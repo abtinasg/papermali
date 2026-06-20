@@ -1,0 +1,16 @@
+﻿feature,mean_abs_shap
+num__leverage_ratio,1.1074
+cat__industry_خودرو و ساخت قطعات,0.8536
+num__log_total_assets,0.5864
+num__net_margin_period_adjusted,0.4491
+num__asset_turnover_period_adjusted,0.3542
+num__current_ratio,0.3204
+num__net_income_growth_period_adjusted,0.2704
+num__financial_expense_to_assets_period_adjusted,0.2442
+num__roa_period_adjusted,0.1771
+num__operating_margin_period_adjusted,0.1277
+num__ocf_to_assets_period_adjusted,0.1157
+num__missingindicator_revenue_growth_period_adjusted,0.0946
+num__revenue_growth_period_adjusted,0.0667
+cat__industry_فلزات اساسی,0.0221
+cat__industry_سایر محصولات کانی غیرفلزی,0.0211

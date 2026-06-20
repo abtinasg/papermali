@@ -1,0 +1,10 @@
+﻿model,method,brier_test
+logistic,uncalibrated,0.12944302992192175
+logistic,platt,0.04016202727989834
+logistic,isotonic,0.056393115331768995
+random_forest,uncalibrated,0.07219724510063535
+random_forest,platt,0.036741929105592465
+random_forest,isotonic,0.03101142700227078
+xgboost,uncalibrated,0.047950901091098785
+xgboost,platt,0.030288269743323326
+xgboost,isotonic,0.04514939337968826

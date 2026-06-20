@@ -1,0 +1,26 @@
+{
+  "logistic": {
+    "penalty": "l2",
+    "C": 0.048546580300052704,
+    "max_iter": 5000
+  },
+  "random_forest": {
+    "n_estimators": 877,
+    "max_depth": 12,
+    "min_samples_split": 7,
+    "min_samples_leaf": 2,
+    "max_features": "log2",
+    "class_weight": "balanced"
+  },
+  "xgboost": {
+    "n_estimators": 599,
+    "learning_rate": 0.06791207765945757,
+    "max_depth": 5,
+    "min_child_weight": 2,
+    "subsample": 0.9238328460293795,
+    "colsample_bytree": 0.7140528931384948,
+    "gamma": 0.8528507558293187,
+    "reg_alpha": 0.0011651829277797847,
+    "reg_lambda": 16.758744665370322
+  }
+}

@@ -1,0 +1,55 @@
+﻿column_name,role,definition,unit_or_format,missing_policy
+row_key,identifier,ticker + fiscal_year; unique row key,,Preserve as supplied; no imputation was applied in this handoff.
+ticker,identifier,TSE/Fara Bourse ticker symbol,,Preserve as supplied; no imputation was applied in this handoff.
+company_name,metadata,Company name,,Preserve as supplied; no imputation was applied in this handoff.
+industry,categorical_feature_candidate,Industry classification text; encoding decision is deferred to modeling,,Preserve as supplied; no imputation was applied in this handoff.
+fiscal_year,time_key,Solar Hijri fiscal year,year,Preserve as supplied; no imputation was applied in this handoff.
+fiscal_year_end,metadata,Fiscal-year-end date as reported,,Preserve as supplied; no imputation was applied in this handoff.
+unit,metadata,Unit of raw financial-statement amounts,,Preserve as supplied; no imputation was applied in this handoff.
+total_assets,raw_feature,Total assets,million IRR,Preserve as supplied; no imputation was applied in this handoff.
+total_liabilities,raw_feature,Total liabilities,million IRR,Preserve as supplied; no imputation was applied in this handoff.
+equity,raw_feature,Total equity,million IRR,Preserve as supplied; no imputation was applied in this handoff.
+registered_capital,raw_feature,Registered capital,million IRR,Preserve as supplied; no imputation was applied in this handoff.
+accumulated_loss,raw_feature,Accumulated loss / retained deficit as standardized,million IRR,Preserve as supplied; no imputation was applied in this handoff.
+current_assets,raw_feature,Current assets,million IRR,Preserve as supplied; no imputation was applied in this handoff.
+current_liabilities,raw_feature,Current liabilities,million IRR,Preserve as supplied; no imputation was applied in this handoff.
+revenue_period_adjusted,raw_feature,Revenue adjusted to the canonical period where required,million IRR,Preserve as supplied; no imputation was applied in this handoff.
+gross_profit_period_adjusted,raw_feature_optional,Gross profit adjusted to the canonical period; material missingness remains,million IRR,Do not fill automatically; handle only inside the modeling pipeline with a documented train-only strategy.
+operating_profit_period_adjusted,raw_feature,Operating profit adjusted to the canonical period,million IRR,Preserve as supplied; no imputation was applied in this handoff.
+net_income_period_adjusted,raw_feature,Net income adjusted to the canonical period,million IRR,Preserve as supplied; no imputation was applied in this handoff.
+operating_cash_flow_period_adjusted,raw_feature_optional,Operating cash flow adjusted to the canonical period; unresolved values remain outside the training-candidate subset,million IRR,Do not fill automatically; handle only inside the modeling pipeline with a documented train-only strategy.
+financial_expense_period_adjusted,raw_feature,Financial expense adjusted to the canonical period; expenses may be negative per source sign convention,million IRR,Preserve as supplied; no imputation was applied in this handoff.
+leverage_ratio,ratio_feature,Total liabilities / total assets,ratio,Preserve as supplied; no imputation was applied in this handoff.
+current_ratio,ratio_feature,Current assets / current liabilities,ratio,Preserve as supplied; no imputation was applied in this handoff.
+roa_period_adjusted,ratio_feature,Period-adjusted net income / total assets,ratio,Preserve as supplied; no imputation was applied in this handoff.
+roe_period_adjusted,ratio_feature,Period-adjusted net income / equity,ratio,Preserve as supplied; no imputation was applied in this handoff.
+equity_ratio,ratio_feature,Equity / total assets,ratio,Preserve as supplied; no imputation was applied in this handoff.
+ocf_to_assets_period_adjusted,ratio_feature_optional,Period-adjusted operating cash flow / total assets,ratio,Do not fill automatically; handle only inside the modeling pipeline with a documented train-only strategy.
+financial_expense_to_assets_period_adjusted,ratio_feature,Period-adjusted financial expense / total assets,ratio,Preserve as supplied; no imputation was applied in this handoff.
+profit_margin_period_adjusted,ratio_feature,Period-adjusted net income / revenue,ratio,Preserve as supplied; no imputation was applied in this handoff.
+operating_margin_period_adjusted,ratio_feature,Period-adjusted operating profit / revenue,ratio,Preserve as supplied; no imputation was applied in this handoff.
+gross_margin_period_adjusted,ratio_feature_optional,Period-adjusted gross profit / revenue; material missingness remains,ratio,Do not fill automatically; handle only inside the modeling pipeline with a documented train-only strategy.
+net_margin_period_adjusted,ratio_feature,Period-adjusted net income / revenue,ratio,Preserve as supplied; no imputation was applied in this handoff.
+financial_expense_to_revenue_period_adjusted,ratio_feature,Period-adjusted financial expense / revenue,ratio,Preserve as supplied; no imputation was applied in this handoff.
+asset_turnover_period_adjusted,ratio_feature,Period-adjusted revenue / total assets,ratio,Preserve as supplied; no imputation was applied in this handoff.
+revenue_growth_period_adjusted,ratio_feature,Period-adjusted year-over-year revenue growth,ratio,Preserve as supplied; no imputation was applied in this handoff.
+net_income_growth_period_adjusted,ratio_feature,Period-adjusted year-over-year net-income growth,ratio,Preserve as supplied; no imputation was applied in this handoff.
+sales_growth_period_adjusted,ratio_feature,Alias retained from source for period-adjusted sales/revenue growth,ratio,Preserve as supplied; no imputation was applied in this handoff.
+accumulated_loss_to_capital_ratio,ratio_feature,Accumulated loss / registered capital,ratio,Preserve as supplied; no imputation was applied in this handoff.
+debt_to_equity,ratio_feature,Total liabilities / equity,ratio,Preserve as supplied; no imputation was applied in this handoff.
+loss_dummy,binary_feature,1 when loss condition is met under source rule; otherwise 0,0/1,Preserve as supplied; no imputation was applied in this handoff.
+equity_negative_dummy,binary_feature,1 when equity is negative; otherwise 0,0/1,Preserve as supplied; no imputation was applied in this handoff.
+distressed_target_reviewed,target,"Reviewed/canonical financial-distress target; 1=distressed, 0=not distressed",0/1,Preserve as supplied; no imputation was applied in this handoff.
+usable_for_model_flag,quality_filter,Existing source flag used to create the training_candidates sheet,0/1,Preserve as supplied; no imputation was applied in this handoff.
+target_status_reviewed,target_metadata,Status of reviewed target construction,,Preserve as supplied; no imputation was applied in this handoff.
+distressed_flag_source_reviewed,target_metadata,Documented source/rule for reviewed target,,Preserve as supplied; no imputation was applied in this handoff.
+data_quality_flag,quality_metadata,Existing data-quality flag from source workbook,,Preserve as supplied; no imputation was applied in this handoff.
+audit_status_clean,quality_metadata,Standardized audit-status classification,,Preserve as supplied; no imputation was applied in this handoff.
+statement_scope_status,quality_metadata,Standardized separate/parent/consolidated scope status,,Preserve as supplied; no imputation was applied in this handoff.
+non_12_month_period_flag,quality_filter,1 when the source period is not a standard 12-month period,0/1,Preserve as supplied; no imputation was applied in this handoff.
+exclusion_flag,quality_filter,Standardized source exclusion flag; not automatically applied in all_rows,0/1,Preserve as supplied; no imputation was applied in this handoff.
+manual_review_required_clean,quality_filter,Standardized manual-review flag,0/1,Preserve as supplied; no imputation was applied in this handoff.
+source_file,provenance,Source workbook/file name when available,,Preserve as supplied; no imputation was applied in this handoff.
+source_url,provenance,Direct source URL when available,,Preserve as supplied; no imputation was applied in this handoff.
+ocf_resolution_status,missingness_metadata,"Observed, pre-listing excluded, source unavailable in Codal, or deferred unresolved",,Preserve as supplied; no imputation was applied in this handoff.
+gross_profit_resolution_status,missingness_metadata,"Observed, pre-listing excluded, or deferred unresolved",,Preserve as supplied; no imputation was applied in this handoff.

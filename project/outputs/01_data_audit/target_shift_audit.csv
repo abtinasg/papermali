@@ -1,0 +1,14 @@
+﻿key,value
+n_candidates,1111.0
+n_built_one_year_ahead,983.0
+n_positive,37.0
+positive_rate,0.03764
+dropped::predictor_last_year_no_next_panel_row,128.0
+dropped::next_year_gap_no_row,0.0
+dropped::next_target_invalid,0.0
+split::dev::n,300.0
+split::dev::positives,27.0
+split::test::n,200.0
+split::test::positives,9.0
+split::unused_no_positive_post_test::n,483.0
+split::unused_no_positive_post_test::positives,1.0

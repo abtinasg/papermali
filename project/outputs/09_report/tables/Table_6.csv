@@ -1,0 +1,10 @@
+﻿model,method,brier_test
+logistic,uncalibrated,0.1294
+logistic,platt,0.0402
+logistic,isotonic,0.0564
+random_forest,uncalibrated,0.0722
+random_forest,platt,0.0367
+random_forest,isotonic,0.031
+xgboost,uncalibrated,0.048
+xgboost,platt,0.0303
+xgboost,isotonic,0.0451

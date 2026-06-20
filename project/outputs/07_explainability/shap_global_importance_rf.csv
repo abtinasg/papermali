@@ -1,0 +1,49 @@
+﻿feature,mean_abs_shap
+num__leverage_ratio,0.06636932257245781
+cat__industry_خودرو و ساخت قطعات,0.054580139186369836
+num__net_margin_period_adjusted,0.040017300850872024
+num__log_total_assets,0.030426905461313426
+num__roa_period_adjusted,0.029132845471188683
+num__financial_expense_to_assets_period_adjusted,0.028717780860257416
+num__operating_margin_period_adjusted,0.027907148454279787
+num__net_income_growth_period_adjusted,0.027055959071673324
+num__asset_turnover_period_adjusted,0.025176732466187707
+num__current_ratio,0.02109189248284899
+num__revenue_growth_period_adjusted,0.01829917010776033
+num__ocf_to_assets_period_adjusted,0.014040720761632099
+cat__industry_نامشخص در فایل ارسالی,0.00884689792980847
+num__missingindicator_revenue_growth_period_adjusted,0.006009907649293085
+num__missingindicator_net_income_growth_period_adjusted,0.005197374032794158
+cat__industry_محصولات شیمیایی,0.0033434972244949478
+cat__industry_سیمان، آهک و گچ,0.0021573969953688067
+cat__industry_سایر محصولات کانی غیرفلزی,0.0012485153262418534
+cat__industry_محصولات غذایی و آشامیدنی به جز قند و شکر,0.0010663967565932486
+cat__industry_محصولات غذایی و آشامیدنی,0.0008275574539240107
+cat__industry_کانی غیرفلزی / نسوز,0.0006889926040189892
+cat__industry_Unknown,0.0006566163562852128
+cat__industry_فلزات اساسی,0.0005559502139076477
+cat__industry_زراعت و خدمات وابسته,0.0004367745701943836
+cat__industry_محصولات غذایی / خوراک دام,0.000358450122058249
+cat__industry_محصولات شیمیایی / هلدینگ پتروشیمی,0.00033884686342063416
+cat__industry_مواد و محصولات دارویی,0.0002872115031085983
+cat__industry_انبوه‌سازی، املاک و مستغلات,0.00019336384907624402
+cat__industry_کاشی و سرامیک / محصولات کانی غیرفلزی,0.00017709749584429317
+cat__industry_استخراج کانه‌های فلزی / سنگ آهن,0.0001536976705038017
+cat__industry_شیشه و محصولات شیشه‌ای,0.00015357595518139725
+cat__industry_استخراج کانه‌های فلزی / معادن,0.00014418892115455656
+cat__industry_محصولات غذایی,0.0001386381329165372
+cat__industry_ماشین‌آلات و تجهیزات / دستگاه‌های برقی,0.00013832675748940896
+cat__industry_رایانه و فعالیت‌های وابسته به آن / خدمات پرداخت,0.00011273709500128416
+cat__industry_ماشین‌آلات و تجهیزات / تجهیزات برقی,0.00011239409807954371
+cat__industry_مواد و محصولات دارویی / هلدینگ دارویی,0.00010680842449764569
+cat__industry_فرآورده‌های نفتی، کک و سوخت هسته‌ای,0.00010468519022723376
+cat__industry_سرمایه‌گذاری / هلدینگ معدنی و فلزی,7.071662666300978e-05
+num__missingindicator_net_margin_period_adjusted,5.5292776880737914e-05
+num__missingindicator_operating_margin_period_adjusted,5.4456914004128495e-05
+cat__industry_حمل و نقل,3.0042570755963492e-05
+cat__industry_رایانه و فعالیت‌های وابسته,0.0
+cat__industry_سیمان، آهک و گچ / هلدینگ سیمانی,0.0
+cat__industry_سرمایه‌گذاری/هلدینگ معدنی,0.0
+cat__industry_مخابرات,0.0
+cat__industry_سرمایه‌گذاری / مالی,0.0
+cat__industry_حمل و نقل آبی,0.0

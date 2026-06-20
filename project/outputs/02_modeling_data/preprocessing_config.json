@@ -1,0 +1,9 @@
+{
+  "numeric_imputation": "median (train-fold only)",
+  "missing_indicator": true,
+  "categorical_impute_value": "Unknown",
+  "categorical_encoding": "one_hot (handle_unknown=ignore)",
+  "logistic_scaler": "RobustScaler",
+  "tree_scaler": "none",
+  "fit_scope": "train fold only — no validation/test statistics used"
+}

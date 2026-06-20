@@ -1,0 +1,21 @@
+﻿feature,odds_ratio,direction,is_industry
+cat__industry_خودرو و ساخت قطعات,1.7842,increases_risk,True
+num__log_total_assets,0.6137,decreases_risk,False
+num__roa_period_adjusted,0.6286,decreases_risk,False
+num__leverage_ratio,1.4347,increases_risk,False
+cat__industry_نامشخص در فایل ارسالی,0.7461,decreases_risk,True
+num__financial_expense_to_assets_period_adjusted,0.7752,decreases_risk,False
+num__ocf_to_assets_period_adjusted,0.7913,decreases_risk,False
+cat__industry_فلزات اساسی,1.1639,increases_risk,True
+num__current_ratio,0.8806,decreases_risk,False
+num__net_income_growth_period_adjusted,0.887,decreases_risk,False
+cat__industry_محصولات شیمیایی,0.8881,decreases_risk,True
+cat__industry_مواد و محصولات دارویی,0.9065,decreases_risk,True
+num__missingindicator_revenue_growth_period_adjusted,1.0929,increases_risk,False
+num__missingindicator_net_income_growth_period_adjusted,1.0929,increases_risk,False
+cat__industry_محصولات غذایی و آشامیدنی,1.0828,increases_risk,True
+num__net_margin_period_adjusted,1.0788,increases_risk,False
+cat__industry_انبوه‌سازی، املاک و مستغلات,1.0777,increases_risk,True
+num__revenue_growth_period_adjusted,1.0721,increases_risk,False
+cat__industry_سیمان، آهک و گچ,0.9335,decreases_risk,True
+cat__industry_سایر محصولات کانی غیرفلزی,1.0708,increases_risk,True

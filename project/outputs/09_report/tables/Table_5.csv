@@ -1,0 +1,13 @@
+﻿variant,model,cv_mean_pr_auc,test_pr_auc,test_recall,test_precision,test_f1,test_brier
+A_main,logistic,0.3874,0.2628,0.4444,0.2667,0.3333,0.1294
+B_extended,logistic,0.536,0.393,0.7778,0.28,0.4118,0.1144
+A_winsorized,logistic,0.3548,0.2642,0.3333,0.3,0.3158,0.1274
+A_smote,logistic,0.3665,0.2646,0.4444,0.25,0.32,0.1263
+B_drop_near_definition,logistic,0.3475,0.3771,0.6667,0.2727,0.3871,0.125
+same_year_classification,logistic,0.48,0.2767,0.5556,0.4545,0.5,0.0958
+A_main,xgboost,0.5011,0.6278,0.6667,0.5,0.5714,0.048
+B_extended,xgboost,0.4696,0.5822,0.8889,0.2581,0.4,0.0621
+A_winsorized,xgboost,0.4869,0.6358,0.6667,0.5,0.5714,0.0471
+A_smote,xgboost,0.3871,0.4952,0.8889,0.3333,0.4848,0.0523
+B_drop_near_definition,xgboost,0.4117,0.6842,0.6667,0.5455,0.6,0.0451
+same_year_classification,xgboost,0.658,0.5637,0.6667,0.3529,0.4615,0.0552

@@ -1,0 +1,32 @@
+{
+  "numeric": [
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "operating_margin_period_adjusted",
+    "net_margin_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "revenue_growth_period_adjusted",
+    "net_income_growth_period_adjusted",
+    "log_total_assets"
+  ],
+  "categorical": [
+    "industry"
+  ],
+  "all": [
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "operating_margin_period_adjusted",
+    "net_margin_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "revenue_growth_period_adjusted",
+    "net_income_growth_period_adjusted",
+    "log_total_assets",
+    "industry"
+  ]
+}

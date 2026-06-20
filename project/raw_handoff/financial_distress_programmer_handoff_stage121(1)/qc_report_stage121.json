@@ -1,0 +1,203 @@
+{
+  "stage": "Stage121 programmer handoff with documented limitations",
+  "created_from": "financial_statements_article_panel_clean_completion_worklist_stage120_working_batch2_9of10_ocf_completed.xlsx",
+  "source_sha256": "e85e796ad12267666ed72b12dd99a0c706e30e0b14ce8b021f4f266f4c9e2825",
+  "source_sheet": "modeling_target_ready_1392_1402",
+  "source_dimensions": {
+    "rows": 1331,
+    "columns": 265
+  },
+  "handoff_dimensions": {
+    "all_rows": {
+      "rows": 1331,
+      "columns": 54
+    },
+    "training_candidates": {
+      "rows": 1111,
+      "columns": 54
+    }
+  },
+  "structural_checks": {
+    "zip_test_bad_member": null,
+    "xml_parse_error_count": 0,
+    "xml_parse_errors": [],
+    "excel_error_cell_count_key_sheets": 0,
+    "excel_error_cells_key_sheets": [],
+    "unique_key_count": 1331,
+    "duplicate_key_count": 0,
+    "duplicate_keys": [],
+    "missing_key_count": 0,
+    "year_counts": {
+      "1392": 57,
+      "1393": 121,
+      "1394": 124,
+      "1395": 125,
+      "1396": 127,
+      "1397": 128,
+      "1398": 129,
+      "1399": 130,
+      "1400": 130,
+      "1401": 130,
+      "1402": 130
+    }
+  },
+  "target_checks": {
+    "known_target_rows": 1312,
+    "missing_target_rows": 19,
+    "training_candidate_rows": 1111,
+    "training_class_0": 1067,
+    "training_class_1": 44,
+    "training_positive_rate": 0.039603960396039604
+  },
+  "accounting_identity": {
+    "rows_checked": 1312,
+    "exact_matches": 1311,
+    "rounding_tolerance_matches_abs_diff_le_1_million_irr": 1,
+    "failures": []
+  },
+  "ratio_recalculation_checks": {
+    "leverage_ratio": {
+      "checked": 1312,
+      "mismatches": 0,
+      "max_abs_error": 4.440892098500626e-16,
+      "examples": []
+    },
+    "current_ratio": {
+      "checked": 1312,
+      "mismatches": 0,
+      "max_abs_error": 5.329070518200751e-15,
+      "examples": []
+    },
+    "equity_ratio": {
+      "checked": 1312,
+      "mismatches": 0,
+      "max_abs_error": 5.551115123125783e-17,
+      "examples": []
+    },
+    "roa_period_adjusted": {
+      "checked": 1312,
+      "mismatches": 0,
+      "max_abs_error": 0.0,
+      "examples": []
+    },
+    "ocf_to_assets_period_adjusted": {
+      "checked": 1273,
+      "mismatches": 0,
+      "max_abs_error": 0.0,
+      "examples": []
+    },
+    "financial_expense_to_assets_period_adjusted": {
+      "checked": 1311,
+      "mismatches": 0,
+      "max_abs_error": 0.0,
+      "examples": []
+    },
+    "asset_turnover_period_adjusted": {
+      "checked": 1312,
+      "mismatches": 0,
+      "max_abs_error": 0.0,
+      "examples": []
+    }
+  },
+  "stage120_ocf_zero_checks": [
+    {
+      "row_key": "تاپیکو|1393",
+      "operating_cash_flow_period_adjusted": 0.0,
+      "ocf_to_assets_period_adjusted": 0.0,
+      "pass": true
+    },
+    {
+      "row_key": "تاپیکو|1394",
+      "operating_cash_flow_period_adjusted": 0.0,
+      "ocf_to_assets_period_adjusted": 0.0,
+      "pass": true
+    },
+    {
+      "row_key": "تپمپی|1393",
+      "operating_cash_flow_period_adjusted": 0.0,
+      "ocf_to_assets_period_adjusted": 0.0,
+      "pass": true
+    },
+    {
+      "row_key": "ثشرق|1392",
+      "operating_cash_flow_period_adjusted": 0.0,
+      "ocf_to_assets_period_adjusted": 0.0,
+      "pass": true
+    },
+    {
+      "row_key": "ثشرق|1393",
+      "operating_cash_flow_period_adjusted": 0.0,
+      "ocf_to_assets_period_adjusted": 0.0,
+      "pass": true
+    },
+    {
+      "row_key": "ثشرق|1394",
+      "operating_cash_flow_period_adjusted": 0.0,
+      "ocf_to_assets_period_adjusted": 0.0,
+      "pass": true
+    },
+    {
+      "row_key": "ثنوسا|1392",
+      "operating_cash_flow_period_adjusted": 0.0,
+      "ocf_to_assets_period_adjusted": 0.0,
+      "pass": true
+    },
+    {
+      "row_key": "ثنوسا|1393",
+      "operating_cash_flow_period_adjusted": 0.0,
+      "ocf_to_assets_period_adjusted": 0.0,
+      "pass": true
+    },
+    {
+      "row_key": "ثنوسا|1394",
+      "operating_cash_flow_period_adjusted": 0.0,
+      "ocf_to_assets_period_adjusted": 0.0,
+      "pass": true
+    }
+  ],
+  "khobahman_1392_source_unavailable_check": {
+    "row_key": "خبهمن|1392",
+    "operating_cash_flow_period_adjusted": null,
+    "ocf_resolution_status": "source_unavailable_codal",
+    "pass": true
+  },
+  "deferred_limitations": [
+    {
+      "item": "operating_cash_flow",
+      "status": "deferred",
+      "count_in_scope_missing": 39,
+      "detail": "1 row (خبهمن 1392) documented as source_unavailable_codal; 38 other in-scope rows remain deferred.",
+      "modeling_implication": "The provided training_candidates subset currently has no missing OCF values, but all_rows retains unresolved records."
+    },
+    {
+      "item": "gross_profit",
+      "status": "deferred",
+      "count_in_scope_missing": 145,
+      "detail": "No zero, estimate, or forced not_applicable classification was inserted.",
+      "modeling_implication": "Gross-profit-based features have material missingness and should be omitted or handled within train-only preprocessing."
+    },
+    {
+      "item": "provenance",
+      "status": "deferred",
+      "count": 13,
+      "detail": "Thirteen rows retain incomplete source/provenance information.",
+      "modeling_implication": "Do not claim full row-level source traceability for every observation."
+    },
+    {
+      "item": "financial_outlier_source_checks",
+      "status": "unchecked_deferred",
+      "count": 99,
+      "detail": "Ninety-nine unusual financial changes were not reconciled against original sources.",
+      "modeling_implication": "Robustness checks and outlier diagnostics remain necessary before publication."
+    }
+  ],
+  "not_performed": [
+    "No missing-value imputation",
+    "No scaling or normalization",
+    "No winsorization",
+    "No train/test split",
+    "No lag/lead target construction",
+    "No model training",
+    "No SHAP analysis"
+  ]
+}

@@ -1,0 +1,49 @@
+﻿feature,mean_abs_shap
+num__leverage_ratio,1.1073992
+cat__industry_خودرو و ساخت قطعات,0.8536276
+num__log_total_assets,0.5864269
+num__net_margin_period_adjusted,0.4491077
+num__asset_turnover_period_adjusted,0.35419735
+num__current_ratio,0.32037318
+num__net_income_growth_period_adjusted,0.2703735
+num__financial_expense_to_assets_period_adjusted,0.24424146
+num__roa_period_adjusted,0.17713612
+num__operating_margin_period_adjusted,0.12769054
+num__ocf_to_assets_period_adjusted,0.11569851
+num__missingindicator_revenue_growth_period_adjusted,0.0945892
+num__revenue_growth_period_adjusted,0.06672049
+cat__industry_فلزات اساسی,0.022061277
+cat__industry_سایر محصولات کانی غیرفلزی,0.021078348
+num__missingindicator_net_income_growth_period_adjusted,0.01682645
+cat__industry_سیمان، آهک و گچ,0.01054068
+cat__industry_محصولات شیمیایی,0.0050321943
+cat__industry_مواد و محصولات دارویی,0.0032836392
+cat__industry_محصولات غذایی و آشامیدنی,0.0025331045
+cat__industry_نامشخص در فایل ارسالی,0.002396397
+cat__industry_کانی غیرفلزی / نسوز,0.00045328273
+cat__industry_رایانه و فعالیت‌های وابسته,0.0
+cat__industry_رایانه و فعالیت‌های وابسته به آن / خدمات پرداخت,0.0
+cat__industry_کاشی و سرامیک / محصولات کانی غیرفلزی,0.0
+num__missingindicator_operating_margin_period_adjusted,0.0
+cat__industry_مواد و محصولات دارویی / هلدینگ دارویی,0.0
+num__missingindicator_net_margin_period_adjusted,0.0
+cat__industry_مخابرات,0.0
+cat__industry_محصولات غذایی و آشامیدنی به جز قند و شکر,0.0
+cat__industry_Unknown,0.0
+cat__industry_محصولات غذایی / خوراک دام,0.0
+cat__industry_محصولات غذایی,0.0
+cat__industry_محصولات شیمیایی / هلدینگ پتروشیمی,0.0
+cat__industry_استخراج کانه‌های فلزی / سنگ آهن,0.0
+cat__industry_ماشین‌آلات و تجهیزات / دستگاه‌های برقی,0.0
+cat__industry_ماشین‌آلات و تجهیزات / تجهیزات برقی,0.0
+cat__industry_استخراج کانه‌های فلزی / معادن,0.0
+cat__industry_فرآورده‌های نفتی، کک و سوخت هسته‌ای,0.0
+cat__industry_شیشه و محصولات شیشه‌ای,0.0
+cat__industry_سیمان، آهک و گچ / هلدینگ سیمانی,0.0
+cat__industry_انبوه‌سازی، املاک و مستغلات,0.0
+cat__industry_سرمایه‌گذاری/هلدینگ معدنی,0.0
+cat__industry_سرمایه‌گذاری / هلدینگ معدنی و فلزی,0.0
+cat__industry_سرمایه‌گذاری / مالی,0.0
+cat__industry_حمل و نقل,0.0
+cat__industry_حمل و نقل آبی,0.0
+cat__industry_زراعت و خدمات وابسته,0.0

@@ -1,0 +1,37 @@
+======================================================================
+Financial Distress Prediction — Stage121 pipeline
+======================================================================
+[02] one-year-ahead dataset: 983 rows, 37 positives (3.76%)
+[01] data audit written -> /Users/abtin/Desktop/papermali/project/outputs/01_data_audit
+   dev: 300 rows / 27 pos | test: 200 rows / 9 pos
+[tune] logistic ...
+   best CV PR-AUC=0.3874
+[tune] random_forest ...
+   best CV PR-AUC=0.4692
+[tune] xgboost ...
+   best CV PR-AUC=0.5912
+[04] final models + thresholds saved -> /Users/abtin/Desktop/papermali/project/outputs/04_models
+[06] seed stability (30 seeds) saved -> /Users/abtin/Desktop/papermali/project/outputs/06_metrics
+[05] test predictions saved -> /Users/abtin/Desktop/papermali/project/outputs/05_predictions
+[06] test metrics + bootstrap CI + threshold analysis saved -> /Users/abtin/Desktop/papermali/project/outputs/06_metrics
+[06] calibration metrics saved -> /Users/abtin/Desktop/papermali/project/outputs/06_metrics
+[06] model_comparison_table.xlsx saved
+[07] logistic coefficients + odds ratios saved
+[07] tree feature importances saved
+[07] SHAP global importance, values, and plots saved
+[06] robustness results saved -> /Users/abtin/Desktop/papermali/project/outputs/06_metrics
+[08] base figures saved
+[09] technical report saved -> /Users/abtin/Desktop/papermali/project/outputs/09_report
+[09] Persian article drafts saved -> /Users/abtin/Desktop/papermali/project/outputs/09_report
+[09] numbered article tables -> /Users/abtin/Desktop/papermali/project/outputs/09_report/article_tables.xlsx
+[09] figure index (32 figures) -> /Users/abtin/Desktop/papermali/project/outputs/09_report/figure_index_fa.csv
+[09] technical report PDF -> /Users/abtin/Desktop/papermali/project/outputs/09_report/technical_modeling_report.pdf
+[09] technical report DOCX -> /Users/abtin/Desktop/papermali/project/outputs/09_report/technical_modeling_report.docx
+[09] Persian article DOCX (methods + results) saved
+[09] full Persian academic article -> /Users/abtin/Desktop/papermali/project/outputs/09_report/article_full_draft_fa.docx
+[09] comprehensive outputs report -> /Users/abtin/Desktop/papermali/project/outputs/09_report/full_outputs_report_fa.docx (+ .md)
+[03] analysis notebook -> /Users/abtin/Desktop/papermali/project/outputs/03_code/analysis_display.ipynb
+[03] runnable code copied -> /Users/abtin/Desktop/papermali/project/outputs/03_code
+[10] reproducibility artifacts saved -> /Users/abtin/Desktop/papermali/project/outputs/10_reproducibility
+
+DONE in 175.0s. Outputs in outputs/

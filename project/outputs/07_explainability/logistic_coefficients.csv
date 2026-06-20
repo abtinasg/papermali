@@ -1,0 +1,49 @@
+﻿feature,coefficient,odds_ratio,direction,is_industry
+cat__industry_خودرو و ساخت قطعات,0.5789914188051211,1.7842379740814809,increases_risk,True
+num__log_total_assets,-0.48827865164449724,0.6136818457598878,decreases_risk,False
+num__roa_period_adjusted,-0.4643236817553952,0.6285600681102472,decreases_risk,False
+num__leverage_ratio,0.3609247169278564,1.4346554515431098,increases_risk,False
+cat__industry_نامشخص در فایل ارسالی,-0.29288260594906923,0.7461097243992041,decreases_risk,True
+num__financial_expense_to_assets_period_adjusted,-0.2546733652503475,0.7751696539599164,decreases_risk,False
+num__ocf_to_assets_period_adjusted,-0.23403113148654936,0.7913371800093345,decreases_risk,False
+cat__industry_فلزات اساسی,0.15173991376722673,1.1638574937531823,increases_risk,True
+num__current_ratio,-0.12716855381040756,0.8805852340909758,decreases_risk,False
+num__net_income_growth_period_adjusted,-0.1199198686098544,0.8869915097322519,decreases_risk,False
+cat__industry_محصولات شیمیایی,-0.11862037117486125,0.8881449021769608,decreases_risk,True
+cat__industry_مواد و محصولات دارویی,-0.09814613198862368,0.9065164230267037,decreases_risk,True
+num__missingindicator_revenue_growth_period_adjusted,0.08881666819452708,1.0928802782444773,increases_risk,False
+num__missingindicator_net_income_growth_period_adjusted,0.08881666819452708,1.0928802782444773,increases_risk,False
+cat__industry_محصولات غذایی و آشامیدنی,0.07951705729703865,1.0827640283995792,increases_risk,True
+num__net_margin_period_adjusted,0.07589380138906372,1.078847995914789,increases_risk,False
+cat__industry_انبوه‌سازی، املاک و مستغلات,0.07479704621035807,1.0776654124090665,increases_risk,True
+num__revenue_growth_period_adjusted,0.06963797693905002,1.0721199788328992,increases_risk,False
+cat__industry_سیمان، آهک و گچ,-0.06884271770180962,0.9334734873882,decreases_risk,True
+cat__industry_سایر محصولات کانی غیرفلزی,0.0684005842847064,1.070794165891281,increases_risk,True
+num__operating_margin_period_adjusted,0.06703543268492305,1.0693333668556129,increases_risk,False
+cat__industry_زراعت و خدمات وابسته,-0.05765472162739365,0.9439758256110649,decreases_risk,True
+cat__industry_محصولات غذایی / خوراک دام,-0.055754568830928795,0.9457712291462149,decreases_risk,True
+num__asset_turnover_period_adjusted,0.04621909556439314,1.0473038454490895,increases_risk,False
+cat__industry_محصولات غذایی و آشامیدنی به جز قند و شکر,0.04110789713768408,1.041964524470289,increases_risk,True
+cat__industry_Unknown,-0.03846807082970279,0.9622624284902729,decreases_risk,True
+cat__industry_کاشی و سرامیک / محصولات کانی غیرفلزی,-0.03536489965913873,0.9652531314485239,decreases_risk,True
+cat__industry_محصولات غذایی,-0.03522760140028708,0.9653856681211419,decreases_risk,True
+cat__industry_شیشه و محصولات شیشه‌ای,-0.03117785722337261,0.9693031601753654,decreases_risk,True
+cat__industry_مواد و محصولات دارویی / هلدینگ دارویی,-0.026259281375350167,0.9740824954145638,decreases_risk,True
+cat__industry_ماشین‌آلات و تجهیزات / تجهیزات برقی,-0.025946748217838454,0.9743869760702045,decreases_risk,True
+cat__industry_کانی غیرفلزی / نسوز,0.025700574627265764,1.0260336819563844,increases_risk,True
+cat__industry_رایانه و فعالیت‌های وابسته به آن / خدمات پرداخت,-0.025343336694520553,0.9749751098252335,decreases_risk,True
+cat__industry_ماشین‌آلات و تجهیزات / دستگاه‌های برقی,-0.023030570245578308,0.9772326090757945,decreases_risk,True
+cat__industry_حمل و نقل,-0.022017807340162548,0.9782228153496836,decreases_risk,True
+cat__industry_سرمایه‌گذاری / مالی,-0.013528884938694141,0.9865622191169475,decreases_risk,True
+cat__industry_استخراج کانه‌های فلزی / سنگ آهن,-0.010359660886854279,0.9896938155746758,decreases_risk,True
+num__missingindicator_net_margin_period_adjusted,-0.009667070424808103,0.9903795054954291,decreases_risk,False
+num__missingindicator_operating_margin_period_adjusted,-0.009667070424808103,0.9903795054954291,decreases_risk,False
+cat__industry_محصولات شیمیایی / هلدینگ پتروشیمی,-0.009521157347011236,0.9905240253606756,decreases_risk,True
+cat__industry_فرآورده‌های نفتی، کک و سوخت هسته‌ای,-0.007656615779275697,0.9923726214363578,decreases_risk,True
+cat__industry_سرمایه‌گذاری / هلدینگ معدنی و فلزی,-0.006246513599074972,0.9937729553083058,decreases_risk,True
+cat__industry_حمل و نقل آبی,-0.005132877068902243,0.994880273634664,decreases_risk,True
+cat__industry_سرمایه‌گذاری/هلدینگ معدنی,-0.004919353521733901,0.9950927266807552,decreases_risk,True
+cat__industry_سیمان، آهک و گچ / هلدینگ سیمانی,-0.004399054323134827,0.9956106073437428,decreases_risk,True
+cat__industry_استخراج کانه‌های فلزی / معادن,-0.002727507831850664,0.9972762084381495,decreases_risk,True
+cat__industry_مخابرات,-0.001678469889603784,0.9983229379531973,decreases_risk,True
+cat__industry_رایانه و فعالیت‌های وابسته,-0.0009556370585159731,0.999044819417158,decreases_risk,True

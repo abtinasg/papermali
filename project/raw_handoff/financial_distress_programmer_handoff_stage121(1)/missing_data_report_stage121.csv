@@ -1,0 +1,55 @@
+﻿column_name,role,all_rows_missing_count,all_rows_missing_percent,training_rows_missing_count,training_rows_missing_percent,recommended_action
+row_key,identifier,0,0.0,0,0.0,No action required before coding.
+ticker,identifier,0,0.0,0,0.0,No action required before coding.
+company_name,metadata,7,0.005259203606311044,7,0.0063006300630063005,Metadata missingness does not imply a zero financial value.
+industry,categorical_feature_candidate,29,0.021788129226145755,29,0.026102610261026102,No action required before coding.
+fiscal_year,time_key,0,0.0,0,0.0,No action required before coding.
+fiscal_year_end,metadata,4,0.003005259203606311,0,0.0,Metadata missingness does not imply a zero financial value.
+unit,metadata,0,0.0,0,0.0,No action required before coding.
+total_assets,raw_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+total_liabilities,raw_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+equity,raw_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+registered_capital,raw_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+accumulated_loss,raw_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+current_assets,raw_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+current_liabilities,raw_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+revenue_period_adjusted,raw_feature,15,0.011269722013523666,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+gross_profit_period_adjusted,raw_feature_optional,163,0.12246431254695718,118,0.10621062106210621,Deferred by user; programmer should omit or handle missing values inside training folds only.
+operating_profit_period_adjusted,raw_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+net_income_period_adjusted,raw_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+operating_cash_flow_period_adjusted,raw_feature_optional,58,0.04357625845229151,0,0.0,Some all_rows values remain unresolved; training_candidates currently has no OCF missing values.
+financial_expense_period_adjusted,raw_feature,20,0.015026296018031555,1,0.0009000900090009,Preserve missingness; use a documented train-only imputation/drop strategy.
+leverage_ratio,ratio_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+current_ratio,ratio_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+roa_period_adjusted,ratio_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+roe_period_adjusted,ratio_feature,20,0.015026296018031555,1,0.0009000900090009,Preserve missingness; use a documented train-only imputation/drop strategy.
+equity_ratio,ratio_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+ocf_to_assets_period_adjusted,ratio_feature_optional,58,0.04357625845229151,0,0.0,Some all_rows values remain unresolved; training_candidates currently has no OCF missing values.
+financial_expense_to_assets_period_adjusted,ratio_feature,20,0.015026296018031555,1,0.0009000900090009,Preserve missingness; use a documented train-only imputation/drop strategy.
+profit_margin_period_adjusted,ratio_feature,31,0.02329075882794891,12,0.010801080108010801,Preserve missingness; use a documented train-only imputation/drop strategy.
+operating_margin_period_adjusted,ratio_feature,31,0.02329075882794891,12,0.010801080108010801,Preserve missingness; use a documented train-only imputation/drop strategy.
+gross_margin_period_adjusted,ratio_feature_optional,166,0.1247182569496619,121,0.10891089108910891,Deferred by user; programmer should omit or handle missing values inside training folds only.
+net_margin_period_adjusted,ratio_feature,31,0.02329075882794891,12,0.010801080108010801,Preserve missingness; use a documented train-only imputation/drop strategy.
+financial_expense_to_revenue_period_adjusted,ratio_feature,32,0.02404207362885049,13,0.011701170117011701,Preserve missingness; use a documented train-only imputation/drop strategy.
+asset_turnover_period_adjusted,ratio_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+revenue_growth_period_adjusted,ratio_feature,158,0.11870773854244929,97,0.08730873087308731,Preserve missingness; use a documented train-only imputation/drop strategy.
+net_income_growth_period_adjusted,ratio_feature,151,0.11344853493613824,86,0.0774077407740774,Preserve missingness; use a documented train-only imputation/drop strategy.
+sales_growth_period_adjusted,ratio_feature,158,0.11870773854244929,97,0.08730873087308731,Preserve missingness; use a documented train-only imputation/drop strategy.
+accumulated_loss_to_capital_ratio,ratio_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+debt_to_equity,ratio_feature,19,0.014274981217129978,0,0.0,Preserve missingness; use a documented train-only imputation/drop strategy.
+loss_dummy,binary_feature,19,0.014274981217129978,0,0.0,No action required before coding.
+equity_negative_dummy,binary_feature,19,0.014274981217129978,0,0.0,No action required before coding.
+distressed_target_reviewed,target,19,0.014274981217129978,0,0.0,No action required before coding.
+usable_for_model_flag,quality_filter,0,0.0,0,0.0,No action required before coding.
+target_status_reviewed,target_metadata,0,0.0,0,0.0,No action required before coding.
+distressed_flag_source_reviewed,target_metadata,0,0.0,0,0.0,No action required before coding.
+data_quality_flag,quality_metadata,715,0.5371900826446281,534,0.48064806480648065,Metadata missingness does not imply a zero financial value.
+audit_status_clean,quality_metadata,0,0.0,0,0.0,No action required before coding.
+statement_scope_status,quality_metadata,0,0.0,0,0.0,No action required before coding.
+non_12_month_period_flag,quality_filter,0,0.0,0,0.0,No action required before coding.
+exclusion_flag,quality_filter,0,0.0,0,0.0,No action required before coding.
+manual_review_required_clean,quality_filter,0,0.0,0,0.0,No action required before coding.
+source_file,provenance,28,0.021036814425244178,11,0.009900990099009901,Metadata missingness does not imply a zero financial value.
+source_url,provenance,1316,0.9887302779864763,1105,0.9945994599459946,Metadata missingness does not imply a zero financial value.
+ocf_resolution_status,missingness_metadata,0,0.0,0,0.0,No action required before coding.
+gross_profit_resolution_status,missingness_metadata,0,0.0,0,0.0,No action required before coding.

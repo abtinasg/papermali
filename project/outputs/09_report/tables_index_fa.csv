@@ -1,0 +1,9 @@
+﻿table,caption_fa,source
+Table_1,جدول ۱: معیارهای مجموعهٔ آزمون سه مدل در آستانهٔ بهینهٔ مبتنی بر اعتبارسنجی,06_metrics/test_metrics.csv
+Table_2,جدول ۲: معیارهای اعتبارسنجی پنجرهٔ گسترش‌یابنده به تفکیک fold,06_metrics/cv_metrics_by_fold.csv
+Table_3,جدول ۳: بازهٔ اطمینان ۹۵٪ با bootstrap خوشه‌ای بر مبنای شرکت (آزمون),06_metrics/test_metrics_bootstrap_ci.csv
+Table_4,جدول ۴: پایداری معیارهای آزمون در ۳۰ seed (RF و XGBoost),06_metrics/seed_stability_summary.csv
+Table_5,جدول ۵: تحلیل‌های استحکام (جدا از مدل اصلی),06_metrics/robustness_results.csv
+Table_6,جدول ۶: کالیبراسیون احتمال (Brier روی آزمون),06_metrics/calibration_metrics.csv
+Table_7,جدول ۷: اهمیت سراسری SHAP — مدل XGBoost (آزمون),07_explainability/shap_global_importance_xgb.csv
+Table_8,جدول ۸: نسبت بخت و جهت اثر — رگرسیون لجستیک,07_explainability/logistic_odds_ratios.csv
