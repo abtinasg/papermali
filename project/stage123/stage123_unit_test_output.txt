@@ -1,0 +1,12 @@
+tests/test_stage123.py::test_nonblocking_article141_only PASSED          [  9%]
+tests/test_stage123.py::test_quantitative_criterion_all_missing_fails PASSED [ 18%]
+tests/test_stage123.py::test_target_missing_not_zero_roundtrip PASSED    [ 27%]
+tests/test_stage123.py::test_predictor_eligibility_independent_of_target_t PASSED [ 36%]
+tests/test_stage123.py::test_exact_one_year_pairing PASSED               [ 45%]
+tests/test_stage123.py::test_no_duplicate_pairs PASSED                   [ 54%]
+tests/test_stage123.py::test_statement_scope_user_confirmation PASSED    [ 63%]
+tests/test_stage123.py::test_source_provenance_unchanged PASSED          [ 72%]
+tests/test_stage123.py::test_manual_company_mapping_main_and_expanded PASSED [ 81%]
+tests/test_stage123.py::test_no_future_columns_in_predictor_manifest PASSED [ 90%]
+tests/test_stage123.py::test_independent_qc_overall_pass PASSED          [100%]
+============================== 11 passed in 2.07s ==============================

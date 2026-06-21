@@ -1,10 +1,10 @@
 ﻿change,detail
-statement_scope_corrected,"95 rows: ['possible_consolidated_statement', 'statement_scope_unknown'] -> annual_separate_company_user_confirmed (basis: explicit_data_owner_confirmation)"
-rows_re_eligible_main,84 rows re-eligible (main) due to correction
-rows_re_eligible_expanded,84 rows re-eligible (expanded)
-pairs_main_before_after,"{'before': 1011, 'after': 1085, 'new_pairs': 74}"
-pairs_expanded_before_after,"{'before': 1057, 'after': 1131, 'new_pairs': 74}"
-company_decision_finalized,"main excludes 9 tickers ['برکت', 'تاپیکو', 'سفارس', 'فارس', 'ومعادن', 'وملی', 'وکغدیر', 'پارسان', 'کروی']; expanded excludes 4 financials ['ومعادن', 'وملی', 'وکغدیر', 'کروی']"
-pair_eligibility_formula_fixed,pair_final_eligible no longer depends on year-t target
-leakage_manifest_regrouped,prohibited_leakage / near_target_predictor / allowed_t_predictor
-target_unchanged,"FD_target_main carried from Stage122: {'1': 98, '0': 1205, 'missing': 28}"
+statement_scope_corrected,95 rows possible_consolidated/unknown -> annual_separate_company_user_confirmed (explicit_data_owner_confirmation)
+rows_re_eligible,"{'main': 84, 'expanded': 84}"
+pairs_main_before_after,"{'before': 1011, 'after': 1085}"
+pairs_expanded_before_after,"{'before': 1057, 'after': 1131}"
+company_mapping_explicit,main excludes 9; expanded excludes 4 financials; version-controlled
+pair_eligibility_independent_of_target_t,fixed
+leakage_3_class,prohibited_leakage / allowed_t_predictor / near_target_predictor
+target_unchanged,"{'1': 98, '0': 1205, 'missing': 28}"
+independent_qc_overall_pass,True

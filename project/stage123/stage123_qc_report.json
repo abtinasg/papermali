@@ -1,16 +1,115 @@
 {
   "stage": "stage123",
   "owner_confirmation": "براساس تأیید مستقیم مالک و استخراج‌کننده داده، همه داده‌های عددی از صورت‌های مالی سالانه شرکت اصلی/جداگانه استخراج شده‌اند؛ حتی در مواردی که بسته گزارش کدال شامل صورت‌های مالی تلفیقی نیز بوده است.",
+  "overall_pass": true,
+  "checks": [
+    {
+      "check": "schema::modeling_all_rows_stage123.csv",
+      "status": "PASS",
+      "detail": "all required columns present"
+    },
+    {
+      "check": "schema::modeling_one_year_ahead_stage123.csv",
+      "status": "PASS",
+      "detail": "all required columns present"
+    },
+    {
+      "check": "schema::eligibility_audit_stage123.csv",
+      "status": "PASS",
+      "detail": "all required columns present"
+    },
+    {
+      "check": "missing_target_not_zero_on_disk",
+      "status": "PASS",
+      "detail": "disk_empty=28, expected_missing=28, disk_zero=1205"
+    },
+    {
+      "check": "rows_preserved",
+      "status": "PASS",
+      "detail": "1331/1331/1331"
+    },
+    {
+      "check": "companies_preserved",
+      "status": "PASS",
+      "detail": "130 vs 130"
+    },
+    {
+      "check": "no_duplicate_row_keys",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "no_duplicate_pairs",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "pairs_exact_plus_one",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "no_year_gaps",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "source_file_unchanged",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "source_url_unchanged",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "no_financial_value_changed",
+      "status": "PASS",
+      "detail": "checked 11 numeric columns"
+    },
+    {
+      "check": "manual_company_mapping_exact",
+      "status": "PASS",
+      "detail": "9 tickers match; no others excluded"
+    },
+    {
+      "check": "statement_corrections_logged",
+      "status": "PASS",
+      "detail": "logged=95, raw_consolidated=95"
+    },
+    {
+      "check": "no_consolidated_in_canonical",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "no_pre_listing_in_final_pairs",
+      "status": "PASS",
+      "detail": "main=0, expanded=0"
+    },
+    {
+      "check": "no_future_columns_in_predictor_manifest",
+      "status": "PASS",
+      "detail": "offenders=[]"
+    },
+    {
+      "check": "no_quantitative_criterion_all_missing",
+      "status": "PASS",
+      "detail": "all_missing=[]"
+    },
+    {
+      "check": "no_non12month_in_final_pairs_main",
+      "status": "PASS",
+      "detail": "0"
+    }
+  ],
   "rows_before": 1331,
   "rows_after": 1331,
   "duplicate_keys_before": 0,
   "duplicate_keys_after": 0,
   "statement_scope_correction": {
     "affected_row_count": 95,
-    "previous_labels_corrected": [
-      "possible_consolidated_statement",
-      "statement_scope_unknown"
-    ],
     "corrected_to": "annual_separate_company_user_confirmed"
   },
   "rows_re_eligible_due_to_correction": {
@@ -24,131 +123,104 @@
   "pairs_total": 1200,
   "pair_final_eligible_main_before_after": {
     "before": 1011,
-    "after": 1085,
-    "new_pairs": 74
+    "after": 1085
   },
   "pair_final_eligible_expanded_before_after": {
     "before": 1057,
-    "after": 1131,
-    "new_pairs": 74
-  },
-  "pair_posneg_main_before": {
-    "pos": 81,
-    "neg": 930,
-    "n": 1011
+    "after": 1131
   },
   "pair_posneg_main_after": {
+    "n": 1085,
     "pos": 86,
-    "neg": 999,
-    "n": 1085
+    "neg": 999
   },
   "pair_posneg_expanded_after": {
+    "n": 1131,
     "pos": 86,
-    "neg": 1045,
-    "n": 1131
+    "neg": 1045
   },
   "annual_target_dist_main_after": {
     "1393": {
       "n": 49,
-      "pos": 8,
-      "neg": 41
+      "pos": 8
     },
     "1394": {
       "n": 106,
-      "pos": 12,
-      "neg": 94
+      "pos": 12
     },
     "1395": {
       "n": 110,
-      "pos": 16,
-      "neg": 94
+      "pos": 16
     },
     "1396": {
       "n": 111,
-      "pos": 18,
-      "neg": 93
+      "pos": 18
     },
     "1397": {
       "n": 113,
-      "pos": 10,
-      "neg": 103
+      "pos": 10
     },
     "1398": {
       "n": 117,
-      "pos": 6,
-      "neg": 111
+      "pos": 6
     },
     "1399": {
       "n": 119,
-      "pos": 4,
-      "neg": 115
+      "pos": 4
     },
     "1400": {
       "n": 121,
-      "pos": 4,
-      "neg": 117
+      "pos": 4
     },
     "1401": {
       "n": 120,
-      "pos": 5,
-      "neg": 115
+      "pos": 5
     },
     "1402": {
       "n": 119,
-      "pos": 3,
-      "neg": 116
+      "pos": 3
     }
   },
   "annual_target_dist_main_before": {
     "1393": {
       "n": 49,
-      "pos": 8,
-      "neg": 41
+      "pos": 8
     },
     "1394": {
       "n": 106,
-      "pos": 12,
-      "neg": 94
+      "pos": 12
     },
     "1395": {
       "n": 106,
-      "pos": 16,
-      "neg": 90
+      "pos": 16
     },
     "1396": {
       "n": 105,
-      "pos": 16,
-      "neg": 89
+      "pos": 16
     },
     "1397": {
       "n": 106,
-      "pos": 9,
-      "neg": 97
+      "pos": 9
     },
     "1398": {
       "n": 108,
-      "pos": 6,
-      "neg": 102
+      "pos": 6
     },
     "1399": {
       "n": 108,
-      "pos": 3,
-      "neg": 105
+      "pos": 3
     },
     "1400": {
       "n": 108,
-      "pos": 4,
-      "neg": 104
+      "pos": 4
     },
     "1401": {
       "n": 107,
-      "pos": 4,
-      "neg": 103
+      "pos": 4
     },
     "1402": {
       "n": 108,
-      "pos": 3,
-      "neg": 105
+      "pos": 3
     }
   },
   "events_1401_1402_main": {
@@ -169,20 +241,5 @@
     "unfilled_tickers": [
       "اپال"
     ]
-  },
-  "assertions": {
-    "rows_preserved": true,
-    "no_duplicate_keys": true,
-    "no_consolidated_in_canonical_scope": true,
-    "non12month_excluded_main": 0,
-    "pre_listing_excluded_main": 0,
-    "financials_excluded_main": 0,
-    "financials_excluded_expanded": 0,
-    "pair_eligibility_independent_of_t_target": true
-  },
-  "notes": [
-    "Target is carried unchanged from Stage122 (no rebuild).",
-    "pair_final_eligible = predictor_eligible_t AND valid_target_(t+1); it does NOT depend on the year-t target.",
-    "Raw provenance (source_file/source_url/codal id/hash) is untouched; the prior scope label is preserved only in the immutable correction audit."
-  ]
+  }
 }
