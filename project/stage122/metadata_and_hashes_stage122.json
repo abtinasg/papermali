@@ -14,13 +14,13 @@
     "stage122_qc_report.json": "4e637d936c118e2a42a82432d5993428c368bf4c3fb44ce7d370f826cb0ee16a",
     "stage122_target_changelog.csv": "11add6d9e78f72b1f437799479fd21d9a6d5b5f09d981be81adc9ac9698e1da3",
     "stage122_target_summary.json": "5559d7dcebf36fbdfd8007588c5217381c488b8fd2cc8243d031d7fdb0127dfb",
-    "stage122_workbook.xlsx": "f92ad80e63197b1f62b19e2dae3aff648f090e5aa903a0c0a720bf2d6a08870b",
+    "stage122_workbook.xlsx": "6b8d71412a0fbba8d7e43f2a1a3031ffdd0ef451a3e6306527de73d34bd9d3be",
     "target_audit_stage122.csv": "2a9dc1b17b344c22faa1a5864bde761373648b0b6d8843c15372dc679385f803",
     "target_definition_stage122.csv": "573bc1e47bef8b9e48b11acd1bf87b7fc89ea22b926b2add94da67b9f95abb98",
     "target_distribution_stage122.csv": "b3cd98603c2977a107f8e98ab8ef6111f220b51f78055d8448f7313ee7c1f348"
   },
-  "datetime": "2026-06-20 18:51:53",
-  "git_commit": "2aec66b99fe0a71fc74cc1c7c2516f8c05eba870",
+  "datetime": "2026-06-21 16:38:06",
+  "git_commit": "adf93dc9221d184ed59d9f7cf3d8cc52e6157252",
   "python": "3.13.0 (v3.13.0:60403a5409f, Oct  7 2024, 00:37:40) [Clang 15.0.0 (clang-1500.3.9.4)]",
   "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
   "library_versions": {
@@ -36,12 +36,12 @@
     "imbalanced_learn": "0.14.2",
     "optuna": "4.9.0",
     "matplotlib": "3.11.0",
-    "timestamp": "2026-06-20 18:51:56"
+    "timestamp": "2026-06-21 16:38:08"
   },
   "seed": 42,
   "rows_before": 1331,
   "rows_after": 1331,
   "duplicate_keys_before": 0,
   "duplicate_keys_after": 0,
-  "runtime_seconds": 3.94
+  "runtime_seconds": 2.73
 }
