@@ -1,0 +1,13 @@
+﻿change,detail
+new_target_columns_added,"FD_target_main, FD_target_article141_only, FD_target_persistent_loss_robustness + 4 criteria"
+target_changed_vs_stage121,50 rows differ from distressed_target_reviewed
+eligibility_columns_added,9 eligibility columns + model_exclusion_reason
+rows_excluded_from_model_not_db,161 rows flagged out of model sample; 0 rows removed from database
+one_year_ahead_pairs_built,1200 pairs; 1054 final-eligible
+company_name_filled,"0 filled, 7 unfilled (['اپال'])"
+exclusion_reason::pre_listing,19 rows
+exclusion_reason::consolidated_or_unresolved_statement,95 rows
+exclusion_reason::source_not_traceable,28 rows
+exclusion_reason::unresolved_target,28 rows
+exclusion_reason::non_12_month_period,6 rows
+exclusion_reason::financial_industry,43 rows

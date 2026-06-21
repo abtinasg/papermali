@@ -1,0 +1,47 @@
+{
+  "stage": "stage122",
+  "input_file": {
+    "name": "modeling_all_rows_stage121.csv",
+    "sha256": "27d4130739c88cb8a5379e26b2e2cbedc33a1c9aa9b57b6747e5c93855540426"
+  },
+  "output_files_sha256": {
+    "eligibility_audit_stage122.csv": "ca30eb5a3f12f14a9be6b1827176600f31622212e204357786d07658ddf6d830",
+    "eligibility_company_review.csv": "398fc500a64bc9c65aab64e52f81f2dd776345d3aaeee254c5c0a838db19f3a6",
+    "leakage_manifest_stage122.csv": "9929328ba27ca20732f44784bb4f80d0e32571cb79d44730721952b7cc6fbfb5",
+    "modeling_all_rows_stage122.csv": "ece991c5ff280afa50c2ced6acfecbed4e57937cf2048cd7a11ae496a3ae7437",
+    "modeling_one_year_ahead_stage122.csv": "b621491a0cbf8f73226182b42395260b43210ce84110f586c216d494e154865d",
+    "stage122_change_log.csv": "0858578340aec8bfd8e3a6e65cd39e475e8c96e6626fed91ca43db04684e418d",
+    "stage122_qc_report.json": "4e637d936c118e2a42a82432d5993428c368bf4c3fb44ce7d370f826cb0ee16a",
+    "stage122_target_changelog.csv": "11add6d9e78f72b1f437799479fd21d9a6d5b5f09d981be81adc9ac9698e1da3",
+    "stage122_target_summary.json": "5559d7dcebf36fbdfd8007588c5217381c488b8fd2cc8243d031d7fdb0127dfb",
+    "stage122_workbook.xlsx": "f92ad80e63197b1f62b19e2dae3aff648f090e5aa903a0c0a720bf2d6a08870b",
+    "target_audit_stage122.csv": "2a9dc1b17b344c22faa1a5864bde761373648b0b6d8843c15372dc679385f803",
+    "target_definition_stage122.csv": "573bc1e47bef8b9e48b11acd1bf87b7fc89ea22b926b2add94da67b9f95abb98",
+    "target_distribution_stage122.csv": "b3cd98603c2977a107f8e98ab8ef6111f220b51f78055d8448f7313ee7c1f348"
+  },
+  "datetime": "2026-06-20 18:51:53",
+  "git_commit": "2aec66b99fe0a71fc74cc1c7c2516f8c05eba870",
+  "python": "3.13.0 (v3.13.0:60403a5409f, Oct  7 2024, 00:37:40) [Clang 15.0.0 (clang-1500.3.9.4)]",
+  "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+  "library_versions": {
+    "python": "3.13.0 (v3.13.0:60403a5409f, Oct  7 2024, 00:37:40) [Clang 15.0.0 (clang-1500.3.9.4)]",
+    "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+    "processor": "arm",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "scipy": "1.18.0",
+    "scikit_learn": "1.9.0",
+    "xgboost": "3.3.0",
+    "shap": "0.52.0",
+    "imbalanced_learn": "0.14.2",
+    "optuna": "4.9.0",
+    "matplotlib": "3.11.0",
+    "timestamp": "2026-06-20 18:51:56"
+  },
+  "seed": 42,
+  "rows_before": 1331,
+  "rows_after": 1331,
+  "duplicate_keys_before": 0,
+  "duplicate_keys_after": 0,
+  "runtime_seconds": 3.94
+}

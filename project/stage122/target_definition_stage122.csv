@@ -1,0 +1,8 @@
+﻿criterion,label,rule
+fd_article141_direct,direct Article-141 evidence,1 if direct Article-141 inclusion verified from a controlled source; 0 if non-inclusion verified; else missing. Stage121 has NO such source -> missing for ALL rows.
+fd_accumulated_loss,accumulated loss >= 50% capital,1 if accumulated_loss/registered_capital >= 0.5; 0 if < 0.5; missing if registered_capital <=0/missing OR accumulated_loss missing.
+fd_negative_equity,negative equity,1 if equity<0; 0 if equity>=0; missing if equity missing.
+fd_ocf_high_leverage,negative OCF & high leverage,1 if OCF<0 AND liabilities/assets>0.70; definite 0 if OCF>=0 OR leverage<=0.70; missing otherwise (three-valued).
+FD_target_main,composite operational financial distress target,modified three-valued OR with non-blocking unavailable direct Article-141 evidence. 1 if any criterion definitely 1; 0 if all evaluable quantitative criteria definitely 0; missing otherwise. NOT an Article-141 target.
+FD_target_persistent_loss_robustness,robustness target (composite + 2-year persistent loss),"modified three-valued OR(FD_target_main, two-consecutive-year net loss). Robustness only."
+FD_target_article141_only,stricter Article-141 robustness definition,"modified three-valued OR(fd_article141_direct, fd_accumulated_loss); with 141 absent reduces to accumulated_loss>=50%. Robustness only."

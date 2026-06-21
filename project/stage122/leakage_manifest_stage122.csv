@@ -1,0 +1,26 @@
+﻿column,leakage_type,note,present_in_stage121
+article_141,direct_target_definition,Article-141 inclusion (absent in data),0
+accumulated_loss,target_component,used in fd_accumulated_loss,1
+registered_capital,target_component,denominator of accumulated_loss ratio,1
+accumulated_loss_to_capital_ratio,target_alias,alias of fd_accumulated_loss,1
+equity,target_component,used in fd_negative_equity,1
+equity_negative_dummy,target_alias,alias of fd_negative_equity,1
+operating_cash_flow_period_adjusted,target_component,used in fd_ocf_high_leverage,1
+total_liabilities,target_component,leverage numerator in fd_ocf_high_leverage,1
+total_assets,target_component,leverage denominator in fd_ocf_high_leverage,1
+leverage_ratio,target_component,leverage used in fd_ocf_high_leverage,1
+net_income_period_adjusted,target_component,used in persistent-loss robustness target,1
+loss_dummy,target_alias,"net-loss indicator, near target definition",1
+distressed_target_reviewed,previous_target,Stage121 target label,1
+target_status_reviewed,target_source,target provenance,1
+distressed_flag_source_reviewed,target_source,target provenance,1
+fd_article141_direct,target_criterion,FD criterion,0
+fd_accumulated_loss,target_criterion,FD criterion,0
+fd_negative_equity,target_criterion,FD criterion,0
+fd_ocf_high_leverage,target_criterion,FD criterion,0
+FD_target_main,target_column,main target,0
+FD_target_article141_only,target_column,robustness target,0
+FD_target_persistent_loss_robustness,target_column,robustness target,0
+FD_target_main_t_plus_1,next_year_derived,t+1 target — never a predictor,0
+FD_target_article141_only_t_plus_1,next_year_derived,t+1 target,0
+FD_target_persistent_loss_robustness_t_plus_1,next_year_derived,t+1 target,0
