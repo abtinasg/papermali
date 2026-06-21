@@ -1,8 +1,14 @@
-# Financial Distress Prediction — Current Run Guide (Stage122 → Stage123)
+# Financial Distress Prediction — Current Run Guide (Stage122 → Stage123 → Stage124 Part 1)
 
 This project is at the **data-freeze** phase. The current, authoritative pipeline is the
-Stage122 → Stage123 sequence. **No final model is run yet** (no Logistic Regression,
-Random Forest, XGBoost, Optuna, SHAP, SMOTE, calibration, or article/report generation).
+Stage122 → Stage123 → Stage124 (Part 1) sequence. **No model is run yet** — no Logistic
+Regression, Random Forest, XGBoost, Optuna, SHAP, SMOTE, calibration, article/report
+generation, or macro/market merge.
+
+**Stage124 status:** Part 1 only — it produces a listing-master **review template**.
+The date and source columns are **intentionally left blank** for scientific manual
+verification (nothing is guessed or copied from previous flags). **Part 2 has NOT run
+yet**; it will execute only after `listing_master_verified_stage124.csv` is returned.
 
 ## Correct run order
 
@@ -16,17 +22,21 @@ pip install -r requirements.txt
 python run_stage122.py               # writes stage122/  (target is frozen here)
 
 # 2) Stage123 — statement-scope correction + eligibility/panel rebuild on the
-#    APPROVED Stage122 output (main vs expanded company sets). Independent QC + tests.
+#    APPROVED Stage122 output (main vs expanded company sets). Independent QC.
 python run_stage123.py               # writes stage123/  (exits non-zero if QC fails)
 
-# 3) Unit tests
-python -m pytest tests/test_stage123.py -q
+# 3) Stage124 Part 1 — listing-master review template (dates/sources blank)
+python run_stage124.py               # writes stage124/  (exits non-zero if QC fails)
+
+# 4) Unit tests (Stage123 and Stage124)
+python -m pytest tests/test_stage123.py tests/test_stage124.py -q
 ```
 
-`run_stage122.py` must run **before** `run_stage123.py`: Stage123 consumes
-`stage122/modeling_all_rows_stage122.csv` (the bulky panel is gitignored, so a fresh
-clone regenerates it via step 1). Stage123 aligns Stage121 raw and the Stage122 base by
-`row_key`, so results are independent of row order.
+`run_stage122.py` must run **before** `run_stage123.py`, and `run_stage123.py` before
+`run_stage124.py`: each stage consumes the previous stage's frozen output (the bulky
+panels are gitignored, so a fresh clone regenerates them in order). Stage123 aligns
+Stage121 raw and the Stage122 base by `row_key`; Stage124 derives its 130-ticker template
+from the frozen Stage123 panel — both are independent of input row order.
 
 ## What each stage produces
 
@@ -34,6 +44,7 @@ clone regenerates it via step 1). Stage123 aligns Stage121 raw and the Stage122 
 |---|---|---|
 | Stage122 | `stage122/` | `FD_target_main` (composite operational distress target) + 2 robustness targets, target audit/definition/distribution, eligibility, t→t+1 pairs, QC, change log, metadata, workbook |
 | Stage123 | `stage123/` | statement-scope correction audit, `modeling_all_rows_stage123.csv`, `modeling_one_year_ahead_stage123.csv`, eligibility audit, company mapping, listing review, leakage manifest (3 classes), independent QC report, change log, metadata+hashes, workbook |
+| Stage124 (Part 1) | `stage124/` | `listing_master_template_stage124.csv` (130 tickers; date/source columns BLANK for manual review), `stage124_template_report.json`, `metadata_and_hashes_stage124_part1.json`, `stage124_unit_test_output.txt` |
 
 ## `run_all.py` is the OLD Stage121 baseline
 

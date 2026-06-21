@@ -13,16 +13,20 @@
   "n_tickers_multiple_name_spellings": 4,
   "stage123_input_file": "modeling_all_rows_stage123.csv",
   "stage123_input_sha256": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+  "n_input_rows": 1331,
+  "n_input_unique_tickers": 130,
   "assertions": {
     "exactly_130_unique": true,
     "zero_duplicate_ticker": true,
     "coverage_exact": true,
     "no_new_or_removed": true,
-    "manual_cells_blank": true
+    "manual_cells_blank": true,
+    "prelisting_flag_count_consistent": true,
+    "stage123_input_hash_recorded": true
   },
   "notes": [
     "Date and source columns are intentionally blank for scientific manual verification; they were NOT guessed or copied from any previous flag.",
-    "current_prelisting_proxy / current_first_eligible_year_proxy are the EXISTING Stage123 proxy values, shown only for comparison during manual review."
+    "current_prelisting_proxy_row_count / current_first_eligible_year_proxy are the EXISTING Stage123 proxy values, shown only for manual comparison."
   ],
   "overall_pass": true
 }
