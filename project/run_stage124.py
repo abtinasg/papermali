@@ -2,8 +2,11 @@
 """Stage124 Part 1 runner — build the listing-master review template only.
 
 No modeling / Optuna / SHAP / SMOTE / calibration / macro merge. Reads the frozen
-Stage123 dataset (read-only) and writes stage124/. Usage:  python run_stage124.py
+Stage123 dataset (read-only) and writes stage124/. On QC failure the report is saved,
+then the process exits non-zero with no success metadata. Usage: python run_stage124.py
 """
+import sys
+
 from src import utils
 from src import stage124
 
@@ -11,7 +14,11 @@ from src import stage124
 def main():
     cfg = utils.load_config()
     utils.set_global_seed(cfg.get("seed", 42))
-    res = stage124.build_template(cfg)
+    try:
+        res = stage124.build_template(cfg)
+    except stage124.QCFail as e:
+        print(f"[stage124] QC FAILURE: {e}", file=sys.stderr)
+        sys.exit(1)
     qc = res["qc"]
     print("\n=== Stage124 Part 1 (template) report ===")
     print("unique tickers:", qc["n_unique_tickers"], "| duplicates:",
