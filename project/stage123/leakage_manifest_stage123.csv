@@ -1,0 +1,40 @@
+﻿column,group,note
+FD_target_main,prohibited_leakage,target column (year t+1 outcome)
+FD_target_article141_only,prohibited_leakage,robustness target column
+FD_target_persistent_loss_robustness,prohibited_leakage,robustness target column
+FD_target_main_t_plus_1,prohibited_leakage,next-year target
+FD_target_article141_only_t_plus_1,prohibited_leakage,next-year target
+FD_target_persistent_loss_robustness_t_plus_1,prohibited_leakage,next-year target
+fd_article141_direct,prohibited_leakage,target criterion
+fd_accumulated_loss,prohibited_leakage,target criterion
+fd_negative_equity,prohibited_leakage,target criterion
+fd_ocf_high_leverage,prohibited_leakage,target criterion
+positive_target_reasons,prohibited_leakage,derived from target
+target_missing_reason,prohibited_leakage,derived from target
+distressed_target_reviewed,prohibited_leakage,Stage121 target label
+target_status_reviewed,prohibited_leakage,target provenance
+distressed_flag_source_reviewed,prohibited_leakage,target provenance
+accumulated_loss_to_capital_ratio,prohibited_leakage,alias of accumulated-loss criterion
+equity_negative_dummy,prohibited_leakage,alias of negative-equity criterion
+loss_dummy,prohibited_leakage,alias of net-loss component
+accumulated_loss,near_target_predictor,year-t input to accumulated-loss criterion
+registered_capital,near_target_predictor,year-t denominator of accumulated-loss ratio
+equity,near_target_predictor,year-t input to negative-equity criterion
+operating_cash_flow_period_adjusted,near_target_predictor,year-t input to OCF criterion
+total_liabilities,near_target_predictor,year-t leverage numerator
+total_assets,near_target_predictor,year-t leverage denominator
+leverage_ratio,near_target_predictor,year-t leverage
+net_income_period_adjusted,near_target_predictor,year-t input to persistent-loss target
+current_ratio,allowed_t_predictor,year-t liquidity ratio
+roa_period_adjusted,allowed_t_predictor,year-t profitability
+roe_period_adjusted,allowed_t_predictor,year-t profitability
+ocf_to_assets_period_adjusted,allowed_t_predictor,year-t cash-flow ratio
+financial_expense_to_assets_period_adjusted,allowed_t_predictor,year-t expense ratio
+operating_margin_period_adjusted,allowed_t_predictor,year-t margin
+net_margin_period_adjusted,allowed_t_predictor,year-t margin
+gross_margin_period_adjusted,allowed_t_predictor,year-t margin
+asset_turnover_period_adjusted,allowed_t_predictor,year-t efficiency
+revenue_growth_period_adjusted,allowed_t_predictor,year-t growth
+net_income_growth_period_adjusted,allowed_t_predictor,year-t growth
+log_total_assets,allowed_t_predictor,year-t size (engineered)
+industry,allowed_t_predictor,year-t sector

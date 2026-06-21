@@ -1,0 +1,46 @@
+{
+  "stage": "stage123",
+  "owner_confirmation": "براساس تأیید مستقیم مالک و استخراج‌کننده داده، همه داده‌های عددی از صورت‌های مالی سالانه شرکت اصلی/جداگانه استخراج شده‌اند؛ حتی در مواردی که بسته گزارش کدال شامل صورت‌های مالی تلفیقی نیز بوده است.",
+  "input_file": {
+    "name": "modeling_all_rows_stage121.csv",
+    "sha256": "27d4130739c88cb8a5379e26b2e2cbedc33a1c9aa9b57b6747e5c93855540426"
+  },
+  "stage122_inputs_referenced": "regenerated from Stage121 raw via stage122 logic",
+  "output_files_sha256": {
+    "eligibility_audit_stage123.csv": "2db633e07e5e95fc9825fe4726df4fffb0acc5bfded14c1b93298f1f2184a0c3",
+    "eligibility_company_review_stage123.csv": "8e57569486e8dbf90ded00ba523cac468f8e8f1919e46dd55c388d5c0bb5b3a0",
+    "leakage_manifest_stage123.csv": "53768d608c02748b3d2b6e238dd20918b29fff4318977b932c1274a9eb6ab2ab",
+    "listing_date_review_stage123.csv": "e6891ac35aa8569465546fc2676672c29cf3a57235ed64c3be3a253c1dc4c193",
+    "modeling_all_rows_stage123.csv": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+    "modeling_one_year_ahead_stage123.csv": "e3d3063e840d61a39c3b4477aabe347050be6c829755acdcead05359fa9181ac",
+    "stage123_change_log.csv": "eb0046791833624f1d5c197ac4aeafe458be7dc84610be4f5e95a804c2d0427b",
+    "stage123_qc_report.json": "acd24cc96941d9cb462467a1c4b1585441a01f82b59bfdea6fecf57c2a0b1b7e",
+    "stage123_workbook.xlsx": "9d33fa5660888e82050160e703ef114b2264ac2630ba05b94399f957c8013936",
+    "statement_scope_correction_audit_stage123.csv": "0983d8b3fe6ab59f65f4906c32066141244b6c313f80c80e84147347540a3b52"
+  },
+  "datetime": "2026-06-21 13:03:19",
+  "git_commit": "490457277db7d0ab99ca79756e8f63932da93368",
+  "python": "3.13.0 (v3.13.0:60403a5409f, Oct  7 2024, 00:37:40) [Clang 15.0.0 (clang-1500.3.9.4)]",
+  "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+  "library_versions": {
+    "python": "3.13.0 (v3.13.0:60403a5409f, Oct  7 2024, 00:37:40) [Clang 15.0.0 (clang-1500.3.9.4)]",
+    "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+    "processor": "arm",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "scipy": "1.18.0",
+    "scikit_learn": "1.9.0",
+    "xgboost": "3.3.0",
+    "shap": "0.52.0",
+    "imbalanced_learn": "0.14.2",
+    "optuna": "4.9.0",
+    "matplotlib": "3.11.0",
+    "timestamp": "2026-06-21 13:03:22"
+  },
+  "seed": 42,
+  "rows_before": 1331,
+  "rows_after": 1331,
+  "duplicate_keys_before": 0,
+  "duplicate_keys_after": 0,
+  "runtime_seconds": 3.37
+}

@@ -1,0 +1,188 @@
+{
+  "stage": "stage123",
+  "owner_confirmation": "براساس تأیید مستقیم مالک و استخراج‌کننده داده، همه داده‌های عددی از صورت‌های مالی سالانه شرکت اصلی/جداگانه استخراج شده‌اند؛ حتی در مواردی که بسته گزارش کدال شامل صورت‌های مالی تلفیقی نیز بوده است.",
+  "rows_before": 1331,
+  "rows_after": 1331,
+  "duplicate_keys_before": 0,
+  "duplicate_keys_after": 0,
+  "statement_scope_correction": {
+    "affected_row_count": 95,
+    "previous_labels_corrected": [
+      "possible_consolidated_statement",
+      "statement_scope_unknown"
+    ],
+    "corrected_to": "annual_separate_company_user_confirmed"
+  },
+  "rows_re_eligible_due_to_correction": {
+    "main": 84,
+    "expanded": 84
+  },
+  "predictor_eligible_counts": {
+    "main": 1212,
+    "expanded": 1263
+  },
+  "pairs_total": 1200,
+  "pair_final_eligible_main_before_after": {
+    "before": 1011,
+    "after": 1085,
+    "new_pairs": 74
+  },
+  "pair_final_eligible_expanded_before_after": {
+    "before": 1057,
+    "after": 1131,
+    "new_pairs": 74
+  },
+  "pair_posneg_main_before": {
+    "pos": 81,
+    "neg": 930,
+    "n": 1011
+  },
+  "pair_posneg_main_after": {
+    "pos": 86,
+    "neg": 999,
+    "n": 1085
+  },
+  "pair_posneg_expanded_after": {
+    "pos": 86,
+    "neg": 1045,
+    "n": 1131
+  },
+  "annual_target_dist_main_after": {
+    "1393": {
+      "n": 49,
+      "pos": 8,
+      "neg": 41
+    },
+    "1394": {
+      "n": 106,
+      "pos": 12,
+      "neg": 94
+    },
+    "1395": {
+      "n": 110,
+      "pos": 16,
+      "neg": 94
+    },
+    "1396": {
+      "n": 111,
+      "pos": 18,
+      "neg": 93
+    },
+    "1397": {
+      "n": 113,
+      "pos": 10,
+      "neg": 103
+    },
+    "1398": {
+      "n": 117,
+      "pos": 6,
+      "neg": 111
+    },
+    "1399": {
+      "n": 119,
+      "pos": 4,
+      "neg": 115
+    },
+    "1400": {
+      "n": 121,
+      "pos": 4,
+      "neg": 117
+    },
+    "1401": {
+      "n": 120,
+      "pos": 5,
+      "neg": 115
+    },
+    "1402": {
+      "n": 119,
+      "pos": 3,
+      "neg": 116
+    }
+  },
+  "annual_target_dist_main_before": {
+    "1393": {
+      "n": 49,
+      "pos": 8,
+      "neg": 41
+    },
+    "1394": {
+      "n": 106,
+      "pos": 12,
+      "neg": 94
+    },
+    "1395": {
+      "n": 106,
+      "pos": 16,
+      "neg": 90
+    },
+    "1396": {
+      "n": 105,
+      "pos": 16,
+      "neg": 89
+    },
+    "1397": {
+      "n": 106,
+      "pos": 9,
+      "neg": 97
+    },
+    "1398": {
+      "n": 108,
+      "pos": 6,
+      "neg": 102
+    },
+    "1399": {
+      "n": 108,
+      "pos": 3,
+      "neg": 105
+    },
+    "1400": {
+      "n": 108,
+      "pos": 4,
+      "neg": 104
+    },
+    "1401": {
+      "n": 107,
+      "pos": 4,
+      "neg": 103
+    },
+    "1402": {
+      "n": 108,
+      "pos": 3,
+      "neg": 105
+    }
+  },
+  "events_1401_1402_main": {
+    "1401_before": 4,
+    "1401_after": 5,
+    "1402_before": 3,
+    "1402_after": 3
+  },
+  "target_unchanged_from_stage122": {
+    "1": 98,
+    "0": 1205,
+    "missing": 28
+  },
+  "company_name_fill": {
+    "n_empty": 7,
+    "n_filled": 0,
+    "n_unfilled": 7,
+    "unfilled_tickers": [
+      "اپال"
+    ]
+  },
+  "assertions": {
+    "rows_preserved": true,
+    "no_duplicate_keys": true,
+    "no_consolidated_in_canonical_scope": true,
+    "non12month_excluded_main": 0,
+    "pre_listing_excluded_main": 0,
+    "financials_excluded_main": 0,
+    "financials_excluded_expanded": 0,
+    "pair_eligibility_independent_of_t_target": true
+  },
+  "notes": [
+    "Target is carried unchanged from Stage122 (no rebuild).",
+    "pair_final_eligible = predictor_eligible_t AND valid_target_(t+1); it does NOT depend on the year-t target.",
+    "Raw provenance (source_file/source_url/codal id/hash) is untouched; the prior scope label is preserved only in the immutable correction audit."
+  ]
+}
