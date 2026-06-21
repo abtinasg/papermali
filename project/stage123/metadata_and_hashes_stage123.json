@@ -17,11 +17,11 @@
     "stage123_change_log.csv": "d725781330634751f3025a9b1d21298d2bb799b79559848d978d030c59126242",
     "stage123_qc_report.json": "0c5a45a21a381b3c51338189725846d8a03b76f168eb527a0d2de8a86359c6cb",
     "stage123_unit_test_output.txt": "8d728b3ff4e81f7d873022b1b0a62f1d29455a13c99cde6108b0de01202cc284",
-    "stage123_workbook.xlsx": "c15d3ec8abd54447edec024dfe297099b8a3b763d1b17438e758af468c21052a",
-    "statement_scope_correction_audit_stage123.csv": "015d1eeb5b42bfea8b93c7b0db3b00ae64d87f10b8e3c269f188c742f6d51d5e"
+    "stage123_workbook.xlsx": "31471d6ee9d388582a801096daa9bcb4f976a50e743d2b7dcf452ab87a9c3b39",
+    "statement_scope_correction_audit_stage123.csv": "72dc235cd4e38f2348171f04a640db390e4dc6ce97d22aefd2ef5397fdb02eba"
   },
-  "datetime": "2026-06-21 13:27:51",
-  "git_commit": "81d807085214614c9872486fa972db913bfd440a",
+  "datetime": "2026-06-21 13:34:23",
+  "git_commit": "b36db7cf5617315a6281e4341520ece91c2eecce",
   "git_worktree_dirty_at_runtime": true,
   "python": "3.13.0 (v3.13.0:60403a5409f, Oct  7 2024, 00:37:40) [Clang 15.0.0 (clang-1500.3.9.4)]",
   "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
@@ -38,12 +38,12 @@
     "imbalanced_learn": "0.14.2",
     "optuna": "4.9.0",
     "matplotlib": "3.11.0",
-    "timestamp": "2026-06-21 13:27:52"
+    "timestamp": "2026-06-21 13:34:24"
   },
   "seed": 42,
   "rows_before": 1331,
   "rows_after": 1331,
   "duplicate_keys_before": 0,
   "duplicate_keys_after": 0,
-  "runtime_seconds": 1.83
+  "runtime_seconds": 1.66
 }

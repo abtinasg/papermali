@@ -9,4 +9,4 @@ tests/test_stage123.py::test_source_provenance_unchanged PASSED          [ 72%]
 tests/test_stage123.py::test_manual_company_mapping_main_and_expanded PASSED [ 81%]
 tests/test_stage123.py::test_no_future_columns_in_predictor_manifest PASSED [ 90%]
 tests/test_stage123.py::test_independent_qc_overall_pass PASSED          [100%]
-============================== 11 passed in 2.07s ==============================
+============================== 11 passed in 1.91s ==============================
