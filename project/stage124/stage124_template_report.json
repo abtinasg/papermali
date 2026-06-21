@@ -1,0 +1,28 @@
+{
+  "stage": "stage124_part1_template",
+  "n_unique_tickers": 130,
+  "n_rows_template": 130,
+  "duplicate_ticker_count": 0,
+  "covers_all_stage123_tickers": true,
+  "tickers_added_vs_stage123": [],
+  "tickers_missing_vs_stage123": [],
+  "n_tickers_incomplete_name": 1,
+  "tickers_incomplete_name": [
+    "اپال"
+  ],
+  "n_tickers_multiple_name_spellings": 4,
+  "stage123_input_file": "modeling_all_rows_stage123.csv",
+  "stage123_input_sha256": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+  "assertions": {
+    "exactly_130_unique": true,
+    "zero_duplicate_ticker": true,
+    "coverage_exact": true,
+    "no_new_or_removed": true,
+    "manual_cells_blank": true
+  },
+  "notes": [
+    "Date and source columns are intentionally blank for scientific manual verification; they were NOT guessed or copied from any previous flag.",
+    "current_prelisting_proxy / current_first_eligible_year_proxy are the EXISTING Stage123 proxy values, shown only for comparison during manual review."
+  ],
+  "overall_pass": true
+}

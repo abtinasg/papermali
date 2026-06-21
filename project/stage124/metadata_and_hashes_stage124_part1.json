@@ -1,0 +1,17 @@
+{
+  "stage": "stage124_part1_template",
+  "stage123_input_file": "modeling_all_rows_stage123.csv",
+  "stage123_input_sha256": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+  "template_file": "listing_master_template_stage124.csv",
+  "template_sha256": "58a4d8e38efa6bcabd412365e87685b24e23a68299df419621b00966ba457ce1",
+  "source_code_commit": "403d562851afb4d52e861c584fc4f831c597adee",
+  "source_file_sha256": {
+    "src/stage124.py": "c3594298a3cfb83543770cd4e912001006c6f8765a4cfbcc7a8941d693f88d1e",
+    "run_stage124.py": "704f8eec1eca9bbed2e704fb7a9c7e4856bf8df52f01105d0c7b3757701482af"
+  },
+  "datetime": "2026-06-21 18:39:30",
+  "python": "3.13.0 (v3.13.0:60403a5409f, Oct  7 2024, 00:37:40) [Clang 15.0.0 (clang-1500.3.9.4)]",
+  "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+  "seed": 42,
+  "runtime_seconds": 0.17
+}
