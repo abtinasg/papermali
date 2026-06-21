@@ -9,3 +9,24 @@ __pycache__/
 
 # Env / secrets
 .env
+
+# --- Repo hygiene: keep source + small QC/metadata/audits; drop bulky outputs ---
+# Models, SHAP arrays, workbooks, figures, duplicated code copy
+*.joblib
+*.npz
+*.xlsx
+project/outputs/08_figures/
+project/outputs/03_code/
+project/outputs/02_modeling_data/modeling_one_year_ahead_final.csv
+project/outputs/05_predictions/
+# Bulky regenerable stage panels (small QC/metadata/audits ARE kept)
+project/stage122/modeling_all_rows_stage122.csv
+project/stage122/modeling_one_year_ahead_stage122.csv
+project/stage122/eligibility_audit_stage122.csv
+project/stage122/target_audit_stage122.csv
+project/stage123/modeling_all_rows_stage123.csv
+project/stage123/modeling_one_year_ahead_stage123.csv
+project/stage123/eligibility_audit_stage123.csv
+
+# Stray local archive (backup, not a deliverable)
+project/Archive.zip

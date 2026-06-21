@@ -1,31 +1,22 @@
 ﻿column,group,note
-FD_target_main,prohibited_leakage,target column (year t+1 outcome)
-FD_target_article141_only,prohibited_leakage,robustness target column
-FD_target_persistent_loss_robustness,prohibited_leakage,robustness target column
-FD_target_main_t_plus_1,prohibited_leakage,next-year target
-FD_target_article141_only_t_plus_1,prohibited_leakage,next-year target
-FD_target_persistent_loss_robustness_t_plus_1,prohibited_leakage,next-year target
-fd_article141_direct,prohibited_leakage,target criterion
-fd_accumulated_loss,prohibited_leakage,target criterion
-fd_negative_equity,prohibited_leakage,target criterion
-fd_ocf_high_leverage,prohibited_leakage,target criterion
-positive_target_reasons,prohibited_leakage,derived from target
-target_missing_reason,prohibited_leakage,derived from target
-distressed_target_reviewed,prohibited_leakage,Stage121 target label
+FD_target_main_t_plus_1,prohibited_leakage,next-year (t+1) target outcome
+FD_target_article141_only_t_plus_1,prohibited_leakage,next-year (t+1) robustness target
+FD_target_persistent_loss_robustness_t_plus_1,prohibited_leakage,next-year (t+1) robustness target
+target_valid_t_plus_1,prohibited_leakage,derived from t+1 target
+distressed_target_reviewed,prohibited_leakage,Stage121 target label / provenance
 target_status_reviewed,prohibited_leakage,target provenance
 distressed_flag_source_reviewed,prohibited_leakage,target provenance
-accumulated_loss_to_capital_ratio,prohibited_leakage,alias of accumulated-loss criterion
-equity_negative_dummy,prohibited_leakage,alias of negative-equity criterion
-loss_dummy,prohibited_leakage,alias of net-loss component
-accumulated_loss,near_target_predictor,year-t input to accumulated-loss criterion
-registered_capital,near_target_predictor,year-t denominator of accumulated-loss ratio
-equity,near_target_predictor,year-t input to negative-equity criterion
-operating_cash_flow_period_adjusted,near_target_predictor,year-t input to OCF criterion
-total_liabilities,near_target_predictor,year-t leverage numerator
-total_assets,near_target_predictor,year-t leverage denominator
-leverage_ratio,near_target_predictor,year-t leverage
-net_income_period_adjusted,near_target_predictor,year-t input to persistent-loss target
-current_ratio,allowed_t_predictor,year-t liquidity ratio
+positive_target_reasons,prohibited_leakage,derived from the target
+target_missing_reason,prohibited_leakage,derived from the target
+leverage_ratio,allowed_t_predictor,year-t leverage
+operating_cash_flow_period_adjusted,allowed_t_predictor,year-t operating cash flow
+equity,allowed_t_predictor,year-t equity
+total_assets,allowed_t_predictor,year-t total assets
+total_liabilities,allowed_t_predictor,year-t total liabilities
+accumulated_loss,allowed_t_predictor,year-t raw accumulated loss
+registered_capital,allowed_t_predictor,year-t registered capital
+net_income_period_adjusted,allowed_t_predictor,year-t net income
+current_ratio,allowed_t_predictor,year-t liquidity
 roa_period_adjusted,allowed_t_predictor,year-t profitability
 roe_period_adjusted,allowed_t_predictor,year-t profitability
 ocf_to_assets_period_adjusted,allowed_t_predictor,year-t cash-flow ratio
@@ -38,3 +29,12 @@ revenue_growth_period_adjusted,allowed_t_predictor,year-t growth
 net_income_growth_period_adjusted,allowed_t_predictor,year-t growth
 log_total_assets,allowed_t_predictor,year-t size (engineered)
 industry,allowed_t_predictor,year-t sector
+accumulated_loss_to_capital_ratio,near_target_predictor,year-t accumulated-loss/capital ratio
+equity_negative_dummy,near_target_predictor,year-t negative-equity dummy
+loss_dummy,near_target_predictor,year-t net-loss dummy
+fd_accumulated_loss,near_target_predictor,year-t accumulated-loss criterion
+fd_negative_equity,near_target_predictor,year-t negative-equity criterion
+fd_ocf_high_leverage,near_target_predictor,year-t OCF<0 & leverage>0.70 criterion
+fd_article141_direct,near_target_predictor,year-t article-141 criterion (unobserved)
+ocf_neg_high_leverage_combo_t,near_target_predictor,year-t direct OCF<0 AND leverage>0.70 combination
+FD_target_main,near_target_predictor,year-t (lagged) target — only if explicitly used as lag
