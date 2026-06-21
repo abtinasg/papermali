@@ -145,3 +145,27 @@ def test_no_future_columns_in_predictor_manifest():
 # bonus: overall independent QC must pass
 def test_independent_qc_overall_pass(built):
     assert built["qc"]["overall_pass"] is True
+
+
+# 11 ---------------------------------------------------------------------
+def test_row_order_independence(built):
+    # aligning the Stage122 base to raw is invariant to the base's row order
+    cfg, raw = built["cfg"], built["raw"]
+    base = s123.load_stage122_base(cfg)
+    shuffled = base.sample(frac=1.0, random_state=7).reset_index(drop=True)
+    a1 = s123.align_base_to_raw(raw, base)
+    a2 = s123.align_base_to_raw(raw, shuffled)
+    assert (a1["row_key"].values == raw["row_key"].values).all()
+    assert a1.equals(a2)  # result identical regardless of input row order
+
+
+# 12 ---------------------------------------------------------------------
+def test_align_rowkey_mismatch_fails():
+    raw = pd.DataFrame({"row_key": ["a", "b"], "ticker": ["x", "y"],
+                        "fiscal_year": ["1392", "1393"]})
+    base_missing = pd.DataFrame({"row_key": ["a", "c"]})
+    with pytest.raises(s123.QCFail):
+        s123.align_base_to_raw(raw, base_missing)
+    base_dup = pd.DataFrame({"row_key": ["a", "a", "b"]})
+    with pytest.raises(s123.QCFail):
+        s123.align_base_to_raw(raw, base_dup)

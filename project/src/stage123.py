@@ -97,6 +97,48 @@ def _to_float(s: pd.Series) -> pd.Series:
     return pd.to_numeric(s.replace("", np.nan), errors="coerce")
 
 
+SOURCE_FILES = ["src/stage122.py", "src/stage123.py",
+                "run_stage122.py", "run_stage123.py"]
+INTENDED_FREEZE_TAG = "stage123-frozen-v1"
+
+
+def align_base_to_raw(raw: pd.DataFrame, base: pd.DataFrame) -> pd.DataFrame:
+    """Align the Stage122 base to raw by row_key so results never depend on row order.
+    Any duplicate / missing / extra row_key raises QCFail."""
+    rk_raw, rk_base = raw["row_key"], base["row_key"]
+    if rk_raw.duplicated().any():
+        raise QCFail("duplicate row_key in raw Stage121")
+    if rk_base.duplicated().any():
+        raise QCFail("duplicate row_key in Stage122 base")
+    sr, sb = set(rk_raw), set(rk_base)
+    if sr != sb:
+        raise QCFail(f"row_key set mismatch raw vs Stage122 base: "
+                     f"missing_in_base={len(sr - sb)}, extra_in_base={len(sb - sr)}")
+    return base.set_index("row_key").loc[rk_raw.values].reset_index()
+
+
+def _source_info() -> dict:
+    """git commit + dirtiness of the SOURCE files only (generated outputs ignored) +
+    content SHA-256 of the executed source files."""
+    hashes = {f: (utils.sha256_file(ROOT / f) if (ROOT / f).exists() else None)
+              for f in SOURCE_FILES}
+    commit = dirty = tag = None
+    try:
+        commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(ROOT),
+                                capture_output=True, text=True).stdout.strip() or None
+        # cwd is the project dir; pathspecs are relative to it (git resolves to repo root)
+        st = subprocess.run(["git", "status", "--porcelain", "--", *SOURCE_FILES],
+                            cwd=str(ROOT), capture_output=True, text=True).stdout.strip()
+        dirty = bool(st)
+        tag = subprocess.run(["git", "describe", "--tags", "--abbrev=0"], cwd=str(ROOT),
+                             capture_output=True, text=True).stdout.strip() or None
+    except Exception:
+        pass
+    return {"source_code_commit": commit, "source_tree_dirty_before_run": dirty,
+            "source_file_sha256": hashes, "nearest_tag": tag,
+            "intended_freeze_tag": INTENDED_FREEZE_TAG}
+
+
 # --------------------------------------------------------------------------
 # Base = approved Stage122 output (NOT the old build_dataset.py pipeline)
 # --------------------------------------------------------------------------
@@ -125,24 +167,6 @@ def aggregate_fd_target(article141: pd.Series, acc: pd.Series, neg: pd.Series,
     anymiss_quant = np.isnan(quant).any(axis=0)  # article141 missingness ignored
     out = np.where(any1, 1.0, np.where(anymiss_quant, np.nan, 0.0))
     return pd.Series(out, index=acc.index)
-
-
-def recompute_and_verify_target(cfg, base: pd.DataFrame):
-    """Recompute criteria/target from RAW via the explicit guarded aggregator and assert
-    they match the frozen Stage122 values carried in the base output."""
-    raw = s122.load_all_rows(cfg)
-    crit = s122.compute_criteria(raw)
-    target = aggregate_fd_target(crit["fd_article141_direct"],
-                                 crit["fd_accumulated_loss"],
-                                 crit["fd_negative_equity"],
-                                 crit["fd_ocf_high_leverage"])
-    base_target = _to_float(base["FD_target_main"])
-    # consistency: recomputed target must equal the approved Stage122 target
-    same = ((target.isna() & base_target.isna()) | (target == base_target))
-    if not bool(same.all()):
-        n = int((~same).sum())
-        raise QCFail(f"recomputed FD_target_main disagrees with Stage122 on {n} rows")
-    return raw, crit, target
 
 
 # --------------------------------------------------------------------------
@@ -319,11 +343,25 @@ def write_company_mapping(out: Path) -> pd.DataFrame:
 def build_full(cfg) -> dict:
     t0 = time.time()
     out = stage_dir()
-    base = load_stage122_base(cfg)               # approved Stage122 output (req 2)
-    raw, crit, target = recompute_and_verify_target(cfg, base)  # guard + consistency
-    n_before = len(base)
-    dup_before = int(base.duplicated(["ticker", "fiscal_year"]).sum())
+    src_info = _source_info()                     # capture BEFORE any output is written
+    raw = s122.load_all_rows(cfg)                 # raw Stage121 (read-only)
+    base_raw = load_stage122_base(cfg)            # approved Stage122 output (req 2)
+    base = align_base_to_raw(raw, base_raw)       # row_key align; QCFail on mismatch/dup
+    base_path = s122.stage_dir(cfg) / "modeling_all_rows_stage122.csv"
 
+    # recompute criteria/target from RAW via the guarded aggregator and verify they
+    # match the (row_key-aligned) Stage122 target — order-independent by construction.
+    crit = s122.compute_criteria(raw)
+    target = aggregate_fd_target(crit["fd_article141_direct"], crit["fd_accumulated_loss"],
+                                 crit["fd_negative_equity"], crit["fd_ocf_high_leverage"])
+    base_target = _to_float(base["FD_target_main"])
+    same = ((target.isna() & base_target.isna()) | (target == base_target))
+    if not bool(same.all()):
+        raise QCFail(f"recomputed FD_target_main disagrees with Stage122 on "
+                     f"{int((~same).sum())} rows after row_key alignment")
+
+    n_before = len(raw)
+    dup_before = int(raw.duplicated(["ticker", "fiscal_year"]).sum())
     main = target
     a141 = _to_float(base["FD_target_article141_only"])
     pers = _to_float(base["FD_target_persistent_loss_robustness"])
@@ -405,16 +443,18 @@ def build_full(cfg) -> dict:
     qc = independent_qc(cfg, out, raw, n_before, n_after, dup_before, dup_after,
                         n_corrected, name_info, pairs, pairs_pre, el, pe_main_pre,
                         pe_exp_pre, main)
+    # QC report is ALWAYS saved first; on failure we raise BEFORE writing metadata
+    # so a successful metadata file never accompanies a failed QC (req 5).
     utils.save_json(qc, out / "stage123_qc_report.json")
     if not qc["overall_pass"]:
-        # still write artifacts, but make the failure loud
-        print("[stage123] !!! INDEPENDENT QC FAILED:",
-              [c["check"] for c in qc["checks"] if c["status"] == "FAIL"])
+        failed = [c["check"] for c in qc["checks"] if c["status"] == "FAIL"]
+        raise QCFail(f"independent QC failed (report saved): {failed}")
 
     changelog = _change_log(qc, n_corrected)
     changelog.to_csv(out / "stage123_change_log.csv", index=False, encoding="utf-8-sig")
     _excel(out, base, el, ea, review, listing, pairs, leak, mapping, corr, qc)
-    meta = _metadata(cfg, out, n_before, n_after, dup_before, dup_after, t0)
+    meta = _metadata(cfg, out, n_before, n_after, dup_before, dup_after, t0,
+                     base_path, base, src_info)
     utils.save_json(meta, out / "metadata_and_hashes_stage123.json")
     print(f"[stage123] complete in {time.time()-t0:.1f}s -> {out} | "
           f"QC overall_pass={qc['overall_pass']}")
@@ -693,24 +733,29 @@ def _excel(out, base, el, ea, review, listing, pairs, leak, mapping, corr, qc):
         verify.to_excel(xw, sheet_name="stage123_independent_qc", index=False)
 
 
-def _metadata(cfg, out, n_before, n_after, dup_before, dup_after, t0):
+def _metadata(cfg, out, n_before, n_after, dup_before, dup_after, t0,
+              base_path, base_aligned, src_info):
     inp = utils.raw_path(cfg, "all_rows_csv")
-    try:
-        commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(ROOT),
-                                capture_output=True, text=True).stdout.strip()
-        dirty = bool(subprocess.run(["git", "status", "--porcelain"], cwd=str(ROOT),
-                                    capture_output=True, text=True).stdout.strip())
-    except Exception:
-        commit, dirty = "unknown", None
     out_hashes = {p.name: utils.sha256_file(p) for p in sorted(out.glob("*"))
                   if p.is_file() and p.name != "metadata_and_hashes_stage123.json"}
+    stage122_base = {
+        "name": base_path.name,
+        "sha256": utils.sha256_file(base_path) if base_path.exists() else None,
+        "n_rows": int(len(base_aligned)),
+        "n_duplicate_keys": int(base_aligned.duplicated(["ticker", "fiscal_year"]).sum()),
+    }
     return {
         "stage": "stage123", "owner_confirmation": OWNER_CONFIRMATION_FA,
-        "input_file": {"name": inp.name, "sha256": utils.sha256_file(inp)},
-        "base_used": "stage122/modeling_all_rows_stage122.csv (approved Stage122 output)",
+        "input_file_stage121": {"name": inp.name, "sha256": utils.sha256_file(inp)},
+        "stage122_base_file": stage122_base,
         "output_files_sha256": out_hashes,
         "datetime": time.strftime("%Y-%m-%d %H:%M:%S"),
-        "git_commit": commit, "git_worktree_dirty_at_runtime": dirty,
+        # source provenance (req 2 & 3): commit, source-only dirtiness, source hashes
+        "source_code_commit": src_info["source_code_commit"],
+        "source_tree_dirty_before_run": src_info["source_tree_dirty_before_run"],
+        "source_file_sha256": src_info["source_file_sha256"],
+        "nearest_tag": src_info["nearest_tag"],
+        "intended_freeze_tag": src_info["intended_freeze_tag"],
         "python": sys.version, "platform": platform.platform(),
         "library_versions": utils.env_report(), "seed": cfg.get("seed", 42),
         "rows_before": n_before, "rows_after": n_after,

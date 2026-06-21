@@ -2,8 +2,11 @@
 """Stage123 runner — statement-scope correction + eligibility/panel rebuild.
 
 Built on the approved Stage122 output. No modeling. Writes to stage123/.
-Usage:  python run_stage123.py
+On QC failure the QC report is saved, then the process exits non-zero WITHOUT a
+successful metadata file. Usage:  python run_stage123.py
 """
+import sys
+
 from src import utils
 from src import stage123
 
@@ -11,7 +14,11 @@ from src import stage123
 def main():
     cfg = utils.load_config()
     utils.set_global_seed(cfg.get("seed", 42))
-    res = stage123.build_full(cfg)
+    try:
+        res = stage123.build_full(cfg)
+    except stage123.QCFail as e:
+        print(f"[stage123] QC FAILURE: {e}", file=sys.stderr)
+        sys.exit(1)
     qc = res["qc"]
     print("\n=== Stage123 QC summary ===")
     print("overall_pass:", qc["overall_pass"])
