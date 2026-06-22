@@ -1,0 +1,1042 @@
+{
+  "schema_version": "stage124_feasibility_probe_v2",
+  "purpose": "API-feasibility & scientific control ONLY; non-authoritative.",
+  "is_verified_file": false,
+  "touches_eligibility": false,
+  "egress": {
+    "exit_ip": "2a03:4000:63:8ae:3450:e8ff:fe33:f1be",
+    "exit_country": "DE",
+    "valid_iran_run": false,
+    "provenance": {
+      "endpoint": "https://api.country.is/",
+      "retrieved_at": "2026-06-22T09:06:57Z",
+      "http_status": 200,
+      "network_error": null,
+      "raw_sha256": "94ec65dce2016fbe7336c2ff46ff610bb5cee1df7def7323e7c3e77937e57187"
+    }
+  },
+  "valid_iran_run": false,
+  "generated_at": "2026-06-22T09:12:44Z",
+  "timeout_seconds": 6.0,
+  "n_tickers": 15,
+  "status_counts": {
+    "network_unreachable": 15
+  },
+  "codal_keywords": [
+    "پذیرش",
+    "درج",
+    "عرضه اولیه",
+    "آغاز معاملات",
+    "گشایش نماد",
+    "امیدنامه",
+    "عرضه سهام"
+  ],
+  "max_codal_notices": 10,
+  "rules_enforced": [
+    "earliest trade date stored only as candidate_first_trade_date (verified=false)",
+    "rights/funds/non-ordinary excluded",
+    "multiple insCodes -> ambiguous_instrument, no auto-pick",
+    "original+normalized+aliases preserved",
+    "endpoint/retrieved_at/http_status/error/raw_sha256 (+raw body) preserved",
+    "network_unreachable kept separate from no_instrument_match",
+    "codal broad, <=10 notices for listing keywords",
+    "no verified file, eligibility untouched"
+  ],
+  "records": [
+    {
+      "requested_ticker": "اردستان",
+      "normalized_ticker": "اردستان",
+      "dataset_ticker": "اردستان",
+      "aliases": [
+        "اردستان"
+      ],
+      "dataset_company_name": "شرکت سیمان اردستان",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D8%A7%D8%B1%D8%AF%D8%B3%D8%AA%D8%A7%D9%86",
+        "retrieved_at": "2026-06-22T09:07:00Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%D8%A7%D8%B1%D8%AF%D8%B3%D8%AA%D8%A7%D9%86&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:07:20Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "اروند",
+      "normalized_ticker": "اروند",
+      "dataset_ticker": "اروند",
+      "aliases": [
+        "اروند"
+      ],
+      "dataset_company_name": "شرکت پتروشیمی اروند",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D8%A7%D8%B1%D9%88%D9%86%D8%AF",
+        "retrieved_at": "2026-06-22T09:07:28Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%D8%A7%D8%B1%D9%88%D9%86%D8%AF&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:08:49Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "سآبیک",
+      "normalized_ticker": "سآبیک",
+      "dataset_ticker": "سآبیک",
+      "aliases": [
+        "سآبیک"
+      ],
+      "dataset_company_name": "سیمان آبیک",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D8%B3%D8%A2%D8%A8%DB%8C%DA%A9",
+        "retrieved_at": "2026-06-22T09:09:00Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%D8%B3%D8%A2%D8%A8%DB%8C%DA%A9&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:09:06Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "وکغدیر",
+      "normalized_ticker": "وکغدیر",
+      "dataset_ticker": "وکغدیر",
+      "aliases": [
+        "وکغدیر"
+      ],
+      "dataset_company_name": "سرمایه گذاری غدیر",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D9%88%DA%A9%D8%BA%D8%AF%DB%8C%D8%B1",
+        "retrieved_at": "2026-06-22T09:09:18Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%D9%88%DA%A9%D8%BA%D8%AF%DB%8C%D8%B1&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:10:23Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "کویر",
+      "normalized_ticker": "کویر",
+      "dataset_ticker": "کویر",
+      "aliases": [
+        "کویر"
+      ],
+      "dataset_company_name": "شرکت تولیدی فولاد سپید فراب کویر",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%DA%A9%D9%88%DB%8C%D8%B1",
+        "retrieved_at": "2026-06-22T09:10:30Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%DA%A9%D9%88%DB%8C%D8%B1&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:10:36Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "بوعلی",
+      "normalized_ticker": "بوعلی",
+      "dataset_ticker": "بوعلی",
+      "aliases": [
+        "بوعلی"
+      ],
+      "dataset_company_name": "شرکت پتروشیمی بوعلی سینا",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D8%A8%D9%88%D8%B9%D9%84%DB%8C",
+        "retrieved_at": "2026-06-22T09:10:42Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%D8%A8%D9%88%D8%B9%D9%84%DB%8C&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:10:48Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "نوری",
+      "normalized_ticker": "نوری",
+      "dataset_ticker": "نوری",
+      "aliases": [
+        "نوری"
+      ],
+      "dataset_company_name": "شرکت پتروشیمی نوری",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D9%86%D9%88%D8%B1%DB%8C",
+        "retrieved_at": "2026-06-22T09:10:54Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%D9%86%D9%88%D8%B1%DB%8C&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:11:00Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "سپید",
+      "normalized_ticker": "سپید",
+      "dataset_ticker": "سپید",
+      "aliases": [
+        "سپید"
+      ],
+      "dataset_company_name": "شرکت سپید ماکیان",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D8%B3%D9%BE%DB%8C%D8%AF",
+        "retrieved_at": "2026-06-22T09:11:06Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%D8%B3%D9%BE%DB%8C%D8%AF&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:11:12Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "کیمیاتک",
+      "normalized_ticker": "کیمیاتک",
+      "dataset_ticker": "کیمیاتک",
+      "aliases": [
+        "کیمیاتک"
+      ],
+      "dataset_company_name": "شرکت آریان کیمیاتک",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%DA%A9%DB%8C%D9%85%DB%8C%D8%A7%D8%AA%DA%A9",
+        "retrieved_at": "2026-06-22T09:11:18Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%DA%A9%DB%8C%D9%85%DB%8C%D8%A7%D8%AA%DA%A9&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:11:24Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "پی‌پاد",
+      "normalized_ticker": "پیپاد",
+      "dataset_ticker": "پی‌پاد",
+      "aliases": [
+        "پی‌پاد",
+        "پیپاد"
+      ],
+      "dataset_company_name": "پرداخت الکترونیک پاسارگاد",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D9%BE%DB%8C%D9%BE%D8%A7%D8%AF",
+        "retrieved_at": "2026-06-22T09:11:30Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%D9%BE%DB%8C%D9%BE%D8%A7%D8%AF&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:11:36Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "پرداخت",
+      "normalized_ticker": "پرداخت",
+      "dataset_ticker": "پرداخت",
+      "aliases": [
+        "پرداخت"
+      ],
+      "dataset_company_name": "به پرداخت ملت",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D9%BE%D8%B1%D8%AF%D8%A7%D8%AE%D8%AA",
+        "retrieved_at": "2026-06-22T09:11:42Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%D9%BE%D8%B1%D8%AF%D8%A7%D8%AE%D8%AA&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:11:48Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "پارس",
+      "normalized_ticker": "پارس",
+      "dataset_ticker": "پارس",
+      "aliases": [
+        "پارس"
+      ],
+      "dataset_company_name": "شرکت پتروشیمی پارس",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D9%BE%D8%A7%D8%B1%D8%B3",
+        "retrieved_at": "2026-06-22T09:11:54Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%D9%BE%D8%A7%D8%B1%D8%B3&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:12:00Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "کاوه",
+      "normalized_ticker": "کاوه",
+      "dataset_ticker": "کاوه",
+      "aliases": [
+        "کاوه"
+      ],
+      "dataset_company_name": "فولاد کاوه جنوب کیش",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%DA%A9%D8%A7%D9%88%D9%87",
+        "retrieved_at": "2026-06-22T09:12:08Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%DA%A9%D8%A7%D9%88%D9%87&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:12:14Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "جم‌پیلن",
+      "normalized_ticker": "جم پیلن",
+      "dataset_ticker": "جم پیلن",
+      "aliases": [
+        "جم‌پیلن",
+        "جمپیلن",
+        "جم پیلن"
+      ],
+      "dataset_company_name": "شرکت پلی پروپیلن جم",
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D8%AC%D9%85%20%D9%BE%DB%8C%D9%84%D9%86",
+        "retrieved_at": "2026-06-22T09:12:20Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%D8%AC%D9%85%20%D9%BE%DB%8C%D9%84%D9%86&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:12:26Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    },
+    {
+      "requested_ticker": "اپال",
+      "normalized_ticker": "اپال",
+      "dataset_ticker": "اپال",
+      "aliases": [
+        "اپال"
+      ],
+      "dataset_company_name": null,
+      "candidate_first_trade_date": {
+        "jalali": null,
+        "gregorian": null,
+        "verified": false
+      },
+      "instrument_excluded_non_ordinary": [],
+      "instrument_candidates": [],
+      "tsetmc_search": {
+        "status": "network_unreachable",
+        "instrument_candidates": [],
+        "excluded": [],
+        "matched_name": null,
+        "market_name": null,
+        "note": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "tsetmc_search_provenance": {
+        "endpoint": "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D8%A7%D9%BE%D8%A7%D9%84",
+        "retrieved_at": "2026-06-22T09:12:32Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='cdn.tsetmc.com', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "tsetmc_trade_history": {
+        "status": "skipped",
+        "n_historical_trade_days": null,
+        "candidate_first_trade_date": {
+          "jalali": null,
+          "gregorian": null,
+          "verified": false
+        },
+        "note": "skipped: instrument_status=network_unreachable"
+      },
+      "tsetmc_trade_history_provenance": null,
+      "codal": {
+        "status": "network_unreachable",
+        "n_letters_total": null,
+        "notices": [],
+        "note": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)"
+      },
+      "codal_provenance": {
+        "endpoint": "https://search.codal.ir/api/search/v2/q?Symbol=%D8%A7%D9%BE%D8%A7%D9%84&PageNumber=1&Audited=true&AuditorRef=-1&Category=-1&Childs=true&CompanyState=-1&CompanyType=-1&Consolidatable=true&IsNotAudited=false&Length=-1&LetterType=-1&Mains=true&Publisher=false&TracingNo=-1",
+        "retrieved_at": "2026-06-22T09:12:38Z",
+        "http_status": null,
+        "ok": false,
+        "network_error": "ReadTimeout: HTTPSConnectionPool(host='search.codal.ir', port=443): Read timed out. (read timeout=6.0)",
+        "parse_error": null,
+        "raw_sha256": null,
+        "raw_bytes": 0,
+        "saved_raw_path": "",
+        "json": null
+      },
+      "extraction_status": "network_unreachable"
+    }
+  ],
+  "runtime_seconds": 347.1,
+  "warning": "egress is NOT Iran (exit_country=DE); results are placeholder — rerun from an Iranian network for real data."
+}
