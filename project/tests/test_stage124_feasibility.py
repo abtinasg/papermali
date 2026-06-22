@@ -1,4 +1,6 @@
+import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -22,6 +24,10 @@ def manifest():
 
 def report():
     return json.loads(p.OUT_REPORT.read_text(encoding="utf-8"))
+
+
+def candidate_history():
+    return pd.read_csv(p.OUT_CANDIDATE_HISTORY, dtype=str, keep_default_na=False)
 
 
 def test_output_has_exactly_15_tickers():
@@ -108,3 +114,23 @@ def test_rerun_same_input_output_structure_stable():
     df = flat()
     assert list(df.columns) == p.FLAT_COLUMNS
     assert list(manifest().columns) == p.MANIFEST_COLUMNS
+
+
+def test_reproducibility_metadata_and_candidate_history():
+    r = report()
+    script_bytes = p.SCRIPT.read_bytes()
+    script_sha256 = hashlib.sha256(script_bytes).hexdigest()
+    source_bytes = subprocess.run(["git", "show", f"{r['code_commit']}:project/stage124_feasibility/probe_listing_sources_stage124_v2.py"], cwd=ROOT.parent, check=True, capture_output=True).stdout
+    assert {"source_commit_before_run", "source_tree_dirty_before_run", "source_file_sha256_before_run"}.issubset(r)
+    assert r["source_tree_dirty_before_run"] is False
+    assert r["script_sha256"] == script_sha256
+    assert r["source_file_sha256"] == script_sha256
+    assert r["source_file_sha256_before_run"] == script_sha256
+    assert r["code_commit"] == r["source_commit_before_run"]
+    assert hashlib.sha256(source_bytes).hexdigest() == r["script_sha256"]
+    assert not list(p.RAW_ROOT.glob("**/_egress__*"))
+    hist = candidate_history()
+    assert len(hist) == 4
+    assert set(hist["ticker"]) == {"بوعلی", "نوری"}
+    assert set(hist["review_status"]) == {"candidate_only_not_verified"}
+    assert set(flat()["verified"].str.lower()) == {"false"}
