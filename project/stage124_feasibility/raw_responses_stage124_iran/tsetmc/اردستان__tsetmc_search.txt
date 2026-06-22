@@ -1,0 +1,1 @@
+{"instrumentSearch":[{"insCode2":"60180484993057513","insCode3":"12491110820929615","insCode4":"53682409688462828","insCode":"35331248532537562","lVal30":"سيمان اردستان","lVal18AFC":"اردستان","flow":1,"cIsin":null,"zTitad":0.0,"baseVol":0,"instrumentID":null,"cgrValCot":"N1","cComVal":null,"lastDate":1,"sourceID":1,"flowTitle":"بازار بورس","cgrValCotTitle":""}]}
