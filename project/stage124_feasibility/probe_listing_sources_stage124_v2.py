@@ -36,6 +36,12 @@ OUT_CSV = HERE / "feasibility_probe_flat_stage124_iran.csv"
 OUT_REPORT = HERE / "feasibility_probe_report_stage124_iran.json"
 OUT_MANIFEST = HERE / "raw_responses_manifest_stage124_iran.csv"
 OUT_CANDIDATE_HISTORY = HERE / "instrument_candidate_history_stage124_iran.csv"
+SOURCE_PROVENANCE_FILES = [
+    "project/stage124_feasibility/probe_listing_sources_stage124_v2.py",
+    "project/tests/test_stage124_feasibility.py",
+    "project/stage124_feasibility/README.md",
+    "project/stage124_feasibility/README_STAGE124_IRAN_PROBE.md",
+]
 
 PILOT_TICKERS = ["اردستان", "اروند", "سآبیک", "وکغدیر", "کویر", "بوعلی", "نوری", "سپید", "کیمیاتک", "پی‌پاد", "پرداخت", "پارس", "کاوه", "جم پیلن", "اپال"]
 CODAL_HINTS = ["عرضه اولیه", "پذیرش", "درج نماد", "آغاز معاملات", "گشایش نماد", "امیدنامه", "عرضه سهام"]
@@ -303,9 +309,22 @@ def git_commit() -> str:
         return ""
 
 
+def source_tree_dirty() -> bool:
+    try:
+        out = subprocess.run(["git", "status", "--porcelain", "--", *SOURCE_PROVENANCE_FILES], cwd=PROJECT.parent, check=False, text=True, capture_output=True).stdout.strip()
+        return bool(out)
+    except Exception:
+        return True
+
+
 def main() -> int:
     start = now_iso(); t0 = time.time()
     before_hash = sha256_file(TEMPLATE)
+    source_commit_before_run = git_commit()
+    dirty_before_run = source_tree_dirty()
+    source_file_hash = sha256_file(SCRIPT)
+    if dirty_before_run:
+        raise SystemExit("source provenance files are dirty; aborting before network extraction")
     names = load_template_names()
     missing = [t for t in PILOT_TICKERS if t not in names]
     if missing:
@@ -358,7 +377,7 @@ def main() -> int:
     with OUT_CANDIDATE_HISTORY.open("w", newline="", encoding="utf-8-sig") as f:
         w = csv.DictWriter(f, fieldnames=CANDIDATE_HISTORY_COLUMNS); w.writeheader(); w.writerows(candidate_history_rows)
     counts = {k: sum(1 for r in rows if r["extraction_status"] == k) for k in STATUS_VALUES}
-    report = {"stage_name": "stage124_iran_data_probe_batch01", "started_at": start, "finished_at": now_iso(), "python_version": sys.version, "platform": platform.platform(), "code_commit": git_commit(), "script_sha256": sha256_file(SCRIPT), "stage124_template_sha256_before": before_hash, "stage124_template_sha256_after": after_hash, "egress_country_code": eg["egress_country_code"], "egress_check_source": eg["egress_check_source"], "egress_checked_at": eg["egress_checked_at"], "egress_ip_masked": eg["egress_ip_masked"], "egress_ip_sha256": eg["egress_ip_sha256"], "valid_iran_run": valid_iran_run, "public_internet_access": source_ok["internet"], "tsetmc_accessible": source_ok["tsetmc"], "codal_accessible": source_ok["codal"], "input_ticker_count": len(PILOT_TICKERS), "candidate_found_count": counts["candidate_found"], "ambiguous_instrument_count": counts["ambiguous_instrument"], "network_unreachable_count": counts["network_unreachable"], "no_instrument_match_count": counts["no_instrument_match"], "empty_trade_history_count": counts["empty_trade_history"], "parse_error_count": counts["parse_error"], "candidate_date_count": sum(bool(r["candidate_first_trade_date_gregorian"]) for r in rows), "codal_notice_ticker_count": sum(int(r["codal_candidate_notice_count"]) > 0 for r in rows), "is_verified_file": False, "touches_eligibility": False, "frozen_files_modified": before_hash != after_hash, "status_counts": counts, "output_files": [str(OUT_CSV.relative_to(PROJECT)), str(OUT_REPORT.relative_to(PROJECT)), str(OUT_MANIFEST.relative_to(PROJECT)), str(OUT_CANDIDATE_HISTORY.relative_to(PROJECT)), str(RAW_ROOT.relative_to(PROJECT))], "runtime_seconds": round(time.time() - t0, 2)}
+    report = {"stage_name": "stage124_iran_data_probe_batch01", "started_at": start, "finished_at": now_iso(), "python_version": sys.version, "platform": platform.platform(), "code_commit": source_commit_before_run, "script_sha256": source_file_hash, "source_file_sha256": source_file_hash, "source_commit_before_run": source_commit_before_run, "source_tree_dirty_before_run": dirty_before_run, "source_file_sha256_before_run": source_file_hash, "stage124_template_sha256_before": before_hash, "stage124_template_sha256_after": after_hash, "egress_country_code": eg["egress_country_code"], "egress_check_source": eg["egress_check_source"], "egress_checked_at": eg["egress_checked_at"], "egress_ip_masked": eg["egress_ip_masked"], "egress_ip_sha256": eg["egress_ip_sha256"], "valid_iran_run": valid_iran_run, "public_internet_access": source_ok["internet"], "tsetmc_accessible": source_ok["tsetmc"], "codal_accessible": source_ok["codal"], "input_ticker_count": len(PILOT_TICKERS), "candidate_found_count": counts["candidate_found"], "ambiguous_instrument_count": counts["ambiguous_instrument"], "network_unreachable_count": counts["network_unreachable"], "no_instrument_match_count": counts["no_instrument_match"], "empty_trade_history_count": counts["empty_trade_history"], "parse_error_count": counts["parse_error"], "candidate_date_count": sum(bool(r["candidate_first_trade_date_gregorian"]) for r in rows), "codal_notice_ticker_count": sum(int(r["codal_candidate_notice_count"]) > 0 for r in rows), "is_verified_file": False, "touches_eligibility": False, "frozen_files_modified": before_hash != after_hash, "status_counts": counts, "output_files": [str(OUT_CSV.relative_to(PROJECT)), str(OUT_REPORT.relative_to(PROJECT)), str(OUT_MANIFEST.relative_to(PROJECT)), str(OUT_CANDIDATE_HISTORY.relative_to(PROJECT)), str(RAW_ROOT.relative_to(PROJECT))], "runtime_seconds": round(time.time() - t0, 2)}
     OUT_REPORT.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({"valid_iran_run": valid_iran_run, "egress_country_code": eg["egress_country_code"], "status_counts": counts, "frozen_files_modified": before_hash != after_hash}, ensure_ascii=False))
     return 0
