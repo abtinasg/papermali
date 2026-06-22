@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Stage124 — FEASIBILITY PROBE v2 (read-only, non-authoritative).
+"""DEPRECATED LEGACY RUNNER — do not use for official Stage124 Iran probe artifacts.
+
+Stage124 — FEASIBILITY PROBE v2 (read-only, non-authoritative).
 
 PURPOSE
     Technical check ONLY: can we automatically pull the *initial* listing info for the
