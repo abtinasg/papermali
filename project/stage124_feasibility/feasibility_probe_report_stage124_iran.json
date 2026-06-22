@@ -1,18 +1,22 @@
 {
   "stage_name": "stage124_iran_data_probe_batch01",
-  "started_at": "2026-06-22T15:18:45Z",
-  "finished_at": "2026-06-22T15:19:11Z",
+  "started_at": "2026-06-22T16:08:56Z",
+  "finished_at": "2026-06-22T16:09:22Z",
   "python_version": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
   "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
-  "code_commit": "e5d4894b2b10b77477dd6f23047ca24f60b972d4",
-  "script_sha256": "fca688a84d39e7d01a2feda30d5d562e6588961999bc9524ba45a8eb96a2148f",
+  "code_commit": "2dd65bae93d2bafb0dc752b9331a75838f16742b",
+  "script_sha256": "fc529c472c271eeade74186ae01785b09e9a0d79d82ee2159022cdc04fa36711",
+  "source_file_sha256": "fc529c472c271eeade74186ae01785b09e9a0d79d82ee2159022cdc04fa36711",
+  "source_commit_before_run": "2dd65bae93d2bafb0dc752b9331a75838f16742b",
+  "source_tree_dirty_before_run": false,
+  "source_file_sha256_before_run": "fc529c472c271eeade74186ae01785b09e9a0d79d82ee2159022cdc04fa36711",
   "stage124_template_sha256_before": "f8e9a1f905e3b8c9ada13ba2008731c401943539e2a0c1d5b42745899c00c7e3",
   "stage124_template_sha256_after": "f8e9a1f905e3b8c9ada13ba2008731c401943539e2a0c1d5b42745899c00c7e3",
   "egress_country_code": "IR",
   "egress_check_source": "https://api.country.is/",
-  "egress_checked_at": "2026-06-22T15:18:45Z",
-  "egress_ip_masked": "5.200.***.***",
-  "egress_ip_sha256": "a70f81af089f81340392ceb3feccbfc87ce59908dd9a56416699e9411cc81fa2",
+  "egress_checked_at": "2026-06-22T16:08:56Z",
+  "egress_ip_masked": "86.55.***.***",
+  "egress_ip_sha256": "b5c32c336e57641aa249db46f6d57534448cbdb66c259dad389b5f61a8524a18",
   "valid_iran_run": true,
   "public_internet_access": true,
   "tsetmc_accessible": true,
@@ -31,14 +35,14 @@
   "frozen_files_modified": false,
   "status_counts": {
     "codal_no_candidate_notice": 0,
+    "empty_trade_history": 0,
+    "network_unreachable": 0,
+    "no_instrument_match": 0,
     "parse_error": 0,
     "partial_success": 0,
-    "no_instrument_match": 0,
-    "empty_trade_history": 0,
     "ambiguous_instrument": 2,
-    "network_unreachable": 0,
-    "candidate_found": 13,
-    "http_error": 0
+    "http_error": 0,
+    "candidate_found": 13
   },
   "output_files": [
     "stage124_feasibility/feasibility_probe_flat_stage124_iran.csv",
@@ -47,5 +51,5 @@
     "stage124_feasibility/instrument_candidate_history_stage124_iran.csv",
     "stage124_feasibility/raw"
   ],
-  "runtime_seconds": 25.96
+  "runtime_seconds": 25.99
 }
