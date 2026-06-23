@@ -1,0 +1,41 @@
+{
+  "stage_name": "stage124_pilot15_user_confirmed",
+  "source_code_commit": "131bd45d90c7341d8a96268ceabf0e3029bb49c7",
+  "source_tree_dirty_before_run": false,
+  "source_file_sha256": {
+    "src/stage124_pilot15.py": "4f4fb67b45f9b5f264a126da3334fc229844367e6963c3f578f68095976c097a",
+    "run_stage124_pilot15.py": "09c243a0184faf332c73aae3a8a5c03310f86768707e2d1f33d9e4e342957398",
+    "tests/test_stage124_pilot15.py": "f955365263e8924d5e7b6cc4b1a4ed3640da7b5d459d0a667a06ac5b8eb7a7e3"
+  },
+  "input_user_confirmed_file": "stage124/listing_pilot15_user_confirmed_stage124.csv",
+  "input_user_confirmed_sha256": "76820ccd439d4617fd6214787a893f421ac0e191ec1223ff617918bf799c1f75",
+  "input_tsetmc_probe_file": "stage124_feasibility/feasibility_probe_flat_stage124_iran.csv",
+  "input_tsetmc_probe_sha256": "07ebbdaaa9ae84236f383d55d4abd0af203211c3dd45a762e088af7d5dd02c91",
+  "stage123_input_file": "stage123/modeling_all_rows_stage123.csv",
+  "stage123_input_sha256_before": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+  "stage123_input_sha256_after": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+  "listing_master_template_sha256_before": "f8e9a1f905e3b8c9ada13ba2008731c401943539e2a0c1d5b42745899c00c7e3",
+  "listing_master_template_sha256_after": "f8e9a1f905e3b8c9ada13ba2008731c401943539e2a0c1d5b42745899c00c7e3",
+  "output_file_hashes": {
+    "stage124/listing_pilot15_user_confirmed_stage124.csv": "76820ccd439d4617fd6214787a893f421ac0e191ec1223ff617918bf799c1f75",
+    "stage124/listing_master_partial_verified_stage124.csv": "efeb30fa609de1a0cf73df24a559311a2eadce5099e3373f131f59802bb3450c",
+    "stage124/listing_pilot15_tsetmc_conflict_audit_stage124.csv": "de52b9264fbf24630ddb95a9d990dba4cef56e2fd53d545e0d01010b9d63aea9",
+    "stage124/listing_eligibility_impact_pilot15_stage124.csv": "83722fac1d47b030226eb16bc56ed189ee9e4d769ed8af51829eb40d9c455e9f",
+    "stage124/listing_eligibility_summary_pilot15_stage124.csv": "e39788c154700e187eee95537fb0f990389df48a7d21278999f85cdc7e50d1ae",
+    "stage124/stage124_pilot15_qc_report.json": "d6da81f26823a421062e751045517437d5e783c955f7f2b603eeb6a61ef04b04",
+    "stage124/stage124_pilot15_unit_test_output.txt": "3cd7b10dcf54248ff7a204fe907b1b5dfa73cb46252ff627b618a873244303ae",
+    "stage124/README_STAGE124_PILOT15_VERIFIED.md": "99fcc6a6476782ad31f706c4e560e66c56bd8061828117fafdf92de7921ff99b",
+    "stage124/stage124_pilot15_change_log.md": "d3f5e45e8ae062056224c549a581328b138675abc7469c6eece8e68b899d1f9e",
+    "stage124/metadata_and_hashes_stage124_pilot15.json": "75a1f09b3ec16deeb3edb8410b991be9a7337b809ebfa725b8731db5edc564c2"
+  },
+  "n_confirmed_tickers": 15,
+  "n_pending_tickers": 115,
+  "n_panel_rows_audited": 128,
+  "n_eligibility_changes_vs_proxy": 55,
+  "n_proxy_0_to_verified_1": 0,
+  "n_proxy_1_to_verified_0": 55,
+  "overall_qc_pass": true,
+  "runtime_seconds": 0.107,
+  "python_version": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
+  "platform": "macOS-26.2-arm64-arm-64bit-Mach-O"
+}
