@@ -6,7 +6,7 @@
   "n_input_unique_tickers": 130,
   "template_file": "listing_master_template_stage124.csv",
   "template_sha256": "f8e9a1f905e3b8c9ada13ba2008731c401943539e2a0c1d5b42745899c00c7e3",
-  "source_code_commit": "76194138ebb59970ef80170d753c448911253228",
+  "source_code_commit": "131bd45d90c7341d8a96268ceabf0e3029bb49c7",
   "source_tree_dirty_before_run": false,
   "source_file_sha256": {
     "src/stage124.py": "affed315d4fc83e535a744a7bfa3ec90559c2f4194f21296e9e45c00ed5dc774",
@@ -14,9 +14,9 @@
     "tests/test_stage124.py": "b843fd75274bc99f04331bfa2d3cbb93ce68c913a2e8af2c7e99622c351e0ab2"
   },
   "intended_freeze_tag": "stage124-template-frozen-v1",
-  "datetime": "2026-06-21 19:07:47",
-  "python": "3.13.0 (v3.13.0:60403a5409f, Oct  7 2024, 00:37:40) [Clang 15.0.0 (clang-1500.3.9.4)]",
+  "datetime": "2026-06-23 13:36:13",
+  "python": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
   "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
   "seed": 42,
-  "runtime_seconds": 0.11
+  "runtime_seconds": 0.09
 }
