@@ -1,0 +1,116 @@
+﻿ticker,ticker_normalized,company_name,earliest_fiscal_year_in_dataset,latest_fiscal_year_in_dataset,n_panel_rows,current_prelisting_proxy_row_count,current_first_eligible_year_proxy,has_prelisting_proxy_rows,tsetmc_candidate_status,tsetmc_candidate_date_jalali,tsetmc_candidate_date_gregorian,tsetmc_instrument_candidate_count,multiple_ordinary_instruments,suspected_public_entry_after_1392,gap_after_1392,estimated_rows_at_risk,estimated_pairs_at_risk,priority_reason,priority_score,priority_rank
+زپارس,زپارس,شرکت ملی کشت و صنعت و دامپروری پارس,1394,1402,9,0,1394,0,not_probed_gate_a,,,,0,1,2,3,3,dataset_starts_well_after_1392|eligibility_rows_at_risk_if_entry_later,35.0,1
+بالبر,بالبر,کابل البرز,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,2
+بترانس,بترانس,شرکت ایران ترانسفو,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,3
+برکت,برکت,گروه دارویی برکت,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,4
+بکاب,بکاب,شرکت صنایع جوشکاب یزد,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,5
+بکام,بکام,شرکت کارخانجات تولیدی شهید قندی,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,6
+تاپیکو,تاپیکو,شرکت سرمایه گذاری نفت و گاز و پتروشیمی تامین,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,7
+تپمپی,تپمپی,گروه صنایع پمپ‌سازی ایران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,8
+تکمبا,تکمبا,شرکت کمباین سازی ایران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,9
+جم,جم,شرکت پتروشیمی جم,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,10
+ددام,ددام,شرکت داروسازی زاگرس فارمد پارس,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,11
+درازک,درازک,لابراتوارهای رازک,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,12
+دسینا,دسینا,شرکت لابراتوارهای سینا دارو,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,13
+دشیمی,دشیمی,شرکت شیمی دارویی داروپخش,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,14
+ذوب,ذوب,ذوب آهن اصفهان,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,15
+ساربیل,ساربیل,شرکت سیمان آرتا اردبیل,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,16
+ساروم,ساروم,شرکت سیمان ارومیه,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,17
+سبجنو,سبجنو,شرکت سیمان بجنورد,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,18
+ستران,ستران,شرکت سیمان تهران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,19
+سخاش,سخاش,شرکت سیمان خاش,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,20
+سصفها,سصفها,شرکت سیمان اصفهان,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,21
+سغرب,سغرب,شرکت صنایع سیمان غرب,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,22
+سنیر,سنیر,شرکت سیمان سفید نی‌ریز,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,23
+شاراک,شاراک,شرکت پتروشیمی شازند,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,24
+شبریز,شبریز,پالایش نفت تبریز,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,25
+شبندر,شبندر,پالایش نفت بندرعباس,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,26
+شدوص,شدوص,شرکت دوده صنعتی پارس,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,27
+شغدیر,شغدیر,شرکت پتروشیمی غدیر,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,28
+شفارس,شفارس,شرکت صنایع شیمیایی فارس,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,29
+شلعاب,شلعاب,شرکت لعابیران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,30
+شپارس,شپارس,شرکت بین‌المللی محصولات پارس,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,31
+شپنا,شپنا,پالایش نفت اصفهان,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,32
+شکربن,شکربن,شرکت کربن ایران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,33
+شکلر,شکلر,شرکت نیروی کلر,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,34
+شیران,شیران,شرکت سرمایه‌گذاری صنایع شیمیایی ایران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,35
+فاذر,فاذر,شرکت صنایع آذرآب,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,36
+فارس,فارس,شرکت صنایع پتروشیمی خلیج فارس,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,37
+فایرا,فایرا,آلومینیوم ایران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,38
+فباهنر,فباهنر,صنایع مس شهید باهنر,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,39
+فجام,فجام,شرکت صنعتی جام دارو (سهامی عام),1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,40
+فجر,فجر,فولاد امیرکبیر کاشان,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,41
+فخوز,فخوز,فولاد خوزستان,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,42
+فرآور,فرآور,فرآوری مواد معدنی ایران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,43
+فسرب,فسرب,ملی سرب و روی ایران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,44
+فسپا,فسپا,گروه صنعتی سپاهان,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,45
+فمراد,فمراد,آلومراد,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,46
+فملی,فملی,ملی صنایع مس ایران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,47
+فنورد,فنورد,نورد و تولید قطعات فولادی,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,48
+فولاژ,فولاژ,فولاد آلیاژی ایران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,49
+فپنتا,فپنتا,صنعتی سپنتا,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,50
+لابسا,لابسا,شرکت آبسال,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,51
+لبوتان,لبوتان,شرکت گروه صنعتی بوتان,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,52
+لخزر,لخزر,شرکت صنعتی پارس خزر,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,53
+لسرما,لسرما,شرکت صنایع سرماآفرین ایران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,54
+وملی,وملی,سرمایه گذاری گروه صنعتی ملی,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,55
+پارسان,پارسان,شرکت گسترش نفت و گاز پارسیان,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,56
+پدرخش,پدرخش,شرکت تولیدی و صنعتی درخشان تهران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,57
+پسهند,پسهند,صنایع لاستیکی سهند,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,58
+پلاسک,پلاسک,کارخانجات پلاسکوکار سایپا,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,59
+چافست,چافست,شرکت افست,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,60
+چکارن,چکارن,کارتن ایران,1393,1402,10,0,1393,0,not_probed_gate_a,,,,0,1,1,2,2,dataset_starts_after_1392|eligibility_rows_at_risk_if_entry_later,20.0,61
+بموتو,بموتو,موتوژن,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,62
+ثشرق,ثشرق,سرمایه گذاری مسکن شمال شرق,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,63
+ثنوسا,ثنوسا,نوسازی و ساختمان تهران,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,64
+حپترو,حپترو,حمل و نقل پتروشیمی,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,65
+حکشتی,حکشتی,کشتیرانی جمهوری اسلامی ایران,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,66
+خاذین,خاذین,سایپا آذین,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,67
+خبهمن,خبهمن,گروه بهمن,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,68
+ختوقا,ختوقا,گروه صنعتی قطعات اتومبیل ایران,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,69
+خرینگ,خرینگ,رینگ سازی مشهد,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,70
+خمحور,خمحور,تولید محور خودرو,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,71
+خمهر,خمهر,مهرکام پارس,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,72
+خنصیر,خنصیر,مهندسی نصیر ماشین,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,73
+خوساز,خوساز,محورسازان ایران خودرو,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,74
+خچرخش,خچرخش,چرخشگر,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,75
+خکمک,خکمک,کمک فنر ایندامین,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,76
+دروز,دروز,روز دارو,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,77
+دسبحا,دسبحا,گروه دارویی سبحان,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,78
+دیران,دیران,ایران دارو,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,79
+رانفور,رانفور,خدمات انفورماتیک,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,80
+رمپنا,رمپنا,گروه مپنا (سهامی عام),1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,81
+زمگسا,زمگسا,شرکت کشاورزی و دامپروری مگسال,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,82
+ساراب,ساراب,سیمان داراب,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,83
+سبهان,سبهان,سیمان بهبهان,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,84
+سخزر,سخزر,سیمان خزر,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,85
+سخوز,سخوز,سیمان خوزستان,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,86
+سدشت,سدشت,سیمان دشتستان,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,87
+سدور,سدور,شرکت سیمان دورود,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,88
+سرود,سرود,سیمان شاهرود,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,89
+سشرق,سشرق,سیمان شرق,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,90
+سفارس,سفارس,سیمان فارس و خوزستان,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,91
+سقاین,سقاین,سیمان قاین,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,92
+سمازن,سمازن,سیمان مازندران,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,93
+سهگمت,سهگمت,سیمان هگمتان,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,94
+سپاها,سپاها,سیمان سپاهان,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,95
+سکرد,سکرد,سیمان کردستان,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,96
+سیلام,سیلام,سیمان ایلام,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,97
+غبهنوش,غبهنوش,بهنوش ایران,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,98
+غدام,غدام,خوراک دام پارس,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,99
+غسالم,غسالم,سالمین,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,100
+غشان,غشان,شیر پاستوریزه پگاه خراسان,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,101
+غشهد,غشهد,شهد ایران,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,102
+غنوش,غنوش,نوش مازندران,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,103
+غگل,غگل,گلوکوزان,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,104
+های وب,های وب,داده گستر عصر نوین,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,105
+همراه,همراه,ارتباطات سیار ایران,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,106
+ومعادن,ومعادن,شرکت سرمایه گذاری توسعه معادن و فلزات (سهامی عام),1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,107
+کبافق,کبافق,معادن بافق,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,108
+کرازی,کرازی,کارخانجات تولیدی شیشه دارویی رازی,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,109
+کروی,کروی,توسعه معادن روی ایران,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,110
+کفرا,کفرا,فرآورده‌های نسوز ایران,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,111
+کفپارس,کفپارس,فرآورده‌های نسوز پارس,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,112
+کهمدا,کهمدا,شیشه همدان,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,113
+کگاز,کگاز,شیشه و گاز,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,114
+کگل,کگل,معدنی و صنعتی گل گهر,1392,1402,11,0,1392,0,not_probed_gate_a,,,,0,0,0,1,1,eligibility_rows_at_risk_if_entry_later,5.0,115
