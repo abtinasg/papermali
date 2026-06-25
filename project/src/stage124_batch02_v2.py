@@ -1016,8 +1016,9 @@ def run() -> dict:
     print(f"  Batch selected: {len(selected_tickers)} tickers")
     print(f"  Note: {batch_note}")
 
-    # 7. Mark selected in priority
+    # 7. Mark selected in priority and selected
     priority["selected_for_batch02_v2"] = priority["ticker"].isin(selected_tickers).astype(int)
+    selected["selected_for_batch02_v2"] = 1
 
     # 8. Build research, provenance, conflict, user review
     retrieved_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
