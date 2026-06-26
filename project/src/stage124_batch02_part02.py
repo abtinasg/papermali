@@ -316,15 +316,55 @@ def check_existing_probe(ticker: str) -> dict | None:
     }
 
 
-def probe_tsetmc_for_tickers(tickers: list, timeout: float = 5.0) -> dict:
+TSETMC_AUDIT_CSV = PART02_DIR / "part02_tsetmc_audit_10tickers.csv"
+
+
+def _load_existing_tsetmc_audit() -> dict | None:
+    if not TSETMC_AUDIT_CSV.exists():
+        return None
+    try:
+        df = read_csv(TSETMC_AUDIT_CSV)
+        result = {}
+        for _, r in df.iterrows():
+            tk = r["ticker"]
+            result[tk] = {
+                "instrument_match_status": r.get("instrument_match_status", ""),
+                "ordinary_instrument_count": r.get("ordinary_instrument_count", ""),
+                "selected_inscode": r.get("selected_inscode", ""),
+                "tsetmc_candidate_date_jalali": r.get("tsetmc_candidate_date_jalali", ""),
+                "tsetmc_candidate_date_gregorian": r.get("tsetmc_candidate_date_gregorian", ""),
+                "probe_retrieved_at": r.get("probe_retrieved_at", ""),
+                "probe_raw_sha256": r.get("probe_raw_sha256", ""),
+                "probe_notes": r.get("probe_notes", ""),
+                "source_file_path": r.get("source_file_path", ""),
+                "source_file_sha256": r.get("source_file_sha256", ""),
+                "valid_iran_run": r.get("valid_iran_run", ""),
+                "ordinary_instrument_candidates_json": r.get("ordinary_instrument_candidates_json", "[]"),
+                "multiple_ordinary_instruments": r.get("multiple_ordinary_instruments", 0),
+                "probe_source": r.get("probe_source", "existing_audit_csv"),
+            }
+        return result
+    except Exception:
+        return None
+
+
+def probe_tsetmc_for_tickers(tickers: list, timeout: float = 5.0,
+                             force: bool = False) -> dict:
     results = {}
-    sess = _http_session()
+    existing_audit = None if force else _load_existing_tsetmc_audit()
+    sess = None
     for tk in tickers:
+        if existing_audit and tk in existing_audit:
+            results[tk] = existing_audit[tk]
+            results[tk]["probe_source"] = "existing_audit_csv"
+            continue
         existing = check_existing_probe(tk)
         if existing and existing.get("instrument_match_status") not in ("", "not_probed"):
             existing["probe_source"] = "existing_probe_csv"
             results[tk] = existing
             continue
+        if sess is None:
+            sess = _http_session()
         result = tsetmc_probe_ticker(tk, sess, timeout=timeout)
         result["probe_source"] = "live_probe"
         results[tk] = result
@@ -380,15 +420,37 @@ def _ambiguity_notes(info: dict, probe: dict) -> str:
 
 
 # ---- source fetch for حکشتی ----------------------------------------------------
-def fetch_sources_hkeshti(timeout: float = 5.0) -> dict:
-    """Fetch up to 3 URLs for حکشتی sequentially. retry=0, timeout=5s."""
+def _snapshot_rel_path(idx: int) -> str:
+    return f"stage124/batch02_parts/snapshots_hkeshti/source_{idx}.html"
+
+
+def fetch_sources_hkeshti(timeout: float = 5.0, force: bool = False) -> dict:
+    """Fetch up to 3 URLs for حکشتی sequentially. retry=0, timeout=5s.
+
+    If an existing provenance CSV has حکشتی rows and the snapshot file exists
+    with a matching SHA-256, the snapshot is reused instead of re-fetching.
+    Timeout/non-fetched sources are also reused from existing provenance
+    without re-sending requests.
+    """
     info = RESEARCH_DATA["حکشتی"]
     sources = info.get("sources", [])[:3]
     results = {}
     snapshot_dir = PART02_DIR / "snapshots_hkeshti"
     snapshot_dir.mkdir(parents=True, exist_ok=True)
+
+    provenance_path = PART02_DIR / "part02_source_provenance_10tickers.csv"
+    existing_prov = None
+    if not force and provenance_path.exists():
+        try:
+            existing_prov = read_csv(provenance_path)
+            existing_prov = existing_prov[existing_prov["ticker"] == "حکشتی"]
+        except Exception:
+            existing_prov = None
+
     for idx, src in enumerate(sources, 1):
         url = src[2]
+        snap_path = snapshot_dir / f"source_{idx}.html"
+        rel_path = _snapshot_rel_path(idx)
         rec = {
             "source_index": idx,
             "source_url": url,
@@ -402,6 +464,48 @@ def fetch_sources_hkeshti(timeout: float = 5.0) -> dict:
             "retrieved_at_utc": _utc_now(),
             "extraction_notes": "",
         }
+
+        reused = False
+        if existing_prov is not None and not existing_prov.empty:
+            prov_row = existing_prov[existing_prov["source_index"] == str(idx)]
+            if not prov_row.empty:
+                pr = prov_row.iloc[0]
+                prov_hash = str(pr.get("content_sha256", ""))
+                prov_status = str(pr.get("retrieval_status", ""))
+                if prov_hash and snap_path.exists():
+                    existing_body = snap_path.read_bytes()
+                    existing_hash = hashlib.sha256(existing_body).hexdigest()
+                    if existing_hash == prov_hash:
+                        rec["http_status"] = str(pr.get("http_status", ""))
+                        rec["retrieval_status"] = "reused_existing_snapshot"
+                        rec["final_url"] = str(pr.get("final_url", url))
+                        rec["content_type"] = str(pr.get("content_type", ""))
+                        rec["response_size_bytes"] = len(existing_body)
+                        rec["snapshot_path"] = rel_path
+                        rec["content_sha256"] = existing_hash
+                        rec["retrieved_at_utc"] = str(pr.get("retrieved_at_utc", _utc_now()))
+                        rec["extraction_notes"] = (
+                            f"Reused existing snapshot; SHA-256 matches provenance. "
+                            f"{len(existing_body)} bytes."
+                        )
+                        results[idx] = rec
+                        reused = True
+                elif prov_status in ("timeout", "connection_error", "fetch_error"):
+                    rec["http_status"] = str(pr.get("http_status", ""))
+                    rec["retrieval_status"] = prov_status
+                    rec["final_url"] = str(pr.get("final_url", url))
+                    rec["content_type"] = str(pr.get("content_type", ""))
+                    rec["response_size_bytes"] = int(pr.get("response_size_bytes", 0) or 0)
+                    rec["snapshot_path"] = str(pr.get("snapshot_path", ""))
+                    rec["content_sha256"] = prov_hash
+                    rec["retrieved_at_utc"] = str(pr.get("retrieved_at_utc", _utc_now()))
+                    rec["extraction_notes"] = str(pr.get("extraction_notes", ""))
+                    results[idx] = rec
+                    reused = True
+
+        if reused:
+            continue
+
         try:
             resp = _requests.get(url, timeout=timeout, allow_redirects=True,
                                  headers={"User-Agent": "Mozilla/5.0"})
@@ -411,9 +515,8 @@ def fetch_sources_hkeshti(timeout: float = 5.0) -> dict:
             body = resp.content
             rec["response_size_bytes"] = len(body)
             rec["content_sha256"] = hashlib.sha256(body).hexdigest()
-            snap_path = snapshot_dir / f"source_{idx}.html"
             snap_path.write_bytes(body)
-            rec["snapshot_path"] = str(snap_path)
+            rec["snapshot_path"] = rel_path
             rec["retrieval_status"] = "fetched_ok"
             rec["extraction_notes"] = f"HTTP {resp.status_code}; {len(body)} bytes; content_sha256 recorded."
         except _requests.exceptions.Timeout:
@@ -723,7 +826,7 @@ def build_hash_manifest(files: list, source_commit: str) -> pd.DataFrame:
 
 
 # ---- main run ------------------------------------------------------------------
-def run() -> dict:
+def run(force_tsetmc: bool = False, force_fetch: bool = False) -> dict:
     PART02_DIR.mkdir(parents=True, exist_ok=True)
     retrieved_at = _utc_now()
     source_commit = git_head()
@@ -732,8 +835,9 @@ def run() -> dict:
 
     company_names = load_company_names()
     tickers_df = build_tickers_df(company_names)
-    probe_results = probe_tsetmc_for_tickers(PART02_TICKERS, timeout=5.0)
-    hkeshti_fetch = fetch_sources_hkeshti(timeout=5.0)
+    probe_results = probe_tsetmc_for_tickers(PART02_TICKERS, timeout=5.0,
+                                             force=force_tsetmc)
+    hkeshti_fetch = fetch_sources_hkeshti(timeout=5.0, force=force_fetch)
 
     research_df = build_research_screening(company_names, probe_results)
     provenance_df = build_source_provenance(probe_results, retrieved_at, hkeshti_fetch)

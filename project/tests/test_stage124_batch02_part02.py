@@ -12,6 +12,7 @@ from project.src.stage124_batch02_part02 import (
     RESEARCH_DATA,
     PART02_DIR,
     FROZEN_FILES,
+    TSETMC_AUDIT_CSV,
     build_tickers_df,
     build_research_screening,
     build_source_provenance,
@@ -21,6 +22,8 @@ from project.src.stage124_batch02_part02 import (
     _tsetmc_disposition,
     _programmer_recommendation,
     _ambiguity_notes,
+    _load_existing_tsetmc_audit,
+    _snapshot_rel_path,
 )
 from project.src.stage124_batch02_v2 import (
     PILOT15,
@@ -409,3 +412,173 @@ class TestOtherNineTickersUnchanged:
         for tk in self.OTHER_NINE:
             assert RESEARCH_DATA[tk]["ordinary_share_confirmed"] == expected[tk], \
                 f"{tk}: expected {expected[tk]}, got {RESEARCH_DATA[tk]['ordinary_share_confirmed']}"
+
+
+# ---- Part 2.1A.1 stabilization tests --------------------------------------------
+class TestNonHkeshtiProvenanceRestored:
+    OTHER_NINE = ["بموتو", "ثشرق", "ثنوسا", "حپترو", "خاذین", "خبهمن", "ختوقا", "خرینگ", "خمحور"]
+    PROVENANCE_PATH = PART02_DIR / "part02_source_provenance_10tickers.csv"
+
+    def test_provenance_file_exists(self):
+        assert self.PROVENANCE_PATH.exists()
+
+    def test_non_hkeshti_retrieved_at_from_original_run(self):
+        df = pd.read_csv(self.PROVENANCE_PATH, dtype=str, encoding="utf-8-sig", keep_default_na=False)
+        non_hk = df[df["ticker"].isin(self.OTHER_NINE)]
+        for _, r in non_hk.iterrows():
+            ts = r["retrieved_at_utc"]
+            assert ts.startswith("2026-06-26T22:44:") or ts.startswith("2026-06-26T22:45:"), \
+                f"{r['ticker']} source {r['source_index']}: retrieved_at_utc={ts} not from original run"
+
+    def test_non_hkeshti_tsetmc_probe_retrieved_at_from_original(self):
+        df = pd.read_csv(self.PROVENANCE_PATH, dtype=str, encoding="utf-8-sig", keep_default_na=False)
+        non_hk_tsetmc = df[(df["ticker"].isin(self.OTHER_NINE)) & (df["source_type"] == "tsetmc_api")]
+        for _, r in non_hk_tsetmc.iterrows():
+            ts = r["retrieved_at_utc"]
+            assert ts.startswith("2026-06-26T22:4"), \
+                f"{r['ticker']}: tsetmc retrieved_at_utc={ts} not from original run"
+
+    def test_thnusa_source_type_is_market_information_aggregator(self):
+        df = pd.read_csv(self.PROVENANCE_PATH, dtype=str, encoding="utf-8-sig", keep_default_na=False)
+        thnusa = df[(df["ticker"] == "ثنوسا") & (df["source_type"] != "tsetmc_api")]
+        for _, r in thnusa.iterrows():
+            if "tacodal" in r["source_url"].lower():
+                assert r["source_type"] == "market_information_aggregator", \
+                    f"ثنوسا tacodal source_type={r['source_type']}, expected market_information_aggregator"
+
+    def test_thnusa_source_type_not_codal_official(self):
+        df = pd.read_csv(self.PROVENANCE_PATH, dtype=str, encoding="utf-8-sig", keep_default_na=False)
+        thnusa = df[df["ticker"] == "ثنوسا"]
+        for _, r in thnusa.iterrows():
+            assert r["source_type"] != "codal_official", \
+                f"ثنوسا source_type should not be codal_official"
+
+
+class TestTsetmcAuditRestored:
+    AUDIT_PATH = PART02_DIR / "part02_tsetmc_audit_10tickers.csv"
+
+    def test_audit_file_exists(self):
+        assert self.AUDIT_PATH.exists()
+
+    def test_all_probe_retrieved_at_from_original_run(self):
+        df = pd.read_csv(self.AUDIT_PATH, dtype=str, encoding="utf-8-sig", keep_default_na=False)
+        for _, r in df.iterrows():
+            ts = r["probe_retrieved_at"]
+            assert ts.startswith("2026-06-26T22:44:") or ts.startswith("2026-06-26T22:45:"), \
+                f"{r['ticker']}: probe_retrieved_at={ts} not from original run"
+
+    def test_all_probe_source_is_live_probe(self):
+        df = pd.read_csv(self.AUDIT_PATH, dtype=str, encoding="utf-8-sig", keep_default_na=False)
+        for _, r in df.iterrows():
+            assert r["probe_source"] == "live_probe", \
+                f"{r['ticker']}: probe_source={r['probe_source']}"
+
+
+class TestNoAbsolutePathInProvenance:
+    PROVENANCE_PATH = PART02_DIR / "part02_source_provenance_10tickers.csv"
+
+    def test_no_absolute_path_in_snapshot_path(self):
+        df = pd.read_csv(self.PROVENANCE_PATH, dtype=str, encoding="utf-8-sig", keep_default_na=False)
+        for _, r in df.iterrows():
+            sp = r.get("snapshot_path", "")
+            if sp:
+                assert not sp.startswith("/"), \
+                    f"{r['ticker']} source {r['source_index']}: absolute snapshot_path={sp}"
+                assert "/Users/" not in sp, \
+                    f"{r['ticker']}: /Users/ in snapshot_path={sp}"
+                assert "Desktop" not in sp, \
+                    f"{r['ticker']}: Desktop in snapshot_path={sp}"
+
+    def test_no_absolute_path_in_any_column(self):
+        df = pd.read_csv(self.PROVENANCE_PATH, dtype=str, encoding="utf-8-sig", keep_default_na=False)
+        for _, r in df.iterrows():
+            for col in df.columns:
+                val = str(r.get(col, ""))
+                if val and "/Users/" in val:
+                    pytest.fail(f"{r['ticker']} col={col}: contains /Users/ -> {val}")
+
+
+class TestSnapshotPathRelative:
+    def test_snapshot_rel_path_format(self):
+        p = _snapshot_rel_path(1)
+        assert p == "stage124/batch02_parts/snapshots_hkeshti/source_1.html"
+        assert not p.startswith("/")
+        assert "/Users/" not in p
+
+    def test_hkeshti_snapshot_path_in_provenance_is_relative(self):
+        df = pd.read_csv(
+            PART02_DIR / "part02_source_provenance_10tickers.csv",
+            dtype=str, encoding="utf-8-sig", keep_default_na=False,
+        )
+        hk = df[df["ticker"] == "حکشتی"]
+        for _, r in hk.iterrows():
+            sp = r.get("snapshot_path", "")
+            if sp:
+                assert sp == "stage124/batch02_parts/snapshots_hkeshti/source_1.html", \
+                    f"snapshot_path={sp}"
+
+
+class TestSnapshotHashMatchesProvenance:
+    SNAPSHOT_PATH = PART02_DIR / "snapshots_hkeshti" / "source_1.html"
+    PROVENANCE_PATH = PART02_DIR / "part02_source_provenance_10tickers.csv"
+
+    def test_snapshot_exists(self):
+        assert self.SNAPSHOT_PATH.exists()
+
+    def test_snapshot_hash_matches_provenance(self):
+        body = self.SNAPSHOT_PATH.read_bytes()
+        actual_hash = hashlib.sha256(body).hexdigest()
+        df = pd.read_csv(self.PROVENANCE_PATH, dtype=str, encoding="utf-8-sig", keep_default_na=False)
+        hk_fetched = df[(df["ticker"] == "حکشتی") & (df["retrieval_status"] == "fetched_ok")]
+        assert len(hk_fetched) >= 1
+        prov_hash = hk_fetched.iloc[0]["content_sha256"]
+        assert actual_hash == prov_hash, \
+            f"snapshot hash={actual_hash} != provenance hash={prov_hash}"
+
+
+class TestRerunNoTsetmc:
+    def test_load_existing_tsetmc_audit_returns_data(self):
+        result = _load_existing_tsetmc_audit()
+        assert result is not None
+        assert len(result) == 10
+        for tk in PART02_TICKERS:
+            assert tk in result
+            assert result[tk]["instrument_match_status"] == "network_unreachable"
+
+    def test_existing_audit_has_original_timestamps(self):
+        result = _load_existing_tsetmc_audit()
+        for tk, probe in result.items():
+            ts = probe["probe_retrieved_at"]
+            assert ts.startswith("2026-06-26T22:4"), \
+                f"{tk}: probe_retrieved_at={ts} not from original run"
+
+
+class TestRerunNoHkeshtiFetch:
+    def test_fetch_sources_hkeshti_reuses_existing(self):
+        from project.src.stage124_batch02_part02 import fetch_sources_hkeshti
+        results = fetch_sources_hkeshti(timeout=5.0, force=False)
+        assert results[1]["retrieval_status"] == "reused_existing_snapshot"
+        assert results[1]["snapshot_path"] == "stage124/batch02_parts/snapshots_hkeshti/source_1.html"
+        assert results[1]["content_sha256"] == hashlib.sha256(
+            (PART02_DIR / "snapshots_hkeshti" / "source_1.html").read_bytes()
+        ).hexdigest()
+
+    def test_timeout_sources_not_refetched(self):
+        from project.src.stage124_batch02_part02 import fetch_sources_hkeshti
+        results = fetch_sources_hkeshti(timeout=5.0, force=False)
+        assert results[2]["retrieval_status"] == "timeout"
+        assert results[3]["retrieval_status"] == "timeout"
+
+
+class TestHkeshtiStatusUnchanged:
+    def test_hkeshti_requires_manual_review(self):
+        assert RESEARCH_DATA["حکشتی"]["evidence_status"] == "requires_manual_review"
+
+    def test_hkeshti_not_ready_for_user_review(self):
+        assert RESEARCH_DATA["حکشتی"]["ready_for_user_review"] == "false"
+
+    def test_hkeshti_canonical_empty(self):
+        assert RESEARCH_DATA["حکشتی"]["proposed_canonical_public_entry_date_jalali"] == ""
+
+    def test_hkeshti_event_type_unresolved(self):
+        assert RESEARCH_DATA["حکشتی"]["proposed_canonical_event_type"] == "unresolved"
