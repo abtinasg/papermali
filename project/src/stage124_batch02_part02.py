@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import quote
 import pandas as pd
+import requests as _requests
 from .stage124_batch02_v2 import (
     normalize_ticker, normalize_symbol, normalize_jalali, normalize_digits,
     jalali_to_gregorian_str, sha, git_head, merge_commit_in_ancestry,
@@ -91,7 +92,7 @@ RESEARCH_DATA = {
         "ordinary_share_confirmed": "true",
         "event_description": "در تاریخ ۹ دی ۸۳ با نماد ثنوسا در بورس به ثبت رسید.",
         "sources": [
-            ["codal_official", "نماد ثنوسا - تاکدال",
+            ["market_information_aggregator", "نماد ثنوسا - تاکدال",
              "https://tacodal.ir/symbol/%D8%AB%D9%86%D9%88%D8%B3%D8%A7", "",
              "در تاریخ 9 دی 83 با نماد ثنوسا در سازمان بورس به ثبت رسید."],
             ["company_official_website", "شرکت نوسازی و ساختمان تهران",
@@ -126,25 +127,28 @@ RESEARCH_DATA = {
     "حکشتی": {
         "admission_date_candidate_jalali": "",
         "listing_date_candidate_jalali": "",
-        "first_public_offering_date_candidate_jalali": "1387-02-28",
+        "first_public_offering_date_candidate_jalali": "",
         "first_public_trading_date_candidate_jalali": "",
-        "proposed_canonical_public_entry_date_jalali": "1387-02-28",
-        "proposed_canonical_event_type": "first_public_offering",
+        "proposed_canonical_public_entry_date_jalali": "",
+        "proposed_canonical_event_type": "unresolved",
         "date_precision": "exact_day",
-        "evidence_status": "candidate_supported",
-        "research_status": "candidate_supported",
-        "ready_for_user_review": "true",
-        "ordinary_share_confirmed": "true",
-        "event_description": "در تاریخ ۱۳۸۷/۰۲/۲۸ سهام کشتیرانی در بورس عرضه گردید.",
+        "evidence_status": "requires_manual_review",
+        "research_status": "requires_manual_review",
+        "ready_for_user_review": "false",
+        "ordinary_share_confirmed": "unknown",
+        "event_description": "تعارض تاریخ نخستین عرضه عمومی: ۱۳۸۷/۰۲/۲۸ (همشهری آنلاین) در برابر ۱۳۸۷/۰۲/۲۹ (شواهد بیرونی دیگر). تعارض تاکنون حل‌نشده.",
         "sources": [
-            ["codal_official", "نماد حکشتی - تاکدال",
+            ["news_website_contemporaneous", "28 اردیبهشت: عرضه اولیه سهام کشتیرانی - همشهری آنلاین",
+             "https://www.hamshahrionline.ir/news/51719/28-%D8%A7%D8%B1%D8%AF%DB%8C%D8%A8%D9%87%D8%B4%D8%AA-%D8%B9%D8%B1%D8%B6%D9%87-%D8%A7%D9%88%D9%84%DB%8C%D9%87-%D8%B3%D9%87%D8%A7%D9%85-%DA%A9%D8%B4%D8%AA%DB%8C%D8%B1%D8%A7%D9%86%DB%8C", "1387-02-28",
+             "سهام کشتیرانی جمهوری اسلامی ایران روز شنبه ۲۸ اردیبهشت پس از پذیرش و درج نام در فهرست شرکت‌های پذیرفته شده، در تابلو فرعی بورس عرضه می‌شود. ۱۲۷ میلیون سهم معادل ۲.۵۵ درصد عرضه می‌گردد."],
+            ["market_information_aggregator", "نماد حکشتی - تاکدال",
              "https://tacodal.ir/symbol/%D8%AD%DA%A9%D8%B4%D8%AA%DB%8C", "1387-02-28",
              "در تاریخ ۱۳۸۷/۰۲/۲۸ سهام کشتیرانی جمهوری اسلامی ایران در بورس عرضه گردید."],
-            ["market_media", "سهام حکشتی - علیرضا مهرابی",
-             "https://alirezamehrabi.com/saham/transportation/kshj", "",
-             "پذیرفته شدن در بورس: 1387. اولین بار در سال 1387 معامله شد."],
+            ["market_media", "بررسی وضعیت سهام کشتیرانی - بورس ۲۴",
+             "https://www.bourse24.ir/news/63921", "",
+             "در روز عرضه اولیه، سهام شرکت کشتیرانی تا دقایق پایانی معاملات در قیمت ۲۳۷ تومان رقابت شد."],
         ],
-        "notes": "first_public_offering با exact day و دو منبع مستقل.",
+        "notes": "تعارض تاریخ ۱۳۸۷/۰۲/۲۸ و ۱۳۸۷/۰۲/۲۹؛ تا حل تعارض canonical خالی و requires_manual_review.",
     },
     "خاذین": {
         "admission_date_candidate_jalali": "",
@@ -359,6 +363,8 @@ def _ambiguity_notes(info: dict, probe: dict) -> str:
             parts.append("only month precision; exact day required")
         elif info["date_precision"] == "year_only":
             parts.append("only year precision; exact day required")
+        elif info["date_precision"] == "exact_day" and not info.get("proposed_canonical_public_entry_date_jalali"):
+            parts.append("conflicting exact-day dates; manual resolution required")
     ts = probe.get("instrument_match_status", "not_probed")
     td = probe.get("tsetmc_candidate_date_jalali", "")
     if ts == "network_unreachable":
@@ -371,6 +377,56 @@ def _ambiguity_notes(info: dict, probe: dict) -> str:
     elif td:
         parts.append("tsetmc candidate audit-only; not canonical")
     return "; ".join(parts) if parts else ""
+
+
+# ---- source fetch for حکشتی ----------------------------------------------------
+def fetch_sources_hkeshti(timeout: float = 5.0) -> dict:
+    """Fetch up to 3 URLs for حکشتی sequentially. retry=0, timeout=5s."""
+    info = RESEARCH_DATA["حکشتی"]
+    sources = info.get("sources", [])[:3]
+    results = {}
+    snapshot_dir = PART02_DIR / "snapshots_hkeshti"
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
+    for idx, src in enumerate(sources, 1):
+        url = src[2]
+        rec = {
+            "source_index": idx,
+            "source_url": url,
+            "http_status": "",
+            "retrieval_status": "",
+            "final_url": url,
+            "content_type": "",
+            "response_size_bytes": 0,
+            "snapshot_path": "",
+            "content_sha256": "",
+            "retrieved_at_utc": _utc_now(),
+            "extraction_notes": "",
+        }
+        try:
+            resp = _requests.get(url, timeout=timeout, allow_redirects=True,
+                                 headers={"User-Agent": "Mozilla/5.0"})
+            rec["http_status"] = resp.status_code
+            rec["final_url"] = resp.url
+            rec["content_type"] = resp.headers.get("Content-Type", "")
+            body = resp.content
+            rec["response_size_bytes"] = len(body)
+            rec["content_sha256"] = hashlib.sha256(body).hexdigest()
+            snap_path = snapshot_dir / f"source_{idx}.html"
+            snap_path.write_bytes(body)
+            rec["snapshot_path"] = str(snap_path)
+            rec["retrieval_status"] = "fetched_ok"
+            rec["extraction_notes"] = f"HTTP {resp.status_code}; {len(body)} bytes; content_sha256 recorded."
+        except _requests.exceptions.Timeout:
+            rec["retrieval_status"] = "timeout"
+            rec["extraction_notes"] = f"Request timed out after {timeout}s."
+        except _requests.exceptions.ConnectionError as e:
+            rec["retrieval_status"] = "connection_error"
+            rec["extraction_notes"] = f"Connection error: {str(e)[:200]}"
+        except Exception as e:
+            rec["retrieval_status"] = "fetch_error"
+            rec["extraction_notes"] = f"Error: {str(e)[:200]}"
+        results[idx] = rec
+    return results
 
 
 # ---- DataFrame builders --------------------------------------------------------
@@ -436,7 +492,8 @@ def build_research_screening(company_names: dict, probe_results: dict) -> pd.Dat
     return pd.DataFrame(rows)
 
 
-def build_source_provenance(probe_results: dict, retrieved_at: str) -> pd.DataFrame:
+def build_source_provenance(probe_results: dict, retrieved_at: str,
+                            hkeshti_fetch: dict | None = None) -> pd.DataFrame:
     rows = []
     for tk in PART02_TICKERS:
         info = RESEARCH_DATA[tk]
@@ -447,7 +504,7 @@ def build_source_provenance(probe_results: dict, retrieved_at: str) -> pd.DataFr
             src_url = src[2]
             pub_date = src[3] if len(src) > 3 else ""
             event_summary = src[4] if len(src) > 4 else ""
-            rows.append({
+            row = {
                 "ticker": tk, "source_index": idx,
                 "source_type": src_type, "source_title": src_title,
                 "source_url": src_url, "publication_date": pub_date,
@@ -458,7 +515,19 @@ def build_source_provenance(probe_results: dict, retrieved_at: str) -> pd.DataFr
                 "content_sha256": "",
                 "extraction_notes": "Source identified during Part 2 web research; raw snapshot not captured.",
                 "exact_text_or_event_summary": event_summary,
-            })
+            }
+            if tk == "حکشتی" and hkeshti_fetch and idx in hkeshti_fetch:
+                fr = hkeshti_fetch[idx]
+                row["http_status"] = str(fr["http_status"])
+                row["retrieval_status"] = fr["retrieval_status"]
+                row["final_url"] = fr["final_url"]
+                row["content_type"] = fr["content_type"]
+                row["response_size_bytes"] = str(fr["response_size_bytes"])
+                row["snapshot_path"] = fr["snapshot_path"]
+                row["content_sha256"] = fr["content_sha256"]
+                row["retrieved_at_utc"] = fr["retrieved_at_utc"]
+                row["extraction_notes"] = fr["extraction_notes"]
+            rows.append(row)
         probe = probe_results.get(tk, {})
         tsetmc_status = probe.get("instrument_match_status", "not_probed")
         tsetmc_raw_sha = probe.get("probe_raw_sha256", "")
@@ -664,9 +733,10 @@ def run() -> dict:
     company_names = load_company_names()
     tickers_df = build_tickers_df(company_names)
     probe_results = probe_tsetmc_for_tickers(PART02_TICKERS, timeout=5.0)
+    hkeshti_fetch = fetch_sources_hkeshti(timeout=5.0)
 
     research_df = build_research_screening(company_names, probe_results)
-    provenance_df = build_source_provenance(probe_results, retrieved_at)
+    provenance_df = build_source_provenance(probe_results, retrieved_at, hkeshti_fetch)
     tsetmc_df = build_tsetmc_audit(probe_results)
 
     research_path = PART02_DIR / "part02_research_screening_10tickers.csv"
@@ -717,6 +787,14 @@ def run() -> dict:
         "unresolved_tickers": [],
         "ready_for_user_review_tickers": [],
         "tsetmc_results": {},
+        "hkeshti_conflict": {
+            "date_28": "1387-02-28",
+            "date_29": "1387-02-29",
+            "resolution": "unresolved",
+            "evidence_status": "requires_manual_review",
+            "ready_for_user_review": False,
+        },
+        "hkeshti_fetch_results": {},
     }
     for _, r in research_df.iterrows():
         tk = r["ticker"]
@@ -736,6 +814,15 @@ def run() -> dict:
             "instrument_match_status": probe.get("instrument_match_status", "not_probed"),
             "tsetmc_candidate_date_jalali": probe.get("tsetmc_candidate_date_jalali", ""),
             "probe_source": probe.get("probe_source", "live_probe"),
+        }
+    for idx, fr in hkeshti_fetch.items():
+        summary["hkeshti_fetch_results"][f"source_{idx}"] = {
+            "source_url": fr["source_url"],
+            "http_status": str(fr["http_status"]),
+            "retrieval_status": fr["retrieval_status"],
+            "content_sha256": fr["content_sha256"],
+            "response_size_bytes": str(fr["response_size_bytes"]),
+            "snapshot_path": fr["snapshot_path"],
         }
     summary_path = PART02_DIR / "part02_summary.json"
     with open(summary_path, "w", encoding="utf-8") as f:

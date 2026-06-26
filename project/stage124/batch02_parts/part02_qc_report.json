@@ -1,7 +1,7 @@
 {
   "stage": "stage124_batch02_part02",
-  "generated_at": "2026-06-26T22:45:41Z",
-  "source_commit": "f472011c550762fc7ce92c08a24f39b8a1c433d2",
+  "generated_at": "2026-06-26T23:00:24Z",
+  "source_commit": "6a4d6eb29c3e615efe65a124cd5c93f3d3b2aacc",
   "ticker_count": 10,
   "tickers": [
     "بموتو",
@@ -115,14 +115,14 @@
       "detail": ""
     },
     {
-      "assertion": "ready_only_for_exact_day_حکشتی",
+      "assertion": "ready_false_when_not_exact_حکشتی",
       "passed": true,
-      "detail": "dp=exact_day, ev=first_public_offering, es=candidate_supported, cand=1387-02-28"
+      "detail": ""
     },
     {
       "assertion": "date_conversion_ok_حکشتی",
       "passed": true,
-      "detail": "jalali=1387-02-28, greg=2008-05-17, expected=2008-05-17"
+      "detail": ""
     },
     {
       "assertion": "no_canonical_from_admission_خاذین",

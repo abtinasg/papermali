@@ -106,20 +106,20 @@ class TestAdmissionOnlyCanonical:
     def test_no_admission_in_canonical_event_type(self):
         for tk, info in RESEARCH_DATA.items():
             ev = info["proposed_canonical_event_type"]
-            if ev:
+            if ev and ev not in ("unresolved", ""):
                 assert ev in ("first_public_offering", "first_public_trading"), \
                     f"{tk}: {ev} is not a canonical event type"
 
 
 class TestReadyForUserReview:
-    def test_only_hkeshti_ready(self):
+    def test_no_ticker_ready(self):
         ready = [tk for tk, info in RESEARCH_DATA.items()
                  if info["ready_for_user_review"] == "true"]
-        assert ready == ["حکشتی"]
+        assert ready == []
 
-    def test_hkeshti_is_exact_day(self):
-        assert RESEARCH_DATA["حکشتی"]["date_precision"] == "exact_day"
-        assert RESEARCH_DATA["حکشتی"]["evidence_status"] == "candidate_supported"
+    def test_hkeshti_not_ready_due_to_conflict(self):
+        assert RESEARCH_DATA["حکشتی"]["ready_for_user_review"] == "false"
+        assert RESEARCH_DATA["حکشتی"]["evidence_status"] == "requires_manual_review"
 
     def test_month_year_not_ready(self):
         for tk in ["خاذین", "خبهمن", "ختوقا"]:
@@ -289,9 +289,9 @@ class TestFrozenIntegrity:
 
 
 class TestProgrammerRecommendation:
-    def test_candidate_supported(self):
+    def test_hkeshti_now_requires_manual_review(self):
         info = RESEARCH_DATA["حکشتی"]
-        assert _programmer_recommendation(info) == "recommend_user_review"
+        assert _programmer_recommendation(info) == "requires_manual_review_for_exact_date"
 
     def test_admission_only(self):
         info = RESEARCH_DATA["بموتو"]
@@ -300,3 +300,112 @@ class TestProgrammerRecommendation:
     def test_manual_review(self):
         info = RESEARCH_DATA["خاذین"]
         assert _programmer_recommendation(info) == "requires_manual_review_for_exact_date"
+
+
+# ---- Part 2.1A tests -----------------------------------------------------------
+class TestTacodalSourceType:
+    def test_no_codal_official_for_tacodal_urls(self):
+        for tk, info in RESEARCH_DATA.items():
+            for src in info.get("sources", []):
+                url = src[2].lower()
+                src_type = src[0]
+                if "tacodal" in url:
+                    assert src_type != "codal_official", \
+                        f"{tk}: Tacodal URL must not be codal_official, got {src_type}"
+
+    def test_tacodal_is_market_information_aggregator(self):
+        for tk, info in RESEARCH_DATA.items():
+            for src in info.get("sources", []):
+                url = src[2].lower()
+                if "tacodal" in url:
+                    assert src[0] == "market_information_aggregator", \
+                        f"{tk}: Tacodal URL should be market_information_aggregator, got {src[0]}"
+
+
+class TestHkeshtiDateConflict:
+    def test_hkeshti_not_ready_for_user_review(self):
+        assert RESEARCH_DATA["حکشتی"]["ready_for_user_review"] == "false"
+
+    def test_hkeshti_evidence_requires_manual_review(self):
+        assert RESEARCH_DATA["حکشتی"]["evidence_status"] == "requires_manual_review"
+
+    def test_hkeshti_canonical_date_empty(self):
+        assert RESEARCH_DATA["حکشتی"]["proposed_canonical_public_entry_date_jalali"] == ""
+
+    def test_hkeshti_event_type_unresolved(self):
+        assert RESEARCH_DATA["حکشتی"]["proposed_canonical_event_type"] == "unresolved"
+
+    def test_hkeshti_ordinary_share_unknown(self):
+        assert RESEARCH_DATA["حکشتی"]["ordinary_share_confirmed"] == "unknown"
+
+    def test_conflicting_dates_cause_not_ready(self):
+        tickers_df, research_df, prov_df, tsetmc_df = _build_fixture()
+        hkeshti_row = research_df[research_df["ticker"] == "حکشتی"].iloc[0]
+        assert str(hkeshti_row["ready_for_user_review"]).lower() == "false"
+        assert hkeshti_row["evidence_status"] == "requires_manual_review"
+        assert hkeshti_row["proposed_canonical_public_entry_date_jalali"] == ""
+
+
+class TestCandidateSupportedRequiresFetchedSource:
+    def test_no_candidate_supported_without_fetched_hash(self):
+        for tk, info in RESEARCH_DATA.items():
+            if info["evidence_status"] == "candidate_supported":
+                assert info["ready_for_user_review"] == "true"
+                assert info["proposed_canonical_public_entry_date_jalali"] != ""
+
+    def test_hkeshti_not_candidate_supported(self):
+        assert RESEARCH_DATA["حکشتی"]["evidence_status"] != "candidate_supported"
+
+
+class TestListingNotFirstOffering:
+    def test_admission_only_not_first_public_offering(self):
+        for tk in ["بموتو", "حپترو", "خمحور"]:
+            info = RESEARCH_DATA[tk]
+            assert info["first_public_offering_date_candidate_jalali"] == ""
+            assert info["first_public_trading_date_candidate_jalali"] == ""
+            assert info["proposed_canonical_public_entry_date_jalali"] == ""
+
+    def test_listing_only_not_first_public_offering(self):
+        for tk in ["ثشرق", "ثنوسا", "خرینگ"]:
+            info = RESEARCH_DATA[tk]
+            assert info["first_public_offering_date_candidate_jalali"] == ""
+            assert info["first_public_trading_date_candidate_jalali"] == ""
+            assert info["proposed_canonical_public_entry_date_jalali"] == ""
+
+
+class TestOtherNineTickersUnchanged:
+    OTHER_NINE = ["بموتو", "ثشرق", "ثنوسا", "حپترو", "خاذین", "خبهمن", "ختوقا", "خرینگ", "خمحور"]
+
+    def test_other_nine_evidence_status_unchanged(self):
+        expected = {
+            "بموتو": "requires_first_public_trade_evidence",
+            "ثشرق": "requires_first_public_trade_evidence",
+            "ثنوسا": "requires_first_public_trade_evidence",
+            "حپترو": "requires_first_public_trade_evidence",
+            "خاذین": "requires_manual_review",
+            "خبهمن": "requires_manual_review",
+            "ختوقا": "requires_manual_review",
+            "خرینگ": "requires_first_public_trade_evidence",
+            "خمحور": "requires_first_public_trade_evidence",
+        }
+        for tk in self.OTHER_NINE:
+            assert RESEARCH_DATA[tk]["evidence_status"] == expected[tk], \
+                f"{tk}: expected {expected[tk]}, got {RESEARCH_DATA[tk]['evidence_status']}"
+
+    def test_other_nine_ready_for_user_review_unchanged(self):
+        for tk in self.OTHER_NINE:
+            assert RESEARCH_DATA[tk]["ready_for_user_review"] == "false"
+
+    def test_other_nine_canonical_date_unchanged(self):
+        for tk in self.OTHER_NINE:
+            assert RESEARCH_DATA[tk]["proposed_canonical_public_entry_date_jalali"] == ""
+
+    def test_other_nine_ordinary_share_confirmed_unchanged(self):
+        expected = {
+            "بموتو": "true", "ثشرق": "true", "ثنوسا": "true",
+            "حپترو": "true", "خاذین": "true", "خبهمن": "true",
+            "ختوقا": "true", "خرینگ": "true", "خمحور": "true",
+        }
+        for tk in self.OTHER_NINE:
+            assert RESEARCH_DATA[tk]["ordinary_share_confirmed"] == expected[tk], \
+                f"{tk}: expected {expected[tk]}, got {RESEARCH_DATA[tk]['ordinary_share_confirmed']}"

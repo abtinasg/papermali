@@ -1,7 +1,7 @@
 {
   "stage": "stage124_batch02_part02",
-  "generated_at": "2026-06-26T22:45:41Z",
-  "source_commit": "f472011c550762fc7ce92c08a24f39b8a1c433d2",
+  "generated_at": "2026-06-26T23:00:24Z",
+  "source_commit": "6a4d6eb29c3e615efe65a124cd5c93f3d3b2aacc",
   "ticker_count": 10,
   "tickers": [
     "بموتو",
@@ -15,9 +15,7 @@
     "خرینگ",
     "خمحور"
   ],
-  "exact_day_dates": {
-    "حکشتی": "1387-02-28"
-  },
+  "exact_day_dates": {},
   "admission_only_tickers": [
     "بموتو",
     "ثشرق",
@@ -27,13 +25,12 @@
     "خمحور"
   ],
   "unresolved_tickers": [
+    "حکشتی",
     "خاذین",
     "خبهمن",
     "ختوقا"
   ],
-  "ready_for_user_review_tickers": [
-    "حکشتی"
-  ],
+  "ready_for_user_review_tickers": [],
   "tsetmc_results": {
     "بموتو": {
       "instrument_match_status": "network_unreachable",
@@ -84,6 +81,39 @@
       "instrument_match_status": "network_unreachable",
       "tsetmc_candidate_date_jalali": "",
       "probe_source": "live_probe"
+    }
+  },
+  "hkeshti_conflict": {
+    "date_28": "1387-02-28",
+    "date_29": "1387-02-29",
+    "resolution": "unresolved",
+    "evidence_status": "requires_manual_review",
+    "ready_for_user_review": false
+  },
+  "hkeshti_fetch_results": {
+    "source_1": {
+      "source_url": "https://www.hamshahrionline.ir/news/51719/28-%D8%A7%D8%B1%D8%AF%DB%8C%D8%A8%D9%87%D8%B4%D8%AA-%D8%B9%D8%B1%D8%B6%D9%87-%D8%A7%D9%88%D9%84%DB%8C%D9%87-%D8%B3%D9%87%D8%A7%D9%85-%DA%A9%D8%B4%D8%AA%DB%8C%D8%B1%D8%A7%D9%86%DB%8C",
+      "http_status": "200",
+      "retrieval_status": "fetched_ok",
+      "content_sha256": "09152a6ce812a01c83093c2a55d4c1faaeeba2d88e3a663c9cb7354263bde47d",
+      "response_size_bytes": "124180",
+      "snapshot_path": "/Users/aliehpourdast/Desktop/papermali/papermali/project/stage124/batch02_parts/snapshots_hkeshti/source_1.html"
+    },
+    "source_2": {
+      "source_url": "https://tacodal.ir/symbol/%D8%AD%DA%A9%D8%B4%D8%AA%DB%8C",
+      "http_status": "",
+      "retrieval_status": "timeout",
+      "content_sha256": "",
+      "response_size_bytes": "0",
+      "snapshot_path": ""
+    },
+    "source_3": {
+      "source_url": "https://www.bourse24.ir/news/63921",
+      "http_status": "",
+      "retrieval_status": "timeout",
+      "content_sha256": "",
+      "response_size_bytes": "0",
+      "snapshot_path": ""
     }
   }
 }
