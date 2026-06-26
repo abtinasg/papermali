@@ -1,4 +1,7 @@
-# Stage124 — Batch 2, Gate A
+> **SUPERSEDED** by `README_STAGE124_BATCH02_GATE_A_V2.md` (Stage124 Batch 2 Gate A V2).
+> This V1 file is preserved for provenance; do not use V1 outputs for downstream work.
+
+# Stage124 — Batch 2, Gate A (V1 — superseded)
 
 Priority ranking of the 115 pending tickers, selection of a 15-ticker Batch 2,
 and a public-entry candidate / research package prepared for **user review**.

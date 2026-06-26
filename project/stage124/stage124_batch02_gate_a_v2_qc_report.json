@@ -1,0 +1,153 @@
+{
+  "all_pass": true,
+  "assertions": [
+    {
+      "assertion": "pending_count_is_115",
+      "passed": true,
+      "detail": "pending=115"
+    },
+    {
+      "assertion": "verified_count_is_15",
+      "passed": true,
+      "detail": "verified=15"
+    },
+    {
+      "assertion": "no_pilot15_in_batch02",
+      "passed": true,
+      "detail": "intersection=set()"
+    },
+    {
+      "assertion": "batch02_size_in_15_20",
+      "passed": true,
+      "detail": "size=20"
+    },
+    {
+      "assertion": "no_verified_user_confirmed_flag",
+      "passed": true,
+      "detail": "Gate A never sets verified_user_confirmed"
+    },
+    {
+      "assertion": "no_full_verified_master_created",
+      "passed": true,
+      "detail": "listing_master_verified_stage124.csv must not exist"
+    },
+    {
+      "assertion": "w_gap_is_zero",
+      "passed": true,
+      "detail": "W_GAP removed from ranking"
+    },
+    {
+      "assertion": "gap_after_1392_not_in_priority_columns",
+      "passed": true,
+      "detail": "gap_after_1392 column absent from V2 priority output"
+    },
+    {
+      "assertion": "priority_tier_column_exists",
+      "passed": true,
+      "detail": "tiered ranking column present"
+    },
+    {
+      "assertion": "priority_score_column_absent",
+      "passed": true,
+      "detail": "old weighted score removed"
+    },
+    {
+      "assertion": "estimated_eligibility_rows_changed_uses_unknown",
+      "passed": true,
+      "detail": "unknown values present for tickers without candidate dates"
+    },
+    {
+      "assertion": "estimated_t_plus_1_pairs_changed_uses_unknown",
+      "passed": true,
+      "detail": "unknown values present for tickers without candidate dates"
+    },
+    {
+      "assertion": "suspected_public_entry_after_1392_uses_unknown",
+      "passed": true,
+      "detail": "unknown values present for tickers without external evidence"
+    },
+    {
+      "assertion": "canonical_date_selected_empty_in_all_conflicts",
+      "passed": true,
+      "detail": "canonical_date_selected remains empty in all conflict audit rows (checked in conflict CSV)"
+    },
+    {
+      "assertion": "admission_only_not_in_proposed_canonical",
+      "passed": true,
+      "detail": "admission-only tickers have empty proposed_canonical_public_entry_date (checked in research CSV)"
+    },
+    {
+      "assertion": "ready_for_user_review_false_for_admission_only",
+      "passed": true,
+      "detail": "admission-only tickers have ready_for_user_review=false (checked in research CSV)"
+    },
+    {
+      "assertion": "event_types_separated",
+      "passed": true,
+      "detail": "admission_date, listing_date, first_public_offering_date, first_public_trading_date are separate columns"
+    },
+    {
+      "assertion": "tsetmc_probe_attempted",
+      "passed": true,
+      "detail": "TSETMC probe attempted for all 115 pending tickers"
+    },
+    {
+      "assertion": "no_ticker_normalized_in_substantive_tie_keys",
+      "passed": true,
+      "detail": "ticker_normalized excluded from substantive tie detection"
+    },
+    {
+      "assertion": "reference_merge_commit_in_ancestry",
+      "passed": true,
+      "detail": "merge commit 439c3ce9 is ancestor of HEAD"
+    },
+    {
+      "assertion": "stage123_sha_matches",
+      "passed": true,
+      "detail": "sha=28b9f9d41856"
+    },
+    {
+      "assertion": "stage122_sha_matches",
+      "passed": true,
+      "detail": "sha=ece991c5ff28"
+    },
+    {
+      "assertion": "boundary_resolved_or_documented",
+      "passed": true,
+      "detail": "boundary_unresolved=True, note=Boundary unresolved: substantive tie extends beyond max 20; capped at 20. Manual"
+    }
+  ],
+  "runner": "stage124_batch02_v2",
+  "start_ts": "2026-06-26T10:39:08Z",
+  "end_ts": "2026-06-26T10:48:55Z",
+  "batch_note": "Boundary unresolved: substantive tie extends beyond max 20; capped at 20. Manual review needed.",
+  "boundary_unresolved": true,
+  "selected_tickers": [
+    "زپارس",
+    "برکت",
+    "بکاب",
+    "جم",
+    "بترانس",
+    "تاپیکو",
+    "تکمبا",
+    "ددام",
+    "ذوب",
+    "بالبر",
+    "بکام",
+    "تپمپی",
+    "درازک",
+    "دسینا",
+    "دشیمی",
+    "بموتو",
+    "ثشرق",
+    "ثنوسا",
+    "حپترو",
+    "حکشتی"
+  ],
+  "selected_count": 20,
+  "probe_summary": {
+    "candidate_found": 0,
+    "network_unreachable": 115,
+    "other": 0
+  }
+}

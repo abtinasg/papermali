@@ -1,4 +1,7 @@
-# Stage124 Batch 2 — Gate A change log
+# Stage124 Batch 2 — Gate A change log (V1 — superseded)
+
+> **SUPERSEDED** by `stage124_batch02_gate_a_v2_change_log.md` (Gate A V2).
+> This V1 file is preserved for provenance.
 
 Date: 2026-06-23
 Branch: `stage124-batch02-priority-research`
