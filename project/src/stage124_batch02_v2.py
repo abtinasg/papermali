@@ -998,7 +998,7 @@ def run() -> dict:
     # 3. TSETMC probe for all 115 pending tickers
     pending_tickers = sorted(pending["ticker"].tolist())
     print(f"  Probing TSETMC for {len(pending_tickers)} pending tickers...")
-    probe_results = tsetmc_probe_all(pending_tickers, timeout=15.0)
+    probe_results = tsetmc_probe_all(pending_tickers, timeout=5.0)
     probe_ok = sum(1 for v in probe_results.values() if v["instrument_match_status"] == "candidate_found")
     probe_fail = sum(1 for v in probe_results.values() if v["instrument_match_status"] == "network_unreachable")
     print(f"  TSETMC probe: {probe_ok} candidate_found, {probe_fail} network_unreachable")
