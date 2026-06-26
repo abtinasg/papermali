@@ -1,0 +1,89 @@
+{
+  "stage": "stage124_batch02_part02",
+  "generated_at": "2026-06-26T22:45:41Z",
+  "source_commit": "f472011c550762fc7ce92c08a24f39b8a1c433d2",
+  "ticker_count": 10,
+  "tickers": [
+    "بموتو",
+    "ثشرق",
+    "ثنوسا",
+    "حپترو",
+    "حکشتی",
+    "خاذین",
+    "خبهمن",
+    "ختوقا",
+    "خرینگ",
+    "خمحور"
+  ],
+  "exact_day_dates": {
+    "حکشتی": "1387-02-28"
+  },
+  "admission_only_tickers": [
+    "بموتو",
+    "ثشرق",
+    "ثنوسا",
+    "حپترو",
+    "خرینگ",
+    "خمحور"
+  ],
+  "unresolved_tickers": [
+    "خاذین",
+    "خبهمن",
+    "ختوقا"
+  ],
+  "ready_for_user_review_tickers": [
+    "حکشتی"
+  ],
+  "tsetmc_results": {
+    "بموتو": {
+      "instrument_match_status": "network_unreachable",
+      "tsetmc_candidate_date_jalali": "",
+      "probe_source": "live_probe"
+    },
+    "ثشرق": {
+      "instrument_match_status": "network_unreachable",
+      "tsetmc_candidate_date_jalali": "",
+      "probe_source": "live_probe"
+    },
+    "ثنوسا": {
+      "instrument_match_status": "network_unreachable",
+      "tsetmc_candidate_date_jalali": "",
+      "probe_source": "live_probe"
+    },
+    "حپترو": {
+      "instrument_match_status": "network_unreachable",
+      "tsetmc_candidate_date_jalali": "",
+      "probe_source": "live_probe"
+    },
+    "حکشتی": {
+      "instrument_match_status": "network_unreachable",
+      "tsetmc_candidate_date_jalali": "",
+      "probe_source": "live_probe"
+    },
+    "خاذین": {
+      "instrument_match_status": "network_unreachable",
+      "tsetmc_candidate_date_jalali": "",
+      "probe_source": "live_probe"
+    },
+    "خبهمن": {
+      "instrument_match_status": "network_unreachable",
+      "tsetmc_candidate_date_jalali": "",
+      "probe_source": "live_probe"
+    },
+    "ختوقا": {
+      "instrument_match_status": "network_unreachable",
+      "tsetmc_candidate_date_jalali": "",
+      "probe_source": "live_probe"
+    },
+    "خرینگ": {
+      "instrument_match_status": "network_unreachable",
+      "tsetmc_candidate_date_jalali": "",
+      "probe_source": "live_probe"
+    },
+    "خمحور": {
+      "instrument_match_status": "network_unreachable",
+      "tsetmc_candidate_date_jalali": "",
+      "probe_source": "live_probe"
+    }
+  }
+}
