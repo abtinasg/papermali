@@ -1089,7 +1089,7 @@ def run() -> dict:
             "gate_b_run": False,
             "verified_user_confirmed_set": False,
             "cumulative_partial_master_created": False,
-            "listing_master_verified_stage124_created": not FULL_VERIFIED_FORBIDDEN.exists(),
+            "listing_master_verified_stage124_created": FULL_VERIFIED_FORBIDDEN.exists(),
             "stage124_part2_run": False,
             "model_trained": False,
         },
