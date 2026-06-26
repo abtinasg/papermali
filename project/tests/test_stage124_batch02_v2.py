@@ -355,14 +355,14 @@ def test_suspected_unknown_when_no_evidence():
 def test_build_hash_manifest():
     df = build_hash_manifest()
     assert len(df) > 0
-    assert "file_path" in df.columns
+    assert "relative_path" in df.columns
     assert "sha256" in df.columns
-    assert "file_type" in df.columns
+    assert "file_role" in df.columns
     # Source code files should have non-empty hashes
-    src_rows = df[df["file_type"] == "source_code"]
+    src_rows = df[df["file_role"] == "source_code"]
     for _, r in src_rows.iterrows():
-        if (PROJECT / r["file_path"]).exists():
-            assert r["sha256"] != "", f"{r['file_path']} should have a hash"
+        if (PROJECT / r["relative_path"]).exists():
+            assert r["sha256"] != "", f"{r['relative_path']} should have a hash"
 
 
 # ---- Test 28: QC assertions cover key guardrails ------------------------------
@@ -499,3 +499,298 @@ def test_normalize_digits():
     assert normalize_digits("۱۳۹۷") == "1397"
     assert normalize_digits("۰۱۲۳۴۵۶۷۸۹") == "0123456789"
     assert normalize_digits("1397") == "1397"
+
+
+# ---- Test 35: QC no_verified_user_confirmed_flag checks real DataFrame --------
+def test_qc_no_verified_user_confirmed_flag_real_check():
+    """Verify QC fails when priority DataFrame contains verified_user_confirmed."""
+    pm = read_csv(PARTIAL_MASTER)
+    st = read_csv(STAGE123_INPUT)
+    pending = load_pending(pm)
+    feats = panel_features(st)
+    research = load_research()
+    probe_stub = {tk: {"instrument_match_status": "network_unreachable",
+                       "ordinary_instrument_count": "",
+                       "tsetmc_candidate_date_jalali": "",
+                       "multiple_ordinary_instruments": 0,
+                       "probe_retrieved_at": "",
+                       "probe_raw_sha256": "",
+                       "probe_notes": "test stub",
+                       "selected_inscode": "",
+                       "ordinary_instrument_candidates_json": "[]",
+                       "tsetmc_candidate_date_gregorian": "",
+                       "tsetmc_candidate_raw_field": "dEven"} for tk in pending["ticker"]}
+    screening = screen_all_pending(pending, feats, probe_stub, research)
+    priority = assign_tiers(screening)
+    selected, tickers, note, unresolved = select_batch_v2(priority)
+    priority["selected_for_batch02_v2"] = priority["ticker"].isin(tickers).astype(int)
+    selected["selected_for_batch02_v2"] = 1
+    retrieved_at = "2026-06-26T00:00:00Z"
+    r_df, p_df, c_df, u_df = build_outputs_v2(selected, priority, probe_stub, research, retrieved_at)
+
+    # Normal case: should pass
+    qc = run_qc(115, 15, tickers, priority, research, probe_stub, unresolved, note,
+                research_df=r_df, conflict_df=c_df, review_df=u_df)
+    a = next(x for x in qc["assertions"] if x["assertion"] == "no_verified_user_confirmed_flag")
+    assert a["passed"] is True, "Normal case should pass"
+
+    # Inject violation
+    priority_bad = priority.copy()
+    priority_bad["verification_status"] = "verified_user_confirmed"
+    qc2 = run_qc(115, 15, tickers, priority_bad, research, probe_stub, unresolved, note,
+                 research_df=r_df, conflict_df=c_df, review_df=u_df)
+    a2 = next(x for x in qc2["assertions"] if x["assertion"] == "no_verified_user_confirmed_flag")
+    assert a2["passed"] is False, "Should fail when verified_user_confirmed present in priority"
+
+
+# ---- Test 36: QC canonical_date_selected_empty checks real conflict_df --------
+def test_qc_canonical_date_selected_real_check():
+    """Verify QC fails when conflict_df has non-empty canonical_date_selected."""
+    pm = read_csv(PARTIAL_MASTER)
+    st = read_csv(STAGE123_INPUT)
+    pending = load_pending(pm)
+    feats = panel_features(st)
+    research = load_research()
+    probe_stub = {tk: {"instrument_match_status": "network_unreachable",
+                       "ordinary_instrument_count": "", "tsetmc_candidate_date_jalali": "",
+                       "multiple_ordinary_instruments": 0, "probe_retrieved_at": "",
+                       "probe_raw_sha256": "", "probe_notes": "stub",
+                       "selected_inscode": "", "ordinary_instrument_candidates_json": "[]",
+                       "tsetmc_candidate_date_gregorian": "", "tsetmc_candidate_raw_field": "dEven"}
+                  for tk in pending["ticker"]}
+    screening = screen_all_pending(pending, feats, probe_stub, research)
+    priority = assign_tiers(screening)
+    selected, tickers, note, unresolved = select_batch_v2(priority)
+    priority["selected_for_batch02_v2"] = priority["ticker"].isin(tickers).astype(int)
+    selected["selected_for_batch02_v2"] = 1
+    r_df, p_df, c_df, u_df = build_outputs_v2(selected, priority, probe_stub, research, "2026-06-26T00:00:00Z")
+
+    # Normal: should pass
+    qc = run_qc(115, 15, tickers, priority, research, probe_stub, unresolved, note,
+                research_df=r_df, conflict_df=c_df, review_df=u_df)
+    a = next(x for x in qc["assertions"] if x["assertion"] == "canonical_date_selected_empty_in_all_conflicts")
+    assert a["passed"] is True
+
+    # Inject violation
+    c_df_bad = c_df.copy()
+    c_df_bad.loc[0, "canonical_date_selected_jalali"] = "1397-01-01"
+    qc2 = run_qc(115, 15, tickers, priority, research, probe_stub, unresolved, note,
+                 research_df=r_df, conflict_df=c_df_bad, review_df=u_df)
+    a2 = next(x for x in qc2["assertions"] if x["assertion"] == "canonical_date_selected_empty_in_all_conflicts")
+    assert a2["passed"] is False, "Should fail when canonical_date_selected is non-empty"
+
+
+# ---- Test 37: QC admission_only_not_in_proposed_canonical checks real data ----
+def test_qc_admission_only_not_in_proposed_canonical_real_check():
+    """Verify QC fails when admission-only row has non-empty proposed_canonical."""
+    pm = read_csv(PARTIAL_MASTER)
+    st = read_csv(STAGE123_INPUT)
+    pending = load_pending(pm)
+    feats = panel_features(st)
+    research = load_research()
+    probe_stub = {tk: {"instrument_match_status": "network_unreachable",
+                       "ordinary_instrument_count": "", "tsetmc_candidate_date_jalali": "",
+                       "multiple_ordinary_instruments": 0, "probe_retrieved_at": "",
+                       "probe_raw_sha256": "", "probe_notes": "stub",
+                       "selected_inscode": "", "ordinary_instrument_candidates_json": "[]",
+                       "tsetmc_candidate_date_gregorian": "", "tsetmc_candidate_raw_field": "dEven"}
+                  for tk in pending["ticker"]}
+    screening = screen_all_pending(pending, feats, probe_stub, research)
+    priority = assign_tiers(screening)
+    selected, tickers, note, unresolved = select_batch_v2(priority)
+    priority["selected_for_batch02_v2"] = priority["ticker"].isin(tickers).astype(int)
+    selected["selected_for_batch02_v2"] = 1
+    r_df, p_df, c_df, u_df = build_outputs_v2(selected, priority, probe_stub, research, "2026-06-26T00:00:00Z")
+
+    # Normal: should pass
+    qc = run_qc(115, 15, tickers, priority, research, probe_stub, unresolved, note,
+                research_df=r_df, conflict_df=c_df, review_df=u_df)
+    a = next(x for x in qc["assertions"] if x["assertion"] == "admission_only_not_in_proposed_canonical")
+    assert a["passed"] is True
+
+    # Inject violation: set an admission-only row to have a non-empty proposed_canonical
+    if "proposed_canonical_event_type" in r_df.columns:
+        adm_mask = r_df["proposed_canonical_event_type"].astype(str).str.contains("admission", case=False)
+        if adm_mask.any():
+            r_df_bad = r_df.copy()
+            r_df_bad.loc[adm_mask, "proposed_canonical_public_entry_date_jalali"] = "1380-01-01"
+            qc2 = run_qc(115, 15, tickers, priority, research, probe_stub, unresolved, note,
+                         research_df=r_df_bad, conflict_df=c_df, review_df=u_df)
+            a2 = next(x for x in qc2["assertions"] if x["assertion"] == "admission_only_not_in_proposed_canonical")
+            assert a2["passed"] is False, "Should fail when admission-only has proposed_canonical date"
+
+
+# ---- Test 38: QC ready_for_user_review_false_for_admission_only real check ----
+def test_qc_ready_for_user_review_admission_only_real_check():
+    """Verify QC fails when admission-only row has ready_for_user_review=true."""
+    pm = read_csv(PARTIAL_MASTER)
+    st = read_csv(STAGE123_INPUT)
+    pending = load_pending(pm)
+    feats = panel_features(st)
+    research = load_research()
+    probe_stub = {tk: {"instrument_match_status": "network_unreachable",
+                       "ordinary_instrument_count": "", "tsetmc_candidate_date_jalali": "",
+                       "multiple_ordinary_instruments": 0, "probe_retrieved_at": "",
+                       "probe_raw_sha256": "", "probe_notes": "stub",
+                       "selected_inscode": "", "ordinary_instrument_candidates_json": "[]",
+                       "tsetmc_candidate_date_gregorian": "", "tsetmc_candidate_raw_field": "dEven"}
+                  for tk in pending["ticker"]}
+    screening = screen_all_pending(pending, feats, probe_stub, research)
+    priority = assign_tiers(screening)
+    selected, tickers, note, unresolved = select_batch_v2(priority)
+    priority["selected_for_batch02_v2"] = priority["ticker"].isin(tickers).astype(int)
+    selected["selected_for_batch02_v2"] = 1
+    r_df, p_df, c_df, u_df = build_outputs_v2(selected, priority, probe_stub, research, "2026-06-26T00:00:00Z")
+
+    # Normal: should pass
+    qc = run_qc(115, 15, tickers, priority, research, probe_stub, unresolved, note,
+                research_df=r_df, conflict_df=c_df, review_df=u_df)
+    a = next(x for x in qc["assertions"] if x["assertion"] == "ready_for_user_review_false_for_admission_only")
+    assert a["passed"] is True
+
+    # Inject violation
+    if "proposed_canonical_event_type" in r_df.columns:
+        adm_mask = r_df["proposed_canonical_event_type"].astype(str).str.contains("admission", case=False)
+        if adm_mask.any():
+            r_df_bad = r_df.copy()
+            r_df_bad.loc[adm_mask, "ready_for_user_review"] = "true"
+            qc2 = run_qc(115, 15, tickers, priority, research, probe_stub, unresolved, note,
+                         research_df=r_df_bad, conflict_df=c_df, review_df=u_df)
+            a2 = next(x for x in qc2["assertions"] if x["assertion"] == "ready_for_user_review_false_for_admission_only")
+            assert a2["passed"] is False, "Should fail when admission-only has ready_for_user_review=true"
+
+
+# ---- Test 39: QC event_types_separated checks real columns --------------------
+def test_qc_event_types_separated_real_check():
+    """Verify QC fails when event-type columns are missing from research_df."""
+    pm = read_csv(PARTIAL_MASTER)
+    st = read_csv(STAGE123_INPUT)
+    pending = load_pending(pm)
+    feats = panel_features(st)
+    research = load_research()
+    probe_stub = {tk: {"instrument_match_status": "network_unreachable",
+                       "ordinary_instrument_count": "", "tsetmc_candidate_date_jalali": "",
+                       "multiple_ordinary_instruments": 0, "probe_retrieved_at": "",
+                       "probe_raw_sha256": "", "probe_notes": "stub",
+                       "selected_inscode": "", "ordinary_instrument_candidates_json": "[]",
+                       "tsetmc_candidate_date_gregorian": "", "tsetmc_candidate_raw_field": "dEven"}
+                  for tk in pending["ticker"]}
+    screening = screen_all_pending(pending, feats, probe_stub, research)
+    priority = assign_tiers(screening)
+    selected, tickers, note, unresolved = select_batch_v2(priority)
+    priority["selected_for_batch02_v2"] = priority["ticker"].isin(tickers).astype(int)
+    selected["selected_for_batch02_v2"] = 1
+    r_df, p_df, c_df, u_df = build_outputs_v2(selected, priority, probe_stub, research, "2026-06-26T00:00:00Z")
+
+    # Normal: should pass
+    qc = run_qc(115, 15, tickers, priority, research, probe_stub, unresolved, note,
+                research_df=r_df, conflict_df=c_df, review_df=u_df)
+    a = next(x for x in qc["assertions"] if x["assertion"] == "event_types_separated")
+    assert a["passed"] is True
+
+    # Remove a column to trigger failure
+    r_df_bad = r_df.drop(columns=["admission_date_candidate_jalali"])
+    qc2 = run_qc(115, 15, tickers, priority, research, probe_stub, unresolved, note,
+                 research_df=r_df_bad, conflict_df=c_df, review_df=u_df)
+    a2 = next(x for x in qc2["assertions"] if x["assertion"] == "event_types_separated")
+    assert a2["passed"] is False, "Should fail when event-type column missing"
+
+
+# ---- Test 40: QC tsetmc_probe_attempted checks real probe count ---------------
+def test_qc_tsetmc_probe_attempted_real_check():
+    """Verify QC fails when probe_results count != pending_count."""
+    pm = read_csv(PARTIAL_MASTER)
+    st = read_csv(STAGE123_INPUT)
+    pending = load_pending(pm)
+    feats = panel_features(st)
+    research = load_research()
+    probe_stub = {tk: {"instrument_match_status": "network_unreachable",
+                       "ordinary_instrument_count": "", "tsetmc_candidate_date_jalali": "",
+                       "multiple_ordinary_instruments": 0, "probe_retrieved_at": "",
+                       "probe_raw_sha256": "", "probe_notes": "stub",
+                       "selected_inscode": "", "ordinary_instrument_candidates_json": "[]",
+                       "tsetmc_candidate_date_gregorian": "", "tsetmc_candidate_raw_field": "dEven"}
+                  for tk in pending["ticker"]}
+    screening = screen_all_pending(pending, feats, probe_stub, research)
+    priority = assign_tiers(screening)
+    selected, tickers, note, unresolved = select_batch_v2(priority)
+    priority["selected_for_batch02_v2"] = priority["ticker"].isin(tickers).astype(int)
+    selected["selected_for_batch02_v2"] = 1
+    r_df, p_df, c_df, u_df = build_outputs_v2(selected, priority, probe_stub, research, "2026-06-26T00:00:00Z")
+
+    # Normal: 115 probes for 115 pending — should pass
+    qc = run_qc(115, 15, tickers, priority, research, probe_stub, unresolved, note,
+                research_df=r_df, conflict_df=c_df, review_df=u_df)
+    a = next(x for x in qc["assertions"] if x["assertion"] == "tsetmc_probe_attempted")
+    assert a["passed"] is True
+
+    # Truncate probe results to trigger failure
+    probe_short = dict(list(probe_stub.items())[:50])
+    qc2 = run_qc(115, 15, tickers, priority, research, probe_short, unresolved, note,
+                 research_df=r_df, conflict_df=c_df, review_df=u_df)
+    a2 = next(x for x in qc2["assertions"] if x["assertion"] == "tsetmc_probe_attempted")
+    assert a2["passed"] is False, "Should fail when probe count != pending count"
+
+
+# ---- Test 41: External hash manifest schema -----------------------------------
+def test_hash_manifest_schema():
+    """Verify manifest has new schema: relative_path, file_role, size_bytes, sha256, generated_at, source_commit."""
+    manifest = build_hash_manifest()
+    expected_cols = ["relative_path", "file_role", "size_bytes", "sha256", "generated_at", "source_commit"]
+    for col in expected_cols:
+        assert col in manifest.columns, f"Missing manifest column: {col}"
+    # Old schema columns should not be present
+    assert "file_path" not in manifest.columns, "Old column file_path should be replaced by relative_path"
+    assert "file_type" not in manifest.columns, "Old column file_type should be replaced by file_role"
+    # Manifest self-row should have empty sha256
+    manifest_row = manifest[manifest["relative_path"] == "stage124/external_hash_manifest_stage124_batch02_gate_a_v2.csv"]
+    if len(manifest_row) > 0:
+        assert str(manifest_row.iloc[0]["sha256"]).strip() == "", "Manifest self-hash should be empty"
+    # All non-manifest rows should have non-empty sha256 if file exists
+    for _, row in manifest.iterrows():
+        if row["file_role"] != "manifest":
+            path = PROJECT / row["relative_path"]
+            if path.exists():
+                assert str(row["sha256"]).strip() != "", f"Empty sha256 for existing file: {row['relative_path']}"
+                assert int(row["size_bytes"]) > 0, f"Zero size for existing file: {row['relative_path']}"
+
+
+# ---- Test 42: QC all assertions use real data (no hardcoded True) -------------
+def test_qc_no_hardcoded_true():
+    """Verify that QC assertions that were previously hardcoded True now have real detail strings."""
+    pm = read_csv(PARTIAL_MASTER)
+    st = read_csv(STAGE123_INPUT)
+    pending = load_pending(pm)
+    feats = panel_features(st)
+    research = load_research()
+    probe_stub = {tk: {"instrument_match_status": "network_unreachable",
+                       "ordinary_instrument_count": "", "tsetmc_candidate_date_jalali": "",
+                       "multiple_ordinary_instruments": 0, "probe_retrieved_at": "",
+                       "probe_raw_sha256": "", "probe_notes": "stub",
+                       "selected_inscode": "", "ordinary_instrument_candidates_json": "[]",
+                       "tsetmc_candidate_date_gregorian": "", "tsetmc_candidate_raw_field": "dEven"}
+                  for tk in pending["ticker"]}
+    screening = screen_all_pending(pending, feats, probe_stub, research)
+    priority = assign_tiers(screening)
+    selected, tickers, note, unresolved = select_batch_v2(priority)
+    priority["selected_for_batch02_v2"] = priority["ticker"].isin(tickers).astype(int)
+    selected["selected_for_batch02_v2"] = 1
+    r_df, p_df, c_df, u_df = build_outputs_v2(selected, priority, probe_stub, research, "2026-06-26T00:00:00Z")
+
+    qc = run_qc(115, 15, tickers, priority, research, probe_stub, unresolved, note,
+                research_df=r_df, conflict_df=c_df, review_df=u_df)
+
+    # These assertions should have detail strings that reference real data, not generic True
+    real_check_names = [
+        "no_verified_user_confirmed_flag",
+        "canonical_date_selected_empty_in_all_conflicts",
+        "admission_only_not_in_proposed_canonical",
+        "ready_for_user_review_false_for_admission_only",
+        "event_types_separated",
+        "tsetmc_probe_attempted",
+    ]
+    for name in real_check_names:
+        a = next(x for x in qc["assertions"] if x["assertion"] == name)
+        # Detail should not be a generic hardcoded message
+        assert "checked" in a["detail"] or "found" in a["detail"] or "entries" in a["detail"] or "columns" in a["detail"] or "No " in a["detail"], \
+            f"QC assertion {name} detail should reference real data: {a['detail']}"

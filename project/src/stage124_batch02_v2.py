@@ -898,21 +898,38 @@ def build_hash_manifest(extra_files: list = None) -> pd.DataFrame:
     if extra_files:
         all_files.extend(extra_files)
 
+    _generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    _source_commit = git_head()
     rows = []
     for rel, ftype in all_files:
         p = ROOT / rel
-        if p.exists():
+        is_manifest_self = (ftype == "manifest")
+        if p.exists() and not is_manifest_self:
             h = utils.sha256_file(p)
+            sz = p.stat().st_size
+        elif p.exists() and is_manifest_self:
+            h = ""  # self-hash excluded; will be reported externally
+            sz = p.stat().st_size
         else:
             h = ""
-        rows.append({"file_path": rel, "file_type": ftype, "sha256": h})
+            sz = 0
+        rows.append({
+            "relative_path": rel,
+            "file_role": ftype,
+            "size_bytes": sz,
+            "sha256": h,
+            "generated_at": _generated_at,
+            "source_commit": _source_commit,
+        })
     return pd.DataFrame(rows)
 
 
 # ---- QC assertions -------------------------------------------------------------
 def run_qc(pending_count: int, verified_count: int, selected_tickers: list,
            priority: pd.DataFrame, research: dict, probe_results: dict,
-           boundary_unresolved: bool, batch_note: str) -> dict:
+           boundary_unresolved: bool, batch_note: str,
+           research_df: pd.DataFrame = None, conflict_df: pd.DataFrame = None,
+           review_df: pd.DataFrame = None) -> dict:
     assertions = []
 
     def check(name: str, passed: bool, detail: str = ""):
@@ -926,7 +943,16 @@ def run_qc(pending_count: int, verified_count: int, selected_tickers: list,
           f"intersection={set(selected_tickers) & PILOT15}")
     check("batch02_size_in_15_20", BATCH02_MIN <= len(selected_tickers) <= BATCH02_MAX,
           f"size={len(selected_tickers)}")
-    check("no_verified_user_confirmed_flag", True, "Gate A never sets verified_user_confirmed")
+
+    # --- Real checks on priority DataFrame ---
+    _has_verified_flag = False
+    for col in priority.columns:
+        if priority[col].astype(str).str.contains("verified_user_confirmed", na=False).any():
+            _has_verified_flag = True
+            break
+    check("no_verified_user_confirmed_flag", not _has_verified_flag,
+          "No verified_user_confirmed value found in any priority column")
+
     check("no_full_verified_master_created", not FULL_VERIFIED_FORBIDDEN.exists(),
           "listing_master_verified_stage124.csv must not exist")
     check("w_gap_is_zero", W_GAP == 0.0, "W_GAP removed from ranking")
@@ -945,16 +971,66 @@ def run_qc(pending_count: int, verified_count: int, selected_tickers: list,
     check("suspected_public_entry_after_1392_uses_unknown",
           "unknown" in priority["suspected_public_entry_after_1392"].astype(str).values,
           "unknown values present for tickers without external evidence")
-    check("canonical_date_selected_empty_in_all_conflicts", True,
-          "canonical_date_selected remains empty in all conflict audit rows (checked in conflict CSV)")
-    check("admission_only_not_in_proposed_canonical", True,
-          "admission-only tickers have empty proposed_canonical_public_entry_date (checked in research CSV)")
-    check("ready_for_user_review_false_for_admission_only", True,
-          "admission-only tickers have ready_for_user_review=false (checked in research CSV)")
-    check("event_types_separated", True,
-          "admission_date, listing_date, first_public_offering_date, first_public_trading_date are separate columns")
-    check("tsetmc_probe_attempted", True,
-          "TSETMC probe attempted for all 115 pending tickers")
+
+    # --- Real checks on conflict_df ---
+    if conflict_df is not None and len(conflict_df) > 0:
+        _canon_empty = all(
+            (str(v).strip() == "")
+            for v in conflict_df.get("canonical_date_selected_jalali", pd.Series([""])).values
+        ) and all(
+            (str(v).strip() == "")
+            for v in conflict_df.get("canonical_date_selected_gregorian", pd.Series([""])).values
+        )
+        check("canonical_date_selected_empty_in_all_conflicts", _canon_empty,
+              f"{len(conflict_df)} conflict rows checked; all canonical_date_selected fields empty")
+    else:
+        check("canonical_date_selected_empty_in_all_conflicts", True,
+              "No conflict rows to check")
+
+    # --- Real checks on research_df ---
+    if research_df is not None and len(research_df) > 0:
+        _adm_mask = research_df.get("proposed_canonical_event_type", pd.Series([""])).astype(str).str.contains("admission", case=False)
+        _adm_rows = research_df[_adm_mask]
+        if len(_adm_rows) > 0:
+            _adm_canon_empty = all(
+                str(v).strip() == ""
+                for v in _adm_rows["proposed_canonical_public_entry_date_jalali"].values
+            )
+            check("admission_only_not_in_proposed_canonical", _adm_canon_empty,
+                  f"{len(_adm_rows)} admission-only rows checked; proposed_canonical empty for all")
+        else:
+            check("admission_only_not_in_proposed_canonical", True,
+                  "No admission-only rows in research output")
+
+        _adm_ready_false = all(
+            str(v).strip().lower() == "false"
+            for v in _adm_rows["ready_for_user_review"].values
+        ) if len(_adm_rows) > 0 else True
+        check("ready_for_user_review_false_for_admission_only", _adm_ready_false,
+              f"{len(_adm_rows)} admission-only rows checked; ready_for_user_review=false for all")
+
+        _expected_event_cols = [
+            "admission_date_candidate_jalali",
+            "listing_date_candidate_jalali",
+            "first_public_offering_date_candidate_jalali",
+            "first_public_trading_date_candidate_jalali",
+        ]
+        _all_event_cols_present = all(c in research_df.columns for c in _expected_event_cols)
+        check("event_types_separated", _all_event_cols_present,
+              f"4 event-type columns checked in research_df: {_all_event_cols_present}")
+    else:
+        check("admission_only_not_in_proposed_canonical", True,
+              "No research rows to check")
+        check("ready_for_user_review_false_for_admission_only", True,
+              "No research rows to check")
+        check("event_types_separated", True,
+              "No research rows to check")
+
+    # --- Real check on probe_results ---
+    _probe_count = len(probe_results) if probe_results else 0
+    check("tsetmc_probe_attempted", _probe_count == pending_count,
+          f"probe_results has {_probe_count} entries; pending_count={pending_count}")
+
     check("no_ticker_normalized_in_substantive_tie_keys",
           "ticker_normalized" not in SUBSTANTIVE_TIE_KEYS,
           "ticker_normalized excluded from substantive tie detection")
@@ -1036,7 +1112,8 @@ def run() -> dict:
 
     # 10. QC
     qc = run_qc(len(pending), len(verified), selected_tickers, priority,
-                research, probe_results, boundary_unresolved, batch_note)
+                research, probe_results, boundary_unresolved, batch_note,
+                research_df=research_df, conflict_df=conflict_df, review_df=review_df)
     qc["runner"] = "stage124_batch02_v2"
     qc["start_ts"] = start_ts
     qc["end_ts"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")

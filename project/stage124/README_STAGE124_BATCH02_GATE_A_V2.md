@@ -45,11 +45,11 @@ Tiers are assigned in lexicographic order:
 
 | Tier | Criteria |
 |---|---|
-| A | `candidate_supported` + exact-day date + eligibility rows changed > 0 |
-| B | `candidate_supported` + exact-day date + eligibility rows changed = 0 |
-| C | `requires_manual_review` or month/year-only precision |
-| D | `requires_first_public_trade_evidence` (admission-only) |
-| E | No research data / unknown |
+| A | Exact-day public-entry candidate with at least one estimated eligibility row changed |
+| B | TSETMC conflict, multiple ordinary instruments, or high-risk ambiguity |
+| C | Suspected post-1392 entry but exact date unresolved; or partial/admission date present but unresolved |
+| D | Exact-day public-entry candidate before study window with zero estimated eligibility rows changed |
+| E | Admission-only, no evidence, or unknown |
 
 Within each tier, rows are sorted by substantive tie keys:
 `estimated_eligibility_rows_changed`, `estimated_t_plus_1_pairs_changed`,
