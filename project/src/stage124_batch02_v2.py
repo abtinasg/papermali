@@ -318,7 +318,7 @@ def _http_session():
     if requests is None:
         return None
     s = requests.Session()
-    retry = Retry(total=2, connect=2, read=2, backoff_factor=0.5,
+    retry = Retry(total=0, connect=0, read=0, backoff_factor=0,
                   status_forcelist=[429, 500, 502, 503, 504], allowed_methods=["GET"])
     s.mount("https://", HTTPAdapter(max_retries=retry))
     s.headers.update({"User-Agent": USER_AGENT, "Accept": "application/json,text/plain,*/*"})
@@ -440,7 +440,7 @@ def tsetmc_probe_all(tickers: list, timeout: float = 15.0) -> dict:
     results = {}
     for i, tk in enumerate(tickers):
         if i > 0 and sess is not None:
-            time.sleep(0.3)
+            time.sleep(0.1)
         results[tk] = tsetmc_probe_ticker(tk, sess, timeout)
     return results
 
