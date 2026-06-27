@@ -1,4 +1,10 @@
-"""Independent tests for Stage124 Batch 2 Part 3 research screening."""
+"""Independent tests for Stage124 Batch 2 Part 3 research screening.
+
+Part 3.1A focus: correct research-status semantics (a network failure is
+"research blocked", never "no reliable evidence") and a safe, testable
+evidence/ready decision that separates a successful *fetch* from reviewed
+*evidence*.
+"""
 
 import json
 import hashlib
@@ -13,18 +19,26 @@ from project.src.stage124_batch02_part03 import (
     SNAPSHOT_DIR,
     RESEARCH_SOURCES,
     CANONICAL_EVENT_TYPES,
+    FETCHED_STATUSES,
+    NETWORK_FAILURE_STATUSES,
     FROZEN_V2_TSETMC_AUDIT,
     PART02_PROTECTED,
+    ROOT,
     build_tickers_df,
     build_research_screening,
     build_source_provenance,
     build_tsetmc_audit,
+    build_manual_research_worklist,
     load_historical_tsetmc,
     run_part03_qc,
+    evaluate_source_record,
+    decide_ready_for_user_review,
+    classify_source_authority,
+    registrable_domain,
     _derive_screening_status,
 )
 from project.src.stage124_batch02_part02 import PART02_TICKERS
-from project.src.stage124_batch02_v2 import PILOT15, sha, ROOT
+from project.src.stage124_batch02_v2 import PILOT15, sha
 
 
 # ---- helpers -------------------------------------------------------------------
@@ -33,7 +47,6 @@ def _names():
 
 
 def _absent_tsetmc():
-    """All 10 tickers absent from frozen V2 audit (matches reality)."""
     out = {}
     for tk in PART03_TICKERS:
         out[tk] = {
@@ -51,7 +64,7 @@ def _absent_tsetmc():
 
 
 def _failed_fetch_results():
-    """All sources attempted, all timed out — no snapshot, no hash."""
+    """All sources attempted, all timed out — no snapshot, no hash, no review."""
     out = {}
     for tk in PART03_TICKERS:
         recs = []
@@ -67,6 +80,14 @@ def _failed_fetch_results():
                 "extraction_notes": "timed out; no snapshot stored; no hash fabricated.",
                 "exact_text_or_event_summary": "",
                 "supported_event_type": "", "supported_date_jalali": "",
+                "content_review_status": "not_available_due_to_fetch_failure",
+                "source_authority_class": classify_source_authority(src[0], src[2]),
+                "ordinary_share_explicit": "unknown",
+                "event_type_supported": "",
+                "exact_date_explicit": "false",
+                "reviewed_date_jalali": "",
+                "independent_source_group": registrable_domain(src[2]),
+                "evidence_accepted": "false",
             })
         out[tk] = recs
     return out
@@ -84,11 +105,11 @@ def _baseline_dfs():
 
 
 def _qc(tickers_df, research_df, provenance_df, tsetmc_df,
-        frozen=None, p02=None):
+        frozen=None, p02=None, worklist=None):
     frozen = frozen or {}
     p02 = p02 or {}
     return run_part03_qc(tickers_df, research_df, provenance_df, tsetmc_df,
-                         frozen, frozen, p02, p02)
+                         frozen, frozen, p02, p02, worklist_df=worklist)
 
 
 def _result(qc, name):
@@ -102,9 +123,32 @@ def _any_failed_containing(qc, substr):
     return any((not a["passed"]) and substr in a["assertion"] for a in qc["assertions"])
 
 
+def _reviewed_rec(**over):
+    """A fully-accepted reviewed evidence record; override fields as needed."""
+    rec = {
+        "ticker": PART03_TICKERS[0], "source_index": 1,
+        "source_type": "codal_official",
+        "source_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=abc",
+        "retrieval_status": "fetched_ok",
+        "content_sha256": "a" * 64,
+        "snapshot_path": "stage124/batch02_parts/snapshots_part03/x.html",
+        "content_review_status": "reviewed",
+        "source_authority_class": "official_regulatory",
+        "event_type_supported": "first_public_offering",
+        "exact_date_explicit": "true",
+        "reviewed_date_jalali": "1380-03-15",
+        "ordinary_share_explicit": "true",
+        "independent_source_group": "codal.ir",
+        "evidence_accepted": "false",
+    }
+    rec.update(over)
+    return rec
+
+
 # ---- baseline ------------------------------------------------------------------
 def test_baseline_qc_passes():
-    qc = _qc(*_baseline_dfs())
+    qc = _qc(*_baseline_dfs(),
+             worklist=build_manual_research_worklist(_names(), _baseline_dfs()[1]))
     failed = [a["assertion"] for a in qc["assertions"] if not a["passed"]]
     assert qc["all_pass"], f"unexpected failures: {failed}"
 
@@ -121,6 +165,259 @@ def test_no_part2_or_pilot15_overlap():
     s = set(research_df["ticker"])
     assert s & set(PART02_TICKERS) == set()
     assert s & PILOT15 == set()
+
+
+# ---- (1)(2)(3) all-timeout research semantics ----------------------------------
+def test_all_timeout_research_blocked_network():
+    _, research_df, _, _ = _baseline_dfs()
+    assert (research_df["research_status"] == "research_blocked_network").all()
+    assert (research_df["network_blocked"].str.lower() == "true").all()
+    assert (research_df["research_completion_status"] == "blocked_network").all()
+
+
+def test_all_timeout_requires_manual_review():
+    _, research_df, _, _ = _baseline_dfs()
+    assert (research_df["evidence_status"] == "requires_manual_review").all()
+    assert (research_df["recommended_next_step"]
+            == "manual_web_research_required").all()
+
+
+def test_all_timeout_never_no_reliable_evidence():
+    _, research_df, _, _ = _baseline_dfs()
+    assert (research_df["evidence_status"] != "no_reliable_evidence").all()
+    assert (research_df["research_status"] != "no_reliable_evidence").all()
+    # counts must all be zero
+    for c in ("fetched_source_count", "reviewed_source_count", "evidence_source_count"):
+        assert (research_df[c].astype(str) == "0").all()
+    # ordinary share unknown, ready never true
+    assert (research_df["ordinary_share_confirmed"] == "unknown").all()
+    assert (research_df["ready_for_user_review"].str.lower() == "false").all()
+
+
+def test_derive_status_timeout_is_blocked_not_no_evidence():
+    recs = [{"retrieval_status": "timeout",
+             "content_review_status": "not_available_due_to_fetch_failure"},
+            {"retrieval_status": "connection_error",
+             "content_review_status": "not_available_due_to_fetch_failure"}]
+    st = _derive_screening_status(recs, snapshot_root=ROOT)
+    assert st["research_status"] == "research_blocked_network"
+    assert st["evidence_status"] == "requires_manual_review"
+    assert st["evidence_status"] != "no_reliable_evidence"
+    assert st["network_blocked"] == "true"
+    assert st["ready_for_user_review"] == "false"
+
+
+def test_no_reliable_evidence_only_after_review():
+    """no_reliable_evidence is only produced once sources are fetched AND
+    reviewed but carry no public-entry evidence."""
+    recs = [_reviewed_rec(event_type_supported="", exact_date_explicit="false",
+                          reviewed_date_jalali="", ordinary_share_explicit="unknown")]
+    st = _derive_screening_status(recs, snapshot_root=None)
+    assert st["evidence_status"] == "no_reliable_evidence"
+    assert st["research_status"] == "research_completed_no_evidence"
+    assert st["ready_for_user_review"] == "false"
+
+
+# ---- (4) fetched but unreviewed → not ready ------------------------------------
+def test_fetched_unreviewed_not_ready():
+    recs = [_reviewed_rec(content_review_status="pending_manual_review")]
+    st = _derive_screening_status(recs, snapshot_root=None)
+    assert st["ready_for_user_review"] == "false"
+    assert st["research_completion_status"] == "fetched_pending_review"
+    assert decide_ready_for_user_review(recs, snapshot_root=None)["ready"] is False
+
+
+# ---- (5) aggregator alone → not ready ------------------------------------------
+def test_aggregator_alone_not_ready():
+    rec = _reviewed_rec(source_type="market_information_aggregator",
+                        source_url="https://rahavard365.com/asset/x",
+                        source_authority_class="market_information_aggregator",
+                        independent_source_group="rahavard365.com")
+    d = decide_ready_for_user_review([rec], snapshot_root=None)
+    assert d["ready"] is False
+    assert d["reason"] == "insufficient_source_authority_or_independence"
+
+
+# ---- (6) generic Codal search page → not ready ---------------------------------
+def test_codal_search_page_alone_not_ready():
+    """A generic Codal symbol-search page with no specific reviewed announcement
+    (no supported event) is not initial-offering evidence."""
+    rec = _reviewed_rec(
+        source_url="https://www.codal.ir/ReportList.aspx?search&Symbol=x",
+        event_type_supported="", exact_date_explicit="false",
+        reviewed_date_jalali="")
+    assert evaluate_source_record(rec, snapshot_root=None) is False
+    assert decide_ready_for_user_review([rec], snapshot_root=None)["ready"] is False
+
+
+# ---- (7) one credible source but ordinary share unknown → not ready ------------
+def test_credible_source_ordinary_share_unknown_not_ready():
+    rec = _reviewed_rec(source_authority_class="credible_news",
+                        source_url="https://donya-e-eqtesad.com/news/1",
+                        independent_source_group="donya-e-eqtesad.com",
+                        ordinary_share_explicit="unknown")
+    assert evaluate_source_record(rec, snapshot_root=None) is False
+    assert decide_ready_for_user_review([rec], snapshot_root=None)["ready"] is False
+
+
+# ---- (8) one official source + ordinary explicit + exact day → ready -----------
+def test_official_source_ordinary_exact_day_ready():
+    rec = _reviewed_rec()  # official_regulatory codal.ir, ordinary explicit, exact day
+    assert evaluate_source_record(rec, snapshot_root=None) is True
+    d = decide_ready_for_user_review([rec], snapshot_root=None)
+    assert d["ready"] is True
+    assert d["event_type"] == "first_public_offering"
+    assert d["canonical_date"] == "1380-03-15"
+    assert d["ordinary_share_confirmed"] == "true"
+
+
+# ---- (9) two independent credible sources → ready ------------------------------
+def test_two_independent_credible_sources_ready():
+    r1 = _reviewed_rec(source_authority_class="credible_news",
+                       source_url="https://donya-e-eqtesad.com/news/1",
+                       independent_source_group="donya-e-eqtesad.com")
+    r2 = _reviewed_rec(source_index=2, source_authority_class="credible_news",
+                       source_url="https://isna.ir/news/2",
+                       independent_source_group="isna.ir")
+    d = decide_ready_for_user_review([r1, r2], snapshot_root=None)
+    assert d["ready"] is True
+
+
+# ---- (10) two sources from same domain → not independent → not ready -----------
+def test_two_sources_same_domain_not_ready():
+    # both aggregator, same domain → no authority and only one group
+    r1 = _reviewed_rec(source_type="market_information_aggregator",
+                       source_authority_class="market_information_aggregator",
+                       source_url="https://rahavard365.com/asset/x",
+                       independent_source_group="rahavard365.com")
+    r2 = _reviewed_rec(source_index=2, source_type="market_information_aggregator",
+                       source_authority_class="market_information_aggregator",
+                       source_url="https://rahavard365.com/asset/y",
+                       independent_source_group="rahavard365.com")
+    d = decide_ready_for_user_review([r1, r2], snapshot_root=None)
+    assert d["ready"] is False
+    assert d["reason"] == "insufficient_source_authority_or_independence"
+
+
+# ---- (11) snapshot hash mismatch → not accepted → not ready --------------------
+def test_snapshot_hash_mismatch_not_ready():
+    SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
+    snap = SNAPSHOT_DIR / "__test_mismatch.html"
+    snap.write_bytes(b"<html>real</html>")
+    rel = "stage124/batch02_parts/snapshots_part03/__test_mismatch.html"
+    try:
+        rec = _reviewed_rec(snapshot_path=rel, content_sha256="0" * 64)  # wrong hash
+        assert evaluate_source_record(rec, snapshot_root=ROOT) is False
+        assert decide_ready_for_user_review([rec], snapshot_root=ROOT)["ready"] is False
+        # matching hash → accepted
+        good = hashlib.sha256(snap.read_bytes()).hexdigest()
+        rec2 = _reviewed_rec(snapshot_path=rel, content_sha256=good)
+        assert evaluate_source_record(rec2, snapshot_root=ROOT) is True
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# ---- (12) conflicting dates → not ready ----------------------------------------
+def test_conflicting_dates_not_ready():
+    r1 = _reviewed_rec(reviewed_date_jalali="1380-03-15")
+    r2 = _reviewed_rec(source_index=2, source_authority_class="credible_news",
+                       source_url="https://isna.ir/news/2",
+                       independent_source_group="isna.ir",
+                       event_type_supported="first_public_trading",
+                       reviewed_date_jalali="1381-04-20")
+    d = decide_ready_for_user_review([r1, r2], snapshot_root=None)
+    assert d["ready"] is False
+    assert d["conflict_flag"] is True
+    st = _derive_screening_status([r1, r2], snapshot_root=None)
+    assert st["conflict_flag"] == "true"
+    assert st["ready_for_user_review"] == "false"
+
+
+# ---- (13)(14) worklist ---------------------------------------------------------
+def test_worklist_exact_ticker_order():
+    wl = build_manual_research_worklist(_names(), _baseline_dfs()[1])
+    assert wl["ticker"].tolist() == PART03_TICKERS
+    assert len(wl) == 10
+
+
+def test_worklist_source_and_date_fields_initially_empty():
+    wl = build_manual_research_worklist(_names(), _baseline_dfs()[1])
+    for c in ("discovered_source_1_url", "discovered_source_2_url",
+              "first_public_event_candidate", "candidate_date_jalali"):
+        assert (wl[c].astype(str).str.strip() == "").all()
+    # search queries are pre-filled (non-empty)
+    assert (wl["primary_search_query_fa"].astype(str).str.strip() != "").all()
+    assert (wl["secondary_search_query_fa"].astype(str).str.strip() != "").all()
+    # no fabricated URLs anywhere in the worklist
+    blob = " ".join(wl.astype(str).values.ravel().tolist())
+    assert "http" not in blob.lower()
+
+
+def test_worklist_qc_checks():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    wl = build_manual_research_worklist(_names(), research_df)
+    qc = _qc(tickers_df, research_df, prov_df, tsetmc_df, worklist=wl)
+    assert _result(qc, "worklist_exactly_10_rows") is True
+    assert _result(qc, "worklist_ticker_order") is True
+    assert _result(qc, "worklist_no_http_urls") is True
+
+
+def test_worklist_qc_detects_guessed_url():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    wl = build_manual_research_worklist(_names(), research_df)
+    wl.at[0, "discovered_source_1_url"] = "https://example.com/guess"
+    qc = _qc(tickers_df, research_df, prov_df, tsetmc_df, worklist=wl)
+    assert _any_failed_containing(qc, "worklist_no_guessed_discovered_source_1_url")
+    assert _result(qc, "worklist_no_http_urls") is False
+
+
+# ---- QC: ready / evidence integrity in research_df + provenance ----------------
+def test_qc_fetched_unreviewed_provenance_not_ready():
+    """A ticker whose only source is fetched-but-unreviewed must not be ready,
+    and the unreviewed record must not be evidence_accepted."""
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    tk = research_df.at[research_df.index[0], "ticker"]
+    j = prov_df.index[prov_df["ticker"] == tk][0]
+    prov_df.at[j, "retrieval_status"] = "fetched_ok"
+    prov_df.at[j, "content_sha256"] = "a" * 64
+    prov_df.at[j, "snapshot_path"] = "stage124/batch02_parts/snapshots_part03/x.html"
+    prov_df.at[j, "content_review_status"] = "pending_manual_review"
+    # forcibly mark ready in research_df → QC must catch it
+    i = research_df.index[0]
+    research_df.at[i, "ready_for_user_review"] = "true"
+    qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
+    assert _result(qc, f"fetched_unreviewed_not_ready_{tk}") is False
+
+
+def test_qc_evidence_accepted_requires_snapshot_hash():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    j = prov_df.index[0]
+    tk = prov_df.at[j, "ticker"]
+    idx = prov_df.at[j, "source_index"]
+    # accepted but still a failed fetch with no hash → integrity violation
+    prov_df.at[j, "evidence_accepted"] = "true"
+    qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
+    assert _result(qc, f"accepted_requires_snapshot_hash_{tk}_{idx}") is False
+
+
+def test_qc_ordinary_share_true_only_when_ready():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    i = research_df.index[0]
+    tk = research_df.at[i, "ticker"]
+    research_df.at[i, "ordinary_share_confirmed"] = "true"
+    research_df.at[i, "ready_for_user_review"] = "false"
+    qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
+    assert _result(qc, f"ordinary_share_only_when_ready_{tk}") is False
+
+
+def test_qc_no_reliable_requires_review():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    i = research_df.index[0]
+    tk = research_df.at[i, "ticker"]
+    # claim no_reliable_evidence while provenance is all-timeout (never reviewed)
+    research_df.at[i, "evidence_status"] = "no_reliable_evidence"
+    qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
+    assert _result(qc, f"no_reliable_only_after_review_{tk}") is False
 
 
 # ---- ticker-set violations -----------------------------------------------------
@@ -174,20 +471,6 @@ def test_invalid_canonical_event_type():
     assert _any_failed_containing(qc, "canonical_event_valid")
 
 
-def test_exact_day_without_valid_evidence_is_not_ready():
-    """An exact-day canonical claim with no fetched, hashed source must fail the
-    ready-requires-fetched-source assertion when marked ready."""
-    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
-    i = research_df.index[0]
-    research_df.at[i, "proposed_canonical_public_entry_date_jalali"] = "1380-01-01"
-    research_df.at[i, "proposed_canonical_event_type"] = "first_public_offering"
-    research_df.at[i, "date_precision"] = "exact_day"
-    research_df.at[i, "evidence_status"] = "candidate_supported"
-    research_df.at[i, "ready_for_user_review"] = "true"
-    qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
-    assert _any_failed_containing(qc, "ready_requires_fetched_source_with_hash")
-
-
 def test_ready_true_without_fetched_source_hash():
     tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
     i = research_df.index[0]
@@ -196,8 +479,8 @@ def test_ready_true_without_fetched_source_hash():
     research_df.at[i, "proposed_canonical_event_type"] = "first_public_trading"
     research_df.at[i, "date_precision"] = "exact_day"
     research_df.at[i, "evidence_status"] = "candidate_supported"
+    research_df.at[i, "ordinary_share_confirmed"] = "true"
     research_df.at[i, "ready_for_user_review"] = "true"
-    # provenance for tk remains failed (no hash)
     qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
     assert _result(qc, f"ready_requires_fetched_source_with_hash_{tk}") is False
 
@@ -207,16 +490,6 @@ def test_month_only_ready_true_fails():
     i = research_df.index[0]
     tk = research_df.at[i, "ticker"]
     research_df.at[i, "date_precision"] = "month_only"
-    research_df.at[i, "ready_for_user_review"] = "true"
-    qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
-    assert _result(qc, f"non_exact_not_ready_{tk}") is False
-
-
-def test_year_only_ready_true_fails():
-    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
-    i = research_df.index[0]
-    tk = research_df.at[i, "ticker"]
-    research_df.at[i, "date_precision"] = "year_only"
     research_df.at[i, "ready_for_user_review"] = "true"
     qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
     assert _result(qc, f"non_exact_not_ready_{tk}") is False
@@ -233,6 +506,16 @@ def test_conflict_with_ready_true_fails():
 
 
 # ---- taxonomy ------------------------------------------------------------------
+def test_classify_source_authority():
+    assert classify_source_authority("codal_official",
+                                     "https://www.codal.ir/x") == "official_regulatory"
+    assert classify_source_authority("market_information_aggregator",
+                                     "https://rahavard365.com/x") == "market_information_aggregator"
+    assert classify_source_authority("news_agency",
+                                     "https://isna.ir/x") == "credible_news"
+    assert registrable_domain("https://www.codal.ir/Report?x=1") == "codal.ir"
+
+
 def test_tacodal_marked_codal_official_fails():
     tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
     j = prov_df.index[0]
@@ -282,8 +565,6 @@ def test_tsetmc_not_from_historical_v2_fails():
 
 
 def test_network_unreachable_preserved():
-    """network_unreachable historical status must keep network_unreachable
-    disposition (never silently become 'no candidate')."""
     tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
     j = tsetmc_df.index[0]
     tk = tsetmc_df.at[j, "ticker"]
@@ -304,28 +585,9 @@ def test_absolute_snapshot_path_fails():
     assert _any_failed_containing(qc, "snapshot_path_relative")
 
 
-def test_snapshot_hash_mismatch_fails(tmp_path):
-    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
-    # write a real snapshot under the real snapshots dir, then claim wrong hash
-    SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
-    snap = SNAPSHOT_DIR / "__test_hashmismatch.html"
-    snap.write_bytes(b"<html>real</html>")
-    rel = "stage124/batch02_parts/snapshots_part03/__test_hashmismatch.html"
-    try:
-        j = prov_df.index[0]
-        prov_df.at[j, "retrieval_status"] = "fetched_ok"
-        prov_df.at[j, "snapshot_path"] = rel
-        prov_df.at[j, "content_sha256"] = "0" * 64  # wrong
-        qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
-        assert _any_failed_containing(qc, "snapshot_hash_matches")
-    finally:
-        snap.unlink(missing_ok=True)
-
-
 def test_failed_fetch_with_fabricated_hash_fails():
     tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
     j = prov_df.index[0]
-    # status still failed, but a hash was fabricated
     prov_df.at[j, "retrieval_status"] = "timeout"
     prov_df.at[j, "content_sha256"] = "f" * 64
     qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
@@ -391,41 +653,7 @@ def test_frozen_change_detected():
     assert _any_failed_containing(qc, "frozen_unchanged")
 
 
-# ---- _derive_screening_status unit ---------------------------------------------
-def test_derive_status_no_evidence_is_unresolved():
-    st = _derive_screening_status([
-        {"retrieval_status": "timeout", "content_sha256": "",
-         "supported_event_type": "", "supported_date_jalali": ""},
-    ])
-    assert st["evidence_status"] == "no_reliable_evidence"
-    assert st["ready_for_user_review"] == "false"
-    assert st["proposed_canonical_public_entry_date_jalali"] == ""
-    assert st["date_precision"] == "unknown"
-
-
-def test_derive_status_conflict_when_two_dates():
-    st = _derive_screening_status([
-        {"retrieval_status": "fetched_ok", "content_sha256": "a",
-         "supported_event_type": "first_public_offering", "supported_date_jalali": "1380-01-01"},
-        {"retrieval_status": "fetched_ok", "content_sha256": "b",
-         "supported_event_type": "first_public_trading", "supported_date_jalali": "1381-02-02"},
-    ])
-    assert st["conflict_flag"] == "true"
-    assert st["ready_for_user_review"] == "false"
-    assert st["proposed_canonical_public_entry_date_jalali"] == ""
-
-
-def test_derive_status_single_supported_date_ready():
-    st = _derive_screening_status([
-        {"retrieval_status": "fetched_ok", "content_sha256": "a",
-         "supported_event_type": "first_public_offering", "supported_date_jalali": "1380-01-01"},
-    ])
-    assert st["proposed_canonical_event_type"] == "first_public_offering"
-    assert st["ready_for_user_review"] == "true"
-    assert st["date_precision"] == "exact_day"
-
-
-# ---- real generated output -----------------------------------------------------
+# ---- (15)(16) real generated output --------------------------------------------
 def _load_real_research():
     p = PART03_DIR / "part03_research_screening_10tickers.csv"
     if not p.exists():
@@ -438,6 +666,18 @@ def test_real_output_exact_set_and_order():
     assert df["ticker"].tolist() == PART03_TICKERS
 
 
+def test_real_output_all_blocked_network():
+    df = _load_real_research()
+    assert (df["research_status"] == "research_blocked_network").all()
+    assert (df["network_blocked"].str.lower() == "true").all()
+    assert (df["evidence_status"] == "requires_manual_review").all()
+    assert (df["evidence_status"] != "no_reliable_evidence").all()
+    assert (df["ready_for_user_review"].str.lower() == "false").all()
+    assert (df["ordinary_share_confirmed"] == "unknown").all()
+    for c in ("fetched_source_count", "reviewed_source_count", "evidence_source_count"):
+        assert (df[c].astype(str) == "0").all()
+
+
 def test_real_output_no_fabricated_evidence():
     p = PART03_DIR / "part03_source_provenance_10tickers.csv"
     if not p.exists():
@@ -447,17 +687,21 @@ def test_real_output_no_fabricated_evidence():
         if r["retrieval_status"] not in ("fetched_ok", "reused_existing_snapshot"):
             assert r["snapshot_path"].strip() == ""
             assert r["content_sha256"].strip() == ""
+        assert r["evidence_accepted"].strip().lower() != "true"
 
 
-def test_real_output_no_ready_without_evidence():
-    df = _load_real_research()
-    prov = pd.read_csv(PART03_DIR / "part03_source_provenance_10tickers.csv",
-                       dtype=str).fillna("")
-    for _, r in df.iterrows():
-        if str(r["ready_for_user_review"]).lower() == "true":
-            sub = prov[prov["ticker"] == r["ticker"]]
-            assert ((sub["retrieval_status"].isin(["fetched_ok", "reused_existing_snapshot"]))
-                    & (sub["content_sha256"].str.strip() != "")).any()
+def test_real_worklist_ten_rows_and_empty_fields():
+    p = PART03_DIR / "part03_manual_research_worklist.csv"
+    if not p.exists():
+        pytest.skip("worklist not generated yet")
+    df = pd.read_csv(p, dtype=str).fillna("")
+    assert df["ticker"].tolist() == PART03_TICKERS
+    assert len(df) == 10
+    for c in ("discovered_source_1_url", "discovered_source_2_url",
+              "first_public_event_candidate", "candidate_date_jalali"):
+        assert (df[c].astype(str).str.strip() == "").all()
+    blob = " ".join(df.astype(str).values.ravel().tolist())
+    assert "http" not in blob.lower()
 
 
 def test_real_qc_report_self_consistent():
@@ -478,6 +722,19 @@ def test_real_tsetmc_no_network_and_historical():
     df = pd.read_csv(p, dtype=str).fillna("")
     assert (df["network_request_performed"].str.lower() == "false").all()
     assert (df["probe_source"] == "historical_v2_audit").all()
+
+
+def test_real_tsetmc_audit_unchanged_by_code():
+    """Re-building the TSETMC audit must reproduce the on-disk file byte-for-byte
+    (Part 3.1A does not touch the TSETMC audit)."""
+    p = PART03_DIR / "part03_tsetmc_audit_10tickers.csv"
+    if not p.exists():
+        pytest.skip("part03 tsetmc not generated yet")
+    rebuilt = build_tsetmc_audit(load_historical_tsetmc())
+    on_disk = pd.read_csv(p, dtype=str).fillna("")
+    rebuilt = rebuilt.astype(str)
+    assert on_disk["ticker"].tolist() == rebuilt["ticker"].tolist()
+    assert (on_disk["network_request_performed"].str.lower() == "false").all()
 
 
 def test_real_part02_outputs_unchanged():

@@ -1,7 +1,7 @@
 {
   "stage": "stage124_batch02_part03",
-  "generated_at": "2026-06-27T01:03:23Z",
-  "source_commit": "414d94efa89f738012430c4601c72e99531e2c6d",
+  "generated_at": "2026-06-27T10:12:31Z",
+  "source_commit": "2a885e6c6f86778be8050dbd9de3f78796dc2b2c",
   "ticker_count": 10,
   "tickers": [
     "خمهر",
@@ -16,8 +16,7 @@
     "رمپنا"
   ],
   "exact_day_canonical": {},
-  "admission_only_tickers": [],
-  "unresolved_tickers": [
+  "research_blocked_network_tickers": [
     "خمهر",
     "خنصیر",
     "خوساز",
@@ -29,8 +28,121 @@
     "رانفور",
     "رمپنا"
   ],
+  "requires_manual_review_tickers": [
+    "خمهر",
+    "خنصیر",
+    "خوساز",
+    "خچرخش",
+    "خکمک",
+    "دروز",
+    "دسبحا",
+    "دیران",
+    "رانفور",
+    "رمپنا"
+  ],
+  "no_reliable_evidence_tickers": [],
   "ready_for_user_review_tickers": [],
   "conflict_tickers": [],
+  "counts": {
+    "ready_count": 0,
+    "network_blocked_count": 10,
+    "total_attempted_sources": 20,
+    "total_fetched_sources": 0,
+    "total_reviewed_sources": 0,
+    "total_evidence_sources": 0
+  },
+  "per_ticker_status": {
+    "خمهر": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "خنصیر": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "خوساز": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "خچرخش": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "خکمک": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "دروز": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "دسبحا": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "دیران": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "رانفور": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "رمپنا": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    }
+  },
   "tsetmc_historical": {
     "خمهر": {
       "instrument_match_status": "not_in_historical_v2_audit",

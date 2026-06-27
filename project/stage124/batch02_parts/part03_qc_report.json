@@ -1,7 +1,7 @@
 {
   "stage": "stage124_batch02_part03",
-  "generated_at": "2026-06-27T01:03:23Z",
-  "source_commit": "414d94efa89f738012430c4601c72e99531e2c6d",
+  "generated_at": "2026-06-27T10:12:31Z",
+  "source_commit": "2a885e6c6f86778be8050dbd9de3f78796dc2b2c",
   "ticker_count": 10,
   "tickers": [
     "خمهر",
@@ -16,7 +16,7 @@
     "رمپنا"
   ],
   "all_pass": true,
-  "assertion_count": 127,
+  "assertion_count": 194,
   "failed_count": 0,
   "assertions": [
     {
@@ -75,6 +75,36 @@
       "detail": "dups=0"
     },
     {
+      "assertion": "timeout_not_no_reliable_evidence_خمهر",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_خمهر",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_خمهر",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_خمهر",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_خمهر",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_خمهر",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
       "assertion": "canonical_empty_event_when_no_date_خمهر",
       "passed": true,
       "detail": "ev="
@@ -88,6 +118,36 @@
       "assertion": "non_exact_not_ready_خمهر",
       "passed": true,
       "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_خنصیر",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_خنصیر",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_خنصیر",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_خنصیر",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_خنصیر",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_خنصیر",
+      "passed": true,
+      "detail": "ready=false"
     },
     {
       "assertion": "canonical_empty_event_when_no_date_خنصیر",
@@ -105,6 +165,36 @@
       "detail": "dp=unknown, ready=false"
     },
     {
+      "assertion": "timeout_not_no_reliable_evidence_خوساز",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_خوساز",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_خوساز",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_خوساز",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_خوساز",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_خوساز",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
       "assertion": "canonical_empty_event_when_no_date_خوساز",
       "passed": true,
       "detail": "ev="
@@ -118,6 +208,36 @@
       "assertion": "non_exact_not_ready_خوساز",
       "passed": true,
       "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_خچرخش",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_خچرخش",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_خچرخش",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_خچرخش",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_خچرخش",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_خچرخش",
+      "passed": true,
+      "detail": "ready=false"
     },
     {
       "assertion": "canonical_empty_event_when_no_date_خچرخش",
@@ -135,6 +255,36 @@
       "detail": "dp=unknown, ready=false"
     },
     {
+      "assertion": "timeout_not_no_reliable_evidence_خکمک",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_خکمک",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_خکمک",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_خکمک",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_خکمک",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_خکمک",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
       "assertion": "canonical_empty_event_when_no_date_خکمک",
       "passed": true,
       "detail": "ev="
@@ -148,6 +298,36 @@
       "assertion": "non_exact_not_ready_خکمک",
       "passed": true,
       "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_دروز",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_دروز",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_دروز",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_دروز",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_دروز",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_دروز",
+      "passed": true,
+      "detail": "ready=false"
     },
     {
       "assertion": "canonical_empty_event_when_no_date_دروز",
@@ -165,6 +345,36 @@
       "detail": "dp=unknown, ready=false"
     },
     {
+      "assertion": "timeout_not_no_reliable_evidence_دسبحا",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_دسبحا",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_دسبحا",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_دسبحا",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_دسبحا",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_دسبحا",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
       "assertion": "canonical_empty_event_when_no_date_دسبحا",
       "passed": true,
       "detail": "ev="
@@ -178,6 +388,36 @@
       "assertion": "non_exact_not_ready_دسبحا",
       "passed": true,
       "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_دیران",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_دیران",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_دیران",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_دیران",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_دیران",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_دیران",
+      "passed": true,
+      "detail": "ready=false"
     },
     {
       "assertion": "canonical_empty_event_when_no_date_دیران",
@@ -195,6 +435,36 @@
       "detail": "dp=unknown, ready=false"
     },
     {
+      "assertion": "timeout_not_no_reliable_evidence_رانفور",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_رانفور",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_رانفور",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_رانفور",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_رانفور",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_رانفور",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
       "assertion": "canonical_empty_event_when_no_date_رانفور",
       "passed": true,
       "detail": "ev="
@@ -208,6 +478,36 @@
       "assertion": "non_exact_not_ready_رانفور",
       "passed": true,
       "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_رمپنا",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_رمپنا",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_رمپنا",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_رمپنا",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_رمپنا",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_رمپنا",
+      "passed": true,
+      "detail": "ready=false"
     },
     {
       "assertion": "canonical_empty_event_when_no_date_رمپنا",
@@ -653,6 +953,41 @@
       "assertion": "stage122_sha_matches",
       "passed": true,
       "detail": "sha=ece991c5ff28"
+    },
+    {
+      "assertion": "worklist_exactly_10_rows",
+      "passed": true,
+      "detail": "rows=10"
+    },
+    {
+      "assertion": "worklist_ticker_order",
+      "passed": true,
+      "detail": "order=['خمهر', 'خنصیر', 'خوساز', 'خچرخش', 'خکمک', 'دروز', 'دسبحا', 'دیران', 'رانفور', 'رمپنا']"
+    },
+    {
+      "assertion": "worklist_no_guessed_discovered_source_1_url",
+      "passed": true,
+      "detail": "non-empty values present in discovered_source_1_url"
+    },
+    {
+      "assertion": "worklist_no_guessed_discovered_source_2_url",
+      "passed": true,
+      "detail": "non-empty values present in discovered_source_2_url"
+    },
+    {
+      "assertion": "worklist_no_guessed_first_public_event_candidate",
+      "passed": true,
+      "detail": "non-empty values present in first_public_event_candidate"
+    },
+    {
+      "assertion": "worklist_no_guessed_candidate_date_jalali",
+      "passed": true,
+      "detail": "non-empty values present in candidate_date_jalali"
+    },
+    {
+      "assertion": "worklist_no_http_urls",
+      "passed": true,
+      "detail": "no discovered URL may be present in the initial worklist"
     }
   ]
 }
