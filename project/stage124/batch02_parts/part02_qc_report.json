@@ -361,11 +361,11 @@
     }
   ],
   "finalization": {
-    "finalizer_source_commit": "014af89ca0cccbe4f1fefba71b39b71729361a92",
+    "finalizer_source_commit": "d3c28eda518d8a2ceb2465eff4d144cf791e6bac",
     "research_state_commit": "9f8894a3dbc1c9507bb8e12035663eaa8cb8b9da",
-    "finalized_at_utc": "2026-06-27T00:22:49Z",
+    "finalized_at_utc": "2026-06-27T00:41:59Z",
     "all_pass": true,
-    "assertion_count": 28,
+    "assertion_count": 42,
     "failed_count": 0,
     "assertions": [
       {
@@ -387,6 +387,76 @@
         "assertion": "immutable_sha_unchanged_snapshots_hkeshti/source_1.html",
         "passed": true,
         "detail": "expected=09152a6ce812, actual=09152a6ce812"
+      },
+      {
+        "assertion": "frozen_unchanged_stage124_batch02_v2_research.json",
+        "passed": true,
+        "detail": "expected=20c807a871b8, actual=20c807a871b8"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_pending_priority_stage124_batch02_v2.csv",
+        "passed": true,
+        "detail": "expected=e7318da7ca9b, actual=e7318da7ca9b"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_batch02_selected_tickers_v2.csv",
+        "passed": true,
+        "detail": "expected=1f61041eaf12, actual=1f61041eaf12"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_batch02_research_candidates_v2.csv",
+        "passed": true,
+        "detail": "expected=4854bfc55349, actual=4854bfc55349"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_batch02_source_provenance_v2.csv",
+        "passed": true,
+        "detail": "expected=f37a44303c97, actual=f37a44303c97"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_batch02_tsetmc_conflict_audit_v2.csv",
+        "passed": true,
+        "detail": "expected=0e5cda36aded, actual=0e5cda36aded"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_batch02_user_review_template_v2.csv",
+        "passed": true,
+        "detail": "expected=33254902ac2d, actual=33254902ac2d"
+      },
+      {
+        "assertion": "frozen_unchanged_stage124_batch02_gate_a_v2_qc_report.json",
+        "passed": true,
+        "detail": "expected=614431ef9310, actual=614431ef9310"
+      },
+      {
+        "assertion": "frozen_unchanged_metadata_and_hashes_stage124_batch02_gate_a_v2.json",
+        "passed": true,
+        "detail": "expected=bed24a1a93ef, actual=bed24a1a93ef"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_master_partial_verified_stage124.csv",
+        "passed": true,
+        "detail": "expected=efeb30fa609d, actual=efeb30fa609d"
+      },
+      {
+        "assertion": "frozen_unchanged_modeling_all_rows_stage122.csv",
+        "passed": true,
+        "detail": "expected=ece991c5ff28, actual=ece991c5ff28"
+      },
+      {
+        "assertion": "frozen_unchanged_modeling_all_rows_stage123.csv",
+        "passed": true,
+        "detail": "expected=28b9f9d41856, actual=28b9f9d41856"
+      },
+      {
+        "assertion": "stage122_sha_unchanged",
+        "passed": true,
+        "detail": "sha=ece991c5ff28"
+      },
+      {
+        "assertion": "stage123_sha_unchanged",
+        "passed": true,
+        "detail": "sha=28b9f9d41856"
       },
       {
         "assertion": "exactly_10_tickers",
@@ -471,7 +541,7 @@
       {
         "assertion": "no_verified_user_confirmed",
         "passed": true,
-        "detail": "skipped in test mode"
+        "detail": "no verified_user_confirmed in Part 2 CSV/JSON outputs"
       },
       {
         "assertion": "no_user_decision",
@@ -481,7 +551,7 @@
       {
         "assertion": "no_full_verified_master",
         "passed": true,
-        "detail": "skipped in test mode"
+        "detail": "listing_master_verified_stage124.csv must not exist"
       },
       {
         "assertion": "no_gate_b",

@@ -118,8 +118,8 @@
   },
   "finalization": {
     "research_state_commit": "9f8894a3dbc1c9507bb8e12035663eaa8cb8b9da",
-    "finalizer_source_commit": "014af89ca0cccbe4f1fefba71b39b71729361a92",
-    "finalized_at_utc": "2026-06-27T00:22:49Z",
+    "finalizer_source_commit": "d3c28eda518d8a2ceb2465eff4d144cf791e6bac",
+    "finalized_at_utc": "2026-06-27T00:41:59Z",
     "network_requests_performed": false,
     "tsetmc_probe_performed": false,
     "source_fetch_performed": false,
