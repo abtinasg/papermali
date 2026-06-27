@@ -132,13 +132,20 @@ FETCHED_STATUSES = {"fetched_ok", "reused_existing_snapshot"}
 # research could not be *completed*; it never means "no reliable evidence".
 NETWORK_FAILURE_STATUSES = {"timeout", "connection_error", "fetch_error"}
 
-# Source authority taxonomy. Only the genuine codal.ir domain is the official
-# regulator; reputable wire/news agencies are contemporaneous news; everything
-# else (Rahavard, Tacodal, TGJU, …) is an information aggregator.
+# Source authority taxonomy. Only genuine regulatory disclosure domains are the
+# official regulator; TSETMC is market-data audit (never canonical); SENA and
+# reputable wire/news agencies are (contemporaneous) market news; everything else
+# (Rahavard, Tacodal, TGJU, …) is an information aggregator.
 OFFICIAL_REGULATORY_DOMAINS = {
-    "codal.ir", "seo.ir", "sena.ir", "ime.co.ir", "tse.ir", "tsetmc.com",
-    "irbourse.com", "ifb.ir",
+    "codal.ir", "seo.ir", "ime.co.ir", "tse.ir", "irbourse.com", "ifb.ir",
 }
+# Market-data / audit only. May corroborate but is NEVER qualifying for ready and
+# never the sole basis of a canonical date.
+OFFICIAL_MARKET_DATA_DOMAINS = {
+    "tsetmc.com",
+}
+# SENA is official market *news*, treated like credible news (needs an explicit
+# contemporaneous publication date to qualify as a single source).
 CREDIBLE_NEWS_DOMAINS = {
     "irna.ir", "isna.ir", "mehrnews.com", "donya-e-eqtesad.com",
     "eghtesadnews.com", "boursenews.ir", "sena.ir", "tasnimnews.com",
@@ -149,9 +156,15 @@ AGGREGATOR_DOMAINS = {
     "bourseview.com", "sahmeto.com", "databours.ir",
 }
 
+# Per-ticker verified company-official domains. Fail-closed: a company_official
+# claim is only valid when the URL host is in this ticker's whitelist. No domain
+# is guessed — these stay empty until a company domain is actually verified in
+# Part 3.1B.
+VERIFIED_COMPANY_OFFICIAL_DOMAINS: dict = {}
+
 # Authority classes that can satisfy the source-sufficiency condition for
-# ready=true. Aggregator / unknown may be *supporting* evidence but never make a
-# record ready on their own (Correction 4).
+# ready=true. Aggregator / unknown / market-data-audit may be *supporting*
+# evidence but never make a record ready on their own.
 QUALIFYING_AUTHORITY_CLASSES = {"official_regulatory", "credible_news", "company_official"}
 # Backwards-compatible alias used by older QC references.
 AUTHORITATIVE_CLASSES = QUALIFYING_AUTHORITY_CLASSES
@@ -163,6 +176,9 @@ _DECLARED_CLASS = {
     "regulatory_official": "official_regulatory",
     "news_agency": "credible_news",
     "credible_news": "credible_news",
+    "official_market_news": "credible_news",
+    "market_data": "official_market_data_audit",
+    "official_market_data_audit": "official_market_data_audit",
     "market_information_aggregator": "market_information_aggregator",
     "aggregator": "market_information_aggregator",
     "company_official": "company_official",
@@ -172,6 +188,29 @@ _DECLARED_CLASS = {
 _CODAL_DOC_IDENTIFIERS = (
     "letterserial", "tracingno", "announcementid", "attachment",
     "/decision.aspx", "/letter", "document", ".pdf",
+)
+# Other regulatory disclosure documents (non-Codal) — stable-id / file markers.
+_REGULATORY_DOC_MARKERS = (
+    "letterserial", "tracingno", "announcementid", "attachment",
+    "announcement", "disclosure", "document", "notice", ".pdf",
+)
+# Credible-news article-page markers and the non-article pages they must avoid.
+_NEWS_ARTICLE_MARKERS = (
+    "/news/", "/article/", "/articles/", "/fa/news", "/post/", "/posts/",
+    "/content/", "/tiny/news", "/detail/",
+)
+_NEWS_NON_ARTICLE_MARKERS = (
+    "/category", "/categories", "/tag", "/tags", "/archive", "/topic",
+    "/service/", "/services", "/section",
+)
+# Company-official document markers and the overview/profile pages to reject.
+_COMPANY_DOC_MARKERS = (
+    "/news", "/announcement", "/announcements", "/press", "/notice",
+    "/disclosure", "/article", ".pdf",
+)
+_COMPANY_NON_DOC_MARKERS = (
+    "/about", "/investor", "/investors", "/profile", "/contact",
+    "/company", "/overview", "/home",
 )
 # Discovery / list / search / overview markers — never document-specific.
 _DISCOVERY_MARKERS = (
@@ -221,6 +260,8 @@ def registrable_domain(url: str) -> str:
 def _domain_authority(host: str) -> str:
     if _host_in(host, OFFICIAL_REGULATORY_DOMAINS):
         return "official_regulatory"
+    if _host_in(host, OFFICIAL_MARKET_DATA_DOMAINS):
+        return "official_market_data_audit"
     if _host_in(host, CREDIBLE_NEWS_DOMAINS):
         return "credible_news"
     if _host_in(host, AGGREGATOR_DOMAINS):
@@ -228,15 +269,28 @@ def _domain_authority(host: str) -> str:
     return "unknown"
 
 
-def classify_source_authority_with_validation(source_type: str, url: str):
+def classify_source_authority_with_validation(source_type: str, url: str,
+                                              ticker: str = ""):
     """Fail-closed authority classification. The URL's real domain is the source
     of truth; a declared ``source_type`` that contradicts the domain yields an
     ``unknown`` class plus a validation error string.
 
+    ``company_official`` is only honoured when the host is in the *verified*
+    whitelist for ``ticker`` (boundary-safe). No domain is guessed.
+
     Returns ``(authority_class, validation_error)``."""
     host = _hostname(url)
-    domain_class = _domain_authority(host)
     declared = _DECLARED_CLASS.get((source_type or "").strip().lower())
+
+    if declared == "company_official":
+        domains = VERIFIED_COMPANY_OFFICIAL_DOMAINS.get(ticker, set())
+        if domains and _host_in(host, domains):
+            return "company_official", ""
+        return "unknown", (
+            f"company_official host '{host or '∅'}' not in verified whitelist "
+            f"for ticker '{ticker or '∅'}'")
+
+    domain_class = _domain_authority(host)
     if declared is None:
         # No (or unrecognised) declared type → trust the domain only.
         return domain_class, ""
@@ -247,20 +301,28 @@ def classify_source_authority_with_validation(source_type: str, url: str):
         f"(domain_class={domain_class})")
 
 
-def classify_source_authority(source_type: str, url: str) -> str:
+def classify_source_authority(source_type: str, url: str, ticker: str = "") -> str:
     """Domain-strict authority class (see
     :func:`classify_source_authority_with_validation`)."""
-    return classify_source_authority_with_validation(source_type, url)[0]
+    return classify_source_authority_with_validation(source_type, url, ticker)[0]
 
 
-def is_document_specific_source(url: str, source_type: str = "") -> bool:
-    """A *document-specific* source is a single announcement/document with a
-    stable identifier — not a discovery, search, list, or asset-overview page.
+def is_document_specific_source(url: str, source_type: str = "",
+                                ticker: str = "") -> bool:
+    """A *document-specific* source is a single announcement/article/document with
+    a stable identifier — not a discovery, search, list, category, or overview
+    page. The rule is specialised per authority class.
 
-    Codal evidence is accepted only from a specific letter/announcement
-    (LetterSerial / TracingNo / AnnouncementId / attachment / a PDF). Generic
-    Codal ``ReportList.aspx`` / symbol-search pages, Rahavard ``/asset/``
-    overviews, homepages and profiles are discovery-only."""
+    * regulatory: a specific disclosure document (Codal LetterSerial / TracingNo /
+      AnnouncementId / attachment / PDF, or equivalent stable-id markers);
+    * credible news: a specific article page (``/news/<id>`` etc.), never a
+      category / tag / search / archive / homepage;
+    * company official: a specific news/announcement/PDF on the verified domain,
+      never about / investor / profile / homepage;
+    * aggregator / unknown: the generic depth-or-id heuristic (these are never
+      *qualifying* anyway);
+    * market-data audit (TSETMC): never document-specific evidence.
+    """
     if not url:
         return False
     parsed = urlparse(str(url).strip() if "://" in str(url) else "http://" + str(url).strip())
@@ -270,9 +332,29 @@ def is_document_specific_source(url: str, source_type: str = "") -> bool:
     full = f"{path}?{query}"
     if any(m in full for m in _DISCOVERY_MARKERS):
         return False
-    if _host_matches(host.replace("www.", "", 1) if host.startswith("www.") else host, "codal.ir"):
-        return any(idn in full for idn in _CODAL_DOC_IDENTIFIERS)
-    # Non-Codal: homepage/profile root is not a document.
+
+    cls = classify_source_authority(source_type, url, ticker)
+
+    if cls == "official_regulatory":
+        if _host_matches(host[4:] if host.startswith("www.") else host, "codal.ir"):
+            return any(idn in full for idn in _CODAL_DOC_IDENTIFIERS)
+        return any(m in full for m in _REGULATORY_DOC_MARKERS)
+
+    if cls == "credible_news":
+        if any(m in full for m in _NEWS_NON_ARTICLE_MARKERS):
+            return False
+        return any(m in full for m in _NEWS_ARTICLE_MARKERS) and any(c.isdigit() for c in path)
+
+    if cls == "company_official":
+        if any(m in full for m in _COMPANY_NON_DOC_MARKERS):
+            return False
+        return any(m in full for m in _COMPANY_DOC_MARKERS)
+
+    if cls == "official_market_data_audit":
+        # Market-data/audit is never document-specific evidence for canonical use.
+        return False
+
+    # aggregator / unknown → generic heuristic (never qualifying).
     if path in ("", "/"):
         return False
     segments = [s for s in path.split("/") if s]
@@ -381,12 +463,14 @@ def fetch_sources(timeout: float = 5.0, force: bool = False) -> dict:
                 "content_sha256": "", "extraction_notes": "",
                 "exact_text_or_event_summary": "",
                 "supported_event_type": "", "supported_date_jalali": "",
-                # --- fetch / evidence separation fields ---
+                # --- fetch / evidence separation fields (derived ones are
+                # recomputed downstream; never trusted from input) ---
                 "content_review_status": "",
-                "source_authority_class": classify_source_authority(src_type, url),
+                "source_authority_class": classify_source_authority(src_type, url, tk),
                 "authority_validation_error":
-                    classify_source_authority_with_validation(src_type, url)[1],
-                "document_specific": "true" if is_document_specific_source(url, src_type) else "false",
+                    classify_source_authority_with_validation(src_type, url, tk)[1],
+                "document_specific":
+                    "true" if is_document_specific_source(url, src_type, tk) else "false",
                 "ordinary_share_explicit": "unknown",
                 "event_type_supported": "",
                 "exact_date_explicit": "false",
@@ -468,8 +552,8 @@ def _reuse_existing(rec, existing_prov, tk, idx, snap_path, rel_path) -> bool:
                 "content_sha256": hashlib.sha256(body).hexdigest(),
                 "retrieved_at_utc": str(pr.get("retrieved_at_utc", _utc_now())),
                 "extraction_notes": "Reused existing snapshot; SHA-256 matches provenance.",
-                "supported_event_type": str(pr.get("supported_event_type", "")),
-                "supported_date_jalali": str(pr.get("supported_date_jalali", "")),
+                # Manual-review fields are intentionally NOT copied here; the
+                # validated review overlay owns them downstream.
                 "content_review_status": "pending_manual_review",
             })
             return True
@@ -578,11 +662,12 @@ def evaluate_source_record(rec: dict, snapshot_root: Path = None) -> bool:
     # Authority consistency (domain is the source of truth).
     src_type = str(rec.get("source_type", ""))
     url = str(rec.get("source_url", ""))
-    _cls, verr = classify_source_authority_with_validation(src_type, url)
+    tk = str(rec.get("ticker", ""))
+    _cls, verr = classify_source_authority_with_validation(src_type, url, tk)
     if verr:
         return False
-    # Document specificity.
-    if not is_document_specific_source(url, src_type):
+    # Document specificity (per authority class).
+    if not is_document_specific_source(url, src_type, tk):
         return False
     # Canonical event + valid exact-day date.
     if str(rec.get("event_type_supported", "")).strip() not in CANONICAL_EVENT_TYPES:
@@ -609,7 +694,162 @@ def compute_evidence_accepted(rec: dict, snapshot_root: Path = None) -> str:
 def _record_authority(rec: dict) -> str:
     """Domain-strict authority class for an (already accepted) record."""
     return classify_source_authority(str(rec.get("source_type", "")),
-                                     str(rec.get("source_url", "")))
+                                     str(rec.get("source_url", "")),
+                                     str(rec.get("ticker", "")))
+
+
+# Canonical provenance schema (stable column order for the output CSV).
+PROVENANCE_COLUMNS = [
+    "ticker", "source_index", "source_type", "source_title", "source_url",
+    "publication_date", "retrieved_at_utc", "http_status", "retrieval_status",
+    "final_url", "content_type", "response_size_bytes", "snapshot_path",
+    "content_sha256", "extraction_notes", "exact_text_or_event_summary",
+    "supported_event_type", "supported_date_jalali", "content_review_status",
+    "source_authority_class", "authority_validation_error", "document_specific",
+    "ordinary_share_explicit", "event_type_supported", "exact_date_explicit",
+    "reviewed_date_jalali", "publication_date_jalali", "publication_date_explicit",
+    "contemporaneous_with_event", "independent_source_group", "evidence_accepted",
+]
+
+# Manual-review fields that may be preserved across runs (only when the overlay
+# is validated against an unchanged URL / snapshot / hash).
+REVIEW_OVERLAY_FIELDS = [
+    "content_review_status", "ordinary_share_explicit", "event_type_supported",
+    "exact_date_explicit", "reviewed_date_jalali", "publication_date_jalali",
+    "publication_date_explicit", "exact_text_or_event_summary",
+    "supported_event_type", "supported_date_jalali",
+    "reviewer_notes", "manual_reviewed_at_utc",
+]
+
+# Default (no-review) values for the overlay fields, so a record with no valid
+# manual review keeps a clean, stable representation.
+REVIEW_FIELD_DEFAULTS = {
+    "ordinary_share_explicit": "unknown",
+    "event_type_supported": "",
+    "exact_date_explicit": "false",
+    "reviewed_date_jalali": "",
+    "publication_date_jalali": "",
+    "publication_date_explicit": "false",
+    "exact_text_or_event_summary": "",
+    "supported_event_type": "",
+    "supported_date_jalali": "",
+    "reviewer_notes": "",
+    "manual_reviewed_at_utc": "",
+}
+
+# Derived fields that are ALWAYS recomputed and never trusted from a prior CSV.
+DERIVED_NEVER_TRUSTED = [
+    "source_authority_class", "authority_validation_error", "document_specific",
+    "contemporaneous_with_event", "independent_source_group", "evidence_accepted",
+    "ready_for_user_review",
+]
+
+
+def _had_manual_review(pr) -> bool:
+    """True if a prior provenance row carried any manual-review content."""
+    if pr is None:
+        return False
+    if str(pr.get("content_review_status", "")).strip().lower() == "reviewed":
+        return True
+    for f in ("event_type_supported", "reviewed_date_jalali", "supported_event_type",
+              "supported_date_jalali", "exact_text_or_event_summary"):
+        if str(pr.get(f, "")).strip():
+            return True
+    if _truthy(pr.get("exact_date_explicit", "")) or _truthy(pr.get("ordinary_share_explicit", "")):
+        return True
+    return False
+
+
+def normalize_provenance_records(records: list, snapshot_root: Path = ROOT) -> list:
+    """Recompute every *derived* evidence field for each record from the URL and
+    reviewed content. Manual values for derived fields are ignored entirely; the
+    engine is the only source of truth for them."""
+    out = []
+    for rec in records:
+        r = {c: str(rec.get(c, "")) for c in PROVENANCE_COLUMNS}
+        # carry over numeric/source_index without stringifying to a float artdefact
+        r["source_index"] = str(rec.get("source_index", "")).strip()
+        src_type = r.get("source_type", "")
+        url = r.get("source_url", "")
+        tk = r.get("ticker", "")
+        cls, verr = classify_source_authority_with_validation(src_type, url, tk)
+        r["source_authority_class"] = cls
+        r["authority_validation_error"] = verr
+        r["document_specific"] = (
+            "true" if is_document_specific_source(url, src_type, tk) else "false")
+        r["independent_source_group"] = registrable_domain(url)
+        r["contemporaneous_with_event"] = (
+            "true" if _contemporaneous_with_event(r) else "false")
+        r["evidence_accepted"] = compute_evidence_accepted(r, snapshot_root)
+        out.append(r)
+    return out
+
+
+def apply_validated_review_overlay(retrieval_records: list, existing_provenance,
+                                   snapshot_root: Path = ROOT) -> list:
+    """Overlay validated manual-review fields from a prior provenance file onto
+    fresh retrieval records, then recompute all derived fields.
+
+    A manual review is preserved only when the prior row matches on
+    ``(ticker, source_index, source_url)`` AND the retrieval is still a successful
+    fetch with the *same* snapshot_path and content_sha256, and the on-disk
+    snapshot exists and hashes to that content_sha256. Otherwise every manual
+    field is cleared; a previously-reviewed row that is now invalid is marked
+    ``stale_review_invalidated``. Timeout/failed records never inherit a review.
+    Derived fields are never trusted from the prior file."""
+    # Keyed on (ticker, source_index) so a *changed* source_url is detected as a
+    # stale review rather than silently missed.
+    index = {}
+    if existing_provenance is not None and not getattr(existing_provenance, "empty", True):
+        for _, pr in existing_provenance.iterrows():
+            key = (str(pr.get("ticker", "")), str(pr.get("source_index", "")).strip())
+            index[key] = pr
+
+    overlaid = []
+    for rec in retrieval_records:
+        r = dict(rec)
+        for f in DERIVED_NEVER_TRUSTED:
+            r.pop(f, None)
+        status = str(r.get("retrieval_status", ""))
+        key = (str(r.get("ticker", "")), str(r.get("source_index", "")).strip())
+        pr = index.get(key)
+
+        overlay_valid = False
+        if pr is not None and status in FETCHED_STATUSES:
+            snap = str(r.get("snapshot_path", "")).strip()
+            h = str(r.get("content_sha256", "")).strip()
+            same = (str(pr.get("source_url", "")) == str(r.get("source_url", ""))
+                    and str(pr.get("snapshot_path", "")) == snap
+                    and str(pr.get("content_sha256", "")) == h)
+            snap_ok = False
+            if snap and _is_sha256(h) and snapshot_root is not None:
+                sp = Path(snapshot_root) / snap
+                snap_ok = sp.exists() and hashlib.sha256(sp.read_bytes()).hexdigest() == h.lower()
+            overlay_valid = bool(same and snap_ok)
+
+        if overlay_valid:
+            for f in REVIEW_OVERLAY_FIELDS:
+                if f in pr.index:
+                    r[f] = str(pr.get(f, ""))
+        else:
+            prior_review = _had_manual_review(pr)
+            for f in REVIEW_OVERLAY_FIELDS:
+                if f == "content_review_status":
+                    continue
+                if f in REVIEW_FIELD_DEFAULTS and (f in r or f not in PROVENANCE_COLUMNS):
+                    # reset to clean default; drop non-schema fields
+                    if f in PROVENANCE_COLUMNS:
+                        r[f] = REVIEW_FIELD_DEFAULTS[f]
+                    else:
+                        r.pop(f, None)
+            if status in FETCHED_STATUSES:
+                r["content_review_status"] = (
+                    "stale_review_invalidated" if prior_review else "pending_manual_review")
+            else:
+                r["content_review_status"] = "not_available_due_to_fetch_failure"
+        overlaid.append(r)
+
+    return normalize_provenance_records(overlaid, snapshot_root)
 
 
 def decide_ready_for_user_review(records: list, snapshot_root: Path = None) -> dict:
@@ -791,11 +1031,16 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
     return base
 
 
-def build_research_screening(company_names: dict, fetch_results: dict,
+def build_research_screening(company_names: dict, provenance_by_ticker: dict,
                              tsetmc: dict) -> pd.DataFrame:
+    """Build research screening *only* from recomputed provenance records.
+
+    ``provenance_by_ticker`` must be the normalized/overlaid provenance records
+    (grouped by ticker) — never raw, pre-recomputation fetch fields. No canonical
+    or ready decision is made from anything but these recomputed records."""
     rows = []
     for tk in PART03_TICKERS:
-        recs = fetch_results.get(tk, [])
+        recs = provenance_by_ticker.get(tk, [])
         st = _derive_screening_status(recs, snapshot_root=ROOT)
         srcs = RESEARCH_SOURCES.get(tk, [])
         src1 = srcs[0] if len(srcs) > 0 else ("", "", "")
@@ -854,25 +1099,14 @@ def build_research_screening(company_names: dict, fetch_results: dict,
 
 def build_source_provenance(fetch_results: dict,
                             snapshot_root: Path = ROOT) -> pd.DataFrame:
-    """Build provenance, recomputing every derived field from the URL/content so
-    a manually-supplied value can never override the engine (Correction 6)."""
-    rows = []
+    """Build the final provenance DataFrame, recomputing every derived field from
+    the URL/content so a manually-supplied value can never override the engine.
+    Accepts a ``{ticker: [record, ...]}`` mapping (raw retrieval or overlaid)."""
+    flat = []
     for tk in PART03_TICKERS:
-        for rec in fetch_results.get(tk, []):
-            r = dict(rec)
-            src_type = str(r.get("source_type", ""))
-            url = str(r.get("source_url", ""))
-            cls, verr = classify_source_authority_with_validation(src_type, url)
-            r["source_authority_class"] = cls
-            r["authority_validation_error"] = verr
-            r["document_specific"] = (
-                "true" if is_document_specific_source(url, src_type) else "false")
-            r["contemporaneous_with_event"] = (
-                "true" if _contemporaneous_with_event(r) else "false")
-            # evidence_accepted is always the computed result, never the input.
-            r["evidence_accepted"] = compute_evidence_accepted(r, snapshot_root)
-            rows.append(r)
-    return pd.DataFrame(rows)
+        flat.extend(fetch_results.get(tk, []))
+    normalized = normalize_provenance_records(flat, snapshot_root)
+    return pd.DataFrame(normalized, columns=PROVENANCE_COLUMNS)
 
 
 def build_tsetmc_audit(tsetmc: dict) -> pd.DataFrame:
@@ -1177,7 +1411,7 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
         # domain-strict taxonomy: stored authority class must match recomputation,
         # and a validation error forbids acceptance.
         real_url = str(pr.get("source_url", ""))
-        rec_cls, rec_verr = classify_source_authority_with_validation(src_type, real_url)
+        rec_cls, rec_verr = classify_source_authority_with_validation(src_type, real_url, str(tk))
         if "source_authority_class" in pr.index:
             check(f"authority_class_matches_engine_{tk}_{idx}",
                   str(pr.get("source_authority_class", "")).strip() == rec_cls,
@@ -1187,6 +1421,32 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
                   not _truthy(pr.get("evidence_accepted", "")),
                   f"validation_error present but evidence_accepted="
                   f"{pr.get('evidence_accepted')}")
+
+        # TSETMC / market-data audit is never accepted evidence.
+        if rec_cls == "official_market_data_audit":
+            check(f"market_data_not_accepted_{tk}_{idx}",
+                  not _truthy(pr.get("evidence_accepted", "")),
+                  "official_market_data_audit must never be evidence_accepted")
+
+        # a reviewed record must carry a valid snapshot + matching hash.
+        review_status = str(pr.get("content_review_status", "")).strip().lower()
+        if review_status == "reviewed":
+            sp2 = PART03_DIR.parent.parent / snap if snap else None
+            ok = (status in FETCHED_STATUSES and snap != "" and _is_sha256(h)
+                  and sp2 is not None and sp2.exists()
+                  and hashlib.sha256(sp2.read_bytes()).hexdigest() == h.lower())
+            check(f"reviewed_requires_valid_snapshot_{tk}_{idx}", ok,
+                  f"reviewed but snapshot/hash invalid (status={status})")
+
+        # a stale-invalidated review must be cleared and never accepted.
+        if review_status == "stale_review_invalidated":
+            check(f"stale_review_not_accepted_{tk}_{idx}",
+                  not _truthy(pr.get("evidence_accepted", "")),
+                  "stale_review_invalidated must not be evidence_accepted")
+            check(f"stale_review_cleared_{tk}_{idx}",
+                  str(pr.get("event_type_supported", "")).strip() == ""
+                  and str(pr.get("reviewed_date_jalali", "")).strip() == "",
+                  "stale_review_invalidated must clear manual review fields")
 
     # TSETMC audit: all from historical V2 audit, no network, never canonical
     research_canon = {r["ticker"]: str(r["proposed_canonical_public_entry_date_jalali"]).strip()
@@ -1208,6 +1468,29 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
             check(f"network_unreachable_preserved_{tk}",
                   str(r["candidate_disposition"]) == "network_unreachable",
                   f"disp={r['candidate_disposition']}")
+
+    # research screening must be exactly reproducible from the recomputed
+    # provenance (it must not depend on any pre-recomputation fetch fields).
+    research_by_tk = {r["ticker"]: r for _, r in research_df.iterrows()}
+    for tk in PART03_TICKERS:
+        sub = prov_by_tk.get(tk)
+        recs = ([{k: pr.get(k, "") for k in pr.index} for _, pr in sub.iterrows()]
+                if sub is not None and not sub.empty else [])
+        derived = _derive_screening_status(recs, snapshot_root=ROOT)
+        r = research_by_tk.get(tk)
+        if r is None:
+            check(f"research_from_provenance_{tk}", False, "missing research row")
+            continue
+        same = all(str(r.get(f, "")).strip() == str(derived.get(f, "")).strip()
+                   for f in ("evidence_status", "research_status",
+                             "research_completion_status", "network_blocked",
+                             "ready_for_user_review", "ordinary_share_confirmed",
+                             "fetched_source_count", "reviewed_source_count",
+                             "evidence_source_count",
+                             "proposed_canonical_public_entry_date_jalali"))
+        check(f"research_from_provenance_{tk}", same,
+              "research screening row must match status derived from recomputed "
+              "provenance")
 
     # no fabricated user verification anywhere
     blob = " ".join(str(df.values) for df in (research_df, provenance_df, tsetmc_df))
@@ -1285,17 +1568,35 @@ def run(force_fetch: bool = False) -> dict:
 
     company_names = load_company_names()
     tickers_df = build_tickers_df(company_names)
-    fetch_results = fetch_sources(timeout=5.0, force=force_fetch)
     tsetmc = load_historical_tsetmc()
 
-    research_df = build_research_screening(company_names, fetch_results, tsetmc)
-    provenance_df = build_source_provenance(fetch_results)
+    provenance_path = PART03_DIR / "part03_source_provenance_10tickers.csv"
+
+    # Correct data flow:
+    #   1) raw retrieval records
+    #   2) overlay validated manual review from the prior provenance file
+    #   3) recompute all derived evidence fields
+    #   4) build final provenance
+    #   5) build research screening *only* from the recomputed provenance
+    retrieval = fetch_sources(timeout=5.0, force=force_fetch)
+    existing_prov = None
+    if provenance_path.exists():
+        try:
+            existing_prov = read_csv(provenance_path)
+        except Exception:
+            existing_prov = None
+    overlaid_by_ticker = {
+        tk: apply_validated_review_overlay(retrieval.get(tk, []), existing_prov, ROOT)
+        for tk in PART03_TICKERS
+    }
+
+    provenance_df = build_source_provenance(overlaid_by_ticker)
+    research_df = build_research_screening(company_names, overlaid_by_ticker, tsetmc)
     tsetmc_df = build_tsetmc_audit(tsetmc)
     worklist_df = build_manual_research_worklist(company_names, research_df)
 
     tickers_path = PART03_DIR / "part03_tickers.csv"
     research_path = PART03_DIR / "part03_research_screening_10tickers.csv"
-    provenance_path = PART03_DIR / "part03_source_provenance_10tickers.csv"
     tsetmc_path = PART03_DIR / "part03_tsetmc_audit_10tickers.csv"
     worklist_path = PART03_DIR / "part03_manual_research_worklist.csv"
 
@@ -1397,7 +1698,7 @@ def run(force_fetch: bool = False) -> dict:
              "http_status": str(rec["http_status"]),
              "snapshot_path": rec["snapshot_path"],
              "content_sha256": rec["content_sha256"]}
-            for rec in fetch_results.get(tk, [])
+            for rec in overlaid_by_ticker.get(tk, [])
         ]
     summary_path = PART03_DIR / "part03_summary.json"
     with open(summary_path, "w", encoding="utf-8") as f:

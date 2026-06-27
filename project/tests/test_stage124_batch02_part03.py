@@ -39,8 +39,12 @@ from project.src.stage124_batch02_part03 import (
     is_document_specific_source,
     is_valid_exact_jalali_date,
     registrable_domain,
+    apply_validated_review_overlay,
+    normalize_provenance_records,
     _derive_screening_status,
+    PROVENANCE_COLUMNS,
 )
+import project.src.stage124_batch02_part03 as part03_mod
 from project.src.stage124_batch02_part02 import PART02_TICKERS
 from project.src.stage124_batch02_v2 import PILOT15, sha
 
@@ -844,6 +848,333 @@ def test_h_qc_evidence_accepted_recompute_detects_mismatch():
     prov_df.at[j, "evidence_accepted"] = "true"  # invalid manual override
     qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
     assert _result(qc, f"evidence_accepted_matches_engine_{tk}_{idx}") is False
+
+
+# ================================================================================
+# Part 3.1A.2 — Manual review overlay ↔ evidence engine wiring (20 checks)
+# ================================================================================
+
+def _make_snapshot(name, body=b"<html>specific document</html>"):
+    SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
+    p = SNAPSHOT_DIR / name
+    p.write_bytes(body)
+    rel = f"stage124/batch02_parts/snapshots_part03/{name}"
+    return p, rel, hashlib.sha256(body).hexdigest()
+
+
+def _retrieval_rec(tk, url, rel, h, status="fetched_ok", **over):
+    rec = {
+        "ticker": tk, "source_index": 1, "source_type": "codal_official",
+        "source_title": "t", "source_url": url, "publication_date": "",
+        "retrieved_at_utc": "2026-01-01T00:00:00Z", "http_status": "200",
+        "retrieval_status": status, "final_url": url, "content_type": "text/html",
+        "response_size_bytes": "10", "snapshot_path": rel if status in
+        ("fetched_ok", "reused_existing_snapshot") else "",
+        "content_sha256": h if status in ("fetched_ok", "reused_existing_snapshot") else "",
+        "extraction_notes": "", "exact_text_or_event_summary": "",
+        "supported_event_type": "", "supported_date_jalali": "",
+        "content_review_status": "pending_manual_review" if status in
+        ("fetched_ok", "reused_existing_snapshot") else "not_available_due_to_fetch_failure",
+    }
+    rec.update(over)
+    return rec
+
+
+def _existing_prov_df(tk, url, rel, h, **review):
+    row = {c: "" for c in PROVENANCE_COLUMNS}
+    row.update({
+        "ticker": tk, "source_index": "1", "source_type": "codal_official",
+        "source_url": url, "retrieval_status": "fetched_ok",
+        "snapshot_path": rel, "content_sha256": h,
+        "content_review_status": "reviewed",
+        "event_type_supported": "first_public_offering",
+        "exact_date_explicit": "true", "reviewed_date_jalali": "1380-03-15",
+        "ordinary_share_explicit": "true", "evidence_accepted": "true",
+    })
+    row.update(review)
+    return pd.DataFrame([row])
+
+
+_CODAL_DOC = "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=ABC123"
+
+
+# (1) valid review overlay preserved
+def test_o01_valid_review_overlay_preserved():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("o01.html")
+    try:
+        retrieval = _retrieval_rec(tk, _CODAL_DOC, rel, h)
+        existing = _existing_prov_df(tk, _CODAL_DOC, rel, h)
+        out = apply_validated_review_overlay([retrieval], existing, ROOT)
+        assert out[0]["content_review_status"] == "reviewed"
+        assert out[0]["event_type_supported"] == "first_public_offering"
+        assert out[0]["evidence_accepted"] == "true"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# (2) changed snapshot hash invalidates review
+def test_o02_changed_hash_invalidates():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("o02.html")
+    try:
+        retrieval = _retrieval_rec(tk, _CODAL_DOC, rel, h)
+        existing = _existing_prov_df(tk, _CODAL_DOC, rel, "0" * 64)  # different hash
+        out = apply_validated_review_overlay([retrieval], existing, ROOT)
+        assert out[0]["content_review_status"] == "stale_review_invalidated"
+        assert out[0]["evidence_accepted"] == "false"
+        assert out[0]["event_type_supported"] == ""
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# (3) changed source URL invalidates review
+def test_o03_changed_url_invalidates():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("o03.html")
+    try:
+        retrieval = _retrieval_rec(tk, _CODAL_DOC, rel, h)
+        existing = _existing_prov_df(tk, "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=OTHER",
+                                     rel, h)
+        out = apply_validated_review_overlay([retrieval], existing, ROOT)
+        assert out[0]["content_review_status"] == "stale_review_invalidated"
+        assert out[0]["evidence_accepted"] == "false"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# (4) timeout record cannot inherit review
+def test_o04_timeout_cannot_inherit():
+    tk = PART03_TICKERS[0]
+    retrieval = _retrieval_rec(tk, _CODAL_DOC, "", "", status="timeout")
+    existing = _existing_prov_df(tk, _CODAL_DOC, "stale.html", "a" * 64)
+    out = apply_validated_review_overlay([retrieval], existing, ROOT)
+    assert out[0]["content_review_status"] == "not_available_due_to_fetch_failure"
+    assert out[0]["evidence_accepted"] == "false"
+    assert out[0]["event_type_supported"] == ""
+
+
+# (5) old evidence_accepted=true is recomputed
+def test_o05_old_evidence_accepted_recomputed():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("o05.html")
+    try:
+        # existing claims accepted but ordinary_share unknown → must recompute false
+        retrieval = _retrieval_rec(tk, _CODAL_DOC, rel, h)
+        existing = _existing_prov_df(tk, _CODAL_DOC, rel, h,
+                                     ordinary_share_explicit="unknown",
+                                     evidence_accepted="true")
+        out = apply_validated_review_overlay([retrieval], existing, ROOT)
+        assert out[0]["evidence_accepted"] == "false"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# (6) research uses recomputed provenance
+def test_o06_research_uses_recomputed_provenance():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
+    for tk in PART03_TICKERS:
+        assert _result(qc, f"research_from_provenance_{tk}") is True
+
+
+# (7) company_official without ticker whitelist rejected
+def test_o07_company_official_no_whitelist_rejected():
+    cls, err = classify_source_authority_with_validation(
+        "company_official", "https://acme.example/news/1", ticker=PART03_TICKERS[0])
+    assert cls == "unknown" and err != ""
+
+
+# (8) company official exact domain for same ticker accepted
+def test_o08_company_official_exact_domain_accepted():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("o08.html")
+    part03_mod.VERIFIED_COMPANY_OFFICIAL_DOMAINS[tk] = {"acme.example"}
+    try:
+        rec = _retrieval_rec(tk, "https://acme.example/news/12345", rel, h,
+                             source_type="company_official",
+                             content_review_status="reviewed",
+                             event_type_supported="first_public_offering",
+                             exact_date_explicit="true",
+                             reviewed_date_jalali="1380-03-15",
+                             ordinary_share_explicit="true")
+        assert classify_source_authority("company_official",
+                                         "https://acme.example/news/12345", tk) == "company_official"
+        assert evaluate_source_record(rec, snapshot_root=ROOT) is True
+    finally:
+        snap.unlink(missing_ok=True)
+        part03_mod.VERIFIED_COMPANY_OFFICIAL_DOMAINS.pop(tk, None)
+
+
+# (9) company official domain for another ticker rejected
+def test_o09_company_official_other_ticker_rejected():
+    tkA, tkB = PART03_TICKERS[0], PART03_TICKERS[1]
+    part03_mod.VERIFIED_COMPANY_OFFICIAL_DOMAINS[tkA] = {"acme.example"}
+    try:
+        cls, err = classify_source_authority_with_validation(
+            "company_official", "https://acme.example/news/1", ticker=tkB)
+        assert cls == "unknown" and err != ""
+    finally:
+        part03_mod.VERIFIED_COMPANY_OFFICIAL_DOMAINS.pop(tkA, None)
+
+
+# (10) fake subdomain boundary rejected
+def test_o10_company_official_fake_subdomain_rejected():
+    tk = PART03_TICKERS[0]
+    part03_mod.VERIFIED_COMPANY_OFFICIAL_DOMAINS[tk] = {"acme.example"}
+    try:
+        for bad in ("https://acme.example.evil.com/news/1",
+                    "https://fake-acme.example/news/1"):
+            cls, err = classify_source_authority_with_validation(
+                "company_official", bad, ticker=tk)
+            assert cls == "unknown" and err != "", bad
+    finally:
+        part03_mod.VERIFIED_COMPANY_OFFICIAL_DOMAINS.pop(tk, None)
+
+
+# (11) TSETMC official market data never ready
+def test_o11_tsetmc_never_ready():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("o11.html")
+    try:
+        rec = _retrieval_rec(tk, "https://tsetmc.com/instInfo/123", rel, h,
+                             source_type="market_data",
+                             content_review_status="reviewed",
+                             event_type_supported="first_public_trading",
+                             exact_date_explicit="true",
+                             reviewed_date_jalali="1380-03-15",
+                             ordinary_share_explicit="true")
+        assert classify_source_authority("market_data",
+                                         "https://tsetmc.com/instInfo/123", tk) == "official_market_data_audit"
+        assert evaluate_source_record(rec, snapshot_root=ROOT) is False
+        assert decide_ready_for_user_review([rec], snapshot_root=ROOT)["ready"] is False
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# (12) TSETMC + aggregator never ready
+def test_o12_tsetmc_plus_aggregator_never_ready():
+    tk = PART03_TICKERS[0]
+    s1, r1, h1 = _make_snapshot("o12a.html", b"a")
+    s2, r2, h2 = _make_snapshot("o12b.html", b"b")
+    try:
+        tsetmc = _retrieval_rec(tk, "https://tsetmc.com/instInfo/1", r1, h1,
+                                source_type="market_data",
+                                content_review_status="reviewed",
+                                event_type_supported="first_public_trading",
+                                exact_date_explicit="true",
+                                reviewed_date_jalali="1380-03-15",
+                                ordinary_share_explicit="true")
+        agg = _retrieval_rec(tk, "https://rahavard365.com/instrument/9/report", r2, h2,
+                             source_index=2, source_type="market_information_aggregator",
+                             content_review_status="reviewed",
+                             event_type_supported="first_public_trading",
+                             exact_date_explicit="true",
+                             reviewed_date_jalali="1380-03-15",
+                             ordinary_share_explicit="true")
+        assert decide_ready_for_user_review([tsetmc, agg], snapshot_root=ROOT)["ready"] is False
+    finally:
+        s1.unlink(missing_ok=True)
+        s2.unlink(missing_ok=True)
+
+
+# (13) SENA without contemporaneous publication date not ready
+def test_o13_sena_without_pubdate_not_ready():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("o13.html")
+    try:
+        rec = _retrieval_rec(tk, "https://sena.ir/news/12345", rel, h,
+                             source_type="official_market_news",
+                             content_review_status="reviewed",
+                             event_type_supported="first_public_offering",
+                             exact_date_explicit="true",
+                             reviewed_date_jalali="1380-03-15",
+                             ordinary_share_explicit="true")
+        assert evaluate_source_record(rec, snapshot_root=ROOT) is True  # accepted
+        assert decide_ready_for_user_review([rec], snapshot_root=ROOT)["ready"] is False
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# (14) contemporaneous SENA article can qualify
+def test_o14_sena_contemporaneous_ready():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("o14.html")
+    try:
+        rec = _retrieval_rec(tk, "https://sena.ir/news/12345", rel, h,
+                             source_type="official_market_news",
+                             content_review_status="reviewed",
+                             event_type_supported="first_public_offering",
+                             exact_date_explicit="true",
+                             reviewed_date_jalali="1380-03-15",
+                             ordinary_share_explicit="true",
+                             publication_date_explicit="true",
+                             publication_date_jalali="1380-03-20")
+        assert decide_ready_for_user_review([rec], snapshot_root=ROOT)["ready"] is True
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# (15) generic company profile rejected
+def test_o15_company_profile_rejected():
+    tk = PART03_TICKERS[0]
+    part03_mod.VERIFIED_COMPANY_OFFICIAL_DOMAINS[tk] = {"acme.example"}
+    try:
+        assert is_document_specific_source("https://acme.example/about",
+                                           "company_official", tk) is False
+    finally:
+        part03_mod.VERIFIED_COMPANY_OFFICIAL_DOMAINS.pop(tk, None)
+
+
+# (16) generic news category rejected
+def test_o16_news_category_rejected():
+    assert is_document_specific_source("https://isna.ir/category/economy",
+                                       "news_agency") is False
+
+
+# (17) specific news article accepted (document-specific)
+def test_o17_specific_news_article_accepted():
+    assert is_document_specific_source("https://isna.ir/news/12345",
+                                       "news_agency") is True
+
+
+# (18) all 20 current timeout records unchanged in character
+def test_o18_current_timeout_records_unchanged():
+    p = PART03_DIR / "part03_source_provenance_10tickers.csv"
+    df = pd.read_csv(p, dtype=str).fillna("")
+    assert len(df) == 20
+    assert (df["retrieval_status"] == "timeout").all()
+    assert (df["content_review_status"] == "not_available_due_to_fetch_failure").all()
+    assert (df["evidence_accepted"].str.lower() == "false").all()
+    assert (df["document_specific"].str.lower() == "false").all()
+    assert (df["snapshot_path"].str.strip() == "").all()
+
+
+# (19) all 10 current research rows unchanged in character
+def test_o19_current_research_rows_unchanged():
+    p = PART03_DIR / "part03_research_screening_10tickers.csv"
+    df = pd.read_csv(p, dtype=str).fillna("")
+    assert df["ticker"].tolist() == PART03_TICKERS
+    assert (df["research_status"] == "research_blocked_network").all()
+    assert (df["ready_for_user_review"].str.lower() == "false").all()
+    assert (df["ordinary_share_confirmed"] == "unknown").all()
+
+
+# (20) Part 2 and TSETMC audit unchanged
+def test_o20_part2_and_tsetmc_audit_unchanged():
+    manifest = PART03_DIR / "part02_hash_manifest.csv"
+    if manifest.exists():
+        mdf = pd.read_csv(manifest, dtype=str).fillna("")
+        for _, r in mdf.iterrows():
+            if not r.get("sha256", "").strip():
+                continue
+            fp = ROOT / r["relative_path"]
+            if fp.exists():
+                assert sha(fp) == r["sha256"], f"{r['relative_path']} changed"
+    ta = PART03_DIR / "part03_tsetmc_audit_10tickers.csv"
+    df = pd.read_csv(ta, dtype=str).fillna("")
+    assert (df["network_request_performed"].str.lower() == "false").all()
+    assert (df["probe_source"] == "historical_v2_audit").all()
 
 
 # ---- (15)(16) real generated output --------------------------------------------

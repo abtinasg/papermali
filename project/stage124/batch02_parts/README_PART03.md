@@ -21,6 +21,43 @@ verified master, does **not** run Gate B, and does **not** run any modelling.
 
 No Part 2 or Pilot15 ticker is re-researched.
 
+## Manual review ↔ evidence engine wiring (Part 3.1A.2)
+
+The data flow was corrected so research screening is built **only** from the
+recomputed provenance:
+
+1. raw retrieval records →
+2. `apply_validated_review_overlay()` overlays validated manual-review fields from
+   the prior provenance file →
+3. all derived evidence fields are recomputed (`normalize_provenance_records()`) →
+4. final provenance →
+5. `build_research_screening()` derives status from that provenance only →
+6. QC + summary.
+
+- **Controlled review preservation.** A prior manual review is kept only when the
+  row matches on `(ticker, source_index)` AND the source_url, snapshot_path and
+  content_sha256 are unchanged and the on-disk snapshot still hashes to that
+  content_sha256. If the URL / snapshot / hash changed, every manual field is
+  cleared and `content_review_status=stale_review_invalidated`; a timeout/failed
+  record never inherits a review.
+- **Derived fields are never trusted from the CSV.** `source_authority_class`,
+  `authority_validation_error`, `document_specific`, `contemporaneous_with_event`,
+  `independent_source_group`, `evidence_accepted` and `ready_for_user_review` are
+  always recomputed; a manual `evidence_accepted=true` is ignored.
+- **company_official is fail-closed.** Honoured only when the host is in
+  `VERIFIED_COMPANY_OFFICIAL_DOMAINS[ticker]` (boundary-safe). The whitelist is
+  empty until a company domain is actually verified in Part 3.1B; one ticker's
+  domain is never valid for another.
+- **TSETMC is `official_market_data_audit`.** It may corroborate but is never
+  qualifying, never single-source ready, never counted in the two-source path,
+  and never the sole basis of a canonical date.
+- **SENA is market news.** `sena.ir` is `credible_news`: as a single source it
+  needs an explicit contemporaneous publication date (≤30 days).
+- **Per-class document specificity.** Regulatory needs a stable-id document;
+  credible news needs a specific article (not category/tag/search/archive);
+  company-official needs a specific news/announcement/PDF on the verified domain
+  (not about/investor/profile); aggregators are never qualifying.
+
 ## Evidence engine hardening (Part 3.1A.1)
 
 The evidence engine was tightened before any real research:
