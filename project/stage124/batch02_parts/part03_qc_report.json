@@ -1,7 +1,7 @@
 {
   "stage": "stage124_batch02_part03",
-  "generated_at": "2026-06-27T11:01:46Z",
-  "source_commit": "795271c1328d41179e484c257570cf7303bf2245",
+  "generated_at": "2026-06-27T11:20:55Z",
+  "source_commit": "448651621b955c632b751404f675bef61a5819b9",
   "ticker_count": 10,
   "tickers": [
     "خمهر",
@@ -16,7 +16,7 @@
     "رمپنا"
   ],
   "all_pass": true,
-  "assertion_count": 244,
+  "assertion_count": 250,
   "failed_count": 0,
   "assertions": [
     {
@@ -1203,6 +1203,36 @@
       "assertion": "stage122_sha_matches",
       "passed": true,
       "detail": "sha=ece991c5ff28"
+    },
+    {
+      "assertion": "registry_valid",
+      "passed": true,
+      "detail": "errors=[]"
+    },
+    {
+      "assertion": "registry_exactly_20_seed_rows",
+      "passed": true,
+      "detail": "rows=20"
+    },
+    {
+      "assertion": "registry_two_seed_sources_each",
+      "passed": true,
+      "detail": "counts={'خمهر': 2, 'خنصیر': 2, 'خوساز': 2, 'خچرخش': 2, 'خکمک': 2, 'دروز': 2, 'دسبحا': 2, 'دیران': 2, 'رانفور': 2, 'رمپنا': 2}"
+    },
+    {
+      "assertion": "provenance_subset_of_registry",
+      "passed": true,
+      "detail": "orphans=set()"
+    },
+    {
+      "assertion": "active_registry_in_provenance",
+      "passed": true,
+      "detail": "missing=set()"
+    },
+    {
+      "assertion": "provenance_only_active_registry",
+      "passed": true,
+      "detail": "prov_extra=set(), active_extra=set()"
     },
     {
       "assertion": "worklist_exactly_10_rows",

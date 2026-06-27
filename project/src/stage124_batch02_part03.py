@@ -125,6 +125,169 @@ RESEARCH_SOURCES = {
 }
 
 
+# ---- persistent source registry ------------------------------------------------
+# The registry is the *source of truth* for which URLs the pipeline attempts. New
+# URLs discovered in Part 3.1B are added here (next source_index) and flow into
+# the pipeline without any code change. ``RESEARCH_SOURCES`` above is kept only to
+# seed the registry the first time and for migration/test compatibility.
+SOURCE_REGISTRY_PATH = PART03_DIR / "part03_source_registry.csv"
+SOURCE_REGISTRY_COLUMNS = [
+    "ticker", "source_index", "source_type", "source_title", "source_url",
+    "source_origin", "active", "discovery_status", "added_at_utc", "added_by",
+    "discovery_notes",
+]
+# Schema for explicitly registering newly discovered sources.
+DISCOVERY_ADDITION_COLUMNS = [
+    "ticker", "source_type", "source_title", "source_url", "added_by",
+    "discovery_notes",
+]
+
+
+def build_seed_registry_df() -> "pd.DataFrame":
+    """Build the initial registry: exactly the current 20 seed sources, two per
+    ticker, preserving ticker / source_index / type / title / url."""
+    rows = []
+    for tk in PART03_TICKERS:
+        for idx, src in enumerate(RESEARCH_SOURCES.get(tk, []), 1):
+            src_type, src_title, url = src
+            rows.append({
+                "ticker": tk, "source_index": str(idx),
+                "source_type": src_type, "source_title": src_title,
+                "source_url": url, "source_origin": "seed_part03",
+                "active": "true", "discovery_status": "network_blocked",
+                "added_at_utc": "", "added_by": "", "discovery_notes": "",
+            })
+    return pd.DataFrame(rows, columns=SOURCE_REGISTRY_COLUMNS)
+
+
+def load_source_registry(path: Path = None) -> "pd.DataFrame":
+    """Load the registry CSV, or fall back to the freshly-seeded registry when the
+    file does not yet exist."""
+    path = path or SOURCE_REGISTRY_PATH
+    if path.exists():
+        df = read_csv(path)
+        # Ensure all expected columns exist (forward-compatible).
+        for c in SOURCE_REGISTRY_COLUMNS:
+            if c not in df.columns:
+                df[c] = ""
+        return df[SOURCE_REGISTRY_COLUMNS]
+    return build_seed_registry_df()
+
+
+def validate_source_registry(df: "pd.DataFrame"):
+    """Fail-closed validation. Returns ``(ok, errors)``."""
+    errors = []
+    if df is None or df.empty:
+        return False, ["registry is empty"]
+    allowed = set(PART03_TICKERS)
+    seen_keys = set()
+    seen_urls = {}
+    for i, r in df.iterrows():
+        tk = str(r.get("ticker", "")).strip()
+        si = str(r.get("source_index", "")).strip()
+        url = str(r.get("source_url", "")).strip()
+        st = str(r.get("source_type", "")).strip()
+        active = str(r.get("active", "")).strip().lower()
+        if tk not in allowed:
+            errors.append(f"row {i}: ticker '{tk}' not in Part 3 scope")
+        if not (si.isdigit() and int(si) >= 1):
+            errors.append(f"row {i}: source_index '{si}' is not a positive integer")
+        key = (tk, si)
+        if key in seen_keys:
+            errors.append(f"row {i}: duplicate (ticker, source_index)={key}")
+        seen_keys.add(key)
+        if not url:
+            errors.append(f"row {i}: empty source_url")
+        if not st:
+            errors.append(f"row {i}: empty source_type")
+        if active not in ("true", "false"):
+            errors.append(f"row {i}: active='{active}' must be true/false")
+        if url:
+            ukey = (tk, url)
+            if ukey in seen_urls:
+                errors.append(f"row {i}: duplicate source_url for ticker '{tk}'")
+            seen_urls[ukey] = i
+    return (len(errors) == 0), errors
+
+
+def registry_to_research_sources(df: "pd.DataFrame",
+                                 include_inactive: bool = False) -> dict:
+    """Convert the registry into ``{ticker: [(source_index, source_type, title,
+    url), ...]}`` sorted by source_index. Inactive sources are excluded unless
+    ``include_inactive`` is set."""
+    out = {tk: [] for tk in PART03_TICKERS}
+    if df is None or df.empty:
+        return out
+    for _, r in df.iterrows():
+        tk = str(r.get("ticker", "")).strip()
+        if tk not in out:
+            continue
+        if not include_inactive and str(r.get("active", "")).strip().lower() != "true":
+            continue
+        si = str(r.get("source_index", "")).strip()
+        if not si.isdigit():
+            continue
+        out[tk].append((int(si), str(r.get("source_type", "")),
+                        str(r.get("source_title", "")), str(r.get("source_url", ""))))
+    for tk in out:
+        out[tk].sort(key=lambda e: e[0])
+    return out
+
+
+def register_discovered_sources(registry_df: "pd.DataFrame",
+                                additions_df: "pd.DataFrame") -> "pd.DataFrame":
+    """Append explicitly-discovered sources to the registry. Never fetches and
+    never writes the file (callers persist deliberately). Assigns the next
+    source_index per ticker, rejects duplicate URLs and out-of-scope tickers,
+    and tags ``source_origin=manual_discovery`` / ``active=true``."""
+    base = registry_df.copy() if registry_df is not None else build_seed_registry_df().iloc[0:0]
+    for c in SOURCE_REGISTRY_COLUMNS:
+        if c not in base.columns:
+            base[c] = ""
+    base = base[SOURCE_REGISTRY_COLUMNS]
+    if additions_df is None or additions_df.empty:
+        return base.reset_index(drop=True)
+
+    allowed = set(PART03_TICKERS)
+    # current max index and url set per ticker
+    max_idx = {}
+    urls = {}
+    for _, r in base.iterrows():
+        tk = str(r.get("ticker", "")).strip()
+        si = str(r.get("source_index", "")).strip()
+        if si.isdigit():
+            max_idx[tk] = max(max_idx.get(tk, 0), int(si))
+        urls.setdefault(tk, set()).add(str(r.get("source_url", "")).strip())
+
+    new_rows = []
+    for _, a in additions_df.iterrows():
+        tk = str(a.get("ticker", "")).strip()
+        url = str(a.get("source_url", "")).strip()
+        st = str(a.get("source_type", "")).strip()
+        if tk not in allowed:
+            raise ValueError(f"register_discovered_sources: ticker '{tk}' out of scope")
+        if not url or not st:
+            raise ValueError("register_discovered_sources: source_url/source_type required")
+        if url in urls.get(tk, set()):
+            raise ValueError(f"register_discovered_sources: duplicate url for '{tk}': {url}")
+        nxt = max_idx.get(tk, 0) + 1
+        max_idx[tk] = nxt
+        urls.setdefault(tk, set()).add(url)
+        new_rows.append({
+            "ticker": tk, "source_index": str(nxt), "source_type": st,
+            "source_title": str(a.get("source_title", "")), "source_url": url,
+            "source_origin": "manual_discovery", "active": "true",
+            "discovery_status": "discovered_pending_fetch",
+            "added_at_utc": str(a.get("added_at_utc", "")),
+            "added_by": str(a.get("added_by", "")),
+            "discovery_notes": str(a.get("discovery_notes", "")),
+        })
+    if new_rows:
+        base = pd.concat([base, pd.DataFrame(new_rows, columns=SOURCE_REGISTRY_COLUMNS)],
+                         ignore_index=True)
+    return base.reset_index(drop=True)
+
+
 # Retrieval statuses that count as a *successful* fetch.
 FETCHED_STATUSES = {"fetched_ok", "reused_existing_snapshot"}
 
@@ -428,14 +591,19 @@ def load_company_names() -> dict:
 
 
 # ---- source fetch --------------------------------------------------------------
-def fetch_sources(timeout: float = 5.0, force: bool = False) -> dict:
-    """Attempt up to 3 source URLs per ticker, sequentially, retry=0.
+def fetch_sources(timeout: float = 5.0, force: bool = False,
+                  sources_by_ticker: dict = None) -> dict:
+    """Attempt each *active* registered source URL per ticker, sequentially,
+    retry=0.
 
-    Returns ``{ticker: [record, ...]}``. A successful fetch writes a snapshot
+    The set of URLs comes from the persistent source registry (the source of
+    truth); ``sources_by_ticker`` may be supplied directly (used by tests). Each
+    entry is ``(source_index, source_type, title, url)`` and the registry's
+    ``source_index`` is preserved verbatim. A successful fetch writes a snapshot
     under ``snapshots_part03/`` and records its SHA-256. A failed fetch records
-    the real failure reason and never fabricates a snapshot or hash. If a
-    previous snapshot exists with a matching SHA in the existing provenance, it
-    is reused without re-sending the request.
+    the real failure reason and never fabricates a snapshot or hash. If a previous
+    snapshot exists with a matching SHA in the existing provenance, it is reused
+    without re-sending the request.
     """
     SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
     provenance_path = PART03_DIR / "part03_source_provenance_10tickers.csv"
@@ -446,11 +614,18 @@ def fetch_sources(timeout: float = 5.0, force: bool = False) -> dict:
         except Exception:
             existing_prov = None
 
+    if sources_by_ticker is None:
+        registry = load_source_registry()
+        ok, errors = validate_source_registry(registry)
+        if not ok:
+            raise ValueError(f"invalid source registry: {errors[:5]}")
+        sources_by_ticker = registry_to_research_sources(registry, include_inactive=False)
+
     results = {}
     for tk in PART03_TICKERS:
         recs = []
-        for idx, src in enumerate(RESEARCH_SOURCES.get(tk, [])[:3], 1):
-            src_type, src_title, url = src
+        for entry in sources_by_ticker.get(tk, []):
+            idx, src_type, src_title, url = entry
             snap_path = SNAPSHOT_DIR / f"{normalize_ticker(tk)}_source_{idx}.html"
             rel_path = _snapshot_rel_path(tk, idx)
             rec = {
@@ -709,6 +884,8 @@ PROVENANCE_COLUMNS = [
     "ordinary_share_explicit", "event_type_supported", "exact_date_explicit",
     "reviewed_date_jalali", "publication_date_jalali", "publication_date_explicit",
     "contemporaneous_with_event", "independent_source_group", "evidence_accepted",
+    # --- manual-review audit fields (preserved only via a validated overlay) ---
+    "reviewer_notes", "manual_reviewed_at_utc",
 ]
 
 # Manual-review fields that may be preserved across runs (only when the overlay
@@ -1042,9 +1219,17 @@ def build_research_screening(company_names: dict, provenance_by_ticker: dict,
     for tk in PART03_TICKERS:
         recs = provenance_by_ticker.get(tk, [])
         st = _derive_screening_status(recs, snapshot_root=ROOT)
-        srcs = RESEARCH_SOURCES.get(tk, [])
-        src1 = srcs[0] if len(srcs) > 0 else ("", "", "")
-        src2 = srcs[1] if len(srcs) > 1 else ("", "", "")
+        # primary/secondary are the first two sources by ascending source_index,
+        # taken from the recomputed provenance — not any hardcoded list.
+        ordered = sorted(
+            recs,
+            key=lambda r: int(str(r.get("source_index", "0")).strip() or 0)
+            if str(r.get("source_index", "0")).strip().isdigit() else 0)
+        def _src_tuple(rec):
+            return (str(rec.get("source_type", "")), str(rec.get("source_title", "")),
+                    str(rec.get("source_url", "")))
+        src1 = _src_tuple(ordered[0]) if len(ordered) > 0 else ("", "", "")
+        src2 = _src_tuple(ordered[1]) if len(ordered) > 1 else ("", "", "")
         ts = tsetmc.get(tk, {})
         cand_j = st["proposed_canonical_public_entry_date_jalali"]
         notes = []
@@ -1181,12 +1366,54 @@ def build_manual_research_worklist(company_names: dict,
     return pd.DataFrame(rows, columns=WORKLIST_COLUMNS)
 
 
+# Only these worklist columns may be refreshed from current status; every other
+# column (manual research findings) is preserved verbatim.
+WORKLIST_REFRESHABLE = {"company_name", "current_research_status", "network_blocked"}
+# Manual columns that must never be cleared by a refresh.
+WORKLIST_PROTECTED = [
+    "discovered_source_1_url", "discovered_source_2_url",
+    "first_public_event_candidate", "candidate_date_jalali", "date_precision",
+    "ordinary_share_explicit", "conflict_notes", "manual_review_status",
+    "reviewer_notes",
+]
+
+
+def merge_existing_worklist_with_current_status(template_df: pd.DataFrame,
+                                                existing_df: pd.DataFrame) -> pd.DataFrame:
+    """Preserve a pre-existing worklist's manual data, refreshing only the
+    computed status columns. Matching is by ticker; a ticker added, removed, or
+    duplicated relative to Part 3 scope is fail-closed."""
+    if existing_df is None or getattr(existing_df, "empty", True):
+        return template_df.copy()
+    ex_tickers = [str(t) for t in existing_df["ticker"].tolist()]
+    if len(ex_tickers) != len(set(ex_tickers)):
+        raise ValueError("worklist has duplicate tickers")
+    if sorted(ex_tickers) != sorted(PART03_TICKERS):
+        raise ValueError("worklist ticker set does not match Part 3 scope")
+    ex_by = {str(r["ticker"]): r for _, r in existing_df.iterrows()}
+    rows = []
+    for _, t in template_df.iterrows():
+        tk = str(t["ticker"])
+        ex = ex_by[tk]
+        row = {}
+        for c in WORKLIST_COLUMNS:
+            if c in WORKLIST_REFRESHABLE:
+                row[c] = str(t.get(c, ""))
+            elif c in existing_df.columns:
+                row[c] = str(ex.get(c, t.get(c, "")))
+            else:
+                row[c] = str(t.get(c, ""))
+        rows.append(row)
+    return pd.DataFrame(rows, columns=WORKLIST_COLUMNS)
+
+
 # ---- QC (fail-closed, computed from real output) -------------------------------
 def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
                   provenance_df: pd.DataFrame, tsetmc_df: pd.DataFrame,
                   frozen_before: dict, frozen_after: dict,
                   part02_before: dict, part02_after: dict,
-                  worklist_df: pd.DataFrame = None) -> dict:
+                  worklist_df: pd.DataFrame = None,
+                  registry_df: pd.DataFrame = None) -> dict:
     assertions = []
 
     def check(name, passed, detail=""):
@@ -1520,6 +1747,30 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
     check("stage122_sha_matches", sha(STAGE122_INPUT) == EXPECTED_STAGE122_SHA,
           f"sha={sha(STAGE122_INPUT)[:12]}")
 
+    # Source registry: validity + one-to-one mapping with provenance.
+    if registry_df is not None:
+        reg_ok, reg_errs = validate_source_registry(registry_df)
+        check("registry_valid", reg_ok, f"errors={reg_errs[:3]}")
+        check("registry_exactly_20_seed_rows", len(registry_df) == 20,
+              f"rows={len(registry_df)}")
+        per_tk = registry_df.groupby("ticker").size().to_dict()
+        check("registry_two_seed_sources_each",
+              all(per_tk.get(tk, 0) == 2 for tk in PART03_TICKERS),
+              f"counts={per_tk}")
+        reg_keys = {(str(r["ticker"]), str(r["source_index"]).strip())
+                    for _, r in registry_df.iterrows()}
+        active_keys = {(str(r["ticker"]), str(r["source_index"]).strip())
+                       for _, r in registry_df.iterrows()
+                       if str(r.get("active", "")).strip().lower() == "true"}
+        prov_keys = {(str(pr["ticker"]), str(pr["source_index"]).strip())
+                     for _, pr in provenance_df.iterrows()}
+        check("provenance_subset_of_registry", prov_keys <= reg_keys,
+              f"orphans={prov_keys - reg_keys}")
+        check("active_registry_in_provenance", active_keys <= prov_keys,
+              f"missing={active_keys - prov_keys}")
+        check("provenance_only_active_registry", prov_keys == active_keys,
+              f"prov_extra={prov_keys - active_keys}, active_extra={active_keys - prov_keys}")
+
     # Manual research worklist: exactly 10 rows, correct order, no guessed
     # URLs/dates.
     if worklist_df is not None:
@@ -1572,13 +1823,25 @@ def run(force_fetch: bool = False) -> dict:
 
     provenance_path = PART03_DIR / "part03_source_provenance_10tickers.csv"
 
+    # The persistent source registry is the source of truth. Seed it the first
+    # time from RESEARCH_SOURCES; afterwards it is read as-is (manual additions
+    # made via register_discovered_sources persist).
+    if not SOURCE_REGISTRY_PATH.exists():
+        write_csv(build_seed_registry_df(), SOURCE_REGISTRY_PATH)
+    registry_df = load_source_registry()
+    ok, reg_errors = validate_source_registry(registry_df)
+    if not ok:
+        raise ValueError(f"invalid source registry: {reg_errors[:5]}")
+    sources_by_ticker = registry_to_research_sources(registry_df, include_inactive=False)
+
     # Correct data flow:
-    #   1) raw retrieval records
+    #   1) raw retrieval records (from active registry sources)
     #   2) overlay validated manual review from the prior provenance file
     #   3) recompute all derived evidence fields
     #   4) build final provenance
     #   5) build research screening *only* from the recomputed provenance
-    retrieval = fetch_sources(timeout=5.0, force=force_fetch)
+    retrieval = fetch_sources(timeout=5.0, force=force_fetch,
+                              sources_by_ticker=sources_by_ticker)
     existing_prov = None
     if provenance_path.exists():
         try:
@@ -1593,12 +1856,21 @@ def run(force_fetch: bool = False) -> dict:
     provenance_df = build_source_provenance(overlaid_by_ticker)
     research_df = build_research_screening(company_names, overlaid_by_ticker, tsetmc)
     tsetmc_df = build_tsetmc_audit(tsetmc)
-    worklist_df = build_manual_research_worklist(company_names, research_df)
+    # Worklist: preserve any existing manual findings, refresh only status cols.
+    worklist_path = PART03_DIR / "part03_manual_research_worklist.csv"
+    worklist_template = build_manual_research_worklist(company_names, research_df)
+    existing_worklist = None
+    if worklist_path.exists():
+        try:
+            existing_worklist = read_csv(worklist_path)
+        except Exception:
+            existing_worklist = None
+    worklist_df = merge_existing_worklist_with_current_status(worklist_template,
+                                                             existing_worklist)
 
     tickers_path = PART03_DIR / "part03_tickers.csv"
     research_path = PART03_DIR / "part03_research_screening_10tickers.csv"
     tsetmc_path = PART03_DIR / "part03_tsetmc_audit_10tickers.csv"
-    worklist_path = PART03_DIR / "part03_manual_research_worklist.csv"
 
     write_csv(research_df, research_path)
     write_csv(provenance_df, provenance_path)
@@ -1609,7 +1881,7 @@ def run(force_fetch: bool = False) -> dict:
 
     qc = run_part03_qc(tickers_df, research_df, provenance_df, tsetmc_df,
                        frozen_before, frozen_after, part02_before, part02_after,
-                       worklist_df=worklist_df)
+                       worklist_df=worklist_df, registry_df=registry_df)
 
     qc_report = {
         "stage": "stage124_batch02_part03",

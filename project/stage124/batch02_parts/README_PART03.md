@@ -21,6 +21,37 @@ verified master, does **not** run Gate B, and does **not** run any modelling.
 
 No Part 2 or Pilot15 ticker is re-researched.
 
+## Persistent source registry & worklist preservation (Part 3.1A.3)
+
+- **Source registry is the source of truth.** `part03_source_registry.csv`
+  (schema: ticker, source_index, source_type, source_title, source_url,
+  source_origin, active, discovery_status, added_at_utc, added_by,
+  discovery_notes) drives retrieval. It is seeded once with exactly the 20 current
+  sources (`source_origin=seed_part03`, `active=true`,
+  `discovery_status=network_blocked`). `fetch_sources()` reads it via
+  `load_source_registry()` / `validate_source_registry()` /
+  `registry_to_research_sources()`; `run()` no longer depends on the hardcoded
+  `RESEARCH_SOURCES` (kept only for seeding/migration). A new Part 3.1B URL is
+  added at the next `source_index` and flows into the pipeline with no code change;
+  inactive rows are skipped. Validation is fail-closed (only the 10 tickers,
+  unique `(ticker, source_index)`, positive index, non-empty url/type, no
+  duplicate url per ticker, `active∈{true,false}`).
+- **Explicit discovery registration.** `register_discovered_sources(registry_df,
+  additions_df)` assigns the next index per ticker, rejects duplicate URLs and
+  out-of-scope tickers, tags `source_origin=manual_discovery`, fetches nothing and
+  does not overwrite the file. Worklist URLs never auto-enter the registry.
+- **Worklist persistence.** `merge_existing_worklist_with_current_status()`
+  preserves all manual columns (discovered_source_*_url, first_public_event_candidate,
+  candidate_date_jalali, date_precision, ordinary_share_explicit, conflict_notes,
+  manual_review_status, reviewer_notes) and refreshes only company_name /
+  current_research_status / network_blocked. Matching is by ticker; an added,
+  removed or duplicated ticker is fail-closed.
+- **Review audit fields.** `reviewer_notes` and `manual_reviewed_at_utc` are added
+  to the provenance schema; they are preserved only via a validated overlay,
+  cleared on a stale review, never inherited by timeouts, and never auto-filled.
+  Research primary/secondary are taken from the recomputed provenance by ascending
+  `source_index`, not from any hardcoded list.
+
 ## Manual review ↔ evidence engine wiring (Part 3.1A.2)
 
 The data flow was corrected so research screening is built **only** from the

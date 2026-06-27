@@ -43,6 +43,16 @@ from project.src.stage124_batch02_part03 import (
     normalize_provenance_records,
     _derive_screening_status,
     PROVENANCE_COLUMNS,
+    SOURCE_REGISTRY_COLUMNS,
+    build_seed_registry_df,
+    load_source_registry,
+    validate_source_registry,
+    registry_to_research_sources,
+    register_discovered_sources,
+    merge_existing_worklist_with_current_status,
+    build_manual_research_worklist,
+    fetch_sources,
+    WORKLIST_COLUMNS,
 )
 import project.src.stage124_batch02_part03 as part03_mod
 from project.src.stage124_batch02_part02 import PART02_TICKERS
@@ -1273,3 +1283,315 @@ def test_real_part02_outputs_unchanged():
         fp = ROOT / r["relative_path"]
         if fp.exists():
             assert sha(fp) == r["sha256"], f"{r['relative_path']} changed"
+
+
+# ================================================================================
+# Part 3.1A.3 — Source registry + worklist persistence + review audit fields
+# ================================================================================
+
+def _seed_registry():
+    return build_seed_registry_df()
+
+
+# (1) initial registry has 20 rows
+def test_r01_registry_initial_20_rows():
+    df = _seed_registry()
+    assert len(df) == 20
+    assert list(df.columns) == SOURCE_REGISTRY_COLUMNS
+    ok, errs = validate_source_registry(df)
+    assert ok, errs
+
+
+# (2) exact ticker / source_index set
+def test_r02_registry_exact_keys():
+    df = _seed_registry()
+    keys = {(str(r["ticker"]), str(r["source_index"])) for _, r in df.iterrows()}
+    expected = {(tk, str(i)) for tk in PART03_TICKERS for i in (1, 2)}
+    assert keys == expected
+    assert (df["source_origin"] == "seed_part03").all()
+    assert (df["active"] == "true").all()
+    assert (df["discovery_status"] == "network_blocked").all()
+
+
+# (3) duplicate (ticker, source_index) rejected
+def test_r03_duplicate_key_rejected():
+    df = _seed_registry()
+    dup = df.iloc[[0]].copy()
+    dup["source_url"] = "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Z"
+    bad = pd.concat([df, dup], ignore_index=True)
+    ok, errs = validate_source_registry(bad)
+    assert ok is False and any("duplicate (ticker, source_index)" in e for e in errs)
+
+
+# (4) duplicate URL for one ticker rejected
+def test_r04_duplicate_url_rejected():
+    df = _seed_registry()
+    row = df.iloc[[0]].copy()
+    row["source_index"] = "3"
+    bad = pd.concat([df, row], ignore_index=True)  # same url as index 1
+    ok, errs = validate_source_registry(bad)
+    assert ok is False and any("duplicate source_url" in e for e in errs)
+
+
+# (5) ticker out of Part 3 scope rejected
+def test_r05_out_of_scope_ticker_rejected():
+    df = _seed_registry()
+    row = df.iloc[[0]].copy()
+    row["ticker"] = "زپارس"
+    bad = pd.concat([df, row], ignore_index=True)
+    ok, errs = validate_source_registry(bad)
+    assert ok is False and any("not in Part 3 scope" in e for e in errs)
+
+
+# (6) invalid source_index rejected
+def test_r06_invalid_source_index_rejected():
+    df = _seed_registry()
+    df = df.copy()
+    df.at[0, "source_index"] = "x"
+    ok, errs = validate_source_registry(df)
+    assert ok is False and any("source_index" in e for e in errs)
+
+
+# (7) pipeline uses the registry (not the hardcoded list)
+def test_r07_pipeline_uses_registry():
+    # a registry with only one active source for the first ticker → fetch yields 1
+    df = _seed_registry()
+    df = df[~((df["ticker"] == PART03_TICKERS[0]) & (df["source_index"] == "2"))].copy()
+    sources = registry_to_research_sources(df, include_inactive=False)
+    saved = part03_mod._requests.get
+    part03_mod._requests.get = lambda *a, **k: (_ for _ in ()).throw(
+        part03_mod._requests.exceptions.Timeout())
+    try:
+        res = fetch_sources(force=True, sources_by_ticker=sources)
+    finally:
+        part03_mod._requests.get = saved
+    assert len(res[PART03_TICKERS[0]]) == 1
+    assert len(res[PART03_TICKERS[1]]) == 2
+
+
+# (8) a third source enters the pipeline with no code change
+def test_r08_third_source_enters_pipeline():
+    tk = PART03_TICKERS[0]
+    df = _seed_registry()
+    add = pd.DataFrame([{
+        "ticker": tk, "source_type": "codal_official",
+        "source_title": "new doc", "added_by": "tester",
+        "source_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=NEW3",
+        "discovery_notes": "",
+    }])
+    df2 = register_discovered_sources(df, add)
+    sources = registry_to_research_sources(df2, include_inactive=False)
+    saved = part03_mod._requests.get
+    part03_mod._requests.get = lambda *a, **k: (_ for _ in ()).throw(
+        part03_mod._requests.exceptions.Timeout())
+    try:
+        res = fetch_sources(force=True, sources_by_ticker=sources)
+    finally:
+        part03_mod._requests.get = saved
+    idxs = sorted(int(r["source_index"]) for r in res[tk])
+    assert idxs == [1, 2, 3]
+
+
+# (9) inactive source is ignored by retrieval
+def test_r09_inactive_source_ignored():
+    tk = PART03_TICKERS[0]
+    df = _seed_registry().copy()
+    df.loc[(df["ticker"] == tk) & (df["source_index"] == "2"), "active"] = "false"
+    sources = registry_to_research_sources(df, include_inactive=False)
+    assert len(sources[tk]) == 1
+    assert all(e[0] != 2 for e in sources[tk])
+
+
+# (10) provenance and active registry are one-to-one
+def test_r10_provenance_registry_one_to_one():
+    df = _seed_registry()
+    sources = registry_to_research_sources(df, include_inactive=False)
+    saved = part03_mod._requests.get
+    part03_mod._requests.get = lambda *a, **k: (_ for _ in ()).throw(
+        part03_mod._requests.exceptions.Timeout())
+    try:
+        res = fetch_sources(force=True, sources_by_ticker=sources)
+    finally:
+        part03_mod._requests.get = saved
+    prov = build_source_provenance(res, snapshot_root=None)
+    prov_keys = {(str(r["ticker"]), str(r["source_index"])) for _, r in prov.iterrows()}
+    active_keys = {(str(r["ticker"]), str(r["source_index"])) for _, r in df.iterrows()
+                   if r["active"] == "true"}
+    assert prov_keys == active_keys
+
+
+# (11) primary/secondary built from registry/provenance ordering
+def test_r11_primary_secondary_from_provenance():
+    names = _names()
+    df = _seed_registry()
+    sources = registry_to_research_sources(df, include_inactive=False)
+    saved = part03_mod._requests.get
+    part03_mod._requests.get = lambda *a, **k: (_ for _ in ()).throw(
+        part03_mod._requests.exceptions.Timeout())
+    try:
+        res = fetch_sources(force=True, sources_by_ticker=sources)
+    finally:
+        part03_mod._requests.get = saved
+    overlaid = {tk: normalize_provenance_records(res.get(tk, []), None)
+                for tk in PART03_TICKERS}
+    research = build_research_screening(names, overlaid, _absent_tsetmc())
+    tk = PART03_TICKERS[0]
+    row = research[research["ticker"] == tk].iloc[0]
+    first_url = sorted(overlaid[tk], key=lambda r: int(r["source_index"]))[0]["source_url"]
+    assert row["primary_source_url"] == first_url
+
+
+# (12) existing worklist is preserved on refresh
+def test_r12_worklist_preserved():
+    names = _names()
+    template = build_manual_research_worklist(names, _baseline_dfs()[1])
+    existing = template.copy()
+    existing.at[0, "manual_review_status"] = "in_progress"
+    existing.at[0, "reviewer_notes"] = "looked at codal"
+    merged = merge_existing_worklist_with_current_status(template, existing)
+    assert merged.at[0, "manual_review_status"] == "in_progress"
+    assert merged.at[0, "reviewer_notes"] == "looked at codal"
+
+
+# (13) discovered URLs in worklist are not cleared
+def test_r13_worklist_discovered_urls_preserved():
+    names = _names()
+    template = build_manual_research_worklist(names, _baseline_dfs()[1])
+    existing = template.copy()
+    existing.at[1, "discovered_source_1_url"] = "https://www.codal.ir/x?LetterSerial=1"
+    existing.at[1, "candidate_date_jalali"] = "1380-03-15"
+    merged = merge_existing_worklist_with_current_status(template, existing)
+    assert merged.at[1, "discovered_source_1_url"] == "https://www.codal.ir/x?LetterSerial=1"
+    assert merged.at[1, "candidate_date_jalali"] == "1380-03-15"
+
+
+# (14) worklist URLs do not auto-enter the registry
+def test_r14_worklist_url_not_in_registry():
+    df = load_source_registry()
+    urls = set(df["source_url"])
+    # a discovered url placed only in the worklist must not appear in the registry
+    assert "https://www.codal.ir/x?LetterSerial=1" not in urls
+
+
+# (15) register_discovered_sources assigns the next index
+def test_r15_register_next_index():
+    tk = PART03_TICKERS[0]
+    df = _seed_registry()
+    add = pd.DataFrame([{
+        "ticker": tk, "source_type": "codal_official", "source_title": "t",
+        "source_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=AA",
+        "added_by": "x", "discovery_notes": "n",
+    }])
+    out = register_discovered_sources(df, add)
+    new = out[(out["ticker"] == tk) & (out["source_index"] == "3")]
+    assert len(new) == 1
+    assert new.iloc[0]["source_origin"] == "manual_discovery"
+    assert new.iloc[0]["active"] == "true"
+
+
+# (16) duplicate discovered URL rejected
+def test_r16_register_duplicate_url_rejected():
+    tk = PART03_TICKERS[0]
+    df = _seed_registry()
+    existing_url = df[(df["ticker"] == tk) & (df["source_index"] == "1")].iloc[0]["source_url"]
+    add = pd.DataFrame([{
+        "ticker": tk, "source_type": "market_information_aggregator",
+        "source_title": "t", "source_url": existing_url,
+        "added_by": "x", "discovery_notes": "",
+    }])
+    with pytest.raises(ValueError):
+        register_discovered_sources(df, add)
+
+
+# (17)(18) reviewer_notes / manual_reviewed_at_utc round-trip via valid overlay
+def test_r17_18_review_audit_fields_roundtrip():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("r17.html")
+    try:
+        retrieval = _retrieval_rec(tk, _CODAL_DOC, rel, h)
+        existing = _existing_prov_df(tk, _CODAL_DOC, rel, h,
+                                     reviewer_notes="checked LetterSerial",
+                                     manual_reviewed_at_utc="2026-06-20T00:00:00Z")
+        out = apply_validated_review_overlay([retrieval], existing, ROOT)
+        assert out[0]["reviewer_notes"] == "checked LetterSerial"
+        assert out[0]["manual_reviewed_at_utc"] == "2026-06-20T00:00:00Z"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# (19) stale review clears the audit fields
+def test_r19_stale_review_clears_audit_fields():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("r19.html")
+    try:
+        retrieval = _retrieval_rec(tk, _CODAL_DOC, rel, h)
+        existing = _existing_prov_df(tk, _CODAL_DOC, rel, "0" * 64,  # hash changed
+                                     reviewer_notes="stale note",
+                                     manual_reviewed_at_utc="2026-06-20T00:00:00Z")
+        out = apply_validated_review_overlay([retrieval], existing, ROOT)
+        assert out[0]["content_review_status"] == "stale_review_invalidated"
+        assert out[0]["reviewer_notes"] == ""
+        assert out[0]["manual_reviewed_at_utc"] == ""
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# (20) current 20 timeout records and 10 research rows unchanged in character
+def test_r20_current_outputs_unchanged_character():
+    prov = pd.read_csv(PART03_DIR / "part03_source_provenance_10tickers.csv",
+                       dtype=str).fillna("")
+    assert len(prov) == 20
+    assert (prov["retrieval_status"] == "timeout").all()
+    assert (prov["evidence_accepted"].str.lower() == "false").all()
+    assert (prov["reviewer_notes"] == "").all()
+    assert (prov["manual_reviewed_at_utc"] == "").all()
+    research = pd.read_csv(PART03_DIR / "part03_research_screening_10tickers.csv",
+                           dtype=str).fillna("")
+    assert research["ticker"].tolist() == PART03_TICKERS
+    assert (research["research_status"] == "research_blocked_network").all()
+    assert (research["ready_for_user_review"].str.lower() == "false").all()
+
+
+# (21) Part 2 hashes stable
+def test_r21_part2_hashes_stable():
+    manifest = PART03_DIR / "part02_hash_manifest.csv"
+    if not manifest.exists():
+        pytest.skip("manifest missing")
+    mdf = pd.read_csv(manifest, dtype=str).fillna("")
+    for _, r in mdf.iterrows():
+        if not r.get("sha256", "").strip():
+            continue
+        fp = ROOT / r["relative_path"]
+        if fp.exists():
+            assert sha(fp) == r["sha256"], f"{r['relative_path']} changed"
+
+
+# (22) TSETMC audit stable
+def test_r22_tsetmc_audit_stable():
+    df = pd.read_csv(PART03_DIR / "part03_tsetmc_audit_10tickers.csv",
+                     dtype=str).fillna("")
+    assert (df["network_request_performed"].str.lower() == "false").all()
+    assert (df["probe_source"] == "historical_v2_audit").all()
+
+
+# registry one-to-one QC surfaced through run_part03_qc
+def test_r_qc_registry_provenance_mapping():
+    df = _seed_registry()
+    sources = registry_to_research_sources(df, include_inactive=False)
+    saved = part03_mod._requests.get
+    part03_mod._requests.get = lambda *a, **k: (_ for _ in ()).throw(
+        part03_mod._requests.exceptions.Timeout())
+    try:
+        res = fetch_sources(force=True, sources_by_ticker=sources)
+    finally:
+        part03_mod._requests.get = saved
+    overlaid = {tk: normalize_provenance_records(res.get(tk, []), None)
+                for tk in PART03_TICKERS}
+    prov = build_source_provenance(overlaid, snapshot_root=None)
+    research = build_research_screening(_names(), overlaid, _absent_tsetmc())
+    tickers_df = build_tickers_df(_names())
+    tsetmc_df = build_tsetmc_audit(_absent_tsetmc())
+    qc = run_part03_qc(tickers_df, research, prov, tsetmc_df, {}, {}, {}, {},
+                       registry_df=df)
+    assert _result(qc, "registry_valid") is True
+    assert _result(qc, "provenance_only_active_registry") is True
