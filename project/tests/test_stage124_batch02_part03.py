@@ -1843,3 +1843,179 @@ def test_f20_tsetmc_audit_stable():
                      dtype=str).fillna("")
     assert (df["network_request_performed"].str.lower() == "false").all()
     assert (df["probe_source"] == "historical_v2_audit").all()
+
+
+# ================================================================================
+# Part 3.1A.4.1 — candidate_date_jalali ↔ date_precision agreement + strict enums
+# ================================================================================
+
+from project.src.stage124_batch02_part03 import validate_worklist_date_precision
+
+
+# date/precision agreement unit cases (1-11)
+def test_g01_empty_unknown_pass():
+    assert validate_worklist_date_precision("", "unknown") is True
+
+
+def test_g02_empty_exact_day_fail():
+    assert validate_worklist_date_precision("", "exact_day") is False
+
+
+def test_g03_year_only_pass():
+    assert validate_worklist_date_precision("1380", "year_only") is True
+
+
+def test_g04_year_with_exact_day_fail():
+    assert validate_worklist_date_precision("1380", "exact_day") is False
+
+
+def test_g05_month_only_pass():
+    assert validate_worklist_date_precision("1380-03", "month_only") is True
+
+
+def test_g06_month_with_year_only_fail():
+    assert validate_worklist_date_precision("1380-03", "year_only") is False
+
+
+def test_g07_exact_day_pass():
+    assert validate_worklist_date_precision("1380-03-15", "exact_day") is True
+
+
+def test_g08_exact_day_with_month_only_fail():
+    assert validate_worklist_date_precision("1380-03-15", "month_only") is False
+
+
+def test_g09_nonempty_unknown_fail():
+    assert validate_worklist_date_precision("1380-03-15", "unknown") is False
+
+
+def test_g10_invalid_precision_fail():
+    assert validate_worklist_date_precision("1380", "decade") is False
+
+
+def test_g11_out_of_range_month_fail():
+    assert validate_worklist_date_precision("9999-03", "month_only") is False
+    assert validate_worklist_date_precision("1380-13", "month_only") is False
+
+
+# QC-level checks (12-15): strict enums + precision matching
+def _wl_template():
+    return build_manual_research_worklist(_names(), _baseline_dfs()[1])
+
+
+def test_g12_ordinary_share_empty_fails():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    wl = _wl_template()
+    wl.at[0, "ordinary_share_explicit"] = ""
+    qc = run_part03_qc(tickers_df, research_df, prov_df, tsetmc_df,
+                       {}, {}, {}, {}, worklist_df=wl)
+    assert _result(qc, "worklist_ordinary_share_value_valid") is False
+
+
+def test_g13_ordinary_share_invalid_fails():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    wl = _wl_template()
+    wl.at[0, "ordinary_share_explicit"] = "maybe"
+    qc = run_part03_qc(tickers_df, research_df, prov_df, tsetmc_df,
+                       {}, {}, {}, {}, worklist_df=wl)
+    assert _result(qc, "worklist_ordinary_share_value_valid") is False
+
+
+def test_g14_manual_status_empty_fails():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    wl = _wl_template()
+    wl.at[0, "manual_review_status"] = ""
+    qc = run_part03_qc(tickers_df, research_df, prov_df, tsetmc_df,
+                       {}, {}, {}, {}, worklist_df=wl)
+    assert _result(qc, "worklist_manual_status_valid") is False
+
+
+def test_g15_manual_status_invalid_fails():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    wl = _wl_template()
+    wl.at[0, "manual_review_status"] = "done_ish"
+    qc = run_part03_qc(tickers_df, research_df, prov_df, tsetmc_df,
+                       {}, {}, {}, {}, worklist_df=wl)
+    assert _result(qc, "worklist_manual_status_valid") is False
+
+
+def test_g_qc_date_precision_mismatch_fails():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    wl = _wl_template()
+    wl.at[0, "candidate_date_jalali"] = "1380"
+    wl.at[0, "date_precision"] = "exact_day"
+    qc = run_part03_qc(tickers_df, research_df, prov_df, tsetmc_df,
+                       {}, {}, {}, {}, worklist_df=wl)
+    assert _result(qc, "worklist_date_precision_matches_candidate") is False
+
+
+def test_g_qc_date_precision_aligned_passes():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    wl = _wl_template()
+    wl.at[0, "candidate_date_jalali"] = "1380-03-15"
+    wl.at[0, "date_precision"] = "exact_day"
+    wl.at[0, "manual_review_status"] = "reviewed"
+    qc = run_part03_qc(tickers_df, research_df, prov_df, tsetmc_df,
+                       {}, {}, {}, {}, worklist_df=wl)
+    assert _result(qc, "worklist_date_precision_matches_candidate") is True
+    assert _result(qc, "worklist_date_precision_enum_valid") is True
+
+
+# (16) current worklist still passes all new checks
+def test_g16_current_worklist_passes():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    wl = _wl_template()
+    qc = run_part03_qc(tickers_df, research_df, prov_df, tsetmc_df,
+                       {}, {}, {}, {}, worklist_df=wl)
+    for a in ("worklist_date_precision_enum_valid",
+              "worklist_date_precision_matches_candidate",
+              "worklist_ordinary_share_value_valid",
+              "worklist_manual_status_valid"):
+        assert _result(qc, a) is True, a
+
+
+# (17) registry with source_index=3 still passes
+def test_g17_registry_index3_still_passes():
+    tk = PART03_TICKERS[0]
+    add = pd.DataFrame([{
+        "ticker": tk, "source_type": "codal_official", "source_title": "doc3",
+        "source_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=NEW3",
+        "added_by": "tester", "discovery_notes": "",
+    }])
+    reg = register_discovered_sources(build_seed_registry_df(), add)
+    qc = _qc_reg(reg, _prov_from_registry(reg))
+    assert _result(qc, "registry_additional_sources_allowed") is True
+    assert _result(qc, "active_registry_matches_provenance") is True
+
+
+# (18) current 20 timeout + 10 research rows unchanged
+def test_g18_current_outputs_unchanged():
+    prov = pd.read_csv(PART03_DIR / "part03_source_provenance_10tickers.csv",
+                       dtype=str).fillna("")
+    assert len(prov) == 20 and (prov["retrieval_status"] == "timeout").all()
+    research = pd.read_csv(PART03_DIR / "part03_research_screening_10tickers.csv",
+                           dtype=str).fillna("")
+    assert research["ticker"].tolist() == PART03_TICKERS
+    assert (research["research_status"] == "research_blocked_network").all()
+
+
+# (19) Part 2 hashes stable
+def test_g19_part2_hashes_stable():
+    manifest = PART03_DIR / "part02_hash_manifest.csv"
+    if not manifest.exists():
+        pytest.skip("manifest missing")
+    mdf = pd.read_csv(manifest, dtype=str).fillna("")
+    for _, r in mdf.iterrows():
+        if not r.get("sha256", "").strip():
+            continue
+        fp = ROOT / r["relative_path"]
+        if fp.exists():
+            assert sha(fp) == r["sha256"], f"{r['relative_path']} changed"
+
+
+# (20) TSETMC audit stable
+def test_g20_tsetmc_audit_stable():
+    df = pd.read_csv(PART03_DIR / "part03_tsetmc_audit_10tickers.csv",
+                     dtype=str).fillna("")
+    assert (df["network_request_performed"].str.lower() == "false").all()
+    assert (df["probe_source"] == "historical_v2_audit").all()

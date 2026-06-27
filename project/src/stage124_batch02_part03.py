@@ -577,6 +577,39 @@ def _worklist_jalali_ok(value: str) -> bool:
     return False
 
 
+WORKLIST_DATE_PRECISIONS = {"unknown", "year_only", "month_only", "exact_day"}
+
+
+def validate_worklist_date_precision(candidate_date_jalali: str,
+                                     date_precision: str) -> bool:
+    """A worklist ``candidate_date_jalali`` must agree with its ``date_precision``.
+
+    * empty date ⇒ precision must be ``unknown``;
+    * non-empty date ⇒ precision must not be ``unknown``;
+    * ``year_only`` ⇒ ``YYYY`` (1200–1500);
+    * ``month_only`` ⇒ ``YYYY-MM`` (year 1200–1500, month 01–12);
+    * ``exact_day`` ⇒ ``YYYY-MM-DD`` and a real convertible Jalali date.
+    """
+    d = str(candidate_date_jalali or "").strip()
+    p = str(date_precision or "").strip()
+    if p not in WORKLIST_DATE_PRECISIONS:
+        return False
+    if d == "":
+        return p == "unknown"
+    if p == "unknown":
+        return False
+    if p == "year_only":
+        return bool(re.fullmatch(r"\d{4}", d)) and 1200 <= int(d) <= 1500
+    if p == "month_only":
+        if not re.fullmatch(r"\d{4}-\d{2}", d):
+            return False
+        y, m = int(d[:4]), int(d[5:7])
+        return 1200 <= y <= 1500 and 1 <= m <= 12
+    if p == "exact_day":
+        return bool(re.fullmatch(r"\d{4}-\d{2}-\d{2}", d)) and is_valid_exact_jalali_date(d)
+    return False
+
+
 def _is_sha256(value: str) -> bool:
     v = (value or "").strip().lower()
     return len(v) == 64 and all(c in "0123456789abcdef" for c in v)
@@ -1880,6 +1913,24 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
               "candidate_date_jalali must be empty or a valid Jalali "
               "year / month / exact-day value")
 
+        # date_precision enum + agreement with candidate_date_jalali
+        prec_series = worklist_df.get("date_precision", pd.Series([], dtype=str)).astype(str)
+        prec_enum_ok = all(str(v).strip() in WORKLIST_DATE_PRECISIONS
+                           for v in prec_series)
+        check("worklist_date_precision_enum_valid", prec_enum_ok,
+              f"date_precision must be in {sorted(WORKLIST_DATE_PRECISIONS)}")
+        if "date_precision" in worklist_df.columns and \
+                "candidate_date_jalali" in worklist_df.columns:
+            match_ok = all(
+                validate_worklist_date_precision(
+                    str(r.get("candidate_date_jalali", "")),
+                    str(r.get("date_precision", "")))
+                for _, r in worklist_df.iterrows())
+        else:
+            match_ok = False
+        check("worklist_date_precision_matches_candidate", match_ok,
+              "candidate_date_jalali must agree with date_precision")
+
         allowed_events = {"", "first_public_offering", "first_public_trading",
                           "admission", "listing", "unresolved"}
         events_ok = all(str(v).strip() in allowed_events
@@ -1888,21 +1939,22 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
         check("worklist_event_candidate_valid", events_ok,
               f"first_public_event_candidate must be in {sorted(allowed_events)}")
 
+        # ordinary_share_explicit: must be present and a valid enum (empty fails).
         allowed_ord = {"true", "false", "unknown"}
         ord_ok = all(str(v).strip().lower() in allowed_ord
                      for v in worklist_df.get("ordinary_share_explicit",
-                                              pd.Series([], dtype=str)).astype(str)
-                     if str(v).strip() != "")
+                                              pd.Series([], dtype=str)).astype(str))
         check("worklist_ordinary_share_value_valid", ord_ok,
-              f"ordinary_share_explicit must be in {sorted(allowed_ord)}")
+              f"ordinary_share_explicit must be in {sorted(allowed_ord)} (non-empty)")
 
+        # manual_review_status: must be present and a valid enum (empty fails).
         allowed_status = {"pending_manual_research", "source_discovered",
                           "under_review", "reviewed", "unresolved"}
-        status_ok = all(str(v).strip() in allowed_status or str(v).strip() == ""
+        status_ok = all(str(v).strip() in allowed_status
                         for v in worklist_df.get("manual_review_status",
                                                  pd.Series([], dtype=str)).astype(str))
         check("worklist_manual_status_valid", status_ok,
-              f"manual_review_status must be in {sorted(allowed_status)}")
+              f"manual_review_status must be in {sorted(allowed_status)} (non-empty)")
 
     all_pass = all(a["passed"] for a in assertions)
     return {"all_pass": all_pass, "assertions": assertions}

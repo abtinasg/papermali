@@ -21,6 +21,19 @@ verified master, does **not** run Gate B, and does **not** run any modelling.
 
 No Part 2 or Pilot15 ticker is re-researched.
 
+## Candidate-date ↔ precision agreement (Part 3.1A.4.1)
+
+A small semantic tightening of the worklist QC:
+
+- `validate_worklist_date_precision(candidate_date_jalali, date_precision)`
+  enforces agreement: empty date ⇒ `unknown`; non-empty date ⇒ not `unknown`;
+  `year_only`⇒`YYYY` (1200–1500); `month_only`⇒`YYYY-MM`; `exact_day`⇒`YYYY-MM-DD`
+  (real convertible Jalali). New assertions `worklist_date_precision_enum_valid`
+  and `worklist_date_precision_matches_candidate`.
+- `ordinary_share_explicit` and `manual_review_status` are now required non-empty
+  and must be valid enum values. The current template (unknown / unknown /
+  pending_manual_research / empty date) still passes unchanged.
+
 ## Forward-compatible registry & worklist QC (Part 3.1A.4)
 
 The QC was relaxed where it would have wrongly blocked legitimate Part 3.1B

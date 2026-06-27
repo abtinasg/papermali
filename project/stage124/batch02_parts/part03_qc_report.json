@@ -1,7 +1,7 @@
 {
   "stage": "stage124_batch02_part03",
-  "generated_at": "2026-06-27T11:47:33Z",
-  "source_commit": "cbbc19982ae06b252bf5a8f2b281057e6be519cd",
+  "generated_at": "2026-06-27T11:59:48Z",
+  "source_commit": "40308c5738af54d8094241aef4022e5aaca84261",
   "ticker_count": 10,
   "tickers": [
     "خمهر",
@@ -16,7 +16,7 @@
     "رمپنا"
   ],
   "all_pass": true,
-  "assertion_count": 253,
+  "assertion_count": 255,
   "failed_count": 0,
   "assertions": [
     {
@@ -1270,6 +1270,16 @@
       "detail": "candidate_date_jalali must be empty or a valid Jalali year / month / exact-day value"
     },
     {
+      "assertion": "worklist_date_precision_enum_valid",
+      "passed": true,
+      "detail": "date_precision must be in ['exact_day', 'month_only', 'unknown', 'year_only']"
+    },
+    {
+      "assertion": "worklist_date_precision_matches_candidate",
+      "passed": true,
+      "detail": "candidate_date_jalali must agree with date_precision"
+    },
+    {
       "assertion": "worklist_event_candidate_valid",
       "passed": true,
       "detail": "first_public_event_candidate must be in ['', 'admission', 'first_public_offering', 'first_public_trading', 'listing', 'unresolved']"
@@ -1277,12 +1287,12 @@
     {
       "assertion": "worklist_ordinary_share_value_valid",
       "passed": true,
-      "detail": "ordinary_share_explicit must be in ['false', 'true', 'unknown']"
+      "detail": "ordinary_share_explicit must be in ['false', 'true', 'unknown'] (non-empty)"
     },
     {
       "assertion": "worklist_manual_status_valid",
       "passed": true,
-      "detail": "manual_review_status must be in ['pending_manual_research', 'reviewed', 'source_discovered', 'under_review', 'unresolved']"
+      "detail": "manual_review_status must be in ['pending_manual_research', 'reviewed', 'source_discovered', 'under_review', 'unresolved'] (non-empty)"
     }
   ]
 }
