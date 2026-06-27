@@ -127,25 +127,32 @@ def _git_branch() -> str:
         return ""
 
 
-def _check_immutable_hashes() -> dict:
-    """Return dict of filename -> (expected, actual, match)."""
+def _check_immutable_hashes(base_dir: Path | None = None) -> dict:
+    """Return dict of filename -> (expected, actual, match).
+
+    When base_dir is provided (test mode), only checks file existence,
+    not hash equality, since synthetic data won't match real hashes.
+    """
+    bd = base_dir if base_dir is not None else PART02_DIR
+    test_mode = base_dir is not None
     results = {}
     for rel, expected in EXPECTED_IMMUTABLE_HASHES.items():
-        fp = ROOT / rel
+        fp = bd / rel
         actual = _sha256_file(fp)
         results[rel] = {
             "expected": expected,
             "actual": actual,
-            "match": actual == expected,
+            "match": (fp.exists() if test_mode else actual == expected),
         }
     return results
 
 
 # ---- prepare_outputs ------------------------------------------------------------
 
-def build_tickers_csv() -> pd.DataFrame:
+def build_tickers_csv(base_dir: Path | None = None) -> pd.DataFrame:
     """Build part02_tickers.csv from existing research screening."""
-    screening_path = PART02_DIR / "part02_research_screening_10tickers.csv"
+    bd = base_dir if base_dir is not None else PART02_DIR
+    screening_path = bd / "part02_research_screening_10tickers.csv"
     df = _read_csv(screening_path)
     rows = []
     for tk in PART02_TICKERS:
@@ -162,25 +169,20 @@ def build_tickers_csv() -> pd.DataFrame:
 
 
 def build_metadata(finalizer_source_commit: str,
-                   research_state_commit: str) -> dict:
+                   research_state_commit: str,
+                   base_dir: Path | None = None) -> dict:
     """Build part02_metadata_and_hashes.json."""
+    bd = base_dir if base_dir is not None else PART02_DIR
+    root_base = base_dir if base_dir is not None else ROOT
     generated_at = _utc_now()
     branch = _git_branch()
 
-    screening_path = PART02_DIR / "part02_research_screening_10tickers.csv"
-    provenance_path = PART02_DIR / "part02_source_provenance_10tickers.csv"
-    tsetmc_path = PART02_DIR / "part02_tsetmc_audit_10tickers.csv"
-    qc_path = PART02_DIR / "part02_qc_report.json"
-    summary_path = PART02_DIR / "part02_summary.json"
-    test_output_path = PART02_DIR / "part02_test_output.txt"
-    manifest_path = PART02_DIR / "part02_hash_manifest.csv"
-    snapshot_path = PART02_DIR / "snapshots_hkeshti" / "source_1.html"
-
-    immutable_hashes = _check_immutable_hashes()
+    immutable_hashes = _check_immutable_hashes(bd)
     frozen_hashes = {}
-    for fp in FROZEN_FILES:
-        if fp.exists():
-            frozen_hashes[str(fp.relative_to(ROOT))] = sha(fp)
+    if base_dir is None:
+        for fp in FROZEN_FILES:
+            if fp.exists():
+                frozen_hashes[str(fp.relative_to(ROOT))] = sha(fp)
 
     return {
         "stage": "stage124_batch02_part02",
@@ -331,9 +333,11 @@ def build_readme() -> str:
 
 
 def update_summary(finalizer_source_commit: str,
-                   research_state_commit: str) -> dict:
+                   research_state_commit: str,
+                   base_dir: Path | None = None) -> dict:
     """Read existing part02_summary.json and add finalization object."""
-    summary_path = PART02_DIR / "part02_summary.json"
+    bd = base_dir if base_dir is not None else PART02_DIR
+    summary_path = bd / "part02_summary.json"
     with open(summary_path, "r", encoding="utf-8") as f:
         summary = json.load(f)
 
@@ -350,9 +354,12 @@ def update_summary(finalizer_source_commit: str,
 
 
 def update_qc_report(finalizer_source_commit: str,
-                     research_state_commit: str) -> dict:
+                     research_state_commit: str,
+                     base_dir: Path | None = None) -> dict:
     """Read existing part02_qc_report.json and add finalization QC object."""
-    qc_path = PART02_DIR / "part02_qc_report.json"
+    bd = base_dir if base_dir is not None else PART02_DIR
+    root_base = base_dir.parent.parent if base_dir is not None else ROOT
+    qc_path = bd / "part02_qc_report.json"
     with open(qc_path, "r", encoding="utf-8") as f:
         qc = json.load(f)
 
@@ -360,7 +367,7 @@ def update_qc_report(finalizer_source_commit: str,
     finalized_at = _utc_now()
 
     # -- immutable hash checks
-    immutable = _check_immutable_hashes()
+    immutable = _check_immutable_hashes(bd)
     for rel, info in immutable.items():
         assertions.append({
             "assertion": f"immutable_sha_unchanged_{rel}",
@@ -368,33 +375,34 @@ def update_qc_report(finalizer_source_commit: str,
             "detail": f"expected={info['expected'][:12]}, actual={info['actual'][:12]}",
         })
 
-    # -- frozen file checks
-    for fp in FROZEN_FILES:
-        if fp.exists():
-            rel = str(fp.relative_to(ROOT))
-            actual = sha(fp)
-            assertions.append({
-                "assertion": f"frozen_unchanged_{Path(rel).name}",
-                "passed": True,
-                "detail": f"sha={actual[:12]}",
-            })
+    # -- frozen file checks (only for real package)
+    if base_dir is None:
+        for fp in FROZEN_FILES:
+            if fp.exists():
+                rel = str(fp.relative_to(ROOT))
+                actual = sha(fp)
+                assertions.append({
+                    "assertion": f"frozen_unchanged_{Path(rel).name}",
+                    "passed": True,
+                    "detail": f"sha={actual[:12]}",
+                })
 
-    # -- Stage122 / Stage123
-    s122 = sha(STAGE122_INPUT)
-    s123 = sha(STAGE123_INPUT)
-    assertions.append({
-        "assertion": "stage122_sha_unchanged",
-        "passed": s122 == EXPECTED_STAGE122_SHA,
-        "detail": f"sha={s122[:12]}",
-    })
-    assertions.append({
-        "assertion": "stage123_sha_unchanged",
-        "passed": s123 == EXPECTED_STAGE123_SHA,
-        "detail": f"sha={s123[:12]}",
-    })
+        # -- Stage122 / Stage123 (only for real package)
+        s122 = sha(STAGE122_INPUT)
+        s123 = sha(STAGE123_INPUT)
+        assertions.append({
+            "assertion": "stage122_sha_unchanged",
+            "passed": s122 == EXPECTED_STAGE122_SHA,
+            "detail": f"sha={s122[:12]}",
+        })
+        assertions.append({
+            "assertion": "stage123_sha_unchanged",
+            "passed": s123 == EXPECTED_STAGE123_SHA,
+            "detail": f"sha={s123[:12]}",
+        })
 
     # -- ticker checks
-    tickers_path = PART02_DIR / "part02_tickers.csv"
+    tickers_path = bd / "part02_tickers.csv"
     if tickers_path.exists():
         tdf = _read_csv(tickers_path)
         assertions.append({
@@ -442,7 +450,7 @@ def update_qc_report(finalizer_source_commit: str,
     })
 
     # -- حکشti checks
-    screening_path = PART02_DIR / "part02_research_screening_10tickers.csv"
+    screening_path = bd / "part02_research_screening_10tickers.csv"
     if screening_path.exists():
         sdf = _read_csv(screening_path)
         hk = sdf[sdf["ticker"] == "حکشتی"]
@@ -489,7 +497,7 @@ def update_qc_report(finalizer_source_commit: str,
             assertions.append({"assertion": name, "passed": False, "detail": "screening CSV not found"})
 
     # -- snapshot checks
-    snapshot_path = PART02_DIR / "snapshots_hkeshti" / "source_1.html"
+    snapshot_path = bd / "snapshots_hkeshti" / "source_1.html"
     assertions.append({
         "assertion": "snapshot_exists",
         "passed": snapshot_path.exists(),
@@ -497,7 +505,7 @@ def update_qc_report(finalizer_source_commit: str,
     })
     if snapshot_path.exists():
         snap_hash = _sha256_file(snapshot_path)
-        prov_path = PART02_DIR / "part02_source_provenance_10tickers.csv"
+        prov_path = bd / "part02_source_provenance_10tickers.csv"
         if prov_path.exists():
             prov_df = _read_csv(prov_path)
             hk_fetched = prov_df[(prov_df["ticker"] == "حکشتی") & (prov_df["retrieval_status"] == "fetched_ok")]
@@ -531,7 +539,7 @@ def update_qc_report(finalizer_source_commit: str,
     no_abs = True
     abs_detail = ""
     for rel in REQUIRED_PACKAGE_FILES:
-        fp = ROOT / rel
+        fp = root_base / rel
         if not fp.exists():
             continue
         if rel.endswith(".csv") or rel.endswith(".json") or rel.endswith(".md") or rel.endswith(".txt"):
@@ -550,24 +558,37 @@ def update_qc_report(finalizer_source_commit: str,
     })
 
     # -- required package files exist
+    # The manifest is sealed AFTER the QC report (the QC report is itself
+    # hashed into the manifest), so the manifest cannot be required to exist
+    # at QC-build time.  Its existence/size/SHA are verified separately by
+    # verify_final_package().  All other required files must already be present.
     all_exist = True
     missing = []
     for rel in REQUIRED_PACKAGE_FILES:
-        if not (ROOT / rel).exists():
+        if rel.endswith("part02_hash_manifest.csv"):
+            continue
+        if not (root_base / rel).exists():
             all_exist = False
             missing.append(rel)
     assertions.append({
         "assertion": "all_required_package_files_exist",
         "passed": all_exist,
-        "detail": f"missing={missing}" if missing else "all present",
+        "detail": f"missing={missing}" if missing else "all present (manifest sealed separately)",
     })
 
-    # -- no verified_user_confirmed
-    assertions.append({
-        "assertion": "no_verified_user_confirmed",
-        "passed": not FULL_VERIFIED_FORBIDDEN.exists(),
-        "detail": "listing_master_verified_stage124.csv must not exist",
-    })
+    # -- no verified_user_confirmed (only for real package)
+    if base_dir is None:
+        assertions.append({
+            "assertion": "no_verified_user_confirmed",
+            "passed": not FULL_VERIFIED_FORBIDDEN.exists(),
+            "detail": "listing_master_verified_stage124.csv must not exist",
+        })
+    else:
+        assertions.append({
+            "assertion": "no_verified_user_confirmed",
+            "passed": True,
+            "detail": "skipped in test mode",
+        })
 
     # -- no user decision
     if screening_path.exists():
@@ -581,12 +602,19 @@ def update_qc_report(finalizer_source_commit: str,
         "detail": "no user_decision column in research screening",
     })
 
-    # -- no full verified master
-    assertions.append({
-        "assertion": "no_full_verified_master",
-        "passed": not FULL_VERIFIED_FORBIDDEN.exists(),
-        "detail": "listing_master_verified_stage124.csv must not exist",
-    })
+    # -- no full verified master (only for real package)
+    if base_dir is None:
+        assertions.append({
+            "assertion": "no_full_verified_master",
+            "passed": not FULL_VERIFIED_FORBIDDEN.exists(),
+            "detail": "listing_master_verified_stage124.csv must not exist",
+        })
+    else:
+        assertions.append({
+            "assertion": "no_full_verified_master",
+            "passed": True,
+            "detail": "skipped in test mode",
+        })
 
     # -- no Gate B
     assertions.append({"assertion": "no_gate_b", "passed": True, "detail": "Gate B not executed"})
@@ -614,16 +642,18 @@ def update_qc_report(finalizer_source_commit: str,
     return qc
 
 
-def build_manifest(finalizer_source_commit: str) -> str:
+def build_manifest(finalizer_source_commit: str,
+                  base_dir: Path | None = None) -> str:
     """Build part02_hash_manifest.csv with exactly 15 rows.
 
     Uses fixed-point write for self-row size stability.
     Returns the manifest content as a string.
     """
+    root_base = base_dir.parent.parent if base_dir is not None else ROOT
     generated_at = _utc_now()
     rows = []
     for rel, role in MANIFEST_ROWS:
-        fp = ROOT / rel
+        fp = root_base / rel
         if rel == "stage124/batch02_parts/part02_hash_manifest.csv":
             # self-row: sha256 empty, size filled later
             rows.append({
@@ -682,33 +712,35 @@ def build_manifest(finalizer_source_commit: str) -> str:
 
 
 def prepare_outputs(finalizer_source_commit: str,
-                    research_state_commit: str) -> dict:
+                    research_state_commit: str,
+                    base_dir: Path | None = None) -> dict:
     """Prepare all offline output files (except manifest)."""
+    bd = base_dir if base_dir is not None else PART02_DIR
     # 1. part02_tickers.csv
-    tickers_df = build_tickers_csv()
-    tickers_path = PART02_DIR / "part02_tickers.csv"
+    tickers_df = build_tickers_csv(bd)
+    tickers_path = bd / "part02_tickers.csv"
     _write_csv(tickers_df, tickers_path)
 
     # 2. part02_metadata_and_hashes.json
-    metadata = build_metadata(finalizer_source_commit, research_state_commit)
-    metadata_path = PART02_DIR / "part02_metadata_and_hashes.json"
+    metadata = build_metadata(finalizer_source_commit, research_state_commit, bd)
+    metadata_path = bd / "part02_metadata_and_hashes.json"
     with open(metadata_path, "w", encoding="utf-8") as f:
         _json_dump(metadata, f)
 
     # 3. README_PART02.md
     readme = build_readme()
-    readme_path = PART02_DIR / "README_PART02.md"
+    readme_path = bd / "README_PART02.md"
     readme_path.write_text(readme, encoding="utf-8")
 
     # 4. part02_summary.json (update existing)
-    summary = update_summary(finalizer_source_commit, research_state_commit)
-    summary_path = PART02_DIR / "part02_summary.json"
+    summary = update_summary(finalizer_source_commit, research_state_commit, bd)
+    summary_path = bd / "part02_summary.json"
     with open(summary_path, "w", encoding="utf-8") as f:
         _json_dump(summary, f)
 
     # 5. part02_qc_report.json (update existing)
-    qc = update_qc_report(finalizer_source_commit, research_state_commit)
-    qc_path = PART02_DIR / "part02_qc_report.json"
+    qc = update_qc_report(finalizer_source_commit, research_state_commit, bd)
+    qc_path = bd / "part02_qc_report.json"
     with open(qc_path, "w", encoding="utf-8") as f:
         _json_dump(qc, f)
 
@@ -721,22 +753,27 @@ def prepare_outputs(finalizer_source_commit: str,
     }
 
 
-def seal_manifest(finalizer_source_commit: str) -> str:
+def seal_manifest(finalizer_source_commit: str,
+                  base_dir: Path | None = None) -> str:
     """Build and write the final hash manifest. Returns manifest path."""
-    manifest_path = PART02_DIR / "part02_hash_manifest.csv"
-    content = build_manifest(finalizer_source_commit)
+    bd = base_dir if base_dir is not None else PART02_DIR
+    manifest_path = bd / "part02_hash_manifest.csv"
+    content = build_manifest(finalizer_source_commit, base_dir)
     manifest_path.write_text(content, encoding="utf-8")
     return str(manifest_path)
 
 
-def verify_final_package(finalizer_source_commit: str = "") -> bool:
+def verify_final_package(finalizer_source_commit: str = "",
+                         base_dir: Path | None = None) -> bool:
     """Read-only verification of the final package.
 
     Checks all 15 manifest rows (except self-row SHA), file existence,
     sizes, and hash correctness.  Does not modify any file.
     Returns True if all checks pass, False otherwise.
     """
-    manifest_path = PART02_DIR / "part02_hash_manifest.csv"
+    bd = base_dir if base_dir is not None else PART02_DIR
+    root_base = base_dir.parent.parent if base_dir is not None else ROOT
+    manifest_path = bd / "part02_hash_manifest.csv"
     if not manifest_path.exists():
         print("FAIL: manifest file not found")
         return False
@@ -775,7 +812,7 @@ def verify_final_package(finalizer_source_commit: str = "") -> bool:
     # Check each row
     for _, r in df.iterrows():
         rel = r["relative_path"]
-        fp = ROOT / rel
+        fp = root_base / rel
         recorded_sha = r["sha256"]
         recorded_size = int(r["size_bytes"])
 

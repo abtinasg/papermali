@@ -24,33 +24,28 @@ def _fail_network(*args, **kwargs):
 @pytest.fixture(autouse=True)
 def _patch_network(monkeypatch):
     """Patch all network functions to fail immediately."""
-    # requests.get
     import requests
     monkeypatch.setattr(requests, "get", _fail_network)
     monkeypatch.setattr(requests.sessions.Session, "request", _fail_network)
 
-    # tsetmc_probe_ticker
     try:
         from project.src.stage124_batch02_v2 import tsetmc_probe_ticker
         monkeypatch.setattr("project.src.stage124_batch02_v2.tsetmc_probe_ticker", _fail_network)
     except ImportError:
         pass
 
-    # probe_tsetmc_for_tickers
     try:
         import project.src.stage124_batch02_part02 as p02
         monkeypatch.setattr(p02, "probe_tsetmc_for_tickers", _fail_network)
     except ImportError:
         pass
 
-    # fetch_sources_hkeshti
     try:
         import project.src.stage124_batch02_part02 as p02
         monkeypatch.setattr(p02, "fetch_sources_hkeshti", _fail_network)
     except ImportError:
         pass
 
-    # stage124_batch02_part02.run
     try:
         import project.src.stage124_batch02_part02 as p02
         monkeypatch.setattr(p02, "run", _fail_network)
@@ -58,7 +53,7 @@ def _patch_network(monkeypatch):
         pass
 
 
-# ---- helpers --------------------------------------------------------------------
+# ---- imports --------------------------------------------------------------------
 
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
@@ -98,19 +93,33 @@ from project.src.stage124_batch02_v2 import (
     STAGE123_INPUT,
     EXPECTED_STAGE122_SHA,
     EXPECTED_STAGE123_SHA,
-    PARTIAL_MASTER,
 )
 
 TEST_FINALIZER_COMMIT = "abcdef0123456789abcdef0123456789abcdef01"
 TEST_RESEARCH_COMMIT = RESEARCH_STATE_COMMIT
 
 
+# ---- synthetic fixture ----------------------------------------------------------
+
 def _make_synthetic_package(tmp_path):
-    """Create a synthetic Part 2 package directory under tmp_path."""
+    """Create a synthetic Part 2 package directory under tmp_path.
+
+    The directory structure mirrors:
+      tmp_path / "stage124" / "batch02_parts" / ...
+      tmp_path / "src" / ...
+      tmp_path / "tests" / ...
+
+    All 15 manifest files are created so manifest and verify tests can run.
+    """
     pkg_dir = tmp_path / "stage124" / "batch02_parts"
     pkg_dir.mkdir(parents=True, exist_ok=True)
     snap_dir = pkg_dir / "snapshots_hkeshti"
     snap_dir.mkdir(exist_ok=True)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir(exist_ok=True)
+    tests_dir = tmp_path / "tests"
+    tests_dir.mkdir(exist_ok=True)
 
     # Research screening
     screening_rows = []
@@ -118,11 +127,11 @@ def _make_synthetic_package(tmp_path):
         if tk in ADMISSION_ONLY_TICKERS:
             es = "requires_first_public_trade_evidence"
             et = ""
-        elif tk in UNRESOLVED_TICKERS:
+        elif tk == "حکشتی":
             es = "requires_manual_review"
-            et = "unresolved" if tk == "حکشتی" else ""
+            et = "unresolved"
         else:
-            es = "requires_first_public_trade_evidence"
+            es = "requires_manual_review"
             et = ""
         screening_rows.append({
             "ticker": tk,
@@ -176,6 +185,8 @@ def _make_synthetic_package(tmp_path):
         })
     prov_df = pd.DataFrame(prov_rows)
     # Add حکشتی fetched source
+    snap_content = b"test snapshot"
+    snap_hash = hashlib.sha256(snap_content).hexdigest()
     hk_fetched = {
         "ticker": "حکشتی", "source_index": 1,
         "source_type": "news_website_contemporaneous", "source_title": "test",
@@ -183,9 +194,9 @@ def _make_synthetic_package(tmp_path):
         "retrieved_at_utc": "2026-06-26T23:00:13Z", "http_status": "200",
         "retrieval_status": "fetched_ok",
         "final_url": "https://example.com/hk", "content_type": "text/html",
-        "response_size_bytes": "100",
+        "response_size_bytes": str(len(snap_content)),
         "snapshot_path": "stage124/batch02_parts/snapshots_hkeshti/source_1.html",
-        "content_sha256": hashlib.sha256(b"test snapshot").hexdigest(),
+        "content_sha256": snap_hash,
         "extraction_notes": "test",
         "exact_text_or_event_summary": "test",
     }
@@ -215,7 +226,7 @@ def _make_synthetic_package(tmp_path):
                     index=False, encoding="utf-8-sig", quoting=csv.QUOTE_MINIMAL)
 
     # Snapshot
-    (snap_dir / "source_1.html").write_bytes(b"test snapshot")
+    (snap_dir / "source_1.html").write_bytes(snap_content)
 
     # Summary
     summary = {
@@ -256,20 +267,54 @@ def _make_synthetic_package(tmp_path):
     with open(pkg_dir / "part02_qc_report.json", "w", encoding="utf-8") as f:
         json.dump(qc, f, ensure_ascii=False, indent=2)
 
-    return pkg_dir
+    # Source and test files
+    (src_dir / "stage124_batch02_part02.py").write_text("# part02 source\n")
+    (src_dir / "stage124_batch02_part02_finalize.py").write_text("# finalizer source\n")
+    (tests_dir / "test_stage124_batch02_part02.py").write_text("# part02 tests\n")
+    (tests_dir / "test_stage124_batch02_part02_finalize.py").write_text("# finalizer tests\n")
 
+    # Test output (placeholder, will be replaced)
+    (pkg_dir / "part02_test_output.txt").write_text("test output placeholder\n")
 
-def _make_synthetic_src(tmp_path):
-    """Create minimal src and test files under tmp_path for manifest testing."""
-    src_dir = tmp_path / "src"
-    src_dir.mkdir(exist_ok=True)
-    tests_dir = tmp_path / "tests"
-    tests_dir.mkdir(exist_ok=True)
+    # Tickers CSV
+    tickers_df = pd.DataFrame([
+        {"ticker": tk, "ticker_normalized": tk, "company_name": f"Company_{tk}"}
+        for tk in PART02_TICKERS
+    ])
+    tickers_df.to_csv(pkg_dir / "part02_tickers.csv",
+                      index=False, encoding="utf-8-sig", quoting=csv.QUOTE_MINIMAL)
 
-    (src_dir / "stage124_batch02_part02.py").write_text("# part02 source")
-    (src_dir / "stage124_batch02_part02_finalize.py").write_text("# finalizer source")
-    (tests_dir / "test_stage124_batch02_part02.py").write_text("# part02 tests")
-    (tests_dir / "test_stage124_batch02_part02_finalize.py").write_text("# finalizer tests")
+    # Metadata
+    metadata = {
+        "stage": "stage124_batch02_part02",
+        "part": "part02",
+        "branch": "test-branch",
+        "initial_generation_source_commit": INITIAL_GENERATION_SOURCE_COMMIT,
+        "research_state_commit": TEST_RESEARCH_COMMIT,
+        "finalizer_source_commit": TEST_FINALIZER_COMMIT,
+        "generated_at_utc": "2026-06-27T00:00:00Z",
+        "ticker_count": 10,
+        "tickers": list(PART02_TICKERS),
+        "exact_day_canonical_count": 0,
+        "admission_only_count": 6,
+        "unresolved_count": 4,
+        "ready_for_user_review_count": 0,
+        "network_requests_performed": False,
+        "tsetmc_probe_performed": False,
+        "source_fetch_performed": False,
+        "gate_b_executed": False,
+        "full_verified_master_created": False,
+        "modeling_executed": False,
+        "pr_created": False,
+        "merged_to_main": False,
+    }
+    with open(pkg_dir / "part02_metadata_and_hashes.json", "w", encoding="utf-8") as f:
+        json.dump(metadata, f, ensure_ascii=False, indent=2)
+
+    # README
+    (pkg_dir / "README_PART02.md").write_text("# Test README\n")
+
+    return tmp_path
 
 
 # ---- Test: No network calls -----------------------------------------------------
@@ -306,68 +351,78 @@ class TestNoNetworkCalls:
             p02.run()
 
 
-# ---- Test: Immutable hashes unchanged -------------------------------------------
+# ---- Test: Immutable hashes (real package) --------------------------------------
 
 class TestImmutableHashes:
     def test_research_screening_sha_unchanged(self):
-        from project.src.stage124_batch02_part02_finalize import _check_immutable_hashes
         results = _check_immutable_hashes()
         assert results["part02_research_screening_10tickers.csv"]["match"]
 
     def test_provenance_sha_unchanged(self):
-        from project.src.stage124_batch02_part02_finalize import _check_immutable_hashes
         results = _check_immutable_hashes()
         assert results["part02_source_provenance_10tickers.csv"]["match"]
 
     def test_tsetmc_audit_sha_unchanged(self):
-        from project.src.stage124_batch02_part02_finalize import _check_immutable_hashes
         results = _check_immutable_hashes()
         assert results["part02_tsetmc_audit_10tickers.csv"]["match"]
 
     def test_snapshot_sha_unchanged(self):
-        from project.src.stage124_batch02_part02_finalize import _check_immutable_hashes
         results = _check_immutable_hashes()
         assert results["snapshots_hkeshti/source_1.html"]["match"]
 
 
-# ---- Test: Tickers CSV ----------------------------------------------------------
+# ---- Test: Tickers CSV (synthetic) ----------------------------------------------
 
 class TestTickersCSV:
-    def test_tickers_csv_has_10_rows(self):
-        df = build_tickers_csv()
+    def test_tickers_csv_has_10_rows(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        df = build_tickers_csv(pkg)
         assert len(df) == 10
 
-    def test_tickers_csv_exact_order(self):
-        df = build_tickers_csv()
+    def test_tickers_csv_exact_order(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        df = build_tickers_csv(pkg)
         assert df["ticker"].tolist() == PART02_TICKERS
 
-    def test_tickers_csv_no_duplicates(self):
-        df = build_tickers_csv()
+    def test_tickers_csv_no_duplicates(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        df = build_tickers_csv(pkg)
         assert df["ticker"].duplicated().sum() == 0
 
-    def test_tickers_csv_columns(self):
-        df = build_tickers_csv()
+    def test_tickers_csv_columns(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        df = build_tickers_csv(pkg)
         assert list(df.columns) == ["ticker", "ticker_normalized", "company_name"]
 
 
-# ---- Test: Metadata -------------------------------------------------------------
+# ---- Test: Metadata (synthetic) -------------------------------------------------
 
 class TestMetadata:
-    def test_metadata_counts(self):
-        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_metadata_counts(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         assert m["exact_day_canonical_count"] == 0
         assert m["admission_only_count"] == 6
         assert m["unresolved_count"] == 4
         assert m["ready_for_user_review_count"] == 0
 
-    def test_metadata_commits(self):
-        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_metadata_commits(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         assert m["finalizer_source_commit"] == TEST_FINALIZER_COMMIT
         assert m["research_state_commit"] == TEST_RESEARCH_COMMIT
         assert m["initial_generation_source_commit"] == INITIAL_GENERATION_SOURCE_COMMIT
 
-    def test_metadata_network_flags_false(self):
-        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_metadata_network_flags_false(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         assert m["network_requests_performed"] is False
         assert m["tsetmc_probe_performed"] is False
         assert m["source_fetch_performed"] is False
@@ -377,8 +432,10 @@ class TestMetadata:
         assert m["pr_created"] is False
         assert m["merged_to_main"] is False
 
-    def test_metadata_hkeshti_status(self):
-        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_metadata_hkeshti_status(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         assert m["hkeshti_status"]["evidence_status"] == "requires_manual_review"
         assert m["hkeshti_status"]["ready_for_user_review"] is False
         assert m["hkeshti_status"]["proposed_canonical_jalali"] == ""
@@ -386,13 +443,17 @@ class TestMetadata:
         assert m["hkeshti_status"]["proposed_canonical_event_type"] == "unresolved"
         assert m["hkeshti_conflict_dates"] == HKESHTI_CONFLICT_DATES
 
-    def test_metadata_manifest_semantics(self):
-        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_metadata_manifest_semantics(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         assert m["manifest_source_commit_semantics"] == \
             "commit containing the offline finalizer code used to seal Part 2"
 
-    def test_metadata_ticker_count(self):
-        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_metadata_ticker_count(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         assert m["ticker_count"] == 10
         assert m["tickers"] == list(PART02_TICKERS)
 
@@ -412,7 +473,7 @@ class TestReadme:
     def test_readme_hkeshti_not_candidate_supported(self):
         content = build_readme()
         assert "candidate_supported" in content
-        assert "not" in content.lower() or "not" in content
+        assert "not" in content.lower()
 
     def test_readme_ready_count_zero(self):
         content = build_readme()
@@ -424,22 +485,28 @@ class TestReadme:
         assert "no TSETMC" in content or "No TSETMC" in content
 
 
-# ---- Test: Summary --------------------------------------------------------------
+# ---- Test: Summary (synthetic) --------------------------------------------------
 
 class TestSummary:
-    def test_summary_substantive_fields_unchanged(self):
-        s = update_summary(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_summary_substantive_fields_unchanged(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        s = update_summary(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         assert s["exact_day_dates"] == {}
         assert s["admission_only_tickers"] == ADMISSION_ONLY_TICKERS
         assert s["unresolved_tickers"] == UNRESOLVED_TICKERS
         assert s["ready_for_user_review_tickers"] == []
 
-    def test_summary_source_commit_preserved(self):
-        s = update_summary(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_summary_source_commit_preserved(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        s = update_summary(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         assert s["source_commit"] == INITIAL_GENERATION_SOURCE_COMMIT
 
-    def test_summary_finalization_object(self):
-        s = update_summary(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_summary_finalization_object(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        s = update_summary(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         assert "finalization" in s
         fin = s["finalization"]
         assert fin["research_state_commit"] == TEST_RESEARCH_COMMIT
@@ -450,18 +517,22 @@ class TestSummary:
         assert fin["package_sealed"] is True
 
 
-# ---- Test: QC Report ------------------------------------------------------------
+# ---- Test: QC Report (synthetic) ------------------------------------------------
 
 class TestQCReport:
-    def test_qc_finalization_object_added(self):
-        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_qc_finalization_object_added(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         assert "finalization" in qc
         fin = qc["finalization"]
         assert fin["finalizer_source_commit"] == TEST_FINALIZER_COMMIT
         assert fin["research_state_commit"] == TEST_RESEARCH_COMMIT
 
-    def test_qc_hkeshti_unresolved(self):
-        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_qc_hkeshti_unresolved(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         fin = qc["finalization"]
         assertion_names = [a["assertion"] for a in fin["assertions"]]
         assert "hkeshti_evidence_requires_manual_review" in assertion_names
@@ -470,8 +541,10 @@ class TestQCReport:
         assert "hkeshti_canonical_gregorian_empty" in assertion_names
         assert "hkeshti_event_type_unresolved" in assertion_names
 
-    def test_qc_immutable_checks(self):
-        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_qc_immutable_checks(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         fin = qc["finalization"]
         assertion_names = [a["assertion"] for a in fin["assertions"]]
         assert "immutable_sha_unchanged_part02_research_screening_10tickers.csv" in assertion_names
@@ -479,88 +552,161 @@ class TestQCReport:
         assert "immutable_sha_unchanged_part02_tsetmc_audit_10tickers.csv" in assertion_names
         assert "immutable_sha_unchanged_snapshots_hkeshti/source_1.html" in assertion_names
 
-    def test_qc_all_pass(self):
-        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT)
+    def test_qc_all_pass(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
         fin = qc["finalization"]
-        assert fin["all_pass"] is True
+        failed = [a for a in fin["assertions"] if not a["passed"]]
+        assert fin["all_pass"] is True, f"Failed assertions: {[(a['assertion'], a['detail']) for a in failed]}"
         assert fin["failed_count"] == 0
 
 
-# ---- Test: Manifest -------------------------------------------------------------
+# ---- Test: Manifest (synthetic) -------------------------------------------------
 
 class TestManifest:
-    def test_manifest_has_15_rows(self):
-        content = build_manifest(TEST_FINALIZER_COMMIT)
+    def test_manifest_has_15_rows(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        content = build_manifest(TEST_FINALIZER_COMMIT, pkg)
         df = pd.read_csv(io.StringIO(content), dtype=str, keep_default_na=False)
         assert len(df) == 15
 
-    def test_manifest_paths_exact(self):
-        content = build_manifest(TEST_FINALIZER_COMMIT)
+    def test_manifest_paths_exact(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        content = build_manifest(TEST_FINALIZER_COMMIT, pkg)
         df = pd.read_csv(io.StringIO(content), dtype=str, keep_default_na=False)
         expected_paths = [r[0] for r in MANIFEST_ROWS]
         assert df["relative_path"].tolist() == expected_paths
 
-    def test_manifest_self_row_sha_empty(self):
-        content = build_manifest(TEST_FINALIZER_COMMIT)
+    def test_manifest_self_row_sha_empty(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        content = build_manifest(TEST_FINALIZER_COMMIT, pkg)
         df = pd.read_csv(io.StringIO(content), dtype=str, keep_default_na=False)
         self_row = df[df["relative_path"] == "stage124/batch02_parts/part02_hash_manifest.csv"]
         assert len(self_row) == 1
         assert self_row.iloc[0]["sha256"] == ""
 
-    def test_manifest_self_row_size_correct(self):
-        content = build_manifest(TEST_FINALIZER_COMMIT)
+    def test_manifest_self_row_size_correct(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        content = build_manifest(TEST_FINALIZER_COMMIT, pkg)
         df = pd.read_csv(io.StringIO(content), dtype=str, keep_default_na=False)
         self_row = df[df["relative_path"] == "stage124/batch02_parts/part02_hash_manifest.csv"]
         recorded_size = int(self_row.iloc[0]["size_bytes"])
         assert recorded_size == len(content.encode("utf-8"))
 
-    def test_manifest_non_self_hashes_correct(self):
-        content = build_manifest(TEST_FINALIZER_COMMIT)
+    def test_manifest_non_self_hashes_correct(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        content = build_manifest(TEST_FINALIZER_COMMIT, pkg)
         df = pd.read_csv(io.StringIO(content), dtype=str, keep_default_na=False)
         for _, r in df.iterrows():
             rel = r["relative_path"]
             if rel == "stage124/batch02_parts/part02_hash_manifest.csv":
                 continue
-            fp = ROOT / rel
+            fp = base / rel
             assert fp.exists(), f"File not found: {rel}"
             assert r["sha256"] != "", f"Empty sha256 for {rel}"
             actual = _sha256_file(fp)
             assert r["sha256"] == actual, f"sha256 mismatch for {rel}"
 
-    def test_manifest_source_commit_all_same(self):
-        content = build_manifest(TEST_FINALIZER_COMMIT)
+    def test_manifest_source_commit_all_same(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        content = build_manifest(TEST_FINALIZER_COMMIT, pkg)
         df = pd.read_csv(io.StringIO(content), dtype=str, keep_default_na=False)
         for _, r in df.iterrows():
             assert r["source_commit"] == TEST_FINALIZER_COMMIT
 
-    def test_manifest_generated_at_all_same(self):
-        content = build_manifest(TEST_FINALIZER_COMMIT)
+    def test_manifest_generated_at_all_same(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        content = build_manifest(TEST_FINALIZER_COMMIT, pkg)
         df = pd.read_csv(io.StringIO(content), dtype=str, keep_default_na=False)
         gen_ats = df["generated_at"].unique()
         assert len(gen_ats) == 1
 
-    def test_manifest_no_absolute_paths(self):
-        content = build_manifest(TEST_FINALIZER_COMMIT)
+    def test_manifest_no_absolute_paths(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        content = build_manifest(TEST_FINALIZER_COMMIT, pkg)
         assert "/Users/" not in content
         assert "Desktop" not in content
 
 
-# ---- Test: verify_final_package -------------------------------------------------
+# ---- Test: prepare_outputs + seal_manifest + verify (synthetic) -----------------
 
-class TestVerifyFinalPackage:
-    def test_verify_passes_on_valid_package(self):
-        ok = verify_final_package(TEST_FINALIZER_COMMIT)
+class TestPrepareSealVerify:
+    def test_prepare_outputs_creates_files(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        results = prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        assert (pkg / "part02_tickers.csv").exists()
+        assert (pkg / "part02_metadata_and_hashes.json").exists()
+        assert (pkg / "README_PART02.md").exists()
+        assert (pkg / "part02_summary.json").exists()
+        assert (pkg / "part02_qc_report.json").exists()
+
+    def test_seal_manifest_creates_manifest(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        seal_manifest(TEST_FINALIZER_COMMIT, pkg)
+        assert (pkg / "part02_hash_manifest.csv").exists()
+
+    def test_verify_final_package_passes(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        seal_manifest(TEST_FINALIZER_COMMIT, pkg)
+        ok = verify_final_package(TEST_FINALIZER_COMMIT, pkg)
         assert ok is True
 
-    def test_verify_fails_on_tampered_file(self, tmp_path):
-        # We can't tamper with real files, so we test verify_final_package
-        # by checking it returns True on the real package (which is valid)
-        # and confirming the function is read-only
-        ok = verify_final_package(TEST_FINALIZER_COMMIT)
+    def test_verify_fails_when_manifest_missing(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        ok = verify_final_package(TEST_FINALIZER_COMMIT, pkg)
+        assert ok is False
+
+    def test_full_workflow_offline(self, tmp_path):
+        """End-to-end: prepare, seal, verify — all offline."""
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+
+        # Prepare
+        prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+
+        # Verify tickers CSV
+        tdf = pd.read_csv(pkg / "part02_tickers.csv", dtype=str, keep_default_na=False)
+        assert len(tdf) == 10
+        assert tdf["ticker"].tolist() == PART02_TICKERS
+
+        # Verify metadata
+        with open(pkg / "part02_metadata_and_hashes.json") as f:
+            m = json.load(f)
+        assert m["network_requests_performed"] is False
+
+        # Verify summary has finalization
+        with open(pkg / "part02_summary.json") as f:
+            s = json.load(f)
+        assert "finalization" in s
+
+        # Verify QC has finalization
+        with open(pkg / "part02_qc_report.json") as f:
+            qc = json.load(f)
+        assert "finalization" in qc
+        assert qc["finalization"]["all_pass"] is True
+
+        # Seal and verify
+        seal_manifest(TEST_FINALIZER_COMMIT, pkg)
+        ok = verify_final_package(TEST_FINALIZER_COMMIT, pkg)
         assert ok is True
 
 
-# ---- Test: Frozen files unchanged -----------------------------------------------
+# ---- Test: Frozen files unchanged (real package) --------------------------------
 
 class TestFrozenFilesUnchanged:
     def test_stage122_sha_unchanged(self):
@@ -568,11 +714,6 @@ class TestFrozenFilesUnchanged:
 
     def test_stage123_sha_unchanged(self):
         assert sha(STAGE123_INPUT) == EXPECTED_STAGE123_SHA
-
-    def test_frozen_files_exist(self):
-        for fp in FROZEN_FILES:
-            if fp.exists():
-                pass  # just checking they exist
 
     def test_no_full_verified_master(self):
         from project.src.stage124_batch02_part02 import FULL_VERIFIED_FORBIDDEN
