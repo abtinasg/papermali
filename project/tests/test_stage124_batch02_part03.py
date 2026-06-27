@@ -34,6 +34,7 @@ from project.src.stage124_batch02_part03 import (
     load_historical_tsetmc,
     run_part03_qc,
     evaluate_source_record,
+    evaluate_reviewed_evidence_record,
     decide_ready_for_user_review,
     compute_evidence_accepted,
     classify_source_authority,
@@ -55,6 +56,11 @@ from project.src.stage124_batch02_part03 import (
     build_manual_research_worklist,
     fetch_sources,
     WORKLIST_COLUMNS,
+    WORKLIST_DATE_PRECISIONS,
+    validate_worklist_date_precision,
+    REVIEWED_EVENT_TYPES,
+    REVIEWED_DATE_PRECISIONS,
+    EVIDENCE_ROLES,
     _is_sha256,
     _truthy,
 )
@@ -1186,8 +1192,13 @@ def test_o19_real_research_rows_semantically_valid():
     assert df["ticker"].tolist() == PART03_TICKERS
     allowed_rs = {"research_blocked_network", "source_discovered",
                   "fetched_pending_manual_review", "research_completed_no_evidence",
-                  "candidate_supported", "research_completed_conflict"}
-    allowed_es = {"requires_manual_review", "no_reliable_evidence", "candidate_supported"}
+                  "candidate_supported", "research_completed_conflict",
+                  "research_completed_partial_public_entry_date",
+                  "research_completed_admission_only",
+                  "research_completed_listing_only",
+                  "research_completed_noncanonical_entry_evidence"}
+    allowed_es = {"requires_manual_review", "no_reliable_evidence",
+                  "candidate_supported", "requires_first_public_trade_evidence"}
     for _, r in df.iterrows():
         assert str(r["research_status"]).strip() in allowed_rs, \
             f"invalid research_status: {r['research_status']}"
@@ -1244,8 +1255,13 @@ def test_real_output_research_semantics_valid():
     assert df["ticker"].tolist() == PART03_TICKERS
     allowed_rs = {"research_blocked_network", "source_discovered",
                   "fetched_pending_manual_review", "research_completed_no_evidence",
-                  "candidate_supported", "research_completed_conflict"}
-    allowed_es = {"requires_manual_review", "no_reliable_evidence", "candidate_supported"}
+                  "candidate_supported", "research_completed_conflict",
+                  "research_completed_partial_public_entry_date",
+                  "research_completed_admission_only",
+                  "research_completed_listing_only",
+                  "research_completed_noncanonical_entry_evidence"}
+    allowed_es = {"requires_manual_review", "no_reliable_evidence",
+                  "candidate_supported", "requires_first_public_trade_evidence"}
     for _, r in df.iterrows():
         assert str(r["research_status"]).strip() in allowed_rs
         assert str(r["evidence_status"]).strip() in allowed_es
@@ -2412,3 +2428,446 @@ def test_summary_count_inconsistent_fails():
         1 for _, r in research.iterrows() if _truthy(r.get("ready_for_user_review", "")))
     assert counts["ready_count"] == actual_ready, \
         "summary ready_count must match research"
+
+
+# ================================================================================
+# Part 3.1A.5 — Reviewed-evidence engine: admission, listing, partial-date,
+# public_company_conversion, conflict, no_reliable_evidence (24 tests)
+# ================================================================================
+
+from project.src.stage124_batch02_part03 import (
+    evaluate_reviewed_evidence_record,
+    REVIEWED_EVENT_TYPES,
+    REVIEWED_DATE_PRECISIONS,
+    EVIDENCE_ROLES,
+)
+
+_A5_CODAL = "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=ABC123"
+
+
+# === Admission-only evidence (3 tests) ===
+
+def test_a5_admission_only_status():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_adm1.html")
+    try:
+        retrieval = _retrieval_rec(tk, _A5_CODAL, rel, h)
+        existing = _existing_prov_df(tk, _A5_CODAL, rel, h,
+                                     event_type_supported="admission",
+                                     exact_date_explicit="true",
+                                     reviewed_date_jalali="1380-03-15",
+                                     ordinary_share_explicit="unknown")
+        overlaid = apply_validated_review_overlay([retrieval], existing, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        st = _derive_screening_status(normalized, snapshot_root=ROOT)
+        assert st["research_status"] == "research_completed_admission_only"
+        assert st["evidence_status"] == "requires_first_public_trade_evidence"
+        assert st["ready_for_user_review"] == "false"
+        assert st["candidate_event_type"] == "admission"
+        assert st["admission_date_candidate_jalali"] == "1380-03-15"
+        assert st["proposed_canonical_public_entry_date_jalali"] == ""
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+def test_a5_admission_only_evidence_role():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_adm2.html")
+    try:
+        rec = _retrieval_rec(tk, _A5_CODAL, rel, h,
+                             content_review_status="reviewed",
+                             event_type_supported="admission",
+                             exact_date_explicit="true",
+                             reviewed_date_jalali="1380-03-15",
+                             ordinary_share_explicit="unknown")
+        ev = evaluate_reviewed_evidence_record(rec, snapshot_root=ROOT)
+        assert ev["reviewed_evidence_valid"] is True
+        assert ev["evidence_role"] == "admission_only"
+        assert ev["reviewed_event_type"] == "admission"
+        assert ev["reviewed_date_precision"] == "exact_day"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+def test_a5_admission_only_not_ready():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_adm3.html")
+    try:
+        retrieval = _retrieval_rec(tk, _A5_CODAL, rel, h)
+        existing = _existing_prov_df(tk, _A5_CODAL, rel, h,
+                                     event_type_supported="admission",
+                                     exact_date_explicit="true",
+                                     reviewed_date_jalali="1380-06-20",
+                                     ordinary_share_explicit="unknown")
+        overlaid = apply_validated_review_overlay([retrieval], existing, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        research = build_research_screening(_names(), {tk: normalized}, _absent_tsetmc())
+        row = research[research["ticker"] == tk].iloc[0]
+        assert str(row["ready_for_user_review"]).lower() == "false"
+        assert str(row["research_status"]) == "research_completed_admission_only"
+        assert str(row["admission_date_candidate_jalali"]) == "1380-06-20"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# === Listing-only evidence (3 tests) ===
+
+def test_a5_listing_only_status():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_lst1.html")
+    try:
+        retrieval = _retrieval_rec(tk, _A5_CODAL, rel, h)
+        existing = _existing_prov_df(tk, _A5_CODAL, rel, h,
+                                     event_type_supported="listing",
+                                     exact_date_explicit="true",
+                                     reviewed_date_jalali="1381-01-10",
+                                     ordinary_share_explicit="unknown")
+        overlaid = apply_validated_review_overlay([retrieval], existing, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        st = _derive_screening_status(normalized, snapshot_root=ROOT)
+        assert st["research_status"] == "research_completed_listing_only"
+        assert st["evidence_status"] == "requires_first_public_trade_evidence"
+        assert st["ready_for_user_review"] == "false"
+        assert st["candidate_event_type"] == "listing"
+        assert st["listing_date_candidate_jalali"] == "1381-01-10"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+def test_a5_listing_only_evidence_role():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_lst2.html")
+    try:
+        rec = _retrieval_rec(tk, _A5_CODAL, rel, h,
+                             content_review_status="reviewed",
+                             event_type_supported="listing",
+                             exact_date_explicit="true",
+                             reviewed_date_jalali="1381-01-10",
+                             ordinary_share_explicit="unknown")
+        ev = evaluate_reviewed_evidence_record(rec, snapshot_root=ROOT)
+        assert ev["reviewed_evidence_valid"] is True
+        assert ev["evidence_role"] == "listing_only"
+        assert ev["reviewed_event_type"] == "listing"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+def test_a5_listing_only_not_ready():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_lst3.html")
+    try:
+        retrieval = _retrieval_rec(tk, _A5_CODAL, rel, h)
+        existing = _existing_prov_df(tk, _A5_CODAL, rel, h,
+                                     event_type_supported="listing",
+                                     exact_date_explicit="true",
+                                     reviewed_date_jalali="1381-01-10",
+                                     ordinary_share_explicit="unknown")
+        overlaid = apply_validated_review_overlay([retrieval], existing, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        research = build_research_screening(_names(), {tk: normalized}, _absent_tsetmc())
+        row = research[research["ticker"] == tk].iloc[0]
+        assert str(row["ready_for_user_review"]).lower() == "false"
+        assert str(row["research_status"]) == "research_completed_listing_only"
+        assert str(row["listing_date_candidate_jalali"]) == "1381-01-10"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# === Partial-date canonical evidence (3 tests) ===
+
+def test_a5_partial_date_year_only_status():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_part1.html")
+    try:
+        retrieval = _retrieval_rec(tk, _A5_CODAL, rel, h)
+        existing = _existing_prov_df(tk, _A5_CODAL, rel, h,
+                                     event_type_supported="first_public_offering",
+                                     exact_date_explicit="false",
+                                     reviewed_date_jalali="1380",
+                                     ordinary_share_explicit="true")
+        overlaid = apply_validated_review_overlay([retrieval], existing, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        st = _derive_screening_status(normalized, snapshot_root=ROOT)
+        assert st["research_status"] == "research_completed_partial_public_entry_date"
+        assert st["evidence_status"] == "requires_first_public_trade_evidence"
+        assert st["ready_for_user_review"] == "false"
+        assert st["date_precision"] == "year_only"
+        assert st["first_public_offering_date_candidate_jalali"] == "1380"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+def test_a5_partial_date_month_only_evidence_role():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_part2.html")
+    try:
+        rec = _retrieval_rec(tk, _A5_CODAL, rel, h,
+                             content_review_status="reviewed",
+                             event_type_supported="first_public_trading",
+                             exact_date_explicit="false",
+                             reviewed_date_jalali="1380-06",
+                             ordinary_share_explicit="true")
+        ev = evaluate_reviewed_evidence_record(rec, snapshot_root=ROOT)
+        assert ev["reviewed_evidence_valid"] is True
+        assert ev["evidence_role"] == "canonical_partial_date"
+        assert ev["reviewed_date_precision"] == "month_only"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+def test_a5_partial_date_not_ready():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_part3.html")
+    try:
+        retrieval = _retrieval_rec(tk, _A5_CODAL, rel, h)
+        existing = _existing_prov_df(tk, _A5_CODAL, rel, h,
+                                     event_type_supported="first_public_offering",
+                                     exact_date_explicit="false",
+                                     reviewed_date_jalali="1380-03",
+                                     ordinary_share_explicit="true")
+        overlaid = apply_validated_review_overlay([retrieval], existing, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        research = build_research_screening(_names(), {tk: normalized}, _absent_tsetmc())
+        row = research[research["ticker"] == tk].iloc[0]
+        assert str(row["ready_for_user_review"]).lower() == "false"
+        assert str(row["research_status"]) == "research_completed_partial_public_entry_date"
+        assert str(row["date_precision"]) == "month_only"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# === Public company conversion only (3 tests) ===
+
+def test_a5_conversion_only_status():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_conv1.html")
+    try:
+        retrieval = _retrieval_rec(tk, _A5_CODAL, rel, h)
+        existing = _existing_prov_df(tk, _A5_CODAL, rel, h,
+                                     event_type_supported="conversion_to_public",
+                                     exact_date_explicit="true",
+                                     reviewed_date_jalali="1380-05-01",
+                                     ordinary_share_explicit="unknown")
+        overlaid = apply_validated_review_overlay([retrieval], existing, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        st = _derive_screening_status(normalized, snapshot_root=ROOT)
+        assert st["research_status"] == "research_completed_noncanonical_entry_evidence"
+        assert st["evidence_status"] == "requires_first_public_trade_evidence"
+        assert st["ready_for_user_review"] == "false"
+        assert st["candidate_event_type"] == "public_company_conversion"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+def test_a5_conversion_only_evidence_role():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_conv2.html")
+    try:
+        rec = _retrieval_rec(tk, _A5_CODAL, rel, h,
+                             content_review_status="reviewed",
+                             event_type_supported="conversion_to_public",
+                             exact_date_explicit="true",
+                             reviewed_date_jalali="1380-05-01",
+                             ordinary_share_explicit="unknown")
+        ev = evaluate_reviewed_evidence_record(rec, snapshot_root=ROOT)
+        assert ev["reviewed_evidence_valid"] is True
+        assert ev["evidence_role"] == "public_company_conversion_only"
+        assert ev["reviewed_event_type"] == "public_company_conversion"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+def test_a5_conversion_only_not_ready():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_conv3.html")
+    try:
+        retrieval = _retrieval_rec(tk, _A5_CODAL, rel, h)
+        existing = _existing_prov_df(tk, _A5_CODAL, rel, h,
+                                     event_type_supported="conversion_to_public",
+                                     exact_date_explicit="true",
+                                     reviewed_date_jalali="1380-05-01",
+                                     ordinary_share_explicit="unknown")
+        overlaid = apply_validated_review_overlay([retrieval], existing, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        research = build_research_screening(_names(), {tk: normalized}, _absent_tsetmc())
+        row = research[research["ticker"] == tk].iloc[0]
+        assert str(row["ready_for_user_review"]).lower() == "false"
+        assert str(row["research_status"]) == "research_completed_noncanonical_entry_evidence"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# === Conflict evidence (3 tests) ===
+
+_CODAL_DOC_2 = "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=DEF456"
+
+
+def test_a5_conflict_status():
+    tk = PART03_TICKERS[0]
+    snap1, rel1, h1 = _make_snapshot("a5_conf1a.html")
+    snap2, rel2, h2 = _make_snapshot("a5_conf1b.html")
+    try:
+        rec1 = _retrieval_rec(tk, _A5_CODAL, rel1, h1, source_index=1,
+                              content_review_status="reviewed",
+                              event_type_supported="first_public_offering",
+                              exact_date_explicit="true",
+                              reviewed_date_jalali="1380-03-15",
+                              ordinary_share_explicit="true")
+        rec2 = _retrieval_rec(tk, _CODAL_DOC_2, rel2, h2, source_index=2,
+                              content_review_status="reviewed",
+                              event_type_supported="first_public_offering",
+                              exact_date_explicit="true",
+                              reviewed_date_jalali="1381-06-20",
+                              ordinary_share_explicit="true")
+        st = _derive_screening_status([rec1, rec2], snapshot_root=ROOT)
+        assert st["research_status"] == "research_completed_conflict"
+        assert st["conflict_flag"] == "true"
+        assert st["ready_for_user_review"] == "false"
+    finally:
+        snap1.unlink(missing_ok=True)
+        snap2.unlink(missing_ok=True)
+
+
+def test_a5_conflict_not_ready():
+    tk = PART03_TICKERS[0]
+    snap1, rel1, h1 = _make_snapshot("a5_conf2a.html")
+    snap2, rel2, h2 = _make_snapshot("a5_conf2b.html")
+    try:
+        rec1 = _retrieval_rec(tk, _A5_CODAL, rel1, h1, source_index=1,
+                              content_review_status="reviewed",
+                              event_type_supported="first_public_trading",
+                              exact_date_explicit="true",
+                              reviewed_date_jalali="1380-01-01",
+                              ordinary_share_explicit="true")
+        rec2 = _retrieval_rec(tk, _CODAL_DOC_2, rel2, h2, source_index=2,
+                              content_review_status="reviewed",
+                              event_type_supported="first_public_trading",
+                              exact_date_explicit="true",
+                              reviewed_date_jalali="1382-06-20",
+                              ordinary_share_explicit="true")
+        research = build_research_screening(_names(), {tk: [rec1, rec2]}, _absent_tsetmc())
+        row = research[research["ticker"] == tk].iloc[0]
+        assert str(row["ready_for_user_review"]).lower() == "false"
+        assert str(row["conflict_flag"]).lower() == "true"
+    finally:
+        snap1.unlink(missing_ok=True)
+        snap2.unlink(missing_ok=True)
+
+
+def test_a5_conflict_candidate_event_type():
+    tk = PART03_TICKERS[0]
+    snap1, rel1, h1 = _make_snapshot("a5_conf3a.html")
+    snap2, rel2, h2 = _make_snapshot("a5_conf3b.html")
+    try:
+        rec1 = _retrieval_rec(tk, _A5_CODAL, rel1, h1, source_index=1,
+                              content_review_status="reviewed",
+                              event_type_supported="first_public_offering",
+                              exact_date_explicit="true",
+                              reviewed_date_jalali="1380-03-15",
+                              ordinary_share_explicit="true")
+        rec2 = _retrieval_rec(tk, _CODAL_DOC_2, rel2, h2, source_index=2,
+                              content_review_status="reviewed",
+                              event_type_supported="first_public_offering",
+                              exact_date_explicit="true",
+                              reviewed_date_jalali="1381-03-15",
+                              ordinary_share_explicit="true")
+        st = _derive_screening_status([rec1, rec2], snapshot_root=ROOT)
+        assert st["candidate_event_type"] == "conflict"
+        assert st["proposed_canonical_event_type"] == "unresolved"
+    finally:
+        snap1.unlink(missing_ok=True)
+        snap2.unlink(missing_ok=True)
+
+
+# === No reliable evidence (3 tests) ===
+
+def test_a5_no_reliable_evidence_after_review():
+    rec = _reviewed_rec(event_type_supported="", exact_date_explicit="false",
+                        reviewed_date_jalali="", ordinary_share_explicit="unknown")
+    st = _derive_screening_status([rec], snapshot_root=None)
+    assert st["evidence_status"] == "no_reliable_evidence"
+    assert st["research_status"] == "research_completed_no_evidence"
+    assert st["ready_for_user_review"] == "false"
+
+
+def test_a5_no_reliable_evidence_not_ready():
+    rec = _reviewed_rec(event_type_supported="", exact_date_explicit="false",
+                        reviewed_date_jalali="", ordinary_share_explicit="unknown")
+    st = _derive_screening_status([rec], snapshot_root=None)
+    assert st["ready_for_user_review"] == "false"
+    assert st["evidence_status"] == "no_reliable_evidence"
+
+
+def test_a5_no_reliable_evidence_no_canonical_date():
+    rec = _reviewed_rec(event_type_supported="", exact_date_explicit="false",
+                        reviewed_date_jalali="", ordinary_share_explicit="unknown")
+    st = _derive_screening_status([rec], snapshot_root=None)
+    assert st["proposed_canonical_public_entry_date_jalali"] == ""
+    assert st["admission_date_candidate_jalali"] == ""
+    assert st["listing_date_candidate_jalali"] == ""
+
+
+# === Provenance field validation (3 tests) ===
+
+def test_a5_provenance_has_new_fields():
+    for f in ("reviewed_event_type", "reviewed_date_precision",
+              "reviewed_evidence_valid", "evidence_role"):
+        assert f in PROVENANCE_COLUMNS, f"missing {f} in PROVENANCE_COLUMNS"
+
+
+def test_a5_normalize_provenance_computes_new_fields():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("a5_norm1.html")
+    try:
+        rec = _retrieval_rec(tk, _A5_CODAL, rel, h,
+                             content_review_status="reviewed",
+                             event_type_supported="first_public_offering",
+                             exact_date_explicit="true",
+                             reviewed_date_jalali="1380-03-15",
+                             ordinary_share_explicit="true")
+        normalized = normalize_provenance_records([rec], ROOT)
+        r = normalized[0]
+        assert r["reviewed_event_type"] == "first_public_offering"
+        assert r["reviewed_date_precision"] == "exact_day"
+        assert r["reviewed_evidence_valid"] == "true"
+        assert r["evidence_role"] == "canonical_exact_candidate"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+def test_a5_fetch_sources_initializes_new_fields():
+    tk = PART03_TICKERS[0]
+    sources = {tk: [(1, RESEARCH_SOURCES[tk][0][0], RESEARCH_SOURCES[tk][0][1],
+                     RESEARCH_SOURCES[tk][0][2])]}
+    results = fetch_sources(timeout=0.001, sources_by_ticker=sources)
+    rec = results[tk][0]
+    assert "reviewed_event_type" in rec
+    assert "reviewed_date_precision" in rec
+    assert "reviewed_evidence_valid" in rec
+    assert "evidence_role" in rec
+    assert rec["reviewed_event_type"] == ""
+    assert rec["reviewed_date_precision"] == "unknown"
+    assert rec["reviewed_evidence_valid"] == "false"
+    assert rec["evidence_role"] == "none"
+
+
+# === Enum validation (3 tests) ===
+
+def test_a5_evidence_role_enum_valid():
+    expected = {"none", "canonical_exact_candidate", "canonical_partial_date",
+                "admission_only", "listing_only", "public_company_conversion_only",
+                "conflicting_evidence", "non_entry_evidence"}
+    assert EVIDENCE_ROLES == expected
+
+
+def test_a5_reviewed_date_precision_enum_valid():
+    expected = {"exact_day", "month_only", "year_only", "unknown"}
+    assert REVIEWED_DATE_PRECISIONS == expected
+
+
+def test_a5_reviewed_event_type_enum_valid():
+    assert "first_public_offering" in REVIEWED_EVENT_TYPES
+    assert "first_public_trading" in REVIEWED_EVENT_TYPES
+    assert "admission" in REVIEWED_EVENT_TYPES
+    assert "listing" in REVIEWED_EVENT_TYPES
+    assert "public_company_conversion" in REVIEWED_EVENT_TYPES

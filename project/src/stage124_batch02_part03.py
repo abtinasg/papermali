@@ -55,6 +55,23 @@ NON_CANONICAL_EVENTS = {
     "rights_offering", "oldest_tsetmc_record_without_ordinary_instrument",
 }
 
+# Reviewed event types: canonical + non-canonical events that reviewed evidence
+# may support.  ``public_company_conversion`` is an alias for conversion_to_public.
+REVIEWED_EVENT_TYPES = {
+    "first_public_offering", "first_public_trading",
+    "admission", "listing", "public_company_conversion",
+}
+
+# Date precision enum for reviewed evidence.
+REVIEWED_DATE_PRECISIONS = {"exact_day", "month_only", "year_only", "unknown"}
+
+# Evidence role enum.
+EVIDENCE_ROLES = {
+    "none", "canonical_exact_candidate", "canonical_partial_date",
+    "admission_only", "listing_only", "public_company_conversion_only",
+    "conflicting_evidence", "non_entry_evidence",
+}
+
 FULL_VERIFIED_FORBIDDEN = OUT / "listing_master_verified_stage124.csv"
 
 # Candidate research sources per ticker. Each entry: (source_type, title, url).
@@ -723,6 +740,10 @@ def fetch_sources(timeout: float = 5.0, force: bool = False,
                 "contemporaneous_with_event": "false",
                 "independent_source_group": registrable_domain(url),
                 "evidence_accepted": "false",
+                "reviewed_event_type": "",
+                "reviewed_date_precision": "unknown",
+                "reviewed_evidence_valid": "false",
+                "evidence_role": "none",
             }
 
             reused = _reuse_existing(rec, existing_prov, tk, idx, snap_path, rel_path)
@@ -952,6 +973,9 @@ PROVENANCE_COLUMNS = [
     "ordinary_share_explicit", "event_type_supported", "exact_date_explicit",
     "reviewed_date_jalali", "publication_date_jalali", "publication_date_explicit",
     "contemporaneous_with_event", "independent_source_group", "evidence_accepted",
+    # --- reviewed-evidence fields (derived from review content) ---
+    "reviewed_event_type", "reviewed_date_precision",
+    "reviewed_evidence_valid", "evidence_role",
     # --- manual-review audit fields (preserved only via a validated overlay) ---
     "reviewer_notes", "manual_reviewed_at_utc",
 ]
@@ -964,6 +988,7 @@ REVIEW_OVERLAY_FIELDS = [
     "publication_date_explicit", "exact_text_or_event_summary",
     "supported_event_type", "supported_date_jalali",
     "reviewer_notes", "manual_reviewed_at_utc",
+    "reviewed_event_type", "reviewed_date_precision",
 ]
 
 # Default (no-review) values for the overlay fields, so a record with no valid
@@ -980,6 +1005,8 @@ REVIEW_FIELD_DEFAULTS = {
     "supported_date_jalali": "",
     "reviewer_notes": "",
     "manual_reviewed_at_utc": "",
+    "reviewed_event_type": "",
+    "reviewed_date_precision": "unknown",
 }
 
 # Derived fields that are ALWAYS recomputed and never trusted from a prior CSV.
@@ -987,6 +1014,7 @@ DERIVED_NEVER_TRUSTED = [
     "source_authority_class", "authority_validation_error", "document_specific",
     "contemporaneous_with_event", "independent_source_group", "evidence_accepted",
     "ready_for_user_review",
+    "reviewed_evidence_valid", "evidence_role",
 ]
 
 
@@ -997,12 +1025,143 @@ def _had_manual_review(pr) -> bool:
     if str(pr.get("content_review_status", "")).strip().lower() == "reviewed":
         return True
     for f in ("event_type_supported", "reviewed_date_jalali", "supported_event_type",
-              "supported_date_jalali", "exact_text_or_event_summary"):
+              "supported_date_jalali", "exact_text_or_event_summary",
+              "reviewed_event_type", "reviewed_date_precision"):
         if str(pr.get(f, "")).strip():
             return True
     if _truthy(pr.get("exact_date_explicit", "")) or _truthy(pr.get("ordinary_share_explicit", "")):
         return True
     return False
+
+
+def _detect_date_precision(date_str: str) -> str:
+    """Detect the precision of a Jalali date string."""
+    s = str(date_str or "").strip()
+    if not s:
+        return "unknown"
+    if is_valid_exact_jalali_date(s):
+        return "exact_day"
+    if re.fullmatch(r"\d{4}-\d{2}", s):
+        y, m = int(s[:4]), int(s[5:7])
+        if 1200 <= y <= 1500 and 1 <= m <= 12:
+            return "month_only"
+        return "unknown"
+    if re.fullmatch(r"\d{4}", s):
+        if 1200 <= int(s) <= 1500:
+            return "year_only"
+        return "unknown"
+    return "unknown"
+
+
+def evaluate_reviewed_evidence_record(rec: dict, snapshot_root: Path = None) -> dict:
+    """Evaluate a *reviewed* provenance record and return a dict with:
+
+    - ``reviewed_event_type``: the event type from review content (canonical,
+      admission, listing, public_company_conversion, or empty).
+    - ``reviewed_date_precision``: exact_day / month_only / year_only / unknown.
+    - ``reviewed_evidence_valid``: True when the source is fetched, reviewed,
+      snapshot-valid, domain-taxonomy valid, document-specific, and supports
+      a valid event/date.
+    - ``evidence_role``: the role this record plays in the evidence set.
+
+    Unlike :func:`evaluate_source_record` (which is strictly for *canonical*
+    evidence and requires ``ordinary_share_explicit``), this function accepts
+    admission, listing, and public_company_conversion events, and does NOT
+    require ``ordinary_share_explicit`` for non-canonical events.
+    """
+    result = {
+        "reviewed_event_type": "",
+        "reviewed_date_precision": "unknown",
+        "reviewed_evidence_valid": False,
+        "evidence_role": "none",
+    }
+
+    # Must be fetched and reviewed.
+    if str(rec.get("retrieval_status", "")) not in FETCHED_STATUSES:
+        return result
+    if str(rec.get("content_review_status", "")).strip().lower() != "reviewed":
+        return result
+
+    # Snapshot/hash validation.
+    h = str(rec.get("content_sha256", "")).strip()
+    snap = str(rec.get("snapshot_path", "")).strip()
+    if not snap or not _is_sha256(h):
+        return result
+    if snapshot_root is not None:
+        sp = Path(snapshot_root) / snap
+        if not sp.exists():
+            return result
+        if hashlib.sha256(sp.read_bytes()).hexdigest() != h.lower():
+            return result
+
+    # Authority consistency.
+    src_type = str(rec.get("source_type", ""))
+    url = str(rec.get("source_url", ""))
+    tk = str(rec.get("ticker", ""))
+    _cls, verr = classify_source_authority_with_validation(src_type, url, tk)
+    if verr:
+        return result
+
+    # Document specificity.
+    if not is_document_specific_source(url, src_type, tk):
+        return result
+
+    # Determine reviewed event type.
+    raw_event = str(rec.get("event_type_supported", "")).strip()
+    # Map conversion_to_public → public_company_conversion.
+    if raw_event == "conversion_to_public":
+        raw_event = "public_company_conversion"
+    if raw_event not in REVIEWED_EVENT_TYPES:
+        return result
+
+    # Determine date precision from reviewed_date_jalali.
+    date_str = str(rec.get("reviewed_date_jalali", "")).strip()
+    precision = _detect_date_precision(date_str)
+    if precision == "unknown":
+        return result
+
+    # For canonical events, exact_date_explicit must be true for exact-day.
+    # Partial dates (year/month) are accepted as canonical_partial_date.
+    if raw_event in CANONICAL_EVENT_TYPES:
+        if precision == "exact_day":
+            if not _truthy(rec.get("exact_date_explicit", "")):
+                return result
+            # ordinary_share_explicit is required for canonical exact evidence.
+            if not _truthy(rec.get("ordinary_share_explicit", "")):
+                return result
+        elif precision in ("month_only", "year_only"):
+            # Partial-date canonical: accept even without exact_date_explicit,
+            # but still require ordinary_share_explicit.
+            if not _truthy(rec.get("ordinary_share_explicit", "")):
+                return result
+        else:
+            return result
+
+    # Independent source group consistency.
+    declared_group = str(rec.get("independent_source_group", "")).strip().lower()
+    if declared_group and declared_group != registrable_domain(url):
+        return result
+
+    # All checks passed — reviewed evidence is valid.
+    result["reviewed_event_type"] = raw_event
+    result["reviewed_date_precision"] = precision
+    result["reviewed_evidence_valid"] = True
+
+    # Assign evidence_role.
+    if raw_event in CANONICAL_EVENT_TYPES and precision == "exact_day":
+        result["evidence_role"] = "canonical_exact_candidate"
+    elif raw_event in CANONICAL_EVENT_TYPES and precision in ("month_only", "year_only"):
+        result["evidence_role"] = "canonical_partial_date"
+    elif raw_event == "admission":
+        result["evidence_role"] = "admission_only"
+    elif raw_event == "listing":
+        result["evidence_role"] = "listing_only"
+    elif raw_event == "public_company_conversion":
+        result["evidence_role"] = "public_company_conversion_only"
+    else:
+        result["evidence_role"] = "non_entry_evidence"
+
+    return result
 
 
 def normalize_provenance_records(records: list, snapshot_root: Path = ROOT) -> list:
@@ -1026,6 +1185,12 @@ def normalize_provenance_records(records: list, snapshot_root: Path = ROOT) -> l
         r["contemporaneous_with_event"] = (
             "true" if _contemporaneous_with_event(r) else "false")
         r["evidence_accepted"] = compute_evidence_accepted(r, snapshot_root)
+        # Reviewed-evidence derived fields.
+        rev = evaluate_reviewed_evidence_record(r, snapshot_root)
+        r["reviewed_event_type"] = rev["reviewed_event_type"]
+        r["reviewed_date_precision"] = rev["reviewed_date_precision"]
+        r["reviewed_evidence_valid"] = "true" if rev["reviewed_evidence_valid"] else "false"
+        r["evidence_role"] = rev["evidence_role"]
         out.append(r)
     return out
 
@@ -1170,11 +1335,17 @@ def decide_ready_for_user_review(records: list, snapshot_root: Path = None) -> d
 def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> dict:
     """Derive the per-ticker screening status with correct research semantics.
 
-    A network failure (timeout/connection/fetch error) means the research could
-    not be *completed* — it is ``research_blocked_network`` /
-    ``requires_manual_review``, and never ``no_reliable_evidence``. The latter is
-    reserved for the case where sources were fetched AND reviewed but none
-    carried first-public-entry evidence.
+    Decision order (after fetched+reviewed):
+    1. Network blocked → research_blocked_network / requires_manual_review.
+    2. Fetched but unreviewed → fetched_pending_manual_review.
+    3. Canonical exact-day conflict → research_completed_conflict.
+    4. Canonical exact-day accepted (ready) → candidate_supported.
+    5. Canonical partial-date (year/month only) → research_completed_partial_public_entry_date.
+    6. Admission-only evidence → research_completed_admission_only.
+    7. Listing-only evidence → research_completed_listing_only.
+    8. Public-company conversion only → research_completed_noncanonical_entry_evidence.
+    9. Non-entry evidence (reviewed but no relevant event) → no_reliable_evidence.
+    10. No reviewed evidence at all → no_reliable_evidence.
     """
     attempted = len(fetch_recs)
     fetched = [r for r in fetch_recs if str(r.get("retrieval_status")) in FETCHED_STATUSES]
@@ -1208,6 +1379,10 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
         "conflict_dates": "",
         "conflict_reason": "",
         "recommended_next_step": "manual_web_research_required",
+        "admission_date_candidate_jalali": "",
+        "listing_date_candidate_jalali": "",
+        "first_public_offering_date_candidate_jalali": "",
+        "first_public_trading_date_candidate_jalali": "",
     }
     base.update(counts)
 
@@ -1215,8 +1390,7 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
     if network_blocked:
         return base
 
-    # Case 2: nothing fetched at all (no sources configured / all non-network
-    # failures that still are not evidence) — keep manual review, not "no evidence".
+    # Case 2: nothing fetched at all.
     if not fetched:
         base.update({
             "research_status": "requires_manual_review",
@@ -1224,7 +1398,7 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
         })
         return base
 
-    # Case 3: fetched but not yet reviewed → cannot judge evidence yet.
+    # Case 3: fetched but not yet reviewed.
     if not reviewed:
         base.update({
             "research_status": "fetched_pending_manual_review",
@@ -1234,6 +1408,27 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
         return base
 
     # Research was completed (fetched AND reviewed). Now apply evidence logic.
+
+    # Evaluate each reviewed record with the new reviewed-evidence engine.
+    reviewed_evals = [evaluate_reviewed_evidence_record(r, snapshot_root) for r in reviewed]
+    valid_evals = [ev for ev in reviewed_evals if ev["reviewed_evidence_valid"]]
+
+    # Separate by evidence role.
+    canonical_exact = [ev for ev in valid_evals
+                       if ev["evidence_role"] == "canonical_exact_candidate"]
+    canonical_partial = [ev for ev in valid_evals
+                         if ev["evidence_role"] == "canonical_partial_date"]
+    admission_evals = [ev for ev in valid_evals
+                       if ev["evidence_role"] == "admission_only"]
+    listing_evals = [ev for ev in valid_evals
+                     if ev["evidence_role"] == "listing_only"]
+    conversion_evals = [ev for ev in valid_evals
+                        if ev["evidence_role"] == "public_company_conversion_only"]
+    non_entry_evals = [ev for ev in valid_evals
+                       if ev["evidence_role"] == "non_entry_evidence"]
+
+    # Step 1: Check for canonical conflict (using the original decide_ready_for_user_review
+    # which checks for conflicting canonical dates/events).
     decision = decide_ready_for_user_review(reviewed, snapshot_root)
 
     if decision["conflict_flag"]:
@@ -1250,6 +1445,7 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
         })
         return base
 
+    # Step 2: Canonical exact-day ready.
     if decision["ready"]:
         base.update({
             "candidate_event_type": decision["event_type"],
@@ -1263,10 +1459,100 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
             "ready_for_user_review": "true",
             "recommended_next_step": "recommend_user_review",
         })
+        # Populate the matching candidate date field.
+        if decision["event_type"] == "first_public_offering":
+            base["first_public_offering_date_candidate_jalali"] = decision["canonical_date"]
+        elif decision["event_type"] == "first_public_trading":
+            base["first_public_trading_date_candidate_jalali"] = decision["canonical_date"]
         return base
 
-    # Reviewed, but no accepted public-entry evidence. THIS — and only this — is
-    # genuine "no reliable evidence".
+    # Step 3: Canonical partial-date (year/month only offering/trading).
+    if canonical_partial:
+        ev = canonical_partial[0]
+        date_str = str(reviewed[0].get("reviewed_date_jalali", "")).strip()
+        # Find the date from the matching reviewed record.
+        for r in reviewed:
+            rev = evaluate_reviewed_evidence_record(r, snapshot_root)
+            if rev["evidence_role"] == "canonical_partial_date":
+                date_str = str(r.get("reviewed_date_jalali", "")).strip()
+                break
+        base.update({
+            "candidate_event_type": ev["reviewed_event_type"],
+            "proposed_canonical_event_type": ev["reviewed_event_type"],
+            "date_precision": ev["reviewed_date_precision"],
+            "evidence_status": "requires_first_public_trade_evidence",
+            "research_status": "research_completed_partial_public_entry_date",
+            "research_completion_status": "completed_partial_evidence",
+            "recommended_next_step": "requires_exact_date_evidence",
+        })
+        if ev["reviewed_event_type"] == "first_public_offering":
+            base["first_public_offering_date_candidate_jalali"] = date_str
+        elif ev["reviewed_event_type"] == "first_public_trading":
+            base["first_public_trading_date_candidate_jalali"] = date_str
+        return base
+
+    # Step 4: Admission-only evidence.
+    if admission_evals and not canonical_exact and not canonical_partial:
+        # Find the date from the matching reviewed record.
+        adm_date = ""
+        for r in reviewed:
+            rev = evaluate_reviewed_evidence_record(r, snapshot_root)
+            if rev["evidence_role"] == "admission_only":
+                adm_date = str(r.get("reviewed_date_jalali", "")).strip()
+                break
+        base.update({
+            "candidate_event_type": "admission",
+            "date_precision": admission_evals[0]["reviewed_date_precision"],
+            "evidence_status": "requires_first_public_trade_evidence",
+            "research_status": "research_completed_admission_only",
+            "research_completion_status": "completed_admission_only",
+            "recommended_next_step": "requires_first_public_trade_evidence",
+            "admission_date_candidate_jalali": adm_date,
+        })
+        return base
+
+    # Step 5: Listing-only evidence.
+    if listing_evals and not canonical_exact and not canonical_partial:
+        lst_date = ""
+        for r in reviewed:
+            rev = evaluate_reviewed_evidence_record(r, snapshot_root)
+            if rev["evidence_role"] == "listing_only":
+                lst_date = str(r.get("reviewed_date_jalali", "")).strip()
+                break
+        base.update({
+            "candidate_event_type": "listing",
+            "date_precision": listing_evals[0]["reviewed_date_precision"],
+            "evidence_status": "requires_first_public_trade_evidence",
+            "research_status": "research_completed_listing_only",
+            "research_completion_status": "completed_listing_only",
+            "recommended_next_step": "requires_first_public_trade_evidence",
+            "listing_date_candidate_jalali": lst_date,
+        })
+        return base
+
+    # Step 6: Public-company conversion only.
+    if conversion_evals and not canonical_exact and not canonical_partial:
+        base.update({
+            "candidate_event_type": "public_company_conversion",
+            "date_precision": conversion_evals[0]["reviewed_date_precision"],
+            "evidence_status": "requires_first_public_trade_evidence",
+            "research_status": "research_completed_noncanonical_entry_evidence",
+            "research_completion_status": "completed_noncanonical_evidence",
+            "recommended_next_step": "requires_first_public_trade_evidence",
+        })
+        return base
+
+    # Step 7: Non-entry evidence (reviewed valid sources but no relevant event).
+    if non_entry_evals and not valid_evals:
+        base.update({
+            "evidence_status": "no_reliable_evidence",
+            "research_status": "research_completed_no_evidence",
+            "research_completion_status": "completed_no_eligibility_evidence",
+            "recommended_next_step": "manual_research_required",
+        })
+        return base
+
+    # Step 8: Reviewed but no valid evidence at all → no_reliable_evidence.
     base.update({
         "evidence_status": "no_reliable_evidence",
         "research_status": "research_completed_no_evidence",
@@ -1313,10 +1599,10 @@ def build_research_screening(company_names: dict, provenance_by_ticker: dict,
             "ticker": tk,
             "ticker_normalized": normalize_ticker(tk),
             "company_name": company_names.get(tk, ""),
-            "admission_date_candidate_jalali": "",
-            "listing_date_candidate_jalali": "",
-            "first_public_offering_date_candidate_jalali": "",
-            "first_public_trading_date_candidate_jalali": "",
+            "admission_date_candidate_jalali": st.get("admission_date_candidate_jalali", ""),
+            "listing_date_candidate_jalali": st.get("listing_date_candidate_jalali", ""),
+            "first_public_offering_date_candidate_jalali": st.get("first_public_offering_date_candidate_jalali", ""),
+            "first_public_trading_date_candidate_jalali": st.get("first_public_trading_date_candidate_jalali", ""),
             "candidate_event_type": st["candidate_event_type"],
             "proposed_canonical_public_entry_date_jalali": cand_j,
             "proposed_canonical_public_entry_date_gregorian": _greg(cand_j),
@@ -1514,6 +1800,21 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
     check("no_duplicate_tickers", research_df["ticker"].duplicated().sum() == 0,
           f"dups={research_df['ticker'].duplicated().sum()}")
 
+    # Allowed enums for research_status and evidence_status.
+    ALLOWED_RESEARCH_STATUSES = {
+        "research_blocked_network", "requires_manual_review",
+        "fetched_pending_manual_review", "candidate_supported",
+        "research_completed_conflict", "research_completed_no_evidence",
+        "research_completed_partial_public_entry_date",
+        "research_completed_admission_only",
+        "research_completed_listing_only",
+        "research_completed_noncanonical_entry_evidence",
+    }
+    ALLOWED_EVIDENCE_STATUSES = {
+        "requires_manual_review", "candidate_supported",
+        "no_reliable_evidence", "requires_first_public_trade_evidence",
+    }
+
     prov_by_tk = {tk: provenance_df[provenance_df["ticker"] == tk]
                   for tk in PART03_TICKERS}
 
@@ -1531,6 +1832,14 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
         rcomp = str(r.get("research_completion_status", "")).strip()
         nblocked = str(r.get("network_blocked", "")).strip().lower()
         ord_conf = str(r.get("ordinary_share_confirmed", "")).strip().lower()
+
+        # Enum validation.
+        check(f"research_status_valid_enum_{tk}",
+              rstatus in ALLOWED_RESEARCH_STATUSES,
+              f"research_status={rstatus}")
+        check(f"evidence_status_valid_enum_{tk}",
+              es in ALLOWED_EVIDENCE_STATUSES,
+              f"evidence_status={es}")
 
         sub = prov_by_tk.get(tk)
         # Real retrieval/review outcome for this ticker (from provenance).
@@ -1703,6 +2012,35 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
               str(pr.get("evidence_accepted", "")).strip().lower() == recomputed,
               f"stored={pr.get('evidence_accepted')}, computed={recomputed}")
 
+        # reviewed-evidence derived fields must match engine recomputation.
+        rev_eval = evaluate_reviewed_evidence_record(rec_dict, snapshot_root=ROOT)
+        check(f"reviewed_event_type_matches_engine_{tk}_{idx}",
+              str(pr.get("reviewed_event_type", "")).strip() == rev_eval["reviewed_event_type"],
+              f"stored={pr.get('reviewed_event_type')}, computed={rev_eval['reviewed_event_type']}")
+        check(f"reviewed_date_precision_matches_engine_{tk}_{idx}",
+              str(pr.get("reviewed_date_precision", "")).strip() == rev_eval["reviewed_date_precision"],
+              f"stored={pr.get('reviewed_date_precision')}, computed={rev_eval['reviewed_date_precision']}")
+        check(f"reviewed_evidence_valid_matches_engine_{tk}_{idx}",
+              str(pr.get("reviewed_evidence_valid", "")).strip().lower() ==
+              ("true" if rev_eval["reviewed_evidence_valid"] else "false"),
+              f"stored={pr.get('reviewed_evidence_valid')}, computed={rev_eval['reviewed_evidence_valid']}")
+        check(f"evidence_role_matches_engine_{tk}_{idx}",
+              str(pr.get("evidence_role", "")).strip() == rev_eval["evidence_role"],
+              f"stored={pr.get('evidence_role')}, computed={rev_eval['evidence_role']}")
+        # evidence_role must be a valid enum.
+        check(f"evidence_role_valid_enum_{tk}_{idx}",
+              str(pr.get("evidence_role", "")).strip() in EVIDENCE_ROLES,
+              f"evidence_role={pr.get('evidence_role')}")
+        # reviewed_date_precision must be a valid enum.
+        check(f"reviewed_date_precision_valid_enum_{tk}_{idx}",
+              str(pr.get("reviewed_date_precision", "")).strip() in REVIEWED_DATE_PRECISIONS,
+              f"reviewed_date_precision={pr.get('reviewed_date_precision')}")
+        # reviewed_event_type must be a valid enum (or empty).
+        check(f"reviewed_event_type_valid_enum_{tk}_{idx}",
+              str(pr.get("reviewed_event_type", "")).strip() in REVIEWED_EVENT_TYPES
+              or str(pr.get("reviewed_event_type", "")).strip() == "",
+              f"reviewed_event_type={pr.get('reviewed_event_type')}")
+
         # domain-strict taxonomy: stored authority class must match recomputation,
         # and a validation error forbids acceptance.
         real_url = str(pr.get("source_url", ""))
@@ -1782,7 +2120,11 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
                              "ready_for_user_review", "ordinary_share_confirmed",
                              "fetched_source_count", "reviewed_source_count",
                              "evidence_source_count",
-                             "proposed_canonical_public_entry_date_jalali"))
+                             "proposed_canonical_public_entry_date_jalali",
+                             "admission_date_candidate_jalali",
+                             "listing_date_candidate_jalali",
+                             "first_public_offering_date_candidate_jalali",
+                             "first_public_trading_date_candidate_jalali"))
         check(f"research_from_provenance_{tk}", same,
               "research screening row must match status derived from recomputed "
               "provenance")
@@ -1932,7 +2274,8 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
               "candidate_date_jalali must agree with date_precision")
 
         allowed_events = {"", "first_public_offering", "first_public_trading",
-                          "admission", "listing", "unresolved"}
+                          "admission", "listing", "public_company_conversion",
+                          "unresolved"}
         events_ok = all(str(v).strip() in allowed_events
                         for v in worklist_df.get("first_public_event_candidate",
                                                  pd.Series([], dtype=str)).astype(str))

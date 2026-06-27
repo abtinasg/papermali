@@ -1,7 +1,7 @@
 {
   "stage": "stage124_batch02_part03",
-  "generated_at": "2026-06-27T10:12:31Z",
-  "source_commit": "2a885e6c6f86778be8050dbd9de3f78796dc2b2c",
+  "generated_at": "2026-06-27T16:53:37Z",
+  "source_commit": "130db8e195e9f05f655f33545c4de64dba202d9b",
   "ticker_count": 10,
   "tickers": [
     "خمهر",
@@ -208,7 +208,7 @@
   "fetch_results": {
     "خمهر": [
       {
-        "source_index": 1,
+        "source_index": "1",
         "source_url": "https://rahavard365.com/asset/jdax/%D8%AE%D9%85%D9%87%D8%B1",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -216,7 +216,7 @@
         "content_sha256": ""
       },
       {
-        "source_index": 2,
+        "source_index": "2",
         "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AE%D9%85%D9%87%D8%B1",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -226,7 +226,7 @@
     ],
     "خنصیر": [
       {
-        "source_index": 1,
+        "source_index": "1",
         "source_url": "https://rahavard365.com/asset/%D8%AE%D9%86%D8%B5%DB%8C%D8%B1",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -234,7 +234,7 @@
         "content_sha256": ""
       },
       {
-        "source_index": 2,
+        "source_index": "2",
         "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AE%D9%86%D8%B5%DB%8C%D8%B1",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -244,7 +244,7 @@
     ],
     "خوساز": [
       {
-        "source_index": 1,
+        "source_index": "1",
         "source_url": "https://rahavard365.com/asset/%D8%AE%D9%88%D8%B3%D8%A7%D8%B2",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -252,7 +252,7 @@
         "content_sha256": ""
       },
       {
-        "source_index": 2,
+        "source_index": "2",
         "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AE%D9%88%D8%B3%D8%A7%D8%B2",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -262,7 +262,7 @@
     ],
     "خچرخش": [
       {
-        "source_index": 1,
+        "source_index": "1",
         "source_url": "https://rahavard365.com/asset/%D8%AE%DA%86%D8%B1%D8%AE%D8%B4",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -270,7 +270,7 @@
         "content_sha256": ""
       },
       {
-        "source_index": 2,
+        "source_index": "2",
         "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AE%DA%86%D8%B1%D8%AE%D8%B4",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -280,7 +280,7 @@
     ],
     "خکمک": [
       {
-        "source_index": 1,
+        "source_index": "1",
         "source_url": "https://rahavard365.com/asset/%D8%AE%DA%A9%D9%85%DA%A9",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -288,7 +288,7 @@
         "content_sha256": ""
       },
       {
-        "source_index": 2,
+        "source_index": "2",
         "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AE%DA%A9%D9%85%DA%A9",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -298,7 +298,7 @@
     ],
     "دروز": [
       {
-        "source_index": 1,
+        "source_index": "1",
         "source_url": "https://rahavard365.com/asset/%D8%AF%D8%B1%D9%88%D8%B2",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -306,7 +306,7 @@
         "content_sha256": ""
       },
       {
-        "source_index": 2,
+        "source_index": "2",
         "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AF%D8%B1%D9%88%D8%B2",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -316,7 +316,7 @@
     ],
     "دسبحا": [
       {
-        "source_index": 1,
+        "source_index": "1",
         "source_url": "https://rahavard365.com/asset/%D8%AF%D8%B3%D8%A8%D8%AD%D8%A7",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -324,7 +324,7 @@
         "content_sha256": ""
       },
       {
-        "source_index": 2,
+        "source_index": "2",
         "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AF%D8%B3%D8%A8%D8%AD%D8%A7",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -334,7 +334,7 @@
     ],
     "دیران": [
       {
-        "source_index": 1,
+        "source_index": "1",
         "source_url": "https://rahavard365.com/asset/%D8%AF%DB%8C%D8%B1%D8%A7%D9%86",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -342,7 +342,7 @@
         "content_sha256": ""
       },
       {
-        "source_index": 2,
+        "source_index": "2",
         "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AF%DB%8C%D8%B1%D8%A7%D9%86",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -352,7 +352,7 @@
     ],
     "رانفور": [
       {
-        "source_index": 1,
+        "source_index": "1",
         "source_url": "https://rahavard365.com/asset/%D8%B1%D8%A7%D9%86%D9%81%D9%88%D8%B1",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -360,7 +360,7 @@
         "content_sha256": ""
       },
       {
-        "source_index": 2,
+        "source_index": "2",
         "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%B1%D8%A7%D9%86%D9%81%D9%88%D8%B1",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -370,7 +370,7 @@
     ],
     "رمپنا": [
       {
-        "source_index": 1,
+        "source_index": "1",
         "source_url": "https://rahavard365.com/asset/%D8%B1%D9%85%D9%BE%D9%86%D8%A7",
         "retrieval_status": "timeout",
         "http_status": "",
@@ -378,7 +378,7 @@
         "content_sha256": ""
       },
       {
-        "source_index": 2,
+        "source_index": "2",
         "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%B1%D9%85%D9%BE%D9%86%D8%A7",
         "retrieval_status": "timeout",
         "http_status": "",
