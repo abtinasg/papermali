@@ -14,16 +14,19 @@ Canonical public-entry dates may only come from ``first_public_offering`` or
 is guessed. Failed fetches never produce a fabricated snapshot or hash.
 """
 
+import re
 import json
 import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 
 import pandas as pd
 import requests as _requests
 
 from .stage124_batch02_v2 import (
     normalize_ticker, normalize_jalali, jalali_to_gregorian_str,
+    jalali_str_to_gregorian_date, gregorian_to_jalali_str,
     sha, git_head, read_csv, write_csv,
     ROOT, OUT, PILOT15, STAGE123_INPUT, STAGE122_INPUT,
     EXPECTED_STAGE123_SHA, EXPECTED_STAGE122_SHA,
@@ -146,9 +149,35 @@ AGGREGATOR_DOMAINS = {
     "bourseview.com", "sahmeto.com", "databours.ir",
 }
 
-# Authority classes that can satisfy the "official / contemporaneous news"
-# single-source condition for ready=true.
-AUTHORITATIVE_CLASSES = {"official_regulatory", "credible_news"}
+# Authority classes that can satisfy the source-sufficiency condition for
+# ready=true. Aggregator / unknown may be *supporting* evidence but never make a
+# record ready on their own (Correction 4).
+QUALIFYING_AUTHORITY_CLASSES = {"official_regulatory", "credible_news", "company_official"}
+# Backwards-compatible alias used by older QC references.
+AUTHORITATIVE_CLASSES = QUALIFYING_AUTHORITY_CLASSES
+
+# Declared source_type → expected authority class. A declared type must be
+# corroborated by the URL's real domain or it is treated as a contradiction.
+_DECLARED_CLASS = {
+    "codal_official": "official_regulatory",
+    "regulatory_official": "official_regulatory",
+    "news_agency": "credible_news",
+    "credible_news": "credible_news",
+    "market_information_aggregator": "market_information_aggregator",
+    "aggregator": "market_information_aggregator",
+    "company_official": "company_official",
+}
+
+# Codal evidence must point at a specific, stable document/announcement.
+_CODAL_DOC_IDENTIFIERS = (
+    "letterserial", "tracingno", "announcementid", "attachment",
+    "/decision.aspx", "/letter", "document", ".pdf",
+)
+# Discovery / list / search / overview markers — never document-specific.
+_DISCOVERY_MARKERS = (
+    "reportlist.aspx", "decisionlist", "searchresult", "/search",
+    "search=", "search&", "symbol=", "/asset/", "/list",
+)
 
 
 # ---- helpers -------------------------------------------------------------------
@@ -156,36 +185,116 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def registrable_domain(url: str) -> str:
-    """Return a lower-cased host (registrable domain) used as the independent
-    source group. Two URLs on the same domain share one group and are therefore
-    *not* independent."""
+def _hostname(url: str) -> str:
+    """Boundary-safe hostname via urllib, lower-cased and de-www'd."""
     if not url:
         return ""
-    u = str(url).strip().lower()
-    if "://" in u:
-        u = u.split("://", 1)[1]
-    u = u.split("/", 1)[0].split("?", 1)[0].split("#", 1)[0]
-    if u.startswith("www."):
-        u = u[4:]
-    return u
+    u = str(url).strip()
+    if "://" not in u:
+        u = "http://" + u
+    host = (urlparse(u).hostname or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    return host
+
+
+def _host_matches(host: str, domain: str) -> bool:
+    """True only when ``host`` *is* ``domain`` or a real subdomain of it.
+
+    ``codal.ir`` and ``www.codal.ir`` match ``codal.ir``; ``fake-codal.ir`` and
+    ``codal.ir.example.com`` do not."""
+    if not host or not domain:
+        return False
+    return host == domain or host.endswith("." + domain)
+
+
+def _host_in(host: str, domains) -> bool:
+    return any(_host_matches(host, d) for d in domains)
+
+
+def registrable_domain(url: str) -> str:
+    """Lower-cased host used as the independent source group. Two URLs on the
+    same host share one group and are therefore *not* independent."""
+    return _hostname(url)
+
+
+def _domain_authority(host: str) -> str:
+    if _host_in(host, OFFICIAL_REGULATORY_DOMAINS):
+        return "official_regulatory"
+    if _host_in(host, CREDIBLE_NEWS_DOMAINS):
+        return "credible_news"
+    if _host_in(host, AGGREGATOR_DOMAINS):
+        return "market_information_aggregator"
+    return "unknown"
+
+
+def classify_source_authority_with_validation(source_type: str, url: str):
+    """Fail-closed authority classification. The URL's real domain is the source
+    of truth; a declared ``source_type`` that contradicts the domain yields an
+    ``unknown`` class plus a validation error string.
+
+    Returns ``(authority_class, validation_error)``."""
+    host = _hostname(url)
+    domain_class = _domain_authority(host)
+    declared = _DECLARED_CLASS.get((source_type or "").strip().lower())
+    if declared is None:
+        # No (or unrecognised) declared type → trust the domain only.
+        return domain_class, ""
+    if declared == domain_class:
+        return domain_class, ""
+    return "unknown", (
+        f"source_type '{source_type}' contradicts domain '{host or '∅'}' "
+        f"(domain_class={domain_class})")
 
 
 def classify_source_authority(source_type: str, url: str) -> str:
-    """Map a source to an authority class from the taxonomy.
+    """Domain-strict authority class (see
+    :func:`classify_source_authority_with_validation`)."""
+    return classify_source_authority_with_validation(source_type, url)[0]
 
-    The genuine codal.ir domain is ``official_regulatory``; reputable news wires
-    are ``credible_news``; Rahavard/Tacodal/TGJU and similar are
-    ``market_information_aggregator``; anything unrecognised is ``unknown``."""
-    dom = registrable_domain(url)
-    st = (source_type or "").strip().lower()
-    if dom in OFFICIAL_REGULATORY_DOMAINS or st in ("codal_official", "regulatory_official"):
-        return "official_regulatory"
-    if dom in CREDIBLE_NEWS_DOMAINS or st in ("news_agency", "credible_news"):
-        return "credible_news"
-    if dom in AGGREGATOR_DOMAINS or st in ("market_information_aggregator", "aggregator"):
-        return "market_information_aggregator"
-    return "unknown"
+
+def is_document_specific_source(url: str, source_type: str = "") -> bool:
+    """A *document-specific* source is a single announcement/document with a
+    stable identifier — not a discovery, search, list, or asset-overview page.
+
+    Codal evidence is accepted only from a specific letter/announcement
+    (LetterSerial / TracingNo / AnnouncementId / attachment / a PDF). Generic
+    Codal ``ReportList.aspx`` / symbol-search pages, Rahavard ``/asset/``
+    overviews, homepages and profiles are discovery-only."""
+    if not url:
+        return False
+    parsed = urlparse(str(url).strip() if "://" in str(url) else "http://" + str(url).strip())
+    host = (parsed.hostname or "").lower()
+    path = (parsed.path or "").lower()
+    query = (parsed.query or "").lower()
+    full = f"{path}?{query}"
+    if any(m in full for m in _DISCOVERY_MARKERS):
+        return False
+    if _host_matches(host.replace("www.", "", 1) if host.startswith("www.") else host, "codal.ir"):
+        return any(idn in full for idn in _CODAL_DOC_IDENTIFIERS)
+    # Non-Codal: homepage/profile root is not a document.
+    if path in ("", "/"):
+        return False
+    segments = [s for s in path.split("/") if s]
+    return len(segments) >= 2 or any(c.isdigit() for c in path)
+
+
+def is_valid_exact_jalali_date(value: str) -> bool:
+    """Strict exact-day Jalali validation.
+
+    Requires ``YYYY-MM-DD`` with a full, in-range, round-trippable day. Year-only,
+    month-only, slash-separated, and out-of-range values are rejected."""
+    s = str(value or "").strip()
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", s):
+        return False
+    y, m, d = (int(x) for x in s.split("-"))
+    if not (1 <= m <= 12 and 1 <= d <= 31):
+        return False
+    try:
+        g = jalali_to_gregorian_str(s)
+        return gregorian_to_jalali_str(g) == s
+    except Exception:
+        return False
 
 
 def _is_sha256(value: str) -> bool:
@@ -195,6 +304,23 @@ def _is_sha256(value: str) -> bool:
 
 def _truthy(value) -> bool:
     return str(value).strip().lower() == "true"
+
+
+def _contemporaneous_with_event(rec: dict) -> bool:
+    """A credible-news source is contemporaneous when it carries an explicit,
+    valid publication date within 30 days of the reviewed event date."""
+    if not _truthy(rec.get("publication_date_explicit", "")):
+        return False
+    pub = str(rec.get("publication_date_jalali", "")).strip()
+    ev = str(rec.get("reviewed_date_jalali", "")).strip()
+    if not is_valid_exact_jalali_date(pub) or not is_valid_exact_jalali_date(ev):
+        return False
+    try:
+        delta = abs((jalali_str_to_gregorian_date(pub)
+                     - jalali_str_to_gregorian_date(ev)).days)
+    except Exception:
+        return False
+    return delta <= 30
 
 
 def _greg(jalali: str) -> str:
@@ -258,10 +384,16 @@ def fetch_sources(timeout: float = 5.0, force: bool = False) -> dict:
                 # --- fetch / evidence separation fields ---
                 "content_review_status": "",
                 "source_authority_class": classify_source_authority(src_type, url),
+                "authority_validation_error":
+                    classify_source_authority_with_validation(src_type, url)[1],
+                "document_specific": "true" if is_document_specific_source(url, src_type) else "false",
                 "ordinary_share_explicit": "unknown",
                 "event_type_supported": "",
                 "exact_date_explicit": "false",
                 "reviewed_date_jalali": "",
+                "publication_date_jalali": "",
+                "publication_date_explicit": "false",
+                "contemporaneous_with_event": "false",
                 "independent_source_group": registrable_domain(url),
                 "evidence_accepted": "false",
             }
@@ -408,7 +540,7 @@ def build_tickers_df(company_names: dict) -> pd.DataFrame:
 
 
 def evaluate_source_record(rec: dict, snapshot_root: Path = None) -> bool:
-    """Decide whether a *single* source record is accepted evidence.
+    """Decide whether a *single* source record is accepted (supporting) evidence.
 
     A successful fetch alone is never evidence. A record is accepted only when
     *all* of the following hold:
@@ -417,9 +549,15 @@ def evaluate_source_record(rec: dict, snapshot_root: Path = None) -> bool:
     * the content was actually reviewed (``content_review_status == reviewed``);
     * a snapshot exists with a real SHA-256, and — when ``snapshot_root`` is
       given and the file is present — the on-disk SHA matches the recorded hash;
+    * the declared ``source_type`` is consistent with the real domain (no
+      authority validation error);
+    * the URL is *document-specific* (not a discovery / search / list page);
     * the reviewed content explicitly supports a canonical event type
-      (first_public_offering / first_public_trading) on an exact day;
-    * the content explicitly states the instrument is an ordinary share.
+      (first_public_offering / first_public_trading);
+    * ``exact_date_explicit`` is true and ``reviewed_date_jalali`` is a valid
+      exact-day Jalali date;
+    * the content explicitly states the instrument is an ordinary share;
+    * any manually-supplied ``independent_source_group`` matches the real domain.
 
     Returns ``True``/``False`` and never mutates ``rec``.
     """
@@ -437,15 +575,41 @@ def evaluate_source_record(rec: dict, snapshot_root: Path = None) -> bool:
             return False
         if hashlib.sha256(sp.read_bytes()).hexdigest() != h.lower():
             return False
+    # Authority consistency (domain is the source of truth).
+    src_type = str(rec.get("source_type", ""))
+    url = str(rec.get("source_url", ""))
+    _cls, verr = classify_source_authority_with_validation(src_type, url)
+    if verr:
+        return False
+    # Document specificity.
+    if not is_document_specific_source(url, src_type):
+        return False
+    # Canonical event + valid exact-day date.
     if str(rec.get("event_type_supported", "")).strip() not in CANONICAL_EVENT_TYPES:
         return False
     if not _truthy(rec.get("exact_date_explicit", "")):
         return False
-    if not str(rec.get("reviewed_date_jalali", "")).strip():
+    if not is_valid_exact_jalali_date(rec.get("reviewed_date_jalali", "")):
         return False
     if not _truthy(rec.get("ordinary_share_explicit", "")):
         return False
+    # A manually-asserted independent group must match the real domain.
+    declared_group = str(rec.get("independent_source_group", "")).strip().lower()
+    if declared_group and declared_group != registrable_domain(url):
+        return False
     return True
+
+
+def compute_evidence_accepted(rec: dict, snapshot_root: Path = None) -> str:
+    """Authoritative, computed ``evidence_accepted`` for a provenance row. Never
+    trusts a manually-supplied value (Correction 6)."""
+    return "true" if evaluate_source_record(rec, snapshot_root) else "false"
+
+
+def _record_authority(rec: dict) -> str:
+    """Domain-strict authority class for an (already accepted) record."""
+    return classify_source_authority(str(rec.get("source_type", "")),
+                                     str(rec.get("source_url", "")))
 
 
 def decide_ready_for_user_review(records: list, snapshot_root: Path = None) -> dict:
@@ -453,12 +617,16 @@ def decide_ready_for_user_review(records: list, snapshot_root: Path = None) -> d
 
     ``ready=True`` requires accepted evidence (see :func:`evaluate_source_record`)
     that converges on a single exact-day canonical date with no conflict, AND a
-    sufficient source condition:
+    sufficient *qualifying* source condition:
 
-    * at least one accepted *official / credible-news* source, OR
-    * at least two accepted sources from *different* independent source groups.
+    * one official-regulatory source (no contemporaneity requirement), OR
+    * one credible-news / company-official source that is *contemporaneous* with
+      the event (publication date within 30 days), OR
+    * two qualifying sources from *different* real domains.
 
-    A single aggregator (or two sources sharing one domain) never reaches ready.
+    Aggregator / unknown sources may corroborate but never make a record ready,
+    so two aggregators (even from different domains) or aggregator+unknown never
+    reach ready.
     """
     accepted = [r for r in records if evaluate_source_record(r, snapshot_root)]
     out = {
@@ -488,17 +656,20 @@ def decide_ready_for_user_review(records: list, snapshot_root: Path = None) -> d
         })
         return out
 
-    has_authority = any(
-        str(r.get("source_authority_class", "")) in AUTHORITATIVE_CLASSES
-        for r in accepted)
-    groups = {registrable_domain(r.get("source_url", "")) or
-              str(r.get("independent_source_group", "")).strip()
-              for r in accepted}
-    groups.discard("")
-    two_independent = len(groups) >= 2
+    qualifying = [r for r in accepted
+                  if _record_authority(r) in QUALIFYING_AUTHORITY_CLASSES]
+    official_single = any(_record_authority(r) == "official_regulatory"
+                          for r in qualifying)
+    contemporaneous_single = any(
+        _record_authority(r) in ("credible_news", "company_official")
+        and _contemporaneous_with_event(r)
+        for r in qualifying)
+    qual_groups = {registrable_domain(r.get("source_url", "")) for r in qualifying}
+    qual_groups.discard("")
+    two_independent_qualifying = len(qual_groups) >= 2
 
-    if not (has_authority or two_independent):
-        out["reason"] = "insufficient_source_authority_or_independence"
+    if not (official_single or contemporaneous_single or two_independent_qualifying):
+        out["reason"] = "insufficient_qualifying_or_independent_sources"
         return out
 
     out.update({
@@ -681,11 +852,26 @@ def build_research_screening(company_names: dict, fetch_results: dict,
     return pd.DataFrame(rows)
 
 
-def build_source_provenance(fetch_results: dict) -> pd.DataFrame:
+def build_source_provenance(fetch_results: dict,
+                            snapshot_root: Path = ROOT) -> pd.DataFrame:
+    """Build provenance, recomputing every derived field from the URL/content so
+    a manually-supplied value can never override the engine (Correction 6)."""
     rows = []
     for tk in PART03_TICKERS:
         for rec in fetch_results.get(tk, []):
-            rows.append(dict(rec))
+            r = dict(rec)
+            src_type = str(r.get("source_type", ""))
+            url = str(r.get("source_url", ""))
+            cls, verr = classify_source_authority_with_validation(src_type, url)
+            r["source_authority_class"] = cls
+            r["authority_validation_error"] = verr
+            r["document_specific"] = (
+                "true" if is_document_specific_source(url, src_type) else "false")
+            r["contemporaneous_with_event"] = (
+                "true" if _contemporaneous_with_event(r) else "false")
+            # evidence_accepted is always the computed result, never the input.
+            r["evidence_accepted"] = compute_evidence_accepted(r, snapshot_root)
+            rows.append(r)
     return pd.DataFrame(rows)
 
 
@@ -909,24 +1095,19 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
             check(f"ready_requires_fetched_source_with_hash_{tk}", has_evidence,
                   "ready=true requires a fetched source with a real SHA-256")
 
-            # ready=true requires *accepted* evidence satisfying the source
-            # condition (≥1 official/credible-news OR ≥2 independent groups).
-            accepted_recs = []
+            # ready=true must be reproducible by the independent decision engine
+            # on this ticker's actual provenance rows (no manual short-cuts).
+            recs = []
             if sub is not None and not sub.empty:
-                for _, pr in sub.iterrows():
-                    rec = {k: pr.get(k, "") for k in pr.index}
-                    if _truthy(pr.get("evidence_accepted", "")):
-                        accepted_recs.append(rec)
-            has_auth = any(str(a.get("source_authority_class", "")) in AUTHORITATIVE_CLASSES
-                           for a in accepted_recs)
-            groups = {registrable_domain(a.get("source_url", "")) or
-                      str(a.get("independent_source_group", "")).strip()
-                      for a in accepted_recs}
-            groups.discard("")
-            check(f"ready_requires_source_condition_{tk}",
-                  bool(accepted_recs) and (has_auth or len(groups) >= 2),
-                  "ready=true needs an official/credible-news source or two "
-                  "independent accepted sources (aggregator-alone is not enough)")
+                recs = [{k: pr.get(k, "") for k in pr.index}
+                        for _, pr in sub.iterrows()]
+            decision = decide_ready_for_user_review(recs, snapshot_root=ROOT)
+            check(f"ready_requires_decision_engine_{tk}", decision["ready"] is True,
+                  f"engine_reason={decision['reason']}")
+            check(f"ready_requires_source_condition_{tk}", decision["ready"] is True,
+                  "ready=true needs a qualifying official/contemporaneous-news "
+                  "source or two qualifying independent sources (aggregators alone "
+                  "are never enough)")
 
         # gregorian conversion of canonical
         cg = str(r["proposed_canonical_public_entry_date_gregorian"]).strip()
@@ -985,6 +1166,27 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
             check(f"unreviewed_not_accepted_{tk}_{idx}",
                   not _truthy(pr.get("evidence_accepted", "")),
                   "fetched but unreviewed source must not be evidence_accepted")
+
+        # evidence_accepted must equal the engine's recomputed value (Correction 6)
+        rec_dict = {k: pr.get(k, "") for k in pr.index}
+        recomputed = compute_evidence_accepted(rec_dict, snapshot_root=ROOT)
+        check(f"evidence_accepted_matches_engine_{tk}_{idx}",
+              str(pr.get("evidence_accepted", "")).strip().lower() == recomputed,
+              f"stored={pr.get('evidence_accepted')}, computed={recomputed}")
+
+        # domain-strict taxonomy: stored authority class must match recomputation,
+        # and a validation error forbids acceptance.
+        real_url = str(pr.get("source_url", ""))
+        rec_cls, rec_verr = classify_source_authority_with_validation(src_type, real_url)
+        if "source_authority_class" in pr.index:
+            check(f"authority_class_matches_engine_{tk}_{idx}",
+                  str(pr.get("source_authority_class", "")).strip() == rec_cls,
+                  f"stored={pr.get('source_authority_class')}, computed={rec_cls}")
+        if rec_verr:
+            check(f"authority_error_blocks_acceptance_{tk}_{idx}",
+                  not _truthy(pr.get("evidence_accepted", "")),
+                  f"validation_error present but evidence_accepted="
+                  f"{pr.get('evidence_accepted')}")
 
     # TSETMC audit: all from historical V2 audit, no network, never canonical
     research_canon = {r["ticker"]: str(r["proposed_canonical_public_entry_date_jalali"]).strip()

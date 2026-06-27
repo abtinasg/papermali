@@ -1,7 +1,7 @@
 {
   "stage": "stage124_batch02_part03",
-  "generated_at": "2026-06-27T10:12:31Z",
-  "source_commit": "2a885e6c6f86778be8050dbd9de3f78796dc2b2c",
+  "generated_at": "2026-06-27T10:38:52Z",
+  "source_commit": "0280973db81ad1e02cc6a7379c7790d64c7c51d1",
   "ticker_count": 10,
   "tickers": [
     "خمهر",
@@ -16,7 +16,7 @@
     "رمپنا"
   ],
   "all_pass": true,
-  "assertion_count": 194,
+  "assertion_count": 234,
   "failed_count": 0,
   "assertions": [
     {
@@ -535,6 +535,16 @@
       "detail": "status=timeout, hash="
     },
     {
+      "assertion": "evidence_accepted_matches_engine_خمهر_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_خمهر_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
+    },
+    {
       "assertion": "failed_fetch_no_snapshot_خمهر_2",
       "passed": true,
       "detail": "status=timeout, snap="
@@ -550,6 +560,16 @@
       "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%d9%85%d9%87%d8%b1"
     },
     {
+      "assertion": "evidence_accepted_matches_engine_خمهر_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_خمهر_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
       "assertion": "failed_fetch_no_snapshot_خنصیر_1",
       "passed": true,
       "detail": "status=timeout, snap="
@@ -558,6 +578,16 @@
       "assertion": "failed_fetch_no_hash_خنصیر_1",
       "passed": true,
       "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خنصیر_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_خنصیر_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
     },
     {
       "assertion": "failed_fetch_no_snapshot_خنصیر_2",
@@ -575,6 +605,16 @@
       "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%d9%86%d8%b5%db%8c%d8%b1"
     },
     {
+      "assertion": "evidence_accepted_matches_engine_خنصیر_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_خنصیر_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
       "assertion": "failed_fetch_no_snapshot_خوساز_1",
       "passed": true,
       "detail": "status=timeout, snap="
@@ -583,6 +623,16 @@
       "assertion": "failed_fetch_no_hash_خوساز_1",
       "passed": true,
       "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خوساز_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_خوساز_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
     },
     {
       "assertion": "failed_fetch_no_snapshot_خوساز_2",
@@ -600,6 +650,16 @@
       "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%d9%88%d8%b3%d8%a7%d8%b2"
     },
     {
+      "assertion": "evidence_accepted_matches_engine_خوساز_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_خوساز_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
       "assertion": "failed_fetch_no_snapshot_خچرخش_1",
       "passed": true,
       "detail": "status=timeout, snap="
@@ -608,6 +668,16 @@
       "assertion": "failed_fetch_no_hash_خچرخش_1",
       "passed": true,
       "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خچرخش_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_خچرخش_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
     },
     {
       "assertion": "failed_fetch_no_snapshot_خچرخش_2",
@@ -625,6 +695,16 @@
       "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%da%86%d8%b1%d8%ae%d8%b4"
     },
     {
+      "assertion": "evidence_accepted_matches_engine_خچرخش_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_خچرخش_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
       "assertion": "failed_fetch_no_snapshot_خکمک_1",
       "passed": true,
       "detail": "status=timeout, snap="
@@ -633,6 +713,16 @@
       "assertion": "failed_fetch_no_hash_خکمک_1",
       "passed": true,
       "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خکمک_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_خکمک_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
     },
     {
       "assertion": "failed_fetch_no_snapshot_خکمک_2",
@@ -650,6 +740,16 @@
       "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%da%a9%d9%85%da%a9"
     },
     {
+      "assertion": "evidence_accepted_matches_engine_خکمک_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_خکمک_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
       "assertion": "failed_fetch_no_snapshot_دروز_1",
       "passed": true,
       "detail": "status=timeout, snap="
@@ -658,6 +758,16 @@
       "assertion": "failed_fetch_no_hash_دروز_1",
       "passed": true,
       "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_دروز_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_دروز_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
     },
     {
       "assertion": "failed_fetch_no_snapshot_دروز_2",
@@ -675,6 +785,16 @@
       "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%af%d8%b1%d9%88%d8%b2"
     },
     {
+      "assertion": "evidence_accepted_matches_engine_دروز_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_دروز_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
       "assertion": "failed_fetch_no_snapshot_دسبحا_1",
       "passed": true,
       "detail": "status=timeout, snap="
@@ -683,6 +803,16 @@
       "assertion": "failed_fetch_no_hash_دسبحا_1",
       "passed": true,
       "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_دسبحا_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_دسبحا_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
     },
     {
       "assertion": "failed_fetch_no_snapshot_دسبحا_2",
@@ -700,6 +830,16 @@
       "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%af%d8%b3%d8%a8%d8%ad%d8%a7"
     },
     {
+      "assertion": "evidence_accepted_matches_engine_دسبحا_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_دسبحا_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
       "assertion": "failed_fetch_no_snapshot_دیران_1",
       "passed": true,
       "detail": "status=timeout, snap="
@@ -708,6 +848,16 @@
       "assertion": "failed_fetch_no_hash_دیران_1",
       "passed": true,
       "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_دیران_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_دیران_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
     },
     {
       "assertion": "failed_fetch_no_snapshot_دیران_2",
@@ -725,6 +875,16 @@
       "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%af%db%8c%d8%b1%d8%a7%d9%86"
     },
     {
+      "assertion": "evidence_accepted_matches_engine_دیران_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_دیران_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
       "assertion": "failed_fetch_no_snapshot_رانفور_1",
       "passed": true,
       "detail": "status=timeout, snap="
@@ -733,6 +893,16 @@
       "assertion": "failed_fetch_no_hash_رانفور_1",
       "passed": true,
       "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_رانفور_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_رانفور_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
     },
     {
       "assertion": "failed_fetch_no_snapshot_رانفور_2",
@@ -750,6 +920,16 @@
       "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%b1%d8%a7%d9%86%d9%81%d9%88%d8%b1"
     },
     {
+      "assertion": "evidence_accepted_matches_engine_رانفور_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_رانفور_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
       "assertion": "failed_fetch_no_snapshot_رمپنا_1",
       "passed": true,
       "detail": "status=timeout, snap="
@@ -758,6 +938,16 @@
       "assertion": "failed_fetch_no_hash_رمپنا_1",
       "passed": true,
       "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_رمپنا_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_رمپنا_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
     },
     {
       "assertion": "failed_fetch_no_snapshot_رمپنا_2",
@@ -773,6 +963,16 @@
       "assertion": "codal_official_is_codal_domain_رمپنا_2",
       "passed": true,
       "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%b1%d9%85%d9%be%d9%86%d8%a7"
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_رمپنا_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "authority_class_matches_engine_رمپنا_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
     },
     {
       "assertion": "tsetmc_from_historical_v2_خمهر",

@@ -33,7 +33,11 @@ from project.src.stage124_batch02_part03 import (
     run_part03_qc,
     evaluate_source_record,
     decide_ready_for_user_review,
+    compute_evidence_accepted,
     classify_source_authority,
+    classify_source_authority_with_validation,
+    is_document_specific_source,
+    is_valid_exact_jalali_date,
     registrable_domain,
     _derive_screening_status,
 )
@@ -124,7 +128,8 @@ def _any_failed_containing(qc, substr):
 
 
 def _reviewed_rec(**over):
-    """A fully-accepted reviewed evidence record; override fields as needed."""
+    """A fully-accepted reviewed evidence record (official-regulatory, Codal
+    document-specific). Override fields as needed."""
     rec = {
         "ticker": PART03_TICKERS[0], "source_index": 1,
         "source_type": "codal_official",
@@ -138,9 +143,25 @@ def _reviewed_rec(**over):
         "exact_date_explicit": "true",
         "reviewed_date_jalali": "1380-03-15",
         "ordinary_share_explicit": "true",
-        "independent_source_group": "codal.ir",
+        "publication_date_jalali": "",
+        "publication_date_explicit": "false",
+        "contemporaneous_with_event": "false",
+        "independent_source_group": "",
         "evidence_accepted": "false",
     }
+    rec.update(over)
+    return rec
+
+
+def _news_rec(**over):
+    """A reviewed credible-news document-specific record (not contemporaneous by
+    default)."""
+    rec = _reviewed_rec(
+        source_type="news_agency",
+        source_url="https://donya-e-eqtesad.com/news/100",
+        source_authority_class="credible_news",
+        independent_source_group="",
+    )
     rec.update(over)
     return rec
 
@@ -229,13 +250,15 @@ def test_fetched_unreviewed_not_ready():
 
 # ---- (5) aggregator alone → not ready ------------------------------------------
 def test_aggregator_alone_not_ready():
+    # document-specific aggregator → accepted as supporting evidence but never
+    # qualifying on its own.
     rec = _reviewed_rec(source_type="market_information_aggregator",
-                        source_url="https://rahavard365.com/asset/x",
-                        source_authority_class="market_information_aggregator",
-                        independent_source_group="rahavard365.com")
+                        source_url="https://rahavard365.com/instrument/12/report",
+                        source_authority_class="market_information_aggregator")
+    assert evaluate_source_record(rec, snapshot_root=None) is True
     d = decide_ready_for_user_review([rec], snapshot_root=None)
     assert d["ready"] is False
-    assert d["reason"] == "insufficient_source_authority_or_independence"
+    assert d["reason"] == "insufficient_qualifying_or_independent_sources"
 
 
 # ---- (6) generic Codal search page → not ready ---------------------------------
@@ -252,10 +275,8 @@ def test_codal_search_page_alone_not_ready():
 
 # ---- (7) one credible source but ordinary share unknown → not ready ------------
 def test_credible_source_ordinary_share_unknown_not_ready():
-    rec = _reviewed_rec(source_authority_class="credible_news",
-                        source_url="https://donya-e-eqtesad.com/news/1",
-                        independent_source_group="donya-e-eqtesad.com",
-                        ordinary_share_explicit="unknown")
+    rec = _news_rec(source_url="https://donya-e-eqtesad.com/news/1",
+                    ordinary_share_explicit="unknown")
     assert evaluate_source_record(rec, snapshot_root=None) is False
     assert decide_ready_for_user_review([rec], snapshot_root=None)["ready"] is False
 
@@ -273,30 +294,20 @@ def test_official_source_ordinary_exact_day_ready():
 
 # ---- (9) two independent credible sources → ready ------------------------------
 def test_two_independent_credible_sources_ready():
-    r1 = _reviewed_rec(source_authority_class="credible_news",
-                       source_url="https://donya-e-eqtesad.com/news/1",
-                       independent_source_group="donya-e-eqtesad.com")
-    r2 = _reviewed_rec(source_index=2, source_authority_class="credible_news",
-                       source_url="https://isna.ir/news/2",
-                       independent_source_group="isna.ir")
+    r1 = _news_rec(source_url="https://donya-e-eqtesad.com/news/1")
+    r2 = _news_rec(source_index=2, source_url="https://isna.ir/news/2")
     d = decide_ready_for_user_review([r1, r2], snapshot_root=None)
     assert d["ready"] is True
 
 
 # ---- (10) two sources from same domain → not independent → not ready -----------
 def test_two_sources_same_domain_not_ready():
-    # both aggregator, same domain → no authority and only one group
-    r1 = _reviewed_rec(source_type="market_information_aggregator",
-                       source_authority_class="market_information_aggregator",
-                       source_url="https://rahavard365.com/asset/x",
-                       independent_source_group="rahavard365.com")
-    r2 = _reviewed_rec(source_index=2, source_type="market_information_aggregator",
-                       source_authority_class="market_information_aggregator",
-                       source_url="https://rahavard365.com/asset/y",
-                       independent_source_group="rahavard365.com")
+    # two qualifying news sources but on the SAME domain → not independent
+    r1 = _news_rec(source_url="https://isna.ir/news/1")
+    r2 = _news_rec(source_index=2, source_url="https://isna.ir/news/2")
     d = decide_ready_for_user_review([r1, r2], snapshot_root=None)
     assert d["ready"] is False
-    assert d["reason"] == "insufficient_source_authority_or_independence"
+    assert d["reason"] == "insufficient_qualifying_or_independent_sources"
 
 
 # ---- (11) snapshot hash mismatch → not accepted → not ready --------------------
@@ -320,11 +331,9 @@ def test_snapshot_hash_mismatch_not_ready():
 # ---- (12) conflicting dates → not ready ----------------------------------------
 def test_conflicting_dates_not_ready():
     r1 = _reviewed_rec(reviewed_date_jalali="1380-03-15")
-    r2 = _reviewed_rec(source_index=2, source_authority_class="credible_news",
-                       source_url="https://isna.ir/news/2",
-                       independent_source_group="isna.ir",
-                       event_type_supported="first_public_trading",
-                       reviewed_date_jalali="1381-04-20")
+    r2 = _news_rec(source_index=2, source_url="https://isna.ir/news/2",
+                   event_type_supported="first_public_trading",
+                   reviewed_date_jalali="1381-04-20")
     d = decide_ready_for_user_review([r1, r2], snapshot_root=None)
     assert d["ready"] is False
     assert d["conflict_flag"] is True
@@ -651,6 +660,190 @@ def test_frozen_change_detected():
     qc = run_part03_qc(tickers_df, research_df, prov_df, tsetmc_df,
                        before, after, {}, {})
     assert _any_failed_containing(qc, "frozen_unchanged")
+
+
+# ================================================================================
+# Part 3.1A.1 — Evidence Engine hardening (20 required checks)
+# ================================================================================
+
+# (1) declared codal_official on aggregator domain → unknown + validation error
+def test_h01_codal_official_on_tacodal_unknown():
+    cls, err = classify_source_authority_with_validation("codal_official",
+                                                         "https://tacodal.ir/symbol/x")
+    assert cls == "unknown"
+    assert err != ""
+
+
+# (2) declared codal_official on look-alike domain → invalid
+def test_h02_codal_official_on_fake_codal_invalid():
+    cls, err = classify_source_authority_with_validation("codal_official",
+                                                         "https://fake-codal.ir/x")
+    assert cls == "unknown" and err != ""
+    # boundary: codal.ir.example.com must NOT be treated as codal
+    cls2, err2 = classify_source_authority_with_validation("codal_official",
+                                                           "https://codal.ir.example.com/x")
+    assert cls2 == "unknown" and err2 != ""
+
+
+# (3) genuine codal.ir → official_regulatory, no error
+def test_h03_real_codal_official():
+    cls, err = classify_source_authority_with_validation(
+        "codal_official", "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=1")
+    assert cls == "official_regulatory" and err == ""
+
+
+# (4) news_agency on unknown domain → unknown
+def test_h04_news_agency_unknown_domain():
+    cls, err = classify_source_authority_with_validation("news_agency",
+                                                         "https://random-blog.example/x")
+    assert cls == "unknown" and err != ""
+
+
+# (5) two aggregators from different domains → ready=false
+def test_h05_two_aggregators_diff_domains_not_ready():
+    r1 = _reviewed_rec(source_type="market_information_aggregator",
+                       source_url="https://rahavard365.com/instrument/12/report",
+                       source_authority_class="market_information_aggregator")
+    r2 = _reviewed_rec(source_index=2, source_type="market_information_aggregator",
+                       source_url="https://tgju.org/profile/12/report",
+                       source_authority_class="market_information_aggregator")
+    assert decide_ready_for_user_review([r1, r2], snapshot_root=None)["ready"] is False
+
+
+# (6) aggregator + unknown → ready=false
+def test_h06_aggregator_plus_unknown_not_ready():
+    r1 = _reviewed_rec(source_type="market_information_aggregator",
+                       source_url="https://rahavard365.com/instrument/12/report")
+    r2 = _reviewed_rec(source_index=2, source_type="",
+                       source_url="https://random-blog.example/post/9")
+    assert decide_ready_for_user_review([r1, r2], snapshot_root=None)["ready"] is False
+
+
+# (7) two qualifying independent sources → ready=true
+def test_h07_two_qualifying_independent_ready():
+    r1 = _news_rec(source_url="https://donya-e-eqtesad.com/news/100")
+    r2 = _news_rec(source_index=2, source_url="https://isna.ir/news/200")
+    assert decide_ready_for_user_review([r1, r2], snapshot_root=None)["ready"] is True
+
+
+# (8) two qualifying sources on the same domain → ready=false
+def test_h08_two_qualifying_same_domain_not_ready():
+    r1 = _news_rec(source_url="https://isna.ir/news/100")
+    r2 = _news_rec(source_index=2, source_url="https://isna.ir/news/200")
+    d = decide_ready_for_user_review([r1, r2], snapshot_root=None)
+    assert d["ready"] is False
+
+
+# (9) generic Codal ReportList with event/date filled → evidence=false
+def test_h09_codal_reportlist_filled_not_evidence():
+    rec = _reviewed_rec(
+        source_url="https://www.codal.ir/ReportList.aspx?search&Symbol=x",
+        event_type_supported="first_public_offering",
+        exact_date_explicit="true", reviewed_date_jalali="1380-03-15")
+    assert evaluate_source_record(rec, snapshot_root=None) is False
+    assert decide_ready_for_user_review([rec], snapshot_root=None)["ready"] is False
+
+
+# (10) Codal document-specific (LetterSerial) → can be evidence=true
+def test_h10_codal_document_specific_evidence():
+    rec = _reviewed_rec(
+        source_url="https://www.codal.ir/Reports/Decision.aspx?LetterSerial=XYZ123")
+    assert is_document_specific_source(rec["source_url"], "codal_official") is True
+    assert evaluate_source_record(rec, snapshot_root=None) is True
+
+
+# (11) year-only date → evidence=false
+def test_h11_year_only_not_evidence():
+    assert is_valid_exact_jalali_date("1380") is False
+    rec = _reviewed_rec(reviewed_date_jalali="1380")
+    assert evaluate_source_record(rec, snapshot_root=None) is False
+
+
+# (12) month-only date → evidence=false
+def test_h12_month_only_not_evidence():
+    assert is_valid_exact_jalali_date("1380-03") is False
+    rec = _reviewed_rec(reviewed_date_jalali="1380-03")
+    assert evaluate_source_record(rec, snapshot_root=None) is False
+
+
+# (13) invalid Jalali → evidence=false
+def test_h13_invalid_jalali_not_evidence():
+    for bad in ("1380/03", "1380-13-01", "1380-02-32", "unknown", ""):
+        assert is_valid_exact_jalali_date(bad) is False
+        rec = _reviewed_rec(reviewed_date_jalali=bad)
+        assert evaluate_source_record(rec, snapshot_root=None) is False
+
+
+# (14) valid exact Jalali → acceptable
+def test_h14_valid_exact_jalali_acceptable():
+    assert is_valid_exact_jalali_date("1380-03-15") is True
+    assert evaluate_source_record(_reviewed_rec(), snapshot_root=None) is True
+
+
+# (15) credible news without publication date → ready=false
+def test_h15_news_without_pub_date_not_ready():
+    rec = _news_rec()  # publication_date_explicit false by default
+    assert decide_ready_for_user_review([rec], snapshot_root=None)["ready"] is False
+
+
+# (16) credible news with publication date far from event → ready=false
+def test_h16_news_pub_date_far_not_ready():
+    rec = _news_rec(publication_date_explicit="true",
+                    publication_date_jalali="1381-03-15",  # ~1 year after event
+                    reviewed_date_jalali="1380-03-15")
+    assert decide_ready_for_user_review([rec], snapshot_root=None)["ready"] is False
+
+
+# (17) credible news contemporaneous with event → can be ready=true
+def test_h17_news_contemporaneous_ready():
+    rec = _news_rec(publication_date_explicit="true",
+                    publication_date_jalali="1380-03-20",  # 5 days after event
+                    reviewed_date_jalali="1380-03-15")
+    d = decide_ready_for_user_review([rec], snapshot_root=None)
+    assert d["ready"] is True
+
+
+# (18) manual evidence_accepted=true on an invalid record → recomputed false
+def test_h18_manual_evidence_accepted_overridden():
+    # invalid: ordinary share unknown, manually flagged accepted
+    rec = _reviewed_rec(ordinary_share_explicit="unknown", evidence_accepted="true")
+    assert compute_evidence_accepted(rec, snapshot_root=None) == "false"
+    # build_source_provenance must overwrite the manual value with the computed one
+    fetch = {tk: [] for tk in PART03_TICKERS}
+    bad = dict(rec); bad["ticker"] = PART03_TICKERS[0]; bad["retrieval_status"] = "timeout"
+    bad["evidence_accepted"] = "true"
+    fetch[PART03_TICKERS[0]] = [bad]
+    prov = build_source_provenance(fetch, snapshot_root=None)
+    assert not (prov["evidence_accepted"].str.lower() == "true").any()
+
+
+# (19) fabricated independent_source_group inconsistent with URL → not accepted
+def test_h19_fake_independent_group_rejected():
+    rec = _news_rec(source_url="https://isna.ir/news/1",
+                    publication_date_explicit="true",
+                    publication_date_jalali="1380-03-20",
+                    independent_source_group="donya-e-eqtesad.com")  # lies about domain
+    assert evaluate_source_record(rec, snapshot_root=None) is False
+    assert decide_ready_for_user_review([rec], snapshot_root=None)["ready"] is False
+
+
+# (20) all 10 current tickers remain blocked / not ready
+def test_h20_all_current_tickers_blocked():
+    _, research_df, prov_df, _ = _baseline_dfs()
+    assert (research_df["research_status"] == "research_blocked_network").all()
+    assert (research_df["ready_for_user_review"].str.lower() == "false").all()
+    assert (prov_df["evidence_accepted"].str.lower() != "true").all()
+    assert (prov_df["document_specific"].str.lower() == "false").all()
+
+
+def test_h_qc_evidence_accepted_recompute_detects_mismatch():
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    j = prov_df.index[0]
+    tk = prov_df.at[j, "ticker"]
+    idx = prov_df.at[j, "source_index"]
+    prov_df.at[j, "evidence_accepted"] = "true"  # invalid manual override
+    qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
+    assert _result(qc, f"evidence_accepted_matches_engine_{tk}_{idx}") is False
 
 
 # ---- (15)(16) real generated output --------------------------------------------

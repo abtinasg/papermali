@@ -21,6 +21,38 @@ verified master, does **not** run Gate B, and does **not** run any modelling.
 
 No Part 2 or Pilot15 ticker is re-researched.
 
+## Evidence engine hardening (Part 3.1A.1)
+
+The evidence engine was tightened before any real research:
+
+- **Domain-strict taxonomy.** `classify_source_authority()` is fail-closed and
+  uses `urllib.parse` with boundary-safe host matching. The URL's real domain is
+  the source of truth; a declared `source_type` that contradicts the domain
+  yields `unknown` plus an `authority_validation_error`. `codal_official` is only
+  valid on `codal.ir` (or a real subdomain) — `fake-codal.ir`, `codal.ir.example.com`
+  and Tacodal can never be official.
+- **Discovery vs. document.** `is_document_specific_source()` rejects search /
+  list / overview pages (Codal `ReportList.aspx`, symbol-search, Rahavard
+  `/asset/`, homepages). Codal evidence is accepted only from a specific document
+  with a stable id (LetterSerial / TracingNo / AnnouncementId / attachment / PDF).
+- **Real exact-day dates.** `is_valid_exact_jalali_date()` requires a complete,
+  in-range, round-trippable `YYYY-MM-DD`; year-only, month-only and invalid
+  strings are rejected.
+- **Qualifying sources only.** Two-independent readiness counts only qualifying
+  authorities (official-regulatory / credible-news / company-official) from two
+  different real domains. Aggregator/unknown sources may corroborate but never
+  make a record ready — two aggregators or aggregator+unknown never reach ready.
+- **Contemporaneous news.** A single credible-news source must carry an explicit
+  publication date within 30 days of the event; an official-regulatory document
+  needs no contemporaneity but must still be document-specific, reviewed,
+  hash-backed, ordinary-share-explicit and exact-day.
+- **Computed `evidence_accepted`.** Provenance `evidence_accepted` is always the
+  engine's recomputation (manual values are ignored); QC re-checks the match.
+- New provenance columns: `authority_validation_error`, `document_specific`,
+  `publication_date_jalali`, `publication_date_explicit`,
+  `contemporaneous_with_event`. For the 20 current (timeout) records they are
+  `false`/empty and `evidence_accepted=false`.
+
 ## Research status vs. evidence (Part 3.1A correction)
 
 A failed fetch (`timeout` / `connection_error` / `fetch_error`) means the
