@@ -1,0 +1,17 @@
+Stage124 Batch02 Part 2.1B — Finalizer Test Output
+====================================================
+
+Command:
+  python -m pytest -q project/tests/test_stage124_batch02_part02.py project/tests/test_stage124_batch02_part02_finalize.py project/tests/test_stage124_batch02_v2.py
+
+........................................................................ [ 39%]
+........................................................................ [ 79%]
+.....................................                                    [100%]
+181 passed in 4.46s
+
+exit_code: 0
+wall_clock_seconds: 5
+
+summary:
+  passed: 181
+  failed: 0

@@ -359,5 +359,155 @@
       "passed": true,
       "detail": "sha=ece991c5ff28"
     }
-  ]
+  ],
+  "finalization": {
+    "finalizer_source_commit": "014af89ca0cccbe4f1fefba71b39b71729361a92",
+    "research_state_commit": "9f8894a3dbc1c9507bb8e12035663eaa8cb8b9da",
+    "finalized_at_utc": "2026-06-27T00:22:49Z",
+    "all_pass": true,
+    "assertion_count": 28,
+    "failed_count": 0,
+    "assertions": [
+      {
+        "assertion": "immutable_sha_unchanged_part02_research_screening_10tickers.csv",
+        "passed": true,
+        "detail": "expected=2c0b39bcbcdd, actual=2c0b39bcbcdd"
+      },
+      {
+        "assertion": "immutable_sha_unchanged_part02_source_provenance_10tickers.csv",
+        "passed": true,
+        "detail": "expected=2a5d0513a8e1, actual=2a5d0513a8e1"
+      },
+      {
+        "assertion": "immutable_sha_unchanged_part02_tsetmc_audit_10tickers.csv",
+        "passed": true,
+        "detail": "expected=5b6f21f26fc7, actual=5b6f21f26fc7"
+      },
+      {
+        "assertion": "immutable_sha_unchanged_snapshots_hkeshti/source_1.html",
+        "passed": true,
+        "detail": "expected=09152a6ce812, actual=09152a6ce812"
+      },
+      {
+        "assertion": "exactly_10_tickers",
+        "passed": true,
+        "detail": "rows=10"
+      },
+      {
+        "assertion": "exact_ticker_set",
+        "passed": true,
+        "detail": "set=['بموتو', 'ثشرق', 'ثنوسا', 'حپترو', 'حکشتی', 'خاذین', 'خبهمن', 'ختوقا', 'خرینگ', 'خمحور']"
+      },
+      {
+        "assertion": "duplicate_ticker_count_zero",
+        "passed": true,
+        "detail": "duplicates=0"
+      },
+      {
+        "assertion": "exact_day_canonical_count_zero",
+        "passed": true,
+        "detail": "count=0"
+      },
+      {
+        "assertion": "admission_only_count_six",
+        "passed": true,
+        "detail": "count=6"
+      },
+      {
+        "assertion": "unresolved_count_four",
+        "passed": true,
+        "detail": "count=4"
+      },
+      {
+        "assertion": "ready_for_user_review_count_zero",
+        "passed": true,
+        "detail": "count=0"
+      },
+      {
+        "assertion": "hkeshti_evidence_requires_manual_review",
+        "passed": true,
+        "detail": "evidence_status=requires_manual_review"
+      },
+      {
+        "assertion": "hkeshti_ready_for_user_review_false",
+        "passed": true,
+        "detail": "ready_for_user_review=false"
+      },
+      {
+        "assertion": "hkeshti_canonical_jalali_empty",
+        "passed": true,
+        "detail": "canonical_jalali="
+      },
+      {
+        "assertion": "hkeshti_canonical_gregorian_empty",
+        "passed": true,
+        "detail": "canonical_gregorian="
+      },
+      {
+        "assertion": "hkeshti_event_type_unresolved",
+        "passed": true,
+        "detail": "event_type=unresolved"
+      },
+      {
+        "assertion": "snapshot_exists",
+        "passed": true,
+        "detail": "True"
+      },
+      {
+        "assertion": "snapshot_sha_matches_provenance",
+        "passed": true,
+        "detail": "snap=09152a6ce812, prov=09152a6ce812"
+      },
+      {
+        "assertion": "no_absolute_paths_in_outputs",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "assertion": "all_required_package_files_exist",
+        "passed": true,
+        "detail": "all present (manifest sealed separately)"
+      },
+      {
+        "assertion": "no_verified_user_confirmed",
+        "passed": true,
+        "detail": "skipped in test mode"
+      },
+      {
+        "assertion": "no_user_decision",
+        "passed": true,
+        "detail": "no user_decision column in research screening"
+      },
+      {
+        "assertion": "no_full_verified_master",
+        "passed": true,
+        "detail": "skipped in test mode"
+      },
+      {
+        "assertion": "no_gate_b",
+        "passed": true,
+        "detail": "Gate B not executed"
+      },
+      {
+        "assertion": "no_modeling",
+        "passed": true,
+        "detail": "modeling not executed"
+      },
+      {
+        "assertion": "no_network_request",
+        "passed": true,
+        "detail": "no network requests"
+      },
+      {
+        "assertion": "no_tsetmc_probe",
+        "passed": true,
+        "detail": "no TSETMC probe"
+      },
+      {
+        "assertion": "no_source_fetch",
+        "passed": true,
+        "detail": "no source fetch"
+      }
+    ]
+  }
 }
