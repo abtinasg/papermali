@@ -78,12 +78,19 @@ from project.src.stage124_batch02_part02_finalize import (
     verify_final_package,
     _sha256_file,
     _check_immutable_hashes,
+    _compute_counts,
+    _frozen_records,
+    _scan_verified_user_confirmed,
 )
+
+import shutil
+import project.src.stage124_batch02_part02_finalize as fin
 
 from project.src.stage124_batch02_part02 import (
     PART02_TICKERS,
     PART02_DIR,
     FROZEN_FILES,
+    FULL_VERIFIED_FORBIDDEN,
 )
 
 from project.src.stage124_batch02_v2 import (
@@ -405,7 +412,7 @@ class TestMetadata:
     def test_metadata_counts(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         assert m["exact_day_canonical_count"] == 0
         assert m["admission_only_count"] == 6
         assert m["unresolved_count"] == 4
@@ -414,7 +421,7 @@ class TestMetadata:
     def test_metadata_commits(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         assert m["finalizer_source_commit"] == TEST_FINALIZER_COMMIT
         assert m["research_state_commit"] == TEST_RESEARCH_COMMIT
         assert m["initial_generation_source_commit"] == INITIAL_GENERATION_SOURCE_COMMIT
@@ -422,7 +429,7 @@ class TestMetadata:
     def test_metadata_network_flags_false(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         assert m["network_requests_performed"] is False
         assert m["tsetmc_probe_performed"] is False
         assert m["source_fetch_performed"] is False
@@ -435,7 +442,7 @@ class TestMetadata:
     def test_metadata_hkeshti_status(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         assert m["hkeshti_status"]["evidence_status"] == "requires_manual_review"
         assert m["hkeshti_status"]["ready_for_user_review"] is False
         assert m["hkeshti_status"]["proposed_canonical_jalali"] == ""
@@ -446,14 +453,14 @@ class TestMetadata:
     def test_metadata_manifest_semantics(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         assert m["manifest_source_commit_semantics"] == \
             "commit containing the offline finalizer code used to seal Part 2"
 
     def test_metadata_ticker_count(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        m = build_metadata(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         assert m["ticker_count"] == 10
         assert m["tickers"] == list(PART02_TICKERS)
 
@@ -491,7 +498,7 @@ class TestSummary:
     def test_summary_substantive_fields_unchanged(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        s = update_summary(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        s = update_summary(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         assert s["exact_day_dates"] == {}
         assert s["admission_only_tickers"] == ADMISSION_ONLY_TICKERS
         assert s["unresolved_tickers"] == UNRESOLVED_TICKERS
@@ -500,13 +507,13 @@ class TestSummary:
     def test_summary_source_commit_preserved(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        s = update_summary(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        s = update_summary(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         assert s["source_commit"] == INITIAL_GENERATION_SOURCE_COMMIT
 
     def test_summary_finalization_object(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        s = update_summary(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        s = update_summary(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         assert "finalization" in s
         fin = s["finalization"]
         assert fin["research_state_commit"] == TEST_RESEARCH_COMMIT
@@ -523,7 +530,7 @@ class TestQCReport:
     def test_qc_finalization_object_added(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         assert "finalization" in qc
         fin = qc["finalization"]
         assert fin["finalizer_source_commit"] == TEST_FINALIZER_COMMIT
@@ -532,7 +539,7 @@ class TestQCReport:
     def test_qc_hkeshti_unresolved(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         fin = qc["finalization"]
         assertion_names = [a["assertion"] for a in fin["assertions"]]
         assert "hkeshti_evidence_requires_manual_review" in assertion_names
@@ -544,7 +551,7 @@ class TestQCReport:
     def test_qc_immutable_checks(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         fin = qc["finalization"]
         assertion_names = [a["assertion"] for a in fin["assertions"]]
         assert "immutable_sha_unchanged_part02_research_screening_10tickers.csv" in assertion_names
@@ -555,7 +562,7 @@ class TestQCReport:
     def test_qc_all_pass(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        qc = update_qc_report(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         fin = qc["finalization"]
         failed = [a for a in fin["assertions"] if not a["passed"]]
         assert fin["all_pass"] is True, f"Failed assertions: {[(a['assertion'], a['detail']) for a in failed]}"
@@ -643,7 +650,7 @@ class TestPrepareSealVerify:
     def test_prepare_outputs_creates_files(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        results = prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        results = prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
         assert (pkg / "part02_tickers.csv").exists()
         assert (pkg / "part02_metadata_and_hashes.json").exists()
         assert (pkg / "README_PART02.md").exists()
@@ -653,22 +660,22 @@ class TestPrepareSealVerify:
     def test_seal_manifest_creates_manifest(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
-        seal_manifest(TEST_FINALIZER_COMMIT, pkg)
+        prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
+        seal_manifest(TEST_FINALIZER_COMMIT, pkg, fixture_mode=True)
         assert (pkg / "part02_hash_manifest.csv").exists()
 
     def test_verify_final_package_passes(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
-        seal_manifest(TEST_FINALIZER_COMMIT, pkg)
-        ok = verify_final_package(TEST_FINALIZER_COMMIT, pkg)
+        prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
+        seal_manifest(TEST_FINALIZER_COMMIT, pkg, fixture_mode=True)
+        ok = verify_final_package(TEST_FINALIZER_COMMIT, pkg, fixture_mode=True)
         assert ok is True
 
     def test_verify_fails_when_manifest_missing(self, tmp_path):
         base = _make_synthetic_package(tmp_path)
         pkg = base / "stage124" / "batch02_parts"
-        ok = verify_final_package(TEST_FINALIZER_COMMIT, pkg)
+        ok = verify_final_package(TEST_FINALIZER_COMMIT, pkg, fixture_mode=True)
         assert ok is False
 
     def test_full_workflow_offline(self, tmp_path):
@@ -677,7 +684,7 @@ class TestPrepareSealVerify:
         pkg = base / "stage124" / "batch02_parts"
 
         # Prepare
-        prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg)
+        prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
 
         # Verify tickers CSV
         tdf = pd.read_csv(pkg / "part02_tickers.csv", dtype=str, keep_default_na=False)
@@ -701,8 +708,8 @@ class TestPrepareSealVerify:
         assert qc["finalization"]["all_pass"] is True
 
         # Seal and verify
-        seal_manifest(TEST_FINALIZER_COMMIT, pkg)
-        ok = verify_final_package(TEST_FINALIZER_COMMIT, pkg)
+        seal_manifest(TEST_FINALIZER_COMMIT, pkg, fixture_mode=True)
+        ok = verify_final_package(TEST_FINALIZER_COMMIT, pkg, fixture_mode=True)
         assert ok is True
 
 
@@ -740,3 +747,197 @@ class TestConstants:
 
     def test_hkeshti_conflict_dates(self):
         assert HKESHTI_CONFLICT_DATES == ["1387-02-28", "1387-02-29"]
+
+
+# ---- Part 2.1B.1: Real-mode vs fixture-mode separation --------------------------
+
+REAL_FSC = "0" * 40
+
+
+def _copy_real_package(tmp_path):
+    """Copy the real Part 2 package (plus its src/tests sources) into tmp_path,
+    mirroring the repo layout so manifest/verify can run.  Frozen/Stage122/123
+    checks still reference the real repository (global ROOT)."""
+    (tmp_path / "stage124").mkdir(parents=True, exist_ok=True)
+    pkg = tmp_path / "stage124" / "batch02_parts"
+    shutil.copytree(PART02_DIR, pkg)
+    for rel, _role in MANIFEST_ROWS:
+        if rel.startswith("src/") or rel.startswith("tests/"):
+            dst = tmp_path / rel
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / rel, dst)
+    return pkg
+
+
+class TestRealModeSeparation:
+    # 1. base_dir=PART02_DIR in real mode must NOT trigger fixture mode.
+    def test_base_dir_does_not_trigger_fixture_mode(self):
+        m = build_metadata(REAL_FSC, RESEARCH_STATE_COMMIT, PART02_DIR)
+        assert len(m["frozen_input_hashes"]) > 0
+        assert all(r["match"] for r in m["frozen_input_hashes"])
+
+    # 13. fixture mode only via explicit parameter.
+    def test_fixture_mode_only_with_explicit_param(self):
+        real = build_metadata(REAL_FSC, RESEARCH_STATE_COMMIT, PART02_DIR)
+        fx = build_metadata(REAL_FSC, RESEARCH_STATE_COMMIT, PART02_DIR, fixture_mode=True)
+        assert len(real["frozen_input_hashes"]) > 0
+        assert fx["frozen_input_hashes"] == []
+
+    # 2. metadata in real mode has non-empty frozen hashes (all match).
+    def test_metadata_real_mode_frozen_hashes_nonempty(self):
+        m = build_metadata(REAL_FSC, RESEARCH_STATE_COMMIT, PART02_DIR)
+        fr = m["frozen_input_hashes"]
+        assert len(fr) == len(FROZEN_FILES)
+        for rec in fr:
+            assert rec["expected_sha256_from_research_state"]
+            assert rec["actual_sha256"]
+            assert rec["match"] is True
+
+    # 3. real QC has no "skipped in test mode" / "skipped in fixture mode".
+    def test_real_qc_no_skipped_phrases(self):
+        qc = update_qc_report(REAL_FSC, RESEARCH_STATE_COMMIT)
+        for a in qc["finalization"]["assertions"]:
+            assert "skipped in test mode" not in a["detail"]
+            assert "skipped in fixture mode" not in a["detail"]
+        assert qc["finalization"]["all_pass"] is True
+
+    # 4. changing an immutable file makes real QC fail.
+    def test_immutable_change_fails(self, tmp_path):
+        pkg = _copy_real_package(tmp_path)
+        with open(pkg / "part02_tsetmc_audit_10tickers.csv", "a", encoding="utf-8") as f:
+            f.write("\n# tampered\n")
+        qc = update_qc_report(REAL_FSC, RESEARCH_STATE_COMMIT, pkg)
+        assert qc["finalization"]["all_pass"] is False
+        imm = [a for a in qc["finalization"]["assertions"]
+               if a["assertion"].startswith("immutable_sha_unchanged_part02_tsetmc_audit")]
+        assert imm and imm[0]["passed"] is False
+
+    # 5. changing a frozen file vs research state makes real QC fail.
+    def test_frozen_change_fails(self, monkeypatch):
+        monkeypatch.setattr(fin, "_research_state_blob", lambda *a, **k: b"tampered-content")
+        # also break the pinned fallback for stage122/123
+        monkeypatch.setattr(fin, "EXPECTED_STAGE122_SHA", "0" * 64)
+        monkeypatch.setattr(fin, "EXPECTED_STAGE123_SHA", "0" * 64)
+        qc = update_qc_report(REAL_FSC, RESEARCH_STATE_COMMIT)
+        assert qc["finalization"]["all_pass"] is False
+        frozen_fails = [a for a in qc["finalization"]["assertions"]
+                        if a["assertion"].startswith("frozen_unchanged_") and not a["passed"]]
+        assert len(frozen_fails) > 0
+
+    # 6. Stage122 mismatch makes real QC fail.
+    def test_stage122_mismatch_fails(self, monkeypatch):
+        monkeypatch.setattr(fin, "EXPECTED_STAGE122_SHA", "deadbeef" * 8)
+        qc = update_qc_report(REAL_FSC, RESEARCH_STATE_COMMIT)
+        s122 = [a for a in qc["finalization"]["assertions"]
+                if a["assertion"] == "stage122_sha_unchanged"][0]
+        assert s122["passed"] is False
+        assert qc["finalization"]["all_pass"] is False
+
+    # 7. Stage123 mismatch makes real QC fail.
+    def test_stage123_mismatch_fails(self, monkeypatch):
+        monkeypatch.setattr(fin, "EXPECTED_STAGE123_SHA", "deadbeef" * 8)
+        qc = update_qc_report(REAL_FSC, RESEARCH_STATE_COMMIT)
+        s123 = [a for a in qc["finalization"]["assertions"]
+                if a["assertion"] == "stage123_sha_unchanged"][0]
+        assert s123["passed"] is False
+        assert qc["finalization"]["all_pass"] is False
+
+    # 8. changing an evidence_status changes counts and fails.
+    def test_evidence_status_change_changes_count_and_fails(self, tmp_path):
+        pkg = _copy_real_package(tmp_path)
+        sp = pkg / "part02_research_screening_10tickers.csv"
+        df = pd.read_csv(sp, dtype=str, encoding="utf-8-sig", keep_default_na=False)
+        # flip حکشتی from requires_manual_review -> admission-only status
+        df.loc[df["ticker"] == "حکشتی", "evidence_status"] = "requires_first_public_trade_evidence"
+        df.to_csv(sp, index=False, encoding="utf-8-sig")
+        counts = _compute_counts(sp)
+        assert counts["unresolved_count"] != 4  # data really changed
+        qc = update_qc_report(REAL_FSC, RESEARCH_STATE_COMMIT, pkg)
+        assert qc["finalization"]["all_pass"] is False
+        bad = [a for a in qc["finalization"]["assertions"]
+               if a["assertion"] in ("unresolved_count_four", "admission_only_count_six")
+               and not a["passed"]]
+        assert len(bad) > 0
+
+    # 9. adding verified_user_confirmed to an output makes real QC fail.
+    def test_verified_user_confirmed_added_fails(self, tmp_path):
+        pkg = _copy_real_package(tmp_path)
+        with open(pkg / "part02_summary.json", "a", encoding="utf-8") as f:
+            f.write('\n{"flag": "verified_user_confirmed"}\n')
+        qc = update_qc_report(REAL_FSC, RESEARCH_STATE_COMMIT, pkg)
+        vuc = [a for a in qc["finalization"]["assertions"]
+               if a["assertion"] == "no_verified_user_confirmed"][0]
+        assert vuc["passed"] is False
+        assert qc["finalization"]["all_pass"] is False
+
+    # 10. existence of full verified master makes real QC fail.
+    def test_full_verified_master_exists_fails(self, tmp_path, monkeypatch):
+        fake_master = tmp_path / "listing_master_verified_stage124.csv"
+        fake_master.write_text("x\n", encoding="utf-8")
+        monkeypatch.setattr(fin, "FULL_VERIFIED_FORBIDDEN", fake_master)
+        qc = update_qc_report(REAL_FSC, RESEARCH_STATE_COMMIT)
+        fm = [a for a in qc["finalization"]["assertions"]
+              if a["assertion"] == "no_full_verified_master"][0]
+        assert fm["passed"] is False
+        assert qc["finalization"]["all_pass"] is False
+
+
+class TestVerifierStrengthened:
+    def test_real_verify_passes_on_clean_copy(self, tmp_path):
+        pkg = _copy_real_package(tmp_path)
+        prepare_outputs(REAL_FSC, RESEARCH_STATE_COMMIT, pkg)  # fresh real-mode QC/metadata
+        seal_manifest(REAL_FSC, pkg)
+        assert verify_final_package("", pkg) is True
+
+    # 11. verifier fails when QC all_pass=false.
+    def test_verify_fails_when_all_pass_false(self, tmp_path):
+        pkg = _copy_real_package(tmp_path)
+        prepare_outputs(REAL_FSC, RESEARCH_STATE_COMMIT, pkg)
+        qcp = pkg / "part02_qc_report.json"
+        qc = json.loads(qcp.read_text(encoding="utf-8"))
+        qc["finalization"]["all_pass"] = False
+        qc["finalization"]["failed_count"] = 1
+        qcp.write_text(json.dumps(qc, ensure_ascii=False, indent=2), encoding="utf-8")
+        seal_manifest(REAL_FSC, pkg)  # re-seal so manifest matches the tamper
+        assert verify_final_package("", pkg) is False
+
+    # 12. verifier fails when frozen hashes empty.
+    def test_verify_fails_when_frozen_hashes_empty(self, tmp_path):
+        pkg = _copy_real_package(tmp_path)
+        prepare_outputs(REAL_FSC, RESEARCH_STATE_COMMIT, pkg)
+        mp = pkg / "part02_metadata_and_hashes.json"
+        meta = json.loads(mp.read_text(encoding="utf-8"))
+        meta["frozen_input_hashes"] = []
+        mp.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+        seal_manifest(REAL_FSC, pkg)
+        assert verify_final_package("", pkg) is False
+
+    def test_verify_fails_when_skipped_phrase_present(self, tmp_path):
+        pkg = _copy_real_package(tmp_path)
+        prepare_outputs(REAL_FSC, RESEARCH_STATE_COMMIT, pkg)
+        qcp = pkg / "part02_qc_report.json"
+        qc = json.loads(qcp.read_text(encoding="utf-8"))
+        qc["finalization"]["assertions"].append(
+            {"assertion": "injected", "passed": True, "detail": "skipped in test mode"})
+        qcp.write_text(json.dumps(qc, ensure_ascii=False, indent=2), encoding="utf-8")
+        seal_manifest(REAL_FSC, pkg)
+        assert verify_final_package("", pkg) is False
+
+
+# 14. tmp_path tests still pass with no network access (fixture mode).
+class TestFixtureModeOffline:
+    def test_full_fixture_workflow_offline(self, tmp_path):
+        base = _make_synthetic_package(tmp_path)
+        pkg = base / "stage124" / "batch02_parts"
+        prepare_outputs(TEST_FINALIZER_COMMIT, TEST_RESEARCH_COMMIT, pkg, fixture_mode=True)
+        seal_manifest(TEST_FINALIZER_COMMIT, pkg, fixture_mode=True)
+        assert verify_final_package(TEST_FINALIZER_COMMIT, pkg, fixture_mode=True) is True
+
+    def test_frozen_records_helper_real(self):
+        recs = _frozen_records(RESEARCH_STATE_COMMIT)
+        assert len(recs) == len(FROZEN_FILES)
+        assert all(r["match"] for r in recs)
+
+    def test_scan_verified_user_confirmed_clean(self):
+        found, _ = _scan_verified_user_confirmed(PART02_DIR)
+        assert found is False

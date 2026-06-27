@@ -79,6 +79,22 @@ UNRESOLVED_TICKERS = ["حکشتی", "خاذین", "خبهمن", "ختوقا"]
 
 HKESHTI_CONFLICT_DATES = ["1387-02-28", "1387-02-29"]
 
+# evidence_status values used for real, data-derived count computation.
+ADMISSION_ONLY_EVIDENCE_STATUS = "requires_first_public_trade_evidence"
+# evidence_status values that mark a ticker as "unresolved" (needs manual review)
+# when no canonical public-entry date has been established.
+UNRESOLVED_EVIDENCE_STATUSES = {"requires_manual_review"}
+
+# Repo root (parent of the project ROOT) — used for `git show` of frozen files.
+REPO_ROOT = ROOT.parent
+# Prefix of a frozen file's path relative to the git repo root.
+PROJECT_PREFIX = ROOT.name  # "project"
+
+# Expected SHA-256 of the four immutable research inputs (defensive duplicate of
+# EXPECTED_IMMUTABLE_HASHES values; kept here so real-mode equality is explicit).
+# Forbidden phrase markers (must never appear in a real-mode QC report).
+FORBIDDEN_QC_PHRASES = ["skipped in test mode", "skipped in fixture mode"]
+
 
 # ---- helpers --------------------------------------------------------------------
 
@@ -127,14 +143,16 @@ def _git_branch() -> str:
         return ""
 
 
-def _check_immutable_hashes(base_dir: Path | None = None) -> dict:
+def _check_immutable_hashes(base_dir: Path | None = None,
+                            fixture_mode: bool = False) -> dict:
     """Return dict of filename -> (expected, actual, match).
 
-    When base_dir is provided (test mode), only checks file existence,
-    not hash equality, since synthetic data won't match real hashes.
+    base_dir only determines WHERE the files are read from; it does NOT
+    decide the verification mode.  In real mode (fixture_mode=False) the
+    actual SHA must equal the expected SHA.  In fixture mode the synthetic
+    data cannot match real hashes, so only existence is required.
     """
     bd = base_dir if base_dir is not None else PART02_DIR
-    test_mode = base_dir is not None
     results = {}
     for rel, expected in EXPECTED_IMMUTABLE_HASHES.items():
         fp = bd / rel
@@ -142,9 +160,121 @@ def _check_immutable_hashes(base_dir: Path | None = None) -> dict:
         results[rel] = {
             "expected": expected,
             "actual": actual,
-            "match": (fp.exists() if test_mode else actual == expected),
+            "match": (fp.exists() if fixture_mode else actual == expected),
         }
     return results
+
+
+# ---- real-mode helpers ----------------------------------------------------------
+
+def _research_state_blob(rel_repo_path: str,
+                         commit: str = RESEARCH_STATE_COMMIT) -> bytes | None:
+    """Return raw bytes of a file as it exists in the given commit.
+
+    Uses `git show <commit>:<path>` (offline, read-only).  Returns None on
+    any git error (missing file, bad commit, not a repo).  Never modifies
+    the working tree.
+    """
+    try:
+        r = subprocess.run(
+            ["git", "show", f"{commit}:{rel_repo_path}"],
+            cwd=REPO_ROOT, capture_output=True, check=True,
+        )
+        return r.stdout
+    except Exception:
+        return None
+
+
+def _research_state_sha(rel_repo_path: str,
+                        commit: str = RESEARCH_STATE_COMMIT) -> str:
+    blob = _research_state_blob(rel_repo_path, commit)
+    if blob is None:
+        return ""
+    return hashlib.sha256(blob).hexdigest()
+
+
+def _frozen_records(commit: str = RESEARCH_STATE_COMMIT) -> list:
+    """Compare each frozen file's working-tree content against its content in
+    the research-state commit.  Fail-closed: a missing file, git error, or
+    SHA mismatch yields match=False.
+
+    Some frozen inputs (the large Stage122/Stage123 modeling CSVs) are not
+    tracked in git, so `git show` cannot read them.  For those the expected
+    SHA falls back to the pinned constants (which are themselves the
+    research-state values); fail-closed still applies.
+    """
+    known_expected = {
+        STAGE122_INPUT: EXPECTED_STAGE122_SHA,
+        STAGE123_INPUT: EXPECTED_STAGE123_SHA,
+    }
+    records = []
+    for fp in FROZEN_FILES:
+        rel_repo = f"{PROJECT_PREFIX}/{fp.relative_to(ROOT).as_posix()}"
+        expected = _research_state_sha(rel_repo, commit)
+        source = "git_research_state"
+        if not expected and fp in known_expected:
+            expected = known_expected[fp]
+            source = "pinned_expected_constant"
+        actual = _sha256_file(fp)
+        records.append({
+            "relative_path": rel_repo,
+            "expected_sha256_from_research_state": expected,
+            "expected_source": source,
+            "actual_sha256": actual,
+            "match": bool(expected) and bool(actual) and expected == actual,
+        })
+    return records
+
+
+def _compute_counts(screening_path: Path) -> dict:
+    """Compute the four research counts directly from research screening.
+
+    canonical:      proposed canonical (jalali) date is non-empty
+    admission_only: evidence_status == requires_first_public_trade_evidence
+    unresolved:     evidence_status in review-needed set AND canonical empty
+    ready:          ready_for_user_review == true
+    """
+    df = _read_csv(screening_path)
+    canonical = admission_only = unresolved = ready = 0
+    for _, r in df.iterrows():
+        canon = str(r.get("proposed_canonical_public_entry_date_jalali", "")).strip()
+        es = str(r.get("evidence_status", "")).strip()
+        rdy = str(r.get("ready_for_user_review", "")).strip().lower()
+        if canon:
+            canonical += 1
+        if es == ADMISSION_ONLY_EVIDENCE_STATUS:
+            admission_only += 1
+        if es in UNRESOLVED_EVIDENCE_STATUSES and not canon:
+            unresolved += 1
+        if rdy == "true":
+            ready += 1
+    return {
+        "exact_day_canonical_count": canonical,
+        "admission_only_count": admission_only,
+        "unresolved_count": unresolved,
+        "ready_for_user_review_count": ready,
+    }
+
+
+def _scan_verified_user_confirmed(base_dir: Path) -> tuple:
+    """Scan Part 2 CSV/JSON files under base_dir for the literal string
+    'verified_user_confirmed'.  Returns (found: bool, detail: str).
+
+    The QC report itself is excluded from the scan: it legitimately contains
+    the token inside its own assertion labels (e.g. 'no_verified_user_confirmed'),
+    which would otherwise self-trigger.  Genuine verified flags would appear in
+    the research/data outputs, which are all scanned.
+    """
+    needle = "verified_user_confirmed"
+    skip_names = {"part02_qc_report.json"}
+    for fp in sorted(base_dir.rglob("*")):
+        if fp.is_file() and fp.suffix.lower() in (".csv", ".json") and fp.name not in skip_names:
+            try:
+                if needle in fp.read_text(encoding="utf-8", errors="ignore"):
+                    return True, f"'{needle}' found in {fp.name}"
+            except Exception:
+                continue
+    return False, "no verified_user_confirmed in Part 2 CSV/JSON outputs"
 
 
 # ---- prepare_outputs ------------------------------------------------------------
@@ -170,19 +300,27 @@ def build_tickers_csv(base_dir: Path | None = None) -> pd.DataFrame:
 
 def build_metadata(finalizer_source_commit: str,
                    research_state_commit: str,
-                   base_dir: Path | None = None) -> dict:
+                   base_dir: Path | None = None,
+                   fixture_mode: bool = False) -> dict:
     """Build part02_metadata_and_hashes.json."""
     bd = base_dir if base_dir is not None else PART02_DIR
-    root_base = base_dir if base_dir is not None else ROOT
     generated_at = _utc_now()
     branch = _git_branch()
 
-    immutable_hashes = _check_immutable_hashes(bd)
-    frozen_hashes = {}
-    if base_dir is None:
-        for fp in FROZEN_FILES:
-            if fp.exists():
-                frozen_hashes[str(fp.relative_to(ROOT))] = sha(fp)
+    immutable_hashes = _check_immutable_hashes(bd, fixture_mode)
+
+    # Real counts are always derived from the actual research screening,
+    # never hardcoded.
+    screening_path = bd / "part02_research_screening_10tickers.csv"
+    counts = _compute_counts(screening_path)
+
+    # Frozen file hashes compared against the research-state commit.  In real
+    # mode this is non-empty and authoritative; in fixture mode there is no
+    # git history for the synthetic files, so the list is left empty.
+    if fixture_mode:
+        frozen_records = []
+    else:
+        frozen_records = _frozen_records(research_state_commit)
 
     return {
         "stage": "stage124_batch02_part02",
@@ -194,10 +332,10 @@ def build_metadata(finalizer_source_commit: str,
         "generated_at_utc": generated_at,
         "ticker_count": 10,
         "tickers": list(PART02_TICKERS),
-        "exact_day_canonical_count": 0,
-        "admission_only_count": 6,
-        "unresolved_count": 4,
-        "ready_for_user_review_count": 0,
+        "exact_day_canonical_count": counts["exact_day_canonical_count"],
+        "admission_only_count": counts["admission_only_count"],
+        "unresolved_count": counts["unresolved_count"],
+        "ready_for_user_review_count": counts["ready_for_user_review_count"],
         "research_screening_path": "stage124/batch02_parts/part02_research_screening_10tickers.csv",
         "source_provenance_path": "stage124/batch02_parts/part02_source_provenance_10tickers.csv",
         "tsetmc_audit_path": "stage124/batch02_parts/part02_tsetmc_audit_10tickers.csv",
@@ -209,7 +347,7 @@ def build_metadata(finalizer_source_commit: str,
         "immutable_input_hashes": {
             k: v["actual"] for k, v in immutable_hashes.items()
         },
-        "frozen_input_hashes": frozen_hashes,
+        "frozen_input_hashes": frozen_records,
         "hkeshti_status": {
             "evidence_status": "requires_manual_review",
             "research_status": "requires_manual_review",
@@ -334,7 +472,8 @@ def build_readme() -> str:
 
 def update_summary(finalizer_source_commit: str,
                    research_state_commit: str,
-                   base_dir: Path | None = None) -> dict:
+                   base_dir: Path | None = None,
+                   fixture_mode: bool = False) -> dict:
     """Read existing part02_summary.json and add finalization object."""
     bd = base_dir if base_dir is not None else PART02_DIR
     summary_path = bd / "part02_summary.json"
@@ -355,8 +494,15 @@ def update_summary(finalizer_source_commit: str,
 
 def update_qc_report(finalizer_source_commit: str,
                      research_state_commit: str,
-                     base_dir: Path | None = None) -> dict:
-    """Read existing part02_qc_report.json and add finalization QC object."""
+                     base_dir: Path | None = None,
+                     fixture_mode: bool = False) -> dict:
+    """Read existing part02_qc_report.json and add finalization QC object.
+
+    base_dir only locates the package files; fixture_mode (explicit) decides
+    whether the synthetic-data shortcuts apply.  Real mode performs genuine
+    SHA-equality, frozen-vs-research-state, Stage122/Stage123, and
+    verified_user_confirmed scans.
+    """
     bd = base_dir if base_dir is not None else PART02_DIR
     root_base = base_dir.parent.parent if base_dir is not None else ROOT
     qc_path = bd / "part02_qc_report.json"
@@ -366,8 +512,8 @@ def update_qc_report(finalizer_source_commit: str,
     assertions = []
     finalized_at = _utc_now()
 
-    # -- immutable hash checks
-    immutable = _check_immutable_hashes(bd)
+    # -- immutable hash checks (real equality unless fixture_mode)
+    immutable = _check_immutable_hashes(bd, fixture_mode)
     for rel, info in immutable.items():
         assertions.append({
             "assertion": f"immutable_sha_unchanged_{rel}",
@@ -375,19 +521,33 @@ def update_qc_report(finalizer_source_commit: str,
             "detail": f"expected={info['expected'][:12]}, actual={info['actual'][:12]}",
         })
 
-    # -- frozen file checks (only for real package)
-    if base_dir is None:
-        for fp in FROZEN_FILES:
-            if fp.exists():
-                rel = str(fp.relative_to(ROOT))
-                actual = sha(fp)
-                assertions.append({
-                    "assertion": f"frozen_unchanged_{Path(rel).name}",
-                    "passed": True,
-                    "detail": f"sha={actual[:12]}",
-                })
+    # -- frozen file checks vs research-state commit
+    if fixture_mode:
+        assertions.append({
+            "assertion": "frozen_files_unchanged_vs_research_state",
+            "passed": True,
+            "detail": "synthetic fixture has no git history",
+        })
+        assertions.append({
+            "assertion": "stage122_sha_unchanged",
+            "passed": True,
+            "detail": "synthetic fixture has no Stage122 input",
+        })
+        assertions.append({
+            "assertion": "stage123_sha_unchanged",
+            "passed": True,
+            "detail": "synthetic fixture has no Stage123 input",
+        })
+    else:
+        frozen_records = _frozen_records(research_state_commit)
+        for rec in frozen_records:
+            assertions.append({
+                "assertion": f"frozen_unchanged_{Path(rec['relative_path']).name}",
+                "passed": rec["match"],
+                "detail": (f"expected={rec['expected_sha256_from_research_state'][:12]}, "
+                           f"actual={rec['actual_sha256'][:12]}"),
+            })
 
-        # -- Stage122 / Stage123 (only for real package)
         s122 = sha(STAGE122_INPUT)
         s123 = sha(STAGE123_INPUT)
         assertions.append({
@@ -427,30 +587,45 @@ def update_qc_report(finalizer_source_commit: str,
             "detail": "tickers CSV not found",
         })
 
-    # -- count checks
+    # -- count checks (computed from the real research screening, not hardcoded)
+    screening_path = bd / "part02_research_screening_10tickers.csv"
+    if screening_path.exists():
+        counts = _compute_counts(screening_path)
+    else:
+        counts = {
+            "exact_day_canonical_count": -1,
+            "admission_only_count": -1,
+            "unresolved_count": -1,
+            "ready_for_user_review_count": -1,
+        }
+    EXPECTED_COUNTS = {
+        "exact_day_canonical_count": 0,
+        "admission_only_count": 6,
+        "unresolved_count": 4,
+        "ready_for_user_review_count": 0,
+    }
     assertions.append({
         "assertion": "exact_day_canonical_count_zero",
-        "passed": True,
-        "detail": "count=0",
+        "passed": counts["exact_day_canonical_count"] == EXPECTED_COUNTS["exact_day_canonical_count"],
+        "detail": f"count={counts['exact_day_canonical_count']}",
     })
     assertions.append({
         "assertion": "admission_only_count_six",
-        "passed": True,
-        "detail": "count=6",
+        "passed": counts["admission_only_count"] == EXPECTED_COUNTS["admission_only_count"],
+        "detail": f"count={counts['admission_only_count']}",
     })
     assertions.append({
         "assertion": "unresolved_count_four",
-        "passed": True,
-        "detail": "count=4",
+        "passed": counts["unresolved_count"] == EXPECTED_COUNTS["unresolved_count"],
+        "detail": f"count={counts['unresolved_count']}",
     })
     assertions.append({
         "assertion": "ready_for_user_review_count_zero",
-        "passed": True,
-        "detail": "count=0",
+        "passed": counts["ready_for_user_review_count"] == EXPECTED_COUNTS["ready_for_user_review_count"],
+        "detail": f"count={counts['ready_for_user_review_count']}",
     })
 
     # -- حکشti checks
-    screening_path = bd / "part02_research_screening_10tickers.csv"
     if screening_path.exists():
         sdf = _read_csv(screening_path)
         hk = sdf[sdf["ticker"] == "حکشتی"]
@@ -576,19 +751,13 @@ def update_qc_report(finalizer_source_commit: str,
         "detail": f"missing={missing}" if missing else "all present (manifest sealed separately)",
     })
 
-    # -- no verified_user_confirmed (only for real package)
-    if base_dir is None:
-        assertions.append({
-            "assertion": "no_verified_user_confirmed",
-            "passed": not FULL_VERIFIED_FORBIDDEN.exists(),
-            "detail": "listing_master_verified_stage124.csv must not exist",
-        })
-    else:
-        assertions.append({
-            "assertion": "no_verified_user_confirmed",
-            "passed": True,
-            "detail": "skipped in test mode",
-        })
+    # -- no verified_user_confirmed (scan all Part 2 CSV/JSON outputs)
+    vuc_found, vuc_detail = _scan_verified_user_confirmed(bd)
+    assertions.append({
+        "assertion": "no_verified_user_confirmed",
+        "passed": not vuc_found,
+        "detail": vuc_detail,
+    })
 
     # -- no user decision
     if screening_path.exists():
@@ -602,19 +771,12 @@ def update_qc_report(finalizer_source_commit: str,
         "detail": "no user_decision column in research screening",
     })
 
-    # -- no full verified master (only for real package)
-    if base_dir is None:
-        assertions.append({
-            "assertion": "no_full_verified_master",
-            "passed": not FULL_VERIFIED_FORBIDDEN.exists(),
-            "detail": "listing_master_verified_stage124.csv must not exist",
-        })
-    else:
-        assertions.append({
-            "assertion": "no_full_verified_master",
-            "passed": True,
-            "detail": "skipped in test mode",
-        })
+    # -- no full verified master (real path check)
+    assertions.append({
+        "assertion": "no_full_verified_master",
+        "passed": not FULL_VERIFIED_FORBIDDEN.exists(),
+        "detail": f"{FULL_VERIFIED_FORBIDDEN.name} must not exist",
+    })
 
     # -- no Gate B
     assertions.append({"assertion": "no_gate_b", "passed": True, "detail": "Gate B not executed"})
@@ -713,7 +875,8 @@ def build_manifest(finalizer_source_commit: str,
 
 def prepare_outputs(finalizer_source_commit: str,
                     research_state_commit: str,
-                    base_dir: Path | None = None) -> dict:
+                    base_dir: Path | None = None,
+                    fixture_mode: bool = False) -> dict:
     """Prepare all offline output files (except manifest)."""
     bd = base_dir if base_dir is not None else PART02_DIR
     # 1. part02_tickers.csv
@@ -722,7 +885,7 @@ def prepare_outputs(finalizer_source_commit: str,
     _write_csv(tickers_df, tickers_path)
 
     # 2. part02_metadata_and_hashes.json
-    metadata = build_metadata(finalizer_source_commit, research_state_commit, bd)
+    metadata = build_metadata(finalizer_source_commit, research_state_commit, bd, fixture_mode)
     metadata_path = bd / "part02_metadata_and_hashes.json"
     with open(metadata_path, "w", encoding="utf-8") as f:
         _json_dump(metadata, f)
@@ -733,13 +896,13 @@ def prepare_outputs(finalizer_source_commit: str,
     readme_path.write_text(readme, encoding="utf-8")
 
     # 4. part02_summary.json (update existing)
-    summary = update_summary(finalizer_source_commit, research_state_commit, bd)
+    summary = update_summary(finalizer_source_commit, research_state_commit, bd, fixture_mode)
     summary_path = bd / "part02_summary.json"
     with open(summary_path, "w", encoding="utf-8") as f:
         _json_dump(summary, f)
 
     # 5. part02_qc_report.json (update existing)
-    qc = update_qc_report(finalizer_source_commit, research_state_commit, bd)
+    qc = update_qc_report(finalizer_source_commit, research_state_commit, bd, fixture_mode)
     qc_path = bd / "part02_qc_report.json"
     with open(qc_path, "w", encoding="utf-8") as f:
         _json_dump(qc, f)
@@ -754,8 +917,13 @@ def prepare_outputs(finalizer_source_commit: str,
 
 
 def seal_manifest(finalizer_source_commit: str,
-                  base_dir: Path | None = None) -> str:
-    """Build and write the final hash manifest. Returns manifest path."""
+                  base_dir: Path | None = None,
+                  fixture_mode: bool = False) -> str:
+    """Build and write the final hash manifest. Returns manifest path.
+
+    fixture_mode is accepted for signature symmetry; the manifest contents
+    are mode-independent (pure file hashing).
+    """
     bd = base_dir if base_dir is not None else PART02_DIR
     manifest_path = bd / "part02_hash_manifest.csv"
     content = build_manifest(finalizer_source_commit, base_dir)
@@ -764,11 +932,15 @@ def seal_manifest(finalizer_source_commit: str,
 
 
 def verify_final_package(finalizer_source_commit: str = "",
-                         base_dir: Path | None = None) -> bool:
+                         base_dir: Path | None = None,
+                         fixture_mode: bool = False) -> bool:
     """Read-only verification of the final package.
 
     Checks all 15 manifest rows (except self-row SHA), file existence,
-    sizes, and hash correctness.  Does not modify any file.
+    sizes, and hash correctness.  Then performs independent (non-manifest)
+    integrity checks: QC all_pass, absence of test-mode shortcuts, non-empty
+    frozen hashes, real frozen/Stage122/Stage123/immutable equality, and
+    counts derived directly from the screening.  Does not modify any file.
     Returns True if all checks pass, False otherwise.
     """
     bd = base_dir if base_dir is not None else PART02_DIR
@@ -842,7 +1014,104 @@ def verify_final_package(finalizer_source_commit: str = "",
                 print(f"FAIL: size mismatch for {rel}: recorded={recorded_size}, actual={actual_size}")
                 return False
 
-    print("PASS: all 15 manifest rows verified")
+    # ---- Independent integrity checks (do NOT trust the manifest alone) ----
+
+    # Load QC report.
+    qc_path = bd / "part02_qc_report.json"
+    if not qc_path.exists():
+        print("FAIL: qc report not found")
+        return False
+    with open(qc_path, "r", encoding="utf-8") as f:
+        qc = json.load(f)
+    fin = qc.get("finalization", {})
+
+    if fin.get("all_pass") is not True:
+        print("FAIL: qc_report.finalization.all_pass is not true")
+        return False
+    if fin.get("failed_count") != 0:
+        print(f"FAIL: qc_report.finalization.failed_count={fin.get('failed_count')} (expected 0)")
+        return False
+
+    # No test-mode / fixture-mode shortcuts anywhere in QC assertions.
+    banned = list(FORBIDDEN_QC_PHRASES) if not fixture_mode else ["skipped in test mode"]
+    for a in fin.get("assertions", []):
+        detail = str(a.get("detail", ""))
+        for phrase in banned:
+            if phrase in detail:
+                print(f"FAIL: forbidden QC phrase '{phrase}' in assertion {a.get('assertion')}")
+                return False
+
+    # Load metadata.
+    meta_path = bd / "part02_metadata_and_hashes.json"
+    if not meta_path.exists():
+        print("FAIL: metadata not found")
+        return False
+    with open(meta_path, "r", encoding="utf-8") as f:
+        meta = json.load(f)
+
+    # Counts must equal a fresh computation from the screening.
+    screening_path = bd / "part02_research_screening_10tickers.csv"
+    if not screening_path.exists():
+        print("FAIL: research screening not found")
+        return False
+    fresh = _compute_counts(screening_path)
+    for k in ("exact_day_canonical_count", "admission_only_count",
+              "unresolved_count", "ready_for_user_review_count"):
+        if meta.get(k) != fresh[k]:
+            print(f"FAIL: metadata {k}={meta.get(k)} != recomputed {fresh[k]}")
+            return False
+
+    # حکشتی status must agree with the screening.
+    sdf = _read_csv(screening_path)
+    hk = sdf[sdf["ticker"] == "حکشتی"]
+    if hk.empty:
+        print("FAIL: حکشتی not found in screening")
+        return False
+    hkr = hk.iloc[0]
+    hkmeta = meta.get("hkeshti_status", {})
+    if hkr.get("evidence_status") != hkmeta.get("evidence_status"):
+        print("FAIL: حکشتی evidence_status mismatch metadata vs screening")
+        return False
+    if str(hkr.get("ready_for_user_review")).lower() != str(hkmeta.get("ready_for_user_review")).lower():
+        print("FAIL: حکشتی ready_for_user_review mismatch metadata vs screening")
+        return False
+
+    # Frozen hashes in metadata must be non-empty and (real mode) all match.
+    frozen = meta.get("frozen_input_hashes", [])
+    if not fixture_mode:
+        if not frozen:
+            print("FAIL: metadata frozen_input_hashes is empty")
+            return False
+        for rec in frozen:
+            if not rec.get("match"):
+                print(f"FAIL: frozen file changed vs research state: {rec.get('relative_path')}")
+                return False
+
+        # Stage122 / Stage123 real equality.
+        if sha(STAGE122_INPUT) != EXPECTED_STAGE122_SHA:
+            print("FAIL: Stage122 SHA mismatch")
+            return False
+        if sha(STAGE123_INPUT) != EXPECTED_STAGE123_SHA:
+            print("FAIL: Stage123 SHA mismatch")
+            return False
+
+        # Four immutable inputs real equality.
+        imm = _check_immutable_hashes(bd, fixture_mode=False)
+        for rel, info in imm.items():
+            if not info["match"]:
+                print(f"FAIL: immutable input changed: {rel}")
+                return False
+
+        # No verified_user_confirmed / no full master.
+        vuc_found, _ = _scan_verified_user_confirmed(bd)
+        if vuc_found:
+            print("FAIL: verified_user_confirmed present in outputs")
+            return False
+        if FULL_VERIFIED_FORBIDDEN.exists():
+            print("FAIL: full verified master exists")
+            return False
+
+    print("PASS: all 15 manifest rows verified + independent integrity checks")
     return True
 
 
