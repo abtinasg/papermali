@@ -542,6 +542,41 @@ def is_valid_exact_jalali_date(value: str) -> bool:
         return False
 
 
+def _worklist_url_ok(value: str) -> bool:
+    """A worklist discovered URL is valid when empty, or an http(s) URL with a
+    real hostname and no local/absolute filesystem path."""
+    v = str(value or "").strip()
+    if v == "":
+        return True
+    if "/Users/" in v or "Desktop" in v:
+        return False
+    try:
+        parsed = urlparse(v)
+    except Exception:
+        return False
+    if parsed.scheme not in ("http", "https"):
+        return False
+    if not parsed.hostname or "." not in parsed.hostname:
+        return False
+    return True
+
+
+def _worklist_jalali_ok(value: str) -> bool:
+    """A worklist candidate date is valid when empty, or a valid Jalali year
+    (``YYYY``), month (``YYYY-MM``) or exact day (``YYYY-MM-DD``)."""
+    v = str(value or "").strip()
+    if v == "":
+        return True
+    if re.fullmatch(r"\d{4}", v):
+        return 1200 <= int(v) <= 1500
+    if re.fullmatch(r"\d{4}-\d{2}", v):
+        m = int(v.split("-")[1])
+        return 1 <= m <= 12
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", v):
+        return is_valid_exact_jalali_date(v)
+    return False
+
+
 def _is_sha256(value: str) -> bool:
     v = (value or "").strip().lower()
     return len(v) == 64 and all(c in "0123456789abcdef" for c in v)
@@ -1747,48 +1782,127 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
     check("stage122_sha_matches", sha(STAGE122_INPUT) == EXPECTED_STAGE122_SHA,
           f"sha={sha(STAGE122_INPUT)[:12]}")
 
-    # Source registry: validity + one-to-one mapping with provenance.
+    # Source registry: validity + forward-compatible seed preservation + a strict
+    # one-to-one mapping between *active* registry rows and provenance. The
+    # registry may legitimately grow beyond 20 rows (manual-discovery sources at
+    # source_index 3, 4, …); only the original 20 seeds are locked.
     if registry_df is not None:
         reg_ok, reg_errs = validate_source_registry(registry_df)
         check("registry_valid", reg_ok, f"errors={reg_errs[:3]}")
-        check("registry_exactly_20_seed_rows", len(registry_df) == 20,
-              f"rows={len(registry_df)}")
-        per_tk = registry_df.groupby("ticker").size().to_dict()
-        check("registry_two_seed_sources_each",
-              all(per_tk.get(tk, 0) == 2 for tk in PART03_TICKERS),
-              f"counts={per_tk}")
-        reg_keys = {(str(r["ticker"]), str(r["source_index"]).strip())
-                    for _, r in registry_df.iterrows()}
+
+        seed_df = build_seed_registry_df()
+        seed_by_key = {(str(r["ticker"]), str(r["source_index"]).strip()):
+                       (str(r["source_type"]), str(r["source_title"]),
+                        str(r["source_url"]), str(r["source_origin"]))
+                       for _, r in seed_df.iterrows()}
+        reg_by_key = {(str(r["ticker"]), str(r["source_index"]).strip()):
+                      (str(r.get("source_type", "")), str(r.get("source_title", "")),
+                       str(r.get("source_url", "")), str(r.get("source_origin", "")))
+                      for _, r in registry_df.iterrows()}
+
+        # 1) all 20 seed keys still present
+        missing_seed = set(seed_by_key) - set(reg_by_key)
+        check("registry_seed_20_preserved",
+              len(seed_by_key) == 20 and not missing_seed,
+              f"missing_seed={missing_seed}")
+        # 2) seed keys are exactly the 10 tickers × source_index {1,2}
+        expected_seed_keys = {(tk, str(i)) for tk in PART03_TICKERS for i in (1, 2)}
+        check("registry_seed_keys_preserved",
+              set(seed_by_key) == expected_seed_keys,
+              f"seed_keys={sorted(set(seed_by_key) - expected_seed_keys)}")
+        # 3) seed type/title/url/source_origin unchanged
+        content_ok = all(reg_by_key.get(k) == v for k, v in seed_by_key.items())
+        check("registry_seed_content_unchanged", content_ok,
+              "seed type/title/url/source_origin must not change")
+        # 4) each ticker has at least two seed sources (not exactly two total)
+        seed_per_tk = {}
+        for (tk, _si) in seed_by_key:
+            seed_per_tk[tk] = seed_per_tk.get(tk, 0) + 1
+        check("registry_minimum_two_seed_sources_each",
+              all(seed_per_tk.get(tk, 0) >= 2 for tk in PART03_TICKERS),
+              f"seed_counts={seed_per_tk}")
+        # 5) additional (manual_discovery, index>=3) rows are allowed
+        extra_rows = [
+            (str(r["ticker"]), str(r["source_index"]).strip(),
+             str(r.get("source_origin", "")))
+            for _, r in registry_df.iterrows()
+            if (str(r["ticker"]), str(r["source_index"]).strip()) not in seed_by_key]
+        bad_extra = [e for e in extra_rows
+                     if not (e[1].isdigit() and int(e[1]) >= 3
+                             and e[2] == "manual_discovery")]
+        check("registry_additional_sources_allowed", not bad_extra,
+              f"invalid_extra_rows={bad_extra}")
+
+        # active registry ↔ provenance is one-to-one; inactive rows never appear.
         active_keys = {(str(r["ticker"]), str(r["source_index"]).strip())
                        for _, r in registry_df.iterrows()
                        if str(r.get("active", "")).strip().lower() == "true"}
+        inactive_keys = {(str(r["ticker"]), str(r["source_index"]).strip())
+                         for _, r in registry_df.iterrows()
+                         if str(r.get("active", "")).strip().lower() != "true"}
         prov_keys = {(str(pr["ticker"]), str(pr["source_index"]).strip())
                      for _, pr in provenance_df.iterrows()}
-        check("provenance_subset_of_registry", prov_keys <= reg_keys,
-              f"orphans={prov_keys - reg_keys}")
-        check("active_registry_in_provenance", active_keys <= prov_keys,
-              f"missing={active_keys - prov_keys}")
-        check("provenance_only_active_registry", prov_keys == active_keys,
-              f"prov_extra={prov_keys - active_keys}, active_extra={active_keys - prov_keys}")
+        check("provenance_subset_of_registry", prov_keys <= set(reg_by_key),
+              f"orphans={prov_keys - set(reg_by_key)}")
+        check("active_registry_matches_provenance", prov_keys == active_keys,
+              f"prov_only={prov_keys - active_keys}, active_only={active_keys - prov_keys}")
+        check("inactive_registry_not_in_provenance",
+              not (inactive_keys & prov_keys),
+              f"inactive_in_prov={inactive_keys & prov_keys}")
 
-    # Manual research worklist: exactly 10 rows, correct order, no guessed
-    # URLs/dates.
+    # Manual research worklist: semantic validation only. Empty findings are
+    # allowed (the template); non-empty findings (Part 3.1B) must be well-formed.
     if worklist_df is not None:
-        check("worklist_exactly_10_rows", len(worklist_df) == 10,
-              f"rows={len(worklist_df)}")
-        check("worklist_ticker_order",
-              worklist_df["ticker"].tolist() == list(PART03_TICKERS),
-              f"order={worklist_df['ticker'].tolist()}")
-        empty_cols = ["discovered_source_1_url", "discovered_source_2_url",
-                      "first_public_event_candidate", "candidate_date_jalali"]
-        for c in empty_cols:
-            check(f"worklist_no_guessed_{c}",
-                  (worklist_df[c].astype(str).str.strip() == "").all(),
-                  f"non-empty values present in {c}")
-        url_blob = " ".join(worklist_df["discovered_source_1_url"].astype(str)) + \
-                   " ".join(worklist_df["discovered_source_2_url"].astype(str))
-        check("worklist_no_http_urls", "http" not in url_blob.lower(),
-              "no discovered URL may be present in the initial worklist")
+        wl_tickers = [str(t) for t in worklist_df["ticker"].tolist()]
+        check("worklist_exact_ticker_scope",
+              wl_tickers == list(PART03_TICKERS),
+              f"order={wl_tickers}")
+        check("worklist_no_duplicates", len(wl_tickers) == len(set(wl_tickers)),
+              f"tickers={wl_tickers}")
+
+        url_cols = ["discovered_source_1_url", "discovered_source_2_url"]
+        urls_ok = True
+        for c in url_cols:
+            if c not in worklist_df.columns:
+                continue
+            for v in worklist_df[c].astype(str):
+                if not _worklist_url_ok(v):
+                    urls_ok = False
+                    break
+        check("worklist_discovered_urls_valid", urls_ok,
+              "discovered URLs must be empty or valid http(s) with a real host "
+              "and no local path")
+
+        dates_ok = all(_worklist_jalali_ok(v)
+                       for v in worklist_df.get("candidate_date_jalali",
+                                                pd.Series([], dtype=str)).astype(str))
+        check("worklist_candidate_date_valid", dates_ok,
+              "candidate_date_jalali must be empty or a valid Jalali "
+              "year / month / exact-day value")
+
+        allowed_events = {"", "first_public_offering", "first_public_trading",
+                          "admission", "listing", "unresolved"}
+        events_ok = all(str(v).strip() in allowed_events
+                        for v in worklist_df.get("first_public_event_candidate",
+                                                 pd.Series([], dtype=str)).astype(str))
+        check("worklist_event_candidate_valid", events_ok,
+              f"first_public_event_candidate must be in {sorted(allowed_events)}")
+
+        allowed_ord = {"true", "false", "unknown"}
+        ord_ok = all(str(v).strip().lower() in allowed_ord
+                     for v in worklist_df.get("ordinary_share_explicit",
+                                              pd.Series([], dtype=str)).astype(str)
+                     if str(v).strip() != "")
+        check("worklist_ordinary_share_value_valid", ord_ok,
+              f"ordinary_share_explicit must be in {sorted(allowed_ord)}")
+
+        allowed_status = {"pending_manual_research", "source_discovered",
+                          "under_review", "reviewed", "unresolved"}
+        status_ok = all(str(v).strip() in allowed_status or str(v).strip() == ""
+                        for v in worklist_df.get("manual_review_status",
+                                                 pd.Series([], dtype=str)).astype(str))
+        check("worklist_manual_status_valid", status_ok,
+              f"manual_review_status must be in {sorted(allowed_status)}")
 
     all_pass = all(a["passed"] for a in assertions)
     return {"all_pass": all_pass, "assertions": assertions}

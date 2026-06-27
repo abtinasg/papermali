@@ -21,6 +21,30 @@ verified master, does **not** run Gate B, and does **not** run any modelling.
 
 No Part 2 or Pilot15 ticker is re-researched.
 
+## Forward-compatible registry & worklist QC (Part 3.1A.4)
+
+The QC was relaxed where it would have wrongly blocked legitimate Part 3.1B
+findings, without weakening integrity:
+
+- **Registry QC is no longer locked to 20 rows.** `registry_exactly_20_seed_rows`
+  / `registry_two_seed_sources_each` are replaced by seed-preservation checks:
+  `registry_seed_20_preserved`, `registry_seed_keys_preserved` (10 tickers ×
+  index {1,2}), `registry_seed_content_unchanged` (type/title/url/source_origin),
+  `registry_minimum_two_seed_sources_each`, and
+  `registry_additional_sources_allowed` (manual_discovery rows at index ≥ 3). The
+  registry may grow; `(ticker, source_index)` stays unique, per-ticker URLs stay
+  unique, and `active_registry_matches_provenance` /
+  `inactive_registry_not_in_provenance` keep active rows one-to-one with
+  provenance.
+- **Worklist QC is now semantic, not "must be empty".** Empty findings are still
+  fine, but non-empty values must be well-formed: `worklist_exact_ticker_scope`,
+  `worklist_no_duplicates`, `worklist_discovered_urls_valid` (empty or http(s)
+  with a real host and no local path), `worklist_candidate_date_valid` (empty or
+  valid Jalali year / month / exact-day), `worklist_event_candidate_valid`,
+  `worklist_ordinary_share_value_valid`, `worklist_manual_status_valid`. A
+  discovered URL in the worklist is a candidate only and never auto-enters the
+  registry.
+
 ## Persistent source registry & worklist preservation (Part 3.1A.3)
 
 - **Source registry is the source of truth.** `part03_source_registry.csv`

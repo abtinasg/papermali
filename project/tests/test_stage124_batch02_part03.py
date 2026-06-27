@@ -380,18 +380,18 @@ def test_worklist_qc_checks():
     tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
     wl = build_manual_research_worklist(_names(), research_df)
     qc = _qc(tickers_df, research_df, prov_df, tsetmc_df, worklist=wl)
-    assert _result(qc, "worklist_exactly_10_rows") is True
-    assert _result(qc, "worklist_ticker_order") is True
-    assert _result(qc, "worklist_no_http_urls") is True
+    assert _result(qc, "worklist_exact_ticker_scope") is True
+    assert _result(qc, "worklist_no_duplicates") is True
+    assert _result(qc, "worklist_discovered_urls_valid") is True
 
 
-def test_worklist_qc_detects_guessed_url():
+def test_worklist_qc_detects_invalid_url():
+    # a local/filesystem URL is invalid; a valid https URL is allowed
     tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
     wl = build_manual_research_worklist(_names(), research_df)
-    wl.at[0, "discovered_source_1_url"] = "https://example.com/guess"
+    wl.at[0, "discovered_source_1_url"] = "/Users/x/Desktop/guess.html"
     qc = _qc(tickers_df, research_df, prov_df, tsetmc_df, worklist=wl)
-    assert _any_failed_containing(qc, "worklist_no_guessed_discovered_source_1_url")
-    assert _result(qc, "worklist_no_http_urls") is False
+    assert _result(qc, "worklist_discovered_urls_valid") is False
 
 
 # ---- QC: ready / evidence integrity in research_df + provenance ----------------
@@ -1594,4 +1594,252 @@ def test_r_qc_registry_provenance_mapping():
     qc = run_part03_qc(tickers_df, research, prov, tsetmc_df, {}, {}, {}, {},
                        registry_df=df)
     assert _result(qc, "registry_valid") is True
-    assert _result(qc, "provenance_only_active_registry") is True
+    assert _result(qc, "active_registry_matches_provenance") is True
+
+
+# ================================================================================
+# Part 3.1A.4 — Forward-compatible registry & worklist QC
+# ================================================================================
+
+def _prov_from_registry(reg_df):
+    sources = registry_to_research_sources(reg_df, include_inactive=False)
+    saved = part03_mod._requests.get
+    part03_mod._requests.get = lambda *a, **k: (_ for _ in ()).throw(
+        part03_mod._requests.exceptions.Timeout())
+    try:
+        res = fetch_sources(force=True, sources_by_ticker=sources)
+    finally:
+        part03_mod._requests.get = saved
+    overlaid = {tk: normalize_provenance_records(res.get(tk, []), None)
+                for tk in PART03_TICKERS}
+    return build_source_provenance(overlaid, snapshot_root=None)
+
+
+def _qc_reg(registry_df, prov_df=None):
+    tickers_df, research_df, base_prov, tsetmc_df = _baseline_dfs()
+    prov = prov_df if prov_df is not None else base_prov
+    return run_part03_qc(tickers_df, research_df, prov, tsetmc_df,
+                         {}, {}, {}, {}, registry_df=registry_df)
+
+
+def _qc_wl(worklist_df):
+    tickers_df, research_df, prov_df, tsetmc_df = _baseline_dfs()
+    return run_part03_qc(tickers_df, research_df, prov_df, tsetmc_df,
+                         {}, {}, {}, {}, worklist_df=worklist_df)
+
+
+# (f1) current 20-row registry passes
+def test_f01_seed_registry_passes():
+    reg = build_seed_registry_df()
+    qc = _qc_reg(reg, _prov_from_registry(reg))
+    for a in ("registry_valid", "registry_seed_20_preserved",
+              "registry_seed_keys_preserved", "registry_seed_content_unchanged",
+              "registry_minimum_two_seed_sources_each",
+              "registry_additional_sources_allowed",
+              "active_registry_matches_provenance"):
+        assert _result(qc, a) is True, a
+
+
+# (f2)/(f3) registry with a valid manual source_index=3 passes (21 rows)
+def test_f02_f03_registry_with_index3_passes():
+    tk = PART03_TICKERS[0]
+    add = pd.DataFrame([{
+        "ticker": tk, "source_type": "codal_official", "source_title": "doc3",
+        "source_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=NEW3",
+        "added_by": "tester", "discovery_notes": "found in 3.1B",
+    }])
+    reg = register_discovered_sources(build_seed_registry_df(), add)
+    assert len(reg) == 21
+    prov = _prov_from_registry(reg)
+    # the index=3 source must reach provenance
+    sub = prov[(prov["ticker"] == tk) & (prov["source_index"] == "3")]
+    assert len(sub) == 1
+    qc = _qc_reg(reg, prov)
+    assert _result(qc, "registry_additional_sources_allowed") is True
+    assert _result(qc, "registry_seed_20_preserved") is True
+    assert _result(qc, "active_registry_matches_provenance") is True
+    # not failed merely for having 21 rows
+    assert _result(qc, "registry_valid") is True
+
+
+# (f4) removing one of the 20 seeds fails
+def test_f04_removed_seed_fails():
+    reg = build_seed_registry_df().iloc[1:].copy()  # drop one seed
+    qc = _qc_reg(reg, _prov_from_registry(reg))
+    assert _result(qc, "registry_seed_20_preserved") is False
+
+
+# (f5) changing a seed URL fails
+def test_f05_changed_seed_url_fails():
+    reg = build_seed_registry_df().copy()
+    reg.at[0, "source_url"] = "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=HACK"
+    qc = _qc_reg(reg, _prov_from_registry(reg))
+    assert _result(qc, "registry_seed_content_unchanged") is False
+
+
+# (f6) duplicate manual URL for same ticker rejected
+def test_f06_duplicate_manual_url_rejected():
+    reg = build_seed_registry_df()
+    existing = reg[(reg["ticker"] == PART03_TICKERS[0]) &
+                   (reg["source_index"] == "1")].iloc[0]["source_url"]
+    add = pd.DataFrame([{
+        "ticker": PART03_TICKERS[0], "source_type": "market_information_aggregator",
+        "source_title": "dup", "source_url": existing, "added_by": "x",
+        "discovery_notes": "",
+    }])
+    with pytest.raises(ValueError):
+        register_discovered_sources(reg, add)
+    # validation also catches a duplicate-url registry
+    bad = reg.copy()
+    bad.loc[len(bad)] = {
+        "ticker": PART03_TICKERS[0], "source_index": "3",
+        "source_type": "market_information_aggregator", "source_title": "d",
+        "source_url": existing, "source_origin": "manual_discovery",
+        "active": "true", "discovery_status": "discovered_pending_fetch",
+        "added_at_utc": "", "added_by": "", "discovery_notes": "",
+    }
+    ok, errs = validate_source_registry(bad)
+    assert ok is False and any("duplicate source_url" in e for e in errs)
+
+
+# (f7) inactive source appearing in provenance fails
+def test_f07_inactive_in_provenance_fails():
+    reg = build_seed_registry_df().copy()
+    reg.loc[(reg["ticker"] == PART03_TICKERS[0]) & (reg["source_index"] == "2"),
+            "active"] = "false"
+    # provenance still includes the now-inactive key (built before deactivation)
+    prov = _prov_from_registry(build_seed_registry_df())
+    qc = _qc_reg(reg, prov)
+    assert (_result(qc, "inactive_registry_not_in_provenance") is False
+            or _result(qc, "active_registry_matches_provenance") is False)
+
+
+# (f8) active source missing from provenance fails
+def test_f08_active_missing_from_provenance_fails():
+    reg = build_seed_registry_df()
+    prov = _prov_from_registry(reg)
+    prov = prov.iloc[1:].copy()  # drop one active provenance row
+    qc = _qc_reg(reg, prov)
+    assert _result(qc, "active_registry_matches_provenance") is False
+
+
+# (f9) empty (template) worklist passes
+def test_f09_empty_worklist_passes():
+    wl = build_manual_research_worklist(_names(), _baseline_dfs()[1])
+    qc = _qc_wl(wl)
+    for a in ("worklist_exact_ticker_scope", "worklist_no_duplicates",
+              "worklist_discovered_urls_valid", "worklist_candidate_date_valid",
+              "worklist_event_candidate_valid", "worklist_ordinary_share_value_valid",
+              "worklist_manual_status_valid"):
+        assert _result(qc, a) is True, a
+
+
+# (f10) valid https discovered URL passes
+def test_f10_worklist_valid_url_passes():
+    wl = build_manual_research_worklist(_names(), _baseline_dfs()[1])
+    wl.at[0, "discovered_source_1_url"] = "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=AB"
+    wl.at[0, "manual_review_status"] = "source_discovered"
+    qc = _qc_wl(wl)
+    assert _result(qc, "worklist_discovered_urls_valid") is True
+    assert _result(qc, "worklist_manual_status_valid") is True
+
+
+# (f11) invalid discovered URL fails
+def test_f11_worklist_invalid_url_fails():
+    wl = build_manual_research_worklist(_names(), _baseline_dfs()[1])
+    wl.at[0, "discovered_source_1_url"] = "file:///Users/x/Desktop/snap.html"
+    qc = _qc_wl(wl)
+    assert _result(qc, "worklist_discovered_urls_valid") is False
+
+
+# (f12) valid exact Jalali passes
+def test_f12_worklist_valid_date_passes():
+    wl = build_manual_research_worklist(_names(), _baseline_dfs()[1])
+    wl.at[0, "candidate_date_jalali"] = "1380-03-15"
+    qc = _qc_wl(wl)
+    assert _result(qc, "worklist_candidate_date_valid") is True
+
+
+# (f13) invalid candidate date fails
+def test_f13_worklist_invalid_date_fails():
+    wl = build_manual_research_worklist(_names(), _baseline_dfs()[1])
+    wl.at[0, "candidate_date_jalali"] = "1380-13-40"
+    qc = _qc_wl(wl)
+    assert _result(qc, "worklist_candidate_date_valid") is False
+
+
+# (f14) invalid event candidate fails
+def test_f14_worklist_invalid_event_fails():
+    wl = build_manual_research_worklist(_names(), _baseline_dfs()[1])
+    wl.at[0, "first_public_event_candidate"] = "rights_offering"
+    qc = _qc_wl(wl)
+    assert _result(qc, "worklist_event_candidate_valid") is False
+
+
+# (f15) invalid manual status fails
+def test_f15_worklist_invalid_status_fails():
+    wl = build_manual_research_worklist(_names(), _baseline_dfs()[1])
+    wl.at[0, "manual_review_status"] = "totally_made_up"
+    qc = _qc_wl(wl)
+    assert _result(qc, "worklist_manual_status_valid") is False
+
+
+# (f16) a worklist URL does not auto-enter the registry
+def test_f16_worklist_url_not_in_registry():
+    names = _names()
+    template = build_manual_research_worklist(names, _baseline_dfs()[1])
+    existing = template.copy()
+    existing.at[0, "discovered_source_1_url"] = "https://example.com/news/1"
+    merged = merge_existing_worklist_with_current_status(template, existing)
+    # merge must not touch the registry
+    reg = load_source_registry()
+    assert "https://example.com/news/1" not in set(reg["source_url"])
+    assert merged.at[0, "discovered_source_1_url"] == "https://example.com/news/1"
+
+
+# (f17) merge preserves existing URL and date
+def test_f17_merge_preserves_url_and_date():
+    names = _names()
+    template = build_manual_research_worklist(names, _baseline_dfs()[1])
+    existing = template.copy()
+    existing.at[2, "discovered_source_1_url"] = "https://isna.ir/news/99"
+    existing.at[2, "candidate_date_jalali"] = "1382-06-10"
+    existing.at[2, "manual_review_status"] = "under_review"
+    merged = merge_existing_worklist_with_current_status(template, existing)
+    assert merged.at[2, "discovered_source_1_url"] == "https://isna.ir/news/99"
+    assert merged.at[2, "candidate_date_jalali"] == "1382-06-10"
+    assert merged.at[2, "manual_review_status"] == "under_review"
+
+
+# (f18) current 20 timeout + 10 research rows unchanged
+def test_f18_current_outputs_unchanged():
+    prov = pd.read_csv(PART03_DIR / "part03_source_provenance_10tickers.csv",
+                       dtype=str).fillna("")
+    assert len(prov) == 20
+    assert (prov["retrieval_status"] == "timeout").all()
+    research = pd.read_csv(PART03_DIR / "part03_research_screening_10tickers.csv",
+                           dtype=str).fillna("")
+    assert research["ticker"].tolist() == PART03_TICKERS
+    assert (research["research_status"] == "research_blocked_network").all()
+
+
+# (f19) Part 2 hashes stable
+def test_f19_part2_hashes_stable():
+    manifest = PART03_DIR / "part02_hash_manifest.csv"
+    if not manifest.exists():
+        pytest.skip("manifest missing")
+    mdf = pd.read_csv(manifest, dtype=str).fillna("")
+    for _, r in mdf.iterrows():
+        if not r.get("sha256", "").strip():
+            continue
+        fp = ROOT / r["relative_path"]
+        if fp.exists():
+            assert sha(fp) == r["sha256"], f"{r['relative_path']} changed"
+
+
+# (f20) TSETMC audit stable
+def test_f20_tsetmc_audit_stable():
+    df = pd.read_csv(PART03_DIR / "part03_tsetmc_audit_10tickers.csv",
+                     dtype=str).fillna("")
+    assert (df["network_request_performed"].str.lower() == "false").all()
+    assert (df["probe_source"] == "historical_v2_audit").all()
