@@ -1,0 +1,658 @@
+{
+  "stage": "stage124_batch02_part03",
+  "generated_at": "2026-06-27T01:03:23Z",
+  "source_commit": "414d94efa89f738012430c4601c72e99531e2c6d",
+  "ticker_count": 10,
+  "tickers": [
+    "خمهر",
+    "خنصیر",
+    "خوساز",
+    "خچرخش",
+    "خکمک",
+    "دروز",
+    "دسبحا",
+    "دیران",
+    "رانفور",
+    "رمپنا"
+  ],
+  "all_pass": true,
+  "assertion_count": 127,
+  "failed_count": 0,
+  "assertions": [
+    {
+      "assertion": "research_df_non_empty",
+      "passed": true,
+      "detail": "rows=10"
+    },
+    {
+      "assertion": "provenance_df_non_empty",
+      "passed": true,
+      "detail": "rows=20"
+    },
+    {
+      "assertion": "tsetmc_df_non_empty",
+      "passed": true,
+      "detail": "rows=10"
+    },
+    {
+      "assertion": "exactly_10_rows",
+      "passed": true,
+      "detail": "rows=10"
+    },
+    {
+      "assertion": "exactly_10_unique_tickers",
+      "passed": true,
+      "detail": "unique=10"
+    },
+    {
+      "assertion": "ticker_set_and_order_match",
+      "passed": true,
+      "detail": "actual=['خمهر', 'خنصیر', 'خوساز', 'خچرخش', 'خکمک', 'دروز', 'دسبحا', 'دیران', 'رانفور', 'رمپنا']"
+    },
+    {
+      "assertion": "no_extra_tickers",
+      "passed": true,
+      "detail": "extra=set()"
+    },
+    {
+      "assertion": "no_missing_tickers",
+      "passed": true,
+      "detail": "missing=set()"
+    },
+    {
+      "assertion": "no_part2_tickers",
+      "passed": true,
+      "detail": "intersection=set()"
+    },
+    {
+      "assertion": "no_pilot15_tickers",
+      "passed": true,
+      "detail": "intersection=set()"
+    },
+    {
+      "assertion": "no_duplicate_tickers",
+      "passed": true,
+      "detail": "dups=0"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_خمهر",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_خمهر",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_خمهر",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_خنصیر",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_خنصیر",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_خنصیر",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_خوساز",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_خوساز",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_خوساز",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_خچرخش",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_خچرخش",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_خچرخش",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_خکمک",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_خکمک",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_خکمک",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_دروز",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_دروز",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_دروز",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_دسبحا",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_دسبحا",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_دسبحا",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_دیران",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_دیران",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_دیران",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_رانفور",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_رانفور",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_رانفور",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_رمپنا",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_رمپنا",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_رمپنا",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خمهر_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خمهر_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خمهر_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خمهر_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_خمهر_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%d9%85%d9%87%d8%b1"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خنصیر_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خنصیر_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خنصیر_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خنصیر_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_خنصیر_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%d9%86%d8%b5%db%8c%d8%b1"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خوساز_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خوساز_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خوساز_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خوساز_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_خوساز_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%d9%88%d8%b3%d8%a7%d8%b2"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خچرخش_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خچرخش_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خچرخش_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خچرخش_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_خچرخش_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%da%86%d8%b1%d8%ae%d8%b4"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خکمک_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خکمک_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خکمک_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خکمک_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_خکمک_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%da%a9%d9%85%da%a9"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_دروز_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_دروز_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_دروز_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_دروز_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_دروز_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%af%d8%b1%d9%88%d8%b2"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_دسبحا_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_دسبحا_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_دسبحا_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_دسبحا_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_دسبحا_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%af%d8%b3%d8%a8%d8%ad%d8%a7"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_دیران_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_دیران_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_دیران_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_دیران_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_دیران_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%af%db%8c%d8%b1%d8%a7%d9%86"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_رانفور_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_رانفور_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_رانفور_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_رانفور_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_رانفور_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%b1%d8%a7%d9%86%d9%81%d9%88%d8%b1"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_رمپنا_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_رمپنا_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_رمپنا_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_رمپنا_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_رمپنا_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%b1%d9%85%d9%be%d9%86%d8%a7"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_خمهر",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_خمهر",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_خنصیر",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_خنصیر",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_خوساز",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_خوساز",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_خچرخش",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_خچرخش",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_خکمک",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_خکمک",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_دروز",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_دروز",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_دسبحا",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_دسبحا",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_دیران",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_دیران",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_رانفور",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_رانفور",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_رمپنا",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_رمپنا",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "no_user_verification_token",
+      "passed": true,
+      "detail": "a fabricated user-verification token must not appear in any Part 3 output"
+    },
+    {
+      "assertion": "no_user_decision_column",
+      "passed": true,
+      "detail": "no user_decision column"
+    },
+    {
+      "assertion": "no_verification_status_column",
+      "passed": true,
+      "detail": "no verification_status column"
+    },
+    {
+      "assertion": "no_full_verified_master",
+      "passed": true,
+      "detail": "listing_master_verified_stage124.csv must not exist"
+    },
+    {
+      "assertion": "part02_unchanged_part02_hash_manifest.csv",
+      "passed": true,
+      "detail": "before=4eeaf5c8b494, after=4eeaf5c8b494"
+    },
+    {
+      "assertion": "part02_unchanged_part02_metadata_and_hashes.json",
+      "passed": true,
+      "detail": "before=575125344f6e, after=575125344f6e"
+    },
+    {
+      "assertion": "part02_unchanged_part02_qc_report.json",
+      "passed": true,
+      "detail": "before=6c9b402ec191, after=6c9b402ec191"
+    },
+    {
+      "assertion": "part02_unchanged_part02_research_screening_10tickers.csv",
+      "passed": true,
+      "detail": "before=2c0b39bcbcdd, after=2c0b39bcbcdd"
+    },
+    {
+      "assertion": "part02_unchanged_part02_source_provenance_10tickers.csv",
+      "passed": true,
+      "detail": "before=2a5d0513a8e1, after=2a5d0513a8e1"
+    },
+    {
+      "assertion": "part02_unchanged_part02_tsetmc_audit_10tickers.csv",
+      "passed": true,
+      "detail": "before=5b6f21f26fc7, after=5b6f21f26fc7"
+    },
+    {
+      "assertion": "part02_unchanged_source_1.html",
+      "passed": true,
+      "detail": "before=09152a6ce812, after=09152a6ce812"
+    },
+    {
+      "assertion": "frozen_unchanged_modeling_all_rows_stage122.csv",
+      "passed": true,
+      "detail": "before=ece991c5ff28, after=ece991c5ff28"
+    },
+    {
+      "assertion": "frozen_unchanged_modeling_all_rows_stage123.csv",
+      "passed": true,
+      "detail": "before=28b9f9d41856, after=28b9f9d41856"
+    },
+    {
+      "assertion": "frozen_unchanged_listing_batch02_tsetmc_conflict_audit_v2.csv",
+      "passed": true,
+      "detail": "before=0e5cda36aded, after=0e5cda36aded"
+    },
+    {
+      "assertion": "stage123_sha_matches",
+      "passed": true,
+      "detail": "sha=28b9f9d41856"
+    },
+    {
+      "assertion": "stage122_sha_matches",
+      "passed": true,
+      "detail": "sha=ece991c5ff28"
+    }
+  ]
+}
