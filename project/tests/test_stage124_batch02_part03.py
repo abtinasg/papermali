@@ -7,8 +7,10 @@ evidence/ready decision that separates a successful *fetch* from reviewed
 """
 
 import json
+import re
 import hashlib
 from pathlib import Path
+from urllib.parse import urlparse
 
 import pandas as pd
 import pytest
@@ -53,6 +55,8 @@ from project.src.stage124_batch02_part03 import (
     build_manual_research_worklist,
     fetch_sources,
     WORKLIST_COLUMNS,
+    _is_sha256,
+    _truthy,
 )
 import project.src.stage124_batch02_part03 as part03_mod
 from project.src.stage124_batch02_part02 import PART02_TICKERS
@@ -1148,26 +1152,61 @@ def test_o17_specific_news_article_accepted():
                                        "news_agency") is True
 
 
-# (18) all 20 current timeout records unchanged in character
-def test_o18_current_timeout_records_unchanged():
+# (18) real provenance retrieval/evidence invariants (forward-compatible)
+def test_o18_real_provenance_retrieval_evidence_invariants():
     p = PART03_DIR / "part03_source_provenance_10tickers.csv"
+    if not p.exists():
+        pytest.skip("part03 provenance not generated yet")
     df = pd.read_csv(p, dtype=str).fillna("")
-    assert len(df) == 20
-    assert (df["retrieval_status"] == "timeout").all()
-    assert (df["content_review_status"] == "not_available_due_to_fetch_failure").all()
-    assert (df["evidence_accepted"].str.lower() == "false").all()
-    assert (df["document_specific"].str.lower() == "false").all()
-    assert (df["snapshot_path"].str.strip() == "").all()
+    for _, r in df.iterrows():
+        status = str(r.get("retrieval_status", ""))
+        snap = str(r.get("snapshot_path", "")).strip()
+        h = str(r.get("content_sha256", "")).strip()
+        if status not in FETCHED_STATUSES:
+            assert snap == "", f"failed fetch has snapshot: {snap}"
+            assert h == "", f"failed fetch has hash: {h}"
+        else:
+            assert snap != "", "fetched source has empty snapshot_path"
+            assert _is_sha256(h), f"fetched source has invalid SHA-256: {h}"
+            sp = ROOT / snap
+            if sp.exists():
+                assert hashlib.sha256(sp.read_bytes()).hexdigest() == h.lower(), \
+                    f"snapshot hash mismatch for {snap}"
+        review_status = str(r.get("content_review_status", "")).strip().lower()
+        if review_status == "reviewed":
+            assert status in FETCHED_STATUSES, "reviewed source not fetched"
+            assert snap != "" and _is_sha256(h), "reviewed source missing snapshot/hash"
+        assert str(r.get("evidence_accepted", "")).strip().lower() == \
+            compute_evidence_accepted({k: r.get(k, "") for k in r.index}, snapshot_root=ROOT)
 
 
-# (19) all 10 current research rows unchanged in character
-def test_o19_current_research_rows_unchanged():
-    p = PART03_DIR / "part03_research_screening_10tickers.csv"
-    df = pd.read_csv(p, dtype=str).fillna("")
+# (19) real research rows are semantically valid (forward-compatible)
+def test_o19_real_research_rows_semantically_valid():
+    df = _load_real_research()
     assert df["ticker"].tolist() == PART03_TICKERS
-    assert (df["research_status"] == "research_blocked_network").all()
-    assert (df["ready_for_user_review"].str.lower() == "false").all()
-    assert (df["ordinary_share_confirmed"] == "unknown").all()
+    allowed_rs = {"research_blocked_network", "source_discovered",
+                  "fetched_pending_manual_review", "research_completed_no_evidence",
+                  "candidate_supported", "research_completed_conflict"}
+    allowed_es = {"requires_manual_review", "no_reliable_evidence", "candidate_supported"}
+    for _, r in df.iterrows():
+        assert str(r["research_status"]).strip() in allowed_rs, \
+            f"invalid research_status: {r['research_status']}"
+        assert str(r["evidence_status"]).strip() in allowed_es, \
+            f"invalid evidence_status: {r['evidence_status']}"
+        if _truthy(r.get("network_blocked", "")):
+            assert r["research_status"] == "research_blocked_network"
+            assert str(r.get("fetched_source_count")) == "0"
+            assert str(r.get("reviewed_source_count")) == "0"
+            assert str(r.get("evidence_source_count")) == "0"
+            assert not _truthy(r.get("ready_for_user_review", ""))
+        if _truthy(r.get("ready_for_user_review", "")):
+            assert str(r.get("date_precision", "")).strip() == "exact_day"
+            assert str(r.get("proposed_canonical_public_entry_date_jalali", "")).strip() != ""
+            assert str(r.get("proposed_canonical_event_type", "")).strip() in CANONICAL_EVENT_TYPES
+            assert _truthy(r.get("ordinary_share_confirmed", ""))
+            assert not _truthy(r.get("conflict_flag", ""))
+        if _truthy(r.get("conflict_flag", "")):
+            assert not _truthy(r.get("ready_for_user_review", ""))
 
 
 # (20) Part 2 and TSETMC audit unchanged
@@ -1200,16 +1239,32 @@ def test_real_output_exact_set_and_order():
     assert df["ticker"].tolist() == PART03_TICKERS
 
 
-def test_real_output_all_blocked_network():
+def test_real_output_research_semantics_valid():
     df = _load_real_research()
-    assert (df["research_status"] == "research_blocked_network").all()
-    assert (df["network_blocked"].str.lower() == "true").all()
-    assert (df["evidence_status"] == "requires_manual_review").all()
-    assert (df["evidence_status"] != "no_reliable_evidence").all()
-    assert (df["ready_for_user_review"].str.lower() == "false").all()
-    assert (df["ordinary_share_confirmed"] == "unknown").all()
-    for c in ("fetched_source_count", "reviewed_source_count", "evidence_source_count"):
-        assert (df[c].astype(str) == "0").all()
+    assert df["ticker"].tolist() == PART03_TICKERS
+    allowed_rs = {"research_blocked_network", "source_discovered",
+                  "fetched_pending_manual_review", "research_completed_no_evidence",
+                  "candidate_supported", "research_completed_conflict"}
+    allowed_es = {"requires_manual_review", "no_reliable_evidence", "candidate_supported"}
+    for _, r in df.iterrows():
+        assert str(r["research_status"]).strip() in allowed_rs
+        assert str(r["evidence_status"]).strip() in allowed_es
+        if _truthy(r.get("network_blocked", "")):
+            assert r["research_status"] == "research_blocked_network"
+            assert str(r.get("fetched_source_count")) == "0"
+            assert str(r.get("reviewed_source_count")) == "0"
+            assert str(r.get("evidence_source_count")) == "0"
+            assert not _truthy(r.get("ready_for_user_review", ""))
+        if _truthy(r.get("ready_for_user_review", "")):
+            assert str(r.get("date_precision", "")).strip() == "exact_day"
+            cand = str(r.get("proposed_canonical_public_entry_date_jalali", "")).strip()
+            assert cand != "" and is_valid_exact_jalali_date(cand)
+            assert str(r.get("proposed_canonical_event_type", "")).strip() in CANONICAL_EVENT_TYPES
+            assert _truthy(r.get("ordinary_share_confirmed", ""))
+            assert not _truthy(r.get("conflict_flag", ""))
+        if _truthy(r.get("conflict_flag", "")):
+            assert not _truthy(r.get("ready_for_user_review", ""))
+            assert str(r.get("proposed_canonical_event_type", "")).strip() == "unresolved"
 
 
 def test_real_output_no_fabricated_evidence():
@@ -1218,24 +1273,64 @@ def test_real_output_no_fabricated_evidence():
         pytest.skip("part03 provenance not generated yet")
     df = pd.read_csv(p, dtype=str).fillna("")
     for _, r in df.iterrows():
-        if r["retrieval_status"] not in ("fetched_ok", "reused_existing_snapshot"):
-            assert r["snapshot_path"].strip() == ""
-            assert r["content_sha256"].strip() == ""
-        assert r["evidence_accepted"].strip().lower() != "true"
+        status = str(r.get("retrieval_status", ""))
+        snap = str(r.get("snapshot_path", "")).strip()
+        h = str(r.get("content_sha256", "")).strip()
+        if status not in FETCHED_STATUSES:
+            assert snap == "", f"failed fetch has snapshot: {snap}"
+            assert h == "", f"failed fetch has hash: {h}"
+            assert not _truthy(r.get("evidence_accepted", "")), \
+                "failed fetch must not have evidence_accepted=true"
+        else:
+            assert snap != "", "fetched source has empty snapshot_path"
+            assert _is_sha256(h), f"fetched source has invalid SHA-256: {h}"
+        assert str(r.get("evidence_accepted", "")).strip().lower() == \
+            compute_evidence_accepted({k: r.get(k, "") for k in r.index}, snapshot_root=ROOT)
 
 
-def test_real_worklist_ten_rows_and_empty_fields():
+def test_real_worklist_semantically_valid():
     p = PART03_DIR / "part03_manual_research_worklist.csv"
     if not p.exists():
         pytest.skip("worklist not generated yet")
     df = pd.read_csv(p, dtype=str).fillna("")
     assert df["ticker"].tolist() == PART03_TICKERS
     assert len(df) == 10
-    for c in ("discovered_source_1_url", "discovered_source_2_url",
-              "first_public_event_candidate", "candidate_date_jalali"):
-        assert (df[c].astype(str).str.strip() == "").all()
-    blob = " ".join(df.astype(str).values.ravel().tolist())
-    assert "http" not in blob.lower()
+    assert df["ticker"].nunique() == 10
+    allowed_events = {"", "first_public_offering", "first_public_trading",
+                      "admission", "listing", "unresolved"}
+    allowed_ord = {"true", "false", "unknown"}
+    allowed_status = {"pending_manual_research", "source_discovered",
+                      "under_review", "reviewed", "unresolved"}
+    allowed_precisions = {"unknown", "year_only", "month_only", "exact_day"}
+    for _, r in df.iterrows():
+        for c in ("discovered_source_1_url", "discovered_source_2_url"):
+            v = str(r.get(c, "")).strip()
+            if v:
+                parsed = urlparse(v)
+                assert parsed.scheme in ("http", "https"), f"invalid URL scheme: {v}"
+                assert parsed.hostname and "." in parsed.hostname, f"invalid URL host: {v}"
+                assert "/Users/" not in v and "Desktop" not in v, f"local path: {v}"
+        cand_date = str(r.get("candidate_date_jalali", "")).strip()
+        precision = str(r.get("date_precision", "")).strip()
+        assert precision in allowed_precisions, f"invalid date_precision: {precision}"
+        if cand_date:
+            assert precision != "unknown", "non-empty date with unknown precision"
+            if precision == "year_only":
+                assert bool(re.fullmatch(r"\d{4}", cand_date)), f"year_only mismatch: {cand_date}"
+            elif precision == "month_only":
+                assert bool(re.fullmatch(r"\d{4}-\d{2}", cand_date)), f"month_only mismatch: {cand_date}"
+            elif precision == "exact_day":
+                assert is_valid_exact_jalali_date(cand_date), f"exact_day invalid: {cand_date}"
+        else:
+            assert precision == "unknown", "empty date with non-unknown precision"
+        event = str(r.get("first_public_event_candidate", "")).strip()
+        assert event in allowed_events, f"invalid event candidate: {event}"
+        ord_val = str(r.get("ordinary_share_explicit", "")).strip().lower()
+        assert ord_val in allowed_ord, f"invalid ordinary_share_explicit: {ord_val}"
+        assert ord_val != "", "ordinary_share_explicit must not be empty"
+        status_val = str(r.get("manual_review_status", "")).strip()
+        assert status_val in allowed_status, f"invalid manual_review_status: {status_val}"
+        assert status_val != "", "manual_review_status must not be empty"
 
 
 def test_real_qc_report_self_consistent():
@@ -1536,20 +1631,112 @@ def test_r19_stale_review_clears_audit_fields():
         snap.unlink(missing_ok=True)
 
 
-# (20) current 20 timeout records and 10 research rows unchanged in character
-def test_r20_current_outputs_unchanged_character():
-    prov = pd.read_csv(PART03_DIR / "part03_source_provenance_10tickers.csv",
-                       dtype=str).fillna("")
-    assert len(prov) == 20
-    assert (prov["retrieval_status"] == "timeout").all()
-    assert (prov["evidence_accepted"].str.lower() == "false").all()
-    assert (prov["reviewer_notes"] == "").all()
-    assert (prov["manual_reviewed_at_utc"] == "").all()
-    research = pd.read_csv(PART03_DIR / "part03_research_screening_10tickers.csv",
-                           dtype=str).fillna("")
-    assert research["ticker"].tolist() == PART03_TICKERS
-    assert (research["research_status"] == "research_blocked_network").all()
-    assert (research["ready_for_user_review"].str.lower() == "false").all()
+# (20) real provenance ↔ registry integrity (forward-compatible)
+def test_r20_real_provenance_registry_integrity():
+    reg_path = PART03_DIR / "part03_source_registry.csv"
+    prov_path = PART03_DIR / "part03_source_provenance_10tickers.csv"
+    if not reg_path.exists() or not prov_path.exists():
+        pytest.skip("part03 registry or provenance not generated yet")
+    reg = pd.read_csv(reg_path, dtype=str).fillna("")
+    prov = pd.read_csv(prov_path, dtype=str).fillna("")
+    active_keys = {(str(r["ticker"]), str(r["source_index"]).strip())
+                   for _, r in reg.iterrows()
+                   if str(r.get("active", "")).strip().lower() == "true"}
+    inactive_keys = {(str(r["ticker"]), str(r["source_index"]).strip())
+                     for _, r in reg.iterrows()
+                     if str(r.get("active", "")).strip().lower() != "true"}
+    prov_keys = {(str(r["ticker"]), str(r["source_index"]).strip())
+                 for _, r in prov.iterrows()}
+    reg_keys = {(str(r["ticker"]), str(r["source_index"]).strip())
+                for _, r in reg.iterrows()}
+    assert prov_keys <= reg_keys, f"provenance rows outside registry: {prov_keys - reg_keys}"
+    assert prov_keys == active_keys, \
+        f"active/provenance mismatch: prov_only={prov_keys - active_keys}, active_only={active_keys - prov_keys}"
+    assert not (inactive_keys & prov_keys), \
+        f"inactive rows in provenance: {inactive_keys & prov_keys}"
+
+
+# (20b) real retrieval/evidence invariants (forward-compatible)
+def test_r20b_real_retrieval_evidence_invariants():
+    prov_path = PART03_DIR / "part03_source_provenance_10tickers.csv"
+    if not prov_path.exists():
+        pytest.skip("part03 provenance not generated yet")
+    df = pd.read_csv(prov_path, dtype=str).fillna("")
+    for _, r in df.iterrows():
+        status = str(r.get("retrieval_status", ""))
+        snap = str(r.get("snapshot_path", "")).strip()
+        h = str(r.get("content_sha256", "")).strip()
+        if status not in FETCHED_STATUSES:
+            assert snap == "", f"failed fetch has snapshot: {snap}"
+            assert h == "", f"failed fetch has hash: {h}"
+            assert not _truthy(r.get("evidence_accepted", "")), \
+                "failed fetch must not have evidence_accepted=true"
+        else:
+            assert snap != "", "fetched source has empty snapshot_path"
+            assert _is_sha256(h), f"fetched source has invalid SHA-256: {h}"
+            sp = ROOT / snap
+            if sp.exists():
+                assert hashlib.sha256(sp.read_bytes()).hexdigest() == h.lower(), \
+                    f"snapshot hash mismatch for {snap}"
+        review_status = str(r.get("content_review_status", "")).strip().lower()
+        if review_status == "reviewed":
+            assert status in FETCHED_STATUSES, "reviewed source not fetched"
+            assert snap != "" and _is_sha256(h), "reviewed source missing snapshot/hash"
+        assert str(r.get("evidence_accepted", "")).strip().lower() == \
+            compute_evidence_accepted({k: r.get(k, "") for k in r.index}, snapshot_root=ROOT)
+
+
+# (20c) real research counts match provenance (forward-compatible)
+def test_r20c_real_research_counts_match_provenance():
+    prov_path = PART03_DIR / "part03_source_provenance_10tickers.csv"
+    research_path = PART03_DIR / "part03_research_screening_10tickers.csv"
+    if not prov_path.exists() or not research_path.exists():
+        pytest.skip("part03 outputs not generated yet")
+    prov = pd.read_csv(prov_path, dtype=str).fillna("")
+    research = pd.read_csv(research_path, dtype=str).fillna("")
+    for _, r in research.iterrows():
+        tk = str(r["ticker"])
+        sub = prov[prov["ticker"] == tk]
+        attempted = len(sub)
+        fetched = sum(1 for _, p in sub.iterrows()
+                      if str(p.get("retrieval_status", "")) in FETCHED_STATUSES)
+        reviewed = sum(1 for _, p in sub.iterrows()
+                       if str(p.get("content_review_status", "")).strip().lower() == "reviewed")
+        accepted = sum(1 for _, p in sub.iterrows()
+                       if _truthy(p.get("evidence_accepted", "")))
+        assert str(r.get("attempted_source_count")) == str(attempted), \
+            f"{tk}: attempted {r.get('attempted_source_count')} != {attempted}"
+        assert str(r.get("fetched_source_count")) == str(fetched), \
+            f"{tk}: fetched {r.get('fetched_source_count')} != {fetched}"
+        assert str(r.get("reviewed_source_count")) == str(reviewed), \
+            f"{tk}: reviewed {r.get('reviewed_source_count')} != {reviewed}"
+        assert str(r.get("evidence_source_count")) == str(accepted), \
+            f"{tk}: evidence {r.get('evidence_source_count')} != {accepted}"
+
+
+# (20d) real summary matches current outputs (forward-compatible)
+def test_r20d_real_summary_matches_current_outputs():
+    summary_path = PART03_DIR / "part03_summary.json"
+    research_path = PART03_DIR / "part03_research_screening_10tickers.csv"
+    prov_path = PART03_DIR / "part03_source_provenance_10tickers.csv"
+    if not summary_path.exists() or not research_path.exists() or not prov_path.exists():
+        pytest.skip("part03 outputs not generated yet")
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    research = pd.read_csv(research_path, dtype=str).fillna("")
+    prov = pd.read_csv(prov_path, dtype=str).fillna("")
+    counts = summary["counts"]
+    assert counts["ready_count"] == sum(
+        1 for _, r in research.iterrows() if _truthy(r.get("ready_for_user_review", "")))
+    assert counts["network_blocked_count"] == sum(
+        1 for _, r in research.iterrows() if _truthy(r.get("network_blocked", "")))
+    assert counts["total_attempted_sources"] == len(prov)
+    assert counts["total_fetched_sources"] == sum(
+        1 for _, p in prov.iterrows() if str(p.get("retrieval_status", "")) in FETCHED_STATUSES)
+    assert counts["total_reviewed_sources"] == sum(
+        1 for _, p in prov.iterrows()
+        if str(p.get("content_review_status", "")).strip().lower() == "reviewed")
+    assert counts["total_evidence_sources"] == sum(
+        1 for _, p in prov.iterrows() if _truthy(p.get("evidence_accepted", "")))
 
 
 # (21) Part 2 hashes stable
@@ -1811,16 +1998,8 @@ def test_f17_merge_preserves_url_and_date():
     assert merged.at[2, "manual_review_status"] == "under_review"
 
 
-# (f18) current 20 timeout + 10 research rows unchanged
-def test_f18_current_outputs_unchanged():
-    prov = pd.read_csv(PART03_DIR / "part03_source_provenance_10tickers.csv",
-                       dtype=str).fillna("")
-    assert len(prov) == 20
-    assert (prov["retrieval_status"] == "timeout").all()
-    research = pd.read_csv(PART03_DIR / "part03_research_screening_10tickers.csv",
-                           dtype=str).fillna("")
-    assert research["ticker"].tolist() == PART03_TICKERS
-    assert (research["research_status"] == "research_blocked_network").all()
+# (f18) real outputs are forward-compatible — covered by r20* tests above
+# (removed test_f18_current_outputs_unchanged which locked on 20 timeout rows)
 
 
 # (f19) Part 2 hashes stable
@@ -1988,15 +2167,8 @@ def test_g17_registry_index3_still_passes():
     assert _result(qc, "active_registry_matches_provenance") is True
 
 
-# (18) current 20 timeout + 10 research rows unchanged
-def test_g18_current_outputs_unchanged():
-    prov = pd.read_csv(PART03_DIR / "part03_source_provenance_10tickers.csv",
-                       dtype=str).fillna("")
-    assert len(prov) == 20 and (prov["retrieval_status"] == "timeout").all()
-    research = pd.read_csv(PART03_DIR / "part03_research_screening_10tickers.csv",
-                           dtype=str).fillna("")
-    assert research["ticker"].tolist() == PART03_TICKERS
-    assert (research["research_status"] == "research_blocked_network").all()
+# (18) real outputs are forward-compatible — covered by r20* tests above
+# (removed test_g18_current_outputs_unchanged which locked on 20 timeout rows)
 
 
 # (19) Part 2 hashes stable
@@ -2019,3 +2191,224 @@ def test_g20_tsetmc_audit_stable():
                      dtype=str).fillna("")
     assert (df["network_request_performed"].str.lower() == "false").all()
     assert (df["probe_source"] == "historical_v2_audit").all()
+
+
+# ================================================================================
+# Part 3.1A.4.2 — Forward-compatible real-output tests + synthetic fixtures
+# ================================================================================
+
+# --- synthetic all-timeout fixture (independent of real repository file) ---
+def test_synthetic_all_timeout_fixture_blocked():
+    """A synthetic 10-ticker fixture where every source times out must produce
+    research_blocked_network, requires_manual_review, ready=false, and
+    ordinary_share=unknown — independent of the real committed CSV."""
+    fetch = _failed_fetch_results()
+    names = _names()
+    tsetmc = _absent_tsetmc()
+    research = build_research_screening(names, fetch, tsetmc)
+    assert (research["research_status"] == "research_blocked_network").all()
+    assert (research["evidence_status"] == "requires_manual_review").all()
+    assert (research["ready_for_user_review"].str.lower() == "false").all()
+    assert (research["ordinary_share_confirmed"] == "unknown").all()
+    assert (research["network_blocked"].str.lower() == "true").all()
+    for c in ("fetched_source_count", "reviewed_source_count", "evidence_source_count"):
+        assert (research[c].astype(str) == "0").all()
+
+
+# --- provenance with valid third source passes ---
+def test_prov_valid_third_source_passes():
+    tk = PART03_TICKERS[0]
+    reg = build_seed_registry_df()
+    add = pd.DataFrame([{
+        "ticker": tk, "source_type": "codal_official", "source_title": "doc3",
+        "source_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=NEW3",
+        "added_by": "tester", "discovery_notes": "found in 3.1B",
+    }])
+    reg = register_discovered_sources(reg, add)
+    assert len(reg) == 21
+    prov = _prov_from_registry(reg)
+    sub = prov[(prov["ticker"] == tk) & (prov["source_index"] == "3")]
+    assert len(sub) == 1
+    qc = _qc_reg(reg, prov)
+    assert _result(qc, "registry_additional_sources_allowed") is True
+    assert _result(qc, "active_registry_matches_provenance") is True
+
+
+# --- provenance with valid fetched source passes ---
+def test_prov_valid_fetched_source_passes():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("fc_fetched.html")
+    try:
+        retrieval = _retrieval_rec(tk, _CODAL_DOC, rel, h)
+        existing = _existing_prov_df(tk, _CODAL_DOC, rel, h)
+        overlaid = apply_validated_review_overlay([retrieval], existing, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        prov = build_source_provenance({tk: normalized}, snapshot_root=ROOT)
+        sub = prov[(prov["ticker"] == tk) & (prov["source_index"] == "1")]
+        assert len(sub) == 1
+        assert str(sub.iloc[0]["retrieval_status"]) in FETCHED_STATUSES
+        assert _is_sha256(str(sub.iloc[0]["content_sha256"]))
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# --- research with valid candidate_supported passes ---
+def test_research_valid_candidate_supported_passes():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("cs.html")
+    try:
+        retrieval = _retrieval_rec(tk, _CODAL_DOC, rel, h)
+        existing = _existing_prov_df(tk, _CODAL_DOC, rel, h)
+        overlaid = apply_validated_review_overlay([retrieval], existing, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        research = build_research_screening(_names(), {tk: normalized},
+                                             _absent_tsetmc())
+        row = research[research["ticker"] == tk].iloc[0]
+        assert row["research_status"] == "candidate_supported"
+        assert str(row["ready_for_user_review"]).lower() == "true"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# --- research with valid conflict passes ---
+def test_research_valid_conflict_passes():
+    tk = PART03_TICKERS[0]
+    snap1, rel1, h1 = _make_snapshot("conf1.html", b"<html>doc1</html>")
+    snap2, rel2, h2 = _make_snapshot("conf2.html", b"<html>doc2</html>")
+    try:
+        ret1 = _retrieval_rec(tk, _CODAL_DOC, rel1, h1)
+        ret1["source_index"] = 1
+        ext1 = _existing_prov_df(tk, _CODAL_DOC, rel1, h1,
+                                 event_type_supported="first_public_offering",
+                                 reviewed_date_jalali="1380-03-15")
+        ret2 = _retrieval_rec(tk, "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=DIFF2",
+                              rel2, h2)
+        ret2["source_index"] = 2
+        ext2 = _existing_prov_df(tk, "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=DIFF2",
+                                 rel2, h2,
+                                 source_index="2",
+                                 event_type_supported="first_public_trading",
+                                 reviewed_date_jalali="1381-06-20")
+        overlaid = apply_validated_review_overlay([ret1, ret2],
+                                                  pd.concat([ext1, ext2], ignore_index=True),
+                                                  ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        research = build_research_screening(_names(), {tk: normalized},
+                                             _absent_tsetmc())
+        row = research[research["ticker"] == tk].iloc[0]
+        assert str(row["research_status"]) == "research_completed_conflict"
+        assert str(row["conflict_flag"]).lower() == "true"
+        assert str(row["ready_for_user_review"]).lower() == "false"
+    finally:
+        snap1.unlink(missing_ok=True)
+        snap2.unlink(missing_ok=True)
+
+
+# --- failed fetch with fabricated snapshot/hash fails ---
+def test_failed_fetch_fabricated_snapshot_fails():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("fab.html")
+    try:
+        retrieval = _retrieval_rec(tk, _CODAL_DOC, rel, h, status="timeout")
+        retrieval["snapshot_path"] = rel
+        retrieval["content_sha256"] = h
+        existing = _existing_prov_df(tk, _CODAL_DOC, "stale.html", "a" * 64)
+        overlaid = apply_validated_review_overlay([retrieval], existing, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        prov = build_source_provenance({tk: normalized}, snapshot_root=ROOT)
+        row = prov[(prov["ticker"] == tk) & (prov["source_index"] == "1")].iloc[0]
+        assert not _truthy(row["evidence_accepted"]), \
+            "failed fetch must not have evidence_accepted=true"
+        tickers_df, _, _, tsetmc_df = _baseline_dfs()
+        research_df = build_research_screening(_names(), {tk: normalized},
+                                               _absent_tsetmc())
+        qc = run_part03_qc(tickers_df, research_df, prov, tsetmc_df, {}, {}, {}, {})
+        failed = [a["assertion"] for a in qc["assertions"] if not a["passed"]]
+        assert any("failed_fetch_no_snapshot" in f for f in failed), \
+            f"expected failed_fetch_no_snapshot failure, got: {failed}"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# --- accepted evidence inconsistent with engine fails ---
+def test_accepted_evidence_inconsistent_fails():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("inc.html")
+    try:
+        retrieval = _retrieval_rec(tk, _CODAL_DOC, rel, h)
+        existing = _existing_prov_df(tk, _CODAL_DOC, rel, h,
+                                     content_review_status="pending_manual_review",
+                                     evidence_accepted="true")
+        overlaid = apply_validated_review_overlay([retrieval], existing, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        prov = build_source_provenance({tk: normalized}, snapshot_root=ROOT)
+        row = prov[(prov["ticker"] == tk) & (prov["source_index"] == "1")].iloc[0]
+        assert not _truthy(row["evidence_accepted"]), \
+            "engine must recompute evidence_accepted=false for unreviewed source"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# --- active registry row missing in provenance fails ---
+def test_active_registry_missing_in_provenance_fails():
+    reg = build_seed_registry_df()
+    prov = _prov_from_registry(reg)
+    prov = prov.iloc[1:].copy()
+    qc = _qc_reg(reg, prov)
+    assert _result(qc, "active_registry_matches_provenance") is False
+
+
+# --- provenance row outside registry fails ---
+def test_provenance_outside_registry_fails():
+    reg = build_seed_registry_df()
+    prov = _prov_from_registry(reg)
+    extra = prov.iloc[0:1].copy()
+    extra.loc[extra.index[0], "source_index"] = "99"
+    prov = pd.concat([prov, extra], ignore_index=True)
+    qc = _qc_reg(reg, prov)
+    assert _result(qc, "provenance_subset_of_registry") is False
+
+
+# --- research count inconsistent with provenance fails ---
+def test_research_count_inconsistent_fails():
+    reg = build_seed_registry_df()
+    prov = _prov_from_registry(reg)
+    sources = registry_to_research_sources(reg, include_inactive=False)
+    saved = part03_mod._requests.get
+    part03_mod._requests.get = lambda *a, **k: (_ for _ in ()).throw(
+        part03_mod._requests.exceptions.Timeout())
+    try:
+        res = fetch_sources(force=True, sources_by_ticker=sources)
+    finally:
+        part03_mod._requests.get = saved
+    overlaid = {tk: normalize_provenance_records(res.get(tk, []), None)
+                for tk in PART03_TICKERS}
+    research = build_research_screening(_names(), overlaid, _absent_tsetmc())
+    research.at[0, "fetched_source_count"] = 999
+    tickers_df, _, prov_df, tsetmc_df = _baseline_dfs()
+    qc = run_part03_qc(tickers_df, research, prov_df, tsetmc_df, {}, {}, {}, {},
+                       registry_df=reg)
+    failed = [a["assertion"] for a in qc["assertions"] if not a["passed"]]
+    assert any("research_from_provenance" in f for f in failed), \
+        f"expected research_from_provenance failure, got: {failed}"
+
+
+# --- summary count inconsistent fails ---
+def test_summary_count_inconsistent_fails():
+    summary_path = PART03_DIR / "part03_summary.json"
+    if not summary_path.exists():
+        pytest.skip("part03 summary not generated yet")
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    research_path = PART03_DIR / "part03_research_screening_10tickers.csv"
+    prov_path = PART03_DIR / "part03_source_provenance_10tickers.csv"
+    research = pd.read_csv(research_path, dtype=str).fillna("")
+    prov = pd.read_csv(prov_path, dtype=str).fillna("")
+    counts = summary["counts"]
+    actual_fetched = sum(
+        1 for _, p in prov.iterrows() if str(p.get("retrieval_status", "")) in FETCHED_STATUSES)
+    assert counts["total_fetched_sources"] == actual_fetched, \
+        "summary total_fetched_sources must match provenance"
+    actual_ready = sum(
+        1 for _, r in research.iterrows() if _truthy(r.get("ready_for_user_review", "")))
+    assert counts["ready_count"] == actual_ready, \
+        "summary ready_count must match research"

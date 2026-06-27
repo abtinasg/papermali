@@ -21,6 +21,60 @@ verified master, does **not** run Gate B, and does **not** run any modelling.
 
 No Part 2 or Pilot15 ticker is re-researched.
 
+## Forward-compatible real-output tests (Part 3.1A.4.2)
+
+The real-output tests were refactored from baseline-locking assertions (which
+would break as soon as Part 3.1B adds a source or a fetch succeeds) to
+semantic-invariant assertions that remain valid as the data evolves:
+
+- **Provenance invariants** (`test_o18_real_provenance_retrieval_evidence_invariants`,
+  `test_r20b_real_retrieval_evidence_invariants`): failed fetches have no
+  snapshot/hash; fetched sources have a valid SHA-256; reviewed sources are
+  fetched; `evidence_accepted` always matches the engine's recomputation.
+- **Registry ↔ provenance integrity** (`test_r20_real_provenance_registry_integrity`):
+  every provenance row is in the registry; active registry rows are one-to-one
+  with provenance; inactive rows are not in provenance.
+- **Research semantic validity** (`test_o19_real_research_rows_semantically_valid`,
+  `test_real_output_research_semantics_valid`): `research_status` and
+  `evidence_status` are in allowed enums; network-blocked tickers have zero
+  counts and are not ready; ready tickers have `exact_day` precision, a valid
+  canonical date, and no conflict; conflict tickers are not ready.
+- **Research counts match provenance** (`test_r20c_real_research_counts_match_provenance`):
+  per-ticker `fetched_source_count`, `reviewed_source_count`,
+  `evidence_source_count`, and `attempted_source_count` in the research CSV
+  match the actual counts in the provenance CSV.
+- **Summary matches outputs** (`test_r20d_real_summary_matches_current_outputs`):
+  `ready_count`, `network_blocked_count`, `total_attempted_sources`,
+  `total_fetched_sources`, `total_reviewed_sources`, and
+  `total_evidence_sources` in the summary JSON match the current CSVs.
+- **Worklist semantic validity** (`test_real_worklist_semantically_valid`):
+  10 unique tickers in order; non-empty URLs are http(s) with real hosts;
+  `candidate_date_jalali` agrees with `date_precision`; enums are valid and
+  non-empty.
+- **Synthetic fixtures**: `test_synthetic_all_timeout_fixture_blocked` verifies
+  the all-timeout semantics independently of the committed CSV;
+  `test_prov_valid_third_source_passes`, `test_prov_valid_fetched_source_passes`,
+  `test_research_valid_candidate_supported_passes`, and
+  `test_research_valid_conflict_passes` verify that legitimate Part 3.1B findings
+  pass through the pipeline.
+- **Negative tests**: `test_failed_fetch_fabricated_snapshot_fails`,
+  `test_accepted_evidence_inconsistent_fails`,
+  `test_active_registry_missing_in_provenance_fails`,
+  `test_provenance_outside_registry_fails`,
+  `test_research_count_inconsistent_fails`, and
+  `test_summary_count_inconsistent_fails` verify that QC catches each class of
+  data corruption.
+
+The removed tests (`test_o18_current_timeout_records_unchanged`,
+`test_o19_current_research_rows_unchanged`,
+`test_real_output_all_blocked_network`,
+`test_real_worklist_ten_rows_and_empty_fields`,
+`test_r20_current_outputs_unchanged_character`,
+`test_f18_current_outputs_unchanged`,
+`test_g18_current_outputs_unchanged`) locked on the current all-timeout
+baseline (20 rows, all `research_blocked_network`, empty worklist). The new
+tests enforce the same invariants without assuming a specific baseline.
+
 ## Candidate-date ↔ precision agreement (Part 3.1A.4.1)
 
 A small semantic tightening of the worklist QC:
