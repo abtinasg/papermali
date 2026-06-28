@@ -352,17 +352,17 @@ def test_snapshot_hash_mismatch_not_ready():
         snap.unlink(missing_ok=True)
 
 
-# ---- (12) conflicting dates → not ready ----------------------------------------
+# ---- (12) conflicting same-event dates → not ready -----------------------------
 def test_conflicting_dates_not_ready():
+    # two incompatible *offering* dates → same-event conflict (offering vs trading
+    # is no longer a conflict as of Part 3.1A.5.2).
     r1 = _reviewed_rec(reviewed_date_jalali="1380-03-15")
     r2 = _news_rec(source_index=2, source_url="https://isna.ir/news/2",
-                   event_type_supported="first_public_trading",
+                   event_type_supported="first_public_offering",
                    reviewed_date_jalali="1381-04-20")
-    d = decide_ready_for_user_review([r1, r2], snapshot_root=None)
-    assert d["ready"] is False
-    assert d["conflict_flag"] is True
     st = _derive_screening_status([r1, r2], snapshot_root=None)
     assert st["conflict_flag"] == "true"
+    assert st["research_status"] == "research_completed_conflict"
     assert st["ready_for_user_review"] == "false"
 
 
@@ -2303,7 +2303,7 @@ def test_research_valid_conflict_passes():
         ext2 = _existing_prov_df(tk, "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=DIFF2",
                                  rel2, h2,
                                  source_index="2",
-                                 event_type_supported="first_public_trading",
+                                 event_type_supported="first_public_offering",
                                  reviewed_date_jalali="1381-06-20")
         overlaid = apply_validated_review_overlay([ret1, ret2],
                                                   pd.concat([ext1, ext2], ignore_index=True),
@@ -3134,7 +3134,8 @@ def test_p351_detect_conflicts_different_event_no_conflict():
 
 
 def test_p351_detect_conflicts_canonical_group():
-    # offering vs trading share the canonical group → incompatible dates conflict
+    # offering vs trading are DIFFERENT events (Part 3.1A.5.2): different dates are
+    # not a conflict; only same-event incompatibility is.
     pairs = [
         ({"ticker": "X", "source_index": "1", "reviewed_date_jalali": "1380-03-15"},
          {"reviewed_event_type": "first_public_offering"}),
@@ -3142,7 +3143,7 @@ def test_p351_detect_conflicts_canonical_group():
          {"reviewed_event_type": "first_public_trading"}),
     ]
     info = detect_evidence_conflicts(pairs)
-    assert info["conflict"] is True
+    assert info["conflict"] is False
 
 
 # --- derived fields are fully recomputed, never inherited from prior CSV (req 7) ---
@@ -3178,3 +3179,314 @@ def test_p351_stale_derived_fields_recomputed():
         assert r["evidence_role"] == "listing_only"
     finally:
         snap.unlink(missing_ok=True)
+
+
+# ================================================================================
+# Part 3.1A.5.2 — multi-event canonical selection, earliest-candidate rule,
+# weak-source corroboration, partial-before-exact blocker, all-candidate
+# preservation, deterministic best-candidate, conflict-role QC, idempotence
+# ================================================================================
+
+from project.src.stage124_batch02_part03 import (
+    decide_canonical_public_entry_candidate,
+    finalize_reviewed_evidence_set,
+    select_best_compatible_candidate,
+    partial_candidate_blocks_exact,
+    _qc_engine_invariants,
+)
+
+_AGG = "https://aggregator-example.ir/co/12345/ipo-report-page"
+
+
+def _rev(tk, idx, event, date, name, src_type="codal_official", url=None,
+         ordinary="true", exact="true"):
+    """Create a real snapshot and return a fully-reviewed record."""
+    snap, rel, h = _make_snapshot(name, f"<html>{name}</html>".encode())
+    rec = _retrieval_rec(tk, url if url is not None else
+                         f"https://www.codal.ir/Reports/Decision.aspx?LetterSerial={idx}{name}",
+                         rel, h, source_index=idx, source_type=src_type,
+                         content_review_status="reviewed",
+                         event_type_supported=event, exact_date_explicit=exact,
+                         reviewed_date_jalali=date, ordinary_share_explicit=ordinary)
+    return rec, snap
+
+
+def _derive_multi(tk, specs):
+    """specs: list of (idx, event, date, kwargs). Returns (status, records)."""
+    recs, snaps = [], []
+    for spec in specs:
+        idx, event, date = spec[0], spec[1], spec[2]
+        kw = spec[3] if len(spec) > 3 else {}
+        rec, snap = _rev(tk, idx, event, date, f"p352_{idx}_{event[:3]}", **kw)
+        recs.append(rec)
+        snaps.append(snap)
+    try:
+        st = _derive_screening_status(recs, snapshot_root=ROOT)
+        normalized = normalize_provenance_records(recs, ROOT)
+    finally:
+        for s in snaps:
+            s.unlink(missing_ok=True)
+    return st, normalized
+
+
+# 1. offering and trading with different dates → not a conflict.
+def test_p352_offering_trading_diff_dates_not_conflict():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "first_public_offering", "1380-03-15"),
+        (2, "first_public_trading", "1381-06-20")])
+    assert st["conflict_flag"] == "false"
+    assert st["research_status"] != "research_completed_conflict"
+
+
+# 2. offering exact earlier than trading exact → offering selected.
+def test_p352_offering_earlier_selected():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "first_public_offering", "1380-03-15"),
+        (2, "first_public_trading", "1381-06-20")])
+    assert st["proposed_canonical_event_type"] == "first_public_offering"
+    assert st["proposed_canonical_public_entry_date_jalali"] == "1380-03-15"
+    assert st["ready_for_user_review"] == "true"
+
+
+# 3. trading exact earlier than offering exact → trading selected.
+def test_p352_trading_earlier_selected():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "first_public_offering", "1381-06-20"),
+        (2, "first_public_trading", "1380-02-02")])
+    assert st["proposed_canonical_event_type"] == "first_public_trading"
+    assert st["proposed_canonical_public_entry_date_jalali"] == "1380-02-02"
+    assert st["ready_for_user_review"] == "true"
+
+
+# 4. offering and trading on the same day → tie-breaker prefers offering.
+def test_p352_same_day_tiebreak_offering():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "first_public_trading", "1380-03-15"),
+        (2, "first_public_offering", "1380-03-15")])
+    assert st["proposed_canonical_event_type"] == "first_public_offering"
+    assert st["proposed_canonical_public_entry_date_jalali"] == "1380-03-15"
+
+
+# 7 / 21. exact candidate from an aggregator → needs corroboration, not no_reliable.
+def test_p352_exact_aggregator_needs_corroboration():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "first_public_offering", "1380-03-15",
+         {"src_type": "", "url": _AGG})])
+    assert st["evidence_status"] != "no_reliable_evidence"
+    assert st["research_status"] == "research_completed_exact_public_entry_needs_corroboration"
+    assert st["research_completion_status"] == "completed_exact_candidate_needs_corroboration"
+    assert st["ready_for_user_review"] == "false"
+    assert st["evidence_status"] == "requires_manual_review"
+    assert st["recommended_next_step"] == "find_qualifying_corroboration"
+    assert st["first_public_offering_date_candidate_jalali"] == "1380-03-15"
+    assert st["proposed_canonical_public_entry_date_jalali"] == ""
+
+
+# 8. earlier weak candidate + later official candidate → later cannot override.
+def test_p352_later_official_cannot_override_earlier_weak():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "first_public_offering", "1380-03-15", {"src_type": "", "url": _AGG}),
+        (2, "first_public_trading", "1381-06-20")])
+    assert st["candidate_event_type"] == "first_public_offering"
+    assert st["research_status"] == "research_completed_exact_public_entry_needs_corroboration"
+    assert st["proposed_canonical_public_entry_date_jalali"] == ""
+    # the later trading candidate is still preserved in its column
+    assert st["first_public_trading_date_candidate_jalali"] == "1381-06-20"
+    assert st["first_public_offering_date_candidate_jalali"] == "1380-03-15"
+
+
+# 9. partial offering year 1380 + exact trading 1381 → exact blocked, partial status.
+def test_p352_partial_year_blocks_later_exact():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "first_public_offering", "1380", {"exact": "false"}),
+        (2, "first_public_trading", "1381-04-10")])
+    assert st["ready_for_user_review"] == "false"
+    assert st["research_status"] == "research_completed_partial_public_entry_date"
+    assert st["evidence_status"] == "requires_manual_review"
+    assert st["recommended_next_step"] == "find_exact_public_entry_day"
+    assert st["proposed_canonical_public_entry_date_jalali"] == ""
+    # both candidate columns preserved
+    assert st["first_public_offering_date_candidate_jalali"] == "1380"
+    assert st["first_public_trading_date_candidate_jalali"] == "1381-04-10"
+
+
+# 10. partial offering month 1380-03 + exact trading 1380-04 → blocker.
+def test_p352_partial_month_blocks_later_exact():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "first_public_offering", "1380-03", {"exact": "false"}),
+        (2, "first_public_trading", "1380-04-10")])
+    assert st["research_status"] == "research_completed_partial_public_entry_date"
+    assert st["ready_for_user_review"] == "false"
+
+
+# 11. partial offering month 1380-03 + exact offering 1380-03-15 → compatible.
+def test_p352_compatible_partial_exact_same_event():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "first_public_offering", "1380-03", {"exact": "false"}),
+        (2, "first_public_offering", "1380-03-15")])
+    assert st["conflict_flag"] == "false"
+    # exact candidate is usable → ready with the exact date
+    assert st["proposed_canonical_public_entry_date_jalali"] == "1380-03-15"
+    assert st["ready_for_user_review"] == "true"
+
+
+# 12. partial candidate entirely after the exact candidate → not a blocker.
+def test_p352_partial_after_exact_not_blocker():
+    assert partial_candidate_blocks_exact("1382", "year_only", "1380-03-15") is False
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "first_public_offering", "1380-03-15"),
+        (2, "first_public_trading", "1382", {"exact": "false"})])
+    # offering exact is the earliest and is not blocked by the later partial
+    assert st["proposed_canonical_public_entry_date_jalali"] == "1380-03-15"
+    assert st["ready_for_user_review"] == "true"
+
+
+# 13. admission year + admission exact compatible → exact candidate chosen.
+def test_p352_admission_year_plus_exact_picks_exact():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "admission", "1380", {"ordinary": "unknown", "exact": "false"}),
+        (2, "admission", "1380-05-10", {"ordinary": "unknown"})])
+    assert st["admission_date_candidate_jalali"] == "1380-05-10"
+    assert st["date_precision"] == "exact_day"
+    assert st["research_status"] == "research_completed_admission_only"
+
+
+# 14. listing month + listing exact compatible → exact candidate chosen.
+def test_p352_listing_month_plus_exact_picks_exact():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "listing", "1381-01", {"ordinary": "unknown", "exact": "false"}),
+        (2, "listing", "1381-01-10", {"ordinary": "unknown"})])
+    assert st["listing_date_candidate_jalali"] == "1381-01-10"
+    assert st["date_precision"] == "exact_day"
+    assert st["research_status"] == "research_completed_listing_only"
+
+
+# 16. admission + listing + offering partial → all three candidates preserved.
+def test_p352_three_candidates_preserved_partial():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "admission", "1379-01-01", {"ordinary": "unknown"}),
+        (2, "listing", "1380-02-02", {"ordinary": "unknown"}),
+        (3, "first_public_offering", "1381", {"exact": "false"})])
+    assert st["admission_date_candidate_jalali"] == "1379-01-01"
+    assert st["listing_date_candidate_jalali"] == "1380-02-02"
+    assert st["first_public_offering_date_candidate_jalali"] == "1381"
+
+
+# 17. admission + listing + trading exact → all three candidates preserved.
+def test_p352_three_candidates_preserved_exact():
+    tk = PART03_TICKERS[0]
+    st, _ = _derive_multi(tk, [
+        (1, "admission", "1379-01-01", {"ordinary": "unknown"}),
+        (2, "listing", "1380-02-02", {"ordinary": "unknown"}),
+        (3, "first_public_trading", "1381-04-10")])
+    assert st["admission_date_candidate_jalali"] == "1379-01-01"
+    assert st["listing_date_candidate_jalali"] == "1380-02-02"
+    assert st["first_public_trading_date_candidate_jalali"] == "1381-04-10"
+    # the exact trading candidate is the dominant public-entry candidate
+    assert st["proposed_canonical_event_type"] == "first_public_trading"
+
+
+# 18. conflict rows take the finalized role conflicting_evidence (provenance).
+def test_p352_conflict_role_in_provenance():
+    tk = PART03_TICKERS[0]
+    _st, normalized = _derive_multi(tk, [
+        (1, "first_public_offering", "1380-03-15"),
+        (2, "first_public_offering", "1381-06-20")])
+    roles = [str(r.get("evidence_role")) for r in normalized]
+    assert roles.count("conflicting_evidence") == 2
+    # finalizer agrees with the stored provenance role (idempotent finalization);
+    # hashes are still valid so snapshot_root=None re-derives the same roles.
+    fin = finalize_reviewed_evidence_set(normalized, None)
+    fin_roles = {(str(fr.get("ticker")), str(fr.get("source_index")).strip()):
+                 fr["_final_evidence_role"] for fr in fin["finalized_records"]}
+    for r in normalized:
+        key = (str(r.get("ticker")), str(r.get("source_index")).strip())
+        assert str(r.get("evidence_role")) == fin_roles[key]
+
+
+# 19. finalizer is idempotent (byte/field-identical roles and candidates).
+def test_p352_finalizer_idempotent():
+    tk = PART03_TICKERS[0]
+    _st, normalized = _derive_multi(tk, [
+        (1, "first_public_offering", "1380-03-15"),
+        (2, "admission", "1379-01-01", {"ordinary": "unknown"})])
+    f1 = finalize_reviewed_evidence_set(normalized, ROOT)
+    f2 = finalize_reviewed_evidence_set(f1["finalized_records"], ROOT)
+    r1 = [fr["_final_evidence_role"] for fr in f1["finalized_records"]]
+    r2 = [fr["_final_evidence_role"] for fr in f2["finalized_records"]]
+    assert r1 == r2
+    c1 = {k: (v["date"], v["precision"], v["conflict"])
+          for k, v in f1["candidates_by_event"].items()}
+    c2 = {k: (v["date"], v["precision"], v["conflict"])
+          for k, v in f2["candidates_by_event"].items()}
+    assert c1 == c2
+
+
+# 20. shuffled record order yields identical candidates and status.
+def test_p352_shuffled_order_stable():
+    tk = PART03_TICKERS[0]
+    specs_a = [
+        (1, "first_public_offering", "1380-03-15"),
+        (2, "first_public_trading", "1381-06-20"),
+        (3, "admission", "1379-01-01", {"ordinary": "unknown"})]
+    specs_b = list(reversed(specs_a))
+    st_a, _ = _derive_multi(tk, specs_a)
+    st_b, _ = _derive_multi(tk, specs_b)
+    fields = ("research_status", "evidence_status", "candidate_event_type",
+              "proposed_canonical_public_entry_date_jalali",
+              "proposed_canonical_event_type", "ready_for_user_review",
+              "admission_date_candidate_jalali",
+              "first_public_offering_date_candidate_jalali",
+              "first_public_trading_date_candidate_jalali")
+    assert all(st_a[f] == st_b[f] for f in fields)
+
+
+# helper-level: select_best_compatible_candidate precision + tie-break.
+def test_p352_select_best_candidate_precision():
+    recs = [
+        ({"source_index": "2", "reviewed_date_jalali": "1380"},
+         {"reviewed_date_precision": "year_only", "reviewed_event_type": "admission"}),
+        ({"source_index": "1", "reviewed_date_jalali": "1380-05-10"},
+         {"reviewed_date_precision": "exact_day", "reviewed_event_type": "admission"}),
+    ]
+    out = select_best_compatible_candidate(recs)
+    assert out["conflict"] is False
+    assert out["date"] == "1380-05-10"
+    assert out["precision"] == "exact_day"
+
+
+# the QC engine-invariant block passes cleanly.
+def test_p352_qc_engine_invariants_pass():
+    results = []
+    def _check(name, passed, detail=""):
+        results.append((name, bool(passed), detail))
+    _qc_engine_invariants(_check)
+    failed = [(n, d) for n, p, d in results if not p]
+    assert not failed, f"engine-invariant failures: {failed}"
+    names = {n for n, _, _ in results}
+    for required in ("different_canonical_events_not_conflict",
+                     "same_event_conflict_only",
+                     "best_candidate_uses_highest_precision",
+                     "candidate_selection_deterministic",
+                     "earliest_exact_public_event_selected",
+                     "later_qualified_candidate_cannot_override_earlier_unqualified_candidate",
+                     "exact_unqualified_not_no_reliable_evidence",
+                     "exact_candidate_needs_corroboration_not_ready",
+                     "earlier_partial_blocks_later_exact",
+                     "compatible_partial_does_not_block_exact",
+                     "finalizer_idempotent",
+                     "qc_report_regenerated_from_current_engine"):
+        assert required in names, f"missing invariant {required}"

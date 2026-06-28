@@ -1,7 +1,7 @@
 {
   "stage": "stage124_batch02_part03",
-  "generated_at": "2026-06-27T16:53:37Z",
-  "source_commit": "130db8e195e9f05f655f33545c4de64dba202d9b",
+  "generated_at": "2026-06-28T12:52:49Z",
+  "source_commit": "a8db554d51c52f7d6134995683b092ca3f86b11a",
   "ticker_count": 10,
   "tickers": [
     "خمهر",
@@ -16,7 +16,7 @@
     "رمپنا"
   ],
   "all_pass": true,
-  "assertion_count": 415,
+  "assertion_count": 457,
   "failed_count": 0,
   "assertions": [
     {
@@ -657,7 +657,12 @@
     {
       "assertion": "evidence_role_matches_engine_خمهر_1",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_خمهر_1",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_خمهر_1",
@@ -717,7 +722,12 @@
     {
       "assertion": "evidence_role_matches_engine_خمهر_2",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_خمهر_2",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_خمهر_2",
@@ -772,7 +782,12 @@
     {
       "assertion": "evidence_role_matches_engine_خنصیر_1",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_خنصیر_1",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_خنصیر_1",
@@ -832,7 +847,12 @@
     {
       "assertion": "evidence_role_matches_engine_خنصیر_2",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_خنصیر_2",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_خنصیر_2",
@@ -887,7 +907,12 @@
     {
       "assertion": "evidence_role_matches_engine_خوساز_1",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_خوساز_1",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_خوساز_1",
@@ -947,7 +972,12 @@
     {
       "assertion": "evidence_role_matches_engine_خوساز_2",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_خوساز_2",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_خوساز_2",
@@ -1002,7 +1032,12 @@
     {
       "assertion": "evidence_role_matches_engine_خچرخش_1",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_خچرخش_1",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_خچرخش_1",
@@ -1062,7 +1097,12 @@
     {
       "assertion": "evidence_role_matches_engine_خچرخش_2",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_خچرخش_2",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_خچرخش_2",
@@ -1117,7 +1157,12 @@
     {
       "assertion": "evidence_role_matches_engine_خکمک_1",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_خکمک_1",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_خکمک_1",
@@ -1177,7 +1222,12 @@
     {
       "assertion": "evidence_role_matches_engine_خکمک_2",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_خکمک_2",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_خکمک_2",
@@ -1232,7 +1282,12 @@
     {
       "assertion": "evidence_role_matches_engine_دروز_1",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_دروز_1",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_دروز_1",
@@ -1292,7 +1347,12 @@
     {
       "assertion": "evidence_role_matches_engine_دروز_2",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_دروز_2",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_دروز_2",
@@ -1347,7 +1407,12 @@
     {
       "assertion": "evidence_role_matches_engine_دسبحا_1",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_دسبحا_1",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_دسبحا_1",
@@ -1407,7 +1472,12 @@
     {
       "assertion": "evidence_role_matches_engine_دسبحا_2",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_دسبحا_2",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_دسبحا_2",
@@ -1462,7 +1532,12 @@
     {
       "assertion": "evidence_role_matches_engine_دیران_1",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_دیران_1",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_دیران_1",
@@ -1522,7 +1597,12 @@
     {
       "assertion": "evidence_role_matches_engine_دیران_2",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_دیران_2",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_دیران_2",
@@ -1577,7 +1657,12 @@
     {
       "assertion": "evidence_role_matches_engine_رانفور_1",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_رانفور_1",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_رانفور_1",
@@ -1637,7 +1722,12 @@
     {
       "assertion": "evidence_role_matches_engine_رانفور_2",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_رانفور_2",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_رانفور_2",
@@ -1692,7 +1782,12 @@
     {
       "assertion": "evidence_role_matches_engine_رمپنا_1",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_رمپنا_1",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_رمپنا_1",
@@ -1752,7 +1847,12 @@
     {
       "assertion": "evidence_role_matches_engine_رمپنا_2",
       "passed": true,
-      "detail": "stored=none, computed=none"
+      "detail": "stored=none, finalized=none"
+    },
+    {
+      "assertion": "conflicting_role_matches_finalized_engine_رمپنا_2",
+      "passed": true,
+      "detail": "stored=none, finalized=none"
     },
     {
       "assertion": "evidence_role_valid_enum_رمپنا_2",
@@ -1880,9 +1980,19 @@
       "detail": "research screening row must match status derived from recomputed provenance"
     },
     {
+      "assertion": "all_candidate_columns_match_provenance_خمهر",
+      "passed": true,
+      "detail": "candidate columns must equal the finalized per-event candidates"
+    },
+    {
       "assertion": "research_from_provenance_خنصیر",
       "passed": true,
       "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "all_candidate_columns_match_provenance_خنصیر",
+      "passed": true,
+      "detail": "candidate columns must equal the finalized per-event candidates"
     },
     {
       "assertion": "research_from_provenance_خوساز",
@@ -1890,9 +2000,19 @@
       "detail": "research screening row must match status derived from recomputed provenance"
     },
     {
+      "assertion": "all_candidate_columns_match_provenance_خوساز",
+      "passed": true,
+      "detail": "candidate columns must equal the finalized per-event candidates"
+    },
+    {
       "assertion": "research_from_provenance_خچرخش",
       "passed": true,
       "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "all_candidate_columns_match_provenance_خچرخش",
+      "passed": true,
+      "detail": "candidate columns must equal the finalized per-event candidates"
     },
     {
       "assertion": "research_from_provenance_خکمک",
@@ -1900,9 +2020,19 @@
       "detail": "research screening row must match status derived from recomputed provenance"
     },
     {
+      "assertion": "all_candidate_columns_match_provenance_خکمک",
+      "passed": true,
+      "detail": "candidate columns must equal the finalized per-event candidates"
+    },
+    {
       "assertion": "research_from_provenance_دروز",
       "passed": true,
       "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "all_candidate_columns_match_provenance_دروز",
+      "passed": true,
+      "detail": "candidate columns must equal the finalized per-event candidates"
     },
     {
       "assertion": "research_from_provenance_دسبحا",
@@ -1910,9 +2040,19 @@
       "detail": "research screening row must match status derived from recomputed provenance"
     },
     {
+      "assertion": "all_candidate_columns_match_provenance_دسبحا",
+      "passed": true,
+      "detail": "candidate columns must equal the finalized per-event candidates"
+    },
+    {
       "assertion": "research_from_provenance_دیران",
       "passed": true,
       "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "all_candidate_columns_match_provenance_دیران",
+      "passed": true,
+      "detail": "candidate columns must equal the finalized per-event candidates"
     },
     {
       "assertion": "research_from_provenance_رانفور",
@@ -1920,9 +2060,79 @@
       "detail": "research screening row must match status derived from recomputed provenance"
     },
     {
+      "assertion": "all_candidate_columns_match_provenance_رانفور",
+      "passed": true,
+      "detail": "candidate columns must equal the finalized per-event candidates"
+    },
+    {
       "assertion": "research_from_provenance_رمپنا",
       "passed": true,
       "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "all_candidate_columns_match_provenance_رمپنا",
+      "passed": true,
+      "detail": "candidate columns must equal the finalized per-event candidates"
+    },
+    {
+      "assertion": "different_canonical_events_not_conflict",
+      "passed": true,
+      "detail": "offering vs trading different dates must not conflict"
+    },
+    {
+      "assertion": "same_event_conflict_only",
+      "passed": true,
+      "detail": "conflict must arise only within the same event"
+    },
+    {
+      "assertion": "best_candidate_uses_highest_precision",
+      "passed": true,
+      "detail": "got={'conflict': False, 'date': '1380-05-10', 'precision': 'exact_day', 'record': {'ticker': 'SYN', 'source_index': 2, 'source_type': 'codal_official', 'source_url': 'https://www.codal.ir/Reports/Decision.aspx?LetterSerial=SYN2', 'retrieval_status': 'fetched_ok', 'content_sha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'snapshot_path': 'stage124/batch02_parts/snapshots_part03/syn.html', 'content_review_status': 'reviewed', 'event_type_supported': 'admission', 'exact_date_explicit': 'true', 'reviewed_date_jalali': '1380-05-10', 'ordinary_share_explicit': 'true', 'independent_source_group': ''}}"
+    },
+    {
+      "assertion": "candidate_selection_deterministic",
+      "passed": true,
+      "detail": "candidate must not depend on record order"
+    },
+    {
+      "assertion": "earliest_exact_public_event_selected",
+      "passed": true,
+      "detail": "got={'has_exact_candidate': True, 'earliest_event': 'first_public_trading', 'earliest_date': '1380-02-02', 'sufficient': True, 'ready': True, 'canonical_date': '1380-02-02', 'canonical_event': 'first_public_trading', 'blocked_by_partial': False, 'blocking_partial': '', 'blocking_partial_event': '', 'blocking_partial_precision': 'unknown', 'reason': 'ready'}"
+    },
+    {
+      "assertion": "later_qualified_candidate_cannot_override_earlier_unqualified_candidate",
+      "passed": true,
+      "detail": "got=research_completed_exact_public_entry_needs_corroboration"
+    },
+    {
+      "assertion": "exact_unqualified_not_no_reliable_evidence",
+      "passed": true,
+      "detail": "es=requires_manual_review"
+    },
+    {
+      "assertion": "exact_candidate_needs_corroboration_not_ready",
+      "passed": true,
+      "detail": "got=research_completed_exact_public_entry_needs_corroboration"
+    },
+    {
+      "assertion": "qc_report_regenerated_from_current_engine",
+      "passed": true,
+      "detail": "current engine must emit the 3.1A.5.2 corroboration status"
+    },
+    {
+      "assertion": "earlier_partial_blocks_later_exact",
+      "passed": true,
+      "detail": "got={'has_exact_candidate': True, 'earliest_event': 'first_public_trading', 'earliest_date': '1381-04-10', 'sufficient': False, 'ready': False, 'canonical_date': '', 'canonical_event': '', 'blocked_by_partial': True, 'blocking_partial': '1380', 'blocking_partial_event': 'first_public_offering', 'blocking_partial_precision': 'year_only', 'reason': 'earlier_partial_blocks_exact'}"
+    },
+    {
+      "assertion": "compatible_partial_does_not_block_exact",
+      "passed": true,
+      "detail": "got={'has_exact_candidate': True, 'earliest_event': 'first_public_offering', 'earliest_date': '1380-03-15', 'sufficient': True, 'ready': True, 'canonical_date': '1380-03-15', 'canonical_event': 'first_public_offering', 'blocked_by_partial': False, 'blocking_partial': '', 'blocking_partial_event': '', 'blocking_partial_precision': 'unknown', 'reason': 'ready'}"
+    },
+    {
+      "assertion": "finalizer_idempotent",
+      "passed": true,
+      "detail": "roles1=['conflicting_evidence', 'conflicting_evidence', 'admission_only'], roles2=['conflicting_evidence', 'conflicting_evidence', 'admission_only']"
     },
     {
       "assertion": "no_user_verification_token",
