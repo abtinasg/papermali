@@ -988,7 +988,6 @@ REVIEW_OVERLAY_FIELDS = [
     "publication_date_explicit", "exact_text_or_event_summary",
     "supported_event_type", "supported_date_jalali",
     "reviewer_notes", "manual_reviewed_at_utc",
-    "reviewed_event_type", "reviewed_date_precision",
 ]
 
 # Default (no-review) values for the overlay fields, so a record with no valid
@@ -1005,15 +1004,17 @@ REVIEW_FIELD_DEFAULTS = {
     "supported_date_jalali": "",
     "reviewer_notes": "",
     "manual_reviewed_at_utc": "",
-    "reviewed_event_type": "",
-    "reviewed_date_precision": "unknown",
 }
 
 # Derived fields that are ALWAYS recomputed and never trusted from a prior CSV.
+# ``reviewed_event_type`` / ``reviewed_date_precision`` / ``reviewed_evidence_valid`` /
+# ``evidence_role`` are fully derived from the review *inputs* on every run and must
+# never be inherited via the overlay.
 DERIVED_NEVER_TRUSTED = [
     "source_authority_class", "authority_validation_error", "document_specific",
     "contemporaneous_with_event", "independent_source_group", "evidence_accepted",
     "ready_for_user_review",
+    "reviewed_event_type", "reviewed_date_precision",
     "reviewed_evidence_valid", "evidence_role",
 ]
 
@@ -1025,8 +1026,7 @@ def _had_manual_review(pr) -> bool:
     if str(pr.get("content_review_status", "")).strip().lower() == "reviewed":
         return True
     for f in ("event_type_supported", "reviewed_date_jalali", "supported_event_type",
-              "supported_date_jalali", "exact_text_or_event_summary",
-              "reviewed_event_type", "reviewed_date_precision"):
+              "supported_date_jalali", "exact_text_or_event_summary"):
         if str(pr.get(f, "")).strip():
             return True
     if _truthy(pr.get("exact_date_explicit", "")) or _truthy(pr.get("ordinary_share_explicit", "")):
@@ -1164,6 +1164,135 @@ def evaluate_reviewed_evidence_record(rec: dict, snapshot_root: Path = None) -> 
     return result
 
 
+def _parse_jalali_components(date_str: str):
+    """Return ``(precision, (year, month, day))`` for a Jalali date, with month
+    and/or day set to ``None`` for coarser precisions. Returns
+    ``("unknown", None)`` when no precision can be established."""
+    p = _detect_date_precision(date_str)
+    s = str(date_str or "").strip()
+    if p == "exact_day":
+        s2 = normalize_jalali(s)
+        return p, (int(s2[:4]), int(s2[5:7]), int(s2[8:10]))
+    if p == "month_only":
+        return p, (int(s[:4]), int(s[5:7]), None)
+    if p == "year_only":
+        return p, (int(s[:4]), None, None)
+    return "unknown", None
+
+
+def jalali_dates_compatible(a: str, b: str) -> bool:
+    """Two reviewed dates are *compatible* when they do not contradict on any
+    component they both specify:
+
+    * exact ``1380-03-15`` is compatible with month ``1380-03`` and year ``1380``;
+    * month ``1380-03`` is compatible with year ``1380``;
+    * a different year, a different month, or two different exact days conflict.
+
+    An ``unknown`` precision on either side cannot establish a conflict.
+    """
+    _pa, ca = _parse_jalali_components(a)
+    _pb, cb = _parse_jalali_components(b)
+    if ca is None or cb is None:
+        return True
+    ya, ma, da = ca
+    yb, mb, db = cb
+    if ya != yb:
+        return False
+    if ma is not None and mb is not None and ma != mb:
+        return False
+    if da is not None and db is not None and da != db:
+        return False
+    return True
+
+
+# Reviewed event types that all compete for the single canonical public-entry
+# date, so an incompatible date across *any* of them is a genuine conflict.
+_CANONICAL_CONFLICT_GROUP = "canonical_public_entry"
+
+
+def _conflict_group_for_event(event_type: str) -> str:
+    """Map a reviewed event type to its conflict-grouping key. Canonical events
+    (first_public_offering / first_public_trading) share one group because they
+    all assert the single canonical entry date; each non-canonical event
+    (admission, listing, public_company_conversion) is its own group so that two
+    *different* events (e.g. admission vs listing) never conflict."""
+    if event_type in CANONICAL_EVENT_TYPES:
+        return _CANONICAL_CONFLICT_GROUP
+    return event_type
+
+
+def detect_evidence_conflicts(valid_pairs: list) -> dict:
+    """Detect same-event conflicts among valid reviewed-evidence records.
+
+    ``valid_pairs`` is a list of ``(record, eval_dict)`` for records whose
+    ``reviewed_evidence_valid`` is True. Records are grouped by conflict group
+    (canonical events together; each non-canonical event on its own). Within a
+    group, any two incompatible dates (per :func:`jalali_dates_compatible`)
+    constitute a conflict. Different events with different dates are NOT a
+    conflict.
+
+    Returns a dict with ``conflict`` (bool), ``event_types`` (sorted list of the
+    conflicting reviewed event types), ``dates`` (sorted unique conflicting
+    date strings), and ``keys`` (set of ``(ticker, source_index)`` for the
+    records participating in a conflict)."""
+    groups = {}
+    for r, ev in valid_pairs:
+        g = _conflict_group_for_event(ev["reviewed_event_type"])
+        groups.setdefault(g, []).append((r, ev))
+
+    conflict = False
+    event_types = set()
+    dates = set()
+    keys = set()
+    for _g, pairs in groups.items():
+        date_list = [str(r.get("reviewed_date_jalali", "")).strip() for r, _ in pairs]
+        group_conflict = False
+        for i in range(len(date_list)):
+            for j in range(i + 1, len(date_list)):
+                if not jalali_dates_compatible(date_list[i], date_list[j]):
+                    group_conflict = True
+        if group_conflict:
+            conflict = True
+            for r, ev in pairs:
+                event_types.add(ev["reviewed_event_type"])
+                d = str(r.get("reviewed_date_jalali", "")).strip()
+                if d:
+                    dates.add(d)
+                keys.add((str(r.get("ticker", "")),
+                          str(r.get("source_index", "")).strip()))
+    return {
+        "conflict": conflict,
+        "event_types": sorted(event_types),
+        "dates": sorted(dates),
+        "keys": keys,
+    }
+
+
+def _mark_conflicting_evidence_roles(records: list, snapshot_root: Path) -> None:
+    """In-place: set ``evidence_role='conflicting_evidence'`` on every record that
+    participates in a same-event conflict, grouped per ticker. Operates on
+    already-normalized records (which carry their derived reviewed-evidence
+    fields). This keeps provenance and research consistent: both are built from
+    one finalized record set."""
+    by_ticker = {}
+    for r in records:
+        by_ticker.setdefault(str(r.get("ticker", "")), []).append(r)
+    for _tk, recs in by_ticker.items():
+        valid_pairs = []
+        for r in recs:
+            if str(r.get("reviewed_evidence_valid", "")).strip().lower() == "true":
+                valid_pairs.append((r, {
+                    "reviewed_event_type": str(r.get("reviewed_event_type", "")).strip(),
+                }))
+        info = detect_evidence_conflicts(valid_pairs)
+        if not info["conflict"]:
+            continue
+        for r in recs:
+            key = (str(r.get("ticker", "")), str(r.get("source_index", "")).strip())
+            if key in info["keys"]:
+                r["evidence_role"] = "conflicting_evidence"
+
+
 def normalize_provenance_records(records: list, snapshot_root: Path = ROOT) -> list:
     """Recompute every *derived* evidence field for each record from the URL and
     reviewed content. Manual values for derived fields are ignored entirely; the
@@ -1192,6 +1321,9 @@ def normalize_provenance_records(records: list, snapshot_root: Path = ROOT) -> l
         r["reviewed_evidence_valid"] = "true" if rev["reviewed_evidence_valid"] else "false"
         r["evidence_role"] = rev["evidence_role"]
         out.append(r)
+    # Cross-record finalization: records that participate in a same-event conflict
+    # take evidence_role=conflicting_evidence so provenance and research agree.
+    _mark_conflicting_evidence_roles(out, snapshot_root)
     return out
 
 
@@ -1409,9 +1541,18 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
 
     # Research was completed (fetched AND reviewed). Now apply evidence logic.
 
-    # Evaluate each reviewed record with the new reviewed-evidence engine.
-    reviewed_evals = [evaluate_reviewed_evidence_record(r, snapshot_root) for r in reviewed]
-    valid_evals = [ev for ev in reviewed_evals if ev["reviewed_evidence_valid"]]
+    # Evaluate each reviewed record with the new reviewed-evidence engine, keeping
+    # the source record alongside each evaluation so dates remain available.
+    reviewed_pairs = [(r, evaluate_reviewed_evidence_record(r, snapshot_root))
+                      for r in reviewed]
+    valid_pairs = [(r, ev) for r, ev in reviewed_pairs if ev["reviewed_evidence_valid"]]
+    valid_evals = [ev for _, ev in valid_pairs]
+
+    def _date_for_role(role):
+        for r, ev in valid_pairs:
+            if ev["evidence_role"] == role:
+                return str(r.get("reviewed_date_jalali", "")).strip()
+        return ""
 
     # Separate by evidence role.
     canonical_exact = [ev for ev in valid_evals
@@ -1424,14 +1565,14 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
                      if ev["evidence_role"] == "listing_only"]
     conversion_evals = [ev for ev in valid_evals
                         if ev["evidence_role"] == "public_company_conversion_only"]
-    non_entry_evals = [ev for ev in valid_evals
-                       if ev["evidence_role"] == "non_entry_evidence"]
 
-    # Step 1: Check for canonical conflict (using the original decide_ready_for_user_review
-    # which checks for conflicting canonical dates/events).
-    decision = decide_ready_for_user_review(reviewed, snapshot_root)
+    # Step 1: Same-event conflict detection — two incompatible dates for the same
+    # event (or among the canonical events) is a conflict; different events with
+    # different dates are NOT a conflict.
+    conflict_info = detect_evidence_conflicts(valid_pairs)
 
-    if decision["conflict_flag"]:
+    if conflict_info["conflict"]:
+        etypes = conflict_info["event_types"]
         base.update({
             "candidate_event_type": "conflict",
             "proposed_canonical_event_type": "unresolved",
@@ -1439,13 +1580,15 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
             "research_status": "research_completed_conflict",
             "research_completion_status": "completed_conflict",
             "conflict_flag": "true",
-            "conflict_dates": decision["conflict_dates"],
-            "conflict_reason": decision["conflict_reason"],
+            "conflict_dates": "; ".join(conflict_info["dates"]),
+            "conflict_reason": (
+                "conflicting " + ", ".join(etypes) + " dates across sources"),
             "recommended_next_step": "manual_resolution_of_conflicting_dates",
         })
         return base
 
-    # Step 2: Canonical exact-day ready.
+    # Step 2: Canonical exact-day ready (qualifying-source decision).
+    decision = decide_ready_for_user_review(reviewed, snapshot_root)
     if decision["ready"]:
         base.update({
             "candidate_event_type": decision["event_type"],
@@ -1466,21 +1609,19 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
             base["first_public_trading_date_candidate_jalali"] = decision["canonical_date"]
         return base
 
-    # Step 3: Canonical partial-date (year/month only offering/trading).
+    # Step 3: Canonical partial-date (year/month only offering/trading). The
+    # candidate date is recorded ONLY in the matching offering/trading column;
+    # the canonical date and canonical event type stay empty and the row needs
+    # manual review.
     if canonical_partial:
         ev = canonical_partial[0]
-        date_str = str(reviewed[0].get("reviewed_date_jalali", "")).strip()
-        # Find the date from the matching reviewed record.
-        for r in reviewed:
-            rev = evaluate_reviewed_evidence_record(r, snapshot_root)
-            if rev["evidence_role"] == "canonical_partial_date":
-                date_str = str(r.get("reviewed_date_jalali", "")).strip()
-                break
+        date_str = _date_for_role("canonical_partial_date")
         base.update({
             "candidate_event_type": ev["reviewed_event_type"],
-            "proposed_canonical_event_type": ev["reviewed_event_type"],
+            "proposed_canonical_event_type": "",
+            "proposed_canonical_public_entry_date_jalali": "",
             "date_precision": ev["reviewed_date_precision"],
-            "evidence_status": "requires_first_public_trade_evidence",
+            "evidence_status": "requires_manual_review",
             "research_status": "research_completed_partial_public_entry_date",
             "research_completion_status": "completed_partial_evidence",
             "recommended_next_step": "requires_exact_date_evidence",
@@ -1491,34 +1632,11 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
             base["first_public_trading_date_candidate_jalali"] = date_str
         return base
 
-    # Step 4: Admission-only evidence.
-    if admission_evals and not canonical_exact and not canonical_partial:
-        # Find the date from the matching reviewed record.
-        adm_date = ""
-        for r in reviewed:
-            rev = evaluate_reviewed_evidence_record(r, snapshot_root)
-            if rev["evidence_role"] == "admission_only":
-                adm_date = str(r.get("reviewed_date_jalali", "")).strip()
-                break
-        base.update({
-            "candidate_event_type": "admission",
-            "date_precision": admission_evals[0]["reviewed_date_precision"],
-            "evidence_status": "requires_first_public_trade_evidence",
-            "research_status": "research_completed_admission_only",
-            "research_completion_status": "completed_admission_only",
-            "recommended_next_step": "requires_first_public_trade_evidence",
-            "admission_date_candidate_jalali": adm_date,
-        })
-        return base
-
-    # Step 5: Listing-only evidence.
-    if listing_evals and not canonical_exact and not canonical_partial:
-        lst_date = ""
-        for r in reviewed:
-            rev = evaluate_reviewed_evidence_record(r, snapshot_root)
-            if rev["evidence_role"] == "listing_only":
-                lst_date = str(r.get("reviewed_date_jalali", "")).strip()
-                break
+    # Step 4: Admission AND listing both valid (no canonical evidence). Preserve
+    # both candidate dates; the listing is the more advanced step, so the row is
+    # treated as listing-only pending first-public-trade evidence.
+    if (admission_evals and listing_evals
+            and not canonical_exact and not canonical_partial):
         base.update({
             "candidate_event_type": "listing",
             "date_precision": listing_evals[0]["reviewed_date_precision"],
@@ -1526,33 +1644,53 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
             "research_status": "research_completed_listing_only",
             "research_completion_status": "completed_listing_only",
             "recommended_next_step": "requires_first_public_trade_evidence",
-            "listing_date_candidate_jalali": lst_date,
+            "admission_date_candidate_jalali": _date_for_role("admission_only"),
+            "listing_date_candidate_jalali": _date_for_role("listing_only"),
         })
         return base
 
-    # Step 6: Public-company conversion only.
+    # Step 5: Admission-only evidence.
+    if admission_evals and not canonical_exact and not canonical_partial:
+        base.update({
+            "candidate_event_type": "admission",
+            "date_precision": admission_evals[0]["reviewed_date_precision"],
+            "evidence_status": "requires_first_public_trade_evidence",
+            "research_status": "research_completed_admission_only",
+            "research_completion_status": "completed_admission_only",
+            "recommended_next_step": "requires_first_public_trade_evidence",
+            "admission_date_candidate_jalali": _date_for_role("admission_only"),
+        })
+        return base
+
+    # Step 6: Listing-only evidence.
+    if listing_evals and not canonical_exact and not canonical_partial:
+        base.update({
+            "candidate_event_type": "listing",
+            "date_precision": listing_evals[0]["reviewed_date_precision"],
+            "evidence_status": "requires_first_public_trade_evidence",
+            "research_status": "research_completed_listing_only",
+            "research_completion_status": "completed_listing_only",
+            "recommended_next_step": "requires_first_public_trade_evidence",
+            "listing_date_candidate_jalali": _date_for_role("listing_only"),
+        })
+        return base
+
+    # Step 7: Public-company conversion only — non-canonical entry evidence that
+    # always needs manual review.
     if conversion_evals and not canonical_exact and not canonical_partial:
         base.update({
             "candidate_event_type": "public_company_conversion",
+            "proposed_canonical_event_type": "",
+            "proposed_canonical_public_entry_date_jalali": "",
             "date_precision": conversion_evals[0]["reviewed_date_precision"],
-            "evidence_status": "requires_first_public_trade_evidence",
+            "evidence_status": "requires_manual_review",
             "research_status": "research_completed_noncanonical_entry_evidence",
             "research_completion_status": "completed_noncanonical_evidence",
             "recommended_next_step": "requires_first_public_trade_evidence",
         })
         return base
 
-    # Step 7: Non-entry evidence (reviewed valid sources but no relevant event).
-    if non_entry_evals and not valid_evals:
-        base.update({
-            "evidence_status": "no_reliable_evidence",
-            "research_status": "research_completed_no_evidence",
-            "research_completion_status": "completed_no_eligibility_evidence",
-            "recommended_next_step": "manual_research_required",
-        })
-        return base
-
-    # Step 8: Reviewed but no valid evidence at all → no_reliable_evidence.
+    # Step 8: Reviewed but no valid entry evidence at all → no_reliable_evidence.
     base.update({
         "evidence_status": "no_reliable_evidence",
         "research_status": "research_completed_no_evidence",

@@ -2589,10 +2589,13 @@ def test_a5_partial_date_year_only_status():
         normalized = normalize_provenance_records(overlaid, ROOT)
         st = _derive_screening_status(normalized, snapshot_root=ROOT)
         assert st["research_status"] == "research_completed_partial_public_entry_date"
-        assert st["evidence_status"] == "requires_first_public_trade_evidence"
+        assert st["evidence_status"] == "requires_manual_review"
         assert st["ready_for_user_review"] == "false"
         assert st["date_precision"] == "year_only"
         assert st["first_public_offering_date_candidate_jalali"] == "1380"
+        # canonical date / event type stay empty for partial-date evidence
+        assert st["proposed_canonical_public_entry_date_jalali"] == ""
+        assert st["proposed_canonical_event_type"] == ""
     finally:
         snap.unlink(missing_ok=True)
 
@@ -2652,7 +2655,9 @@ def test_a5_conversion_only_status():
         normalized = normalize_provenance_records(overlaid, ROOT)
         st = _derive_screening_status(normalized, snapshot_root=ROOT)
         assert st["research_status"] == "research_completed_noncanonical_entry_evidence"
-        assert st["evidence_status"] == "requires_first_public_trade_evidence"
+        assert st["evidence_status"] == "requires_manual_review"
+        assert st["proposed_canonical_public_entry_date_jalali"] == ""
+        assert st["proposed_canonical_event_type"] == ""
         assert st["ready_for_user_review"] == "false"
         assert st["candidate_event_type"] == "public_company_conversion"
     finally:
@@ -2871,3 +2876,305 @@ def test_a5_reviewed_event_type_enum_valid():
     assert "admission" in REVIEWED_EVENT_TYPES
     assert "listing" in REVIEWED_EVENT_TYPES
     assert "public_company_conversion" in REVIEWED_EVENT_TYPES
+
+
+# ================================================================================
+# Part 3.1A.5.1 — partial-date manual review, same-event conflict + precision
+# compatibility, admission+listing preservation, derived-field recomputation
+# ================================================================================
+
+from project.src.stage124_batch02_part03 import (
+    jalali_dates_compatible,
+    detect_evidence_conflicts,
+    REVIEW_OVERLAY_FIELDS,
+    DERIVED_NEVER_TRUSTED,
+)
+
+_C1 = "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=AAA111"
+_C2 = "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=BBB222"
+
+
+def _two_source_status(tk, ev1, d1, ev2, d2, ord1="true", ord2="true",
+                       ex1="true", ex2="true"):
+    """Build a normalized two-source provenance set with the given reviewed
+    events/dates and return (_derive_screening_status, normalized records)."""
+    snap1, rel1, h1 = _make_snapshot("p351_s1.html", b"<html>doc-one</html>")
+    snap2, rel2, h2 = _make_snapshot("p351_s2.html", b"<html>doc-two</html>")
+    ret1 = _retrieval_rec(tk, _C1, rel1, h1)
+    ret1["source_index"] = 1
+    ret2 = _retrieval_rec(tk, _C2, rel2, h2)
+    ret2["source_index"] = 2
+    ext1 = _existing_prov_df(tk, _C1, rel1, h1, source_index="1",
+                             event_type_supported=ev1, exact_date_explicit=ex1,
+                             reviewed_date_jalali=d1, ordinary_share_explicit=ord1)
+    ext2 = _existing_prov_df(tk, _C2, rel2, h2, source_index="2",
+                             event_type_supported=ev2, exact_date_explicit=ex2,
+                             reviewed_date_jalali=d2, ordinary_share_explicit=ord2)
+    overlaid = apply_validated_review_overlay(
+        [ret1, ret2], pd.concat([ext1, ext2], ignore_index=True), ROOT)
+    normalized = normalize_provenance_records(overlaid, ROOT)
+    st = _derive_screening_status(normalized, snapshot_root=ROOT)
+    snap1.unlink(missing_ok=True)
+    snap2.unlink(missing_ok=True)
+    return st, normalized
+
+
+# --- precision compatibility helper (requirement 6) ---
+
+def test_p351_compat_exact_with_month():
+    assert jalali_dates_compatible("1380-03-15", "1380-03") is True
+
+
+def test_p351_compat_exact_with_year():
+    assert jalali_dates_compatible("1380-03-15", "1380") is True
+
+
+def test_p351_compat_month_with_year():
+    assert jalali_dates_compatible("1380-03", "1380") is True
+
+
+def test_p351_conflict_different_month():
+    assert jalali_dates_compatible("1380-03", "1380-04") is False
+
+
+def test_p351_conflict_different_year():
+    assert jalali_dates_compatible("1380", "1381") is False
+
+
+def test_p351_conflict_two_exact_days():
+    assert jalali_dates_compatible("1380-03-15", "1380-03-16") is False
+
+
+def test_p351_compat_exact_within_month_not_conflict():
+    # exact day inside the stated month is compatible, different day-month conflict
+    assert jalali_dates_compatible("1380-03-15", "1380-03") is True
+    assert jalali_dates_compatible("1380-03-15", "1380-04") is False
+
+
+# --- partial offering/trading → manual review, canonical empty (req 1) ---
+
+def test_p351_partial_offering_month_manual_review():
+    tk = PART03_TICKERS[0]
+    st, _ = _two_source_status(tk, "first_public_offering", "1380-03",
+                               "first_public_offering", "1380-03")
+    assert st["research_status"] == "research_completed_partial_public_entry_date"
+    assert st["evidence_status"] == "requires_manual_review"
+    assert st["proposed_canonical_public_entry_date_jalali"] == ""
+    assert st["proposed_canonical_event_type"] == ""
+    assert st["ready_for_user_review"] == "false"
+    assert st["first_public_offering_date_candidate_jalali"] == "1380-03"
+    assert st["first_public_trading_date_candidate_jalali"] == ""
+
+
+def test_p351_partial_trading_year_manual_review():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("p351_trad.html")
+    try:
+        ret = _retrieval_rec(tk, _C1, rel, h)
+        ext = _existing_prov_df(tk, _C1, rel, h,
+                                event_type_supported="first_public_trading",
+                                exact_date_explicit="false",
+                                reviewed_date_jalali="1381",
+                                ordinary_share_explicit="true")
+        overlaid = apply_validated_review_overlay([ret], ext, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        st = _derive_screening_status(normalized, snapshot_root=ROOT)
+        assert st["research_status"] == "research_completed_partial_public_entry_date"
+        assert st["evidence_status"] == "requires_manual_review"
+        assert st["date_precision"] == "year_only"
+        assert st["first_public_trading_date_candidate_jalali"] == "1381"
+        assert st["proposed_canonical_public_entry_date_jalali"] == ""
+        assert st["proposed_canonical_event_type"] == ""
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# --- conversion-only: canonical empty + manual review (req 2) ---
+
+def test_p351_conversion_only_canonical_empty():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("p351_conv.html")
+    try:
+        ret = _retrieval_rec(tk, _C1, rel, h)
+        ext = _existing_prov_df(tk, _C1, rel, h,
+                                event_type_supported="conversion_to_public",
+                                exact_date_explicit="true",
+                                reviewed_date_jalali="1380-05-01",
+                                ordinary_share_explicit="unknown")
+        overlaid = apply_validated_review_overlay([ret], ext, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        st = _derive_screening_status(normalized, snapshot_root=ROOT)
+        assert st["research_status"] == "research_completed_noncanonical_entry_evidence"
+        assert st["evidence_status"] == "requires_manual_review"
+        assert st["proposed_canonical_public_entry_date_jalali"] == ""
+        assert st["proposed_canonical_event_type"] == ""
+        assert st["ready_for_user_review"] == "false"
+    finally:
+        snap.unlink(missing_ok=True)
+
+
+# --- same-event incompatible dates conflict (req 3) ---
+
+def test_p351_two_admissions_conflict():
+    tk = PART03_TICKERS[0]
+    st, _ = _two_source_status(tk, "admission", "1380-03-15",
+                               "admission", "1381-06-20", ord1="unknown", ord2="unknown")
+    assert st["research_status"] == "research_completed_conflict"
+    assert st["conflict_flag"] == "true"
+    assert st["ready_for_user_review"] == "false"
+
+
+def test_p351_two_listings_conflict():
+    tk = PART03_TICKERS[0]
+    st, _ = _two_source_status(tk, "listing", "1380-03-15",
+                               "listing", "1381-06-20", ord1="unknown", ord2="unknown")
+    assert st["research_status"] == "research_completed_conflict"
+    assert st["conflict_flag"] == "true"
+
+
+def test_p351_two_offerings_conflict():
+    tk = PART03_TICKERS[0]
+    st, _ = _two_source_status(tk, "first_public_offering", "1380-03-15",
+                               "first_public_offering", "1381-06-20")
+    assert st["research_status"] == "research_completed_conflict"
+    assert st["conflict_flag"] == "true"
+
+
+def test_p351_two_tradings_conflict():
+    tk = PART03_TICKERS[0]
+    st, _ = _two_source_status(tk, "first_public_trading", "1380-03-15",
+                               "first_public_trading", "1381-06-20")
+    assert st["research_status"] == "research_completed_conflict"
+    assert st["conflict_flag"] == "true"
+
+
+def test_p351_two_conversions_conflict():
+    tk = PART03_TICKERS[0]
+    st, _ = _two_source_status(tk, "conversion_to_public", "1380-03-15",
+                               "conversion_to_public", "1381-06-20",
+                               ord1="unknown", ord2="unknown")
+    assert st["research_status"] == "research_completed_conflict"
+    assert st["conflict_flag"] == "true"
+
+
+# --- compatible same-event dates are NOT a conflict (req 6) ---
+
+def test_p351_compatible_exact_month_no_conflict():
+    tk = PART03_TICKERS[0]
+    st, _ = _two_source_status(tk, "admission", "1380-03-15",
+                               "admission", "1380-03", ord1="unknown", ord2="unknown")
+    assert st["research_status"] == "research_completed_admission_only"
+    assert st["conflict_flag"] == "false"
+
+
+# --- different events with different dates are NOT a conflict (req 4) ---
+
+def test_p351_admission_listing_not_conflict():
+    tk = PART03_TICKERS[0]
+    st, _ = _two_source_status(tk, "admission", "1380-03-15",
+                               "listing", "1381-06-20", ord1="unknown", ord2="unknown")
+    assert st["conflict_flag"] == "false"
+    assert st["research_status"] != "research_completed_conflict"
+
+
+# --- admission + listing both valid → both candidates preserved (req 5) ---
+
+def test_p351_admission_listing_preservation():
+    tk = PART03_TICKERS[0]
+    st, _ = _two_source_status(tk, "admission", "1380-03-15",
+                               "listing", "1381-06-20", ord1="unknown", ord2="unknown")
+    assert st["candidate_event_type"] == "listing"
+    assert st["research_status"] == "research_completed_listing_only"
+    assert st["evidence_status"] == "requires_first_public_trade_evidence"
+    assert st["admission_date_candidate_jalali"] == "1380-03-15"
+    assert st["listing_date_candidate_jalali"] == "1381-06-20"
+    assert st["proposed_canonical_public_entry_date_jalali"] == ""
+    assert st["proposed_canonical_event_type"] == ""
+    assert st["conflict_flag"] == "false"
+
+
+# --- conflicting records get evidence_role=conflicting_evidence (req 9) ---
+
+def test_p351_conflicting_evidence_role():
+    tk = PART03_TICKERS[0]
+    _st, normalized = _two_source_status(tk, "admission", "1380-03-15",
+                                         "admission", "1381-06-20",
+                                         ord1="unknown", ord2="unknown")
+    roles = {str(r.get("evidence_role", "")) for r in normalized}
+    assert "conflicting_evidence" in roles
+    # both conflicting admission records are flagged
+    flagged = [r for r in normalized if r.get("evidence_role") == "conflicting_evidence"]
+    assert len(flagged) == 2
+
+
+# --- detect_evidence_conflicts direct unit semantics ---
+
+def test_p351_detect_conflicts_same_event():
+    pairs = [
+        ({"ticker": "X", "source_index": "1", "reviewed_date_jalali": "1380-03-15"},
+         {"reviewed_event_type": "admission", "evidence_role": "admission_only"}),
+        ({"ticker": "X", "source_index": "2", "reviewed_date_jalali": "1381-06-20"},
+         {"reviewed_event_type": "admission", "evidence_role": "admission_only"}),
+    ]
+    info = detect_evidence_conflicts(pairs)
+    assert info["conflict"] is True
+    assert "admission" in info["event_types"]
+    assert ("X", "1") in info["keys"] and ("X", "2") in info["keys"]
+
+
+def test_p351_detect_conflicts_different_event_no_conflict():
+    pairs = [
+        ({"ticker": "X", "source_index": "1", "reviewed_date_jalali": "1380-03-15"},
+         {"reviewed_event_type": "admission", "evidence_role": "admission_only"}),
+        ({"ticker": "X", "source_index": "2", "reviewed_date_jalali": "1381-06-20"},
+         {"reviewed_event_type": "listing", "evidence_role": "listing_only"}),
+    ]
+    info = detect_evidence_conflicts(pairs)
+    assert info["conflict"] is False
+
+
+def test_p351_detect_conflicts_canonical_group():
+    # offering vs trading share the canonical group → incompatible dates conflict
+    pairs = [
+        ({"ticker": "X", "source_index": "1", "reviewed_date_jalali": "1380-03-15"},
+         {"reviewed_event_type": "first_public_offering"}),
+        ({"ticker": "X", "source_index": "2", "reviewed_date_jalali": "1381-06-20"},
+         {"reviewed_event_type": "first_public_trading"}),
+    ]
+    info = detect_evidence_conflicts(pairs)
+    assert info["conflict"] is True
+
+
+# --- derived fields are fully recomputed, never inherited from prior CSV (req 7) ---
+
+def test_p351_derived_fields_not_in_overlay():
+    for f in ("reviewed_event_type", "reviewed_date_precision",
+              "reviewed_evidence_valid", "evidence_role"):
+        assert f not in REVIEW_OVERLAY_FIELDS
+        assert f in DERIVED_NEVER_TRUSTED
+
+
+def test_p351_stale_derived_fields_recomputed():
+    tk = PART03_TICKERS[0]
+    snap, rel, h = _make_snapshot("p351_recompute.html")
+    try:
+        ret = _retrieval_rec(tk, _C1, rel, h)
+        # prior CSV carries WRONG derived values that must be ignored/recomputed
+        ext = _existing_prov_df(tk, _C1, rel, h,
+                                event_type_supported="listing",
+                                exact_date_explicit="true",
+                                reviewed_date_jalali="1381-01-10",
+                                ordinary_share_explicit="unknown",
+                                reviewed_event_type="first_public_offering",
+                                reviewed_date_precision="year_only",
+                                reviewed_evidence_valid="false",
+                                evidence_role="non_entry_evidence")
+        overlaid = apply_validated_review_overlay([ret], ext, ROOT)
+        normalized = normalize_provenance_records(overlaid, ROOT)
+        r = normalized[0]
+        assert r["reviewed_event_type"] == "listing"
+        assert r["reviewed_date_precision"] == "exact_day"
+        assert r["reviewed_evidence_valid"] == "true"
+        assert r["evidence_role"] == "listing_only"
+    finally:
+        snap.unlink(missing_ok=True)
