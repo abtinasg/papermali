@@ -1,0 +1,57 @@
+{
+  "stage_name": "stage124_batch02_gate_a",
+  "gate": "A",
+  "source_code_commit": "439c3ce9b673c4c0cf41e6a8b8cf229849aed053",
+  "source_file_sha256": {
+    "src/stage124_batch02.py": "254d853901cf62318f8a8a66cc19aeb415dd7750ec28ccd3bbbcefeee57fc4b5",
+    "run_stage124_batch02.py": "68b88d259ee1f3a315214a5e70b9d0269de2a14a44418e72b2a6bd31553b8f22",
+    "tests/test_stage124_batch02.py": "4c1d10bfabfbc2ab6ee99122d01e2b34d5004cf787e7e98b64a4ccb4506a9bf0"
+  },
+  "reference_merge_commit": "439c3ce9b673c4c0cf41e6a8b8cf229849aed053",
+  "reference_merge_commit_in_ancestry": true,
+  "stage123_input_sha256": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+  "stage122_input_sha256": "ece991c5ff280afa50c2ced6acfecbed4e57937cf2048cd7a11ae496a3ae7437",
+  "partial_master_sha256": "efeb30fa609de1a0cf73df24a559311a2eadce5099e3373f131f59802bb3450c",
+  "priority_weights": {
+    "W_GAP_gap_after_1392": 10.0,
+    "W_PRELIST_current_prelisting_proxy_row_count": 8.0,
+    "W_RISK_estimated_rows_at_risk": 3.0,
+    "W_PAIR_estimated_pairs_at_risk": 2.0,
+    "W_MULTI_multiple_ordinary_instruments": 5.0,
+    "W_CONF_tsetmc_candidate_conflict_flag": 4.0
+  },
+  "n_pending": 115,
+  "n_selected_batch02": 15,
+  "selected_tickers": [
+    "زپارس",
+    "بالبر",
+    "بترانس",
+    "برکت",
+    "بکاب",
+    "بکام",
+    "تاپیکو",
+    "تپمپی",
+    "تکمبا",
+    "جم",
+    "ددام",
+    "درازک",
+    "دسینا",
+    "دشیمی",
+    "ذوب"
+  ],
+  "selection_note": "Selected top 15 by deterministic priority_rank; the multi-key sort ['priority_score', 'current_prelisting_proxy_row_count', 'estimated_rows_at_risk', 'n_panel_rows', 'ticker_normalized'] fully resolves the rank-15/16 boundary (unique ticker_normalized), so no extension to 20 is warranted.",
+  "output_file_hashes": {
+    "stage124/listing_pending_priority_stage124_batch02.csv": "4ebe967bfd69dbf0277493f42505132198e41f9406c4c599c4b49380d49f8d93",
+    "stage124/listing_batch02_selected_tickers.csv": "69c136802e00891ac1a6ce4b68a713bec8cd5cfeda675292e326008ec37110ba",
+    "stage124/listing_batch02_research_candidates.csv": "5b3c9f3d861e22594808ede56fa613730e88832643a5f807f5152f6ca9931a04",
+    "stage124/listing_batch02_source_provenance.csv": "92aea3f6c06a767da7504ba3f5b48d3a628d0d399d1ca81ba4d2b50b2b8a953c",
+    "stage124/listing_batch02_tsetmc_conflict_audit.csv": "3f88f15f52b4ff55865f03ba32e3f95628e787b39081d8084302b9a9075aeddc",
+    "stage124/listing_batch02_user_review_template.csv": "844487ef01aaaf353f378dd6dccb9c65db1ff1c2d03c50b2e992d2240ddb945e",
+    "stage124/stage124_batch02_gate_a_qc_report.json": "0ca48ba3ef1a4a5445f03d7cde2404ca0deab70bca7e6ba5f49d68e7a6bbc460",
+    "stage124/metadata_and_hashes_stage124_batch02_gate_a.json": "3b494a9a9e9d277f3c6e72a945166c601d0f4f9d8ed80a8efc8fd60a8fae012d"
+  },
+  "overall_qc_pass": true,
+  "runtime_seconds": 0.105,
+  "python_version": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
+  "platform": "macOS-26.2-arm64-arm-64bit-Mach-O"
+}

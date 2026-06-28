@@ -1,0 +1,154 @@
+{
+  "stage": "stage124_batch02_part02",
+  "part": "part02",
+  "branch": "stage124-batch02-priority-research",
+  "initial_generation_source_commit": "6a4d6eb29c3e615efe65a124cd5c93f3d3b2aacc",
+  "research_state_commit": "9f8894a3dbc1c9507bb8e12035663eaa8cb8b9da",
+  "finalizer_source_commit": "d3c28eda518d8a2ceb2465eff4d144cf791e6bac",
+  "generated_at_utc": "2026-06-27T00:41:59Z",
+  "ticker_count": 10,
+  "tickers": [
+    "بموتو",
+    "ثشرق",
+    "ثنوسا",
+    "حپترو",
+    "حکشتی",
+    "خاذین",
+    "خبهمن",
+    "ختوقا",
+    "خرینگ",
+    "خمحور"
+  ],
+  "exact_day_canonical_count": 0,
+  "admission_only_count": 6,
+  "unresolved_count": 4,
+  "ready_for_user_review_count": 0,
+  "research_screening_path": "stage124/batch02_parts/part02_research_screening_10tickers.csv",
+  "source_provenance_path": "stage124/batch02_parts/part02_source_provenance_10tickers.csv",
+  "tsetmc_audit_path": "stage124/batch02_parts/part02_tsetmc_audit_10tickers.csv",
+  "qc_report_path": "stage124/batch02_parts/part02_qc_report.json",
+  "summary_path": "stage124/batch02_parts/part02_summary.json",
+  "test_output_path": "stage124/batch02_parts/part02_test_output.txt",
+  "manifest_path": "stage124/batch02_parts/part02_hash_manifest.csv",
+  "snapshot_paths": [
+    "stage124/batch02_parts/snapshots_hkeshti/source_1.html"
+  ],
+  "immutable_input_hashes": {
+    "part02_research_screening_10tickers.csv": "2c0b39bcbcddaa349fe5e58a037d653c13daa9cbcbc1042d7ba311170e98d3a1",
+    "part02_source_provenance_10tickers.csv": "2a5d0513a8e16b8dd138e33d35db2856a0c8c46ac880518859dc9dd06738821f",
+    "part02_tsetmc_audit_10tickers.csv": "5b6f21f26fc7a55498e663cb15e684538a0fb3528c439b73e9eb66837fbb1016",
+    "snapshots_hkeshti/source_1.html": "09152a6ce812a01c83093c2a55d4c1faaeeba2d88e3a663c9cb7354263bde47d"
+  },
+  "frozen_input_hashes": [
+    {
+      "relative_path": "project/src/stage124_batch02_v2_research.json",
+      "expected_sha256_from_research_state": "20c807a871b89acec70265ac0e01eceb0c3bf488ec95a6ebf4df330941198e72",
+      "expected_source": "git_research_state",
+      "actual_sha256": "20c807a871b89acec70265ac0e01eceb0c3bf488ec95a6ebf4df330941198e72",
+      "match": true
+    },
+    {
+      "relative_path": "project/stage124/listing_pending_priority_stage124_batch02_v2.csv",
+      "expected_sha256_from_research_state": "e7318da7ca9b4a9f3c889fc5ddda93a3e6433c0dbe58bc7051b51388e4f768c3",
+      "expected_source": "git_research_state",
+      "actual_sha256": "e7318da7ca9b4a9f3c889fc5ddda93a3e6433c0dbe58bc7051b51388e4f768c3",
+      "match": true
+    },
+    {
+      "relative_path": "project/stage124/listing_batch02_selected_tickers_v2.csv",
+      "expected_sha256_from_research_state": "1f61041eaf1201dd49d028fcccfe7b6112b4e7d47bbcdd29056344c87bdba0d0",
+      "expected_source": "git_research_state",
+      "actual_sha256": "1f61041eaf1201dd49d028fcccfe7b6112b4e7d47bbcdd29056344c87bdba0d0",
+      "match": true
+    },
+    {
+      "relative_path": "project/stage124/listing_batch02_research_candidates_v2.csv",
+      "expected_sha256_from_research_state": "4854bfc5534956562cc08a1987558817e7bed4fa5e3da74ed4192ae652fe7b8e",
+      "expected_source": "git_research_state",
+      "actual_sha256": "4854bfc5534956562cc08a1987558817e7bed4fa5e3da74ed4192ae652fe7b8e",
+      "match": true
+    },
+    {
+      "relative_path": "project/stage124/listing_batch02_source_provenance_v2.csv",
+      "expected_sha256_from_research_state": "f37a44303c977ba2953c22994625ab2dc9306df4ae73dac4524702fb91df8474",
+      "expected_source": "git_research_state",
+      "actual_sha256": "f37a44303c977ba2953c22994625ab2dc9306df4ae73dac4524702fb91df8474",
+      "match": true
+    },
+    {
+      "relative_path": "project/stage124/listing_batch02_tsetmc_conflict_audit_v2.csv",
+      "expected_sha256_from_research_state": "0e5cda36aded1e30b3c61f9ef31a055e0a3f06b4106f4d8f135f67d775e8eca6",
+      "expected_source": "git_research_state",
+      "actual_sha256": "0e5cda36aded1e30b3c61f9ef31a055e0a3f06b4106f4d8f135f67d775e8eca6",
+      "match": true
+    },
+    {
+      "relative_path": "project/stage124/listing_batch02_user_review_template_v2.csv",
+      "expected_sha256_from_research_state": "33254902ac2d562089cfcf2da4fa664600edc7a7771e85e8cf2439d8ccc9ad53",
+      "expected_source": "git_research_state",
+      "actual_sha256": "33254902ac2d562089cfcf2da4fa664600edc7a7771e85e8cf2439d8ccc9ad53",
+      "match": true
+    },
+    {
+      "relative_path": "project/stage124/stage124_batch02_gate_a_v2_qc_report.json",
+      "expected_sha256_from_research_state": "614431ef9310e436260796beb1573b4a8c7d8e39373849a633327be0b84b8675",
+      "expected_source": "git_research_state",
+      "actual_sha256": "614431ef9310e436260796beb1573b4a8c7d8e39373849a633327be0b84b8675",
+      "match": true
+    },
+    {
+      "relative_path": "project/stage124/metadata_and_hashes_stage124_batch02_gate_a_v2.json",
+      "expected_sha256_from_research_state": "bed24a1a93ef29a575836d2e04eb07baf2849ae396c5311a12b79db15e11bf2f",
+      "expected_source": "git_research_state",
+      "actual_sha256": "bed24a1a93ef29a575836d2e04eb07baf2849ae396c5311a12b79db15e11bf2f",
+      "match": true
+    },
+    {
+      "relative_path": "project/stage124/listing_master_partial_verified_stage124.csv",
+      "expected_sha256_from_research_state": "efeb30fa609de1a0cf73df24a559311a2eadce5099e3373f131f59802bb3450c",
+      "expected_source": "git_research_state",
+      "actual_sha256": "efeb30fa609de1a0cf73df24a559311a2eadce5099e3373f131f59802bb3450c",
+      "match": true
+    },
+    {
+      "relative_path": "project/stage122/modeling_all_rows_stage122.csv",
+      "expected_sha256_from_research_state": "ece991c5ff280afa50c2ced6acfecbed4e57937cf2048cd7a11ae496a3ae7437",
+      "expected_source": "pinned_expected_constant",
+      "actual_sha256": "ece991c5ff280afa50c2ced6acfecbed4e57937cf2048cd7a11ae496a3ae7437",
+      "match": true
+    },
+    {
+      "relative_path": "project/stage123/modeling_all_rows_stage123.csv",
+      "expected_sha256_from_research_state": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+      "expected_source": "pinned_expected_constant",
+      "actual_sha256": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+      "match": true
+    }
+  ],
+  "hkeshti_status": {
+    "evidence_status": "requires_manual_review",
+    "research_status": "requires_manual_review",
+    "ready_for_user_review": false,
+    "proposed_canonical_jalali": "",
+    "proposed_canonical_gregorian": "",
+    "proposed_canonical_event_type": "unresolved",
+    "ordinary_share_confirmed": "unknown",
+    "conflict_dates": [
+      "1387-02-28",
+      "1387-02-29"
+    ]
+  },
+  "hkeshti_conflict_dates": [
+    "1387-02-28",
+    "1387-02-29"
+  ],
+  "network_requests_performed": false,
+  "tsetmc_probe_performed": false,
+  "source_fetch_performed": false,
+  "gate_b_executed": false,
+  "full_verified_master_created": false,
+  "modeling_executed": false,
+  "pr_created": false,
+  "merged_to_main": false,
+  "manifest_source_commit_semantics": "commit containing the offline finalizer code used to seal Part 2"
+}

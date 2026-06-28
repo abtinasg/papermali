@@ -1,0 +1,583 @@
+{
+  "stage": "stage124_batch02_part02",
+  "generated_at": "2026-06-26T23:00:24Z",
+  "source_commit": "6a4d6eb29c3e615efe65a124cd5c93f3d3b2aacc",
+  "ticker_count": 10,
+  "tickers": [
+    "بموتو",
+    "ثشرق",
+    "ثنوسا",
+    "حپترو",
+    "حکشتی",
+    "خاذین",
+    "خبهمن",
+    "ختوقا",
+    "خرینگ",
+    "خمحور"
+  ],
+  "all_pass": true,
+  "assertion_count": 68,
+  "failed_count": 0,
+  "assertions": [
+    {
+      "assertion": "exactly_10_rows",
+      "passed": true,
+      "detail": "rows=10"
+    },
+    {
+      "assertion": "exactly_10_unique_tickers",
+      "passed": true,
+      "detail": "unique=10"
+    },
+    {
+      "assertion": "ticker_set_matches_announced",
+      "passed": true,
+      "detail": "missing=set(), extra=set()"
+    },
+    {
+      "assertion": "no_pilot15_in_part02",
+      "passed": true,
+      "detail": "intersection=set()"
+    },
+    {
+      "assertion": "no_other_tickers",
+      "passed": true,
+      "detail": "extra=set()"
+    },
+    {
+      "assertion": "no_duplicate_tickers",
+      "passed": true,
+      "detail": "duplicates=0"
+    },
+    {
+      "assertion": "no_canonical_from_admission_بموتو",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "ready_false_when_not_exact_بموتو",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "date_conversion_ok_بموتو",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "no_canonical_from_admission_ثشرق",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "ready_false_when_not_exact_ثشرق",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "date_conversion_ok_ثشرق",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "no_canonical_from_admission_ثنوسا",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "ready_false_when_not_exact_ثنوسا",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "date_conversion_ok_ثنوسا",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "no_canonical_from_admission_حپترو",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "ready_false_when_not_exact_حپترو",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "date_conversion_ok_حپترو",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "no_canonical_from_admission_حکشتی",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "ready_false_when_not_exact_حکشتی",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "date_conversion_ok_حکشتی",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "no_canonical_from_admission_خاذین",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "ready_false_when_not_exact_خاذین",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "month_year_only_not_ready_خاذین",
+      "passed": true,
+      "detail": "dp=month_only, ready=false"
+    },
+    {
+      "assertion": "date_conversion_ok_خاذین",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "no_canonical_from_admission_خبهمن",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "ready_false_when_not_exact_خبهمن",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "month_year_only_not_ready_خبهمن",
+      "passed": true,
+      "detail": "dp=month_only, ready=false"
+    },
+    {
+      "assertion": "date_conversion_ok_خبهمن",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "no_canonical_from_admission_ختوقا",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "ready_false_when_not_exact_ختوقا",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "month_year_only_not_ready_ختوقا",
+      "passed": true,
+      "detail": "dp=year_only, ready=false"
+    },
+    {
+      "assertion": "date_conversion_ok_ختوقا",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "no_canonical_from_admission_خرینگ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "ready_false_when_not_exact_خرینگ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "date_conversion_ok_خرینگ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "no_canonical_from_admission_خمحور",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "ready_false_when_not_exact_خمحور",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "date_conversion_ok_خمحور",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "network_unreachable_not_no_candidate_بموتو",
+      "passed": true,
+      "detail": "disp=network_unreachable"
+    },
+    {
+      "assertion": "network_unreachable_not_no_candidate_ثشرق",
+      "passed": true,
+      "detail": "disp=network_unreachable"
+    },
+    {
+      "assertion": "network_unreachable_not_no_candidate_ثنوسا",
+      "passed": true,
+      "detail": "disp=network_unreachable"
+    },
+    {
+      "assertion": "network_unreachable_not_no_candidate_حپترو",
+      "passed": true,
+      "detail": "disp=network_unreachable"
+    },
+    {
+      "assertion": "network_unreachable_not_no_candidate_حکشتی",
+      "passed": true,
+      "detail": "disp=network_unreachable"
+    },
+    {
+      "assertion": "network_unreachable_not_no_candidate_خاذین",
+      "passed": true,
+      "detail": "disp=network_unreachable"
+    },
+    {
+      "assertion": "network_unreachable_not_no_candidate_خبهمن",
+      "passed": true,
+      "detail": "disp=network_unreachable"
+    },
+    {
+      "assertion": "network_unreachable_not_no_candidate_ختوقا",
+      "passed": true,
+      "detail": "disp=network_unreachable"
+    },
+    {
+      "assertion": "network_unreachable_not_no_candidate_خرینگ",
+      "passed": true,
+      "detail": "disp=network_unreachable"
+    },
+    {
+      "assertion": "network_unreachable_not_no_candidate_خمحور",
+      "passed": true,
+      "detail": "disp=network_unreachable"
+    },
+    {
+      "assertion": "no_verified_user_confirmed",
+      "passed": true,
+      "detail": "verified_user_confirmed must not appear in any Part 2 output"
+    },
+    {
+      "assertion": "no_full_verified_master_created",
+      "passed": true,
+      "detail": "listing_master_verified_stage124.csv must not exist"
+    },
+    {
+      "assertion": "no_user_decision_status",
+      "passed": true,
+      "detail": "no user_decision column in research screening"
+    },
+    {
+      "assertion": "no_verification_status_column",
+      "passed": true,
+      "detail": "no verification_status column in research screening"
+    },
+    {
+      "assertion": "frozen_unchanged_stage124_batch02_v2_research.json",
+      "passed": true,
+      "detail": "before=20c807a871b8, after=20c807a871b8"
+    },
+    {
+      "assertion": "frozen_unchanged_modeling_all_rows_stage122.csv",
+      "passed": true,
+      "detail": "before=ece991c5ff28, after=ece991c5ff28"
+    },
+    {
+      "assertion": "frozen_unchanged_modeling_all_rows_stage123.csv",
+      "passed": true,
+      "detail": "before=28b9f9d41856, after=28b9f9d41856"
+    },
+    {
+      "assertion": "frozen_unchanged_listing_batch02_research_candidates_v2.csv",
+      "passed": true,
+      "detail": "before=4854bfc55349, after=4854bfc55349"
+    },
+    {
+      "assertion": "frozen_unchanged_listing_batch02_selected_tickers_v2.csv",
+      "passed": true,
+      "detail": "before=1f61041eaf12, after=1f61041eaf12"
+    },
+    {
+      "assertion": "frozen_unchanged_listing_batch02_source_provenance_v2.csv",
+      "passed": true,
+      "detail": "before=f37a44303c97, after=f37a44303c97"
+    },
+    {
+      "assertion": "frozen_unchanged_listing_batch02_tsetmc_conflict_audit_v2.csv",
+      "passed": true,
+      "detail": "before=0e5cda36aded, after=0e5cda36aded"
+    },
+    {
+      "assertion": "frozen_unchanged_listing_batch02_user_review_template_v2.csv",
+      "passed": true,
+      "detail": "before=33254902ac2d, after=33254902ac2d"
+    },
+    {
+      "assertion": "frozen_unchanged_listing_master_partial_verified_stage124.csv",
+      "passed": true,
+      "detail": "before=efeb30fa609d, after=efeb30fa609d"
+    },
+    {
+      "assertion": "frozen_unchanged_listing_pending_priority_stage124_batch02_v2.csv",
+      "passed": true,
+      "detail": "before=e7318da7ca9b, after=e7318da7ca9b"
+    },
+    {
+      "assertion": "frozen_unchanged_metadata_and_hashes_stage124_batch02_gate_a_v2.json",
+      "passed": true,
+      "detail": "before=bed24a1a93ef, after=bed24a1a93ef"
+    },
+    {
+      "assertion": "frozen_unchanged_stage124_batch02_gate_a_v2_qc_report.json",
+      "passed": true,
+      "detail": "before=614431ef9310, after=614431ef9310"
+    },
+    {
+      "assertion": "reference_merge_commit_in_ancestry",
+      "passed": true,
+      "detail": "merge commit 439c3ce9 is ancestor of HEAD"
+    },
+    {
+      "assertion": "stage123_sha_matches",
+      "passed": true,
+      "detail": "sha=28b9f9d41856"
+    },
+    {
+      "assertion": "stage122_sha_matches",
+      "passed": true,
+      "detail": "sha=ece991c5ff28"
+    }
+  ],
+  "finalization": {
+    "finalizer_source_commit": "d3c28eda518d8a2ceb2465eff4d144cf791e6bac",
+    "research_state_commit": "9f8894a3dbc1c9507bb8e12035663eaa8cb8b9da",
+    "finalized_at_utc": "2026-06-27T00:41:59Z",
+    "all_pass": true,
+    "assertion_count": 42,
+    "failed_count": 0,
+    "assertions": [
+      {
+        "assertion": "immutable_sha_unchanged_part02_research_screening_10tickers.csv",
+        "passed": true,
+        "detail": "expected=2c0b39bcbcdd, actual=2c0b39bcbcdd"
+      },
+      {
+        "assertion": "immutable_sha_unchanged_part02_source_provenance_10tickers.csv",
+        "passed": true,
+        "detail": "expected=2a5d0513a8e1, actual=2a5d0513a8e1"
+      },
+      {
+        "assertion": "immutable_sha_unchanged_part02_tsetmc_audit_10tickers.csv",
+        "passed": true,
+        "detail": "expected=5b6f21f26fc7, actual=5b6f21f26fc7"
+      },
+      {
+        "assertion": "immutable_sha_unchanged_snapshots_hkeshti/source_1.html",
+        "passed": true,
+        "detail": "expected=09152a6ce812, actual=09152a6ce812"
+      },
+      {
+        "assertion": "frozen_unchanged_stage124_batch02_v2_research.json",
+        "passed": true,
+        "detail": "expected=20c807a871b8, actual=20c807a871b8"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_pending_priority_stage124_batch02_v2.csv",
+        "passed": true,
+        "detail": "expected=e7318da7ca9b, actual=e7318da7ca9b"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_batch02_selected_tickers_v2.csv",
+        "passed": true,
+        "detail": "expected=1f61041eaf12, actual=1f61041eaf12"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_batch02_research_candidates_v2.csv",
+        "passed": true,
+        "detail": "expected=4854bfc55349, actual=4854bfc55349"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_batch02_source_provenance_v2.csv",
+        "passed": true,
+        "detail": "expected=f37a44303c97, actual=f37a44303c97"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_batch02_tsetmc_conflict_audit_v2.csv",
+        "passed": true,
+        "detail": "expected=0e5cda36aded, actual=0e5cda36aded"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_batch02_user_review_template_v2.csv",
+        "passed": true,
+        "detail": "expected=33254902ac2d, actual=33254902ac2d"
+      },
+      {
+        "assertion": "frozen_unchanged_stage124_batch02_gate_a_v2_qc_report.json",
+        "passed": true,
+        "detail": "expected=614431ef9310, actual=614431ef9310"
+      },
+      {
+        "assertion": "frozen_unchanged_metadata_and_hashes_stage124_batch02_gate_a_v2.json",
+        "passed": true,
+        "detail": "expected=bed24a1a93ef, actual=bed24a1a93ef"
+      },
+      {
+        "assertion": "frozen_unchanged_listing_master_partial_verified_stage124.csv",
+        "passed": true,
+        "detail": "expected=efeb30fa609d, actual=efeb30fa609d"
+      },
+      {
+        "assertion": "frozen_unchanged_modeling_all_rows_stage122.csv",
+        "passed": true,
+        "detail": "expected=ece991c5ff28, actual=ece991c5ff28"
+      },
+      {
+        "assertion": "frozen_unchanged_modeling_all_rows_stage123.csv",
+        "passed": true,
+        "detail": "expected=28b9f9d41856, actual=28b9f9d41856"
+      },
+      {
+        "assertion": "stage122_sha_unchanged",
+        "passed": true,
+        "detail": "sha=ece991c5ff28"
+      },
+      {
+        "assertion": "stage123_sha_unchanged",
+        "passed": true,
+        "detail": "sha=28b9f9d41856"
+      },
+      {
+        "assertion": "exactly_10_tickers",
+        "passed": true,
+        "detail": "rows=10"
+      },
+      {
+        "assertion": "exact_ticker_set",
+        "passed": true,
+        "detail": "set=['بموتو', 'ثشرق', 'ثنوسا', 'حپترو', 'حکشتی', 'خاذین', 'خبهمن', 'ختوقا', 'خرینگ', 'خمحور']"
+      },
+      {
+        "assertion": "duplicate_ticker_count_zero",
+        "passed": true,
+        "detail": "duplicates=0"
+      },
+      {
+        "assertion": "exact_day_canonical_count_zero",
+        "passed": true,
+        "detail": "count=0"
+      },
+      {
+        "assertion": "admission_only_count_six",
+        "passed": true,
+        "detail": "count=6"
+      },
+      {
+        "assertion": "unresolved_count_four",
+        "passed": true,
+        "detail": "count=4"
+      },
+      {
+        "assertion": "ready_for_user_review_count_zero",
+        "passed": true,
+        "detail": "count=0"
+      },
+      {
+        "assertion": "hkeshti_evidence_requires_manual_review",
+        "passed": true,
+        "detail": "evidence_status=requires_manual_review"
+      },
+      {
+        "assertion": "hkeshti_ready_for_user_review_false",
+        "passed": true,
+        "detail": "ready_for_user_review=false"
+      },
+      {
+        "assertion": "hkeshti_canonical_jalali_empty",
+        "passed": true,
+        "detail": "canonical_jalali="
+      },
+      {
+        "assertion": "hkeshti_canonical_gregorian_empty",
+        "passed": true,
+        "detail": "canonical_gregorian="
+      },
+      {
+        "assertion": "hkeshti_event_type_unresolved",
+        "passed": true,
+        "detail": "event_type=unresolved"
+      },
+      {
+        "assertion": "snapshot_exists",
+        "passed": true,
+        "detail": "True"
+      },
+      {
+        "assertion": "snapshot_sha_matches_provenance",
+        "passed": true,
+        "detail": "snap=09152a6ce812, prov=09152a6ce812"
+      },
+      {
+        "assertion": "no_absolute_paths_in_outputs",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "assertion": "all_required_package_files_exist",
+        "passed": true,
+        "detail": "all present (manifest sealed separately)"
+      },
+      {
+        "assertion": "no_verified_user_confirmed",
+        "passed": true,
+        "detail": "no verified_user_confirmed in Part 2 CSV/JSON outputs"
+      },
+      {
+        "assertion": "no_user_decision",
+        "passed": true,
+        "detail": "no user_decision column in research screening"
+      },
+      {
+        "assertion": "no_full_verified_master",
+        "passed": true,
+        "detail": "listing_master_verified_stage124.csv must not exist"
+      },
+      {
+        "assertion": "no_gate_b",
+        "passed": true,
+        "detail": "Gate B not executed"
+      },
+      {
+        "assertion": "no_modeling",
+        "passed": true,
+        "detail": "modeling not executed"
+      },
+      {
+        "assertion": "no_network_request",
+        "passed": true,
+        "detail": "no network requests"
+      },
+      {
+        "assertion": "no_tsetmc_probe",
+        "passed": true,
+        "detail": "no TSETMC probe"
+      },
+      {
+        "assertion": "no_source_fetch",
+        "passed": true,
+        "detail": "no source fetch"
+      }
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.5, pytest-8.3.4, pluggy-1.5.0 -- /Users/aliehpourdast/anaconda3/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/aliehpourdast/Desktop/papermali/papermali/project
+plugins: anyio-4.7.0
+collecting ... collected 32 items
+
+tests/test_stage124_batch02.py::test_exactly_115_pending_extracted_independently PASSED [  3%]
+tests/test_stage124_batch02.py::test_priority_table_is_exactly_the_115_pending PASSED [  6%]
+tests/test_stage124_batch02.py::test_no_pilot15_in_priority PASSED       [  9%]
+tests/test_stage124_batch02.py::test_no_pilot15_in_batch02 PASSED        [ 12%]
+tests/test_stage124_batch02.py::test_all_15_pilot_names_absent PASSED    [ 15%]
+tests/test_stage124_batch02.py::test_ranking_deterministic_across_repeats PASSED [ 18%]
+tests/test_stage124_batch02.py::test_priority_rank_unique_and_contiguous PASSED [ 21%]
+tests/test_stage124_batch02.py::test_priority_score_recomputed_manually PASSED [ 25%]
+tests/test_stage124_batch02.py::test_batch_size_15_when_boundary_resolved PASSED [ 28%]
+tests/test_stage124_batch02.py::test_selected_subset_of_pending PASSED   [ 31%]
+tests/test_stage124_batch02.py::test_tie_handling_extends_only_on_full_tie PASSED [ 34%]
+tests/test_stage124_batch02.py::test_normal_boundary_keeps_15 PASSED     [ 37%]
+tests/test_stage124_batch02.py::test_ticker_normalization_variants PASSED [ 40%]
+tests/test_stage124_batch02.py::test_normalization_no_duplicate_collision PASSED [ 43%]
+tests/test_stage124_batch02.py::test_normalization_does_not_merge_distinct_tickers PASSED [ 46%]
+tests/test_stage124_batch02.py::test_jalali_to_gregorian_two_independent_paths[1397-07-25-2018-10-17] PASSED [ 50%]
+tests/test_stage124_batch02.py::test_jalali_to_gregorian_two_independent_paths[1395-11-17-2017-02-05] PASSED [ 53%]
+tests/test_stage124_batch02.py::test_jalali_to_gregorian_two_independent_paths[1383-07-07-2004-09-28] PASSED [ 56%]
+tests/test_stage124_batch02.py::test_jalali_to_gregorian_two_independent_paths[1392-06-26-2013-09-17] PASSED [ 59%]
+tests/test_stage124_batch02.py::test_jalali_to_gregorian_two_independent_paths[1390-06-29-2011-09-20] PASSED [ 62%]
+tests/test_stage124_batch02.py::test_all_research_dates_convert_consistently PASSED [ 65%]
+tests/test_stage124_batch02.py::test_ordinary_share_distinguished_from_rights PASSED [ 68%]
+tests/test_stage124_batch02.py::test_ambiguous_instrument_kept_unresolved PASSED [ 71%]
+tests/test_stage124_batch02.py::test_no_candidate_marked_verified PASSED [ 75%]
+tests/test_stage124_batch02.py::test_tsetmc_candidate_not_canonical PASSED [ 78%]
+tests/test_stage124_batch02.py::test_user_review_decision_columns_blank PASSED [ 81%]
+tests/test_stage124_batch02.py::test_full_verified_master_not_created PASSED [ 84%]
+tests/test_stage124_batch02.py::test_no_new_partial_master_with_more_verified PASSED [ 87%]
+tests/test_stage124_batch02.py::test_stage122_stage123_unchanged PASSED  [ 90%]
+tests/test_stage124_batch02.py::test_stage123_shape_invariants PASSED    [ 93%]
+tests/test_stage124_batch02.py::test_all_provenance_rows_have_type_title_url PASSED [ 96%]
+tests/test_stage124_batch02.py::test_overall_qc_pass PASSED              [100%]
+
+============================== 32 passed in 0.96s ==============================

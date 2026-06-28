@@ -1,0 +1,2098 @@
+{
+  "stage": "stage124_batch02_part03",
+  "generated_at": "2026-06-27T16:53:37Z",
+  "source_commit": "130db8e195e9f05f655f33545c4de64dba202d9b",
+  "ticker_count": 10,
+  "tickers": [
+    "خمهر",
+    "خنصیر",
+    "خوساز",
+    "خچرخش",
+    "خکمک",
+    "دروز",
+    "دسبحا",
+    "دیران",
+    "رانفور",
+    "رمپنا"
+  ],
+  "all_pass": true,
+  "assertion_count": 415,
+  "failed_count": 0,
+  "assertions": [
+    {
+      "assertion": "research_df_non_empty",
+      "passed": true,
+      "detail": "rows=10"
+    },
+    {
+      "assertion": "provenance_df_non_empty",
+      "passed": true,
+      "detail": "rows=20"
+    },
+    {
+      "assertion": "tsetmc_df_non_empty",
+      "passed": true,
+      "detail": "rows=10"
+    },
+    {
+      "assertion": "exactly_10_rows",
+      "passed": true,
+      "detail": "rows=10"
+    },
+    {
+      "assertion": "exactly_10_unique_tickers",
+      "passed": true,
+      "detail": "unique=10"
+    },
+    {
+      "assertion": "ticker_set_and_order_match",
+      "passed": true,
+      "detail": "actual=['خمهر', 'خنصیر', 'خوساز', 'خچرخش', 'خکمک', 'دروز', 'دسبحا', 'دیران', 'رانفور', 'رمپنا']"
+    },
+    {
+      "assertion": "no_extra_tickers",
+      "passed": true,
+      "detail": "extra=set()"
+    },
+    {
+      "assertion": "no_missing_tickers",
+      "passed": true,
+      "detail": "missing=set()"
+    },
+    {
+      "assertion": "no_part2_tickers",
+      "passed": true,
+      "detail": "intersection=set()"
+    },
+    {
+      "assertion": "no_pilot15_tickers",
+      "passed": true,
+      "detail": "intersection=set()"
+    },
+    {
+      "assertion": "no_duplicate_tickers",
+      "passed": true,
+      "detail": "dups=0"
+    },
+    {
+      "assertion": "research_status_valid_enum_خمهر",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "evidence_status_valid_enum_خمهر",
+      "passed": true,
+      "detail": "evidence_status=requires_manual_review"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_خمهر",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_خمهر",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_خمهر",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_خمهر",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_خمهر",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_خمهر",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_خمهر",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_خمهر",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_خمهر",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "research_status_valid_enum_خنصیر",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "evidence_status_valid_enum_خنصیر",
+      "passed": true,
+      "detail": "evidence_status=requires_manual_review"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_خنصیر",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_خنصیر",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_خنصیر",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_خنصیر",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_خنصیر",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_خنصیر",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_خنصیر",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_خنصیر",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_خنصیر",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "research_status_valid_enum_خوساز",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "evidence_status_valid_enum_خوساز",
+      "passed": true,
+      "detail": "evidence_status=requires_manual_review"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_خوساز",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_خوساز",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_خوساز",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_خوساز",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_خوساز",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_خوساز",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_خوساز",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_خوساز",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_خوساز",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "research_status_valid_enum_خچرخش",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "evidence_status_valid_enum_خچرخش",
+      "passed": true,
+      "detail": "evidence_status=requires_manual_review"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_خچرخش",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_خچرخش",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_خچرخش",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_خچرخش",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_خچرخش",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_خچرخش",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_خچرخش",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_خچرخش",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_خچرخش",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "research_status_valid_enum_خکمک",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "evidence_status_valid_enum_خکمک",
+      "passed": true,
+      "detail": "evidence_status=requires_manual_review"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_خکمک",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_خکمک",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_خکمک",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_خکمک",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_خکمک",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_خکمک",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_خکمک",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_خکمک",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_خکمک",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "research_status_valid_enum_دروز",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "evidence_status_valid_enum_دروز",
+      "passed": true,
+      "detail": "evidence_status=requires_manual_review"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_دروز",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_دروز",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_دروز",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_دروز",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_دروز",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_دروز",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_دروز",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_دروز",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_دروز",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "research_status_valid_enum_دسبحا",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "evidence_status_valid_enum_دسبحا",
+      "passed": true,
+      "detail": "evidence_status=requires_manual_review"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_دسبحا",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_دسبحا",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_دسبحا",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_دسبحا",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_دسبحا",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_دسبحا",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_دسبحا",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_دسبحا",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_دسبحا",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "research_status_valid_enum_دیران",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "evidence_status_valid_enum_دیران",
+      "passed": true,
+      "detail": "evidence_status=requires_manual_review"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_دیران",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_دیران",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_دیران",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_دیران",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_دیران",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_دیران",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_دیران",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_دیران",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_دیران",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "research_status_valid_enum_رانفور",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "evidence_status_valid_enum_رانفور",
+      "passed": true,
+      "detail": "evidence_status=requires_manual_review"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_رانفور",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_رانفور",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_رانفور",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_رانفور",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_رانفور",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_رانفور",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_رانفور",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_رانفور",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_رانفور",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "research_status_valid_enum_رمپنا",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "evidence_status_valid_enum_رمپنا",
+      "passed": true,
+      "detail": "evidence_status=requires_manual_review"
+    },
+    {
+      "assertion": "timeout_not_no_reliable_evidence_رمپنا",
+      "passed": true,
+      "detail": "es=requires_manual_review despite all-network-failure"
+    },
+    {
+      "assertion": "timeout_is_research_blocked_رمپنا",
+      "passed": true,
+      "detail": "research_status=research_blocked_network"
+    },
+    {
+      "assertion": "network_blocked_flag_true_رمپنا",
+      "passed": true,
+      "detail": "network_blocked=true"
+    },
+    {
+      "assertion": "blocked_no_evidence_counts_رمپنا",
+      "passed": true,
+      "detail": "fetched=0, reviewed=0, evidence=0"
+    },
+    {
+      "assertion": "blocked_ordinary_share_unknown_رمپنا",
+      "passed": true,
+      "detail": "ordinary_share_confirmed=unknown"
+    },
+    {
+      "assertion": "blocked_not_ready_رمپنا",
+      "passed": true,
+      "detail": "ready=false"
+    },
+    {
+      "assertion": "canonical_empty_event_when_no_date_رمپنا",
+      "passed": true,
+      "detail": "ev="
+    },
+    {
+      "assertion": "no_canonical_from_admission_رمپنا",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "assertion": "non_exact_not_ready_رمپنا",
+      "passed": true,
+      "detail": "dp=unknown, ready=false"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خمهر_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خمهر_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خمهر_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_خمهر_1",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_خمهر_1",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_خمهر_1",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_خمهر_1",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_خمهر_1",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_خمهر_1",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_خمهر_1",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_خمهر_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خمهر_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خمهر_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_خمهر_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%d9%85%d9%87%d8%b1"
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خمهر_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_خمهر_2",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_خمهر_2",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_خمهر_2",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_خمهر_2",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_خمهر_2",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_خمهر_2",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_خمهر_2",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_خمهر_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خنصیر_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خنصیر_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خنصیر_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_خنصیر_1",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_خنصیر_1",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_خنصیر_1",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_خنصیر_1",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_خنصیر_1",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_خنصیر_1",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_خنصیر_1",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_خنصیر_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خنصیر_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خنصیر_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_خنصیر_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%d9%86%d8%b5%db%8c%d8%b1"
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خنصیر_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_خنصیر_2",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_خنصیر_2",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_خنصیر_2",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_خنصیر_2",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_خنصیر_2",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_خنصیر_2",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_خنصیر_2",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_خنصیر_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خوساز_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خوساز_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خوساز_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_خوساز_1",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_خوساز_1",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_خوساز_1",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_خوساز_1",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_خوساز_1",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_خوساز_1",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_خوساز_1",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_خوساز_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خوساز_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خوساز_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_خوساز_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%d9%88%d8%b3%d8%a7%d8%b2"
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خوساز_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_خوساز_2",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_خوساز_2",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_خوساز_2",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_خوساز_2",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_خوساز_2",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_خوساز_2",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_خوساز_2",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_خوساز_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خچرخش_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خچرخش_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خچرخش_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_خچرخش_1",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_خچرخش_1",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_خچرخش_1",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_خچرخش_1",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_خچرخش_1",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_خچرخش_1",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_خچرخش_1",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_خچرخش_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خچرخش_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خچرخش_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_خچرخش_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%da%86%d8%b1%d8%ae%d8%b4"
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خچرخش_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_خچرخش_2",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_خچرخش_2",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_خچرخش_2",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_خچرخش_2",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_خچرخش_2",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_خچرخش_2",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_خچرخش_2",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_خچرخش_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خکمک_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خکمک_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خکمک_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_خکمک_1",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_خکمک_1",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_خکمک_1",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_خکمک_1",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_خکمک_1",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_خکمک_1",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_خکمک_1",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_خکمک_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_خکمک_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_خکمک_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_خکمک_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%ae%da%a9%d9%85%da%a9"
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_خکمک_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_خکمک_2",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_خکمک_2",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_خکمک_2",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_خکمک_2",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_خکمک_2",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_خکمک_2",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_خکمک_2",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_خکمک_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_دروز_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_دروز_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_دروز_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_دروز_1",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_دروز_1",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_دروز_1",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_دروز_1",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_دروز_1",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_دروز_1",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_دروز_1",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_دروز_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_دروز_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_دروز_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_دروز_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%af%d8%b1%d9%88%d8%b2"
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_دروز_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_دروز_2",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_دروز_2",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_دروز_2",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_دروز_2",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_دروز_2",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_دروز_2",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_دروز_2",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_دروز_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_دسبحا_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_دسبحا_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_دسبحا_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_دسبحا_1",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_دسبحا_1",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_دسبحا_1",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_دسبحا_1",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_دسبحا_1",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_دسبحا_1",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_دسبحا_1",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_دسبحا_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_دسبحا_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_دسبحا_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_دسبحا_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%af%d8%b3%d8%a8%d8%ad%d8%a7"
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_دسبحا_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_دسبحا_2",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_دسبحا_2",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_دسبحا_2",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_دسبحا_2",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_دسبحا_2",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_دسبحا_2",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_دسبحا_2",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_دسبحا_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_دیران_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_دیران_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_دیران_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_دیران_1",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_دیران_1",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_دیران_1",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_دیران_1",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_دیران_1",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_دیران_1",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_دیران_1",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_دیران_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_دیران_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_دیران_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_دیران_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%af%db%8c%d8%b1%d8%a7%d9%86"
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_دیران_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_دیران_2",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_دیران_2",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_دیران_2",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_دیران_2",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_دیران_2",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_دیران_2",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_دیران_2",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_دیران_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_رانفور_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_رانفور_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_رانفور_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_رانفور_1",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_رانفور_1",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_رانفور_1",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_رانفور_1",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_رانفور_1",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_رانفور_1",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_رانفور_1",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_رانفور_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_رانفور_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_رانفور_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_رانفور_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%b1%d8%a7%d9%86%d9%81%d9%88%d8%b1"
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_رانفور_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_رانفور_2",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_رانفور_2",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_رانفور_2",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_رانفور_2",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_رانفور_2",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_رانفور_2",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_رانفور_2",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_رانفور_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_رمپنا_1",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_رمپنا_1",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_رمپنا_1",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_رمپنا_1",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_رمپنا_1",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_رمپنا_1",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_رمپنا_1",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_رمپنا_1",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_رمپنا_1",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_رمپنا_1",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_رمپنا_1",
+      "passed": true,
+      "detail": "stored=market_information_aggregator, computed=market_information_aggregator"
+    },
+    {
+      "assertion": "failed_fetch_no_snapshot_رمپنا_2",
+      "passed": true,
+      "detail": "status=timeout, snap="
+    },
+    {
+      "assertion": "failed_fetch_no_hash_رمپنا_2",
+      "passed": true,
+      "detail": "status=timeout, hash="
+    },
+    {
+      "assertion": "codal_official_is_codal_domain_رمپنا_2",
+      "passed": true,
+      "detail": "url=https://www.codal.ir/reportlist.aspx?search&symbol=%d8%b1%d9%85%d9%be%d9%86%d8%a7"
+    },
+    {
+      "assertion": "evidence_accepted_matches_engine_رمپنا_2",
+      "passed": true,
+      "detail": "stored=false, computed=false"
+    },
+    {
+      "assertion": "reviewed_event_type_matches_engine_رمپنا_2",
+      "passed": true,
+      "detail": "stored=, computed="
+    },
+    {
+      "assertion": "reviewed_date_precision_matches_engine_رمپنا_2",
+      "passed": true,
+      "detail": "stored=unknown, computed=unknown"
+    },
+    {
+      "assertion": "reviewed_evidence_valid_matches_engine_رمپنا_2",
+      "passed": true,
+      "detail": "stored=false, computed=False"
+    },
+    {
+      "assertion": "evidence_role_matches_engine_رمپنا_2",
+      "passed": true,
+      "detail": "stored=none, computed=none"
+    },
+    {
+      "assertion": "evidence_role_valid_enum_رمپنا_2",
+      "passed": true,
+      "detail": "evidence_role=none"
+    },
+    {
+      "assertion": "reviewed_date_precision_valid_enum_رمپنا_2",
+      "passed": true,
+      "detail": "reviewed_date_precision=unknown"
+    },
+    {
+      "assertion": "reviewed_event_type_valid_enum_رمپنا_2",
+      "passed": true,
+      "detail": "reviewed_event_type="
+    },
+    {
+      "assertion": "authority_class_matches_engine_رمپنا_2",
+      "passed": true,
+      "detail": "stored=official_regulatory, computed=official_regulatory"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_خمهر",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_خمهر",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_خنصیر",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_خنصیر",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_خوساز",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_خوساز",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_خچرخش",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_خچرخش",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_خکمک",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_خکمک",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_دروز",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_دروز",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_دسبحا",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_دسبحا",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_دیران",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_دیران",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_رانفور",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_رانفور",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "tsetmc_from_historical_v2_رمپنا",
+      "passed": true,
+      "detail": "probe_source=historical_v2_audit"
+    },
+    {
+      "assertion": "tsetmc_no_network_رمپنا",
+      "passed": true,
+      "detail": "network_request_performed=false"
+    },
+    {
+      "assertion": "research_from_provenance_خمهر",
+      "passed": true,
+      "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "research_from_provenance_خنصیر",
+      "passed": true,
+      "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "research_from_provenance_خوساز",
+      "passed": true,
+      "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "research_from_provenance_خچرخش",
+      "passed": true,
+      "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "research_from_provenance_خکمک",
+      "passed": true,
+      "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "research_from_provenance_دروز",
+      "passed": true,
+      "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "research_from_provenance_دسبحا",
+      "passed": true,
+      "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "research_from_provenance_دیران",
+      "passed": true,
+      "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "research_from_provenance_رانفور",
+      "passed": true,
+      "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "research_from_provenance_رمپنا",
+      "passed": true,
+      "detail": "research screening row must match status derived from recomputed provenance"
+    },
+    {
+      "assertion": "no_user_verification_token",
+      "passed": true,
+      "detail": "a fabricated user-verification token must not appear in any Part 3 output"
+    },
+    {
+      "assertion": "no_user_decision_column",
+      "passed": true,
+      "detail": "no user_decision column"
+    },
+    {
+      "assertion": "no_verification_status_column",
+      "passed": true,
+      "detail": "no verification_status column"
+    },
+    {
+      "assertion": "no_full_verified_master",
+      "passed": true,
+      "detail": "listing_master_verified_stage124.csv must not exist"
+    },
+    {
+      "assertion": "part02_unchanged_part02_hash_manifest.csv",
+      "passed": true,
+      "detail": "before=4eeaf5c8b494, after=4eeaf5c8b494"
+    },
+    {
+      "assertion": "part02_unchanged_part02_metadata_and_hashes.json",
+      "passed": true,
+      "detail": "before=575125344f6e, after=575125344f6e"
+    },
+    {
+      "assertion": "part02_unchanged_part02_qc_report.json",
+      "passed": true,
+      "detail": "before=6c9b402ec191, after=6c9b402ec191"
+    },
+    {
+      "assertion": "part02_unchanged_part02_research_screening_10tickers.csv",
+      "passed": true,
+      "detail": "before=2c0b39bcbcdd, after=2c0b39bcbcdd"
+    },
+    {
+      "assertion": "part02_unchanged_part02_source_provenance_10tickers.csv",
+      "passed": true,
+      "detail": "before=2a5d0513a8e1, after=2a5d0513a8e1"
+    },
+    {
+      "assertion": "part02_unchanged_part02_tsetmc_audit_10tickers.csv",
+      "passed": true,
+      "detail": "before=5b6f21f26fc7, after=5b6f21f26fc7"
+    },
+    {
+      "assertion": "part02_unchanged_source_1.html",
+      "passed": true,
+      "detail": "before=09152a6ce812, after=09152a6ce812"
+    },
+    {
+      "assertion": "frozen_unchanged_modeling_all_rows_stage122.csv",
+      "passed": true,
+      "detail": "before=ece991c5ff28, after=ece991c5ff28"
+    },
+    {
+      "assertion": "frozen_unchanged_modeling_all_rows_stage123.csv",
+      "passed": true,
+      "detail": "before=28b9f9d41856, after=28b9f9d41856"
+    },
+    {
+      "assertion": "frozen_unchanged_listing_batch02_tsetmc_conflict_audit_v2.csv",
+      "passed": true,
+      "detail": "before=0e5cda36aded, after=0e5cda36aded"
+    },
+    {
+      "assertion": "stage123_sha_matches",
+      "passed": true,
+      "detail": "sha=28b9f9d41856"
+    },
+    {
+      "assertion": "stage122_sha_matches",
+      "passed": true,
+      "detail": "sha=ece991c5ff28"
+    },
+    {
+      "assertion": "registry_valid",
+      "passed": true,
+      "detail": "errors=[]"
+    },
+    {
+      "assertion": "registry_seed_20_preserved",
+      "passed": true,
+      "detail": "missing_seed=set()"
+    },
+    {
+      "assertion": "registry_seed_keys_preserved",
+      "passed": true,
+      "detail": "seed_keys=[]"
+    },
+    {
+      "assertion": "registry_seed_content_unchanged",
+      "passed": true,
+      "detail": "seed type/title/url/source_origin must not change"
+    },
+    {
+      "assertion": "registry_minimum_two_seed_sources_each",
+      "passed": true,
+      "detail": "seed_counts={'خمهر': 2, 'خنصیر': 2, 'خوساز': 2, 'خچرخش': 2, 'خکمک': 2, 'دروز': 2, 'دسبحا': 2, 'دیران': 2, 'رانفور': 2, 'رمپنا': 2}"
+    },
+    {
+      "assertion": "registry_additional_sources_allowed",
+      "passed": true,
+      "detail": "invalid_extra_rows=[]"
+    },
+    {
+      "assertion": "provenance_subset_of_registry",
+      "passed": true,
+      "detail": "orphans=set()"
+    },
+    {
+      "assertion": "active_registry_matches_provenance",
+      "passed": true,
+      "detail": "prov_only=set(), active_only=set()"
+    },
+    {
+      "assertion": "inactive_registry_not_in_provenance",
+      "passed": true,
+      "detail": "inactive_in_prov=set()"
+    },
+    {
+      "assertion": "worklist_exact_ticker_scope",
+      "passed": true,
+      "detail": "order=['خمهر', 'خنصیر', 'خوساز', 'خچرخش', 'خکمک', 'دروز', 'دسبحا', 'دیران', 'رانفور', 'رمپنا']"
+    },
+    {
+      "assertion": "worklist_no_duplicates",
+      "passed": true,
+      "detail": "tickers=['خمهر', 'خنصیر', 'خوساز', 'خچرخش', 'خکمک', 'دروز', 'دسبحا', 'دیران', 'رانفور', 'رمپنا']"
+    },
+    {
+      "assertion": "worklist_discovered_urls_valid",
+      "passed": true,
+      "detail": "discovered URLs must be empty or valid http(s) with a real host and no local path"
+    },
+    {
+      "assertion": "worklist_candidate_date_valid",
+      "passed": true,
+      "detail": "candidate_date_jalali must be empty or a valid Jalali year / month / exact-day value"
+    },
+    {
+      "assertion": "worklist_date_precision_enum_valid",
+      "passed": true,
+      "detail": "date_precision must be in ['exact_day', 'month_only', 'unknown', 'year_only']"
+    },
+    {
+      "assertion": "worklist_date_precision_matches_candidate",
+      "passed": true,
+      "detail": "candidate_date_jalali must agree with date_precision"
+    },
+    {
+      "assertion": "worklist_event_candidate_valid",
+      "passed": true,
+      "detail": "first_public_event_candidate must be in ['', 'admission', 'first_public_offering', 'first_public_trading', 'listing', 'public_company_conversion', 'unresolved']"
+    },
+    {
+      "assertion": "worklist_ordinary_share_value_valid",
+      "passed": true,
+      "detail": "ordinary_share_explicit must be in ['false', 'true', 'unknown'] (non-empty)"
+    },
+    {
+      "assertion": "worklist_manual_status_valid",
+      "passed": true,
+      "detail": "manual_review_status must be in ['pending_manual_research', 'reviewed', 'source_discovered', 'under_review', 'unresolved'] (non-empty)"
+    }
+  ]
+}

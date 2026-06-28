@@ -1,0 +1,390 @@
+{
+  "stage": "stage124_batch02_part03",
+  "generated_at": "2026-06-27T16:53:37Z",
+  "source_commit": "130db8e195e9f05f655f33545c4de64dba202d9b",
+  "ticker_count": 10,
+  "tickers": [
+    "خمهر",
+    "خنصیر",
+    "خوساز",
+    "خچرخش",
+    "خکمک",
+    "دروز",
+    "دسبحا",
+    "دیران",
+    "رانفور",
+    "رمپنا"
+  ],
+  "exact_day_canonical": {},
+  "research_blocked_network_tickers": [
+    "خمهر",
+    "خنصیر",
+    "خوساز",
+    "خچرخش",
+    "خکمک",
+    "دروز",
+    "دسبحا",
+    "دیران",
+    "رانفور",
+    "رمپنا"
+  ],
+  "requires_manual_review_tickers": [
+    "خمهر",
+    "خنصیر",
+    "خوساز",
+    "خچرخش",
+    "خکمک",
+    "دروز",
+    "دسبحا",
+    "دیران",
+    "رانفور",
+    "رمپنا"
+  ],
+  "no_reliable_evidence_tickers": [],
+  "ready_for_user_review_tickers": [],
+  "conflict_tickers": [],
+  "counts": {
+    "ready_count": 0,
+    "network_blocked_count": 10,
+    "total_attempted_sources": 20,
+    "total_fetched_sources": 0,
+    "total_reviewed_sources": 0,
+    "total_evidence_sources": 0
+  },
+  "per_ticker_status": {
+    "خمهر": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "خنصیر": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "خوساز": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "خچرخش": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "خکمک": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "دروز": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "دسبحا": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "دیران": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "رانفور": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    },
+    "رمپنا": {
+      "evidence_status": "requires_manual_review",
+      "research_status": "research_blocked_network",
+      "research_completion_status": "blocked_network",
+      "network_blocked": "true",
+      "ordinary_share_confirmed": "unknown",
+      "ready_for_user_review": "false",
+      "recommended_next_step": "manual_web_research_required"
+    }
+  },
+  "tsetmc_historical": {
+    "خمهر": {
+      "instrument_match_status": "not_in_historical_v2_audit",
+      "historical_candidate_date": "",
+      "candidate_disposition": "not_in_historical_v2_audit",
+      "network_request_performed": "false"
+    },
+    "خنصیر": {
+      "instrument_match_status": "not_in_historical_v2_audit",
+      "historical_candidate_date": "",
+      "candidate_disposition": "not_in_historical_v2_audit",
+      "network_request_performed": "false"
+    },
+    "خوساز": {
+      "instrument_match_status": "not_in_historical_v2_audit",
+      "historical_candidate_date": "",
+      "candidate_disposition": "not_in_historical_v2_audit",
+      "network_request_performed": "false"
+    },
+    "خچرخش": {
+      "instrument_match_status": "not_in_historical_v2_audit",
+      "historical_candidate_date": "",
+      "candidate_disposition": "not_in_historical_v2_audit",
+      "network_request_performed": "false"
+    },
+    "خکمک": {
+      "instrument_match_status": "not_in_historical_v2_audit",
+      "historical_candidate_date": "",
+      "candidate_disposition": "not_in_historical_v2_audit",
+      "network_request_performed": "false"
+    },
+    "دروز": {
+      "instrument_match_status": "not_in_historical_v2_audit",
+      "historical_candidate_date": "",
+      "candidate_disposition": "not_in_historical_v2_audit",
+      "network_request_performed": "false"
+    },
+    "دسبحا": {
+      "instrument_match_status": "not_in_historical_v2_audit",
+      "historical_candidate_date": "",
+      "candidate_disposition": "not_in_historical_v2_audit",
+      "network_request_performed": "false"
+    },
+    "دیران": {
+      "instrument_match_status": "not_in_historical_v2_audit",
+      "historical_candidate_date": "",
+      "candidate_disposition": "not_in_historical_v2_audit",
+      "network_request_performed": "false"
+    },
+    "رانفور": {
+      "instrument_match_status": "not_in_historical_v2_audit",
+      "historical_candidate_date": "",
+      "candidate_disposition": "not_in_historical_v2_audit",
+      "network_request_performed": "false"
+    },
+    "رمپنا": {
+      "instrument_match_status": "not_in_historical_v2_audit",
+      "historical_candidate_date": "",
+      "candidate_disposition": "not_in_historical_v2_audit",
+      "network_request_performed": "false"
+    }
+  },
+  "fetch_results": {
+    "خمهر": [
+      {
+        "source_index": "1",
+        "source_url": "https://rahavard365.com/asset/jdax/%D8%AE%D9%85%D9%87%D8%B1",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      },
+      {
+        "source_index": "2",
+        "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AE%D9%85%D9%87%D8%B1",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      }
+    ],
+    "خنصیر": [
+      {
+        "source_index": "1",
+        "source_url": "https://rahavard365.com/asset/%D8%AE%D9%86%D8%B5%DB%8C%D8%B1",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      },
+      {
+        "source_index": "2",
+        "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AE%D9%86%D8%B5%DB%8C%D8%B1",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      }
+    ],
+    "خوساز": [
+      {
+        "source_index": "1",
+        "source_url": "https://rahavard365.com/asset/%D8%AE%D9%88%D8%B3%D8%A7%D8%B2",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      },
+      {
+        "source_index": "2",
+        "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AE%D9%88%D8%B3%D8%A7%D8%B2",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      }
+    ],
+    "خچرخش": [
+      {
+        "source_index": "1",
+        "source_url": "https://rahavard365.com/asset/%D8%AE%DA%86%D8%B1%D8%AE%D8%B4",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      },
+      {
+        "source_index": "2",
+        "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AE%DA%86%D8%B1%D8%AE%D8%B4",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      }
+    ],
+    "خکمک": [
+      {
+        "source_index": "1",
+        "source_url": "https://rahavard365.com/asset/%D8%AE%DA%A9%D9%85%DA%A9",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      },
+      {
+        "source_index": "2",
+        "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AE%DA%A9%D9%85%DA%A9",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      }
+    ],
+    "دروز": [
+      {
+        "source_index": "1",
+        "source_url": "https://rahavard365.com/asset/%D8%AF%D8%B1%D9%88%D8%B2",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      },
+      {
+        "source_index": "2",
+        "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AF%D8%B1%D9%88%D8%B2",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      }
+    ],
+    "دسبحا": [
+      {
+        "source_index": "1",
+        "source_url": "https://rahavard365.com/asset/%D8%AF%D8%B3%D8%A8%D8%AD%D8%A7",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      },
+      {
+        "source_index": "2",
+        "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AF%D8%B3%D8%A8%D8%AD%D8%A7",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      }
+    ],
+    "دیران": [
+      {
+        "source_index": "1",
+        "source_url": "https://rahavard365.com/asset/%D8%AF%DB%8C%D8%B1%D8%A7%D9%86",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      },
+      {
+        "source_index": "2",
+        "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%AF%DB%8C%D8%B1%D8%A7%D9%86",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      }
+    ],
+    "رانفور": [
+      {
+        "source_index": "1",
+        "source_url": "https://rahavard365.com/asset/%D8%B1%D8%A7%D9%86%D9%81%D9%88%D8%B1",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      },
+      {
+        "source_index": "2",
+        "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%B1%D8%A7%D9%86%D9%81%D9%88%D8%B1",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      }
+    ],
+    "رمپنا": [
+      {
+        "source_index": "1",
+        "source_url": "https://rahavard365.com/asset/%D8%B1%D9%85%D9%BE%D9%86%D8%A7",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      },
+      {
+        "source_index": "2",
+        "source_url": "https://www.codal.ir/ReportList.aspx?search&Symbol=%D8%B1%D9%85%D9%BE%D9%86%D8%A7",
+        "retrieval_status": "timeout",
+        "http_status": "",
+        "snapshot_path": "",
+        "content_sha256": ""
+      }
+    ]
+  }
+}
