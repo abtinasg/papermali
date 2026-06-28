@@ -61,6 +61,8 @@ from project.src.stage124_batch02_part03 import (
     REVIEWED_EVENT_TYPES,
     REVIEWED_DATE_PRECISIONS,
     EVIDENCE_ROLES,
+    ALLOWED_RESEARCH_STATUSES,
+    ALLOWED_EVIDENCE_STATUSES,
     _is_sha256,
     _truthy,
 )
@@ -491,7 +493,7 @@ def test_admission_only_canonical_violation():
     research_df.at[i, "proposed_canonical_public_entry_date_jalali"] = "1380-01-01"
     research_df.at[i, "proposed_canonical_event_type"] = "first_public_offering"
     qc = _qc(tickers_df, research_df, prov_df, tsetmc_df)
-    assert _any_failed_containing(qc, "no_canonical_from_admission")
+    assert _any_failed_containing(qc, "canonical_not_derived_from_noncanonical_event")
 
 
 def test_invalid_canonical_event_type():
@@ -1190,15 +1192,8 @@ def test_o18_real_provenance_retrieval_evidence_invariants():
 def test_o19_real_research_rows_semantically_valid():
     df = _load_real_research()
     assert df["ticker"].tolist() == PART03_TICKERS
-    allowed_rs = {"research_blocked_network", "source_discovered",
-                  "fetched_pending_manual_review", "research_completed_no_evidence",
-                  "candidate_supported", "research_completed_conflict",
-                  "research_completed_partial_public_entry_date",
-                  "research_completed_admission_only",
-                  "research_completed_listing_only",
-                  "research_completed_noncanonical_entry_evidence"}
-    allowed_es = {"requires_manual_review", "no_reliable_evidence",
-                  "candidate_supported", "requires_first_public_trade_evidence"}
+    allowed_rs = ALLOWED_RESEARCH_STATUSES
+    allowed_es = ALLOWED_EVIDENCE_STATUSES
     for _, r in df.iterrows():
         assert str(r["research_status"]).strip() in allowed_rs, \
             f"invalid research_status: {r['research_status']}"
@@ -1253,15 +1248,8 @@ def test_real_output_exact_set_and_order():
 def test_real_output_research_semantics_valid():
     df = _load_real_research()
     assert df["ticker"].tolist() == PART03_TICKERS
-    allowed_rs = {"research_blocked_network", "source_discovered",
-                  "fetched_pending_manual_review", "research_completed_no_evidence",
-                  "candidate_supported", "research_completed_conflict",
-                  "research_completed_partial_public_entry_date",
-                  "research_completed_admission_only",
-                  "research_completed_listing_only",
-                  "research_completed_noncanonical_entry_evidence"}
-    allowed_es = {"requires_manual_review", "no_reliable_evidence",
-                  "candidate_supported", "requires_first_public_trade_evidence"}
+    allowed_rs = ALLOWED_RESEARCH_STATUSES
+    allowed_es = ALLOWED_EVIDENCE_STATUSES
     for _, r in df.iterrows():
         assert str(r["research_status"]).strip() in allowed_rs
         assert str(r["evidence_status"]).strip() in allowed_es
@@ -3490,3 +3478,339 @@ def test_p352_qc_engine_invariants_pass():
                      "finalizer_idempotent",
                      "qc_report_regenerated_from_current_engine"):
         assert required in names, f"missing invariant {required}"
+
+
+# ================================================================================
+# Part 3.1A.5.3 — unified engine, full research↔provenance QC, status-specific QC,
+# no-reliable hardening, QC-level multi-event scenarios, artifact reproducibility
+# ================================================================================
+
+def _scenario_dfs(target_tk, specs):
+    """Build full 10-ticker research/provenance DataFrames where `target_tk`
+    carries reviewed records (real persisted snapshots) and every other ticker
+    is the all-timeout baseline. Returns (tickers_df, research_df, provenance_df,
+    tsetmc_df, snaps); the caller unlinks `snaps`."""
+    names = _names()
+    tsetmc = _absent_tsetmc()
+    fetch = _failed_fetch_results()
+    snaps = []
+    recs = []
+    for n, spec in enumerate(specs):
+        idx, event, date = spec[0], spec[1], spec[2]
+        kw = spec[3] if len(spec) > 3 else {}
+        rec, snap = _rev(target_tk, idx, event, date,
+                         f"p353_{target_tk}_{idx}_{n}", **kw)
+        recs.append(rec)
+        snaps.append(snap)
+    prov_by_ticker = dict(fetch)
+    prov_by_ticker[target_tk] = recs
+    tickers_df = build_tickers_df(names)
+    research_df = build_research_screening(names, prov_by_ticker, tsetmc)
+    provenance_df = build_source_provenance(prov_by_ticker)
+    tsetmc_df = build_tsetmc_audit(tsetmc)
+    return tickers_df, research_df, provenance_df, tsetmc_df, snaps
+
+
+def _run_scenario_qc(target_tk, specs):
+    t, r, p, ts, snaps = _scenario_dfs(target_tk, specs)
+    try:
+        qc = _qc(t, r, p, ts)
+    finally:
+        for s in snaps:
+            s.unlink(missing_ok=True)
+    return qc, r
+
+
+def _passed(qc, name):
+    for a in qc["assertions"]:
+        if a["assertion"] == name:
+            return a["passed"]
+    return None
+
+
+# 1. a real-output-like fixture with a weak exact candidate passes enum + QC.
+def test_p353_real_like_needs_corroboration_valid():
+    tk = PART03_TICKERS[0]
+    qc, r = _run_scenario_qc(tk, [
+        (1, "first_public_offering", "1380-03-15", {"src_type": "", "url": _AGG})])
+    row = r[r["ticker"] == tk].iloc[0]
+    assert row["research_status"] == "research_completed_exact_public_entry_needs_corroboration"
+    assert row["research_status"] in ALLOWED_RESEARCH_STATUSES
+    assert _passed(qc, f"research_status_valid_enum_{tk}") is True
+    assert _passed(qc, f"status_needs_corroboration_semantics_{tk}") is True
+    assert _passed(qc, f"research_from_provenance_{tk}") is True
+    assert qc["all_pass"] is True
+
+
+# 2. offering + trading different dates are not flagged conflict by QC.
+def test_p353_qc_offering_trading_diff_not_conflict():
+    tk = PART03_TICKERS[0]
+    qc, r = _run_scenario_qc(tk, [
+        (1, "first_public_offering", "1380-03-15"),
+        (2, "first_public_trading", "1381-06-20")])
+    row = r[r["ticker"] == tk].iloc[0]
+    assert str(row["conflict_flag"]).lower() == "false"
+    assert row["research_status"] != "research_completed_conflict"
+    assert qc["all_pass"] is True
+
+
+# 3. offering + trading same day → tie-break offering, QC passes.
+def test_p353_qc_same_day_tiebreak_offering():
+    tk = PART03_TICKERS[0]
+    qc, r = _run_scenario_qc(tk, [
+        (1, "first_public_trading", "1380-03-15"),
+        (2, "first_public_offering", "1380-03-15")])
+    row = r[r["ticker"] == tk].iloc[0]
+    assert row["proposed_canonical_event_type"] == "first_public_offering"
+    assert row["proposed_canonical_public_entry_date_jalali"] == "1380-03-15"
+    assert _passed(qc, f"canonical_not_derived_from_noncanonical_event_{tk}") is True
+    assert qc["all_pass"] is True
+
+
+# 4. admission + listing + offering exact → all candidates kept, canonical valid.
+def test_p353_qc_admission_listing_offering_exact():
+    tk = PART03_TICKERS[0]
+    qc, r = _run_scenario_qc(tk, [
+        (1, "admission", "1379-01-01", {"ordinary": "unknown"}),
+        (2, "listing", "1380-02-02", {"ordinary": "unknown"}),
+        (3, "first_public_offering", "1381-04-10")])
+    row = r[r["ticker"] == tk].iloc[0]
+    assert row["admission_date_candidate_jalali"] == "1379-01-01"
+    assert row["listing_date_candidate_jalali"] == "1380-02-02"
+    assert row["first_public_offering_date_candidate_jalali"] == "1381-04-10"
+    assert row["proposed_canonical_event_type"] == "first_public_offering"
+    assert row["proposed_canonical_public_entry_date_jalali"] == "1381-04-10"
+    assert _passed(qc, f"canonical_not_derived_from_noncanonical_event_{tk}") is True
+    assert qc["all_pass"] is True
+
+
+# 5. admission + trading exact → admission kept, canonical trading valid.
+def test_p353_qc_admission_trading_exact():
+    tk = PART03_TICKERS[0]
+    qc, r = _run_scenario_qc(tk, [
+        (1, "admission", "1379-01-01", {"ordinary": "unknown"}),
+        (2, "first_public_trading", "1380-05-05")])
+    row = r[r["ticker"] == tk].iloc[0]
+    assert row["admission_date_candidate_jalali"] == "1379-01-01"
+    assert row["proposed_canonical_event_type"] == "first_public_trading"
+    assert row["proposed_canonical_public_entry_date_jalali"] == "1380-05-05"
+    assert qc["all_pass"] is True
+
+
+# 6. admission/listing presence does not fail the canonical assertion.
+def test_p353_qc_admission_listing_presence_ok():
+    tk = PART03_TICKERS[0]
+    qc, _ = _run_scenario_qc(tk, [
+        (1, "admission", "1379-01-01", {"ordinary": "unknown"}),
+        (2, "listing", "1380-02-02", {"ordinary": "unknown"}),
+        (3, "first_public_offering", "1381-04-10")])
+    assert _passed(qc, f"canonical_not_derived_from_noncanonical_event_{tk}") is True
+
+
+# 7. admission-only produces no canonical date.
+def test_p353_qc_admission_only_no_canonical():
+    tk = PART03_TICKERS[0]
+    qc, r = _run_scenario_qc(tk, [
+        (1, "admission", "1379-01-01", {"ordinary": "unknown"})])
+    row = r[r["ticker"] == tk].iloc[0]
+    assert row["proposed_canonical_public_entry_date_jalali"] == ""
+    assert row["research_status"] == "research_completed_admission_only"
+    assert qc["all_pass"] is True
+
+
+# 8. the legacy wrapper agrees with the canonical engine on selection/ready.
+def test_p353_wrapper_matches_canonical_engine():
+    tk = PART03_TICKERS[0]
+    snaps = []
+    try:
+        recs = []
+        for n, (idx, ev, dt) in enumerate([
+                (1, "first_public_offering", "1381-06-20"),
+                (2, "first_public_trading", "1380-02-02")]):
+            rec, snap = _rev(tk, idx, ev, dt, f"p353_wrap_{idx}")
+            recs.append(rec); snaps.append(snap)
+        legacy = decide_ready_for_user_review(recs, snapshot_root=ROOT)
+        canon = decide_canonical_public_entry_candidate(recs, snapshot_root=ROOT)
+        assert legacy["ready"] == canon["ready"] is True
+        assert legacy["canonical_date"] == canon["canonical_date"] == "1380-02-02"
+        assert legacy["event_type"] == canon["canonical_event"] == "first_public_trading"
+        assert legacy["conflict_flag"] is False
+    finally:
+        for s in snaps:
+            s.unlink(missing_ok=True)
+
+
+# 9-17. negative research↔provenance mutations → QC fails.
+def _mutate_qc(field, value, base_specs=None):
+    tk = PART03_TICKERS[0]
+    base_specs = base_specs or [(1, "first_public_offering", "1380-03-15")]
+    t, r, p, ts, snaps = _scenario_dfs(tk, base_specs)
+    try:
+        i = r.index[r["ticker"] == tk][0]
+        r[field] = r[field].astype(object)
+        r.at[i, field] = value
+        qc = _qc(t, r, p, ts)
+    finally:
+        for s in snaps:
+            s.unlink(missing_ok=True)
+    return qc, tk
+
+
+def test_p353_neg_candidate_event_type():
+    qc, tk = _mutate_qc("candidate_event_type", "listing")
+    assert _passed(qc, f"research_from_provenance_{tk}") is False
+
+
+def test_p353_neg_proposed_canonical_event():
+    qc, tk = _mutate_qc("proposed_canonical_event_type", "first_public_trading")
+    assert _passed(qc, f"research_from_provenance_{tk}") is False
+
+
+def test_p353_neg_date_precision():
+    qc, tk = _mutate_qc("date_precision", "month_only")
+    assert _passed(qc, f"research_from_provenance_{tk}") is False
+
+
+def test_p353_neg_conflict_flag():
+    qc, tk = _mutate_qc("conflict_flag", "true")
+    assert _passed(qc, f"research_from_provenance_{tk}") is False
+
+
+def test_p353_neg_conflict_dates():
+    qc, tk = _mutate_qc("conflict_dates", "1399-01-01")
+    assert _passed(qc, f"research_from_provenance_{tk}") is False
+
+
+def test_p353_neg_recommended_next_step():
+    qc, tk = _mutate_qc("recommended_next_step", "totally_wrong_step")
+    assert _passed(qc, f"research_from_provenance_{tk}") is False
+
+
+def test_p353_neg_attempted_source_count():
+    qc, tk = _mutate_qc("attempted_source_count", "99")
+    assert _passed(qc, f"research_from_provenance_{tk}") is False
+
+
+def test_p353_neg_candidate_column():
+    qc, tk = _mutate_qc("admission_date_candidate_jalali", "1399-01-01")
+    assert (_passed(qc, f"research_from_provenance_{tk}") is False
+            or _passed(qc, f"all_candidate_columns_match_provenance_{tk}") is False)
+
+
+def test_p353_neg_gregorian_conversion():
+    qc, tk = _mutate_qc("proposed_canonical_public_entry_date_gregorian", "1999-01-01")
+    assert _passed(qc, f"date_conversion_ok_{tk}") is False
+
+
+# 18-21. no_reliable_evidence is rejected whenever real entry evidence exists.
+def _no_reliable_neg(specs):
+    tk = PART03_TICKERS[0]
+    t, r, p, ts, snaps = _scenario_dfs(tk, specs)
+    try:
+        i = r.index[r["ticker"] == tk][0]
+        r.at[i, "evidence_status"] = "no_reliable_evidence"
+        r.at[i, "research_status"] = "research_completed_no_evidence"
+        qc = _qc(t, r, p, ts)
+    finally:
+        for s in snaps:
+            s.unlink(missing_ok=True)
+    return qc, tk
+
+
+def test_p353_no_reliable_with_conflict_fails():
+    qc, tk = _no_reliable_neg([
+        (1, "first_public_offering", "1380-03-15"),
+        (2, "first_public_offering", "1381-06-20")])
+    assert _passed(qc, f"no_reliable_only_when_no_valid_entry_evidence_{tk}") is False
+
+
+def test_p353_no_reliable_with_exact_weak_fails():
+    qc, tk = _no_reliable_neg([
+        (1, "first_public_offering", "1380-03-15", {"src_type": "", "url": _AGG})])
+    assert _passed(qc, f"no_reliable_only_when_no_valid_entry_evidence_{tk}") is False
+
+
+def test_p353_no_reliable_with_partial_fails():
+    qc, tk = _no_reliable_neg([
+        (1, "first_public_offering", "1380", {"exact": "false"})])
+    assert _passed(qc, f"no_reliable_only_when_no_valid_entry_evidence_{tk}") is False
+
+
+def test_p353_no_reliable_with_admission_fails():
+    qc, tk = _no_reliable_neg([
+        (1, "admission", "1379-01-01", {"ordinary": "unknown"})])
+    assert _passed(qc, f"no_reliable_only_when_no_valid_entry_evidence_{tk}") is False
+
+
+# 22. production provenance role equals the finalizer role.
+def test_p353_provenance_role_equals_finalizer():
+    tk = PART03_TICKERS[0]
+    t, r, p, ts, snaps = _scenario_dfs(tk, [
+        (1, "first_public_offering", "1380-03-15"),
+        (2, "first_public_offering", "1381-06-20")])
+    try:
+        sub = p[p["ticker"] == tk]
+        recs = [{k: pr.get(k, "") for k in pr.index} for _, pr in sub.iterrows()]
+        fin = finalize_reviewed_evidence_set(recs, ROOT)
+        froles = {(str(fr.get("ticker")), str(fr.get("source_index")).strip()):
+                  fr["evidence_role"] for fr in fin["finalized_records"]}
+        for _, pr in sub.iterrows():
+            key = (str(pr["ticker"]), str(pr["source_index"]).strip())
+            assert str(pr["evidence_role"]) == froles[key]
+        assert list(froles.values()).count("conflicting_evidence") == 2
+    finally:
+        for s in snaps:
+            s.unlink(missing_ok=True)
+
+
+# 23/24. finalizer single-path: normalize uses the finalizer; idempotent + order-free.
+def test_p353_normalize_uses_single_finalizer_path():
+    import project.src.stage124_batch02_part03 as mod
+    assert not hasattr(mod, "_mark_conflicting_evidence_roles")
+
+
+def test_p353_finalizer_order_independent():
+    tk = PART03_TICKERS[0]
+    snaps = []
+    try:
+        a = []
+        for idx, ev, dt in [(1, "first_public_offering", "1380-03-15"),
+                            (2, "admission", "1379-01-01", )]:
+            kw = {"ordinary": "unknown"} if ev == "admission" else {}
+            rec, snap = _rev(tk, idx, ev, dt, f"p353_ord_{idx}", **kw)
+            a.append(rec); snaps.append(snap)
+        f1 = finalize_reviewed_evidence_set(a, ROOT)
+        f2 = finalize_reviewed_evidence_set(list(reversed(a)), ROOT)
+        c1 = {k: (v["date"], v["precision"], v["conflict"])
+              for k, v in f1["candidates_by_event"].items()}
+        c2 = {k: (v["date"], v["precision"], v["conflict"])
+              for k, v in f2["candidates_by_event"].items()}
+        assert c1 == c2
+        assert f1["canonical_decision"]["canonical_date"] == \
+            f2["canonical_decision"]["canonical_date"]
+    finally:
+        for s in snaps:
+            s.unlink(missing_ok=True)
+
+
+# 26. the current real outputs still pass QC unchanged (20 timeout, 10 blocked).
+def test_p353_current_real_outputs_still_pass():
+    df = _load_real_research()
+    assert (df["research_status"] == "research_blocked_network").all()
+    assert len(df) == 10
+    prov = pd.read_csv(PART03_DIR / "part03_source_provenance_10tickers.csv",
+                       dtype=str).fillna("")
+    assert len(prov) == 20
+    assert (prov["retrieval_status"] == "timeout").all()
+
+
+# artifact reproducibility fields exist in the QC report and summary.
+def test_p353_qc_report_has_source_fingerprints():
+    qc = json.loads((PART03_DIR / "part03_qc_report.json").read_text(encoding="utf-8"))
+    if "source_file_sha256" not in qc:
+        pytest.skip("artifact predates fingerprint fields; added by the artifact "
+                    "regeneration commit")
+    assert len(qc["source_file_sha256"]) == 64
+    assert len(qc["test_file_sha256"]) == 64
+    summ = json.loads((PART03_DIR / "part03_summary.json").read_text(encoding="utf-8"))
+    assert "source_file_sha256" in summ and "test_file_sha256" in summ

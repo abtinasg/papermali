@@ -98,6 +98,47 @@ hard-blocked; the 20 timeout provenance rows and 10 `research_blocked_network`
 research rows are unchanged in research content (only the QC report's and
 summary's `generated_at` / `source_commit` move).
 
+## Unified decision engine & reproducible QC (Part 3.1A.5.3)
+
+The final pre-research gate removes every remaining dual path and makes QC a
+faithful mirror of the production engine.
+
+- **Central status enums.** `ALLOWED_RESEARCH_STATUSES` and
+  `ALLOWED_EVIDENCE_STATUSES` are exported from the module; production QC and the
+  tests import them — no set is redefined locally. The corroboration status
+  `research_completed_exact_public_entry_needs_corroboration` is included, so the
+  real-output enum tests are forward-compatible.
+- **One decision engine.** `decide_ready_for_user_review` is now a thin wrapper
+  over `finalize_reviewed_evidence_set` / `decide_canonical_public_entry_candidate`
+  and maps to the legacy keys. The QC `ready` path validates **only** the
+  canonical decision (`ready`, `canonical_date`, `canonical_event`, earliest
+  candidate, no partial blocker, no conflict). No QC or test keeps the old
+  "different events = conflict" semantics.
+- **Single finalizer in provenance.** `normalize_provenance_records` calls the
+  finalizer and copies back the conflict-aware `evidence_role`; the standalone
+  `_mark_conflicting_evidence_roles` is gone. `finalize_reviewed_evidence_set`
+  writes the final `evidence_role` into schema-compatible `finalized_records`
+  (the private `_final_evidence_role` mirror is never written to CSV).
+- **Admission/listing coexistence.** The old `no_canonical_from_admission`
+  assertion is replaced by `canonical_not_derived_from_noncanonical_event`: a
+  canonical date is valid only when it equals the canonical engine's exact-day
+  offering/trading decision, so admission/listing/conversion may coexist with a
+  valid canonical without being rejected — but never produce one themselves.
+- **Full research↔provenance recompute.** QC now compares every important
+  derived field (candidate/canonical event & date, precision,
+  ordinary_share_confirmed, evidence/research/completion status, network_blocked,
+  all four source counts, ready, conflict flag/dates/reason, recommended next
+  step, and the four candidate columns) against `_derive_screening_status`. The
+  Gregorian canonical is recomputed independently: empty when the Jalali
+  canonical is empty, otherwise the exact conversion.
+- **Status-specific semantics** are asserted for every completed status, and
+  **`no_reliable_evidence`** is permitted only when the finalizer shows no
+  conflict, no exact candidate and no entry-event candidate of any kind.
+- **Reproducible artifacts.** The QC report and summary record
+  `source_file_sha256` and `test_file_sha256`, and the package is sealed with a
+  two-commit workflow: a code commit (source/tests/README), then an artifact
+  commit whose `source_commit` pins to the code commit's SHA on a clean tree.
+
 ## Forward-compatible real-output tests (Part 3.1A.4.2)
 
 The real-output tests were refactored from baseline-locking assertions (which
