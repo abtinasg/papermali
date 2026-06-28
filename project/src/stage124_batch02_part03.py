@@ -1205,19 +1205,14 @@ def jalali_dates_compatible(a: str, b: str) -> bool:
     return True
 
 
-# Reviewed event types that all compete for the single canonical public-entry
-# date, so an incompatible date across *any* of them is a genuine conflict.
-_CANONICAL_CONFLICT_GROUP = "canonical_public_entry"
-
-
 def _conflict_group_for_event(event_type: str) -> str:
-    """Map a reviewed event type to its conflict-grouping key. Canonical events
-    (first_public_offering / first_public_trading) share one group because they
-    all assert the single canonical entry date; each non-canonical event
-    (admission, listing, public_company_conversion) is its own group so that two
-    *different* events (e.g. admission vs listing) never conflict."""
-    if event_type in CANONICAL_EVENT_TYPES:
-        return _CANONICAL_CONFLICT_GROUP
+    """Map a reviewed event type to its conflict-grouping key. Every event type
+    has its OWN conflict group, so a conflict can only arise between incompatible
+    evidence for the *same* event (offering vs offering, trading vs trading,
+    admission vs admission, listing vs listing, conversion vs conversion). A
+    different offering and trading date is NOT a conflict — the earlier event is
+    the basis of public entry and that selection is resolved by
+    :func:`decide_canonical_public_entry_candidate`."""
     return event_type
 
 
@@ -1291,6 +1286,209 @@ def _mark_conflicting_evidence_roles(records: list, snapshot_root: Path) -> None
             key = (str(r.get("ticker", "")), str(r.get("source_index", "")).strip())
             if key in info["keys"]:
                 r["evidence_role"] = "conflicting_evidence"
+
+
+def _jalali_interval(date_str: str, precision: str):
+    """Return ``(start, end)`` as normalized ``YYYY-MM-DD`` strings spanning the
+    interval implied by a (possibly partial) Jalali date, or ``None`` when the
+    value cannot be interpreted."""
+    s = str(date_str or "").strip()
+    if precision == "exact_day" and is_valid_exact_jalali_date(s):
+        n = normalize_jalali(s)
+        return n, n
+    if precision == "month_only" and re.fullmatch(r"\d{4}-\d{2}", s):
+        return f"{s}-01", f"{s}-31"
+    if precision == "year_only" and re.fullmatch(r"\d{4}", s):
+        return f"{s}-01-01", f"{s}-12-31"
+    return None
+
+
+def partial_candidate_blocks_exact(partial_date: str, precision: str,
+                                   exact_date: str) -> bool:
+    """A partial offering/trading candidate *blocks* a later exact candidate when
+    its interval could yield a date EARLIER than the exact candidate.
+
+    Rules (Jalali strings compare lexically because they are fixed-width):
+
+    * the partial interval *contains* the exact date → compatible, not a blocker;
+    * the partial interval starts strictly before the exact date → blocker
+      (a genuinely earlier public entry is possible);
+    * the partial interval is entirely after the exact date → not a blocker.
+    """
+    iv = _jalali_interval(partial_date, precision)
+    ex = normalize_jalali(str(exact_date or "").strip())
+    if iv is None or not ex:
+        return False
+    start, end = iv
+    if start <= ex <= end:
+        return False
+    if start < ex:
+        return True
+    return False
+
+
+_PRECISION_RANK = {"exact_day": 0, "month_only": 1, "year_only": 2, "unknown": 3}
+
+
+def _candidate_sort_key(item):
+    """Deterministic ordering key: highest precision first, then lowest
+    source_index, then URL — never the DataFrame's incidental row order."""
+    r, ev = item
+    si_raw = str(r.get("source_index", "0")).strip()
+    si = int(si_raw) if si_raw.isdigit() else 0
+    return (_PRECISION_RANK.get(ev["reviewed_date_precision"], 3), si,
+            str(r.get("source_url", "")))
+
+
+def select_best_compatible_candidate(event_records: list) -> dict:
+    """Pick the single best candidate for ONE event type from
+    ``[(record, eval_dict), ...]`` (all the same reviewed_event_type).
+
+    If any two dates are incompatible → ``conflict=True`` and no candidate. When
+    compatible, prefer precision exact_day > month_only > year_only, breaking ties
+    by lowest source_index then sorted URL."""
+    out = {"conflict": False, "date": "", "precision": "unknown", "record": None}
+    if not event_records:
+        return out
+    dates = [str(r.get("reviewed_date_jalali", "")).strip() for r, _ in event_records]
+    for i in range(len(dates)):
+        for j in range(i + 1, len(dates)):
+            if not jalali_dates_compatible(dates[i], dates[j]):
+                out["conflict"] = True
+                return out
+    best_r, best_ev = sorted(event_records, key=_candidate_sort_key)[0]
+    out["date"] = str(best_r.get("reviewed_date_jalali", "")).strip()
+    out["precision"] = best_ev["reviewed_date_precision"]
+    out["record"] = best_r
+    return out
+
+
+def _source_sufficiency(records: list) -> bool:
+    """True when the given accepted records meet the qualifying-source bar:
+    one official-regulatory source, OR one contemporaneous credible-news /
+    company-official source, OR two qualifying sources from two real domains.
+    Aggregators alone are never sufficient."""
+    qualifying = [r for r in records
+                  if _record_authority(r) in QUALIFYING_AUTHORITY_CLASSES]
+    official_single = any(_record_authority(r) == "official_regulatory"
+                          for r in qualifying)
+    contemporaneous_single = any(
+        _record_authority(r) in ("credible_news", "company_official")
+        and _contemporaneous_with_event(r)
+        for r in qualifying)
+    qual_groups = {registrable_domain(r.get("source_url", "")) for r in qualifying}
+    qual_groups.discard("")
+    return bool(official_single or contemporaneous_single or len(qual_groups) >= 2)
+
+
+def decide_canonical_public_entry_candidate(records: list,
+                                            snapshot_root: Path = None) -> dict:
+    """Deterministically choose the canonical public-entry candidate.
+
+    1. Collect valid exact-day public-entry candidates per event (offering /
+       trading) and valid partial-date candidates.
+    2. The earliest exact date is the only candidate that may become canonical
+       (tie-breaker: first_public_offering before first_public_trading).
+    3. A partial candidate whose interval could be earlier than that exact date
+       *blocks* it (no later candidate may override an earlier, unresolved one).
+    4. The earliest exact candidate becomes canonical/ready only if its own
+       event+date has sufficient qualifying sources; otherwise it is retained but
+       needs corroboration."""
+    out = {
+        "has_exact_candidate": False,
+        "earliest_event": "", "earliest_date": "",
+        "sufficient": False, "ready": False,
+        "canonical_date": "", "canonical_event": "",
+        "blocked_by_partial": False, "blocking_partial": "",
+        "blocking_partial_event": "", "blocking_partial_precision": "unknown",
+        "reason": "",
+    }
+    pairs = [(r, evaluate_reviewed_evidence_record(r, snapshot_root)) for r in records]
+    valid = [(r, ev) for r, ev in pairs if ev["reviewed_evidence_valid"]]
+    exact = [(r, ev) for r, ev in valid
+             if ev["evidence_role"] == "canonical_exact_candidate"]
+    partial = [(r, ev) for r, ev in valid
+               if ev["evidence_role"] == "canonical_partial_date"]
+    if not exact:
+        out["reason"] = "no_exact_candidate"
+        return out
+    out["has_exact_candidate"] = True
+
+    def _earliest_key(item):
+        r, ev = item
+        d = normalize_jalali(str(r.get("reviewed_date_jalali", "")))
+        ev_rank = 0 if ev["reviewed_event_type"] == "first_public_offering" else 1
+        si_raw = str(r.get("source_index", "0")).strip()
+        si = int(si_raw) if si_raw.isdigit() else 0
+        return (d, ev_rank, si, str(r.get("source_url", "")))
+
+    earliest_r, earliest_ev = sorted(exact, key=_earliest_key)[0]
+    earliest_date = normalize_jalali(str(earliest_r.get("reviewed_date_jalali", "")))
+    earliest_event = earliest_ev["reviewed_event_type"]
+    out["earliest_event"] = earliest_event
+    out["earliest_date"] = earliest_date
+
+    for r, ev in partial:
+        pdate = str(r.get("reviewed_date_jalali", "")).strip()
+        if partial_candidate_blocks_exact(pdate, ev["reviewed_date_precision"],
+                                          earliest_date):
+            out["blocked_by_partial"] = True
+            out["blocking_partial"] = pdate
+            out["blocking_partial_event"] = ev["reviewed_event_type"]
+            out["blocking_partial_precision"] = ev["reviewed_date_precision"]
+            out["reason"] = "earlier_partial_blocks_exact"
+            return out
+
+    same = [r for r, ev in exact
+            if ev["reviewed_event_type"] == earliest_event
+            and normalize_jalali(str(r.get("reviewed_date_jalali", ""))) == earliest_date]
+    out["sufficient"] = _source_sufficiency(same)
+    if out["sufficient"]:
+        out.update(ready=True, canonical_date=earliest_date,
+                   canonical_event=earliest_event, reason="ready")
+    else:
+        out["reason"] = "needs_corroboration"
+    return out
+
+
+def finalize_reviewed_evidence_set(records: list,
+                                   snapshot_root: Path = None) -> dict:
+    """Single, idempotent finalizer used by BOTH the production pipeline and QC.
+
+    Returns ``finalized_records`` (each with ``_final_evidence_role``),
+    ``candidates_by_event`` (best compatible candidate per event),
+    ``conflict_info`` (same-event conflicts), and ``canonical_decision``.
+
+    A record participating in a real same-event conflict takes the finalized role
+    ``conflicting_evidence``; every other record keeps its own base role. Running
+    the finalizer again on its own output yields identical roles/candidates."""
+    pairs = [(r, evaluate_reviewed_evidence_record(r, snapshot_root)) for r in records]
+    valid = [(r, ev) for r, ev in pairs if ev["reviewed_evidence_valid"]]
+    conflict_info = detect_evidence_conflicts(valid)
+
+    finalized = []
+    for r, ev in pairs:
+        role = ev["evidence_role"]
+        key = (str(r.get("ticker", "")), str(r.get("source_index", "")).strip())
+        if ev["reviewed_evidence_valid"] and key in conflict_info["keys"]:
+            role = "conflicting_evidence"
+        fr = dict(r)
+        fr["_final_evidence_role"] = role
+        finalized.append(fr)
+
+    by_event = {}
+    for r, ev in valid:
+        by_event.setdefault(ev["reviewed_event_type"], []).append((r, ev))
+    candidates_by_event = {etype: select_best_compatible_candidate(recs)
+                           for etype, recs in by_event.items()}
+
+    canonical_decision = decide_canonical_public_entry_candidate(records, snapshot_root)
+    return {
+        "finalized_records": finalized,
+        "candidates_by_event": candidates_by_event,
+        "conflict_info": conflict_info,
+        "canonical_decision": canonical_decision,
+    }
 
 
 def normalize_provenance_records(records: list, snapshot_root: Path = ROOT) -> list:
@@ -1539,38 +1737,50 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
         })
         return base
 
-    # Research was completed (fetched AND reviewed). Now apply evidence logic.
+    # Research was completed (fetched AND reviewed). One finalized evidence set
+    # drives both the candidate columns and the dominant status.
+    fin = finalize_reviewed_evidence_set(reviewed, snapshot_root)
+    cbe = fin["candidates_by_event"]
+    conflict_info = fin["conflict_info"]
+    canon = fin["canonical_decision"]
 
-    # Evaluate each reviewed record with the new reviewed-evidence engine, keeping
-    # the source record alongside each evaluation so dates remain available.
-    reviewed_pairs = [(r, evaluate_reviewed_evidence_record(r, snapshot_root))
-                      for r in reviewed]
-    valid_pairs = [(r, ev) for r, ev in reviewed_pairs if ev["reviewed_evidence_valid"]]
-    valid_evals = [ev for _, ev in valid_pairs]
+    def _cand(event):
+        c = cbe.get(event)
+        return c["date"] if (c and not c["conflict"] and c["date"]) else ""
 
-    def _date_for_role(role):
-        for r, ev in valid_pairs:
-            if ev["evidence_role"] == role:
-                return str(r.get("reviewed_date_jalali", "")).strip()
-        return ""
+    def _cand_precision(event):
+        c = cbe.get(event)
+        return c["precision"] if (c and not c["conflict"] and c["date"]) else "unknown"
 
-    # Separate by evidence role.
-    canonical_exact = [ev for ev in valid_evals
-                       if ev["evidence_role"] == "canonical_exact_candidate"]
-    canonical_partial = [ev for ev in valid_evals
-                         if ev["evidence_role"] == "canonical_partial_date"]
-    admission_evals = [ev for ev in valid_evals
-                       if ev["evidence_role"] == "admission_only"]
-    listing_evals = [ev for ev in valid_evals
-                     if ev["evidence_role"] == "listing_only"]
-    conversion_evals = [ev for ev in valid_evals
-                        if ev["evidence_role"] == "public_company_conversion_only"]
+    # (Problem four) Build ALL candidate columns first, independently and
+    # simultaneously — no early return may drop another event's candidate.
+    base["admission_date_candidate_jalali"] = _cand("admission")
+    base["listing_date_candidate_jalali"] = _cand("listing")
+    base["first_public_offering_date_candidate_jalali"] = _cand("first_public_offering")
+    base["first_public_trading_date_candidate_jalali"] = _cand("first_public_trading")
 
-    # Step 1: Same-event conflict detection — two incompatible dates for the same
-    # event (or among the canonical events) is a conflict; different events with
-    # different dates are NOT a conflict.
-    conflict_info = detect_evidence_conflicts(valid_pairs)
+    has_admission = bool(_cand("admission"))
+    has_listing = bool(_cand("listing"))
+    has_conversion = bool(_cand("public_company_conversion"))
 
+    # Partial offering/trading candidates (no exact canonical), earliest first.
+    partial_pe = []
+    for event in ("first_public_offering", "first_public_trading"):
+        c = cbe.get(event)
+        if c and not c["conflict"] and c["date"] and c["precision"] in ("month_only", "year_only"):
+            partial_pe.append((event, c["date"], c["precision"]))
+
+    def _partial_sort_key(item):
+        event, date, _prec = item
+        iv = _jalali_interval(date, _prec)
+        start = iv[0] if iv else date
+        ev_rank = 0 if event == "first_public_offering" else 1
+        return (start, ev_rank)
+    partial_pe.sort(key=_partial_sort_key)
+
+    # ---- Dominant status (candidate columns above are always preserved) ----
+
+    # 1. Same-event conflict.
     if conflict_info["conflict"]:
         etypes = conflict_info["event_types"]
         base.update({
@@ -1583,17 +1793,30 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
             "conflict_dates": "; ".join(conflict_info["dates"]),
             "conflict_reason": (
                 "conflicting " + ", ".join(etypes) + " dates across sources"),
-            "recommended_next_step": "manual_resolution_of_conflicting_dates",
+            "recommended_next_step": "resolve_conflicting_evidence",
         })
         return base
 
-    # Step 2: Canonical exact-day ready (qualifying-source decision).
-    decision = decide_ready_for_user_review(reviewed, snapshot_root)
-    if decision["ready"]:
+    # 2. An earlier partial public-entry candidate blocks a later exact candidate.
+    if canon["blocked_by_partial"]:
         base.update({
-            "candidate_event_type": decision["event_type"],
-            "proposed_canonical_public_entry_date_jalali": decision["canonical_date"],
-            "proposed_canonical_event_type": decision["event_type"],
+            "candidate_event_type": canon["blocking_partial_event"],
+            "proposed_canonical_event_type": "",
+            "proposed_canonical_public_entry_date_jalali": "",
+            "date_precision": canon["blocking_partial_precision"],
+            "evidence_status": "requires_manual_review",
+            "research_status": "research_completed_partial_public_entry_date",
+            "research_completion_status": "completed_partial_evidence",
+            "recommended_next_step": "find_exact_public_entry_day",
+        })
+        return base
+
+    # 3. Earliest exact public-entry candidate WITH source sufficiency → ready.
+    if canon["ready"]:
+        base.update({
+            "candidate_event_type": canon["canonical_event"],
+            "proposed_canonical_public_entry_date_jalali": canon["canonical_date"],
+            "proposed_canonical_event_type": canon["canonical_event"],
             "date_precision": "exact_day",
             "ordinary_share_confirmed": "true",
             "evidence_status": "candidate_supported",
@@ -1602,95 +1825,76 @@ def _derive_screening_status(fetch_recs: list, snapshot_root: Path = None) -> di
             "ready_for_user_review": "true",
             "recommended_next_step": "recommend_user_review",
         })
-        # Populate the matching candidate date field.
-        if decision["event_type"] == "first_public_offering":
-            base["first_public_offering_date_candidate_jalali"] = decision["canonical_date"]
-        elif decision["event_type"] == "first_public_trading":
-            base["first_public_trading_date_candidate_jalali"] = decision["canonical_date"]
         return base
 
-    # Step 3: Canonical partial-date (year/month only offering/trading). The
-    # candidate date is recorded ONLY in the matching offering/trading column;
-    # the canonical date and canonical event type stay empty and the row needs
-    # manual review.
-    if canonical_partial:
-        ev = canonical_partial[0]
-        date_str = _date_for_role("canonical_partial_date")
+    # 4. Earliest exact public-entry candidate WITHOUT source sufficiency.
+    if canon["has_exact_candidate"]:
         base.update({
-            "candidate_event_type": ev["reviewed_event_type"],
+            "candidate_event_type": canon["earliest_event"],
             "proposed_canonical_event_type": "",
             "proposed_canonical_public_entry_date_jalali": "",
-            "date_precision": ev["reviewed_date_precision"],
+            "date_precision": "exact_day",
+            "evidence_status": "requires_manual_review",
+            "research_status": "research_completed_exact_public_entry_needs_corroboration",
+            "research_completion_status": "completed_exact_candidate_needs_corroboration",
+            "recommended_next_step": "find_qualifying_corroboration",
+        })
+        return base
+
+    # 5. Partial offering/trading evidence (no exact candidate).
+    if partial_pe:
+        event, _date, prec = partial_pe[0]
+        base.update({
+            "candidate_event_type": event,
+            "proposed_canonical_event_type": "",
+            "proposed_canonical_public_entry_date_jalali": "",
+            "date_precision": prec,
             "evidence_status": "requires_manual_review",
             "research_status": "research_completed_partial_public_entry_date",
             "research_completion_status": "completed_partial_evidence",
-            "recommended_next_step": "requires_exact_date_evidence",
+            "recommended_next_step": "find_exact_public_entry_day",
         })
-        if ev["reviewed_event_type"] == "first_public_offering":
-            base["first_public_offering_date_candidate_jalali"] = date_str
-        elif ev["reviewed_event_type"] == "first_public_trading":
-            base["first_public_trading_date_candidate_jalali"] = date_str
         return base
 
-    # Step 4: Admission AND listing both valid (no canonical evidence). Preserve
-    # both candidate dates; the listing is the more advanced step, so the row is
-    # treated as listing-only pending first-public-trade evidence.
-    if (admission_evals and listing_evals
-            and not canonical_exact and not canonical_partial):
+    # 6. Listing evidence (admission candidate, if any, is already preserved).
+    if has_listing:
         base.update({
             "candidate_event_type": "listing",
-            "date_precision": listing_evals[0]["reviewed_date_precision"],
+            "date_precision": _cand_precision("listing"),
             "evidence_status": "requires_first_public_trade_evidence",
             "research_status": "research_completed_listing_only",
             "research_completion_status": "completed_listing_only",
-            "recommended_next_step": "requires_first_public_trade_evidence",
-            "admission_date_candidate_jalali": _date_for_role("admission_only"),
-            "listing_date_candidate_jalali": _date_for_role("listing_only"),
+            "recommended_next_step": "find_first_public_offering_or_trading",
         })
         return base
 
-    # Step 5: Admission-only evidence.
-    if admission_evals and not canonical_exact and not canonical_partial:
+    # 7. Admission evidence.
+    if has_admission:
         base.update({
             "candidate_event_type": "admission",
-            "date_precision": admission_evals[0]["reviewed_date_precision"],
+            "date_precision": _cand_precision("admission"),
             "evidence_status": "requires_first_public_trade_evidence",
             "research_status": "research_completed_admission_only",
             "research_completion_status": "completed_admission_only",
-            "recommended_next_step": "requires_first_public_trade_evidence",
-            "admission_date_candidate_jalali": _date_for_role("admission_only"),
+            "recommended_next_step": "find_first_public_offering_or_trading",
         })
         return base
 
-    # Step 6: Listing-only evidence.
-    if listing_evals and not canonical_exact and not canonical_partial:
-        base.update({
-            "candidate_event_type": "listing",
-            "date_precision": listing_evals[0]["reviewed_date_precision"],
-            "evidence_status": "requires_first_public_trade_evidence",
-            "research_status": "research_completed_listing_only",
-            "research_completion_status": "completed_listing_only",
-            "recommended_next_step": "requires_first_public_trade_evidence",
-            "listing_date_candidate_jalali": _date_for_role("listing_only"),
-        })
-        return base
-
-    # Step 7: Public-company conversion only — non-canonical entry evidence that
-    # always needs manual review.
-    if conversion_evals and not canonical_exact and not canonical_partial:
+    # 8. Public-company conversion only.
+    if has_conversion:
         base.update({
             "candidate_event_type": "public_company_conversion",
             "proposed_canonical_event_type": "",
             "proposed_canonical_public_entry_date_jalali": "",
-            "date_precision": conversion_evals[0]["reviewed_date_precision"],
+            "date_precision": _cand_precision("public_company_conversion"),
             "evidence_status": "requires_manual_review",
             "research_status": "research_completed_noncanonical_entry_evidence",
             "research_completion_status": "completed_noncanonical_evidence",
-            "recommended_next_step": "requires_first_public_trade_evidence",
+            "recommended_next_step": "find_first_public_offering_or_trading",
         })
         return base
 
-    # Step 8: Reviewed but no valid entry evidence at all → no_reliable_evidence.
+    # 9. No valid reviewed entry evidence at all → no_reliable_evidence.
     base.update({
         "evidence_status": "no_reliable_evidence",
         "research_status": "research_completed_no_evidence",
@@ -1900,6 +2104,124 @@ def merge_existing_worklist_with_current_status(template_df: pd.DataFrame,
 
 
 # ---- QC (fail-closed, computed from real output) -------------------------------
+def _qc_engine_invariants(check) -> None:
+    """Deterministic engine-invariant assertions that need no network and no
+    files (snapshot_root=None skips on-disk hash checks). They lock the canonical
+    selection, conflict grouping, candidate aggregation and finalizer behaviour."""
+    OFF = "first_public_offering"
+    TRD = "first_public_trading"
+    codal = "https://www.codal.ir/Reports/Decision.aspx?LetterSerial="
+    aggr = "https://aggregator-example.ir/co/12345/ipo-report-page"
+
+    def syn(idx, event, date, url=None, source_type="codal_official",
+            ordinary="true", exact="true"):
+        return {
+            "ticker": "SYN", "source_index": idx,
+            "source_type": source_type,
+            "source_url": url if url is not None else f"{codal}SYN{idx}",
+            "retrieval_status": "fetched_ok", "content_sha256": "a" * 64,
+            "snapshot_path": "stage124/batch02_parts/snapshots_part03/syn.html",
+            "content_review_status": "reviewed", "event_type_supported": event,
+            "exact_date_explicit": exact, "reviewed_date_jalali": date,
+            "ordinary_share_explicit": ordinary, "independent_source_group": "",
+        }
+
+    # different canonical events with different dates are NOT a conflict.
+    mixed = finalize_reviewed_evidence_set(
+        [syn(1, OFF, "1380-03-15"), syn(2, TRD, "1381-06-20")], None)
+    check("different_canonical_events_not_conflict",
+          not mixed["conflict_info"]["conflict"],
+          "offering vs trading different dates must not conflict")
+
+    # two incompatible same-event candidates ARE a conflict.
+    same = finalize_reviewed_evidence_set(
+        [syn(1, OFF, "1380-03-15"), syn(2, OFF, "1381-06-20")], None)
+    check("same_event_conflict_only",
+          same["conflict_info"]["conflict"]
+          and not mixed["conflict_info"]["conflict"],
+          "conflict must arise only within the same event")
+
+    # best candidate prefers highest precision (admission year + exact → exact).
+    adm = finalize_reviewed_evidence_set(
+        [syn(1, "admission", "1380", exact="false"),
+         syn(2, "admission", "1380-05-10")], None)
+    cadm = adm["candidates_by_event"].get("admission", {})
+    check("best_candidate_uses_highest_precision",
+          cadm.get("date") == "1380-05-10" and cadm.get("precision") == "exact_day",
+          f"got={cadm}")
+
+    # deterministic under shuffled input order.
+    adm_rev = finalize_reviewed_evidence_set(
+        [syn(2, "admission", "1380-05-10"),
+         syn(1, "admission", "1380", exact="false")], None)
+    check("candidate_selection_deterministic",
+          adm_rev["candidates_by_event"].get("admission", {}).get("date")
+          == "1380-05-10",
+          "candidate must not depend on record order")
+
+    # earliest exact public event is selected (trading 1380 before offering 1381).
+    early = decide_canonical_public_entry_candidate(
+        [syn(1, OFF, "1381-05-05"), syn(2, TRD, "1380-02-02")], None)
+    check("earliest_exact_public_event_selected",
+          early["earliest_event"] == TRD and early["canonical_date"] == "1380-02-02"
+          and early["ready"] is True,
+          f"got={early}")
+
+    # a later, qualified candidate cannot override an earlier, unqualified one.
+    later = _derive_screening_status(
+        [syn(1, OFF, "1380-03-15", url=aggr, source_type=""),
+         syn(2, TRD, "1381-06-20")], snapshot_root=None)
+    check("later_qualified_candidate_cannot_override_earlier_unqualified_candidate",
+          later["research_status"]
+          == "research_completed_exact_public_entry_needs_corroboration"
+          and later["candidate_event_type"] == OFF
+          and later["proposed_canonical_public_entry_date_jalali"] == ""
+          and later["first_public_trading_date_candidate_jalali"] == "1381-06-20",
+          f"got={later['research_status']}")
+
+    # an exact candidate with an insufficient source is NOT no_reliable_evidence.
+    weak = _derive_screening_status(
+        [syn(1, OFF, "1380-03-15", url=aggr, source_type="")], snapshot_root=None)
+    check("exact_unqualified_not_no_reliable_evidence",
+          weak["evidence_status"] != "no_reliable_evidence",
+          f"es={weak['evidence_status']}")
+    check("exact_candidate_needs_corroboration_not_ready",
+          weak["research_status"]
+          == "research_completed_exact_public_entry_needs_corroboration"
+          and weak["ready_for_user_review"] == "false",
+          f"got={weak['research_status']}")
+    check("qc_report_regenerated_from_current_engine",
+          weak["research_completion_status"]
+          == "completed_exact_candidate_needs_corroboration",
+          "current engine must emit the 3.1A.5.2 corroboration status")
+
+    # an earlier partial blocks a later exact; a compatible partial does not.
+    blocked = decide_canonical_public_entry_candidate(
+        [syn(1, OFF, "1380", exact="false"), syn(2, TRD, "1381-04-10")], None)
+    check("earlier_partial_blocks_later_exact", blocked["blocked_by_partial"] is True,
+          f"got={blocked}")
+    compat = decide_canonical_public_entry_candidate(
+        [syn(1, OFF, "1380-03", exact="false"), syn(2, OFF, "1380-03-15")], None)
+    check("compatible_partial_does_not_block_exact",
+          compat["blocked_by_partial"] is False
+          and compat["has_exact_candidate"] is True,
+          f"got={compat}")
+
+    # the finalizer is idempotent (roles + candidates stable on re-run).
+    recs = [syn(1, OFF, "1380-03-15"), syn(2, OFF, "1381-06-20"),
+            syn(3, "admission", "1379-01-01")]
+    f1 = finalize_reviewed_evidence_set(recs, None)
+    f2 = finalize_reviewed_evidence_set(f1["finalized_records"], None)
+    roles1 = [fr["_final_evidence_role"] for fr in f1["finalized_records"]]
+    roles2 = [fr["_final_evidence_role"] for fr in f2["finalized_records"]]
+    cand1 = {k: (v["date"], v["precision"], v["conflict"])
+             for k, v in f1["candidates_by_event"].items()}
+    cand2 = {k: (v["date"], v["precision"], v["conflict"])
+             for k, v in f2["candidates_by_event"].items()}
+    check("finalizer_idempotent", roles1 == roles2 and cand1 == cand2,
+          f"roles1={roles1}, roles2={roles2}")
+
+
 def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
                   provenance_df: pd.DataFrame, tsetmc_df: pd.DataFrame,
                   frozen_before: dict, frozen_after: dict,
@@ -1947,6 +2269,7 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
         "research_completed_admission_only",
         "research_completed_listing_only",
         "research_completed_noncanonical_entry_evidence",
+        "research_completed_exact_public_entry_needs_corroboration",
     }
     ALLOWED_EVIDENCE_STATUSES = {
         "requires_manual_review", "candidate_supported",
@@ -1955,6 +2278,21 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
 
     prov_by_tk = {tk: provenance_df[provenance_df["ticker"] == tk]
                   for tk in PART03_TICKERS}
+
+    # One finalized evidence set per ticker drives the conflict-aware role and the
+    # candidate columns. QC compares against THIS (not a single-record evaluation).
+    final_role_by_key = {}
+    final_candidates_by_tk = {}
+    for tk in PART03_TICKERS:
+        sub = prov_by_tk.get(tk)
+        recs = ([{k: pr.get(k, "") for k in pr.index} for _, pr in sub.iterrows()]
+                if sub is not None and not sub.empty else [])
+        fin = finalize_reviewed_evidence_set(recs, snapshot_root=ROOT)
+        for fr in fin["finalized_records"]:
+            final_role_by_key[(str(fr.get("ticker", "")),
+                               str(fr.get("source_index", "")).strip())] = \
+                fr["_final_evidence_role"]
+        final_candidates_by_tk[tk] = fin["candidates_by_event"]
 
     for _, r in research_df.iterrows():
         tk = r["ticker"]
@@ -2162,9 +2500,16 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
               str(pr.get("reviewed_evidence_valid", "")).strip().lower() ==
               ("true" if rev_eval["reviewed_evidence_valid"] else "false"),
               f"stored={pr.get('reviewed_evidence_valid')}, computed={rev_eval['reviewed_evidence_valid']}")
+        # evidence_role must match the FINALIZED (conflict-aware) role, not just
+        # the single-record base role — a conflicting record is conflicting_evidence.
+        final_role = final_role_by_key.get(
+            (str(tk), str(idx).strip()), rev_eval["evidence_role"])
         check(f"evidence_role_matches_engine_{tk}_{idx}",
-              str(pr.get("evidence_role", "")).strip() == rev_eval["evidence_role"],
-              f"stored={pr.get('evidence_role')}, computed={rev_eval['evidence_role']}")
+              str(pr.get("evidence_role", "")).strip() == final_role,
+              f"stored={pr.get('evidence_role')}, finalized={final_role}")
+        check(f"conflicting_role_matches_finalized_engine_{tk}_{idx}",
+              str(pr.get("evidence_role", "")).strip() == final_role,
+              f"stored={pr.get('evidence_role')}, finalized={final_role}")
         # evidence_role must be a valid enum.
         check(f"evidence_role_valid_enum_{tk}_{idx}",
               str(pr.get("evidence_role", "")).strip() in EVIDENCE_ROLES,
@@ -2266,6 +2611,36 @@ def run_part03_qc(tickers_df: pd.DataFrame, research_df: pd.DataFrame,
         check(f"research_from_provenance_{tk}", same,
               "research screening row must match status derived from recomputed "
               "provenance")
+
+        # candidate columns must equal the finalizer's per-event candidates.
+        cbe = final_candidates_by_tk.get(tk, {})
+        def _exp(event):
+            c = cbe.get(event)
+            return c["date"] if (c and not c["conflict"] and c["date"]) else ""
+        cols_ok = all(str(r.get(col, "")).strip() == _exp(event)
+                      for col, event in (
+                          ("admission_date_candidate_jalali", "admission"),
+                          ("listing_date_candidate_jalali", "listing"),
+                          ("first_public_offering_date_candidate_jalali",
+                           "first_public_offering"),
+                          ("first_public_trading_date_candidate_jalali",
+                           "first_public_trading")))
+        check(f"all_candidate_columns_match_provenance_{tk}", cols_ok,
+              "candidate columns must equal the finalized per-event candidates")
+
+        # no_reliable_evidence only when no valid reviewed entry evidence exists.
+        if str(r.get("evidence_status", "")).strip() == "no_reliable_evidence":
+            entry_events = {"first_public_offering", "first_public_trading",
+                            "admission", "listing", "public_company_conversion"}
+            has_entry = any(ev in cbe and not cbe[ev]["conflict"] and cbe[ev]["date"]
+                            for ev in entry_events)
+            check(f"no_reliable_only_when_no_valid_entry_evidence_{tk}",
+                  not has_entry,
+                  "no_reliable_evidence requires the absence of any valid entry "
+                  "evidence candidate")
+
+    # ---- engine-invariant checks (deterministic, no network, no files) ----
+    _qc_engine_invariants(check)
 
     # no fabricated user verification anywhere
     blob = " ".join(str(df.values) for df in (research_df, provenance_df, tsetmc_df))

@@ -21,6 +21,83 @@ verified master, does **not** run Gate B, and does **not** run any modelling.
 
 No Part 2 or Pilot15 ticker is re-researched.
 
+## Reviewed-evidence engine (Part 3.1A.5)
+
+The reviewed-evidence engine evaluates each *reviewed* provenance record and
+assigns a derived `reviewed_event_type`, `reviewed_date_precision`,
+`reviewed_evidence_valid` and `evidence_role`. It accepts the canonical events
+(`first_public_offering` / `first_public_trading`) as well as the non-canonical
+entry events `admission`, `listing` and `public_company_conversion`
+(`conversion_to_public` is mapped onto `public_company_conversion`). A successful
+fetch is never evidence; only a reviewed, snapshot-and-hash-valid,
+domain-consistent, document-specific record can support an event/date.
+
+## Partial-date, conversion, conflict, derived fields (Part 3.1A.5.1)
+
+- **Partial offering/trading** (`year_only` / `month_only`): the canonical date
+  and canonical event type stay empty, `evidence_status=requires_manual_review`,
+  `research_status=research_completed_partial_public_entry_date`, and the
+  candidate date is recorded only in the matching offering/trading column.
+- **`public_company_conversion`**: canonical date/event empty,
+  `evidence_status=requires_manual_review`,
+  `research_status=research_completed_noncanonical_entry_evidence`, never ready.
+- **Same-event conflict**: two *incompatible* dates for the **same** event
+  (offering↔offering, trading↔trading, admission↔admission, listing↔listing,
+  conversion↔conversion) raise a conflict. A `jalali_dates_compatible` helper
+  defines precision compatibility (exact `1380-03-15` is compatible with month
+  `1380-03` and year `1380`; a different month/year or two different exact days
+  conflict).
+- **Admission + listing**: both candidate columns are preserved; the row is
+  treated as listing-only pending first-public-trade evidence.
+- The four reviewed-evidence fields are **fully derived** every run (removed from
+  the review overlay; added to `DERIVED_NEVER_TRUSTED`). Records in a real
+  conflict take `evidence_role=conflicting_evidence`. Provenance and research are
+  built from one finalized record set.
+
+## Cross-record aggregation & canonical selection (Part 3.1A.5.2)
+
+- **Offering and trading are different events.** A different offering and trading
+  date is **not** a conflict; `_conflict_group_for_event` gives every event its
+  own conflict group, so a conflict can only arise within the same event.
+- **Deterministic canonical selection** (`decide_canonical_public_entry_candidate`):
+  all valid exact-day public-entry candidates are collected; the **earliest**
+  exact date is the only one that may become canonical (tie-breaker:
+  `first_public_offering` before `first_public_trading`). The earliest candidate
+  becomes `candidate_supported` / ready **only** if its own event+date has a
+  qualifying source (one official-regulatory document, one contemporaneous
+  credible-news / company-official document, or two qualifying independent
+  domains; aggregators alone never qualify). A later, better-sourced candidate
+  can never override an earlier, unresolved one.
+- **Exact candidate with an insufficient source** is not `no_reliable_evidence`;
+  it gets the new status
+  `research_completed_exact_public_entry_needs_corroboration`
+  (`research_completion_status=completed_exact_candidate_needs_corroboration`,
+  `evidence_status=requires_manual_review`, `ready=false`,
+  `recommended_next_step=find_qualifying_corroboration`).
+- **Earlier partial blocks a later exact** (`partial_candidate_blocks_exact`): a
+  partial interval is expanded (`year_only` → whole year, `month_only` → whole
+  month); if it could yield a date earlier than the exact candidate it blocks
+  canonicalisation (status stays partial, `find_exact_public_entry_day`). A
+  partial that *contains* or is entirely after the exact candidate does not block.
+- **All candidate columns are built first** (admission / listing / offering /
+  trading) via `select_best_compatible_candidate` (precision exact > month >
+  year, tie-break lowest `source_index` then URL) before the dominant status is
+  chosen, so no candidate is dropped by an early return.
+- A single, idempotent `finalize_reviewed_evidence_set` feeds both the production
+  pipeline and QC; QC compares the stored `evidence_role` against the finalized
+  (conflict-aware) role, not a single-record evaluation. `no_reliable_evidence`
+  is permitted only when no valid entry evidence of any kind exists.
+
+Recommended next-step strings are fixed: partial → `find_exact_public_entry_day`;
+exact-needs-corroboration → `find_qualifying_corroboration`;
+admission/listing/conversion → `find_first_public_offering_or_trading`;
+conflict → `resolve_conflicting_evidence`; ready → `recommend_user_review`.
+
+The QC report is regenerated from the current engine with the network
+hard-blocked; the 20 timeout provenance rows and 10 `research_blocked_network`
+research rows are unchanged in research content (only the QC report's and
+summary's `generated_at` / `source_commit` move).
+
 ## Forward-compatible real-output tests (Part 3.1A.4.2)
 
 The real-output tests were refactored from baseline-locking assertions (which
