@@ -1,7 +1,9 @@
 {
   "stage": "stage124_batch02_part03",
-  "generated_at": "2026-06-28T12:52:49Z",
-  "source_commit": "a8db554d51c52f7d6134995683b092ca3f86b11a",
+  "generated_at": "2026-06-28T13:25:28Z",
+  "source_commit": "076388246ce237b041ed56376b6609a89258656d",
+  "source_file_sha256": "6e93174025e1cb1d5a9eed1651b9637664026c979d495747e1bacebdeb437605",
+  "test_file_sha256": "69474f04e4c5177cbdfe2bbcb399b6c689176c9cf14128c4ec1fdbb6918f5969",
   "ticker_count": 10,
   "tickers": [
     "خمهر",
