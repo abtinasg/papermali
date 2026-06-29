@@ -5,9 +5,8 @@
 
 _Generated from the Stage122/Stage123 hash manifests (`metadata_and_hashes_stage12{2,3}.json`)._
 
-- Tracked frozen files verified: **15/16 match**, **1 mismatch**.
-- Gitignored, locally-regenerated outputs (xlsx workbooks, bulky panels) are listed as `regenerable` and not hash-verified (their SHA is machine-dependent).
-- A *missing* tracked file fails generation. A mismatch is flagged here and folded into the state fingerprint, but is not fatal.
+- Frozen (verified) files: **15/15 match**. A missing or mismatched frozen file is **fatal** (generation/validation fails).
+- Files are *regenerable* when gitignored (machine-dependent SHA) or explicitly classified non-frozen (`NON_FROZEN_TRACKED`, e.g. a pytest log whose timing line is non-deterministic); these are not hash-verified.
 
 | Status | Path | Manifest |
 |---|---|---|
@@ -33,6 +32,6 @@ _Generated from the Stage122/Stage123 hash manifests (`metadata_and_hashes_stage
 | ➖ regenerable (gitignored, not verified) | `project/stage123/modeling_one_year_ahead_stage123.csv` | `project/stage123/metadata_and_hashes_stage123.json` |
 | ✅ match | `project/stage123/stage123_change_log.csv` | `project/stage123/metadata_and_hashes_stage123.json` |
 | ✅ match | `project/stage123/stage123_qc_report.json` | `project/stage123/metadata_and_hashes_stage123.json` |
-| ❌ mismatch | `project/stage123/stage123_unit_test_output.txt` | `project/stage123/metadata_and_hashes_stage123.json` |
+| ➖ regenerable (classified non-frozen) | `project/stage123/stage123_unit_test_output.txt` | `project/stage123/metadata_and_hashes_stage123.json` |
 | ➖ regenerable (gitignored, not verified) | `project/stage123/stage123_workbook.xlsx` | `project/stage123/metadata_and_hashes_stage123.json` |
 | ✅ match | `project/stage123/statement_scope_correction_audit_stage123.csv` | `project/stage123/metadata_and_hashes_stage123.json` |
