@@ -1,8 +1,8 @@
 ---
 roadmap_version: 1
 active_research_workstream_id: stage124-batch02-part03
-last_completed_research_action_id: stage124-batch02-part03-1a-5-3
-next_research_action_id: stage124-batch02-part03-1b-0
+last_completed_research_action_id: stage124-batch02-part03-1b-0
+next_research_action_id: stage124-batch02-part03-1b-1
 active_maintenance_task_id: repository-driven-ai-handoff
 ---
 
@@ -24,15 +24,17 @@ must also appear in the body below. The validator checks that:
 1. `stage124-batch02-part03-1a-5` — reviewed-evidence engine
 2. `stage124-batch02-part03-1a-5-1` — partial-date manual review + precision compatibility
 3. `stage124-batch02-part03-1a-5-2` — cross-record evidence aggregation, deterministic canonical
-4. `stage124-batch02-part03-1a-5-3` — unified decision engine, full research↔provenance QC ✅ **last completed**
-5. `stage124-batch02-part03-1b-0` — **Research-Intake Readiness, baseline unlock, auditable manual snapshot import** ⬅️ **next**
+4. `stage124-batch02-part03-1a-5-3` — unified decision engine, full research↔provenance QC
+5. `stage124-batch02-part03-1b-0` — Research-Intake Readiness, baseline unlock, auditable intake scaffold ✅ **last completed**
+6. `stage124-batch02-part03-1b-1` — manual source discovery, snapshot capture, and reviewed-evidence intake for the 10 Part 3 tickers ⬅️ **next**
 
 ## Maintenance tasks
 
-- `repository-driven-ai-handoff` — this AI Handoff Package (in progress)
+- `repository-driven-ai-handoff` — repository-derived Handoff Package (generator + validator + tests)
 
 ## Notes on ordering
 
-`*-1b-0` follows `*-1a-5-3`: the `1a.*` line finishes the evidence/decision engine;
-`1b.0` opens the research-intake phase. Modeling, Gate B, and the verified listing
-master are all **after** the manual research is complete — they are not in scope yet.
+`*-1b-0` prepares and hardens the intake path without adding research findings.
+`*-1b-1` performs the actual manual research for the exact 10-ticker Part 3 scope.
+Gate B, the verified listing master, and modeling remain out of scope until the
+manual research and user review gates are complete.
