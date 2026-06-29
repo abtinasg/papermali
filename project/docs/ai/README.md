@@ -61,9 +61,11 @@ changed).
   `active_maintenance_task_id` vs `active_research_workstream_id`).
 - QC freshness is checked by source/test **fingerprint**, not by `qc_source_commit ==
   HEAD` (the project uses a code → artifact → merge two-commit workflow).
-- A **frozen** asset that is missing or mismatched is **fatal**. A file is exempt only
-  when it is gitignored (machine-dependent SHA) or explicitly classified in
-  `NON_FROZEN_TRACKED` (e.g. a pytest log with a non-deterministic timing line).
+- A **frozen** asset that is missing, mismatched, or untracked is **fatal**. A file is
+  exempt only when it is explicitly classified in `NON_FROZEN_TRACKED` (e.g. a pytest
+  log with a non-deterministic timing line) or is **proven gitignored** via
+  `git check-ignore`. An untracked, non-ignored, unclassified manifest file is fatal —
+  it is not really frozen.
 - The change allowlist distinguishes **directories** (prefix match, must end in `/`)
   from **files** (exact match only) — no `foo.py.bak`-style prefix bypass.
 - Regeneration is **package-atomic**: all auto files are written to temp siblings, the
