@@ -328,11 +328,24 @@ def _tracked_files(root: str) -> set[str]:
     return set(_git(root, "ls-files").splitlines())
 
 
-def frozen_asset_report(root: str) -> list[dict]:
-    """Classify every frozen-manifest file.
+def _is_git_ignored(root: str, path: str) -> bool:
+    """True iff `git check-ignore` confirms the path is ignored (rc 0)."""
+    proc = subprocess.run(
+        ["git", "-C", root, "check-ignore", "-q", "--", path],
+        capture_output=True,
+    )
+    return proc.returncode == 0
 
-    Each row carries: tracked (git-tracked?), frozen (verified vs explicitly
-    regenerable), exists, matches. The caller decides what is fatal.
+
+def frozen_asset_report(root: str) -> list[dict]:
+    """Classify every frozen-manifest file (fail-closed).
+
+    A file is *regenerable* (exempt from hash verification) ONLY when:
+      * it is git-tracked and explicitly listed in NON_FROZEN_TRACKED, or
+      * it is untracked AND (explicitly NON_FROZEN_TRACKED OR proven gitignored).
+    Everything else is *frozen* and must be tracked, present, and matching —
+    otherwise the caller treats it as fatal. An untracked, non-ignored,
+    unclassified manifest file is therefore fatal (it is not really frozen).
     """
     tracked = _tracked_files(root)
     rows: list[dict] = []
@@ -348,17 +361,24 @@ def frozen_asset_report(root: str) -> list[dict]:
         for fname, expected in sorted(outputs.items()):
             file_rel = f"{manifest_dir}/{fname}"
             is_tracked = file_rel in tracked
-            regenerable = (not is_tracked) or (file_rel in NON_FROZEN_TRACKED)
-            actual = sha256_file(os.path.join(root, file_rel)) if is_tracked else None
+            classified = file_rel in NON_FROZEN_TRACKED
+            if is_tracked:
+                regenerable = classified
+            else:
+                regenerable = classified or _is_git_ignored(root, file_rel)
+            frozen = not regenerable
+            # Hash only what we must verify (tracked frozen files).
+            actual = (sha256_file(os.path.join(root, file_rel))
+                      if (frozen and is_tracked) else None)
             rows.append({
                 "manifest": manifest_rel,
                 "path": file_rel,
                 "expected_sha256": expected,
                 "actual_sha256": actual,
                 "tracked": is_tracked,
-                "frozen": not regenerable,        # frozen => must match (fatal)
+                "frozen": frozen,                 # frozen => must be tracked & match
                 "exists": os.path.isfile(os.path.join(root, file_rel)),
-                "matches": (actual == expected) if is_tracked else None,
+                "matches": (actual == expected) if (frozen and is_tracked) else None,
             })
     return rows
 
@@ -395,7 +415,9 @@ def semantic_state(root: str):
     for r in frozen:
         if not r["frozen"]:
             continue
-        if not r["exists"]:
+        if not r["tracked"]:
+            fatal.append(f"untracked non-ignored frozen asset {r['path']}")
+        elif not r["exists"]:
             fatal.append(f"missing {r['path']}")
         elif not r["matches"]:
             fatal.append(f"mismatch {r['path']}")
@@ -538,10 +560,11 @@ def render_current_state(record: dict) -> str:
 
 def render_frozen_assets(frozen: list[dict]) -> str:
     def status(r: dict) -> str:
-        if not r["tracked"]:
-            return "➖ regenerable (gitignored, not verified)"
         if not r["frozen"]:
-            return "➖ regenerable (classified non-frozen)"
+            return ("➖ regenerable (classified non-frozen)" if r["tracked"]
+                    else "➖ regenerable (gitignored, not verified)")
+        if not r["tracked"]:
+            return "❌ UNTRACKED non-ignored (frozen)"
         if not r["exists"]:
             return "⚠️ MISSING (frozen)"
         return "✅ match" if r["matches"] else "❌ MISMATCH (frozen)"
@@ -584,7 +607,7 @@ def _atomic_write(root: str, rel_outputs: dict[str, str]) -> None:
     targets = {rel: os.path.join(root, rel) for rel in rel_outputs}
     tmpfiles: dict[str, str] = {}
     backups: dict[str, str] = {}
-    done: list[str] = []
+    created_new: list[str] = []   # targets we created that had no prior version
 
     for rel, content in rel_outputs.items():
         os.makedirs(os.path.dirname(targets[rel]), exist_ok=True)
@@ -599,16 +622,25 @@ def _atomic_write(root: str, rel_outputs: dict[str, str]) -> None:
             if os.path.exists(tgt):
                 bak = tgt + ".handoff_bak"
                 os.replace(tgt, bak)
-                backups[rel] = bak
+                backups[rel] = bak  # recorded BEFORE the risky tmp->tgt replace
             os.replace(tmpfiles[rel], tgt)
-            done.append(rel)
+            if rel not in backups:
+                created_new.append(rel)
     except Exception:
-        for rel in done:
+        # Restore EVERY original we moved aside — even one whose tmp->tgt replace
+        # failed (it has a backup but never made it past the failing step).
+        for rel, bak in backups.items():
             tgt = targets[rel]
-            if rel in backups:
-                os.replace(backups[rel], tgt)
-            else:
+            if os.path.exists(tgt):
                 _silent_remove(tgt)
+            try:
+                os.replace(bak, tgt)
+            except OSError:
+                pass
+        # Remove only targets WE created (had no prior version); never touch
+        # originals that were simply not reached before the failure.
+        for rel in created_new:
+            _silent_remove(targets[rel])
         for tmp in tmpfiles.values():
             _silent_remove(tmp)
         raise
