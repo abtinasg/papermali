@@ -335,3 +335,57 @@ def test_change_allowlist_blocks_non_handoff(synth):
     _write(synth, f"project/src/{STAGE}.py", "STAGE_SRC = 2\n")
     _commit(synth, "Stage1 Part: source edit")
     assert val.run_check_changes(synth, base, include_wt=True) == 1
+
+
+# ---- correction-commit fixes --------------------------------------------- #
+
+def test_atomic_write_rollback_restores_all(synth, monkeypatch):
+    import glob
+    files = list(gen.AUTO_FILES)
+    originals = {f: open(os.path.join(synth, f), encoding="utf-8").read() for f in files}
+    outputs = {f: f"NEW CONTENT for {f}\n" for f in files}
+
+    real_replace = os.replace
+
+    def flaky(src, dst, *a, **k):
+        # Fail exactly on the risky tmp->target move of the 2nd auto file,
+        # AFTER its backup has already been created.
+        if str(dst).endswith(files[1]) and str(src).endswith(".handoff_tmp"):
+            raise OSError("boom")
+        return real_replace(src, dst, *a, **k)
+
+    monkeypatch.setattr(gen.os, "replace", flaky)
+    with pytest.raises(OSError):
+        gen._atomic_write(synth, outputs)
+    monkeypatch.undo()
+
+    # Every original is intact (including the one whose replace failed).
+    for f in files:
+        assert open(os.path.join(synth, f), encoding="utf-8").read() == originals[f]
+    # No stray backup/temp files left behind.
+    d = os.path.join(synth, "project/docs/ai")
+    assert glob.glob(os.path.join(d, "*.handoff_bak")) == []
+    assert glob.glob(os.path.join(d, "*.handoff_tmp")) == []
+
+
+def _add_manifest_entry(root: str, rel_file: str, content: str) -> None:
+    _write(root, rel_file, content)
+    manifest = os.path.join(root, "project/stage122/metadata_and_hashes_stage122.json")
+    data = json.load(open(manifest, encoding="utf-8"))
+    data["output_files_sha256"][os.path.basename(rel_file)] = _sha(content)
+    with open(manifest, "w", encoding="utf-8") as fh:
+        json.dump(data, fh)
+
+
+def test_untracked_not_ignored_frozen_is_fatal(synth):
+    # Untracked, NOT gitignored, NOT classified -> fatal even if content matches.
+    _add_manifest_entry(synth, "project/stage122/extra_frozen.csv", "x\n")
+    with pytest.raises(gen.HandoffError):
+        gen.semantic_state(synth)
+
+
+def test_untracked_but_ignored_is_regenerable(synth):
+    _write(synth, ".gitignore", "project/stage122/ignored_out.csv\n")
+    _add_manifest_entry(synth, "project/stage122/ignored_out.csv", "y\n")
+    # Proven gitignored -> regenerable -> must NOT raise.
+    gen.semantic_state(synth)
