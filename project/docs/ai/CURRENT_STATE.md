@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage124_batch02_part03`
 - **Last completed research action:** `stage124-batch02-part03-1a-5-3`
 - **Next research action:** `stage124-batch02-part03-1b-0`
-- **Last stage commit:** `fec87cc988485ecabe3bc8c4b7ff07826abb11b2`
-- **Generated from commit:** `d59f32ab8c5486a0f5224d5e37310d8e9493259a` (branch `docs/ai-handoff-package`, informational)
-- **Baseline:** `origin/main` @ `fec87cc988485ecabe3bc8c4b7ff07826abb11b2`
+- **Last stage commit:** `bfd449fdf790a3412e12ca90ef750a85740db6b6`
+- **Generated from commit:** `bfd449fdf790a3412e12ca90ef750a85740db6b6` (branch `stage124-batch02-part03-1b0`, informational)
+- **Baseline:** `origin/main` @ `9e29fdcbe3a371d9b84ecf2d065a03892470ecb3`
 
 ## QC
 
@@ -32,5 +32,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 خمهر، خنصیر، خوساز، خچرخش، خکمک، دروز، دسبحا، دیران، رانفور، رمپنا
 
-_state_fingerprint: `05a6d7630a5f8bd5434a02a70c17f6a369562c3aef0dca01475c74cb4cb16a64`_
-_generated_at_utc: 2026-06-29T11:00:33Z (informational)_
+_state_fingerprint: `ee026d83a8189b4d3a50001fe13d5239c460fa81bb598fb23a1a3850d8cefb99`_
+_generated_at_utc: 2026-06-29T13:44:51Z (informational)_
