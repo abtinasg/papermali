@@ -50,8 +50,22 @@ changed).
 
 - A tracked file cannot store the SHA of the commit that contains it, so we never
   require `head_commit == HEAD`. We anchor on `generated_from_commit` (an ancestor of
-  HEAD) plus a semantic `state_fingerprint`.
+  HEAD) plus a semantic `state_fingerprint`. The validator also requires every commit
+  between `generated_from_commit` and HEAD — **merge commits included** — to be
+  Handoff-only.
+- The validator compares the **full** non-volatile semantic projection of
+  `handoff_state.json` against a freshly computed state, so any tampered field
+  (`current_stage`, `current_batch`, `tickers`, counts, commits, markers, fingerprint)
+  is caught — not just a hand-picked subset.
 - Handoff/documentation commits never advance the **research** stage (separate
   `active_maintenance_task_id` vs `active_research_workstream_id`).
 - QC freshness is checked by source/test **fingerprint**, not by `qc_source_commit ==
   HEAD` (the project uses a code → artifact → merge two-commit workflow).
+- A **frozen** asset that is missing or mismatched is **fatal**. A file is exempt only
+  when it is gitignored (machine-dependent SHA) or explicitly classified in
+  `NON_FROZEN_TRACKED` (e.g. a pytest log with a non-deterministic timing line).
+- The change allowlist distinguishes **directories** (prefix match, must end in `/`)
+  from **files** (exact match only) — no `foo.py.bak`-style prefix bypass.
+- Regeneration is **package-atomic**: all auto files are written to temp siblings, the
+  originals are moved aside, and on any error everything is rolled back, so the package
+  is never left half-updated.

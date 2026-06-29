@@ -14,10 +14,13 @@ Design rules (see docs/ai/README.md):
       ancestor of HEAD) and a semantic ``state_fingerprint``.
     * QC freshness is checked by source/test SHA-256 fingerprint, not by
       ``qc_source_commit == HEAD`` (code-commit -> artifact-commit -> merge).
+    * Frozen-asset mismatch/absence is FATAL, unless the file is explicitly
+      classified as regenerable/non-frozen (NON_FROZEN_TRACKED) or is gitignored.
     * Human files (ROADMAP/DECISIONS/OPEN_TASKS/CHANGELOG/README/HANDOFF_PACKAGE)
       are *inputs*; this script never overwrites them.
-    * Generation is atomic and fail-closed: everything is built and validated in a
-      temp dir, then atomically moved into place. ``--check`` writes nothing.
+    * Generation is package-atomic and fail-closed: outputs are written to temp
+      siblings, originals are moved aside, and on any error everything is rolled
+      back so no partial state is left behind. ``--check`` writes nothing.
 
 Usage:
     python project/scripts/update_ai_handoff.py --from-repository --write
@@ -32,23 +35,21 @@ import os
 import re
 import subprocess
 import sys
-import tempfile
 from datetime import datetime, timezone
 
 # --------------------------------------------------------------------------- #
-# Paths & constants
+# Constants
 # --------------------------------------------------------------------------- #
 
-STAGE_SUBJECT_RE = re.compile(r"\bStage\d+\b.*\bPart\b", re.IGNORECASE)
+# Matches a research-workflow commit anywhere in the full commit body.
+STAGE_BODY_RE = re.compile(r"\bStage\d+\b.*?\bPart\b", re.IGNORECASE | re.DOTALL)
 
-# Auto-managed (generator output) files, relative to repo root.
 AUTO_FILES = (
     "project/docs/ai/handoff_state.json",
     "project/docs/ai/CURRENT_STATE.md",
     "project/docs/ai/FROZEN_ASSETS.md",
 )
 
-# Human (input) files the generator must never overwrite.
 HUMAN_FILES = (
     "project/docs/ai/README.md",
     "project/docs/ai/HANDOFF_PACKAGE.md",
@@ -58,10 +59,13 @@ HUMAN_FILES = (
     "project/docs/ai/CHANGELOG.md",
 )
 
-# Paths a Handoff/maintenance commit is allowed to touch (used for "Handoff-only"
-# commit detection and for the change allowlist in the validator).
-HANDOFF_ALLOWLIST = (
+# Change allowlist, split by kind so matching is precise (no prefix attacks):
+#   * directory entries match via startswith(dir) and MUST end with "/".
+#   * file entries match by EXACT path only.
+ALLOWLIST_DIRS = (
     "project/docs/ai/",
+)
+ALLOWLIST_FILES = (
     "project/scripts/update_ai_handoff.py",
     "project/scripts/validate_ai_handoff.py",
     "project/tests/test_ai_handoff.py",
@@ -69,27 +73,42 @@ HANDOFF_ALLOWLIST = (
     "CLAUDE.md",
 )
 
-# Frozen-asset hash manifests, relative to repo root. Each declares
-# ``output_files_sha256`` (filename -> sha256) relative to the manifest's dir.
 FROZEN_MANIFESTS = (
     "project/stage122/metadata_and_hashes_stage122.json",
     "project/stage123/metadata_and_hashes_stage123.json",
 )
 
-# Explicit, allow-listed markers (NOT broad filename search). Legacy Stage121
-# artifacts under outputs/04_models/ must never flip these to True.
+# Tracked files declared in a frozen manifest that are EXPLICITLY classified as
+# regenerable / non-frozen, and therefore allowed to mismatch without aborting.
+# Each entry must have a documented reason.
+NON_FROZEN_TRACKED = {
+    # pytest log: last line "N passed in X.XXs" embeds a non-deterministic wall
+    # time, so the byte content (and SHA) varies per run while the tests pass.
+    "project/stage123/stage123_unit_test_output.txt",
+}
+
+# Explicit, allow-listed workflow markers (NOT broad filename search). Legacy
+# Stage121 artifacts under outputs/04_models/ must never flip these to True.
 VERIFIED_MASTER_PATH = "project/stage124/listing_master_verified_stage124.csv"
 GATE_B_MARKER_PATHS = (
     "project/stage124/stage124_batch02_gate_b_qc_report.json",
     "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
 )
-# A run-manifest for the *new* (post-Stage123) modeling pipeline. The legacy
-# baseline lives in outputs/04_models/ and is intentionally excluded.
 MODELING_MARKER_PATHS = (
     "project/outputs/stage_modeling/run_manifest.json",
 )
 
-GENERATOR_VERSION = 1
+# handoff_state.json fields that are informational / HEAD-relative and must be
+# EXCLUDED from the full semantic-projection equality check.
+VOLATILE_FIELDS = frozenset({
+    "generated_at_utc",
+    "observed_branch",
+    "observed_repository_head_commit",
+    "generated_from_commit",
+    "baseline_commit",
+})
+
+GENERATOR_VERSION = 2
 
 
 class HandoffError(RuntimeError):
@@ -102,8 +121,7 @@ class HandoffError(RuntimeError):
 
 def _git(repo_root: str, *args: str) -> str:
     proc = subprocess.run(
-        ["git", "-C", repo_root, *args],
-        capture_output=True, text=True,
+        ["git", "-C", repo_root, *args], capture_output=True, text=True,
     )
     if proc.returncode != 0:
         raise HandoffError(f"git {' '.join(args)} failed: {proc.stderr.strip()}")
@@ -112,13 +130,12 @@ def _git(repo_root: str, *args: str) -> str:
 
 def repo_root() -> str:
     try:
-        top = subprocess.run(
+        return subprocess.run(
             ["git", "rev-parse", "--show-toplevel"],
             capture_output=True, text=True, check=True,
         ).stdout.strip()
     except subprocess.CalledProcessError as exc:  # pragma: no cover - env guard
         raise HandoffError(f"not inside a git repository: {exc.stderr}") from exc
-    return top
 
 
 def head_commit(root: str) -> str:
@@ -137,36 +154,55 @@ def is_ancestor(root: str, ancestor: str, descendant: str) -> bool:
     return proc.returncode == 0
 
 
-def _commit_changed_files(root: str, sha: str) -> list[str]:
-    # Files changed by a single commit (vs its first parent). Empty for the very
-    # first commit; that's fine - it won't be Handoff-only.
-    out = _git(root, "show", "--no-renames", "--name-only", "--format=", sha)
+def _introduced_files(root: str, sha: str) -> list[str]:
+    """Files a commit introduced relative to its first parent.
+
+    Works for merge commits too (diff against the first parent shows what the
+    merge brought in). The root commit (no parent) lists all its files.
+    """
+    parents = _git(root, "rev-list", "--parents", "-n", "1", sha).split()[1:]
+    if not parents:
+        out = _git(root, "show", "--no-renames", "--name-only", "--format=", sha)
+    else:
+        out = _git(root, "diff", "--no-renames", "--name-only", f"{sha}^1", sha)
     return [line for line in out.splitlines() if line.strip()]
+
+
+def path_allowlisted(path: str) -> bool:
+    """Directory allowlist => startswith(dir + '/'); file allowlist => exact."""
+    if path in ALLOWLIST_FILES:
+        return True
+    return any(path.startswith(d) for d in ALLOWLIST_DIRS)
 
 
 def _is_handoff_only(files: list[str]) -> bool:
     if not files:
         return False
-    for f in files:
-        if not any(f == p or f.startswith(p) for p in HANDOFF_ALLOWLIST):
-            return False
-    return True
+    return all(path_allowlisted(f) for f in files)
 
 
 def last_stage_commit(root: str) -> str:
-    """Latest reachable, non-merge, non-Handoff commit with a Stage/Part subject."""
-    log = _git(root, "log", "--format=%H%x1f%P%x1f%s")
-    for line in log.splitlines():
-        sha, parents, subject = line.split("\x1f", 2)
-        if len(parents.split()) > 1:
-            continue  # skip merge commits
-        if not STAGE_SUBJECT_RE.search(subject):
+    """Latest reachable, non-Handoff-only commit whose full body names a Stage/Part.
+
+    Merge commits are NOT skipped blindly: their introduced files (vs first
+    parent) are inspected; a merge that brings in only Handoff files is skipped,
+    and the body of every candidate is matched against the Stage/Part pattern.
+    """
+    for sha in _git(root, "rev-list", "HEAD").splitlines():
+        if _is_handoff_only(_introduced_files(root, sha)):
             continue
-        if _is_handoff_only(root_files := _commit_changed_files(root, sha)):
-            continue
-        del root_files
-        return sha
+        body = _git(root, "log", "-1", "--format=%B", sha)
+        if STAGE_BODY_RE.search(body):
+            return sha
     raise HandoffError("no qualifying Stage/Part commit found in history")
+
+
+def derive_repository(root: str) -> str | None:
+    url = _safe(lambda: _git(root, "remote", "get-url", "origin"))
+    if not url:
+        return None
+    m = re.search(r"[:/]([^/:]+/[^/]+?)(?:\.git)?/?$", url)
+    return m.group(1) if m else url
 
 
 # --------------------------------------------------------------------------- #
@@ -212,11 +248,7 @@ def read_roadmap(root: str) -> dict:
     for key in required:
         if key not in fm:
             raise HandoffError(f"ROADMAP front matter missing '{key}'")
-    # Every research action ID must also appear in the body.
-    for key in (
-        "last_completed_research_action_id",
-        "next_research_action_id",
-    ):
+    for key in ("last_completed_research_action_id", "next_research_action_id"):
         if fm[key] not in body:
             raise HandoffError(
                 f"ROADMAP body does not list action id '{fm[key]}' (from {key})"
@@ -233,16 +265,17 @@ def _qc_source_test_paths(stage: str) -> tuple[str, str]:
     return f"project/src/{stage}.py", f"project/tests/test_{stage}.py"
 
 
-def select_qc_report(root: str, workstream: str, head: str) -> dict:
-    """Pick the newest *valid* QC report whose scope matches the workstream.
+def derive_stage_batch(qc_stage: str) -> tuple[str | None, str | None]:
+    s = re.search(r"stage(\d+)", qc_stage, re.IGNORECASE)
+    b = re.search(r"batch(\d+)", qc_stage, re.IGNORECASE)
+    return (f"Stage{s.group(1)}" if s else None,
+            f"Batch{b.group(1)}" if b else None)
 
-    Validity (per plan): reachable source_commit, matching source/test
-    fingerprints, scope match. Selection among valid candidates: newest
-    generated_at. ``workstream`` like ``stage124_batch02_part03``.
-    """
-    qc_dir = os.path.join(root, "project")
+
+def select_qc_report(root: str, workstream: str, head: str) -> dict:
+    """Pick the newest *valid* QC report whose scope matches the workstream."""
     candidates: list[dict] = []
-    for dirpath, _dirs, files in os.walk(qc_dir):
+    for dirpath, _dirs, files in os.walk(os.path.join(root, "project")):
         for name in files:
             if not (name.endswith(".json") and "qc" in name.lower()):
                 continue
@@ -251,8 +284,7 @@ def select_qc_report(root: str, workstream: str, head: str) -> dict:
                 data = json.load(open(full, encoding="utf-8"))
             except (json.JSONDecodeError, OSError):
                 continue
-            stage = data.get("stage")
-            if stage != workstream:
+            if data.get("stage") != workstream:
                 continue
             required = (
                 "source_commit", "source_file_sha256", "test_file_sha256",
@@ -260,8 +292,7 @@ def select_qc_report(root: str, workstream: str, head: str) -> dict:
             )
             if any(k not in data for k in required):
                 continue
-            rel = os.path.relpath(full, root)
-            data["_path"] = rel
+            data["_path"] = os.path.relpath(full, root)
             candidates.append(data)
 
     if not candidates:
@@ -269,8 +300,7 @@ def select_qc_report(root: str, workstream: str, head: str) -> dict:
 
     valid: list[dict] = []
     for data in candidates:
-        src_commit = data["source_commit"]
-        if not is_ancestor(root, src_commit, head):
+        if not is_ancestor(root, data["source_commit"], head):
             continue
         src_rel, test_rel = _qc_source_test_paths(data["stage"])
         if sha256_file(os.path.join(root, src_rel)) != data["source_file_sha256"]:
@@ -295,22 +325,14 @@ def select_qc_report(root: str, workstream: str, head: str) -> dict:
 # --------------------------------------------------------------------------- #
 
 def _tracked_files(root: str) -> set[str]:
-    """Repo-relative paths tracked by git (single batch call)."""
-    out = _git(root, "ls-files")
-    return set(out.splitlines())
+    return set(_git(root, "ls-files").splitlines())
 
 
 def frozen_asset_report(root: str) -> list[dict]:
-    """Report on frozen-manifest files that are **git-tracked**.
+    """Classify every frozen-manifest file.
 
-    The manifests' ``output_files_sha256`` also list gitignored, locally
-    regenerated bulky outputs (xlsx workbooks, large panels) whose SHA-256 is
-    machine-dependent; those are excluded from verification (reported as
-    regenerable). Among tracked files, a *missing* file is fail-closed (handled by
-    the caller); a content mismatch is reported but not fatal, because the
-    committed tree may carry a pre-existing manifest/file drift outside this
-    maintenance task's scope. Each file's expected SHA + match status feeds the
-    semantic fingerprint, so future drift is still detected.
+    Each row carries: tracked (git-tracked?), frozen (verified vs explicitly
+    regenerable), exists, matches. The caller decides what is fatal.
     """
     tracked = _tracked_files(root)
     rows: list[dict] = []
@@ -325,26 +347,18 @@ def frozen_asset_report(root: str) -> list[dict]:
         manifest_dir = os.path.dirname(manifest_rel)
         for fname, expected in sorted(outputs.items()):
             file_rel = f"{manifest_dir}/{fname}"
-            if file_rel not in tracked:
-                rows.append({
-                    "manifest": manifest_rel,
-                    "path": file_rel,
-                    "expected_sha256": expected,
-                    "actual_sha256": None,
-                    "tracked": False,
-                    "exists": os.path.isfile(os.path.join(root, file_rel)),
-                    "matches": None,  # not verified (regenerable / gitignored)
-                })
-                continue
-            actual = sha256_file(os.path.join(root, file_rel))
+            is_tracked = file_rel in tracked
+            regenerable = (not is_tracked) or (file_rel in NON_FROZEN_TRACKED)
+            actual = sha256_file(os.path.join(root, file_rel)) if is_tracked else None
             rows.append({
                 "manifest": manifest_rel,
                 "path": file_rel,
                 "expected_sha256": expected,
                 "actual_sha256": actual,
-                "tracked": True,
-                "exists": actual is not None,
-                "matches": actual == expected,
+                "tracked": is_tracked,
+                "frozen": not regenerable,        # frozen => must match (fatal)
+                "exists": os.path.isfile(os.path.join(root, file_rel)),
+                "matches": (actual == expected) if is_tracked else None,
             })
     return rows
 
@@ -358,9 +372,7 @@ def detect_markers(root: str) -> dict:
         return any(os.path.isfile(os.path.join(root, p)) for p in paths)
 
     return {
-        "verified_master_created": os.path.isfile(
-            os.path.join(root, VERIFIED_MASTER_PATH)
-        ),
+        "verified_master_created": os.path.isfile(os.path.join(root, VERIFIED_MASTER_PATH)),
         "gate_b_started": any_exists(GATE_B_MARKER_PATHS),
         "modeling_started": any_exists(MODELING_MARKER_PATHS),
     }
@@ -370,22 +382,26 @@ def detect_markers(root: str) -> dict:
 # State assembly + fingerprint
 # --------------------------------------------------------------------------- #
 
-def semantic_state(root: str) -> dict:
+def semantic_state(root: str):
     head = head_commit(root)
     roadmap = read_roadmap(root)
     workstream = roadmap["active_research_workstream_id"].replace("-", "_")
     qc = select_qc_report(root, workstream, head)
     frozen = frozen_asset_report(root)
 
-    # Fail-closed: a tracked frozen asset that has been deleted is unambiguous
-    # tampering. (Content mismatches are reported, not fatal — see
-    # frozen_asset_report docstring.)
-    missing_tracked = [r["path"] for r in frozen if r["tracked"] and not r["exists"]]
-    if missing_tracked:
-        raise HandoffError(
-            "tracked frozen asset(s) missing (fail-closed): "
-            + ", ".join(missing_tracked)
-        )
+    # Fatal: any FROZEN (non-regenerable) tracked asset that is missing or
+    # mismatched. Regenerable / gitignored files are exempt by classification.
+    fatal = []
+    for r in frozen:
+        if not r["frozen"]:
+            continue
+        if not r["exists"]:
+            fatal.append(f"missing {r['path']}")
+        elif not r["matches"]:
+            fatal.append(f"mismatch {r['path']}")
+    if fatal:
+        raise HandoffError("frozen-asset integrity failure (fail-closed): "
+                           + "; ".join(fatal))
 
     state = {
         "last_stage_commit": last_stage_commit(root),
@@ -398,11 +414,11 @@ def semantic_state(root: str) -> dict:
             "source_file_sha256": qc["source_file_sha256"],
             "test_file_sha256": qc["test_file_sha256"],
         },
-        # Fingerprint over tracked frozen files: expected SHA + match status, so a
-        # later content change (matches flips) is detected as drift.
+        # Only FROZEN (verified) files feed the fingerprint, by expected SHA.
+        # Regenerable files are excluded so benign log churn is not "drift".
         "frozen_assets": {
-            r["path"]: {"expected": r["expected_sha256"], "matches": r["matches"]}
-            for r in sorted(frozen, key=lambda x: x["path"]) if r["tracked"]
+            r["path"]: r["expected_sha256"]
+            for r in sorted(frozen, key=lambda x: x["path"]) if r["frozen"]
         },
         "roadmap": {
             "active_research_workstream_id": roadmap["active_research_workstream_id"],
@@ -420,23 +436,23 @@ def fingerprint(state: dict) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-def build_handoff_state(root: str) -> tuple[dict, dict, list[dict]]:
+def build_handoff_state(root: str):
     state, head, qc, roadmap, frozen = semantic_state(root)
-    fp = fingerprint(state)
+    stage, batch = derive_stage_batch(qc["stage"])
     record = {
         "schema_version": GENERATOR_VERSION,
-        "repository": "abtinasg/papermali",
-        # Informational only - never required to equal current HEAD/branch.
+        "repository": derive_repository(root),
+        # Informational only (see VOLATILE_FIELDS).
         "observed_branch": current_branch(root),
         "observed_repository_head_commit": head,
         "baseline_branch": "origin/main",
         "baseline_commit": _safe(lambda: _git(root, "rev-parse", "origin/main")),
-        # Anchors used by the validator.
         "generated_from_commit": head,
+        # Semantic anchors (checked by the validator).
         "last_stage_commit": state["last_stage_commit"],
         "qc_source_commit": state["selected_qc"]["source_commit"],
-        "current_stage": "Stage124",
-        "current_batch": "Batch02",
+        "current_stage": stage,
+        "current_batch": batch,
         "active_workstream": roadmap["active_research_workstream_id"].replace("-", "_"),
         "last_completed_micro_part": roadmap["last_completed_research_action_id"],
         "next_research_action_id": roadmap["next_research_action_id"],
@@ -450,9 +466,13 @@ def build_handoff_state(root: str) -> tuple[dict, dict, list[dict]]:
         "verified_master_created": state["markers"]["verified_master_created"],
         "tickers": state["tickers"],
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "state_fingerprint": fp,
+        "state_fingerprint": fingerprint(state),
     }
     return record, state, frozen
+
+
+def compute_record(root: str) -> dict:
+    return build_handoff_state(root)[0]
 
 
 def _safe(fn):
@@ -460,6 +480,11 @@ def _safe(fn):
         return fn()
     except HandoffError:
         return None
+
+
+def projection(record: dict) -> dict:
+    """Non-volatile semantic projection of a handoff_state record."""
+    return {k: v for k, v in record.items() if k not in VOLATILE_FIELDS}
 
 
 # --------------------------------------------------------------------------- #
@@ -487,8 +512,7 @@ def render_current_state(record: dict) -> str:
         f"- **Last stage commit:** `{record['last_stage_commit']}`",
         f"- **Generated from commit:** `{record['generated_from_commit']}` "
         f"(branch `{record['observed_branch']}`, informational)",
-        f"- **Baseline:** `{record['baseline_branch']}` @ "
-        f"`{record['baseline_commit']}`",
+        f"- **Baseline:** `{record['baseline_branch']}` @ `{record['baseline_commit']}`",
         "",
         "## QC\n",
         f"- {qc_ok} **{record['qc_assertions']} assertions, "
@@ -516,24 +540,25 @@ def render_frozen_assets(frozen: list[dict]) -> str:
     def status(r: dict) -> str:
         if not r["tracked"]:
             return "➖ regenerable (gitignored, not verified)"
+        if not r["frozen"]:
+            return "➖ regenerable (classified non-frozen)"
         if not r["exists"]:
-            return "⚠️ MISSING (tracked)"
-        return "✅ match" if r["matches"] else "❌ mismatch"
+            return "⚠️ MISSING (frozen)"
+        return "✅ match" if r["matches"] else "❌ MISMATCH (frozen)"
 
-    n_tracked = sum(1 for r in frozen if r["tracked"])
-    n_match = sum(1 for r in frozen if r["tracked"] and r["matches"])
-    n_mismatch = sum(1 for r in frozen if r["tracked"] and r["exists"] and not r["matches"])
+    frozen_rows = [r for r in frozen if r["frozen"] and r["tracked"]]
+    n_frozen = len(frozen_rows)
+    n_match = sum(1 for r in frozen_rows if r["matches"])
     lines = [
         _AUTO_BANNER,
         "# FROZEN ASSETS\n",
         "_Generated from the Stage122/Stage123 hash manifests "
         "(`metadata_and_hashes_stage12{2,3}.json`)._\n",
-        f"- Tracked frozen files verified: **{n_match}/{n_tracked} match**"
-        + (f", **{n_mismatch} mismatch**" if n_mismatch else "") + ".",
-        "- Gitignored, locally-regenerated outputs (xlsx workbooks, bulky panels) are "
-        "listed as `regenerable` and not hash-verified (their SHA is machine-dependent).",
-        "- A *missing* tracked file fails generation. A mismatch is flagged here and "
-        "folded into the state fingerprint, but is not fatal.",
+        f"- Frozen (verified) files: **{n_match}/{n_frozen} match**. A missing or "
+        "mismatched frozen file is **fatal** (generation/validation fails).",
+        "- Files are *regenerable* when gitignored (machine-dependent SHA) or "
+        "explicitly classified non-frozen (`NON_FROZEN_TRACKED`, e.g. a pytest log "
+        "whose timing line is non-deterministic); these are not hash-verified.",
         "",
         "| Status | Path | Manifest |",
         "|---|---|---|",
@@ -545,21 +570,58 @@ def render_frozen_assets(frozen: list[dict]) -> str:
 
 
 # --------------------------------------------------------------------------- #
-# Atomic write
+# Package-atomic write with rollback
 # --------------------------------------------------------------------------- #
 
 def _atomic_write(root: str, rel_outputs: dict[str, str]) -> None:
-    """Write all outputs atomically: build in a temp dir, then os.replace each."""
-    tmp_paths: dict[str, str] = {}
-    docs_dir = os.path.join(root, "project/docs/ai")
-    with tempfile.TemporaryDirectory(prefix="handoff_", dir=docs_dir) as tmp:
-        for rel, content in rel_outputs.items():
-            tmp_file = os.path.join(tmp, os.path.basename(rel))
-            with open(tmp_file, "w", encoding="utf-8") as fh:
-                fh.write(content)
-            tmp_paths[rel] = tmp_file
-        for rel, tmp_file in tmp_paths.items():
-            os.replace(tmp_file, os.path.join(root, rel))
+    """All-or-nothing write of the auto files.
+
+    1) Write every new file to a ``.handoff_tmp`` sibling.
+    2) Move each existing target aside to ``.handoff_bak``, then move the temp in.
+    3) On success, delete backups. On any error, restore backups / remove newly
+       created files so the package is never left half-updated.
+    """
+    targets = {rel: os.path.join(root, rel) for rel in rel_outputs}
+    tmpfiles: dict[str, str] = {}
+    backups: dict[str, str] = {}
+    done: list[str] = []
+
+    for rel, content in rel_outputs.items():
+        os.makedirs(os.path.dirname(targets[rel]), exist_ok=True)
+        tmp = targets[rel] + ".handoff_tmp"
+        with open(tmp, "w", encoding="utf-8") as fh:
+            fh.write(content)
+        tmpfiles[rel] = tmp
+
+    try:
+        for rel in rel_outputs:
+            tgt = targets[rel]
+            if os.path.exists(tgt):
+                bak = tgt + ".handoff_bak"
+                os.replace(tgt, bak)
+                backups[rel] = bak
+            os.replace(tmpfiles[rel], tgt)
+            done.append(rel)
+    except Exception:
+        for rel in done:
+            tgt = targets[rel]
+            if rel in backups:
+                os.replace(backups[rel], tgt)
+            else:
+                _silent_remove(tgt)
+        for tmp in tmpfiles.values():
+            _silent_remove(tmp)
+        raise
+    else:
+        for bak in backups.values():
+            _silent_remove(bak)
+
+
+def _silent_remove(path: str) -> None:
+    try:
+        os.remove(path)
+    except OSError:
+        pass
 
 
 # --------------------------------------------------------------------------- #
@@ -567,14 +629,8 @@ def _atomic_write(root: str, rel_outputs: dict[str, str]) -> None:
 # --------------------------------------------------------------------------- #
 
 def generate(root: str) -> dict[str, str]:
-    """Return {repo_relative_path: content} for all auto files."""
     record, _state, frozen = build_handoff_state(root)
-    return {
-        "project/docs/ai/handoff_state.json":
-            json.dumps(record, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
-        "project/docs/ai/CURRENT_STATE.md": render_current_state(record),
-        "project/docs/ai/FROZEN_ASSETS.md": render_frozen_assets(frozen),
-    }
+    return generate_from(record, frozen)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -592,7 +648,8 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         root = repo_root()
-        outputs = generate(root)
+        record, _state, frozen = build_handoff_state(root)
+        outputs = generate_from(record, frozen)
     except HandoffError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
@@ -604,21 +661,22 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  - {rel}")
         return 0
 
-    # --check: compare generated content to on-disk content (ignore volatile
-    # generated_at_utc for the JSON file).
+    # --check: full semantic-projection comparison for the JSON, content compare
+    # (minus volatile timestamp) for the markdown.
     drift = False
+    state_path = os.path.join(root, "project/docs/ai/handoff_state.json")
+    on_disk = _load_json(state_path)
+    if on_disk is None or projection(on_disk) != projection(record):
+        drift = True
+        print("DRIFT: handoff_state.json (semantic projection differs)", file=sys.stderr)
     for rel, content in outputs.items():
-        disk_path = os.path.join(root, rel)
-        on_disk = open(disk_path, encoding="utf-8").read() if os.path.isfile(disk_path) else None
         if rel.endswith("handoff_state.json"):
-            if _semantic_json_differs(on_disk, content):
-                drift = True
-                print(f"DRIFT: {rel} (semantic state differs)", file=sys.stderr)
-        elif on_disk != content:
-            # CURRENT_STATE.md carries a volatile timestamp line; compare without it.
-            if _strip_volatile(on_disk) != _strip_volatile(content):
-                drift = True
-                print(f"DRIFT: {rel}", file=sys.stderr)
+            continue
+        disk = open(os.path.join(root, rel), encoding="utf-8").read() \
+            if os.path.isfile(os.path.join(root, rel)) else None
+        if _strip_volatile(disk) != _strip_volatile(content):
+            drift = True
+            print(f"DRIFT: {rel}", file=sys.stderr)
     if drift:
         print("Handoff Package is OUT OF DATE — run with --write.", file=sys.stderr)
         return 1
@@ -626,28 +684,28 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
+def generate_from(record: dict, frozen: list[dict]) -> dict[str, str]:
+    return {
+        "project/docs/ai/handoff_state.json":
+            json.dumps(record, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
+        "project/docs/ai/CURRENT_STATE.md": render_current_state(record),
+        "project/docs/ai/FROZEN_ASSETS.md": render_frozen_assets(frozen),
+    }
+
+
+def _load_json(path: str):
+    if not os.path.isfile(path):
+        return None
+    try:
+        return json.load(open(path, encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+
 def _strip_volatile(text: str | None) -> str:
     if text is None:
         return ""
-    return "\n".join(
-        l for l in text.splitlines() if "generated_at_utc" not in l
-    )
-
-
-def _semantic_json_differs(on_disk: str | None, fresh: str) -> bool:
-    if on_disk is None:
-        return True
-    try:
-        a = json.loads(on_disk)
-        b = json.loads(fresh)
-    except json.JSONDecodeError:
-        return True
-    # The fingerprint summarizes the semantic state; compare it plus the anchors.
-    keys = ("state_fingerprint", "last_stage_commit", "qc_source_commit",
-            "qc_assertions", "qc_failed", "qc_all_pass", "next_research_action_id",
-            "last_completed_micro_part", "modeling_started", "gate_b_started",
-            "verified_master_created")
-    return any(a.get(k) != b.get(k) for k in keys)
+    return "\n".join(l for l in text.splitlines() if "generated_at_utc" not in l)
 
 
 if __name__ == "__main__":

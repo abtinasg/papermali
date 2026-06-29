@@ -14,7 +14,6 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-import shutil
 import subprocess
 import sys
 
@@ -44,6 +43,10 @@ def _git(root: str, *args: str) -> str:
     ).stdout.strip()
 
 
+def _state(root: str) -> dict:
+    return json.load(open(os.path.join(root, "project/docs/ai/handoff_state.json"), encoding="utf-8"))
+
+
 # --------------------------------------------------------------------------- #
 # Real-repo, read-only checks
 # --------------------------------------------------------------------------- #
@@ -53,9 +56,7 @@ def test_real_repo_validates():
 
 
 def test_state_matches_git():
-    state = json.load(
-        open(os.path.join(REAL_ROOT, "project/docs/ai/handoff_state.json"), encoding="utf-8")
-    )
+    state = _state(REAL_ROOT)
     head = gen.head_commit(REAL_ROOT)
     gfc = state["generated_from_commit"]
     assert gfc == head or gen.is_ancestor(REAL_ROOT, gfc, head)
@@ -63,9 +64,7 @@ def test_state_matches_git():
 
 
 def test_qc_counts_match_report():
-    state = json.load(
-        open(os.path.join(REAL_ROOT, "project/docs/ai/handoff_state.json"), encoding="utf-8")
-    )
+    state = _state(REAL_ROOT)
     qc = json.load(open(os.path.join(REAL_ROOT, state["selected_qc_path"]), encoding="utf-8"))
     assert state["qc_assertions"] == qc["assertion_count"]
     assert state["qc_failed"] == qc["failed_count"]
@@ -74,9 +73,7 @@ def test_qc_counts_match_report():
 
 
 def test_markers_are_off():
-    state = json.load(
-        open(os.path.join(REAL_ROOT, "project/docs/ai/handoff_state.json"), encoding="utf-8")
-    )
+    state = _state(REAL_ROOT)
     assert state["modeling_started"] is False
     assert state["gate_b_started"] is False
     assert state["verified_master_created"] is False
@@ -89,8 +86,7 @@ def test_frozen_stages_present():
 
 def test_internal_links_resolve():
     errors: list[str] = []
-    gen_root = REAL_ROOT
-    val._check_links(gen_root, errors)
+    val._check_links(REAL_ROOT, errors)
     assert errors == [], errors
 
 
@@ -107,17 +103,12 @@ def test_roadmap_ordering():
 
 
 def test_generator_is_idempotent():
-    # Re-generating must not change the semantic fingerprint.
     outputs = gen.generate(REAL_ROOT)
     fresh = json.loads(outputs["project/docs/ai/handoff_state.json"])
-    on_disk = json.load(
-        open(os.path.join(REAL_ROOT, "project/docs/ai/handoff_state.json"), encoding="utf-8")
-    )
-    assert fresh["state_fingerprint"] == on_disk["state_fingerprint"]
+    assert fresh["state_fingerprint"] == _state(REAL_ROOT)["state_fingerprint"]
 
 
 def test_change_allowlist_real_repo():
-    # origin/main must resolve for this check; skip cleanly if offline/no remote.
     try:
         gen._git(REAL_ROOT, "rev-parse", "origin/main")
     except gen.HandoffError:
@@ -126,10 +117,31 @@ def test_change_allowlist_real_repo():
 
 
 # --------------------------------------------------------------------------- #
+# Allowlist path matching (no prefix attacks) — pure unit
+# --------------------------------------------------------------------------- #
+
+@pytest.mark.parametrize("path,ok", [
+    ("AGENTS.md", True),
+    ("CLAUDE.md", True),
+    ("project/docs/ai/CURRENT_STATE.md", True),
+    ("project/docs/ai/sub/x.md", True),
+    ("project/scripts/update_ai_handoff.py", True),
+    # prefix attacks must be rejected
+    ("AGENTS.md.evil", False),
+    ("project/scripts/update_ai_handoff.py.bak", False),
+    ("project/docs/ai-evil/x.md", False),
+    ("project/docs/aimalicious", False),
+    ("project/src/secret.py", False),
+])
+def test_allowlist_prefix_attack(path, ok):
+    assert gen.path_allowlisted(path) is ok
+
+
+# --------------------------------------------------------------------------- #
 # Synthetic repo for semantic-drift tests
 # --------------------------------------------------------------------------- #
 
-STAGE = "stagex"
+STAGE = "stage9_batch1_part0"          # digit-bearing -> Stage9 / Batch1
 
 
 def _commit(root: str, subject: str) -> str:
@@ -166,37 +178,40 @@ def synth(tmp_path, monkeypatch):
     _write(root, f"project/src/{STAGE}.py", src)
     _write(root, f"project/tests/test_{STAGE}.py", test)
 
-    # Frozen manifests + their tracked data files.
+    # Frozen manifests + tracked data files (frozen) + a regenerable log file.
     for s in ("stage122", "stage123"):
         data = f"frozen {s}\n"
         _write(root, f"project/{s}/data_{s}.csv", data)
-        _write(root, f"project/{s}/metadata_and_hashes_{s}.json", json.dumps(
-            {"stage": s, "output_files_sha256": {f"data_{s}.csv": _sha(data)}}, indent=2
-        ))
+    log = "log line\n"
+    _write(root, "project/stage123/log_stage123.txt", log)
+    _write(root, "project/stage122/metadata_and_hashes_stage122.json", json.dumps(
+        {"stage": "stage122", "output_files_sha256": {"data_stage122.csv": _sha("frozen stage122\n")}}))
+    _write(root, "project/stage123/metadata_and_hashes_stage123.json", json.dumps(
+        {"stage": "stage123", "output_files_sha256": {
+            "data_stage123.csv": _sha("frozen stage123\n"),
+            "log_stage123.txt": _sha(log)}}))
 
-    # Roadmap (human input).
     _write(root, "project/docs/ai/ROADMAP.md",
            "---\n"
            "roadmap_version: 1\n"
            f"active_research_workstream_id: {STAGE}\n"
-           f"last_completed_research_action_id: {STAGE}-a-1\n"
-           f"next_research_action_id: {STAGE}-a-2\n"
+           f"last_completed_research_action_id: stage9-a-1\n"
+           f"next_research_action_id: stage9-a-2\n"
            "active_maintenance_task_id: handoff\n"
            "---\n\n"
            "## Research actions\n\n"
-           f"1. `{STAGE}-a-1` done\n"
-           f"2. `{STAGE}-a-2` next\n")
-    os.makedirs(os.path.join(root, "project/docs/ai"), exist_ok=True)
+           "1. `stage9-a-1` done\n"
+           "2. `stage9-a-2` next\n")
 
-    # Point the generator's frozen-manifest list at the synthetic manifests.
     monkeypatch.setattr(gen, "FROZEN_MANIFESTS", (
         "project/stage122/metadata_and_hashes_stage122.json",
         "project/stage123/metadata_and_hashes_stage123.json",
     ))
+    # log_stage123.txt is tracked & in the manifest, but classified regenerable.
+    monkeypatch.setattr(gen, "NON_FROZEN_TRACKED", {"project/stage123/log_stage123.txt"})
 
     sha1 = _commit(root, f"Stage1 Part initial: {STAGE} code")
 
-    # QC report referencing the code commit, with matching fingerprints.
     _write(root, f"project/qc/{STAGE}_qc_report.json", json.dumps({
         "stage": STAGE,
         "generated_at": "2026-01-01T00:00:00Z",
@@ -208,10 +223,9 @@ def synth(tmp_path, monkeypatch):
         "all_pass": True,
         "assertion_count": 3,
         "failed_count": 0,
-    }, indent=2))
+    }))
     _commit(root, f"Stage1 Part artifacts: {STAGE} QC")
 
-    # Generate + commit the handoff (handoff-only commit).
     outputs = gen.generate(root)
     for rel, content in outputs.items():
         _write(root, rel, content)
@@ -220,6 +234,8 @@ def synth(tmp_path, monkeypatch):
     assert val.run_check(root) == 0  # baseline must be valid
     return root
 
+
+# ---- the 7 plan scenarios -------------------------------------------------- #
 
 def test_scenario1_handoff_only_commit_ok(synth):
     _write(synth, "AGENTS.md", "pointer tweak\n")
@@ -247,8 +263,8 @@ def test_scenario4_frozen_asset_change_fails(synth):
 
 def test_scenario5_roadmap_id_change_without_regen_fails(synth):
     text = open(os.path.join(synth, "project/docs/ai/ROADMAP.md"), encoding="utf-8").read()
-    text = text.replace(f"{STAGE}-a-2", f"{STAGE}-a-3")
-    text = text.replace(f"2. `{STAGE}-a-3` next", f"2. `{STAGE}-a-2` mid\n3. `{STAGE}-a-3` next")
+    text = text.replace("stage9-a-2", "stage9-a-3")
+    text = text.replace("2. `stage9-a-3` next", "2. `stage9-a-2` mid\n3. `stage9-a-3` next")
     _write(synth, "project/docs/ai/ROADMAP.md", text)
     _commit(synth, "handoff: bump roadmap next id (no regen)")
     assert val.run_check(synth) == 1
@@ -261,10 +277,7 @@ def test_scenario6_new_stage_commit_fails(synth):
 
 
 def test_scenario7_timestamp_only_change_keeps_fingerprint(synth):
-    state_path = os.path.join(synth, "project/docs/ai/handoff_state.json")
-    state = json.load(open(state_path, encoding="utf-8"))
-    fp_before = state["state_fingerprint"]
-    # Regenerate (new timestamp) — semantic fingerprint must be unchanged.
+    fp_before = _state(synth)["state_fingerprint"]
     outputs = gen.generate(synth)
     fresh = json.loads(outputs["project/docs/ai/handoff_state.json"])
     assert fresh["state_fingerprint"] == fp_before
@@ -272,9 +285,53 @@ def test_scenario7_timestamp_only_change_keeps_fingerprint(synth):
     assert val.run_check(synth) == 0
 
 
-def test_changes_allowlist_blocks_non_handoff(synth):
+# ---- hardening tests (item 8) --------------------------------------------- #
+
+def test_frozen_mismatch_is_fatal(synth):
+    # Uncommitted tamper of a FROZEN (non-regenerable) file -> generation fatal.
+    _write(synth, "project/stage122/data_stage122.csv", "TAMPERED\n")
+    with pytest.raises(gen.HandoffError):
+        gen.semantic_state(synth)
+    assert val.run_check(synth) == 1
+
+
+def test_regenerable_mismatch_not_fatal(synth):
+    # Uncommitted tamper of the regenerable log file -> still valid.
+    _write(synth, "project/stage123/log_stage123.txt", "different timing line\n")
+    gen.semantic_state(synth)            # must not raise
+    assert val.run_check(synth) == 0
+
+
+def test_merge_commit_with_research_file_fails(synth):
+    base = _git(synth, "rev-parse", "--abbrev-ref", "HEAD")
+    _git(synth, "checkout", "-b", "side")
+    _write(synth, "project/src/new_research.py", "RESEARCH = 1\n")
+    _commit(synth, "research: add new module")
+    _git(synth, "checkout", base)
+    env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t",
+           "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"}
+    subprocess.run(["git", "-C", synth, "merge", "--no-ff", "-m", "Merge research", "side"],
+                   check=True, env=env, capture_output=True, text=True)
+    # The merge introduces a non-Handoff file -> commit-anchor check fails.
+    assert val.run_check(synth) == 1
+
+
+@pytest.mark.parametrize("field,value", [
+    ("current_stage", "Stage999"),
+    ("current_batch", "Batch99"),
+    ("tickers", ["ZZZ"]),
+])
+def test_tampered_record_field_fails(synth, field, value):
+    path = os.path.join(synth, "project/docs/ai/handoff_state.json")
+    state = json.load(open(path, encoding="utf-8"))
+    state[field] = value
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(state, fh, indent=2, ensure_ascii=False, sort_keys=True)
+    assert val.run_check(synth) == 1
+
+
+def test_change_allowlist_blocks_non_handoff(synth):
     base = _git(synth, "rev-parse", "HEAD")
     _write(synth, f"project/src/{STAGE}.py", "STAGE_SRC = 2\n")
     _commit(synth, "Stage1 Part: source edit")
-    # The new commit touches a non-allowlisted path -> allowlist check fails.
     assert val.run_check_changes(synth, base, include_wt=True) == 1
