@@ -631,3 +631,56 @@ def test_dashboard_loads_all_10_tickers_when_outputs_exist(tmp_path):
 def test_streamlit_app_import_smoke():
     import apps.stage124_part03_hil_panel as app_module  # noqa: F401
     assert hasattr(app_module, "st")
+
+
+def test_snapshot_upload_key_includes_ticker():
+    import apps.stage124_part03_hil_panel as app
+
+    class Uploaded:
+        name = "x.html"
+
+        def getvalue(self):
+            return b"body"
+
+    assert app._snapshot_upload_key("خمهر", Uploaded()) == (
+        "خمهر",
+        "x.html",
+        hashlib.sha256(b"body").hexdigest(),
+    )
+
+
+def test_clear_snapshot_state_removes_only_snapshot_keys():
+    import apps.stage124_part03_hil_panel as app
+    from unittest.mock import patch
+
+    fake_st = type(
+        "FakeSt",
+        (),
+        {
+            "session_state": {
+                "snapshot_path": "x",
+                "content_sha256": "y",
+                "snapshot_size": 1,
+                "snapshot_stored": "z",
+                "_last_upload_key": "k",
+                "other": "keep",
+            }
+        },
+    )()
+    with patch.object(app, "st", fake_st):
+        app._clear_snapshot_state()
+    assert fake_st.session_state == {"other": "keep"}
+
+
+def test_store_snapshot_same_content_different_tickers_creates_two_files(tmp_path):
+    _seed_registry(tmp_path)
+    body = b"<html>same</html>"
+    result1 = panel.store_snapshot(
+        root=tmp_path, ticker=PART03_TICKERS[0], filename="same.html", content=body
+    )
+    result2 = panel.store_snapshot(
+        root=tmp_path, ticker=PART03_TICKERS[1], filename="same.html", content=body
+    )
+    assert result1["snapshot_path"] != result2["snapshot_path"]
+    assert (tmp_path / result1["snapshot_path"]).exists()
+    assert (tmp_path / result2["snapshot_path"]).exists()

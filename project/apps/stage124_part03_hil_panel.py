@@ -62,6 +62,26 @@ st.set_page_config(
 st.title("Stage124 Part03 — Human-in-the-Loop Panel")
 
 
+_SNAPSHOT_STATE_KEYS = (
+    "snapshot_path",
+    "content_sha256",
+    "snapshot_size",
+    "snapshot_stored",
+    "_last_upload_key",
+)
+
+
+def _clear_snapshot_state() -> None:
+    """Remove all snapshot-related keys from session state."""
+    for key in _SNAPSHOT_STATE_KEYS:
+        st.session_state.pop(key, None)
+
+
+def _snapshot_upload_key(selected_ticker: str, uploaded) -> tuple:
+    """Return a stable key for the uploaded file including the ticker."""
+    return (selected_ticker, uploaded.name, hashlib.sha256(uploaded.getvalue()).hexdigest())
+
+
 def _render_preview(snapshot_path: str) -> None:
     """Render a safe, non-executable preview of the stored snapshot."""
     if not snapshot_path:
@@ -189,20 +209,24 @@ with tab_register:
         help=f"حداکثر حجم: {MAX_UPLOAD_BYTES // 1024 // 1024} MB",
     )
 
-    if uploaded is not None:
-        content = uploaded.getvalue()
-        upload_key = (uploaded.name, hashlib.sha256(content).hexdigest())
+    if uploaded is None:
+        # Clear stale snapshot metadata when the user removes the upload.
+        _clear_snapshot_state()
+    else:
+        selected_ticker = st.session_state.get("ticker", PART03_TICKERS[0])
+        upload_key = _snapshot_upload_key(selected_ticker, uploaded)
         # Streamlit reruns the script whenever state changes; only store the
-        # snapshot once per distinct upload to avoid duplicate files on disk.
+        # snapshot once per distinct (ticker, upload) to avoid duplicate files
+        # on disk and to keep it attached to the correct ticker.
         if st.session_state.get("_last_upload_key") == upload_key:
             st.info("snapshot قبلاً ذخیره شده است.")
         else:
             try:
                 snap = store_snapshot(
                     root=_PROJECT_DIR,
-                    ticker=st.session_state.get("ticker", PART03_TICKERS[0]),
+                    ticker=selected_ticker,
                     filename=uploaded.name,
-                    content=content,
+                    content=uploaded.getvalue(),
                 )
                 st.session_state["snapshot_path"] = snap["snapshot_path"]
                 st.session_state["content_sha256"] = snap["content_sha256"]
@@ -212,9 +236,7 @@ with tab_register:
                 st.success("snapshot با موفقیت ذخیره شد.")
             except Exception as exc:
                 st.error(f"خطا در ذخیره snapshot: {exc}")
-                st.session_state.pop("snapshot_path", None)
-                st.session_state.pop("content_sha256", None)
-                st.session_state.pop("_last_upload_key", None)
+                _clear_snapshot_state()
 
     if st.session_state.get("snapshot_path"):
         st.markdown("**پیش‌نمایش Snapshot**")
@@ -262,6 +284,7 @@ def _handle_submission(action: str, actor: str) -> None:
         result = apply_submission(row=row, root=_PROJECT_DIR, actor=actor.strip(), action="apply")
         if result.get("applied"):
             st.success("Apply با موفقیت انجام شد.")
+            _clear_snapshot_state()
         elif result.get("bridge_status") == "duplicate_blocked":
             st.error(result["errors"][0])
         else:
@@ -269,7 +292,10 @@ def _handle_submission(action: str, actor: str) -> None:
         st.json(result)
     else:  # reject
         result = apply_submission(row=row, root=_PROJECT_DIR, actor=actor.strip(), action="reject")
-        st.info("منبع ردشده ثبت شد.")
+        if result.get("rejected"):
+            st.success("منبع ردشده با موفقیت ثبت شد.")
+        else:
+            st.error(f"ثبت رد منبع ناموفق بود: {result.get('errors', [])}")
         st.json(result)
 
 
