@@ -9,10 +9,10 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 - **Stage / Batch:** Stage124 / Batch02
 - **Active workstream:** `stage124_batch02_part03`
-- **Last completed research action:** `stage124-batch02-part03-1a-5-3`
-- **Next research action:** `stage124-batch02-part03-1b-0`
-- **Last stage commit:** `810a25a14813580c543a682a66e1baad94c68b55`
-- **Generated from commit:** `b29a8b6e62dddf2a7d1f02ebde8f71ccd31efa44` (branch `stage124-batch02-part03-1b0`, informational)
+- **Last completed research action:** `stage124-batch02-part03-1b-0`
+- **Next research action:** `stage124-batch02-part03-1b-1`
+- **Last stage commit:** `78f3ee03fb36396c8e4e5f46bd1d50fab7914025`
+- **Generated from commit:** `2cbbf8b3e6273fc75631f23cdfd1fc4f2d844bec` (branch `stage124-part03-1b1`, informational)
 - **Baseline:** `origin/main` @ `cab0f0edc462593411ce8ad86643390c33a653f2`
 
 ## QC
@@ -20,7 +20,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - ✅ **467 assertions, 0 failed**, all_pass=True
 - Scope: `stage124_batch02_part03`
 - Report: `project/stage124/batch02_parts/part03_qc_report.json`
-- QC source commit (code): `076388246ce237b041ed56376b6609a89258656d`
+- QC source commit (code): `2cbbf8b3e6273fc75631f23cdfd1fc4f2d844bec`
 
 ## Workflow markers
 
@@ -32,5 +32,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 خمهر، خنصیر، خوساز، خچرخش، خکمک، دروز، دسبحا، دیران، رانفور، رمپنا
 
-_state_fingerprint: `b93d4ab29178917ae1ffbf4e11df40f12e33b9b6d637b48fa04e37f139be87d9`_
-_generated_at_utc: 2026-06-29T14:30:39Z (informational)_
+_state_fingerprint: `c7bef1f461a46083b93cd6eaeab5ddc9eacccf678112ec0350899508220b87e3`_
+_generated_at_utc: 2026-06-29T15:34:45Z (informational)_

@@ -329,7 +329,7 @@ def register_discovered_sources(registry_df: "pd.DataFrame",
 
 
 # Retrieval statuses that count as a *successful* fetch.
-FETCHED_STATUSES = {"fetched_ok", "reused_existing_snapshot"}
+FETCHED_STATUSES = {"fetched_ok", "reused_existing_snapshot", "manual_snapshot_imported"}
 
 # Retrieval statuses that are pure network failures. A network failure means the
 # research could not be *completed*; it never means "no reliable evidence".
