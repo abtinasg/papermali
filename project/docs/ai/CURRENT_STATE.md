@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage124_batch02_part03`
 - **Last completed research action:** `stage124-batch02-part03-1b-0`
 - **Next research action:** `stage124-batch02-part03-1b-1`
-- **Last stage commit:** `fed86e634c5f2652ec505cf4109c8907ea9ade73`
-- **Generated from commit:** `664ff04d00aa796ecebb9d3e81a2c78d5c1e962d` (branch `stage124-part03-1b1-panel-mvp`, informational)
+- **Last stage commit:** `52e1d83e71379ce1308ae466b220d1915a59a1af`
+- **Generated from commit:** `52e1d83e71379ce1308ae466b220d1915a59a1af` (branch `stage124-part03-1b1-panel-mvp`, informational)
 - **Baseline:** `origin/main` @ `cab0f0edc462593411ce8ad86643390c33a653f2`
 
 ## QC
@@ -32,5 +32,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 خمهر، خنصیر، خوساز، خچرخش، خکمک، دروز، دسبحا، دیران، رانفور، رمپنا
 
-_state_fingerprint: `59bd01a9ac96dc2acd9389601e2bc48528d3634a3564c0ed5f815e65f97709f2`_
-_generated_at_utc: 2026-06-29T16:38:42Z (informational)_
+_state_fingerprint: `568dcbe538ac21e7d752f23ccc0244388f091b311e280d166f699a74e0891473`_
+_generated_at_utc: 2026-06-29T16:49:52Z (informational)_

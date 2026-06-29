@@ -24,9 +24,16 @@ run_stage124_batch02_part03_manual_intake.run_intake
 ```
 
 - Validation-only calls `run_intake(..., apply=False, write_report=False)`.
-- Apply calls `run_intake(..., apply=True)`.
+- Apply calls `run_intake(..., apply=True)` and persists changes to the Part 3
+  outputs under the configured `root` (by default the project directory itself).
 - The panel never edits `registry`, `provenance`, `screening`, `summary`,
-  `QC` or `manifest` files directly.
+  `QC` or `manifest` files directly; all mutations are performed by the bridge
+  via atomic writes.
+
+> **Caution:** When the panel is run against the real project root,
+> `Apply` genuinely mutates `part03_source_registry.csv`, provenance, screening,
+> summary, QC and manifest. Use validation-only mode or a dedicated `root` for
+> testing.
 
 ## Security rules
 
@@ -42,7 +49,7 @@ run_stage124_batch02_part03_manual_intake.run_intake
 
 | Mode | `content_review_status` | Notes |
 |------|---------------------------|-------|
-| کشف منبع | empty | Only registers the source URL |
+| کشف منبع | empty | Registers the source URL; optional snapshot is kept and attached |
 | نیازمند بررسی | `pending_manual_review` | Snapshot allowed, no findings |
 | بررسی‌شده | `reviewed` | Requires snapshot, notes, UTC timestamp |
 | ردشده | `rejected` | Requires reason, creates no evidence |

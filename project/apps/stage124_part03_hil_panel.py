@@ -5,6 +5,7 @@ This file contains only UI code. All operations are delegated to
 """
 from __future__ import annotations
 
+import hashlib
 import sys
 from pathlib import Path
 
@@ -26,7 +27,6 @@ from src.stage124_part03_hil_panel import (  # noqa: E402
     read_audit_events,
     sanitize_filename,
     store_snapshot,
-    validate_submission,
 )
 
 _REVIEW_MODES = {
@@ -191,22 +191,30 @@ with tab_register:
 
     if uploaded is not None:
         content = uploaded.getvalue()
-        try:
-            snap = store_snapshot(
-                root=_PROJECT_DIR,
-                ticker=st.session_state.get("ticker", PART03_TICKERS[0]),
-                filename=uploaded.name,
-                content=content,
-            )
-            st.session_state["snapshot_path"] = snap["snapshot_path"]
-            st.session_state["content_sha256"] = snap["content_sha256"]
-            st.session_state["snapshot_size"] = snap["size_bytes"]
-            st.session_state["snapshot_stored"] = snap["stored_filename"]
-            st.success("snapshot با موفقیت ذخیره شد.")
-        except Exception as exc:
-            st.error(f"خطا در ذخیره snapshot: {exc}")
-            st.session_state.pop("snapshot_path", None)
-            st.session_state.pop("content_sha256", None)
+        upload_key = (uploaded.name, hashlib.sha256(content).hexdigest())
+        # Streamlit reruns the script whenever state changes; only store the
+        # snapshot once per distinct upload to avoid duplicate files on disk.
+        if st.session_state.get("_last_upload_key") == upload_key:
+            st.info("snapshot قبلاً ذخیره شده است.")
+        else:
+            try:
+                snap = store_snapshot(
+                    root=_PROJECT_DIR,
+                    ticker=st.session_state.get("ticker", PART03_TICKERS[0]),
+                    filename=uploaded.name,
+                    content=content,
+                )
+                st.session_state["snapshot_path"] = snap["snapshot_path"]
+                st.session_state["content_sha256"] = snap["content_sha256"]
+                st.session_state["snapshot_size"] = snap["size_bytes"]
+                st.session_state["snapshot_stored"] = snap["stored_filename"]
+                st.session_state["_last_upload_key"] = upload_key
+                st.success("snapshot با موفقیت ذخیره شد.")
+            except Exception as exc:
+                st.error(f"خطا در ذخیره snapshot: {exc}")
+                st.session_state.pop("snapshot_path", None)
+                st.session_state.pop("content_sha256", None)
+                st.session_state.pop("_last_upload_key", None)
 
     if st.session_state.get("snapshot_path"):
         st.markdown("**پیش‌نمایش Snapshot**")
@@ -248,7 +256,7 @@ def _handle_submission(action: str, actor: str) -> None:
         return
 
     if action == "validate":
-        result = validate_submission(row=row, root=_PROJECT_DIR)
+        result = apply_submission(row=row, root=_PROJECT_DIR, actor=actor.strip(), action="validate")
         st.json(result)
     elif action == "apply":
         result = apply_submission(row=row, root=_PROJECT_DIR, actor=actor.strip(), action="apply")

@@ -316,8 +316,8 @@ def build_intake_row(
         candidate_date_jalali = ""
         ordinary_share_explicit = "unknown"
         reviewer_notes = ""
-        snapshot_path = ""
-        content_sha256 = ""
+        # Snapshot is optional for discovery, but if provided it must be kept
+        # so the stored file is linked to the submission and validated by the bridge.
     else:  # rejected
         manual_reviewed_at_utc = ""
         if not reviewer_notes:
@@ -349,18 +349,21 @@ def build_intake_row(
 # ---------------------------------------------------------------------------
 def _write_submission_csv(path: Path, row: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        raise PanelError(f"submission file already exists: {path}")
     df = pd.DataFrame([{c: _s(row.get(c, "")) for c in _INTAKE_COLUMNS}])
     df.to_csv(path, index=False, encoding="utf-8-sig", lineterminator="\n")
 
 
 def _submission_path(root: Path, ticker: str, row: dict) -> Path:
     ts = _utc_timestamp_for_filename()
+    nonce = uuid.uuid4().hex[:12]
     return (
         Path(root).resolve()
         / "stage124"
         / "batch02_parts"
         / "panel_submissions"
-        / f"{ts}_{_s(ticker)}_{_row_sha256(row)}.csv"
+        / f"{ts}_{nonce}_{_s(ticker)}_{_row_sha256(row)}.csv"
     )
 
 
@@ -517,6 +520,31 @@ def apply_submission(
         return result
 
     if action == "reject":
+        # Reject decisions must still pass bridge validation so that malformed
+        # URL / ticker / schema cannot be recorded as an audit event.
+        val = validate_submission(row=row, root=root)
+        if not val["valid"]:
+            result = {
+                "valid": False,
+                "bridge_status": val["bridge_status"],
+                "report": None,
+                "errors": val["errors"],
+                "submission_path": "",
+                "action": "reject",
+                "applied": False,
+                "rejected": False,
+            }
+            audit_event = _append_audit_event(
+                root=root,
+                actor=actor,
+                action="reject",
+                row=row,
+                result=result,
+                submission_path="",
+            )
+            result["audit_event"] = audit_event
+            return result
+
         submission_path = _submission_path(root, row.get("ticker", ""), row)
         _write_submission_csv(submission_path, row)
         result = {

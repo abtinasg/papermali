@@ -200,14 +200,15 @@ def test_store_snapshot_under_correct_root_and_sha_matches_bytes(tmp_path):
 
 def test_store_snapshot_rejects_symlink_directory(tmp_path):
     _seed_registry(tmp_path)
-    snap_dir = tmp_path / "stage124" / "batch02_parts" / "snapshots_part03" / PART03_TICKERS[0]
-    snap_dir.mkdir(parents=True, exist_ok=True)
-    link_dir = tmp_path / "stage124" / "batch02_parts" / "snapshots_part03" / (PART03_TICKERS[0] + "_link")
-    link_dir.symlink_to(snap_dir)
+    # Use a valid ticker so the ticker-scope check does not mask the symlink test.
+    real_dir = tmp_path / "stage124" / "batch02_parts" / "snapshots_part03" / (PART03_TICKERS[0] + "_real")
+    real_dir.mkdir(parents=True)
+    link_dir = tmp_path / "stage124" / "batch02_parts" / "snapshots_part03" / PART03_TICKERS[0]
+    link_dir.symlink_to(real_dir)
     with pytest.raises(panel.PanelError):
         panel.store_snapshot(
             root=tmp_path,
-            ticker=PART03_TICKERS[0] + "_link",
+            ticker=PART03_TICKERS[0],
             filename="x.html",
             content=b"x",
         )
@@ -424,6 +425,49 @@ def test_apply_submission_duplicate_provenance_blocked(tmp_path):
     assert "این منبع قبلاً وارد provenance شده است" in second["errors"][0]
 
 
+def test_discovery_row_preserves_optional_snapshot(tmp_path):
+    _seed_registry(tmp_path)
+    rel, digest = _snapshot(tmp_path)
+    row = panel.build_intake_row(
+        ticker=PART03_TICKERS[0],
+        source_type="codal_official",
+        source_url="https://www.codal.ir/Reports/Decision.aspx?LetterSerial=DISC",
+        source_title="Codal discovery",
+        review_mode="discovery",
+        snapshot_path=rel,
+        content_sha256=digest,
+        actor="researcher",
+        discovery_notes="discovery with snapshot",
+    )
+    assert row["snapshot_path"] == rel
+    assert row["content_sha256"] == digest
+
+
+def test_discovery_submission_with_snapshot_attaches_to_source(tmp_path):
+    _seed_registry(tmp_path)
+    rel, digest = _snapshot(tmp_path)
+    row = panel.build_intake_row(
+        ticker=PART03_TICKERS[0],
+        source_type="codal_official",
+        source_url="https://www.codal.ir/Reports/Decision.aspx?LetterSerial=DISC",
+        source_title="Codal discovery",
+        review_mode="discovery",
+        snapshot_path=rel,
+        content_sha256=digest,
+        actor="researcher",
+        discovery_notes="discovery with snapshot",
+    )
+    result = panel.apply_submission(row=row, root=tmp_path, actor="researcher", action="apply")
+    assert result["valid"] is True
+    registry = read_csv(tmp_path / "stage124" / "batch02_parts" / "part03_source_registry.csv")
+    assert any(str(r["source_url"]).strip() == row["source_url"] for _, r in registry.iterrows())
+    # No provenance row because discovery is not a reviewed finding.
+    prov = read_csv(tmp_path / "stage124" / "batch02_parts" / "part03_source_provenance_10tickers.csv")
+    assert prov.empty or not any(
+        str(r["source_url"]).strip() == row["source_url"] for _, r in prov.iterrows()
+    )
+
+
 def test_discovery_registers_source_without_provenance(tmp_path):
     _seed_registry(tmp_path)
     row = _discovery_row(tmp_path)
@@ -458,9 +502,52 @@ def test_rejected_source_produces_no_accepted_evidence(tmp_path):
             assert before[name] == after[name], f"{name} mutated by reject"
 
 
+def test_reject_submission_validates_invalid_row(tmp_path):
+    _seed_registry(tmp_path)
+    row = _rejected_row(tmp_path)
+    row["source_url"] = "not-a-valid-url"
+    result = panel.apply_submission(row=row, root=tmp_path, actor="researcher", action="reject")
+    assert result["valid"] is False
+    assert result["rejected"] is False
+    assert result["action"] == "reject"
+    events = panel.read_audit_events(tmp_path)
+    assert events
+    assert events[0]["action"] == "reject"
+    assert events[0]["error"]
+
+
+def test_submission_filename_is_unique(tmp_path):
+    _seed_registry(tmp_path)
+    row = _reviewed_row(tmp_path)
+    path1 = panel._submission_path(tmp_path, row["ticker"], row)
+    path2 = panel._submission_path(tmp_path, row["ticker"], row)
+    assert path1 != path2
+
+
+def test_submission_csv_refuses_overwrite(tmp_path):
+    _seed_registry(tmp_path)
+    row = _reviewed_row(tmp_path)
+    path = panel._submission_path(tmp_path, row["ticker"], row)
+    panel._write_submission_csv(path, row)
+    with pytest.raises(panel.PanelError):
+        panel._write_submission_csv(path, row)
+
+
 # ---------------------------------------------------------------------------
 # Audit log
 # ---------------------------------------------------------------------------
+def test_validate_action_records_audit_event(tmp_path):
+    _seed_registry(tmp_path)
+    row = _reviewed_row(tmp_path)
+    result = panel.apply_submission(row=row, root=tmp_path, actor="researcher", action="validate")
+    assert result["valid"] is True
+    assert result["action"] == "validate"
+    events = panel.read_audit_events(tmp_path)
+    assert events
+    assert events[0]["action"] == "validate"
+    assert events[0]["actor"] == "researcher"
+
+
 def test_audit_success_event_written(tmp_path):
     _seed_registry(tmp_path)
     row = _reviewed_row(tmp_path)
