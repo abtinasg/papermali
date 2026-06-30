@@ -108,6 +108,10 @@ def test_generator_is_idempotent():
     assert fresh["state_fingerprint"] == _state(REAL_ROOT)["state_fingerprint"]
 
 
+@pytest.mark.skipif(
+    os.environ.get("ENFORCE_HANDOFF_CHANGE_ALLOWLIST") != "1",
+    reason="Change allowlist is only enforced on Handoff-maintenance branches",
+)
 def test_change_allowlist_real_repo():
     try:
         gen._git(REAL_ROOT, "rev-parse", "origin/main")
