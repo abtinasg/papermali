@@ -28,14 +28,20 @@ def _synthetic(n_tickers=130, years=(1392, 1393, 1394), prelisting_ticker="AAA0"
     return pd.DataFrame(rows)
 
 
+_TRACKED_META = ROOT / "stage124" / "metadata_and_hashes_stage124_part1.json"
+
+
 @pytest.fixture(scope="session")
 def built():
     cfg = utils.load_config()
+    _backup = _TRACKED_META.read_bytes() if _TRACKED_META.is_file() else None
     res = s124.build_template(cfg)
     tmpl = pd.read_csv(res["out"] / "listing_master_template_stage124.csv", dtype=str,
                        keep_default_na=False)
     raw = s124.load_stage123_frozen()
-    return {"cfg": cfg, "out": res["out"], "qc": res["qc"], "tmpl": tmpl, "raw": raw}
+    yield {"cfg": cfg, "out": res["out"], "qc": res["qc"], "tmpl": tmpl, "raw": raw}
+    if _backup is not None:
+        _TRACKED_META.write_bytes(_backup)
 
 
 # 1 ----------------------------------------------------------------------

@@ -17,12 +17,19 @@ from src import utils, stage123 as s123  # noqa: E402
 from src import stage122 as s122  # noqa: E402
 
 
+_TRACKED_FILES = (
+    ROOT / "stage123" / "metadata_and_hashes_stage123.json",
+    ROOT / "stage123" / "statement_scope_correction_audit_stage123.csv",
+)
+
+
 @pytest.fixture(scope="session")
 def built():
     cfg = utils.load_config()
+    _backups = {p: p.read_bytes() if p.is_file() else None for p in _TRACKED_FILES}
     res = s123.build_full(cfg)
     out = res["out"]
-    return {
+    yield {
         "cfg": cfg, "out": out, "qc": res["qc"],
         "mar": pd.read_csv(out / "modeling_all_rows_stage123.csv", dtype=str,
                            encoding="utf-8-sig", keep_default_na=False),
@@ -32,6 +39,9 @@ def built():
                           encoding="utf-8-sig", keep_default_na=False),
         "raw": s122.load_all_rows(cfg),
     }
+    for p, data in _backups.items():
+        if data is not None:
+            p.write_bytes(data)
 
 
 def _s(vals):
