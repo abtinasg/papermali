@@ -1,3 +1,12 @@
+> **⚠️ HISTORICAL / SUPERSEDED**
+>
+> Do not execute manual research or HIL workflow.
+> The official TSE API verified master is now canonical.
+>
+> `listing_master_verified_stage124.csv` (130 tickers, dates from official
+> TSETMC API) supersedes the manual Part 3 research path. This README is
+> retained for historical reference only.
+
 # Stage124 Batch 2 — Part 3: Research Screening (next 10 tickers)
 
 This package contains the **research screening only** for the next 10 tickers in

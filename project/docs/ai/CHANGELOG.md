@@ -11,12 +11,22 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
   `streamlit` dependency have been removed. The `part03_manual_intake_input.csv`
   template and the HIL panel README were also deleted.
 - **`stage124-batch02-part03-1b-1` superseded** — cancelled by the official TSETMC
-  API. The verified master (`listing_master_verified_stage124.csv`) now contains
-  130 unique tickers with `first_observed_trading_date_from_official_tse_api`
-  (status `verified_tse_api_first_observed_trade`). These dates are first observed
+  API (not completed). The verified master (`listing_master_verified_stage124.csv`)
+  now contains 130 unique tickers with dates in `first_public_trading_date_jalali`
+  and `first_public_trading_date_gregorian`
+  (date_semantics=`first_observed_trading_date_from_official_tse_api`,
+  status `verified_tse_api_first_observed_trade`). These dates are first observed
   trading dates, not necessarily IPO, admission, or listing dates.
+- **`stage124-official-api-finalize` completed** — Finalized verified master for
+  130 tickers using official TSETMC first-observed-trade dates; merged through PR
+  #15, merge commit 22c2d0c.
 - **Next action** is `stage124-gate-b-readiness` (Gate B readiness / eligibility
   rebuild planning). Gate B execution and modeling are not in scope.
+- Updated ROADMAP front matter: `active_research_workstream_id` changed to
+  `stage124-gate-b-readiness` (Part 3 is no longer the active path);
+  `last_completed_research_action_id` changed to `stage124-official-api-finalize`;
+  `qc_scope: stage124-batch02-part03` added so the generator can still locate the
+  Part 3 QC report.
 - Removed the old DECISIONS rule "No `listing_master_verified_stage124.csv`" —
   the verified master now exists and is canonical.
 - Historical Part 3 artifacts (worklist, QC report, provenance, snapshots) are

@@ -114,47 +114,84 @@ def test_verified_master_verification_status():
 OFFICIAL_API_DIR = ROOT / "stage124" / "official_api"
 MANIFEST_PATH = OFFICIAL_API_DIR / "metadata_and_hashes.json"
 
+REQUIRED_FILE_ROLES = {
+    "bulk_first_trade_export",
+    "ambiguous_resolved_export",
+    "final_pair_export",
+    "provenance_manifest",
+    "verified_listing_master",
+    "first_trade_conflict_audit",
+    "import_manifest",
+}
 
-def test_official_api_manifest_hashes_match_files():
+
+def test_official_api_metadata_hashes_match_files():
+    """Verify every file in metadata_and_hashes.json has a matching SHA-256."""
     assert MANIFEST_PATH.is_file(), "metadata_and_hashes.json missing"
     manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
-    for batch in manifest.get("raw_batches", []):
-        path = ROOT / batch["path"]
-        assert path.is_file(), f"Missing raw batch file: {batch['path']}"
-        actual = hashlib.sha256(path.read_bytes()).hexdigest()
-        assert actual == batch["sha256"], (
-            f"SHA-256 mismatch for {batch['path']}: "
-            f"expected {batch['sha256']}, got {actual}"
-        )
+    files = manifest.get("files", [])
+    assert len(files) > 0, "metadata_and_hashes.json has empty 'files' list"
 
-
-def test_official_api_provenance_manifest_hashes_match_files():
-    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
-    for entry in manifest.get("provenance_manifests", []):
-        path = ROOT / entry["path"]
-        assert path.is_file(), f"Missing provenance manifest: {entry['path']}"
-        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+    seen_roles: set[str] = set()
+    for entry in files:
+        rel_path = entry["relative_path"]
+        file_path = ROOT / rel_path
+        assert file_path.is_file(), f"Missing file listed in manifest: {rel_path}"
+        actual = hashlib.sha256(file_path.read_bytes()).hexdigest()
         assert actual == entry["sha256"], (
-            f"SHA-256 mismatch for {entry['path']}: "
+            f"SHA-256 mismatch for {rel_path}: "
             f"expected {entry['sha256']}, got {actual}"
         )
+        seen_roles.add(entry["file_role"])
+
+    missing_roles = REQUIRED_FILE_ROLES - seen_roles
+    assert not missing_roles, (
+        f"metadata_and_hashes.json missing required file_role(s): {missing_roles}"
+    )
 
 
-# ---- 6. Stage122 and Stage123 tracked file sets are stable --------------------
+# ---- 6. Stage122 and Stage123 frozen-asset hashes verified -------------------
 
-STAGE_DIRS = ["project/stage122", "project/stage123"]
+STAGE_MANIFESTS = {
+    "stage122": ROOT / "stage122" / "metadata_and_hashes_stage122.json",
+    "stage123": ROOT / "stage123" / "metadata_and_hashes_stage123.json",
+}
+
+# Files classified as non-frozen (regenerable) — their hash may differ.
+NON_FROZEN_TRACKED = {
+    "project/stage123/stage123_unit_test_output.txt",
+}
 
 
-@pytest.mark.parametrize("stage_dir", STAGE_DIRS)
-def test_stage_dir_tracked_files_unchanged(stage_dir: str):
-    """Verify that the tracked file list for stage122/stage123 matches HEAD."""
-    head_files = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "ls-files", stage_dir],
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.splitlines()
-    assert len(head_files) > 0, f"No tracked files in {stage_dir}"
-    # Verify all listed files exist on disk
-    for rel in head_files:
-        assert (REPO_ROOT / rel).is_file(), f"Missing tracked file: {rel}"
+@pytest.mark.parametrize("stage_name", list(STAGE_MANIFESTS))
+def test_stage_frozen_asset_hashes_match(stage_name: str):
+    """Verify SHA-256 of every frozen tracked file matches its manifest."""
+    manifest_path = STAGE_MANIFESTS[stage_name]
+    assert manifest_path.is_file(), f"Manifest missing: {manifest_path}"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    outputs = manifest.get("output_files_sha256", {})
+    assert len(outputs) > 0, f"{manifest_path.name} has empty output_files_sha256"
+
+    stage_dir = stage_name  # e.g. "stage122"
+    for fname, expected_sha in outputs.items():
+        file_rel = f"project/{stage_dir}/{fname}"
+        file_path = REPO_ROOT / file_rel
+
+        # Skip non-frozen (regenerable) files.
+        if file_rel in NON_FROZEN_TRACKED:
+            continue
+
+        # Skip gitignored files (regenerable, not hash-verified).
+        ignore_check = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "check-ignore", "-q", "--", file_rel],
+            capture_output=True,
+        )
+        if ignore_check.returncode == 0:
+            continue
+
+        assert file_path.is_file(), f"Missing frozen asset: {file_rel}"
+        actual = hashlib.sha256(file_path.read_bytes()).hexdigest()
+        assert actual == expected_sha, (
+            f"SHA-256 mismatch for {file_rel}: "
+            f"expected {expected_sha}, got {actual}"
+        )

@@ -39,8 +39,10 @@ These are stable project decisions. Change them only deliberately (and note it i
 
 - `listing_master_verified_stage124.csv` **exists** and contains exactly **130
   unique tickers**. It is the canonical source for first-trading-date information.
-- The date column is `first_observed_trading_date_from_official_tse_api` with
-  status `verified_tse_api_first_observed_trade`. These dates are **first observed
+- The date columns are `first_public_trading_date_jalali` and
+  `first_public_trading_date_gregorian`, with
+  `date_semantics=first_observed_trading_date_from_official_tse_api` and status
+  `verified_tse_api_first_observed_trade`. These dates are **first observed
   trading dates** from the official TSETMC API — they are **not** necessarily IPO,
   admission, or listing dates.
 - The Human-in-the-Loop (HIL) dashboard and manual intake runner have been

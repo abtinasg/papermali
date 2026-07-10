@@ -1,7 +1,8 @@
 ---
 roadmap_version: 1
-active_research_workstream_id: stage124-batch02-part03
-last_completed_research_action_id: stage124-batch02-part03-1b-1
+active_research_workstream_id: stage124-gate-b-readiness
+qc_scope: stage124-batch02-part03
+last_completed_research_action_id: stage124-official-api-finalize
 next_research_action_id: stage124-gate-b-readiness
 active_maintenance_task_id: repository-driven-ai-handoff
 ---
@@ -26,8 +27,9 @@ must also appear in the body below. The validator checks that:
 3. `stage124-batch02-part03-1a-5-2` — cross-record evidence aggregation, deterministic canonical
 4. `stage124-batch02-part03-1a-5-3` — unified decision engine, full research↔provenance QC
 5. `stage124-batch02-part03-1b-0` — Research-Intake Readiness, baseline unlock, auditable intake scaffold ✅
-6. `stage124-batch02-part03-1b-1` — manual source discovery, snapshot capture, and reviewed-evidence intake for the 10 Part 3 tickers ✅ **superseded** — cancelled by official TSE API; the verified master (`listing_master_verified_stage124.csv`) now contains 130 tickers with `first_observed_trading_date_from_official_tse_api`
-7. `stage124-gate-b-readiness` — Gate B readiness / eligibility rebuild planning ⬅️ **next**
+6. `stage124-batch02-part03-1b-1` — manual source discovery, snapshot capture, and reviewed-evidence intake for the 10 Part 3 tickers — **superseded / cancelled by official TSE API** (not completed)
+7. `stage124-official-api-finalize` — Finalized verified master for 130 tickers using official TSETMC first-observed-trade dates; merged through PR #15, merge commit 22c2d0c ✅
+8. `stage124-gate-b-readiness` — Gate B readiness / eligibility rebuild planning ⬅️ **next**
 
 ## Maintenance tasks
 
@@ -36,9 +38,14 @@ must also appear in the body below. The validator checks that:
 ## Notes on ordering
 
 `*-1b-0` prepared and hardened the intake path without adding research findings.
-`*-1b-1` was superseded: the canonical listing dates for all 130 tickers were
-obtained from the official TSETMC API (`first_observed_trading_date_from_official_tse_api`),
-making the manual Human-in-the-Loop research path obsolete. The HIL dashboard and
-manual intake runner have been retired.
+`*-1b-1` was superseded / cancelled by official TSE API (not completed): the
+canonical listing dates for all 130 tickers were obtained from the official
+TSETMC API. The verified master (`listing_master_verified_stage124.csv`) stores
+dates in `first_public_trading_date_jalali` and `first_public_trading_date_gregorian`
+with `date_semantics=first_observed_trading_date_from_official_tse_api`, making the
+manual Human-in-the-Loop research path obsolete. The HIL dashboard and manual
+intake runner have been retired.
+`stage124-official-api-finalize` completed the verified master for 130 tickers and
+was merged through PR #15 (merge commit 22c2d0c).
 `stage124-gate-b-readiness` is planning only — Gate B execution and modeling remain
 out of scope in the current PR.
