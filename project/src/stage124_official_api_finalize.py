@@ -112,6 +112,36 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+_TIMESTAMP_KEYS = frozenset({"finalized_at_utc", "generated_at_utc"})
+
+
+def _without_timestamp_fields(payload: dict) -> dict:
+    return {k: v for k, v in payload.items() if k not in _TIMESTAMP_KEYS}
+
+
+def _reuse_stable_timestamps(path: Path, payload: dict) -> dict:
+    if not path.is_file():
+        return payload
+    try:
+        existing = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return payload
+    if _without_timestamp_fields(existing) != _without_timestamp_fields(payload):
+        return payload
+    for key in _TIMESTAMP_KEYS:
+        if key in existing:
+            payload[key] = existing[key]
+    return payload
+
+
+def _write_json_if_changed(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    new_text = json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
+    if path.is_file() and path.read_text(encoding="utf-8") == new_text:
+        return
+    path.write_text(new_text, encoding="utf-8")
+
+
 def _s(value) -> str:
     return "" if value is None else str(value).strip()
 
@@ -452,10 +482,8 @@ def write_provenance_manifests(*, batches: list[dict], official_api_dir: Path = 
             **_extraction_script_provenance(),
         }
         manifest_path = PROVENANCE_MANIFESTS_DIR / f"{Path(batch['path']).stem}_provenance_manifest.json"
-        manifest_path.write_text(
-            json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
+        payload = _reuse_stable_timestamps(manifest_path, payload)
+        _write_json_if_changed(manifest_path, payload)
         manifests.append({"path": str(manifest_path.relative_to(ROOT)), "sha256": _file_sha256(manifest_path)})
     return manifests
 
@@ -503,11 +531,8 @@ def write_manifest(
         ],
         **_extraction_script_provenance(),
     }
-    manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_text(
-        json.dumps(manifest, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    manifest = _reuse_stable_timestamps(manifest_path, manifest)
+    _write_json_if_changed(manifest_path, manifest)
     return manifest
 
 
@@ -549,10 +574,8 @@ def write_metadata(*, manifest: dict, metadata_path: Path = METADATA) -> dict:
         "allowed_verification_statuses": manifest["allowed_verification_statuses"],
         "files": files,
     }
-    metadata_path.write_text(
-        json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    payload = _reuse_stable_timestamps(metadata_path, payload)
+    _write_json_if_changed(metadata_path, payload)
     return payload
 
 
