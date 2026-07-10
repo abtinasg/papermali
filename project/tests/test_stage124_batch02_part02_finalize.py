@@ -28,6 +28,20 @@ def _patch_network(monkeypatch):
     monkeypatch.setattr(requests, "get", _fail_network)
     monkeypatch.setattr(requests.sessions.Session, "request", _fail_network)
 
+
+@pytest.fixture(autouse=True)
+def _guard_verified_master_path(tmp_path, monkeypatch):
+    """Finalizer QC guardrails must not depend on whether the repo verified master exists."""
+    forbidden = tmp_path / "listing_master_verified_stage124.csv"
+    monkeypatch.setattr(
+        "project.src.stage124_batch02_part02.FULL_VERIFIED_FORBIDDEN",
+        forbidden,
+    )
+    monkeypatch.setattr(
+        "project.src.stage124_batch02_part02_finalize.FULL_VERIFIED_FORBIDDEN",
+        forbidden,
+    )
+
     try:
         from project.src.stage124_batch02_v2 import tsetmc_probe_ticker
         monkeypatch.setattr("project.src.stage124_batch02_v2.tsetmc_probe_ticker", _fail_network)

@@ -1,0 +1,59 @@
+{
+  "allowed_verification_statuses": [
+    "verified_tse_api_first_observed_trade"
+  ],
+  "date_semantics": "first_observed_trading_date_from_official_tse_api",
+  "files": [
+    {
+      "file_role": "bulk_first_trade_export",
+      "relative_path": "stage124/official_api/tse_first_trade_dates_batch01_bulk.csv",
+      "sha256": "bf1dafaa91f5a3dc840fa891306d4f58cdfd753a36a58190740d0257cc09ea6c"
+    },
+    {
+      "file_role": "ambiguous_resolved_export",
+      "relative_path": "stage124/official_api/tse_first_trade_dates_batch02_ambiguous_resolved.csv",
+      "sha256": "594c797ec6151064d0fba2207c48605b9e3fc8bf8c576825235417f50af41927"
+    },
+    {
+      "file_role": "final_pair_export",
+      "relative_path": "stage124/official_api/tse_first_trade_dates_batch03_final_pair.csv",
+      "sha256": "dfdcd8dfbce926f8f5fa9c4e31c2a7e4142f2f140387a234218ba94864da0d8f"
+    },
+    {
+      "file_role": "provenance_manifest",
+      "relative_path": "stage124/official_api/provenance_manifests/tse_first_trade_dates_batch01_bulk_provenance_manifest.json",
+      "sha256": "7c0fd66c769a2048bccfe275ccbf5e8259ada21e56af932cd3c69c9883a17409"
+    },
+    {
+      "file_role": "provenance_manifest",
+      "relative_path": "stage124/official_api/provenance_manifests/tse_first_trade_dates_batch02_ambiguous_resolved_provenance_manifest.json",
+      "sha256": "aa7f4d2681d6eb0e148688663fe8cf9a4e956d5af4f1fae3c4492b56be51d9c6"
+    },
+    {
+      "file_role": "provenance_manifest",
+      "relative_path": "stage124/official_api/provenance_manifests/tse_first_trade_dates_batch03_final_pair_provenance_manifest.json",
+      "sha256": "ac61283c1a84d242f2e57d08f979aca9843a44f660e7cf9c16e5ff278897809f"
+    },
+    {
+      "file_role": "verified_listing_master",
+      "relative_path": "stage124/listing_master_verified_stage124.csv",
+      "sha256": "968cf0cc4613aadd738d14e3cd3058e25920256c891b431d9e99776de3479fd7"
+    },
+    {
+      "file_role": "template_schema",
+      "relative_path": "stage124/listing_master_template_stage124.csv",
+      "sha256": "f8e9a1f905e3b8c9ada13ba2008731c401943539e2a0c1d5b42745899c00c7e3"
+    },
+    {
+      "file_role": "first_trade_conflict_audit",
+      "relative_path": "stage124/official_api/tse_first_trade_conflict_audit.csv",
+      "sha256": "84b0776d37c92e59a2f7335d9bf72e6460ffb91c09890408d7700b59607e7588"
+    },
+    {
+      "file_role": "import_manifest",
+      "relative_path": "stage124/official_api/import_manifest.json",
+      "sha256": "9ff7bd939b1e28844d897412db6c2671db3e6857b83dce9261c3de44b4871e06"
+    }
+  ],
+  "generated_at_utc": "2026-07-10T12:16:43Z"
+}

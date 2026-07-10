@@ -1,0 +1,102 @@
+{
+  "allowed_verification_statuses": [
+    "verified_tse_api_first_observed_trade"
+  ],
+  "api_provider": "Tehran Stock Exchange Market Data (TSETMC CDN API)",
+  "api_response_semantics": "Earliest observed closing-price record date (dEven) for the resolved insCode; used as first observed trading date, not official IPO/admission/listing date.",
+  "build_stats": {
+    "api_ticker_count": 130,
+    "row_count": 130,
+    "template_ticker_count": 130,
+    "verified_tse_api_first_observed_trade": 130
+  },
+  "conflict_audit_path": "stage124/official_api/tse_first_trade_conflict_audit.csv",
+  "conflict_row_count": 14,
+  "date_semantics": "first_observed_trading_date_from_official_tse_api",
+  "exact_endpoint_url": "https://cdn.tsetmc.com/api/ClosingPrice/GetClosingPriceDailyList/{ins_code}/0",
+  "extraction_script_description": "project-owner batch exporter: earliest non-zero trade day per insCode from ClosingPriceDailyList",
+  "extraction_script_not_archived": true,
+  "finalized_at_utc": "2026-07-10T12:16:43Z",
+  "generated_at_utc": "2026-07-10T12:16:43Z",
+  "notes": [
+    "All inputs are read only from stage124/official_api/.",
+    "First-trade dates are written only to first_public_trading_date_* columns.",
+    "ipo_date_jalali is populated only when the API row explicitly denotes an IPO event.",
+    "conflict_status is not auto-resolved; see tse_first_trade_conflict_audit.csv.",
+    "Batch CSV files are normalized exports; raw API JSON responses were not archived."
+  ],
+  "official_api_dir": "stage124/official_api",
+  "provenance_manifests": [
+    {
+      "path": "stage124/official_api/provenance_manifests/tse_first_trade_dates_batch01_bulk_provenance_manifest.json",
+      "sha256": "7c0fd66c769a2048bccfe275ccbf5e8259ada21e56af932cd3c69c9883a17409"
+    },
+    {
+      "path": "stage124/official_api/provenance_manifests/tse_first_trade_dates_batch02_ambiguous_resolved_provenance_manifest.json",
+      "sha256": "aa7f4d2681d6eb0e148688663fe8cf9a4e956d5af4f1fae3c4492b56be51d9c6"
+    },
+    {
+      "path": "stage124/official_api/provenance_manifests/tse_first_trade_dates_batch03_final_pair_provenance_manifest.json",
+      "sha256": "ac61283c1a84d242f2e57d08f979aca9843a44f660e7cf9c16e5ff278897809f"
+    }
+  ],
+  "raw_batches": [
+    {
+      "columns": [
+        "symbol",
+        "insCode",
+        "first_trade_date_gregorian",
+        "first_trade_date_jalali",
+        "status",
+        "note"
+      ],
+      "description": "Primary bulk export (ambiguous rows skipped).",
+      "path": "stage124/official_api/tse_first_trade_dates_batch01_bulk.csv",
+      "repo_name": "tse_first_trade_dates_batch01_bulk.csv",
+      "role": "bulk_first_trade_export",
+      "row_count": 128,
+      "sha256": "bf1dafaa91f5a3dc840fa891306d4f58cdfd753a36a58190740d0257cc09ea6c"
+    },
+    {
+      "columns": [
+        "symbol",
+        "insCode",
+        "first_trade_date_gregorian",
+        "first_trade_date_jalali",
+        "status",
+        "note"
+      ],
+      "description": "Resolved ambiguous / pending tickers from the bulk export.",
+      "path": "stage124/official_api/tse_first_trade_dates_batch02_ambiguous_resolved.csv",
+      "repo_name": "tse_first_trade_dates_batch02_ambiguous_resolved.csv",
+      "role": "ambiguous_resolved_export",
+      "row_count": 9,
+      "sha256": "594c797ec6151064d0fba2207c48605b9e3fc8bf8c576825235417f50af41927"
+    },
+    {
+      "columns": [
+        "symbol",
+        "insCode",
+        "first_trade_date_gregorian",
+        "first_trade_date_jalali",
+        "status",
+        "note"
+      ],
+      "description": "Final two tickers (اروند, وکغدیر) supplied after bulk import.",
+      "path": "stage124/official_api/tse_first_trade_dates_batch03_final_pair.csv",
+      "repo_name": "tse_first_trade_dates_batch03_final_pair.csv",
+      "role": "final_pair_export",
+      "row_count": 2,
+      "sha256": "dfdcd8dfbce926f8f5fa9c4e31c2a7e4142f2f140387a234218ba94864da0d8f"
+    }
+  ],
+  "request_parameters": {
+    "history_offset": "0",
+    "ins_code": "per-row insCode in committed batch CSV files"
+  },
+  "retrieved_at_utc": null,
+  "stage": "stage124_official_api_finalize",
+  "template_path": "stage124/listing_master_template_stage124.csv",
+  "verified_master_path": "stage124/listing_master_verified_stage124.csv",
+  "verified_master_sha256": "968cf0cc4613aadd738d14e3cd3058e25920256c891b431d9e99776de3479fd7"
+}

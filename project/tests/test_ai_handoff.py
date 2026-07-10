@@ -76,7 +76,7 @@ def test_markers_are_off():
     state = _state(REAL_ROOT)
     assert state["modeling_started"] is False
     assert state["gate_b_started"] is False
-    assert state["verified_master_created"] is False
+    assert state["verified_master_created"] is True
 
 
 def test_frozen_stages_present():

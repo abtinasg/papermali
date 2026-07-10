@@ -7,6 +7,17 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+
+@pytest.fixture(autouse=True)
+def _guard_verified_master_path(tmp_path, monkeypatch):
+    """Gate-A guardrails must not depend on whether the repo verified master exists."""
+    forbidden = tmp_path / "listing_master_verified_stage124.csv"
+    monkeypatch.setattr(
+        "project.src.stage124_batch02_part02.FULL_VERIFIED_FORBIDDEN",
+        forbidden,
+    )
+
+
 from project.src.stage124_batch02_part02 import (
     PART02_TICKERS,
     RESEARCH_DATA,

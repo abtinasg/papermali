@@ -15,6 +15,17 @@ from urllib.parse import urlparse
 import pandas as pd
 import pytest
 
+
+@pytest.fixture(autouse=True)
+def _guard_verified_master_path(tmp_path, monkeypatch):
+    """Part 3 QC guardrails must not depend on whether the repo verified master exists."""
+    forbidden = tmp_path / "listing_master_verified_stage124.csv"
+    monkeypatch.setattr(
+        "project.src.stage124_batch02_part03.FULL_VERIFIED_FORBIDDEN",
+        forbidden,
+    )
+
+
 from project.src.stage124_batch02_part03 import (
     PART03_TICKERS,
     PART03_DIR,
