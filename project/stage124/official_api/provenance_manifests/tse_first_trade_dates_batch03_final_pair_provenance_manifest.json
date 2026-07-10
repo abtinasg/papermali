@@ -1,0 +1,17 @@
+{
+  "api_provider": "Tehran Stock Exchange Market Data (TSETMC CDN API)",
+  "api_response_semantics": "Earliest observed closing-price record date (dEven) for the resolved insCode; used as first observed trading date, not official IPO/admission/listing date.",
+  "batch_file": "stage124/official_api/tse_first_trade_dates_batch03_final_pair.csv",
+  "date_semantics": "first_observed_trading_date_from_official_tse_api",
+  "exact_endpoint_url": "https://cdn.tsetmc.com/api/ClosingPrice/GetClosingPriceDailyList/{ins_code}/0",
+  "extraction_script_description": "project-owner batch exporter: earliest non-zero trade day per insCode from ClosingPriceDailyList",
+  "extraction_script_not_archived": true,
+  "finalized_at_utc": "2026-07-10T12:16:43Z",
+  "normalized_batch_csv_sha256": "dfdcd8dfbce926f8f5fa9c4e31c2a7e4142f2f140387a234218ba94864da0d8f",
+  "note": "Committed batch CSV is the normalized extraction output. Raw API JSON responses were not archived in this repository.",
+  "request_parameters": {
+    "history_offset": "0",
+    "ins_code": "per-row insCode column in batch CSV"
+  },
+  "retrieved_at_utc": null
+}

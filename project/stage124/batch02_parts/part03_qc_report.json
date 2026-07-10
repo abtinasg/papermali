@@ -1,9 +1,9 @@
 {
   "stage": "stage124_batch02_part03",
-  "generated_at": "2026-06-28T13:25:28Z",
-  "source_commit": "2cbbf8b3e6273fc75631f23cdfd1fc4f2d844bec",
+  "generated_at": "2026-07-10T12:22:43Z",
+  "source_commit": "c5a62b5320d543974e9be03f5c893810ad5cc84c",
   "source_file_sha256": "93fc55b9655c9fbe34a04cca3c49a8721800eb3f5f73853338a685fcc4c419de",
-  "test_file_sha256": "69474f04e4c5177cbdfe2bbcb399b6c689176c9cf14128c4ec1fdbb6918f5969",
+  "test_file_sha256": "03eb2accb2797a8c909cc3ab4c0390c0ecb76f249980e273130c2a4e0685ddaa",
   "ticker_count": 10,
   "tickers": [
     "خمهر",
@@ -2209,7 +2209,7 @@
     {
       "assertion": "part02_unchanged_part02_hash_manifest.csv",
       "passed": true,
-      "detail": "before=4eeaf5c8b494, after=4eeaf5c8b494"
+      "detail": "before=9ef40c70aaa6, after=9ef40c70aaa6"
     },
     {
       "assertion": "part02_unchanged_part02_metadata_and_hashes.json",

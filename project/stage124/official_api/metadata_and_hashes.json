@@ -20,19 +20,19 @@
       "sha256": "dfdcd8dfbce926f8f5fa9c4e31c2a7e4142f2f140387a234218ba94864da0d8f"
     },
     {
-      "file_role": "raw_response_manifest",
-      "relative_path": "stage124/official_api/raw/tse_first_trade_dates_batch01_bulk_response_manifest.json",
-      "sha256": "c0fc81386d6704622ce7b0fed4b7fd9b7695f7db97284f37727669dfb8c9d85c"
+      "file_role": "provenance_manifest",
+      "relative_path": "stage124/official_api/provenance_manifests/tse_first_trade_dates_batch01_bulk_provenance_manifest.json",
+      "sha256": "7c0fd66c769a2048bccfe275ccbf5e8259ada21e56af932cd3c69c9883a17409"
     },
     {
-      "file_role": "raw_response_manifest",
-      "relative_path": "stage124/official_api/raw/tse_first_trade_dates_batch02_ambiguous_resolved_response_manifest.json",
-      "sha256": "6b4363276e2bdac494b87e2fd31b9aa473ecfae27457baf010cc46e6c1ba9fd5"
+      "file_role": "provenance_manifest",
+      "relative_path": "stage124/official_api/provenance_manifests/tse_first_trade_dates_batch02_ambiguous_resolved_provenance_manifest.json",
+      "sha256": "aa7f4d2681d6eb0e148688663fe8cf9a4e956d5af4f1fae3c4492b56be51d9c6"
     },
     {
-      "file_role": "raw_response_manifest",
-      "relative_path": "stage124/official_api/raw/tse_first_trade_dates_batch03_final_pair_response_manifest.json",
-      "sha256": "273c4dcdeaac199624cf4c48f748b1c43f01e6f033d3bc3d52856c8235e54e58"
+      "file_role": "provenance_manifest",
+      "relative_path": "stage124/official_api/provenance_manifests/tse_first_trade_dates_batch03_final_pair_provenance_manifest.json",
+      "sha256": "ac61283c1a84d242f2e57d08f979aca9843a44f660e7cf9c16e5ff278897809f"
     },
     {
       "file_role": "verified_listing_master",
@@ -52,8 +52,8 @@
     {
       "file_role": "import_manifest",
       "relative_path": "stage124/official_api/import_manifest.json",
-      "sha256": "723790b1b0cfa64e22be444c8aa1c3ebdc272b2500de926d5f0c3313ab8c554b"
+      "sha256": "9ff7bd939b1e28844d897412db6c2671db3e6857b83dce9261c3de44b4871e06"
     }
   ],
-  "generated_at_utc": "2026-07-10T11:48:17Z"
+  "generated_at_utc": "2026-07-10T12:16:43Z"
 }

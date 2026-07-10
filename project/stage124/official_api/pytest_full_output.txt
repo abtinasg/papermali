@@ -1,13 +1,41 @@
-.........s.............................................................. [ 10%]
+F.......Fs.............................................................. [ 10%]
 ........................................................................ [ 20%]
 ........................................................................ [ 30%]
-........................................................................ [ 41%]
+........................................................................ [ 40%]
 ........................................................................ [ 51%]
 ........................................................................ [ 61%]
 ........................................................................ [ 71%]
-........................................................................ [ 82%]
+........................................................................ [ 81%]
 ........................................................................ [ 92%]
-.....................................................                    [100%]
+........................................................                 [100%]
+=================================== FAILURES ===================================
+___________________________ test_real_repo_validates ___________________________
+
+    def test_real_repo_validates():
+>       assert val.run_check(REAL_ROOT) == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = <function run_check at 0x106e75ee0>('/Users/aliehpourdast/Desktop/papermali/papermali')
+E        +    where <function run_check at 0x106e75ee0> = val.run_check
+
+project/tests/test_ai_handoff.py:55: AssertionError
+----------------------------- Captured stderr call -----------------------------
+Handoff validation FAILED:
+  - non-Handoff commit c5a62b53 between generated_from_commit and HEAD — regenerate the Handoff Package
+  - non-Handoff commit 93c26c07 between generated_from_commit and HEAD — regenerate the Handoff Package
+  - semantic drift: qc_source_commit stored='2cbbf8b3e6273fc75631f23cdfd1fc4f2d844bec' != repo='c5a62b5320d543974e9be03f5c893810ad5cc84c'
+  - semantic drift: state_fingerprint stored='20c2ee775109b4b7fdd085dafc9a048ef027f12ff5adea7b05d646ada1c207d8' != repo='621eac2fd15b218c3fcf2dc804de6c3e35ce64f7b30f05945d74c5537323769e'
+_________________________ test_generator_is_idempotent _________________________
+
+    def test_generator_is_idempotent():
+        outputs = gen.generate(REAL_ROOT)
+        fresh = json.loads(outputs["project/docs/ai/handoff_state.json"])
+>       assert fresh["state_fingerprint"] == _state(REAL_ROOT)["state_fingerprint"]
+E       AssertionError: assert '621eac2fd15b...4c5537323769e' == '20c2ee775109...646ada1c207d8'
+E         
+E         - 20c2ee775109b4b7fdd085dafc9a048ef027f12ff5adea7b05d646ada1c207d8
+E         + 621eac2fd15b218c3fcf2dc804de6c3e35ce64f7b30f05945d74c5537323769e
+
+project/tests/test_ai_handoff.py:108: AssertionError
 =============================== warnings summary ===============================
 project/tests/test_stage123.py::test_no_duplicate_pairs
   /Users/aliehpourdast/anaconda3/lib/python3.13/site-packages/shap/plots/colors/_colors.py:47: PendingDeprecationWarning: The set_bad function will be deprecated in a future version. Use cmap.with_extremes(bad=...) or Colormap(bad=...) instead.
@@ -22,4 +50,7 @@ project/tests/test_stage123.py::test_no_duplicate_pairs
     red_blue.set_under(gray_rgb.tolist(), 1.0)  # "under" is incorrectly used instead of "bad" in the scatter plot
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-700 passed, 1 skipped, 3 warnings in 69.88s (0:01:09)
+=========================== short test summary info ============================
+FAILED project/tests/test_ai_handoff.py::test_real_repo_validates - Assertion...
+FAILED project/tests/test_ai_handoff.py::test_generator_is_idempotent - Asser...
+2 failed, 701 passed, 1 skipped, 3 warnings in 53.20s
