@@ -7,8 +7,6 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from src import utils, stage124_pilot15 as s124p  # noqa: E402
-from src import stage124_part03_csv_import as part03_csv  # noqa: E402
-from src.stage124_batch02_part03 import PART03_TICKERS  # noqa: E402
 
 
 def input_df():
@@ -58,13 +56,8 @@ def test_only_15_rows_leave_pending_if_present():
     if not s124p.PARTIAL_MASTER.exists():
         return
     df = pd.read_csv(s124p.PARTIAL_MASTER, dtype=str, keep_default_na=False)
-    imported = (df["verification_status"] == part03_csv.VERIFICATION_STATUS).sum()
-    user_confirmed = (df["verification_status"] == s124p.VERIFICATION_STATUS).sum()
-    assert user_confirmed in {0, 2, 3, 5, 15}
-    assert imported in {0, 9, 10, 119, 127, 128, 130}
-    assert (
-        df["verification_status"] == "pending"
-    ).sum() == 130 - imported - user_confirmed
+    assert (df["verification_status"] == s124p.VERIFICATION_STATUS).sum() == 15
+    assert (df["verification_status"] == "pending").sum() == 115
 
 
 def test_nonpilot_rows_match_template_if_present():
@@ -72,13 +65,7 @@ def test_nonpilot_rows_match_template_if_present():
         return
     tmpl = pd.read_csv(s124p.TEMPLATE, dtype=str, keep_default_na=False).set_index("ticker")
     part = pd.read_csv(s124p.PARTIAL_MASTER, dtype=str, keep_default_na=False).set_index("ticker")
-    imported = set(
-        part.loc[
-            part["verification_status"] == part03_csv.VERIFICATION_STATUS, :
-        ].index
-    )
-    allowed_mutations = set(PART03_TICKERS) | imported
-    for tk in set(tmpl.index) - s124p.PILOT_TICKERS - allowed_mutations:
+    for tk in set(tmpl.index) - s124p.PILOT_TICKERS:
         assert tmpl.loc[tk].equals(part.loc[tk])
 
 
@@ -133,13 +120,8 @@ def test_no_target_or_financial_changes_if_present():
         assert assertions["financial_values_unchanged"]
 
 
-def test_listing_master_verified_created_and_complete():
-    assert s124p.FULL_VERIFIED_FORBIDDEN.exists()
-    df = pd.read_csv(s124p.FULL_VERIFIED_FORBIDDEN, dtype=str, keep_default_na=False)
-    tmpl = pd.read_csv(s124p.TEMPLATE, dtype=str, keep_default_na=False)
-    assert list(df.columns) == list(tmpl.columns)
-    assert len(df) == 130
-    assert (df["first_public_trading_date_jalali"].str.len() > 0).all()
+def test_no_listing_master_verified_created():
+    assert not s124p.FULL_VERIFIED_FORBIDDEN.exists()
 
 
 def test_outputs_have_hashes_and_provenance_if_metadata_present():

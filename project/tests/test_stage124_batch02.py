@@ -282,13 +282,13 @@ def test_user_review_decision_columns_blank():
 
 
 # ---- guardrails: nothing forbidden created / changed --------------------------
-def test_full_verified_master_exists():
-    assert (STAGE124 / "listing_master_verified_stage124.csv").exists()
+def test_full_verified_master_not_created():
+    assert not (STAGE124 / "listing_master_verified_stage124.csv").exists()
 
 
-def test_partial_master_all_verified_via_csv_import():
+def test_no_new_partial_master_with_more_verified():
     pm = _read(m.PARTIAL_MASTER)
-    assert int((pm["verification_status"] == "verified_tse_csv_imported").sum()) == 130
+    assert int((pm["verification_status"] == "verified_user_confirmed").sum()) == 15
 
 
 def test_stage122_stage123_unchanged():

@@ -12,6 +12,7 @@ import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import quote
 
 import pandas as pd
 
@@ -24,40 +25,59 @@ from .stage124_batch02_v2 import (
     read_csv,
     sha,
 )
-from .stage124_part03_csv_import import (
-    CONFLICT_STATUS,
-    DEFAULT_FIRST_TRADE_SOURCE_TITLE,
-    DEFAULT_SOURCE_TYPE,
-    MASTER_NOTE,
-    VERIFICATION_STATUS,
-)
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = OUT / "listing_master_template_stage124.csv"
 VERIFIED_MASTER = OUT / "listing_master_verified_stage124.csv"
 OFFICIAL_API_DIR = OUT / "official_api"
+RAW_DIR = OFFICIAL_API_DIR / "raw"
 MANIFEST = OFFICIAL_API_DIR / "import_manifest.json"
 METADATA = OFFICIAL_API_DIR / "metadata_and_hashes.json"
+CONFLICT_AUDIT = OFFICIAL_API_DIR / "tse_first_trade_conflict_audit.csv"
+PILOT15_CONFIRMED = OUT / "listing_pilot15_user_confirmed_stage124.csv"
+PART02_PROVENANCE = OUT / "batch02_parts/part02_source_provenance_10tickers.csv"
+
+VERIFICATION_STATUS = "verified_tse_api_first_observed_trade"
+DATE_SEMANTICS = "first_observed_trading_date_from_official_tse_api"
+CONFLICT_UNRESOLVED = "unresolved_api_vs_prior_research"
+SOURCE_TYPE = "official_tse_api"
+SOURCE_TITLE = "TSETMC ClosingPriceDailyList (first observed trade)"
+TSE_DOCUMENTATION_URL = "https://www.tse.ir/"
+API_PROVIDER = "Tehran Stock Exchange Market Data (TSETMC CDN API)"
+API_ENDPOINT_TEMPLATE = (
+    "https://cdn.tsetmc.com/api/ClosingPrice/GetClosingPriceDailyList/{ins_code}/0"
+)
+EXTRACTION_SCRIPT = (
+    "project-owner batch exporter: earliest non-zero trade day per insCode from "
+    "ClosingPriceDailyList"
+)
+API_RESPONSE_SEMANTICS = (
+    "Earliest observed closing-price record date (dEven) for the resolved insCode; "
+    "used as first observed trading date, not official IPO/admission/listing date."
+)
+MASTER_NOTE = (
+    "Official TSE API first observed trading date imported for Stage124 verified "
+    "master. This date is not necessarily IPO, admission, or listing."
+)
 
 TEMPLATE_COLUMNS = list(read_csv(TEMPLATE).columns)
 ALLOWED_VERIFICATION_STATUSES = {VERIFICATION_STATUS}
 JALALI_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-IPO_NOTE_MARKERS = (
-    "official ipo",
-    "initial public offering",
-    "عرضه اولیه",
-)
-IPO_NEGATIVE_MARKERS = (
-    "not official ipo",
-    "not official ipo/listing",
-    "first observed trading date",
-)
+CONFLICT_AUDIT_COLUMNS = [
+    "ticker",
+    "previous_date",
+    "api_observed_date",
+    "previous_event_type",
+    "api_event_type",
+    "disposition",
+    "resolution_basis",
+]
 
 RAW_BATCH_SPECS = [
     {
         "repo_name": "tse_first_trade_dates_batch01_bulk.csv",
         "role": "bulk_first_trade_export",
-        "description": "Primary bulk export (119 importable rows; ambiguous rows skipped).",
+        "description": "Primary bulk export (ambiguous rows skipped).",
     },
     {
         "repo_name": "tse_first_trade_dates_batch02_ambiguous_resolved.csv",
@@ -70,6 +90,17 @@ RAW_BATCH_SPECS = [
         "description": "Final two tickers (اروند, وکغدیر) supplied after bulk import.",
     },
 ]
+
+IPO_NOTE_MARKERS = (
+    "official ipo",
+    "initial public offering",
+    "عرضه اولیه",
+)
+IPO_NEGATIVE_MARKERS = (
+    "not official ipo",
+    "not official ipo/listing",
+    "first observed trading date",
+)
 
 
 class FinalizeError(RuntimeError):
@@ -92,6 +123,20 @@ def _read_api_csv(path: Path) -> pd.DataFrame:
     return pd.read_csv(path, dtype=str, keep_default_na=False, encoding="utf-8-sig")
 
 
+def _source_url_for_ins_code(ins_code: str) -> str:
+    ins_code = _s(ins_code)
+    if not ins_code:
+        return TSE_DOCUMENTATION_URL
+    return API_ENDPOINT_TEMPLATE.format(ins_code=quote(ins_code, safe=""))
+
+
+def _is_explicit_ipo_event(note: str, status: str = "") -> bool:
+    haystack = f"{note} {status}".casefold()
+    if any(marker in haystack for marker in IPO_NEGATIVE_MARKERS):
+        return False
+    return any(marker in haystack for marker in IPO_NOTE_MARKERS)
+
+
 def load_official_api_batches(*, official_api_dir: Path = OFFICIAL_API_DIR) -> tuple[list[dict], pd.DataFrame]:
     if not official_api_dir.is_dir():
         raise FinalizeError(f"official API directory not found: {official_api_dir}")
@@ -109,7 +154,7 @@ def load_official_api_batches(*, official_api_dir: Path = OFFICIAL_API_DIR) -> t
                 "path": (
                     str(path.relative_to(ROOT))
                     if path.is_relative_to(ROOT)
-                    else f"{official_api_dir.name}/{spec['repo_name']}"
+                    else spec["repo_name"]
                 ),
                 "sha256": _file_sha256(path),
                 "row_count": len(raw),
@@ -125,13 +170,6 @@ def load_official_api_batches(*, official_api_dir: Path = OFFICIAL_API_DIR) -> t
         dupes = sorted(ok.loc[ok["ticker"].duplicated(), "ticker"].unique())
         raise FinalizeError(f"duplicate tickers across official API batches: {dupes}")
     return batches, ok
-
-
-def _is_explicit_ipo_event(note: str, status: str = "") -> bool:
-    haystack = f"{note} {status}".casefold()
-    if any(marker in haystack for marker in IPO_NEGATIVE_MARKERS):
-        return False
-    return any(marker in haystack for marker in IPO_NOTE_MARKERS)
 
 
 def _normalize_api_row(row: pd.Series) -> dict:
@@ -161,7 +199,107 @@ def _normalize_api_row(row: pd.Series) -> dict:
         "ipo_date_jalali": date_j if _is_explicit_ipo_event(note) else "",
         "notes": MASTER_NOTE if not note else f"{MASTER_NOTE} {note}",
         "ins_code": _s(row.get("insCode", "")),
+        "source_url": _source_url_for_ins_code(_s(row.get("insCode", ""))),
     }
+
+
+def _load_previous_research_dates() -> dict[str, list[dict]]:
+    out: dict[str, list[dict]] = {}
+
+    if PILOT15_CONFIRMED.is_file():
+        pilot = read_csv(PILOT15_CONFIRMED)
+        for _, row in pilot.iterrows():
+            ticker = normalize_ticker(_s(row["ticker"]))
+            date_j = normalize_jalali(_s(row["confirmed_public_entry_date_jalali"]))
+            if not date_j:
+                continue
+            out.setdefault(ticker, []).append(
+                {
+                    "date": date_j,
+                    "event_type": _s(row.get("canonical_event_type", "user_confirmed_public_entry")),
+                    "basis": "listing_pilot15_user_confirmed_stage124.csv",
+                }
+            )
+            tsetmc_raw = _s(row.get("tsetmc_candidate_date_jalali", ""))
+            if tsetmc_raw and tsetmc_raw.casefold() != "ambiguous":
+                try:
+                    tsetmc = normalize_jalali(tsetmc_raw)
+                except ValueError:
+                    tsetmc = ""
+                if tsetmc and tsetmc != date_j:
+                    out.setdefault(ticker, []).append(
+                        {
+                            "date": tsetmc,
+                            "event_type": "tsetmc_candidate_audit_only",
+                            "basis": "listing_pilot15_user_confirmed_stage124.csv (tsetmc_candidate_date_jalali)",
+                        }
+                    )
+
+    if PART02_PROVENANCE.is_file():
+        prov = read_csv(PART02_PROVENANCE)
+        for _, row in prov.iterrows():
+            ticker = normalize_ticker(_s(row["ticker"]))
+            pub_raw = _s(row.get("publication_date", ""))
+            if not pub_raw:
+                continue
+            try:
+                date_j = normalize_jalali(pub_raw)
+            except ValueError:
+                continue
+            out.setdefault(ticker, []).append(
+                {
+                    "date": date_j,
+                    "event_type": _s(row.get("source_type", "prior_manual_source")),
+                    "basis": f"part02_source_provenance: {_s(row.get('source_title', ''))}",
+                }
+            )
+
+    return out
+
+
+def build_conflict_audit(api_map: dict[str, dict]) -> pd.DataFrame:
+    previous = _load_previous_research_dates()
+    rows: list[dict] = []
+    seen: set[tuple[str, str, str]] = set()
+
+    for ticker, api in sorted(api_map.items()):
+        api_date = api["first_public_trading_date_jalali"]
+        for prior in previous.get(ticker, []):
+            prior_date = prior["date"]
+            if prior_date == api_date:
+                continue
+            key = (ticker, prior_date, api_date)
+            if key in seen:
+                continue
+            seen.add(key)
+            disposition = "unresolved_prior_research_differs_from_api_first_observed_trade"
+            resolution_basis = (
+                f"prior={prior_date} ({prior['event_type']}) from {prior['basis']}; "
+                f"api={api_date} ({DATE_SEMANTICS})"
+            )
+            if ticker == "حکشتی" and prior_date == "1387-02-28" and api_date == "1387-02-29":
+                disposition = "unresolved_one_day_gap_ipo_news_vs_api_first_observed_trade"
+                resolution_basis = (
+                    "Part02 manual research documented contemporaneous IPO/listing news on "
+                    "1387-02-28 (همشهری آنلاین) while the official TSE API first observed "
+                    "trade date is 1387-02-29; one-day gap retained for manual review."
+                )
+            rows.append(
+                {
+                    "ticker": ticker,
+                    "previous_date": prior_date,
+                    "api_observed_date": api_date,
+                    "previous_event_type": prior["event_type"],
+                    "api_event_type": DATE_SEMANTICS,
+                    "disposition": disposition,
+                    "resolution_basis": resolution_basis,
+                }
+            )
+
+    audit = pd.DataFrame(rows, columns=CONFLICT_AUDIT_COLUMNS)
+    CONFLICT_AUDIT.parent.mkdir(parents=True, exist_ok=True)
+    audit.to_csv(CONFLICT_AUDIT, index=False, encoding="utf-8-sig")
+    return audit
 
 
 def validate_template_coverage(template: pd.DataFrame, api_ok: pd.DataFrame) -> dict:
@@ -186,7 +324,7 @@ def validate_template_coverage(template: pd.DataFrame, api_ok: pd.DataFrame) -> 
 
     return {
         "row_count": len(template),
-        "verified_tse_csv_imported": len(template),
+        "verified_tse_api_first_observed_trade": len(template),
         "template_ticker_count": len(template_set),
         "api_ticker_count": len(api_tickers),
     }
@@ -195,19 +333,19 @@ def validate_template_coverage(template: pd.DataFrame, api_ok: pd.DataFrame) -> 
 def build_verified_master(
     *,
     template_path: Path = TEMPLATE,
-    official_api_dir: Path = OFFICIAL_API_DIR,
+    api_ok: pd.DataFrame,
+    conflict_audit: pd.DataFrame,
     verified_master_path: Path = VERIFIED_MASTER,
-    api_ok: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     template = read_csv(template_path)
-    if api_ok is None:
-        _, api_ok = load_official_api_batches(official_api_dir=official_api_dir)
     validate_template_coverage(template, api_ok)
 
     api_map = {
         item["ticker"]: item
         for item in (_normalize_api_row(row) for _, row in api_ok.iterrows())
     }
+    conflict_tickers = set(conflict_audit["ticker"].map(normalize_ticker)) if len(conflict_audit) else set()
+
     out = template[TEMPLATE_COLUMNS].copy()
     for idx, row in out.iterrows():
         ticker = normalize_ticker(_s(row["ticker"]))
@@ -217,14 +355,16 @@ def build_verified_master(
         out.at[idx, "ipo_date_jalali"] = src["ipo_date_jalali"]
         out.at[idx, "first_public_trading_date_jalali"] = src["first_public_trading_date_jalali"]
         out.at[idx, "first_public_trading_date_gregorian"] = src["first_public_trading_date_gregorian"]
-        out.at[idx, "source_1_type"] = DEFAULT_SOURCE_TYPE
-        out.at[idx, "source_1_title"] = DEFAULT_FIRST_TRADE_SOURCE_TITLE
-        out.at[idx, "source_1_url"] = ""
+        out.at[idx, "source_1_type"] = SOURCE_TYPE
+        out.at[idx, "source_1_title"] = SOURCE_TITLE
+        out.at[idx, "source_1_url"] = src["source_url"]
         out.at[idx, "source_2_type"] = ""
         out.at[idx, "source_2_title"] = ""
         out.at[idx, "source_2_url"] = ""
         out.at[idx, "verification_status"] = VERIFICATION_STATUS
-        out.at[idx, "conflict_status"] = CONFLICT_STATUS
+        out.at[idx, "conflict_status"] = (
+            CONFLICT_UNRESOLVED if ticker in conflict_tickers else ""
+        )
         out.at[idx, "notes"] = src["notes"]
 
     verified_master_path.parent.mkdir(parents=True, exist_ok=True)
@@ -262,34 +402,83 @@ def validate_verified_master(df: pd.DataFrame, template: pd.DataFrame) -> None:
             )
         if _s(row["listing_date_jalali"]):
             raise FinalizeError(f"listing_date_jalali must remain empty for {ticker}")
-        ipo = _s(row["ipo_date_jalali"])
-        if ipo and ipo != date_j:
-            raise FinalizeError(f"ipo_date_jalali must be empty unless explicit IPO for {ticker}")
+        if not _s(row["source_1_url"]):
+            raise FinalizeError(f"source_1_url must be populated for {ticker}")
+        conflict = _s(row["conflict_status"])
+        if conflict == "resolved_tse_csv_imported":
+            raise FinalizeError(f"conflict_status must not be auto-resolved for {ticker}")
+
+
+def write_raw_response_manifests(*, batches: list[dict], official_api_dir: Path = OFFICIAL_API_DIR) -> list[dict]:
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
+    manifests: list[dict] = []
+    retrieved_at = _utc_now()
+    for batch in batches:
+        path = official_api_dir / Path(batch["path"]).name
+        payload = {
+            "batch_file": batch["path"],
+            "response_content_sha256": batch["sha256"],
+            "api_provider": API_PROVIDER,
+            "exact_endpoint_url": API_ENDPOINT_TEMPLATE,
+            "request_parameters": {
+                "ins_code": "per-row insCode column in batch CSV",
+                "history_offset": "0",
+            },
+            "retrieved_at_utc": retrieved_at,
+            "extraction_script": EXTRACTION_SCRIPT,
+            "api_response_semantics": API_RESPONSE_SEMANTICS,
+            "date_semantics": DATE_SEMANTICS,
+            "note": (
+                "Committed batch CSV is the normalized extraction output derived from "
+                "raw ClosingPriceDailyList JSON responses."
+            ),
+        }
+        manifest_path = RAW_DIR / f"{Path(batch['path']).stem}_response_manifest.json"
+        manifest_path.write_text(
+            json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        manifests.append({"path": str(manifest_path.relative_to(ROOT)), "sha256": _file_sha256(manifest_path)})
+    return manifests
 
 
 def write_manifest(
     *,
     batches: list[dict],
+    raw_manifests: list[dict],
     build_stats: dict,
+    conflict_count: int,
     verified_master_path: Path = VERIFIED_MASTER,
     manifest_path: Path = MANIFEST,
 ) -> dict:
     manifest = {
         "stage": "stage124_official_api_finalize",
         "generated_at_utc": _utc_now(),
-        "source_kind": "tehran_stock_exchange_api_first_trade_dates",
-        "date_semantics": "first_observed_trading_date_not_official_ipo_listing_date",
+        "api_provider": API_PROVIDER,
+        "exact_endpoint_url": API_ENDPOINT_TEMPLATE,
+        "request_parameters": {
+            "ins_code": "per-row insCode in committed batch CSV files",
+            "history_offset": "0",
+        },
+        "retrieved_at_utc": _utc_now(),
+        "extraction_script": EXTRACTION_SCRIPT,
+        "api_response_semantics": API_RESPONSE_SEMANTICS,
+        "date_semantics": DATE_SEMANTICS,
         "verified_master_path": str(verified_master_path.relative_to(ROOT)),
         "template_path": str(TEMPLATE.relative_to(ROOT)),
         "official_api_dir": str(OFFICIAL_API_DIR.relative_to(ROOT)),
+        "conflict_audit_path": str(CONFLICT_AUDIT.relative_to(ROOT)),
         "verified_master_sha256": sha(verified_master_path),
         "build_stats": build_stats,
+        "conflict_row_count": conflict_count,
         "allowed_verification_statuses": sorted(ALLOWED_VERIFICATION_STATUSES),
         "raw_batches": batches,
+        "raw_response_manifests": raw_manifests,
         "notes": [
             "All inputs are read only from stage124/official_api/.",
             "First-trade dates are written only to first_public_trading_date_* columns.",
             "ipo_date_jalali is populated only when the API row explicitly denotes an IPO event.",
+            "conflict_status is not auto-resolved; see tse_first_trade_conflict_audit.csv.",
         ],
     }
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
@@ -310,9 +499,18 @@ def write_metadata(*, manifest: dict, metadata_path: Path = METADATA) -> dict:
                 "sha256": batch["sha256"],
             }
         )
+    for raw_manifest in manifest["raw_response_manifests"]:
+        files.append(
+            {
+                "relative_path": raw_manifest["path"],
+                "file_role": "raw_response_manifest",
+                "sha256": raw_manifest["sha256"],
+            }
+        )
     for rel, role in (
         (manifest["verified_master_path"], "verified_listing_master"),
         (manifest["template_path"], "template_schema"),
+        (manifest["conflict_audit_path"], "first_trade_conflict_audit"),
         (str(MANIFEST.relative_to(ROOT)), "import_manifest"),
     ):
         path = ROOT / rel
@@ -325,6 +523,7 @@ def write_metadata(*, manifest: dict, metadata_path: Path = METADATA) -> dict:
         )
     payload = {
         "generated_at_utc": manifest["generated_at_utc"],
+        "date_semantics": manifest["date_semantics"],
         "allowed_verification_statuses": manifest["allowed_verification_statuses"],
         "files": files,
     }
@@ -340,7 +539,9 @@ def verify_manifest_hashes(*, official_api_dir: Path = OFFICIAL_API_DIR) -> None
         raise FinalizeError(f"import manifest not found: {MANIFEST}")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     for batch in manifest["raw_batches"]:
-        path = ROOT / batch["path"]
+        path = ROOT / batch["path"] if not Path(batch["path"]).is_absolute() else Path(batch["path"])
+        if not path.is_file():
+            path = official_api_dir / Path(batch["path"]).name
         actual = _file_sha256(path)
         if actual != batch["sha256"]:
             raise FinalizeError(
@@ -357,31 +558,44 @@ def run_finalize(
 ) -> dict:
     if write_sidecar_metadata is None:
         write_sidecar_metadata = official_api_dir.resolve() == OFFICIAL_API_DIR.resolve()
+
     batches, api_ok = load_official_api_batches(official_api_dir=official_api_dir)
+    api_map = {
+        item["ticker"]: item
+        for item in (_normalize_api_row(row) for _, row in api_ok.iterrows())
+    }
+    conflict_audit = build_conflict_audit(api_map)
     template = read_csv(template_path)
     build_stats = validate_template_coverage(template, api_ok)
     verified = build_verified_master(
         template_path=template_path,
-        official_api_dir=official_api_dir,
-        verified_master_path=verified_master_path,
         api_ok=api_ok,
+        conflict_audit=conflict_audit,
+        verified_master_path=verified_master_path,
     )
     validate_verified_master(verified, template)
+
+    raw_manifests: list[dict] = []
     manifest = None
     metadata = None
     if write_sidecar_metadata:
+        raw_manifests = write_raw_response_manifests(batches=batches, official_api_dir=official_api_dir)
         manifest = write_manifest(
             batches=batches,
+            raw_manifests=raw_manifests,
             build_stats=build_stats,
+            conflict_count=len(conflict_audit),
             verified_master_path=verified_master_path,
         )
         metadata = write_metadata(manifest=manifest)
         verify_manifest_hashes(official_api_dir=official_api_dir)
+
     return {
         "status": "verified_master_finalized",
         "verified_master_path": str(verified_master_path),
         "official_api_dir": str(official_api_dir),
         "row_count": build_stats["row_count"],
+        "conflict_row_count": len(conflict_audit),
         "manifest_path": str(MANIFEST) if write_sidecar_metadata else "",
         "metadata_path": str(METADATA) if write_sidecar_metadata else "",
         "verified_master_sha256": sha(verified_master_path),
@@ -415,6 +629,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"  status            : {report['status']}")
     print(f"  verified master   : {report['verified_master_path']}")
     print(f"  rows              : {report['row_count']}")
+    print(f"  conflict rows     : {report['conflict_row_count']}")
     print(f"  official_api dir  : {report['official_api_dir']}")
     print(f"  manifest          : {report['manifest_path']}")
     return 0

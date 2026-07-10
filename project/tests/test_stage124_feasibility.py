@@ -48,11 +48,7 @@ def test_verified_all_false():
 
 
 def test_verified_file_not_created():
-    pass  # feasibility probe never writes listing_master_verified_stage124.csv
-
-
-def test_listing_master_verified_exists():
-    assert (ROOT / "stage124" / "listing_master_verified_stage124.csv").exists()
+    assert not (ROOT / "stage124" / "listing_master_verified_stage124.csv").exists()
 
 
 def test_no_eligibility_columns_created():

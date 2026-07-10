@@ -488,12 +488,10 @@ def test_priority_ranking_deterministic():
     assert priority1["priority_rank"].tolist() == priority2["priority_rank"].tolist()
 
 
-# ---- Test 33: Verified listing master exists after official API finalize -----
-def test_full_verified_master_exists():
-    assert FULL_VERIFIED_FORBIDDEN.exists(), \
-        "listing_master_verified_stage124.csv must exist after official API finalize"
-    df = pd.read_csv(FULL_VERIFIED_FORBIDDEN, dtype=str, keep_default_na=False)
-    assert len(df) == 130
+# ---- Test 33: No listing_master_verified_stage124.csv exists ------------------
+def test_no_full_verified_master():
+    assert not FULL_VERIFIED_FORBIDDEN.exists(), \
+        "listing_master_verified_stage124.csv must not exist (Gate A forbidden action)"
 
 
 # ---- Test 34: normalize_digits ------------------------------------------------

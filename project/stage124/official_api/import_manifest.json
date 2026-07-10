@@ -1,19 +1,26 @@
 {
   "allowed_verification_statuses": [
-    "verified_tse_csv_imported"
+    "verified_tse_api_first_observed_trade"
   ],
+  "api_provider": "Tehran Stock Exchange Market Data (TSETMC CDN API)",
+  "api_response_semantics": "Earliest observed closing-price record date (dEven) for the resolved insCode; used as first observed trading date, not official IPO/admission/listing date.",
   "build_stats": {
     "api_ticker_count": 130,
     "row_count": 130,
     "template_ticker_count": 130,
-    "verified_tse_csv_imported": 130
+    "verified_tse_api_first_observed_trade": 130
   },
-  "date_semantics": "first_observed_trading_date_not_official_ipo_listing_date",
-  "generated_at_utc": "2026-07-10T11:22:48Z",
+  "conflict_audit_path": "stage124/official_api/tse_first_trade_conflict_audit.csv",
+  "conflict_row_count": 14,
+  "date_semantics": "first_observed_trading_date_from_official_tse_api",
+  "exact_endpoint_url": "https://cdn.tsetmc.com/api/ClosingPrice/GetClosingPriceDailyList/{ins_code}/0",
+  "extraction_script": "project-owner batch exporter: earliest non-zero trade day per insCode from ClosingPriceDailyList",
+  "generated_at_utc": "2026-07-10T11:48:17Z",
   "notes": [
     "All inputs are read only from stage124/official_api/.",
     "First-trade dates are written only to first_public_trading_date_* columns.",
-    "ipo_date_jalali is populated only when the API row explicitly denotes an IPO event."
+    "ipo_date_jalali is populated only when the API row explicitly denotes an IPO event.",
+    "conflict_status is not auto-resolved; see tse_first_trade_conflict_audit.csv."
   ],
   "official_api_dir": "stage124/official_api",
   "raw_batches": [
@@ -26,7 +33,7 @@
         "status",
         "note"
       ],
-      "description": "Primary bulk export (119 importable rows; ambiguous rows skipped).",
+      "description": "Primary bulk export (ambiguous rows skipped).",
       "path": "stage124/official_api/tse_first_trade_dates_batch01_bulk.csv",
       "repo_name": "tse_first_trade_dates_batch01_bulk.csv",
       "role": "bulk_first_trade_export",
@@ -66,9 +73,27 @@
       "sha256": "dfdcd8dfbce926f8f5fa9c4e31c2a7e4142f2f140387a234218ba94864da0d8f"
     }
   ],
-  "source_kind": "tehran_stock_exchange_api_first_trade_dates",
+  "raw_response_manifests": [
+    {
+      "path": "stage124/official_api/raw/tse_first_trade_dates_batch01_bulk_response_manifest.json",
+      "sha256": "c0fc81386d6704622ce7b0fed4b7fd9b7695f7db97284f37727669dfb8c9d85c"
+    },
+    {
+      "path": "stage124/official_api/raw/tse_first_trade_dates_batch02_ambiguous_resolved_response_manifest.json",
+      "sha256": "6b4363276e2bdac494b87e2fd31b9aa473ecfae27457baf010cc46e6c1ba9fd5"
+    },
+    {
+      "path": "stage124/official_api/raw/tse_first_trade_dates_batch03_final_pair_response_manifest.json",
+      "sha256": "273c4dcdeaac199624cf4c48f748b1c43f01e6f033d3bc3d52856c8235e54e58"
+    }
+  ],
+  "request_parameters": {
+    "history_offset": "0",
+    "ins_code": "per-row insCode in committed batch CSV files"
+  },
+  "retrieved_at_utc": "2026-07-10T11:48:17Z",
   "stage": "stage124_official_api_finalize",
   "template_path": "stage124/listing_master_template_stage124.csv",
   "verified_master_path": "stage124/listing_master_verified_stage124.csv",
-  "verified_master_sha256": "b99aa40b14bc28af0bbda2ab7561b1cdd7ad3dace480a3380475fc9f0d215cee"
+  "verified_master_sha256": "968cf0cc4613aadd738d14e3cd3058e25920256c891b431d9e99776de3479fd7"
 }

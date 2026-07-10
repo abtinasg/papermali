@@ -1,7 +1,8 @@
 {
   "allowed_verification_statuses": [
-    "verified_tse_csv_imported"
+    "verified_tse_api_first_observed_trade"
   ],
+  "date_semantics": "first_observed_trading_date_from_official_tse_api",
   "files": [
     {
       "file_role": "bulk_first_trade_export",
@@ -19,9 +20,24 @@
       "sha256": "dfdcd8dfbce926f8f5fa9c4e31c2a7e4142f2f140387a234218ba94864da0d8f"
     },
     {
+      "file_role": "raw_response_manifest",
+      "relative_path": "stage124/official_api/raw/tse_first_trade_dates_batch01_bulk_response_manifest.json",
+      "sha256": "c0fc81386d6704622ce7b0fed4b7fd9b7695f7db97284f37727669dfb8c9d85c"
+    },
+    {
+      "file_role": "raw_response_manifest",
+      "relative_path": "stage124/official_api/raw/tse_first_trade_dates_batch02_ambiguous_resolved_response_manifest.json",
+      "sha256": "6b4363276e2bdac494b87e2fd31b9aa473ecfae27457baf010cc46e6c1ba9fd5"
+    },
+    {
+      "file_role": "raw_response_manifest",
+      "relative_path": "stage124/official_api/raw/tse_first_trade_dates_batch03_final_pair_response_manifest.json",
+      "sha256": "273c4dcdeaac199624cf4c48f748b1c43f01e6f033d3bc3d52856c8235e54e58"
+    },
+    {
       "file_role": "verified_listing_master",
       "relative_path": "stage124/listing_master_verified_stage124.csv",
-      "sha256": "b99aa40b14bc28af0bbda2ab7561b1cdd7ad3dace480a3380475fc9f0d215cee"
+      "sha256": "968cf0cc4613aadd738d14e3cd3058e25920256c891b431d9e99776de3479fd7"
     },
     {
       "file_role": "template_schema",
@@ -29,10 +45,15 @@
       "sha256": "f8e9a1f905e3b8c9ada13ba2008731c401943539e2a0c1d5b42745899c00c7e3"
     },
     {
+      "file_role": "first_trade_conflict_audit",
+      "relative_path": "stage124/official_api/tse_first_trade_conflict_audit.csv",
+      "sha256": "84b0776d37c92e59a2f7335d9bf72e6460ffb91c09890408d7700b59607e7588"
+    },
+    {
       "file_role": "import_manifest",
       "relative_path": "stage124/official_api/import_manifest.json",
-      "sha256": "21d806e78b6daf419a36eb03b238577e1a5141e83be27be13a5b1a5a94cacd69"
+      "sha256": "723790b1b0cfa64e22be444c8aa1c3ebdc272b2500de926d5f0c3313ab8c554b"
     }
   ],
-  "generated_at_utc": "2026-07-10T11:22:48Z"
+  "generated_at_utc": "2026-07-10T11:48:17Z"
 }
