@@ -488,10 +488,38 @@ def test_priority_ranking_deterministic():
     assert priority1["priority_rank"].tolist() == priority2["priority_rank"].tolist()
 
 
-# ---- Test 33: No listing_master_verified_stage124.csv exists ------------------
-def test_no_full_verified_master():
-    assert not FULL_VERIFIED_FORBIDDEN.exists(), \
-        "listing_master_verified_stage124.csv must not exist (Gate A forbidden action)"
+# ---- Test 33: Gate A must not create verified master in a temp workspace ------
+def test_no_full_verified_master(tmp_path, monkeypatch):
+    forbidden = tmp_path / "listing_master_verified_stage124.csv"
+    monkeypatch.setattr(
+        "src.stage124_batch02_v2.FULL_VERIFIED_FORBIDDEN",
+        forbidden,
+    )
+    pm = read_csv(PARTIAL_MASTER)
+    st = read_csv(STAGE123_INPUT)
+    pending = load_pending(pm)
+    verified = pm[pm["verification_status"] == "verified_user_confirmed"]
+    feats = panel_features(st)
+    research = load_research()
+    probe_stub = {tk: {"instrument_match_status": "network_unreachable",
+                       "ordinary_instrument_count": "",
+                       "tsetmc_candidate_date_jalali": "",
+                       "multiple_ordinary_instruments": 0,
+                       "probe_retrieved_at": "",
+                       "probe_raw_sha256": "",
+                       "probe_notes": "test stub",
+                       "selected_inscode": "",
+                       "ordinary_instrument_candidates_json": "[]",
+                       "tsetmc_candidate_date_gregorian": "",
+                       "tsetmc_candidate_raw_field": "dEven"} for tk in pending["ticker"]}
+    screening = screen_all_pending(pending, feats, probe_stub, research)
+    priority = assign_tiers(screening)
+    selected, tickers, note, unresolved = select_batch_v2(priority)
+    qc = run_qc(len(pending), len(verified), tickers, priority, research,
+                probe_stub, unresolved, note)
+    guard = next(a for a in qc["assertions"] if a["assertion"] == "no_full_verified_master_created")
+    assert guard["passed"]
+    assert not forbidden.exists()
 
 
 # ---- Test 34: normalize_digits ------------------------------------------------

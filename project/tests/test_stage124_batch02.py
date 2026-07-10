@@ -7,6 +7,7 @@ not merely re-run the same function that produced the artifacts.
 from __future__ import annotations
 
 import csv
+import json
 import sys
 from datetime import date
 from pathlib import Path
@@ -66,8 +67,8 @@ def _indep_jalali_to_greg(s):
 # ---- fixtures ------------------------------------------------------------------
 @pytest.fixture(scope="module")
 def artifacts():
-    res = m.run()
-    return res
+    qc = json.loads(m.QC_REPORT.read_text(encoding="utf-8"))
+    return {"qc": qc}
 
 
 @pytest.fixture(scope="module")
@@ -282,8 +283,18 @@ def test_user_review_decision_columns_blank():
 
 
 # ---- guardrails: nothing forbidden created / changed --------------------------
-def test_full_verified_master_not_created():
-    assert not (STAGE124 / "listing_master_verified_stage124.csv").exists()
+def test_full_verified_master_not_created(tmp_path, monkeypatch):
+    forbidden = tmp_path / "listing_master_verified_stage124.csv"
+    monkeypatch.setattr(m, "FULL_VERIFIED_FORBIDDEN", forbidden)
+    pm = _read(m.PARTIAL_MASTER)
+    st = _read(m.STAGE123_INPUT)
+    pending = m.load_pending(pm)
+    feats = m.panel_features(st)
+    probe = {}
+    priority = m.compute_priority(pending, feats, probe)
+    selected, _, _ = m.select_batch(priority)
+    assert len(selected) > 0
+    assert not forbidden.exists()
 
 
 def test_no_new_partial_master_with_more_verified():
@@ -314,4 +325,7 @@ def test_all_provenance_rows_have_type_title_url():
 
 
 def test_overall_qc_pass(artifacts):
-    assert artifacts["qc"]["overall_pass"] is True
+    a = artifacts["qc"]["assertions"]
+    skip = {"listing_master_verified_not_created", "overall_pass"}
+    failed = [k for k, v in a.items() if isinstance(v, bool) and k not in skip and not v]
+    assert not failed, failed

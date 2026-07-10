@@ -120,8 +120,15 @@ def test_no_target_or_financial_changes_if_present():
         assert assertions["financial_values_unchanged"]
 
 
-def test_no_listing_master_verified_created():
-    assert not s124p.FULL_VERIFIED_FORBIDDEN.exists()
+def test_no_listing_master_verified_created(tmp_path, monkeypatch):
+    forbidden = tmp_path / "listing_master_verified_stage124.csv"
+    monkeypatch.setattr(s124p, "FULL_VERIFIED_FORBIDDEN", forbidden)
+    monkeypatch.setattr(s124p, "PARTIAL_MASTER", tmp_path / "listing_master_partial_verified_stage124.csv")
+    monkeypatch.setattr(s124p, "CONFLICT_AUDIT", tmp_path / "listing_pilot15_tsetmc_conflict_audit_stage124.csv")
+    inp = input_df()
+    s124p.build_partial_master(inp)
+    s124p.build_conflict_audit(inp)
+    assert not forbidden.exists()
 
 
 def test_outputs_have_hashes_and_provenance_if_metadata_present():

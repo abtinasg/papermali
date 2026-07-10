@@ -29,11 +29,13 @@ def isolated_official_api_tree(tmp_path):
         shutil.copy2(finalize.OFFICIAL_API_DIR / spec["repo_name"], api_dir / spec["repo_name"])
     template_path = tmp_path / "listing_master_template_stage124.csv"
     verified_path = tmp_path / "listing_master_verified_stage124.csv"
+    conflict_audit_path = tmp_path / "tse_first_trade_conflict_audit.csv"
     shutil.copy2(finalize.TEMPLATE, template_path)
     return {
         "api_dir": api_dir,
         "template_path": template_path,
         "verified_path": verified_path,
+        "conflict_audit_path": conflict_audit_path,
     }
 
 
@@ -42,6 +44,7 @@ def _run_finalize(tree: dict) -> pd.DataFrame:
         official_api_dir=tree["api_dir"],
         template_path=tree["template_path"],
         verified_master_path=tree["verified_path"],
+        conflict_audit_path=tree["conflict_audit_path"],
         write_sidecar_metadata=False,
     )
     assert report["row_count"] == 130
@@ -120,13 +123,38 @@ def test_hkeshti_conflict_documented(isolated_official_api_tree):
                     official_api_dir=isolated_official_api_tree["api_dir"]
                 )[1].iterrows()
             )
-        }
+        },
+        isolated_official_api_tree["conflict_audit_path"],
     )
     hk = audit[audit["ticker"] == "حکشتی"]
     assert not hk.empty
     assert {"1387-02-28", "1387-02-29"}.issubset(
         set(hk["previous_date"]).union(set(hk["api_observed_date"]))
     )
+
+
+def test_official_api_provenance_manifest_hashes_match_files():
+    manifest = json.loads(finalize.MANIFEST.read_text(encoding="utf-8"))
+    for entry in manifest["provenance_manifests"]:
+        path = ROOT / entry["path"]
+        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        assert actual == entry["sha256"], entry["path"]
+
+
+def test_official_api_manifest_records_extraction_script_not_archived():
+    manifest = json.loads(finalize.MANIFEST.read_text(encoding="utf-8"))
+    assert manifest.get("extraction_script_not_archived") is True
+    assert manifest.get("retrieved_at_utc") is None
+    assert manifest.get("finalized_at_utc")
+
+
+def test_repo_conflict_audit_not_modified_by_tmp_path_finalize(isolated_official_api_tree):
+    repo_audit = finalize.CONFLICT_AUDIT
+    before = hashlib.sha256(repo_audit.read_bytes()).hexdigest() if repo_audit.is_file() else None
+    _run_finalize(isolated_official_api_tree)
+    if before is not None:
+        assert hashlib.sha256(repo_audit.read_bytes()).hexdigest() == before
+    assert isolated_official_api_tree["conflict_audit_path"].is_file()
 
 
 def test_official_api_manifest_hashes_match_files():
@@ -159,6 +187,8 @@ def test_cli_runs_without_downloads_dependency(isolated_official_api_tree):
             str(isolated_official_api_tree["template_path"]),
             "--verified-master",
             str(isolated_official_api_tree["verified_path"]),
+            "--conflict-audit",
+            str(isolated_official_api_tree["conflict_audit_path"]),
         ],
         cwd=ROOT,
         capture_output=True,

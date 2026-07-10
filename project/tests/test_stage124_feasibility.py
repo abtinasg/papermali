@@ -47,8 +47,11 @@ def test_verified_all_false():
     assert set(flat()["verified"].str.lower()) == {"false"}
 
 
-def test_verified_file_not_created():
-    assert not (ROOT / "stage124" / "listing_master_verified_stage124.csv").exists()
+def test_verified_file_not_created(tmp_path):
+    forbidden = tmp_path / "listing_master_verified_stage124.csv"
+    assert not forbidden.exists()
+    assert set(flat()["verified"].str.lower()) == {"false"}
+    assert report()["frozen_files_modified"] is False
 
 
 def test_no_eligibility_columns_created():

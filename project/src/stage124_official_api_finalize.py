@@ -30,7 +30,8 @@ ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = OUT / "listing_master_template_stage124.csv"
 VERIFIED_MASTER = OUT / "listing_master_verified_stage124.csv"
 OFFICIAL_API_DIR = OUT / "official_api"
-RAW_DIR = OFFICIAL_API_DIR / "raw"
+PROVENANCE_MANIFESTS_DIR = OFFICIAL_API_DIR / "provenance_manifests"
+EXTRACTION_SCRIPT_PATH = OFFICIAL_API_DIR / "extract_tse_first_trade_dates.py"
 MANIFEST = OFFICIAL_API_DIR / "import_manifest.json"
 METADATA = OFFICIAL_API_DIR / "metadata_and_hashes.json"
 CONFLICT_AUDIT = OFFICIAL_API_DIR / "tse_first_trade_conflict_audit.csv"
@@ -47,7 +48,7 @@ API_PROVIDER = "Tehran Stock Exchange Market Data (TSETMC CDN API)"
 API_ENDPOINT_TEMPLATE = (
     "https://cdn.tsetmc.com/api/ClosingPrice/GetClosingPriceDailyList/{ins_code}/0"
 )
-EXTRACTION_SCRIPT = (
+EXTRACTION_SCRIPT_DESCRIPTION = (
     "project-owner batch exporter: earliest non-zero trade day per insCode from "
     "ClosingPriceDailyList"
 )
@@ -257,7 +258,24 @@ def _load_previous_research_dates() -> dict[str, list[dict]]:
     return out
 
 
-def build_conflict_audit(api_map: dict[str, dict]) -> pd.DataFrame:
+def _extraction_script_provenance() -> dict:
+    if EXTRACTION_SCRIPT_PATH.is_file():
+        rel = (
+            str(EXTRACTION_SCRIPT_PATH.relative_to(ROOT))
+            if EXTRACTION_SCRIPT_PATH.is_relative_to(ROOT)
+            else str(EXTRACTION_SCRIPT_PATH)
+        )
+        return {
+            "extraction_script_path": rel,
+            "extraction_script_sha256": _file_sha256(EXTRACTION_SCRIPT_PATH),
+        }
+    return {
+        "extraction_script_not_archived": True,
+        "extraction_script_description": EXTRACTION_SCRIPT_DESCRIPTION,
+    }
+
+
+def build_conflict_audit(api_map: dict[str, dict], conflict_audit_path: Path) -> pd.DataFrame:
     previous = _load_previous_research_dates()
     rows: list[dict] = []
     seen: set[tuple[str, str, str]] = set()
@@ -297,8 +315,8 @@ def build_conflict_audit(api_map: dict[str, dict]) -> pd.DataFrame:
             )
 
     audit = pd.DataFrame(rows, columns=CONFLICT_AUDIT_COLUMNS)
-    CONFLICT_AUDIT.parent.mkdir(parents=True, exist_ok=True)
-    audit.to_csv(CONFLICT_AUDIT, index=False, encoding="utf-8-sig")
+    conflict_audit_path.parent.mkdir(parents=True, exist_ok=True)
+    audit.to_csv(conflict_audit_path, index=False, encoding="utf-8-sig")
     return audit
 
 
@@ -409,31 +427,31 @@ def validate_verified_master(df: pd.DataFrame, template: pd.DataFrame) -> None:
             raise FinalizeError(f"conflict_status must not be auto-resolved for {ticker}")
 
 
-def write_raw_response_manifests(*, batches: list[dict], official_api_dir: Path = OFFICIAL_API_DIR) -> list[dict]:
-    RAW_DIR.mkdir(parents=True, exist_ok=True)
+def write_provenance_manifests(*, batches: list[dict], official_api_dir: Path = OFFICIAL_API_DIR) -> list[dict]:
+    PROVENANCE_MANIFESTS_DIR.mkdir(parents=True, exist_ok=True)
     manifests: list[dict] = []
-    retrieved_at = _utc_now()
+    finalized_at = _utc_now()
     for batch in batches:
-        path = official_api_dir / Path(batch["path"]).name
         payload = {
             "batch_file": batch["path"],
-            "response_content_sha256": batch["sha256"],
+            "normalized_batch_csv_sha256": batch["sha256"],
             "api_provider": API_PROVIDER,
             "exact_endpoint_url": API_ENDPOINT_TEMPLATE,
             "request_parameters": {
                 "ins_code": "per-row insCode column in batch CSV",
                 "history_offset": "0",
             },
-            "retrieved_at_utc": retrieved_at,
-            "extraction_script": EXTRACTION_SCRIPT,
+            "retrieved_at_utc": None,
+            "finalized_at_utc": finalized_at,
             "api_response_semantics": API_RESPONSE_SEMANTICS,
             "date_semantics": DATE_SEMANTICS,
             "note": (
-                "Committed batch CSV is the normalized extraction output derived from "
-                "raw ClosingPriceDailyList JSON responses."
+                "Committed batch CSV is the normalized extraction output. Raw API JSON "
+                "responses were not archived in this repository."
             ),
+            **_extraction_script_provenance(),
         }
-        manifest_path = RAW_DIR / f"{Path(batch['path']).stem}_response_manifest.json"
+        manifest_path = PROVENANCE_MANIFESTS_DIR / f"{Path(batch['path']).stem}_provenance_manifest.json"
         manifest_path.write_text(
             json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
             encoding="utf-8",
@@ -445,41 +463,45 @@ def write_raw_response_manifests(*, batches: list[dict], official_api_dir: Path 
 def write_manifest(
     *,
     batches: list[dict],
-    raw_manifests: list[dict],
+    provenance_manifests: list[dict],
     build_stats: dict,
     conflict_count: int,
     verified_master_path: Path = VERIFIED_MASTER,
+    conflict_audit_path: Path = CONFLICT_AUDIT,
     manifest_path: Path = MANIFEST,
 ) -> dict:
+    finalized_at = _utc_now()
     manifest = {
         "stage": "stage124_official_api_finalize",
-        "generated_at_utc": _utc_now(),
+        "generated_at_utc": finalized_at,
+        "finalized_at_utc": finalized_at,
         "api_provider": API_PROVIDER,
         "exact_endpoint_url": API_ENDPOINT_TEMPLATE,
         "request_parameters": {
             "ins_code": "per-row insCode in committed batch CSV files",
             "history_offset": "0",
         },
-        "retrieved_at_utc": _utc_now(),
-        "extraction_script": EXTRACTION_SCRIPT,
+        "retrieved_at_utc": None,
         "api_response_semantics": API_RESPONSE_SEMANTICS,
         "date_semantics": DATE_SEMANTICS,
         "verified_master_path": str(verified_master_path.relative_to(ROOT)),
         "template_path": str(TEMPLATE.relative_to(ROOT)),
         "official_api_dir": str(OFFICIAL_API_DIR.relative_to(ROOT)),
-        "conflict_audit_path": str(CONFLICT_AUDIT.relative_to(ROOT)),
+        "conflict_audit_path": str(conflict_audit_path.relative_to(ROOT)),
         "verified_master_sha256": sha(verified_master_path),
         "build_stats": build_stats,
         "conflict_row_count": conflict_count,
         "allowed_verification_statuses": sorted(ALLOWED_VERIFICATION_STATUSES),
         "raw_batches": batches,
-        "raw_response_manifests": raw_manifests,
+        "provenance_manifests": provenance_manifests,
         "notes": [
             "All inputs are read only from stage124/official_api/.",
             "First-trade dates are written only to first_public_trading_date_* columns.",
             "ipo_date_jalali is populated only when the API row explicitly denotes an IPO event.",
             "conflict_status is not auto-resolved; see tse_first_trade_conflict_audit.csv.",
+            "Batch CSV files are normalized exports; raw API JSON responses were not archived.",
         ],
+        **_extraction_script_provenance(),
     }
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(
@@ -499,12 +521,12 @@ def write_metadata(*, manifest: dict, metadata_path: Path = METADATA) -> dict:
                 "sha256": batch["sha256"],
             }
         )
-    for raw_manifest in manifest["raw_response_manifests"]:
+    for prov_manifest in manifest["provenance_manifests"]:
         files.append(
             {
-                "relative_path": raw_manifest["path"],
-                "file_role": "raw_response_manifest",
-                "sha256": raw_manifest["sha256"],
+                "relative_path": prov_manifest["path"],
+                "file_role": "provenance_manifest",
+                "sha256": prov_manifest["sha256"],
             }
         )
     for rel, role in (
@@ -554,6 +576,7 @@ def run_finalize(
     official_api_dir: Path = OFFICIAL_API_DIR,
     template_path: Path = TEMPLATE,
     verified_master_path: Path = VERIFIED_MASTER,
+    conflict_audit_path: Path = CONFLICT_AUDIT,
     write_sidecar_metadata: bool | None = None,
 ) -> dict:
     if write_sidecar_metadata is None:
@@ -564,7 +587,7 @@ def run_finalize(
         item["ticker"]: item
         for item in (_normalize_api_row(row) for _, row in api_ok.iterrows())
     }
-    conflict_audit = build_conflict_audit(api_map)
+    conflict_audit = build_conflict_audit(api_map, conflict_audit_path)
     template = read_csv(template_path)
     build_stats = validate_template_coverage(template, api_ok)
     verified = build_verified_master(
@@ -575,17 +598,18 @@ def run_finalize(
     )
     validate_verified_master(verified, template)
 
-    raw_manifests: list[dict] = []
+    provenance_manifests: list[dict] = []
     manifest = None
     metadata = None
     if write_sidecar_metadata:
-        raw_manifests = write_raw_response_manifests(batches=batches, official_api_dir=official_api_dir)
+        provenance_manifests = write_provenance_manifests(batches=batches, official_api_dir=official_api_dir)
         manifest = write_manifest(
             batches=batches,
-            raw_manifests=raw_manifests,
+            provenance_manifests=provenance_manifests,
             build_stats=build_stats,
             conflict_count=len(conflict_audit),
             verified_master_path=verified_master_path,
+            conflict_audit_path=conflict_audit_path,
         )
         metadata = write_metadata(manifest=manifest)
         verify_manifest_hashes(official_api_dir=official_api_dir)
@@ -613,6 +637,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--template", type=Path, default=TEMPLATE)
     parser.add_argument("--verified-master", type=Path, default=VERIFIED_MASTER)
+    parser.add_argument("--conflict-audit", type=Path, default=CONFLICT_AUDIT)
     args = parser.parse_args(argv)
 
     try:
@@ -620,6 +645,7 @@ def main(argv: list[str] | None = None) -> int:
             official_api_dir=args.official_api_dir,
             template_path=args.template,
             verified_master_path=args.verified_master,
+            conflict_audit_path=args.conflict_audit,
         )
     except FinalizeError as exc:
         print(f"FINALIZE FAILED: {exc}")
