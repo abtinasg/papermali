@@ -5,43 +5,36 @@ front matter; this file is the working description.
 
 ## Active research workstream: `stage124-batch02-part03`
 
-Manual public-entry-date research for the current **10 tickers** (still
-`pending_manual_research`):
+### Superseded — `stage124-batch02-part03-1b-1`
 
-| # | Ticker |
-|---|--------|
-| 1 | خمهر |
-| 2 | خنصیر |
-| 3 | خوساز |
-| 4 | خچرخش |
-| 5 | خکمک |
-| 6 | دروز |
-| 7 | دسبحا |
-| 8 | دیران |
-| 9 | رانفور |
-| 10 | رمپنا |
+**Cancelled by official TSE API.** The canonical listing dates for all 130
+tickers were obtained from the official TSETMC API and are stored in
+`project/stage124/listing_master_verified_stage124.csv` with the column
+`first_observed_trading_date_from_official_tse_api` and status
+`verified_tse_api_first_observed_trade`.
 
-### Next action — `stage124-batch02-part03-1b-1`
+The manual Human-in-the-Loop research path (HIL dashboard, manual intake runner)
+has been **retired**. The 10 Part 3 tickers no longer require manual source
+discovery or dashboard confirmation.
 
-**Execute the actual manual research and populate the dedicated intake safely.**
-For each discovered source, record only source-backed facts. Store a snapshot under
-the approved Part 3 snapshot directory, recompute SHA-256, and keep event/date and
-ordinary-share findings empty unless they are explicit in the stored source.
+### Next action — `stage124-gate-b-readiness`
 
-The intake runner must first pass in dry-run mode. Registry changes require the
-explicit `--apply` flag. No canonical listing date is accepted merely because a
-source was discovered or a snapshot was stored; the existing reviewed-evidence
-engine remains the decision authority.
+**Gate B readiness / eligibility rebuild planning.** This is planning only —
+Gate B execution, modeling, tuning, SHAP, SMOTE, calibration, and article
+reporting are **not** in scope for the current PR.
 
-## Completed immediately before this task
+## Completed
 
 - ✅ `stage124-batch02-part03-1b-0` — dedicated intake scaffold and readiness gate.
-  The committed intake is header-only; no URL, snapshot, event, or date was added.
+- ✅ `stage124-batch02-part03-1b-1` — superseded by official TSE API; verified
+  master with 130 tickers created.
+- ✅ Verified master: `listing_master_verified_stage124.csv` — 130 unique tickers,
+  dates are `first_observed_trading_date` (not necessarily IPO, admission, or
+  listing dates).
 
 ## Not in scope yet (do NOT start)
 
 - ❌ Gate B execution
-- ❌ `listing_master_verified_stage124.csv` (verified master)
 - ❌ Modeling, tuning, SHAP, SMOTE, calibration, or article reporting
 
 ## Maintenance
