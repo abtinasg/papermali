@@ -1,0 +1,74 @@
+{
+  "allowed_verification_statuses": [
+    "verified_tse_csv_imported"
+  ],
+  "build_stats": {
+    "api_ticker_count": 130,
+    "row_count": 130,
+    "template_ticker_count": 130,
+    "verified_tse_csv_imported": 130
+  },
+  "date_semantics": "first_observed_trading_date_not_official_ipo_listing_date",
+  "generated_at_utc": "2026-07-10T11:22:48Z",
+  "notes": [
+    "All inputs are read only from stage124/official_api/.",
+    "First-trade dates are written only to first_public_trading_date_* columns.",
+    "ipo_date_jalali is populated only when the API row explicitly denotes an IPO event."
+  ],
+  "official_api_dir": "stage124/official_api",
+  "raw_batches": [
+    {
+      "columns": [
+        "symbol",
+        "insCode",
+        "first_trade_date_gregorian",
+        "first_trade_date_jalali",
+        "status",
+        "note"
+      ],
+      "description": "Primary bulk export (119 importable rows; ambiguous rows skipped).",
+      "path": "stage124/official_api/tse_first_trade_dates_batch01_bulk.csv",
+      "repo_name": "tse_first_trade_dates_batch01_bulk.csv",
+      "role": "bulk_first_trade_export",
+      "row_count": 128,
+      "sha256": "bf1dafaa91f5a3dc840fa891306d4f58cdfd753a36a58190740d0257cc09ea6c"
+    },
+    {
+      "columns": [
+        "symbol",
+        "insCode",
+        "first_trade_date_gregorian",
+        "first_trade_date_jalali",
+        "status",
+        "note"
+      ],
+      "description": "Resolved ambiguous / pending tickers from the bulk export.",
+      "path": "stage124/official_api/tse_first_trade_dates_batch02_ambiguous_resolved.csv",
+      "repo_name": "tse_first_trade_dates_batch02_ambiguous_resolved.csv",
+      "role": "ambiguous_resolved_export",
+      "row_count": 9,
+      "sha256": "594c797ec6151064d0fba2207c48605b9e3fc8bf8c576825235417f50af41927"
+    },
+    {
+      "columns": [
+        "symbol",
+        "insCode",
+        "first_trade_date_gregorian",
+        "first_trade_date_jalali",
+        "status",
+        "note"
+      ],
+      "description": "Final two tickers (اروند, وکغدیر) supplied after bulk import.",
+      "path": "stage124/official_api/tse_first_trade_dates_batch03_final_pair.csv",
+      "repo_name": "tse_first_trade_dates_batch03_final_pair.csv",
+      "role": "final_pair_export",
+      "row_count": 2,
+      "sha256": "dfdcd8dfbce926f8f5fa9c4e31c2a7e4142f2f140387a234218ba94864da0d8f"
+    }
+  ],
+  "source_kind": "tehran_stock_exchange_api_first_trade_dates",
+  "stage": "stage124_official_api_finalize",
+  "template_path": "stage124/listing_master_template_stage124.csv",
+  "verified_master_path": "stage124/listing_master_verified_stage124.csv",
+  "verified_master_sha256": "b99aa40b14bc28af0bbda2ab7561b1cdd7ad3dace480a3380475fc9f0d215cee"
+}

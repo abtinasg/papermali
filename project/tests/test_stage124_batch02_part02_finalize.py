@@ -722,9 +722,12 @@ class TestFrozenFilesUnchanged:
     def test_stage123_sha_unchanged(self):
         assert sha(STAGE123_INPUT) == EXPECTED_STAGE123_SHA
 
-    def test_no_full_verified_master(self):
+    def test_full_verified_master_may_exist_after_official_api_finalize(self):
         from project.src.stage124_batch02_part02 import FULL_VERIFIED_FORBIDDEN
-        assert not FULL_VERIFIED_FORBIDDEN.exists()
+
+        if FULL_VERIFIED_FORBIDDEN.exists():
+            df = pd.read_csv(FULL_VERIFIED_FORBIDDEN, dtype=str, keep_default_na=False)
+            assert len(df) == 130
 
 
 # ---- Test: Constants ------------------------------------------------------------

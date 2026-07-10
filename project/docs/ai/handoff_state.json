@@ -1,18 +1,18 @@
 {
   "active_workstream": "stage124_batch02_part03",
   "baseline_branch": "origin/main",
-  "baseline_commit": "cab0f0edc462593411ce8ad86643390c33a653f2",
+  "baseline_commit": "ac40d33f641ed112e8c92c7ea21491d22b071dbb",
   "current_batch": "Batch02",
   "current_stage": "Stage124",
   "gate_b_started": false,
-  "generated_at_utc": "2026-06-29T16:57:21Z",
-  "generated_from_commit": "c24a5e90b02a1d3e55768dc20f6ada477ada7b09",
+  "generated_at_utc": "2026-07-10T11:23:02Z",
+  "generated_from_commit": "ac40d33f641ed112e8c92c7ea21491d22b071dbb",
   "last_completed_micro_part": "stage124-batch02-part03-1b-0",
-  "last_stage_commit": "c24a5e90b02a1d3e55768dc20f6ada477ada7b09",
+  "last_stage_commit": "ac40d33f641ed112e8c92c7ea21491d22b071dbb",
   "modeling_started": false,
   "next_research_action_id": "stage124-batch02-part03-1b-1",
-  "observed_branch": "stage124-part03-1b1-panel-mvp",
-  "observed_repository_head_commit": "c24a5e90b02a1d3e55768dc20f6ada477ada7b09",
+  "observed_branch": "main",
+  "observed_repository_head_commit": "ac40d33f641ed112e8c92c7ea21491d22b071dbb",
   "qc_all_pass": true,
   "qc_assertions": 467,
   "qc_failed": 0,
@@ -21,7 +21,7 @@
   "schema_version": 2,
   "selected_qc_path": "project/stage124/batch02_parts/part03_qc_report.json",
   "selected_qc_scope": "stage124_batch02_part03",
-  "state_fingerprint": "5b41e94b6b731a8216407870af4d6700d11cac67ee5620e263bbd38f2c97b569",
+  "state_fingerprint": "bf785c42e6d30150f1572507170f2add531e14ee0811fbd2c25c922472dc8010",
   "tickers": [
     "خمهر",
     "خنصیر",
@@ -34,5 +34,5 @@
     "رانفور",
     "رمپنا"
   ],
-  "verified_master_created": false
+  "verified_master_created": true
 }
