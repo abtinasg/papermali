@@ -32,8 +32,22 @@ These are stable project decisions. Change them only deliberately (and note it i
 - **No** model / tuning / SHAP / SMOTE / calibration / report in this phase.
 - Stage124 produces review templates; nothing is promoted to
   `verified_user_confirmed` outside an explicit user-confirmation step.
-- No `listing_master_verified_stage124.csv`, no Gate B, no Part 2 modeling until the
-  manual research is complete.
+- Gate B execution and Part 2 modeling are not yet in scope; the next step is
+  Gate B readiness / eligibility rebuild planning only.
+
+## Verified listing master (Stage124)
+
+- `listing_master_verified_stage124.csv` **exists** and contains exactly **130
+  unique tickers**. It is the canonical source for first-trading-date information.
+- The date columns are `first_public_trading_date_jalali` and
+  `first_public_trading_date_gregorian`, with
+  `date_semantics=first_observed_trading_date_from_official_tse_api` and status
+  `verified_tse_api_first_observed_trade`. These dates are **first observed
+  trading dates** from the official TSETMC API — they are **not** necessarily IPO,
+  admission, or listing dates.
+- The Human-in-the-Loop (HIL) dashboard and manual intake runner have been
+  **retired**. The manual research path for the 10 Part 3 tickers
+  (`stage124-batch02-part03-1b-1`) is **superseded** by the official TSE API.
 
 ## Ranking & evidence (Stage124 Batch02)
 

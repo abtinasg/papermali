@@ -8,12 +8,12 @@ _Generated from the repository (git + QC). Do not edit by hand._
 ## Snapshot
 
 - **Stage / Batch:** Stage124 / Batch02
-- **Active workstream:** `stage124_batch02_part03`
-- **Last completed research action:** `stage124-batch02-part03-1b-0`
-- **Next research action:** `stage124-batch02-part03-1b-1`
-- **Last stage commit:** `ac40d33f641ed112e8c92c7ea21491d22b071dbb`
-- **Generated from commit:** `2fb32ac2c04db0bb8a214fd83569559062b42a93` (branch `stage124-official-api-finalize`, informational)
-- **Baseline:** `origin/main` @ `ac40d33f641ed112e8c92c7ea21491d22b071dbb`
+- **Active workstream:** `stage124_gate_b_readiness`
+- **Last completed research action:** `stage124-official-api-finalize`
+- **Next research action:** `stage124-gate-b-readiness`
+- **Last stage commit:** `d52d3eaf9cc46e51d24e0382adfd9784d7f9f8d7`
+- **Generated from commit:** `bfc36febe682fe6df0c89204fe93f9fb8bae7961` (branch `stage124-retire-hil-manual-research`, informational)
+- **Baseline:** `origin/main` @ `22c2d0cf54a8c621b0ee99bccb05a28758002ff5`
 
 ## QC
 
@@ -30,7 +30,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 ## Tickers in current research scope
 
-خمهر، خنصیر، خوساز، خچرخش، خکمک، دروز، دسبحا، دیران، رانفور، رمپنا
+اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `9f78150de5d023fb412bfe0617b5401fd398005d084f1cc6b20b0a5efff1d473`_
-_generated_at_utc: 2026-07-10T13:12:38Z (informational)_
+_state_fingerprint: `915c71a8ef30e894566aec09c646ffb73bc9e85d5acdf620234dc81981e6a295`_
+_generated_at_utc: 2026-07-11T08:31:27Z (informational)_

@@ -29,6 +29,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import os
@@ -398,6 +399,19 @@ def detect_markers(root: str) -> dict:
     }
 
 
+def _verified_master_tickers(root: str) -> list[str] | None:
+    """Read tickers from the verified master CSV if it exists."""
+    vm_path = os.path.join(root, VERIFIED_MASTER_PATH)
+    if not os.path.isfile(vm_path):
+        return None
+    try:
+        with open(vm_path, encoding="utf-8-sig") as fh:
+            reader = csv.DictReader(fh)
+            return [row["ticker"] for row in reader if row.get("ticker")]
+    except (OSError, KeyError):
+        return None
+
+
 # --------------------------------------------------------------------------- #
 # State assembly + fingerprint
 # --------------------------------------------------------------------------- #
@@ -406,7 +420,9 @@ def semantic_state(root: str):
     head = head_commit(root)
     roadmap = read_roadmap(root)
     workstream = roadmap["active_research_workstream_id"].replace("-", "_")
-    qc = select_qc_report(root, workstream, head)
+    qc_scope_val = roadmap.get("qc_scope", "")
+    qc_scope = qc_scope_val.replace("-", "_") if qc_scope_val else workstream
+    qc = select_qc_report(root, qc_scope, head)
     frozen = frozen_asset_report(root)
 
     # Fatal: any FROZEN (non-regenerable) tracked asset that is missing or
@@ -424,6 +440,11 @@ def semantic_state(root: str):
     if fatal:
         raise HandoffError("frozen-asset integrity failure (fail-closed): "
                            + "; ".join(fatal))
+
+    # Use verified master tickers when available (Gate B readiness scope);
+    # fall back to QC report tickers when the verified master does not exist.
+    vm_tickers = _verified_master_tickers(root)
+    tickers = sorted(vm_tickers) if vm_tickers is not None else sorted(qc["tickers"])
 
     state = {
         "last_stage_commit": last_stage_commit(root),
@@ -448,7 +469,7 @@ def semantic_state(root: str):
             "next_research_action_id": roadmap["next_research_action_id"],
         },
         "markers": detect_markers(root),
-        "tickers": sorted(qc["tickers"]),
+        "tickers": tickers,
     }
     return state, head, qc, roadmap, frozen
 

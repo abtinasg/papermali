@@ -28,9 +28,5 @@ project/stage123/modeling_all_rows_stage123.csv
 project/stage123/modeling_one_year_ahead_stage123.csv
 project/stage123/eligibility_audit_stage123.csv
 
-# Part 3.1B.0 manual-intake run report (regenerable audit artifact; its
-# source_commit/state reflect the run, so it is produced per-run, not tracked).
-project/stage124/batch02_parts/part03_manual_intake_report.json
-
 # Stray local archive (backup, not a deliverable)
 project/Archive.zip

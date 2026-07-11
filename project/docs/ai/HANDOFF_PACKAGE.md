@@ -20,8 +20,8 @@ for the paper, where **every value is traceable to a source** and nothing is gue
 ## 3. Current state
 
 See [`CURRENT_STATE.md`](CURRENT_STATE.md) (auto-generated). In one line: data-freeze
-/ manual-verification phase, Stage122 & Stage123 frozen, Stage124 Batch02 Part 3
-research screening of 10 tickers; **no model trained yet**.
+phase, Stage122 & Stage123 frozen, Stage124 verified master with 130 tickers
+from official TSE API; **no model trained yet**.
 
 ## 4. Firm decisions
 
@@ -72,8 +72,8 @@ See [`OPEN_TASKS.md`](OPEN_TASKS.md).
 ## 10. Next step
 
 See `next_research_action_id` in [`ROADMAP.md`](ROADMAP.md) and
-[`handoff_state.json`](handoff_state.json). Currently: **Stage124 Batch02 Part 3.1B.0**
-(Research-Intake Readiness).
+[`handoff_state.json`](handoff_state.json). Currently: **stage124-gate-b-readiness**
+(Gate B readiness / eligibility rebuild planning).
 
 ## 11. Recent change history
 
