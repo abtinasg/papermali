@@ -1,7 +1,7 @@
 ---
 roadmap_version: 1
 active_research_workstream_id: stage124-gate-b-readiness
-qc_scope: stage124-batch02-part03
+qc_scope: stage124-gate-b-readiness
 last_completed_research_action_id: stage124-gate-b-readiness
 next_research_action_id: stage124-gate-b-rule-approval
 active_maintenance_task_id: repository-driven-ai-handoff

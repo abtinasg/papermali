@@ -35,7 +35,7 @@ def main() -> int:
         print(f"  - {f}")
     print()
 
-    print("Hash verification:", "✅ all match" if result["hash_report"]["all_match"] else "❌ mismatch")
+    print("Hash verification:", "✅ all match" if result["hash_report"]["authoritative_csv_all_match"] else "❌ mismatch")
     print(f"Schema validation: {'✅ PASS' if result['schema_report']['overall_pass'] else '❌ FAIL'}")
     print()
 

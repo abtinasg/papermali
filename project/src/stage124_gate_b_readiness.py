@@ -47,6 +47,7 @@ DATE_SEMANTICS_NOTE = (
 )
 EXPECTED_ROWS = 1331
 EXPECTED_TICKERS = 130
+TARGET_YEAR_RANGE = list(range(1393, 1403))  # 1393–1402 inclusive
 
 RULE_DESCRIPTIONS = {
     "rule_a": "first_observed_trading_date <= fiscal_year_end (end-of-year rule)",
@@ -70,6 +71,7 @@ AUDIT_COLUMNS = [
     "ticker",
     "fiscal_year",
     "fiscal_year_end",
+    "fiscal_year_start",
     "first_public_trading_date_jalali",
     "first_public_trading_date_gregorian",
     "date_semantics",
@@ -118,8 +120,16 @@ def verify_input_hashes(project_dir: Path) -> dict:
     its hash is reported informationally but does not block the dry-run.
     The workbook is not used in the analysis.
 
-    Returns a dict with ``all_match`` (CSV-only), per-file details, and
-    a ``workbook_note`` field.
+    Returns a dict with explicit per-category fields:
+
+    - ``authoritative_csv_all_match``: True iff both CSVs match.
+    - ``authoritative_csv_verified_count``: number of CSVs that matched.
+    - ``workbook_match``: True iff the workbook hash matches.
+    - ``workbook_nonblocking``: always True (workbook is informational).
+    - ``workbook_used_in_analysis``: always False.
+    - ``files``: per-file details.
+    - ``mismatches``: list of mismatch descriptions (CSV only).
+    - ``workbook_note``: informational note about the workbook.
     """
     metadata_path = project_dir / "stage123" / "metadata_and_hashes_stage123.json"
     with open(metadata_path, encoding="utf-8") as f:
@@ -137,12 +147,21 @@ def verify_input_hashes(project_dir: Path) -> dict:
         "stage123_workbook.xlsx": project_dir / "stage123" / "stage123_workbook.xlsx",
     }
 
-    result = {"all_match": True, "files": {}, "mismatches": [], "workbook_note": ""}
+    result = {
+        "authoritative_csv_all_match": True,
+        "authoritative_csv_verified_count": 0,
+        "workbook_match": False,
+        "workbook_nonblocking": True,
+        "workbook_used_in_analysis": False,
+        "files": {},
+        "mismatches": [],
+        "workbook_note": "",
+    }
 
     # Check CSVs (fail-closed)
     for fname, fpath in csv_files.items():
         if not fpath.is_file():
-            result["all_match"] = False
+            result["authoritative_csv_all_match"] = False
             result["mismatches"].append(f"{fname}: file not found")
             result["files"][fname] = {"found": False}
             continue
@@ -156,8 +175,10 @@ def verify_input_hashes(project_dir: Path) -> dict:
             "match": match,
             "fail_closed": True,
         }
-        if not match:
-            result["all_match"] = False
+        if match:
+            result["authoritative_csv_verified_count"] += 1
+        else:
+            result["authoritative_csv_all_match"] = False
             result["mismatches"].append(
                 f"{fname}: expected {expected}, got {actual}"
             )
@@ -178,6 +199,7 @@ def verify_input_hashes(project_dir: Path) -> dict:
             "match": match,
             "fail_closed": False,
         }
+        result["workbook_match"] = match
         if not match:
             result["workbook_note"] = (
                 f"{fname}: hash mismatch (expected {expected[:16]}..., "
@@ -185,7 +207,7 @@ def verify_input_hashes(project_dir: Path) -> dict:
                 "it is not used in the analysis. CSV files verified successfully."
             )
 
-    if not result["all_match"]:
+    if not result["authoritative_csv_all_match"]:
         raise QCFail(
             "Input file hash verification failed (fail-closed):\n  "
             + "\n  ".join(result["mismatches"])
@@ -350,6 +372,7 @@ def compute_rules(
     audit["ticker"] = merged["ticker"]
     audit["fiscal_year"] = merged["fiscal_year"]
     audit["fiscal_year_end"] = merged["fiscal_year_end"]
+    audit["fiscal_year_start"] = ""
     audit["first_public_trading_date_jalali"] = merged["first_public_trading_date_jalali"]
     audit["first_public_trading_date_gregorian"] = merged["first_public_trading_date_gregorian"]
     audit["date_semantics"] = DATE_SEMANTICS
@@ -377,6 +400,7 @@ def compute_rules(
     reason_a = []
     reason_b = []
     reason_c = []
+    fy_start_strs = []
 
     for i in merged.index:
         fye_str = merged.at[i, "fiscal_year_end"]
@@ -403,6 +427,12 @@ def compute_rules(
 
         # --- Compute fiscal_year_start for Rule B and C ---
         fy_start = compute_fiscal_year_start(fye_str, non12)
+        if fy_start is not None:
+            fy_start_strs.append(
+                f"{fy_start.year}/{fy_start.month:02d}/{fy_start.day:02d}"
+            )
+        else:
+            fy_start_strs.append("")
 
         # --- Rule B: first_observed_trading_date <= fiscal_year_start ---
         if fy_start is None:
@@ -441,6 +471,7 @@ def compute_rules(
     audit["exclusion_reason_rule_a"] = reason_a
     audit["exclusion_reason_rule_b"] = reason_b
     audit["exclusion_reason_rule_c"] = reason_c
+    audit["fiscal_year_start"] = fy_start_strs
 
     # Sort by row_key for deterministic output
     audit = audit.sort_values("row_key").reset_index(drop=True)
@@ -541,45 +572,59 @@ def compute_pair_impact(
 
         # Target values for eligible pairs
         targets = pairs["FD_target_main_t_plus_1"].tolist()
-        years = pairs["fiscal_year_t"].tolist()
+        predictor_years = pairs["fiscal_year_t"].tolist()
+        target_years = pairs["target_year"].tolist()
 
         n_pos = 0
         n_neg = 0
         n_target_missing = 0
-        pos_by_year = {}
-        neg_by_year = {}
 
         for i in pair_eligible_set:
             t = targets[i]
-            y = str(int(years[i]))
             if pd.isna(t):
                 n_target_missing += 1
             elif float(t) == 1.0:
                 n_pos += 1
-                pos_by_year[y] = pos_by_year.get(y, 0) + 1
             else:
                 n_neg += 1
-                neg_by_year[y] = neg_by_year.get(y, 0) + 1
 
-        # Year distribution
-        year_dist = {}
-        for y in sorted(set(list(years))):
-            y_str = str(int(y))
-            year_dist[y_str] = {
-                "n": 0,
-                "pos": 0,
-                "neg": 0,
-            }
+        # --- Distribution by predictor year (fiscal_year_t) ---
+        predictor_year_dist = {}
+        for y in sorted(set(int(y) for y in predictor_years if pd.notna(y))):
+            y_str = str(y)
+            predictor_year_dist[y_str] = {"n": 0, "pos": 0, "neg": 0}
         for i in pair_eligible_set:
-            y_str = str(int(years[i]))
-            year_dist[y_str]["n"] += 1
+            y_str = str(int(predictor_years[i]))
+            predictor_year_dist[y_str]["n"] += 1
             t = targets[i]
             if pd.isna(t):
                 pass
             elif float(t) == 1.0:
-                year_dist[y_str]["pos"] += 1
+                predictor_year_dist[y_str]["pos"] += 1
             else:
-                year_dist[y_str]["neg"] += 1
+                predictor_year_dist[y_str]["neg"] += 1
+
+        # --- Distribution by target year (target_year = t+1) ---
+        # Main distribution for article and Rule comparison; covers 1393–1402
+        target_year_dist = {}
+        for y in TARGET_YEAR_RANGE:
+            y_str = str(y)
+            target_year_dist[y_str] = {"n": 0, "pos": 0, "neg": 0}
+        for i in pair_eligible_set:
+            ty = target_years[i]
+            if pd.isna(ty):
+                continue
+            y_str = str(int(ty))
+            if y_str not in target_year_dist:
+                target_year_dist[y_str] = {"n": 0, "pos": 0, "neg": 0}
+            target_year_dist[y_str]["n"] += 1
+            t = targets[i]
+            if pd.isna(t):
+                pass
+            elif float(t) == 1.0:
+                target_year_dist[y_str]["pos"] += 1
+            else:
+                target_year_dist[y_str]["neg"] += 1
 
         # Change vs Stage123
         s123_n_eligible = sum(s123_eligible)
@@ -599,31 +644,55 @@ def compute_pair_impact(
             "negative_pairs": n_neg,
             "target_missing_pairs": n_target_missing,
             "change_vs_stage123": change,
-            "pos_neg_by_year": year_dist,
+            "pos_neg_by_predictor_year_t": predictor_year_dist,
+            "pos_neg_by_target_year_t_plus_1": target_year_dist,
         }
 
     # Stage123 baseline
     s123_targets = pairs["FD_target_main_t_plus_1"].tolist()
-    s123_years = pairs["fiscal_year_t"].tolist()
+    s123_predictor_years = pairs["fiscal_year_t"].tolist()
+    s123_target_years = pairs["target_year"].tolist()
     s123_eligible_set = [i for i, v in enumerate(s123_eligible) if v == 1]
     s123_pos = sum(1 for i in s123_eligible_set if not pd.isna(s123_targets[i]) and float(s123_targets[i]) == 1.0)
     s123_neg = sum(1 for i in s123_eligible_set if not pd.isna(s123_targets[i]) and float(s123_targets[i]) == 0.0)
     s123_missing = sum(1 for i in s123_eligible_set if pd.isna(s123_targets[i]))
 
-    s123_year_dist = {}
-    for y in sorted(set(list(s123_years))):
-        y_str = str(int(y))
-        s123_year_dist[y_str] = {"n": 0, "pos": 0, "neg": 0}
+    # Baseline distribution by predictor year
+    s123_predictor_dist = {}
+    for y in sorted(set(int(y) for y in s123_predictor_years if pd.notna(y))):
+        y_str = str(y)
+        s123_predictor_dist[y_str] = {"n": 0, "pos": 0, "neg": 0}
     for i in s123_eligible_set:
-        y_str = str(int(s123_years[i]))
-        s123_year_dist[y_str]["n"] += 1
+        y_str = str(int(s123_predictor_years[i]))
+        s123_predictor_dist[y_str]["n"] += 1
         t = s123_targets[i]
         if pd.isna(t):
             pass
         elif float(t) == 1.0:
-            s123_year_dist[y_str]["pos"] += 1
+            s123_predictor_dist[y_str]["pos"] += 1
         else:
-            s123_year_dist[y_str]["neg"] += 1
+            s123_predictor_dist[y_str]["neg"] += 1
+
+    # Baseline distribution by target year
+    s123_target_dist = {}
+    for y in TARGET_YEAR_RANGE:
+        y_str = str(y)
+        s123_target_dist[y_str] = {"n": 0, "pos": 0, "neg": 0}
+    for i in s123_eligible_set:
+        ty = s123_target_years[i]
+        if pd.isna(ty):
+            continue
+        y_str = str(int(ty))
+        if y_str not in s123_target_dist:
+            s123_target_dist[y_str] = {"n": 0, "pos": 0, "neg": 0}
+        s123_target_dist[y_str]["n"] += 1
+        t = s123_targets[i]
+        if pd.isna(t):
+            pass
+        elif float(t) == 1.0:
+            s123_target_dist[y_str]["pos"] += 1
+        else:
+            s123_target_dist[y_str]["neg"] += 1
 
     impact["stage123_baseline"] = {
         "description": "Stage123 existing eligible_listing (ocf_resolution_status proxy)",
@@ -632,7 +701,8 @@ def compute_pair_impact(
         "positive_pairs": s123_pos,
         "negative_pairs": s123_neg,
         "target_missing_pairs": s123_missing,
-        "pos_neg_by_year": s123_year_dist,
+        "pos_neg_by_predictor_year_t": s123_predictor_dist,
+        "pos_neg_by_target_year_t_plus_1": s123_target_dist,
     }
 
     # Rows differing between Rule A and Rule B
@@ -665,6 +735,59 @@ def compute_pair_impact(
     impact["rows_differing_between_b_and_c"] = differ_b_c
     impact["count_rows_differing_between_b_and_c"] = len(differ_b_c)
 
+    # --- Build disagreement rows DataFrame ---
+    # All rows where any two rules disagree, with pair-level fields joined.
+    differ_row_keys = set(differ_a_b) | set(differ_a_c) | set(differ_b_c)
+    disagree_rows = audit[audit["row_key"].isin(differ_row_keys)].copy()
+
+    # Build pair lookup: predictor_row_key_t -> (FD_target, pair_eligible per rule)
+    pair_lookup = {}
+    for idx, pair in pairs.iterrows():
+        rk = pair["predictor_row_key_t"]
+        pair_lookup[rk] = {
+            "FD_target_main_t_plus_1": pair["FD_target_main_t_plus_1"],
+            "pair_eligible_rule_a": pair_results["eligible_rule_a"][idx],
+            "pair_eligible_rule_b": pair_results["eligible_rule_b"][idx],
+            "pair_eligible_rule_c": pair_results["eligible_rule_c"][idx],
+        }
+
+    fd_targets = []
+    pe_a = []
+    pe_b = []
+    pe_c = []
+    for _, row in disagree_rows.iterrows():
+        info = pair_lookup.get(row["row_key"])
+        if info:
+            fd_targets.append(info["FD_target_main_t_plus_1"])
+            pe_a.append(info["pair_eligible_rule_a"])
+            pe_b.append(info["pair_eligible_rule_b"])
+            pe_c.append(info["pair_eligible_rule_c"])
+        else:
+            fd_targets.append("")
+            pe_a.append("")
+            pe_b.append("")
+            pe_c.append("")
+
+    disagree_rows = disagree_rows.assign(
+        FD_target_main_t_plus_1=fd_targets,
+        pair_eligible_rule_a=pe_a,
+        pair_eligible_rule_b=pe_b,
+        pair_eligible_rule_c=pe_c,
+    )
+
+    DISAGREE_COLUMNS = [
+        "row_key", "ticker", "fiscal_year", "fiscal_year_end",
+        "fiscal_year_start", "first_public_trading_date_jalali",
+        "eligible_rule_a", "eligible_rule_b", "eligible_rule_c",
+        "exclusion_reason_rule_a", "exclusion_reason_rule_b",
+        "exclusion_reason_rule_c",
+        "FD_target_main_t_plus_1",
+        "pair_eligible_rule_a", "pair_eligible_rule_b",
+        "pair_eligible_rule_c",
+    ]
+    available_cols = [c for c in DISAGREE_COLUMNS if c in disagree_rows.columns]
+    impact["disagreement_rows"] = disagree_rows[available_cols]
+
     return impact
 
 
@@ -678,6 +801,28 @@ def _git_head(repo_root: str) -> str:
         capture_output=True, text=True,
     )
     return proc.stdout.strip() if proc.returncode == 0 else "unknown"
+
+
+def _git_commit_timestamp(repo_root: str, commit: str) -> str:
+    """Return the committer timestamp of *commit* in ISO-8601 UTC.
+
+    Used as a deterministic timestamp so that repeated runs from the same
+    commit produce byte-identical artifacts (idempotence).
+    """
+    proc = subprocess.run(
+        ["git", "-C", repo_root, "log", "-1", "--format=%cI", commit],
+        capture_output=True, text=True,
+    )
+    if proc.returncode != 0:
+        return "unknown"
+    raw = proc.stdout.strip()
+    # %cI gives e.g. 2026-07-11T14:30:00+03:30 — normalise to UTC Z suffix
+    try:
+        from datetime import datetime as _dt
+        dt = _dt.fromisoformat(raw)
+        return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    except Exception:
+        return raw
 
 
 def generate_outputs(
@@ -717,7 +862,8 @@ def generate_outputs(
             "negative_pairs": r["negative_pairs"],
             "target_missing_pairs": r["target_missing_pairs"],
             "change_vs_stage123": r["change_vs_stage123"],
-            "pos_neg_by_year": json.dumps(r["pos_neg_by_year"], ensure_ascii=False, sort_keys=True),
+            "pos_neg_by_predictor_year_t": json.dumps(r["pos_neg_by_predictor_year_t"], ensure_ascii=False, sort_keys=True),
+            "pos_neg_by_target_year_t_plus_1": json.dumps(r["pos_neg_by_target_year_t_plus_1"], ensure_ascii=False, sort_keys=True),
         })
     # Add baseline
     bl = impact["stage123_baseline"]
@@ -736,7 +882,8 @@ def generate_outputs(
         "negative_pairs": bl["negative_pairs"],
         "target_missing_pairs": bl["target_missing_pairs"],
         "change_vs_stage123": 0,
-        "pos_neg_by_year": json.dumps(bl["pos_neg_by_year"], ensure_ascii=False, sort_keys=True),
+        "pos_neg_by_predictor_year_t": json.dumps(bl["pos_neg_by_predictor_year_t"], ensure_ascii=False, sort_keys=True),
+        "pos_neg_by_target_year_t_plus_1": json.dumps(bl["pos_neg_by_target_year_t_plus_1"], ensure_ascii=False, sort_keys=True),
     })
     impact_df = pd.DataFrame(impact_rows)
     impact_path = out_dir / "gate_b_pair_impact_summary.csv"
@@ -746,6 +893,12 @@ def generate_outputs(
     unmatched = audit[audit["data_quality_status"] != "ok"].copy()
     unmatched_path = out_dir / "gate_b_unmatched_or_ambiguous_rows.csv"
     unmatched.to_csv(unmatched_path, index=False, encoding="utf-8-sig")
+
+    # 3b. gate_b_rule_disagreement_rows.csv
+    disagree_df = impact.get("disagreement_rows")
+    if disagree_df is not None and len(disagree_df) > 0:
+        disagree_path = out_dir / "gate_b_rule_disagreement_rows.csv"
+        disagree_df.to_csv(disagree_path, index=False, encoding="utf-8-sig")
 
     # 4. gate_b_rule_comparison_summary.json
     summary = {
@@ -778,13 +931,13 @@ def generate_outputs(
             },
         },
         "hash_verification": {
-            "all_match": hash_report["all_match"],
+            "authoritative_csv_all_match": hash_report["authoritative_csv_all_match"],
+            "authoritative_csv_verified_count": hash_report["authoritative_csv_verified_count"],
+            "workbook_match": hash_report["workbook_match"],
+            "workbook_nonblocking": hash_report["workbook_nonblocking"],
+            "workbook_used_in_analysis": hash_report["workbook_used_in_analysis"],
             "mismatches": hash_report["mismatches"],
             "workbook_note": hash_report.get("workbook_note", ""),
-            "csv_files_verified": [
-                fname for fname, info in hash_report["files"].items()
-                if info.get("fail_closed") and info.get("match")
-            ],
         },
         "schema_validation": schema_report,
         "data_quality_summary": dq_summary,
@@ -823,10 +976,21 @@ def generate_outputs(
             "status": check["status"],
             "detail": check["detail"],
         })
+    if hash_report["workbook_match"]:
+        _hash_detail = (
+            f"{hash_report['authoritative_csv_verified_count']} authoritative "
+            "Stage123 CSV files matched exactly. Workbook hash matched."
+        )
+    else:
+        _hash_detail = (
+            f"{hash_report['authoritative_csv_verified_count']} authoritative "
+            "Stage123 CSV files matched exactly. Workbook hash mismatch "
+            "recorded as a non-blocking warning; workbook not used."
+        )
     qc_assertions.append({
         "assertion": "hash_verification",
-        "status": "PASS" if hash_report["all_match"] else "FAIL",
-        "detail": f"{len(hash_report['files'])} files verified",
+        "status": "PASS" if hash_report["authoritative_csv_all_match"] else "FAIL",
+        "detail": _hash_detail,
     })
     qc_assertions.append({
         "assertion": "no_modeling_started",
@@ -863,12 +1027,13 @@ def generate_outputs(
     lm = pd.read_csv(project_dir / "stage124" / "listing_master_verified_stage124.csv")
     tickers = sorted(lm["ticker"].tolist())
 
-    all_pass = schema_report["overall_pass"] and hash_report["all_match"]
+    all_pass = schema_report["overall_pass"] and hash_report["authoritative_csv_all_match"]
     failed_count = sum(1 for a in qc_assertions if a["status"] != "PASS")
 
+    deterministic_ts = _git_commit_timestamp(str(repo_root), source_commit)
     qc_report = {
         "stage": "stage124_gate_b_readiness",
-        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated_at": deterministic_ts,
         "source_commit": source_commit,
         "source_file_sha256": sha256_file(src_path) if src_path.is_file() else None,
         "test_file_sha256": sha256_file(test_path) if test_path.is_file() else None,
@@ -883,12 +1048,19 @@ def generate_outputs(
     with open(qc_path, "w", encoding="utf-8") as f:
         json.dump(qc_report, f, indent=2, ensure_ascii=False, sort_keys=True)
 
-    # 6. metadata_and_hashes_gate_b_readiness.json
+    # 6. Generate README before computing hashes so its hash is current
+    generate_readme(out_dir, impact, hash_report, schema_report, dq_summary)
+
+    # 7. metadata_and_hashes_gate_b_readiness.json
+    # NOTE: metadata_and_hashes_gate_b_readiness.json is intentionally NOT
+    # included in output_files_sha256 to avoid the self-hash paradox
+    # (writing the hash inside the file changes the file's hash).
     output_files = [
         "gate_b_rule_comparison_summary.json",
         "gate_b_company_year_audit.csv",
         "gate_b_pair_impact_summary.csv",
         "gate_b_unmatched_or_ambiguous_rows.csv",
+        "gate_b_rule_disagreement_rows.csv",
         "gate_b_readiness_qc_report.json",
         "README_GATE_B_READINESS.md",
     ]
@@ -912,7 +1084,7 @@ def generate_outputs(
         },
         "listing_master_sha256": sha256_file(project_dir / "stage124" / "listing_master_verified_stage124.csv"),
         "output_files_sha256": output_hashes,
-        "datetime": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
+        "datetime": deterministic_ts,
         "source_code_commit": source_commit,
         "source_file_sha256": sha256_file(src_path) if src_path.is_file() else None,
         "test_file_sha256": sha256_file(test_path) if test_path.is_file() else None,
@@ -923,11 +1095,6 @@ def generate_outputs(
         "warning": "No rule has been finalized. Next action: stage124-gate-b-rule-approval",
     }
     meta_path = out_dir / "metadata_and_hashes_gate_b_readiness.json"
-    with open(meta_path, "w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=2, ensure_ascii=False, sort_keys=True)
-
-    # Compute hashes of the metadata file itself (after writing)
-    metadata["output_files_sha256"]["metadata_and_hashes_gate_b_readiness.json"] = sha256_file(meta_path)
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2, ensure_ascii=False, sort_keys=True)
 
@@ -1028,6 +1195,7 @@ def generate_readme(
         "- `gate_b_company_year_audit.csv` — per-row audit with all rule eligibility",
         "- `gate_b_pair_impact_summary.csv` — per-rule pair statistics",
         "- `gate_b_unmatched_or_ambiguous_rows.csv` — rows with data quality issues",
+        "- `gate_b_rule_disagreement_rows.csv` — rows where rules disagree (A/B/C comparison)",
         "- `gate_b_readiness_qc_report.json` — QC report",
         "- `metadata_and_hashes_gate_b_readiness.json` — hashes and metadata",
         "- `README_GATE_B_READINESS.md` — this file\n",
@@ -1095,10 +1263,6 @@ def run(project_dir: Path | None = None) -> dict:
         project_dir, repo_root, audit, impact,
         schema_report, hash_report, dq_summary,
     )
-
-    # 7. Generate README
-    out_dir = project_dir / "stage124" / "gate_b_readiness"
-    generate_readme(out_dir, impact, hash_report, schema_report, dq_summary)
 
     return {
         **output_info,
