@@ -1,0 +1,30 @@
+{
+  "date_semantics": "first_observed_trading_date_from_official_tse_api",
+  "date_semantics_note": "These dates are the first observed trading dates from the official TSETMC API. They are NOT IPO dates, admission dates, or listing dates.",
+  "datetime": "2026-07-11 10:02:22 UTC",
+  "description": "Gate B readiness dry-run — eligibility rule comparison",
+  "expected_rows": 1331,
+  "expected_tickers": 130,
+  "has_jdatetime": true,
+  "input_files_sha256": {
+    "modeling_all_rows_stage123.csv": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+    "modeling_one_year_ahead_stage123.csv": "e3d3063e840d61a39c3b4477aabe347050be6c829755acdcead05359fa9181ac",
+    "stage123_workbook.xlsx": "2295f742d7ecc3114c8c66eecbead9e2da9e2900dba9af7374ee4ac248c42185"
+  },
+  "listing_master_sha256": "968cf0cc4613aadd738d14e3cd3058e25920256c891b431d9e99776de3479fd7",
+  "output_files_sha256": {
+    "README_GATE_B_READINESS.md": "9d48150d549a43e2054082996220dacddb3c85f1899754c0b2fd5c9700fd475f",
+    "gate_b_company_year_audit.csv": "e9d98d6fc4f43b4799e5ca00b26e144289a2750b0f82156d51e878297a631ced",
+    "gate_b_pair_impact_summary.csv": "1558c278a2f7d31e1537a40e63ad58fc19e7362c7e68585fe86078df99741453",
+    "gate_b_readiness_qc_report.json": "b984725796369231dd4476b316e3e84f0f07b2ed31e76689a7a6345fcc3dd11f",
+    "gate_b_rule_comparison_summary.json": "aabcfef1a1328211bf90bd7a8ba7bf5c728c9bf486bc57b016d5033e0a2323ac",
+    "gate_b_unmatched_or_ambiguous_rows.csv": "fb9d78b40e03ada73c6e59316549187477f855cd2de65ff0450d7fb60a1ba1e8",
+    "metadata_and_hashes_gate_b_readiness.json": "3fd788529fe7ba17e52adab3a21c6ce69631453455103c472f65ef2c979d949c"
+  },
+  "python": "3.14.0 (v3.14.0:ebf955df7a8, Oct  7 2025, 08:20:14) [Clang 16.0.0 (clang-1600.0.26.6)]",
+  "source_code_commit": "371b5a8169ff84e448ce8c4e60ca489fc09b8650",
+  "source_file_sha256": "387cfa09dd15e1476385f4998cd539930ae2eca68afefe28c422371b47bc848d",
+  "stage": "stage124-gate-b-readiness",
+  "test_file_sha256": "7feece23998f985341bc858929f98b347c586660e43f438a1623aab97bb4de77",
+  "warning": "No rule has been finalized. Next action: stage124-gate-b-rule-approval"
+}

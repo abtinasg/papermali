@@ -3,6 +3,33 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-11
+
+- **`stage124-gate-b-readiness` completed** — Dry-run comparison of three Gate B
+  eligibility rules (A/B/C) against the verified master and Stage123 modeling data.
+  Rule A: `first_observed_trading_date <= fiscal_year_end` (1013 eligible pairs).
+  Rule B: `first_observed_trading_date <= fiscal_year_start` (994 eligible pairs).
+  Rule C: `first_observed_trading_year < fiscal_year` (995 eligible pairs).
+  Stage123 baseline: 1085 eligible pairs. No rule finalized.
+- **Output files** in `project/stage124/gate_b_readiness/`: comparison summary JSON,
+  per-row audit CSV, pair impact summary CSV, unmatched/ambiguous rows CSV, QC report
+  (all pass), metadata/hashes, and README.
+- **33 independent tests** added in `project/tests/test_stage124_gate_b_readiness.py`
+  covering hash verification, schema validation, rule determinism, fiscal_year_start
+  computation (leap year Esfand 30 fix), date semantics, no-rows-dropped, and output
+  integrity.
+- **`fiscal_year_start` computation fix**: for Jalali leap-year Esfand 30 dates
+  (e.g. 1399/12/30), the naive "fy_end - 1 year + 1 day" fails because the previous
+  year's Esfand has only 29 days. Fixed to use month-based logic: month 12 →
+  `jdatetime.date(fy_end.year, 1, 1)`, otherwise `jdatetime.date(fy_end.year - 1,
+  fy_end.month + 1, 1)`.
+- **Workbook hash note**: `stage123_workbook.xlsx` hash differs from Stage123 metadata
+  (gitignored, regenerable, not used in analysis). CSV files verified successfully.
+- Updated ROADMAP: `last_completed_research_action_id` → `stage124-gate-b-readiness`,
+  `next_research_action_id` → `stage124-gate-b-rule-approval`.
+- **Next action** is `stage124-gate-b-rule-approval` — user and scientific reviewer
+  must approve the final Gate B rule from the comparison report.
+
 ## 2026-07-10
 
 - **Retired the Human-in-the-Loop (HIL) and manual listing-date research path.**

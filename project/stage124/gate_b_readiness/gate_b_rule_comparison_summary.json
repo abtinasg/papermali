@@ -1,0 +1,507 @@
+{
+  "data_quality_summary": {
+    "missing_fiscal_year_end": 4,
+    "non_12_month_period": 6,
+    "ok": 1321,
+    "unmatched_ticker": 0
+  },
+  "date_semantics": "first_observed_trading_date_from_official_tse_api",
+  "date_semantics_note": "These dates are the first observed trading dates from the official TSETMC API. They are NOT IPO dates, admission dates, or listing dates.",
+  "description": "Dry-run comparison of three Gate B eligibility rules",
+  "hash_verification": {
+    "all_match": true,
+    "csv_files_verified": [
+      "modeling_all_rows_stage123.csv",
+      "modeling_one_year_ahead_stage123.csv"
+    ],
+    "mismatches": [],
+    "workbook_note": "stage123_workbook.xlsx: hash mismatch (expected 5f2558993dc35d92..., got 2295f742d7ecc311...). This file is gitignored and regenerable; it is not used in the analysis. CSV files verified successfully."
+  },
+  "input_files": {
+    "listing_master": {
+      "path": "project/stage124/listing_master_verified_stage124.csv",
+      "tickers": 130
+    },
+    "modeling_all_rows": {
+      "path": "project/stage123/modeling_all_rows_stage123.csv",
+      "rows": 1331,
+      "sha256": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390"
+    },
+    "modeling_one_year_ahead": {
+      "path": "project/stage123/modeling_one_year_ahead_stage123.csv",
+      "sha256": "e3d3063e840d61a39c3b4477aabe347050be6c829755acdcead05359fa9181ac"
+    },
+    "stage123_workbook": {
+      "path": "project/stage123/stage123_workbook.xlsx",
+      "sha256": "2295f742d7ecc3114c8c66eecbead9e2da9e2900dba9af7374ee4ac248c42185"
+    }
+  },
+  "next_action": "stage124-gate-b-rule-approval",
+  "rows_differing_between_a_and_b": {
+    "count": 29,
+    "row_keys": [
+      "اردستان|1401",
+      "اپال|1400",
+      "برکت|1395",
+      "بوعلی|1399",
+      "تاپیکو|1393",
+      "ثشرق|1393",
+      "جم پیلن|1398",
+      "جم|1394",
+      "ذوب|1400",
+      "زپارس|1397",
+      "سآبیک|1401",
+      "سخوز|1394",
+      "سپید|1400",
+      "شغدیر|1400",
+      "شکلر|1397",
+      "شکلر|1400",
+      "غشان|1402",
+      "نوری|1398",
+      "های وب|1396",
+      "همراه|1392",
+      "وکغدیر|1402",
+      "پارس|1397",
+      "پرداخت|1396",
+      "پرداخت|1401",
+      "پی‌پاد|1401",
+      "پی‌پاد|1402",
+      "کاوه|1396",
+      "کویر|1398",
+      "کیمیاتک|1400"
+    ]
+  },
+  "rows_differing_between_a_and_c": {
+    "count": 26,
+    "row_keys": [
+      "اردستان|1401",
+      "برکت|1395",
+      "بوعلی|1399",
+      "ثشرق|1393",
+      "جم پیلن|1398",
+      "جم|1394",
+      "ذوب|1400",
+      "زپارس|1397",
+      "سآبیک|1401",
+      "سخوز|1394",
+      "سپید|1400",
+      "شغدیر|1400",
+      "شکلر|1397",
+      "شکلر|1400",
+      "غشان|1402",
+      "نوری|1398",
+      "های وب|1396",
+      "همراه|1392",
+      "پارس|1397",
+      "پرداخت|1396",
+      "پرداخت|1401",
+      "پی‌پاد|1401",
+      "پی‌پاد|1402",
+      "کاوه|1396",
+      "کویر|1398",
+      "کیمیاتک|1400"
+    ]
+  },
+  "rows_differing_between_b_and_c": {
+    "count": 3,
+    "row_keys": [
+      "اپال|1400",
+      "تاپیکو|1393",
+      "وکغدیر|1402"
+    ]
+  },
+  "rules": {
+    "rule_a": {
+      "affected_tickers": [
+        "اردستان",
+        "اروند",
+        "اپال",
+        "برکت",
+        "بوعلی",
+        "ثشرق",
+        "جم",
+        "جم پیلن",
+        "ذوب",
+        "زپارس",
+        "سآبیک",
+        "سخوز",
+        "سپید",
+        "شغدیر",
+        "نوری",
+        "های وب",
+        "وکغدیر",
+        "پارس",
+        "پرداخت",
+        "پی‌پاد",
+        "کاوه",
+        "کویر",
+        "کیمیاتک"
+      ],
+      "affected_tickers_count": 23,
+      "change_vs_stage123": -72,
+      "description": "first_observed_trading_date <= fiscal_year_end (end-of-year rule)",
+      "eligible_pairs": 1013,
+      "eligible_rows": 1230,
+      "negative_pairs": 932,
+      "pos_neg_by_year": {
+        "1392": {
+          "n": 46,
+          "neg": 38,
+          "pos": 8
+        },
+        "1393": {
+          "n": 98,
+          "neg": 87,
+          "pos": 11
+        },
+        "1394": {
+          "n": 101,
+          "neg": 87,
+          "pos": 14
+        },
+        "1395": {
+          "n": 101,
+          "neg": 85,
+          "pos": 16
+        },
+        "1396": {
+          "n": 105,
+          "neg": 95,
+          "pos": 10
+        },
+        "1397": {
+          "n": 106,
+          "neg": 100,
+          "pos": 6
+        },
+        "1398": {
+          "n": 110,
+          "neg": 106,
+          "pos": 4
+        },
+        "1399": {
+          "n": 112,
+          "neg": 108,
+          "pos": 4
+        },
+        "1400": {
+          "n": 116,
+          "neg": 111,
+          "pos": 5
+        },
+        "1401": {
+          "n": 118,
+          "neg": 115,
+          "pos": 3
+        }
+      },
+      "positive_pairs": 81,
+      "pre_listing_rows": 97,
+      "target_missing_pairs": 0,
+      "total_company_year_rows": 1331,
+      "total_pairs": 1200,
+      "unresolved_rows": 4
+    },
+    "rule_b": {
+      "affected_tickers": [
+        "اردستان",
+        "اروند",
+        "اپال",
+        "برکت",
+        "بوعلی",
+        "تاپیکو",
+        "ثشرق",
+        "جم",
+        "جم پیلن",
+        "ذوب",
+        "زپارس",
+        "سآبیک",
+        "سخوز",
+        "سپید",
+        "شغدیر",
+        "شکلر",
+        "غشان",
+        "نوری",
+        "های وب",
+        "همراه",
+        "وکغدیر",
+        "پارس",
+        "پرداخت",
+        "پی‌پاد",
+        "کاوه",
+        "کویر",
+        "کیمیاتک"
+      ],
+      "affected_tickers_count": 27,
+      "change_vs_stage123": -91,
+      "description": "first_observed_trading_date <= fiscal_year_start (start-of-year strict rule)",
+      "eligible_pairs": 994,
+      "eligible_rows": 1202,
+      "negative_pairs": 914,
+      "pos_neg_by_year": {
+        "1392": {
+          "n": 46,
+          "neg": 38,
+          "pos": 8
+        },
+        "1393": {
+          "n": 97,
+          "neg": 86,
+          "pos": 11
+        },
+        "1394": {
+          "n": 99,
+          "neg": 85,
+          "pos": 14
+        },
+        "1395": {
+          "n": 101,
+          "neg": 85,
+          "pos": 16
+        },
+        "1396": {
+          "n": 102,
+          "neg": 92,
+          "pos": 10
+        },
+        "1397": {
+          "n": 104,
+          "neg": 98,
+          "pos": 6
+        },
+        "1398": {
+          "n": 107,
+          "neg": 103,
+          "pos": 4
+        },
+        "1399": {
+          "n": 111,
+          "neg": 107,
+          "pos": 4
+        },
+        "1400": {
+          "n": 111,
+          "neg": 107,
+          "pos": 4
+        },
+        "1401": {
+          "n": 116,
+          "neg": 113,
+          "pos": 3
+        }
+      },
+      "positive_pairs": 80,
+      "pre_listing_rows": 119,
+      "target_missing_pairs": 0,
+      "total_company_year_rows": 1331,
+      "total_pairs": 1200,
+      "unresolved_rows": 10
+    },
+    "rule_c": {
+      "affected_tickers": [
+        "اردستان",
+        "اروند",
+        "اپال",
+        "برکت",
+        "بوعلی",
+        "ثشرق",
+        "جم",
+        "جم پیلن",
+        "ذوب",
+        "زپارس",
+        "سآبیک",
+        "سخوز",
+        "سپید",
+        "شغدیر",
+        "شکلر",
+        "غشان",
+        "نوری",
+        "های وب",
+        "همراه",
+        "وکغدیر",
+        "پارس",
+        "پرداخت",
+        "پی‌پاد",
+        "کاوه",
+        "کویر",
+        "کیمیاتک"
+      ],
+      "affected_tickers_count": 26,
+      "change_vs_stage123": -90,
+      "description": "first_observed_trading_year < fiscal_year (year-level conservative rule)",
+      "eligible_pairs": 995,
+      "eligible_rows": 1205,
+      "negative_pairs": 915,
+      "pos_neg_by_year": {
+        "1392": {
+          "n": 46,
+          "neg": 38,
+          "pos": 8
+        },
+        "1393": {
+          "n": 97,
+          "neg": 86,
+          "pos": 11
+        },
+        "1394": {
+          "n": 99,
+          "neg": 85,
+          "pos": 14
+        },
+        "1395": {
+          "n": 101,
+          "neg": 85,
+          "pos": 16
+        },
+        "1396": {
+          "n": 102,
+          "neg": 92,
+          "pos": 10
+        },
+        "1397": {
+          "n": 104,
+          "neg": 98,
+          "pos": 6
+        },
+        "1398": {
+          "n": 107,
+          "neg": 103,
+          "pos": 4
+        },
+        "1399": {
+          "n": 111,
+          "neg": 107,
+          "pos": 4
+        },
+        "1400": {
+          "n": 112,
+          "neg": 108,
+          "pos": 4
+        },
+        "1401": {
+          "n": 116,
+          "neg": 113,
+          "pos": 3
+        }
+      },
+      "positive_pairs": 80,
+      "pre_listing_rows": 116,
+      "target_missing_pairs": 0,
+      "total_company_year_rows": 1331,
+      "total_pairs": 1200,
+      "unresolved_rows": 10
+    }
+  },
+  "schema_validation": {
+    "checks": [
+      {
+        "check": "all_rows_count",
+        "detail": "1331/1331",
+        "status": "PASS"
+      },
+      {
+        "check": "all_rows_required_columns",
+        "detail": "all present",
+        "status": "PASS"
+      },
+      {
+        "check": "row_key_unique",
+        "detail": "duplicates=0",
+        "status": "PASS"
+      },
+      {
+        "check": "unique_tickers",
+        "detail": "130/130",
+        "status": "PASS"
+      },
+      {
+        "check": "listing_master_unique_tickers",
+        "detail": "130/130",
+        "status": "PASS"
+      },
+      {
+        "check": "all_tickers_matched",
+        "detail": "all matched",
+        "status": "PASS"
+      },
+      {
+        "check": "no_duplicate_listing_tickers",
+        "detail": "duplicates=0",
+        "status": "PASS"
+      },
+      {
+        "check": "listing_master_required_columns",
+        "detail": "all present",
+        "status": "PASS"
+      },
+      {
+        "check": "no_missing_trading_dates",
+        "detail": "missing=0",
+        "status": "PASS"
+      }
+    ],
+    "overall_pass": true
+  },
+  "stage": "stage124-gate-b-readiness",
+  "stage123_baseline": {
+    "description": "Stage123 existing eligible_listing (ocf_resolution_status proxy)",
+    "eligible_pairs": 1085,
+    "negative_pairs": 999,
+    "pos_neg_by_year": {
+      "1392": {
+        "n": 49,
+        "neg": 41,
+        "pos": 8
+      },
+      "1393": {
+        "n": 106,
+        "neg": 94,
+        "pos": 12
+      },
+      "1394": {
+        "n": 110,
+        "neg": 94,
+        "pos": 16
+      },
+      "1395": {
+        "n": 111,
+        "neg": 93,
+        "pos": 18
+      },
+      "1396": {
+        "n": 113,
+        "neg": 103,
+        "pos": 10
+      },
+      "1397": {
+        "n": 117,
+        "neg": 111,
+        "pos": 6
+      },
+      "1398": {
+        "n": 119,
+        "neg": 115,
+        "pos": 4
+      },
+      "1399": {
+        "n": 121,
+        "neg": 117,
+        "pos": 4
+      },
+      "1400": {
+        "n": 120,
+        "neg": 115,
+        "pos": 5
+      },
+      "1401": {
+        "n": 119,
+        "neg": 116,
+        "pos": 3
+      }
+    },
+    "positive_pairs": 86,
+    "target_missing_pairs": 0,
+    "total_company_year_rows": 1331
+  },
+  "warning": "No rule has been finalized. User and scientific reviewer must approve the final rule from the comparison report before proceeding."
+}
