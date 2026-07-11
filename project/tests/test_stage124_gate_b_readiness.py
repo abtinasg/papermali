@@ -451,7 +451,7 @@ def test_output_hashes_match_files(metadata_json):
 # --------------------------------------------------------------------------- #
 
 def test_full_run_idempotence():
-    """Two consecutive full runs produce byte-identical tracked output files."""
+    """Baseline committed outputs == run1 == run2 (byte-identical tracked files)."""
     out_dir = ROOT / "stage124" / "gate_b_readiness"
     tracked_outputs = [
         "gate_b_rule_comparison_summary.json",
@@ -462,6 +462,13 @@ def test_full_run_idempotence():
         "metadata_and_hashes_gate_b_readiness.json",
         "README_GATE_B_READINESS.md",
     ]
+
+    # Baseline: committed (on-disk) hashes before any run
+    hashes_0 = {}
+    for fname in tracked_outputs:
+        fpath = out_dir / fname
+        if fpath.is_file():
+            hashes_0[fname] = hashlib.sha256(fpath.read_bytes()).hexdigest()
 
     # First run
     gate_b.run(ROOT)
@@ -480,10 +487,13 @@ def test_full_run_idempotence():
             hashes_2[fname] = hashlib.sha256(fpath.read_bytes()).hexdigest()
 
     for fname in tracked_outputs:
+        assert fname in hashes_0, f"{fname}: missing at baseline"
         assert fname in hashes_1, f"{fname}: missing after run 1"
         assert fname in hashes_2, f"{fname}: missing after run 2"
+        assert hashes_0[fname] == hashes_1[fname], \
+            f"{fname}: baseline != run1 (idempotence violation)"
         assert hashes_1[fname] == hashes_2[fname], \
-            f"{fname}: changed between runs (idempotence violation)"
+            f"{fname}: run1 != run2 (idempotence violation)"
 
 
 # --------------------------------------------------------------------------- #

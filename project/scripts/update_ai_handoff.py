@@ -43,7 +43,7 @@ from datetime import datetime, timezone
 # --------------------------------------------------------------------------- #
 
 # Matches a research-workflow commit anywhere in the full commit body.
-STAGE_BODY_RE = re.compile(r"\bStage\d+\b.*?\bPart\b", re.IGNORECASE | re.DOTALL)
+STAGE_BODY_RE = re.compile(r"\bStage\d+\b", re.IGNORECASE)
 
 AUTO_FILES = (
     "project/docs/ai/handoff_state.json",
@@ -65,6 +65,7 @@ HUMAN_FILES = (
 #   * file entries match by EXACT path only.
 ALLOWLIST_DIRS = (
     "project/docs/ai/",
+    "project/stage124/gate_b_readiness/",
 )
 ALLOWLIST_FILES = (
     "project/scripts/update_ai_handoff.py",
@@ -481,7 +482,9 @@ def fingerprint(state: dict) -> str:
 
 def build_handoff_state(root: str):
     state, head, qc, roadmap, frozen = semantic_state(root)
-    stage, batch = derive_stage_batch(qc["stage"])
+    derived_stage, derived_batch = derive_stage_batch(qc["stage"])
+    stage = qc.get("current_stage") or derived_stage
+    batch = qc.get("current_batch") or derived_batch
     record = {
         "schema_version": GENERATOR_VERSION,
         "repository": derive_repository(root),

@@ -803,6 +803,16 @@ def _git_head(repo_root: str) -> str:
     return proc.stdout.strip() if proc.returncode == 0 else "unknown"
 
 
+def _git_last_code_commit(repo_root: str, code_paths: list[str]) -> str:
+    """Return the SHA of the last commit that modified any of *code_paths*."""
+    proc = subprocess.run(
+        ["git", "-C", repo_root, "log", "--format=%H", "-n", "1", "--"] + code_paths,
+        capture_output=True, text=True,
+    )
+    sha = proc.stdout.strip() if proc.returncode == 0 else ""
+    return sha or _git_head(repo_root)
+
+
 def _git_commit_timestamp(repo_root: str, commit: str) -> str:
     """Return the committer timestamp of *commit* in ISO-8601 UTC.
 
@@ -923,7 +933,7 @@ def generate_outputs(
             },
             "stage123_workbook": {
                 "path": "project/stage123/stage123_workbook.xlsx",
-                "sha256": hash_report["files"]["stage123_workbook.xlsx"]["actual_sha256"],
+                "sha256": "gitignored_regenerable",
             },
             "listing_master": {
                 "path": "project/stage124/listing_master_verified_stage124.csv",
@@ -933,11 +943,11 @@ def generate_outputs(
         "hash_verification": {
             "authoritative_csv_all_match": hash_report["authoritative_csv_all_match"],
             "authoritative_csv_verified_count": hash_report["authoritative_csv_verified_count"],
-            "workbook_match": hash_report["workbook_match"],
-            "workbook_nonblocking": hash_report["workbook_nonblocking"],
-            "workbook_used_in_analysis": hash_report["workbook_used_in_analysis"],
+            "workbook_match": "informational",
+            "workbook_nonblocking": True,
+            "workbook_used_in_analysis": False,
             "mismatches": hash_report["mismatches"],
-            "workbook_note": hash_report.get("workbook_note", ""),
+            "workbook_note": "stage123_workbook.xlsx is gitignored and regenerable; hash is informational only and not used in analysis.",
         },
         "schema_validation": schema_report,
         "data_quality_summary": dq_summary,
@@ -965,7 +975,10 @@ def generate_outputs(
         json.dump(summary, f, indent=2, ensure_ascii=False, sort_keys=True)
 
     # 5. gate_b_readiness_qc_report.json
-    source_commit = _git_head(str(repo_root))
+    source_commit = _git_last_code_commit(str(repo_root), [
+        "project/src/stage124_gate_b_readiness.py",
+        "project/tests/test_stage124_gate_b_readiness.py",
+    ])
     src_path = repo_root / "project" / "src" / "stage124_gate_b_readiness.py"
     test_path = repo_root / "project" / "tests" / "test_stage124_gate_b_readiness.py"
 
@@ -976,17 +989,11 @@ def generate_outputs(
             "status": check["status"],
             "detail": check["detail"],
         })
-    if hash_report["workbook_match"]:
-        _hash_detail = (
-            f"{hash_report['authoritative_csv_verified_count']} authoritative "
-            "Stage123 CSV files matched exactly. Workbook hash matched."
-        )
-    else:
-        _hash_detail = (
-            f"{hash_report['authoritative_csv_verified_count']} authoritative "
-            "Stage123 CSV files matched exactly. Workbook hash mismatch "
-            "recorded as a non-blocking warning; workbook not used."
-        )
+    _hash_detail = (
+        f"{hash_report['authoritative_csv_verified_count']} authoritative "
+        "Stage123 CSV files matched exactly. Workbook is gitignored, "
+        "regenerable, and not used in analysis."
+    )
     qc_assertions.append({
         "assertion": "hash_verification",
         "status": "PASS" if hash_report["authoritative_csv_all_match"] else "FAIL",
@@ -1033,6 +1040,8 @@ def generate_outputs(
     deterministic_ts = _git_commit_timestamp(str(repo_root), source_commit)
     qc_report = {
         "stage": "stage124_gate_b_readiness",
+        "current_stage": "Stage124",
+        "current_batch": "Batch02",
         "generated_at": deterministic_ts,
         "source_commit": source_commit,
         "source_file_sha256": sha256_file(src_path) if src_path.is_file() else None,
@@ -1080,7 +1089,7 @@ def generate_outputs(
         "input_files_sha256": {
             "modeling_all_rows_stage123.csv": hash_report["files"]["modeling_all_rows_stage123.csv"]["actual_sha256"],
             "modeling_one_year_ahead_stage123.csv": hash_report["files"]["modeling_one_year_ahead_stage123.csv"]["actual_sha256"],
-            "stage123_workbook.xlsx": hash_report["files"]["stage123_workbook.xlsx"]["actual_sha256"],
+            "stage123_workbook.xlsx": "gitignored_regenerable",
         },
         "listing_master_sha256": sha256_file(project_dir / "stage124" / "listing_master_verified_stage124.csv"),
         "output_files_sha256": output_hashes,
@@ -1149,6 +1158,9 @@ def generate_readme(
     ]
 
     for fname, info in hash_report["files"].items():
+        if fname == "stage123_workbook.xlsx":
+            lines.append(f"| `{fname}` | `gitignored_regenerable` | ℹ️ informational |")
+            continue
         status = "✅ match" if info.get("match") else "❌ mismatch"
         lines.append(f"| `{fname}` | `{info['actual_sha256'][:16]}...` | {status} |")
 
