@@ -1,0 +1,30 @@
+﻿row_key,ticker,fiscal_year,fiscal_year_end,fiscal_year_start,first_public_trading_date_jalali,eligible_rule_a,eligible_rule_b,eligible_rule_c,exclusion_reason_rule_a,exclusion_reason_rule_b,exclusion_reason_rule_c,FD_target_main_t_plus_1,pair_eligible_rule_a,pair_eligible_rule_b,pair_eligible_rule_c
+اردستان|1401,اردستان,1401,1401/12/29,1401/01/01,1401-10-28,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+اپال|1400,اپال,1400,1400/10/30,1399/11/01,1399-12-06,1,0,1,,first_trading_date_after_fy_start,,0.0,1,0,1
+برکت|1395,برکت,1395,1395/12/30,1395/01/01,1395-11-17,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,0,0,0
+بوعلی|1399,بوعلی,1399,1399/12/30,1399/01/01,1399-09-19,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+تاپیکو|1393,تاپیکو,1393,1393/02/31,1392/03/01,1392-04-18,1,0,1,,first_trading_date_after_fy_start,,0.0,0,0,0
+ثشرق|1393,ثشرق,1393,1393/06/31,1392/07/01,1393-04-04,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+جم پیلن|1398,جم پیلن,1398,1398/12/29,1398/01/01,1398-03-27,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+جم|1394,جم,1394,1394/12/29,1394/01/01,1394-05-18,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+ذوب|1400,ذوب,1400,1400/12/29,1400/01/01,1400-10-05,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,1.0,1,0,0
+زپارس|1397,زپارس,1397,1397/09/30,1396/10/01,1397-07-25,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+سآبیک|1401,سآبیک,1401,1401/12/29,1401/01/01,1401-02-28,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+سخوز|1394,سخوز,1394,1394/12/29,1394/01/01,1394-01-18,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+سپید|1400,سپید,1400,1400/12/29,1400/01/01,1400-04-23,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+شغدیر|1400,شغدیر,1400,1400/12/29,1400/01/01,1400-02-01,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+شکلر|1397,شکلر,1397,1397/05/31,,1382-08-24,1,unresolved,unresolved,,fiscal_year_start_unresolved,fiscal_year_start_unresolved,0.0,0,0,0
+شکلر|1400,شکلر,1400,1400/08/30,,1382-08-24,1,unresolved,unresolved,,fiscal_year_start_unresolved,fiscal_year_start_unresolved,0.0,0,0,0
+غشان|1402,غشان,1402,1402/10/30,,1384-03-23,1,unresolved,unresolved,,fiscal_year_start_unresolved,fiscal_year_start_unresolved,,,,
+نوری|1398,نوری,1398,1398/12/29,1398/01/01,1398-04-22,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+های وب|1396,های وب,1396,1396/12/29,1396/01/01,1396-06-22,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+همراه|1392,همراه,1392,1392/12/29,1392/01/01,1392-05-29,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,,0,0,0
+وکغدیر|1402,وکغدیر,1402,1402/06/31,1401/07/01,1401-12-23,1,0,1,,first_trading_date_after_fy_start,,,,,
+پارس|1397,پارس,1397,1397/12/29,1397/01/01,1397-04-20,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+پرداخت|1396,پرداخت,1396,1396/12/29,1396/01/01,1396-04-27,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+پرداخت|1401,پرداخت,1401,1401/09/30,,1396-04-27,1,unresolved,unresolved,,fiscal_year_start_unresolved,fiscal_year_start_unresolved,0.0,0,0,0
+پی‌پاد|1401,پی‌پاد,1401,1401/09/30,,1402-01-16,0,unresolved,unresolved,first_trading_date_after_fy_end,fiscal_year_start_unresolved,fiscal_year_start_unresolved,0.0,0,0,0
+پی‌پاد|1402,پی‌پاد,1402,1402/09/30,,1402-01-16,1,unresolved,unresolved,,fiscal_year_start_unresolved,fiscal_year_start_unresolved,,,,
+کاوه|1396,کاوه,1396,1396/12/29,1396/01/01,1396-07-26,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+کویر|1398,کویر,1398,1398/12/29,1398/01/01,1398-07-17,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0
+کیمیاتک|1400,کیمیاتک,1400,1400/12/29,1400/01/01,1400-06-17,1,0,0,,first_trading_date_after_fy_start,first_trading_year_gte_fy,0.0,1,0,0

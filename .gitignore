@@ -27,6 +27,8 @@ project/stage122/target_audit_stage122.csv
 project/stage123/modeling_all_rows_stage123.csv
 project/stage123/modeling_one_year_ahead_stage123.csv
 project/stage123/eligibility_audit_stage123.csv
+# Gate B readiness: bulky per-row audit CSV is regenerable; small CSVs/JSON/MD kept
+project/stage124/gate_b_readiness/gate_b_company_year_audit.csv
 
 # Stray local archive (backup, not a deliverable)
 project/Archive.zip

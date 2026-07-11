@@ -1,9 +1,9 @@
 ---
 roadmap_version: 1
 active_research_workstream_id: stage124-gate-b-readiness
-qc_scope: stage124-batch02-part03
-last_completed_research_action_id: stage124-official-api-finalize
-next_research_action_id: stage124-gate-b-readiness
+qc_scope: stage124-gate-b-readiness
+last_completed_research_action_id: stage124-gate-b-readiness
+next_research_action_id: stage124-gate-b-rule-approval
 active_maintenance_task_id: repository-driven-ai-handoff
 ---
 
@@ -29,7 +29,8 @@ must also appear in the body below. The validator checks that:
 5. `stage124-batch02-part03-1b-0` — Research-Intake Readiness, baseline unlock, auditable intake scaffold ✅
 6. `stage124-batch02-part03-1b-1` — manual source discovery, snapshot capture, and reviewed-evidence intake for the 10 Part 3 tickers — **superseded / cancelled by official TSE API** (not completed)
 7. `stage124-official-api-finalize` — Finalized verified master for 130 tickers using official TSETMC first-observed-trade dates; merged through PR #15, merge commit 22c2d0c ✅
-8. `stage124-gate-b-readiness` — Gate B readiness / eligibility rebuild planning ⬅️ **next**
+8. `stage124-gate-b-readiness` — Gate B readiness dry-run: three eligibility rules (A/B/C) compared, per-rule impact report generated, 33 independent tests added ✅
+9. `stage124-gate-b-rule-approval` — User and scientific reviewer approve final Gate B rule from comparison report ⬅️ **next**
 
 ## Maintenance tasks
 
@@ -47,5 +48,9 @@ manual Human-in-the-Loop research path obsolete. The HIL dashboard and manual
 intake runner have been retired.
 `stage124-official-api-finalize` completed the verified master for 130 tickers and
 was merged through PR #15 (merge commit 22c2d0c).
-`stage124-gate-b-readiness` is planning only — Gate B execution and modeling remain
-out of scope in the current PR.
+`stage124-gate-b-readiness` completed the dry-run comparison of three eligibility
+rules (A/B/C) with per-rule impact reports and 33 independent tests. No rule has
+been finalized. Gate B execution and modeling remain out of scope.
+`stage124-gate-b-rule-approval` is the next action — the user and scientific
+reviewer must approve the final Gate B rule from the comparison report before
+proceeding.
