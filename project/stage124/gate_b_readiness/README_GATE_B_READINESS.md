@@ -19,7 +19,7 @@ All listing master dates have `date_semantics = first_observed_trading_date_from
 |---|---|---|
 | `modeling_all_rows_stage123.csv` | `28b9f9d418561718...` | ✅ match |
 | `modeling_one_year_ahead_stage123.csv` | `e3d3063e840d61a3...` | ✅ match |
-| `stage123_workbook.xlsx` | `2295f742d7ecc311...` | ❌ mismatch |
+| `stage123_workbook.xlsx` | `3e47d871086f81f0...` | ❌ mismatch |
 
 ## Schema Validation
 
@@ -128,6 +128,7 @@ All listing master dates have `date_semantics = first_observed_trading_date_from
 - `gate_b_company_year_audit.csv` — per-row audit with all rule eligibility
 - `gate_b_pair_impact_summary.csv` — per-rule pair statistics
 - `gate_b_unmatched_or_ambiguous_rows.csv` — rows with data quality issues
+- `gate_b_rule_disagreement_rows.csv` — rows where rules disagree (A/B/C comparison)
 - `gate_b_readiness_qc_report.json` — QC report
 - `metadata_and_hashes_gate_b_readiness.json` — hashes and metadata
 - `README_GATE_B_READINESS.md` — this file

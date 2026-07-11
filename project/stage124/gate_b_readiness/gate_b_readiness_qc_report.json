@@ -49,7 +49,7 @@
     },
     {
       "assertion": "hash_verification",
-      "detail": "3 files verified",
+      "detail": "2 authoritative Stage123 CSV files matched exactly. Workbook hash mismatch recorded as a non-blocking warning; workbook not used.",
       "status": "PASS"
     },
     {
@@ -84,11 +84,11 @@
     }
   ],
   "failed_count": 0,
-  "generated_at": "2026-07-11T10:02:22Z",
-  "source_commit": "371b5a8169ff84e448ce8c4e60ca489fc09b8650",
-  "source_file_sha256": "387cfa09dd15e1476385f4998cd539930ae2eca68afefe28c422371b47bc848d",
+  "generated_at": "2026-07-11T12:11:42Z",
+  "source_commit": "66924699dc09ccf53eb38e1a7cf72a6d5bd679a3",
+  "source_file_sha256": "2137c62dcfe778611430e842553d4b6cbe146e3f2efda0670a0e173243120540",
   "stage": "stage124_gate_b_readiness",
-  "test_file_sha256": "7feece23998f985341bc858929f98b347c586660e43f438a1623aab97bb4de77",
+  "test_file_sha256": "6b5ac5eb9bd4031b8943647791c4577cb7c4e9955a01a9e663dae83d89572531",
   "ticker_count": 130,
   "tickers": [
     "اردستان",
