@@ -65,7 +65,6 @@ HUMAN_FILES = (
 #   * file entries match by EXACT path only.
 ALLOWLIST_DIRS = (
     "project/docs/ai/",
-    "project/stage124/gate_b_readiness/",
 )
 ALLOWLIST_FILES = (
     "project/scripts/update_ai_handoff.py",
