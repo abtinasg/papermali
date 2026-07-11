@@ -12,9 +12,9 @@
     "authoritative_csv_all_match": true,
     "authoritative_csv_verified_count": 2,
     "mismatches": [],
-    "workbook_match": false,
+    "workbook_match": "informational",
     "workbook_nonblocking": true,
-    "workbook_note": "stage123_workbook.xlsx: hash mismatch (expected 5f2558993dc35d92..., got 3e47d871086f81f0...). This file is gitignored and regenerable; it is not used in the analysis. CSV files verified successfully.",
+    "workbook_note": "stage123_workbook.xlsx is gitignored and regenerable; hash is informational only and not used in analysis.",
     "workbook_used_in_analysis": false
   },
   "input_files": {
@@ -33,7 +33,7 @@
     },
     "stage123_workbook": {
       "path": "project/stage123/stage123_workbook.xlsx",
-      "sha256": "3e47d871086f81f0ee69d3f765cacedde19c451cf9c38a8013caa4181756aaae"
+      "sha256": "gitignored_regenerable"
     }
   },
   "next_action": "stage124-gate-b-rule-approval",

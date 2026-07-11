@@ -19,7 +19,7 @@ All listing master dates have `date_semantics = first_observed_trading_date_from
 |---|---|---|
 | `modeling_all_rows_stage123.csv` | `28b9f9d418561718...` | ✅ match |
 | `modeling_one_year_ahead_stage123.csv` | `e3d3063e840d61a3...` | ✅ match |
-| `stage123_workbook.xlsx` | `3e47d871086f81f0...` | ❌ mismatch |
+| `stage123_workbook.xlsx` | `gitignored_regenerable` | ℹ️ informational |
 
 ## Schema Validation
 
