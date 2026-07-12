@@ -1,0 +1,72 @@
+{
+  "code_commit": "cf5f7f2f1f6fc7fc1283782ee6cdad20fc8e8965",
+  "current_batch": "Batch02",
+  "current_stage": "Stage124",
+  "date_semantics": "first_observed_trading_date_from_official_tse_api",
+  "date_semantics_note": "These dates are the first observed trading dates from the official TSETMC API. They are NOT IPO dates, admission dates, or listing dates.",
+  "description": "Stage124 Gate B execution — final eligibility rule application",
+  "gate_b_started": true,
+  "generated_at": "2026-07-12T10:40:08Z",
+  "input_files_sha256": {
+    "modeling_all_rows_stage123.csv": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+    "modeling_one_year_ahead_stage123.csv": "e3d3063e840d61a39c3b4477aabe347050be6c829755acdcead05359fa9181ac"
+  },
+  "listing_master_sha256": "968cf0cc4613aadd738d14e3cd3058e25920256c891b431d9e99776de3479fd7",
+  "modeling_started": false,
+  "output_files_sha256": {
+    "gate_b_final/README_STAGE124_GATE_B_EXECUTION.md": "a423135e6276bc54b5d43e035953588a970874b4ecd722789c50c9e620a14291",
+    "gate_b_final/gate_b_distribution_by_target_year.csv": "6183f840c9c80fe38da41ee4cbb7a312a397aaba8c81dbdaeee2bd6bdc86bc4a",
+    "gate_b_final/gate_b_pair_change_vs_stage123.csv": "c94fd6216761a774ea341caceb74970bdb1d56dad227044c53144d1ea05e98b7",
+    "gate_b_final/gate_b_sample_matrix.csv": "d6417505581763a624ff64d631f28f876f4bece6ad4864658ab56ab7bd6a7885",
+    "gate_b_final/gate_b_unresolved_rows.csv": "6a49f2af78eb4ef4d99e6a6a27150f368019421520f1aa12a7b7e868712fcc5b",
+    "gate_b_final/modeling_all_rows_stage124_gate_b.csv": "f6b6bc41cbe757d19d4397ffc5898629d0fca8ab0480351f75040a71d7ce7376",
+    "gate_b_final/modeling_expanded_rule_a_eligible.csv": "b2f950b5a6a5a79f6b0fd8019e9021079339b6c80290695bb18d0e4a56b7d8e6",
+    "gate_b_final/modeling_expanded_rule_b_eligible.csv": "0aac404c2a856af8785f79361d22b42abfbe5898a983985d003c051c4ca43a12",
+    "gate_b_final/modeling_main_rule_a_eligible.csv": "f943d5cfd2a3dcaa091eacbac5e305fdad83787548a6e43b50976f1455664420",
+    "gate_b_final/modeling_main_rule_b_eligible.csv": "99bdf0296a274f2ad42a6e9942a42d79b6370c7b99b57967b44c6821313f36c1",
+    "gate_b_final/modeling_one_year_ahead_stage124_gate_b.csv": "9743c49337c66a3699bce34dfd02a151e34f48f0717f225ad487fe1487031d05",
+    "stage124_batch02_gate_b_qc_report.json": "75caf0111c1663ca403b368e446a219671c8cc435a32d7c2a4cfd2d82f0957b5"
+  },
+  "python": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
+  "readiness_summary_sha256": "c910bf89ec4e4b63faa4c466d0b7f18a3f2a8d1ed1036b9bdf43bd3346b11e54",
+  "rule_approval_sha256": "bb03754bea1826e1fa406e485448708e34ae01bd1e2e7ce4709e1defb35d8cbf",
+  "sample_counts": {
+    "all_company_year_rows": 1331,
+    "all_pairs": 1200,
+    "designs": {
+      "expanded_rule_a_company_scope_robustness": {
+        "negative": 976,
+        "pairs": 1057,
+        "positive": 81,
+        "target_missing": 0
+      },
+      "expanded_rule_b_combined_robustness": {
+        "negative": 956,
+        "pairs": 1036,
+        "positive": 80,
+        "target_missing": 0
+      },
+      "main_rule_a_primary": {
+        "negative": 932,
+        "pairs": 1013,
+        "positive": 81,
+        "target_missing": 0
+      },
+      "main_rule_b_listing_robustness": {
+        "negative": 914,
+        "pairs": 994,
+        "positive": 80,
+        "target_missing": 0
+      }
+    },
+    "tickers": 130
+  },
+  "source_file_sha256": "e53c88bcda7f24e0cfa5a192583b2e627ad11cdf0bc79b71fa9515522ac3bb55",
+  "stage": "stage124_gate_b_execution",
+  "test_file_sha256": "1d67277d055dc1296332cb106a7b2008861206126e9190e4d128fd15a794ba03",
+  "unresolved_counts": {
+    "rule_a_primary_unresolved_rows": 4,
+    "rule_b_robustness_unresolved_rows": 10
+  },
+  "warning": "No modeling has started. Gate B execution only. Next action: stage125-modeling-readiness."
+}

@@ -1,7 +1,7 @@
 {
   "date_semantics": "first_observed_trading_date_from_official_tse_api",
   "date_semantics_note": "These dates are the first observed trading dates from the official TSETMC API. They are NOT IPO dates, admission dates, or listing dates.",
-  "datetime": "2026-07-11T13:29:14Z",
+  "datetime": "2026-07-12T10:40:08Z",
   "description": "Gate B readiness dry-run — eligibility rule comparison",
   "expected_rows": 1331,
   "expected_tickers": 130,
@@ -16,15 +16,15 @@
     "README_GATE_B_READINESS.md": "d33d271024ba888dffa5a61a5864d36cf8083f4a4c15449e1d746e12f0a02fe7",
     "gate_b_company_year_audit.csv": "903a8e93eac612cc65dbabb0d89c948a3ce256e3c61629cda8f4ff5be521bf39",
     "gate_b_pair_impact_summary.csv": "7ddff5b107ea6e3b8dc2f68f713a3c1354dfa81085dab6c9cd2de25a06e06e13",
-    "gate_b_readiness_qc_report.json": "5e976a2858cf4e2aa36c41cafcaa2ee8fbb98fe3224fb68c0b5febc3b10530d1",
+    "gate_b_readiness_qc_report.json": "1bac303d8f473d1ed64c17f1a624ac5042c1970fdddb9156cf98619d1e93b8ea",
     "gate_b_rule_comparison_summary.json": "c910bf89ec4e4b63faa4c466d0b7f18a3f2a8d1ed1036b9bdf43bd3346b11e54",
     "gate_b_rule_disagreement_rows.csv": "1a330329874180357ad9ba1fadb65462eb18c8c0b947a39c62a923d4c4a97664",
     "gate_b_unmatched_or_ambiguous_rows.csv": "2a5081dc46b582ad5cccbea73b36d89affeb4b9595411e47b589f18ad0ece0d4"
   },
-  "python": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
-  "source_code_commit": "74152d28876d65c5eca32bc00fd1ab38f0ecbdb9",
+  "python": "3.14.0 (v3.14.0:ebf955df7a8, Oct  7 2025, 08:20:14) [Clang 16.0.0 (clang-1600.0.26.6)]",
+  "source_code_commit": "cf5f7f2f1f6fc7fc1283782ee6cdad20fc8e8965",
   "source_file_sha256": "4e1b1f7790dad33e185ce2b6183f928ca1115a98f8cb5fee1966cfbbd33baab6",
   "stage": "stage124-gate-b-readiness",
-  "test_file_sha256": "9db5859479b28cbd69a1451f35d5da33bf53dcde90ae501bedfd15d6a376fd85",
+  "test_file_sha256": "1372289e5427944efa55646050f201b954964ee639573bfa88abb59a3853513a",
   "warning": "No rule has been finalized. Next action: stage124-gate-b-rule-approval"
 }

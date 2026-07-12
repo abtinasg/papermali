@@ -1,70 +1,70 @@
 {
   "all_pass": true,
-  "assertion_count": 16,
+  "assertion_count": 15,
   "assertions": [
     {
       "assertion": "all_rows_count",
-      "detail": "1331/1331",
+      "detail": "1331",
       "status": "PASS"
     },
     {
-      "assertion": "all_rows_required_columns",
-      "detail": "all present",
+      "assertion": "pairs_count",
+      "detail": "1200",
       "status": "PASS"
     },
     {
       "assertion": "row_key_unique",
-      "detail": "duplicates=0",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pair_key_unique",
+      "detail": "",
       "status": "PASS"
     },
     {
       "assertion": "unique_tickers",
-      "detail": "130/130",
+      "detail": "130",
       "status": "PASS"
     },
     {
-      "assertion": "listing_master_unique_tickers",
-      "detail": "130/130",
+      "assertion": "listing_master_tickers",
+      "detail": "130",
       "status": "PASS"
     },
     {
-      "assertion": "all_tickers_matched",
-      "detail": "all matched",
+      "assertion": "no_unmatched_tickers",
+      "detail": "[]",
       "status": "PASS"
     },
     {
       "assertion": "no_duplicate_listing_tickers",
-      "detail": "duplicates=0",
-      "status": "PASS"
-    },
-    {
-      "assertion": "listing_master_required_columns",
-      "detail": "all present",
+      "detail": "",
       "status": "PASS"
     },
     {
       "assertion": "no_missing_trading_dates",
-      "detail": "missing=0",
+      "detail": "",
       "status": "PASS"
     },
     {
-      "assertion": "hash_verification",
-      "detail": "2 authoritative Stage123 CSV files matched exactly. Workbook is gitignored, regenerable, and not used in analysis.",
+      "assertion": "main_rule_a_counts",
+      "detail": "1013/81/932",
+      "status": "PASS"
+    },
+    {
+      "assertion": "main_rule_b_counts",
+      "detail": "994/80/914",
       "status": "PASS"
     },
     {
       "assertion": "no_modeling_started",
-      "detail": "No modeling artifacts created",
+      "detail": "no modeling artifacts produced",
       "status": "PASS"
     },
     {
-      "assertion": "no_gate_b_executed",
-      "detail": "Gate B not finalized; dry-run only",
-      "status": "PASS"
-    },
-    {
-      "assertion": "no_canonical_dataset_produced",
-      "detail": "No new canonical dataset generated",
+      "assertion": "no_rule_c_canonical",
+      "detail": "Rule C absent from final eligibility flags",
       "status": "PASS"
     },
     {
@@ -74,23 +74,65 @@
     },
     {
       "assertion": "no_missing_zeroed",
-      "detail": "No missing values were zeroed",
-      "status": "PASS"
-    },
-    {
-      "assertion": "no_rows_dropped",
-      "detail": "All 1331 rows preserved in audit",
+      "detail": "unresolved listing preserved",
       "status": "PASS"
     }
   ],
   "current_batch": "Batch02",
   "current_stage": "Stage124",
+  "expanded_counts": {
+    "expanded_rule_a_company_scope_robustness": {
+      "affected_tickers_count": 23,
+      "change_vs_stage123_main": -28,
+      "company_scope": "expanded",
+      "listing_rule": "rule_a",
+      "negative": 976,
+      "pairs": 1057,
+      "positive": 81,
+      "target_missing": 0
+    },
+    "expanded_rule_b_combined_robustness": {
+      "affected_tickers_count": 27,
+      "change_vs_stage123_main": -49,
+      "company_scope": "expanded",
+      "listing_rule": "rule_b",
+      "negative": 956,
+      "pairs": 1036,
+      "positive": 80,
+      "target_missing": 0
+    }
+  },
   "failed_count": 0,
+  "gate_b_started": true,
   "generated_at": "2026-07-12T10:40:08Z",
+  "main_primary_counts": {
+    "affected_tickers_count": 23,
+    "change_vs_stage123_main": -72,
+    "company_scope": "main",
+    "listing_rule": "rule_a",
+    "negative": 932,
+    "pairs": 1013,
+    "positive": 81,
+    "target_missing": 0
+  },
+  "main_robustness_counts": {
+    "affected_tickers_count": 27,
+    "change_vs_stage123_main": -91,
+    "company_scope": "main",
+    "listing_rule": "rule_b",
+    "negative": 914,
+    "pairs": 994,
+    "positive": 80,
+    "target_missing": 0
+  },
+  "modeling_started": false,
+  "primary_rule": "rule_a: first_observed_trading_date <= fiscal_year_end",
+  "rejected_rule": "rule_c: first_observed_trading_year < fiscal_year",
+  "robustness_rule": "rule_b: first_observed_trading_date <= fiscal_year_start",
   "source_commit": "cf5f7f2f1f6fc7fc1283782ee6cdad20fc8e8965",
-  "source_file_sha256": "4e1b1f7790dad33e185ce2b6183f928ca1115a98f8cb5fee1966cfbbd33baab6",
-  "stage": "stage124_gate_b_readiness",
-  "test_file_sha256": "1372289e5427944efa55646050f201b954964ee639573bfa88abb59a3853513a",
+  "source_file_sha256": "e53c88bcda7f24e0cfa5a192583b2e627ad11cdf0bc79b71fa9515522ac3bb55",
+  "stage": "stage124_gate_b_execution",
+  "test_file_sha256": "1d67277d055dc1296332cb106a7b2008861206126e9190e4d128fd15a794ba03",
   "ticker_count": 130,
   "tickers": [
     "اردستان",
@@ -223,5 +265,9 @@
     "کگاز",
     "کگل",
     "کیمیاتک"
-  ]
+  ],
+  "unresolved_counts": {
+    "rule_a_primary_unresolved_rows": 4,
+    "rule_b_robustness_unresolved_rows": 10
+  }
 }

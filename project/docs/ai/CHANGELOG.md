@@ -18,8 +18,18 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
     as a documented rejected readiness candidate.
   - Approval record: `project/stage124/gate_b_final/gate_b_rule_approval_stage124.json`
     and `README_GATE_B_RULE_APPROVAL.md`.
-- Gate B **execution is authorized**; **modeling remains prohibited** until
-  `stage125-modeling-readiness` is approved.
+- **`stage124-gate-b-execution` completed** — Applied the approved rules to the
+  frozen Stage123 data (1331 company-year rows, 1200 pairs, 130 tickers). Four
+  sample designs:
+  - `main_rule_a_primary` = 1013 (81 pos / 932 neg)
+  - `main_rule_b_listing_robustness` = 994 (80 pos / 914 neg)
+  - `expanded_rule_a_company_scope_robustness` = 1057 (81 pos / 976 neg)
+  - `expanded_rule_b_combined_robustness` = 1036 (80 pos / 956 neg)
+  - Unresolved listing rows: Rule A = 4, Rule B = 10 (preserved, never
+    zero-filled). Outputs in `project/stage124/gate_b_final/`; module
+    `project/src/stage124_gate_b_execution.py`; 38 focused tests (717 full-suite).
+- Gate B **executed** (`gate_b_started = true`); **modeling remains prohibited**
+  until `stage125-modeling-readiness` is approved.
 
 ## 2026-07-11
 
@@ -32,7 +42,7 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 - **Output files** in `project/stage124/gate_b_readiness/`: comparison summary JSON,
   per-row audit CSV, pair impact summary CSV, unmatched/ambiguous rows CSV, QC report
   (all pass), metadata/hashes, and README.
-- **33 independent tests** added in `project/tests/test_stage124_gate_b_readiness.py`
+- **45 focused tests** in `project/tests/test_stage124_gate_b_readiness.py`
   covering hash verification, schema validation, rule determinism, fiscal_year_start
   computation (leap year Esfand 30 fix), date semantics, no-rows-dropped, and output
   integrity.
