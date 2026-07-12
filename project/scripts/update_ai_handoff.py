@@ -77,6 +77,7 @@ ALLOWLIST_FILES = (
 FROZEN_MANIFESTS = (
     "project/stage122/metadata_and_hashes_stage122.json",
     "project/stage123/metadata_and_hashes_stage123.json",
+    "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
 )
 
 # Tracked files declared in a frozen manifest that are EXPLICITLY classified as
