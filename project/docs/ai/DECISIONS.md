@@ -30,10 +30,10 @@ These are stable project decisions. Change them only deliberately (and note it i
 ## Phase guardrails (current data-freeze phase)
 
 - **No** model / tuning / SHAP / SMOTE / calibration / report in this phase.
-- Stage124 produces review templates; nothing is promoted to
-  `verified_user_confirmed` outside an explicit user-confirmation step.
-- Gate B execution and Part 2 modeling are not yet in scope; the next step is
-  Gate B readiness / eligibility rebuild planning only.
+- Stage124 Gate B is **completed and frozen**: four sample designs produced,
+  canonical + filtered outputs verified, 58 focused tests (736 passed, 1 skipped,
+  local results — no GitHub Actions configured).
+- **Modeling remains prohibited** until `stage125-modeling-readiness` is approved.
 
 ## Verified listing master (Stage124)
 
@@ -65,7 +65,7 @@ These are stable project decisions. Change them only deliberately (and note it i
 - Approval basis: **explicit user/data-owner confirmation** supported by the
   completed Gate B readiness comparison (no external reviewer approval claimed).
   Recorded in `project/stage124/gate_b_final/gate_b_rule_approval_stage124.json`.
-- Gate B **execution is authorized**. **Modeling remains prohibited** until a
+- Gate B **execution is completed and frozen**. **Modeling remains prohibited** until a
   separate post-Gate-B modeling-readiness action (`stage125-modeling-readiness`)
   is approved.
 
