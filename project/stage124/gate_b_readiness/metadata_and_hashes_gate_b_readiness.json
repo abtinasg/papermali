@@ -21,7 +21,7 @@
     "gate_b_rule_disagreement_rows.csv": "1a330329874180357ad9ba1fadb65462eb18c8c0b947a39c62a923d4c4a97664",
     "gate_b_unmatched_or_ambiguous_rows.csv": "2a5081dc46b582ad5cccbea73b36d89affeb4b9595411e47b589f18ad0ece0d4"
   },
-  "python": "3.14.0 (v3.14.0:ebf955df7a8, Oct  7 2025, 08:20:14) [Clang 16.0.0 (clang-1600.0.26.6)]",
+  "python": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
   "source_code_commit": "cf5f7f2f1f6fc7fc1283782ee6cdad20fc8e8965",
   "source_file_sha256": "4e1b1f7790dad33e185ce2b6183f928ca1115a98f8cb5fee1966cfbbd33baab6",
   "stage": "stage124-gate-b-readiness",
