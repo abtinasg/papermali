@@ -144,7 +144,7 @@
   },
   "failed_count": 0,
   "gate_b_started": true,
-  "generated_at": "2026-07-12T10:40:08Z",
+  "generated_at": "2026-07-12T11:57:34Z",
   "main_primary_counts": {
     "affected_tickers_count": 23,
     "change_vs_stage123_main": -72,
@@ -169,7 +169,7 @@
   "primary_rule": "rule_a: first_observed_trading_date <= fiscal_year_end",
   "rejected_rule": "rule_c: first_observed_trading_year < fiscal_year",
   "robustness_rule": "rule_b: first_observed_trading_date <= fiscal_year_start",
-  "source_commit": "cf5f7f2f1f6fc7fc1283782ee6cdad20fc8e8965",
+  "source_commit": "14151eda47784521f6893beba1aaf829a68aaccf",
   "source_file_sha256": "da10445b69f58ea1bcda69d7555dbaf6f5e256dbcf1eb5d60a60669d331b9340",
   "stage": "stage124_gate_b_execution",
   "test_file_sha256": "e619a9473891a033366cc88a6e3ac79fac0908d0651dfba678894b3eac063e08",
