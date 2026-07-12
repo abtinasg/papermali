@@ -59,7 +59,7 @@
     },
     {
       "assertion": "no_modeling_started",
-      "detail": "checked stage125 dir and modeling markers",
+      "detail": "checked paths and artifact patterns",
       "status": "PASS"
     },
     {
@@ -69,12 +69,12 @@
     },
     {
       "assertion": "date_semantics_declared",
-      "detail": "first_observed_trading_date_from_official_tse_api",
+      "detail": "constant + 130 listing master rows verified",
       "status": "PASS"
     },
     {
       "assertion": "no_missing_zeroed",
-      "detail": "unresolved listing preserved as 'unresolved'",
+      "detail": "all unresolved company-years verified",
       "status": "PASS"
     },
     {
@@ -104,17 +104,17 @@
     },
     {
       "assertion": "source_columns_preserved",
-      "detail": "15 source/predictor columns present",
+      "detail": "all 76 Stage123 columns verified cell-by-cell",
       "status": "PASS"
     },
     {
       "assertion": "target_columns_preserved",
-      "detail": "5 target columns present",
+      "detail": "all 5 target columns verified cell-by-cell",
       "status": "PASS"
     },
     {
       "assertion": "output_hashes_verified",
-      "detail": "14/14 files hashed",
+      "detail": "all 13 output hashes verified from disk",
       "status": "PASS"
     }
   ],
@@ -144,7 +144,7 @@
   },
   "failed_count": 0,
   "gate_b_started": true,
-  "generated_at": "2026-07-12T11:57:34Z",
+  "generated_at": "2026-07-12T13:19:29Z",
   "main_primary_counts": {
     "affected_tickers_count": 23,
     "change_vs_stage123_main": -72,
@@ -169,10 +169,10 @@
   "primary_rule": "rule_a: first_observed_trading_date <= fiscal_year_end",
   "rejected_rule": "rule_c: first_observed_trading_year < fiscal_year",
   "robustness_rule": "rule_b: first_observed_trading_date <= fiscal_year_start",
-  "source_commit": "14151eda47784521f6893beba1aaf829a68aaccf",
-  "source_file_sha256": "da10445b69f58ea1bcda69d7555dbaf6f5e256dbcf1eb5d60a60669d331b9340",
+  "source_commit": "077cdf6d394cf24e34751e49108a2a04d460068c",
+  "source_file_sha256": "0465369c71896ba484a30d1de6ccbcc546d43c88c87728c58a7b29772cb8bf43",
   "stage": "stage124_gate_b_execution",
-  "test_file_sha256": "e619a9473891a033366cc88a6e3ac79fac0908d0651dfba678894b3eac063e08",
+  "test_file_sha256": "f185d1b3742359a856baf1b28b8ab32fe9a8db28a7e258bf92213755ea40ad05",
   "ticker_count": 130,
   "tickers": [
     "اردستان",
