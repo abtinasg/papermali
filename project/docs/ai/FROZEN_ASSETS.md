@@ -3,9 +3,9 @@
 
 # FROZEN ASSETS
 
-_Generated from the Stage122/Stage123 hash manifests (`metadata_and_hashes_stage12{2,3}.json`)._
+_Generated from the Stage122/Stage123/Stage124 hash manifests (`metadata_and_hashes_stage12{2,3}.json`, `metadata_and_hashes_stage124_batch02_gate_b.json`)._
 
-- Frozen (verified) files: **21/21 match**. A missing or mismatched frozen file is **fatal** (generation/validation fails).
+- Frozen (verified) files: **23/23 match**. A missing or mismatched frozen file is **fatal** (generation/validation fails).
 - Files are *regenerable* when gitignored (machine-dependent SHA) or explicitly classified non-frozen (`NON_FROZEN_TRACKED`, e.g. a pytest log whose timing line is non-deterministic); these are not hash-verified.
 
 | Status | Path | Manifest |
@@ -35,9 +35,11 @@ _Generated from the Stage122/Stage123 hash manifests (`metadata_and_hashes_stage
 | ➖ regenerable (classified non-frozen) | `project/stage123/stage123_unit_test_output.txt` | `project/stage123/metadata_and_hashes_stage123.json` |
 | ➖ regenerable (gitignored, not verified) | `project/stage123/stage123_workbook.xlsx` | `project/stage123/metadata_and_hashes_stage123.json` |
 | ✅ match | `project/stage123/statement_scope_correction_audit_stage123.csv` | `project/stage123/metadata_and_hashes_stage123.json` |
+| ✅ match | `project/stage124/gate_b_final/README_GATE_B_RULE_APPROVAL.md` | `project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json` |
 | ✅ match | `project/stage124/gate_b_final/README_STAGE124_GATE_B_EXECUTION.md` | `project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json` |
 | ✅ match | `project/stage124/gate_b_final/gate_b_distribution_by_target_year.csv` | `project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json` |
 | ✅ match | `project/stage124/gate_b_final/gate_b_pair_change_vs_stage123.csv` | `project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json` |
+| ✅ match | `project/stage124/gate_b_final/gate_b_rule_approval_stage124.json` | `project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json` |
 | ✅ match | `project/stage124/gate_b_final/gate_b_sample_matrix.csv` | `project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json` |
 | ✅ match | `project/stage124/gate_b_final/gate_b_unresolved_rows.csv` | `project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json` |
 | ➖ regenerable (gitignored, not verified) | `project/stage124/gate_b_final/modeling_all_rows_stage124_gate_b.csv` | `project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json` |

@@ -31,8 +31,8 @@ tickers). Four sample designs:
 Unresolved listing rows: Rule A = 4, Rule B = 10 (preserved explicitly, never
 zero-filled). Outputs in `project/stage124/gate_b_final/` (large canonical +
 filtered CSVs gitignored/hashed; small audit CSVs, QC, metadata, README tracked).
-38 focused tests (`project/tests/test_stage124_gate_b_execution.py`); 717 in the
-full suite. **No modeling started.**
+46 focused tests (`project/tests/test_stage124_gate_b_execution.py`); 724 passed,
+1 skipped in the full suite. **No modeling started.**
 
 ### Next action — `stage125-modeling-readiness`
 
@@ -90,7 +90,7 @@ applied under `stage124-gate-b-execution` (see the active workstream above).
 - ✅ `stage124-gate-b-rule-approval` — Rule A approved as primary, Rule B as
   listing-timing robustness; Rule C rejected.
 - ✅ `stage124-gate-b-execution` — Approved rules applied; four sample designs,
-  canonical + filtered outputs, 38 focused tests. No modeling started.
+  canonical + filtered outputs, 46 focused tests. No modeling started.
 - ✅ Verified master: `listing_master_verified_stage124.csv` — 130 unique tickers,
   dates in `first_public_trading_date_jalali` / `first_public_trading_date_gregorian`
   with date_semantics=`first_observed_trading_date_from_official_tse_api`

@@ -88,7 +88,7 @@
   "failed_count": 0,
   "generated_at": "2026-07-12T10:40:08Z",
   "source_commit": "cf5f7f2f1f6fc7fc1283782ee6cdad20fc8e8965",
-  "source_file_sha256": "4e1b1f7790dad33e185ce2b6183f928ca1115a98f8cb5fee1966cfbbd33baab6",
+  "source_file_sha256": "a131bf0d4a8c7691b3ac664d29cb50ba15f069f5adf56d0329d8121d5122cb74",
   "stage": "stage124_gate_b_readiness",
   "test_file_sha256": "1372289e5427944efa55646050f201b954964ee639573bfa88abb59a3853513a",
   "ticker_count": 130,

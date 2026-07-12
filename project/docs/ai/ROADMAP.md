@@ -31,7 +31,7 @@ must also appear in the body below. The validator checks that:
 7. `stage124-official-api-finalize` — Finalized verified master for 130 tickers using official TSETMC first-observed-trade dates; merged through PR #15, merge commit 22c2d0c ✅
 8. `stage124-gate-b-readiness` — Gate B readiness dry-run: three eligibility rules (A/B/C) compared, per-rule impact report generated, 45 focused tests added ✅
 9. `stage124-gate-b-rule-approval` — User/data owner approved Rule A (primary) and Rule B (listing-timing robustness); Rule C rejected ✅
-10. `stage124-gate-b-execution` — Executed the approved Gate B rules; four sample designs, canonical + filtered outputs, 38 focused tests (717 full-suite) ✅
+10. `stage124-gate-b-execution` — Executed the approved Gate B rules; four sample designs, canonical + filtered outputs, 46 focused tests (724 passed, 1 skipped) ✅
 11. `stage125-modeling-readiness` — Post-Gate-B modeling readiness; modeling remains prohibited until approved ⬅️ **next**
 
 ## Maintenance tasks
@@ -60,6 +60,6 @@ Rule C (`first_observed_trading_year < fiscal_year`) was rejected.
 `stage124-gate-b-execution` applied the approved rules to the frozen Stage123
 data and verified listing master, producing four sample designs (main Rule A =
 1013 pairs / 81 pos / 932 neg; main Rule B = 994 / 80 / 914) with canonical and
-filtered outputs and 38 focused tests. **No modeling was started.**
+filtered outputs and 46 focused tests. **No modeling was started.**
 `stage125-modeling-readiness` is the next action — modeling remains prohibited
 until post-Gate-B modeling readiness is approved.

@@ -27,7 +27,7 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
   - `expanded_rule_b_combined_robustness` = 1036 (80 pos / 956 neg)
   - Unresolved listing rows: Rule A = 4, Rule B = 10 (preserved, never
     zero-filled). Outputs in `project/stage124/gate_b_final/`; module
-    `project/src/stage124_gate_b_execution.py`; 38 focused tests (717 full-suite).
+    `project/src/stage124_gate_b_execution.py`; 46 focused tests (724 passed, 1 skipped).
 - Gate B **executed** (`gate_b_started = true`); **modeling remains prohibited**
   until `stage125-modeling-readiness` is approved.
 

@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 15,
+  "assertion_count": 23,
   "assertions": [
     {
       "assertion": "all_rows_count",
@@ -49,22 +49,22 @@
     },
     {
       "assertion": "main_rule_a_counts",
-      "detail": "1013/81/932",
+      "detail": "1013/81/932/0",
       "status": "PASS"
     },
     {
       "assertion": "main_rule_b_counts",
-      "detail": "994/80/914",
+      "detail": "994/80/914/0",
       "status": "PASS"
     },
     {
       "assertion": "no_modeling_started",
-      "detail": "no modeling artifacts produced",
+      "detail": "checked stage125 dir and modeling markers",
       "status": "PASS"
     },
     {
       "assertion": "no_rule_c_canonical",
-      "detail": "Rule C absent from final eligibility flags",
+      "detail": "rule_c cols in company_year=[], pairs=[]",
       "status": "PASS"
     },
     {
@@ -74,7 +74,47 @@
     },
     {
       "assertion": "no_missing_zeroed",
-      "detail": "unresolved listing preserved",
+      "detail": "unresolved listing preserved as 'unresolved'",
+      "status": "PASS"
+    },
+    {
+      "assertion": "input_hashes_verified",
+      "detail": "0 mismatches",
+      "status": "PASS"
+    },
+    {
+      "assertion": "listing_master_hash_verified",
+      "detail": "hash matches EXPECTED_LISTING_MASTER_SHA256",
+      "status": "PASS"
+    },
+    {
+      "assertion": "approval_record_verified",
+      "detail": "all approval anchors match",
+      "status": "PASS"
+    },
+    {
+      "assertion": "nesting_invariants",
+      "detail": "all 4 nesting invariants hold",
+      "status": "PASS"
+    },
+    {
+      "assertion": "distribution_sums",
+      "detail": "eligible pairs == sum of distribution",
+      "status": "PASS"
+    },
+    {
+      "assertion": "source_columns_preserved",
+      "detail": "15 source/predictor columns present",
+      "status": "PASS"
+    },
+    {
+      "assertion": "target_columns_preserved",
+      "detail": "5 target columns present",
+      "status": "PASS"
+    },
+    {
+      "assertion": "output_hashes_verified",
+      "detail": "14/14 files hashed",
       "status": "PASS"
     }
   ],
@@ -130,9 +170,9 @@
   "rejected_rule": "rule_c: first_observed_trading_year < fiscal_year",
   "robustness_rule": "rule_b: first_observed_trading_date <= fiscal_year_start",
   "source_commit": "cf5f7f2f1f6fc7fc1283782ee6cdad20fc8e8965",
-  "source_file_sha256": "e53c88bcda7f24e0cfa5a192583b2e627ad11cdf0bc79b71fa9515522ac3bb55",
+  "source_file_sha256": "da10445b69f58ea1bcda69d7555dbaf6f5e256dbcf1eb5d60a60669d331b9340",
   "stage": "stage124_gate_b_execution",
-  "test_file_sha256": "1d67277d055dc1296332cb106a7b2008861206126e9190e4d128fd15a794ba03",
+  "test_file_sha256": "e619a9473891a033366cc88a6e3ac79fac0908d0651dfba678894b3eac063e08",
   "ticker_count": 130,
   "tickers": [
     "اردستان",
