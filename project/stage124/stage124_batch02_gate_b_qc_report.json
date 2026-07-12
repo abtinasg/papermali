@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 23,
+  "assertion_count": 24,
   "assertions": [
     {
       "assertion": "all_rows_count",
@@ -68,8 +68,8 @@
       "status": "PASS"
     },
     {
-      "assertion": "date_semantics_declared",
-      "detail": "constant + 130 listing master rows verified",
+      "assertion": "date_semantics_provenance_verified",
+      "detail": "constant + 130 verification_status + 130 source_1_type + listing master SHA-256 verified",
       "status": "PASS"
     },
     {
@@ -105,6 +105,11 @@
     {
       "assertion": "source_columns_preserved",
       "detail": "all 76 Stage123 columns verified cell-by-cell",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pair_source_columns_preserved",
+      "detail": "all 16 original pair columns verified cell-by-cell",
       "status": "PASS"
     },
     {
@@ -144,7 +149,7 @@
   },
   "failed_count": 0,
   "gate_b_started": true,
-  "generated_at": "2026-07-12T13:19:29Z",
+  "generated_at": "2026-07-12T13:59:08Z",
   "main_primary_counts": {
     "affected_tickers_count": 23,
     "change_vs_stage123_main": -72,
@@ -169,10 +174,10 @@
   "primary_rule": "rule_a: first_observed_trading_date <= fiscal_year_end",
   "rejected_rule": "rule_c: first_observed_trading_year < fiscal_year",
   "robustness_rule": "rule_b: first_observed_trading_date <= fiscal_year_start",
-  "source_commit": "077cdf6d394cf24e34751e49108a2a04d460068c",
-  "source_file_sha256": "0465369c71896ba484a30d1de6ccbcc546d43c88c87728c58a7b29772cb8bf43",
+  "source_commit": "e74646426b28437b4c0270062ea14c8971a93c66",
+  "source_file_sha256": "51e04153eb5121bbf10c26148ee526a8c1c919672d5f31d1ac0b27407fb473c8",
   "stage": "stage124_gate_b_execution",
-  "test_file_sha256": "f185d1b3742359a856baf1b28b8ab32fe9a8db28a7e258bf92213755ea40ad05",
+  "test_file_sha256": "61418bcd20cee36995cf167f0dfd54a38ea11df152f21528d267b8c773a8bb94",
   "ticker_count": 130,
   "tickers": [
     "اردستان",
