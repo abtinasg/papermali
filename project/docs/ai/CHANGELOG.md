@@ -3,6 +3,24 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-12
+
+- **`stage124-gate-b-rule-approval` completed** — The user/data owner explicitly
+  approved the final Gate B listing-eligibility rules, supported by the completed
+  Gate B readiness comparison (no external reviewer approval claimed):
+  - **Rule A (primary)**: `first_observed_trading_date <= fiscal_year_end`
+    — main sample 1013 eligible pairs (81 pos / 932 neg).
+  - **Rule B (listing-timing robustness)**:
+    `first_observed_trading_date <= fiscal_year_start` — main sample 994 eligible
+    pairs (80 pos / 914 neg).
+  - **Rule C rejected**: `first_observed_trading_year < fiscal_year` — coarse
+    year-level approximation, no advantage over exact-date Rule B; retained only
+    as a documented rejected readiness candidate.
+  - Approval record: `project/stage124/gate_b_final/gate_b_rule_approval_stage124.json`
+    and `README_GATE_B_RULE_APPROVAL.md`.
+- Gate B **execution is authorized**; **modeling remains prohibited** until
+  `stage125-modeling-readiness` is approved.
+
 ## 2026-07-11
 
 - **`stage124-gate-b-readiness` completed** — Dry-run comparison of three Gate B
