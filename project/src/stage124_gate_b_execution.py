@@ -166,6 +166,26 @@ SMALL_OUTPUTS = [
     "README_GATE_B_RULE_APPROVAL.md",
 ]
 
+EXPECTED_PYTHON_VERSION = "3.13.5"
+EXPECTED_PYTHON_IMPLEMENTATION = "CPython"
+
+MODELING_ARTIFACT_PATTERNS = [
+    "shap", "smote", "calibration", "temporal_split",
+    "predictions", "model_results",
+]
+MODELING_ARTIFACT_EXTENSIONS = [".joblib", ".npz"]
+
+TARGET_COLUMNS = [
+    "FD_target_main_t_plus_1",
+    "FD_target_article141_only_t_plus_1",
+    "FD_target_persistent_loss_robustness_t_plus_1",
+    "valid_target_t_plus_1",
+    "target_year",
+]
+
+DATE_SEMANTICS_EXPECTED_VERIFICATION_STATUS = "verified_tse_api_first_observed_trade"
+DATE_SEMANTICS_EXPECTED_SOURCE_TYPE = "official_tse_api"
+
 
 # --------------------------------------------------------------------------- #
 # Git helpers (deterministic timestamps)
@@ -195,6 +215,21 @@ def _git_commit_timestamp(repo_root: str, commit: str) -> str:
         return _dt.fromisoformat(raw).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     except ValueError:
         return raw
+
+
+# --------------------------------------------------------------------------- #
+# Python runtime verification (fail-closed)
+# --------------------------------------------------------------------------- #
+
+def verify_python_runtime() -> None:
+    """Fail-closed if Python runtime does not match expected version/implementation."""
+    actual_ver = platform.python_version()
+    actual_impl = platform.python_implementation()
+    if actual_ver != EXPECTED_PYTHON_VERSION or actual_impl != EXPECTED_PYTHON_IMPLEMENTATION:
+        raise QCFail(
+            f"Python runtime mismatch (fail-closed): "
+            f"expected {EXPECTED_PYTHON_VERSION}/{EXPECTED_PYTHON_IMPLEMENTATION}, "
+            f"got {actual_ver}/{actual_impl}")
 
 
 # --------------------------------------------------------------------------- #
@@ -449,7 +484,8 @@ def generate_outputs(project_dir: Path, repo_root: Path,
                      company_year: pd.DataFrame, pairs_out: pd.DataFrame,
                      audit: pd.DataFrame, stats: dict, pairs_src: pd.DataFrame,
                      verify_report: dict, schema_report: dict,
-                     listing_master: pd.DataFrame = None) -> dict:
+                     listing_master: pd.DataFrame = None,
+                     src_all_rows: pd.DataFrame = None) -> dict:
     out_dir = project_dir / "stage124" / "gate_b_final"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -564,19 +600,23 @@ def generate_outputs(project_dir: Path, repo_root: Path,
         "rule_b_robustness_unresolved_rows":
             int((company_year["eligible_listing_gate_b_robustness"] == "unresolved").sum()),
     }
-    # Compute output hashes first so QC assertions can verify them.
+    # 1. Compute hashes of non-QC outputs from disk (circularity: QC not yet written)
     output_hashes = {}
     for fname in LARGE_OUTPUTS + SMALL_OUTPUTS:
         fpath = out_dir / fname
         output_hashes[f"gate_b_final/{fname}"] = (
             sha256_file(fpath) if fpath.is_file() else None)
-    qc_path = project_dir / "stage124" / "stage124_batch02_gate_b_qc_report.json"
-    output_hashes["stage124_batch02_gate_b_qc_report.json"] = (
-        sha256_file(qc_path) if qc_path.is_file() else None)
+    # 2. Write QC report (assertions verify non-QC output hashes by re-computing from disk)
     qc_info = write_qc_report(project_dir, repo_root, stats, schema_report,
                               unresolved_counts, company_year=company_year,
                               pairs_out=pairs_out, listing_master=listing_master,
-                              verify_report=verify_report, output_hashes=output_hashes)
+                              verify_report=verify_report, output_hashes=output_hashes,
+                              src_all_rows=src_all_rows, src_pairs=pairs_src)
+    # 3. Compute QC report hash from disk (after QC is written)
+    qc_path = project_dir / "stage124" / "stage124_batch02_gate_b_qc_report.json"
+    output_hashes["stage124_batch02_gate_b_qc_report.json"] = (
+        sha256_file(qc_path) if qc_path.is_file() else None)
+    # 4. Write metadata with complete hashes (non-QC + QC report)
     meta_info = write_metadata(project_dir, repo_root, verify_report, stats,
                                unresolved_counts, qc_info, output_hashes)
     return {"output_dir": str(out_dir), "stats": stats,
@@ -641,7 +681,17 @@ def generate_readme(out_dir: Path, stats: dict) -> None:
 def _qc_assertions(stats: dict, schema_report: dict,
                   company_year: pd.DataFrame, pairs_out: pd.DataFrame,
                   listing_master: pd.DataFrame, verify_report: dict,
-                  output_hashes: dict, project_dir: Path) -> list[dict]:
+                  output_hashes: dict, project_dir: Path,
+                  src_all_rows: pd.DataFrame | None = None,
+                  src_pairs: pd.DataFrame | None = None) -> list[dict]:
+    if src_all_rows is None:
+        src_all_rows = pd.read_csv(
+            project_dir / "stage123" / "modeling_all_rows_stage123.csv",
+            encoding="utf-8-sig")
+    if src_pairs is None:
+        src_pairs = pd.read_csv(
+            project_dir / "stage123" / "modeling_one_year_ahead_stage123.csv",
+            encoding="utf-8-sig")
     a = stats["main_rule_a_primary"]
     b = stats["main_rule_b_listing_robustness"]
     out = [{"assertion": c["check"], "status": c["status"], "detail": c["detail"]}
@@ -663,15 +713,39 @@ def _qc_assertions(stats: dict, schema_report: dict,
                 "status": "PASS" if ok_b else "FAIL",
                 "detail": f"{b['pairs']}/{b['positive']}/{b['negative']}/{b['target_missing']}"})
 
-    # no_modeling_started — check no modeling marker files or artifacts exist
-    modeling_markers = [
+    # no_modeling_started — check explicit paths and artifact patterns
+    modeling_paths = [
+        project_dir / "outputs" / "stage_modeling" / "run_manifest.json",
         project_dir / "stage125",
-        project_dir / "stage124" / "gate_b_final" / "modeling_started_marker",
     ]
-    modeling_artifacts = any(p.exists() for p in modeling_markers)
+    modeling_path_hits = [str(p) for p in modeling_paths if p.exists()]
+    gate_b_dir = project_dir / "stage124" / "gate_b_final"
+    artifact_hits = []
+    if gate_b_dir.is_dir():
+        for f in gate_b_dir.iterdir():
+            if not f.is_file():
+                continue
+            low = f.name.lower()
+            if low.startswith("modeling_") and low.endswith(".csv"):
+                continue
+            for ext in MODELING_ARTIFACT_EXTENSIONS:
+                if low.endswith(ext):
+                    artifact_hits.append(f.name)
+                    break
+            else:
+                for pat in MODELING_ARTIFACT_PATTERNS:
+                    if pat in low:
+                        artifact_hits.append(f.name)
+                        break
+    no_modeling = len(modeling_path_hits) == 0 and len(artifact_hits) == 0
+    detail_parts = []
+    if modeling_path_hits:
+        detail_parts.append(f"paths: {modeling_path_hits}")
+    if artifact_hits:
+        detail_parts.append(f"artifacts: {artifact_hits}")
     out.append({"assertion": "no_modeling_started",
-                "status": "PASS" if not modeling_artifacts else "FAIL",
-                "detail": "checked stage125 dir and modeling markers"})
+                "status": "PASS" if no_modeling else "FAIL",
+                "detail": "; ".join(detail_parts) if detail_parts else "checked paths and artifact patterns"})
 
     # no_rule_c_canonical — Rule C must not appear in any final eligibility column
     rule_c_cols = [c for c in company_year.columns if "rule_c" in c.lower()]
@@ -681,22 +755,77 @@ def _qc_assertions(stats: dict, schema_report: dict,
                 "status": "PASS" if no_rule_c else "FAIL",
                 "detail": f"rule_c cols in company_year={rule_c_cols}, pairs={rule_c_in_pairs}"})
 
-    # date_semantics_declared — DATE_SEMANTICS constant must be set and documented
-    has_ds = bool(DATE_SEMANTICS) and DATE_SEMANTICS == "first_observed_trading_date_from_official_tse_api"
+    # date_semantics_declared — check DATE_SEMANTICS constant AND listing master values
+    ds_const_ok = bool(DATE_SEMANTICS) and DATE_SEMANTICS == "first_observed_trading_date_from_official_tse_api"
+    ds_details = []
+    if not ds_const_ok:
+        ds_details.append("DATE_SEMANTICS constant mismatched")
+    if "verification_status" not in listing_master.columns:
+        ds_details.append("verification_status column missing")
+        ds_lm_ok = False
+    else:
+        vs = listing_master["verification_status"]
+        ds_lm_ok = (vs.notna().all()
+                    and (vs == DATE_SEMANTICS_EXPECTED_VERIFICATION_STATUS).all()
+                    and len(vs) == EXPECTED_TICKERS)
+        if not ds_lm_ok:
+            n_missing = int(vs.isna().sum())
+            n_mismatch = int((vs != DATE_SEMANTICS_EXPECTED_VERIFICATION_STATUS).sum())
+            ds_details.append(f"verification_status: {n_missing} missing, {n_mismatch} mismatched, {len(vs)} rows")
+    if "source_1_type" not in listing_master.columns:
+        ds_details.append("source_1_type column missing")
+        ds_src_ok = False
+    else:
+        st = listing_master["source_1_type"]
+        ds_src_ok = (st.notna().all()
+                     and (st == DATE_SEMANTICS_EXPECTED_SOURCE_TYPE).all()
+                     and len(st) == EXPECTED_TICKERS)
+        if not ds_src_ok:
+            ds_details.append(f"source_1_type: mismatches in {len(st)} rows")
+    ds_ok = ds_const_ok and ds_lm_ok and ds_src_ok
     out.append({"assertion": "date_semantics_declared",
-                "status": "PASS" if has_ds else "FAIL",
-                "detail": DATE_SEMANTICS if has_ds else "date_semantics constant missing or mismatched"})
+                "status": "PASS" if ds_ok else "FAIL",
+                "detail": "; ".join(ds_details) if ds_details else f"constant + {EXPECTED_TICKERS} listing master rows verified"})
 
-    # no_missing_zeroed — unresolved listings must remain 'unresolved', not zeroed
-    unresolved_a = company_year["eligible_listing_gate_b_primary"] == "unresolved"
-    unresolved_b = company_year["eligible_listing_gate_b_robustness"] == "unresolved"
-    no_zeroed = (not (company_year.loc[unresolved_a, "eligible_listing_gate_b_primary"]
-                      .isin([0, "0", False]).any())
-                 and not (company_year.loc[unresolved_b, "eligible_listing_gate_b_robustness"]
-                          .isin([0, "0", False]).any()))
+    # no_missing_zeroed — thorough check of unresolved company-years
+    nmz_details = []
+    nmz_ok = True
+    for rule_label, elig_col, status_col, pred_cols, pair_flag, reason_col in [
+        ("rule_a", "eligible_listing_gate_b_primary", "listing_gate_b_primary_status",
+         ["predictor_eligible_main_gate_b_primary", "predictor_eligible_expanded_gate_b_primary"],
+         "pair_final_eligible_main_gate_b_primary", "listing_gate_b_primary_exclusion_reason"),
+        ("rule_b", "eligible_listing_gate_b_robustness", "listing_gate_b_robustness_status",
+         ["predictor_eligible_main_gate_b_robustness", "predictor_eligible_expanded_gate_b_robustness"],
+         "pair_final_eligible_main_gate_b_robustness", "listing_gate_b_robustness_exclusion_reason"),
+    ]:
+        unres_mask = company_year[elig_col] == "unresolved"
+        unres_rows = company_year.loc[unres_mask]
+        for _, row in unres_rows.iterrows():
+            rk = row["row_key"]
+            if row[elig_col] != "unresolved":
+                nmz_ok = False
+                nmz_details.append(f"{rule_label}: {rk} eligibility not 'unresolved'")
+            if row[status_col] != "unresolved":
+                nmz_ok = False
+                nmz_details.append(f"{rule_label}: {rk} status not 'unresolved'")
+            for pc in pred_cols:
+                if pc in company_year.columns and int(row[pc]) != 0:
+                    nmz_ok = False
+                    nmz_details.append(f"{rule_label}: {rk} {pc} != 0")
+            dep_pairs = pairs_out[pairs_out["predictor_row_key_t"] == rk]
+            if (dep_pairs[pair_flag] == 1).any():
+                nmz_ok = False
+                nmz_details.append(f"{rule_label}: {rk} has eligible pair")
+            if reason_col in row.index:
+                reason = str(row[reason_col])
+                if not reason or ("unresolved" not in reason.lower()
+                                  and "missing" not in reason.lower()
+                                  and "unparseable" not in reason.lower()):
+                    nmz_ok = False
+                    nmz_details.append(f"{rule_label}: {rk} exclusion reason lacks listing cause: '{reason}'")
     out.append({"assertion": "no_missing_zeroed",
-                "status": "PASS" if no_zeroed else "FAIL",
-                "detail": "unresolved listing preserved as 'unresolved'"})
+                "status": "PASS" if nmz_ok else "FAIL",
+                "detail": "; ".join(nmz_details[:5]) if nmz_details else "all unresolved company-years verified"})
 
     # input_hashes_verified — verify_report has no mismatches
     iv_ok = len(verify_report.get("mismatches", [])) == 0
@@ -748,27 +877,92 @@ def _qc_assertions(stats: dict, schema_report: dict,
                 "status": "PASS" if dist_ok else "FAIL",
                 "detail": "eligible pairs == sum of distribution" if dist_ok else "distribution sum mismatch"})
 
-    # source_columns_preserved — predictor eligibility and row key columns from Stage123
-    src_cols = [c for c in pairs_out.columns
-                if c.startswith("predictor_eligible_") or c == "predictor_row_key_t"
-                or c.startswith("pair_final_eligible_") or c.startswith("pair_exclusion_reason_")]
-    src_ok = len(src_cols) > 0  # columns exist
+    # source_columns_preserved — cell-by-cell comparison of all Stage123 columns in company-year
+    src_missing = [c for c in src_all_rows.columns if c not in company_year.columns]
+    src_mismatches = []
+    for col in src_all_rows.columns:
+        if col not in company_year.columns:
+            continue
+        s = src_all_rows[col].reset_index(drop=True)
+        d = company_year[col].reset_index(drop=True)
+        if len(s) != len(d):
+            src_mismatches.append(f"{col}: length {len(s)} vs {len(d)}")
+            continue
+        s_nan = s.isna()
+        d_nan = d.isna()
+        if not s_nan.equals(d_nan):
+            src_mismatches.append(f"{col}: NaN positions differ")
+            continue
+        s_vals = s[~s_nan]
+        d_vals = d[~s_nan]
+        if not s_vals.equals(d_vals):
+            src_mismatches.append(f"{col}: values differ")
+            continue
+        if s.dtype != d.dtype and str(s.dtype) != object and str(d.dtype) != object:
+            src_mismatches.append(f"{col}: dtype {s.dtype} vs {d.dtype}")
+    src_ok = len(src_missing) == 0 and len(src_mismatches) == 0
+    src_detail_parts = []
+    if src_missing:
+        src_detail_parts.append(f"missing: {src_missing}")
+    if src_mismatches:
+        src_detail_parts.append(f"mismatches: {src_mismatches[:5]}")
     out.append({"assertion": "source_columns_preserved",
                 "status": "PASS" if src_ok else "FAIL",
-                "detail": f"{len(src_cols)} source/predictor columns present"})
+                "detail": "; ".join(src_detail_parts) if src_detail_parts else f"all {len(src_all_rows.columns)} Stage123 columns verified cell-by-cell"})
 
-    # target_columns_preserved — target value columns unchanged from Stage123
-    tgt_cols = [c for c in pairs_out.columns if c.startswith("FD_target_") or c.startswith("target_")]
-    tgt_ok = len(tgt_cols) > 0  # columns exist
+    # target_columns_preserved — cell-by-cell comparison of target columns vs Stage123
+    tgt_missing = [c for c in TARGET_COLUMNS if c not in pairs_out.columns]
+    tgt_mismatches = []
+    for col in TARGET_COLUMNS:
+        if col not in pairs_out.columns or col not in src_pairs.columns:
+            continue
+        s = src_pairs[col].reset_index(drop=True)
+        d = pairs_out[col].reset_index(drop=True)
+        if len(s) != len(d):
+            tgt_mismatches.append(f"{col}: length {len(s)} vs {len(d)}")
+            continue
+        s_nan = s.isna()
+        d_nan = d.isna()
+        if not s_nan.equals(d_nan):
+            tgt_mismatches.append(f"{col}: NaN positions differ")
+            continue
+        s_vals = s[~s_nan]
+        d_vals = d[~d_nan]
+        if not s_vals.equals(d_vals):
+            tgt_mismatches.append(f"{col}: values differ")
+    tgt_ok = len(tgt_missing) == 0 and len(tgt_mismatches) == 0
+    tgt_detail_parts = []
+    if tgt_missing:
+        tgt_detail_parts.append(f"missing: {tgt_missing}")
+    if tgt_mismatches:
+        tgt_detail_parts.append(f"mismatches: {tgt_mismatches[:5]}")
     out.append({"assertion": "target_columns_preserved",
                 "status": "PASS" if tgt_ok else "FAIL",
-                "detail": f"{len(tgt_cols)} target columns present"})
+                "detail": "; ".join(tgt_detail_parts) if tgt_detail_parts else f"all {len(TARGET_COLUMNS)} target columns verified cell-by-cell"})
 
-    # output_hashes_verified — all output files have non-None hashes in metadata
-    hash_ok = all(v is not None for v in output_hashes.values())
+    # output_hashes_verified — re-compute SHA-256 from disk and compare to recorded hashes
+    hash_mismatches = []
+    hash_missing = []
+    for key, recorded_hash in output_hashes.items():
+        fpath = project_dir / "stage124" / key
+        if not fpath.is_file():
+            hash_missing.append(key)
+            continue
+        if recorded_hash is None:
+            hash_missing.append(f"{key} (hash is None)")
+            continue
+        actual_hash = sha256_file(fpath)
+        if actual_hash != recorded_hash:
+            hash_mismatches.append(f"{key}: expected {recorded_hash[:12]}..., got {actual_hash[:12]}...")
+    hash_ok = len(hash_mismatches) == 0 and len(hash_missing) == 0
+    hash_detail_parts = []
+    if hash_missing:
+        hash_detail_parts.append(f"missing: {hash_missing}")
+    if hash_mismatches:
+        hash_detail_parts.append(f"mismatches: {hash_mismatches[:5]}")
     out.append({"assertion": "output_hashes_verified",
                 "status": "PASS" if hash_ok else "FAIL",
-                "detail": f"{sum(1 for v in output_hashes.values() if v is not None)}/{len(output_hashes)} files hashed"})
+                "detail": "; ".join(hash_detail_parts) if hash_detail_parts else f"all {len(output_hashes)} output hashes verified from disk"})
 
     return out
 
@@ -779,7 +973,9 @@ def write_qc_report(project_dir: Path, repo_root: Path, stats: dict,
                     pairs_out: pd.DataFrame = None,
                     listing_master: pd.DataFrame = None,
                     verify_report: dict = None,
-                    output_hashes: dict = None) -> dict:
+                    output_hashes: dict = None,
+                    src_all_rows: pd.DataFrame = None,
+                    src_pairs: pd.DataFrame = None) -> dict:
     src_rel = "project/src/stage124_gate_b_execution.py"
     test_rel = "project/tests/test_stage124_gate_b_execution.py"
     source_commit = _git_last_code_commit(str(repo_root), [src_rel, test_rel])
@@ -793,7 +989,8 @@ def write_qc_report(project_dir: Path, repo_root: Path, stats: dict,
 
     assertions = _qc_assertions(stats, schema_report,
                                 company_year, pairs_out, listing_master,
-                                verify_report, output_hashes or {}, project_dir)
+                                verify_report, output_hashes or {}, project_dir,
+                                src_all_rows=src_all_rows, src_pairs=src_pairs)
     failed = sum(1 for a in assertions if a["status"] != "PASS")
     all_pass = schema_report["overall_pass"] and failed == 0
 
@@ -936,6 +1133,7 @@ def check_invariants(company_year: pd.DataFrame, pairs_out: pd.DataFrame,
 # --------------------------------------------------------------------------- #
 
 def run(project_dir: Path | None = None) -> dict:
+    verify_python_runtime()
     if project_dir is None:
         project_dir = Path(__file__).resolve().parent.parent
     repo_root = project_dir.parent
@@ -964,7 +1162,8 @@ def run(project_dir: Path | None = None) -> dict:
 
     output_info = generate_outputs(project_dir, repo_root, company_year, pairs_out,
                                    audit, stats, pairs, verify_report, schema_report,
-                                   listing_master=listing_master)
+                                   listing_master=listing_master,
+                                   src_all_rows=all_rows)
     return {**output_info, "schema_report": schema_report,
             "verify_report": verify_report, "company_year": company_year,
             "pairs_out": pairs_out, "audit": audit}

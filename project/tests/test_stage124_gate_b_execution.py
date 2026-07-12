@@ -301,26 +301,56 @@ def test_upstream_assets_unchanged():
 # --------------------------------------------------------------------------- #
 
 def test_source_columns_preserved(company_year, src_all_rows):
+    """Every Stage123 source column must be present and cell-by-cell identical."""
     for col in src_all_rows.columns:
-        assert col in company_year.columns
-        pd.testing.assert_series_equal(
-            company_year[col].reset_index(drop=True),
-            src_all_rows[col].reset_index(drop=True),
-            check_names=False)
+        assert col in company_year.columns, f"missing source column: {col}"
+        s = src_all_rows[col].reset_index(drop=True)
+        d = company_year[col].reset_index(drop=True)
+        assert len(s) == len(d), f"{col}: length mismatch {len(s)} vs {len(d)}"
+        assert s.isna().equals(d.isna()), f"{col}: NaN positions differ"
+        assert s[~s.isna()].equals(d[~d.isna()]), f"{col}: values differ"
+        if str(s.dtype) != object and str(d.dtype) != object:
+            assert s.dtype == d.dtype, f"{col}: dtype {s.dtype} vs {d.dtype}"
 
 
 def test_target_values_unchanged(pairs_out, src_pairs):
-    for col in ("FD_target_main_t_plus_1", "FD_target_article141_only_t_plus_1",
-                "FD_target_persistent_loss_robustness_t_plus_1"):
-        pd.testing.assert_series_equal(
-            pairs_out[col].reset_index(drop=True),
-            src_pairs[col].reset_index(drop=True), check_names=False)
+    """All target columns must be cell-by-cell identical to Stage123."""
+    target_cols = [
+        "FD_target_main_t_plus_1",
+        "FD_target_article141_only_t_plus_1",
+        "FD_target_persistent_loss_robustness_t_plus_1",
+        "valid_target_t_plus_1",
+        "target_year",
+    ]
+    for col in target_cols:
+        assert col in pairs_out.columns, f"missing target column: {col}"
+        assert col in src_pairs.columns, f"missing source target column: {col}"
+        s = src_pairs[col].reset_index(drop=True)
+        d = pairs_out[col].reset_index(drop=True)
+        assert len(s) == len(d), f"{col}: length mismatch"
+        assert s.isna().equals(d.isna()), f"{col}: NaN positions differ"
+        assert s[~s.isna()].equals(d[~d.isna()]), f"{col}: values differ"
 
 
-def test_no_missing_zero_filled(company_year):
-    # Unresolved listing must remain the string 'unresolved', never 0.
-    unresolved = company_year[company_year["listing_gate_b_robustness_status"] == "unresolved"]
-    assert (unresolved["eligible_listing_gate_b_robustness"] == "unresolved").all()
+def test_no_missing_zero_filled(company_year, pairs_out):
+    """Unresolved company-years must remain 'unresolved' with zeroed predictors and no eligible pairs."""
+    for elig_col, status_col, pred_cols, pair_flag in [
+        ("eligible_listing_gate_b_primary", "listing_gate_b_primary_status",
+         ["predictor_eligible_main_gate_b_primary", "predictor_eligible_expanded_gate_b_primary"],
+         "pair_final_eligible_main_gate_b_primary"),
+        ("eligible_listing_gate_b_robustness", "listing_gate_b_robustness_status",
+         ["predictor_eligible_main_gate_b_robustness", "predictor_eligible_expanded_gate_b_robustness"],
+         "pair_final_eligible_main_gate_b_robustness"),
+    ]:
+        unres = company_year[company_year[elig_col] == "unresolved"]
+        for _, row in unres.iterrows():
+            assert row[elig_col] == "unresolved"
+            assert row[status_col] == "unresolved"
+            for pc in pred_cols:
+                if pc in company_year.columns:
+                    assert int(row[pc]) == 0, f"{row['row_key']} {pc} != 0"
+            dep = pairs_out[pairs_out["predictor_row_key_t"] == row["row_key"]]
+            assert not (dep[pair_flag] == 1).any(), f"{row['row_key']} has eligible pair"
 
 
 # --------------------------------------------------------------------------- #
@@ -347,11 +377,20 @@ def test_rule_c_absent_in_canonical_files():
 # --------------------------------------------------------------------------- #
 
 def test_no_modeling_artifacts():
+    """No modeling artifacts or paths may exist in Gate B outputs."""
     assert not (ROOT / "outputs" / "stage_modeling" / "run_manifest.json").is_file()
+    assert not (ROOT / "stage125").is_dir()
+    banned_exts = (".joblib", ".npz")
+    banned_pats = ("shap", "smote", "calibration", "temporal_split",
+                   "predictions", "model_results")
     for name in [f.name for f in GATE_B_DIR.iterdir() if f.is_file()]:
         low = name.lower()
-        for banned in ("shap", "smote", "calibrat", "temporal_split", "model_", ".joblib"):
-            assert banned not in low, name
+        if low.startswith("modeling_") and low.endswith(".csv"):
+            continue
+        for ext in banned_exts:
+            assert not low.endswith(ext), name
+        for pat in banned_pats:
+            assert pat not in low, name
 
 
 # --------------------------------------------------------------------------- #
@@ -398,13 +437,12 @@ def test_approval_files_frozen_in_manifest(metadata):
 
 
 def test_metadata_stable_python_fields(metadata):
-    """Metadata must use stable python_version/python_implementation, not full sys.version."""
+    """Metadata must use stable python_version/python_implementation matching expected runtime."""
     assert "python" not in metadata or metadata["python"] is None
     assert "python_version" in metadata
     assert "python_implementation" in metadata
-    assert isinstance(metadata["python_version"], str)
-    assert len(metadata["python_version"].split(".")) == 3
-    assert metadata["python_implementation"] in ("CPython", "PyPy", "Jython", "IronPython")
+    assert metadata["python_version"] == ex.EXPECTED_PYTHON_VERSION
+    assert metadata["python_implementation"] == ex.EXPECTED_PYTHON_IMPLEMENTATION
 
 
 def test_no_workbook_hash(metadata):
@@ -574,3 +612,170 @@ def test_filtered_views_match_flags(pairs_out):
         expected = int((pairs_out[flag] == 1).sum())
         assert len(df) == expected, fname
         assert (df[flag] == 1).all(), fname
+
+
+# --------------------------------------------------------------------------- #
+# Negative tests — each QC assertion must be computed, not constant PASS
+# --------------------------------------------------------------------------- #
+
+@pytest.fixture(scope="session")
+def listing_master():
+    return pd.read_csv(ROOT / "stage124" / "listing_master_verified_stage124.csv",
+                       encoding="utf-8-sig")
+
+
+def _mock_stats():
+    """Minimal stats dict for negative tests that only check specific assertions."""
+    return {
+        "main_rule_a_primary": {"pairs": 0, "positive": 0, "negative": 0, "target_missing": 0},
+        "main_rule_b_listing_robustness": {"pairs": 0, "positive": 0, "negative": 0, "target_missing": 0},
+        "expanded_rule_a_company_scope_robustness": {"pairs": 0, "positive": 0, "negative": 0, "target_missing": 0},
+        "expanded_rule_b_combined_robustness": {"pairs": 0, "positive": 0, "negative": 0, "target_missing": 0},
+    }
+
+
+def _empty_company_year():
+    """Minimal company_year with required columns and no unresolved rows."""
+    return pd.DataFrame({
+        "row_key": [],
+        "eligible_listing_gate_b_primary": [],
+        "listing_gate_b_primary_status": [],
+        "eligible_listing_gate_b_robustness": [],
+        "listing_gate_b_robustness_status": [],
+        "predictor_eligible_main_gate_b_primary": [],
+        "predictor_eligible_expanded_gate_b_primary": [],
+        "predictor_eligible_main_gate_b_robustness": [],
+        "predictor_eligible_expanded_gate_b_robustness": [],
+    })
+
+
+def _empty_pairs_out():
+    """Minimal pairs_out with required columns and no eligible pairs."""
+    return pd.DataFrame({
+        "predictor_row_key_t": [],
+        "pair_final_eligible_main_gate_b_primary": [],
+        "pair_final_eligible_main_gate_b_robustness": [],
+        "pair_final_eligible_expanded_gate_b_primary": [],
+        "pair_final_eligible_expanded_gate_b_robustness": [],
+    })
+
+
+def test_negative_altered_target_value(pairs_out, src_pairs):
+    """Altering a target value must cause target_columns_preserved to FAIL."""
+    tampered = pairs_out.copy()
+    tampered.loc[0, "FD_target_main_t_plus_1"] = (
+        999 if tampered.loc[0, "FD_target_main_t_plus_1"] != 999 else 998)
+    assertions = ex._qc_assertions(
+        _mock_stats(), {"checks": [], "overall_pass": True},
+        pairs_out=tampered, company_year=_empty_company_year(),
+        listing_master=pd.DataFrame(), verify_report={"inputs": {}, "mismatches": []},
+        output_hashes={}, project_dir=ROOT,
+        src_all_rows=src_pairs, src_pairs=src_pairs)
+    tgt = [a for a in assertions if a["assertion"] == "target_columns_preserved"]
+    assert len(tgt) == 1
+    assert tgt[0]["status"] == "FAIL", "target_columns_preserved must FAIL on altered target"
+
+
+def test_negative_altered_source_value(company_year, src_all_rows):
+    """Altering a source value must cause source_columns_preserved to FAIL."""
+    tampered = company_year.copy()
+    tampered.loc[0, "total_assets"] = (
+        999999.0 if float(tampered.loc[0, "total_assets"]) != 999999.0 else 888888.0)
+    assertions = ex._qc_assertions(
+        _mock_stats(), {"checks": [], "overall_pass": True},
+        pairs_out=_empty_pairs_out(), company_year=tampered,
+        listing_master=pd.DataFrame(), verify_report={"inputs": {}, "mismatches": []},
+        output_hashes={}, project_dir=ROOT,
+        src_all_rows=src_all_rows, src_pairs=_empty_pairs_out())
+    src = [a for a in assertions if a["assertion"] == "source_columns_preserved"]
+    assert len(src) == 1
+    assert src[0]["status"] == "FAIL", "source_columns_preserved must FAIL on altered source"
+
+
+def test_negative_wrong_date_semantics(listing_master):
+    """Changing verification_status must cause date_semantics_declared to FAIL."""
+    tampered_lm = listing_master.copy()
+    tampered_lm.loc[0, "verification_status"] = "wrong_value"
+    assertions = ex._qc_assertions(
+        _mock_stats(), {"checks": [], "overall_pass": True},
+        pairs_out=_empty_pairs_out(), company_year=_empty_company_year(),
+        listing_master=tampered_lm, verify_report={"inputs": {}, "mismatches": []},
+        output_hashes={}, project_dir=ROOT,
+        src_all_rows=_empty_company_year(), src_pairs=_empty_pairs_out())
+    ds = [a for a in assertions if a["assertion"] == "date_semantics_declared"]
+    assert len(ds) == 1
+    assert ds[0]["status"] == "FAIL", "date_semantics_declared must FAIL on wrong verification_status"
+
+
+def test_negative_inserted_rule_c_column(company_year, pairs_out):
+    """Inserting a Rule C column must cause no_rule_c_canonical to FAIL."""
+    tampered_cy = company_year.copy()
+    tampered_cy["eligible_rule_c_test"] = 0
+    assertions = ex._qc_assertions(
+        _mock_stats(), {"checks": [], "overall_pass": True},
+        pairs_out=pairs_out, company_year=tampered_cy,
+        listing_master=pd.DataFrame(), verify_report={"inputs": {}, "mismatches": []},
+        output_hashes={}, project_dir=ROOT,
+        src_all_rows=_empty_company_year(), src_pairs=_empty_pairs_out())
+    rc = [a for a in assertions if a["assertion"] == "no_rule_c_canonical"]
+    assert len(rc) == 1
+    assert rc[0]["status"] == "FAIL", "no_rule_c_canonical must FAIL on Rule C column"
+
+
+def test_negative_unresolved_pair_eligible(company_year, pairs_out):
+    """Making an unresolved pair eligible must cause no_missing_zeroed to FAIL."""
+    unres_a_keys = set(
+        company_year[company_year["eligible_listing_gate_b_primary"] == "unresolved"]["row_key"])
+    tampered_pairs = pairs_out.copy()
+    mask = tampered_pairs["predictor_row_key_t"].isin(unres_a_keys)
+    if mask.any():
+        idx = tampered_pairs.index[mask][0]
+        tampered_pairs.loc[idx, "pair_final_eligible_main_gate_b_primary"] = 1
+    assertions = ex._qc_assertions(
+        _mock_stats(), {"checks": [], "overall_pass": True},
+        pairs_out=tampered_pairs, company_year=company_year,
+        listing_master=pd.DataFrame(), verify_report={"inputs": {}, "mismatches": []},
+        output_hashes={}, project_dir=ROOT,
+        src_all_rows=_empty_company_year(), src_pairs=_empty_pairs_out())
+    nmz = [a for a in assertions if a["assertion"] == "no_missing_zeroed"]
+    assert len(nmz) == 1
+    assert nmz[0]["status"] == "FAIL", "no_missing_zeroed must FAIL on eligible unresolved pair"
+
+
+def test_negative_modeling_artifact_present():
+    """Creating a .joblib artifact must cause no_modeling_started to FAIL."""
+    artifact = GATE_B_DIR / "test_model.joblib"
+    artifact.write_bytes(b"fake model")
+    try:
+        assertions = ex._qc_assertions(
+            _mock_stats(), {"checks": [], "overall_pass": True},
+            pairs_out=_empty_pairs_out(), company_year=_empty_company_year(),
+            listing_master=pd.DataFrame(), verify_report={"inputs": {}, "mismatches": []},
+            output_hashes={}, project_dir=ROOT,
+            src_all_rows=_empty_company_year(), src_pairs=_empty_pairs_out())
+        nm = [a for a in assertions if a["assertion"] == "no_modeling_started"]
+        assert len(nm) == 1
+        assert nm[0]["status"] == "FAIL", "no_modeling_started must FAIL on .joblib artifact"
+    finally:
+        artifact.unlink(missing_ok=True)
+
+
+def test_negative_mismatched_output_hash():
+    """A tampered output hash must cause output_hashes_verified to FAIL."""
+    fake_hashes = {"gate_b_final/gate_b_sample_matrix.csv": "0" * 64}
+    assertions = ex._qc_assertions(
+        _mock_stats(), {"checks": [], "overall_pass": True},
+        pairs_out=_empty_pairs_out(), company_year=_empty_company_year(),
+        listing_master=pd.DataFrame(), verify_report={"inputs": {}, "mismatches": []},
+        output_hashes=fake_hashes, project_dir=ROOT,
+        src_all_rows=_empty_company_year(), src_pairs=_empty_pairs_out())
+    oh = [a for a in assertions if a["assertion"] == "output_hashes_verified"]
+    assert len(oh) == 1
+    assert oh[0]["status"] == "FAIL", "output_hashes_verified must FAIL on mismatched hash"
+
+
+def test_negative_wrong_python_runtime(monkeypatch):
+    """Mismatched Python runtime must cause fail-closed before any artifact write."""
+    monkeypatch.setattr(ex, "EXPECTED_PYTHON_VERSION", "9.9.9")
+    with pytest.raises(ex.QCFail, match="Python runtime mismatch"):
+        ex.verify_python_runtime()
