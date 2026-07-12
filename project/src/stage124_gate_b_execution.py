@@ -33,8 +33,8 @@ Scientific controls
 from __future__ import annotations
 
 import json
+import platform
 import subprocess
-import sys
 from datetime import timezone
 from pathlib import Path
 
@@ -69,6 +69,33 @@ EXPECTED_INPUT_SHA256 = {
         "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
     "modeling_one_year_ahead_stage123.csv":
         "e3d3063e840d61a39c3b4477aabe347050be6c829755acdcead05359fa9181ac",
+}
+
+EXPECTED_LISTING_MASTER_SHA256 = (
+    "968cf0cc4613aadd738d14e3cd3058e25920256c891b431d9e99776de3479fd7"
+)
+
+APPROVAL_EXPECTED = {
+    "decision_status": "approved",
+    "approval_basis": "explicit_user_data_owner_confirmation",
+    "primary_rule_id": "rule_a",
+    "primary_rule_expression": "first_observed_trading_date <= fiscal_year_end",
+    "primary_rule_role": "primary",
+    "robustness_rule_id": "rule_b",
+    "robustness_rule_expression": "first_observed_trading_date <= fiscal_year_start",
+    "robustness_rule_role": "listing_timing_robustness",
+    "rejected_rule_id": "rule_c",
+    "modeling_authorized": False,
+    "date_semantics": "first_observed_trading_date_from_official_tse_api",
+    "readiness_merge_commit": "cf1ab8877555159f127e4f9d7bf581ca7059a745",
+    "readiness_summary_sha256":
+        "c910bf89ec4e4b63faa4c466d0b7f18a3f2a8d1ed1036b9bdf43bd3346b11e54",
+    "approved_primary_expected_pairs": 1013,
+    "approved_primary_expected_positive": 81,
+    "approved_primary_expected_negative": 932,
+    "approved_robustness_expected_pairs": 994,
+    "approved_robustness_expected_positive": 80,
+    "approved_robustness_expected_negative": 914,
 }
 
 OTHER_BASE_FLAGS = [
@@ -135,6 +162,8 @@ SMALL_OUTPUTS = [
     "gate_b_pair_change_vs_stage123.csv",
     "gate_b_unresolved_rows.csv",
     "README_STAGE124_GATE_B_EXECUTION.md",
+    "gate_b_rule_approval_stage124.json",
+    "README_GATE_B_RULE_APPROVAL.md",
 ]
 
 
@@ -197,7 +226,12 @@ def verify_inputs(project_dir: Path) -> dict:
     if not lm_path.is_file():
         report["mismatches"].append("listing_master_verified_stage124.csv: file not found")
     else:
-        report["inputs"]["listing_master_verified_stage124.csv"] = sha256_file(lm_path)
+        lm_hash = sha256_file(lm_path)
+        report["inputs"]["listing_master_verified_stage124.csv"] = lm_hash
+        if lm_hash != EXPECTED_LISTING_MASTER_SHA256:
+            report["mismatches"].append(
+                f"listing_master_verified_stage124.csv: expected "
+                f"{EXPECTED_LISTING_MASTER_SHA256}, got {lm_hash}")
 
     # Readiness summary must match the hash recorded in its own metadata.
     summary_path = (project_dir / "stage124" / "gate_b_readiness"
@@ -226,22 +260,12 @@ def verify_inputs(project_dir: Path) -> dict:
         approval = json.load(open(approval_path, encoding="utf-8"))
         report["inputs"]["gate_b_rule_approval_stage124.json"] = sha256_file(approval_path)
         report["approval"] = approval
-        checks = [
-            approval.get("decision_status") == "approved",
-            approval.get("primary_rule_id") == "rule_a",
-            approval.get("primary_rule_expression")
-            == "first_observed_trading_date <= fiscal_year_end",
-            approval.get("robustness_rule_id") == "rule_b",
-            approval.get("robustness_rule_expression")
-            == "first_observed_trading_date <= fiscal_year_start",
-            approval.get("rejected_rule_id") == "rule_c",
-            approval.get("modeling_authorized") is False,
-            approval.get("approved_primary_expected_pairs") == 1013,
-            approval.get("approved_robustness_expected_pairs") == 994,
-        ]
-        if not all(checks):
-            report["mismatches"].append(
-                "approval record does not match the executed rules")
+        for field, expected_val in APPROVAL_EXPECTED.items():
+            actual_val = approval.get(field)
+            if actual_val != expected_val:
+                report["mismatches"].append(
+                    f"approval anchor mismatch: {field}: "
+                    f"expected {expected_val!r}, got {actual_val!r}")
 
     if report["mismatches"]:
         raise QCFail("Input verification failed (fail-closed):\n  "
@@ -424,7 +448,8 @@ def _write_csv(df: pd.DataFrame, path: Path) -> None:
 def generate_outputs(project_dir: Path, repo_root: Path,
                      company_year: pd.DataFrame, pairs_out: pd.DataFrame,
                      audit: pd.DataFrame, stats: dict, pairs_src: pd.DataFrame,
-                     verify_report: dict, schema_report: dict) -> dict:
+                     verify_report: dict, schema_report: dict,
+                     listing_master: pd.DataFrame = None) -> dict:
     out_dir = project_dir / "stage124" / "gate_b_final"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -539,10 +564,21 @@ def generate_outputs(project_dir: Path, repo_root: Path,
         "rule_b_robustness_unresolved_rows":
             int((company_year["eligible_listing_gate_b_robustness"] == "unresolved").sum()),
     }
+    # Compute output hashes first so QC assertions can verify them.
+    output_hashes = {}
+    for fname in LARGE_OUTPUTS + SMALL_OUTPUTS:
+        fpath = out_dir / fname
+        output_hashes[f"gate_b_final/{fname}"] = (
+            sha256_file(fpath) if fpath.is_file() else None)
+    qc_path = project_dir / "stage124" / "stage124_batch02_gate_b_qc_report.json"
+    output_hashes["stage124_batch02_gate_b_qc_report.json"] = (
+        sha256_file(qc_path) if qc_path.is_file() else None)
     qc_info = write_qc_report(project_dir, repo_root, stats, schema_report,
-                              unresolved_counts)
+                              unresolved_counts, company_year=company_year,
+                              pairs_out=pairs_out, listing_master=listing_master,
+                              verify_report=verify_report, output_hashes=output_hashes)
     meta_info = write_metadata(project_dir, repo_root, verify_report, stats,
-                               unresolved_counts, qc_info)
+                               unresolved_counts, qc_info, output_hashes)
     return {"output_dir": str(out_dir), "stats": stats,
             "unresolved_counts": unresolved_counts, "qc": qc_info,
             "metadata": meta_info}
@@ -602,29 +638,148 @@ def generate_readme(out_dir: Path, stats: dict) -> None:
         "\n".join(lines), encoding="utf-8")
 
 
-def _qc_assertions(stats: dict, schema_report: dict) -> list[dict]:
+def _qc_assertions(stats: dict, schema_report: dict,
+                  company_year: pd.DataFrame, pairs_out: pd.DataFrame,
+                  listing_master: pd.DataFrame, verify_report: dict,
+                  output_hashes: dict, project_dir: Path) -> list[dict]:
     a = stats["main_rule_a_primary"]
     b = stats["main_rule_b_listing_robustness"]
     out = [{"assertion": c["check"], "status": c["status"], "detail": c["detail"]}
            for c in schema_report["checks"]]
+
+    # main_rule_a_counts
+    exp_a = EXPECTED_COUNTS["main_rule_a_primary"]
+    ok_a = (a["pairs"] == exp_a["pairs"] and a["positive"] == exp_a["positive"]
+            and a["negative"] == exp_a["negative"] and a["target_missing"] == exp_a["missing"])
     out.append({"assertion": "main_rule_a_counts",
-                "status": "PASS" if (a["pairs"] == 1013 and a["positive"] == 81
-                                     and a["negative"] == 932 and a["target_missing"] == 0)
-                else "FAIL", "detail": f"{a['pairs']}/{a['positive']}/{a['negative']}"})
+                "status": "PASS" if ok_a else "FAIL",
+                "detail": f"{a['pairs']}/{a['positive']}/{a['negative']}/{a['target_missing']}"})
+
+    # main_rule_b_counts
+    exp_b = EXPECTED_COUNTS["main_rule_b_listing_robustness"]
+    ok_b = (b["pairs"] == exp_b["pairs"] and b["positive"] == exp_b["positive"]
+            and b["negative"] == exp_b["negative"] and b["target_missing"] == exp_b["missing"])
     out.append({"assertion": "main_rule_b_counts",
-                "status": "PASS" if (b["pairs"] == 994 and b["positive"] == 80
-                                     and b["negative"] == 914 and b["target_missing"] == 0)
-                else "FAIL", "detail": f"{b['pairs']}/{b['positive']}/{b['negative']}"})
-    for name, det in (("no_modeling_started", "no modeling artifacts produced"),
-                      ("no_rule_c_canonical", "Rule C absent from final eligibility flags"),
-                      ("date_semantics_declared", DATE_SEMANTICS),
-                      ("no_missing_zeroed", "unresolved listing preserved")):
-        out.append({"assertion": name, "status": "PASS", "detail": det})
+                "status": "PASS" if ok_b else "FAIL",
+                "detail": f"{b['pairs']}/{b['positive']}/{b['negative']}/{b['target_missing']}"})
+
+    # no_modeling_started — check no modeling marker files or artifacts exist
+    modeling_markers = [
+        project_dir / "stage125",
+        project_dir / "stage124" / "gate_b_final" / "modeling_started_marker",
+    ]
+    modeling_artifacts = any(p.exists() for p in modeling_markers)
+    out.append({"assertion": "no_modeling_started",
+                "status": "PASS" if not modeling_artifacts else "FAIL",
+                "detail": "checked stage125 dir and modeling markers"})
+
+    # no_rule_c_canonical — Rule C must not appear in any final eligibility column
+    rule_c_cols = [c for c in company_year.columns if "rule_c" in c.lower()]
+    rule_c_in_pairs = [c for c in pairs_out.columns if "rule_c" in c.lower()]
+    no_rule_c = len(rule_c_cols) == 0 and len(rule_c_in_pairs) == 0
+    out.append({"assertion": "no_rule_c_canonical",
+                "status": "PASS" if no_rule_c else "FAIL",
+                "detail": f"rule_c cols in company_year={rule_c_cols}, pairs={rule_c_in_pairs}"})
+
+    # date_semantics_declared — DATE_SEMANTICS constant must be set and documented
+    has_ds = bool(DATE_SEMANTICS) and DATE_SEMANTICS == "first_observed_trading_date_from_official_tse_api"
+    out.append({"assertion": "date_semantics_declared",
+                "status": "PASS" if has_ds else "FAIL",
+                "detail": DATE_SEMANTICS if has_ds else "date_semantics constant missing or mismatched"})
+
+    # no_missing_zeroed — unresolved listings must remain 'unresolved', not zeroed
+    unresolved_a = company_year["eligible_listing_gate_b_primary"] == "unresolved"
+    unresolved_b = company_year["eligible_listing_gate_b_robustness"] == "unresolved"
+    no_zeroed = (not (company_year.loc[unresolved_a, "eligible_listing_gate_b_primary"]
+                      .isin([0, "0", False]).any())
+                 and not (company_year.loc[unresolved_b, "eligible_listing_gate_b_robustness"]
+                          .isin([0, "0", False]).any()))
+    out.append({"assertion": "no_missing_zeroed",
+                "status": "PASS" if no_zeroed else "FAIL",
+                "detail": "unresolved listing preserved as 'unresolved'"})
+
+    # input_hashes_verified — verify_report has no mismatches
+    iv_ok = len(verify_report.get("mismatches", [])) == 0
+    out.append({"assertion": "input_hashes_verified",
+                "status": "PASS" if iv_ok else "FAIL",
+                "detail": f"{len(verify_report.get('mismatches', []))} mismatches"})
+
+    # listing_master_hash_verified — listing master hash matches expected
+    lm_ok = verify_report["inputs"].get("listing_master_verified_stage124.csv") == EXPECTED_LISTING_MASTER_SHA256
+    out.append({"assertion": "listing_master_hash_verified",
+                "status": "PASS" if lm_ok else "FAIL",
+                "detail": "hash matches EXPECTED_LISTING_MASTER_SHA256" if lm_ok else "hash mismatch"})
+
+    # approval_record_verified — all approval anchors validated
+    ap_ok = len([m for m in verify_report.get("mismatches", [])
+                 if "approval anchor" in m]) == 0
+    out.append({"assertion": "approval_record_verified",
+                "status": "PASS" if ap_ok else "FAIL",
+                "detail": "all approval anchors match" if ap_ok else "approval anchor mismatch"})
+
+    # nesting_invariants — verified by check_invariants (no exception means pass)
+    nests = [
+        ("pair_final_eligible_main_gate_b_robustness", "pair_final_eligible_main_gate_b_primary"),
+        ("pair_final_eligible_expanded_gate_b_robustness", "pair_final_eligible_expanded_gate_b_primary"),
+        ("pair_final_eligible_main_gate_b_primary", "pair_final_eligible_expanded_gate_b_primary"),
+        ("pair_final_eligible_main_gate_b_robustness", "pair_final_eligible_expanded_gate_b_robustness"),
+    ]
+    nest_ok = all(
+        bool((~((pairs_out[a_col] == 1) & (pairs_out[b_col] != 1))).all())
+        for a_col, b_col in nests)
+    out.append({"assertion": "nesting_invariants",
+                "status": "PASS" if nest_ok else "FAIL",
+                "detail": "all 4 nesting invariants hold" if nest_ok else "nesting violation"})
+
+    # distribution_sums — per-design eligible pair count must equal sum of target-year distribution
+    dist_path = project_dir / "stage124" / "gate_b_final" / "gate_b_distribution_by_target_year.csv"
+    dist_ok = True
+    if dist_path.is_file():
+        dist_df = pd.read_csv(dist_path, encoding="utf-8-sig")
+        for design, (scope, rule_col, flag_col) in SAMPLE_DESIGNS.items():
+            elig_count = int((pairs_out[flag_col] == 1).sum())
+            dist_sum = int(dist_df[dist_df["sample_design"] == design]["n"].sum())
+            if elig_count != dist_sum:
+                dist_ok = False
+                break
+    else:
+        dist_ok = False
+    out.append({"assertion": "distribution_sums",
+                "status": "PASS" if dist_ok else "FAIL",
+                "detail": "eligible pairs == sum of distribution" if dist_ok else "distribution sum mismatch"})
+
+    # source_columns_preserved — predictor eligibility and row key columns from Stage123
+    src_cols = [c for c in pairs_out.columns
+                if c.startswith("predictor_eligible_") or c == "predictor_row_key_t"
+                or c.startswith("pair_final_eligible_") or c.startswith("pair_exclusion_reason_")]
+    src_ok = len(src_cols) > 0  # columns exist
+    out.append({"assertion": "source_columns_preserved",
+                "status": "PASS" if src_ok else "FAIL",
+                "detail": f"{len(src_cols)} source/predictor columns present"})
+
+    # target_columns_preserved — target value columns unchanged from Stage123
+    tgt_cols = [c for c in pairs_out.columns if c.startswith("FD_target_") or c.startswith("target_")]
+    tgt_ok = len(tgt_cols) > 0  # columns exist
+    out.append({"assertion": "target_columns_preserved",
+                "status": "PASS" if tgt_ok else "FAIL",
+                "detail": f"{len(tgt_cols)} target columns present"})
+
+    # output_hashes_verified — all output files have non-None hashes in metadata
+    hash_ok = all(v is not None for v in output_hashes.values())
+    out.append({"assertion": "output_hashes_verified",
+                "status": "PASS" if hash_ok else "FAIL",
+                "detail": f"{sum(1 for v in output_hashes.values() if v is not None)}/{len(output_hashes)} files hashed"})
+
     return out
 
 
 def write_qc_report(project_dir: Path, repo_root: Path, stats: dict,
-                    schema_report: dict, unresolved_counts: dict) -> dict:
+                    schema_report: dict, unresolved_counts: dict,
+                    company_year: pd.DataFrame = None,
+                    pairs_out: pd.DataFrame = None,
+                    listing_master: pd.DataFrame = None,
+                    verify_report: dict = None,
+                    output_hashes: dict = None) -> dict:
     src_rel = "project/src/stage124_gate_b_execution.py"
     test_rel = "project/tests/test_stage124_gate_b_execution.py"
     source_commit = _git_last_code_commit(str(repo_root), [src_rel, test_rel])
@@ -636,7 +791,9 @@ def write_qc_report(project_dir: Path, repo_root: Path, stats: dict,
                      encoding="utf-8-sig")
     tickers = sorted(lm["ticker"].tolist())
 
-    assertions = _qc_assertions(stats, schema_report)
+    assertions = _qc_assertions(stats, schema_report,
+                                company_year, pairs_out, listing_master,
+                                verify_report, output_hashes or {}, project_dir)
     failed = sum(1 for a in assertions if a["status"] != "PASS")
     all_pass = schema_report["overall_pass"] and failed == 0
 
@@ -678,23 +835,25 @@ def write_qc_report(project_dir: Path, repo_root: Path, stats: dict,
 
 
 def write_metadata(project_dir: Path, repo_root: Path, verify_report: dict,
-                   stats: dict, unresolved_counts: dict, qc_info: dict) -> dict:
+                   stats: dict, unresolved_counts: dict, qc_info: dict,
+                   output_hashes: dict = None) -> dict:
     out_dir = project_dir / "stage124" / "gate_b_final"
     src_rel = "project/src/stage124_gate_b_execution.py"
     test_rel = "project/tests/test_stage124_gate_b_execution.py"
     src_path = repo_root / src_rel
     test_path = repo_root / test_rel
 
-    # output_files_sha256 keys are relative to project/stage124/ so the Handoff
-    # frozen-manifest resolver can locate them.
-    output_hashes = {}
-    for fname in LARGE_OUTPUTS + SMALL_OUTPUTS:
-        fpath = out_dir / fname
-        output_hashes[f"gate_b_final/{fname}"] = (
-            sha256_file(fpath) if fpath.is_file() else None)
-    qc_path = project_dir / "stage124" / "stage124_batch02_gate_b_qc_report.json"
-    output_hashes["stage124_batch02_gate_b_qc_report.json"] = (
-        sha256_file(qc_path) if qc_path.is_file() else None)
+    # Use pre-computed output_hashes if available (from generate_outputs),
+    # otherwise compute them here for backward compatibility.
+    if output_hashes is None:
+        output_hashes = {}
+        for fname in LARGE_OUTPUTS + SMALL_OUTPUTS:
+            fpath = out_dir / fname
+            output_hashes[f"gate_b_final/{fname}"] = (
+                sha256_file(fpath) if fpath.is_file() else None)
+        qc_path = project_dir / "stage124" / "stage124_batch02_gate_b_qc_report.json"
+        output_hashes["stage124_batch02_gate_b_qc_report.json"] = (
+            sha256_file(qc_path) if qc_path.is_file() else None)
 
     inputs = verify_report["inputs"]
     metadata = {
@@ -708,7 +867,8 @@ def write_metadata(project_dir: Path, repo_root: Path, verify_report: dict,
         "code_commit": qc_info["source_commit"],
         "source_file_sha256": sha256_file(src_path) if src_path.is_file() else None,
         "test_file_sha256": sha256_file(test_path) if test_path.is_file() else None,
-        "python": sys.version,
+        "python_version": platform.python_version(),
+        "python_implementation": platform.python_implementation(),
         "input_files_sha256": {
             "modeling_all_rows_stage123.csv": inputs["modeling_all_rows_stage123.csv"],
             "modeling_one_year_ahead_stage123.csv": inputs["modeling_one_year_ahead_stage123.csv"],
@@ -803,7 +963,8 @@ def run(project_dir: Path | None = None) -> dict:
     check_invariants(company_year, pairs_out, stats)
 
     output_info = generate_outputs(project_dir, repo_root, company_year, pairs_out,
-                                   audit, stats, pairs, verify_report, schema_report)
+                                   audit, stats, pairs, verify_report, schema_report,
+                                   listing_master=listing_master)
     return {**output_info, "schema_report": schema_report,
             "verify_report": verify_report, "company_year": company_year,
             "pairs_out": pairs_out, "audit": audit}

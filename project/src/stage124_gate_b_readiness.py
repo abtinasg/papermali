@@ -23,6 +23,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import platform
 import subprocess
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -1097,7 +1098,8 @@ def generate_outputs(
         "source_code_commit": source_commit,
         "source_file_sha256": sha256_file(src_path) if src_path.is_file() else None,
         "test_file_sha256": sha256_file(test_path) if test_path.is_file() else None,
-        "python": sys.version,
+        "python_version": platform.python_version(),
+        "python_implementation": platform.python_implementation(),
         "has_jdatetime": HAS_JDATETIME,
         "expected_rows": EXPECTED_ROWS,
         "expected_tickers": EXPECTED_TICKERS,

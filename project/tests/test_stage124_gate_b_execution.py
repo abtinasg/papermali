@@ -91,6 +91,13 @@ def test_input_hash_fail_closed(monkeypatch):
         ex.verify_inputs(ROOT)
 
 
+def test_listing_master_hash_mismatch_fail_closed(monkeypatch):
+    """Listing master hash mismatch must fail closed."""
+    monkeypatch.setattr(ex, "EXPECTED_LISTING_MASTER_SHA256", "deadbeef")
+    with pytest.raises(ex.QCFail):
+        ex.verify_inputs(ROOT)
+
+
 # --------------------------------------------------------------------------- #
 # 2. Listing master schema and 130 ticker match
 # --------------------------------------------------------------------------- #
@@ -372,13 +379,32 @@ def test_metadata_has_all_inputs(metadata):
     assert metadata["listing_master_sha256"]
     assert metadata["readiness_summary_sha256"]
     assert metadata["rule_approval_sha256"]
-    # Six large + four small + qc report all hashed.
+    # Six large + small outputs (including approval JSON + README) + qc report all hashed.
     keys = metadata["output_files_sha256"]
     for large in ex.LARGE_OUTPUTS:
         assert f"gate_b_final/{large}" in keys
     for small in ex.SMALL_OUTPUTS:
         assert f"gate_b_final/{small}" in keys
     assert "stage124_batch02_gate_b_qc_report.json" in keys
+
+
+def test_approval_files_frozen_in_manifest(metadata):
+    """Approval JSON and README must be in output_files_sha256 (frozen assets)."""
+    keys = metadata["output_files_sha256"]
+    assert "gate_b_final/gate_b_rule_approval_stage124.json" in keys
+    assert keys["gate_b_final/gate_b_rule_approval_stage124.json"] is not None
+    assert "gate_b_final/README_GATE_B_RULE_APPROVAL.md" in keys
+    assert keys["gate_b_final/README_GATE_B_RULE_APPROVAL.md"] is not None
+
+
+def test_metadata_stable_python_fields(metadata):
+    """Metadata must use stable python_version/python_implementation, not full sys.version."""
+    assert "python" not in metadata or metadata["python"] is None
+    assert "python_version" in metadata
+    assert "python_implementation" in metadata
+    assert isinstance(metadata["python_version"], str)
+    assert len(metadata["python_version"].split(".")) == 3
+    assert metadata["python_implementation"] in ("CPython", "PyPy", "Jython", "IronPython")
 
 
 def test_no_workbook_hash(metadata):
@@ -451,6 +477,37 @@ def test_approval_matches_execution(stats):
     assert ap["approved_robustness_expected_positive"] == stats["main_rule_b_listing_robustness"]["positive"]
 
 
+def test_approval_all_anchors_validated():
+    """verify_inputs must validate every approval anchor with exact values."""
+    report = ex.verify_inputs(ROOT)
+    approval_mismatches = [m for m in report["mismatches"]
+                           if "approval anchor" in m]
+    assert approval_mismatches == []
+    ap = report["approval"]
+    for field, expected in ex.APPROVAL_EXPECTED.items():
+        assert ap.get(field) == expected, f"approval field {field}: {ap.get(field)!r} != {expected!r}"
+
+
+def test_approval_anchor_fail_closed(monkeypatch):
+    """A modified approval anchor must cause fail-closed."""
+    original = ex.APPROVAL_EXPECTED.copy()
+    monkeypatch.setitem(ex.APPROVAL_EXPECTED, "decision_status", "rejected")
+    with pytest.raises(ex.QCFail):
+        ex.verify_inputs(ROOT)
+
+
+def test_approval_counts_validated(stats):
+    """verify_inputs must validate exact approved counts for Rule A and Rule B."""
+    report = ex.verify_inputs(ROOT)
+    ap = report["approval"]
+    assert ap["approved_primary_expected_pairs"] == 1013
+    assert ap["approved_primary_expected_positive"] == 81
+    assert ap["approved_primary_expected_negative"] == 932
+    assert ap["approved_robustness_expected_pairs"] == 994
+    assert ap["approved_robustness_expected_positive"] == 80
+    assert ap["approved_robustness_expected_negative"] == 914
+
+
 # --------------------------------------------------------------------------- #
 # 29. QC source commit points to actual code/test commit
 # --------------------------------------------------------------------------- #
@@ -471,6 +528,34 @@ def test_qc_source_commit_valid(qc_report):
 def test_qc_all_pass(qc_report):
     assert qc_report["all_pass"] is True
     assert qc_report["failed_count"] == 0
+
+
+def test_qc_assertions_are_real(qc_report):
+    """QC assertions must include real computed checks, not constant PASS."""
+    assertion_names = {a["assertion"] for a in qc_report["assertions"]}
+    required = {
+        "no_modeling_started",
+        "no_rule_c_canonical",
+        "date_semantics_declared",
+        "no_missing_zeroed",
+        "input_hashes_verified",
+        "listing_master_hash_verified",
+        "approval_record_verified",
+        "nesting_invariants",
+        "distribution_sums",
+        "source_columns_preserved",
+        "target_columns_preserved",
+        "output_hashes_verified",
+    }
+    assert required.issubset(assertion_names), \
+        f"missing assertions: {required - assertion_names}"
+    for a in qc_report["assertions"]:
+        assert a["status"] == "PASS", f"{a['assertion']}: {a['status']}"
+
+
+def test_qc_assertion_count(qc_report):
+    """QC report must have a reasonable number of assertions (schema + computed)."""
+    assert qc_report["assertion_count"] >= 20
 
 
 # --------------------------------------------------------------------------- #
