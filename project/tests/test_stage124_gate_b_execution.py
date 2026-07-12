@@ -574,7 +574,7 @@ def test_qc_assertions_are_real(qc_report):
     required = {
         "no_modeling_started",
         "no_rule_c_canonical",
-        "date_semantics_declared",
+        "date_semantics_provenance_verified",
         "no_missing_zeroed",
         "input_hashes_verified",
         "listing_master_hash_verified",
@@ -582,6 +582,7 @@ def test_qc_assertions_are_real(qc_report):
         "nesting_invariants",
         "distribution_sums",
         "source_columns_preserved",
+        "pair_source_columns_preserved",
         "target_columns_preserved",
         "output_hashes_verified",
     }
@@ -693,7 +694,7 @@ def test_negative_altered_source_value(company_year, src_all_rows):
 
 
 def test_negative_wrong_date_semantics(listing_master):
-    """Changing verification_status must cause date_semantics_declared to FAIL."""
+    """Changing verification_status must cause date_semantics_provenance_verified to FAIL."""
     tampered_lm = listing_master.copy()
     tampered_lm.loc[0, "verification_status"] = "wrong_value"
     assertions = ex._qc_assertions(
@@ -702,9 +703,9 @@ def test_negative_wrong_date_semantics(listing_master):
         listing_master=tampered_lm, verify_report={"inputs": {}, "mismatches": []},
         output_hashes={}, project_dir=ROOT,
         src_all_rows=_empty_company_year(), src_pairs=_empty_pairs_out())
-    ds = [a for a in assertions if a["assertion"] == "date_semantics_declared"]
+    ds = [a for a in assertions if a["assertion"] == "date_semantics_provenance_verified"]
     assert len(ds) == 1
-    assert ds[0]["status"] == "FAIL", "date_semantics_declared must FAIL on wrong verification_status"
+    assert ds[0]["status"] == "FAIL", "date_semantics_provenance_verified must FAIL on wrong verification_status"
 
 
 def test_negative_inserted_rule_c_column(company_year, pairs_out):
@@ -758,6 +759,53 @@ def test_negative_modeling_artifact_present():
         assert nm[0]["status"] == "FAIL", "no_modeling_started must FAIL on .joblib artifact"
     finally:
         artifact.unlink(missing_ok=True)
+
+
+def test_negative_altered_pair_source_value(pairs_out, src_pairs):
+    """Altering a non-target pair feature must cause pair_source_columns_preserved to FAIL."""
+    tampered = pairs_out.copy()
+    tampered.loc[0, "predictor_eligible_main_t"] = (
+        999 if int(tampered.loc[0, "predictor_eligible_main_t"]) != 999 else 998)
+    assertions = ex._qc_assertions(
+        _mock_stats(), {"checks": [], "overall_pass": True},
+        pairs_out=tampered, company_year=_empty_company_year(),
+        listing_master=pd.DataFrame(), verify_report={"inputs": {}, "mismatches": []},
+        output_hashes={}, project_dir=ROOT,
+        src_all_rows=_empty_company_year(), src_pairs=src_pairs)
+    psc = [a for a in assertions if a["assertion"] == "pair_source_columns_preserved"]
+    assert len(psc) == 1
+    assert psc[0]["status"] == "FAIL", "pair_source_columns_preserved must FAIL on altered pair source value"
+
+
+def test_negative_altered_pair_provenance_field(pairs_out, src_pairs):
+    """Altering a provenance field (ticker) must cause pair_source_columns_preserved to FAIL."""
+    tampered = pairs_out.copy()
+    tampered.loc[0, "ticker"] = "TAMPERED_TICKER"
+    assertions = ex._qc_assertions(
+        _mock_stats(), {"checks": [], "overall_pass": True},
+        pairs_out=tampered, company_year=_empty_company_year(),
+        listing_master=pd.DataFrame(), verify_report={"inputs": {}, "mismatches": []},
+        output_hashes={}, project_dir=ROOT,
+        src_all_rows=_empty_company_year(), src_pairs=src_pairs)
+    psc = [a for a in assertions if a["assertion"] == "pair_source_columns_preserved"]
+    assert len(psc) == 1
+    assert psc[0]["status"] == "FAIL", "pair_source_columns_preserved must FAIL on altered ticker"
+
+
+def test_pair_source_columns_preserved(qc_report):
+    """QC report must include pair_source_columns_preserved assertion and it must PASS."""
+    psc = [a for a in qc_report["assertions"]
+           if a["assertion"] == "pair_source_columns_preserved"]
+    assert len(psc) == 1
+    assert psc[0]["status"] == "PASS"
+
+
+def test_date_semantics_provenance_verified(qc_report):
+    """QC report must include date_semantics_provenance_verified assertion and it must PASS."""
+    ds = [a for a in qc_report["assertions"]
+          if a["assertion"] == "date_semantics_provenance_verified"]
+    assert len(ds) == 1
+    assert ds[0]["status"] == "PASS"
 
 
 def test_negative_mismatched_output_hash():

@@ -27,7 +27,7 @@
     "gate_b_final/modeling_main_rule_a_eligible.csv": "f943d5cfd2a3dcaa091eacbac5e305fdad83787548a6e43b50976f1455664420",
     "gate_b_final/modeling_main_rule_b_eligible.csv": "99bdf0296a274f2ad42a6e9942a42d79b6370c7b99b57967b44c6821313f36c1",
     "gate_b_final/modeling_one_year_ahead_stage124_gate_b.csv": "9743c49337c66a3699bce34dfd02a151e34f48f0717f225ad487fe1487031d05",
-    "stage124_batch02_gate_b_qc_report.json": "843b04b06d3f415729d3f3375c7f13b3069334ecd5a5e0eeb5b30a666526c5c4"
+    "stage124_batch02_gate_b_qc_report.json": "524333ec0781a1b963055505a7d4f5ec17145bce53989a6afb9f3e1791e39ec5"
   },
   "python_implementation": "CPython",
   "python_version": "3.13.5",
@@ -64,9 +64,9 @@
     },
     "tickers": 130
   },
-  "source_file_sha256": "0465369c71896ba484a30d1de6ccbcc546d43c88c87728c58a7b29772cb8bf43",
+  "source_file_sha256": "51e04153eb5121bbf10c26148ee526a8c1c919672d5f31d1ac0b27407fb473c8",
   "stage": "stage124_gate_b_execution",
-  "test_file_sha256": "f185d1b3742359a856baf1b28b8ab32fe9a8db28a7e258bf92213755ea40ad05",
+  "test_file_sha256": "61418bcd20cee36995cf167f0dfd54a38ea11df152f21528d267b8c773a8bb94",
   "unresolved_counts": {
     "rule_a_primary_unresolved_rows": 4,
     "rule_b_robustness_unresolved_rows": 10

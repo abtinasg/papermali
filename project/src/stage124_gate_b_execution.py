@@ -755,7 +755,11 @@ def _qc_assertions(stats: dict, schema_report: dict,
                 "status": "PASS" if no_rule_c else "FAIL",
                 "detail": f"rule_c cols in company_year={rule_c_cols}, pairs={rule_c_in_pairs}"})
 
-    # date_semantics_declared — check DATE_SEMANTICS constant AND listing master values
+    # date_semantics_provenance_verified — verify DATE_SEMANTICS constant,
+    # all 130 verification_status values, all 130 source_1_type values,
+    # and the frozen listing-master SHA-256.
+    # The listing master does NOT contain a literal date_semantics column;
+    # date semantics are provenance-verified via verification_status and source_1_type.
     ds_const_ok = bool(DATE_SEMANTICS) and DATE_SEMANTICS == "first_observed_trading_date_from_official_tse_api"
     ds_details = []
     if not ds_const_ok:
@@ -782,10 +786,15 @@ def _qc_assertions(stats: dict, schema_report: dict,
                      and len(st) == EXPECTED_TICKERS)
         if not ds_src_ok:
             ds_details.append(f"source_1_type: mismatches in {len(st)} rows")
-    ds_ok = ds_const_ok and ds_lm_ok and ds_src_ok
-    out.append({"assertion": "date_semantics_declared",
+    # Verify the frozen listing-master SHA-256
+    lm_hash = verify_report["inputs"].get("listing_master_verified_stage124.csv")
+    ds_hash_ok = lm_hash == EXPECTED_LISTING_MASTER_SHA256
+    if not ds_hash_ok:
+        ds_details.append("listing master SHA-256 mismatch")
+    ds_ok = ds_const_ok and ds_lm_ok and ds_src_ok and ds_hash_ok
+    out.append({"assertion": "date_semantics_provenance_verified",
                 "status": "PASS" if ds_ok else "FAIL",
-                "detail": "; ".join(ds_details) if ds_details else f"constant + {EXPECTED_TICKERS} listing master rows verified"})
+                "detail": "; ".join(ds_details) if ds_details else f"constant + {EXPECTED_TICKERS} verification_status + {EXPECTED_TICKERS} source_1_type + listing master SHA-256 verified"})
 
     # no_missing_zeroed — thorough check of unresolved company-years
     nmz_details = []
@@ -909,6 +918,41 @@ def _qc_assertions(stats: dict, schema_report: dict,
     out.append({"assertion": "source_columns_preserved",
                 "status": "PASS" if src_ok else "FAIL",
                 "detail": "; ".join(src_detail_parts) if src_detail_parts else f"all {len(src_all_rows.columns)} Stage123 columns verified cell-by-cell"})
+
+    # pair_source_columns_preserved — cell-by-cell comparison of ALL original
+    # Stage123 pair columns against the Gate B pair output. Only new Gate B
+    # columns may be added; original columns must be identical.
+    pair_src_missing = [c for c in src_pairs.columns if c not in pairs_out.columns]
+    pair_src_mismatches = []
+    for col in src_pairs.columns:
+        if col not in pairs_out.columns:
+            continue
+        s = src_pairs[col].reset_index(drop=True)
+        d = pairs_out[col].reset_index(drop=True)
+        if len(s) != len(d):
+            pair_src_mismatches.append(f"{col}: length {len(s)} vs {len(d)}")
+            continue
+        s_nan = s.isna()
+        d_nan = d.isna()
+        if not s_nan.equals(d_nan):
+            pair_src_mismatches.append(f"{col}: NaN positions differ")
+            continue
+        s_vals = s[~s_nan]
+        d_vals = d[~d_nan]
+        if not s_vals.equals(d_vals):
+            pair_src_mismatches.append(f"{col}: values differ")
+            continue
+        if s.dtype != d.dtype and str(s.dtype) != object and str(d.dtype) != object:
+            pair_src_mismatches.append(f"{col}: dtype {s.dtype} vs {d.dtype}")
+    pair_src_ok = (len(pair_src_missing) == 0 and len(pair_src_mismatches) == 0)
+    pair_src_detail_parts = []
+    if pair_src_missing:
+        pair_src_detail_parts.append(f"missing: {pair_src_missing}")
+    if pair_src_mismatches:
+        pair_src_detail_parts.append(f"mismatches: {pair_src_mismatches[:5]}")
+    out.append({"assertion": "pair_source_columns_preserved",
+                "status": "PASS" if pair_src_ok else "FAIL",
+                "detail": "; ".join(pair_src_detail_parts) if pair_src_detail_parts else f"all {len(src_pairs.columns)} original pair columns verified cell-by-cell"})
 
     # target_columns_preserved — cell-by-cell comparison of target columns vs Stage123
     tgt_missing = [c for c in TARGET_COLUMNS if c not in pairs_out.columns]
