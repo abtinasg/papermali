@@ -73,9 +73,11 @@ def test_qc_counts_match_report():
 
 
 def test_markers_are_off():
+    # Gate B has been executed (Stage124 finalization): gate_b_started is now
+    # True. Modeling has NOT started and must remain False.
     state = _state(REAL_ROOT)
     assert state["modeling_started"] is False
-    assert state["gate_b_started"] is False
+    assert state["gate_b_started"] is True
     assert state["verified_master_created"] is True
 
 

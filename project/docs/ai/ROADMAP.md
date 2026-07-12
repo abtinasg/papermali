@@ -1,9 +1,9 @@
 ---
 roadmap_version: 1
-active_research_workstream_id: stage124-gate-b-readiness
-qc_scope: stage124-gate-b-readiness
-last_completed_research_action_id: stage124-gate-b-readiness
-next_research_action_id: stage124-gate-b-rule-approval
+active_research_workstream_id: stage124-gate-b-execution
+qc_scope: stage124-gate-b-execution
+last_completed_research_action_id: stage124-gate-b-execution
+next_research_action_id: stage125-modeling-readiness
 active_maintenance_task_id: repository-driven-ai-handoff
 ---
 
@@ -29,8 +29,10 @@ must also appear in the body below. The validator checks that:
 5. `stage124-batch02-part03-1b-0` — Research-Intake Readiness, baseline unlock, auditable intake scaffold ✅
 6. `stage124-batch02-part03-1b-1` — manual source discovery, snapshot capture, and reviewed-evidence intake for the 10 Part 3 tickers — **superseded / cancelled by official TSE API** (not completed)
 7. `stage124-official-api-finalize` — Finalized verified master for 130 tickers using official TSETMC first-observed-trade dates; merged through PR #15, merge commit 22c2d0c ✅
-8. `stage124-gate-b-readiness` — Gate B readiness dry-run: three eligibility rules (A/B/C) compared, per-rule impact report generated, 33 independent tests added ✅
-9. `stage124-gate-b-rule-approval` — User and scientific reviewer approve final Gate B rule from comparison report ⬅️ **next**
+8. `stage124-gate-b-readiness` — Gate B readiness dry-run: three eligibility rules (A/B/C) compared, per-rule impact report generated, 45 focused tests added ✅
+9. `stage124-gate-b-rule-approval` — User/data owner approved Rule A (primary) and Rule B (listing-timing robustness); Rule C rejected ✅
+10. `stage124-gate-b-execution` — Executed the approved Gate B rules; four sample designs, canonical + filtered outputs, 46 focused tests (724 passed, 1 skipped) ✅
+11. `stage125-modeling-readiness` — Post-Gate-B modeling readiness; modeling remains prohibited until approved ⬅️ **next**
 
 ## Maintenance tasks
 
@@ -49,8 +51,15 @@ intake runner have been retired.
 `stage124-official-api-finalize` completed the verified master for 130 tickers and
 was merged through PR #15 (merge commit 22c2d0c).
 `stage124-gate-b-readiness` completed the dry-run comparison of three eligibility
-rules (A/B/C) with per-rule impact reports and 33 independent tests. No rule has
-been finalized. Gate B execution and modeling remain out of scope.
-`stage124-gate-b-rule-approval` is the next action — the user and scientific
-reviewer must approve the final Gate B rule from the comparison report before
-proceeding.
+rules (A/B/C) with per-rule impact reports and 45 focused tests. Gate B execution
+and modeling were out of scope at that point.
+`stage124-gate-b-rule-approval` recorded explicit user/data-owner approval of
+Rule A (primary, `first_observed_trading_date <= fiscal_year_end`) and Rule B
+(listing-timing robustness, `first_observed_trading_date <= fiscal_year_start`);
+Rule C (`first_observed_trading_year < fiscal_year`) was rejected.
+`stage124-gate-b-execution` applied the approved rules to the frozen Stage123
+data and verified listing master, producing four sample designs (main Rule A =
+1013 pairs / 81 pos / 932 neg; main Rule B = 994 / 80 / 914) with canonical and
+filtered outputs and 46 focused tests. **No modeling was started.**
+`stage125-modeling-readiness` is the next action — modeling remains prohibited
+until post-Gate-B modeling readiness is approved.

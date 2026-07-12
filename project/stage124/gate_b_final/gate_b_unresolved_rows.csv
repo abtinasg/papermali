@@ -1,0 +1,11 @@
+﻿row_key,ticker,fiscal_year,fiscal_year_end,fiscal_year_start_gate_b,first_public_trading_date_jalali,eligible_listing_gate_b_primary,listing_gate_b_primary_exclusion_reason,eligible_listing_gate_b_robustness,listing_gate_b_robustness_exclusion_reason
+غشان|1402,غشان,1402,1402/10/30,,1384-03-23,1,,unresolved,fiscal_year_start_unresolved
+پرداخت|1401,پرداخت,1401,1401/09/30,,1396-04-27,1,,unresolved,fiscal_year_start_unresolved
+پی‌پاد|1401,پی‌پاد,1401,1401/09/30,,1402-01-16,0,first_trading_date_after_fy_end,unresolved,fiscal_year_start_unresolved
+پی‌پاد|1402,پی‌پاد,1402,1402/09/30,,1402-01-16,1,,unresolved,fiscal_year_start_unresolved
+سآبیک|1393,سآبیک,1393,,,1401-02-28,unresolved,fiscal_year_end_missing_or_unparseable,unresolved,fiscal_year_start_unresolved
+سآبیک|1394,سآبیک,1394,,,1401-02-28,unresolved,fiscal_year_end_missing_or_unparseable,unresolved,fiscal_year_start_unresolved
+سآبیک|1395,سآبیک,1395,,,1401-02-28,unresolved,fiscal_year_end_missing_or_unparseable,unresolved,fiscal_year_start_unresolved
+سآبیک|1396,سآبیک,1396,,,1401-02-28,unresolved,fiscal_year_end_missing_or_unparseable,unresolved,fiscal_year_start_unresolved
+شکلر|1400,شکلر,1400,1400/08/30,,1382-08-24,1,,unresolved,fiscal_year_start_unresolved
+شکلر|1397,شکلر,1397,1397/05/31,,1382-08-24,1,,unresolved,fiscal_year_start_unresolved

@@ -29,6 +29,14 @@ project/stage123/modeling_one_year_ahead_stage123.csv
 project/stage123/eligibility_audit_stage123.csv
 # Gate B readiness: bulky per-row audit CSV is regenerable; small CSVs/JSON/MD kept
 project/stage124/gate_b_readiness/gate_b_company_year_audit.csv
+# Gate B execution: bulky canonical + filtered CSVs are regenerable (hashed in
+# metadata); small tracked audits/QC/metadata/README ARE kept.
+project/stage124/gate_b_final/modeling_all_rows_stage124_gate_b.csv
+project/stage124/gate_b_final/modeling_one_year_ahead_stage124_gate_b.csv
+project/stage124/gate_b_final/modeling_main_rule_a_eligible.csv
+project/stage124/gate_b_final/modeling_main_rule_b_eligible.csv
+project/stage124/gate_b_final/modeling_expanded_rule_a_eligible.csv
+project/stage124/gate_b_final/modeling_expanded_rule_b_eligible.csv
 
 # Stray local archive (backup, not a deliverable)
 project/Archive.zip

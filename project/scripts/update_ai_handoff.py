@@ -6,7 +6,7 @@ state (git + QC reports + frozen-asset manifests):
 
     - handoff_state.json   (machine-readable snapshot + semantic fingerprint)
     - CURRENT_STATE.md     (human-readable render of the snapshot)
-    - FROZEN_ASSETS.md     (report over Stage122/Stage123 hash manifests)
+    - FROZEN_ASSETS.md     (report over Stage122/Stage123/Stage124 hash manifests)
 
 Design rules (see docs/ai/README.md):
     * A tracked file cannot store the SHA of the commit that contains it, so we
@@ -77,6 +77,7 @@ ALLOWLIST_FILES = (
 FROZEN_MANIFESTS = (
     "project/stage122/metadata_and_hashes_stage122.json",
     "project/stage123/metadata_and_hashes_stage123.json",
+    "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
 )
 
 # Tracked files declared in a frozen manifest that are EXPLICITLY classified as
@@ -598,8 +599,9 @@ def render_frozen_assets(frozen: list[dict]) -> str:
     lines = [
         _AUTO_BANNER,
         "# FROZEN ASSETS\n",
-        "_Generated from the Stage122/Stage123 hash manifests "
-        "(`metadata_and_hashes_stage12{2,3}.json`)._\n",
+        "_Generated from the Stage122/Stage123/Stage124 hash manifests "
+        "(`metadata_and_hashes_stage12{2,3}.json`, "
+        "`metadata_and_hashes_stage124_batch02_gate_b.json`)._\n",
         f"- Frozen (verified) files: **{n_match}/{n_frozen} match**. A missing or "
         "mismatched frozen file is **fatal** (generation/validation fails).",
         "- Files are *regenerable* when gitignored (machine-dependent SHA) or "

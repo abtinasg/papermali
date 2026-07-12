@@ -1,0 +1,313 @@
+{
+  "all_pass": true,
+  "assertion_count": 23,
+  "assertions": [
+    {
+      "assertion": "all_rows_count",
+      "detail": "1331",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pairs_count",
+      "detail": "1200",
+      "status": "PASS"
+    },
+    {
+      "assertion": "row_key_unique",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pair_key_unique",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unique_tickers",
+      "detail": "130",
+      "status": "PASS"
+    },
+    {
+      "assertion": "listing_master_tickers",
+      "detail": "130",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_unmatched_tickers",
+      "detail": "[]",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_duplicate_listing_tickers",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_missing_trading_dates",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "main_rule_a_counts",
+      "detail": "1013/81/932/0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "main_rule_b_counts",
+      "detail": "994/80/914/0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_modeling_started",
+      "detail": "checked paths and artifact patterns",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_rule_c_canonical",
+      "detail": "rule_c cols in company_year=[], pairs=[]",
+      "status": "PASS"
+    },
+    {
+      "assertion": "date_semantics_declared",
+      "detail": "constant + 130 listing master rows verified",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_missing_zeroed",
+      "detail": "all unresolved company-years verified",
+      "status": "PASS"
+    },
+    {
+      "assertion": "input_hashes_verified",
+      "detail": "0 mismatches",
+      "status": "PASS"
+    },
+    {
+      "assertion": "listing_master_hash_verified",
+      "detail": "hash matches EXPECTED_LISTING_MASTER_SHA256",
+      "status": "PASS"
+    },
+    {
+      "assertion": "approval_record_verified",
+      "detail": "all approval anchors match",
+      "status": "PASS"
+    },
+    {
+      "assertion": "nesting_invariants",
+      "detail": "all 4 nesting invariants hold",
+      "status": "PASS"
+    },
+    {
+      "assertion": "distribution_sums",
+      "detail": "eligible pairs == sum of distribution",
+      "status": "PASS"
+    },
+    {
+      "assertion": "source_columns_preserved",
+      "detail": "all 76 Stage123 columns verified cell-by-cell",
+      "status": "PASS"
+    },
+    {
+      "assertion": "target_columns_preserved",
+      "detail": "all 5 target columns verified cell-by-cell",
+      "status": "PASS"
+    },
+    {
+      "assertion": "output_hashes_verified",
+      "detail": "all 13 output hashes verified from disk",
+      "status": "PASS"
+    }
+  ],
+  "current_batch": "Batch02",
+  "current_stage": "Stage124",
+  "expanded_counts": {
+    "expanded_rule_a_company_scope_robustness": {
+      "affected_tickers_count": 23,
+      "change_vs_stage123_main": -28,
+      "company_scope": "expanded",
+      "listing_rule": "rule_a",
+      "negative": 976,
+      "pairs": 1057,
+      "positive": 81,
+      "target_missing": 0
+    },
+    "expanded_rule_b_combined_robustness": {
+      "affected_tickers_count": 27,
+      "change_vs_stage123_main": -49,
+      "company_scope": "expanded",
+      "listing_rule": "rule_b",
+      "negative": 956,
+      "pairs": 1036,
+      "positive": 80,
+      "target_missing": 0
+    }
+  },
+  "failed_count": 0,
+  "gate_b_started": true,
+  "generated_at": "2026-07-12T13:19:29Z",
+  "main_primary_counts": {
+    "affected_tickers_count": 23,
+    "change_vs_stage123_main": -72,
+    "company_scope": "main",
+    "listing_rule": "rule_a",
+    "negative": 932,
+    "pairs": 1013,
+    "positive": 81,
+    "target_missing": 0
+  },
+  "main_robustness_counts": {
+    "affected_tickers_count": 27,
+    "change_vs_stage123_main": -91,
+    "company_scope": "main",
+    "listing_rule": "rule_b",
+    "negative": 914,
+    "pairs": 994,
+    "positive": 80,
+    "target_missing": 0
+  },
+  "modeling_started": false,
+  "primary_rule": "rule_a: first_observed_trading_date <= fiscal_year_end",
+  "rejected_rule": "rule_c: first_observed_trading_year < fiscal_year",
+  "robustness_rule": "rule_b: first_observed_trading_date <= fiscal_year_start",
+  "source_commit": "077cdf6d394cf24e34751e49108a2a04d460068c",
+  "source_file_sha256": "0465369c71896ba484a30d1de6ccbcc546d43c88c87728c58a7b29772cb8bf43",
+  "stage": "stage124_gate_b_execution",
+  "test_file_sha256": "f185d1b3742359a856baf1b28b8ab32fe9a8db28a7e258bf92213755ea40ad05",
+  "ticker_count": 130,
+  "tickers": [
+    "اردستان",
+    "اروند",
+    "اپال",
+    "بالبر",
+    "بترانس",
+    "برکت",
+    "بموتو",
+    "بوعلی",
+    "بکاب",
+    "بکام",
+    "تاپیکو",
+    "تپمپی",
+    "تکمبا",
+    "ثشرق",
+    "ثنوسا",
+    "جم",
+    "جم پیلن",
+    "حپترو",
+    "حکشتی",
+    "خاذین",
+    "خبهمن",
+    "ختوقا",
+    "خرینگ",
+    "خمحور",
+    "خمهر",
+    "خنصیر",
+    "خوساز",
+    "خچرخش",
+    "خکمک",
+    "ددام",
+    "درازک",
+    "دروز",
+    "دسبحا",
+    "دسینا",
+    "دشیمی",
+    "دیران",
+    "ذوب",
+    "رانفور",
+    "رمپنا",
+    "زمگسا",
+    "زپارس",
+    "سآبیک",
+    "ساراب",
+    "ساربیل",
+    "ساروم",
+    "سبجنو",
+    "سبهان",
+    "ستران",
+    "سخاش",
+    "سخزر",
+    "سخوز",
+    "سدشت",
+    "سدور",
+    "سرود",
+    "سشرق",
+    "سصفها",
+    "سغرب",
+    "سفارس",
+    "سقاین",
+    "سمازن",
+    "سنیر",
+    "سهگمت",
+    "سپاها",
+    "سپید",
+    "سکرد",
+    "سیلام",
+    "شاراک",
+    "شبریز",
+    "شبندر",
+    "شدوص",
+    "شغدیر",
+    "شفارس",
+    "شلعاب",
+    "شپارس",
+    "شپنا",
+    "شکربن",
+    "شکلر",
+    "شیران",
+    "غبهنوش",
+    "غدام",
+    "غسالم",
+    "غشان",
+    "غشهد",
+    "غنوش",
+    "غگل",
+    "فاذر",
+    "فارس",
+    "فایرا",
+    "فباهنر",
+    "فجام",
+    "فجر",
+    "فخوز",
+    "فرآور",
+    "فسرب",
+    "فسپا",
+    "فمراد",
+    "فملی",
+    "فنورد",
+    "فولاژ",
+    "فپنتا",
+    "لابسا",
+    "لبوتان",
+    "لخزر",
+    "لسرما",
+    "نوری",
+    "های وب",
+    "همراه",
+    "ومعادن",
+    "وملی",
+    "وکغدیر",
+    "پارس",
+    "پارسان",
+    "پدرخش",
+    "پرداخت",
+    "پسهند",
+    "پلاسک",
+    "پی‌پاد",
+    "چافست",
+    "چکارن",
+    "کاوه",
+    "کبافق",
+    "کرازی",
+    "کروی",
+    "کفرا",
+    "کفپارس",
+    "کهمدا",
+    "کویر",
+    "کگاز",
+    "کگل",
+    "کیمیاتک"
+  ],
+  "unresolved_counts": {
+    "rule_a_primary_unresolved_rows": 4,
+    "rule_b_robustness_unresolved_rows": 10
+  }
+}

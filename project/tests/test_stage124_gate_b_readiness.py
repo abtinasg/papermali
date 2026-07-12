@@ -190,9 +190,20 @@ def test_no_modeling_started():
     assert not (ROOT / "outputs" / "stage_modeling" / "run_manifest.json").is_file()
 
 
-def test_no_gate_b_finalized():
-    assert not (ROOT / "stage124" / "stage124_batch02_gate_b_qc_report.json").is_file()
-    assert not (ROOT / "stage124" / "metadata_and_hashes_stage124_batch02_gate_b.json").is_file()
+def test_readiness_run_does_not_finalize_gate_b():
+    """The readiness dry-run itself must not write the Gate B finalization files.
+
+    (Gate B was subsequently finalized by the separate `stage124-gate-b-execution`
+    stage; those files legitimately exist now, but the readiness ``run`` must not
+    be what produces or modifies them.)
+    """
+    qc = ROOT / "stage124" / "stage124_batch02_gate_b_qc_report.json"
+    meta = ROOT / "stage124" / "metadata_and_hashes_stage124_batch02_gate_b.json"
+    before = {p: (p.stat().st_mtime_ns if p.is_file() else None) for p in (qc, meta)}
+    gate_b.run(ROOT)
+    for p, mtime in before.items():
+        after = p.stat().st_mtime_ns if p.is_file() else None
+        assert after == mtime, f"readiness run touched finalization file: {p}"
 
 
 def test_no_new_canonical_dataset():

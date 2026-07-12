@@ -49,6 +49,26 @@ These are stable project decisions. Change them only deliberately (and note it i
   **retired**. The manual research path for the 10 Part 3 tickers
   (`stage124-batch02-part03-1b-1`) is **superseded** by the official TSE API.
 
+## Gate B eligibility rules (Stage124 Batch02) — approved
+
+- **Rule A is the approved PRIMARY Gate B listing rule** for the main
+  financial-statement sample: `first_observed_trading_date <= fiscal_year_end`.
+- **Rule B is the approved listing-timing ROBUSTNESS rule**:
+  `first_observed_trading_date <= fiscal_year_start`. Rule B must **not** replace
+  Rule A in the primary sample and must **not** be treated as a future
+  market-data / minimum trading-history / market-lookback rule.
+- **Rule C is REJECTED** as the final rule (`first_observed_trading_year <
+  fiscal_year`): a coarse year-level approximation with no methodological
+  advantage over the exact-date Rule B. Rule C may remain documented only as a
+  rejected readiness candidate and must never be a final canonical eligibility
+  flag.
+- Approval basis: **explicit user/data-owner confirmation** supported by the
+  completed Gate B readiness comparison (no external reviewer approval claimed).
+  Recorded in `project/stage124/gate_b_final/gate_b_rule_approval_stage124.json`.
+- Gate B **execution is authorized**. **Modeling remains prohibited** until a
+  separate post-Gate-B modeling-readiness action (`stage125-modeling-readiness`)
+  is approved.
+
 ## Ranking & evidence (Stage124 Batch02)
 
 - Tiered **lexicographic** ranking (A–E), not a weighted score.

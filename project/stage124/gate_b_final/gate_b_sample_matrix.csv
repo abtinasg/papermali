@@ -1,0 +1,5 @@
+﻿sample_design,company_scope,listing_rule,eligible_pairs,positive_pairs,negative_pairs,target_missing_pairs,change_vs_stage123_main,affected_tickers_count
+main_rule_a_primary,main,rule_a,1013,81,932,0,-72,23
+main_rule_b_listing_robustness,main,rule_b,994,80,914,0,-91,27
+expanded_rule_a_company_scope_robustness,expanded,rule_a,1057,81,976,0,-28,23
+expanded_rule_b_combined_robustness,expanded,rule_b,1036,80,956,0,-49,27
