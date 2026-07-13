@@ -1,0 +1,55 @@
+{
+  "contract_version": "stage125_part1_v1",
+  "identifiers": {
+    "future_identifier_crosswalk": {
+      "definition": "Future identifiers (e.g. TSETMC insCode, company national id) are defined ONLY in a separate crosswalk, never guessed and never merged here.",
+      "no_identifier_guessed": true,
+      "required_fields": [
+        "source_identifier",
+        "canonical_ticker",
+        "validity_start",
+        "validity_end",
+        "provenance_id",
+        "mapping_evidence"
+      ],
+      "requires_validity_dates_and_provenance": true
+    },
+    "predictor_row_key_t": {
+      "definition": "Stage123 predictor (year t) row_key in the one-year-ahead pairs; NOT redefined.",
+      "redefined_in_stage125": false
+    },
+    "row_key": {
+      "definition": "Immutable Stage123 company-year primary key.",
+      "immutable": true,
+      "redefined_in_stage125": false,
+      "unique_row_count": 1331
+    },
+    "target_row_key_t_plus_1": {
+      "definition": "Stage123 target (year t+1) row_key in the pairs; NOT redefined.",
+      "redefined_in_stage125": false
+    },
+    "ticker": {
+      "changed_in_stage125": false,
+      "definition": "Canonical TSE sample ticker."
+    }
+  },
+  "scope": "Part 1 — data dictionary & provenance contract (no modeling)",
+  "stage": "Stage125",
+  "time_concepts": {
+    "available_at": "When the information first became usable/accessible.",
+    "fiscal_year_end": "Fiscal year-end date of the statement.",
+    "observation_date": "When the underlying fact was observed.",
+    "period_end": "End of the reporting period.",
+    "period_start": "Start of the reporting period.",
+    "published_at": "When the source document was published.",
+    "retrieved_at_utc": "When the record was retrieved (UTC)."
+  },
+  "time_rules": {
+    "jalali_and_gregorian_in_separate_columns": true,
+    "published_at_and_available_at_not_assumed_equal": true,
+    "raw_source_date_preserved": true,
+    "revision_is_new_version_not_overwrite": true,
+    "source_timezone_recorded": true,
+    "unknown_time_is_null_never_inferred": true
+  }
+}

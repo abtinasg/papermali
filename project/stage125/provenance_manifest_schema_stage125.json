@@ -1,0 +1,190 @@
+{
+  "allowed_blocks": [
+    "M1",
+    "M2",
+    "M3",
+    "M4"
+  ],
+  "disallowed_blocks": [
+    "M5"
+  ],
+  "fields": [
+    {
+      "description": "Unique id of this provenance record.",
+      "name": "provenance_id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "description": "FK to source_registry_stage125.csv.",
+      "name": "source_id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "description": "Model block; M5 is not permitted.",
+      "name": "block",
+      "required": true,
+      "type": "enum[M1,M2,M3,M4]"
+    },
+    {
+      "description": "Source document identifier.",
+      "name": "source_document_id",
+      "required": false,
+      "type": "string"
+    },
+    {
+      "description": "Canonical TSE ticker.",
+      "name": "canonical_ticker",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "description": "Stage123 company-year row_key.",
+      "name": "row_key",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "description": "Variable this record documents.",
+      "name": "feature_name",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "description": "Observation date (raw preserved separately).",
+      "name": "observation_date",
+      "required": false,
+      "type": "date_or_null"
+    },
+    {
+      "description": "Reporting period start.",
+      "name": "period_start",
+      "required": false,
+      "type": "date_or_null"
+    },
+    {
+      "description": "Reporting period end.",
+      "name": "period_end",
+      "required": false,
+      "type": "date_or_null"
+    },
+    {
+      "description": "Fiscal year-end date.",
+      "name": "fiscal_year_end",
+      "required": false,
+      "type": "date_or_null"
+    },
+    {
+      "description": "Raw publication timestamp as in source.",
+      "name": "published_at_raw",
+      "required": false,
+      "type": "string_or_null"
+    },
+    {
+      "description": "Normalized publication time; null if unknown.",
+      "name": "published_at",
+      "required": false,
+      "type": "datetime_or_null"
+    },
+    {
+      "description": "Time first usable; not assumed equal to published_at.",
+      "name": "available_at",
+      "required": false,
+      "type": "datetime_or_null"
+    },
+    {
+      "description": "Retrieval time in UTC.",
+      "name": "retrieved_at_utc",
+      "required": false,
+      "type": "datetime_or_null"
+    },
+    {
+      "description": "Public source URL.",
+      "name": "source_url",
+      "required": false,
+      "type": "url_or_null"
+    },
+    {
+      "description": "Local source file path.",
+      "name": "source_file",
+      "required": false,
+      "type": "string_or_null"
+    },
+    {
+      "description": "Content-addressed raw snapshot path.",
+      "name": "snapshot_path",
+      "required": false,
+      "type": "string_or_null"
+    },
+    {
+      "description": "SHA-256 of the raw bytes.",
+      "name": "content_sha256",
+      "required": false,
+      "type": "sha256_or_null"
+    },
+    {
+      "description": "Source/document version label.",
+      "name": "source_version",
+      "required": false,
+      "type": "string_or_null"
+    },
+    {
+      "description": "How the value was extracted.",
+      "name": "extraction_method",
+      "required": false,
+      "type": "string_or_null"
+    },
+    {
+      "description": "Git commit of the extraction code.",
+      "name": "extraction_code_commit",
+      "required": false,
+      "type": "string_or_null"
+    },
+    {
+      "description": "Unit as stated by the source.",
+      "name": "unit_raw",
+      "required": false,
+      "type": "string_or_null"
+    },
+    {
+      "description": "Normalized unit.",
+      "name": "unit_normalized",
+      "required": false,
+      "type": "string_or_null"
+    },
+    {
+      "description": "Revision status.",
+      "name": "revision_status",
+      "required": false,
+      "type": "enum[original,revision,restatement]"
+    },
+    {
+      "description": "Human/QC review status.",
+      "name": "review_status",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "description": "Why a value is missing, if applicable.",
+      "name": "missing_reason",
+      "required": false,
+      "type": "string_or_null"
+    },
+    {
+      "description": "Free-text notes.",
+      "name": "notes",
+      "required": false,
+      "type": "string_or_null"
+    }
+  ],
+  "principles": {
+    "no_value_guessed": true,
+    "raw_immutable_content_addressed": true,
+    "revision_is_new_version_not_overwrite": true,
+    "unknown_time_is_null_never_inferred": true
+  },
+  "record_kind": "provenance_manifest_record",
+  "schema_version": "stage125_part1_v1",
+  "stage": "Stage125"
+}

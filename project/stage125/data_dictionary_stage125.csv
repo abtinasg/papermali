@@ -1,0 +1,39 @@
+variable_name,block,role,data_type,unit,temporal_reference,source_id,provenance_status,description
+row_key,M1,identifier,string,,point_in_time_company_year,src_m1_stage123,in_use_frozen,Immutable Stage123 company-year primary key; unique across 1331 rows.
+ticker,M1,identifier,string,,point_in_time_company_year,src_m1_stage123,in_use_frozen,Canonical TSE sample ticker; not redefined in Stage125.
+fiscal_year,M1,identifier,integer,jalali_year,period,src_m1_stage123,in_use_frozen,Jalali fiscal year of the observation.
+company_name,M1,identifier,string,,point_in_time_company_year,src_m1_codal_fs,in_use_partial_gap,"Company name; 7 rows missing (provenance gap, not imputed)."
+industry,M1,identifier,string,,point_in_time_company_year,src_m1_codal_fs,in_use_partial_gap,"Industry label; 29 rows missing (provenance gap, not imputed)."
+fiscal_year_end,M1,time,date,jalali_or_iso_date,period_end,src_m1_codal_fs,in_use_partial_gap,"Fiscal year-end date; 4 rows missing (provenance gap, not imputed)."
+source_file,M1,provenance,string,,retrieval,src_m1_uploaded_xls,in_use_partial_gap,Local source statement file; 28 rows missing (provenance gap).
+source_url,M1,provenance,string,,publication,src_m1_codal_fs,in_use_major_gap,"Public source URL; 1316 rows missing — recorded as provenance gap only, never used to change eligibility in Part 1."
+audit_status_clean,M1,provenance,string,,publication,src_m1_codal_audit,in_use_partial_gap,Audit status label; 316 rows are audit_status_unknown.
+total_assets,M1,financial_level,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+total_liabilities,M1,financial_level,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+equity,M1,financial_level,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+registered_capital,M1,financial_level,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+accumulated_loss,M1,financial_level,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+net_income_period_adjusted,M1,financial_level,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+operating_cash_flow_period_adjusted,M1,financial_level,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+leverage_ratio,M1,financial_ratio,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+current_ratio,M1,financial_ratio,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+roa_period_adjusted,M1,financial_ratio,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+roe_period_adjusted,M1,financial_ratio,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+equity_ratio,M1,financial_ratio,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+debt_to_equity,M1,financial_ratio,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+profit_margin_period_adjusted,M1,financial_ratio,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+asset_turnover_period_adjusted,M1,financial_ratio,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+accumulated_loss_to_capital_ratio,M1,financial_ratio,numeric,irr_or_ratio,period,src_m1_codal_fs,in_use_frozen,"Frozen Stage123 financial variable; documented, never re-copied here."
+FD_target_main,M1,target,categorical,,target_t_plus_1,src_m1_stage122_target,in_use_frozen,Composite operational-distress target (frozen Stage122).
+FD_target_article141_only,M1,target,categorical,,target_t_plus_1,src_m1_stage122_target,in_use_frozen,Article-141 robustness target (frozen).
+FD_target_persistent_loss_robustness,M1,target,categorical,,target_t_plus_1,src_m1_stage122_target,in_use_frozen,Persistent-loss robustness target (frozen).
+equity_return_window,M2,candidate_feature,numeric,return_ratio,market_window_closing_before_cutoff,src_m2_tsetmc_market,planned,Point-in-time equity return/momentum; window closes before prediction cutoff.
+realized_volatility,M2,candidate_feature,numeric,volatility,market_window_closing_before_cutoff,src_m2_tsetmc_market,planned,Realized volatility over a pre-cutoff window.
+amihud_illiquidity,M2,candidate_feature,numeric,illiquidity,market_window_closing_before_cutoff,src_m2_tsetmc_market,planned,Amihud illiquidity; computable liquidity measure.
+cpi_inflation,M3,candidate_feature,numeric,percent,macro_series_pre_cutoff,src_m3_cbi_macro,planned,CPI / official inflation; only if publication date and coverage reliable.
+fx_change_official,M3,candidate_feature,numeric,percent,macro_series_pre_cutoff,src_m3_cbi_macro,planned,FX change from an official source that passes the data Gate.
+policy_financing_rate,M3,candidate_feature,numeric,percent,macro_series_pre_cutoff,src_m3_cbi_macro,planned,Policy / financing rate; parsimonious macro set only.
+audit_opinion_type,M4,candidate_feature,categorical,,publication,src_m4_codal_audit,planned,"Audit opinion type as a structured, auditable label (Gated individually)."
+going_concern_flag,M4,candidate_feature,boolean,,publication,src_m4_codal_audit,planned,Going-concern / material-uncertainty clause as a structured label.
+audit_lag_days,M4,candidate_feature,integer,days,publication,src_m4_codal_audit,planned,Days between period end and audit report; Gated individually.
+board_size,M4,candidate_feature,integer,count,publication,src_m4_codal_governance,planned,Board size; only if definition/coverage are auditable.
