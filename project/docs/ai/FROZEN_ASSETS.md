@@ -5,7 +5,7 @@
 
 _Generated from the Stage122/Stage123/Stage124 hash manifests (`metadata_and_hashes_stage12{2,3}.json`, `metadata_and_hashes_stage124_batch02_gate_b.json`)._
 
-- Frozen (verified) files: **23/23 match**. A missing or mismatched frozen file is **fatal** (generation/validation fails).
+- Frozen (verified) files: **32/32 match**. A missing or mismatched frozen file is **fatal** (generation/validation fails).
 - Files are *regenerable* when gitignored (machine-dependent SHA) or explicitly classified non-frozen (`NON_FROZEN_TRACKED`, e.g. a pytest log whose timing line is non-deterministic); these are not hash-verified.
 
 | Status | Path | Manifest |
@@ -49,3 +49,12 @@ _Generated from the Stage122/Stage123/Stage124 hash manifests (`metadata_and_has
 | ➖ regenerable (gitignored, not verified) | `project/stage124/gate_b_final/modeling_main_rule_b_eligible.csv` | `project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json` |
 | ➖ regenerable (gitignored, not verified) | `project/stage124/gate_b_final/modeling_one_year_ahead_stage124_gate_b.csv` | `project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json` |
 | ✅ match | `project/stage124/stage124_batch02_gate_b_qc_report.json` | `project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json` |
+| ✅ match | `project/stage125/README_STAGE125_PART1_DATA_CONTRACT.md` | `project/stage125/metadata_and_hashes_stage125_part1.json` |
+| ✅ match | `project/stage125/data_admission_gate_template_stage125.csv` | `project/stage125/metadata_and_hashes_stage125_part1.json` |
+| ✅ match | `project/stage125/data_dictionary_stage125.csv` | `project/stage125/metadata_and_hashes_stage125_part1.json` |
+| ✅ match | `project/stage125/identifier_time_contract_stage125.json` | `project/stage125/metadata_and_hashes_stage125_part1.json` |
+| ✅ match | `project/stage125/m1_provenance_gap_audit_stage125.csv` | `project/stage125/metadata_and_hashes_stage125_part1.json` |
+| ✅ match | `project/stage125/m1_provenance_gap_summary_stage125.json` | `project/stage125/metadata_and_hashes_stage125_part1.json` |
+| ✅ match | `project/stage125/provenance_manifest_schema_stage125.json` | `project/stage125/metadata_and_hashes_stage125_part1.json` |
+| ✅ match | `project/stage125/source_registry_stage125.csv` | `project/stage125/metadata_and_hashes_stage125_part1.json` |
+| ✅ match | `project/stage125/stage125_part1_data_contract_qc_report.json` | `project/stage125/metadata_and_hashes_stage125_part1.json` |

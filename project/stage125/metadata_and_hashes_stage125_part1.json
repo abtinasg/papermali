@@ -1,0 +1,28 @@
+{
+  "code_commit": "cdfe884e13d80ad7f04311038ab7150c315a8038",
+  "current_stage": "Stage125",
+  "description": "Stage125 Part 1 — data dictionary & provenance contract.",
+  "gate_b_started": true,
+  "generated_at": "2026-07-13T23:00:48+03:30",
+  "input_name": "modeling_all_rows_stage123.csv",
+  "input_sha256": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+  "input_source": "canonical_input_csv",
+  "modeling_started": false,
+  "network_extraction_performed": false,
+  "output_files_sha256": {
+    "README_STAGE125_PART1_DATA_CONTRACT.md": "34fc241c4e9cc99983a5e05b8468f12bd1cde1c18b0318b158ac10285a481c2b",
+    "data_admission_gate_template_stage125.csv": "dbd91e0769e44b828829fe118b7b0adca2945407d38486725061bc9d835f1847",
+    "data_dictionary_stage125.csv": "ed3d0593fe8456842841be0286285ecfe076f5349b54f0bd6bdf664cc77a759d",
+    "identifier_time_contract_stage125.json": "409193ed791d36d5073ff9bc69f9a6b4f5b87d1ae98c135e659133d348198831",
+    "m1_provenance_gap_audit_stage125.csv": "928ce8dc139f9531a675170a6121e18435f8255d072cfc21bc4fdef8024a86c3",
+    "m1_provenance_gap_summary_stage125.json": "21f6fa6757876c5a69d3956714593c0eb7a9e56137c3e5694ae78564b7cc6bd6",
+    "provenance_manifest_schema_stage125.json": "a2f6b1eee7d4d67ab645bbf9f6b95f21321ec638435a2500fe7d4431b94571b3",
+    "source_registry_stage125.csv": "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c",
+    "stage125_part1_data_contract_qc_report.json": "82764ce7443aa5835a8aaf9b50a0ad9c0ede5984354c06b599b74fd9c8248b8e"
+  },
+  "part2_started": false,
+  "source_file_sha256": "6ec0c77f391bb8ec8c7195167370b57458d0fdf057bd498a2486bcf8fc4f58e6",
+  "stage": "stage125_part1_data_contract",
+  "test_file_sha256": "f5a5944bd9063b0e4bbe2c7d453204e2934924c0406b3295955cf57f5e0e7d60",
+  "warning": "Part 1 only: data dictionary & provenance contract. No modeling, no extraction, no Part 2. Stage122-124 assets unchanged."
+}

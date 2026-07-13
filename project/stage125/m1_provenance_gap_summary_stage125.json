@@ -1,0 +1,41 @@
+{
+  "block": "M1",
+  "counts": {
+    "audit_status_unknown": 316,
+    "company_name_missing": 7,
+    "company_name_present": 1324,
+    "fiscal_year_end_missing": 4,
+    "fiscal_year_end_present": 1327,
+    "industry_missing": 29,
+    "industry_present": 1302,
+    "rows": 1331,
+    "source_file_missing": 28,
+    "source_file_present": 1303,
+    "source_url_missing": 1316,
+    "source_url_present": 15,
+    "unique_row_key": 1331
+  },
+  "current_stage": "Stage125",
+  "expected_invariants": {
+    "audit_status_unknown": 316,
+    "company_name_missing": 7,
+    "company_name_present": 1324,
+    "fiscal_year_end_missing": 4,
+    "fiscal_year_end_present": 1327,
+    "industry_missing": 29,
+    "industry_present": 1302,
+    "rows": 1331,
+    "source_file_missing": 28,
+    "source_file_present": 1303,
+    "source_url_missing": 1316,
+    "source_url_present": 15,
+    "unique_row_key": 1331
+  },
+  "input_name": "modeling_all_rows_stage123.csv",
+  "input_sha256": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+  "input_source": "canonical_input_csv",
+  "invariants_match": true,
+  "notes": "Empty source_url for 1316 rows is recorded as a provenance gap only. It does NOT change eligibility or drop any row in Part 1. No gap is filled and no value is guessed.",
+  "scope": "read_only_provenance_gap_audit",
+  "stage": "stage125_part1_data_contract"
+}
