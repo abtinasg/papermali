@@ -33,7 +33,10 @@ These are stable project decisions. Change them only deliberately (and note it i
 - Stage124 Gate B is **completed and frozen**: four sample designs produced,
   canonical + filtered outputs verified, 58 focused tests (736 passed, 1 skipped,
   local results — no GitHub Actions configured).
-- **Modeling remains prohibited** until `stage125-modeling-readiness` is approved.
+- **Modeling remains prohibited.** Stage125 is a **Research Design & Data
+  Readiness** stage that performs **no** modeling; modeling begins only when
+  Stage126 (M1 Financial Baseline) is explicitly approved. See
+  [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md).
 
 ## Verified listing master (Stage124)
 
@@ -65,9 +68,36 @@ These are stable project decisions. Change them only deliberately (and note it i
 - Approval basis: **explicit user/data-owner confirmation** supported by the
   completed Gate B readiness comparison (no external reviewer approval claimed).
   Recorded in `project/stage124/gate_b_final/gate_b_rule_approval_stage124.json`.
-- Gate B **execution is completed and frozen**. **Modeling remains prohibited** until a
-  separate post-Gate-B modeling-readiness action (`stage125-modeling-readiness`)
-  is approved.
+- Gate B **execution is completed and frozen**. **Modeling remains prohibited**
+  through all of Stage125 (Research Design & Data Readiness); it begins only when
+  Stage126 (M1 Financial Baseline) is explicitly approved.
+
+## Stage125 research design (locked 2026-07-13)
+
+The research contract for the paper is frozen in
+[`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Firm points:
+
+- **Incremental nested blocks:** M1 Financial → M2 Market → M3 Parsimonious Macro →
+  M4 Structured Audit/Governance, compared on the same common sample, same temporal
+  split, and paired predictions.
+- **M5 (Persian text / text modeling) is removed** from the paper and roadmap
+  (no TF-IDF, embeddings, or heavy language models).
+- **All data and analyses depending on accessibility < 3 are removed.**
+- **accessibility = 3 is NOT an automatic pass** — it only admits a variable to the
+  coverage/quality pilot. A variable enters the main analysis only if it also passes
+  provenance, `published_at`/`available_at`, coverage, and event-count Gates.
+- **Allowed core models:** regularized Logistic Regression, Random Forest, XGBoost.
+  Class weighting is the primary imbalance method; SMOTE is train-fold robustness only.
+- **Primary metric (locked before running): PR-AUC**; operational `Recall@K` /
+  `Lift@K`; calibration via Brier/curve; ROC-AUC complementary only; temporal splits;
+  single locked final test.
+- Full out-of-scope list (order-book/bid–ask, non-reproducible free-market FX,
+  director biography/network/interlocking, social/news/ESG unstructured sources,
+  large searched macro sets, multiple post-hoc regime definitions, real cost-matrix/
+  DCA, algorithm inflation) is recorded in `STAGE125_RESEARCH_DESIGN.md` §5.
+- Any change to target, universe, eligibility, cutoff, primary metric, or the locked
+  test requires an explicit research decision and a new version of that contract.
+- **Stage122–Stage124 files are not rewritten or redefined during Stage125.**
 
 ## Ranking & evidence (Stage124 Batch02)
 

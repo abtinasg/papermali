@@ -49,6 +49,7 @@ See [`DECISIONS.md`](DECISIONS.md).
   `tests/test_stage124_gate_b_execution.py`,
   `stage124/stage124_batch02_gate_b_qc_report.json`
 - Frozen-asset report: [`FROZEN_ASSETS.md`](FROZEN_ASSETS.md)
+- Stage125 research contract: [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md)
 
 ## 7. Done
 
@@ -73,8 +74,12 @@ See [`OPEN_TASKS.md`](OPEN_TASKS.md).
 ## 10. Next step
 
 See `next_research_action_id` in [`ROADMAP.md`](ROADMAP.md) and
-[`handoff_state.json`](handoff_state.json). Currently: **stage125-modeling-readiness**
-(post-Gate-B modeling readiness; modeling remains prohibited until approved).
+[`handoff_state.json`](handoff_state.json). Currently:
+**stage125-research-design-readiness** — Stage125 is a Research Design & Data
+Readiness stage that performs **no** modeling. The frozen research contract
+(M1–M4 blocks, M5 removed, accessibility Gates) is in
+[`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
+prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.
 
 ## 11. Recent change history
 

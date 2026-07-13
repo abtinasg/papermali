@@ -3,6 +3,32 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-13
+
+- **Stage125 Part 0 — Research Design Decision Lock.** Confirmed the live baseline
+  (PR #20 MERGED, `main` merge commit `873e538c90645d0fa7c52ddf2bbe79081f310c84`,
+  Stage124 Gate B frozen, Stage125/new modeling not started) and froze the research
+  contract in the new human doc
+  [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md):
+  - Incremental nested blocks **M1 Financial → M2 Market → M3 Parsimonious Macro →
+    M4 Structured Audit/Governance**, compared on the same common sample / temporal
+    split with paired predictions.
+  - **M5 (Persian text / text modeling) removed** from the paper and roadmap.
+  - **All data/analyses depending on accessibility < 3 removed.**
+  - **accessibility = 3 is a pilot gate only** — a variable enters the main analysis
+    only if it also passes provenance, `published_at`/`available_at`, coverage, and
+    event-count Gates.
+  - Full out-of-scope list recorded (order-book/bid–ask, non-reproducible free-market
+    FX, director biography/network/interlocking, social/news/ESG unstructured sources,
+    large searched macro sets, multiple post-hoc regime definitions, real cost-matrix/
+    DCA, algorithm inflation).
+- **ROADMAP updated:** `next_research_action_id` →
+  `stage125-research-design-readiness` (Stage125 = Research Design & Data Readiness,
+  **no modeling**); `active_maintenance_task_id` → `stage125-part0-research-design-lock`.
+- Documentation-only; **no** data extraction, model runs, or target/sample changes.
+  **Modeling remains prohibited** until Stage126 (M1 Financial Baseline) is approved.
+  Stage122–Stage124 files are untouched.
+
 ## 2026-07-12
 
 - **PR #19 merged** — Stage124 post-merge Gate B audit and handoff refresh.

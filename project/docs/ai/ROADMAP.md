@@ -3,8 +3,8 @@ roadmap_version: 1
 active_research_workstream_id: stage124-gate-b-execution
 qc_scope: stage124-gate-b-execution
 last_completed_research_action_id: stage124-gate-b-execution
-next_research_action_id: stage125-modeling-readiness
-active_maintenance_task_id: repository-driven-ai-handoff
+next_research_action_id: stage125-research-design-readiness
+active_maintenance_task_id: stage125-part0-research-design-lock
 ---
 
 # ROADMAP
@@ -32,11 +32,12 @@ must also appear in the body below. The validator checks that:
 8. `stage124-gate-b-readiness` — Gate B readiness dry-run: three eligibility rules (A/B/C) compared, per-rule impact report generated, 45 focused tests added ✅
 9. `stage124-gate-b-rule-approval` — User/data owner approved Rule A (primary) and Rule B (listing-timing robustness); Rule C rejected ✅
 10. `stage124-gate-b-execution` — Executed the approved Gate B rules; four sample designs, canonical + filtered outputs, 58 focused tests (736 passed, 1 skipped, local results — no GitHub Actions) ✅
-11. `stage125-modeling-readiness` — Post-Gate-B modeling readiness; modeling remains prohibited until approved ⬅️ **next**
+11. `stage125-research-design-readiness` — Stage125 Research Design & Data Readiness (Part 0 = research-design decision lock); **no modeling** in this stage — modeling remains prohibited until Stage126 is approved ⬅️ **next**
 
 ## Maintenance tasks
 
 - `repository-driven-ai-handoff` — repository-derived Handoff Package (generator + validator + tests)
+- `stage125-part0-research-design-lock` — record the frozen Stage125 research contract in human docs (see [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md)); documentation-only, advances no research action
 
 ## Notes on ordering
 
@@ -61,5 +62,11 @@ Rule C (`first_observed_trading_year < fiscal_year`) was rejected.
 data and verified listing master, producing four sample designs (main Rule A =
 1013 pairs / 81 pos / 932 neg; main Rule B = 994 / 80 / 914) with canonical and
 filtered outputs and 58 focused tests (736 passed, 1 skipped, local results). **No modeling was started.**
-`stage125-modeling-readiness` is the next action — modeling remains prohibited
-until post-Gate-B modeling readiness is approved.
+`stage125-research-design-readiness` is the next research action. Stage125 is a
+**Research Design & Data Readiness** stage that performs **no** modeling. Part 0
+(this decision lock) records the agreed design (M1 Financial, M2 Market, M3
+Parsimonious Macro, M4 Structured Audit/Governance; M5 Persian-text modeling
+removed) and the firm data-admission rule (accessibility ≥ 3 is a pilot gate, not
+an automatic pass). See [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md).
+Modeling remains prohibited until Stage126 (M1 Financial Baseline) is explicitly
+approved.
