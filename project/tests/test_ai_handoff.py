@@ -158,6 +158,47 @@ def test_allowlist_prefix_attack(path, ok):
 
 
 # --------------------------------------------------------------------------- #
+# Handoff-only classification (independent of change allowlist) — pure unit
+# --------------------------------------------------------------------------- #
+
+@pytest.mark.parametrize("path,ok", [
+    # Handoff-maintenance paths ARE handoff-only.
+    ("AGENTS.md", True),
+    ("CLAUDE.md", True),
+    ("project/docs/ai/CURRENT_STATE.md", True),
+    ("project/docs/ai/sub/x.md", True),
+    ("project/scripts/update_ai_handoff.py", True),
+    ("project/scripts/validate_ai_handoff.py", True),
+    ("project/tests/test_ai_handoff.py", True),
+    # Stage125 Part 1 code is change-allowlisted but MUST NOT be handoff-only.
+    ("project/stage125/data_dictionary_stage125.csv", False),
+    ("project/src/stage125_part1_data_contract.py", False),
+    ("project/run_stage125_part1.py", False),
+    ("project/tests/test_stage125_part1_data_contract.py", False),
+    # prefix attacks must be rejected
+    ("AGENTS.md.evil", False),
+    ("project/scripts/update_ai_handoff.py.bak", False),
+    ("project/docs/ai-evil/x.md", False),
+    ("project/docs/aimalicious", False),
+    ("project/src/secret.py", False),
+])
+def test_handoff_only_classification(path, ok):
+    assert gen.path_handoff_only(path) is ok
+
+
+def test_handoff_only_disjoint_from_stage125_code():
+    # Change allowlist accepts Stage125 Part 1 code; handoff-only does not.
+    for p in (
+        "project/src/stage125_part1_data_contract.py",
+        "project/run_stage125_part1.py",
+        "project/tests/test_stage125_part1_data_contract.py",
+        "project/stage125/data_dictionary_stage125.csv",
+    ):
+        assert gen.path_allowlisted(p) is True
+        assert gen.path_handoff_only(p) is False
+
+
+# --------------------------------------------------------------------------- #
 # Synthetic repo for semantic-drift tests
 # --------------------------------------------------------------------------- #
 
@@ -348,6 +389,37 @@ def test_tampered_record_field_fails(synth, field, value):
     with open(path, "w", encoding="utf-8") as fh:
         json.dump(state, fh, indent=2, ensure_ascii=False, sort_keys=True)
     assert val.run_check(synth) == 1
+
+
+def test_docs_ai_commit_stays_handoff_only(synth):
+    # A commit touching only project/docs/ai/ is handoff-only -> skipped, so
+    # last_stage_commit does not advance to it and the package stays valid.
+    before = gen.last_stage_commit(synth)
+    _write(synth, "project/docs/ai/OPEN_TASKS.md", "note tweak\n")
+    _commit(synth, "handoff: tweak open tasks")
+    assert gen.last_stage_commit(synth) == before
+    assert val.run_check(synth) == 0
+
+
+def test_stage125_part1_code_commit_advances_stage(synth):
+    # A Stage125-Part1-style code commit is change-allowlisted but NOT
+    # handoff-only, so last_stage_commit MUST recognise it.
+    before = gen.last_stage_commit(synth)
+    _write(synth, "project/src/stage125_part1_data_contract.py", "CONTRACT = 1\n")
+    sha = _commit(synth, "Stage125 Part1: implement data contract")
+    assert gen.path_allowlisted("project/src/stage125_part1_data_contract.py") is True
+    got = gen.last_stage_commit(synth)
+    assert got == sha
+    assert got != before
+
+
+def test_artifact_commit_without_stage_does_not_advance(synth):
+    # A non-handoff-only commit whose body lacks any Stage/Part marker must not
+    # become last_stage_commit.
+    before = gen.last_stage_commit(synth)
+    _write(synth, "project/stage125/data_dictionary_stage125.csv", "col\n")
+    _commit(synth, "artifact: refresh generated data dictionary")
+    assert gen.last_stage_commit(synth) == before
 
 
 def test_change_allowlist_blocks_non_handoff(synth):
