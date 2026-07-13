@@ -132,12 +132,26 @@ def test_change_allowlist_real_repo():
     ("project/docs/ai/CURRENT_STATE.md", True),
     ("project/docs/ai/sub/x.md", True),
     ("project/scripts/update_ai_handoff.py", True),
+    # Stage125 Part 1 (maintenance task) allowlisted paths
+    ("project/stage125/data_dictionary_stage125.csv", True),
+    ("project/stage125/sub/x.json", True),
+    ("project/src/stage125_part1_data_contract.py", True),
+    ("project/run_stage125_part1.py", True),
+    ("project/tests/test_stage125_part1_data_contract.py", True),
     # prefix attacks must be rejected
     ("AGENTS.md.evil", False),
     ("project/scripts/update_ai_handoff.py.bak", False),
     ("project/docs/ai-evil/x.md", False),
     ("project/docs/aimalicious", False),
     ("project/src/secret.py", False),
+    # Stage125 similar-but-unauthorized prefixes must be rejected
+    ("project/stage125", False),
+    ("project/stage1250/evil.csv", False),
+    ("project/stage125_evil/x.csv", False),
+    ("project/src/stage125_part1_data_contract.py.bak", False),
+    ("project/run_stage125_part1.py.evil", False),
+    ("project/src/stage125_part2_data_contract.py", False),
+    ("project/tests/test_stage125_part2_data_contract.py", False),
 ])
 def test_allowlist_prefix_attack(path, ok):
     assert gen.path_allowlisted(path) is ok

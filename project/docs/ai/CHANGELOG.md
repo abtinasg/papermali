@@ -5,6 +5,27 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 
 ## 2026-07-13
 
+- **Stage125 Part 1 — Data Dictionary & Provenance Contract.** PR #21 (Part 0)
+  is **MERGED** (`main` merge commit `d39e770ff49729a2f0b1b0262c0b1aa5ae41b0c4`),
+  so Part 0 is closed. Part 1 is authorized and executed (in review) as a
+  contracts / read-only-audit task tracked by
+  `active_maintenance_task_id = stage125-part1-data-contract` (advances **no**
+  research action; `last_completed_research_action_id` stays
+  `stage124-gate-b-execution`). New code/tests:
+  `project/src/stage125_part1_data_contract.py`,
+  `project/run_stage125_part1.py`,
+  `project/tests/test_stage125_part1_data_contract.py`. Deliverables in
+  `project/stage125/`: M1–M4 data dictionary, identifier/time contract, source
+  registry (M1–M4 only, **no M5**), provenance manifest schema,
+  data-admission-gate template (accessibility ≥ 3 = pilot gate only), and a
+  read-only M1 provenance-gap audit (rows 1331; source_file missing 28;
+  source_url missing 1316; fiscal_year_end missing 4; company_name missing 7;
+  industry missing 29; audit_status_unknown 316). Empty `source_url` is recorded
+  as a provenance gap only — **no** eligibility change, **no** row drop, **no**
+  gap filled, **no** value guessed. `metadata_and_hashes_stage125_part1.json`
+  added to the frozen-manifest workflow. **No modeling, no network extraction,
+  Part 2 not started; `modeling_started` remains `false`; Stage122–Stage124
+  assets unchanged.**
 - **Stage125 Part 0 — Research Design Decision Lock.** Confirmed the live baseline
   (PR #20 MERGED, `main` merge commit `873e538c90645d0fa7c52ddf2bbe79081f310c84`,
   Stage124 Gate B frozen, Stage125/new modeling not started) and froze the research

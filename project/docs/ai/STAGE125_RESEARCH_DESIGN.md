@@ -170,9 +170,13 @@ robustness check.
   after PR #20; create the Stage125 branch; record the research contract in human
   docs; regenerate the Handoff via the generator; run validator + tests; open a PR
   (no merge). **No** extraction, target/sample change, or modeling.
-- **Part 1 — Data dictionary & provenance contract.** Stable company id, fiscal
-  year, dates; mandatory provenance fields; source manifest for M1–M4; audit the
-  current M1 provenance gap; cache / raw-vs-processed policy; no raw-file overwrite.
+- **Part 1 — Data dictionary & provenance contract. (Authorized and executed —
+  in review.)** Stable company id, fiscal year, dates; mandatory provenance
+  fields; source manifest for M1–M4; audit the current M1 provenance gap; cache /
+  raw-vs-processed policy; no raw-file overwrite. Delivered in `project/stage125/`
+  as a contracts / read-only-audit task (`stage125-part1-data-contract`); it
+  advances no research action, performs no modeling and no extraction, and does
+  not start Part 2. `modeling_started` remains `false`.
 - **Part 2 — Prediction-time contract.** Exact prediction time and cutoff; when each
   statement / audit report / board report / market series / macro series became
   usable; lag and revision policy; leakage checklist and anti-leakage machine tests.

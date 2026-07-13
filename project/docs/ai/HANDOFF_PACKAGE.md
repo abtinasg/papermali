@@ -50,6 +50,10 @@ See [`DECISIONS.md`](DECISIONS.md).
   `stage124/stage124_batch02_gate_b_qc_report.json`
 - Frozen-asset report: [`FROZEN_ASSETS.md`](FROZEN_ASSETS.md)
 - Stage125 research contract: [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md)
+- Stage125 Part 1 data-contract source/test/QC: `src/stage125_part1_data_contract.py`,
+  `run_stage125_part1.py`, `tests/test_stage125_part1_data_contract.py`,
+  `stage125/stage125_part1_data_contract_qc_report.json` (contracts + read-only
+  M1 provenance-gap audit; no modeling, no extraction)
 
 ## 7. Done
 

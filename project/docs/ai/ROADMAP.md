@@ -1,10 +1,10 @@
 ---
 roadmap_version: 1
-active_research_workstream_id: stage124-gate-b-execution
-qc_scope: stage124-gate-b-execution
+active_research_workstream_id: stage125-research-design-readiness
+qc_scope: stage125-part1-data-contract
 last_completed_research_action_id: stage124-gate-b-execution
 next_research_action_id: stage125-research-design-readiness
-active_maintenance_task_id: stage125-part0-research-design-lock
+active_maintenance_task_id: stage125-part1-data-contract
 ---
 
 # ROADMAP
@@ -38,6 +38,7 @@ must also appear in the body below. The validator checks that:
 
 - `repository-driven-ai-handoff` — repository-derived Handoff Package (generator + validator + tests)
 - `stage125-part0-research-design-lock` — record the frozen Stage125 research contract in human docs (see [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md)); documentation-only, advances no research action
+- `stage125-part1-data-contract` — Stage125 Part 1 data dictionary & provenance contract (data dictionary M1–M4, identifier/time contract, source registry, provenance manifest schema, data-admission-gate template, immutable raw/cache policy, read-only M1 provenance-gap audit); contracts/audit only, **no modeling, no extraction, no Part 2**; advances no research action
 
 ## Notes on ordering
 

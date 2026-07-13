@@ -99,6 +99,32 @@ The research contract for the paper is frozen in
   test requires an explicit research decision and a new version of that contract.
 - **Stage122–Stage124 files are not rewritten or redefined during Stage125.**
 
+## Stage125 Part 0 / Part 1 status (2026-07-13)
+
+- **Part 0 (Research Design Decision Lock) is CLOSED.** PR #21 is **MERGED**;
+  `main` contains merge commit `d39e770ff49729a2f0b1b0262c0b1aa5ae41b0c4`.
+- **Part 1 (Data Dictionary & Provenance Contract) is authorized and executed
+  (in review).** It is a contracts / read-only-audit task tracked as
+  `active_maintenance_task_id = stage125-part1-data-contract`; it advances **no**
+  research action (`last_completed_research_action_id` remains
+  `stage124-gate-b-execution`).
+- Part 1 defines, in `project/stage125/`: the M1–M4 data dictionary; the
+  identifier contract (`row_key` immutable + unique 1331; `predictor_row_key_t` /
+  `target_row_key_t_plus_1` not redefined; future ids only via a separate,
+  provenance-and-validity crosswalk); the time contract (observation / period /
+  fiscal-year-end / published_at / available_at / retrieved_at_utc as **distinct**
+  concepts; Jalali and Gregorian in separate columns; unknown time stays null,
+  never inferred; revision = new version, never overwrite); the source registry
+  (M1–M4 only, **no M5**; unknown URLs/scores blank + status unresolved/pending);
+  the provenance manifest schema; the data-admission-gate template (accessibility
+  ≥ 3 is a pilot gate only; no admitted candidate with score < 3 or unknown score);
+  and the immutable, content-addressed raw/cache policy.
+- Part 1 audits the M1 provenance gap **read-only** and fills **nothing**. Empty
+  `source_url` (1316 rows) is recorded as a provenance gap only and never changes
+  eligibility or drops a row.
+- **Part 2 has NOT started. `modeling_started` remains `false`. No network
+  extraction was performed.** Modeling begins only when Stage126 is approved.
+
 ## Ranking & evidence (Stage124 Batch02)
 
 - Tiered **lexicographic** ranking (A–E), not a weighted score.

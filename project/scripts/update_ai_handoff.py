@@ -65,11 +65,18 @@ HUMAN_FILES = (
 #   * file entries match by EXACT path only.
 ALLOWLIST_DIRS = (
     "project/docs/ai/",
+    # Stage125 Part 1 is tracked as a maintenance task (it does not advance the
+    # research stage); its deliverables live under this directory.
+    "project/stage125/",
 )
 ALLOWLIST_FILES = (
     "project/scripts/update_ai_handoff.py",
     "project/scripts/validate_ai_handoff.py",
     "project/tests/test_ai_handoff.py",
+    # Stage125 Part 1 code, runner, and tests (maintenance task).
+    "project/src/stage125_part1_data_contract.py",
+    "project/run_stage125_part1.py",
+    "project/tests/test_stage125_part1_data_contract.py",
     "AGENTS.md",
     "CLAUDE.md",
 )
@@ -78,6 +85,7 @@ FROZEN_MANIFESTS = (
     "project/stage122/metadata_and_hashes_stage122.json",
     "project/stage123/metadata_and_hashes_stage123.json",
     "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
+    "project/stage125/metadata_and_hashes_stage125_part1.json",
 )
 
 # Tracked files declared in a frozen manifest that are EXPLICITLY classified as
