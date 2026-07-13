@@ -218,3 +218,28 @@ Handoff validation passed (--check).
 is explicitly approved.
 
 Do not start modeling.
+
+---
+
+## PR #19 closure — post-merge Gate B audit and handoff refresh
+
+- **PR #19 merged** = **true**
+- **Final PR head:** `09dea8aed22ff51f72346ac438561d24a84327a5`
+- **Actual PR #19 merge commit:** `9758ba5f9745e2274e800d901b3516a70815dc50`
+- **Total PR #19 commits:** 5
+- **Focused result:** 58 passed
+- **Full-suite result:** 736 passed, 1 skipped
+- **QC assertions:** 24
+- **QC failures:** 0
+- **qc_source_commit:** `e74646426b28437b4c0270062ea14c8971a93c66`
+- **Artifact commit:** `dbaeaafbe0c154572dedbb52b8efeb96bd9e20fd`
+- **Handoff commit:** `09dea8aed22ff51f72346ac438561d24a84327a5`
+- **gate_b_started:** `true`
+- **modeling_started:** `false`
+- **Next action:** `stage125-modeling-readiness`
+
+PR #19 hardened the post-merge Gate B state with a new
+`pair_source_columns_preserved` QC assertion (cell-by-cell comparison of all 16
+original Stage123 pair columns), renamed `date_semantics_declared` to
+`date_semantics_provenance_verified`, and refreshed the Handoff. QC assertions
+increased from 23 to 24 (all PASS). Stage124 Gate B is now fully closed.

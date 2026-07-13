@@ -5,6 +5,11 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 
 ## 2026-07-12
 
+- **PR #19 merged** — Stage124 post-merge Gate B audit and handoff refresh.
+  Merge commit `9758ba5f9745e2274e800d901b3516a70815dc50`. Added
+  `pair_source_columns_preserved` QC assertion (24 total, 0 failed), renamed
+  `date_semantics_declared` to `date_semantics_provenance_verified`, refreshed
+  Handoff. Stage124 Gate B is fully closed. Modeling remains prohibited.
 - **`stage124-gate-b-rule-approval` completed** — The user/data owner explicitly
   approved the final Gate B listing-eligibility rules, supported by the completed
   Gate B readiness comparison (no external reviewer approval claimed):
