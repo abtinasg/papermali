@@ -28,18 +28,37 @@ python run_stage122.py               # writes stage122/  (target is frozen here)
 #    APPROVED Stage122 output (main vs expanded company sets). Independent QC.
 python run_stage123.py               # writes stage123/  (exits non-zero if QC fails)
 
-# 3) Stage124 — listing-master verification + Gate B eligibility execution
-python run_stage124.py               # writes stage124/  (exits non-zero if QC fails)
+# 3a) Stage124 Part 1 — build the 130-ticker review template
+python run_stage124.py
 
-# 4) Unit tests (Stage123, Stage124, Gate B readiness + execution)
+# 3b) Finalize the verified master from committed official TSE API batches
+python run_stage124_official_api_finalize.py
+
+# 3c) Reproduce the historical Gate B readiness comparison
+python run_stage124_gate_b_readiness.py
+
+# 3d) Execute the already-approved final Gate B rules
+python run_stage124_gate_b_execution.py
+
+# 4) Full test suite
 python -m pytest tests/ -q
 ```
 
 `run_stage122.py` must run **before** `run_stage123.py`, and `run_stage123.py` before
-`run_stage124.py`: each stage consumes the previous stage's frozen output (the bulky
+the Stage124 runners: each stage consumes the previous stage's frozen output (the bulky
 panels are gitignored, so a fresh clone regenerates them in order). Stage123 aligns
 Stage121 raw and the Stage122 base by `row_key`; Stage124 derives its 130-ticker template
 from the frozen Stage123 panel — both are independent of input row order.
+
+- `run_stage124.py` only builds the template.
+- `run_stage124_official_api_finalize.py` builds the verified master from committed
+  official files.
+- `run_stage124_gate_b_readiness.py` reproduces the historical rule comparison.
+- `run_stage124_gate_b_execution.py` executes the already-approved Rule A and Rule B.
+- None of them perform modeling.
+- The meaning of dates remains
+  `first_observed_trading_date_from_official_tse_api`;
+  no IPO/admission/listing date is introduced.
 
 ## What each stage produces
 
