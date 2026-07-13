@@ -180,6 +180,11 @@ robustness check.
 - **Part 2 — Prediction-time contract.** Exact prediction time and cutoff; when each
   statement / audit report / board report / market series / macro series became
   usable; lag and revision policy; leakage checklist and anti-leakage machine tests.
+  **Executed (in review) 2026-07-14.** Deliverables in `project/stage125/`:
+  prediction-time contract, feature availability contract (M1–M4), leakage checklist
+  (8 machine-testable checks LC01–LC08), per-pair cutoff/feature/leakage audit CSVs
+  (all 1200 pairs preserved), cutoff summary. Missing `fiscal_year_end` never filled
+  or guessed; `eligibility_impact=none_contract_audit_only` for every pair.
 - **Part 3 — Accessibility, coverage & event pilot.** Small representative pilot for
   M2–M4 sources; per-variable accessibility/quality scoring; coverage on
   company-year and common sample; positive/negative counts in proposed temporal

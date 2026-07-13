@@ -138,6 +138,12 @@ def test_change_allowlist_real_repo():
     ("project/src/stage125_part1_data_contract.py", True),
     ("project/run_stage125_part1.py", True),
     ("project/tests/test_stage125_part1_data_contract.py", True),
+    # Stage125 Part 2 allowlisted paths
+    ("project/src/stage125_part2_prediction_time_contract.py", True),
+    ("project/run_stage125_part2.py", True),
+    ("project/tests/test_stage125_part2_prediction_time_contract.py", True),
+    ("project/stage125/prediction_time_contract_stage125_part2.json", True),
+    ("project/stage125/metadata_and_hashes_stage125_part2.json", True),
     # prefix attacks must be rejected
     ("AGENTS.md.evil", False),
     ("project/scripts/update_ai_handoff.py.bak", False),
@@ -152,6 +158,8 @@ def test_change_allowlist_real_repo():
     ("project/run_stage125_part1.py.evil", False),
     ("project/src/stage125_part2_data_contract.py", False),
     ("project/tests/test_stage125_part2_data_contract.py", False),
+    ("project/src/stage125_part2_prediction_time_contract.py.bak", False),
+    ("project/run_stage125_part2.py.evil", False),
 ])
 def test_allowlist_prefix_attack(path, ok):
     assert gen.path_allowlisted(path) is ok
@@ -175,6 +183,11 @@ def test_allowlist_prefix_attack(path, ok):
     ("project/src/stage125_part1_data_contract.py", False),
     ("project/run_stage125_part1.py", False),
     ("project/tests/test_stage125_part1_data_contract.py", False),
+    # Stage125 Part 2 code is change-allowlisted but MUST NOT be handoff-only.
+    ("project/src/stage125_part2_prediction_time_contract.py", False),
+    ("project/run_stage125_part2.py", False),
+    ("project/tests/test_stage125_part2_prediction_time_contract.py", False),
+    ("project/stage125/prediction_time_contract_stage125_part2.json", False),
     # prefix attacks must be rejected
     ("AGENTS.md.evil", False),
     ("project/scripts/update_ai_handoff.py.bak", False),

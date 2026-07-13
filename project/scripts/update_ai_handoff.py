@@ -77,6 +77,10 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part1_data_contract.py",
     "project/run_stage125_part1.py",
     "project/tests/test_stage125_part1_data_contract.py",
+    # Stage125 Part 2 code, runner, and tests.
+    "project/src/stage125_part2_prediction_time_contract.py",
+    "project/run_stage125_part2.py",
+    "project/tests/test_stage125_part2_prediction_time_contract.py",
     "AGENTS.md",
     "CLAUDE.md",
 )
@@ -105,6 +109,7 @@ FROZEN_MANIFESTS = (
     "project/stage123/metadata_and_hashes_stage123.json",
     "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
     "project/stage125/metadata_and_hashes_stage125_part1.json",
+    "project/stage125/metadata_and_hashes_stage125_part2.json",
 )
 
 # Tracked files declared in a frozen manifest that are EXPLICITLY classified as

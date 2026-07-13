@@ -59,14 +59,26 @@ template, immutable raw/cache policy, and a read-only M1 provenance-gap audit
 (rows 1331; source_file missing 28; source_url missing 1316; fiscal_year_end
 missing 4; company_name missing 7; industry missing 29; audit_status_unknown
 316). Empty `source_url` is a provenance gap only — no eligibility change, no row
-drop, no gap filled, no value guessed. **Part 2 not started; `modeling_started`
-remains `false`; no network extraction.**
+drop, no gap filled, no value guessed.
+
+**Part 2 (authorized and executed — in review):** Prediction-time & Leakage
+Contract. Contract / read-only-audit only; tracked as maintenance task
+`stage125-part2-prediction-time-contract` (advances no research action).
+Deliverables in `project/stage125/`: prediction-time contract (cutoff based on
+verified `available_at`; revision policy; deterministic tie-breaking); feature
+availability contract (M1–M4 temporal gating; no target-year features); leakage
+checklist (8 machine-testable fail-closed checks LC01–LC08); per-pair
+cutoff/feature/leakage audit CSVs preserving all 1200 pairs; cutoff summary.
+Missing `fiscal_year_end` (4 predictor, 4 target; 5 pairs either missing, 3 both
+missing) is never filled or guessed — those pairs have
+`temporal_status=unresolvable`. `eligibility_impact=none_contract_audit_only` for
+every pair. No pair is dropped. `modeling_started` remains `false`;
+`part2_started=true` (contract only, not modeling); no network extraction.
 
 **Modeling remains prohibited** (no modeling, tuning, SHAP, SMOTE, calibration,
 temporal splitting, feature selection, or article result generation) through all of
 Stage125; it begins only when Stage126 (M1 Financial Baseline) is explicitly
-approved. Stage125 Part 2 (Prediction-time contract) must not start until Part 1
-is reviewed and approved.
+approved.
 
 ## Historical — `stage124-gate-b-readiness`
 

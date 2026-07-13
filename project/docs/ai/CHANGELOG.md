@@ -3,6 +3,29 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-14
+
+- **Stage125 Part 2 — Prediction-time & Leakage Contract.** Authorized and
+  executed (in review) as a contract / read-only-audit task tracked by
+  `active_maintenance_task_id = stage125-part2-prediction-time-contract`
+  (advances **no** research action; `last_completed_research_action_id` stays
+  `stage124-gate-b-execution`). New code/tests:
+  `project/src/stage125_part2_prediction_time_contract.py`,
+  `project/run_stage125_part2.py`,
+  `project/tests/test_stage125_part2_prediction_time_contract.py`. Deliverables
+  in `project/stage125/`: prediction-time contract (cutoff based on verified
+  `available_at`; revision policy; deterministic tie-breaking); feature
+  availability contract (M1–M4 temporal gating; no target-year features);
+  leakage checklist (8 machine-testable fail-cailed checks LC01–LC08); per-pair
+  cutoff/feature/leakage audit CSVs preserving all 1200 pairs; cutoff summary.
+  Missing `fiscal_year_end` (4 predictor, 4 target; 5 pairs either missing, 3
+  both missing) is never filled or guessed — those pairs have
+  `temporal_status=unresolvable`. `eligibility_impact=none_contract_audit_only`
+  for every pair. No pair is dropped. `metadata_and_hashes_stage125_part2.json`
+  added to the frozen-manifest workflow. **No modeling, no network extraction;
+  `modeling_started` remains `false`; `part2_started=true` (contract only, not
+  modeling); Stage122–Stage125 Part 1 assets unchanged.**
+
 ## 2026-07-13
 
 - **Stage125 Part 1 — Data Dictionary & Provenance Contract.** PR #21 (Part 0)
