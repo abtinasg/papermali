@@ -40,7 +40,11 @@ Part 3A.1 records **user-approved decisions** on top of the frozen Part 3A proto
 - 1402: 3 positive / 5 negative
 
 - Unique tickers: 26
-- Unique industries: 11
+- Unique known industries: 10
+- Industry present pairs: 53
+- Industry missing pairs: 27
+- Legacy nonempty industry label count (includes unknown sentinel): 11
+- Unknown sentinel `نامشخص در فایل ارسالی` is **not** a known industry.
 
 ## Approved G09–G14 thresholds
 

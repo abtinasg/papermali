@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 24,
+  "assertion_count": 27,
   "assertions": [
     {
       "assertion": "invariants_match",
@@ -43,8 +43,23 @@
       "status": "PASS"
     },
     {
-      "assertion": "ticker_industry_diversity_locked",
-      "detail": "tickers=26 industries=11",
+      "assertion": "ticker_diversity_locked",
+      "detail": "tickers=26",
+      "status": "PASS"
+    },
+    {
+      "assertion": "industry_accounting_locked",
+      "detail": "known=10 present_pairs=53 missing_pairs=27 legacy_nonempty=11",
+      "status": "PASS"
+    },
+    {
+      "assertion": "industry_present_columns_fail_closed",
+      "detail": "industry_present/industry_missing_reason consistent for all pairs",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unknown_sentinel_not_known_industry",
+      "detail": "unknown sentinel excluded from known industries",
       "status": "PASS"
     },
     {
@@ -217,7 +232,7 @@
     "project/stage125/stage125_part2_prediction_time_contract_qc_report.json": "cd43c01cc39e2d43a39f686884916630c47d2324799766058f7e34bce19689e6"
   },
   "gate_b_started": true,
-  "generated_at": "2026-07-15T01:12:59+03:30",
+  "generated_at": "2026-07-15T01:38:02+03:30",
   "guard_evidence": {
     "eligibility": {
       "pair_count": 1200,
@@ -262,10 +277,10 @@
   "network_calls_attempted": 0,
   "network_extraction_performed": false,
   "output_sha256": {
-    "README_STAGE125_PART3A_DECISION_LOCK.md": "94e580363063166c633754c935ceea567064ce6a540b41c1c569ea9ad191e1e6",
-    "part3a_approved_gate_thresholds_stage125.csv": "f60ef0a16effbe07bc4861d6e63b0390241c669aa92f55baf6314d87d9108dd4",
-    "part3a_decision_lock_stage125.json": "f73f971697fe128a0e2614da5a9b1f7f9760ea01d42bb6ac29587b26cd1837a9",
-    "part3a_selected_pilot_pairs_stage125.csv": "f42c47cb8ef513146ddfeb41af9f20904c357e411b875f9a0d13e7f47122a510"
+    "README_STAGE125_PART3A_DECISION_LOCK.md": "5421c655aef475f4992cf8305ea263e9fca8f927eb46506084249d76b53b5b29",
+    "part3a_approved_gate_thresholds_stage125.csv": "11c7efe5f242ab8e4a4f7b1955fb25d48e288249f7a1ce4c6bf1713dbf117d20",
+    "part3a_decision_lock_stage125.json": "475c82b3483ef18ff19aea2268f65527ca87c9441603622bd1952bd21f18f35e",
+    "part3a_selected_pilot_pairs_stage125.csv": "9a441b5e3696353967489b356d0ff48cf7cbea276aeea5018be6edc8368b40f5"
   },
   "part2_started": true,
   "part3_started": true,
@@ -297,10 +312,10 @@
   "pilot_extraction_started": false,
   "selected_pilot_option": "pilot_option_event_enriched",
   "selected_pilot_pairs": 80,
-  "source_commit": "1cd211ad92405b45464132d76902a6c79f713f01",
-  "source_file_sha256": "aa72379687b876b7e40fb1dd913b3aac0e888a007d7d9d99bfc49778fd0275d8",
+  "source_commit": "71ad8d934cbeeac76d8fa94baacd6f466c4437be",
+  "source_file_sha256": "d94f4d1642bccb01565fc8448e329acc54b75f0d40f41bf57602f024d5c75c1c",
   "stage": "stage125_part3a_decision_lock",
-  "test_file_sha256": "d40c6b08b79e0e4e3ea023ac0936e10c68d3423cb650ebecc38c0b50124ff432",
+  "test_file_sha256": "b8b1a3f76fe51c8542915ff1356a7077802d4afaae3b9c2ffb05292862c3a1a3",
   "ticker_count": 130,
   "tickers": [
     "اردستان",

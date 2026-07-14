@@ -68,7 +68,7 @@
     {
       "approval_status": "approved_for_part3b_pilot",
       "blocks_included": "all",
-      "computation_method": "Deterministic without-replacement selection from Rule A eligible pool by frozen identifiers before evidence; positive=39 negative=41 unknown=0; allocation_by_target_year as locked; unique_tickers=26 unique_industries=11; no post-evidence substitution.",
+      "computation_method": "Deterministic without-replacement selection from Rule A eligible pool by frozen identifiers before evidence; positive=39 negative=41 unknown=0; allocation_by_target_year as locked; unique_tickers=26 unique_known_industries=10 industry_present_pairs=53 industry_missing_pairs=27 legacy_nonempty_industry_label_count=11; no post-evidence substitution.",
       "denominator": "80 selected pilot pairs",
       "gate_id": "G14",
       "gate_name": "final_pilot_allocation",
@@ -148,7 +148,9 @@
       }
     },
     "eligibility_impact": "none_protocol_only",
-    "industries": [
+    "industry_missing_pairs": 27,
+    "industry_present_pairs": 53,
+    "known_industries": [
       "انبوه‌سازی، املاک و مستغلات",
       "حمل و نقل",
       "حمل و نقل آبی",
@@ -158,9 +160,9 @@
       "ماشین‌آلات و تجهیزات / تجهیزات برقی",
       "ماشین‌آلات و تجهیزات / دستگاه‌های برقی",
       "محصولات شیمیایی",
-      "مواد و محصولات دارویی",
-      "نامشخص در فایل ارسالی"
+      "مواد و محصولات دارویی"
     ],
+    "legacy_nonempty_industry_label_count": 11,
     "modeling_sample": false,
     "negative": 41,
     "not_selected_options": [
@@ -203,7 +205,8 @@
       "فاذر",
       "لبوتان"
     ],
-    "unique_industries": 11,
+    "unique_known_industries": 10,
+    "unique_nonempty_industry_labels": 11,
     "unique_tickers": 26,
     "unknown": 0
   },
