@@ -212,7 +212,7 @@ def test_selected_pairs_csv_structure():
     assert all(r["option_id"] == "pilot_option_event_enriched" for r in rows)
 
 
-def test_runner_check_mode_before_write():
+def test_runner_check_mode():
     import subprocess
     env = {**os.environ, "PYTHONPATH": str(ROOT)}
     proc = subprocess.run(
@@ -220,9 +220,7 @@ def test_runner_check_mode_before_write():
          "--check"],
         capture_output=True, text=True, env=env, cwd=str(REPO_ROOT),
     )
-    # Before artifacts are written, --check should report drift (exit 1).
-    assert proc.returncode == 1
-    assert "DRIFT" in proc.stderr or "drift" in proc.stderr.lower()
+    assert proc.returncode == 0, proc.stderr
 
 
 # --------------------------------------------------------------------------- #
