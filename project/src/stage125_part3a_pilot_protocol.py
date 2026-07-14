@@ -204,8 +204,24 @@ _PILOT_OPTIONS_HEADER = [
     "proposed_ticker_industry_diversity_rule",
     "rule_a_pool_positive_total", "rule_a_pool_negative_total",
     "expected_document_api_workload_m2", "expected_document_api_workload_m3",
-    "expected_document_api_workload_m4", "advantages", "limitations", "status",
+    "expected_document_api_workload_m4", "advantages", "limitations",
+    "sampling_purpose", "population_representative", "modeling_sample",
+    "eligibility_impact", "status",
 ]
+
+_PILOT_METHODOLOGY_SCOPE = {
+    "sampling_purpose": "event_enriched_accessibility_coverage_pilot",
+    "population_representative": "false",
+    "modeling_sample": "false",
+    "eligibility_impact": "none_protocol_only",
+}
+
+_PILOT_METHODOLOGY_DISCLAIMER = (
+    "Not population-representative; intended only for accessibility, "
+    "provenance, and coverage testing; must not be used to estimate "
+    "population class prevalence or report model performance; does not "
+    "alter the final modeling sample or eligibility."
+)
 
 _SAMPLING_BY_YEAR_HEADER = [
     "target_year", "total_pairs", "positive_count", "negative_count",
@@ -1008,25 +1024,31 @@ def build_pilot_sampling_options(
             "pilot_option_compact",
             2,
             4,
-            "Compact pilot: 4 Rule-A pairs per target year (2 positive where "
-            "available + 2 negative); scales positive representation without "
-            "using the full Rule A pool.",
+            "Compact event-enriched accessibility pilot: 4 Rule-A pairs per "
+            "target year (2 positive where available + 2 negative); "
+            "deliberately oversamples positive distress events relative to "
+            f"Rule A pool prevalence (~8%). {_PILOT_METHODOLOGY_DISCLAIMER}",
         ),
         (
-            "pilot_option_representative",
+            "pilot_option_event_enriched",
             4,
             8,
-            "Representative pilot: 8 Rule-A pairs per target year (up to 4 "
-            "positive where available + negatives); increases positive "
-            "coverage across years subject to Rule A availability.",
+            "Event-enriched temporally stratified accessibility pilot: 8 "
+            "Rule-A pairs per target year (up to 4 positive where available + "
+            "negatives); deliberately oversamples positive distress events "
+            "(~48.75% positive in this option vs ~8% in the Rule A pool); "
+            "temporally stratified across target years. "
+            f"{_PILOT_METHODOLOGY_DISCLAIMER}",
         ),
         (
             "pilot_option_extended",
             None,
             16,
-            "Extended pilot: 16 Rule-A pairs per target year (all available "
-            "positives per year up to quota + negatives); uses the full 81 "
-            "Rule A positives where year supply allows.",
+            "Extended event-enriched accessibility pilot: 16 Rule-A pairs per "
+            "target year (all available positives per year up to quota + "
+            "negatives); uses the full 81 Rule A positives where year supply "
+            "allows; deliberately event-enriched (not population-"
+            f"representative). {_PILOT_METHODOLOGY_DISCLAIMER}",
         ),
     ]
     rows: list[dict] = []
@@ -1082,8 +1104,11 @@ def build_pilot_sampling_options(
             "limitations": (
                 "Does not account for future accessibility results; "
                 f"Rule A pool has only {pool_pos} positives / {pool_neg} "
-                "negatives — not class-balanced at full-pool scale"
+                "negatives (~8% positive prevalence) — pilot options "
+                "deliberately oversample positives for accessibility testing "
+                "and must not be interpreted as population-representative"
             ),
+            **_PILOT_METHODOLOGY_SCOPE,
             "status": "pending_user_approval",
         })
     return rows
@@ -1204,8 +1229,16 @@ def build_readme(counts: dict) -> str:
         "## Sampling frame\n\n"
         "Derived from frozen Gate B data only. Rule A primary = 1013 eligible "
         "(81 pos / 932 neg). Rule B robustness = 994 eligible (80 pos / 914 neg). "
-        "Three pilot-size options provided for later human approval; none "
-        "executed in Part 3A.\n\n"
+        "Three event-enriched accessibility/coverage pilot options "
+        "(`pilot_option_compact`, `pilot_option_event_enriched`, "
+        "`pilot_option_extended`) provided for later human approval; none "
+        "executed in Part 3A. All options share "
+        "`sampling_purpose=event_enriched_accessibility_coverage_pilot`, "
+        "`population_representative=false`, `modeling_sample=false`, "
+        "`eligibility_impact=none_protocol_only`. They deliberately "
+        "oversample positive distress events relative to Rule A prevalence "
+        "(~8%) and must not be used to estimate population class prevalence "
+        "or report model performance.\n\n"
         "## Guardrails\n\n"
         "- `modeling_started` remains `false`.\n"
         "- `part3a_protocol_locked` = `true`; `part3b_started` = `false`.\n"
@@ -1226,6 +1259,7 @@ def build_qc_assertions(
     inventory_rows: list[dict],
     gate_rows: list[dict],
     rubric: dict,
+    pilot_options: list[dict],
     repo_root: str,
     guard_evidence: dict,
 ) -> list[dict]:
@@ -1342,6 +1376,49 @@ def build_qc_assertions(
     add("part1_part2_frozen_unchanged",
         len(frozen_before) > 0 and frozen_before == frozen_after,
         "Stage122-Stage125 Part1/Part2 frozen deliverables unchanged")
+
+    pilot_ids = {o["option_id"] for o in pilot_options}
+    bad_representative = [
+        o["option_id"] for o in pilot_options
+        if "representative" in o["option_id"].lower()
+    ]
+    bad_desc = [
+        o["option_id"] for o in pilot_options
+        if "representative pilot" in o.get("proposed_temporal_allocation", "").lower()
+        or o.get("proposed_temporal_allocation", "").lower().startswith(
+            "representative "
+        )
+    ]
+    add("pilot_options_no_representative_label",
+        "pilot_option_representative" not in pilot_ids and
+        not bad_representative and not bad_desc,
+        f"option_ids={sorted(pilot_ids)}; bad_ids={bad_representative + bad_desc}")
+    add("pilot_options_all_non_population_representative",
+        len(pilot_options) == 3 and all(
+            o.get("population_representative") == "false"
+            for o in pilot_options
+        ),
+        "all options population_representative=false")
+    add("pilot_options_all_non_modeling_pilot",
+        len(pilot_options) == 3 and all(
+            o.get("modeling_sample") == "false" and
+            o.get("sampling_purpose") ==
+            "event_enriched_accessibility_coverage_pilot"
+            for o in pilot_options
+        ),
+        "all options event_enriched_accessibility_coverage_pilot; "
+        "modeling_sample=false")
+    add("pilot_options_all_pending_user_approval",
+        len(pilot_options) == 3 and all(
+            o.get("status") == "pending_user_approval" for o in pilot_options
+        ),
+        "all options pending_user_approval")
+    add("pilot_options_no_final_selection",
+        "pilot_option_event_enriched" in pilot_ids and
+        "pilot_option_representative" not in pilot_ids and
+        all(o.get("eligibility_impact") == "none_protocol_only"
+            for o in pilot_options),
+        "no final pilot selected or executed")
     return out
 
 
@@ -1354,6 +1431,7 @@ def build_qc_report(
     inventory_rows: list[dict],
     gate_rows: list[dict],
     rubric: dict,
+    pilot_options: list[dict],
     guard_evidence: dict,
 ) -> dict:
     root = str(repo_root)
@@ -1363,7 +1441,7 @@ def build_qc_report(
     test_sha = sha256_file(repo_root / TEST_REL)
     assertions = build_qc_assertions(
         counts, content_hashes, frozen_before, frozen_after,
-        inventory_rows, gate_rows, rubric, root, guard_evidence,
+        inventory_rows, gate_rows, rubric, pilot_options, root, guard_evidence,
     )
     failed = sum(1 for a in assertions if a["status"] != "PASS")
     all_pass = failed == 0
@@ -1474,6 +1552,7 @@ def build_content_files(
         "_inventory_rows": inventory_rows,
         "_gate_rows": gate_rows,
         "_rubric": rubric,
+        "_pilot_options": pilot_options,
     }
 
 
@@ -1509,6 +1588,7 @@ def build_all(
         inventory_rows = raw_content.pop("_inventory_rows")
         gate_rows = raw_content.pop("_gate_rows")
         rubric = raw_content.pop("_rubric")
+        pilot_options = raw_content.pop("_pilot_options")
         content_files = {
             k: v for k, v in raw_content.items() if not k.startswith("_")
         }
@@ -1527,7 +1607,7 @@ def build_all(
         qc_report = build_qc_report(
             repo_root, counts, sha_all, sha_pairs, content_hashes,
             frozen_before, frozen_after, tickers,
-            inventory_rows, gate_rows, rubric, guard_evidence,
+            inventory_rows, gate_rows, rubric, pilot_options, guard_evidence,
         )
         if not qc_report["all_pass"]:
             failed = [a for a in qc_report["assertions"] if a["status"] != "PASS"]

@@ -242,7 +242,68 @@ def test_pilot_sampling_options_pending_approval():
         assert int(opt["proposed_sample_size"]) > 0
     ids = [o["option_id"] for o in options]
     assert "pilot_option_balanced" not in ids
-    assert "pilot_option_representative" in ids
+    assert "pilot_option_representative" not in ids
+    assert "pilot_option_event_enriched" in ids
+
+
+def test_pilot_sampling_methodology_scope_fields():
+    df_all, df_pairs, _, _ = part3a.load_inputs(ALL_ROWS_PATH, PAIRS_PATH)
+    options = part3a.build_pilot_sampling_options(df_all, df_pairs)
+    for opt in options:
+        assert opt["sampling_purpose"] == (
+            "event_enriched_accessibility_coverage_pilot"
+        )
+        assert opt["population_representative"] == "false"
+        assert opt["modeling_sample"] == "false"
+        assert opt["eligibility_impact"] == "none_protocol_only"
+        assert opt["status"] == "pending_user_approval"
+
+
+def test_pilot_sampling_no_incorrect_representative_label():
+    df_all, df_pairs, _, _ = part3a.load_inputs(ALL_ROWS_PATH, PAIRS_PATH)
+    options = part3a.build_pilot_sampling_options(df_all, df_pairs)
+    for opt in options:
+        assert "representative" not in opt["option_id"].lower()
+        desc = opt["proposed_temporal_allocation"].lower()
+        assert not desc.startswith("representative ")
+        assert "representative pilot" not in desc
+
+
+def test_pilot_sampling_event_enriched_description():
+    df_all, df_pairs, _, _ = part3a.load_inputs(ALL_ROWS_PATH, PAIRS_PATH)
+    options = part3a.build_pilot_sampling_options(df_all, df_pairs)
+    enriched = next(
+        o for o in options if o["option_id"] == "pilot_option_event_enriched"
+    )
+    desc = enriched["proposed_temporal_allocation"].lower()
+    assert "oversample" in desc
+    assert "48.75%" in enriched["proposed_temporal_allocation"]
+    assert "accessibility" in desc
+    assert "population class prevalence" in desc
+    assert "model performance" in desc
+
+
+def test_pilot_sampling_no_final_selection():
+    df_all, df_pairs, _, _ = part3a.load_inputs(ALL_ROWS_PATH, PAIRS_PATH)
+    options = part3a.build_pilot_sampling_options(df_all, df_pairs)
+    assert all(o["status"] == "pending_user_approval" for o in options)
+    assert not any("selected" in o["status"] for o in options)
+    assert not any("executed" in o["status"] for o in options)
+
+
+def test_pilot_sampling_negative_allocations_unchanged():
+    df_all, df_pairs, _, _ = part3a.load_inputs(ALL_ROWS_PATH, PAIRS_PATH)
+    options = part3a.build_pilot_sampling_options(df_all, df_pairs)
+    by_id = {o["option_id"]: o for o in options}
+    expected = {
+        "pilot_option_compact": (20, 20),
+        "pilot_option_event_enriched": (39, 41),
+        "pilot_option_extended": (81, 79),
+    }
+    for opt_id, (pos, neg) in expected.items():
+        alloc = by_id[opt_id]["proposed_class_allocation"]
+        assert f"positive={pos}" in alloc
+        assert f"negative={neg}" in alloc
 
 
 def test_pilot_sampling_positive_counts_scale():
@@ -321,6 +382,19 @@ def test_build_all_passes_qc():
     assert qc["network_extraction_performed"] is False
     assert qc["eligibility_impact"] == "none_protocol_only"
     assert qc["baseline_commit"] == part3a.EXPECTED_BASELINE_COMMIT
+
+
+def test_qc_pilot_methodology_assertions():
+    result = _build()
+    names = {a["assertion"]: a for a in result["qc"]["assertions"]}
+    for key in (
+        "pilot_options_no_representative_label",
+        "pilot_options_all_non_population_representative",
+        "pilot_options_all_non_modeling_pilot",
+        "pilot_options_all_pending_user_approval",
+        "pilot_options_no_final_selection",
+    ):
+        assert names[key]["status"] == "PASS", names[key]["detail"]
 
 
 def test_qc_assertion_count_at_least_25():
