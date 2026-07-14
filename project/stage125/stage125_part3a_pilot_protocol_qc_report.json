@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 25,
+  "assertion_count": 30,
   "assertions": [
     {
       "assertion": "invariants_match",
@@ -126,6 +126,31 @@
       "assertion": "part1_part2_frozen_unchanged",
       "detail": "Stage122-Stage125 Part1/Part2 frozen deliverables unchanged",
       "status": "PASS"
+    },
+    {
+      "assertion": "pilot_options_no_representative_label",
+      "detail": "option_ids=['pilot_option_compact', 'pilot_option_event_enriched', 'pilot_option_extended']; bad_ids=[]",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pilot_options_all_non_population_representative",
+      "detail": "all options population_representative=false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pilot_options_all_non_modeling_pilot",
+      "detail": "all options event_enriched_accessibility_coverage_pilot; modeling_sample=false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pilot_options_all_pending_user_approval",
+      "detail": "all options pending_user_approval",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pilot_options_no_final_selection",
+      "detail": "no final pilot selected or executed",
+      "status": "PASS"
     }
   ],
   "baseline_commit": "c6cbb6b7a7dc4dfe7ca3fa6ea0bcf34d7f0612c0",
@@ -228,7 +253,7 @@
     "project/stage125/stage125_part2_prediction_time_contract_qc_report.json": "cd43c01cc39e2d43a39f686884916630c47d2324799766058f7e34bce19689e6"
   },
   "gate_b_started": true,
-  "generated_at": "2026-07-14T23:19:17+03:30",
+  "generated_at": "2026-07-14T23:38:21+03:30",
   "guard_evidence": {
     "eligibility": {
       "pair_count": 1200,
@@ -273,11 +298,11 @@
   "network_calls_attempted": 0,
   "network_extraction_performed": false,
   "output_sha256": {
-    "README_STAGE125_PART3A_PILOT_PROTOCOL.md": "7de1e2872cc7dd36e8dc895bd8fc0045ee1e2f5e2028c5c96720a00cde9f2262",
+    "README_STAGE125_PART3A_PILOT_PROTOCOL.md": "379c6b29e196f96633a351098e481d89ce4ad1cdafaa757a6ecaf5cc6dfe4ff4",
     "accessibility_scoring_rubric_stage125_part3a.json": "72342262384d7a5eed583aee7dd555f3ba434c8461d1a700ad5e7ef967e80c6b",
     "part3_candidate_inventory_stage125.csv": "4bd5f6a71ecf0e1f74866a64a3774e51340729f4188ae2784f1d90db07e7032f",
     "part3_gate_decision_protocol_stage125.csv": "a454a74da89e2d330f9c6dc34217e2eb8b0f9647a959691df43e93db078a3162",
-    "part3_pilot_sampling_options_stage125.csv": "bafb693690601f0d85d76c9b3370de7d396d95701bb7decf54d128aa11aa9b11",
+    "part3_pilot_sampling_options_stage125.csv": "bcbe687e43d790b8a6dbab3bd4929df7d39aef421fcabd00e6b69bd5466c97b5",
     "part3_sampling_frame_by_target_year_stage125.csv": "96e6826681b8b46e6d0ebf9bd2dd9c1d7895f0432ca600986ab8beffb680f584",
     "part3_sampling_frame_summary_stage125.json": "359394f0522f2c3db24a56238d6f9ff78bcab75dd36cbdef9b64f23162c6b945",
     "part3_source_evidence_manifest_schema_stage125.json": "9a736edb18046128851d55c87f07609b8dc2a4b2be73a41c5837fe0e2a4cd78d"
@@ -288,10 +313,10 @@
   "part3b_started": false,
   "pilot_extraction_started": false,
   "registered_candidate_count": 10,
-  "source_commit": "13bf90e45566bb11ac50bb3b4211bbe6da198654",
-  "source_file_sha256": "8f06555b7c4adc15bfde96ea9df1e05b1a5add24258169a2996dcb79ebe58162",
+  "source_commit": "a5d7fd27955b9690bd2257211e467d485ec1ff3e",
+  "source_file_sha256": "0e6a237019543395729763eda567f24a6470245ca8b97567c1ac667eb3ea07fc",
   "stage": "stage125_part3a_pilot_protocol",
-  "test_file_sha256": "e7b79ba26720fb25c38b78e88cc3c62434efe911354209ba6bc2d124d9b1f2cb",
+  "test_file_sha256": "1b9879d96da624a41a0fbea28811a8728e14066b24053160613b7e4e3aafa4f7",
   "ticker_count": 130,
   "tickers": [
     "اردستان",

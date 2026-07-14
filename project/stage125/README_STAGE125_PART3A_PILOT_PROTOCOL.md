@@ -37,7 +37,7 @@ Eight Gates are locked (accessibility ≥ 3, authoritative source, reproducibili
 
 ## Sampling frame
 
-Derived from frozen Gate B data only. Rule A primary = 1013 eligible (81 pos / 932 neg). Rule B robustness = 994 eligible (80 pos / 914 neg). Three pilot-size options provided for later human approval; none executed in Part 3A.
+Derived from frozen Gate B data only. Rule A primary = 1013 eligible (81 pos / 932 neg). Rule B robustness = 994 eligible (80 pos / 914 neg). Three event-enriched accessibility/coverage pilot options (`pilot_option_compact`, `pilot_option_event_enriched`, `pilot_option_extended`) provided for later human approval; none executed in Part 3A. All options share `sampling_purpose=event_enriched_accessibility_coverage_pilot`, `population_representative=false`, `modeling_sample=false`, `eligibility_impact=none_protocol_only`. They deliberately oversample positive distress events relative to Rule A prevalence (~8%) and must not be used to estimate population class prevalence or report model performance.
 
 ## Guardrails
 
