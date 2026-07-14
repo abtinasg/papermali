@@ -1,0 +1,45 @@
+{
+  "calendar_rules": {
+    "fiscal_year_end_not_inferred_when_missing": true,
+    "jalali_and_gregorian_preserved_separately": true,
+    "no_calendar_conversion_without_provenance": true
+  },
+  "contract_version": "stage125_part2_v1",
+  "eligibility_rules": {
+    "description": "Part 2 is a contract/audit only. It does not change eligibility, drop pairs, or modify the sample.",
+    "eligibility_impact": "none_contract_audit_only",
+    "no_eligibility_changed": true,
+    "no_pair_dropped": true
+  },
+  "identifier_rules": {
+    "predictor_row_key_t": {
+      "description": "Stage124 Gate B predictor row key; not redefined.",
+      "redefined": false
+    },
+    "target_row_key_t_plus_1": {
+      "description": "Stage124 Gate B target row key; not redefined.",
+      "redefined": false
+    }
+  },
+  "prediction_cutoff": {
+    "cutoff_basis": "verified_available_at_timestamp",
+    "cutoff_not_based_on": [
+      "fiscal_year_end_alone",
+      "published_at_alone",
+      "retrieved_at_alone",
+      "any_inferred_or_guessed_date"
+    ],
+    "definition": "The prediction cutoff for a t -> t+1 pair is the earliest verified available_at timestamp of the predictor (year t) financial statement. No feature value whose available_at is after the cutoff may be used at prediction time.",
+    "missing_available_at_rule": "If available_at is unknown for a predictor row, the prediction cutoff is unresolvable for that pair. The pair is NOT dropped; its temporal_status is set to 'unresolvable' and no feature is marked available."
+  },
+  "revision_policy": {
+    "description": "When a source document is revised, a new provenance record is created with a new revision_status. The original version is never silently overwritten. The prediction cutoff uses the available_at of the version that was available at prediction time, not a later revision.",
+    "rule": "revision_is_new_version_not_overwrite"
+  },
+  "scope": "Part 2 — prediction-time & leakage contract (no modeling)",
+  "stage": "Stage125",
+  "tie_breaking": {
+    "description": "If multiple provenance records exist for the same predictor row, the earliest verified available_at is used as the cutoff. Ties are broken by provenance_id (lexicographic).",
+    "rule": "earliest_verified_available_at"
+  }
+}

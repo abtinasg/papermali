@@ -1,0 +1,62 @@
+{
+  "checks": [
+    {
+      "description": "No feature value from the target year (t+1) is used at prediction time.",
+      "fail_closed": true,
+      "id": "LC01",
+      "machine_testable": true,
+      "name": "no_target_year_feature_used"
+    },
+    {
+      "description": "No data from a period after the prediction cutoff is used as a feature.",
+      "fail_closed": true,
+      "id": "LC02",
+      "machine_testable": true,
+      "name": "no_future_period_data"
+    },
+    {
+      "description": "No feature is marked available without a verified available_at timestamp.",
+      "fail_closed": true,
+      "id": "LC03",
+      "machine_testable": true,
+      "name": "no_unverified_available_at"
+    },
+    {
+      "description": "The prediction cutoff is never inferred or guessed; it is either verified or unresolvable.",
+      "fail_closed": true,
+      "id": "LC04",
+      "machine_testable": true,
+      "name": "no_inferred_cutoff"
+    },
+    {
+      "description": "A revised document is never treated as the original; the version available at prediction time is used.",
+      "fail_closed": true,
+      "id": "LC05",
+      "machine_testable": true,
+      "name": "no_revision_used_as_original"
+    },
+    {
+      "description": "Part 2 does not change any pair's eligibility.",
+      "fail_closed": true,
+      "id": "LC06",
+      "machine_testable": true,
+      "name": "no_eligibility_changed"
+    },
+    {
+      "description": "All 1200 pairs are preserved in the audit; none are dropped.",
+      "fail_closed": true,
+      "id": "LC07",
+      "machine_testable": true,
+      "name": "no_pair_dropped"
+    },
+    {
+      "description": "Missing fiscal_year_end values are never filled or guessed; they remain null and the pair's temporal status is unresolvable.",
+      "fail_closed": true,
+      "id": "LC08",
+      "machine_testable": true,
+      "name": "missing_fiscal_year_end_not_filled"
+    }
+  ],
+  "contract_version": "stage125_part2_v1",
+  "stage": "Stage125"
+}

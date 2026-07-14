@@ -1,0 +1,20 @@
+{
+  "contract_version": "stage125_part2_v1",
+  "eligibility_impact": "none_contract_audit_only",
+  "fiscal_year_end_t_missing": 4,
+  "fiscal_year_end_t_plus_1_missing": 4,
+  "fiscal_year_end_t_plus_1_present": 1196,
+  "fiscal_year_end_t_present": 1196,
+  "no_fiscal_year_end_filled_or_guessed": true,
+  "no_pair_dropped": true,
+  "pairs_both_dates_missing": 3,
+  "pairs_both_dates_present": 1195,
+  "pairs_either_date_missing": 5,
+  "stage": "Stage125",
+  "temporal_status_breakdown": {
+    "resolvable_pending_available_at": 1195,
+    "unresolvable_both_dates_missing": 3,
+    "unresolvable_one_date_missing": 2
+  },
+  "total_pairs": 1200
+}

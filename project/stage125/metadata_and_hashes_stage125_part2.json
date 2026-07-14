@@ -1,0 +1,29 @@
+{
+  "code_commit": "7b0d3dde532b5a37e3cfc77ea1457fe73aea2e08",
+  "current_stage": "Stage125",
+  "description": "Stage125 Part 2 — prediction-time & leakage contract.",
+  "gate_b_started": true,
+  "generated_at": "2026-07-14T01:52:34+03:30",
+  "input_all_rows_name": "modeling_all_rows_stage124_gate_b.csv",
+  "input_all_rows_sha256": "f6b6bc41cbe757d19d4397ffc5898629d0fca8ab0480351f75040a71d7ce7376",
+  "input_pairs_name": "modeling_one_year_ahead_stage124_gate_b.csv",
+  "input_pairs_sha256": "9743c49337c66a3699bce34dfd02a151e34f48f0717f225ad487fe1487031d05",
+  "modeling_started": false,
+  "network_extraction_performed": false,
+  "output_files_sha256": {
+    "README_STAGE125_PART2_PREDICTION_TIME_CONTRACT.md": "437310452392bfcea448452fa1a65c745dce52d52b2df2fccdbb406b1abd5518",
+    "feature_availability_audit_stage125_part2.csv": "6dfca12c3d9d1e076ef0f6f73abbf48f7b183fea68455ce3e63a3fb45b2ff255",
+    "feature_availability_contract_stage125_part2.json": "b97593ed46fa2440b66cafd6a3752300177df4773cbdcf45b3126872d3c200a3",
+    "leakage_audit_stage125_part2.csv": "26f47bb4b2633330fe2f9fc75960f44c369a7f9bb4ecfa18fa2a8ab2a714e8fc",
+    "leakage_checklist_stage125_part2.json": "fab951e12a7ecdc280b74e865e3d5fa9bd4378b04441deb9773ac10a167612a7",
+    "prediction_cutoff_audit_stage125_part2.csv": "d50e6617b011a7818d972de8e5c8a862a45f73fb07a0a22cdb5c9f59b6dc88f0",
+    "prediction_cutoff_summary_stage125_part2.json": "ae41d22f84e694ce7d5369735b5de313b586c3b221834694bd047e7728ab9f3d",
+    "prediction_time_contract_stage125_part2.json": "9bd40b4832302fb2c9c890b99b06f3b47bcfee2c07d065416f8776e7e0046a89",
+    "stage125_part2_prediction_time_contract_qc_report.json": "14b3c8e1c9d79b7f896341169936495ab26adb7e2f779056b78be88f43163d92"
+  },
+  "part2_started": true,
+  "source_file_sha256": "fc6c8edfbabb168a0b4bad6bebadc328f464027701ad5b171da9430e85c6385d",
+  "stage": "stage125_part2_prediction_time_contract",
+  "test_file_sha256": "946180e249f2dd0138a790140d6f1462d1eaa332b7345d85a355adf871c4a828",
+  "warning": "Part 2 only: prediction-time & leakage contract. No modeling, no extraction. Stage122-Stage125 Part 1 assets unchanged."
+}

@@ -1,0 +1,37 @@
+{
+  "blocks": {
+    "M1_financial": {
+      "available_when": "predictor (year t) financial statement has a verified available_at on or before the prediction cutoff",
+      "target_leakage_rule": "target (year t+1) financial values are NEVER available at prediction time; using them is leakage",
+      "temporal_gating": "strict_point_in_time",
+      "unavailable_when": "available_at is missing, unknown, or after the cutoff"
+    },
+    "M2_market": {
+      "available_when": "market series window closes before the prediction cutoff; all returns/volatility/liquidity from pre-cutoff data only",
+      "target_leakage_rule": "market data from year t+1 is NEVER available at prediction time",
+      "temporal_gating": "window_must_close_before_cutoff",
+      "unavailable_when": "market window extends past the cutoff or no verified available_at for the market series"
+    },
+    "M3_macro": {
+      "available_when": "macro series publication date is on or before the prediction cutoff; only official/pre-announced data",
+      "target_leakage_rule": "macro revisions released after the cutoff are NEVER used",
+      "temporal_gating": "publication_date_before_cutoff",
+      "unavailable_when": "macro publication date is after the cutoff or unknown"
+    },
+    "M4_audit_governance": {
+      "available_when": "audit report / governance disclosure has a verified available_at on or before the prediction cutoff",
+      "target_leakage_rule": "audit opinion for year t+1 is NEVER available at prediction time",
+      "temporal_gating": "strict_point_in_time",
+      "unavailable_when": "audit/governance available_at is missing, unknown, or after the cutoff"
+    }
+  },
+  "contract_version": "stage125_part2_v1",
+  "global_rules": {
+    "missing_available_at_means_unavailable": true,
+    "no_feature_from_future_period": true,
+    "no_feature_from_target_year": true,
+    "no_feature_without_verified_available_at": true,
+    "no_imputation_of_availability": true
+  },
+  "stage": "Stage125"
+}
