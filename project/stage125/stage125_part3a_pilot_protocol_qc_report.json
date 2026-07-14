@@ -99,27 +99,27 @@
     },
     {
       "assertion": "modeling_not_started",
-      "detail": "no modeling artifact produced",
+      "detail": "checked paths and artifact patterns",
       "status": "PASS"
     },
     {
       "assertion": "no_network_extraction",
-      "detail": "no network or API access performed",
+      "detail": "network_calls_attempted=0",
       "status": "PASS"
     },
     {
       "assertion": "no_data_extraction",
-      "detail": "no data extraction performed",
+      "detail": "no Part 3B evidence datasets or extraction outputs",
       "status": "PASS"
     },
     {
       "assertion": "part3b_not_started",
-      "detail": "Part 3B evidence capture not started",
+      "detail": "no Part 3B runner/implementation/captured evidence",
       "status": "PASS"
     },
     {
       "assertion": "eligibility_impact_none",
-      "detail": "eligibility_impact=none_protocol_only",
+      "detail": "snapshot_sha256=d18431046162f975df3b240c615ad5ff4632ee0c4f8ece164abc1679839f8861; rule_a=1013/81pos/932neg",
       "status": "PASS"
     },
     {
@@ -228,7 +228,36 @@
     "project/stage125/stage125_part2_prediction_time_contract_qc_report.json": "cd43c01cc39e2d43a39f686884916630c47d2324799766058f7e34bce19689e6"
   },
   "gate_b_started": true,
-  "generated_at": "2026-07-14T22:58:35+03:30",
+  "generated_at": "2026-07-14T23:19:17+03:30",
+  "guard_evidence": {
+    "eligibility": {
+      "pair_count": 1200,
+      "rule_a_eligible_pairs": 1013,
+      "rule_a_negative": 932,
+      "rule_a_positive": 81,
+      "rule_a_unknown": 0,
+      "rule_b_eligible_pairs": 994,
+      "rule_b_negative": 914,
+      "rule_b_positive": 80,
+      "rule_b_unknown": 0,
+      "snapshot_sha256": "d18431046162f975df3b240c615ad5ff4632ee0c4f8ece164abc1679839f8861",
+      "unique_predictor_keys": 1200,
+      "unique_target_keys": 1200
+    },
+    "eligibility_mismatches": [],
+    "eligibility_unchanged": true,
+    "modeling": {
+      "artifact_hits": [],
+      "no_modeling": true,
+      "path_hits": []
+    },
+    "network_calls_attempted": 0,
+    "no_network_calls": true,
+    "part3b": {
+      "hits": [],
+      "no_part3b": true
+    }
+  },
   "input_all_rows_name": "modeling_all_rows_stage124_gate_b.csv",
   "input_all_rows_sha256": "f6b6bc41cbe757d19d4397ffc5898629d0fca8ab0480351f75040a71d7ce7376",
   "input_pairs_name": "modeling_one_year_ahead_stage124_gate_b.csv",
@@ -241,13 +270,14 @@
     "unique_tickers_pairs": 130
   },
   "modeling_started": false,
+  "network_calls_attempted": 0,
   "network_extraction_performed": false,
   "output_sha256": {
     "README_STAGE125_PART3A_PILOT_PROTOCOL.md": "7de1e2872cc7dd36e8dc895bd8fc0045ee1e2f5e2028c5c96720a00cde9f2262",
     "accessibility_scoring_rubric_stage125_part3a.json": "72342262384d7a5eed583aee7dd555f3ba434c8461d1a700ad5e7ef967e80c6b",
     "part3_candidate_inventory_stage125.csv": "4bd5f6a71ecf0e1f74866a64a3774e51340729f4188ae2784f1d90db07e7032f",
     "part3_gate_decision_protocol_stage125.csv": "a454a74da89e2d330f9c6dc34217e2eb8b0f9647a959691df43e93db078a3162",
-    "part3_pilot_sampling_options_stage125.csv": "699c31c3ef738ebb9a9be4b1fff5a11b7367c3a111d2b03e850e0e707056d0f5",
+    "part3_pilot_sampling_options_stage125.csv": "bafb693690601f0d85d76c9b3370de7d396d95701bb7decf54d128aa11aa9b11",
     "part3_sampling_frame_by_target_year_stage125.csv": "96e6826681b8b46e6d0ebf9bd2dd9c1d7895f0432ca600986ab8beffb680f584",
     "part3_sampling_frame_summary_stage125.json": "359394f0522f2c3db24a56238d6f9ff78bcab75dd36cbdef9b64f23162c6b945",
     "part3_source_evidence_manifest_schema_stage125.json": "9a736edb18046128851d55c87f07609b8dc2a4b2be73a41c5837fe0e2a4cd78d"
@@ -258,10 +288,10 @@
   "part3b_started": false,
   "pilot_extraction_started": false,
   "registered_candidate_count": 10,
-  "source_commit": "882c078608fb951cef6316536ace5a8396850a6d",
-  "source_file_sha256": "d8e1c16f99d46e05dc8bcd4a9425eaedb6f490c717f87b577f5bd385585e1c79",
+  "source_commit": "13bf90e45566bb11ac50bb3b4211bbe6da198654",
+  "source_file_sha256": "8f06555b7c4adc15bfde96ea9df1e05b1a5add24258169a2996dcb79ebe58162",
   "stage": "stage125_part3a_pilot_protocol",
-  "test_file_sha256": "acf3feabeec8a86168ff93b0dbe1fc280d37f215100d604b30d2d68a6245094d",
+  "test_file_sha256": "e7b79ba26720fb25c38b78e88cc3c62434efe911354209ba6bc2d124d9b1f2cb",
   "ticker_count": 130,
   "tickers": [
     "اردستان",
