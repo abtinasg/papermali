@@ -139,6 +139,45 @@ def _source_info() -> dict:
             "intended_freeze_tag": INTENDED_FREEZE_TAG}
 
 
+# Files whose last commit anchors the deterministic timestamp below (Stage123's
+# OWN logic only — deliberately narrower than SOURCE_FILES, which also covers
+# stage122/run_stage122 as upstream-dirtiness inputs).
+_TIMESTAMP_ANCHOR_FILES = ["src/stage123.py", "tests/test_stage123.py"]
+
+
+def _deterministic_timestamp() -> str:
+    """Timestamp anchored to the last commit touching Stage123's own code
+    (src/test), NOT wall-clock time, so repeated `build_full()` runs at the
+    SAME commit produce byte-identical output (statement-scope correction
+    audit CSV, metadata `datetime`) instead of a fresh value every run. This
+    is what previously made `project/tests/test_stage123.py`'s `built`
+    fixture rebuild a tracked file with content that could never match what
+    was already committed, which in turn was observable by any OTHER test
+    running later in the same pytest session (e.g. Stage125 Part 2's
+    frozen-asset snapshot) before the fixture's deferred restore ran.
+
+    Falls back to a wall-clock timestamp only if git is unavailable (e.g.
+    running outside a git checkout) — this preserves prior behavior in that
+    edge case rather than raising.
+    """
+    try:
+        commit = subprocess.run(
+            ["git", "log", "--format=%H", "-n", "1", "--", *_TIMESTAMP_ANCHOR_FILES],
+            cwd=str(ROOT), capture_output=True, text=True).stdout.strip()
+        if not commit:
+            commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(ROOT),
+                                    capture_output=True, text=True).stdout.strip()
+        if commit:
+            raw = subprocess.run(["git", "log", "-1", "--format=%cI", commit],
+                                 cwd=str(ROOT), capture_output=True, text=True).stdout.strip()
+            if raw:
+                from datetime import datetime as _dt
+                return _dt.fromisoformat(raw).strftime("%Y-%m-%d %H:%M:%S")
+    except Exception:
+        pass
+    return time.strftime("%Y-%m-%d %H:%M:%S")
+
+
 # --------------------------------------------------------------------------
 # Base = approved Stage122 output (NOT the old build_dataset.py pipeline)
 # --------------------------------------------------------------------------
@@ -376,7 +415,7 @@ def build_full(cfg) -> dict:
     corr["previous_statement_scope"] = prev_scope[corrected_mask].values
     corr["corrected_statement_scope"] = CORRECTED_SCOPE
     corr["correction_basis"] = "explicit_data_owner_confirmation"
-    corr["timestamp"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    corr["timestamp"] = _deterministic_timestamp()
     corr.to_csv(out / "statement_scope_correction_audit_stage123.csv", index=False,
                 encoding="utf-8-sig")
 
@@ -749,7 +788,7 @@ def _metadata(cfg, out, n_before, n_after, dup_before, dup_after, t0,
         "input_file_stage121": {"name": inp.name, "sha256": utils.sha256_file(inp)},
         "stage122_base_file": stage122_base,
         "output_files_sha256": out_hashes,
-        "datetime": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "datetime": _deterministic_timestamp(),
         # source provenance (req 2 & 3): commit, source-only dirtiness, source hashes
         "source_code_commit": src_info["source_code_commit"],
         "source_tree_dirty_before_run": src_info["source_tree_dirty_before_run"],
