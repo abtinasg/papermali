@@ -1,0 +1,41 @@
+{
+  "applied_to_sources": false,
+  "approval_status": "pending_user_approval",
+  "label": "proposed, not yet applied",
+  "rubric_version": "stage125_part3a_v1",
+  "score_definitions": {
+    "0": {
+      "description": "Source inaccessible or unusable; no reproducible retrieval path. Hard drop if ever scored.",
+      "label": "proposed, not yet applied"
+    },
+    "1": {
+      "description": "Marginal accessibility; manual-only, unstable, or non-reproducible access. Hard drop if ever scored.",
+      "label": "proposed, not yet applied"
+    },
+    "2": {
+      "description": "Limited accessibility; significant barriers to systematic retrieval. Hard drop if ever scored.",
+      "label": "proposed, not yet applied"
+    },
+    "3": {
+      "description": "Pilot-eligible only: systematic retrieval is plausible but coverage/quality unproven. Does NOT automatically admit to main analysis.",
+      "label": "proposed, not yet applied"
+    },
+    "4": {
+      "description": "Good accessibility with documented API/portal and reproducible retrieval; must still pass all other Gates.",
+      "label": "proposed, not yet applied"
+    },
+    "5": {
+      "description": "Excellent accessibility: authoritative, fully reproducible, machine-readable or reliably structured; must still pass all other Gates.",
+      "label": "proposed, not yet applied"
+    }
+  },
+  "scoring_rules": {
+    "every_score_requires_captured_evidence_and_provenance": true,
+    "missing_evidence": "null_or_unresolved_never_zero",
+    "no_memory_or_reputation_scoring": true,
+    "score_4_or_5": "must_still_pass_every_other_gate",
+    "score_below_3": "hard_drop",
+    "score_equals_3": "pilot_permission_only_not_automatic_admission"
+  },
+  "stage": "Stage125"
+}

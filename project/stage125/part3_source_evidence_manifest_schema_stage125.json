@@ -1,0 +1,122 @@
+{
+  "null_rules": {
+    "never_infer_from_memory_or_reputation": true,
+    "no_guessed_urls_or_dates": true,
+    "unknown_fields_must_be_null": true
+  },
+  "purpose": "Required fields for Part 3B evidence capture. Unknown fields must be null; never inferred.",
+  "required_fields": [
+    {
+      "name": "evidence_id",
+      "nullable": false,
+      "type": "string"
+    },
+    {
+      "name": "candidate_id",
+      "nullable": false,
+      "type": "string"
+    },
+    {
+      "name": "source_id",
+      "nullable": false,
+      "type": "string"
+    },
+    {
+      "name": "source_owner",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "source_url",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "source_title",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "source_identifier",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "retrieved_at_utc",
+      "nullable": true,
+      "type": "datetime"
+    },
+    {
+      "name": "published_at",
+      "nullable": true,
+      "type": "datetime"
+    },
+    {
+      "name": "available_at",
+      "nullable": true,
+      "type": "datetime"
+    },
+    {
+      "name": "raw_date_text",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "calendar",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "timezone",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "access_method",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "authentication_required",
+      "nullable": true,
+      "type": "boolean"
+    },
+    {
+      "name": "response_status_evidence",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "local_snapshot_path",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "snapshot_sha256",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "revision_status",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "license_or_usage_notes",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "reviewer_status",
+      "nullable": true,
+      "type": "string"
+    },
+    {
+      "name": "failure_reason",
+      "nullable": true,
+      "type": "string"
+    }
+  ],
+  "schema_version": "stage125_part3b_evidence_v1",
+  "stage": "Stage125"
+}

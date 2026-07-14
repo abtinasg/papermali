@@ -58,6 +58,10 @@ See [`DECISIONS.md`](DECISIONS.md).
   `run_stage125_part2.py`, `tests/test_stage125_part2_prediction_time_contract.py`,
   `stage125/stage125_part2_prediction_time_contract_qc_report.json` (prediction-time
   & leakage contract; per-pair cutoff/feature/leakage audit; no modeling, no extraction)
+- Stage125 Part 3A pilot-protocol source/test/QC: `src/stage125_part3a_pilot_protocol.py`,
+  `run_stage125_part3a.py`, `tests/test_stage125_part3a_pilot_protocol.py`,
+  `stage125/stage125_part3a_pilot_protocol_qc_report.json` (accessibility rubric,
+  gate protocol, candidate inventory freeze, sampling frame; no evidence, no extraction)
 
 ## 7. Done
 

@@ -1,0 +1,97 @@
+{
+  "fiscal_year_coverage": {
+    "fiscal_years_present": [
+      "1392",
+      "1393",
+      "1394",
+      "1395",
+      "1396",
+      "1397",
+      "1398",
+      "1399",
+      "1400",
+      "1401",
+      "1402"
+    ],
+    "rows_per_fiscal_year": {
+      "1392": 57,
+      "1393": 121,
+      "1394": 124,
+      "1395": 125,
+      "1396": 127,
+      "1397": 128,
+      "1398": 129,
+      "1399": 130,
+      "1400": 130,
+      "1401": 130,
+      "1402": 130
+    }
+  },
+  "frame_version": "stage125_part3a_v1",
+  "industry_summary_all_rows": {
+    "industry_missing_rows": 29,
+    "industry_present_rows": 1302,
+    "unique_industries": 39
+  },
+  "pilot_design_notes": "Counts derived from frozen Stage124 Gate B inputs only. Final temporal CV and locked final test belong to Part 4. No coverage or event thresholds applied in Part 3A.",
+  "rule_a_primary_sample": {
+    "industry_missing": 18,
+    "industry_present": 995,
+    "negative": 932,
+    "pairs": 1013,
+    "positive": 81,
+    "unique_industries": 32,
+    "unique_tickers": 119,
+    "unknown": 0
+  },
+  "rule_b_listing_robustness_sample": {
+    "industry_missing": 16,
+    "industry_present": 978,
+    "negative": 914,
+    "pairs": 994,
+    "positive": 80,
+    "unique_industries": 32,
+    "unique_tickers": 117,
+    "unknown": 0
+  },
+  "stage": "Stage125",
+  "target_class_all_pairs": {
+    "industry_missing": 26,
+    "industry_present": 1174,
+    "negative": 1092,
+    "pairs": 1200,
+    "positive": 86,
+    "unique_industries": 39,
+    "unique_tickers": 130,
+    "unknown": 22
+  },
+  "target_year_coverage": {
+    "pairs_per_target_year": {
+      "1393": 57,
+      "1394": 121,
+      "1395": 124,
+      "1396": 125,
+      "1397": 126,
+      "1398": 128,
+      "1399": 129,
+      "1400": 130,
+      "1401": 130,
+      "1402": 130
+    },
+    "target_years_present": [
+      "1393",
+      "1394",
+      "1395",
+      "1396",
+      "1397",
+      "1398",
+      "1399",
+      "1400",
+      "1401",
+      "1402"
+    ]
+  },
+  "total_company_year_rows": 1331,
+  "total_pairs": 1200,
+  "unique_tickers": 130
+}

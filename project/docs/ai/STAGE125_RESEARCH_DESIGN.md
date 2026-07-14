@@ -170,25 +170,34 @@ robustness check.
   after PR #20; create the Stage125 branch; record the research contract in human
   docs; regenerate the Handoff via the generator; run validator + tests; open a PR
   (no merge). **No** extraction, target/sample change, or modeling.
-- **Part 1 — Data dictionary & provenance contract. (Authorized and executed —
-  in review.)** Stable company id, fiscal year, dates; mandatory provenance
+- **Part 1 — Data dictionary & provenance contract. (Completed and merged.)** Stable company id, fiscal year, dates; mandatory provenance
   fields; source manifest for M1–M4; audit the current M1 provenance gap; cache /
   raw-vs-processed policy; no raw-file overwrite. Delivered in `project/stage125/`
   as a contracts / read-only-audit task (`stage125-part1-data-contract`); it
   advances no research action, performs no modeling and no extraction, and does
   not start Part 2. `modeling_started` remains `false`.
-- **Part 2 — Prediction-time contract.** Exact prediction time and cutoff; when each
-  statement / audit report / board report / market series / macro series became
-  usable; lag and revision policy; leakage checklist and anti-leakage machine tests.
-  **Executed (in review) 2026-07-14.** Deliverables in `project/stage125/`:
-  prediction-time contract, feature availability contract (M1–M4), leakage checklist
-  (8 machine-testable checks LC01–LC08), per-pair cutoff/feature/leakage audit CSVs
-  (all 1200 pairs preserved), cutoff summary. Missing `fiscal_year_end` never filled
-  or guessed; `eligibility_impact=none_contract_audit_only` for every pair.
-- **Part 3 — Accessibility, coverage & event pilot.** Small representative pilot for
-  M2–M4 sources; per-variable accessibility/quality scoring; coverage on
-  company-year and common sample; positive/negative counts in proposed temporal
-  splits; drop every Gate-failing variable; **no** final model.
+- **Part 2 — Prediction-time contract. (Completed and merged.)** Exact
+  prediction time and cutoff; when each statement / audit report / board report /
+  market series / macro series became usable; lag and revision policy; leakage
+  checklist and anti-leakage machine tests. Deliverables in `project/stage125/`:
+  prediction-time contract, feature availability contract (M1–M4), leakage
+  checklist (8 machine-testable checks LC01–LC08), per-pair cutoff/feature/leakage
+  audit CSVs (all 1200 pairs preserved), cutoff summary. Missing `fiscal_year_end`
+  never filled or guessed; `eligibility_impact=none_contract_audit_only` for every
+  pair. PR #27 post-merge Handoff refresh merged (`c6cbb6b7…`).
+- **Part 3A — Accessibility & pilot protocol lock. (Authorized and active.)**
+  Freeze the 10 registered M2–M4 candidates; propose (but do not apply) the
+  accessibility rubric; lock gate decision protocol; compute sampling frame from
+  frozen data; provide pilot-size options for human approval; define Part 3B
+  evidence schema. **No** live evidence, **no** scores, **no** admitted
+  candidates. `part3b_started=false`.
+- **Part 3B — Evidence capture & accessibility scoring. (Not started.)** Small
+  representative pilot for M2–M4 sources; per-variable accessibility/quality
+  scoring; coverage on company-year and common sample; positive/negative counts
+  in proposed temporal splits; drop every Gate-failing variable; **no** final
+  model.
+- **Part 3 (umbrella) — Accessibility, coverage & event pilot.** Parts 3A + 3B
+  together; Part 3A must complete before Part 3B starts.
 - **Part 4 — Statistical analysis plan.** Lock M1–M4 definitions and order; lock
   primary/robustness samples and the common-sample rule; lock temporal CV and the
   locked final test; lock PR-AUC / Recall@K / Lift@K / calibration; define paired

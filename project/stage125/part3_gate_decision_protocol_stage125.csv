@@ -1,0 +1,15 @@
+gate_id,gate_name,gate_category,lock_status,threshold_value,approval_status,description,notes
+G01,accessibility_score_gte_3,accessibility,locked,,locked_in_protocol,accessibility score >= 3 required; score < 3 is hard drop,Locked in Part 3A protocol; no threshold invented.
+G02,authoritative_source_required,provenance,locked,,locked_in_protocol,"Source must be valid, citable, and authoritative",Locked in Part 3A protocol; no threshold invented.
+G03,reproducibility_required,provenance,locked,,locked_in_protocol,Retrieval path must be reproducible with captured evidence,Locked in Part 3A protocol; no threshold invented.
+G04,published_or_available_at_verified,temporal,locked,,locked_in_protocol,published_at or available_at must be verified from evidence,Locked in Part 3A protocol; no threshold invented.
+G05,extraction_adjustment_join_error_controlled,quality,locked,,locked_in_protocol,"Extraction, adjustment, unit, calendar, and join error controlled",Locked in Part 3A protocol; no threshold invented.
+G06,missing_availability_means_unavailable,temporal,locked,,locked_in_protocol,Missing availability time means unavailable; never inferred,Locked in Part 3A protocol; no threshold invented.
+G07,no_future_or_target_year_information,leakage,locked,,locked_in_protocol,No future or target-year information at prediction time,Locked in Part 3A protocol; no threshold invented.
+G08,all_gates_must_pass,composite,locked,,locked_in_protocol,All Gates must pass; one failure is sufficient for rejection,Locked in Part 3A protocol; no threshold invented.
+G09,minimum_company_year_coverage,coverage,pending_user_approval,,pending_user_approval,Numeric minimum company-year coverage threshold,Threshold not defined in Part 3A; requires explicit user approval before application.
+G10,minimum_common_sample_coverage,coverage,pending_user_approval,,pending_user_approval,Numeric minimum common-sample coverage threshold,Threshold not defined in Part 3A; requires explicit user approval before application.
+G11,minimum_positive_event_count_per_fold,events,pending_user_approval,,pending_user_approval,Minimum positive-event count per proposed temporal fold,Threshold not defined in Part 3A; requires explicit user approval before application.
+G12,minimum_negative_event_count_per_fold,events,pending_user_approval,,pending_user_approval,Minimum negative-event count per proposed temporal fold,Threshold not defined in Part 3A; requires explicit user approval before application.
+G13,final_pilot_sample_size,sampling,pending_user_approval,,pending_user_approval,Final pilot sample size selection,Threshold not defined in Part 3A; requires explicit user approval before application.
+G14,final_pilot_sampling_allocation,sampling,pending_user_approval,,pending_user_approval,Final pilot class/temporal/ticker allocation,Threshold not defined in Part 3A; requires explicit user approval before application.

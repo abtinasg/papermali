@@ -78,6 +78,10 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part2_prediction_time_contract.py",
     "project/run_stage125_part2.py",
     "project/tests/test_stage125_part2_prediction_time_contract.py",
+    # Stage125 Part 3A code, runner, and tests.
+    "project/src/stage125_part3a_pilot_protocol.py",
+    "project/run_stage125_part3a.py",
+    "project/tests/test_stage125_part3a_pilot_protocol.py",
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
     # Do NOT broadly allowlist Stage122–Stage124 directories.
     "project/src/stage124_gate_b_execution.py",
@@ -143,8 +147,19 @@ ARTIFACT_ONLY_FILES = (
     "project/stage124/official_api/metadata_and_hashes.json",
     "project/stage125/metadata_and_hashes_stage125_part1.json",
     "project/stage125/metadata_and_hashes_stage125_part2.json",
+    "project/stage125/metadata_and_hashes_stage125_part3a.json",
     "project/stage125/stage125_part1_data_contract_qc_report.json",
     "project/stage125/stage125_part2_prediction_time_contract_qc_report.json",
+    "project/stage125/stage125_part3a_pilot_protocol_qc_report.json",
+    # Stage125 Part 3A generated protocol artifacts (runner output only).
+    "project/stage125/README_STAGE125_PART3A_PILOT_PROTOCOL.md",
+    "project/stage125/accessibility_scoring_rubric_stage125_part3a.json",
+    "project/stage125/part3_candidate_inventory_stage125.csv",
+    "project/stage125/part3_gate_decision_protocol_stage125.csv",
+    "project/stage125/part3_pilot_sampling_options_stage125.csv",
+    "project/stage125/part3_sampling_frame_by_target_year_stage125.csv",
+    "project/stage125/part3_sampling_frame_summary_stage125.json",
+    "project/stage125/part3_source_evidence_manifest_schema_stage125.json",
 )
 
 FROZEN_MANIFESTS = (
@@ -153,6 +168,7 @@ FROZEN_MANIFESTS = (
     "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
     "project/stage125/metadata_and_hashes_stage125_part1.json",
     "project/stage125/metadata_and_hashes_stage125_part2.json",
+    "project/stage125/metadata_and_hashes_stage125_part3a.json",
 )
 
 # Tracked files declared in a frozen manifest that are EXPLICITLY classified as

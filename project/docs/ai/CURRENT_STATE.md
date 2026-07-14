@@ -11,16 +11,16 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage125_research_design_readiness`
 - **Last completed research action:** `stage124-gate-b-execution`
 - **Next research action:** `stage125-research-design-readiness`
-- **Last stage commit:** `8d46e069af8f99244d6167583b4cccb1e718ed2c`
-- **Generated from commit:** `8d46e069af8f99244d6167583b4cccb1e718ed2c` (branch `stage125-post-pr25-pr26-handoff-refresh`, informational)
-- **Baseline:** `origin/main` @ `8d46e069af8f99244d6167583b4cccb1e718ed2c`
+- **Last stage commit:** `a5d7fd27955b9690bd2257211e467d485ec1ff3e`
+- **Generated from commit:** `7b338d838e62ed0fafce016a5452a449567eb217` (branch `stage125-part3a-pilot-protocol-lock`, informational)
+- **Baseline:** `origin/main` @ `c6cbb6b7a7dc4dfe7ca3fa6ea0bcf34d7f0612c0`
 
 ## QC
 
-- ✅ **21 assertions, 0 failed**, all_pass=True
-- Scope: `stage125_part2_prediction_time_contract`
-- Report: `project/stage125/stage125_part2_prediction_time_contract_qc_report.json`
-- QC source commit (code): `7b0d3dde532b5a37e3cfc77ea1457fe73aea2e08`
+- ✅ **30 assertions, 0 failed**, all_pass=True
+- Scope: `stage125_part3a_pilot_protocol`
+- Report: `project/stage125/stage125_part3a_pilot_protocol_qc_report.json`
+- QC source commit (code): `a5d7fd27955b9690bd2257211e467d485ec1ff3e`
 
 ## Workflow markers
 
@@ -32,5 +32,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `45af665f283e5030649b2ce924143b0feaf90d3ed27d0083923d01f75fd38bb8`_
-_generated_at_utc: 2026-07-14T18:50:28Z (informational)_
+_state_fingerprint: `023d161cc75d7d75a28412b9976be3cb6047e977ab3989569d0e202ee7dcd80d`_
+_generated_at_utc: 2026-07-14T20:22:16Z (informational)_
