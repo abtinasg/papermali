@@ -42,9 +42,6 @@ from datetime import datetime, timezone
 # Constants
 # --------------------------------------------------------------------------- #
 
-# Matches a research-workflow commit anywhere in the full commit body.
-STAGE_BODY_RE = re.compile(r"\bStage\d+\b", re.IGNORECASE)
-
 AUTO_FILES = (
     "project/docs/ai/handoff_state.json",
     "project/docs/ai/CURRENT_STATE.md",
@@ -295,27 +292,40 @@ def _is_artifact_only(files: list[str]) -> bool:
     return all(path_artifact_only(f) for f in files)
 
 
-def last_stage_commit(root: str) -> str:
-    """Latest reachable, non-Handoff-only, non-artifact-only commit whose full
-    body names a Stage/Part.
+def _is_stage_relevant(files: list[str]) -> bool:
+    """True iff at least one introduced file is REAL content — i.e. neither
+    Handoff-only infrastructure nor a curated generated artifact.
 
-    Merge commits are NOT skipped blindly: their introduced files (vs first
-    parent) are inspected; a merge that brings in only Handoff files, or only
-    generated-artifact files (QC report / metadata_and_hashes regeneration), is
-    skipped regardless of Stage/Part wording in its subject/body. The body of
-    every remaining candidate is matched against the Stage/Part pattern. A
-    mixed commit (source/test/human-research files alongside a generated
-    artifact) is NOT artifact-only, because _is_artifact_only requires EVERY
-    introduced file to be a generated artifact.
+    This is deliberately PATH-BASED / SEMANTIC, not wording-based: it does not
+    inspect the commit subject or body at all. A commit that changes
+    ``project/src/stage124_gate_b_execution.py`` and
+    ``project/tests/test_stage124_gate_b_execution.py`` is stage-relevant
+    whether its subject is ``fix(qc-scan): ...`` or ``Stage124: ...`` — the
+    message text is irrelevant to the classification.
+    """
+    return any(not path_handoff_only(f) and not path_artifact_only(f) for f in files)
+
+
+def last_stage_commit(root: str) -> str:
+    """Latest reachable commit that introduces real (non-Handoff-only,
+    non-artifact-only) content.
+
+    PATH-BASED / SEMANTIC, NOT message-wording-dependent: this walks commit
+    history from HEAD and returns the first (i.e. most recent) commit whose
+    introduced files (vs first parent; works for merges too) include at least
+    one file that is neither Handoff-only infrastructure nor a curated
+    generated artifact. A commit whose introduced files are ALL Handoff-only
+    is skipped; a commit whose introduced files are ALL curated generated
+    artifacts (QC report / metadata_and_hashes regeneration) is skipped; a
+    commit mixing real content with either of those (e.g. a source-code fix
+    committed alongside its regenerated QC artifact) still qualifies, because
+    only ONE introduced file needs to be real content.
     """
     for sha in _git(root, "rev-list", "HEAD").splitlines():
         files = _introduced_files(root, sha)
-        if _is_handoff_only(files) or _is_artifact_only(files):
-            continue
-        body = _git(root, "log", "-1", "--format=%B", sha)
-        if STAGE_BODY_RE.search(body):
+        if _is_stage_relevant(files):
             return sha
-    raise HandoffError("no qualifying Stage/Part commit found in history")
+    raise HandoffError("no qualifying stage-relevant commit found in history")
 
 
 def derive_repository(root: str) -> str | None:

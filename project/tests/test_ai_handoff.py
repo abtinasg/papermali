@@ -63,12 +63,30 @@ def test_state_matches_git():
     assert state["last_stage_commit"] == gen.last_stage_commit(REAL_ROOT)
 
 
-def test_real_repo_last_stage_commit_is_modeling_guardrail_fix():
-    # The Stage124 modeling-guardrail fix (src + test change) must be
-    # last_stage_commit — NOT one of the artifact-only regeneration commits
-    # that followed it, even though their messages also mention Stage124/125.
-    assert (gen.last_stage_commit(REAL_ROOT)
-            == "b60927012c2398240251c5920cc3648c013e55c2")
+def test_real_repo_last_stage_commit_is_a_real_content_commit():
+    # last_stage_commit is PATH-BASED / SEMANTIC: it must resolve to the most
+    # recent commit that introduces real (non-Handoff-only, non-artifact-only)
+    # content, regardless of that commit's message wording. This test does
+    # NOT hard-code a specific SHA (a hard-coded expectation here would itself
+    # be message-wording-adjacent and would need editing on every future real
+    # commit) — instead it independently recomputes the expectation via the
+    # same path-based rule and cross-checks it against the git history walk.
+    got = gen.last_stage_commit(REAL_ROOT)
+    files = gen._introduced_files(REAL_ROOT, got)
+    assert gen._is_stage_relevant(files), (
+        f"last_stage_commit {got} must introduce at least one real "
+        "(non-Handoff-only, non-artifact-only) file"
+    )
+    # Every commit strictly newer than `got` must NOT be stage-relevant,
+    # otherwise `got` would not be the LATEST qualifying commit.
+    newer = gen._git(REAL_ROOT, "rev-list", f"{got}..HEAD").splitlines()
+    for sha in newer:
+        newer_files = gen._introduced_files(REAL_ROOT, sha)
+        assert not gen._is_stage_relevant(newer_files), (
+            f"commit {sha} is newer than last_stage_commit {got} but is "
+            f"ALSO stage-relevant (files={newer_files}) — last_stage_commit "
+            "should have resolved to it instead"
+        )
 
 
 def test_qc_counts_match_report():
@@ -493,13 +511,16 @@ def test_stage125_part1_code_commit_advances_stage(synth):
     assert got != before
 
 
-def test_artifact_commit_without_stage_does_not_advance(synth):
-    # A non-handoff-only commit whose body lacks any Stage/Part marker must not
-    # become last_stage_commit.
+def test_real_content_commit_advances_regardless_of_missing_stage_wording(synth):
+    # PATH-BASED / SEMANTIC recognition: a commit that introduces a real
+    # (non-Handoff-only, non-artifact-only) file MUST advance last_stage_commit
+    # even when its message contains NO "Stage"/"Part" wording at all.
     before = gen.last_stage_commit(synth)
     _write(synth, "project/stage125/data_dictionary_stage125.csv", "col\n")
-    _commit(synth, "artifact: refresh generated data dictionary")
-    assert gen.last_stage_commit(synth) == before
+    sha = _commit(synth, "artifact: refresh generated data dictionary")
+    got = gen.last_stage_commit(synth)
+    assert got == sha
+    assert got != before
 
 
 # ---- BLOCKER 1: artifact-only classification must not depend on wording ---- #
@@ -520,9 +541,36 @@ def test_generated_artifact_only_commit_with_stage_wording_is_skipped(synth):
     assert got != sha
 
 
+def test_generated_artifact_only_commit_without_stage_wording_is_also_skipped(synth):
+    # The artifact-only classification must be equally wording-INDEPENDENT in
+    # the other direction: a purely generated artifact commit stays skipped
+    # even when its message has NO Stage/Part wording at all.
+    before = gen.last_stage_commit(synth)
+    _write(synth, "project/stage125/metadata_and_hashes_stage125_part2.json",
+           json.dumps({"stage": "stage125_part2", "output_files_sha256": {}}))
+    sha = _commit(synth, "chore: bump generated hash manifest")
+    got = gen.last_stage_commit(synth)
+    assert got == before
+    assert got != sha
+
+
+# ---- BLOCKER A: last_stage_commit must be PATH-BASED, not wording-based --- #
+
+def test_code_and_test_commit_advances_with_no_stage_wording_in_message(synth):
+    # Requirement: a commit changing real source + test files must be
+    # recognised as stage-relevant even when its message is a plain
+    # conventional-commit subject with NO "Stage"/"Part" anywhere.
+    _write(synth, "project/src/stage124_gate_b_execution.py", "GUARDRAIL = 1\n")
+    _write(synth, "project/tests/test_stage124_gate_b_execution.py",
+           "def test_guardrail():\n    assert True\n")
+    sha = _commit(synth, "fix(qc-scan): recursive nested-artifact detection")
+    assert gen.last_stage_commit(synth) == sha
+
+
 def test_stage124_code_test_commit_advances_last_stage_commit(synth):
-    # A real Stage124 code/test change (not handoff-only, not artifact-only)
-    # must advance last_stage_commit.
+    # The same real code/test change also advances last_stage_commit when its
+    # message DOES happen to mention "Stage124" — wording must be irrelevant
+    # either way.
     _write(synth, "project/src/stage124_gate_b_execution.py", "GUARDRAIL = 1\n")
     _write(synth, "project/tests/test_stage124_gate_b_execution.py",
            "def test_guardrail():\n    assert True\n")
@@ -533,27 +581,54 @@ def test_stage124_code_test_commit_advances_last_stage_commit(synth):
     assert gen.last_stage_commit(synth) == sha
 
 
-def test_mixed_source_and_artifact_commit_advances(synth):
+@pytest.mark.parametrize("subject", [
+    "fix(stage124): guardrail fix plus regenerated QC artifact (Stage124 Part)",
+    "fix(qc-scan): guardrail fix plus regenerated QC artifact",
+])
+def test_mixed_source_and_artifact_commit_advances(synth, subject):
     # A commit that introduces BOTH a real code file AND a generated artifact
     # file must NOT be misclassified as artifact-only; it must still advance
-    # last_stage_commit.
+    # last_stage_commit — regardless of whether the message mentions
+    # "Stage"/"Part" or not.
     _write(synth, "project/src/stage124_gate_b_execution.py", "GUARDRAIL = 2\n")
     _write(synth, "project/stage124/stage124_batch02_gate_b_qc_report.json",
            json.dumps({"stage": "stage124_gate_b_execution"}))
-    sha = _commit(
-        synth,
-        "fix(stage124): guardrail fix plus regenerated QC artifact (Stage124 Part)",
-    )
+    sha = _commit(synth, subject)
     assert gen.last_stage_commit(synth) == sha
 
 
-def test_handoff_only_commits_remain_skipped_alongside_artifact_only(synth):
-    # Handoff-only classification must keep working even after the
-    # artifact-only classification is added (both are independently checked).
+@pytest.mark.parametrize("subject", [
+    "handoff: Stage125 Part 2 open-tasks tweak",
+    "handoff: tweak open tasks",
+])
+def test_handoff_only_commits_remain_skipped_alongside_artifact_only(synth, subject):
+    # Handoff-only classification must keep working regardless of message
+    # wording, both after the artifact-only classification was added and
+    # after last_stage_commit became fully path-based.
     before = gen.last_stage_commit(synth)
-    _write(synth, "project/docs/ai/OPEN_TASKS.md", "Stage125 Part 2 note tweak\n")
-    _commit(synth, "handoff: Stage125 Part 2 open-tasks tweak")
+    _write(synth, "project/docs/ai/OPEN_TASKS.md", "note tweak\n")
+    _commit(synth, subject)
     assert gen.last_stage_commit(synth) == before
+
+
+def test_is_stage_relevant_unit():
+    # Direct unit coverage of the classification primitive itself.
+    assert gen._is_stage_relevant(["project/src/stage124_gate_b_execution.py"]) is True
+    assert gen._is_stage_relevant(
+        ["project/tests/test_stage124_gate_b_execution.py"]) is True
+    assert gen._is_stage_relevant(["project/docs/ai/OPEN_TASKS.md"]) is False
+    assert gen._is_stage_relevant(
+        ["project/stage124/stage124_batch02_gate_b_qc_report.json"]) is False
+    assert gen._is_stage_relevant([]) is False
+    # Mixed: one real file is enough to qualify.
+    assert gen._is_stage_relevant([
+        "project/docs/ai/OPEN_TASKS.md",
+        "project/src/stage124_gate_b_execution.py",
+    ]) is True
+    assert gen._is_stage_relevant([
+        "project/docs/ai/OPEN_TASKS.md",
+        "project/stage124/stage124_batch02_gate_b_qc_report.json",
+    ]) is False
 
 
 def test_change_allowlist_blocks_non_handoff(synth):
