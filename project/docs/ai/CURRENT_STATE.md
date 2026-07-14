@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage125_research_design_readiness`
 - **Last completed research action:** `stage124-gate-b-execution`
 - **Next research action:** `stage125-research-design-readiness`
-- **Last stage commit:** `77d0294d54b5aa6f45ec7269fab82788e200e147`
-- **Generated from commit:** `36aece430db023491f909f882308417b89a6c5a6` (branch `stage125-post-merge-modeling-guardrail-fix`, informational)
-- **Baseline:** `origin/main` @ `eaa313deb7aeca607ddb8bb4b02b539206836431`
+- **Last stage commit:** `8d46e069af8f99244d6167583b4cccb1e718ed2c`
+- **Generated from commit:** `8d46e069af8f99244d6167583b4cccb1e718ed2c` (branch `stage125-post-pr25-pr26-handoff-refresh`, informational)
+- **Baseline:** `origin/main` @ `8d46e069af8f99244d6167583b4cccb1e718ed2c`
 
 ## QC
 
@@ -32,5 +32,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `8e5d0bb77b410ebfd8991de5f14df054945836e35c3fdeb791a17808fe3ac472`_
-_generated_at_utc: 2026-07-14T15:27:37Z (informational)_
+_state_fingerprint: `45af665f283e5030649b2ce924143b0feaf90d3ed27d0083923d01f75fd38bb8`_
+_generated_at_utc: 2026-07-14T18:50:28Z (informational)_
