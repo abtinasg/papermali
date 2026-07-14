@@ -3,6 +3,8 @@
 Pure-function tests use small synthetic frames; a few integration tests read the
 Stage123 outputs produced by run_stage123.py (the session fixture builds them once).
 """
+import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -27,21 +29,37 @@ _TRACKED_FILES = (
 def built():
     cfg = utils.load_config()
     _backups = {p: p.read_bytes() if p.is_file() else None for p in _TRACKED_FILES}
-    res = s123.build_full(cfg)
-    out = res["out"]
-    yield {
-        "cfg": cfg, "out": out, "qc": res["qc"],
-        "mar": pd.read_csv(out / "modeling_all_rows_stage123.csv", dtype=str,
-                           encoding="utf-8-sig", keep_default_na=False),
-        "pairs": pd.read_csv(out / "modeling_one_year_ahead_stage123.csv", dtype=str,
-                             encoding="utf-8-sig", keep_default_na=False),
-        "ea": pd.read_csv(out / "eligibility_audit_stage123.csv", dtype=str,
-                          encoding="utf-8-sig", keep_default_na=False),
-        "raw": s122.load_all_rows(cfg),
-    }
-    for p, data in _backups.items():
-        if data is not None:
-            p.write_bytes(data)
+    try:
+        res = s123.build_full(cfg)
+        out = res["out"]
+        data = {
+            "cfg": cfg, "out": out, "qc": res["qc"],
+            "mar": pd.read_csv(out / "modeling_all_rows_stage123.csv", dtype=str,
+                               encoding="utf-8-sig", keep_default_na=False),
+            "pairs": pd.read_csv(out / "modeling_one_year_ahead_stage123.csv", dtype=str,
+                                 encoding="utf-8-sig", keep_default_na=False),
+            "ea": pd.read_csv(out / "eligibility_audit_stage123.csv", dtype=str,
+                              encoding="utf-8-sig", keep_default_na=False),
+            "corr": pd.read_csv(out / "statement_scope_correction_audit_stage123.csv",
+                                dtype=str, keep_default_na=False),
+            "raw": s122.load_all_rows(cfg),
+        }
+    finally:
+        # Restore the tracked files IMMEDIATELY here (setup-time, via
+        # try/finally) rather than deferring to session teardown (the old
+        # code restored only after the LAST test using `built` returned).
+        # Session-scoped fixtures live for the whole pytest process, so a
+        # deferred restore left these tracked files mutated on disk for the
+        # entire session — observable by any OTHER test module that reads
+        # them fresh in the meantime (e.g. Stage125 Part 2's
+        # frozen_asset_hashes(), which snapshots this file's actual on-disk
+        # SHA-256). Everything the tests below need is already captured in
+        # `data` above (read from disk before this restore runs), so no test
+        # depends on the mutated, not-yet-restored content.
+        for p, backup in _backups.items():
+            if backup is not None:
+                p.write_bytes(backup)
+    yield data
 
 
 def _s(vals):
@@ -118,8 +136,11 @@ def test_statement_scope_user_confirmation(built):
     mar = built["mar"]
     # no consolidated/unknown remains in the analytical canonical status
     assert int(mar["statement_scope_status"].isin(s123.CONSOLIDATED_SCOPES).sum()) == 0
-    corr = pd.read_csv(built["out"] / "statement_scope_correction_audit_stage123.csv",
-                       dtype=str, keep_default_na=False)
+    # Read from the in-memory snapshot (captured before the tracked-file
+    # restore), NOT re-read from disk — by the time this test runs, the
+    # tracked audit CSV on disk has already been restored to its committed
+    # content (see the `built` fixture).
+    corr = built["corr"]
     assert (corr["corrected_statement_scope"] == s123.CORRECTED_SCOPE).all()
 
 
@@ -179,3 +200,76 @@ def test_align_rowkey_mismatch_fails():
     base_dup = pd.DataFrame({"row_key": ["a", "a", "b"]})
     with pytest.raises(s123.QCFail):
         s123.align_base_to_raw(raw, base_dup)
+
+
+# ---- Stage123 timestamp determinism + pytest session-isolation fix ------ #
+#
+# Regression coverage for a real bug: `built`'s tracked-file restore was
+# deferred to session teardown, so any OTHER test module running later in the
+# SAME pytest session (e.g. Stage125 Part 2's frozen-asset snapshot) could
+# observe `statement_scope_correction_audit_stage123.csv` mid-rebuild, with a
+# wall-clock `timestamp` value that never matched the committed content. Fixed
+# by (a) anchoring the timestamp to the last commit touching Stage123's own
+# code instead of wall-clock time, and (b) restoring the tracked files
+# immediately (try/finally) rather than deferring to session teardown.
+
+def test_deterministic_timestamp_stable_within_same_commit():
+    # Core determinism guarantee: two calls with no intervening commit must
+    # agree, unlike time.strftime(...)/datetime.now(), which never would.
+    ts1 = s123._deterministic_timestamp()
+    ts2 = s123._deterministic_timestamp()
+    assert ts1 == ts2
+    assert ts1 != ""
+
+
+def test_build_full_is_deterministic_across_repeated_runs():
+    # Two consecutive build_full() calls at the SAME commit must produce a
+    # byte-identical statement_scope_correction_audit_stage123.csv and an
+    # identical metadata `datetime` field. This is the actual regression
+    # test for the bug: before the fix, `timestamp`/`datetime` were
+    # wall-clock-based and differed on every call, so this assertion would
+    # have failed.
+    cfg = utils.load_config()
+    corr_path = ROOT / "stage123" / "statement_scope_correction_audit_stage123.csv"
+    meta_path = ROOT / "stage123" / "metadata_and_hashes_stage123.json"
+    backups = {p: p.read_bytes() if p.is_file() else None
+              for p in (corr_path, meta_path)}
+    try:
+        s123.build_full(cfg)
+        first_corr = corr_path.read_bytes()
+        first_datetime = json.loads(meta_path.read_text(encoding="utf-8"))["datetime"]
+
+        s123.build_full(cfg)
+        second_corr = corr_path.read_bytes()
+        second_datetime = json.loads(meta_path.read_text(encoding="utf-8"))["datetime"]
+
+        assert first_corr == second_corr, (
+            "statement_scope_correction_audit_stage123.csv must be "
+            "byte-identical across repeated build_full() runs at the same "
+            "commit (only non-deterministic before this fix)"
+        )
+        assert first_datetime == second_datetime
+    finally:
+        for p, data in backups.items():
+            if data is not None:
+                p.write_bytes(data)
+
+
+def test_tracked_files_restored_immediately_after_build(built):
+    # Proves the restore is NOT deferred to session teardown: by the time
+    # this test runs, `built`'s setup has already completed, and the pytest
+    # session is still very much in progress (teardown has not happened) —
+    # both tracked files on disk must already match the committed HEAD
+    # content byte-for-byte. Before the fix, this would only become true
+    # after the LAST test using `built` finished (i.e. at session end),
+    # meaning any OTHER test module reading these files fresh in between
+    # would see the freshly-rebuilt (not-yet-restored) content.
+    for p in _TRACKED_FILES:
+        rel = p.relative_to(ROOT.parent).as_posix()
+        committed = subprocess.run(
+            ["git", "show", f"HEAD:{rel}"], cwd=str(ROOT.parent),
+            capture_output=True, check=True).stdout
+        assert p.read_bytes() == committed, (
+            f"{rel} was not restored to its committed content immediately "
+            "after the `built` fixture ran"
+        )
