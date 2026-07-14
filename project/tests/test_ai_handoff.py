@@ -144,6 +144,11 @@ def test_change_allowlist_real_repo():
     ("project/tests/test_stage125_part2_prediction_time_contract.py", True),
     ("project/stage125/prediction_time_contract_stage125_part2.json", True),
     ("project/stage125/metadata_and_hashes_stage125_part2.json", True),
+    # Stage124 modeling-guardrail fix — narrowest exact-file allowance
+    ("project/src/stage124_gate_b_execution.py", True),
+    ("project/tests/test_stage124_gate_b_execution.py", True),
+    ("project/stage124/stage124_batch02_gate_b_qc_report.json", True),
+    ("project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json", True),
     # prefix attacks must be rejected
     ("AGENTS.md.evil", False),
     ("project/scripts/update_ai_handoff.py.bak", False),
@@ -160,6 +165,14 @@ def test_change_allowlist_real_repo():
     ("project/tests/test_stage125_part2_data_contract.py", False),
     ("project/src/stage125_part2_prediction_time_contract.py.bak", False),
     ("project/run_stage125_part2.py.evil", False),
+    # Stage124 similar-but-unauthorized paths must be rejected
+    ("project/src/stage124_gate_b_execution.py.bak", False),
+    ("project/tests/test_stage124_gate_b_execution.py.evil", False),
+    ("project/stage124/stage124_batch02_gate_b_qc_report.json.bak", False),
+    ("project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json.bak", False),
+    ("project/stage124/other_file.json", False),
+    ("project/src/stage124_gate_b_readiness.py", False),
+    ("project/stage124/gate_b_final/modeling_main_rule_a_eligible.csv", False),
 ])
 def test_allowlist_prefix_attack(path, ok):
     assert gen.path_allowlisted(path) is ok

@@ -81,6 +81,12 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part2_prediction_time_contract.py",
     "project/run_stage125_part2.py",
     "project/tests/test_stage125_part2_prediction_time_contract.py",
+    # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
+    # Do NOT broadly allowlist Stage122–Stage124 directories.
+    "project/src/stage124_gate_b_execution.py",
+    "project/tests/test_stage124_gate_b_execution.py",
+    "project/stage124/stage124_batch02_gate_b_qc_report.json",
+    "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
     "AGENTS.md",
     "CLAUDE.md",
 )
