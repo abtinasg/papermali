@@ -5,6 +5,16 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 
 ## 2026-07-15
 
+- **Stage125 Part 3A.1 blocker fixes (PR #30, additive).** Industry accounting
+  corrected: 10 known industries, 53 industry-present pairs, 27 industry-missing
+  pairs; unknown sentinel `نامشخص در فایل ارسالی` is not a known industry.
+  Handoff generator now propagates `part3a_protocol_locked`,
+  `part3a_decision_locked`, and `part3b_started` from the selected QC scope
+  (fail-closed). ROADMAP pointers:
+  `last_completed_research_action_id=stage125-part3a-decision-lock`,
+  `next_research_action_id=stage125-part3b-evidence-capture` (pointer only; Part
+  3B not started).
+
 - **Stage125 Part 3A.1 — User-Approved Pilot Decision Lock.** Authorized and
   active as a decision-record task tracked by
   `active_maintenance_task_id = stage125-part3a1-decision-lock`

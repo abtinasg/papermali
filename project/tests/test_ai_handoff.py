@@ -861,3 +861,60 @@ def test_stage125_part3a1_mixed_code_and_artifact_commit_advances(synth):
     got = gen.last_stage_commit(synth)
     assert got == sha
     assert got != before
+
+
+# ---- Part 3A.1 handoff workflow markers (Blocker 1) ------------------------ #
+
+def test_extract_qc_workflow_markers_decision_lock_scope():
+    qc = {
+        "stage": "stage125_part3a_decision_lock",
+        "part3a_protocol_locked": True,
+        "part3a_decision_locked": True,
+        "part3b_started": False,
+    }
+    got = gen.extract_qc_workflow_markers(qc)
+    assert got == {
+        "part3a_protocol_locked": True,
+        "part3a_decision_locked": True,
+        "part3b_started": False,
+    }
+
+
+def test_extract_qc_workflow_markers_part3a_scope_without_decision_lock():
+    qc = {
+        "stage": "stage125_part3a_pilot_protocol",
+        "part3a_protocol_locked": True,
+        "part3b_started": False,
+    }
+    got = gen.extract_qc_workflow_markers(qc)
+    assert got == {
+        "part3a_protocol_locked": True,
+        "part3b_started": False,
+    }
+    assert "part3a_decision_locked" not in got
+
+
+def test_extract_qc_workflow_markers_fail_closed_when_field_missing():
+    qc = {
+        "stage": "stage125_part3a_decision_lock",
+        "part3a_protocol_locked": True,
+        "part3b_started": False,
+    }
+    with pytest.raises(gen.HandoffError, match="part3a_decision_locked"):
+        gen.extract_qc_workflow_markers(qc)
+
+
+@pytest.mark.skipif(
+    not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
+    reason="real-repo test requires git checkout",
+)
+def test_real_repo_handoff_part3a1_workflow_markers():
+    state = _state(REAL_ROOT)
+    assert state["current_stage"] == "Stage125"
+    assert state["selected_qc_scope"] == "stage125_part3a_decision_lock"
+    assert state["last_completed_micro_part"] == "stage125-part3a-decision-lock"
+    assert state["next_research_action_id"] == "stage125-part3b-evidence-capture"
+    assert state["part3a_protocol_locked"] is True
+    assert state["part3a_decision_locked"] is True
+    assert state["part3b_started"] is False
+    assert state["modeling_started"] is False

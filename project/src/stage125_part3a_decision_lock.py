@@ -45,7 +45,11 @@ APPROVED_POSITIVE = 39
 APPROVED_NEGATIVE = 41
 APPROVED_UNKNOWN = 0
 APPROVED_UNIQUE_TICKERS = 26
-APPROVED_UNIQUE_INDUSTRIES = 11
+INDUSTRY_UNKNOWN_SENTINEL = "نامشخص در فایل ارسالی"
+APPROVED_UNIQUE_KNOWN_INDUSTRIES = 10
+APPROVED_INDUSTRY_PRESENT_PAIRS = 53
+APPROVED_INDUSTRY_MISSING_PAIRS = 27
+LEGACY_NONEMPTY_INDUSTRY_LABEL_COUNT = 11
 
 PILOT_MAX_POS_PER_YEAR = 4
 PILOT_PER_YEAR_QUOTA = 8
@@ -76,13 +80,57 @@ _GATE_THRESHOLDS_HEADER = [
 _SELECTED_PAIRS_HEADER = [
     "selection_rank", "option_id", "predictor_row_key_t",
     "target_row_key_t_plus_1", "ticker", "fiscal_year_t", "target_year",
-    "class_label", "industry", "rule_a_eligible", "selection_method",
+    "class_label", "industry", "industry_present", "industry_missing_reason",
+    "rule_a_eligible", "selection_method",
     "post_evidence_substitution_allowed", "selection_status",
 ]
 
 
 class QCFail(RuntimeError):
     """Fail-closed error for Stage125 Part 3A.1."""
+
+
+def is_industry_missing(industry: str) -> bool:
+    """Industry is missing when blank/whitespace or the unknown sentinel."""
+    value = str(industry or "").strip()
+    return not value or value == INDUSTRY_UNKNOWN_SENTINEL
+
+
+def industry_missing_reason(industry: str) -> str:
+    """Return a fail-closed missing-reason token, or empty when present."""
+    value = str(industry or "").strip()
+    if not value:
+        return "blank_or_whitespace"
+    if value == INDUSTRY_UNKNOWN_SENTINEL:
+        return "unknown_sentinel"
+    return ""
+
+
+def classify_industry(industry: str) -> tuple[bool, str]:
+    """Return (industry_present, industry_missing_reason)."""
+    if is_industry_missing(industry):
+        return False, industry_missing_reason(industry)
+    return True, ""
+
+
+def summarize_industry_counts(industries: list[str]) -> dict:
+    """Aggregate industry accounting for the locked pilot selection."""
+    present_pairs = sum(1 for ind in industries if not is_industry_missing(ind))
+    missing_pairs = len(industries) - present_pairs
+    known = sorted({
+        str(ind).strip() for ind in industries if not is_industry_missing(ind)
+    })
+    nonempty_labels = sorted({
+        str(ind).strip() for ind in industries if str(ind or "").strip()
+    })
+    return {
+        "unique_known_industries": len(known),
+        "unique_nonempty_industry_labels": len(nonempty_labels),
+        "legacy_nonempty_industry_label_count": len(nonempty_labels),
+        "industry_present_pairs": present_pairs,
+        "industry_missing_pairs": missing_pairs,
+        "known_industries": known,
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -366,7 +414,12 @@ def build_gate_threshold_rows() -> list[dict]:
                 "Deterministic without-replacement selection from Rule A "
                 "eligible pool by frozen identifiers before evidence; "
                 "positive=39 negative=41 unknown=0; allocation_by_target_year "
-                "as locked; unique_tickers=26 unique_industries=11; "
+                "as locked; unique_tickers=26 "
+                f"unique_known_industries={APPROVED_UNIQUE_KNOWN_INDUSTRIES} "
+                f"industry_present_pairs={APPROVED_INDUSTRY_PRESENT_PAIRS} "
+                f"industry_missing_pairs={APPROVED_INDUSTRY_MISSING_PAIRS} "
+                f"legacy_nonempty_industry_label_count="
+                f"{LEGACY_NONEMPTY_INDUSTRY_LABEL_COUNT}; "
                 "no post-evidence substitution."
             ),
             "pass_criterion": (
@@ -404,6 +457,7 @@ def build_selected_pilot_pairs_rows(
     for rank, s in enumerate(selected, start=1):
         pred_key = s["predictor_row_key_t"]
         pair_row = pair_lookup.loc[pred_key]
+        present, missing_reason = classify_industry(s["industry"])
         rows.append({
             "selection_rank": rank,
             "option_id": APPROVED_PILOT_OPTION,
@@ -414,6 +468,8 @@ def build_selected_pilot_pairs_rows(
             "target_year": s["target_year"],
             "class_label": s["class"],
             "industry": s["industry"],
+            "industry_present": "true" if present else "false",
+            "industry_missing_reason": missing_reason,
             "rule_a_eligible": "1",
             "selection_method": (
                 "deterministic_without_replacement_rule_a_eligible_"
@@ -432,9 +488,8 @@ def build_pilot_selection_record(
     neg = sum(1 for s in selected if s["class"] == "negative")
     unk = sum(1 for s in selected if s["class"] == "unknown")
     tickers = sorted({s["ticker"] for s in selected})
-    industries = sorted({
-        s["industry"] for s in selected if str(s["industry"]).strip()
-    })
+    industries = [s["industry"] for s in selected]
+    industry_summary = summarize_industry_counts(industries)
     return {
         "selected_option": APPROVED_PILOT_OPTION,
         "not_selected_options": list(NOT_SELECTED_OPTIONS),
@@ -448,9 +503,17 @@ def build_pilot_selection_record(
         "sampling_purpose": "event_enriched_accessibility_coverage_pilot",
         "status": "approved_for_part3b_pilot",
         "unique_tickers": len(tickers),
-        "unique_industries": len(industries),
+        "unique_known_industries": industry_summary["unique_known_industries"],
+        "unique_nonempty_industry_labels": (
+            industry_summary["unique_nonempty_industry_labels"]
+        ),
+        "legacy_nonempty_industry_label_count": (
+            industry_summary["legacy_nonempty_industry_label_count"]
+        ),
+        "industry_present_pairs": industry_summary["industry_present_pairs"],
+        "industry_missing_pairs": industry_summary["industry_missing_pairs"],
         "tickers": tickers,
-        "industries": industries,
+        "known_industries": industry_summary["known_industries"],
         "allocation_by_target_year": year_allocation,
         "selection_method": (
             "deterministic without replacement from Rule A eligible pool; "
@@ -545,7 +608,14 @@ def build_readme(pilot_selection: dict) -> str:
         "### Allocation by target year\n\n"
         f"{alloc_block}\n\n"
         f"- Unique tickers: {APPROVED_UNIQUE_TICKERS}\n"
-        f"- Unique industries: {APPROVED_UNIQUE_INDUSTRIES}\n\n"
+        f"- Unique known industries: {APPROVED_UNIQUE_KNOWN_INDUSTRIES}\n"
+        f"- Industry present pairs: {APPROVED_INDUSTRY_PRESENT_PAIRS}\n"
+        f"- Industry missing pairs: {APPROVED_INDUSTRY_MISSING_PAIRS}\n"
+        f"- Legacy nonempty industry label count "
+        f"(includes unknown sentinel): "
+        f"{LEGACY_NONEMPTY_INDUSTRY_LABEL_COUNT}\n"
+        "- Unknown sentinel `نامشخص در فایل ارسالی` is **not** a known "
+        "industry.\n\n"
         "## Approved G09–G14 thresholds\n\n"
         "Pilot-only coverage/event thresholds (not final modeling thresholds). "
         "See `part3a_approved_gate_thresholds_stage125.csv`.\n\n"
@@ -645,13 +715,39 @@ def build_qc_assertions(
     add("year_allocation_locked", alloc_ok, alloc_detail)
 
     tickers = {r["ticker"] for r in selected_rows}
-    industries = {
-        r["industry"] for r in selected_rows if str(r["industry"]).strip()
-    }
-    add("ticker_industry_diversity_locked",
-        len(tickers) == APPROVED_UNIQUE_TICKERS
-        and len(industries) == APPROVED_UNIQUE_INDUSTRIES,
-        f"tickers={len(tickers)} industries={len(industries)}")
+    industry_values = [r["industry"] for r in selected_rows]
+    industry_summary = summarize_industry_counts(industry_values)
+    add("ticker_diversity_locked",
+        len(tickers) == APPROVED_UNIQUE_TICKERS,
+        f"tickers={len(tickers)}")
+    add("industry_accounting_locked",
+        industry_summary["unique_known_industries"] == APPROVED_UNIQUE_KNOWN_INDUSTRIES
+        and industry_summary["industry_present_pairs"] == APPROVED_INDUSTRY_PRESENT_PAIRS
+        and industry_summary["industry_missing_pairs"] == APPROVED_INDUSTRY_MISSING_PAIRS
+        and industry_summary["legacy_nonempty_industry_label_count"]
+        == LEGACY_NONEMPTY_INDUSTRY_LABEL_COUNT,
+        (
+            f"known={industry_summary['unique_known_industries']} "
+            f"present_pairs={industry_summary['industry_present_pairs']} "
+            f"missing_pairs={industry_summary['industry_missing_pairs']} "
+            f"legacy_nonempty={industry_summary['legacy_nonempty_industry_label_count']}"
+        ))
+    add("industry_present_columns_fail_closed",
+        all("industry_present" in r and "industry_missing_reason" in r
+            for r in selected_rows)
+        and all(
+            (r["industry_present"] == "true") == (r["industry_missing_reason"] == "")
+            for r in selected_rows
+        )
+        and all(
+            r["industry_present"] == "false"
+            if is_industry_missing(r["industry"]) else r["industry_present"] == "true"
+            for r in selected_rows
+        ),
+        "industry_present/industry_missing_reason consistent for all pairs")
+    add("unknown_sentinel_not_known_industry",
+        INDUSTRY_UNKNOWN_SENTINEL not in industry_summary["known_industries"],
+        "unknown sentinel excluded from known industries")
 
     add("no_post_evidence_substitution",
         all(r["post_evidence_substitution_allowed"] == "false"

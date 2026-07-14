@@ -108,9 +108,11 @@ def test_pilot_selection_eighty_pairs():
     assert sum(1 for s in selected if s["class"] == "negative") == 41
     assert sum(1 for s in selected if s["class"] == "unknown") == 0
     assert len({s["ticker"] for s in selected}) == 26
-    assert len({
-        s["industry"] for s in selected if str(s["industry"]).strip()
-    }) == 11
+    summary = lock.summarize_industry_counts([s["industry"] for s in selected])
+    assert summary["unique_known_industries"] == 10
+    assert summary["industry_present_pairs"] == 53
+    assert summary["industry_missing_pairs"] == 27
+    assert summary["legacy_nonempty_industry_label_count"] == 11
     for ty, expected in lock.EXPECTED_YEAR_ALLOCATION.items():
         assert ya[ty] == expected
 
@@ -210,6 +212,41 @@ def test_selected_pairs_csv_structure():
     assert len(rows) == 80
     assert all(r["post_evidence_substitution_allowed"] == "false" for r in rows)
     assert all(r["option_id"] == "pilot_option_event_enriched" for r in rows)
+    assert "industry_present" in rows[0]
+    assert "industry_missing_reason" in rows[0]
+    summary = lock.summarize_industry_counts([r["industry"] for r in rows])
+    assert summary["unique_known_industries"] == 10
+    assert summary["industry_present_pairs"] == 53
+    assert summary["industry_missing_pairs"] == 27
+
+
+def test_industry_blank_and_unknown_sentinel_never_known():
+    assert lock.is_industry_missing("") is True
+    assert lock.is_industry_missing("   ") is True
+    assert lock.is_industry_missing(lock.INDUSTRY_UNKNOWN_SENTINEL) is True
+    assert lock.industry_missing_reason("") == "blank_or_whitespace"
+    assert lock.industry_missing_reason(
+        lock.INDUSTRY_UNKNOWN_SENTINEL,
+    ) == "unknown_sentinel"
+    summary = lock.summarize_industry_counts([
+        "", "  ", lock.INDUSTRY_UNKNOWN_SENTINEL, "خودرو و ساخت قطعات",
+    ])
+    assert summary["unique_known_industries"] == 1
+    assert summary["industry_present_pairs"] == 1
+    assert summary["industry_missing_pairs"] == 3
+    assert lock.INDUSTRY_UNKNOWN_SENTINEL not in summary["known_industries"]
+
+
+def test_pilot_selection_industry_json_fields():
+    df_all, df_pairs, _, _ = part3a.load_inputs(ALL_ROWS_PATH, PAIRS_PATH)
+    selected, ya = lock.select_approved_pilot_pairs(df_all, df_pairs)
+    record = lock.build_pilot_selection_record(selected, ya)
+    assert record["unique_known_industries"] == 10
+    assert record["industry_present_pairs"] == 53
+    assert record["industry_missing_pairs"] == 27
+    assert record["legacy_nonempty_industry_label_count"] == 11
+    assert "unique_industries" not in record
+    assert lock.INDUSTRY_UNKNOWN_SENTINEL not in record["known_industries"]
 
 
 def test_runner_check_mode():
