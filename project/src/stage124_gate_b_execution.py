@@ -731,7 +731,10 @@ def _qc_assertions(stats: dict, schema_report: dict,
     for scan_dir in artifact_scan_dirs:
         if not scan_dir.is_dir():
             continue
-        for f in scan_dir.iterdir():
+        # Recursive (rglob) so a nested file such as
+        # project/stage125/models/model.joblib is not missed — iterdir() only
+        # sees the top level of scan_dir and would silently skip subdirectories.
+        for f in scan_dir.rglob("*"):
             if not f.is_file():
                 continue
             low = f.name.lower()
