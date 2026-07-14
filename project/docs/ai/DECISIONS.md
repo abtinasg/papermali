@@ -99,7 +99,7 @@ The research contract for the paper is frozen in
   test requires an explicit research decision and a new version of that contract.
 - **Stage122–Stage124 files are not rewritten or redefined during Stage125.**
 
-## Stage125 Part 0 / Part 1 status (2026-07-13)
+## Stage125 Part 0 / Part 1 / Part 2 status (2026-07-14)
 
 - **Part 0 (Research Design Decision Lock) is CLOSED.** PR #21 is **MERGED**;
   `main` contains merge commit `d39e770ff49729a2f0b1b0262c0b1aa5ae41b0c4`.
@@ -122,8 +122,22 @@ The research contract for the paper is frozen in
 - Part 1 audits the M1 provenance gap **read-only** and fills **nothing**. Empty
   `source_url` (1316 rows) is recorded as a provenance gap only and never changes
   eligibility or drops a row.
-- **Part 2 has NOT started. `modeling_started` remains `false`. No network
-  extraction was performed.** Modeling begins only when Stage126 is approved.
+- **Part 2 (Prediction-time & Leakage Contract) is authorized and executed
+  (in review).** It is a contract / read-only-audit task tracked as
+  `active_maintenance_task_id = stage125-part2-prediction-time-contract`; it
+  advances **no** research action.
+- Part 2 defines, in `project/stage125/`: the prediction-time contract (cutoff
+  based on verified `available_at`; revision policy; deterministic tie-breaking);
+  the feature availability contract (M1–M4 temporal gating rules; no target-year
+  features); the leakage checklist (8 machine-testable, fail-closed checks LC01–LC08);
+  per-pair cutoff/feature/leakage audit CSVs preserving all 1200 pairs; and a
+  cutoff summary. Missing `fiscal_year_end` (4 predictor, 4 target; 5 pairs with
+  either missing, 3 with both missing) is never filled or guessed — those pairs
+  have `temporal_status=unresolvable`. `eligibility_impact=none_contract_audit_only`
+  for every pair. No pair is dropped.
+- **`modeling_started` remains `false`. `part2_started` is `true` (contract only,
+  not modeling). No network extraction was performed.** Modeling begins only when
+  Stage126 is approved.
 
 ## Ranking & evidence (Stage124 Batch02)
 

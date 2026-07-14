@@ -54,6 +54,10 @@ See [`DECISIONS.md`](DECISIONS.md).
   `run_stage125_part1.py`, `tests/test_stage125_part1_data_contract.py`,
   `stage125/stage125_part1_data_contract_qc_report.json` (contracts + read-only
   M1 provenance-gap audit; no modeling, no extraction)
+- Stage125 Part 2 prediction-time-contract source/test/QC: `src/stage125_part2_prediction_time_contract.py`,
+  `run_stage125_part2.py`, `tests/test_stage125_part2_prediction_time_contract.py`,
+  `stage125/stage125_part2_prediction_time_contract_qc_report.json` (prediction-time
+  & leakage contract; per-pair cutoff/feature/leakage audit; no modeling, no extraction)
 
 ## 7. Done
 
