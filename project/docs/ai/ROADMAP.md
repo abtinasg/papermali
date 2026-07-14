@@ -1,7 +1,7 @@
 ---
 roadmap_version: 1
 active_research_workstream_id: stage125-research-design-readiness
-qc_scope: stage125-part3a-pilot-protocol-lock
+qc_scope: stage125-part3a-pilot-protocol
 last_completed_research_action_id: stage124-gate-b-execution
 next_research_action_id: stage125-research-design-readiness
 active_maintenance_task_id: stage125-part3a-pilot-protocol-lock
