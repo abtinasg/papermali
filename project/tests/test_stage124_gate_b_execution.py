@@ -379,8 +379,7 @@ def test_rule_c_absent_in_canonical_files():
 def test_no_modeling_artifacts():
     """No modeling artifacts or paths may exist in Gate B outputs."""
     assert not (ROOT / "outputs" / "stage_modeling" / "run_manifest.json").is_file()
-    assert not (ROOT / "stage125").is_dir()
-    banned_exts = (".joblib", ".npz")
+    banned_exts = (".joblib", ".npz", ".pickle", ".pkl", ".model")
     banned_pats = ("shap", "smote", "calibration", "temporal_split",
                    "predictions", "model_results")
     for name in [f.name for f in GATE_B_DIR.iterdir() if f.is_file()]:
@@ -391,6 +390,209 @@ def test_no_modeling_artifacts():
             assert not low.endswith(ext), name
         for pat in banned_pats:
             assert pat not in low, name
+
+
+def test_stage125_contract_dir_not_modeling():
+    """An existing project/stage125 contract/audit directory must NOT fail
+    no_modeling_started.  Stage125 Part 0–2 contract/audit files are not
+    modeling artifacts."""
+    assert (ROOT / "stage125").is_dir(), "stage125 contract dir should exist"
+    assertions = ex._qc_assertions(
+        _mock_stats(), {"checks": [], "overall_pass": True},
+        pairs_out=_empty_pairs_out(), company_year=_empty_company_year(),
+        listing_master=pd.DataFrame(), verify_report={"inputs": {}, "mismatches": []},
+        output_hashes={}, project_dir=ROOT,
+        src_all_rows=_empty_company_year(), src_pairs=_empty_pairs_out())
+    nm = [a for a in assertions if a["assertion"] == "no_modeling_started"]
+    assert len(nm) == 1
+    assert nm[0]["status"] == "PASS", (
+        "no_modeling_started must PASS when stage125 has only contract/audit files; "
+        f"detail: {nm[0]['detail']}")
+
+
+def test_negative_model_artifact_in_stage125():
+    """A .joblib artifact placed in stage125 must cause no_modeling_started to FAIL."""
+    artifact = ROOT / "stage125" / "test_model.joblib"
+    artifact.write_bytes(b"fake model")
+    try:
+        assertions = ex._qc_assertions(
+            _mock_stats(), {"checks": [], "overall_pass": True},
+            pairs_out=_empty_pairs_out(), company_year=_empty_company_year(),
+            listing_master=pd.DataFrame(), verify_report={"inputs": {}, "mismatches": []},
+            output_hashes={}, project_dir=ROOT,
+            src_all_rows=_empty_company_year(), src_pairs=_empty_pairs_out())
+        nm = [a for a in assertions if a["assertion"] == "no_modeling_started"]
+        assert len(nm) == 1
+        assert nm[0]["status"] == "FAIL", (
+            "no_modeling_started must FAIL on .joblib in stage125; "
+            f"detail: {nm[0]['detail']}")
+    finally:
+        artifact.unlink(missing_ok=True)
+
+
+# --------------------------------------------------------------------------- #
+# 21b. Recursive artifact scan — nested modeling artifacts must be detected
+# --------------------------------------------------------------------------- #
+
+def _run_no_modeling_started_assertion() -> dict:
+    assertions = ex._qc_assertions(
+        _mock_stats(), {"checks": [], "overall_pass": True},
+        pairs_out=_empty_pairs_out(), company_year=_empty_company_year(),
+        listing_master=pd.DataFrame(), verify_report={"inputs": {}, "mismatches": []},
+        output_hashes={}, project_dir=ROOT,
+        src_all_rows=_empty_company_year(), src_pairs=_empty_pairs_out())
+    nm = [a for a in assertions if a["assertion"] == "no_modeling_started"]
+    assert len(nm) == 1
+    return nm[0]
+
+
+def test_negative_nested_model_artifact_in_stage125_subdir():
+    """A .joblib artifact nested inside project/stage125/models/ must also
+    cause no_modeling_started to FAIL — the scan must be recursive, not just
+    top-level (iterdir() would silently miss this)."""
+    models_dir = ROOT / "stage125" / "models"
+    models_dir.mkdir(exist_ok=True)
+    artifact = models_dir / "test_model.joblib"
+    artifact.write_bytes(b"fake nested model")
+    try:
+        nm = _run_no_modeling_started_assertion()
+        assert nm["status"] == "FAIL", (
+            "no_modeling_started must FAIL on a nested "
+            f".joblib under stage125/models/; detail: {nm['detail']}")
+    finally:
+        artifact.unlink(missing_ok=True)
+        try:
+            models_dir.rmdir()
+        except OSError:
+            pass
+
+
+@pytest.mark.parametrize("ext", [".joblib", ".pickle", ".pkl", ".npz", ".model"])
+def test_negative_all_banned_extensions_rejected_top_level(ext):
+    """Every banned modeling-artifact extension must be rejected at top level."""
+    artifact = ROOT / "stage125" / f"test_artifact{ext}"
+    artifact.write_bytes(b"fake artifact")
+    try:
+        nm = _run_no_modeling_started_assertion()
+        assert nm["status"] == "FAIL", (
+            f"no_modeling_started must FAIL on {ext} artifact; detail: {nm['detail']}")
+    finally:
+        artifact.unlink(missing_ok=True)
+
+
+@pytest.mark.parametrize("ext", [".joblib", ".pickle", ".pkl", ".npz", ".model"])
+def test_negative_all_banned_extensions_rejected_nested(ext):
+    """Every banned modeling-artifact extension must also be rejected when
+    nested one level deep (recursive scan coverage)."""
+    nested_dir = ROOT / "stage125" / "models"
+    nested_dir.mkdir(exist_ok=True)
+    artifact = nested_dir / f"test_artifact{ext}"
+    artifact.write_bytes(b"fake artifact")
+    try:
+        nm = _run_no_modeling_started_assertion()
+        assert nm["status"] == "FAIL", (
+            f"no_modeling_started must FAIL on nested {ext} artifact; "
+            f"detail: {nm['detail']}")
+    finally:
+        artifact.unlink(missing_ok=True)
+        try:
+            nested_dir.rmdir()
+        except OSError:
+            pass
+
+
+def test_nested_contract_json_and_csv_do_not_false_positive():
+    """Unrelated nested contract JSON/CSV files (not modeling artifacts) must
+    NOT trip no_modeling_started, even when placed in a nested subdirectory
+    that the recursive scan now covers."""
+    nested_dir = ROOT / "stage125" / "contracts_audit_nested"
+    nested_dir.mkdir(exist_ok=True)
+    json_file = nested_dir / "feature_availability_contract_extra.json"
+    csv_file = nested_dir / "leakage_audit_extra.csv"
+    json_file.write_text('{"contract": true}\n', encoding="utf-8")
+    csv_file.write_text("col_a,col_b\n1,2\n", encoding="utf-8")
+    try:
+        nm = _run_no_modeling_started_assertion()
+        assert nm["status"] == "PASS", (
+            "no_modeling_started must PASS on unrelated nested contract "
+            f"JSON/CSV files; detail: {nm['detail']}")
+    finally:
+        json_file.unlink(missing_ok=True)
+        csv_file.unlink(missing_ok=True)
+        try:
+            nested_dir.rmdir()
+        except OSError:
+            pass
+
+
+def test_stage124_runner_deterministic():
+    """Running the Stage124 runner twice must produce identical QC assertions."""
+    qc_path = ROOT / "stage124" / "stage124_batch02_gate_b_qc_report.json"
+    ex.run(ROOT)
+    with open(qc_path, encoding="utf-8") as f:
+        qc1 = json.load(f)
+    ex.run(ROOT)
+    with open(qc_path, encoding="utf-8") as f:
+        qc2 = json.load(f)
+    assert qc1["assertions"] == qc2["assertions"]
+
+
+TRACKED_QC_METADATA_PATHS = (
+    "project/stage124/stage124_batch02_gate_b_qc_report.json",
+    "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
+)
+
+
+def test_git_status_no_untracked_after_tests():
+    """Running the Stage124 runner must leave the tracked Stage124 QC/metadata
+    files BYTE-IDENTICAL to their committed HEAD versions, and must not leave
+    any stray untracked artifact behind.
+
+    Checking only untracked files (git status "??") is insufficient: it would
+    silently pass even if the runner rewrote a tracked, committed file (e.g.
+    non-deterministic content, or a subtle hash/count drift) because a tracked
+    file that changes on disk shows as " M", not "??". We therefore capture the
+    exact committed bytes via `git show HEAD:<path>` BEFORE running, then
+    compare the on-disk bytes AFTER running to those exact committed bytes —
+    this fails the test if either tracked file is modified, and does not
+    "fix" anything by restoring files inside the assertion.
+    """
+    committed_bytes = {}
+    for rel in TRACKED_QC_METADATA_PATHS:
+        result = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "show", f"HEAD:{rel}"],
+            capture_output=True, check=True)
+        committed_bytes[rel] = result.stdout
+
+    ex.run(ROOT)
+
+    for rel in TRACKED_QC_METADATA_PATHS:
+        on_disk_bytes = (REPO_ROOT / rel).read_bytes()
+        assert on_disk_bytes == committed_bytes[rel], (
+            f"{rel} was modified by the runner relative to its committed "
+            "HEAD version — tracked-file cleanliness violated (Stage124 "
+            "QC/metadata must remain unchanged when re-run against an "
+            "already-committed, up-to-date state)")
+
+    result = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=REPO_ROOT, capture_output=True, text=True, check=True)
+    untracked = [l for l in result.stdout.strip().splitlines()
+                 if l.startswith("??")]
+    assert not untracked, (
+        f"untracked files left by test suite:\n{chr(10).join(untracked)}")
+
+
+def test_scientific_counts_unchanged(run_result, qc_report):
+    """Eligibility, target, sample, date semantics and scientific counts
+    must remain exactly unchanged after the guardrail fix."""
+    a = run_result["stats"]["main_rule_a_primary"]
+    b = run_result["stats"]["main_rule_b_listing_robustness"]
+    assert a["pairs"] == 1013 and a["positive"] == 81 and a["negative"] == 932
+    assert b["pairs"] == 994 and b["positive"] == 80 and b["negative"] == 914
+    ds = [x for x in qc_report["assertions"]
+          if x["assertion"] == "date_semantics_provenance_verified"]
+    assert len(ds) == 1 and ds[0]["status"] == "PASS"
 
 
 # --------------------------------------------------------------------------- #

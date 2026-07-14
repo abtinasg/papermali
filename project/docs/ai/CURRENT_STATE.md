@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage125_research_design_readiness`
 - **Last completed research action:** `stage124-gate-b-execution`
 - **Next research action:** `stage125-research-design-readiness`
-- **Last stage commit:** `7b0d3dde532b5a37e3cfc77ea1457fe73aea2e08`
-- **Generated from commit:** `57c86133ef695df6cedd04770d5c7196ed0d5e68` (branch `stage125-part2-prediction-time-contract`, informational)
-- **Baseline:** `origin/main` @ `0886874f25522002553e24398cdf2e5a667a3bb0`
+- **Last stage commit:** `77d0294d54b5aa6f45ec7269fab82788e200e147`
+- **Generated from commit:** `36aece430db023491f909f882308417b89a6c5a6` (branch `stage125-post-merge-modeling-guardrail-fix`, informational)
+- **Baseline:** `origin/main` @ `eaa313deb7aeca607ddb8bb4b02b539206836431`
 
 ## QC
 
@@ -32,5 +32,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `ca43bb83b477b93a504a6a315b995668701af7f41a06ba2bbc5494b2f5536c52`_
-_generated_at_utc: 2026-07-14T07:56:26Z (informational)_
+_state_fingerprint: `8e5d0bb77b410ebfd8991de5f14df054945836e35c3fdeb791a17808fe3ac472`_
+_generated_at_utc: 2026-07-14T15:27:37Z (informational)_

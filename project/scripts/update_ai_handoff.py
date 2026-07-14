@@ -42,9 +42,6 @@ from datetime import datetime, timezone
 # Constants
 # --------------------------------------------------------------------------- #
 
-# Matches a research-workflow commit anywhere in the full commit body.
-STAGE_BODY_RE = re.compile(r"\bStage\d+\b", re.IGNORECASE)
-
 AUTO_FILES = (
     "project/docs/ai/handoff_state.json",
     "project/docs/ai/CURRENT_STATE.md",
@@ -81,6 +78,12 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part2_prediction_time_contract.py",
     "project/run_stage125_part2.py",
     "project/tests/test_stage125_part2_prediction_time_contract.py",
+    # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
+    # Do NOT broadly allowlist Stage122–Stage124 directories.
+    "project/src/stage124_gate_b_execution.py",
+    "project/tests/test_stage124_gate_b_execution.py",
+    "project/stage124/stage124_batch02_gate_b_qc_report.json",
+    "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
     "AGENTS.md",
     "CLAUDE.md",
 )
@@ -102,6 +105,46 @@ HANDOFF_ONLY_FILES = (
     "project/tests/test_ai_handoff.py",
     "AGENTS.md",
     "CLAUDE.md",
+)
+
+# Generated-artifact-only classification, INDEPENDENT of both the change
+# allowlist AND the Handoff-only classification. A commit is "artifact-only"
+# (and therefore never advances last_stage_commit) only when every file it
+# introduces is one of these exact, generated bookkeeping outputs (a QC report
+# or a metadata_and_hashes hash manifest written by a runner). This is
+# deliberately NOT wording-based (a commit body containing "Stage"/"Part" is
+# irrelevant to this classification) and deliberately NOT directory-based for
+# whole Stage122-Stage125 trees, so a real research/data-contract deliverable
+# living under project/stageNNN/ (e.g. a data dictionary or contract JSON) is
+# never swept in by accident. New generated outputs must be added here
+# explicitly, one exact path at a time, the same way HANDOFF_ONLY_FILES and
+# ALLOWLIST_FILES are curated.
+#   * file entries match by EXACT path only (no directory entries).
+ARTIFACT_ONLY_FILES = (
+    "project/stage122/metadata_and_hashes_stage122.json",
+    "project/stage122/stage122_qc_report.json",
+    "project/stage123/metadata_and_hashes_stage123.json",
+    "project/stage123/stage123_qc_report.json",
+    "project/stage124/batch02_parts/part02_qc_report.json",
+    "project/stage124/batch02_parts/part02_metadata_and_hashes.json",
+    "project/stage124/batch02_parts/part03_qc_report.json",
+    "project/stage124/gate_b_readiness/gate_b_readiness_qc_report.json",
+    "project/stage124/gate_b_readiness/metadata_and_hashes_gate_b_readiness.json",
+    "project/stage124/metadata_and_hashes_stage124_batch02_gate_a.json",
+    "project/stage124/metadata_and_hashes_stage124_batch02_gate_a_v2.json",
+    "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
+    "project/stage124/metadata_and_hashes_stage124_part1.json",
+    "project/stage124/metadata_and_hashes_stage124_pilot15.json",
+    "project/stage124/stage124_batch02_gate_a_qc_report.json",
+    "project/stage124/stage124_batch02_gate_a_v2_qc_report.json",
+    "project/stage124/stage124_batch02_gate_b_qc_report.json",
+    "project/stage124/stage124_pilot15_qc_report.json",
+    "project/stage124/stage124_template_report.json",
+    "project/stage124/official_api/metadata_and_hashes.json",
+    "project/stage125/metadata_and_hashes_stage125_part1.json",
+    "project/stage125/metadata_and_hashes_stage125_part2.json",
+    "project/stage125/stage125_part1_data_contract_qc_report.json",
+    "project/stage125/stage125_part2_prediction_time_contract_qc_report.json",
 )
 
 FROZEN_MANIFESTS = (
@@ -227,26 +270,62 @@ def path_handoff_only(path: str) -> bool:
     return any(path.startswith(d) for d in HANDOFF_ONLY_DIRS)
 
 
+def path_artifact_only(path: str) -> bool:
+    """Generated-artifact-only classification: EXACT file match only.
+
+    A strict, independent subset used solely by last_stage_commit() to skip
+    commits that only regenerate a QC report / metadata_and_hashes hash
+    manifest. See ARTIFACT_ONLY_FILES for the curation rules.
+    """
+    return path in ARTIFACT_ONLY_FILES
+
+
 def _is_handoff_only(files: list[str]) -> bool:
     if not files:
         return False
     return all(path_handoff_only(f) for f in files)
 
 
-def last_stage_commit(root: str) -> str:
-    """Latest reachable, non-Handoff-only commit whose full body names a Stage/Part.
+def _is_artifact_only(files: list[str]) -> bool:
+    if not files:
+        return False
+    return all(path_artifact_only(f) for f in files)
 
-    Merge commits are NOT skipped blindly: their introduced files (vs first
-    parent) are inspected; a merge that brings in only Handoff files is skipped,
-    and the body of every candidate is matched against the Stage/Part pattern.
+
+def _is_stage_relevant(files: list[str]) -> bool:
+    """True iff at least one introduced file is REAL content — i.e. neither
+    Handoff-only infrastructure nor a curated generated artifact.
+
+    This is deliberately PATH-BASED / SEMANTIC, not wording-based: it does not
+    inspect the commit subject or body at all. A commit that changes
+    ``project/src/stage124_gate_b_execution.py`` and
+    ``project/tests/test_stage124_gate_b_execution.py`` is stage-relevant
+    whether its subject is ``fix(qc-scan): ...`` or ``Stage124: ...`` — the
+    message text is irrelevant to the classification.
+    """
+    return any(not path_handoff_only(f) and not path_artifact_only(f) for f in files)
+
+
+def last_stage_commit(root: str) -> str:
+    """Latest reachable commit that introduces real (non-Handoff-only,
+    non-artifact-only) content.
+
+    PATH-BASED / SEMANTIC, NOT message-wording-dependent: this walks commit
+    history from HEAD and returns the first (i.e. most recent) commit whose
+    introduced files (vs first parent; works for merges too) include at least
+    one file that is neither Handoff-only infrastructure nor a curated
+    generated artifact. A commit whose introduced files are ALL Handoff-only
+    is skipped; a commit whose introduced files are ALL curated generated
+    artifacts (QC report / metadata_and_hashes regeneration) is skipped; a
+    commit mixing real content with either of those (e.g. a source-code fix
+    committed alongside its regenerated QC artifact) still qualifies, because
+    only ONE introduced file needs to be real content.
     """
     for sha in _git(root, "rev-list", "HEAD").splitlines():
-        if _is_handoff_only(_introduced_files(root, sha)):
-            continue
-        body = _git(root, "log", "-1", "--format=%B", sha)
-        if STAGE_BODY_RE.search(body):
+        files = _introduced_files(root, sha)
+        if _is_stage_relevant(files):
             return sha
-    raise HandoffError("no qualifying Stage/Part commit found in history")
+    raise HandoffError("no qualifying stage-relevant commit found in history")
 
 
 def derive_repository(root: str) -> str | None:

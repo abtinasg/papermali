@@ -149,7 +149,7 @@
   },
   "failed_count": 0,
   "gate_b_started": true,
-  "generated_at": "2026-07-12T13:59:08Z",
+  "generated_at": "2026-07-14T14:36:52Z",
   "main_primary_counts": {
     "affected_tickers_count": 23,
     "change_vs_stage123_main": -72,
@@ -174,10 +174,10 @@
   "primary_rule": "rule_a: first_observed_trading_date <= fiscal_year_end",
   "rejected_rule": "rule_c: first_observed_trading_year < fiscal_year",
   "robustness_rule": "rule_b: first_observed_trading_date <= fiscal_year_start",
-  "source_commit": "e74646426b28437b4c0270062ea14c8971a93c66",
-  "source_file_sha256": "51e04153eb5121bbf10c26148ee526a8c1c919672d5f31d1ac0b27407fb473c8",
+  "source_commit": "77d0294d54b5aa6f45ec7269fab82788e200e147",
+  "source_file_sha256": "cfc2d8c50a3b1c1b1d61b1fcb3f7c9af4456c520c33bf141c5740e9bef99be6b",
   "stage": "stage124_gate_b_execution",
-  "test_file_sha256": "61418bcd20cee36995cf167f0dfd54a38ea11df152f21528d267b8c773a8bb94",
+  "test_file_sha256": "9fd7b9c4bfa8f0b4374ba9d1f908f64cd9b829c4751277afacced1cd85c6f182",
   "ticker_count": 130,
   "tickers": [
     "اردستان",

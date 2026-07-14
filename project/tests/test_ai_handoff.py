@@ -63,6 +63,32 @@ def test_state_matches_git():
     assert state["last_stage_commit"] == gen.last_stage_commit(REAL_ROOT)
 
 
+def test_real_repo_last_stage_commit_is_a_real_content_commit():
+    # last_stage_commit is PATH-BASED / SEMANTIC: it must resolve to the most
+    # recent commit that introduces real (non-Handoff-only, non-artifact-only)
+    # content, regardless of that commit's message wording. This test does
+    # NOT hard-code a specific SHA (a hard-coded expectation here would itself
+    # be message-wording-adjacent and would need editing on every future real
+    # commit) — instead it independently recomputes the expectation via the
+    # same path-based rule and cross-checks it against the git history walk.
+    got = gen.last_stage_commit(REAL_ROOT)
+    files = gen._introduced_files(REAL_ROOT, got)
+    assert gen._is_stage_relevant(files), (
+        f"last_stage_commit {got} must introduce at least one real "
+        "(non-Handoff-only, non-artifact-only) file"
+    )
+    # Every commit strictly newer than `got` must NOT be stage-relevant,
+    # otherwise `got` would not be the LATEST qualifying commit.
+    newer = gen._git(REAL_ROOT, "rev-list", f"{got}..HEAD").splitlines()
+    for sha in newer:
+        newer_files = gen._introduced_files(REAL_ROOT, sha)
+        assert not gen._is_stage_relevant(newer_files), (
+            f"commit {sha} is newer than last_stage_commit {got} but is "
+            f"ALSO stage-relevant (files={newer_files}) — last_stage_commit "
+            "should have resolved to it instead"
+        )
+
+
 def test_qc_counts_match_report():
     state = _state(REAL_ROOT)
     qc = json.load(open(os.path.join(REAL_ROOT, state["selected_qc_path"]), encoding="utf-8"))
@@ -144,6 +170,11 @@ def test_change_allowlist_real_repo():
     ("project/tests/test_stage125_part2_prediction_time_contract.py", True),
     ("project/stage125/prediction_time_contract_stage125_part2.json", True),
     ("project/stage125/metadata_and_hashes_stage125_part2.json", True),
+    # Stage124 modeling-guardrail fix — narrowest exact-file allowance
+    ("project/src/stage124_gate_b_execution.py", True),
+    ("project/tests/test_stage124_gate_b_execution.py", True),
+    ("project/stage124/stage124_batch02_gate_b_qc_report.json", True),
+    ("project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json", True),
     # prefix attacks must be rejected
     ("AGENTS.md.evil", False),
     ("project/scripts/update_ai_handoff.py.bak", False),
@@ -160,6 +191,14 @@ def test_change_allowlist_real_repo():
     ("project/tests/test_stage125_part2_data_contract.py", False),
     ("project/src/stage125_part2_prediction_time_contract.py.bak", False),
     ("project/run_stage125_part2.py.evil", False),
+    # Stage124 similar-but-unauthorized paths must be rejected
+    ("project/src/stage124_gate_b_execution.py.bak", False),
+    ("project/tests/test_stage124_gate_b_execution.py.evil", False),
+    ("project/stage124/stage124_batch02_gate_b_qc_report.json.bak", False),
+    ("project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json.bak", False),
+    ("project/stage124/other_file.json", False),
+    ("project/src/stage124_gate_b_readiness.py", False),
+    ("project/stage124/gate_b_final/modeling_main_rule_a_eligible.csv", False),
 ])
 def test_allowlist_prefix_attack(path, ok):
     assert gen.path_allowlisted(path) is ok
@@ -208,6 +247,52 @@ def test_handoff_only_disjoint_from_stage125_code():
         "project/stage125/data_dictionary_stage125.csv",
     ):
         assert gen.path_allowlisted(p) is True
+        assert gen.path_handoff_only(p) is False
+
+
+# --------------------------------------------------------------------------- #
+# Generated-artifact-only classification (independent of path_allowlisted AND
+# path_handoff_only) — pure unit
+# --------------------------------------------------------------------------- #
+
+@pytest.mark.parametrize("path,ok", [
+    # Known generated QC-report / metadata_and_hashes outputs ARE artifact-only.
+    ("project/stage124/stage124_batch02_gate_b_qc_report.json", True),
+    ("project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json", True),
+    ("project/stage125/metadata_and_hashes_stage125_part2.json", True),
+    ("project/stage125/stage125_part2_prediction_time_contract_qc_report.json", True),
+    ("project/stage122/metadata_and_hashes_stage122.json", True),
+    ("project/stage123/stage123_qc_report.json", True),
+    # Real research/contract deliverables under the SAME directories are NOT
+    # artifact-only, even though they sit next to generated bookkeeping files.
+    ("project/stage125/prediction_time_contract_stage125_part2.json", False),
+    ("project/stage125/data_dictionary_stage125.csv", False),
+    ("project/stage124/listing_master_verified_stage124.csv", False),
+    ("project/stage124/gate_b_final/modeling_main_rule_a_eligible.csv", False),
+    # Handoff-only / source / test paths are NOT artifact-only.
+    ("project/docs/ai/CURRENT_STATE.md", False),
+    ("project/scripts/update_ai_handoff.py", False),
+    ("project/tests/test_ai_handoff.py", False),
+    ("project/src/stage124_gate_b_execution.py", False),
+    ("project/tests/test_stage124_gate_b_execution.py", False),
+    ("AGENTS.md", False),
+    # prefix / suffix attacks must be rejected
+    ("project/stage124/stage124_batch02_gate_b_qc_report.json.bak", False),
+    ("project/stage125/metadata_and_hashes_stage125_part2.json.evil", False),
+    ("project/stage125/sub/metadata_and_hashes_stage125_part2.json", False),
+])
+def test_artifact_only_classification(path, ok):
+    assert gen.path_artifact_only(path) is ok
+
+
+def test_artifact_only_independent_of_allowlist_and_handoff_only():
+    # A file can be change-allowlisted (Stage125 dir) without being
+    # artifact-only, and an artifact-only file is never handoff-only.
+    contract_path = "project/stage125/prediction_time_contract_stage125_part2.json"
+    assert gen.path_allowlisted(contract_path) is True
+    assert gen.path_artifact_only(contract_path) is False
+
+    for p in gen.ARTIFACT_ONLY_FILES:
         assert gen.path_handoff_only(p) is False
 
 
@@ -426,13 +511,124 @@ def test_stage125_part1_code_commit_advances_stage(synth):
     assert got != before
 
 
-def test_artifact_commit_without_stage_does_not_advance(synth):
-    # A non-handoff-only commit whose body lacks any Stage/Part marker must not
-    # become last_stage_commit.
+def test_real_content_commit_advances_regardless_of_missing_stage_wording(synth):
+    # PATH-BASED / SEMANTIC recognition: a commit that introduces a real
+    # (non-Handoff-only, non-artifact-only) file MUST advance last_stage_commit
+    # even when its message contains NO "Stage"/"Part" wording at all.
     before = gen.last_stage_commit(synth)
     _write(synth, "project/stage125/data_dictionary_stage125.csv", "col\n")
-    _commit(synth, "artifact: refresh generated data dictionary")
+    sha = _commit(synth, "artifact: refresh generated data dictionary")
+    got = gen.last_stage_commit(synth)
+    assert got == sha
+    assert got != before
+
+
+# ---- BLOCKER 1: artifact-only classification must not depend on wording ---- #
+
+def test_generated_artifact_only_commit_with_stage_wording_is_skipped(synth):
+    # Reproduces the real-repo bug: a commit that ONLY regenerates a known
+    # generated QC/metadata artifact must be skipped even though its message
+    # contains "Stage125 Part 2" (or any Stage/Part wording).
+    before = gen.last_stage_commit(synth)
+    _write(synth, "project/stage125/metadata_and_hashes_stage125_part2.json",
+           json.dumps({"stage": "stage125_part2", "output_files_sha256": {}}))
+    sha = _commit(
+        synth,
+        "artifacts(stage125-part2): regenerate QC/metadata after Stage125 Part 2 hash change",
+    )
+    got = gen.last_stage_commit(synth)
+    assert got == before
+    assert got != sha
+
+
+def test_generated_artifact_only_commit_without_stage_wording_is_also_skipped(synth):
+    # The artifact-only classification must be equally wording-INDEPENDENT in
+    # the other direction: a purely generated artifact commit stays skipped
+    # even when its message has NO Stage/Part wording at all.
+    before = gen.last_stage_commit(synth)
+    _write(synth, "project/stage125/metadata_and_hashes_stage125_part2.json",
+           json.dumps({"stage": "stage125_part2", "output_files_sha256": {}}))
+    sha = _commit(synth, "chore: bump generated hash manifest")
+    got = gen.last_stage_commit(synth)
+    assert got == before
+    assert got != sha
+
+
+# ---- BLOCKER A: last_stage_commit must be PATH-BASED, not wording-based --- #
+
+def test_code_and_test_commit_advances_with_no_stage_wording_in_message(synth):
+    # Requirement: a commit changing real source + test files must be
+    # recognised as stage-relevant even when its message is a plain
+    # conventional-commit subject with NO "Stage"/"Part" anywhere.
+    _write(synth, "project/src/stage124_gate_b_execution.py", "GUARDRAIL = 1\n")
+    _write(synth, "project/tests/test_stage124_gate_b_execution.py",
+           "def test_guardrail():\n    assert True\n")
+    sha = _commit(synth, "fix(qc-scan): recursive nested-artifact detection")
+    assert gen.last_stage_commit(synth) == sha
+
+
+def test_stage124_code_test_commit_advances_last_stage_commit(synth):
+    # The same real code/test change also advances last_stage_commit when its
+    # message DOES happen to mention "Stage124" — wording must be irrelevant
+    # either way.
+    _write(synth, "project/src/stage124_gate_b_execution.py", "GUARDRAIL = 1\n")
+    _write(synth, "project/tests/test_stage124_gate_b_execution.py",
+           "def test_guardrail():\n    assert True\n")
+    sha = _commit(
+        synth,
+        "fix(stage124): modeling-guardrail - contract dir is not a modeling artifact",
+    )
+    assert gen.last_stage_commit(synth) == sha
+
+
+@pytest.mark.parametrize("subject", [
+    "fix(stage124): guardrail fix plus regenerated QC artifact (Stage124 Part)",
+    "fix(qc-scan): guardrail fix plus regenerated QC artifact",
+])
+def test_mixed_source_and_artifact_commit_advances(synth, subject):
+    # A commit that introduces BOTH a real code file AND a generated artifact
+    # file must NOT be misclassified as artifact-only; it must still advance
+    # last_stage_commit — regardless of whether the message mentions
+    # "Stage"/"Part" or not.
+    _write(synth, "project/src/stage124_gate_b_execution.py", "GUARDRAIL = 2\n")
+    _write(synth, "project/stage124/stage124_batch02_gate_b_qc_report.json",
+           json.dumps({"stage": "stage124_gate_b_execution"}))
+    sha = _commit(synth, subject)
+    assert gen.last_stage_commit(synth) == sha
+
+
+@pytest.mark.parametrize("subject", [
+    "handoff: Stage125 Part 2 open-tasks tweak",
+    "handoff: tweak open tasks",
+])
+def test_handoff_only_commits_remain_skipped_alongside_artifact_only(synth, subject):
+    # Handoff-only classification must keep working regardless of message
+    # wording, both after the artifact-only classification was added and
+    # after last_stage_commit became fully path-based.
+    before = gen.last_stage_commit(synth)
+    _write(synth, "project/docs/ai/OPEN_TASKS.md", "note tweak\n")
+    _commit(synth, subject)
     assert gen.last_stage_commit(synth) == before
+
+
+def test_is_stage_relevant_unit():
+    # Direct unit coverage of the classification primitive itself.
+    assert gen._is_stage_relevant(["project/src/stage124_gate_b_execution.py"]) is True
+    assert gen._is_stage_relevant(
+        ["project/tests/test_stage124_gate_b_execution.py"]) is True
+    assert gen._is_stage_relevant(["project/docs/ai/OPEN_TASKS.md"]) is False
+    assert gen._is_stage_relevant(
+        ["project/stage124/stage124_batch02_gate_b_qc_report.json"]) is False
+    assert gen._is_stage_relevant([]) is False
+    # Mixed: one real file is enough to qualify.
+    assert gen._is_stage_relevant([
+        "project/docs/ai/OPEN_TASKS.md",
+        "project/src/stage124_gate_b_execution.py",
+    ]) is True
+    assert gen._is_stage_relevant([
+        "project/docs/ai/OPEN_TASKS.md",
+        "project/stage124/stage124_batch02_gate_b_qc_report.json",
+    ]) is False
 
 
 def test_change_allowlist_blocks_non_handoff(synth):

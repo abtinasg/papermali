@@ -173,7 +173,7 @@ MODELING_ARTIFACT_PATTERNS = [
     "shap", "smote", "calibration", "temporal_split",
     "predictions", "model_results",
 ]
-MODELING_ARTIFACT_EXTENSIONS = [".joblib", ".npz"]
+MODELING_ARTIFACT_EXTENSIONS = [".joblib", ".npz", ".pickle", ".pkl", ".model"]
 
 TARGET_COLUMNS = [
     "FD_target_main_t_plus_1",
@@ -714,15 +714,27 @@ def _qc_assertions(stats: dict, schema_report: dict,
                 "detail": f"{b['pairs']}/{b['positive']}/{b['negative']}/{b['target_missing']}"})
 
     # no_modeling_started — check explicit paths and artifact patterns
+    # NOTE: a generic future-stage directory (e.g. project/stage125) containing
+    # contract/audit files is NOT a modeling artifact.  We scan it for actual
+    # model artifacts (.joblib, .pickle, .model, etc.) instead of treating its
+    # mere existence as evidence of modeling.
     modeling_paths = [
         project_dir / "outputs" / "stage_modeling" / "run_manifest.json",
-        project_dir / "stage125",
     ]
     modeling_path_hits = [str(p) for p in modeling_paths if p.exists()]
-    gate_b_dir = project_dir / "stage124" / "gate_b_final"
+    # Directories to scan for model-artifact files
+    artifact_scan_dirs = [
+        project_dir / "stage124" / "gate_b_final",
+        project_dir / "stage125",
+    ]
     artifact_hits = []
-    if gate_b_dir.is_dir():
-        for f in gate_b_dir.iterdir():
+    for scan_dir in artifact_scan_dirs:
+        if not scan_dir.is_dir():
+            continue
+        # Recursive (rglob) so a nested file such as
+        # project/stage125/models/model.joblib is not missed — iterdir() only
+        # sees the top level of scan_dir and would silently skip subdirectories.
+        for f in scan_dir.rglob("*"):
             if not f.is_file():
                 continue
             low = f.name.lower()
@@ -730,12 +742,12 @@ def _qc_assertions(stats: dict, schema_report: dict,
                 continue
             for ext in MODELING_ARTIFACT_EXTENSIONS:
                 if low.endswith(ext):
-                    artifact_hits.append(f.name)
+                    artifact_hits.append(str(f))
                     break
             else:
                 for pat in MODELING_ARTIFACT_PATTERNS:
                     if pat in low:
-                        artifact_hits.append(f.name)
+                        artifact_hits.append(str(f))
                         break
     no_modeling = len(modeling_path_hits) == 0 and len(artifact_hits) == 0
     detail_parts = []
