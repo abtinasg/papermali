@@ -82,6 +82,10 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part3a_pilot_protocol.py",
     "project/run_stage125_part3a.py",
     "project/tests/test_stage125_part3a_pilot_protocol.py",
+    # Stage125 Part 3A.1 code, runner, and tests.
+    "project/src/stage125_part3a_decision_lock.py",
+    "project/run_stage125_part3a_decision_lock.py",
+    "project/tests/test_stage125_part3a_decision_lock.py",
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
     # Do NOT broadly allowlist Stage122–Stage124 directories.
     "project/src/stage124_gate_b_execution.py",
@@ -160,6 +164,13 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/part3_sampling_frame_by_target_year_stage125.csv",
     "project/stage125/part3_sampling_frame_summary_stage125.json",
     "project/stage125/part3_source_evidence_manifest_schema_stage125.json",
+    # Stage125 Part 3A.1 generated decision-lock artifacts (runner output only).
+    "project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json",
+    "project/stage125/stage125_part3a_decision_lock_qc_report.json",
+    "project/stage125/README_STAGE125_PART3A_DECISION_LOCK.md",
+    "project/stage125/part3a_decision_lock_stage125.json",
+    "project/stage125/part3a_approved_gate_thresholds_stage125.csv",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv",
 )
 
 FROZEN_MANIFESTS = (
@@ -169,6 +180,7 @@ FROZEN_MANIFESTS = (
     "project/stage125/metadata_and_hashes_stage125_part1.json",
     "project/stage125/metadata_and_hashes_stage125_part2.json",
     "project/stage125/metadata_and_hashes_stage125_part3a.json",
+    "project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json",
 )
 
 # Tracked files declared in a frozen manifest that are EXPLICITLY classified as

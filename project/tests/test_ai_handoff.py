@@ -176,6 +176,12 @@ def test_change_allowlist_real_repo():
     ("project/tests/test_stage125_part3a_pilot_protocol.py", True),
     ("project/stage125/part3_candidate_inventory_stage125.csv", True),
     ("project/stage125/metadata_and_hashes_stage125_part3a.json", True),
+    # Stage125 Part 3A.1 allowlisted paths
+    ("project/src/stage125_part3a_decision_lock.py", True),
+    ("project/run_stage125_part3a_decision_lock.py", True),
+    ("project/tests/test_stage125_part3a_decision_lock.py", True),
+    ("project/stage125/part3a_decision_lock_stage125.json", True),
+    ("project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json", True),
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance
     ("project/src/stage124_gate_b_execution.py", True),
     ("project/tests/test_stage124_gate_b_execution.py", True),
@@ -201,6 +207,10 @@ def test_change_allowlist_real_repo():
     ("project/run_stage125_part3a.py.evil", False),
     ("project/src/stage125_part3a_data_contract.py", False),
     ("project/tests/test_stage125_part3a_data_contract.py", False),
+    # Stage125 Part 3A.1 similar-but-unauthorized prefixes must be rejected
+    ("project/src/stage125_part3a_decision_lock.py.bak", False),
+    ("project/run_stage125_part3a_decision_lock.py.evil", False),
+    ("project/src/stage125_part3a1_decision_lock.py", False),
     # Stage124 similar-but-unauthorized paths must be rejected
     ("project/src/stage124_gate_b_execution.py.bak", False),
     ("project/tests/test_stage124_gate_b_execution.py.evil", False),
@@ -242,6 +252,11 @@ def test_allowlist_prefix_attack(path, ok):
     ("project/run_stage125_part3a.py", False),
     ("project/tests/test_stage125_part3a_pilot_protocol.py", False),
     ("project/stage125/part3_candidate_inventory_stage125.csv", False),
+    # Stage125 Part 3A.1 code is change-allowlisted but MUST NOT be handoff-only.
+    ("project/src/stage125_part3a_decision_lock.py", False),
+    ("project/run_stage125_part3a_decision_lock.py", False),
+    ("project/tests/test_stage125_part3a_decision_lock.py", False),
+    ("project/stage125/part3a_decision_lock_stage125.json", False),
     # prefix attacks must be rejected
     ("AGENTS.md.evil", False),
     ("project/scripts/update_ai_handoff.py.bak", False),
@@ -286,6 +301,13 @@ def test_handoff_only_disjoint_from_stage125_code():
     ("project/stage125/part3_sampling_frame_by_target_year_stage125.csv", True),
     ("project/stage125/part3_sampling_frame_summary_stage125.json", True),
     ("project/stage125/part3_source_evidence_manifest_schema_stage125.json", True),
+    # Stage125 Part 3A.1 generated decision-lock artifacts
+    ("project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json", True),
+    ("project/stage125/stage125_part3a_decision_lock_qc_report.json", True),
+    ("project/stage125/README_STAGE125_PART3A_DECISION_LOCK.md", True),
+    ("project/stage125/part3a_decision_lock_stage125.json", True),
+    ("project/stage125/part3a_approved_gate_thresholds_stage125.csv", True),
+    ("project/stage125/part3a_selected_pilot_pairs_stage125.csv", True),
     ("project/stage122/metadata_and_hashes_stage122.json", True),
     ("project/stage123/stage123_qc_report.json", True),
     # Real research/contract deliverables under the SAME directories are NOT
@@ -307,6 +329,9 @@ def test_handoff_only_disjoint_from_stage125_code():
     ("project/stage125/metadata_and_hashes_stage125_part3a.json.evil", False),
     ("project/stage125/part3_candidate_inventory_stage125.csv.evil", False),
     ("project/stage125/sub/part3_candidate_inventory_stage125.csv", False),
+    ("project/stage125/part3a_decision_lock_stage125.json.bak", False),
+    ("project/stage125/part3a_selected_pilot_pairs_stage125.csv.evil", False),
+    ("project/stage125/sub/part3a_decision_lock_stage125.json", False),
     ("project/stage125/sub/metadata_and_hashes_stage125_part2.json", False),
 ])
 def test_artifact_only_classification(path, ok):
@@ -785,3 +810,54 @@ def test_real_repo_last_stage_commit_is_part3a_code_commit():
     files = gen._introduced_files(REAL_ROOT, got)
     assert gen._is_stage_relevant(files)
     assert any("stage125_part3a" in f for f in files)
+
+
+# ---- Stage125 Part 3A.1 artifact-only + last_stage_commit regression -------- #
+
+@pytest.mark.parametrize("path", [
+    "project/stage125/README_STAGE125_PART3A_DECISION_LOCK.md",
+    "project/stage125/part3a_decision_lock_stage125.json",
+    "project/stage125/part3a_approved_gate_thresholds_stage125.csv",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv",
+])
+def test_stage125_part3a1_generated_files_are_artifact_only(path):
+    assert gen.path_artifact_only(path) is True
+    assert gen.path_handoff_only(path) is False
+
+
+@pytest.mark.parametrize("path", [
+    "project/stage125/part3a_decision_lock_stage125.json.bak",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv.evil",
+    "project/stage125/sub/part3a_decision_lock_stage125.json",
+    "project/stage125/part3a_approved_gate_thresholds_stage125.csv~",
+])
+def test_stage125_part3a1_artifact_prefix_suffix_attacks_rejected(path):
+    assert gen.path_artifact_only(path) is False
+
+
+def test_stage125_part3a1_full_artifact_commit_is_skipped(synth):
+    before = gen.last_stage_commit(synth)
+    for rel in (
+        "project/stage125/stage125_part3a_decision_lock_qc_report.json",
+        "project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json",
+        "project/stage125/part3a_decision_lock_stage125.json",
+        "project/stage125/part3a_approved_gate_thresholds_stage125.csv",
+        "project/stage125/part3a_selected_pilot_pairs_stage125.csv",
+        "project/stage125/README_STAGE125_PART3A_DECISION_LOCK.md",
+    ):
+        _write(synth, rel, "generated\n")
+    sha = _commit(synth, "artifacts: Stage125 Part3A.1 decision lock")
+    got = gen.last_stage_commit(synth)
+    assert got == before
+    assert got != sha
+
+
+def test_stage125_part3a1_mixed_code_and_artifact_commit_advances(synth):
+    before = gen.last_stage_commit(synth)
+    _write(synth, "project/src/stage125_part3a_decision_lock.py", "GUARD = 1\n")
+    _write(synth, "project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json",
+           json.dumps({"stage": "stage125_part3a_decision_lock"}))
+    sha = _commit(synth, "fix(part3a1): guard update plus regenerated metadata")
+    got = gen.last_stage_commit(synth)
+    assert got == sha
+    assert got != before

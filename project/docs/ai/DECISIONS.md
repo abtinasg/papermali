@@ -108,16 +108,23 @@ The research contract for the paper is frozen in
 - **Part 2 (Prediction-time & Leakage Contract) is COMPLETED and MERGED.**
   PR #27 post-merge Handoff refresh merged (`main` @ `c6cbb6b7…`); tracked as
   `stage125-part2-prediction-time-contract`.
-- **Part 3A (Accessibility & Pilot Protocol Lock) is AUTHORIZED and ACTIVE.**
-  Tracked as `stage125-part3a-pilot-protocol-lock`; advances **no** research
-  action. Locks 10 registered M2–M4 candidates, proposed accessibility rubric,
-  gate protocol, sampling frame, pilot options, Part 3B evidence schema. **No**
-  evidence collection, **no** network access, **no** scores assigned.
+- **Part 3A (Accessibility & Pilot Protocol Lock) is COMPLETED and MERGED.**
+  PR #29 merged (`main` @ `4e15cb7…`); tracked as `stage125-part3a-pilot-protocol-lock`.
+  Protocol assets frozen. Locks 10 registered M2–M4 candidates, proposed
+  accessibility rubric, gate protocol, sampling frame, pilot options, Part 3B
+  evidence schema. **No** evidence collection, **no** network access, **no**
+  scores assigned.
+- **Part 3A.1 (User-Approved Pilot Decision Lock) is AUTHORIZED and ACTIVE.**
+  Tracked as `stage125-part3a1-decision-lock`; advances **no** research action.
+  Records user-approved rubric `stage125_part3a_v1` (approved but not applied),
+  G09–G14 pilot thresholds, and locked `pilot_option_event_enriched` pilot
+  (80 pairs; event-enriched; not population-representative; not modeling
+  sample). **No** evidence, **no** network access, **no** scores applied.
 - **Part 3B is NOT started.** Evidence capture belongs to Part 3B only.
 - **`modeling_started` remains `false`. `part2_started` is `true` (contract only,
-  not modeling). `part3a_protocol_locked` is `true` (protocol only, not modeling).
-  `part3b_started` is `false`. No network extraction was performed.** Modeling
-  begins only when Stage126 is approved.
+  not modeling). `part3a_protocol_locked` is `true`. `part3a_decision_locked` is
+  `true` (Part 3A.1). `part3b_started` is `false`. No network extraction was
+  performed.** Modeling begins only when Stage126 is approved.
 
 ## Ranking & evidence (Stage124 Batch02)
 

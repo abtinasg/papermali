@@ -62,6 +62,10 @@ See [`DECISIONS.md`](DECISIONS.md).
   `run_stage125_part3a.py`, `tests/test_stage125_part3a_pilot_protocol.py`,
   `stage125/stage125_part3a_pilot_protocol_qc_report.json` (accessibility rubric,
   gate protocol, candidate inventory freeze, sampling frame; no evidence, no extraction)
+- Stage125 Part 3A.1 decision-lock source/test/QC: `src/stage125_part3a_decision_lock.py`,
+  `run_stage125_part3a_decision_lock.py`, `tests/test_stage125_part3a_decision_lock.py`,
+  `stage125/stage125_part3a_decision_lock_qc_report.json` (approved rubric, G09–G14
+  thresholds, locked pilot selection; no evidence, no extraction)
 
 ## 7. Done
 

@@ -76,18 +76,32 @@ every pair. No pair is dropped. `modeling_started` remains `false`;
 **PR #27 post-merge Handoff refresh — MERGED** (`main` merge commit
 `c6cbb6b7a7dc4dfe7ca3fa6ea0bcf34d7f0612c0`). Part 1 and Part 2 are CLOSED.
 
-**Part 3A (authorized and active):** Accessibility, Coverage & Event Pilot
+**Part 3A (completed and merged):** Accessibility, Coverage & Event Pilot
 Protocol Lock. Protocol / inventory freeze only; tracked as maintenance task
 `stage125-part3a-pilot-protocol-lock` (advances no research action).
-Locks the 10 registered M2–M4 candidates, proposed accessibility rubric (not
-yet applied), gate decision protocol (8 locked Gates + 6 pending thresholds),
-sampling frame from frozen Gate B data, pilot-size options for later approval,
-and Part 3B evidence manifest schema. **No** evidence collection, **no**
-network access, **no** accessibility scores assigned, **no** candidate admitted.
-`modeling_started` remains `false`; `part3b_started=false`.
+PR #29 **MERGED** (`main` @ `4e15cb7…`). Locks the 10 registered M2–M4
+candidates, proposed accessibility rubric (not yet applied), gate decision
+protocol (8 locked Gates + 6 pending thresholds), sampling frame from frozen
+Gate B data, pilot-size options for later approval, and Part 3B evidence
+manifest schema. **No** evidence collection, **no** network access, **no**
+accessibility scores assigned, **no** candidate admitted.
+`part3a_protocol_locked=true`; `modeling_started` remains `false`;
+`part3b_started=false`. Part 3A protocol assets are **frozen**.
+
+**Part 3A.1 (authorized and active):** User-Approved Pilot Decision Lock.
+Decision record only; tracked as maintenance task
+`stage125-part3a1-decision-lock` (advances no research action). Records
+user-approved rubric version `stage125_part3a_v1` (approved but not applied),
+G09–G14 pilot-only thresholds, and locked `pilot_option_event_enriched`
+selection (80 pairs: 39 positive / 41 negative; 26 tickers; 11 industries;
+event-enriched, non-population-representative, not modeling sample).
+**No** evidence collection, **no** network access, **no** accessibility scores
+applied, **no** candidate admitted/rejected. `part3a_decision_locked=true`;
+`part3b_started=false`; `modeling_started=false`.
 
 **Part 3B — NOT started.** Evidence capture and live accessibility scoring
-belong to Part 3B only.
+belong to Part 3B only. Next action after Part 3A.1 merge: Part 3B evidence
+capture (not started in Part 3A.1).
 
 **Modeling remains prohibited** (no modeling, tuning, SHAP, SMOTE, calibration,
 temporal splitting, feature selection, or article result generation) through all of
