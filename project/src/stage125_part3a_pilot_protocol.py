@@ -14,8 +14,11 @@ import csv
 import hashlib
 import io
 import json
+import socket
 import subprocess
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Iterator
 
 import pandas as pd
 
@@ -55,6 +58,51 @@ EXPECTED_INVARIANTS = {
     "predictor_keys_in_all_rows": 1200,
     "target_keys_in_all_rows": 1200,
 }
+
+EXPECTED_ELIGIBILITY = {
+    "rule_a_eligible_pairs": 1013,
+    "rule_a_positive": 81,
+    "rule_a_negative": 932,
+    "rule_a_unknown": 0,
+    "rule_b_eligible_pairs": 994,
+    "rule_b_positive": 80,
+    "rule_b_negative": 914,
+    "rule_b_unknown": 0,
+}
+
+ELIGIBILITY_SNAPSHOT_COLUMNS = (
+    "predictor_row_key_t",
+    "target_row_key_t_plus_1",
+    "ticker",
+    "fiscal_year_t",
+    "target_year",
+    "pair_final_eligible_main_gate_b_primary",
+    "pair_final_eligible_main_gate_b_robustness",
+)
+
+MODELING_ARTIFACT_PATTERNS = (
+    "shap", "smote", "calibration", "temporal_split",
+    "predictions", "model_results",
+)
+MODELING_ARTIFACT_EXTENSIONS = (".joblib", ".npz", ".pickle", ".pkl", ".model")
+
+PART3B_FORBIDDEN_EXACT = (
+    "project/run_stage125_part3b.py",
+)
+PART3B_FORBIDDEN_PREFIXES = (
+    "project/src/stage125_part3b",
+    "project/tests/test_stage125_part3b",
+    "project/stage125/part3b/",
+)
+PART3B_FORBIDDEN_GLOBS = (
+    "part3_evidence_",
+    "part3b_evidence_",
+    "part3_captured_",
+    "part3_raw_snapshot_",
+)
+PART3B_ALLOWED_EXACT = (
+    "project/stage125/part3_source_evidence_manifest_schema_stage125.json",
+)
 
 REGISTERED_CANDIDATES = (
     {"candidate_id": "cand_m2_equity_return_window", "block": "M2",
@@ -152,7 +200,9 @@ _GATE_HEADER = [
 
 _PILOT_OPTIONS_HEADER = [
     "option_id", "proposed_sample_size", "proposed_class_allocation",
-    "proposed_temporal_allocation", "proposed_ticker_industry_diversity_rule",
+    "allocation_by_target_year", "proposed_temporal_allocation",
+    "proposed_ticker_industry_diversity_rule",
+    "rule_a_pool_positive_total", "rule_a_pool_negative_total",
     "expected_document_api_workload_m2", "expected_document_api_workload_m3",
     "expected_document_api_workload_m4", "advantages", "limitations", "status",
 ]
@@ -330,6 +380,189 @@ def verify_baseline_commit(repo_root: str) -> None:
                 f"origin/main ({origin_main}) does not contain expected "
                 f"baseline {EXPECTED_BASELINE_COMMIT}"
             )
+
+
+# --------------------------------------------------------------------------- #
+# Fail-closed guardrails (evidence-based)
+# --------------------------------------------------------------------------- #
+
+class NetworkSentinel:
+    """Count outbound socket connect attempts during Part 3A execution."""
+
+    def __init__(self) -> None:
+        self.calls_attempted = 0
+        self._orig_connect = socket.socket.connect
+
+    def _blocked_connect(self, _sock, *args, **kwargs):
+        self.calls_attempted += 1
+        raise OSError(f"network blocked by Part 3A sentinel: {args!r}")
+
+    def install(self) -> None:
+        socket.socket.connect = self._blocked_connect  # type: ignore[method-assign]
+
+    def restore(self) -> None:
+        socket.socket.connect = self._orig_connect  # type: ignore[method-assign]
+
+
+@contextmanager
+def network_sentinel() -> Iterator[NetworkSentinel]:
+    sentinel = NetworkSentinel()
+    sentinel.install()
+    try:
+        yield sentinel
+    finally:
+        sentinel.restore()
+
+
+def scan_for_modeling_artifacts(project_dir: Path) -> dict:
+    """Reuse Stage124 guardrail semantics for modeling-artifact detection."""
+    modeling_paths = [
+        project_dir / "outputs" / "stage_modeling" / "run_manifest.json",
+    ]
+    path_hits = [str(p.relative_to(project_dir.parent))
+                 for p in modeling_paths if p.is_file()]
+    artifact_hits: list[str] = []
+    scan_dirs = [
+        project_dir / "stage124" / "gate_b_final",
+        project_dir / "stage125",
+    ]
+    for scan_dir in scan_dirs:
+        if not scan_dir.is_dir():
+            continue
+        for f in scan_dir.rglob("*"):
+            if not f.is_file():
+                continue
+            low = f.name.lower()
+            if low.startswith("modeling_") and low.endswith(".csv"):
+                continue
+            rel = str(f.relative_to(project_dir.parent))
+            for ext in MODELING_ARTIFACT_EXTENSIONS:
+                if low.endswith(ext):
+                    artifact_hits.append(rel)
+                    break
+            else:
+                for pat in MODELING_ARTIFACT_PATTERNS:
+                    if pat in low:
+                        artifact_hits.append(rel)
+                        break
+    return {
+        "path_hits": sorted(path_hits),
+        "artifact_hits": sorted(artifact_hits),
+        "no_modeling": len(path_hits) == 0 and len(artifact_hits) == 0,
+    }
+
+
+def scan_for_part3b_artifacts(repo_root: Path) -> dict:
+    """Detect Part 3B runner/implementation/captured evidence (schema allowed)."""
+    hits: list[str] = []
+    for rel in PART3B_FORBIDDEN_EXACT:
+        if (repo_root / rel).exists():
+            hits.append(rel)
+    stage125 = repo_root / "project" / "stage125"
+    if stage125.is_dir():
+        for f in stage125.rglob("*"):
+            if not f.is_file():
+                continue
+            rel = str(f.relative_to(repo_root))
+            if rel in PART3B_ALLOWED_EXACT:
+                continue
+            low = f.name.lower()
+            if any(low.startswith(prefix) for prefix in PART3B_FORBIDDEN_GLOBS):
+                hits.append(rel)
+    src = repo_root / "project" / "src"
+    if src.is_dir():
+        for f in src.iterdir():
+            if not f.is_file():
+                continue
+            rel = str(f.relative_to(repo_root))
+            if any(rel.startswith(p) for p in PART3B_FORBIDDEN_PREFIXES):
+                hits.append(rel)
+    tests = repo_root / "project" / "tests"
+    if tests.is_dir():
+        for f in tests.iterdir():
+            if not f.is_file():
+                continue
+            rel = str(f.relative_to(repo_root))
+            if any(rel.startswith(p) for p in PART3B_FORBIDDEN_PREFIXES):
+                hits.append(rel)
+    for prefix in PART3B_FORBIDDEN_PREFIXES:
+        if (repo_root / prefix).is_dir():
+            for f in (repo_root / prefix).rglob("*"):
+                if f.is_file():
+                    hits.append(str(f.relative_to(repo_root)))
+    return {"hits": sorted(set(hits)), "no_part3b": len(hits) == 0}
+
+
+def eligibility_snapshot(df_pairs: pd.DataFrame) -> str:
+    """Deterministic fingerprint of frozen pair keys and eligibility fields."""
+    cols = [c for c in ELIGIBILITY_SNAPSHOT_COLUMNS if c in df_pairs.columns]
+    sub = df_pairs[cols].copy()
+    sub = sub.sort_values(cols[:2]).reset_index(drop=True)
+    return sha256_bytes(sub.to_csv(index=False).encode("utf-8"))
+
+
+def compute_eligibility_counts_with_targets(
+    df_all: pd.DataFrame, df_pairs: pd.DataFrame,
+) -> dict:
+    merged = _merge_pairs_targets(df_all, df_pairs)
+    ra = merged[merged["pair_final_eligible_main_gate_b_primary"] == "1"]
+    rb = merged[merged["pair_final_eligible_main_gate_b_robustness"] == "1"]
+
+    def _class_counts(sub: pd.DataFrame) -> tuple[int, int, int]:
+        pos = int(sum(sub["FD_target_main"].map(_target_class) == "positive"))
+        neg = int(sum(sub["FD_target_main"].map(_target_class) == "negative"))
+        unk = int(sum(sub["FD_target_main"].map(_target_class) == "unknown"))
+        return pos, neg, unk
+
+    ra_pos, ra_neg, ra_unk = _class_counts(ra)
+    rb_pos, rb_neg, rb_unk = _class_counts(rb)
+    return {
+        "rule_a_eligible_pairs": int(len(ra)),
+        "rule_a_positive": ra_pos,
+        "rule_a_negative": ra_neg,
+        "rule_a_unknown": ra_unk,
+        "rule_b_eligible_pairs": int(len(rb)),
+        "rule_b_positive": rb_pos,
+        "rule_b_negative": rb_neg,
+        "rule_b_unknown": rb_unk,
+        "pair_count": int(len(df_pairs)),
+        "unique_predictor_keys": int(df_pairs["predictor_row_key_t"].nunique()),
+        "unique_target_keys": int(df_pairs["target_row_key_t_plus_1"].nunique()),
+        "snapshot_sha256": eligibility_snapshot(df_pairs),
+    }
+
+
+def run_guardrails(
+    project_dir: Path,
+    repo_root: Path,
+    df_all: pd.DataFrame,
+    df_pairs: pd.DataFrame,
+    network_calls: int,
+) -> dict:
+    modeling = scan_for_modeling_artifacts(project_dir)
+    part3b = scan_for_part3b_artifacts(repo_root)
+    eligibility = compute_eligibility_counts_with_targets(df_all, df_pairs)
+    elig_mismatches = []
+    for key in (
+        "rule_a_eligible_pairs", "rule_a_positive", "rule_a_negative",
+        "rule_a_unknown", "rule_b_eligible_pairs", "rule_b_positive",
+        "rule_b_negative", "rule_b_unknown", "pair_count",
+        "unique_predictor_keys", "unique_target_keys",
+    ):
+        expected = EXPECTED_ELIGIBILITY.get(key, EXPECTED_INVARIANTS.get(key))
+        if expected is not None and eligibility.get(key) != expected:
+            elig_mismatches.append(
+                f"{key}: expected {expected}, got {eligibility.get(key)}"
+            )
+    return {
+        "modeling": modeling,
+        "part3b": part3b,
+        "eligibility": eligibility,
+        "eligibility_mismatches": elig_mismatches,
+        "eligibility_unchanged": not elig_mismatches,
+        "network_calls_attempted": network_calls,
+        "no_network_calls": network_calls == 0,
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -680,8 +913,11 @@ def build_sampling_summary(
 # --------------------------------------------------------------------------- #
 
 def _deterministic_pilot_pairs(
-    df_all: pd.DataFrame, df_pairs: pd.DataFrame, per_year: int,
-) -> list[dict]:
+    df_all: pd.DataFrame,
+    df_pairs: pd.DataFrame,
+    max_pos_per_year: int | None,
+    per_year_quota: int,
+) -> tuple[list[dict], dict[str, dict[str, int]]]:
     """Select pairs deterministically from frozen identifiers only."""
     merged = _merge_pairs_targets(df_all, df_pairs)
     ra = merged[merged["pair_final_eligible_main_gate_b_primary"] == "1"].copy()
@@ -691,30 +927,52 @@ def _deterministic_pilot_pairs(
         ascending=[True, True, True, True],
     )
     selected: list[dict] = []
+    used_keys: set[str] = set()
+    year_allocation: dict[str, dict[str, int]] = {}
+
     for ty in sorted(ra["target_year"].unique()):
         sub = ra[ra["target_year"] == ty]
         pos = sub[sub["_class"] == "positive"]
         neg = sub[sub["_class"] == "negative"]
+        unk = sub[sub["_class"] == "unknown"]
         picked: list[pd.Series] = []
-        if len(pos) > 0:
-            picked.append(pos.iloc[0])
-        remaining = per_year - len(picked)
-        for _, row in neg.iterrows():
-            if remaining <= 0:
+        pos_cap = len(pos) if max_pos_per_year is None else max_pos_per_year
+
+        for _, row in pos.iterrows():
+            if len(picked) >= per_year_quota:
                 break
-            if any(p["ticker"] == row["ticker"] for p in picked):
+            if sum(1 for p in picked if p["_class"] == "positive") >= pos_cap:
+                break
+            key = row["predictor_row_key_t"]
+            if key in used_keys:
                 continue
             picked.append(row)
-            remaining -= 1
-        if remaining > 0:
-            for _, row in sub.iterrows():
-                if remaining <= 0:
+            used_keys.add(key)
+
+        for _, row in neg.iterrows():
+            if len(picked) >= per_year_quota:
+                break
+            key = row["predictor_row_key_t"]
+            if key in used_keys:
+                continue
+            picked.append(row)
+            used_keys.add(key)
+
+        if len(picked) < per_year_quota:
+            for _, row in unk.iterrows():
+                if len(picked) >= per_year_quota:
                     break
-                if any(p["predictor_row_key_t"] == row["predictor_row_key_t"]
-                       for p in picked):
+                key = row["predictor_row_key_t"]
+                if key in used_keys:
                     continue
                 picked.append(row)
-                remaining -= 1
+                used_keys.add(key)
+
+        year_allocation[str(ty)] = {
+            "positive": sum(1 for p in picked if p["_class"] == "positive"),
+            "negative": sum(1 for p in picked if p["_class"] == "negative"),
+            "unknown": sum(1 for p in picked if p["_class"] == "unknown"),
+        }
         for row in picked:
             selected.append({
                 "predictor_row_key_t": row["predictor_row_key_t"],
@@ -724,55 +982,93 @@ def _deterministic_pilot_pairs(
                 "class": row["_class"],
                 "industry": row["industry"],
             })
-    return selected
+    return selected, year_allocation
+
+
+def _format_year_allocation(year_allocation: dict[str, dict[str, int]]) -> str:
+    parts = []
+    for ty in sorted(year_allocation):
+        a = year_allocation[ty]
+        parts.append(
+            f"{ty}:pos={a['positive']},neg={a['negative']},unk={a['unknown']}"
+        )
+    return ";".join(parts)
 
 
 def build_pilot_sampling_options(
     df_all: pd.DataFrame, df_pairs: pd.DataFrame,
 ) -> list[dict]:
+    merged = _merge_pairs_targets(df_all, df_pairs)
+    ra = merged[merged["pair_final_eligible_main_gate_b_primary"] == "1"]
+    pool_pos = int(sum(ra["FD_target_main"].map(_target_class) == "positive"))
+    pool_neg = int(sum(ra["FD_target_main"].map(_target_class) == "negative"))
+
     options_spec = [
-        ("pilot_option_compact", 4,
-         "4 pairs per target year (~40 total); 1 positive where available per year"),
-        ("pilot_option_balanced", 8,
-         "8 pairs per target year (~80 total); stratified by year with positive priority"),
-        ("pilot_option_extended", 16,
-         "16 pairs per target year (~160 total); broader ticker/industry spread"),
+        (
+            "pilot_option_compact",
+            2,
+            4,
+            "Compact pilot: 4 Rule-A pairs per target year (2 positive where "
+            "available + 2 negative); scales positive representation without "
+            "using the full Rule A pool.",
+        ),
+        (
+            "pilot_option_representative",
+            4,
+            8,
+            "Representative pilot: 8 Rule-A pairs per target year (up to 4 "
+            "positive where available + negatives); increases positive "
+            "coverage across years subject to Rule A availability.",
+        ),
+        (
+            "pilot_option_extended",
+            None,
+            16,
+            "Extended pilot: 16 Rule-A pairs per target year (all available "
+            "positives per year up to quota + negatives); uses the full 81 "
+            "Rule A positives where year supply allows.",
+        ),
     ]
     rows: list[dict] = []
-    for opt_id, per_year, temporal_desc in options_spec:
-        selected = _deterministic_pilot_pairs(df_all, df_pairs, per_year)
+    for opt_id, max_pos, per_year, temporal_desc in options_spec:
+        selected, year_allocation = _deterministic_pilot_pairs(
+            df_all, df_pairs, max_pos, per_year,
+        )
         n = len(selected)
         pos_n = sum(1 for s in selected if s["class"] == "positive")
         neg_n = sum(1 for s in selected if s["class"] == "negative")
         unk_n = sum(1 for s in selected if s["class"] == "unknown")
         unique_tickers = len({s["ticker"] for s in selected})
         unique_industries = len({
-            s["industry"] for s in selected
-            if str(s["industry"]).strip()
+            s["industry"] for s in selected if str(s["industry"]).strip()
         })
         company_years = len({s["predictor_row_key_t"] for s in selected})
+        target_years = len({s["target_year"] for s in selected})
         rows.append({
             "option_id": opt_id,
             "proposed_sample_size": n,
             "proposed_class_allocation": (
                 f"positive={pos_n};negative={neg_n};unknown={unk_n}"
             ),
+            "allocation_by_target_year": _format_year_allocation(year_allocation),
             "proposed_temporal_allocation": (
                 f"{per_year} pairs per target year (Rule A eligible); "
                 f"{temporal_desc}"
             ),
             "proposed_ticker_industry_diversity_rule": (
-                f"max 1 pair per ticker per target year where possible; "
+                f"deterministic without replacement by predictor_row_key_t; "
                 f"unique_tickers={unique_tickers}; "
                 f"unique_industries={unique_industries}"
             ),
+            "rule_a_pool_positive_total": pool_pos,
+            "rule_a_pool_negative_total": pool_neg,
             "expected_document_api_workload_m2": (
                 f"~{company_years} company-years x 3 M2 variables "
                 f"(market series retrieval)"
             ),
             "expected_document_api_workload_m3": (
-                f"~{len(sorted({s['target_year'] for s in selected}))} "
-                f"target years x 3 M3 variables (macro series retrieval)"
+                f"~{target_years} target years x 3 M3 variables "
+                f"(macro series retrieval)"
             ),
             "expected_document_api_workload_m4": (
                 f"~{company_years} company-years x 4 M4 variables "
@@ -780,12 +1076,13 @@ def build_pilot_sampling_options(
             ),
             "advantages": (
                 f"Deterministic selection from frozen identifiers; "
-                f"manageable workload; preserves temporal spread across "
-                f"{len(sorted({s['target_year'] for s in selected}))} target years"
+                f"positive={pos_n} of Rule A pool={pool_pos}; temporal spread "
+                f"across {target_years} target years"
             ),
             "limitations": (
                 "Does not account for future accessibility results; "
-                "positive count limited by frozen sample (~81 Rule A positives total)"
+                f"Rule A pool has only {pool_pos} positives / {pool_neg} "
+                "negatives — not class-balanced at full-pool scale"
             ),
             "status": "pending_user_approval",
         })
@@ -930,6 +1227,7 @@ def build_qc_assertions(
     gate_rows: list[dict],
     rubric: dict,
     repo_root: str,
+    guard_evidence: dict,
 ) -> list[dict]:
     out: list[dict] = []
 
@@ -1014,11 +1312,33 @@ def build_qc_assertions(
         frozen_before == frozen_after and len(frozen_before) > 0,
         f"{len(frozen_before)} tracked frozen assets identical")
 
-    add("modeling_not_started", True, "no modeling artifact produced")
-    add("no_network_extraction", True, "no network or API access performed")
-    add("no_data_extraction", True, "no data extraction performed")
-    add("part3b_not_started", True, "Part 3B evidence capture not started")
-    add("eligibility_impact_none", True, "eligibility_impact=none_protocol_only")
+    modeling = guard_evidence["modeling"]
+    add("modeling_not_started", modeling["no_modeling"],
+        "checked paths and artifact patterns"
+        if modeling["no_modeling"] else
+        f"paths={modeling['path_hits']}; artifacts={modeling['artifact_hits']}")
+
+    add("no_network_extraction", guard_evidence["no_network_calls"],
+        f"network_calls_attempted={guard_evidence['network_calls_attempted']}")
+
+    part3b = guard_evidence["part3b"]
+    add("no_data_extraction", part3b["no_part3b"],
+        "no Part 3B evidence datasets or extraction outputs"
+        if part3b["no_part3b"] else f"part3b_hits={part3b['hits']}")
+
+    add("part3b_not_started", part3b["no_part3b"],
+        "no Part 3B runner/implementation/captured evidence"
+        if part3b["no_part3b"] else f"part3b_hits={part3b['hits']}")
+
+    eligibility = guard_evidence["eligibility"]
+    add("eligibility_impact_none", guard_evidence["eligibility_unchanged"],
+        f"snapshot_sha256={eligibility['snapshot_sha256']}; "
+        f"rule_a={eligibility['rule_a_eligible_pairs']}/"
+        f"{eligibility['rule_a_positive']}pos/"
+        f"{eligibility['rule_a_negative']}neg"
+        if guard_evidence["eligibility_unchanged"] else
+        "; ".join(guard_evidence["eligibility_mismatches"]))
+
     add("part1_part2_frozen_unchanged",
         len(frozen_before) > 0 and frozen_before == frozen_after,
         "Stage122-Stage125 Part1/Part2 frozen deliverables unchanged")
@@ -1034,6 +1354,7 @@ def build_qc_report(
     inventory_rows: list[dict],
     gate_rows: list[dict],
     rubric: dict,
+    guard_evidence: dict,
 ) -> dict:
     root = str(repo_root)
     source_commit = _git_last_code_commit(root, [SRC_REL, TEST_REL])
@@ -1042,7 +1363,7 @@ def build_qc_report(
     test_sha = sha256_file(repo_root / TEST_REL)
     assertions = build_qc_assertions(
         counts, content_hashes, frozen_before, frozen_after,
-        inventory_rows, gate_rows, rubric, root,
+        inventory_rows, gate_rows, rubric, root, guard_evidence,
     )
     failed = sum(1 for a in assertions if a["status"] != "PASS")
     all_pass = failed == 0
@@ -1076,8 +1397,13 @@ def build_qc_report(
         "part3a_protocol_locked": True,
         "part3b_started": False,
         "pilot_extraction_started": False,
-        "network_extraction_performed": False,
-        "eligibility_impact": "none_protocol_only",
+        "network_extraction_performed": not guard_evidence["no_network_calls"],
+        "network_calls_attempted": guard_evidence["network_calls_attempted"],
+        "guard_evidence": guard_evidence,
+        "eligibility_impact": (
+            "none_protocol_only"
+            if guard_evidence["eligibility_unchanged"] else "protocol_check_failed"
+        ),
         "assertions": assertions,
     }
 
@@ -1111,7 +1437,9 @@ def build_metadata(
         "part3a_protocol_locked": True,
         "part3b_started": False,
         "pilot_extraction_started": False,
-        "network_extraction_performed": False,
+        "network_extraction_performed": qc_report.get(
+            "network_extraction_performed", False),
+        "network_calls_attempted": qc_report.get("network_calls_attempted", 0),
         "warning": (
             "Part 3A only: protocol lock before evidence collection. "
             "No modeling, no extraction, no network access. "
@@ -1165,51 +1493,65 @@ def build_all(
     pairs_path: Path | None,
 ) -> dict:
     verify_baseline_commit(str(repo_root))
-    df_all, df_pairs, sha_all, sha_pairs = load_inputs(all_rows_path, pairs_path)
+    project_dir = repo_root / "project"
+    with network_sentinel() as sentinel:
+        df_all, df_pairs, sha_all, sha_pairs = load_inputs(all_rows_path, pairs_path)
 
-    counts = compute_invariants(df_all, df_pairs)
-    inv_errs = check_invariants(counts)
-    if inv_errs:
-        raise QCFail("invariant mismatch (fail-closed):\n  " + "\n  ".join(inv_errs))
+        counts = compute_invariants(df_all, df_pairs)
+        inv_errs = check_invariants(counts)
+        if inv_errs:
+            raise QCFail(
+                "invariant mismatch (fail-closed):\n  " + "\n  ".join(inv_errs)
+            )
 
-    frozen_before = frozen_asset_hashes(repo_root)
-    raw_content = build_content_files(df_all, df_pairs, counts)
-    inventory_rows = raw_content.pop("_inventory_rows")
-    gate_rows = raw_content.pop("_gate_rows")
-    rubric = raw_content.pop("_rubric")
-    content_files = {k: v for k, v in raw_content.items() if not k.startswith("_")}
-    content_hashes = _hash_map(content_files)
-    frozen_after = frozen_asset_hashes(repo_root)
-    if frozen_before != frozen_after:
-        raise QCFail("frozen assets changed during Part 3A run (fail-closed)")
+        frozen_before = frozen_asset_hashes(repo_root)
+        raw_content = build_content_files(df_all, df_pairs, counts)
+        inventory_rows = raw_content.pop("_inventory_rows")
+        gate_rows = raw_content.pop("_gate_rows")
+        rubric = raw_content.pop("_rubric")
+        content_files = {
+            k: v for k, v in raw_content.items() if not k.startswith("_")
+        }
+        content_hashes = _hash_map(content_files)
+        frozen_after = frozen_asset_hashes(repo_root)
+        if frozen_before != frozen_after:
+            raise QCFail("frozen assets changed during Part 3A run (fail-closed)")
 
-    tickers = sorted(t for t in df_pairs["ticker"].dropna().unique() if str(t).strip())
-    qc_report = build_qc_report(
-        repo_root, counts, sha_all, sha_pairs, content_hashes,
-        frozen_before, frozen_after, tickers,
-        inventory_rows, gate_rows, rubric,
-    )
-    if not qc_report["all_pass"]:
-        failed = [a for a in qc_report["assertions"] if a["status"] != "PASS"]
-        raise QCFail("QC failed (fail-closed): "
-                     + "; ".join(f"{a['assertion']}: {a['detail']}" for a in failed))
+        guard_evidence = run_guardrails(
+            project_dir, repo_root, df_all, df_pairs, sentinel.calls_attempted,
+        )
 
-    qc_str = _json_str(qc_report)
-    qc_hash = sha256_bytes(qc_str.encode("utf-8"))
-    metadata = build_metadata(repo_root, qc_report, content_hashes, qc_hash,
-                              sha_all, sha_pairs)
+        tickers = sorted(
+            t for t in df_pairs["ticker"].dropna().unique() if str(t).strip()
+        )
+        qc_report = build_qc_report(
+            repo_root, counts, sha_all, sha_pairs, content_hashes,
+            frozen_before, frozen_after, tickers,
+            inventory_rows, gate_rows, rubric, guard_evidence,
+        )
+        if not qc_report["all_pass"]:
+            failed = [a for a in qc_report["assertions"] if a["status"] != "PASS"]
+            raise QCFail("QC failed (fail-closed): "
+                         + "; ".join(f"{a['assertion']}: {a['detail']}"
+                                     for a in failed))
 
-    files: dict[str, str] = dict(content_files)
-    files[F_QC] = qc_str
-    files[F_METADATA] = _json_str(metadata)
-    return {
-        "files": files,
-        "qc": qc_report,
-        "counts": counts,
-        "inventory_rows": inventory_rows,
-        "input_all_rows_sha256": sha_all,
-        "input_pairs_sha256": sha_pairs,
-    }
+        qc_str = _json_str(qc_report)
+        qc_hash = sha256_bytes(qc_str.encode("utf-8"))
+        metadata = build_metadata(repo_root, qc_report, content_hashes, qc_hash,
+                                  sha_all, sha_pairs)
+
+        files: dict[str, str] = dict(content_files)
+        files[F_QC] = qc_str
+        files[F_METADATA] = _json_str(metadata)
+        return {
+            "files": files,
+            "qc": qc_report,
+            "counts": counts,
+            "inventory_rows": inventory_rows,
+            "guard_evidence": guard_evidence,
+            "input_all_rows_sha256": sha_all,
+            "input_pairs_sha256": sha_pairs,
+        }
 
 
 def run(

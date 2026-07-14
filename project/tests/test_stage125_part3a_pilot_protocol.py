@@ -240,6 +240,49 @@ def test_pilot_sampling_options_pending_approval():
     for opt in options:
         assert opt["status"] == "pending_user_approval"
         assert int(opt["proposed_sample_size"]) > 0
+    ids = [o["option_id"] for o in options]
+    assert "pilot_option_balanced" not in ids
+    assert "pilot_option_representative" in ids
+
+
+def test_pilot_sampling_positive_counts_scale():
+    df_all, df_pairs, _, _ = part3a.load_inputs(ALL_ROWS_PATH, PAIRS_PATH)
+    options = part3a.build_pilot_sampling_options(df_all, df_pairs)
+    pos_counts = []
+    for opt in options:
+        pos = int(opt["proposed_class_allocation"].split(";")[0].split("=")[1])
+        pos_counts.append(pos)
+    assert pos_counts == [20, 39, 81]
+    assert pos_counts[0] < pos_counts[1] < pos_counts[2]
+
+
+def test_pilot_sampling_rule_a_pool_reported():
+    df_all, df_pairs, _, _ = part3a.load_inputs(ALL_ROWS_PATH, PAIRS_PATH)
+    options = part3a.build_pilot_sampling_options(df_all, df_pairs)
+    for opt in options:
+        assert int(opt["rule_a_pool_positive_total"]) == 81
+        assert int(opt["rule_a_pool_negative_total"]) == 932
+        assert "allocation_by_target_year" in opt
+        assert "1393:pos=" in opt["allocation_by_target_year"]
+
+
+def test_pilot_sampling_selected_keys_unique_and_eligible():
+    df_all, df_pairs, _, _ = part3a.load_inputs(ALL_ROWS_PATH, PAIRS_PATH)
+    merged = part3a._merge_pairs_targets(df_all, df_pairs)
+    ra_keys = set(
+        merged[merged["pair_final_eligible_main_gate_b_primary"] == "1"][
+            "predictor_row_key_t"
+        ]
+    )
+    all_keys = set(df_all["row_key"]) | set(df_pairs["predictor_row_key_t"])
+    for max_pos, per_year in ((2, 4), (4, 8), (None, 16)):
+        selected, _ = part3a._deterministic_pilot_pairs(
+            df_all, df_pairs, max_pos, per_year,
+        )
+        keys = [s["predictor_row_key_t"] for s in selected]
+        assert len(keys) == len(set(keys))
+        assert all(k in ra_keys for k in keys)
+        assert all(k in all_keys for k in keys)
 
 
 def test_pilot_sampling_deterministic():
@@ -328,3 +371,86 @@ def test_inventory_csv_structure_in_build():
     assert len(rows) > 10
     registered = [r for r in rows if r["candidate_scope_status"] == "registered_candidate"]
     assert len(registered) == 10
+
+
+# --------------------------------------------------------------------------- #
+# Evidence-based guardrails
+# --------------------------------------------------------------------------- #
+
+def test_guard_modeling_scan_clean():
+    evidence = part3a.scan_for_modeling_artifacts(ROOT)
+    assert evidence["no_modeling"] is True
+
+
+def test_guard_part3b_scan_clean():
+    evidence = part3a.scan_for_part3b_artifacts(REPO_ROOT)
+    assert evidence["no_part3b"] is True
+
+
+def test_guard_eligibility_unchanged():
+    df_all, df_pairs, _, _ = part3a.load_inputs(ALL_ROWS_PATH, PAIRS_PATH)
+    counts = part3a.compute_eligibility_counts_with_targets(df_all, df_pairs)
+    assert counts["rule_a_eligible_pairs"] == 1013
+    assert counts["rule_a_positive"] == 81
+    assert counts["rule_a_negative"] == 932
+
+
+def test_guard_network_sentinel_zero_calls():
+    result = _build()
+    assert result["guard_evidence"]["network_calls_attempted"] == 0
+    assert result["guard_evidence"]["no_network_calls"] is True
+
+
+def test_qc_guard_assertions_evidence_backed():
+    result = _build()
+    names = {a["assertion"]: a for a in result["qc"]["assertions"]}
+    for key in (
+        "modeling_not_started", "no_network_extraction", "no_data_extraction",
+        "part3b_not_started", "eligibility_impact_none",
+    ):
+        assert names[key]["status"] == "PASS"
+        assert names[key]["detail"] != "no modeling artifact produced"
+
+
+def test_negative_modeling_artifact_detected(tmp_path):
+    bad = tmp_path / "stage125" / "nested"
+    bad.mkdir(parents=True)
+    artifact = bad / "model.joblib"
+    artifact.write_bytes(b"fake")
+    project_dir = tmp_path
+    evidence = part3a.scan_for_modeling_artifacts(project_dir)
+    assert evidence["no_modeling"] is False
+    assert any("model.joblib" in h for h in evidence["artifact_hits"])
+
+
+def test_negative_part3b_runner_detected(tmp_path):
+    src = tmp_path / "project" / "src"
+    src.mkdir(parents=True)
+    (src / "stage125_part3b_evidence.py").write_text("x\n")
+    evidence = part3a.scan_for_part3b_artifacts(tmp_path)
+    assert evidence["no_part3b"] is False
+
+
+def test_negative_network_call_blocked():
+    import socket as _socket
+    with part3a.network_sentinel() as sentinel:
+        sock = _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM)
+        try:
+            with pytest.raises(OSError):
+                sock.connect(("127.0.0.1", 9))
+        finally:
+            sock.close()
+        assert sentinel.calls_attempted == 1
+
+
+def test_negative_eligibility_mismatch_detected():
+    df_all, df_pairs, _, _ = part3a.load_inputs(ALL_ROWS_PATH, PAIRS_PATH)
+    tampered = df_pairs.copy()
+    idx = tampered.index[
+        tampered["pair_final_eligible_main_gate_b_primary"] == "1"
+    ][0]
+    tampered.loc[idx, "pair_final_eligible_main_gate_b_primary"] = "0"
+    evidence = part3a.run_guardrails(ROOT, REPO_ROOT, df_all, tampered, 0)
+    assert evidence["eligibility_unchanged"] is False
+    assert any("rule_a_eligible_pairs" in m
+               for m in evidence["eligibility_mismatches"])

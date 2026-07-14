@@ -278,12 +278,19 @@ def test_handoff_only_disjoint_from_stage125_code():
     ("project/stage125/stage125_part2_prediction_time_contract_qc_report.json", True),
     ("project/stage125/metadata_and_hashes_stage125_part3a.json", True),
     ("project/stage125/stage125_part3a_pilot_protocol_qc_report.json", True),
+    ("project/stage125/README_STAGE125_PART3A_PILOT_PROTOCOL.md", True),
+    ("project/stage125/accessibility_scoring_rubric_stage125_part3a.json", True),
+    ("project/stage125/part3_candidate_inventory_stage125.csv", True),
+    ("project/stage125/part3_gate_decision_protocol_stage125.csv", True),
+    ("project/stage125/part3_pilot_sampling_options_stage125.csv", True),
+    ("project/stage125/part3_sampling_frame_by_target_year_stage125.csv", True),
+    ("project/stage125/part3_sampling_frame_summary_stage125.json", True),
+    ("project/stage125/part3_source_evidence_manifest_schema_stage125.json", True),
     ("project/stage122/metadata_and_hashes_stage122.json", True),
     ("project/stage123/stage123_qc_report.json", True),
     # Real research/contract deliverables under the SAME directories are NOT
     # artifact-only, even though they sit next to generated bookkeeping files.
     ("project/stage125/prediction_time_contract_stage125_part2.json", False),
-    ("project/stage125/part3_candidate_inventory_stage125.csv", False),
     ("project/stage125/data_dictionary_stage125.csv", False),
     ("project/stage124/listing_master_verified_stage124.csv", False),
     ("project/stage124/gate_b_final/modeling_main_rule_a_eligible.csv", False),
@@ -298,6 +305,8 @@ def test_handoff_only_disjoint_from_stage125_code():
     ("project/stage124/stage124_batch02_gate_b_qc_report.json.bak", False),
     ("project/stage125/metadata_and_hashes_stage125_part2.json.evil", False),
     ("project/stage125/metadata_and_hashes_stage125_part3a.json.evil", False),
+    ("project/stage125/part3_candidate_inventory_stage125.csv.evil", False),
+    ("project/stage125/sub/part3_candidate_inventory_stage125.csv", False),
     ("project/stage125/sub/metadata_and_hashes_stage125_part2.json", False),
 ])
 def test_artifact_only_classification(path, ok):
@@ -709,3 +718,67 @@ def test_untracked_but_ignored_is_regenerable(synth):
     _add_manifest_entry(synth, "project/stage122/ignored_out.csv", "y\n")
     # Proven gitignored -> regenerable -> must NOT raise.
     gen.semantic_state(synth)
+
+
+# ---- Stage125 Part 3A artifact-only + last_stage_commit regression -------- #
+
+@pytest.mark.parametrize("path", [
+    "project/stage125/README_STAGE125_PART3A_PILOT_PROTOCOL.md",
+    "project/stage125/accessibility_scoring_rubric_stage125_part3a.json",
+    "project/stage125/part3_candidate_inventory_stage125.csv",
+    "project/stage125/part3_gate_decision_protocol_stage125.csv",
+    "project/stage125/part3_pilot_sampling_options_stage125.csv",
+    "project/stage125/part3_sampling_frame_by_target_year_stage125.csv",
+    "project/stage125/part3_sampling_frame_summary_stage125.json",
+    "project/stage125/part3_source_evidence_manifest_schema_stage125.json",
+])
+def test_stage125_part3a_generated_files_are_artifact_only(path):
+    assert gen.path_artifact_only(path) is True
+    assert gen.path_handoff_only(path) is False
+
+
+@pytest.mark.parametrize("path", [
+    "project/stage125/part3_candidate_inventory_stage125.csv.bak",
+    "project/stage125/part3_candidate_inventory_stage125.csv.evil",
+    "project/stage125/sub/part3_pilot_sampling_options_stage125.csv",
+    "project/stage125/part3_gate_decision_protocol_stage125.csv~",
+])
+def test_stage125_part3a_artifact_prefix_suffix_attacks_rejected(path):
+    assert gen.path_artifact_only(path) is False
+
+
+def test_stage125_part3a_full_artifact_commit_is_skipped(synth):
+    before = gen.last_stage_commit(synth)
+    for rel in (
+        "project/stage125/part3_candidate_inventory_stage125.csv",
+        "project/stage125/part3_pilot_sampling_options_stage125.csv",
+        "project/stage125/stage125_part3a_pilot_protocol_qc_report.json",
+        "project/stage125/metadata_and_hashes_stage125_part3a.json",
+    ):
+        _write(synth, rel, "generated\n")
+    sha = _commit(synth, "artifacts: freeze Stage125 Part3A pilot protocol")
+    assert gen.last_stage_commit(synth) == before
+    assert gen.last_stage_commit(synth) != sha
+
+
+def test_stage125_part3a_mixed_code_and_artifact_commit_advances(synth):
+    before = gen.last_stage_commit(synth)
+    _write(synth, "project/src/stage125_part3a_pilot_protocol.py", "GUARD = 1\n")
+    _write(synth, "project/stage125/metadata_and_hashes_stage125_part3a.json",
+           json.dumps({"stage": "stage125_part3a"}))
+    sha = _commit(synth, "fix(part3a): guard update plus regenerated metadata")
+    got = gen.last_stage_commit(synth)
+    assert got == sha
+    assert got != before
+
+
+@pytest.mark.skipif(
+    not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
+    reason="real-repo test requires git checkout",
+)
+def test_real_repo_last_stage_commit_is_part3a_code_commit():
+    # Regression for Blocker 1: artifact-only Part 3A commit must not anchor
+    # last_stage_commit; the code/test/human-doc commit must.
+    code_sha = "882c078608fb951cef6316536ace5a8396850a6d"
+    got = gen.last_stage_commit(REAL_ROOT)
+    assert got == code_sha
