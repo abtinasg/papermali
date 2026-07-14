@@ -170,6 +170,12 @@ def test_change_allowlist_real_repo():
     ("project/tests/test_stage125_part2_prediction_time_contract.py", True),
     ("project/stage125/prediction_time_contract_stage125_part2.json", True),
     ("project/stage125/metadata_and_hashes_stage125_part2.json", True),
+    # Stage125 Part 3A allowlisted paths
+    ("project/src/stage125_part3a_pilot_protocol.py", True),
+    ("project/run_stage125_part3a.py", True),
+    ("project/tests/test_stage125_part3a_pilot_protocol.py", True),
+    ("project/stage125/part3_candidate_inventory_stage125.csv", True),
+    ("project/stage125/metadata_and_hashes_stage125_part3a.json", True),
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance
     ("project/src/stage124_gate_b_execution.py", True),
     ("project/tests/test_stage124_gate_b_execution.py", True),
@@ -191,6 +197,10 @@ def test_change_allowlist_real_repo():
     ("project/tests/test_stage125_part2_data_contract.py", False),
     ("project/src/stage125_part2_prediction_time_contract.py.bak", False),
     ("project/run_stage125_part2.py.evil", False),
+    ("project/src/stage125_part3a_pilot_protocol.py.bak", False),
+    ("project/run_stage125_part3a.py.evil", False),
+    ("project/src/stage125_part3a_data_contract.py", False),
+    ("project/tests/test_stage125_part3a_data_contract.py", False),
     # Stage124 similar-but-unauthorized paths must be rejected
     ("project/src/stage124_gate_b_execution.py.bak", False),
     ("project/tests/test_stage124_gate_b_execution.py.evil", False),
@@ -227,6 +237,11 @@ def test_allowlist_prefix_attack(path, ok):
     ("project/run_stage125_part2.py", False),
     ("project/tests/test_stage125_part2_prediction_time_contract.py", False),
     ("project/stage125/prediction_time_contract_stage125_part2.json", False),
+    # Stage125 Part 3A code is change-allowlisted but MUST NOT be handoff-only.
+    ("project/src/stage125_part3a_pilot_protocol.py", False),
+    ("project/run_stage125_part3a.py", False),
+    ("project/tests/test_stage125_part3a_pilot_protocol.py", False),
+    ("project/stage125/part3_candidate_inventory_stage125.csv", False),
     # prefix attacks must be rejected
     ("AGENTS.md.evil", False),
     ("project/scripts/update_ai_handoff.py.bak", False),
@@ -261,11 +276,14 @@ def test_handoff_only_disjoint_from_stage125_code():
     ("project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json", True),
     ("project/stage125/metadata_and_hashes_stage125_part2.json", True),
     ("project/stage125/stage125_part2_prediction_time_contract_qc_report.json", True),
+    ("project/stage125/metadata_and_hashes_stage125_part3a.json", True),
+    ("project/stage125/stage125_part3a_pilot_protocol_qc_report.json", True),
     ("project/stage122/metadata_and_hashes_stage122.json", True),
     ("project/stage123/stage123_qc_report.json", True),
     # Real research/contract deliverables under the SAME directories are NOT
     # artifact-only, even though they sit next to generated bookkeeping files.
     ("project/stage125/prediction_time_contract_stage125_part2.json", False),
+    ("project/stage125/part3_candidate_inventory_stage125.csv", False),
     ("project/stage125/data_dictionary_stage125.csv", False),
     ("project/stage124/listing_master_verified_stage124.csv", False),
     ("project/stage124/gate_b_final/modeling_main_rule_a_eligible.csv", False),
@@ -279,6 +297,7 @@ def test_handoff_only_disjoint_from_stage125_code():
     # prefix / suffix attacks must be rejected
     ("project/stage124/stage124_batch02_gate_b_qc_report.json.bak", False),
     ("project/stage125/metadata_and_hashes_stage125_part2.json.evil", False),
+    ("project/stage125/metadata_and_hashes_stage125_part3a.json.evil", False),
     ("project/stage125/sub/metadata_and_hashes_stage125_part2.json", False),
 ])
 def test_artifact_only_classification(path, ok):

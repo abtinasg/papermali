@@ -5,11 +5,27 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 
 ## 2026-07-14
 
-- **Stage125 Part 2 — Prediction-time & Leakage Contract.** Authorized and
-  executed (in review) as a contract / read-only-audit task tracked by
-  `active_maintenance_task_id = stage125-part2-prediction-time-contract`
+- **Stage125 Part 3A — Accessibility & Pilot Protocol Lock.** Authorized and
+  active as a protocol / inventory-freeze task tracked by
+  `active_maintenance_task_id = stage125-part3a-pilot-protocol-lock`
   (advances **no** research action; `last_completed_research_action_id` stays
-  `stage124-gate-b-execution`). New code/tests:
+  `stage124-gate-b-execution`). Baseline: PR #27 MERGED, `main` @
+  `c6cbb6b7a7dc4dfe7ca3fa6ea0bcf34d7f0612c0`. New code/tests:
+  `project/src/stage125_part3a_pilot_protocol.py`,
+  `project/run_stage125_part3a.py`,
+  `project/tests/test_stage125_part3a_pilot_protocol.py`. Deliverables in
+  `project/stage125/`: 10 registered M2–M4 candidate inventory freeze;
+  proposed accessibility rubric (`pending_user_approval`, not applied);
+  gate decision protocol (8 locked Gates + 6 pending thresholds); sampling
+  frame summary and by-target-year CSV; three pilot-size options
+  (`pending_user_approval`); Part 3B evidence manifest schema. **No**
+  evidence collection, **no** network access, **no** accessibility scores,
+  **no** candidate admitted. `part3a_protocol_locked=true`;
+  `part3b_started=false`; `modeling_started` remains `false`.
+- **Stage125 Part 2 — Prediction-time & Leakage Contract — COMPLETED and
+  MERGED.** PR #27 post-merge Handoff refresh merged (`main` @
+  `c6cbb6b7a7dc4dfe7ca3fa6ea0bcf34d7f0612c0`). Part 2 tracked by
+  `stage125-part2-prediction-time-contract` (advances **no** research action).
   `project/src/stage125_part2_prediction_time_contract.py`,
   `project/run_stage125_part2.py`,
   `project/tests/test_stage125_part2_prediction_time_contract.py`. Deliverables

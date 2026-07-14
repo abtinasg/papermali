@@ -103,41 +103,21 @@ The research contract for the paper is frozen in
 
 - **Part 0 (Research Design Decision Lock) is CLOSED.** PR #21 is **MERGED**;
   `main` contains merge commit `d39e770ff49729a2f0b1b0262c0b1aa5ae41b0c4`.
-- **Part 1 (Data Dictionary & Provenance Contract) is authorized and executed
-  (in review).** It is a contracts / read-only-audit task tracked as
-  `active_maintenance_task_id = stage125-part1-data-contract`; it advances **no**
-  research action (`last_completed_research_action_id` remains
-  `stage124-gate-b-execution`).
-- Part 1 defines, in `project/stage125/`: the M1–M4 data dictionary; the
-  identifier contract (`row_key` immutable + unique 1331; `predictor_row_key_t` /
-  `target_row_key_t_plus_1` not redefined; future ids only via a separate,
-  provenance-and-validity crosswalk); the time contract (observation / period /
-  fiscal-year-end / published_at / available_at / retrieved_at_utc as **distinct**
-  concepts; Jalali and Gregorian in separate columns; unknown time stays null,
-  never inferred; revision = new version, never overwrite); the source registry
-  (M1–M4 only, **no M5**; unknown URLs/scores blank + status unresolved/pending);
-  the provenance manifest schema; the data-admission-gate template (accessibility
-  ≥ 3 is a pilot gate only; no admitted candidate with score < 3 or unknown score);
-  and the immutable, content-addressed raw/cache policy.
-- Part 1 audits the M1 provenance gap **read-only** and fills **nothing**. Empty
-  `source_url` (1316 rows) is recorded as a provenance gap only and never changes
-  eligibility or drops a row.
-- **Part 2 (Prediction-time & Leakage Contract) is authorized and executed
-  (in review).** It is a contract / read-only-audit task tracked as
-  `active_maintenance_task_id = stage125-part2-prediction-time-contract`; it
-  advances **no** research action.
-- Part 2 defines, in `project/stage125/`: the prediction-time contract (cutoff
-  based on verified `available_at`; revision policy; deterministic tie-breaking);
-  the feature availability contract (M1–M4 temporal gating rules; no target-year
-  features); the leakage checklist (8 machine-testable, fail-closed checks LC01–LC08);
-  per-pair cutoff/feature/leakage audit CSVs preserving all 1200 pairs; and a
-  cutoff summary. Missing `fiscal_year_end` (4 predictor, 4 target; 5 pairs with
-  either missing, 3 with both missing) is never filled or guessed — those pairs
-  have `temporal_status=unresolvable`. `eligibility_impact=none_contract_audit_only`
-  for every pair. No pair is dropped.
+- **Part 1 (Data Dictionary & Provenance Contract) is COMPLETED and MERGED.**
+  PR #21 merged; tracked as `stage125-part1-data-contract`.
+- **Part 2 (Prediction-time & Leakage Contract) is COMPLETED and MERGED.**
+  PR #27 post-merge Handoff refresh merged (`main` @ `c6cbb6b7…`); tracked as
+  `stage125-part2-prediction-time-contract`.
+- **Part 3A (Accessibility & Pilot Protocol Lock) is AUTHORIZED and ACTIVE.**
+  Tracked as `stage125-part3a-pilot-protocol-lock`; advances **no** research
+  action. Locks 10 registered M2–M4 candidates, proposed accessibility rubric,
+  gate protocol, sampling frame, pilot options, Part 3B evidence schema. **No**
+  evidence collection, **no** network access, **no** scores assigned.
+- **Part 3B is NOT started.** Evidence capture belongs to Part 3B only.
 - **`modeling_started` remains `false`. `part2_started` is `true` (contract only,
-  not modeling). No network extraction was performed.** Modeling begins only when
-  Stage126 is approved.
+  not modeling). `part3a_protocol_locked` is `true` (protocol only, not modeling).
+  `part3b_started` is `false`. No network extraction was performed.** Modeling
+  begins only when Stage126 is approved.
 
 ## Ranking & evidence (Stage124 Batch02)
 
