@@ -1,0 +1,226 @@
+{
+  "approved_gate_thresholds_g09_g14": [
+    {
+      "approval_status": "approved_for_part3b_pilot",
+      "blocks_included": "per_candidate",
+      "computation_method": "Compute separately for each registered candidate. Numerator counts pilot pairs where the candidate value has valid provenance, acceptable quality, and valid prediction-time availability. Denominator is 80 locked pilot pairs.",
+      "denominator": "80 selected pilot pairs",
+      "gate_id": "G09",
+      "gate_name": "minimum_company_year_coverage",
+      "notes": "Pilot-only threshold; not a final modeling sample threshold.",
+      "pass_criterion": "coverage >= 0.80 for every candidate (each candidate evaluated independently)",
+      "scope": "evidence_accessibility_pilot_only_not_final_modeling",
+      "threshold_value": "0.80",
+      "unit": "proportion"
+    },
+    {
+      "approval_status": "approved_for_part3b_pilot",
+      "blocks_included": "M2;M3;M4",
+      "computation_method": "Compute separately for each block (M2=all three registered M2 variables; M3=all three registered M3 variables; M4=all four registered M4 variables). Numerator counts pilot pairs where all variables in the block simultaneously pass Gates G01–G07. Denominator is 80 locked pilot pairs.",
+      "denominator": "80 selected pilot pairs",
+      "gate_id": "G10",
+      "gate_name": "minimum_common_sample_coverage",
+      "notes": "Pilot-only threshold; not a final modeling sample threshold.",
+      "pass_criterion": "common coverage >= 0.70 for every block (M2, M3, M4 evaluated independently)",
+      "scope": "evidence_accessibility_pilot_only_not_final_modeling",
+      "threshold_value": "0.70",
+      "unit": "proportion"
+    },
+    {
+      "approval_status": "approved_for_part3b_pilot",
+      "blocks_included": "M2;M3;M4",
+      "computation_method": "After applying Gates G01–G07, for each block and each target_year temporal stratum (not final modeling folds), count usable positive pilot pairs.",
+      "denominator": "per_target_year_stratum_per_block",
+      "gate_id": "G11",
+      "gate_name": "minimum_positive_events",
+      "notes": "Temporal stratum is target_year for this pilot only.",
+      "pass_criterion": ">= 3 usable positive pairs in every target_year stratum for every block",
+      "scope": "evidence_accessibility_pilot_only_not_final_modeling",
+      "threshold_value": "3",
+      "unit": "usable_positive_pairs_per_target_year_stratum"
+    },
+    {
+      "approval_status": "approved_for_part3b_pilot",
+      "blocks_included": "M2;M3;M4",
+      "computation_method": "After applying Gates G01–G07, for each block and each target_year temporal stratum, count usable negative pilot pairs.",
+      "denominator": "per_target_year_stratum_per_block",
+      "gate_id": "G12",
+      "gate_name": "minimum_negative_events",
+      "notes": "Temporal stratum is target_year for this pilot only.",
+      "pass_criterion": ">= 3 usable negative pairs in every target_year stratum for every block",
+      "scope": "evidence_accessibility_pilot_only_not_final_modeling",
+      "threshold_value": "3",
+      "unit": "usable_negative_pairs_per_target_year_stratum"
+    },
+    {
+      "approval_status": "approved_for_part3b_pilot",
+      "blocks_included": "all",
+      "computation_method": "Count of unique predictor_row_key_t in the locked pilot selection (deterministic without replacement from Rule A eligible pool, before accessibility evidence).",
+      "denominator": "locked_pilot_selection",
+      "gate_id": "G13",
+      "gate_name": "final_pilot_sample_size",
+      "notes": "Locked in Part 3A.1; not the final modeling sample size.",
+      "pass_criterion": "exactly 80 selected pairs",
+      "scope": "evidence_accessibility_pilot_only_not_final_modeling",
+      "threshold_value": "80",
+      "unit": "selected_rule_a_eligible_pairs"
+    },
+    {
+      "approval_status": "approved_for_part3b_pilot",
+      "blocks_included": "all",
+      "computation_method": "Deterministic without-replacement selection from Rule A eligible pool by frozen identifiers before evidence; positive=39 negative=41 unknown=0; allocation_by_target_year as locked; unique_tickers=26 unique_industries=11; no post-evidence substitution.",
+      "denominator": "80 selected pilot pairs",
+      "gate_id": "G14",
+      "gate_name": "final_pilot_allocation",
+      "notes": "Failed pairs after evidence must be recorded fail/unresolved; pairs must not be replaced post-evidence.",
+      "pass_criterion": "option=pilot_option_event_enriched; positive=39; negative=41; allocation_by_target_year matches locked table",
+      "scope": "evidence_accessibility_pilot_only_not_final_modeling",
+      "threshold_value": "pilot_option_event_enriched",
+      "unit": "pilot_option"
+    }
+  ],
+  "baseline_commit": "4e15cb7bdec07bfc007e6abe854c877ffd2ac1cc",
+  "candidate_decisions": "unresolved_pending_part3b_evidence",
+  "decision_lock_version": "stage125_part3a1_v1",
+  "eligibility_impact": "none_protocol_only",
+  "evidence_collected": false,
+  "frozen_part3a_assets_unchanged": true,
+  "frozen_part3a_metadata": "project/stage125/metadata_and_hashes_stage125_part3a.json",
+  "micro_part": "Part3A.1",
+  "modeling_started": false,
+  "network_extraction_performed": false,
+  "next_action": "Part 3B evidence capture (authorized only after this decision lock is merged; Part 3B not started by Part 3A.1)",
+  "part3a_decision_locked": true,
+  "part3a_protocol_locked": true,
+  "part3b_started": false,
+  "pilot_scope_disclaimer": "Event-enriched accessibility/coverage pilot only. Not population-representative and not the modeling sample. G09–G14 thresholds apply to the evidence pilot only and must not be presented as final modeling thresholds.",
+  "pilot_selection": {
+    "allocation_by_target_year": {
+      "1393": {
+        "negative": 4,
+        "positive": 4,
+        "unknown": 0
+      },
+      "1394": {
+        "negative": 4,
+        "positive": 4,
+        "unknown": 0
+      },
+      "1395": {
+        "negative": 4,
+        "positive": 4,
+        "unknown": 0
+      },
+      "1396": {
+        "negative": 4,
+        "positive": 4,
+        "unknown": 0
+      },
+      "1397": {
+        "negative": 4,
+        "positive": 4,
+        "unknown": 0
+      },
+      "1398": {
+        "negative": 4,
+        "positive": 4,
+        "unknown": 0
+      },
+      "1399": {
+        "negative": 4,
+        "positive": 4,
+        "unknown": 0
+      },
+      "1400": {
+        "negative": 4,
+        "positive": 4,
+        "unknown": 0
+      },
+      "1401": {
+        "negative": 4,
+        "positive": 4,
+        "unknown": 0
+      },
+      "1402": {
+        "negative": 5,
+        "positive": 3,
+        "unknown": 0
+      }
+    },
+    "eligibility_impact": "none_protocol_only",
+    "industries": [
+      "انبوه‌سازی، املاک و مستغلات",
+      "حمل و نقل",
+      "حمل و نقل آبی",
+      "خودرو و ساخت قطعات",
+      "سیمان، آهک و گچ",
+      "فلزات اساسی",
+      "ماشین‌آلات و تجهیزات / تجهیزات برقی",
+      "ماشین‌آلات و تجهیزات / دستگاه‌های برقی",
+      "محصولات شیمیایی",
+      "مواد و محصولات دارویی",
+      "نامشخص در فایل ارسالی"
+    ],
+    "modeling_sample": false,
+    "negative": 41,
+    "not_selected_options": [
+      "pilot_option_compact",
+      "pilot_option_extended"
+    ],
+    "population_representative": false,
+    "positive": 39,
+    "post_evidence_substitution_policy": "forbidden — failed pairs recorded fail/unresolved; sample not redesigned after evidence observation",
+    "sample_size": 80,
+    "sampling_purpose": "event_enriched_accessibility_coverage_pilot",
+    "selected_option": "pilot_option_event_enriched",
+    "selection_method": "deterministic without replacement from Rule A eligible pool; before accessibility evidence; based on frozen identifiers",
+    "status": "approved_for_part3b_pilot",
+    "tickers": [
+      "اردستان",
+      "اپال",
+      "بالبر",
+      "بترانس",
+      "بموتو",
+      "بوعلی",
+      "بکاب",
+      "بکام",
+      "تپمپی",
+      "تکمبا",
+      "ثنوسا",
+      "حپترو",
+      "حکشتی",
+      "خاذین",
+      "خبهمن",
+      "ختوقا",
+      "خرینگ",
+      "خمهر",
+      "خنصیر",
+      "دروز",
+      "ذوب",
+      "سدور",
+      "سیلام",
+      "شپارس",
+      "فاذر",
+      "لبوتان"
+    ],
+    "unique_industries": 11,
+    "unique_tickers": 26,
+    "unknown": 0
+  },
+  "rubric": {
+    "applied_to_sources": false,
+    "frozen_rubric_path": "project/stage125/accessibility_scoring_rubric_stage125_part3a.json",
+    "frozen_rubric_scoring_rules_match": true,
+    "notes": "User approved rubric version stage125_part3a_v1 for Part 3B evidence pilot. Rubric file is frozen and not modified; applied_to_sources remains false until Part 3B evidence capture.",
+    "rubric_approval_status": "approved_for_part3b_evidence_pilot",
+    "rubric_version": "stage125_part3a_v1",
+    "scoring_rules_locked": {
+      "missing_evidence": "null_or_unresolved_never_zero",
+      "no_score_without_evidence_and_provenance": true,
+      "score_4_or_5": "must_still_pass_every_other_gate",
+      "score_below_3": "hard_drop",
+      "score_equals_3": "pilot_permission_only_not_automatic_admission"
+    }
+  },
+  "stage": "Stage125"
+}

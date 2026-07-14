@@ -1,0 +1,33 @@
+{
+  "baseline_commit": "4e15cb7bdec07bfc007e6abe854c877ffd2ac1cc",
+  "code_commit": "9f49ff2d01e30d3fd2d513ee35462cea3cf49fb0",
+  "current_stage": "Stage125",
+  "description": "Stage125 Part 3A.1 — user-approved pilot decision lock.",
+  "evidence_collected": false,
+  "gate_b_started": true,
+  "generated_at": "2026-07-15T00:59:48+03:30",
+  "input_all_rows_name": "modeling_all_rows_stage124_gate_b.csv",
+  "input_all_rows_sha256": "f6b6bc41cbe757d19d4397ffc5898629d0fca8ab0480351f75040a71d7ce7376",
+  "input_pairs_name": "modeling_one_year_ahead_stage124_gate_b.csv",
+  "input_pairs_sha256": "9743c49337c66a3699bce34dfd02a151e34f48f0717f225ad487fe1487031d05",
+  "modeling_started": false,
+  "network_calls_attempted": 0,
+  "network_extraction_performed": false,
+  "output_files_sha256": {
+    "README_STAGE125_PART3A_DECISION_LOCK.md": "94e580363063166c633754c935ceea567064ce6a540b41c1c569ea9ad191e1e6",
+    "part3a_approved_gate_thresholds_stage125.csv": "f60ef0a16effbe07bc4861d6e63b0390241c669aa92f55baf6314d87d9108dd4",
+    "part3a_decision_lock_stage125.json": "f73f971697fe128a0e2614da5a9b1f7f9760ea01d42bb6ac29587b26cd1837a9",
+    "part3a_selected_pilot_pairs_stage125.csv": "f42c47cb8ef513146ddfeb41af9f20904c357e411b875f9a0d13e7f47122a510",
+    "stage125_part3a_decision_lock_qc_report.json": "bddad828911fc962e0ed53fd385a76eddfda9acaca12d14b25d074cd2fb68f81"
+  },
+  "part2_started": true,
+  "part3_started": true,
+  "part3a_decision_locked": true,
+  "part3a_protocol_locked": true,
+  "part3b_started": false,
+  "pilot_extraction_started": false,
+  "source_file_sha256": "aa72379687b876b7e40fb1dd913b3aac0e888a007d7d9d99bfc49778fd0275d8",
+  "stage": "stage125_part3a_decision_lock",
+  "test_file_sha256": "b07590b72dbc1d9589009e23531b8817dd06f458671c3ae4a88ee00ad181217c",
+  "warning": "Part 3A.1 only: records approved rubric, G09–G14 thresholds, and locked pilot selection. No modeling, no extraction, no network access. Part 3B not started. Frozen Part 3A assets unchanged."
+}
