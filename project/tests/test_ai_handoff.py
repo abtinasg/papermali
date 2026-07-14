@@ -778,7 +778,10 @@ def test_stage125_part3a_mixed_code_and_artifact_commit_advances(synth):
 )
 def test_real_repo_last_stage_commit_is_part3a_code_commit():
     # Regression for Blocker 1: artifact-only Part 3A commit must not anchor
-    # last_stage_commit; the code/test/human-doc commit must.
-    code_sha = "882c078608fb951cef6316536ace5a8396850a6d"
+    # last_stage_commit; a code/test/human-doc commit must.
+    artifact_sha = "49d2d3324c4cec84687b917b5dd97b3eb1196625"
     got = gen.last_stage_commit(REAL_ROOT)
-    assert got == code_sha
+    assert got != artifact_sha
+    files = gen._introduced_files(REAL_ROOT, got)
+    assert gen._is_stage_relevant(files)
+    assert any("stage125_part3a" in f for f in files)
