@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage125_research_design_readiness`
 - **Last completed research action:** `stage125-part3a-decision-lock`
 - **Next research action:** `stage125-part3b-evidence-capture`
-- **Last stage commit:** `9b8cf806458bfc4ba6fabf6a0de07140a9b798cc`
-- **Generated from commit:** `a995667159304cf2bc3506f05296882087aa3b0d` (branch `maintenance-stage125-part3a1-baseline-semantics`, informational)
+- **Last stage commit:** `3f80a0455ae87b25c6241be894c1705f3728fc53`
+- **Generated from commit:** `b895c055ad066a0524414d0ff552efaaf7808705` (branch `maintenance-stage125-part3a1-baseline-semantics`, informational)
 - **Baseline:** `origin/main` @ `7a77b62a2c6509fde711762e2680fb497dea3c13`
 
 ## QC
@@ -20,7 +20,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - ✅ **27 assertions, 0 failed**, all_pass=True
 - Scope: `stage125_part3a_decision_lock`
 - Report: `project/stage125/stage125_part3a_decision_lock_qc_report.json`
-- QC source commit (code): `9b8cf806458bfc4ba6fabf6a0de07140a9b798cc`
+- QC source commit (code): `3f80a0455ae87b25c6241be894c1705f3728fc53`
 
 ## Workflow markers
 
@@ -35,5 +35,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `f804d0146363018e283a2063feda16af17eca1cb459a7b80387cd169182c7190`_
-_generated_at_utc: 2026-07-15T10:22:37Z (informational)_
+_state_fingerprint: `ec57fd017b1198730688db3bfcf8656d895d79ac4711faafe09cc8e49bc346cd`_
+_generated_at_utc: 2026-07-15T10:29:54Z (informational)_
