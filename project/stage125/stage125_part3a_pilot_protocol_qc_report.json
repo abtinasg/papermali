@@ -314,7 +314,7 @@
   "pilot_extraction_started": false,
   "registered_candidate_count": 10,
   "source_commit": "a5d7fd27955b9690bd2257211e467d485ec1ff3e",
-  "source_file_sha256": "0e6a237019543395729763eda567f24a6470245ca8b97567c1ac667eb3ea07fc",
+  "source_file_sha256": "bd918d7c763b1cd831bff6e756d1276faf44aa1496eaddbf637f53eeb40faadc",
   "stage": "stage125_part3a_pilot_protocol",
   "test_file_sha256": "1b9879d96da624a41a0fbea28811a8728e14066b24053160613b7e4e3aafa4f7",
   "ticker_count": 130,

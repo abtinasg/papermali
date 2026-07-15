@@ -103,6 +103,12 @@ PART3B_FORBIDDEN_GLOBS = (
 PART3B_ALLOWED_EXACT = (
     "project/stage125/part3_source_evidence_manifest_schema_stage125.json",
 )
+PART3B0_ALLOWED_EXACT = (
+    "project/src/stage125_part3b0_evidence_readiness.py",
+    "project/tests/test_stage125_part3b0_evidence_readiness.py",
+    "project/run_stage125_part3b0.py",
+)
+PART3B0_ALLOWED_NAME_PREFIX = "part3b0_"
 
 REGISTERED_CANDIDATES = (
     {"candidate_id": "cand_m2_equity_return_window", "block": "M2",
@@ -468,6 +474,12 @@ def scan_for_modeling_artifacts(project_dir: Path) -> dict:
     }
 
 
+def _part3b0_allowed(rel: str, basename: str) -> bool:
+    if rel in PART3B0_ALLOWED_EXACT:
+        return True
+    return basename.startswith(PART3B0_ALLOWED_NAME_PREFIX)
+
+
 def scan_for_part3b_artifacts(repo_root: Path) -> dict:
     """Detect Part 3B runner/implementation/captured evidence (schema allowed)."""
     hits: list[str] = []
@@ -482,6 +494,8 @@ def scan_for_part3b_artifacts(repo_root: Path) -> dict:
             rel = str(f.relative_to(repo_root))
             if rel in PART3B_ALLOWED_EXACT:
                 continue
+            if _part3b0_allowed(rel, f.name):
+                continue
             low = f.name.lower()
             if any(low.startswith(prefix) for prefix in PART3B_FORBIDDEN_GLOBS):
                 hits.append(rel)
@@ -491,6 +505,8 @@ def scan_for_part3b_artifacts(repo_root: Path) -> dict:
             if not f.is_file():
                 continue
             rel = str(f.relative_to(repo_root))
+            if _part3b0_allowed(rel, f.name):
+                continue
             if any(rel.startswith(p) for p in PART3B_FORBIDDEN_PREFIXES):
                 hits.append(rel)
     tests = repo_root / "project" / "tests"
@@ -499,6 +515,8 @@ def scan_for_part3b_artifacts(repo_root: Path) -> dict:
             if not f.is_file():
                 continue
             rel = str(f.relative_to(repo_root))
+            if _part3b0_allowed(rel, f.name):
+                continue
             if any(rel.startswith(p) for p in PART3B_FORBIDDEN_PREFIXES):
                 hits.append(rel)
     for prefix in PART3B_FORBIDDEN_PREFIXES:

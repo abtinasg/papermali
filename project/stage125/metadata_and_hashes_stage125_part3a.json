@@ -21,14 +21,14 @@
     "part3_sampling_frame_by_target_year_stage125.csv": "96e6826681b8b46e6d0ebf9bd2dd9c1d7895f0432ca600986ab8beffb680f584",
     "part3_sampling_frame_summary_stage125.json": "359394f0522f2c3db24a56238d6f9ff78bcab75dd36cbdef9b64f23162c6b945",
     "part3_source_evidence_manifest_schema_stage125.json": "9a736edb18046128851d55c87f07609b8dc2a4b2be73a41c5837fe0e2a4cd78d",
-    "stage125_part3a_pilot_protocol_qc_report.json": "34b9584df0f35e1490318b1257dcac909baba9a559ad882c3c88cc45b911c4e6"
+    "stage125_part3a_pilot_protocol_qc_report.json": "63cf511192a61ecbfed7c7e5484d90284617117cff3d44dc4d45af7d1f71bffe"
   },
   "part2_started": true,
   "part3_started": true,
   "part3a_protocol_locked": true,
   "part3b_started": false,
   "pilot_extraction_started": false,
-  "source_file_sha256": "0e6a237019543395729763eda567f24a6470245ca8b97567c1ac667eb3ea07fc",
+  "source_file_sha256": "bd918d7c763b1cd831bff6e756d1276faf44aa1496eaddbf637f53eeb40faadc",
   "stage": "stage125_part3a_pilot_protocol",
   "test_file_sha256": "1b9879d96da624a41a0fbea28811a8728e14066b24053160613b7e4e3aafa4f7",
   "warning": "Part 3A only: protocol lock before evidence collection. No modeling, no extraction, no network access. Part 3B not started. Stage122-Stage125 Part 1/2 assets unchanged."

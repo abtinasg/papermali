@@ -1,8 +1,8 @@
 {
   "stage": "stage125_part3b0_evidence_readiness",
   "current_stage": "Stage125",
-  "generated_at": "2026-07-15T17:46:53+03:30",
-  "source_commit": "75abf3f6d92e514df568e1d6912ccc47cdffc933",
+  "generated_at": "2026-07-15T18:20:25+03:00",
+  "source_commit": "5c063759d0cdd8a35e26fc1f39cc8b0e520febbd",
   "source_file_sha256": "b5b489e0a499fcd40fedb68e5198c1087f2546983f6ca4804d737a2db907521a",
   "test_file_sha256": "aef327cd678014c8176b4a0233825d3f82d220d4af154a12d4cea82f4b7fc841",
   "baseline_commit": "75abf3f6d92e514df568e1d6912ccc47cdffc933",
