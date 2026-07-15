@@ -232,7 +232,7 @@
     "project/stage125/stage125_part2_prediction_time_contract_qc_report.json": "cd43c01cc39e2d43a39f686884916630c47d2324799766058f7e34bce19689e6"
   },
   "gate_b_started": true,
-  "generated_at": "2026-07-15T13:29:35+03:00",
+  "generated_at": "2026-07-15T13:31:35+03:00",
   "guard_evidence": {
     "eligibility": {
       "pair_count": 1200,
@@ -312,10 +312,10 @@
   "pilot_extraction_started": false,
   "selected_pilot_option": "pilot_option_event_enriched",
   "selected_pilot_pairs": 80,
-  "source_commit": "3f80a0455ae87b25c6241be894c1705f3728fc53",
+  "source_commit": "ab95b5d6114a81b1fa39ffc62cfd3eca1a7fbf7c",
   "source_file_sha256": "09b594af7288cad490ca39c606e6aaaa35f629e2172ef2ec88aa8724727c876e",
   "stage": "stage125_part3a_decision_lock",
-  "test_file_sha256": "4664c52037c4129e2a5e4831696074bfba5f48fda79f3a00a1dd86f8a0224cd6",
+  "test_file_sha256": "8807c7213b796add9082915023bfe88114c6999e74a948961ce8f5ee904dce68",
   "ticker_count": 130,
   "tickers": [
     "اردستان",
