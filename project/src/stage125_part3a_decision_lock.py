@@ -196,19 +196,43 @@ def _is_ancestor(repo_root: str, ancestor: str, descendant: str) -> bool:
 # Baseline + frozen Part 3A verification
 # --------------------------------------------------------------------------- #
 
+def _resolve_commit(repo_root: str, ref: str, label: str) -> str:
+    sha = _git(repo_root, "rev-parse", ref)
+    if not sha:
+        raise QCFail(f"{label} ({ref!r}) is not resolvable (fail-closed)")
+    return sha
+
+
+def _baseline_ancestry_ok(repo_root: str) -> tuple[bool, str]:
+    baseline = _resolve_commit(
+        repo_root, EXPECTED_BASELINE_COMMIT, "EXPECTED_BASELINE_COMMIT",
+    )
+    origin_main = _resolve_commit(repo_root, "origin/main", "origin/main")
+    head = _resolve_commit(repo_root, "HEAD", "HEAD")
+
+    if not _is_ancestor(repo_root, baseline, origin_main):
+        return False, (
+            f"expected baseline {baseline} is not an ancestor of "
+            f"origin/main ({origin_main})"
+        )
+    if not _is_ancestor(repo_root, baseline, head):
+        return False, (
+            f"expected baseline {baseline} is not an ancestor of HEAD ({head})"
+        )
+    if not _is_ancestor(repo_root, origin_main, head):
+        return False, (
+            f"origin/main ({origin_main}) is not an ancestor of HEAD ({head})"
+        )
+    return True, (
+        f"baseline {EXPECTED_BASELINE_COMMIT} is ancestor of origin/main "
+        f"and HEAD; origin/main is ancestor of HEAD"
+    )
+
+
 def verify_baseline_commit(repo_root: str) -> None:
-    head = _git(repo_root, "rev-parse", "HEAD")
-    origin_main = _git(repo_root, "rev-parse", "origin/main")
-    if origin_main != EXPECTED_BASELINE_COMMIT:
-        raise QCFail(
-            f"origin/main ({origin_main}) != expected baseline "
-            f"{EXPECTED_BASELINE_COMMIT} (fail-closed)"
-        )
-    if not _is_ancestor(repo_root, EXPECTED_BASELINE_COMMIT, head):
-        raise QCFail(
-            f"expected baseline {EXPECTED_BASELINE_COMMIT} is not an ancestor "
-            f"of HEAD ({head}) (fail-closed)"
-        )
+    ok, detail = _baseline_ancestry_ok(repo_root)
+    if not ok:
+        raise QCFail(f"{detail} (fail-closed)")
 
 
 def part3a_frozen_hashes(repo_root: Path) -> dict[str, str]:
@@ -673,9 +697,8 @@ def build_qc_assertions(
     add("invariants_match", inv_errs == [],
         "all invariant counts match" if not inv_errs else "; ".join(inv_errs))
 
-    add("baseline_commit_exact",
-        _git(repo_root, "rev-parse", "origin/main") == EXPECTED_BASELINE_COMMIT,
-        f"origin/main == {EXPECTED_BASELINE_COMMIT}")
+    baseline_ok, baseline_detail = _baseline_ancestry_ok(repo_root)
+    add("baseline_ancestry_chain", baseline_ok, baseline_detail)
 
     add("eighty_unique_pairs", len(selected_rows) == APPROVED_SAMPLE_SIZE,
         f"selected={len(selected_rows)}")

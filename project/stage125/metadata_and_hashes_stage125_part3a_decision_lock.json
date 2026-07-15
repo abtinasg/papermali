@@ -1,11 +1,11 @@
 {
   "baseline_commit": "4e15cb7bdec07bfc007e6abe854c877ffd2ac1cc",
-  "code_commit": "71ad8d934cbeeac76d8fa94baacd6f466c4437be",
+  "code_commit": "565c969235460d94bec4c8e6c3757b7da4bc9e44",
   "current_stage": "Stage125",
   "description": "Stage125 Part 3A.1 — user-approved pilot decision lock.",
   "evidence_collected": false,
   "gate_b_started": true,
-  "generated_at": "2026-07-15T01:38:02+03:30",
+  "generated_at": "2026-07-15T14:46:33+03:00",
   "input_all_rows_name": "modeling_all_rows_stage124_gate_b.csv",
   "input_all_rows_sha256": "f6b6bc41cbe757d19d4397ffc5898629d0fca8ab0480351f75040a71d7ce7376",
   "input_pairs_name": "modeling_one_year_ahead_stage124_gate_b.csv",
@@ -18,7 +18,7 @@
     "part3a_approved_gate_thresholds_stage125.csv": "11c7efe5f242ab8e4a4f7b1955fb25d48e288249f7a1ce4c6bf1713dbf117d20",
     "part3a_decision_lock_stage125.json": "475c82b3483ef18ff19aea2268f65527ca87c9441603622bd1952bd21f18f35e",
     "part3a_selected_pilot_pairs_stage125.csv": "9a441b5e3696353967489b356d0ff48cf7cbea276aeea5018be6edc8368b40f5",
-    "stage125_part3a_decision_lock_qc_report.json": "505917ef6dda4ba61b52a35ebb80200a30ddb2736756b9124797a9ecb6fe982b"
+    "stage125_part3a_decision_lock_qc_report.json": "5dd4fe6431cefcd68551551ab862bcafce0d55840db0d406b54fe942517139c1"
   },
   "part2_started": true,
   "part3_started": true,
@@ -26,8 +26,8 @@
   "part3a_protocol_locked": true,
   "part3b_started": false,
   "pilot_extraction_started": false,
-  "source_file_sha256": "d94f4d1642bccb01565fc8448e329acc54b75f0d40f41bf57602f024d5c75c1c",
+  "source_file_sha256": "4f6524c5619aff5a08aa88daef91649cf9210643566b32cdbd31be2a0bc5d577",
   "stage": "stage125_part3a_decision_lock",
-  "test_file_sha256": "b8b1a3f76fe51c8542915ff1356a7077802d4afaae3b9c2ffb05292862c3a1a3",
+  "test_file_sha256": "c1ea95e93faf45e57677f05f4a25ca51a191dccd0851668e68e4f3e709e9f66b",
   "warning": "Part 3A.1 only: records approved rubric, G09–G14 thresholds, and locked pilot selection. No modeling, no extraction, no network access. Part 3B not started. Frozen Part 3A assets unchanged."
 }
