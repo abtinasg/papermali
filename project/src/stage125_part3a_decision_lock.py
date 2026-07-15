@@ -224,7 +224,8 @@ def _baseline_ancestry_ok(repo_root: str) -> tuple[bool, str]:
             f"origin/main ({origin_main}) is not an ancestor of HEAD ({head})"
         )
     return True, (
-        f"baseline {baseline} -> origin/main {origin_main} -> HEAD {head}"
+        f"baseline {EXPECTED_BASELINE_COMMIT} is ancestor of origin/main "
+        f"and HEAD; origin/main is ancestor of HEAD"
     )
 
 
