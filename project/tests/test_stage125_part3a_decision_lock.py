@@ -8,6 +8,7 @@ import csv
 import io
 import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -42,8 +43,14 @@ def test_input_files_exist():
     assert PAIRS_PATH.is_file()
 
 
-def test_baseline_commit_exact():
+def test_baseline_commit_ancestry_chain():
     lock.verify_baseline_commit(str(REPO_ROOT))
+
+
+def test_expected_baseline_commit_constant():
+    assert lock.EXPECTED_BASELINE_COMMIT == (
+        "4e15cb7bdec07bfc007e6abe854c877ffd2ac1cc"
+    )
 
 
 def test_part3a_frozen_files_intact():
@@ -314,11 +321,18 @@ def test_negative_modeling_artifact_detected(tmp_path):
 
 
 def test_negative_wrong_baseline_fails(tmp_path, monkeypatch):
+    root = _init_git_repo(tmp_path)
+    c1 = _git_commit(root, "c1.txt")
+    _git_commit(root, "c2.txt")
+    _set_origin_main(root)
+    missing = "1111111111111111111111111111111111111111"
     monkeypatch.setattr(
-        lock, "EXPECTED_BASELINE_COMMIT", "0" * 40, raising=False,
+        lock, "EXPECTED_BASELINE_COMMIT", missing, raising=False,
     )
-    with pytest.raises(lock.QCFail, match="origin/main"):
-        lock.verify_baseline_commit(str(REPO_ROOT))
+    with pytest.raises(lock.QCFail, match="not resolvable"):
+        lock.verify_baseline_commit(str(root))
+    monkeypatch.setattr(lock, "EXPECTED_BASELINE_COMMIT", c1, raising=False)
+    lock.verify_baseline_commit(str(root))
 
 
 def test_negative_part3a_frozen_tamper_detected(tmp_path):
@@ -343,3 +357,136 @@ def test_qc_guard_assertions_evidence_backed():
         "no_candidate_admitted_or_rejected",
     ):
         assert names[key]["status"] == "PASS", names[key]["detail"]
+
+
+# --------------------------------------------------------------------------- #
+# Baseline verification semantics (synthetic git repos)
+# --------------------------------------------------------------------------- #
+
+def _git_env() -> dict[str, str]:
+    return {
+        **os.environ,
+        "GIT_AUTHOR_NAME": "t",
+        "GIT_AUTHOR_EMAIL": "t@t",
+        "GIT_COMMITTER_NAME": "t",
+        "GIT_COMMITTER_EMAIL": "t@t",
+    }
+
+
+def _init_git_repo(tmp_path) -> Path:
+    root = tmp_path / "repo"
+    root.mkdir()
+    env = _git_env()
+    subprocess.run(
+        ["git", "init", "-b", "main"], cwd=root, check=True, env=env,
+        capture_output=True, text=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.email", "t@t"], cwd=root, check=True,
+        capture_output=True, text=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "t"], cwd=root, check=True,
+        capture_output=True, text=True,
+    )
+    return root
+
+
+def _git_commit(root: Path, filename: str) -> str:
+    (root / filename).write_text(f"{filename}\n", encoding="utf-8")
+    env = _git_env()
+    subprocess.run(
+        ["git", "add", "-A"], cwd=root, check=True, env=env,
+        capture_output=True, text=True,
+    )
+    subprocess.run(
+        ["git", "commit", "-m", filename], cwd=root, check=True, env=env,
+        capture_output=True, text=True,
+    )
+    return subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=root, check=True,
+        capture_output=True, text=True,
+    ).stdout.strip()
+
+
+def _set_origin_main(root: Path, ref: str = "HEAD") -> None:
+    sha = subprocess.run(
+        ["git", "rev-parse", ref], cwd=root, check=True,
+        capture_output=True, text=True,
+    ).stdout.strip()
+    subprocess.run(
+        ["git", "update-ref", "refs/remotes/origin/main", sha],
+        cwd=root, check=True, capture_output=True, text=True,
+    )
+
+
+def test_baseline_main_ahead_of_expected_passes(tmp_path, monkeypatch):
+    root = _init_git_repo(tmp_path)
+    c1 = _git_commit(root, "c1.txt")
+    _git_commit(root, "c2.txt")
+    _git_commit(root, "c3.txt")
+    _set_origin_main(root)
+    monkeypatch.setattr(lock, "EXPECTED_BASELINE_COMMIT", c1, raising=False)
+    lock.verify_baseline_commit(str(root))
+
+
+def test_branch_from_current_origin_main_passes(tmp_path, monkeypatch):
+    root = _init_git_repo(tmp_path)
+    c1 = _git_commit(root, "c1.txt")
+    _git_commit(root, "c2.txt")
+    _set_origin_main(root)
+    subprocess.run(
+        ["git", "checkout", "-b", "feature"], cwd=root, check=True,
+        capture_output=True, text=True,
+    )
+    _git_commit(root, "c3.txt")
+    monkeypatch.setattr(lock, "EXPECTED_BASELINE_COMMIT", c1, raising=False)
+    lock.verify_baseline_commit(str(root))
+
+
+def test_baseline_not_ancestor_fails(tmp_path, monkeypatch):
+    root = _init_git_repo(tmp_path)
+    c1 = _git_commit(root, "c1.txt")
+    c2 = _git_commit(root, "c2.txt")
+    c3 = _git_commit(root, "c3.txt")
+    _set_origin_main(root, c2)
+    monkeypatch.setattr(lock, "EXPECTED_BASELINE_COMMIT", c3, raising=False)
+    with pytest.raises(lock.QCFail, match="not an ancestor of origin/main"):
+        lock.verify_baseline_commit(str(root))
+    monkeypatch.setattr(lock, "EXPECTED_BASELINE_COMMIT", c1, raising=False)
+    lock.verify_baseline_commit(str(root))
+
+
+def test_head_not_descendant_of_origin_main_fails(tmp_path, monkeypatch):
+    root = _init_git_repo(tmp_path)
+    c1 = _git_commit(root, "c1.txt")
+    c2 = _git_commit(root, "c2.txt")
+    _set_origin_main(root, c2)
+    subprocess.run(
+        ["git", "checkout", c1], cwd=root, check=True,
+        capture_output=True, text=True,
+    )
+    monkeypatch.setattr(lock, "EXPECTED_BASELINE_COMMIT", c1, raising=False)
+    with pytest.raises(lock.QCFail, match="origin/main .* not an ancestor of HEAD"):
+        lock.verify_baseline_commit(str(root))
+
+
+def test_unresolvable_origin_main_fails(tmp_path, monkeypatch):
+    root = _init_git_repo(tmp_path)
+    c1 = _git_commit(root, "c1.txt")
+    monkeypatch.setattr(lock, "EXPECTED_BASELINE_COMMIT", c1, raising=False)
+    with pytest.raises(lock.QCFail, match="origin/main .* not resolvable"):
+        lock.verify_baseline_commit(str(root))
+
+
+def test_unresolvable_head_fails(monkeypatch):
+    real_git = lock._git
+
+    def fake_git(repo_root, *args):
+        if args == ("rev-parse", "HEAD"):
+            return ""
+        return real_git(repo_root, *args)
+
+    monkeypatch.setattr(lock, "_git", fake_git)
+    with pytest.raises(lock.QCFail, match="HEAD .* not resolvable"):
+        lock.verify_baseline_commit(str(REPO_ROOT))
