@@ -1,7 +1,7 @@
 name: financial-distress-stage121
 channels: [conda-forge]
 dependencies:
-  - python=3.13
+  - python=3.13.5
   - pip
   - pip:
       - -r requirements.txt
