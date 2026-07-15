@@ -698,7 +698,7 @@ def build_qc_assertions(
         "all invariant counts match" if not inv_errs else "; ".join(inv_errs))
 
     baseline_ok, baseline_detail = _baseline_ancestry_ok(repo_root)
-    add("baseline_commit_exact", baseline_ok, baseline_detail)
+    add("baseline_ancestry_chain", baseline_ok, baseline_detail)
 
     add("eighty_unique_pairs", len(selected_rows) == APPROVED_SAMPLE_SIZE,
         f"selected={len(selected_rows)}")

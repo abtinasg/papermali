@@ -8,7 +8,7 @@
       "status": "PASS"
     },
     {
-      "assertion": "baseline_commit_exact",
+      "assertion": "baseline_ancestry_chain",
       "detail": "baseline 4e15cb7bdec07bfc007e6abe854c877ffd2ac1cc is ancestor of origin/main and HEAD; origin/main is ancestor of HEAD",
       "status": "PASS"
     },
@@ -313,9 +313,9 @@
   "selected_pilot_option": "pilot_option_event_enriched",
   "selected_pilot_pairs": 80,
   "source_commit": "ab95b5d6114a81b1fa39ffc62cfd3eca1a7fbf7c",
-  "source_file_sha256": "09b594af7288cad490ca39c606e6aaaa35f629e2172ef2ec88aa8724727c876e",
+  "source_file_sha256": "4f6524c5619aff5a08aa88daef91649cf9210643566b32cdbd31be2a0bc5d577",
   "stage": "stage125_part3a_decision_lock",
-  "test_file_sha256": "8807c7213b796add9082915023bfe88114c6999e74a948961ce8f5ee904dce68",
+  "test_file_sha256": "c1ea95e93faf45e57677f05f4a25ca51a191dccd0851668e68e4f3e709e9f66b",
   "ticker_count": 130,
   "tickers": [
     "اردستان",

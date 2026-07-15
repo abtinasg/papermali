@@ -179,6 +179,22 @@ def test_qc_assertion_count_at_least_20():
     assert result["qc"]["assertion_count"] >= 20
 
 
+def test_qc_baseline_ancestry_chain_assertion_present():
+    result = _build()
+    names = {a["assertion"]: a for a in result["qc"]["assertions"]}
+    assert "baseline_ancestry_chain" in names
+    assert names["baseline_ancestry_chain"]["status"] == "PASS"
+
+
+def test_negative_qc_no_baseline_commit_exact_assertion():
+    result = _build()
+    names = [a["assertion"] for a in result["qc"]["assertions"]]
+    assert "baseline_commit_exact" not in names
+    qc_path = OUTPUT_DIR / "stage125_part3a_decision_lock_qc_report.json"
+    qc_text = qc_path.read_text(encoding="utf-8")
+    assert "baseline_commit_exact" not in qc_text
+
+
 def test_frozen_assets_unchanged():
     before = lock.frozen_asset_hashes(REPO_ROOT)
     _build()
