@@ -9,7 +9,7 @@
     },
     {
       "assertion": "baseline_commit_exact",
-      "detail": "baseline 4e15cb7bdec07bfc007e6abe854c877ffd2ac1cc -> origin/main 7a77b62a2c6509fde711762e2680fb497dea3c13 -> HEAD 9b8cf806458bfc4ba6fabf6a0de07140a9b798cc",
+      "detail": "baseline 4e15cb7bdec07bfc007e6abe854c877ffd2ac1cc -> origin/main 7a77b62a2c6509fde711762e2680fb497dea3c13 -> HEAD 2bb472c7d5b572ea8f2569ce314744512a67e564",
       "status": "PASS"
     },
     {
