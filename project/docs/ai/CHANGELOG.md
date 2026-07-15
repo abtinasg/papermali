@@ -5,6 +5,19 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 
 ## 2026-07-15
 
+- **Stage125 Part 3B.0 — Evidence Capture Readiness (authorized/active).**
+  Infrastructure/readiness only; tracked as maintenance task
+  `stage125-part3b0-evidence-readiness` (advances **no** research action).
+  Baseline: `origin/main` @ `75abf3f6d92e514df568e1d6912ccc47cdffc933`.
+  New code/tests: `project/src/stage125_part3b0_evidence_readiness.py`,
+  `project/run_stage125_part3b0.py`,
+  `project/tests/test_stage125_part3b0_evidence_readiness.py`. Readiness
+  contracts/templates in `project/stage125/` (header-only CSVs; zero real
+  evidence rows). **No** network calls, **no** real evidence, **no**
+  accessibility scores, **no** modeling. `part3b0_readiness=true`;
+  `part3b_started=false`; next research action remains
+  `stage125-part3b-evidence-capture` (pointer only).
+
 - **Stage125 Part 3A.1 blocker fixes (PR #30, additive).** Industry accounting
   corrected: 10 known industries, 53 industry-present pairs, 27 industry-missing
   pairs; unknown sentinel `نامشخص در فایل ارسالی` is not a known industry.
