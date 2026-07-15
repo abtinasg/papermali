@@ -1,10 +1,10 @@
 ---
 roadmap_version: 1
 active_research_workstream_id: stage125-research-design-readiness
-qc_scope: stage125-part3a-pilot-protocol
-last_completed_research_action_id: stage124-gate-b-execution
-next_research_action_id: stage125-research-design-readiness
-active_maintenance_task_id: stage125-part3a-pilot-protocol-lock
+qc_scope: stage125-part3a-decision-lock
+last_completed_research_action_id: stage125-part3a-decision-lock
+next_research_action_id: stage125-part3b-evidence-capture
+active_maintenance_task_id: stage125-part3a1-decision-lock
 ---
 
 # ROADMAP
@@ -32,7 +32,9 @@ must also appear in the body below. The validator checks that:
 8. `stage124-gate-b-readiness` — Gate B readiness dry-run: three eligibility rules (A/B/C) compared, per-rule impact report generated, 45 focused tests added ✅
 9. `stage124-gate-b-rule-approval` — User/data owner approved Rule A (primary) and Rule B (listing-timing robustness); Rule C rejected ✅
 10. `stage124-gate-b-execution` — Executed the approved Gate B rules; four sample designs, canonical + filtered outputs, 58 focused tests (736 passed, 1 skipped, local results — no GitHub Actions) ✅
-11. `stage125-research-design-readiness` — Stage125 Research Design & Data Readiness (Part 0 = research-design decision lock); **no modeling** in this stage — modeling remains prohibited until Stage126 is approved ⬅️ **next**
+11. `stage125-research-design-readiness` — Stage125 Research Design & Data Readiness (Parts 0–3A.1); **no modeling** in this stage — modeling remains prohibited until Stage126 is approved ✅
+12. `stage125-part3a-decision-lock` — Part 3A.1 user-approved pilot decision lock (rubric approval, G09–G14 thresholds, locked 80-pair event-enriched selection); decision record only, **no evidence collection** ✅
+13. `stage125-part3b-evidence-capture` — Part 3B evidence capture and accessibility scoring pilot (**not started**; next action pointer only) ⬅️ **next**
 
 ## Maintenance tasks
 
@@ -40,7 +42,8 @@ must also appear in the body below. The validator checks that:
 - `stage125-part0-research-design-lock` — record the frozen Stage125 research contract in human docs (see [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md)); documentation-only, advances no research action
 - `stage125-part1-data-contract` — Stage125 Part 1 data dictionary & provenance contract (data dictionary M1–M4, identifier/time contract, source registry, provenance manifest schema, data-admission-gate template, immutable raw/cache policy, read-only M1 provenance-gap audit); contracts/audit only, **no modeling, no extraction, no Part 2**; advances no research action
 - `stage125-part2-prediction-time-contract` — Stage125 Part 2 prediction-time & leakage contract (prediction cutoff rules, feature availability M1–M4, revision policy, tie-breaking, anti-leakage checklist with 8 machine-testable checks, per-pair cutoff/feature/leakage audit preserving all 1200 pairs); contract/audit only, **no modeling, no extraction, no eligibility changes**; advances no research action ✅
-- `stage125-part3a-pilot-protocol-lock` — Stage125 Part 3A accessibility & pilot protocol lock (candidate inventory freeze, proposed accessibility rubric, gate decision protocol, sampling frame summary, pilot-size options, Part 3B evidence schema); protocol only, **no evidence collection, no network access, no modeling**; advances no research action ⬅️ **active**
+- `stage125-part3a-pilot-protocol-lock` — Stage125 Part 3A accessibility & pilot protocol lock (candidate inventory freeze, proposed accessibility rubric, gate decision protocol, sampling frame summary, pilot-size options, Part 3B evidence schema); protocol only, **no evidence collection, no network access, no modeling**; advances no research action ✅
+- `stage125-part3a1-decision-lock` — Stage125 Part 3A.1 user-approved pilot decision lock (rubric approval record, G09–G14 pilot thresholds, locked event-enriched pilot pair selection); decision record only, **no evidence collection, no network access, no modeling**; advances no research action ✅
 
 ## Notes on ordering
 
@@ -65,11 +68,11 @@ Rule C (`first_observed_trading_year < fiscal_year`) was rejected.
 data and verified listing master, producing four sample designs (main Rule A =
 1013 pairs / 81 pos / 932 neg; main Rule B = 994 / 80 / 914) with canonical and
 filtered outputs and 58 focused tests (736 passed, 1 skipped, local results). **No modeling was started.**
-`stage125-research-design-readiness` is the next research action. Stage125 is a
-**Research Design & Data Readiness** stage that performs **no** modeling. Part 0
-(this decision lock) records the agreed design (M1 Financial, M2 Market, M3
-Parsimonious Macro, M4 Structured Audit/Governance; M5 Persian-text modeling
-removed) and the firm data-admission rule (accessibility ≥ 3 is a pilot gate, not
-an automatic pass). See [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md).
-Modeling remains prohibited until Stage126 (M1 Financial Baseline) is explicitly
-approved.
+`stage125-research-design-readiness` completed Parts 0–3A.1 under Stage125 (no
+modeling). `stage125-part3a-decision-lock` recorded the approved rubric,
+G09–G14 pilot thresholds, and locked 80-pair event-enriched selection
+(39 positive / 41 negative; 26 tickers; 10 known industries; 53 industry-present
+pairs; 27 industry-missing pairs). `stage125-part3b-evidence-capture` is the
+next action pointer only — Part 3B is **not started** by Part 3A.1. See
+[`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
+prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.

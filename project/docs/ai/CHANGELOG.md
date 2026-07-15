@@ -3,14 +3,39 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-15
+
+- **Stage125 Part 3A.1 blocker fixes (PR #30, additive).** Industry accounting
+  corrected: 10 known industries, 53 industry-present pairs, 27 industry-missing
+  pairs; unknown sentinel `نامشخص در فایل ارسالی` is not a known industry.
+  Handoff generator now propagates `part3a_protocol_locked`,
+  `part3a_decision_locked`, and `part3b_started` from the selected QC scope
+  (fail-closed). ROADMAP pointers:
+  `last_completed_research_action_id=stage125-part3a-decision-lock`,
+  `next_research_action_id=stage125-part3b-evidence-capture` (pointer only; Part
+  3B not started).
+
+- **Stage125 Part 3A.1 — User-Approved Pilot Decision Lock.** Authorized and
+  active as a decision-record task tracked by
+  `active_maintenance_task_id = stage125-part3a1-decision-lock`
+  (advances **no** research action). Baseline: PR #29 MERGED, `main` @
+  `4e15cb7bdec07bfc007e6abe854c877ffd2ac1cc`. Part 3A protocol merged and
+  frozen. New code/tests:
+  `project/src/stage125_part3a_decision_lock.py`,
+  `project/run_stage125_part3a_decision_lock.py`,
+  `project/tests/test_stage125_part3a_decision_lock.py`. Deliverables in
+  `project/stage125/`: decision lock JSON (rubric approved but not applied;
+  locked `pilot_option_event_enriched`; G09–G14 pilot thresholds); approved
+  gate thresholds CSV; selected pilot pairs CSV (80 pairs). Pilot is
+  event-enriched and non-population-representative; **not** the modeling sample.
+  **No** evidence collection, **no** network access, **no** accessibility
+  scores applied, **no** candidate admitted/rejected. `part3a_decision_locked=true`;
+  `part3b_started=false`; `modeling_started` remains `false`.
+
 ## 2026-07-14
 
-- **Stage125 Part 3A — Accessibility & Pilot Protocol Lock.** Authorized and
-  active as a protocol / inventory-freeze task tracked by
-  `active_maintenance_task_id = stage125-part3a-pilot-protocol-lock`
-  (advances **no** research action; `last_completed_research_action_id` stays
-  `stage124-gate-b-execution`). Baseline: PR #27 MERGED, `main` @
-  `c6cbb6b7a7dc4dfe7ca3fa6ea0bcf34d7f0612c0`. New code/tests:
+- **Stage125 Part 3A — Accessibility & Pilot Protocol Lock — COMPLETED and
+  MERGED.** PR #29 merged (`main` @ `4e15cb7…`). Protocol assets frozen.
   `project/src/stage125_part3a_pilot_protocol.py`,
   `project/run_stage125_part3a.py`,
   `project/tests/test_stage125_part3a_pilot_protocol.py`. Deliverables in

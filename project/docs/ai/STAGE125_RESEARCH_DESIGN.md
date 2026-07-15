@@ -185,12 +185,18 @@ robustness check.
   audit CSVs (all 1200 pairs preserved), cutoff summary. Missing `fiscal_year_end`
   never filled or guessed; `eligibility_impact=none_contract_audit_only` for every
   pair. PR #27 post-merge Handoff refresh merged (`c6cbb6b7…`).
-- **Part 3A — Accessibility & pilot protocol lock. (Authorized and active.)**
-  Freeze the 10 registered M2–M4 candidates; propose (but do not apply) the
-  accessibility rubric; lock gate decision protocol; compute sampling frame from
-  frozen data; provide pilot-size options for human approval; define Part 3B
-  evidence schema. **No** live evidence, **no** scores, **no** admitted
-  candidates. `part3b_started=false`.
+- **Part 3A — Accessibility & pilot protocol lock. (Completed and merged.)**
+  PR #29 merged (`main` @ `4e15cb7…`). Freeze the 10 registered M2–M4
+  candidates; propose (but do not apply) the accessibility rubric; lock gate
+  decision protocol; compute sampling frame from frozen data; provide pilot-size
+  options for human approval; define Part 3B evidence schema. **No** live
+  evidence, **no** scores, **no** admitted candidates. Protocol assets frozen.
+  `part3a_protocol_locked=true`; `part3b_started=false`.
+- **Part 3A.1 — User-approved pilot decision lock. (Authorized and active.)**
+  Record user-approved rubric version, G09–G14 pilot thresholds, and locked
+  `pilot_option_event_enriched` selection (80 pairs; event-enriched; not
+  population-representative; not modeling sample). **No** evidence, **no**
+  scores applied. `part3a_decision_locked=true`; `part3b_started=false`.
 - **Part 3B — Evidence capture & accessibility scoring. (Not started.)** Small
   representative pilot for M2–M4 sources; per-variable accessibility/quality
   scoring; coverage on company-year and common sample; positive/negative counts

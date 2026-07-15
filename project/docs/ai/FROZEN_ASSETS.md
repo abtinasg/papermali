@@ -5,7 +5,7 @@
 
 _Generated from the Stage122/Stage123/Stage124 hash manifests (`metadata_and_hashes_stage12{2,3}.json`, `metadata_and_hashes_stage124_batch02_gate_b.json`)._
 
-- Frozen (verified) files: **50/50 match**. A missing or mismatched frozen file is **fatal** (generation/validation fails).
+- Frozen (verified) files: **55/55 match**. A missing or mismatched frozen file is **fatal** (generation/validation fails).
 - Files are *regenerable* when gitignored (machine-dependent SHA) or explicitly classified non-frozen (`NON_FROZEN_TRACKED`, e.g. a pytest log whose timing line is non-deterministic); these are not hash-verified.
 
 | Status | Path | Manifest |
@@ -51,6 +51,7 @@ _Generated from the Stage122/Stage123/Stage124 hash manifests (`metadata_and_has
 | ✅ match | `project/stage124/stage124_batch02_gate_b_qc_report.json` | `project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json` |
 | ✅ match | `project/stage125/README_STAGE125_PART1_DATA_CONTRACT.md` | `project/stage125/metadata_and_hashes_stage125_part1.json` |
 | ✅ match | `project/stage125/README_STAGE125_PART2_PREDICTION_TIME_CONTRACT.md` | `project/stage125/metadata_and_hashes_stage125_part2.json` |
+| ✅ match | `project/stage125/README_STAGE125_PART3A_DECISION_LOCK.md` | `project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json` |
 | ✅ match | `project/stage125/README_STAGE125_PART3A_PILOT_PROTOCOL.md` | `project/stage125/metadata_and_hashes_stage125_part3a.json` |
 | ✅ match | `project/stage125/accessibility_scoring_rubric_stage125_part3a.json` | `project/stage125/metadata_and_hashes_stage125_part3a.json` |
 | ✅ match | `project/stage125/data_admission_gate_template_stage125.csv` | `project/stage125/metadata_and_hashes_stage125_part1.json` |
@@ -68,6 +69,9 @@ _Generated from the Stage122/Stage123/Stage124 hash manifests (`metadata_and_has
 | ✅ match | `project/stage125/part3_sampling_frame_by_target_year_stage125.csv` | `project/stage125/metadata_and_hashes_stage125_part3a.json` |
 | ✅ match | `project/stage125/part3_sampling_frame_summary_stage125.json` | `project/stage125/metadata_and_hashes_stage125_part3a.json` |
 | ✅ match | `project/stage125/part3_source_evidence_manifest_schema_stage125.json` | `project/stage125/metadata_and_hashes_stage125_part3a.json` |
+| ✅ match | `project/stage125/part3a_approved_gate_thresholds_stage125.csv` | `project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json` |
+| ✅ match | `project/stage125/part3a_decision_lock_stage125.json` | `project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json` |
+| ✅ match | `project/stage125/part3a_selected_pilot_pairs_stage125.csv` | `project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json` |
 | ✅ match | `project/stage125/prediction_cutoff_audit_stage125_part2.csv` | `project/stage125/metadata_and_hashes_stage125_part2.json` |
 | ✅ match | `project/stage125/prediction_cutoff_summary_stage125_part2.json` | `project/stage125/metadata_and_hashes_stage125_part2.json` |
 | ✅ match | `project/stage125/prediction_time_contract_stage125_part2.json` | `project/stage125/metadata_and_hashes_stage125_part2.json` |
@@ -75,4 +79,5 @@ _Generated from the Stage122/Stage123/Stage124 hash manifests (`metadata_and_has
 | ✅ match | `project/stage125/source_registry_stage125.csv` | `project/stage125/metadata_and_hashes_stage125_part1.json` |
 | ✅ match | `project/stage125/stage125_part1_data_contract_qc_report.json` | `project/stage125/metadata_and_hashes_stage125_part1.json` |
 | ✅ match | `project/stage125/stage125_part2_prediction_time_contract_qc_report.json` | `project/stage125/metadata_and_hashes_stage125_part2.json` |
+| ✅ match | `project/stage125/stage125_part3a_decision_lock_qc_report.json` | `project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json` |
 | ✅ match | `project/stage125/stage125_part3a_pilot_protocol_qc_report.json` | `project/stage125/metadata_and_hashes_stage125_part3a.json` |

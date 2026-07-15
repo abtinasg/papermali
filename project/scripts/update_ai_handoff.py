@@ -82,6 +82,10 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part3a_pilot_protocol.py",
     "project/run_stage125_part3a.py",
     "project/tests/test_stage125_part3a_pilot_protocol.py",
+    # Stage125 Part 3A.1 code, runner, and tests.
+    "project/src/stage125_part3a_decision_lock.py",
+    "project/run_stage125_part3a_decision_lock.py",
+    "project/tests/test_stage125_part3a_decision_lock.py",
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
     # Do NOT broadly allowlist Stage122–Stage124 directories.
     "project/src/stage124_gate_b_execution.py",
@@ -160,6 +164,13 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/part3_sampling_frame_by_target_year_stage125.csv",
     "project/stage125/part3_sampling_frame_summary_stage125.json",
     "project/stage125/part3_source_evidence_manifest_schema_stage125.json",
+    # Stage125 Part 3A.1 generated decision-lock artifacts (runner output only).
+    "project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json",
+    "project/stage125/stage125_part3a_decision_lock_qc_report.json",
+    "project/stage125/README_STAGE125_PART3A_DECISION_LOCK.md",
+    "project/stage125/part3a_decision_lock_stage125.json",
+    "project/stage125/part3a_approved_gate_thresholds_stage125.csv",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv",
 )
 
 FROZEN_MANIFESTS = (
@@ -169,6 +180,7 @@ FROZEN_MANIFESTS = (
     "project/stage125/metadata_and_hashes_stage125_part1.json",
     "project/stage125/metadata_and_hashes_stage125_part2.json",
     "project/stage125/metadata_and_hashes_stage125_part3a.json",
+    "project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json",
 )
 
 # Tracked files declared in a frozen manifest that are EXPLICITLY classified as
@@ -202,6 +214,19 @@ VOLATILE_FIELDS = frozenset({
 })
 
 GENERATOR_VERSION = 2
+
+# QC workflow markers propagated into handoff_state.json (fail-closed per scope).
+QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
+    "stage125_part3a_pilot_protocol": (
+        "part3a_protocol_locked",
+        "part3b_started",
+    ),
+    "stage125_part3a_decision_lock": (
+        "part3a_protocol_locked",
+        "part3a_decision_locked",
+        "part3b_started",
+    ),
+}
 
 
 class HandoffError(RuntimeError):
@@ -545,6 +570,23 @@ def detect_markers(root: str) -> dict:
     }
 
 
+def extract_qc_workflow_markers(qc: dict) -> dict:
+    """Fail-closed extraction of scope-specific workflow markers from QC."""
+    scope = qc.get("stage")
+    if not scope:
+        raise HandoffError("QC report missing 'stage' (fail-closed)")
+    required = QC_WORKFLOW_FIELDS_BY_SCOPE.get(scope)
+    if required is None:
+        return {}
+    missing = [key for key in required if key not in qc]
+    if missing:
+        raise HandoffError(
+            f"QC scope '{scope}' missing required workflow field(s) "
+            f"{missing} (fail-closed)"
+        )
+    return {key: qc[key] for key in required}
+
+
 def _verified_master_tickers(root: str) -> list[str] | None:
     """Read tickers from the verified master CSV if it exists."""
     vm_path = os.path.join(root, VERIFIED_MASTER_PATH)
@@ -591,6 +633,7 @@ def semantic_state(root: str):
     # fall back to QC report tickers when the verified master does not exist.
     vm_tickers = _verified_master_tickers(root)
     tickers = sorted(vm_tickers) if vm_tickers is not None else sorted(qc["tickers"])
+    qc_workflow = extract_qc_workflow_markers(qc)
 
     state = {
         "last_stage_commit": last_stage_commit(root),
@@ -615,6 +658,7 @@ def semantic_state(root: str):
             "next_research_action_id": roadmap["next_research_action_id"],
         },
         "markers": detect_markers(root),
+        "qc_workflow": qc_workflow,
         "tickers": tickers,
     }
     return state, head, qc, roadmap, frozen
@@ -659,6 +703,7 @@ def build_handoff_state(root: str):
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "state_fingerprint": fingerprint(state),
     }
+    record.update(state["qc_workflow"])
     return record, state, frozen
 
 
@@ -716,6 +761,18 @@ def render_current_state(record: dict) -> str:
         f"- modeling_started: **{record['modeling_started']}**",
         f"- gate_b_started: **{record['gate_b_started']}**",
         f"- verified_master_created: **{record['verified_master_created']}**",
+    ]
+    if "part3a_protocol_locked" in record:
+        lines.append(
+            f"- part3a_protocol_locked: **{record['part3a_protocol_locked']}**"
+        )
+    if "part3a_decision_locked" in record:
+        lines.append(
+            f"- part3a_decision_locked: **{record['part3a_decision_locked']}**"
+        )
+    if "part3b_started" in record:
+        lines.append(f"- part3b_started: **{record['part3b_started']}**")
+    lines.extend([
         "",
         "## Tickers in current research scope\n",
         "، ".join(record["tickers"]),
@@ -723,7 +780,7 @@ def render_current_state(record: dict) -> str:
         f"_state_fingerprint: `{record['state_fingerprint']}`_",
         f"_generated_at_utc: {record['generated_at_utc']} (informational)_",
         "",
-    ]
+    ])
     return "\n".join(lines)
 
 
