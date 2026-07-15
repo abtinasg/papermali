@@ -1,0 +1,29 @@
+{
+  "stage": "stage125_part3b0_evidence_readiness",
+  "current_stage": "Stage125",
+  "description": "Stage125 Part 3B.0 — evidence capture readiness.",
+  "generated_at": "2026-07-15T17:46:53+03:30",
+  "code_commit": "75abf3f6d92e514df568e1d6912ccc47cdffc933",
+  "baseline_commit": "75abf3f6d92e514df568e1d6912ccc47cdffc933",
+  "source_file_sha256": "b5b489e0a499fcd40fedb68e5198c1087f2546983f6ca4804d737a2db907521a",
+  "test_file_sha256": "aef327cd678014c8176b4a0233825d3f82d220d4af154a12d4cea82f4b7fc841",
+  "output_files_sha256": {
+    "README_STAGE125_PART3B0_EVIDENCE_READINESS.md": "5bd76f1ac20ecdabfe7e66813dbaaa45f7b4557b64c0e5e3826c308462d183f2",
+    "part3b0_evidence_capture_contract_stage125.json": "caa233819d2e6e6798c299c752a9441535330d70bcac8bb33f7e1bfee42143ae",
+    "part3b0_evidence_manifest_template_stage125.csv": "c61f5c9b1948bda5611cadf84f3c84aea56912d063bb0017ac09a3b8d49a5d59",
+    "part3b0_gate_result_template_stage125.csv": "cef8d433248e594159f0b61a06bd863d138506ccd76170f0eb7813e05f6857f5",
+    "part3b0_immutable_cache_contract_stage125.json": "7b5f67e8d874592e7c844a44dd8d9664969b79a695f21cd4fabeb3c4b3820a22",
+    "part3b0_network_denial_contract_stage125.json": "9f61d5d8447a18cc4030e755345ba5190eb36ce72bd72575bb1bd120d43d8a7a",
+    "stage125_part3b0_evidence_readiness_qc_report.json": "67aae7f6953ea6ea4284c4f800794797b2fde2de9c94b680d5dac74cdb96f4d0"
+  },
+  "modeling_started": false,
+  "part3a_protocol_locked": true,
+  "part3a_decision_locked": true,
+  "part3b0_readiness": true,
+  "part3b_started": false,
+  "evidence_collected": false,
+  "accessibility_scoring_applied": false,
+  "network_extraction_performed": false,
+  "network_calls_attempted": 0,
+  "warning": "Part 3B.0 only: readiness contracts and validators. No modeling, no real evidence, no network access. Part 3B evidence capture not started. Frozen scientific assets unchanged."
+}

@@ -1,0 +1,16 @@
+{
+  "contract_version": "stage125_part3b0_v1",
+  "stage": "Stage125",
+  "keying": "sha256_of_exact_raw_bytes",
+  "write_once": true,
+  "atomic_write": true,
+  "identical_bytes_no_op": true,
+  "different_bytes_same_identity_fail_closed": true,
+  "path_traversal_rejected": true,
+  "symlink_escape_rejected": true,
+  "overwrite_support": false,
+  "mutable_latest_file": false,
+  "metadata_payload_hash_verified_together": true,
+  "unknown_hash_or_missing_payload": "unresolved_fail_closed",
+  "repository_cache_populated_in_part3b0": false
+}

@@ -1,0 +1,21 @@
+{
+  "contract_version": "stage125_part3b0_v1",
+  "stage": "Stage125",
+  "default_deny": true,
+  "blocked_primitives": [
+    "socket.socket.connect",
+    "socket.socket.connect_ex",
+    "socket.create_connection",
+    "urllib.request.urlopen",
+    "http.client.HTTPConnection.connect"
+  ],
+  "on_attempt": {
+    "increment_network_calls_attempted": true,
+    "raise_fail_closed_exception": true,
+    "leave_no_partial_cache_or_evidence": true
+  },
+  "required_final_state": {
+    "network_calls_attempted": 0,
+    "network_extraction_performed": false
+  }
+}
