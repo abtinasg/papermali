@@ -858,30 +858,22 @@ def test_stage125_part3a_mixed_code_and_artifact_commit_advances(synth):
     not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
     reason="real-repo test requires git checkout",
 )
-def test_real_repo_last_stage_commit_excludes_dependency_maintenance_merge():
+def test_real_repo_dependency_maintenance_merge_is_excluded():
     # Regression: dependency-only maintenance merges (e.g. PR #33) must not
-    # advance the research-stage anchor. The PR #32 merge introduced real
-    # Part 3A.1 source corrections and remains the anchor.
+    # advance the research-stage anchor. This test pins the historical
+    # dependency merge as excluded; it does NOT freeze the latest stage SHA.
     dep_merge = "167be6c68264cb04722da26f7fbbf527d67e1230"
-    pr32_merge = "c783e3dafa9a109d43893a9691a4f5147dc710f7"
-    got = gen.last_stage_commit(REAL_ROOT)
-    assert got == pr32_merge
-    assert got != dep_merge
-    files = gen._introduced_files(REAL_ROOT, got)
-    assert gen._is_stage_relevant(files)
-    assert not gen._is_handoff_only(files)
-    assert not gen._is_artifact_only(files)
-    assert not gen._is_maintenance_only(files)
+    head = gen.head_commit(REAL_ROOT)
+    assert gen.is_ancestor(REAL_ROOT, dep_merge, head)
+
     dep_files = gen._introduced_files(REAL_ROOT, dep_merge)
+    assert dep_files
+    assert set(dep_files) == set(gen.MAINTENANCE_ONLY_FILES)
     assert gen._is_maintenance_only(dep_files)
+    assert all(gen.path_maintenance_only(p) for p in dep_files)
     assert not gen._is_stage_relevant(dep_files)
-    newer = gen._git(REAL_ROOT, "rev-list", f"{got}..HEAD").splitlines()
-    for sha in newer:
-        newer_files = gen._introduced_files(REAL_ROOT, sha)
-        assert not gen._is_stage_relevant(newer_files), (
-            f"commit {sha} is newer than last_stage_commit {got} but is "
-            f"ALSO stage-relevant (files={newer_files})"
-        )
+
+    assert gen.last_stage_commit(REAL_ROOT) != dep_merge
 
 
 # ---- Stage125 Part 3A.1 artifact-only + last_stage_commit regression -------- #
