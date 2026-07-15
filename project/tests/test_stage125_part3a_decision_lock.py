@@ -323,16 +323,27 @@ def test_negative_modeling_artifact_detected(tmp_path):
 def test_negative_wrong_baseline_fails(tmp_path, monkeypatch):
     root = _init_git_repo(tmp_path)
     c1 = _git_commit(root, "c1.txt")
-    _git_commit(root, "c2.txt")
-    _set_origin_main(root)
-    missing = "1111111111111111111111111111111111111111"
-    monkeypatch.setattr(
-        lock, "EXPECTED_BASELINE_COMMIT", missing, raising=False,
-    )
-    with pytest.raises(lock.QCFail, match="not resolvable"):
+    c2 = _git_commit(root, "c2.txt")
+    c3 = _git_commit(root, "c3.txt")
+    _set_origin_main(root, c2)
+    monkeypatch.setattr(lock, "EXPECTED_BASELINE_COMMIT", c3, raising=False)
+    with pytest.raises(lock.QCFail, match="not an ancestor of origin/main"):
         lock.verify_baseline_commit(str(root))
     monkeypatch.setattr(lock, "EXPECTED_BASELINE_COMMIT", c1, raising=False)
     lock.verify_baseline_commit(str(root))
+
+
+def test_unresolvable_baseline_fails(monkeypatch):
+    real_git = lock._git
+
+    def fake_git(repo_root, *args):
+        if args == ("rev-parse", lock.EXPECTED_BASELINE_COMMIT):
+            return ""
+        return real_git(repo_root, *args)
+
+    monkeypatch.setattr(lock, "_git", fake_git)
+    with pytest.raises(lock.QCFail, match="EXPECTED_BASELINE_COMMIT .* not resolvable"):
+        lock.verify_baseline_commit(str(REPO_ROOT))
 
 
 def test_negative_part3a_frozen_tamper_detected(tmp_path):
