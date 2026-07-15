@@ -1,10 +1,10 @@
 {
   "baseline_commit": "c6cbb6b7a7dc4dfe7ca3fa6ea0bcf34d7f0612c0",
-  "code_commit": "a5d7fd27955b9690bd2257211e467d485ec1ff3e",
+  "code_commit": "9d049d408b481a07d0cd0cb989ccff6de6ef626e",
   "current_stage": "Stage125",
   "description": "Stage125 Part 3A — accessibility & pilot protocol lock.",
   "gate_b_started": true,
-  "generated_at": "2026-07-14T23:38:21+03:30",
+  "generated_at": "2026-07-15T18:21:32+03:00",
   "input_all_rows_name": "modeling_all_rows_stage124_gate_b.csv",
   "input_all_rows_sha256": "f6b6bc41cbe757d19d4397ffc5898629d0fca8ab0480351f75040a71d7ce7376",
   "input_pairs_name": "modeling_one_year_ahead_stage124_gate_b.csv",
@@ -21,7 +21,7 @@
     "part3_sampling_frame_by_target_year_stage125.csv": "96e6826681b8b46e6d0ebf9bd2dd9c1d7895f0432ca600986ab8beffb680f584",
     "part3_sampling_frame_summary_stage125.json": "359394f0522f2c3db24a56238d6f9ff78bcab75dd36cbdef9b64f23162c6b945",
     "part3_source_evidence_manifest_schema_stage125.json": "9a736edb18046128851d55c87f07609b8dc2a4b2be73a41c5837fe0e2a4cd78d",
-    "stage125_part3a_pilot_protocol_qc_report.json": "63cf511192a61ecbfed7c7e5484d90284617117cff3d44dc4d45af7d1f71bffe"
+    "stage125_part3a_pilot_protocol_qc_report.json": "a42de51996fdf48f5062d8417bcb3784028b08deeb34aca69a8aa235a12254f7"
   },
   "part2_started": true,
   "part3_started": true,
