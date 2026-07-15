@@ -9,7 +9,7 @@
     },
     {
       "assertion": "baseline_commit_exact",
-      "detail": "baseline 4e15cb7bdec07bfc007e6abe854c877ffd2ac1cc -> origin/main 7a77b62a2c6509fde711762e2680fb497dea3c13 -> HEAD 2bb472c7d5b572ea8f2569ce314744512a67e564",
+      "detail": "baseline 4e15cb7bdec07bfc007e6abe854c877ffd2ac1cc is ancestor of origin/main and HEAD; origin/main is ancestor of HEAD",
       "status": "PASS"
     },
     {
@@ -232,7 +232,7 @@
     "project/stage125/stage125_part2_prediction_time_contract_qc_report.json": "cd43c01cc39e2d43a39f686884916630c47d2324799766058f7e34bce19689e6"
   },
   "gate_b_started": true,
-  "generated_at": "2026-07-15T13:21:37+03:00",
+  "generated_at": "2026-07-15T13:29:35+03:00",
   "guard_evidence": {
     "eligibility": {
       "pair_count": 1200,
@@ -312,8 +312,8 @@
   "pilot_extraction_started": false,
   "selected_pilot_option": "pilot_option_event_enriched",
   "selected_pilot_pairs": 80,
-  "source_commit": "9b8cf806458bfc4ba6fabf6a0de07140a9b798cc",
-  "source_file_sha256": "8e86ef8c31f5eb44864c2fd2a45558d4a6be9b73de9764393fae55da24cbb553",
+  "source_commit": "3f80a0455ae87b25c6241be894c1705f3728fc53",
+  "source_file_sha256": "09b594af7288cad490ca39c606e6aaaa35f629e2172ef2ec88aa8724727c876e",
   "stage": "stage125_part3a_decision_lock",
   "test_file_sha256": "4664c52037c4129e2a5e4831696074bfba5f48fda79f3a00a1dd86f8a0224cd6",
   "ticker_count": 130,
