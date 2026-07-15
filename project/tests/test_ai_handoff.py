@@ -65,17 +65,18 @@ def test_state_matches_git():
 
 def test_real_repo_last_stage_commit_is_a_real_content_commit():
     # last_stage_commit is PATH-BASED / SEMANTIC: it must resolve to the most
-    # recent commit that introduces real (non-Handoff-only, non-artifact-only)
-    # content, regardless of that commit's message wording. This test does
-    # NOT hard-code a specific SHA (a hard-coded expectation here would itself
-    # be message-wording-adjacent and would need editing on every future real
-    # commit) — instead it independently recomputes the expectation via the
-    # same path-based rule and cross-checks it against the git history walk.
+    # recent commit that introduces real (non-Handoff-only, non-artifact-only,
+    # non-maintenance-only) content, regardless of that commit's message
+    # wording. This test does NOT hard-code a specific SHA (a hard-coded
+    # expectation here would itself be message-wording-adjacent and would need
+    # editing on every future real commit) — instead it independently
+    # recomputes the expectation via the same path-based rule and cross-checks
+    # it against the git history walk.
     got = gen.last_stage_commit(REAL_ROOT)
     files = gen._introduced_files(REAL_ROOT, got)
     assert gen._is_stage_relevant(files), (
         f"last_stage_commit {got} must introduce at least one real "
-        "(non-Handoff-only, non-artifact-only) file"
+        "(non-Handoff-only, non-artifact-only, non-maintenance-only) file"
     )
     # Every commit strictly newer than `got` must NOT be stage-relevant,
     # otherwise `got` would not be the LATEST qualifying commit.
@@ -347,6 +348,62 @@ def test_artifact_only_independent_of_allowlist_and_handoff_only():
 
     for p in gen.ARTIFACT_ONLY_FILES:
         assert gen.path_handoff_only(p) is False
+
+
+# --------------------------------------------------------------------------- #
+# Dependency-contract maintenance-only classification (independent of
+# path_allowlisted, path_handoff_only, and path_artifact_only) — pure unit
+# --------------------------------------------------------------------------- #
+
+@pytest.mark.parametrize("path,ok", [
+    ("project/environment.yml", True),
+    ("project/requirements.txt", True),
+    ("project/tests/test_dependency_contract.py", True),
+    # prefix / suffix attacks must be rejected
+    ("project/environment.yml.bak", False),
+    ("project/requirements.txt.evil", False),
+    ("project/tests/test_dependency_contract.py.bak", False),
+    ("project/tests/sub/test_dependency_contract.py", False),
+    # real research / Handoff / artifact paths are NOT maintenance-only
+    ("project/src/stage125_part3a_decision_lock.py", False),
+    ("project/docs/ai/CURRENT_STATE.md", False),
+    ("project/stage125/stage125_part3a_decision_lock_qc_report.json", False),
+])
+def test_maintenance_only_classification(path, ok):
+    assert gen.path_maintenance_only(path) is ok
+
+
+def test_maintenance_only_disjoint_from_handoff_and_artifact():
+    for p in gen.MAINTENANCE_ONLY_FILES:
+        assert gen.path_handoff_only(p) is False
+        assert gen.path_artifact_only(p) is False
+
+
+def test_dependency_contract_full_commit_is_skipped(synth):
+    before = gen.last_stage_commit(synth)
+    for rel in gen.MAINTENANCE_ONLY_FILES:
+        _write(synth, rel, "pinned\n")
+    sha = _commit(synth, "Stage125: dependency contract refresh")
+    assert gen.last_stage_commit(synth) == before
+    assert gen.last_stage_commit(synth) != sha
+
+
+def test_single_maintenance_file_commit_is_skipped(synth):
+    before = gen.last_stage_commit(synth)
+    _write(synth, "project/requirements.txt", "jdatetime==6.0.1\n")
+    sha = _commit(synth, "fix(deps): pin jdatetime")
+    assert gen.last_stage_commit(synth) == before
+    assert gen.last_stage_commit(synth) != sha
+
+
+def test_mixed_maintenance_and_stage_source_commit_advances(synth):
+    before = gen.last_stage_commit(synth)
+    _write(synth, "project/environment.yml", "python=3.13.5\n")
+    _write(synth, "project/src/stage125_part3a_decision_lock.py", "GUARD = 2\n")
+    sha = _commit(synth, "fix(part3a1): runtime pin plus guard update")
+    got = gen.last_stage_commit(synth)
+    assert got == sha
+    assert got != before
 
 
 # --------------------------------------------------------------------------- #
@@ -801,15 +858,22 @@ def test_stage125_part3a_mixed_code_and_artifact_commit_advances(synth):
     not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
     reason="real-repo test requires git checkout",
 )
-def test_real_repo_last_stage_commit_is_part3a_code_commit():
-    # Regression for Blocker 1: artifact-only Part 3A commit must not anchor
-    # last_stage_commit; a code/test/human-doc commit must.
-    artifact_sha = "49d2d3324c4cec84687b917b5dd97b3eb1196625"
-    got = gen.last_stage_commit(REAL_ROOT)
-    assert got != artifact_sha
-    files = gen._introduced_files(REAL_ROOT, got)
-    assert gen._is_stage_relevant(files)
-    assert any("stage125_part3a" in f for f in files)
+def test_real_repo_dependency_maintenance_merge_is_excluded():
+    # Regression: dependency-only maintenance merges (e.g. PR #33) must not
+    # advance the research-stage anchor. This test pins the historical
+    # dependency merge as excluded; it does NOT freeze the latest stage SHA.
+    dep_merge = "167be6c68264cb04722da26f7fbbf527d67e1230"
+    head = gen.head_commit(REAL_ROOT)
+    assert gen.is_ancestor(REAL_ROOT, dep_merge, head)
+
+    dep_files = gen._introduced_files(REAL_ROOT, dep_merge)
+    assert dep_files
+    assert set(dep_files) == set(gen.MAINTENANCE_ONLY_FILES)
+    assert gen._is_maintenance_only(dep_files)
+    assert all(gen.path_maintenance_only(p) for p in dep_files)
+    assert not gen._is_stage_relevant(dep_files)
+
+    assert gen.last_stage_commit(REAL_ROOT) != dep_merge
 
 
 # ---- Stage125 Part 3A.1 artifact-only + last_stage_commit regression -------- #

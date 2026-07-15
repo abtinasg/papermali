@@ -173,6 +173,20 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/part3a_selected_pilot_pairs_stage125.csv",
 )
 
+# Dependency-contract maintenance classification, INDEPENDENT of the change
+# allowlist, Handoff-only classification, and artifact-only classification.
+# A commit is "maintenance-only" (and therefore never advances
+# last_stage_commit) only when every file it introduces is one of these exact
+# curated dependency/environment paths. This keeps dependency-contract PRs
+# (e.g. jdatetime pin, Python runtime pin) from advancing the research-stage
+# anchor while still allowing mixed commits that touch real research code.
+#   * file entries match by EXACT path only (no directory entries).
+MAINTENANCE_ONLY_FILES = (
+    "project/environment.yml",
+    "project/requirements.txt",
+    "project/tests/test_dependency_contract.py",
+)
+
 FROZEN_MANIFESTS = (
     "project/stage122/metadata_and_hashes_stage122.json",
     "project/stage123/metadata_and_hashes_stage123.json",
@@ -321,6 +335,16 @@ def path_artifact_only(path: str) -> bool:
     return path in ARTIFACT_ONLY_FILES
 
 
+def path_maintenance_only(path: str) -> bool:
+    """Dependency-contract maintenance classification: EXACT file match only.
+
+    A strict, independent subset used solely by last_stage_commit() to skip
+    commits that only touch curated dependency/environment contract files.
+    See MAINTENANCE_ONLY_FILES for the curation rules.
+    """
+    return path in MAINTENANCE_ONLY_FILES
+
+
 def _is_handoff_only(files: list[str]) -> bool:
     if not files:
         return False
@@ -333,9 +357,16 @@ def _is_artifact_only(files: list[str]) -> bool:
     return all(path_artifact_only(f) for f in files)
 
 
+def _is_maintenance_only(files: list[str]) -> bool:
+    if not files:
+        return False
+    return all(path_maintenance_only(f) for f in files)
+
+
 def _is_stage_relevant(files: list[str]) -> bool:
     """True iff at least one introduced file is REAL content — i.e. neither
-    Handoff-only infrastructure nor a curated generated artifact.
+    Handoff-only infrastructure, a curated generated artifact, nor a
+    dependency-contract maintenance file.
 
     This is deliberately PATH-BASED / SEMANTIC, not wording-based: it does not
     inspect the commit subject or body at all. A commit that changes
@@ -344,23 +375,30 @@ def _is_stage_relevant(files: list[str]) -> bool:
     whether its subject is ``fix(qc-scan): ...`` or ``Stage124: ...`` — the
     message text is irrelevant to the classification.
     """
-    return any(not path_handoff_only(f) and not path_artifact_only(f) for f in files)
+    return any(
+        not path_handoff_only(f)
+        and not path_artifact_only(f)
+        and not path_maintenance_only(f)
+        for f in files
+    )
 
 
 def last_stage_commit(root: str) -> str:
     """Latest reachable commit that introduces real (non-Handoff-only,
-    non-artifact-only) content.
+    non-artifact-only, non-maintenance-only) content.
 
     PATH-BASED / SEMANTIC, NOT message-wording-dependent: this walks commit
     history from HEAD and returns the first (i.e. most recent) commit whose
     introduced files (vs first parent; works for merges too) include at least
-    one file that is neither Handoff-only infrastructure nor a curated
-    generated artifact. A commit whose introduced files are ALL Handoff-only
-    is skipped; a commit whose introduced files are ALL curated generated
-    artifacts (QC report / metadata_and_hashes regeneration) is skipped; a
-    commit mixing real content with either of those (e.g. a source-code fix
-    committed alongside its regenerated QC artifact) still qualifies, because
-    only ONE introduced file needs to be real content.
+    one file that is neither Handoff-only infrastructure, a curated generated
+    artifact, nor a dependency-contract maintenance file. A commit whose
+    introduced files are ALL Handoff-only is skipped; a commit whose introduced
+    files are ALL curated generated artifacts (QC report / metadata_and_hashes
+    regeneration) is skipped; a commit whose introduced files are ALL
+    dependency-contract maintenance files is skipped; a commit mixing real
+    content with any of those (e.g. a source-code fix committed alongside its
+    regenerated QC artifact) still qualifies, because only ONE introduced file
+    needs to be real content.
     """
     for sha in _git(root, "rev-list", "HEAD").splitlines():
         files = _introduced_files(root, sha)
