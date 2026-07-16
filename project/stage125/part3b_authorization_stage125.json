@@ -8,8 +8,8 @@
   "modeling_started": false,
   "real_evidence_authorized": true,
   "network_readonly_authorized": true,
-  "capture_plan_sha256": "41cba4f57ba87a6f39e02f1f3e9e3bf5e626a996d82eab064c683653d65e0d11",
-  "endpoint_registry_sha256": "8cc47fcb7be63a6a07ee1476b83d6d7d9e6af1719d7a2e80fceba50a05c87e41",
+  "capture_plan_sha256": "acb888189bb679b1f417ef7b83fda4f81b211111816cc736b5e9610d6cb0b4b8",
+  "endpoint_registry_sha256": "3d36eca0a0a63ef406ec48ef1bcf78ecbe2ce99ce24a6e8804c2b9c3ffb431b7",
   "frozen_input_sha256": {
     "project/stage125/part3_candidate_inventory_stage125.csv": "4bd5f6a71ecf0e1f74866a64a3774e51340729f4188ae2784f1d90db07e7032f",
     "project/stage125/part3_source_evidence_manifest_schema_stage125.json": "9a736edb18046128851d55c87f07609b8dc2a4b2be73a41c5837fe0e2a4cd78d",
@@ -32,5 +32,12 @@
   ],
   "pilot_pair_count": 80,
   "assessment_matrix_size": 800,
-  "notes": "Part 3B authorized for evidence capture and accessibility scoring pilot only. No modeling. No sample/target/eligibility change."
+  "notes": "Part 3B authorized for evidence capture and accessibility scoring pilot only. No modeling. No sample/target/eligibility change.",
+  "endpoint_provenance_sha256": {
+    "project/stage124/official_api/import_manifest.json": "9ff7bd939b1e28844d897412db6c2671db3e6857b83dce9261c3de44b4871e06",
+    "project/stage124/official_api/README.md": "0d4cf8581a953877f3102f4f7289c9017aa0b968e6ec9c8cfd4d3918c3c64492",
+    "project/raw_handoff/financial_distress_programmer_handoff_stage121(1)/ocf_source_manifest_stage121.csv": "b1bf92d74f19b4c00373079c3222489d6cb54e1c8f11e30a9e02557e6936057a"
+  },
+  "part3b_completed": false,
+  "status": "active_incomplete_accessibility_feasibility_probe"
 }
