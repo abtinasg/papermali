@@ -5,8 +5,10 @@ All repository-mutating cache tests use pytest temporary directories only.
 from __future__ import annotations
 
 import csv
+import dataclasses
 import io
 import json
+import multiprocessing
 import os
 import socket
 import subprocess
@@ -585,6 +587,120 @@ def test_forged_weakened_locked_policy_rejected():
         p3b0.require_sealed_gate_policy(forged)
 
 
+def test_policy_seal_rejects_mutated_labels_retaining_old_seal():
+    real = _policy()
+    victim_key = next(iter(real.frozen_pilot_keys))
+    old_lab = dict(real.frozen_pilot_key_labels)[victim_key]
+    new_lab = "negative" if old_lab == "positive" else "positive"
+    mutated_labels = frozenset(
+        (k, new_lab if k == victim_key else lab)
+        for k, lab in real.frozen_pilot_key_labels
+    )
+    forged = dataclasses.replace(
+        real, frozen_pilot_key_labels=mutated_labels,
+    )
+    with pytest.raises(p3b0.QCFail, match="seal verification failed"):
+        p3b0.require_sealed_gate_policy(forged)
+
+
+def test_policy_seal_rejects_mutated_years_retaining_old_seal():
+    real = _policy()
+    victim_key = next(iter(real.frozen_pilot_keys))
+    old_year = dict(real.frozen_pilot_key_years)[victim_key]
+    new_year = "1393" if old_year != "1393" else "1402"
+    mutated_years = frozenset(
+        (k, new_year if k == victim_key else y)
+        for k, y in real.frozen_pilot_key_years
+    )
+    forged = dataclasses.replace(
+        real, frozen_pilot_key_years=mutated_years,
+    )
+    with pytest.raises(p3b0.QCFail, match="seal verification failed"):
+        p3b0.require_sealed_gate_policy(forged)
+
+
+def test_policy_rejects_missing_extra_duplicate_and_domain_mismatches():
+    real = _policy()
+    keys = set(real.frozen_pilot_keys)
+    victim = next(iter(keys))
+    missing_keys = frozenset(keys - {victim})
+    with pytest.raises(p3b0.QCFail):
+        p3b0.require_sealed_gate_policy(
+            dataclasses.replace(
+                real,
+                frozen_pilot_keys=missing_keys,
+                _seal=p3b0._compute_policy_seal(
+                    real.source_thresholds_sha256,
+                    real.source_decision_lock_sha256,
+                    real.source_pilot_pairs_sha256,
+                    missing_keys,
+                    real.frozen_pilot_key_labels,
+                    real.frozen_pilot_key_years,
+                ),
+            )
+        )
+    extra_keys = frozenset(keys | {"EXTRA|0000"})
+    with pytest.raises(p3b0.QCFail):
+        p3b0.require_sealed_gate_policy(
+            dataclasses.replace(
+                real,
+                frozen_pilot_keys=extra_keys,
+                frozen_pilot_key_labels=real.frozen_pilot_key_labels
+                | {("EXTRA|0000", "positive")},
+                frozen_pilot_key_years=real.frozen_pilot_key_years
+                | {("EXTRA|0000", "1393")},
+                _seal=p3b0._compute_policy_seal(
+                    real.source_thresholds_sha256,
+                    real.source_decision_lock_sha256,
+                    real.source_pilot_pairs_sha256,
+                    extra_keys,
+                    real.frozen_pilot_key_labels | {("EXTRA|0000", "positive")},
+                    real.frozen_pilot_key_years | {("EXTRA|0000", "1393")},
+                ),
+            )
+        )
+    # Label projection missing a key while retaining seal domain inputs mismatched.
+    bad_labels = frozenset(
+        (k, lab) for k, lab in real.frozen_pilot_key_labels if k != victim
+    )
+    with pytest.raises(p3b0.QCFail, match="label key projection|pair counts"):
+        p3b0.require_sealed_gate_policy(
+            dataclasses.replace(
+                real,
+                frozen_pilot_key_labels=bad_labels,
+                _seal=p3b0._compute_policy_seal(
+                    real.source_thresholds_sha256,
+                    real.source_decision_lock_sha256,
+                    real.source_pilot_pairs_sha256,
+                    real.frozen_pilot_keys,
+                    bad_labels,
+                    real.frozen_pilot_key_years,
+                ),
+            )
+        )
+    # Duplicate key via conflicting label pairs is impossible in frozenset of
+    # (key,label); instead inject a wrong-domain label value under a recomputed seal.
+    wrong_domain_labels = frozenset(
+        (k, "not-a-class" if k == victim else lab)
+        for k, lab in real.frozen_pilot_key_labels
+    )
+    with pytest.raises(p3b0.QCFail, match="class labels invalid|allocation"):
+        p3b0.require_sealed_gate_policy(
+            dataclasses.replace(
+                real,
+                frozen_pilot_key_labels=wrong_domain_labels,
+                _seal=p3b0._compute_policy_seal(
+                    real.source_thresholds_sha256,
+                    real.source_decision_lock_sha256,
+                    real.source_pilot_pairs_sha256,
+                    real.frozen_pilot_keys,
+                    wrong_domain_labels,
+                    real.frozen_pilot_key_years,
+                ),
+            )
+        )
+
+
 def test_g09_caller_cannot_weaken_threshold():
     policy = _policy()
     pilot, _, _ = _frozen_pilot(policy)
@@ -672,6 +788,50 @@ def _full_block_usable_map(pilot: set[str], usable_keys: list[str]):
     }
 
 
+def _registered_candidate_ids() -> list[str]:
+    return [c["candidate_id"] for c in part3a.REGISTERED_CANDIDATES]
+
+
+def _complete_pair_block_usability(
+    policy,
+    *,
+    usable_keys: set[str] | None = None,
+    all_true: bool = False,
+) -> dict[str, dict[str, bool]]:
+    """Exact frozen-key map with per-candidate bool flags for G11/G12."""
+    usable_keys = usable_keys or set()
+    cands = _registered_candidate_ids()
+    out: dict[str, dict[str, bool]] = {}
+    for key in policy.frozen_pilot_keys:
+        flag = all_true or key in usable_keys
+        out[key] = {cid: flag for cid in cands}
+    return out
+
+
+def _class_keys_by_year(policy, class_label: str) -> dict[str, list[str]]:
+    label_by_key = {k: lab for k, lab in policy.frozen_pilot_key_labels}
+    year_by_key = {k: y for k, y in policy.frozen_pilot_key_years}
+    by_year: dict[str, list[str]] = {y: [] for y in policy.target_years}
+    for key in sorted(policy.frozen_pilot_keys):
+        if label_by_key[key] == class_label:
+            by_year[year_by_key[key]].append(key)
+    return by_year
+
+
+def _usability_for_min_count(
+    policy, class_label: str, per_block_year: int,
+) -> dict[str, dict[str, bool]]:
+    """Mark exactly ``per_block_year`` keys usable per block/year for a class."""
+    records = _complete_pair_block_usability(policy)
+    by_year = _class_keys_by_year(policy, class_label)
+    cands = _registered_candidate_ids()
+    for year, keys in by_year.items():
+        chosen = keys[:per_block_year]
+        for key in chosen:
+            records[key] = {cid: True for cid in cands}
+    return records
+
+
 def test_g10_just_below_threshold_one_block_only():
     """Boundary: M2 just below 0.70 while M3 and M4 pass."""
     policy = _policy()
@@ -702,52 +862,92 @@ def test_g10_rejects_string_usable_flag():
         p3b0.evaluate_g10(usable_map, pilot, policy)
 
 
-def test_g11_one_year_below_while_all_others_pass():
+def test_g11_boundary_2_fails_from_pair_records():
     policy = _policy()
-    data = {
+    records = _usability_for_min_count(policy, "positive", 2)
+    assert p3b0.evaluate_g11(records, policy) == p3b0.GATE_FAIL
+
+
+def test_g11_boundary_3_passes_from_pair_records():
+    policy = _policy()
+    records = _usability_for_min_count(policy, "positive", 3)
+    assert p3b0.evaluate_g11(records, policy) == p3b0.GATE_PASS
+
+
+def test_g11_rejects_raw_caller_supplied_counts():
+    policy = _policy()
+    fabricated = {
         b: {y: 3 for y in policy.target_years}
         for b in p3b0.BLOCK_CANDIDATES
     }
-    data["M2"]["1393"] = 2
-    assert p3b0.evaluate_g11(data, policy) == p3b0.GATE_FAIL
+    with pytest.raises(p3b0.QCFail, match="raw caller-supplied counts|per-pair"):
+        p3b0.evaluate_g11(fabricated, policy)
 
 
-def test_g11_count_3_passes():
+def test_g11_fabricated_sealed_counts_fail_while_records_yield_2():
     policy = _policy()
-    data = {
-        b: {y: 3 for y in policy.target_years}
-        for b in p3b0.BLOCK_CANDIDATES
-    }
-    assert p3b0.evaluate_g11(data, policy) == p3b0.GATE_PASS
+    records = _usability_for_min_count(policy, "positive", 2)
+    sealed = p3b0.build_sealed_class_block_year_usability(
+        records, policy, class_label="positive",
+    )
+    assert p3b0.evaluate_g11(sealed, policy) == p3b0.GATE_FAIL
+    fake_counts = frozenset(
+        (b, y, 3) for b in p3b0.BLOCK_CANDIDATES for y in policy.target_years
+    )
+    forged = dataclasses.replace(sealed, counts_by_block_year=fake_counts)
+    with pytest.raises(p3b0.QCFail, match="seal verification failed"):
+        p3b0.evaluate_g11(forged, policy)
 
 
-def test_g11_rejects_float_count():
+def test_g11_rejects_missing_extra_duplicate_and_non_bool():
     policy = _policy()
-    data = {
-        b: {y: 3.0 for y in policy.target_years}  # type: ignore[dict-item]
-        for b in p3b0.BLOCK_CANDIDATES
+    records = _usability_for_min_count(policy, "positive", 3)
+    missing = dict(records)
+    missing.pop(next(iter(missing)))
+    with pytest.raises(p3b0.QCFail, match="missing"):
+        p3b0.evaluate_g11(missing, policy)
+    extra = dict(records)
+    extra["EXTRA|0000"] = {cid: True for cid in _registered_candidate_ids()}
+    with pytest.raises(p3b0.QCFail, match="extra"):
+        p3b0.evaluate_g11(extra, policy)
+    dup_list = list(records.items()) + [next(iter(records.items()))]
+    with pytest.raises(p3b0.QCFail, match="duplicate"):
+        p3b0.evaluate_g11(dup_list, policy)
+    bad = dict(records)
+    victim = next(iter(bad))
+    bad[victim] = {
+        cid: ("true" if flag else "false")  # type: ignore[dict-item]
+        for cid, flag in bad[victim].items()
     }
-    with pytest.raises(p3b0.QCFail, match="exact int"):
-        p3b0.evaluate_g11(data, policy)
+    with pytest.raises(p3b0.QCFail, match="exact bool"):
+        p3b0.evaluate_g11(bad, policy)
 
 
-def test_g12_one_year_below_while_all_others_pass():
+def test_g12_boundary_2_fails_from_pair_records():
     policy = _policy()
-    data = {
-        b: {y: 3 for y in policy.target_years}
-        for b in p3b0.BLOCK_CANDIDATES
-    }
-    data["M4"]["1402"] = 2
-    assert p3b0.evaluate_g12(data, policy) == p3b0.GATE_FAIL
+    records = _usability_for_min_count(policy, "negative", 2)
+    assert p3b0.evaluate_g12(records, policy) == p3b0.GATE_FAIL
 
 
-def test_g12_count_3_passes():
+def test_g12_boundary_3_passes_from_pair_records():
     policy = _policy()
-    data = {
-        b: {y: 3 for y in policy.target_years}
-        for b in p3b0.BLOCK_CANDIDATES
-    }
-    assert p3b0.evaluate_g12(data, policy) == p3b0.GATE_PASS
+    records = _usability_for_min_count(policy, "negative", 3)
+    assert p3b0.evaluate_g12(records, policy) == p3b0.GATE_PASS
+
+
+def test_g12_fabricated_sealed_counts_fail_while_records_yield_2():
+    policy = _policy()
+    records = _usability_for_min_count(policy, "negative", 2)
+    sealed = p3b0.build_sealed_class_block_year_usability(
+        records, policy, class_label="negative",
+    )
+    assert p3b0.evaluate_g12(sealed, policy) == p3b0.GATE_FAIL
+    fake_counts = frozenset(
+        (b, y, 3) for b in p3b0.BLOCK_CANDIDATES for y in policy.target_years
+    )
+    forged = dataclasses.replace(sealed, counts_by_block_year=fake_counts)
+    with pytest.raises(p3b0.QCFail, match="seal verification failed"):
+        p3b0.evaluate_g12(forged, policy)
 
 
 def test_g13_79_pairs_fails():
@@ -899,14 +1099,14 @@ def test_composite_pilot_gate_evaluation_frozen_identity():
         c["candidate_id"]: usable for c in part3a.REGISTERED_CANDIDATES
     }
     usable_map = _full_block_usable_map(pilot, keys[:56])
-    pos = {b: {y: 3 for y in policy.target_years} for b in p3b0.BLOCK_CANDIDATES}
-    neg = {b: {y: 3 for y in policy.target_years} for b in p3b0.BLOCK_CANDIDATES}
+    g11_records = _usability_for_min_count(policy, "positive", 3)
+    g12_records = _usability_for_min_count(policy, "negative", 3)
     statuses = p3b0.evaluate_pilot_gates_synthetic(
         policy=policy,
         usable_by_candidate=usable_by_candidate,
         usable_by_pair_block=usable_map,
-        usable_positive_by_block_year=pos,
-        usable_negative_by_block_year=neg,
+        g11_pair_block_usability=g11_records,
+        g12_pair_block_usability=g12_records,
         pilot_keys=pilot,
         key_labels=labels,
         key_years=years,
@@ -1159,24 +1359,30 @@ def test_immutable_cache_contract_states_enforced_guarantees_only():
     assert contract["put_returns_payload_and_metadata_sha256"] is True
     assert contract["external_expected_metadata_sha256_required_on_get"] is True
     assert contract["external_cache_handle_required_for_secure_get"] is True
+    assert contract["cache_handle_binds_evidence_id_into_canonical_metadata"] is True
+    assert contract["cache_handle_load_requires_external_handle_sha256"] is True
+    assert contract["cache_handle_internal_row_hash_not_trusted"] is True
     assert contract["real_cache_handles_created_in_part3b0"] is False
     assert "tautological_meta_hash_check" not in contract
 
 
 def test_cache_handle_serialize_restart_load_get(tmp_path):
     cache_a = p3b0.ImmutableCache(tmp_path / "a")
-    result = cache_a.put(b"persist-me", {"note": "synthetic"})
+    result = cache_a.put(
+        b"persist-me", {"note": "synthetic"}, evidence_id="synth_cache_001",
+    )
     handle = p3b0.cache_handle_from_put_result("synth_cache_001", result)
     serialized = p3b0.serialize_cache_handle(handle)
+    digest = p3b0.cache_handle_sha256(serialized)
     # Simulate process restart with a new cache object on the same root bytes.
     cache_b = p3b0.ImmutableCache(tmp_path / "a")
-    loaded = p3b0.load_cache_handle(serialized)
+    loaded = p3b0.load_cache_handle(serialized, expected_handle_sha256=digest)
     assert cache_b.get_by_handle(loaded) == b"persist-me"
 
 
 def test_cache_handle_altered_payload_hash_fails(tmp_path):
     cache = p3b0.ImmutableCache(tmp_path)
-    result = cache.put(b"payload", {"note": "x"})
+    result = cache.put(b"payload", {"note": "x"}, evidence_id="synth_cache_001")
     handle = p3b0.cache_handle_from_put_result("synth_cache_001", result)
     bad = p3b0.CacheHandle(
         evidence_id=handle.evidence_id,
@@ -1191,7 +1397,7 @@ def test_cache_handle_altered_payload_hash_fails(tmp_path):
 
 def test_cache_handle_altered_metadata_hash_fails(tmp_path):
     cache = p3b0.ImmutableCache(tmp_path)
-    result = cache.put(b"payload", {"note": "x"})
+    result = cache.put(b"payload", {"note": "x"}, evidence_id="synth_cache_001")
     handle = p3b0.cache_handle_from_put_result("synth_cache_001", result)
     bad = p3b0.CacheHandle(
         evidence_id=handle.evidence_id,
@@ -1206,21 +1412,89 @@ def test_cache_handle_altered_metadata_hash_fails(tmp_path):
 
 def test_cache_handle_altered_serialization_fails(tmp_path):
     cache = p3b0.ImmutableCache(tmp_path)
-    result = cache.put(b"payload", {"note": "x"})
+    result = cache.put(b"payload", {"note": "x"}, evidence_id="synth_cache_001")
     handle = p3b0.cache_handle_from_put_result("synth_cache_001", result)
     serialized = p3b0.serialize_cache_handle(handle)
+    digest = p3b0.cache_handle_sha256(serialized)
     tampered = serialized.replace(handle.metadata_sha256, "d" * 64)
+    with pytest.raises(p3b0.ImmutableCacheError, match="integrity check"):
+        p3b0.load_cache_handle(tampered, expected_handle_sha256=digest)
     with pytest.raises(p3b0.ImmutableCacheError):
-        loaded = p3b0.load_cache_handle(tampered)
+        loaded = p3b0.load_cache_handle(
+            tampered, expected_handle_sha256=p3b0.cache_handle_sha256(tampered),
+        )
         cache.get_by_handle(loaded)
+
+
+def test_cache_handle_cross_entry_substitution_fails(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result_a = cache.put(b"payload-a", {"note": "a"}, evidence_id="evidence_A")
+    result_b = cache.put(b"payload-b", {"note": "b"}, evidence_id="evidence_B")
+    handle_a = p3b0.cache_handle_from_put_result("evidence_A", result_a)
+    # Cross-entry: keep A's evidence_id but point hashes at B.
+    substituted = p3b0.CacheHandle(
+        evidence_id=handle_a.evidence_id,
+        payload_sha256=result_b.payload_sha256,
+        metadata_sha256=result_b.metadata_sha256,
+        cache_contract_version=handle_a.cache_contract_version,
+        schema_version=handle_a.schema_version,
+    )
+    with pytest.raises(p3b0.ImmutableCacheError, match="evidence_id mismatch"):
+        cache.get_by_handle(substituted)
+
+
+def test_cache_handle_altered_evidence_id_fails(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "x"}, evidence_id="evidence_A")
+    handle = p3b0.cache_handle_from_put_result("evidence_A", result)
+    bad = p3b0.CacheHandle(
+        evidence_id="evidence_B",
+        payload_sha256=handle.payload_sha256,
+        metadata_sha256=handle.metadata_sha256,
+        cache_contract_version=handle.cache_contract_version,
+        schema_version=handle.schema_version,
+    )
+    with pytest.raises(p3b0.ImmutableCacheError, match="evidence_id mismatch"):
+        cache.get_by_handle(bad)
+
+
+def test_cache_handle_whole_row_replacement_fails_external_digest(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result_a = cache.put(b"payload-a", {"note": "a"}, evidence_id="evidence_A")
+    result_b = cache.put(b"payload-b", {"note": "b"}, evidence_id="evidence_B")
+    ser_a = p3b0.serialize_cache_handle(
+        p3b0.cache_handle_from_put_result("evidence_A", result_a),
+    )
+    ser_b = p3b0.serialize_cache_handle(
+        p3b0.cache_handle_from_put_result("evidence_B", result_b),
+    )
+    digest_a = p3b0.cache_handle_sha256(ser_a)
+    with pytest.raises(p3b0.ImmutableCacheError, match="integrity check"):
+        p3b0.load_cache_handle(ser_b, expected_handle_sha256=digest_a)
+
+
+def test_cache_handle_stale_after_entry_removed_fails(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "x"}, evidence_id="evidence_A")
+    handle = p3b0.cache_handle_from_put_result("evidence_A", result)
+    entry = cache._entry_dir(result.payload_sha256)
+    for child in entry.iterdir():
+        child.unlink()
+    entry.rmdir()
+    with pytest.raises(p3b0.ImmutableCacheError, match="unknown hash|missing"):
+        cache.get_by_handle(handle)
 
 
 def test_cache_local_dual_tamper_still_fails_with_handle(tmp_path):
     cache = p3b0.ImmutableCache(tmp_path)
-    result = cache.put(b"payload", {"note": "orig"})
+    result = cache.put(b"payload", {"note": "orig"}, evidence_id="synth_cache_001")
     handle = p3b0.cache_handle_from_put_result("synth_cache_001", result)
     entry = cache._entry_dir(result.payload_sha256)
-    tampered = {"content_sha256": result.payload_sha256, "note": "evil"}
+    tampered = {
+        "content_sha256": result.payload_sha256,
+        "note": "evil",
+        "evidence_id": "synth_cache_001",
+    }
     meta_bytes = json.dumps(tampered, sort_keys=True, separators=(",", ":")).encode()
     (entry / cache._META_NAME).write_bytes(meta_bytes)
     (entry / cache._META_HASH_NAME).write_text(
@@ -1232,12 +1506,14 @@ def test_cache_local_dual_tamper_still_fails_with_handle(tmp_path):
 
 def test_cache_cannot_read_securely_without_persisted_handle(tmp_path):
     cache = p3b0.ImmutableCache(tmp_path)
-    result = cache.put(b"payload", {"note": "orig"})
+    result = cache.put(b"payload", {"note": "orig"}, evidence_id="synth_cache_001")
     # Knowing only the payload hash is insufficient without external metadata seal.
     with pytest.raises(p3b0.ImmutableCacheError, match="expected metadata|metadata"):
         cache.get(result.payload_sha256, "")
     with pytest.raises(p3b0.ImmutableCacheError):
         cache.get_by_handle("not-a-handle")  # type: ignore[arg-type]
+    with pytest.raises(p3b0.ImmutableCacheError, match="expected_handle_sha256"):
+        p3b0.load_cache_handle("evidence_id\n", expected_handle_sha256="")
 
 
 def test_cache_handle_template_header_only_zero_rows():
@@ -1363,10 +1639,13 @@ def test_os_system_popen_spawn_denied_no_child_process():
         saved_system = sentinel._orig_os_system
         saved_popen = sentinel._orig_os_popen
         saved_spawns = dict(sentinel._orig_os_spawns)
+        saved_routes = dict(sentinel._orig_os_process_routes)
         sentinel._orig_os_system = _boom_system  # type: ignore[method-assign]
         sentinel._orig_os_popen = _boom_popen  # type: ignore[method-assign]
         for name in list(sentinel._orig_os_spawns):
-            sentinel._orig_os_spawns[name] = _make_boom_spawn(name)
+            boom = _make_boom_spawn(name)
+            sentinel._orig_os_spawns[name] = boom
+            sentinel._orig_os_process_routes[name] = boom
         try:
             with pytest.raises(p3b0.NetworkBlockedError):
                 os.system("echo blocked")
@@ -1393,6 +1672,82 @@ def test_os_system_popen_spawn_denied_no_child_process():
             sentinel._orig_os_system = saved_system
             sentinel._orig_os_popen = saved_popen
             sentinel._orig_os_spawns = saved_spawns
+            sentinel._orig_os_process_routes = saved_routes
+
+
+def test_direct_child_process_routes_denied_no_child_created():
+    launched: list[str] = []
+
+    def _make_boom(name: str):
+        def _boom(*args, **kwargs):
+            launched.append(name)
+            raise AssertionError(f"{name} launched")
+        return _boom
+
+    route_names = [
+        name for name in (
+            *p3b0._OS_POSIX_SPAWN_NAMES,
+            *p3b0._OS_FORK_NAMES,
+            *p3b0._OS_EXEC_NAMES,
+        )
+        if hasattr(os, name)
+    ]
+    with p3b0.network_sentinel() as sentinel:
+        saved_routes = dict(sentinel._orig_os_process_routes)
+        saved_mp = sentinel._orig_mp_process_start
+        for name in route_names:
+            sentinel._orig_os_process_routes[name] = _make_boom(f"os.{name}")
+        sentinel._orig_mp_process_start = _make_boom(  # type: ignore[method-assign]
+            "multiprocessing.Process.start",
+        )
+        try:
+            for name in route_names:
+                with pytest.raises(p3b0.NetworkBlockedError):
+                    getattr(os, name)()
+            with pytest.raises(p3b0.NetworkBlockedError):
+                multiprocessing.Process(target=lambda: None).start()
+            assert launched == []
+            assert sentinel.calls_attempted >= len(route_names) + 1
+        finally:
+            sentinel._orig_os_process_routes = saved_routes
+            sentinel._orig_mp_process_start = saved_mp
+
+
+def test_nested_sentinel_restores_every_patched_process_primitive():
+    process_names = [
+        name for name in (
+            *p3b0._OS_SPAWN_NAMES,
+            *p3b0._OS_POSIX_SPAWN_NAMES,
+            *p3b0._OS_FORK_NAMES,
+            *p3b0._OS_EXEC_NAMES,
+        )
+        if hasattr(os, name)
+    ]
+
+    def _snapshot() -> dict[str, object]:
+        return {
+            "subprocess.run": subprocess.run,
+            "subprocess.Popen": subprocess.Popen,
+            "os.system": os.system,
+            "os.popen": os.popen,
+            "multiprocessing.Process.start": multiprocessing.Process.start,
+            **{f"os.{n}": getattr(os, n) for n in process_names},
+        }
+
+    before = _snapshot()
+    with p3b0.network_sentinel() as outer:
+        mid = _snapshot()
+        assert mid["subprocess.run"] is not before["subprocess.run"]
+        assert mid["os.system"] is not before["os.system"]
+        assert mid["multiprocessing.Process.start"] is not before[
+            "multiprocessing.Process.start"
+        ]
+        with p3b0.network_sentinel() as inner:
+            assert inner is not outer
+            for name in process_names:
+                assert getattr(os, name) is not before[f"os.{name}"]
+        assert _snapshot() == mid
+    assert _snapshot() == before
 
 
 def test_network_allows_readonly_git_and_restores_after_exception():
@@ -1416,6 +1771,20 @@ def test_network_allows_readonly_git_and_restores_after_exception():
             with pytest.raises(p3b0.NetworkBlockedError):
                 socket.getaddrinfo("example.invalid", 443)
             assert inner.calls_attempted >= 1
+
+
+def test_network_denial_contract_lists_direct_process_routes():
+    contract = p3b0.build_network_denial_contract()
+    blocked = set(contract["blocked_primitives"])
+    assert "os.system" in blocked
+    assert "multiprocessing.Process.start" in blocked
+    for name in ("posix_spawn", "fork", "execv"):
+        if hasattr(os, name):
+            assert f"os.{name}" in blocked
+    assert "exact_git_readonly_allowlist" in contract
+    assert "rev-parse" in contract["exact_git_readonly_allowlist"]
+    assert "ctypes" not in contract["child_process_policy"]
+    assert "non-stdlib" in contract["child_process_scope_note"]
 
 
 def test_guard_network_sentinel_zero_calls():

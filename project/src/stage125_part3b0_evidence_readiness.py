@@ -14,6 +14,7 @@ import hashlib
 import io
 import json
 import math
+import multiprocessing
 import os
 import re
 import shutil
@@ -205,7 +206,20 @@ _GIT_FORBIDDEN_TOKENS = frozenset({
     "--info-path", "--namespace", "--list-cmds", "--attr-source",
 })
 _GIT_ALLOWED_FORMATS = frozenset({"--format=%H", "--format=%cI"})
-_POLICY_SEAL_DOMAIN = "stage125_part3b0_locked_gate_policy_v1"
+_POLICY_SEAL_DOMAIN = "stage125_part3b0_locked_gate_policy_v2"
+_CLASS_BLOCK_YEAR_USABILITY_SEAL_DOMAIN = (
+    "stage125_part3b0_class_block_year_usability_v1"
+)
+_OS_SPAWN_NAMES = (
+    "spawnl", "spawnle", "spawnlp", "spawnlpe",
+    "spawnv", "spawnve", "spawnvp", "spawnvpe",
+)
+_OS_POSIX_SPAWN_NAMES = ("posix_spawn", "posix_spawnp")
+_OS_FORK_NAMES = ("fork", "forkpty")
+_OS_EXEC_NAMES = (
+    "execl", "execle", "execlp", "execlpe",
+    "execv", "execve", "execvp", "execvpe",
+)
 _STAGING_NAME_RE = re.compile(r"^\.staging-([a-f0-9]{16})-[a-f0-9]{32}$")
 
 # Closed-world allowlist of permitted Stage125 tracked files (exact paths).
@@ -533,14 +547,25 @@ def _expected_target_years() -> tuple[str, ...]:
     return tuple(sorted(lock.EXPECTED_YEAR_ALLOCATION.keys()))
 
 
+def _canonical_key_set_hash(pilot_keys: frozenset[str]) -> str:
+    keys_blob = "\n".join(sorted(pilot_keys))
+    return sha256_bytes(keys_blob.encode("utf-8"))
+
+
+def _canonical_key_pair_hash(pairs: frozenset[tuple[str, str]]) -> str:
+    blob = "\n".join(f"{k}\t{v}" for k, v in sorted(pairs))
+    return sha256_bytes(blob.encode("utf-8"))
+
+
 def _compute_policy_seal(
     thr_hash: str,
     lock_hash: str,
     pilot_pairs_hash: str,
     pilot_keys: frozenset[str],
+    pilot_key_labels: frozenset[tuple[str, str]],
+    pilot_key_years: frozenset[tuple[str, str]],
 ) -> str:
-    """Seal binds verified source hashes to hard-coded locked G09–G14 values."""
-    keys_blob = ",".join(sorted(pilot_keys))
+    """Seal binds verified source hashes to locked G09–G14 values and identity."""
     payload = "|".join([
         _POLICY_SEAL_DOMAIN,
         "0.80",
@@ -553,9 +578,82 @@ def _compute_policy_seal(
         thr_hash,
         lock_hash,
         pilot_pairs_hash,
-        sha256_bytes(keys_blob.encode("utf-8")),
+        _canonical_key_set_hash(pilot_keys),
+        _canonical_key_pair_hash(pilot_key_labels),
+        _canonical_key_pair_hash(pilot_key_years),
     ])
     return sha256_bytes(payload.encode("utf-8"))
+
+
+def _validate_frozen_pilot_identity_sets(
+    frozen_keys: frozenset[str],
+    frozen_labels: frozenset[tuple[str, str]],
+    frozen_years: frozenset[tuple[str, str]],
+) -> None:
+    """Require exact 80-key projection, labels, years, and 39/41/0 allocation."""
+    if type(frozen_keys) is not frozenset or type(frozen_labels) is not frozenset:
+        raise QCFail("LockedGatePolicy identity set types invalid")
+    if type(frozen_years) is not frozenset:
+        raise QCFail("LockedGatePolicy identity set types invalid")
+    if len(frozen_keys) != 80:
+        raise QCFail("LockedGatePolicy frozen key count must be 80")
+    if any(type(k) is not str or not k for k in frozen_keys):
+        raise QCFail("LockedGatePolicy frozen keys must be non-empty str")
+    if len(frozen_labels) != 80 or len(frozen_years) != 80:
+        raise QCFail("LockedGatePolicy label/year pair counts must be 80")
+    label_keys: list[str] = []
+    year_keys: list[str] = []
+    for item in frozen_labels:
+        if (
+            type(item) is not tuple
+            or len(item) != 2
+            or type(item[0]) is not str
+            or type(item[1]) is not str
+        ):
+            raise QCFail("LockedGatePolicy label pairs must be (str, str)")
+        label_keys.append(item[0])
+        if item[1] not in ("positive", "negative", "unknown"):
+            raise QCFail("LockedGatePolicy class labels invalid")
+    for item in frozen_years:
+        if (
+            type(item) is not tuple
+            or len(item) != 2
+            or type(item[0]) is not str
+            or type(item[1]) is not str
+        ):
+            raise QCFail("LockedGatePolicy year pairs must be (str, str)")
+        year_keys.append(item[0])
+        if item[1] not in _expected_target_years():
+            raise QCFail("LockedGatePolicy target years invalid")
+    if len(label_keys) != len(set(label_keys)):
+        raise QCFail("LockedGatePolicy duplicate label keys rejected")
+    if len(year_keys) != len(set(year_keys)):
+        raise QCFail("LockedGatePolicy duplicate year keys rejected")
+    if frozenset(label_keys) != frozen_keys:
+        raise QCFail("LockedGatePolicy label key projection mismatch")
+    if frozenset(year_keys) != frozen_keys:
+        raise QCFail("LockedGatePolicy year key projection mismatch")
+    pos = sum(1 for _, lab in frozen_labels if lab == "positive")
+    neg = sum(1 for _, lab in frozen_labels if lab == "negative")
+    unk = sum(1 for _, lab in frozen_labels if lab == "unknown")
+    if (
+        pos != lock.APPROVED_POSITIVE
+        or neg != lock.APPROVED_NEGATIVE
+        or unk != lock.APPROVED_UNKNOWN
+    ):
+        raise QCFail("LockedGatePolicy 39/41/0 class allocation mismatch")
+    label_by_key = {k: lab for k, lab in frozen_labels}
+    year_by_key = {k: y for k, y in frozen_years}
+    allocation: dict[str, dict[str, int]] = {
+        y: {"positive": 0, "negative": 0, "unknown": 0}
+        for y in _expected_target_years()
+    }
+    for key in frozen_keys:
+        year = year_by_key[key]
+        lab = label_by_key[key]
+        allocation[year][lab] += 1
+    if allocation != lock.EXPECTED_YEAR_ALLOCATION:
+        raise QCFail("LockedGatePolicy frozen year allocation mismatch")
 
 
 def require_sealed_gate_policy(policy: LockedGatePolicy) -> LockedGatePolicy:
@@ -567,6 +665,8 @@ def require_sealed_gate_policy(policy: LockedGatePolicy) -> LockedGatePolicy:
         policy.source_decision_lock_sha256,
         policy.source_pilot_pairs_sha256,
         policy.frozen_pilot_keys,
+        policy.frozen_pilot_key_labels,
+        policy.frozen_pilot_key_years,
     )
     if policy._seal != expected_seal:
         raise QCFail("LockedGatePolicy seal verification failed")
@@ -581,12 +681,13 @@ def require_sealed_gate_policy(policy: LockedGatePolicy) -> LockedGatePolicy:
         or not SHA256_RE.match(policy.source_thresholds_sha256 or "")
         or not SHA256_RE.match(policy.source_decision_lock_sha256 or "")
         or not SHA256_RE.match(policy.source_pilot_pairs_sha256 or "")
-        or type(policy.frozen_pilot_keys) is not frozenset
-        or len(policy.frozen_pilot_keys) != 80
-        or len(policy.frozen_pilot_key_labels) != 80
-        or len(policy.frozen_pilot_key_years) != 80
     ):
         raise QCFail("LockedGatePolicy value verification failed")
+    _validate_frozen_pilot_identity_sets(
+        policy.frozen_pilot_keys,
+        policy.frozen_pilot_key_labels,
+        policy.frozen_pilot_key_years,
+    )
     return policy
 
 
@@ -718,7 +819,9 @@ def load_locked_gate_policy(repo_root: Path) -> LockedGatePolicy:
         frozen_pilot_key_labels=labels,
         frozen_pilot_key_years=years,
         source_pilot_pairs_sha256=pairs_hash,
-        _seal=_compute_policy_seal(thr_hash, lock_hash, pairs_hash, frozen_keys),
+        _seal=_compute_policy_seal(
+            thr_hash, lock_hash, pairs_hash, frozen_keys, labels, years,
+        ),
     )
     return require_sealed_gate_policy(policy)
 
@@ -745,14 +848,23 @@ class NetworkSentinel:
         self._orig_subprocess_popen = subprocess.Popen
         self._orig_os_system = os.system
         self._orig_os_popen = os.popen
-        self._orig_os_spawns: dict[str, Any] = {
+        self._orig_os_process_routes: dict[str, Any] = {
             name: getattr(os, name)
             for name in (
-                "spawnl", "spawnle", "spawnlp", "spawnlpe",
-                "spawnv", "spawnve", "spawnvp", "spawnvpe",
+                *_OS_SPAWN_NAMES,
+                *_OS_POSIX_SPAWN_NAMES,
+                *_OS_FORK_NAMES,
+                *_OS_EXEC_NAMES,
             )
             if hasattr(os, name)
         }
+        # Backward-compatible alias used by existing spawn spy tests.
+        self._orig_os_spawns = {
+            name: fn
+            for name, fn in self._orig_os_process_routes.items()
+            if name in _OS_SPAWN_NAMES
+        }
+        self._orig_mp_process_start = multiprocessing.Process.start
         self._module_patches: list[tuple[Any, str, Any]] = []
 
     def _blocked(self, label: str, *args, **kwargs):
@@ -762,7 +874,7 @@ class NetworkSentinel:
         )
 
     def _blocked_os_launch(self, label: str, *args, **kwargs):
-        """Deny os.system / os.popen / os.spawn* before any child is created."""
+        """Deny os child/process-replacement routes before any child is created."""
         self._blocked(label, *args, **kwargs)
 
     def _blocked_connect(self, _sock, *args, **kwargs):
@@ -861,16 +973,23 @@ class NetworkSentinel:
         os.popen = (  # type: ignore[assignment]
             lambda *a, **k: self._blocked_os_launch("os.popen", *a, **k)
         )
-        for spawn_name in self._orig_os_spawns:
+        for route_name in self._orig_os_process_routes:
             setattr(
                 os,
-                spawn_name,
+                route_name,
                 (
-                    lambda *a, _n=spawn_name, **k: self._blocked_os_launch(
+                    lambda *a, _n=route_name, **k: self._blocked_os_launch(
                         f"os.{_n}", *a, **k
                     )
                 ),
             )
+
+        def _blocked_mp_process_start(proc, *args, **kwargs):  # noqa: ARG001
+            sentinel._blocked("multiprocessing.Process.start", *args, **kwargs)
+
+        multiprocessing.Process.start = (  # type: ignore[method-assign,assignment]
+            _blocked_mp_process_start
+        )
 
         try:
             import urllib.request as urllib_request
@@ -932,8 +1051,9 @@ class NetworkSentinel:
         subprocess.Popen = self._orig_subprocess_popen  # type: ignore[misc,assignment]
         os.system = self._orig_os_system  # type: ignore[assignment]
         os.popen = self._orig_os_popen  # type: ignore[assignment]
-        for spawn_name, original in self._orig_os_spawns.items():
-            setattr(os, spawn_name, original)
+        for route_name, original in self._orig_os_process_routes.items():
+            setattr(os, route_name, original)
+        multiprocessing.Process.start = self._orig_mp_process_start  # type: ignore[method-assign,assignment]
         for module, attr, original in self._module_patches:
             setattr(module, attr, original)
         self._module_patches.clear()
@@ -1007,6 +1127,13 @@ def serialize_cache_handle(handle: CacheHandle) -> str:
     )
 
 
+def cache_handle_sha256(serialized: str) -> str:
+    """External integrity digest over the exact serialized handle bytes."""
+    if type(serialized) is not str:
+        raise ImmutableCacheError("cache handle serialization must be str")
+    return sha256_bytes(serialized.encode("utf-8"))
+
+
 def require_valid_cache_handle(handle: CacheHandle) -> CacheHandle:
     if type(handle) is not CacheHandle:
         raise ImmutableCacheError("CacheHandle type check failed")
@@ -1023,10 +1150,25 @@ def require_valid_cache_handle(handle: CacheHandle) -> CacheHandle:
     return handle
 
 
-def load_cache_handle(serialized: str) -> CacheHandle:
-    """Fail-closed load of a persisted CacheHandle after process restart."""
+def load_cache_handle(
+    serialized: str,
+    *,
+    expected_handle_sha256: str,
+) -> CacheHandle:
+    """Fail-closed load requiring an external handle digest trust anchor.
+
+    The digest must be supplied by the caller from outside the mutable
+    serialized row; a hash stored only inside that row is never trusted.
+    """
     if type(serialized) is not str or not serialized.strip():
         raise ImmutableCacheError("empty cache handle serialization")
+    if type(expected_handle_sha256) is not str or not SHA256_RE.match(
+        expected_handle_sha256 or "",
+    ):
+        raise ImmutableCacheError("expected_handle_sha256 required")
+    actual = cache_handle_sha256(serialized)
+    if actual != expected_handle_sha256:
+        raise ImmutableCacheError("cache handle integrity check failed")
     rows = list(csv.DictReader(io.StringIO(serialized)))
     if len(rows) != 1:
         raise ImmutableCacheError("cache handle must contain exactly one row")
@@ -1115,11 +1257,24 @@ class ImmutableCache:
         return target
 
     def _canonical_metadata_bytes(
-        self, content_hash: str, metadata: dict[str, Any] | None,
+        self,
+        content_hash: str,
+        metadata: dict[str, Any] | None,
+        *,
+        evidence_id: str | None = None,
     ) -> bytes:
         meta = dict(metadata or {})
         meta["content_sha256"] = content_hash
         meta.pop("metadata_sha256", None)
+        if evidence_id is not None:
+            if type(evidence_id) is not str or not evidence_id.strip():
+                raise ImmutableCacheError("evidence_id required for bound metadata")
+            meta["evidence_id"] = evidence_id.strip()
+        elif "evidence_id" in meta:
+            eid = meta["evidence_id"]
+            if type(eid) is not str or not eid.strip():
+                raise ImmutableCacheError("evidence_id in metadata must be non-empty str")
+            meta["evidence_id"] = eid.strip()
         return json.dumps(
             meta, sort_keys=True, ensure_ascii=False, separators=(",", ":"),
         ).encode("utf-8")
@@ -1199,11 +1354,14 @@ class ImmutableCache:
         data: bytes,
         metadata: dict[str, Any] | None = None,
         *,
+        evidence_id: str | None = None,
         _inject_failure: str | None = None,
     ) -> CachePutResult:
         content_hash = sha256_bytes(data)
         entry_dir = self._entry_dir(content_hash)
-        meta_bytes = self._canonical_metadata_bytes(content_hash, metadata)
+        meta_bytes = self._canonical_metadata_bytes(
+            content_hash, metadata, evidence_id=evidence_id,
+        )
         meta_hash = sha256_bytes(meta_bytes)
         result = CachePutResult(
             payload_sha256=content_hash, metadata_sha256=meta_hash,
@@ -1301,9 +1459,30 @@ class ImmutableCache:
         return payload
 
     def get_by_handle(self, handle: CacheHandle) -> bytes:
-        """Secure get requires the persisted external CacheHandle trust anchor."""
+        """Secure get requires the persisted external CacheHandle trust anchor.
+
+        Verifies payload/metadata hashes and that ``handle.evidence_id`` matches
+        the ``evidence_id`` bound into canonical cached metadata.
+        """
         handle = require_valid_cache_handle(handle)
-        return self.get(handle.payload_sha256, handle.metadata_sha256)
+        payload = self.get(handle.payload_sha256, handle.metadata_sha256)
+        entry_dir = self._entry_dir(handle.payload_sha256)
+        _payload, meta_bytes, _meta_hash = self._read_complete_entry(entry_dir)
+        del _payload, _meta_hash
+        try:
+            meta = json.loads(meta_bytes.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ImmutableCacheError("malformed metadata JSON") from exc
+        if not isinstance(meta, dict):
+            raise ImmutableCacheError("malformed metadata JSON")
+        cached_eid = meta.get("evidence_id")
+        if type(cached_eid) is not str or not cached_eid.strip():
+            raise ImmutableCacheError("cached metadata missing bound evidence_id")
+        if cached_eid.strip() != handle.evidence_id:
+            raise ImmutableCacheError(
+                "evidence_id mismatch between handle and cached metadata"
+            )
+        return payload
 
     def has(self, content_hash: str, expected_metadata_sha256: str) -> bool:
         try:
@@ -2063,45 +2242,278 @@ def evaluate_g10(
     return GATE_PASS
 
 
-def _require_block_year_counts(data: Any, policy: LockedGatePolicy) -> dict[str, dict[str, int]]:
-    if type(data) is not dict:
-        raise QCFail("block/year count map must be a dict")
-    out: dict[str, dict[str, int]] = {}
-    for block, years in data.items():
-        if type(block) is not str or type(years) is not dict:
-            raise QCFail("block/year count map types invalid")
-        out[block] = {}
-        for year, count in years.items():
-            if type(year) is not str or type(count) is not int or count < 0:
-                raise QCFail("G11/G12 counts must be exact int >= 0")
-            out[block][year] = count
+@dataclass(frozen=True)
+class SealedClassBlockYearUsability:
+    """Sealed G11/G12 aggregate derived only from per-pair block usability."""
+
+    class_label: str
+    counts_by_block_year: frozenset[tuple[str, str, int]]
+    pair_records_sha256: str
+    policy_seal: str
+    _seal: str = field(repr=False, compare=True)
+
+
+def _require_complete_pair_block_usability(
+    usable_by_pair_block: Any,
+    policy: LockedGatePolicy,
+) -> dict[str, dict[str, bool]]:
+    """Require exact frozen key set and exact-bool per-candidate usability."""
+    policy = require_sealed_gate_policy(policy)
+    if type(usable_by_pair_block) is list:
+        keys_list: list[str] = []
+        mapping: dict[str, dict[str, bool]] = {}
+        for item in usable_by_pair_block:
+            if (
+                type(item) is not tuple
+                or len(item) != 2
+                or type(item[0]) is not str
+                or type(item[1]) is not dict
+            ):
+                raise QCFail("pair block usability records must be (key, flags) tuples")
+            keys_list.append(item[0])
+            mapping[item[0]] = item[1]
+        if len(keys_list) != len(set(keys_list)):
+            raise QCFail("duplicate pilot keys in usability records")
+        usable_by_pair_block = mapping
+    if type(usable_by_pair_block) is not dict:
+        raise QCFail("pair block usability must be a dict or list of records")
+    supplied_keys = list(usable_by_pair_block.keys())
+    if any(type(k) is not str for k in supplied_keys):
+        raise QCFail("usability record keys must be str")
+    if len(supplied_keys) != len(set(supplied_keys)):
+        raise QCFail("duplicate pilot keys in usability records")
+    supplied = frozenset(supplied_keys)
+    if supplied != policy.frozen_pilot_keys:
+        missing = policy.frozen_pilot_keys - supplied
+        extra = supplied - policy.frozen_pilot_keys
+        if missing and extra:
+            raise QCFail("missing and extra pilot keys in usability records")
+        if missing:
+            raise QCFail("missing pilot keys in usability records")
+        raise QCFail("extra pilot keys in usability records")
+    registered = {
+        c["candidate_id"] for c in part3a.REGISTERED_CANDIDATES
+    }
+    out: dict[str, dict[str, bool]] = {}
+    for key, cand_flags in usable_by_pair_block.items():
+        if type(cand_flags) is not dict:
+            raise QCFail("usability flags must be a dict")
+        if set(cand_flags.keys()) != registered:
+            raise QCFail("usability flags must cover exact registered candidates")
+        normalized: dict[str, bool] = {}
+        for cand_id, flag in cand_flags.items():
+            if type(cand_id) is not str or type(flag) is not bool:
+                raise QCFail("G11/G12 usability values must be exact bool")
+            normalized[cand_id] = flag
+        out[key] = normalized
     return out
 
 
+def _pair_block_usable(
+    cand_flags: dict[str, bool], block: str,
+) -> bool:
+    candidates = BLOCK_CANDIDATES[block]
+    return all(cand_flags.get(cand_id, False) is True for cand_id in candidates)
+
+
+def _derive_class_block_year_counts(
+    usable_by_pair_block: dict[str, dict[str, bool]],
+    policy: LockedGatePolicy,
+    class_label: str,
+) -> dict[str, dict[str, int]]:
+    label_by_key = {k: lab for k, lab in policy.frozen_pilot_key_labels}
+    year_by_key = {k: y for k, y in policy.frozen_pilot_key_years}
+    counts: dict[str, dict[str, int]] = {
+        block: {year: 0 for year in policy.target_years}
+        for block in BLOCK_CANDIDATES
+    }
+    for key, cand_flags in usable_by_pair_block.items():
+        if label_by_key[key] != class_label:
+            continue
+        year = year_by_key[key]
+        for block in BLOCK_CANDIDATES:
+            if _pair_block_usable(cand_flags, block):
+                counts[block][year] += 1
+    return counts
+
+
+def _pair_records_sha256(
+    usable_by_pair_block: dict[str, dict[str, bool]],
+) -> str:
+    lines: list[str] = []
+    for key in sorted(usable_by_pair_block):
+        flags = usable_by_pair_block[key]
+        flag_blob = ",".join(
+            f"{cid}={1 if flags[cid] else 0}" for cid in sorted(flags)
+        )
+        lines.append(f"{key}|{flag_blob}")
+    return sha256_bytes("\n".join(lines).encode("utf-8"))
+
+
+def _compute_class_block_year_usability_seal(
+    class_label: str,
+    counts: frozenset[tuple[str, str, int]],
+    pair_records_sha256: str,
+    policy_seal: str,
+) -> str:
+    counts_blob = ",".join(
+        f"{b}:{y}:{c}" for b, y, c in sorted(counts)
+    )
+    payload = "|".join([
+        _CLASS_BLOCK_YEAR_USABILITY_SEAL_DOMAIN,
+        class_label,
+        counts_blob,
+        pair_records_sha256,
+        policy_seal,
+    ])
+    return sha256_bytes(payload.encode("utf-8"))
+
+
+def build_sealed_class_block_year_usability(
+    usable_by_pair_block: Any,
+    policy: LockedGatePolicy,
+    *,
+    class_label: str,
+) -> SealedClassBlockYearUsability:
+    """Derive and seal G11/G12 aggregates from exact per-pair usability records."""
+    policy = require_sealed_gate_policy(policy)
+    if class_label not in ("positive", "negative"):
+        raise QCFail("class_label must be positive or negative")
+    records = _require_complete_pair_block_usability(usable_by_pair_block, policy)
+    derived = _derive_class_block_year_counts(records, policy, class_label)
+    counts = frozenset(
+        (block, year, count)
+        for block, years in derived.items()
+        for year, count in years.items()
+    )
+    records_hash = _pair_records_sha256(records)
+    seal = _compute_class_block_year_usability_seal(
+        class_label, counts, records_hash, policy._seal,
+    )
+    return SealedClassBlockYearUsability(
+        class_label=class_label,
+        counts_by_block_year=counts,
+        pair_records_sha256=records_hash,
+        policy_seal=policy._seal,
+        _seal=seal,
+    )
+
+
+def require_sealed_class_block_year_usability(
+    sealed: SealedClassBlockYearUsability,
+    policy: LockedGatePolicy,
+    *,
+    expected_label: str,
+) -> SealedClassBlockYearUsability:
+    policy = require_sealed_gate_policy(policy)
+    if type(sealed) is not SealedClassBlockYearUsability:
+        raise QCFail("SealedClassBlockYearUsability type check failed")
+    if sealed.class_label != expected_label:
+        raise QCFail("sealed usability class_label mismatch")
+    if sealed.policy_seal != policy._seal:
+        raise QCFail("sealed usability policy seal mismatch")
+    if type(sealed.counts_by_block_year) is not frozenset:
+        raise QCFail("sealed usability counts type invalid")
+    expected = {
+        (block, year) for block in BLOCK_CANDIDATES for year in policy.target_years
+    }
+    seen: set[tuple[str, str]] = set()
+    for item in sealed.counts_by_block_year:
+        if (
+            type(item) is not tuple
+            or len(item) != 3
+            or type(item[0]) is not str
+            or type(item[1]) is not str
+            or type(item[2]) is not int
+            or item[2] < 0
+        ):
+            raise QCFail("sealed usability count tuples invalid")
+        seen.add((item[0], item[1]))
+    if seen != expected:
+        raise QCFail("sealed usability block/year coverage mismatch")
+    if not SHA256_RE.match(sealed.pair_records_sha256 or ""):
+        raise QCFail("sealed usability pair_records_sha256 invalid")
+    expected_seal = _compute_class_block_year_usability_seal(
+        sealed.class_label,
+        sealed.counts_by_block_year,
+        sealed.pair_records_sha256,
+        sealed.policy_seal,
+    )
+    if sealed._seal != expected_seal:
+        raise QCFail("SealedClassBlockYearUsability seal verification failed")
+    return sealed
+
+
+def _reject_raw_block_year_counts(data: Any, gate_id: str) -> None:
+    """Fail closed if caller supplies independent block/year count dictionaries."""
+    if type(data) is not dict or not data:
+        return
+    keys = set(data.keys())
+    if keys and keys.issubset(set(BLOCK_CANDIDATES)):
+        sample = next(iter(data.values()))
+        if type(sample) is dict and sample and type(next(iter(sample.values()))) is int:
+            raise QCFail(
+                f"{gate_id} requires sealed usability or per-pair records; "
+                "raw caller-supplied counts are rejected"
+            )
+
+
 def evaluate_g11(
-    usable_positive_by_block_year: dict[str, dict[str, int]],
+    sealed_or_records: SealedClassBlockYearUsability | Any,
     policy: LockedGatePolicy,
 ) -> str:
+    """G11 from sealed aggregate or exact per-pair usability records only."""
     policy = require_sealed_gate_policy(policy)
-    data = _require_block_year_counts(usable_positive_by_block_year, policy)
+    if type(sealed_or_records) is SealedClassBlockYearUsability:
+        sealed = sealed_or_records
+    elif type(sealed_or_records) in (dict, list):
+        _reject_raw_block_year_counts(sealed_or_records, "G11")
+        sealed = build_sealed_class_block_year_usability(
+            sealed_or_records, policy, class_label="positive",
+        )
+    else:
+        raise QCFail(
+            "G11 requires sealed usability or per-pair records; "
+            "raw caller-supplied counts are rejected"
+        )
+    sealed = require_sealed_class_block_year_usability(
+        sealed, policy, expected_label="positive",
+    )
+    count_map = {(b, y): c for b, y, c in sealed.counts_by_block_year}
     for block in BLOCK_CANDIDATES:
         for year in policy.target_years:
-            count = data.get(block, {}).get(year, 0)
-            if type(count) is not int or count < policy.g11_minimum:
+            count = count_map[(block, year)]
+            if count < policy.g11_minimum:
                 return GATE_FAIL
     return GATE_PASS
 
 
 def evaluate_g12(
-    usable_negative_by_block_year: dict[str, dict[str, int]],
+    sealed_or_records: SealedClassBlockYearUsability | Any,
     policy: LockedGatePolicy,
 ) -> str:
+    """G12 from sealed aggregate or exact per-pair usability records only."""
     policy = require_sealed_gate_policy(policy)
-    data = _require_block_year_counts(usable_negative_by_block_year, policy)
+    if type(sealed_or_records) is SealedClassBlockYearUsability:
+        sealed = sealed_or_records
+    elif type(sealed_or_records) in (dict, list):
+        _reject_raw_block_year_counts(sealed_or_records, "G12")
+        sealed = build_sealed_class_block_year_usability(
+            sealed_or_records, policy, class_label="negative",
+        )
+    else:
+        raise QCFail(
+            "G12 requires sealed usability or per-pair records; "
+            "raw caller-supplied counts are rejected"
+        )
+    sealed = require_sealed_class_block_year_usability(
+        sealed, policy, expected_label="negative",
+    )
+    count_map = {(b, y): c for b, y, c in sealed.counts_by_block_year}
     for block in BLOCK_CANDIDATES:
         for year in policy.target_years:
-            count = data.get(block, {}).get(year, 0)
-            if type(count) is not int or count < policy.g12_minimum:
+            count = count_map[(block, year)]
+            if count < policy.g12_minimum:
                 return GATE_FAIL
     return GATE_PASS
 
@@ -2208,8 +2620,8 @@ def evaluate_pilot_gates_synthetic(
     policy: LockedGatePolicy,
     usable_by_candidate: dict[str, set[str]],
     usable_by_pair_block: dict[str, dict[str, bool]],
-    usable_positive_by_block_year: dict[str, dict[str, int]],
-    usable_negative_by_block_year: dict[str, dict[str, int]],
+    g11_pair_block_usability: Any,
+    g12_pair_block_usability: Any,
     pilot_keys: set[str] | frozenset[str] | list[str],
     key_labels: set[tuple[str, str]] | frozenset[tuple[str, str]] | list[tuple[str, str]],
     key_years: set[tuple[str, str]] | frozenset[tuple[str, str]] | list[tuple[str, str]],
@@ -2228,8 +2640,8 @@ def evaluate_pilot_gates_synthetic(
     return {
         "G09": evaluate_g09(usable_by_candidate, pilot_keys, policy),
         "G10": evaluate_g10(usable_by_pair_block, pilot_keys, policy),
-        "G11": evaluate_g11(usable_positive_by_block_year, policy),
-        "G12": evaluate_g12(usable_negative_by_block_year, policy),
+        "G11": evaluate_g11(g11_pair_block_usability, policy),
+        "G12": evaluate_g12(g12_pair_block_usability, policy),
         "G13": evaluate_g13(pilot_keys, policy),
         "G14": evaluate_g14(
             option_id=option_id,
@@ -2298,17 +2710,23 @@ def build_immutable_cache_contract() -> dict:
         "put_returns_payload_and_metadata_sha256": True,
         "external_cache_handle_required_for_secure_get": True,
         "cache_handle_persists_metadata_sha256_across_restart": True,
+        "cache_handle_binds_evidence_id_into_canonical_metadata": True,
+        "cache_handle_evidence_id_verified_on_secure_get": True,
+        "cache_handle_load_requires_external_handle_sha256": True,
+        "cache_handle_internal_row_hash_not_trusted": True,
         "cache_handle_template_header_only_in_part3b0": True,
         "real_cache_handles_created_in_part3b0": False,
     }
 
 
 def build_network_denial_contract() -> dict:
-    spawn_names = sorted(
+    process_route_names = sorted(
         f"os.{name}"
         for name in (
-            "spawnl", "spawnle", "spawnlp", "spawnlpe",
-            "spawnv", "spawnve", "spawnvp", "spawnvpe",
+            *_OS_SPAWN_NAMES,
+            *_OS_POSIX_SPAWN_NAMES,
+            *_OS_FORK_NAMES,
+            *_OS_EXEC_NAMES,
         )
         if hasattr(os, name)
     )
@@ -2331,11 +2749,19 @@ def build_network_denial_contract() -> dict:
             "subprocess:default_deny_except_exact_readonly_git",
             "os.system",
             "os.popen",
-            *spawn_names,
+            *process_route_names,
+            "multiprocessing.Process.start",
         ],
         "subprocess_policy": "default_deny_except_exact_argument_level_readonly_git",
         "child_process_policy": (
-            "default_deny_stdlib_launch_routes_except_exact_readonly_git"
+            "default_deny_available_stdlib_child_and_process_replacement_routes_"
+            "except_exact_readonly_git"
+        ),
+        "child_process_scope_note": (
+            "Denies available direct stdlib routes: subprocess, os.system/popen, "
+            "os.spawn*, os.posix_spawn*, os.fork/forkpty, os.exec*, and "
+            "multiprocessing.Process.start. Does not claim coverage of "
+            "non-stdlib or ctypes/native bypasses."
         ),
         "exact_git_readonly_allowlist": sorted(_GIT_ALLOWED_SUBCOMMANDS),
         "on_attempt": {
