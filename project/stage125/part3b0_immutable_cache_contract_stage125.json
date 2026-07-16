@@ -23,6 +23,10 @@
   "put_returns_payload_and_metadata_sha256": true,
   "external_cache_handle_required_for_secure_get": true,
   "cache_handle_persists_metadata_sha256_across_restart": true,
+  "cache_handle_binds_evidence_id_into_canonical_metadata": true,
+  "cache_handle_evidence_id_verified_on_secure_get": true,
+  "cache_handle_load_requires_external_handle_sha256": true,
+  "cache_handle_internal_row_hash_not_trusted": true,
   "cache_handle_template_header_only_in_part3b0": true,
   "real_cache_handles_created_in_part3b0": false
 }
