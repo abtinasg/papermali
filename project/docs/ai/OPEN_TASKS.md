@@ -85,22 +85,31 @@ accessibility scores assigned, **no** candidate admitted.
 `part3a_protocol_locked=true`; `modeling_started` remains `false`;
 `part3b_started=false`. Part 3A protocol assets are **frozen**.
 
-**Part 3A.1 (authorized and active):** User-Approved Pilot Decision Lock.
+**Part 3A.1 (completed and merged):** User-Approved Pilot Decision Lock.
 Decision record only; tracked as maintenance task
-`stage125-part3a1-decision-lock` (advances no research action). Records
-user-approved rubric version `stage125_part3a_v1` (approved but not applied),
-G09–G14 pilot-only thresholds, and locked `pilot_option_event_enriched`
-selection (80 pairs: 39 positive / 41 negative; 26 tickers; 10 known industries;
-53 industry-present pairs; 27 industry-missing pairs; legacy nonempty industry
-label count 11 includes the unknown sentinel and is **not** a known-industry
-count).
+`stage125-part3a1-decision-lock` (advances no research action). PR #34
+Handoff refresh **MERGED** (`main` @ `75abf3f…`). Records user-approved rubric
+version `stage125_part3a_v1` (approved but not applied), G09–G14 pilot-only
+thresholds, and locked `pilot_option_event_enriched` selection (80 pairs:
+39 positive / 41 negative; 26 tickers; 10 known industries; 53 industry-present
+pairs; 27 industry-missing pairs).
 **No** evidence collection, **no** network access, **no** accessibility scores
 applied, **no** candidate admitted/rejected. `part3a_decision_locked=true`;
 `part3b_started=false`; `modeling_started=false`.
 
+**Part 3B.0 (authorized/active):** Evidence Capture Readiness.
+Infrastructure/readiness only; tracked as maintenance task
+`stage125-part3b0-evidence-readiness` (advances no research action). Delivers
+schema validator, immutable cache contract, default-deny network sentinel, pure
+Gate engine scaffolding, and header-only templates. **No** real evidence records,
+**no** network access, **no** accessibility scores, **no** candidate decisions.
+`part3b0_readiness=true`; `part3b_started=false`; `evidence_collected=false`;
+`accessibility_scoring_applied=false`; `network_extraction_performed=false`;
+`modeling_started=false`.
+
 **Part 3B — NOT started.** Evidence capture and live accessibility scoring
-belong to Part 3B only. Next research action pointer:
-`stage125-part3b-evidence-capture` (Part 3B not started by Part 3A.1).
+belong to Part 3B only. Next research action pointer remains:
+`stage125-part3b-evidence-capture` (Part 3B not started by Part 3B.0).
 
 **Modeling remains prohibited** (no modeling, tuning, SHAP, SMOTE, calibration,
 temporal splitting, feature selection, or article result generation) through all of

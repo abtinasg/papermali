@@ -972,13 +972,65 @@ def test_extract_qc_workflow_markers_fail_closed_when_field_missing():
     not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
     reason="real-repo test requires git checkout",
 )
-def test_real_repo_handoff_part3a1_workflow_markers():
+def test_real_repo_handoff_part3b0_workflow_markers():
     state = _state(REAL_ROOT)
     assert state["current_stage"] == "Stage125"
-    assert state["selected_qc_scope"] == "stage125_part3a_decision_lock"
+    assert state["selected_qc_scope"] == "stage125_part3b0_evidence_readiness"
     assert state["last_completed_micro_part"] == "stage125-part3a-decision-lock"
     assert state["next_research_action_id"] == "stage125-part3b-evidence-capture"
     assert state["part3a_protocol_locked"] is True
     assert state["part3a_decision_locked"] is True
+    assert state["part3b0_readiness"] is True
     assert state["part3b_started"] is False
+    assert state["evidence_collected"] is False
+    assert state["accessibility_scoring_applied"] is False
+    assert state["network_extraction_performed"] is False
     assert state["modeling_started"] is False
+
+
+# ---- Stage125 Part 3B.0 artifact-only + workflow markers ------------------- #
+
+@pytest.mark.parametrize("path", [
+    "project/stage125/README_STAGE125_PART3B0_EVIDENCE_READINESS.md",
+    "project/stage125/part3b0_evidence_capture_contract_stage125.json",
+    "project/stage125/part3b0_evidence_manifest_template_stage125.csv",
+    "project/stage125/part3b0_gate_result_template_stage125.csv",
+    "project/stage125/part3b0_immutable_cache_contract_stage125.json",
+    "project/stage125/part3b0_network_denial_contract_stage125.json",
+])
+def test_stage125_part3b0_generated_files_are_artifact_only(path):
+    assert gen.path_artifact_only(path) is True
+    assert gen.path_handoff_only(path) is False
+
+
+def test_extract_qc_workflow_markers_part3b0_scope():
+    qc = {
+        "stage": "stage125_part3b0_evidence_readiness",
+        "part3a_protocol_locked": True,
+        "part3a_decision_locked": True,
+        "part3b0_readiness": True,
+        "part3b_started": False,
+        "evidence_collected": False,
+        "accessibility_scoring_applied": False,
+        "network_extraction_performed": False,
+        "modeling_started": False,
+    }
+    got = gen.extract_qc_workflow_markers(qc)
+    assert got["part3b0_readiness"] is True
+    assert got["evidence_collected"] is False
+    assert got["part3b_started"] is False
+
+
+def test_stage125_part3b0_full_artifact_commit_is_skipped(synth):
+    before = gen.last_stage_commit(synth)
+    for rel in (
+        "project/stage125/stage125_part3b0_evidence_readiness_qc_report.json",
+        "project/stage125/metadata_and_hashes_stage125_part3b0.json",
+        "project/stage125/part3b0_evidence_capture_contract_stage125.json",
+        "project/stage125/README_STAGE125_PART3B0_EVIDENCE_READINESS.md",
+    ):
+        _write(synth, rel, "generated\n")
+    sha = _commit(synth, "artifacts: Stage125 Part3B.0 readiness")
+    got = gen.last_stage_commit(synth)
+    assert got == before
+    assert got != sha

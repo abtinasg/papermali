@@ -1,10 +1,10 @@
 {
   "baseline_commit": "c6cbb6b7a7dc4dfe7ca3fa6ea0bcf34d7f0612c0",
-  "code_commit": "a5d7fd27955b9690bd2257211e467d485ec1ff3e",
+  "code_commit": "80898b6c77913f03b757b8da4e97961fab85c77b",
   "current_stage": "Stage125",
   "description": "Stage125 Part 3A — accessibility & pilot protocol lock.",
   "gate_b_started": true,
-  "generated_at": "2026-07-14T23:38:21+03:30",
+  "generated_at": "2026-07-16T17:52:41+03:00",
   "input_all_rows_name": "modeling_all_rows_stage124_gate_b.csv",
   "input_all_rows_sha256": "f6b6bc41cbe757d19d4397ffc5898629d0fca8ab0480351f75040a71d7ce7376",
   "input_pairs_name": "modeling_one_year_ahead_stage124_gate_b.csv",
@@ -21,14 +21,14 @@
     "part3_sampling_frame_by_target_year_stage125.csv": "96e6826681b8b46e6d0ebf9bd2dd9c1d7895f0432ca600986ab8beffb680f584",
     "part3_sampling_frame_summary_stage125.json": "359394f0522f2c3db24a56238d6f9ff78bcab75dd36cbdef9b64f23162c6b945",
     "part3_source_evidence_manifest_schema_stage125.json": "9a736edb18046128851d55c87f07609b8dc2a4b2be73a41c5837fe0e2a4cd78d",
-    "stage125_part3a_pilot_protocol_qc_report.json": "34b9584df0f35e1490318b1257dcac909baba9a559ad882c3c88cc45b911c4e6"
+    "stage125_part3a_pilot_protocol_qc_report.json": "b9dbd251c6a725ebca3b92af48836ce08927b234bd70039aeb5124b4a9d257e0"
   },
   "part2_started": true,
   "part3_started": true,
   "part3a_protocol_locked": true,
   "part3b_started": false,
   "pilot_extraction_started": false,
-  "source_file_sha256": "0e6a237019543395729763eda567f24a6470245ca8b97567c1ac667eb3ea07fc",
+  "source_file_sha256": "e8b5e30a216304a7c1ca9dd0217332659d0cafc7929304a9f8697fc8f0d0b88b",
   "stage": "stage125_part3a_pilot_protocol",
   "test_file_sha256": "1b9879d96da624a41a0fbea28811a8728e14066b24053160613b7e4e3aafa4f7",
   "warning": "Part 3A only: protocol lock before evidence collection. No modeling, no extraction, no network access. Part 3B not started. Stage122-Stage125 Part 1/2 assets unchanged."

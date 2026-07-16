@@ -66,6 +66,11 @@ See [`DECISIONS.md`](DECISIONS.md).
   `run_stage125_part3a_decision_lock.py`, `tests/test_stage125_part3a_decision_lock.py`,
   `stage125/stage125_part3a_decision_lock_qc_report.json` (approved rubric, G09–G14
   thresholds, locked pilot selection; no evidence, no extraction)
+- Stage125 Part 3B.0 evidence-readiness source/test/QC: `src/stage125_part3b0_evidence_readiness.py`,
+  `run_stage125_part3b0.py`, `tests/test_stage125_part3b0_evidence_readiness.py`,
+  `stage125/stage125_part3b0_evidence_readiness_qc_report.json` (schema validator,
+  immutable cache contract, network sentinel, Gate engine scaffolding; no evidence,
+  no network, no extraction)
 
 ## 7. Done
 

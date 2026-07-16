@@ -1,10 +1,10 @@
 ---
 roadmap_version: 1
 active_research_workstream_id: stage125-research-design-readiness
-qc_scope: stage125-part3a-decision-lock
+qc_scope: stage125-part3b0-evidence-readiness
 last_completed_research_action_id: stage125-part3a-decision-lock
 next_research_action_id: stage125-part3b-evidence-capture
-active_maintenance_task_id: stage125-part3a1-decision-lock
+active_maintenance_task_id: stage125-part3b0-evidence-readiness
 ---
 
 # ROADMAP
@@ -44,6 +44,7 @@ must also appear in the body below. The validator checks that:
 - `stage125-part2-prediction-time-contract` — Stage125 Part 2 prediction-time & leakage contract (prediction cutoff rules, feature availability M1–M4, revision policy, tie-breaking, anti-leakage checklist with 8 machine-testable checks, per-pair cutoff/feature/leakage audit preserving all 1200 pairs); contract/audit only, **no modeling, no extraction, no eligibility changes**; advances no research action ✅
 - `stage125-part3a-pilot-protocol-lock` — Stage125 Part 3A accessibility & pilot protocol lock (candidate inventory freeze, proposed accessibility rubric, gate decision protocol, sampling frame summary, pilot-size options, Part 3B evidence schema); protocol only, **no evidence collection, no network access, no modeling**; advances no research action ✅
 - `stage125-part3a1-decision-lock` — Stage125 Part 3A.1 user-approved pilot decision lock (rubric approval record, G09–G14 pilot thresholds, locked event-enriched pilot pair selection); decision record only, **no evidence collection, no network access, no modeling**; advances no research action ✅
+- `stage125-part3b0-evidence-readiness` — Stage125 Part 3B.0 evidence capture readiness (schema validator, immutable cache contract, default-deny network sentinel, pure Gate engine scaffolding, header-only templates); infrastructure/readiness only, **no real evidence, no network access, no accessibility scores, no modeling**; advances no research action
 
 ## Notes on ordering
 

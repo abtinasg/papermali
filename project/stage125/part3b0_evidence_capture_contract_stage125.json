@@ -1,0 +1,43 @@
+{
+  "contract_version": "stage125_part3b0_v1",
+  "stage": "Stage125",
+  "schema_version": "stage125_part3b_evidence_v1",
+  "purpose": "Readiness contract for Part 3B evidence capture. Templates only; no real evidence rows in Part 3B.0.",
+  "required_field_count": 22,
+  "required_fields": [
+    "evidence_id",
+    "candidate_id",
+    "source_id",
+    "source_owner",
+    "source_url",
+    "source_title",
+    "source_identifier",
+    "retrieved_at_utc",
+    "published_at",
+    "available_at",
+    "raw_date_text",
+    "calendar",
+    "timezone",
+    "access_method",
+    "authentication_required",
+    "response_status_evidence",
+    "local_snapshot_path",
+    "snapshot_sha256",
+    "revision_status",
+    "license_or_usage_notes",
+    "reviewer_status",
+    "failure_reason"
+  ],
+  "null_rules": {
+    "never_infer_from_memory_or_reputation": true,
+    "no_guessed_urls_or_dates": true,
+    "unknown_fields_must_be_null": true
+  },
+  "real_evidence_records_allowed": false,
+  "accessibility_scoring_allowed": false,
+  "candidate_decisions_allowed": false,
+  "part3b_started": false,
+  "part3b0_readiness": true,
+  "synthetic_validator_only": true,
+  "unknown_factual_values": "null_never_zero_or_guess"
+}

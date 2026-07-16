@@ -253,7 +253,7 @@
     "project/stage125/stage125_part2_prediction_time_contract_qc_report.json": "cd43c01cc39e2d43a39f686884916630c47d2324799766058f7e34bce19689e6"
   },
   "gate_b_started": true,
-  "generated_at": "2026-07-14T23:38:21+03:30",
+  "generated_at": "2026-07-16T17:52:41+03:00",
   "guard_evidence": {
     "eligibility": {
       "pair_count": 1200,
@@ -313,8 +313,8 @@
   "part3b_started": false,
   "pilot_extraction_started": false,
   "registered_candidate_count": 10,
-  "source_commit": "a5d7fd27955b9690bd2257211e467d485ec1ff3e",
-  "source_file_sha256": "0e6a237019543395729763eda567f24a6470245ca8b97567c1ac667eb3ea07fc",
+  "source_commit": "80898b6c77913f03b757b8da4e97961fab85c77b",
+  "source_file_sha256": "e8b5e30a216304a7c1ca9dd0217332659d0cafc7929304a9f8697fc8f0d0b88b",
   "stage": "stage125_part3a_pilot_protocol",
   "test_file_sha256": "1b9879d96da624a41a0fbea28811a8728e14066b24053160613b7e4e3aafa4f7",
   "ticker_count": 130,
