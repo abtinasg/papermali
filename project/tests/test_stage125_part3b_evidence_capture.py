@@ -369,3 +369,159 @@ def test_no_model_artifact_constants():
     assert part3b.QC_STAGE == "stage125_part3b_evidence_capture"
     assert "model" not in part3b.F_METADATA
     assert part3a.REGISTERED_CANDIDATES and len(part3b.REGISTERED_CANDIDATE_IDS) == 10
+
+
+def test_snapshot_alone_does_not_imply_g02_g03():
+    ev = {
+        "evidence_id": "ev_x",
+        "snapshot_sha256": "a" * 64,
+        "source_owner": "TSETMC",
+    }
+    auth, repro, notes = part3b.derive_gate_authority_flags(
+        evidence_row=ev, handle_row=None, cache=None, endpoint_row=None,
+    )
+    assert auth is False
+    assert repro is False
+    assert any("without_handle" in n for n in notes)
+
+
+def test_handle_bound_to_different_evidence_id_fails(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path / "cache")
+    put = cache.put(b"body", metadata={"k": 1}, evidence_id="ev_bound")
+    handle = p3b0.cache_handle_from_put_result("ev_bound", put)
+    ser = p3b0.serialize_cache_handle(handle)
+    row = {
+        "evidence_id": "ev_other",
+        "payload_sha256": put.payload_sha256,
+        "metadata_sha256": put.metadata_sha256,
+        "cache_contract_version": p3b0.CACHE_CONTRACT_VERSION,
+        "cache_handle_schema_version": p3b0.CACHE_HANDLE_SCHEMA_VERSION,
+        "external_handle_sha256": p3b0.cache_handle_sha256(ser),
+    }
+    # external sha was computed for ev_bound serialization; mismatch expected
+    with pytest.raises(part3b.QCFail):
+        part3b.verify_external_handle_binding(
+            cache, row, expected_evidence_id="ev_other",
+        )
+
+
+def test_forged_candidate_evidence_id_on_shared_payload_fails(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path / "cache")
+    put = cache.put(b"shared", metadata={"k": 1}, evidence_id="ev_canonical")
+    handle = p3b0.cache_handle_from_put_result("ev_canonical", put)
+    ser = p3b0.serialize_cache_handle(handle)
+    forged = p3b0.CacheHandle(
+        evidence_id="ev_forged_candidate",
+        payload_sha256=handle.payload_sha256,
+        metadata_sha256=handle.metadata_sha256,
+        cache_contract_version=p3b0.CACHE_CONTRACT_VERSION,
+    )
+    with pytest.raises(p3b0.ImmutableCacheError):
+        cache.get_by_handle(forged)
+    row = {
+        "evidence_id": "ev_canonical",
+        "payload_sha256": put.payload_sha256,
+        "metadata_sha256": put.metadata_sha256,
+        "cache_contract_version": p3b0.CACHE_CONTRACT_VERSION,
+        "cache_handle_schema_version": p3b0.CACHE_HANDLE_SCHEMA_VERSION,
+        "external_handle_sha256": p3b0.cache_handle_sha256(ser),
+    }
+    part3b.verify_external_handle_binding(cache, row, expected_evidence_id="ev_canonical")
+
+
+def test_tampered_external_handle_sha_fails(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path / "cache")
+    put = cache.put(b"x", metadata={"k": 1}, evidence_id="ev_t")
+    handle = p3b0.cache_handle_from_put_result("ev_t", put)
+    ser = p3b0.serialize_cache_handle(handle)
+    row = {
+        "evidence_id": "ev_t",
+        "payload_sha256": put.payload_sha256,
+        "metadata_sha256": put.metadata_sha256,
+        "cache_contract_version": p3b0.CACHE_CONTRACT_VERSION,
+        "cache_handle_schema_version": p3b0.CACHE_HANDLE_SCHEMA_VERSION,
+        "external_handle_sha256": "0" * 64,
+    }
+    with pytest.raises(part3b.QCFail, match="external handle SHA"):
+        part3b.verify_external_handle_binding(cache, row)
+    del ser
+
+
+def test_missing_payload_raises_evidence_cache_unavailable(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path / "cache")
+    put = cache.put(b"gone", metadata={"k": 1}, evidence_id="ev_gone")
+    handle = p3b0.cache_handle_from_put_result("ev_gone", put)
+    ser = p3b0.serialize_cache_handle(handle)
+    row = {
+        "evidence_id": "ev_gone",
+        "payload_sha256": put.payload_sha256,
+        "metadata_sha256": put.metadata_sha256,
+        "cache_contract_version": p3b0.CACHE_CONTRACT_VERSION,
+        "cache_handle_schema_version": p3b0.CACHE_HANDLE_SCHEMA_VERSION,
+        "external_handle_sha256": p3b0.cache_handle_sha256(ser),
+    }
+    entry = tmp_path / "cache" / put.payload_sha256[:2] / put.payload_sha256
+    (entry / "payload.bin").unlink()
+    with pytest.raises(part3b.EvidenceCacheUnavailable):
+        part3b.verify_external_handle_binding(cache, row)
+
+
+def test_check_fails_without_local_cache(tmp_path):
+    # Copy tracked manifests into isolated output without raw_cache
+    src = REPO_ROOT / "project" / "stage125"
+    out = tmp_path / "stage125"
+    out.mkdir()
+    for name in (
+        part3b.F_METADATA, part3b.F_QC, part3b.F_ASSESS, part3b.F_EVIDENCE,
+        part3b.F_HANDLES, part3b.F_LINKAGE, part3b.F_GATE_SUMMARY,
+        part3b.F_ENDPOINTS, part3b.F_PLAN, part3b.F_AUTH, part3b.F_NETWORK_LOG,
+        part3b.F_ATTEMPTS, part3b.F_SCORES, part3b.F_GATES, part3b.F_UNRESOLVED,
+        part3b.F_README, part3b.F_DECISION_REQ, part3b.F_DECISION_REQ_MD,
+    ):
+        p = src / name
+        if p.is_file():
+            (out / name).write_bytes(p.read_bytes())
+    # Point cache root under tmp (empty) by monkeypatching CACHE_DIR_REL via
+    # run_check using repo_root=tmp with staged project tree.
+    fake_repo = tmp_path / "repo"
+    (fake_repo / "project" / "stage125").mkdir(parents=True)
+    # Minimal: invoke verify path directly
+    cache = p3b0.ImmutableCache(fake_repo / part3b.CACHE_DIR_REL)
+    handles = list(csv.DictReader((out / part3b.F_HANDLES).open(encoding="utf-8")))
+    with pytest.raises(part3b.EvidenceCacheUnavailable):
+        part3b.verify_external_handle_binding(cache, handles[0])
+
+
+def test_repo_check_passes_with_intact_cache():
+    result = part3b.run_check(REPO_ROOT, REPO_ROOT / "project" / "stage125")
+    assert result["ok"] is True
+    assert result["cache_verified"] is True
+
+
+def test_check_manifest_only_warns():
+    result = part3b.run_check_manifest_only(
+        REPO_ROOT, REPO_ROOT / "project" / "stage125",
+    )
+    assert result["ok"] is True
+    assert "not full evidence verification" in result["warning"]
+
+
+def test_endpoint_provenance_hashes_pinned():
+    got = part3b.verify_endpoint_provenance_hashes(REPO_ROOT)
+    assert got == part3b.FROZEN_ENDPOINT_PROVENANCE_HASHES
+
+
+def test_completion_semantics_in_qc():
+    qc = json.loads(
+        (REPO_ROOT / "project/stage125" / part3b.F_QC).read_text(encoding="utf-8")
+    )
+    assert qc["part3b_completed"] is False
+    assert qc["accessibility_scoring_applied"] is False
+    assert qc["endpoint_probe_evidence_collected"] is True
+    assert qc["candidate_value_evidence_collected"] is False
+    assert qc["pair_level_evidence_collected"] is False
+    assert qc["data_value_extraction_performed"] is False
+    assert qc["execution_qc_all_pass"] is True
+    assert qc["research_gate_all_pass"] is False
+    assert qc["research_gate_failed"] == ["G09", "G10", "G11", "G12"]
+    assert "active_incomplete" in qc["status"]

@@ -197,13 +197,17 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/part3b_verified_endpoint_registry_stage125.csv",
     "project/stage125/part3b_evidence_manifest_stage125.csv",
     "project/stage125/part3b_cache_handles_stage125.csv",
+    "project/stage125/part3b_candidate_evidence_linkage_stage125.csv",
+    "project/stage125/part3b_capture_attempt_log_stage125.csv",
     "project/stage125/part3b_capture_network_log_stage125.json",
     "project/stage125/part3b_pair_candidate_assessment_stage125.csv",
     "project/stage125/part3b_accessibility_scores_stage125.csv",
     "project/stage125/part3b_gate_results_stage125.csv",
     "project/stage125/part3b_gate_summary_stage125.json",
     "project/stage125/part3b_unresolved_and_failures_stage125.csv",
+    "project/stage125/part3b_decision_requirements_stage125.json",
     "project/stage125/README_STAGE125_PART3B_EVIDENCE_CAPTURE.md",
+    "project/stage125/README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md",
     "project/stage125/stage125_part3b_evidence_capture_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b.json",
 )
@@ -291,7 +295,12 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "part3b0_readiness",
         "part3b_started",
         "evidence_collected",
+        "endpoint_probe_evidence_collected",
+        "candidate_value_evidence_collected",
+        "pair_level_evidence_collected",
+        "data_value_extraction_performed",
         "accessibility_scoring_applied",
+        "part3b_completed",
         "network_extraction_performed",
         "modeling_started",
     ),
@@ -868,17 +877,21 @@ def render_current_state(record: dict) -> str:
     if "part3b0_readiness" in record:
         lines.append(f"- part3b0_readiness: **{record['part3b0_readiness']}**")
     if "evidence_collected" in record:
-        lines.append(f"- evidence_collected: **{record['evidence_collected']}**")
-    if "accessibility_scoring_applied" in record:
         lines.append(
-            f"- accessibility_scoring_applied: "
-            f"**{record['accessibility_scoring_applied']}**"
+            f"- evidence_collected: **{record['evidence_collected']}** "
+            f"(endpoint-probe scope when Part 3B active)"
         )
-    if "network_extraction_performed" in record:
-        lines.append(
-            f"- network_extraction_performed: "
-            f"**{record['network_extraction_performed']}**"
-        )
+    for key in (
+        "endpoint_probe_evidence_collected",
+        "candidate_value_evidence_collected",
+        "pair_level_evidence_collected",
+        "data_value_extraction_performed",
+        "accessibility_scoring_applied",
+        "part3b_completed",
+        "network_extraction_performed",
+    ):
+        if key in record:
+            lines.append(f"- {key}: **{record[key]}**")
     lines.extend([
         "",
         "## Tickers in current research scope\n",

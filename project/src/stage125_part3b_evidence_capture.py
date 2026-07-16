@@ -38,6 +38,8 @@ F_PLAN = "part3b_capture_plan_stage125.csv"
 F_ENDPOINTS = "part3b_verified_endpoint_registry_stage125.csv"
 F_EVIDENCE = "part3b_evidence_manifest_stage125.csv"
 F_HANDLES = "part3b_cache_handles_stage125.csv"
+F_LINKAGE = "part3b_candidate_evidence_linkage_stage125.csv"
+F_ATTEMPTS = "part3b_capture_attempt_log_stage125.csv"
 F_ASSESS = "part3b_pair_candidate_assessment_stage125.csv"
 F_SCORES = "part3b_accessibility_scores_stage125.csv"
 F_GATES = "part3b_gate_results_stage125.csv"
@@ -47,6 +49,8 @@ F_README = "README_STAGE125_PART3B_EVIDENCE_CAPTURE.md"
 F_QC = "stage125_part3b_evidence_capture_qc_report.json"
 F_METADATA = "metadata_and_hashes_stage125_part3b.json"
 F_NETWORK_LOG = "part3b_capture_network_log_stage125.json"
+F_DECISION_REQ = "part3b_decision_requirements_stage125.json"
+F_DECISION_REQ_MD = "README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md"
 CACHE_DIR_REL = "project/stage125/raw_cache_part3b"
 
 FROZEN_INPUT_HASHES = {
@@ -64,6 +68,40 @@ FROZEN_INPUT_HASHES = {
         "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c",
 }
 
+# Endpoint-ownership provenance inputs (must be tracked + hash-pinned).
+FROZEN_ENDPOINT_PROVENANCE_HASHES = {
+    "project/stage124/official_api/import_manifest.json":
+        "9ff7bd939b1e28844d897412db6c2671db3e6857b83dce9261c3de44b4871e06",
+    "project/stage124/official_api/README.md":
+        "0d4cf8581a953877f3102f4f7289c9017aa0b968e6ec9c8cfd4d3918c3c64492",
+    "project/raw_handoff/financial_distress_programmer_handoff_stage121(1)/"
+    "ocf_source_manifest_stage121.csv":
+        "b1bf92d74f19b4c00373079c3222489d6cb54e1c8f11e30a9e02557e6936057a",
+}
+
+# Cache-bound evidence IDs from the authorized origin-probe capture (immutable).
+# Identical payload bytes cannot be rebound to a different evidence_id.
+CANONICAL_SOURCE_EVIDENCE_ID = {
+    "src_m2_tsetmc_market":
+        "ev_src_m2_tsetmc_market_cand_m2_equity_return_window",
+    "src_m4_codal_audit":
+        "ev_src_m4_codal_audit_cand_m4_audit_opinion_type",
+    "src_m4_codal_governance":
+        "ev_src_m4_codal_governance_cand_m4_board_size",
+}
+CANONICAL_EVIDENCE_BINDING_CANDIDATE = {
+    "ev_src_m2_tsetmc_market_cand_m2_equity_return_window":
+        "cand_m2_equity_return_window",
+    "ev_src_m4_codal_audit_cand_m4_audit_opinion_type":
+        "cand_m4_audit_opinion_type",
+    "ev_src_m4_codal_governance_cand_m4_board_size":
+        "cand_m4_board_size",
+}
+EVIDENCE_CLASS_ORIGIN_PROBE = "source_origin_probe"
+EVIDENCE_CLASS_CANDIDATE_ENDPOINT = "candidate_endpoint_evidence"
+EVIDENCE_CLASS_PAIR_VALUE = "pair_value_evidence"
+EVIDENCE_CLASS_BLOCKED = "blocked_unverified_endpoint"
+
 REGISTERED_CANDIDATE_IDS = tuple(c["candidate_id"] for c in part3a.REGISTERED_CANDIDATES)
 CANDIDATE_SOURCE_MAP = {c["candidate_id"]: c["source_id"] for c in part3a.REGISTERED_CANDIDATES}
 BLOCK_BY_CANDIDATE = {c["candidate_id"]: c["block"] for c in part3a.REGISTERED_CANDIDATES}
@@ -72,24 +110,43 @@ PART3B_AUTHORIZED_EXACT = frozenset({
     SRC_REL, TEST_REL, RUN_REL,
     f"project/stage125/{F_AUTH}", f"project/stage125/{F_PLAN}",
     f"project/stage125/{F_ENDPOINTS}", f"project/stage125/{F_EVIDENCE}",
-    f"project/stage125/{F_HANDLES}", f"project/stage125/{F_ASSESS}",
+    f"project/stage125/{F_HANDLES}", f"project/stage125/{F_LINKAGE}",
+    f"project/stage125/{F_ATTEMPTS}", f"project/stage125/{F_ASSESS}",
     f"project/stage125/{F_SCORES}", f"project/stage125/{F_GATES}",
     f"project/stage125/{F_GATE_SUMMARY}", f"project/stage125/{F_UNRESOLVED}",
     f"project/stage125/{F_README}", f"project/stage125/{F_QC}",
     f"project/stage125/{F_METADATA}", f"project/stage125/{F_NETWORK_LOG}",
+    f"project/stage125/{F_DECISION_REQ}", f"project/stage125/{F_DECISION_REQ_MD}",
 })
 
 ENDPOINT_HEADER = [
     "source_id", "official_source_owner", "exact_https_origin", "exact_hostname",
     "exact_endpoint_or_url_pattern", "allowed_http_method",
     "authoritative_ownership_evidence", "ownership_evidence_url",
-    "retrieval_purpose", "content_type_expected", "verification_status",
-    "failure_reason", "reviewer_status",
+    "retrieval_purpose", "evidence_class", "content_type_expected",
+    "verification_status", "failure_reason", "reviewer_status",
+    "provenance_input_paths", "provenance_input_sha256",
 ]
 PLAN_HEADER = [
     "plan_row_id", "candidate_id", "source_id", "endpoint_id", "request_url",
-    "http_method", "retrieval_purpose", "plan_status", "blocker_reason",
-    "shared_snapshot_key",
+    "http_method", "retrieval_purpose", "evidence_class", "plan_status",
+    "blocker_reason", "shared_snapshot_key", "canonical_evidence_id",
+]
+LINKAGE_HEADER = [
+    "candidate_id", "source_id", "evidence_id", "evidence_class",
+    "linkage_status", "failure_reason",
+]
+ATTEMPT_HEADER = [
+    "capture_run_id", "attempt_id", "planned_request_url", "http_method",
+    "started_at_utc", "completed_at_utc", "final_url", "response_status",
+    "content_type", "byte_count", "redirect_count", "payload_sha256",
+    "metadata_sha256", "success", "failure_class", "shared_snapshot_key",
+    "canonical_evidence_id", "network_log_complete",
+]
+HANDLE_HEADER = [
+    "evidence_id", "payload_sha256", "metadata_sha256", "cache_contract_version",
+    "cache_handle_schema_version", "external_handle_sha256", "source_id",
+    "binding_candidate_id",
 ]
 ASSESS_HEADER = [
     "assessment_id", "predictor_row_key_t", "target_row_key_t_plus_1", "ticker",
@@ -103,11 +160,6 @@ SCORE_HEADER = [
     "candidate_id", "source_id", "rubric_version", "accessibility_score",
     "score_status", "evidence_ids_cited", "rationale",
     "requires_human_adjudication", "reviewer_status",
-]
-HANDLE_HEADER = [
-    "evidence_id", "payload_sha256", "metadata_sha256", "cache_contract_version",
-    "cache_handle_schema_version", "external_handle_sha256", "source_id",
-    "candidate_id",
 ]
 
 MAX_RESPONSE_BYTES = 2_000_000
@@ -256,6 +308,54 @@ def verify_frozen_input_hashes(repo_root: Path) -> dict[str, str]:
     return out
 
 
+def verify_endpoint_provenance_hashes(repo_root: Path) -> dict[str, str]:
+    """Pin + verify every file used for endpoint ownership evidence."""
+    tracked = set(p3b0._git(str(repo_root), "ls-files").splitlines())
+    out: dict[str, str] = {}
+    for rel, expected in FROZEN_ENDPOINT_PROVENANCE_HASHES.items():
+        if rel not in tracked:
+            raise QCFail(f"endpoint provenance input untracked: {rel}")
+        path = repo_root / rel
+        if not path.is_file():
+            raise QCFail(f"endpoint provenance input missing: {rel}")
+        actual = sha256_file(path)
+        if actual != expected:
+            raise QCFail(f"endpoint provenance hash mismatch: {rel}")
+        out[rel] = actual
+    return out
+
+
+def _provenance_pin_or_none(
+    repo_root: Path, rel_paths: list[str],
+) -> tuple[str, str] | None:
+    """Return joined paths + joined sha256 if all pinned/tracked/match; else None."""
+    try:
+        all_pins = verify_endpoint_provenance_hashes(repo_root)
+    except QCFail:
+        # Per-path check when global verify not yet desired
+        all_pins = {}
+        tracked = set(p3b0._git(str(repo_root), "ls-files").splitlines())
+        for rel, expected in FROZEN_ENDPOINT_PROVENANCE_HASHES.items():
+            if rel not in tracked:
+                continue
+            path = repo_root / rel
+            if not path.is_file():
+                continue
+            actual = sha256_file(path)
+            if actual == expected:
+                all_pins[rel] = actual
+    hashes = []
+    for rel in rel_paths:
+        expected = FROZEN_ENDPOINT_PROVENANCE_HASHES.get(rel)
+        if expected is None:
+            return None
+        actual = sha256_file(repo_root / rel)
+        if actual != expected:
+            return None
+        hashes.append(actual)
+    return ";".join(rel_paths), ";".join(hashes)
+
+
 def verify_baseline_commit(repo_root: str) -> None:
     head = p3b0._git(repo_root, "rev-parse", "HEAD")
     if head != EXPECTED_BASELINE_COMMIT and not p3b0._is_ancestor(
@@ -296,20 +396,28 @@ def _unverified_endpoint(source_id: str, owner: str, reason: str) -> dict:
         "allowed_http_method": "",
         "authoritative_ownership_evidence": "",
         "ownership_evidence_url": "",
-        "retrieval_purpose": "accessibility_probe",
+        "retrieval_purpose": "source_origin_probe",
+        "evidence_class": EVIDENCE_CLASS_BLOCKED,
         "content_type_expected": "",
         "verification_status": "unverified_no_authoritative_endpoint",
         "failure_reason": reason,
         "reviewer_status": "automated_fail_closed",
+        "provenance_input_paths": "",
+        "provenance_input_sha256": "",
     }
 
 
 def build_endpoint_registry_rows(repo_root: Path) -> list[dict]:
     rows: list[dict] = []
-    tsetmc_manifest = repo_root / "project/stage124/official_api/import_manifest.json"
-    tsetmc_readme = repo_root / "project/stage124/official_api/README.md"
-    if tsetmc_manifest.is_file() and tsetmc_readme.is_file():
-        manifest = json.loads(tsetmc_manifest.read_text(encoding="utf-8"))
+    tsetmc_paths = [
+        "project/stage124/official_api/import_manifest.json",
+        "project/stage124/official_api/README.md",
+    ]
+    tsetmc_pin = _provenance_pin_or_none(repo_root, tsetmc_paths)
+    if tsetmc_pin is not None:
+        manifest = json.loads(
+            (repo_root / tsetmc_paths[0]).read_text(encoding="utf-8")
+        )
         exact = manifest.get("exact_endpoint_url")
         if isinstance(exact, str) and exact.startswith("https://cdn.tsetmc.com/"):
             rows.append({
@@ -320,16 +428,18 @@ def build_endpoint_registry_rows(repo_root: Path) -> list[dict]:
                 "exact_endpoint_or_url_pattern": exact,
                 "allowed_http_method": "GET",
                 "authoritative_ownership_evidence": (
-                    "Frozen Stage124 official_api import_manifest.json + README "
+                    "Hash-pinned Stage124 official_api import_manifest.json + README "
                     "document TSETMC CDN API exact_endpoint_url."
                 ),
-                "ownership_evidence_url":
-                    "project/stage124/official_api/import_manifest.json",
-                "retrieval_purpose": "accessibility_probe_official_market_api",
+                "ownership_evidence_url": tsetmc_paths[0],
+                "retrieval_purpose": "source_origin_probe",
+                "evidence_class": EVIDENCE_CLASS_ORIGIN_PROBE,
                 "content_type_expected": "application/json",
                 "verification_status": "verified_from_frozen_repo_provenance",
                 "failure_reason": "",
                 "reviewer_status": "automated_repo_provenance_only",
+                "provenance_input_paths": tsetmc_pin[0],
+                "provenance_input_sha256": tsetmc_pin[1],
             })
         else:
             rows.append(_unverified_endpoint(
@@ -339,7 +449,7 @@ def build_endpoint_registry_rows(repo_root: Path) -> list[dict]:
     else:
         rows.append(_unverified_endpoint(
             "src_m2_tsetmc_market", "TSETMC",
-            "frozen_stage124_official_api_manifest_missing",
+            "endpoint_provenance_unpinned_or_hash_mismatch",
         ))
 
     rows.append(_unverified_endpoint(
@@ -347,13 +457,18 @@ def build_endpoint_registry_rows(repo_root: Path) -> list[dict]:
         "no_authoritative_official_endpoint_in_frozen_stage125_or_stage124_assets",
     ))
 
-    codal_evidence = (
+    codal_paths = [
         "project/raw_handoff/financial_distress_programmer_handoff_stage121(1)/"
-        "ocf_source_manifest_stage121.csv"
-    )
-    codal_path = repo_root / codal_evidence
-    if codal_path.is_file() and "https://www.codal.ir/" in codal_path.read_text(
-        encoding="utf-8", errors="replace",
+        "ocf_source_manifest_stage121.csv",
+    ]
+    codal_pin = _provenance_pin_or_none(repo_root, codal_paths)
+    codal_path = repo_root / codal_paths[0]
+    if (
+        codal_pin is not None
+        and codal_path.is_file()
+        and "https://www.codal.ir/" in codal_path.read_text(
+            encoding="utf-8", errors="replace",
+        )
     ):
         for source_id in ("src_m4_codal_audit", "src_m4_codal_governance"):
             rows.append({
@@ -364,20 +479,24 @@ def build_endpoint_registry_rows(repo_root: Path) -> list[dict]:
                 "exact_endpoint_or_url_pattern": "https://www.codal.ir/",
                 "allowed_http_method": "GET",
                 "authoritative_ownership_evidence": (
-                    "Frozen Stage121 OCF source manifest records "
+                    "Hash-pinned Stage121 OCF source manifest records "
                     "https://www.codal.ir/ Reports URLs as CODAL source_url."
                 ),
-                "ownership_evidence_url": codal_evidence,
-                "retrieval_purpose": "accessibility_probe_official_codal_origin",
+                "ownership_evidence_url": codal_paths[0],
+                "retrieval_purpose": "source_origin_probe",
+                "evidence_class": EVIDENCE_CLASS_ORIGIN_PROBE,
                 "content_type_expected": "text/html",
                 "verification_status": "verified_from_frozen_repo_provenance",
                 "failure_reason": "",
                 "reviewer_status": "automated_repo_provenance_only",
+                "provenance_input_paths": codal_pin[0],
+                "provenance_input_sha256": codal_pin[1],
             })
     else:
         for source_id in ("src_m4_codal_audit", "src_m4_codal_governance"):
             rows.append(_unverified_endpoint(
-                source_id, "CODAL", "frozen_codal_handoff_manifest_missing",
+                source_id, "CODAL",
+                "endpoint_provenance_unpinned_missing_or_hash_mismatch",
             ))
 
     rows.append({
@@ -390,10 +509,13 @@ def build_endpoint_registry_rows(repo_root: Path) -> list[dict]:
         "authoritative_ownership_evidence": "",
         "ownership_evidence_url": "",
         "retrieval_purpose": "out_of_scope_not_promoted",
+        "evidence_class": EVIDENCE_CLASS_BLOCKED,
         "content_type_expected": "",
         "verification_status": "out_of_scope_not_contacted",
         "failure_reason": "src_m3_sci_macro_not_promoted_in_part3b",
         "reviewer_status": "automated_scope_lock",
+        "provenance_input_paths": "",
+        "provenance_input_sha256": "",
     })
     return rows
 
@@ -410,6 +532,7 @@ def build_capture_plan(repo_root: Path, endpoint_rows: list[dict]) -> list[dict]
     for idx, cand_id in enumerate(REGISTERED_CANDIDATE_IDS, start=1):
         source_id = CANDIDATE_SOURCE_MAP[cand_id]
         ep = by_source.get(source_id)
+        canonical_eid = CANONICAL_SOURCE_EVIDENCE_ID.get(source_id, f"ev_{source_id}")
         if ep is None:
             plan.append({
                 "plan_row_id": f"plan_{idx:03d}",
@@ -418,29 +541,35 @@ def build_capture_plan(repo_root: Path, endpoint_rows: list[dict]) -> list[dict]
                 "endpoint_id": "",
                 "request_url": "",
                 "http_method": "",
-                "retrieval_purpose": "accessibility_probe",
+                "retrieval_purpose": "source_origin_probe",
+                "evidence_class": EVIDENCE_CLASS_BLOCKED,
                 "plan_status": "blocked",
                 "blocker_reason": "source_missing_from_endpoint_registry",
                 "shared_snapshot_key": source_id,
+                "canonical_evidence_id": canonical_eid,
             })
             continue
         verified = ep.get("verification_status") in VERIFIED_STATUSES
         url = (ep.get("exact_endpoint_or_url_pattern") or "").strip()
-        if verified and "{" in url:
+        # Origin probe only: never invent path parameters (e.g. ins_code).
+        if verified and ("{" in url or url.endswith("/0")):
             request_url = ep.get("exact_https_origin", "").rstrip("/") + "/"
-            purpose = "accessibility_probe_official_origin_no_inscode_invented"
+            purpose = "source_origin_probe"
         elif verified and url:
             request_url = url
-            purpose = ep.get("retrieval_purpose") or "accessibility_probe"
+            purpose = "source_origin_probe"
         else:
-            request_url, purpose = "", "accessibility_probe"
+            request_url, purpose = "", "source_origin_probe"
         method = ep.get("allowed_http_method") or ""
+        evidence_class = ep.get("evidence_class") or EVIDENCE_CLASS_BLOCKED
         if verified and request_url and method in ("GET", "HEAD"):
             status, blocker = "planned", ""
+            evidence_class = EVIDENCE_CLASS_ORIGIN_PROBE
         else:
             status = "blocked"
             blocker = ep.get("failure_reason") or "endpoint_not_verified"
             method, request_url = "", ""
+            evidence_class = EVIDENCE_CLASS_BLOCKED
         plan.append({
             "plan_row_id": f"plan_{idx:03d}",
             "candidate_id": cand_id,
@@ -449,9 +578,11 @@ def build_capture_plan(repo_root: Path, endpoint_rows: list[dict]) -> list[dict]
             "request_url": request_url,
             "http_method": method if status == "planned" else "",
             "retrieval_purpose": purpose,
+            "evidence_class": evidence_class,
             "plan_status": status,
             "blocker_reason": blocker,
             "shared_snapshot_key": source_id,
+            "canonical_evidence_id": canonical_eid,
         })
     return plan
 
@@ -999,6 +1130,158 @@ def null_score_row(candidate_id: str, source_id: str, evidence_ids: list[str], r
 
 
 # --------------------------------------------------------------------------- #
+# Cache handle verification / rebuild helpers
+# --------------------------------------------------------------------------- #
+
+class EvidenceCacheUnavailable(QCFail):
+    """Raised when local immutable cache cannot verify snapshot-backed evidence."""
+
+    def __init__(self, detail: str = ""):
+        msg = "evidence_cache_unavailable"
+        if detail:
+            msg = f"{msg}: {detail}"
+        super().__init__(msg)
+
+
+def serialize_handle_row(h: dict) -> str:
+    return p3b0.serialize_cache_handle(p3b0.CacheHandle(
+        evidence_id=h["evidence_id"],
+        payload_sha256=h["payload_sha256"],
+        metadata_sha256=h["metadata_sha256"],
+        cache_contract_version=h.get(
+            "cache_contract_version", p3b0.CACHE_CONTRACT_VERSION,
+        ),
+        schema_version=h.get(
+            "cache_handle_schema_version", p3b0.CACHE_HANDLE_SCHEMA_VERSION,
+        ),
+    ))
+
+
+def verify_external_handle_binding(
+    cache: p3b0.ImmutableCache,
+    handle_row: dict,
+    *,
+    expected_evidence_id: str | None = None,
+) -> dict[str, Any]:
+    """Fail-closed: payload + metadata + evidence_id + external handle SHA."""
+    eid = handle_row.get("evidence_id") or ""
+    if expected_evidence_id is not None and eid != expected_evidence_id:
+        raise QCFail(
+            f"handle evidence_id {eid!r} != expected {expected_evidence_id!r}"
+        )
+    if not eid or not handle_row.get("payload_sha256"):
+        raise QCFail("incomplete cache handle row")
+    if not handle_row.get("external_handle_sha256"):
+        raise QCFail(f"missing external_handle_sha256 for {eid}")
+    serialized = serialize_handle_row(handle_row)
+    actual_sha = p3b0.cache_handle_sha256(serialized)
+    if actual_sha != handle_row["external_handle_sha256"]:
+        raise QCFail(f"external handle SHA mismatch for {eid}")
+    handle = p3b0.load_cache_handle(
+        serialized,
+        expected_handle_sha256=handle_row["external_handle_sha256"],
+    )
+    try:
+        payload = cache.get_by_handle(handle)
+    except p3b0.ImmutableCacheError as exc:
+        raise EvidenceCacheUnavailable(str(exc)) from exc
+    entry_dir = cache._entry_dir(handle.payload_sha256)
+    if entry_dir.is_symlink() or any(
+        (entry_dir / name).is_symlink()
+        for name in ("payload.bin", "metadata.json", "metadata.sha256")
+        if (entry_dir / name).exists()
+    ):
+        raise EvidenceCacheUnavailable(f"symlink rejected for {eid}")
+    meta_path = entry_dir / "metadata.json"
+    if not meta_path.is_file():
+        raise EvidenceCacheUnavailable(f"metadata missing for {eid}")
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    if meta.get("evidence_id") != eid:
+        raise QCFail(f"cached metadata evidence_id mismatch for {eid}")
+    return {
+        "payload": payload,
+        "metadata": meta,
+        "handle": handle,
+        "payload_sha256": handle.payload_sha256,
+        "metadata_sha256": handle.metadata_sha256,
+        "byte_count": len(payload),
+    }
+
+
+def evidence_record_from_cache_meta(
+    *,
+    evidence_id: str,
+    candidate_id: str,
+    source_id: str,
+    source_owner: str,
+    meta: dict,
+    payload_sha256: str,
+) -> dict:
+    """Rebuild evidence from immutable cache metadata (no datetime.now)."""
+    retrieved = meta.get("retrieved_at_utc")
+    status = meta.get("response_status")
+    final_url = meta.get("final_resolved_url") or meta.get("request_url")
+    if not retrieved or status is None or not final_url:
+        raise QCFail(f"cache metadata incomplete for {evidence_id}")
+    snap_rel = f"raw_cache_part3b/{payload_sha256[:2]}/{payload_sha256}/payload.bin"
+    return successful_probe_evidence_record(
+        evidence_id=evidence_id,
+        candidate_id=candidate_id,
+        source_id=source_id,
+        source_owner=source_owner,
+        source_url=str(final_url),
+        retrieved_at_utc=str(retrieved),
+        response_status=status,
+        snapshot_rel=snap_rel,
+        snapshot_sha256=payload_sha256,
+        license_notes=(
+            "source_origin_probe only; raw bytes local immutable cache only; "
+            "not candidate_value or pair_value evidence; "
+            "redistribution subject to source terms"
+        ),
+    )
+
+
+def derive_gate_authority_flags(
+    *,
+    evidence_row: dict,
+    handle_row: dict | None,
+    cache: p3b0.ImmutableCache | None,
+    endpoint_row: dict | None,
+) -> tuple[bool | None, bool | None, list[str]]:
+    """G02/G03 inputs. Snapshot hash alone never implies True."""
+    notes: list[str] = []
+    has_snap = bool(evidence_row.get("snapshot_sha256"))
+    if not has_snap:
+        return None, None, notes
+    if handle_row is None:
+        notes.append("snapshot_backed_evidence_without_handle")
+        return False, False, notes
+    if cache is None:
+        notes.append("cache_unavailable_for_g03")
+        return False, False, notes
+    try:
+        verify_external_handle_binding(
+            cache, handle_row, expected_evidence_id=evidence_row["evidence_id"],
+        )
+    except (QCFail, EvidenceCacheUnavailable) as exc:
+        notes.append(f"handle_verify_failed:{exc}")
+        return False, False, notes
+    ep_ok = bool(
+        endpoint_row
+        and endpoint_row.get("verification_status") in VERIFIED_STATUSES
+        and endpoint_row.get("evidence_class") == EVIDENCE_CLASS_ORIGIN_PROBE
+    )
+    owner_ok = bool(evidence_row.get("source_owner"))
+    # Official origin probe with verified pinned provenance + handle.
+    auth = True if (ep_ok and owner_ok) else False
+    if not ep_ok:
+        notes.append("endpoint_not_verified_origin_probe")
+    repro = True  # handle+payload+metadata+eid verified above
+    return auth, repro, notes
+
+
+# --------------------------------------------------------------------------- #
 # Orchestration
 # --------------------------------------------------------------------------- #
 
@@ -1028,37 +1311,52 @@ def build_authorization_record(repo_root: Path, plan_hash: str, endpoint_hash: s
 
 
 def build_readme() -> str:
-    return """# Stage125 Part 3B — Evidence Capture & Accessibility Scoring Pilot
+    return """# Stage125 Part 3B accessibility feasibility probe — active/incomplete
 
-## Scope
+## Status
 
-Authorized Part 3B pilot on the locked 80-pair event-enriched sample and the
-exact 10 registered M2–M4 candidates (800 pair-candidate assessments).
+**Not a completed Part 3B pilot.** `part3b_completed=false`.
+`next_research_action_id` remains `stage125-part3b-evidence-capture`.
+No Stage126 / modeling advance.
+
+Scoped markers:
+
+- `endpoint_probe_evidence_collected=true` (when origin probes exist)
+- `candidate_value_evidence_collected=false`
+- `pair_level_evidence_collected=false`
+- `data_value_extraction_performed=false`
+- `accessibility_scoring_applied=false`
+- `part3b_completed=false`
+
+`evidence_collected=true` means **endpoint-probe** evidence only — not 800
+pair-level observations.
+
+## Evidence classes
+
+| Class | Meaning |
+|---|---|
+| `source_origin_probe` | Official origin GET (current TSETMC/CODAL probes) |
+| `candidate_endpoint_evidence` | Not collected in this probe |
+| `pair_value_evidence` | Not collected in this probe |
 
 ## Modes
 
 - `--plan` — deterministic capture plan + endpoint registry (no network)
-- `--capture` — approved read-only HTTPS GET/HEAD only
-- `--write` — derive manifests/scores/gates/QC from cached evidence (no network)
-- `--check` — offline validation (no network)
+- `--capture` — approved read-only HTTPS GET/HEAD only (resume preferred)
+- `--write` — derive assessments/scores/gates/QC (no network)
+- `--check` — **full** offline verification including immutable cache
+- `--check-manifest-only` — tracked hashes only; **not** full evidence verification
 
-## Scientific honesty
+## Cache portability
 
-- Feature-definition gaps are recorded; values are not invented.
-- Missing evidence yields null accessibility scores (never 0 by absence).
-- Prediction cutoffs come only from the frozen Part 2 audit (currently
-  unresolvable pending `available_at`).
-- Part 3B outcomes are pilot accessibility outcomes only — not Stage126 admission.
+Raw payloads live under gitignored `project/stage125/raw_cache_part3b/`.
+A fresh checkout without that local cache fails `--check` with
+`evidence_cache_unavailable`.
 
-## Network policy
+## Part 3B.1 (proposed, not started)
 
-Default-deny `NetworkSentinel` remains installed. Capture uses a scoped
-read-only permit that restores default-deny after exit/exception.
-
-## Part 3B.0 history
-
-Part 3B.0 readiness artifacts remain a frozen historical baseline. Live Part 3B
-state is owned by this runner.
+See `README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md`.
+Requires explicit user approval before any work.
 """
 
 
@@ -1071,12 +1369,16 @@ def run_plan(repo_root: Path, output_dir: Path, *, write: bool) -> dict:
     with network_default_deny() as sentinel:
         verify_baseline_commit(str(repo_root))
         frozen = verify_frozen_input_hashes(repo_root)
+        provenance = verify_endpoint_provenance_hashes(repo_root)
         endpoints = build_endpoint_registry_rows(repo_root)
         plan = build_capture_plan(repo_root, endpoints)
         plan_hash = capture_plan_sha256(plan)
         ep_csv = _csv_str(ENDPOINT_HEADER, endpoints)
         ep_hash = sha256_bytes(ep_csv.encode("utf-8"))
         auth = build_authorization_record(repo_root, plan_hash, ep_hash, frozen)
+        auth["endpoint_provenance_sha256"] = provenance
+        auth["part3b_completed"] = False
+        auth["status"] = "active_incomplete_accessibility_feasibility_probe"
         files = {
             F_AUTH: _json_str(auth),
             F_ENDPOINTS: ep_csv,
@@ -1099,14 +1401,25 @@ def run_plan(repo_root: Path, output_dir: Path, *, write: bool) -> dict:
         }
 
 
+def _append_attempt(rows: list[dict], row: dict) -> None:
+    rows.append({k: row.get(k) for k in ATTEMPT_HEADER})
+
+
 def run_capture(repo_root: Path, output_dir: Path) -> dict:
-    """Perform approved read-only retrieval for planned URLs; update cache/handles/evidence."""
+    """Source-level origin-probe capture with shared evidence + linkage.
+
+    Prefer resume from existing immutable CacheHandles (zero network). New
+    network only when a planned canonical evidence_id has no verifiable handle.
+    Never forge a snapshot-backed evidence_id without an external handle.
+    """
     verify_baseline_commit(str(repo_root))
     verify_frozen_input_hashes(repo_root)
+    verify_endpoint_provenance_hashes(repo_root)
     if not (output_dir / F_PLAN).is_file() or not (output_dir / F_AUTH).is_file():
         raise QCFail("run --plan --write before --capture")
     plan = list(csv.DictReader((output_dir / F_PLAN).open(encoding="utf-8")))
     endpoints = list(csv.DictReader((output_dir / F_ENDPOINTS).open(encoding="utf-8")))
+    ep_by_source = {r["source_id"]: r for r in endpoints}
     registry = p3b0.load_source_registry(repo_root)
     schema = p3b0.load_frozen_evidence_schema(repo_root)
     cand_map = p3b0.load_candidate_source_map(repo_root)
@@ -1117,103 +1430,131 @@ def run_capture(repo_root: Path, output_dir: Path) -> dict:
         if r["plan_status"] == "planned" and r["request_url"] and r["http_method"]
     }
     stats = NetworkStats()
-    cache_root = repo_root / CACHE_DIR_REL
-    cache = p3b0.ImmutableCache(cache_root)
+    cache = p3b0.ImmutableCache(repo_root / CACHE_DIR_REL)
+    capture_run_id = f"capture_{EXPECTED_BASELINE_COMMIT[:12]}"
 
-    # Reuse successful snapshot per shared_snapshot_key
-    evidence_rows: list[dict] = []
-    handle_rows: list[dict] = []
-    shared_success: dict[str, dict] = {}
-
-    # Load existing handles if present for resume
-    existing_handles = {}
+    existing_handles: dict[str, dict] = {}
     if (output_dir / F_HANDLES).is_file():
         for row in csv.DictReader((output_dir / F_HANDLES).open(encoding="utf-8")):
+            if not row.get("binding_candidate_id") and row.get("candidate_id"):
+                row["binding_candidate_id"] = row["candidate_id"]
             existing_handles[row["evidence_id"]] = row
 
+    # Prior append-only attempts (keep; never rewrite unknown into invented values)
+    prior_attempts: list[dict] = []
+    if (output_dir / F_ATTEMPTS).is_file():
+        prior_attempts = list(csv.DictReader((output_dir / F_ATTEMPTS).open(encoding="utf-8")))
+
+    evidence_by_id: dict[str, dict] = {}
+    handle_rows: list[dict] = []
+    attempt_rows: list[dict] = list(prior_attempts)
+    linkage_rows: list[dict] = []
+    resumed_sources: set[str] = set()
+    fetched_sources: set[str] = set()
+    attempt_seq = len(prior_attempts)
+
+    # Unique planned source fetches (canonical evidence per source)
+    planned_by_source: dict[str, dict] = {}
+    for prow in plan:
+        if prow["plan_status"] == "planned":
+            planned_by_source.setdefault(prow["source_id"], prow)
+
+    def _resume_source(source_id: str, prow: dict) -> bool:
+        nonlocal attempt_seq
+        eid = prow["canonical_evidence_id"]
+        binding_cand = CANONICAL_EVIDENCE_BINDING_CANDIDATE[eid]
+        owner = _source_owner(registry, source_id)
+        h = existing_handles.get(eid)
+        if h is None:
+            return False
+        verified = verify_external_handle_binding(cache, h, expected_evidence_id=eid)
+        rec = evidence_record_from_cache_meta(
+            evidence_id=eid,
+            candidate_id=binding_cand,
+            source_id=source_id,
+            source_owner=owner,
+            meta=verified["metadata"],
+            payload_sha256=verified["payload_sha256"],
+        )
+        validate_and_seal_real_evidence(
+            {k: (None if v == "" else v) for k, v in rec.items()},
+            schema=schema, candidate_source_map=cand_map,
+            source_registry=registry,
+            metadata_sha256=h["metadata_sha256"],
+            external_handle_sha256=h["external_handle_sha256"],
+            allowed_snapshot_root=repo_root / "project/stage125",
+        )
+        evidence_by_id[eid] = rec
+        handle_rows.append({
+            "evidence_id": eid,
+            "payload_sha256": h["payload_sha256"],
+            "metadata_sha256": h["metadata_sha256"],
+            "cache_contract_version": h.get(
+                "cache_contract_version", p3b0.CACHE_CONTRACT_VERSION,
+            ),
+            "cache_handle_schema_version": h.get(
+                "cache_handle_schema_version", p3b0.CACHE_HANDLE_SCHEMA_VERSION,
+            ),
+            "external_handle_sha256": h["external_handle_sha256"],
+            "source_id": source_id,
+            "binding_candidate_id": binding_cand,
+        })
+        # Append resume audit row only if not already logged for this evidence
+        if not any(a.get("canonical_evidence_id") == eid for a in attempt_rows):
+            attempt_seq += 1
+            meta = verified["metadata"]
+            _append_attempt(attempt_rows, {
+                "capture_run_id": capture_run_id,
+                "attempt_id": f"att_{attempt_seq:04d}",
+                "planned_request_url": prow["request_url"],
+                "http_method": prow["http_method"],
+                "started_at_utc": None,
+                "completed_at_utc": meta.get("retrieved_at_utc"),
+                "final_url": meta.get("final_resolved_url") or meta.get("request_url"),
+                "response_status": meta.get("response_status"),
+                "content_type": None,
+                "byte_count": verified["byte_count"],
+                "redirect_count": None,
+                "payload_sha256": verified["payload_sha256"],
+                "metadata_sha256": verified["metadata_sha256"],
+                "success": True,
+                "failure_class": None,
+                "shared_snapshot_key": source_id,
+                "canonical_evidence_id": eid,
+                "network_log_complete": False,
+            })
+        resumed_sources.add(source_id)
+        return True
+
+    # Phase 1: resume all verifiable sources (fail closed; no silent refetch)
+    for source_id, prow in planned_by_source.items():
+        eid = prow["canonical_evidence_id"]
+        if eid not in existing_handles:
+            continue
+        try:
+            _resume_source(source_id, prow)
+        except (EvidenceCacheUnavailable, QCFail) as exc:
+            # Handle row exists but cache/handle integrity failed — never refetch.
+            raise EvidenceCacheUnavailable(f"{eid}: {exc}") from exc
+
+    need_fetch = {
+        sid: prow for sid, prow in planned_by_source.items()
+        if sid not in resumed_sources
+    }
+
     with network_default_deny() as outer_sentinel:
-      with ReadOnlyNetworkPermit(allowed, stats=stats, sentinel=outer_sentinel) as permit:
-        for prow in plan:
-            cand_id = prow["candidate_id"]
-            source_id = prow["source_id"]
-            shared_key = prow["shared_snapshot_key"]
-            evidence_id = f"ev_{source_id}_{cand_id}"
+      if need_fetch:
+        with ReadOnlyNetworkPermit(allowed, stats=stats, sentinel=outer_sentinel) as permit:
+          for source_id, prow in need_fetch.items():
+            eid = prow["canonical_evidence_id"]
+            binding_cand = CANONICAL_EVIDENCE_BINDING_CANDIDATE[eid]
             owner = _source_owner(registry, source_id)
-
-            if prow["plan_status"] != "planned":
-                evidence_rows.append(empty_evidence_record(
-                    evidence_id=evidence_id,
-                    candidate_id=cand_id,
-                    source_id=source_id,
-                    source_owner=owner,
-                    failure_reason=prow.get("blocker_reason") or "plan_blocked",
-                ))
-                continue
-
-            if shared_key in shared_success:
-                base = {
-                    k: v for k, v in shared_success[shared_key].items()
-                    if not str(k).startswith("_")
-                }
-                base["evidence_id"] = evidence_id
-                base["candidate_id"] = cand_id
-                evidence_rows.append(base)
-                # Shared snapshot: reuse evidence fields/snapshot hash, but do NOT
-                # forge a CacheHandle for a different evidence_id (metadata is
-                # write-once bound to the first put). Handle row omitted.
-                continue
-
-            # Resume if evidence already captured
-            if evidence_id in existing_handles:
-                h = existing_handles[evidence_id]
-                try:
-                    handle = p3b0.CacheHandle(
-                        evidence_id=h["evidence_id"],
-                        payload_sha256=h["payload_sha256"],
-                        metadata_sha256=h["metadata_sha256"],
-                        cache_contract_version=h.get("cache_contract_version", p3b0.CACHE_CONTRACT_VERSION),
-                        schema_version=h.get("cache_handle_schema_version", p3b0.CACHE_HANDLE_SCHEMA_VERSION),
-                    )
-                    payload = cache.get_by_handle(handle)
-                    retrieved = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-                    rec = successful_probe_evidence_record(
-                        evidence_id=evidence_id,
-                        candidate_id=cand_id,
-                        source_id=source_id,
-                        source_owner=owner,
-                        source_url=prow["request_url"],
-                        retrieved_at_utc=retrieved,
-                        response_status=200,
-                        snapshot_rel=f"raw_cache_part3b/{handle.payload_sha256[:2]}/{handle.payload_sha256}/payload.bin",
-                        snapshot_sha256=handle.payload_sha256,
-                        license_notes="raw bytes retained in local immutable cache; redistribution per source terms",
-                    )
-                    # validate
-                    validate_and_seal_real_evidence(
-                        {k: (None if v == "" else v) for k, v in rec.items()},
-                        schema=schema, candidate_source_map=cand_map,
-                        source_registry=registry,
-                        metadata_sha256=handle.metadata_sha256,
-                        external_handle_sha256=h.get("external_handle_sha256"),
-                        allowed_snapshot_root=repo_root / "project/stage125",
-                    )
-                    del payload
-                    evidence_rows.append(rec)
-                    handle_rows.append(h)
-                    shared_success[shared_key] = {
-                        **rec,
-                        "_payload_sha256": handle.payload_sha256,
-                        "_metadata_sha256": handle.metadata_sha256,
-                        "_external_handle_sha256": h.get("external_handle_sha256"),
-                        "_bound_evidence_id": evidence_id,
-                    }
-                    continue
-                except Exception:
-                    pass  # fall through to re-fetch
-
+            attempt_seq += 1
+            attempt_id = f"att_{attempt_seq:04d}"
+            started = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
             try:
                 body, meta = permit.request(prow["http_method"], prow["request_url"])
-                retrieved = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+                completed = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
                 put = cache.put(
                     body,
                     metadata={
@@ -1221,31 +1562,27 @@ def run_capture(repo_root: Path, output_dir: Path) -> dict:
                         "request_url": prow["request_url"],
                         "final_resolved_url": meta["final_resolved_url"],
                         "response_status": meta["response_status"],
-                        "retrieved_at_utc": retrieved,
-                        "retrieval_purpose": prow["retrieval_purpose"],
+                        "retrieved_at_utc": completed,
+                        "retrieval_purpose": "source_origin_probe",
+                        "evidence_class": EVIDENCE_CLASS_ORIGIN_PROBE,
                     },
-                    evidence_id=evidence_id,
+                    evidence_id=eid,
                 )
-                handle = p3b0.cache_handle_from_put_result(evidence_id, put)
+                handle = p3b0.cache_handle_from_put_result(eid, put)
                 serialized = p3b0.serialize_cache_handle(handle)
                 handle_sha = p3b0.cache_handle_sha256(serialized)
-                # Materialize snapshot path under stage125 for schema path checks
-                snap_dir = repo_root / "project/stage125/raw_cache_part3b" / put.payload_sha256[:2] / put.payload_sha256
-                snap_rel = f"raw_cache_part3b/{put.payload_sha256[:2]}/{put.payload_sha256}/payload.bin"
-                rec = successful_probe_evidence_record(
-                    evidence_id=evidence_id,
-                    candidate_id=cand_id,
+                rec = evidence_record_from_cache_meta(
+                    evidence_id=eid,
+                    candidate_id=binding_cand,
                     source_id=source_id,
                     source_owner=owner,
-                    source_url=meta["final_resolved_url"],
-                    retrieved_at_utc=retrieved,
-                    response_status=meta["response_status"],
-                    snapshot_rel=snap_rel,
-                    snapshot_sha256=put.payload_sha256,
-                    license_notes=(
-                        "raw bytes retained in local immutable cache only; "
-                        "manifest/handles committed; redistribution subject to source terms"
-                    ),
+                    meta={
+                        "retrieved_at_utc": completed,
+                        "response_status": meta["response_status"],
+                        "final_resolved_url": meta["final_resolved_url"],
+                        "request_url": prow["request_url"],
+                    },
+                    payload_sha256=put.payload_sha256,
                 )
                 validate_and_seal_real_evidence(
                     {k: (None if v == "" else v) for k, v in rec.items()},
@@ -1255,97 +1592,207 @@ def run_capture(repo_root: Path, output_dir: Path) -> dict:
                     external_handle_sha256=handle_sha,
                     allowed_snapshot_root=repo_root / "project/stage125",
                 )
-                evidence_rows.append(rec)
-                hrow = {
-                    "evidence_id": evidence_id,
+                evidence_by_id[eid] = rec
+                handle_rows.append({
+                    "evidence_id": eid,
                     "payload_sha256": put.payload_sha256,
                     "metadata_sha256": put.metadata_sha256,
                     "cache_contract_version": p3b0.CACHE_CONTRACT_VERSION,
                     "cache_handle_schema_version": p3b0.CACHE_HANDLE_SCHEMA_VERSION,
                     "external_handle_sha256": handle_sha,
                     "source_id": source_id,
-                    "candidate_id": cand_id,
-                }
-                handle_rows.append(hrow)
-                shared_success[shared_key] = {
-                    **rec,
-                    "_payload_sha256": put.payload_sha256,
-                    "_metadata_sha256": put.metadata_sha256,
-                    "_external_handle_sha256": handle_sha,
-                    "_bound_evidence_id": evidence_id,
-                }
-                del snap_dir
+                    "binding_candidate_id": binding_cand,
+                })
+                _append_attempt(attempt_rows, {
+                    "capture_run_id": capture_run_id,
+                    "attempt_id": attempt_id,
+                    "planned_request_url": prow["request_url"],
+                    "http_method": prow["http_method"],
+                    "started_at_utc": started,
+                    "completed_at_utc": completed,
+                    "final_url": meta["final_resolved_url"],
+                    "response_status": meta["response_status"],
+                    "content_type": meta.get("content_type"),
+                    "byte_count": meta.get("bytes"),
+                    "redirect_count": meta.get("redirect_count"),
+                    "payload_sha256": put.payload_sha256,
+                    "metadata_sha256": put.metadata_sha256,
+                    "success": True,
+                    "failure_class": None,
+                    "shared_snapshot_key": source_id,
+                    "canonical_evidence_id": eid,
+                    "network_log_complete": True,
+                })
+                fetched_sources.add(source_id)
             except Exception as exc:
-                evidence_rows.append(empty_evidence_record(
-                    evidence_id=evidence_id,
+                _append_attempt(attempt_rows, {
+                    "capture_run_id": capture_run_id,
+                    "attempt_id": attempt_id,
+                    "planned_request_url": prow["request_url"],
+                    "http_method": prow["http_method"],
+                    "started_at_utc": started,
+                    "completed_at_utc": datetime.now(timezone.utc).strftime(
+                        "%Y-%m-%dT%H:%M:%SZ"
+                    ),
+                    "final_url": None,
+                    "response_status": None,
+                    "content_type": None,
+                    "byte_count": None,
+                    "redirect_count": None,
+                    "payload_sha256": None,
+                    "metadata_sha256": None,
+                    "success": False,
+                    "failure_class": f"{type(exc).__name__}:{exc}",
+                    "shared_snapshot_key": source_id,
+                    "canonical_evidence_id": eid,
+                    "network_log_complete": True,
+                })
+                raise
+
+    # Blocked sources: one source-level unresolved evidence row (no snapshot)
+    blocked_sources = sorted({
+        r["source_id"] for r in plan if r["plan_status"] != "planned"
+        and r["source_id"] in {CANDIDATE_SOURCE_MAP[c] for c in REGISTERED_CANDIDATE_IDS}
+    })
+    for source_id in blocked_sources:
+        if source_id in CANONICAL_SOURCE_EVIDENCE_ID:
+            continue  # planned sources only
+        eid = f"ev_{source_id}"
+        # pick first candidate for schema-required candidate_id
+        cand_id = next(
+            c for c in REGISTERED_CANDIDATE_IDS if CANDIDATE_SOURCE_MAP[c] == source_id
+        )
+        reason = next(
+            (r.get("blocker_reason") for r in plan if r["source_id"] == source_id),
+            "plan_blocked",
+        )
+        evidence_by_id[eid] = empty_evidence_record(
+            evidence_id=eid,
+            candidate_id=cand_id,
+            source_id=source_id,
+            source_owner=_source_owner(registry, source_id),
+            failure_reason=reason or "plan_blocked",
+        )
+
+    # Linkage: every registered candidate → canonical evidence
+    for prow in plan:
+        cand_id = prow["candidate_id"]
+        source_id = prow["source_id"]
+        eid = prow.get("canonical_evidence_id") or f"ev_{source_id}"
+        if prow["plan_status"] == "planned" and eid in evidence_by_id and evidence_by_id[eid].get("snapshot_sha256"):
+            # Require handle for every snapshot-backed evidence
+            if not any(h["evidence_id"] == eid for h in handle_rows):
+                raise QCFail(f"snapshot-backed evidence without handle: {eid}")
+            linkage_rows.append({
+                "candidate_id": cand_id,
+                "source_id": source_id,
+                "evidence_id": eid,
+                "evidence_class": EVIDENCE_CLASS_ORIGIN_PROBE,
+                "linkage_status": "linked_shared_source_origin_probe",
+                "failure_reason": "",
+            })
+        else:
+            if eid not in evidence_by_id:
+                evidence_by_id[eid] = empty_evidence_record(
+                    evidence_id=eid,
                     candidate_id=cand_id,
                     source_id=source_id,
-                    source_owner=owner,
-                    failure_reason=f"capture_failed:{type(exc).__name__}:{exc}",
-                ))
+                    source_owner=_source_owner(registry, source_id),
+                    failure_reason=prow.get("blocker_reason") or "plan_blocked",
+                )
+            linkage_rows.append({
+                "candidate_id": cand_id,
+                "source_id": source_id,
+                "evidence_id": eid,
+                "evidence_class": EVIDENCE_CLASS_BLOCKED,
+                "linkage_status": "unresolved",
+                "failure_reason": prow.get("blocker_reason") or "plan_blocked",
+            })
 
-    # Normalize evidence for CSV (None -> empty)
+    # Final invariant: every snapshot-backed evidence has exactly one handle
+    for eid, rec in evidence_by_id.items():
+        if rec.get("snapshot_sha256"):
+            matches = [h for h in handle_rows if h["evidence_id"] == eid]
+            if len(matches) != 1:
+                raise QCFail(
+                    f"snapshot-backed evidence must have exactly one handle: {eid}"
+                )
+
     ev_header = p3b0.evidence_header_from_schema(schema)
     ev_out = []
-    for r in evidence_rows:
+    for eid in sorted(evidence_by_id):
+        r = evidence_by_id[eid]
         ev_out.append({k: ("" if r.get(k) is None else r.get(k, "")) for k in ev_header})
 
-    handle_header = HANDLE_HEADER
-    # strip helper keys from handle rows
-    handles_clean = [{k: h.get(k, "") for k in handle_header} for h in handle_rows]
-
-    unique_snapshots = len({
-        h["payload_sha256"] for h in handles_clean if h.get("payload_sha256")
-    })
-    prior_log: dict[str, Any] = {}
+    handles_clean = [{k: h.get(k, "") for k in HANDLE_HEADER} for h in handle_rows]
+    unique_snapshots = len({h["payload_sha256"] for h in handles_clean if h.get("payload_sha256")})
+    network_log_complete = all(
+        str(a.get("network_log_complete")).lower() == "true" for a in attempt_rows
+    ) if attempt_rows else False
+    network_log = {
+        "stage": QC_STAGE,
+        "baseline_commit": EXPECTED_BASELINE_COMMIT,
+        "capture_run_id": capture_run_id,
+        "network_calls_attempted": stats.network_calls_attempted,
+        "network_calls_succeeded": stats.network_calls_succeeded,
+        "network_calls_failed": stats.network_calls_failed,
+        "bytes_retrieved": stats.bytes_retrieved,
+        "final_resolved_urls": sorted(set(stats.final_resolved_urls)),
+        "response_statuses": list(stats.response_statuses),
+        "redirect_counts": list(stats.redirect_counts),
+        "hosts_contacted": sorted({
+            urllib.parse.urlparse(u).hostname
+            for u in stats.final_resolved_urls
+            if urllib.parse.urlparse(u).hostname
+        }),
+        "http_methods": ["GET"] if stats.network_calls_attempted else [],
+        "network_extraction_performed": (
+            stats.network_calls_succeeded > 0 or unique_snapshots > 0
+        ),
+        "unique_raw_snapshot_count": unique_snapshots,
+        "evidence_record_count": len(ev_out),
+        "handle_count": len(handles_clean),
+        "resume_verified_without_new_network": (
+            stats.network_calls_attempted == 0 and bool(resumed_sources)
+        ),
+        "network_log_complete": network_log_complete,
+        "evidence_class": EVIDENCE_CLASS_ORIGIN_PROBE,
+        "notes": (
+            "Per-request rows in part3b_capture_attempt_log_stage125.csv. "
+            "Resume rows may set network_log_complete=false when redirect_count/"
+            "content_type/started_at were not retained at original capture time. "
+            "Never invent those fields. Cache is local-only / not in git."
+        ),
+        "part3b_completed": False,
+        "status": "active_incomplete_accessibility_feasibility_probe",
+    }
+    # If resume-only, preserve prior live attempt/success counts when present
     prior_path = output_dir / F_NETWORK_LOG
-    if prior_path.is_file():
+    if stats.network_calls_attempted == 0 and prior_path.is_file():
         try:
-            prior_log = json.loads(prior_path.read_text(encoding="utf-8"))
+            prior = json.loads(prior_path.read_text(encoding="utf-8"))
+            if int(prior.get("network_calls_attempted") or 0) > 0:
+                for key in (
+                    "network_calls_attempted", "network_calls_succeeded",
+                    "network_calls_failed", "bytes_retrieved",
+                    "final_resolved_urls", "hosts_contacted", "http_methods",
+                    "response_statuses",
+                ):
+                    if key in prior:
+                        network_log[key] = prior[key]
+                network_log["network_extraction_performed"] = True
+                # Do not copy invented redirect_counts; keep attempt log as source
+                network_log["redirect_counts"] = prior.get("redirect_counts")
+                if prior.get("redirect_counts") == []:
+                    network_log["redirect_counts"] = None
         except (json.JSONDecodeError, OSError):
-            prior_log = {}
+            pass
 
-    # Resume/idempotent reruns that only verify cache must not wipe honest
-    # historical network attempt/success counts from a prior live capture.
-    if stats.network_calls_attempted == 0 and int(prior_log.get("network_calls_attempted") or 0) > 0:
-        network_log = dict(prior_log)
-        network_log["unique_raw_snapshot_count"] = unique_snapshots
-        network_log["evidence_record_count"] = len(ev_out)
-        network_log["resume_verified_without_new_network"] = True
-        network_log["network_extraction_performed"] = bool(
-            prior_log.get("network_extraction_performed") or unique_snapshots > 0
-        )
-    else:
-        network_log = {
-            "stage": QC_STAGE,
-            "baseline_commit": EXPECTED_BASELINE_COMMIT,
-            "network_calls_attempted": stats.network_calls_attempted,
-            "network_calls_succeeded": stats.network_calls_succeeded,
-            "network_calls_failed": stats.network_calls_failed,
-            "bytes_retrieved": stats.bytes_retrieved,
-            "final_resolved_urls": sorted(set(stats.final_resolved_urls)),
-            "response_statuses": list(stats.response_statuses),
-            "redirect_counts": list(stats.redirect_counts),
-            "hosts_contacted": sorted({
-                urllib.parse.urlparse(u).hostname
-                for u in stats.final_resolved_urls
-                if urllib.parse.urlparse(u).hostname
-            }),
-            "http_methods": ["GET"],
-            "network_extraction_performed": (
-                stats.network_calls_succeeded > 0 or unique_snapshots > 0
-            ),
-            "unique_raw_snapshot_count": unique_snapshots,
-            "evidence_record_count": len(ev_out),
-            "resume_verified_without_new_network": False,
-            "notes": (
-                "Persisted at capture time. --write/--check must reuse these stats "
-                "and must not claim zero attempts after successful retrieval."
-            ),
-        }
     files = {
         F_EVIDENCE: _csv_str(ev_header, ev_out),
-        F_HANDLES: _csv_str(handle_header, handles_clean),
+        F_HANDLES: _csv_str(HANDLE_HEADER, handles_clean),
+        F_LINKAGE: _csv_str(LINKAGE_HEADER, linkage_rows),
+        F_ATTEMPTS: _csv_str(ATTEMPT_HEADER, attempt_rows),
         F_NETWORK_LOG: _json_str(network_log),
     }
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -1356,18 +1803,109 @@ def run_capture(repo_root: Path, output_dir: Path) -> dict:
         "mode": "capture",
         "files": files,
         "network_stats": stats.__dict__,
-        "network_extraction_performed": stats.network_calls_succeeded > 0,
+        "network_extraction_performed": network_log["network_extraction_performed"],
         "evidence_count": len(ev_out),
         "handle_count": len(handles_clean),
-        "unique_snapshot_count": network_log["unique_raw_snapshot_count"],
+        "unique_snapshot_count": unique_snapshots,
+        "linkage_count": len(linkage_rows),
         "output_dir": str(output_dir),
         "written": True,
-        "endpoints_contacted": network_log["final_resolved_urls"],
+        "endpoints_contacted": network_log.get("final_resolved_urls") or [],
+        "resumed_sources": sorted(resumed_sources),
+        "fetched_sources": sorted(fetched_sources),
     }
 
 
-def _evidence_by_candidate(evidence_rows: list[dict]) -> dict[str, dict]:
-    return {r["candidate_id"]: r for r in evidence_rows}
+def build_decision_requirements() -> tuple[dict, str]:
+    """Part 3B.1 decision requirements — list gaps; do not select answers."""
+    data = {
+        "proposed_micro_step_id":
+            "stage125-part3b1-feature-definition-scoring-adjudication-lock",
+        "proposed_micro_step_title":
+            "Stage125 Part 3B.1 — Feature Definition & Scoring Adjudication Lock",
+        "status": "proposed_not_started",
+        "requires_explicit_user_approval_before_start": True,
+        "part3b_completed": False,
+        "current_probe_status": "active_incomplete_accessibility_feasibility_probe",
+        "user_decisions_still_needed": [
+            {
+                "decision_id": "m2_feature_definitions",
+                "scope": ["cand_m2_equity_return_window", "cand_m2_realized_volatility",
+                          "cand_m2_amihud_illiquidity"],
+                "required": (
+                    "exact feature definition, unit and pre-cutoff window for each M2 variable"
+                ),
+                "selected_answer": None,
+            },
+            {
+                "decision_id": "m3_feature_definitions",
+                "scope": ["cand_m3_cpi_inflation", "cand_m3_fx_change_official",
+                          "cand_m3_policy_financing_rate"],
+                "required": (
+                    "exact transformation/unit/release series for each M3 variable"
+                ),
+                "selected_answer": None,
+            },
+            {
+                "decision_id": "m4_feature_definitions",
+                "scope": ["cand_m4_audit_opinion_type", "cand_m4_going_concern_flag",
+                          "cand_m4_audit_lag_days", "cand_m4_board_size"],
+                "required": (
+                    "exact document/field/derivation rules for each M4 variable"
+                ),
+                "selected_answer": None,
+            },
+            {
+                "decision_id": "rubric_score_mapping_0_5",
+                "scope": ["stage125_part3a_v1"],
+                "required": (
+                    "operational evidence-to-score mapping for rubric scores 0–5"
+                ),
+                "selected_answer": None,
+            },
+            {
+                "decision_id": "cbi_endpoint_provenance",
+                "scope": ["src_m3_cbi_macro"],
+                "required": "authoritative CBI endpoint/provenance decision",
+                "selected_answer": None,
+            },
+            {
+                "decision_id": "available_at_and_cutoff_rules",
+                "scope": ["prediction_cutoff", "available_at", "G06", "G07"],
+                "required": "available_at and prediction-cutoff rules",
+                "selected_answer": None,
+            },
+        ],
+        "explicit_non_claims": [
+            "current GETs are source_origin_probe only",
+            "not candidate_endpoint_evidence",
+            "not pair_value_evidence",
+            "no numeric accessibility scores assigned",
+            "not Stage126 admission",
+        ],
+    }
+    md = """# Stage125 Part 3B.1 — Feature Definition & Scoring Adjudication Lock
+
+**Status:** proposed / not started. Requires explicit user approval before any work.
+
+This artifact lists methodology decisions still required. It does **not** select
+answers, invent feature definitions, endpoints, dates, values, cutoffs, or scores.
+
+## Decisions still needed
+
+1. Exact feature definition, unit and pre-cutoff window for each M2 variable
+2. Exact transformation/unit/release series for each M3 variable
+3. Exact document/field/derivation rules for each M4 variable
+4. Operational evidence-to-score mapping for rubric scores 0–5
+5. Authoritative CBI endpoint/provenance decision
+6. `available_at` and prediction-cutoff rules
+
+## Current Part 3B probe status
+
+Stage125 Part 3B accessibility feasibility probe — **active/incomplete**.
+`part3b_completed=false`. Do not advance to Stage126 or modeling.
+"""
+    return data, md
 
 
 def run_write(repo_root: Path, output_dir: Path) -> dict:
@@ -1375,8 +1913,13 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
         verify_baseline_commit(str(repo_root))
         frozen_before = p3b0.frozen_asset_hashes(repo_root)
         frozen = verify_frozen_input_hashes(repo_root)
+        provenance = verify_endpoint_provenance_hashes(repo_root)
         if not (output_dir / F_EVIDENCE).is_file():
             raise QCFail("evidence manifest missing; run --capture first")
+        if not (output_dir / F_LINKAGE).is_file():
+            raise QCFail("candidate-evidence linkage missing; run --capture first")
+        if not (output_dir / F_HANDLES).is_file():
+            raise QCFail("cache handles missing; run --capture first")
         schema = p3b0.load_frozen_evidence_schema(repo_root)
         registry = p3b0.load_source_registry(repo_root)
         cand_map = p3b0.load_candidate_source_map(repo_root)
@@ -1384,23 +1927,40 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
         pilots = p3b0.load_locked_pilot_pairs(repo_root)
         cutoff_map = load_prediction_cutoff_map(repo_root)
         evidence_rows = list(csv.DictReader((output_dir / F_EVIDENCE).open(encoding="utf-8")))
-        handle_rows = []
-        if (output_dir / F_HANDLES).is_file():
-            handle_rows = list(csv.DictReader((output_dir / F_HANDLES).open(encoding="utf-8")))
+        handle_rows = list(csv.DictReader((output_dir / F_HANDLES).open(encoding="utf-8")))
+        linkage_rows = list(csv.DictReader((output_dir / F_LINKAGE).open(encoding="utf-8")))
+        endpoints = list(csv.DictReader((output_dir / F_ENDPOINTS).open(encoding="utf-8")))
+        ep_by_source = {r["source_id"]: r for r in endpoints}
         handles_by_eid = {h["evidence_id"]: h for h in handle_rows}
-        ev_by_cand = _evidence_by_candidate(evidence_rows)
+        ev_by_id = {r["evidence_id"]: r for r in evidence_rows}
+        link_by_cand = {r["candidate_id"]: r for r in linkage_rows}
+        cache = p3b0.ImmutableCache(repo_root / CACHE_DIR_REL)
 
-        # Scores: null unless uniquely supported — accessibility probe alone does not uniquely map to 0-5
+        # Snapshot-backed evidence must have exactly one verifiable handle
+        for ev in evidence_rows:
+            if ev.get("snapshot_sha256"):
+                h = handles_by_eid.get(ev["evidence_id"])
+                if h is None:
+                    raise QCFail(
+                        f"snapshot-backed evidence without handle: {ev['evidence_id']}"
+                    )
+                verify_external_handle_binding(
+                    cache, h, expected_evidence_id=ev["evidence_id"],
+                )
+
+        # Scores: null — origin probe never uniquely maps to rubric 0-5
         score_rows = []
         for cand_id in REGISTERED_CANDIDATE_IDS:
-            ev = ev_by_cand.get(cand_id)
+            link = link_by_cand.get(cand_id) or {}
             source_id = CANDIDATE_SOURCE_MAP[cand_id]
-            eids = [ev["evidence_id"]] if ev and ev.get("evidence_id") else []
-            if ev and ev.get("snapshot_sha256"):
+            eid = link.get("evidence_id") or ""
+            ev = ev_by_id.get(eid) or {}
+            eids = [eid] if eid else []
+            if ev.get("snapshot_sha256"):
                 rationale = (
-                    "Official-source accessibility probe evidence exists, but the "
-                    "frozen rubric does not uniquely determine a numeric score from "
-                    "HTTP accessibility alone without human adjudication."
+                    "source_origin_probe evidence exists (not candidate_value / "
+                    "not pair_value). Frozen rubric does not uniquely determine a "
+                    "numeric score without human adjudication."
                 )
             else:
                 rationale = (
@@ -1409,11 +1969,9 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
                 )
             score_rows.append(null_score_row(cand_id, source_id, eids, rationale))
 
-        # 800 assessments
         assess_rows = []
         gate_detail_rows = []
         unresolved_rows = []
-        pair_records_for_g11 = []  # retained for audit trail in assessments
 
         for pair in pilots:
             pred = pair["predictor_row_key_t"]
@@ -1422,25 +1980,36 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
             cutoff, cutoff_ok = pair_prediction_cutoff(audit)
             for cand_id in REGISTERED_CANDIDATE_IDS:
                 source_id = CANDIDATE_SOURCE_MAP[cand_id]
-                ev = ev_by_cand.get(cand_id) or {}
-                eid = ev.get("evidence_id") or ""
-                h = handles_by_eid.get(eid, {})
+                link = link_by_cand.get(cand_id) or {}
+                eid = link.get("evidence_id") or ""
+                ev = ev_by_id.get(eid) or {}
+                h = handles_by_eid.get(eid)
                 assessment_id = f"assess_{pred}_{targ}_{cand_id}".replace("|", "_")
 
-                # Build sealed assessment inputs
                 has_snap = bool(ev.get("snapshot_sha256"))
                 failure_bits = []
+                if link.get("evidence_class") == EVIDENCE_CLASS_ORIGIN_PROBE:
+                    failure_bits.append(
+                        "evidence_class=source_origin_probe_not_candidate_or_pair_value"
+                    )
                 if not has_snap:
-                    failure_bits.append(ev.get("failure_reason") or "missing_snapshot_evidence")
+                    failure_bits.append(
+                        ev.get("failure_reason") or link.get("failure_reason")
+                        or "missing_snapshot_evidence"
+                    )
                 failure_bits.append(DEFINITION_CONTRACT_GAP)
                 if not cutoff_ok:
                     failure_bits.append("prediction_cutoff_unresolvable_in_part2_audit")
 
-                # Gate derivation via sealed real path when possible
-                score = None  # never invent
-                auth_src = True if has_snap else None
-                repro = True if has_snap else None
-                quality = False if has_snap else None  # definition gap => quality not met
+                score = None
+                auth_src, repro, auth_notes = derive_gate_authority_flags(
+                    evidence_row=ev,
+                    handle_row=h,
+                    cache=cache,
+                    endpoint_row=ep_by_source.get(source_id),
+                )
+                failure_bits.extend(auth_notes)
+                quality = False if has_snap else None
 
                 gstat = {
                     "G01": p3b0.GATE_UNRESOLVED,
@@ -1452,8 +2021,7 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
                     "G07": p3b0.GATE_UNRESOLVED,
                     "G08": p3b0.GATE_UNRESOLVED,
                 }
-                if has_snap:
-                    # Normalize record nulls
+                if has_snap and h is not None and auth_src is not None and repro is not None:
                     rec = _coerce_evidence_record_types(
                         {k: (None if ev.get(k) in ("", None) else ev.get(k)) for k in ev}
                     )
@@ -1481,6 +2049,9 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
                     except Exception as exc:
                         failure_bits.append(f"seal_or_gate_error:{type(exc).__name__}")
                         gstat = {k: p3b0.GATE_FAIL for k in gstat}
+                elif has_snap and h is None:
+                    failure_bits.append("snapshot_backed_evidence_without_handle")
+                    gstat = {k: p3b0.GATE_FAIL for k in gstat}
 
                 # Assessment status: PASS only if G08 PASS (won't happen with null score)
                 if gstat["G08"] == p3b0.GATE_PASS:
@@ -1504,8 +2075,8 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
                     prediction_cutoff=cutoff,
                     evidence_id=eid or None,
                     snapshot_sha256=ev.get("snapshot_sha256") or None,
-                    metadata_sha256=h.get("metadata_sha256") or None,
-                    external_handle_sha256=h.get("external_handle_sha256") or None,
+                    metadata_sha256=(h or {}).get("metadata_sha256") or None,
+                    external_handle_sha256=(h or {}).get("external_handle_sha256") or None,
                     assessment_status=astatus,
                     usability_flag=usable,
                 )
@@ -1604,6 +2175,11 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
                 "status": status, "detail": "derived_from_sealed_assessments",
             })
 
+        research_failed = [
+            gid for gid, st in (
+                ("G09", g09), ("G10", g10), ("G11", g11), ("G12", g12),
+            ) if st != p3b0.GATE_PASS
+        ]
         gate_summary = {
             "G09": g09, "G10": g10, "G11": g11, "G12": g12, "G13": g13, "G14": g14,
             "assessment_count": 800,
@@ -1621,42 +2197,28 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
             "definition_contract_gap": DEFINITION_CONTRACT_GAP,
             "modeling_started": False,
             "part3b_completed": False,
-            "status": "active_in_review",
+            "research_gate_all_pass": False,
+            "research_gate_failed": research_failed,
+            "status": "active_incomplete_accessibility_feasibility_probe",
         }
 
         network_log_path = output_dir / F_NETWORK_LOG
-        if network_log_path.is_file():
-            network_log = json.loads(network_log_path.read_text(encoding="utf-8"))
-        else:
-            network_log = {
-                "network_calls_attempted": 0,
-                "network_calls_succeeded": 0,
-                "network_calls_failed": 0,
-                "bytes_retrieved": 0,
-                "final_resolved_urls": [],
-                "hosts_contacted": [],
-                "network_extraction_performed": False,
-            }
+        if not network_log_path.is_file():
+            raise QCFail("network log missing")
+        network_log = json.loads(network_log_path.read_text(encoding="utf-8"))
         net_attempted = int(network_log.get("network_calls_attempted") or 0)
         net_succeeded = int(network_log.get("network_calls_succeeded") or 0)
         net_failed = int(network_log.get("network_calls_failed") or 0)
         bytes_retrieved = int(network_log.get("bytes_retrieved") or 0)
-        network_extraction = bool(
-            network_log.get("network_extraction_performed")
-            or any(e.get("access_method") == "https_get_readonly_permit" for e in evidence_rows)
-        )
+        network_extraction = bool(network_log.get("network_extraction_performed"))
         if network_extraction and net_attempted == 0:
             raise QCFail(
-                "network_extraction_performed=true but network_calls_attempted=0; "
-                "capture network log missing or dishonest"
+                "network_extraction_performed=true but network_calls_attempted=0"
             )
 
-        # Evidence-backed numeric score required; null/UNRESOLVED alone is not scoring applied.
-        scoring_applied = any(
-            s.get("accessibility_score") not in ("", None)
-            and s.get("evidence_ids_cited")
-            for s in score_rows
-        )
+        scoring_applied = False  # all numeric scores absent by design in this probe
+        if any(s.get("accessibility_score") not in ("", None) for s in score_rows):
+            raise QCFail("numeric accessibility score invented during feasibility probe")
 
         frozen_after = p3b0.frozen_asset_hashes(repo_root)
         if frozen_before != frozen_after:
@@ -1667,6 +2229,81 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
         test_sha = p3b0.sha256_file(repo_root / TEST_REL)
         if not src_sha or not test_sha:
             raise QCFail("missing source/test fingerprint for QC")
+
+        decision_data, decision_md = build_decision_requirements()
+        pos = sum(1 for r in pilots if r["class_label"] == "positive")
+        neg = sum(1 for r in pilots if r["class_label"] == "negative")
+        unk = sum(1 for r in pilots if r["class_label"] == "unknown")
+        snap_eids = {e["evidence_id"] for e in evidence_rows if e.get("snapshot_sha256")}
+        handle_eids = {h["evidence_id"] for h in handle_rows}
+
+        def _assert(name: str, ok: bool, detail: str = "") -> dict:
+            return {
+                "assertion": name,
+                "status": "PASS" if ok else "FAIL",
+                "detail": detail,
+            }
+
+        assertions = [
+            _assert("exact_80_locked_pairs", len(pilots) == 80, str(len(pilots))),
+            _assert("exact_10_candidates", len(REGISTERED_CANDIDATE_IDS) == 10, "10"),
+            _assert("exact_800_unique_assessments",
+                    len(assess_rows) == 800 and len({r["assessment_id"] for r in assess_rows}) == 800,
+                    str(len(assess_rows))),
+            _assert("frozen_labels_years_allocation",
+                    pos == 39 and neg == 41 and unk == 0 and g14 == p3b0.GATE_PASS,
+                    f"pos={pos},neg={neg},unk={unk},g14={g14}"),
+            _assert("no_sample_target_eligibility_change",
+                    frozen_before == frozen_after, "before==after"),
+            _assert("no_modeling", True, "modeling_started=false"),
+            _assert("frozen_scientific_assets_unchanged",
+                    frozen_before == frozen_after, "before==after"),
+            _assert("endpoint_provenance_hashes_verified",
+                    bool(provenance), f"n={len(provenance)}"),
+            _assert("network_hosts_methods_allowlisted",
+                    set(network_log.get("hosts_contacted") or []).issubset(
+                        {"cdn.tsetmc.com", "www.codal.ir"}
+                    )
+                    and set(network_log.get("http_methods") or ["GET"]).issubset({"GET", "HEAD"}),
+                    str(network_log.get("hosts_contacted"))),
+            _assert("capture_attempt_log_present",
+                    (output_dir / F_ATTEMPTS).is_file(), F_ATTEMPTS),
+            _assert("evidence_handles_payload_consistent",
+                    snap_eids == handle_eids and len(snap_eids) == 3,
+                    f"snap={len(snap_eids)},handles={len(handle_eids)}"),
+            _assert("no_snapshot_without_handle",
+                    snap_eids <= handle_eids, "ok"),
+            _assert("score_rows_10", len(score_rows) == 10, str(len(score_rows))),
+            _assert("all_numeric_scores_absent",
+                    all(s.get("accessibility_score") in ("", None) for s in score_rows),
+                    "null"),
+            _assert("human_adjudication_required",
+                    all(s.get("requires_human_adjudication") == "true" for s in score_rows),
+                    "true"),
+            _assert("accessibility_scoring_applied_false", scoring_applied is False, "false"),
+            _assert("g09_g12_fail",
+                    all(x == p3b0.GATE_FAIL for x in (g09, g10, g11, g12)),
+                    f"{g09}/{g10}/{g11}/{g12}"),
+            _assert("g13_g14_pass",
+                    g13 == p3b0.GATE_PASS and g14 == p3b0.GATE_PASS,
+                    f"{g13}/{g14}"),
+            _assert("part3b_completed_false", True, "false"),
+            _assert("no_network_during_write",
+                    sentinel.calls_attempted == 0, str(sentinel.calls_attempted)),
+            _assert("linkage_rows_10", len(linkage_rows) == 10, str(len(linkage_rows))),
+            _assert("evidence_class_origin_probe_only",
+                    all(
+                        (link_by_cand[c].get("evidence_class") in (
+                            EVIDENCE_CLASS_ORIGIN_PROBE, EVIDENCE_CLASS_BLOCKED,
+                        ))
+                        for c in REGISTERED_CANDIDATE_IDS
+                    ),
+                    "ok"),
+        ]
+        execution_qc_all_pass = all(a["status"] == "PASS" for a in assertions)
+        if not execution_qc_all_pass:
+            failed = [a["assertion"] for a in assertions if a["status"] != "PASS"]
+            raise QCFail("execution QC failed: " + ", ".join(failed))
 
         content = {
             F_SCORES: _csv_str(SCORE_HEADER, score_rows),
@@ -1682,15 +2319,19 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
                 unresolved_rows,
             ),
             F_README: build_readme(),
+            F_DECISION_REQ: _json_str(decision_data),
+            F_DECISION_REQ_MD: decision_md if decision_md.endswith("\n") else decision_md + "\n",
         }
         content_hashes = {n: sha256_bytes(c.encode("utf-8")) for n, c in content.items()}
-
-        # Include plan/endpoint/evidence/handle/network-log hashes
-        for name in (F_AUTH, F_PLAN, F_ENDPOINTS, F_EVIDENCE, F_HANDLES, F_NETWORK_LOG):
+        for name in (
+            F_AUTH, F_PLAN, F_ENDPOINTS, F_EVIDENCE, F_HANDLES, F_LINKAGE,
+            F_ATTEMPTS, F_NETWORK_LOG,
+        ):
             path = output_dir / name
             if path.is_file():
                 content_hashes[name] = sha256_file(path)
 
+        endpoint_probe = any(e.get("snapshot_sha256") for e in evidence_rows)
         qc = {
             "stage": QC_STAGE,
             "current_stage": CURRENT_STAGE,
@@ -1702,17 +2343,26 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
                 str(repo_root),
                 p3b0._git(str(repo_root), "rev-parse", "HEAD"),
             ),
-            "assertion_count": 0,
+            "assertion_count": len(assertions),
             "failed_count": 0,
             "all_pass": True,
+            "execution_qc_all_pass": execution_qc_all_pass,
+            "research_gate_all_pass": False,
+            "research_gate_failed": research_failed,
             "ticker_count": len(tickers),
             "tickers": tickers,
             "part3a_protocol_locked": True,
             "part3a_decision_locked": True,
             "part3b0_readiness": True,
             "part3b_started": True,
-            "evidence_collected": any(e.get("snapshot_sha256") for e in evidence_rows),
-            "accessibility_scoring_applied": scoring_applied,
+            # evidence_collected = endpoint-probe evidence only (not 800 pair observations)
+            "evidence_collected": endpoint_probe,
+            "endpoint_probe_evidence_collected": endpoint_probe,
+            "candidate_value_evidence_collected": False,
+            "pair_level_evidence_collected": False,
+            "data_value_extraction_performed": False,
+            "accessibility_scoring_applied": False,
+            "part3b_completed": False,
             "network_extraction_performed": network_extraction,
             "modeling_started": False,
             "assessment_count": 800,
@@ -1722,6 +2372,7 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
             },
             "gate_summary": gate_summary,
             "frozen_input_sha256": frozen,
+            "endpoint_provenance_sha256": provenance,
             "output_sha256": content_hashes,
             "frozen_assets_before": frozen_before,
             "frozen_assets_after": frozen_after,
@@ -1731,54 +2382,57 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
             "bytes_retrieved": bytes_retrieved,
             "hosts_contacted": network_log.get("hosts_contacted") or [],
             "final_resolved_urls": network_log.get("final_resolved_urls") or [],
-            "unique_raw_snapshot_count": len({
-                e["snapshot_sha256"] for e in evidence_rows if e.get("snapshot_sha256")
-            }),
+            "unique_raw_snapshot_count": len(snap_eids),
             "evidence_record_count": len(evidence_rows),
+            "handle_count": len(handle_rows),
+            "linkage_count": len(linkage_rows),
+            "cache_portability": (
+                "local_immutable_cache_only_not_in_git;"
+                "fresh_checkout_without_raw_cache_part3b_fails_evidence_cache_unavailable"
+            ),
+            "status": "active_incomplete_accessibility_feasibility_probe",
             "guard_evidence": {
                 "network_calls_attempted_during_write": sentinel.calls_attempted,
                 "no_network_during_write": sentinel.calls_attempted == 0,
             },
-            "assertions": [
-                {"assertion": "assessment_matrix_800", "status": "PASS", "detail": "800"},
-                {"assertion": "no_modeling", "status": "PASS", "detail": "modeling_started=false"},
-                {"assertion": "frozen_assets_unchanged", "status": "PASS",
-                 "detail": "before==after"},
-                {"assertion": "g13_pass", "status": "PASS" if g13 == p3b0.GATE_PASS else "FAIL",
-                 "detail": g13},
-                {"assertion": "g14_pass", "status": "PASS" if g14 == p3b0.GATE_PASS else "FAIL",
-                 "detail": g14},
-            ],
+            "assertions": assertions,
         }
-        qc["assertion_count"] = len(qc["assertions"])
-        qc["failed_count"] = sum(1 for a in qc["assertions"] if a["status"] != "PASS")
-        qc["all_pass"] = qc["failed_count"] == 0
-        if not qc["all_pass"]:
-            raise QCFail("QC assertions failed")
-
         qc_str = _json_str(qc)
         qc_hash = sha256_bytes(qc_str.encode("utf-8"))
         content_hashes[F_QC] = qc_hash
         metadata = {
             "stage": QC_STAGE,
             "current_stage": CURRENT_STAGE,
-            "description": "Stage125 Part 3B — evidence capture & accessibility scoring pilot.",
+            "description": (
+                "Stage125 Part 3B accessibility feasibility probe — active/incomplete. "
+                "Not a completed Part 3B pilot. Not Stage126 admission."
+            ),
             "code_commit": qc["source_commit"],
             "baseline_commit": EXPECTED_BASELINE_COMMIT,
             "generated_at": qc["generated_at"],
             "output_files_sha256": dict(sorted({**content_hashes, F_QC: qc_hash}.items())),
             "frozen_input_sha256": frozen,
+            "endpoint_provenance_sha256": provenance,
             "part3b0_readiness": True,
             "part3b_started": True,
-            "evidence_collected": qc["evidence_collected"],
-            "accessibility_scoring_applied": scoring_applied,
+            "evidence_collected": endpoint_probe,
+            "endpoint_probe_evidence_collected": endpoint_probe,
+            "candidate_value_evidence_collected": False,
+            "pair_level_evidence_collected": False,
+            "data_value_extraction_performed": False,
+            "accessibility_scoring_applied": False,
+            "part3b_completed": False,
             "network_extraction_performed": network_extraction,
             "modeling_started": False,
+            "execution_qc_all_pass": True,
+            "research_gate_all_pass": False,
+            "research_gate_failed": research_failed,
             "assessment_count": 800,
-            "status": "active_in_review",
+            "status": "active_incomplete_accessibility_feasibility_probe",
             "warning": (
-                "Part 3B pilot accessibility outcomes only. Not final Stage126 "
-                "admission. Definition-contract gaps recorded fail-closed."
+                "Accessibility feasibility probe only. Source-origin probes are not "
+                "candidate-value or pair-level evidence. Local cache not in git. "
+                "Not Stage126 admission."
             ),
         }
         files = dict(content)
@@ -1798,7 +2452,8 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
         }
 
 
-def run_check(repo_root: Path, output_dir: Path) -> dict:
+def run_check_manifest_only(repo_root: Path, output_dir: Path) -> dict:
+    """Tracked output hash verification only — NOT full evidence verification."""
     with network_default_deny() as sentinel:
         verify_baseline_commit(str(repo_root))
         verify_frozen_input_hashes(repo_root)
@@ -1807,28 +2462,109 @@ def run_check(repo_root: Path, output_dir: Path) -> dict:
             raise QCFail("metadata missing; run --write first")
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
         hashes = meta.get("output_files_sha256") or {}
-        drift = []
-        for name, expected in sorted(hashes.items()):
-            path = output_dir / name
-            if not path.is_file() or sha256_file(path) != expected:
-                drift.append(name)
-        # Required invariants
-        assess_path = output_dir / F_ASSESS
-        if assess_path.is_file():
-            n = len(list(csv.DictReader(assess_path.open(encoding="utf-8"))))
-            if n != 800:
-                raise QCFail(f"assessment count {n} != 800")
+        drift = [
+            name for name, expected in sorted(hashes.items())
+            if not (output_dir / name).is_file()
+            or sha256_file(output_dir / name) != expected
+        ]
+        if drift:
+            raise QCFail("manifest-only check drift: " + ", ".join(drift))
+        if sentinel.calls_attempted != 0:
+            raise QCFail("network attempted during --check-manifest-only")
+        return {
+            "mode": "check-manifest-only",
+            "ok": True,
+            "warning": (
+                "manifest-only: does NOT verify immutable cache payloads; "
+                "not full evidence verification"
+            ),
+            "network_calls_attempted": 0,
+            "output_dir": str(output_dir),
+        }
+
+
+def run_check(repo_root: Path, output_dir: Path) -> dict:
+    """Full offline check including real immutable cache verification."""
+    with network_default_deny() as sentinel:
+        verify_baseline_commit(str(repo_root))
+        verify_frozen_input_hashes(repo_root)
+        verify_endpoint_provenance_hashes(repo_root)
+        meta_path = output_dir / F_METADATA
+        if not meta_path.is_file():
+            raise QCFail("metadata missing; run --write first")
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        hashes = meta.get("output_files_sha256") or {}
+        drift = [
+            name for name, expected in sorted(hashes.items())
+            if not (output_dir / name).is_file()
+            or sha256_file(output_dir / name) != expected
+        ]
         if drift:
             raise QCFail("check drift: " + ", ".join(drift))
+
+        policy = p3b0.load_locked_gate_policy(repo_root)
+        pilots = p3b0.load_locked_pilot_pairs(repo_root)
+        assess_rows = list(csv.DictReader((output_dir / F_ASSESS).open(encoding="utf-8")))
+        evidence_rows = list(csv.DictReader((output_dir / F_EVIDENCE).open(encoding="utf-8")))
+        handle_rows = list(csv.DictReader((output_dir / F_HANDLES).open(encoding="utf-8")))
+        linkage_rows = list(csv.DictReader((output_dir / F_LINKAGE).open(encoding="utf-8")))
+        if len(assess_rows) != 800:
+            raise QCFail(f"assessment count {len(assess_rows)} != 800")
+        if len({r["assessment_id"] for r in assess_rows}) != 800:
+            raise QCFail("duplicate assessment_id")
+        expected_keys = frozenset(policy.frozen_pilot_keys)
+        got_keys = {r["predictor_row_key_t"] for r in assess_rows}
+        if got_keys != expected_keys:
+            raise QCFail("assessment pilot keys != frozen 80")
+        for cand in REGISTERED_CANDIDATE_IDS:
+            n = sum(1 for r in assess_rows if r["candidate_id"] == cand)
+            if n != 80:
+                raise QCFail(f"candidate {cand} assessment count {n} != 80")
+        pos = sum(1 for r in pilots if r["class_label"] == "positive")
+        neg = sum(1 for r in pilots if r["class_label"] == "negative")
+        unk = sum(1 for r in pilots if r["class_label"] == "unknown")
+        if (pos, neg, unk) != (39, 41, 0):
+            raise QCFail(f"pilot allocation drift: {pos}/{neg}/{unk}")
+
+        cache = p3b0.ImmutableCache(repo_root / CACHE_DIR_REL)
+        handles_by_eid = {h["evidence_id"]: h for h in handle_rows}
+        for ev in evidence_rows:
+            if not ev.get("snapshot_sha256"):
+                continue
+            h = handles_by_eid.get(ev["evidence_id"])
+            if h is None:
+                raise QCFail(
+                    f"snapshot-backed evidence without handle: {ev['evidence_id']}"
+                )
+            try:
+                verify_external_handle_binding(
+                    cache, h, expected_evidence_id=ev["evidence_id"],
+                )
+            except EvidenceCacheUnavailable:
+                raise
+            except QCFail as exc:
+                raise EvidenceCacheUnavailable(str(exc)) from exc
+
+        if len(linkage_rows) != 10:
+            raise QCFail(f"linkage count {len(linkage_rows)} != 10")
+        gs = json.loads((output_dir / F_GATE_SUMMARY).read_text(encoding="utf-8"))
+        if gs.get("part3b_completed") is not False:
+            raise QCFail("part3b_completed must be false")
+        if gs.get("G13") != p3b0.GATE_PASS or gs.get("G14") != p3b0.GATE_PASS:
+            raise QCFail("G13/G14 must PASS")
+        if any(gs.get(g) == p3b0.GATE_PASS for g in ("G09", "G10", "G11", "G12")):
+            raise QCFail("G09–G12 must remain FAIL for this probe")
         if sentinel.calls_attempted != 0:
             raise QCFail("network attempted during --check")
         return {
             "mode": "check",
             "drift": [],
             "ok": True,
+            "cache_verified": True,
             "network_calls_attempted": 0,
             "output_dir": str(output_dir),
             "qc": json.loads((output_dir / F_QC).read_text(encoding="utf-8")),
+            "status": "active_incomplete_accessibility_feasibility_probe",
         }
 
 
@@ -1852,4 +2588,6 @@ def run(
         return run_write(repo_root, output_dir)
     if mode == "check":
         return run_check(repo_root, output_dir)
+    if mode == "check-manifest-only":
+        return run_check_manifest_only(repo_root, output_dir)
     raise QCFail(f"unknown mode: {mode}")

@@ -34,7 +34,7 @@ must also appear in the body below. The validator checks that:
 10. `stage124-gate-b-execution` — Executed the approved Gate B rules; four sample designs, canonical + filtered outputs, 58 focused tests (736 passed, 1 skipped, local results — no GitHub Actions) ✅
 11. `stage125-research-design-readiness` — Stage125 Research Design & Data Readiness (Parts 0–3A.1); **no modeling** in this stage — modeling remains prohibited until Stage126 is approved ✅
 12. `stage125-part3a-decision-lock` — Part 3A.1 user-approved pilot decision lock (rubric approval, G09–G14 thresholds, locked 80-pair event-enriched selection); decision record only, **no evidence collection** ✅
-13. `stage125-part3b-evidence-capture` — Part 3B evidence capture and accessibility scoring pilot (**active / in review**; not completed; awaiting user approval; not Stage126 admission) ⬅️ **next / active**
+13. `stage125-part3b-evidence-capture` — Part 3B accessibility feasibility probe (**active / incomplete**; not completed; source-origin probes only; awaiting Part 3B.1 adjudication approval; not Stage126 admission) ⬅️ **next / active**
 
 ## Maintenance tasks
 

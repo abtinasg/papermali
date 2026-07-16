@@ -102,19 +102,17 @@ Readiness. Infrastructure/readiness only. After Part 3B authorization, its
 `--check` verifies historical deliverables byte-identically and does not rewrite
 zero-evidence QC history. `part3b0_readiness=true`.
 
-**Part 3B (active / in review):** Evidence Capture & Accessibility Scoring Pilot
-(`stage125-part3b-evidence-capture`). Authorized real read-only evidence capture
-on the locked 80-pair pilot × 10 registered M2–M4 candidates (800 assessments).
-Endpoints contacted only when verified from frozen repo provenance (TSETMC CDN
-origin + CODAL origin). CBI left unresolved (no authoritative frozen endpoint).
-Accessibility scores remain null pending human adjudication (probe evidence does
-not uniquely determine rubric 0–5). G13/G14 PASS; G09–G12 FAIL (no usable
-coverage under definition-contract gaps + unresolvable Part 2 cutoffs).
-`part3b_started=true`; `evidence_collected=true`;
-`accessibility_scoring_applied=false` (all scores null / UNRESOLVED; no numeric
-evidence-backed score persisted); `network_extraction_performed=true`;
-`modeling_started=false`. **Not completed** — awaiting user review; not Stage126
-admission; no candidate finally admitted.
+**Part 3B (active / incomplete accessibility feasibility probe):**
+`stage125-part3b-evidence-capture`. Source-origin probes only (TSETMC CDN +
+CODAL origins; CBI blocked). Not candidate-value or pair-level evidence.
+800 assessments derived; scores null; G13/G14 PASS; G09–G12 FAIL.
+`part3b_started=true`; `endpoint_probe_evidence_collected=true`;
+`candidate_value_evidence_collected=false`; `pair_level_evidence_collected=false`;
+`data_value_extraction_performed=false`; `accessibility_scoring_applied=false`;
+`part3b_completed=false`; `network_extraction_performed=true`;
+`modeling_started=false`. Proposed next micro-step (not started):
+`Stage125 Part 3B.1 — Feature Definition & Scoring Adjudication Lock`.
+Not Stage126 admission.
 
 **Modeling remains prohibited** (no modeling, tuning, SHAP, SMOTE, calibration,
 temporal splitting, feature selection, or article result generation) through all of

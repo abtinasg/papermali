@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""Runner for Stage125 Part 3B — Evidence Capture & Accessibility Scoring Pilot.
+"""Runner for Stage125 Part 3B accessibility feasibility probe (active/incomplete).
 
 Usage:
     python project/run_stage125_part3b.py --plan [--write]
     python project/run_stage125_part3b.py --capture
     python project/run_stage125_part3b.py --write
     python project/run_stage125_part3b.py --check
+    python project/run_stage125_part3b.py --check-manifest-only
 
 ``--capture`` is the only mode that may perform approved read-only network
-retrieval. ``--check`` and ``--plan`` (without capture) never access the network.
+retrieval. ``--check`` verifies the local immutable cache; it is not a
+manifest-only hash check. ``--check-manifest-only`` never claims full evidence
+verification.
 """
 from __future__ import annotations
 
@@ -34,7 +37,11 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--write", action="store_true",
                       help="derive scores/gates/QC from cached evidence (no network)")
     mode.add_argument("--check", action="store_true",
-                      help="offline validation of frozen Part 3B outputs")
+                      help="full offline validation including immutable cache")
+    mode.add_argument(
+        "--check-manifest-only", action="store_true",
+        help="tracked output hashes only (NOT full evidence verification)",
+    )
     parser.add_argument(
         "--persist-plan", action="store_true",
         help="with --plan, write authorization/plan/registry to disk",
@@ -42,7 +49,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     print("=" * 70)
-    print("Stage125 Part 3B — Evidence Capture & Accessibility Scoring Pilot")
+    print("Stage125 Part 3B accessibility feasibility probe — active/incomplete")
     print("=" * 70)
 
     output_dir = Path(args.output_dir) if args.output_dir else None
@@ -53,7 +60,6 @@ def main(argv: list[str] | None = None) -> int:
                 project_dir=ROOT, output_dir=output_dir,
                 mode="plan", write=args.persist_plan or False,
             )
-            # Convenience: --plan --write means persist plan
         elif args.capture:
             result = part3b.run(
                 project_dir=ROOT, output_dir=output_dir, mode="capture",
@@ -62,10 +68,18 @@ def main(argv: list[str] | None = None) -> int:
             result = part3b.run(
                 project_dir=ROOT, output_dir=output_dir, mode="write",
             )
+        elif args.check_manifest_only:
+            result = part3b.run(
+                project_dir=ROOT, output_dir=output_dir,
+                mode="check-manifest-only",
+            )
         else:
             result = part3b.run(
                 project_dir=ROOT, output_dir=output_dir, mode="check",
             )
+    except part3b.EvidenceCacheUnavailable as exc:
+        print(f"FAIL (fail-closed): {exc}", file=sys.stderr)
+        return 1
     except part3b.QCFail as exc:
         print(f"FAIL (fail-closed): {exc}", file=sys.stderr)
         return 1
@@ -85,22 +99,26 @@ def main(argv: list[str] | None = None) -> int:
         print(f"network_calls_succeeded={stats.get('network_calls_succeeded')}")
         print(f"network_calls_failed={stats.get('network_calls_failed')}")
         print(f"bytes_retrieved={stats.get('bytes_retrieved')}")
-        print(f"network_extraction_performed={result.get('network_extraction_performed')}")
-        print(f"endpoints_contacted={result.get('endpoints_contacted')}")
+        print(f"handle_count={result.get('handle_count')}")
+        print(f"evidence_count={result.get('evidence_count')}")
+        print(f"resumed_sources={result.get('resumed_sources')}")
+        print(f"fetched_sources={result.get('fetched_sources')}")
     if result.get("mode") == "write":
         gs = result.get("gate_summary") or {}
         print(f"assessments={gs.get('assessment_count')}")
         print(f"G09–G14: G09={gs.get('G09')} G10={gs.get('G10')} "
               f"G11={gs.get('G11')} G12={gs.get('G12')} "
               f"G13={gs.get('G13')} G14={gs.get('G14')}")
+        print(f"research_gate_failed={gs.get('research_gate_failed')}")
     if result.get("mode") == "check":
-        print("Offline --check OK (byte-stable).")
-    print("modeling_started=false | no Stage126 admission")
+        print("Offline --check OK (byte-stable + immutable cache verified).")
+    if result.get("mode") == "check-manifest-only":
+        print("WARNING:", result.get("warning"))
+    print("part3b_completed=false | modeling_started=false | no Stage126 admission")
     return 0
 
 
 if __name__ == "__main__":
-    # Support: python project/run_stage125_part3b.py --plan --write
     argv = sys.argv[1:]
     if "--plan" in argv and "--write" in argv:
         argv = [a for a in argv if a != "--write"] + ["--persist-plan"]
