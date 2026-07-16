@@ -11,16 +11,16 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage125_research_design_readiness`
 - **Last completed research action:** `stage125-part3a-decision-lock`
 - **Next research action:** `stage125-part3b-evidence-capture`
-- **Last stage commit:** `4761d5973d5f3fe6ccaa7f0f0d7533c3cc287b43`
-- **Generated from commit:** `32cfe98d60587fa554057b3c6a70fc4b5a40cc1b` (branch `stage125-part3b-evidence-capture`, informational)
+- **Last stage commit:** `baf672c291d040a2c20878f9861954bb924ab626`
+- **Generated from commit:** `5a132aca8d21fe5a0ab0c964b702af10b8080d6e` (branch `stage125-part3b-evidence-capture`, informational)
 - **Baseline:** `origin/main` @ `959169c71a6e9378995be40979d1c6df7dc45a1d`
 
 ## QC
 
-- ✅ **5 assertions, 0 failed**, all_pass=True
+- ✅ **22 assertions, 0 failed**, all_pass=True
 - Scope: `stage125_part3b_evidence_capture`
 - Report: `project/stage125/stage125_part3b_evidence_capture_qc_report.json`
-- QC source commit (code): `4761d5973d5f3fe6ccaa7f0f0d7533c3cc287b43`
+- QC source commit (code): `baf672c291d040a2c20878f9861954bb924ab626`
 
 ## Workflow markers
 
@@ -31,13 +31,18 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - part3a_decision_locked: **True**
 - part3b_started: **True**
 - part3b0_readiness: **True**
-- evidence_collected: **True**
+- evidence_collected: **True** (endpoint-probe scope when Part 3B active)
+- endpoint_probe_evidence_collected: **True**
+- candidate_value_evidence_collected: **False**
+- pair_level_evidence_collected: **False**
+- data_value_extraction_performed: **False**
 - accessibility_scoring_applied: **False**
+- part3b_completed: **False**
 - network_extraction_performed: **True**
 
 ## Tickers in current research scope
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `364c07efe24b088cb907232ca000a7c6a888374c9b59126488050f01b0fa8216`_
-_generated_at_utc: 2026-07-16T22:50:47Z (informational)_
+_state_fingerprint: `dac8cda9e611e9665002e0b4b92818af200f71d536d16f9ab24c46a38094488e`_
+_generated_at_utc: 2026-07-16T23:26:19Z (informational)_
