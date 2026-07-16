@@ -2,13 +2,21 @@
   "stage": "stage125_part3b_evidence_capture",
   "current_stage": "Stage125",
   "baseline_commit": "959169c71a6e9378995be40979d1c6df7dc45a1d",
-  "source_commit": "4761d5973d5f3fe6ccaa7f0f0d7533c3cc287b43",
-  "source_file_sha256": "4ba7ec6941eb563cf375b1739d3d15b7707657d11d55bd8efa2dd5714ed8edb1",
-  "test_file_sha256": "45dd7c68bd66f2b4e067dcf5387b53423f9662f9cd02293f97f71f0088e6e9bc",
-  "generated_at": "2026-07-17T01:44:58+03:00",
-  "assertion_count": 5,
+  "source_commit": "baf672c291d040a2c20878f9861954bb924ab626",
+  "source_file_sha256": "13a7d3e4cf2d41fe935b8f481bed7fd9f6e0b96749b578ab288a3233c2987f1d",
+  "test_file_sha256": "eb2c7955127ddb51d16fef3d02e9e5444e43a7193dbfb2d84b0c39cb6cc41e90",
+  "generated_at": "2026-07-17T02:25:48+03:00",
+  "assertion_count": 22,
   "failed_count": 0,
   "all_pass": true,
+  "execution_qc_all_pass": true,
+  "research_gate_all_pass": false,
+  "research_gate_failed": [
+    "G09",
+    "G10",
+    "G11",
+    "G12"
+  ],
   "ticker_count": 26,
   "tickers": [
     "اردستان",
@@ -43,7 +51,12 @@
   "part3b0_readiness": true,
   "part3b_started": true,
   "evidence_collected": true,
+  "endpoint_probe_evidence_collected": true,
+  "candidate_value_evidence_collected": false,
+  "pair_level_evidence_collected": false,
+  "data_value_extraction_performed": false,
   "accessibility_scoring_applied": false,
+  "part3b_completed": false,
   "network_extraction_performed": true,
   "modeling_started": false,
   "assessment_count": 800,
@@ -67,7 +80,14 @@
     "definition_contract_gap": "feature_definition_not_uniquely_locked_in_frozen_contracts;accessibility_evidence_only;value_extraction_unresolved",
     "modeling_started": false,
     "part3b_completed": false,
-    "status": "active_in_review"
+    "research_gate_all_pass": false,
+    "research_gate_failed": [
+      "G09",
+      "G10",
+      "G11",
+      "G12"
+    ],
+    "status": "active_incomplete_accessibility_feasibility_probe"
   },
   "frozen_input_sha256": {
     "project/stage125/part3_candidate_inventory_stage125.csv": "4bd5f6a71ecf0e1f74866a64a3774e51340729f4188ae2784f1d90db07e7032f",
@@ -77,19 +97,28 @@
     "project/stage125/part3a_decision_lock_stage125.json": "475c82b3483ef18ff19aea2268f65527ca87c9441603622bd1952bd21f18f35e",
     "project/stage125/source_registry_stage125.csv": "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c"
   },
+  "endpoint_provenance_sha256": {
+    "project/stage124/official_api/import_manifest.json": "9ff7bd939b1e28844d897412db6c2671db3e6857b83dce9261c3de44b4871e06",
+    "project/stage124/official_api/README.md": "0d4cf8581a953877f3102f4f7289c9017aa0b968e6ec9c8cfd4d3918c3c64492",
+    "project/raw_handoff/financial_distress_programmer_handoff_stage121(1)/ocf_source_manifest_stage121.csv": "b1bf92d74f19b4c00373079c3222489d6cb54e1c8f11e30a9e02557e6936057a"
+  },
   "output_sha256": {
-    "part3b_accessibility_scores_stage125.csv": "ed088882c691243cc7acb935674ebbfd9589dec7e3c483e02a64124d69c76c77",
-    "part3b_pair_candidate_assessment_stage125.csv": "07fa9a2cc8ebf161b117777288c52ce2d6d33a43def379f730a1ac64dfb163e6",
-    "part3b_gate_results_stage125.csv": "d90791aacc79f27a5a0a04c2c48d911b63f31eda2c26462be2b9731f6e8518d6",
-    "part3b_gate_summary_stage125.json": "5ae84f4bf1ba51fe669652e07796d84f0a61ee7f1aaee719c63df7af796a9cc9",
-    "part3b_unresolved_and_failures_stage125.csv": "c41b1b33e7f2cf48b27e55aa9a87a8b955eecf2f217b09bf532e71eb59e9d3f5",
-    "README_STAGE125_PART3B_EVIDENCE_CAPTURE.md": "cecda86abd5f39fa0afaf8820584bd7cd62dffb8afbced8d28e0b1011b4e6c4a",
-    "part3b_authorization_stage125.json": "ca8c3ac44cbdb7352dd1166ca6427a5055a8e9f4aac0285991e2803ab1c1c96e",
-    "part3b_capture_plan_stage125.csv": "41cba4f57ba87a6f39e02f1f3e9e3bf5e626a996d82eab064c683653d65e0d11",
-    "part3b_verified_endpoint_registry_stage125.csv": "8cc47fcb7be63a6a07ee1476b83d6d7d9e6af1719d7a2e80fceba50a05c87e41",
-    "part3b_evidence_manifest_stage125.csv": "43729eaf6c8467296b1a5ab83721dc9575cebbf8e3861a9a9933283c1351d420",
-    "part3b_cache_handles_stage125.csv": "2c49d9ee88fa5159f3104b861fac1f34f76904c25db8e56d4430626f7bddd1fb",
-    "part3b_capture_network_log_stage125.json": "321ca6f7293574963cc2e0c57924c3fe19fbce2044d94b54180e93de3570e39c"
+    "part3b_accessibility_scores_stage125.csv": "11c313ec77ab5b63e0e1f01a51ab8d59c4a90533ffaf066c2ac54f3eec7af6a3",
+    "part3b_pair_candidate_assessment_stage125.csv": "b431fbacedf6d0473e36574bd52335c44306210114bd4091947ef28baf860051",
+    "part3b_gate_results_stage125.csv": "945f08869f30b0e2185a20f61ca46c2051f542ff27b1e67b48a205b7f4250811",
+    "part3b_gate_summary_stage125.json": "37b6b0aa00b9faf92ae6024012a004ed2bbe270950aab898bb471d60ed8ecdbb",
+    "part3b_unresolved_and_failures_stage125.csv": "e52a32a939c492696d7038983fbdd702e5b0cc5d33a577700b950ad09e55045a",
+    "README_STAGE125_PART3B_EVIDENCE_CAPTURE.md": "72b9c8b431b920a04a45b2ac78cd1e74b09b682a80519a9b31cc1389e46afc46",
+    "part3b_decision_requirements_stage125.json": "f9ac3bdcf43465337660cbe24124765c938922a1044aa500318b581bb20e0d83",
+    "README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md": "9511ed1dd5ceab26feb4b9b3d9fcdc9beb7adbdbccc27f9889268b3cf613e342",
+    "part3b_authorization_stage125.json": "100a56ab2bb7fe4af3e255aac53fd80c239ffd09dd3228ffbbd8ae5c6cfa1a63",
+    "part3b_capture_plan_stage125.csv": "acb888189bb679b1f417ef7b83fda4f81b211111816cc736b5e9610d6cb0b4b8",
+    "part3b_verified_endpoint_registry_stage125.csv": "3d36eca0a0a63ef406ec48ef1bcf78ecbe2ce99ce24a6e8804c2b9c3ffb431b7",
+    "part3b_evidence_manifest_stage125.csv": "94a825470dfc55eb740ac0720471b6851c840b3c4a60ea1e19897b34c9771667",
+    "part3b_cache_handles_stage125.csv": "b37ddcd713ee985a59e61a6ef824369a935ca7eb61a6969047a84847bb792159",
+    "part3b_candidate_evidence_linkage_stage125.csv": "33c9d921e6274b8fef32991554504849ef3040ef6545aa51b87867b1cfd0b370",
+    "part3b_capture_attempt_log_stage125.csv": "6d951481493699a96928b0fb5f0a3c79a37f96da5105996c04e14816d3f3e1a3",
+    "part3b_capture_network_log_stage125.json": "68b01fb5e115b1c2a29c3b77be38ef660ae2d86a17de0687ce66e10c92590855"
   },
   "frozen_assets_before": {
     "project/stage122/eligibility_company_review.csv": "398fc500a64bc9c65aab64e52f81f2dd776345d3aaeee254c5c0a838db19f3a6",
@@ -192,16 +221,40 @@
     "https://www.codal.ir/"
   ],
   "unique_raw_snapshot_count": 3,
-  "evidence_record_count": 10,
+  "evidence_record_count": 4,
+  "handle_count": 3,
+  "linkage_count": 10,
+  "cache_portability": "local_immutable_cache_only_not_in_git;fresh_checkout_without_raw_cache_part3b_fails_evidence_cache_unavailable",
+  "status": "active_incomplete_accessibility_feasibility_probe",
   "guard_evidence": {
     "network_calls_attempted_during_write": 0,
     "no_network_during_write": true
   },
   "assertions": [
     {
-      "assertion": "assessment_matrix_800",
+      "assertion": "exact_80_locked_pairs",
+      "status": "PASS",
+      "detail": "80"
+    },
+    {
+      "assertion": "exact_10_candidates",
+      "status": "PASS",
+      "detail": "10"
+    },
+    {
+      "assertion": "exact_800_unique_assessments",
       "status": "PASS",
       "detail": "800"
+    },
+    {
+      "assertion": "frozen_labels_years_allocation",
+      "status": "PASS",
+      "detail": "pos=39,neg=41,unk=0,g14=PASS"
+    },
+    {
+      "assertion": "no_sample_target_eligibility_change",
+      "status": "PASS",
+      "detail": "before==after"
     },
     {
       "assertion": "no_modeling",
@@ -209,19 +262,84 @@
       "detail": "modeling_started=false"
     },
     {
-      "assertion": "frozen_assets_unchanged",
+      "assertion": "frozen_scientific_assets_unchanged",
       "status": "PASS",
       "detail": "before==after"
     },
     {
-      "assertion": "g13_pass",
+      "assertion": "endpoint_provenance_hashes_verified",
       "status": "PASS",
-      "detail": "PASS"
+      "detail": "n=3"
     },
     {
-      "assertion": "g14_pass",
+      "assertion": "network_hosts_methods_allowlisted",
       "status": "PASS",
-      "detail": "PASS"
+      "detail": "['cdn.tsetmc.com', 'www.codal.ir']"
+    },
+    {
+      "assertion": "capture_attempt_log_present",
+      "status": "PASS",
+      "detail": "part3b_capture_attempt_log_stage125.csv"
+    },
+    {
+      "assertion": "evidence_handles_payload_consistent",
+      "status": "PASS",
+      "detail": "snap=3,handles=3"
+    },
+    {
+      "assertion": "no_snapshot_without_handle",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "assertion": "score_rows_10",
+      "status": "PASS",
+      "detail": "10"
+    },
+    {
+      "assertion": "all_numeric_scores_absent",
+      "status": "PASS",
+      "detail": "null"
+    },
+    {
+      "assertion": "human_adjudication_required",
+      "status": "PASS",
+      "detail": "true"
+    },
+    {
+      "assertion": "accessibility_scoring_applied_false",
+      "status": "PASS",
+      "detail": "false"
+    },
+    {
+      "assertion": "g09_g12_fail",
+      "status": "PASS",
+      "detail": "FAIL/FAIL/FAIL/FAIL"
+    },
+    {
+      "assertion": "g13_g14_pass",
+      "status": "PASS",
+      "detail": "PASS/PASS"
+    },
+    {
+      "assertion": "part3b_completed_false",
+      "status": "PASS",
+      "detail": "false"
+    },
+    {
+      "assertion": "no_network_during_write",
+      "status": "PASS",
+      "detail": "0"
+    },
+    {
+      "assertion": "linkage_rows_10",
+      "status": "PASS",
+      "detail": "10"
+    },
+    {
+      "assertion": "evidence_class_origin_probe_only",
+      "status": "PASS",
+      "detail": "ok"
     }
   ]
 }

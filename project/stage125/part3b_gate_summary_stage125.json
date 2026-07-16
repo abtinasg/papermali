@@ -14,5 +14,12 @@
   "definition_contract_gap": "feature_definition_not_uniquely_locked_in_frozen_contracts;accessibility_evidence_only;value_extraction_unresolved",
   "modeling_started": false,
   "part3b_completed": false,
-  "status": "active_in_review"
+  "research_gate_all_pass": false,
+  "research_gate_failed": [
+    "G09",
+    "G10",
+    "G11",
+    "G12"
+  ],
+  "status": "active_incomplete_accessibility_feasibility_probe"
 }

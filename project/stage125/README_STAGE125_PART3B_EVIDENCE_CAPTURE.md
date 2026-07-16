@@ -1,31 +1,46 @@
-# Stage125 Part 3B — Evidence Capture & Accessibility Scoring Pilot
+# Stage125 Part 3B accessibility feasibility probe — active/incomplete
 
-## Scope
+## Status
 
-Authorized Part 3B pilot on the locked 80-pair event-enriched sample and the
-exact 10 registered M2–M4 candidates (800 pair-candidate assessments).
+**Not a completed Part 3B pilot.** `part3b_completed=false`.
+`next_research_action_id` remains `stage125-part3b-evidence-capture`.
+No Stage126 / modeling advance.
+
+Scoped markers:
+
+- `endpoint_probe_evidence_collected=true` (when origin probes exist)
+- `candidate_value_evidence_collected=false`
+- `pair_level_evidence_collected=false`
+- `data_value_extraction_performed=false`
+- `accessibility_scoring_applied=false`
+- `part3b_completed=false`
+
+`evidence_collected=true` means **endpoint-probe** evidence only — not 800
+pair-level observations.
+
+## Evidence classes
+
+| Class | Meaning |
+|---|---|
+| `source_origin_probe` | Official origin GET (current TSETMC/CODAL probes) |
+| `candidate_endpoint_evidence` | Not collected in this probe |
+| `pair_value_evidence` | Not collected in this probe |
 
 ## Modes
 
 - `--plan` — deterministic capture plan + endpoint registry (no network)
-- `--capture` — approved read-only HTTPS GET/HEAD only
-- `--write` — derive manifests/scores/gates/QC from cached evidence (no network)
-- `--check` — offline validation (no network)
+- `--capture` — approved read-only HTTPS GET/HEAD only (resume preferred)
+- `--write` — derive assessments/scores/gates/QC (no network)
+- `--check` — **full** offline verification including immutable cache
+- `--check-manifest-only` — tracked hashes only; **not** full evidence verification
 
-## Scientific honesty
+## Cache portability
 
-- Feature-definition gaps are recorded; values are not invented.
-- Missing evidence yields null accessibility scores (never 0 by absence).
-- Prediction cutoffs come only from the frozen Part 2 audit (currently
-  unresolvable pending `available_at`).
-- Part 3B outcomes are pilot accessibility outcomes only — not Stage126 admission.
+Raw payloads live under gitignored `project/stage125/raw_cache_part3b/`.
+A fresh checkout without that local cache fails `--check` with
+`evidence_cache_unavailable`.
 
-## Network policy
+## Part 3B.1 (proposed, not started)
 
-Default-deny `NetworkSentinel` remains installed. Capture uses a scoped
-read-only permit that restores default-deny after exit/exception.
-
-## Part 3B.0 history
-
-Part 3B.0 readiness artifacts remain a frozen historical baseline. Live Part 3B
-state is owned by this runner.
+See `README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md`.
+Requires explicit user approval before any work.
