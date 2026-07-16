@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage125_research_design_readiness`
 - **Last completed research action:** `stage125-part3a-decision-lock`
 - **Next research action:** `stage125-part3b-evidence-capture`
-- **Last stage commit:** `8932d71b43f11c7edfd1088f0f12a21681f15a8b`
-- **Generated from commit:** `398a72ba7370be1fe728122a4a0c72cc8d05d1a1` (branch `stage125-part3b0-evidence-readiness`, informational)
-- **Baseline:** `origin/main` @ `75abf3f6d92e514df568e1d6912ccc47cdffc933`
+- **Last stage commit:** `abe333a3a3030bccfc8ecd30600d5c735f5afe76`
+- **Generated from commit:** `abe333a3a3030bccfc8ecd30600d5c735f5afe76` (branch `handoff/post-pr35-merge`, informational)
+- **Baseline:** `origin/main` @ `abe333a3a3030bccfc8ecd30600d5c735f5afe76`
 
 ## QC
 
@@ -39,5 +39,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `195f79ecb9bb92c1a0b4ae50c639398261af4a739c3ec36771f110097163d18c`_
-_generated_at_utc: 2026-07-16T21:23:59Z (informational)_
+_state_fingerprint: `6f758609fe84e4af25aea68c21bc2d3fdb3805e50c9622d96e7ad7a32f841ed7`_
+_generated_at_utc: 2026-07-16T21:43:39Z (informational)_
