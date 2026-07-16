@@ -37,5 +37,7 @@
   "accessibility_scoring_allowed": false,
   "candidate_decisions_allowed": false,
   "part3b_started": false,
-  "part3b0_readiness": true
+  "part3b0_readiness": true,
+  "synthetic_validator_only": true,
+  "unknown_factual_values": "null_never_zero_or_guess"
 }

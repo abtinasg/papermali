@@ -6,8 +6,24 @@
     "socket.socket.connect",
     "socket.socket.connect_ex",
     "socket.create_connection",
+    "socket.socket.sendto",
+    "socket.socket.sendmsg",
+    "socket.getaddrinfo",
+    "socket.gethostbyname",
     "urllib.request.urlopen",
-    "http.client.HTTPConnection.connect"
+    "urllib.request.urlretrieve",
+    "http.client.HTTPConnection.connect",
+    "http.client.HTTPSConnection.connect",
+    "subprocess:curl|wget|nc|ssh"
+  ],
+  "exact_git_readonly_allowlist": [
+    "diff",
+    "log",
+    "ls-files",
+    "merge-base",
+    "rev-parse",
+    "show",
+    "status"
   ],
   "on_attempt": {
     "increment_network_calls_attempted": true,
