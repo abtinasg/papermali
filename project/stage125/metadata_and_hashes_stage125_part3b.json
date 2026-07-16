@@ -1,0 +1,40 @@
+{
+  "stage": "stage125_part3b_evidence_capture",
+  "current_stage": "Stage125",
+  "description": "Stage125 Part 3B — evidence capture & accessibility scoring pilot.",
+  "code_commit": "4761d5973d5f3fe6ccaa7f0f0d7533c3cc287b43",
+  "baseline_commit": "959169c71a6e9378995be40979d1c6df7dc45a1d",
+  "generated_at": "2026-07-17T01:44:58+03:00",
+  "output_files_sha256": {
+    "README_STAGE125_PART3B_EVIDENCE_CAPTURE.md": "cecda86abd5f39fa0afaf8820584bd7cd62dffb8afbced8d28e0b1011b4e6c4a",
+    "part3b_accessibility_scores_stage125.csv": "ed088882c691243cc7acb935674ebbfd9589dec7e3c483e02a64124d69c76c77",
+    "part3b_authorization_stage125.json": "ca8c3ac44cbdb7352dd1166ca6427a5055a8e9f4aac0285991e2803ab1c1c96e",
+    "part3b_cache_handles_stage125.csv": "2c49d9ee88fa5159f3104b861fac1f34f76904c25db8e56d4430626f7bddd1fb",
+    "part3b_capture_network_log_stage125.json": "321ca6f7293574963cc2e0c57924c3fe19fbce2044d94b54180e93de3570e39c",
+    "part3b_capture_plan_stage125.csv": "41cba4f57ba87a6f39e02f1f3e9e3bf5e626a996d82eab064c683653d65e0d11",
+    "part3b_evidence_manifest_stage125.csv": "43729eaf6c8467296b1a5ab83721dc9575cebbf8e3861a9a9933283c1351d420",
+    "part3b_gate_results_stage125.csv": "d90791aacc79f27a5a0a04c2c48d911b63f31eda2c26462be2b9731f6e8518d6",
+    "part3b_gate_summary_stage125.json": "5ae84f4bf1ba51fe669652e07796d84f0a61ee7f1aaee719c63df7af796a9cc9",
+    "part3b_pair_candidate_assessment_stage125.csv": "07fa9a2cc8ebf161b117777288c52ce2d6d33a43def379f730a1ac64dfb163e6",
+    "part3b_unresolved_and_failures_stage125.csv": "c41b1b33e7f2cf48b27e55aa9a87a8b955eecf2f217b09bf532e71eb59e9d3f5",
+    "part3b_verified_endpoint_registry_stage125.csv": "8cc47fcb7be63a6a07ee1476b83d6d7d9e6af1719d7a2e80fceba50a05c87e41",
+    "stage125_part3b_evidence_capture_qc_report.json": "9d92bbbb61576783baa48971b6c5ff8f4850bfbe2d96321e7c996d43ca9691f4"
+  },
+  "frozen_input_sha256": {
+    "project/stage125/part3_candidate_inventory_stage125.csv": "4bd5f6a71ecf0e1f74866a64a3774e51340729f4188ae2784f1d90db07e7032f",
+    "project/stage125/part3_source_evidence_manifest_schema_stage125.json": "9a736edb18046128851d55c87f07609b8dc2a4b2be73a41c5837fe0e2a4cd78d",
+    "project/stage125/part3a_approved_gate_thresholds_stage125.csv": "11c7efe5f242ab8e4a4f7b1955fb25d48e288249f7a1ce4c6bf1713dbf117d20",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv": "9a441b5e3696353967489b356d0ff48cf7cbea276aeea5018be6edc8368b40f5",
+    "project/stage125/part3a_decision_lock_stage125.json": "475c82b3483ef18ff19aea2268f65527ca87c9441603622bd1952bd21f18f35e",
+    "project/stage125/source_registry_stage125.csv": "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c"
+  },
+  "part3b0_readiness": true,
+  "part3b_started": true,
+  "evidence_collected": true,
+  "accessibility_scoring_applied": false,
+  "network_extraction_performed": true,
+  "modeling_started": false,
+  "assessment_count": 800,
+  "status": "active_in_review",
+  "warning": "Part 3B pilot accessibility outcomes only. Not final Stage126 admission. Definition-contract gaps recorded fail-closed."
+}
