@@ -107,8 +107,15 @@ PART3B0_ALLOWED_EXACT = (
     "project/src/stage125_part3b0_evidence_readiness.py",
     "project/tests/test_stage125_part3b0_evidence_readiness.py",
     "project/run_stage125_part3b0.py",
+    "project/stage125/part3b0_evidence_capture_contract_stage125.json",
+    "project/stage125/part3b0_evidence_manifest_template_stage125.csv",
+    "project/stage125/part3b0_gate_result_template_stage125.csv",
+    "project/stage125/part3b0_immutable_cache_contract_stage125.json",
+    "project/stage125/part3b0_network_denial_contract_stage125.json",
+    "project/stage125/README_STAGE125_PART3B0_EVIDENCE_READINESS.md",
+    "project/stage125/stage125_part3b0_evidence_readiness_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b0.json",
 )
-PART3B0_ALLOWED_NAME_PREFIX = "part3b0_"
 
 REGISTERED_CANDIDATES = (
     {"candidate_id": "cand_m2_equity_return_window", "block": "M2",
@@ -475,9 +482,8 @@ def scan_for_modeling_artifacts(project_dir: Path) -> dict:
 
 
 def _part3b0_allowed(rel: str, basename: str) -> bool:
-    if rel in PART3B0_ALLOWED_EXACT:
-        return True
-    return basename.startswith(PART3B0_ALLOWED_NAME_PREFIX)
+    del basename  # exact-path allowlist only; no prefix/directory-wide bypass
+    return rel in PART3B0_ALLOWED_EXACT
 
 
 def scan_for_part3b_artifacts(repo_root: Path) -> dict:
