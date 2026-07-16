@@ -18,11 +18,12 @@ import os
 import re
 import shutil
 import socket
+import stat
 import subprocess
 import tempfile
 import uuid
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator
@@ -184,12 +185,63 @@ BLOCK_CANDIDATES = {
     ],
 }
 
-_NETWORK_BLOCKED_BINARIES = frozenset({
-    "curl", "wget", "nc", "ncat", "netcat", "ssh", "scp", "sftp", "telnet",
-    "ftp", "fetch", "http", "https",
-})
 _GIT_ALLOWED_SUBCOMMANDS = frozenset({
-    "rev-parse", "merge-base", "log", "show", "status", "diff", "ls-files",
+    "rev-parse", "merge-base", "log", "show", "ls-files", "check-ignore",
+})
+_GIT_FORBIDDEN_TOKENS = frozenset({
+    "--ext-diff", "--textconv", "--exec-path", "--html-path", "--man-path",
+    "--info-path", "--namespace", "--list-cmds", "--attr-source",
+})
+_GIT_ALLOWED_FORMATS = frozenset({"--format=%H", "--format=%cI"})
+_POLICY_SEAL_DOMAIN = "stage125_part3b0_locked_gate_policy_v1"
+_STAGING_NAME_RE = re.compile(r"^\.staging-([a-f0-9]{16})-[a-f0-9]{32}$")
+
+# Closed-world allowlist of permitted Stage125 tracked files (exact paths).
+STAGE125_ALLOWED_EXACT = frozenset({
+    "project/stage125/README_STAGE125_PART1_DATA_CONTRACT.md",
+    "project/stage125/README_STAGE125_PART2_PREDICTION_TIME_CONTRACT.md",
+    "project/stage125/README_STAGE125_PART3A_DECISION_LOCK.md",
+    "project/stage125/README_STAGE125_PART3A_PILOT_PROTOCOL.md",
+    "project/stage125/README_STAGE125_PART3B0_EVIDENCE_READINESS.md",
+    "project/stage125/accessibility_scoring_rubric_stage125_part3a.json",
+    "project/stage125/data_admission_gate_template_stage125.csv",
+    "project/stage125/data_dictionary_stage125.csv",
+    "project/stage125/feature_availability_audit_stage125_part2.csv",
+    "project/stage125/feature_availability_contract_stage125_part2.json",
+    "project/stage125/identifier_time_contract_stage125.json",
+    "project/stage125/leakage_audit_stage125_part2.csv",
+    "project/stage125/leakage_checklist_stage125_part2.json",
+    "project/stage125/m1_provenance_gap_audit_stage125.csv",
+    "project/stage125/m1_provenance_gap_summary_stage125.json",
+    "project/stage125/metadata_and_hashes_stage125_part1.json",
+    "project/stage125/metadata_and_hashes_stage125_part2.json",
+    "project/stage125/metadata_and_hashes_stage125_part3a.json",
+    "project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b0.json",
+    "project/stage125/part3_candidate_inventory_stage125.csv",
+    "project/stage125/part3_gate_decision_protocol_stage125.csv",
+    "project/stage125/part3_pilot_sampling_options_stage125.csv",
+    "project/stage125/part3_sampling_frame_by_target_year_stage125.csv",
+    "project/stage125/part3_sampling_frame_summary_stage125.json",
+    "project/stage125/part3_source_evidence_manifest_schema_stage125.json",
+    "project/stage125/part3a_approved_gate_thresholds_stage125.csv",
+    "project/stage125/part3a_decision_lock_stage125.json",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv",
+    "project/stage125/part3b0_evidence_capture_contract_stage125.json",
+    "project/stage125/part3b0_evidence_manifest_template_stage125.csv",
+    "project/stage125/part3b0_gate_result_template_stage125.csv",
+    "project/stage125/part3b0_immutable_cache_contract_stage125.json",
+    "project/stage125/part3b0_network_denial_contract_stage125.json",
+    "project/stage125/prediction_cutoff_audit_stage125_part2.csv",
+    "project/stage125/prediction_cutoff_summary_stage125_part2.json",
+    "project/stage125/prediction_time_contract_stage125_part2.json",
+    "project/stage125/provenance_manifest_schema_stage125.json",
+    "project/stage125/source_registry_stage125.csv",
+    "project/stage125/stage125_part1_data_contract_qc_report.json",
+    "project/stage125/stage125_part2_prediction_time_contract_qc_report.json",
+    "project/stage125/stage125_part3a_decision_lock_qc_report.json",
+    "project/stage125/stage125_part3a_pilot_protocol_qc_report.json",
+    "project/stage125/stage125_part3b0_evidence_readiness_qc_report.json",
 })
 
 
@@ -228,23 +280,78 @@ def sha256_file(path: Path) -> str | None:
 
 
 def _is_allowed_git_command(cmd: list[str]) -> bool:
-    if not cmd:
+    """Allow only exact argument-level read-only git used by Part 3B.0 QC."""
+    if not cmd or len(cmd) < 4:
         return False
-    prog = Path(cmd[0]).name.lower()
-    if prog != "git":
+    # Literal argv[0] must be "git" (reject absolute/renamed wrappers).
+    if cmd[0] != "git":
         return False
-    args = cmd[1:]
-    if args and args[0] == "-C" and len(args) >= 2:
-        args = args[2:]
-    while args and args[0].startswith("-"):
-        # allow only harmless global flags before subcommand
-        if args[0] in {"--no-pager", "--literal-pathspecs"}:
-            args = args[1:]
-            continue
+    if cmd[1] != "-C" or not str(cmd[2]).strip():
         return False
-    if not args:
+    args = list(cmd[3:])
+    for tok in args:
+        low = tok.lower()
+        if low in _GIT_FORBIDDEN_TOKENS:
+            return False
+        if low == "-c" or low.startswith("--config"):
+            return False
+        if "ext-diff" in low or "textconv" in low:
+            return False
+    if not args or args[0] not in _GIT_ALLOWED_SUBCOMMANDS:
         return False
-    return args[0] in _GIT_ALLOWED_SUBCOMMANDS
+    sub, rest = args[0], args[1:]
+    if sub == "rev-parse":
+        return len(rest) == 1 and not rest[0].startswith("-")
+    if sub == "merge-base":
+        if rest[:1] == ["--is-ancestor"]:
+            return len(rest) == 3 and all(not x.startswith("-") for x in rest[1:])
+        return len(rest) == 2 and all(not x.startswith("-") for x in rest)
+    if sub == "ls-files":
+        return rest == []
+    if sub == "check-ignore":
+        return (
+            len(rest) >= 3
+            and rest[0] == "-q"
+            and rest[1] == "--"
+            and all(not x.startswith("-") for x in rest[2:])
+        )
+    if sub == "log":
+        # git -C <repo> log -1 --format=%H|--format=%cI -- <path>...
+        if (
+            len(rest) >= 4
+            and rest[0] == "-1"
+            and rest[1] in _GIT_ALLOWED_FORMATS
+            and rest[2] == "--"
+            and all(not x.startswith("-") for x in rest[3:])
+        ):
+            return True
+        # git -C <repo> log --format=%H -n 1 -- <path>...
+        if (
+            len(rest) >= 5
+            and rest[0] in _GIT_ALLOWED_FORMATS
+            and rest[1] == "-n"
+            and rest[2] == "1"
+            and rest[3] == "--"
+            and all(not x.startswith("-") for x in rest[4:])
+        ):
+            return True
+        # git -C <repo> log -1 --format=%cI <commit>
+        if (
+            len(rest) == 3
+            and rest[0] == "-1"
+            and rest[1] in _GIT_ALLOWED_FORMATS
+            and not rest[2].startswith("-")
+        ):
+            return True
+        return False
+    if sub == "show":
+        return (
+            len(rest) == 3
+            and rest[0] == "-s"
+            and rest[1] in _GIT_ALLOWED_FORMATS
+            and not rest[2].startswith("-")
+        )
+    return False
 
 
 def _git(repo_root: str, *args: str) -> str:
@@ -402,6 +509,52 @@ class LockedGatePolicy:
     target_years: tuple[str, ...]
     source_thresholds_sha256: str
     source_decision_lock_sha256: str
+    _seal: str = field(repr=False, compare=True)
+
+
+def _expected_target_years() -> tuple[str, ...]:
+    return tuple(sorted(lock.EXPECTED_YEAR_ALLOCATION.keys()))
+
+
+def _compute_policy_seal(thr_hash: str, lock_hash: str) -> str:
+    """Seal binds verified source hashes to hard-coded locked G09–G14 values."""
+    payload = "|".join([
+        _POLICY_SEAL_DOMAIN,
+        "0.80",
+        "0.70",
+        "3",
+        "3",
+        "80",
+        lock.APPROVED_PILOT_OPTION,
+        ",".join(_expected_target_years()),
+        thr_hash,
+        lock_hash,
+    ])
+    return sha256_bytes(payload.encode("utf-8"))
+
+
+def require_sealed_gate_policy(policy: LockedGatePolicy) -> LockedGatePolicy:
+    """Reject forged/weakened LockedGatePolicy instances (fail closed)."""
+    if type(policy) is not LockedGatePolicy:
+        raise QCFail("LockedGatePolicy type check failed")
+    expected_seal = _compute_policy_seal(
+        policy.source_thresholds_sha256, policy.source_decision_lock_sha256,
+    )
+    if policy._seal != expected_seal:
+        raise QCFail("LockedGatePolicy seal verification failed")
+    if (
+        policy.g09_threshold != 0.80
+        or policy.g10_threshold != 0.70
+        or policy.g11_minimum != 3
+        or policy.g12_minimum != 3
+        or policy.g13_expected != 80
+        or policy.g14_option_id != lock.APPROVED_PILOT_OPTION
+        or tuple(policy.target_years) != _expected_target_years()
+        or not SHA256_RE.match(policy.source_thresholds_sha256 or "")
+        or not SHA256_RE.match(policy.source_decision_lock_sha256 or "")
+    ):
+        raise QCFail("LockedGatePolicy value verification failed")
+    return policy
 
 
 def load_locked_gate_policy(repo_root: Path) -> LockedGatePolicy:
@@ -433,7 +586,8 @@ def load_locked_gate_policy(repo_root: Path) -> LockedGatePolicy:
             f"G14 locked option mismatch: {g14_option!r} vs "
             f"{lock.APPROVED_PILOT_OPTION!r}"
         )
-    years = tuple(sorted(lock.EXPECTED_YEAR_ALLOCATION.keys()))
+    thr_hash = verified[thr_rel]
+    lock_hash = verified[lock_rel]
     policy = LockedGatePolicy(
         g09_threshold=_float("G09"),
         g10_threshold=_float("G10"),
@@ -441,19 +595,12 @@ def load_locked_gate_policy(repo_root: Path) -> LockedGatePolicy:
         g12_minimum=_int("G12"),
         g13_expected=_int("G13"),
         g14_option_id=g14_option,
-        target_years=years,
-        source_thresholds_sha256=verified[thr_rel],
-        source_decision_lock_sha256=verified[lock_rel],
+        target_years=_expected_target_years(),
+        source_thresholds_sha256=thr_hash,
+        source_decision_lock_sha256=lock_hash,
+        _seal=_compute_policy_seal(thr_hash, lock_hash),
     )
-    if policy.g09_threshold != 0.80:
-        raise QCFail("locked G09 threshold drift")
-    if policy.g10_threshold != 0.70:
-        raise QCFail("locked G10 threshold drift")
-    if policy.g11_minimum != 3 or policy.g12_minimum != 3:
-        raise QCFail("locked G11/G12 minimum drift")
-    if policy.g13_expected != 80:
-        raise QCFail("locked G13 expected drift")
-    return policy
+    return require_sealed_gate_policy(policy)
 
 
 # --------------------------------------------------------------------------- #
@@ -513,23 +660,38 @@ class NetworkSentinel:
 
     def _normalize_cmd(self, args: Any) -> list[str]:
         if isinstance(args, (str, bytes)):
+            # String command form is never an exact argv allowlist match.
             return [os.fsdecode(args)]
-        return [os.fsdecode(a) if isinstance(a, (bytes, os.PathLike)) else str(a)
-                for a in args]
+        try:
+            return [
+                os.fsdecode(a) if isinstance(a, (bytes, os.PathLike)) else str(a)
+                for a in args
+            ]
+        except TypeError:
+            return [str(args)]
 
-    def _guard_subprocess(self, label: str, popenargs: Any):
-        cmd = self._normalize_cmd(popenargs)
+    def _extract_cmd(self, args: tuple[Any, ...], kwargs: dict[str, Any]) -> Any:
+        if "args" in kwargs and kwargs["args"] is not None:
+            return kwargs["args"]
+        if args:
+            return args[0]
+        return None
+
+    def _guard_subprocess(
+        self, label: str, args: tuple[Any, ...], kwargs: dict[str, Any],
+    ) -> None:
+        if kwargs.get("shell"):
+            self._blocked(label, "shell=True")
+        raw = self._extract_cmd(args, kwargs)
+        if raw is None:
+            self._blocked(label, "missing command args")
+        if isinstance(raw, (str, bytes)):
+            self._blocked(label, "string command form denied", raw)
+        cmd = self._normalize_cmd(raw)
         if _is_allowed_git_command(cmd):
             return
-        prog = Path(cmd[0]).name.lower() if cmd else ""
-        if prog in _NETWORK_BLOCKED_BINARIES or prog.endswith(".exe") and (
-            Path(prog).stem.lower() in _NETWORK_BLOCKED_BINARIES
-        ):
-            self._blocked(label, *cmd)
-        # Default-deny other external network-capable tools by binary name only;
-        # do not create a broad subprocess allowance.
-        if prog in _NETWORK_BLOCKED_BINARIES:
-            self._blocked(label, *cmd)
+        # Default-deny: every non-allowlisted subprocess is blocked before spawn.
+        self._blocked(label, *cmd)
 
     def install(self) -> None:
         socket.socket.connect = self._blocked_connect  # type: ignore[method-assign]
@@ -548,14 +710,12 @@ class NetworkSentinel:
         sentinel = self
 
         def _run(*args, **kwargs):
-            if args:
-                sentinel._guard_subprocess("subprocess.run", args[0])
+            sentinel._guard_subprocess("subprocess.run", args, kwargs)
             return sentinel._orig_subprocess_run(*args, **kwargs)
 
         class _Popen(subprocess.Popen):
             def __init__(self, *args, **kwargs):
-                if args:
-                    sentinel._guard_subprocess("subprocess.Popen", args[0])
+                sentinel._guard_subprocess("subprocess.Popen", args, kwargs)
                 super().__init__(*args, **kwargs)
 
         subprocess.run = _run  # type: ignore[assignment]
@@ -654,44 +814,59 @@ class ImmutableCache:
 
     def __init__(self, root: Path) -> None:
         raw = Path(root)
-        if raw.exists() and raw.is_symlink():
+        lexical_root = self._lexical_absolute(raw)
+        self._assert_lexical_no_symlinks(lexical_root, through_existing_only=True)
+        # Root directory itself must not be a symlink.
+        if self._is_symlink(lexical_root):
             raise ImmutableCacheError("symlink components rejected")
-        self.root = raw.resolve()
-        if self.root.exists() and self.root.is_symlink():
-            raise ImmutableCacheError("symlink components rejected")
-        self.root.mkdir(parents=True, exist_ok=True)
-        self._assert_no_symlink_components(self.root, self.root)
+        lexical_root.mkdir(parents=True, exist_ok=True)
+        self.root = lexical_root
 
-    def _assert_no_symlink_components(self, path: Path, root: Path) -> None:
-        path = Path(path)
-        root = Path(root).resolve()
+    @staticmethod
+    def _lexical_absolute(path: Path) -> Path:
+        """Absolutize/normalize without following symlinks (abspath+normpath)."""
+        return Path(os.path.normpath(os.path.abspath(os.fspath(path))))
+
+    @staticmethod
+    def _is_symlink(path: Path) -> bool:
         try:
-            rel = path.resolve()
+            return stat.S_ISLNK(os.lstat(path).st_mode)
+        except FileNotFoundError:
+            return False
         except OSError as exc:
-            raise ImmutableCacheError("path resolution failed") from exc
-        if path.exists() and path.is_symlink():
-            raise ImmutableCacheError("symlink components rejected")
-        current = root
-        if current.is_symlink():
-            raise ImmutableCacheError("symlink components rejected")
-        try:
-            parts = Path(rel).relative_to(root).parts
-        except ValueError:
-            # path is root itself
-            return
-        for part in parts:
-            current = current / part
-            if current.exists() and current.is_symlink():
+            raise ImmutableCacheError("symlink lstat failed") from exc
+
+    def _assert_lexical_no_symlinks(
+        self, path: Path, *, through_existing_only: bool = False,
+    ) -> None:
+        """Inspect every lexical component with lstat (never resolve through links)."""
+        lexical = self._lexical_absolute(path)
+        root = getattr(self, "root", None)
+        if root is not None:
+            root_s = str(root)
+            lex_s = str(lexical)
+            if lex_s != root_s and not lex_s.startswith(root_s + os.sep):
+                raise ImmutableCacheError("path traversal rejected")
+        accum: Path | None = None
+        for index, part in enumerate(lexical.parts):
+            accum = Path(part) if accum is None else accum / part
+            try:
+                mode = os.lstat(accum).st_mode
+            except FileNotFoundError:
+                if through_existing_only:
+                    break
+                continue
+            except OSError as exc:
+                raise ImmutableCacheError("symlink lstat failed") from exc
+            if stat.S_ISLNK(mode):
                 raise ImmutableCacheError("symlink components rejected")
+            del index  # unused; loop is for side-effect checks
 
     def _entry_dir(self, content_hash: str) -> Path:
         if not SHA256_RE.match(content_hash):
             raise ImmutableCacheError(f"invalid content hash: {content_hash}")
-        rel = Path(content_hash[:2]) / content_hash
-        target = (self.root / rel).resolve()
-        if not str(target).startswith(str(self.root) + os.sep):
-            raise ImmutableCacheError("path traversal rejected")
-        self._assert_no_symlink_components(target, self.root)
+        target = self.root / content_hash[:2] / content_hash
+        self._assert_lexical_no_symlinks(target)
         return target
 
     def _canonical_metadata_bytes(
@@ -699,16 +874,37 @@ class ImmutableCache:
     ) -> bytes:
         meta = dict(metadata or {})
         meta["content_sha256"] = content_hash
-        # metadata_sha256 is stored separately; never embed into canonical bytes
         meta.pop("metadata_sha256", None)
-        return json.dumps(meta, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode(
-            "utf-8"
-        )
+        return json.dumps(
+            meta, sort_keys=True, ensure_ascii=False, separators=(",", ":"),
+        ).encode("utf-8")
+
+    def _read_file_nofollow(self, path: Path) -> bytes:
+        self._assert_lexical_no_symlinks(path)
+        if self._is_symlink(path):
+            raise ImmutableCacheError("symlink components rejected")
+        flags = os.O_RDONLY
+        if hasattr(os, "O_NOFOLLOW"):
+            flags |= os.O_NOFOLLOW
+        try:
+            fd = os.open(path, flags)
+        except OSError as exc:
+            raise ImmutableCacheError("failed to open cache file") from exc
+        try:
+            chunks: list[bytes] = []
+            while True:
+                chunk = os.read(fd, 65536)
+                if not chunk:
+                    break
+                chunks.append(chunk)
+            return b"".join(chunks)
+        finally:
+            os.close(fd)
 
     def _read_complete_entry(self, entry_dir: Path) -> tuple[bytes, bytes, str]:
-        if not entry_dir.is_dir() or entry_dir.is_symlink():
+        self._assert_lexical_no_symlinks(entry_dir)
+        if self._is_symlink(entry_dir) or not entry_dir.is_dir():
             raise ImmutableCacheError("unknown hash or incomplete entry")
-        self._assert_no_symlink_components(entry_dir, self.root)
         names = {p.name for p in entry_dir.iterdir()}
         if names != self._ENTRY_FILES:
             raise ImmutableCacheError(
@@ -716,13 +912,13 @@ class ImmutableCache:
             )
         for name in self._ENTRY_FILES:
             path = entry_dir / name
-            if path.is_symlink() or not path.is_file():
+            if self._is_symlink(path) or not path.is_file():
                 raise ImmutableCacheError("symlink or non-file entry component")
-        payload = (entry_dir / self._PAYLOAD_NAME).read_bytes()
-        meta_bytes = (entry_dir / self._META_NAME).read_bytes()
-        meta_hash_text = (
-            (entry_dir / self._META_HASH_NAME).read_text(encoding="utf-8").strip()
-        )
+        payload = self._read_file_nofollow(entry_dir / self._PAYLOAD_NAME)
+        meta_bytes = self._read_file_nofollow(entry_dir / self._META_NAME)
+        meta_hash_text = self._read_file_nofollow(
+            entry_dir / self._META_HASH_NAME,
+        ).decode("utf-8").strip()
         return payload, meta_bytes, meta_hash_text
 
     def _entry_matches(
@@ -742,6 +938,17 @@ class ImmutableCache:
             and existing_hash == meta_hash
         )
 
+    def _staging_orphans(self, parent: Path, content_hash: str) -> list[Path]:
+        """Scan parent for staging dirs matching put() naming convention."""
+        prefix = f".staging-{content_hash[:16]}-"
+        orphans: list[Path] = []
+        if not parent.is_dir() or self._is_symlink(parent):
+            return orphans
+        for p in parent.iterdir():
+            if p.name.startswith(prefix) and _STAGING_NAME_RE.match(p.name):
+                orphans.append(p)
+        return orphans
+
     def put(
         self,
         data: bytes,
@@ -760,15 +967,13 @@ class ImmutableCache:
         if entry_dir.exists():
             if self._entry_matches(entry_dir, data, meta_bytes, meta_hash):
                 return result
-            # Same payload identity with different canonical metadata, or
-            # corrupt/partial existing entry: fail closed (no overwrite).
             raise ImmutableCacheError(
                 f"immutable entry conflict for {content_hash}"
             )
 
         parent = entry_dir.parent
         parent.mkdir(parents=True, exist_ok=True)
-        self._assert_no_symlink_components(parent, self.root)
+        self._assert_lexical_no_symlinks(parent)
         staging = parent / f".staging-{content_hash[:16]}-{uuid.uuid4().hex}"
         try:
             staging.mkdir(mode=0o755)
@@ -783,15 +988,12 @@ class ImmutableCache:
             )
             if _inject_failure == "before_commit":
                 raise ImmutableCacheError("injected failure before_commit")
-            # Atomic commit: directory rename fails if destination exists (no
-            # overwrite of an accepted entry during a race).
             try:
                 os.rename(staging, entry_dir)
             except OSError as exc:
                 if entry_dir.exists() and self._entry_matches(
                     entry_dir, data, meta_bytes, meta_hash,
                 ):
-                    # Lost race to identical writer: treat as no-op.
                     if staging.exists():
                         shutil.rmtree(staging, ignore_errors=True)
                     return result
@@ -804,39 +1006,40 @@ class ImmutableCache:
             raise
         return result
 
-    def get(self, content_hash: str) -> bytes:
+    def get(self, content_hash: str, expected_metadata_sha256: str) -> bytes:
+        if not SHA256_RE.match(expected_metadata_sha256 or ""):
+            raise ImmutableCacheError("expected metadata sha256 required")
         entry_dir = self._entry_dir(content_hash)
-        # Reject orphans / sibling partials sharing the hash prefix directory.
         parent = entry_dir.parent
+        orphans = self._staging_orphans(parent, content_hash)
+        if orphans:
+            raise ImmutableCacheError("orphan/partial staging entry present")
+        if not entry_dir.exists():
+            raise ImmutableCacheError(
+                f"unknown hash or missing payload/metadata: {content_hash}"
+            )
+        # Reject duplicate artifacts beside the complete entry.
         if parent.is_dir():
-            siblings = [
+            extras = [
                 p for p in parent.iterdir()
-                if p.name == content_hash or p.name.startswith(content_hash)
-            ]
-            complete = [
-                p for p in siblings
-                if p.is_dir() and not p.is_symlink() and p.name == content_hash
-            ]
-            staging_orphans = [
-                p for p in siblings
-                if p.name.startswith(f".staging-{content_hash[:16]}")
-            ]
-            if staging_orphans:
-                raise ImmutableCacheError("orphan/partial staging entry present")
-            if len(complete) != 1:
-                raise ImmutableCacheError(
-                    "unknown hash or not exactly one complete entry"
+                if p.name != content_hash
+                and (
+                    p.name.startswith(content_hash)
+                    or _STAGING_NAME_RE.match(p.name)
                 )
-            extras = [p for p in siblings if p not in complete]
+            ]
             if extras:
                 raise ImmutableCacheError("duplicate or partial entry artifacts")
 
         payload, meta_bytes, meta_hash_text = self._read_complete_entry(entry_dir)
         if sha256_bytes(payload) != content_hash:
             raise ImmutableCacheError(f"payload hash mismatch for {content_hash}")
-        if not SHA256_RE.match(meta_hash_text):
-            raise ImmutableCacheError("malformed metadata hash seal")
-        if sha256_bytes(meta_bytes) != meta_hash_text:
+        actual_meta_hash = sha256_bytes(meta_bytes)
+        if actual_meta_hash != expected_metadata_sha256:
+            raise ImmutableCacheError(
+                f"metadata hash mismatch for {content_hash}"
+            )
+        if meta_hash_text != expected_metadata_sha256:
             raise ImmutableCacheError(
                 f"metadata hash mismatch for {content_hash}"
             )
@@ -852,30 +1055,32 @@ class ImmutableCache:
             )
         return payload
 
-    def has(self, content_hash: str) -> bool:
+    def has(self, content_hash: str, expected_metadata_sha256: str) -> bool:
         try:
-            self.get(content_hash)
+            self.get(content_hash, expected_metadata_sha256)
         except ImmutableCacheError:
             return False
         return True
 
     def entry_count(self) -> int:
+        """Count structurally complete entries (external seal checked on get)."""
         count = 0
-        if not self.root.is_dir():
+        if not self.root.is_dir() or self._is_symlink(self.root):
             return 0
         for shard in self.root.iterdir():
-            if not shard.is_dir() or shard.is_symlink():
+            if self._is_symlink(shard) or not shard.is_dir():
                 continue
             for entry in shard.iterdir():
-                if not entry.is_dir() or entry.is_symlink():
+                if self._is_symlink(entry) or not entry.is_dir():
                     continue
                 if entry.name.startswith(".staging-"):
                     continue
                 try:
-                    self.get(entry.name)
-                except ImmutableCacheError:
+                    names = {p.name for p in entry.iterdir()}
+                except OSError:
                     continue
-                count += 1
+                if names == self._ENTRY_FILES:
+                    count += 1
         return count
 
 
@@ -1023,9 +1228,12 @@ def _validate_evidence_record_core(
         name = field["name"]
         nullable = field.get("nullable", True)
         ftype = field.get("type")
+        # Every schema field must be present; nullable allows explicit null/empty.
+        if name not in record:
+            raise EvidenceValidationError(
+                f"missing field (omission not allowed): {name}"
+            )
         value = record.get(name)
-        if name not in record and not nullable:
-            raise EvidenceValidationError(f"missing non-nullable field: {name}")
         if not nullable and _is_null(value):
             raise EvidenceValidationError(f"missing non-nullable field: {name}")
         if _is_null(value):
@@ -1147,11 +1355,27 @@ def evaluate_g03(reproducible_retrieval: bool | None) -> str:
     return GATE_PASS if reproducible_retrieval else GATE_FAIL
 
 
+def _gate_datetime_ok(name: str, value: Any) -> bool:
+    if _is_null(value):
+        return True
+    if not isinstance(value, str):
+        return False
+    try:
+        _parse_datetime_semantic(name, value)
+    except EvidenceValidationError:
+        return False
+    return True
+
+
 def evaluate_g04(
     published_at: str | None, available_at: str | None,
 ) -> str:
     if _is_null(published_at) and _is_null(available_at):
         return GATE_UNRESOLVED
+    if not _gate_datetime_ok("published_at", published_at):
+        return GATE_FAIL
+    if not _gate_datetime_ok("available_at", available_at):
+        return GATE_FAIL
     if not _is_null(published_at) or not _is_null(available_at):
         return GATE_PASS
     return GATE_UNRESOLVED
@@ -1166,6 +1390,8 @@ def evaluate_g05(quality_controls_met: bool | None) -> str:
 def evaluate_g06(available_at: str | None) -> str:
     if _is_null(available_at):
         return GATE_UNRESOLVED
+    if not _gate_datetime_ok("available_at", available_at):
+        return GATE_FAIL
     return GATE_PASS
 
 
@@ -1195,6 +1421,7 @@ def evaluate_g09(
     pilot_keys: set[str],
     policy: LockedGatePolicy,
 ) -> str:
+    policy = require_sealed_gate_policy(policy)
     if not pilot_keys:
         return GATE_UNRESOLVED
     registered = [c["candidate_id"] for c in part3a.REGISTERED_CANDIDATES]
@@ -1213,6 +1440,7 @@ def evaluate_g10(
     pilot_keys: set[str],
     policy: LockedGatePolicy,
 ) -> str:
+    policy = require_sealed_gate_policy(policy)
     if not pilot_keys:
         return GATE_UNRESOLVED
     for block, candidates in BLOCK_CANDIDATES.items():
@@ -1235,6 +1463,7 @@ def evaluate_g11(
     usable_positive_by_block_year: dict[str, dict[str, int]],
     policy: LockedGatePolicy,
 ) -> str:
+    policy = require_sealed_gate_policy(policy)
     for block in BLOCK_CANDIDATES:
         for year in policy.target_years:
             count = usable_positive_by_block_year.get(block, {}).get(year, 0)
@@ -1247,6 +1476,7 @@ def evaluate_g12(
     usable_negative_by_block_year: dict[str, dict[str, int]],
     policy: LockedGatePolicy,
 ) -> str:
+    policy = require_sealed_gate_policy(policy)
     for block in BLOCK_CANDIDATES:
         for year in policy.target_years:
             count = usable_negative_by_block_year.get(block, {}).get(year, 0)
@@ -1256,6 +1486,7 @@ def evaluate_g12(
 
 
 def evaluate_g13(predictor_keys: set[str], policy: LockedGatePolicy) -> str:
+    policy = require_sealed_gate_policy(policy)
     n = len(predictor_keys)
     if n != policy.g13_expected:
         return GATE_FAIL
@@ -1272,6 +1503,7 @@ def evaluate_g14(
     post_evidence_substitution: bool,
     policy: LockedGatePolicy,
 ) -> str:
+    policy = require_sealed_gate_policy(policy)
     if post_evidence_substitution:
         return GATE_FAIL
     if option_id != policy.g14_option_id:
@@ -1357,11 +1589,12 @@ def build_immutable_cache_contract() -> dict:
         "identical_payload_different_metadata_fail_closed": True,
         "payload_hash_verified_on_get": True,
         "metadata_hash_verified_on_get": True,
+        "external_expected_metadata_sha256_required_on_get": True,
         "metadata_payload_linkage_verified_on_get": True,
         "exactly_one_complete_entry_required": True,
         "path_traversal_rejected": True,
-        "symlink_components_rejected": True,
-        "orphan_partial_entries_fail_closed": True,
+        "symlink_components_rejected_lexically": True,
+        "orphan_partial_staging_entries_fail_closed": True,
         "malformed_metadata_json_fail_closed": True,
         "overwrite_support": False,
         "mutable_latest_file": False,
@@ -1388,8 +1621,9 @@ def build_network_denial_contract() -> dict:
             "urllib.request.urlretrieve",
             "http.client.HTTPConnection.connect",
             "http.client.HTTPSConnection.connect",
-            "subprocess:curl|wget|nc|ssh",
+            "subprocess:default_deny_except_exact_readonly_git",
         ],
+        "subprocess_policy": "default_deny_except_exact_argument_level_readonly_git",
         "exact_git_readonly_allowlist": sorted(_GIT_ALLOWED_SUBCOMMANDS),
         "on_attempt": {
             "increment_network_calls_attempted": True,
@@ -1528,26 +1762,113 @@ def count_real_evidence_records(repo_root: Path) -> int:
     return count
 
 
+_PENDING_DECISION_STATUSES = frozenset({
+    "pending_part3b_evidence",
+    "",
+    "out_of_scope_locked",
+    "research_design_only_not_registered",
+    "registry_only_not_registered",
+})
+_SCORE_FIELD_NAMES = frozenset({
+    "accessibility_score", "accessibility_scores", "score",
+})
+_DECISION_FIELD_NAMES = frozenset({
+    "decision_status", "candidate_decision", "admission_status",
+})
+_CONTENT_SCAN_SUFFIXES = frozenset({".csv", ".tsv", ".json", ".jsonl", ".ndjson"})
+
+
+def _stage125_files(repo_root: Path) -> list[Path]:
+    stage125 = repo_root / "project" / "stage125"
+    if not stage125.is_dir():
+        return []
+    return [p for p in stage125.rglob("*") if p.is_file() and not p.is_symlink()]
+
+
+def _iter_content_dicts(path: Path) -> list[dict[str, Any]]:
+    suffix = path.suffix.lower()
+    try:
+        if suffix in {".csv", ".tsv"}:
+            delim = "\t" if suffix == ".tsv" else ","
+            return list(csv.DictReader(path.open(encoding="utf-8"), delimiter=delim))
+        if suffix == ".json":
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(data, list):
+                return [x for x in data if isinstance(x, dict)]
+            if isinstance(data, dict):
+                for key in ("records", "rows", "evidence", "items", "assertions"):
+                    if isinstance(data.get(key), list):
+                        return [x for x in data[key] if isinstance(x, dict)]
+                return [data]
+        if suffix in {".jsonl", ".ndjson"}:
+            out: list[dict[str, Any]] = []
+            with path.open(encoding="utf-8") as fh:
+                for line in fh:
+                    if not line.strip():
+                        continue
+                    obj = json.loads(line)
+                    if isinstance(obj, dict):
+                        out.append(obj)
+            return out
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, csv.Error):
+        return []
+    return []
+
+
+def _is_nonempty_score(value: Any) -> bool:
+    if value is None:
+        return False
+    text = str(value).strip()
+    return text not in ("", "null", "None", "nan", "NaN")
+
+
 def count_accessibility_scores(repo_root: Path) -> int:
-    path = repo_root / "project/stage125/part3_candidate_inventory_stage125.csv"
+    """Recursively count non-empty accessibility/score fields under stage125."""
     scored = 0
-    for row in csv.DictReader(path.open(encoding="utf-8")):
-        val = row.get("accessibility_score", "")
-        if str(val).strip() not in ("", "null", "None"):
-            scored += 1
+    for path in _stage125_files(repo_root):
+        if path.suffix.lower() not in _CONTENT_SCAN_SUFFIXES:
+            continue
+        # Schema/rubric/contract docs define the field name but hold no scores.
+        if path.name in {
+            "accessibility_scoring_rubric_stage125_part3a.json",
+            "part3_source_evidence_manifest_schema_stage125.json",
+            "data_dictionary_stage125.csv",
+        }:
+            continue
+        for row in _iter_content_dicts(path):
+            for key, value in row.items():
+                if str(key).strip().lower() in _SCORE_FIELD_NAMES and _is_nonempty_score(value):
+                    scored += 1
     return scored
 
 
 def count_candidate_decisions(repo_root: Path) -> int:
-    path = repo_root / "project/stage125/part3_candidate_inventory_stage125.csv"
+    """Recursively count non-pending decision fields under stage125."""
     decided = 0
-    for row in csv.DictReader(path.open(encoding="utf-8")):
-        status = row.get("decision_status", "")
-        if status not in ("pending_part3b_evidence", "", "out_of_scope_locked",
-                          "research_design_only_not_registered",
-                          "registry_only_not_registered"):
-            decided += 1
+    for path in _stage125_files(repo_root):
+        if path.suffix.lower() not in _CONTENT_SCAN_SUFFIXES:
+            continue
+        for row in _iter_content_dicts(path):
+            for key, value in row.items():
+                if str(key).strip().lower() not in _DECISION_FIELD_NAMES:
+                    continue
+                status = str(value or "").strip()
+                if status not in _PENDING_DECISION_STATUSES:
+                    decided += 1
     return decided
+
+
+def count_populated_gate_results(repo_root: Path) -> int:
+    """Count populated Gate-result data rows (template must remain header-only)."""
+    count = 0
+    for path in _stage125_files(repo_root):
+        low = path.name.lower()
+        if "gate_result" not in low and path.name != F_GATE_TEMPLATE:
+            continue
+        if path.suffix.lower() not in {".csv", ".tsv"}:
+            continue
+        count += _count_records_in_file(path)
+    return count
 
 
 def scan_repository_cache_entries(repo_root: Path) -> int:
@@ -1566,79 +1887,78 @@ def scan_repository_cache_entries(repo_root: Path) -> int:
     return count
 
 
-def _is_unauthorized_part3b_path(rel: str, path: Path) -> bool:
-    if rel in PART3B0_ALLOWED_EXACT:
+def _file_has_prohibited_live_content(path: Path) -> bool:
+    """True when an allowlisted/unknown file carries live scores/decisions/evidence."""
+    if path.suffix.lower() not in _CONTENT_SCAN_SUFFIXES:
         return False
-    # Allow the frozen Part 3A evidence *schema* only.
-    if rel in part3a.PART3B_ALLOWED_EXACT:
+    # Skip pure schema/rubric vocabulary files.
+    if path.name in {
+        "accessibility_scoring_rubric_stage125_part3a.json",
+        "part3_source_evidence_manifest_schema_stage125.json",
+        "data_dictionary_stage125.csv",
+        "provenance_manifest_schema_stage125.json",
+    }:
         return False
-    low_name = path.name.lower()
-    low_rel = rel.lower().replace("\\", "/")
-    if any(low_name.startswith(p) for p in UNAUTHORIZED_NAME_PREFIXES):
-        return True
-    if any(marker in low_name for marker in UNAUTHORIZED_NAME_SUFFIX_MARKERS):
-        return True
-    if any(low_rel.startswith(p) for p in part3a.PART3B_FORBIDDEN_PREFIXES):
-        return True
-    if rel in part3a.PART3B_FORBIDDEN_EXACT:
-        return True
-    if any(tok in low_name for tok in EVIDENCE_NAME_TOKENS) and (
-        path.suffix.lower() in EVIDENCE_SCAN_SUFFIXES
-        or path.suffix.lower() in {".bin", ".raw", ".snapshot"}
-    ):
-        # Avoid flagging frozen Part 3A/3A.1 contract filenames that mention
-        # evidence only as schema/protocol vocabulary.
-        frozen_ok = {
-            "part3_source_evidence_manifest_schema_stage125.json",
-            "part3_gate_decision_protocol_stage125.csv",
-            "part3a_approved_gate_thresholds_stage125.csv",
-            "part3a_decision_lock_stage125.json",
-            "part3a_selected_pilot_pairs_stage125.csv",
-            "part3_candidate_inventory_stage125.csv",
-            "accessibility_scoring_rubric_stage125_part3a.json",
-            "stage125_part3a_decision_lock_qc_report.json",
-            "metadata_and_hashes_stage125_part3a_decision_lock.json",
-            "stage125_part3a_pilot_protocol_qc_report.json",
-            "metadata_and_hashes_stage125_part3a.json",
-            "README_STAGE125_PART3A_DECISION_LOCK.md",
-            "README_STAGE125_PART3A_PILOT_PROTOCOL.md",
-        }
-        if path.name in frozen_ok:
-            return False
-        if "schema" in low_name and "part3_source_evidence" in low_name:
-            return False
-        # part3a decision-lock assets are frozen protocol, not Part 3B capture.
-        if "part3a_decision" in low_name or "part3a_pilot" in low_name:
-            return False
-        if "part3_gate_decision_protocol" in low_name:
-            return False
-        return True
-    parts = {p.lower() for p in Path(rel).parts}
-    if parts & CACHE_DIR_NAMES:
-        return True
+    rows = _iter_content_dicts(path)
+    for row in rows:
+        keys = {str(k).strip().lower() for k in row}
+        if keys & _SCORE_FIELD_NAMES:
+            for k, v in row.items():
+                if str(k).strip().lower() in _SCORE_FIELD_NAMES and _is_nonempty_score(v):
+                    return True
+        if keys & _DECISION_FIELD_NAMES:
+            for k, v in row.items():
+                if str(k).strip().lower() in _DECISION_FIELD_NAMES:
+                    if str(v or "").strip() not in _PENDING_DECISION_STATUSES:
+                        return True
+        # Populated evidence records outside the empty template.
+        if "evidence_id" in keys and _is_nonempty_score(row.get("evidence_id")):
+            if path.name != F_EVIDENCE_TEMPLATE and "schema" not in path.name.lower():
+                return True
+        if "status" in keys and path.name == F_GATE_TEMPLATE:
+            if _is_nonempty_score(row.get("status")):
+                return True
     return False
 
 
 def scan_for_part3b_capture_start(repo_root: Path) -> dict:
-    """Recursively detect unauthorized Part 3B/evidence/scoring/decision/cache files."""
+    """Closed-world Stage125 allowlist + recursive content-aware capture detector."""
     hits: list[str] = []
     for rel in part3a.PART3B_FORBIDDEN_EXACT:
         if (repo_root / rel).exists() and rel not in PART3B0_ALLOWED_EXACT:
             hits.append(rel)
-    scan_roots = [
-        repo_root / "project" / "stage125",
-        repo_root / "project" / "src",
-        repo_root / "project" / "tests",
-    ]
-    for base in scan_roots:
+
+    stage125 = repo_root / "project" / "stage125"
+    if stage125.is_dir():
+        for path in stage125.rglob("*"):
+            if not path.is_file():
+                continue
+            rel = str(path.relative_to(repo_root)).replace("\\", "/")
+            if rel not in STAGE125_ALLOWED_EXACT:
+                hits.append(rel)
+                continue
+            if _file_has_prohibited_live_content(path):
+                hits.append(rel)
+
+    for base_name, base in (
+        ("src", repo_root / "project" / "src"),
+        ("tests", repo_root / "project" / "tests"),
+    ):
+        del base_name
         if not base.is_dir():
             continue
         for path in base.rglob("*"):
             if not path.is_file():
                 continue
-            rel = str(path.relative_to(repo_root))
-            if _is_unauthorized_part3b_path(rel, path):
+            rel = str(path.relative_to(repo_root)).replace("\\", "/")
+            if rel in PART3B0_ALLOWED_EXACT:
+                continue
+            low = path.name.lower()
+            if any(low.startswith(p) for p in UNAUTHORIZED_NAME_PREFIXES):
                 hits.append(rel)
+            elif any(rel.startswith(p) for p in part3a.PART3B_FORBIDDEN_PREFIXES):
+                hits.append(rel)
+
     for prefix in part3a.PART3B_FORBIDDEN_PREFIXES:
         root = repo_root / prefix
         if root.is_dir():
@@ -1647,7 +1967,19 @@ def scan_for_part3b_capture_start(repo_root: Path) -> dict:
                     rel = str(path.relative_to(repo_root))
                     if rel not in PART3B0_ALLOWED_EXACT:
                         hits.append(rel)
-    return {"hits": sorted(set(hits)), "no_part3b": len(set(hits)) == 0}
+
+    # Content-derived capture signals.
+    if count_accessibility_scores(repo_root) > 0:
+        hits.append("content:accessibility_scores_present")
+    if count_candidate_decisions(repo_root) > 0:
+        hits.append("content:candidate_decisions_present")
+    if count_populated_gate_results(repo_root) > 0:
+        hits.append("content:populated_gate_results_present")
+    if count_real_evidence_records(repo_root) > 0:
+        hits.append("content:real_evidence_records_present")
+
+    uniq = sorted(set(hits))
+    return {"hits": uniq, "no_part3b": len(uniq) == 0}
 
 
 def run_guardrails(

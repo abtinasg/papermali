@@ -248,6 +248,28 @@ def test_unknown_field_rejected(schema_and_maps):
         p3b0.validate_evidence_record_synthetic(rec, **schema_and_maps)
 
 
+def test_omission_of_nullable_field_fails(schema_and_maps):
+    rec = _synthetic_valid_record()
+    rec.pop("source_title")
+    with pytest.raises(p3b0.EvidenceValidationError, match="omission not allowed"):
+        p3b0.validate_evidence_record_synthetic(rec, **schema_and_maps)
+
+
+def test_explicit_null_nullable_field_passes(schema_and_maps):
+    rec = _synthetic_valid_record()
+    rec["source_title"] = None
+    p3b0.validate_evidence_record_synthetic(rec, **schema_and_maps)
+
+
+def test_exact_22_field_manifest_record_passes(schema_and_maps):
+    schema = schema_and_maps["schema"]
+    fields = p3b0.evidence_header_from_schema(schema)
+    assert len(fields) == 22
+    rec = _synthetic_valid_record()
+    assert set(rec) == set(fields)
+    p3b0.validate_evidence_record_synthetic(rec, **schema_and_maps)
+
+
 def test_invalid_calendar_enum(schema_and_maps):
     rec = _synthetic_valid_record()
     rec["calendar"] = "mayan"
@@ -325,8 +347,41 @@ def test_missing_availability_time_unresolved():
     assert p3b0.evaluate_g06(None) == p3b0.GATE_UNRESOLVED
 
 
+def test_g04_g06_malformed_dates_fail():
+    assert p3b0.evaluate_g04("not-a-date", None) == p3b0.GATE_FAIL
+    assert p3b0.evaluate_g04(None, "not-a-date") == p3b0.GATE_FAIL
+    assert p3b0.evaluate_g04("2026-99-99T00:00:00Z", None) == p3b0.GATE_FAIL
+    assert p3b0.evaluate_g06("not-a-date") == p3b0.GATE_FAIL
+    assert p3b0.evaluate_g06("2026-01-01T00:00:00Z") == p3b0.GATE_PASS
+    assert p3b0.evaluate_g04(
+        "2026-01-01T00:00:00Z", "2026-01-02T00:00:00+00:00",
+    ) == p3b0.GATE_PASS
+
+
 def test_future_target_year_leakage_fails():
     assert p3b0.evaluate_g07(False) == p3b0.GATE_FAIL
+
+
+def test_forged_weakened_locked_policy_rejected():
+    real = _policy()
+    forged = p3b0.LockedGatePolicy(
+        g09_threshold=0.1,
+        g10_threshold=0.0,
+        g11_minimum=0,
+        g12_minimum=0,
+        g13_expected=79,
+        g14_option_id=real.g14_option_id,
+        target_years=real.target_years,
+        source_thresholds_sha256=real.source_thresholds_sha256,
+        source_decision_lock_sha256=real.source_decision_lock_sha256,
+        _seal=real._seal,
+    )
+    pilot = {f"k{i}" for i in range(80)}
+    usable = {c["candidate_id"]: pilot for c in part3a.REGISTERED_CANDIDATES}
+    with pytest.raises(p3b0.QCFail, match="LockedGatePolicy"):
+        p3b0.evaluate_g09(usable, pilot, forged)
+    with pytest.raises(p3b0.QCFail, match="LockedGatePolicy"):
+        p3b0.require_sealed_gate_policy(forged)
 
 
 def test_g09_caller_cannot_weaken_threshold():
@@ -521,7 +576,7 @@ def test_cache_write_once_and_identical_no_op(tmp_path):
     r2 = cache.put(data, {"note": "synthetic"})
     assert r1.payload_sha256 == r2.payload_sha256
     assert r1.metadata_sha256 == r2.metadata_sha256
-    assert cache.get(r1.payload_sha256) == data
+    assert cache.get(r1.payload_sha256, r1.metadata_sha256) == data
     assert cache.entry_count() == 1
 
 
@@ -550,7 +605,46 @@ def test_cache_metadata_only_tampering_fails(tmp_path):
     tampered["note"] = "tampered"
     meta_path.write_text(json.dumps(tampered, sort_keys=True), encoding="utf-8")
     with pytest.raises(p3b0.ImmutableCacheError, match="metadata hash"):
-        cache.get(result.payload_sha256)
+        cache.get(result.payload_sha256, result.metadata_sha256)
+
+
+def test_cache_metadata_and_local_seal_tampering_fails(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "orig"})
+    entry = cache._entry_dir(result.payload_sha256)
+    tampered = {"content_sha256": result.payload_sha256, "note": "evil"}
+    meta_bytes = json.dumps(tampered, sort_keys=True, separators=(",", ":")).encode()
+    (entry / cache._META_NAME).write_bytes(meta_bytes)
+    (entry / cache._META_HASH_NAME).write_text(
+        p3b0.sha256_bytes(meta_bytes) + "\n", encoding="utf-8",
+    )
+    # Local seal matches tampered bytes, but original returned handle must fail.
+    with pytest.raises(p3b0.ImmutableCacheError, match="metadata hash"):
+        cache.get(result.payload_sha256, result.metadata_sha256)
+
+
+def test_cache_wrong_expected_metadata_hash_fails(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "orig"})
+    with pytest.raises(p3b0.ImmutableCacheError, match="metadata hash"):
+        cache.get(result.payload_sha256, "c" * 64)
+
+
+def test_cache_original_handle_detects_every_mutation(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "orig"})
+    entry = cache._entry_dir(result.payload_sha256)
+    (entry / cache._PAYLOAD_NAME).write_bytes(b"mutated-payload")
+    with pytest.raises(p3b0.ImmutableCacheError):
+        cache.get(result.payload_sha256, result.metadata_sha256)
+    # restore payload, mutate metadata only
+    (entry / cache._PAYLOAD_NAME).write_bytes(b"payload")
+    meta_path = entry / cache._META_NAME
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    meta["note"] = "mutated"
+    meta_path.write_text(json.dumps(meta, sort_keys=True, separators=(",", ":")), encoding="utf-8")
+    with pytest.raises(p3b0.ImmutableCacheError, match="metadata hash"):
+        cache.get(result.payload_sha256, result.metadata_sha256)
 
 
 def test_cache_payload_tampering_fails(tmp_path):
@@ -559,7 +653,7 @@ def test_cache_payload_tampering_fails(tmp_path):
     entry = cache._entry_dir(result.payload_sha256)
     (entry / cache._PAYLOAD_NAME).write_bytes(b"tampered")
     with pytest.raises(p3b0.ImmutableCacheError, match="payload hash"):
-        cache.get(result.payload_sha256)
+        cache.get(result.payload_sha256, result.metadata_sha256)
 
 
 def test_cache_payload_without_metadata_fails(tmp_path):
@@ -569,7 +663,7 @@ def test_cache_payload_without_metadata_fails(tmp_path):
     (entry / cache._META_NAME).unlink()
     (entry / cache._META_HASH_NAME).unlink()
     with pytest.raises(p3b0.ImmutableCacheError):
-        cache.get(result.payload_sha256)
+        cache.get(result.payload_sha256, result.metadata_sha256)
 
 
 def test_cache_metadata_without_payload_fails(tmp_path):
@@ -578,7 +672,7 @@ def test_cache_metadata_without_payload_fails(tmp_path):
     entry = cache._entry_dir(result.payload_sha256)
     (entry / cache._PAYLOAD_NAME).unlink()
     with pytest.raises(p3b0.ImmutableCacheError):
-        cache.get(result.payload_sha256)
+        cache.get(result.payload_sha256, result.metadata_sha256)
 
 
 def test_cache_duplicate_metadata_fails(tmp_path):
@@ -587,7 +681,7 @@ def test_cache_duplicate_metadata_fails(tmp_path):
     entry = cache._entry_dir(result.payload_sha256)
     (entry / "metadata.json.bak").write_bytes((entry / cache._META_NAME).read_bytes())
     with pytest.raises(p3b0.ImmutableCacheError, match="exactly"):
-        cache.get(result.payload_sha256)
+        cache.get(result.payload_sha256, result.metadata_sha256)
 
 
 def test_cache_malformed_metadata_json_fails(tmp_path):
@@ -599,11 +693,22 @@ def test_cache_malformed_metadata_json_fails(tmp_path):
     (entry / cache._META_HASH_NAME).write_text(
         p3b0.sha256_bytes(bad) + "\n", encoding="utf-8",
     )
-    with pytest.raises(p3b0.ImmutableCacheError, match="malformed metadata JSON"):
-        cache.get(result.payload_sha256)
+    with pytest.raises(p3b0.ImmutableCacheError, match="malformed metadata JSON|metadata hash"):
+        cache.get(result.payload_sha256, result.metadata_sha256)
 
 
-def test_cache_symlink_component_rejected(tmp_path):
+def test_cache_orphan_staging_detected_with_real_name(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "orig"})
+    parent = cache._entry_dir(result.payload_sha256).parent
+    orphan = parent / f".staging-{result.payload_sha256[:16]}-{'a' * 32}"
+    orphan.mkdir()
+    (orphan / cache._PAYLOAD_NAME).write_bytes(b"partial")
+    with pytest.raises(p3b0.ImmutableCacheError, match="orphan/partial staging"):
+        cache.get(result.payload_sha256, result.metadata_sha256)
+
+
+def test_cache_symlink_root_rejected(tmp_path):
     real = tmp_path / "real"
     real.mkdir()
     link = tmp_path / "link"
@@ -612,15 +717,66 @@ def test_cache_symlink_component_rejected(tmp_path):
         p3b0.ImmutableCache(link)
 
 
+def test_cache_intermediate_shard_symlink_inside_root_rejected(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "x"})
+    entry = cache._entry_dir(result.payload_sha256)
+    shard = entry.parent
+    # Replace shard directory with symlink to another dir inside root.
+    alt = tmp_path / "altshard"
+    alt.mkdir()
+    shutil = __import__("shutil")
+    shutil.rmtree(shard)
+    shard.symlink_to(alt, target_is_directory=True)
+    with pytest.raises(p3b0.ImmutableCacheError, match="symlink"):
+        cache.get(result.payload_sha256, result.metadata_sha256)
+
+
+def test_cache_intermediate_symlink_outside_root_rejected(tmp_path):
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    cache_root = tmp_path / "cache"
+    cache_root.mkdir()
+    cache = p3b0.ImmutableCache(cache_root)
+    data = b"payload"
+    content_hash = p3b0.sha256_bytes(data)
+    shard = cache_root / content_hash[:2]
+    shard.symlink_to(outside, target_is_directory=True)
+    with pytest.raises(p3b0.ImmutableCacheError, match="symlink"):
+        cache.put(data, {"note": "x"})
+
+
+def test_cache_final_entry_file_symlink_rejected(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "x"})
+    entry = cache._entry_dir(result.payload_sha256)
+    payload = entry / cache._PAYLOAD_NAME
+    real = entry / "real.bin"
+    real.write_bytes(b"payload")
+    payload.unlink()
+    payload.symlink_to(real)
+    with pytest.raises(p3b0.ImmutableCacheError, match="symlink|exactly|failed to open"):
+        cache.get(result.payload_sha256, result.metadata_sha256)
+
+
+def test_cache_symlink_introduced_after_init_rejected(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "x"})
+    entry = cache._entry_dir(result.payload_sha256)
+    meta = entry / cache._META_NAME
+    backup = entry / "meta.bak"
+    backup.write_bytes(meta.read_bytes())
+    meta.unlink()
+    meta.symlink_to(backup)
+    with pytest.raises(p3b0.ImmutableCacheError, match="symlink|exactly|failed to open"):
+        cache.get(result.payload_sha256, result.metadata_sha256)
+
+
 def test_cache_injected_failure_leaves_no_partial(tmp_path):
     cache = p3b0.ImmutableCache(tmp_path)
     with pytest.raises(p3b0.ImmutableCacheError, match="injected failure"):
         cache.put(b"payload", {"note": "x"}, _inject_failure="before_commit")
     assert cache.entry_count() == 0
-    assert list(tmp_path.rglob("*")) == [] or all(
-        p.name.startswith(".") or p.is_dir() for p in tmp_path.rglob("*")
-    )
-    # No complete entry accepted
     for p in tmp_path.rglob("payload.bin"):
         pytest.fail(f"partial payload left behind: {p}")
 
@@ -633,14 +789,15 @@ def test_cache_path_traversal_rejected(tmp_path):
 
 def test_cache_unknown_hash_fail_closed(tmp_path):
     cache = p3b0.ImmutableCache(tmp_path)
-    with pytest.raises(p3b0.ImmutableCacheError, match="unknown hash|exactly one"):
-        cache.get("b" * 64)
+    with pytest.raises(p3b0.ImmutableCacheError, match="unknown hash|expected metadata"):
+        cache.get("b" * 64, "c" * 64)
 
 
 def test_immutable_cache_contract_states_enforced_guarantees_only():
     contract = p3b0.build_immutable_cache_contract()
     assert contract["overwrite_support"] is False
     assert contract["put_returns_payload_and_metadata_sha256"] is True
+    assert contract["external_expected_metadata_sha256_required_on_get"] is True
     assert "tautological_meta_hash_check" not in contract
 
 
@@ -683,6 +840,59 @@ def test_network_blocks_urllib_and_curl_subprocess():
         with pytest.raises(p3b0.NetworkBlockedError):
             subprocess.run(["curl", "http://example.invalid/"], check=False)
         assert sentinel.calls_attempted >= 2
+
+
+def test_subprocess_default_deny_no_child_process_launched():
+    launched: list[tuple] = []
+
+    def _boom_run(*args, **kwargs):
+        launched.append(("run", args, kwargs))
+        raise AssertionError("child process launched")
+
+    class _BoomPopen:
+        def __init__(self, *args, **kwargs):
+            launched.append(("popen", args, kwargs))
+            raise AssertionError("child process launched")
+
+    cases = [
+        (["bash", "-c", "echo hi"], {}),
+        (["python", "-c", "print(1)"], {}),
+        (["/usr/bin/curl", "http://example.invalid/"], {}),
+        ([], {"args": ["wget", "http://example.invalid/"]}),
+        (["echo hi"], {"shell": True}),
+        ("echo hi", {}),
+        (["git", "-C", str(REPO_ROOT), "-c", "alias.x=!touch /tmp/x", "x"], {}),
+        (["git", "-C", str(REPO_ROOT), "log", "--ext-diff"], {}),
+        (["git", "-C", str(REPO_ROOT), "show", "--textconv", "HEAD"], {}),
+        (["/usr/bin/git", "-C", str(REPO_ROOT), "rev-parse", "HEAD"], {}),
+    ]
+    with p3b0.network_sentinel() as sentinel:
+        saved_run = sentinel._orig_subprocess_run
+        saved_popen = sentinel._orig_subprocess_popen
+        sentinel._orig_subprocess_run = _boom_run  # type: ignore[method-assign]
+        sentinel._orig_subprocess_popen = _BoomPopen  # type: ignore[assignment]
+        try:
+            for args, kwargs in cases:
+                with pytest.raises(p3b0.NetworkBlockedError):
+                    if isinstance(args, str):
+                        subprocess.run(args, **kwargs)
+                    elif args:
+                        subprocess.run(args, **kwargs)
+                    else:
+                        subprocess.run(**kwargs)
+                with pytest.raises(p3b0.NetworkBlockedError):
+                    if isinstance(args, str):
+                        subprocess.Popen(args, **kwargs)
+                    elif args:
+                        subprocess.Popen(args, **kwargs)
+                    else:
+                        subprocess.Popen(**kwargs)
+            assert launched == []
+            assert sentinel.calls_attempted >= len(cases)
+        finally:
+            # Restore originals before context exit so sentinel.restore() is clean.
+            sentinel._orig_subprocess_run = saved_run
+            sentinel._orig_subprocess_popen = saved_popen
 
 
 def test_network_allows_readonly_git_and_restores_after_exception():
@@ -760,6 +970,26 @@ def test_count_real_evidence_records_includes_populated_template(tmp_path):
         encoding="utf-8",
     )
     assert p3b0.count_real_evidence_records(tmp_path) >= 1
+
+
+def test_content_aware_qc_detects_innocuous_filenames(tmp_path):
+    stage = tmp_path / "project" / "stage125"
+    stage.mkdir(parents=True)
+    (stage / "notes.csv").write_text(
+        "accessibility_score,decision_status\n4,admitted\n",
+        encoding="utf-8",
+    )
+    (stage / "results.json").write_text(
+        json.dumps([{"evidence_id": "ev1", "accessibility_score": 5}]),
+        encoding="utf-8",
+    )
+    assert p3b0.count_accessibility_scores(tmp_path) >= 2
+    assert p3b0.count_candidate_decisions(tmp_path) >= 1
+    scan = p3b0.scan_for_part3b_capture_start(tmp_path)
+    assert scan["no_part3b"] is False
+    joined = "\n".join(scan["hits"])
+    assert "notes.csv" in joined
+    assert "results.json" in joined
 
 
 def test_no_hardcoded_true_qc_assertions():
