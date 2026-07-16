@@ -14,16 +14,16 @@
     "urllib.request.urlretrieve",
     "http.client.HTTPConnection.connect",
     "http.client.HTTPSConnection.connect",
-    "subprocess:curl|wget|nc|ssh"
+    "subprocess:default_deny_except_exact_readonly_git"
   ],
+  "subprocess_policy": "default_deny_except_exact_argument_level_readonly_git",
   "exact_git_readonly_allowlist": [
-    "diff",
+    "check-ignore",
     "log",
     "ls-files",
     "merge-base",
     "rev-parse",
-    "show",
-    "status"
+    "show"
   ],
   "on_attempt": {
     "increment_network_calls_attempted": true,

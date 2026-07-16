@@ -1,10 +1,10 @@
 {
   "stage": "stage125_part3b0_evidence_readiness",
   "current_stage": "Stage125",
-  "generated_at": "2026-07-16T16:04:35+03:00",
-  "source_commit": "79d8c6ecc145c8e17a781070ff81efed158e590c",
-  "source_file_sha256": "56f5ef34d9fe22d2a7e518eb981ec0fdec1a9a69a3e7db677771b3a547d51369",
-  "test_file_sha256": "35de53cd6c14621e8d52969274b9f376b2fdfec66bde2e5c11109896630065a2",
+  "generated_at": "2026-07-16T16:38:15+03:00",
+  "source_commit": "2fd7a93a5df8c109b2dd717427bffda500943de2",
+  "source_file_sha256": "70fed3c08f05455762c90aae2d5ab7b94224f16a68c960d5fbc0eaaeb168a8a5",
+  "test_file_sha256": "de86ea205a52a78d9badeaaa06f11d84acda40914ea2a4ecfc348ef4191e3e02",
   "baseline_commit": "75abf3f6d92e514df568e1d6912ccc47cdffc933",
   "assertion_count": 32,
   "failed_count": 0,
@@ -159,8 +159,8 @@
     "part3b0_evidence_capture_contract_stage125.json": "e5ed52af444b205e4ba9e2357df69e148aeb4f3a14d710b944284a17ed9d6b05",
     "part3b0_evidence_manifest_template_stage125.csv": "c61f5c9b1948bda5611cadf84f3c84aea56912d063bb0017ac09a3b8d49a5d59",
     "part3b0_gate_result_template_stage125.csv": "cef8d433248e594159f0b61a06bd863d138506ccd76170f0eb7813e05f6857f5",
-    "part3b0_immutable_cache_contract_stage125.json": "8c3befb0092e0d7bc62da3f44ea4313b8124598155deba64636778f98c599cb6",
-    "part3b0_network_denial_contract_stage125.json": "295487e3fd27520279d300fdc5e780012b4f491e27ab6f461b1dca300944fb28"
+    "part3b0_immutable_cache_contract_stage125.json": "ebc456ea8b5f1fc4bdf9862ec1103b93a991c50837d95296ee2072e60a919cd8",
+    "part3b0_network_denial_contract_stage125.json": "7b9bd4364ec3a5c538063eace53286530cb942490ad77910a2eaa029904643f7"
   },
   "frozen_assets_before": {
     "project/stage122/eligibility_company_review.csv": "398fc500a64bc9c65aab64e52f81f2dd776345d3aaeee254c5c0a838db19f3a6",
