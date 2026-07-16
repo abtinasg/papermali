@@ -1,0 +1,30 @@
+{
+  "stage": "stage125_part3b_evidence_capture",
+  "baseline_commit": "959169c71a6e9378995be40979d1c6df7dc45a1d",
+  "network_calls_attempted": 3,
+  "network_calls_succeeded": 3,
+  "network_calls_failed": 0,
+  "bytes_retrieved": 204280,
+  "final_resolved_urls": [
+    "https://cdn.tsetmc.com/",
+    "https://www.codal.ir/"
+  ],
+  "response_statuses": [
+    200,
+    200,
+    200
+  ],
+  "redirect_counts": [],
+  "hosts_contacted": [
+    "cdn.tsetmc.com",
+    "www.codal.ir"
+  ],
+  "http_methods": [
+    "GET"
+  ],
+  "network_extraction_performed": true,
+  "unique_raw_snapshot_count": 3,
+  "evidence_record_count": 10,
+  "resume_verified_without_new_network": false,
+  "notes": "Reconstructed from immutable cache payloads after capture; 3 successful GET probes (TSETMC origin + CODAL origin x2 shared). Exact redirect_counts not retained in cache metadata; response status 200 recorded from capture evidence."
+}

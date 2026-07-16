@@ -1,0 +1,36 @@
+{
+  "authorization_version": "stage125_part3b_auth_v1",
+  "stage": "Stage125",
+  "authorized_action": "stage125-part3b-evidence-capture",
+  "baseline_commit": "959169c71a6e9378995be40979d1c6df7dc45a1d",
+  "part3b_started": true,
+  "part3b0_readiness": true,
+  "modeling_started": false,
+  "real_evidence_authorized": true,
+  "network_readonly_authorized": true,
+  "capture_plan_sha256": "41cba4f57ba87a6f39e02f1f3e9e3bf5e626a996d82eab064c683653d65e0d11",
+  "endpoint_registry_sha256": "8cc47fcb7be63a6a07ee1476b83d6d7d9e6af1719d7a2e80fceba50a05c87e41",
+  "frozen_input_sha256": {
+    "project/stage125/part3_candidate_inventory_stage125.csv": "4bd5f6a71ecf0e1f74866a64a3774e51340729f4188ae2784f1d90db07e7032f",
+    "project/stage125/part3_source_evidence_manifest_schema_stage125.json": "9a736edb18046128851d55c87f07609b8dc2a4b2be73a41c5837fe0e2a4cd78d",
+    "project/stage125/part3a_approved_gate_thresholds_stage125.csv": "11c7efe5f242ab8e4a4f7b1955fb25d48e288249f7a1ce4c6bf1713dbf117d20",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv": "9a441b5e3696353967489b356d0ff48cf7cbea276aeea5018be6edc8368b40f5",
+    "project/stage125/part3a_decision_lock_stage125.json": "475c82b3483ef18ff19aea2268f65527ca87c9441603622bd1952bd21f18f35e",
+    "project/stage125/source_registry_stage125.csv": "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c"
+  },
+  "registered_candidate_ids": [
+    "cand_m2_equity_return_window",
+    "cand_m2_realized_volatility",
+    "cand_m2_amihud_illiquidity",
+    "cand_m3_cpi_inflation",
+    "cand_m3_fx_change_official",
+    "cand_m3_policy_financing_rate",
+    "cand_m4_audit_opinion_type",
+    "cand_m4_going_concern_flag",
+    "cand_m4_audit_lag_days",
+    "cand_m4_board_size"
+  ],
+  "pilot_pair_count": 80,
+  "assessment_matrix_size": 800,
+  "notes": "Part 3B authorized for evidence capture and accessibility scoring pilot only. No modeling. No sample/target/eligibility change."
+}
