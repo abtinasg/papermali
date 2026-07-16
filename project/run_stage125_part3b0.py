@@ -45,21 +45,24 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     qc = result["qc"]
-    guard = result["guard_evidence"]
+    guard = result.get("guard_evidence") or {}
     print(f"Baseline commit: {readiness.EXPECTED_BASELINE_COMMIT}")
     print(f"Output dir: {result['output_dir']}")
     print(f"QC assertions: {qc['assertion_count']} "
           f"(failed={qc['failed_count']}, all_pass={qc['all_pass']})")
+    if result.get("historical_baseline_ok"):
+        print("historical_baseline_mode=true (Part 3B authorized; "
+              "Part 3B.0 artifacts verified byte-identical)")
     print("part3b0_readiness=true | part3b_started=false | "
           "evidence_collected=false | accessibility_scoring_applied=false")
-    print(f"network_calls_attempted={guard['network_calls_attempted']} | "
+    print(f"network_calls_attempted={guard.get('network_calls_attempted', 0)} | "
           "network_extraction_performed=false | modeling_started=false")
 
     if args.write:
-        print(f"Wrote {len(result['files'])} files.")
+        print(f"Wrote {len(result.get('files') or {})} files.")
         return 0 if qc["all_pass"] else 1
 
-    if result["drift"]:
+    if result.get("drift"):
         print("DRIFT (on-disk differs from computed):", file=sys.stderr)
         for name in result["drift"]:
             print(f"  - {name}", file=sys.stderr)

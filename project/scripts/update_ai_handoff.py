@@ -90,6 +90,12 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part3b0_evidence_readiness.py",
     "project/run_stage125_part3b0.py",
     "project/tests/test_stage125_part3b0_evidence_readiness.py",
+    # Stage125 Part 3B code, runner, and tests.
+    "project/src/stage125_part3b_evidence_capture.py",
+    "project/run_stage125_part3b.py",
+    "project/tests/test_stage125_part3b_evidence_capture.py",
+    # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
+    # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
     # Do NOT broadly allowlist Stage122–Stage124 directories.
     "project/src/stage124_gate_b_execution.py",
@@ -98,6 +104,7 @@ ALLOWLIST_FILES = (
     "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
     "AGENTS.md",
     "CLAUDE.md",
+    ".gitignore",
 )
 
 # Handoff-only classification, INDEPENDENT of the change allowlist. A commit is
@@ -184,6 +191,21 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/part3b0_gate_result_template_stage125.csv",
     "project/stage125/part3b0_immutable_cache_contract_stage125.json",
     "project/stage125/part3b0_network_denial_contract_stage125.json",
+    # Stage125 Part 3B generated artifacts (runner output only).
+    "project/stage125/part3b_authorization_stage125.json",
+    "project/stage125/part3b_capture_plan_stage125.csv",
+    "project/stage125/part3b_verified_endpoint_registry_stage125.csv",
+    "project/stage125/part3b_evidence_manifest_stage125.csv",
+    "project/stage125/part3b_cache_handles_stage125.csv",
+    "project/stage125/part3b_capture_network_log_stage125.json",
+    "project/stage125/part3b_pair_candidate_assessment_stage125.csv",
+    "project/stage125/part3b_accessibility_scores_stage125.csv",
+    "project/stage125/part3b_gate_results_stage125.csv",
+    "project/stage125/part3b_gate_summary_stage125.json",
+    "project/stage125/part3b_unresolved_and_failures_stage125.csv",
+    "project/stage125/README_STAGE125_PART3B_EVIDENCE_CAPTURE.md",
+    "project/stage125/stage125_part3b_evidence_capture_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -254,6 +276,16 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "part3b_started",
     ),
     "stage125_part3b0_evidence_readiness": (
+        "part3a_protocol_locked",
+        "part3a_decision_locked",
+        "part3b0_readiness",
+        "part3b_started",
+        "evidence_collected",
+        "accessibility_scoring_applied",
+        "network_extraction_performed",
+        "modeling_started",
+    ),
+    "stage125_part3b_evidence_capture": (
         "part3a_protocol_locked",
         "part3a_decision_locked",
         "part3b0_readiness",

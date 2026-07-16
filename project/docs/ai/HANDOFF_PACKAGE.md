@@ -69,8 +69,12 @@ See [`DECISIONS.md`](DECISIONS.md).
 - Stage125 Part 3B.0 evidence-readiness source/test/QC: `src/stage125_part3b0_evidence_readiness.py`,
   `run_stage125_part3b0.py`, `tests/test_stage125_part3b0_evidence_readiness.py`,
   `stage125/stage125_part3b0_evidence_readiness_qc_report.json` (schema validator,
-  immutable cache contract, network sentinel, Gate engine scaffolding; no evidence,
-  no network, no extraction)
+  immutable cache contract, network sentinel, Gate engine scaffolding; frozen
+  historical baseline after Part 3B authorization)
+- Stage125 Part 3B evidence-capture source/test/QC: `src/stage125_part3b_evidence_capture.py`,
+  `run_stage125_part3b.py`, `tests/test_stage125_part3b_evidence_capture.py`,
+  `stage125/stage125_part3b_evidence_capture_qc_report.json` (authorized real
+  evidence capture + accessibility scoring pilot; 800 assessments; no modeling)
 
 ## 7. Done
 

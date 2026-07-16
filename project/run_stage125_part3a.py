@@ -52,13 +52,17 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     qc = result["qc"]
-    counts = result["counts"]
+    counts = result.get("counts") or {}
     print(f"Baseline commit: {part3a.EXPECTED_BASELINE_COMMIT}")
-    print(f"Input all_rows SHA-256: {result['input_all_rows_sha256']}")
-    print(f"Input pairs SHA-256: {result['input_pairs_sha256']}")
+    if result.get("historical_baseline_ok"):
+        print("historical_baseline_mode=true (Part 3B authorized; "
+              "Part 3A artifacts verified byte-identical)")
+    else:
+        print(f"Input all_rows SHA-256: {result.get('input_all_rows_sha256')}")
+        print(f"Input pairs SHA-256: {result.get('input_pairs_sha256')}")
+        print(f"Pairs={counts.get('pairs')} all_rows={counts.get('all_rows')} "
+              f"tickers={counts.get('unique_tickers_pairs')}")
     print(f"Output dir: {result['output_dir']}")
-    print(f"Pairs={counts['pairs']} all_rows={counts['all_rows']} "
-          f"tickers={counts['unique_tickers_pairs']}")
     print(f"Registered candidates: 10 (M2=3, M3=3, M4=4)")
     print(f"QC assertions: {qc['assertion_count']} "
           f"(failed={qc['failed_count']}, all_pass={qc['all_pass']})")
@@ -66,10 +70,10 @@ def main(argv: list[str] | None = None) -> int:
           "part3b_started=false | no network extraction")
 
     if args.write:
-        print(f"Wrote {len(result['files'])} files.")
+        print(f"Wrote {len(result.get('files') or {})} files.")
         return 0 if qc["all_pass"] else 1
 
-    if result["drift"]:
+    if result.get("drift"):
         print("DRIFT (on-disk differs from computed):", file=sys.stderr)
         for name in result["drift"]:
             print(f"  - {name}", file=sys.stderr)

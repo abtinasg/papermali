@@ -40,3 +40,6 @@ project/stage124/gate_b_final/modeling_expanded_rule_b_eligible.csv
 
 # Stray local archive (backup, not a deliverable)
 project/Archive.zip
+
+# Stage125 Part 3B immutable raw cache (manifests/handles tracked; raw payloads local)
+project/stage125/raw_cache_part3b/

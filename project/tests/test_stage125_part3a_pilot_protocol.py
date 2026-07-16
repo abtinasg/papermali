@@ -418,6 +418,14 @@ def test_content_deterministic():
 
 
 def test_on_disk_matches_computed():
+    from src import stage125_part3b_evidence_capture as part3b
+    if part3b.part3b_authorization_active(REPO_ROOT):
+        # After Part 3B authorization, Part 3A is a frozen historical baseline;
+        # live build_all would regenerate QC with new source hashes.
+        result = part3a.run(project_dir=ROOT, output_dir=OUTPUT_DIR, write=False)
+        assert result.get("historical_baseline_ok") is True
+        assert result.get("drift") == []
+        return
     result = _build()
     _check_files(result)
 

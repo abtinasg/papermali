@@ -1,10 +1,10 @@
 ---
 roadmap_version: 1
 active_research_workstream_id: stage125-research-design-readiness
-qc_scope: stage125-part3b0-evidence-readiness
+qc_scope: stage125-part3b-evidence-capture
 last_completed_research_action_id: stage125-part3a-decision-lock
 next_research_action_id: stage125-part3b-evidence-capture
-active_maintenance_task_id: stage125-part3b0-evidence-readiness
+active_maintenance_task_id: repository-driven-ai-handoff
 ---
 
 # ROADMAP
@@ -34,7 +34,7 @@ must also appear in the body below. The validator checks that:
 10. `stage124-gate-b-execution` — Executed the approved Gate B rules; four sample designs, canonical + filtered outputs, 58 focused tests (736 passed, 1 skipped, local results — no GitHub Actions) ✅
 11. `stage125-research-design-readiness` — Stage125 Research Design & Data Readiness (Parts 0–3A.1); **no modeling** in this stage — modeling remains prohibited until Stage126 is approved ✅
 12. `stage125-part3a-decision-lock` — Part 3A.1 user-approved pilot decision lock (rubric approval, G09–G14 thresholds, locked 80-pair event-enriched selection); decision record only, **no evidence collection** ✅
-13. `stage125-part3b-evidence-capture` — Part 3B evidence capture and accessibility scoring pilot (**not started**; next action pointer only) ⬅️ **next**
+13. `stage125-part3b-evidence-capture` — Part 3B evidence capture and accessibility scoring pilot (**active / in review**; not completed; awaiting user approval; not Stage126 admission) ⬅️ **next / active**
 
 ## Maintenance tasks
 
@@ -44,7 +44,7 @@ must also appear in the body below. The validator checks that:
 - `stage125-part2-prediction-time-contract` — Stage125 Part 2 prediction-time & leakage contract (prediction cutoff rules, feature availability M1–M4, revision policy, tie-breaking, anti-leakage checklist with 8 machine-testable checks, per-pair cutoff/feature/leakage audit preserving all 1200 pairs); contract/audit only, **no modeling, no extraction, no eligibility changes**; advances no research action ✅
 - `stage125-part3a-pilot-protocol-lock` — Stage125 Part 3A accessibility & pilot protocol lock (candidate inventory freeze, proposed accessibility rubric, gate decision protocol, sampling frame summary, pilot-size options, Part 3B evidence schema); protocol only, **no evidence collection, no network access, no modeling**; advances no research action ✅
 - `stage125-part3a1-decision-lock` — Stage125 Part 3A.1 user-approved pilot decision lock (rubric approval record, G09–G14 pilot thresholds, locked event-enriched pilot pair selection); decision record only, **no evidence collection, no network access, no modeling**; advances no research action ✅
-- `stage125-part3b0-evidence-readiness` — Stage125 Part 3B.0 evidence capture readiness (schema validator, immutable cache contract, default-deny network sentinel, pure Gate engine scaffolding, header-only templates); infrastructure/readiness only, **no real evidence, no network access, no accessibility scores, no modeling**; advances no research action
+- `stage125-part3b0-evidence-readiness` — Stage125 Part 3B.0 evidence capture readiness (schema validator, immutable cache contract, default-deny network sentinel, pure Gate engine scaffolding, header-only templates); infrastructure/readiness only; frozen historical baseline after Part 3B authorization; advances no research action ✅
 
 ## Notes on ordering
 
@@ -73,7 +73,8 @@ filtered outputs and 58 focused tests (736 passed, 1 skipped, local results). **
 modeling). `stage125-part3a-decision-lock` recorded the approved rubric,
 G09–G14 pilot thresholds, and locked 80-pair event-enriched selection
 (39 positive / 41 negative; 26 tickers; 10 known industries; 53 industry-present
-pairs; 27 industry-missing pairs). `stage125-part3b-evidence-capture` is the
-next action pointer only — Part 3B is **not started** by Part 3A.1. See
+pairs; 27 industry-missing pairs). `stage125-part3b-evidence-capture` is
+**active / in review** (authorized evidence capture + accessibility scoring
+pilot; not marked completed; not Stage126 admission). See
 [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
 prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.

@@ -1086,6 +1086,27 @@ def run(
     if output_dir is None:
         output_dir = project_dir / "stage125"
 
+    # Transition-aware historical baseline after authorized Part 3B starts.
+    from src import stage125_part3b_evidence_capture as part3b  # lazy
+
+    canonical_out = (project_dir / "stage125").resolve()
+    if part3b.part3b_authorization_active(repo_root) and output_dir.resolve() == canonical_out:
+        if write:
+            raise part3b.QCFail(
+                "Part 3A.1 historical baseline is frozen after Part 3B "
+                "authorization; --write to canonical stage125 is refused"
+            )
+        return part3b.check_historical_baseline(
+            repo_root,
+            output_dir,
+            F_METADATA,
+            require_historical_flags={
+                "part3a_decision_locked": True,
+                "part3b_started": False,
+                "modeling_started": False,
+            },
+        )
+
     result = build_all(repo_root, all_rows_path, pairs_path)
     files = result["files"]
 

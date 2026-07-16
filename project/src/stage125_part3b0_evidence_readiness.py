@@ -2877,6 +2877,35 @@ def _count_records_in_file(path: Path) -> int:
     return 0
 
 
+def _authorized_part3b_paths(repo_root: Path) -> frozenset[str]:
+    """Exact Part 3B live paths excluded from Part 3B.0 zero-evidence scans.
+
+    Only active when the Part 3B authorization marker exists. Unauthorized
+    Part 3B evidence still fails closed.
+    """
+    try:
+        from src import stage125_part3b_evidence_capture as part3b
+    except Exception:
+        return frozenset()
+    if not part3b.part3b_authorization_active(repo_root):
+        return frozenset()
+    return frozenset(part3b.PART3B_AUTHORIZED_EXACT)
+
+
+def _is_authorized_part3b_path(repo_root: Path, rel: str) -> bool:
+    rel = rel.replace("\\", "/")
+    if rel in _authorized_part3b_paths(repo_root):
+        return True
+    # Local immutable cache for authorized Part 3B (gitignored payloads).
+    if rel.startswith("project/stage125/raw_cache_part3b/"):
+        try:
+            from src import stage125_part3b_evidence_capture as part3b
+            return part3b.part3b_authorization_active(repo_root)
+        except Exception:
+            return False
+    return False
+
+
 def count_real_evidence_records(repo_root: Path) -> int:
     """Count evidence records on disk, including a populated template file."""
     count = 0
@@ -2889,7 +2918,9 @@ def count_real_evidence_records(repo_root: Path) -> int:
     for path in stage125.rglob("*"):
         if not path.is_file() or path.is_symlink():
             continue
-        rel = str(path.relative_to(repo_root))
+        rel = str(path.relative_to(repo_root)).replace("\\", "/")
+        if _is_authorized_part3b_path(repo_root, rel):
+            continue
         if rel in PART3B0_ALLOWED_EXACT and path.name != F_EVIDENCE_TEMPLATE:
             continue
         if path == template_path:
@@ -2970,6 +3001,9 @@ def count_accessibility_scores(repo_root: Path) -> int:
     """Recursively count non-empty accessibility/score fields under stage125."""
     scored = 0
     for path in _stage125_files(repo_root):
+        rel = str(path.relative_to(repo_root)).replace("\\", "/")
+        if _is_authorized_part3b_path(repo_root, rel):
+            continue
         if path.suffix.lower() not in _CONTENT_SCAN_SUFFIXES:
             continue
         # Schema/rubric/contract docs define the field name but hold no scores.
@@ -2990,6 +3024,9 @@ def count_candidate_decisions(repo_root: Path) -> int:
     """Recursively count non-pending decision fields under stage125."""
     decided = 0
     for path in _stage125_files(repo_root):
+        rel = str(path.relative_to(repo_root)).replace("\\", "/")
+        if _is_authorized_part3b_path(repo_root, rel):
+            continue
         if path.suffix.lower() not in _CONTENT_SCAN_SUFFIXES:
             continue
         for row in _iter_content_dicts(path):
@@ -3006,6 +3043,9 @@ def count_populated_gate_results(repo_root: Path) -> int:
     """Count populated Gate-result data rows (template must remain header-only)."""
     count = 0
     for path in _stage125_files(repo_root):
+        rel = str(path.relative_to(repo_root)).replace("\\", "/")
+        if _is_authorized_part3b_path(repo_root, rel):
+            continue
         low = path.name.lower()
         if "gate_result" not in low and path.name != F_GATE_TEMPLATE:
             continue
@@ -3023,9 +3063,15 @@ def scan_repository_cache_entries(repo_root: Path) -> int:
     for path in stage125.rglob("*"):
         if not path.is_file() or path.is_symlink():
             continue
+        rel = str(path.relative_to(repo_root)).replace("\\", "/")
+        if _is_authorized_part3b_path(repo_root, rel):
+            continue
         parts = {p.lower() for p in path.relative_to(stage125).parts}
-        if parts & CACHE_DIR_NAMES:
+        if parts & CACHE_DIR_NAMES or "raw_cache_part3b" in parts:
             if path.name.endswith(".meta.json") or path.name == "metadata.sha256":
+                continue
+            # Authorized Part 3B cache is excluded above; any other cache counts.
+            if "raw_cache_part3b" in parts:
                 continue
             count += 1
     return count
@@ -3070,7 +3116,8 @@ def scan_for_part3b_capture_start(repo_root: Path) -> dict:
     hits: list[str] = []
     for rel in part3a.PART3B_FORBIDDEN_EXACT:
         if (repo_root / rel).exists() and rel not in PART3B0_ALLOWED_EXACT:
-            hits.append(rel)
+            if not _is_authorized_part3b_path(repo_root, rel):
+                hits.append(rel)
 
     stage125 = repo_root / "project" / "stage125"
     if stage125.is_dir():
@@ -3078,6 +3125,8 @@ def scan_for_part3b_capture_start(repo_root: Path) -> dict:
             if not path.is_file():
                 continue
             rel = str(path.relative_to(repo_root)).replace("\\", "/")
+            if _is_authorized_part3b_path(repo_root, rel):
+                continue
             if rel not in STAGE125_ALLOWED_EXACT:
                 hits.append(rel)
                 continue
@@ -3097,6 +3146,8 @@ def scan_for_part3b_capture_start(repo_root: Path) -> dict:
             rel = str(path.relative_to(repo_root)).replace("\\", "/")
             if rel in PART3B0_ALLOWED_EXACT:
                 continue
+            if _is_authorized_part3b_path(repo_root, rel):
+                continue
             low = path.name.lower()
             if any(low.startswith(p) for p in UNAUTHORIZED_NAME_PREFIXES):
                 hits.append(rel)
@@ -3108,8 +3159,10 @@ def scan_for_part3b_capture_start(repo_root: Path) -> dict:
         if root.is_dir():
             for path in root.rglob("*"):
                 if path.is_file():
-                    rel = str(path.relative_to(repo_root))
-                    if rel not in PART3B0_ALLOWED_EXACT:
+                    rel = str(path.relative_to(repo_root)).replace("\\", "/")
+                    if rel not in PART3B0_ALLOWED_EXACT and not _is_authorized_part3b_path(
+                        repo_root, rel,
+                    ):
                         hits.append(rel)
 
     # Content-derived capture signals.
@@ -3525,6 +3578,35 @@ def run(
     repo_root = project_dir.parent
     if output_dir is None:
         output_dir = project_dir / "stage125"
+
+    # Transition-aware: after authorized Part 3B starts, the canonical Part 3B.0
+    # deliverables are a frozen historical baseline (byte-identical check).
+    # Writes to the canonical stage125 directory are refused. Writes to a
+    # temporary output_dir (tests) may still regenerate via build_all, which
+    # excludes authorized Part 3B paths from zero-evidence scans.
+    from src import stage125_part3b_evidence_capture as part3b  # lazy
+
+    canonical_out = (project_dir / "stage125").resolve()
+    if part3b.part3b_authorization_active(repo_root):
+        if output_dir.resolve() == canonical_out:
+            if write:
+                raise QCFail(
+                    "Part 3B.0 historical baseline is frozen after Part 3B "
+                    "authorization; --write to canonical stage125 is refused"
+                )
+            return part3b.check_historical_baseline(
+                repo_root,
+                output_dir,
+                F_METADATA,
+                require_historical_flags={
+                    "part3b0_readiness": True,
+                    "part3b_started": False,
+                    "evidence_collected": False,
+                    "accessibility_scoring_applied": False,
+                    "network_extraction_performed": False,
+                    "modeling_started": False,
+                },
+            )
 
     result = build_all(repo_root)
     files = result["files"]

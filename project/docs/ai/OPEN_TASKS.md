@@ -97,19 +97,24 @@ pairs; 27 industry-missing pairs).
 applied, **no** candidate admitted/rejected. `part3a_decision_locked=true`;
 `part3b_started=false`; `modeling_started=false`.
 
-**Part 3B.0 (authorized/active):** Evidence Capture Readiness.
-Infrastructure/readiness only; tracked as maintenance task
-`stage125-part3b0-evidence-readiness` (advances no research action). Delivers
-schema validator, immutable cache contract, default-deny network sentinel, pure
-Gate engine scaffolding, and header-only templates. **No** real evidence records,
-**no** network access, **no** accessibility scores, **no** candidate decisions.
-`part3b0_readiness=true`; `part3b_started=false`; `evidence_collected=false`;
-`accessibility_scoring_applied=false`; `network_extraction_performed=false`;
-`modeling_started=false`.
+**Part 3B.0 (completed — frozen historical baseline):** Evidence Capture
+Readiness. Infrastructure/readiness only. After Part 3B authorization, its
+`--check` verifies historical deliverables byte-identically and does not rewrite
+zero-evidence QC history. `part3b0_readiness=true`.
 
-**Part 3B — NOT started.** Evidence capture and live accessibility scoring
-belong to Part 3B only. Next research action pointer remains:
-`stage125-part3b-evidence-capture` (Part 3B not started by Part 3B.0).
+**Part 3B (active / in review):** Evidence Capture & Accessibility Scoring Pilot
+(`stage125-part3b-evidence-capture`). Authorized real read-only evidence capture
+on the locked 80-pair pilot × 10 registered M2–M4 candidates (800 assessments).
+Endpoints contacted only when verified from frozen repo provenance (TSETMC CDN
+origin + CODAL origin). CBI left unresolved (no authoritative frozen endpoint).
+Accessibility scores remain null pending human adjudication (probe evidence does
+not uniquely determine rubric 0–5). G13/G14 PASS; G09–G12 FAIL (no usable
+coverage under definition-contract gaps + unresolvable Part 2 cutoffs).
+`part3b_started=true`; `evidence_collected=true`;
+`accessibility_scoring_applied=false` (all scores null / UNRESOLVED; no numeric
+evidence-backed score persisted); `network_extraction_performed=true`;
+`modeling_started=false`. **Not completed** — awaiting user review; not Stage126
+admission; no candidate finally admitted.
 
 **Modeling remains prohibited** (no modeling, tuning, SHAP, SMOTE, calibration,
 temporal splitting, feature selection, or article result generation) through all of
