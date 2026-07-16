@@ -111,6 +111,7 @@ PART3B0_ALLOWED_EXACT = (
     "project/stage125/part3b0_evidence_manifest_template_stage125.csv",
     "project/stage125/part3b0_gate_result_template_stage125.csv",
     "project/stage125/part3b0_immutable_cache_contract_stage125.json",
+    "project/stage125/part3b0_cache_handle_template_stage125.csv",
     "project/stage125/part3b0_network_denial_contract_stage125.json",
     "project/stage125/README_STAGE125_PART3B0_EVIDENCE_READINESS.md",
     "project/stage125/stage125_part3b0_evidence_readiness_qc_report.json",

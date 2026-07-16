@@ -73,16 +73,27 @@ F_EVIDENCE_CONTRACT = "part3b0_evidence_capture_contract_stage125.json"
 F_EVIDENCE_TEMPLATE = "part3b0_evidence_manifest_template_stage125.csv"
 F_GATE_TEMPLATE = "part3b0_gate_result_template_stage125.csv"
 F_CACHE_CONTRACT = "part3b0_immutable_cache_contract_stage125.json"
+F_CACHE_HANDLE_TEMPLATE = "part3b0_cache_handle_template_stage125.csv"
 F_NETWORK_CONTRACT = "part3b0_network_denial_contract_stage125.json"
 F_QC = "stage125_part3b0_evidence_readiness_qc_report.json"
 F_METADATA = "metadata_and_hashes_stage125_part3b0.json"
 F_README = "README_STAGE125_PART3B0_EVIDENCE_READINESS.md"
+
+CACHE_HANDLE_SCHEMA_VERSION = "stage125_part3b0_cache_handle_v1"
+CACHE_CONTRACT_VERSION = "stage125_part3b0_v1"
+_CACHE_HANDLE_HEADER = [
+    "evidence_id",
+    "payload_sha256",
+    "metadata_sha256",
+    "cache_contract_version",
+]
 
 CONTENT_FILES = (
     F_EVIDENCE_CONTRACT,
     F_EVIDENCE_TEMPLATE,
     F_GATE_TEMPLATE,
     F_CACHE_CONTRACT,
+    F_CACHE_HANDLE_TEMPLATE,
     F_NETWORK_CONTRACT,
     F_README,
 )
@@ -96,6 +107,7 @@ PART3B0_ALLOWED_EXACT = frozenset({
     f"project/stage125/{F_EVIDENCE_TEMPLATE}",
     f"project/stage125/{F_GATE_TEMPLATE}",
     f"project/stage125/{F_CACHE_CONTRACT}",
+    f"project/stage125/{F_CACHE_HANDLE_TEMPLATE}",
     f"project/stage125/{F_NETWORK_CONTRACT}",
     f"project/stage125/{F_README}",
     f"project/stage125/{F_QC}",
@@ -231,6 +243,7 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/part3b0_evidence_manifest_template_stage125.csv",
     "project/stage125/part3b0_gate_result_template_stage125.csv",
     "project/stage125/part3b0_immutable_cache_contract_stage125.json",
+    "project/stage125/part3b0_cache_handle_template_stage125.csv",
     "project/stage125/part3b0_network_denial_contract_stage125.json",
     "project/stage125/prediction_cutoff_audit_stage125_part2.csv",
     "project/stage125/prediction_cutoff_summary_stage125_part2.json",
@@ -509,6 +522,10 @@ class LockedGatePolicy:
     target_years: tuple[str, ...]
     source_thresholds_sha256: str
     source_decision_lock_sha256: str
+    frozen_pilot_keys: frozenset[str]
+    frozen_pilot_key_labels: frozenset[tuple[str, str]]
+    frozen_pilot_key_years: frozenset[tuple[str, str]]
+    source_pilot_pairs_sha256: str
     _seal: str = field(repr=False, compare=True)
 
 
@@ -516,8 +533,14 @@ def _expected_target_years() -> tuple[str, ...]:
     return tuple(sorted(lock.EXPECTED_YEAR_ALLOCATION.keys()))
 
 
-def _compute_policy_seal(thr_hash: str, lock_hash: str) -> str:
+def _compute_policy_seal(
+    thr_hash: str,
+    lock_hash: str,
+    pilot_pairs_hash: str,
+    pilot_keys: frozenset[str],
+) -> str:
     """Seal binds verified source hashes to hard-coded locked G09–G14 values."""
+    keys_blob = ",".join(sorted(pilot_keys))
     payload = "|".join([
         _POLICY_SEAL_DOMAIN,
         "0.80",
@@ -529,6 +552,8 @@ def _compute_policy_seal(thr_hash: str, lock_hash: str) -> str:
         ",".join(_expected_target_years()),
         thr_hash,
         lock_hash,
+        pilot_pairs_hash,
+        sha256_bytes(keys_blob.encode("utf-8")),
     ])
     return sha256_bytes(payload.encode("utf-8"))
 
@@ -538,7 +563,10 @@ def require_sealed_gate_policy(policy: LockedGatePolicy) -> LockedGatePolicy:
     if type(policy) is not LockedGatePolicy:
         raise QCFail("LockedGatePolicy type check failed")
     expected_seal = _compute_policy_seal(
-        policy.source_thresholds_sha256, policy.source_decision_lock_sha256,
+        policy.source_thresholds_sha256,
+        policy.source_decision_lock_sha256,
+        policy.source_pilot_pairs_sha256,
+        policy.frozen_pilot_keys,
     )
     if policy._seal != expected_seal:
         raise QCFail("LockedGatePolicy seal verification failed")
@@ -552,9 +580,84 @@ def require_sealed_gate_policy(policy: LockedGatePolicy) -> LockedGatePolicy:
         or tuple(policy.target_years) != _expected_target_years()
         or not SHA256_RE.match(policy.source_thresholds_sha256 or "")
         or not SHA256_RE.match(policy.source_decision_lock_sha256 or "")
+        or not SHA256_RE.match(policy.source_pilot_pairs_sha256 or "")
+        or type(policy.frozen_pilot_keys) is not frozenset
+        or len(policy.frozen_pilot_keys) != 80
+        or len(policy.frozen_pilot_key_labels) != 80
+        or len(policy.frozen_pilot_key_years) != 80
     ):
         raise QCFail("LockedGatePolicy value verification failed")
     return policy
+
+
+def require_frozen_pilot_key_identity(
+    policy: LockedGatePolicy, pilot_keys: Any,
+) -> frozenset[str]:
+    """Fail closed unless caller supplies the exact frozen pilot key set."""
+    policy = require_sealed_gate_policy(policy)
+    if type(pilot_keys) is list:
+        if any(type(k) is not str for k in pilot_keys):
+            raise QCFail("pilot_keys must contain only str identifiers")
+        if len(pilot_keys) != len(set(pilot_keys)):
+            raise QCFail("duplicate pilot keys rejected")
+        supplied = frozenset(pilot_keys)
+    elif type(pilot_keys) in (set, frozenset):
+        if any(type(k) is not str for k in pilot_keys):
+            raise QCFail("pilot_keys must contain only str identifiers")
+        supplied = frozenset(pilot_keys)
+    else:
+        raise QCFail("pilot_keys must be a list/set/frozenset of frozen identifiers")
+    if supplied != policy.frozen_pilot_keys:
+        raise QCFail("pilot key identity mismatch with frozen selection")
+    return supplied
+
+
+def require_frozen_pilot_label_identity(
+    policy: LockedGatePolicy, key_labels: Any,
+) -> frozenset[tuple[str, str]]:
+    policy = require_sealed_gate_policy(policy)
+    if type(key_labels) not in (set, frozenset, list):
+        raise QCFail("pilot key labels must be a set/frozenset/list")
+    pairs: list[tuple[str, str]] = []
+    for item in key_labels:
+        if (
+            type(item) is not tuple
+            or len(item) != 2
+            or type(item[0]) is not str
+            or type(item[1]) is not str
+        ):
+            raise QCFail("pilot key labels must be (str, str) pairs")
+        pairs.append(item)
+    if len(pairs) != len(set(pairs)):
+        raise QCFail("duplicate pilot key labels rejected")
+    supplied = frozenset(pairs)
+    if supplied != policy.frozen_pilot_key_labels:
+        raise QCFail("pilot key label identity mismatch with frozen selection")
+    return supplied
+
+
+def require_frozen_pilot_year_identity(
+    policy: LockedGatePolicy, key_years: Any,
+) -> frozenset[tuple[str, str]]:
+    policy = require_sealed_gate_policy(policy)
+    if type(key_years) not in (set, frozenset, list):
+        raise QCFail("pilot key years must be a set/frozenset/list")
+    pairs: list[tuple[str, str]] = []
+    for item in key_years:
+        if (
+            type(item) is not tuple
+            or len(item) != 2
+            or type(item[0]) is not str
+            or type(item[1]) is not str
+        ):
+            raise QCFail("pilot key years must be (str, str) pairs")
+        pairs.append(item)
+    if len(pairs) != len(set(pairs)):
+        raise QCFail("duplicate pilot key years rejected")
+    supplied = frozenset(pairs)
+    if supplied != policy.frozen_pilot_key_years:
+        raise QCFail("pilot key year identity mismatch with frozen selection")
+    return supplied
 
 
 def load_locked_gate_policy(repo_root: Path) -> LockedGatePolicy:
@@ -562,6 +665,7 @@ def load_locked_gate_policy(repo_root: Path) -> LockedGatePolicy:
     verified = verify_frozen_input_hashes(repo_root)
     thr_rel = "project/stage125/part3a_approved_gate_thresholds_stage125.csv"
     lock_rel = "project/stage125/part3a_decision_lock_stage125.json"
+    pairs_rel = "project/stage125/part3a_selected_pilot_pairs_stage125.csv"
     thr_path = repo_root / thr_rel
     rows = {r["gate_id"]: r for r in csv.DictReader(thr_path.open(encoding="utf-8"))}
     required = {"G09", "G10", "G11", "G12", "G13", "G14"}
@@ -588,6 +692,18 @@ def load_locked_gate_policy(repo_root: Path) -> LockedGatePolicy:
         )
     thr_hash = verified[thr_rel]
     lock_hash = verified[lock_rel]
+    pairs_hash = verified[pairs_rel]
+    pilot_rows = load_locked_pilot_pairs(repo_root)
+    keys = [r["predictor_row_key_t"] for r in pilot_rows]
+    if len(keys) != 80 or len(set(keys)) != 80:
+        raise QCFail("frozen pilot key set must be exactly 80 unique keys")
+    labels = frozenset(
+        (r["predictor_row_key_t"], r["class_label"]) for r in pilot_rows
+    )
+    years = frozenset(
+        (r["predictor_row_key_t"], str(r["target_year"])) for r in pilot_rows
+    )
+    frozen_keys = frozenset(keys)
     policy = LockedGatePolicy(
         g09_threshold=_float("G09"),
         g10_threshold=_float("G10"),
@@ -598,7 +714,11 @@ def load_locked_gate_policy(repo_root: Path) -> LockedGatePolicy:
         target_years=_expected_target_years(),
         source_thresholds_sha256=thr_hash,
         source_decision_lock_sha256=lock_hash,
-        _seal=_compute_policy_seal(thr_hash, lock_hash),
+        frozen_pilot_keys=frozen_keys,
+        frozen_pilot_key_labels=labels,
+        frozen_pilot_key_years=years,
+        source_pilot_pairs_sha256=pairs_hash,
+        _seal=_compute_policy_seal(thr_hash, lock_hash, pairs_hash, frozen_keys),
     )
     return require_sealed_gate_policy(policy)
 
@@ -623,6 +743,16 @@ class NetworkSentinel:
         self._orig_sendmsg = getattr(socket.socket, "sendmsg", None)
         self._orig_subprocess_run = subprocess.run
         self._orig_subprocess_popen = subprocess.Popen
+        self._orig_os_system = os.system
+        self._orig_os_popen = os.popen
+        self._orig_os_spawns: dict[str, Any] = {
+            name: getattr(os, name)
+            for name in (
+                "spawnl", "spawnle", "spawnlp", "spawnlpe",
+                "spawnv", "spawnve", "spawnvp", "spawnvpe",
+            )
+            if hasattr(os, name)
+        }
         self._module_patches: list[tuple[Any, str, Any]] = []
 
     def _blocked(self, label: str, *args, **kwargs):
@@ -630,6 +760,10 @@ class NetworkSentinel:
         raise NetworkBlockedError(
             f"network blocked by Part 3B.0 sentinel ({label}): {args!r}"
         )
+
+    def _blocked_os_launch(self, label: str, *args, **kwargs):
+        """Deny os.system / os.popen / os.spawn* before any child is created."""
+        self._blocked(label, *args, **kwargs)
 
     def _blocked_connect(self, _sock, *args, **kwargs):
         self._blocked("socket.connect", *args, **kwargs)
@@ -721,6 +855,23 @@ class NetworkSentinel:
         subprocess.run = _run  # type: ignore[assignment]
         subprocess.Popen = _Popen  # type: ignore[misc,assignment]
 
+        os.system = (  # type: ignore[assignment]
+            lambda *a, **k: self._blocked_os_launch("os.system", *a, **k)
+        )
+        os.popen = (  # type: ignore[assignment]
+            lambda *a, **k: self._blocked_os_launch("os.popen", *a, **k)
+        )
+        for spawn_name in self._orig_os_spawns:
+            setattr(
+                os,
+                spawn_name,
+                (
+                    lambda *a, _n=spawn_name, **k: self._blocked_os_launch(
+                        f"os.{_n}", *a, **k
+                    )
+                ),
+            )
+
         try:
             import urllib.request as urllib_request
 
@@ -779,6 +930,10 @@ class NetworkSentinel:
             socket.socket.sendmsg = self._orig_sendmsg  # type: ignore[method-assign]
         subprocess.run = self._orig_subprocess_run  # type: ignore[assignment]
         subprocess.Popen = self._orig_subprocess_popen  # type: ignore[misc,assignment]
+        os.system = self._orig_os_system  # type: ignore[assignment]
+        os.popen = self._orig_os_popen  # type: ignore[assignment]
+        for spawn_name, original in self._orig_os_spawns.items():
+            setattr(os, spawn_name, original)
         for module, attr, original in self._module_patches:
             setattr(module, attr, original)
         self._module_patches.clear()
@@ -802,6 +957,96 @@ def network_sentinel() -> Iterator[NetworkSentinel]:
 class CachePutResult:
     payload_sha256: str
     metadata_sha256: str
+
+
+@dataclass(frozen=True)
+class CacheHandle:
+    """External trust anchor for an immutable cache entry (persist across restart)."""
+
+    evidence_id: str
+    payload_sha256: str
+    metadata_sha256: str
+    cache_contract_version: str
+    schema_version: str = CACHE_HANDLE_SCHEMA_VERSION
+
+
+def cache_handle_from_put_result(
+    evidence_id: str, result: CachePutResult,
+) -> CacheHandle:
+    if type(evidence_id) is not str or not evidence_id.strip():
+        raise ImmutableCacheError("evidence_id required for cache handle")
+    if type(result) is not CachePutResult:
+        raise ImmutableCacheError("CachePutResult required")
+    if not SHA256_RE.match(result.payload_sha256 or ""):
+        raise ImmutableCacheError("invalid payload_sha256 on handle")
+    if not SHA256_RE.match(result.metadata_sha256 or ""):
+        raise ImmutableCacheError("invalid metadata_sha256 on handle")
+    return CacheHandle(
+        evidence_id=evidence_id.strip(),
+        payload_sha256=result.payload_sha256,
+        metadata_sha256=result.metadata_sha256,
+        cache_contract_version=CACHE_CONTRACT_VERSION,
+        schema_version=CACHE_HANDLE_SCHEMA_VERSION,
+    )
+
+
+def serialize_cache_handle(handle: CacheHandle) -> str:
+    """Canonical CSV serialization (header + one data row)."""
+    if type(handle) is not CacheHandle:
+        raise ImmutableCacheError("CacheHandle type check failed")
+    require_valid_cache_handle(handle)
+    return _csv_str(
+        _CACHE_HANDLE_HEADER + ["cache_handle_schema_version"],
+        [{
+            "evidence_id": handle.evidence_id,
+            "payload_sha256": handle.payload_sha256,
+            "metadata_sha256": handle.metadata_sha256,
+            "cache_contract_version": handle.cache_contract_version,
+            "cache_handle_schema_version": handle.schema_version,
+        }],
+    )
+
+
+def require_valid_cache_handle(handle: CacheHandle) -> CacheHandle:
+    if type(handle) is not CacheHandle:
+        raise ImmutableCacheError("CacheHandle type check failed")
+    if type(handle.evidence_id) is not str or not handle.evidence_id.strip():
+        raise ImmutableCacheError("invalid evidence_id on handle")
+    if not SHA256_RE.match(handle.payload_sha256 or ""):
+        raise ImmutableCacheError("invalid payload_sha256 on handle")
+    if not SHA256_RE.match(handle.metadata_sha256 or ""):
+        raise ImmutableCacheError("invalid metadata_sha256 on handle")
+    if handle.cache_contract_version != CACHE_CONTRACT_VERSION:
+        raise ImmutableCacheError("cache_contract_version mismatch on handle")
+    if handle.schema_version != CACHE_HANDLE_SCHEMA_VERSION:
+        raise ImmutableCacheError("cache handle schema_version mismatch")
+    return handle
+
+
+def load_cache_handle(serialized: str) -> CacheHandle:
+    """Fail-closed load of a persisted CacheHandle after process restart."""
+    if type(serialized) is not str or not serialized.strip():
+        raise ImmutableCacheError("empty cache handle serialization")
+    rows = list(csv.DictReader(io.StringIO(serialized)))
+    if len(rows) != 1:
+        raise ImmutableCacheError("cache handle must contain exactly one row")
+    row = rows[0]
+    expected_cols = set(_CACHE_HANDLE_HEADER + ["cache_handle_schema_version"])
+    if set(row.keys()) != expected_cols:
+        raise ImmutableCacheError("cache handle columns mismatch")
+    handle = CacheHandle(
+        evidence_id=str(row["evidence_id"]),
+        payload_sha256=str(row["payload_sha256"]).strip().lower(),
+        metadata_sha256=str(row["metadata_sha256"]).strip().lower(),
+        cache_contract_version=str(row["cache_contract_version"]),
+        schema_version=str(row["cache_handle_schema_version"]),
+    )
+    return require_valid_cache_handle(handle)
+
+
+def build_cache_handle_template_csv() -> str:
+    """Zero-row header-only template; no real cache handles in Part 3B.0."""
+    return _csv_str(_CACHE_HANDLE_HEADER + ["cache_handle_schema_version"], [])
 
 
 class ImmutableCache:
@@ -1055,6 +1300,11 @@ class ImmutableCache:
             )
         return payload
 
+    def get_by_handle(self, handle: CacheHandle) -> bytes:
+        """Secure get requires the persisted external CacheHandle trust anchor."""
+        handle = require_valid_cache_handle(handle)
+        return self.get(handle.payload_sha256, handle.metadata_sha256)
+
     def has(self, content_hash: str, expected_metadata_sha256: str) -> bool:
         try:
             self.get(content_hash, expected_metadata_sha256)
@@ -1187,16 +1437,96 @@ def _validate_synthetic_markers(
             raise EvidenceValidationError(
                 "snapshot path requires allowed_snapshot_root (pytest tmp_path)"
             )
-        root = Path(allowed_snapshot_root).resolve()
-        candidate = Path(snap)
-        if not candidate.is_absolute():
-            candidate = (root / candidate).resolve()
-        else:
-            candidate = candidate.resolve()
-        if not str(candidate).startswith(str(root) + os.sep) and candidate != root:
-            raise EvidenceValidationError(
-                "snapshot path must be confined to allowed_snapshot_root"
-            )
+
+
+def _lexical_absolute_path(path: Path) -> Path:
+    return Path(os.path.normpath(os.path.abspath(os.fspath(path))))
+
+
+def _path_is_symlink(path: Path) -> bool:
+    try:
+        return stat.S_ISLNK(os.lstat(path).st_mode)
+    except FileNotFoundError:
+        return False
+    except OSError as exc:
+        raise EvidenceValidationError("snapshot lstat failed") from exc
+
+
+def _assert_snapshot_no_symlinks(path: Path) -> None:
+    lexical = _lexical_absolute_path(path)
+    accum: Path | None = None
+    for part in lexical.parts:
+        accum = Path(part) if accum is None else accum / part
+        try:
+            mode = os.lstat(accum).st_mode
+        except FileNotFoundError:
+            raise EvidenceValidationError("snapshot missing or unreadable")
+        except OSError as exc:
+            raise EvidenceValidationError("snapshot lstat failed") from exc
+        if stat.S_ISLNK(mode):
+            raise EvidenceValidationError("snapshot symlink rejected")
+
+
+def _read_snapshot_bytes_nofollow(path: Path) -> bytes:
+    _assert_snapshot_no_symlinks(path)
+    if _path_is_symlink(path):
+        raise EvidenceValidationError("snapshot symlink rejected")
+    try:
+        mode = os.lstat(path).st_mode
+    except OSError as exc:
+        raise EvidenceValidationError("snapshot missing or unreadable") from exc
+    if not stat.S_ISREG(mode):
+        raise EvidenceValidationError("snapshot must be a regular file")
+    flags = os.O_RDONLY
+    if hasattr(os, "O_NOFOLLOW"):
+        flags |= os.O_NOFOLLOW
+    try:
+        fd = os.open(path, flags)
+    except OSError as exc:
+        raise EvidenceValidationError("snapshot missing or unreadable") from exc
+    try:
+        chunks: list[bytes] = []
+        while True:
+            chunk = os.read(fd, 65536)
+            if not chunk:
+                break
+            chunks.append(chunk)
+        return b"".join(chunks)
+    finally:
+        os.close(fd)
+
+
+def _verify_snapshot_bytes_match_hash(
+    record: dict[str, Any],
+    *,
+    allowed_snapshot_root: Path,
+) -> None:
+    """When local_snapshot_path is set: exist, regular file, no symlinks, hash match."""
+    snap = record.get("local_snapshot_path")
+    expected = record.get("snapshot_sha256")
+    if _is_null(snap):
+        return
+    if not isinstance(snap, str) or not isinstance(expected, str):
+        raise EvidenceValidationError("snapshot path/hash type invalid")
+    if not SHA256_RE.match(expected.strip().lower()):
+        raise EvidenceValidationError("snapshot_sha256: invalid SHA-256")
+    root = _lexical_absolute_path(Path(allowed_snapshot_root))
+    if _path_is_symlink(root):
+        raise EvidenceValidationError("snapshot root symlink rejected")
+    candidate = Path(snap)
+    if not candidate.is_absolute():
+        candidate = root / candidate
+    candidate = _lexical_absolute_path(candidate)
+    root_s = str(root)
+    cand_s = str(candidate)
+    if cand_s != root_s and not cand_s.startswith(root_s + os.sep):
+        raise EvidenceValidationError(
+            "snapshot path must be confined to allowed_snapshot_root"
+        )
+    _assert_snapshot_no_symlinks(candidate)
+    actual = sha256_bytes(_read_snapshot_bytes_nofollow(candidate))
+    if actual != expected.strip().lower():
+        raise EvidenceValidationError("snapshot_sha256 does not match file bytes")
 
 
 def _validate_evidence_record_core(
@@ -1284,6 +1614,217 @@ def _validate_evidence_record_core(
             )
 
 
+@dataclass(frozen=True)
+class ValidatedSyntheticEvidence:
+    """Sealed synthetic evidence produced only after full fail-closed validation."""
+
+    evidence_id: str
+    candidate_id: str
+    source_id: str
+    published_at: str | None
+    available_at: str | None
+    retrieved_at_utc: str
+    local_snapshot_path: str | None
+    snapshot_sha256: str | None
+    _seal: str = field(repr=False, compare=True)
+
+
+@dataclass(frozen=True)
+class ValidatedGateInput:
+    """Strictly typed Gate inputs derived from sealed synthetic evidence."""
+
+    evidence: ValidatedSyntheticEvidence
+    accessibility_score: int | None
+    authoritative_source: bool | None
+    reproducible_retrieval: bool | None
+    quality_controls_met: bool | None
+    prediction_cutoff: str
+    _seal: str = field(repr=False, compare=True)
+
+
+_EVIDENCE_SEAL_DOMAIN = "stage125_part3b0_validated_synthetic_evidence_v1"
+_GATE_INPUT_SEAL_DOMAIN = "stage125_part3b0_validated_gate_input_v1"
+
+
+def _nullable_str(value: Any) -> str | None:
+    if _is_null(value):
+        return None
+    if type(value) is not str:
+        raise EvidenceValidationError("expected string or null")
+    return value
+
+
+def validate_and_seal_synthetic_evidence(
+    record: dict[str, Any],
+    *,
+    schema: dict,
+    candidate_source_map: dict[str, str],
+    source_registry: dict[str, dict],
+    allowed_snapshot_root: Path | None = None,
+) -> ValidatedSyntheticEvidence:
+    """Schema + registry + snapshot-byte validation; returns sealed evidence."""
+    validate_evidence_record_synthetic(
+        record,
+        schema=schema,
+        candidate_source_map=candidate_source_map,
+        source_registry=source_registry,
+        allowed_snapshot_root=allowed_snapshot_root,
+    )
+    evidence = ValidatedSyntheticEvidence(
+        evidence_id=str(record["evidence_id"]),
+        candidate_id=str(record["candidate_id"]),
+        source_id=str(record["source_id"]),
+        published_at=_nullable_str(record.get("published_at")),
+        available_at=_nullable_str(record.get("available_at")),
+        retrieved_at_utc=str(record["retrieved_at_utc"]),
+        local_snapshot_path=_nullable_str(record.get("local_snapshot_path")),
+        snapshot_sha256=(
+            None
+            if _is_null(record.get("snapshot_sha256"))
+            else str(record["snapshot_sha256"]).strip().lower()
+        ),
+        _seal="",
+    )
+    seal = sha256_bytes(
+        "|".join([
+            _EVIDENCE_SEAL_DOMAIN,
+            evidence.evidence_id,
+            evidence.candidate_id,
+            evidence.source_id,
+            evidence.published_at or "",
+            evidence.available_at or "",
+            evidence.retrieved_at_utc,
+            evidence.local_snapshot_path or "",
+            evidence.snapshot_sha256 or "",
+        ]).encode("utf-8")
+    )
+    sealed = ValidatedSyntheticEvidence(
+        evidence_id=evidence.evidence_id,
+        candidate_id=evidence.candidate_id,
+        source_id=evidence.source_id,
+        published_at=evidence.published_at,
+        available_at=evidence.available_at,
+        retrieved_at_utc=evidence.retrieved_at_utc,
+        local_snapshot_path=evidence.local_snapshot_path,
+        snapshot_sha256=evidence.snapshot_sha256,
+        _seal=seal,
+    )
+    return require_sealed_synthetic_evidence(sealed)
+
+
+def require_sealed_synthetic_evidence(
+    evidence: ValidatedSyntheticEvidence,
+) -> ValidatedSyntheticEvidence:
+    if type(evidence) is not ValidatedSyntheticEvidence:
+        raise QCFail("ValidatedSyntheticEvidence type check failed")
+    expected = sha256_bytes(
+        "|".join([
+            _EVIDENCE_SEAL_DOMAIN,
+            evidence.evidence_id,
+            evidence.candidate_id,
+            evidence.source_id,
+            evidence.published_at or "",
+            evidence.available_at or "",
+            evidence.retrieved_at_utc,
+            evidence.local_snapshot_path or "",
+            evidence.snapshot_sha256 or "",
+        ]).encode("utf-8")
+    )
+    if evidence._seal != expected:
+        raise QCFail("ValidatedSyntheticEvidence seal verification failed")
+    return evidence
+
+
+def build_validated_gate_input(
+    evidence: ValidatedSyntheticEvidence,
+    *,
+    prediction_cutoff: str,
+    accessibility_score: int | None = None,
+    authoritative_source: bool | None = None,
+    reproducible_retrieval: bool | None = None,
+    quality_controls_met: bool | None = None,
+) -> ValidatedGateInput:
+    """Build sealed Gate input; rejects truthiness coercion and untyped values."""
+    evidence = require_sealed_synthetic_evidence(evidence)
+    if accessibility_score is not None and type(accessibility_score) is not int:
+        raise QCFail("accessibility_score must be int or None")
+    for name, value in (
+        ("authoritative_source", authoritative_source),
+        ("reproducible_retrieval", reproducible_retrieval),
+        ("quality_controls_met", quality_controls_met),
+    ):
+        if value is not None and type(value) is not bool:
+            raise QCFail(f"{name} must be bool or None (no truthiness coercion)")
+    if type(prediction_cutoff) is not str or _is_null(prediction_cutoff):
+        raise QCFail("prediction_cutoff must be a non-empty validated datetime string")
+    try:
+        _parse_datetime_semantic("prediction_cutoff", prediction_cutoff)
+    except EvidenceValidationError as exc:
+        raise QCFail("prediction_cutoff invalid datetime") from exc
+    if evidence.available_at is not None:
+        try:
+            _parse_datetime_semantic("available_at", evidence.available_at)
+        except EvidenceValidationError as exc:
+            raise QCFail("evidence.available_at invalid") from exc
+    seal = sha256_bytes(
+        "|".join([
+            _GATE_INPUT_SEAL_DOMAIN,
+            evidence._seal,
+            "" if accessibility_score is None else str(accessibility_score),
+            "" if authoritative_source is None else (
+                "1" if authoritative_source else "0"
+            ),
+            "" if reproducible_retrieval is None else (
+                "1" if reproducible_retrieval else "0"
+            ),
+            "" if quality_controls_met is None else (
+                "1" if quality_controls_met else "0"
+            ),
+            prediction_cutoff,
+        ]).encode("utf-8")
+    )
+    sealed = ValidatedGateInput(
+        evidence=evidence,
+        accessibility_score=accessibility_score,
+        authoritative_source=authoritative_source,
+        reproducible_retrieval=reproducible_retrieval,
+        quality_controls_met=quality_controls_met,
+        prediction_cutoff=prediction_cutoff,
+        _seal=seal,
+    )
+    return require_sealed_gate_input(sealed)
+
+
+def require_sealed_gate_input(gate_input: ValidatedGateInput) -> ValidatedGateInput:
+    if type(gate_input) is not ValidatedGateInput:
+        raise QCFail("ValidatedGateInput type check failed")
+    require_sealed_synthetic_evidence(gate_input.evidence)
+    expected = sha256_bytes(
+        "|".join([
+            _GATE_INPUT_SEAL_DOMAIN,
+            gate_input.evidence._seal,
+            (
+                ""
+                if gate_input.accessibility_score is None
+                else str(gate_input.accessibility_score)
+            ),
+            "" if gate_input.authoritative_source is None else (
+                "1" if gate_input.authoritative_source else "0"
+            ),
+            "" if gate_input.reproducible_retrieval is None else (
+                "1" if gate_input.reproducible_retrieval else "0"
+            ),
+            "" if gate_input.quality_controls_met is None else (
+                "1" if gate_input.quality_controls_met else "0"
+            ),
+            gate_input.prediction_cutoff,
+        ]).encode("utf-8")
+    )
+    if gate_input._seal != expected:
+        raise QCFail("ValidatedGateInput seal verification failed")
+    return gate_input
+
+
 def validate_evidence_record_synthetic(
     record: dict[str, Any],
     *,
@@ -1302,6 +1843,14 @@ def validate_evidence_record_synthetic(
         candidate_source_map=candidate_source_map,
         source_registry=source_registry,
     )
+    if not _is_null(record.get("local_snapshot_path")):
+        if allowed_snapshot_root is None:
+            raise EvidenceValidationError(
+                "snapshot path requires allowed_snapshot_root (pytest tmp_path)"
+            )
+        _verify_snapshot_bytes_match_hash(
+            record, allowed_snapshot_root=Path(allowed_snapshot_root),
+        )
 
 
 def validate_evidence_manifest_synthetic(
@@ -1343,22 +1892,26 @@ def evaluate_g01(accessibility_score: Any) -> str:
     return GATE_PASS
 
 
-def evaluate_g02(authoritative_source: bool | None) -> str:
+def evaluate_g02(authoritative_source: Any) -> str:
     if authoritative_source is None:
         return GATE_UNRESOLVED
+    if type(authoritative_source) is not bool:
+        return GATE_FAIL
     return GATE_PASS if authoritative_source else GATE_FAIL
 
 
-def evaluate_g03(reproducible_retrieval: bool | None) -> str:
+def evaluate_g03(reproducible_retrieval: Any) -> str:
     if reproducible_retrieval is None:
         return GATE_UNRESOLVED
+    if type(reproducible_retrieval) is not bool:
+        return GATE_FAIL
     return GATE_PASS if reproducible_retrieval else GATE_FAIL
 
 
 def _gate_datetime_ok(name: str, value: Any) -> bool:
     if _is_null(value):
         return True
-    if not isinstance(value, str):
+    if type(value) is not str:
         return False
     try:
         _parse_datetime_semantic(name, value)
@@ -1381,9 +1934,11 @@ def evaluate_g04(
     return GATE_UNRESOLVED
 
 
-def evaluate_g05(quality_controls_met: bool | None) -> str:
+def evaluate_g05(quality_controls_met: Any) -> str:
     if quality_controls_met is None:
         return GATE_UNRESOLVED
+    if type(quality_controls_met) is not bool:
+        return GATE_FAIL
     return GATE_PASS if quality_controls_met else GATE_FAIL
 
 
@@ -1395,17 +1950,42 @@ def evaluate_g06(available_at: str | None) -> str:
     return GATE_PASS
 
 
-def evaluate_g07(no_future_leakage: bool | None) -> str:
+def evaluate_g07_from_cutoff(
+    available_at: str | None, prediction_cutoff: str | None,
+) -> str:
+    """G07 derived from validated available_at vs prediction cutoff (not a bool flag)."""
+    if _is_null(available_at) or _is_null(prediction_cutoff):
+        return GATE_UNRESOLVED
+    if type(available_at) is not str or type(prediction_cutoff) is not str:
+        return GATE_FAIL
+    try:
+        avail = _parse_datetime_semantic("available_at", available_at)
+        cutoff = _parse_datetime_semantic("prediction_cutoff", prediction_cutoff)
+    except EvidenceValidationError:
+        return GATE_FAIL
+    if avail.tzinfo is None or cutoff.tzinfo is None:
+        # Compare naive/aware consistently by requiring both parseable; treat
+        # missing tz as fail-closed for leakage decisions.
+        return GATE_FAIL
+    return GATE_PASS if avail <= cutoff else GATE_FAIL
+
+
+def evaluate_g07(no_future_leakage: Any) -> str:
+    """Legacy boolean form — not accepted by evaluate_candidate_gates."""
     if no_future_leakage is None:
         return GATE_UNRESOLVED
+    if type(no_future_leakage) is not bool:
+        return GATE_FAIL
     return GATE_PASS if no_future_leakage else GATE_FAIL
 
 
 def evaluate_g08(gate_statuses: dict[str, str]) -> str:
+    if type(gate_statuses) is not dict:
+        return GATE_FAIL
     if set(gate_statuses.keys()) != set(G01_G07):
         return GATE_FAIL
     for status in gate_statuses.values():
-        if status not in ALLOWED_GATE_STATUSES:
+        if type(status) is not str or status not in ALLOWED_GATE_STATUSES:
             return GATE_FAIL
     if any(s == GATE_FAIL for s in gate_statuses.values()):
         return GATE_FAIL
@@ -1416,20 +1996,37 @@ def evaluate_g08(gate_statuses: dict[str, str]) -> str:
     return GATE_PASS
 
 
+def _require_usable_key_map(
+    usable_by_candidate: Any, pilot_keys: frozenset[str],
+) -> dict[str, set[str]]:
+    if type(usable_by_candidate) is not dict:
+        raise QCFail("usable_by_candidate must be a dict")
+    out: dict[str, set[str]] = {}
+    for cand_id, usable in usable_by_candidate.items():
+        if type(cand_id) is not str:
+            raise QCFail("usable_by_candidate keys must be str")
+        if type(usable) not in (set, frozenset):
+            raise QCFail("usable_by_candidate values must be set/frozenset")
+        if any(type(k) is not str for k in usable):
+            raise QCFail("usable keys must be str")
+        out[cand_id] = set(usable)
+    return out
+
+
 def evaluate_g09(
     usable_by_candidate: dict[str, set[str]],
-    pilot_keys: set[str],
+    pilot_keys: set[str] | frozenset[str] | list[str],
     policy: LockedGatePolicy,
 ) -> str:
     policy = require_sealed_gate_policy(policy)
-    if not pilot_keys:
-        return GATE_UNRESOLVED
+    keys = require_frozen_pilot_key_identity(policy, pilot_keys)
+    usable_map = _require_usable_key_map(usable_by_candidate, keys)
     registered = [c["candidate_id"] for c in part3a.REGISTERED_CANDIDATES]
     if len(registered) != 10:
         return GATE_FAIL
     for cand_id in registered:
-        usable = usable_by_candidate.get(cand_id, set())
-        coverage = len(usable & pilot_keys) / len(pilot_keys)
+        usable = usable_map.get(cand_id, set())
+        coverage = len(usable & keys) / len(keys)
         if coverage < policy.g09_threshold:
             return GATE_FAIL
     return GATE_PASS
@@ -1437,26 +2034,48 @@ def evaluate_g09(
 
 def evaluate_g10(
     usable_by_pair_block: dict[str, dict[str, bool]],
-    pilot_keys: set[str],
+    pilot_keys: set[str] | frozenset[str] | list[str],
     policy: LockedGatePolicy,
 ) -> str:
     policy = require_sealed_gate_policy(policy)
-    if not pilot_keys:
-        return GATE_UNRESOLVED
+    keys = require_frozen_pilot_key_identity(policy, pilot_keys)
+    if type(usable_by_pair_block) is not dict:
+        raise QCFail("usable_by_pair_block must be a dict")
+    for key, cand_flags in usable_by_pair_block.items():
+        if type(key) is not str or type(cand_flags) is not dict:
+            raise QCFail("usable_by_pair_block map types invalid")
+        for cand_id, flag in cand_flags.items():
+            if type(cand_id) is not str or type(flag) is not bool:
+                raise QCFail("G10 usable flags must be exact bool")
     for block, candidates in BLOCK_CANDIDATES.items():
         if not candidates:
             return GATE_FAIL
         usable_pairs = {
-            key for key in pilot_keys
+            key for key in keys
             if all(
-                usable_by_pair_block.get(key, {}).get(cand_id, False)
+                usable_by_pair_block.get(key, {}).get(cand_id, False) is True
                 for cand_id in candidates
             )
         }
-        coverage = len(usable_pairs) / len(pilot_keys)
+        coverage = len(usable_pairs) / len(keys)
         if coverage < policy.g10_threshold:
             return GATE_FAIL
     return GATE_PASS
+
+
+def _require_block_year_counts(data: Any, policy: LockedGatePolicy) -> dict[str, dict[str, int]]:
+    if type(data) is not dict:
+        raise QCFail("block/year count map must be a dict")
+    out: dict[str, dict[str, int]] = {}
+    for block, years in data.items():
+        if type(block) is not str or type(years) is not dict:
+            raise QCFail("block/year count map types invalid")
+        out[block] = {}
+        for year, count in years.items():
+            if type(year) is not str or type(count) is not int or count < 0:
+                raise QCFail("G11/G12 counts must be exact int >= 0")
+            out[block][year] = count
+    return out
 
 
 def evaluate_g11(
@@ -1464,10 +2083,11 @@ def evaluate_g11(
     policy: LockedGatePolicy,
 ) -> str:
     policy = require_sealed_gate_policy(policy)
+    data = _require_block_year_counts(usable_positive_by_block_year, policy)
     for block in BLOCK_CANDIDATES:
         for year in policy.target_years:
-            count = usable_positive_by_block_year.get(block, {}).get(year, 0)
-            if count < policy.g11_minimum:
+            count = data.get(block, {}).get(year, 0)
+            if type(count) is not int or count < policy.g11_minimum:
                 return GATE_FAIL
     return GATE_PASS
 
@@ -1477,18 +2097,22 @@ def evaluate_g12(
     policy: LockedGatePolicy,
 ) -> str:
     policy = require_sealed_gate_policy(policy)
+    data = _require_block_year_counts(usable_negative_by_block_year, policy)
     for block in BLOCK_CANDIDATES:
         for year in policy.target_years:
-            count = usable_negative_by_block_year.get(block, {}).get(year, 0)
-            if count < policy.g12_minimum:
+            count = data.get(block, {}).get(year, 0)
+            if type(count) is not int or count < policy.g12_minimum:
                 return GATE_FAIL
     return GATE_PASS
 
 
-def evaluate_g13(predictor_keys: set[str], policy: LockedGatePolicy) -> str:
+def evaluate_g13(
+    predictor_keys: set[str] | frozenset[str] | list[str],
+    policy: LockedGatePolicy,
+) -> str:
     policy = require_sealed_gate_policy(policy)
-    n = len(predictor_keys)
-    if n != policy.g13_expected:
+    keys = require_frozen_pilot_key_identity(policy, predictor_keys)
+    if len(keys) != policy.g13_expected:
         return GATE_FAIL
     return GATE_PASS
 
@@ -1502,17 +2126,39 @@ def evaluate_g14(
     year_allocation: dict[str, dict[str, int]],
     post_evidence_substitution: bool,
     policy: LockedGatePolicy,
+    pilot_keys: set[str] | frozenset[str] | list[str],
+    key_labels: set[tuple[str, str]] | frozenset[tuple[str, str]] | list[tuple[str, str]],
+    key_years: set[tuple[str, str]] | frozenset[tuple[str, str]] | list[tuple[str, str]],
 ) -> str:
     policy = require_sealed_gate_policy(policy)
+    if type(post_evidence_substitution) is not bool:
+        raise QCFail("post_evidence_substitution must be exact bool")
+    if type(positive) is not int or type(negative) is not int or type(unknown) is not int:
+        raise QCFail("G14 class counts must be exact int")
+    if positive < 0 or negative < 0 or unknown < 0:
+        raise QCFail("G14 class counts must be >= 0")
+    keys = require_frozen_pilot_key_identity(policy, pilot_keys)
+    labels = require_frozen_pilot_label_identity(policy, key_labels)
+    years = require_frozen_pilot_year_identity(policy, key_years)
     if post_evidence_substitution:
         return GATE_FAIL
-    if option_id != policy.g14_option_id:
+    # Claiming no substitution while identity already mismatched is impossible
+    # after require_*; still bind identity into the pass path explicitly.
+    if (
+        keys != policy.frozen_pilot_keys
+        or labels != policy.frozen_pilot_key_labels
+        or years != policy.frozen_pilot_key_years
+    ):
+        return GATE_FAIL
+    if type(option_id) is not str or option_id != policy.g14_option_id:
         return GATE_FAIL
     if positive != lock.APPROVED_POSITIVE:
         return GATE_FAIL
     if negative != lock.APPROVED_NEGATIVE:
         return GATE_FAIL
     if unknown != lock.APPROVED_UNKNOWN:
+        return GATE_FAIL
+    if type(year_allocation) is not dict:
         return GATE_FAIL
     if year_allocation != lock.EXPECTED_YEAR_ALLOCATION:
         return GATE_FAIL
@@ -1521,34 +2167,83 @@ def evaluate_g14(
 
 def evaluate_score_without_evidence(
     accessibility_score: Any,
-    evidence_captured: bool,
+    evidence_captured: Any,
 ) -> str:
+    if type(evidence_captured) is not bool:
+        return GATE_FAIL
     if accessibility_score is not None and not evidence_captured:
         return GATE_FAIL
     return GATE_NOT_APPLIED
 
 
-def evaluate_candidate_gates(context: dict[str, Any]) -> dict[str, str]:
-    """Evaluate G01–G08 for one in-memory candidate/pair context."""
-    score = context.get("accessibility_score")
-    evidence_captured = bool(context.get("evidence_captured", False))
+def evaluate_candidate_gates(gate_input: ValidatedGateInput) -> dict[str, str]:
+    """Evaluate G01–G08 from sealed ValidatedGateInput only (no raw dicts)."""
+    gate_input = require_sealed_gate_input(gate_input)
+    evidence = gate_input.evidence
+    # Sealed evidence is proof that synthetic evidence exists; never trust a
+    # caller-controlled evidence_captured boolean.
+    evidence_captured = True
+    score = gate_input.accessibility_score
     if score is not None and not evidence_captured:
         g01 = GATE_FAIL
     else:
         g01 = evaluate_g01(score)
     statuses = {
         "G01": g01,
-        "G02": evaluate_g02(context.get("authoritative_source")),
-        "G03": evaluate_g03(context.get("reproducible_retrieval")),
-        "G04": evaluate_g04(
-            context.get("published_at"), context.get("available_at"),
+        "G02": evaluate_g02(gate_input.authoritative_source),
+        "G03": evaluate_g03(gate_input.reproducible_retrieval),
+        "G04": evaluate_g04(evidence.published_at, evidence.available_at),
+        "G05": evaluate_g05(gate_input.quality_controls_met),
+        "G06": evaluate_g06(evidence.available_at),
+        "G07": evaluate_g07_from_cutoff(
+            evidence.available_at, gate_input.prediction_cutoff,
         ),
-        "G05": evaluate_g05(context.get("quality_controls_met")),
-        "G06": evaluate_g06(context.get("available_at")),
-        "G07": evaluate_g07(context.get("no_future_leakage")),
     }
     statuses["G08"] = evaluate_g08(statuses)
     return statuses
+
+
+def evaluate_pilot_gates_synthetic(
+    *,
+    policy: LockedGatePolicy,
+    usable_by_candidate: dict[str, set[str]],
+    usable_by_pair_block: dict[str, dict[str, bool]],
+    usable_positive_by_block_year: dict[str, dict[str, int]],
+    usable_negative_by_block_year: dict[str, dict[str, int]],
+    pilot_keys: set[str] | frozenset[str] | list[str],
+    key_labels: set[tuple[str, str]] | frozenset[tuple[str, str]] | list[tuple[str, str]],
+    key_years: set[tuple[str, str]] | frozenset[tuple[str, str]] | list[tuple[str, str]],
+    option_id: str,
+    positive: int,
+    negative: int,
+    unknown: int,
+    year_allocation: dict[str, dict[str, int]],
+    post_evidence_substitution: bool,
+) -> dict[str, str]:
+    """Composite G09–G14 evaluation bound to exact frozen pilot identity."""
+    policy = require_sealed_gate_policy(policy)
+    require_frozen_pilot_key_identity(policy, pilot_keys)
+    require_frozen_pilot_label_identity(policy, key_labels)
+    require_frozen_pilot_year_identity(policy, key_years)
+    return {
+        "G09": evaluate_g09(usable_by_candidate, pilot_keys, policy),
+        "G10": evaluate_g10(usable_by_pair_block, pilot_keys, policy),
+        "G11": evaluate_g11(usable_positive_by_block_year, policy),
+        "G12": evaluate_g12(usable_negative_by_block_year, policy),
+        "G13": evaluate_g13(pilot_keys, policy),
+        "G14": evaluate_g14(
+            option_id=option_id,
+            positive=positive,
+            negative=negative,
+            unknown=unknown,
+            year_allocation=year_allocation,
+            post_evidence_substitution=post_evidence_substitution,
+            policy=policy,
+            pilot_keys=pilot_keys,
+            key_labels=key_labels,
+            key_years=key_years,
+        ),
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -1601,10 +2296,22 @@ def build_immutable_cache_contract() -> dict:
         "unknown_hash_or_missing_payload": "unresolved_fail_closed",
         "repository_cache_populated_in_part3b0": False,
         "put_returns_payload_and_metadata_sha256": True,
+        "external_cache_handle_required_for_secure_get": True,
+        "cache_handle_persists_metadata_sha256_across_restart": True,
+        "cache_handle_template_header_only_in_part3b0": True,
+        "real_cache_handles_created_in_part3b0": False,
     }
 
 
 def build_network_denial_contract() -> dict:
+    spawn_names = sorted(
+        f"os.{name}"
+        for name in (
+            "spawnl", "spawnle", "spawnlp", "spawnlpe",
+            "spawnv", "spawnve", "spawnvp", "spawnvpe",
+        )
+        if hasattr(os, name)
+    )
     return {
         "contract_version": "stage125_part3b0_v1",
         "stage": CURRENT_STAGE,
@@ -1622,13 +2329,20 @@ def build_network_denial_contract() -> dict:
             "http.client.HTTPConnection.connect",
             "http.client.HTTPSConnection.connect",
             "subprocess:default_deny_except_exact_readonly_git",
+            "os.system",
+            "os.popen",
+            *spawn_names,
         ],
         "subprocess_policy": "default_deny_except_exact_argument_level_readonly_git",
+        "child_process_policy": (
+            "default_deny_stdlib_launch_routes_except_exact_readonly_git"
+        ),
         "exact_git_readonly_allowlist": sorted(_GIT_ALLOWED_SUBCOMMANDS),
         "on_attempt": {
             "increment_network_calls_attempted": True,
             "raise_fail_closed_exception": True,
             "leave_no_partial_cache_or_evidence": True,
+            "no_child_process_created_on_deny": True,
         },
         "required_final_state": {
             "network_calls_attempted": 0,
@@ -1663,7 +2377,8 @@ def build_readme() -> str:
         "- Header-only evidence manifest template CSV (zero data rows).",
         "- Header-only gate-result template CSV (zero data rows).",
         "- Immutable raw-cache contract JSON (tested in pytest temp dirs only).",
-        "- Default-deny network sentinel contract JSON.",
+        "- Header-only cache-handle template CSV (external trust-anchor contract).",
+        "- Default-deny network/child-process sentinel contract JSON.",
         "",
         "## Guardrails",
         "",
@@ -1675,6 +2390,9 @@ def build_readme() -> str:
         "- `modeling_started=false`",
         "- `part3a_protocol_locked=true`",
         "- `part3a_decision_locked=true`",
+        "- Snapshot bytes verified against `snapshot_sha256` (no symlink follow).",
+        "- Gate inputs are sealed/typed; G07 derived from available_at vs cutoff.",
+        "- G09–G14 bound to exact frozen pilot key identity (80/39/41).",
         "",
         "## Next research action",
         "",
@@ -2320,6 +3038,7 @@ def build_all(repo_root: Path) -> dict:
             F_EVIDENCE_TEMPLATE: build_evidence_manifest_template_csv(schema),
             F_GATE_TEMPLATE: build_gate_result_template_csv(),
             F_CACHE_CONTRACT: _json_str(cache_contract),
+            F_CACHE_HANDLE_TEMPLATE: build_cache_handle_template_csv(),
             F_NETWORK_CONTRACT: _json_str(network_contract),
             F_README: build_readme(),
         }

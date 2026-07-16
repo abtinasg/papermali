@@ -32,7 +32,12 @@ def _policy():
     return p3b0.load_locked_gate_policy(REPO_ROOT)
 
 
-def _synthetic_valid_record(*, snapshot_rel: str | None = None) -> dict:
+def _synthetic_valid_record(
+    *,
+    snapshot_rel: str | None = None,
+    snapshot_bytes: bytes | None = None,
+    snapshot_sha256: str | None = None,
+) -> dict:
     rec = {
         "evidence_id": "synth_001",
         "candidate_id": "cand_m2_equity_return_window",
@@ -58,10 +63,50 @@ def _synthetic_valid_record(*, snapshot_rel: str | None = None) -> dict:
         "failure_reason": "",
     }
     if snapshot_rel is not None:
+        payload = b"synthetic-snapshot-bytes" if snapshot_bytes is None else snapshot_bytes
         rec["local_snapshot_path"] = snapshot_rel
-        rec["snapshot_sha256"] = "a" * 64
+        rec["snapshot_sha256"] = (
+            snapshot_sha256
+            if snapshot_sha256 is not None
+            else p3b0.sha256_bytes(payload)
+        )
+        rec["_snapshot_bytes"] = payload  # test helper only; stripped before validate
     return rec
 
+
+def _write_snapshot(tmp_path: Path, rec: dict) -> dict:
+    """Materialize snapshot bytes for a fixture record and drop helper key."""
+    out = {k: v for k, v in rec.items() if k != "_snapshot_bytes"}
+    rel = out.get("local_snapshot_path")
+    if rel:
+        payload = rec.get("_snapshot_bytes", b"synthetic-snapshot-bytes")
+        path = tmp_path / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(payload)
+    return out
+
+
+def _frozen_pilot(policy=None):
+    policy = policy or _policy()
+    return (
+        set(policy.frozen_pilot_keys),
+        set(policy.frozen_pilot_key_labels),
+        set(policy.frozen_pilot_key_years),
+    )
+
+
+def _seal_gate_input(schema_and_maps, tmp_path, **gate_kwargs):
+    rec = _write_snapshot(tmp_path, _synthetic_valid_record())
+    evidence = p3b0.validate_and_seal_synthetic_evidence(
+        rec, allowed_snapshot_root=tmp_path, **schema_and_maps,
+    )
+    return p3b0.build_validated_gate_input(
+        evidence,
+        prediction_cutoff=gate_kwargs.pop(
+            "prediction_cutoff", "2026-01-01T00:00:00Z",
+        ),
+        **gate_kwargs,
+    )
 
 @pytest.fixture
 def schema_and_maps():
@@ -101,6 +146,8 @@ def test_locked_gate_policy_from_frozen_artifacts():
     assert policy.g13_expected == 80
     assert policy.g14_option_id == lock.APPROVED_PILOT_OPTION
     assert len(policy.target_years) == 10
+    assert len(policy.frozen_pilot_keys) == 80
+    assert p3b0.SHA256_RE.match(policy.source_pilot_pairs_sha256)
 
 
 # --------------------------------------------------------------------------- #
@@ -108,11 +155,90 @@ def test_locked_gate_policy_from_frozen_artifacts():
 # --------------------------------------------------------------------------- #
 
 def test_schema_valid_synthetic_record(schema_and_maps, tmp_path):
-    rec = _synthetic_valid_record(snapshot_rel="snap.bin")
-    (tmp_path / "snap.bin").write_bytes(b"x")
+    rec = _write_snapshot(tmp_path, _synthetic_valid_record(snapshot_rel="snap.bin"))
     p3b0.validate_evidence_record_synthetic(
         rec, allowed_snapshot_root=tmp_path, **schema_and_maps,
     )
+
+
+def test_snapshot_correct_bytes_and_hash_pass(schema_and_maps, tmp_path):
+    payload = b"exact-bytes-ok"
+    rec = _write_snapshot(
+        tmp_path,
+        _synthetic_valid_record(snapshot_rel="ok.bin", snapshot_bytes=payload),
+    )
+    p3b0.validate_evidence_record_synthetic(
+        rec, allowed_snapshot_root=tmp_path, **schema_and_maps,
+    )
+
+
+def test_snapshot_wrong_hash_fails(schema_and_maps, tmp_path):
+    rec = _write_snapshot(
+        tmp_path,
+        _synthetic_valid_record(
+            snapshot_rel="bad.bin",
+            snapshot_bytes=b"bytes",
+            snapshot_sha256="a" * 64,
+        ),
+    )
+    with pytest.raises(p3b0.EvidenceValidationError, match="does not match"):
+        p3b0.validate_evidence_record_synthetic(
+            rec, allowed_snapshot_root=tmp_path, **schema_and_maps,
+        )
+
+
+def test_snapshot_nonexistent_fails(schema_and_maps, tmp_path):
+    rec = _synthetic_valid_record(snapshot_rel="missing.bin")
+    rec = {k: v for k, v in rec.items() if k != "_snapshot_bytes"}
+    with pytest.raises(p3b0.EvidenceValidationError, match="missing|unreadable"):
+        p3b0.validate_evidence_record_synthetic(
+            rec, allowed_snapshot_root=tmp_path, **schema_and_maps,
+        )
+
+
+def test_snapshot_mutated_after_record_creation_fails(schema_and_maps, tmp_path):
+    rec = _write_snapshot(
+        tmp_path,
+        _synthetic_valid_record(snapshot_rel="mut.bin", snapshot_bytes=b"original"),
+    )
+    (tmp_path / "mut.bin").write_bytes(b"mutated-after-hash")
+    with pytest.raises(p3b0.EvidenceValidationError, match="does not match"):
+        p3b0.validate_evidence_record_synthetic(
+            rec, allowed_snapshot_root=tmp_path, **schema_and_maps,
+        )
+
+
+def test_snapshot_symlink_rejected(schema_and_maps, tmp_path):
+    real = tmp_path / "real.bin"
+    real.write_bytes(b"payload")
+    link = tmp_path / "link.bin"
+    link.symlink_to(real)
+    rec = _synthetic_valid_record(
+        snapshot_rel="link.bin",
+        snapshot_bytes=b"payload",
+    )
+    rec = {k: v for k, v in rec.items() if k != "_snapshot_bytes"}
+    with pytest.raises(p3b0.EvidenceValidationError, match="symlink"):
+        p3b0.validate_evidence_record_synthetic(
+            rec, allowed_snapshot_root=tmp_path, **schema_and_maps,
+        )
+
+
+def test_snapshot_intermediate_dir_symlink_rejected(schema_and_maps, tmp_path):
+    real_dir = tmp_path / "realdir"
+    real_dir.mkdir()
+    (real_dir / "snap.bin").write_bytes(b"payload")
+    link_dir = tmp_path / "linkdir"
+    link_dir.symlink_to(real_dir, target_is_directory=True)
+    rec = _synthetic_valid_record(
+        snapshot_rel="linkdir/snap.bin",
+        snapshot_bytes=b"payload",
+    )
+    rec = {k: v for k, v in rec.items() if k != "_snapshot_bytes"}
+    with pytest.raises(p3b0.EvidenceValidationError, match="symlink"):
+        p3b0.validate_evidence_record_synthetic(
+            rec, allowed_snapshot_root=tmp_path, **schema_and_maps,
+        )
 
 
 def test_missing_required_identifier(schema_and_maps):
@@ -160,7 +286,7 @@ def test_out_of_scope_candidate(schema_and_maps):
 
 
 def test_malformed_sha256(schema_and_maps, tmp_path):
-    rec = _synthetic_valid_record(snapshot_rel="snap.bin")
+    rec = _write_snapshot(tmp_path, _synthetic_valid_record(snapshot_rel="snap.bin"))
     rec["snapshot_sha256"] = "not-a-hash"
     with pytest.raises(p3b0.EvidenceValidationError, match="invalid SHA-256"):
         p3b0.validate_evidence_record_synthetic(
@@ -194,6 +320,18 @@ def test_snapshot_path_hash_co_presence(schema_and_maps, tmp_path):
     rec["local_snapshot_path"] = "snap.bin"
     rec["snapshot_sha256"] = ""
     with pytest.raises(p3b0.EvidenceValidationError, match="co-present"):
+        p3b0.validate_evidence_record_synthetic(
+            rec, allowed_snapshot_root=tmp_path, **schema_and_maps,
+        )
+
+
+def test_wrong_hash_with_b_x_bytes_no_longer_passes(schema_and_maps, tmp_path):
+    """Regression: writing b'x' while supplying 'a'*64 must fail closed."""
+    (tmp_path / "snap.bin").write_bytes(b"x")
+    rec = _synthetic_valid_record(snapshot_rel="snap.bin")
+    rec = {k: v for k, v in rec.items() if k != "_snapshot_bytes"}
+    rec["snapshot_sha256"] = "a" * 64
+    with pytest.raises(p3b0.EvidenceValidationError, match="does not match"):
         p3b0.validate_evidence_record_synthetic(
             rec, allowed_snapshot_root=tmp_path, **schema_and_maps,
         )
@@ -278,7 +416,10 @@ def test_invalid_calendar_enum(schema_and_maps):
 
 
 def test_snapshot_outside_tmp_rejected(schema_and_maps, tmp_path):
-    rec = _synthetic_valid_record(snapshot_rel=str(REPO_ROOT / "project/stage125/x.bin"))
+    rec = _synthetic_valid_record(
+        snapshot_rel=str(REPO_ROOT / "project/stage125/x.bin"),
+    )
+    rec = {k: v for k, v in rec.items() if k != "_snapshot_bytes"}
     with pytest.raises(p3b0.EvidenceValidationError):
         p3b0.validate_evidence_record_synthetic(
             rec, allowed_snapshot_root=tmp_path, **schema_and_maps,
@@ -312,21 +453,74 @@ def test_g01_rejects_non_int_and_out_of_range():
     assert p3b0.evaluate_g01(6) == p3b0.GATE_FAIL
 
 
-def test_g01_score_4_with_other_gate_failing():
-    ctx = {
-        "accessibility_score": 4,
-        "evidence_captured": True,
-        "authoritative_source": False,
-        "reproducible_retrieval": True,
-        "published_at": "2025-01-01T00:00:00Z",
-        "available_at": "2025-01-01T00:00:00Z",
-        "quality_controls_met": True,
-        "no_future_leakage": True,
-    }
-    statuses = p3b0.evaluate_candidate_gates(ctx)
+def test_g01_score_4_with_other_gate_failing(schema_and_maps, tmp_path):
+    gate_input = _seal_gate_input(
+        schema_and_maps,
+        tmp_path,
+        accessibility_score=4,
+        authoritative_source=False,
+        reproducible_retrieval=True,
+        quality_controls_met=True,
+        prediction_cutoff="2026-01-01T00:00:00Z",
+    )
+    statuses = p3b0.evaluate_candidate_gates(gate_input)
     assert statuses["G01"] == p3b0.GATE_PASS
     assert statuses["G02"] == p3b0.GATE_FAIL
     assert statuses["G08"] == p3b0.GATE_FAIL
+
+
+def test_evaluate_candidate_gates_rejects_raw_dict():
+    with pytest.raises((TypeError, p3b0.QCFail)):
+        p3b0.evaluate_candidate_gates({  # type: ignore[arg-type]
+            "evidence_captured": True,
+            "no_future_leakage": True,
+            "authoritative_source": "false",
+        })
+
+
+def test_truthiness_coercion_rejected(schema_and_maps, tmp_path):
+    rec = _write_snapshot(tmp_path, _synthetic_valid_record())
+    evidence = p3b0.validate_and_seal_synthetic_evidence(
+        rec, allowed_snapshot_root=tmp_path, **schema_and_maps,
+    )
+    with pytest.raises(p3b0.QCFail, match="bool"):
+        p3b0.build_validated_gate_input(
+            evidence,
+            prediction_cutoff="2026-01-01T00:00:00Z",
+            authoritative_source="false",  # type: ignore[arg-type]
+        )
+    assert p3b0.evaluate_g02("false") == p3b0.GATE_FAIL
+    assert p3b0.evaluate_g03("false") == p3b0.GATE_FAIL
+    assert p3b0.evaluate_g05("false") == p3b0.GATE_FAIL
+    assert p3b0.evaluate_g07("false") == p3b0.GATE_FAIL
+    assert p3b0.evaluate_score_without_evidence(3, "false") == p3b0.GATE_FAIL
+
+
+def test_g07_derived_from_cutoff_not_caller_bool(schema_and_maps, tmp_path):
+    # available_at=2025-12-31, cutoff earlier => leakage FAIL even if a caller
+    # would have claimed no_future_leakage=True.
+    gate_input = _seal_gate_input(
+        schema_and_maps,
+        tmp_path,
+        accessibility_score=4,
+        authoritative_source=True,
+        reproducible_retrieval=True,
+        quality_controls_met=True,
+        prediction_cutoff="2025-01-01T00:00:00Z",
+    )
+    statuses = p3b0.evaluate_candidate_gates(gate_input)
+    assert statuses["G07"] == p3b0.GATE_FAIL
+    # Same evidence with later cutoff passes G07.
+    gate_ok = _seal_gate_input(
+        schema_and_maps,
+        tmp_path,
+        accessibility_score=4,
+        authoritative_source=True,
+        reproducible_retrieval=True,
+        quality_controls_met=True,
+        prediction_cutoff="2026-01-01T00:00:00Z",
+    )
+    assert p3b0.evaluate_candidate_gates(gate_ok)["G07"] == p3b0.GATE_PASS
 
 
 def test_g08_requires_exactly_g01_g07_and_allowed_status():
@@ -360,6 +554,9 @@ def test_g04_g06_malformed_dates_fail():
 
 def test_future_target_year_leakage_fails():
     assert p3b0.evaluate_g07(False) == p3b0.GATE_FAIL
+    assert p3b0.evaluate_g07_from_cutoff(
+        "2026-06-01T00:00:00Z", "2026-01-01T00:00:00Z",
+    ) == p3b0.GATE_FAIL
 
 
 def test_forged_weakened_locked_policy_rejected():
@@ -374,9 +571,13 @@ def test_forged_weakened_locked_policy_rejected():
         target_years=real.target_years,
         source_thresholds_sha256=real.source_thresholds_sha256,
         source_decision_lock_sha256=real.source_decision_lock_sha256,
+        frozen_pilot_keys=real.frozen_pilot_keys,
+        frozen_pilot_key_labels=real.frozen_pilot_key_labels,
+        frozen_pilot_key_years=real.frozen_pilot_key_years,
+        source_pilot_pairs_sha256=real.source_pilot_pairs_sha256,
         _seal=real._seal,
     )
-    pilot = {f"k{i}" for i in range(80)}
+    pilot, _, _ = _frozen_pilot(real)
     usable = {c["candidate_id"]: pilot for c in part3a.REGISTERED_CANDIDATES}
     with pytest.raises(p3b0.QCFail, match="LockedGatePolicy"):
         p3b0.evaluate_g09(usable, pilot, forged)
@@ -386,12 +587,11 @@ def test_forged_weakened_locked_policy_rejected():
 
 def test_g09_caller_cannot_weaken_threshold():
     policy = _policy()
-    pilot = {f"k{i}" for i in range(80)}
-    usable = {f"k{i}" for i in range(8)}  # 0.10 coverage
+    pilot, _, _ = _frozen_pilot(policy)
+    usable = set(list(sorted(pilot))[:8])  # 0.10 coverage
     statuses = {
         c["candidate_id"]: usable for c in part3a.REGISTERED_CANDIDATES
     }
-    # Even if a caller *wanted* threshold=0.1, the API only accepts LockedGatePolicy.
     assert p3b0.evaluate_g09(statuses, pilot, policy) == p3b0.GATE_FAIL
     with pytest.raises(TypeError):
         p3b0.evaluate_g09(statuses, pilot, threshold=0.1)  # type: ignore[call-arg]
@@ -399,8 +599,8 @@ def test_g09_caller_cannot_weaken_threshold():
 
 def test_g09_just_below_threshold_fails_all_ten_candidates():
     policy = _policy()
-    pilot = {f"k{i}" for i in range(80)}
-    usable = {f"k{i}" for i in range(63)}  # 63/80 < 0.80
+    pilot, _, _ = _frozen_pilot(policy)
+    usable = set(list(sorted(pilot))[:63])  # 63/80 < 0.80
     statuses = {
         c["candidate_id"]: usable for c in part3a.REGISTERED_CANDIDATES
     }
@@ -410,8 +610,8 @@ def test_g09_just_below_threshold_fails_all_ten_candidates():
 
 def test_g09_exactly_at_threshold_passes():
     policy = _policy()
-    pilot = {f"k{i}" for i in range(80)}
-    usable = {f"k{i}" for i in range(64)}
+    pilot, _, _ = _frozen_pilot(policy)
+    usable = set(list(sorted(pilot))[:64])
     statuses = {
         c["candidate_id"]: usable for c in part3a.REGISTERED_CANDIDATES
     }
@@ -420,15 +620,45 @@ def test_g09_exactly_at_threshold_passes():
 
 def test_g09_single_candidate_below_fails_while_others_pass():
     policy = _policy()
-    pilot = {f"k{i}" for i in range(80)}
-    full = {f"k{i}" for i in range(64)}
-    weak = {f"k{i}" for i in range(63)}
+    pilot, _, _ = _frozen_pilot(policy)
+    keys = list(sorted(pilot))
+    full = set(keys[:64])
+    weak = set(keys[:63])
     statuses = {
         c["candidate_id"]: full for c in part3a.REGISTERED_CANDIDATES
     }
     victim = part3a.REGISTERED_CANDIDATES[0]["candidate_id"]
     statuses[victim] = weak
     assert p3b0.evaluate_g09(statuses, pilot, policy) == p3b0.GATE_FAIL
+
+
+def test_g09_rejects_arbitrary_eighty_keys():
+    policy = _policy()
+    pilot = {f"k{i}" for i in range(80)}
+    usable = {c["candidate_id"]: pilot for c in part3a.REGISTERED_CANDIDATES}
+    with pytest.raises(p3b0.QCFail, match="pilot key identity"):
+        p3b0.evaluate_g09(usable, pilot, policy)
+
+
+def test_g09_rejects_one_replaced_key():
+    policy = _policy()
+    pilot, _, _ = _frozen_pilot(policy)
+    mutated = set(pilot)
+    victim = next(iter(mutated))
+    mutated.remove(victim)
+    mutated.add("REPLACED|0000")
+    usable = {c["candidate_id"]: mutated for c in part3a.REGISTERED_CANDIDATES}
+    with pytest.raises(p3b0.QCFail, match="pilot key identity"):
+        p3b0.evaluate_g09(usable, mutated, policy)
+
+
+def test_g09_rejects_duplicate_keys_list():
+    policy = _policy()
+    pilot, _, _ = _frozen_pilot(policy)
+    dup = list(pilot) + [next(iter(pilot))]
+    usable = {c["candidate_id"]: pilot for c in part3a.REGISTERED_CANDIDATES}
+    with pytest.raises(p3b0.QCFail, match="duplicate"):
+        p3b0.evaluate_g09(usable, dup, policy)
 
 
 def _full_block_usable_map(pilot: set[str], usable_keys: list[str]):
@@ -445,23 +675,31 @@ def _full_block_usable_map(pilot: set[str], usable_keys: list[str]):
 def test_g10_just_below_threshold_one_block_only():
     """Boundary: M2 just below 0.70 while M3 and M4 pass."""
     policy = _policy()
-    pilot = {f"k{i}" for i in range(80)}
+    pilot, _, _ = _frozen_pilot(policy)
     keys = list(sorted(pilot))
     usable_map = _full_block_usable_map(pilot, keys[:56])  # all blocks at 0.70
-    # Drop one M2 candidate flag on enough pairs to push M2 just below 0.70
-    # while keeping M3/M4 at 56/80.
     for key in keys[55:56]:
         for cand in p3b0.BLOCK_CANDIDATES["M2"]:
             usable_map[key][cand] = False
-    # Now M2 has 55/80, M3/M4 still 56/80.
     assert p3b0.evaluate_g10(usable_map, pilot, policy) == p3b0.GATE_FAIL
 
 
 def test_g10_exactly_at_threshold_passes():
     policy = _policy()
-    pilot = {f"k{i}" for i in range(80)}
-    usable_map = _full_block_usable_map(pilot, list(pilot)[:56])
+    pilot, _, _ = _frozen_pilot(policy)
+    usable_map = _full_block_usable_map(pilot, list(sorted(pilot))[:56])
     assert p3b0.evaluate_g10(usable_map, pilot, policy) == p3b0.GATE_PASS
+
+
+def test_g10_rejects_string_usable_flag():
+    policy = _policy()
+    pilot, _, _ = _frozen_pilot(policy)
+    key = next(iter(pilot))
+    usable_map = {
+        key: {p3b0.BLOCK_CANDIDATES["M2"][0]: "false"},  # type: ignore[dict-item]
+    }
+    with pytest.raises(p3b0.QCFail, match="exact bool"):
+        p3b0.evaluate_g10(usable_map, pilot, policy)
 
 
 def test_g11_one_year_below_while_all_others_pass():
@@ -481,6 +719,16 @@ def test_g11_count_3_passes():
         for b in p3b0.BLOCK_CANDIDATES
     }
     assert p3b0.evaluate_g11(data, policy) == p3b0.GATE_PASS
+
+
+def test_g11_rejects_float_count():
+    policy = _policy()
+    data = {
+        b: {y: 3.0 for y in policy.target_years}  # type: ignore[dict-item]
+        for b in p3b0.BLOCK_CANDIDATES
+    }
+    with pytest.raises(p3b0.QCFail, match="exact int"):
+        p3b0.evaluate_g11(data, policy)
 
 
 def test_g12_one_year_below_while_all_others_pass():
@@ -504,28 +752,36 @@ def test_g12_count_3_passes():
 
 def test_g13_79_pairs_fails():
     policy = _policy()
-    assert p3b0.evaluate_g13({f"k{i}" for i in range(79)}, policy) == p3b0.GATE_FAIL
+    pilot, _, _ = _frozen_pilot(policy)
+    with pytest.raises(p3b0.QCFail, match="pilot key identity"):
+        p3b0.evaluate_g13(set(list(pilot)[:79]), policy)
 
 
 def test_g13_80_pairs_passes():
     policy = _policy()
-    assert p3b0.evaluate_g13({f"k{i}" for i in range(80)}, policy) == p3b0.GATE_PASS
+    pilot, _, _ = _frozen_pilot(policy)
+    assert p3b0.evaluate_g13(pilot, policy) == p3b0.GATE_PASS
 
 
 def test_g13_81_pairs_fails():
     policy = _policy()
-    assert p3b0.evaluate_g13({f"k{i}" for i in range(81)}, policy) == p3b0.GATE_FAIL
+    pilot, _, _ = _frozen_pilot(policy)
+    with pytest.raises(p3b0.QCFail, match="pilot key identity"):
+        p3b0.evaluate_g13(set(pilot) | {"EXTRA|0000"}, policy)
 
 
 def test_g13_caller_cannot_weaken_expected():
     policy = _policy()
+    pilot, _, _ = _frozen_pilot(policy)
     with pytest.raises(TypeError):
-        p3b0.evaluate_g13({f"k{i}" for i in range(79)}, expected=79)  # type: ignore[call-arg]
-    assert p3b0.evaluate_g13({f"k{i}" for i in range(79)}, policy) == p3b0.GATE_FAIL
+        p3b0.evaluate_g13(set(list(pilot)[:79]), expected=79)  # type: ignore[call-arg]
+    with pytest.raises(p3b0.QCFail, match="pilot key identity"):
+        p3b0.evaluate_g13({f"k{i}" for i in range(80)}, policy)
 
 
 def test_g14_altered_allocation_fails():
     policy = _policy()
+    pilot, labels, years = _frozen_pilot(policy)
     bad_year = dict(lock.EXPECTED_YEAR_ALLOCATION)
     bad_year["1402"] = {"positive": 4, "negative": 4, "unknown": 0}
     assert p3b0.evaluate_g14(
@@ -536,11 +792,15 @@ def test_g14_altered_allocation_fails():
         year_allocation=bad_year,
         post_evidence_substitution=False,
         policy=policy,
+        pilot_keys=pilot,
+        key_labels=labels,
+        key_years=years,
     ) == p3b0.GATE_FAIL
 
 
 def test_g14_post_evidence_substitution_fails():
     policy = _policy()
+    pilot, labels, years = _frozen_pilot(policy)
     assert p3b0.evaluate_g14(
         option_id=lock.APPROVED_PILOT_OPTION,
         positive=39,
@@ -549,11 +809,15 @@ def test_g14_post_evidence_substitution_fails():
         year_allocation=lock.EXPECTED_YEAR_ALLOCATION,
         post_evidence_substitution=True,
         policy=policy,
+        pilot_keys=pilot,
+        key_labels=labels,
+        key_years=years,
     ) == p3b0.GATE_FAIL
 
 
 def test_g14_locked_allocation_passes():
     policy = _policy()
+    pilot, labels, years = _frozen_pilot(policy)
     assert p3b0.evaluate_g14(
         option_id=lock.APPROVED_PILOT_OPTION,
         positive=39,
@@ -562,7 +826,103 @@ def test_g14_locked_allocation_passes():
         year_allocation=lock.EXPECTED_YEAR_ALLOCATION,
         post_evidence_substitution=False,
         policy=policy,
+        pilot_keys=pilot,
+        key_labels=labels,
+        key_years=years,
     ) == p3b0.GATE_PASS
+
+
+def test_g14_rejects_float_positive_count():
+    policy = _policy()
+    pilot, labels, years = _frozen_pilot(policy)
+    with pytest.raises(p3b0.QCFail, match="exact int"):
+        p3b0.evaluate_g14(
+            option_id=lock.APPROVED_PILOT_OPTION,
+            positive=39.0,  # type: ignore[arg-type]
+            negative=41,
+            unknown=0,
+            year_allocation=lock.EXPECTED_YEAR_ALLOCATION,
+            post_evidence_substitution=False,
+            policy=policy,
+            pilot_keys=pilot,
+            key_labels=labels,
+            key_years=years,
+        )
+
+
+def test_g14_rejects_changed_class_labels():
+    policy = _policy()
+    pilot, labels, years = _frozen_pilot(policy)
+    mutated = set()
+    for key, label in labels:
+        mutated.add((key, "positive" if label == "negative" else "negative"))
+    with pytest.raises(p3b0.QCFail, match="label identity"):
+        p3b0.evaluate_g14(
+            option_id=lock.APPROVED_PILOT_OPTION,
+            positive=39,
+            negative=41,
+            unknown=0,
+            year_allocation=lock.EXPECTED_YEAR_ALLOCATION,
+            post_evidence_substitution=False,
+            policy=policy,
+            pilot_keys=pilot,
+            key_labels=mutated,
+            key_years=years,
+        )
+
+
+def test_g14_rejects_changed_target_years():
+    policy = _policy()
+    pilot, labels, years = _frozen_pilot(policy)
+    mutated = {(k, "1393" if y != "1393" else "1402") for k, y in years}
+    with pytest.raises(p3b0.QCFail, match="year identity"):
+        p3b0.evaluate_g14(
+            option_id=lock.APPROVED_PILOT_OPTION,
+            positive=39,
+            negative=41,
+            unknown=0,
+            year_allocation=lock.EXPECTED_YEAR_ALLOCATION,
+            post_evidence_substitution=False,
+            policy=policy,
+            pilot_keys=pilot,
+            key_labels=labels,
+            key_years=mutated,
+        )
+
+
+def test_composite_pilot_gate_evaluation_frozen_identity():
+    policy = _policy()
+    pilot, labels, years = _frozen_pilot(policy)
+    keys = list(sorted(pilot))
+    usable = set(keys[:64])
+    usable_by_candidate = {
+        c["candidate_id"]: usable for c in part3a.REGISTERED_CANDIDATES
+    }
+    usable_map = _full_block_usable_map(pilot, keys[:56])
+    pos = {b: {y: 3 for y in policy.target_years} for b in p3b0.BLOCK_CANDIDATES}
+    neg = {b: {y: 3 for y in policy.target_years} for b in p3b0.BLOCK_CANDIDATES}
+    statuses = p3b0.evaluate_pilot_gates_synthetic(
+        policy=policy,
+        usable_by_candidate=usable_by_candidate,
+        usable_by_pair_block=usable_map,
+        usable_positive_by_block_year=pos,
+        usable_negative_by_block_year=neg,
+        pilot_keys=pilot,
+        key_labels=labels,
+        key_years=years,
+        option_id=lock.APPROVED_PILOT_OPTION,
+        positive=39,
+        negative=41,
+        unknown=0,
+        year_allocation=lock.EXPECTED_YEAR_ALLOCATION,
+        post_evidence_substitution=False,
+    )
+    assert statuses["G09"] == p3b0.GATE_PASS
+    assert statuses["G10"] == p3b0.GATE_PASS
+    assert statuses["G11"] == p3b0.GATE_PASS
+    assert statuses["G12"] == p3b0.GATE_PASS
+    assert statuses["G13"] == p3b0.GATE_PASS
+    assert statuses["G14"] == p3b0.GATE_PASS
 
 
 # --------------------------------------------------------------------------- #
@@ -798,7 +1158,94 @@ def test_immutable_cache_contract_states_enforced_guarantees_only():
     assert contract["overwrite_support"] is False
     assert contract["put_returns_payload_and_metadata_sha256"] is True
     assert contract["external_expected_metadata_sha256_required_on_get"] is True
+    assert contract["external_cache_handle_required_for_secure_get"] is True
+    assert contract["real_cache_handles_created_in_part3b0"] is False
     assert "tautological_meta_hash_check" not in contract
+
+
+def test_cache_handle_serialize_restart_load_get(tmp_path):
+    cache_a = p3b0.ImmutableCache(tmp_path / "a")
+    result = cache_a.put(b"persist-me", {"note": "synthetic"})
+    handle = p3b0.cache_handle_from_put_result("synth_cache_001", result)
+    serialized = p3b0.serialize_cache_handle(handle)
+    # Simulate process restart with a new cache object on the same root bytes.
+    cache_b = p3b0.ImmutableCache(tmp_path / "a")
+    loaded = p3b0.load_cache_handle(serialized)
+    assert cache_b.get_by_handle(loaded) == b"persist-me"
+
+
+def test_cache_handle_altered_payload_hash_fails(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "x"})
+    handle = p3b0.cache_handle_from_put_result("synth_cache_001", result)
+    bad = p3b0.CacheHandle(
+        evidence_id=handle.evidence_id,
+        payload_sha256="b" * 64,
+        metadata_sha256=handle.metadata_sha256,
+        cache_contract_version=handle.cache_contract_version,
+        schema_version=handle.schema_version,
+    )
+    with pytest.raises(p3b0.ImmutableCacheError):
+        cache.get_by_handle(bad)
+
+
+def test_cache_handle_altered_metadata_hash_fails(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "x"})
+    handle = p3b0.cache_handle_from_put_result("synth_cache_001", result)
+    bad = p3b0.CacheHandle(
+        evidence_id=handle.evidence_id,
+        payload_sha256=handle.payload_sha256,
+        metadata_sha256="c" * 64,
+        cache_contract_version=handle.cache_contract_version,
+        schema_version=handle.schema_version,
+    )
+    with pytest.raises(p3b0.ImmutableCacheError, match="metadata hash"):
+        cache.get_by_handle(bad)
+
+
+def test_cache_handle_altered_serialization_fails(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "x"})
+    handle = p3b0.cache_handle_from_put_result("synth_cache_001", result)
+    serialized = p3b0.serialize_cache_handle(handle)
+    tampered = serialized.replace(handle.metadata_sha256, "d" * 64)
+    with pytest.raises(p3b0.ImmutableCacheError):
+        loaded = p3b0.load_cache_handle(tampered)
+        cache.get_by_handle(loaded)
+
+
+def test_cache_local_dual_tamper_still_fails_with_handle(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "orig"})
+    handle = p3b0.cache_handle_from_put_result("synth_cache_001", result)
+    entry = cache._entry_dir(result.payload_sha256)
+    tampered = {"content_sha256": result.payload_sha256, "note": "evil"}
+    meta_bytes = json.dumps(tampered, sort_keys=True, separators=(",", ":")).encode()
+    (entry / cache._META_NAME).write_bytes(meta_bytes)
+    (entry / cache._META_HASH_NAME).write_text(
+        p3b0.sha256_bytes(meta_bytes) + "\n", encoding="utf-8",
+    )
+    with pytest.raises(p3b0.ImmutableCacheError, match="metadata hash"):
+        cache.get_by_handle(handle)
+
+
+def test_cache_cannot_read_securely_without_persisted_handle(tmp_path):
+    cache = p3b0.ImmutableCache(tmp_path)
+    result = cache.put(b"payload", {"note": "orig"})
+    # Knowing only the payload hash is insufficient without external metadata seal.
+    with pytest.raises(p3b0.ImmutableCacheError, match="expected metadata|metadata"):
+        cache.get(result.payload_sha256, "")
+    with pytest.raises(p3b0.ImmutableCacheError):
+        cache.get_by_handle("not-a-handle")  # type: ignore[arg-type]
+
+
+def test_cache_handle_template_header_only_zero_rows():
+    text = p3b0.build_cache_handle_template_csv()
+    rows = list(csv.DictReader(io.StringIO(text)))
+    assert rows == []
+    assert "evidence_id" in text.splitlines()[0]
+    assert "metadata_sha256" in text.splitlines()[0]
 
 
 # --------------------------------------------------------------------------- #
@@ -893,6 +1340,59 @@ def test_subprocess_default_deny_no_child_process_launched():
             # Restore originals before context exit so sentinel.restore() is clean.
             sentinel._orig_subprocess_run = saved_run
             sentinel._orig_subprocess_popen = saved_popen
+
+
+def test_os_system_popen_spawn_denied_no_child_process():
+    launched: list[str] = []
+
+    def _boom_system(*args, **kwargs):
+        launched.append("system")
+        raise AssertionError("os.system launched")
+
+    def _boom_popen(*args, **kwargs):
+        launched.append("popen")
+        raise AssertionError("os.popen launched")
+
+    def _make_boom_spawn(name: str):
+        def _boom(*args, **kwargs):
+            launched.append(name)
+            raise AssertionError(f"os.{name} launched")
+        return _boom
+
+    with p3b0.network_sentinel() as sentinel:
+        saved_system = sentinel._orig_os_system
+        saved_popen = sentinel._orig_os_popen
+        saved_spawns = dict(sentinel._orig_os_spawns)
+        sentinel._orig_os_system = _boom_system  # type: ignore[method-assign]
+        sentinel._orig_os_popen = _boom_popen  # type: ignore[method-assign]
+        for name in list(sentinel._orig_os_spawns):
+            sentinel._orig_os_spawns[name] = _make_boom_spawn(name)
+        try:
+            with pytest.raises(p3b0.NetworkBlockedError):
+                os.system("echo blocked")
+            with pytest.raises(p3b0.NetworkBlockedError):
+                os.popen("echo blocked")
+            for name in saved_spawns:
+                fn = getattr(os, name)
+                with pytest.raises(p3b0.NetworkBlockedError):
+                    if name.endswith("l") or name.endswith("le") or name.endswith("lp") or name.endswith("lpe"):
+                        # spawnl family: mode, file, *args
+                        if "e" in name[-2:]:
+                            fn(os.P_WAIT, "/bin/echo", "echo", "hi", {"PATH": "/bin"})
+                        else:
+                            fn(os.P_WAIT, "/bin/echo", "echo", "hi")
+                    else:
+                        # spawnv family
+                        if name.endswith("e"):
+                            fn(os.P_WAIT, "/bin/echo", ["echo", "hi"], {"PATH": "/bin"})
+                        else:
+                            fn(os.P_WAIT, "/bin/echo", ["echo", "hi"])
+            assert launched == []
+            assert sentinel.calls_attempted >= 2 + len(saved_spawns)
+        finally:
+            sentinel._orig_os_system = saved_system
+            sentinel._orig_os_popen = saved_popen
+            sentinel._orig_os_spawns = saved_spawns
 
 
 def test_network_allows_readonly_git_and_restores_after_exception():
@@ -1026,8 +1526,10 @@ def test_templates_header_only_zero_rows():
     schema = p3b0.load_frozen_evidence_schema(REPO_ROOT)
     evidence = result["files"][p3b0.F_EVIDENCE_TEMPLATE]
     gate = result["files"][p3b0.F_GATE_TEMPLATE]
+    handle = result["files"][p3b0.F_CACHE_HANDLE_TEMPLATE]
     assert len(list(csv.DictReader(io.StringIO(evidence)))) == 0
     assert len(list(csv.DictReader(io.StringIO(gate)))) == 0
+    assert len(list(csv.DictReader(io.StringIO(handle)))) == 0
     assert evidence.splitlines()[0] == ",".join(
         p3b0.evidence_header_from_schema(schema)
     )
