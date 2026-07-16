@@ -14,9 +14,20 @@
     "urllib.request.urlretrieve",
     "http.client.HTTPConnection.connect",
     "http.client.HTTPSConnection.connect",
-    "subprocess:default_deny_except_exact_readonly_git"
+    "subprocess:default_deny_except_exact_readonly_git",
+    "os.system",
+    "os.popen",
+    "os.spawnl",
+    "os.spawnle",
+    "os.spawnlp",
+    "os.spawnlpe",
+    "os.spawnv",
+    "os.spawnve",
+    "os.spawnvp",
+    "os.spawnvpe"
   ],
   "subprocess_policy": "default_deny_except_exact_argument_level_readonly_git",
+  "child_process_policy": "default_deny_stdlib_launch_routes_except_exact_readonly_git",
   "exact_git_readonly_allowlist": [
     "check-ignore",
     "log",
@@ -28,7 +39,8 @@
   "on_attempt": {
     "increment_network_calls_attempted": true,
     "raise_fail_closed_exception": true,
-    "leave_no_partial_cache_or_evidence": true
+    "leave_no_partial_cache_or_evidence": true,
+    "no_child_process_created_on_deny": true
   },
   "required_final_state": {
     "network_calls_attempted": 0,

@@ -14,7 +14,8 @@ Part 3B.0 is **infrastructure/readiness only**. It performs:
 - Header-only evidence manifest template CSV (zero data rows).
 - Header-only gate-result template CSV (zero data rows).
 - Immutable raw-cache contract JSON (tested in pytest temp dirs only).
-- Default-deny network sentinel contract JSON.
+- Header-only cache-handle template CSV (external trust-anchor contract).
+- Default-deny network/child-process sentinel contract JSON.
 
 ## Guardrails
 
@@ -26,6 +27,9 @@ Part 3B.0 is **infrastructure/readiness only**. It performs:
 - `modeling_started=false`
 - `part3a_protocol_locked=true`
 - `part3a_decision_locked=true`
+- Snapshot bytes verified against `snapshot_sha256` (no symlink follow).
+- Gate inputs are sealed/typed; G07 derived from available_at vs cutoff.
+- G09–G14 bound to exact frozen pilot key identity (80/39/41).
 
 ## Next research action
 

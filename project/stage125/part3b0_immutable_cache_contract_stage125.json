@@ -20,5 +20,9 @@
   "mutable_latest_file": false,
   "unknown_hash_or_missing_payload": "unresolved_fail_closed",
   "repository_cache_populated_in_part3b0": false,
-  "put_returns_payload_and_metadata_sha256": true
+  "put_returns_payload_and_metadata_sha256": true,
+  "external_cache_handle_required_for_secure_get": true,
+  "cache_handle_persists_metadata_sha256_across_restart": true,
+  "cache_handle_template_header_only_in_part3b0": true,
+  "real_cache_handles_created_in_part3b0": false
 }
