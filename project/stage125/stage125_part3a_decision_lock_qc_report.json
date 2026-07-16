@@ -294,7 +294,7 @@
     "project/stage125/part3_sampling_frame_by_target_year_stage125.csv": "96e6826681b8b46e6d0ebf9bd2dd9c1d7895f0432ca600986ab8beffb680f584",
     "project/stage125/part3_sampling_frame_summary_stage125.json": "359394f0522f2c3db24a56238d6f9ff78bcab75dd36cbdef9b64f23162c6b945",
     "project/stage125/part3_source_evidence_manifest_schema_stage125.json": "9a736edb18046128851d55c87f07609b8dc2a4b2be73a41c5837fe0e2a4cd78d",
-    "project/stage125/stage125_part3a_pilot_protocol_qc_report.json": "a42de51996fdf48f5062d8417bcb3784028b08deeb34aca69a8aa235a12254f7"
+    "project/stage125/stage125_part3a_pilot_protocol_qc_report.json": "6445d9f4fca6bce68166342f0fae786fd6d8c1e5ee5b602d3c368cbc803c313e"
   },
   "part3a_frozen_before": {
     "project/stage125/README_STAGE125_PART3A_PILOT_PROTOCOL.md": "379c6b29e196f96633a351098e481d89ce4ad1cdafaa757a6ecaf5cc6dfe4ff4",
@@ -305,7 +305,7 @@
     "project/stage125/part3_sampling_frame_by_target_year_stage125.csv": "96e6826681b8b46e6d0ebf9bd2dd9c1d7895f0432ca600986ab8beffb680f584",
     "project/stage125/part3_sampling_frame_summary_stage125.json": "359394f0522f2c3db24a56238d6f9ff78bcab75dd36cbdef9b64f23162c6b945",
     "project/stage125/part3_source_evidence_manifest_schema_stage125.json": "9a736edb18046128851d55c87f07609b8dc2a4b2be73a41c5837fe0e2a4cd78d",
-    "project/stage125/stage125_part3a_pilot_protocol_qc_report.json": "a42de51996fdf48f5062d8417bcb3784028b08deeb34aca69a8aa235a12254f7"
+    "project/stage125/stage125_part3a_pilot_protocol_qc_report.json": "6445d9f4fca6bce68166342f0fae786fd6d8c1e5ee5b602d3c368cbc803c313e"
   },
   "part3a_protocol_locked": true,
   "part3b_started": false,
