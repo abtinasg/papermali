@@ -489,17 +489,36 @@ def _part3b0_allowed(rel: str, basename: str) -> bool:
 
 def scan_for_part3b_artifacts(repo_root: Path) -> dict:
     """Detect Part 3B runner/implementation/captured evidence (schema allowed)."""
+    try:
+        from src import stage125_part3b_evidence_capture as part3b
+        authorized = (
+            frozenset(part3b.PART3B_AUTHORIZED_EXACT)
+            if part3b.part3b_authorization_active(repo_root)
+            else frozenset()
+        )
+    except Exception:
+        authorized = frozenset()
+
+    def _authorized(rel: str) -> bool:
+        rel = rel.replace("\\", "/")
+        if rel in authorized:
+            return True
+        return bool(
+            authorized
+            and rel.startswith("project/stage125/raw_cache_part3b/")
+        )
+
     hits: list[str] = []
     for rel in PART3B_FORBIDDEN_EXACT:
-        if (repo_root / rel).exists():
+        if (repo_root / rel).exists() and not _authorized(rel):
             hits.append(rel)
     stage125 = repo_root / "project" / "stage125"
     if stage125.is_dir():
         for f in stage125.rglob("*"):
             if not f.is_file():
                 continue
-            rel = str(f.relative_to(repo_root))
-            if rel in PART3B_ALLOWED_EXACT:
+            rel = str(f.relative_to(repo_root)).replace("\\", "/")
+            if rel in PART3B_ALLOWED_EXACT or _authorized(rel):
                 continue
             if _part3b0_allowed(rel, f.name):
                 continue
@@ -511,8 +530,8 @@ def scan_for_part3b_artifacts(repo_root: Path) -> dict:
         for f in src.iterdir():
             if not f.is_file():
                 continue
-            rel = str(f.relative_to(repo_root))
-            if _part3b0_allowed(rel, f.name):
+            rel = str(f.relative_to(repo_root)).replace("\\", "/")
+            if _part3b0_allowed(rel, f.name) or _authorized(rel):
                 continue
             if any(rel.startswith(p) for p in PART3B_FORBIDDEN_PREFIXES):
                 hits.append(rel)
@@ -521,8 +540,8 @@ def scan_for_part3b_artifacts(repo_root: Path) -> dict:
         for f in tests.iterdir():
             if not f.is_file():
                 continue
-            rel = str(f.relative_to(repo_root))
-            if _part3b0_allowed(rel, f.name):
+            rel = str(f.relative_to(repo_root)).replace("\\", "/")
+            if _part3b0_allowed(rel, f.name) or _authorized(rel):
                 continue
             if any(rel.startswith(p) for p in PART3B_FORBIDDEN_PREFIXES):
                 hits.append(rel)
@@ -530,7 +549,9 @@ def scan_for_part3b_artifacts(repo_root: Path) -> dict:
         if (repo_root / prefix).is_dir():
             for f in (repo_root / prefix).rglob("*"):
                 if f.is_file():
-                    hits.append(str(f.relative_to(repo_root)))
+                    rel = str(f.relative_to(repo_root)).replace("\\", "/")
+                    if not _authorized(rel):
+                        hits.append(rel)
     return {"hits": sorted(set(hits)), "no_part3b": len(hits) == 0}
 
 
@@ -1679,6 +1700,27 @@ def run(
         )
     if output_dir is None:
         output_dir = project_dir / "stage125"
+
+    # Transition-aware historical baseline after authorized Part 3B starts.
+    from src import stage125_part3b_evidence_capture as part3b  # lazy
+
+    canonical_out = (project_dir / "stage125").resolve()
+    if part3b.part3b_authorization_active(repo_root) and output_dir.resolve() == canonical_out:
+        if write:
+            raise part3b.QCFail(
+                "Part 3A historical baseline is frozen after Part 3B "
+                "authorization; --write to canonical stage125 is refused"
+            )
+        return part3b.check_historical_baseline(
+            repo_root,
+            output_dir,
+            F_METADATA,
+            require_historical_flags={
+                "part3a_protocol_locked": True,
+                "part3b_started": False,
+                "modeling_started": False,
+            },
+        )
 
     result = build_all(repo_root, all_rows_path, pairs_path)
     files = result["files"]

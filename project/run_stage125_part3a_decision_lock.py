@@ -52,27 +52,31 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     qc = result["qc"]
-    counts = result["counts"]
-    pilot = result["pilot_selection"]
+    counts = result.get("counts") or {}
+    pilot = result.get("pilot_selection") or {}
     print(f"Baseline commit: {lock.EXPECTED_BASELINE_COMMIT}")
-    print(f"Input all_rows SHA-256: {result['input_all_rows_sha256']}")
-    print(f"Input pairs SHA-256: {result['input_pairs_sha256']}")
+    if result.get("historical_baseline_ok"):
+        print("historical_baseline_mode=true (Part 3B authorized; "
+              "Part 3A.1 artifacts verified byte-identical)")
+    else:
+        print(f"Input all_rows SHA-256: {result.get('input_all_rows_sha256')}")
+        print(f"Input pairs SHA-256: {result.get('input_pairs_sha256')}")
+        print(f"Pairs={counts.get('pairs')} all_rows={counts.get('all_rows')} "
+              f"tickers={counts.get('unique_tickers_pairs')}")
     print(f"Output dir: {result['output_dir']}")
-    print(f"Pairs={counts['pairs']} all_rows={counts['all_rows']} "
-          f"tickers={counts['unique_tickers_pairs']}")
     print(f"Selected pilot: {lock.APPROVED_PILOT_OPTION} "
-          f"n={pilot['sample_size']} pos={pilot['positive']} "
-          f"neg={pilot['negative']}")
+          f"n={pilot.get('sample_size')} pos={pilot.get('positive')} "
+          f"neg={pilot.get('negative')}")
     print(f"QC assertions: {qc['assertion_count']} "
           f"(failed={qc['failed_count']}, all_pass={qc['all_pass']})")
     print("modeling_started=false | part3a_decision_locked=true | "
           "part3b_started=false | no evidence | no network extraction")
 
     if args.write:
-        print(f"Wrote {len(result['files'])} files.")
+        print(f"Wrote {len(result.get('files') or {})} files.")
         return 0 if qc["all_pass"] else 1
 
-    if result["drift"]:
+    if result.get("drift"):
         print("DRIFT (on-disk differs from computed):", file=sys.stderr)
         for name in result["drift"]:
             print(f"  - {name}", file=sys.stderr)

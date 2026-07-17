@@ -1,0 +1,75 @@
+{
+  "proposed_micro_step_id": "stage125-part3b1-feature-definition-scoring-adjudication-lock",
+  "proposed_micro_step_title": "Stage125 Part 3B.1 — Feature Definition & Scoring Adjudication Lock",
+  "status": "proposed_not_started",
+  "requires_explicit_user_approval_before_start": true,
+  "part3b_completed": false,
+  "current_probe_status": "active_incomplete_accessibility_feasibility_probe",
+  "user_decisions_still_needed": [
+    {
+      "decision_id": "m2_feature_definitions",
+      "scope": [
+        "cand_m2_equity_return_window",
+        "cand_m2_realized_volatility",
+        "cand_m2_amihud_illiquidity"
+      ],
+      "required": "exact feature definition, unit and pre-cutoff window for each M2 variable",
+      "selected_answer": null
+    },
+    {
+      "decision_id": "m3_feature_definitions",
+      "scope": [
+        "cand_m3_cpi_inflation",
+        "cand_m3_fx_change_official",
+        "cand_m3_policy_financing_rate"
+      ],
+      "required": "exact transformation/unit/release series for each M3 variable",
+      "selected_answer": null
+    },
+    {
+      "decision_id": "m4_feature_definitions",
+      "scope": [
+        "cand_m4_audit_opinion_type",
+        "cand_m4_going_concern_flag",
+        "cand_m4_audit_lag_days",
+        "cand_m4_board_size"
+      ],
+      "required": "exact document/field/derivation rules for each M4 variable",
+      "selected_answer": null
+    },
+    {
+      "decision_id": "rubric_score_mapping_0_5",
+      "scope": [
+        "stage125_part3a_v1"
+      ],
+      "required": "operational evidence-to-score mapping for rubric scores 0–5",
+      "selected_answer": null
+    },
+    {
+      "decision_id": "cbi_endpoint_provenance",
+      "scope": [
+        "src_m3_cbi_macro"
+      ],
+      "required": "authoritative CBI endpoint/provenance decision",
+      "selected_answer": null
+    },
+    {
+      "decision_id": "available_at_and_cutoff_rules",
+      "scope": [
+        "prediction_cutoff",
+        "available_at",
+        "G06",
+        "G07"
+      ],
+      "required": "available_at and prediction-cutoff rules",
+      "selected_answer": null
+    }
+  ],
+  "explicit_non_claims": [
+    "current GETs are source_origin_probe only",
+    "not candidate_endpoint_evidence",
+    "not pair_value_evidence",
+    "no numeric accessibility scores assigned",
+    "not Stage126 admission"
+  ]
+}

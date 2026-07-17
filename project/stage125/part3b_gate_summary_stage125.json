@@ -1,0 +1,25 @@
+{
+  "G09": "FAIL",
+  "G10": "FAIL",
+  "G11": "FAIL",
+  "G12": "FAIL",
+  "G13": "PASS",
+  "G14": "PASS",
+  "assessment_count": 800,
+  "score_null_count": 10,
+  "score_numeric_count": 0,
+  "unresolved_assessment_count": 240,
+  "fail_assessment_count": 560,
+  "pass_assessment_count": 0,
+  "definition_contract_gap": "feature_definition_not_uniquely_locked_in_frozen_contracts;accessibility_evidence_only;value_extraction_unresolved",
+  "modeling_started": false,
+  "part3b_completed": false,
+  "research_gate_all_pass": false,
+  "research_gate_failed": [
+    "G09",
+    "G10",
+    "G11",
+    "G12"
+  ],
+  "status": "active_incomplete_accessibility_feasibility_probe"
+}

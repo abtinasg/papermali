@@ -1,0 +1,36 @@
+{
+  "stage": "stage125_part3b_evidence_capture",
+  "baseline_commit": "959169c71a6e9378995be40979d1c6df7dc45a1d",
+  "capture_run_id": "capture_959169c71a6e",
+  "network_calls_attempted": 3,
+  "network_calls_succeeded": 3,
+  "network_calls_failed": 0,
+  "bytes_retrieved": 204280,
+  "final_resolved_urls": [
+    "https://cdn.tsetmc.com/",
+    "https://www.codal.ir/"
+  ],
+  "response_statuses": [
+    200,
+    200,
+    200
+  ],
+  "redirect_counts": null,
+  "hosts_contacted": [
+    "cdn.tsetmc.com",
+    "www.codal.ir"
+  ],
+  "http_methods": [
+    "GET"
+  ],
+  "network_extraction_performed": true,
+  "unique_raw_snapshot_count": 3,
+  "evidence_record_count": 4,
+  "handle_count": 3,
+  "resume_verified_without_new_network": true,
+  "network_log_complete": false,
+  "evidence_class": "source_origin_probe",
+  "notes": "Per-request rows in part3b_capture_attempt_log_stage125.csv. Resume rows may set network_log_complete=false when redirect_count/content_type/started_at were not retained at original capture time. Never invent those fields. Cache is local-only / not in git.",
+  "part3b_completed": false,
+  "status": "active_incomplete_accessibility_feasibility_probe"
+}

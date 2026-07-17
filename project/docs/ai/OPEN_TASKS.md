@@ -97,19 +97,22 @@ pairs; 27 industry-missing pairs).
 applied, **no** candidate admitted/rejected. `part3a_decision_locked=true`;
 `part3b_started=false`; `modeling_started=false`.
 
-**Part 3B.0 (authorized/active):** Evidence Capture Readiness.
-Infrastructure/readiness only; tracked as maintenance task
-`stage125-part3b0-evidence-readiness` (advances no research action). Delivers
-schema validator, immutable cache contract, default-deny network sentinel, pure
-Gate engine scaffolding, and header-only templates. **No** real evidence records,
-**no** network access, **no** accessibility scores, **no** candidate decisions.
-`part3b0_readiness=true`; `part3b_started=false`; `evidence_collected=false`;
-`accessibility_scoring_applied=false`; `network_extraction_performed=false`;
-`modeling_started=false`.
+**Part 3B.0 (completed — frozen historical baseline):** Evidence Capture
+Readiness. Infrastructure/readiness only. After Part 3B authorization, its
+`--check` verifies historical deliverables byte-identically and does not rewrite
+zero-evidence QC history. `part3b0_readiness=true`.
 
-**Part 3B — NOT started.** Evidence capture and live accessibility scoring
-belong to Part 3B only. Next research action pointer remains:
-`stage125-part3b-evidence-capture` (Part 3B not started by Part 3B.0).
+**Part 3B (active / incomplete accessibility feasibility probe):**
+`stage125-part3b-evidence-capture`. Source-origin probes only (TSETMC CDN +
+CODAL origins; CBI blocked). Not candidate-value or pair-level evidence.
+800 assessments derived; scores null; G13/G14 PASS; G09–G12 FAIL.
+`part3b_started=true`; `endpoint_probe_evidence_collected=true`;
+`candidate_value_evidence_collected=false`; `pair_level_evidence_collected=false`;
+`data_value_extraction_performed=false`; `accessibility_scoring_applied=false`;
+`part3b_completed=false`; `network_extraction_performed=true`;
+`modeling_started=false`. Proposed next micro-step (not started):
+`Stage125 Part 3B.1 — Feature Definition & Scoring Adjudication Lock`.
+Not Stage126 admission.
 
 **Modeling remains prohibited** (no modeling, tuning, SHAP, SMOTE, calibration,
 temporal splitting, feature selection, or article result generation) through all of

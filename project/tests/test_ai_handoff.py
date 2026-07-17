@@ -972,19 +972,24 @@ def test_extract_qc_workflow_markers_fail_closed_when_field_missing():
     not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
     reason="real-repo test requires git checkout",
 )
-def test_real_repo_handoff_part3b0_workflow_markers():
+def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
     assert state["current_stage"] == "Stage125"
-    assert state["selected_qc_scope"] == "stage125_part3b0_evidence_readiness"
+    assert state["selected_qc_scope"] == "stage125_part3b_evidence_capture"
     assert state["last_completed_micro_part"] == "stage125-part3a-decision-lock"
     assert state["next_research_action_id"] == "stage125-part3b-evidence-capture"
     assert state["part3a_protocol_locked"] is True
     assert state["part3a_decision_locked"] is True
     assert state["part3b0_readiness"] is True
-    assert state["part3b_started"] is False
-    assert state["evidence_collected"] is False
+    assert state["part3b_started"] is True
+    assert state["evidence_collected"] is True
+    assert state["endpoint_probe_evidence_collected"] is True
+    assert state["candidate_value_evidence_collected"] is False
+    assert state["pair_level_evidence_collected"] is False
+    assert state["data_value_extraction_performed"] is False
     assert state["accessibility_scoring_applied"] is False
-    assert state["network_extraction_performed"] is False
+    assert state["part3b_completed"] is False
+    assert state["network_extraction_performed"] is True
     assert state["modeling_started"] is False
 
 
@@ -999,6 +1004,31 @@ def test_real_repo_handoff_part3b0_workflow_markers():
     "project/stage125/part3b0_network_denial_contract_stage125.json",
 ])
 def test_stage125_part3b0_generated_files_are_artifact_only(path):
+    assert gen.path_artifact_only(path) is True
+    assert gen.path_handoff_only(path) is False
+
+
+@pytest.mark.parametrize("path", [
+    "project/stage125/README_STAGE125_PART3B_EVIDENCE_CAPTURE.md",
+    "project/stage125/README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md",
+    "project/stage125/part3b_authorization_stage125.json",
+    "project/stage125/part3b_capture_plan_stage125.csv",
+    "project/stage125/part3b_verified_endpoint_registry_stage125.csv",
+    "project/stage125/part3b_evidence_manifest_stage125.csv",
+    "project/stage125/part3b_cache_handles_stage125.csv",
+    "project/stage125/part3b_candidate_evidence_linkage_stage125.csv",
+    "project/stage125/part3b_capture_attempt_log_stage125.csv",
+    "project/stage125/part3b_capture_network_log_stage125.json",
+    "project/stage125/part3b_pair_candidate_assessment_stage125.csv",
+    "project/stage125/part3b_accessibility_scores_stage125.csv",
+    "project/stage125/part3b_gate_results_stage125.csv",
+    "project/stage125/part3b_gate_summary_stage125.json",
+    "project/stage125/part3b_unresolved_and_failures_stage125.csv",
+    "project/stage125/part3b_decision_requirements_stage125.json",
+    "project/stage125/stage125_part3b_evidence_capture_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b.json",
+])
+def test_stage125_part3b_generated_files_are_artifact_only(path):
     assert gen.path_artifact_only(path) is True
     assert gen.path_handoff_only(path) is False
 
@@ -1019,6 +1049,32 @@ def test_extract_qc_workflow_markers_part3b0_scope():
     assert got["part3b0_readiness"] is True
     assert got["evidence_collected"] is False
     assert got["part3b_started"] is False
+
+
+def test_extract_qc_workflow_markers_part3b_scope():
+    qc = {
+        "stage": "stage125_part3b_evidence_capture",
+        "part3a_protocol_locked": True,
+        "part3a_decision_locked": True,
+        "part3b0_readiness": True,
+        "part3b_started": True,
+        "evidence_collected": True,
+        "endpoint_probe_evidence_collected": True,
+        "candidate_value_evidence_collected": False,
+        "pair_level_evidence_collected": False,
+        "data_value_extraction_performed": False,
+        "accessibility_scoring_applied": False,
+        "part3b_completed": False,
+        "network_extraction_performed": True,
+        "modeling_started": False,
+    }
+    got = gen.extract_qc_workflow_markers(qc)
+    assert got["part3b_started"] is True
+    assert got["endpoint_probe_evidence_collected"] is True
+    assert got["candidate_value_evidence_collected"] is False
+    assert got["part3b_completed"] is False
+    assert got["accessibility_scoring_applied"] is False
+    assert got["modeling_started"] is False
 
 
 def test_stage125_part3b0_full_artifact_commit_is_skipped(synth):

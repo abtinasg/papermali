@@ -1,0 +1,345 @@
+{
+  "stage": "stage125_part3b_evidence_capture",
+  "current_stage": "Stage125",
+  "baseline_commit": "959169c71a6e9378995be40979d1c6df7dc45a1d",
+  "source_commit": "baf672c291d040a2c20878f9861954bb924ab626",
+  "source_file_sha256": "13a7d3e4cf2d41fe935b8f481bed7fd9f6e0b96749b578ab288a3233c2987f1d",
+  "test_file_sha256": "eb2c7955127ddb51d16fef3d02e9e5444e43a7193dbfb2d84b0c39cb6cc41e90",
+  "generated_at": "2026-07-17T02:25:48+03:00",
+  "assertion_count": 22,
+  "failed_count": 0,
+  "all_pass": true,
+  "execution_qc_all_pass": true,
+  "research_gate_all_pass": false,
+  "research_gate_failed": [
+    "G09",
+    "G10",
+    "G11",
+    "G12"
+  ],
+  "ticker_count": 26,
+  "tickers": [
+    "اردستان",
+    "اپال",
+    "بالبر",
+    "بترانس",
+    "بموتو",
+    "بوعلی",
+    "بکاب",
+    "بکام",
+    "تپمپی",
+    "تکمبا",
+    "ثنوسا",
+    "حپترو",
+    "حکشتی",
+    "خاذین",
+    "خبهمن",
+    "ختوقا",
+    "خرینگ",
+    "خمهر",
+    "خنصیر",
+    "دروز",
+    "ذوب",
+    "سدور",
+    "سیلام",
+    "شپارس",
+    "فاذر",
+    "لبوتان"
+  ],
+  "part3a_protocol_locked": true,
+  "part3a_decision_locked": true,
+  "part3b0_readiness": true,
+  "part3b_started": true,
+  "evidence_collected": true,
+  "endpoint_probe_evidence_collected": true,
+  "candidate_value_evidence_collected": false,
+  "pair_level_evidence_collected": false,
+  "data_value_extraction_performed": false,
+  "accessibility_scoring_applied": false,
+  "part3b_completed": false,
+  "network_extraction_performed": true,
+  "modeling_started": false,
+  "assessment_count": 800,
+  "score_distribution": {
+    "null": 10,
+    "numeric": 0
+  },
+  "gate_summary": {
+    "G09": "FAIL",
+    "G10": "FAIL",
+    "G11": "FAIL",
+    "G12": "FAIL",
+    "G13": "PASS",
+    "G14": "PASS",
+    "assessment_count": 800,
+    "score_null_count": 10,
+    "score_numeric_count": 0,
+    "unresolved_assessment_count": 240,
+    "fail_assessment_count": 560,
+    "pass_assessment_count": 0,
+    "definition_contract_gap": "feature_definition_not_uniquely_locked_in_frozen_contracts;accessibility_evidence_only;value_extraction_unresolved",
+    "modeling_started": false,
+    "part3b_completed": false,
+    "research_gate_all_pass": false,
+    "research_gate_failed": [
+      "G09",
+      "G10",
+      "G11",
+      "G12"
+    ],
+    "status": "active_incomplete_accessibility_feasibility_probe"
+  },
+  "frozen_input_sha256": {
+    "project/stage125/part3_candidate_inventory_stage125.csv": "4bd5f6a71ecf0e1f74866a64a3774e51340729f4188ae2784f1d90db07e7032f",
+    "project/stage125/part3_source_evidence_manifest_schema_stage125.json": "9a736edb18046128851d55c87f07609b8dc2a4b2be73a41c5837fe0e2a4cd78d",
+    "project/stage125/part3a_approved_gate_thresholds_stage125.csv": "11c7efe5f242ab8e4a4f7b1955fb25d48e288249f7a1ce4c6bf1713dbf117d20",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv": "9a441b5e3696353967489b356d0ff48cf7cbea276aeea5018be6edc8368b40f5",
+    "project/stage125/part3a_decision_lock_stage125.json": "475c82b3483ef18ff19aea2268f65527ca87c9441603622bd1952bd21f18f35e",
+    "project/stage125/source_registry_stage125.csv": "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c"
+  },
+  "endpoint_provenance_sha256": {
+    "project/stage124/official_api/import_manifest.json": "9ff7bd939b1e28844d897412db6c2671db3e6857b83dce9261c3de44b4871e06",
+    "project/stage124/official_api/README.md": "0d4cf8581a953877f3102f4f7289c9017aa0b968e6ec9c8cfd4d3918c3c64492",
+    "project/raw_handoff/financial_distress_programmer_handoff_stage121(1)/ocf_source_manifest_stage121.csv": "b1bf92d74f19b4c00373079c3222489d6cb54e1c8f11e30a9e02557e6936057a"
+  },
+  "output_sha256": {
+    "part3b_accessibility_scores_stage125.csv": "11c313ec77ab5b63e0e1f01a51ab8d59c4a90533ffaf066c2ac54f3eec7af6a3",
+    "part3b_pair_candidate_assessment_stage125.csv": "b431fbacedf6d0473e36574bd52335c44306210114bd4091947ef28baf860051",
+    "part3b_gate_results_stage125.csv": "945f08869f30b0e2185a20f61ca46c2051f542ff27b1e67b48a205b7f4250811",
+    "part3b_gate_summary_stage125.json": "37b6b0aa00b9faf92ae6024012a004ed2bbe270950aab898bb471d60ed8ecdbb",
+    "part3b_unresolved_and_failures_stage125.csv": "e52a32a939c492696d7038983fbdd702e5b0cc5d33a577700b950ad09e55045a",
+    "README_STAGE125_PART3B_EVIDENCE_CAPTURE.md": "72b9c8b431b920a04a45b2ac78cd1e74b09b682a80519a9b31cc1389e46afc46",
+    "part3b_decision_requirements_stage125.json": "f9ac3bdcf43465337660cbe24124765c938922a1044aa500318b581bb20e0d83",
+    "README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md": "9511ed1dd5ceab26feb4b9b3d9fcdc9beb7adbdbccc27f9889268b3cf613e342",
+    "part3b_authorization_stage125.json": "100a56ab2bb7fe4af3e255aac53fd80c239ffd09dd3228ffbbd8ae5c6cfa1a63",
+    "part3b_capture_plan_stage125.csv": "acb888189bb679b1f417ef7b83fda4f81b211111816cc736b5e9610d6cb0b4b8",
+    "part3b_verified_endpoint_registry_stage125.csv": "3d36eca0a0a63ef406ec48ef1bcf78ecbe2ce99ce24a6e8804c2b9c3ffb431b7",
+    "part3b_evidence_manifest_stage125.csv": "94a825470dfc55eb740ac0720471b6851c840b3c4a60ea1e19897b34c9771667",
+    "part3b_cache_handles_stage125.csv": "b37ddcd713ee985a59e61a6ef824369a935ca7eb61a6969047a84847bb792159",
+    "part3b_candidate_evidence_linkage_stage125.csv": "33c9d921e6274b8fef32991554504849ef3040ef6545aa51b87867b1cfd0b370",
+    "part3b_capture_attempt_log_stage125.csv": "6d951481493699a96928b0fb5f0a3c79a37f96da5105996c04e14816d3f3e1a3",
+    "part3b_capture_network_log_stage125.json": "68b01fb5e115b1c2a29c3b77be38ef660ae2d86a17de0687ce66e10c92590855"
+  },
+  "frozen_assets_before": {
+    "project/stage122/eligibility_company_review.csv": "398fc500a64bc9c65aab64e52f81f2dd776345d3aaeee254c5c0a838db19f3a6",
+    "project/stage122/leakage_manifest_stage122.csv": "9929328ba27ca20732f44784bb4f80d0e32571cb79d44730721952b7cc6fbfb5",
+    "project/stage122/stage122_change_log.csv": "0858578340aec8bfd8e3a6e65cd39e475e8c96e6626fed91ca43db04684e418d",
+    "project/stage122/stage122_qc_report.json": "4e637d936c118e2a42a82432d5993428c368bf4c3fb44ce7d370f826cb0ee16a",
+    "project/stage122/stage122_target_changelog.csv": "11add6d9e78f72b1f437799479fd21d9a6d5b5f09d981be81adc9ac9698e1da3",
+    "project/stage122/stage122_target_summary.json": "5559d7dcebf36fbdfd8007588c5217381c488b8fd2cc8243d031d7fdb0127dfb",
+    "project/stage122/target_definition_stage122.csv": "573bc1e47bef8b9e48b11acd1bf87b7fc89ea22b926b2add94da67b9f95abb98",
+    "project/stage122/target_distribution_stage122.csv": "b3cd98603c2977a107f8e98ab8ef6111f220b51f78055d8448f7313ee7c1f348",
+    "project/stage123/company_sample_mapping_stage123.csv": "3a5f82aa227752c9d255e5b5b7ca4f66b19a8b6fe80e6ef28378412bb09a1651",
+    "project/stage123/eligibility_company_review_stage123.csv": "0330e72ee718cc75ac43e18f7a1d7d3cc952878a935458ec6019504d9cb8c2b5",
+    "project/stage123/leakage_manifest_stage123.csv": "173db2a0c5a0a49a624e9dc1ee4acb0057a96fef848d2c2621b43df0259a0a53",
+    "project/stage123/listing_date_review_stage123.csv": "cddab428411548826de2ff07a26ce9f061b57bf58e2868b24db256c6217dda1b",
+    "project/stage123/stage123_change_log.csv": "d725781330634751f3025a9b1d21298d2bb799b79559848d978d030c59126242",
+    "project/stage123/stage123_qc_report.json": "0c5a45a21a381b3c51338189725846d8a03b76f168eb527a0d2de8a86359c6cb",
+    "project/stage123/stage123_unit_test_output.txt": "eea1505dd0fb50189da30683ce0473868cc7d043b0f7e9c4970f08583ca5eeb5",
+    "project/stage123/statement_scope_correction_audit_stage123.csv": "d243fe245a4a45d445db7fbcea331a60c885a32372777348486985ee47249f2c",
+    "project/stage124/gate_b_final/README_GATE_B_RULE_APPROVAL.md": "7802c215888f74d12c5707aaee328c434863148fb18aaee8d5000f185b8415a0",
+    "project/stage124/gate_b_final/README_STAGE124_GATE_B_EXECUTION.md": "a423135e6276bc54b5d43e035953588a970874b4ecd722789c50c9e620a14291",
+    "project/stage124/gate_b_final/gate_b_distribution_by_target_year.csv": "6183f840c9c80fe38da41ee4cbb7a312a397aaba8c81dbdaeee2bd6bdc86bc4a",
+    "project/stage124/gate_b_final/gate_b_pair_change_vs_stage123.csv": "c94fd6216761a774ea341caceb74970bdb1d56dad227044c53144d1ea05e98b7",
+    "project/stage124/gate_b_final/gate_b_rule_approval_stage124.json": "bb03754bea1826e1fa406e485448708e34ae01bd1e2e7ce4709e1defb35d8cbf",
+    "project/stage124/gate_b_final/gate_b_sample_matrix.csv": "d6417505581763a624ff64d631f28f876f4bece6ad4864658ab56ab7bd6a7885",
+    "project/stage124/gate_b_final/gate_b_unresolved_rows.csv": "6a49f2af78eb4ef4d99e6a6a27150f368019421520f1aa12a7b7e868712fcc5b",
+    "project/stage124/stage124_batch02_gate_b_qc_report.json": "825b70debeeaf8767ec6e3aebc718da35670b8a9d68c49ad4932d993b8bf58a1",
+    "project/stage125/README_STAGE125_PART1_DATA_CONTRACT.md": "34fc241c4e9cc99983a5e05b8468f12bd1cde1c18b0318b158ac10285a481c2b",
+    "project/stage125/README_STAGE125_PART2_PREDICTION_TIME_CONTRACT.md": "437310452392bfcea448452fa1a65c745dce52d52b2df2fccdbb406b1abd5518",
+    "project/stage125/data_admission_gate_template_stage125.csv": "dbd91e0769e44b828829fe118b7b0adca2945407d38486725061bc9d835f1847",
+    "project/stage125/data_dictionary_stage125.csv": "ed3d0593fe8456842841be0286285ecfe076f5349b54f0bd6bdf664cc77a759d",
+    "project/stage125/feature_availability_audit_stage125_part2.csv": "6dfca12c3d9d1e076ef0f6f73abbf48f7b183fea68455ce3e63a3fb45b2ff255",
+    "project/stage125/feature_availability_contract_stage125_part2.json": "b97593ed46fa2440b66cafd6a3752300177df4773cbdcf45b3126872d3c200a3",
+    "project/stage125/identifier_time_contract_stage125.json": "409193ed791d36d5073ff9bc69f9a6b4f5b87d1ae98c135e659133d348198831",
+    "project/stage125/leakage_audit_stage125_part2.csv": "26f47bb4b2633330fe2f9fc75960f44c369a7f9bb4ecfa18fa2a8ab2a714e8fc",
+    "project/stage125/leakage_checklist_stage125_part2.json": "fab951e12a7ecdc280b74e865e3d5fa9bd4378b04441deb9773ac10a167612a7",
+    "project/stage125/m1_provenance_gap_audit_stage125.csv": "928ce8dc139f9531a675170a6121e18435f8255d072cfc21bc4fdef8024a86c3",
+    "project/stage125/m1_provenance_gap_summary_stage125.json": "21f6fa6757876c5a69d3956714593c0eb7a9e56137c3e5694ae78564b7cc6bd6",
+    "project/stage125/prediction_cutoff_audit_stage125_part2.csv": "d50e6617b011a7818d972de8e5c8a862a45f73fb07a0a22cdb5c9f59b6dc88f0",
+    "project/stage125/prediction_cutoff_summary_stage125_part2.json": "ae41d22f84e694ce7d5369735b5de313b586c3b221834694bd047e7728ab9f3d",
+    "project/stage125/prediction_time_contract_stage125_part2.json": "9bd40b4832302fb2c9c890b99b06f3b47bcfee2c07d065416f8776e7e0046a89",
+    "project/stage125/provenance_manifest_schema_stage125.json": "a2f6b1eee7d4d67ab645bbf9f6b95f21321ec638435a2500fe7d4431b94571b3",
+    "project/stage125/source_registry_stage125.csv": "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c",
+    "project/stage125/stage125_part1_data_contract_qc_report.json": "82764ce7443aa5835a8aaf9b50a0ad9c0ede5984354c06b599b74fd9c8248b8e",
+    "project/stage125/stage125_part2_prediction_time_contract_qc_report.json": "cd43c01cc39e2d43a39f686884916630c47d2324799766058f7e34bce19689e6"
+  },
+  "frozen_assets_after": {
+    "project/stage122/eligibility_company_review.csv": "398fc500a64bc9c65aab64e52f81f2dd776345d3aaeee254c5c0a838db19f3a6",
+    "project/stage122/leakage_manifest_stage122.csv": "9929328ba27ca20732f44784bb4f80d0e32571cb79d44730721952b7cc6fbfb5",
+    "project/stage122/stage122_change_log.csv": "0858578340aec8bfd8e3a6e65cd39e475e8c96e6626fed91ca43db04684e418d",
+    "project/stage122/stage122_qc_report.json": "4e637d936c118e2a42a82432d5993428c368bf4c3fb44ce7d370f826cb0ee16a",
+    "project/stage122/stage122_target_changelog.csv": "11add6d9e78f72b1f437799479fd21d9a6d5b5f09d981be81adc9ac9698e1da3",
+    "project/stage122/stage122_target_summary.json": "5559d7dcebf36fbdfd8007588c5217381c488b8fd2cc8243d031d7fdb0127dfb",
+    "project/stage122/target_definition_stage122.csv": "573bc1e47bef8b9e48b11acd1bf87b7fc89ea22b926b2add94da67b9f95abb98",
+    "project/stage122/target_distribution_stage122.csv": "b3cd98603c2977a107f8e98ab8ef6111f220b51f78055d8448f7313ee7c1f348",
+    "project/stage123/company_sample_mapping_stage123.csv": "3a5f82aa227752c9d255e5b5b7ca4f66b19a8b6fe80e6ef28378412bb09a1651",
+    "project/stage123/eligibility_company_review_stage123.csv": "0330e72ee718cc75ac43e18f7a1d7d3cc952878a935458ec6019504d9cb8c2b5",
+    "project/stage123/leakage_manifest_stage123.csv": "173db2a0c5a0a49a624e9dc1ee4acb0057a96fef848d2c2621b43df0259a0a53",
+    "project/stage123/listing_date_review_stage123.csv": "cddab428411548826de2ff07a26ce9f061b57bf58e2868b24db256c6217dda1b",
+    "project/stage123/stage123_change_log.csv": "d725781330634751f3025a9b1d21298d2bb799b79559848d978d030c59126242",
+    "project/stage123/stage123_qc_report.json": "0c5a45a21a381b3c51338189725846d8a03b76f168eb527a0d2de8a86359c6cb",
+    "project/stage123/stage123_unit_test_output.txt": "eea1505dd0fb50189da30683ce0473868cc7d043b0f7e9c4970f08583ca5eeb5",
+    "project/stage123/statement_scope_correction_audit_stage123.csv": "d243fe245a4a45d445db7fbcea331a60c885a32372777348486985ee47249f2c",
+    "project/stage124/gate_b_final/README_GATE_B_RULE_APPROVAL.md": "7802c215888f74d12c5707aaee328c434863148fb18aaee8d5000f185b8415a0",
+    "project/stage124/gate_b_final/README_STAGE124_GATE_B_EXECUTION.md": "a423135e6276bc54b5d43e035953588a970874b4ecd722789c50c9e620a14291",
+    "project/stage124/gate_b_final/gate_b_distribution_by_target_year.csv": "6183f840c9c80fe38da41ee4cbb7a312a397aaba8c81dbdaeee2bd6bdc86bc4a",
+    "project/stage124/gate_b_final/gate_b_pair_change_vs_stage123.csv": "c94fd6216761a774ea341caceb74970bdb1d56dad227044c53144d1ea05e98b7",
+    "project/stage124/gate_b_final/gate_b_rule_approval_stage124.json": "bb03754bea1826e1fa406e485448708e34ae01bd1e2e7ce4709e1defb35d8cbf",
+    "project/stage124/gate_b_final/gate_b_sample_matrix.csv": "d6417505581763a624ff64d631f28f876f4bece6ad4864658ab56ab7bd6a7885",
+    "project/stage124/gate_b_final/gate_b_unresolved_rows.csv": "6a49f2af78eb4ef4d99e6a6a27150f368019421520f1aa12a7b7e868712fcc5b",
+    "project/stage124/stage124_batch02_gate_b_qc_report.json": "825b70debeeaf8767ec6e3aebc718da35670b8a9d68c49ad4932d993b8bf58a1",
+    "project/stage125/README_STAGE125_PART1_DATA_CONTRACT.md": "34fc241c4e9cc99983a5e05b8468f12bd1cde1c18b0318b158ac10285a481c2b",
+    "project/stage125/README_STAGE125_PART2_PREDICTION_TIME_CONTRACT.md": "437310452392bfcea448452fa1a65c745dce52d52b2df2fccdbb406b1abd5518",
+    "project/stage125/data_admission_gate_template_stage125.csv": "dbd91e0769e44b828829fe118b7b0adca2945407d38486725061bc9d835f1847",
+    "project/stage125/data_dictionary_stage125.csv": "ed3d0593fe8456842841be0286285ecfe076f5349b54f0bd6bdf664cc77a759d",
+    "project/stage125/feature_availability_audit_stage125_part2.csv": "6dfca12c3d9d1e076ef0f6f73abbf48f7b183fea68455ce3e63a3fb45b2ff255",
+    "project/stage125/feature_availability_contract_stage125_part2.json": "b97593ed46fa2440b66cafd6a3752300177df4773cbdcf45b3126872d3c200a3",
+    "project/stage125/identifier_time_contract_stage125.json": "409193ed791d36d5073ff9bc69f9a6b4f5b87d1ae98c135e659133d348198831",
+    "project/stage125/leakage_audit_stage125_part2.csv": "26f47bb4b2633330fe2f9fc75960f44c369a7f9bb4ecfa18fa2a8ab2a714e8fc",
+    "project/stage125/leakage_checklist_stage125_part2.json": "fab951e12a7ecdc280b74e865e3d5fa9bd4378b04441deb9773ac10a167612a7",
+    "project/stage125/m1_provenance_gap_audit_stage125.csv": "928ce8dc139f9531a675170a6121e18435f8255d072cfc21bc4fdef8024a86c3",
+    "project/stage125/m1_provenance_gap_summary_stage125.json": "21f6fa6757876c5a69d3956714593c0eb7a9e56137c3e5694ae78564b7cc6bd6",
+    "project/stage125/prediction_cutoff_audit_stage125_part2.csv": "d50e6617b011a7818d972de8e5c8a862a45f73fb07a0a22cdb5c9f59b6dc88f0",
+    "project/stage125/prediction_cutoff_summary_stage125_part2.json": "ae41d22f84e694ce7d5369735b5de313b586c3b221834694bd047e7728ab9f3d",
+    "project/stage125/prediction_time_contract_stage125_part2.json": "9bd40b4832302fb2c9c890b99b06f3b47bcfee2c07d065416f8776e7e0046a89",
+    "project/stage125/provenance_manifest_schema_stage125.json": "a2f6b1eee7d4d67ab645bbf9f6b95f21321ec638435a2500fe7d4431b94571b3",
+    "project/stage125/source_registry_stage125.csv": "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c",
+    "project/stage125/stage125_part1_data_contract_qc_report.json": "82764ce7443aa5835a8aaf9b50a0ad9c0ede5984354c06b599b74fd9c8248b8e",
+    "project/stage125/stage125_part2_prediction_time_contract_qc_report.json": "cd43c01cc39e2d43a39f686884916630c47d2324799766058f7e34bce19689e6"
+  },
+  "network_calls_attempted": 3,
+  "network_calls_succeeded": 3,
+  "network_calls_failed": 0,
+  "bytes_retrieved": 204280,
+  "hosts_contacted": [
+    "cdn.tsetmc.com",
+    "www.codal.ir"
+  ],
+  "final_resolved_urls": [
+    "https://cdn.tsetmc.com/",
+    "https://www.codal.ir/"
+  ],
+  "unique_raw_snapshot_count": 3,
+  "evidence_record_count": 4,
+  "handle_count": 3,
+  "linkage_count": 10,
+  "cache_portability": "local_immutable_cache_only_not_in_git;fresh_checkout_without_raw_cache_part3b_fails_evidence_cache_unavailable",
+  "status": "active_incomplete_accessibility_feasibility_probe",
+  "guard_evidence": {
+    "network_calls_attempted_during_write": 0,
+    "no_network_during_write": true
+  },
+  "assertions": [
+    {
+      "assertion": "exact_80_locked_pairs",
+      "status": "PASS",
+      "detail": "80"
+    },
+    {
+      "assertion": "exact_10_candidates",
+      "status": "PASS",
+      "detail": "10"
+    },
+    {
+      "assertion": "exact_800_unique_assessments",
+      "status": "PASS",
+      "detail": "800"
+    },
+    {
+      "assertion": "frozen_labels_years_allocation",
+      "status": "PASS",
+      "detail": "pos=39,neg=41,unk=0,g14=PASS"
+    },
+    {
+      "assertion": "no_sample_target_eligibility_change",
+      "status": "PASS",
+      "detail": "before==after"
+    },
+    {
+      "assertion": "no_modeling",
+      "status": "PASS",
+      "detail": "modeling_started=false"
+    },
+    {
+      "assertion": "frozen_scientific_assets_unchanged",
+      "status": "PASS",
+      "detail": "before==after"
+    },
+    {
+      "assertion": "endpoint_provenance_hashes_verified",
+      "status": "PASS",
+      "detail": "n=3"
+    },
+    {
+      "assertion": "network_hosts_methods_allowlisted",
+      "status": "PASS",
+      "detail": "['cdn.tsetmc.com', 'www.codal.ir']"
+    },
+    {
+      "assertion": "capture_attempt_log_present",
+      "status": "PASS",
+      "detail": "part3b_capture_attempt_log_stage125.csv"
+    },
+    {
+      "assertion": "evidence_handles_payload_consistent",
+      "status": "PASS",
+      "detail": "snap=3,handles=3"
+    },
+    {
+      "assertion": "no_snapshot_without_handle",
+      "status": "PASS",
+      "detail": "ok"
+    },
+    {
+      "assertion": "score_rows_10",
+      "status": "PASS",
+      "detail": "10"
+    },
+    {
+      "assertion": "all_numeric_scores_absent",
+      "status": "PASS",
+      "detail": "null"
+    },
+    {
+      "assertion": "human_adjudication_required",
+      "status": "PASS",
+      "detail": "true"
+    },
+    {
+      "assertion": "accessibility_scoring_applied_false",
+      "status": "PASS",
+      "detail": "false"
+    },
+    {
+      "assertion": "g09_g12_fail",
+      "status": "PASS",
+      "detail": "FAIL/FAIL/FAIL/FAIL"
+    },
+    {
+      "assertion": "g13_g14_pass",
+      "status": "PASS",
+      "detail": "PASS/PASS"
+    },
+    {
+      "assertion": "part3b_completed_false",
+      "status": "PASS",
+      "detail": "false"
+    },
+    {
+      "assertion": "no_network_during_write",
+      "status": "PASS",
+      "detail": "0"
+    },
+    {
+      "assertion": "linkage_rows_10",
+      "status": "PASS",
+      "detail": "10"
+    },
+    {
+      "assertion": "evidence_class_origin_probe_only",
+      "status": "PASS",
+      "detail": "ok"
+    }
+  ]
+}
