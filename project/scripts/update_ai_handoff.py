@@ -98,6 +98,7 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part3b1_decision_lock.py",
     "project/run_stage125_part3b1.py",
     "project/tests/test_stage125_part3b1_decision_lock.py",
+    "project/tests/test_stage125_part3b1_allowlist_guards.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.

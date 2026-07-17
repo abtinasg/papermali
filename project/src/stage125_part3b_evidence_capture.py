@@ -106,6 +106,30 @@ REGISTERED_CANDIDATE_IDS = tuple(c["candidate_id"] for c in part3a.REGISTERED_CA
 CANDIDATE_SOURCE_MAP = {c["candidate_id"]: c["source_id"] for c in part3a.REGISTERED_CANDIDATES}
 BLOCK_BY_CANDIDATE = {c["candidate_id"]: c["block"] for c in part3a.REGISTERED_CANDIDATES}
 
+# Exact-path Part 3B.1 Decision Lock surfaces (no globs / no directory-wide).
+PART3B1_SRC_REL = "project/src/stage125_part3b1_decision_lock.py"
+PART3B1_TEST_REL = "project/tests/test_stage125_part3b1_decision_lock.py"
+PART3B1_ALLOWLIST_TEST_REL = (
+    "project/tests/test_stage125_part3b1_allowlist_guards.py"
+)
+PART3B1_RUN_REL = "project/run_stage125_part3b1.py"
+PART3B1_AUTHORIZED_EXACT = frozenset({
+    PART3B1_SRC_REL,
+    PART3B1_TEST_REL,
+    PART3B1_ALLOWLIST_TEST_REL,
+    PART3B1_RUN_REL,
+    "project/stage125/README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md",
+    "project/stage125/metadata_and_hashes_stage125_part3b1.json",
+    "project/stage125/part3b1_cutoff_available_at_contract_stage125.json",
+    "project/stage125/part3b1_decision_lock_stage125.json",
+    "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
+    "project/stage125/part3b1_m3_cbi_policy_contract_stage125.json",
+    "project/stage125/part3b1_m4_feature_definition_contract_stage125.json",
+    "project/stage125/part3b1_rubric_operational_mapping_stage125.json",
+    "project/stage125/part3b1_selected_decisions_stage125.csv",
+    "project/stage125/stage125_part3b1_decision_lock_qc_report.json",
+})
+
 PART3B_AUTHORIZED_EXACT = frozenset({
     SRC_REL, TEST_REL, RUN_REL,
     f"project/stage125/{F_AUTH}", f"project/stage125/{F_PLAN}",
@@ -117,7 +141,7 @@ PART3B_AUTHORIZED_EXACT = frozenset({
     f"project/stage125/{F_README}", f"project/stage125/{F_QC}",
     f"project/stage125/{F_METADATA}", f"project/stage125/{F_NETWORK_LOG}",
     f"project/stage125/{F_DECISION_REQ}", f"project/stage125/{F_DECISION_REQ_MD}",
-})
+}) | PART3B1_AUTHORIZED_EXACT
 
 PART3B1_OWNED_AFTER_LOCK = frozenset({F_DECISION_REQ, F_DECISION_REQ_MD})
 PART3B1_LOCK_PATH = "project/stage125/part3b1_decision_lock_stage125.json"
