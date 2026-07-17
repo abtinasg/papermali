@@ -40,6 +40,22 @@ See [`DECISIONS.md`](DECISIONS.md).
 - Two-commit workflow: **code-commit → artifact-commit → merge-commit**. QC points at
   the *code* commit, not the merge.
 
+### 5.1 Research vs maintenance pointers (Handoff semantics)
+
+Do not confuse QC selection with the research-action chain:
+
+- `last_completed_micro_part` in `handoff_state.json` is a **legacy JSON field
+  name**; its value is copied from
+  `ROADMAP.md` → `last_completed_research_action_id` (research chain only).
+- `next_research_action_id` likewise shows only the research chain.
+- `selected_qc_scope` may point at a **newer maintenance-task QC** (for example
+  Part 3B.1 Decision Lock) while those research IDs stay unchanged.
+- Part 3B.1 completion is signaled by `part3b1_decision_locked=true` and must
+  **not** advance `last_completed_research_action_id` /
+  `next_research_action_id`.
+- Handoff / documentation commits also never advance the research stage
+  (`active_maintenance_task_id` vs `active_research_workstream_id`).
+
 ## 6. Reference files
 
 - Run guide: [`../../README_RUN.md`](../../README_RUN.md)
@@ -73,8 +89,10 @@ See [`DECISIONS.md`](DECISIONS.md).
   historical baseline after Part 3B authorization)
 - Stage125 Part 3B evidence-capture source/test/QC: `src/stage125_part3b_evidence_capture.py`,
   `run_stage125_part3b.py`, `tests/test_stage125_part3b_evidence_capture.py`,
-  `stage125/stage125_part3b_evidence_capture_qc_report.json` (authorized real
-  evidence capture + accessibility scoring pilot; 800 assessments; no modeling)
+  `stage125/stage125_part3b_evidence_capture_qc_report.json` (authorized Part 3B
+  endpoint/source-origin feasibility probe; 800 pair-candidate assessments;
+  scores null; no candidate-value or pair-level value extraction; no real
+  accessibility scoring; no modeling)
 - Stage125 Part 3B.1 decision-lock source/test/QC: `src/stage125_part3b1_decision_lock.py`,
   `run_stage125_part3b1.py`, `tests/test_stage125_part3b1_decision_lock.py`,
   `stage125/stage125_part3b1_decision_lock_qc_report.json` (feature/scoring/cutoff
@@ -107,10 +125,11 @@ See [`OPEN_TASKS.md`](OPEN_TASKS.md).
 ## 10. Next step
 
 See `next_research_action_id` in [`ROADMAP.md`](ROADMAP.md) and
-[`handoff_state.json`](handoff_state.json). Currently:
-**stage125-research-design-readiness** — Stage125 is a Research Design & Data
-Readiness stage that performs **no** modeling. The frozen research contract
-(M1–M4 blocks, M5 removed, accessibility Gates) is in
+[`handoff_state.json`](handoff_state.json). Currently the research pointer is
+**`stage125-part3b-evidence-capture`** (Part 3B active/incomplete). Part 3B.1 is
+maintenance-locked (`part3b1_decision_locked=true`) and does not move that
+pointer. Stage125 performs **no** modeling; the frozen research contract (M1–M4
+blocks, M5 removed, accessibility Gates) is in
 [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
 prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.
 
