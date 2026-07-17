@@ -1,7 +1,7 @@
 ---
 roadmap_version: 1
 active_research_workstream_id: stage125-research-design-readiness
-qc_scope: stage125-part3b1-decision-lock
+qc_scope: stage125-part3b1a-cut-a-available-at-operationalization-lock
 last_completed_research_action_id: stage125-part3a-decision-lock
 next_research_action_id: stage125-part3b-evidence-capture
 active_maintenance_task_id: repository-driven-ai-handoff
@@ -46,6 +46,7 @@ must also appear in the body below. The validator checks that:
 - `stage125-part3a1-decision-lock` — Stage125 Part 3A.1 user-approved pilot decision lock (rubric approval record, G09–G14 pilot thresholds, locked event-enriched pilot pair selection); decision record only, **no evidence collection, no network access, no modeling**; advances no research action ✅
 - `stage125-part3b0-evidence-readiness` — Stage125 Part 3B.0 evidence capture readiness (schema validator, immutable cache contract, default-deny network sentinel, pure Gate engine scaffolding, header-only templates); infrastructure/readiness only; frozen historical baseline after Part 3B authorization; advances no research action ✅
 - `stage125-part3b1-decision-lock` — Stage125 Part 3B.1 feature-definition & scoring adjudication lock (M2-A modified, M3-C+CBI-A, M4-A, R-A, CUT-A); schema/formula contracts + synthetic validation only; **no network, no real extraction, no real scoring, no modeling**; advances no research action ✅
+- `stage125-part3b1a-cut-a-available-at-operationalization-lock` — Stage125 Part 3B.1A CUT-A available-at operationalization lock (`PublishDateTime` for exact version-bound CODAL documents; `SentDateTime` audit-only); schema/pure parsers/synthetic validation only; **no network, no real available_at assignment, no cutoff resolution, no extraction, no scoring, no modeling**; advances no research action
 
 ## Notes on ordering
 
@@ -77,6 +78,9 @@ G09–G14 pilot thresholds, and locked 80-pair event-enriched selection
 pairs; 27 industry-missing pairs). `stage125-part3b-evidence-capture` is
 **active / incomplete** (origin probes only). `stage125-part3b1-decision-lock`
 records approved feature/scoring/cutoff adjudication contracts without authorizing
-real extraction or scoring. See
+real extraction or scoring. `stage125-part3b1a-cut-a-available-at-operationalization-lock`
+operationalizes CUT-A `available_at` as `PublishDateTime` of an exact
+version-bound CODAL letter without assigning real timestamps or resolving pilot
+cutoffs. See
 [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
 prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.

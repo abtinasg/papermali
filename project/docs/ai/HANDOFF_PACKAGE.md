@@ -49,10 +49,11 @@ Do not confuse QC selection with the research-action chain:
   `ROADMAP.md` → `last_completed_research_action_id` (research chain only).
 - `next_research_action_id` likewise shows only the research chain.
 - `selected_qc_scope` may point at a **newer maintenance-task QC** (for example
-  Part 3B.1 Decision Lock) while those research IDs stay unchanged.
-- Part 3B.1 completion is signaled by `part3b1_decision_locked=true` and must
-  **not** advance `last_completed_research_action_id` /
-  `next_research_action_id`.
+  Part 3B.1A CUT-A available-at operationalization lock) while those research
+  IDs stay unchanged.
+- Part 3B.1 completion is signaled by `part3b1_decision_locked=true`; Part 3B.1A
+  adds `cut_a_available_at_operationalization_locked=true`. Neither must advance
+  `last_completed_research_action_id` / `next_research_action_id`.
 - Handoff / documentation commits also never advance the research stage
   (`active_maintenance_task_id` vs `active_research_workstream_id`).
 
@@ -127,9 +128,10 @@ See [`OPEN_TASKS.md`](OPEN_TASKS.md).
 See `next_research_action_id` in [`ROADMAP.md`](ROADMAP.md) and
 [`handoff_state.json`](handoff_state.json). Currently the research pointer is
 **`stage125-part3b-evidence-capture`** (Part 3B active/incomplete). Part 3B.1 is
-maintenance-locked (`part3b1_decision_locked=true`) and does not move that
-pointer. Stage125 performs **no** modeling; the frozen research contract (M1–M4
-blocks, M5 removed, accessibility Gates) is in
+maintenance-locked (`part3b1_decision_locked=true`); Part 3B.1A adds
+`cut_a_available_at_operationalization_locked=true` without moving that pointer
+or assigning real `available_at` values. Stage125 performs **no** modeling; the
+frozen research contract (M1–M4 blocks, M5 removed, accessibility Gates) is in
 [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
 prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.
 
