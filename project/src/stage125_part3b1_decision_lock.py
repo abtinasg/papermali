@@ -1056,14 +1056,15 @@ def scan_closed_world_part3b1(repo_root: Path) -> list[str]:
 def verify_changed_paths_exact_allowlist(
     repo_root: Path, baseline: str = EXPECTED_BASELINE_COMMIT,
 ) -> tuple[bool, list[str]]:
-    """Every path changed vs baseline must be on the curated exact allowlist."""
+    """Every committed path vs baseline must be on the curated exact allowlist.
+
+    Working-tree dirt from unrelated tests is intentionally excluded; handoff
+    ``--check-changes`` remains the WT gate for PR hygiene.
+    """
     from scripts import update_ai_handoff as handoff
 
     raw = _git(str(repo_root), "diff", "--name-only", f"{baseline}...HEAD")
     changed = {p for p in raw.splitlines() if p.strip()}
-    # Include uncommitted tracked modifications relevant to local verification.
-    wt = _git(str(repo_root), "diff", "--name-only", "HEAD")
-    changed |= {p for p in wt.splitlines() if p.strip()}
     offenders = sorted(p for p in changed if not handoff.path_allowlisted(p))
     return (not offenders), offenders
 
