@@ -1,9 +1,9 @@
 {
   "baseline_commit": "274ff216f0f3a59ae611c68b662382d75ad84c8b",
-  "code_commit": "59865c375e5b0e401615a18d959b27f520df954a",
+  "code_commit": "bbfa22cefcbd53c4c71361c473e36580fb6f9d56",
   "current_stage": "Stage125",
   "description": "Stage125 Part 3B.1 — feature definition & scoring adjudication lock (contracts + synthetic validation only).",
-  "generated_at": "2026-07-17T18:54:10+03:00",
+  "generated_at": "2026-07-17T18:58:32+03:00",
   "modeling_started": false,
   "network_extraction_performed": true,
   "output_files_sha256": {
@@ -16,12 +16,12 @@
     "part3b1_m4_feature_definition_contract_stage125.json": "f703f3fe3a48b11952f6f1410ae03d0032867cca8bf16cc825a10910c644fad5",
     "part3b1_rubric_operational_mapping_stage125.json": "845681e70c79a3c9ed81844d2dd2f6c92104f2088777669ffe9018d3dfd09110",
     "part3b1_selected_decisions_stage125.csv": "8f8fcf706388c6777c71ff8d2c814a86cf35c4c5a1fd1437979c3ff84871993c",
-    "stage125_part3b1_decision_lock_qc_report.json": "1abe2de568f5f74aa0ac7e81a48cea4415a320574300ac936c2186ac2f52fd22"
+    "stage125_part3b1_decision_lock_qc_report.json": "425b9bf2948ae3cbe46c5fec63bb38e959b0ee6a5f76801bf1c1875cc1ff69a1"
   },
   "part3b1_decision_locked": true,
   "part3b1_network_calls_attempted": 0,
   "part3b_completed": false,
-  "source_file_sha256": "9cba92c7c32c20e38817396a75837261ae90df6751b86a04c297c9cb0fdfd6ab",
+  "source_file_sha256": "d7927216257a1b5fdee0ebfad320a660ea202ddc8c61329788422adda04fe008",
   "stage": "stage125_part3b1_decision_lock",
   "test_file_sha256": "bd0edb94e63f6b6010795875e73d5a0fe36a3becb5e3a4fb576cddbae15d20a1"
 }

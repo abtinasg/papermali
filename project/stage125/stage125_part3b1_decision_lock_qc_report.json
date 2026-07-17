@@ -317,7 +317,7 @@
     "part3b_verified_endpoint_registry_stage125.csv": "3d36eca0a0a63ef406ec48ef1bcf78ecbe2ce99ce24a6e8804c2b9c3ffb431b7",
     "stage125_part3b_evidence_capture_qc_report.json": "c683375f3afe8c2d1a757898122e601f36c145be2b8c69be7ba9b4b781b0f92d"
   },
-  "generated_at": "2026-07-17T18:54:10+03:00",
+  "generated_at": "2026-07-17T18:58:32+03:00",
   "modeling_started": false,
   "network_extraction_performed": true,
   "output_sha256": {
@@ -341,8 +341,8 @@
   "part3b2_started": false,
   "part3b_completed": false,
   "part3b_started": true,
-  "source_commit": "59865c375e5b0e401615a18d959b27f520df954a",
-  "source_file_sha256": "9cba92c7c32c20e38817396a75837261ae90df6751b86a04c297c9cb0fdfd6ab",
+  "source_commit": "bbfa22cefcbd53c4c71361c473e36580fb6f9d56",
+  "source_file_sha256": "d7927216257a1b5fdee0ebfad320a660ea202ddc8c61329788422adda04fe008",
   "stage": "stage125_part3b1_decision_lock",
   "stage126_started": false,
   "test_file_sha256": "bd0edb94e63f6b6010795875e73d5a0fe36a3becb5e3a4fb576cddbae15d20a1",
