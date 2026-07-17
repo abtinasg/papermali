@@ -8,7 +8,9 @@ import json
 import socket
 import sys
 from datetime import datetime, timezone
+from importlib.metadata import version
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -144,6 +146,72 @@ def test_naive_datetime_rejected():
     ) is True
 
 
+def test_historical_nonexistent_tehran_wall_time():
+    """Known historical spring-forward gap → nonexistent_local_time (not ambiguous)."""
+    jalali = m.jalali_string_from_tehran_gregorian_wall(2021, 3, 22, 0, 0, 0)
+    parsed = m.parse_codal_publish_datetime(jalali)
+    assert isinstance(parsed, m.TimestampParseFailure)
+    assert parsed.reason == m.REASON_NONEXISTENT_LOCAL
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw=jalali,
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(),
+    )
+    assert res.available_at is None
+    assert m.REASON_NONEXISTENT_LOCAL in res.reasons
+
+
+def test_historical_ambiguous_tehran_wall_time():
+    """Known historical fall-back fold → ambiguous without deterministic rule."""
+    jalali = m.jalali_string_from_tehran_gregorian_wall(2021, 9, 21, 23, 0, 0)
+    parsed = m.parse_codal_publish_datetime(jalali)
+    assert isinstance(parsed, m.TimestampParseFailure)
+    assert parsed.reason == m.REASON_AMBIGUOUS_LOCAL
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw=jalali,
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(),
+    )
+    assert res.available_at is None
+    assert m.REASON_AMBIGUOUS_LOCAL in res.reasons
+
+
+def test_normal_pre_transition_timestamp_resolves():
+    jalali = m.jalali_string_from_tehran_gregorian_wall(2021, 3, 21, 23, 0, 0)
+    parsed = m.parse_codal_publish_datetime(jalali)
+    assert isinstance(parsed, m.NormalizedTimestamp)
+
+
+def test_normal_post_transition_timestamp_resolves():
+    jalali = m.jalali_string_from_tehran_gregorian_wall(2021, 3, 22, 1, 0, 0)
+    parsed = m.parse_codal_publish_datetime(jalali)
+    assert isinstance(parsed, m.NormalizedTimestamp)
+
+
+def test_post_dst_abolition_ordinary_timestamp_no_fabricated_fold():
+    """Current non-DST year must not receive a fabricated fold/gap."""
+    jalali = m.jalali_string_from_tehran_gregorian_wall(2024, 3, 22, 0, 0, 0)
+    parsed = m.parse_codal_publish_datetime(jalali)
+    assert isinstance(parsed, m.NormalizedTimestamp)
+    assert parsed.local_tehran.fold == 0
+    tz = ZoneInfo(m.TEHRAN_TZ_NAME)
+    kind, local = m.classify_tehran_wall_time(2024, 3, 22, 0, 0, 0, tz)
+    assert kind == "valid"
+    assert local is not None
+
+
+def test_no_fixed_0330_assumption_across_seasons():
+    winter = m.parse_codal_publish_datetime("1400/01/01 12:00:00")
+    summer = m.parse_codal_publish_datetime("1400/06/01 12:00:00")
+    assert isinstance(winter, m.NormalizedTimestamp)
+    assert isinstance(summer, m.NormalizedTimestamp)
+    assert winter.local_tehran.utcoffset() != summer.local_tehran.utcoffset()
+    contract = m.build_operationalization_contract()
+    assert "fixed_offset_plus_0330_for_all_years" in (
+        contract["timezone_and_normalization"]["forbidden"]
+    )
+
+
 def test_subsidiary_title_rejected():
     res = m.resolve_operational_available_at(
         publish_datetime_raw="1400/01/15 10:30:00",
@@ -235,10 +303,106 @@ def test_incomplete_cache_without_canonical_letterserial_unresolved():
             incomplete_pagination=True,
             canonical_letter_serial=None,
             letter_serial=None,
+            values_source_letter_serial=None,
         ),
     )
     assert res.available_at is None
     assert "incomplete_pagination_without_canonical_letter_serial" in res.reasons
+    assert m.REASON_MISSING_CANONICAL_LETTER_SERIAL in res.reasons
+
+
+def test_missing_canonical_letter_serial_unresolved():
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw="1400/01/15 10:30:00",
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(canonical_letter_serial=None),
+    )
+    assert res.available_at is None
+    assert m.REASON_MISSING_CANONICAL_LETTER_SERIAL in res.reasons
+
+
+def test_letter_serial_mismatch_unresolved():
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw="1400/01/15 10:30:00",
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(
+            letter_serial="A1",
+            canonical_letter_serial="B2",
+            values_source_letter_serial="A1",
+            candidate_letter_serials=["A1"],
+        ),
+    )
+    assert res.available_at is None
+    assert "letter_serial_mismatch" in res.reasons
+
+
+def test_canonical_tracing_no_present_but_letter_tracing_missing():
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw="1400/01/15 10:30:00",
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(
+            tracing_no=None,
+            canonical_tracing_no="T-9",
+        ),
+    )
+    assert res.available_at is None
+    assert m.REASON_MISSING_REQUIRED_TRACING_NO in res.reasons
+
+
+def test_tracing_no_mismatch_unresolved():
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw="1400/01/15 10:30:00",
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(
+            tracing_no="T-1",
+            canonical_tracing_no="T-9",
+        ),
+    )
+    assert res.available_at is None
+    assert "tracing_no_mismatch" in res.reasons
+
+
+def test_revision_values_source_serial_differs_unresolved():
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw="1400/02/01 11:00:00",
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(
+            revision_status="revision",
+            revision_status_raw=m.CODAL_ESLAHIYE_RAW,
+            letter_serial="REV9",
+            canonical_letter_serial="REV9",
+            candidate_letter_serials=["REV9"],
+            values_source_letter_serial="ORIG1",
+        ),
+    )
+    assert res.available_at is None
+    assert m.REASON_VALUES_SOURCE_SERIAL_MISMATCH in res.reasons
+
+
+def test_restatement_values_source_serial_differs_unresolved():
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw="1400/02/01 11:00:00",
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(
+            revision_status="restatement",
+            letter_serial="RST9",
+            canonical_letter_serial="RST9",
+            candidate_letter_serials=["RST9"],
+            values_source_letter_serial="ORIG1",
+        ),
+    )
+    assert res.available_at is None
+    assert m.REASON_VALUES_SOURCE_SERIAL_MISMATCH in res.reasons
+
+
+def test_exact_original_binding():
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw="1400/01/15 10:30:00",
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(revision_status="original"),
+    )
+    assert res.available_at is not None
+    assert res.source_field == "PublishDateTime"
 
 
 def test_exact_revision_binding():
@@ -246,28 +410,77 @@ def test_exact_revision_binding():
         publish_datetime_raw="1400/02/01 11:00:00",
         sent_datetime_raw=None,
         binding=m.synthetic_valid_binding(
-            revision_status="correction",
-            letter_serial="CORR9",
-            canonical_letter_serial="CORR9",
-            candidate_letter_serials=["CORR9"],
-            values_from_revision_serial="CORR9",
+            revision_status="revision",
+            revision_status_raw=m.CODAL_ESLAHIYE_RAW,
+            letter_serial="REV9",
+            canonical_letter_serial="REV9",
+            candidate_letter_serials=["REV9"],
+            values_source_letter_serial="REV9",
         ),
     )
     assert res.available_at is not None
     assert res.source_field == "PublishDateTime"
 
 
-def test_correction_values_cannot_use_original_publication_cutoff():
+def test_exact_restatement_binding():
     res = m.resolve_operational_available_at(
-        publish_datetime_raw="1400/01/01 10:00:00",
+        publish_datetime_raw="1400/02/01 11:00:00",
         sent_datetime_raw=None,
         binding=m.synthetic_valid_binding(
-            revision_status="correction",
-            publish_of_original_used_for_correction_values=True,
+            revision_status="restatement",
+            letter_serial="RST9",
+            canonical_letter_serial="RST9",
+            candidate_letter_serials=["RST9"],
+            values_source_letter_serial="RST9",
+        ),
+    )
+    assert res.available_at is not None
+    assert res.source_field == "PublishDateTime"
+
+
+def test_boolean_flags_cannot_bypass_identifier_mismatch():
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw="1400/01/15 10:30:00",
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(
+            letter_serial="A1",
+            canonical_letter_serial="B2",
+            values_source_letter_serial="A1",
+            candidate_letter_serials=["A1"],
+            canonical_source_version_bound=True,
+            publish_of_original_used_for_correction_values=False,
         ),
     )
     assert res.available_at is None
-    assert m.REASON_CORRECTION_USES_ORIGINAL in res.reasons
+    assert "letter_serial_mismatch" in res.reasons
+
+
+def test_correction_is_not_normalized_revision_status():
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw="1400/01/15 10:30:00",
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(revision_status="correction"),
+    )
+    assert res.available_at is None
+    assert "unknown_revision_status" in res.reasons
+    assert m.NORMALIZED_REVISION_STATUS == {"original", "revision", "restatement"}
+    assert "correction" not in m.NORMALIZED_REVISION_STATUS
+
+
+def test_codal_eslahiye_explicit_map_to_revision_only():
+    assert m.explicit_normalized_revision_for_codal_eslahiye(
+        revision_status_raw=m.CODAL_ESLAHIYE_RAW,
+        map_eslahiye_to_revision=True,
+    ) == "revision"
+    assert m.explicit_normalized_revision_for_codal_eslahiye(
+        revision_status_raw=m.CODAL_ESLAHIYE_RAW,
+        map_eslahiye_to_revision=False,
+    ) is None
+    # Never silently map اصلاحیه to restatement.
+    assert m.explicit_normalized_revision_for_codal_eslahiye(
+        revision_status_raw=m.CODAL_ESLAHIYE_RAW,
+        map_eslahiye_to_revision=True,
+    ) != "restatement"
 
 
 def test_unknown_revision_status_unresolved():
@@ -278,6 +491,34 @@ def test_unknown_revision_status_unresolved():
     )
     assert res.available_at is None
     assert "unknown_revision_status" in res.reasons
+
+
+def test_null_revision_status_unresolved():
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw="1400/01/15 10:30:00",
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(revision_status=None),
+    )
+    assert res.available_at is None
+    assert "unknown_revision_status" in res.reasons
+
+
+def test_redundant_audit_flag_still_fail_closed():
+    res = m.resolve_operational_available_at(
+        publish_datetime_raw="1400/01/01 10:00:00",
+        sent_datetime_raw=None,
+        binding=m.synthetic_valid_binding(
+            revision_status="revision",
+            revision_status_raw=m.CODAL_ESLAHIYE_RAW,
+            letter_serial="REV9",
+            canonical_letter_serial="REV9",
+            candidate_letter_serials=["REV9"],
+            values_source_letter_serial="REV9",
+            publish_of_original_used_for_correction_values=True,
+        ),
+    )
+    assert res.available_at is None
+    assert m.REASON_CORRECTION_USES_ORIGINAL in res.reasons
 
 
 def test_multi_document_row_unresolved():
@@ -362,6 +603,16 @@ def test_contract_and_lock_markers():
     assert lock["part3b_completed"] is False
     assert lock["predictor_available_at_evidence_collected"] is False
     assert lock["pilot_cutoff_provenance_resolved"] is False
+    assert set(contract["source_version_and_revision_policy"][
+        "normalized_revision_status_enum"
+    ]) == m.NORMALIZED_REVISION_STATUS
+    assert "correction" not in contract["source_version_and_revision_policy"][
+        "normalized_revision_status_enum"
+    ]
+
+
+def test_canonical_jdatetime_runtime():
+    assert version("jdatetime") == "6.0.1"
 
 
 def test_run_check_and_qc_assertions():
@@ -383,6 +634,21 @@ def test_run_check_and_qc_assertions():
     assert qc["cut_a_available_at_operationalization_locked"] is True
     assert qc["part3b1_decision_locked"] is True
     assert qc["stage"] == m.QC_STAGE
+    assertion_names = {a["assertion"] for a in qc["assertions"]}
+    for required in (
+        "normalized_revision_enum_matches_frozen_provenance_schema",
+        "correction_not_emitted_as_normalized_revision_status",
+        "exact_values_source_serial_binding",
+        "missing_canonical_serial_rejected",
+        "missing_required_tracing_no_rejected",
+        "synth_historical_nonexistent_tehran_time",
+        "synth_historical_ambiguous_tehran_time",
+        "canonical_jdatetime_runtime_pin",
+    ):
+        assert required in assertion_names
+        assert next(
+            a for a in qc["assertions"] if a["assertion"] == required
+        )["status"] == "PASS"
     # Idempotent check
     result2 = m.run(project_dir=ROOT, write=False)
     assert result2["drift"] == []

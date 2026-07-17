@@ -119,9 +119,17 @@ Does **not** advance research action pointers.
   (each `LetterSerial` is an independent version; multi-document rows stay
   `UNRESOLVED` with
   `multi_document_predictor_row_requires_separate_adjudication`).
-- **Timezone:** raw Jalali CODAL timestamps normalized via `jdatetime` +
-  `zoneinfo.ZoneInfo("Asia/Tehran")` → UTC ISO-8601; no fixed `+03:30` for all
-  years; malformed/ambiguous/naive → `available_at=null`.
+- **Normalized `revision_status`** matches the frozen provenance schema only:
+  `original` / `revision` / `restatement`. `correction` is not a normalized
+  status. CODAL «اصلاحیه» may be retained in `revision_status_raw` and maps to
+  `revision` only when that mapping is explicit. Exact
+  `values_source_letter_serial == letter_serial == canonical_letter_serial`
+  is authoritative for revision/restatement rows (boolean flags cannot bypass).
+- **Timezone:** raw Jalali CODAL timestamps normalized via `jdatetime==6.0.1` +
+  `zoneinfo.ZoneInfo("Asia/Tehran")` → UTC ISO-8601 using UTC round-trip
+  fold=0/fold=1 classification; nonexistent spring-forward ≠ ambiguous;
+  no fixed `+03:30` for all years; malformed/nonexistent/ambiguous/naive →
+  `available_at=null`.
 - **Non-claims:** no network; no real `available_at` assignment; no pilot cutoff
   resolution; no extraction/scoring/Gate admission; no Part 3B.2 / Stage126 /
   modeling. Marker: `cut_a_available_at_operationalization_locked=true`.

@@ -119,12 +119,22 @@ REASON_AMBIGUOUS_LOCAL = "ambiguous_local_time_without_deterministic_rule"
 REASON_BINDING_FAILED = "exact_document_binding_failed"
 REASON_UNKNOWN_REVISION = "unknown_revision_status"
 REASON_CANONICAL_VERSION_UNBOUND = "canonical_source_version_not_provably_bound"
+REASON_VALUES_SOURCE_SERIAL_MISMATCH = "values_source_letter_serial_mismatch"
+REASON_MISSING_CANONICAL_LETTER_SERIAL = "missing_canonical_letter_serial"
+REASON_MISSING_REQUIRED_TRACING_NO = "missing_required_tracing_no"
+REASON_MISSING_OFFICIAL_TITLE = "missing_official_title"
+# Deprecated as primary enforcement; retained only as a redundant audit flag.
+# Exact LetterSerial equality (values_source / letter / canonical) is authoritative.
 REASON_CORRECTION_USES_ORIGINAL = (
     "correction_values_cannot_use_original_publication_cutoff"
 )
 REASON_MULTIPLE_CANDIDATES = "multiple_letter_serial_candidates"
 REASON_INCOMPLETE_CACHE = "incomplete_cache_without_canonical_letter_serial"
 REASON_SENT_USED_AS_AVAILABILITY = "sent_datetime_must_never_be_availability"
+
+# Matches frozen provenance_manifest_schema_stage125.json revision_status enum.
+NORMALIZED_REVISION_STATUS = frozenset({"original", "revision", "restatement"})
+CODAL_ESLAHIYE_RAW = "اصلاحیه"
 
 BINDING_FAIL_REASONS = (
     "subsidiary_only_title",
@@ -137,6 +147,10 @@ BINDING_FAIL_REASONS = (
     "ticker_year_only_match",
     "title_only_match",
     "missing_letter_serial",
+    REASON_MISSING_CANONICAL_LETTER_SERIAL,
+    REASON_MISSING_REQUIRED_TRACING_NO,
+    REASON_VALUES_SOURCE_SERIAL_MISMATCH,
+    REASON_MISSING_OFFICIAL_TITLE,
     "unknown_revision_status",
     "canonical_source_version_not_provably_bound",
     "ticker_mismatch",
@@ -278,6 +292,90 @@ def _tehran_zone() -> ZoneInfo:
         raise QCFail(REASON_TZ_UNAVAILABLE) from exc
 
 
+def classify_tehran_wall_time(
+    year: int,
+    month: int,
+    day: int,
+    hour: int,
+    minute: int,
+    second: int,
+    tz: ZoneInfo,
+) -> tuple[str, datetime | None]:
+    """Classify a naive Asia/Tehran wall time via UTC round-trips.
+
+    For each fold candidate (0 and 1):
+      construct local → convert to UTC → convert back to Asia/Tehran →
+      compare returned naive wall components with the original wall time.
+
+    Classification:
+      - neither fold round-trips exactly → nonexistent_local_time
+      - both round-trip exactly and produce different UTC instants →
+        ambiguous_local_time_without_deterministic_rule
+      - exactly one fold round-trips exactly → valid (use that fold)
+      - both round-trip exactly and represent the same instant → valid
+    """
+    wall = (year, month, day, hour, minute, second)
+    surviving: list[tuple[int, datetime, datetime]] = []
+    for fold in (0, 1):
+        local = datetime(
+            year, month, day, hour, minute, second, tzinfo=tz, fold=fold,
+        )
+        utc = local.astimezone(timezone.utc)
+        back = utc.astimezone(tz)
+        back_wall = (
+            back.year, back.month, back.day, back.hour, back.minute, back.second,
+        )
+        if back_wall == wall:
+            surviving.append((fold, local, utc))
+
+    if not surviving:
+        return REASON_NONEXISTENT_LOCAL, None
+    if len(surviving) == 1:
+        return "valid", surviving[0][1]
+    # Both folds round-trip.
+    if surviving[0][2] != surviving[1][2]:
+        return REASON_AMBIGUOUS_LOCAL, None
+    return "valid", surviving[0][1]
+
+
+def jalali_string_from_tehran_gregorian_wall(
+    year: int,
+    month: int,
+    day: int,
+    hour: int = 0,
+    minute: int = 0,
+    second: int = 0,
+) -> str:
+    """Deterministic Jalali CODAL string from a Gregorian Tehran wall time.
+
+    Uses the pinned project `jdatetime` so DST fixtures are not manually guessed.
+    """
+    g = jdatetime.datetime.fromgregorian(
+        datetime=datetime(year, month, day, hour, minute, second),
+    )
+    return (
+        f"{g.year:04d}/{g.month:02d}/{g.day:02d} "
+        f"{g.hour:02d}:{g.minute:02d}:{g.second:02d}"
+    )
+
+
+def explicit_normalized_revision_for_codal_eslahiye(
+    *,
+    revision_status_raw: str | None,
+    map_eslahiye_to_revision: bool,
+) -> str | None:
+    """Map CODAL «اصلاحیه» to normalized `revision` only when explicitly requested.
+
+    Raw wording may be retained separately in `revision_status_raw`. This helper
+    never silently maps اصلاحیه to `restatement`, and never invents a status
+    when the mapping flag is false.
+    """
+    raw = (revision_status_raw or "").strip()
+    if map_eslahiye_to_revision and raw == CODAL_ESLAHIYE_RAW:
+        return "revision"
+    return None
+
+
 def parse_codal_publish_datetime(
     raw: str | None,
 ) -> NormalizedTimestamp | TimestampParseFailure:
@@ -326,32 +424,17 @@ def parse_codal_publish_datetime(
     except QCFail:
         return TimestampParseFailure(raw=raw_s, reason=REASON_TZ_UNAVAILABLE)
 
-    # Construct local wall time and detect fold/gap via zoneinfo.
-    try:
-        local = datetime(
-            gregorian_naive.year, gregorian_naive.month, gregorian_naive.day,
-            gregorian_naive.hour, gregorian_naive.minute, gregorian_naive.second,
-            tzinfo=tz,
-        )
-    except Exception:
-        return TimestampParseFailure(raw=raw_s, reason=REASON_NONEXISTENT_LOCAL)
-
-    # Detect nonexistent times (DST spring-forward gap) by round-trip.
-    # zoneinfo may silently adjust; compare reconstituted wall components.
-    if (
-        local.year != gregorian_naive.year
-        or local.month != gregorian_naive.month
-        or local.day != gregorian_naive.day
-        or local.hour != gregorian_naive.hour
-        or local.minute != gregorian_naive.minute
-        or local.second != gregorian_naive.second
-    ):
-        return TimestampParseFailure(raw=raw_s, reason=REASON_NONEXISTENT_LOCAL)
-
-    # Ambiguous fall-back hour: fold=0 vs fold=1 produce different UTC offsets.
-    local_fold1 = local.replace(fold=1)
-    if local.utcoffset() != local_fold1.utcoffset():
-        return TimestampParseFailure(raw=raw_s, reason=REASON_AMBIGUOUS_LOCAL)
+    kind, local = classify_tehran_wall_time(
+        gregorian_naive.year,
+        gregorian_naive.month,
+        gregorian_naive.day,
+        gregorian_naive.hour,
+        gregorian_naive.minute,
+        gregorian_naive.second,
+        tz,
+    )
+    if kind != "valid" or local is None:
+        return TimestampParseFailure(raw=raw_s, reason=kind)
 
     if local.tzinfo is None:
         return TimestampParseFailure(raw=raw_s, reason=REASON_NAIVE_DATETIME)
@@ -408,7 +491,11 @@ class ExactDocumentBindingInput:
     canonical_tracing_no: str | None
     official_title: str
     canonical_official_title: str
-    revision_status: str  # original | correction | unknown
+    # Normalized status must match frozen provenance schema enum only:
+    # original | revision | restatement. Null/unknown/other → UNRESOLVED.
+    # CODAL «اصلاحیه» raw wording may be retained in revision_status_raw;
+    # normalized status is never silently invented from raw text alone.
+    revision_status: str | None
     public_codal_url: str | None
     raw_payload_or_snapshot_hash: str | None
     candidate_letter_serials: list[str] = field(default_factory=list)
@@ -418,9 +505,14 @@ class ExactDocumentBindingInput:
     entity_ambiguous: bool = False
     consolidated_separate_ambiguous: bool = False
     annual_interim_ambiguous: bool = False
+    # Redundant audit flag only; exact identifier equality is authoritative.
     canonical_source_version_bound: bool = False
     multi_document_predictor_row: bool = False
-    values_from_revision_serial: str | None = None
+    # Values-source LetterSerial for the version that supplied canonical values.
+    values_source_letter_serial: str | None = None
+    # Raw/audit CODAL revision wording (e.g. «اصلاحیه»); not a normalized enum.
+    revision_status_raw: str | None = None
+    # Deprecated as primary enforcement; redundant audit flag only.
     publish_of_original_used_for_correction_values: bool = False
 
 
@@ -428,6 +520,10 @@ class ExactDocumentBindingInput:
 class BindingResult:
     ok: bool
     reasons: tuple[str, ...]
+
+
+def _nonempty(value: str | None) -> bool:
+    return value is not None and str(value).strip() != ""
 
 
 def evaluate_exact_document_binding(
@@ -455,15 +551,16 @@ def evaluate_exact_document_binding(
     elif inp.match_basis == "title_only":
         reasons.append("title_only_match")
 
-    if not inp.letter_serial:
+    if not _nonempty(inp.letter_serial):
         reasons.append("missing_letter_serial")
-    if inp.incomplete_pagination and not inp.canonical_letter_serial:
+    if not _nonempty(inp.canonical_letter_serial):
+        reasons.append(REASON_MISSING_CANONICAL_LETTER_SERIAL)
+    if inp.incomplete_pagination and not _nonempty(inp.canonical_letter_serial):
         reasons.append("incomplete_pagination_without_canonical_letter_serial")
+        reasons.append(REASON_INCOMPLETE_CACHE)
     if len(inp.candidate_letter_serials) > 1:
         reasons.append("multiple_candidate_letters")
         reasons.append(REASON_MULTIPLE_CANDIDATES)
-    if inp.incomplete_pagination and not inp.canonical_letter_serial:
-        reasons.append(REASON_INCOMPLETE_CACHE)
 
     if inp.canonical_ticker != inp.letter_ticker:
         reasons.append("ticker_mismatch")
@@ -488,27 +585,45 @@ def evaluate_exact_document_binding(
         reasons.append("separate_scope_required_but_not_met")
     if inp.letter_code_canonical != inp.letter_code_letter:
         reasons.append("letter_code_mismatch")
+
+    # Exact source-version binding: structural identifier equality is authoritative.
+    # Boolean flags cannot bypass these checks.
     if (
-        inp.canonical_letter_serial
-        and inp.letter_serial
-        and inp.canonical_letter_serial != inp.letter_serial
+        _nonempty(inp.letter_serial)
+        and _nonempty(inp.canonical_letter_serial)
+        and inp.letter_serial != inp.canonical_letter_serial
     ):
         reasons.append("letter_serial_mismatch")
-    if (
-        inp.canonical_tracing_no
-        and inp.tracing_no
-        and inp.canonical_tracing_no != inp.tracing_no
-    ):
-        reasons.append("tracing_no_mismatch")
-    if inp.official_title != inp.canonical_official_title:
+
+    if _nonempty(inp.canonical_tracing_no):
+        if not _nonempty(inp.tracing_no):
+            reasons.append(REASON_MISSING_REQUIRED_TRACING_NO)
+        elif inp.canonical_tracing_no != inp.tracing_no:
+            reasons.append("tracing_no_mismatch")
+
+    if not _nonempty(inp.official_title) or not _nonempty(inp.canonical_official_title):
+        reasons.append(REASON_MISSING_OFFICIAL_TITLE)
+    elif inp.official_title != inp.canonical_official_title:
         reasons.append("official_title_mismatch")
-    if inp.revision_status not in {"original", "correction"}:
+
+    if inp.revision_status not in NORMALIZED_REVISION_STATUS:
         reasons.append("unknown_revision_status")
         reasons.append(REASON_UNKNOWN_REVISION)
+    elif inp.revision_status in {"revision", "restatement"}:
+        # Canonical values must come from this exact Serial only.
+        if (
+            not _nonempty(inp.values_source_letter_serial)
+            or inp.values_source_letter_serial != inp.letter_serial
+            or inp.values_source_letter_serial != inp.canonical_letter_serial
+            or inp.letter_serial != inp.canonical_letter_serial
+        ):
+            reasons.append(REASON_VALUES_SOURCE_SERIAL_MISMATCH)
+
     if not inp.public_codal_url:
         reasons.append("missing_public_codal_url")
     if not inp.raw_payload_or_snapshot_hash:
         reasons.append("missing_raw_payload_or_snapshot_hash")
+    # Redundant audit flags — cannot authorize a structurally unbound row.
     if not inp.canonical_source_version_bound:
         reasons.append("canonical_source_version_not_provably_bound")
         reasons.append(REASON_CANONICAL_VERSION_UNBOUND)
@@ -633,8 +748,9 @@ def resolve_operational_available_at(
             sent_publish_relation=relation,
         )
 
-    # Revision policy: correction values must use that correction's PublishDateTime.
-    # (Enforced via binding.publish_of_original_used_for_correction_values.)
+    # Revision/restatement values must use that exact LetterSerial's PublishDateTime.
+    # Enforced structurally via values_source_letter_serial == letter_serial ==
+    # canonical_letter_serial (boolean audit flags cannot bypass).
     return AvailableAtResolution(
         available_at=parsed.utc_iso8601,
         available_at_raw_publish=parsed.raw,
@@ -676,6 +792,7 @@ def synthetic_valid_binding(**overrides: Any) -> ExactDocumentBindingInput:
             "اطلاعات و صورت‌های مالی سالانه دوره ۱۲ ماهه منتهی به ۱۴۰۰/۱۲/۲۹ (حسابرسی شده)"
         ),
         revision_status="original",
+        revision_status_raw=None,
         public_codal_url="https://codal.ir/Reports/Decision.aspx?LetterSerial=ABC123",
         raw_payload_or_snapshot_hash="a" * 64,
         candidate_letter_serials=["ABC123"],
@@ -687,7 +804,7 @@ def synthetic_valid_binding(**overrides: Any) -> ExactDocumentBindingInput:
         annual_interim_ambiguous=False,
         canonical_source_version_bound=True,
         multi_document_predictor_row=False,
-        values_from_revision_serial=None,
+        values_source_letter_serial="ABC123",
         publish_of_original_used_for_correction_values=False,
     )
     for key, value in overrides.items():
@@ -753,9 +870,12 @@ def build_operationalization_contract() -> dict:
                 "separate_non_consolidated_when_canonical_requires",
                 "letter_code_compatible",
                 "exact_letter_serial",
-                "exact_tracing_no_when_present",
-                "exact_official_title",
-                "original_or_revision_status_known",
+                "exact_canonical_letter_serial",
+                "letter_serial_equals_canonical_letter_serial",
+                "exact_tracing_no_when_canonical_tracing_no_present",
+                "exact_official_title_nonempty_both_sides",
+                "normalized_revision_status_in_frozen_provenance_enum",
+                "values_source_letter_serial_equals_bound_serial_for_revision_or_restatement",
                 "public_codal_url_recorded",
                 "raw_payload_or_snapshot_hash_bound",
             ],
@@ -763,13 +883,23 @@ def build_operationalization_contract() -> dict:
         },
         "source_version_and_revision_policy": {
             "each_letter_serial_is_independent_version": True,
+            "normalized_revision_status_enum": sorted(NORMALIZED_REVISION_STATUS),
+            "normalized_revision_status_matches_frozen_provenance_schema": True,
+            "correction_is_not_a_normalized_revision_status": True,
+            "codal_eslahiye_raw_field": "revision_status_raw",
+            "codal_eslahiye_maps_to_revision_only_when_explicit": True,
+            "restatement_only_when_source_version_evidence_supports": True,
+            "missing_or_unclassifiable_revision_status_is_unresolved": True,
+            "exact_values_source_serial_binding_authoritative": True,
+            "boolean_flags_cannot_bypass_identifier_mismatch": True,
+            "publish_of_original_used_for_correction_values_is_redundant_audit_only": True,
             "rules": [
-                "original_and_correction_never_overwrite_each_other",
+                "original_revision_restatement_never_overwrite_each_other",
                 "each_version_has_independent_provenance_record",
                 "cutoff_taken_only_from_version_that_supplied_canonical_predictor_values",
-                "correction_values_cannot_use_original_PublishDateTime",
-                "if_canonical_row_from_correction_then_available_at_is_that_correction_PublishDateTime",
-                "if_canonical_source_version_not_provably_bound_then_available_at_null_cutoff_UNRESOLVED",
+                "values_source_letter_serial_must_equal_letter_serial_and_canonical_letter_serial_for_revision_or_restatement",
+                "if_canonical_row_from_revision_or_restatement_then_available_at_is_that_exact_LetterSerial_PublishDateTime",
+                "if_exact_source_version_identifiers_unbound_then_available_at_null_cutoff_UNRESOLVED",
                 "multi_document_predictor_row_requires_separate_adjudication",
             ],
             "multi_document_reason_code": REASON_MULTI_DOCUMENT,
@@ -782,13 +912,21 @@ def build_operationalization_contract() -> dict:
                 "persian_digits_to_ascii",
                 "jalali_to_gregorian_via_project_canonical_jdatetime",
                 "source_local_timezone_Asia_Tehran_via_zoneinfo",
+                "utc_round_trip_fold0_and_fold1_wall_time_classification",
                 "timezone_aware_datetime_required",
                 "convert_to_UTC",
                 "ISO-8601_UTC_output",
             ],
+            "wall_time_classification": {
+                "neither_fold_round_trips": REASON_NONEXISTENT_LOCAL,
+                "both_folds_round_trip_different_utc": REASON_AMBIGUOUS_LOCAL,
+                "exactly_one_fold_round_trips": "valid_use_that_fold",
+                "both_folds_round_trip_same_instant": "valid_non_ambiguous",
+            },
             "forbidden": [
                 "fixed_offset_plus_0330_for_all_years",
                 "naive_datetime_as_available_at",
+                "classify_nonexistent_spring_forward_as_ambiguous",
             ],
             "fail_closed_to_null": [
                 "malformed_jalali_date",
@@ -801,6 +939,7 @@ def build_operationalization_contract() -> dict:
             ],
             "timezone": TEHRAN_TZ_NAME,
             "calendar_library": "jdatetime",
+            "calendar_library_pin": "jdatetime==6.0.1",
         },
         "implementation_scope": {
             "allowed": [
@@ -864,6 +1003,9 @@ def build_decision_lock_record(contract: dict) -> dict:
             "sent_datetime_is_available_at": False,
             "exact_document_binding_required": True,
             "each_letter_serial_independent_version": True,
+            "normalized_revision_status_enum": sorted(NORMALIZED_REVISION_STATUS),
+            "exact_values_source_serial_binding_authoritative": True,
+            "tehran_wall_time_utc_round_trip_classification": True,
             "timezone": TEHRAN_TZ_NAME,
             "multi_document_reason_code": REASON_MULTI_DOCUMENT,
         },
@@ -922,6 +1064,40 @@ canonical source version.
 - `SentDateTime` may be publisher-send time and does not prove public availability
 - more conservative / leakage-safe than `SentDateTime`
 - methodological operationalization lock — not inference from local filenames/mtimes
+
+## Normalized revision vocabulary
+
+Normalized `revision_status` matches the frozen provenance schema enum only:
+
+```text
+original
+revision
+restatement
+```
+
+`correction` is **not** a normalized status. CODAL «اصلاحیه» may be retained in
+`revision_status_raw`; it maps to normalized `revision` only when that mapping is
+explicit. `restatement` is used only when source/version evidence supports it.
+Missing/unclassifiable status → `UNRESOLVED`.
+
+## Exact source-version binding
+
+Authoritative structural checks (boolean flags cannot bypass):
+
+- non-empty `letter_serial` and `canonical_letter_serial` with exact equality
+- if `canonical_tracing_no` is present, `tracing_no` must be present and equal
+- non-empty official titles on both sides with exact equality
+- for `revision` / `restatement`:
+  `values_source_letter_serial == letter_serial == canonical_letter_serial`
+- official URL and raw payload/snapshot hash present
+
+## Asia/Tehran wall time
+
+Jalali CODAL timestamps are classified with UTC round-trips over `fold=0` and
+`fold=1` (`zoneinfo` `Asia/Tehran`). Nonexistent spring-forward times are
+`nonexistent_local_time` (not ambiguous). Ambiguous fall-back times without a
+deterministic fold rule are
+`ambiguous_local_time_without_deterministic_rule`. No fixed `+03:30`.
 
 ## Non-claims
 
@@ -1121,8 +1297,45 @@ def _synth_qc_checks() -> list[tuple[str, bool, str]]:
          "incomplete_pagination_without_canonical_letter_serial"),
         ("synth_unknown_revision_unresolved",
          {"revision_status": "unknown"}, "unknown_revision_status"),
+        ("synth_correction_not_normalized_status",
+         {"revision_status": "correction"}, "unknown_revision_status"),
         ("synth_multi_document_unresolved",
          {"multi_document_predictor_row": True}, REASON_MULTI_DOCUMENT),
+        ("synth_missing_canonical_letter_serial",
+         {"canonical_letter_serial": None}, REASON_MISSING_CANONICAL_LETTER_SERIAL),
+        ("synth_letter_serial_mismatch",
+         {"letter_serial": "A1", "canonical_letter_serial": "B2",
+          "values_source_letter_serial": "A1",
+          "candidate_letter_serials": ["A1"]},
+         "letter_serial_mismatch"),
+        ("synth_missing_required_tracing_no",
+         {"tracing_no": None, "canonical_tracing_no": "T-9"},
+         REASON_MISSING_REQUIRED_TRACING_NO),
+        ("synth_tracing_no_mismatch",
+         {"tracing_no": "T-1", "canonical_tracing_no": "T-9"},
+         "tracing_no_mismatch"),
+        ("synth_revision_values_source_serial_differs",
+         {"revision_status": "revision",
+          "revision_status_raw": CODAL_ESLAHIYE_RAW,
+          "letter_serial": "REV9",
+          "canonical_letter_serial": "REV9",
+          "candidate_letter_serials": ["REV9"],
+          "values_source_letter_serial": "ORIG1"},
+         REASON_VALUES_SOURCE_SERIAL_MISMATCH),
+        ("synth_restatement_values_source_serial_differs",
+         {"revision_status": "restatement",
+          "letter_serial": "RST9",
+          "canonical_letter_serial": "RST9",
+          "candidate_letter_serials": ["RST9"],
+          "values_source_letter_serial": "ORIG1"},
+         REASON_VALUES_SOURCE_SERIAL_MISMATCH),
+        ("synth_boolean_cannot_bypass_serial_mismatch",
+         {"letter_serial": "A1", "canonical_letter_serial": "B2",
+          "values_source_letter_serial": "A1",
+          "candidate_letter_serials": ["A1"],
+          "canonical_source_version_bound": True,
+          "publish_of_original_used_for_correction_values": False},
+         "letter_serial_mismatch"),
     ]
     for name, overrides, needle in cases:
         res = resolve_operational_available_at(
@@ -1138,16 +1351,17 @@ def _synth_qc_checks() -> list[tuple[str, bool, str]]:
             str(res.reasons),
         ))
 
-    # 21) exact revision binding
+    # Exact revision / restatement / original bindings
     rev = resolve_operational_available_at(
         publish_datetime_raw="1400/02/01 11:00:00",
         sent_datetime_raw=None,
         binding=synthetic_valid_binding(
-            revision_status="correction",
-            letter_serial="CORR9",
-            canonical_letter_serial="CORR9",
-            candidate_letter_serials=["CORR9"],
-            values_from_revision_serial="CORR9",
+            revision_status="revision",
+            revision_status_raw=CODAL_ESLAHIYE_RAW,
+            letter_serial="REV9",
+            canonical_letter_serial="REV9",
+            candidate_letter_serials=["REV9"],
+            values_source_letter_serial="REV9",
             canonical_source_version_bound=True,
         ),
     )
@@ -1157,23 +1371,123 @@ def _synth_qc_checks() -> list[tuple[str, bool, str]]:
         str(rev.available_at),
     ))
 
-    # 22) correction values cannot use original publication cutoff
-    bad_corr = resolve_operational_available_at(
+    rest = resolve_operational_available_at(
+        publish_datetime_raw="1400/02/01 11:00:00",
+        sent_datetime_raw=None,
+        binding=synthetic_valid_binding(
+            revision_status="restatement",
+            letter_serial="RST9",
+            canonical_letter_serial="RST9",
+            candidate_letter_serials=["RST9"],
+            values_source_letter_serial="RST9",
+        ),
+    )
+    checks.append((
+        "synth_exact_restatement_binding",
+        rest.available_at is not None and rest.source_field == "PublishDateTime",
+        str(rest.available_at),
+    ))
+
+    checks.append((
+        "synth_exact_original_binding",
+        r.available_at is not None and r.source_field == "PublishDateTime",
+        str(r.available_at),
+    ))
+
+    # Explicit اصلاحیه → revision mapping (test-backed); never silent restatement.
+    mapped = explicit_normalized_revision_for_codal_eslahiye(
+        revision_status_raw=CODAL_ESLAHIYE_RAW,
+        map_eslahiye_to_revision=True,
+    )
+    unmapped = explicit_normalized_revision_for_codal_eslahiye(
+        revision_status_raw=CODAL_ESLAHIYE_RAW,
+        map_eslahiye_to_revision=False,
+    )
+    checks.append((
+        "synth_eslahiye_explicit_map_to_revision",
+        mapped == "revision" and unmapped is None,
+        f"mapped={mapped} unmapped={unmapped}",
+    ))
+
+    # Historical Tehran gap / fold classification (Gregorian walls → Jalali via jdatetime)
+    gap_jalali = jalali_string_from_tehran_gregorian_wall(2021, 3, 22, 0, 0, 0)
+    fold_jalali = jalali_string_from_tehran_gregorian_wall(2021, 9, 21, 23, 0, 0)
+    pre_gap = jalali_string_from_tehran_gregorian_wall(2021, 3, 21, 23, 0, 0)
+    post_gap = jalali_string_from_tehran_gregorian_wall(2021, 3, 22, 1, 0, 0)
+    post_dst = jalali_string_from_tehran_gregorian_wall(2024, 3, 22, 0, 0, 0)
+    p_gap = parse_codal_publish_datetime(gap_jalali)
+    p_fold = parse_codal_publish_datetime(fold_jalali)
+    p_pre = parse_codal_publish_datetime(pre_gap)
+    p_post = parse_codal_publish_datetime(post_gap)
+    p_abolition = parse_codal_publish_datetime(post_dst)
+    checks.append((
+        "synth_historical_nonexistent_tehran_time",
+        isinstance(p_gap, TimestampParseFailure)
+        and p_gap.reason == REASON_NONEXISTENT_LOCAL,
+        f"{gap_jalali}->{getattr(p_gap, 'reason', p_gap)}",
+    ))
+    checks.append((
+        "synth_historical_ambiguous_tehran_time",
+        isinstance(p_fold, TimestampParseFailure)
+        and p_fold.reason == REASON_AMBIGUOUS_LOCAL,
+        f"{fold_jalali}->{getattr(p_fold, 'reason', p_fold)}",
+    ))
+    checks.append((
+        "synth_pre_transition_timestamp_resolves",
+        isinstance(p_pre, NormalizedTimestamp),
+        getattr(p_pre, "utc_iso8601", str(p_pre)),
+    ))
+    checks.append((
+        "synth_post_transition_timestamp_resolves",
+        isinstance(p_post, NormalizedTimestamp),
+        getattr(p_post, "utc_iso8601", str(p_post)),
+    ))
+    checks.append((
+        "synth_post_dst_abolition_no_fabricated_fold",
+        isinstance(p_abolition, NormalizedTimestamp)
+        and p_abolition.local_tehran.fold == 0,
+        getattr(p_abolition, "utc_iso8601", str(p_abolition)),
+    ))
+    gap_res = resolve_operational_available_at(
+        publish_datetime_raw=gap_jalali,
+        sent_datetime_raw=None,
+        binding=ok_bind,
+    )
+    fold_res = resolve_operational_available_at(
+        publish_datetime_raw=fold_jalali,
+        sent_datetime_raw=None,
+        binding=ok_bind,
+    )
+    checks.append((
+        "synth_gap_fold_failures_null_available_at",
+        gap_res.available_at is None
+        and fold_res.available_at is None
+        and REASON_NONEXISTENT_LOCAL in gap_res.reasons
+        and REASON_AMBIGUOUS_LOCAL in fold_res.reasons,
+        f"gap={gap_res.reasons} fold={fold_res.reasons}",
+    ))
+
+    # Redundant audit flag still fails closed, but Serial equality is authoritative.
+    bad_audit = resolve_operational_available_at(
         publish_datetime_raw="1400/01/01 10:00:00",
         sent_datetime_raw=None,
         binding=synthetic_valid_binding(
-            revision_status="correction",
+            revision_status="revision",
+            revision_status_raw=CODAL_ESLAHIYE_RAW,
+            letter_serial="REV9",
+            canonical_letter_serial="REV9",
+            candidate_letter_serials=["REV9"],
+            values_source_letter_serial="REV9",
             publish_of_original_used_for_correction_values=True,
         ),
     )
     checks.append((
-        "synth_correction_cannot_use_original",
-        bad_corr.available_at is None
-        and REASON_CORRECTION_USES_ORIGINAL in bad_corr.reasons,
-        str(bad_corr.reasons),
+        "synth_redundant_audit_flag_still_fail_closed",
+        bad_audit.available_at is None
+        and REASON_CORRECTION_USES_ORIGINAL in bad_audit.reasons,
+        str(bad_audit.reasons),
     ))
 
-    # 25) no actual pilot row assignment
     checks.append((
         "synth_no_pilot_row_assignment",
         r.real_pilot_row_assigned is False,
@@ -1251,9 +1565,41 @@ def build_qc_assertions(
         "fixed_offset_plus_0330_for_all_years"
         in contract["timezone_and_normalization"]["forbidden"],
         "no fixed +03:30")
+    rev_pol = contract["source_version_and_revision_policy"]
+    add("normalized_revision_enum_matches_frozen_provenance_schema",
+        rev_pol.get("normalized_revision_status_enum")
+        == sorted(NORMALIZED_REVISION_STATUS)
+        and rev_pol.get("normalized_revision_status_matches_frozen_provenance_schema")
+        is True,
+        str(rev_pol.get("normalized_revision_status_enum")))
+    add("correction_not_emitted_as_normalized_revision_status",
+        rev_pol.get("correction_is_not_a_normalized_revision_status") is True
+        and "correction" not in set(rev_pol.get("normalized_revision_status_enum") or []),
+        "correction excluded")
+    add("exact_values_source_serial_binding",
+        rev_pol.get("exact_values_source_serial_binding_authoritative") is True
+        and REASON_VALUES_SOURCE_SERIAL_MISMATCH in BINDING_FAIL_REASONS,
+        REASON_VALUES_SOURCE_SERIAL_MISMATCH)
+    add("missing_canonical_serial_rejected",
+        REASON_MISSING_CANONICAL_LETTER_SERIAL in BINDING_FAIL_REASONS,
+        REASON_MISSING_CANONICAL_LETTER_SERIAL)
+    add("missing_required_tracing_no_rejected",
+        REASON_MISSING_REQUIRED_TRACING_NO in BINDING_FAIL_REASONS,
+        REASON_MISSING_REQUIRED_TRACING_NO)
+    add("canonical_jdatetime_pin_documented",
+        contract["timezone_and_normalization"].get("calendar_library_pin")
+        == "jdatetime==6.0.1",
+        str(contract["timezone_and_normalization"].get("calendar_library_pin")))
+    try:
+        from importlib.metadata import version as _pkg_version
+        _jd_ver = _pkg_version("jdatetime")
+    except Exception as exc:  # pragma: no cover - environment contract
+        _jd_ver = f"unavailable:{exc}"
+    add("canonical_jdatetime_runtime_pin",
+        _jd_ver == "6.0.1",
+        f"jdatetime=={_jd_ver}")
     add("multi_document_reason_locked",
-        contract["source_version_and_revision_policy"]["multi_document_reason_code"]
-        == REASON_MULTI_DOCUMENT,
+        rev_pol["multi_document_reason_code"] == REASON_MULTI_DOCUMENT,
         REASON_MULTI_DOCUMENT)
     add("frozen_cut_a_unchanged",
         contract.get("frozen_cut_a_unchanged") is True, "unchanged")
