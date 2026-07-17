@@ -1,0 +1,183 @@
+{
+  "contract_version": "stage125_part3b1a_v1",
+  "decision_id": "cut_a_available_at_operationalization",
+  "exact_document_binding_required": {
+    "fail_closed": [
+      "subsidiary_only_title",
+      "entity_ambiguity",
+      "consolidated_separate_ambiguity",
+      "annual_interim_ambiguity",
+      "multiple_candidate_letters",
+      "incomplete_pagination_without_canonical_letter_serial",
+      "source_filename_only_match",
+      "ticker_year_only_match",
+      "title_only_match",
+      "missing_letter_serial",
+      "missing_canonical_letter_serial",
+      "missing_required_tracing_no",
+      "values_source_letter_serial_mismatch",
+      "missing_official_title",
+      "unknown_revision_status",
+      "canonical_source_version_not_provably_bound",
+      "ticker_mismatch",
+      "entity_mismatch",
+      "fiscal_year_mismatch",
+      "fiscal_year_end_mismatch",
+      "interim_statement",
+      "unaudited_statement",
+      "parent_company_identity_mismatch",
+      "statement_scope_mismatch",
+      "separate_scope_required_but_not_met",
+      "letter_code_mismatch",
+      "letter_serial_mismatch",
+      "tracing_no_mismatch",
+      "official_title_mismatch",
+      "missing_public_codal_url",
+      "missing_raw_payload_or_snapshot_hash"
+    ],
+    "must_all_hold": [
+      "canonical_ticker_exact_match",
+      "legal_entity_exact_match",
+      "predictor_fiscal_year_exact_match",
+      "fiscal_year_end_exact_match",
+      "annual_statement_not_interim",
+      "audited_statement",
+      "parent_company_identity",
+      "statement_scope_compatible_with_canonical_row",
+      "separate_non_consolidated_when_canonical_requires",
+      "letter_code_compatible",
+      "exact_letter_serial",
+      "exact_canonical_letter_serial",
+      "letter_serial_equals_canonical_letter_serial",
+      "exact_tracing_no_when_canonical_tracing_no_present",
+      "exact_official_title_nonempty_both_sides",
+      "normalized_revision_status_in_frozen_provenance_enum",
+      "values_source_letter_serial_equals_bound_serial_for_revision_or_restatement",
+      "public_codal_url_recorded",
+      "raw_payload_or_snapshot_hash_bound"
+    ]
+  },
+  "frozen_cut_a_unchanged": true,
+  "implementation_scope": {
+    "allowed": [
+      "schema",
+      "contracts",
+      "pure_parsers",
+      "synthetic_validators"
+    ],
+    "forbidden": [
+      "codal_network",
+      "tsetmc_network",
+      "cbi_network",
+      "real_timestamp_assignment_to_pilot_pairs",
+      "mutation_of_prediction_cutoff_audit_stage125_part2_csv",
+      "dataset_mutation",
+      "candidate_or_pair_evidence_capture",
+      "real_data_extraction",
+      "accessibility_scoring",
+      "real_gate_application",
+      "candidate_admit_reject",
+      "part3b_completion",
+      "stage126",
+      "modeling"
+    ],
+    "local_cache_must_not_become_real_row_admission": true,
+    "local_cache_read_only_for_regression_vocabulary": true
+  },
+  "maintenance_task_id": "stage125-part3b1a-cut-a-available-at-operationalization-lock",
+  "network_access_authorized": false,
+  "operational_available_at": {
+    "definition": "PublishDateTime of the exact matched official CODAL LetterSerial/version for the predictor-year financial statement.",
+    "mapping_allowed_only_when": "official document is exactly bound to the predictor row and the canonical source version",
+    "selection_rationale": [
+      "PublishDateTime is the operational public-release timestamp in this project",
+      "SentDateTime may be publisher-send time and does not prove public availability",
+      "PublishDateTime is more conservative / leakage-safe than SentDateTime",
+      "This is a locked methodological operationalization, not inference from local filenames or local cache mtimes"
+    ],
+    "sent_datetime_policy": {
+      "allowed_uses": [
+        "audit",
+        "comparison"
+      ],
+      "even_when_equal_to_publish": "mapping_still_uses_PublishDateTime_only",
+      "forbidden_uses": [
+        "cutoff",
+        "public_availability",
+        "prediction_time_gate"
+      ],
+      "preserve_raw": true,
+      "sent_datetime_is_available_at": false
+    },
+    "source_field": "PublishDateTime"
+  },
+  "option_id": "CUT-A",
+  "parent_cutoff_contract": "part3b1_cutoff_available_at_contract_stage125.json",
+  "real_available_at_assignment_authorized": false,
+  "real_cutoff_resolution_authorized": false,
+  "source_version_and_revision_policy": {
+    "boolean_flags_cannot_bypass_identifier_mismatch": true,
+    "codal_eslahiye_maps_to_revision_only_when_explicit": true,
+    "codal_eslahiye_raw_field": "revision_status_raw",
+    "correction_is_not_a_normalized_revision_status": true,
+    "each_letter_serial_is_independent_version": true,
+    "exact_values_source_serial_binding_authoritative": true,
+    "frozen_cut_a_without_new_decision": true,
+    "missing_or_unclassifiable_revision_status_is_unresolved": true,
+    "multi_document_reason_code": "multi_document_predictor_row_requires_separate_adjudication",
+    "no_new_earliest_or_max_rule_invented": true,
+    "normalized_revision_status_enum": [
+      "original",
+      "restatement",
+      "revision"
+    ],
+    "normalized_revision_status_matches_frozen_provenance_schema": true,
+    "publish_of_original_used_for_correction_values_is_redundant_audit_only": true,
+    "restatement_only_when_source_version_evidence_supports": true,
+    "rules": [
+      "original_revision_restatement_never_overwrite_each_other",
+      "each_version_has_independent_provenance_record",
+      "cutoff_taken_only_from_version_that_supplied_canonical_predictor_values",
+      "values_source_letter_serial_must_equal_letter_serial_and_canonical_letter_serial_for_revision_or_restatement",
+      "if_canonical_row_from_revision_or_restatement_then_available_at_is_that_exact_LetterSerial_PublishDateTime",
+      "if_exact_source_version_identifiers_unbound_then_available_at_null_cutoff_UNRESOLVED",
+      "multi_document_predictor_row_requires_separate_adjudication"
+    ]
+  },
+  "synthetic_validation_only": true,
+  "timezone_and_normalization": {
+    "calendar_library": "jdatetime",
+    "calendar_library_pin": "jdatetime==6.0.1",
+    "fail_closed_to_null": [
+      "malformed_jalali_date",
+      "invalid_time",
+      "nonexistent_local_time",
+      "ambiguous_local_time_without_deterministic_documented_rule",
+      "missing_timezone_library_or_data",
+      "naive_datetime",
+      "impossible_calendar_conversion"
+    ],
+    "forbidden": [
+      "fixed_offset_plus_0330_for_all_years",
+      "naive_datetime_as_available_at",
+      "classify_nonexistent_spring_forward_as_ambiguous"
+    ],
+    "raw_preserved_format": "YYYY/MM/DD HH:MM:SS Persian digits Jalali",
+    "steps": [
+      "persian_digits_to_ascii",
+      "jalali_to_gregorian_via_project_canonical_jdatetime",
+      "source_local_timezone_Asia_Tehran_via_zoneinfo",
+      "utc_round_trip_fold0_and_fold1_wall_time_classification",
+      "timezone_aware_datetime_required",
+      "convert_to_UTC",
+      "ISO-8601_UTC_output"
+    ],
+    "timezone": "Asia/Tehran",
+    "wall_time_classification": {
+      "both_folds_round_trip_different_utc": "ambiguous_local_time_without_deterministic_rule",
+      "both_folds_round_trip_same_instant": "valid_non_ambiguous",
+      "exactly_one_fold_round_trips": "valid_use_that_fold",
+      "neither_fold_round_trips": "nonexistent_local_time"
+    }
+  }
+}

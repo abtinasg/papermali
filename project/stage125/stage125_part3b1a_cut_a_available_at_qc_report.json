@@ -1,0 +1,497 @@
+{
+  "accessibility_scoring_applied": false,
+  "all_pass": true,
+  "assertion_count": 79,
+  "assertions": [
+    {
+      "assertion": "baseline_commit_constant",
+      "detail": "3a54a79c935f27e311679e8582e4c46330590a43",
+      "status": "PASS"
+    },
+    {
+      "assertion": "decision_lock_only",
+      "detail": "cut_a_available_at_operationalization_locked_contracts_only",
+      "status": "PASS"
+    },
+    {
+      "assertion": "cut_a_available_at_operationalization_locked",
+      "detail": "locked",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3b1_decision_locked_preserved",
+      "detail": "preserved",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3b_started_preserved",
+      "detail": "preserved",
+      "status": "PASS"
+    },
+    {
+      "assertion": "predictor_available_at_evidence_collected_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pilot_cutoff_provenance_resolved_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "candidate_value_evidence_collected_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pair_level_evidence_collected_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "data_value_extraction_performed_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "accessibility_scoring_applied_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3b_completed_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "modeling_started_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "zero_network_calls",
+      "detail": "calls=0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "zero_real_available_at_assignments",
+      "detail": "0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "zero_resolved_pilot_cutoffs",
+      "detail": "0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "publish_is_source_field",
+      "detail": "PublishDateTime",
+      "status": "PASS"
+    },
+    {
+      "assertion": "sent_not_availability",
+      "detail": "sent!=available_at",
+      "status": "PASS"
+    },
+    {
+      "assertion": "timezone_asia_tehran",
+      "detail": "Asia/Tehran",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_fixed_offset_all_years",
+      "detail": "no fixed +03:30",
+      "status": "PASS"
+    },
+    {
+      "assertion": "normalized_revision_enum_matches_frozen_provenance_schema",
+      "detail": "['original', 'restatement', 'revision']",
+      "status": "PASS"
+    },
+    {
+      "assertion": "correction_not_emitted_as_normalized_revision_status",
+      "detail": "correction excluded",
+      "status": "PASS"
+    },
+    {
+      "assertion": "exact_values_source_serial_binding",
+      "detail": "values_source_letter_serial_mismatch",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing_canonical_serial_rejected",
+      "detail": "missing_canonical_letter_serial",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing_required_tracing_no_rejected",
+      "detail": "missing_required_tracing_no",
+      "status": "PASS"
+    },
+    {
+      "assertion": "canonical_jdatetime_pin_documented",
+      "detail": "jdatetime==6.0.1",
+      "status": "PASS"
+    },
+    {
+      "assertion": "canonical_jdatetime_runtime_pin",
+      "detail": "jdatetime==6.0.1",
+      "status": "PASS"
+    },
+    {
+      "assertion": "multi_document_reason_locked",
+      "detail": "multi_document_predictor_row_requires_separate_adjudication",
+      "status": "PASS"
+    },
+    {
+      "assertion": "frozen_cut_a_unchanged",
+      "detail": "unchanged",
+      "status": "PASS"
+    },
+    {
+      "assertion": "research_pointers_unchanged",
+      "detail": "research pointers fixed",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_part3b2",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_stage126",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synthetic_validation_only",
+      "detail": "synthetic",
+      "status": "PASS"
+    },
+    {
+      "assertion": "network_not_authorized",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "frozen_scientific_present",
+      "detail": "n=15",
+      "status": "PASS"
+    },
+    {
+      "assertion": "content_exact_allowlist",
+      "detail": "keys=['README_STAGE125_PART3B1A_CUT_A_AVAILABLE_AT_LOCK.md', 'part3b1a_cut_a_available_at_decision_lock_stage125.json', 'part3b1a_cut_a_available_at_operationalization_contract_stage125.json']",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_part3b2_or_stage126_surfaces",
+      "detail": "forbidden=[]",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_publish_mapping_success",
+      "detail": "available_at=2021-04-04T06:00:00Z",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_sent_never_availability",
+      "detail": "('sent_datetime_must_never_be_availability',)",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_equal_still_publish",
+      "detail": "PublishDateTime",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_sent_before_publish_uses_publish",
+      "detail": "sent_before_publish",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_sent_after_publish_unresolved",
+      "detail": "('sent_datetime_after_publish_datetime_inconsistency',)",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_malformed_null",
+      "detail": "('malformed_publish_datetime',)",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_missing_null",
+      "detail": "('missing_publish_datetime',)",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_persian_digit_normalization",
+      "detail": "2021-04-04T06:00:00Z",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_jalali_conversion",
+      "detail": "2021-03-21T08:30:00Z",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_historical_tehran_timezone",
+      "detail": "winter/summer offsets differ",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_naive_datetime_rejected",
+      "detail": "naive rejected",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_subsidiary_rejected",
+      "detail": "('exact_document_binding_failed', 'subsidiary_only_title')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_interim_rejected",
+      "detail": "('exact_document_binding_failed', 'interim_statement')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_unaudited_rejected",
+      "detail": "('exact_document_binding_failed', 'unaudited_statement')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_fye_mismatch_rejected",
+      "detail": "('exact_document_binding_failed', 'fiscal_year_end_mismatch')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_ticker_mismatch_rejected",
+      "detail": "('exact_document_binding_failed', 'ticker_mismatch')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_entity_mismatch_rejected",
+      "detail": "('exact_document_binding_failed', 'entity_mismatch')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_scope_mismatch_rejected",
+      "detail": "('exact_document_binding_failed', 'statement_scope_mismatch', 'separate_scope_required_but_not_met')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_multiple_letterserial_unresolved",
+      "detail": "('exact_document_binding_failed', 'multiple_candidate_letters', 'multiple_letter_serial_candidates')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_incomplete_cache_unresolved",
+      "detail": "('exact_document_binding_failed', 'missing_letter_serial', 'missing_canonical_letter_serial', 'incomplete_pagination_without_canonical_letter_serial', 'incomplete_cache_without_canonical_letter_serial')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_unknown_revision_unresolved",
+      "detail": "('exact_document_binding_failed', 'unknown_revision_status')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_correction_not_normalized_status",
+      "detail": "('exact_document_binding_failed', 'unknown_revision_status')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_multi_document_unresolved",
+      "detail": "('exact_document_binding_failed', 'multi_document_predictor_row_requires_separate_adjudication')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_missing_canonical_letter_serial",
+      "detail": "('exact_document_binding_failed', 'missing_canonical_letter_serial')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_letter_serial_mismatch",
+      "detail": "('exact_document_binding_failed', 'letter_serial_mismatch')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_missing_required_tracing_no",
+      "detail": "('exact_document_binding_failed', 'missing_required_tracing_no')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_tracing_no_mismatch",
+      "detail": "('exact_document_binding_failed', 'tracing_no_mismatch')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_revision_values_source_serial_differs",
+      "detail": "('exact_document_binding_failed', 'values_source_letter_serial_mismatch')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_restatement_values_source_serial_differs",
+      "detail": "('exact_document_binding_failed', 'values_source_letter_serial_mismatch')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_boolean_cannot_bypass_serial_mismatch",
+      "detail": "('exact_document_binding_failed', 'letter_serial_mismatch')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_exact_revision_binding",
+      "detail": "2021-04-21T06:30:00Z",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_exact_restatement_binding",
+      "detail": "2021-04-21T06:30:00Z",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_exact_original_binding",
+      "detail": "2021-04-04T06:00:00Z",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_eslahiye_explicit_map_to_revision",
+      "detail": "mapped=revision unmapped=None",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_historical_nonexistent_tehran_time",
+      "detail": "1400/01/02 00:00:00->nonexistent_local_time",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_historical_ambiguous_tehran_time",
+      "detail": "1400/06/30 23:00:00->ambiguous_local_time_without_deterministic_rule",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_pre_transition_timestamp_resolves",
+      "detail": "2021-03-21T19:30:00Z",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_post_transition_timestamp_resolves",
+      "detail": "2021-03-21T20:30:00Z",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_post_dst_abolition_no_fabricated_fold",
+      "detail": "2024-03-21T20:30:00Z",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_gap_fold_failures_null_available_at",
+      "detail": "gap=('nonexistent_local_time',) fold=('ambiguous_local_time_without_deterministic_rule',)",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_redundant_audit_flag_still_fail_closed",
+      "detail": "('exact_document_binding_failed', 'correction_values_cannot_use_original_publication_cutoff')",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_no_pilot_row_assignment",
+      "detail": "real_pilot_row_assigned=false",
+      "status": "PASS"
+    }
+  ],
+  "baseline_commit": "3a54a79c935f27e311679e8582e4c46330590a43",
+  "candidate_value_evidence_collected": false,
+  "current_stage": "Stage125",
+  "cut_a_available_at_operationalization_locked": true,
+  "data_value_extraction_performed": false,
+  "decision_lock_only": true,
+  "decision_lock_version": "stage125_part3b1a_v1",
+  "endpoint_probe_evidence_collected": true,
+  "evidence_collected": true,
+  "failed_count": 0,
+  "frozen_scientific_sha256": {
+    "project/stage125/data_dictionary_stage125.csv": "ed3d0593fe8456842841be0286285ecfe076f5349b54f0bd6bdf664cc77a759d",
+    "project/stage125/feature_availability_contract_stage125_part2.json": "b97593ed46fa2440b66cafd6a3752300177df4773cbdcf45b3126872d3c200a3",
+    "project/stage125/leakage_checklist_stage125_part2.json": "fab951e12a7ecdc280b74e865e3d5fa9bd4378b04441deb9773ac10a167612a7",
+    "project/stage125/part3_candidate_inventory_stage125.csv": "4bd5f6a71ecf0e1f74866a64a3774e51340729f4188ae2784f1d90db07e7032f",
+    "project/stage125/part3a_approved_gate_thresholds_stage125.csv": "11c7efe5f242ab8e4a4f7b1955fb25d48e288249f7a1ce4c6bf1713dbf117d20",
+    "project/stage125/part3a_decision_lock_stage125.json": "475c82b3483ef18ff19aea2268f65527ca87c9441603622bd1952bd21f18f35e",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv": "9a441b5e3696353967489b356d0ff48cf7cbea276aeea5018be6edc8368b40f5",
+    "project/stage125/part3b1_cutoff_available_at_contract_stage125.json": "3966addbf4f2768e139c55ff7eef7ac7b11aafa717bf7024cf115fdf956f72b2",
+    "project/stage125/part3b1_decision_lock_stage125.json": "3a7b62b19640dd648bdde15112e44f1d79f6e663007dc2ab8bd0a94d1c82c8d4",
+    "project/stage125/part3b_verified_endpoint_registry_stage125.csv": "3d36eca0a0a63ef406ec48ef1bcf78ecbe2ce99ce24a6e8804c2b9c3ffb431b7",
+    "project/stage125/prediction_cutoff_audit_stage125_part2.csv": "d50e6617b011a7818d972de8e5c8a862a45f73fb07a0a22cdb5c9f59b6dc88f0",
+    "project/stage125/prediction_time_contract_stage125_part2.json": "9bd40b4832302fb2c9c890b99b06f3b47bcfee2c07d065416f8776e7e0046a89",
+    "project/stage125/source_registry_stage125.csv": "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c",
+    "project/stage125/stage125_part3b1_decision_lock_qc_report.json": "425b9bf2948ae3cbe46c5fec63bb38e959b0ee6a5f76801bf1c1875cc1ff69a1",
+    "project/stage125/stage125_part3b_evidence_capture_qc_report.json": "c683375f3afe8c2d1a757898122e601f36c145be2b8c69be7ba9b4b781b0f92d"
+  },
+  "generated_at": "2026-07-17T23:06:37+03:00",
+  "maintenance_task_id": "stage125-part3b1a-cut-a-available-at-operationalization-lock",
+  "modeling_started": false,
+  "network_extraction_performed": true,
+  "no_modeling": true,
+  "no_part3b_completion": true,
+  "output_sha256": {
+    "README_STAGE125_PART3B1A_CUT_A_AVAILABLE_AT_LOCK.md": "a03bac69596bcadc51514f2a8b4aa2ce4522b3798b5229abe67b946da039e8be",
+    "part3b1a_cut_a_available_at_decision_lock_stage125.json": "dc66630e95f9b02359453c4857792fa06ea32b9cecdbe9e71b5985e2027b1853",
+    "part3b1a_cut_a_available_at_operationalization_contract_stage125.json": "8a453fe5b9453df7d3787e00ce4b4f97b679050cf05eeab9171191fc65a54b27"
+  },
+  "pair_level_evidence_collected": false,
+  "part3a_decision_locked": true,
+  "part3a_protocol_locked": true,
+  "part3b0_readiness": true,
+  "part3b1_decision_locked": true,
+  "part3b1a_network_calls_attempted": 0,
+  "part3b2_started": false,
+  "part3b_completed": false,
+  "part3b_started": true,
+  "pilot_cutoff_provenance_resolved": false,
+  "predictor_available_at_evidence_collected": false,
+  "research_pointers": {
+    "last_completed_research_action_id": "stage125-part3a-decision-lock",
+    "next_research_action_id": "stage125-part3b-evidence-capture"
+  },
+  "source_commit": "efeeae9091b792da1e0a433d629c57416e48fb5d",
+  "source_file_sha256": "199e0fcb27f136c0a5e30ff4ce2f88ac88fc10498805e952b1a7f7b5f4952b4f",
+  "stage": "stage125_part3b1a_cut_a_available_at_operationalization_lock",
+  "stage126_started": false,
+  "synthetic_validation_only": true,
+  "test_file_sha256": "64347b66f1f28e80382a4e096e95862c04c9753c5df58a171c0b610ed828a09c",
+  "ticker_count": 26,
+  "tickers": [
+    "اردستان",
+    "اپال",
+    "بالبر",
+    "بترانس",
+    "بموتو",
+    "بوعلی",
+    "بکاب",
+    "بکام",
+    "تپمپی",
+    "تکمبا",
+    "ثنوسا",
+    "حپترو",
+    "حکشتی",
+    "خاذین",
+    "خبهمن",
+    "ختوقا",
+    "خرینگ",
+    "خمهر",
+    "خنصیر",
+    "دروز",
+    "ذوب",
+    "سدور",
+    "سیلام",
+    "شپارس",
+    "فاذر",
+    "لبوتان"
+  ],
+  "zero_accessibility_scores": true,
+  "zero_candidate_values": true,
+  "zero_gate_admissions": true,
+  "zero_network_calls": true,
+  "zero_pair_values": true,
+  "zero_real_available_at_assignments": true,
+  "zero_resolved_pilot_cutoffs": true
+}

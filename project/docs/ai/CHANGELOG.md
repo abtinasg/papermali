@@ -3,6 +3,32 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-17
+
+- **Stage125 Part 3B.1A hardening (PR #41, maintenance).** Normalized
+  `revision_status` aligned to frozen provenance enum
+  (`original`/`revision`/`restatement`; `correction` removed as normalized
+  status). Exact values-source LetterSerial / TracingNo / title binding is
+  structural and authoritative. Asia/Tehran gap vs fold classification uses UTC
+  round-trips (nonexistent ≠ ambiguous). Canonical runtime
+  `Python 3.13.5` + `jdatetime==6.0.1`. Still **no** network, real assignment,
+  cutoff recovery, extraction, scoring, Part 3B.2, Stage126, or modeling.
+  Research pointers unchanged.
+
+- **Stage125 Part 3B.1A — CUT-A Available-at Operationalization Lock
+  (maintenance).** Tracked as
+  `stage125-part3b1a-cut-a-available-at-operationalization-lock` (advances **no**
+  research action). Baseline: `origin/main` @
+  `3a54a79c935f27e311679e8582e4c46330590a43`. Locks operational `available_at` =
+  `PublishDateTime` of an exact version-bound CODAL letter; `SentDateTime`
+  audit-only; exact-document binding + revision + `Asia/Tehran` normalization
+  fail-closed. Schema/pure parsers/synthetic validation only. **No** network,
+  **no** real `available_at` assignment, **no** cutoff resolution, **no**
+  extraction/scoring, **no** Part 3B.2 / Stage126 / modeling. Marker
+  `cut_a_available_at_operationalization_locked=true`. Research pointers remain
+  `last_completed_research_action_id=stage125-part3a-decision-lock`,
+  `next_research_action_id=stage125-part3b-evidence-capture`.
+
 ## 2026-07-15
 
 - **Stage125 Part 3B.0 — Evidence Capture Readiness (authorized/active).**

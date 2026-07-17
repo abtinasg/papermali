@@ -1,0 +1,60 @@
+{
+  "accessibility_scoring_applied": false,
+  "baseline_commit": "3a54a79c935f27e311679e8582e4c46330590a43",
+  "candidate_value_evidence_collected": false,
+  "contract_file": "part3b1a_cut_a_available_at_operationalization_contract_stage125.json",
+  "contract_version": "stage125_part3b1a_v1",
+  "cut_a_available_at_operationalization_locked": true,
+  "data_value_extraction_performed": false,
+  "decision_lock_version": "stage125_part3b1a_v1",
+  "explicit_non_claims": [
+    "maintenance_decision_lock_only",
+    "synthetic_validation_only",
+    "zero_network_calls",
+    "zero_real_available_at_assignments",
+    "zero_resolved_pilot_cutoffs",
+    "zero_candidate_values",
+    "zero_pair_values",
+    "zero_accessibility_scores",
+    "zero_gate_admissions",
+    "no_part3b_completion",
+    "no_part3b2",
+    "no_stage126",
+    "no_modeling",
+    "research_pointers_unchanged",
+    "merge_requires_explicit_user_approval"
+  ],
+  "locked_decisions": {
+    "each_letter_serial_independent_version": true,
+    "exact_document_binding_required": true,
+    "exact_values_source_serial_binding_authoritative": true,
+    "multi_document_reason_code": "multi_document_predictor_row_requires_separate_adjudication",
+    "normalized_revision_status_enum": [
+      "original",
+      "restatement",
+      "revision"
+    ],
+    "operational_available_at_source_field": "PublishDateTime",
+    "sent_datetime_is_available_at": false,
+    "tehran_wall_time_utc_round_trip_classification": true,
+    "timezone": "Asia/Tehran"
+  },
+  "maintenance_task_id": "stage125-part3b1a-cut-a-available-at-operationalization-lock",
+  "modeling_started": false,
+  "pair_level_evidence_collected": false,
+  "part3b1_decision_locked": true,
+  "part3b2_started": false,
+  "part3b_completed": false,
+  "part3b_started": true,
+  "pilot_cutoff_provenance_resolved": false,
+  "predictor_available_at_evidence_collected": false,
+  "qc_scope": "stage125_part3b1a_cut_a_available_at_operationalization_lock",
+  "real_pilot_rows_assigned": 0,
+  "research_pointers_unchanged": {
+    "last_completed_research_action_id": "stage125-part3a-decision-lock",
+    "next_research_action_id": "stage125-part3b-evidence-capture"
+  },
+  "resolved_pilot_cutoffs": 0,
+  "stage126_started": false,
+  "status": "cut_a_available_at_operationalization_locked_contracts_only"
+}

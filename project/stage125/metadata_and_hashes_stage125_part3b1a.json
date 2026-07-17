@@ -1,0 +1,21 @@
+{
+  "baseline_commit": "3a54a79c935f27e311679e8582e4c46330590a43",
+  "code_commit": "efeeae9091b792da1e0a433d629c57416e48fb5d",
+  "current_stage": "Stage125",
+  "cut_a_available_at_operationalization_locked": true,
+  "description": "Stage125 Part 3B.1A — CUT-A available-at operationalization lock (contracts + synthetic validation only).",
+  "generated_at": "2026-07-17T23:06:37+03:00",
+  "modeling_started": false,
+  "output_files_sha256": {
+    "README_STAGE125_PART3B1A_CUT_A_AVAILABLE_AT_LOCK.md": "a03bac69596bcadc51514f2a8b4aa2ce4522b3798b5229abe67b946da039e8be",
+    "part3b1a_cut_a_available_at_decision_lock_stage125.json": "dc66630e95f9b02359453c4857792fa06ea32b9cecdbe9e71b5985e2027b1853",
+    "part3b1a_cut_a_available_at_operationalization_contract_stage125.json": "8a453fe5b9453df7d3787e00ce4b4f97b679050cf05eeab9171191fc65a54b27",
+    "stage125_part3b1a_cut_a_available_at_qc_report.json": "2be99dd5b335ce09d01c90498a49fffe377bd0bd152280c707fb949b6d0dc63f"
+  },
+  "part3b1_decision_locked": true,
+  "part3b1a_network_calls_attempted": 0,
+  "part3b_completed": false,
+  "source_file_sha256": "199e0fcb27f136c0a5e30ff4ce2f88ac88fc10498805e952b1a7f7b5f4952b4f",
+  "stage": "stage125_part3b1a_cut_a_available_at_operationalization_lock",
+  "test_file_sha256": "64347b66f1f28e80382a4e096e95862c04c9753c5df58a171c0b610ed828a09c"
+}

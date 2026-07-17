@@ -99,6 +99,41 @@ The research contract for the paper is frozen in
   test requires an explicit research decision and a new version of that contract.
 - **Stage122–Stage124 files are not rewritten or redefined during Stage125.**
 
+## Stage125 Part 3B.1A — CUT-A Available-at Operationalization (2026-07-17)
+
+Maintenance decision lock only (`stage125-part3b1a-cut-a-available-at-operationalization-lock`).
+Does **not** advance research action pointers.
+
+- **Operational `available_at`** for predictor-year financial statements =
+  `PublishDateTime` of the exact matched official CODAL `LetterSerial`/version,
+  only when the document is exactly bound to the predictor row and the canonical
+  source version.
+- **`SentDateTime` ≠ `available_at`**: preserved raw for audit/comparison only;
+  never cutoff or public availability; even when equal to `PublishDateTime`,
+  mapping still uses `PublishDateTime`.
+- **Rationale:** `PublishDateTime` is the operational public-release timestamp;
+  `SentDateTime` may be publisher-send time; `PublishDateTime` is more
+  conservative / leakage-safe. Methodological operationalization — not inference
+  from local filenames or cache mtimes.
+- **Exact-document binding** and **revision/version** policy are fail-closed
+  (each `LetterSerial` is an independent version; multi-document rows stay
+  `UNRESOLVED` with
+  `multi_document_predictor_row_requires_separate_adjudication`).
+- **Normalized `revision_status`** matches the frozen provenance schema only:
+  `original` / `revision` / `restatement`. `correction` is not a normalized
+  status. CODAL «اصلاحیه» may be retained in `revision_status_raw` and maps to
+  `revision` only when that mapping is explicit. Exact
+  `values_source_letter_serial == letter_serial == canonical_letter_serial`
+  is authoritative for revision/restatement rows (boolean flags cannot bypass).
+- **Timezone:** raw Jalali CODAL timestamps normalized via `jdatetime==6.0.1` +
+  `zoneinfo.ZoneInfo("Asia/Tehran")` → UTC ISO-8601 using UTC round-trip
+  fold=0/fold=1 classification; nonexistent spring-forward ≠ ambiguous;
+  no fixed `+03:30` for all years; malformed/nonexistent/ambiguous/naive →
+  `available_at=null`.
+- **Non-claims:** no network; no real `available_at` assignment; no pilot cutoff
+  resolution; no extraction/scoring/Gate admission; no Part 3B.2 / Stage126 /
+  modeling. Marker: `cut_a_available_at_operationalization_locked=true`.
+
 ## Stage125 Part 0 / Part 1 / Part 2 status (2026-07-14)
 
 > **Historical snapshot (as of 2026-07-14).** Do not treat the bullets below as
