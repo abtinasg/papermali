@@ -1,0 +1,6 @@
+scope_row_id,selection_rank,predictor_row_key_t,target_row_key_t_plus_1,ticker,fiscal_year_t,starting_evidence_class,canonical_fiscal_year_end,canonical_company_name,canonical_statement_scope,canonical_letter_serial,pilot_csv_verified,reviewer_status
+p3b1b_scope_006,6,ثنوسا|1392,ثنوسا|1393,ثنوسا,1392,B2,1392/06/31,نوسازی و ساختمان تهران,separate,Ddg2e7HG6FGR5ygaTFJd4g==,true,automated_part3b1b
+p3b1b_scope_063,63,بوعلی|1399,بوعلی|1400,بوعلی,1399,B1,1399/12/30,شرکت پتروشیمی بوعلی سینا,separate,,true,automated_part3b1b
+p3b1b_scope_072,72,بوعلی|1400,بوعلی|1401,بوعلی,1400,B1,1400/12/29,شرکت پتروشیمی بوعلی سینا,separate,,true,automated_part3b1b
+p3b1b_scope_076,76,اردستان|1401,اردستان|1402,اردستان,1401,B3,1401/12/29,شرکت سیمان اردستان,separate,,true,automated_part3b1b
+p3b1b_scope_077,77,اپال|1401,اپال|1402,اپال,1401,B1,1401/10/30,فرآوری معدنی اپال کانی پارس,separate,,true,automated_part3b1b

@@ -1087,11 +1087,24 @@ def adjudicate_scope_row(
             binding=binding_inp,
         )
 
-    failure_reasons = ";".join(bind_res.reasons)
+    reason_list = list(bind_res.reasons)
     if status != BINDING_BOUND and avail_res.reasons:
-        extra = [r for r in avail_res.reasons if r not in bind_res.reasons]
-        if extra:
-            failure_reasons = ";".join(list(bind_res.reasons) + extra)
+        for r in avail_res.reasons:
+            if r not in reason_list:
+                reason_list.append(r)
+    if (
+        scope_row["ticker"] == "ثنوسا"
+        and thanusa_fetch is not None
+        and thanusa_fetch.success
+        and not (publish_raw or "").strip()
+    ):
+        for extra_reason in (
+            "official_metadata_not_exposed_by_direct_url",
+            cut_a.REASON_MISSING_PUBLISH,
+        ):
+            if extra_reason not in reason_list:
+                reason_list.append(extra_reason)
+    failure_reasons = ";".join(reason_list)
 
     evidence = {
         "scope_row_id": sid,
@@ -1584,10 +1597,16 @@ def run(
         else:
             thanusa_fetch = authorize_and_fetch_thanusa(cache=cache, capture=False)
 
-        if sentinel.calls_attempted != network_requests_attempted:
+        # Authorized CODAL GET uses sentinel._orig_connect bypass, so the
+        # default-deny sentinel must remain at zero intercepted calls.
+        if sentinel.calls_attempted != 0:
             raise QCFail(
-                f"network sentinel mismatch: sentinel={sentinel.calls_attempted} "
-                f"authorized={network_requests_attempted}"
+                f"unauthorized network intercepted by sentinel: "
+                f"{sentinel.calls_attempted}"
+            )
+        if network_requests_attempted > NETWORK_REQUESTS_AUTHORIZED_MAX:
+            raise QCFail(
+                f"network request budget exceeded: {network_requests_attempted}"
             )
 
         content, evidence_rows, network_log = build_all_content(

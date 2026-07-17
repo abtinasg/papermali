@@ -1,0 +1,25 @@
+{
+  "authorized_hosts": [
+    "www.codal.ir"
+  ],
+  "authorized_urls": [
+    "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D"
+  ],
+  "network_requests_attempted": 0,
+  "network_requests_authorized_max": 1,
+  "requests": [
+    {
+      "bytes": 59904,
+      "content_type": "text/html; charset=utf-8",
+      "final_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D",
+      "from_immutable_cache": true,
+      "payload_sha256": "6d7b08e87a4024851c8e2f17225c2aca43dc968673ccd2869cde2a4fb123b4ee",
+      "redirect_chain": [
+        "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D"
+      ],
+      "request_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D",
+      "response_status": 200
+    }
+  ],
+  "stage": "stage125_part3b1b_codal_document_binding_mini_pilot"
+}
