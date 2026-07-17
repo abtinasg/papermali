@@ -1,5 +1,5 @@
 decision_id,option_id,status,summary,blocks_real_extraction
-m2_feature_definitions,M2-A_modified,user_approved_locked,Shared 12-month window ending on last trading day strictly before pair cutoff (market_observation_date < pair_cutoff_date); adjusted close; cumulative return; daily-return stdev; Amihud; no imputation.,true_until_explicit_later_authorization
+m2_feature_definitions,M2-A_modified,user_approved_locked,Shared 12-month window ending on last trading day strictly before pair cutoff (market_observation_date < pair_cutoff_date); adjusted close; cumulative return; daily-return stdev; Amihud; minimum_valid_daily_return_observations=126; minimum_valid_amihud_observations=126; no imputation.,true_until_explicit_later_authorization
 m3_feature_definitions,M3-C,user_approved_locked,All M3 remain null/UNRESOLVED until official CBI source approval.,true
 m4_feature_definitions,M4-A,user_approved_locked,Explicit CODAL structured definitions; ambiguity/missing => null.,true_until_explicit_later_authorization
 rubric_score_mapping_0_5,R-A,user_approved_locked,Candidate-level accessibility mapping; pair coverage via G09–G12.,true_until_explicit_later_authorization

@@ -1,7 +1,7 @@
 {
   "accessibility_scoring_applied": false,
   "all_pass": true,
-  "assertion_count": 35,
+  "assertion_count": 54,
   "assertions": [
     {
       "assertion": "baseline_commit_constant",
@@ -34,8 +34,28 @@
       "status": "PASS"
     },
     {
-      "assertion": "no_network_in_part3b1",
-      "detail": "this micro-step offline",
+      "assertion": "zero_part3b1_network_calls_sentinel",
+      "detail": "calls_attempted=0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unchanged_frozen_part3b_hashes",
+      "detail": "verified=17",
+      "status": "PASS"
+    },
+    {
+      "assertion": "closed_world_no_new_cache_evidence_score_model",
+      "detail": "hits=[]",
+      "status": "PASS"
+    },
+    {
+      "assertion": "changed_path_exact_allowlist",
+      "detail": "offenders=[]",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_part3b2_or_stage126_surfaces",
+      "detail": "forbidden=[]",
       "status": "PASS"
     },
     {
@@ -49,8 +69,18 @@
       "status": "PASS"
     },
     {
+      "assertion": "m2_min_valid_return_obs_126",
+      "detail": "126",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m2_min_valid_amihud_obs_126",
+      "detail": "126",
+      "status": "PASS"
+    },
+    {
       "assertion": "m2_window_12m",
-      "detail": "12m",
+      "detail": "12m shared",
       "status": "PASS"
     },
     {
@@ -84,6 +114,16 @@
       "status": "PASS"
     },
     {
+      "assertion": "m4_going_concern_false_only_explicit",
+      "detail": "explicit false only",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m4_audit_lag_rejects_negative",
+      "detail": "negative=>null",
+      "status": "PASS"
+    },
+    {
       "assertion": "rubric_r_a",
       "detail": "R-A",
       "status": "PASS"
@@ -114,8 +154,23 @@
       "status": "PASS"
     },
     {
+      "assertion": "adjudicated_req_filename",
+      "detail": "part3b1_adjudicated_decision_requirements_stage125.json",
+      "status": "PASS"
+    },
+    {
+      "assertion": "legacy_part3b_req_not_owned",
+      "detail": "legacy remains Part 3B",
+      "status": "PASS"
+    },
+    {
       "assertion": "frozen_inputs_present",
       "detail": "n=12",
+      "status": "PASS"
+    },
+    {
+      "assertion": "content_exact_allowlist",
+      "detail": "keys=['README_STAGE125_PART3B1_DECISION_LOCK.md', 'part3b1_adjudicated_decision_requirements_stage125.json', 'part3b1_cutoff_available_at_contract_stage125.json', 'part3b1_decision_lock_stage125.json', 'part3b1_m2_feature_formula_contract_stage125.json', 'part3b1_m3_cbi_policy_contract_stage125.json', 'part3b1_m4_feature_definition_contract_stage125.json', 'part3b1_rubric_operational_mapping_stage125.json', 'part3b1_selected_decisions_stage125.csv']",
       "status": "PASS"
     },
     {
@@ -126,6 +181,11 @@
     {
       "assertion": "synth_window_end_strictly_before_cutoff",
       "detail": "end=2020-12-14",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_diagnostics_recorded",
+      "detail": "{'missing_price_day_count': 0, 'zero_traded_value_day_count': 1, 'usable_daily_return_count': 247, 'usable_amihud_day_count': 246}",
       "status": "PASS"
     },
     {
@@ -149,8 +209,28 @@
       "status": "PASS"
     },
     {
+      "assertion": "synth_vol_125_fail",
+      "detail": "125=>null",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_vol_126_pass",
+      "detail": "126=>ok",
+      "status": "PASS"
+    },
+    {
       "assertion": "synth_audit_lag",
       "detail": "93 days",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_audit_lag_equal_zero",
+      "detail": "0 days",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_audit_lag_before_null",
+      "detail": "negative=>null",
       "status": "PASS"
     },
     {
@@ -164,8 +244,23 @@
       "status": "PASS"
     },
     {
+      "assertion": "synth_going_concern_explicit_false",
+      "detail": "explicit false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_going_concern_explicit_true",
+      "detail": "explicit true",
+      "status": "PASS"
+    },
+    {
       "assertion": "synth_feature_usable_cutoff",
-      "detail": "available_at<=cutoff",
+      "detail": "semantic UTC available_at<=cutoff",
+      "status": "PASS"
+    },
+    {
+      "assertion": "synth_feature_usable_offset_equivalence",
+      "detail": "offset/Z equivalence",
       "status": "PASS"
     },
     {
@@ -181,6 +276,8 @@
   ],
   "baseline_commit": "274ff216f0f3a59ae611c68b662382d75ad84c8b",
   "candidate_value_evidence_collected": false,
+  "changed_path_offenders": [],
+  "closed_world_hits": [],
   "current_stage": "Stage125",
   "data_value_extraction_performed": false,
   "decision_lock_version": "stage125_part3b1_v1",
@@ -201,19 +298,38 @@
     "project/stage125/source_registry_stage125.csv": "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c",
     "project/stage125/stage125_part3b_evidence_capture_qc_report.json": "c683375f3afe8c2d1a757898122e601f36c145be2b8c69be7ba9b4b781b0f92d"
   },
-  "generated_at": "2026-07-17T17:48:02+03:00",
+  "frozen_part3b_output_sha256": {
+    "README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md": "9511ed1dd5ceab26feb4b9b3d9fcdc9beb7adbdbccc27f9889268b3cf613e342",
+    "README_STAGE125_PART3B_EVIDENCE_CAPTURE.md": "72b9c8b431b920a04a45b2ac78cd1e74b09b682a80519a9b31cc1389e46afc46",
+    "part3b_accessibility_scores_stage125.csv": "11c313ec77ab5b63e0e1f01a51ab8d59c4a90533ffaf066c2ac54f3eec7af6a3",
+    "part3b_authorization_stage125.json": "100a56ab2bb7fe4af3e255aac53fd80c239ffd09dd3228ffbbd8ae5c6cfa1a63",
+    "part3b_cache_handles_stage125.csv": "b37ddcd713ee985a59e61a6ef824369a935ca7eb61a6969047a84847bb792159",
+    "part3b_candidate_evidence_linkage_stage125.csv": "33c9d921e6274b8fef32991554504849ef3040ef6545aa51b87867b1cfd0b370",
+    "part3b_capture_attempt_log_stage125.csv": "6d951481493699a96928b0fb5f0a3c79a37f96da5105996c04e14816d3f3e1a3",
+    "part3b_capture_network_log_stage125.json": "68b01fb5e115b1c2a29c3b77be38ef660ae2d86a17de0687ce66e10c92590855",
+    "part3b_capture_plan_stage125.csv": "acb888189bb679b1f417ef7b83fda4f81b211111816cc736b5e9610d6cb0b4b8",
+    "part3b_decision_requirements_stage125.json": "f9ac3bdcf43465337660cbe24124765c938922a1044aa500318b581bb20e0d83",
+    "part3b_evidence_manifest_stage125.csv": "94a825470dfc55eb740ac0720471b6851c840b3c4a60ea1e19897b34c9771667",
+    "part3b_gate_results_stage125.csv": "945f08869f30b0e2185a20f61ca46c2051f542ff27b1e67b48a205b7f4250811",
+    "part3b_gate_summary_stage125.json": "37b6b0aa00b9faf92ae6024012a004ed2bbe270950aab898bb471d60ed8ecdbb",
+    "part3b_pair_candidate_assessment_stage125.csv": "b431fbacedf6d0473e36574bd52335c44306210114bd4091947ef28baf860051",
+    "part3b_unresolved_and_failures_stage125.csv": "e52a32a939c492696d7038983fbdd702e5b0cc5d33a577700b950ad09e55045a",
+    "part3b_verified_endpoint_registry_stage125.csv": "3d36eca0a0a63ef406ec48ef1bcf78ecbe2ce99ce24a6e8804c2b9c3ffb431b7",
+    "stage125_part3b_evidence_capture_qc_report.json": "c683375f3afe8c2d1a757898122e601f36c145be2b8c69be7ba9b4b781b0f92d"
+  },
+  "generated_at": "2026-07-17T18:44:07+03:00",
   "modeling_started": false,
   "network_extraction_performed": true,
   "output_sha256": {
-    "README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md": "0b5ad0673d2f61d2ca08c9be2d862f3fc62507b95092020841f536c27ce4b215",
+    "README_STAGE125_PART3B1_DECISION_LOCK.md": "5cbea637910d1d1f2e81e2e0e1134fd1107d3fbdfe47cd8a34dba0add62aa358",
+    "part3b1_adjudicated_decision_requirements_stage125.json": "e6d56a7b55deec83d8460241c101cb520f43b7917495e7c9a61eaf6d20c11f38",
     "part3b1_cutoff_available_at_contract_stage125.json": "3966addbf4f2768e139c55ff7eef7ac7b11aafa717bf7024cf115fdf956f72b2",
     "part3b1_decision_lock_stage125.json": "3a7b62b19640dd648bdde15112e44f1d79f6e663007dc2ab8bd0a94d1c82c8d4",
-    "part3b1_m2_feature_formula_contract_stage125.json": "7213c62df414dbc3759aea127781c0bece3c019a277980d55cdc3a5622df995c",
+    "part3b1_m2_feature_formula_contract_stage125.json": "6d7c8e63d04475f95da8b6f0364be326d7b4581ae21e5b2fe9df955ea7f83f82",
     "part3b1_m3_cbi_policy_contract_stage125.json": "50a0c48f4c465aa9f69561f16de338ba0fd016959566e8a78ea93bdaa4b3b435",
-    "part3b1_m4_feature_definition_contract_stage125.json": "606e57c8ef098d790ed851e93f07234e656e7056155117af2c8b472df21b2d33",
+    "part3b1_m4_feature_definition_contract_stage125.json": "f703f3fe3a48b11952f6f1410ae03d0032867cca8bf16cc825a10910c644fad5",
     "part3b1_rubric_operational_mapping_stage125.json": "845681e70c79a3c9ed81844d2dd2f6c92104f2088777669ffe9018d3dfd09110",
-    "part3b1_selected_decisions_stage125.csv": "c4c3118d84fe35c11c32431516d74f438441344272d27849b21715e0c305a887",
-    "part3b_decision_requirements_stage125.json": "e6d56a7b55deec83d8460241c101cb520f43b7917495e7c9a61eaf6d20c11f38"
+    "part3b1_selected_decisions_stage125.csv": "8f8fcf706388c6777c71ff8d2c814a86cf35c4c5a1fd1437979c3ff84871993c"
   },
   "pair_level_evidence_collected": false,
   "part3a_decision_locked": true,
@@ -225,11 +341,11 @@
   "part3b2_started": false,
   "part3b_completed": false,
   "part3b_started": true,
-  "source_commit": "d809f3e8b5393c567d36d2d4bc46351f8f4ca359",
-  "source_file_sha256": "ef635b7a067f3d4ae1fd7b8b74cfa3b85b389e19f70870564773f642eff7f550",
+  "source_commit": "8a7055488105a8ece8c64f00f8b71ccacabde2ee",
+  "source_file_sha256": "9cba92c7c32c20e38817396a75837261ae90df6751b86a04c297c9cb0fdfd6ab",
   "stage": "stage125_part3b1_decision_lock",
   "stage126_started": false,
-  "test_file_sha256": "c92fa3e54c4b9307cca11acdb1eef6d7bdcd52052b1312d3dbdb5f9123cf9897",
+  "test_file_sha256": "9db03ee4b37fa4b206caa34406e729d7cb1f27a1bbe14f2798fec7935bef02a5",
   "ticker_count": 26,
   "tickers": [
     "اردستان",

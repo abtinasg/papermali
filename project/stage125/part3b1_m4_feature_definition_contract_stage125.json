@@ -15,7 +15,7 @@
       "available_at_field": "verified_available_at_of_that_audit_report",
       "candidate_id": "cand_m4_audit_lag_days",
       "data_type": "integer",
-      "definition": "audit_lag_days = calendar_days(fiscal_year_end, audit_report_date) using the official CODAL audit report date field and the predictor fiscal_year_end. If fiscal_year_end missing (LC08), or audit_report_date missing/ambiguous, or either date unparseable => null. Never impute dates.",
+      "definition": "audit_lag_days = calendar_days(fiscal_year_end, audit_report_date) using the official CODAL audit report date field and the predictor fiscal_year_end. Both dates must be semantic valid ISO calendar dates. If fiscal_year_end missing (LC08), or audit_report_date missing/ambiguous, or either date unparseable, or audit_report_date < fiscal_year_end (negative lag) => null/UNRESOLVED. Never impute dates or emit a negative lag.",
       "document": "official_CODAL_audit_report_year_t",
       "source_id": "src_m4_codal_audit",
       "unit": "calendar_days"
@@ -41,7 +41,7 @@
       "available_at_field": "verified_available_at_of_that_audit_report",
       "candidate_id": "cand_m4_going_concern_flag",
       "data_type": "boolean_or_null",
-      "definition": "true only when the official CODAL audit report for year t contains an explicit structured going-concern / material-uncertainty indication. Absent clause, unstructured-only text, or ambiguity => null (never default false).",
+      "definition": "true only when the official CODAL audit report for year t contains an explicit structured going-concern / material-uncertainty indication set to true/present. false only when an explicit structured official field states negative/false for going-concern. Absent clause, missing field, unstructured-only text, conflict, or ambiguity => null/UNRESOLVED (never default false).",
       "document": "official_CODAL_audit_report_year_t",
       "source_id": "src_m4_codal_audit"
     }

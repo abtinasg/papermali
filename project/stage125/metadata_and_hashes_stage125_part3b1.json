@@ -1,27 +1,27 @@
 {
   "baseline_commit": "274ff216f0f3a59ae611c68b662382d75ad84c8b",
-  "code_commit": "d809f3e8b5393c567d36d2d4bc46351f8f4ca359",
+  "code_commit": "8a7055488105a8ece8c64f00f8b71ccacabde2ee",
   "current_stage": "Stage125",
   "description": "Stage125 Part 3B.1 — feature definition & scoring adjudication lock (contracts + synthetic validation only).",
-  "generated_at": "2026-07-17T17:48:02+03:00",
+  "generated_at": "2026-07-17T18:44:07+03:00",
   "modeling_started": false,
   "network_extraction_performed": true,
   "output_files_sha256": {
-    "README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md": "0b5ad0673d2f61d2ca08c9be2d862f3fc62507b95092020841f536c27ce4b215",
+    "README_STAGE125_PART3B1_DECISION_LOCK.md": "5cbea637910d1d1f2e81e2e0e1134fd1107d3fbdfe47cd8a34dba0add62aa358",
+    "part3b1_adjudicated_decision_requirements_stage125.json": "e6d56a7b55deec83d8460241c101cb520f43b7917495e7c9a61eaf6d20c11f38",
     "part3b1_cutoff_available_at_contract_stage125.json": "3966addbf4f2768e139c55ff7eef7ac7b11aafa717bf7024cf115fdf956f72b2",
     "part3b1_decision_lock_stage125.json": "3a7b62b19640dd648bdde15112e44f1d79f6e663007dc2ab8bd0a94d1c82c8d4",
-    "part3b1_m2_feature_formula_contract_stage125.json": "7213c62df414dbc3759aea127781c0bece3c019a277980d55cdc3a5622df995c",
+    "part3b1_m2_feature_formula_contract_stage125.json": "6d7c8e63d04475f95da8b6f0364be326d7b4581ae21e5b2fe9df955ea7f83f82",
     "part3b1_m3_cbi_policy_contract_stage125.json": "50a0c48f4c465aa9f69561f16de338ba0fd016959566e8a78ea93bdaa4b3b435",
-    "part3b1_m4_feature_definition_contract_stage125.json": "606e57c8ef098d790ed851e93f07234e656e7056155117af2c8b472df21b2d33",
+    "part3b1_m4_feature_definition_contract_stage125.json": "f703f3fe3a48b11952f6f1410ae03d0032867cca8bf16cc825a10910c644fad5",
     "part3b1_rubric_operational_mapping_stage125.json": "845681e70c79a3c9ed81844d2dd2f6c92104f2088777669ffe9018d3dfd09110",
-    "part3b1_selected_decisions_stage125.csv": "c4c3118d84fe35c11c32431516d74f438441344272d27849b21715e0c305a887",
-    "part3b_decision_requirements_stage125.json": "e6d56a7b55deec83d8460241c101cb520f43b7917495e7c9a61eaf6d20c11f38",
-    "stage125_part3b1_decision_lock_qc_report.json": "9dd55a385b93384f0b88a21497428d1e118c12bed7f185cd72d7d1be3c1f3267"
+    "part3b1_selected_decisions_stage125.csv": "8f8fcf706388c6777c71ff8d2c814a86cf35c4c5a1fd1437979c3ff84871993c",
+    "stage125_part3b1_decision_lock_qc_report.json": "07c3397a5d92b6c1b597d8f5889618d3e0dc85eb7ff32b1b896f9d6fc05cd366"
   },
   "part3b1_decision_locked": true,
   "part3b1_network_calls_attempted": 0,
   "part3b_completed": false,
-  "source_file_sha256": "ef635b7a067f3d4ae1fd7b8b74cfa3b85b389e19f70870564773f642eff7f550",
+  "source_file_sha256": "9cba92c7c32c20e38817396a75837261ae90df6751b86a04c297c9cb0fdfd6ab",
   "stage": "stage125_part3b1_decision_lock",
-  "test_file_sha256": "c92fa3e54c4b9307cca11acdb1eef6d7bdcd52052b1312d3dbdb5f9123cf9897"
+  "test_file_sha256": "9db03ee4b37fa4b206caa34406e729d7cb1f27a1bbe14f2798fec7935bef02a5"
 }

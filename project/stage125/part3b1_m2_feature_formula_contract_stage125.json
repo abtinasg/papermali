@@ -1,6 +1,12 @@
 {
   "contract_version": "stage125_part3b1_v1",
   "decision_id": "m2_feature_definitions",
+  "diagnostics_recorded": [
+    "missing_price_day_count",
+    "zero_traded_value_day_count",
+    "usable_daily_return_count",
+    "usable_amihud_day_count"
+  ],
   "imputation_allowed": false,
   "leakage_rules": {
     "no_post_cutoff_trading_day": true,
@@ -8,7 +14,9 @@
     "no_target_year_market_data": true,
     "window_must_end_strictly_before_pair_cutoff": true
   },
-  "note": "M2 daily market observations require market_observation_date < pair_cutoff_date because intraday ordering of market close vs cutoff is not provable. CUT-A feature available_at <= pair_cutoff remains unchanged for feature usability.",
+  "minimum_valid_amihud_observations": 126,
+  "minimum_valid_daily_return_observations": 126,
+  "note": "M2 daily market observations require market_observation_date < pair_cutoff_date because intraday ordering of market close vs cutoff is not provable. CUT-A feature available_at <= pair_cutoff remains unchanged for feature usability. All three M2 variables use the same shared 12-month window W.",
   "option_id": "M2-A_modified",
   "price_field": {
     "description": "Corporate-action-adjusted closing price from TSETMC (src_m2_tsetmc_market); unadjusted close is not used.",
@@ -16,7 +24,9 @@
     "name": "adjusted_close"
   },
   "real_extraction_authorized": false,
+  "scaling_or_extrapolation_allowed": false,
   "shared_window": {
+    "applies_to_all_m2_variables": true,
     "empty_window_rule": "feature_unavailable_null",
     "end_rule": "last_trading_day_with_verified_available_at_strictly_before_pair_cutoff",
     "equal_to_cutoff_trading_day_rule": "reject_and_select_previous_trading_day_strictly_before_cutoff",
@@ -27,26 +37,30 @@
     "start_rule": "inclusive_trading_days_on_or_after_calendar_date_T_star_minus_12_calendar_months"
   },
   "synthetic_validation_only": true,
+  "threshold_reduction_allowed": false,
   "variables": {
     "amihud_illiquidity": {
       "candidate_id": "cand_m2_amihud_illiquidity",
-      "formula": "For each trading day t in W with r_t defined and traded_value_rial V_t > 0: a_t = abs(r_t) / V_t. amihud = mean(a_t) over usable days. Days with V_t<=0 or missing V_t or missing r_t are excluded (never imputed). If usable day count == 0 => null.",
+      "formula": "For each trading day t in shared window W with r_t defined and traded_value_rial V_t > 0: a_t = abs(r_t) / V_t. amihud = mean(a_t) over usable days. Days with V_t<=0 or missing V_t or missing r_t are excluded (never imputed to a fabricated volume). If usable day count < minimum_valid_amihud_observations=126 => null/UNRESOLVED.",
       "formula_id": "m2_amihud_mean_abs_return_over_value_W",
+      "minimum_valid_amihud_observations": 126,
       "unit": "illiquidity_per_rial",
       "volume_field": "traded_value_rial",
       "zero_volume_rule": "exclude_day_never_impute"
     },
     "equity_return_window": {
       "candidate_id": "cand_m2_equity_return_window",
-      "formula": "Let P_t be adjusted_close on trading day t in window W ordered t0..tN=T*. Require P_{t0} and P_{tN} present. R_W = (P_{tN} / P_{t0}) - 1. If either endpoint price missing => null.",
+      "formula": "Let P_t be adjusted_close on trading day t in shared window W ordered t0..tN=T*. Require P_{t0} and P_{tN} present AND at least minimum_valid_daily_return_observations=126 valid daily simple returns in W. R_W = (P_{tN} / P_{t0}) - 1. If either endpoint missing OR usable daily return count < 126 => null/UNRESOLVED. No imputation, scaling, or extrapolation.",
       "formula_id": "m2_cumulative_simple_return_W",
+      "minimum_valid_daily_return_observations": 126,
       "transform": "none_beyond_simple_return_ratio",
       "unit": "return_ratio"
     },
     "realized_volatility": {
       "candidate_id": "cand_m2_realized_volatility",
-      "formula": "Daily simple returns r_t = (P_t / P_{t-1}) - 1 for consecutive trading days in W with both prices present. realized_volatility = sample_stdev(r_t) with ddof=1 (daily-return volatility proxy; NOT annualized). If usable return count < 2 => null.",
+      "formula": "Daily simple returns r_t = (P_t / P_{t-1}) - 1 for consecutive trading days in shared window W with both prices present. realized_volatility = sample_stdev(r_t) with ddof=1 (daily-return volatility proxy; NOT annualized). If usable return count < minimum_valid_daily_return_observations=126 => null/UNRESOLVED. No imputation, scaling, annualization, or automatic threshold reduction.",
       "formula_id": "m2_daily_return_stdev_sample_W",
+      "minimum_valid_daily_return_observations": 126,
       "transform": "sample_standard_deviation_ddof_1_not_annualized",
       "unit": "volatility"
     }
