@@ -5,6 +5,16 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 
 ## 2026-07-17
 
+- **Stage125 Part 3B.1A hardening (PR #41, maintenance).** Normalized
+  `revision_status` aligned to frozen provenance enum
+  (`original`/`revision`/`restatement`; `correction` removed as normalized
+  status). Exact values-source LetterSerial / TracingNo / title binding is
+  structural and authoritative. Asia/Tehran gap vs fold classification uses UTC
+  round-trips (nonexistent ≠ ambiguous). Canonical runtime
+  `Python 3.13.5` + `jdatetime==6.0.1`. Still **no** network, real assignment,
+  cutoff recovery, extraction, scoring, Part 3B.2, Stage126, or modeling.
+  Research pointers unchanged.
+
 - **Stage125 Part 3B.1A — CUT-A Available-at Operationalization Lock
   (maintenance).** Tracked as
   `stage125-part3b1a-cut-a-available-at-operationalization-lock` (advances **no**
