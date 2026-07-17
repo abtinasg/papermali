@@ -11,16 +11,16 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage125_research_design_readiness`
 - **Last completed research action:** `stage125-part3a-decision-lock`
 - **Next research action:** `stage125-part3b-evidence-capture`
-- **Last stage commit:** `ed99e35d3a31009f73daa74429d5380b332dc16c`
-- **Generated from commit:** `ed99e35d3a31009f73daa74429d5380b332dc16c` (branch `handoff/post-pr37-merge`, informational)
-- **Baseline:** `origin/main` @ `ed99e35d3a31009f73daa74429d5380b332dc16c`
+- **Last stage commit:** `80da342c41d525790bc7c134b5bbac0e3b6bd53e`
+- **Generated from commit:** `47f3e89e05753bb4085b3b5491c89a4c9107f26b` (branch `stage125-part3b1-decision-lock`, informational)
+- **Baseline:** `origin/main` @ `274ff216f0f3a59ae611c68b662382d75ad84c8b`
 
 ## QC
 
-- ✅ **22 assertions, 0 failed**, all_pass=True
-- Scope: `stage125_part3b_evidence_capture`
-- Report: `project/stage125/stage125_part3b_evidence_capture_qc_report.json`
-- QC source commit (code): `baf672c291d040a2c20878f9861954bb924ab626`
+- ✅ **33 assertions, 0 failed**, all_pass=True
+- Scope: `stage125_part3b1_decision_lock`
+- Report: `project/stage125/stage125_part3b1_decision_lock_qc_report.json`
+- QC source commit (code): `80da342c41d525790bc7c134b5bbac0e3b6bd53e`
 
 ## Workflow markers
 
@@ -30,6 +30,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - part3a_protocol_locked: **True**
 - part3a_decision_locked: **True**
 - part3b_started: **True**
+- part3b1_decision_locked: **True**
 - part3b0_readiness: **True**
 - evidence_collected: **True** (endpoint-probe scope when Part 3B active)
 - endpoint_probe_evidence_collected: **True**
@@ -44,5 +45,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `715d73c96204a1c84d79cf35ebbbb0026e3eb7ca729168128ea512de8657a97f`_
-_generated_at_utc: 2026-07-17T13:02:10Z (informational)_
+_state_fingerprint: `44e57a32912e0b9c712c341b44449001e9c5ed7a729a93c08c10e22fa284d2f5`_
+_generated_at_utc: 2026-07-17T13:57:36Z (informational)_
