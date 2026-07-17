@@ -11,16 +11,16 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage125_research_design_readiness`
 - **Last completed research action:** `stage125-part3a-decision-lock`
 - **Next research action:** `stage125-part3b-evidence-capture`
-- **Last stage commit:** `48f9e0b59454b151fb25e16edb04f1150f374d30`
-- **Generated from commit:** `48f9e0b59454b151fb25e16edb04f1150f374d30` (branch `handoff/post-pr41-merge`, informational)
-- **Baseline:** `origin/main` @ `48f9e0b59454b151fb25e16edb04f1150f374d30`
+- **Last stage commit:** `4db0a9ffbde1f663c65d91bded76ff58d85313e4`
+- **Generated from commit:** `4db0a9ffbde1f663c65d91bded76ff58d85313e4` (branch `stage125-part3b1b-codal-document-binding-mini-pilot`, informational)
+- **Baseline:** `origin/main` @ `4d7a48288543c971f43337e9a5d9a70ccfed2610`
 
 ## QC
 
-- ✅ **79 assertions, 0 failed**, all_pass=True
-- Scope: `stage125_part3b1a_cut_a_available_at_operationalization_lock`
-- Report: `project/stage125/stage125_part3b1a_cut_a_available_at_qc_report.json`
-- QC source commit (code): `efeeae9091b792da1e0a433d629c57416e48fb5d`
+- ✅ **24 assertions, 0 failed**, all_pass=True
+- Scope: `stage125_part3b1b_codal_document_binding_mini_pilot`
+- Report: `project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json`
+- QC source commit (code): `4db0a9ffbde1f663c65d91bded76ff58d85313e4`
 
 ## Workflow markers
 
@@ -33,6 +33,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - part3b1_decision_locked: **True**
 - cut_a_available_at_operationalization_locked: **True**
 - predictor_available_at_evidence_collected: **False**
+- predictor_document_binding_mini_pilot_completed: **True**
+- predictor_document_binding_evidence_collected: **True**
 - pilot_cutoff_provenance_resolved: **False**
 - part3b0_readiness: **True**
 - evidence_collected: **True** (endpoint-probe scope when Part 3B active)
@@ -48,5 +50,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `f70d594e2d11ec79b340f6492b554851a522a2aaa97e9451a100c7b3ad64d20a`_
-_generated_at_utc: 2026-07-17T20:30:09Z (informational)_
+_state_fingerprint: `790c7e6bc5e7eb73bf105d2cb11a0feefe5eeea7bacfeb821cdc262d9e413934`_
+_generated_at_utc: 2026-07-17T21:05:10Z (informational)_

@@ -1,9 +1,9 @@
 {
   "baseline_commit": "4d7a48288543c971f43337e9a5d9a70ccfed2610",
-  "code_commit": "ca5538fce843092a5bec93063754e6597cd221c6",
+  "code_commit": "4db0a9ffbde1f663c65d91bded76ff58d85313e4",
   "current_stage": "Stage125",
   "description": "Stage125 Part 3B.1B CODAL predictor-document binding mini-pilot.",
-  "generated_at": "ca5538fce843092a5bec93063754e6597cd221c6",
+  "generated_at": "4db0a9ffbde1f663c65d91bded76ff58d85313e4",
   "modeling_started": false,
   "network_requests_attempted": 0,
   "output_files_sha256": {
@@ -14,11 +14,11 @@
     "part3b1b_network_log_stage125.json": "216adbf749248780b716e760789bbeef8002bce63cd34da404fa188ba04ebeb8",
     "part3b1b_predictor_document_scope_stage125.csv": "4ff20a6833cd6de1b303d9506e53fa49c936f67c890b262a553ee678499eb8b1",
     "part3b1b_unresolved_and_rejections_stage125.csv": "b62c881a64f2282b228688ecb0718d781349e23a6e967b985ecbb59ef37e85b6",
-    "stage125_part3b1b_codal_document_binding_qc_report.json": "7ef50321494217186a4a3fc6e78989bfdc200d1c047ff4e877de69cb6586be87"
+    "stage125_part3b1b_codal_document_binding_qc_report.json": "3157f9625f6eb8fe119a84de60e4f939fb19a2db928d62f9a2d35e74210964ee"
   },
   "part3b_completed": false,
   "predictor_document_binding_mini_pilot_completed": true,
-  "source_file_sha256": "03934987bd6ec4ea4d3bd86cf5831843abd9c740262064777063200cb1c10a15",
+  "source_file_sha256": "b49af1260fcc3934232f1157ae8a91d7a3f678ad8be84e966d0b91f87462d43d",
   "stage": "stage125_part3b1b_codal_document_binding_mini_pilot",
   "test_file_sha256": "9809b84d181cccd505507f2ed7883def7de83daa805a44c0e05e1be8dbb1505a"
 }

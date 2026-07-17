@@ -1,4 +1,5 @@
 {
+  "accessibility_scores_assigned": 0,
   "accessibility_scoring_applied": false,
   "all_pass": true,
   "assertion_count": 24,
@@ -128,8 +129,13 @@
   "baseline_commit": "4d7a48288543c971f43337e9a5d9a70ccfed2610",
   "bound_count": 0,
   "candidate_value_evidence_collected": false,
+  "candidate_values_extracted": 0,
+  "canonical_cutoff_rows_mutated": 0,
   "current_stage": "Stage125",
+  "cut_a_available_at_operationalization_locked": true,
   "data_value_extraction_performed": false,
+  "endpoint_probe_evidence_collected": true,
+  "evidence_collected": true,
   "failed_count": 0,
   "financial_values_extracted": 0,
   "frozen_scientific_sha256": {
@@ -152,8 +158,10 @@
     "project/stage125/stage125_part3b1a_cut_a_available_at_qc_report.json": "2be99dd5b335ce09d01c90498a49fffe377bd0bd152280c707fb949b6d0dc63f",
     "project/stage125/stage125_part3b_evidence_capture_qc_report.json": "c683375f3afe8c2d1a757898122e601f36c145be2b8c69be7ba9b4b781b0f92d"
   },
+  "gates_applied": 0,
   "maintenance_task_id": "stage125-part3b1b-codal-document-binding-mini-pilot",
   "modeling_started": false,
+  "network_extraction_performed": true,
   "network_requests_attempted": 0,
   "network_requests_authorized_max": 1,
   "output_sha256": {
@@ -166,7 +174,13 @@
     "part3b1b_unresolved_and_rejections_stage125.csv": "b62c881a64f2282b228688ecb0718d781349e23a6e967b985ecbb59ef37e85b6"
   },
   "pair_level_evidence_collected": false,
+  "pair_values_extracted": 0,
+  "part3a_decision_locked": true,
+  "part3a_protocol_locked": true,
+  "part3b0_readiness": true,
+  "part3b1_decision_locked": true,
   "part3b_completed": false,
+  "part3b_started": true,
   "pilot_cutoff_provenance_resolved": false,
   "predictor_available_at_evidence_collected": false,
   "predictor_document_binding_evidence_collected": true,
@@ -177,9 +191,16 @@
     "next_research_action_id": "stage125-part3b-evidence-capture"
   },
   "scope_rows": 5,
-  "source_commit": "ca5538fce843092a5bec93063754e6597cd221c6",
-  "source_file_sha256": "03934987bd6ec4ea4d3bd86cf5831843abd9c740262064777063200cb1c10a15",
+  "source_commit": "4db0a9ffbde1f663c65d91bded76ff58d85313e4",
+  "source_file_sha256": "b49af1260fcc3934232f1157ae8a91d7a3f678ad8be84e966d0b91f87462d43d",
   "stage": "stage125_part3b1b_codal_document_binding_mini_pilot",
+  "stage126_started": false,
   "test_file_sha256": "9809b84d181cccd505507f2ed7883def7de83daa805a44c0e05e1be8dbb1505a",
+  "tickers": [
+    "اردستان",
+    "اپال",
+    "بوعلی",
+    "ثنوسا"
+  ],
   "unresolved_count": 4
 }
