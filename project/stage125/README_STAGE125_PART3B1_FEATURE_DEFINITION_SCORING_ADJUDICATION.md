@@ -1,20 +1,32 @@
 # Stage125 Part 3B.1 — Feature Definition & Scoring Adjudication Lock
 
-**Status:** proposed / not started. Requires explicit user approval before any work.
+**Status:** decision locked (contracts / synthetic validation only).
 
-This artifact lists methodology decisions still required. It does **not** select
-answers, invent feature definitions, endpoints, dates, values, cutoffs, or scores.
+User-approved selections:
 
-## Decisions still needed
+| decision_id | selected_answer |
+|---|---|
+| m2_feature_definitions | M2-A_modified |
+| m3_feature_definitions | M3-C |
+| m4_feature_definitions | M4-A |
+| rubric_score_mapping_0_5 | R-A |
+| cbi_endpoint_provenance | CBI-A |
+| available_at_and_cutoff_rules | CUT-A |
 
-1. Exact feature definition, unit and pre-cutoff window for each M2 variable
-2. Exact transformation/unit/release series for each M3 variable
-3. Exact document/field/derivation rules for each M4 variable
-4. Operational evidence-to-score mapping for rubric scores 0–5
-5. Authoritative CBI endpoint/provenance decision
-6. `available_at` and prediction-cutoff rules
+## Locked scope
 
-## Current Part 3B probe status
+- Schema/formula contracts for M2/M3/M4
+- Operational rubric mapping (candidate-level scores; pair coverage via G09–G12)
+- CUT-A retention of Part 2 pair cutoff
+- Synthetic validators only
 
-Stage125 Part 3B accessibility feasibility probe — **active/incomplete**.
-`part3b_completed=false`. Do not advance to Stage126 or modeling.
+## Still prohibited
+
+- Network extraction / real values
+- Real accessibility scoring application
+- Part 3B.2 / Stage126 / modeling
+- Merging any PR without explicit user approval
+
+`part3b_completed=false`. Part 3B remains an active/incomplete accessibility
+feasibility probe until candidate/pair evidence and scoring are separately
+authorized.

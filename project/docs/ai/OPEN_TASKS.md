@@ -110,9 +110,19 @@ CODAL origins; CBI blocked). Not candidate-value or pair-level evidence.
 `candidate_value_evidence_collected=false`; `pair_level_evidence_collected=false`;
 `data_value_extraction_performed=false`; `accessibility_scoring_applied=false`;
 `part3b_completed=false`; `network_extraction_performed=true`;
-`modeling_started=false`. Proposed next micro-step (not started):
-`Stage125 Part 3B.1 — Feature Definition & Scoring Adjudication Lock`.
-Not Stage126 admission.
+`modeling_started=false`.
+
+**Part 3B.1 (Decision Lock recorded — contracts only):**
+`stage125-part3b1-decision-lock` (maintenance). User-approved selections locked:
+M2-A modified (12-month shared pre-cutoff window; adjusted close; cumulative
+return; daily-return stdev; Amihud; no imputation), M3-C + CBI-A (all M3
+null/UNRESOLVED; no SCI/free-market substitute), M4-A (explicit CODAL structured
+definitions; ambiguity⇒null), R-A (candidate-level accessibility mapping; pair
+coverage via G09–G12), CUT-A (Part 2 pair cutoff retained). Schema/formula
+contracts + synthetic validation only. **No** network, **no** real value
+extraction, **no** real scoring, **no** Part 3B.2 / Stage126 / modeling.
+`part3b1_decision_locked=true`. Merge of any PR still requires explicit user
+approval. Not Stage126 admission.
 
 **Modeling remains prohibited** (no modeling, tuning, SHAP, SMOTE, calibration,
 temporal splitting, feature selection, or article result generation) through all of

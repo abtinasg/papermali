@@ -1,0 +1,49 @@
+{
+  "ambiguity_or_missing_equals_null": true,
+  "contract_version": "stage125_part3b1_v1",
+  "decision_id": "m4_feature_definitions",
+  "leakage_rules": {
+    "document_available_at_must_be_le_pair_cutoff": true,
+    "no_target_year_t_plus_1_audit_or_governance": true
+  },
+  "nlp_or_persian_text_modeling_forbidden": true,
+  "option_id": "M4-A",
+  "real_extraction_authorized": false,
+  "source_family": "official_CODAL_structured_disclosures_only",
+  "variables": {
+    "audit_lag_days": {
+      "available_at_field": "verified_available_at_of_that_audit_report",
+      "candidate_id": "cand_m4_audit_lag_days",
+      "data_type": "integer",
+      "definition": "audit_lag_days = calendar_days(fiscal_year_end, audit_report_date) using the official CODAL audit report date field and the predictor fiscal_year_end. If fiscal_year_end missing (LC08), or audit_report_date missing/ambiguous, or either date unparseable => null. Never impute dates.",
+      "document": "official_CODAL_audit_report_year_t",
+      "source_id": "src_m4_codal_audit",
+      "unit": "calendar_days"
+    },
+    "audit_opinion_type": {
+      "available_at_field": "verified_available_at_of_that_audit_report",
+      "candidate_id": "cand_m4_audit_opinion_type",
+      "data_type": "categorical",
+      "definition": "Structured audit-opinion label taken only from an official CODAL audit report for predictor year t. The label must be an explicit structured field/value on the report (not inferred from free text). If the field is absent, unreadable, conflicting, or ambiguous => null.",
+      "document": "official_CODAL_audit_report_year_t",
+      "source_id": "src_m4_codal_audit"
+    },
+    "board_size": {
+      "available_at_field": "verified_available_at_of_that_governance_disclosure",
+      "candidate_id": "cand_m4_board_size",
+      "data_type": "integer",
+      "definition": "Integer count of board members from an official CODAL governance disclosure for year t, using an explicit auditable membership list/field. Ambiguous membership, missing list, or conflicting counts => null. Director networks remain out of scope.",
+      "document": "official_CODAL_governance_disclosure_year_t",
+      "source_id": "src_m4_codal_governance",
+      "unit": "count"
+    },
+    "going_concern_flag": {
+      "available_at_field": "verified_available_at_of_that_audit_report",
+      "candidate_id": "cand_m4_going_concern_flag",
+      "data_type": "boolean_or_null",
+      "definition": "true only when the official CODAL audit report for year t contains an explicit structured going-concern / material-uncertainty indication. Absent clause, unstructured-only text, or ambiguity => null (never default false).",
+      "document": "official_CODAL_audit_report_year_t",
+      "source_id": "src_m4_codal_audit"
+    }
+  }
+}

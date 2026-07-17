@@ -75,6 +75,11 @@ See [`DECISIONS.md`](DECISIONS.md).
   `run_stage125_part3b.py`, `tests/test_stage125_part3b_evidence_capture.py`,
   `stage125/stage125_part3b_evidence_capture_qc_report.json` (authorized real
   evidence capture + accessibility scoring pilot; 800 assessments; no modeling)
+- Stage125 Part 3B.1 decision-lock source/test/QC: `src/stage125_part3b1_decision_lock.py`,
+  `run_stage125_part3b1.py`, `tests/test_stage125_part3b1_decision_lock.py`,
+  `stage125/stage125_part3b1_decision_lock_qc_report.json` (feature/scoring/cutoff
+  adjudication contracts + synthetic validation only; no network; no real
+  extraction/scoring; no modeling)
 
 ## 7. Done
 
