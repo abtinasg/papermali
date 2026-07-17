@@ -172,8 +172,9 @@ def build_m2_formula_contract() -> dict:
         "shared_window": {
             "length": "12_calendar_months",
             "end_rule": (
-                "last_trading_day_T_star_with_verified_available_at_le_pair_cutoff"
+                "last_trading_day_with_verified_available_at_strictly_before_pair_cutoff"
             ),
+            "market_observation_end_predicate": "market_observation_date < pair_cutoff_date",
             "start_rule": (
                 "inclusive_trading_days_on_or_after_calendar_date_"
                 "T_star_minus_12_calendar_months"
@@ -181,6 +182,9 @@ def build_m2_formula_contract() -> dict:
             "pair_cutoff_reference": "part2_earliest_verified_available_at_of_predictor_fs",
             "missing_cutoff_rule": "feature_unavailable_null",
             "empty_window_rule": "feature_unavailable_null",
+            "equal_to_cutoff_trading_day_rule": (
+                "reject_and_select_previous_trading_day_strictly_before_cutoff"
+            ),
         },
         "price_field": {
             "name": "adjusted_close",
@@ -232,10 +236,17 @@ def build_m2_formula_contract() -> dict:
             },
         },
         "leakage_rules": {
-            "window_must_end_on_or_before_pair_cutoff": True,
+            "window_must_end_strictly_before_pair_cutoff": True,
             "no_target_year_market_data": True,
             "no_post_cutoff_trading_day": True,
+            "no_same_calendar_day_as_pair_cutoff": True,
         },
+        "note": (
+            "M2 daily market observations require market_observation_date < "
+            "pair_cutoff_date because intraday ordering of market close vs "
+            "cutoff is not provable. CUT-A feature available_at <= pair_cutoff "
+            "remains unchanged for feature usability."
+        ),
         "synthetic_validation_only": True,
         "real_extraction_authorized": False,
     }
@@ -441,7 +452,10 @@ def build_cutoff_contract(repo_root: Path) -> dict:
             "g07": "no_future_or_target_year_information",
         },
         "block_rules": {
-            "M2": "market_window_end_available_at_le_pair_cutoff",
+            "M2": (
+                "market_observation_date_strictly_before_pair_cutoff;"
+                "feature_available_at_still_le_pair_cutoff_under_CUT_A"
+            ),
             "M3": "macro_publication_or_available_at_le_pair_cutoff_when_cbi_approved",
             "M4": "document_available_at_le_pair_cutoff",
         },
@@ -456,7 +470,8 @@ def build_selected_decision_rows() -> list[dict]:
             "option_id": "M2-A_modified",
             "status": "user_approved_locked",
             "summary": (
-                "Shared 12-month window to last trading day before pair cutoff; "
+                "Shared 12-month window ending on last trading day strictly "
+                "before pair cutoff (market_observation_date < pair_cutoff_date); "
                 "adjusted close; cumulative return; daily-return stdev; Amihud; "
                 "no imputation."
             ),
@@ -668,8 +683,12 @@ User-approved selections:
 ## Locked scope
 
 - Schema/formula contracts for M2/M3/M4
+- M2 market window ends strictly before pair cutoff
+  (`market_observation_date < pair_cutoff_date`); equal-to-cutoff trading days
+  are rejected
 - Operational rubric mapping (candidate-level scores; pair coverage via G09–G12)
 - CUT-A retention of Part 2 pair cutoff
+  (`feature_available_at <= pair_cutoff` unchanged)
 - Synthetic validators only
 
 ## Still prohibited
@@ -693,18 +712,24 @@ def _parse_iso_date(value: str) -> date:
     return date.fromisoformat(value)
 
 
-def last_trading_day_on_or_before(cutoff: date, trading_days: list[date]) -> date | None:
-    eligible = [d for d in trading_days if d <= cutoff]
+def last_trading_day_strictly_before(
+    cutoff: date, trading_days: list[date],
+) -> date | None:
+    """Last trading day with market_observation_date < pair_cutoff_date.
+
+    A trading day equal to the cutoff calendar date is rejected; the previous
+    trading day is used when present. Returns None when no valid day exists.
+    """
+    eligible = [d for d in trading_days if d < cutoff]
     return max(eligible) if eligible else None
 
 
 def window_trading_days(
     trading_days: list[date], cutoff: date,
 ) -> list[date] | None:
-    t_star = last_trading_day_on_or_before(cutoff, trading_days)
+    t_star = last_trading_day_strictly_before(cutoff, trading_days)
     if t_star is None:
         return None
-    start = t_star - timedelta(days=365)  # 12 calendar months approximation for synth
     # Exact calendar-month rule: on_or_after date(t_star.year-1, t_star.month, t_star.day)
     try:
         start = date(t_star.year - 1, t_star.month, t_star.day)
@@ -868,6 +893,17 @@ def build_qc_assertions(content: dict[str, str], frozen: dict[str, str]) -> list
     add("m2_no_imputation", m2.get("imputation_allowed") is False, "no impute")
     add("m2_window_12m",
         m2["shared_window"]["length"] == "12_calendar_months", "12m")
+    add(
+        "m2_end_strictly_before_cutoff",
+        m2["shared_window"]["end_rule"] == (
+            "last_trading_day_with_verified_available_at_strictly_before_pair_cutoff"
+        )
+        and m2["leakage_rules"].get("window_must_end_strictly_before_pair_cutoff") is True
+        and m2["shared_window"].get("market_observation_end_predicate") == (
+            "market_observation_date < pair_cutoff_date"
+        ),
+        m2["shared_window"]["end_rule"],
+    )
     add("m3_c", m3.get("option_id") == "M3-C", m3.get("option_id"))
     add("cbi_a", m3.get("paired_option_id") == "CBI-A", m3.get("paired_option_id"))
     add("no_sci_substitute",
@@ -904,6 +940,11 @@ def build_qc_assertions(content: dict[str, str], frozen: dict[str, str]) -> list
     values[days[10]] = 0.0  # must be excluded, not imputed
     w = window_trading_days(days, cutoff_d)
     add("synth_window_nonempty", w is not None and len(w) > 10, f"len={len(w or [])}")
+    add(
+        "synth_window_end_strictly_before_cutoff",
+        w is not None and w[-1] < cutoff_d,
+        f"end={w[-1] if w else None}",
+    )
     r = cumulative_simple_return(prices, w or [])
     add("synth_return_defined", r is not None, str(r))
     vol = sample_stdev(daily_returns(prices, w or []))

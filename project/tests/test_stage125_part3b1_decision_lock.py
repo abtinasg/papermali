@@ -34,6 +34,14 @@ def test_m2_contract_locked():
     assert m2["option_id"] == "M2-A_modified"
     assert m2["imputation_allowed"] is False
     assert m2["shared_window"]["length"] == "12_calendar_months"
+    assert m2["shared_window"]["end_rule"] == (
+        "last_trading_day_with_verified_available_at_strictly_before_pair_cutoff"
+    )
+    assert m2["shared_window"]["market_observation_end_predicate"] == (
+        "market_observation_date < pair_cutoff_date"
+    )
+    assert m2["leakage_rules"]["window_must_end_strictly_before_pair_cutoff"] is True
+    assert "window_must_end_on_or_before_pair_cutoff" not in m2["leakage_rules"]
     assert m2["price_field"]["name"] == "adjusted_close"
     assert m2["real_extraction_authorized"] is False
 
@@ -63,11 +71,13 @@ def test_rubric_r_a_candidate_level():
     assert r["real_scoring_authorized"] is False
 
 
-def test_cutoff_cut_a_retains_part2():
+def test_cutoff_cut_a_retains_part2_and_keeps_feature_le():
     c = part3b1.build_cutoff_contract(REPO_ROOT)
     assert c["option_id"] == "CUT-A"
     assert c["pair_cutoff"]["cutoff_basis"] == "verified_available_at_timestamp"
     assert "fiscal_year_end_alone" in c["pair_cutoff"]["cutoff_not_based_on"]
+    assert "available_at <= pair_cutoff" in c["feature_availability"]["rule"]
+    assert "strictly_before" in c["block_rules"]["M2"]
 
 
 def test_synth_m2_formulas_no_imputation():
@@ -82,11 +92,81 @@ def test_synth_m2_formulas_no_imputation():
     values[days[20]] = 0.0
     w = part3b1.window_trading_days(days, cutoff)
     assert w is not None
-    assert w[-1] <= cutoff
+    assert w[-1] < cutoff
     assert part3b1.cumulative_simple_return(prices, w) is not None
     assert part3b1.sample_stdev(part3b1.daily_returns(prices, w)) is not None
     am = part3b1.amihud_mean(prices, values, w)
     assert am is not None and am > 0
+
+
+def test_m2_trading_day_before_cutoff_accepted():
+    cutoff = date(2020, 6, 10)
+    days = [date(2020, 6, 8), date(2020, 6, 9)]
+    assert part3b1.last_trading_day_strictly_before(cutoff, days) == date(2020, 6, 9)
+
+
+def test_m2_trading_day_equal_cutoff_rejected():
+    cutoff = date(2020, 6, 10)
+    days = [date(2020, 6, 8), date(2020, 6, 10)]
+    chosen = part3b1.last_trading_day_strictly_before(cutoff, days)
+    assert chosen == date(2020, 6, 8)
+    assert chosen != cutoff
+
+
+def test_m2_trading_day_after_cutoff_rejected():
+    cutoff = date(2020, 6, 10)
+    days = [date(2020, 6, 8), date(2020, 6, 11)]
+    chosen = part3b1.last_trading_day_strictly_before(cutoff, days)
+    assert chosen == date(2020, 6, 8)
+    assert date(2020, 6, 11) not in (part3b1.window_trading_days(days, cutoff) or [])
+
+
+def test_m2_equal_cutoff_falls_back_to_previous_trading_day():
+    cutoff = date(2020, 6, 10)
+    days = [date(2020, 6, 5), date(2020, 6, 8), date(2020, 6, 9), date(2020, 6, 10)]
+    w = part3b1.window_trading_days(days, cutoff)
+    assert w is not None
+    assert w[-1] == date(2020, 6, 9)
+    assert date(2020, 6, 10) not in w
+
+
+def test_m2_no_valid_pre_cutoff_day_returns_null_window():
+    cutoff = date(2020, 6, 10)
+    days = [date(2020, 6, 10), date(2020, 6, 11)]
+    assert part3b1.last_trading_day_strictly_before(cutoff, days) is None
+    assert part3b1.window_trading_days(days, cutoff) is None
+
+
+def test_m2_no_imputation_or_cutoff_mutation():
+    cutoff = date(2020, 6, 10)
+    days = [date(2020, 6, 10)]
+    # Empty eligible set => null; cutoff argument unchanged and not guessed.
+    assert part3b1.window_trading_days(days, cutoff) is None
+    assert cutoff == date(2020, 6, 10)
+
+
+def test_m2_shared_window_used_by_all_three_variables():
+    days = [
+        date(2020, 1, 2) + timedelta(days=i)
+        for i in range(0, 400)
+        if (date(2020, 1, 2) + timedelta(days=i)).weekday() < 5
+    ]
+    cutoff = date(2020, 12, 15)
+    prices = {d: 100.0 + (i % 11) for i, d in enumerate(days)}
+    values = {d: 1_000_000.0 for d in days}
+    w = part3b1.window_trading_days(days, cutoff)
+    assert w is not None
+    r = part3b1.cumulative_simple_return(prices, w)
+    vol = part3b1.sample_stdev(part3b1.daily_returns(prices, w))
+    am = part3b1.amihud_mean(prices, values, w)
+    assert r is not None and vol is not None and am is not None
+    # Same shared end day for all three derived features.
+    assert w[-1] < cutoff
+    m2 = part3b1.build_m2_formula_contract()
+    assert set(m2["variables"]) == {
+        "equity_return_window", "realized_volatility", "amihud_illiquidity",
+    }
+    assert m2["shared_window"]["length"] == "12_calendar_months"
 
 
 def test_synth_m2_null_when_endpoint_price_missing():
