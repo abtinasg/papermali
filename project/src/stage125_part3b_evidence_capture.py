@@ -118,8 +118,9 @@ PART3B1_AUTHORIZED_EXACT = frozenset({
     PART3B1_TEST_REL,
     PART3B1_ALLOWLIST_TEST_REL,
     PART3B1_RUN_REL,
-    "project/stage125/README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md",
+    "project/stage125/README_STAGE125_PART3B1_DECISION_LOCK.md",
     "project/stage125/metadata_and_hashes_stage125_part3b1.json",
+    "project/stage125/part3b1_adjudicated_decision_requirements_stage125.json",
     "project/stage125/part3b1_cutoff_available_at_contract_stage125.json",
     "project/stage125/part3b1_decision_lock_stage125.json",
     "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
@@ -143,20 +144,6 @@ PART3B_AUTHORIZED_EXACT = frozenset({
     f"project/stage125/{F_DECISION_REQ}", f"project/stage125/{F_DECISION_REQ_MD}",
 }) | PART3B1_AUTHORIZED_EXACT
 
-PART3B1_OWNED_AFTER_LOCK = frozenset({F_DECISION_REQ, F_DECISION_REQ_MD})
-PART3B1_LOCK_PATH = "project/stage125/part3b1_decision_lock_stage125.json"
-
-
-def part3b1_decision_locked(repo_root: Path) -> bool:
-    """True when Part 3B.1 Decision Lock artifacts are present and locked."""
-    path = repo_root / PART3B1_LOCK_PATH
-    if not path.is_file():
-        return False
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return False
-    return data.get("part3b1_decision_locked") is True
 
 ENDPOINT_HEADER = [
     "source_id", "official_source_owner", "exact_https_origin", "exact_hostname",
@@ -2358,13 +2345,11 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
                 unresolved_rows,
             ),
             F_README: build_readme(),
-        }
-        # After Part 3B.1 Decision Lock, those two files are owned by Part 3B.1.
-        if not part3b1_decision_locked(repo_root):
-            content[F_DECISION_REQ] = _json_str(decision_data)
-            content[F_DECISION_REQ_MD] = (
+            F_DECISION_REQ: _json_str(decision_data),
+            F_DECISION_REQ_MD: (
                 decision_md if decision_md.endswith("\n") else decision_md + "\n"
-            )
+            ),
+        }
         content_hashes = {n: sha256_bytes(c.encode("utf-8")) for n, c in content.items()}
         for name in (
             F_AUTH, F_PLAN, F_ENDPOINTS, F_EVIDENCE, F_HANDLES, F_LINKAGE,
@@ -2505,13 +2490,9 @@ def run_check_manifest_only(repo_root: Path, output_dir: Path) -> dict:
             raise QCFail("metadata missing; run --write first")
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
         hashes = meta.get("output_files_sha256") or {}
-        skip_owned = (
-            PART3B1_OWNED_AFTER_LOCK if part3b1_decision_locked(repo_root) else frozenset()
-        )
         drift = [
             name for name, expected in sorted(hashes.items())
-            if name not in skip_owned
-            and (
+            if (
                 not (output_dir / name).is_file()
                 or sha256_file(output_dir / name) != expected
             )
@@ -2543,13 +2524,9 @@ def run_check(repo_root: Path, output_dir: Path) -> dict:
             raise QCFail("metadata missing; run --write first")
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
         hashes = meta.get("output_files_sha256") or {}
-        skip_owned = (
-            PART3B1_OWNED_AFTER_LOCK if part3b1_decision_locked(repo_root) else frozenset()
-        )
         drift = [
             name for name, expected in sorted(hashes.items())
-            if name not in skip_owned
-            and (
+            if (
                 not (output_dir / name).is_file()
                 or sha256_file(output_dir / name) != expected
             )

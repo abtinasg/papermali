@@ -32,8 +32,14 @@ EXPECTED_BASELINE_COMMIT = "274ff216f0f3a59ae611c68b662382d75ad84c8b"
 DECISION_LOCK_VERSION = "stage125_part3b1_v1"
 MICRO_STEP_ID = "stage125-part3b1-feature-definition-scoring-adjudication-lock"
 
+# Locked minimum-valid-observation contract (no auto reduction / imputation).
+MINIMUM_VALID_DAILY_RETURN_OBSERVATIONS = 126
+MINIMUM_VALID_AMIHUD_OBSERVATIONS = 126
+
 SRC_REL = "project/src/stage125_part3b1_decision_lock.py"
 TEST_REL = "project/tests/test_stage125_part3b1_decision_lock.py"
+ALLOWLIST_TEST_REL = "project/tests/test_stage125_part3b1_allowlist_guards.py"
+RUN_REL = "project/run_stage125_part3b1.py"
 
 FROZEN_INPUT_PATHS = (
     "project/stage125/data_dictionary_stage125.csv",
@@ -50,6 +56,14 @@ FROZEN_INPUT_PATHS = (
     "project/stage125/stage125_part3b_evidence_capture_qc_report.json",
 )
 
+# Historical Part 3B frozen outputs — verified byte-identically; never overwritten
+# by Part 3B.1 adjudication.
+PART3B_FROZEN_METADATA = "project/stage125/metadata_and_hashes_stage125_part3b.json"
+PART3B_LEGACY_DECISION_REQ = "project/stage125/part3b_decision_requirements_stage125.json"
+PART3B_LEGACY_README = (
+    "project/stage125/README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md"
+)
+
 F_DECISION = "part3b1_decision_lock_stage125.json"
 F_M2 = "part3b1_m2_feature_formula_contract_stage125.json"
 F_M3 = "part3b1_m3_cbi_policy_contract_stage125.json"
@@ -57,13 +71,44 @@ F_M4 = "part3b1_m4_feature_definition_contract_stage125.json"
 F_RUBRIC = "part3b1_rubric_operational_mapping_stage125.json"
 F_CUTOFF = "part3b1_cutoff_available_at_contract_stage125.json"
 F_DECISIONS_CSV = "part3b1_selected_decisions_stage125.csv"
-F_REQ = "part3b_decision_requirements_stage125.json"
+F_REQ = "part3b1_adjudicated_decision_requirements_stage125.json"
 F_QC = "stage125_part3b1_decision_lock_qc_report.json"
 F_METADATA = "metadata_and_hashes_stage125_part3b1.json"
-F_README = "README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md"
+F_README = "README_STAGE125_PART3B1_DECISION_LOCK.md"
 
 CONTENT_FILES = (
     F_DECISION, F_M2, F_M3, F_M4, F_RUBRIC, F_CUTOFF, F_DECISIONS_CSV, F_REQ, F_README,
+)
+
+# Exact-path Part 3B.1 surfaces (no globs / no directory-wide ownership transfer).
+PART3B1_AUTHORIZED_EXACT = frozenset({
+    SRC_REL,
+    TEST_REL,
+    ALLOWLIST_TEST_REL,
+    RUN_REL,
+    f"project/stage125/{F_DECISION}",
+    f"project/stage125/{F_M2}",
+    f"project/stage125/{F_M3}",
+    f"project/stage125/{F_M4}",
+    f"project/stage125/{F_RUBRIC}",
+    f"project/stage125/{F_CUTOFF}",
+    f"project/stage125/{F_DECISIONS_CSV}",
+    f"project/stage125/{F_REQ}",
+    f"project/stage125/{F_README}",
+    f"project/stage125/{F_QC}",
+    f"project/stage125/{F_METADATA}",
+})
+
+FORBIDDEN_SURFACE_EXACT = frozenset({
+    "project/stage125/part3b2_feature_extraction_stage125.json",
+    "project/run_stage126.py",
+    "project/src/stage126_modeling.py",
+    "project/stage126/README_STAGE126.md",
+})
+
+_PROHIBITED_NEW_NAME_MARKERS = (
+    "raw_cache", "evidence_cache", "model_weights", "model_artifact",
+    "live_score", "accessibility_scores_live", "pair_value_evidence",
 )
 
 _DECISIONS_HEADER = [
@@ -169,6 +214,12 @@ def build_m2_formula_contract() -> dict:
         "option_id": "M2-A_modified",
         "contract_version": DECISION_LOCK_VERSION,
         "imputation_allowed": False,
+        "threshold_reduction_allowed": False,
+        "scaling_or_extrapolation_allowed": False,
+        "minimum_valid_daily_return_observations": (
+            MINIMUM_VALID_DAILY_RETURN_OBSERVATIONS
+        ),
+        "minimum_valid_amihud_observations": MINIMUM_VALID_AMIHUD_OBSERVATIONS,
         "shared_window": {
             "length": "12_calendar_months",
             "end_rule": (
@@ -185,6 +236,7 @@ def build_m2_formula_contract() -> dict:
             "equal_to_cutoff_trading_day_rule": (
                 "reject_and_select_previous_trading_day_strictly_before_cutoff"
             ),
+            "applies_to_all_m2_variables": True,
         },
         "price_field": {
             "name": "adjusted_close",
@@ -194,18 +246,29 @@ def build_m2_formula_contract() -> dict:
             ),
             "missing_price_rule": "exclude_day_from_window_computations",
         },
+        "diagnostics_recorded": [
+            "missing_price_day_count",
+            "zero_traded_value_day_count",
+            "usable_daily_return_count",
+            "usable_amihud_day_count",
+        ],
         "variables": {
             "equity_return_window": {
                 "candidate_id": "cand_m2_equity_return_window",
                 "unit": "return_ratio",
                 "formula_id": "m2_cumulative_simple_return_W",
                 "formula": (
-                    "Let P_t be adjusted_close on trading day t in window W "
-                    "ordered t0..tN=T*. Require P_{t0} and P_{tN} present. "
-                    "R_W = (P_{tN} / P_{t0}) - 1. "
-                    "If either endpoint price missing => null."
+                    "Let P_t be adjusted_close on trading day t in shared window W "
+                    "ordered t0..tN=T*. Require P_{t0} and P_{tN} present AND at "
+                    "least minimum_valid_daily_return_observations=126 valid daily "
+                    "simple returns in W. R_W = (P_{tN} / P_{t0}) - 1. "
+                    "If either endpoint missing OR usable daily return count < 126 "
+                    "=> null/UNRESOLVED. No imputation, scaling, or extrapolation."
                 ),
                 "transform": "none_beyond_simple_return_ratio",
+                "minimum_valid_daily_return_observations": (
+                    MINIMUM_VALID_DAILY_RETURN_OBSERVATIONS
+                ),
             },
             "realized_volatility": {
                 "candidate_id": "cand_m2_realized_volatility",
@@ -213,26 +276,34 @@ def build_m2_formula_contract() -> dict:
                 "formula_id": "m2_daily_return_stdev_sample_W",
                 "formula": (
                     "Daily simple returns r_t = (P_t / P_{t-1}) - 1 for consecutive "
-                    "trading days in W with both prices present. "
+                    "trading days in shared window W with both prices present. "
                     "realized_volatility = sample_stdev(r_t) with ddof=1 "
                     "(daily-return volatility proxy; NOT annualized). "
-                    "If usable return count < 2 => null."
+                    "If usable return count < minimum_valid_daily_return_observations"
+                    "=126 => null/UNRESOLVED. No imputation, scaling, annualization, "
+                    "or automatic threshold reduction."
                 ),
                 "transform": "sample_standard_deviation_ddof_1_not_annualized",
+                "minimum_valid_daily_return_observations": (
+                    MINIMUM_VALID_DAILY_RETURN_OBSERVATIONS
+                ),
             },
             "amihud_illiquidity": {
                 "candidate_id": "cand_m2_amihud_illiquidity",
                 "unit": "illiquidity_per_rial",
                 "formula_id": "m2_amihud_mean_abs_return_over_value_W",
                 "formula": (
-                    "For each trading day t in W with r_t defined and "
+                    "For each trading day t in shared window W with r_t defined and "
                     "traded_value_rial V_t > 0: a_t = abs(r_t) / V_t. "
                     "amihud = mean(a_t) over usable days. "
                     "Days with V_t<=0 or missing V_t or missing r_t are excluded "
-                    "(never imputed). If usable day count == 0 => null."
+                    "(never imputed to a fabricated volume). "
+                    "If usable day count < minimum_valid_amihud_observations=126 "
+                    "=> null/UNRESOLVED."
                 ),
                 "volume_field": "traded_value_rial",
                 "zero_volume_rule": "exclude_day_never_impute",
+                "minimum_valid_amihud_observations": MINIMUM_VALID_AMIHUD_OBSERVATIONS,
             },
         },
         "leakage_rules": {
@@ -245,7 +316,8 @@ def build_m2_formula_contract() -> dict:
             "M2 daily market observations require market_observation_date < "
             "pair_cutoff_date because intraday ordering of market close vs "
             "cutoff is not provable. CUT-A feature available_at <= pair_cutoff "
-            "remains unchanged for feature usability."
+            "remains unchanged for feature usability. All three M2 variables use "
+            "the same shared 12-month window W."
         ),
         "synthetic_validation_only": True,
         "real_extraction_authorized": False,
@@ -315,9 +387,11 @@ def build_m4_definition_contract() -> dict:
                 "definition": (
                     "true only when the official CODAL audit report for year t "
                     "contains an explicit structured going-concern / "
-                    "material-uncertainty indication. "
-                    "Absent clause, unstructured-only text, or ambiguity => null "
-                    "(never default false)."
+                    "material-uncertainty indication set to true/present. "
+                    "false only when an explicit structured official field states "
+                    "negative/false for going-concern. "
+                    "Absent clause, missing field, unstructured-only text, conflict, "
+                    "or ambiguity => null/UNRESOLVED (never default false)."
                 ),
                 "document": "official_CODAL_audit_report_year_t",
                 "available_at_field": "verified_available_at_of_that_audit_report",
@@ -330,9 +404,12 @@ def build_m4_definition_contract() -> dict:
                 "definition": (
                     "audit_lag_days = calendar_days(fiscal_year_end, audit_report_date) "
                     "using the official CODAL audit report date field and the "
-                    "predictor fiscal_year_end. "
+                    "predictor fiscal_year_end. Both dates must be semantic valid "
+                    "ISO calendar dates. "
                     "If fiscal_year_end missing (LC08), or audit_report_date missing/"
-                    "ambiguous, or either date unparseable => null. Never impute dates."
+                    "ambiguous, or either date unparseable, or "
+                    "audit_report_date < fiscal_year_end (negative lag) => "
+                    "null/UNRESOLVED. Never impute dates or emit a negative lag."
                 ),
                 "document": "official_CODAL_audit_report_year_t",
                 "available_at_field": "verified_available_at_of_that_audit_report",
@@ -473,7 +550,8 @@ def build_selected_decision_rows() -> list[dict]:
                 "Shared 12-month window ending on last trading day strictly "
                 "before pair cutoff (market_observation_date < pair_cutoff_date); "
                 "adjusted close; cumulative return; daily-return stdev; Amihud; "
-                "no imputation."
+                "minimum_valid_daily_return_observations=126; "
+                "minimum_valid_amihud_observations=126; no imputation."
             ),
             "blocks_real_extraction": "true_until_explicit_later_authorization",
         },
@@ -665,9 +743,14 @@ def build_updated_decision_requirements(lock_record: dict) -> dict:
 
 
 def build_readme() -> str:
-    return """# Stage125 Part 3B.1 — Feature Definition & Scoring Adjudication Lock
+    return """# Stage125 Part 3B.1 — Decision Lock
 
 **Status:** decision locked (contracts / synthetic validation only).
+
+This versioned Part 3B.1 adjudication README is independent of the historical
+Part 3B proposed-requirements README
+(`README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md`), which
+remains a frozen Part 3B artifact.
 
 User-approved selections:
 
@@ -683,12 +766,12 @@ User-approved selections:
 ## Locked scope
 
 - Schema/formula contracts for M2/M3/M4
-- M2 market window ends strictly before pair cutoff
-  (`market_observation_date < pair_cutoff_date`); equal-to-cutoff trading days
-  are rejected
+- Shared 12-month M2 window ending strictly before pair cutoff
+  (`market_observation_date < pair_cutoff_date`)
+- M2 minimum-valid-observation lock: 126 daily returns / 126 Amihud days
 - Operational rubric mapping (candidate-level scores; pair coverage via G09–G12)
-- CUT-A retention of Part 2 pair cutoff
-  (`feature_available_at <= pair_cutoff` unchanged)
+- CUT-A retention of Part 2 pair cutoff with semantic UTC timestamp compare
+  (`feature_available_at <= pair_cutoff`)
 - Synthetic validators only
 
 ## Still prohibited
@@ -710,6 +793,33 @@ authorized.
 
 def _parse_iso_date(value: str) -> date:
     return date.fromisoformat(value)
+
+
+def parse_aware_utc_instant(value: str | None) -> datetime | None:
+    """Strict timezone-aware ISO-8601 → UTC instant. Fail-closed on bad input."""
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text or " " in text:
+        return None
+    if "T" not in text:
+        return None
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    try:
+        dt = datetime.fromisoformat(text)
+    except (TypeError, ValueError):
+        return None
+    if dt.tzinfo is None:
+        return None
+    # Reject invented/invalid fixed offsets by requiring a concrete tzinfo utcoffset.
+    try:
+        offset = dt.utcoffset()
+    except Exception:
+        return None
+    if offset is None:
+        return None
+    return dt.astimezone(timezone.utc)
 
 
 def last_trading_day_strictly_before(
@@ -740,16 +850,6 @@ def window_trading_days(
     return days or None
 
 
-def cumulative_simple_return(prices: dict[date, float], days: list[date]) -> float | None:
-    if not days:
-        return None
-    p0 = prices.get(days[0])
-    p1 = prices.get(days[-1])
-    if p0 is None or p1 is None or p0 == 0:
-        return None
-    return (p1 / p0) - 1.0
-
-
 def daily_returns(prices: dict[date, float], days: list[date]) -> list[float]:
     out: list[float] = []
     for i in range(1, len(days)):
@@ -761,9 +861,64 @@ def daily_returns(prices: dict[date, float], days: list[date]) -> list[float]:
     return out
 
 
-def sample_stdev(values: list[float]) -> float | None:
+def m2_window_diagnostics(
+    prices: dict[date, float],
+    values_rial: dict[date, float],
+    days: list[date],
+) -> dict[str, int]:
+    """Diagnostic counts only — never converts zero-volume into a fabricated value."""
+    missing_price = 0
+    for d in days:
+        if prices.get(d) is None:
+            missing_price += 1
+    rets_by_day: dict[date, float] = {}
+    for i in range(1, len(days)):
+        a = prices.get(days[i - 1])
+        b = prices.get(days[i])
+        if a is None or b is None or a == 0:
+            continue
+        rets_by_day[days[i]] = (b / a) - 1.0
+    zero_tv = 0
+    usable_amihud = 0
+    for d, r in rets_by_day.items():
+        v = values_rial.get(d)
+        if v is None or v <= 0:
+            zero_tv += 1
+            continue
+        usable_amihud += 1
+        del r
+    return {
+        "missing_price_day_count": missing_price,
+        "zero_traded_value_day_count": zero_tv,
+        "usable_daily_return_count": len(rets_by_day),
+        "usable_amihud_day_count": usable_amihud,
+    }
+
+
+def cumulative_simple_return(
+    prices: dict[date, float],
+    days: list[date],
+    *,
+    min_returns: int = MINIMUM_VALID_DAILY_RETURN_OBSERVATIONS,
+) -> float | None:
+    if not days:
+        return None
+    p0 = prices.get(days[0])
+    p1 = prices.get(days[-1])
+    if p0 is None or p1 is None or p0 == 0:
+        return None
+    if len(daily_returns(prices, days)) < min_returns:
+        return None
+    return (p1 / p0) - 1.0
+
+
+def sample_stdev(
+    values: list[float],
+    *,
+    min_obs: int = MINIMUM_VALID_DAILY_RETURN_OBSERVATIONS,
+) -> float | None:
     n = len(values)
-    if n < 2:
+    if n < min_obs:
         return None
     mean = sum(values) / n
     var = sum((x - mean) ** 2 for x in values) / (n - 1)
@@ -774,6 +929,8 @@ def amihud_mean(
     prices: dict[date, float],
     values_rial: dict[date, float],
     days: list[date],
+    *,
+    min_obs: int = MINIMUM_VALID_AMIHUD_OBSERVATIONS,
 ) -> float | None:
     rets = {}
     for i in range(1, len(days)):
@@ -788,7 +945,7 @@ def amihud_mean(
         if v is None or v <= 0:
             continue
         ratios.append(abs(r) / v)
-    if not ratios:
+    if len(ratios) < min_obs:
         return None
     return sum(ratios) / len(ratios)
 
@@ -797,32 +954,118 @@ def audit_lag_days(fiscal_year_end: str | None, audit_report_date: str | None) -
     if not fiscal_year_end or not audit_report_date:
         return None
     try:
-        a = _parse_iso_date(fiscal_year_end)
-        b = _parse_iso_date(audit_report_date)
+        a = _parse_iso_date(str(fiscal_year_end).strip())
+        b = _parse_iso_date(str(audit_report_date).strip())
     except ValueError:
         return None
-    return (b - a).days
+    lag = (b - a).days
+    if lag < 0:
+        return None
+    return lag
 
 
 def going_concern_flag(structured_indication: str | None) -> bool | None:
     if structured_indication is None:
         return None
     token = str(structured_indication).strip().lower()
-    if token in {"", "ambiguous", "unstructured_only", "missing"}:
+    if token in {
+        "", "ambiguous", "unstructured_only", "missing", "absent",
+        "conflict", "conflicting", "unreadable",
+    }:
         return None
     if token in {"true", "yes", "1", "present"}:
         return True
     if token in {"false", "no", "0", "absent_explicit_false"}:
-        # Explicit structured false is allowed only when source states false;
-        # absent remains null via the branch above.
+        # Explicit structured false only — absence remains null above.
         return False
     return None
 
 
 def feature_usable(available_at: str | None, pair_cutoff: str | None) -> bool:
-    if not available_at or not pair_cutoff:
+    """CUT-A: available_at <= pair_cutoff on real UTC instants (equality allowed)."""
+    a = parse_aware_utc_instant(available_at)
+    b = parse_aware_utc_instant(pair_cutoff)
+    if a is None or b is None:
         return False
-    return available_at <= pair_cutoff
+    return a <= b
+
+
+def verify_frozen_part3b_output_hashes(repo_root: Path) -> dict[str, str]:
+    """Every hash recorded in Part 3B metadata must still match on disk."""
+    meta_path = repo_root / PART3B_FROZEN_METADATA
+    if not meta_path.is_file():
+        raise QCFail(f"missing Part 3B metadata: {PART3B_FROZEN_METADATA}")
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    hashes = meta.get("output_files_sha256") or {}
+    if not hashes:
+        raise QCFail("Part 3B metadata has empty output_files_sha256")
+    verified: dict[str, str] = {}
+    for name, expected in sorted(hashes.items()):
+        path = repo_root / "project" / "stage125" / name
+        actual = sha256_file(path)
+        if actual is None:
+            raise QCFail(f"Part 3B frozen output missing: {name}")
+        if actual != expected:
+            raise QCFail(
+                f"Part 3B frozen hash drift for {name}: "
+                f"expected={expected} actual={actual}"
+            )
+        verified[name] = actual
+    return verified
+
+
+def scan_closed_world_part3b1(repo_root: Path) -> list[str]:
+    """Fail on unauthorized new cache/evidence/value/score/model surfaces."""
+    from src import stage125_part3b0_evidence_readiness as p3b0
+    from src import stage125_part3b_evidence_capture as part3b
+
+    hits: list[str] = []
+    for rel in FORBIDDEN_SURFACE_EXACT:
+        if (repo_root / rel).exists():
+            hits.append(rel)
+
+    stage125 = repo_root / "project" / "stage125"
+    if not stage125.is_dir():
+        return hits
+    allowed = set(p3b0.STAGE125_ALLOWED_EXACT) | set(part3b.PART3B_AUTHORIZED_EXACT)
+    for path in stage125.rglob("*"):
+        if not path.is_file():
+            continue
+        rel = str(path.relative_to(repo_root)).replace("\\", "/")
+        if rel in allowed:
+            continue
+        if p3b0._is_authorized_part3b_path(repo_root, rel):
+            continue
+        hits.append(rel)
+        continue
+    # Name-marker scan even inside allowlisted dirs for newly planted attack files
+    # that somehow got allowlisted incorrectly — catch obvious model/cache plants
+    # that are not historical Part 3B outputs.
+    for path in stage125.rglob("*"):
+        if not path.is_file():
+            continue
+        rel = str(path.relative_to(repo_root)).replace("\\", "/")
+        lower = path.name.lower()
+        if any(m in lower for m in _PROHIBITED_NEW_NAME_MARKERS):
+            if rel not in part3b.PART3B_AUTHORIZED_EXACT:
+                if rel not in hits:
+                    hits.append(rel)
+    return sorted(set(hits))
+
+
+def verify_changed_paths_exact_allowlist(
+    repo_root: Path, baseline: str = EXPECTED_BASELINE_COMMIT,
+) -> tuple[bool, list[str]]:
+    """Every path changed vs baseline must be on the curated exact allowlist."""
+    from scripts import update_ai_handoff as handoff
+
+    raw = _git(str(repo_root), "diff", "--name-only", f"{baseline}...HEAD")
+    changed = {p for p in raw.splitlines() if p.strip()}
+    # Include uncommitted tracked modifications relevant to local verification.
+    wt = _git(str(repo_root), "diff", "--name-only", "HEAD")
+    changed |= {p for p in wt.splitlines() if p.strip()}
+    offenders = sorted(p for p in changed if not handoff.path_allowlisted(p))
+    return (not offenders), offenders
 
 
 # --------------------------------------------------------------------------- #
@@ -852,7 +1095,17 @@ def build_all(repo_root: Path) -> dict[str, str]:
     }
 
 
-def build_qc_assertions(content: dict[str, str], frozen: dict[str, str]) -> list[dict]:
+def build_qc_assertions(
+    repo_root: Path,
+    content: dict[str, str],
+    frozen: dict[str, str],
+    *,
+    network_calls_attempted: int,
+    part3b_hashes: dict[str, str],
+    closed_world_hits: list[str],
+    changed_path_ok: bool,
+    changed_path_offenders: list[str],
+) -> list[dict]:
     assertions: list[dict] = []
 
     def add(name: str, ok: bool, detail: str) -> None:
@@ -885,14 +1138,61 @@ def build_qc_assertions(content: dict[str, str], frozen: dict[str, str]) -> list
         lock.get("accessibility_scoring_applied") is False
         and rubric.get("real_scoring_authorized") is False,
         "scoring not authorized")
-    add("no_network_in_part3b1",
-        lock.get("network_extraction_performed") is False, "this micro-step offline")
-    # Historical Part 3B probe network remains recorded on the Part 3B QC;
-    # Part 3B.1 itself must not claim new host contact.
+    add(
+        "zero_part3b1_network_calls_sentinel",
+        network_calls_attempted == 0,
+        f"calls_attempted={network_calls_attempted}",
+    )
+    add(
+        "unchanged_frozen_part3b_hashes",
+        len(part3b_hashes) > 0,
+        f"verified={len(part3b_hashes)}",
+    )
+    add(
+        "closed_world_no_new_cache_evidence_score_model",
+        not closed_world_hits,
+        f"hits={closed_world_hits[:8]}",
+    )
+    add(
+        "changed_path_exact_allowlist",
+        changed_path_ok,
+        f"offenders={changed_path_offenders[:8]}",
+    )
+    forbidden_present = [
+        rel for rel in FORBIDDEN_SURFACE_EXACT if (repo_root / rel).exists()
+    ]
+    add(
+        "no_part3b2_or_stage126_surfaces",
+        not forbidden_present
+        and not any(("part3b2" in h) or ("stage126" in h) for h in closed_world_hits),
+        f"forbidden={forbidden_present}",
+    )
     add("m2_option", m2.get("option_id") == "M2-A_modified", m2.get("option_id"))
     add("m2_no_imputation", m2.get("imputation_allowed") is False, "no impute")
+    add(
+        "m2_min_valid_return_obs_126",
+        m2.get("minimum_valid_daily_return_observations")
+        == MINIMUM_VALID_DAILY_RETURN_OBSERVATIONS
+        and m2["variables"]["realized_volatility"].get(
+            "minimum_valid_daily_return_observations"
+        ) == MINIMUM_VALID_DAILY_RETURN_OBSERVATIONS
+        and m2["variables"]["equity_return_window"].get(
+            "minimum_valid_daily_return_observations"
+        ) == MINIMUM_VALID_DAILY_RETURN_OBSERVATIONS,
+        "126",
+    )
+    add(
+        "m2_min_valid_amihud_obs_126",
+        m2.get("minimum_valid_amihud_observations")
+        == MINIMUM_VALID_AMIHUD_OBSERVATIONS
+        and m2["variables"]["amihud_illiquidity"].get(
+            "minimum_valid_amihud_observations"
+        ) == MINIMUM_VALID_AMIHUD_OBSERVATIONS,
+        "126",
+    )
     add("m2_window_12m",
-        m2["shared_window"]["length"] == "12_calendar_months", "12m")
+        m2["shared_window"]["length"] == "12_calendar_months"
+        and m2["shared_window"].get("applies_to_all_m2_variables") is True, "12m shared")
     add(
         "m2_end_strictly_before_cutoff",
         m2["shared_window"]["end_rule"] == (
@@ -911,6 +1211,18 @@ def build_qc_assertions(content: dict[str, str], frozen: dict[str, str]) -> list
     add("m4_a", m4.get("option_id") == "M4-A", m4.get("option_id"))
     add("m4_ambiguity_null",
         m4.get("ambiguity_or_missing_equals_null") is True, "null on ambiguity")
+    add(
+        "m4_going_concern_false_only_explicit",
+        "false only when an explicit structured official field" in (
+            m4["variables"]["going_concern_flag"]["definition"]
+        ),
+        "explicit false only",
+    )
+    add(
+        "m4_audit_lag_rejects_negative",
+        "negative lag" in m4["variables"]["audit_lag_days"]["definition"],
+        "negative=>null",
+    )
     add("rubric_r_a", rubric.get("option_id") == "R-A", rubric.get("option_id"))
     add("rubric_candidate_level",
         rubric.get("score_level") == "candidate_source_accessibility", "candidate")
@@ -928,10 +1240,23 @@ def build_qc_assertions(content: dict[str, str], frozen: dict[str, str]) -> list
     add("requirements_answers_filled",
         all(d.get("selected_answer") for d in req["user_decisions_still_needed"]),
         "answers recorded")
+    add("adjudicated_req_filename",
+        F_REQ == "part3b1_adjudicated_decision_requirements_stage125.json"
+        and F_REQ in content,
+        F_REQ)
+    add("legacy_part3b_req_not_owned",
+        "part3b_decision_requirements_stage125.json" not in content
+        and PART3B_LEGACY_DECISION_REQ.split("/")[-1] in part3b_hashes,
+        "legacy remains Part 3B")
     add("frozen_inputs_present", len(frozen) == len(FROZEN_INPUT_PATHS),
         f"n={len(frozen)}")
+    add(
+        "content_exact_allowlist",
+        set(content) == set(CONTENT_FILES),
+        f"keys={sorted(content)}",
+    )
 
-    # Synthetic formula checks
+    # Synthetic formula checks with locked 126 thresholds
     days = [date(2020, 1, 2) + timedelta(days=i) for i in range(0, 400, 1)
             if (date(2020, 1, 2) + timedelta(days=i)).weekday() < 5]
     cutoff_d = date(2020, 12, 15)
@@ -945,6 +1270,13 @@ def build_qc_assertions(content: dict[str, str], frozen: dict[str, str]) -> list
         w is not None and w[-1] < cutoff_d,
         f"end={w[-1] if w else None}",
     )
+    diag = m2_window_diagnostics(prices, values, w or [])
+    add(
+        "synth_diagnostics_recorded",
+        diag["usable_daily_return_count"] >= MINIMUM_VALID_DAILY_RETURN_OBSERVATIONS
+        and diag["zero_traded_value_day_count"] >= 1,
+        str(diag),
+    )
     r = cumulative_simple_return(prices, w or [])
     add("synth_return_defined", r is not None, str(r))
     vol = sample_stdev(daily_returns(prices, w or []))
@@ -952,17 +1284,42 @@ def build_qc_assertions(content: dict[str, str], frozen: dict[str, str]) -> list
     am = amihud_mean(prices, values, w or [])
     add("synth_amihud_defined", am is not None and am > 0, str(am))
     add("synth_amihud_excludes_zero_volume", True, "zero volume excluded by construction")
+    # Boundary: 125 fails, 126 passes
+    rets_125 = [0.01] * 125
+    rets_126 = [0.01] * 126
+    add("synth_vol_125_fail", sample_stdev(rets_125) is None, "125=>null")
+    add("synth_vol_126_pass", sample_stdev(rets_126) is not None, "126=>ok")
     add("synth_audit_lag",
         audit_lag_days("2020-03-19", "2020-06-20") == 93, "93 days")
+    add("synth_audit_lag_equal_zero",
+        audit_lag_days("2020-03-19", "2020-03-19") == 0, "0 days")
+    add("synth_audit_lag_before_null",
+        audit_lag_days("2020-06-20", "2020-03-19") is None, "negative=>null")
     add("synth_audit_lag_missing_null",
         audit_lag_days(None, "2020-06-20") is None, "null")
     add("synth_going_concern_null_default",
         going_concern_flag(None) is None, "null not false")
+    add("synth_going_concern_explicit_false",
+        going_concern_flag("false") is False, "explicit false")
+    add("synth_going_concern_explicit_true",
+        going_concern_flag("present") is True, "explicit true")
     add("synth_feature_usable_cutoff",
         feature_usable("2020-06-01T00:00:00Z", "2020-06-15T00:00:00Z") is True
+        and feature_usable("2020-06-15T00:00:00Z", "2020-06-15T00:00:00Z") is True
         and feature_usable("2020-06-20T00:00:00Z", "2020-06-15T00:00:00Z") is False
-        and feature_usable(None, "2020-06-15T00:00:00Z") is False,
-        "available_at<=cutoff")
+        and feature_usable(None, "2020-06-15T00:00:00Z") is False
+        and feature_usable("2020-06-01T00:00:00", "2020-06-15T00:00:00Z") is False,
+        "semantic UTC available_at<=cutoff")
+    add(
+        "synth_feature_usable_offset_equivalence",
+        feature_usable(
+            "2020-06-15T04:00:00+04:00", "2020-06-15T00:00:00Z",
+        ) is True
+        and feature_usable(
+            "2020-06-15T00:00:00Z", "2020-06-15T00:00:00+00:00",
+        ) is True,
+        "offset/Z equivalence",
+    )
     add("no_part3b2", lock.get("part3b2_started") is False, "no 3B.2")
     add("no_stage126", lock.get("stage126_started") is False, "no 126")
     return assertions
@@ -971,11 +1328,24 @@ def build_qc_assertions(content: dict[str, str], frozen: dict[str, str]) -> list
 def build_qc_report(
     repo_root: Path, content: dict[str, str], content_hashes: dict[str, str],
     frozen: dict[str, str],
+    *,
+    network_calls_attempted: int,
+    part3b_hashes: dict[str, str],
+    closed_world_hits: list[str],
+    changed_path_ok: bool,
+    changed_path_offenders: list[str],
 ) -> dict:
     root = str(repo_root)
-    source_commit = _git_last_code_commit(root, [SRC_REL, TEST_REL])
+    source_commit = _git_last_code_commit(root, [SRC_REL, TEST_REL, ALLOWLIST_TEST_REL])
     ts = _git_commit_timestamp(root, source_commit)
-    assertions = build_qc_assertions(content, frozen)
+    assertions = build_qc_assertions(
+        repo_root, content, frozen,
+        network_calls_attempted=network_calls_attempted,
+        part3b_hashes=part3b_hashes,
+        closed_world_hits=closed_world_hits,
+        changed_path_ok=changed_path_ok,
+        changed_path_offenders=changed_path_offenders,
+    )
     failed = sum(1 for a in assertions if a["status"] != "PASS")
     part3b_qc = json.loads(
         (repo_root / "project/stage125/stage125_part3b_evidence_capture_qc_report.json")
@@ -997,6 +1367,9 @@ def build_qc_report(
         "tickers": tickers,
         "output_sha256": dict(sorted(content_hashes.items())),
         "frozen_input_sha256": dict(sorted(frozen.items())),
+        "frozen_part3b_output_sha256": dict(sorted(part3b_hashes.items())),
+        "closed_world_hits": list(closed_world_hits),
+        "changed_path_offenders": list(changed_path_offenders),
         "part3a_protocol_locked": True,
         "part3a_decision_locked": True,
         "part3b0_readiness": True,
@@ -1011,7 +1384,7 @@ def build_qc_report(
         "accessibility_scoring_applied": False,
         "part3b_completed": False,
         "network_extraction_performed": True,
-        "part3b1_network_calls_attempted": 0,
+        "part3b1_network_calls_attempted": network_calls_attempted,
         "modeling_started": False,
         "part3b2_started": False,
         "stage126_started": False,
@@ -1040,51 +1413,75 @@ def build_metadata(qc: dict, content_hashes: dict[str, str], qc_hash: str) -> di
         "part3b_completed": False,
         "part3b1_decision_locked": True,
         "network_extraction_performed": True,
-        "part3b1_network_calls_attempted": 0,
+        "part3b1_network_calls_attempted": qc["part3b1_network_calls_attempted"],
     }
 
 
 def run(project_dir: Path, output_dir: Path | None = None, write: bool = False) -> dict:
+    from src import stage125_part3b0_evidence_readiness as p3b0
+
     repo_root = project_dir.parent if project_dir.name == "project" else project_dir
     out_dir = output_dir or (repo_root / "project" / "stage125")
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    # Git-diff allowlist evidence must run outside the Part 3B.0 network
+    # sentinel (which only permits a narrow readonly git argv set).
     verify_baseline_commit(str(repo_root))
-    frozen = frozen_input_hashes(repo_root)
+    changed_path_ok, changed_path_offenders = verify_changed_paths_exact_allowlist(
+        repo_root,
+    )
 
-    content = build_all(repo_root)
-    content_hashes = {name: sha256_bytes(text.encode("utf-8"))
-                      for name, text in content.items()}
-    qc = build_qc_report(repo_root, content, content_hashes, frozen)
-    qc_text = _json_str(qc)
-    qc_hash = sha256_bytes(qc_text.encode("utf-8"))
-    meta = build_metadata(qc, content_hashes, qc_hash)
-    meta_text = _json_str(meta)
+    with p3b0.network_sentinel() as sentinel:
+        frozen = frozen_input_hashes(repo_root)
+        part3b_hashes = verify_frozen_part3b_output_hashes(repo_root)
+        closed_world_hits = scan_closed_world_part3b1(repo_root)
 
-    drift: list[str] = []
-    for name, text in list(content.items()) + [(F_QC, qc_text), (F_METADATA, meta_text)]:
-        path = out_dir / name
-        if path.is_file():
-            on_disk = path.read_text(encoding="utf-8")
-            if on_disk != text:
+        content = build_all(repo_root)
+        content_hashes = {name: sha256_bytes(text.encode("utf-8"))
+                          for name, text in content.items()}
+        qc = build_qc_report(
+            repo_root, content, content_hashes, frozen,
+            network_calls_attempted=sentinel.calls_attempted,
+            part3b_hashes=part3b_hashes,
+            closed_world_hits=closed_world_hits,
+            changed_path_ok=changed_path_ok,
+            changed_path_offenders=changed_path_offenders,
+        )
+        qc_text = _json_str(qc)
+        qc_hash = sha256_bytes(qc_text.encode("utf-8"))
+        meta = build_metadata(qc, content_hashes, qc_hash)
+        meta_text = _json_str(meta)
+
+        drift: list[str] = []
+        for name, text in list(content.items()) + [(F_QC, qc_text), (F_METADATA, meta_text)]:
+            path = out_dir / name
+            if path.is_file():
+                on_disk = path.read_text(encoding="utf-8")
+                if on_disk != text:
+                    drift.append(name)
+            else:
                 drift.append(name)
-        else:
-            drift.append(name)
 
-    files_written: dict[str, str] = {}
-    if write:
-        for name, text in content.items():
-            (out_dir / name).write_text(text, encoding="utf-8")
-            files_written[name] = content_hashes[name]
-        (out_dir / F_QC).write_text(qc_text, encoding="utf-8")
-        (out_dir / F_METADATA).write_text(meta_text, encoding="utf-8")
-        files_written[F_QC] = qc_hash
-        files_written[F_METADATA] = sha256_bytes(meta_text.encode("utf-8"))
+        files_written: dict[str, str] = {}
+        if write:
+            for name, text in content.items():
+                (out_dir / name).write_text(text, encoding="utf-8")
+                files_written[name] = content_hashes[name]
+            (out_dir / F_QC).write_text(qc_text, encoding="utf-8")
+            (out_dir / F_METADATA).write_text(meta_text, encoding="utf-8")
+            files_written[F_QC] = qc_hash
+            files_written[F_METADATA] = sha256_bytes(meta_text.encode("utf-8"))
 
-    if not qc["all_pass"]:
-        failed = [a for a in qc["assertions"] if a["status"] != "PASS"]
-        raise QCFail(f"QC failed: {failed[:3]}")
+        if not qc["all_pass"]:
+            failed = [a for a in qc["assertions"] if a["status"] != "PASS"]
+            raise QCFail(f"QC failed: {failed[:3]}")
+
+        if sentinel.calls_attempted != 0:
+            raise QCFail(
+                f"Part 3B.1 network sentinel calls_attempted="
+                f"{sentinel.calls_attempted}"
+            )
 
     return {
         "output_dir": str(out_dir),
@@ -1092,4 +1489,6 @@ def run(project_dir: Path, output_dir: Path | None = None, write: bool = False) 
         "drift": drift,
         "files": files_written,
         "frozen_input_sha256": frozen,
+        "frozen_part3b_output_sha256": part3b_hashes,
+        "network_calls_attempted": 0,
     }

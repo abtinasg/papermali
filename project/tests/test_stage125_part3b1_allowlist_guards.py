@@ -60,8 +60,9 @@ def test_part3b1_authorized_exact_paths_are_literal_and_complete():
         "project/src/stage125_part3b1_decision_lock.py",
         "project/tests/test_stage125_part3b1_decision_lock.py",
         "project/tests/test_stage125_part3b1_allowlist_guards.py",
-        "project/stage125/README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md",
+        "project/stage125/README_STAGE125_PART3B1_DECISION_LOCK.md",
         "project/stage125/metadata_and_hashes_stage125_part3b1.json",
+        "project/stage125/part3b1_adjudicated_decision_requirements_stage125.json",
         "project/stage125/part3b1_cutoff_available_at_contract_stage125.json",
         "project/stage125/part3b1_decision_lock_stage125.json",
         "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
@@ -76,8 +77,24 @@ def test_part3b1_authorized_exact_paths_are_literal_and_complete():
     for rel in expected:
         if rel.startswith("project/stage125/"):
             assert rel in p3b0.STAGE125_ALLOWED_EXACT
-        assert (REPO_ROOT / rel).is_file()
-
+        # Deliverables may be written later; code/tests/runners must exist.
+        if rel.endswith(".py"):
+            assert (REPO_ROOT / rel).is_file()
+    # Historical Part 3B proposed README remains Part 3B-owned, not Part 3B.1.
+    legacy_readme = (
+        "project/stage125/README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md"
+    )
+    assert legacy_readme not in part3b.PART3B1_AUTHORIZED_EXACT
+    assert legacy_readme in part3b.PART3B_AUTHORIZED_EXACT
+    assert (REPO_ROOT / legacy_readme).is_file()
+    assert (
+        "project/stage125/part3b_decision_requirements_stage125.json"
+        in part3b.PART3B_AUTHORIZED_EXACT
+    )
+    assert (
+        "project/stage125/part3b_decision_requirements_stage125.json"
+        not in part3b.PART3B1_AUTHORIZED_EXACT
+    )
 
 def test_no_wildcard_or_directory_wide_part3b1_allowlist():
     joined_auth = "\n".join(sorted(part3b.PART3B_AUTHORIZED_EXACT))

@@ -217,13 +217,14 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/metadata_and_hashes_stage125_part3b.json",
     # Stage125 Part 3B.1 generated decision-lock artifacts (runner output only).
     "project/stage125/part3b1_decision_lock_stage125.json",
+    "project/stage125/part3b1_adjudicated_decision_requirements_stage125.json",
     "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
     "project/stage125/part3b1_m3_cbi_policy_contract_stage125.json",
     "project/stage125/part3b1_m4_feature_definition_contract_stage125.json",
     "project/stage125/part3b1_rubric_operational_mapping_stage125.json",
     "project/stage125/part3b1_cutoff_available_at_contract_stage125.json",
     "project/stage125/part3b1_selected_decisions_stage125.csv",
-    "project/stage125/README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md",
+    "project/stage125/README_STAGE125_PART3B1_DECISION_LOCK.md",
     "project/stage125/stage125_part3b1_decision_lock_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1.json",
 )
