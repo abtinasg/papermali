@@ -2,7 +2,7 @@
   "accessibility_scores_assigned": 0,
   "accessibility_scoring_applied": false,
   "all_pass": true,
-  "assertion_count": 24,
+  "assertion_count": 48,
   "assertions": [
     {
       "assertion": "scope_rows_exactly_five",
@@ -25,18 +25,143 @@
       "status": "PASS"
     },
     {
+      "assertion": "full_pilot_scope_fields_verified",
+      "detail": "['اردستان|1401', 'اپال|1401', 'بوعلی|1399', 'بوعلی|1400', 'ثنوسا|1392']",
+      "status": "PASS"
+    },
+    {
       "assertion": "frozen_scientific_unchanged",
       "detail": "unchanged",
       "status": "PASS"
     },
     {
-      "assertion": "network_max_one",
+      "assertion": "capture_receipt_tracked",
+      "detail": "project/stage125/part3b1b_thanusa_capture_receipt_stage125.json",
+      "status": "PASS"
+    },
+    {
+      "assertion": "capture_receipt_required_fields_complete_or_explicitly_null",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "capture_started_at_preserved",
+      "detail": "2026-07-17T21:02:52Z",
+      "status": "PASS"
+    },
+    {
+      "assertion": "capture_completed_at_preserved",
+      "detail": "None",
+      "status": "PASS"
+    },
+    {
+      "assertion": "capture_retrieved_at_preserved",
+      "detail": "2026-07-17T21:02:56Z",
+      "status": "PASS"
+    },
+    {
+      "assertion": "historical_capture_request_count_equals_one",
+      "detail": "1",
+      "status": "PASS"
+    },
+    {
+      "assertion": "current_check_network_requests_zero",
       "detail": "0",
       "status": "PASS"
     },
     {
+      "assertion": "authorized_url_exact",
+      "detail": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D",
+      "status": "PASS"
+    },
+    {
+      "assertion": "authorized_host_exact",
+      "detail": "www.codal.ir",
+      "status": "PASS"
+    },
+    {
+      "assertion": "payload_sha_matches_receipt",
+      "detail": "6d7b08e87a4024851c8e2f17225c2aca43dc968673ccd2869cde2a4fb123b4ee",
+      "status": "PASS"
+    },
+    {
+      "assertion": "metadata_sha_matches_receipt",
+      "detail": "43d435e7b696169e14bf731b54e0f4f8f1b32e06363fd6e3498a8d40d1f1ed2f",
+      "status": "PASS"
+    },
+    {
+      "assertion": "attempt_log_matches_receipt",
+      "detail": "checked",
+      "status": "PASS"
+    },
+    {
+      "assertion": "network_log_matches_receipt",
+      "detail": "checked",
+      "status": "PASS"
+    },
+    {
+      "assertion": "network_log_complete",
+      "detail": "1",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fresh_clone_check_does_not_require_raw_payload",
+      "detail": "raw_payload_local_present_verified",
+      "status": "PASS"
+    },
+    {
+      "assertion": "source_fields_not_filled_from_canonical_fields",
+      "detail": "paired columns present",
+      "status": "PASS"
+    },
+    {
+      "assertion": "source_and_canonical_entities_separate",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "source_and_canonical_fye_separate",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "canonical_title_not_copied_from_candidate",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "thanusa_manifest_exact_row_unique",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "thanusa_letter_serial_derived_from_manifest_url",
+      "detail": "Ddg2e7HG6FGR5ygaTFJd4g==",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_fabricated_thanusa_metadata",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "revision_status_not_guessed",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing_local_cache_fails_closed",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "multiple_candidates_not_silently_first-selected",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
       "assertion": "financial_values_extracted_zero",
-      "detail": "0",
+      "detail": "derived",
       "status": "PASS"
     },
     {
@@ -71,22 +196,22 @@
     },
     {
       "assertion": "part3b_completed_false_marker",
-      "detail": "false",
+      "detail": "derived",
       "status": "PASS"
     },
     {
       "assertion": "modeling_started_false_marker",
-      "detail": "false",
+      "detail": "derived",
       "status": "PASS"
     },
     {
       "assertion": "pilot_cutoff_provenance_resolved_false",
-      "detail": "false",
+      "detail": "derived",
       "status": "PASS"
     },
     {
       "assertion": "data_value_extraction_performed_false",
-      "detail": "false",
+      "detail": "derived",
       "status": "PASS"
     },
     {
@@ -105,11 +230,6 @@
       "status": "PASS"
     },
     {
-      "assertion": "network_log_complete",
-      "detail": "1",
-      "status": "PASS"
-    },
-    {
       "assertion": "predictor_document_binding_mini_pilot_completed",
       "detail": "True",
       "status": "PASS"
@@ -120,8 +240,8 @@
       "status": "PASS"
     },
     {
-      "assertion": "predictor_available_at_evidence_collected_false",
-      "detail": "0",
+      "assertion": "predictor_available_at_evidence_collected_derived",
+      "detail": "False",
       "status": "PASS"
     }
   ],
@@ -131,6 +251,7 @@
   "candidate_value_evidence_collected": false,
   "candidate_values_extracted": 0,
   "canonical_cutoff_rows_mutated": 0,
+  "current_check_run_network_requests_attempted": 0,
   "current_stage": "Stage125",
   "cut_a_available_at_operationalization_locked": true,
   "data_value_extraction_performed": false,
@@ -159,19 +280,21 @@
     "project/stage125/stage125_part3b_evidence_capture_qc_report.json": "c683375f3afe8c2d1a757898122e601f36c145be2b8c69be7ba9b4b781b0f92d"
   },
   "gates_applied": 0,
+  "historical_authorized_capture_requests_performed": 1,
   "maintenance_task_id": "stage125-part3b1b-codal-document-binding-mini-pilot",
   "modeling_started": false,
   "network_extraction_performed": true,
   "network_requests_attempted": 0,
   "network_requests_authorized_max": 1,
   "output_sha256": {
-    "README_STAGE125_PART3B1B_CODAL_DOCUMENT_BINDING.md": "d9182669eceb34704a7db837b48b628bf14c28b9c74703baef853fba82939c36",
-    "part3b1b_capture_attempt_log_stage125.csv": "c192b8bb7eaa6c622db637e112294dc746c6e151039dc2cdf42e68fcd4378593",
-    "part3b1b_codal_document_evidence_stage125.csv": "a7cfada40777c96ab63eea9af31723f012f9c337269c3c3f879b5f5ab1672c73",
-    "part3b1b_document_binding_adjudication_stage125.csv": "b4fb07e7ac231ce5c9dd7b3fdab604777bddc7dc34ece170995afe120aafa0f0",
-    "part3b1b_network_log_stage125.json": "216adbf749248780b716e760789bbeef8002bce63cd34da404fa188ba04ebeb8",
-    "part3b1b_predictor_document_scope_stage125.csv": "4ff20a6833cd6de1b303d9506e53fa49c936f67c890b262a553ee678499eb8b1",
-    "part3b1b_unresolved_and_rejections_stage125.csv": "b62c881a64f2282b228688ecb0718d781349e23a6e967b985ecbb59ef37e85b6"
+    "README_STAGE125_PART3B1B_CODAL_DOCUMENT_BINDING.md": "bf97e714b09ca16f13b403a8916f4b184aa03eb78f32d3dc42117b4e21495487",
+    "part3b1b_capture_attempt_log_stage125.csv": "c0c86f74ef4ca198dd775032b2abb78423d170b5cf9a0e26a5d62c27d30f75c4",
+    "part3b1b_codal_document_evidence_stage125.csv": "b0ded2c9c084cfc8ca882c370b6437d3949af52e00297b3f3d30f80bd315f867",
+    "part3b1b_document_binding_adjudication_stage125.csv": "d4515c0f3741bec7733aac97c4167a1ca730e983b0cc1627d77da7c20c8aa7e1",
+    "part3b1b_network_log_stage125.json": "e779ecf87da4c26b85b3c4d96d3e142a9ef88b21a2e5caa2f97829913418ccb3",
+    "part3b1b_predictor_document_scope_stage125.csv": "835e1b6b17df35f167180e59f7fe51e31c0c679cef464b7d78256ce24bb07f91",
+    "part3b1b_thanusa_capture_receipt_stage125.json": "57e70b5c643c3a0d45d9bcaf968bdae16feefb7b2d6cb62c2df2a07b9d00c128",
+    "part3b1b_unresolved_and_rejections_stage125.csv": "d5e0ce0d400601057d65b935683dbd8b3e3c0d03fa7bb24842f56f61cbf53a67"
   },
   "pair_level_evidence_collected": false,
   "pair_values_extracted": 0,
@@ -185,17 +308,18 @@
   "predictor_available_at_evidence_collected": false,
   "predictor_document_binding_evidence_collected": true,
   "predictor_document_binding_mini_pilot_completed": true,
+  "raw_payload_status": "raw_payload_local_present_verified",
   "rejected_count": 1,
   "research_pointers": {
     "last_completed_research_action_id": "stage125-part3a-decision-lock",
     "next_research_action_id": "stage125-part3b-evidence-capture"
   },
   "scope_rows": 5,
-  "source_commit": "4db0a9ffbde1f663c65d91bded76ff58d85313e4",
-  "source_file_sha256": "b49af1260fcc3934232f1157ae8a91d7a3f678ad8be84e966d0b91f87462d43d",
+  "source_commit": "08143bd2a1812fb437b7a3670e27a77dae09e00a",
+  "source_file_sha256": "c6c0a73e8d9d57160f3557eb68aef51c14cb24aa68c4b56e35818cffba891817",
   "stage": "stage125_part3b1b_codal_document_binding_mini_pilot",
   "stage126_started": false,
-  "test_file_sha256": "9809b84d181cccd505507f2ed7883def7de83daa805a44c0e05e1be8dbb1505a",
+  "test_file_sha256": "a3cbaeaa94aece6ade4ea9a8fc2000fe8d077eb0d454f18cc37a5527233c2b82",
   "tickers": [
     "اردستان",
     "اپال",

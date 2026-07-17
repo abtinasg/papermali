@@ -1,0 +1,22 @@
+{
+  "byte_count": 59904,
+  "completed_at_utc": null,
+  "content_type": "text/html; charset=utf-8",
+  "evidence_id": "ev_p3b1b_thanusa_1392_decision",
+  "final_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D",
+  "http_method": "GET",
+  "letter_serial": "Ddg2e7HG6FGR5ygaTFJd4g==",
+  "metadata_sha256": "43d435e7b696169e14bf731b54e0f4f8f1b32e06363fd6e3498a8d40d1f1ed2f",
+  "payload_sha256": "6d7b08e87a4024851c8e2f17225c2aca43dc968673ccd2869cde2a4fb123b4ee",
+  "predictor_row_key_t": "ثنوسا|1392",
+  "raw_payload_storage_policy": "gitignored_immutable_cache_optional_local",
+  "redirect_chain": [
+    "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D"
+  ],
+  "request_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D",
+  "response_status": 200,
+  "retrieval_purpose": "predictor_document_binding_mini_pilot",
+  "retrieved_at_utc": "2026-07-17T21:02:56Z",
+  "scope_row_id": "p3b1b_scope_006",
+  "started_at_utc": "2026-07-17T21:02:52Z"
+}

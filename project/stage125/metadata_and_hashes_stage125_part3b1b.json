@@ -1,24 +1,25 @@
 {
   "baseline_commit": "4d7a48288543c971f43337e9a5d9a70ccfed2610",
-  "code_commit": "4db0a9ffbde1f663c65d91bded76ff58d85313e4",
+  "code_commit": "08143bd2a1812fb437b7a3670e27a77dae09e00a",
   "current_stage": "Stage125",
   "description": "Stage125 Part 3B.1B CODAL predictor-document binding mini-pilot.",
-  "generated_at": "4db0a9ffbde1f663c65d91bded76ff58d85313e4",
+  "generated_at": "08143bd2a1812fb437b7a3670e27a77dae09e00a",
   "modeling_started": false,
   "network_requests_attempted": 0,
   "output_files_sha256": {
-    "README_STAGE125_PART3B1B_CODAL_DOCUMENT_BINDING.md": "d9182669eceb34704a7db837b48b628bf14c28b9c74703baef853fba82939c36",
-    "part3b1b_capture_attempt_log_stage125.csv": "c192b8bb7eaa6c622db637e112294dc746c6e151039dc2cdf42e68fcd4378593",
-    "part3b1b_codal_document_evidence_stage125.csv": "a7cfada40777c96ab63eea9af31723f012f9c337269c3c3f879b5f5ab1672c73",
-    "part3b1b_document_binding_adjudication_stage125.csv": "b4fb07e7ac231ce5c9dd7b3fdab604777bddc7dc34ece170995afe120aafa0f0",
-    "part3b1b_network_log_stage125.json": "216adbf749248780b716e760789bbeef8002bce63cd34da404fa188ba04ebeb8",
-    "part3b1b_predictor_document_scope_stage125.csv": "4ff20a6833cd6de1b303d9506e53fa49c936f67c890b262a553ee678499eb8b1",
-    "part3b1b_unresolved_and_rejections_stage125.csv": "b62c881a64f2282b228688ecb0718d781349e23a6e967b985ecbb59ef37e85b6",
-    "stage125_part3b1b_codal_document_binding_qc_report.json": "3157f9625f6eb8fe119a84de60e4f939fb19a2db928d62f9a2d35e74210964ee"
+    "README_STAGE125_PART3B1B_CODAL_DOCUMENT_BINDING.md": "bf97e714b09ca16f13b403a8916f4b184aa03eb78f32d3dc42117b4e21495487",
+    "part3b1b_capture_attempt_log_stage125.csv": "c0c86f74ef4ca198dd775032b2abb78423d170b5cf9a0e26a5d62c27d30f75c4",
+    "part3b1b_codal_document_evidence_stage125.csv": "b0ded2c9c084cfc8ca882c370b6437d3949af52e00297b3f3d30f80bd315f867",
+    "part3b1b_document_binding_adjudication_stage125.csv": "d4515c0f3741bec7733aac97c4167a1ca730e983b0cc1627d77da7c20c8aa7e1",
+    "part3b1b_network_log_stage125.json": "e779ecf87da4c26b85b3c4d96d3e142a9ef88b21a2e5caa2f97829913418ccb3",
+    "part3b1b_predictor_document_scope_stage125.csv": "835e1b6b17df35f167180e59f7fe51e31c0c679cef464b7d78256ce24bb07f91",
+    "part3b1b_thanusa_capture_receipt_stage125.json": "57e70b5c643c3a0d45d9bcaf968bdae16feefb7b2d6cb62c2df2a07b9d00c128",
+    "part3b1b_unresolved_and_rejections_stage125.csv": "d5e0ce0d400601057d65b935683dbd8b3e3c0d03fa7bb24842f56f61cbf53a67",
+    "stage125_part3b1b_codal_document_binding_qc_report.json": "a243b75a9e6dbbc04759968ab9bfc3c08369a839f866a4a9c78dd0205e09f461"
   },
   "part3b_completed": false,
   "predictor_document_binding_mini_pilot_completed": true,
-  "source_file_sha256": "b49af1260fcc3934232f1157ae8a91d7a3f678ad8be84e966d0b91f87462d43d",
+  "source_file_sha256": "c6c0a73e8d9d57160f3557eb68aef51c14cb24aa68c4b56e35818cffba891817",
   "stage": "stage125_part3b1b_codal_document_binding_mini_pilot",
-  "test_file_sha256": "9809b84d181cccd505507f2ed7883def7de83daa805a44c0e05e1be8dbb1505a"
+  "test_file_sha256": "a3cbaeaa94aece6ade4ea9a8fc2000fe8d077eb0d454f18cc37a5527233c2b82"
 }
