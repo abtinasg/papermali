@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage125_research_design_readiness`
 - **Last completed research action:** `stage125-part3a-decision-lock`
 - **Next research action:** `stage125-part3b-evidence-capture`
-- **Last stage commit:** `efeeae9091b792da1e0a433d629c57416e48fb5d`
-- **Generated from commit:** `683a0b22323f350c66419bec2cc408336629a48d` (branch `stage125-part3b1a-cut-a-available-at-lock`, informational)
-- **Baseline:** `origin/main` @ `3a54a79c935f27e311679e8582e4c46330590a43`
+- **Last stage commit:** `48f9e0b59454b151fb25e16edb04f1150f374d30`
+- **Generated from commit:** `48f9e0b59454b151fb25e16edb04f1150f374d30` (branch `handoff/post-pr41-merge`, informational)
+- **Baseline:** `origin/main` @ `48f9e0b59454b151fb25e16edb04f1150f374d30`
 
 ## QC
 
@@ -48,5 +48,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `37e7e246958f531704dee932b7c0f9eaee838c8e49bffeceba901e84ffd14e42`_
-_generated_at_utc: 2026-07-17T20:08:09Z (informational)_
+_state_fingerprint: `f70d594e2d11ec79b340f6492b554851a522a2aaa97e9451a100c7b3ad64d20a`_
+_generated_at_utc: 2026-07-17T20:30:09Z (informational)_
