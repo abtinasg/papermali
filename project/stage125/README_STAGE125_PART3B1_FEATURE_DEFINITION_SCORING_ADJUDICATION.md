@@ -16,8 +16,12 @@ User-approved selections:
 ## Locked scope
 
 - Schema/formula contracts for M2/M3/M4
+- M2 market window ends strictly before pair cutoff
+  (`market_observation_date < pair_cutoff_date`); equal-to-cutoff trading days
+  are rejected
 - Operational rubric mapping (candidate-level scores; pair coverage via G09–G12)
 - CUT-A retention of Part 2 pair cutoff
+  (`feature_available_at <= pair_cutoff` unchanged)
 - Synthetic validators only
 
 ## Still prohibited

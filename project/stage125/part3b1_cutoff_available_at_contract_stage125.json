@@ -1,6 +1,6 @@
 {
   "block_rules": {
-    "M2": "market_window_end_available_at_le_pair_cutoff",
+    "M2": "market_observation_date_strictly_before_pair_cutoff;feature_available_at_still_le_pair_cutoff_under_CUT_A",
     "M3": "macro_publication_or_available_at_le_pair_cutoff_when_cbi_approved",
     "M4": "document_available_at_le_pair_cutoff"
   },
