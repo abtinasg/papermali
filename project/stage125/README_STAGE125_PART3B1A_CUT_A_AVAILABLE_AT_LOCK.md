@@ -29,6 +29,40 @@ canonical source version.
 - more conservative / leakage-safe than `SentDateTime`
 - methodological operationalization lock — not inference from local filenames/mtimes
 
+## Normalized revision vocabulary
+
+Normalized `revision_status` matches the frozen provenance schema enum only:
+
+```text
+original
+revision
+restatement
+```
+
+`correction` is **not** a normalized status. CODAL «اصلاحیه» may be retained in
+`revision_status_raw`; it maps to normalized `revision` only when that mapping is
+explicit. `restatement` is used only when source/version evidence supports it.
+Missing/unclassifiable status → `UNRESOLVED`.
+
+## Exact source-version binding
+
+Authoritative structural checks (boolean flags cannot bypass):
+
+- non-empty `letter_serial` and `canonical_letter_serial` with exact equality
+- if `canonical_tracing_no` is present, `tracing_no` must be present and equal
+- non-empty official titles on both sides with exact equality
+- for `revision` / `restatement`:
+  `values_source_letter_serial == letter_serial == canonical_letter_serial`
+- official URL and raw payload/snapshot hash present
+
+## Asia/Tehran wall time
+
+Jalali CODAL timestamps are classified with UTC round-trips over `fold=0` and
+`fold=1` (`zoneinfo` `Asia/Tehran`). Nonexistent spring-forward times are
+`nonexistent_local_time` (not ambiguous). Ambiguous fall-back times without a
+deterministic fold rule are
+`ambiguous_local_time_without_deterministic_rule`. No fixed `+03:30`.
+
 ## Non-claims
 
 - no CODAL / TSETMC / CBI network

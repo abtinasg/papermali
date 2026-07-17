@@ -27,9 +27,16 @@
   "locked_decisions": {
     "each_letter_serial_independent_version": true,
     "exact_document_binding_required": true,
+    "exact_values_source_serial_binding_authoritative": true,
     "multi_document_reason_code": "multi_document_predictor_row_requires_separate_adjudication",
+    "normalized_revision_status_enum": [
+      "original",
+      "restatement",
+      "revision"
+    ],
     "operational_available_at_source_field": "PublishDateTime",
     "sent_datetime_is_available_at": false,
+    "tehran_wall_time_utc_round_trip_classification": true,
     "timezone": "Asia/Tehran"
   },
   "maintenance_task_id": "stage125-part3b1a-cut-a-available-at-operationalization-lock",
