@@ -343,7 +343,8 @@ def test_qc_all_pass_offline_evidence_based():
             changed_path_ok=ok,
             changed_path_offenders=offenders,
         )
-    assert qc["all_pass"] is True
+    failed = [a for a in qc["assertions"] if a["status"] != "PASS"]
+    assert qc["all_pass"] is True, failed
     assert qc["failed_count"] == 0
     assert qc["part3b1_decision_locked"] is True
     assert qc["part3b_completed"] is False
@@ -386,14 +387,11 @@ def test_part3b_check_verifies_all_metadata_hashes_no_skip():
 def test_part3b_tamper_legacy_decision_req_fails_check(tmp_path):
     stage = tmp_path / "project" / "stage125"
     stage.mkdir(parents=True)
-    # Copy only the files needed for hash check of one artifact via metadata.
     meta = json.loads(
         (OUTPUT_DIR / "metadata_and_hashes_stage125_part3b.json").read_text(
             encoding="utf-8",
         )
     )
-    # Minimal repo for check would need many files; instead unit-test the
-    # hash-loop semantics used by run_check.
     name = "part3b_decision_requirements_stage125.json"
     expected = meta["output_files_sha256"][name]
     shutil.copy2(OUTPUT_DIR / name, stage / name)
@@ -406,32 +404,29 @@ def test_part3b_tamper_legacy_decision_req_fails_check(tmp_path):
 
 
 def test_negative_closed_world_evidence_score_cache_model(tmp_path, monkeypatch):
-    # Use real repo root scan but plant an unauthorized file via monkeypatch of
-    # stage125 path by copying structure is heavy; call scanner on REPO_ROOT
-    # after planting a temp unauthorized file then remove it.
-    planted = OUTPUT_DIR / "model_weights.pkl"
-    planted.write_bytes(b"evil-model")
-    try:
-        hits = part3b1.scan_closed_world_part3b1(REPO_ROOT)
-        assert any("model_weights.pkl" in h for h in hits)
-    finally:
-        planted.unlink(missing_ok=True)
-
-    planted2 = OUTPUT_DIR / "accessibility_scores_live.csv"
-    planted2.write_text("a,b\n", encoding="utf-8")
-    try:
-        hits = part3b1.scan_closed_world_part3b1(REPO_ROOT)
-        assert any("accessibility_scores_live.csv" in h for h in hits)
-    finally:
-        planted2.unlink(missing_ok=True)
-
-    planted3 = OUTPUT_DIR / "evil_evidence_cache.bin"
-    planted3.write_bytes(b"cache")
-    try:
-        hits = part3b1.scan_closed_world_part3b1(REPO_ROOT)
-        assert any("evil_evidence_cache.bin" in h for h in hits)
-    finally:
-        planted3.unlink(missing_ok=True)
+    """Plant prohibited files under a temp stage125 mirror via monkeypatched root."""
+    # Build a minimal repo root that reuses real allowlists but a disposable stage125.
+    repo = tmp_path
+    (repo / "project" / "stage125").mkdir(parents=True)
+    (repo / "project" / "src").mkdir(parents=True)
+    (repo / "project" / "tests").mkdir(parents=True)
+    # Authorization marker so Part 3B path helper can run.
+    (repo / "project" / "stage125" / "part3b_authorization_stage125.json").write_text(
+        json.dumps({"part3b_started": True}), encoding="utf-8",
+    )
+    # Copy STAGE125_ALLOWED emptiness: any planted attack file should be a hit.
+    for name in (
+        "model_weights.pkl",
+        "accessibility_scores_live.csv",
+        "evil_evidence_cache.bin",
+    ):
+        (repo / "project" / "stage125" / name).write_bytes(b"evil")
+    hits = part3b1.scan_closed_world_part3b1(repo)
+    assert any("model_weights.pkl" in h for h in hits)
+    assert any("accessibility_scores_live.csv" in h for h in hits)
+    assert any("evil_evidence_cache.bin" in h for h in hits)
+    # Real repo must remain clean.
+    assert part3b1.scan_closed_world_part3b1(REPO_ROOT) == []
 
 
 def test_negative_network_attempt_fails_qc_assertion():
