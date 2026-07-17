@@ -1,0 +1,28 @@
+{
+  "assessment_treatment": "UNRESOLVED_until_cbi_authority_approved",
+  "authoritative_cbi_endpoint_frozen": false,
+  "candidates": [
+    "cand_m3_cpi_inflation",
+    "cand_m3_fx_change_official",
+    "cand_m3_policy_financing_rate"
+  ],
+  "cbi_status": "unverified_no_authoritative_endpoint",
+  "contract_version": "stage125_part3b1_v1",
+  "decision_id": "m3_feature_definitions",
+  "network_access_authorized": false,
+  "option_id": "M3-C",
+  "paired_decision_id": "cbi_endpoint_provenance",
+  "paired_option_id": "CBI-A",
+  "policy": "all_m3_null_unresolved_until_official_cbi_source_approved",
+  "real_extraction_authorized": false,
+  "score_treatment": "null_or_unresolved_never_zero",
+  "source_id_required": "src_m3_cbi_macro",
+  "substitutions_forbidden": [
+    "src_m3_sci_macro_silent_remap",
+    "sci_cpi_for_cbi_cpi",
+    "sci_for_cbi_fx",
+    "sci_for_cbi_policy_rate",
+    "free_market_fx",
+    "oos_free_market_fx"
+  ]
+}

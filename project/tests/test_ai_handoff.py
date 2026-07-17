@@ -975,13 +975,14 @@ def test_extract_qc_workflow_markers_fail_closed_when_field_missing():
 def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
     assert state["current_stage"] == "Stage125"
-    assert state["selected_qc_scope"] == "stage125_part3b_evidence_capture"
+    assert state["selected_qc_scope"] == "stage125_part3b1_decision_lock"
     assert state["last_completed_micro_part"] == "stage125-part3a-decision-lock"
     assert state["next_research_action_id"] == "stage125-part3b-evidence-capture"
     assert state["part3a_protocol_locked"] is True
     assert state["part3a_decision_locked"] is True
     assert state["part3b0_readiness"] is True
     assert state["part3b_started"] is True
+    assert state["part3b1_decision_locked"] is True
     assert state["evidence_collected"] is True
     assert state["endpoint_probe_evidence_collected"] is True
     assert state["candidate_value_evidence_collected"] is False
@@ -1027,6 +1028,15 @@ def test_stage125_part3b0_generated_files_are_artifact_only(path):
     "project/stage125/part3b_decision_requirements_stage125.json",
     "project/stage125/stage125_part3b_evidence_capture_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b.json",
+    "project/stage125/part3b1_decision_lock_stage125.json",
+    "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
+    "project/stage125/part3b1_m3_cbi_policy_contract_stage125.json",
+    "project/stage125/part3b1_m4_feature_definition_contract_stage125.json",
+    "project/stage125/part3b1_rubric_operational_mapping_stage125.json",
+    "project/stage125/part3b1_cutoff_available_at_contract_stage125.json",
+    "project/stage125/part3b1_selected_decisions_stage125.csv",
+    "project/stage125/stage125_part3b1_decision_lock_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b1.json",
 ])
 def test_stage125_part3b_generated_files_are_artifact_only(path):
     assert gen.path_artifact_only(path) is True
@@ -1074,6 +1084,31 @@ def test_extract_qc_workflow_markers_part3b_scope():
     assert got["candidate_value_evidence_collected"] is False
     assert got["part3b_completed"] is False
     assert got["accessibility_scoring_applied"] is False
+    assert got["modeling_started"] is False
+
+
+def test_extract_qc_workflow_markers_part3b1_scope():
+    qc = {
+        "stage": "stage125_part3b1_decision_lock",
+        "part3a_protocol_locked": True,
+        "part3a_decision_locked": True,
+        "part3b0_readiness": True,
+        "part3b_started": True,
+        "part3b1_decision_locked": True,
+        "evidence_collected": True,
+        "endpoint_probe_evidence_collected": True,
+        "candidate_value_evidence_collected": False,
+        "pair_level_evidence_collected": False,
+        "data_value_extraction_performed": False,
+        "accessibility_scoring_applied": False,
+        "part3b_completed": False,
+        "network_extraction_performed": True,
+        "modeling_started": False,
+    }
+    got = gen.extract_qc_workflow_markers(qc)
+    assert got["part3b1_decision_locked"] is True
+    assert got["part3b_completed"] is False
+    assert got["candidate_value_evidence_collected"] is False
     assert got["modeling_started"] is False
 
 

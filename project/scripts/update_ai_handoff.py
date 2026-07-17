@@ -94,6 +94,11 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part3b_evidence_capture.py",
     "project/run_stage125_part3b.py",
     "project/tests/test_stage125_part3b_evidence_capture.py",
+    # Stage125 Part 3B.1 code, runner, and tests.
+    "project/src/stage125_part3b1_decision_lock.py",
+    "project/run_stage125_part3b1.py",
+    "project/tests/test_stage125_part3b1_decision_lock.py",
+    "project/tests/test_stage125_part3b1_allowlist_guards.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
@@ -210,6 +215,18 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md",
     "project/stage125/stage125_part3b_evidence_capture_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b.json",
+    # Stage125 Part 3B.1 generated decision-lock artifacts (runner output only).
+    "project/stage125/part3b1_decision_lock_stage125.json",
+    "project/stage125/part3b1_adjudicated_decision_requirements_stage125.json",
+    "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
+    "project/stage125/part3b1_m3_cbi_policy_contract_stage125.json",
+    "project/stage125/part3b1_m4_feature_definition_contract_stage125.json",
+    "project/stage125/part3b1_rubric_operational_mapping_stage125.json",
+    "project/stage125/part3b1_cutoff_available_at_contract_stage125.json",
+    "project/stage125/part3b1_selected_decisions_stage125.csv",
+    "project/stage125/README_STAGE125_PART3B1_DECISION_LOCK.md",
+    "project/stage125/stage125_part3b1_decision_lock_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b1.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -294,6 +311,22 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "part3a_decision_locked",
         "part3b0_readiness",
         "part3b_started",
+        "evidence_collected",
+        "endpoint_probe_evidence_collected",
+        "candidate_value_evidence_collected",
+        "pair_level_evidence_collected",
+        "data_value_extraction_performed",
+        "accessibility_scoring_applied",
+        "part3b_completed",
+        "network_extraction_performed",
+        "modeling_started",
+    ),
+    "stage125_part3b1_decision_lock": (
+        "part3a_protocol_locked",
+        "part3a_decision_locked",
+        "part3b0_readiness",
+        "part3b_started",
+        "part3b1_decision_locked",
         "evidence_collected",
         "endpoint_probe_evidence_collected",
         "candidate_value_evidence_collected",
@@ -874,6 +907,10 @@ def render_current_state(record: dict) -> str:
         )
     if "part3b_started" in record:
         lines.append(f"- part3b_started: **{record['part3b_started']}**")
+    if "part3b1_decision_locked" in record:
+        lines.append(
+            f"- part3b1_decision_locked: **{record['part3b1_decision_locked']}**"
+        )
     if "part3b0_readiness" in record:
         lines.append(f"- part3b0_readiness: **{record['part3b0_readiness']}**")
     if "evidence_collected" in record:

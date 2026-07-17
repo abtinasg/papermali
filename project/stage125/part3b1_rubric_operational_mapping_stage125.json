@@ -1,0 +1,47 @@
+{
+  "contract_version": "stage125_part3b1_v1",
+  "decision_id": "rubric_score_mapping_0_5",
+  "evidence_class_minimum_for_numeric_score": "candidate_endpoint_evidence",
+  "missing_evidence_rule": "null_or_unresolved_never_zero",
+  "no_memory_or_reputation_scoring": true,
+  "operational_mapping": {
+    "0": {
+      "hard_drop_if_scored": true,
+      "requires": "Captured evidence proving no reproducible retrieval path to the authoritative source for this candidate."
+    },
+    "1": {
+      "hard_drop_if_scored": true,
+      "requires": "Captured evidence of only marginal/manual/unstable access; no systematic reproducible retrieval."
+    },
+    "2": {
+      "hard_drop_if_scored": true,
+      "requires": "Captured evidence of limited accessibility with significant barriers to systematic retrieval."
+    },
+    "3": {
+      "hard_drop_if_scored": false,
+      "pilot_permission_only": true,
+      "requires": "Captured candidate_endpoint_evidence showing systematic retrieval is plausible; coverage/quality still unproven. Pilot permission only — not automatic main admission."
+    },
+    "4": {
+      "hard_drop_if_scored": false,
+      "requires": "Documented API/portal + reproducible candidate-level retrieval with provenance; must still pass G02–G07 and coverage gates."
+    },
+    "5": {
+      "hard_drop_if_scored": false,
+      "requires": "Authoritative, fully reproducible, machine-readable or reliably structured candidate-level retrieval with provenance; must still pass every other gate."
+    }
+  },
+  "option_id": "R-A",
+  "pair_coverage_evaluated_by": [
+    "G09",
+    "G10",
+    "G11",
+    "G12"
+  ],
+  "pair_value_evidence_not_required_for_candidate_score": true,
+  "pair_value_evidence_required_for_g09_g12_numerators": true,
+  "real_scoring_authorized": false,
+  "rubric_version": "stage125_part3a_v1",
+  "score_level": "candidate_source_accessibility",
+  "source_origin_probe_alone_insufficient_for_numeric_score": true
+}

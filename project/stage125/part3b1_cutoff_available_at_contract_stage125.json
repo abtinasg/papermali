@@ -1,0 +1,29 @@
+{
+  "block_rules": {
+    "M2": "market_observation_date_strictly_before_pair_cutoff;feature_available_at_still_le_pair_cutoff_under_CUT_A",
+    "M3": "macro_publication_or_available_at_le_pair_cutoff_when_cbi_approved",
+    "M4": "document_available_at_le_pair_cutoff"
+  },
+  "contract_version": "stage125_part3b1_v1",
+  "decision_id": "available_at_and_cutoff_rules",
+  "feature_availability": {
+    "g06": "missing_availability_means_unavailable",
+    "g07": "no_future_or_target_year_information",
+    "missing_or_after_cutoff": "unavailable_null_never_inferred",
+    "rule": "A feature value is usable at prediction time only if it has a verified available_at and available_at <= pair_cutoff."
+  },
+  "option_id": "CUT-A",
+  "pair_cutoff": {
+    "cutoff_basis": "verified_available_at_timestamp",
+    "cutoff_not_based_on": [
+      "fiscal_year_end_alone",
+      "published_at_alone",
+      "retrieved_at_alone",
+      "any_inferred_or_guessed_date"
+    ],
+    "definition": "The prediction cutoff for a t -> t+1 pair is the earliest verified available_at timestamp of the predictor (year t) financial statement. No feature value whose available_at is after the cutoff may be used at prediction time.",
+    "missing_available_at_rule": "If available_at is unknown for a predictor row, the prediction cutoff is unresolvable for that pair. The pair is NOT dropped; its temporal_status is set to 'unresolvable' and no feature is marked available.",
+    "retained_from": "stage125_part2_v1"
+  },
+  "real_extraction_authorized": false
+}

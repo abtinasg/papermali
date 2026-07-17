@@ -106,6 +106,31 @@ REGISTERED_CANDIDATE_IDS = tuple(c["candidate_id"] for c in part3a.REGISTERED_CA
 CANDIDATE_SOURCE_MAP = {c["candidate_id"]: c["source_id"] for c in part3a.REGISTERED_CANDIDATES}
 BLOCK_BY_CANDIDATE = {c["candidate_id"]: c["block"] for c in part3a.REGISTERED_CANDIDATES}
 
+# Exact-path Part 3B.1 Decision Lock surfaces (no globs / no directory-wide).
+PART3B1_SRC_REL = "project/src/stage125_part3b1_decision_lock.py"
+PART3B1_TEST_REL = "project/tests/test_stage125_part3b1_decision_lock.py"
+PART3B1_ALLOWLIST_TEST_REL = (
+    "project/tests/test_stage125_part3b1_allowlist_guards.py"
+)
+PART3B1_RUN_REL = "project/run_stage125_part3b1.py"
+PART3B1_AUTHORIZED_EXACT = frozenset({
+    PART3B1_SRC_REL,
+    PART3B1_TEST_REL,
+    PART3B1_ALLOWLIST_TEST_REL,
+    PART3B1_RUN_REL,
+    "project/stage125/README_STAGE125_PART3B1_DECISION_LOCK.md",
+    "project/stage125/metadata_and_hashes_stage125_part3b1.json",
+    "project/stage125/part3b1_adjudicated_decision_requirements_stage125.json",
+    "project/stage125/part3b1_cutoff_available_at_contract_stage125.json",
+    "project/stage125/part3b1_decision_lock_stage125.json",
+    "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
+    "project/stage125/part3b1_m3_cbi_policy_contract_stage125.json",
+    "project/stage125/part3b1_m4_feature_definition_contract_stage125.json",
+    "project/stage125/part3b1_rubric_operational_mapping_stage125.json",
+    "project/stage125/part3b1_selected_decisions_stage125.csv",
+    "project/stage125/stage125_part3b1_decision_lock_qc_report.json",
+})
+
 PART3B_AUTHORIZED_EXACT = frozenset({
     SRC_REL, TEST_REL, RUN_REL,
     f"project/stage125/{F_AUTH}", f"project/stage125/{F_PLAN}",
@@ -117,7 +142,8 @@ PART3B_AUTHORIZED_EXACT = frozenset({
     f"project/stage125/{F_README}", f"project/stage125/{F_QC}",
     f"project/stage125/{F_METADATA}", f"project/stage125/{F_NETWORK_LOG}",
     f"project/stage125/{F_DECISION_REQ}", f"project/stage125/{F_DECISION_REQ_MD}",
-})
+}) | PART3B1_AUTHORIZED_EXACT
+
 
 ENDPOINT_HEADER = [
     "source_id", "official_source_owner", "exact_https_origin", "exact_hostname",
@@ -2320,7 +2346,9 @@ def run_write(repo_root: Path, output_dir: Path) -> dict:
             ),
             F_README: build_readme(),
             F_DECISION_REQ: _json_str(decision_data),
-            F_DECISION_REQ_MD: decision_md if decision_md.endswith("\n") else decision_md + "\n",
+            F_DECISION_REQ_MD: (
+                decision_md if decision_md.endswith("\n") else decision_md + "\n"
+            ),
         }
         content_hashes = {n: sha256_bytes(c.encode("utf-8")) for n, c in content.items()}
         for name in (
@@ -2464,8 +2492,10 @@ def run_check_manifest_only(repo_root: Path, output_dir: Path) -> dict:
         hashes = meta.get("output_files_sha256") or {}
         drift = [
             name for name, expected in sorted(hashes.items())
-            if not (output_dir / name).is_file()
-            or sha256_file(output_dir / name) != expected
+            if (
+                not (output_dir / name).is_file()
+                or sha256_file(output_dir / name) != expected
+            )
         ]
         if drift:
             raise QCFail("manifest-only check drift: " + ", ".join(drift))
@@ -2496,8 +2526,10 @@ def run_check(repo_root: Path, output_dir: Path) -> dict:
         hashes = meta.get("output_files_sha256") or {}
         drift = [
             name for name, expected in sorted(hashes.items())
-            if not (output_dir / name).is_file()
-            or sha256_file(output_dir / name) != expected
+            if (
+                not (output_dir / name).is_file()
+                or sha256_file(output_dir / name) != expected
+            )
         ]
         if drift:
             raise QCFail("check drift: " + ", ".join(drift))
