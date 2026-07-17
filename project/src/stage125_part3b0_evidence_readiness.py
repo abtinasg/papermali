@@ -230,6 +230,7 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/README_STAGE125_PART3A_PILOT_PROTOCOL.md",
     "project/stage125/README_STAGE125_PART3B0_EVIDENCE_READINESS.md",
     "project/stage125/README_STAGE125_PART3B1_DECISION_LOCK.md",
+    "project/stage125/README_STAGE125_PART3B1A_CUT_A_AVAILABLE_AT_LOCK.md",
     "project/stage125/README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md",
     "project/stage125/accessibility_scoring_rubric_stage125_part3a.json",
     "project/stage125/data_admission_gate_template_stage125.csv",
@@ -247,6 +248,7 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/metadata_and_hashes_stage125_part3a_decision_lock.json",
     "project/stage125/metadata_and_hashes_stage125_part3b0.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b1a.json",
     "project/stage125/part3_candidate_inventory_stage125.csv",
     "project/stage125/part3_gate_decision_protocol_stage125.csv",
     "project/stage125/part3_pilot_sampling_options_stage125.csv",
@@ -270,6 +272,8 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/part3b1_m4_feature_definition_contract_stage125.json",
     "project/stage125/part3b1_rubric_operational_mapping_stage125.json",
     "project/stage125/part3b1_selected_decisions_stage125.csv",
+    "project/stage125/part3b1a_cut_a_available_at_decision_lock_stage125.json",
+    "project/stage125/part3b1a_cut_a_available_at_operationalization_contract_stage125.json",
     "project/stage125/prediction_cutoff_audit_stage125_part2.csv",
     "project/stage125/prediction_cutoff_summary_stage125_part2.json",
     "project/stage125/prediction_time_contract_stage125_part2.json",
@@ -281,6 +285,7 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/stage125_part3a_pilot_protocol_qc_report.json",
     "project/stage125/stage125_part3b0_evidence_readiness_qc_report.json",
     "project/stage125/stage125_part3b1_decision_lock_qc_report.json",
+    "project/stage125/stage125_part3b1a_cut_a_available_at_qc_report.json",
 })
 
 

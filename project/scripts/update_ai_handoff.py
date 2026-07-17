@@ -99,6 +99,10 @@ ALLOWLIST_FILES = (
     "project/run_stage125_part3b1.py",
     "project/tests/test_stage125_part3b1_decision_lock.py",
     "project/tests/test_stage125_part3b1_allowlist_guards.py",
+    # Stage125 Part 3B.1A code, runner, and tests.
+    "project/src/stage125_part3b1a_cut_a_available_at_operationalization.py",
+    "project/run_stage125_part3b1a.py",
+    "project/tests/test_stage125_part3b1a_cut_a_available_at_operationalization.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
@@ -227,6 +231,12 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/README_STAGE125_PART3B1_DECISION_LOCK.md",
     "project/stage125/stage125_part3b1_decision_lock_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1.json",
+    # Stage125 Part 3B.1A generated available-at operationalization lock artifacts.
+    "project/stage125/README_STAGE125_PART3B1A_CUT_A_AVAILABLE_AT_LOCK.md",
+    "project/stage125/part3b1a_cut_a_available_at_operationalization_contract_stage125.json",
+    "project/stage125/part3b1a_cut_a_available_at_decision_lock_stage125.json",
+    "project/stage125/stage125_part3b1a_cut_a_available_at_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b1a.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -329,6 +339,25 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "part3b1_decision_locked",
         "evidence_collected",
         "endpoint_probe_evidence_collected",
+        "candidate_value_evidence_collected",
+        "pair_level_evidence_collected",
+        "data_value_extraction_performed",
+        "accessibility_scoring_applied",
+        "part3b_completed",
+        "network_extraction_performed",
+        "modeling_started",
+    ),
+    "stage125_part3b1a_cut_a_available_at_operationalization_lock": (
+        "part3a_protocol_locked",
+        "part3a_decision_locked",
+        "part3b0_readiness",
+        "part3b_started",
+        "part3b1_decision_locked",
+        "cut_a_available_at_operationalization_locked",
+        "evidence_collected",
+        "endpoint_probe_evidence_collected",
+        "predictor_available_at_evidence_collected",
+        "pilot_cutoff_provenance_resolved",
         "candidate_value_evidence_collected",
         "pair_level_evidence_collected",
         "data_value_extraction_performed",
@@ -567,8 +596,19 @@ def read_roadmap(root: str) -> dict:
 # QC discovery
 # --------------------------------------------------------------------------- #
 
+# Limited overrides when QC stage id does not equal the source/test stem.
+_QC_SOURCE_TEST_OVERRIDES: dict[str, tuple[str, str]] = {
+    "stage125_part3b1a_cut_a_available_at_operationalization_lock": (
+        "project/src/stage125_part3b1a_cut_a_available_at_operationalization.py",
+        "project/tests/test_stage125_part3b1a_cut_a_available_at_operationalization.py",
+    ),
+}
+
+
 def _qc_source_test_paths(stage: str) -> tuple[str, str]:
     """Convention: src/<stage>.py and tests/test_<stage>.py (repo-relative)."""
+    if stage in _QC_SOURCE_TEST_OVERRIDES:
+        return _QC_SOURCE_TEST_OVERRIDES[stage]
     return f"project/src/{stage}.py", f"project/tests/test_{stage}.py"
 
 
@@ -910,6 +950,21 @@ def render_current_state(record: dict) -> str:
     if "part3b1_decision_locked" in record:
         lines.append(
             f"- part3b1_decision_locked: **{record['part3b1_decision_locked']}**"
+        )
+    if "cut_a_available_at_operationalization_locked" in record:
+        lines.append(
+            "- cut_a_available_at_operationalization_locked: "
+            f"**{record['cut_a_available_at_operationalization_locked']}**"
+        )
+    if "predictor_available_at_evidence_collected" in record:
+        lines.append(
+            "- predictor_available_at_evidence_collected: "
+            f"**{record['predictor_available_at_evidence_collected']}**"
+        )
+    if "pilot_cutoff_provenance_resolved" in record:
+        lines.append(
+            "- pilot_cutoff_provenance_resolved: "
+            f"**{record['pilot_cutoff_provenance_resolved']}**"
         )
     if "part3b0_readiness" in record:
         lines.append(f"- part3b0_readiness: **{record['part3b0_readiness']}**")
