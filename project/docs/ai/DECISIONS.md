@@ -101,6 +101,13 @@ The research contract for the paper is frozen in
 
 ## Stage125 Part 0 / Part 1 / Part 2 status (2026-07-14)
 
+> **Historical snapshot (as of 2026-07-14).** Do not treat the bullets below as
+> current project status. For live state, use `ROADMAP.md`, `CURRENT_STATE.md`,
+> and `OPEN_TASKS.md`. After this date, Part 3B became **active but incomplete**
+> (endpoint/source-origin feasibility probe only), and Part 3B.1 was recorded as
+> a **maintenance** Decision Lock (`part3b1_decision_locked=true`) without
+> advancing research action pointers.
+
 - **Part 0 (Research Design Decision Lock) is CLOSED.** PR #21 is **MERGED**;
   `main` contains merge commit `d39e770ff49729a2f0b1b0262c0b1aa5ae41b0c4`.
 - **Part 1 (Data Dictionary & Provenance Contract) is COMPLETED and MERGED.**

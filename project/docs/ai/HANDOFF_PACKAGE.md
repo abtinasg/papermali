@@ -89,8 +89,10 @@ Do not confuse QC selection with the research-action chain:
   historical baseline after Part 3B authorization)
 - Stage125 Part 3B evidence-capture source/test/QC: `src/stage125_part3b_evidence_capture.py`,
   `run_stage125_part3b.py`, `tests/test_stage125_part3b_evidence_capture.py`,
-  `stage125/stage125_part3b_evidence_capture_qc_report.json` (authorized real
-  evidence capture + accessibility scoring pilot; 800 assessments; no modeling)
+  `stage125/stage125_part3b_evidence_capture_qc_report.json` (authorized Part 3B
+  endpoint/source-origin feasibility probe; 800 pair-candidate assessments;
+  scores null; no candidate-value or pair-level value extraction; no real
+  accessibility scoring; no modeling)
 - Stage125 Part 3B.1 decision-lock source/test/QC: `src/stage125_part3b1_decision_lock.py`,
   `run_stage125_part3b1.py`, `tests/test_stage125_part3b1_decision_lock.py`,
   `stage125/stage125_part3b1_decision_lock_qc_report.json` (feature/scoring/cutoff
