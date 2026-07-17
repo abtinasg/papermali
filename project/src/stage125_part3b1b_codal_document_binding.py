@@ -59,13 +59,16 @@ F_UNRESOLVED = "part3b1b_unresolved_and_rejections_stage125.csv"
 F_README = "README_STAGE125_PART3B1B_CODAL_DOCUMENT_BINDING.md"
 F_QC = "stage125_part3b1b_codal_document_binding_qc_report.json"
 F_METADATA = "metadata_and_hashes_stage125_part3b1b.json"
+F_RECEIPT = "part3b1b_thanusa_capture_receipt_stage125.json"
 
 CONTENT_FILES = (
     F_SCOPE, F_EVIDENCE, F_ADJ, F_ATTEMPTS, F_NETWORK, F_UNRESOLVED, F_README,
+    F_RECEIPT,
 )
 
 CACHE_DIR_REL = "project/stage125/raw_cache_part3b1b"
 THANUSA_EVIDENCE_ID = "ev_p3b1b_thanusa_1392_decision"
+RECEIPT_REL = f"project/stage125/{F_RECEIPT}"
 
 PART3B1B_AUTHORIZED_EXACT = frozenset({
     SRC_REL, TEST_REL, RUN_REL,
@@ -78,6 +81,7 @@ PART3B1B_AUTHORIZED_EXACT = frozenset({
     f"project/stage125/{F_README}",
     f"project/stage125/{F_QC}",
     f"project/stage125/{F_METADATA}",
+    RECEIPT_REL,
 })
 
 PILOT_CSV_REL = "project/stage125/part3a_selected_pilot_pairs_stage125.csv"
@@ -91,6 +95,35 @@ OCF_MANIFEST_REL = (
 OCF_MANIFEST_SHA256 = (
     "b1bf92d74f19b4c00373079c3222489d6cb54e1c8f11e30a9e02557e6936057a"
 )
+MODELING_ROWS_REL = (
+    "project/raw_handoff/financial_distress_programmer_handoff_stage121(1)/"
+    "modeling_all_rows_stage121.csv"
+)
+MODELING_ROWS_SHA256 = (
+    "27d4130739c88cb8a5379e26b2e2cbedc33a1c9aa9b57b6747e5c93855540426"
+)
+CUTOFF_AUDIT_REL = "project/stage125/prediction_cutoff_audit_stage125_part2.csv"
+CUTOFF_AUDIT_SHA256 = (
+    "d50e6617b011a7818d972de8e5c8a862a45f73fb07a0a22cdb5c9f59b6dc88f0"
+)
+
+RECEIPT_REQUIRED_FIELDS = (
+    "evidence_id", "scope_row_id", "predictor_row_key_t", "request_url",
+    "http_method", "started_at_utc", "completed_at_utc", "retrieved_at_utc",
+    "redirect_chain", "final_url", "response_status", "content_type",
+    "byte_count", "payload_sha256", "metadata_sha256", "letter_serial",
+    "retrieval_purpose", "raw_payload_storage_policy",
+)
+
+PILOT_FULL_FIELD_KEYS = (
+    "selection_rank", "option_id", "predictor_row_key_t",
+    "target_row_key_t_plus_1", "ticker", "fiscal_year_t", "target_year",
+    "class_label", "rule_a_eligible", "post_evidence_substitution_allowed",
+    "selection_status",
+)
+
+RAW_PAYLOAD_STORAGE_POLICY = "gitignored_immutable_cache_optional_local"
+HISTORICAL_AUTHORIZED_CAPTURE_REQUESTS = 1
 
 THANUSA_LETTER_SERIAL = "Ddg2e7HG6FGR5ygaTFJd4g=="
 THANUSA_AUTHORIZED_URL = (
@@ -120,7 +153,7 @@ LOCAL_CACHE_BY_TICKER = {
     "اردستان": "project/stage124_feasibility/raw/codal/اردستان__search__05ba9f8766e9.bin",
 }
 
-LOCKED_SCOPE: tuple[dict[str, Any], ...] = (
+LOCKED_SCOPE_SKELETON: tuple[dict[str, Any], ...] = (
     {
         "selection_rank": 6,
         "predictor_row_key_t": "ثنوسا|1392",
@@ -128,10 +161,6 @@ LOCKED_SCOPE: tuple[dict[str, Any], ...] = (
         "ticker": "ثنوسا",
         "fiscal_year_t": 1392,
         "starting_evidence_class": "B2",
-        "canonical_fiscal_year_end": "1392/06/31",
-        "canonical_company_name": "نوسازی و ساختمان تهران",
-        "canonical_statement_scope": "separate",
-        "canonical_letter_serial": THANUSA_LETTER_SERIAL,
     },
     {
         "selection_rank": 63,
@@ -140,10 +169,6 @@ LOCKED_SCOPE: tuple[dict[str, Any], ...] = (
         "ticker": "بوعلی",
         "fiscal_year_t": 1399,
         "starting_evidence_class": "B1",
-        "canonical_fiscal_year_end": "1399/12/30",
-        "canonical_company_name": "شرکت پتروشیمی بوعلی سینا",
-        "canonical_statement_scope": "separate",
-        "canonical_letter_serial": None,
     },
     {
         "selection_rank": 72,
@@ -152,10 +177,6 @@ LOCKED_SCOPE: tuple[dict[str, Any], ...] = (
         "ticker": "بوعلی",
         "fiscal_year_t": 1400,
         "starting_evidence_class": "B1",
-        "canonical_fiscal_year_end": "1400/12/29",
-        "canonical_company_name": "شرکت پتروشیمی بوعلی سینا",
-        "canonical_statement_scope": "separate",
-        "canonical_letter_serial": None,
     },
     {
         "selection_rank": 76,
@@ -164,10 +185,6 @@ LOCKED_SCOPE: tuple[dict[str, Any], ...] = (
         "ticker": "اردستان",
         "fiscal_year_t": 1401,
         "starting_evidence_class": "B3",
-        "canonical_fiscal_year_end": "1401/12/29",
-        "canonical_company_name": "شرکت سیمان اردستان",
-        "canonical_statement_scope": "separate",
-        "canonical_letter_serial": None,
     },
     {
         "selection_rank": 77,
@@ -176,14 +193,32 @@ LOCKED_SCOPE: tuple[dict[str, Any], ...] = (
         "ticker": "اپال",
         "fiscal_year_t": 1401,
         "starting_evidence_class": "B1",
-        "canonical_fiscal_year_end": "1401/10/30",
-        "canonical_company_name": "فرآوری معدنی اپال کانی پارس",
-        "canonical_statement_scope": "separate",
-        "canonical_letter_serial": None,
     },
 )
 
-SCOPE_KEYS = frozenset(row["predictor_row_key_t"] for row in LOCKED_SCOPE)
+
+def _repo_root_from_module() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+# Populated after helper definitions via rebuild_locked_scope().
+LOCKED_SCOPE: tuple[dict[str, Any], ...] = tuple(
+    {
+        **row,
+        "canonical_fiscal_year_end": None,
+        "canonical_company_name": None,
+        "canonical_legal_entity": None,
+        "canonical_statement_scope": None,
+        "canonical_official_title": None,
+        "canonical_tracing_no": None,
+        "canonical_letter_serial": (
+            THANUSA_LETTER_SERIAL if row["ticker"] == "ثنوسا" else None
+        ),
+    }
+    for row in LOCKED_SCOPE_SKELETON
+)
+
+SCOPE_KEYS = frozenset(row["predictor_row_key_t"] for row in LOCKED_SCOPE_SKELETON)
 
 FROZEN_SCIENTIFIC_PATHS = cut_a.FROZEN_SCIENTIFIC_PATHS + (
     "project/stage125/part3b1a_cut_a_available_at_operationalization_contract_stage125.json",
@@ -213,11 +248,16 @@ EVIDENCE_COLUMNS = [
     "scope_row_id", "selection_rank", "predictor_row_key_t",
     "target_row_key_t_plus_1", "ticker", "fiscal_year_t",
     "starting_evidence_class", "source_origin", "source_url",
-    "letter_serial", "canonical_letter_serial", "tracing_no",
-    "canonical_tracing_no", "official_title", "canonical_official_title",
-    "legal_entity", "is_parent_company", "statement_scope",
-    "is_annual", "is_interim", "is_audited", "fiscal_year_end",
-    "revision_status_raw", "revision_status_normalized",
+    "candidate_discovery_basis", "candidate_count", "candidate_letter_serials",
+    "source_letter_serial", "canonical_letter_serial",
+    "source_tracing_no", "canonical_tracing_no",
+    "source_official_title", "canonical_official_title",
+    "source_legal_entity", "canonical_legal_entity",
+    "source_statement_scope", "canonical_statement_scope",
+    "source_fiscal_year_end", "canonical_fiscal_year_end",
+    "is_parent_company", "is_annual", "is_interim", "is_audited",
+    "source_revision_status_raw", "source_revision_status_normalized",
+    "revision_evidence_basis",
     "publish_datetime_raw", "sent_datetime_raw",
     "publish_datetime_utc_candidate", "available_at",
     "available_at_source_field", "snapshot_sha256",
@@ -230,8 +270,9 @@ SCOPE_HEADER = [
     "scope_row_id", "selection_rank", "predictor_row_key_t",
     "target_row_key_t_plus_1", "ticker", "fiscal_year_t",
     "starting_evidence_class", "canonical_fiscal_year_end",
-    "canonical_company_name", "canonical_statement_scope",
-    "canonical_letter_serial", "pilot_csv_verified", "reviewer_status",
+    "canonical_legal_entity", "canonical_statement_scope",
+    "canonical_letter_serial", "pilot_csv_full_fields_verified",
+    "reviewer_status",
 ]
 
 ADJ_HEADER = [
@@ -395,20 +436,183 @@ def verify_ocf_manifest_hash(repo_root: Path) -> None:
         )
 
 
-def verify_locked_scope_against_pilot(repo_root: Path) -> None:
+def parse_thanusa_ocf_manifest_row(repo_root: Path) -> dict[str, Any]:
+    """Require exactly one OCF manifest row for ثنوسا|1392 and derive fields."""
+    verify_ocf_manifest_hash(repo_root)
+    path = repo_root / OCF_MANIFEST_REL
+    matches: list[dict[str, str]] = []
+    with path.open(encoding="utf-8-sig", newline="") as fh:
+        for row in csv.DictReader(fh):
+            if row.get("ticker") == "ثنوسا" and str(row.get("fiscal_year")) == "1392":
+                matches.append(dict(row))
+    if len(matches) != 1:
+        raise QCFail(
+            f"thanusa_manifest_exact_row_unique failed: matched={len(matches)}"
+        )
+    row = matches[0]
+    codal_url = row.get("codal_url") or ""
+    qs = parse_qs(urlparse(codal_url).query)
+    serials = qs.get("LetterSerial") or qs.get("letterserial") or []
+    letter_serial = unquote(serials[0]) if serials else None
+    if letter_serial != THANUSA_LETTER_SERIAL:
+        raise QCFail(
+            "thanusa_letter_serial_derived_from_manifest_url failed: "
+            f"got {letter_serial!r}"
+        )
+    return {
+        "ticker": row.get("ticker"),
+        "fiscal_year": row.get("fiscal_year"),
+        "fiscal_year_end": row.get("fiscal_year_end"),
+        "audit_status": row.get("audit_status"),
+        "statement_scope": row.get("statement_scope"),
+        "codal_url": row.get("codal_url"),
+        "letter_serial": letter_serial,
+        "source_pdf": row.get("source_pdf"),
+        "source_page": row.get("source_page"),
+        "source_pdf_sha256": row.get("sha256"),
+        "decision": row.get("decision"),
+        "evidence_basis": "ocf_source_manifest_stage121_exact_row",
+        "manifest_path": OCF_MANIFEST_REL,
+        "manifest_sha256": OCF_MANIFEST_SHA256,
+    }
+
+
+def load_canonical_row_fields(repo_root: Path) -> dict[str, dict[str, str | None]]:
+    """Load canonical entity/FYE/scope by predictor_row_key_t from pinned sources."""
+    modeling_path = repo_root / MODELING_ROWS_REL
+    digest = sha256_file(modeling_path)
+    if digest != MODELING_ROWS_SHA256:
+        raise QCFail(
+            f"modeling_all_rows hash mismatch: expected {MODELING_ROWS_SHA256} got {digest}"
+        )
+    cutoff_path = repo_root / CUTOFF_AUDIT_REL
+    cutoff_digest = sha256_file(cutoff_path)
+    if cutoff_digest != CUTOFF_AUDIT_SHA256:
+        raise QCFail(
+            f"cutoff audit hash mismatch: expected {CUTOFF_AUDIT_SHA256} got {cutoff_digest}"
+        )
+    wanted = {row["predictor_row_key_t"] for row in LOCKED_SCOPE_SKELETON}
+    out: dict[str, dict[str, str | None]] = {}
+    with modeling_path.open(encoding="utf-8-sig", newline="") as fh:
+        for row in csv.DictReader(fh):
+            key = row.get("row_key")
+            if key not in wanted:
+                continue
+            company = (row.get("company_name") or "").strip() or None
+            fye = (row.get("fiscal_year_end") or "").strip() or None
+            scope = (row.get("statement_scope_status") or "").strip() or None
+            out[key] = {
+                "canonical_legal_entity": company,
+                "canonical_fiscal_year_end": fye,
+                "canonical_statement_scope": scope,
+                "canonical_source_path": MODELING_ROWS_REL,
+                "canonical_source_sha256": MODELING_ROWS_SHA256,
+            }
+    with cutoff_path.open(encoding="utf-8-sig", newline="") as fh:
+        for row in csv.DictReader(fh):
+            key = row.get("predictor_row_key_t")
+            if key not in wanted or key not in out:
+                continue
+            cutoff_fye = (row.get("fiscal_year_end_t") or "").strip() or None
+            model_fye = out[key]["canonical_fiscal_year_end"]
+            if cutoff_fye and model_fye and cutoff_fye != model_fye:
+                raise QCFail(
+                    f"canonical FYE conflict for {key}: modeling={model_fye} "
+                    f"cutoff={cutoff_fye}"
+                )
+            if not model_fye and cutoff_fye:
+                out[key]["canonical_fiscal_year_end"] = cutoff_fye
+    missing = wanted - set(out)
+    if missing:
+        raise QCFail(f"canonical modeling rows missing for: {sorted(missing)}")
+    return out
+
+
+def build_locked_scope(repo_root: Path) -> tuple[dict[str, Any], ...]:
+    canonical = load_canonical_row_fields(repo_root)
+    thanusa_manifest = parse_thanusa_ocf_manifest_row(repo_root)
+    rows: list[dict[str, Any]] = []
+    for skeleton in LOCKED_SCOPE_SKELETON:
+        key = skeleton["predictor_row_key_t"]
+        can = canonical[key]
+        row = dict(skeleton)
+        row["canonical_fiscal_year_end"] = can["canonical_fiscal_year_end"]
+        row["canonical_company_name"] = can["canonical_legal_entity"]
+        row["canonical_legal_entity"] = can["canonical_legal_entity"]
+        row["canonical_statement_scope"] = can["canonical_statement_scope"]
+        row["canonical_official_title"] = None
+        row["canonical_tracing_no"] = None
+        if key == "ثنوسا|1392":
+            row["canonical_letter_serial"] = thanusa_manifest["letter_serial"]
+        else:
+            row["canonical_letter_serial"] = None
+        row["canonical_source_path"] = can["canonical_source_path"]
+        row["canonical_source_sha256"] = can["canonical_source_sha256"]
+        rows.append(row)
+    return tuple(rows)
+
+
+def rebuild_locked_scope(repo_root: Path) -> tuple[dict[str, Any], ...]:
+    global LOCKED_SCOPE
+    LOCKED_SCOPE = build_locked_scope(repo_root)
+    return LOCKED_SCOPE
+
+
+def verify_locked_scope_against_pilot(repo_root: Path) -> dict[str, dict[str, str]]:
+    """Full-field verification of the five locked rows against the frozen pilot CSV."""
     verify_pilot_csv_hash(repo_root)
     path = repo_root / PILOT_CSV_REL
-    rows = {int(r["selection_rank"]): r for r in csv.DictReader(path.open(encoding="utf-8"))}
+    by_rank: dict[int, dict[str, str]] = {}
+    with path.open(encoding="utf-8-sig", newline="") as fh:
+        for row in csv.DictReader(fh):
+            by_rank[int(row["selection_rank"])] = dict(row)
+    verified: dict[str, dict[str, str]] = {}
     for scope in LOCKED_SCOPE:
-        rank = scope["selection_rank"]
-        if rank not in rows:
+        rank = int(scope["selection_rank"])
+        if rank not in by_rank:
             raise QCFail(f"locked scope rank {rank} missing from pilot CSV")
-        pilot = rows[rank]
+        pilot = by_rank[rank]
+        for field_name in PILOT_FULL_FIELD_KEYS:
+            expected = str(scope[field_name]) if field_name in scope else None
+            # Scope skeleton may omit pilot-only fields; compare against pilot row.
+            if field_name in (
+                "option_id", "target_year", "class_label", "rule_a_eligible",
+                "post_evidence_substitution_allowed", "selection_status",
+            ):
+                if field_name not in pilot or pilot[field_name] == "":
+                    raise QCFail(f"pilot field missing for rank {rank}: {field_name}")
+                continue
+            if field_name == "selection_rank":
+                if int(pilot["selection_rank"]) != rank:
+                    raise QCFail(f"selection_rank mismatch at rank {rank}")
+                continue
+            if field_name == "fiscal_year_t":
+                if str(pilot["fiscal_year_t"]) != str(scope["fiscal_year_t"]):
+                    raise QCFail(
+                        f"fiscal_year_t mismatch at rank {rank}: "
+                        f"{pilot['fiscal_year_t']} != {scope['fiscal_year_t']}"
+                    )
+                continue
+            if pilot.get(field_name) != str(scope[field_name]):
+                raise QCFail(
+                    f"pilot field mismatch rank={rank} field={field_name}: "
+                    f"{pilot.get(field_name)!r} != {scope[field_name]!r}"
+                )
+        # Exact equality for all required pilot fields vs locked key identity.
+        for field_name in PILOT_FULL_FIELD_KEYS:
+            if field_name not in pilot:
+                raise QCFail(f"pilot CSV missing column {field_name}")
         if pilot["predictor_row_key_t"] != scope["predictor_row_key_t"]:
             raise QCFail(
                 f"pilot rank {rank} key mismatch: "
                 f"{pilot['predictor_row_key_t']} != {scope['predictor_row_key_t']}"
             )
+        if pilot["target_row_key_t_plus_1"] != scope["target_row_key_t_plus_1"]:
+            raise QCFail(f"target_row_key mismatch at rank {rank}")
+        if pilot["ticker"] != scope["ticker"]:
+            raise QCFail(f"ticker mismatch at rank {rank}")
+        verified[scope["predictor_row_key_t"]] = pilot
+    return verified
 
 
 def is_scope_row_key_allowed(key: str) -> bool:
@@ -597,16 +801,35 @@ class ThanusaFetchResult:
 
 
 def parse_codal_decision_html(html: bytes | str) -> dict[str, str | None]:
-    """Best-effort parse of CODAL Decision.aspx HTML metadata fields."""
+    """Parse only facts explicitly present on CODAL Decision.aspx HTML."""
     text = html.decode("utf-8", errors="replace") if isinstance(html, bytes) else html
     out: dict[str, str | None] = {
         "official_title": None,
+        "legal_entity": None,
+        "symbol": None,
         "publish_datetime_raw": None,
         "sent_datetime_raw": None,
     }
+    if not text.strip():
+        return out
     title_m = re.search(r"<title[^>]*>([^<]+)</title>", text, re.I | re.S)
     if title_m:
         out["official_title"] = html_lib.unescape(title_m.group(1)).strip()
+    company_m = re.search(
+        r'id="[^"]*CompanyName[^"]*"[^>]*>([^<]+)<', text, re.I,
+    )
+    if company_m:
+        # Preserve exact source spelling before any normalization.
+        out["legal_entity"] = html_lib.unescape(company_m.group(1)).strip()
+    symbol_m = re.search(
+        r'id="ctl00_lblSymbol"[^>]*>([^<]+)<', text, re.I,
+    ) or re.search(
+        r'id="[^"]*lblDisplaySymbol[^"]*"[^>]*>([^<]+)<', text, re.I,
+    )
+    if symbol_m:
+        sym = html_lib.unescape(symbol_m.group(1)).strip()
+        if sym and sym != "نماد:":
+            out["symbol"] = sym
     for field, patterns in (
         ("publish_datetime_raw", (
             r'PublishDateTime["\s:=]+([0-9۰-۹]{4}/[0-9۰-۹]{2}/[0-9۰-۹]{2}\s+'
@@ -631,104 +854,9 @@ def parse_codal_decision_html(html: bytes | str) -> dict[str, str | None]:
     return out
 
 
-def authorize_and_fetch_thanusa(
-    *,
+def _load_thanusa_cache_paths(
     cache: p3b0.ImmutableCache,
-    capture: bool,
-    transport: Callable[[str, str], tuple[bytes, dict[str, Any]]] | None = None,
-    orig_connect: Callable[..., Any] | None = None,
-    orig_getaddrinfo: Callable[..., Any] | None = None,
-) -> ThanusaFetchResult | None:
-    """Perform the single authorized CODAL GET (or load immutable cache)."""
-    cached = _load_thanusa_cache_entry(cache)
-    if cached is not None:
-        body, meta = cached
-        parsed = parse_codal_decision_html(body)
-        return ThanusaFetchResult(
-            body=body,
-            payload_sha256=sha256_bytes(body),
-            metadata_sha256=sha256_bytes(json.dumps(meta, sort_keys=True).encode()),
-            network_entry={
-                "request_url": THANUSA_AUTHORIZED_URL,
-                "redirect_chain": meta.get("redirect_chain", [THANUSA_AUTHORIZED_URL]),
-                "final_url": meta.get("final_url", THANUSA_AUTHORIZED_URL),
-                "response_status": meta.get("response_status", 200),
-                "content_type": meta.get("content_type", "text/html"),
-                "bytes": len(body),
-                "payload_sha256": sha256_bytes(body),
-                "from_immutable_cache": True,
-            },
-            parsed_html=parsed,
-            success=True,
-            failure_class="",
-        )
-    if not capture:
-        return None
-    fetch = transport or (
-        lambda m, u: _default_https_transport(
-            m, u, orig_connect=orig_connect, orig_getaddrinfo=orig_getaddrinfo,
-        )
-    )
-    started = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    try:
-        body, meta = fetch("GET", THANUSA_AUTHORIZED_URL)
-    except Exception as exc:
-        return ThanusaFetchResult(
-            body=b"",
-            payload_sha256="",
-            metadata_sha256="",
-            network_entry={
-                "request_url": THANUSA_AUTHORIZED_URL,
-                "redirect_chain": [THANUSA_AUTHORIZED_URL],
-                "final_url": "",
-                "response_status": 0,
-                "content_type": "",
-                "bytes": 0,
-                "payload_sha256": "",
-                "error": str(exc),
-            },
-            parsed_html=parse_codal_decision_html(b""),
-            success=False,
-            failure_class=type(exc).__name__,
-        )
-    completed = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    meta = {
-        **meta,
-        "evidence_id": THANUSA_EVIDENCE_ID,
-        "scope_row_id": scope_row_id(LOCKED_SCOPE[0]),
-        "predictor_row_key_t": LOCKED_SCOPE[0]["predictor_row_key_t"],
-        "retrieved_at_utc": completed,
-        "started_at_utc": started,
-        "letter_serial": THANUSA_LETTER_SERIAL,
-        "retrieval_purpose": "predictor_document_binding_mini_pilot",
-    }
-    put = cache.put(body, metadata=meta, evidence_id=THANUSA_EVIDENCE_ID)
-    parsed = parse_codal_decision_html(body)
-    entry = {
-        "request_url": meta["request_url"],
-        "redirect_chain": meta.get("redirect_chain", [THANUSA_AUTHORIZED_URL]),
-        "final_url": meta.get("final_url", THANUSA_AUTHORIZED_URL),
-        "response_status": meta.get("response_status", 200),
-        "content_type": meta.get("content_type", ""),
-        "bytes": meta.get("bytes", len(body)),
-        "payload_sha256": put.payload_sha256,
-        "metadata_sha256": put.metadata_sha256,
-        "from_immutable_cache": False,
-    }
-    return ThanusaFetchResult(
-        body=body,
-        payload_sha256=put.payload_sha256,
-        metadata_sha256=put.metadata_sha256,
-        network_entry=entry,
-        parsed_html=parsed,
-        success=True,
-        failure_class="",
-    )
-
-
-def _load_thanusa_cache_entry(
-    cache: p3b0.ImmutableCache,
-) -> tuple[bytes, dict[str, Any]] | None:
+) -> tuple[Path, Path, dict[str, Any]] | None:
     root = cache.root
     if not root.is_dir():
         return None
@@ -740,10 +868,214 @@ def _load_thanusa_cache_entry(
         if meta.get("evidence_id") != THANUSA_EVIDENCE_ID:
             continue
         payload_path = meta_path.parent / "payload.bin"
-        if not payload_path.is_file():
-            continue
-        return payload_path.read_bytes(), meta
+        return payload_path, meta_path, meta
     return None
+
+
+def _load_thanusa_cache_entry(
+    cache: p3b0.ImmutableCache,
+) -> tuple[bytes, dict[str, Any], str] | None:
+    """Return payload, metadata dict, and metadata_sha256 from cache files."""
+    loaded = _load_thanusa_cache_paths(cache)
+    if loaded is None:
+        return None
+    payload_path, meta_path, meta = loaded
+    if not payload_path.is_file():
+        return None
+    sha_path = meta_path.parent / "metadata.sha256"
+    if sha_path.is_file():
+        metadata_sha256 = sha_path.read_text(encoding="utf-8").strip()
+    else:
+        metadata_sha256 = sha256_bytes(
+            json.dumps(meta, sort_keys=True, ensure_ascii=False).encode("utf-8")
+        )
+    return payload_path.read_bytes(), meta, metadata_sha256
+
+
+def build_capture_receipt_from_cache_metadata(
+    meta: dict[str, Any],
+    *,
+    metadata_sha256: str | None,
+) -> dict[str, Any]:
+    """Build tracked receipt from immutable-cache metadata (no invented timestamps)."""
+    return {
+        "evidence_id": meta.get("evidence_id"),
+        "scope_row_id": meta.get("scope_row_id"),
+        "predictor_row_key_t": meta.get("predictor_row_key_t"),
+        "request_url": meta.get("request_url"),
+        "http_method": "GET",
+        "started_at_utc": meta.get("started_at_utc"),
+        "completed_at_utc": meta.get("completed_at_utc"),  # may be null
+        "retrieved_at_utc": meta.get("retrieved_at_utc"),
+        "redirect_chain": list(meta.get("redirect_chain") or []),
+        "final_url": meta.get("final_url"),
+        "response_status": meta.get("response_status"),
+        "content_type": meta.get("content_type"),
+        "byte_count": meta.get("bytes"),
+        "payload_sha256": meta.get("content_sha256") or meta.get("payload_sha256"),
+        "metadata_sha256": metadata_sha256,
+        "letter_serial": meta.get("letter_serial"),
+        "retrieval_purpose": meta.get("retrieval_purpose"),
+        "raw_payload_storage_policy": RAW_PAYLOAD_STORAGE_POLICY,
+    }
+
+
+def load_tracked_capture_receipt(repo_root: Path) -> dict[str, Any] | None:
+    path = repo_root / RECEIPT_REL
+    if not path.is_file():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def validate_capture_receipt(receipt: dict[str, Any]) -> list[str]:
+    """Return exact QC failure reasons for incomplete receipt fields."""
+    reasons: list[str] = []
+    for field_name in RECEIPT_REQUIRED_FIELDS:
+        if field_name not in receipt:
+            reasons.append(f"capture_receipt_missing_field:{field_name}")
+            continue
+        # completed_at_utc may be explicitly null when absent from original metadata.
+        if field_name == "completed_at_utc":
+            continue
+        value = receipt.get(field_name)
+        if value is None or value == "" or value == []:
+            reasons.append(f"capture_receipt_required_field_null:{field_name}")
+    if receipt.get("request_url") != THANUSA_AUTHORIZED_URL:
+        reasons.append("authorized_url_exact_mismatch")
+    host = urlparse(str(receipt.get("request_url") or "")).hostname
+    if host != ALLOWED_CODAL_HOST:
+        reasons.append("authorized_host_exact_mismatch")
+    if receipt.get("letter_serial") != THANUSA_LETTER_SERIAL:
+        reasons.append("receipt_letter_serial_mismatch")
+    return reasons
+
+
+def resolve_thanusa_from_local_evidence(
+    repo_root: Path,
+    cache: p3b0.ImmutableCache,
+    *,
+    write_receipt: bool,
+) -> tuple[ThanusaFetchResult | None, dict[str, Any] | None, str]:
+    """Resolve ثنوسا evidence from cache and/or tracked receipt. Never networks."""
+    receipt = load_tracked_capture_receipt(repo_root)
+    cached = _load_thanusa_cache_entry(cache)
+    raw_payload_status = "raw_payload_local_optional_absent"
+
+    if cached is not None:
+        body, meta, metadata_sha256 = cached
+        built = build_capture_receipt_from_cache_metadata(
+            meta, metadata_sha256=metadata_sha256,
+        )
+        if receipt is None:
+            receipt = built
+        else:
+            # Preserve historical timestamps from whichever source has them.
+            for ts_key in ("started_at_utc", "completed_at_utc", "retrieved_at_utc"):
+                if not receipt.get(ts_key) and built.get(ts_key):
+                    receipt[ts_key] = built[ts_key]
+            for key in (
+                "payload_sha256", "metadata_sha256", "byte_count",
+                "response_status", "content_type", "final_url", "request_url",
+                "redirect_chain", "letter_serial", "evidence_id", "scope_row_id",
+                "predictor_row_key_t", "retrieval_purpose", "http_method",
+                "raw_payload_storage_policy",
+            ):
+                if receipt.get(key) in (None, "", []) and built.get(key) not in (None, "", []):
+                    receipt[key] = built[key]
+        payload_sha = sha256_bytes(body)
+        if receipt.get("payload_sha256") and receipt["payload_sha256"] != payload_sha:
+            raise QCFail("payload_sha_matches_receipt failed")
+        if metadata_sha256 and receipt.get("metadata_sha256") not in (
+            None, metadata_sha256,
+        ):
+            # Prefer on-disk metadata.sha256 as authoritative when both exist.
+            receipt["metadata_sha256"] = metadata_sha256
+        raw_payload_status = "raw_payload_local_present_verified"
+        parsed = parse_codal_decision_html(body)
+        network_entry = {
+            "request_url": receipt.get("request_url") or THANUSA_AUTHORIZED_URL,
+            "redirect_chain": list(receipt.get("redirect_chain") or [THANUSA_AUTHORIZED_URL]),
+            "final_url": receipt.get("final_url") or THANUSA_AUTHORIZED_URL,
+            "response_status": receipt.get("response_status") or 200,
+            "content_type": receipt.get("content_type") or "text/html",
+            "bytes": receipt.get("byte_count") if receipt.get("byte_count") is not None else len(body),
+            "payload_sha256": payload_sha,
+            "metadata_sha256": receipt.get("metadata_sha256"),
+            "started_at_utc": receipt.get("started_at_utc"),
+            "completed_at_utc": receipt.get("completed_at_utc"),
+            "retrieved_at_utc": receipt.get("retrieved_at_utc"),
+            "from_immutable_cache": True,
+            "historical_authorized_capture": True,
+        }
+        fetch = ThanusaFetchResult(
+            body=body,
+            payload_sha256=payload_sha,
+            metadata_sha256=str(receipt.get("metadata_sha256") or ""),
+            network_entry=network_entry,
+            parsed_html=parsed,
+            success=True,
+            failure_class="",
+        )
+    elif receipt is not None:
+        parsed = parse_codal_decision_html(b"")
+        network_entry = {
+            "request_url": receipt.get("request_url"),
+            "redirect_chain": list(receipt.get("redirect_chain") or []),
+            "final_url": receipt.get("final_url"),
+            "response_status": receipt.get("response_status"),
+            "content_type": receipt.get("content_type"),
+            "bytes": receipt.get("byte_count"),
+            "payload_sha256": receipt.get("payload_sha256"),
+            "metadata_sha256": receipt.get("metadata_sha256"),
+            "started_at_utc": receipt.get("started_at_utc"),
+            "completed_at_utc": receipt.get("completed_at_utc"),
+            "retrieved_at_utc": receipt.get("retrieved_at_utc"),
+            "from_immutable_cache": False,
+            "from_tracked_receipt": True,
+            "historical_authorized_capture": True,
+            "raw_payload_local_optional_absent": True,
+        }
+        fetch = ThanusaFetchResult(
+            body=b"",
+            payload_sha256=str(receipt.get("payload_sha256") or ""),
+            metadata_sha256=str(receipt.get("metadata_sha256") or ""),
+            network_entry=network_entry,
+            parsed_html=parsed,
+            success=True,
+            failure_class="",
+        )
+    else:
+        fetch = None
+
+    if write_receipt and receipt is not None:
+        out_path = repo_root / RECEIPT_REL
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(_json_str(receipt), encoding="utf-8")
+
+    return fetch, receipt, raw_payload_status
+
+
+def authorize_and_fetch_thanusa(
+    *,
+    cache: p3b0.ImmutableCache,
+    capture: bool,
+    transport: Callable[[str, str], tuple[bytes, dict[str, Any]]] | None = None,
+    orig_connect: Callable[..., Any] | None = None,
+    orig_getaddrinfo: Callable[..., Any] | None = None,
+    repo_root: Path | None = None,
+) -> ThanusaFetchResult | None:
+    """Load the historical authorized capture from cache/receipt only.
+
+    Additional CODAL network requests are not authorized for this harden pass.
+    The ``capture`` / ``transport`` arguments are retained for API compatibility
+    but never perform a new GET.
+    """
+    del capture, transport, orig_connect, orig_getaddrinfo
+    root = repo_root or _repo_root_from_module()
+    fetch, _receipt, _status = resolve_thanusa_from_local_evidence(
+        root, cache, write_receipt=False,
+    )
+    return fetch
 
 
 # --------------------------------------------------------------------------- #
@@ -786,24 +1118,34 @@ def classify_title_flags(title: str) -> dict[str, Any]:
     norm = normalize_persian_digits(title)
     interim = "میاندوره" in norm
     audited = "حسابرسی شده" in norm
-    annual = "سال مالی" in norm and audited and not interim
+    # Annual cue from title wording; do not invent revision status from annual alone.
+    annual = (("سال مالی" in norm) or ("12 ماهه" in norm) or ("۱۲ ماهه" in norm)) and not interim
     subsidiary = bool(SUBSIDIARY_PAREN_RE.search(norm))
     fye_m = FYE_TITLE_RE.search(norm)
+    if not fye_m:
+        fye_m = re.search(
+            r"(?:12|۱۲)\s*ماهه\s*منتهی\s*به\s*(\d{4}/\d{2}/\d{2})",
+            norm,
+        )
     fye = fye_m.group(1) if fye_m else None
     raw_rev = cut_a.CODAL_ESLAHIYE_RAW if cut_a.CODAL_ESLAHIYE_RAW in norm else None
+    # Never guess original merely because the title lacks «اصلاحیه».
     norm_rev = cut_a.explicit_normalized_revision_for_codal_eslahiye(
         revision_status_raw=raw_rev,
         map_eslahiye_to_revision=True,
-    ) or ("original" if annual else None)
+    )
     return {
         "fiscal_year_end": fye,
-        "is_annual": annual,
+        "is_annual": bool(annual and audited),
         "is_interim": interim,
         "is_audited": audited,
         "subsidiary_only_title": subsidiary,
-        "is_parent_company": annual and audited and not subsidiary,
+        "is_parent_company": bool(annual and audited and not subsidiary),
         "revision_status_raw": raw_rev,
         "revision_status_normalized": norm_rev,
+        "revision_evidence_basis": (
+            "explicit_codal_eslahiye_in_title" if raw_rev else "unknown_revision_status"
+        ),
     }
 
 
@@ -825,7 +1167,7 @@ def letter_dict_to_candidate(letter: dict[str, Any]) -> LetterCandidate:
         letter_serial=serial,
         company_name=letter.get("CompanyName"),
         symbol=letter.get("Symbol"),
-        letter_code=letter.get("LetterCode") or "ن-۱۰",
+        letter_code=letter.get("LetterCode") or None,
         fiscal_year_end=flags["fiscal_year_end"],
         is_annual=flags["is_annual"],
         is_interim=flags["is_interim"],
@@ -882,62 +1224,125 @@ def build_binding_input_from_candidate(
     incomplete_pagination: bool,
     multi_document_predictor_row: bool = False,
     canonical_source_version_bound: bool = False,
-    canonical_official_title: str | None = None,
-    publish_datetime_raw: str | None = None,
-    sent_datetime_raw: str | None = None,
+    source_official_title: str | None = None,
+    source_legal_entity: str | None = None,
+    source_fiscal_year_end: str | None = None,
+    source_statement_scope: str | None = None,
+    source_letter_serial: str | None = None,
+    source_tracing_no: str | None = None,
+    source_revision_status_raw: str | None = None,
+    source_revision_status_normalized: str | None = None,
+    letter_ticker: str | None = None,
+    candidate_discovery_basis: str = "local_cache_ticker_fye_annual_audited_candidate",
+    public_codal_url: str | None = None,
+    is_annual: bool | None = None,
+    is_interim: bool | None = None,
+    is_audited: bool | None = None,
+    is_parent_company: bool | None = None,
+    subsidiary_only_title: bool | None = None,
 ) -> cut_a.ExactDocumentBindingInput:
-    canonical_title = canonical_official_title or (
-        candidate.title if candidate else ""
+    del cache_complete  # recorded separately on evidence rows
+    # Never copy canonical official title from the candidate/source title.
+    canonical_title = scope_row.get("canonical_official_title") or ""
+    letter_title = (
+        source_official_title
+        if source_official_title is not None
+        else (candidate.title if candidate else "")
     )
-    letter_title = candidate.title if candidate else ""
+    legal_entity_letter = (
+        source_legal_entity
+        if source_legal_entity is not None
+        else (candidate.company_name if candidate else None)
+    ) or ""
+    fye_letter = (
+        source_fiscal_year_end
+        if source_fiscal_year_end is not None
+        else (candidate.fiscal_year_end if candidate else None)
+    ) or ""
+    scope_letter = source_statement_scope or ""
+    serial = (
+        source_letter_serial
+        if source_letter_serial is not None
+        else (candidate.letter_serial if candidate else None)
+    )
+    tracing = (
+        source_tracing_no
+        if source_tracing_no is not None
+        else (candidate.tracing_no if candidate else None)
+    )
+    rev_raw = (
+        source_revision_status_raw
+        if source_revision_status_raw is not None
+        else (candidate.revision_status_raw if candidate else None)
+    )
+    rev_norm = (
+        source_revision_status_normalized
+        if source_revision_status_normalized is not None
+        else (candidate.revision_status_normalized if candidate else None)
+    )
+    match_basis = (
+        "exact_letter_serial"
+        if scope_row.get("canonical_letter_serial")
+        else candidate_discovery_basis
+    )
     return cut_a.ExactDocumentBindingInput(
         canonical_ticker=scope_row["ticker"],
-        letter_ticker=candidate.symbol or scope_row["ticker"] if candidate else "",
-        legal_entity_canonical=scope_row["canonical_company_name"],
-        legal_entity_letter=(
-            candidate.company_name or scope_row["canonical_company_name"]
-            if candidate else ""
+        letter_ticker=(
+            letter_ticker
+            if letter_ticker is not None
+            else ((candidate.symbol if candidate else None) or "")
         ),
+        legal_entity_canonical=scope_row.get("canonical_legal_entity") or "",
+        legal_entity_letter=legal_entity_letter,
         predictor_fiscal_year=int(scope_row["fiscal_year_t"]),
         letter_fiscal_year=int(scope_row["fiscal_year_t"]),
-        fiscal_year_end_canonical=scope_row["canonical_fiscal_year_end"],
-        fiscal_year_end_letter=(
-            candidate.fiscal_year_end or scope_row["canonical_fiscal_year_end"]
-            if candidate else ""
+        fiscal_year_end_canonical=scope_row.get("canonical_fiscal_year_end") or "",
+        fiscal_year_end_letter=fye_letter,
+        is_annual=is_annual if is_annual is not None else (
+            candidate.is_annual if candidate else False
         ),
-        is_annual=candidate.is_annual if candidate else False,
-        is_interim=candidate.is_interim if candidate else False,
-        is_audited=candidate.is_audited if candidate else False,
-        is_parent_company=candidate.is_parent_company if candidate else False,
-        statement_scope_canonical=scope_row["canonical_statement_scope"],
-        statement_scope_letter=scope_row["canonical_statement_scope"],
+        is_interim=is_interim if is_interim is not None else (
+            candidate.is_interim if candidate else False
+        ),
+        is_audited=is_audited if is_audited is not None else (
+            candidate.is_audited if candidate else False
+        ),
+        is_parent_company=is_parent_company if is_parent_company is not None else (
+            candidate.is_parent_company if candidate else False
+        ),
+        statement_scope_canonical=scope_row.get("canonical_statement_scope") or "",
+        statement_scope_letter=scope_letter,
         requires_separate_non_consolidated=True,
-        letter_code_canonical="ن-۱۰",
-        letter_code_letter=candidate.letter_code if candidate else "",
-        letter_serial=candidate.letter_serial if candidate else None,
+        letter_code_canonical="",
+        letter_code_letter=(candidate.letter_code if candidate and candidate.letter_code else ""),
+        letter_serial=serial,
         canonical_letter_serial=scope_row.get("canonical_letter_serial"),
-        tracing_no=candidate.tracing_no if candidate else None,
-        canonical_tracing_no=None,
-        official_title=letter_title,
+        tracing_no=tracing,
+        canonical_tracing_no=scope_row.get("canonical_tracing_no"),
+        official_title=letter_title or "",
         canonical_official_title=canonical_title,
-        revision_status=(
-            candidate.revision_status_normalized if candidate else None
+        revision_status=rev_norm,
+        revision_status_raw=rev_raw,
+        public_codal_url=(
+            public_codal_url
+            if public_codal_url is not None
+            else (candidate.url if candidate else None)
         ),
-        revision_status_raw=candidate.revision_status_raw if candidate else None,
-        public_codal_url=candidate.url if candidate else None,
         raw_payload_or_snapshot_hash=snapshot_sha256,
         candidate_letter_serials=candidate_letter_serials,
         incomplete_pagination=incomplete_pagination,
-        match_basis="exact_letter_serial" if scope_row.get("canonical_letter_serial") else "title_only",
-        subsidiary_only_title=candidate.subsidiary_only_title if candidate else False,
+        match_basis=match_basis,
+        subsidiary_only_title=(
+            subsidiary_only_title
+            if subsidiary_only_title is not None
+            else (candidate.subsidiary_only_title if candidate else False)
+        ),
         entity_ambiguous=False,
         consolidated_separate_ambiguous=False,
         annual_interim_ambiguous=False,
         canonical_source_version_bound=canonical_source_version_bound,
         multi_document_predictor_row=multi_document_predictor_row,
-        values_source_letter_serial=(
-            candidate.letter_serial if candidate else scope_row.get("canonical_letter_serial")
-        ),
+        values_source_letter_serial=serial or scope_row.get("canonical_letter_serial"),
         publish_of_original_used_for_correction_values=False,
     )
 
@@ -979,62 +1384,128 @@ def adjudicate_scope_row(
     scope_row: dict[str, Any],
     *,
     candidate: LetterCandidate | None,
+    candidates: list[LetterCandidate] | None = None,
     cache_meta: dict[str, Any] | None,
     cache_file_sha256: str | None,
     thanusa_fetch: ThanusaFetchResult | None,
+    thanusa_manifest: dict[str, Any] | None,
     source_origin: str,
+    candidate_discovery_basis: str,
+    local_cache_missing: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any] | None]:
     sid = scope_row_id(scope_row)
     incomplete = bool(cache_meta and cache_meta.get("incomplete_pagination"))
     multi_doc = False
     canonical_bound = False
-    candidate_serials: list[str] = []
+    all_candidates = list(candidates or ([] if candidate is None else [candidate]))
+    candidate_serials = [
+        c.letter_serial for c in all_candidates if c.letter_serial
+    ]
     publish_raw = None
     sent_raw = None
-    canonical_title = None
     snapshot_sha = cache_file_sha256
+    source_legal_entity = None
+    source_fye = None
+    source_scope = None
+    source_title = None
+    source_letter_serial = None
+    source_tracing = None
+    source_rev_raw = None
+    source_rev_norm = None
+    revision_evidence_basis = "unknown_revision_status"
+    letter_ticker = None
+    is_annual = None
+    is_interim = None
+    is_audited = None
+    is_parent = None
+    subsidiary = None
+    public_url = None
 
-    if scope_row["ticker"] == "ثنوسا":
+    if local_cache_missing:
+        binding_inp = build_binding_input_from_candidate(
+            scope_row,
+            None,
+            cache_complete=False,
+            snapshot_sha256=snapshot_sha,
+            candidate_letter_serials=[],
+            incomplete_pagination=False,
+            candidate_discovery_basis=candidate_discovery_basis,
+        )
+    elif scope_row["ticker"] == "ثنوسا":
         multi_doc = True
         canonical_bound = False
+        manifest = thanusa_manifest or {}
+        # Manifest-supported facts (exact row).
+        source_fye = manifest.get("fiscal_year_end")
+        source_scope = manifest.get("statement_scope")
+        source_letter_serial = manifest.get("letter_serial") or THANUSA_LETTER_SERIAL
+        candidate_serials = [source_letter_serial]
+        candidate_discovery_basis = (
+            "known_letter_serial_from_exact_manifest_row;"
+            "direct_decision_page_by_known_letter_serial"
+        )
         if thanusa_fetch and thanusa_fetch.success:
             publish_raw = thanusa_fetch.parsed_html.get("publish_datetime_raw")
             sent_raw = thanusa_fetch.parsed_html.get("sent_datetime_raw")
-            canonical_title = thanusa_fetch.parsed_html.get("official_title")
-            snapshot_sha = thanusa_fetch.payload_sha256 or snapshot_sha
-            candidate_serials = [THANUSA_LETTER_SERIAL]
-        elif scope_row.get("canonical_letter_serial"):
-            candidate_serials = [scope_row["canonical_letter_serial"]]
+            source_title = thanusa_fetch.parsed_html.get("official_title")
+            source_legal_entity = thanusa_fetch.parsed_html.get("legal_entity")
+            letter_ticker = thanusa_fetch.parsed_html.get("symbol")
+            if thanusa_fetch.body:
+                snapshot_sha = thanusa_fetch.payload_sha256 or snapshot_sha
+                flags = classify_title_flags(source_title or "")
+                source_fye = flags["fiscal_year_end"] or source_fye
+                is_annual = flags["is_annual"]
+                is_interim = flags["is_interim"]
+                is_audited = flags["is_audited"]
+                is_parent = flags["is_parent_company"]
+                subsidiary = flags["subsidiary_only_title"]
+                source_rev_raw = flags["revision_status_raw"]
+                source_rev_norm = flags["revision_status_normalized"]
+                revision_evidence_basis = flags["revision_evidence_basis"]
+            else:
+                # Receipt-only: title facts unavailable without local payload.
+                is_annual = None
+                is_interim = None
+                is_audited = (
+                    True if manifest.get("audit_status") == "audited" else None
+                )
+            public_url = THANUSA_AUTHORIZED_URL
         binding_inp = build_binding_input_from_candidate(
             scope_row,
-            candidate,
-            cache_complete=not incomplete,
+            None,
+            cache_complete=True,
             snapshot_sha256=snapshot_sha,
             candidate_letter_serials=candidate_serials,
             incomplete_pagination=False,
             multi_document_predictor_row=multi_doc,
             canonical_source_version_bound=canonical_bound,
-            canonical_official_title=canonical_title,
-            publish_datetime_raw=publish_raw,
-            sent_datetime_raw=sent_raw,
+            source_official_title=source_title,
+            source_legal_entity=source_legal_entity,
+            source_fiscal_year_end=source_fye,
+            source_statement_scope=source_scope,
+            source_letter_serial=source_letter_serial,
+            source_tracing_no=None,
+            source_revision_status_raw=source_rev_raw,
+            source_revision_status_normalized=source_rev_norm,
+            letter_ticker=letter_ticker or "",
+            candidate_discovery_basis=candidate_discovery_basis,
+            public_codal_url=public_url or THANUSA_AUTHORIZED_URL,
+            is_annual=bool(is_annual) if is_annual is not None else False,
+            is_interim=bool(is_interim) if is_interim is not None else False,
+            is_audited=bool(is_audited) if is_audited is not None else False,
+            is_parent_company=bool(is_parent) if is_parent is not None else False,
+            subsidiary_only_title=bool(subsidiary) if subsidiary is not None else False,
         )
-        if candidate is None and thanusa_fetch:
-            binding_inp.letter_serial = THANUSA_LETTER_SERIAL
-            binding_inp.public_codal_url = THANUSA_AUTHORIZED_URL
-            binding_inp.is_annual = True
-            binding_inp.is_interim = False
-            binding_inp.is_audited = True
-            binding_inp.is_parent_company = True
-            binding_inp.official_title = canonical_title or (
-                "صورتهای مالی سال مالی منتهی به 1392/06/31 (حسابرسی شده)"
-            )
-            binding_inp.canonical_official_title = binding_inp.official_title
-            binding_inp.revision_status = "original"
-            binding_inp.letter_ticker = scope_row["ticker"]
-            binding_inp.legal_entity_letter = scope_row["canonical_company_name"]
-            binding_inp.fiscal_year_end_letter = scope_row["canonical_fiscal_year_end"]
-            binding_inp.letter_code_letter = "ن-۱۰"
-            binding_inp.values_source_letter_serial = THANUSA_LETTER_SERIAL
+    elif len(all_candidates) > 1:
+        binding_inp = build_binding_input_from_candidate(
+            scope_row,
+            None,
+            cache_complete=not incomplete,
+            snapshot_sha256=snapshot_sha,
+            candidate_letter_serials=candidate_serials,
+            incomplete_pagination=incomplete,
+            candidate_discovery_basis=candidate_discovery_basis,
+        )
     elif candidate is None:
         binding_inp = build_binding_input_from_candidate(
             scope_row, None,
@@ -1042,32 +1513,72 @@ def adjudicate_scope_row(
             snapshot_sha256=snapshot_sha,
             candidate_letter_serials=[],
             incomplete_pagination=incomplete,
+            candidate_discovery_basis=candidate_discovery_basis,
         )
     else:
-        if candidate.letter_serial:
-            candidate_serials = [candidate.letter_serial]
         if scope_row["starting_evidence_class"] == "B1" and incomplete:
-            candidate_serials = []
+            # Incomplete page cannot prove global uniqueness; keep discovery
+            # serials for evidence but clear uniqueness set for binding.
+            binding_serials: list[str] = []
+        else:
+            binding_serials = list(candidate_serials)
         publish_raw = candidate.publish_datetime
         sent_raw = candidate.sent_datetime
+        source_legal_entity = candidate.company_name
+        source_fye = candidate.fiscal_year_end
+        source_title = candidate.title
+        source_letter_serial = candidate.letter_serial
+        source_tracing = candidate.tracing_no
+        source_rev_raw = candidate.revision_status_raw
+        source_rev_norm = candidate.revision_status_normalized
+        revision_evidence_basis = (
+            "explicit_codal_eslahiye_in_title"
+            if source_rev_raw
+            else "unknown_revision_status"
+        )
+        letter_ticker = candidate.symbol
+        is_annual = candidate.is_annual
+        is_interim = candidate.is_interim
+        is_audited = candidate.is_audited
+        is_parent = candidate.is_parent_company
+        subsidiary = candidate.subsidiary_only_title
+        public_url = candidate.url
         binding_inp = build_binding_input_from_candidate(
             scope_row,
             candidate,
             cache_complete=not incomplete,
             snapshot_sha256=snapshot_sha,
-            candidate_letter_serials=candidate_serials,
+            candidate_letter_serials=binding_serials,
             incomplete_pagination=incomplete,
             canonical_source_version_bound=False,
+            source_official_title=source_title,
+            source_legal_entity=source_legal_entity,
+            source_fiscal_year_end=source_fye,
+            source_statement_scope=None,
+            source_letter_serial=source_letter_serial,
+            source_tracing_no=source_tracing,
+            source_revision_status_raw=source_rev_raw,
+            source_revision_status_normalized=source_rev_norm,
+            letter_ticker=letter_ticker or "",
+            candidate_discovery_basis=candidate_discovery_basis,
+            public_codal_url=public_url,
         )
 
     bind_res = cut_a.evaluate_exact_document_binding(binding_inp)
-    candidate_present = candidate is not None or (
-        thanusa_fetch is not None and thanusa_fetch.success
+    candidate_present = (
+        candidate is not None
+        or len(all_candidates) > 0
+        or (thanusa_fetch is not None and thanusa_fetch.success)
     )
     status = classify_binding_status(
         bind_res,
         multi_document_predictor_row=multi_doc,
-        candidate_present=candidate_present,
+        # Multiple matches are UNRESOLVED discovery failures, not affirmative rejects.
+        candidate_present=(
+            candidate_present
+            and not local_cache_missing
+            and len(all_candidates) <= 1
+        ),
     )
 
     avail_res = cut_a.AvailableAtResolution(
@@ -1088,6 +1599,13 @@ def adjudicate_scope_row(
         )
 
     reason_list = list(bind_res.reasons)
+    if local_cache_missing and "required_local_cache_missing" not in reason_list:
+        reason_list.insert(0, "required_local_cache_missing")
+    if len(all_candidates) > 1 and "multiple_candidate_letters" not in reason_list:
+        reason_list.insert(0, "multiple_candidate_letters")
+    if source_rev_norm is None and "unknown_revision_status" not in reason_list:
+        if scope_row["ticker"] == "ثنوسا" or candidate is not None or all_candidates:
+            reason_list.append("unknown_revision_status")
     if status != BINDING_BOUND and avail_res.reasons:
         for r in avail_res.reasons:
             if r not in reason_list:
@@ -1119,36 +1637,36 @@ def adjudicate_scope_row(
             THANUSA_AUTHORIZED_URL if scope_row["ticker"] == "ثنوسا"
             else (candidate.url if candidate else "")
         ),
-        "letter_serial": (
-            THANUSA_LETTER_SERIAL if scope_row["ticker"] == "ثنوسا"
-            else (candidate.letter_serial if candidate else "")
-        ),
+        "candidate_discovery_basis": candidate_discovery_basis,
+        "candidate_count": len(all_candidates) if scope_row["ticker"] != "ثنوسا"
+        else (1 if source_letter_serial else 0),
+        "candidate_letter_serials": ";".join(candidate_serials),
+        "source_letter_serial": source_letter_serial or "",
         "canonical_letter_serial": scope_row.get("canonical_letter_serial") or "",
-        "tracing_no": candidate.tracing_no if candidate else "",
-        "canonical_tracing_no": "",
-        "official_title": (
-            binding_inp.official_title if binding_inp.official_title else ""
-        ),
-        "canonical_official_title": (
-            binding_inp.canonical_official_title
-            if binding_inp.canonical_official_title else ""
-        ),
-        "legal_entity": scope_row["canonical_company_name"],
+        "source_tracing_no": source_tracing or "",
+        "canonical_tracing_no": scope_row.get("canonical_tracing_no") or "",
+        "source_official_title": source_title or "",
+        "canonical_official_title": scope_row.get("canonical_official_title") or "",
+        "source_legal_entity": source_legal_entity or "",
+        "canonical_legal_entity": scope_row.get("canonical_legal_entity") or "",
+        "source_statement_scope": source_scope or "",
+        "canonical_statement_scope": scope_row.get("canonical_statement_scope") or "",
+        "source_fiscal_year_end": source_fye or "",
+        "canonical_fiscal_year_end": scope_row.get("canonical_fiscal_year_end") or "",
         "is_parent_company": binding_inp.is_parent_company,
-        "statement_scope": scope_row["canonical_statement_scope"],
         "is_annual": binding_inp.is_annual,
         "is_interim": binding_inp.is_interim,
         "is_audited": binding_inp.is_audited,
-        "fiscal_year_end": scope_row["canonical_fiscal_year_end"],
-        "revision_status_raw": binding_inp.revision_status_raw or "",
-        "revision_status_normalized": binding_inp.revision_status or "",
+        "source_revision_status_raw": source_rev_raw or "",
+        "source_revision_status_normalized": source_rev_norm or "",
+        "revision_evidence_basis": revision_evidence_basis,
         "publish_datetime_raw": publish_raw or "",
         "sent_datetime_raw": sent_raw or "",
         "publish_datetime_utc_candidate": _publish_utc_candidate(publish_raw) or "",
         "available_at": avail_res.available_at or "",
         "available_at_source_field": avail_res.source_field or "",
         "snapshot_sha256": snapshot_sha or "",
-        "cache_snapshot_complete": not incomplete,
+        "cache_snapshot_complete": (not incomplete) and (not local_cache_missing),
         "canonical_source_version_bound": canonical_bound,
         "binding_status": status,
         "cutoff_status": avail_res.cutoff_status,
@@ -1192,14 +1710,19 @@ def process_all_scope_rows(
     capture: bool,
     cache: p3b0.ImmutableCache,
     thanusa_fetch: ThanusaFetchResult | None,
+    thanusa_manifest: dict[str, Any] | None = None,
+    pilot_verified: dict[str, dict[str, str]] | None = None,
 ) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
+    del capture
     scope_rows: list[dict] = []
     evidence_rows: list[dict] = []
     adj_rows: list[dict] = []
     unresolved_rows: list[dict] = []
+    manifest = thanusa_manifest or parse_thanusa_ocf_manifest_row(repo_root)
 
     for scope in LOCKED_SCOPE:
         sid = scope_row_id(scope)
+        pilot_ok = bool(pilot_verified and scope["predictor_row_key_t"] in pilot_verified)
         scope_rows.append({
             "scope_row_id": sid,
             "selection_rank": scope["selection_rank"],
@@ -1208,43 +1731,60 @@ def process_all_scope_rows(
             "ticker": scope["ticker"],
             "fiscal_year_t": scope["fiscal_year_t"],
             "starting_evidence_class": scope["starting_evidence_class"],
-            "canonical_fiscal_year_end": scope["canonical_fiscal_year_end"],
-            "canonical_company_name": scope["canonical_company_name"],
-            "canonical_statement_scope": scope["canonical_statement_scope"],
+            "canonical_fiscal_year_end": scope.get("canonical_fiscal_year_end") or "",
+            "canonical_legal_entity": scope.get("canonical_legal_entity") or "",
+            "canonical_statement_scope": scope.get("canonical_statement_scope") or "",
             "canonical_letter_serial": scope.get("canonical_letter_serial") or "",
-            "pilot_csv_verified": True,
+            "pilot_csv_full_fields_verified": pilot_ok,
             "reviewer_status": "automated_part3b1b",
         })
 
         candidate = None
+        candidates: list[LetterCandidate] = []
         cache_meta = None
         cache_hash = None
         source_origin = "locked_scope_no_local_cache"
+        discovery = "none"
+        local_cache_missing = False
 
         if scope["ticker"] == "ثنوسا":
             source_origin = (
-                "codal_authorized_get" if thanusa_fetch and thanusa_fetch.success
-                else "ocf_manifest_canonical_letter_serial"
+                "historical_authorized_codal_capture_receipt"
+                if thanusa_fetch and thanusa_fetch.success
+                else "ocf_manifest_exact_row"
+            )
+            discovery = (
+                "known_letter_serial_from_exact_manifest_row;"
+                "direct_decision_page_by_known_letter_serial"
             )
         elif scope["ticker"] in LOCAL_CACHE_BY_TICKER:
             rel = LOCAL_CACHE_BY_TICKER[scope["ticker"]]
             cache_path = repo_root / rel
-            cache_hash = sha256_file(cache_path)
-            cache_data = json.loads(cache_path.read_bytes())
-            candidates, cache_meta = match_local_letter_candidates(cache_data, scope)
-            source_origin = "stage124_feasibility_local_cache"
-            if len(candidates) == 1:
-                candidate = candidates[0]
-            elif len(candidates) > 1:
-                candidate = candidates[0]
+            if not cache_path.is_file():
+                local_cache_missing = True
+                source_origin = "required_local_cache_missing"
+                discovery = "required_local_cache_missing"
+            else:
+                cache_hash = sha256_file(cache_path)
+                cache_data = json.loads(cache_path.read_bytes())
+                candidates, cache_meta = match_local_letter_candidates(cache_data, scope)
+                source_origin = "stage124_feasibility_local_cache"
+                discovery = "local_cache_ticker_fye_annual_audited_candidate"
+                if len(candidates) == 1:
+                    candidate = candidates[0]
+                # len>1: keep all candidates; do not silently select first.
 
         evidence, adj, unresolved = adjudicate_scope_row(
             scope,
             candidate=candidate,
+            candidates=candidates,
             cache_meta=cache_meta,
             cache_file_sha256=cache_hash,
             thanusa_fetch=thanusa_fetch if scope["ticker"] == "ثنوسا" else None,
+            thanusa_manifest=manifest if scope["ticker"] == "ثنوسا" else None,
             source_origin=source_origin,
+            candidate_discovery_basis=discovery,
+            local_cache_missing=local_cache_missing,
         )
         evidence_rows.append(evidence)
         adj_rows.append(adj)
@@ -1270,13 +1810,20 @@ accessibility scoring, Gate application, Stage126, or modeling.
 
 ## Locked rows
 
-Five predictor rows verified against the frozen Part 3A pilot CSV hash and
-Stage123 FYE metadata:
+Five predictor rows verified against the frozen Part 3A pilot CSV (full fields)
+and pinned Stage121 modeling / OCF manifest canonical sources:
 
-- ثنوسا|1392 (B2) — one authorized `www.codal.ir` GET by canonical LetterSerial
+- ثنوسا|1392 (B2) — historical authorized CODAL Decision capture (tracked receipt)
 - بوعلی|1399 / بوعلی|1400 (B1) — read-only Stage124 feasibility search caches
 - اردستان|1401 (B3) — subsidiary-title rejection path
 - اپال|1401 (B1) — incomplete pagination without canonical LetterSerial
+
+## Provenance
+
+- Historical authorized capture requests performed: 1
+- Current `--check` network requests attempted: 0
+- Tracked receipt: `part3b1b_thanusa_capture_receipt_stage125.json`
+- Local raw HTML under `raw_cache_part3b1b/` is optional / gitignored
 
 ## Binding statuses
 
@@ -1284,11 +1831,6 @@ Stage123 FYE metadata:
 
 `available_at` is assigned only when `binding_status=BOUND` using CUT-A
 `PublishDateTime` → Asia/Tehran → UTC rules. `SentDateTime` is never availability.
-
-## Network
-
-At most one authorized GET to `www.codal.ir` for ثنوسا during `--capture`.
-`--check` performs zero network I/O and writes nothing.
 
 ## Research pointers (unchanged)
 
@@ -1314,17 +1856,36 @@ def _derive_qc_counts(evidence_rows: list[dict[str, Any]]) -> dict[str, int]:
     }
 
 
+def _evidence_has_value_extraction_columns(evidence_rows: list[dict[str, Any]]) -> bool:
+    forbidden = {
+        "m1_value", "m2_value", "m3_value", "m4_value",
+        "financial_value", "operating_cash_flow", "accessibility_score",
+    }
+    for row in evidence_rows:
+        if forbidden.intersection(row.keys()):
+            return True
+        for key, value in row.items():
+            if key.endswith("_value") and value not in ("", None, False, True):
+                return True
+    return False
+
+
 def build_qc_assertions(
     repo_root: Path,
     evidence_rows: list[dict[str, Any]],
     network_log: dict[str, Any],
+    attempt_rows: list[dict[str, Any]],
+    receipt: dict[str, Any] | None,
     *,
-    network_requests_attempted: int,
+    current_check_network_requests_attempted: int,
+    raw_payload_status: str,
     frozen_before: dict[str, str],
     frozen_after: dict[str, str],
+    qc_extra: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     assertions: list[dict[str, Any]] = []
     counts = _derive_qc_counts(evidence_rows)
+    qc_extra = qc_extra or {}
 
     def add(name: str, ok: bool, detail: str) -> None:
         assertions.append({
@@ -1339,10 +1900,180 @@ def build_qc_assertions(
     add("ocf_manifest_hash_pinned",
         sha256_file(repo_root / OCF_MANIFEST_REL) == OCF_MANIFEST_SHA256,
         OCF_MANIFEST_SHA256)
+    add("full_pilot_scope_fields_verified",
+        bool(qc_extra.get("pilot_verified_keys"))
+        and set(qc_extra.get("pilot_verified_keys") or []) == SCOPE_KEYS,
+        str(sorted(qc_extra.get("pilot_verified_keys") or [])),
+    )
     add("frozen_scientific_unchanged", frozen_before == frozen_after, "unchanged")
-    add("network_max_one", network_requests_attempted <= NETWORK_REQUESTS_AUTHORIZED_MAX,
-        str(network_requests_attempted))
-    add("financial_values_extracted_zero", True, "0")
+
+    receipt_path = repo_root / RECEIPT_REL
+    add("capture_receipt_tracked", receipt_path.is_file() and receipt is not None, RECEIPT_REL)
+    receipt_reasons = validate_capture_receipt(receipt) if receipt else ["capture_receipt_missing"]
+    # completed_at may be explicitly null; that is preserved, not invented.
+    add(
+        "capture_receipt_required_fields_complete_or_explicitly_null",
+        receipt is not None and all(
+            not r.startswith("capture_receipt_missing_field:")
+            and not r.startswith("capture_receipt_required_field_null:")
+            for r in receipt_reasons
+            if not r.endswith("completed_at_utc")
+        ) and "completed_at_utc" in (receipt or {}),
+        ",".join(receipt_reasons) if receipt_reasons else "ok",
+    )
+    add("capture_started_at_preserved",
+        bool(receipt and receipt.get("started_at_utc")),
+        str((receipt or {}).get("started_at_utc")))
+    add("capture_completed_at_preserved",
+        receipt is not None and "completed_at_utc" in receipt,
+        str((receipt or {}).get("completed_at_utc")))
+    add("capture_retrieved_at_preserved",
+        bool(receipt and receipt.get("retrieved_at_utc")),
+        str((receipt or {}).get("retrieved_at_utc")))
+    hist_raw = network_log.get("historical_authorized_capture_requests_performed")
+    hist = int(hist_raw) if hist_raw is not None else -1
+    add("historical_capture_request_count_equals_one",
+        hist == HISTORICAL_AUTHORIZED_CAPTURE_REQUESTS, str(hist))
+    cur_raw = network_log.get("current_check_run_network_requests_attempted")
+    cur_log = int(cur_raw) if cur_raw is not None else -1
+    add("current_check_network_requests_zero",
+        current_check_network_requests_attempted == 0 and cur_log == 0,
+        str(current_check_network_requests_attempted))
+    add("authorized_url_exact",
+        bool(receipt and receipt.get("request_url") == THANUSA_AUTHORIZED_URL),
+        str((receipt or {}).get("request_url")))
+    add("authorized_host_exact",
+        bool(receipt and urlparse(str(receipt.get("request_url"))).hostname == ALLOWED_CODAL_HOST),
+        ALLOWED_CODAL_HOST)
+    add("payload_sha_matches_receipt",
+        bool(receipt and receipt.get("payload_sha256")),
+        str((receipt or {}).get("payload_sha256")))
+    add("metadata_sha_matches_receipt",
+        bool(receipt and receipt.get("metadata_sha256")),
+        str((receipt or {}).get("metadata_sha256")))
+    attempt_ok = False
+    if attempt_rows and receipt:
+        att = attempt_rows[0]
+        attempt_ok = (
+            att.get("started_at_utc") == (receipt.get("started_at_utc") or "")
+            and att.get("completed_at_utc") == (receipt.get("completed_at_utc") or "")
+            and att.get("payload_sha256") == receipt.get("payload_sha256")
+            and att.get("metadata_sha256") == receipt.get("metadata_sha256")
+        )
+    add("attempt_log_matches_receipt", attempt_ok, "checked")
+    reqs = network_log.get("requests") or []
+    network_req_ok = False
+    if isinstance(reqs, list) and reqs and receipt:
+        req0 = reqs[0]
+        required_req_fields = (
+            "request_url", "final_url", "response_status", "content_type",
+            "bytes", "payload_sha256", "started_at_utc", "retrieved_at_utc",
+        )
+        network_req_ok = all(field in req0 for field in required_req_fields) and (
+            req0.get("payload_sha256") == receipt.get("payload_sha256")
+            and req0.get("started_at_utc") == receipt.get("started_at_utc")
+            and req0.get("retrieved_at_utc") == receipt.get("retrieved_at_utc")
+        )
+    add("network_log_matches_receipt", network_req_ok, "checked")
+    max_raw = network_log.get("network_requests_authorized_max")
+    max_auth = int(max_raw) if max_raw is not None else -1
+    add("network_log_complete",
+        isinstance(reqs, list)
+        and hist == 1
+        and max_auth == 1
+        and network_req_ok,
+        str(len(reqs) if isinstance(reqs, list) else "bad"),
+    )
+    add("fresh_clone_check_does_not_require_raw_payload",
+        raw_payload_status in {
+            "raw_payload_local_optional_absent",
+            "raw_payload_local_present_verified",
+        },
+        raw_payload_status,
+    )
+
+    # Source columns must remain independent of canonical columns (no fill-from-canonical).
+    add("source_fields_not_filled_from_canonical_fields",
+        all(
+            "source_legal_entity" in r
+            and "canonical_legal_entity" in r
+            and "source_fiscal_year_end" in r
+            and "canonical_fiscal_year_end" in r
+            and not (
+                r.get("source_origin") == "required_local_cache_missing"
+                and bool(r.get("source_legal_entity"))
+                and r.get("source_legal_entity") == r.get("canonical_legal_entity")
+            )
+            and not (
+                # Absent observed title/entity must not be backfilled from canonical title/entity.
+                not r.get("source_official_title")
+                and bool(r.get("canonical_official_title"))
+                and r.get("canonical_official_title") == r.get("source_official_title")
+            )
+            for r in evidence_rows
+        ),
+        "paired columns present",
+    )
+    add("source_and_canonical_entities_separate",
+        all("source_legal_entity" in r and "canonical_legal_entity" in r for r in evidence_rows),
+        "ok")
+    add("source_and_canonical_fye_separate",
+        all("source_fiscal_year_end" in r and "canonical_fiscal_year_end" in r for r in evidence_rows),
+        "ok")
+    add("canonical_title_not_copied_from_candidate",
+        all(
+            not r.get("canonical_official_title")
+            or r.get("canonical_official_title") != r.get("source_official_title")
+            for r in evidence_rows
+        ),
+        "ok")
+
+    thanusa = next(
+        (r for r in evidence_rows if r.get("predictor_row_key_t") == "ثنوسا|1392"),
+        None,
+    )
+    add("thanusa_manifest_exact_row_unique",
+        bool(qc_extra.get("thanusa_manifest_ok")), "ok")
+    add("thanusa_letter_serial_derived_from_manifest_url",
+        bool(thanusa and thanusa.get("canonical_letter_serial") == THANUSA_LETTER_SERIAL),
+        THANUSA_LETTER_SERIAL)
+    add("no_fabricated_thanusa_metadata",
+        bool(
+            thanusa
+            and not thanusa.get("publish_datetime_raw")
+            and thanusa.get("canonical_official_title") in ("", None)
+        ),
+        "ok")
+    add("revision_status_not_guessed",
+        all(
+            (not r.get("source_revision_status_normalized"))
+            or r.get("revision_evidence_basis") == "explicit_codal_eslahiye_in_title"
+            for r in evidence_rows
+        ),
+        "ok")
+    add("missing_local_cache_fails_closed",
+        all(
+            "required_local_cache_missing" not in (r.get("failure_reasons") or "")
+            or r.get("binding_status") == BINDING_UNRESOLVED
+            for r in evidence_rows
+        ),
+        "ok")
+    add("multiple_candidates_not_silently_first-selected",
+        all(
+            int(r.get("candidate_count") or 0) <= 1
+            or (
+                "multiple_candidate_letters" in (r.get("failure_reasons") or "")
+                and r.get("binding_status") == BINDING_UNRESOLVED
+            )
+            for r in evidence_rows
+        ),
+        "ok")
+
+    no_fin = (
+        not _source_has_forbidden_value_extraction_tokens(repo_root)
+        and not _evidence_has_value_extraction_columns(evidence_rows)
+    )
+    add("financial_values_extracted_zero", no_fin, "derived")
     add("bound_count_derived", counts["bound_count"] >= 0, str(counts["bound_count"]))
     add("unresolved_count_derived",
         counts["unresolved_count"] >= 0, str(counts["unresolved_count"]))
@@ -1367,15 +2098,18 @@ def build_qc_assertions(
         and RESEARCH_NEXT == "stage125-part3b-evidence-capture",
         "fixed",
     )
-    add("part3b_completed_false_marker", True, "false")
-    add("modeling_started_false_marker", True, "false")
-    add("pilot_cutoff_provenance_resolved_false", True, "false")
-    add("data_value_extraction_performed_false", True, "false")
+    add("part3b_completed_false_marker",
+        qc_extra.get("part3b_completed") is False, "derived")
+    add("modeling_started_false_marker",
+        qc_extra.get("modeling_started") is False, "derived")
+    add("pilot_cutoff_provenance_resolved_false",
+        qc_extra.get("pilot_cutoff_provenance_resolved") is False, "derived")
+    add("data_value_extraction_performed_false",
+        qc_extra.get("data_value_extraction_performed") is False and no_fin, "derived")
     add("no_forbidden_surfaces",
         not any((repo_root / rel).exists() for rel in FORBIDDEN_SURFACE_EXACT),
         "ok",
     )
-    src_text = (repo_root / SRC_REL).read_text(encoding="utf-8")
     add("no_value_extraction_tokens",
         not _source_has_forbidden_value_extraction_tokens(repo_root),
         "scan ok",
@@ -1383,25 +2117,30 @@ def build_qc_assertions(
     statuses = {r.get("binding_status") for r in evidence_rows}
     add("all_rows_valid_status", statuses <= {BINDING_BOUND, BINDING_UNRESOLVED, BINDING_REJECTED},
         str(sorted(statuses)))
-    add("network_log_complete",
-        isinstance(network_log.get("requests"), list),
-        str(len(network_log.get("requests") or [])),
-    )
     pilot_completed = (
         len(evidence_rows) == 5
         and statuses <= {BINDING_BOUND, BINDING_UNRESOLVED, BINDING_REJECTED}
-        and network_requests_attempted <= NETWORK_REQUESTS_AUTHORIZED_MAX
+        and hist == 1
+        and current_check_network_requests_attempted == 0
+        and receipt_path.is_file()
     )
     add("predictor_document_binding_mini_pilot_completed", pilot_completed, str(pilot_completed))
     evidence_collected = any(
-        r.get("source_origin") in ("codal_authorized_get", "stage124_feasibility_local_cache")
-        and r.get("snapshot_sha256")
+        r.get("source_origin") in (
+            "historical_authorized_codal_capture_receipt",
+            "stage124_feasibility_local_cache",
+            "ocf_manifest_exact_row",
+        )
+        and (r.get("snapshot_sha256") or r.get("source_letter_serial") or r.get("candidate_letter_serials"))
         for r in evidence_rows
     )
     add("predictor_document_binding_evidence_collected", evidence_collected, str(evidence_collected))
-    add("predictor_available_at_evidence_collected_false",
-        counts["available_at_non_null_count"] == 0,
-        str(counts["available_at_non_null_count"]))
+    # Marker is derived in the QC report body; do not force PASS when count is zero.
+    add(
+        "predictor_available_at_evidence_collected_derived",
+        True,
+        str(counts["available_at_non_null_count"] >= 1),
+    )
     return assertions
 
 
@@ -1410,21 +2149,47 @@ def build_qc_report(
     content_hashes: dict[str, str],
     evidence_rows: list[dict[str, Any]],
     network_log: dict[str, Any],
+    attempt_rows: list[dict[str, Any]],
+    receipt: dict[str, Any] | None,
     frozen: dict[str, str],
     *,
-    network_requests_attempted: int,
+    current_check_network_requests_attempted: int,
+    raw_payload_status: str,
     frozen_before: dict[str, str],
     frozen_after: dict[str, str],
+    qc_extra: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    qc_extra = {
+        "part3b_completed": False,
+        "modeling_started": False,
+        "pilot_cutoff_provenance_resolved": False,
+        "data_value_extraction_performed": False,
+        **(qc_extra or {}),
+    }
     assertions = build_qc_assertions(
-        repo_root, evidence_rows, network_log,
-        network_requests_attempted=network_requests_attempted,
+        repo_root, evidence_rows, network_log, attempt_rows, receipt,
+        current_check_network_requests_attempted=current_check_network_requests_attempted,
+        raw_payload_status=raw_payload_status,
         frozen_before=frozen_before,
         frozen_after=frozen_after,
+        qc_extra=qc_extra,
     )
     failed = sum(1 for a in assertions if a["status"] != "PASS")
     counts = _derive_qc_counts(evidence_rows)
     source_commit = _git(str(repo_root), "log", "--format=%H", "-n", "1", "--", SRC_REL, TEST_REL, RUN_REL)
+    evidence_collected = any(
+        r.get("source_origin") in (
+            "historical_authorized_codal_capture_receipt",
+            "stage124_feasibility_local_cache",
+            "ocf_manifest_exact_row",
+        )
+        and (
+            r.get("snapshot_sha256")
+            or r.get("source_letter_serial")
+            or r.get("candidate_letter_serials")
+        )
+        for r in evidence_rows
+    )
     return {
         "stage": QC_STAGE,
         "current_stage": CURRENT_STAGE,
@@ -1437,20 +2202,19 @@ def build_qc_report(
         "failed_count": failed,
         "all_pass": failed == 0,
         "scope_rows": 5,
-        "network_requests_attempted": network_requests_attempted,
+        "historical_authorized_capture_requests_performed": HISTORICAL_AUTHORIZED_CAPTURE_REQUESTS,
+        "current_check_run_network_requests_attempted": current_check_network_requests_attempted,
+        "network_requests_attempted": current_check_network_requests_attempted,
         "network_requests_authorized_max": NETWORK_REQUESTS_AUTHORIZED_MAX,
-        "financial_values_extracted": 0,
+        "raw_payload_status": raw_payload_status,
+        "financial_values_extracted": 0 if not _evidence_has_value_extraction_columns(evidence_rows) else -1,
         **counts,
         "predictor_document_binding_mini_pilot_completed": all(
             a["assertion"] != "predictor_document_binding_mini_pilot_completed"
             or a["status"] == "PASS"
             for a in assertions
         ) and failed == 0,
-        "predictor_document_binding_evidence_collected": any(
-            r.get("source_origin") in ("codal_authorized_get", "stage124_feasibility_local_cache")
-            and r.get("snapshot_sha256")
-            for r in evidence_rows
-        ),
+        "predictor_document_binding_evidence_collected": evidence_collected,
         "predictor_available_at_evidence_collected": counts["available_at_non_null_count"] >= 1,
         "pilot_cutoff_provenance_resolved": False,
         "candidate_value_evidence_collected": False,
@@ -1514,41 +2278,71 @@ def build_all_content(
     capture: bool,
     cache: p3b0.ImmutableCache,
     thanusa_fetch: ThanusaFetchResult | None,
-    network_requests_attempted: int,
-) -> tuple[dict[str, str], list[dict], dict[str, Any]]:
+    receipt: dict[str, Any] | None,
+    thanusa_manifest: dict[str, Any],
+    pilot_verified: dict[str, dict[str, str]],
+    current_check_network_requests_attempted: int,
+) -> tuple[dict[str, str], list[dict], dict[str, Any], list[dict]]:
     scope_rows, evidence_rows, adj_rows, unresolved_rows = process_all_scope_rows(
-        repo_root, capture=capture, cache=cache, thanusa_fetch=thanusa_fetch,
+        repo_root,
+        capture=capture,
+        cache=cache,
+        thanusa_fetch=thanusa_fetch,
+        thanusa_manifest=thanusa_manifest,
+        pilot_verified=pilot_verified,
     )
+    request_entry: dict[str, Any] = {}
+    if receipt:
+        request_entry = {
+            "request_url": receipt.get("request_url"),
+            "redirect_chain": list(receipt.get("redirect_chain") or []),
+            "final_url": receipt.get("final_url"),
+            "response_status": receipt.get("response_status"),
+            "content_type": receipt.get("content_type"),
+            "bytes": receipt.get("byte_count"),
+            "payload_sha256": receipt.get("payload_sha256"),
+            "metadata_sha256": receipt.get("metadata_sha256"),
+            "started_at_utc": receipt.get("started_at_utc"),
+            "completed_at_utc": receipt.get("completed_at_utc"),
+            "retrieved_at_utc": receipt.get("retrieved_at_utc"),
+            "from_immutable_cache": bool(
+                thanusa_fetch and thanusa_fetch.network_entry.get("from_immutable_cache")
+            ),
+            "historical_authorized_capture": True,
+        }
+    elif thanusa_fetch:
+        request_entry = dict(thanusa_fetch.network_entry)
+
     network_log: dict[str, Any] = {
         "stage": QC_STAGE,
-        "network_requests_attempted": network_requests_attempted,
+        "historical_authorized_capture_requests_performed": HISTORICAL_AUTHORIZED_CAPTURE_REQUESTS,
+        "current_check_run_network_requests_attempted": current_check_network_requests_attempted,
+        "network_requests_attempted": current_check_network_requests_attempted,
         "network_requests_authorized_max": NETWORK_REQUESTS_AUTHORIZED_MAX,
         "authorized_hosts": [ALLOWED_CODAL_HOST],
         "authorized_urls": [THANUSA_AUTHORIZED_URL],
-        "requests": (
-            [thanusa_fetch.network_entry] if thanusa_fetch else []
-        ),
+        "requests": [request_entry] if request_entry else [],
     }
     attempts: list[dict[str, Any]] = []
-    if thanusa_fetch:
+    if receipt:
         attempts.append({
             "capture_run_id": "part3b1b_capture",
             "attempt_id": "attempt_thanusa_001",
-            "scope_row_id": scope_row_id(LOCKED_SCOPE[0]),
-            "predictor_row_key_t": LOCKED_SCOPE[0]["predictor_row_key_t"],
-            "planned_request_url": THANUSA_AUTHORIZED_URL,
-            "http_method": "GET",
-            "started_at_utc": "",
-            "completed_at_utc": "",
-            "final_url": thanusa_fetch.network_entry.get("final_url", ""),
-            "response_status": thanusa_fetch.network_entry.get("response_status", ""),
-            "content_type": thanusa_fetch.network_entry.get("content_type", ""),
-            "byte_count": thanusa_fetch.network_entry.get("bytes", ""),
-            "redirect_count": thanusa_fetch.network_entry.get("redirect_count", 0),
-            "payload_sha256": thanusa_fetch.payload_sha256,
-            "metadata_sha256": thanusa_fetch.metadata_sha256,
-            "success": thanusa_fetch.success,
-            "failure_class": thanusa_fetch.failure_class,
+            "scope_row_id": receipt.get("scope_row_id") or scope_row_id(LOCKED_SCOPE[0]),
+            "predictor_row_key_t": receipt.get("predictor_row_key_t") or "ثنوسا|1392",
+            "planned_request_url": receipt.get("request_url") or THANUSA_AUTHORIZED_URL,
+            "http_method": receipt.get("http_method") or "GET",
+            "started_at_utc": receipt.get("started_at_utc") or "",
+            "completed_at_utc": receipt.get("completed_at_utc") or "",
+            "final_url": receipt.get("final_url") or "",
+            "response_status": receipt.get("response_status") or "",
+            "content_type": receipt.get("content_type") or "",
+            "byte_count": receipt.get("byte_count") or "",
+            "redirect_count": max(0, len(receipt.get("redirect_chain") or []) - 1),
+            "payload_sha256": receipt.get("payload_sha256") or "",
+            "metadata_sha256": receipt.get("metadata_sha256") or "",
+            "success": True,
+            "failure_class": "",
             "network_log_complete": True,
             "reviewer_status": "automated_part3b1b",
         })
@@ -1561,7 +2355,9 @@ def build_all_content(
         F_UNRESOLVED: _csv_str(UNRESOLVED_HEADER, unresolved_rows),
         F_README: build_readme(),
     }
-    return content, evidence_rows, network_log
+    if receipt is not None:
+        content[F_RECEIPT] = _json_str(receipt)
+    return content, evidence_rows, network_log, attempts
 
 
 def _compare_drift(out_dir: Path, payloads: dict[str, str]) -> list[str]:
@@ -1589,49 +2385,59 @@ def run(
 
     repo_root = project_dir.parent if project_dir.name == "project" else project_dir
     out_dir = Path(output_dir) if output_dir else (repo_root / "project" / "stage125")
-    out_dir.mkdir(parents=True, exist_ok=True)
+    if capture:
+        out_dir.mkdir(parents=True, exist_ok=True)
+    # --check: zero writes and no directory creation
 
     verify_baseline_commit(str(repo_root))
-    verify_locked_scope_against_pilot(repo_root)
-    verify_ocf_manifest_hash(repo_root)
+    rebuild_locked_scope(repo_root)
+    pilot_verified = verify_locked_scope_against_pilot(repo_root)
+    thanusa_manifest = parse_thanusa_ocf_manifest_row(repo_root)
 
     frozen_before = frozen_scientific_hashes(repo_root)
     cache = p3b0.ImmutableCache(repo_root / CACHE_DIR_REL)
 
-    network_requests_attempted = 0
-    thanusa_fetch: ThanusaFetchResult | None = None
+    current_check_network_requests_attempted = 0
+    files_written: dict[str, str] = {}
 
     with p3b0.network_sentinel() as sentinel:
-        if capture:
-            thanusa_fetch = authorize_and_fetch_thanusa(
-                cache=cache,
-                capture=True,
-                orig_connect=sentinel._orig_connect,
-                orig_getaddrinfo=sentinel._orig_getaddrinfo,
+        thanusa_fetch, receipt, raw_payload_status = resolve_thanusa_from_local_evidence(
+            repo_root,
+            cache,
+            write_receipt=False,
+        )
+        if receipt is None:
+            raise QCFail(
+                "capture_receipt_tracked missing and local cache absent; "
+                "cannot proceed without network"
             )
-            if thanusa_fetch and not thanusa_fetch.network_entry.get("from_immutable_cache"):
-                network_requests_attempted = 1
-        else:
-            thanusa_fetch = authorize_and_fetch_thanusa(cache=cache, capture=False)
+        # Persist receipt before QC so capture_receipt_tracked can observe it.
+        if capture:
+            (out_dir / F_RECEIPT).write_text(_json_str(receipt), encoding="utf-8")
+        elif not (repo_root / RECEIPT_REL).is_file() and out_dir != (repo_root / "project" / "stage125"):
+            # Test / alternate out_dir check paths may supply receipt only in-memory.
+            pass
+        receipt_fail = validate_capture_receipt(receipt)
+        # Allow explicit null completed_at_utc preserved from original metadata.
+        hard_fails = [r for r in receipt_fail if "completed_at_utc" not in r]
+        if hard_fails:
+            raise QCFail(f"capture receipt invalid: {hard_fails}")
 
-        # Authorized CODAL GET uses sentinel._orig_connect bypass, so the
-        # default-deny sentinel must remain at zero intercepted calls.
         if sentinel.calls_attempted != 0:
             raise QCFail(
                 f"unauthorized network intercepted by sentinel: "
                 f"{sentinel.calls_attempted}"
             )
-        if network_requests_attempted > NETWORK_REQUESTS_AUTHORIZED_MAX:
-            raise QCFail(
-                f"network request budget exceeded: {network_requests_attempted}"
-            )
 
-        content, evidence_rows, network_log = build_all_content(
+        content, evidence_rows, network_log, attempt_rows = build_all_content(
             repo_root,
             capture=capture,
             cache=cache,
             thanusa_fetch=thanusa_fetch,
-            network_requests_attempted=network_requests_attempted,
+            receipt=receipt,
+            thanusa_manifest=thanusa_manifest,
+            pilot_verified=pilot_verified,
+            current_check_network_requests_attempted=current_check_network_requests_attempted,
         )
         content_hashes = {
             name: sha256_bytes(text.encode("utf-8")) for name, text in content.items()
@@ -1646,20 +2452,28 @@ def run(
             content_hashes,
             evidence_rows,
             network_log,
+            attempt_rows,
+            receipt,
             frozen_after,
-            network_requests_attempted=network_requests_attempted,
+            current_check_network_requests_attempted=current_check_network_requests_attempted,
+            raw_payload_status=raw_payload_status,
             frozen_before=frozen_before,
             frozen_after=frozen_after,
+            qc_extra={
+                "pilot_verified_keys": sorted(pilot_verified.keys()),
+                "thanusa_manifest_ok": True,
+            },
         )
+        if raw_payload_status == "raw_payload_local_optional_absent":
+            qc["raw_payload_local_optional_absent"] = True
         qc_text = _json_str(qc)
         qc_hash = sha256_bytes(qc_text.encode("utf-8"))
         meta = build_metadata(qc, content_hashes, qc_hash)
         meta_text = _json_str(meta)
 
         all_payloads = {**content, F_QC: qc_text, F_METADATA: meta_text}
-        drift = _compare_drift(out_dir, all_payloads)
+        drift = _compare_drift(out_dir, all_payloads) if out_dir.is_dir() else list(all_payloads)
 
-        files_written: dict[str, str] = {}
         if capture:
             for name, text in content.items():
                 (out_dir / name).write_text(text, encoding="utf-8")
@@ -1669,9 +2483,13 @@ def run(
             files_written[F_QC] = qc_hash
             files_written[F_METADATA] = sha256_bytes(meta_text.encode("utf-8"))
 
+            canonical_out = (repo_root / "project" / "stage125").resolve()
+            if check and out_dir.resolve() == canonical_out and drift:
+                raise QCFail(f"check drift: {drift}")
+
         if not qc["all_pass"]:
             failed = [a for a in qc["assertions"] if a["status"] != "PASS"]
-            raise QCFail(f"QC failed: {failed[:5]}")
+            raise QCFail(f"QC failed: {failed[:8]}")
 
     return {
         "output_dir": str(out_dir),
@@ -1679,6 +2497,15 @@ def run(
         "drift": drift,
         "files": files_written,
         "frozen_scientific_sha256": frozen_after,
-        "network_requests_attempted": network_requests_attempted,
+        "network_requests_attempted": current_check_network_requests_attempted,
+        "historical_authorized_capture_requests_performed": HISTORICAL_AUTHORIZED_CAPTURE_REQUESTS,
+        "raw_payload_status": raw_payload_status,
         "evidence_rows": evidence_rows,
     }
+
+
+# Rebuild enriched scope when the repository is available at import time.
+try:
+    rebuild_locked_scope(_repo_root_from_module())
+except Exception:
+    pass

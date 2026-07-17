@@ -249,6 +249,7 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/part3b1b_capture_attempt_log_stage125.csv",
     "project/stage125/part3b1b_network_log_stage125.json",
     "project/stage125/part3b1b_unresolved_and_rejections_stage125.csv",
+    "project/stage125/part3b1b_thanusa_capture_receipt_stage125.json",
     "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1b.json",
 )

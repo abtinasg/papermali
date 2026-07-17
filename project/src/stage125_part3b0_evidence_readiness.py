@@ -282,6 +282,7 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/part3b1b_capture_attempt_log_stage125.csv",
     "project/stage125/part3b1b_network_log_stage125.json",
     "project/stage125/part3b1b_unresolved_and_rejections_stage125.csv",
+    "project/stage125/part3b1b_thanusa_capture_receipt_stage125.json",
     "project/stage125/prediction_cutoff_audit_stage125_part2.csv",
     "project/stage125/prediction_cutoff_summary_stage125_part2.json",
     "project/stage125/prediction_time_contract_stage125_part2.json",

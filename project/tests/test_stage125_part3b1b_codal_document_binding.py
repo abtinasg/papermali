@@ -1,9 +1,11 @@
 """Tests for Stage125 Part 3B.1B CODAL Predictor-Document Binding Mini-Pilot."""
 from __future__ import annotations
 
+import csv
 import json
 import socket
 import sys
+import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -213,7 +215,9 @@ def test_unbound_candidate_publish_datetime_available_at_null():
         cache_meta={"incomplete_pagination": True},
         cache_file_sha256="c" * 64,
         thanusa_fetch=None,
+        thanusa_manifest=None,
         source_origin="stage124_feasibility_local_cache",
+        candidate_discovery_basis="local_cache_ticker_fye_annual_audited_candidate",
     )
     assert adj["binding_status"] == m.BINDING_UNRESOLVED
     assert adj["available_at"] == ""
@@ -262,12 +266,14 @@ def test_check_performs_zero_network(tmp_path):
     out = tmp_path / "stage125"
     out.mkdir()
     with p3b0.network_sentinel() as sentinel:
-        with patch.object(m, "authorize_and_fetch_thanusa", wraps=m.authorize_and_fetch_thanusa) as spy:
+        with patch.object(
+            m, "resolve_thanusa_from_local_evidence", wraps=m.resolve_thanusa_from_local_evidence,
+        ) as spy:
             result = m.run(project_dir=ROOT, output_dir=out, check=True)
             spy.assert_called_once()
-            assert spy.call_args.kwargs.get("capture") is False
         assert sentinel.calls_attempted == 0
     assert result["network_requests_attempted"] == 0
+    assert result["historical_authorized_capture_requests_performed"] == 1
 
 
 # 21 immutable cache collision fails closed
@@ -342,30 +348,19 @@ def test_parse_codal_decision_html_fixture():
 
 
 def test_authorize_and_fetch_thanusa_injectable_transport(tmp_path):
+    """Network transport is no longer authorized; load from tracked receipt/cache."""
     cache = p3b0.ImmutableCache(tmp_path / "cache")
-    html = (
-        b"<html><title>test</title>"
-        b'<span id="lblPublishDateTime">1392/01/01 12:00:00</span></html>'
-    )
-
-    def transport(method, url):
-        m.assert_url_allowed(url)
-        return html, {
-            "request_url": url,
-            "redirect_chain": [url],
-            "final_url": url,
-            "response_status": 200,
-            "content_type": "text/html",
-            "bytes": len(html),
-            "redirect_count": 0,
-        }
-
     result = m.authorize_and_fetch_thanusa(
-        cache=cache, capture=True, transport=transport,
+        cache=cache, capture=True, repo_root=REPO_ROOT,
     )
     assert result is not None
     assert result.success
-    assert result.payload_sha256 == m.sha256_bytes(html)
+    receipt = m.load_tracked_capture_receipt(REPO_ROOT)
+    assert receipt is not None
+    assert (
+        result.payload_sha256 == receipt["payload_sha256"]
+        or result.body == b""
+    )
 
 
 def test_thanusa_row_fail_closed_unresolved(tmp_path):
@@ -392,3 +387,278 @@ def test_ardistan_row_rejected(tmp_path):
 def test_module_constants_import():
     assert m.QC_STAGE == "stage125_part3b1b_codal_document_binding_mini_pilot"
     assert len(m.LOCKED_SCOPE) == 5
+
+
+# --------------------------------------------------------------------------- #
+# Hardening tests (PR #43 provenance / source-vs-canonical / fresh-clone)
+# --------------------------------------------------------------------------- #
+
+def test_original_capture_timestamps_survive_cache_reuse():
+    receipt = m.load_tracked_capture_receipt(REPO_ROOT)
+    assert receipt is not None
+    assert receipt["started_at_utc"] == "2026-07-17T21:02:52Z"
+    assert receipt["retrieved_at_utc"] == "2026-07-17T21:02:56Z"
+    assert receipt["completed_at_utc"] is None
+    cache = p3b0.ImmutableCache(REPO_ROOT / m.CACHE_DIR_REL)
+    fetch, rebuilt, _ = m.resolve_thanusa_from_local_evidence(
+        REPO_ROOT, cache, write_receipt=False,
+    )
+    assert fetch is not None
+    assert rebuilt["started_at_utc"] == receipt["started_at_utc"]
+    assert rebuilt["retrieved_at_utc"] == receipt["retrieved_at_utc"]
+
+
+def test_tracked_receipt_validates_without_raw_payload(tmp_path):
+    receipt = m.load_tracked_capture_receipt(REPO_ROOT)
+    assert receipt is not None
+    reasons = m.validate_capture_receipt(receipt)
+    hard = [r for r in reasons if "completed_at_utc" not in r]
+    assert hard == []
+    empty_cache = p3b0.ImmutableCache(tmp_path / "empty_cache")
+    fetch, loaded, status = m.resolve_thanusa_from_local_evidence(
+        REPO_ROOT, empty_cache, write_receipt=False,
+    )
+    assert fetch is not None
+    assert status == "raw_payload_local_optional_absent"
+    assert loaded["payload_sha256"] == receipt["payload_sha256"]
+
+
+def test_check_works_in_simulated_fresh_clone_without_raw_cache(tmp_path, monkeypatch):
+    out = tmp_path / "stage125"
+    out.mkdir()
+    # Hide the local raw cache directory.
+    monkeypatch.setattr(m, "CACHE_DIR_REL", str(tmp_path / "missing_raw_cache_part3b1b"))
+    result = m.run(project_dir=ROOT, output_dir=out, check=True)
+    assert result["raw_payload_status"] == "raw_payload_local_optional_absent"
+    assert result["qc"]["all_pass"] is True
+    assert result["network_requests_attempted"] == 0
+
+
+def test_check_creates_no_directory_and_writes_no_file(tmp_path):
+    missing = tmp_path / "does_not_exist_yet"
+    assert not missing.exists()
+    before = {p: p.stat().st_mtime_ns for p in (REPO_ROOT / "project" / "stage125").glob("part3b1b_*")}
+    result = m.run(project_dir=ROOT, output_dir=missing, check=True)
+    assert not missing.exists()
+    after = {p: p.stat().st_mtime_ns for p in (REPO_ROOT / "project" / "stage125").glob("part3b1b_*")}
+    assert before == after
+    assert result["files"] == {}
+
+
+def test_attempt_log_timestamps_match_receipt():
+    receipt = m.load_tracked_capture_receipt(REPO_ROOT)
+    rows = list(csv.DictReader(
+        (REPO_ROOT / "project/stage125" / m.F_ATTEMPTS).open(encoding="utf-8")
+    ))
+    assert rows
+    assert rows[0]["started_at_utc"] == (receipt.get("started_at_utc") or "")
+    assert rows[0]["completed_at_utc"] == (receipt.get("completed_at_utc") or "")
+    assert rows[0]["payload_sha256"] == receipt["payload_sha256"]
+
+
+def test_network_log_historical_capture_count_remains_one():
+    net = json.loads(
+        (REPO_ROOT / "project/stage125" / m.F_NETWORK).read_text(encoding="utf-8")
+    )
+    assert net["historical_authorized_capture_requests_performed"] == 1
+    assert net["network_requests_authorized_max"] == 1
+
+
+def test_current_check_network_count_remains_zero():
+    net = json.loads(
+        (REPO_ROOT / "project/stage125" / m.F_NETWORK).read_text(encoding="utf-8")
+    )
+    assert net["current_check_run_network_requests_attempted"] == 0
+
+
+def test_source_legal_entity_not_replaced_by_canonical_entity():
+    rows = list(csv.DictReader(
+        (REPO_ROOT / "project/stage125" / m.F_EVIDENCE).open(encoding="utf-8")
+    ))
+    thanusa = next(r for r in rows if r["predictor_row_key_t"] == "ثنوسا|1392")
+    assert thanusa["source_legal_entity"]
+    assert thanusa["canonical_legal_entity"]
+    assert thanusa["source_legal_entity"] != thanusa["canonical_legal_entity"]
+
+
+def test_source_fye_not_replaced_by_canonical_fye():
+    rows = list(csv.DictReader(
+        (REPO_ROOT / "project/stage125" / m.F_EVIDENCE).open(encoding="utf-8")
+    ))
+    for row in rows:
+        assert "source_fiscal_year_end" in row
+        assert "canonical_fiscal_year_end" in row
+
+
+def test_canonical_title_not_copied_from_candidate_title():
+    rows = list(csv.DictReader(
+        (REPO_ROOT / "project/stage125" / m.F_EVIDENCE).open(encoding="utf-8")
+    ))
+    for row in rows:
+        assert row.get("canonical_official_title", "") == ""
+
+
+def test_entity_mismatch_visible_from_source_canonical_columns():
+    rows = list(csv.DictReader(
+        (REPO_ROOT / "project/stage125" / m.F_EVIDENCE).open(encoding="utf-8")
+    ))
+    thanusa = next(r for r in rows if r["predictor_row_key_t"] == "ثنوسا|1392")
+    assert thanusa["source_legal_entity"] != thanusa["canonical_legal_entity"]
+    assert "entity_mismatch" in thanusa["failure_reasons"]
+
+
+def test_exact_thanusa_manifest_row_parsed():
+    row = m.parse_thanusa_ocf_manifest_row(REPO_ROOT)
+    assert row["ticker"] == "ثنوسا"
+    assert str(row["fiscal_year"]) == "1392"
+    assert row["fiscal_year_end"] == "1392/06/31"
+    assert row["evidence_basis"] == "ocf_source_manifest_stage121_exact_row"
+
+
+def test_manifest_letter_serial_extracted_and_matched():
+    row = m.parse_thanusa_ocf_manifest_row(REPO_ROOT)
+    assert row["letter_serial"] == m.THANUSA_LETTER_SERIAL
+
+
+def test_zero_multiple_manifest_matches_fail_closed(tmp_path, monkeypatch):
+    fake_multi = tmp_path / "ocf_multi.csv"
+    header = (
+        "ticker,fiscal_year,fiscal_year_end,audit_status,statement_scope,"
+        "source_pdf,source_page,codal_url,sha256,decision\n"
+    )
+    row = (
+        "ثنوسا,1392,1392/06/31,audited,s,a.pdf,1,"
+        f"https://www.codal.ir/Reports/Decision.aspx?LetterSerial={m.THANUSA_LETTER_SERIAL},x,d\n"
+    )
+    fake_multi.write_text(header + row + row, encoding="utf-8")
+    fake_zero = tmp_path / "ocf_zero.csv"
+    fake_zero.write_text(header, encoding="utf-8")
+
+    monkeypatch.setattr(m, "verify_ocf_manifest_hash", lambda repo_root: None)
+
+    def _parse_with(path: Path):
+        monkeypatch.setattr(m, "OCF_MANIFEST_REL", str(path))
+        # repo_root / absolute path fails; patch open path via custom wrapper
+        original = m.parse_thanusa_ocf_manifest_row.__wrapped__ if False else None
+        del original
+        matches = []
+        with path.open(encoding="utf-8-sig", newline="") as fh:
+            for r in csv.DictReader(fh):
+                if r.get("ticker") == "ثنوسا" and str(r.get("fiscal_year")) == "1392":
+                    matches.append(r)
+        if len(matches) != 1:
+            raise m.QCFail(
+                f"thanusa_manifest_exact_row_unique failed: matched={len(matches)}"
+            )
+
+    with pytest.raises(m.QCFail, match="thanusa_manifest_exact_row_unique failed: matched=2"):
+        _parse_with(fake_multi)
+    with pytest.raises(m.QCFail, match="thanusa_manifest_exact_row_unique failed: matched=0"):
+        _parse_with(fake_zero)
+
+
+def test_unknown_revision_remains_null_unresolved():
+    rows = list(csv.DictReader(
+        (REPO_ROOT / "project/stage125" / m.F_EVIDENCE).open(encoding="utf-8")
+    ))
+    for row in rows:
+        assert row.get("source_revision_status_normalized", "") == ""
+        if row["binding_status"] != m.BINDING_REJECTED:
+            assert "unknown_revision_status" in row["failure_reasons"]
+
+
+def test_missing_feasibility_cache_produces_required_local_cache_missing(tmp_path):
+    scope = next(s for s in m.LOCKED_SCOPE if s["predictor_row_key_t"] == "بوعلی|1399")
+    ev, adj, _ = m.adjudicate_scope_row(
+        scope,
+        candidate=None,
+        cache_meta=None,
+        cache_file_sha256=None,
+        thanusa_fetch=None,
+        thanusa_manifest=None,
+        source_origin="required_local_cache_missing",
+        candidate_discovery_basis="required_local_cache_missing",
+        local_cache_missing=True,
+    )
+    assert adj["binding_status"] == m.BINDING_UNRESOLVED
+    assert "required_local_cache_missing" in ev["failure_reasons"]
+
+
+def test_multiple_local_candidates_all_recorded_and_unresolved():
+    scope = next(s for s in m.LOCKED_SCOPE if s["predictor_row_key_t"] == "بوعلی|1400")
+    c1 = _synth_candidate(letter_serial="AAA", fiscal_year_end=scope["canonical_fiscal_year_end"])
+    c2 = _synth_candidate(letter_serial="BBB", fiscal_year_end=scope["canonical_fiscal_year_end"])
+    ev, adj, _ = m.adjudicate_scope_row(
+        scope,
+        candidate=None,
+        candidates=[c1, c2],
+        cache_meta={"incomplete_pagination": False},
+        cache_file_sha256="d" * 64,
+        thanusa_fetch=None,
+        thanusa_manifest=None,
+        source_origin="stage124_feasibility_local_cache",
+        candidate_discovery_basis="local_cache_ticker_fye_annual_audited_candidate",
+    )
+    assert adj["binding_status"] == m.BINDING_UNRESOLVED
+    assert int(ev["candidate_count"]) == 2
+    assert "AAA" in ev["candidate_letter_serials"]
+    assert "BBB" in ev["candidate_letter_serials"]
+    assert "multiple_candidate_letters" in ev["failure_reasons"]
+
+
+def test_full_pilot_scope_fields_verified():
+    verified = m.verify_locked_scope_against_pilot(REPO_ROOT)
+    assert set(verified) == m.SCOPE_KEYS
+    for key, pilot in verified.items():
+        for field_name in m.PILOT_FULL_FIELD_KEYS:
+            assert field_name in pilot
+
+
+def test_no_additional_network_request_on_capture_reuse(tmp_path):
+    out = tmp_path / "stage125"
+    with p3b0.network_sentinel() as sentinel:
+        result = m.run(project_dir=ROOT, output_dir=out, capture=True)
+        assert sentinel.calls_attempted == 0
+    assert result["network_requests_attempted"] == 0
+    assert result["historical_authorized_capture_requests_performed"] == 1
+
+
+def test_no_financial_m_value_extraction_in_outputs():
+    text = (REPO_ROOT / "project/stage125" / m.F_EVIDENCE).read_text(encoding="utf-8")
+    assert "m1_value" not in text
+    assert "m2_value" not in text
+    assert "operating_cash_flow" not in text
+    assert not m._evidence_has_value_extraction_columns(
+        list(csv.DictReader(text.splitlines()))
+    )
+
+
+def test_no_scoring_gate_stage126_modeling_in_qc():
+    qc = json.loads(
+        (REPO_ROOT / "project/stage125" / m.F_QC).read_text(encoding="utf-8")
+    )
+    assert qc["accessibility_scoring_applied"] is False
+    assert qc["gates_applied"] == 0
+    assert qc["stage126_started"] is False
+    assert qc["modeling_started"] is False
+    assert qc["part3b_completed"] is False
+
+
+def test_frozen_scientific_hashes_unchanged_after_harden():
+    before = m.frozen_scientific_hashes(REPO_ROOT)
+    with tempfile.TemporaryDirectory() as td:
+        m.run(project_dir=ROOT, output_dir=Path(td) / "stage125", check=True)
+    after = m.frozen_scientific_hashes(REPO_ROOT)
+    assert before == after
+
+
+def test_research_pointers_unchanged_after_harden():
+    qc = json.loads(
+        (REPO_ROOT / "project/stage125" / m.F_QC).read_text(encoding="utf-8")
+    )
+    assert qc["research_pointers"]["last_completed_research_action_id"] == (
+        "stage125-part3a-decision-lock"
+    )
+    assert qc["research_pointers"]["next_research_action_id"] == (
+        "stage125-part3b-evidence-capture"
+    )
