@@ -28,7 +28,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
-from urllib.parse import parse_qs, urljoin, urlparse
+from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
 from src import stage125_part3b0_evidence_readiness as p3b0
 
@@ -402,7 +402,9 @@ def _assert_redirect_allowed(url: str, *, expected_letter_serial: str) -> None:
     if parsed.fragment:
         raise NetworkPolicyError("redirect fragment rejected")
     if parsed.path != ALLOWED_PATH:
-        raise NetworkPolicyError("redirect reaches non-Decision endpoint")
+        raise NetworkPolicyError(
+            f"redirect reaches non-Decision endpoint: {parsed.path!r} url={url}"
+        )
     qs = parse_qs(parsed.query, keep_blank_values=True)
     unknown = sorted(set(qs) - ALLOWED_QUERY_KEYS)
     if unknown:
@@ -521,8 +523,10 @@ def default_https_transport(
             family = socket.AF_INET6 if ":" in ip else socket.AF_INET
             raw_sock = socket.socket(family, socket.SOCK_STREAM)
             raw_sock.settimeout(REQUEST_TIMEOUT_SEC)
-            connect = orig_connect or raw_sock.connect
-            connect(raw_sock, (ip, 443))
+            if orig_connect is not None:
+                orig_connect(raw_sock, (ip, 443))
+            else:
+                raw_sock.connect((ip, 443))
             sock = context.wrap_socket(raw_sock, server_hostname=host)
             sock.sendall(raw_req)
             chunks: list[bytes] = []
@@ -737,16 +741,17 @@ def parse_codal_decision_metadata(html: bytes | str) -> dict[str, dict[str, Any]
     letter_serial = None
     ls_sel = None
     for pat, sel in (
-        (r'LetterSerial["\s:=]+([A-Za-z0-9+/=]{10,})', "html/text:LetterSerial"),
         (
             r'id="[^"]*LetterSerial[^"]*"[^>]*value="([^"]+)"',
             "html/input:LetterSerial",
         ),
         (r'lblLetterSerial[^>]*>([^<]+)<', "html/id:lblLetterSerial"),
+        # Explicit query token in page markup; decode percent-encoding only.
+        (r'LetterSerial=([A-Za-z0-9+%/=_-]{10,})', "html/markup:LetterSerial_query"),
     ):
         m = re.search(pat, text, re.I)
         if m:
-            letter_serial = html_lib.unescape(m.group(1)).strip()
+            letter_serial = unquote(html_lib.unescape(m.group(1))).strip()
             ls_sel = sel
             break
     fields["LetterSerial"] = _field_record(
@@ -1653,6 +1658,7 @@ def build_qc_assertions(
 
 
 def build_qc_report(
+    repo_root: Path,
     *,
     assertions: list[dict[str, Any]],
     scientific: dict[str, Any],
@@ -1662,12 +1668,27 @@ def build_qc_report(
 ) -> dict[str, Any]:
     failed = [x for x in assertions if x["status"] != "PASS"]
     completed = bool(manifest.get("same_five_metadata_resolution_capture_completed"))
+    source_commit = _git(
+        str(repo_root), "log", "--format=%H", "-n", "1", "--", SRC_REL, TEST_REL, RUN_REL,
+    )
+    if not source_commit:
+        raise QCFail(
+            "source_commit unresolved: commit Part 3B.1D source/test/runner "
+            "before regenerating QC artifacts"
+        )
+    tickers = sorted({key.split("|", 1)[0] for key in LOCKED_KEYS})
     return {
         "stage": QC_STAGE,
         "current_stage": CURRENT_STAGE,
         "task_id": TASK_ID,
         "maintenance_task_id": MAINTENANCE_TASK_ID,
         "baseline_commit": EXPECTED_BASELINE_COMMIT,
+        "source_commit": source_commit,
+        "source_file_sha256": sha256_file(repo_root / SRC_REL),
+        "test_file_sha256": sha256_file(repo_root / TEST_REL),
+        "generated_at": source_commit,
+        "tickers": tickers,
+        "ticker_count": len(tickers),
         "assertion_count": len(assertions),
         "failed_count": len(failed),
         "all_pass": not failed,
@@ -1717,8 +1738,14 @@ def build_metadata(
         "stage": QC_STAGE,
         "task_id": TASK_ID,
         "baseline_commit": EXPECTED_BASELINE_COMMIT,
+        "generated_at": qc.get("source_commit"),
+        "code_commit": qc.get("source_commit"),
+        "source_commit": qc.get("source_commit"),
+        "source_file_sha256": qc.get("source_file_sha256"),
+        "test_file_sha256": qc.get("test_file_sha256"),
         "qc_sha256": qc_hash,
         "files": content_hashes,
+        "output_files_sha256": dict(sorted({**content_hashes, F_QC: qc_hash}.items())),
         "same_five_metadata_resolution_capture_completed": qc[
             "same_five_metadata_resolution_capture_completed"
         ],
@@ -1780,6 +1807,7 @@ def assemble_payloads(
         drift=[],
     )
     qc = build_qc_report(
+        repo_root,
         assertions=assertions,
         scientific=scientific,
         manifest=manifest,
@@ -1866,6 +1894,7 @@ def run(
             if name not in (F_QC, F_METADATA)
         }
         qc = build_qc_report(
+            repo_root,
             assertions=assertions,
             scientific=scientific,
             manifest=manifest,
@@ -1936,43 +1965,13 @@ def run(
             if name not in (F_QC, F_METADATA)
         }
         qc = build_qc_report(
+            repo_root,
             assertions=assertions,
             scientific=scientific,
             manifest=manifest,
             content_hashes=content_hashes,
             logical_attempted=logical_attempted,
         )
-        qc_text = _json_str(qc)
-        qc_hash = sha256_bytes(qc_text.encode("utf-8"))
-        meta = build_metadata(qc, content_hashes, qc_hash)
-        meta_text = _json_str(meta)
-        all_payloads[F_QC] = qc_text
-        all_payloads[F_METADATA] = meta_text
-        # Recompute drift including QC/metadata
-        drift = (
-            _compare_drift(out_dir, all_payloads)
-            if out_dir.is_dir()
-            else sorted(all_payloads)
-        )
-        # Refresh official_check assertion with final drift
-        assertions = build_qc_assertions(
-            repo_root,
-            lock=lock,
-            receipts=receipts,
-            parsed_map=parsed_map,
-            manifest=manifest,
-            scientific=scientific,
-            pinned=pinned,
-            proposed_urls=proposed_urls,
-            logical_attempted=logical_attempted,
-            sentinel_calls=sentinel.calls_attempted,
-            drift=drift if out_dir.resolve() == canonical_out else [],
-        )
-        qc["assertions"] = assertions
-        qc["failed_count"] = sum(1 for x in assertions if x["status"] != "PASS")
-        qc["assertion_count"] = len(assertions)
-        qc["all_pass"] = qc["failed_count"] == 0
-        # Rebuild deterministic QC/metadata texts after assertion refresh
         qc_text = _json_str(qc)
         qc_hash = sha256_bytes(qc_text.encode("utf-8"))
         meta = build_metadata(qc, content_hashes, qc_hash)
