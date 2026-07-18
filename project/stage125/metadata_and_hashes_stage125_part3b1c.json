@@ -1,26 +1,26 @@
 {
   "baseline_commit": "99def5b4c15a41ca80729d873032d8c5c81ec672",
-  "code_commit": "b67eff49b1ed753185ad62794b4f48471a74dd47",
+  "code_commit": "5ce86efd491dbdb0c220c40ec79395bff83ecff5",
   "current_stage": "Stage125",
   "description": "Stage125 Part 3B.1C document-binding resolution decision lock (offline taxonomy/normalization/hierarchy/proposal only).",
   "document_binding_resolution_decision_locked": true,
-  "generated_at": "b67eff49b1ed753185ad62794b4f48471a74dd47",
+  "generated_at": "5ce86efd491dbdb0c220c40ec79395bff83ecff5",
   "modeling_started": false,
   "network_requests_attempted": 0,
   "output_files_sha256": {
     "README_STAGE125_PART3B1C_DOCUMENT_BINDING_RESOLUTION.md": "2fafe9c39fbb73a6886d1997114dc894ac6fd9dca157f5507ce599e3f0203a63",
-    "part3b1c_binding_failure_taxonomy_stage125.csv": "1fecc48f95d231b6ec5c40b5363b54789efacd6f1f2e0df9d8196bc79bc63160",
-    "part3b1c_document_binding_resolution_decision_lock_stage125.json": "68f8b8595d4436e7e9d049baae1c47f459ece83f8519f10b34091678c057cd26",
+    "part3b1c_binding_failure_taxonomy_stage125.csv": "63ae6073a5eb929f49e21caa41dc4e297439e7923df66ff772ad9ac70851e81d",
+    "part3b1c_document_binding_resolution_decision_lock_stage125.json": "ea1c1a7270414710621253b7e1fe0c9e84fcbac0d4ab95689618e561b200753e",
     "part3b1c_exact_document_evidence_hierarchy_stage125.json": "efcbfd397c661d048572bd98a66186ee0758b7ea5b1a59df97da98a791a459f0",
     "part3b1c_identity_normalization_contract_stage125.json": "3bc3378fccf6bb56092633cd174d3adf80e88eec489b1e41bd6e0fe474093284",
     "part3b1c_proposed_capture_authorization_stage125.json": "c97b17669c44969eb1fdc567e9c81f8b9de7b36ad3f63dc5ee6613f7bda17d78",
     "part3b1c_row_resolution_requirements_stage125.csv": "ebb83df39c45598abd239cab60c519061c0742062602e71058f82bacced3ff4d",
     "part3b1c_scale_up_readiness_decision_stage125.json": "ee49e9e844d2276009ce1db0daf38a39e0f40b169ada1c4e08ef9ae8546520cd",
-    "stage125_part3b1c_document_binding_resolution_qc_report.json": "bb95fb782a65d73561d5987fe68403d43592ddc4522df31bb837372804ed9734"
+    "stage125_part3b1c_document_binding_resolution_qc_report.json": "7df5091f78d1a7f95120b141cab97faadec9107ea2363d659b536ea604fd9e05"
   },
   "part3b_completed": false,
   "scale_up_to_80_rows_authorized": false,
-  "source_file_sha256": "d2379f22a59c12da9479ee8ff2eb7aa6d988a8a9ffbcc3ffc9a4141c9a079d17",
+  "source_file_sha256": "0d7e189bc6f0891d20d3384b58a1aca5701a7ef3b958ad9216beedf1f45c7737",
   "stage": "stage125_part3b1c_document_binding_resolution_decision_lock",
-  "test_file_sha256": "7b8b7802865520db3374f97c3091ed6e2c586fa91c5ef52f44cefe8a49a832fe"
+  "test_file_sha256": "d5fac3284b290de437c623fa2af023dee973b1018a420213b5578d5ba513e677"
 }

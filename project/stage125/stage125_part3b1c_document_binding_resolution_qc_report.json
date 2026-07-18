@@ -1,11 +1,11 @@
 {
   "accessibility_scoring_applied": false,
   "all_pass": true,
-  "assertion_count": 33,
+  "assertion_count": 44,
   "assertions": [
     {
       "assertion": "baseline_main_exact",
-      "detail": "99def5b4c15a41ca80729d873032d8c5c81ec672",
+      "detail": "5ce86efd491dbdb0c220c40ec79395bff83ecff5",
       "status": "PASS"
     },
     {
@@ -30,17 +30,42 @@
     },
     {
       "assertion": "all_failure_tokens_taxonomized",
-      "detail": "55",
+      "detail": "unique_failure_token_count=17;taxonomy_row_count=55",
       "status": "PASS"
     },
     {
       "assertion": "no_invented_failure_token",
-      "detail": "ok",
+      "detail": "[]",
+      "status": "PASS"
+    },
+    {
+      "assertion": "ticker_source_not_backfilled_from_canonical",
+      "detail": "rows=[{'scope_row_id': 'p3b1b_scope_006', 'predictor_row_key_t': 'ثنوسا|1392', 'current_binding_status': 'UNRESOLVED', 'failure_reason': 'ticker_mismatch', 'failure_layer': 'ticker', 'failure_class': 'missing_source_evidence', 'evidence_source_path': 'project/stage125/part3b1b_codal_document_evidence_stage125.csv', 'evidence_source_sha256': 'b0ded2c9c084cfc8ca882c370b6437d3949af52e00297b3f3d30f80bd315f867', 'observed_source_value': '', 'observed_canonical_value': 'ثنوسا', 'normalization_safe': 'false', 'normalization_rule_id': '', 'requires_official_metadata': 'true', 'requires_network_capture': 'true', 'requires_human_adjudication': 'false', 'structural_rejection': 'false', 'resolution_candidate': 'true', 'resolution_status': 'requires_official_symbol_metadata', 'notes': 'source symbol was not exposed/preserved in the frozen Part 3B.1B evidence artifact; canonical ticker must not be copied into the source field'}]",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing_title_side_classified_exactly",
+      "detail": "n=5",
+      "status": "PASS"
+    },
+    {
+      "assertion": "letter_code_not_substituted_with_letter_serial",
+      "detail": "n=4",
+      "status": "PASS"
+    },
+    {
+      "assertion": "statement_scope_values_preserved",
+      "detail": "n=10",
       "status": "PASS"
     },
     {
       "assertion": "raw_values_preserved",
-      "detail": "entity fields present",
+      "detail": "entity_rows=5",
+      "status": "PASS"
+    },
+    {
+      "assertion": "taxonomy_field_families_exact",
+      "detail": "ok",
       "status": "PASS"
     },
     {
@@ -94,6 +119,36 @@
       "status": "PASS"
     },
     {
+      "assertion": "all_non_null_urls_https",
+      "detail": "https",
+      "status": "PASS"
+    },
+    {
+      "assertion": "all_non_null_hosts_exact",
+      "detail": "www.codal.ir",
+      "status": "PASS"
+    },
+    {
+      "assertion": "all_non_null_paths_exact",
+      "detail": "/Reports/Decision.aspx",
+      "status": "PASS"
+    },
+    {
+      "assertion": "all_url_letter_serials_match",
+      "detail": "LetterSerial",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_credentials_or_fragments",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "structurally_rejected_request_not_proposed",
+      "detail": "اردستان|1401",
+      "status": "PASS"
+    },
+    {
       "assertion": "no_wildcard_endpoint",
       "detail": "ok",
       "status": "PASS"
@@ -135,12 +190,12 @@
     },
     {
       "assertion": "gates_applied_zero",
-      "detail": "0",
+      "detail": "gates_applied=0",
       "status": "PASS"
     },
     {
       "assertion": "part3b_completed_false",
-      "detail": "false",
+      "detail": "lock.part3b_completed=False",
       "status": "PASS"
     },
     {
@@ -155,7 +210,7 @@
     },
     {
       "assertion": "research_pointers_unchanged",
-      "detail": "fixed",
+      "detail": "lock={'last_completed_research_action_id': 'stage125-part3a-decision-lock', 'next_research_action_id': 'stage125-part3b-evidence-capture'};roadmap=(stage125-part3a-decision-lock,stage125-part3b-evidence-capture)",
       "status": "PASS"
     },
     {
@@ -215,8 +270,8 @@
   "network_requests_attempted": 0,
   "output_sha256": {
     "README_STAGE125_PART3B1C_DOCUMENT_BINDING_RESOLUTION.md": "2fafe9c39fbb73a6886d1997114dc894ac6fd9dca157f5507ce599e3f0203a63",
-    "part3b1c_binding_failure_taxonomy_stage125.csv": "1fecc48f95d231b6ec5c40b5363b54789efacd6f1f2e0df9d8196bc79bc63160",
-    "part3b1c_document_binding_resolution_decision_lock_stage125.json": "68f8b8595d4436e7e9d049baae1c47f459ece83f8519f10b34091678c057cd26",
+    "part3b1c_binding_failure_taxonomy_stage125.csv": "63ae6073a5eb929f49e21caa41dc4e297439e7923df66ff772ad9ac70851e81d",
+    "part3b1c_document_binding_resolution_decision_lock_stage125.json": "ea1c1a7270414710621253b7e1fe0c9e84fcbac0d4ab95689618e561b200753e",
     "part3b1c_exact_document_evidence_hierarchy_stage125.json": "efcbfd397c661d048572bd98a66186ee0758b7ea5b1a59df97da98a791a459f0",
     "part3b1c_identity_normalization_contract_stage125.json": "3bc3378fccf6bb56092633cd174d3adf80e88eec489b1e41bd6e0fe474093284",
     "part3b1c_proposed_capture_authorization_stage125.json": "c97b17669c44969eb1fdc567e9c81f8b9de7b36ad3f63dc5ee6613f7bda17d78",
@@ -258,11 +313,12 @@
   },
   "scale_up_to_80_rows_authorized": false,
   "scope_rows": 5,
-  "source_commit": "b67eff49b1ed753185ad62794b4f48471a74dd47",
-  "source_file_sha256": "d2379f22a59c12da9479ee8ff2eb7aa6d988a8a9ffbcc3ffc9a4141c9a079d17",
+  "source_commit": "5ce86efd491dbdb0c220c40ec79395bff83ecff5",
+  "source_file_sha256": "0d7e189bc6f0891d20d3384b58a1aca5701a7ef3b958ad9216beedf1f45c7737",
   "stage": "stage125_part3b1c_document_binding_resolution_decision_lock",
   "stage126_started": false,
-  "test_file_sha256": "7b8b7802865520db3374f97c3091ed6e2c586fa91c5ef52f44cefe8a49a832fe",
+  "taxonomy_row_count": 55,
+  "test_file_sha256": "d5fac3284b290de437c623fa2af023dee973b1018a420213b5578d5ba513e677",
   "ticker_count": 4,
   "tickers": [
     "اردستان",
@@ -270,5 +326,6 @@
     "بوعلی",
     "ثنوسا"
   ],
+  "unique_failure_token_count": 17,
   "unresolved_count": 4
 }
