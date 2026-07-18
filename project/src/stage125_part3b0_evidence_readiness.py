@@ -299,6 +299,15 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/part3b1e_frozen_financial_data_manifest_stage125.json",
     "project/stage125/stage125_part3b1e_conservative_lag_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1e.json",
+    "project/stage125/README_STAGE125_PART3C_LEAKAGE_SAFE_DATASET.md",
+    "project/stage125/part3c_leakage_safe_dataset_contract_stage125.json",
+    "project/stage125/part3c_input_hash_manifest_stage125.json",
+    "project/stage125/part3c_column_role_map_stage125.csv",
+    "project/stage125/part3c_sample_summary_stage125.csv",
+    "project/stage125/part3c_target_year_distribution_stage125.csv",
+    "project/stage125/part3c_leakage_audit_stage125.csv",
+    "project/stage125/stage125_part3c_leakage_safe_dataset_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3c.json",
     "project/stage125/prediction_cutoff_audit_stage125_part2.csv",
     "project/stage125/prediction_cutoff_summary_stage125_part2.json",
     "project/stage125/prediction_time_contract_stage125_part2.json",
@@ -2948,6 +2957,13 @@ def _is_authorized_part3b_path(repo_root: Path, rel: str) -> bool:
             return False
     # Part 3B.1B document-binding mini-pilot raw payloads (gitignored).
     if rel.startswith("project/stage125/raw_cache_part3b1b/"):
+        try:
+            from src import stage125_part3b_evidence_capture as part3b
+            return part3b.part3b_authorization_active(repo_root)
+        except Exception:
+            return False
+    # Part 3C bulky leakage-safe pair datasets (gitignored; hashed in metadata).
+    if rel.startswith("project/stage125/part3c_outputs/"):
         try:
             from src import stage125_part3b_evidence_capture as part3b
             return part3b.part3b_authorization_active(repo_root)
