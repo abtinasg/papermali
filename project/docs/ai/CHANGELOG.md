@@ -3,7 +3,36 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-18
+
+- **Stage125 Part 3B.1B — tracked parsed-metadata receipt + fresh-clone
+  determinism (PR #43 harden, maintenance).** Adds
+  `part3b1b_thanusa_parsed_metadata_receipt_stage125.json` bound to the
+  historical payload SHA so source-observed ثنوسا fields reconstruct without
+  gitignored raw HTML. Official `--check` enforces canonical drift outside
+  `--capture` (zero writes / zero network). Exact 11-field pilot equality;
+  `completed_at_utc=null` preserved with explicit
+  `completed_at_status=missing_in_original_cache_metadata_preserved_null`.
+  Scientific result unchanged: BOUND=0, UNRESOLVED=4, REJECTED=1,
+  `available_at` non-null=0. Research pointers unchanged.
+
 ## 2026-07-17
+
+- **Stage125 Part 3B.1B — Controlled CODAL Predictor-Document Binding
+  Mini-Pilot (maintenance).** Tracked as
+  `stage125-part3b1b-codal-document-binding-mini-pilot` (advances **no**
+  research action). Baseline: `origin/main` @
+  `4d7a48288543c971f43337e9a5d9a70ccfed2610`. Five locked rows only
+  (`ثنوسا|1392`, `بوعلی|1399`, `بوعلی|1400`, `اردستان|1401`, `اپال|1401`);
+  document metadata/provenance capture with at most one authorized
+  `www.codal.ir` Decision.aspx GET. **No** financial-value extraction, **no**
+  accessibility scoring, **no** Gate application, **no** cutoff audit mutation,
+  **no** Part 3B.2 / Stage126 / modeling. Markers
+  `predictor_document_binding_mini_pilot_completed=true`,
+  `predictor_document_binding_evidence_collected=true`,
+  `predictor_available_at_evidence_collected=false`. Research pointers remain
+  `last_completed_research_action_id=stage125-part3a-decision-lock`,
+  `next_research_action_id=stage125-part3b-evidence-capture`.
 
 - **Stage125 Part 3B.1A hardening (PR #41, maintenance).** Normalized
   `revision_status` aligned to frozen provenance enum

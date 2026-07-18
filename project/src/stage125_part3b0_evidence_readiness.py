@@ -231,6 +231,7 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/README_STAGE125_PART3B0_EVIDENCE_READINESS.md",
     "project/stage125/README_STAGE125_PART3B1_DECISION_LOCK.md",
     "project/stage125/README_STAGE125_PART3B1A_CUT_A_AVAILABLE_AT_LOCK.md",
+    "project/stage125/README_STAGE125_PART3B1B_CODAL_DOCUMENT_BINDING.md",
     "project/stage125/README_STAGE125_PART3B1_FEATURE_DEFINITION_SCORING_ADJUDICATION.md",
     "project/stage125/accessibility_scoring_rubric_stage125_part3a.json",
     "project/stage125/data_admission_gate_template_stage125.csv",
@@ -249,6 +250,7 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/metadata_and_hashes_stage125_part3b0.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1a.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b1b.json",
     "project/stage125/part3_candidate_inventory_stage125.csv",
     "project/stage125/part3_gate_decision_protocol_stage125.csv",
     "project/stage125/part3_pilot_sampling_options_stage125.csv",
@@ -274,6 +276,14 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/part3b1_selected_decisions_stage125.csv",
     "project/stage125/part3b1a_cut_a_available_at_decision_lock_stage125.json",
     "project/stage125/part3b1a_cut_a_available_at_operationalization_contract_stage125.json",
+    "project/stage125/part3b1b_predictor_document_scope_stage125.csv",
+    "project/stage125/part3b1b_codal_document_evidence_stage125.csv",
+    "project/stage125/part3b1b_document_binding_adjudication_stage125.csv",
+    "project/stage125/part3b1b_capture_attempt_log_stage125.csv",
+    "project/stage125/part3b1b_network_log_stage125.json",
+    "project/stage125/part3b1b_unresolved_and_rejections_stage125.csv",
+    "project/stage125/part3b1b_thanusa_capture_receipt_stage125.json",
+    "project/stage125/part3b1b_thanusa_parsed_metadata_receipt_stage125.json",
     "project/stage125/prediction_cutoff_audit_stage125_part2.csv",
     "project/stage125/prediction_cutoff_summary_stage125_part2.json",
     "project/stage125/prediction_time_contract_stage125_part2.json",
@@ -286,6 +296,7 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/stage125_part3b0_evidence_readiness_qc_report.json",
     "project/stage125/stage125_part3b1_decision_lock_qc_report.json",
     "project/stage125/stage125_part3b1a_cut_a_available_at_qc_report.json",
+    "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json",
 })
 
 
@@ -2915,6 +2926,13 @@ def _is_authorized_part3b_path(repo_root: Path, rel: str) -> bool:
         return True
     # Local immutable cache for authorized Part 3B (gitignored payloads).
     if rel.startswith("project/stage125/raw_cache_part3b/"):
+        try:
+            from src import stage125_part3b_evidence_capture as part3b
+            return part3b.part3b_authorization_active(repo_root)
+        except Exception:
+            return False
+    # Part 3B.1B document-binding mini-pilot raw payloads (gitignored).
+    if rel.startswith("project/stage125/raw_cache_part3b1b/"):
         try:
             from src import stage125_part3b_evidence_capture as part3b
             return part3b.part3b_authorization_active(repo_root)

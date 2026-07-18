@@ -150,6 +150,29 @@ PART3B1A_AUTHORIZED_EXACT = frozenset({
     "project/stage125/metadata_and_hashes_stage125_part3b1a.json",
 })
 
+# Exact-path Part 3B.1B CODAL document-binding mini-pilot surfaces.
+PART3B1B_SRC_REL = "project/src/stage125_part3b1b_codal_document_binding.py"
+PART3B1B_TEST_REL = (
+    "project/tests/test_stage125_part3b1b_codal_document_binding.py"
+)
+PART3B1B_RUN_REL = "project/run_stage125_part3b1b.py"
+PART3B1B_AUTHORIZED_EXACT = frozenset({
+    PART3B1B_SRC_REL,
+    PART3B1B_TEST_REL,
+    PART3B1B_RUN_REL,
+    "project/stage125/README_STAGE125_PART3B1B_CODAL_DOCUMENT_BINDING.md",
+    "project/stage125/part3b1b_predictor_document_scope_stage125.csv",
+    "project/stage125/part3b1b_codal_document_evidence_stage125.csv",
+    "project/stage125/part3b1b_document_binding_adjudication_stage125.csv",
+    "project/stage125/part3b1b_capture_attempt_log_stage125.csv",
+    "project/stage125/part3b1b_network_log_stage125.json",
+    "project/stage125/part3b1b_unresolved_and_rejections_stage125.csv",
+    "project/stage125/part3b1b_thanusa_capture_receipt_stage125.json",
+    "project/stage125/part3b1b_thanusa_parsed_metadata_receipt_stage125.json",
+    "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b1b.json",
+})
+
 PART3B_AUTHORIZED_EXACT = frozenset({
     SRC_REL, TEST_REL, RUN_REL,
     f"project/stage125/{F_AUTH}", f"project/stage125/{F_PLAN}",
@@ -161,7 +184,7 @@ PART3B_AUTHORIZED_EXACT = frozenset({
     f"project/stage125/{F_README}", f"project/stage125/{F_QC}",
     f"project/stage125/{F_METADATA}", f"project/stage125/{F_NETWORK_LOG}",
     f"project/stage125/{F_DECISION_REQ}", f"project/stage125/{F_DECISION_REQ_MD}",
-}) | PART3B1_AUTHORIZED_EXACT | PART3B1A_AUTHORIZED_EXACT
+}) | PART3B1_AUTHORIZED_EXACT | PART3B1A_AUTHORIZED_EXACT | PART3B1B_AUTHORIZED_EXACT
 
 
 ENDPOINT_HEADER = [

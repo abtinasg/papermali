@@ -976,7 +976,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
     assert state["current_stage"] == "Stage125"
     assert state["selected_qc_scope"] == (
-        "stage125_part3b1a_cut_a_available_at_operationalization_lock"
+        "stage125_part3b1b_codal_document_binding_mini_pilot"
     )
     assert state["last_completed_micro_part"] == "stage125-part3a-decision-lock"
     assert state["next_research_action_id"] == "stage125-part3b-evidence-capture"
@@ -986,6 +986,8 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["part3b_started"] is True
     assert state["part3b1_decision_locked"] is True
     assert state["cut_a_available_at_operationalization_locked"] is True
+    assert state["predictor_document_binding_mini_pilot_completed"] is True
+    assert state["predictor_document_binding_evidence_collected"] is True
     assert state["predictor_available_at_evidence_collected"] is False
     assert state["pilot_cutoff_provenance_resolved"] is False
     assert state["evidence_collected"] is True
@@ -1047,6 +1049,17 @@ def test_stage125_part3b0_generated_files_are_artifact_only(path):
     "project/stage125/part3b1a_cut_a_available_at_decision_lock_stage125.json",
     "project/stage125/stage125_part3b1a_cut_a_available_at_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1a.json",
+    "project/stage125/README_STAGE125_PART3B1B_CODAL_DOCUMENT_BINDING.md",
+    "project/stage125/part3b1b_predictor_document_scope_stage125.csv",
+    "project/stage125/part3b1b_codal_document_evidence_stage125.csv",
+    "project/stage125/part3b1b_document_binding_adjudication_stage125.csv",
+    "project/stage125/part3b1b_capture_attempt_log_stage125.csv",
+    "project/stage125/part3b1b_network_log_stage125.json",
+    "project/stage125/part3b1b_unresolved_and_rejections_stage125.csv",
+    "project/stage125/part3b1b_thanusa_capture_receipt_stage125.json",
+    "project/stage125/part3b1b_thanusa_parsed_metadata_receipt_stage125.json",
+    "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b1b.json",
 ])
 def test_stage125_part3b_generated_files_are_artifact_only(path):
     assert gen.path_artifact_only(path) is True
@@ -1162,6 +1175,45 @@ def test_qc_source_test_override_part3b1a():
     assert test.endswith(
         "test_stage125_part3b1a_cut_a_available_at_operationalization.py"
     )
+
+
+def test_extract_qc_workflow_markers_part3b1b_scope():
+    qc = {
+        "stage": "stage125_part3b1b_codal_document_binding_mini_pilot",
+        "part3a_protocol_locked": True,
+        "part3a_decision_locked": True,
+        "part3b0_readiness": True,
+        "part3b_started": True,
+        "part3b1_decision_locked": True,
+        "cut_a_available_at_operationalization_locked": True,
+        "predictor_document_binding_mini_pilot_completed": True,
+        "predictor_document_binding_evidence_collected": True,
+        "predictor_available_at_evidence_collected": False,
+        "pilot_cutoff_provenance_resolved": False,
+        "evidence_collected": True,
+        "endpoint_probe_evidence_collected": True,
+        "candidate_value_evidence_collected": False,
+        "pair_level_evidence_collected": False,
+        "data_value_extraction_performed": False,
+        "accessibility_scoring_applied": False,
+        "part3b_completed": False,
+        "network_extraction_performed": True,
+        "modeling_started": False,
+    }
+    got = gen.extract_qc_workflow_markers(qc)
+    assert got["predictor_document_binding_mini_pilot_completed"] is True
+    assert got["predictor_document_binding_evidence_collected"] is True
+    assert got["predictor_available_at_evidence_collected"] is False
+    assert got["part3b_completed"] is False
+    assert got["modeling_started"] is False
+
+
+def test_qc_source_test_override_part3b1b():
+    src, test = gen._qc_source_test_paths(
+        "stage125_part3b1b_codal_document_binding_mini_pilot"
+    )
+    assert src.endswith("stage125_part3b1b_codal_document_binding.py")
+    assert test.endswith("test_stage125_part3b1b_codal_document_binding.py")
 
 
 def test_stage125_part3b0_full_artifact_commit_is_skipped(synth):
