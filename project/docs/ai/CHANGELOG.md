@@ -5,6 +5,15 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 
 ## 2026-07-18
 
+- **Stage125 Part 3C correction — audited vs analysis-ready split.** The
+  authorized `رمپنا|1396` → `رمپنا|1397` timing exception remains visible in
+  the complete audited pair surface with explicit ineligibility flags, but is
+  excluded from leakage-safe analysis-ready / model-eligible datasets. Full
+  membership files are described as audited pair datasets; only
+  timing-eligible (`assumed_before_target_fiscal_year_end=true`) files are
+  leakage-safe analysis-ready. Fail-closed reconciliation of audit vs
+  analysis-ready counts; no silent drops; no financial/target mutation.
+
 - **Stage125 Part 3C / research action
   `stage125-part3c-leakage-safe-dataset-finalization` — Leakage-safe dataset
   finalization.** Operationalizes the locked six-month Jalali lag for all four

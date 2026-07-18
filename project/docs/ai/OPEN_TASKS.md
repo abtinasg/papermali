@@ -57,12 +57,17 @@ from year **t** may only predict distress target **t+1**. Stage125 remains
 
 ### Completed research action — `stage125-part3c-leakage-safe-dataset-finalization`
 
-Leakage-safe pair datasets finalized for all four locked Gate B sample
-designs under the six-month Jalali conservative lag. Financial values and
-targets remain frozen copies (no re-extraction / no target recalculation).
-Assumed availability uses `assumed_available_at_conservative` only (not
-observed `PublishDateTime` / `available_at`). Bulky outputs are gitignored
-and hashed. **Do not** start Stage126 or modeling. **Do not** resume broad
+Audited pair datasets and timing-eligible leakage-safe analysis-ready
+datasets finalized for all four locked Gate B sample designs under the
+six-month Jalali conservative lag. Full Gate B membership is preserved on
+the audited surface; analysis-ready outputs exclude every row where
+`assumed_before_target_fiscal_year_end != true` (including the authorized
+`رمپنا|1396` → `رمپنا|1397` exception, which remains visible in audit with
+explicit ineligibility flags). Financial values and targets remain frozen
+copies (no re-extraction / no target recalculation). Assumed availability
+uses `assumed_available_at_conservative` only (not observed
+`PublishDateTime` / `available_at`). Bulky outputs are gitignored and
+hashed. **Do not** start Stage126 or modeling. **Do not** resume broad
 CODAL capture or row-level PublishDateTime collection.
 
 ### Next / active research action — `stage125-part4-statistical-analysis-plan`

@@ -104,8 +104,8 @@ The research contract for the paper is frozen in
 Research action `stage125-part3c-leakage-safe-dataset-finalization`:
 
 - Operationalizes the Part 3B.1E locked six-month **Jalali** calendar lag for
-  all four frozen Gate B sample designs (membership, targets, and positive
-  counts unchanged).
+  all four frozen Gate B sample designs. Gate B **audit membership**, targets,
+  and positive counts are unchanged on the audited pair surface.
 - Predictors join Stage123 on `predictor_row_key_t` → `row_key` (fail-closed
   one-to-one). Targets are **copied** from Gate B pair files (never recomputed).
 - Assumed availability uses `assumed_available_at_conservative` only; never
@@ -113,8 +113,18 @@ Research action `stage125-part3c-leakage-safe-dataset-finalization`:
 - Part 3B broad CODAL expansion remains **superseded**. Financial data remain
   researcher-verified and frozen.
 - One audited fiscal-year-calendar-shift timing exception is recorded
-  (`رمپنا|1396` → `رمپنا|1397`): membership preserved; not silently dropped;
-  not claimed as timing-safe. Any other timing violation fails closed.
+  (`رمپنا|1396` → `رمپنا|1397`): retained in the **audited pair** surface with
+  `timing_relation_exception=true`,
+  `assumed_before_target_fiscal_year_end=false`,
+  `timing_eligible_for_analysis=false`, `timing_eligible_for_model=false`, and
+  exclusion reason
+  `assumed_availability_not_before_target_fye_authorized_calendar_shift`;
+  **not** timing-safe; **not** eligible for analysis-ready / model matrices.
+  Any other timing violation fails closed. No row is silently dropped.
+- Full-membership outputs are **audited pair datasets**. Only the filtered
+  timing-eligible outputs (`assumed_before_target_fiscal_year_end=true`) are
+  **leakage-safe analysis-ready datasets**. Gate B membership preservation
+  refers to the audit population, not necessarily the analysis-ready population.
 - Feature selection / model fitting / Stage126 remain unauthorized. Stage125
   remains incomplete. Next research action:
   `stage125-part4-statistical-analysis-plan`.

@@ -18,7 +18,12 @@ Versioned methodological addendum (does not silently rewrite Part 0 history):
 - Part 3B broad CODAL expansion is **superseded**.
 - Six-month conservative Jalali lag is **approved** and operationalized.
 - Part 3C leakage-safe dataset finalization is **completed** for all four
-  locked Gate B sample designs (membership/targets unchanged).
+  locked Gate B sample designs.
+- Full Gate B membership is preserved on the **audited pair** surface;
+  leakage-safe **analysis-ready** outputs exclude every row where
+  `assumed_before_target_fiscal_year_end != true` (including the authorized
+  `رمپنا|1396` → `رمپنا|1397` calendar-shift exception, which is audited but
+  not timing-safe / not model-eligible).
 - Financial data remain researcher-verified and frozen (no re-extraction).
 - Assumed availability is **not** an observed publication-time claim.
 - Stage125 remains incomplete; Stage126 and modeling remain unauthorized.

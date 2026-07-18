@@ -1,10 +1,16 @@
 """Stage125 Part 3C — Leakage-Safe Dataset Finalization.
 
 Operationalizes the Part 3B.1E locked six-month Jalali availability lag into
-leakage-safe pair-level datasets for all four frozen Gate B sample designs.
+audited pair datasets and timing-eligible analysis-ready datasets for all four
+frozen Gate B sample designs.
 
 Offline. Deterministic. Zero network. No modeling. No Stage126.
 Financial values and targets remain researcher-verified and frozen.
+
+Terminology:
+- audited pair datasets = full Gate B membership (exceptions visible/audited)
+- leakage-safe analysis-ready datasets = timing-eligible subset only
+  (assumed_before_target_fiscal_year_end == true)
 """
 from __future__ import annotations
 
@@ -29,10 +35,13 @@ from src import stage125_part3b1e_conservative_lag_decision as part3b1e
 QC_STAGE = "stage125_part3c_leakage_safe_dataset_finalization"
 CURRENT_STAGE = "Stage125"
 EXPECTED_BASELINE_COMMIT = "93ab6d8f2c1fbddaaed4a9dc21de6490ef38de30"
-CONTRACT_VERSION = "stage125_part3c_v1"
+CONTRACT_VERSION = "stage125_part3c_v2"
 RESEARCH_ACTION_ID = "stage125-part3c-leakage-safe-dataset-finalization"
 RESEARCH_LAST_COMPLETED = RESEARCH_ACTION_ID
 RESEARCH_NEXT = "stage125-part4-statistical-analysis-plan"
+TIMING_EXCLUSION_REASON_AUTHORIZED = (
+    "assumed_availability_not_before_target_fye_authorized_calendar_shift"
+)
 PART3B1E_DECISION_LOCK_REL = (
     "project/stage125/part3b1e_conservative_lag_decision_lock_stage125.json"
 )
@@ -74,16 +83,36 @@ F_QC = "stage125_part3c_leakage_safe_dataset_qc_report.json"
 F_METADATA = "metadata_and_hashes_stage125_part3c.json"
 
 BULKY_OUTPUT_DIR_REL = "project/stage125/part3c_outputs"
-DESIGN_OUTPUT_FILES = {
-    "main_rule_a_primary": "leakage_safe_main_rule_a_stage125.csv",
-    "main_rule_b_listing_robustness": "leakage_safe_main_rule_b_stage125.csv",
+# Full Gate B membership — audited pair surface (not model-ready).
+AUDITED_OUTPUT_FILES = {
+    "main_rule_a_primary": "audited_pairs_main_rule_a_stage125.csv",
+    "main_rule_b_listing_robustness": "audited_pairs_main_rule_b_stage125.csv",
     "expanded_rule_a_company_scope_robustness": (
-        "leakage_safe_expanded_rule_a_stage125.csv"
+        "audited_pairs_expanded_rule_a_stage125.csv"
     ),
     "expanded_rule_b_combined_robustness": (
-        "leakage_safe_expanded_rule_b_stage125.csv"
+        "audited_pairs_expanded_rule_b_stage125.csv"
     ),
 }
+# Timing-eligible leakage-safe analysis-ready surface.
+ANALYSIS_READY_OUTPUT_FILES = {
+    "main_rule_a_primary": "analysis_ready_main_rule_a_stage125.csv",
+    "main_rule_b_listing_robustness": "analysis_ready_main_rule_b_stage125.csv",
+    "expanded_rule_a_company_scope_robustness": (
+        "analysis_ready_expanded_rule_a_stage125.csv"
+    ),
+    "expanded_rule_b_combined_robustness": (
+        "analysis_ready_expanded_rule_b_stage125.csv"
+    ),
+}
+# Backward-compatible alias used by older call sites/tests.
+DESIGN_OUTPUT_FILES = AUDITED_OUTPUT_FILES
+OBSOLETE_BULKY_OUTPUT_FILES = (
+    "leakage_safe_main_rule_a_stage125.csv",
+    "leakage_safe_main_rule_b_stage125.csv",
+    "leakage_safe_expanded_rule_a_stage125.csv",
+    "leakage_safe_expanded_rule_b_stage125.csv",
+)
 
 TRACKED_CONTENT_FILES = (
     F_CONTRACT,
@@ -153,8 +182,9 @@ DESIGN_SPECS: dict[str, dict[str, Any]] = {
 }
 
 # One fiscal-year-calendar-shift pair where predictor FYE is Esfand and target
-# FYE is Farvardin; assumed (FYE+6m) is after target FYE. Membership is
-# preserved; the violation is explicitly audited (never silently dropped).
+# FYE is Farvardin; assumed (FYE+6m) is after target FYE. The pair remains in
+# the audited Gate B membership surface with explicit exclusion flags, but is
+# never eligible for analysis-ready / model matrices.
 AUTHORIZED_TIMING_EXCEPTIONS = frozenset({
     ("رمپنا", 1396, 1397, "رمپنا|1396", "رمپنا|1397"),
 })
@@ -226,6 +256,11 @@ PREDICTOR_RATIO_COLS = [
     "accumulated_loss_to_capital_ratio",
     "debt_to_equity",
 ]
+# Explicit predictor whitelist — model feature matrix may only use these.
+# Do not rely solely on dropping known forbidden columns.
+PREDICTOR_FEATURE_WHITELIST = frozenset(
+    PREDICTOR_FINANCIAL_LEVEL_COLS + PREDICTOR_RATIO_COLS
+)
 FORBIDDEN_TARGET_COMPONENT_COLS = [
     "loss_dummy",
     "equity_negative_dummy",
@@ -283,8 +318,18 @@ TIMING_ASSUMPTION_COLS = [
     "target_fiscal_year_end_t_plus_1_gregorian",
     "assumed_before_target_fiscal_year_end",
     "timing_relation_exception",
+    "timing_eligible_for_analysis",
+    "timing_eligible_for_model",
+    "timing_exclusion_reason",
     "sample_design",
 ]
+TIMING_ELIGIBILITY_AUDIT_COLS = frozenset({
+    "assumed_before_target_fiscal_year_end",
+    "timing_relation_exception",
+    "timing_eligible_for_analysis",
+    "timing_eligible_for_model",
+    "timing_exclusion_reason",
+})
 TARGET_IDENTITY_AUDIT_COLS = [
     "target_row_ticker",
     "target_row_fiscal_year",
@@ -505,12 +550,17 @@ def build_column_role_rows() -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
 
     def add(col: str, role: str, notes: str = "") -> None:
+        # Explicit whitelist only — never infer eligibility solely by dropping
+        # known forbidden columns.
+        enters = (
+            "true"
+            if role == "predictor_candidate" and col in PREDICTOR_FEATURE_WHITELIST
+            else "false"
+        )
         rows.append({
             "column_name": col,
             "role": role,
-            "enters_model_feature_matrix": (
-                "true" if role == "predictor_candidate" else "false"
-            ),
+            "enters_model_feature_matrix": enters,
             "notes": notes,
         })
 
@@ -529,6 +579,8 @@ def build_column_role_rows() -> list[dict[str, str]]:
         add(col, "identifier")
 
     for col in PREDICTOR_FINANCIAL_LEVEL_COLS + PREDICTOR_RATIO_COLS:
+        if col not in PREDICTOR_FEATURE_WHITELIST:
+            raise QCFail(f"predictor candidate missing from whitelist: {col}")
         add(col, "predictor_candidate", "predictor-year financial surface only")
 
     for col in (
@@ -541,7 +593,18 @@ def build_column_role_rows() -> list[dict[str, str]]:
     for col in TIMING_ASSUMPTION_COLS:
         if col == "sample_design":
             continue
-        add(col, "timing_assumption", "methodological; not observed publication")
+        if col in TIMING_ELIGIBILITY_AUDIT_COLS:
+            add(
+                col,
+                "timing_eligibility_audit",
+                "audit/eligibility only; never predictor feature matrix",
+            )
+        else:
+            add(
+                col,
+                "timing_assumption",
+                "methodological; not observed publication",
+            )
 
     for col in GATE_B_PAIR_COLUMNS:
         if col in {
@@ -582,7 +645,7 @@ def build_column_role_rows() -> list[dict[str, str]]:
 
 
 def final_output_header() -> list[str]:
-    """Deterministic column order for bulky leakage-safe CSVs."""
+    """Deterministic column order for audited / analysis-ready bulky CSVs."""
     header: list[str] = []
     for col in (
         "sample_design",
@@ -765,6 +828,16 @@ def build_design_rows(
             "true" if relation_ok else "false"
         )
         row["timing_relation_exception"] = "true" if is_exc else "false"
+        if relation_ok:
+            row["timing_eligible_for_analysis"] = "true"
+            row["timing_eligible_for_model"] = "true"
+            row["timing_exclusion_reason"] = ""
+        else:
+            # Authorized exception only reaches this branch; unauthorized
+            # violations already failed closed in require_timing_relation.
+            row["timing_eligible_for_analysis"] = "false"
+            row["timing_eligible_for_model"] = "false"
+            row["timing_exclusion_reason"] = TIMING_EXCLUSION_REASON_AUTHORIZED
         row["target_row_ticker"] = tgt["ticker"]
         row["target_row_fiscal_year"] = str(tgt["fiscal_year"])
         row["target_row_key_matched"] = tgt["row_key"]
@@ -800,6 +873,9 @@ def build_design_rows(
                 "assumed_before_target_fiscal_year_end"
             ],
             "timing_relation_exception": row["timing_relation_exception"],
+            "timing_eligible_for_analysis": row["timing_eligible_for_analysis"],
+            "timing_eligible_for_model": row["timing_eligible_for_model"],
+            "timing_exclusion_reason": row["timing_exclusion_reason"],
             "target_value_source": "frozen_gate_b_pair_copy",
             "financial_value_source": "frozen_stage123_predictor_row_copy",
             "is_observed_publication_timestamp": "false",
@@ -828,23 +904,123 @@ def build_design_rows(
     return out_rows, audit_rows
 
 
+def split_analysis_ready(
+    rows: list[dict[str, Any]],
+    *,
+    design: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Split audited rows into analysis-ready vs explicit timing exclusions.
+
+    Fail-closed: every exclusion must be an authorized timing exception with
+    assumed_before_target_fiscal_year_end != true. Analysis-ready rows must
+    all have assumed_before_target_fiscal_year_end == true.
+    """
+    ready: list[dict[str, Any]] = []
+    excluded: list[dict[str, Any]] = []
+    for row in rows:
+        before = row["assumed_before_target_fiscal_year_end"] == "true"
+        is_exc = row["timing_relation_exception"] == "true"
+        eligible = row["timing_eligible_for_analysis"] == "true"
+        model_eligible = row["timing_eligible_for_model"] == "true"
+        if before:
+            if is_exc:
+                raise QCFail(
+                    f"{design}: timing_relation_exception cannot be true when "
+                    f"assumed_before_target_fiscal_year_end=true "
+                    f"({row['predictor_row_key_t']})"
+                )
+            if not eligible or not model_eligible:
+                raise QCFail(
+                    f"{design}: timing-eligible flags must be true when "
+                    f"assumed_before_target_fiscal_year_end=true "
+                    f"({row['predictor_row_key_t']})"
+                )
+            if row["timing_exclusion_reason"]:
+                raise QCFail(
+                    f"{design}: timing_exclusion_reason must be empty for "
+                    f"timing-eligible row {row['predictor_row_key_t']}"
+                )
+            ready.append(row)
+            continue
+
+        # Not before target FYE → must be authorized audited exception.
+        if not is_exc:
+            raise QCFail(
+                f"{design}: unauthorized timing violation for "
+                f"{row['predictor_row_key_t']}"
+            )
+        if eligible or model_eligible:
+            raise QCFail(
+                f"{design}: authorized timing exception must not be "
+                f"analysis/model eligible ({row['predictor_row_key_t']})"
+            )
+        if row["timing_exclusion_reason"] != TIMING_EXCLUSION_REASON_AUTHORIZED:
+            raise QCFail(
+                f"{design}: unexpected timing_exclusion_reason="
+                f"{row['timing_exclusion_reason']!r} for "
+                f"{row['predictor_row_key_t']}"
+            )
+        excluded.append(row)
+
+    if len(ready) + len(excluded) != len(rows):
+        raise QCFail(
+            f"{design}: analysis-ready/exclusion split does not reconcile "
+            f"with audited row count ({len(ready)}+{len(excluded)}!={len(rows)})"
+        )
+    return ready, excluded
+
+
 def summarize_design(
     design: str,
-    rows: list[dict[str, Any]],
-    output_sha256: str,
+    audited_rows: list[dict[str, Any]],
+    analysis_rows: list[dict[str, Any]],
+    excluded_rows: list[dict[str, Any]],
+    audited_sha256: str,
+    analysis_sha256: str,
 ) -> dict[str, Any]:
-    pos = sum(1 for r in rows if _positive_flag(r["FD_target_main_t_plus_1"]))
+    audited_pos = sum(
+        1 for r in audited_rows if _positive_flag(r["FD_target_main_t_plus_1"])
+    )
+    analysis_pos = sum(
+        1 for r in analysis_rows if _positive_flag(r["FD_target_main_t_plus_1"])
+    )
     return {
         "sample_design": design,
-        "pairs": str(len(rows)),
-        "companies": str(len({r["ticker"] for r in rows})),
-        "positive": str(pos),
-        "negative": str(len(rows) - pos),
+        # Backward-compatible aliases = audited Gate B membership surface.
+        "pairs": str(len(audited_rows)),
+        "companies": str(len({r["ticker"] for r in audited_rows})),
+        "positive": str(audited_pos),
+        "negative": str(len(audited_rows) - audited_pos),
+        "audited_pairs": str(len(audited_rows)),
+        "audited_companies": str(len({r["ticker"] for r in audited_rows})),
+        "audited_positive": str(audited_pos),
+        "audited_negative": str(len(audited_rows) - audited_pos),
+        "analysis_ready_pairs": str(len(analysis_rows)),
+        "analysis_ready_companies": str(
+            len({r["ticker"] for r in analysis_rows})
+        ),
+        "analysis_ready_positive": str(analysis_pos),
+        "analysis_ready_negative": str(len(analysis_rows) - analysis_pos),
+        "excluded_timing_exception_count": str(len(excluded_rows)),
         "columns": str(len(final_output_header())),
-        "output_file": f"{BULKY_OUTPUT_DIR_REL}/{DESIGN_OUTPUT_FILES[design]}",
-        "output_sha256": output_sha256,
+        "audited_output_file": (
+            f"{BULKY_OUTPUT_DIR_REL}/{AUDITED_OUTPUT_FILES[design]}"
+        ),
+        "audited_output_sha256": audited_sha256,
+        "analysis_ready_output_file": (
+            f"{BULKY_OUTPUT_DIR_REL}/{ANALYSIS_READY_OUTPUT_FILES[design]}"
+        ),
+        "analysis_ready_output_sha256": analysis_sha256,
+        # Legacy keys retained for readers; point at audited surface.
+        "output_file": (
+            f"{BULKY_OUTPUT_DIR_REL}/{AUDITED_OUTPUT_FILES[design]}"
+        ),
+        "output_sha256": audited_sha256,
         "timing_relation_exceptions": str(
-            sum(1 for r in rows if r["timing_relation_exception"] == "true")
+            sum(
+                1 for r in audited_rows
+                if r["timing_relation_exception"] == "true"
+            )
         ),
     }
 
@@ -852,6 +1028,8 @@ def summarize_design(
 def target_year_distribution_rows(
     design: str,
     rows: list[dict[str, Any]],
+    *,
+    dataset_surface: str,
 ) -> list[dict[str, str]]:
     counts: Counter[str] = Counter()
     pos_by: Counter[str] = Counter()
@@ -864,6 +1042,7 @@ def target_year_distribution_rows(
     for y in sorted(counts, key=lambda x: int(x)):
         out.append({
             "sample_design": design,
+            "dataset_surface": dataset_surface,
             "target_year": y,
             "pairs": str(counts[y]),
             "positive": str(pos_by[y]),
@@ -926,7 +1105,16 @@ def build_contract(
         "pinned_bulky_input_sha256": dict(sorted(pinned_inputs.items())),
         "bulky_output_dir": BULKY_OUTPUT_DIR_REL,
         "bulky_output_sha256": dict(sorted(output_hashes.items())),
+        "audited_pair_output_files": {
+            k: f"{BULKY_OUTPUT_DIR_REL}/{v}"
+            for k, v in sorted(AUDITED_OUTPUT_FILES.items())
+        },
+        "analysis_ready_output_files": {
+            k: f"{BULKY_OUTPUT_DIR_REL}/{v}"
+            for k, v in sorted(ANALYSIS_READY_OUTPUT_FILES.items())
+        },
         "column_role_counts": dict(sorted(role_counts.items())),
+        "predictor_feature_whitelist": sorted(PREDICTOR_FEATURE_WHITELIST),
         "forbidden_from_model_feature_surface": sorted(
             FORBIDDEN_FROM_FEATURE_SURFACE
         ),
@@ -938,10 +1126,15 @@ def build_contract(
                 "target_year": t[2],
                 "predictor_row_key_t": t[3],
                 "target_row_key_t_plus_1": t[4],
+                "timing_eligible_for_analysis": False,
+                "timing_eligible_for_model": False,
+                "timing_exclusion_reason": TIMING_EXCLUSION_REASON_AUTHORIZED,
                 "reason": (
                     "fiscal_year_calendar_shift: predictor Esfand FYE + 6m "
-                    "is after target Farvardin FYE; membership preserved; "
-                    "not silently dropped; not claimed as timing-safe"
+                    "is after target Farvardin FYE; retained in audited Gate B "
+                    "membership surface only; excluded from analysis-ready / "
+                    "model-eligible datasets; not silently dropped; not "
+                    "claimed as timing-safe"
                 ),
             }
             for t in sorted(AUTHORIZED_TIMING_EXCEPTIONS)
@@ -956,6 +1149,11 @@ def build_contract(
         "target_join_rule": (
             "target_row_key_t_plus_1 == stage123.row_key; exactly one match; "
             "identity/FYE audit only"
+        ),
+        "analysis_ready_rule": (
+            "analysis-ready / leakage-safe modeling surface includes only "
+            "rows with assumed_before_target_fiscal_year_end=true; authorized "
+            "timing exceptions remain visible in the audited pair surface"
         ),
         "research_pointers": {
             "last_completed_research_action_id": RESEARCH_LAST_COMPLETED,
@@ -974,6 +1172,8 @@ def build_contract(
             "no_temporal_cv",
             "no_stage126",
             "stage125_not_complete",
+            "audited_pairs_are_not_fully_leakage_safe_model_ready",
+            "authorized_timing_exceptions_not_timing_safe",
             "merge_requires_explicit_human_approval",
         ],
         "part3b_broad_codal_expansion_superseded": True,
@@ -1008,9 +1208,19 @@ def build_input_manifest(
 def build_readme(contract: dict[str, Any]) -> str:
     return (
         "# Stage125 Part 3C — Leakage-Safe Dataset Finalization\n\n"
-        "**Status:** leakage-safe pair datasets finalized under the locked "
+        "**Status:** audited pair datasets and timing-eligible "
+        "leakage-safe analysis-ready datasets finalized under the locked "
         "six-month Jalali lag. Stage125 remains incomplete. "
         "No modeling / Stage126.\n\n"
+        "## Terminology\n\n"
+        "- **Audited pair datasets** = full frozen Gate B membership "
+        "(authorized timing exceptions remain visible).\n"
+        "- **Leakage-safe analysis-ready datasets** = timing-eligible subset "
+        "only (`assumed_before_target_fiscal_year_end=true`).\n"
+        "- Gate B membership preservation refers to the **audit population**, "
+        "not necessarily the analysis-ready population.\n"
+        "- The authorized `رمپنا|1396` → `رمپنا|1397` exception is **not** "
+        "timing-safe and is **not** analysis/model eligible.\n\n"
         "## Methodology\n\n"
         "- Part 3B broad CODAL expansion is **superseded**.\n"
         "- Six-month conservative Jalali lag is **approved** "
@@ -1024,17 +1234,32 @@ def build_readme(contract: dict[str, Any]) -> str:
         "claim (`PublishDateTime` / `available_at` / `SentDateTime`).\n"
         "- Targets are copied from frozen Gate B pair files; never recomputed.\n"
         "- Predictors join Stage123 on `predictor_row_key_t` → `row_key` "
-        "(fail-closed one-to-one).\n\n"
-        "## Designs preserved\n\n"
-        "| Design | pairs | companies | positive | negative |\n"
+        "(fail-closed one-to-one).\n"
+        "- Predictor feature matrix uses an **explicit whitelist** only.\n\n"
+        "## Audited Gate B membership (complete pair surface)\n\n"
+        "| Design | audited pairs | companies | positive | negative | excluded |\n"
+        "|---|---:|---:|---:|---:|---:|\n"
+        + "".join(
+            f"| `{s['sample_design']}` | {s['audited_pairs']} | "
+            f"{s['audited_companies']} | {s['audited_positive']} | "
+            f"{s['audited_negative']} | "
+            f"{s['excluded_timing_exception_count']} |\n"
+            for s in contract["sample_summaries"]
+        )
+        + "\n## Leakage-safe analysis-ready (timing-eligible)\n\n"
+        "| Design | analysis pairs | companies | positive | negative |\n"
         "|---|---:|---:|---:|---:|\n"
         + "".join(
-            f"| `{s['sample_design']}` | {s['pairs']} | {s['companies']} | "
-            f"{s['positive']} | {s['negative']} |\n"
+            f"| `{s['sample_design']}` | {s['analysis_ready_pairs']} | "
+            f"{s['analysis_ready_companies']} | "
+            f"{s['analysis_ready_positive']} | "
+            f"{s['analysis_ready_negative']} |\n"
             for s in contract["sample_summaries"]
         )
         + "\n## Outputs\n\n"
         f"- Bulky CSVs (gitignored): `{BULKY_OUTPUT_DIR_REL}/`\n"
+        "  - `audited_pairs_*.csv` — complete audited pair datasets\n"
+        "  - `analysis_ready_*.csv` — leakage-safe analysis-ready datasets\n"
         "- Tracked contracts / QC / hashes / column-role map / audits in "
         "`project/stage125/`.\n\n"
         "## Research pointers\n\n"
@@ -1060,19 +1285,44 @@ def build_all(
     all_audit: list[dict[str, Any]] = []
     all_ty: list[dict[str, str]] = []
     header = final_output_header()
+    excluded_by_design: dict[str, list[dict[str, Any]]] = {}
 
     for design, spec in DESIGN_SPECS.items():
         pairs = _read_csv_dicts(repo_root / spec["input_rel"])
         rows, audit = build_design_rows(
             design=design, pair_rows=pairs, stage123=stage123,
         )
-        text = _csv_str(header, rows)
-        digest = sha256_bytes(text.encode("utf-8"))
-        fname = DESIGN_OUTPUT_FILES[design]
-        bulky[fname] = text
-        summaries.append(summarize_design(design, rows, digest))
+        analysis_rows, excluded_rows = split_analysis_ready(
+            rows, design=design,
+        )
+        excluded_by_design[design] = excluded_rows
+        audited_text = _csv_str(header, rows)
+        analysis_text = _csv_str(header, analysis_rows)
+        audited_digest = sha256_bytes(audited_text.encode("utf-8"))
+        analysis_digest = sha256_bytes(analysis_text.encode("utf-8"))
+        bulky[AUDITED_OUTPUT_FILES[design]] = audited_text
+        bulky[ANALYSIS_READY_OUTPUT_FILES[design]] = analysis_text
+        summaries.append(
+            summarize_design(
+                design,
+                rows,
+                analysis_rows,
+                excluded_rows,
+                audited_digest,
+                analysis_digest,
+            )
+        )
         all_audit.extend(audit)
-        all_ty.extend(target_year_distribution_rows(design, rows))
+        all_ty.extend(
+            target_year_distribution_rows(
+                design, rows, dataset_surface="audited_pairs",
+            )
+        )
+        all_ty.extend(
+            target_year_distribution_rows(
+                design, analysis_rows, dataset_surface="analysis_ready",
+            )
+        )
 
     contract = build_contract(
         pinned_inputs=pinned,
@@ -1095,14 +1345,26 @@ def build_all(
         ),
         F_SAMPLE_SUMMARY: _csv_str(
             [
-                "sample_design", "pairs", "companies", "positive", "negative",
-                "columns", "output_file", "output_sha256",
+                "sample_design",
+                "pairs", "companies", "positive", "negative",
+                "audited_pairs", "audited_companies",
+                "audited_positive", "audited_negative",
+                "analysis_ready_pairs", "analysis_ready_companies",
+                "analysis_ready_positive", "analysis_ready_negative",
+                "excluded_timing_exception_count",
+                "columns",
+                "audited_output_file", "audited_output_sha256",
+                "analysis_ready_output_file", "analysis_ready_output_sha256",
+                "output_file", "output_sha256",
                 "timing_relation_exceptions",
             ],
             summaries,
         ),
         F_TARGET_YEAR_DIST: _csv_str(
-            ["sample_design", "target_year", "pairs", "positive", "negative"],
+            [
+                "sample_design", "dataset_surface", "target_year",
+                "pairs", "positive", "negative",
+            ],
             all_ty,
         ),
         F_LEAKAGE_AUDIT: _csv_str(
@@ -1115,6 +1377,9 @@ def build_all(
                 "target_fiscal_year_end_t_plus_1_jalali",
                 "assumed_before_target_fiscal_year_end",
                 "timing_relation_exception",
+                "timing_eligible_for_analysis",
+                "timing_eligible_for_model",
+                "timing_exclusion_reason",
                 "target_value_source", "financial_value_source",
                 "is_observed_publication_timestamp", "row_silently_dropped",
             ],
@@ -1129,6 +1394,7 @@ def build_all(
         "summaries": summaries,
         "role_rows": role_rows,
         "audit_rows": all_audit,
+        "excluded_by_design": excluded_by_design,
         "bulky_names": list(bulky.keys()),
     }
     return content, bulky, extras
@@ -1235,14 +1501,17 @@ def build_qc_assertions(
             f"{design}:{s['pairs']}/{s['companies']}/"
             f"{s['positive']}/{s['negative']}"
         )
-    _assert(assertions, "all_pair_counts_exact", counts_ok, ";".join(detail_counts))
+    _assert(
+        assertions, "all_pair_counts_exact", counts_ok,
+        ";".join(detail_counts) + " (audited Gate B membership)",
+    )
     _assert(
         assertions, "all_positive_negative_counts_exact", counts_ok,
-        ";".join(detail_counts),
+        ";".join(detail_counts) + " (audited Gate B membership)",
     )
     _assert(
         assertions, "all_company_counts_exact", counts_ok,
-        ";".join(detail_counts),
+        ";".join(detail_counts) + " (audited Gate B membership)",
     )
 
     pred_join_ok = all(a["predictor_join"] == "one_to_one" for a in audit_rows)
@@ -1275,13 +1544,80 @@ def build_qc_assertions(
             AUTHORIZED_TIMING_EXCEPTIONS
         ),
         f"unexpected_violations={len(unexpected)} "
-        f"authorized_exceptions={len(authorized_exc)}",
+        f"authorized_exceptions={len(authorized_exc)} "
+        f"(audit surface; exceptions not analysis-ready)",
+    )
+    rampna_audit_visible = [
+        a for a in authorized_exc
+        if a["predictor_row_key_t"] == "رمپنا|1396"
+        and a["target_row_key_t_plus_1"] == "رمپنا|1397"
+        and a["timing_eligible_for_analysis"] == "false"
+        and a["timing_eligible_for_model"] == "false"
+        and a["timing_exclusion_reason"] == TIMING_EXCLUSION_REASON_AUTHORIZED
+        and a["assumed_before_target_fiscal_year_end"] == "false"
+        and a["row_silently_dropped"] == "false"
+    ]
+    _assert(
+        assertions, "authorized_rampna_exception_visible_in_audit",
+        len(rampna_audit_visible) == len(DESIGN_SPECS),
+        f"visible_in_audit={len(rampna_audit_visible)}",
+    )
+
+    analysis_ready_ok = True
+    reconcile_ok = True
+    analysis_details: list[str] = []
+    for design in DESIGN_SPECS:
+        s = summaries[design]
+        audited_n = int(s["audited_pairs"])
+        ready_n = int(s["analysis_ready_pairs"])
+        excl_n = int(s["excluded_timing_exception_count"])
+        if audited_n != ready_n + excl_n:
+            reconcile_ok = False
+        analysis_text = bulky_payloads[ANALYSIS_READY_OUTPUT_FILES[design]]
+        analysis_rows = list(csv.DictReader(io.StringIO(analysis_text)))
+        if len(analysis_rows) != ready_n:
+            analysis_ready_ok = False
+        if any(
+            r.get("assumed_before_target_fiscal_year_end") != "true"
+            for r in analysis_rows
+        ):
+            analysis_ready_ok = False
+        if any(
+            r.get("timing_relation_exception") == "true"
+            for r in analysis_rows
+        ):
+            analysis_ready_ok = False
+        if any(
+            r.get("timing_eligible_for_analysis") != "true"
+            or r.get("timing_eligible_for_model") != "true"
+            for r in analysis_rows
+        ):
+            analysis_ready_ok = False
+        analysis_details.append(
+            f"{design}:audited={audited_n}/ready={ready_n}/excl={excl_n}"
+        )
+    _assert(
+        assertions, "analysis_ready_assumed_before_target_fye_true",
+        analysis_ready_ok,
+        ";".join(analysis_details),
+    )
+    _assert(
+        assertions, "no_authorized_timing_exception_in_analysis_ready",
+        analysis_ready_ok,
+        ";".join(analysis_details),
+    )
+    _assert(
+        assertions, "audit_and_analysis_ready_counts_reconcile",
+        reconcile_ok and analysis_ready_ok,
+        ";".join(analysis_details),
     )
     _assert(
         assertions, "no_row_silently_dropped",
         all(a["row_silently_dropped"] == "false" for a in audit_rows)
-        and len(audit_rows) == sum(s["pairs"] for s in DESIGN_SPECS.values()),
-        f"audit_rows={len(audit_rows)}",
+        and len(audit_rows) == sum(s["pairs"] for s in DESIGN_SPECS.values())
+        and reconcile_ok,
+        f"audit_rows={len(audit_rows)}; "
+        f"reconcile={'ok' if reconcile_ok else 'fail'}",
     )
     _assert(
         assertions, "no_target_recalculation",
@@ -1311,14 +1647,27 @@ def build_qc_assertions(
         if r["enters_model_feature_matrix"] == "true"
     }
     leakage_in_features = feature_roles & FORBIDDEN_FROM_FEATURE_SURFACE
+    eligibility_in_features = feature_roles & TIMING_ELIGIBILITY_AUDIT_COLS
     _assert(
         assertions, "forbidden_target_columns_excluded_from_feature_surface",
         not leakage_in_features,
         f"overlap={sorted(leakage_in_features)[:8]}",
     )
     _assert(
+        assertions, "timing_eligibility_fields_excluded_from_feature_surface",
+        not eligibility_in_features,
+        f"overlap={sorted(eligibility_in_features)}",
+    )
+    _assert(
+        assertions, "predictor_feature_whitelist_exact",
+        feature_roles == PREDICTOR_FEATURE_WHITELIST,
+        f"feature_count={len(feature_roles)} "
+        f"whitelist={len(PREDICTOR_FEATURE_WHITELIST)}",
+    )
+    expected_bulky = len(DESIGN_SPECS) * 2  # audited + analysis-ready
+    _assert(
         assertions, "output_hashes_recorded",
-        len(contract.get("bulky_output_sha256") or {}) == len(DESIGN_SPECS),
+        len(contract.get("bulky_output_sha256") or {}) == expected_bulky,
         str(len(contract.get("bulky_output_sha256") or {})),
     )
 
@@ -1560,8 +1909,9 @@ def run(
             "stage": QC_STAGE,
             "current_stage": CURRENT_STAGE,
             "description": (
-                "Stage125 Part 3C leakage-safe dataset finalization "
-                "(six-month Jalali lag; frozen Gate B samples; offline)."
+                "Stage125 Part 3C audited-pair + timing-eligible "
+                "analysis-ready dataset finalization (six-month Jalali lag; "
+                "frozen Gate B samples; offline)."
             ),
             "generated_at": source_commit,
             "code_commit": source_commit,
@@ -1605,6 +1955,12 @@ def run(
                 files_written[f"part3c_outputs/{name}"] = sha256_bytes(
                     text.encode("utf-8")
                 )
+            # Remove superseded bulky filenames so stale leakage_safe_* files
+            # cannot be mistaken for the current analysis surface.
+            for obsolete in OBSOLETE_BULKY_OUTPUT_FILES:
+                obsolete_path = bulky_dir / obsolete
+                if obsolete_path.is_file():
+                    obsolete_path.unlink()
 
         canonical = out_dir.resolve() == canonical_out
         if check and canonical and (tracked_drift or bulky_drift):

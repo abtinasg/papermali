@@ -75,9 +75,16 @@ def main(argv: list[str] | None = None) -> int:
     )
     for s in qc.get("sample_summaries") or []:
         print(
-            f"  {s['sample_design']}: pairs={s['pairs']} "
-            f"companies={s['companies']} pos={s['positive']} "
-            f"neg={s['negative']}"
+            f"  {s['sample_design']}: "
+            f"audited={s.get('audited_pairs', s['pairs'])}/"
+            f"{s.get('audited_companies', s['companies'])}/"
+            f"{s.get('audited_positive', s['positive'])}/"
+            f"{s.get('audited_negative', s['negative'])} "
+            f"analysis_ready={s.get('analysis_ready_pairs', '?')}/"
+            f"{s.get('analysis_ready_companies', '?')}/"
+            f"{s.get('analysis_ready_positive', '?')}/"
+            f"{s.get('analysis_ready_negative', '?')} "
+            f"excluded={s.get('excluded_timing_exception_count', '?')}"
         )
 
     if args.build:

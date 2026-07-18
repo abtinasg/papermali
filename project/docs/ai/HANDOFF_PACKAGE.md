@@ -114,8 +114,9 @@ Do not confuse QC selection with the research-action chain:
   `run_stage125_part3c.py`,
   `tests/test_stage125_part3c_leakage_safe_dataset_finalization.py`,
   `stage125/stage125_part3c_leakage_safe_dataset_qc_report.json` (four
-  Gate B designs; Jalali six-month lag operationalized; bulky outputs
-  gitignored/hashed; no feature selection / modeling / Stage126).
+  Gate B designs; audited pair + timing-eligible analysis-ready surfaces;
+  Jalali six-month lag operationalized; bulky outputs gitignored/hashed;
+  no feature selection / modeling / Stage126).
 
 ## 7. Done
 

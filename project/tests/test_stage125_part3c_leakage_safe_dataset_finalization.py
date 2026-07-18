@@ -237,6 +237,70 @@ def test_authorized_timing_exception_preserves_membership():
     assert is_exc is True
 
 
+def test_authorized_exception_retained_in_audit_excluded_from_analysis_ready():
+    stage123 = m.load_stage123_by_row_key(REPO_ROOT)
+    for design, spec in m.DESIGN_SPECS.items():
+        pairs = m._read_csv_dicts(REPO_ROOT / spec["input_rel"])
+        rows, audit = m.build_design_rows(
+            design=design, pair_rows=pairs, stage123=stage123,
+        )
+        ready, excluded = m.split_analysis_ready(rows, design=design)
+        assert len(rows) == spec["pairs"]
+        assert len(ready) + len(excluded) == len(rows)
+        assert len(excluded) == 1
+        exc = excluded[0]
+        assert exc["predictor_row_key_t"] == "رمپنا|1396"
+        assert exc["target_row_key_t_plus_1"] == "رمپنا|1397"
+        assert exc["assumed_before_target_fiscal_year_end"] == "false"
+        assert exc["timing_relation_exception"] == "true"
+        assert exc["timing_eligible_for_analysis"] == "false"
+        assert exc["timing_eligible_for_model"] == "false"
+        assert exc["timing_exclusion_reason"] == (
+            m.TIMING_EXCLUSION_REASON_AUTHORIZED
+        )
+        audit_exc = [
+            a for a in audit
+            if a["predictor_row_key_t"] == "رمپنا|1396"
+            and a["target_row_key_t_plus_1"] == "رمپنا|1397"
+        ]
+        assert len(audit_exc) == 1
+        assert audit_exc[0]["timing_eligible_for_analysis"] == "false"
+        assert audit_exc[0]["timing_eligible_for_model"] == "false"
+        assert audit_exc[0]["row_silently_dropped"] == "false"
+        assert all(
+            r["assumed_before_target_fiscal_year_end"] == "true"
+            for r in ready
+        )
+        assert all(r["timing_relation_exception"] == "false" for r in ready)
+        assert all(
+            r["timing_eligible_for_analysis"] == "true"
+            and r["timing_eligible_for_model"] == "true"
+            for r in ready
+        )
+
+
+def test_unauthorized_timing_violation_fails_closed_not_silently_dropped():
+    stage123 = m.load_stage123_by_row_key(REPO_ROOT)
+    design = "main_rule_a_primary"
+    pairs = m._read_csv_dicts(REPO_ROOT / m.DESIGN_SPECS[design]["input_rel"])
+    rows, _ = m.build_design_rows(
+        design=design, pair_rows=pairs, stage123=stage123,
+    )
+    # Synthesize an unauthorized timing violation after construction.
+    victim = next(
+        r for r in rows
+        if r["timing_relation_exception"] == "false"
+        and r["assumed_before_target_fiscal_year_end"] == "true"
+    )
+    victim["assumed_before_target_fiscal_year_end"] = "false"
+    victim["timing_relation_exception"] = "false"
+    victim["timing_eligible_for_analysis"] = "false"
+    victim["timing_eligible_for_model"] = "false"
+    victim["timing_exclusion_reason"] = "synthetic_unauthorized"
+    with pytest.raises(m.QCFail, match="unauthorized timing violation"):
+        m.split_analysis_ready(rows, design=design)
+
+
 def test_attempt_to_populate_PublishDateTime_rejected():
     with pytest.raises(m.AuthorizationError, match="PublishDateTime"):
         m.reject_assumed_date_as_observed_field("PublishDateTime", "1402-06-29")
@@ -262,11 +326,30 @@ def test_target_derived_field_not_in_feature_surface():
         "source_file",
         "source_url",
         "assumed_available_at_conservative_jalali",
+        "timing_eligible_for_analysis",
+        "timing_eligible_for_model",
+        "timing_exclusion_reason",
+        "timing_relation_exception",
+        "assumed_before_target_fiscal_year_end",
     ):
         assert by_name[col]["enters_model_feature_matrix"] == "false"
-    # Predictor financials may be candidates only.
+    for col in (
+        "timing_eligible_for_analysis",
+        "timing_eligible_for_model",
+        "timing_exclusion_reason",
+        "timing_relation_exception",
+        "assumed_before_target_fiscal_year_end",
+    ):
+        assert by_name[col]["role"] == "timing_eligibility_audit"
+    # Predictor financials may be candidates only via explicit whitelist.
     assert by_name["total_assets"]["role"] == "predictor_candidate"
     assert by_name["total_assets"]["enters_model_feature_matrix"] == "true"
+    feature_cols = {
+        r["column_name"]
+        for r in roles
+        if r["enters_model_feature_matrix"] == "true"
+    }
+    assert feature_cols == m.PREDICTOR_FEATURE_WHITELIST
 
 
 def test_network_attempt_blocked_and_counted():
@@ -325,10 +408,15 @@ def test_build_all_offline_preserves_targets_and_financials():
     with p3b0.network_sentinel() as sentinel:
         content, bulky, extras = m.build_all(REPO_ROOT)
         assert sentinel.calls_attempted == 0
-    assert set(bulky) == set(m.DESIGN_OUTPUT_FILES.values())
-    # Spot-check main rule A first row financial copy equals Stage123.
+    expected_bulky = set(m.AUDITED_OUTPUT_FILES.values()) | set(
+        m.ANALYSIS_READY_OUTPUT_FILES.values()
+    )
+    assert set(bulky) == expected_bulky
+    # Spot-check main rule A first audited row financial copy equals Stage123.
     stage123 = m.load_stage123_by_row_key(REPO_ROOT)
-    reader = csv.DictReader(bulky["leakage_safe_main_rule_a_stage125.csv"].splitlines())
+    reader = csv.DictReader(
+        bulky[m.AUDITED_OUTPUT_FILES["main_rule_a_primary"]].splitlines()
+    )
     row = next(reader)
     src = stage123[row["predictor_row_key_t"]]
     assert row["total_assets"] == src["total_assets"]
@@ -343,8 +431,31 @@ def test_build_all_offline_preserves_targets_and_financials():
     assert row["FD_target_main_t_plus_1"] == gate[row["predictor_row_key_t"]][
         "FD_target_main_t_plus_1"
     ]
+    # Analysis-ready must exclude the authorized exception and keep frozen
+    # target polarity of remaining rows unchanged.
+    for design, spec in m.DESIGN_SPECS.items():
+        audited = list(csv.DictReader(
+            bulky[m.AUDITED_OUTPUT_FILES[design]].splitlines()
+        ))
+        ready = list(csv.DictReader(
+            bulky[m.ANALYSIS_READY_OUTPUT_FILES[design]].splitlines()
+        ))
+        assert len(audited) == spec["pairs"]
+        assert len(ready) == spec["pairs"] - 1
+        assert all(
+            r["predictor_row_key_t"] != "رمپنا|1396"
+            or r["target_row_key_t_plus_1"] != "رمپنا|1397"
+            for r in ready
+        )
+        summary = next(
+            s for s in extras["summaries"] if s["sample_design"] == design
+        )
+        assert int(summary["excluded_timing_exception_count"]) == 1
+        assert int(summary["analysis_ready_pairs"]) == len(ready)
+        assert int(summary["audited_pairs"]) == len(audited)
     contract = json.loads(content[m.F_CONTRACT])
     assert contract["six_month_lag_exact"] == 6
+    assert contract["contract_version"] == m.CONTRACT_VERSION
     assert contract["research_pointers"]["next_research_action_id"] == (
         m.RESEARCH_NEXT
     )
@@ -367,10 +478,19 @@ def test_run_build_check_offline(tmp_path):
     assert result["qc"]["all_pass"] is True
     assert result["network_requests_attempted"] == 0
     assert (tmp_path / m.F_CONTRACT).is_file()
-    assert (tmp_path / "part3c_outputs" / "leakage_safe_main_rule_a_stage125.csv").is_file()
+    assert (
+        tmp_path / "part3c_outputs"
+        / m.AUDITED_OUTPUT_FILES["main_rule_a_primary"]
+    ).is_file()
+    assert (
+        tmp_path / "part3c_outputs"
+        / m.ANALYSIS_READY_OUTPUT_FILES["main_rule_a_primary"]
+    ).is_file()
     # Second build byte-identical.
     result2 = m.run(project_dir=ROOT, output_dir=tmp_path, build=True)
-    for name in m.DESIGN_OUTPUT_FILES.values():
+    for name in list(m.AUDITED_OUTPUT_FILES.values()) + list(
+        m.ANALYSIS_READY_OUTPUT_FILES.values()
+    ):
         p = tmp_path / "part3c_outputs" / name
         assert p.read_bytes() == (
             tmp_path / "part3c_outputs" / name
@@ -380,3 +500,10 @@ def test_run_build_check_offline(tmp_path):
     assert not check["drift"] or all(
         str(x).startswith("part3c_outputs/") for x in check["drift"]
     ) is False or check["drift"] == []
+    # QC assertions include the analysis-ready fail-closed surface.
+    names = {a["assertion"] for a in check["qc"]["assertions"]}
+    assert "analysis_ready_assumed_before_target_fye_true" in names
+    assert "no_authorized_timing_exception_in_analysis_ready" in names
+    assert "audit_and_analysis_ready_counts_reconcile" in names
+    assert "authorized_rampna_exception_visible_in_audit" in names
+    assert "predictor_feature_whitelist_exact" in names
