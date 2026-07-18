@@ -27,7 +27,7 @@ import subprocess
 import unicodedata
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from src import stage125_part3b0_evidence_readiness as p3b0
 
@@ -149,7 +149,7 @@ TOKEN_META: dict[str, dict[str, str]] = {
     },
     "ticker_mismatch": {
         "failure_layer": "ticker",
-        "failure_class": "structural_mismatch",
+        "failure_class": "missing_source_evidence",
     },
     "entity_mismatch": {
         "failure_layer": "identity",
@@ -164,8 +164,9 @@ TOKEN_META: dict[str, dict[str, str]] = {
         "failure_class": "semantic_scope_conflict",
     },
     "missing_official_title": {
-        "failure_layer": "source_metadata",
-        "failure_class": "missing_source_evidence",
+        # Default overridden per-row by classify_missing_official_title().
+        "failure_layer": "canonical_metadata",
+        "failure_class": "missing_canonical_evidence",
     },
     "unknown_revision_status": {
         "failure_layer": "revision_chain",
@@ -201,7 +202,7 @@ TOKEN_META: dict[str, dict[str, str]] = {
     },
     "letter_code_mismatch": {
         "failure_layer": "identity",
-        "failure_class": "structural_mismatch",
+        "failure_class": "missing_source_evidence",
     },
     "subsidiary_only_title": {
         "failure_layer": "structural_parent_subsidiary",
@@ -506,6 +507,81 @@ def _entity_norm_fields(row: dict[str, str]) -> tuple[str, str, str, str]:
     return "false", "", "requires_official_metadata", ""
 
 
+# Exact frozen-evidence column pairs per failure token (no cross-family fallback).
+# Empty source/canonical column names mean the column is absent from the frozen
+# Part 3B.1B evidence artifact; observed values must stay empty.
+FIELD_FAMILY_COLUMNS: dict[str, tuple[str, str]] = {
+    "ticker_mismatch": ("", "ticker"),
+    "entity_mismatch": ("source_legal_entity", "canonical_legal_entity"),
+    "statement_scope_mismatch": (
+        "source_statement_scope", "canonical_statement_scope",
+    ),
+    "separate_scope_required_but_not_met": (
+        "source_statement_scope", "canonical_statement_scope",
+    ),
+    "missing_official_title": (
+        "source_official_title", "canonical_official_title",
+    ),
+    "letter_code_mismatch": ("", ""),
+    "missing_canonical_letter_serial": (
+        "source_letter_serial", "canonical_letter_serial",
+    ),
+    "canonical_source_version_not_provably_bound": (
+        "source_letter_serial", "canonical_letter_serial",
+    ),
+    "subsidiary_only_title": (
+        "source_official_title", "canonical_official_title",
+    ),
+    "parent_company_identity_mismatch": (
+        "source_legal_entity", "canonical_legal_entity",
+    ),
+    "missing_publish_datetime": ("publish_datetime_raw", ""),
+    "official_metadata_not_exposed_by_direct_url": ("", ""),
+    "unknown_revision_status": ("source_revision_status_raw", ""),
+    "multi_document_predictor_row_requires_separate_adjudication": ("", ""),
+    "exact_document_binding_failed": ("", ""),
+    "incomplete_pagination_without_canonical_letter_serial": ("", ""),
+    "incomplete_cache_without_canonical_letter_serial": ("", ""),
+}
+
+
+def observed_values_for_token(row: dict[str, str], token: str) -> tuple[str, str]:
+    """Return (source, canonical) from exact field-family columns only."""
+    if token not in FIELD_FAMILY_COLUMNS:
+        raise QCFail(f"taxonomy_field_families_exact: unmapped token {token}")
+    src_col, can_col = FIELD_FAMILY_COLUMNS[token]
+    src_val = (row.get(src_col) or "") if src_col else ""
+    can_val = (row.get(can_col) or "") if can_col else ""
+    return src_val, can_val
+
+
+def classify_missing_official_title(
+    src_title: str, can_title: str,
+) -> tuple[str, str, str]:
+    """Return (failure_layer, failure_class, notes). Fail closed if both empty."""
+    if src_title and not can_title:
+        return (
+            "canonical_metadata",
+            "missing_canonical_evidence",
+            "source title nonempty; canonical title empty",
+        )
+    if (not src_title) and can_title:
+        return (
+            "source_metadata",
+            "missing_source_evidence",
+            "source title empty; canonical title nonempty",
+        )
+    if (not src_title) and (not can_title):
+        raise QCFail(
+            "missing_official_title both_sides_missing: "
+            "source and canonical official titles are both empty"
+        )
+    raise QCFail(
+        "missing_official_title both_sides_nonempty_unexpected: "
+        "token claims missing title but both sides are nonempty"
+    )
+
+
 def build_taxonomy_rows(evidence: list[dict[str, str]], evidence_sha: str) -> list[dict[str, str]]:
     rows_out: list[dict[str, str]] = []
     for row in evidence:
@@ -514,35 +590,46 @@ def build_taxonomy_rows(evidence: list[dict[str, str]], evidence_sha: str) -> li
         for token in tokens:
             if token not in TOKEN_META:
                 raise QCFail(f"invented_or_unmapped_failure_token:{token}")
-            meta = TOKEN_META[token]
-            if meta["failure_layer"] not in FAILURE_LAYERS:
-                raise QCFail(f"bad_failure_layer:{meta['failure_layer']}")
-            if meta["failure_class"] not in FAILURE_CLASSES:
-                raise QCFail(f"bad_failure_class:{meta['failure_class']}")
+            meta = dict(TOKEN_META[token])
             norm_safe, norm_rule, res_status, notes = ("false", "", "open", "")
-            src_val, can_val = "", ""
+            src_val, can_val = observed_values_for_token(row, token)
+
             if token == "entity_mismatch":
-                src_val = row.get("source_legal_entity") or ""
-                can_val = row.get("canonical_legal_entity") or ""
                 norm_safe, norm_rule, res_status, notes = _entity_norm_fields(row)
             elif token == "ticker_mismatch":
-                src_val = row.get("letter_ticker") or row.get("ticker") or ""
+                # Frozen evidence has no source ticker/symbol column; never copy
+                # the predictor/canonical ticker into observed_source_value.
+                src_val = ""
                 can_val = row.get("ticker") or ""
+                norm_safe, norm_rule = "false", ""
+                res_status = "requires_official_symbol_metadata"
+                notes = (
+                    "source symbol was not exposed/preserved in the frozen "
+                    "Part 3B.1B evidence artifact; canonical ticker must not be "
+                    "copied into the source field"
+                )
+            elif token == "missing_official_title":
+                layer, fclass, notes = classify_missing_official_title(src_val, can_val)
+                meta["failure_layer"] = layer
+                meta["failure_class"] = fclass
                 res_status = "requires_official_metadata"
+            elif token == "letter_code_mismatch":
+                src_val, can_val = "", ""
+                norm_safe, norm_rule = "false", ""
+                res_status = "letter_code_values_not_preserved_in_frozen_evidence"
+                notes = (
+                    "The frozen failure token is retained, but exact LetterCode "
+                    "values were not preserved in the frozen Part 3B.1B evidence "
+                    "artifact. LetterSerial must not be substituted for LetterCode."
+                )
             elif token in (
-                "missing_official_title", "official_metadata_not_exposed_by_direct_url",
-                "missing_publish_datetime",
+                "statement_scope_mismatch", "separate_scope_required_but_not_met",
             ):
-                src_val = row.get("source_official_title") or ""
-                can_val = row.get("canonical_official_title") or ""
-                res_status = "requires_official_metadata"
+                res_status = "requires_scope_evidence"
             elif token in (
                 "missing_canonical_letter_serial",
                 "canonical_source_version_not_provably_bound",
-                "letter_code_mismatch",
             ):
-                src_val = row.get("source_letter_serial") or ""
-                can_val = row.get("canonical_letter_serial") or ""
                 res_status = "requires_canonical_version_proof"
             elif token in (
                 "incomplete_pagination_without_canonical_letter_serial",
@@ -550,11 +637,12 @@ def build_taxonomy_rows(evidence: list[dict[str, str]], evidence_sha: str) -> li
             ):
                 res_status = "incomplete_snapshot_not_unique"
                 notes = "incomplete cache cannot prove canonical uniqueness"
-            elif token in ("subsidiary_only_title", "parent_company_identity_mismatch"):
-                src_val = row.get("source_official_title") or ""
-                can_val = row.get("canonical_legal_entity") or ""
+            elif token == "subsidiary_only_title":
                 res_status = "structurally_rejected"
                 notes = "subsidiary-only title remains structural rejection for parent row"
+            elif token == "parent_company_identity_mismatch":
+                res_status = "structurally_rejected"
+                notes = "parent-company identity mismatch remains structural rejection"
             elif token == "unknown_revision_status":
                 res_status = "revision_status_unproven"
                 notes = "absence of اصلاحیه does not prove original"
@@ -562,20 +650,43 @@ def build_taxonomy_rows(evidence: list[dict[str, str]], evidence_sha: str) -> li
                 res_status = "requires_document_role_adjudication"
             elif token == "exact_document_binding_failed":
                 res_status = "downstream_of_prior_blockers"
+            elif token == "official_metadata_not_exposed_by_direct_url":
+                res_status = "requires_official_metadata"
+                notes = (
+                    "Decision.aspx without required official metadata cannot "
+                    "independently prove all binding dimensions"
+                )
+            elif token == "missing_publish_datetime":
+                res_status = "requires_official_metadata"
+
+            if meta["failure_layer"] not in FAILURE_LAYERS:
+                raise QCFail(f"bad_failure_layer:{meta['failure_layer']}")
+            if meta["failure_class"] not in FAILURE_CLASSES:
+                raise QCFail(f"bad_failure_class:{meta['failure_class']}")
+
+            # Hard guard: never treat LetterSerial as LetterCode evidence.
+            if token == "letter_code_mismatch":
+                serials = {
+                    (row.get("source_letter_serial") or "").strip(),
+                    (row.get("canonical_letter_serial") or "").strip(),
+                }
+                serials.discard("")
+                if src_val in serials or can_val in serials:
+                    raise QCFail("letter_code_not_substituted_with_letter_serial")
+
             structural = token in (
                 "subsidiary_only_title", "parent_company_identity_mismatch",
             )
+            failure_class = meta["failure_class"]
+            if token == "entity_mismatch" and norm_safe == "true":
+                failure_class = "normalization_only"
             rows_out.append({
                 "scope_row_id": row["scope_row_id"],
                 "predictor_row_key_t": key,
                 "current_binding_status": row["binding_status"],
                 "failure_reason": token,
                 "failure_layer": meta["failure_layer"],
-                "failure_class": (
-                    "normalization_only"
-                    if token == "entity_mismatch" and norm_safe == "true"
-                    else meta["failure_class"]
-                ),
+                "failure_class": failure_class,
                 "evidence_source_path": EVIDENCE_REL,
                 "evidence_source_sha256": evidence_sha,
                 "observed_source_value": src_val,
@@ -590,6 +701,7 @@ def build_taxonomy_rows(evidence: list[dict[str, str]], evidence_sha: str) -> li
                         "unknown_revision_status",
                         "ticker_mismatch",
                         "entity_mismatch",
+                        "letter_code_mismatch",
                     ) else "false"
                 ),
                 "requires_network_capture": (
@@ -712,6 +824,72 @@ def build_row_requirements(evidence: list[dict[str, str]]) -> list[dict[str, str
     return out
 
 
+ALLOWED_DECISION_QUERY_KEYS = frozenset({"LetterSerial", "rt", "let", "ct", "ft"})
+
+
+def validate_proposed_request_url(
+    exact_url: str | None,
+    candidate_letter_serial: str | None,
+    *,
+    request_status: str,
+) -> None:
+    """Fail-closed HTTPS/host/path/LetterSerial contract for proposed URLs."""
+    if exact_url is None:
+        if request_status != "endpoint_unresolved_not_authorizable":
+            raise QCFail(
+                "exact_url null only permitted when "
+                "request_status=endpoint_unresolved_not_authorizable"
+            )
+        return
+    if not isinstance(exact_url, str) or not exact_url.strip():
+        raise QCFail("exact_url must be a nonempty string when not null")
+    if "*" in exact_url:
+        raise QCFail("wildcard_endpoint_forbidden")
+    parsed = urlparse(exact_url)
+    if parsed.scheme != "https":
+        raise QCFail(f"all_non_null_urls_https failed: scheme={parsed.scheme!r}")
+    if parsed.hostname != "www.codal.ir":
+        raise QCFail(
+            f"all_non_null_hosts_exact failed: host={parsed.hostname!r}"
+        )
+    if "*" in (parsed.hostname or ""):
+        raise QCFail("wildcard_host_forbidden")
+    if parsed.port is not None and parsed.port != 443:
+        raise QCFail(f"all_non_null_hosts_exact failed: port={parsed.port}")
+    if parsed.path != "/Reports/Decision.aspx":
+        raise QCFail(f"all_non_null_paths_exact failed: path={parsed.path!r}")
+    if parsed.username is not None or parsed.password is not None:
+        raise QCFail("no_credentials_or_fragments: credentials present")
+    if parsed.fragment:
+        raise QCFail("no_credentials_or_fragments: fragment present")
+    qs = parse_qs(parsed.query, keep_blank_values=True)
+    unknown = sorted(set(qs) - ALLOWED_DECISION_QUERY_KEYS)
+    if unknown:
+        raise QCFail(f"unexpected_query_keys:{unknown}")
+    serials = qs.get("LetterSerial", [])
+    if len(serials) != 1:
+        raise QCFail(
+            f"all_url_letter_serials_match failed: "
+            f"LetterSerial count={len(serials)}"
+        )
+    decoded = serials[0]
+    expected = (candidate_letter_serial or "").strip()
+    if not expected:
+        raise QCFail("all_url_letter_serials_match failed: missing candidate")
+    if decoded != expected:
+        raise QCFail(
+            f"all_url_letter_serials_match failed: "
+            f"url={decoded!r} candidate={expected!r}"
+        )
+    if request_status == "not_proposed_structurally_rejected":
+        return
+    if request_status not in (
+        "proposed_not_authorized",
+        "endpoint_unresolved_not_authorizable",
+    ):
+        raise QCFail(f"unexpected_request_status:{request_status}")
+
+
 def build_proposed_capture(evidence: list[dict[str, str]]) -> dict[str, Any]:
     requests: list[dict[str, Any]] = []
     for idx, row in enumerate(evidence, start=1):
@@ -721,23 +899,28 @@ def build_proposed_capture(evidence: list[dict[str, str]]) -> dict[str, Any]:
         if key == "اردستان|1401":
             status = "not_proposed_structurally_rejected"
             necessity = "none_structural_rejection"
+            # Retain tracked URL as evidence; never eligible for execution.
+            if not url:
+                status = "endpoint_unresolved_not_authorizable"
+                necessity = "cannot_authorize_without_exact_tracked_url"
         elif url:
-            host = urlparse(url).hostname
-            if host != "www.codal.ir":
-                raise QCFail(f"non_codal_host_in_tracked_url:{host}")
-            if "*" in url or (host and "*" in host):
-                raise QCFail("wildcard_endpoint_forbidden")
             status = "proposed_not_authorized"
             necessity = "official_metadata_for_binding_resolution"
         else:
             status = "endpoint_unresolved_not_authorizable"
             necessity = "cannot_authorize_without_exact_tracked_url"
+            url = None
+        if status == "endpoint_unresolved_not_authorizable":
+            url = None
+        validate_proposed_request_url(
+            url, serial, request_status=status,
+        )
         requests.append({
             "request_id": f"p3b1c_proposed_{idx:03d}",
             "predictor_row_key_t": key,
             "purpose": "document_metadata_provenance_only",
             "http_method": "GET",
-            "exact_url": url if status != "endpoint_unresolved_not_authorizable" else None,
+            "exact_url": url,
             "host": "www.codal.ir" if url else None,
             "expected_metadata_fields": [
                 "official_title", "legal_entity", "symbol", "fiscal_year_end",
@@ -854,6 +1037,7 @@ def build_decision_lock(
             "next_research_action_id": RESEARCH_NEXT,
         },
         "part3b_completed": False,
+        "gates_applied": 0,
         "predictor_available_at_evidence_collected": False,
         "pilot_cutoff_provenance_resolved": False,
         "candidate_value_evidence_collected": False,
@@ -917,13 +1101,20 @@ def verify_current_statuses(evidence: list[dict[str, str]]) -> None:
             raise QCFail("available_at must remain null on all rows")
 
 
+def taxonomy_frozen_pairs(
+    evidence: list[dict[str, str]],
+) -> set[tuple[str, str]]:
+    pairs: set[tuple[str, str]] = set()
+    for row in evidence:
+        for token in split_failure_tokens(row.get("failure_reasons") or ""):
+            pairs.add((row["predictor_row_key_t"], token))
+    return pairs
+
+
 def verify_taxonomy_coverage(
     evidence: list[dict[str, str]], taxonomy: list[dict[str, str]],
 ) -> None:
-    frozen_pairs: set[tuple[str, str]] = set()
-    for row in evidence:
-        for token in split_failure_tokens(row.get("failure_reasons") or ""):
-            frozen_pairs.add((row["predictor_row_key_t"], token))
+    frozen_pairs = taxonomy_frozen_pairs(evidence)
     tax_pairs = {
         (r["predictor_row_key_t"], r["failure_reason"]) for r in taxonomy
     }
@@ -933,6 +1124,154 @@ def verify_taxonomy_coverage(
         raise QCFail(f"all_failure_tokens_taxonomized failed missing={missing}")
     if invented:
         raise QCFail(f"no_invented_failure_token failed invented={invented}")
+    if frozen_pairs != tax_pairs:
+        raise QCFail("all_failure_tokens_taxonomized pair equality failed")
+
+
+def read_roadmap_research_pointers(repo_root: Path) -> tuple[str, str]:
+    text = (repo_root / "project/docs/ai/ROADMAP.md").read_text(encoding="utf-8")
+    last = next_id = ""
+    for line in text.splitlines():
+        if line.startswith("last_completed_research_action_id:"):
+            last = line.split(":", 1)[1].strip()
+        elif line.startswith("next_research_action_id:"):
+            next_id = line.split(":", 1)[1].strip()
+    if not last or not next_id:
+        raise QCFail("roadmap research pointers missing")
+    return last, next_id
+
+
+def _assert_taxonomy_field_provenance(
+    evidence: list[dict[str, str]],
+    taxonomy: list[dict[str, str]],
+) -> dict[str, tuple[bool, str]]:
+    by_key = {r["predictor_row_key_t"]: r for r in evidence}
+    results: dict[str, tuple[bool, str]] = {}
+
+    thanusa_ticker = [
+        r for r in taxonomy
+        if r["predictor_row_key_t"] == "ثنوسا|1392"
+        and r["failure_reason"] == "ticker_mismatch"
+    ]
+    ok_ticker = (
+        len(thanusa_ticker) == 1
+        and thanusa_ticker[0]["observed_source_value"] == ""
+        and thanusa_ticker[0]["observed_canonical_value"] == "ثنوسا"
+        and thanusa_ticker[0]["normalization_safe"] == "false"
+        and thanusa_ticker[0]["normalization_rule_id"] == ""
+        and thanusa_ticker[0]["failure_layer"] == "ticker"
+        and thanusa_ticker[0]["failure_class"] == "missing_source_evidence"
+        and thanusa_ticker[0]["resolution_status"]
+        == "requires_official_symbol_metadata"
+    )
+    results["ticker_source_not_backfilled_from_canonical"] = (
+        ok_ticker,
+        f"rows={thanusa_ticker}",
+    )
+
+    title_rows = [r for r in taxonomy if r["failure_reason"] == "missing_official_title"]
+    title_ok = True
+    title_detail: list[str] = []
+    for tr in title_rows:
+        erow = by_key[tr["predictor_row_key_t"]]
+        exp_src = erow.get("source_official_title") or ""
+        exp_can = erow.get("canonical_official_title") or ""
+        if tr["observed_source_value"] != exp_src:
+            title_ok = False
+            title_detail.append(f"{tr['predictor_row_key_t']}:source_drift")
+        if tr["observed_canonical_value"] != exp_can:
+            title_ok = False
+            title_detail.append(f"{tr['predictor_row_key_t']}:canonical_drift")
+        if exp_src and not exp_can:
+            if (
+                tr["failure_layer"] != "canonical_metadata"
+                or tr["failure_class"] != "missing_canonical_evidence"
+            ):
+                title_ok = False
+                title_detail.append(f"{tr['predictor_row_key_t']}:side_class")
+        elif (not exp_src) and exp_can:
+            if (
+                tr["failure_layer"] != "source_metadata"
+                or tr["failure_class"] != "missing_source_evidence"
+            ):
+                title_ok = False
+                title_detail.append(f"{tr['predictor_row_key_t']}:side_class")
+    results["missing_title_side_classified_exactly"] = (
+        title_ok and bool(title_rows),
+        ";".join(title_detail) or f"n={len(title_rows)}",
+    )
+
+    letter_rows = [r for r in taxonomy if r["failure_reason"] == "letter_code_mismatch"]
+    letter_ok = True
+    for lr in letter_rows:
+        erow = by_key[lr["predictor_row_key_t"]]
+        serials = {
+            (erow.get("source_letter_serial") or "").strip(),
+            (erow.get("canonical_letter_serial") or "").strip(),
+        }
+        serials.discard("")
+        if lr["observed_source_value"] or lr["observed_canonical_value"]:
+            letter_ok = False
+        if (
+            lr["observed_source_value"] in serials
+            or lr["observed_canonical_value"] in serials
+        ):
+            letter_ok = False
+        if lr["resolution_status"] != (
+            "letter_code_values_not_preserved_in_frozen_evidence"
+        ):
+            letter_ok = False
+    results["letter_code_not_substituted_with_letter_serial"] = (
+        letter_ok and bool(letter_rows),
+        f"n={len(letter_rows)}",
+    )
+
+    scope_tokens = {
+        "statement_scope_mismatch", "separate_scope_required_but_not_met",
+    }
+    scope_rows = [r for r in taxonomy if r["failure_reason"] in scope_tokens]
+    scope_ok = True
+    for sr in scope_rows:
+        erow = by_key[sr["predictor_row_key_t"]]
+        if sr["observed_source_value"] != (erow.get("source_statement_scope") or ""):
+            scope_ok = False
+        if sr["observed_canonical_value"] != (
+            erow.get("canonical_statement_scope") or ""
+        ):
+            scope_ok = False
+    results["statement_scope_values_preserved"] = (
+        scope_ok and bool(scope_rows), f"n={len(scope_rows)}",
+    )
+
+    entity_rows = [r for r in taxonomy if r["failure_reason"] == "entity_mismatch"]
+    entity_ok = True
+    for er in entity_rows:
+        erow = by_key[er["predictor_row_key_t"]]
+        if er["observed_source_value"] != (erow.get("source_legal_entity") or ""):
+            entity_ok = False
+        if er["observed_canonical_value"] != (
+            erow.get("canonical_legal_entity") or ""
+        ):
+            entity_ok = False
+    results["raw_values_preserved"] = (
+        entity_ok and bool(entity_rows), f"entity_rows={len(entity_rows)}",
+    )
+
+    family_ok = True
+    for tr in taxonomy:
+        erow = by_key[tr["predictor_row_key_t"]]
+        exp_src, exp_can = observed_values_for_token(erow, tr["failure_reason"])
+        if tr["failure_reason"] == "ticker_mismatch":
+            exp_src = ""
+            exp_can = erow.get("ticker") or ""
+        elif tr["failure_reason"] == "letter_code_mismatch":
+            exp_src, exp_can = "", ""
+        if tr["observed_source_value"] != exp_src:
+            family_ok = False
+        if tr["observed_canonical_value"] != exp_can:
+            family_ok = False
+    results["taxonomy_field_families_exact"] = (family_ok, "ok" if family_ok else "drift")
+    return results
 
 
 def build_qc_assertions(
@@ -944,6 +1283,9 @@ def build_qc_assertions(
     hierarchy: dict[str, Any],
     proposed: dict[str, Any],
     scale: dict[str, Any],
+    lock: dict[str, Any],
+    baseline_ok: bool,
+    baseline_detail: str,
     drift: list[str],
     network_attempts: int,
     frozen_before: dict[str, str],
@@ -958,8 +1300,7 @@ def build_qc_assertions(
             "detail": detail,
         })
 
-    add("baseline_main_exact",
-        EXPECTED_BASELINE_COMMIT.startswith("99def5b"), EXPECTED_BASELINE_COMMIT)
+    add("baseline_main_exact", baseline_ok, baseline_detail)
     add("five_locked_rows_exact",
         [r["predictor_row_key_t"] for r in evidence] == list(LOCKED_KEYS),
         str([r["predictor_row_key_t"] for r in evidence]))
@@ -975,11 +1316,28 @@ def build_qc_assertions(
     add("current_counts_unchanged",
         (bound, unresolved, rejected, avail) == (0, 4, 1, 0),
         f"b={bound},u={unresolved},r={rejected},a={avail}")
-    add("all_failure_tokens_taxonomized", len(taxonomy) >= 17, str(len(taxonomy)))
+
+    frozen_pairs = taxonomy_frozen_pairs(evidence)
+    tax_pairs = {
+        (r["predictor_row_key_t"], r["failure_reason"]) for r in taxonomy
+    }
+    unique_tokens = {p[1] for p in frozen_pairs}
+    add(
+        "all_failure_tokens_taxonomized",
+        frozen_pairs == tax_pairs,
+        (
+            f"unique_failure_token_count={len(unique_tokens)};"
+            f"taxonomy_row_count={len(taxonomy)}"
+        ),
+    )
     add("no_invented_failure_token",
-        all(r["failure_reason"] in TOKEN_META for r in taxonomy), "ok")
-    add("raw_values_preserved",
-        any(r.get("observed_source_value") for r in taxonomy), "entity fields present")
+        not (tax_pairs - frozen_pairs),
+        str(sorted(tax_pairs - frozen_pairs)))
+
+    provenance = _assert_taxonomy_field_provenance(evidence, taxonomy)
+    for name, (ok, detail) in provenance.items():
+        add(name, ok, detail)
+
     add("normalization_rules_mechanical_only",
         all(not r.get("identity_information_removed", True)
             for r in norm["allowed_mechanical_rules"]),
@@ -1015,10 +1373,53 @@ def build_qc_assertions(
         proposed["authorization_status"] == "not_authorized"
         and proposed["execution_performed"] is False,
         proposed["authorization_status"])
-    urls = [r.get("exact_url") for r in proposed["proposed_requests"]]
-    add("proposed_urls_exact_or_null",
-        all(u is None or (isinstance(u, str) and "*" not in u) for u in urls),
-        "ok")
+
+    url_errors: list[str] = []
+    https_ok = hosts_ok = paths_ok = serials_ok = creds_ok = True
+    structural_ok = True
+    for req in proposed["proposed_requests"]:
+        url = req.get("exact_url")
+        status = req.get("request_status")
+        try:
+            validate_proposed_request_url(
+                url, req.get("candidate_letter_serial"), request_status=status,
+            )
+        except QCFail as exc:
+            url_errors.append(str(exc))
+            https_ok = hosts_ok = paths_ok = serials_ok = creds_ok = False
+            continue
+        if url is None:
+            continue
+        parsed = urlparse(url)
+        https_ok = https_ok and parsed.scheme == "https"
+        hosts_ok = hosts_ok and parsed.hostname == "www.codal.ir" and (
+            parsed.port is None or parsed.port == 443
+        )
+        paths_ok = paths_ok and parsed.path == "/Reports/Decision.aspx"
+        qs = parse_qs(parsed.query, keep_blank_values=True)
+        serials = qs.get("LetterSerial", [])
+        serials_ok = serials_ok and (
+            len(serials) == 1
+            and serials[0] == (req.get("candidate_letter_serial") or "")
+        )
+        creds_ok = creds_ok and (
+            parsed.username is None
+            and parsed.password is None
+            and not parsed.fragment
+        )
+        if req["predictor_row_key_t"] == "اردستان|1401":
+            structural_ok = (
+                status == "not_proposed_structurally_rejected"
+                and req.get("request_necessity") == "none_structural_rejection"
+            )
+
+    add("proposed_urls_exact_or_null", not url_errors, ";".join(url_errors) or "ok")
+    add("all_non_null_urls_https", https_ok, "https")
+    add("all_non_null_hosts_exact", hosts_ok, "www.codal.ir")
+    add("all_non_null_paths_exact", paths_ok, "/Reports/Decision.aspx")
+    add("all_url_letter_serials_match", serials_ok, "LetterSerial")
+    add("no_credentials_or_fragments", creds_ok, "ok")
+    add("structurally_rejected_request_not_proposed", structural_ok, "اردستان|1401")
     add("no_wildcard_endpoint",
         proposed["wildcard_url_forbidden"] and proposed["wildcard_host_forbidden"],
         "ok")
@@ -1037,20 +1438,40 @@ def build_qc_assertions(
         scale["cutoff_resolution_authorized"] is False, "false")
     add("accessibility_scoring_false",
         scale["accessibility_scoring_authorized"] is False, "false")
-    add("gates_applied_zero",
-        scale["gate_application_authorized"] is False, "0")
-    add("part3b_completed_false", True, "false")
+    add(
+        "gates_applied_zero",
+        lock.get("gates_applied") == 0
+        and scale["gate_application_authorized"] is False,
+        f"gates_applied={lock.get('gates_applied')}",
+    )
+    add(
+        "part3b_completed_false",
+        lock.get("part3b_completed") is False
+        and scale.get("part3b2_authorized") is False,
+        f"lock.part3b_completed={lock.get('part3b_completed')}",
+    )
     add("stage126_started_false",
         scale["stage126_authorized"] is False
         and not any((repo_root / p).exists() for p in FORBIDDEN_SURFACE_EXACT
                     if "stage126" in p),
         "false")
     add("modeling_started_false",
-        scale["modeling_authorized"] is False, "false")
-    add("research_pointers_unchanged",
-        RESEARCH_LAST_COMPLETED == "stage125-part3a-decision-lock"
-        and RESEARCH_NEXT == "stage125-part3b-evidence-capture",
-        "fixed")
+        scale["modeling_authorized"] is False
+        and lock.get("modeling_started") is False,
+        "false")
+    roadmap_last, roadmap_next = read_roadmap_research_pointers(repo_root)
+    lock_ptrs = lock.get("research_pointers") or {}
+    add(
+        "research_pointers_unchanged",
+        (
+            lock_ptrs.get("last_completed_research_action_id")
+            == RESEARCH_LAST_COMPLETED
+            and lock_ptrs.get("next_research_action_id") == RESEARCH_NEXT
+            and roadmap_last == RESEARCH_LAST_COMPLETED
+            and roadmap_next == RESEARCH_NEXT
+        ),
+        f"lock={lock_ptrs};roadmap=({roadmap_last},{roadmap_next})",
+    )
     add("frozen_scientific_hashes_unchanged",
         frozen_before == frozen_after, "unchanged")
     add("official_check_drift_empty", drift == [], str(drift))
@@ -1122,7 +1543,8 @@ def run(
     if write:
         out_dir.mkdir(parents=True, exist_ok=True)
 
-    verify_baseline_commit(str(repo_root))
+    baseline_detail = verify_baseline_commit(str(repo_root))
+    baseline_ok = True
     frozen_before = frozen_scientific_hashes(repo_root)
     network_attempts = 0
     files_written: dict[str, str] = {}
@@ -1157,6 +1579,9 @@ def run(
             hierarchy=extras["hierarchy"],
             proposed=extras["proposed"],
             scale=extras["scale"],
+            lock=extras["lock"],
+            baseline_ok=baseline_ok,
+            baseline_detail=baseline_detail,
             drift=[],
             network_attempts=network_attempts,
             frozen_before=frozen_before,
@@ -1172,6 +1597,10 @@ def run(
                 "before regenerating QC artifacts"
             )
         tickers = sorted({key.split("|", 1)[0] for key in LOCKED_KEYS})
+        unique_failure_token_count = len({
+            r["failure_reason"] for r in extras["taxonomy"]
+        })
+        taxonomy_row_count = len(extras["taxonomy"])
         qc = {
             "stage": QC_STAGE,
             "current_stage": CURRENT_STAGE,
@@ -1186,6 +1615,8 @@ def run(
             "scope_rows": len(LOCKED_KEYS),
             "tickers": tickers,
             "ticker_count": len(tickers),
+            "unique_failure_token_count": unique_failure_token_count,
+            "taxonomy_row_count": taxonomy_row_count,
             "network_requests_attempted": network_attempts,
             "document_binding_resolution_decision_locked": True,
             "predictor_document_binding_mini_pilot_completed": True,
