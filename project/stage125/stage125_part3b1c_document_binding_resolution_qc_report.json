@@ -313,7 +313,7 @@
   },
   "scale_up_to_80_rows_authorized": false,
   "scope_rows": 5,
-  "source_commit": "c084db2092bcd0d9c2d825b0cc6d8d20a7275ff1",
+  "source_commit": "e2d0970a1344ca6d2be06417a5e558707f6fde09",
   "source_file_sha256": "f201435ea8bb7ed24eebf7aeb616c530fd918a11a66195c7b0368e746aa33038",
   "stage": "stage125_part3b1c_document_binding_resolution_decision_lock",
   "stage126_started": false,
