@@ -211,6 +211,7 @@
   "gates_applied": 0,
   "maintenance_task_id": "stage125-part3b1c-document-binding-resolution-decision-lock",
   "modeling_started": false,
+  "network_extraction_performed": true,
   "network_requests_attempted": 0,
   "output_sha256": {
     "README_STAGE125_PART3B1C_DOCUMENT_BINDING_RESOLUTION.md": "2fafe9c39fbb73a6886d1997114dc894ac6fd9dca157f5507ce599e3f0203a63",
@@ -257,8 +258,8 @@
   },
   "scale_up_to_80_rows_authorized": false,
   "scope_rows": 5,
-  "source_commit": "b385c33412d484e68c6aba18a1a3057204a0101b",
-  "source_file_sha256": "e929516c49538436610808c8f5c48d8f1510c2cbc1bd80d277dc47a7e27addb8",
+  "source_commit": "b67eff49b1ed753185ad62794b4f48471a74dd47",
+  "source_file_sha256": "d2379f22a59c12da9479ee8ff2eb7aa6d988a8a9ffbcc3ffc9a4141c9a079d17",
   "stage": "stage125_part3b1c_document_binding_resolution_decision_lock",
   "stage126_started": false,
   "test_file_sha256": "7b8b7802865520db3374f97c3091ed6e2c586fa91c5ef52f44cefe8a49a832fe",
