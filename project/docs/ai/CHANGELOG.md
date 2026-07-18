@@ -5,6 +5,16 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 
 ## 2026-07-18
 
+- **Stage125 Part 3B.1C — Document Binding Resolution Decision Lock
+  (maintenance).** Tracked as
+  `stage125-part3b1c-document-binding-resolution-decision-lock`. Offline
+  failure taxonomy, mechanical identity-normalization contract, exact-document
+  evidence hierarchy, row-level resolution requirements, proposed (not
+  authorized) capture manifest, and `scale_up_to_80_rows_authorized=false`.
+  **No** network, **no** new capture, **no** Part 3B.1B evidence mutation,
+  **no** available_at / extraction / scoring / Gates / Part 3B.2 / Stage126 /
+  modeling. Research pointers unchanged.
+
 - **Stage125 Part 3B.1B — tracked parsed-metadata receipt + fresh-clone
   determinism (PR #43 harden, maintenance).** Adds
   `part3b1b_thanusa_parsed_metadata_receipt_stage125.json` bound to the

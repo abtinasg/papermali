@@ -1,0 +1,21 @@
+{
+  "accessibility_scoring_authorized": false,
+  "candidate_value_extraction_authorized": false,
+  "current_available_at_non_null_count": 0,
+  "current_bound_count": 0,
+  "current_rejected_count": 1,
+  "current_unresolved_count": 4,
+  "cutoff_resolution_authorized": false,
+  "decision_version": "stage125_part3b1c_v1",
+  "five_row_binding_pilot_completed": true,
+  "gate_application_authorized": false,
+  "modeling_authorized": false,
+  "pair_value_extraction_authorized": false,
+  "part3b2_authorized": false,
+  "rationale": "A zero-bound five-row mini-pilot does not justify expanding document-binding capture to all 80 pilot pairs. A later explicit user decision may authorize a second resolution attempt on the same five rows only.",
+  "real_available_at_assignment_authorized": false,
+  "same_five_row_resolution_capture_authorized": false,
+  "same_five_row_resolution_capture_requires_explicit_user_approval": true,
+  "scale_up_to_80_rows_authorized": false,
+  "stage126_authorized": false
+}

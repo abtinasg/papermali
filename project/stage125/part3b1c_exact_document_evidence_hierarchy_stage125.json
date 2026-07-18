@@ -1,0 +1,58 @@
+{
+  "contract_version": "stage125_part3b1c_v1",
+  "locked_rules": {
+    "absence_of_eslahiye_does_not_prove_original": true,
+    "candidate_search_result_not_automatically_canonical": true,
+    "decision_aspx_without_required_official_metadata_insufficient": true,
+    "incomplete_paginated_cache_cannot_prove_canonical_uniqueness": true,
+    "letter_serial_or_tracing_no_identifies_exact_official_version": true,
+    "multiple_documents_unresolved_until_document_role_adjudication": true,
+    "normalization_alone_never_creates_bound": true,
+    "publish_datetime_only_after_exact_source_version_binding": true,
+    "sent_datetime_is_audit_only_never_available_at": true,
+    "subsidiary_only_title_structural_rejection_for_parent_row": true,
+    "unknown_revision_status_remains_unresolved": true
+  },
+  "ordered_evidence_hierarchy": [
+    {
+      "element": "exact_official_codal_source_version_metadata_payload",
+      "rank": 1
+    },
+    {
+      "element": "exact_letter_serial_and_or_exact_tracing_no",
+      "rank": 2
+    },
+    {
+      "element": "official_source_title",
+      "rank": 3
+    },
+    {
+      "element": "official_legal_entity_and_symbol",
+      "rank": 4
+    },
+    {
+      "element": "fiscal_year_end",
+      "rank": 5
+    },
+    {
+      "element": "annual_or_interim_status",
+      "rank": 6
+    },
+    {
+      "element": "audited_or_unaudited_status",
+      "rank": 7
+    },
+    {
+      "element": "parent_separate_or_consolidated_scope",
+      "rank": 8
+    },
+    {
+      "element": "revision_or_restatement_identity",
+      "rank": 9
+    },
+    {
+      "element": "publish_datetime_of_exact_bound_version",
+      "rank": 10
+    }
+  ]
+}

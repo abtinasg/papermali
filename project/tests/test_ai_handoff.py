@@ -976,7 +976,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
     assert state["current_stage"] == "Stage125"
     assert state["selected_qc_scope"] == (
-        "stage125_part3b1b_codal_document_binding_mini_pilot"
+        "stage125_part3b1c_document_binding_resolution_decision_lock"
     )
     assert state["last_completed_micro_part"] == "stage125-part3a-decision-lock"
     assert state["next_research_action_id"] == "stage125-part3b-evidence-capture"
@@ -988,6 +988,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["cut_a_available_at_operationalization_locked"] is True
     assert state["predictor_document_binding_mini_pilot_completed"] is True
     assert state["predictor_document_binding_evidence_collected"] is True
+    assert state["document_binding_resolution_decision_locked"] is True
     assert state["predictor_available_at_evidence_collected"] is False
     assert state["pilot_cutoff_provenance_resolved"] is False
     assert state["evidence_collected"] is True
@@ -1060,6 +1061,16 @@ def test_stage125_part3b0_generated_files_are_artifact_only(path):
     "project/stage125/part3b1b_thanusa_parsed_metadata_receipt_stage125.json",
     "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1b.json",
+    "project/stage125/README_STAGE125_PART3B1C_DOCUMENT_BINDING_RESOLUTION.md",
+    "project/stage125/part3b1c_binding_failure_taxonomy_stage125.csv",
+    "project/stage125/part3b1c_identity_normalization_contract_stage125.json",
+    "project/stage125/part3b1c_exact_document_evidence_hierarchy_stage125.json",
+    "project/stage125/part3b1c_row_resolution_requirements_stage125.csv",
+    "project/stage125/part3b1c_proposed_capture_authorization_stage125.json",
+    "project/stage125/part3b1c_scale_up_readiness_decision_stage125.json",
+    "project/stage125/part3b1c_document_binding_resolution_decision_lock_stage125.json",
+    "project/stage125/stage125_part3b1c_document_binding_resolution_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b1c.json",
 ])
 def test_stage125_part3b_generated_files_are_artifact_only(path):
     assert gen.path_artifact_only(path) is True

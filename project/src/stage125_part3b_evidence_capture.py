@@ -173,6 +173,27 @@ PART3B1B_AUTHORIZED_EXACT = frozenset({
     "project/stage125/metadata_and_hashes_stage125_part3b1b.json",
 })
 
+PART3B1C_SRC_REL = "project/src/stage125_part3b1c_document_binding_resolution.py"
+PART3B1C_TEST_REL = (
+    "project/tests/test_stage125_part3b1c_document_binding_resolution.py"
+)
+PART3B1C_RUN_REL = "project/run_stage125_part3b1c.py"
+PART3B1C_AUTHORIZED_EXACT = frozenset({
+    PART3B1C_SRC_REL,
+    PART3B1C_TEST_REL,
+    PART3B1C_RUN_REL,
+    "project/stage125/README_STAGE125_PART3B1C_DOCUMENT_BINDING_RESOLUTION.md",
+    "project/stage125/part3b1c_binding_failure_taxonomy_stage125.csv",
+    "project/stage125/part3b1c_identity_normalization_contract_stage125.json",
+    "project/stage125/part3b1c_exact_document_evidence_hierarchy_stage125.json",
+    "project/stage125/part3b1c_row_resolution_requirements_stage125.csv",
+    "project/stage125/part3b1c_proposed_capture_authorization_stage125.json",
+    "project/stage125/part3b1c_scale_up_readiness_decision_stage125.json",
+    "project/stage125/part3b1c_document_binding_resolution_decision_lock_stage125.json",
+    "project/stage125/stage125_part3b1c_document_binding_resolution_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b1c.json",
+})
+
 PART3B_AUTHORIZED_EXACT = frozenset({
     SRC_REL, TEST_REL, RUN_REL,
     f"project/stage125/{F_AUTH}", f"project/stage125/{F_PLAN}",
@@ -184,7 +205,7 @@ PART3B_AUTHORIZED_EXACT = frozenset({
     f"project/stage125/{F_README}", f"project/stage125/{F_QC}",
     f"project/stage125/{F_METADATA}", f"project/stage125/{F_NETWORK_LOG}",
     f"project/stage125/{F_DECISION_REQ}", f"project/stage125/{F_DECISION_REQ_MD}",
-}) | PART3B1_AUTHORIZED_EXACT | PART3B1A_AUTHORIZED_EXACT | PART3B1B_AUTHORIZED_EXACT
+}) | PART3B1_AUTHORIZED_EXACT | PART3B1A_AUTHORIZED_EXACT | PART3B1B_AUTHORIZED_EXACT | PART3B1C_AUTHORIZED_EXACT
 
 
 ENDPOINT_HEADER = [

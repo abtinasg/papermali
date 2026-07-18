@@ -107,6 +107,10 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part3b1b_codal_document_binding.py",
     "project/run_stage125_part3b1b.py",
     "project/tests/test_stage125_part3b1b_codal_document_binding.py",
+    # Stage125 Part 3B.1C code, runner, and tests.
+    "project/src/stage125_part3b1c_document_binding_resolution.py",
+    "project/run_stage125_part3b1c.py",
+    "project/tests/test_stage125_part3b1c_document_binding_resolution.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
@@ -253,6 +257,17 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/part3b1b_thanusa_parsed_metadata_receipt_stage125.json",
     "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1b.json",
+    # Stage125 Part 3B.1C generated decision-lock artifacts.
+    "project/stage125/README_STAGE125_PART3B1C_DOCUMENT_BINDING_RESOLUTION.md",
+    "project/stage125/part3b1c_binding_failure_taxonomy_stage125.csv",
+    "project/stage125/part3b1c_identity_normalization_contract_stage125.json",
+    "project/stage125/part3b1c_exact_document_evidence_hierarchy_stage125.json",
+    "project/stage125/part3b1c_row_resolution_requirements_stage125.csv",
+    "project/stage125/part3b1c_proposed_capture_authorization_stage125.json",
+    "project/stage125/part3b1c_scale_up_readiness_decision_stage125.json",
+    "project/stage125/part3b1c_document_binding_resolution_decision_lock_stage125.json",
+    "project/stage125/stage125_part3b1c_document_binding_resolution_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b1c.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -391,6 +406,28 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "cut_a_available_at_operationalization_locked",
         "predictor_document_binding_mini_pilot_completed",
         "predictor_document_binding_evidence_collected",
+        "predictor_available_at_evidence_collected",
+        "pilot_cutoff_provenance_resolved",
+        "evidence_collected",
+        "endpoint_probe_evidence_collected",
+        "candidate_value_evidence_collected",
+        "pair_level_evidence_collected",
+        "data_value_extraction_performed",
+        "accessibility_scoring_applied",
+        "part3b_completed",
+        "network_extraction_performed",
+        "modeling_started",
+    ),
+    "stage125_part3b1c_document_binding_resolution_decision_lock": (
+        "part3a_protocol_locked",
+        "part3a_decision_locked",
+        "part3b0_readiness",
+        "part3b_started",
+        "part3b1_decision_locked",
+        "cut_a_available_at_operationalization_locked",
+        "predictor_document_binding_mini_pilot_completed",
+        "predictor_document_binding_evidence_collected",
+        "document_binding_resolution_decision_locked",
         "predictor_available_at_evidence_collected",
         "pilot_cutoff_provenance_resolved",
         "evidence_collected",
@@ -642,6 +679,10 @@ _QC_SOURCE_TEST_OVERRIDES: dict[str, tuple[str, str]] = {
     "stage125_part3b1b_codal_document_binding_mini_pilot": (
         "project/src/stage125_part3b1b_codal_document_binding.py",
         "project/tests/test_stage125_part3b1b_codal_document_binding.py",
+    ),
+    "stage125_part3b1c_document_binding_resolution_decision_lock": (
+        "project/src/stage125_part3b1c_document_binding_resolution.py",
+        "project/tests/test_stage125_part3b1c_document_binding_resolution.py",
     ),
 }
 
