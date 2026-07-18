@@ -5,7 +5,7 @@
   "assertions": [
     {
       "assertion": "baseline_main_exact",
-      "detail": "5ce86efd491dbdb0c220c40ec79395bff83ecff5",
+      "detail": "99def5b4c15a41ca80729d873032d8c5c81ec672",
       "status": "PASS"
     },
     {
@@ -313,8 +313,8 @@
   },
   "scale_up_to_80_rows_authorized": false,
   "scope_rows": 5,
-  "source_commit": "5ce86efd491dbdb0c220c40ec79395bff83ecff5",
-  "source_file_sha256": "0d7e189bc6f0891d20d3384b58a1aca5701a7ef3b958ad9216beedf1f45c7737",
+  "source_commit": "0552c7008bf13f2f6f3ebce60f35953ba40ee876",
+  "source_file_sha256": "ed94aba2d009bf7ab91d93c0daf235ce541b7ee3f4386609b1883ebc4930be28",
   "stage": "stage125_part3b1c_document_binding_resolution_decision_lock",
   "stage126_started": false,
   "taxonomy_row_count": 55,
