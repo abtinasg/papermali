@@ -1,0 +1,38 @@
+{
+  "canonical_inputs_sha256": {
+    "project/stage122/modeling_all_rows_stage122.csv": "ece991c5ff280afa50c2ced6acfecbed4e57937cf2048cd7a11ae496a3ae7437",
+    "project/stage122/modeling_one_year_ahead_stage122.csv": "b621491a0cbf8f73226182b42395260b43210ce84110f586c216d494e154865d",
+    "project/stage122/target_definition_stage122.csv": "573bc1e47bef8b9e48b11acd1bf87b7fc89ea22b926b2add94da67b9f95abb98",
+    "project/stage123/eligibility_audit_stage123.csv": "a6a18b9894761b75a0363f93a436ba07e97bc5442ce7897719e7c921b15dfcf5",
+    "project/stage123/modeling_all_rows_stage123.csv": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+    "project/stage123/modeling_one_year_ahead_stage123.csv": "e3d3063e840d61a39c3b4477aabe347050be6c829755acdcead05359fa9181ac",
+    "project/stage124/listing_master_verified_stage124.csv": "968cf0cc4613aadd738d14e3cd3058e25920256c891b431d9e99776de3479fd7",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv": "9a441b5e3696353967489b356d0ff48cf7cbea276aeea5018be6edc8368b40f5",
+    "project/stage125/part3b1b_codal_document_evidence_stage125.csv": "b0ded2c9c084cfc8ca882c370b6437d3949af52e00297b3f3d30f80bd315f867",
+    "project/stage125/part3b1b_document_binding_adjudication_stage125.csv": "d4515c0f3741bec7733aac97c4167a1ca730e983b0cc1627d77da7c20c8aa7e1",
+    "project/stage125/prediction_cutoff_audit_stage125_part2.csv": "d50e6617b011a7818d972de8e5c8a862a45f73fb07a0a22cdb5c9f59b6dc88f0"
+  },
+  "derived_ratio_surfaces_sha256": {
+    "project/stage122/modeling_all_rows_stage122.csv": "ece991c5ff280afa50c2ced6acfecbed4e57937cf2048cd7a11ae496a3ae7437",
+    "project/stage123/modeling_all_rows_stage123.csv": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390"
+  },
+  "description": "SHA-256 hashes of canonical inputs used by future conservative lag operationalization. Accounting values must not change.",
+  "financial_data_status": "researcher_verified_frozen",
+  "financial_value_reextraction_required": false,
+  "financial_value_surfaces_sha256": {
+    "project/stage122/modeling_all_rows_stage122.csv": "ece991c5ff280afa50c2ced6acfecbed4e57937cf2048cd7a11ae496a3ae7437",
+    "project/stage123/modeling_all_rows_stage123.csv": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390"
+  },
+  "immutability_rule": "before/after SHA-256 equality required; any mismatch is QC failure",
+  "manifest_version": "stage125_part3b1e_v1",
+  "part3b1b_scientific_evidence_sha256": {
+    "project/stage125/part3b1b_codal_document_evidence_stage125.csv": "b0ded2c9c084cfc8ca882c370b6437d3949af52e00297b3f3d30f80bd315f867",
+    "project/stage125/part3b1b_document_binding_adjudication_stage125.csv": "d4515c0f3741bec7733aac97c4167a1ca730e983b0cc1627d77da7c20c8aa7e1"
+  },
+  "prediction_cutoff_audit_sha256": "d50e6617b011a7818d972de8e5c8a862a45f73fb07a0a22cdb5c9f59b6dc88f0",
+  "target_surfaces_sha256": {
+    "project/stage122/modeling_one_year_ahead_stage122.csv": "b621491a0cbf8f73226182b42395260b43210ce84110f586c216d494e154865d",
+    "project/stage122/target_definition_stage122.csv": "573bc1e47bef8b9e48b11acd1bf87b7fc89ea22b926b2add94da67b9f95abb98",
+    "project/stage123/modeling_one_year_ahead_stage123.csv": "e3d3063e840d61a39c3b4477aabe347050be6c829755acdcead05359fa9181ac"
+  }
+}

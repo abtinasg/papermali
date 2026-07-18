@@ -1,0 +1,215 @@
+{
+  "accessibility_scoring_applied": false,
+  "all_pass": true,
+  "assertion_count": 28,
+  "assertions": [
+    {
+      "assertion": "baseline_main_exact",
+      "detail": "baseline=f1bc5eb770d883754078f15427dac45fe40a8c0b head=8f9ca65af0c2798eb0d69da865ad5d840ae64979",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pr47_closed_unmerged",
+      "detail": "PR #47 recorded closed-unmerged in decision lock",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pr47_head_not_in_main",
+      "detail": "pr47_head=6fc1b9a3ae4f6d3e1ac678ad706f84021d8c5797 not ancestor of HEAD/origin/main",
+      "status": "PASS"
+    },
+    {
+      "assertion": "six_month_lag_exact",
+      "detail": "6",
+      "status": "PASS"
+    },
+    {
+      "assertion": "lag_semantics_assumed_not_observed",
+      "detail": "assumed_methodological_date_not_observed_publication_timestamp",
+      "status": "PASS"
+    },
+    {
+      "assertion": "financial_data_frozen",
+      "detail": "researcher_verified_frozen",
+      "status": "PASS"
+    },
+    {
+      "assertion": "canonical_input_hashes_recorded",
+      "detail": "count=11",
+      "status": "PASS"
+    },
+    {
+      "assertion": "financial_values_unchanged",
+      "detail": "before/after SHA-256 equal",
+      "status": "PASS"
+    },
+    {
+      "assertion": "derived_ratios_unchanged",
+      "detail": "before/after SHA-256 equal",
+      "status": "PASS"
+    },
+    {
+      "assertion": "targets_unchanged",
+      "detail": "before/after SHA-256 equal",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_real_available_at_assignment",
+      "detail": "authorized=false; evidence=false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_publish_datetime_assignment",
+      "detail": "collection not authorized/required",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_codal_network_capture",
+      "detail": "network_attempts=0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_80_row_scale_up",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_130_company_source_revalidation",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "t_predicts_t_plus_1",
+      "detail": "financial predictors from fiscal year t may only predict distress target t+1",
+      "status": "PASS"
+    },
+    {
+      "assertion": "stage126_false",
+      "detail": "authorized=false started=false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "modeling_false",
+      "detail": "authorized=false started=false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pr3_unchanged",
+      "detail": "expected=2dd65bae93d2bafb0dc752b9331a75838f16742b observed=2dd65bae93d2bafb0dc752b9331a75838f16742b",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_lag_shorter_rejected",
+      "detail": "5",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_lag_longer_rejected",
+      "detail": "7",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_assumed_not_observed_available_at",
+      "detail": "available_at",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_assumed_not_PublishDateTime",
+      "detail": "PublishDateTime",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_same_year_rejected",
+      "detail": "1400→1400",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_t_to_t_plus_1_accepted",
+      "detail": "1400→1401",
+      "status": "PASS"
+    },
+    {
+      "assertion": "formula_fiscal_year_end_plus_six_months",
+      "detail": "1402-06-29",
+      "status": "PASS"
+    },
+    {
+      "assertion": "frozen_canonical_hashes_unchanged",
+      "detail": "before==after",
+      "status": "PASS"
+    },
+    {
+      "assertion": "forbidden_surfaces_absent",
+      "detail": "stage126/part3b2 absent",
+      "status": "PASS"
+    }
+  ],
+  "availability_date_semantics": "assumed_methodological_date_not_observed_publication_timestamp",
+  "availability_method": "fixed_conservative_lag",
+  "baseline_commit": "f1bc5eb770d883754078f15427dac45fe40a8c0b",
+  "broad_codal_capture_stopped": true,
+  "candidate_value_evidence_collected": false,
+  "conservative_availability_lag_locked": true,
+  "conservative_lag_months": 6,
+  "conservative_six_month_lag_decision_locked": true,
+  "current_stage": "Stage125",
+  "cut_a_available_at_operationalization_locked": true,
+  "data_value_extraction_performed": false,
+  "decision_lock_version": "stage125_part3b1e_v1",
+  "document_binding_resolution_decision_locked": true,
+  "endpoint_probe_evidence_collected": true,
+  "evidence_collected": true,
+  "failed_count": 0,
+  "financial_data_researcher_verified_frozen": true,
+  "financial_data_status": "researcher_verified_frozen",
+  "frozen_canonical_sha256": {
+    "project/stage122/modeling_all_rows_stage122.csv": "ece991c5ff280afa50c2ced6acfecbed4e57937cf2048cd7a11ae496a3ae7437",
+    "project/stage122/modeling_one_year_ahead_stage122.csv": "b621491a0cbf8f73226182b42395260b43210ce84110f586c216d494e154865d",
+    "project/stage122/target_definition_stage122.csv": "573bc1e47bef8b9e48b11acd1bf87b7fc89ea22b926b2add94da67b9f95abb98",
+    "project/stage123/eligibility_audit_stage123.csv": "a6a18b9894761b75a0363f93a436ba07e97bc5442ce7897719e7c921b15dfcf5",
+    "project/stage123/modeling_all_rows_stage123.csv": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+    "project/stage123/modeling_one_year_ahead_stage123.csv": "e3d3063e840d61a39c3b4477aabe347050be6c829755acdcead05359fa9181ac",
+    "project/stage124/listing_master_verified_stage124.csv": "968cf0cc4613aadd738d14e3cd3058e25920256c891b431d9e99776de3479fd7",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv": "9a441b5e3696353967489b356d0ff48cf7cbea276aeea5018be6edc8368b40f5",
+    "project/stage125/part3b1b_codal_document_evidence_stage125.csv": "b0ded2c9c084cfc8ca882c370b6437d3949af52e00297b3f3d30f80bd315f867",
+    "project/stage125/part3b1b_document_binding_adjudication_stage125.csv": "d4515c0f3741bec7733aac97c4167a1ca730e983b0cc1627d77da7c20c8aa7e1",
+    "project/stage125/prediction_cutoff_audit_stage125_part2.csv": "d50e6617b011a7818d972de8e5c8a862a45f73fb07a0a22cdb5c9f59b6dc88f0"
+  },
+  "maintenance_task_id": "stage125-part3b1e-conservative-six-month-lag-decision-lock",
+  "modeling_authorized": false,
+  "modeling_started": false,
+  "network_extraction_performed": true,
+  "network_requests_attempted": 0,
+  "output_sha256": {
+    "README_STAGE125_PART3B1E_CONSERVATIVE_LAG.md": "857b3f9bad2d5c449fff51036129871ae3948e70daf0cc1562714af4ec87f763",
+    "part3b1e_conservative_lag_decision_lock_stage125.json": "07c8ba503116f8b0b18b1c349dfe590e7a9568a9a02b377af34a11754494f664",
+    "part3b1e_frozen_financial_data_manifest_stage125.json": "78406e04afa5eddc8876dbe5f0fb3e1883afcc2b03072e9e7d70bd6e75a3536b"
+  },
+  "pair_level_evidence_collected": false,
+  "part3a_decision_locked": true,
+  "part3a_protocol_locked": true,
+  "part3b0_readiness": true,
+  "part3b1_decision_locked": true,
+  "part3b1e_network_requests_attempted": 0,
+  "part3b_completed": false,
+  "part3b_started": true,
+  "pilot_cutoff_provenance_resolved": false,
+  "predictor_available_at_evidence_collected": false,
+  "predictor_document_binding_evidence_collected": true,
+  "predictor_document_binding_mini_pilot_completed": true,
+  "research_action_id": "stage125-part3b-conservative-lag-decision-lock",
+  "research_pointers": {
+    "last_completed_research_action_id": "stage125-part3b-conservative-lag-decision-lock",
+    "next_research_action_id": "stage125-part3c-leakage-safe-dataset-finalization"
+  },
+  "row_level_publish_datetime_collection_required": false,
+  "scale_up_to_80_rows_authorized": false,
+  "source_commit": "8f9ca65af0c2798eb0d69da865ad5d840ae64979",
+  "source_file_sha256": "d4a130b1574c7286a20d57da0d4fb9b7f8c150a9c6879a0d7814242e81bfa612",
+  "stage": "stage125_part3b1e_conservative_six_month_lag_decision_lock",
+  "stage126_authorized": false,
+  "stage126_started": false,
+  "test_file_sha256": "7305c2cac19ba39de81600f0cd9c06967d5ffe9c11036914066a9accfa935920",
+  "ticker_count": 0,
+  "tickers": []
+}
