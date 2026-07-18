@@ -976,7 +976,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
     assert state["current_stage"] == "Stage125"
     assert state["selected_qc_scope"] == (
-        "stage125_part3b1b_codal_document_binding_mini_pilot"
+        "stage125_part3b1c_document_binding_resolution_decision_lock"
     )
     assert state["last_completed_micro_part"] == "stage125-part3a-decision-lock"
     assert state["next_research_action_id"] == "stage125-part3b-evidence-capture"
@@ -988,6 +988,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["cut_a_available_at_operationalization_locked"] is True
     assert state["predictor_document_binding_mini_pilot_completed"] is True
     assert state["predictor_document_binding_evidence_collected"] is True
+    assert state["document_binding_resolution_decision_locked"] is True
     assert state["predictor_available_at_evidence_collected"] is False
     assert state["pilot_cutoff_provenance_resolved"] is False
     assert state["evidence_collected"] is True
