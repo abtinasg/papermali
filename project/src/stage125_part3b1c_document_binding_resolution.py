@@ -1211,6 +1211,9 @@ def run(
             "cut_a_available_at_operationalization_locked": True,
             "evidence_collected": True,
             "endpoint_probe_evidence_collected": True,
+            # Historical Part 3B endpoint-probe network occurred earlier; this
+            # Part 3B.1C offline lock performs zero network itself.
+            "network_extraction_performed": True,
             **EXPECTED_COUNTS,
             "research_pointers": {
                 "last_completed_research_action_id": RESEARCH_LAST_COMPLETED,
