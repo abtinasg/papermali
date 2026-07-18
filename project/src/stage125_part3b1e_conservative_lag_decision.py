@@ -606,7 +606,9 @@ def build_qc_assertions(
         baseline_exact and _is_ancestor(
             str(repo_root), EXPECTED_BASELINE_COMMIT, head,
         ),
-        f"baseline={EXPECTED_BASELINE_COMMIT} head={head}",
+        # Stable detail (no HEAD SHA) so QC bytes stay deterministic across
+        # subsequent artifact/Handoff commits on the same branch.
+        f"baseline={EXPECTED_BASELINE_COMMIT} ancestor_of_HEAD=true",
     )
 
     pr47_not_in_main = not _is_ancestor(str(repo_root), PR47_HEAD_OID, head)
