@@ -12,7 +12,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed research action:** `stage125-part3b-conservative-lag-decision-lock`
 - **Next research action:** `stage125-part3c-leakage-safe-dataset-finalization`
 - **Last stage commit:** `b99a89840ded777628e2d9601647b732e5210776`
-- **Generated from commit:** `b99a89840ded777628e2d9601647b732e5210776` (branch `stage125-part3b1e-conservative-six-month-lag-decision-lock`, informational)
+- **Generated from commit:** `94e00b7d405d1b29a9be68c2f9b196638d663da1` (branch `stage125-part3b1e-conservative-six-month-lag-decision-lock`, informational)
 - **Baseline:** `origin/main` @ `f1bc5eb770d883754078f15427dac45fe40a8c0b`
 
 ## QC
