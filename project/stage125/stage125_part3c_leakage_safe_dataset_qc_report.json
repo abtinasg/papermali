@@ -1,0 +1,293 @@
+{
+  "accessibility_scoring_applied": false,
+  "all_pass": true,
+  "assertion_count": 34,
+  "assertions": [
+    {
+      "assertion": "baseline_merge_sha_exact",
+      "detail": "baseline=93ab6d8f2c1fbddaaed4a9dc21de6490ef38de30 ancestor_of_HEAD=true",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3b1e_decision_lock_present",
+      "detail": "project/stage125/part3b1e_conservative_lag_decision_lock_stage125.json",
+      "status": "PASS"
+    },
+    {
+      "assertion": "six_month_lag_exact",
+      "detail": "6",
+      "status": "PASS"
+    },
+    {
+      "assertion": "Jalali_calendar_used",
+      "detail": "jdatetime calendar months via Part 3B.1E",
+      "status": "PASS"
+    },
+    {
+      "assertion": "all_input_hashes_exact",
+      "detail": "count=6",
+      "status": "PASS"
+    },
+    {
+      "assertion": "frozen_financial_values_unchanged",
+      "detail": "stage123 all-rows SHA-256 unchanged",
+      "status": "PASS"
+    },
+    {
+      "assertion": "frozen_targets_unchanged",
+      "detail": "Gate B eligible pair SHA-256 unchanged",
+      "status": "PASS"
+    },
+    {
+      "assertion": "four_locked_sample_designs_present",
+      "detail": "main_rule_a_primary,main_rule_b_listing_robustness,expanded_rule_a_company_scope_robustness,expanded_rule_b_combined_robustness",
+      "status": "PASS"
+    },
+    {
+      "assertion": "all_pair_counts_exact",
+      "detail": "main_rule_a_primary:1013/119/81/932;main_rule_b_listing_robustness:994/117/80/914;expanded_rule_a_company_scope_robustness:1057/124/81/976;expanded_rule_b_combined_robustness:1036/122/80/956",
+      "status": "PASS"
+    },
+    {
+      "assertion": "all_positive_negative_counts_exact",
+      "detail": "main_rule_a_primary:1013/119/81/932;main_rule_b_listing_robustness:994/117/80/914;expanded_rule_a_company_scope_robustness:1057/124/81/976;expanded_rule_b_combined_robustness:1036/122/80/956",
+      "status": "PASS"
+    },
+    {
+      "assertion": "all_company_counts_exact",
+      "detail": "main_rule_a_primary:1013/119/81/932;main_rule_b_listing_robustness:994/117/80/914;expanded_rule_a_company_scope_robustness:1057/124/81/976;expanded_rule_b_combined_robustness:1036/122/80/956",
+      "status": "PASS"
+    },
+    {
+      "assertion": "predictor_join_one_to_one",
+      "detail": "all pairs",
+      "status": "PASS"
+    },
+    {
+      "assertion": "target_join_one_to_one",
+      "detail": "all pairs",
+      "status": "PASS"
+    },
+    {
+      "assertion": "ticker_identity_exact",
+      "detail": "all pairs",
+      "status": "PASS"
+    },
+    {
+      "assertion": "t_to_t_plus_1_exact",
+      "detail": "all pairs",
+      "status": "PASS"
+    },
+    {
+      "assertion": "assumed_date_before_target_fiscal_year_end",
+      "detail": "unexpected_violations=0 authorized_exceptions=4",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_row_silently_dropped",
+      "detail": "audit_rows=4100",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_target_recalculation",
+      "detail": "gate_b_pair_copy",
+      "status": "PASS"
+    },
+    {
+      "assertion": "target_values_byte_or_semantically_identical",
+      "detail": "copied from frozen Gate B",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_observed_PublishDateTime_claim",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_real_available_at_assignment",
+      "detail": "authorized=false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "forbidden_target_columns_excluded_from_feature_surface",
+      "detail": "overlap=[]",
+      "status": "PASS"
+    },
+    {
+      "assertion": "output_hashes_recorded",
+      "detail": "4",
+      "status": "PASS"
+    },
+    {
+      "assertion": "build_deterministic",
+      "detail": "sha256 stable",
+      "status": "PASS"
+    },
+    {
+      "assertion": "network_requests_zero",
+      "detail": "0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "Stage126_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "modeling_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_lag_five_rejected",
+      "detail": "5",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_lag_seven_rejected",
+      "detail": "7",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_PublishDateTime_rejected",
+      "detail": "PublishDateTime",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_available_at_rejected",
+      "detail": "available_at",
+      "status": "PASS"
+    },
+    {
+      "assertion": "formula_fiscal_year_end_plus_six_months",
+      "detail": "1402-06-29",
+      "status": "PASS"
+    },
+    {
+      "assertion": "jalali_day_clamping_probe",
+      "detail": "1401-12-29",
+      "status": "PASS"
+    },
+    {
+      "assertion": "forbidden_surfaces_absent",
+      "detail": "stage126/part3b2 absent",
+      "status": "PASS"
+    }
+  ],
+  "baseline_commit": "93ab6d8f2c1fbddaaed4a9dc21de6490ef38de30",
+  "broad_codal_capture_stopped": true,
+  "bulky_output_sha256": {
+    "project/stage125/part3c_outputs/leakage_safe_expanded_rule_a_stage125.csv": "173c07679b17fb3ccf776e72fdbdbec676168c38f6b101dc3bf365c21ea55fb5",
+    "project/stage125/part3c_outputs/leakage_safe_expanded_rule_b_stage125.csv": "80b9371ef47f1917b51ef0bbbb2d47ee83aeede2c3ac961039f47139e93e5a7d",
+    "project/stage125/part3c_outputs/leakage_safe_main_rule_a_stage125.csv": "c4d27dcf32669c567395ecc3c30f5afa804df5835a570105f7d65f620ae07bc6",
+    "project/stage125/part3c_outputs/leakage_safe_main_rule_b_stage125.csv": "f5e38ce7836fe2fdcf0d1d59f88aff33f22c10b52397b7a2cbfe117bdfd702da"
+  },
+  "candidate_value_evidence_collected": false,
+  "conservative_availability_lag_locked": true,
+  "conservative_lag_months": 6,
+  "conservative_six_month_lag_decision_locked": true,
+  "contract_version": "stage125_part3c_v1",
+  "current_stage": "Stage125",
+  "cut_a_available_at_operationalization_locked": true,
+  "data_value_extraction_performed": false,
+  "document_binding_resolution_decision_locked": true,
+  "endpoint_probe_evidence_collected": true,
+  "evidence_collected": true,
+  "failed_count": 0,
+  "feature_selection_authorized": false,
+  "financial_data_researcher_verified_frozen": true,
+  "frozen_bulky_input_sha256": {
+    "project/stage123/modeling_all_rows_stage123.csv": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+    "project/stage124/gate_b_final/modeling_expanded_rule_a_eligible.csv": "b2f950b5a6a5a79f6b0fd8019e9021079339b6c80290695bb18d0e4a56b7d8e6",
+    "project/stage124/gate_b_final/modeling_expanded_rule_b_eligible.csv": "0aac404c2a856af8785f79361d22b42abfbe5898a983985d003c051c4ca43a12",
+    "project/stage124/gate_b_final/modeling_main_rule_a_eligible.csv": "f943d5cfd2a3dcaa091eacbac5e305fdad83787548a6e43b50976f1455664420",
+    "project/stage124/gate_b_final/modeling_main_rule_b_eligible.csv": "99bdf0296a274f2ad42a6e9942a42d79b6370c7b99b57967b44c6821313f36c1",
+    "project/stage124/gate_b_final/modeling_one_year_ahead_stage124_gate_b.csv": "9743c49337c66a3699bce34dfd02a151e34f48f0717f225ad487fe1487031d05"
+  },
+  "modeling_authorized": false,
+  "modeling_started": false,
+  "network_extraction_performed": true,
+  "network_requests_attempted": 0,
+  "output_sha256": {
+    "README_STAGE125_PART3C_LEAKAGE_SAFE_DATASET.md": "ddb00db49bab2a7104e4bac2bc922ca49d3576a92e953be1946e878f475c905c",
+    "part3c_column_role_map_stage125.csv": "c656018d3bc671113a7d5c8d32e9f5a249dbc4c097d7663cf216bcc718abf754",
+    "part3c_input_hash_manifest_stage125.json": "d8781d0034d1817360337f067833c8cf6f5329fccf3c499863d78a029b64e97c",
+    "part3c_leakage_audit_stage125.csv": "d1f53b2906f7eb233b4ef4d8b1ff27ae1ea7e11d14213ce95088686fc01e8ca5",
+    "part3c_leakage_safe_dataset_contract_stage125.json": "5dbf2e38365f95c057678028f72056d347376b8c1b48a8a95741d6084b653a0b",
+    "part3c_sample_summary_stage125.csv": "c446a99ba37a1e08f0bda8a4cb15b2dfb347d3d48c9575d36910eb4cd583d02c",
+    "part3c_target_year_distribution_stage125.csv": "94c63e4e434c4d8462af4c6b8fd3f169c9382624abd3636806b6b186f6b1db8b"
+  },
+  "pair_level_evidence_collected": true,
+  "part3a_decision_locked": true,
+  "part3a_protocol_locked": true,
+  "part3b0_readiness": true,
+  "part3b1_decision_locked": true,
+  "part3b_completed": false,
+  "part3b_started": true,
+  "part3c_leakage_safe_finalization_completed": true,
+  "part3c_network_requests_attempted": 0,
+  "pilot_cutoff_provenance_resolved": false,
+  "predictor_available_at_evidence_collected": false,
+  "predictor_document_binding_evidence_collected": true,
+  "predictor_document_binding_mini_pilot_completed": true,
+  "research_action_id": "stage125-part3c-leakage-safe-dataset-finalization",
+  "research_pointers": {
+    "last_completed_research_action_id": "stage125-part3c-leakage-safe-dataset-finalization",
+    "next_research_action_id": "stage125-part4-statistical-analysis-plan"
+  },
+  "row_level_publish_datetime_collection_required": false,
+  "sample_summaries": [
+    {
+      "columns": "112",
+      "companies": "119",
+      "negative": "932",
+      "output_file": "project/stage125/part3c_outputs/leakage_safe_main_rule_a_stage125.csv",
+      "output_sha256": "c4d27dcf32669c567395ecc3c30f5afa804df5835a570105f7d65f620ae07bc6",
+      "pairs": "1013",
+      "positive": "81",
+      "sample_design": "main_rule_a_primary",
+      "timing_relation_exceptions": "1"
+    },
+    {
+      "columns": "112",
+      "companies": "117",
+      "negative": "914",
+      "output_file": "project/stage125/part3c_outputs/leakage_safe_main_rule_b_stage125.csv",
+      "output_sha256": "f5e38ce7836fe2fdcf0d1d59f88aff33f22c10b52397b7a2cbfe117bdfd702da",
+      "pairs": "994",
+      "positive": "80",
+      "sample_design": "main_rule_b_listing_robustness",
+      "timing_relation_exceptions": "1"
+    },
+    {
+      "columns": "112",
+      "companies": "124",
+      "negative": "976",
+      "output_file": "project/stage125/part3c_outputs/leakage_safe_expanded_rule_a_stage125.csv",
+      "output_sha256": "173c07679b17fb3ccf776e72fdbdbec676168c38f6b101dc3bf365c21ea55fb5",
+      "pairs": "1057",
+      "positive": "81",
+      "sample_design": "expanded_rule_a_company_scope_robustness",
+      "timing_relation_exceptions": "1"
+    },
+    {
+      "columns": "112",
+      "companies": "122",
+      "negative": "956",
+      "output_file": "project/stage125/part3c_outputs/leakage_safe_expanded_rule_b_stage125.csv",
+      "output_sha256": "80b9371ef47f1917b51ef0bbbb2d47ee83aeede2c3ac961039f47139e93e5a7d",
+      "pairs": "1036",
+      "positive": "80",
+      "sample_design": "expanded_rule_b_combined_robustness",
+      "timing_relation_exceptions": "1"
+    }
+  ],
+  "source_commit": "22c9ed4f566e8aaa892048882a757680dd80a22c",
+  "source_file_sha256": "2d47a24686bb0730e80ace229813610abaf73b422a46c6dee440a8c623283afc",
+  "stage": "stage125_part3c_leakage_safe_dataset_finalization",
+  "stage126_authorized": false,
+  "stage126_started": false,
+  "test_file_sha256": "2444141ebcfaade35b11ce0d75a1c61a8b6467e62064c461494c10d2e2e828a3",
+  "ticker_count": 0,
+  "tickers": []
+}
