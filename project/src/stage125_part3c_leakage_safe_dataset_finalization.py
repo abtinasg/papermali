@@ -1,16 +1,20 @@
 """Stage125 Part 3C — Leakage-Safe Dataset Finalization.
 
-Operationalizes the Part 3B.1E locked six-month Jalali availability lag into
-audited pair datasets and timing-eligible analysis-ready datasets for all four
-frozen Gate B sample designs.
+Operationalizes the human-approved four-Jalali-calendar-month regulatory
+availability lag into audited pair datasets and timing-eligible analysis-ready
+datasets for all four frozen Gate B sample designs.
+
+The Part 3B.1E six-month decision remains retained as historical provenance and
+is explicitly superseded for the active modeling path.
 
 Offline. Deterministic. Zero network. No modeling. No Stage126.
 Financial values and targets remain researcher-verified and frozen.
+Part 3C does not approve model features; Part 4 locks the feature surface.
 
 Terminology:
-- audited pair datasets = full Gate B membership (exceptions visible/audited)
+- audited pair datasets = full Gate B membership (timing violations visible)
 - leakage-safe analysis-ready datasets = timing-eligible subset only
-  (assumed_before_target_fiscal_year_end == true)
+  (assumed_available_at_regulatory < target_fiscal_year_end_t_plus_1)
 """
 from __future__ import annotations
 
@@ -35,12 +39,12 @@ from src import stage125_part3b1e_conservative_lag_decision as part3b1e
 QC_STAGE = "stage125_part3c_leakage_safe_dataset_finalization"
 CURRENT_STAGE = "Stage125"
 EXPECTED_BASELINE_COMMIT = "93ab6d8f2c1fbddaaed4a9dc21de6490ef38de30"
-CONTRACT_VERSION = "stage125_part3c_v2"
+CONTRACT_VERSION = "stage125_part3c_v3_four_month_regulatory_lag"
 RESEARCH_ACTION_ID = "stage125-part3c-leakage-safe-dataset-finalization"
 RESEARCH_LAST_COMPLETED = RESEARCH_ACTION_ID
 RESEARCH_NEXT = "stage125-part4-statistical-analysis-plan"
-TIMING_EXCLUSION_REASON_AUTHORIZED = (
-    "assumed_availability_not_before_target_fye_authorized_calendar_shift"
+TIMING_EXCLUSION_REASON = (
+    "regulatory_lag_not_before_target_fiscal_year_end"
 )
 PART3B1E_DECISION_LOCK_REL = (
     "project/stage125/part3b1e_conservative_lag_decision_lock_stage125.json"
@@ -48,11 +52,28 @@ PART3B1E_DECISION_LOCK_REL = (
 PART3B1E_FROZEN_MANIFEST_REL = (
     "project/stage125/part3b1e_frozen_financial_data_manifest_stage125.json"
 )
+FOUR_MONTH_REVISION_DECISION_REL = (
+    "project/stage125/"
+    "part3c_four_month_regulatory_lag_revision_decision_stage125.json"
+)
+FOUR_MONTH_REVISION_README_REL = (
+    "project/stage125/README_STAGE125_PART3C_FOUR_MONTH_LAG_REVISION.md"
+)
+# Historical Part 3B.1E lag (superseded; retained as provenance only).
+HISTORICAL_SIX_MONTH_LAG = 6
 
-APPROVED_LAG_MONTHS = part3b1e.APPROVED_LAG_MONTHS
-ASSUMED_FIELD_NAME = part3b1e.ASSUMED_FIELD_NAME
-AVAILABILITY_METHOD = part3b1e.AVAILABILITY_METHOD
-AVAILABILITY_DATE_SEMANTICS = part3b1e.AVAILABILITY_DATE_SEMANTICS
+# Active Part 3C availability specification (human-approved revision).
+APPROVED_LAG_MONTHS = 4
+ASSUMED_FIELD_NAME = "assumed_available_at_regulatory"
+AVAILABILITY_METHOD = "fixed_regulatory_lag"
+AVAILABILITY_DATE_SEMANTICS = (
+    "assumed_regulatory_deadline_not_observed_publication_timestamp"
+)
+ADMISSION_STATUS_PENDING_PART4 = "pending_part4_statistical_analysis_plan"
+EXPECTED_TIMING_VIOLATIONS_PER_DESIGN = 1
+EXPECTED_TIMING_VIOLATION_PAIR = (
+    "رمپنا", 1396, 1397, "رمپنا|1396", "رمپنا|1397",
+)
 
 FORBIDDEN_OBSERVED_FIELD_NAMES = frozenset({
     "available_at",
@@ -79,6 +100,10 @@ F_SAMPLE_SUMMARY = "part3c_sample_summary_stage125.csv"
 F_TARGET_YEAR_DIST = "part3c_target_year_distribution_stage125.csv"
 F_LEAKAGE_AUDIT = "part3c_leakage_audit_stage125.csv"
 F_README = "README_STAGE125_PART3C_LEAKAGE_SAFE_DATASET.md"
+F_FOUR_MONTH_DECISION = (
+    "part3c_four_month_regulatory_lag_revision_decision_stage125.json"
+)
+F_FOUR_MONTH_README = "README_STAGE125_PART3C_FOUR_MONTH_LAG_REVISION.md"
 F_QC = "stage125_part3c_leakage_safe_dataset_qc_report.json"
 F_METADATA = "metadata_and_hashes_stage125_part3c.json"
 
@@ -122,6 +147,8 @@ TRACKED_CONTENT_FILES = (
     F_TARGET_YEAR_DIST,
     F_LEAKAGE_AUDIT,
     F_README,
+    F_FOUR_MONTH_DECISION,
+    F_FOUR_MONTH_README,
 )
 
 # Pinned local bulky inputs (gitignored; must exist with exact SHA-256).
@@ -149,6 +176,11 @@ DESIGN_SPECS: dict[str, dict[str, Any]] = {
         "companies": 119,
         "positive": 81,
         "negative": 932,
+        "analysis_ready_pairs": 1012,
+        "analysis_ready_companies": 119,
+        "analysis_ready_positive": 80,
+        "analysis_ready_negative": 932,
+        "timing_exclusions": 1,
     },
     "main_rule_b_listing_robustness": {
         "input_rel": (
@@ -158,6 +190,11 @@ DESIGN_SPECS: dict[str, dict[str, Any]] = {
         "companies": 117,
         "positive": 80,
         "negative": 914,
+        "analysis_ready_pairs": 993,
+        "analysis_ready_companies": 117,
+        "analysis_ready_positive": 79,
+        "analysis_ready_negative": 914,
+        "timing_exclusions": 1,
     },
     "expanded_rule_a_company_scope_robustness": {
         "input_rel": (
@@ -168,6 +205,11 @@ DESIGN_SPECS: dict[str, dict[str, Any]] = {
         "companies": 124,
         "positive": 81,
         "negative": 976,
+        "analysis_ready_pairs": 1056,
+        "analysis_ready_companies": 124,
+        "analysis_ready_positive": 80,
+        "analysis_ready_negative": 976,
+        "timing_exclusions": 1,
     },
     "expanded_rule_b_combined_robustness": {
         "input_rel": (
@@ -178,16 +220,13 @@ DESIGN_SPECS: dict[str, dict[str, Any]] = {
         "companies": 122,
         "positive": 80,
         "negative": 956,
+        "analysis_ready_pairs": 1035,
+        "analysis_ready_companies": 122,
+        "analysis_ready_positive": 79,
+        "analysis_ready_negative": 956,
+        "timing_exclusions": 1,
     },
 }
-
-# One fiscal-year-calendar-shift pair where predictor FYE is Esfand and target
-# FYE is Farvardin; assumed (FYE+6m) is after target FYE. The pair remains in
-# the audited Gate B membership surface with explicit exclusion flags, but is
-# never eligible for analysis-ready / model matrices.
-AUTHORIZED_TIMING_EXCEPTIONS = frozenset({
-    ("رمپنا", 1396, 1397, "رمپنا|1396", "رمپنا|1397"),
-})
 
 GATE_B_PAIR_COLUMNS = [
     "ticker",
@@ -256,9 +295,9 @@ PREDICTOR_RATIO_COLS = [
     "accumulated_loss_to_capital_ratio",
     "debt_to_equity",
 ]
-# Explicit predictor whitelist — model feature matrix may only use these.
-# Do not rely solely on dropping known forbidden columns.
-PREDICTOR_FEATURE_WHITELIST = frozenset(
+# Part 3C candidate inventory only — no variable is approved for model entry.
+# Part 4 decides final M1 variables / transforms / order.
+PREDICTOR_CANDIDATE_INVENTORY = frozenset(
     PREDICTOR_FINANCIAL_LEVEL_COLS + PREDICTOR_RATIO_COLS
 )
 FORBIDDEN_TARGET_COMPONENT_COLS = [
@@ -308,16 +347,16 @@ PROVENANCE_AUDIT_COLS = [
 TIMING_ASSUMPTION_COLS = [
     "fiscal_year_end_t_jalali",
     "fiscal_year_end_t_gregorian",
-    "assumed_available_at_conservative_jalali",
-    "assumed_available_at_conservative_gregorian",
-    "conservative_lag_months",
+    "assumed_available_at_regulatory_jalali",
+    "assumed_available_at_regulatory_gregorian",
+    "regulatory_lag_months",
     "availability_method",
     "availability_date_semantics",
     "is_observed_publication_timestamp",
     "target_fiscal_year_end_t_plus_1_jalali",
     "target_fiscal_year_end_t_plus_1_gregorian",
     "assumed_before_target_fiscal_year_end",
-    "timing_relation_exception",
+    "timing_relation_violation",
     "timing_eligible_for_analysis",
     "timing_eligible_for_model",
     "timing_exclusion_reason",
@@ -325,10 +364,16 @@ TIMING_ASSUMPTION_COLS = [
 ]
 TIMING_ELIGIBILITY_AUDIT_COLS = frozenset({
     "assumed_before_target_fiscal_year_end",
-    "timing_relation_exception",
+    "timing_relation_violation",
     "timing_eligible_for_analysis",
     "timing_eligible_for_model",
     "timing_exclusion_reason",
+})
+# Obsolete active six-month field names must not appear in Part 3C outputs.
+OBSOLETE_ACTIVE_CONSERVATIVE_FIELDS = frozenset({
+    "assumed_available_at_conservative_jalali",
+    "assumed_available_at_conservative_gregorian",
+    "conservative_lag_months",
 })
 TARGET_IDENTITY_AUDIT_COLS = [
     "target_row_ticker",
@@ -467,6 +512,7 @@ def frozen_bulky_hashes(repo_root: Path) -> dict[str, str]:
 
 
 def require_part3b1e_locks(repo_root: Path) -> dict[str, str]:
+    """Retain historical Part 3B.1E six-month lock as superseded provenance."""
     out: dict[str, str] = {}
     for rel in (PART3B1E_DECISION_LOCK_REL, PART3B1E_FROZEN_MANIFEST_REL):
         path = repo_root / rel
@@ -476,17 +522,42 @@ def require_part3b1e_locks(repo_root: Path) -> dict[str, str]:
     lock = json.loads(
         (repo_root / PART3B1E_DECISION_LOCK_REL).read_text(encoding="utf-8")
     )
-    if lock.get("conservative_lag_months") != APPROVED_LAG_MONTHS:
-        raise QCFail("Part 3B.1E decision lock lag is not 6 months")
-    if lock.get("availability_method") != AVAILABILITY_METHOD:
+    if lock.get("conservative_lag_months") != HISTORICAL_SIX_MONTH_LAG:
+        raise QCFail(
+            "historical Part 3B.1E decision lock must retain six-month lag"
+        )
+    if lock.get("availability_method") != "fixed_conservative_lag":
         raise QCFail("Part 3B.1E decision lock availability_method mismatch")
     if lock.get("financial_value_reextraction_required") is not False:
         raise QCFail("Part 3B.1E lock must forbid financial re-extraction")
     return out
 
 
+def validate_four_month_revision_decision(decision: dict[str, Any]) -> None:
+    if decision.get("decision_authority") != "explicit_human_supervisor_approval":
+        raise QCFail("four-month revision decision_authority mismatch")
+    if decision.get("decision_status") != "active":
+        raise QCFail("four-month revision decision_status must be active")
+    if decision.get("active_lag_months") != APPROVED_LAG_MONTHS:
+        raise QCFail("four-month revision active_lag_months must be 4")
+    if decision.get("active_availability_method") != AVAILABILITY_METHOD:
+        raise QCFail("four-month revision active_availability_method mismatch")
+    if decision.get("historical_six_month_decision_retained") is not True:
+        raise QCFail("historical six-month decision must remain retained")
+    if decision.get("historical_six_month_decision_active") is not False:
+        raise QCFail("historical six-month decision must not be active")
+    if decision.get("supersedes_active_methodology") != (
+        "fixed_conservative_six_month_lag"
+    ):
+        raise QCFail("four-month revision must supersede six-month methodology")
+    if decision.get("Stage126_authorized") is not False:
+        raise QCFail("four-month revision must keep Stage126 unauthorized")
+    if decision.get("modeling_authorized") is not False:
+        raise QCFail("four-month revision must keep modeling unauthorized")
+
+
 # --------------------------------------------------------------------------- #
-# Date helpers (reuse Part 3B.1E Jalali calendar function)
+# Date helpers (Jalali calendar-month arithmetic; active four-month guard)
 # --------------------------------------------------------------------------- #
 
 def parse_jalali_date(value: str, *, field: str, row_key: str) -> jdatetime.date:
@@ -513,6 +584,63 @@ def gregorian_iso(d: jdatetime.date) -> str:
     return d.togregorian().isoformat()
 
 
+def require_approved_regulatory_lag_months(months: int) -> int:
+    """Reject every active lag other than exactly four Jalali months."""
+    if not isinstance(months, int) or isinstance(months, bool):
+        raise AuthorizationError(
+            f"regulatory_lag_months must be int 4; got {months!r}"
+        )
+    if months != APPROVED_LAG_MONTHS:
+        raise AuthorizationError(
+            f"active regulatory lag must be exactly 4 Jalali months; "
+            f"rejected {months}"
+        )
+    return months
+
+
+def add_jalali_calendar_months(d: jdatetime.date, months: int) -> jdatetime.date:
+    """Add Jalali calendar months; clamp day to last valid day of target month.
+
+    Reuses the same tested arithmetic as Part 3B.1E, but under the active
+    four-month authorization guard (not the historical six-month guard).
+    """
+    require_approved_regulatory_lag_months(months)
+    total = d.year * 12 + (d.month - 1) + months
+    year = total // 12
+    month = (total % 12) + 1
+    for day in range(d.day, 0, -1):
+        try:
+            return jdatetime.date(year, month, day)
+        except ValueError:
+            continue
+    raise QCFail(f"unable to add {months} months to {d}")
+
+
+def compute_assumed_available_at_regulatory(
+    fiscal_year_end: jdatetime.date,
+    *,
+    lag_months: int = APPROVED_LAG_MONTHS,
+) -> dict[str, Any]:
+    """Methodological regulatory-deadline date: FYE + 4 Jalali calendar months.
+
+    Never labeled as observed PublishDateTime / CODAL publication / available_at.
+    """
+    require_approved_regulatory_lag_months(lag_months)
+    assumed = add_jalali_calendar_months(fiscal_year_end, lag_months)
+    g = assumed.togregorian()
+    return {
+        "field_name": ASSUMED_FIELD_NAME,
+        "assumed_available_at_regulatory_jalali": assumed.strftime("%Y-%m-%d"),
+        "assumed_available_at_regulatory_gregorian": g.isoformat(),
+        "availability_method": AVAILABILITY_METHOD,
+        "availability_date_semantics": AVAILABILITY_DATE_SEMANTICS,
+        "regulatory_lag_months": lag_months,
+        "is_observed_publication_timestamp": False,
+        "is_PublishDateTime": False,
+        "is_real_available_at": False,
+    }
+
+
 def reject_assumed_date_as_observed_field(field_name: str, value: Any) -> None:
     if field_name in FORBIDDEN_OBSERVED_FIELD_NAMES:
         raise AuthorizationError(
@@ -521,25 +649,12 @@ def reject_assumed_date_as_observed_field(field_name: str, value: Any) -> None:
         )
 
 
-def require_timing_relation(
+def evaluate_timing_relation(
     assumed: jdatetime.date,
     target_fye: jdatetime.date,
-    *,
-    exception_key: tuple[str, int, int, str, str] | None,
-    row_key: str,
-) -> tuple[bool, bool]:
-    """Return (relation_ok, is_authorized_exception). Fail closed otherwise."""
-    ok = assumed < target_fye
-    if ok:
-        return True, False
-    if exception_key in AUTHORIZED_TIMING_EXCEPTIONS:
-        return False, True
-    raise QCFail(
-        f"assumed_available_at_conservative not before "
-        f"target_fiscal_year_end for {row_key}: "
-        f"assumed={jalali_to_iso(assumed)} "
-        f"target_fye={jalali_to_iso(target_fye)}"
-    )
+) -> bool:
+    """General rule: assumed_available_at_regulatory < target FYE t+1."""
+    return assumed < target_fye
 
 
 # --------------------------------------------------------------------------- #
@@ -549,17 +664,21 @@ def require_timing_relation(
 def build_column_role_rows() -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
 
-    def add(col: str, role: str, notes: str = "") -> None:
-        # Explicit whitelist only — never infer eligibility solely by dropping
-        # known forbidden columns.
-        enters = (
-            "true"
-            if role == "predictor_candidate" and col in PREDICTOR_FEATURE_WHITELIST
-            else "false"
-        )
+    def add(
+        col: str,
+        role: str,
+        notes: str = "",
+        *,
+        admission_status: str = "",
+    ) -> None:
+        # Part 3C never approves model entry; Part 4 locks features.
+        enters = "false"
+        if role == "predictor_candidate":
+            admission_status = ADMISSION_STATUS_PENDING_PART4
         rows.append({
             "column_name": col,
             "role": role,
+            "admission_status": admission_status,
             "enters_model_feature_matrix": enters,
             "notes": notes,
         })
@@ -579,9 +698,13 @@ def build_column_role_rows() -> list[dict[str, str]]:
         add(col, "identifier")
 
     for col in PREDICTOR_FINANCIAL_LEVEL_COLS + PREDICTOR_RATIO_COLS:
-        if col not in PREDICTOR_FEATURE_WHITELIST:
-            raise QCFail(f"predictor candidate missing from whitelist: {col}")
-        add(col, "predictor_candidate", "predictor-year financial surface only")
+        if col not in PREDICTOR_CANDIDATE_INVENTORY:
+            raise QCFail(f"predictor candidate missing from inventory: {col}")
+        add(
+            col,
+            "predictor_candidate",
+            "candidate inventory only; pending Part 4 SAP",
+        )
 
     for col in (
         "FD_target_main_t_plus_1",
@@ -779,20 +902,16 @@ def build_design_rows(
             field="fiscal_year_end_t_plus_1",
             row_key=tk,
         )
-        lag_payload = part3b1e.compute_assumed_available_at_conservative(
+        lag_payload = compute_assumed_available_at_regulatory(
             fye_t, lag_months=APPROVED_LAG_MONTHS,
         )
         assumed = parse_jalali_date(
-            lag_payload["assumed_available_at_conservative_jalali"],
+            lag_payload["assumed_available_at_regulatory_jalali"],
             field=ASSUMED_FIELD_NAME,
             row_key=pk,
         )
-        exception_key = (
-            pair["ticker"], fy_t, ty, pk, tk,
-        )
-        relation_ok, is_exc = require_timing_relation(
-            assumed, fye_t1, exception_key=exception_key, row_key=pk,
-        )
+        relation_ok = evaluate_timing_relation(assumed, fye_t1)
+        timing_violation = not relation_ok
 
         row: dict[str, Any] = {k: "" for k in header}
         row["sample_design"] = design
@@ -812,13 +931,13 @@ def build_design_rows(
 
         row["fiscal_year_end_t_jalali"] = jalali_to_iso(fye_t)
         row["fiscal_year_end_t_gregorian"] = gregorian_iso(fye_t)
-        row["assumed_available_at_conservative_jalali"] = lag_payload[
-            "assumed_available_at_conservative_jalali"
+        row["assumed_available_at_regulatory_jalali"] = lag_payload[
+            "assumed_available_at_regulatory_jalali"
         ]
-        row["assumed_available_at_conservative_gregorian"] = lag_payload[
-            "assumed_available_at_conservative_gregorian"
+        row["assumed_available_at_regulatory_gregorian"] = lag_payload[
+            "assumed_available_at_regulatory_gregorian"
         ]
-        row["conservative_lag_months"] = str(APPROVED_LAG_MONTHS)
+        row["regulatory_lag_months"] = str(APPROVED_LAG_MONTHS)
         row["availability_method"] = AVAILABILITY_METHOD
         row["availability_date_semantics"] = AVAILABILITY_DATE_SEMANTICS
         row["is_observed_publication_timestamp"] = "false"
@@ -827,17 +946,16 @@ def build_design_rows(
         row["assumed_before_target_fiscal_year_end"] = (
             "true" if relation_ok else "false"
         )
-        row["timing_relation_exception"] = "true" if is_exc else "false"
+        row["timing_relation_violation"] = "true" if timing_violation else "false"
         if relation_ok:
             row["timing_eligible_for_analysis"] = "true"
             row["timing_eligible_for_model"] = "true"
             row["timing_exclusion_reason"] = ""
         else:
-            # Authorized exception only reaches this branch; unauthorized
-            # violations already failed closed in require_timing_relation.
+            # General sample rule: retain in audit; exclude from analysis-ready.
             row["timing_eligible_for_analysis"] = "false"
             row["timing_eligible_for_model"] = "false"
-            row["timing_exclusion_reason"] = TIMING_EXCLUSION_REASON_AUTHORIZED
+            row["timing_exclusion_reason"] = TIMING_EXCLUSION_REASON
         row["target_row_ticker"] = tgt["ticker"]
         row["target_row_fiscal_year"] = str(tgt["fiscal_year"])
         row["target_row_key_matched"] = tgt["row_key"]
@@ -850,6 +968,13 @@ def build_design_rows(
                     f"{forbidden} for {pk}"
                 )
             row.pop(forbidden, None)
+        for obsolete in OBSOLETE_ACTIVE_CONSERVATIVE_FIELDS:
+            if obsolete in row and row[obsolete] not in ("", None):
+                raise QCFail(
+                    f"obsolete active conservative field {obsolete} "
+                    f"populated for {pk}"
+                )
+            row.pop(obsolete, None)
 
         out_rows.append(row)
         audit_rows.append({
@@ -863,8 +988,8 @@ def build_design_rows(
             "target_join": "one_to_one",
             "ticker_identity_exact": "true",
             "t_to_t_plus_1_exact": "true",
-            "assumed_available_at_conservative_jalali": row[
-                "assumed_available_at_conservative_jalali"
+            "assumed_available_at_regulatory_jalali": row[
+                "assumed_available_at_regulatory_jalali"
             ],
             "target_fiscal_year_end_t_plus_1_jalali": row[
                 "target_fiscal_year_end_t_plus_1_jalali"
@@ -872,7 +997,7 @@ def build_design_rows(
             "assumed_before_target_fiscal_year_end": row[
                 "assumed_before_target_fiscal_year_end"
             ],
-            "timing_relation_exception": row["timing_relation_exception"],
+            "timing_relation_violation": row["timing_relation_violation"],
             "timing_eligible_for_analysis": row["timing_eligible_for_analysis"],
             "timing_eligible_for_model": row["timing_eligible_for_model"],
             "timing_exclusion_reason": row["timing_exclusion_reason"],
@@ -911,21 +1036,20 @@ def split_analysis_ready(
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Split audited rows into analysis-ready vs explicit timing exclusions.
 
-    Fail-closed: every exclusion must be an authorized timing exception with
-    assumed_before_target_fiscal_year_end != true. Analysis-ready rows must
-    all have assumed_before_target_fiscal_year_end == true.
+    General rule: exclude every row where assumed_available_at_regulatory is
+    not strictly before target FYE t+1. Exclusions remain visible in audit.
     """
     ready: list[dict[str, Any]] = []
     excluded: list[dict[str, Any]] = []
     for row in rows:
         before = row["assumed_before_target_fiscal_year_end"] == "true"
-        is_exc = row["timing_relation_exception"] == "true"
+        is_violation = row["timing_relation_violation"] == "true"
         eligible = row["timing_eligible_for_analysis"] == "true"
         model_eligible = row["timing_eligible_for_model"] == "true"
         if before:
-            if is_exc:
+            if is_violation:
                 raise QCFail(
-                    f"{design}: timing_relation_exception cannot be true when "
+                    f"{design}: timing_relation_violation cannot be true when "
                     f"assumed_before_target_fiscal_year_end=true "
                     f"({row['predictor_row_key_t']})"
                 )
@@ -943,18 +1067,19 @@ def split_analysis_ready(
             ready.append(row)
             continue
 
-        # Not before target FYE → must be authorized audited exception.
-        if not is_exc:
+        # Not before target FYE → retain in audit; exclude from analysis-ready.
+        if not is_violation:
             raise QCFail(
-                f"{design}: unauthorized timing violation for "
+                f"{design}: timing violation must set "
+                f"timing_relation_violation=true for "
                 f"{row['predictor_row_key_t']}"
             )
         if eligible or model_eligible:
             raise QCFail(
-                f"{design}: authorized timing exception must not be "
+                f"{design}: timing violation must not be "
                 f"analysis/model eligible ({row['predictor_row_key_t']})"
             )
-        if row["timing_exclusion_reason"] != TIMING_EXCLUSION_REASON_AUTHORIZED:
+        if row["timing_exclusion_reason"] != TIMING_EXCLUSION_REASON:
             raise QCFail(
                 f"{design}: unexpected timing_exclusion_reason="
                 f"{row['timing_exclusion_reason']!r} for "
@@ -1002,6 +1127,7 @@ def summarize_design(
         "analysis_ready_positive": str(analysis_pos),
         "analysis_ready_negative": str(len(analysis_rows) - analysis_pos),
         "excluded_timing_exception_count": str(len(excluded_rows)),
+        "timing_exclusions": str(len(excluded_rows)),
         "columns": str(len(final_output_header())),
         "audited_output_file": (
             f"{BULKY_OUTPUT_DIR_REL}/{AUDITED_OUTPUT_FILES[design]}"
@@ -1016,10 +1142,10 @@ def summarize_design(
             f"{BULKY_OUTPUT_DIR_REL}/{AUDITED_OUTPUT_FILES[design]}"
         ),
         "output_sha256": audited_sha256,
-        "timing_relation_exceptions": str(
+        "timing_relation_violations": str(
             sum(
                 1 for r in audited_rows
-                if r["timing_relation_exception"] == "true"
+                if r["timing_relation_violation"] == "true"
             )
         ),
     }
@@ -1059,11 +1185,18 @@ def build_contract(
     *,
     pinned_inputs: dict[str, str],
     part3b1e_locks: dict[str, str],
+    four_month_revision: dict[str, str],
     output_hashes: dict[str, str],
     sample_summaries: list[dict[str, Any]],
 ) -> dict[str, Any]:
     role_rows = build_column_role_rows()
     role_counts = Counter(r["role"] for r in role_rows)
+    approved_features = [
+        r["column_name"]
+        for r in role_rows
+        if r["enters_model_feature_matrix"] == "true"
+    ]
+    t = EXPECTED_TIMING_VIOLATION_PAIR
     return {
         "contract_version": CONTRACT_VERSION,
         "research_action_id": RESEARCH_ACTION_ID,
@@ -1075,25 +1208,47 @@ def build_contract(
         "part3b1e_frozen_manifest_sha256": part3b1e_locks[
             PART3B1E_FROZEN_MANIFEST_REL
         ],
-        "six_month_lag_exact": APPROVED_LAG_MONTHS,
+        "four_month_revision_decision_sha256": four_month_revision[
+            FOUR_MONTH_REVISION_DECISION_REL
+        ],
+        "active_lag_months": APPROVED_LAG_MONTHS,
+        "active_lag_calendar": "Jalali",
         "Jalali_calendar_used": True,
         "availability_method": AVAILABILITY_METHOD,
         "availability_date_semantics": AVAILABILITY_DATE_SEMANTICS,
         "assumed_availability_field_name": ASSUMED_FIELD_NAME,
         "is_observed_publication_timestamp": False,
+        "four_month_regulatory_lag_locked": True,
+        "six_month_lag_superseded": True,
+        "historical_six_month_decision_retained": True,
+        "historical_six_month_decision_active": False,
+        "supersedes_active_methodology": "fixed_conservative_six_month_lag",
         "financial_data_status": "researcher_verified_frozen",
         "financial_value_reextraction_required": False,
         "broad_codal_capture_authorized": False,
         "row_level_publish_datetime_collection_authorized": False,
+        "row_level_publish_datetime_collection_required": False,
         "row_level_real_available_at_assignment_authorized": False,
         "feature_selection_authorized": False,
         "model_fitting_authorized": False,
         "stage126_authorized": False,
         "modeling_authorized": False,
         "stage125_complete": False,
+        "zero_features_approved_before_part4": len(approved_features) == 0,
+        "features_approved_for_model_entry": approved_features,
         "four_locked_sample_designs": list(DESIGN_SPECS.keys()),
         "expected_sample_counts": {
             k: {
+                "audited_pairs": v["pairs"],
+                "audited_companies": v["companies"],
+                "audited_positive": v["positive"],
+                "audited_negative": v["negative"],
+                "analysis_ready_pairs": v["analysis_ready_pairs"],
+                "analysis_ready_companies": v["analysis_ready_companies"],
+                "analysis_ready_positive": v["analysis_ready_positive"],
+                "analysis_ready_negative": v["analysis_ready_negative"],
+                "timing_exclusions": v["timing_exclusions"],
+                # Backward-compatible aliases for audited membership.
                 "pairs": v["pairs"],
                 "companies": v["companies"],
                 "positive": v["positive"],
@@ -1114,30 +1269,33 @@ def build_contract(
             for k, v in sorted(ANALYSIS_READY_OUTPUT_FILES.items())
         },
         "column_role_counts": dict(sorted(role_counts.items())),
-        "predictor_feature_whitelist": sorted(PREDICTOR_FEATURE_WHITELIST),
+        "predictor_candidate_inventory": sorted(PREDICTOR_CANDIDATE_INVENTORY),
         "forbidden_from_model_feature_surface": sorted(
             FORBIDDEN_FROM_FEATURE_SURFACE
         ),
         "forbidden_observed_field_names": sorted(FORBIDDEN_OBSERVED_FIELD_NAMES),
-        "authorized_timing_relation_exceptions": [
+        "expected_timing_violation_pairs": [
             {
                 "ticker": t[0],
                 "fiscal_year_t": t[1],
                 "target_year": t[2],
                 "predictor_row_key_t": t[3],
                 "target_row_key_t_plus_1": t[4],
+                "predictor_fiscal_year_end": "1396/12/29",
+                "assumed_available_at_regulatory": "1397/04/29",
+                "target_fiscal_year_end": "1397/01/31",
+                "timing_relation_violation": True,
                 "timing_eligible_for_analysis": False,
                 "timing_eligible_for_model": False,
-                "timing_exclusion_reason": TIMING_EXCLUSION_REASON_AUTHORIZED,
+                "timing_exclusion_reason": TIMING_EXCLUSION_REASON,
                 "reason": (
-                    "fiscal_year_calendar_shift: predictor Esfand FYE + 6m "
-                    "is after target Farvardin FYE; retained in audited Gate B "
-                    "membership surface only; excluded from analysis-ready / "
-                    "model-eligible datasets; not silently dropped; not "
-                    "claimed as timing-safe"
+                    "general timing rule: predictor Esfand FYE + 4 Jalali "
+                    "months is not before target Farvardin FYE; retained in "
+                    "audited Gate B membership surface only; excluded from "
+                    "analysis-ready / model-eligible datasets; not silently "
+                    "dropped; not claimed as observed publication time"
                 ),
             }
-            for t in sorted(AUTHORIZED_TIMING_EXCEPTIONS)
         ],
         "target_copy_rule": (
             "targets copied byte-for-byte from frozen Gate B pair files; "
@@ -1152,8 +1310,15 @@ def build_contract(
         ),
         "analysis_ready_rule": (
             "analysis-ready / leakage-safe modeling surface includes only "
-            "rows with assumed_before_target_fiscal_year_end=true; authorized "
-            "timing exceptions remain visible in the audited pair surface"
+            "rows with assumed_available_at_regulatory < "
+            "target_fiscal_year_end_t_plus_1; timing violations remain "
+            "visible in the audited pair surface"
+        ),
+        "timing_eligibility_rule": (
+            "timing_eligible_for_analysis = "
+            "assumed_available_at_regulatory < "
+            "target_fiscal_year_end_t_plus_1; "
+            "timing_eligible_for_model = timing_eligible_for_analysis"
         ),
         "research_pointers": {
             "last_completed_research_action_id": RESEARCH_LAST_COMPLETED,
@@ -1167,17 +1332,19 @@ def build_contract(
             "no_observed_PublishDateTime_claim",
             "no_real_available_at_assignment",
             "no_feature_selection",
+            "no_model_feature_approval_before_part4",
             "no_model_fitting",
             "no_imputation_or_scaling",
             "no_temporal_cv",
             "no_stage126",
             "stage125_not_complete",
             "audited_pairs_are_not_fully_leakage_safe_model_ready",
-            "authorized_timing_exceptions_not_timing_safe",
+            "four_month_date_is_not_observed_publication_time",
+            "six_month_methodology_superseded_not_deleted",
+            "no_ticker_specific_timing_authorization",
             "merge_requires_explicit_human_approval",
         ],
         "part3b_broad_codal_expansion_superseded": True,
-        "conservative_six_month_lag_approved": True,
         "part3c_leakage_safe_finalization_completed": True,
         "pair_level_evidence_collected": True,
         "part3b_completed": False,
@@ -1189,42 +1356,145 @@ def build_contract(
 def build_input_manifest(
     pinned: dict[str, str],
     part3b1e_locks: dict[str, str],
+    four_month_revision: dict[str, str],
 ) -> dict[str, Any]:
     return {
         "manifest_version": CONTRACT_VERSION,
         "description": (
-            "SHA-256 pins for local bulky Gate B / Stage123 inputs and the "
-            "tracked Part 3B.1E decision lock / frozen-data manifest."
+            "SHA-256 pins for local bulky Gate B / Stage123 inputs, the "
+            "historical Part 3B.1E decision lock / frozen-data manifest, and "
+            "the active four-month regulatory-lag revision decision."
         ),
         "bulky_inputs_sha256": dict(sorted(pinned.items())),
         "part3b1e_tracked_locks_sha256": dict(sorted(part3b1e_locks.items())),
+        "four_month_revision_sha256": dict(sorted(four_month_revision.items())),
         "immutability_rule": (
             "before/after SHA-256 equality required; mismatch is QC failure"
         ),
         "financial_value_reextraction_required": False,
+        "active_availability_method": AVAILABILITY_METHOD,
+        "active_lag_months": APPROVED_LAG_MONTHS,
     }
+
+
+def build_four_month_revision_decision() -> dict[str, Any]:
+    return {
+        "decision_id": (
+            "stage125-part3c-four-month-regulatory-lag-revision"
+        ),
+        "decision_authority": "explicit_human_supervisor_approval",
+        "decision_status": "active",
+        "supersedes_active_methodology": "fixed_conservative_six_month_lag",
+        "historical_six_month_decision_retained": True,
+        "historical_six_month_decision_active": False,
+        "historical_six_month_decision_artifact": PART3B1E_DECISION_LOCK_REL,
+        "active_availability_method": AVAILABILITY_METHOD,
+        "active_lag_calendar": "Jalali",
+        "active_lag_months": APPROVED_LAG_MONTHS,
+        "active_assumed_availability_field": ASSUMED_FIELD_NAME,
+        "availability_date_semantics": AVAILABILITY_DATE_SEMANTICS,
+        "assumed_available_at_formula": (
+            "fiscal_year_end_t + 4 Jalali calendar months"
+        ),
+        "scientific_rationale": (
+            "Annual audited financial statements are operationally assumed "
+            "available four Jalali calendar months after fiscal-year-end. "
+            "This is a methodological regulatory-deadline assumption. "
+            "It is not the observed publication date of any specific "
+            "company report."
+        ),
+        "financial_data_status": "researcher_verified_frozen",
+        "financial_value_reextraction_required": False,
+        "row_level_publish_datetime_collection_required": False,
+        "Stage126_authorized": False,
+        "modeling_authorized": False,
+        "feature_selection_authorized": False,
+        "timing_eligibility_rule": (
+            "timing_eligible_for_analysis = "
+            "assumed_available_at_regulatory < "
+            "target_fiscal_year_end_t_plus_1; "
+            "timing_eligible_for_model = timing_eligible_for_analysis"
+        ),
+        "timing_exclusion_reason": TIMING_EXCLUSION_REASON,
+        "no_ticker_specific_authorization": True,
+        "contract_version": CONTRACT_VERSION,
+        "research_pointers": {
+            "last_completed_research_action_id": RESEARCH_LAST_COMPLETED,
+            "next_research_action_id": RESEARCH_NEXT,
+        },
+    }
+
+
+def build_four_month_revision_readme() -> str:
+    return (
+        "# Stage125 Part 3C — Four-Month Regulatory Lag Revision\n\n"
+        "**Status:** active human-approved methodological revision. "
+        "Supersedes the Part 3B.1E six-month active methodology while "
+        "retaining the six-month decision artifact as historical provenance.\n\n"
+        "## Active principles\n\n"
+        "- `decision_authority = explicit_human_supervisor_approval`\n"
+        "- `decision_status = active`\n"
+        "- `supersedes_active_methodology = fixed_conservative_six_month_lag`\n"
+        "- `historical_six_month_decision_retained = true`\n"
+        "- `historical_six_month_decision_active = false`\n"
+        f"- `active_availability_method = {AVAILABILITY_METHOD}`\n"
+        "- `active_lag_calendar = Jalali`\n"
+        f"- `active_lag_months = {APPROVED_LAG_MONTHS}`\n"
+        f"- `active_assumed_availability_field = {ASSUMED_FIELD_NAME}`\n"
+        f"- `availability_date_semantics = {AVAILABILITY_DATE_SEMANTICS}`\n"
+        "- `financial_data_status = researcher_verified_frozen`\n"
+        "- `financial_value_reextraction_required = false`\n"
+        "- `row_level_publish_datetime_collection_required = false`\n"
+        "- `Stage126_authorized = false`\n"
+        "- `modeling_authorized = false`\n\n"
+        "## Scientific rationale\n\n"
+        "Annual audited financial statements are operationally assumed "
+        "available four Jalali calendar months after fiscal-year-end.\n\n"
+        "This is a methodological regulatory-deadline assumption. "
+        "It is **not** the observed publication date of any specific "
+        "company report.\n\n"
+        "## Timing eligibility\n\n"
+        "General deterministic rule for every pair "
+        "(no ticker-specific authorization):\n\n"
+        "```text\n"
+        "timing_eligible_for_analysis =\n"
+        "  assumed_available_at_regulatory < target_fiscal_year_end_t_plus_1\n"
+        "timing_eligible_for_model = timing_eligible_for_analysis\n"
+        "```\n\n"
+        "Violations remain in the audited pair surface and are excluded from "
+        "analysis-ready outputs with "
+        f"`timing_exclusion_reason = {TIMING_EXCLUSION_REASON}`.\n"
+    )
 
 
 def build_readme(contract: dict[str, Any]) -> str:
     return (
         "# Stage125 Part 3C — Leakage-Safe Dataset Finalization\n\n"
         "**Status:** audited pair datasets and timing-eligible "
-        "leakage-safe analysis-ready datasets finalized under the locked "
-        "six-month Jalali lag. Stage125 remains incomplete. "
-        "No modeling / Stage126.\n\n"
+        "leakage-safe analysis-ready datasets finalized under the active "
+        "four-Jalali-calendar-month regulatory lag. The six-month "
+        "methodology is superseded (historical artifact retained). "
+        "Stage125 remains incomplete. No modeling / Stage126. "
+        "Part 3C does **not** perform feature selection.\n\n"
         "## Terminology\n\n"
         "- **Audited pair datasets** = full frozen Gate B membership "
-        "(authorized timing exceptions remain visible).\n"
+        "(timing violations remain visible).\n"
         "- **Leakage-safe analysis-ready datasets** = timing-eligible subset "
-        "only (`assumed_before_target_fiscal_year_end=true`).\n"
+        "only (`assumed_available_at_regulatory < "
+        "target_fiscal_year_end_t_plus_1`).\n"
         "- Gate B membership preservation refers to the **audit population**, "
         "not necessarily the analysis-ready population.\n"
-        "- The authorized `رمپنا|1396` → `رمپنا|1397` exception is **not** "
-        "timing-safe and is **not** analysis/model eligible.\n\n"
+        "- `رمپنا|1396` → `رمپنا|1397` fails the four-month timing rule and "
+        "remains **audit-only** (not analysis/model eligible).\n"
+        "- The four-month date is a **regulatory/methodological assumption**, "
+        "not an observed publication timestamp.\n\n"
         "## Methodology\n\n"
         "- Part 3B broad CODAL expansion is **superseded**.\n"
-        "- Six-month conservative Jalali lag is **approved** "
-        f"(`conservative_lag_months={APPROVED_LAG_MONTHS}`).\n"
+        "- Active lag is **four Jalali calendar months** "
+        f"(`regulatory_lag_months={APPROVED_LAG_MONTHS}`, "
+        f"`availability_method={AVAILABILITY_METHOD}`).\n"
+        "- Six-month active methodology is **superseded**; the Part 3B.1E "
+        "six-month decision artifact remains **historical**.\n"
         "- Part 3C leakage-safe finalization is **completed** for all four "
         "locked Gate B sample designs.\n"
         "- Financial data remain **researcher-verified and frozen** "
@@ -1235,15 +1505,17 @@ def build_readme(contract: dict[str, Any]) -> str:
         "- Targets are copied from frozen Gate B pair files; never recomputed.\n"
         "- Predictors join Stage123 on `predictor_row_key_t` → `row_key` "
         "(fail-closed one-to-one).\n"
-        "- Predictor feature matrix uses an **explicit whitelist** only.\n\n"
+        "- Financial variables are **predictor candidates pending Part 4**; "
+        "zero fields are approved for model entry in Part 3C.\n\n"
         "## Audited Gate B membership (complete pair surface)\n\n"
-        "| Design | audited pairs | companies | positive | negative | excluded |\n"
+        "| Design | audited pairs | companies | positive | negative | "
+        "timing exclusions |\n"
         "|---|---:|---:|---:|---:|---:|\n"
         + "".join(
             f"| `{s['sample_design']}` | {s['audited_pairs']} | "
             f"{s['audited_companies']} | {s['audited_positive']} | "
             f"{s['audited_negative']} | "
-            f"{s['excluded_timing_exception_count']} |\n"
+            f"{s['timing_exclusions']} |\n"
             for s in contract["sample_summaries"]
         )
         + "\n## Leakage-safe analysis-ready (timing-eligible)\n\n"
@@ -1261,7 +1533,9 @@ def build_readme(contract: dict[str, Any]) -> str:
         "  - `audited_pairs_*.csv` — complete audited pair datasets\n"
         "  - `analysis_ready_*.csv` — leakage-safe analysis-ready datasets\n"
         "- Tracked contracts / QC / hashes / column-role map / audits in "
-        "`project/stage125/`.\n\n"
+        "`project/stage125/`.\n"
+        "- Four-month revision decision: "
+        f"`{F_FOUR_MONTH_DECISION}` / `{F_FOUR_MONTH_README}`.\n\n"
         "## Research pointers\n\n"
         f"- `last_completed_research_action_id="
         f"{RESEARCH_LAST_COMPLETED}`\n"
@@ -1278,6 +1552,17 @@ def build_all(
     """
     pinned = frozen_bulky_hashes(repo_root)
     part3b1e_locks = require_part3b1e_locks(repo_root)
+    four_month_decision = build_four_month_revision_decision()
+    validate_four_month_revision_decision(four_month_decision)
+    four_month_readme = build_four_month_revision_readme()
+    four_month_revision = {
+        FOUR_MONTH_REVISION_DECISION_REL: sha256_bytes(
+            _json_str(four_month_decision).encode("utf-8")
+        ),
+        FOUR_MONTH_REVISION_README_REL: sha256_bytes(
+            four_month_readme.encode("utf-8")
+        ),
+    }
     stage123 = load_stage123_by_row_key(repo_root)
 
     bulky: dict[str, str] = {}
@@ -1327,6 +1612,7 @@ def build_all(
     contract = build_contract(
         pinned_inputs=pinned,
         part3b1e_locks=part3b1e_locks,
+        four_month_revision=four_month_revision,
         output_hashes={
             f"{BULKY_OUTPUT_DIR_REL}/{k}": sha256_bytes(v.encode("utf-8"))
             for k, v in bulky.items()
@@ -1337,10 +1623,13 @@ def build_all(
     content = {
         F_CONTRACT: _json_str(contract),
         F_INPUT_MANIFEST: _json_str(
-            build_input_manifest(pinned, part3b1e_locks)
+            build_input_manifest(pinned, part3b1e_locks, four_month_revision)
         ),
         F_COLUMN_ROLES: _csv_str(
-            ["column_name", "role", "enters_model_feature_matrix", "notes"],
+            [
+                "column_name", "role", "admission_status",
+                "enters_model_feature_matrix", "notes",
+            ],
             role_rows,
         ),
         F_SAMPLE_SUMMARY: _csv_str(
@@ -1352,11 +1641,12 @@ def build_all(
                 "analysis_ready_pairs", "analysis_ready_companies",
                 "analysis_ready_positive", "analysis_ready_negative",
                 "excluded_timing_exception_count",
+                "timing_exclusions",
                 "columns",
                 "audited_output_file", "audited_output_sha256",
                 "analysis_ready_output_file", "analysis_ready_output_sha256",
                 "output_file", "output_sha256",
-                "timing_relation_exceptions",
+                "timing_relation_violations",
             ],
             summaries,
         ),
@@ -1373,10 +1663,10 @@ def build_all(
                 "ticker", "fiscal_year_t", "target_year",
                 "predictor_join", "target_join", "ticker_identity_exact",
                 "t_to_t_plus_1_exact",
-                "assumed_available_at_conservative_jalali",
+                "assumed_available_at_regulatory_jalali",
                 "target_fiscal_year_end_t_plus_1_jalali",
                 "assumed_before_target_fiscal_year_end",
-                "timing_relation_exception",
+                "timing_relation_violation",
                 "timing_eligible_for_analysis",
                 "timing_eligible_for_model",
                 "timing_exclusion_reason",
@@ -1386,11 +1676,14 @@ def build_all(
             all_audit,
         ),
         F_README: build_readme(contract),
+        F_FOUR_MONTH_DECISION: _json_str(four_month_decision),
+        F_FOUR_MONTH_README: four_month_readme,
     }
     extras = {
         "contract": contract,
         "pinned": pinned,
         "part3b1e_locks": part3b1e_locks,
+        "four_month_revision": four_month_revision,
         "summaries": summaries,
         "role_rows": role_rows,
         "audit_rows": all_audit,
@@ -1428,8 +1721,10 @@ def build_qc_assertions(
     audit_rows: list[dict[str, Any]],
     role_rows: list[dict[str, str]],
     bulky_payloads: dict[str, str],
+    content_payloads: dict[str, str] | None = None,
 ) -> list[dict[str, str]]:
     assertions: list[dict[str, str]] = []
+    content_payloads = content_payloads or {}
 
     _assert(
         assertions, "baseline_merge_sha_exact",
@@ -1441,28 +1736,78 @@ def build_qc_assertions(
         f"baseline={EXPECTED_BASELINE_COMMIT} ancestor_of_HEAD=true",
     )
     _assert(
-        assertions, "part3b1e_decision_lock_present",
-        contract.get("part3b1e_decision_lock_present") is True
+        assertions, "historical_six_month_decision_retained",
+        contract.get("historical_six_month_decision_retained") is True
         and (repo_root / PART3B1E_DECISION_LOCK_REL).is_file(),
         PART3B1E_DECISION_LOCK_REL,
     )
+    decision_text = content_payloads.get(F_FOUR_MONTH_DECISION, "")
+    decision = (
+        json.loads(decision_text) if decision_text else
+        build_four_month_revision_decision()
+    )
     _assert(
-        assertions, "six_month_lag_exact",
-        contract.get("six_month_lag_exact") == APPROVED_LAG_MONTHS,
-        str(contract.get("six_month_lag_exact")),
+        assertions, "explicit_human_four_month_decision_recorded",
+        decision.get("decision_authority")
+        == "explicit_human_supervisor_approval"
+        and decision.get("decision_status") == "active",
+        str(decision.get("decision_authority")),
+    )
+    _assert(
+        assertions, "six_month_methodology_superseded",
+        contract.get("six_month_lag_superseded") is True
+        and contract.get("historical_six_month_decision_active") is False
+        and decision.get("supersedes_active_methodology")
+        == "fixed_conservative_six_month_lag",
+        "superseded=true; historical_active=false",
+    )
+    _assert(
+        assertions, "active_lag_months_exactly_four",
+        contract.get("active_lag_months") == APPROVED_LAG_MONTHS
+        and decision.get("active_lag_months") == APPROVED_LAG_MONTHS,
+        str(contract.get("active_lag_months")),
+    )
+    _assert(
+        assertions, "active_method_fixed_regulatory_lag",
+        contract.get("availability_method") == AVAILABILITY_METHOD
+        and decision.get("active_availability_method") == AVAILABILITY_METHOD,
+        AVAILABILITY_METHOD,
     )
     _assert(
         assertions, "Jalali_calendar_used",
-        contract.get("Jalali_calendar_used") is True,
-        "jdatetime calendar months via Part 3B.1E",
+        contract.get("Jalali_calendar_used") is True
+        and contract.get("active_lag_calendar") == "Jalali",
+        "Jalali",
     )
     _assert(
-        assertions, "all_input_hashes_exact",
+        assertions, "four_month_date_semantics_not_observed",
+        contract.get("availability_date_semantics")
+        == AVAILABILITY_DATE_SEMANTICS
+        and contract.get("is_observed_publication_timestamp") is False,
+        AVAILABILITY_DATE_SEMANTICS,
+    )
+    old_fields_absent = True
+    for name, text in bulky_payloads.items():
+        header = next(csv.reader(io.StringIO(text)), [])
+        if any(f in header for f in OBSOLETE_ACTIVE_CONSERVATIVE_FIELDS):
+            old_fields_absent = False
+            break
+    audit_header_ok = not any(
+        f in (content_payloads.get(F_LEAKAGE_AUDIT, "").splitlines() or [""])[0]
+        for f in OBSOLETE_ACTIVE_CONSERVATIVE_FIELDS
+    )
+    _assert(
+        assertions, "old_active_conservative_field_absent",
+        old_fields_absent and audit_header_ok,
+        "assumed_available_at_conservative* / conservative_lag_months absent",
+    )
+    _assert(
+        assertions, "all_frozen_input_hashes_exact",
         pinned_before == FROZEN_BULKY_INPUTS and pinned_after == pinned_before,
         f"count={len(pinned_after)}",
     )
     _assert(
-        assertions, "frozen_financial_values_unchanged",
+        assertions, "financial_values_unchanged",
         pinned_before[
             "project/stage123/modeling_all_rows_stage123.csv"
         ] == pinned_after[
@@ -1475,43 +1820,57 @@ def build_qc_assertions(
         for spec in DESIGN_SPECS.values()
     )
     _assert(
-        assertions, "frozen_targets_unchanged",
+        assertions, "targets_unchanged",
         gate_b_targets_ok,
         "Gate B eligible pair SHA-256 unchanged",
     )
     _assert(
-        assertions, "four_locked_sample_designs_present",
+        assertions, "audited_membership_unchanged",
         set(contract["four_locked_sample_designs"]) == set(DESIGN_SPECS),
         ",".join(contract["four_locked_sample_designs"]),
     )
 
     summaries = {s["sample_design"]: s for s in contract["sample_summaries"]}
-    counts_ok = True
+    audited_counts_ok = True
+    analysis_counts_ok = True
     detail_counts = []
     for design, spec in DESIGN_SPECS.items():
         s = summaries[design]
-        ok = (
-            int(s["pairs"]) == spec["pairs"]
-            and int(s["companies"]) == spec["companies"]
-            and int(s["positive"]) == spec["positive"]
-            and int(s["negative"]) == spec["negative"]
+        a_ok = (
+            int(s["audited_pairs"]) == spec["pairs"]
+            and int(s["audited_companies"]) == spec["companies"]
+            and int(s["audited_positive"]) == spec["positive"]
+            and int(s["audited_negative"]) == spec["negative"]
         )
-        counts_ok = counts_ok and ok
+        r_ok = (
+            int(s["analysis_ready_pairs"]) == spec["analysis_ready_pairs"]
+            and int(s["analysis_ready_companies"])
+            == spec["analysis_ready_companies"]
+            and int(s["analysis_ready_positive"])
+            == spec["analysis_ready_positive"]
+            and int(s["analysis_ready_negative"])
+            == spec["analysis_ready_negative"]
+            and int(s["timing_exclusions"]) == spec["timing_exclusions"]
+        )
+        audited_counts_ok = audited_counts_ok and a_ok
+        analysis_counts_ok = analysis_counts_ok and r_ok
         detail_counts.append(
-            f"{design}:{s['pairs']}/{s['companies']}/"
-            f"{s['positive']}/{s['negative']}"
+            f"{design}:audited={s['audited_pairs']}/"
+            f"ready={s['analysis_ready_pairs']}/excl={s['timing_exclusions']}"
         )
     _assert(
-        assertions, "all_pair_counts_exact", counts_ok,
+        assertions, "all_pair_counts_exact", audited_counts_ok,
         ";".join(detail_counts) + " (audited Gate B membership)",
     )
     _assert(
-        assertions, "all_positive_negative_counts_exact", counts_ok,
-        ";".join(detail_counts) + " (audited Gate B membership)",
+        assertions, "all_positive_negative_counts_exact",
+        audited_counts_ok and analysis_counts_ok,
+        ";".join(detail_counts),
     )
     _assert(
-        assertions, "all_company_counts_exact", counts_ok,
-        ";".join(detail_counts) + " (audited Gate B membership)",
+        assertions, "all_company_counts_exact",
+        audited_counts_ok and analysis_counts_ok,
+        ";".join(detail_counts),
     )
 
     pred_join_ok = all(a["predictor_join"] == "one_to_one" for a in audit_rows)
@@ -1529,53 +1888,73 @@ def build_qc_assertions(
         "all pairs",
     )
 
-    unexpected = [
-        a for a in audit_rows
-        if a["assumed_before_target_fiscal_year_end"] != "true"
-        and a["timing_relation_exception"] != "true"
+    violations = [
+        a for a in audit_rows if a["timing_relation_violation"] == "true"
     ]
-    authorized_exc = [
-        a for a in audit_rows if a["timing_relation_exception"] == "true"
+    unexpected_extra = [
+        a for a in violations
+        if not (
+            a["predictor_row_key_t"] == "رمپنا|1396"
+            and a["target_row_key_t_plus_1"] == "رمپنا|1397"
+        )
     ]
     _assert(
-        assertions, "assumed_date_before_target_fiscal_year_end",
-        len(unexpected) == 0
-        and len(authorized_exc) == len(DESIGN_SPECS) * len(
-            AUTHORIZED_TIMING_EXCEPTIONS
-        ),
-        f"unexpected_violations={len(unexpected)} "
-        f"authorized_exceptions={len(authorized_exc)} "
-        f"(audit surface; exceptions not analysis-ready)",
+        assertions, "all_timing_violations_visible_in_audit",
+        all(
+            a["assumed_before_target_fiscal_year_end"] == "false"
+            and a["timing_eligible_for_analysis"] == "false"
+            and a["timing_eligible_for_model"] == "false"
+            and a["timing_exclusion_reason"] == TIMING_EXCLUSION_REASON
+            and a["row_silently_dropped"] == "false"
+            for a in violations
+        )
+        and len(violations) == len(DESIGN_SPECS) * EXPECTED_TIMING_VIOLATIONS_PER_DESIGN,
+        f"violations={len(violations)}",
+    )
+    _assert(
+        assertions, "exactly_one_timing_violation_per_design",
+        all(
+            int(summaries[d]["timing_exclusions"])
+            == EXPECTED_TIMING_VIOLATIONS_PER_DESIGN
+            for d in DESIGN_SPECS
+        )
+        and len(unexpected_extra) == 0,
+        f"extra_unexpected={len(unexpected_extra)}",
     )
     rampna_audit_visible = [
-        a for a in authorized_exc
+        a for a in violations
         if a["predictor_row_key_t"] == "رمپنا|1396"
         and a["target_row_key_t_plus_1"] == "رمپنا|1397"
-        and a["timing_eligible_for_analysis"] == "false"
-        and a["timing_eligible_for_model"] == "false"
-        and a["timing_exclusion_reason"] == TIMING_EXCLUSION_REASON_AUTHORIZED
-        and a["assumed_before_target_fiscal_year_end"] == "false"
-        and a["row_silently_dropped"] == "false"
+        and a["assumed_available_at_regulatory_jalali"] == "1397-04-29"
+        and a["target_fiscal_year_end_t_plus_1_jalali"] == "1397-01-31"
     ]
     _assert(
-        assertions, "authorized_rampna_exception_visible_in_audit",
-        len(rampna_audit_visible) == len(DESIGN_SPECS),
-        f"visible_in_audit={len(rampna_audit_visible)}",
+        assertions, "only_rampna_1396_to_1397_excluded",
+        len(rampna_audit_visible) == len(DESIGN_SPECS)
+        and len(unexpected_extra) == 0,
+        f"rampna_visible={len(rampna_audit_visible)}",
     )
 
     analysis_ready_ok = True
     reconcile_ok = True
+    four_outputs_present = True
     analysis_details: list[str] = []
-    for design in DESIGN_SPECS:
+    for design, spec in DESIGN_SPECS.items():
         s = summaries[design]
         audited_n = int(s["audited_pairs"])
         ready_n = int(s["analysis_ready_pairs"])
-        excl_n = int(s["excluded_timing_exception_count"])
+        excl_n = int(s["timing_exclusions"])
         if audited_n != ready_n + excl_n:
             reconcile_ok = False
+        if ANALYSIS_READY_OUTPUT_FILES[design] not in bulky_payloads:
+            four_outputs_present = False
+            analysis_ready_ok = False
+            continue
         analysis_text = bulky_payloads[ANALYSIS_READY_OUTPUT_FILES[design]]
         analysis_rows = list(csv.DictReader(io.StringIO(analysis_text)))
         if len(analysis_rows) != ready_n:
+            analysis_ready_ok = False
+        if len(analysis_rows) != spec["analysis_ready_pairs"]:
             analysis_ready_ok = False
         if any(
             r.get("assumed_before_target_fiscal_year_end") != "true"
@@ -1583,7 +1962,7 @@ def build_qc_assertions(
         ):
             analysis_ready_ok = False
         if any(
-            r.get("timing_relation_exception") == "true"
+            r.get("timing_relation_violation") == "true"
             for r in analysis_rows
         ):
             analysis_ready_ok = False
@@ -1593,22 +1972,31 @@ def build_qc_assertions(
             for r in analysis_rows
         ):
             analysis_ready_ok = False
+        if any(
+            r.get("predictor_row_key_t") == "رمپنا|1396"
+            and r.get("target_row_key_t_plus_1") == "رمپنا|1397"
+            for r in analysis_rows
+        ):
+            analysis_ready_ok = False
         analysis_details.append(
             f"{design}:audited={audited_n}/ready={ready_n}/excl={excl_n}"
         )
     _assert(
-        assertions, "analysis_ready_assumed_before_target_fye_true",
-        analysis_ready_ok,
-        ";".join(analysis_details),
+        assertions, "four_analysis_ready_outputs_present",
+        four_outputs_present
+        and len([
+            n for n in bulky_payloads if n.startswith("analysis_ready_")
+        ]) == len(DESIGN_SPECS),
+        str(len(DESIGN_SPECS)),
     )
     _assert(
-        assertions, "no_authorized_timing_exception_in_analysis_ready",
+        assertions, "all_analysis_ready_rows_timing_safe",
         analysis_ready_ok,
         ";".join(analysis_details),
     )
     _assert(
         assertions, "audit_and_analysis_ready_counts_reconcile",
-        reconcile_ok and analysis_ready_ok,
+        reconcile_ok and analysis_ready_ok and analysis_counts_ok,
         ";".join(analysis_details),
     )
     _assert(
@@ -1623,11 +2011,6 @@ def build_qc_assertions(
         assertions, "no_target_recalculation",
         all(a["target_value_source"] == "frozen_gate_b_pair_copy" for a in audit_rows),
         "gate_b_pair_copy",
-    )
-    _assert(
-        assertions, "target_values_byte_or_semantically_identical",
-        all(a["target_value_source"] == "frozen_gate_b_pair_copy" for a in audit_rows),
-        "copied from frozen Gate B",
     )
     _assert(
         assertions, "no_observed_PublishDateTime_claim",
@@ -1646,23 +2029,30 @@ def build_qc_assertions(
         for r in role_rows
         if r["enters_model_feature_matrix"] == "true"
     }
+    candidates = [
+        r for r in role_rows if r["role"] == "predictor_candidate"
+    ]
     leakage_in_features = feature_roles & FORBIDDEN_FROM_FEATURE_SURFACE
-    eligibility_in_features = feature_roles & TIMING_ELIGIBILITY_AUDIT_COLS
     _assert(
-        assertions, "forbidden_target_columns_excluded_from_feature_surface",
-        not leakage_in_features,
-        f"overlap={sorted(leakage_in_features)[:8]}",
+        assertions, "forbidden_target_fields_not_model_features",
+        not leakage_in_features and not feature_roles,
+        f"approved={sorted(feature_roles)[:8]}",
     )
     _assert(
-        assertions, "timing_eligibility_fields_excluded_from_feature_surface",
-        not eligibility_in_features,
-        f"overlap={sorted(eligibility_in_features)}",
+        assertions, "zero_features_approved_before_part4",
+        len(feature_roles) == 0
+        and contract.get("zero_features_approved_before_part4") is True,
+        f"approved_count={len(feature_roles)}",
     )
     _assert(
-        assertions, "predictor_feature_whitelist_exact",
-        feature_roles == PREDICTOR_FEATURE_WHITELIST,
-        f"feature_count={len(feature_roles)} "
-        f"whitelist={len(PREDICTOR_FEATURE_WHITELIST)}",
+        assertions, "all_predictor_candidates_pending_part4",
+        len(candidates) == len(PREDICTOR_CANDIDATE_INVENTORY)
+        and all(
+            r["admission_status"] == ADMISSION_STATUS_PENDING_PART4
+            and r["enters_model_feature_matrix"] == "false"
+            for r in candidates
+        ),
+        f"candidates={len(candidates)}",
     )
     expected_bulky = len(DESIGN_SPECS) * 2  # audited + analysis-ready
     _assert(
@@ -1671,8 +2061,6 @@ def build_qc_assertions(
         str(len(contract.get("bulky_output_sha256") or {})),
     )
 
-    # Determinism probe: rebuild byte strings already in bulky_payloads;
-    # second serialization of same rows must match (ordering fixed).
     det_ok = all(
         sha256_bytes(text.encode("utf-8"))
         == contract["bulky_output_sha256"][
@@ -1680,7 +2068,7 @@ def build_qc_assertions(
         ]
         for name, text in bulky_payloads.items()
     )
-    _assert(assertions, "build_deterministic", det_ok, "sha256 stable")
+    _assert(assertions, "deterministic_rebuild", det_ok, "sha256 stable")
     _assert(
         assertions, "network_requests_zero",
         network_attempts == 0,
@@ -1699,51 +2087,73 @@ def build_qc_assertions(
         "false",
     )
 
-    # Non-tautological policy probes.
-    lag5 = False
+    # Non-tautological policy probes for the active four-month guard.
+    lag_accept = False
     try:
-        part3b1e.require_approved_lag_months(5)
-    except part3b1e.AuthorizationError:
-        lag5 = True
-    _assert(assertions, "policy_lag_five_rejected", lag5, "5")
-    lag7 = False
-    try:
-        part3b1e.require_approved_lag_months(7)
-    except part3b1e.AuthorizationError:
-        lag7 = True
-    _assert(assertions, "policy_lag_seven_rejected", lag7, "7")
+        require_approved_regulatory_lag_months(4)
+        lag_accept = True
+    except AuthorizationError:
+        lag_accept = False
+    _assert(assertions, "policy_lag_four_accepted", lag_accept, "4")
+    for months in (3, 5, 6, 7):
+        rejected = False
+        try:
+            require_approved_regulatory_lag_months(months)
+        except AuthorizationError:
+            rejected = True
+        _assert(
+            assertions, f"policy_lag_{months}_rejected",
+            rejected, str(months),
+        )
 
     pub_reject = False
     try:
-        reject_assumed_date_as_observed_field("PublishDateTime", "1402-06-29")
+        reject_assumed_date_as_observed_field("PublishDateTime", "1402-04-29")
     except AuthorizationError:
         pub_reject = True
     _assert(assertions, "policy_PublishDateTime_rejected", pub_reject, "PublishDateTime")
 
     avail_reject = False
     try:
-        reject_assumed_date_as_observed_field("available_at", "1402-06-29")
+        reject_assumed_date_as_observed_field("available_at", "1402-04-29")
     except AuthorizationError:
         avail_reject = True
     _assert(assertions, "policy_available_at_rejected", avail_reject, "available_at")
 
-    sample = part3b1e.compute_assumed_available_at_conservative(
+    sample = compute_assumed_available_at_regulatory(
         jdatetime.date(1401, 12, 29)
     )
     _assert(
-        assertions, "formula_fiscal_year_end_plus_six_months",
-        sample["assumed_available_at_conservative_jalali"] == "1402-06-29"
+        assertions, "formula_fiscal_year_end_plus_four_months",
+        sample["assumed_available_at_regulatory_jalali"] == "1402-04-29"
         and sample["is_observed_publication_timestamp"] is False,
-        sample["assumed_available_at_conservative_jalali"],
+        sample["assumed_available_at_regulatory_jalali"],
     )
-    # Jalali clamp probe: 31-day month into shorter month.
-    clamped = part3b1e.add_jalali_calendar_months(
+    rampna_assumed = compute_assumed_available_at_regulatory(
+        jdatetime.date(1396, 12, 29)
+    )
+    _assert(
+        assertions, "rampna_four_month_date_exact",
+        rampna_assumed["assumed_available_at_regulatory_jalali"] == "1397-04-29"
+        and not evaluate_timing_relation(
+            jdatetime.date(1397, 4, 29), jdatetime.date(1397, 1, 31),
+        ),
+        "1396/12/29 + 4m = 1397/04/29; not before 1397/01/31",
+    )
+    clamped = add_jalali_calendar_months(
         jdatetime.date(1401, 6, 31), APPROVED_LAG_MONTHS,
     )
     _assert(
         assertions, "jalali_day_clamping_probe",
-        clamped == jdatetime.date(1401, 12, 29),
+        clamped == jdatetime.date(1401, 10, 30),
         str(clamped),
+    )
+    import src.stage125_part3c_leakage_safe_dataset_finalization as _mod
+    _assert(
+        assertions, "no_ticker_specific_authorization_mechanism",
+        not hasattr(_mod, "AUTHORIZED_TIMING_EXCEPTIONS")
+        and not hasattr(_mod, "TIMING_EXCLUSION_REASON_AUTHORIZED"),
+        "AUTHORIZED_TIMING_EXCEPTIONS absent",
     )
     _assert(
         assertions, "forbidden_surfaces_absent",
@@ -1823,6 +2233,7 @@ def run(
             audit_rows=extras["audit_rows"],
             role_rows=extras["role_rows"],
             bulky_payloads=bulky,
+            content_payloads=content,
         )
         failed = sum(1 for a in assertions if a["status"] != "PASS")
         source_commit = _git(
@@ -1857,10 +2268,16 @@ def run(
             "part3c_network_requests_attempted": network_attempts,
             "broad_codal_capture_stopped": True,
             "financial_data_researcher_verified_frozen": True,
-            "conservative_availability_lag_locked": True,
-            "conservative_lag_months": APPROVED_LAG_MONTHS,
-            "row_level_publish_datetime_collection_required": False,
+            "active_availability_method": AVAILABILITY_METHOD,
+            "active_availability_lag_months": APPROVED_LAG_MONTHS,
+            "four_month_regulatory_lag_locked": True,
+            "six_month_lag_superseded": True,
+            "historical_six_month_decision_retained": True,
+            "historical_six_month_decision_active": False,
+            # Historical Part 3B.1E markers retained as provenance only.
             "conservative_six_month_lag_decision_locked": True,
+            "conservative_availability_lag_locked": True,
+            "row_level_publish_datetime_collection_required": False,
             "part3a_protocol_locked": True,
             "part3a_decision_locked": True,
             "part3b0_readiness": True,
@@ -1910,8 +2327,8 @@ def run(
             "current_stage": CURRENT_STAGE,
             "description": (
                 "Stage125 Part 3C audited-pair + timing-eligible "
-                "analysis-ready dataset finalization (six-month Jalali lag; "
-                "frozen Gate B samples; offline)."
+                "analysis-ready dataset finalization (four-month Jalali "
+                "regulatory lag; frozen Gate B samples; offline)."
             ),
             "generated_at": source_commit,
             "code_commit": source_commit,
@@ -1927,7 +2344,11 @@ def run(
             "part3c_leakage_safe_finalization_completed": True,
             "broad_codal_capture_stopped": True,
             "financial_data_researcher_verified_frozen": True,
-            "conservative_lag_months": APPROVED_LAG_MONTHS,
+            "active_availability_method": AVAILABILITY_METHOD,
+            "active_availability_lag_months": APPROVED_LAG_MONTHS,
+            "four_month_regulatory_lag_locked": True,
+            "six_month_lag_superseded": True,
+            "historical_six_month_decision_retained": True,
             "part3b_completed": False,
             "modeling_started": False,
             "stage126_started": False,

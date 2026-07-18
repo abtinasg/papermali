@@ -997,8 +997,13 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["broad_codal_capture_stopped"] is True
     assert state["financial_data_researcher_verified_frozen"] is True
     assert state["conservative_availability_lag_locked"] is True
-    assert state["conservative_lag_months"] == 6
     assert state["row_level_publish_datetime_collection_required"] is False
+    assert state["active_availability_method"] == "fixed_regulatory_lag"
+    assert state["active_availability_lag_months"] == 4
+    assert state["four_month_regulatory_lag_locked"] is True
+    assert state["six_month_lag_superseded"] is True
+    assert state["historical_six_month_decision_retained"] is True
+    assert state["historical_six_month_decision_active"] is False
     assert state["predictor_available_at_evidence_collected"] is False
     assert state["pilot_cutoff_provenance_resolved"] is False
     assert state["evidence_collected"] is True
@@ -1011,6 +1016,9 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["part3c_leakage_safe_finalization_completed"] is True
     assert state["network_extraction_performed"] is True
     assert state["modeling_started"] is False
+    # Active lag must not ambiguously remain six months.
+    assert "conservative_lag_months" not in state
+    assert state["active_availability_lag_months"] == 4
 
 
 # ---- Stage125 Part 3B.0 artifact-only + workflow markers ------------------- #
@@ -1088,7 +1096,9 @@ def test_stage125_part3b0_generated_files_are_artifact_only(path):
     "project/stage125/stage125_part3b1e_conservative_lag_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1e.json",
     "project/stage125/README_STAGE125_PART3C_LEAKAGE_SAFE_DATASET.md",
+    "project/stage125/README_STAGE125_PART3C_FOUR_MONTH_LAG_REVISION.md",
     "project/stage125/part3c_leakage_safe_dataset_contract_stage125.json",
+    "project/stage125/part3c_four_month_regulatory_lag_revision_decision_stage125.json",
     "project/stage125/part3c_input_hash_manifest_stage125.json",
     "project/stage125/part3c_column_role_map_stage125.csv",
     "project/stage125/part3c_sample_summary_stage125.csv",
@@ -1318,8 +1328,13 @@ def test_extract_qc_workflow_markers_part3c_scope():
         "broad_codal_capture_stopped": True,
         "financial_data_researcher_verified_frozen": True,
         "conservative_availability_lag_locked": True,
-        "conservative_lag_months": 6,
         "row_level_publish_datetime_collection_required": False,
+        "active_availability_method": "fixed_regulatory_lag",
+        "active_availability_lag_months": 4,
+        "four_month_regulatory_lag_locked": True,
+        "six_month_lag_superseded": True,
+        "historical_six_month_decision_retained": True,
+        "historical_six_month_decision_active": False,
         "predictor_available_at_evidence_collected": False,
         "pilot_cutoff_provenance_resolved": False,
         "evidence_collected": True,
@@ -1337,6 +1352,9 @@ def test_extract_qc_workflow_markers_part3c_scope():
     assert got["part3c_leakage_safe_finalization_completed"] is True
     assert got["pair_level_evidence_collected"] is True
     assert got["modeling_started"] is False
+    assert got["active_availability_lag_months"] == 4
+    assert got["four_month_regulatory_lag_locked"] is True
+    assert got["six_month_lag_superseded"] is True
 
 
 def test_qc_source_test_override_part3c():

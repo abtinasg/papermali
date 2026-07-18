@@ -16,16 +16,28 @@
 Versioned methodological addendum (does not silently rewrite Part 0 history):
 
 - Part 3B broad CODAL expansion is **superseded**.
-- Six-month conservative Jalali lag is **approved** and operationalized.
+- Originally operationalized under the Part 3B.1E six-month lag
+  (historical; see Addendum B).
+
+### Addendum B — Four-month regulatory lag revision (2026-07-19)
+
+Explicit human-approved revision of the active availability specification:
+
+- Active lag is **four Jalali calendar months**
+  (`fixed_regulatory_lag` / `assumed_available_at_regulatory`).
+- Six-month active methodology is **superseded**; Part 3B.1E six-month
+  decision artifacts remain **historical**.
 - Part 3C leakage-safe dataset finalization is **completed** for all four
-  locked Gate B sample designs.
+  locked Gate B sample designs under the four-month rule.
 - Full Gate B membership is preserved on the **audited pair** surface;
-  leakage-safe **analysis-ready** outputs exclude every row where
-  `assumed_before_target_fiscal_year_end != true` (including the authorized
-  `رمپنا|1396` → `رمپنا|1397` calendar-shift exception, which is audited but
-  not timing-safe / not model-eligible).
+  leakage-safe **analysis-ready** outputs include only rows where
+  `assumed_available_at_regulatory < target_fiscal_year_end_t_plus_1`
+  (general rule; `رمپنا|1396` → `رمپنا|1397` remains audit-only).
 - Financial data remain researcher-verified and frozen (no re-extraction).
-- Assumed availability is **not** an observed publication-time claim.
+- The four-month date is a regulatory/methodological assumption — **not**
+  an observed publication-time claim.
+- Part 3C does **not** approve model features; Part 4 locks the feature
+  surface.
 - Stage125 remains incomplete; Stage126 and modeling remain unauthorized.
 - Next research action: `stage125-part4-statistical-analysis-plan`.
 
@@ -219,8 +231,9 @@ robustness check.
   expansion.)** Origin probes / five-row CODAL metadata history retained;
   broad CODAL expansion stopped by Part 3B.1E conservative-lag decision.
 - **Part 3C — Leakage-safe dataset finalization. (Completed.)** Four Gate B
-  designs preserved; six-month Jalali `assumed_available_at_conservative`
-  operationalized; column-role map + leakage audit; **no** modeling.
+  designs preserved; active four-Jalali-month `assumed_available_at_regulatory`
+  operationalized (six-month methodology superseded); candidate inventory
+  only; column-role map + leakage audit; **no** feature approval / modeling.
 - **Part 3 (umbrella) — Accessibility, coverage & event pilot.** Parts 3A–3C;
   Part 3B expansion path superseded by conservative lag + Part 3C.
 - **Part 4 — Statistical analysis plan. (Next.)** Lock M1–M4 definitions and order; lock

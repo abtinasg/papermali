@@ -59,16 +59,18 @@ from year **t** may only predict distress target **t+1**. Stage125 remains
 
 Audited pair datasets and timing-eligible leakage-safe analysis-ready
 datasets finalized for all four locked Gate B sample designs under the
-six-month Jalali conservative lag. Full Gate B membership is preserved on
-the audited surface; analysis-ready outputs exclude every row where
-`assumed_before_target_fiscal_year_end != true` (including the authorized
-`رمپنا|1396` → `رمپنا|1397` exception, which remains visible in audit with
-explicit ineligibility flags). Financial values and targets remain frozen
-copies (no re-extraction / no target recalculation). Assumed availability
-uses `assumed_available_at_conservative` only (not observed
-`PublishDateTime` / `available_at`). Bulky outputs are gitignored and
-hashed. **Do not** start Stage126 or modeling. **Do not** resume broad
-CODAL capture or row-level PublishDateTime collection.
+**active four-Jalali-calendar-month regulatory lag** (human-approved
+revision; six-month active methodology superseded; Part 3B.1E six-month
+decision retained as historical provenance). Full Gate B membership is
+preserved on the audited surface; analysis-ready outputs include only rows
+where `assumed_available_at_regulatory < target_fiscal_year_end_t_plus_1`
+(general rule; `رمپنا|1396` → `رمپنا|1397` remains audit-only). Financial
+values and targets remain frozen copies. Assumed availability uses
+`assumed_available_at_regulatory` only (not observed `PublishDateTime` /
+`available_at`). Part 3C does **not** approve model features — candidates
+remain pending Part 4. Bulky outputs are gitignored and hashed. **Do not**
+start Stage126 or modeling. **Do not** resume broad CODAL capture or
+row-level PublishDateTime collection.
 
 ### Next / active research action — `stage125-part4-statistical-analysis-plan`
 
@@ -83,10 +85,13 @@ Current markers (must stay true until separately authorized otherwise):
 
 - `broad_codal_capture_stopped=true`
 - `financial_data_researcher_verified_frozen=true`
-- `conservative_availability_lag_locked=true`
-- `conservative_lag_months=6`
+- `active_availability_method=fixed_regulatory_lag`
+- `active_availability_lag_months=4`
+- `four_month_regulatory_lag_locked=true`
+- `six_month_lag_superseded=true`
+- `historical_six_month_decision_retained=true`
 - `row_level_publish_datetime_collection_required=false`
-- `conservative_six_month_lag_decision_locked=true`
+- `conservative_six_month_lag_decision_locked=true` (historical Part 3B.1E)
 - `part3b_started=true`; `endpoint_probe_evidence_collected=true`
 - `part3b1_decision_locked=true`
 - `cut_a_available_at_operationalization_locked=true` (historical observed-PublishDateTime contract; collection not authorized for modeling path)

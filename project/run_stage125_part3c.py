@@ -65,7 +65,9 @@ def main(argv: list[str] | None = None) -> int:
         f"network_requests_attempted={result['network_requests_attempted']} | "
         "broad_codal_capture_stopped=true | "
         "financial_data_researcher_verified_frozen=true | "
-        "conservative_lag_months=6 | "
+        f"active_availability_method={qc.get('active_availability_method')} | "
+        f"active_availability_lag_months="
+        f"{qc.get('active_availability_lag_months')} | "
         "stage126_authorized=false | modeling_authorized=false"
     )
     print(

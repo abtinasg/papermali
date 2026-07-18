@@ -115,8 +115,8 @@ Do not confuse QC selection with the research-action chain:
   `tests/test_stage125_part3c_leakage_safe_dataset_finalization.py`,
   `stage125/stage125_part3c_leakage_safe_dataset_qc_report.json` (four
   Gate B designs; audited pair + timing-eligible analysis-ready surfaces;
-  Jalali six-month lag operationalized; bulky outputs gitignored/hashed;
-  no feature selection / modeling / Stage126).
+  active four-Jalali-month regulatory lag; six-month methodology superseded;
+  bulky outputs gitignored/hashed; no feature approval / modeling / Stage126).
 
 ## 7. Done
 
@@ -146,9 +146,10 @@ See `next_research_action_id` in [`ROADMAP.md`](ROADMAP.md) and
 dataset finalization
 (`last_completed_research_action_id=stage125-part3c-leakage-safe-dataset-finalization`).
 Broad CODAL capture is stopped; researcher-verified financial data are frozen;
-assumed availability uses `assumed_available_at_conservative` only. Stage125
-performs **no** modeling; the frozen research contract (M1–M4 blocks, M5
-removed, accessibility Gates) is in
+active assumed availability uses `assumed_available_at_regulatory` (four
+Jalali months; six-month methodology superseded). Stage125 performs **no**
+modeling; the frozen research contract (M1–M4 blocks, M5 removed,
+accessibility Gates) is in
 [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
 prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.
 
