@@ -1060,6 +1060,16 @@ def test_stage125_part3b0_generated_files_are_artifact_only(path):
     "project/stage125/part3b1b_thanusa_parsed_metadata_receipt_stage125.json",
     "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1b.json",
+    "project/stage125/README_STAGE125_PART3B1C_DOCUMENT_BINDING_RESOLUTION.md",
+    "project/stage125/part3b1c_binding_failure_taxonomy_stage125.csv",
+    "project/stage125/part3b1c_identity_normalization_contract_stage125.json",
+    "project/stage125/part3b1c_exact_document_evidence_hierarchy_stage125.json",
+    "project/stage125/part3b1c_row_resolution_requirements_stage125.csv",
+    "project/stage125/part3b1c_proposed_capture_authorization_stage125.json",
+    "project/stage125/part3b1c_scale_up_readiness_decision_stage125.json",
+    "project/stage125/part3b1c_document_binding_resolution_decision_lock_stage125.json",
+    "project/stage125/stage125_part3b1c_document_binding_resolution_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b1c.json",
 ])
 def test_stage125_part3b_generated_files_are_artifact_only(path):
     assert gen.path_artifact_only(path) is True

@@ -56,7 +56,11 @@ resolve pilot cutoffs, or advance research pointers. Part 3B.1B is a controlled
 **document-metadata binding mini-pilot** for exactly five locked rows
 (`stage125-part3b1b-codal-document-binding-mini-pilot`); it does **not** complete
 Part 3B, resolve the 80-row pilot cutoff, extract financial values, or advance
-research pointers.
+research pointers. Part 3B.1C is an offline **document-binding resolution
+decision lock** (`stage125-part3b1c-document-binding-resolution-decision-lock`)
+— failure taxonomy, normalization/hierarchy contracts, and a not-authorized
+capture proposal only; it does **not** execute network, mutate Part 3B.1B
+evidence, assign available_at, or authorize 80-row scale-up.
 
 Current markers (must stay true until separately authorized otherwise):
 
@@ -65,6 +69,7 @@ Current markers (must stay true until separately authorized otherwise):
 - `cut_a_available_at_operationalization_locked=true` (maintenance; operationalization only)
 - `predictor_document_binding_mini_pilot_completed=true` (five-row metadata binding only)
 - `predictor_document_binding_evidence_collected=true`
+- `document_binding_resolution_decision_locked=true` (Part 3B.1C offline adjudication)
 - `predictor_available_at_evidence_collected=false`
 - `pilot_cutoff_provenance_resolved=false`
 - `candidate_value_evidence_collected=false`
