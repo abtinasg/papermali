@@ -1464,7 +1464,9 @@ def build_qc_assertions(
         scale["modeling_authorized"] is False
         and lock.get("modeling_started") is False,
         "false")
-    roadmap_last, roadmap_next = read_roadmap_research_pointers(repo_root)
+    # Historical Part 3B.1C lock freezes the research pointers that were current
+    # when this maintenance lock was recorded. Later ROADMAP advancement (e.g.
+    # conservative six-month lag) must not rewrite those lock-embedded values.
     lock_ptrs = lock.get("research_pointers") or {}
     add(
         "research_pointers_unchanged",
@@ -1472,10 +1474,8 @@ def build_qc_assertions(
             lock_ptrs.get("last_completed_research_action_id")
             == RESEARCH_LAST_COMPLETED
             and lock_ptrs.get("next_research_action_id") == RESEARCH_NEXT
-            and roadmap_last == RESEARCH_LAST_COMPLETED
-            and roadmap_next == RESEARCH_NEXT
         ),
-        f"lock={lock_ptrs};roadmap=({roadmap_last},{roadmap_next})",
+        f"lock={lock_ptrs}",
     )
     add("frozen_scientific_hashes_unchanged",
         frozen_before == frozen_after, "unchanged")
