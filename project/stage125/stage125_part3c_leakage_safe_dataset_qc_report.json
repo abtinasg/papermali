@@ -1,7 +1,9 @@
 {
   "accessibility_scoring_applied": false,
+  "active_availability_lag_months": 4,
+  "active_availability_method": "fixed_regulatory_lag",
   "all_pass": true,
-  "assertion_count": 40,
+  "assertion_count": 50,
   "assertions": [
     {
       "assertion": "baseline_merge_sha_exact",
@@ -9,53 +11,78 @@
       "status": "PASS"
     },
     {
-      "assertion": "part3b1e_decision_lock_present",
+      "assertion": "historical_six_month_decision_retained",
       "detail": "project/stage125/part3b1e_conservative_lag_decision_lock_stage125.json",
       "status": "PASS"
     },
     {
-      "assertion": "six_month_lag_exact",
-      "detail": "6",
+      "assertion": "explicit_human_four_month_decision_recorded",
+      "detail": "explicit_human_supervisor_approval",
+      "status": "PASS"
+    },
+    {
+      "assertion": "six_month_methodology_superseded",
+      "detail": "superseded=true; historical_active=false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "active_lag_months_exactly_four",
+      "detail": "4",
+      "status": "PASS"
+    },
+    {
+      "assertion": "active_method_fixed_regulatory_lag",
+      "detail": "fixed_regulatory_lag",
       "status": "PASS"
     },
     {
       "assertion": "Jalali_calendar_used",
-      "detail": "jdatetime calendar months via Part 3B.1E",
+      "detail": "Jalali",
       "status": "PASS"
     },
     {
-      "assertion": "all_input_hashes_exact",
+      "assertion": "four_month_date_semantics_not_observed",
+      "detail": "assumed_regulatory_deadline_not_observed_publication_timestamp",
+      "status": "PASS"
+    },
+    {
+      "assertion": "old_active_conservative_field_absent",
+      "detail": "assumed_available_at_conservative* / conservative_lag_months absent",
+      "status": "PASS"
+    },
+    {
+      "assertion": "all_frozen_input_hashes_exact",
       "detail": "count=6",
       "status": "PASS"
     },
     {
-      "assertion": "frozen_financial_values_unchanged",
+      "assertion": "financial_values_unchanged",
       "detail": "stage123 all-rows SHA-256 unchanged",
       "status": "PASS"
     },
     {
-      "assertion": "frozen_targets_unchanged",
+      "assertion": "targets_unchanged",
       "detail": "Gate B eligible pair SHA-256 unchanged",
       "status": "PASS"
     },
     {
-      "assertion": "four_locked_sample_designs_present",
+      "assertion": "audited_membership_unchanged",
       "detail": "main_rule_a_primary,main_rule_b_listing_robustness,expanded_rule_a_company_scope_robustness,expanded_rule_b_combined_robustness",
       "status": "PASS"
     },
     {
       "assertion": "all_pair_counts_exact",
-      "detail": "main_rule_a_primary:1013/119/81/932;main_rule_b_listing_robustness:994/117/80/914;expanded_rule_a_company_scope_robustness:1057/124/81/976;expanded_rule_b_combined_robustness:1036/122/80/956 (audited Gate B membership)",
+      "detail": "main_rule_a_primary:audited=1013/ready=1012/excl=1;main_rule_b_listing_robustness:audited=994/ready=993/excl=1;expanded_rule_a_company_scope_robustness:audited=1057/ready=1056/excl=1;expanded_rule_b_combined_robustness:audited=1036/ready=1035/excl=1 (audited Gate B membership)",
       "status": "PASS"
     },
     {
       "assertion": "all_positive_negative_counts_exact",
-      "detail": "main_rule_a_primary:1013/119/81/932;main_rule_b_listing_robustness:994/117/80/914;expanded_rule_a_company_scope_robustness:1057/124/81/976;expanded_rule_b_combined_robustness:1036/122/80/956 (audited Gate B membership)",
+      "detail": "main_rule_a_primary:audited=1013/ready=1012/excl=1;main_rule_b_listing_robustness:audited=994/ready=993/excl=1;expanded_rule_a_company_scope_robustness:audited=1057/ready=1056/excl=1;expanded_rule_b_combined_robustness:audited=1036/ready=1035/excl=1",
       "status": "PASS"
     },
     {
       "assertion": "all_company_counts_exact",
-      "detail": "main_rule_a_primary:1013/119/81/932;main_rule_b_listing_robustness:994/117/80/914;expanded_rule_a_company_scope_robustness:1057/124/81/976;expanded_rule_b_combined_robustness:1036/122/80/956 (audited Gate B membership)",
+      "detail": "main_rule_a_primary:audited=1013/ready=1012/excl=1;main_rule_b_listing_robustness:audited=994/ready=993/excl=1;expanded_rule_a_company_scope_robustness:audited=1057/ready=1056/excl=1;expanded_rule_b_combined_robustness:audited=1036/ready=1035/excl=1",
       "status": "PASS"
     },
     {
@@ -79,22 +106,27 @@
       "status": "PASS"
     },
     {
-      "assertion": "assumed_date_before_target_fiscal_year_end",
-      "detail": "unexpected_violations=0 authorized_exceptions=4 (audit surface; exceptions not analysis-ready)",
+      "assertion": "all_timing_violations_visible_in_audit",
+      "detail": "violations=4",
       "status": "PASS"
     },
     {
-      "assertion": "authorized_rampna_exception_visible_in_audit",
-      "detail": "visible_in_audit=4",
+      "assertion": "exactly_one_timing_violation_per_design",
+      "detail": "extra_unexpected=0",
       "status": "PASS"
     },
     {
-      "assertion": "analysis_ready_assumed_before_target_fye_true",
-      "detail": "main_rule_a_primary:audited=1013/ready=1012/excl=1;main_rule_b_listing_robustness:audited=994/ready=993/excl=1;expanded_rule_a_company_scope_robustness:audited=1057/ready=1056/excl=1;expanded_rule_b_combined_robustness:audited=1036/ready=1035/excl=1",
+      "assertion": "only_rampna_1396_to_1397_excluded",
+      "detail": "rampna_visible=4",
       "status": "PASS"
     },
     {
-      "assertion": "no_authorized_timing_exception_in_analysis_ready",
+      "assertion": "four_analysis_ready_outputs_present",
+      "detail": "4",
+      "status": "PASS"
+    },
+    {
+      "assertion": "all_analysis_ready_rows_timing_safe",
       "detail": "main_rule_a_primary:audited=1013/ready=1012/excl=1;main_rule_b_listing_robustness:audited=994/ready=993/excl=1;expanded_rule_a_company_scope_robustness:audited=1057/ready=1056/excl=1;expanded_rule_b_combined_robustness:audited=1036/ready=1035/excl=1",
       "status": "PASS"
     },
@@ -114,11 +146,6 @@
       "status": "PASS"
     },
     {
-      "assertion": "target_values_byte_or_semantically_identical",
-      "detail": "copied from frozen Gate B",
-      "status": "PASS"
-    },
-    {
       "assertion": "no_observed_PublishDateTime_claim",
       "detail": "false",
       "status": "PASS"
@@ -129,18 +156,18 @@
       "status": "PASS"
     },
     {
-      "assertion": "forbidden_target_columns_excluded_from_feature_surface",
-      "detail": "overlap=[]",
+      "assertion": "forbidden_target_fields_not_model_features",
+      "detail": "approved=[]",
       "status": "PASS"
     },
     {
-      "assertion": "timing_eligibility_fields_excluded_from_feature_surface",
-      "detail": "overlap=[]",
+      "assertion": "zero_features_approved_before_part4",
+      "detail": "approved_count=0",
       "status": "PASS"
     },
     {
-      "assertion": "predictor_feature_whitelist_exact",
-      "detail": "feature_count=31 whitelist=31",
+      "assertion": "all_predictor_candidates_pending_part4",
+      "detail": "candidates=31",
       "status": "PASS"
     },
     {
@@ -149,7 +176,7 @@
       "status": "PASS"
     },
     {
-      "assertion": "build_deterministic",
+      "assertion": "deterministic_rebuild",
       "detail": "sha256 stable",
       "status": "PASS"
     },
@@ -169,12 +196,27 @@
       "status": "PASS"
     },
     {
-      "assertion": "policy_lag_five_rejected",
+      "assertion": "policy_lag_four_accepted",
+      "detail": "4",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_lag_3_rejected",
+      "detail": "3",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_lag_5_rejected",
       "detail": "5",
       "status": "PASS"
     },
     {
-      "assertion": "policy_lag_seven_rejected",
+      "assertion": "policy_lag_6_rejected",
+      "detail": "6",
+      "status": "PASS"
+    },
+    {
+      "assertion": "policy_lag_7_rejected",
       "detail": "7",
       "status": "PASS"
     },
@@ -189,13 +231,23 @@
       "status": "PASS"
     },
     {
-      "assertion": "formula_fiscal_year_end_plus_six_months",
-      "detail": "1402-06-29",
+      "assertion": "formula_fiscal_year_end_plus_four_months",
+      "detail": "1402-04-29",
+      "status": "PASS"
+    },
+    {
+      "assertion": "rampna_four_month_date_exact",
+      "detail": "1396/12/29 + 4m = 1397/04/29; not before 1397/01/31",
       "status": "PASS"
     },
     {
       "assertion": "jalali_day_clamping_probe",
-      "detail": "1401-12-29",
+      "detail": "1401-10-30",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_ticker_specific_authorization_mechanism",
+      "detail": "AUTHORIZED_TIMING_EXCEPTIONS absent",
       "status": "PASS"
     },
     {
@@ -207,20 +259,19 @@
   "baseline_commit": "93ab6d8f2c1fbddaaed4a9dc21de6490ef38de30",
   "broad_codal_capture_stopped": true,
   "bulky_output_sha256": {
-    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_a_stage125.csv": "df9be2fee3385eaa8ed01c201282cc8a77b597f77d9fe0267361ee6cdf4fdbbd",
-    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_b_stage125.csv": "4bb5867fc255d8109069c8c222f1217f503749b027b37fda3966002b372c83e3",
-    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "7660355695946bf119c8eed9cf88a7b5ed2c40dc9bca8c4e0ca3da5f566714cc",
-    "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv": "f5359196e7f51433ce843f6ece7e3190b2ca1a36bd93262922e4b5000fafbeb8",
-    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_a_stage125.csv": "e4c8e7b97342688b63c9d5c32138793c356608e3528b58bc12c142874dcce749",
-    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_b_stage125.csv": "67fb2035e47c6f224968c732dcaaf8da3ea737bf64b16d4e94a1f9bac1daf819",
-    "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv": "6893281a4d95b8eb72fe8046742422c23cb10e5da698b49d5ab75a33c18dd305",
-    "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv": "2fa4cc8551c0bc8ebeda756877a5938ba63a0f3da62c0c94bf0d25ceab684d34"
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_a_stage125.csv": "fbe9b29c6323b59e830ca9d2dd8c1543b9ef48b21709b01cc56a3989cd2d64d9",
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_b_stage125.csv": "2e61a282165ccdaef37bac61a460c83878f2ae633b10535945cc33897d3b4c22",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv": "5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_a_stage125.csv": "23ff63d82bbc1a5a06536783eddfa5113ad988cb0db8c1c9adb004489da22bc9",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_b_stage125.csv": "56c80ccb0a8bcbb1c030e87c892190579628c298026c6140045cbaf08ff7135f",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv": "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv": "d2d9893e40b0c3bdf876a7447fc5147985fc25c9c5add07264677f6ed817b72c"
   },
   "candidate_value_evidence_collected": false,
   "conservative_availability_lag_locked": true,
-  "conservative_lag_months": 6,
   "conservative_six_month_lag_decision_locked": true,
-  "contract_version": "stage125_part3c_v2",
+  "contract_version": "stage125_part3c_v3_four_month_regulatory_lag",
   "current_stage": "Stage125",
   "cut_a_available_at_operationalization_locked": true,
   "data_value_extraction_performed": false,
@@ -230,6 +281,7 @@
   "failed_count": 0,
   "feature_selection_authorized": false,
   "financial_data_researcher_verified_frozen": true,
+  "four_month_regulatory_lag_locked": true,
   "frozen_bulky_input_sha256": {
     "project/stage123/modeling_all_rows_stage123.csv": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
     "project/stage124/gate_b_final/modeling_expanded_rule_a_eligible.csv": "b2f950b5a6a5a79f6b0fd8019e9021079339b6c80290695bb18d0e4a56b7d8e6",
@@ -238,17 +290,21 @@
     "project/stage124/gate_b_final/modeling_main_rule_b_eligible.csv": "99bdf0296a274f2ad42a6e9942a42d79b6370c7b99b57967b44c6821313f36c1",
     "project/stage124/gate_b_final/modeling_one_year_ahead_stage124_gate_b.csv": "9743c49337c66a3699bce34dfd02a151e34f48f0717f225ad487fe1487031d05"
   },
+  "historical_six_month_decision_active": false,
+  "historical_six_month_decision_retained": true,
   "modeling_authorized": false,
   "modeling_started": false,
   "network_extraction_performed": true,
   "network_requests_attempted": 0,
   "output_sha256": {
-    "README_STAGE125_PART3C_LEAKAGE_SAFE_DATASET.md": "4a7e49014081dbee55243cc8ff3d01fd0a29a8b2345aac395d1b08fc7e291869",
-    "part3c_column_role_map_stage125.csv": "5bbf98b592b76479047cacc2e28716578985efe724a1fc3a5b78f3482fd82d50",
-    "part3c_input_hash_manifest_stage125.json": "eba07604d192f82a4b0f10e8eb3c63806e907b76b18b6af72f55e2f991a9b35e",
-    "part3c_leakage_audit_stage125.csv": "663b72818b9c1bc8087106addf2a8a2717cc147d598c2545fc7a073aeb42341b",
-    "part3c_leakage_safe_dataset_contract_stage125.json": "e969a7d1e7babb7eac56996791f399a86aba66b8ee921f801048cebe90b01c31",
-    "part3c_sample_summary_stage125.csv": "2c272fd5d001abb8c47c3cc89b5ce00a2b8539218235c3b8b969bab30a02c1ed",
+    "README_STAGE125_PART3C_FOUR_MONTH_LAG_REVISION.md": "d2f7e5cb28a690a99558d263cfdb6a3f358bcbc8005b59d6e38e1113ad0b1e4e",
+    "README_STAGE125_PART3C_LEAKAGE_SAFE_DATASET.md": "4fb0faf38e3aa44d45cc3825384cf1184f88424319c3498eb22da95bafd41d8b",
+    "part3c_column_role_map_stage125.csv": "c06d5ceb7dc0b63bccbadc9e95a59bc04d30e8a2b3c97e76111bd989c89b5fc2",
+    "part3c_four_month_regulatory_lag_revision_decision_stage125.json": "dd223fe54c5f3e4ca94de44d61188213d7f1456948e7bae2211a1ee997c7800e",
+    "part3c_input_hash_manifest_stage125.json": "ed91b8d4b620748c2363988026aa7eccfcb3e7b0970dcb697bc1c83ab6758035",
+    "part3c_leakage_audit_stage125.csv": "1697f4823545cde504e235d5dd3e38a1e458b8b21aa21b0709193b92794e545f",
+    "part3c_leakage_safe_dataset_contract_stage125.json": "f294454602c3fac83e191319bfe3354c3f601326396092f228db17eb08649839",
+    "part3c_sample_summary_stage125.csv": "c203ed3f31a796b769d96e586d45b9b14ab1f73a74bffdfbfcf2d975f2e512bc",
     "part3c_target_year_distribution_stage125.csv": "d9f4a9e30bd2a94284bc01bb4dd44cf3e1c0b325c748110bcfe1acd9183677eb"
   },
   "pair_level_evidence_collected": true,
@@ -275,13 +331,13 @@
       "analysis_ready_companies": "119",
       "analysis_ready_negative": "932",
       "analysis_ready_output_file": "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv",
-      "analysis_ready_output_sha256": "7660355695946bf119c8eed9cf88a7b5ed2c40dc9bca8c4e0ca3da5f566714cc",
+      "analysis_ready_output_sha256": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
       "analysis_ready_pairs": "1012",
       "analysis_ready_positive": "80",
       "audited_companies": "119",
       "audited_negative": "932",
       "audited_output_file": "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv",
-      "audited_output_sha256": "6893281a4d95b8eb72fe8046742422c23cb10e5da698b49d5ab75a33c18dd305",
+      "audited_output_sha256": "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
       "audited_pairs": "1013",
       "audited_positive": "81",
       "columns": "115",
@@ -289,23 +345,24 @@
       "excluded_timing_exception_count": "1",
       "negative": "932",
       "output_file": "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv",
-      "output_sha256": "6893281a4d95b8eb72fe8046742422c23cb10e5da698b49d5ab75a33c18dd305",
+      "output_sha256": "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
       "pairs": "1013",
       "positive": "81",
       "sample_design": "main_rule_a_primary",
-      "timing_relation_exceptions": "1"
+      "timing_exclusions": "1",
+      "timing_relation_violations": "1"
     },
     {
       "analysis_ready_companies": "117",
       "analysis_ready_negative": "914",
       "analysis_ready_output_file": "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv",
-      "analysis_ready_output_sha256": "f5359196e7f51433ce843f6ece7e3190b2ca1a36bd93262922e4b5000fafbeb8",
+      "analysis_ready_output_sha256": "5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480",
       "analysis_ready_pairs": "993",
       "analysis_ready_positive": "79",
       "audited_companies": "117",
       "audited_negative": "914",
       "audited_output_file": "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv",
-      "audited_output_sha256": "2fa4cc8551c0bc8ebeda756877a5938ba63a0f3da62c0c94bf0d25ceab684d34",
+      "audited_output_sha256": "d2d9893e40b0c3bdf876a7447fc5147985fc25c9c5add07264677f6ed817b72c",
       "audited_pairs": "994",
       "audited_positive": "80",
       "columns": "115",
@@ -313,23 +370,24 @@
       "excluded_timing_exception_count": "1",
       "negative": "914",
       "output_file": "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv",
-      "output_sha256": "2fa4cc8551c0bc8ebeda756877a5938ba63a0f3da62c0c94bf0d25ceab684d34",
+      "output_sha256": "d2d9893e40b0c3bdf876a7447fc5147985fc25c9c5add07264677f6ed817b72c",
       "pairs": "994",
       "positive": "80",
       "sample_design": "main_rule_b_listing_robustness",
-      "timing_relation_exceptions": "1"
+      "timing_exclusions": "1",
+      "timing_relation_violations": "1"
     },
     {
       "analysis_ready_companies": "124",
       "analysis_ready_negative": "976",
       "analysis_ready_output_file": "project/stage125/part3c_outputs/analysis_ready_expanded_rule_a_stage125.csv",
-      "analysis_ready_output_sha256": "df9be2fee3385eaa8ed01c201282cc8a77b597f77d9fe0267361ee6cdf4fdbbd",
+      "analysis_ready_output_sha256": "fbe9b29c6323b59e830ca9d2dd8c1543b9ef48b21709b01cc56a3989cd2d64d9",
       "analysis_ready_pairs": "1056",
       "analysis_ready_positive": "80",
       "audited_companies": "124",
       "audited_negative": "976",
       "audited_output_file": "project/stage125/part3c_outputs/audited_pairs_expanded_rule_a_stage125.csv",
-      "audited_output_sha256": "e4c8e7b97342688b63c9d5c32138793c356608e3528b58bc12c142874dcce749",
+      "audited_output_sha256": "23ff63d82bbc1a5a06536783eddfa5113ad988cb0db8c1c9adb004489da22bc9",
       "audited_pairs": "1057",
       "audited_positive": "81",
       "columns": "115",
@@ -337,23 +395,24 @@
       "excluded_timing_exception_count": "1",
       "negative": "976",
       "output_file": "project/stage125/part3c_outputs/audited_pairs_expanded_rule_a_stage125.csv",
-      "output_sha256": "e4c8e7b97342688b63c9d5c32138793c356608e3528b58bc12c142874dcce749",
+      "output_sha256": "23ff63d82bbc1a5a06536783eddfa5113ad988cb0db8c1c9adb004489da22bc9",
       "pairs": "1057",
       "positive": "81",
       "sample_design": "expanded_rule_a_company_scope_robustness",
-      "timing_relation_exceptions": "1"
+      "timing_exclusions": "1",
+      "timing_relation_violations": "1"
     },
     {
       "analysis_ready_companies": "122",
       "analysis_ready_negative": "956",
       "analysis_ready_output_file": "project/stage125/part3c_outputs/analysis_ready_expanded_rule_b_stage125.csv",
-      "analysis_ready_output_sha256": "4bb5867fc255d8109069c8c222f1217f503749b027b37fda3966002b372c83e3",
+      "analysis_ready_output_sha256": "2e61a282165ccdaef37bac61a460c83878f2ae633b10535945cc33897d3b4c22",
       "analysis_ready_pairs": "1035",
       "analysis_ready_positive": "79",
       "audited_companies": "122",
       "audited_negative": "956",
       "audited_output_file": "project/stage125/part3c_outputs/audited_pairs_expanded_rule_b_stage125.csv",
-      "audited_output_sha256": "67fb2035e47c6f224968c732dcaaf8da3ea737bf64b16d4e94a1f9bac1daf819",
+      "audited_output_sha256": "56c80ccb0a8bcbb1c030e87c892190579628c298026c6140045cbaf08ff7135f",
       "audited_pairs": "1036",
       "audited_positive": "80",
       "columns": "115",
@@ -361,19 +420,21 @@
       "excluded_timing_exception_count": "1",
       "negative": "956",
       "output_file": "project/stage125/part3c_outputs/audited_pairs_expanded_rule_b_stage125.csv",
-      "output_sha256": "67fb2035e47c6f224968c732dcaaf8da3ea737bf64b16d4e94a1f9bac1daf819",
+      "output_sha256": "56c80ccb0a8bcbb1c030e87c892190579628c298026c6140045cbaf08ff7135f",
       "pairs": "1036",
       "positive": "80",
       "sample_design": "expanded_rule_b_combined_robustness",
-      "timing_relation_exceptions": "1"
+      "timing_exclusions": "1",
+      "timing_relation_violations": "1"
     }
   ],
-  "source_commit": "1ac4c08b8f21b3704f2c32a741a405184afcc872",
-  "source_file_sha256": "e6b1934576f029f064ca8337c5079617bc8af3508afd895391f5cf34a4a3f2d0",
+  "six_month_lag_superseded": true,
+  "source_commit": "53c8ea138ee9e4fba58686d213b2353d872c0d07",
+  "source_file_sha256": "b0366b78daf08e6551ef97279ce8c6627b4bdf428e7202c50c6ba32826bfcdcb",
   "stage": "stage125_part3c_leakage_safe_dataset_finalization",
   "stage126_authorized": false,
   "stage126_started": false,
-  "test_file_sha256": "1243cd532b55344c11e36d14a480ec8b3698fbe079d4216451d3d1e5acd2c3e7",
+  "test_file_sha256": "190997188020278b262ce02a07bd18c4f4e7353434d3440a4f85a6539b1ef229",
   "ticker_count": 0,
   "tickers": []
 }
