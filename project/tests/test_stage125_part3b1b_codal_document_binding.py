@@ -393,17 +393,63 @@ def test_module_constants_import():
 # Hardening tests (PR #43 provenance / source-vs-canonical / fresh-clone)
 # --------------------------------------------------------------------------- #
 
+def _part3b1b_overlay_rels() -> list[str]:
+    return sorted(m.PART3B1B_AUTHORIZED_EXACT | {
+        "project/src/stage125_part3b1b_codal_document_binding.py",
+        "project/run_stage125_part3b1b.py",
+        "project/tests/test_stage125_part3b1b_codal_document_binding.py",
+    })
+
+
+def _make_isolated_repo_worktree(tmp_path: Path) -> Path:
+    """Detach worktree with current Part 3B.1B working-tree overlays; no raw cache."""
+    import shutil
+    import subprocess
+
+    wt = tmp_path / "fresh_clone_wt"
+    subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "worktree", "add", "--detach", str(wt), "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    for rel in _part3b1b_overlay_rels():
+        src = REPO_ROOT / rel
+        if not src.is_file():
+            continue
+        dst = wt / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+    raw = wt / "project" / "stage125" / "raw_cache_part3b1b"
+    if raw.exists():
+        shutil.rmtree(raw)
+    return wt
+
+
+def _remove_worktree(wt: Path) -> None:
+    import subprocess
+
+    subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "worktree", "remove", "--force", str(wt)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
 def test_original_capture_timestamps_survive_cache_reuse():
     receipt = m.load_tracked_capture_receipt(REPO_ROOT)
     assert receipt is not None
     assert receipt["started_at_utc"] == "2026-07-17T21:02:52Z"
     assert receipt["retrieved_at_utc"] == "2026-07-17T21:02:56Z"
     assert receipt["completed_at_utc"] is None
+    assert receipt["completed_at_status"] == m.COMPLETED_AT_STATUS_MISSING
     cache = p3b0.ImmutableCache(REPO_ROOT / m.CACHE_DIR_REL)
-    fetch, rebuilt, _ = m.resolve_thanusa_from_local_evidence(
+    fetch, rebuilt, parsed, _ = m.resolve_thanusa_from_local_evidence(
         REPO_ROOT, cache, write_receipt=False,
     )
     assert fetch is not None
+    assert parsed is not None
     assert rebuilt["started_at_utc"] == receipt["started_at_utc"]
     assert rebuilt["retrieved_at_utc"] == receipt["retrieved_at_utc"]
 
@@ -415,23 +461,130 @@ def test_tracked_receipt_validates_without_raw_payload(tmp_path):
     hard = [r for r in reasons if "completed_at_utc" not in r]
     assert hard == []
     empty_cache = p3b0.ImmutableCache(tmp_path / "empty_cache")
-    fetch, loaded, status = m.resolve_thanusa_from_local_evidence(
+    fetch, loaded, parsed, status = m.resolve_thanusa_from_local_evidence(
         REPO_ROOT, empty_cache, write_receipt=False,
     )
     assert fetch is not None
+    assert parsed is not None
     assert status == "raw_payload_local_optional_absent"
     assert loaded["payload_sha256"] == receipt["payload_sha256"]
+    assert fetch.parsed_html["official_title"] == parsed["parsed_source_official_title"]
 
 
-def test_check_works_in_simulated_fresh_clone_without_raw_cache(tmp_path, monkeypatch):
-    out = tmp_path / "stage125"
-    out.mkdir()
-    # Hide the local raw cache directory.
-    monkeypatch.setattr(m, "CACHE_DIR_REL", str(tmp_path / "missing_raw_cache_part3b1b"))
-    result = m.run(project_dir=ROOT, output_dir=out, check=True)
-    assert result["raw_payload_status"] == "raw_payload_local_optional_absent"
-    assert result["qc"]["all_pass"] is True
-    assert result["network_requests_attempted"] == 0
+def test_parsed_metadata_receipt_tracked():
+    path = REPO_ROOT / m.PARSED_RECEIPT_REL
+    assert path.is_file()
+    parsed = m.load_tracked_parsed_metadata_receipt(REPO_ROOT)
+    assert parsed is not None
+    for field_name in m.PARSED_RECEIPT_REQUIRED_FIELDS:
+        assert field_name in parsed
+
+
+def test_parsed_receipt_bound_to_payload_sha():
+    receipt = m.load_tracked_capture_receipt(REPO_ROOT)
+    parsed = m.load_tracked_parsed_metadata_receipt(REPO_ROOT)
+    assert receipt is not None and parsed is not None
+    assert parsed["payload_sha256"] == receipt["payload_sha256"]
+    assert parsed["metadata_sha256"] == receipt["metadata_sha256"]
+    assert m.validate_parsed_metadata_receipt(
+        parsed, capture_receipt=receipt,
+    ) == []
+
+
+def test_raw_present_reconstruction_equals_raw_absent(tmp_path):
+    cache = p3b0.ImmutableCache(REPO_ROOT / m.CACHE_DIR_REL)
+    fetch_present, receipt, parsed, status_p = m.resolve_thanusa_from_local_evidence(
+        REPO_ROOT, cache, write_receipt=False,
+    )
+    assert status_p == "raw_payload_local_present_verified"
+    empty_cache = p3b0.ImmutableCache(tmp_path / "empty_cache_absent")
+    fetch_absent, _, _, status_a = m.resolve_thanusa_from_local_evidence(
+        REPO_ROOT, empty_cache, write_receipt=False,
+    )
+    assert status_a == "raw_payload_local_optional_absent"
+    assert fetch_present is not None and fetch_absent is not None
+    assert fetch_present.parsed_html == fetch_absent.parsed_html
+    content_p, _, _, _ = m.build_all_content(
+        REPO_ROOT, capture=False, cache=cache, thanusa_fetch=fetch_present,
+        receipt=receipt, parsed_receipt=parsed,
+        thanusa_manifest=m.parse_thanusa_ocf_manifest_row(REPO_ROOT),
+        pilot_verified=m.verify_locked_scope_against_pilot(REPO_ROOT),
+        current_check_network_requests_attempted=0,
+    )
+    content_a, _, _, _ = m.build_all_content(
+        REPO_ROOT, capture=False, cache=empty_cache, thanusa_fetch=fetch_absent,
+        receipt=receipt, parsed_receipt=parsed,
+        thanusa_manifest=m.parse_thanusa_ocf_manifest_row(REPO_ROOT),
+        pilot_verified=m.verify_locked_scope_against_pilot(REPO_ROOT),
+        current_check_network_requests_attempted=0,
+    )
+    for name in m.DETERMINISTIC_OUTPUT_FILES:
+        if name in (m.F_QC, m.F_METADATA):
+            continue
+        key = name if name in content_p else None
+        if key is None:
+            continue
+    for name in (
+        m.F_EVIDENCE, m.F_ADJ, m.F_ATTEMPTS, m.F_NETWORK, m.F_UNRESOLVED,
+        m.F_RECEIPT, m.F_PARSED_RECEIPT,
+    ):
+        assert content_p[name] == content_a[name]
+
+
+def test_fresh_clone_canonical_check_zero_drift(tmp_path):
+    wt = _make_isolated_repo_worktree(tmp_path)
+    try:
+        assert not (wt / "project/stage125/raw_cache_part3b1b").exists()
+        before = {
+            p: p.read_bytes()
+            for p in (wt / "project" / "stage125").glob("part3b1b_*")
+        }
+        before.update({
+            (wt / "project" / "stage125" / m.F_QC): (
+                wt / "project" / "stage125" / m.F_QC
+            ).read_bytes(),
+            (wt / "project" / "stage125" / m.F_METADATA): (
+                wt / "project" / "stage125" / m.F_METADATA
+            ).read_bytes(),
+        })
+        with p3b0.network_sentinel() as sentinel:
+            result = m.run(project_dir=wt / "project", check=True)
+            assert sentinel.calls_attempted == 0
+        assert result["drift"] == []
+        assert result["files"] == {}
+        assert result["network_requests_attempted"] == 0
+        assert result["raw_payload_status"] == "raw_payload_local_optional_absent"
+        after = {
+            p: p.read_bytes()
+            for p in (wt / "project" / "stage125").glob("part3b1b_*")
+        }
+        after.update({
+            (wt / "project" / "stage125" / m.F_QC): (
+                wt / "project" / "stage125" / m.F_QC
+            ).read_bytes(),
+            (wt / "project" / "stage125" / m.F_METADATA): (
+                wt / "project" / "stage125" / m.F_METADATA
+            ).read_bytes(),
+        })
+        assert before == after
+        for name in m.DETERMINISTIC_OUTPUT_FILES:
+            committed = (REPO_ROOT / "project" / "stage125" / name).read_bytes()
+            isolated = (wt / "project" / "stage125" / name).read_bytes()
+            assert committed == isolated
+    finally:
+        _remove_worktree(wt)
+
+
+def test_official_check_fails_after_evidence_mutation(tmp_path):
+    wt = _make_isolated_repo_worktree(tmp_path)
+    try:
+        ev = wt / "project" / "stage125" / m.F_EVIDENCE
+        text = ev.read_text(encoding="utf-8")
+        ev.write_text(text.replace("UNRESOLVED", "BOUND", 1), encoding="utf-8")
+        with pytest.raises(m.QCFail, match="check drift"):
+            m.run(project_dir=wt / "project", check=True)
+    finally:
+        _remove_worktree(wt)
 
 
 def test_check_creates_no_directory_and_writes_no_file(tmp_path):
@@ -606,12 +759,51 @@ def test_multiple_local_candidates_all_recorded_and_unresolved():
     assert "multiple_candidate_letters" in ev["failure_reasons"]
 
 
-def test_full_pilot_scope_fields_verified():
+def test_full_pilot_all_11_fields_exact():
     verified = m.verify_locked_scope_against_pilot(REPO_ROOT)
     assert set(verified) == m.SCOPE_KEYS
-    for key, pilot in verified.items():
+    for scope in m.LOCKED_SCOPE:
+        key = scope["predictor_row_key_t"]
+        pilot = verified[key]
         for field_name in m.PILOT_FULL_FIELD_KEYS:
-            assert field_name in pilot
+            assert str(pilot[field_name]) == str(scope[field_name])
+
+
+@pytest.mark.parametrize(
+    "field_name,mutated_value",
+    [
+        ("option_id", "mutated_option"),
+        ("target_year", "9999"),
+        ("class_label", "positive"),
+        ("rule_a_eligible", "0"),
+        ("post_evidence_substitution_allowed", "true"),
+        ("selection_status", "rejected"),
+    ],
+)
+def test_pilot_field_mutation_fails_closed(field_name, mutated_value, monkeypatch):
+    skeleton = [dict(row) for row in m.LOCKED_SCOPE_SKELETON]
+    skeleton[0][field_name] = mutated_value
+    monkeypatch.setattr(m, "LOCKED_SCOPE_SKELETON", tuple(skeleton))
+    m.rebuild_locked_scope(REPO_ROOT)
+    with pytest.raises(m.QCFail, match=f"pilot_field_mismatch:.*:{field_name}"):
+        m.verify_locked_scope_against_pilot(REPO_ROOT)
+    # Restore real scope for subsequent tests.
+    monkeypatch.undo()
+    m.rebuild_locked_scope(REPO_ROOT)
+
+
+def test_completed_at_null_explicit_and_documented():
+    receipt = m.load_tracked_capture_receipt(REPO_ROOT)
+    assert receipt is not None
+    assert receipt["completed_at_utc"] is None
+    assert receipt["completed_at_status"] == (
+        "missing_in_original_cache_metadata_preserved_null"
+    )
+    qc = json.loads(
+        (REPO_ROOT / "project/stage125" / m.F_QC).read_text(encoding="utf-8")
+    )
+    names = {a["assertion"]: a for a in qc["assertions"]}
+    assert names["capture_completed_at_missingness_explicit"]["status"] == "PASS"
 
 
 def test_no_additional_network_request_on_capture_reuse(tmp_path):
@@ -621,16 +813,40 @@ def test_no_additional_network_request_on_capture_reuse(tmp_path):
         assert sentinel.calls_attempted == 0
     assert result["network_requests_attempted"] == 0
     assert result["historical_authorized_capture_requests_performed"] == 1
+    assert result["files"]  # capture writes
+
+
+def test_official_check_zero_network_and_zero_writes():
+    before = {
+        p: p.stat().st_mtime_ns
+        for p in (REPO_ROOT / "project" / "stage125").glob("part3b1b_*")
+    }
+    before_qc = (REPO_ROOT / "project/stage125" / m.F_QC).stat().st_mtime_ns
+    with p3b0.network_sentinel() as sentinel:
+        result = m.run(project_dir=ROOT, check=True)
+        assert sentinel.calls_attempted == 0
+    assert result["drift"] == []
+    assert result["files"] == {}
+    assert result["network_requests_attempted"] == 0
+    after = {
+        p: p.stat().st_mtime_ns
+        for p in (REPO_ROOT / "project" / "stage125").glob("part3b1b_*")
+    }
+    assert before == after
+    assert (REPO_ROOT / "project/stage125" / m.F_QC).stat().st_mtime_ns == before_qc
 
 
 def test_no_financial_m_value_extraction_in_outputs():
     text = (REPO_ROOT / "project/stage125" / m.F_EVIDENCE).read_text(encoding="utf-8")
     assert "m1_value" not in text
     assert "m2_value" not in text
+    assert "m3_value" not in text
+    assert "m4_value" not in text
     assert "operating_cash_flow" not in text
     assert not m._evidence_has_value_extraction_columns(
         list(csv.DictReader(text.splitlines()))
     )
+    assert not m._source_has_forbidden_value_extraction_tokens(REPO_ROOT)
 
 
 def test_no_scoring_gate_stage126_modeling_in_qc():
@@ -642,6 +858,29 @@ def test_no_scoring_gate_stage126_modeling_in_qc():
     assert qc["stage126_started"] is False
     assert qc["modeling_started"] is False
     assert qc["part3b_completed"] is False
+    assert "raw_payload_status" not in qc
+    assert qc["raw_payload_storage_policy"] == m.RAW_PAYLOAD_DETERMINISM_POLICY
+
+
+def test_strengthened_qc_assertions_present():
+    qc = json.loads(
+        (REPO_ROOT / "project/stage125" / m.F_QC).read_text(encoding="utf-8")
+    )
+    names = {a["assertion"]: a for a in qc["assertions"]}
+    required = [
+        "parsed_metadata_receipt_tracked",
+        "parsed_metadata_receipt_payload_hash_bound",
+        "parsed_metadata_receipt_fields_exact",
+        "raw_present_and_absent_outputs_byte_identical",
+        "official_check_drift_empty",
+        "official_check_fails_on_mutated_output",
+        "full_pilot_all_11_fields_exact",
+        "capture_completed_at_missingness_explicit",
+        "fresh_clone_check_does_not_require_raw_payload",
+    ]
+    for name in required:
+        assert names[name]["status"] == "PASS", name
+    assert names["fresh_clone_check_does_not_require_raw_payload"]["detail"]
 
 
 def test_frozen_scientific_hashes_unchanged_after_harden():

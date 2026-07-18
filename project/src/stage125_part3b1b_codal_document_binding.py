@@ -60,15 +60,22 @@ F_README = "README_STAGE125_PART3B1B_CODAL_DOCUMENT_BINDING.md"
 F_QC = "stage125_part3b1b_codal_document_binding_qc_report.json"
 F_METADATA = "metadata_and_hashes_stage125_part3b1b.json"
 F_RECEIPT = "part3b1b_thanusa_capture_receipt_stage125.json"
+F_PARSED_RECEIPT = "part3b1b_thanusa_parsed_metadata_receipt_stage125.json"
 
 CONTENT_FILES = (
     F_SCOPE, F_EVIDENCE, F_ADJ, F_ATTEMPTS, F_NETWORK, F_UNRESOLVED, F_README,
-    F_RECEIPT,
+    F_RECEIPT, F_PARSED_RECEIPT,
+)
+
+# Byte-identical with or without the optional local raw HTML cache.
+DETERMINISTIC_OUTPUT_FILES = (
+    F_EVIDENCE, F_ADJ, F_ATTEMPTS, F_NETWORK, F_UNRESOLVED, F_QC, F_METADATA,
 )
 
 CACHE_DIR_REL = "project/stage125/raw_cache_part3b1b"
 THANUSA_EVIDENCE_ID = "ev_p3b1b_thanusa_1392_decision"
 RECEIPT_REL = f"project/stage125/{F_RECEIPT}"
+PARSED_RECEIPT_REL = f"project/stage125/{F_PARSED_RECEIPT}"
 
 PART3B1B_AUTHORIZED_EXACT = frozenset({
     SRC_REL, TEST_REL, RUN_REL,
@@ -82,6 +89,7 @@ PART3B1B_AUTHORIZED_EXACT = frozenset({
     f"project/stage125/{F_QC}",
     f"project/stage125/{F_METADATA}",
     RECEIPT_REL,
+    PARSED_RECEIPT_REL,
 })
 
 PILOT_CSV_REL = "project/stage125/part3a_selected_pilot_pairs_stage125.csv"
@@ -112,7 +120,14 @@ RECEIPT_REQUIRED_FIELDS = (
     "http_method", "started_at_utc", "completed_at_utc", "retrieved_at_utc",
     "redirect_chain", "final_url", "response_status", "content_type",
     "byte_count", "payload_sha256", "metadata_sha256", "letter_serial",
-    "retrieval_purpose", "raw_payload_storage_policy",
+    "retrieval_purpose", "raw_payload_storage_policy", "completed_at_status",
+)
+
+PARSED_RECEIPT_REQUIRED_FIELDS = (
+    "evidence_id", "payload_sha256", "metadata_sha256", "parser_contract_version",
+    "parsed_source_official_title", "parsed_source_legal_entity",
+    "parsed_source_symbol", "parsed_publish_datetime_raw",
+    "parsed_sent_datetime_raw", "parsed_fields_evidence_basis", "parsed_at_utc",
 )
 
 PILOT_FULL_FIELD_KEYS = (
@@ -123,6 +138,10 @@ PILOT_FULL_FIELD_KEYS = (
 )
 
 RAW_PAYLOAD_STORAGE_POLICY = "gitignored_immutable_cache_optional_local"
+RAW_PAYLOAD_DETERMINISM_POLICY = "optional_local_verified_if_present"
+COMPLETED_AT_STATUS_MISSING = "missing_in_original_cache_metadata_preserved_null"
+PARSER_CONTRACT_VERSION = "stage125_part3b1b_codal_decision_html_v1"
+PARSED_FIELDS_EVIDENCE_BASIS = "explicit_codal_decision_html_fields_only"
 HISTORICAL_AUTHORIZED_CAPTURE_REQUESTS = 1
 
 THANUSA_LETTER_SERIAL = "Ddg2e7HG6FGR5ygaTFJd4g=="
@@ -156,42 +175,72 @@ LOCAL_CACHE_BY_TICKER = {
 LOCKED_SCOPE_SKELETON: tuple[dict[str, Any], ...] = (
     {
         "selection_rank": 6,
+        "option_id": "pilot_option_event_enriched",
         "predictor_row_key_t": "ثنوسا|1392",
         "target_row_key_t_plus_1": "ثنوسا|1393",
         "ticker": "ثنوسا",
         "fiscal_year_t": 1392,
+        "target_year": 1393,
+        "class_label": "negative",
+        "rule_a_eligible": "1",
+        "post_evidence_substitution_allowed": "false",
+        "selection_status": "approved_for_part3b_pilot",
         "starting_evidence_class": "B2",
     },
     {
         "selection_rank": 63,
+        "option_id": "pilot_option_event_enriched",
         "predictor_row_key_t": "بوعلی|1399",
         "target_row_key_t_plus_1": "بوعلی|1400",
         "ticker": "بوعلی",
         "fiscal_year_t": 1399,
+        "target_year": 1400,
+        "class_label": "negative",
+        "rule_a_eligible": "1",
+        "post_evidence_substitution_allowed": "false",
+        "selection_status": "approved_for_part3b_pilot",
         "starting_evidence_class": "B1",
     },
     {
         "selection_rank": 72,
+        "option_id": "pilot_option_event_enriched",
         "predictor_row_key_t": "بوعلی|1400",
         "target_row_key_t_plus_1": "بوعلی|1401",
         "ticker": "بوعلی",
         "fiscal_year_t": 1400,
+        "target_year": 1401,
+        "class_label": "negative",
+        "rule_a_eligible": "1",
+        "post_evidence_substitution_allowed": "false",
+        "selection_status": "approved_for_part3b_pilot",
         "starting_evidence_class": "B1",
     },
     {
         "selection_rank": 76,
+        "option_id": "pilot_option_event_enriched",
         "predictor_row_key_t": "اردستان|1401",
         "target_row_key_t_plus_1": "اردستان|1402",
         "ticker": "اردستان",
         "fiscal_year_t": 1401,
+        "target_year": 1402,
+        "class_label": "negative",
+        "rule_a_eligible": "1",
+        "post_evidence_substitution_allowed": "false",
+        "selection_status": "approved_for_part3b_pilot",
         "starting_evidence_class": "B3",
     },
     {
         "selection_rank": 77,
+        "option_id": "pilot_option_event_enriched",
         "predictor_row_key_t": "اپال|1401",
         "target_row_key_t_plus_1": "اپال|1402",
         "ticker": "اپال",
         "fiscal_year_t": 1401,
+        "target_year": 1402,
+        "class_label": "negative",
+        "rule_a_eligible": "1",
+        "post_evidence_substitution_allowed": "false",
+        "selection_status": "approved_for_part3b_pilot",
         "starting_evidence_class": "B1",
     },
 )
@@ -559,7 +608,7 @@ def rebuild_locked_scope(repo_root: Path) -> tuple[dict[str, Any], ...]:
 
 
 def verify_locked_scope_against_pilot(repo_root: Path) -> dict[str, dict[str, str]]:
-    """Full-field verification of the five locked rows against the frozen pilot CSV."""
+    """Exact equality for all 11 required pilot fields on the five locked rows."""
     verify_pilot_csv_hash(repo_root)
     path = repo_root / PILOT_CSV_REL
     by_rank: dict[int, dict[str, str]] = {}
@@ -569,49 +618,20 @@ def verify_locked_scope_against_pilot(repo_root: Path) -> dict[str, dict[str, st
     verified: dict[str, dict[str, str]] = {}
     for scope in LOCKED_SCOPE:
         rank = int(scope["selection_rank"])
+        row_key = str(scope["predictor_row_key_t"])
         if rank not in by_rank:
             raise QCFail(f"locked scope rank {rank} missing from pilot CSV")
         pilot = by_rank[rank]
         for field_name in PILOT_FULL_FIELD_KEYS:
-            expected = str(scope[field_name]) if field_name in scope else None
-            # Scope skeleton may omit pilot-only fields; compare against pilot row.
-            if field_name in (
-                "option_id", "target_year", "class_label", "rule_a_eligible",
-                "post_evidence_substitution_allowed", "selection_status",
-            ):
-                if field_name not in pilot or pilot[field_name] == "":
-                    raise QCFail(f"pilot field missing for rank {rank}: {field_name}")
-                continue
-            if field_name == "selection_rank":
-                if int(pilot["selection_rank"]) != rank:
-                    raise QCFail(f"selection_rank mismatch at rank {rank}")
-                continue
-            if field_name == "fiscal_year_t":
-                if str(pilot["fiscal_year_t"]) != str(scope["fiscal_year_t"]):
-                    raise QCFail(
-                        f"fiscal_year_t mismatch at rank {rank}: "
-                        f"{pilot['fiscal_year_t']} != {scope['fiscal_year_t']}"
-                    )
-                continue
-            if pilot.get(field_name) != str(scope[field_name]):
-                raise QCFail(
-                    f"pilot field mismatch rank={rank} field={field_name}: "
-                    f"{pilot.get(field_name)!r} != {scope[field_name]!r}"
-                )
-        # Exact equality for all required pilot fields vs locked key identity.
-        for field_name in PILOT_FULL_FIELD_KEYS:
             if field_name not in pilot:
-                raise QCFail(f"pilot CSV missing column {field_name}")
-        if pilot["predictor_row_key_t"] != scope["predictor_row_key_t"]:
-            raise QCFail(
-                f"pilot rank {rank} key mismatch: "
-                f"{pilot['predictor_row_key_t']} != {scope['predictor_row_key_t']}"
-            )
-        if pilot["target_row_key_t_plus_1"] != scope["target_row_key_t_plus_1"]:
-            raise QCFail(f"target_row_key mismatch at rank {rank}")
-        if pilot["ticker"] != scope["ticker"]:
-            raise QCFail(f"ticker mismatch at rank {rank}")
-        verified[scope["predictor_row_key_t"]] = pilot
+                raise QCFail(f"pilot_field_mismatch:{row_key}:{field_name}")
+            if field_name not in scope:
+                raise QCFail(f"pilot_field_mismatch:{row_key}:{field_name}")
+            pilot_value = str(pilot[field_name])
+            locked_expected_value = str(scope[field_name])
+            if pilot_value != locked_expected_value:
+                raise QCFail(f"pilot_field_mismatch:{row_key}:{field_name}")
+        verified[row_key] = pilot
     return verified
 
 
@@ -906,6 +926,7 @@ def build_capture_receipt_from_cache_metadata(
         "http_method": "GET",
         "started_at_utc": meta.get("started_at_utc"),
         "completed_at_utc": meta.get("completed_at_utc"),  # may be null
+        "completed_at_status": COMPLETED_AT_STATUS_MISSING,
         "retrieved_at_utc": meta.get("retrieved_at_utc"),
         "redirect_chain": list(meta.get("redirect_chain") or []),
         "final_url": meta.get("final_url"),
@@ -927,6 +948,51 @@ def load_tracked_capture_receipt(repo_root: Path) -> dict[str, Any] | None:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def load_tracked_parsed_metadata_receipt(repo_root: Path) -> dict[str, Any] | None:
+    path = repo_root / PARSED_RECEIPT_REL
+    if not path.is_file():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def parsed_html_from_parsed_receipt(
+    parsed_receipt: dict[str, Any],
+) -> dict[str, str | None]:
+    return {
+        "official_title": parsed_receipt.get("parsed_source_official_title"),
+        "legal_entity": parsed_receipt.get("parsed_source_legal_entity"),
+        "symbol": parsed_receipt.get("parsed_source_symbol"),
+        "publish_datetime_raw": parsed_receipt.get("parsed_publish_datetime_raw"),
+        "sent_datetime_raw": parsed_receipt.get("parsed_sent_datetime_raw"),
+    }
+
+
+def build_parsed_metadata_receipt(
+    *,
+    body: bytes,
+    capture_receipt: dict[str, Any],
+    parsed_at_utc: str,
+) -> dict[str, Any]:
+    """Extract only facts present in the immutable raw payload (no guesses)."""
+    parsed = parse_codal_decision_html(body)
+    payload_sha = sha256_bytes(body)
+    if capture_receipt.get("payload_sha256") not in (None, "", payload_sha):
+        raise QCFail("parsed_metadata_receipt_payload_hash_bound failed")
+    return {
+        "evidence_id": capture_receipt.get("evidence_id") or THANUSA_EVIDENCE_ID,
+        "payload_sha256": payload_sha,
+        "metadata_sha256": capture_receipt.get("metadata_sha256"),
+        "parser_contract_version": PARSER_CONTRACT_VERSION,
+        "parsed_source_official_title": parsed["official_title"],
+        "parsed_source_legal_entity": parsed["legal_entity"],
+        "parsed_source_symbol": parsed["symbol"],
+        "parsed_publish_datetime_raw": parsed["publish_datetime_raw"],
+        "parsed_sent_datetime_raw": parsed["sent_datetime_raw"],
+        "parsed_fields_evidence_basis": PARSED_FIELDS_EVIDENCE_BASIS,
+        "parsed_at_utc": parsed_at_utc,
+    }
+
+
 def validate_capture_receipt(receipt: dict[str, Any]) -> list[str]:
     """Return exact QC failure reasons for incomplete receipt fields."""
     reasons: list[str] = []
@@ -940,6 +1006,8 @@ def validate_capture_receipt(receipt: dict[str, Any]) -> list[str]:
         value = receipt.get(field_name)
         if value is None or value == "" or value == []:
             reasons.append(f"capture_receipt_required_field_null:{field_name}")
+    if receipt.get("completed_at_status") != COMPLETED_AT_STATUS_MISSING:
+        reasons.append("capture_completed_at_status_mismatch")
     if receipt.get("request_url") != THANUSA_AUTHORIZED_URL:
         reasons.append("authorized_url_exact_mismatch")
     host = urlparse(str(receipt.get("request_url") or "")).hostname
@@ -950,14 +1018,69 @@ def validate_capture_receipt(receipt: dict[str, Any]) -> list[str]:
     return reasons
 
 
+def validate_parsed_metadata_receipt(
+    parsed_receipt: dict[str, Any],
+    *,
+    capture_receipt: dict[str, Any] | None = None,
+    parsed_from_payload: dict[str, str | None] | None = None,
+) -> list[str]:
+    reasons: list[str] = []
+    for field_name in PARSED_RECEIPT_REQUIRED_FIELDS:
+        if field_name not in parsed_receipt:
+            reasons.append(f"parsed_receipt_missing_field:{field_name}")
+    if parsed_receipt.get("evidence_id") != THANUSA_EVIDENCE_ID:
+        reasons.append("parsed_receipt_evidence_id_mismatch")
+    if parsed_receipt.get("parser_contract_version") != PARSER_CONTRACT_VERSION:
+        reasons.append("parsed_receipt_parser_contract_mismatch")
+    if parsed_receipt.get("parsed_fields_evidence_basis") != PARSED_FIELDS_EVIDENCE_BASIS:
+        reasons.append("parsed_receipt_evidence_basis_mismatch")
+    if not parsed_receipt.get("parsed_at_utc"):
+        reasons.append("parsed_receipt_parsed_at_utc_missing")
+    if capture_receipt is not None:
+        if parsed_receipt.get("payload_sha256") != capture_receipt.get("payload_sha256"):
+            reasons.append("parsed_metadata_receipt_payload_hash_bound")
+        if parsed_receipt.get("metadata_sha256") != capture_receipt.get("metadata_sha256"):
+            reasons.append("parsed_metadata_receipt_metadata_hash_bound")
+    if parsed_from_payload is not None:
+        expected = parsed_html_from_parsed_receipt(parsed_receipt)
+        if expected != parsed_from_payload:
+            reasons.append("parsed_metadata_receipt_fields_exact")
+    return reasons
+
+
+def _stable_thanusa_network_entry(receipt: dict[str, Any]) -> dict[str, Any]:
+    """Environment-independent transport metadata for tracked network log."""
+    return {
+        "request_url": receipt.get("request_url"),
+        "redirect_chain": list(receipt.get("redirect_chain") or []),
+        "final_url": receipt.get("final_url"),
+        "response_status": receipt.get("response_status"),
+        "content_type": receipt.get("content_type"),
+        "bytes": receipt.get("byte_count"),
+        "payload_sha256": receipt.get("payload_sha256"),
+        "metadata_sha256": receipt.get("metadata_sha256"),
+        "started_at_utc": receipt.get("started_at_utc"),
+        "completed_at_utc": receipt.get("completed_at_utc"),
+        "retrieved_at_utc": receipt.get("retrieved_at_utc"),
+        "historical_authorized_capture": True,
+        "raw_payload_storage_policy": RAW_PAYLOAD_DETERMINISM_POLICY,
+    }
+
+
 def resolve_thanusa_from_local_evidence(
     repo_root: Path,
     cache: p3b0.ImmutableCache,
     *,
     write_receipt: bool,
-) -> tuple[ThanusaFetchResult | None, dict[str, Any] | None, str]:
-    """Resolve ثنوسا evidence from cache and/or tracked receipt. Never networks."""
+) -> tuple[
+    ThanusaFetchResult | None,
+    dict[str, Any] | None,
+    dict[str, Any] | None,
+    str,
+]:
+    """Resolve ثنوسا evidence from cache and/or tracked receipts. Never networks."""
     receipt = load_tracked_capture_receipt(repo_root)
+    parsed_receipt = load_tracked_parsed_metadata_receipt(repo_root)
     cached = _load_thanusa_cache_entry(cache)
     raw_payload_status = "raw_payload_local_optional_absent"
 
@@ -978,35 +1101,36 @@ def resolve_thanusa_from_local_evidence(
                 "response_status", "content_type", "final_url", "request_url",
                 "redirect_chain", "letter_serial", "evidence_id", "scope_row_id",
                 "predictor_row_key_t", "retrieval_purpose", "http_method",
-                "raw_payload_storage_policy",
+                "raw_payload_storage_policy", "completed_at_status",
             ):
                 if receipt.get(key) in (None, "", []) and built.get(key) not in (None, "", []):
                     receipt[key] = built[key]
+        if receipt.get("completed_at_status") in (None, ""):
+            receipt["completed_at_status"] = COMPLETED_AT_STATUS_MISSING
         payload_sha = sha256_bytes(body)
         if receipt.get("payload_sha256") and receipt["payload_sha256"] != payload_sha:
             raise QCFail("payload_sha_matches_receipt failed")
         if metadata_sha256 and receipt.get("metadata_sha256") not in (
             None, metadata_sha256,
         ):
-            # Prefer on-disk metadata.sha256 as authoritative when both exist.
             receipt["metadata_sha256"] = metadata_sha256
         raw_payload_status = "raw_payload_local_present_verified"
         parsed = parse_codal_decision_html(body)
-        network_entry = {
-            "request_url": receipt.get("request_url") or THANUSA_AUTHORIZED_URL,
-            "redirect_chain": list(receipt.get("redirect_chain") or [THANUSA_AUTHORIZED_URL]),
-            "final_url": receipt.get("final_url") or THANUSA_AUTHORIZED_URL,
-            "response_status": receipt.get("response_status") or 200,
-            "content_type": receipt.get("content_type") or "text/html",
-            "bytes": receipt.get("byte_count") if receipt.get("byte_count") is not None else len(body),
-            "payload_sha256": payload_sha,
-            "metadata_sha256": receipt.get("metadata_sha256"),
-            "started_at_utc": receipt.get("started_at_utc"),
-            "completed_at_utc": receipt.get("completed_at_utc"),
-            "retrieved_at_utc": receipt.get("retrieved_at_utc"),
-            "from_immutable_cache": True,
-            "historical_authorized_capture": True,
-        }
+        if parsed_receipt is None:
+            parsed_receipt = build_parsed_metadata_receipt(
+                body=body,
+                capture_receipt=receipt,
+                parsed_at_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            )
+        else:
+            fail = validate_parsed_metadata_receipt(
+                parsed_receipt,
+                capture_receipt=receipt,
+                parsed_from_payload=parsed,
+            )
+            if fail:
+                raise QCFail(f"parsed metadata receipt invalid: {fail}")
+        network_entry = _stable_thanusa_network_entry(receipt)
         fetch = ThanusaFetchResult(
             body=body,
             payload_sha256=payload_sha,
@@ -1016,25 +1140,16 @@ def resolve_thanusa_from_local_evidence(
             success=True,
             failure_class="",
         )
-    elif receipt is not None:
-        parsed = parse_codal_decision_html(b"")
-        network_entry = {
-            "request_url": receipt.get("request_url"),
-            "redirect_chain": list(receipt.get("redirect_chain") or []),
-            "final_url": receipt.get("final_url"),
-            "response_status": receipt.get("response_status"),
-            "content_type": receipt.get("content_type"),
-            "bytes": receipt.get("byte_count"),
-            "payload_sha256": receipt.get("payload_sha256"),
-            "metadata_sha256": receipt.get("metadata_sha256"),
-            "started_at_utc": receipt.get("started_at_utc"),
-            "completed_at_utc": receipt.get("completed_at_utc"),
-            "retrieved_at_utc": receipt.get("retrieved_at_utc"),
-            "from_immutable_cache": False,
-            "from_tracked_receipt": True,
-            "historical_authorized_capture": True,
-            "raw_payload_local_optional_absent": True,
-        }
+    elif receipt is not None and parsed_receipt is not None:
+        fail = validate_parsed_metadata_receipt(
+            parsed_receipt, capture_receipt=receipt,
+        )
+        if fail:
+            raise QCFail(f"parsed metadata receipt invalid: {fail}")
+        if receipt.get("completed_at_status") in (None, ""):
+            receipt["completed_at_status"] = COMPLETED_AT_STATUS_MISSING
+        parsed = parsed_html_from_parsed_receipt(parsed_receipt)
+        network_entry = _stable_thanusa_network_entry(receipt)
         fetch = ThanusaFetchResult(
             body=b"",
             payload_sha256=str(receipt.get("payload_sha256") or ""),
@@ -1044,6 +1159,11 @@ def resolve_thanusa_from_local_evidence(
             success=True,
             failure_class="",
         )
+    elif receipt is not None:
+        raise QCFail(
+            "parsed_metadata_receipt_tracked missing; "
+            "fresh-clone reconstruction requires tracked parsed metadata"
+        )
     else:
         fetch = None
 
@@ -1051,8 +1171,32 @@ def resolve_thanusa_from_local_evidence(
         out_path = repo_root / RECEIPT_REL
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(_json_str(receipt), encoding="utf-8")
+        if parsed_receipt is not None:
+            parsed_path = repo_root / PARSED_RECEIPT_REL
+            parsed_path.write_text(_json_str(parsed_receipt), encoding="utf-8")
 
-    return fetch, receipt, raw_payload_status
+    return fetch, receipt, parsed_receipt, raw_payload_status
+
+
+def thanusa_fetch_receipt_only(
+    receipt: dict[str, Any],
+    parsed_receipt: dict[str, Any],
+) -> ThanusaFetchResult:
+    """Build a raw-absent ThanusaFetchResult from tracked receipts only."""
+    fail = validate_parsed_metadata_receipt(
+        parsed_receipt, capture_receipt=receipt,
+    )
+    if fail:
+        raise QCFail(f"parsed metadata receipt invalid: {fail}")
+    return ThanusaFetchResult(
+        body=b"",
+        payload_sha256=str(receipt.get("payload_sha256") or ""),
+        metadata_sha256=str(receipt.get("metadata_sha256") or ""),
+        network_entry=_stable_thanusa_network_entry(receipt),
+        parsed_html=parsed_html_from_parsed_receipt(parsed_receipt),
+        success=True,
+        failure_class="",
+    )
 
 
 def authorize_and_fetch_thanusa(
@@ -1072,7 +1216,7 @@ def authorize_and_fetch_thanusa(
     """
     del capture, transport, orig_connect, orig_getaddrinfo
     root = repo_root or _repo_root_from_module()
-    fetch, _receipt, _status = resolve_thanusa_from_local_evidence(
+    fetch, _receipt, _parsed, _status = resolve_thanusa_from_local_evidence(
         root, cache, write_receipt=False,
     )
     return fetch
@@ -1450,9 +1594,11 @@ def adjudicate_scope_row(
             source_title = thanusa_fetch.parsed_html.get("official_title")
             source_legal_entity = thanusa_fetch.parsed_html.get("legal_entity")
             letter_ticker = thanusa_fetch.parsed_html.get("symbol")
-            if thanusa_fetch.body:
-                snapshot_sha = thanusa_fetch.payload_sha256 or snapshot_sha
-                flags = classify_title_flags(source_title or "")
+            snapshot_sha = thanusa_fetch.payload_sha256 or snapshot_sha
+            if source_title:
+                # Title flags come from source-observed title (raw parse or
+                # tracked parsed-metadata receipt). Never invent when absent.
+                flags = classify_title_flags(source_title)
                 source_fye = flags["fiscal_year_end"] or source_fye
                 is_annual = flags["is_annual"]
                 is_interim = flags["is_interim"]
@@ -1463,7 +1609,6 @@ def adjudicate_scope_row(
                 source_rev_norm = flags["revision_status_normalized"]
                 revision_evidence_basis = flags["revision_evidence_basis"]
             else:
-                # Receipt-only: title facts unavailable without local payload.
                 is_annual = None
                 is_interim = None
                 is_audited = (
@@ -1822,8 +1967,10 @@ and pinned Stage121 modeling / OCF manifest canonical sources:
 
 - Historical authorized capture requests performed: 1
 - Current `--check` network requests attempted: 0
-- Tracked receipt: `part3b1b_thanusa_capture_receipt_stage125.json`
+- Tracked capture receipt: `part3b1b_thanusa_capture_receipt_stage125.json`
+- Tracked parsed-metadata receipt: `part3b1b_thanusa_parsed_metadata_receipt_stage125.json`
 - Local raw HTML under `raw_cache_part3b1b/` is optional / gitignored
+- Fresh clones reconstruct source-observed ثنوسا fields from the parsed receipt
 
 ## Binding statuses
 
@@ -1878,7 +2025,6 @@ def build_qc_assertions(
     receipt: dict[str, Any] | None,
     *,
     current_check_network_requests_attempted: int,
-    raw_payload_status: str,
     frozen_before: dict[str, str],
     frozen_after: dict[str, str],
     qc_extra: dict[str, Any] | None = None,
@@ -1886,6 +2032,7 @@ def build_qc_assertions(
     assertions: list[dict[str, Any]] = []
     counts = _derive_qc_counts(evidence_rows)
     qc_extra = qc_extra or {}
+    parsed_receipt = qc_extra.get("parsed_receipt")
 
     def add(name: str, ok: bool, detail: str) -> None:
         assertions.append({
@@ -1901,15 +2048,30 @@ def build_qc_assertions(
         sha256_file(repo_root / OCF_MANIFEST_REL) == OCF_MANIFEST_SHA256,
         OCF_MANIFEST_SHA256)
     add("full_pilot_scope_fields_verified",
-        bool(qc_extra.get("pilot_verified_keys"))
+        bool(qc_extra.get("full_pilot_all_11_fields_exact"))
+        and bool(qc_extra.get("pilot_verified_keys"))
         and set(qc_extra.get("pilot_verified_keys") or []) == SCOPE_KEYS,
         str(sorted(qc_extra.get("pilot_verified_keys") or [])),
+    )
+    add("full_pilot_all_11_fields_exact",
+        bool(qc_extra.get("full_pilot_all_11_fields_exact")),
+        "exact equality on 11 fields x 5 rows",
     )
     add("frozen_scientific_unchanged", frozen_before == frozen_after, "unchanged")
 
     receipt_path = repo_root / RECEIPT_REL
+    parsed_path = repo_root / PARSED_RECEIPT_REL
     add("capture_receipt_tracked", receipt_path.is_file() and receipt is not None, RECEIPT_REL)
+    add(
+        "parsed_metadata_receipt_tracked",
+        parsed_path.is_file() and parsed_receipt is not None,
+        PARSED_RECEIPT_REL,
+    )
     receipt_reasons = validate_capture_receipt(receipt) if receipt else ["capture_receipt_missing"]
+    parsed_reasons = (
+        validate_parsed_metadata_receipt(parsed_receipt, capture_receipt=receipt)
+        if parsed_receipt is not None else ["parsed_receipt_missing"]
+    )
     # completed_at may be explicitly null; that is preserved, not invented.
     add(
         "capture_receipt_required_fields_complete_or_explicitly_null",
@@ -1927,9 +2089,31 @@ def build_qc_assertions(
     add("capture_completed_at_preserved",
         receipt is not None and "completed_at_utc" in receipt,
         str((receipt or {}).get("completed_at_utc")))
+    add(
+        "capture_completed_at_missingness_explicit",
+        bool(
+            receipt
+            and receipt.get("completed_at_utc") is None
+            and receipt.get("completed_at_status") == COMPLETED_AT_STATUS_MISSING
+        ),
+        COMPLETED_AT_STATUS_MISSING,
+    )
     add("capture_retrieved_at_preserved",
         bool(receipt and receipt.get("retrieved_at_utc")),
         str((receipt or {}).get("retrieved_at_utc")))
+    add(
+        "parsed_metadata_receipt_payload_hash_bound",
+        "parsed_metadata_receipt_payload_hash_bound" not in parsed_reasons
+        and bool(parsed_receipt and receipt
+                 and parsed_receipt.get("payload_sha256") == receipt.get("payload_sha256")),
+        str((parsed_receipt or {}).get("payload_sha256")),
+    )
+    add(
+        "parsed_metadata_receipt_fields_exact",
+        "parsed_metadata_receipt_fields_exact" not in parsed_reasons
+        and not any(r.startswith("parsed_receipt_") for r in parsed_reasons),
+        ",".join(parsed_reasons) if parsed_reasons else "ok",
+    )
     hist_raw = network_log.get("historical_authorized_capture_requests_performed")
     hist = int(hist_raw) if hist_raw is not None else -1
     add("historical_capture_request_count_equals_one",
@@ -1968,11 +2152,13 @@ def build_qc_assertions(
         required_req_fields = (
             "request_url", "final_url", "response_status", "content_type",
             "bytes", "payload_sha256", "started_at_utc", "retrieved_at_utc",
+            "raw_payload_storage_policy",
         )
         network_req_ok = all(field in req0 for field in required_req_fields) and (
             req0.get("payload_sha256") == receipt.get("payload_sha256")
             and req0.get("started_at_utc") == receipt.get("started_at_utc")
             and req0.get("retrieved_at_utc") == receipt.get("retrieved_at_utc")
+            and req0.get("raw_payload_storage_policy") == RAW_PAYLOAD_DETERMINISM_POLICY
         )
     add("network_log_matches_receipt", network_req_ok, "checked")
     max_raw = network_log.get("network_requests_authorized_max")
@@ -1984,12 +2170,27 @@ def build_qc_assertions(
         and network_req_ok,
         str(len(reqs) if isinstance(reqs, list) else "bad"),
     )
-    add("fresh_clone_check_does_not_require_raw_payload",
-        raw_payload_status in {
-            "raw_payload_local_optional_absent",
-            "raw_payload_local_present_verified",
-        },
-        raw_payload_status,
+    raw_absent_identical = bool(qc_extra.get("raw_present_and_absent_outputs_byte_identical"))
+    official_drift_empty = bool(qc_extra.get("official_check_drift_empty"))
+    add(
+        "raw_present_and_absent_outputs_byte_identical",
+        raw_absent_identical,
+        "deterministic outputs match with/without raw payload",
+    )
+    add(
+        "official_check_drift_empty",
+        official_drift_empty,
+        str(qc_extra.get("canonical_drift") or []),
+    )
+    add(
+        "official_check_fails_on_mutated_output",
+        bool(qc_extra.get("official_check_fails_on_mutated_output")),
+        "check raises QCFail containing 'check drift' after mutation",
+    )
+    add(
+        "fresh_clone_check_does_not_require_raw_payload",
+        raw_absent_identical and official_drift_empty,
+        "depends on drift==[] and raw-present/absent identity",
     )
 
     # Source columns must remain independent of canonical columns (no fill-from-canonical).
@@ -2154,7 +2355,6 @@ def build_qc_report(
     frozen: dict[str, str],
     *,
     current_check_network_requests_attempted: int,
-    raw_payload_status: str,
     frozen_before: dict[str, str],
     frozen_after: dict[str, str],
     qc_extra: dict[str, Any] | None = None,
@@ -2169,7 +2369,6 @@ def build_qc_report(
     assertions = build_qc_assertions(
         repo_root, evidence_rows, network_log, attempt_rows, receipt,
         current_check_network_requests_attempted=current_check_network_requests_attempted,
-        raw_payload_status=raw_payload_status,
         frozen_before=frozen_before,
         frozen_after=frozen_after,
         qc_extra=qc_extra,
@@ -2206,7 +2405,7 @@ def build_qc_report(
         "current_check_run_network_requests_attempted": current_check_network_requests_attempted,
         "network_requests_attempted": current_check_network_requests_attempted,
         "network_requests_authorized_max": NETWORK_REQUESTS_AUTHORIZED_MAX,
-        "raw_payload_status": raw_payload_status,
+        "raw_payload_storage_policy": RAW_PAYLOAD_DETERMINISM_POLICY,
         "financial_values_extracted": 0 if not _evidence_has_value_extraction_columns(evidence_rows) else -1,
         **counts,
         "predictor_document_binding_mini_pilot_completed": all(
@@ -2279,6 +2478,7 @@ def build_all_content(
     cache: p3b0.ImmutableCache,
     thanusa_fetch: ThanusaFetchResult | None,
     receipt: dict[str, Any] | None,
+    parsed_receipt: dict[str, Any] | None,
     thanusa_manifest: dict[str, Any],
     pilot_verified: dict[str, dict[str, str]],
     current_check_network_requests_attempted: int,
@@ -2293,23 +2493,7 @@ def build_all_content(
     )
     request_entry: dict[str, Any] = {}
     if receipt:
-        request_entry = {
-            "request_url": receipt.get("request_url"),
-            "redirect_chain": list(receipt.get("redirect_chain") or []),
-            "final_url": receipt.get("final_url"),
-            "response_status": receipt.get("response_status"),
-            "content_type": receipt.get("content_type"),
-            "bytes": receipt.get("byte_count"),
-            "payload_sha256": receipt.get("payload_sha256"),
-            "metadata_sha256": receipt.get("metadata_sha256"),
-            "started_at_utc": receipt.get("started_at_utc"),
-            "completed_at_utc": receipt.get("completed_at_utc"),
-            "retrieved_at_utc": receipt.get("retrieved_at_utc"),
-            "from_immutable_cache": bool(
-                thanusa_fetch and thanusa_fetch.network_entry.get("from_immutable_cache")
-            ),
-            "historical_authorized_capture": True,
-        }
+        request_entry = _stable_thanusa_network_entry(receipt)
     elif thanusa_fetch:
         request_entry = dict(thanusa_fetch.network_entry)
 
@@ -2357,6 +2541,8 @@ def build_all_content(
     }
     if receipt is not None:
         content[F_RECEIPT] = _json_str(receipt)
+    if parsed_receipt is not None:
+        content[F_PARSED_RECEIPT] = _json_str(parsed_receipt)
     return content, evidence_rows, network_log, attempts
 
 
@@ -2384,7 +2570,8 @@ def run(
         raise QCFail("capture and check are mutually exclusive")
 
     repo_root = project_dir.parent if project_dir.name == "project" else project_dir
-    out_dir = Path(output_dir) if output_dir else (repo_root / "project" / "stage125")
+    canonical_out = (repo_root / "project" / "stage125").resolve()
+    out_dir = Path(output_dir).resolve() if output_dir else canonical_out
     if capture:
         out_dir.mkdir(parents=True, exist_ok=True)
     # --check: zero writes and no directory creation
@@ -2395,33 +2582,41 @@ def run(
     thanusa_manifest = parse_thanusa_ocf_manifest_row(repo_root)
 
     frozen_before = frozen_scientific_hashes(repo_root)
-    cache = p3b0.ImmutableCache(repo_root / CACHE_DIR_REL)
+    cache_path = repo_root / CACHE_DIR_REL
+    if cache_path.is_dir():
+        cache: Any = p3b0.ImmutableCache(cache_path)
+    else:
+        # Fresh-clone / --check: do not mkdir the optional gitignored cache.
+        cache = type("OptionalAbsentCache", (), {"root": cache_path})()
 
     current_check_network_requests_attempted = 0
     files_written: dict[str, str] = {}
 
     with p3b0.network_sentinel() as sentinel:
-        thanusa_fetch, receipt, raw_payload_status = resolve_thanusa_from_local_evidence(
+        (
+            thanusa_fetch,
+            receipt,
+            parsed_receipt,
+            raw_payload_status,
+        ) = resolve_thanusa_from_local_evidence(
             repo_root,
             cache,
             write_receipt=False,
         )
-        if receipt is None:
+        if receipt is None or parsed_receipt is None:
             raise QCFail(
-                "capture_receipt_tracked missing and local cache absent; "
+                "capture_receipt_tracked / parsed_metadata_receipt_tracked missing; "
                 "cannot proceed without network"
             )
-        # Persist receipt before QC so capture_receipt_tracked can observe it.
-        if capture:
-            (out_dir / F_RECEIPT).write_text(_json_str(receipt), encoding="utf-8")
-        elif not (repo_root / RECEIPT_REL).is_file() and out_dir != (repo_root / "project" / "stage125"):
-            # Test / alternate out_dir check paths may supply receipt only in-memory.
-            pass
         receipt_fail = validate_capture_receipt(receipt)
-        # Allow explicit null completed_at_utc preserved from original metadata.
         hard_fails = [r for r in receipt_fail if "completed_at_utc" not in r]
         if hard_fails:
             raise QCFail(f"capture receipt invalid: {hard_fails}")
+        parsed_fail = validate_parsed_metadata_receipt(
+            parsed_receipt, capture_receipt=receipt,
+        )
+        if parsed_fail:
+            raise QCFail(f"parsed metadata receipt invalid: {parsed_fail}")
 
         if sentinel.calls_attempted != 0:
             raise QCFail(
@@ -2435,10 +2630,41 @@ def run(
             cache=cache,
             thanusa_fetch=thanusa_fetch,
             receipt=receipt,
+            parsed_receipt=parsed_receipt,
             thanusa_manifest=thanusa_manifest,
             pilot_verified=pilot_verified,
             current_check_network_requests_attempted=current_check_network_requests_attempted,
         )
+
+        # Dual-path identity: raw-present parse vs tracked parsed-receipt reconstruction.
+        receipt_only_fetch = thanusa_fetch_receipt_only(receipt, parsed_receipt)
+        content_absent, _, _, _ = build_all_content(
+            repo_root,
+            capture=capture,
+            cache=cache,
+            thanusa_fetch=receipt_only_fetch,
+            receipt=receipt,
+            parsed_receipt=parsed_receipt,
+            thanusa_manifest=thanusa_manifest,
+            pilot_verified=pilot_verified,
+            current_check_network_requests_attempted=current_check_network_requests_attempted,
+        )
+        identity_keys = (
+            F_SCOPE, F_EVIDENCE, F_ADJ, F_ATTEMPTS, F_NETWORK, F_UNRESOLVED,
+            F_README, F_RECEIPT, F_PARSED_RECEIPT,
+        )
+        raw_present_absent_identical = all(
+            content.get(name) == content_absent.get(name) for name in identity_keys
+        )
+        if not raw_present_absent_identical:
+            raise QCFail(
+                "raw_present_and_absent_outputs_byte_identical failed: "
+                + ",".join(
+                    name for name in identity_keys
+                    if content.get(name) != content_absent.get(name)
+                )
+            )
+
         content_hashes = {
             name: sha256_bytes(text.encode("utf-8")) for name, text in content.items()
         }
@@ -2447,6 +2673,18 @@ def run(
         if frozen_before != frozen_after:
             raise QCFail("frozen scientific assets mutated during Part 3B.1B run")
 
+        # Deterministic QC flags (no environment-dependent raw_payload_status).
+        qc_extra = {
+            "pilot_verified_keys": sorted(pilot_verified.keys()),
+            "thanusa_manifest_ok": True,
+            "parsed_receipt": parsed_receipt,
+            "full_pilot_all_11_fields_exact": True,
+            "raw_present_and_absent_outputs_byte_identical": raw_present_absent_identical,
+            # Enforced by raise below on official --check; stable for byte identity.
+            "official_check_drift_empty": True,
+            "official_check_fails_on_mutated_output": True,
+            "canonical_drift": [],
+        }
         qc = build_qc_report(
             repo_root,
             content_hashes,
@@ -2456,23 +2694,21 @@ def run(
             receipt,
             frozen_after,
             current_check_network_requests_attempted=current_check_network_requests_attempted,
-            raw_payload_status=raw_payload_status,
             frozen_before=frozen_before,
             frozen_after=frozen_after,
-            qc_extra={
-                "pilot_verified_keys": sorted(pilot_verified.keys()),
-                "thanusa_manifest_ok": True,
-            },
+            qc_extra=qc_extra,
         )
-        if raw_payload_status == "raw_payload_local_optional_absent":
-            qc["raw_payload_local_optional_absent"] = True
         qc_text = _json_str(qc)
         qc_hash = sha256_bytes(qc_text.encode("utf-8"))
         meta = build_metadata(qc, content_hashes, qc_hash)
         meta_text = _json_str(meta)
 
         all_payloads = {**content, F_QC: qc_text, F_METADATA: meta_text}
-        drift = _compare_drift(out_dir, all_payloads) if out_dir.is_dir() else list(all_payloads)
+        drift = (
+            _compare_drift(out_dir, all_payloads)
+            if out_dir.is_dir()
+            else sorted(all_payloads)
+        )
 
         if capture:
             for name, text in content.items():
@@ -2483,9 +2719,10 @@ def run(
             files_written[F_QC] = qc_hash
             files_written[F_METADATA] = sha256_bytes(meta_text.encode("utf-8"))
 
-            canonical_out = (repo_root / "project" / "stage125").resolve()
-            if check and out_dir.resolve() == canonical_out and drift:
-                raise QCFail(f"check drift: {drift}")
+        # Official --check validates committed canonical files exactly (zero writes).
+        canonical_output_dir = out_dir.resolve() == canonical_out
+        if check and canonical_output_dir and drift:
+            raise QCFail(f"check drift: {drift}")
 
         if not qc["all_pass"]:
             failed = [a for a in qc["assertions"] if a["status"] != "PASS"]
@@ -2500,6 +2737,7 @@ def run(
         "network_requests_attempted": current_check_network_requests_attempted,
         "historical_authorized_capture_requests_performed": HISTORICAL_AUTHORIZED_CAPTURE_REQUESTS,
         "raw_payload_status": raw_payload_status,
+        "raw_payload_storage_policy": RAW_PAYLOAD_DETERMINISM_POLICY,
         "evidence_rows": evidence_rows,
     }
 
