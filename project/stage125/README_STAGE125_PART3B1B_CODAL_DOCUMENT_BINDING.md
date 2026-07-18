@@ -21,8 +21,10 @@ and pinned Stage121 modeling / OCF manifest canonical sources:
 
 - Historical authorized capture requests performed: 1
 - Current `--check` network requests attempted: 0
-- Tracked receipt: `part3b1b_thanusa_capture_receipt_stage125.json`
+- Tracked capture receipt: `part3b1b_thanusa_capture_receipt_stage125.json`
+- Tracked parsed-metadata receipt: `part3b1b_thanusa_parsed_metadata_receipt_stage125.json`
 - Local raw HTML under `raw_cache_part3b1b/` is optional / gitignored
+- Fresh clones reconstruct source-observed ثنوسا fields from the parsed receipt
 
 ## Binding statuses
 

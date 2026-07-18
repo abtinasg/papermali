@@ -7,19 +7,20 @@
   "modeling_started": false,
   "network_requests_attempted": 0,
   "output_files_sha256": {
-    "README_STAGE125_PART3B1B_CODAL_DOCUMENT_BINDING.md": "bf97e714b09ca16f13b403a8916f4b184aa03eb78f32d3dc42117b4e21495487",
+    "README_STAGE125_PART3B1B_CODAL_DOCUMENT_BINDING.md": "fa4886b0f2ce6c027844e09c760a4bd7611b4462ef2c88a210f32cf70c2e6c9d",
     "part3b1b_capture_attempt_log_stage125.csv": "c0c86f74ef4ca198dd775032b2abb78423d170b5cf9a0e26a5d62c27d30f75c4",
     "part3b1b_codal_document_evidence_stage125.csv": "b0ded2c9c084cfc8ca882c370b6437d3949af52e00297b3f3d30f80bd315f867",
     "part3b1b_document_binding_adjudication_stage125.csv": "d4515c0f3741bec7733aac97c4167a1ca730e983b0cc1627d77da7c20c8aa7e1",
-    "part3b1b_network_log_stage125.json": "e779ecf87da4c26b85b3c4d96d3e142a9ef88b21a2e5caa2f97829913418ccb3",
+    "part3b1b_network_log_stage125.json": "77c1e1feda3056166892c25bbdfc4bd7c2417e5daefc3ba26383bf4e7c39ce12",
     "part3b1b_predictor_document_scope_stage125.csv": "835e1b6b17df35f167180e59f7fe51e31c0c679cef464b7d78256ce24bb07f91",
-    "part3b1b_thanusa_capture_receipt_stage125.json": "57e70b5c643c3a0d45d9bcaf968bdae16feefb7b2d6cb62c2df2a07b9d00c128",
+    "part3b1b_thanusa_capture_receipt_stage125.json": "f2571c296d3400af1bc6b607180d231b4b06096ca4f5c58f024286ade4821626",
+    "part3b1b_thanusa_parsed_metadata_receipt_stage125.json": "217228edd67595167746f006e5bec21f17aa9f3f16008d30c3abc7023e9f84a4",
     "part3b1b_unresolved_and_rejections_stage125.csv": "d5e0ce0d400601057d65b935683dbd8b3e3c0d03fa7bb24842f56f61cbf53a67",
-    "stage125_part3b1b_codal_document_binding_qc_report.json": "a243b75a9e6dbbc04759968ab9bfc3c08369a839f866a4a9c78dd0205e09f461"
+    "stage125_part3b1b_codal_document_binding_qc_report.json": "73199d12a1e6fe2d6cd38e2e1e41236bd9b5d31d5b1f0f9b76c9d35419e03eda"
   },
   "part3b_completed": false,
   "predictor_document_binding_mini_pilot_completed": true,
-  "source_file_sha256": "c6c0a73e8d9d57160f3557eb68aef51c14cb24aa68c4b56e35818cffba891817",
+  "source_file_sha256": "f751846655cb1cbe1573de99a195a25039a06f21ca6101b73b9ffcfe868f1fd0",
   "stage": "stage125_part3b1b_codal_document_binding_mini_pilot",
-  "test_file_sha256": "a3cbaeaa94aece6ade4ea9a8fc2000fe8d077eb0d454f18cc37a5527233c2b82"
+  "test_file_sha256": "0c59212c4b9306d9dfd37b7aa8ab181c009b9a023b151bc32e43d4d84f7de1d2"
 }

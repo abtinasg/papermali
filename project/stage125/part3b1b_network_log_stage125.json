@@ -15,10 +15,10 @@
       "completed_at_utc": null,
       "content_type": "text/html; charset=utf-8",
       "final_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D",
-      "from_immutable_cache": true,
       "historical_authorized_capture": true,
       "metadata_sha256": "43d435e7b696169e14bf731b54e0f4f8f1b32e06363fd6e3498a8d40d1f1ed2f",
       "payload_sha256": "6d7b08e87a4024851c8e2f17225c2aca43dc968673ccd2869cde2a4fb123b4ee",
+      "raw_payload_storage_policy": "optional_local_verified_if_present",
       "redirect_chain": [
         "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D"
       ],
