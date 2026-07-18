@@ -1,0 +1,18 @@
+{
+  "accessibility_scoring_authorized": false,
+  "authorization_granted_by": "human_supervisor",
+  "authorization_scope": "same_five_metadata_resolution_second_attempt",
+  "authorized_logical_requests": 4,
+  "authorized_rows": "ثنوسا|1392;بوعلی|1399;بوعلی|1400;اپال|1401",
+  "baseline_main_sha": "f1bc5eb770d883754078f15427dac45fe40a8c0b",
+  "binding_status_mutation_authorized": false,
+  "financial_value_extraction_authorized": false,
+  "gate_application_authorized": false,
+  "modeling_authorized": false,
+  "part3b2_authorized": false,
+  "real_available_at_assignment_authorized": false,
+  "scale_up_to_80_rows_authorized": false,
+  "stage126_authorized": false,
+  "structurally_rejected_no_request_row": "اردستان|1401",
+  "task_id": "stage125-part3b1d-same-five-metadata-resolution-capture"
+}
