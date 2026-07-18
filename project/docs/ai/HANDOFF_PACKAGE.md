@@ -102,6 +102,13 @@ Do not confuse QC selection with the research-action chain:
   `part3b1_adjudicated_decision_requirements_stage125.json` and
   `README_STAGE125_PART3B1_DECISION_LOCK.md` (historical Part 3B proposed
   requirements README remains frozen).
+- Stage125 Part 3B.1E conservative-lag decision-lock source/test/QC:
+  `src/stage125_part3b1e_conservative_lag_decision.py`,
+  `run_stage125_part3b1e.py`,
+  `tests/test_stage125_part3b1e_conservative_lag_decision.py`,
+  `stage125/stage125_part3b1e_conservative_lag_qc_report.json` (fixed
+  six-month lag; researcher-verified financials frozen; no broad CODAL
+  capture; assumed availability field only; no Stage126 / modeling).
 
 ## 7. Done
 
@@ -127,11 +134,13 @@ See [`OPEN_TASKS.md`](OPEN_TASKS.md).
 
 See `next_research_action_id` in [`ROADMAP.md`](ROADMAP.md) and
 [`handoff_state.json`](handoff_state.json). Currently the research pointer is
-**`stage125-part3b-evidence-capture`** (Part 3B active/incomplete). Part 3B.1 is
-maintenance-locked (`part3b1_decision_locked=true`); Part 3B.1A adds
-`cut_a_available_at_operationalization_locked=true` without moving that pointer
-or assigning real `available_at` values. Stage125 performs **no** modeling; the
-frozen research contract (M1–M4 blocks, M5 removed, accessibility Gates) is in
+**`stage125-part3c-leakage-safe-dataset-finalization`** after the conservative
+six-month lag decision lock
+(`last_completed_research_action_id=stage125-part3b-conservative-lag-decision-lock`).
+Broad CODAL capture is stopped; researcher-verified financial data are frozen;
+assumed availability uses `assumed_available_at_conservative` only. Stage125
+performs **no** modeling; the frozen research contract (M1–M4 blocks, M5
+removed, accessibility Gates) is in
 [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
 prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.
 

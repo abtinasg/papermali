@@ -99,10 +99,41 @@ The research contract for the paper is frozen in
   test requires an explicit research decision and a new version of that contract.
 - **Stage122–Stage124 files are not rewritten or redefined during Stage125.**
 
+## Stage125 Part 3B.1E — Conservative six-month availability lag (2026-07-18)
+
+Human-supervisor-approved methodological pivot
+(`stage125-part3b-conservative-lag-decision-lock` /
+`stage125-part3b1e-conservative-six-month-lag-decision-lock`):
+
+- **Financial data status:** researcher-verified and **frozen**. No
+  financial-value re-extraction or revalidation in this stage.
+- **Broad CODAL capture:** stopped / not authorized. The five-row CODAL
+  metadata pilot did not justify expansion; PR #47 was closed unmerged;
+  no 80-row or 130-company CODAL metadata capture is planned.
+- **Availability method:** `fixed_conservative_lag` with
+  `conservative_lag_months = 6`.
+  `assumed_available_at_conservative = fiscal_year_end + 6 calendar months`.
+  This is a methodological anti-leakage assumption — **not** an observed
+  `PublishDateTime`, CODAL publication date, verified source timestamp, or
+  observed `available_at`. Do not write the assumed date into those fields.
+- **Alignment:** predictors from fiscal year **t** may only predict distress
+  target **t+1**. A predictor observation may only be used after the six-month
+  lag has elapsed.
+- **Non-claims:** Stage125 incomplete; Stage126 and modeling remain
+  unauthorized. Markers:
+  `broad_codal_capture_stopped=true`,
+  `financial_data_researcher_verified_frozen=true`,
+  `conservative_availability_lag_locked=true`,
+  `row_level_publish_datetime_collection_required=false`.
+
 ## Stage125 Part 3B.1A — CUT-A Available-at Operationalization (2026-07-17)
 
 Maintenance decision lock only (`stage125-part3b1a-cut-a-available-at-operationalization-lock`).
-Does **not** advance research action pointers.
+Historical contract for *observed* CODAL `PublishDateTime` mapping when an
+exact document is bound. **Superseded for modeling-path availability** by the
+2026-07-18 conservative six-month lag decision (Part 3B.1E): row-level
+PublishDateTime collection is no longer authorized. Does **not** by itself
+advance research action pointers.
 
 - **Operational `available_at`** for predictor-year financial statements =
   `PublishDateTime` of the exact matched official CODAL `LetterSerial`/version,

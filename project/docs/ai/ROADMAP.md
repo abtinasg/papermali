@@ -1,9 +1,9 @@
 ---
 roadmap_version: 1
 active_research_workstream_id: stage125-research-design-readiness
-qc_scope: stage125-part3b1c-document-binding-resolution-decision-lock
-last_completed_research_action_id: stage125-part3a-decision-lock
-next_research_action_id: stage125-part3b-evidence-capture
+qc_scope: stage125-part3b1e-conservative-six-month-lag-decision-lock
+last_completed_research_action_id: stage125-part3b-conservative-lag-decision-lock
+next_research_action_id: stage125-part3c-leakage-safe-dataset-finalization
 active_maintenance_task_id: repository-driven-ai-handoff
 ---
 
@@ -34,7 +34,9 @@ must also appear in the body below. The validator checks that:
 10. `stage124-gate-b-execution` — Executed the approved Gate B rules; four sample designs, canonical + filtered outputs, 58 focused tests (736 passed, 1 skipped, local results — no GitHub Actions) ✅
 11. `stage125-research-design-readiness` — Stage125 Research Design & Data Readiness (Parts 0–3A.1); **no modeling** in this stage — modeling remains prohibited until Stage126 is approved ✅
 12. `stage125-part3a-decision-lock` — Part 3A.1 user-approved pilot decision lock (rubric approval, G09–G14 thresholds, locked 80-pair event-enriched selection); decision record only, **no evidence collection** ✅
-13. `stage125-part3b-evidence-capture` — Part 3B accessibility feasibility probe (**active / incomplete**; source-origin probes done; Part 3B.1 Decision Lock recorded; candidate/pair value extraction and real scoring still prohibited; not Stage126 admission) ⬅️ **next / active**
+13. `stage125-part3b-evidence-capture` — Part 3B accessibility feasibility probe — **superseded for expansion** by the conservative six-month lag methodology (origin probes retained as historical evidence; broad CODAL metadata / financial-statement capture stopped; PR #47 closed unmerged)
+14. `stage125-part3b-conservative-lag-decision-lock` — Human-supervisor-approved fixed conservative six-calendar-month availability lag; researcher-verified financial data frozen; no broad CODAL capture; no row-level PublishDateTime collection; assumed availability is methodological only ✅
+15. `stage125-part3c-leakage-safe-dataset-finalization` — Leakage-safe dataset finalization under the locked six-month lag (operationalize `assumed_available_at_conservative`; no Stage126 / modeling) ⬅️ **next / active**
 
 ## Maintenance tasks
 
@@ -49,6 +51,7 @@ must also appear in the body below. The validator checks that:
 - `stage125-part3b1a-cut-a-available-at-operationalization-lock` — Stage125 Part 3B.1A CUT-A available-at operationalization lock (`PublishDateTime` for exact version-bound CODAL documents; `SentDateTime` audit-only); schema/pure parsers/synthetic validation only; **no network, no real available_at assignment, no cutoff resolution, no extraction, no scoring, no modeling**; advances no research action ✅
 - `stage125-part3b1b-codal-document-binding-mini-pilot` — Stage125 Part 3B.1B controlled CODAL predictor-document binding mini-pilot (exactly five locked rows; document metadata/provenance only; at most one authorized `www.codal.ir` GET); **no financial-value extraction, no accessibility scoring, no Gate application, no cutoff audit mutation, no Part 3B.2 / Stage126 / modeling**; advances no research action
 - `stage125-part3b1c-document-binding-resolution-decision-lock` — Stage125 Part 3B.1C offline document-binding failure adjudication, normalization/source hierarchy lock, and future capture authorization proposal only; **no network, no new capture, no evidence mutation, no available_at assignment, no extraction/scoring/Gates, no 80-row scale-up, no Part 3B.2 / Stage126 / modeling**; advances no research action
+- `stage125-part3b1e-conservative-six-month-lag-decision-lock` — Stage125 Part 3B.1E offline conservative six-month availability-lag decision lock (researcher-verified financial data frozen; broad CODAL capture stopped; assumed availability field only); QC scope for the research action `stage125-part3b-conservative-lag-decision-lock`; **no network, no re-extraction, no Stage126 / modeling**
 
 ## Notes on ordering
 
@@ -77,14 +80,10 @@ filtered outputs and 58 focused tests (736 passed, 1 skipped, local results). **
 modeling). `stage125-part3a-decision-lock` recorded the approved rubric,
 G09–G14 pilot thresholds, and locked 80-pair event-enriched selection
 (39 positive / 41 negative; 26 tickers; 10 known industries; 53 industry-present
-pairs; 27 industry-missing pairs). `stage125-part3b-evidence-capture` is
-**active / incomplete** (origin probes only). `stage125-part3b1-decision-lock`
-records approved feature/scoring/cutoff adjudication contracts without authorizing
-real extraction or scoring. `stage125-part3b1a-cut-a-available-at-operationalization-lock`
-operationalizes CUT-A `available_at` as `PublishDateTime` of an exact
-version-bound CODAL letter without assigning real timestamps or resolving pilot
-cutoffs. `stage125-part3b1b-codal-document-binding-mini-pilot` captures
-document-metadata binding evidence for five locked rows only and does not
-complete Part 3B or resolve the 80-row pilot cutoff. See
+pairs; 27 industry-missing pairs). `stage125-part3b-evidence-capture` remains
+historical for origin probes but is **superseded for expansion** by
+`stage125-part3b-conservative-lag-decision-lock` (fixed six-month lag;
+researcher-verified financials frozen; PR #47 closed unmerged). Next:
+`stage125-part3c-leakage-safe-dataset-finalization`. See
 [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
 prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.
