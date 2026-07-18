@@ -63,11 +63,96 @@ def test_raw_source_canonical_values_preserved():
     tax = list(csv.DictReader(
         (REPO_ROOT / "project/stage125" / m.F_TAXONOMY).open(encoding="utf-8")
     ))
+    evidence = {r["predictor_row_key_t"]: r for r in m.load_evidence_rows(REPO_ROOT)}
     entity_rows = [r for r in tax if r["failure_reason"] == "entity_mismatch"]
     assert entity_rows
     thanusa = next(r for r in entity_rows if r["predictor_row_key_t"] == "ثنوسا|1392")
     assert thanusa["observed_source_value"] == "نوسازي و ساختمان تهران"
     assert thanusa["observed_canonical_value"] == "نوسازی و ساختمان تهران"
+    for er in entity_rows:
+        row = evidence[er["predictor_row_key_t"]]
+        assert er["observed_source_value"] == (row.get("source_legal_entity") or "")
+        assert er["observed_canonical_value"] == (row.get("canonical_legal_entity") or "")
+
+
+def test_thanusa_ticker_mismatch_source_not_backfilled():
+    tax = list(csv.DictReader(
+        (REPO_ROOT / "project/stage125" / m.F_TAXONOMY).open(encoding="utf-8")
+    ))
+    row = next(
+        r for r in tax
+        if r["predictor_row_key_t"] == "ثنوسا|1392"
+        and r["failure_reason"] == "ticker_mismatch"
+    )
+    assert row["observed_source_value"] == ""
+    assert row["observed_canonical_value"] == "ثنوسا"
+    assert row["normalization_safe"] == "false"
+    assert row["normalization_rule_id"] == ""
+    assert row["failure_layer"] == "ticker"
+    assert row["failure_class"] == "missing_source_evidence"
+    assert row["resolution_status"] == "requires_official_symbol_metadata"
+    assert "must not be copied" in row["notes"]
+
+
+def test_missing_official_title_side_classification():
+    tax = list(csv.DictReader(
+        (REPO_ROOT / "project/stage125" / m.F_TAXONOMY).open(encoding="utf-8")
+    ))
+    evidence = {r["predictor_row_key_t"]: r for r in m.load_evidence_rows(REPO_ROOT)}
+    title_rows = [r for r in tax if r["failure_reason"] == "missing_official_title"]
+    assert title_rows
+    for tr in title_rows:
+        er = evidence[tr["predictor_row_key_t"]]
+        assert tr["observed_source_value"] == (er.get("source_official_title") or "")
+        assert tr["observed_canonical_value"] == (er.get("canonical_official_title") or "")
+        assert tr["observed_source_value"]
+        assert tr["observed_canonical_value"] == ""
+        assert tr["failure_layer"] == "canonical_metadata"
+        assert tr["failure_class"] == "missing_canonical_evidence"
+
+
+def test_letter_code_not_substituted_with_letter_serial():
+    tax = list(csv.DictReader(
+        (REPO_ROOT / "project/stage125" / m.F_TAXONOMY).open(encoding="utf-8")
+    ))
+    evidence = {r["predictor_row_key_t"]: r for r in m.load_evidence_rows(REPO_ROOT)}
+    letter_rows = [r for r in tax if r["failure_reason"] == "letter_code_mismatch"]
+    assert letter_rows
+    for lr in letter_rows:
+        er = evidence[lr["predictor_row_key_t"]]
+        serials = {
+            (er.get("source_letter_serial") or "").strip(),
+            (er.get("canonical_letter_serial") or "").strip(),
+        }
+        serials.discard("")
+        assert lr["observed_source_value"] == ""
+        assert lr["observed_canonical_value"] == ""
+        assert lr["observed_source_value"] not in serials
+        assert lr["observed_canonical_value"] not in serials
+        assert lr["resolution_status"] == (
+            "letter_code_values_not_preserved_in_frozen_evidence"
+        )
+        assert "LetterSerial must not be substituted" in lr["notes"]
+
+
+def test_statement_scope_values_preserved():
+    tax = list(csv.DictReader(
+        (REPO_ROOT / "project/stage125" / m.F_TAXONOMY).open(encoding="utf-8")
+    ))
+    evidence = {r["predictor_row_key_t"]: r for r in m.load_evidence_rows(REPO_ROOT)}
+    scope_rows = [
+        r for r in tax
+        if r["failure_reason"] in (
+            "statement_scope_mismatch", "separate_scope_required_but_not_met",
+        )
+    ]
+    assert scope_rows
+    for sr in scope_rows:
+        er = evidence[sr["predictor_row_key_t"]]
+        assert sr["observed_source_value"] == (er.get("source_statement_scope") or "")
+        assert sr["observed_canonical_value"] == (
+            er.get("canonical_statement_scope") or ""
+        )
 
 
 def test_arabic_persian_character_normalization_mechanical():
@@ -137,7 +222,7 @@ def test_wildcard_url_fails():
     evidence = m.load_evidence_rows(REPO_ROOT)
     bad = [dict(r) for r in evidence]
     bad[0]["source_url"] = "https://www.codal.ir/*/Decision.aspx"
-    with pytest.raises(m.QCFail, match="wildcard_endpoint_forbidden"):
+    with pytest.raises(m.QCFail, match="wildcard"):
         m.build_proposed_capture(bad)
 
 
@@ -147,6 +232,88 @@ def test_wildcard_host_fails():
     )
     assert proposed["wildcard_host_forbidden"] is True
     assert proposed["wildcard_url_forbidden"] is True
+    with pytest.raises(m.QCFail, match="hosts_exact|wildcard"):
+        m.validate_proposed_request_url(
+            "https://*.codal.ir/Reports/Decision.aspx?LetterSerial=abc",
+            "abc",
+            request_status="proposed_not_authorized",
+        )
+
+
+def _tracked_serial_for(key: str) -> str:
+    row = next(
+        r for r in m.load_evidence_rows(REPO_ROOT)
+        if r["predictor_row_key_t"] == key
+    )
+    return row["source_letter_serial"]
+
+
+@pytest.mark.parametrize("bad_url,match", [
+    (
+        "http://www.codal.ir/Reports/Decision.aspx?LetterSerial=SERIAL",
+        "https",
+    ),
+    (
+        "https://codal.ir/Reports/Decision.aspx?LetterSerial=SERIAL",
+        "hosts_exact",
+    ),
+    (
+        "https://www.codal.ir:444/Reports/Decision.aspx?LetterSerial=SERIAL",
+        "port",
+    ),
+    (
+        "https://www.codal.ir/Reports/Other.aspx?LetterSerial=SERIAL",
+        "paths_exact",
+    ),
+    (
+        "https://www.codal.ir/Reports/Decision.aspx",
+        "LetterSerial count",
+    ),
+    (
+        "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=SERIAL&LetterSerial=OTHER",
+        "LetterSerial count",
+    ),
+    (
+        "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=WRONG",
+        "all_url_letter_serials_match",
+    ),
+    (
+        "https://www.codal.ir/*/Decision.aspx?LetterSerial=SERIAL",
+        "wildcard",
+    ),
+    (
+        "https://user:pass@www.codal.ir/Reports/Decision.aspx?LetterSerial=SERIAL",
+        "credentials",
+    ),
+    (
+        "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=SERIAL#frag",
+        "fragment",
+    ),
+])
+def test_url_mutation_fails_closed(bad_url, match):
+    serial = _tracked_serial_for("ثنوسا|1392")
+    url = bad_url.replace("SERIAL", serial).replace("WRONG", serial + "x")
+    with pytest.raises(m.QCFail, match=match):
+        m.validate_proposed_request_url(
+            url, serial, request_status="proposed_not_authorized",
+        )
+
+
+def test_current_five_tracked_urls_pass_exact_validation():
+    proposed = json.loads(
+        (REPO_ROOT / "project/stage125" / m.F_PROPOSED).read_text(encoding="utf-8")
+    )
+    assert len(proposed["proposed_requests"]) == 5
+    for req in proposed["proposed_requests"]:
+        m.validate_proposed_request_url(
+            req["exact_url"],
+            req["candidate_letter_serial"],
+            request_status=req["request_status"],
+        )
+        if req["predictor_row_key_t"] == "اردستان|1401":
+            assert req["request_status"] == "not_proposed_structurally_rejected"
+            assert req["request_necessity"] == "none_structural_rejection"
+            assert req["exact_url"]
 
 
 def test_unresolved_endpoint_stays_null_when_url_absent():
@@ -158,6 +325,10 @@ def test_unresolved_endpoint_stays_null_when_url_absent():
     for req in prop["proposed_requests"]:
         if req["request_status"] == "endpoint_unresolved_not_authorizable":
             assert req["exact_url"] is None
+            m.validate_proposed_request_url(
+                None, req.get("candidate_letter_serial"),
+                request_status=req["request_status"],
+            )
 
 
 def test_authorization_status_cannot_become_authorized():
@@ -261,21 +432,58 @@ def test_mutation_of_committed_artifact_causes_check_drift(tmp_path):
 
 
 def test_fresh_clone_check_zero_writes_zero_network(tmp_path):
-    missing = tmp_path / "does_not_exist"
-    before = {
-        p: p.stat().st_mtime_ns
-        for p in (REPO_ROOT / "project" / "stage125").glob("part3b1c_*")
-    }
-    with p3b0.network_sentinel() as sentinel:
-        result = m.run(project_dir=ROOT, output_dir=missing, check=True)
-        assert sentinel.calls_attempted == 0
-    assert not missing.exists()
-    assert result["files"] == {}
-    after = {
-        p: p.stat().st_mtime_ns
-        for p in (REPO_ROOT / "project" / "stage125").glob("part3b1c_*")
-    }
-    assert before == after
+    """Isolated detached worktree: official --check with zero writes/network."""
+    wt = tmp_path / "fresh_wt"
+    subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "worktree", "add", "--detach", str(wt), "HEAD"],
+        check=True, capture_output=True, text=True,
+    )
+    try:
+        # Optional gitignored Part 3B.1B raw cache must be absent in the worktree.
+        raw_cache_candidates = [
+            wt / "project/stage125/raw_cache",
+            wt / "project/stage125/.cache",
+            wt / "project/stage125/part3b1b_thanusa_decision_raw.html",
+        ]
+        for cand in raw_cache_candidates:
+            assert not cand.exists()
+
+        part3b1c_rels = sorted(
+            rel for rel in m.PART3B1C_AUTHORIZED_EXACT
+            if rel.startswith("project/stage125/")
+        )
+        before_bytes = {
+            rel: (wt / rel).read_bytes()
+            for rel in part3b1c_rels
+            if (wt / rel).is_file()
+        }
+        before_mtime = {
+            rel: (wt / rel).stat().st_mtime_ns
+            for rel in before_bytes
+        }
+        env = dict(**{k: v for k, v in __import__("os").environ.items()})
+        env["PYTHONPATH"] = str(wt / "project")
+        proc = subprocess.run(
+            [sys.executable, str(wt / m.RUN_REL), "--check"],
+            cwd=str(wt),
+            capture_output=True,
+            text=True,
+            env=env,
+            check=False,
+        )
+        assert proc.returncode == 0, proc.stdout + "\n" + proc.stderr
+        assert "Deliverables up to date" in proc.stdout
+        assert "network_requests_attempted=0" in proc.stdout
+        for rel, expected in before_bytes.items():
+            actual = (wt / rel).read_bytes()
+            assert actual == expected
+            assert actual == (REPO_ROOT / rel).read_bytes()
+            assert (wt / rel).stat().st_mtime_ns == before_mtime[rel]
+    finally:
+        subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "worktree", "remove", "--force", str(wt)],
+            check=False, capture_output=True, text=True,
+        )
 
 
 def test_frozen_scientific_hashes_unchanged():
