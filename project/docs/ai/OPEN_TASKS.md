@@ -6,11 +6,11 @@ front matter; this file is the working description.
 ## Active research workstream: `stage125-research-design-readiness`
 
 Authoritative research pointers live in `ROADMAP.md` front matter:
-`last_completed_research_action_id=stage125-part3a-decision-lock`,
-`next_research_action_id=stage125-part3b-evidence-capture`. Part 3B.1 and
-Part 3B.1A are **maintenance** tasks (`stage125-part3b1-decision-lock`,
-`stage125-part3b1a-cut-a-available-at-operationalization-lock`) and do **not**
-advance those research IDs.
+`last_completed_research_action_id=stage125-part3b-conservative-lag-decision-lock`,
+`next_research_action_id=stage125-part3c-leakage-safe-dataset-finalization`.
+Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
+Part 3B.1E is the QC/deliverable surface for the conservative-lag research
+action.
 
 ### Completed — `stage124-gate-b-rule-approval`
 
@@ -42,34 +42,43 @@ filtered CSVs gitignored/hashed; small audit CSVs, QC, metadata, README tracked)
 1 skipped in the full suite (local results — no GitHub Actions configured).
 **No modeling started.**
 
-### Next / active research action — `stage125-part3b-evidence-capture`
+### Completed research action — `stage125-part3b-conservative-lag-decision-lock`
 
-Part 3B is **active but incomplete** (accessibility feasibility probe). Historical
-source-origin / endpoint probes only (TSETMC CDN + CODAL origins; CBI blocked) —
-**not** candidate-value or pair-level evidence. Part 3B.1 Decision Lock is
-**recorded** (maintenance; contracts + synthetic validation only) and does not
-complete Part 3B or authorize real extraction/scoring. Part 3B.1A CUT-A
-available-at operationalization is a further **maintenance** lock
-(`stage125-part3b1a-cut-a-available-at-operationalization-lock`) that defines
-`PublishDateTime` mapping rules only — it does **not** assign real timestamps,
-resolve pilot cutoffs, or advance research pointers. Part 3B.1B is a controlled
-**document-metadata binding mini-pilot** for exactly five locked rows
-(`stage125-part3b1b-codal-document-binding-mini-pilot`); it does **not** complete
-Part 3B, resolve the 80-row pilot cutoff, extract financial values, or advance
-research pointers. Part 3B.1C is an offline **document-binding resolution
-decision lock** (`stage125-part3b1c-document-binding-resolution-decision-lock`)
-— failure taxonomy, normalization/hierarchy contracts, and a not-authorized
-capture proposal only; it does **not** execute network, mutate Part 3B.1B
-evidence, assign available_at, or authorize 80-row scale-up.
+Human supervisor approved a **fixed conservative six-calendar-month**
+availability lag. Deliverables / QC surface:
+`stage125-part3b1e-conservative-six-month-lag-decision-lock`. Researcher-verified
+financial data are **frozen** (no re-extraction). Broad CODAL metadata and
+financial-statement capture are **stopped**. PR #47 was closed **unmerged**
+(superseded; branch retained). Assumed availability uses
+`assumed_available_at_conservative = fiscal_year_end + 6 calendar months` and
+must never be written as observed `PublishDateTime` / `available_at`. Predictors
+from year **t** may only predict distress target **t+1**. Stage125 remains
+**incomplete**; Stage126 and modeling remain unstarted.
+
+### Next / active research action — `stage125-part3c-leakage-safe-dataset-finalization`
+
+Operationalize the locked six-month lag into a leakage-safe dataset
+finalization path. **Do not** start Stage126 or modeling. **Do not** resume
+broad CODAL capture or row-level PublishDateTime collection.
+
+Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
+document-binding evidence remain as frozen scientific history; they do **not**
+authorize expansion. 80-row scale-up is cancelled.
 
 Current markers (must stay true until separately authorized otherwise):
 
+- `broad_codal_capture_stopped=true`
+- `financial_data_researcher_verified_frozen=true`
+- `conservative_availability_lag_locked=true`
+- `conservative_lag_months=6`
+- `row_level_publish_datetime_collection_required=false`
+- `conservative_six_month_lag_decision_locked=true`
 - `part3b_started=true`; `endpoint_probe_evidence_collected=true`
-- `part3b1_decision_locked=true` (maintenance completion signal)
-- `cut_a_available_at_operationalization_locked=true` (maintenance; operationalization only)
-- `predictor_document_binding_mini_pilot_completed=true` (five-row metadata binding only)
+- `part3b1_decision_locked=true`
+- `cut_a_available_at_operationalization_locked=true` (historical observed-PublishDateTime contract; collection not authorized for modeling path)
+- `predictor_document_binding_mini_pilot_completed=true`
 - `predictor_document_binding_evidence_collected=true`
-- `document_binding_resolution_decision_locked=true` (Part 3B.1C offline adjudication)
+- `document_binding_resolution_decision_locked=true`
 - `predictor_available_at_evidence_collected=false`
 - `pilot_cutoff_provenance_resolved=false`
 - `candidate_value_evidence_collected=false`
@@ -80,8 +89,8 @@ Current markers (must stay true until separately authorized otherwise):
 - `modeling_started=false`
 
 **Still prohibited without explicit user authorization:** expanded CODAL/TSETMC/CBI
-network for value extraction, real available_at assignment on unbound rows,
-cutoff resolution, candidate/pair value evidence, real accessibility scoring,
+network for value extraction, row-level PublishDateTime collection, real
+observed available_at assignment, 80-row / 130-company CODAL scale-up,
 Part 3B.2, Stage126, or modeling.
 
 **Part 0 (done — documentation lock):** baseline after PR #20 confirmed;

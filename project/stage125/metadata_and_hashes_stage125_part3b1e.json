@@ -1,0 +1,28 @@
+{
+  "baseline_commit": "f1bc5eb770d883754078f15427dac45fe40a8c0b",
+  "broad_codal_capture_stopped": true,
+  "code_commit": "b99a89840ded777628e2d9601647b732e5210776",
+  "conservative_lag_months": 6,
+  "conservative_six_month_lag_decision_locked": true,
+  "current_stage": "Stage125",
+  "description": "Stage125 Part 3B.1E conservative six-month availability-lag decision lock (offline methodology; financial data frozen).",
+  "financial_data_researcher_verified_frozen": true,
+  "generated_at": "b99a89840ded777628e2d9601647b732e5210776",
+  "modeling_started": false,
+  "network_requests_attempted": 0,
+  "output_files_sha256": {
+    "README_STAGE125_PART3B1E_CONSERVATIVE_LAG.md": "857b3f9bad2d5c449fff51036129871ae3948e70daf0cc1562714af4ec87f763",
+    "part3b1e_conservative_lag_decision_lock_stage125.json": "07c8ba503116f8b0b18b1c349dfe590e7a9568a9a02b377af34a11754494f664",
+    "part3b1e_frozen_financial_data_manifest_stage125.json": "78406e04afa5eddc8876dbe5f0fb3e1883afcc2b03072e9e7d70bd6e75a3536b",
+    "stage125_part3b1e_conservative_lag_qc_report.json": "bdd21845d1de4d12bce0251c58d15faeadda4abd0519f8531123430d1ae00771"
+  },
+  "part3b_completed": false,
+  "research_pointers": {
+    "last_completed_research_action_id": "stage125-part3b-conservative-lag-decision-lock",
+    "next_research_action_id": "stage125-part3c-leakage-safe-dataset-finalization"
+  },
+  "source_file_sha256": "dfe38d0d2c812d337fdc25efc7111264105b51762e3e5e1c0b9c0bfa19a5ee60",
+  "stage": "stage125_part3b1e_conservative_six_month_lag_decision_lock",
+  "stage126_started": false,
+  "test_file_sha256": "7305c2cac19ba39de81600f0cd9c06967d5ffe9c11036914066a9accfa935920"
+}

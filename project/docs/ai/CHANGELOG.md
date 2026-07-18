@@ -5,6 +5,24 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 
 ## 2026-07-18
 
+- **Stage125 Part 3B.1E / research action
+  `stage125-part3b-conservative-lag-decision-lock` — Conservative six-month
+  availability-lag methodology lock.** Human supervisor approved a fixed
+  conservative six-calendar-month availability lag; researcher-verified
+  financial data are frozen; broad CODAL metadata / financial-statement
+  extraction is stopped. PR #47 closed **unmerged** (superseded; branch
+  retained as audit trail). Assumed availability uses field
+  `assumed_available_at_conservative` only (never observed `PublishDateTime` /
+  `available_at`). Predictors from fiscal year t may only predict distress
+  target t+1. Markers: `broad_codal_capture_stopped=true`,
+  `financial_data_researcher_verified_frozen=true`,
+  `conservative_availability_lag_locked=true`, `conservative_lag_months=6`,
+  `row_level_publish_datetime_collection_required=false`. Research pointers
+  advance to
+  `last_completed_research_action_id=stage125-part3b-conservative-lag-decision-lock`,
+  `next_research_action_id=stage125-part3c-leakage-safe-dataset-finalization`.
+  Stage125 remains incomplete; **no** Stage126 / modeling.
+
 - **Stage125 Part 3B.1C — Document Binding Resolution Decision Lock
   (maintenance).** Tracked as
   `stage125-part3b1c-document-binding-resolution-decision-lock`. Offline

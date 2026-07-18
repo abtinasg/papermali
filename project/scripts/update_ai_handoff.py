@@ -111,6 +111,10 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part3b1c_document_binding_resolution.py",
     "project/run_stage125_part3b1c.py",
     "project/tests/test_stage125_part3b1c_document_binding_resolution.py",
+    # Stage125 Part 3B.1E code, runner, and tests.
+    "project/src/stage125_part3b1e_conservative_lag_decision.py",
+    "project/run_stage125_part3b1e.py",
+    "project/tests/test_stage125_part3b1e_conservative_lag_decision.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
@@ -268,6 +272,12 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/part3b1c_document_binding_resolution_decision_lock_stage125.json",
     "project/stage125/stage125_part3b1c_document_binding_resolution_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1c.json",
+    # Stage125 Part 3B.1E generated conservative-lag decision-lock artifacts.
+    "project/stage125/README_STAGE125_PART3B1E_CONSERVATIVE_LAG.md",
+    "project/stage125/part3b1e_conservative_lag_decision_lock_stage125.json",
+    "project/stage125/part3b1e_frozen_financial_data_manifest_stage125.json",
+    "project/stage125/stage125_part3b1e_conservative_lag_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3b1e.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -428,6 +438,34 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "predictor_document_binding_mini_pilot_completed",
         "predictor_document_binding_evidence_collected",
         "document_binding_resolution_decision_locked",
+        "predictor_available_at_evidence_collected",
+        "pilot_cutoff_provenance_resolved",
+        "evidence_collected",
+        "endpoint_probe_evidence_collected",
+        "candidate_value_evidence_collected",
+        "pair_level_evidence_collected",
+        "data_value_extraction_performed",
+        "accessibility_scoring_applied",
+        "part3b_completed",
+        "network_extraction_performed",
+        "modeling_started",
+    ),
+    "stage125_part3b1e_conservative_six_month_lag_decision_lock": (
+        "part3a_protocol_locked",
+        "part3a_decision_locked",
+        "part3b0_readiness",
+        "part3b_started",
+        "part3b1_decision_locked",
+        "cut_a_available_at_operationalization_locked",
+        "predictor_document_binding_mini_pilot_completed",
+        "predictor_document_binding_evidence_collected",
+        "document_binding_resolution_decision_locked",
+        "conservative_six_month_lag_decision_locked",
+        "broad_codal_capture_stopped",
+        "financial_data_researcher_verified_frozen",
+        "conservative_availability_lag_locked",
+        "conservative_lag_months",
+        "row_level_publish_datetime_collection_required",
         "predictor_available_at_evidence_collected",
         "pilot_cutoff_provenance_resolved",
         "evidence_collected",
@@ -683,6 +721,10 @@ _QC_SOURCE_TEST_OVERRIDES: dict[str, tuple[str, str]] = {
     "stage125_part3b1c_document_binding_resolution_decision_lock": (
         "project/src/stage125_part3b1c_document_binding_resolution.py",
         "project/tests/test_stage125_part3b1c_document_binding_resolution.py",
+    ),
+    "stage125_part3b1e_conservative_six_month_lag_decision_lock": (
+        "project/src/stage125_part3b1e_conservative_lag_decision.py",
+        "project/tests/test_stage125_part3b1e_conservative_lag_decision.py",
     ),
 }
 

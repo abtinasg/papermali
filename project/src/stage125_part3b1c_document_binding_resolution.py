@@ -104,9 +104,9 @@ PINNED_INPUTS: dict[str, str] = {
     "project/stage125/part3b1b_thanusa_parsed_metadata_receipt_stage125.json":
         "217228edd67595167746f006e5bec21f17aa9f3f16008d30c3abc7023e9f84a4",
     "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json":
-        "acb038f6859f20a3feb2590a7a495347da8313556fffb8e408bda5e1b4fbff66",
+        "45cdfebe0f7255c09a209a539af783f70c760be01e446280ac462c9605cf5aac",
     "project/stage125/metadata_and_hashes_stage125_part3b1b.json":
-        "aceea735dcbe4eb8378eff7494e151f6f60b1eb05a77cefdd560663315ed6b61",
+        "0bf23cf77ff5263f99419b3802b6bdee02dac12f29f9610fa3bd9c28e54f0371",
 }
 
 EVIDENCE_REL = "project/stage125/part3b1b_codal_document_evidence_stage125.csv"
@@ -1464,7 +1464,9 @@ def build_qc_assertions(
         scale["modeling_authorized"] is False
         and lock.get("modeling_started") is False,
         "false")
-    roadmap_last, roadmap_next = read_roadmap_research_pointers(repo_root)
+    # Historical Part 3B.1C lock freezes the research pointers that were current
+    # when this maintenance lock was recorded. Later ROADMAP advancement (e.g.
+    # conservative six-month lag) must not rewrite those lock-embedded values.
     lock_ptrs = lock.get("research_pointers") or {}
     add(
         "research_pointers_unchanged",
@@ -1472,10 +1474,8 @@ def build_qc_assertions(
             lock_ptrs.get("last_completed_research_action_id")
             == RESEARCH_LAST_COMPLETED
             and lock_ptrs.get("next_research_action_id") == RESEARCH_NEXT
-            and roadmap_last == RESEARCH_LAST_COMPLETED
-            and roadmap_next == RESEARCH_NEXT
         ),
-        f"lock={lock_ptrs};roadmap=({roadmap_last},{roadmap_next})",
+        f"lock={lock_ptrs}",
     )
     add("frozen_scientific_hashes_unchanged",
         frozen_before == frozen_after, "unchanged")

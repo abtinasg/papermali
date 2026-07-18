@@ -46,7 +46,7 @@
   "part3b_completed": false,
   "pilot_cutoff_provenance_resolved": false,
   "pinned_input_sha256": {
-    "project/stage125/metadata_and_hashes_stage125_part3b1b.json": "aceea735dcbe4eb8378eff7494e151f6f60b1eb05a77cefdd560663315ed6b61",
+    "project/stage125/metadata_and_hashes_stage125_part3b1b.json": "0bf23cf77ff5263f99419b3802b6bdee02dac12f29f9610fa3bd9c28e54f0371",
     "project/stage125/part3a_approved_gate_thresholds_stage125.csv": "11c7efe5f242ab8e4a4f7b1955fb25d48e288249f7a1ce4c6bf1713dbf117d20",
     "project/stage125/part3a_selected_pilot_pairs_stage125.csv": "9a441b5e3696353967489b356d0ff48cf7cbea276aeea5018be6edc8368b40f5",
     "project/stage125/part3b1_adjudicated_decision_requirements_stage125.json": "e6d56a7b55deec83d8460241c101cb520f43b7917495e7c9a61eaf6d20c11f38",
@@ -59,7 +59,7 @@
     "project/stage125/part3b1b_thanusa_capture_receipt_stage125.json": "f2571c296d3400af1bc6b607180d231b4b06096ca4f5c58f024286ade4821626",
     "project/stage125/part3b1b_thanusa_parsed_metadata_receipt_stage125.json": "217228edd67595167746f006e5bec21f17aa9f3f16008d30c3abc7023e9f84a4",
     "project/stage125/part3b1b_unresolved_and_rejections_stage125.csv": "d5e0ce0d400601057d65b935683dbd8b3e3c0d03fa7bb24842f56f61cbf53a67",
-    "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json": "acb038f6859f20a3feb2590a7a495347da8313556fffb8e408bda5e1b4fbff66"
+    "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json": "45cdfebe0f7255c09a209a539af783f70c760be01e446280ac462c9605cf5aac"
   },
   "predictor_available_at_evidence_collected": false,
   "proposed_capture_authorization_status": "not_authorized",
