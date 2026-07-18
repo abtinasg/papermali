@@ -1,9 +1,9 @@
 {
   "baseline_commit": "4d7a48288543c971f43337e9a5d9a70ccfed2610",
-  "code_commit": "08143bd2a1812fb437b7a3670e27a77dae09e00a",
+  "code_commit": "efad1e8667588f11e38633e700632b4c0a630338",
   "current_stage": "Stage125",
   "description": "Stage125 Part 3B.1B CODAL predictor-document binding mini-pilot.",
-  "generated_at": "08143bd2a1812fb437b7a3670e27a77dae09e00a",
+  "generated_at": "efad1e8667588f11e38633e700632b4c0a630338",
   "modeling_started": false,
   "network_requests_attempted": 0,
   "output_files_sha256": {
@@ -16,7 +16,7 @@
     "part3b1b_thanusa_capture_receipt_stage125.json": "f2571c296d3400af1bc6b607180d231b4b06096ca4f5c58f024286ade4821626",
     "part3b1b_thanusa_parsed_metadata_receipt_stage125.json": "217228edd67595167746f006e5bec21f17aa9f3f16008d30c3abc7023e9f84a4",
     "part3b1b_unresolved_and_rejections_stage125.csv": "d5e0ce0d400601057d65b935683dbd8b3e3c0d03fa7bb24842f56f61cbf53a67",
-    "stage125_part3b1b_codal_document_binding_qc_report.json": "73199d12a1e6fe2d6cd38e2e1e41236bd9b5d31d5b1f0f9b76c9d35419e03eda"
+    "stage125_part3b1b_codal_document_binding_qc_report.json": "acb038f6859f20a3feb2590a7a495347da8313556fffb8e408bda5e1b4fbff66"
   },
   "part3b_completed": false,
   "predictor_document_binding_mini_pilot_completed": true,

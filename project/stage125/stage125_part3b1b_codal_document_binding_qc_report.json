@@ -356,7 +356,7 @@
     "next_research_action_id": "stage125-part3b-evidence-capture"
   },
   "scope_rows": 5,
-  "source_commit": "08143bd2a1812fb437b7a3670e27a77dae09e00a",
+  "source_commit": "efad1e8667588f11e38633e700632b4c0a630338",
   "source_file_sha256": "f751846655cb1cbe1573de99a195a25039a06f21ca6101b73b9ffcfe868f1fd0",
   "stage": "stage125_part3b1b_codal_document_binding_mini_pilot",
   "stage126_started": false,
