@@ -310,9 +310,14 @@ def _git(repo_root: str, *args: str) -> str:
 
 
 def verify_baseline_commit(repo_root: str) -> str:
+    """Verify EXPECTED_BASELINE_COMMIT is HEAD or an ancestor; return that SHA.
+
+    Returns the stable baseline SHA (not HEAD) so regenerated QC remains
+    byte-identical across additive maintenance commits on the task branch.
+    """
     head = _git(repo_root, "rev-parse", "HEAD")
     if head == EXPECTED_BASELINE_COMMIT:
-        return head
+        return EXPECTED_BASELINE_COMMIT
     proc = subprocess.run(
         ["git", "-C", repo_root, "merge-base", "--is-ancestor",
          EXPECTED_BASELINE_COMMIT, head],
@@ -323,7 +328,7 @@ def verify_baseline_commit(repo_root: str) -> str:
             f"baseline_main_exact failed: HEAD={head} "
             f"expected_ancestor={EXPECTED_BASELINE_COMMIT}"
         )
-    return head
+    return EXPECTED_BASELINE_COMMIT
 
 
 def verify_pinned_inputs(repo_root: Path) -> dict[str, str]:
