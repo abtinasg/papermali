@@ -1,0 +1,26 @@
+{
+  "baseline_commit": "99def5b4c15a41ca80729d873032d8c5c81ec672",
+  "code_commit": "b385c33412d484e68c6aba18a1a3057204a0101b",
+  "current_stage": "Stage125",
+  "description": "Stage125 Part 3B.1C document-binding resolution decision lock (offline taxonomy/normalization/hierarchy/proposal only).",
+  "document_binding_resolution_decision_locked": true,
+  "generated_at": "b385c33412d484e68c6aba18a1a3057204a0101b",
+  "modeling_started": false,
+  "network_requests_attempted": 0,
+  "output_files_sha256": {
+    "README_STAGE125_PART3B1C_DOCUMENT_BINDING_RESOLUTION.md": "2fafe9c39fbb73a6886d1997114dc894ac6fd9dca157f5507ce599e3f0203a63",
+    "part3b1c_binding_failure_taxonomy_stage125.csv": "1fecc48f95d231b6ec5c40b5363b54789efacd6f1f2e0df9d8196bc79bc63160",
+    "part3b1c_document_binding_resolution_decision_lock_stage125.json": "68f8b8595d4436e7e9d049baae1c47f459ece83f8519f10b34091678c057cd26",
+    "part3b1c_exact_document_evidence_hierarchy_stage125.json": "efcbfd397c661d048572bd98a66186ee0758b7ea5b1a59df97da98a791a459f0",
+    "part3b1c_identity_normalization_contract_stage125.json": "3bc3378fccf6bb56092633cd174d3adf80e88eec489b1e41bd6e0fe474093284",
+    "part3b1c_proposed_capture_authorization_stage125.json": "c97b17669c44969eb1fdc567e9c81f8b9de7b36ad3f63dc5ee6613f7bda17d78",
+    "part3b1c_row_resolution_requirements_stage125.csv": "ebb83df39c45598abd239cab60c519061c0742062602e71058f82bacced3ff4d",
+    "part3b1c_scale_up_readiness_decision_stage125.json": "ee49e9e844d2276009ce1db0daf38a39e0f40b169ada1c4e08ef9ae8546520cd",
+    "stage125_part3b1c_document_binding_resolution_qc_report.json": "c3d5007fa8e7e7eec9ec8e0c53ac35bd9917a100468d05febdbe40ee2312e9f1"
+  },
+  "part3b_completed": false,
+  "scale_up_to_80_rows_authorized": false,
+  "source_file_sha256": "e929516c49538436610808c8f5c48d8f1510c2cbc1bd80d277dc47a7e27addb8",
+  "stage": "stage125_part3b1c_document_binding_resolution_decision_lock",
+  "test_file_sha256": "7b8b7802865520db3374f97c3091ed6e2c586fa91c5ef52f44cefe8a49a832fe"
+}

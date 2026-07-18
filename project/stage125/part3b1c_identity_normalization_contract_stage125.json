@@ -1,0 +1,88 @@
+{
+  "allowed_mechanical_rules": [
+    {
+      "description": "Unicode NFC normalization",
+      "identity_information_removed": false,
+      "input_example": "نوسازي",
+      "normalization_rule_id": "nfc_unicode",
+      "output_example": "نوسازي"
+    },
+    {
+      "description": "Arabic Yeh U+064A to Persian Yeh U+06CC",
+      "identity_information_removed": false,
+      "input_example": "نوسازي",
+      "normalization_rule_id": "arabic_yeh_to_persian_yeh",
+      "output_example": "نوسازی"
+    },
+    {
+      "description": "Arabic Kaf U+0643 to Persian Kaf U+06A9",
+      "identity_information_removed": false,
+      "input_example": "شركت",
+      "normalization_rule_id": "arabic_kaf_to_persian_kaf",
+      "output_example": "شرکت"
+    },
+    {
+      "description": "Persian/Arabic digits to ASCII digits",
+      "identity_information_removed": false,
+      "input_example": "۱۳۹۲",
+      "normalization_rule_id": "digit_normalization",
+      "output_example": "1392"
+    },
+    {
+      "description": "Trim and collapse internal whitespace",
+      "identity_information_removed": false,
+      "input_example": "  الف   ب  ",
+      "normalization_rule_id": "whitespace_trim_collapse",
+      "output_example": "الف ب"
+    },
+    {
+      "description": "ZWNJ treated as space then collapsed",
+      "identity_information_removed": false,
+      "input_example": "صورت‌های",
+      "normalization_rule_id": "zwnj_to_space_collapse",
+      "output_example": "صورت های"
+    },
+    {
+      "description": "Standard dash/quote canonicalization only",
+      "identity_information_removed": false,
+      "input_example": "الف–ب",
+      "normalization_rule_id": "punctuation_canonicalization",
+      "output_example": "الف-ب"
+    }
+  ],
+  "contract_version": "stage125_part3b1c_v1",
+  "explicit_non_equivalence_without_alias": [
+    {
+      "left": "پتروشیمی بوعلی سینا",
+      "normalization_safe": false,
+      "reason": "legal_prefix_requires_pinned_alias_evidence",
+      "resolution_status": "requires_alias_evidence",
+      "right": "شرکت پتروشیمی بوعلی سینا"
+    }
+  ],
+  "legal_prefix_equivalence_without_pinned_alias": false,
+  "maintenance_task_id": "stage125-part3b1c-document-binding-resolution-decision-lock",
+  "mechanical_character_equivalence_example": {
+    "left": "نوسازي",
+    "normalization_rule_id": "arabic_yeh_to_persian_yeh",
+    "normalization_safe": true,
+    "note": "raw values remain preserved; normalization alone never creates BOUND",
+    "right": "نوسازی"
+  },
+  "normalization_alone_never_creates_bound": true,
+  "pinned_alias_source_present": false,
+  "prohibited_transforms": [
+    "fuzzy_matching",
+    "Levenshtein_thresholds",
+    "substring_matching",
+    "token_set_similarity",
+    "removing_arbitrary_words",
+    "removing_subsidiary_names",
+    "removing_industry_or_location_words",
+    "silently_removing_شرکت",
+    "silently_removing_legal_form_tokens",
+    "manual_alias_invention",
+    "ticker_only_entity_acceptance"
+  ],
+  "raw_and_normalized_both_preserved": true
+}

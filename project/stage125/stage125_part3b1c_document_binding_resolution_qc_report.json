@@ -1,0 +1,273 @@
+{
+  "accessibility_scoring_applied": false,
+  "all_pass": true,
+  "assertion_count": 33,
+  "assertions": [
+    {
+      "assertion": "baseline_main_exact",
+      "detail": "99def5b4c15a41ca80729d873032d8c5c81ec672",
+      "status": "PASS"
+    },
+    {
+      "assertion": "five_locked_rows_exact",
+      "detail": "['ثنوسا|1392', 'بوعلی|1399', 'بوعلی|1400', 'اردستان|1401', 'اپال|1401']",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3b1b_source_hashes_pinned",
+      "detail": "verified_pre_build",
+      "status": "PASS"
+    },
+    {
+      "assertion": "current_statuses_unchanged",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "current_counts_unchanged",
+      "detail": "b=0,u=4,r=1,a=0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "all_failure_tokens_taxonomized",
+      "detail": "55",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_invented_failure_token",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "raw_values_preserved",
+      "detail": "entity fields present",
+      "status": "PASS"
+    },
+    {
+      "assertion": "normalization_rules_mechanical_only",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_fuzzy_matching",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_unproven_alias",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "subsidiary_rejection_preserved",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "unknown_revision_not_promoted_to_original",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "incomplete_cache_not_treated_as_unique",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "publish_datetime_requires_exact_binding",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "sent_datetime_never_availability",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "proposed_capture_not_authorized",
+      "detail": "not_authorized",
+      "status": "PASS"
+    },
+    {
+      "assertion": "proposed_urls_exact_or_null",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_wildcard_endpoint",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "network_requests_attempted_zero",
+      "detail": "0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "scale_up_to_80_rows_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "candidate_value_extraction_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pair_value_extraction_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "real_available_at_assignment_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "cutoff_resolution_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "accessibility_scoring_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "gates_applied_zero",
+      "detail": "0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3b_completed_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "stage126_started_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "modeling_started_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "research_pointers_unchanged",
+      "detail": "fixed",
+      "status": "PASS"
+    },
+    {
+      "assertion": "frozen_scientific_hashes_unchanged",
+      "detail": "unchanged",
+      "status": "PASS"
+    },
+    {
+      "assertion": "official_check_drift_empty",
+      "detail": "enforced_by_canonical_check_raise",
+      "status": "PASS"
+    }
+  ],
+  "available_at_non_null_count": 0,
+  "baseline_commit": "99def5b4c15a41ca80729d873032d8c5c81ec672",
+  "bound_count": 0,
+  "candidate_value_evidence_collected": false,
+  "current_stage": "Stage125",
+  "cut_a_available_at_operationalization_locked": true,
+  "data_value_extraction_performed": false,
+  "document_binding_resolution_decision_locked": true,
+  "endpoint_probe_evidence_collected": true,
+  "evidence_collected": true,
+  "failed_count": 0,
+  "frozen_scientific_sha256": {
+    "project/stage125/data_dictionary_stage125.csv": "ed3d0593fe8456842841be0286285ecfe076f5349b54f0bd6bdf664cc77a759d",
+    "project/stage125/feature_availability_contract_stage125_part2.json": "b97593ed46fa2440b66cafd6a3752300177df4773cbdcf45b3126872d3c200a3",
+    "project/stage125/leakage_checklist_stage125_part2.json": "fab951e12a7ecdc280b74e865e3d5fa9bd4378b04441deb9773ac10a167612a7",
+    "project/stage125/metadata_and_hashes_stage125_part3b1b.json": "aceea735dcbe4eb8378eff7494e151f6f60b1eb05a77cefdd560663315ed6b61",
+    "project/stage125/part3_candidate_inventory_stage125.csv": "4bd5f6a71ecf0e1f74866a64a3774e51340729f4188ae2784f1d90db07e7032f",
+    "project/stage125/part3a_approved_gate_thresholds_stage125.csv": "11c7efe5f242ab8e4a4f7b1955fb25d48e288249f7a1ce4c6bf1713dbf117d20",
+    "project/stage125/part3a_decision_lock_stage125.json": "475c82b3483ef18ff19aea2268f65527ca87c9441603622bd1952bd21f18f35e",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv": "9a441b5e3696353967489b356d0ff48cf7cbea276aeea5018be6edc8368b40f5",
+    "project/stage125/part3b1_adjudicated_decision_requirements_stage125.json": "e6d56a7b55deec83d8460241c101cb520f43b7917495e7c9a61eaf6d20c11f38",
+    "project/stage125/part3b1_cutoff_available_at_contract_stage125.json": "3966addbf4f2768e139c55ff7eef7ac7b11aafa717bf7024cf115fdf956f72b2",
+    "project/stage125/part3b1_decision_lock_stage125.json": "3a7b62b19640dd648bdde15112e44f1d79f6e663007dc2ab8bd0a94d1c82c8d4",
+    "project/stage125/part3b1a_cut_a_available_at_decision_lock_stage125.json": "dc66630e95f9b02359453c4857792fa06ea32b9cecdbe9e71b5985e2027b1853",
+    "project/stage125/part3b1a_cut_a_available_at_operationalization_contract_stage125.json": "8a453fe5b9453df7d3787e00ce4b4f97b679050cf05eeab9171191fc65a54b27",
+    "project/stage125/part3b1b_codal_document_evidence_stage125.csv": "b0ded2c9c084cfc8ca882c370b6437d3949af52e00297b3f3d30f80bd315f867",
+    "project/stage125/part3b1b_document_binding_adjudication_stage125.csv": "d4515c0f3741bec7733aac97c4167a1ca730e983b0cc1627d77da7c20c8aa7e1",
+    "project/stage125/part3b1b_predictor_document_scope_stage125.csv": "835e1b6b17df35f167180e59f7fe51e31c0c679cef464b7d78256ce24bb07f91",
+    "project/stage125/part3b1b_thanusa_capture_receipt_stage125.json": "f2571c296d3400af1bc6b607180d231b4b06096ca4f5c58f024286ade4821626",
+    "project/stage125/part3b1b_thanusa_parsed_metadata_receipt_stage125.json": "217228edd67595167746f006e5bec21f17aa9f3f16008d30c3abc7023e9f84a4",
+    "project/stage125/part3b1b_unresolved_and_rejections_stage125.csv": "d5e0ce0d400601057d65b935683dbd8b3e3c0d03fa7bb24842f56f61cbf53a67",
+    "project/stage125/part3b_verified_endpoint_registry_stage125.csv": "3d36eca0a0a63ef406ec48ef1bcf78ecbe2ce99ce24a6e8804c2b9c3ffb431b7",
+    "project/stage125/prediction_cutoff_audit_stage125_part2.csv": "d50e6617b011a7818d972de8e5c8a862a45f73fb07a0a22cdb5c9f59b6dc88f0",
+    "project/stage125/prediction_time_contract_stage125_part2.json": "9bd40b4832302fb2c9c890b99b06f3b47bcfee2c07d065416f8776e7e0046a89",
+    "project/stage125/source_registry_stage125.csv": "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c",
+    "project/stage125/stage125_part3b1_decision_lock_qc_report.json": "425b9bf2948ae3cbe46c5fec63bb38e959b0ee6a5f76801bf1c1875cc1ff69a1",
+    "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json": "acb038f6859f20a3feb2590a7a495347da8313556fffb8e408bda5e1b4fbff66",
+    "project/stage125/stage125_part3b_evidence_capture_qc_report.json": "c683375f3afe8c2d1a757898122e601f36c145be2b8c69be7ba9b4b781b0f92d"
+  },
+  "gates_applied": 0,
+  "maintenance_task_id": "stage125-part3b1c-document-binding-resolution-decision-lock",
+  "modeling_started": false,
+  "network_requests_attempted": 0,
+  "output_sha256": {
+    "README_STAGE125_PART3B1C_DOCUMENT_BINDING_RESOLUTION.md": "2fafe9c39fbb73a6886d1997114dc894ac6fd9dca157f5507ce599e3f0203a63",
+    "part3b1c_binding_failure_taxonomy_stage125.csv": "1fecc48f95d231b6ec5c40b5363b54789efacd6f1f2e0df9d8196bc79bc63160",
+    "part3b1c_document_binding_resolution_decision_lock_stage125.json": "68f8b8595d4436e7e9d049baae1c47f459ece83f8519f10b34091678c057cd26",
+    "part3b1c_exact_document_evidence_hierarchy_stage125.json": "efcbfd397c661d048572bd98a66186ee0758b7ea5b1a59df97da98a791a459f0",
+    "part3b1c_identity_normalization_contract_stage125.json": "3bc3378fccf6bb56092633cd174d3adf80e88eec489b1e41bd6e0fe474093284",
+    "part3b1c_proposed_capture_authorization_stage125.json": "c97b17669c44969eb1fdc567e9c81f8b9de7b36ad3f63dc5ee6613f7bda17d78",
+    "part3b1c_row_resolution_requirements_stage125.csv": "ebb83df39c45598abd239cab60c519061c0742062602e71058f82bacced3ff4d",
+    "part3b1c_scale_up_readiness_decision_stage125.json": "ee49e9e844d2276009ce1db0daf38a39e0f40b169ada1c4e08ef9ae8546520cd"
+  },
+  "pair_level_evidence_collected": false,
+  "part3a_decision_locked": true,
+  "part3a_protocol_locked": true,
+  "part3b0_readiness": true,
+  "part3b1_decision_locked": true,
+  "part3b_completed": false,
+  "part3b_started": true,
+  "pilot_cutoff_provenance_resolved": false,
+  "pinned_input_sha256": {
+    "project/stage125/metadata_and_hashes_stage125_part3b1b.json": "aceea735dcbe4eb8378eff7494e151f6f60b1eb05a77cefdd560663315ed6b61",
+    "project/stage125/part3a_approved_gate_thresholds_stage125.csv": "11c7efe5f242ab8e4a4f7b1955fb25d48e288249f7a1ce4c6bf1713dbf117d20",
+    "project/stage125/part3a_selected_pilot_pairs_stage125.csv": "9a441b5e3696353967489b356d0ff48cf7cbea276aeea5018be6edc8368b40f5",
+    "project/stage125/part3b1_adjudicated_decision_requirements_stage125.json": "e6d56a7b55deec83d8460241c101cb520f43b7917495e7c9a61eaf6d20c11f38",
+    "project/stage125/part3b1_cutoff_available_at_contract_stage125.json": "3966addbf4f2768e139c55ff7eef7ac7b11aafa717bf7024cf115fdf956f72b2",
+    "project/stage125/part3b1a_cut_a_available_at_decision_lock_stage125.json": "dc66630e95f9b02359453c4857792fa06ea32b9cecdbe9e71b5985e2027b1853",
+    "project/stage125/part3b1a_cut_a_available_at_operationalization_contract_stage125.json": "8a453fe5b9453df7d3787e00ce4b4f97b679050cf05eeab9171191fc65a54b27",
+    "project/stage125/part3b1b_codal_document_evidence_stage125.csv": "b0ded2c9c084cfc8ca882c370b6437d3949af52e00297b3f3d30f80bd315f867",
+    "project/stage125/part3b1b_document_binding_adjudication_stage125.csv": "d4515c0f3741bec7733aac97c4167a1ca730e983b0cc1627d77da7c20c8aa7e1",
+    "project/stage125/part3b1b_predictor_document_scope_stage125.csv": "835e1b6b17df35f167180e59f7fe51e31c0c679cef464b7d78256ce24bb07f91",
+    "project/stage125/part3b1b_thanusa_capture_receipt_stage125.json": "f2571c296d3400af1bc6b607180d231b4b06096ca4f5c58f024286ade4821626",
+    "project/stage125/part3b1b_thanusa_parsed_metadata_receipt_stage125.json": "217228edd67595167746f006e5bec21f17aa9f3f16008d30c3abc7023e9f84a4",
+    "project/stage125/part3b1b_unresolved_and_rejections_stage125.csv": "d5e0ce0d400601057d65b935683dbd8b3e3c0d03fa7bb24842f56f61cbf53a67",
+    "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json": "acb038f6859f20a3feb2590a7a495347da8313556fffb8e408bda5e1b4fbff66"
+  },
+  "predictor_available_at_evidence_collected": false,
+  "predictor_document_binding_evidence_collected": true,
+  "predictor_document_binding_mini_pilot_completed": true,
+  "proposed_capture_authorization_status": "not_authorized",
+  "rejected_count": 1,
+  "research_pointers": {
+    "last_completed_research_action_id": "stage125-part3a-decision-lock",
+    "next_research_action_id": "stage125-part3b-evidence-capture"
+  },
+  "scale_up_to_80_rows_authorized": false,
+  "scope_rows": 5,
+  "source_commit": "b385c33412d484e68c6aba18a1a3057204a0101b",
+  "source_file_sha256": "e929516c49538436610808c8f5c48d8f1510c2cbc1bd80d277dc47a7e27addb8",
+  "stage": "stage125_part3b1c_document_binding_resolution_decision_lock",
+  "stage126_started": false,
+  "test_file_sha256": "7b8b7802865520db3374f97c3091ed6e2c586fa91c5ef52f44cefe8a49a832fe",
+  "ticker_count": 4,
+  "tickers": [
+    "اردستان",
+    "اپال",
+    "بوعلی",
+    "ثنوسا"
+  ],
+  "unresolved_count": 4
+}
