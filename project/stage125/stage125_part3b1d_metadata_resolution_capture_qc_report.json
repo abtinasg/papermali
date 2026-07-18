@@ -5,7 +5,7 @@
   "assertions": [
     {
       "assertion": "baseline_main_exact",
-      "detail": "HEAD=a36c0df9a3375dec120a8a261dcb9cd235309ae3",
+      "detail": "f1bc5eb770d883754078f15427dac45fe40a8c0b",
       "status": "PASS"
     },
     {
@@ -241,7 +241,7 @@
   "evidence_collected": true,
   "failed_count": 0,
   "gates_applied": 0,
-  "generated_at": "a36c0df9a3375dec120a8a261dcb9cd235309ae3",
+  "generated_at": "d831ac9c94e6d72b08f3ed1d5e35712ab0738ab8",
   "logical_network_requests_attempted": 4,
   "maintenance_task_id": "stage125-part3b1d-same-five-metadata-resolution-capture",
   "modeling_started": false,
@@ -264,8 +264,8 @@
   "research_next": "stage125-part3b-evidence-capture",
   "same_five_metadata_resolution_capture_completed": true,
   "scale_up_to_80_rows_authorized": false,
-  "source_commit": "a36c0df9a3375dec120a8a261dcb9cd235309ae3",
-  "source_file_sha256": "237c65ddbfe5dec8b8b5d4bc1bcae2eab06d45dde2b6096021bbac4529758139",
+  "source_commit": "d831ac9c94e6d72b08f3ed1d5e35712ab0738ab8",
+  "source_file_sha256": "c21334e52133d1e0c3115f28198be77465a0c0708600094c3413b305bae84883",
   "stage": "stage125_part3b1d_same_five_metadata_resolution_capture",
   "stage126_authorized": false,
   "task_id": "stage125-part3b1d-same-five-metadata-resolution-capture",

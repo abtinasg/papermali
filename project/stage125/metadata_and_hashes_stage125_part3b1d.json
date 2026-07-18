@@ -1,6 +1,6 @@
 {
   "baseline_commit": "f1bc5eb770d883754078f15427dac45fe40a8c0b",
-  "code_commit": "a36c0df9a3375dec120a8a261dcb9cd235309ae3",
+  "code_commit": "d831ac9c94e6d72b08f3ed1d5e35712ab0738ab8",
   "files": {
     "README_STAGE125_PART3B1D_METADATA_RESOLUTION_CAPTURE.md": "f31c38063fc88ad2cc3809e00d6ebe8854dc65ddefd95f9b0e3366e26efc81e8",
     "part3b1d_capture_authorization_lock_stage125.json": "50a8232ddbc2985df849fc7120f707c3dcbae013b1a4e92076e17e21c1698dcd",
@@ -15,7 +15,7 @@
     "part3b1d_parsed_metadata_opal_1401_stage125.json": "3bc13b192e7112b45dc8a14f28f6df792a4c5c4fe1c438b49269f9289851cdb6",
     "part3b1d_parsed_metadata_thanusa_1392_stage125.json": "8907a3814cdf966e5acc455c1a21a496555f790e9e486834277d8ed5267735a9"
   },
-  "generated_at": "a36c0df9a3375dec120a8a261dcb9cd235309ae3",
+  "generated_at": "d831ac9c94e6d72b08f3ed1d5e35712ab0738ab8",
   "output_files_sha256": {
     "README_STAGE125_PART3B1D_METADATA_RESOLUTION_CAPTURE.md": "f31c38063fc88ad2cc3809e00d6ebe8854dc65ddefd95f9b0e3366e26efc81e8",
     "part3b1d_capture_authorization_lock_stage125.json": "50a8232ddbc2985df849fc7120f707c3dcbae013b1a4e92076e17e21c1698dcd",
@@ -29,15 +29,15 @@
     "part3b1d_parsed_metadata_bouali_1400_stage125.json": "6f9cc84b010a353207e856c8b6fc1be1c85d3673a9ab0f0d44a00fa1a19811c5",
     "part3b1d_parsed_metadata_opal_1401_stage125.json": "3bc13b192e7112b45dc8a14f28f6df792a4c5c4fe1c438b49269f9289851cdb6",
     "part3b1d_parsed_metadata_thanusa_1392_stage125.json": "8907a3814cdf966e5acc455c1a21a496555f790e9e486834277d8ed5267735a9",
-    "stage125_part3b1d_metadata_resolution_capture_qc_report.json": "6000465734b998b6ee57d382e1944d00864c5e5b7959879cf29c9ed1ead50eb1"
+    "stage125_part3b1d_metadata_resolution_capture_qc_report.json": "8cdffa12abecf79b4bdff9c7f488c9d23909114a549fc86afb24694553432672"
   },
-  "qc_sha256": "6000465734b998b6ee57d382e1944d00864c5e5b7959879cf29c9ed1ead50eb1",
+  "qc_sha256": "8cdffa12abecf79b4bdff9c7f488c9d23909114a549fc86afb24694553432672",
   "raw_payload_storage_policy": "gitignored_immutable_cache_optional_local",
   "research_last_completed": "stage125-part3a-decision-lock",
   "research_next": "stage125-part3b-evidence-capture",
   "same_five_metadata_resolution_capture_completed": true,
-  "source_commit": "a36c0df9a3375dec120a8a261dcb9cd235309ae3",
-  "source_file_sha256": "237c65ddbfe5dec8b8b5d4bc1bcae2eab06d45dde2b6096021bbac4529758139",
+  "source_commit": "d831ac9c94e6d72b08f3ed1d5e35712ab0738ab8",
+  "source_file_sha256": "c21334e52133d1e0c3115f28198be77465a0c0708600094c3413b305bae84883",
   "stage": "stage125_part3b1d_same_five_metadata_resolution_capture",
   "task_id": "stage125-part3b1d-same-five-metadata-resolution-capture",
   "test_file_sha256": "7f4b78edc8ca744e74a9cfa87f4c91ea9fcc5396170744d13d9a8b766c83b723"
