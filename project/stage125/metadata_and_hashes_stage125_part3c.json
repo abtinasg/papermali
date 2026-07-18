@@ -2,28 +2,32 @@
   "baseline_commit": "93ab6d8f2c1fbddaaed4a9dc21de6490ef38de30",
   "broad_codal_capture_stopped": true,
   "bulky_output_sha256": {
-    "project/stage125/part3c_outputs/leakage_safe_expanded_rule_a_stage125.csv": "173c07679b17fb3ccf776e72fdbdbec676168c38f6b101dc3bf365c21ea55fb5",
-    "project/stage125/part3c_outputs/leakage_safe_expanded_rule_b_stage125.csv": "80b9371ef47f1917b51ef0bbbb2d47ee83aeede2c3ac961039f47139e93e5a7d",
-    "project/stage125/part3c_outputs/leakage_safe_main_rule_a_stage125.csv": "c4d27dcf32669c567395ecc3c30f5afa804df5835a570105f7d65f620ae07bc6",
-    "project/stage125/part3c_outputs/leakage_safe_main_rule_b_stage125.csv": "f5e38ce7836fe2fdcf0d1d59f88aff33f22c10b52397b7a2cbfe117bdfd702da"
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_a_stage125.csv": "df9be2fee3385eaa8ed01c201282cc8a77b597f77d9fe0267361ee6cdf4fdbbd",
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_b_stage125.csv": "4bb5867fc255d8109069c8c222f1217f503749b027b37fda3966002b372c83e3",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "7660355695946bf119c8eed9cf88a7b5ed2c40dc9bca8c4e0ca3da5f566714cc",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv": "f5359196e7f51433ce843f6ece7e3190b2ca1a36bd93262922e4b5000fafbeb8",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_a_stage125.csv": "e4c8e7b97342688b63c9d5c32138793c356608e3528b58bc12c142874dcce749",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_b_stage125.csv": "67fb2035e47c6f224968c732dcaaf8da3ea737bf64b16d4e94a1f9bac1daf819",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv": "6893281a4d95b8eb72fe8046742422c23cb10e5da698b49d5ab75a33c18dd305",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv": "2fa4cc8551c0bc8ebeda756877a5938ba63a0f3da62c0c94bf0d25ceab684d34"
   },
-  "code_commit": "22c9ed4f566e8aaa892048882a757680dd80a22c",
+  "code_commit": "1ac4c08b8f21b3704f2c32a741a405184afcc872",
   "conservative_lag_months": 6,
   "current_stage": "Stage125",
-  "description": "Stage125 Part 3C leakage-safe dataset finalization (six-month Jalali lag; frozen Gate B samples; offline).",
+  "description": "Stage125 Part 3C audited-pair + timing-eligible analysis-ready dataset finalization (six-month Jalali lag; frozen Gate B samples; offline).",
   "financial_data_researcher_verified_frozen": true,
-  "generated_at": "22c9ed4f566e8aaa892048882a757680dd80a22c",
+  "generated_at": "1ac4c08b8f21b3704f2c32a741a405184afcc872",
   "modeling_started": false,
   "network_requests_attempted": 0,
   "output_files_sha256": {
-    "README_STAGE125_PART3C_LEAKAGE_SAFE_DATASET.md": "ddb00db49bab2a7104e4bac2bc922ca49d3576a92e953be1946e878f475c905c",
-    "part3c_column_role_map_stage125.csv": "c656018d3bc671113a7d5c8d32e9f5a249dbc4c097d7663cf216bcc718abf754",
-    "part3c_input_hash_manifest_stage125.json": "d8781d0034d1817360337f067833c8cf6f5329fccf3c499863d78a029b64e97c",
-    "part3c_leakage_audit_stage125.csv": "d1f53b2906f7eb233b4ef4d8b1ff27ae1ea7e11d14213ce95088686fc01e8ca5",
-    "part3c_leakage_safe_dataset_contract_stage125.json": "5dbf2e38365f95c057678028f72056d347376b8c1b48a8a95741d6084b653a0b",
-    "part3c_sample_summary_stage125.csv": "c446a99ba37a1e08f0bda8a4cb15b2dfb347d3d48c9575d36910eb4cd583d02c",
-    "part3c_target_year_distribution_stage125.csv": "94c63e4e434c4d8462af4c6b8fd3f169c9382624abd3636806b6b186f6b1db8b",
-    "stage125_part3c_leakage_safe_dataset_qc_report.json": "5c64e10ac796d5841c490941aa1a6318ffc95a559f7dfd842ade26af7714c25f"
+    "README_STAGE125_PART3C_LEAKAGE_SAFE_DATASET.md": "4a7e49014081dbee55243cc8ff3d01fd0a29a8b2345aac395d1b08fc7e291869",
+    "part3c_column_role_map_stage125.csv": "5bbf98b592b76479047cacc2e28716578985efe724a1fc3a5b78f3482fd82d50",
+    "part3c_input_hash_manifest_stage125.json": "eba07604d192f82a4b0f10e8eb3c63806e907b76b18b6af72f55e2f991a9b35e",
+    "part3c_leakage_audit_stage125.csv": "663b72818b9c1bc8087106addf2a8a2717cc147d598c2545fc7a073aeb42341b",
+    "part3c_leakage_safe_dataset_contract_stage125.json": "e969a7d1e7babb7eac56996791f399a86aba66b8ee921f801048cebe90b01c31",
+    "part3c_sample_summary_stage125.csv": "2c272fd5d001abb8c47c3cc89b5ce00a2b8539218235c3b8b969bab30a02c1ed",
+    "part3c_target_year_distribution_stage125.csv": "d9f4a9e30bd2a94284bc01bb4dd44cf3e1c0b325c748110bcfe1acd9183677eb",
+    "stage125_part3c_leakage_safe_dataset_qc_report.json": "d9db70c6b1d96d8e9bf3d7e8bb63e2f31a22645048a902cbdd5ba72aabcdbb09"
   },
   "part3b_completed": false,
   "part3c_leakage_safe_finalization_completed": true,
@@ -31,8 +35,8 @@
     "last_completed_research_action_id": "stage125-part3c-leakage-safe-dataset-finalization",
     "next_research_action_id": "stage125-part4-statistical-analysis-plan"
   },
-  "source_file_sha256": "2d47a24686bb0730e80ace229813610abaf73b422a46c6dee440a8c623283afc",
+  "source_file_sha256": "e6b1934576f029f064ca8337c5079617bc8af3508afd895391f5cf34a4a3f2d0",
   "stage": "stage125_part3c_leakage_safe_dataset_finalization",
   "stage126_started": false,
-  "test_file_sha256": "2444141ebcfaade35b11ce0d75a1c61a8b6467e62064c461494c10d2e2e828a3"
+  "test_file_sha256": "1243cd532b55344c11e36d14a480ec8b3698fbe079d4216451d3d1e5acd2c3e7"
 }

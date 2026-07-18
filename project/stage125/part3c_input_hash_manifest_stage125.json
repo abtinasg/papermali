@@ -10,7 +10,7 @@
   "description": "SHA-256 pins for local bulky Gate B / Stage123 inputs and the tracked Part 3B.1E decision lock / frozen-data manifest.",
   "financial_value_reextraction_required": false,
   "immutability_rule": "before/after SHA-256 equality required; mismatch is QC failure",
-  "manifest_version": "stage125_part3c_v1",
+  "manifest_version": "stage125_part3c_v2",
   "part3b1e_tracked_locks_sha256": {
     "project/stage125/part3b1e_conservative_lag_decision_lock_stage125.json": "07c8ba503116f8b0b18b1c349dfe590e7a9568a9a02b377af34a11754494f664",
     "project/stage125/part3b1e_frozen_financial_data_manifest_stage125.json": "78406e04afa5eddc8876dbe5f0fb3e1883afcc2b03072e9e7d70bd6e75a3536b"

@@ -101,7 +101,6 @@ FD_target_main_t_plus_1,target,false,copied from frozen Gate B pair; not recompu
 FD_target_persistent_loss_robustness_t_plus_1,target,false,copied from frozen Gate B pair; not recomputed
 assumed_available_at_conservative_gregorian,timing_assumption,false,methodological; not observed publication
 assumed_available_at_conservative_jalali,timing_assumption,false,methodological; not observed publication
-assumed_before_target_fiscal_year_end,timing_assumption,false,methodological; not observed publication
 availability_date_semantics,timing_assumption,false,methodological; not observed publication
 availability_method,timing_assumption,false,methodological; not observed publication
 conservative_lag_months,timing_assumption,false,methodological; not observed publication
@@ -110,4 +109,8 @@ fiscal_year_end_t_jalali,timing_assumption,false,methodological; not observed pu
 is_observed_publication_timestamp,timing_assumption,false,methodological; not observed publication
 target_fiscal_year_end_t_plus_1_gregorian,timing_assumption,false,methodological; not observed publication
 target_fiscal_year_end_t_plus_1_jalali,timing_assumption,false,methodological; not observed publication
-timing_relation_exception,timing_assumption,false,methodological; not observed publication
+assumed_before_target_fiscal_year_end,timing_eligibility_audit,false,audit/eligibility only; never predictor feature matrix
+timing_eligible_for_analysis,timing_eligibility_audit,false,audit/eligibility only; never predictor feature matrix
+timing_eligible_for_model,timing_eligibility_audit,false,audit/eligibility only; never predictor feature matrix
+timing_exclusion_reason,timing_eligibility_audit,false,audit/eligibility only; never predictor feature matrix
+timing_relation_exception,timing_eligibility_audit,false,audit/eligibility only; never predictor feature matrix
