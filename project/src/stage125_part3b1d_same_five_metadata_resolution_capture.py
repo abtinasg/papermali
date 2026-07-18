@@ -288,15 +288,20 @@ def _is_ancestor(repo_root: str, ancestor: str, descendant: str) -> bool:
 
 
 def verify_baseline_commit(repo_root: str) -> str:
+    """Verify EXPECTED_BASELINE_COMMIT is HEAD or an ancestor; return that SHA.
+
+    Returns the stable baseline SHA (not HEAD) so regenerated QC remains
+    byte-identical across later commits on the research branch.
+    """
     head = _git(repo_root, "rev-parse", "HEAD")
     if head == EXPECTED_BASELINE_COMMIT:
-        return head
+        return EXPECTED_BASELINE_COMMIT
     if not _is_ancestor(repo_root, EXPECTED_BASELINE_COMMIT, head):
         raise QCFail(
-            f"expected baseline {EXPECTED_BASELINE_COMMIT} not ancestor of HEAD "
-            f"(HEAD={head})"
+            f"baseline_main_exact failed: HEAD={head} "
+            f"expected ancestor {EXPECTED_BASELINE_COMMIT}"
         )
-    return head
+    return EXPECTED_BASELINE_COMMIT
 
 
 def utc_now_iso() -> str:
@@ -1449,11 +1454,8 @@ def build_qc_assertions(
     drift: list[str],
 ) -> list[dict[str, Any]]:
     a: list[dict[str, Any]] = []
-    head = _git(str(repo_root), "rev-parse", "HEAD")
-    baseline_ok = head == EXPECTED_BASELINE_COMMIT or _is_ancestor(
-        str(repo_root), EXPECTED_BASELINE_COMMIT, head,
-    )
-    a.append(_assert("baseline_main_exact", baseline_ok, f"HEAD={head}"))
+    baseline_detail = verify_baseline_commit(str(repo_root))
+    a.append(_assert("baseline_main_exact", True, baseline_detail))
     a.append(_assert(
         "five_locked_rows_exact",
         list(scientific["statuses"].keys()) == list(LOCKED_KEYS),
