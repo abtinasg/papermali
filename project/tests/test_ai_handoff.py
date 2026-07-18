@@ -976,13 +976,13 @@ def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
     assert state["current_stage"] == "Stage125"
     assert state["selected_qc_scope"] == (
-        "stage125_part3b1e_conservative_six_month_lag_decision_lock"
+        "stage125_part3c_leakage_safe_dataset_finalization"
     )
     assert state["last_completed_micro_part"] == (
-        "stage125-part3b-conservative-lag-decision-lock"
+        "stage125-part3c-leakage-safe-dataset-finalization"
     )
     assert state["next_research_action_id"] == (
-        "stage125-part3c-leakage-safe-dataset-finalization"
+        "stage125-part4-statistical-analysis-plan"
     )
     assert state["part3a_protocol_locked"] is True
     assert state["part3a_decision_locked"] is True
@@ -1004,10 +1004,11 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["evidence_collected"] is True
     assert state["endpoint_probe_evidence_collected"] is True
     assert state["candidate_value_evidence_collected"] is False
-    assert state["pair_level_evidence_collected"] is False
+    assert state["pair_level_evidence_collected"] is True
     assert state["data_value_extraction_performed"] is False
     assert state["accessibility_scoring_applied"] is False
     assert state["part3b_completed"] is False
+    assert state["part3c_leakage_safe_finalization_completed"] is True
     assert state["network_extraction_performed"] is True
     assert state["modeling_started"] is False
 
@@ -1086,6 +1087,15 @@ def test_stage125_part3b0_generated_files_are_artifact_only(path):
     "project/stage125/part3b1e_frozen_financial_data_manifest_stage125.json",
     "project/stage125/stage125_part3b1e_conservative_lag_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1e.json",
+    "project/stage125/README_STAGE125_PART3C_LEAKAGE_SAFE_DATASET.md",
+    "project/stage125/part3c_leakage_safe_dataset_contract_stage125.json",
+    "project/stage125/part3c_input_hash_manifest_stage125.json",
+    "project/stage125/part3c_column_role_map_stage125.csv",
+    "project/stage125/part3c_sample_summary_stage125.csv",
+    "project/stage125/part3c_target_year_distribution_stage125.csv",
+    "project/stage125/part3c_leakage_audit_stage125.csv",
+    "project/stage125/stage125_part3c_leakage_safe_dataset_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3c.json",
 ])
 def test_stage125_part3b_generated_files_are_artifact_only(path):
     assert gen.path_artifact_only(path) is True
@@ -1289,6 +1299,55 @@ def test_qc_source_test_override_part3b1e():
     assert src.endswith("stage125_part3b1e_conservative_lag_decision.py")
     assert test.endswith(
         "test_stage125_part3b1e_conservative_lag_decision.py"
+    )
+
+
+def test_extract_qc_workflow_markers_part3c_scope():
+    qc = {
+        "stage": "stage125_part3c_leakage_safe_dataset_finalization",
+        "part3a_protocol_locked": True,
+        "part3a_decision_locked": True,
+        "part3b0_readiness": True,
+        "part3b_started": True,
+        "part3b1_decision_locked": True,
+        "cut_a_available_at_operationalization_locked": True,
+        "predictor_document_binding_mini_pilot_completed": True,
+        "predictor_document_binding_evidence_collected": True,
+        "document_binding_resolution_decision_locked": True,
+        "conservative_six_month_lag_decision_locked": True,
+        "broad_codal_capture_stopped": True,
+        "financial_data_researcher_verified_frozen": True,
+        "conservative_availability_lag_locked": True,
+        "conservative_lag_months": 6,
+        "row_level_publish_datetime_collection_required": False,
+        "predictor_available_at_evidence_collected": False,
+        "pilot_cutoff_provenance_resolved": False,
+        "evidence_collected": True,
+        "endpoint_probe_evidence_collected": True,
+        "candidate_value_evidence_collected": False,
+        "pair_level_evidence_collected": True,
+        "data_value_extraction_performed": False,
+        "accessibility_scoring_applied": False,
+        "part3b_completed": False,
+        "part3c_leakage_safe_finalization_completed": True,
+        "network_extraction_performed": True,
+        "modeling_started": False,
+    }
+    got = gen.extract_qc_workflow_markers(qc)
+    assert got["part3c_leakage_safe_finalization_completed"] is True
+    assert got["pair_level_evidence_collected"] is True
+    assert got["modeling_started"] is False
+
+
+def test_qc_source_test_override_part3c():
+    src, test = gen._qc_source_test_paths(
+        "stage125_part3c_leakage_safe_dataset_finalization"
+    )
+    assert src.endswith(
+        "stage125_part3c_leakage_safe_dataset_finalization.py"
+    )
+    assert test.endswith(
+        "test_stage125_part3c_leakage_safe_dataset_finalization.py"
     )
 
 

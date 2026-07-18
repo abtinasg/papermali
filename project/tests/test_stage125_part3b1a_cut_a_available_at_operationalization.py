@@ -591,11 +591,11 @@ def test_research_pointers_unchanged():
     assert "stage125-part3a-decision-lock" in roadmap
     assert (
         "last_completed_research_action_id: "
-        "stage125-part3b-conservative-lag-decision-lock"
+        "stage125-part3c-leakage-safe-dataset-finalization"
     ) in roadmap
     assert (
         "next_research_action_id: "
-        "stage125-part3c-leakage-safe-dataset-finalization"
+        "stage125-part4-statistical-analysis-plan"
     ) in roadmap
 
 

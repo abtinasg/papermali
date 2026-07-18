@@ -11,6 +11,19 @@
 **Decision-lock date:** 2026-07-13
 **Status:** Authoritative research contract from the start of Stage125.
 
+### Addendum A — Part 3C leakage-safe finalization (2026-07-18)
+
+Versioned methodological addendum (does not silently rewrite Part 0 history):
+
+- Part 3B broad CODAL expansion is **superseded**.
+- Six-month conservative Jalali lag is **approved** and operationalized.
+- Part 3C leakage-safe dataset finalization is **completed** for all four
+  locked Gate B sample designs (membership/targets unchanged).
+- Financial data remain researcher-verified and frozen (no re-extraction).
+- Assumed availability is **not** an observed publication-time claim.
+- Stage125 remains incomplete; Stage126 and modeling remain unauthorized.
+- Next research action: `stage125-part4-statistical-analysis-plan`.
+
 ## 0. Scope of this Part (Part 0)
 
 Part 0 is a **documentation-only decision lock**. It performs **no** data
@@ -197,14 +210,15 @@ robustness check.
   `pilot_option_event_enriched` selection (80 pairs; event-enriched; not
   population-representative; not modeling sample). **No** evidence, **no**
   scores applied. `part3a_decision_locked=true`; `part3b_started=false`.
-- **Part 3B — Evidence capture & accessibility scoring. (Not started.)** Small
-  representative pilot for M2–M4 sources; per-variable accessibility/quality
-  scoring; coverage on company-year and common sample; positive/negative counts
-  in proposed temporal splits; drop every Gate-failing variable; **no** final
-  model.
-- **Part 3 (umbrella) — Accessibility, coverage & event pilot.** Parts 3A + 3B
-  together; Part 3A must complete before Part 3B starts.
-- **Part 4 — Statistical analysis plan.** Lock M1–M4 definitions and order; lock
+- **Part 3B — Evidence capture & accessibility scoring. (Superseded for
+  expansion.)** Origin probes / five-row CODAL metadata history retained;
+  broad CODAL expansion stopped by Part 3B.1E conservative-lag decision.
+- **Part 3C — Leakage-safe dataset finalization. (Completed.)** Four Gate B
+  designs preserved; six-month Jalali `assumed_available_at_conservative`
+  operationalized; column-role map + leakage audit; **no** modeling.
+- **Part 3 (umbrella) — Accessibility, coverage & event pilot.** Parts 3A–3C;
+  Part 3B expansion path superseded by conservative lag + Part 3C.
+- **Part 4 — Statistical analysis plan. (Next.)** Lock M1–M4 definitions and order; lock
   primary/robustness samples and the common-sample rule; lock temporal CV and the
   locked final test; lock PR-AUC / Recall@K / Lift@K / calibration; define paired
   uncertainty/bootstrap and multiplicity control; set seeds and tuning budget.

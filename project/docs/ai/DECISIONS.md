@@ -99,6 +99,26 @@ The research contract for the paper is frozen in
   test requires an explicit research decision and a new version of that contract.
 - **Stage122–Stage124 files are not rewritten or redefined during Stage125.**
 
+## Stage125 Part 3C — Leakage-safe dataset finalization (2026-07-18)
+
+Research action `stage125-part3c-leakage-safe-dataset-finalization`:
+
+- Operationalizes the Part 3B.1E locked six-month **Jalali** calendar lag for
+  all four frozen Gate B sample designs (membership, targets, and positive
+  counts unchanged).
+- Predictors join Stage123 on `predictor_row_key_t` → `row_key` (fail-closed
+  one-to-one). Targets are **copied** from Gate B pair files (never recomputed).
+- Assumed availability uses `assumed_available_at_conservative` only; never
+  written as observed `PublishDateTime` / `available_at` / `SentDateTime`.
+- Part 3B broad CODAL expansion remains **superseded**. Financial data remain
+  researcher-verified and frozen.
+- One audited fiscal-year-calendar-shift timing exception is recorded
+  (`رمپنا|1396` → `رمپنا|1397`): membership preserved; not silently dropped;
+  not claimed as timing-safe. Any other timing violation fails closed.
+- Feature selection / model fitting / Stage126 remain unauthorized. Stage125
+  remains incomplete. Next research action:
+  `stage125-part4-statistical-analysis-plan`.
+
 ## Stage125 Part 3B.1E — Conservative six-month availability lag (2026-07-18)
 
 Human-supervisor-approved methodological pivot

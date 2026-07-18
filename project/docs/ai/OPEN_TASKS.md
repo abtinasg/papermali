@@ -6,11 +6,11 @@ front matter; this file is the working description.
 ## Active research workstream: `stage125-research-design-readiness`
 
 Authoritative research pointers live in `ROADMAP.md` front matter:
-`last_completed_research_action_id=stage125-part3b-conservative-lag-decision-lock`,
-`next_research_action_id=stage125-part3c-leakage-safe-dataset-finalization`.
+`last_completed_research_action_id=stage125-part3c-leakage-safe-dataset-finalization`,
+`next_research_action_id=stage125-part4-statistical-analysis-plan`.
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
-Part 3B.1E is the QC/deliverable surface for the conservative-lag research
-action.
+Part 3B.1E is the decision-lock surface for the conservative-lag research
+action; Part 3C is the operationalization / leakage-safe dataset surface.
 
 ### Completed — `stage124-gate-b-rule-approval`
 
@@ -55,11 +55,20 @@ must never be written as observed `PublishDateTime` / `available_at`. Predictors
 from year **t** may only predict distress target **t+1**. Stage125 remains
 **incomplete**; Stage126 and modeling remain unstarted.
 
-### Next / active research action — `stage125-part3c-leakage-safe-dataset-finalization`
+### Completed research action — `stage125-part3c-leakage-safe-dataset-finalization`
 
-Operationalize the locked six-month lag into a leakage-safe dataset
-finalization path. **Do not** start Stage126 or modeling. **Do not** resume
-broad CODAL capture or row-level PublishDateTime collection.
+Leakage-safe pair datasets finalized for all four locked Gate B sample
+designs under the six-month Jalali conservative lag. Financial values and
+targets remain frozen copies (no re-extraction / no target recalculation).
+Assumed availability uses `assumed_available_at_conservative` only (not
+observed `PublishDateTime` / `available_at`). Bulky outputs are gitignored
+and hashed. **Do not** start Stage126 or modeling. **Do not** resume broad
+CODAL capture or row-level PublishDateTime collection.
+
+### Next / active research action — `stage125-part4-statistical-analysis-plan`
+
+Lock the statistical analysis plan (feature subset order, samples, temporal
+CV, metrics, seeds). **No** model fitting. **No** Stage126.
 
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
 document-binding evidence remain as frozen scientific history; they do **not**
@@ -82,10 +91,11 @@ Current markers (must stay true until separately authorized otherwise):
 - `predictor_available_at_evidence_collected=false`
 - `pilot_cutoff_provenance_resolved=false`
 - `candidate_value_evidence_collected=false`
-- `pair_level_evidence_collected=false`
+- `pair_level_evidence_collected=true` (Part 3C leakage-safe pair construction)
 - `data_value_extraction_performed=false`
 - `accessibility_scoring_applied=false`
 - `part3b_completed=false`
+- `part3c_leakage_safe_finalization_completed=true`
 - `modeling_started=false`
 
 **Still prohibited without explicit user authorization:** expanded CODAL/TSETMC/CBI
