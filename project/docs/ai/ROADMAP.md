@@ -1,7 +1,7 @@
 ---
 roadmap_version: 1
 active_research_workstream_id: stage125-research-design-readiness
-qc_scope: stage125-part3b1c-document-binding-resolution-decision-lock
+qc_scope: stage125-part3b1d-same-five-metadata-resolution-capture
 last_completed_research_action_id: stage125-part3a-decision-lock
 next_research_action_id: stage125-part3b-evidence-capture
 active_maintenance_task_id: repository-driven-ai-handoff
@@ -49,6 +49,7 @@ must also appear in the body below. The validator checks that:
 - `stage125-part3b1a-cut-a-available-at-operationalization-lock` — Stage125 Part 3B.1A CUT-A available-at operationalization lock (`PublishDateTime` for exact version-bound CODAL documents; `SentDateTime` audit-only); schema/pure parsers/synthetic validation only; **no network, no real available_at assignment, no cutoff resolution, no extraction, no scoring, no modeling**; advances no research action ✅
 - `stage125-part3b1b-codal-document-binding-mini-pilot` — Stage125 Part 3B.1B controlled CODAL predictor-document binding mini-pilot (exactly five locked rows; document metadata/provenance only; at most one authorized `www.codal.ir` GET); **no financial-value extraction, no accessibility scoring, no Gate application, no cutoff audit mutation, no Part 3B.2 / Stage126 / modeling**; advances no research action
 - `stage125-part3b1c-document-binding-resolution-decision-lock` — Stage125 Part 3B.1C offline document-binding failure adjudication, normalization/source hierarchy lock, and future capture authorization proposal only; **no network, no new capture, no evidence mutation, no available_at assignment, no extraction/scoring/Gates, no 80-row scale-up, no Part 3B.2 / Stage126 / modeling**; advances no research action
+- `stage125-part3b1d-same-five-metadata-resolution-capture` — Stage125 Part 3B.1D controlled same-five metadata-resolution capture (exactly four authorized `www.codal.ir` Decision.aspx GETs; اردستان zero requests; metadata provenance only; raw payloads gitignored); **no binding-status mutation, no available_at assignment, no financial-value extraction, no accessibility scoring, no Gate application, no 80-row scale-up, no Part 3B.2 / Stage126 / modeling**; advances no research action
 
 ## Notes on ordering
 

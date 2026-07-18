@@ -1,0 +1,281 @@
+{
+  "accessibility_scoring_applied": false,
+  "all_pass": true,
+  "assertion_count": 42,
+  "assertions": [
+    {
+      "assertion": "baseline_main_exact",
+      "detail": "HEAD=a36c0df9a3375dec120a8a261dcb9cd235309ae3",
+      "status": "PASS"
+    },
+    {
+      "assertion": "five_locked_rows_exact",
+      "detail": "['ثنوسا|1392', 'بوعلی|1399', 'بوعلی|1400', 'اردستان|1401', 'اپال|1401']",
+      "status": "PASS"
+    },
+    {
+      "assertion": "four_network_eligible_rows_exact",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "ardistan_structural_rejection_preserved",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "ardistan_network_attempted_zero",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "authorized_urls_equal_part3b1c_manifest_exactly",
+      "detail": "auth=['https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D', 'https://www.codal.ir/Reports/Decision.aspx?LetterSerial=X1Tbq4%2Bnahb6qy6UkUigkw%3D%3D&rt=0&let=6&ct=0&ft=-1', 'https://www.codal.ir/Reports/Decision.aspx?LetterSerial=AoU4UDrZexlj4Kd1iQszEw%3d%3d&rt=0&let=6&ct=0&ft=-1', 'https://www.codal.ir/Reports/Decision.aspx?LetterSerial=pScUnGYLuZOexpdcJdTCdQ%3d%3d&rt=2&let=6&ct=0&ft=-1'] proposed=['https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D', 'https://www.codal.ir/Reports/Decision.aspx?LetterSerial=X1Tbq4%2Bnahb6qy6UkUigkw%3D%3D&rt=0&let=6&ct=0&ft=-1', 'https://www.codal.ir/Reports/Decision.aspx?LetterSerial=AoU4UDrZexlj4Kd1iQszEw%3d%3d&rt=0&let=6&ct=0&ft=-1', 'https://www.codal.ir/Reports/Decision.aspx?LetterSerial=pScUnGYLuZOexpdcJdTCdQ%3d%3d&rt=2&let=6&ct=0&ft=-1']",
+      "status": "PASS"
+    },
+    {
+      "assertion": "candidate_letter_serials_match_urls",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "GET_only",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "HTTPS_only",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "exact_host_and_path",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_credentials_or_fragments",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_wildcards",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_search_or_discovery_endpoint",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "logical_request_count_at_most_four",
+      "detail": "4",
+      "status": "PASS"
+    },
+    {
+      "assertion": "each_eligible_url_attempted_at_most_once",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_automatic_retry",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "redirect_chains_recorded",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "response_size_cap_enforced",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "capture_receipts_present_for_four_rows",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "parsed_receipts_bound_to_payload_hashes",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "metadata_field_allowlist_exact",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing_values_remain_null",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_canonical_to_source_backfill",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_source_to_canonical_backfill",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_letterserial_as_lettercode",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "sent_datetime_never_available_at",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "publish_datetime_not_assigned_to_available_at",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3b1b_frozen_hashes_unchanged",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "binding_statuses_unchanged",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "scientific_counts_unchanged",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "available_at_non_null_zero",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "financial_value_extraction_false",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "accessibility_scoring_false",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "gates_applied_zero",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "scale_up_to_80_rows_false",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3b_completed_false",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "stage126_started_false",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "modeling_started_false",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "research_pointers_unchanged",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "official_check_zero_drift",
+      "detail": "enforced_by_raise",
+      "status": "PASS"
+    },
+    {
+      "assertion": "authorization_lock_present",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "check_sentinel_zero_network",
+      "detail": "sentinel_calls=0",
+      "status": "PASS"
+    }
+  ],
+  "authorized_logical_requests": 4,
+  "available_at_non_null_count": 0,
+  "baseline_commit": "f1bc5eb770d883754078f15427dac45fe40a8c0b",
+  "bound_count": 0,
+  "candidate_value_evidence_collected": false,
+  "content_sha256": {
+    "README_STAGE125_PART3B1D_METADATA_RESOLUTION_CAPTURE.md": "f31c38063fc88ad2cc3809e00d6ebe8854dc65ddefd95f9b0e3366e26efc81e8",
+    "part3b1d_capture_authorization_lock_stage125.json": "50a8232ddbc2985df849fc7120f707c3dcbae013b1a4e92076e17e21c1698dcd",
+    "part3b1d_capture_manifest_stage125.json": "b65903b5689a7f2fb7178f3621732da7c4e6708c1c7f40fc1e9dde0b47fc0cbf",
+    "part3b1d_capture_receipt_bouali_1399_stage125.json": "302c76a9827d380fd0c8c8e6492c4a67e4ece46d5a12cafaffa6b3b559a951ad",
+    "part3b1d_capture_receipt_bouali_1400_stage125.json": "156f1132ab4360f161422222e0b0757572596cf8596c8192e769e42a05c17df4",
+    "part3b1d_capture_receipt_opal_1401_stage125.json": "04c32c6af257816b317bbf5b190c1f66cffc834409870e6eafd7b4dc2d1b27cd",
+    "part3b1d_capture_receipt_thanusa_1392_stage125.json": "7d5c3191ea4ee6acbc51fc778060cbbbd13feac81a2e774b14ce208c2c662c15",
+    "part3b1d_metadata_capture_summary_stage125.csv": "9a7faa34a93924acfd75b5114030e99e53b0d5d6acbc55c5fd0a281679dd05e2",
+    "part3b1d_parsed_metadata_bouali_1399_stage125.json": "a02eaff550c67bddcb0712f44c829ac51bb83949c2cd97c09713356baa3da67f",
+    "part3b1d_parsed_metadata_bouali_1400_stage125.json": "6f9cc84b010a353207e856c8b6fc1be1c85d3673a9ab0f0d44a00fa1a19811c5",
+    "part3b1d_parsed_metadata_opal_1401_stage125.json": "3bc13b192e7112b45dc8a14f28f6df792a4c5c4fe1c438b49269f9289851cdb6",
+    "part3b1d_parsed_metadata_thanusa_1392_stage125.json": "8907a3814cdf966e5acc455c1a21a496555f790e9e486834277d8ed5267735a9"
+  },
+  "current_stage": "Stage125",
+  "cut_a_available_at_operationalization_locked": true,
+  "data_value_extraction_performed": false,
+  "document_binding_resolution_decision_locked": true,
+  "endpoint_probe_evidence_collected": true,
+  "evidence_collected": true,
+  "failed_count": 0,
+  "gates_applied": 0,
+  "generated_at": "a36c0df9a3375dec120a8a261dcb9cd235309ae3",
+  "logical_network_requests_attempted": 4,
+  "maintenance_task_id": "stage125-part3b1d-same-five-metadata-resolution-capture",
+  "modeling_started": false,
+  "network_extraction_performed": true,
+  "official_check_drift_empty": true,
+  "pair_level_evidence_collected": false,
+  "part3a_decision_locked": true,
+  "part3a_protocol_locked": true,
+  "part3b0_readiness": true,
+  "part3b1_decision_locked": true,
+  "part3b2_authorized": false,
+  "part3b_completed": false,
+  "part3b_started": true,
+  "pilot_cutoff_provenance_resolved": false,
+  "predictor_available_at_evidence_collected": false,
+  "predictor_document_binding_evidence_collected": true,
+  "predictor_document_binding_mini_pilot_completed": true,
+  "rejected_count": 1,
+  "research_last_completed": "stage125-part3a-decision-lock",
+  "research_next": "stage125-part3b-evidence-capture",
+  "same_five_metadata_resolution_capture_completed": true,
+  "scale_up_to_80_rows_authorized": false,
+  "source_commit": "a36c0df9a3375dec120a8a261dcb9cd235309ae3",
+  "source_file_sha256": "237c65ddbfe5dec8b8b5d4bc1bcae2eab06d45dde2b6096021bbac4529758139",
+  "stage": "stage125_part3b1d_same_five_metadata_resolution_capture",
+  "stage126_authorized": false,
+  "task_id": "stage125-part3b1d-same-five-metadata-resolution-capture",
+  "test_file_sha256": "7f4b78edc8ca744e74a9cfa87f4c91ea9fcc5396170744d13d9a8b766c83b723",
+  "ticker_count": 4,
+  "tickers": [
+    "اردستان",
+    "اپال",
+    "بوعلی",
+    "ثنوسا"
+  ],
+  "unresolved_count": 4
+}

@@ -1,0 +1,89 @@
+{
+  "available_at": null,
+  "binding_status_verdict": null,
+  "candidate_letter_serial": "X1Tbq4+nahb6qy6UkUigkw==",
+  "capture_receipt_response_sha256": null,
+  "fields": {
+    "LetterSerial": {
+      "missingness_reason": "parser_not_eligible_capture_failed",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "PublishDateTime": {
+      "missingness_reason": "parser_not_eligible_capture_failed",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "SentDateTime": {
+      "missingness_reason": "parser_not_eligible_capture_failed",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "TracingNo": {
+      "missingness_reason": "parser_not_eligible_capture_failed",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "fiscal_year_end": {
+      "missingness_reason": "parser_not_eligible_capture_failed",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "legal_entity": {
+      "missingness_reason": "parser_not_eligible_capture_failed",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "official_title": {
+      "missingness_reason": "parser_not_eligible_capture_failed",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "revision_status": {
+      "missingness_reason": "parser_not_eligible_capture_failed",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "symbol": {
+      "missingness_reason": "parser_not_eligible_capture_failed",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    }
+  },
+  "notes": "capture failed or not parser-eligible; no adjudication",
+  "parsed_at_utc": "2026-07-18T14:28:51Z",
+  "parser_contract_version": "stage125_part3b1d_codal_decision_html_v1",
+  "parser_eligible": false,
+  "payload_sha256": null,
+  "predictor_row_key_t": "بوعلی|1399",
+  "request_id": "p3b1d_req_002",
+  "scope_row_id": "p3b1b_scope_063",
+  "task_id": "stage125-part3b1d-same-five-metadata-resolution-capture"
+}

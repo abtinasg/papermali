@@ -60,7 +60,13 @@ research pointers. Part 3B.1C is an offline **document-binding resolution
 decision lock** (`stage125-part3b1c-document-binding-resolution-decision-lock`)
 — failure taxonomy, normalization/hierarchy contracts, and a not-authorized
 capture proposal only; it does **not** execute network, mutate Part 3B.1B
-evidence, assign available_at, or authorize 80-row scale-up.
+evidence, assign available_at, or authorize 80-row scale-up. Part 3B.1D is a
+controlled **same-five metadata-resolution capture**
+(`stage125-part3b1d-same-five-metadata-resolution-capture`) that executes
+exactly four authorized CODAL Decision.aspx GETs (اردستان receives zero
+requests); it does **not** mutate binding statuses, assign available_at,
+extract financial values, score accessibility, apply Gates, or advance research
+pointers.
 
 Current markers (must stay true until separately authorized otherwise):
 
@@ -70,6 +76,7 @@ Current markers (must stay true until separately authorized otherwise):
 - `predictor_document_binding_mini_pilot_completed=true` (five-row metadata binding only)
 - `predictor_document_binding_evidence_collected=true`
 - `document_binding_resolution_decision_locked=true` (Part 3B.1C offline adjudication)
+- `same_five_metadata_resolution_capture_completed=true` (Part 3B.1D four-request capture)
 - `predictor_available_at_evidence_collected=false`
 - `pilot_cutoff_provenance_resolved=false`
 - `candidate_value_evidence_collected=false`

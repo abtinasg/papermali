@@ -1,0 +1,90 @@
+{
+  "available_at": null,
+  "binding_status_verdict": null,
+  "candidate_letter_serial": "pScUnGYLuZOexpdcJdTCdQ==",
+  "capture_receipt_response_sha256": "892a9ac89a4c1f68b47a857d6f2b516027cd2bdba9f6fd3ad36e9160813b62d9",
+  "fields": {
+    "LetterSerial": {
+      "missingness_reason": null,
+      "normalized_value": "pScUnGYLuZOexpdcJdTCdQ==",
+      "parse_warning": null,
+      "presence_status": "present",
+      "raw_value": "pScUnGYLuZOexpdcJdTCdQ==",
+      "source_selector": "html/markup:LetterSerial_query"
+    },
+    "PublishDateTime": {
+      "missingness_reason": "PublishDateTime_not_exposed_in_html",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "SentDateTime": {
+      "missingness_reason": "SentDateTime_not_exposed_in_html",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "TracingNo": {
+      "missingness_reason": "TracingNo_not_exposed_in_html",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "fiscal_year_end": {
+      "missingness_reason": null,
+      "normalized_value": "1401/10/30",
+      "parse_warning": null,
+      "presence_status": "present",
+      "raw_value": "1401/10/30",
+      "source_selector": "html/title:منتهی_به_date"
+    },
+    "legal_entity": {
+      "missingness_reason": null,
+      "normalized_value": "فرآوری معدنی اپال کانی پارس",
+      "parse_warning": null,
+      "presence_status": "present",
+      "raw_value": "فرآوري معدني اپال کاني پارس",
+      "source_selector": "html/id:CompanyName"
+    },
+    "official_title": {
+      "missingness_reason": null,
+      "normalized_value": "صورت های مالی 12 ماهه منتهی به 1401/10/30 (حسابرسی شده)",
+      "parse_warning": null,
+      "presence_status": "present",
+      "raw_value": "صورت‌های مالی 12 ماهه منتهی به  1401/10/30 (حسابرسی شده)",
+      "source_selector": "html/title"
+    },
+    "revision_status": {
+      "missingness_reason": "revision_status_not_explicitly_exposed",
+      "normalized_value": null,
+      "parse_warning": "absence_of_اصلاحیه_does_not_prove_original;revision_status_left_missing",
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "symbol": {
+      "missingness_reason": "symbol_not_exposed_in_html",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    }
+  },
+  "metadata_sha256": "84444b54091e55da8aa3a9f1d722dcc872e133873cbb0cb7c7f99c39612811c1",
+  "notes": "metadata provenance capture only; no binding adjudication; SentDateTime audit-only",
+  "parsed_at_utc": "2026-07-18T14:28:54Z",
+  "parser_contract_version": "stage125_part3b1d_codal_decision_html_v1",
+  "parser_eligible": true,
+  "payload_sha256": "892a9ac89a4c1f68b47a857d6f2b516027cd2bdba9f6fd3ad36e9160813b62d9",
+  "predictor_row_key_t": "اپال|1401",
+  "request_id": "p3b1d_req_004",
+  "scope_row_id": "p3b1b_scope_077",
+  "task_id": "stage125-part3b1d-same-five-metadata-resolution-capture"
+}

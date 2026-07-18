@@ -1,0 +1,90 @@
+{
+  "available_at": null,
+  "binding_status_verdict": null,
+  "candidate_letter_serial": "Ddg2e7HG6FGR5ygaTFJd4g==",
+  "capture_receipt_response_sha256": "6d7b08e87a4024851c8e2f17225c2aca43dc968673ccd2869cde2a4fb123b4ee",
+  "fields": {
+    "LetterSerial": {
+      "missingness_reason": null,
+      "normalized_value": "Ddg2e7HG6FGR5ygaTFJd4g==",
+      "parse_warning": null,
+      "presence_status": "present",
+      "raw_value": "Ddg2e7HG6FGR5ygaTFJd4g==",
+      "source_selector": "html/markup:LetterSerial_query"
+    },
+    "PublishDateTime": {
+      "missingness_reason": "PublishDateTime_not_exposed_in_html",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "SentDateTime": {
+      "missingness_reason": "SentDateTime_not_exposed_in_html",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "TracingNo": {
+      "missingness_reason": "TracingNo_not_exposed_in_html",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "fiscal_year_end": {
+      "missingness_reason": null,
+      "normalized_value": "1392/06/31",
+      "parse_warning": null,
+      "presence_status": "present",
+      "raw_value": "1392/06/31",
+      "source_selector": "html/title:منتهی_به_date"
+    },
+    "legal_entity": {
+      "missingness_reason": null,
+      "normalized_value": "نوسازی و ساختمان تهران",
+      "parse_warning": null,
+      "presence_status": "present",
+      "raw_value": "نوسازي و ساختمان تهران",
+      "source_selector": "html/id:CompanyName"
+    },
+    "official_title": {
+      "missingness_reason": null,
+      "normalized_value": "صورت های مالی 12 ماهه منتهی به 1392/06/31 (حسابرسی شده)",
+      "parse_warning": null,
+      "presence_status": "present",
+      "raw_value": "صورت‌های مالی 12 ماهه منتهی به  1392/06/31 (حسابرسی شده)",
+      "source_selector": "html/title"
+    },
+    "revision_status": {
+      "missingness_reason": "revision_status_not_explicitly_exposed",
+      "normalized_value": null,
+      "parse_warning": "absence_of_اصلاحیه_does_not_prove_original;revision_status_left_missing",
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    },
+    "symbol": {
+      "missingness_reason": "symbol_not_exposed_in_html",
+      "normalized_value": null,
+      "parse_warning": null,
+      "presence_status": "missing",
+      "raw_value": null,
+      "source_selector": null
+    }
+  },
+  "metadata_sha256": "af2d82cc9475f9cc0ee5c6c9249df5833f7e9fafde432d941ed753837ae569b0",
+  "notes": "metadata provenance capture only; no binding adjudication; SentDateTime audit-only",
+  "parsed_at_utc": "2026-07-18T14:28:50Z",
+  "parser_contract_version": "stage125_part3b1d_codal_decision_html_v1",
+  "parser_eligible": true,
+  "payload_sha256": "6d7b08e87a4024851c8e2f17225c2aca43dc968673ccd2869cde2a4fb123b4ee",
+  "predictor_row_key_t": "ثنوسا|1392",
+  "request_id": "p3b1d_req_001",
+  "scope_row_id": "p3b1b_scope_006",
+  "task_id": "stage125-part3b1d-same-five-metadata-resolution-capture"
+}

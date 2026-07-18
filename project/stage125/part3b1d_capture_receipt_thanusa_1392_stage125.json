@@ -1,0 +1,28 @@
+{
+  "candidate_letter_serial": "Ddg2e7HG6FGR5ygaTFJd4g==",
+  "capture_status": "captured_ok",
+  "content_type": "text/html; charset=utf-8",
+  "final_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D",
+  "http_method": "GET",
+  "http_status": 200,
+  "local_cache_path": "project/stage125/raw_cache_part3b1d/6d/6d7b08e87a4024851c8e2f17225c2aca43dc968673ccd2869cde2a4fb123b4ee/payload.bin",
+  "logical_request_number": 1,
+  "metadata_sha256": "af2d82cc9475f9cc0ee5c6c9249df5833f7e9fafde432d941ed753837ae569b0",
+  "network_error": null,
+  "parser_eligible": true,
+  "payload_sha256": "6d7b08e87a4024851c8e2f17225c2aca43dc968673ccd2869cde2a4fb123b4ee",
+  "predictor_row_key_t": "ثنوسا|1392",
+  "raw_payload_storage_policy": "gitignored_immutable_cache_optional_local",
+  "redirect_chain": [
+    "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D"
+  ],
+  "redirect_count": 0,
+  "request_completed_at_utc": "2026-07-18T14:28:50Z",
+  "request_id": "p3b1d_req_001",
+  "request_started_at_utc": "2026-07-18T14:28:48Z",
+  "requested_exact_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D",
+  "response_bytes": 59904,
+  "response_sha256": "6d7b08e87a4024851c8e2f17225c2aca43dc968673ccd2869cde2a4fb123b4ee",
+  "scope_row_id": "p3b1b_scope_006",
+  "task_id": "stage125-part3b1d-same-five-metadata-resolution-capture"
+}

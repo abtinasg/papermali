@@ -1,0 +1,28 @@
+{
+  "candidate_letter_serial": "AoU4UDrZexlj4Kd1iQszEw==",
+  "capture_status": "capture_failed",
+  "content_type": null,
+  "final_url": null,
+  "http_method": "GET",
+  "http_status": null,
+  "local_cache_path": null,
+  "logical_request_number": 3,
+  "metadata_sha256": null,
+  "network_error": "NetworkPolicyError: redirect reaches non-Decision endpoint",
+  "parser_eligible": false,
+  "payload_sha256": null,
+  "predictor_row_key_t": "بوعلی|1400",
+  "raw_payload_storage_policy": "gitignored_immutable_cache_optional_local",
+  "redirect_chain": [
+    "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=AoU4UDrZexlj4Kd1iQszEw%3d%3d&rt=0&let=6&ct=0&ft=-1"
+  ],
+  "redirect_count": 0,
+  "request_completed_at_utc": "2026-07-18T14:28:52Z",
+  "request_id": "p3b1d_req_003",
+  "request_started_at_utc": "2026-07-18T14:28:51Z",
+  "requested_exact_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=AoU4UDrZexlj4Kd1iQszEw%3d%3d&rt=0&let=6&ct=0&ft=-1",
+  "response_bytes": null,
+  "response_sha256": null,
+  "scope_row_id": "p3b1b_scope_072",
+  "task_id": "stage125-part3b1d-same-five-metadata-resolution-capture"
+}

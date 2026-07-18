@@ -1,0 +1,66 @@
+{
+  "accessibility_scoring_performed": false,
+  "ardistan_capture_status": "not_attempted_structurally_rejected",
+  "ardistan_network_request_attempted": false,
+  "authorization_scope": "same_five_metadata_resolution_second_attempt",
+  "authorized_logical_requests": 4,
+  "authorized_requests": [
+    {
+      "candidate_letter_serial": "Ddg2e7HG6FGR5ygaTFJd4g==",
+      "capture_receipt": "part3b1d_capture_receipt_thanusa_1392_stage125.json",
+      "capture_status": "captured_ok",
+      "exact_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=Ddg2e7HG6FGR5ygaTFJd4g%3D%3D",
+      "parsed_metadata_receipt": "part3b1d_parsed_metadata_thanusa_1392_stage125.json",
+      "predictor_row_key_t": "ثنوسا|1392",
+      "request_id": "p3b1d_req_001",
+      "response_sha256": "6d7b08e87a4024851c8e2f17225c2aca43dc968673ccd2869cde2a4fb123b4ee"
+    },
+    {
+      "candidate_letter_serial": "X1Tbq4+nahb6qy6UkUigkw==",
+      "capture_receipt": "part3b1d_capture_receipt_bouali_1399_stage125.json",
+      "capture_status": "capture_failed",
+      "exact_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=X1Tbq4%2Bnahb6qy6UkUigkw%3D%3D&rt=0&let=6&ct=0&ft=-1",
+      "parsed_metadata_receipt": "part3b1d_parsed_metadata_bouali_1399_stage125.json",
+      "predictor_row_key_t": "بوعلی|1399",
+      "request_id": "p3b1d_req_002",
+      "response_sha256": null
+    },
+    {
+      "candidate_letter_serial": "AoU4UDrZexlj4Kd1iQszEw==",
+      "capture_receipt": "part3b1d_capture_receipt_bouali_1400_stage125.json",
+      "capture_status": "capture_failed",
+      "exact_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=AoU4UDrZexlj4Kd1iQszEw%3d%3d&rt=0&let=6&ct=0&ft=-1",
+      "parsed_metadata_receipt": "part3b1d_parsed_metadata_bouali_1400_stage125.json",
+      "predictor_row_key_t": "بوعلی|1400",
+      "request_id": "p3b1d_req_003",
+      "response_sha256": null
+    },
+    {
+      "candidate_letter_serial": "pScUnGYLuZOexpdcJdTCdQ==",
+      "capture_receipt": "part3b1d_capture_receipt_opal_1401_stage125.json",
+      "capture_status": "captured_ok",
+      "exact_url": "https://www.codal.ir/Reports/Decision.aspx?LetterSerial=pScUnGYLuZOexpdcJdTCdQ%3d%3d&rt=2&let=6&ct=0&ft=-1",
+      "parsed_metadata_receipt": "part3b1d_parsed_metadata_opal_1401_stage125.json",
+      "predictor_row_key_t": "اپال|1401",
+      "request_id": "p3b1d_req_004",
+      "response_sha256": "892a9ac89a4c1f68b47a857d6f2b516027cd2bdba9f6fd3ad36e9160813b62d9"
+    }
+  ],
+  "automatic_retry_performed": false,
+  "available_at_assignment_performed": false,
+  "binding_status_mutation_performed": false,
+  "capture_completed": true,
+  "financial_value_extraction_performed": false,
+  "gates_applied": 0,
+  "logical_requests_attempted": 4,
+  "modeling_authorized": false,
+  "part3b1b_thanusa_receipt_overwritten": false,
+  "part3b2_authorized": false,
+  "raw_payload_storage_policy": "gitignored_immutable_cache_optional_local",
+  "research_last_completed": "stage125-part3a-decision-lock",
+  "research_next": "stage125-part3b-evidence-capture",
+  "same_five_metadata_resolution_capture_completed": true,
+  "scale_up_to_80_rows_authorized": false,
+  "stage126_authorized": false,
+  "task_id": "stage125-part3b1d-same-five-metadata-resolution-capture"
+}

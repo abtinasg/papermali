@@ -5,6 +5,16 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 
 ## 2026-07-18
 
+- **Stage125 Part 3B.1D — Controlled Same-Five Metadata Resolution Capture
+  (maintenance).** Tracked as
+  `stage125-part3b1d-same-five-metadata-resolution-capture`. Exactly four
+  authorized CODAL Decision.aspx GETs within the existing five-row pilot;
+  اردستان receives zero network requests; raw payloads remain gitignored;
+  tracked receipts are payload-hash-bound. **No** binding-status mutation,
+  **no** available_at assignment, **no** financial-value extraction, **no**
+  accessibility scoring / Gate application, **no** 80-row scale-up / Part 3B.2 /
+  Stage126 / modeling. Research pointers unchanged.
+
 - **Stage125 Part 3B.1C — Document Binding Resolution Decision Lock
   (maintenance).** Tracked as
   `stage125-part3b1c-document-binding-resolution-decision-lock`. Offline
