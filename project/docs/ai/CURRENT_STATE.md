@@ -7,48 +7,44 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 ## Snapshot
 
-- **Stage / Batch:** Stage125 / None
-- **Active workstream:** `stage125_research_design_readiness`
+- **Stage / Batch:** Stage126 / None
+- **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed research action:** `stage125-part5-readiness-closure`
 - **Next research action:** `stage126-m1-financial-baseline`
-- **Last stage commit:** `e4c7d3bbee6fc3599884414c3723bc2b166e39c6`
-- **Generated from commit:** `69b46f78a3f0cbe9110480dd74bc3729b1dec0b6` (branch `stage125-part5-readiness-closure`, informational)
-- **Baseline:** `origin/main` @ `5836059e2d533f4be7e1898f942937a57c0b8fef`
+- **Last stage commit:** `7963e21922065a5e4690cc5897632c17ef97da1c`
+- **Generated from commit:** `a4b3c3e13a94879f162e3467ad70bcc8b648b4ae` (branch `stage126-m1-primary-development-tuning`, informational)
+- **Baseline:** `origin/main` @ `5f56be5b2e49e66c54b451994a5e36c4fcc754d9`
 
 ## QC
 
-- ✅ **64 assertions, 0 failed**, all_pass=True
-- Scope: `stage125_part5_readiness_closure`
-- Report: `project/stage125/stage125_part5_readiness_closure_qc_report.json`
-- QC source commit (code): `e4c7d3bbee6fc3599884414c3723bc2b166e39c6`
+- ✅ **65 assertions, 0 failed**, all_pass=True
+- Scope: `stage126_m1_financial_baseline`
+- Report: `project/stage126/stage126_m1_primary_development_tuning_qc_report.json`
+- QC source commit (code): `7963e21922065a5e4690cc5897632c17ef97da1c`
 
 ## Workflow markers
 
-- modeling_started: **False**
+- modeling_started: **True**
 - gate_b_started: **True**
 - verified_master_created: **True**
-- part3a_protocol_locked: **True**
-- part3a_decision_locked: **True**
-- part3b_started: **True**
-- part3b1_decision_locked: **True**
-- cut_a_available_at_operationalization_locked: **True**
-- predictor_available_at_evidence_collected: **False**
-- predictor_document_binding_mini_pilot_completed: **True**
-- predictor_document_binding_evidence_collected: **True**
-- pilot_cutoff_provenance_resolved: **False**
-- part3b0_readiness: **True**
-- evidence_collected: **True** (endpoint-probe scope when Part 3B active)
-- endpoint_probe_evidence_collected: **True**
-- candidate_value_evidence_collected: **False**
-- pair_level_evidence_collected: **True**
-- data_value_extraction_performed: **False**
-- accessibility_scoring_applied: **False**
-- part3b_completed: **False**
-- network_extraction_performed: **True**
+- stage125_completed: **True**
+- stage126_authorized: **True**
+- stage126_started: **True**
+- development_modeling_authorized: **True**
+- modeling_authorized: **True**
+- m1_primary_development_tuning_completed: **True**
+- m1_robustness_started: **False**
+- m1_robustness_completed: **False**
+- final_test_unlocked: **False**
+- final_test_access_authorized: **False**
+- final_test_evaluation_performed: **False**
+- m2_data_collected: **False**
+- m3_data_collected: **False**
+- m4_data_collected: **False**
 
 ## Tickers in current research scope
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `f897c92394ac872a134b1d2b160c53f398fe0b82277a97e82a094fabcb232aba`_
-_generated_at_utc: 2026-07-19T14:30:06Z (informational)_
+_state_fingerprint: `c83f133b1aecd779fa661a95bb3b0b32d7cbbff45241362af0962dbc4dc31caf`_
+_generated_at_utc: 2026-07-19T17:37:46Z (informational)_
