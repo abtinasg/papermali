@@ -85,6 +85,14 @@ MODELING_ARTIFACT_PATTERNS = (
     "predictions", "model_results",
 )
 MODELING_ARTIFACT_EXTENSIONS = (".joblib", ".npz", ".pickle", ".pkl", ".model")
+# Explicit Part 4 SAP contract filenames may contain pattern substrings
+# (e.g. "shap", "temporal_split") but are plan-lock text contracts only —
+# never fitted-model artifacts. Exact-path exemption only.
+MODELING_SCAN_ALLOWED_EXACT = (
+    "project/stage125/part4_shap_stability_contract_stage125.json",
+    "project/stage125/part4_temporal_split_contract_stage125.json",
+    "project/stage125/part4_temporal_split_manifest_stage125.csv",
+)
 
 PART3B_FORBIDDEN_EXACT = (
     "project/run_stage125_part3b.py",
@@ -466,6 +474,8 @@ def scan_for_modeling_artifacts(project_dir: Path) -> dict:
             if low.startswith("modeling_") and low.endswith(".csv"):
                 continue
             rel = str(f.relative_to(project_dir.parent))
+            if rel in MODELING_SCAN_ALLOWED_EXACT:
+                continue
             for ext in MODELING_ARTIFACT_EXTENSIONS:
                 if low.endswith(ext):
                     artifact_hits.append(rel)
