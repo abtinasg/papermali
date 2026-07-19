@@ -1211,13 +1211,13 @@ def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
     assert state["current_stage"] == "Stage125"
     assert state["selected_qc_scope"] == (
-        "stage125_part4_statistical_analysis_plan"
+        "stage125_part5_readiness_closure"
     )
     assert state["last_completed_micro_part"] == (
-        "stage125-part4-statistical-analysis-plan"
+        "stage125-part5-readiness-closure"
     )
     assert state["next_research_action_id"] == (
-        "stage125-part5-readiness-closure"
+        "stage126-m1-financial-baseline"
     )
     assert state["part3a_protocol_locked"] is True
     assert state["part3a_decision_locked"] is True
@@ -1250,8 +1250,15 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["part3b_completed"] is False
     assert state["part3c_leakage_safe_finalization_completed"] is True
     assert state["part4_statistical_analysis_plan_locked"] is True
-    assert state["network_extraction_performed"] is True
+    assert state["stage125_part5_readiness_closure_completed"] is True
+    assert state["stage125_completed"] is True
+    assert state["stage126_m1_entry_ready"] is True
+    assert state["stage126_authorized"] is False
+    assert state["stage126_started"] is False
+    assert state["modeling_authorized"] is False
     assert state["modeling_started"] is False
+    assert state["final_test_unlocked"] is False
+    assert state["network_extraction_performed"] is True
     # Active lag must not ambiguously remain six months.
     assert "conservative_lag_months" not in state
     assert state["active_availability_lag_months"] == 4
@@ -1360,6 +1367,14 @@ def test_stage125_part3b0_generated_files_are_artifact_only(path):
     "project/stage125/README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md",
     "project/stage125/stage125_part4_statistical_analysis_plan_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part4.json",
+    "project/stage125/README_STAGE125_PART5_READINESS_CLOSURE.md",
+    "project/stage125/part5_readiness_closure_report_stage125.json",
+    "project/stage125/part5_keep_drop_decisions_stage125.csv",
+    "project/stage125/part5_blocker_register_stage125.csv",
+    "project/stage125/part5_stage126_m1_entry_contract_stage125.json",
+    "project/stage125/part5_artifact_integrity_manifest_stage125.csv",
+    "project/stage125/stage125_part5_readiness_closure_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part5.json",
 ])
 def test_stage125_part3b_generated_files_are_artifact_only(path):
     assert gen.path_artifact_only(path) is True
