@@ -23,9 +23,11 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import importlib.metadata as importlib_metadata
 import io
 import json
 import math
+import platform
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -46,6 +48,24 @@ RESEARCH_ACTION_ID = "stage126-m1-financial-baseline"
 RESEARCH_LAST_COMPLETED = "stage125-part5-readiness-closure"
 RESEARCH_NEXT = "stage126-m1-financial-baseline"
 ACTIVE_WORKSTREAM = "stage126_m1_financial_baseline"
+
+# Packages whose exact versions are recorded for reproducibility (§16). Recorded
+# under the canonical Stage126 environment; --check compares them verbatim so a
+# version drift surfaces as drift rather than silently altering numeric results.
+RUNTIME_VERSION_PACKAGES = ("pandas", "numpy", "scikit-learn", "xgboost", "jdatetime")
+
+
+def runtime_versions() -> dict[str, str]:
+    """Deterministically record exact runtime package versions."""
+    def _v(dist: str) -> str:
+        try:
+            return importlib_metadata.version(dist)
+        except Exception:
+            return "unavailable"
+
+    versions = {"python": platform.python_version()}
+    versions.update({pkg: _v(pkg) for pkg in RUNTIME_VERSION_PACKAGES})
+    return versions
 
 EXPECTED_BASELINE_COMMIT = "5f56be5b2e49e66c54b451994a5e36c4fcc754d9"
 EXPECTED_BASELINE_TREE = "d8f399e3dedac123065f6eda876dc9e71f0c36e7"
@@ -1745,6 +1765,7 @@ def run(
             "baseline_tree": EXPECTED_BASELINE_TREE,
             "source_file_sha256": qc["source_file_sha256"],
             "test_file_sha256": qc["test_file_sha256"],
+            "runtime_versions": runtime_versions(),
             "output_files_sha256": dict(
                 sorted({**content_hashes, F_QC: qc_hash}.items())
             ),

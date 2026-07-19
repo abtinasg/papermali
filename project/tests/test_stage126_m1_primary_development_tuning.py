@@ -654,3 +654,20 @@ def test_full_run_check_is_deterministic_and_clean():
     assert result["qc"]["failed_count"] == 0
     assert result["drift"] == []
     assert result["network_requests_attempted"] == 0
+
+
+# --------------------------------------------------------------------------- #
+# 12. Runtime version recording (§16)
+# --------------------------------------------------------------------------- #
+
+def test_runtime_versions_helper_records_required_packages():
+    versions = m1.runtime_versions()
+    for key in ("python", "pandas", "numpy", "scikit-learn", "xgboost", "jdatetime"):
+        assert key in versions
+        assert isinstance(versions[key], str) and versions[key]
+
+
+def test_metadata_records_runtime_versions_matching_environment():
+    meta = _read_json(STAGE_DIR / m1.F_METADATA)
+    assert "runtime_versions" in meta
+    assert meta["runtime_versions"] == m1.runtime_versions()
