@@ -1,0 +1,65 @@
+{
+  "calibration": {
+    "do_not_select_winner_on_calibrated_final_test": true,
+    "isotonic_authorized": false,
+    "logit_clip_epsilon": 1e-06,
+    "optional_secondary_recalibration": "sigmoid_Platt",
+    "platt_fit_on": "pooled_development_OOF_predictions_only",
+    "primary_probabilities": "raw_locked_pipeline_probabilities",
+    "report": [
+      "Brier_score",
+      "5_bin_quantile_calibration_curve",
+      "calibration_intercept",
+      "calibration_slope"
+    ],
+    "skip_recalibration_if_oof_positives_lt": 20
+  },
+  "multiplicity": {
+    "additional_post_hoc_families_authorized": false,
+    "alpha": 0.05,
+    "confirmatory_family_1": [
+      "Logistic_vs_RF",
+      "Logistic_vs_XGBoost",
+      "RF_vs_XGBoost"
+    ],
+    "confirmatory_family_2_adjacent_block_gains_if_admitted": [
+      "M2_minus_M1",
+      "M3_minus_M2",
+      "M4_minus_M3"
+    ],
+    "correction": "Holm"
+  },
+  "primary_metric": "PR-AUC",
+  "secondary_metrics": [
+    "ROC-AUC",
+    "Brier_score",
+    "Recall@10%",
+    "Lift@10%"
+  ],
+  "thresholded_secondary": {
+    "never_optimize_on_final_test": true,
+    "rule": "development_OOF_F2_maximizing_threshold",
+    "tie_break": "higher_threshold"
+  },
+  "topk": {
+    "definition": "K_y = ceil(0.10 * N_y)",
+    "fraction": 0.1,
+    "lift_at_10pct": "pooled_precision_among_selected_topK / pooled_test_prevalence",
+    "optimize_K_after_results": false,
+    "ranking_order": [
+      "predicted_probability_descending",
+      "ticker_ascending_deterministic_tiebreaker"
+    ],
+    "recall_at_10pct": "sum_captured_positives_across_target_years / sum_total_positives_across_target_years"
+  },
+  "uncertainty": {
+    "bootstrap_seed": 20260724,
+    "cluster": "ticker",
+    "confidence_interval": "percentile_95",
+    "method": "paired_company_cluster_bootstrap",
+    "min_valid_replicates": 1000,
+    "replicates": 2000,
+    "same_resampled_rows_for_all_compared_models": true,
+    "valid_replicate_requires_both_classes": true
+  }
+}

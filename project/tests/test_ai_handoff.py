@@ -1211,13 +1211,13 @@ def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
     assert state["current_stage"] == "Stage125"
     assert state["selected_qc_scope"] == (
-        "stage125_part3c_leakage_safe_dataset_finalization"
+        "stage125_part4_statistical_analysis_plan"
     )
     assert state["last_completed_micro_part"] == (
-        "stage125-part3c-leakage-safe-dataset-finalization"
+        "stage125-part4-statistical-analysis-plan"
     )
     assert state["next_research_action_id"] == (
-        "stage125-part4-statistical-analysis-plan"
+        "stage125-part5-readiness-closure"
     )
     assert state["part3a_protocol_locked"] is True
     assert state["part3a_decision_locked"] is True
@@ -1249,6 +1249,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["accessibility_scoring_applied"] is False
     assert state["part3b_completed"] is False
     assert state["part3c_leakage_safe_finalization_completed"] is True
+    assert state["part4_statistical_analysis_plan_locked"] is True
     assert state["network_extraction_performed"] is True
     assert state["modeling_started"] is False
     # Active lag must not ambiguously remain six months.
@@ -1341,6 +1342,24 @@ def test_stage125_part3b0_generated_files_are_artifact_only(path):
     "project/stage125/part3c_leakage_audit_stage125.csv",
     "project/stage125/stage125_part3c_leakage_safe_dataset_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3c.json",
+    "project/stage125/README_STAGE125_PART4_STATISTICAL_ANALYSIS_PLAN.md",
+    "project/stage125/part4_statistical_analysis_plan_stage125.json",
+    "project/stage125/part4_feature_sets_stage125.csv",
+    "project/stage125/part4_feature_exclusion_decisions_stage125.csv",
+    "project/stage125/part4_sample_target_matrix_stage125.csv",
+    "project/stage125/part4_temporal_split_contract_stage125.json",
+    "project/stage125/part4_temporal_split_manifest_stage125.csv",
+    "project/stage125/part4_event_count_gate_stage125.csv",
+    "project/stage125/part4_development_feature_coverage_audit_stage125.csv",
+    "project/stage125/part4_preprocessing_contract_stage125.json",
+    "project/stage125/part4_model_specifications_stage125.json",
+    "project/stage125/part4_hyperparameter_budget_stage125.json",
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
+    "project/stage125/part4_shap_stability_contract_stage125.json",
+    "project/stage125/part4_revenue_growth_exclusion_revision_decision_stage125.json",
+    "project/stage125/README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md",
+    "project/stage125/stage125_part4_statistical_analysis_plan_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part4.json",
 ])
 def test_stage125_part3b_generated_files_are_artifact_only(path):
     assert gen.path_artifact_only(path) is True
@@ -1601,6 +1620,62 @@ def test_qc_source_test_override_part3c():
     )
     assert test.endswith(
         "test_stage125_part3c_leakage_safe_dataset_finalization.py"
+    )
+
+
+def test_extract_qc_workflow_markers_part4_scope():
+    qc = {
+        "stage": "stage125_part4_statistical_analysis_plan",
+        "part3a_protocol_locked": True,
+        "part3a_decision_locked": True,
+        "part3b0_readiness": True,
+        "part3b_started": True,
+        "part3b1_decision_locked": True,
+        "cut_a_available_at_operationalization_locked": True,
+        "predictor_document_binding_mini_pilot_completed": True,
+        "predictor_document_binding_evidence_collected": True,
+        "document_binding_resolution_decision_locked": True,
+        "conservative_six_month_lag_decision_locked": True,
+        "broad_codal_capture_stopped": True,
+        "financial_data_researcher_verified_frozen": True,
+        "conservative_availability_lag_locked": True,
+        "row_level_publish_datetime_collection_required": False,
+        "active_availability_method": "fixed_regulatory_lag",
+        "active_availability_lag_months": 4,
+        "four_month_regulatory_lag_locked": True,
+        "six_month_lag_superseded": True,
+        "historical_six_month_decision_retained": True,
+        "historical_six_month_decision_active": False,
+        "predictor_available_at_evidence_collected": False,
+        "pilot_cutoff_provenance_resolved": False,
+        "evidence_collected": True,
+        "endpoint_probe_evidence_collected": True,
+        "candidate_value_evidence_collected": False,
+        "pair_level_evidence_collected": True,
+        "data_value_extraction_performed": False,
+        "accessibility_scoring_applied": False,
+        "part3b_completed": False,
+        "part3c_leakage_safe_finalization_completed": True,
+        "part4_statistical_analysis_plan_locked": True,
+        "contract_version": "stage125_part4_sap_v2",
+        "network_extraction_performed": True,
+        "modeling_started": False,
+    }
+    got = gen.extract_qc_workflow_markers(qc)
+    assert got["part4_statistical_analysis_plan_locked"] is True
+    assert got["part3c_leakage_safe_finalization_completed"] is True
+    assert got["modeling_started"] is False
+    assert got["active_availability_lag_months"] == 4
+    assert got["contract_version"] == "stage125_part4_sap_v2"
+
+
+def test_qc_source_test_override_part4():
+    src, test = gen._qc_source_test_paths(
+        "stage125_part4_statistical_analysis_plan"
+    )
+    assert src.endswith("stage125_part4_statistical_analysis_plan.py")
+    assert test.endswith(
+        "test_stage125_part4_statistical_analysis_plan.py"
     )
 
 

@@ -585,17 +585,17 @@ def test_research_pointers_unchanged():
         "last_completed_research_action_id": "stage125-part3a-decision-lock",
         "next_research_action_id": "stage125-part3b-evidence-capture",
     }
-    # Later ROADMAP advancement (conservative lag) is expected and must not
+    # Later ROADMAP advancement (Part 4 SAP lock) is expected and must not
     # rewrite the Part 3B.1A lock-embedded historical pointers above.
     roadmap = (REPO_ROOT / "project/docs/ai/ROADMAP.md").read_text(encoding="utf-8")
     assert "stage125-part3a-decision-lock" in roadmap
     assert (
         "last_completed_research_action_id: "
-        "stage125-part3c-leakage-safe-dataset-finalization"
+        "stage125-part4-statistical-analysis-plan"
     ) in roadmap
     assert (
         "next_research_action_id: "
-        "stage125-part4-statistical-analysis-plan"
+        "stage125-part5-readiness-closure"
     ) in roadmap
 
 

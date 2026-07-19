@@ -1,0 +1,89 @@
+{
+  "complexity_ordering": {
+    "logistic": "smaller_C_preferred",
+    "rf": "shallower_max_depth_then_larger_min_samples_leaf_then_sqrt",
+    "xgboost": "shallower_max_depth_then_larger_min_child_weight_then_larger_reg_lambda_then_lower_learning_rate"
+  },
+  "configuration_score": "equal_weight_mean_validation_PR_AUC_across_2_folds_and_3_seeds",
+  "early_stopping_authorized": false,
+  "final_rf_xgb_probability": "mean_predicted_probability_across_5_fixed_seeds",
+  "final_seeds": [
+    20260719,
+    20260720,
+    20260721,
+    20260722,
+    20260723
+  ],
+  "grid_expansion_after_results_authorized": false,
+  "logistic_regression": {
+    "C": [
+      0.01,
+      0.1,
+      1.0,
+      10.0
+    ],
+    "max_iter": 5000,
+    "n_configurations": 4,
+    "penalty": "l2",
+    "solver": "liblinear"
+  },
+  "logistic_regression_deterministic": true,
+  "random_forest": {
+    "bootstrap": true,
+    "max_depth": [
+      3,
+      5,
+      null
+    ],
+    "max_features": [
+      "sqrt",
+      0.5
+    ],
+    "min_samples_leaf": [
+      5,
+      10
+    ],
+    "n_configurations": 12,
+    "n_estimators": 500
+  },
+  "tie_breaking_order": [
+    "higher_mean_temporal_validation_PR_AUC",
+    "higher_minimum_fold_PR_AUC",
+    "simpler_configuration",
+    "lexicographically_smaller_configuration_id"
+  ],
+  "total_configurations_per_block": 32,
+  "tuning_seeds": [
+    20260719,
+    20260720,
+    20260721
+  ],
+  "xgboost": {
+    "colsample_bytree": 0.8,
+    "early_stopping": false,
+    "eval_metric": "aucpr",
+    "gamma": 0,
+    "learning_rate": [
+      0.03,
+      0.1
+    ],
+    "max_depth": [
+      2,
+      3
+    ],
+    "min_child_weight": [
+      1,
+      5
+    ],
+    "n_configurations": 16,
+    "n_estimators": 300,
+    "n_jobs": 1,
+    "objective": "binary:logistic",
+    "reg_lambda": [
+      1,
+      10
+    ],
+    "subsample": 0.8,
+    "tree_method": "hist"
+  }
+}

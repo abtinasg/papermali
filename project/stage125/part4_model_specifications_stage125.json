@@ -1,0 +1,56 @@
+{
+  "allowed_models_only": [
+    "regularized_logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "forbidden_models": [
+    "SVM",
+    "neural_network",
+    "LightGBM",
+    "CatBoost",
+    "stacking",
+    "voting"
+  ],
+  "imbalance_handling_primary": {
+    "logistic_regression": {
+      "class_weight": "balanced"
+    },
+    "random_forest": {
+      "class_weight": "balanced_subsample"
+    },
+    "xgboost": {
+      "counts_exclude_missing_target_rows": true,
+      "scale_pos_weight": "training_fold_negative_evaluable_count / training_fold_positive_evaluable_count"
+    }
+  },
+  "no_model_fitting_in_part4": true,
+  "smote_robustness": {
+    "apply_only_inside_training_fold": true,
+    "class_weighting_disabled_when_smote_active": true,
+    "features": "M1_PRIMARY_FEATURE_ORDER",
+    "k_neighbors": "min(5, training_minority_count - 1)",
+    "logistic_regression": {
+      "class_weight": null
+    },
+    "m1_feature_count": 9,
+    "models": [
+      "Logistic",
+      "RF",
+      "XGBoost"
+    ],
+    "never_before_temporal_splitting": true,
+    "oversampling_and_class_weighting_combined": false,
+    "primary": false,
+    "random_forest": {
+      "class_weight": null
+    },
+    "random_state": 20260725,
+    "sample": "main_rule_a_primary",
+    "second_tuning_search": false,
+    "uses_selected_non_weight_hyperparameters": true,
+    "xgboost": {
+      "scale_pos_weight": 1
+    }
+  }
+}

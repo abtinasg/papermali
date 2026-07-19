@@ -6,11 +6,12 @@ front matter; this file is the working description.
 ## Active research workstream: `stage125-research-design-readiness`
 
 Authoritative research pointers live in `ROADMAP.md` front matter:
-`last_completed_research_action_id=stage125-part3c-leakage-safe-dataset-finalization`,
-`next_research_action_id=stage125-part4-statistical-analysis-plan`.
+`last_completed_research_action_id=stage125-part4-statistical-analysis-plan`,
+`next_research_action_id=stage125-part5-readiness-closure`.
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
 Part 3B.1E is the decision-lock surface for the conservative-lag research
-action; Part 3C is the operationalization / leakage-safe dataset surface.
+action; Part 3C is the operationalization / leakage-safe dataset surface;
+Part 4 is the statistical analysis plan lock (no modeling).
 
 ### Completed — `stage124-gate-b-rule-approval`
 
@@ -72,10 +73,29 @@ remain pending Part 4. Bulky outputs are gitignored and hashed. **Do not**
 start Stage126 or modeling. **Do not** resume broad CODAL capture or
 row-level PublishDateTime collection.
 
-### Next / active research action — `stage125-part4-statistical-analysis-plan`
+### Completed research action — `stage125-part4-statistical-analysis-plan`
 
-Lock the statistical analysis plan (feature subset order, samples, temporal
-CV, metrics, seeds). **No** model fitting. **No** Stage126.
+Statistical analysis plan locked for all four analysis-ready samples under
+the active four-month regulatory lag. Active contract:
+`stage125_part4_sap_v2`. Primary paper result uses
+`main_rule_a_primary` × `FD_target_main_t_plus_1`. M1 primary feature order
+(9 admitted), M1 coverage-audit candidates (10; `revenue_growth_period_adjusted`
+rejected at Fold 1 train coverage `148/245 = 0.6040816327`), M1
+target-proximity robustness (6), nested M2–M4 blocks (9/12/15/19), temporal
+folds (development 1393–1399; final test 1400–1402), strict
+positive/negative/missing event accounting, pre-imputation missingness-mask
+preprocessing, SMOTE without class weighting, model families, finite
+hyperparameter budget (32 configs/block), seeds, PR-AUC primary,
+Recall@10%/Lift@10%, calibration, paired ticker-cluster bootstrap, Holm, and
+SHAP stability contracts are frozen. Part 3C hashes pinned. **No** model
+fitting, **no** final-test predictor inspection, **no** M2/M3/M4 data
+collection, **no** Stage126. Article-141-only final test (1 positive on
+primary sample) is distributional/descriptive robustness only.
+
+### Next / active research action — `stage125-part5-readiness-closure`
+
+Stage125 closure / readiness report; record keep/drop decisions; full
+validator + tests. **No** Stage126. **No** modeling.
 
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
 document-binding evidence remain as frozen scientific history; they do **not**
@@ -106,6 +126,7 @@ Current markers (must stay true until separately authorized otherwise):
 - `accessibility_scoring_applied=false`
 - `part3b_completed=false`
 - `part3c_leakage_safe_finalization_completed=true`
+- `part4_statistical_analysis_plan_locked=true`
 - `modeling_started=false`
 
 **Still prohibited without explicit user authorization:** expanded CODAL/TSETMC/CBI

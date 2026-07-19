@@ -1,0 +1,32 @@
+{
+  "background": {
+    "max_rows": 200,
+    "selection": "deterministic_stratified_by_target_year_and_class",
+    "source": "development_period_only"
+  },
+  "do_not_suppress_unstable_explanations": true,
+  "methods": {
+    "Logistic": "LinearSHAP",
+    "RF": "TreeSHAP",
+    "XGBoost": "TreeSHAP"
+  },
+  "no_shap_computation_in_part4": true,
+  "no_single_plot_stability_claim": true,
+  "report": [
+    "mean_absolute_SHAP",
+    "mean_signed_SHAP",
+    "feature_rank",
+    "top5_features"
+  ],
+  "shap_for_feature_selection": false,
+  "stability_across": [
+    "temporal_validation_folds",
+    "RF_XGBoost_seeds",
+    "final_test_versus_development_OOF_explanations"
+  ],
+  "stability_checks": [
+    "pairwise_Spearman_rank_correlation",
+    "top5_Jaccard_overlap",
+    "mean_sign_agreement"
+  ]
+}

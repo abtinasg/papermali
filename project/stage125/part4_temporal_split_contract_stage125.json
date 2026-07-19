@@ -1,0 +1,62 @@
+{
+  "development_target_years": [
+    1393,
+    1394,
+    1395,
+    1396,
+    1397,
+    1398,
+    1399
+  ],
+  "final_test_target_years": [
+    1400,
+    1401,
+    1402
+  ],
+  "final_test_untouched_until_stage126_lock": true,
+  "manifest_allowed_columns": [
+    "sample_design",
+    "predictor_row_key_t",
+    "target_row_key_t_plus_1",
+    "ticker",
+    "fiscal_year_t",
+    "target_year",
+    "dataset_split",
+    "temporal_fold"
+  ],
+  "manifest_forbids_predictor_values": true,
+  "manifest_forbids_row_level_targets": true,
+  "primary_sample_final_test_expected": {
+    "negative": 334,
+    "pairs": 346,
+    "positive": 12,
+    "sample": "main_rule_a_primary"
+  },
+  "random_split_authorized": false,
+  "shuffle_authorized": false,
+  "split_variable": "target_year",
+  "temporal_validation_fold_1": {
+    "train_target_years": [
+      1393,
+      1394,
+      1395
+    ],
+    "validation_target_years": [
+      1396,
+      1397
+    ]
+  },
+  "temporal_validation_fold_2": {
+    "train_target_years": [
+      1393,
+      1394,
+      1395,
+      1396,
+      1397
+    ],
+    "validation_target_years": [
+      1398,
+      1399
+    ]
+  }
+}

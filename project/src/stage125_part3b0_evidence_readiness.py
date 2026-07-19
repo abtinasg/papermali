@@ -310,6 +310,25 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/part3c_leakage_audit_stage125.csv",
     "project/stage125/stage125_part3c_leakage_safe_dataset_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3c.json",
+    # Stage125 Part 4 statistical analysis plan (contract lock only; no modeling).
+    "project/stage125/README_STAGE125_PART4_STATISTICAL_ANALYSIS_PLAN.md",
+    "project/stage125/part4_statistical_analysis_plan_stage125.json",
+    "project/stage125/part4_feature_sets_stage125.csv",
+    "project/stage125/part4_feature_exclusion_decisions_stage125.csv",
+    "project/stage125/part4_sample_target_matrix_stage125.csv",
+    "project/stage125/part4_temporal_split_contract_stage125.json",
+    "project/stage125/part4_temporal_split_manifest_stage125.csv",
+    "project/stage125/part4_event_count_gate_stage125.csv",
+    "project/stage125/part4_development_feature_coverage_audit_stage125.csv",
+    "project/stage125/part4_preprocessing_contract_stage125.json",
+    "project/stage125/part4_model_specifications_stage125.json",
+    "project/stage125/part4_hyperparameter_budget_stage125.json",
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
+    "project/stage125/part4_shap_stability_contract_stage125.json",
+    "project/stage125/part4_revenue_growth_exclusion_revision_decision_stage125.json",
+    "project/stage125/README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md",
+    "project/stage125/stage125_part4_statistical_analysis_plan_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part4.json",
     "project/stage125/prediction_cutoff_audit_stage125_part2.csv",
     "project/stage125/prediction_cutoff_summary_stage125_part2.json",
     "project/stage125/prediction_time_contract_stage125_part2.json",
@@ -324,6 +343,22 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/stage125_part3b1a_cut_a_available_at_qc_report.json",
     "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json",
 })
+
+# Part 4 SAP contracts may use coverage admission labels / "manifest" filenames
+# without meaning live Part 3B evidence capture. Exact-path exemption only.
+PART4_SAP_ALLOWED_EXACT = frozenset(
+    rel for rel in STAGE125_ALLOWED_EXACT
+    if (
+        "/part4_" in rel
+        or "/README_STAGE125_PART4_" in rel
+        or rel.endswith("README_STAGE125_PART4_STATISTICAL_ANALYSIS_PLAN.md")
+        or rel.endswith(
+            "README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md"
+        )
+        or rel.endswith("stage125_part4_statistical_analysis_plan_qc_report.json")
+        or rel.endswith("metadata_and_hashes_stage125_part4.json")
+    )
+)
 
 
 class QCFail(RuntimeError):
@@ -2989,6 +3024,8 @@ def count_real_evidence_records(repo_root: Path) -> int:
         rel = str(path.relative_to(repo_root)).replace("\\", "/")
         if _is_authorized_part3b_path(repo_root, rel):
             continue
+        if rel in PART4_SAP_ALLOWED_EXACT:
+            continue
         if rel in PART3B0_ALLOWED_EXACT and path.name != F_EVIDENCE_TEMPLATE:
             continue
         if path == template_path:
@@ -3095,6 +3132,8 @@ def count_candidate_decisions(repo_root: Path) -> int:
         rel = str(path.relative_to(repo_root)).replace("\\", "/")
         if _is_authorized_part3b_path(repo_root, rel):
             continue
+        if rel in PART4_SAP_ALLOWED_EXACT:
+            continue
         if path.suffix.lower() not in _CONTENT_SCAN_SUFFIXES:
             continue
         for row in _iter_content_dicts(path):
@@ -3156,6 +3195,18 @@ def _file_has_prohibited_live_content(path: Path) -> bool:
         "data_dictionary_stage125.csv",
         "provenance_manifest_schema_stage125.json",
     }:
+        return False
+    # Part 4 SAP coverage/admission labels are plan-lock vocabulary only.
+    low_name = path.name.lower()
+    if (
+        low_name.startswith("part4_")
+        or "stage125_part4_" in low_name
+        or low_name.startswith("readme_stage125_part4_")
+        or low_name == "readme_stage125_part4_statistical_analysis_plan.md"
+        or low_name
+        == "readme_stage125_part4_revenue_growth_exclusion_revision.md"
+        or low_name == "metadata_and_hashes_stage125_part4.json"
+    ):
         return False
     rows = _iter_content_dicts(path)
     for row in rows:

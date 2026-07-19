@@ -1,12 +1,12 @@
 {
-  "code_commit": "77d0294d54b5aa6f45ec7269fab82788e200e147",
+  "code_commit": "970be0de80ef52cae9530999da6bb27a7067b5e1",
   "current_batch": "Batch02",
   "current_stage": "Stage124",
   "date_semantics": "first_observed_trading_date_from_official_tse_api",
   "date_semantics_note": "These dates are the first observed trading dates from the official TSETMC API. They are NOT IPO dates, admission dates, or listing dates.",
   "description": "Stage124 Gate B execution — final eligibility rule application",
   "gate_b_started": true,
-  "generated_at": "2026-07-14T14:36:52Z",
+  "generated_at": "2026-07-19T08:42:34Z",
   "input_files_sha256": {
     "modeling_all_rows_stage123.csv": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
     "modeling_one_year_ahead_stage123.csv": "e3d3063e840d61a39c3b4477aabe347050be6c829755acdcead05359fa9181ac"
@@ -27,7 +27,7 @@
     "gate_b_final/modeling_main_rule_a_eligible.csv": "f943d5cfd2a3dcaa091eacbac5e305fdad83787548a6e43b50976f1455664420",
     "gate_b_final/modeling_main_rule_b_eligible.csv": "99bdf0296a274f2ad42a6e9942a42d79b6370c7b99b57967b44c6821313f36c1",
     "gate_b_final/modeling_one_year_ahead_stage124_gate_b.csv": "9743c49337c66a3699bce34dfd02a151e34f48f0717f225ad487fe1487031d05",
-    "stage124_batch02_gate_b_qc_report.json": "825b70debeeaf8767ec6e3aebc718da35670b8a9d68c49ad4932d993b8bf58a1"
+    "stage124_batch02_gate_b_qc_report.json": "e9dff56e4ab6bd34fcd3e7db05b452c9ea0541514c5e84009d2dcb20de735e54"
   },
   "python_implementation": "CPython",
   "python_version": "3.13.5",
@@ -64,7 +64,7 @@
     },
     "tickers": 130
   },
-  "source_file_sha256": "cfc2d8c50a3b1c1b1d61b1fcb3f7c9af4456c520c33bf141c5740e9bef99be6b",
+  "source_file_sha256": "5e156eee278897b7d22038e2ecc5ce58cfdfa2ecabb683f8132af99a5c38dd41",
   "stage": "stage124_gate_b_execution",
   "test_file_sha256": "9fd7b9c4bfa8f0b4374ba9d1f908f64cd9b829c4751277afacced1cd85c6f182",
   "unresolved_counts": {
