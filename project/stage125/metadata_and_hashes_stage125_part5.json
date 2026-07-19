@@ -2,23 +2,23 @@
   "baseline_commit": "5836059e2d533f4be7e1898f942937a57c0b8fef",
   "baseline_tree": "3c2de72270bc05afeabcd2f07088f71f886796a3",
   "closure_outcome": "READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION",
-  "code_commit": "070b14091ee803a978d8e7c28107d21e2c040aaf",
+  "code_commit": "385b6a9896308a27ccc1d2fc9ea1b9b196816f12",
   "current_stage": "Stage125",
   "description": "Stage125 Part 5 readiness closure (keep/drop decisions, blocker register, Stage126 M1 entry contract, artifact integrity manifest, Gate 125.0; no modeling).",
   "final_test_unlocked": false,
-  "generated_at": "070b14091ee803a978d8e7c28107d21e2c040aaf",
+  "generated_at": "385b6a9896308a27ccc1d2fc9ea1b9b196816f12",
   "model_fit_calls": 0,
   "modeling_authorized": false,
   "modeling_started": false,
   "network_requests_attempted": 0,
   "output_files_sha256": {
     "README_STAGE125_PART5_READINESS_CLOSURE.md": "a18932b695213fe64fbd1851def9c67bf8dbdc831fc2773914b1801040b6d405",
-    "part5_artifact_integrity_manifest_stage125.csv": "bc13a51f12ef2efac6eee304c8064577d8d4cd9ccdc19313db4325276c1a3c31",
+    "part5_artifact_integrity_manifest_stage125.csv": "7cee961bef5fcfd43f918226223d4e28198270f7d90ab9ada9c8dd1974d9de74",
     "part5_blocker_register_stage125.csv": "32e679ed513fcbdebf114bf88225a9251fb4793648655d7f044347fdf54a35d3",
     "part5_keep_drop_decisions_stage125.csv": "bacb202cc3404b512e71740ed6c71bfaee8a0201fb941388e0a06f484323c718",
-    "part5_readiness_closure_report_stage125.json": "3e9f5133f2b1d5b45c05167979d6f9f41e3f38e6901ca2410c966ce708445140",
+    "part5_readiness_closure_report_stage125.json": "8d8ed8b31a8a6773fe8773f35f70fb397a59d66214b8d1521dba6f72b10d8795",
     "part5_stage126_m1_entry_contract_stage125.json": "74a2159785daeda44fa82ebd76f42870fa25aba3667846bccba6b3099ea65da5",
-    "stage125_part5_readiness_closure_qc_report.json": "1f9b77a24490076dd50240e9b7665851eb98a4b47d2696ea9130a8e974aca794"
+    "stage125_part5_readiness_closure_qc_report.json": "245f402de5a3162a9e56c0236e865d48091ca41898eae0860d0f837b508b2c2c"
   },
   "prediction_calls": 0,
   "research_pointers": {
@@ -26,7 +26,7 @@
     "next_research_action_id": "stage126-m1-financial-baseline"
   },
   "shap_calls": 0,
-  "source_file_sha256": "29da6a43762539ac041a229a58857a123fe7625bb85e4ad74f5370bae3f7c059",
+  "source_file_sha256": "a5d62b6e64b761cbbd64a1a4e655861e97286392a2472eb28385ac38f547d0cf",
   "stage": "stage125_part5_readiness_closure",
   "stage125_completed": true,
   "stage125_gate_125_0": "PASS",
@@ -34,5 +34,5 @@
   "stage126_authorized": false,
   "stage126_m1_entry_ready": true,
   "stage126_started": false,
-  "test_file_sha256": "acd2c3f6ab9f572fa53d957ca7122ae393b3befb0bfd29ef6a0a1698d9923136"
+  "test_file_sha256": "49521b0e855031a406553613980090f51e6d4537d6cfbeb0689d171b582aa37d"
 }

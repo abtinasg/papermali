@@ -108,7 +108,7 @@
       "pass": true
     },
     "stage126_entry_boundary_explicit": {
-      "detail": "explicit",
+      "detail": "structural_and_authorization_boundary_valid",
       "pass": true
     },
     "stage126_false": {
