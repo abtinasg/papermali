@@ -1,13 +1,13 @@
 {
   "baseline_commit": "5f56be5b2e49e66c54b451994a5e36c4fcc754d9",
   "baseline_tree": "d8f399e3dedac123065f6eda876dc9e71f0c36e7",
-  "code_commit": "b98fc5e7bf6589ae3c8b3e307112528251e76a25",
+  "code_commit": "052d1dab360d18d349a8ffb8358b4e78d8ed6503",
   "current_stage": "Stage126",
   "description": "Stage126 M1 primary development-fold tuning (human-authorized; development only; final test locked; no SMOTE/SHAP/robustness; no full-development refit).",
   "final_test_evaluations": 0,
   "final_test_predictor_rows_loaded": 0,
   "final_test_target_rows_loaded": 0,
-  "generated_at": "b98fc5e7bf6589ae3c8b3e307112528251e76a25",
+  "generated_at": "052d1dab360d18d349a8ffb8358b4e78d8ed6503",
   "network_requests_attempted": 0,
   "output_files_sha256": {
     "README_STAGE126_M1_PRIMARY_DEVELOPMENT_TUNING.md": "d3a67cab445fe4344abfd50e07d42febc0053a1d08154916fc76cd53b53b2cf6",
@@ -18,13 +18,21 @@
     "stage126_m1_final_test_lock_guard.json": "509e58fc39e3c5d886993c11b954fc06c267c96d02c081d8e50b0cda52e58b03",
     "stage126_m1_human_authorization_record.json": "aa7b3ee285173374701b4e0a183e3e3d8417820ec9e7bdbae49af6b844a610a2",
     "stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4",
-    "stage126_m1_primary_development_tuning_qc_report.json": "c17fc1f46dcafa98bc01d1127d21dc546e9313e38505849cc46e01ffb3211e19",
+    "stage126_m1_primary_development_tuning_qc_report.json": "26aaa01886c98567fa1973c1c1b1359ce6942ae8320b2e52b691d7e6312a1e48",
     "stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e",
     "stage126_m1_tuning_results.csv": "e7e1e6808e394273676709aa94bfa713bbf8a790fadabee22ea20b849adbe649"
   },
+  "runtime_versions": {
+    "jdatetime": "6.0.1",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "python": "3.13.5",
+    "scikit-learn": "1.9.0",
+    "xgboost": "3.3.0"
+  },
   "shap_calls": 0,
   "smote_calls": 0,
-  "source_file_sha256": "f8d6df40053e69939caf391bb94cc25a42a2fc00524a86f8fbcdac2c5213f289",
+  "source_file_sha256": "02a2ed3d6d2458313ad8eee6d0400752c9e841a12cf94af5b36c662c50ae87a2",
   "stage": "stage126_m1_financial_baseline",
-  "test_file_sha256": "3bfe293f368bf9dae34dd08ba37d29564605cd321af42c940a61d3bfed98f7d4"
+  "test_file_sha256": "6d13340ac66934988d41ce5a2ee7416b38fd23b1866aeccc486413e728a51f72"
 }

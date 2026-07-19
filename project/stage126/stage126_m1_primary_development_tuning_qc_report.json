@@ -373,14 +373,14 @@
   },
   "shap_calls": 0,
   "smote_calls": 0,
-  "source_commit": "b98fc5e7bf6589ae3c8b3e307112528251e76a25",
-  "source_file_sha256": "f8d6df40053e69939caf391bb94cc25a42a2fc00524a86f8fbcdac2c5213f289",
+  "source_commit": "052d1dab360d18d349a8ffb8358b4e78d8ed6503",
+  "source_file_sha256": "02a2ed3d6d2458313ad8eee6d0400752c9e841a12cf94af5b36c662c50ae87a2",
   "stage": "stage126_m1_financial_baseline",
   "stage125_completed": true,
   "stage126_authorized": true,
   "stage126_m1_entry_ready": true,
   "stage126_started": true,
-  "test_file_sha256": "3bfe293f368bf9dae34dd08ba37d29564605cd321af42c940a61d3bfed98f7d4",
+  "test_file_sha256": "6d13340ac66934988d41ce5a2ee7416b38fd23b1866aeccc486413e728a51f72",
   "ticker_count": 0,
   "tickers": []
 }
