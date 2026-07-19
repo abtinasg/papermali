@@ -124,7 +124,7 @@
       "pass": true
     },
     "working_tree_clean": {
-      "detail": "authorized_or_empty",
+      "detail": "clean",
       "pass": true
     }
   },
