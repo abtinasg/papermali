@@ -175,6 +175,15 @@ MODELING_ARTIFACT_PATTERNS = [
 ]
 MODELING_ARTIFACT_EXTENSIONS = [".joblib", ".npz", ".pickle", ".pkl", ".model"]
 
+# Explicit Part 4 SAP contract filenames may contain pattern substrings
+# (e.g. "shap", "temporal_split") but are plan-lock text contracts only —
+# never fitted-model artifacts. Exact-path exemption only.
+MODELING_SCAN_ALLOWED_EXACT = frozenset({
+    "project/stage125/part4_shap_stability_contract_stage125.json",
+    "project/stage125/part4_temporal_split_contract_stage125.json",
+    "project/stage125/part4_temporal_split_manifest_stage125.csv",
+})
+
 TARGET_COLUMNS = [
     "FD_target_main_t_plus_1",
     "FD_target_article141_only_t_plus_1",
@@ -739,6 +748,12 @@ def _qc_assertions(stats: dict, schema_report: dict,
                 continue
             low = f.name.lower()
             if low.startswith("modeling_") and low.endswith(".csv"):
+                continue
+            try:
+                rel = str(f.relative_to(project_dir.parent)).replace("\\", "/")
+            except ValueError:
+                rel = str(f)
+            if rel in MODELING_SCAN_ALLOWED_EXACT:
                 continue
             for ext in MODELING_ARTIFACT_EXTENSIONS:
                 if low.endswith(ext):
