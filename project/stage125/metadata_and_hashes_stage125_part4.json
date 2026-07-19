@@ -1,9 +1,9 @@
 {
   "baseline_commit": "6cb27d6817bf167358d480adbccc1728ad59e109",
-  "code_commit": "f322f9db8e473f9333d8d52fb7d152b78667ae66",
+  "code_commit": "fbba65241f38843d0726b3a6421041f6e1a4ddd2",
   "current_stage": "Stage125",
   "description": "Stage125 Part 4 statistical analysis plan lock (features/samples/splits/metrics/seeds; no modeling).",
-  "generated_at": "f322f9db8e473f9333d8d52fb7d152b78667ae66",
+  "generated_at": "fbba65241f38843d0726b3a6421041f6e1a4ddd2",
   "model_fit_calls": 0,
   "modeling_started": false,
   "network_requests_attempted": 0,
@@ -24,7 +24,7 @@
     "part4_statistical_analysis_plan_stage125.json": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
     "part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
     "part4_temporal_split_manifest_stage125.csv": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc",
-    "stage125_part4_statistical_analysis_plan_qc_report.json": "e7909b32aebc4a8feb2a7ad910dcf02a70d64d99180eb4939fc0a7a90bdfb96a"
+    "stage125_part4_statistical_analysis_plan_qc_report.json": "2b38bcaa87a43056da4e7a525cebf50037f2d7b31b251d34a22df1ae5918d24e"
   },
   "part4_statistical_analysis_plan_locked": true,
   "prediction_calls": 0,
