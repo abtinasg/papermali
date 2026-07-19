@@ -1,0 +1,183 @@
+{
+  "active_availability_lag_months": 4,
+  "active_availability_method": "fixed_regulatory_lag",
+  "blocker_summary": {
+    "blocking_stage125_closure": 0,
+    "blocking_stage126_m1": 0,
+    "total": 8
+  },
+  "closure_outcome": "READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION",
+  "contract_version": "stage125_part5_readiness_closure_v1",
+  "final_test_model_evaluation_in_part5": false,
+  "final_test_predictor_inspection_in_part5": false,
+  "final_test_status": "locked_for_single_future_evaluation",
+  "final_test_years": [
+    1400,
+    1401,
+    1402
+  ],
+  "gate_125_0": {
+    "article141_descriptive_only": {
+      "detail": "descriptive_only",
+      "pass": true
+    },
+    "blocker_register_complete": {
+      "detail": "8 rows",
+      "pass": true
+    },
+    "contradiction_free_docs": {
+      "detail": "roadmap_next_matches_part5_or_already_advanced_and_readme_consistent",
+      "pass": true
+    },
+    "final_test_still_locked": {
+      "detail": "locked",
+      "pass": true
+    },
+    "financial_data_unchanged": {
+      "detail": "part3c_pinned_unchanged",
+      "pass": true
+    },
+    "four_month_lag_active": {
+      "detail": "4",
+      "pass": true
+    },
+    "keep_drop_decisions_complete": {
+      "detail": "24 rows",
+      "pass": true
+    },
+    "m1_ready": {
+      "detail": "9_features_ready",
+      "pass": true
+    },
+    "m2_deferred": {
+      "detail": "deferred",
+      "pass": true
+    },
+    "m3_not_admitted": {
+      "detail": "not_admitted",
+      "pass": true
+    },
+    "m4_deferred": {
+      "detail": "deferred",
+      "pass": true
+    },
+    "m5_removed": {
+      "detail": "removed",
+      "pass": true
+    },
+    "model_fit_calls_zero": {
+      "detail": "0",
+      "pass": true
+    },
+    "network_requests_zero": {
+      "detail": "0",
+      "pass": true
+    },
+    "part3c_hashes_unchanged": {
+      "detail": "8 unchanged",
+      "pass": true
+    },
+    "part4_hashes_unchanged": {
+      "detail": "17 outputs + src + test unchanged",
+      "pass": true
+    },
+    "part4_qc_all_pass": {
+      "detail": "70/0/true/sap_v2",
+      "pass": true
+    },
+    "prediction_calls_zero": {
+      "detail": "0",
+      "pass": true
+    },
+    "revenue_growth_audit_only": {
+      "detail": "audit_only_absent_from_model_surfaces",
+      "pass": true
+    },
+    "samples_unchanged": {
+      "detail": "4_sample_designs_match",
+      "pass": true
+    },
+    "shap_calls_zero": {
+      "detail": "0",
+      "pass": true
+    },
+    "six_month_method_historical_only": {
+      "detail": "superseded",
+      "pass": true
+    },
+    "stage126_entry_boundary_explicit": {
+      "detail": "explicit",
+      "pass": true
+    },
+    "stage126_false": {
+      "detail": "false_and_absent",
+      "pass": true
+    },
+    "targets_unchanged": {
+      "detail": "3_targets_present",
+      "pass": true
+    },
+    "valid_handoff": {
+      "detail": "part5_qc_marker_fields_present",
+      "pass": true
+    },
+    "working_tree_clean": {
+      "detail": "authorized_dirty=8",
+      "pass": true
+    }
+  },
+  "keep_drop_item_count": 24,
+  "keep_drop_summary": {
+    "DEFER_NONBLOCKING_FOR_M1": 2,
+    "DROP_CURRENT_ACTIVE_PATH": 3,
+    "KEEP_AUDIT_ONLY": 2,
+    "KEEP_DESCRIPTIVE_ONLY": 1,
+    "KEEP_LOCKED": 2,
+    "KEEP_READY": 7,
+    "KEEP_ROBUSTNESS": 6,
+    "SUPERSEDED_HISTORICAL_ONLY": 1
+  },
+  "modeling_authorized": false,
+  "modeling_started": false,
+  "part3b_completed": false,
+  "part3b_expansion_disposition": "superseded_not_required_for_stage125_closure",
+  "part3b_incomplete_blocks_stage126_m1": false,
+  "part4_contract_version": "stage125_part4_sap_v2",
+  "part4_qc_all_pass": true,
+  "part4_qc_assertion_count": 70,
+  "part4_qc_failed_count": 0,
+  "research_action_id": "stage125-part5-readiness-closure",
+  "sample_counts": {
+    "expanded_rule_a_company_scope_robustness": {
+      "companies": 124,
+      "negative": 976,
+      "positive": 80,
+      "rows": 1056
+    },
+    "expanded_rule_b_combined_robustness": {
+      "companies": 122,
+      "negative": 956,
+      "positive": 79,
+      "rows": 1035
+    },
+    "main_rule_a_primary": {
+      "companies": 119,
+      "negative": 932,
+      "positive": 80,
+      "rows": 1012
+    },
+    "main_rule_b_listing_robustness": {
+      "companies": 117,
+      "negative": 914,
+      "positive": 79,
+      "rows": 993
+    }
+  },
+  "stage125_completed": true,
+  "stage125_gate_125_0": "PASS",
+  "stage125_part5_readiness_closure_completed": true,
+  "stage126_authorized": false,
+  "stage126_m1_entry_contract_id": "stage126_m1_financial_baseline_entry_contract",
+  "stage126_m1_entry_ready": true,
+  "stage126_started": false
+}

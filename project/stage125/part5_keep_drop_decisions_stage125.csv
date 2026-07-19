@@ -1,0 +1,25 @@
+item_id,decision,category,notes,blocks_stage126_m1,interpretation
+SAMPLE_PRIMARY_RULE_A,KEEP_READY,sample,"Rule A primary sample locked in Part 3C/Part 4 (1012 rows, 119 companies, 80 positive, 932 negative).",false,primary_sample_ready_for_stage126_m1_primary_specification
+SAMPLE_RULE_B,KEEP_ROBUSTNESS,sample,"Rule B listing-timing robustness sample (993 rows, 117 companies, 79 positive, 914 negative).",false,robustness_only_not_primary
+SAMPLE_EXPANDED_RULE_A,KEEP_ROBUSTNESS,sample,"Expanded Rule A company-scope robustness sample (1056 rows, 124 companies, 80 positive, 976 negative).",false,robustness_only_not_primary
+SAMPLE_EXPANDED_RULE_B,KEEP_ROBUSTNESS,sample,"Expanded Rule B combined robustness sample (1035 rows, 122 companies, 79 positive, 956 negative).",false,robustness_only_not_primary
+TARGET_MAIN_T_PLUS_1,KEEP_READY,target,Primary target FD_target_main_t_plus_1; development-comparison supported and final-test claim-eligible on all four sample designs.,false,primary_target_ready_for_stage126_m1
+TARGET_PERSISTENT_LOSS_T_PLUS_1,KEEP_ROBUSTNESS,target,Secondary robustness target FD_target_persistent_loss_robustness_t_plus_1.,false,robustness_target_registered_after_primary_lock
+TARGET_ARTICLE141_ONLY_T_PLUS_1,KEEP_DESCRIPTIVE_ONLY,target,Article-141-only target: development comparison not supported (Fold 2 validation positive=3<5); final test 1 positive on the primary sample; distributional/descriptive robustness only.,false,excluded_from_model_estimation_descriptive_only
+FEATURESET_M1_PRIMARY_9,KEEP_READY,feature_set,9 admitted M1 primary features locked in Part 4 in exact order.,false,primary_feature_set_ready
+FEATURESET_M1_TARGET_PROXIMITY_6,KEEP_ROBUSTNESS,feature_set,"6-feature target-proximity robustness set, registered for use only after the primary specification is locked.",false,robustness_feature_set_registered_after_primary_lock
+FEATURE_REVENUE_GROWTH,KEEP_AUDIT_ONLY,feature,revenue_growth_period_adjusted rejected from M1 primary (Fold 1 training coverage 148/245=0.6040816327 below the locked 0.75 threshold); retained only in frozen data and in the coverage/exclusion audits.,false,audit_only_absent_from_all_model_surfaces
+BLOCK_M2_MARKET,DEFER_NONBLOCKING_FOR_M1,block,M2 market/liquidity block; no values collected; deferred and does not block Stage126 M1.,false,deferred_future_block_not_required_for_m1
+BLOCK_M3_MACRO,DROP_CURRENT_ACTIVE_PATH,block,M3 macro block; no authoritative CBI endpoint admitted; not admitted on the current active path.,false,not_admitted_current_path_dropped
+BLOCK_M4_AUDIT_GOVERNANCE,DEFER_NONBLOCKING_FOR_M1,block,M4 audit/governance block; no values collected; deferred and does not block Stage126 M1.,false,deferred_future_block_not_required_for_m1
+BLOCK_M5_PERSIAN_TEXT,DROP_CURRENT_ACTIVE_PATH,block,M5 Persian-text block; never defined or collected on the current active path; removed.,false,removed_current_path_dropped
+MODEL_REGULARIZED_LOGISTIC,KEEP_READY,model,Regularized logistic regression locked model family for Stage126 M1.,false,model_family_ready_no_fitting_in_part5
+MODEL_RANDOM_FOREST,KEEP_READY,model,Random forest locked model family for Stage126 M1.,false,model_family_ready_no_fitting_in_part5
+MODEL_XGBOOST,KEEP_READY,model,XGBoost locked model family for Stage126 M1.,false,model_family_ready_no_fitting_in_part5
+IMBALANCE_CLASS_WEIGHTING,KEEP_READY,imbalance,Primary class-weighting imbalance-handling strategy locked.,false,primary_imbalance_strategy_ready
+IMBALANCE_SMOTE,KEEP_ROBUSTNESS,imbalance,SMOTE robustness strategy locked (disables class weighting; training-fold only; no second tuning search).,false,robustness_imbalance_strategy_ready
+FINAL_TEST_1400_1402,KEEP_LOCKED,temporal,Locked single-use final test years 1400-1402; predictor values not inspected in Part 5.,false,locked_for_single_future_evaluation_not_yet_used
+AVAILABILITY_FOUR_JALALI_MONTHS,KEEP_LOCKED,availability,Active four-Jalali-month fixed regulatory lag remains locked.,false,active_locked_method
+AVAILABILITY_SIX_MONTH_METHOD,SUPERSEDED_HISTORICAL_ONLY,availability,Historical conservative six-month lag decision retained as history only; not active.,false,superseded_historical_evidence_only
+BROAD_CODAL_PUBLISH_DATETIME_CAPTURE,DROP_CURRENT_ACTIVE_PATH,evidence_capture,Broad CODAL PublishDateTime capture remains stopped on the current active path.,false,not_admitted_current_path_dropped
+RAMPNA_1396_TO_1397_TIMING_VIOLATION,KEEP_AUDIT_ONLY,audit,رمپنا|1396 → رمپنا|1397 timing violation retained as audit-only evidence; رمپنا|1396 does not re-enter analysis-ready data.,false,audit_only_historical_violation_record

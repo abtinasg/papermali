@@ -1,0 +1,78 @@
+{
+  "article141_excluded_from_model_estimation": true,
+  "authorization_note": "entry_readiness is NOT authorization; stage126_authorized remains false",
+  "contract_id": "stage126_m1_financial_baseline_entry_contract",
+  "entry_readiness": "READY_FOR_HUMAN_AUTHORIZATION_DECISION",
+  "final_test_predictor_values_inspected": false,
+  "final_test_unlocked": false,
+  "future_stage126_sequence_recorded_not_executed": [
+    "1_obtain_explicit_human_stage126_authorization",
+    "2_fit_primary_M1_models_on_development_folds_only",
+    "3_select_hyperparameters_within_locked_finite_budget",
+    "4_evaluate_registered_M1_robustness_variants",
+    "5_unlock_locked_final_test_1400_1402_exactly_once",
+    "6_report_paired_uncertainty_and_holm_corrected_comparisons"
+  ],
+  "m2_m3_m4_excluded_from_immediate_stage126_m1": true,
+  "modeling_authorized": false,
+  "modeling_started": false,
+  "primary_specification": {
+    "development_years": "1393–1399",
+    "feature_count": 9,
+    "feature_set": "M1_PRIMARY_FEATURE_ORDER",
+    "features_exact_order": [
+      "log_total_assets",
+      "leverage_ratio",
+      "current_ratio",
+      "roa_period_adjusted",
+      "ocf_to_assets_period_adjusted",
+      "asset_turnover_period_adjusted",
+      "operating_margin_period_adjusted",
+      "financial_expense_to_assets_period_adjusted",
+      "accumulated_loss_to_capital_ratio"
+    ],
+    "fold1": {
+      "train": "1393–1395",
+      "validation": "1396–1397"
+    },
+    "fold2": {
+      "train": "1393–1397",
+      "validation": "1398–1399"
+    },
+    "locked_final_test": "1400–1402",
+    "models": [
+      "regularized_logistic_regression",
+      "random_forest",
+      "xgboost"
+    ],
+    "primary_metric": "PR-AUC",
+    "sample": "main_rule_a_primary",
+    "target": "FD_target_main_t_plus_1"
+  },
+  "registered_m1_robustness_after_primary_lock": [
+    {
+      "feature_count": 6,
+      "feature_set": "M1_TARGET_PROXIMITY_ROBUSTNESS",
+      "features_exact_order": [
+        "log_total_assets",
+        "current_ratio",
+        "roa_period_adjusted",
+        "asset_turnover_period_adjusted",
+        "operating_margin_period_adjusted",
+        "financial_expense_to_assets_period_adjusted"
+      ],
+      "role": "target_proximity_robustness"
+    },
+    {
+      "role": "secondary_robustness_target",
+      "target": "FD_target_persistent_loss_robustness_t_plus_1"
+    },
+    {
+      "imbalance_strategy": "SMOTE",
+      "role": "robustness_imbalance_handling"
+    }
+  ],
+  "stage126_authorized": false,
+  "stage126_m1_entry_ready": true,
+  "stage126_started": false
+}

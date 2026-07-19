@@ -1,0 +1,35 @@
+{
+  "baseline_commit": "5836059e2d533f4be7e1898f942937a57c0b8fef",
+  "baseline_tree": "3c2de72270bc05afeabcd2f07088f71f886796a3",
+  "code_commit": "98ef58a7197c7fbb21fa57bfecf927468afc6df3",
+  "current_stage": "Stage125",
+  "description": "Stage125 Part 5 readiness closure (keep/drop decisions, blocker register, Stage126 M1 entry contract, artifact integrity manifest, Gate 125.0; no modeling).",
+  "generated_at": "98ef58a7197c7fbb21fa57bfecf927468afc6df3",
+  "model_fit_calls": 0,
+  "modeling_authorized": false,
+  "modeling_started": false,
+  "network_requests_attempted": 0,
+  "output_files_sha256": {
+    "README_STAGE125_PART5_READINESS_CLOSURE.md": "bb1e1e1470b4cc94cd3e5dbfe139c110cff9445380b1e118674ca6bee6e835ad",
+    "part5_artifact_integrity_manifest_stage125.csv": "a8b7b4f0594237bc59e46cda486f4998c175cb25d5222e0b24741d89cb7c1c18",
+    "part5_blocker_register_stage125.csv": "8793ac997555eee15b00783cf8ba63f14852c3ee76b426cf6696ebd4c046e77b",
+    "part5_keep_drop_decisions_stage125.csv": "81f59937c52a3a34d58c79f67d22312a818af869cc7f5bb67283a53c711a97f7",
+    "part5_readiness_closure_report_stage125.json": "4a720129cda9d32c01c36825ae9664c82e7c46ea1eb61e685a04dfb3cfbd9c72",
+    "part5_stage126_m1_entry_contract_stage125.json": "d52e8bb7b00f80a5c7f3319036335835fcef91b5837484075681db387d491e51",
+    "stage125_part5_readiness_closure_qc_report.json": "90a89ab491e76281d14b825803e07006c07b011e092530f136d939f6135b71af"
+  },
+  "prediction_calls": 0,
+  "research_pointers": {
+    "last_completed_research_action_id": "stage125-part5-readiness-closure",
+    "next_research_action_id": "stage126-m1-financial-baseline"
+  },
+  "shap_calls": 0,
+  "source_file_sha256": "38e82d577d9e03b6d4c9ab649c5bdf9c39486864088512ca1bb302e11f2524e5",
+  "stage": "stage125_part5_readiness_closure",
+  "stage125_completed": true,
+  "stage125_part5_readiness_closure_completed": true,
+  "stage126_authorized": false,
+  "stage126_m1_entry_ready": true,
+  "stage126_started": false,
+  "test_file_sha256": "f994d904e96716c47d2547c643e82856c0c8576f49fb2d95426d9f3a14bedb46"
+}
