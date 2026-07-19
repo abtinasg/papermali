@@ -3,7 +3,7 @@
   "active_availability_lag_months": 4,
   "active_availability_method": "fixed_regulatory_lag",
   "all_pass": true,
-  "assertion_count": 31,
+  "assertion_count": 57,
   "assertions": [
     {
       "assertion": "baseline_commit_pinned",
@@ -16,13 +16,93 @@
       "status": "PASS"
     },
     {
-      "assertion": "m1_feature_count_10",
-      "detail": "10",
+      "assertion": "Part3C_hashes_unchanged",
+      "detail": "8 unchanged",
       "status": "PASS"
     },
     {
-      "assertion": "m1_target_proximity_count_7",
-      "detail": "7",
+      "assertion": "human_revenue_growth_exclusion_decision_recorded",
+      "detail": "recorded",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part4_contract_version_v2_active",
+      "detail": "stage125_part4_sap_v2",
+      "status": "PASS"
+    },
+    {
+      "assertion": "growth_denominator_exception_absent",
+      "detail": "absent",
+      "status": "PASS"
+    },
+    {
+      "assertion": "coverage_denominator_all_subset_rows",
+      "detail": "ordinary_denominators",
+      "status": "PASS"
+    },
+    {
+      "assertion": "revenue_growth_coverage_audit_present",
+      "detail": "present",
+      "status": "PASS"
+    },
+    {
+      "assertion": "revenue_growth_fold1_train_numerator_148",
+      "detail": "148",
+      "status": "PASS"
+    },
+    {
+      "assertion": "revenue_growth_fold1_train_denominator_245",
+      "detail": "245",
+      "status": "PASS"
+    },
+    {
+      "assertion": "revenue_growth_fold1_train_coverage_0_6040816327",
+      "detail": "0.6040816327",
+      "status": "PASS"
+    },
+    {
+      "assertion": "revenue_growth_rejected",
+      "detail": "rejected_audit_only",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m1_coverage_decisions_exact",
+      "detail": "9 admitted + 1 rejected revenue-growth",
+      "status": "PASS"
+    },
+    {
+      "assertion": "nine_final_M1_features_pass_coverage",
+      "detail": "9 pass",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m1_primary_feature_count_9",
+      "detail": "9",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m1_target_proximity_count_6",
+      "detail": "6",
+      "status": "PASS"
+    },
+    {
+      "assertion": "nested_M2_count_12",
+      "detail": "12",
+      "status": "PASS"
+    },
+    {
+      "assertion": "nested_M3_count_15",
+      "detail": "15",
+      "status": "PASS"
+    },
+    {
+      "assertion": "nested_M4_count_19",
+      "detail": "19",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m1_exclusion_count_23",
+      "detail": "23",
       "status": "PASS"
     },
     {
@@ -38,6 +118,61 @@
     {
       "assertion": "m4_block_count_4",
       "detail": "4",
+      "status": "PASS"
+    },
+    {
+      "assertion": "target_event_counts_have_missing_column",
+      "detail": "missing+evaluable",
+      "status": "PASS"
+    },
+    {
+      "assertion": "target_event_count_reconciliation_exact",
+      "detail": "rows=pos+neg+miss",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missing_never_counted_as_negative",
+      "detail": "strict_three_state",
+      "status": "PASS"
+    },
+    {
+      "assertion": "target_specific_evaluable_rows_recorded",
+      "detail": "evaluable_recorded",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_threshold_is_claim_gate_not_feature_admission",
+      "detail": "claim_gate_only",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missingness_mask_before_imputation",
+      "detail": "pre_imputation_mask",
+      "status": "PASS"
+    },
+    {
+      "assertion": "missingness_indicators_not_standardized",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "SMOTE_class_weighting_disabled",
+      "detail": "disabled",
+      "status": "PASS"
+    },
+    {
+      "assertion": "SMOTE_uses_no_second_tuning_search",
+      "detail": "no_second_search",
+      "status": "PASS"
+    },
+    {
+      "assertion": "temporal_split_unchanged",
+      "detail": "unchanged",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_unchanged",
+      "detail": "1400-1402",
       "status": "PASS"
     },
     {
@@ -73,11 +208,6 @@
     {
       "assertion": "smote_training_fold_only",
       "detail": "train_fold_only",
-      "status": "PASS"
-    },
-    {
-      "assertion": "m1_coverage_all_admitted",
-      "detail": "all admitted",
       "status": "PASS"
     },
     {
@@ -166,7 +296,7 @@
   "candidate_value_evidence_collected": false,
   "conservative_availability_lag_locked": true,
   "conservative_six_month_lag_decision_locked": true,
-  "contract_version": "stage125_part4_sap_v1",
+  "contract_version": "stage125_part4_sap_v2",
   "current_stage": "Stage125",
   "cut_a_available_at_operationalization_locked": true,
   "data_value_extraction_performed": false,
@@ -199,18 +329,20 @@
   "network_extraction_performed": true,
   "network_requests_attempted": 0,
   "output_sha256": {
-    "README_STAGE125_PART4_STATISTICAL_ANALYSIS_PLAN.md": "1e11edee04e776f82ba1b84135e13a7cfff8362807fa4914f34018897ccdb9c6",
-    "part4_development_feature_coverage_audit_stage125.csv": "f5cdcb71cf9be9e0e28f98c72b12f2f6d49244c95c858f2c3a99d7d8144a7f35",
-    "part4_event_count_gate_stage125.csv": "a1477e1d56cee83a9eeed239a3b5c8b793065f4fc1361663ce3a8e869023ff60",
-    "part4_feature_exclusion_decisions_stage125.csv": "b4faa4470248409784cb65cf942f013f0bc9de3fc1220cf5bb6997632c88045a",
-    "part4_feature_sets_stage125.csv": "1554e95e18ac818155a95a1dac2c37637d236e928a06e3c33507374d8cf88173",
+    "README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md": "e656fdf915f7dff89173b99c14c23a73f1f6664777b12e75c98e57ef388a65e8",
+    "README_STAGE125_PART4_STATISTICAL_ANALYSIS_PLAN.md": "e542d2eabc3da62065e503a04bfb85bfb6c8c52311b7c1da3e89723233165d94",
+    "part4_development_feature_coverage_audit_stage125.csv": "7c18da23265d1c544bd397686518cbc064f14f6deba45ecf1af8d55c21126703",
+    "part4_event_count_gate_stage125.csv": "ab76d5c5392cc18dd6ad4bca0b81c3d18b1f32c3661f1438a126a2534327f5d3",
+    "part4_feature_exclusion_decisions_stage125.csv": "f89125c99b6d6d4f4e5063b4276aa42e9a5b21933aa5e939bf65c7e76705291d",
+    "part4_feature_sets_stage125.csv": "79e87cbcef1a6aa70fa6e4b837c4634df9e1f701e25f42a87ac34012452b850f",
     "part4_hyperparameter_budget_stage125.json": "22d6989681a7cd59ffbf57077910615ce00adb9f171d303d5d61100a54490b40",
     "part4_metrics_uncertainty_contract_stage125.json": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
-    "part4_model_specifications_stage125.json": "6d8b014056cb3e13212b2999b3e394bca53905e1e48e7e01d1b52430bc0df9a0",
-    "part4_preprocessing_contract_stage125.json": "ace3013155fb8435f2b30001923eba5628238ad78d01b7550ee675949bfd1750",
-    "part4_sample_target_matrix_stage125.csv": "35837e0c8b52e2b778020708f08d799a1d17398c5d8f5b8ae07b06bef24acf3a",
+    "part4_model_specifications_stage125.json": "ef933be3eb2f75e6f493ac1401100c629bdb83850c81950d8f235c5ccf4cdb21",
+    "part4_preprocessing_contract_stage125.json": "3722bd6165574c78aef1138a810ff4863b5c214f80df197889eaa40163f0e415",
+    "part4_revenue_growth_exclusion_revision_decision_stage125.json": "f6104b2038224a2b76679ad5957fb012b9e413e979377efe80fb8f2b97369f4e",
+    "part4_sample_target_matrix_stage125.csv": "99e560d6527e72a891bf1f1f68e9241c935711213347c5c15b9237f9d54e1017",
     "part4_shap_stability_contract_stage125.json": "acd19339b8f998ba54c00f3cb32d5ca12d353619316ecab951b7d03f96ed5f8a",
-    "part4_statistical_analysis_plan_stage125.json": "076c4656a5200a4721d2b6d76707d4c5db1e5759ea607474c4f625950e22e56d",
+    "part4_statistical_analysis_plan_stage125.json": "c46507f76d57c25237df772d6be463c854b5b220f3c1649a85f01bdbc5ccdc44",
     "part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
     "part4_temporal_split_manifest_stage125.csv": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc"
   },
@@ -235,12 +367,12 @@
   },
   "row_level_publish_datetime_collection_required": false,
   "six_month_lag_superseded": true,
-  "source_commit": "13d7ead6499046ff02ec9bc98f339ab9affdabae",
-  "source_file_sha256": "04e90288fad0c34ee5e1b00b2ff2f88f53c45c16f3fb03f75916a8052d251304",
+  "source_commit": "f322f9db8e473f9333d8d52fb7d152b78667ae66",
+  "source_file_sha256": "a81cc27ebc75cfe4aa81ced527af44a6af1ae1f9e9e3145501f9a5ea3bf731e4",
   "stage": "stage125_part4_statistical_analysis_plan",
   "stage126_authorized": false,
   "stage126_started": false,
-  "test_file_sha256": "73fed54609ea106466cd3ff15789b6a1ad7509880115eda8884e41e00cb7799d",
+  "test_file_sha256": "db0cb3dacbca70694d9f34b1c1c4ef9630a31b3bef9a6f2b99407d4e72518194",
   "ticker_count": 0,
   "tickers": []
 }

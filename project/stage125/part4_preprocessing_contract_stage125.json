@@ -1,10 +1,18 @@
 {
-  "continuous_pipeline": [
-    "deterministic_source_to_feature_transformation",
-    "training_fold_1st_99th_percentile_clipping",
-    "training_fold_median_imputation",
-    "missingness_indicators"
+  "clipping_fit_on_observed_training_values_only": true,
+  "clipping_medians_standardization_parameters_from_training_only": true,
+  "continuous_pipeline_order": [
+    "1_deterministic_source_to_feature_transformation",
+    "2_capture_original_pre_imputation_missingness_mask",
+    "3_estimate_1st_99th_percentile_clipping_bounds_on_observed_training_fold_values_only",
+    "4_apply_training_derived_clipping_bounds",
+    "5_estimate_training_fold_median_on_observed_clipped_training_values",
+    "6_impute_missing_values_with_training_fold_median",
+    "7_append_missingness_indicators_from_original_pre_imputation_mask",
+    "8_logistic_regression_only_standardize_imputed_continuous_features_using_training_fold_mean_std"
   ],
+  "do_not_compute_clipping_quantiles_after_median_imputation": true,
+  "do_not_infer_missingness_indicator_from_imputed_matrix": true,
   "final_development_refit": {
     "after_hyperparameter_selection": true,
     "apply_once_to_locked_final_test": true,
@@ -35,7 +43,12 @@
     "target_encoding": false,
     "unknown_category": true
   },
-  "logistic_regression_extra": "training_fold_standardization_after_imputation",
+  "logistic_regression_extra": "training_fold_standardization_after_imputation_continuous_only",
+  "median_fit_after_training_clipping": true,
+  "missing_indicators_standardized": false,
+  "missingness_indicator_source": "original_pre_imputation_mask",
+  "missingness_mask_captured_before_imputation": true,
   "random_forest_standardization": false,
+  "validation_and_final_test_masks_from_own_original_missing_positions": true,
   "xgboost_standardization": false
 }

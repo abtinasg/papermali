@@ -1,6 +1,7 @@
 # Stage125 Part 4 — Statistical Analysis Plan
 
 **Status:** Locked research-design / contract surface only.
+**Contract version:** `stage125_part4_sap_v2` (v1 retained in Git history).
 **Research action:** `stage125-part4-statistical-analysis-plan`
 **Next:** `stage125-part5-readiness-closure`
 
@@ -10,13 +11,25 @@ Part 4 locks the statistical analysis plan for future Stage126 modeling:
 
 - primary sample `main_rule_a_primary` (1012 / 119 / 80 / 932)
 - primary target `FD_target_main_t_plus_1`
-- M1 primary ordered feature set (exactly 10)
-- M1 target-proximity robustness set (exactly 7)
-- nested M2–M4 blocks (conditional; no data collected here)
+- M1 primary ordered feature set (exactly 9 admitted)
+- M1 coverage-audit candidates (exactly 10, including rejected revenue growth)
+- M1 target-proximity robustness set (exactly 6)
+- nested M2–M4 blocks (9 / 12 / 15 / 19; conditional; no data collected here)
 - target-year temporal folds and locked final test 1400–1402
-- preprocessing, model families, finite hyperparameter budget, seeds
+- strict positive / negative / missing target event accounting
+- preprocessing with pre-imputation missingness masks
+- model families, finite hyperparameter budget, seeds
+- SMOTE robustness disables class weighting (no combined oversampling+weights)
 - PR-AUC primary; Recall@10% / Lift@10%; calibration; paired ticker-cluster bootstrap; Holm
 - SHAP stability contract (no SHAP computation in Part 4)
+
+## v2 methodological correction
+
+Human supervisor rejected `revenue_growth_period_adjusted` from admitted M1
+because raw Fold 1 training coverage `148/245 = 0.6040816327` is below the
+locked 0.75 threshold. The unauthorized first-observation denominator exception
+is removed. The feature remains in frozen Part 3C data and in the coverage
+audit as `rejected_m1_primary_coverage_gate_failed`.
 
 ## Explicit non-claims
 
@@ -24,6 +37,7 @@ Part 4 locks the statistical analysis plan for future Stage126 modeling:
 - No prediction was generated (`prediction_calls = 0`).
 - No SHAP value was calculated.
 - Final-test predictor values were not used for admission, tuning, or selection.
+- Final-test event thresholds control claim eligibility only, not feature admission.
 - Stage126 remains unauthorized and unstarted.
 - Modeling remains unstarted.
 - M3 remains unavailable pending an authoritative CBI source.
@@ -32,15 +46,6 @@ Part 4 locks the statistical analysis plan for future Stage126 modeling:
 - Financial data and targets remain frozen.
 - `رمپنا|1396 → رمپنا|1397` remains audit-only.
 - Part 3C outputs remain unchanged (SHA-256 pinned).
-
-## Growth coverage exception
-
-`revenue_growth_period_adjusted` uses an explicit Part 4 exception for
-**fold training/validation coverage only**: rows where `fiscal_year_t` equals
-the ticker's first observed fiscal year in the analysis-ready sample are
-excluded from the fold-coverage denominator because growth is structurally
-undefined. Overall development coverage still uses all development rows and
-must remain ≥ 0.80.
 
 ## Runners
 

@@ -1,23 +1,24 @@
-feature_name,decision,exclusion_reasons,retained_in_frozen_datasets,available_in_audit_surface
-current_assets,excluded_from_m1_primary,numerator/denominator duplication; scale redundancy,true,true
-current_liabilities,excluded_from_m1_primary,numerator/denominator duplication; scale redundancy,true,true
-debt_to_equity,excluded_from_m1_primary,high conceptual overlap; unstable denominator,true,true
-equity,excluded_from_m1_primary,raw-level size dependence; scale redundancy,true,true
-equity_ratio,excluded_from_m1_primary,exact or near accounting identity; high conceptual overlap,true,true
-gross_margin_period_adjusted,excluded_from_m1_primary,high conceptual overlap; parsimony under low event count,true,true
-gross_profit_period_adjusted,excluded_from_m1_primary,raw-level size dependence; numerator/denominator duplication,true,true
-net_income_growth_period_adjusted,excluded_from_m1_primary,duplicate growth definition; parsimony under low event count,true,true
-net_income_period_adjusted,excluded_from_m1_primary,raw-level size dependence; target-component proximity,true,true
-net_margin_period_adjusted,excluded_from_m1_primary,high conceptual overlap; parsimony under low event count,true,true
-operating_cash_flow_period_adjusted,excluded_from_m1_primary,numerator/denominator duplication; raw-level size dependence,true,true
-operating_profit_period_adjusted,excluded_from_m1_primary,numerator/denominator duplication; raw-level size dependence,true,true
-profit_margin_period_adjusted,excluded_from_m1_primary,high conceptual overlap; parsimony under low event count,true,true
-registered_capital,excluded_from_m1_primary,raw-level size dependence; scale redundancy,true,true
-revenue_period_adjusted,excluded_from_m1_primary,raw-level size dependence; numerator/denominator duplication,true,true
-roe_period_adjusted,excluded_from_m1_primary,unstable denominator; high conceptual overlap,true,true
-sales_growth_period_adjusted,excluded_from_m1_primary,duplicate growth definition,true,true
-total_assets,excluded_from_m1_primary,raw-level size dependence; replaced by log_total_assets transform,true,true
-total_liabilities,excluded_from_m1_primary,raw-level size dependence; scale redundancy,true,true
-accumulated_loss,excluded_from_m1_primary,raw-level size dependence; target-component proximity,true,true
-financial_expense_period_adjusted,excluded_from_m1_primary,numerator/denominator duplication; raw-level size dependence,true,true
-financial_expense_to_revenue_period_adjusted,excluded_from_m1_primary,high conceptual overlap; unstable denominator,true,true
+feature_name,decision,admission_status,exclusion_reasons,retained_in_frozen_datasets,retained_in_audit,available_in_audit_surface,deleted_from_source_data
+current_assets,excluded_from_m1_primary,excluded_from_m1_primary,numerator/denominator duplication; scale redundancy,true,true,true,false
+current_liabilities,excluded_from_m1_primary,excluded_from_m1_primary,numerator/denominator duplication; scale redundancy,true,true,true,false
+debt_to_equity,excluded_from_m1_primary,excluded_from_m1_primary,high conceptual overlap; unstable denominator,true,true,true,false
+equity,excluded_from_m1_primary,excluded_from_m1_primary,raw-level size dependence; scale redundancy,true,true,true,false
+equity_ratio,excluded_from_m1_primary,excluded_from_m1_primary,exact or near accounting identity; high conceptual overlap,true,true,true,false
+gross_margin_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,high conceptual overlap; parsimony under low event count,true,true,true,false
+gross_profit_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,raw-level size dependence; numerator/denominator duplication,true,true,true,false
+net_income_growth_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,duplicate growth definition; parsimony under low event count,true,true,true,false
+net_income_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,raw-level size dependence; target-component proximity,true,true,true,false
+net_margin_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,high conceptual overlap; parsimony under low event count,true,true,true,false
+operating_cash_flow_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,numerator/denominator duplication; raw-level size dependence,true,true,true,false
+operating_profit_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,numerator/denominator duplication; raw-level size dependence,true,true,true,false
+profit_margin_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,high conceptual overlap; parsimony under low event count,true,true,true,false
+registered_capital,excluded_from_m1_primary,excluded_from_m1_primary,raw-level size dependence; scale redundancy,true,true,true,false
+revenue_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,raw-level size dependence; numerator/denominator duplication,true,true,true,false
+roe_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,unstable denominator; high conceptual overlap,true,true,true,false
+sales_growth_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,duplicate growth definition,true,true,true,false
+total_assets,excluded_from_m1_primary,excluded_from_m1_primary,raw-level size dependence; replaced by log_total_assets transform,true,true,true,false
+total_liabilities,excluded_from_m1_primary,excluded_from_m1_primary,raw-level size dependence; scale redundancy,true,true,true,false
+accumulated_loss,excluded_from_m1_primary,excluded_from_m1_primary,raw-level size dependence; target-component proximity,true,true,true,false
+financial_expense_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,numerator/denominator duplication; raw-level size dependence,true,true,true,false
+financial_expense_to_revenue_period_adjusted,excluded_from_m1_primary,excluded_from_m1_primary,high conceptual overlap; unstable denominator,true,true,true,false
+revenue_growth_period_adjusted,rejected_m1_primary_coverage_gate_failed,rejected_m1_primary_coverage_gate_failed,minimum temporal-fold training coverage below locked threshold; Fold 1 training coverage 148/245 = 0.6040816327; parsimony under low event count,true,true,true,false
