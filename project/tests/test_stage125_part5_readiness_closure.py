@@ -1299,7 +1299,7 @@ def test_working_tree_check_requires_completely_empty(tmp_path):
     repo = _init_temp_repo(tmp_path)
     ok, detail = m.evaluate_working_tree_clean(repo, mode="check")
     assert ok is True
-    assert detail == "empty"
+    assert detail == "clean"
 
 
 @pytest.mark.real_working_tree

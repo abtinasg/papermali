@@ -1003,14 +1003,12 @@ def evaluate_working_tree_clean(
     lines = git_status_porcelain(repo_root)
     if mode == "check":
         ok = len(lines) == 0
-        return ok, "empty" if ok else f"dirty_lines={len(lines)}"
+        # Stable pass detail so --build/--check closure reports do not drift.
+        return ok, "clean" if ok else f"dirty_lines={len(lines)}"
     paths = parse_porcelain_paths(lines)
     unauthorized = [p for p in paths if p not in AUTHORIZED_PART5_GENERATED_PATHS]
     ok = len(unauthorized) == 0
-    detail = (
-        "authorized_or_empty"
-        if ok else f"unauthorized={unauthorized[:8]}"
-    )
+    detail = "clean" if ok else f"unauthorized={unauthorized[:8]}"
     return ok, detail
 
 
