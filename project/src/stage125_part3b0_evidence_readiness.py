@@ -325,6 +325,8 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/part4_hyperparameter_budget_stage125.json",
     "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
     "project/stage125/part4_shap_stability_contract_stage125.json",
+    "project/stage125/part4_revenue_growth_exclusion_revision_decision_stage125.json",
+    "project/stage125/README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md",
     "project/stage125/stage125_part4_statistical_analysis_plan_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part4.json",
     "project/stage125/prediction_cutoff_audit_stage125_part2.csv",
@@ -348,7 +350,11 @@ PART4_SAP_ALLOWED_EXACT = frozenset(
     rel for rel in STAGE125_ALLOWED_EXACT
     if (
         "/part4_" in rel
+        or "/README_STAGE125_PART4_" in rel
         or rel.endswith("README_STAGE125_PART4_STATISTICAL_ANALYSIS_PLAN.md")
+        or rel.endswith(
+            "README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md"
+        )
         or rel.endswith("stage125_part4_statistical_analysis_plan_qc_report.json")
         or rel.endswith("metadata_and_hashes_stage125_part4.json")
     )
@@ -3195,7 +3201,10 @@ def _file_has_prohibited_live_content(path: Path) -> bool:
     if (
         low_name.startswith("part4_")
         or "stage125_part4_" in low_name
+        or low_name.startswith("readme_stage125_part4_")
         or low_name == "readme_stage125_part4_statistical_analysis_plan.md"
+        or low_name
+        == "readme_stage125_part4_revenue_growth_exclusion_revision.md"
         or low_name == "metadata_and_hashes_stage125_part4.json"
     ):
         return False
