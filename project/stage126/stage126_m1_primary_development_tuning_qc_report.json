@@ -1,0 +1,386 @@
+{
+  "active_workstream": "stage126_m1_financial_baseline",
+  "all_pass": true,
+  "assertion_count": 65,
+  "assertions": [
+    {
+      "assertion": "baseline_commit_verified",
+      "detail": "7963e21922065a5e4690cc5897632c17ef97da1c",
+      "status": "PASS"
+    },
+    {
+      "assertion": "baseline_tree_verified",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "authorization_text_byte_for_byte",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "authorization_text_sha256_matches",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "stage126_authorized_true",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "development_modeling_authorized_true",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_unlocked_false",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_access_authorized_false",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_evaluation_authorized_false",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "contract_change_not_authorized",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m2_m3_m4_not_authorized",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3c_hashes_unchanged",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part4_hashes_unchanged",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part5_hashes_unchanged",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "split_manifest_hash_pinned",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "analysis_ready_hash_pinned",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "primary_sample",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "primary_target",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "feature_count_9",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "revenue_growth_prohibited",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "article141_not_estimation_target",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "allowed_families_only",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_forbidden_families",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "development_rows_666",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_pairs_346",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fold1_train_rows_245",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fold1_train_pos_33",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fold1_train_neg_212",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fold1_validation_rows_205",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fold1_validation_pos_25",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fold1_validation_neg_180",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fold2_train_rows_450",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fold2_train_pos_58",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fold2_train_neg_392",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fold2_validation_rows_216",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fold2_validation_pos_10",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "fold2_validation_neg_206",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "development_positive_68",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "development_negative_598",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "development_missing_target_0",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "logistic_4_configs",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "rf_12_configs",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "xgboost_16_configs",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "total_32_configs",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "tuning_seeds_locked",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_oof_seeds_locked",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "one_config_selected_per_family",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "oof_421_per_family",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "oof_1263_total",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_final_test_row_in_oof",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "pooled_oof_positive_35",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_predictor_rows_loaded_0",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_target_rows_loaded_0",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_rows_seen_but_unparsed_346",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_full_development_refit",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_smote",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_shap",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m1_robustness_not_started",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "wrong_baseline_rejected",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "auth_text_mutation_rejected",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "auth_hash_mutation_rejected",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_unlocked_true_rejected",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_access_true_rejected",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "stage126_unauthorized_rejected",
+      "detail": "",
+      "status": "PASS"
+    },
+    {
+      "assertion": "network_requests_zero",
+      "detail": "",
+      "status": "PASS"
+    }
+  ],
+  "baseline_commit": "5f56be5b2e49e66c54b451994a5e36c4fcc754d9",
+  "baseline_tree": "d8f399e3dedac123065f6eda876dc9e71f0c36e7",
+  "contract_version": "stage126_m1_primary_development_tuning_v1",
+  "current_stage": "Stage126",
+  "development_modeling_authorized": true,
+  "failed_count": 0,
+  "final_test_access_authorized": false,
+  "final_test_evaluation_performed": false,
+  "final_test_evaluations": 0,
+  "final_test_predictor_rows_loaded": 0,
+  "final_test_predictor_values_inspected": false,
+  "final_test_target_rows_loaded": 0,
+  "final_test_target_values_inspected": false,
+  "final_test_unlocked": false,
+  "m1_primary_development_tuning_completed": true,
+  "m1_robustness_completed": false,
+  "m1_robustness_started": false,
+  "m2_data_collected": false,
+  "m3_data_collected": false,
+  "m4_data_collected": false,
+  "model_fit_calls_scope": "development_folds_only",
+  "modeling_authorized": true,
+  "modeling_started": true,
+  "network_requests_attempted": 0,
+  "output_sha256": {
+    "README_STAGE126_M1_PRIMARY_DEVELOPMENT_TUNING.md": "d3a67cab445fe4344abfd50e07d42febc0053a1d08154916fc76cd53b53b2cf6",
+    "stage126_m1_configuration_registry.csv": "decbf43a5c34669bdd7a0c68c0ad6aec5611efc7c3ca82b09f5e85f72d635804",
+    "stage126_m1_development_access_manifest.csv": "0c2783d0e43ebba712a1c41b6889a2f8f646340bae6a75ad15902a8a0c368e39",
+    "stage126_m1_development_metrics.csv": "178c2a398268e6d62011555b17c47ebd4800330c28f13b22925a8a0eef335c38",
+    "stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "stage126_m1_final_test_lock_guard.json": "509e58fc39e3c5d886993c11b954fc06c267c96d02c081d8e50b0cda52e58b03",
+    "stage126_m1_human_authorization_record.json": "aa7b3ee285173374701b4e0a183e3e3d8417820ec9e7bdbae49af6b844a610a2",
+    "stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4",
+    "stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e",
+    "stage126_m1_tuning_results.csv": "e7e1e6808e394273676709aa94bfa713bbf8a790fadabee22ea20b849adbe649"
+  },
+  "research_action_id": "stage126-m1-financial-baseline",
+  "selected_configurations": {
+    "random_forest": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
+    "regularized_logistic_regression": "logistic__C_0.1",
+    "xgboost": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1"
+  },
+  "shap_calls": 0,
+  "smote_calls": 0,
+  "source_commit": "7963e21922065a5e4690cc5897632c17ef97da1c",
+  "source_file_sha256": "e959ac6c6d8bd6e039a3368f5b9bd9dcc1bf27d22bc4f51cc861cf3494c4e629",
+  "stage": "stage126_m1_financial_baseline",
+  "stage125_completed": true,
+  "stage126_authorized": true,
+  "stage126_m1_entry_ready": true,
+  "stage126_started": true,
+  "test_file_sha256": "3bfe293f368bf9dae34dd08ba37d29564605cd321af42c940a61d3bfed98f7d4",
+  "ticker_count": 0,
+  "tickers": []
+}

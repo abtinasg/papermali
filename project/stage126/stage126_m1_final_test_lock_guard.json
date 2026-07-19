@@ -1,0 +1,25 @@
+{
+  "aggregate_derived_from_row_level_targets": false,
+  "final_test_access_authorized": false,
+  "final_test_aggregate": {
+    "negative": 334,
+    "pairs": 346,
+    "positive": 12
+  },
+  "final_test_aggregate_source": "frozen_part4_temporal_split_contract",
+  "final_test_evaluation_authorized": false,
+  "final_test_evaluation_performed": false,
+  "final_test_locked": true,
+  "final_test_pair_key_count_from_manifest": 346,
+  "final_test_predictor_rows_loaded": 0,
+  "final_test_predictor_values_inspected": false,
+  "final_test_rows_seen_but_not_parsed": 346,
+  "final_test_target_rows_loaded": 0,
+  "final_test_target_values_inspected": false,
+  "final_test_target_years": [
+    1400,
+    1401,
+    1402
+  ],
+  "final_test_unlocked": false
+}
