@@ -116,6 +116,13 @@ Do not confuse QC selection with the research-action chain:
   `stage125/stage125_part4_statistical_analysis_plan_qc_report.json` (active
   contract `stage125_part4_sap_v2`; M1=9 admitted; revenue-growth audit-only
   rejection; temporal splits; coverage/event gates; no modeling)
+- Stage125 Part 5 readiness closure source/test/QC:
+  `src/stage125_part5_readiness_closure.py`,
+  `run_stage125_part5.py`,
+  `tests/test_stage125_part5_readiness_closure.py`,
+  `stage125/stage125_part5_readiness_closure_qc_report.json` (Gate 125.0;
+  keep/drop/defer; Stage126 M1 entry contract readiness-only; no modeling;
+  Stage126 unauthorized)
 - Stage125 Part 3C leakage-safe dataset finalization source/test/QC:
   `src/stage125_part3c_leakage_safe_dataset_finalization.py`,
   `run_stage125_part3c.py`,
@@ -149,13 +156,15 @@ See [`OPEN_TASKS.md`](OPEN_TASKS.md).
 
 See `next_research_action_id` in [`ROADMAP.md`](ROADMAP.md) and
 [`handoff_state.json`](handoff_state.json). Currently the research pointer is
-**`stage125-part5-readiness-closure`** after Part 4 SAP lock
-(`last_completed_research_action_id=stage125-part4-statistical-analysis-plan`).
-Broad CODAL capture is stopped; researcher-verified financial data are frozen;
-active assumed availability uses `assumed_available_at_regulatory` (four
-Jalali months; six-month methodology superseded). Stage125 performs **no**
-modeling; the frozen research contract (M1–M4 blocks, M5 removed,
-accessibility Gates, Part 4 SAP) is in
+**`stage126-m1-financial-baseline`** after Part 5 readiness closure
+(`last_completed_research_action_id=stage125-part5-readiness-closure`).
+That pointer is **future / blocked pending explicit human authorization /
+not started** — readiness is not authorization. Broad CODAL capture is
+stopped; researcher-verified financial data are frozen; active assumed
+availability uses `assumed_available_at_regulatory` (four Jalali months;
+six-month methodology superseded). Stage125 performs **no** modeling; the
+frozen research contract (M1–M4 blocks, M5 removed, accessibility Gates,
+Part 4 SAP, Part 5 Gate 125.0) is in
 [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
 prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.
 

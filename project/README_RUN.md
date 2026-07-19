@@ -40,7 +40,12 @@ python run_stage124_gate_b_readiness.py
 # 3d) Execute the already-approved final Gate B rules
 python run_stage124_gate_b_execution.py
 
-# 4) Full test suite
+# 4) Stage125 Part 3C / Part 4 / Part 5 (offline contracts; no modeling)
+python run_stage125_part3c.py --check
+python run_stage125_part4.py --check
+python run_stage125_part5.py --check   # readiness closure / Gate 125.0
+
+# 5) Full test suite
 python -m pytest tests/ -q
 ```
 
@@ -55,6 +60,8 @@ from the frozen Stage123 panel — both are independent of input row order.
   official files.
 - `run_stage124_gate_b_readiness.py` reproduces the historical rule comparison.
 - `run_stage124_gate_b_execution.py` executes the already-approved Rule A and Rule B.
+- `run_stage125_part5.py` is Stage125 readiness closure only (Gate 125.0); it does
+  **not** authorize or start Stage126 / modeling.
 - None of them perform modeling.
 - The meaning of dates remains
   `first_observed_trading_date_from_official_tse_api`;

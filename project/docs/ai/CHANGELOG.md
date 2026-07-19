@@ -5,6 +5,18 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 
 ## 2026-07-19
 
+- **Stage125 Part 5 / research action
+  `stage125-part5-readiness-closure` — Readiness Closure.** Offline Gate 125.0
+  closure: keep/drop/defer register, blocker register, Stage126 M1 entry
+  contract (readiness only), integrity manifest. Stage125 completed for
+  closure; Stage126 M1 entry ready for a **future authorization decision**
+  only (`stage126_authorized=false`, `modeling_authorized=false`, final test
+  locked). Part 3C and Part 4 hashes unchanged. Zero network / fit / predict /
+  SHAP. Research pointers advance to
+  `last_completed_research_action_id=stage125-part5-readiness-closure`,
+  `next_research_action_id=stage126-m1-financial-baseline` (future; blocked
+  pending explicit human authorization; not started).
+
 - **Stage125 Part 4 v2 correction — revenue-growth exclusion revision.**
   Human supervisor rejected `revenue_growth_period_adjusted` from admitted M1
   (raw Fold 1 training coverage `148/245 = 0.6040816327` < 0.75). Removed the

@@ -6,12 +6,15 @@ front matter; this file is the working description.
 ## Active research workstream: `stage125-research-design-readiness`
 
 Authoritative research pointers live in `ROADMAP.md` front matter:
-`last_completed_research_action_id=stage125-part4-statistical-analysis-plan`,
-`next_research_action_id=stage125-part5-readiness-closure`.
+`last_completed_research_action_id=stage125-part5-readiness-closure`,
+`next_research_action_id=stage126-m1-financial-baseline`
+(**future**; blocked pending explicit human authorization; not started —
+a pointer is not authorization).
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
 Part 3B.1E is the decision-lock surface for the conservative-lag research
 action; Part 3C is the operationalization / leakage-safe dataset surface;
-Part 4 is the statistical analysis plan lock (no modeling).
+Part 4 is the statistical analysis plan lock (no modeling);
+Part 5 is the Stage125 readiness closure (Gate 125.0; no Stage126 start).
 
 ### Completed — `stage124-gate-b-rule-approval`
 
@@ -92,14 +95,24 @@ fitting, **no** final-test predictor inspection, **no** M2/M3/M4 data
 collection, **no** Stage126. Article-141-only final test (1 positive on
 primary sample) is distributional/descriptive robustness only.
 
-### Next / active research action — `stage125-part5-readiness-closure`
+### Completed research action — `stage125-part5-readiness-closure`
 
-Stage125 closure / readiness report; record keep/drop decisions; full
-validator + tests. **No** Stage126. **No** modeling.
+Stage125 readiness closure / Gate 125.0. Keep/drop/defer decisions recorded;
+blocker register classified; Stage126 M1 entry contract written as
+**readiness for a future authorization decision only** (Stage126 unauthorized;
+modeling unstarted; final test locked). Part 3C and Part 4 hashes unchanged.
+**No** model fitting, predictions, SHAP, SMOTE, or final-test predictor
+inspection. PR remains open pending explicit human merge approval.
+
+### Next research pointer — `stage126-m1-financial-baseline` (future; not authorized)
+
+Blocked pending explicit human authorization. **Not started.** A roadmap
+next-action pointer is **not** authorization to execute modeling.
 
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
 document-binding evidence remain as frozen scientific history; they do **not**
-authorize expansion. 80-row scale-up is cancelled.
+authorize expansion. 80-row scale-up is cancelled. Part 3B expansion disposition
+is `superseded_not_required_for_stage125_closure` (`part3b_completed=false`).
 
 Current markers (must stay true until separately authorized otherwise):
 
@@ -127,7 +140,14 @@ Current markers (must stay true until separately authorized otherwise):
 - `part3b_completed=false`
 - `part3c_leakage_safe_finalization_completed=true`
 - `part4_statistical_analysis_plan_locked=true`
+- `stage125_part5_readiness_closure_completed=true`
+- `stage125_completed=true`
+- `stage126_m1_entry_ready=true`
+- `stage126_authorized=false`
+- `stage126_started=false`
+- `modeling_authorized=false`
 - `modeling_started=false`
+- `final_test_unlocked=false`
 
 **Still prohibited without explicit user authorization:** expanded CODAL/TSETMC/CBI
 network for value extraction, row-level PublishDateTime collection, real

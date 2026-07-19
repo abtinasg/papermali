@@ -123,6 +123,10 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part4_statistical_analysis_plan.py",
     "project/run_stage125_part4.py",
     "project/tests/test_stage125_part4_statistical_analysis_plan.py",
+    # Stage125 Part 5 code, runner, and tests.
+    "project/src/stage125_part5_readiness_closure.py",
+    "project/run_stage125_part5.py",
+    "project/tests/test_stage125_part5_readiness_closure.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
@@ -134,6 +138,7 @@ ALLOWLIST_FILES = (
     "AGENTS.md",
     "CLAUDE.md",
     ".gitignore",
+    "project/README_RUN.md",
 )
 
 # Handoff-only classification, INDEPENDENT of the change allowlist. A commit is
@@ -317,6 +322,15 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md",
     "project/stage125/stage125_part4_statistical_analysis_plan_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part4.json",
+    # Stage125 Part 5 generated readiness-closure artifacts.
+    "project/stage125/README_STAGE125_PART5_READINESS_CLOSURE.md",
+    "project/stage125/part5_readiness_closure_report_stage125.json",
+    "project/stage125/part5_keep_drop_decisions_stage125.csv",
+    "project/stage125/part5_blocker_register_stage125.csv",
+    "project/stage125/part5_stage126_m1_entry_contract_stage125.json",
+    "project/stage125/part5_artifact_integrity_manifest_stage125.csv",
+    "project/stage125/stage125_part5_readiness_closure_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part5.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -586,6 +600,49 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "contract_version",
         "network_extraction_performed",
         "modeling_started",
+    ),
+    "stage125_part5_readiness_closure": (
+        "part3a_protocol_locked",
+        "part3a_decision_locked",
+        "part3b0_readiness",
+        "part3b_started",
+        "part3b1_decision_locked",
+        "cut_a_available_at_operationalization_locked",
+        "predictor_document_binding_mini_pilot_completed",
+        "predictor_document_binding_evidence_collected",
+        "document_binding_resolution_decision_locked",
+        "conservative_six_month_lag_decision_locked",
+        "broad_codal_capture_stopped",
+        "financial_data_researcher_verified_frozen",
+        "conservative_availability_lag_locked",
+        "row_level_publish_datetime_collection_required",
+        "active_availability_method",
+        "active_availability_lag_months",
+        "four_month_regulatory_lag_locked",
+        "six_month_lag_superseded",
+        "historical_six_month_decision_retained",
+        "historical_six_month_decision_active",
+        "predictor_available_at_evidence_collected",
+        "pilot_cutoff_provenance_resolved",
+        "evidence_collected",
+        "endpoint_probe_evidence_collected",
+        "candidate_value_evidence_collected",
+        "pair_level_evidence_collected",
+        "data_value_extraction_performed",
+        "accessibility_scoring_applied",
+        "part3b_completed",
+        "part3c_leakage_safe_finalization_completed",
+        "part4_statistical_analysis_plan_locked",
+        "stage125_part5_readiness_closure_completed",
+        "stage125_completed",
+        "stage126_m1_entry_ready",
+        "stage126_authorized",
+        "stage126_started",
+        "modeling_authorized",
+        "modeling_started",
+        "final_test_unlocked",
+        "contract_version",
+        "network_extraction_performed",
     ),
 }
 
@@ -870,6 +927,10 @@ _QC_SOURCE_TEST_OVERRIDES: dict[str, tuple[str, str]] = {
     "stage125_part4_statistical_analysis_plan": (
         "project/src/stage125_part4_statistical_analysis_plan.py",
         "project/tests/test_stage125_part4_statistical_analysis_plan.py",
+    ),
+    "stage125_part5_readiness_closure": (
+        "project/src/stage125_part5_readiness_closure.py",
+        "project/tests/test_stage125_part5_readiness_closure.py",
     ),
 }
 

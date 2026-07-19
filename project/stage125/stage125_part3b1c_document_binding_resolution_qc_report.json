@@ -239,7 +239,7 @@
     "project/stage125/data_dictionary_stage125.csv": "ed3d0593fe8456842841be0286285ecfe076f5349b54f0bd6bdf664cc77a759d",
     "project/stage125/feature_availability_contract_stage125_part2.json": "b97593ed46fa2440b66cafd6a3752300177df4773cbdcf45b3126872d3c200a3",
     "project/stage125/leakage_checklist_stage125_part2.json": "fab951e12a7ecdc280b74e865e3d5fa9bd4378b04441deb9773ac10a167612a7",
-    "project/stage125/metadata_and_hashes_stage125_part3b1b.json": "f7edabb7e9c99b95ea2b2a056d2fc8ceca1534882555bf123db3842e0326fc55",
+    "project/stage125/metadata_and_hashes_stage125_part3b1b.json": "0beaf7aac42bafb401e3c23816cbe510ba99c12c8965da60600f85acd2f509cd",
     "project/stage125/part3_candidate_inventory_stage125.csv": "4bd5f6a71ecf0e1f74866a64a3774e51340729f4188ae2784f1d90db07e7032f",
     "project/stage125/part3a_approved_gate_thresholds_stage125.csv": "11c7efe5f242ab8e4a4f7b1955fb25d48e288249f7a1ce4c6bf1713dbf117d20",
     "project/stage125/part3a_decision_lock_stage125.json": "475c82b3483ef18ff19aea2268f65527ca87c9441603622bd1952bd21f18f35e",
@@ -260,7 +260,7 @@
     "project/stage125/prediction_time_contract_stage125_part2.json": "9bd40b4832302fb2c9c890b99b06f3b47bcfee2c07d065416f8776e7e0046a89",
     "project/stage125/source_registry_stage125.csv": "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c",
     "project/stage125/stage125_part3b1_decision_lock_qc_report.json": "425b9bf2948ae3cbe46c5fec63bb38e959b0ee6a5f76801bf1c1875cc1ff69a1",
-    "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json": "cf26891f899b3abe48175f63fa46ea1c2169ecf3a1fadedc0a928ef72dfd18fd",
+    "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json": "450ba80e1307d043acd05dd58b548ad71be37069552310ec34ebee00b1f882c2",
     "project/stage125/stage125_part3b_evidence_capture_qc_report.json": "c683375f3afe8c2d1a757898122e601f36c145be2b8c69be7ba9b4b781b0f92d"
   },
   "gates_applied": 0,
@@ -271,7 +271,7 @@
   "output_sha256": {
     "README_STAGE125_PART3B1C_DOCUMENT_BINDING_RESOLUTION.md": "2fafe9c39fbb73a6886d1997114dc894ac6fd9dca157f5507ce599e3f0203a63",
     "part3b1c_binding_failure_taxonomy_stage125.csv": "63ae6073a5eb929f49e21caa41dc4e297439e7923df66ff772ad9ac70851e81d",
-    "part3b1c_document_binding_resolution_decision_lock_stage125.json": "fd92b3d8b1c36a1d0a2997217b01a60fb66340f82300e898c5c6cf04c76cc520",
+    "part3b1c_document_binding_resolution_decision_lock_stage125.json": "72ff726b581bf7546fafed6a123225d09714c7fc8d16472601da65ac1ecc5925",
     "part3b1c_exact_document_evidence_hierarchy_stage125.json": "efcbfd397c661d048572bd98a66186ee0758b7ea5b1a59df97da98a791a459f0",
     "part3b1c_identity_normalization_contract_stage125.json": "3bc3378fccf6bb56092633cd174d3adf80e88eec489b1e41bd6e0fe474093284",
     "part3b1c_proposed_capture_authorization_stage125.json": "c97b17669c44969eb1fdc567e9c81f8b9de7b36ad3f63dc5ee6613f7bda17d78",
@@ -287,7 +287,7 @@
   "part3b_started": true,
   "pilot_cutoff_provenance_resolved": false,
   "pinned_input_sha256": {
-    "project/stage125/metadata_and_hashes_stage125_part3b1b.json": "f7edabb7e9c99b95ea2b2a056d2fc8ceca1534882555bf123db3842e0326fc55",
+    "project/stage125/metadata_and_hashes_stage125_part3b1b.json": "0beaf7aac42bafb401e3c23816cbe510ba99c12c8965da60600f85acd2f509cd",
     "project/stage125/part3a_approved_gate_thresholds_stage125.csv": "11c7efe5f242ab8e4a4f7b1955fb25d48e288249f7a1ce4c6bf1713dbf117d20",
     "project/stage125/part3a_selected_pilot_pairs_stage125.csv": "9a441b5e3696353967489b356d0ff48cf7cbea276aeea5018be6edc8368b40f5",
     "project/stage125/part3b1_adjudicated_decision_requirements_stage125.json": "e6d56a7b55deec83d8460241c101cb520f43b7917495e7c9a61eaf6d20c11f38",
@@ -300,7 +300,7 @@
     "project/stage125/part3b1b_thanusa_capture_receipt_stage125.json": "f2571c296d3400af1bc6b607180d231b4b06096ca4f5c58f024286ade4821626",
     "project/stage125/part3b1b_thanusa_parsed_metadata_receipt_stage125.json": "217228edd67595167746f006e5bec21f17aa9f3f16008d30c3abc7023e9f84a4",
     "project/stage125/part3b1b_unresolved_and_rejections_stage125.csv": "d5e0ce0d400601057d65b935683dbd8b3e3c0d03fa7bb24842f56f61cbf53a67",
-    "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json": "cf26891f899b3abe48175f63fa46ea1c2169ecf3a1fadedc0a928ef72dfd18fd"
+    "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json": "450ba80e1307d043acd05dd58b548ad71be37069552310ec34ebee00b1f882c2"
   },
   "predictor_available_at_evidence_collected": false,
   "predictor_document_binding_evidence_collected": true,
@@ -313,8 +313,8 @@
   },
   "scale_up_to_80_rows_authorized": false,
   "scope_rows": 5,
-  "source_commit": "bde48253ba33e2dc828002030b6f95d930eed5c6",
-  "source_file_sha256": "16f3f5f48f2b178b0ed3aa20aa8a8878b5b9906c5cd44979efb5f53930a271c3",
+  "source_commit": "6297545caa1acbd7ee83d1376c7085f0ffb2a36f",
+  "source_file_sha256": "22d40b2165df9f438fd1af5839aa9ca3216f0fe34faeb6b66f4c3044bc29c574",
   "stage": "stage125_part3b1c_document_binding_resolution_decision_lock",
   "stage126_started": false,
   "taxonomy_row_count": 55,

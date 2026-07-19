@@ -200,6 +200,8 @@ BLOCK_CANDIDATES = {
 
 _GIT_ALLOWED_SUBCOMMANDS = frozenset({
     "rev-parse", "merge-base", "log", "show", "ls-files", "check-ignore",
+    # Exact read-only status form used by Stage125 Part 5 working-tree Gate.
+    "status",
 })
 _GIT_FORBIDDEN_TOKENS = frozenset({
     "--ext-diff", "--textconv", "--exec-path", "--html-path", "--man-path",
@@ -329,6 +331,15 @@ STAGE125_ALLOWED_EXACT = frozenset({
     "project/stage125/README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md",
     "project/stage125/stage125_part4_statistical_analysis_plan_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part4.json",
+    # Stage125 Part 5 readiness closure (offline audit only; no modeling).
+    "project/stage125/README_STAGE125_PART5_READINESS_CLOSURE.md",
+    "project/stage125/part5_readiness_closure_report_stage125.json",
+    "project/stage125/part5_keep_drop_decisions_stage125.csv",
+    "project/stage125/part5_blocker_register_stage125.csv",
+    "project/stage125/part5_stage126_m1_entry_contract_stage125.json",
+    "project/stage125/part5_artifact_integrity_manifest_stage125.csv",
+    "project/stage125/stage125_part5_readiness_closure_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part5.json",
     "project/stage125/prediction_cutoff_audit_stage125_part2.csv",
     "project/stage125/prediction_cutoff_summary_stage125_part2.json",
     "project/stage125/prediction_time_contract_stage125_part2.json",
@@ -357,6 +368,20 @@ PART4_SAP_ALLOWED_EXACT = frozenset(
         )
         or rel.endswith("stage125_part4_statistical_analysis_plan_qc_report.json")
         or rel.endswith("metadata_and_hashes_stage125_part4.json")
+    )
+)
+
+# Part 5 readiness-closure contracts may use keep/drop decision vocabulary and
+# "manifest" / Stage126-entry filenames without meaning live capture or modeling.
+# Exact-path exemption only — no wildcards.
+PART5_READINESS_ALLOWED_EXACT = frozenset(
+    rel for rel in STAGE125_ALLOWED_EXACT
+    if (
+        "/part5_" in rel
+        or "/README_STAGE125_PART5_" in rel
+        or rel.endswith("README_STAGE125_PART5_READINESS_CLOSURE.md")
+        or rel.endswith("stage125_part5_readiness_closure_qc_report.json")
+        or rel.endswith("metadata_and_hashes_stage125_part5.json")
     )
 )
 
@@ -467,6 +492,9 @@ def _is_allowed_git_command(cmd: list[str]) -> bool:
             and rest[1] in _GIT_ALLOWED_FORMATS
             and not rest[2].startswith("-")
         )
+    if sub == "status":
+        # Exact argv only: git -C <repo> status --porcelain=v1 --untracked-files=all
+        return rest == ["--porcelain=v1", "--untracked-files=all"]
     return False
 
 
@@ -3026,6 +3054,8 @@ def count_real_evidence_records(repo_root: Path) -> int:
             continue
         if rel in PART4_SAP_ALLOWED_EXACT:
             continue
+        if rel in PART5_READINESS_ALLOWED_EXACT:
+            continue
         if rel in PART3B0_ALLOWED_EXACT and path.name != F_EVIDENCE_TEMPLATE:
             continue
         if path == template_path:
@@ -3134,6 +3164,8 @@ def count_candidate_decisions(repo_root: Path) -> int:
             continue
         if rel in PART4_SAP_ALLOWED_EXACT:
             continue
+        if rel in PART5_READINESS_ALLOWED_EXACT:
+            continue
         if path.suffix.lower() not in _CONTENT_SCAN_SUFFIXES:
             continue
         for row in _iter_content_dicts(path):
@@ -3197,6 +3229,7 @@ def _file_has_prohibited_live_content(path: Path) -> bool:
     }:
         return False
     # Part 4 SAP coverage/admission labels are plan-lock vocabulary only.
+    # Part 5 keep/drop / entry-contract vocabulary is closure-audit only.
     low_name = path.name.lower()
     if (
         low_name.startswith("part4_")
@@ -3206,6 +3239,11 @@ def _file_has_prohibited_live_content(path: Path) -> bool:
         or low_name
         == "readme_stage125_part4_revenue_growth_exclusion_revision.md"
         or low_name == "metadata_and_hashes_stage125_part4.json"
+        or low_name.startswith("part5_")
+        or "stage125_part5_" in low_name
+        or low_name.startswith("readme_stage125_part5_")
+        or low_name == "readme_stage125_part5_readiness_closure.md"
+        or low_name == "metadata_and_hashes_stage125_part5.json"
     ):
         return False
     rows = _iter_content_dicts(path)

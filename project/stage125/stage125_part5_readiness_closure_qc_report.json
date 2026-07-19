@@ -1,0 +1,545 @@
+{
+  "accessibility_scoring_applied": false,
+  "active_availability_lag_months": 4,
+  "active_availability_method": "fixed_regulatory_lag",
+  "all_pass": true,
+  "assertion_count": 64,
+  "assertions": [
+    {
+      "assertion": "baseline_commit_pinned",
+      "detail": "5836059e2d533f4be7e1898f942937a57c0b8fef",
+      "status": "PASS"
+    },
+    {
+      "assertion": "baseline_tree_pinned",
+      "detail": "3c2de72270bc05afeabcd2f07088f71f886796a3",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3c_hashes_unchanged",
+      "detail": "8 unchanged",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part4_hashes_unchanged",
+      "detail": "17 outputs + src + test unchanged",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part4_contract_version_v2_still_active",
+      "detail": "stage125_part4_sap_v2",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part4_qc_70_assertions_0_failed_all_pass",
+      "detail": "70/0/true",
+      "status": "PASS"
+    },
+    {
+      "assertion": "keep_drop_exact_item_ids_and_decisions",
+      "detail": "24 rows",
+      "status": "PASS"
+    },
+    {
+      "assertion": "keep_drop_vocabulary_no_unknown",
+      "detail": "all_known",
+      "status": "PASS"
+    },
+    {
+      "assertion": "blocker_register_required_rows_present",
+      "detail": "8 required",
+      "status": "PASS"
+    },
+    {
+      "assertion": "blocker_register_nonblocking",
+      "detail": "nonblocking",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m1_primary_exact_nine_feature_order",
+      "detail": "9_exact_order",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m1_target_proximity_exact_six_feature_order",
+      "detail": "6_exact_order",
+      "status": "PASS"
+    },
+    {
+      "assertion": "revenue_growth_audit_only_absent_from_model_surfaces",
+      "detail": "audit_only",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m2_deferred_nonblocking",
+      "detail": "deferred",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m3_not_admitted",
+      "detail": "not_admitted",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m4_deferred_nonblocking",
+      "detail": "deferred",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m5_removed",
+      "detail": "removed",
+      "status": "PASS"
+    },
+    {
+      "assertion": "article141_descriptive_only",
+      "detail": "descriptive_only",
+      "status": "PASS"
+    },
+    {
+      "assertion": "article141_absent_from_entry_contract_model_estimation",
+      "detail": "excluded",
+      "status": "PASS"
+    },
+    {
+      "assertion": "main_target_ready",
+      "detail": "ready",
+      "status": "PASS"
+    },
+    {
+      "assertion": "persistent_loss_target_robustness",
+      "detail": "robustness",
+      "status": "PASS"
+    },
+    {
+      "assertion": "four_month_lag_active",
+      "detail": "4",
+      "status": "PASS"
+    },
+    {
+      "assertion": "six_month_method_historical_only",
+      "detail": "historical_only",
+      "status": "PASS"
+    },
+    {
+      "assertion": "rampna_audit_only_persian_present",
+      "detail": "persian_present",
+      "status": "PASS"
+    },
+    {
+      "assertion": "rampna_never_literal_ram_pna",
+      "detail": "absent",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3b_incomplete_nonblocking",
+      "detail": "nonblocking",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3b_completed_false_in_qc",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "stage125_completed_matches_gate",
+      "detail": "true",
+      "status": "PASS"
+    },
+    {
+      "assertion": "stage126_entry_ready_matches_gate",
+      "detail": "true",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part5_closure_completed_matches_gate",
+      "detail": "true",
+      "status": "PASS"
+    },
+    {
+      "assertion": "stage126_authorized_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "stage126_started_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "modeling_authorized_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "modeling_started_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_unlocked_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_predictor_inspection_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_analysis_ready_access_in_source",
+      "detail": "absent",
+      "status": "PASS"
+    },
+    {
+      "assertion": "sample_counts_match_part4_matrix_main_rule_a_primary",
+      "detail": "1012/119/80/932",
+      "status": "PASS"
+    },
+    {
+      "assertion": "sample_counts_match_part4_matrix_main_rule_b_listing_robustness",
+      "detail": "993/117/79/914",
+      "status": "PASS"
+    },
+    {
+      "assertion": "sample_counts_match_part4_matrix_expanded_rule_a_company_scope_robustness",
+      "detail": "1056/124/80/976",
+      "status": "PASS"
+    },
+    {
+      "assertion": "sample_counts_match_part4_matrix_expanded_rule_b_combined_robustness",
+      "detail": "1035/122/79/956",
+      "status": "PASS"
+    },
+    {
+      "assertion": "closure_outcome_matches_gate",
+      "detail": "READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION",
+      "status": "PASS"
+    },
+    {
+      "assertion": "gate_125_0_all_dimensions_pass",
+      "detail": "27/27",
+      "status": "PASS"
+    },
+    {
+      "assertion": "entry_boundary_independent_of_readiness",
+      "detail": "structural_only",
+      "status": "PASS"
+    },
+    {
+      "assertion": "entry_contract_readiness_derived_from_gate",
+      "detail": "READY_FOR_HUMAN_AUTHORIZATION_DECISION",
+      "status": "PASS"
+    },
+    {
+      "assertion": "cross_artifact_readiness_consistency",
+      "detail": "all_4_readiness_surfaces_consistent_ready",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m1_robustness_registry_six_categories_exact",
+      "detail": "6_exact",
+      "status": "PASS"
+    },
+    {
+      "assertion": "gate_125_0_has_27_dimensions",
+      "detail": "27",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_model_imports_in_source",
+      "detail": "enforced",
+      "status": "PASS"
+    },
+    {
+      "assertion": "network_requests_zero",
+      "detail": "0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "model_fit_calls_zero",
+      "detail": "0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "prediction_calls_zero",
+      "detail": "0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "shap_calls_zero",
+      "detail": "0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "forbidden_surfaces_absent",
+      "detail": "absent",
+      "status": "PASS"
+    },
+    {
+      "assertion": "deterministic_rebuild",
+      "detail": "stable",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reject_stage126_authorized_guard",
+      "detail": "rejected",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reject_modeling_started_guard",
+      "detail": "rejected",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reject_final_test_unlocked_guard",
+      "detail": "rejected",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reject_revenue_growth_keep_ready_guard",
+      "detail": "rejected",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reject_article141_model_ready_guard",
+      "detail": "rejected",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reject_m3_admitted_guard",
+      "detail": "rejected",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reject_final_test_year_change_guard",
+      "detail": "rejected",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reject_active_lag_change_guard",
+      "detail": "rejected",
+      "status": "PASS"
+    },
+    {
+      "assertion": "reject_next_research_pointer_guard",
+      "detail": "rejected",
+      "status": "PASS"
+    }
+  ],
+  "baseline_commit": "5836059e2d533f4be7e1898f942937a57c0b8fef",
+  "baseline_tree": "3c2de72270bc05afeabcd2f07088f71f886796a3",
+  "broad_codal_capture_stopped": true,
+  "candidate_value_evidence_collected": false,
+  "conservative_availability_lag_locked": true,
+  "conservative_six_month_lag_decision_locked": true,
+  "contract_version": "stage125_part5_readiness_closure_v1",
+  "current_stage": "Stage125",
+  "cut_a_available_at_operationalization_locked": true,
+  "data_value_extraction_performed": false,
+  "document_binding_resolution_decision_locked": true,
+  "endpoint_probe_evidence_collected": true,
+  "evidence_collected": true,
+  "failed_count": 0,
+  "final_test_accessed_for_modeling": false,
+  "final_test_unlocked": false,
+  "financial_data_researcher_verified_frozen": true,
+  "four_month_regulatory_lag_locked": true,
+  "frozen_part3c_input_sha256": {
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_a_stage125.csv": "fbe9b29c6323b59e830ca9d2dd8c1543b9ef48b21709b01cc56a3989cd2d64d9",
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_b_stage125.csv": "2e61a282165ccdaef37bac61a460c83878f2ae633b10535945cc33897d3b4c22",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv": "5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_a_stage125.csv": "23ff63d82bbc1a5a06536783eddfa5113ad988cb0db8c1c9adb004489da22bc9",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_b_stage125.csv": "56c80ccb0a8bcbb1c030e87c892190579628c298026c6140045cbaf08ff7135f",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv": "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv": "d2d9893e40b0c3bdf876a7447fc5147985fc25c9c5add07264677f6ed817b72c"
+  },
+  "frozen_part4_output_sha256": {
+    "project/src/stage125_part4_statistical_analysis_plan.py": "93c3ad3a438d7f596a79637f579509d9a60e24142aab66f407994ad057cfdd37",
+    "project/stage125/README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md": "e656fdf915f7dff89173b99c14c23a73f1f6664777b12e75c98e57ef388a65e8",
+    "project/stage125/README_STAGE125_PART4_STATISTICAL_ANALYSIS_PLAN.md": "b9d8a5354967e9c5dae863fd240cbca145fbc358c50c81967fa866b8babb01ac",
+    "project/stage125/part4_development_feature_coverage_audit_stage125.csv": "7c18da23265d1c544bd397686518cbc064f14f6deba45ecf1af8d55c21126703",
+    "project/stage125/part4_event_count_gate_stage125.csv": "e8432e1f6e3958b658affa05070b5161d36d95e98bc2041bef4b1143ac9f0d17",
+    "project/stage125/part4_feature_exclusion_decisions_stage125.csv": "f89125c99b6d6d4f4e5063b4276aa42e9a5b21933aa5e939bf65c7e76705291d",
+    "project/stage125/part4_feature_sets_stage125.csv": "79e87cbcef1a6aa70fa6e4b837c4634df9e1f701e25f42a87ac34012452b850f",
+    "project/stage125/part4_hyperparameter_budget_stage125.json": "22d6989681a7cd59ffbf57077910615ce00adb9f171d303d5d61100a54490b40",
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
+    "project/stage125/part4_model_specifications_stage125.json": "ef933be3eb2f75e6f493ac1401100c629bdb83850c81950d8f235c5ccf4cdb21",
+    "project/stage125/part4_preprocessing_contract_stage125.json": "3722bd6165574c78aef1138a810ff4863b5c214f80df197889eaa40163f0e415",
+    "project/stage125/part4_revenue_growth_exclusion_revision_decision_stage125.json": "f6104b2038224a2b76679ad5957fb012b9e413e979377efe80fb8f2b97369f4e",
+    "project/stage125/part4_sample_target_matrix_stage125.csv": "d7f026ecf0b3b2810eb95df5b912184c3b9f4e36031e9b366c00fd858b7c4792",
+    "project/stage125/part4_shap_stability_contract_stage125.json": "acd19339b8f998ba54c00f3cb32d5ca12d353619316ecab951b7d03f96ed5f8a",
+    "project/stage125/part4_statistical_analysis_plan_stage125.json": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
+    "project/stage125/part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
+    "project/stage125/part4_temporal_split_manifest_stage125.csv": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc",
+    "project/stage125/stage125_part4_statistical_analysis_plan_qc_report.json": "2b38bcaa87a43056da4e7a525cebf50037f2d7b31b251d34a22df1ae5918d24e",
+    "project/tests/test_stage125_part4_statistical_analysis_plan.py": "f78aae6e8e52f838a6da3106fa55b6a2a36fd0665877f6f4e3965902c344ced3"
+  },
+  "gate_125_0": {
+    "article141_descriptive_only": {
+      "detail": "descriptive_only",
+      "pass": true
+    },
+    "blocker_register_complete": {
+      "detail": "8 rows",
+      "pass": true
+    },
+    "contradiction_free_docs": {
+      "detail": "roadmap_and_readme_outcome_consistent_with_derived_closure",
+      "pass": true
+    },
+    "final_test_still_locked": {
+      "detail": "locked",
+      "pass": true
+    },
+    "financial_data_unchanged": {
+      "detail": "part3c_pinned_unchanged",
+      "pass": true
+    },
+    "four_month_lag_active": {
+      "detail": "4",
+      "pass": true
+    },
+    "keep_drop_decisions_complete": {
+      "detail": "24 rows",
+      "pass": true
+    },
+    "m1_ready": {
+      "detail": "9_features_ready",
+      "pass": true
+    },
+    "m2_deferred": {
+      "detail": "deferred",
+      "pass": true
+    },
+    "m3_not_admitted": {
+      "detail": "not_admitted",
+      "pass": true
+    },
+    "m4_deferred": {
+      "detail": "deferred",
+      "pass": true
+    },
+    "m5_removed": {
+      "detail": "removed",
+      "pass": true
+    },
+    "model_fit_calls_zero": {
+      "detail": "0",
+      "pass": true
+    },
+    "network_requests_zero": {
+      "detail": "0",
+      "pass": true
+    },
+    "part3c_hashes_unchanged": {
+      "detail": "8 unchanged",
+      "pass": true
+    },
+    "part4_hashes_unchanged": {
+      "detail": "17 outputs + src + test unchanged",
+      "pass": true
+    },
+    "part4_qc_all_pass": {
+      "detail": "70/0/true/sap_v2",
+      "pass": true
+    },
+    "prediction_calls_zero": {
+      "detail": "0",
+      "pass": true
+    },
+    "revenue_growth_audit_only": {
+      "detail": "audit_only_absent_from_model_surfaces",
+      "pass": true
+    },
+    "samples_unchanged": {
+      "detail": "4_sample_designs_match",
+      "pass": true
+    },
+    "shap_calls_zero": {
+      "detail": "0",
+      "pass": true
+    },
+    "six_month_method_historical_only": {
+      "detail": "superseded",
+      "pass": true
+    },
+    "stage126_entry_boundary_explicit": {
+      "detail": "structural_and_authorization_boundary_valid",
+      "pass": true
+    },
+    "stage126_false": {
+      "detail": "false_and_absent",
+      "pass": true
+    },
+    "targets_unchanged": {
+      "detail": "3_targets_present",
+      "pass": true
+    },
+    "valid_handoff": {
+      "detail": "actual_handoff_state_matches_derived_closure",
+      "pass": true
+    },
+    "working_tree_clean": {
+      "detail": "clean",
+      "pass": true
+    }
+  },
+  "historical_six_month_decision_active": false,
+  "historical_six_month_decision_retained": true,
+  "m2_data_collected": false,
+  "m3_admitted": false,
+  "m3_data_collected": false,
+  "m4_data_collected": false,
+  "model_fit_calls": 0,
+  "modeling_authorized": false,
+  "modeling_started": false,
+  "network_extraction_performed": true,
+  "network_requests_attempted": 0,
+  "output_sha256": {
+    "README_STAGE125_PART5_READINESS_CLOSURE.md": "a18932b695213fe64fbd1851def9c67bf8dbdc831fc2773914b1801040b6d405",
+    "part5_artifact_integrity_manifest_stage125.csv": "6e88be15f217e696d89b77134ba7ba472b959d9fb8441c603d71672484042eb7",
+    "part5_blocker_register_stage125.csv": "32e679ed513fcbdebf114bf88225a9251fb4793648655d7f044347fdf54a35d3",
+    "part5_keep_drop_decisions_stage125.csv": "bacb202cc3404b512e71740ed6c71bfaee8a0201fb941388e0a06f484323c718",
+    "part5_readiness_closure_report_stage125.json": "8d8ed8b31a8a6773fe8773f35f70fb397a59d66214b8d1521dba6f72b10d8795",
+    "part5_stage126_m1_entry_contract_stage125.json": "74a2159785daeda44fa82ebd76f42870fa25aba3667846bccba6b3099ea65da5"
+  },
+  "pair_level_evidence_collected": true,
+  "part3a_decision_locked": true,
+  "part3a_protocol_locked": true,
+  "part3b0_readiness": true,
+  "part3b1_decision_locked": true,
+  "part3b_completed": false,
+  "part3b_started": true,
+  "part3c_leakage_safe_finalization_completed": true,
+  "part4_contract_version": "stage125_part4_sap_v2",
+  "part4_qc_all_pass": true,
+  "part4_qc_assertion_count": 70,
+  "part4_qc_failed_count": 0,
+  "part4_statistical_analysis_plan_locked": true,
+  "pilot_cutoff_provenance_resolved": false,
+  "prediction_calls": 0,
+  "predictor_available_at_evidence_collected": false,
+  "predictor_document_binding_evidence_collected": true,
+  "predictor_document_binding_mini_pilot_completed": true,
+  "research_action_id": "stage125-part5-readiness-closure",
+  "research_pointers": {
+    "last_completed_research_action_id": "stage125-part5-readiness-closure",
+    "next_research_action_id": "stage126-m1-financial-baseline"
+  },
+  "row_level_publish_datetime_collection_required": false,
+  "shap_calls": 0,
+  "six_month_lag_superseded": true,
+  "source_commit": "e4c7d3bbee6fc3599884414c3723bc2b166e39c6",
+  "source_file_sha256": "99ab34996052b7a4f0cc93d2ee35b39c926240760ab471f613814c4846b872cc",
+  "stage": "stage125_part5_readiness_closure",
+  "stage125_completed": true,
+  "stage125_gate_125_0": "PASS",
+  "stage125_part5_readiness_closure_completed": true,
+  "stage126_authorized": false,
+  "stage126_m1_entry_ready": true,
+  "stage126_started": false,
+  "test_file_sha256": "3bbe6928428f8af3491622e842eef1c697f2cbc3e7d6653fd50e0bf4fca8eb01",
+  "ticker_count": 0,
+  "tickers": []
+}
