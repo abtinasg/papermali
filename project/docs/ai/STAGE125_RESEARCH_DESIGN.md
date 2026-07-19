@@ -19,6 +19,31 @@ Versioned methodological addendum (does not silently rewrite Part 0 history):
 - Originally operationalized under the Part 3B.1E six-month lag
   (historical; see Addendum B).
 
+### Addendum D — Part 5 Readiness Closure (2026-07-19)
+
+Versioned closure addendum (does not silently rewrite Part 0–4 history):
+
+- Stage125 Part 5 closes Stage125 research-design readiness under Gate 125.0.
+- Closure outcome:
+  `READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION`.
+- **Readiness is not authorization.** `stage126_m1_entry_ready=true` does
+  **not** set `stage126_authorized`, `modeling_authorized`, or unlock the
+  final test.
+- M1 primary (9 features) is ready for a future Stage126 authorization
+  decision; M1 target-proximity (6) remains registered robustness;
+  `revenue_growth_period_adjusted` remains audit-only rejected.
+- M2 deferred (nonblocking for M1); M3 not admitted; M4 deferred
+  (nonblocking for M1); M5 removed.
+- Article-141 remains descriptive-only (no comparative/inferential ranking).
+- Part 3B expansion remains `superseded_not_required_for_stage125_closure`
+  with `part3b_completed=false` (historical evidence unchanged).
+- Four-Jalali-month regulatory lag remains active; six-month method remains
+  historical only; final test 1400–1402 remains locked.
+- Stage126 M1 entry contract is recorded; Stage126 is **not** authorized and
+  was **not** started; modeling is **not** authorized and was **not** started.
+- Next research pointer: `stage126-m1-financial-baseline` (**future**;
+  blocked pending explicit human authorization; not started).
+
 ### Addendum C — Part 4 Statistical Analysis Plan (2026-07-19)
 
 Versioned methodological addendum (does not silently rewrite Part 0–3C history):
@@ -43,8 +68,8 @@ Versioned methodological addendum (does not silently rewrite Part 0–3C history
 - Final-test predictor values must not be inspected for admission, tuning,
   feature selection, or model comparison until Stage126 is authorized.
   Final-test event thresholds control claim eligibility only.
-- Stage125 remains incomplete; Stage126 and modeling remain unauthorized.
-- Next research action: `stage125-part5-readiness-closure`.
+- Historical next pointer after Part 4 was `stage125-part5-readiness-closure`
+  (completed; see Addendum D).
 
 ### Addendum B — Four-month regulatory lag revision (2026-07-19)
 
@@ -267,11 +292,15 @@ robustness check.
   and order; primary/robustness samples; temporal CV and locked final test;
   PR-AUC / Recall@K / Lift@K / calibration; paired bootstrap and Holm; seeds
   and finite tuning budget. **No** model fitting.
-- **Part 5 — Stage125 closure. (Next.)** Final readiness report; record all
-  keep/drop decisions; full validator + tests; open PR for review — merge only
-  with explicit user approval.
+- **Part 5 — Stage125 closure. (Completed on PR branch; merge requires human
+  approval.)** Final readiness report; keep/drop/defer register; blocker
+  register; Stage126 M1 entry contract (readiness only); integrity manifest;
+  Gate 125.0; full validator + tests. **No** Stage126 authorization or start;
+  **no** modeling.
 
-**Gate 125.0:** contradiction-free docs, valid Handoff, green tests, clean working tree.
+**Gate 125.0:** contradiction-free docs, valid Handoff, green tests, clean
+working tree, frozen Part 3C/Part 4 hashes, keep/drop complete, final test
+locked, Stage126 unauthorized.
 
 ## 8. Change-control principles
 

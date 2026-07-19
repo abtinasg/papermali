@@ -127,9 +127,32 @@ Research action `stage125-part4-statistical-analysis-plan`:
 - Article-141-only final-test event count on the primary sample is below 10
   positives → distributional/descriptive robustness only.
 - **Non-claims:** no model fitting; no prediction; no SHAP computation; no
-  final-test predictor inspection for admission/tuning; Stage125 incomplete;
-  Stage126 and modeling unauthorized. Next:
-  `stage125-part5-readiness-closure`.
+  final-test predictor inspection for admission/tuning; Stage125 incomplete
+  until Part 5; Stage126 and modeling unauthorized. Historical next after
+  Part 4: `stage125-part5-readiness-closure`.
+
+## Stage125 Part 5 — Readiness Closure (2026-07-19)
+
+Research action `stage125-part5-readiness-closure`:
+
+- Closes Stage125 under Gate 125.0 with outcome
+  `READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION`.
+- Distinguishes **ready for a future authorization decision** from
+  **authorized to execute modeling**.
+- Keep/drop/defer vocabulary locked; M1 primary 9 ready; M1 target-proximity
+  6 robustness; Revenue Growth audit-only; Article-141 descriptive-only;
+  M2 deferred; M3 not admitted; M4 deferred; M5 removed.
+- Part 3B expansion superseded/nonblocking (`part3b_completed` remains false).
+- Final test 1400–1402 remains locked; four-month lag active; six-month
+  historical only.
+- Stage126 M1 entry contract recorded with
+  `entry_readiness=READY_FOR_HUMAN_AUTHORIZATION_DECISION` and
+  `stage126_authorized=false`, `modeling_authorized=false`,
+  `final_test_unlocked=false`.
+- **Non-claims:** no model fitting; no prediction; no SHAP; no SMOTE
+  execution; no final-test predictor inspection; Stage126 not authorized and
+  not started. Next pointer `stage126-m1-financial-baseline` is **future /
+  blocked pending explicit human authorization / not started**.
 
 ## Stage125 Part 3C — Leakage-safe dataset finalization (2026-07-18)
 
