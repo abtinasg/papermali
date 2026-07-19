@@ -8,8 +8,10 @@ Two independent modes:
       repository. Fails (exit 1) on semantic drift. Key checks:
         * handoff_state.json parses;
         * generated_from_commit is an ancestor of HEAD;
-        * every commit between generated_from_commit and HEAD (merge commits
-          included) is Handoff-only;
+        * every ordinary commit between generated_from_commit and HEAD is
+          Handoff-only; at most one transparent GitHub-style merge commit may
+          be accepted, and only when it is exactly HEAD and satisfies the
+          strict tree/ancestry conditions in _is_transparent_head_merge;
         * the FULL non-volatile semantic projection equals the freshly computed
           state (so any tampered field — current_stage, current_batch, tickers,
           counts, commits, markers, fingerprint — is caught);
@@ -94,9 +96,60 @@ def _check_roadmap(root: str, errors: list[str]) -> None:
         )
 
 
+def _commit_parents(root: str, sha: str) -> list[str]:
+    """Return parent SHAs for ``sha`` (empty for a root commit)."""
+    return gen._commit_parents(root, sha)
+
+
+def _commit_tree(root: str, sha: str) -> str:
+    """Return the tree SHA for ``sha``."""
+    return gen._commit_tree(root, sha)
+
+
+def _is_transparent_head_merge(
+    root: str,
+    sha: str,
+    head: str,
+    generated_from_commit: str,
+    baseline_commit: str | None,
+) -> bool:
+    """True only for a single transparent GitHub-style merge at HEAD.
+
+    A merge is transparent only when every structural condition holds:
+      1. ``sha`` is exactly current HEAD;
+      2. it has exactly two parents;
+      3. ``generated_from_commit`` is an ancestor of the second parent;
+      4. the stored ``baseline_commit`` is an ancestor of the first parent;
+      5. the merge commit tree SHA equals the second-parent tree SHA;
+      6. ``diff(second_parent, merge)`` has zero changed paths
+         (no manual merge-resolution content).
+
+    Message/title wording is intentionally ignored.
+    """
+    if not sha or sha != head:
+        return False
+    if not generated_from_commit or not baseline_commit:
+        return False
+    parents = _commit_parents(root, sha)
+    if len(parents) != 2:
+        return False
+    first_parent, second_parent = parents[0], parents[1]
+    if not gen.is_ancestor(root, generated_from_commit, second_parent):
+        return False
+    if not gen.is_ancestor(root, baseline_commit, first_parent):
+        return False
+    if not gen._is_content_preserving_merge(root, sha):
+        return False
+    changed = gen._git(root, "diff", "--name-only", second_parent, sha)
+    if changed.strip():
+        return False
+    return True
+
+
 def _check_commit_anchors(root: str, state: dict, errors: list[str]) -> None:
     head = gen.head_commit(root)
     gfc = state.get("generated_from_commit")
+    baseline = state.get("baseline_commit")
     if not gfc:
         errors.append("handoff_state: missing generated_from_commit")
         return
@@ -106,14 +159,37 @@ def _check_commit_anchors(root: str, state: dict, errors: list[str]) -> None:
         )
         return
     if gfc != head:
-        # Every commit in (gfc, HEAD] — merge commits included — must be
-        # Handoff-only (inspected via files introduced vs the first parent).
+        # Ordinary commits in (gfc, HEAD] must stay Handoff-only. Exactly one
+        # transparent GitHub-style merge may be accepted, and only at HEAD.
+        # Any other merge commit (including a transparent-looking merge that is
+        # not HEAD, or a HEAD merge that fails the strict tree/ancestry gates)
+        # is rejected as non-transparent — even when its first-parent diff is
+        # Handoff-only.
+        transparent_merge_count = 0
         for sha in gen._git(root, "rev-list", f"{gfc}..{head}").splitlines():
+            parents = _commit_parents(root, sha)
+            if _is_transparent_head_merge(root, sha, head, gfc, baseline):
+                transparent_merge_count += 1
+                if transparent_merge_count > 1:
+                    errors.append(
+                        f"multiple transparent merge commits between "
+                        f"generated_from_commit and HEAD ({sha[:8]}) — "
+                        "regenerate the Handoff Package"
+                    )
+                continue
+            if len(parents) >= 2:
+                errors.append(
+                    f"non-transparent merge commit {sha[:8]} between "
+                    "generated_from_commit and HEAD — regenerate the "
+                    "Handoff Package"
+                )
+                continue
             files = gen._introduced_files(root, sha)
             if not gen._is_handoff_only(files):
                 errors.append(
-                    f"non-Handoff commit {sha[:8]} between generated_from_commit and "
-                    "HEAD — regenerate the Handoff Package"
+                    f"non-Handoff commit {sha[:8]} between "
+                    "generated_from_commit and HEAD — regenerate the "
+                    "Handoff Package"
                 )
 
 

@@ -9,18 +9,18 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 - **Stage / Batch:** Stage125 / None
 - **Active workstream:** `stage125_research_design_readiness`
-- **Last completed research action:** `stage125-part3b-conservative-lag-decision-lock`
-- **Next research action:** `stage125-part3c-leakage-safe-dataset-finalization`
-- **Last stage commit:** `e2d0970a1344ca6d2be06417a5e558707f6fde09`
-- **Generated from commit:** `1834216e1806130dba7140e3c2c379a73f4ea2b4` (branch `stage125-part3b1e-conservative-six-month-lag-decision-lock`, informational)
-- **Baseline:** `origin/main` @ `f1bc5eb770d883754078f15427dac45fe40a8c0b`
+- **Last completed research action:** `stage125-part3c-leakage-safe-dataset-finalization`
+- **Next research action:** `stage125-part4-statistical-analysis-plan`
+- **Last stage commit:** `53c8ea138ee9e4fba58686d213b2353d872c0d07`
+- **Generated from commit:** `fbd90ecda8b309914a29e75d4179d2f18e8d53de` (branch `stage125-part3c-leakage-safe-dataset-finalization`, informational)
+- **Baseline:** `origin/main` @ `93ab6d8f2c1fbddaaed4a9dc21de6490ef38de30`
 
 ## QC
 
-- ✅ **28 assertions, 0 failed**, all_pass=True
-- Scope: `stage125_part3b1e_conservative_six_month_lag_decision_lock`
-- Report: `project/stage125/stage125_part3b1e_conservative_lag_qc_report.json`
-- QC source commit (code): `b99a89840ded777628e2d9601647b732e5210776`
+- ✅ **50 assertions, 0 failed**, all_pass=True
+- Scope: `stage125_part3c_leakage_safe_dataset_finalization`
+- Report: `project/stage125/stage125_part3c_leakage_safe_dataset_qc_report.json`
+- QC source commit (code): `53c8ea138ee9e4fba58686d213b2353d872c0d07`
 
 ## Workflow markers
 
@@ -40,7 +40,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - evidence_collected: **True** (endpoint-probe scope when Part 3B active)
 - endpoint_probe_evidence_collected: **True**
 - candidate_value_evidence_collected: **False**
-- pair_level_evidence_collected: **False**
+- pair_level_evidence_collected: **True**
 - data_value_extraction_performed: **False**
 - accessibility_scoring_applied: **False**
 - part3b_completed: **False**
@@ -50,5 +50,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `58551fa1c56689c25804497f9e1567194c74fce5f01e025d0fb9bdc1d382a54e`_
-_generated_at_utc: 2026-07-18T15:59:39Z (informational)_
+_state_fingerprint: `9ac1c1fc65443e87d9ed6675f4d91bc5244575b7e512be65ef94f8eb94b7bca7`_
+_generated_at_utc: 2026-07-19T06:37:19Z (informational)_

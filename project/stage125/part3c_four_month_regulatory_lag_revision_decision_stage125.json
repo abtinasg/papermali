@@ -1,0 +1,30 @@
+{
+  "Stage126_authorized": false,
+  "active_assumed_availability_field": "assumed_available_at_regulatory",
+  "active_availability_method": "fixed_regulatory_lag",
+  "active_lag_calendar": "Jalali",
+  "active_lag_months": 4,
+  "assumed_available_at_formula": "fiscal_year_end_t + 4 Jalali calendar months",
+  "availability_date_semantics": "assumed_regulatory_deadline_not_observed_publication_timestamp",
+  "contract_version": "stage125_part3c_v3_four_month_regulatory_lag",
+  "decision_authority": "explicit_human_supervisor_approval",
+  "decision_id": "stage125-part3c-four-month-regulatory-lag-revision",
+  "decision_status": "active",
+  "feature_selection_authorized": false,
+  "financial_data_status": "researcher_verified_frozen",
+  "financial_value_reextraction_required": false,
+  "historical_six_month_decision_active": false,
+  "historical_six_month_decision_artifact": "project/stage125/part3b1e_conservative_lag_decision_lock_stage125.json",
+  "historical_six_month_decision_retained": true,
+  "modeling_authorized": false,
+  "no_ticker_specific_authorization": true,
+  "research_pointers": {
+    "last_completed_research_action_id": "stage125-part3c-leakage-safe-dataset-finalization",
+    "next_research_action_id": "stage125-part4-statistical-analysis-plan"
+  },
+  "row_level_publish_datetime_collection_required": false,
+  "scientific_rationale": "Annual audited financial statements are operationally assumed available four Jalali calendar months after fiscal-year-end. This is a methodological regulatory-deadline assumption. It is not the observed publication date of any specific company report.",
+  "supersedes_active_methodology": "fixed_conservative_six_month_lag",
+  "timing_eligibility_rule": "timing_eligible_for_analysis = assumed_available_at_regulatory < target_fiscal_year_end_t_plus_1; timing_eligible_for_model = timing_eligible_for_analysis",
+  "timing_exclusion_reason": "regulatory_lag_not_before_target_fiscal_year_end"
+}

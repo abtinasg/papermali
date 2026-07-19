@@ -1,0 +1,48 @@
+{
+  "active_availability_lag_months": 4,
+  "active_availability_method": "fixed_regulatory_lag",
+  "baseline_commit": "93ab6d8f2c1fbddaaed4a9dc21de6490ef38de30",
+  "broad_codal_capture_stopped": true,
+  "bulky_output_sha256": {
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_a_stage125.csv": "fbe9b29c6323b59e830ca9d2dd8c1543b9ef48b21709b01cc56a3989cd2d64d9",
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_b_stage125.csv": "2e61a282165ccdaef37bac61a460c83878f2ae633b10535945cc33897d3b4c22",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv": "5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_a_stage125.csv": "23ff63d82bbc1a5a06536783eddfa5113ad988cb0db8c1c9adb004489da22bc9",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_b_stage125.csv": "56c80ccb0a8bcbb1c030e87c892190579628c298026c6140045cbaf08ff7135f",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv": "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv": "d2d9893e40b0c3bdf876a7447fc5147985fc25c9c5add07264677f6ed817b72c"
+  },
+  "code_commit": "53c8ea138ee9e4fba58686d213b2353d872c0d07",
+  "current_stage": "Stage125",
+  "description": "Stage125 Part 3C audited-pair + timing-eligible analysis-ready dataset finalization (four-month Jalali regulatory lag; frozen Gate B samples; offline).",
+  "financial_data_researcher_verified_frozen": true,
+  "four_month_regulatory_lag_locked": true,
+  "generated_at": "53c8ea138ee9e4fba58686d213b2353d872c0d07",
+  "historical_six_month_decision_retained": true,
+  "modeling_started": false,
+  "network_requests_attempted": 0,
+  "output_files_sha256": {
+    "README_STAGE125_PART3C_FOUR_MONTH_LAG_REVISION.md": "d2f7e5cb28a690a99558d263cfdb6a3f358bcbc8005b59d6e38e1113ad0b1e4e",
+    "README_STAGE125_PART3C_LEAKAGE_SAFE_DATASET.md": "4fb0faf38e3aa44d45cc3825384cf1184f88424319c3498eb22da95bafd41d8b",
+    "part3c_column_role_map_stage125.csv": "c06d5ceb7dc0b63bccbadc9e95a59bc04d30e8a2b3c97e76111bd989c89b5fc2",
+    "part3c_four_month_regulatory_lag_revision_decision_stage125.json": "dd223fe54c5f3e4ca94de44d61188213d7f1456948e7bae2211a1ee997c7800e",
+    "part3c_input_hash_manifest_stage125.json": "ed91b8d4b620748c2363988026aa7eccfcb3e7b0970dcb697bc1c83ab6758035",
+    "part3c_leakage_audit_stage125.csv": "1697f4823545cde504e235d5dd3e38a1e458b8b21aa21b0709193b92794e545f",
+    "part3c_leakage_safe_dataset_contract_stage125.json": "f294454602c3fac83e191319bfe3354c3f601326396092f228db17eb08649839",
+    "part3c_sample_summary_stage125.csv": "c203ed3f31a796b769d96e586d45b9b14ab1f73a74bffdfbfcf2d975f2e512bc",
+    "part3c_target_year_distribution_stage125.csv": "d9f4a9e30bd2a94284bc01bb4dd44cf3e1c0b325c748110bcfe1acd9183677eb",
+    "stage125_part3c_leakage_safe_dataset_qc_report.json": "a9e9d81756aff3b79170f39d561b4bda3875b23b67da12d03f2a314252e5ccad"
+  },
+  "part3b_completed": false,
+  "part3c_leakage_safe_finalization_completed": true,
+  "research_pointers": {
+    "last_completed_research_action_id": "stage125-part3c-leakage-safe-dataset-finalization",
+    "next_research_action_id": "stage125-part4-statistical-analysis-plan"
+  },
+  "six_month_lag_superseded": true,
+  "source_file_sha256": "b0366b78daf08e6551ef97279ce8c6627b4bdf428e7202c50c6ba32826bfcdcb",
+  "stage": "stage125_part3c_leakage_safe_dataset_finalization",
+  "stage126_started": false,
+  "test_file_sha256": "190997188020278b262ce02a07bd18c4f4e7353434d3440a4f85a6539b1ef229"
+}

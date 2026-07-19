@@ -426,7 +426,7 @@
     "project/stage125/stage125_part3b1_decision_lock_qc_report.json": "425b9bf2948ae3cbe46c5fec63bb38e959b0ee6a5f76801bf1c1875cc1ff69a1",
     "project/stage125/stage125_part3b_evidence_capture_qc_report.json": "c683375f3afe8c2d1a757898122e601f36c145be2b8c69be7ba9b4b781b0f92d"
   },
-  "generated_at": "2026-07-18T19:18:08+03:30",
+  "generated_at": "2026-07-18T22:59:04+03:30",
   "maintenance_task_id": "stage125-part3b1a-cut-a-available-at-operationalization-lock",
   "modeling_started": false,
   "network_extraction_performed": true,
@@ -452,12 +452,12 @@
     "last_completed_research_action_id": "stage125-part3a-decision-lock",
     "next_research_action_id": "stage125-part3b-evidence-capture"
   },
-  "source_commit": "c084db2092bcd0d9c2d825b0cc6d8d20a7275ff1",
+  "source_commit": "22c9ed4f566e8aaa892048882a757680dd80a22c",
   "source_file_sha256": "199e0fcb27f136c0a5e30ff4ce2f88ac88fc10498805e952b1a7f7b5f4952b4f",
   "stage": "stage125_part3b1a_cut_a_available_at_operationalization_lock",
   "stage126_started": false,
   "synthetic_validation_only": true,
-  "test_file_sha256": "7e3318ae59309a3daae20a6b10f9c444c48573b4ac3c16fd0a9061b404197894",
+  "test_file_sha256": "06ffac8b5a4e084341cd41ba26c45586dbca6424d3acd23cd488398f5cf25608",
   "ticker_count": 26,
   "tickers": [
     "اردستان",

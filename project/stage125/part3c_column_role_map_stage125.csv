@@ -1,0 +1,116 @@
+column_name,role,admission_status,enters_model_feature_matrix,notes
+FD_target_article141_only,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+FD_target_main,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+FD_target_persistent_loss_robustness,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+distressed_flag_source_reviewed,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+distressed_target_reviewed,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+equity_negative_dummy,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+fd_accumulated_loss,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+fd_article141_direct,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+fd_negative_equity,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+fd_ocf_high_leverage,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+loss_dummy,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+positive_target_reasons,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+target_missing_reason,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+target_status_reviewed,forbidden_from_model_matrix,,false,target-derived / pending Part 4 decision; never feature matrix
+company_name,identifier,,false,
+fiscal_year_t,identifier,,false,
+industry,identifier,,false,
+predictor_row_key_t,identifier,,false,
+row_key_predictor,identifier,,false,
+sample_design,identifier,,false,
+target_row_key_t_plus_1,identifier,,false,
+target_year,identifier,,false,
+ticker,identifier,,false,
+unit,identifier,,false,
+accumulated_loss,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+accumulated_loss_to_capital_ratio,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+asset_turnover_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+current_assets,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+current_liabilities,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+current_ratio,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+debt_to_equity,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+equity,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+equity_ratio,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+financial_expense_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+financial_expense_to_assets_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+financial_expense_to_revenue_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+gross_margin_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+gross_profit_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+leverage_ratio,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+net_income_growth_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+net_income_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+net_margin_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+ocf_to_assets_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+operating_cash_flow_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+operating_margin_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+operating_profit_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+profit_margin_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+registered_capital,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+revenue_growth_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+revenue_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+roa_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+roe_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+sales_growth_period_adjusted,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+total_assets,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+total_liabilities,predictor_candidate,pending_part4_statistical_analysis_plan,false,candidate inventory only; pending Part 4 SAP
+source_file,provenance_audit,,false,
+source_url,provenance_audit,,false,
+target_row_fiscal_year,provenance_audit,,false,target-row identity join audit
+target_row_key_matched,provenance_audit,,false,target-row identity join audit
+target_row_ticker,provenance_audit,,false,target-row identity join audit
+audit_status_clean,sample_eligibility_audit,,false,predictor-year eligibility audit
+data_quality_flag,sample_eligibility_audit,,false,predictor-year eligibility audit
+eligible_accounting_quality,sample_eligibility_audit,,false,predictor-year eligibility audit
+eligible_annual_period,sample_eligibility_audit,,false,predictor-year eligibility audit
+eligible_company_expanded,sample_eligibility_audit,,false,predictor-year eligibility audit
+eligible_company_main,sample_eligibility_audit,,false,predictor-year eligibility audit
+eligible_listing,sample_eligibility_audit,,false,predictor-year eligibility audit
+eligible_source_quality,sample_eligibility_audit,,false,predictor-year eligibility audit
+eligible_statement_type,sample_eligibility_audit,,false,predictor-year eligibility audit
+eligible_target,sample_eligibility_audit,,false,predictor-year eligibility audit
+exclusion_flag,sample_eligibility_audit,,false,predictor-year eligibility audit
+gross_profit_resolution_status,sample_eligibility_audit,,false,predictor-year eligibility audit
+manual_review_required_clean,sample_eligibility_audit,,false,predictor-year eligibility audit
+model_exclusion_reason_expanded,sample_eligibility_audit,,false,predictor-year eligibility audit
+model_exclusion_reason_main,sample_eligibility_audit,,false,predictor-year eligibility audit
+non_12_month_period_flag,sample_eligibility_audit,,false,predictor-year eligibility audit
+ocf_resolution_status,sample_eligibility_audit,,false,predictor-year eligibility audit
+pair_exclusion_reason_expanded,sample_eligibility_audit,,false,Gate B eligibility audit only
+pair_exclusion_reason_expanded_gate_b_primary,sample_eligibility_audit,,false,Gate B eligibility audit only
+pair_exclusion_reason_expanded_gate_b_robustness,sample_eligibility_audit,,false,Gate B eligibility audit only
+pair_exclusion_reason_main,sample_eligibility_audit,,false,Gate B eligibility audit only
+pair_exclusion_reason_main_gate_b_primary,sample_eligibility_audit,,false,Gate B eligibility audit only
+pair_exclusion_reason_main_gate_b_robustness,sample_eligibility_audit,,false,Gate B eligibility audit only
+pair_final_eligible_expanded,sample_eligibility_audit,,false,Gate B eligibility audit only
+pair_final_eligible_expanded_gate_b_primary,sample_eligibility_audit,,false,Gate B eligibility audit only
+pair_final_eligible_expanded_gate_b_robustness,sample_eligibility_audit,,false,Gate B eligibility audit only
+pair_final_eligible_main,sample_eligibility_audit,,false,Gate B eligibility audit only
+pair_final_eligible_main_gate_b_primary,sample_eligibility_audit,,false,Gate B eligibility audit only
+pair_final_eligible_main_gate_b_robustness,sample_eligibility_audit,,false,Gate B eligibility audit only
+predictor_eligible_expanded,sample_eligibility_audit,,false,predictor-year eligibility audit
+predictor_eligible_expanded_t,sample_eligibility_audit,,false,Gate B eligibility audit only
+predictor_eligible_main,sample_eligibility_audit,,false,predictor-year eligibility audit
+predictor_eligible_main_t,sample_eligibility_audit,,false,Gate B eligibility audit only
+statement_scope_display_fa,sample_eligibility_audit,,false,predictor-year eligibility audit
+statement_scope_status,sample_eligibility_audit,,false,predictor-year eligibility audit
+usable_for_model_flag,sample_eligibility_audit,,false,predictor-year eligibility audit
+valid_target_t_plus_1,sample_eligibility_audit,,false,Gate B eligibility audit only
+FD_target_article141_only_t_plus_1,target,,false,copied from frozen Gate B pair; not recomputed
+FD_target_main_t_plus_1,target,,false,copied from frozen Gate B pair; not recomputed
+FD_target_persistent_loss_robustness_t_plus_1,target,,false,copied from frozen Gate B pair; not recomputed
+assumed_available_at_regulatory_gregorian,timing_assumption,,false,methodological; not observed publication
+assumed_available_at_regulatory_jalali,timing_assumption,,false,methodological; not observed publication
+availability_date_semantics,timing_assumption,,false,methodological; not observed publication
+availability_method,timing_assumption,,false,methodological; not observed publication
+fiscal_year_end_t_gregorian,timing_assumption,,false,methodological; not observed publication
+fiscal_year_end_t_jalali,timing_assumption,,false,methodological; not observed publication
+is_observed_publication_timestamp,timing_assumption,,false,methodological; not observed publication
+regulatory_lag_months,timing_assumption,,false,methodological; not observed publication
+target_fiscal_year_end_t_plus_1_gregorian,timing_assumption,,false,methodological; not observed publication
+target_fiscal_year_end_t_plus_1_jalali,timing_assumption,,false,methodological; not observed publication
+assumed_before_target_fiscal_year_end,timing_eligibility_audit,,false,audit/eligibility only; never predictor feature matrix
+timing_eligible_for_analysis,timing_eligibility_audit,,false,audit/eligibility only; never predictor feature matrix
+timing_eligible_for_model,timing_eligibility_audit,,false,audit/eligibility only; never predictor feature matrix
+timing_exclusion_reason,timing_eligibility_audit,,false,audit/eligibility only; never predictor feature matrix
+timing_relation_violation,timing_eligibility_audit,,false,audit/eligibility only; never predictor feature matrix

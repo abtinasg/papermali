@@ -115,6 +115,10 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part3b1e_conservative_lag_decision.py",
     "project/run_stage125_part3b1e.py",
     "project/tests/test_stage125_part3b1e_conservative_lag_decision.py",
+    # Stage125 Part 3C code, runner, and tests.
+    "project/src/stage125_part3c_leakage_safe_dataset_finalization.py",
+    "project/run_stage125_part3c.py",
+    "project/tests/test_stage125_part3c_leakage_safe_dataset_finalization.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
@@ -278,6 +282,18 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/part3b1e_frozen_financial_data_manifest_stage125.json",
     "project/stage125/stage125_part3b1e_conservative_lag_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part3b1e.json",
+    # Stage125 Part 3C generated leakage-safe dataset artifacts.
+    "project/stage125/README_STAGE125_PART3C_LEAKAGE_SAFE_DATASET.md",
+    "project/stage125/part3c_leakage_safe_dataset_contract_stage125.json",
+    "project/stage125/part3c_four_month_regulatory_lag_revision_decision_stage125.json",
+    "project/stage125/README_STAGE125_PART3C_FOUR_MONTH_LAG_REVISION.md",
+    "project/stage125/part3c_input_hash_manifest_stage125.json",
+    "project/stage125/part3c_column_role_map_stage125.csv",
+    "project/stage125/part3c_sample_summary_stage125.csv",
+    "project/stage125/part3c_target_year_distribution_stage125.csv",
+    "project/stage125/part3c_leakage_audit_stage125.csv",
+    "project/stage125/stage125_part3c_leakage_safe_dataset_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3c.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -478,6 +494,40 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "network_extraction_performed",
         "modeling_started",
     ),
+    "stage125_part3c_leakage_safe_dataset_finalization": (
+        "part3a_protocol_locked",
+        "part3a_decision_locked",
+        "part3b0_readiness",
+        "part3b_started",
+        "part3b1_decision_locked",
+        "cut_a_available_at_operationalization_locked",
+        "predictor_document_binding_mini_pilot_completed",
+        "predictor_document_binding_evidence_collected",
+        "document_binding_resolution_decision_locked",
+        "conservative_six_month_lag_decision_locked",
+        "broad_codal_capture_stopped",
+        "financial_data_researcher_verified_frozen",
+        "conservative_availability_lag_locked",
+        "row_level_publish_datetime_collection_required",
+        "active_availability_method",
+        "active_availability_lag_months",
+        "four_month_regulatory_lag_locked",
+        "six_month_lag_superseded",
+        "historical_six_month_decision_retained",
+        "historical_six_month_decision_active",
+        "predictor_available_at_evidence_collected",
+        "pilot_cutoff_provenance_resolved",
+        "evidence_collected",
+        "endpoint_probe_evidence_collected",
+        "candidate_value_evidence_collected",
+        "pair_level_evidence_collected",
+        "data_value_extraction_performed",
+        "accessibility_scoring_applied",
+        "part3b_completed",
+        "part3c_leakage_safe_finalization_completed",
+        "network_extraction_performed",
+        "modeling_started",
+    ),
 }
 
 
@@ -524,13 +574,36 @@ def is_ancestor(root: str, ancestor: str, descendant: str) -> bool:
     return proc.returncode == 0
 
 
+def _commit_parents(root: str, sha: str) -> list[str]:
+    """Return parent SHAs for ``sha`` (empty for a root commit)."""
+    parts = _git(root, "rev-list", "--parents", "-n", "1", sha).split()
+    return parts[1:]
+
+
+def _commit_tree(root: str, sha: str) -> str:
+    """Return the tree SHA for ``sha``."""
+    return _git(root, "rev-parse", f"{sha}^{{tree}}")
+
+
+def _is_content_preserving_merge(root: str, sha: str) -> bool:
+    """True when ``sha`` is a two-parent merge whose tree equals parent 2.
+
+    Such merges introduce no unique tree content of their own (typical clean
+    GitHub --no-ff merges). They must not become ``last_stage_commit``.
+    """
+    parents = _commit_parents(root, sha)
+    if len(parents) != 2:
+        return False
+    return _commit_tree(root, sha) == _commit_tree(root, parents[1])
+
+
 def _introduced_files(root: str, sha: str) -> list[str]:
     """Files a commit introduced relative to its first parent.
 
     Works for merge commits too (diff against the first parent shows what the
     merge brought in). The root commit (no parent) lists all its files.
     """
-    parents = _git(root, "rev-list", "--parents", "-n", "1", sha).split()[1:]
+    parents = _commit_parents(root, sha)
     if not parents:
         out = _git(root, "show", "--no-renames", "--name-only", "--format=", sha)
     else:
@@ -639,6 +712,11 @@ def last_stage_commit(root: str) -> str:
     needs to be real content.
     """
     for sha in _git(root, "rev-list", "HEAD").splitlines():
+        # Clean GitHub-style merges replay second-parent trees; the real
+        # content commits already exist on that parent and must remain the
+        # stage anchor (otherwise post-merge last_stage_commit drifts).
+        if _is_content_preserving_merge(root, sha):
+            continue
         files = _introduced_files(root, sha)
         if _is_stage_relevant(files):
             return sha
@@ -725,6 +803,10 @@ _QC_SOURCE_TEST_OVERRIDES: dict[str, tuple[str, str]] = {
     "stage125_part3b1e_conservative_six_month_lag_decision_lock": (
         "project/src/stage125_part3b1e_conservative_lag_decision.py",
         "project/tests/test_stage125_part3b1e_conservative_lag_decision.py",
+    ),
+    "stage125_part3c_leakage_safe_dataset_finalization": (
+        "project/src/stage125_part3c_leakage_safe_dataset_finalization.py",
+        "project/tests/test_stage125_part3c_leakage_safe_dataset_finalization.py",
     ),
 }
 

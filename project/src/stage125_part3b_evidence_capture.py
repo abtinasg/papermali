@@ -210,6 +210,30 @@ PART3B1E_AUTHORIZED_EXACT = frozenset({
     "project/stage125/metadata_and_hashes_stage125_part3b1e.json",
 })
 
+PART3C_SRC_REL = (
+    "project/src/stage125_part3c_leakage_safe_dataset_finalization.py"
+)
+PART3C_TEST_REL = (
+    "project/tests/test_stage125_part3c_leakage_safe_dataset_finalization.py"
+)
+PART3C_RUN_REL = "project/run_stage125_part3c.py"
+PART3C_AUTHORIZED_EXACT = frozenset({
+    PART3C_SRC_REL,
+    PART3C_TEST_REL,
+    PART3C_RUN_REL,
+    "project/stage125/README_STAGE125_PART3C_LEAKAGE_SAFE_DATASET.md",
+    "project/stage125/README_STAGE125_PART3C_FOUR_MONTH_LAG_REVISION.md",
+    "project/stage125/part3c_leakage_safe_dataset_contract_stage125.json",
+    "project/stage125/part3c_four_month_regulatory_lag_revision_decision_stage125.json",
+    "project/stage125/part3c_input_hash_manifest_stage125.json",
+    "project/stage125/part3c_column_role_map_stage125.csv",
+    "project/stage125/part3c_sample_summary_stage125.csv",
+    "project/stage125/part3c_target_year_distribution_stage125.csv",
+    "project/stage125/part3c_leakage_audit_stage125.csv",
+    "project/stage125/stage125_part3c_leakage_safe_dataset_qc_report.json",
+    "project/stage125/metadata_and_hashes_stage125_part3c.json",
+})
+
 PART3B_AUTHORIZED_EXACT = frozenset({
     SRC_REL, TEST_REL, RUN_REL,
     f"project/stage125/{F_AUTH}", f"project/stage125/{F_PLAN}",
@@ -221,7 +245,7 @@ PART3B_AUTHORIZED_EXACT = frozenset({
     f"project/stage125/{F_README}", f"project/stage125/{F_QC}",
     f"project/stage125/{F_METADATA}", f"project/stage125/{F_NETWORK_LOG}",
     f"project/stage125/{F_DECISION_REQ}", f"project/stage125/{F_DECISION_REQ_MD}",
-}) | PART3B1_AUTHORIZED_EXACT | PART3B1A_AUTHORIZED_EXACT | PART3B1B_AUTHORIZED_EXACT | PART3B1C_AUTHORIZED_EXACT | PART3B1E_AUTHORIZED_EXACT
+}) | PART3B1_AUTHORIZED_EXACT | PART3B1A_AUTHORIZED_EXACT | PART3B1B_AUTHORIZED_EXACT | PART3B1C_AUTHORIZED_EXACT | PART3B1E_AUTHORIZED_EXACT | PART3C_AUTHORIZED_EXACT
 
 
 ENDPOINT_HEADER = [

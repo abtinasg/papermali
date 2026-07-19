@@ -11,6 +11,36 @@
 **Decision-lock date:** 2026-07-13
 **Status:** Authoritative research contract from the start of Stage125.
 
+### Addendum A — Part 3C leakage-safe finalization (2026-07-18)
+
+Versioned methodological addendum (does not silently rewrite Part 0 history):
+
+- Part 3B broad CODAL expansion is **superseded**.
+- Originally operationalized under the Part 3B.1E six-month lag
+  (historical; see Addendum B).
+
+### Addendum B — Four-month regulatory lag revision (2026-07-19)
+
+Explicit human-approved revision of the active availability specification:
+
+- Active lag is **four Jalali calendar months**
+  (`fixed_regulatory_lag` / `assumed_available_at_regulatory`).
+- Six-month active methodology is **superseded**; Part 3B.1E six-month
+  decision artifacts remain **historical**.
+- Part 3C leakage-safe dataset finalization is **completed** for all four
+  locked Gate B sample designs under the four-month rule.
+- Full Gate B membership is preserved on the **audited pair** surface;
+  leakage-safe **analysis-ready** outputs include only rows where
+  `assumed_available_at_regulatory < target_fiscal_year_end_t_plus_1`
+  (general rule; `رمپنا|1396` → `رمپنا|1397` remains audit-only).
+- Financial data remain researcher-verified and frozen (no re-extraction).
+- The four-month date is a regulatory/methodological assumption — **not**
+  an observed publication-time claim.
+- Part 3C does **not** approve model features; Part 4 locks the feature
+  surface.
+- Stage125 remains incomplete; Stage126 and modeling remain unauthorized.
+- Next research action: `stage125-part4-statistical-analysis-plan`.
+
 ## 0. Scope of this Part (Part 0)
 
 Part 0 is a **documentation-only decision lock**. It performs **no** data
@@ -197,14 +227,16 @@ robustness check.
   `pilot_option_event_enriched` selection (80 pairs; event-enriched; not
   population-representative; not modeling sample). **No** evidence, **no**
   scores applied. `part3a_decision_locked=true`; `part3b_started=false`.
-- **Part 3B — Evidence capture & accessibility scoring. (Not started.)** Small
-  representative pilot for M2–M4 sources; per-variable accessibility/quality
-  scoring; coverage on company-year and common sample; positive/negative counts
-  in proposed temporal splits; drop every Gate-failing variable; **no** final
-  model.
-- **Part 3 (umbrella) — Accessibility, coverage & event pilot.** Parts 3A + 3B
-  together; Part 3A must complete before Part 3B starts.
-- **Part 4 — Statistical analysis plan.** Lock M1–M4 definitions and order; lock
+- **Part 3B — Evidence capture & accessibility scoring. (Superseded for
+  expansion.)** Origin probes / five-row CODAL metadata history retained;
+  broad CODAL expansion stopped by Part 3B.1E conservative-lag decision.
+- **Part 3C — Leakage-safe dataset finalization. (Completed.)** Four Gate B
+  designs preserved; active four-Jalali-month `assumed_available_at_regulatory`
+  operationalized (six-month methodology superseded); candidate inventory
+  only; column-role map + leakage audit; **no** feature approval / modeling.
+- **Part 3 (umbrella) — Accessibility, coverage & event pilot.** Parts 3A–3C;
+  Part 3B expansion path superseded by conservative lag + Part 3C.
+- **Part 4 — Statistical analysis plan. (Next.)** Lock M1–M4 definitions and order; lock
   primary/robustness samples and the common-sample rule; lock temporal CV and the
   locked final test; lock PR-AUC / Recall@K / Lift@K / calibration; define paired
   uncertainty/bootstrap and multiplicity control; set seeds and tuning budget.

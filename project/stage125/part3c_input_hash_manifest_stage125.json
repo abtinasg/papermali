@@ -1,0 +1,24 @@
+{
+  "active_availability_method": "fixed_regulatory_lag",
+  "active_lag_months": 4,
+  "bulky_inputs_sha256": {
+    "project/stage123/modeling_all_rows_stage123.csv": "28b9f9d4185617182c0fe06299deeb0e9a092558b8849f1dfdef7072261bc390",
+    "project/stage124/gate_b_final/modeling_expanded_rule_a_eligible.csv": "b2f950b5a6a5a79f6b0fd8019e9021079339b6c80290695bb18d0e4a56b7d8e6",
+    "project/stage124/gate_b_final/modeling_expanded_rule_b_eligible.csv": "0aac404c2a856af8785f79361d22b42abfbe5898a983985d003c051c4ca43a12",
+    "project/stage124/gate_b_final/modeling_main_rule_a_eligible.csv": "f943d5cfd2a3dcaa091eacbac5e305fdad83787548a6e43b50976f1455664420",
+    "project/stage124/gate_b_final/modeling_main_rule_b_eligible.csv": "99bdf0296a274f2ad42a6e9942a42d79b6370c7b99b57967b44c6821313f36c1",
+    "project/stage124/gate_b_final/modeling_one_year_ahead_stage124_gate_b.csv": "9743c49337c66a3699bce34dfd02a151e34f48f0717f225ad487fe1487031d05"
+  },
+  "description": "SHA-256 pins for local bulky Gate B / Stage123 inputs, the historical Part 3B.1E decision lock / frozen-data manifest, and the active four-month regulatory-lag revision decision.",
+  "financial_value_reextraction_required": false,
+  "four_month_revision_sha256": {
+    "project/stage125/README_STAGE125_PART3C_FOUR_MONTH_LAG_REVISION.md": "d2f7e5cb28a690a99558d263cfdb6a3f358bcbc8005b59d6e38e1113ad0b1e4e",
+    "project/stage125/part3c_four_month_regulatory_lag_revision_decision_stage125.json": "dd223fe54c5f3e4ca94de44d61188213d7f1456948e7bae2211a1ee997c7800e"
+  },
+  "immutability_rule": "before/after SHA-256 equality required; mismatch is QC failure",
+  "manifest_version": "stage125_part3c_v3_four_month_regulatory_lag",
+  "part3b1e_tracked_locks_sha256": {
+    "project/stage125/part3b1e_conservative_lag_decision_lock_stage125.json": "07c8ba503116f8b0b18b1c349dfe590e7a9568a9a02b377af34a11754494f664",
+    "project/stage125/part3b1e_frozen_financial_data_manifest_stage125.json": "78406e04afa5eddc8876dbe5f0fb3e1883afcc2b03072e9e7d70bd6e75a3536b"
+  }
+}

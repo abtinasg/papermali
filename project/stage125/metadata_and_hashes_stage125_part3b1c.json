@@ -1,26 +1,26 @@
 {
   "baseline_commit": "99def5b4c15a41ca80729d873032d8c5c81ec672",
-  "code_commit": "e2d0970a1344ca6d2be06417a5e558707f6fde09",
+  "code_commit": "e509a32a6c94f02d630a134e4eb34963365462bf",
   "current_stage": "Stage125",
   "description": "Stage125 Part 3B.1C document-binding resolution decision lock (offline taxonomy/normalization/hierarchy/proposal only).",
   "document_binding_resolution_decision_locked": true,
-  "generated_at": "e2d0970a1344ca6d2be06417a5e558707f6fde09",
+  "generated_at": "e509a32a6c94f02d630a134e4eb34963365462bf",
   "modeling_started": false,
   "network_requests_attempted": 0,
   "output_files_sha256": {
     "README_STAGE125_PART3B1C_DOCUMENT_BINDING_RESOLUTION.md": "2fafe9c39fbb73a6886d1997114dc894ac6fd9dca157f5507ce599e3f0203a63",
     "part3b1c_binding_failure_taxonomy_stage125.csv": "63ae6073a5eb929f49e21caa41dc4e297439e7923df66ff772ad9ac70851e81d",
-    "part3b1c_document_binding_resolution_decision_lock_stage125.json": "eb390ac9085d856ac0b6c4b27be7f5ff86cbd62202f5b88775c7c6e54376042f",
+    "part3b1c_document_binding_resolution_decision_lock_stage125.json": "a783a25ea25b9db73db40a3c397f67424155cd1cae80f306443daf04a347ef8b",
     "part3b1c_exact_document_evidence_hierarchy_stage125.json": "efcbfd397c661d048572bd98a66186ee0758b7ea5b1a59df97da98a791a459f0",
     "part3b1c_identity_normalization_contract_stage125.json": "3bc3378fccf6bb56092633cd174d3adf80e88eec489b1e41bd6e0fe474093284",
     "part3b1c_proposed_capture_authorization_stage125.json": "c97b17669c44969eb1fdc567e9c81f8b9de7b36ad3f63dc5ee6613f7bda17d78",
     "part3b1c_row_resolution_requirements_stage125.csv": "ebb83df39c45598abd239cab60c519061c0742062602e71058f82bacced3ff4d",
     "part3b1c_scale_up_readiness_decision_stage125.json": "ee49e9e844d2276009ce1db0daf38a39e0f40b169ada1c4e08ef9ae8546520cd",
-    "stage125_part3b1c_document_binding_resolution_qc_report.json": "647de20d25e440a1eefe67b41eacb1f413921f9079322f55568bda4cb074f257"
+    "stage125_part3b1c_document_binding_resolution_qc_report.json": "f6d5f056200d7a2d2a38e56160a27ae8e1d6ed19da727007992aca8de18a2417"
   },
   "part3b_completed": false,
   "scale_up_to_80_rows_authorized": false,
-  "source_file_sha256": "f201435ea8bb7ed24eebf7aeb616c530fd918a11a66195c7b0368e746aa33038",
+  "source_file_sha256": "1547bd6d41cabfb08b8da5c8f49bce221a0bedbcac5346de40750501d8def952",
   "stage": "stage125_part3b1c_document_binding_resolution_decision_lock",
   "test_file_sha256": "d5fac3284b290de437c623fa2af023dee973b1018a420213b5578d5ba513e677"
 }

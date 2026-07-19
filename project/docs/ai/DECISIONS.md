@@ -99,26 +99,76 @@ The research contract for the paper is frozen in
   test requires an explicit research decision and a new version of that contract.
 - **Stage122–Stage124 files are not rewritten or redefined during Stage125.**
 
+## Stage125 Part 3C — Leakage-safe dataset finalization (2026-07-18)
+
+Research action `stage125-part3c-leakage-safe-dataset-finalization`:
+
+- Operationalizes the Part 3B.1E locked six-month **Jalali** calendar lag for
+  all four frozen Gate B sample designs. Gate B **audit membership**, targets,
+  and positive counts are unchanged on the audited pair surface.
+- Predictors join Stage123 on `predictor_row_key_t` → `row_key` (fail-closed
+  one-to-one). Targets are **copied** from Gate B pair files (never recomputed).
+- Assumed availability uses `assumed_available_at_conservative` only; never
+  written as observed `PublishDateTime` / `available_at` / `SentDateTime`.
+- Part 3B broad CODAL expansion remains **superseded**. Financial data remain
+  researcher-verified and frozen.
+- One audited fiscal-year-calendar-shift timing exception is recorded
+  (`رمپنا|1396` → `رمپنا|1397`): retained in the **audited pair** surface with
+  `timing_relation_exception=true`,
+  `assumed_before_target_fiscal_year_end=false`,
+  `timing_eligible_for_analysis=false`, `timing_eligible_for_model=false`, and
+  exclusion reason
+  `assumed_availability_not_before_target_fye_authorized_calendar_shift`;
+  **not** timing-safe; **not** eligible for analysis-ready / model matrices.
+  Any other timing violation fails closed. No row is silently dropped.
+- Full-membership outputs are **audited pair datasets**. Only the filtered
+  timing-eligible outputs (`assumed_before_target_fiscal_year_end=true`) are
+  **leakage-safe analysis-ready datasets**. Gate B membership preservation
+  refers to the audit population, not necessarily the analysis-ready population.
+- Feature selection / model fitting / Stage126 remain unauthorized. Stage125
+  remains incomplete. Next research action:
+  `stage125-part4-statistical-analysis-plan`.
+
+## Stage125 Part 3C — Four-month regulatory lag revision (2026-07-19)
+
+Explicit human-supervisor approval supersedes the active six-month lag for
+the modeling path (`stage125-part3c-four-month-regulatory-lag-revision`):
+
+- **Active method:** `fixed_regulatory_lag` with `active_lag_months = 4`
+  (Jalali calendar).
+  `assumed_available_at_regulatory = fiscal_year_end_t + 4 Jalali months`.
+- **Semantics:** methodological regulatory-deadline assumption — **not**
+  observed publication time / `PublishDateTime` / `available_at`.
+- **Historical six-month decision:** retained (`part3b1e_*` artifacts) but
+  `historical_six_month_decision_active=false`.
+- **Timing rule (general):**
+  `assumed_available_at_regulatory < target_fiscal_year_end_t_plus_1`;
+  no ticker-specific authorization. رمپنا 1396→1397 remains audit-only.
+- **Features:** Part 3C candidate inventory only; zero fields approved for
+  model entry (Part 4 locks features).
+- **Non-claims:** Stage126 / modeling unauthorized.
+
 ## Stage125 Part 3B.1E — Conservative six-month availability lag (2026-07-18)
 
 Human-supervisor-approved methodological pivot
 (`stage125-part3b-conservative-lag-decision-lock` /
-`stage125-part3b1e-conservative-six-month-lag-decision-lock`):
+`stage125-part3b1e-conservative-six-month-lag-decision-lock`).
+**Superseded for the active modeling path** by the 2026-07-19 four-month
+regulatory lag revision; retained as historical provenance:
 
 - **Financial data status:** researcher-verified and **frozen**. No
   financial-value re-extraction or revalidation in this stage.
 - **Broad CODAL capture:** stopped / not authorized. The five-row CODAL
   metadata pilot did not justify expansion; PR #47 was closed unmerged;
   no 80-row or 130-company CODAL metadata capture is planned.
-- **Availability method:** `fixed_conservative_lag` with
+- **Availability method (historical):** `fixed_conservative_lag` with
   `conservative_lag_months = 6`.
   `assumed_available_at_conservative = fiscal_year_end + 6 calendar months`.
-  This is a methodological anti-leakage assumption — **not** an observed
+  This was a methodological anti-leakage assumption — **not** an observed
   `PublishDateTime`, CODAL publication date, verified source timestamp, or
-  observed `available_at`. Do not write the assumed date into those fields.
+  observed `available_at`.
 - **Alignment:** predictors from fiscal year **t** may only predict distress
-  target **t+1**. A predictor observation may only be used after the six-month
-  lag has elapsed.
+  target **t+1**.
 - **Non-claims:** Stage125 incomplete; Stage126 and modeling remain
   unauthorized. Markers:
   `broad_codal_capture_stopped=true`,

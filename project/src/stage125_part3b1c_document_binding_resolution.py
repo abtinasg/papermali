@@ -104,9 +104,9 @@ PINNED_INPUTS: dict[str, str] = {
     "project/stage125/part3b1b_thanusa_parsed_metadata_receipt_stage125.json":
         "217228edd67595167746f006e5bec21f17aa9f3f16008d30c3abc7023e9f84a4",
     "project/stage125/stage125_part3b1b_codal_document_binding_qc_report.json":
-        "45cdfebe0f7255c09a209a539af783f70c760be01e446280ac462c9605cf5aac",
+        "333e1997c06eb653eb6743a48d198cf80af5fa76cac75ae938ac19f61200541a",
     "project/stage125/metadata_and_hashes_stage125_part3b1b.json":
-        "0bf23cf77ff5263f99419b3802b6bdee02dac12f29f9610fa3bd9c28e54f0371",
+        "597a9de101c8921dbd045ffe13009cf8011d650dd20000d3dd4aa423cbe4523c",
 }
 
 EVIDENCE_REL = "project/stage125/part3b1b_codal_document_evidence_stage125.csv"
