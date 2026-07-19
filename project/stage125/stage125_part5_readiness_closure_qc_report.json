@@ -456,7 +456,7 @@
       "pass": true
     },
     "working_tree_clean": {
-      "detail": "authorized_dirty=8",
+      "detail": "clean",
       "pass": true
     }
   },
@@ -473,10 +473,10 @@
   "network_requests_attempted": 0,
   "output_sha256": {
     "README_STAGE125_PART5_READINESS_CLOSURE.md": "bb1e1e1470b4cc94cd3e5dbfe139c110cff9445380b1e118674ca6bee6e835ad",
-    "part5_artifact_integrity_manifest_stage125.csv": "a8b7b4f0594237bc59e46cda486f4998c175cb25d5222e0b24741d89cb7c1c18",
+    "part5_artifact_integrity_manifest_stage125.csv": "682be8249f952da1bb2e86504361e38efab62fc159127ded7706cc5939d3d82c",
     "part5_blocker_register_stage125.csv": "8793ac997555eee15b00783cf8ba63f14852c3ee76b426cf6696ebd4c046e77b",
     "part5_keep_drop_decisions_stage125.csv": "81f59937c52a3a34d58c79f67d22312a818af869cc7f5bb67283a53c711a97f7",
-    "part5_readiness_closure_report_stage125.json": "4a720129cda9d32c01c36825ae9664c82e7c46ea1eb61e685a04dfb3cfbd9c72",
+    "part5_readiness_closure_report_stage125.json": "be307f339552e25cd6bd9f0eaf77a5278134865749c8f59563b3881c43d7fdbc",
     "part5_stage126_m1_entry_contract_stage125.json": "d52e8bb7b00f80a5c7f3319036335835fcef91b5837484075681db387d491e51"
   },
   "pair_level_evidence_collected": true,

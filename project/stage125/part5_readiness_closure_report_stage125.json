@@ -122,7 +122,7 @@
       "pass": true
     },
     "working_tree_clean": {
-      "detail": "authorized_dirty=8",
+      "detail": "clean",
       "pass": true
     }
   },
