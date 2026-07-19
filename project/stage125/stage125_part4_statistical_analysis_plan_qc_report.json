@@ -7,7 +7,7 @@
   "assertions": [
     {
       "assertion": "baseline_commit_pinned",
-      "detail": "f64dea73d1efce83ca0da26e372d90092d8dc530",
+      "detail": "6389370857613bab994e999cc5b6afa855014990",
       "status": "PASS"
     },
     {
