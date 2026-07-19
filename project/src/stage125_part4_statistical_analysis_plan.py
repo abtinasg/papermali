@@ -1414,7 +1414,7 @@ def build_qc_assertions(
         head == EXPECTED_BASELINE_COMMIT or _is_ancestor(
             repo_root, EXPECTED_BASELINE_COMMIT, head,
         ),
-        head,
+        EXPECTED_BASELINE_COMMIT,
     )
     _assert(
         assertions, "part3c_inputs_pinned",

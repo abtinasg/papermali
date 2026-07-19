@@ -7,7 +7,7 @@
   "assertions": [
     {
       "assertion": "baseline_commit_pinned",
-      "detail": "6389370857613bab994e999cc5b6afa855014990",
+      "detail": "6cb27d6817bf167358d480adbccc1728ad59e109",
       "status": "PASS"
     },
     {
@@ -236,7 +236,7 @@
   "row_level_publish_datetime_collection_required": false,
   "six_month_lag_superseded": true,
   "source_commit": "f64dea73d1efce83ca0da26e372d90092d8dc530",
-  "source_file_sha256": "2a3fe06c0b0b501736f76de558d430d78d4e116b93aef15325900049ce1bdb49",
+  "source_file_sha256": "04e90288fad0c34ee5e1b00b2ff2f88f53c45c16f3fb03f75916a8052d251304",
   "stage": "stage125_part4_statistical_analysis_plan",
   "stage126_authorized": false,
   "stage126_started": false,
