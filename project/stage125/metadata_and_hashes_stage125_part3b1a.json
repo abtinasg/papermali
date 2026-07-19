@@ -1,21 +1,21 @@
 {
   "baseline_commit": "3a54a79c935f27e311679e8582e4c46330590a43",
-  "code_commit": "970be0de80ef52cae9530999da6bb27a7067b5e1",
+  "code_commit": "98ef58a7197c7fbb21fa57bfecf927468afc6df3",
   "current_stage": "Stage125",
   "cut_a_available_at_operationalization_locked": true,
   "description": "Stage125 Part 3B.1A — CUT-A available-at operationalization lock (contracts + synthetic validation only).",
-  "generated_at": "2026-07-19T12:12:34+03:30",
+  "generated_at": "2026-07-19T16:03:24+03:30",
   "modeling_started": false,
   "output_files_sha256": {
     "README_STAGE125_PART3B1A_CUT_A_AVAILABLE_AT_LOCK.md": "a03bac69596bcadc51514f2a8b4aa2ce4522b3798b5229abe67b946da039e8be",
     "part3b1a_cut_a_available_at_decision_lock_stage125.json": "dc66630e95f9b02359453c4857792fa06ea32b9cecdbe9e71b5985e2027b1853",
     "part3b1a_cut_a_available_at_operationalization_contract_stage125.json": "8a453fe5b9453df7d3787e00ce4b4f97b679050cf05eeab9171191fc65a54b27",
-    "stage125_part3b1a_cut_a_available_at_qc_report.json": "fa609c33205dbc083831a9c396ade22f7f3c9304f1cb638498843ae5a894eb04"
+    "stage125_part3b1a_cut_a_available_at_qc_report.json": "3f6f2b3c53c7dd6eb263161c512588fb8a5189967620efda9da7f44c98ec465a"
   },
   "part3b1_decision_locked": true,
   "part3b1a_network_calls_attempted": 0,
   "part3b_completed": false,
   "source_file_sha256": "199e0fcb27f136c0a5e30ff4ce2f88ac88fc10498805e952b1a7f7b5f4952b4f",
   "stage": "stage125_part3b1a_cut_a_available_at_operationalization_lock",
-  "test_file_sha256": "4e1c3e4543d135b9d4ad7edcec30a9dc559ab785a12e5d8568b06bc159aaf72c"
+  "test_file_sha256": "f1db59932c54de11684898a1dc739cef887ba5c2d053634462c0f1601eeb521c"
 }

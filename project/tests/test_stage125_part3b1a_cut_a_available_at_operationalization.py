@@ -585,18 +585,10 @@ def test_research_pointers_unchanged():
         "last_completed_research_action_id": "stage125-part3a-decision-lock",
         "next_research_action_id": "stage125-part3b-evidence-capture",
     }
-    # Later ROADMAP advancement (Part 5 readiness closure) is expected and must
-    # not rewrite the Part 3B.1A lock-embedded historical pointers above.
+    # Later ROADMAP tip advancement must not rewrite the Part 3B.1A
+    # lock-embedded historical pointers above.
     roadmap = (REPO_ROOT / "project/docs/ai/ROADMAP.md").read_text(encoding="utf-8")
     assert "stage125-part3a-decision-lock" in roadmap
-    assert (
-        "last_completed_research_action_id: "
-        "stage125-part5-readiness-closure"
-    ) in roadmap
-    assert (
-        "next_research_action_id: "
-        "stage126-m1-financial-baseline"
-    ) in roadmap
 
 
 def test_contract_and_lock_markers():
