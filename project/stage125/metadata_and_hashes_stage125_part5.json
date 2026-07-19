@@ -2,23 +2,23 @@
   "baseline_commit": "5836059e2d533f4be7e1898f942937a57c0b8fef",
   "baseline_tree": "3c2de72270bc05afeabcd2f07088f71f886796a3",
   "closure_outcome": "READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION",
-  "code_commit": "fd80644c49113800f8c24cdbbf2e9cfe320ad6a7",
+  "code_commit": "23f60f031cb887e79d66940239728d2de54266e6",
   "current_stage": "Stage125",
   "description": "Stage125 Part 5 readiness closure (keep/drop decisions, blocker register, Stage126 M1 entry contract, artifact integrity manifest, Gate 125.0; no modeling).",
   "final_test_unlocked": false,
-  "generated_at": "fd80644c49113800f8c24cdbbf2e9cfe320ad6a7",
+  "generated_at": "23f60f031cb887e79d66940239728d2de54266e6",
   "model_fit_calls": 0,
   "modeling_authorized": false,
   "modeling_started": false,
   "network_requests_attempted": 0,
   "output_files_sha256": {
     "README_STAGE125_PART5_READINESS_CLOSURE.md": "a18932b695213fe64fbd1851def9c67bf8dbdc831fc2773914b1801040b6d405",
-    "part5_artifact_integrity_manifest_stage125.csv": "21ab500c1254ade297ce53b9d7e1278858a61553bb74bf5fdafbe07a76f606fd",
+    "part5_artifact_integrity_manifest_stage125.csv": "bb70353c888a8f0e30704e1938309cc5b53d1b4639d8e6f256128db3e224aab6",
     "part5_blocker_register_stage125.csv": "32e679ed513fcbdebf114bf88225a9251fb4793648655d7f044347fdf54a35d3",
     "part5_keep_drop_decisions_stage125.csv": "bacb202cc3404b512e71740ed6c71bfaee8a0201fb941388e0a06f484323c718",
     "part5_readiness_closure_report_stage125.json": "1777a4c80ea8300e607e0ac289092710feb65dd2f10258da1bf7986d57b066f7",
     "part5_stage126_m1_entry_contract_stage125.json": "74a2159785daeda44fa82ebd76f42870fa25aba3667846bccba6b3099ea65da5",
-    "stage125_part5_readiness_closure_qc_report.json": "3641e10ea9381e582b897f552ef2ceee2c2a35fe5f9425cc933b15aa21f0a185"
+    "stage125_part5_readiness_closure_qc_report.json": "3c7d8db9b5840a23c75d8cda7a7f132ccfbc3db4bea4ea0ecc7202c6377738ab"
   },
   "prediction_calls": 0,
   "research_pointers": {
@@ -26,7 +26,7 @@
     "next_research_action_id": "stage126-m1-financial-baseline"
   },
   "shap_calls": 0,
-  "source_file_sha256": "e686440cfca485fd7fcfe5f092bc21ca7f6b287a210bd6520db8f152e653ce89",
+  "source_file_sha256": "95960d99e762c4e53f0f11505c477688a5efe4727f182e35d794ae664cc975c8",
   "stage": "stage125_part5_readiness_closure",
   "stage125_completed": true,
   "stage125_gate_125_0": "PASS",
