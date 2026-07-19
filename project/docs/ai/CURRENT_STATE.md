@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage125_research_design_readiness`
 - **Last completed research action:** `stage125-part4-statistical-analysis-plan`
 - **Next research action:** `stage125-part5-readiness-closure`
-- **Last stage commit:** `f322f9db8e473f9333d8d52fb7d152b78667ae66`
-- **Generated from commit:** `79e98edd1c9b4b75befe01e312ff8cfdd8fa9e15` (branch `stage125-part4-statistical-analysis-plan`, informational)
+- **Last stage commit:** `79a94daef8960f0af8d22c53247442a5e3a4432b`
+- **Generated from commit:** `79a94daef8960f0af8d22c53247442a5e3a4432b` (branch `stage125-part4-statistical-analysis-plan`, informational)
 - **Baseline:** `origin/main` @ `6cb27d6817bf167358d480adbccc1728ad59e109`
 
 ## QC
@@ -50,5 +50,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `082f7dfad53be19c67a3ade9dee2c02236c2e1dbf5b14ec68609f67c51af41ec`_
-_generated_at_utc: 2026-07-19T09:51:11Z (informational)_
+_state_fingerprint: `6988f7fb64ac21231e2f0572b84382e4d94f7382406f3b9dfece0a9abcd5e458`_
+_generated_at_utc: 2026-07-19T09:59:57Z (informational)_
