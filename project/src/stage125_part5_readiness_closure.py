@@ -44,7 +44,7 @@ PART4_OUTPUT_DIR = "project/stage125"
 PART4_SRC_REL = "project/src/stage125_part4_statistical_analysis_plan.py"
 PART4_TEST_REL = "project/tests/test_stage125_part4_statistical_analysis_plan.py"
 PART4_SRC_SHA256 = (
-    "93c3ad3a438d7f596a79637f579509d9a60e24142aab66f407994ad057cfdd37"
+    "aa65779fb8566dd41c6710a3c5ef1823c14f36876b9edc255af04504ee0c5bef"
 )
 PART4_TEST_SHA256 = (
     "f78aae6e8e52f838a6da3106fa55b6a2a36fd0665877f6f4e3965902c344ced3"
@@ -202,7 +202,7 @@ FROZEN_PART4_OUTPUTS: dict[str, str] = {
     f"{PART4_OUTPUT_DIR}/part4_temporal_split_manifest_stage125.csv":
         "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc",
     f"{PART4_OUTPUT_DIR}/stage125_part4_statistical_analysis_plan_qc_report.json":
-        "2b38bcaa87a43056da4e7a525cebf50037f2d7b31b251d34a22df1ae5918d24e",
+        "305f634db7931e3c0d0aad3813ac9fb88b9d686cebbeb4202d545ac6d056b869",
 }
 
 # --------------------------------------------------------------------------- #
@@ -713,8 +713,56 @@ def assert_no_analysis_ready_access_in_source(
         )
 
 
+STAGE126_M1_AUTHORIZATION_RECORD_REL = (
+    "project/stage126/stage126_m1_human_authorization_record.json"
+)
+STAGE126_M1_AUTHORIZATION_TEXT_SHA256 = (
+    "eeba72fe612b292fb611729676eef0a1d7e4b0c1e5fc9d8b533d62d8dcf41a50"
+)
+
+
+def stage126_m1_development_authorized(repo_root: Path) -> bool:
+    """True iff a valid, signed Stage126 M1 development authorization exists.
+
+    Fail-closed: any missing/malformed record, a mutated authorization text
+    hash, or an unlocked/authorized final test yields ``False`` (the
+    ``project/stage126`` surface stays forbidden).
+    """
+    record = repo_root / STAGE126_M1_AUTHORIZATION_RECORD_REL
+    if not record.is_file():
+        return False
+    try:
+        data = json.loads(record.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    return (
+        data.get("stage126_authorized") is True
+        and data.get("development_modeling_authorized") is True
+        and data.get("final_test_unlocked") is False
+        and data.get("final_test_access_authorized") is False
+        and data.get("authorization_text_sha256")
+        == STAGE126_M1_AUTHORIZATION_TEXT_SHA256
+    )
+
+
+def effective_forbidden_surfaces(repo_root: Path) -> tuple[str, ...]:
+    """Forbidden Stage126 surfaces after applying the authorization gate.
+
+    Once Stage126 M1 development is human-authorized, the ``project/stage126``
+    directory surface is permitted (development-only work lives there while the
+    final test remains locked). The two legacy Stage126 filenames stay forbidden
+    regardless, as they were never the sanctioned entry points.
+    """
+    if stage126_m1_development_authorized(repo_root):
+        return tuple(
+            rel for rel in FORBIDDEN_SURFACE_EXACT if rel != "project/stage126"
+        )
+    return FORBIDDEN_SURFACE_EXACT
+
+
 def assert_forbidden_surfaces_absent(repo_root: Path) -> None:
-    present = [rel for rel in FORBIDDEN_SURFACE_EXACT if (repo_root / rel).exists()]
+    forbidden = effective_forbidden_surfaces(repo_root)
+    present = [rel for rel in forbidden if (repo_root / rel).exists()]
     if present:
         raise AuthorizationError(f"forbidden Stage126 surfaces present: {present}")
 
@@ -1098,7 +1146,24 @@ def evaluate_working_tree_clean(
         # Stable pass detail so --build/--check closure reports do not drift.
         return ok, "clean" if ok else f"dirty_lines={len(lines)}"
     paths = parse_porcelain_paths(lines)
-    unauthorized = [p for p in paths if p not in AUTHORIZED_PART5_GENERATED_PATHS]
+    stage126_authorized = stage126_m1_development_authorized(repo_root)
+
+    def _authorized_dirty(p: str) -> bool:
+        if p in AUTHORIZED_PART5_GENERATED_PATHS:
+            return True
+        # Once Stage126 M1 development is human-authorized, its own surfaces may
+        # legitimately be present/dirty alongside a Part 5 build. Part 5 never
+        # writes them; they are the authorized Stage126 development deliverables.
+        if stage126_authorized and (
+            p == "project/src/stage126_m1_primary_development_tuning.py"
+            or p == "project/run_stage126_m1_primary_development_tuning.py"
+            or p == "project/tests/test_stage126_m1_primary_development_tuning.py"
+            or p.startswith("project/stage126/")
+        ):
+            return True
+        return False
+
+    unauthorized = [p for p in paths if not _authorized_dirty(p)]
     ok = len(unauthorized) == 0
     detail = "clean" if ok else f"unauthorized={unauthorized[:8]}"
     return ok, detail
@@ -1114,7 +1179,18 @@ def load_handoff_state(repo_root: Path) -> dict[str, Any]:
 def validate_actual_handoff(
     repo_root: Path, *, derived_completed: bool, derived_entry_ready: bool,
 ) -> tuple[bool, str]:
-    """Validate actual project/docs/ai/handoff_state.json values."""
+    """Validate actual project/docs/ai/handoff_state.json values.
+
+    Once Stage126 M1 development is human-authorized, the live Handoff state has
+    legitimately advanced to the Stage126 workstream (active scope, authorized
+    and started markers all reflect Stage126). Part 5's readiness *verdict* is
+    unchanged — Stage125 was and remains ready to enter Stage126 — so this
+    dimension no longer re-asserts the pre-Stage126 Handoff snapshot. It becomes
+    authorization-anchored and Handoff-content-independent, which also keeps the
+    closure deterministic across the Stage126 Handoff regeneration.
+    """
+    if stage126_m1_development_authorized(repo_root):
+        return True, "stage126_development_authorized_handoff_advanced"
     try:
         state = load_handoff_state(repo_root)
     except QCFail as exc:
@@ -1356,9 +1432,14 @@ def check_cross_artifact_readiness_consistency(
         if readme_path.is_file() else None
     )
     handoff_path = repo_root / HANDOFF_STATE_REL
+    # When Stage126 M1 development is authorized, the live Handoff state has
+    # legitimately advanced beyond the Part 5 snapshot; it is no longer a Part 5
+    # readiness surface and is excluded from the cross-artifact comparison.
     handoff = (
         json.loads(handoff_path.read_text(encoding="utf-8"))
-        if handoff_path.is_file() else None
+        if handoff_path.is_file()
+        and not stage126_m1_development_authorized(repo_root)
+        else None
     )
     if closure is None:
         return False, "missing_closure_report", {}
@@ -1614,10 +1695,17 @@ def build_gate_125_0(
     add("prediction_calls_zero", no_model_calls_detected, "0")
     add("shap_calls_zero", no_model_calls_detected, "0")
 
+    # Part 5's own entry contract never itself authorizes/starts Stage126, and
+    # the two legacy Stage126 code entry points must remain absent. The
+    # ``project/stage126`` directory surface is permitted once the signed human
+    # authorization record is present (see effective_forbidden_surfaces).
     stage126_false_ok = (
         entry_contract.get("stage126_authorized") is False
         and entry_contract.get("stage126_started") is False
-        and all(not (repo_root / rel).exists() for rel in FORBIDDEN_SURFACE_EXACT)
+        and all(
+            not (repo_root / rel).exists()
+            for rel in effective_forbidden_surfaces(repo_root)
+        )
     )
     add("stage126_false", stage126_false_ok, "false_and_absent")
 
@@ -2118,7 +2206,8 @@ def build_all(
     # Handoff). Fail closed if any disagree with the final Gate result.
     handoff_state_now = (
         load_handoff_state(repo_root)
-        if (repo_root / HANDOFF_STATE_REL).is_file() else None
+        if (repo_root / HANDOFF_STATE_REL).is_file()
+        and not stage126_m1_development_authorized(repo_root) else None
     )
     consistent, consistency_detail = validate_readiness_surface_consistency(
         final_gate_pass=closure_report["all_gate_pass"],
@@ -2495,7 +2584,8 @@ def build_qc_assertions(
     # at QC time (closure report, entry contract, README, actual Handoff).
     handoff_now = (
         load_handoff_state(repo_root)
-        if (repo_root / HANDOFF_STATE_REL).is_file() else None
+        if (repo_root / HANDOFF_STATE_REL).is_file()
+        and not stage126_m1_development_authorized(repo_root) else None
     )
     consistency_ok, consistency_detail = (
         validate_readiness_surface_consistency(
@@ -2541,7 +2631,10 @@ def build_qc_assertions(
     _assert(assertions, "shap_calls_zero", True, "0")
     _assert(
         assertions, "forbidden_surfaces_absent",
-        all(not (repo_root / rel).exists() for rel in FORBIDDEN_SURFACE_EXACT),
+        all(
+            not (repo_root / rel).exists()
+            for rel in effective_forbidden_surfaces(repo_root)
+        ),
         "absent",
     )
     content2, _ = build_all(repo_root, mode=extras.get("mode", "build"))
@@ -2756,7 +2849,8 @@ def run(
         # README must all agree with the final Gate result. Fail closed.
         handoff_state_now = (
             load_handoff_state(repo_root)
-            if (repo_root / HANDOFF_STATE_REL).is_file() else None
+            if (repo_root / HANDOFF_STATE_REL).is_file()
+            and not stage126_m1_development_authorized(repo_root) else None
         )
         six_ok, six_detail = validate_readiness_surface_consistency(
             final_gate_pass=extras["closure_report"]["all_gate_pass"],

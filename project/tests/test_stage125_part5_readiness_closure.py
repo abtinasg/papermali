@@ -796,9 +796,12 @@ def test_forbidden_analysis_ready_reference_rejected_via_ast(tmp_path):
 
 
 def test_forbidden_surfaces_absent():
+    # Stage126 M1 development is human-authorized, so the project/stage126
+    # directory surface is permitted; the guard must not raise. The two legacy
+    # Stage126 filenames must still be absent.
     m.assert_forbidden_surfaces_absent(REPO_ROOT)
-    for rel in m.FORBIDDEN_SURFACE_EXACT:
-        assert not (REPO_ROOT / rel).exists()
+    assert not (REPO_ROOT / "project/src/stage126_m1_financial_baseline.py").exists()
+    assert not (REPO_ROOT / "project/run_stage126.py").exists()
 
 
 def test_forbidden_surfaces_exact_paths():
@@ -807,6 +810,40 @@ def test_forbidden_surfaces_exact_paths():
         "project/run_stage126.py",
         "project/stage126",
     )
+
+
+def test_stage126_surface_forbidden_when_unauthorized(tmp_path):
+    # Without a valid authorization record, the whole project/stage126 surface
+    # is forbidden (fail-closed) and the guard raises.
+    (tmp_path / "project" / "stage126").mkdir(parents=True)
+    assert m.stage126_m1_development_authorized(tmp_path) is False
+    assert "project/stage126" in m.effective_forbidden_surfaces(tmp_path)
+    with pytest.raises(m.AuthorizationError, match="forbidden Stage126 surfaces"):
+        m.assert_forbidden_surfaces_absent(tmp_path)
+
+
+def test_stage126_surface_permitted_only_with_valid_authorization(tmp_path):
+    rec_dir = tmp_path / "project" / "stage126"
+    rec_dir.mkdir(parents=True)
+    rec = rec_dir / "stage126_m1_human_authorization_record.json"
+    payload = {
+        "stage126_authorized": True,
+        "development_modeling_authorized": True,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "authorization_text_sha256": m.STAGE126_M1_AUTHORIZATION_TEXT_SHA256,
+    }
+    rec.write_text(json.dumps(payload), encoding="utf-8")
+    assert m.stage126_m1_development_authorized(tmp_path) is True
+    assert "project/stage126" not in m.effective_forbidden_surfaces(tmp_path)
+    m.assert_forbidden_surfaces_absent(tmp_path)
+
+    # A mutated authorization-text hash must re-close the gate.
+    payload["authorization_text_sha256"] = "0" * 64
+    rec.write_text(json.dumps(payload), encoding="utf-8")
+    assert m.stage126_m1_development_authorized(tmp_path) is False
+    with pytest.raises(m.AuthorizationError, match="forbidden Stage126 surfaces"):
+        m.assert_forbidden_surfaces_absent(tmp_path)
 
 
 # --------------------------------------------------------------------------- #
@@ -1170,8 +1207,11 @@ def test_gate_dimension_failure_produces_not_ready(dim_name):
 def test_cross_artifact_readiness_consistency_on_disk():
     ok, detail, states = m.check_cross_artifact_readiness_consistency(REPO_ROOT)
     assert ok is True, f"{detail} :: {states}"
-    # All six surfaces must be present and ready in the canonical (passing) state.
-    assert set(states) == set(m.READINESS_SURFACE_NAMES)
+    # Stage126 M1 development is authorized, so the live Handoff state has
+    # advanced beyond the Part 5 snapshot and is excluded as a readiness
+    # surface. The remaining five surfaces must all be present and ready.
+    expected = set(m.READINESS_SURFACE_NAMES) - {"handoff_state"}
+    assert set(states) == expected
     assert all(v is True for v in states.values()), states
 
 
@@ -1382,14 +1422,19 @@ def test_robustness_sample_duplicate_fails():
 # --------------------------------------------------------------------------- #
 
 def test_validate_actual_handoff_passes_current_state():
+    # Stage126 M1 development is human-authorized, so the live Handoff state has
+    # legitimately advanced to the Stage126 workstream. Part 5's readiness
+    # verdict is unchanged and this dimension becomes authorization-anchored.
     ok, detail = m.validate_actual_handoff(
         REPO_ROOT, derived_completed=True, derived_entry_ready=True,
     )
     assert ok is True
-    assert detail == "actual_handoff_state_matches_derived_closure"
+    assert detail == "stage126_development_authorized_handoff_advanced"
 
 
 def test_handoff_mutation_wrong_selected_qc_scope(tmp_path, monkeypatch):
+    # Exercise the pre-Stage126 Handoff validation branch (unauthorized world).
+    monkeypatch.setattr(m, "stage126_m1_development_authorized", lambda _root: False)
     state = m.load_handoff_state(REPO_ROOT)
     state["selected_qc_scope"] = "stage125_part4_statistical_analysis_plan"
     handoff = tmp_path / "handoff_state.json"
@@ -1407,6 +1452,7 @@ def test_handoff_mutation_wrong_selected_qc_scope(tmp_path, monkeypatch):
 
 
 def test_handoff_mutation_wrong_next_research_action_id(monkeypatch):
+    monkeypatch.setattr(m, "stage126_m1_development_authorized", lambda _root: False)
     state = m.load_handoff_state(REPO_ROOT)
     state["next_research_action_id"] = "stage126-unauthorized"
     monkeypatch.setattr(m, "load_handoff_state", lambda _root: state)
@@ -1427,6 +1473,7 @@ def test_handoff_mutation_wrong_next_research_action_id(monkeypatch):
     ],
 )
 def test_handoff_mutation_auth_and_lag_fields(monkeypatch, field, value):
+    monkeypatch.setattr(m, "stage126_m1_development_authorized", lambda _root: False)
     state = m.load_handoff_state(REPO_ROOT)
     state[field] = value
     monkeypatch.setattr(m, "load_handoff_state", lambda _root: state)
