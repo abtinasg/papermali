@@ -1,6 +1,7 @@
 {
   "active_availability_lag_months": 4,
   "active_availability_method": "fixed_regulatory_lag",
+  "article141_development_comparison_supported": false,
   "article141_final_test_gate": {
     "decision": "distributional_descriptive_robustness_only;no_comparative_predictive_performance_claim;no_inferential_model_ranking",
     "evaluable_rows": 346,
@@ -10,6 +11,7 @@
     "sample": "main_rule_a_primary",
     "target": "FD_target_article141_only_t_plus_1"
   },
+  "article141_inferential_final_test_claim_supported": false,
   "baseline_commit": "6cb27d6817bf167358d480adbccc1728ad59e109",
   "broad_codal_capture_stopped": true,
   "candidate_data_admission": {
@@ -38,8 +40,20 @@
   },
   "coverage_denominator_policy": "all_rows_belonging_to_the_relevant_development_or_fold_subset",
   "development_model_comparison_feasibility": {
+    "aggregate_development_uses_fold_conjunction_not_own_count": true,
     "fail_action": "development_comparison_not_supported",
-    "min_positive_evaluable_each_temporal_validation_window": 5
+    "generic_comparative_claims_default_label_removed": true,
+    "is_target_level_conjunction": true,
+    "min_positive_evaluable_each_temporal_validation_window": 5,
+    "neutral_event_count_label": "event_count_only_not_an_independent_claim_gate",
+    "neutral_windows": [
+      "fold1_train",
+      "fold2_train",
+      "all"
+    ],
+    "not_supported_label": "development_comparison_not_supported",
+    "requires_both_locked_validation_windows": true,
+    "supported_label": "development_comparison_feasibility_met"
   },
   "final_test_accessed_for_modeling": false,
   "final_test_inferential_claim_eligibility": {
@@ -532,6 +546,116 @@
   },
   "stage126_authorized": false,
   "stage126_started": false,
+  "target_comparison_decisions": [
+    {
+      "development_comparison_feasibility": "development_comparison_feasibility_met",
+      "final_test_claim_eligibility": "final_test_inferential_claim_eligible",
+      "final_test_positive": 12,
+      "fold1_validation_positive": 25,
+      "fold2_validation_positive": 10,
+      "sample_design": "expanded_rule_a_company_scope_robustness",
+      "target": "FD_target_main_t_plus_1"
+    },
+    {
+      "development_comparison_feasibility": "development_comparison_feasibility_met",
+      "final_test_claim_eligibility": "final_test_inferential_claim_eligible",
+      "final_test_positive": 15,
+      "fold1_validation_positive": 30,
+      "fold2_validation_positive": 13,
+      "sample_design": "expanded_rule_a_company_scope_robustness",
+      "target": "FD_target_persistent_loss_robustness_t_plus_1"
+    },
+    {
+      "development_comparison_feasibility": "development_comparison_not_supported",
+      "final_test_claim_eligibility": "distributional_descriptive_robustness_only;no_comparative_predictive_performance_claim;no_inferential_model_ranking",
+      "final_test_positive": 1,
+      "fold1_validation_positive": 17,
+      "fold2_validation_positive": 3,
+      "sample_design": "expanded_rule_a_company_scope_robustness",
+      "target": "FD_target_article141_only_t_plus_1"
+    },
+    {
+      "development_comparison_feasibility": "development_comparison_feasibility_met",
+      "final_test_claim_eligibility": "final_test_inferential_claim_eligible",
+      "final_test_positive": 11,
+      "fold1_validation_positive": 25,
+      "fold2_validation_positive": 10,
+      "sample_design": "expanded_rule_b_combined_robustness",
+      "target": "FD_target_main_t_plus_1"
+    },
+    {
+      "development_comparison_feasibility": "development_comparison_feasibility_met",
+      "final_test_claim_eligibility": "final_test_inferential_claim_eligible",
+      "final_test_positive": 14,
+      "fold1_validation_positive": 30,
+      "fold2_validation_positive": 13,
+      "sample_design": "expanded_rule_b_combined_robustness",
+      "target": "FD_target_persistent_loss_robustness_t_plus_1"
+    },
+    {
+      "development_comparison_feasibility": "development_comparison_not_supported",
+      "final_test_claim_eligibility": "distributional_descriptive_robustness_only;no_comparative_predictive_performance_claim;no_inferential_model_ranking",
+      "final_test_positive": 0,
+      "fold1_validation_positive": 17,
+      "fold2_validation_positive": 3,
+      "sample_design": "expanded_rule_b_combined_robustness",
+      "target": "FD_target_article141_only_t_plus_1"
+    },
+    {
+      "development_comparison_feasibility": "development_comparison_feasibility_met",
+      "final_test_claim_eligibility": "final_test_inferential_claim_eligible",
+      "final_test_positive": 12,
+      "fold1_validation_positive": 25,
+      "fold2_validation_positive": 10,
+      "sample_design": "main_rule_a_primary",
+      "target": "FD_target_main_t_plus_1"
+    },
+    {
+      "development_comparison_feasibility": "development_comparison_feasibility_met",
+      "final_test_claim_eligibility": "final_test_inferential_claim_eligible",
+      "final_test_positive": 15,
+      "fold1_validation_positive": 30,
+      "fold2_validation_positive": 13,
+      "sample_design": "main_rule_a_primary",
+      "target": "FD_target_persistent_loss_robustness_t_plus_1"
+    },
+    {
+      "development_comparison_feasibility": "development_comparison_not_supported",
+      "final_test_claim_eligibility": "distributional_descriptive_robustness_only;no_comparative_predictive_performance_claim;no_inferential_model_ranking",
+      "final_test_positive": 1,
+      "fold1_validation_positive": 17,
+      "fold2_validation_positive": 3,
+      "sample_design": "main_rule_a_primary",
+      "target": "FD_target_article141_only_t_plus_1"
+    },
+    {
+      "development_comparison_feasibility": "development_comparison_feasibility_met",
+      "final_test_claim_eligibility": "final_test_inferential_claim_eligible",
+      "final_test_positive": 11,
+      "fold1_validation_positive": 25,
+      "fold2_validation_positive": 10,
+      "sample_design": "main_rule_b_listing_robustness",
+      "target": "FD_target_main_t_plus_1"
+    },
+    {
+      "development_comparison_feasibility": "development_comparison_feasibility_met",
+      "final_test_claim_eligibility": "final_test_inferential_claim_eligible",
+      "final_test_positive": 14,
+      "fold1_validation_positive": 30,
+      "fold2_validation_positive": 13,
+      "sample_design": "main_rule_b_listing_robustness",
+      "target": "FD_target_persistent_loss_robustness_t_plus_1"
+    },
+    {
+      "development_comparison_feasibility": "development_comparison_not_supported",
+      "final_test_claim_eligibility": "distributional_descriptive_robustness_only;no_comparative_predictive_performance_claim;no_inferential_model_ranking",
+      "final_test_positive": 0,
+      "fold1_validation_positive": 17,
+      "fold2_validation_positive": 3,
+      "sample_design": "main_rule_b_listing_robustness",
+      "target": "FD_target_article141_only_t_plus_1"
+    }
+  ],
   "target_state_contract": {
     "evaluable_rows": "positive_plus_negative",
     "missing": "blank_null_unparseable_or_any_other_value",

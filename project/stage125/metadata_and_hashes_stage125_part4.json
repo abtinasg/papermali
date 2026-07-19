@@ -9,9 +9,9 @@
   "network_requests_attempted": 0,
   "output_files_sha256": {
     "README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md": "e656fdf915f7dff89173b99c14c23a73f1f6664777b12e75c98e57ef388a65e8",
-    "README_STAGE125_PART4_STATISTICAL_ANALYSIS_PLAN.md": "e542d2eabc3da62065e503a04bfb85bfb6c8c52311b7c1da3e89723233165d94",
+    "README_STAGE125_PART4_STATISTICAL_ANALYSIS_PLAN.md": "b9d8a5354967e9c5dae863fd240cbca145fbc358c50c81967fa866b8babb01ac",
     "part4_development_feature_coverage_audit_stage125.csv": "7c18da23265d1c544bd397686518cbc064f14f6deba45ecf1af8d55c21126703",
-    "part4_event_count_gate_stage125.csv": "ab76d5c5392cc18dd6ad4bca0b81c3d18b1f32c3661f1438a126a2534327f5d3",
+    "part4_event_count_gate_stage125.csv": "e8432e1f6e3958b658affa05070b5161d36d95e98bc2041bef4b1143ac9f0d17",
     "part4_feature_exclusion_decisions_stage125.csv": "f89125c99b6d6d4f4e5063b4276aa42e9a5b21933aa5e939bf65c7e76705291d",
     "part4_feature_sets_stage125.csv": "79e87cbcef1a6aa70fa6e4b837c4634df9e1f701e25f42a87ac34012452b850f",
     "part4_hyperparameter_budget_stage125.json": "22d6989681a7cd59ffbf57077910615ce00adb9f171d303d5d61100a54490b40",
@@ -19,12 +19,12 @@
     "part4_model_specifications_stage125.json": "ef933be3eb2f75e6f493ac1401100c629bdb83850c81950d8f235c5ccf4cdb21",
     "part4_preprocessing_contract_stage125.json": "3722bd6165574c78aef1138a810ff4863b5c214f80df197889eaa40163f0e415",
     "part4_revenue_growth_exclusion_revision_decision_stage125.json": "f6104b2038224a2b76679ad5957fb012b9e413e979377efe80fb8f2b97369f4e",
-    "part4_sample_target_matrix_stage125.csv": "99e560d6527e72a891bf1f1f68e9241c935711213347c5c15b9237f9d54e1017",
+    "part4_sample_target_matrix_stage125.csv": "d7f026ecf0b3b2810eb95df5b912184c3b9f4e36031e9b366c00fd858b7c4792",
     "part4_shap_stability_contract_stage125.json": "acd19339b8f998ba54c00f3cb32d5ca12d353619316ecab951b7d03f96ed5f8a",
-    "part4_statistical_analysis_plan_stage125.json": "c46507f76d57c25237df772d6be463c854b5b220f3c1649a85f01bdbc5ccdc44",
+    "part4_statistical_analysis_plan_stage125.json": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
     "part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
     "part4_temporal_split_manifest_stage125.csv": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc",
-    "stage125_part4_statistical_analysis_plan_qc_report.json": "a8215bb891b73692fef96362e28bea58cacca6c5fa198e18fda2acca3a560874"
+    "stage125_part4_statistical_analysis_plan_qc_report.json": "e7909b32aebc4a8feb2a7ad910dcf02a70d64d99180eb4939fc0a7a90bdfb96a"
   },
   "part4_statistical_analysis_plan_locked": true,
   "prediction_calls": 0,
@@ -32,8 +32,8 @@
     "last_completed_research_action_id": "stage125-part4-statistical-analysis-plan",
     "next_research_action_id": "stage125-part5-readiness-closure"
   },
-  "source_file_sha256": "a81cc27ebc75cfe4aa81ced527af44a6af1ae1f9e9e3145501f9a5ea3bf731e4",
+  "source_file_sha256": "93c3ad3a438d7f596a79637f579509d9a60e24142aab66f407994ad057cfdd37",
   "stage": "stage125_part4_statistical_analysis_plan",
   "stage126_started": false,
-  "test_file_sha256": "db0cb3dacbca70694d9f34b1c1c4ef9630a31b3bef9a6f2b99407d4e72518194"
+  "test_file_sha256": "f78aae6e8e52f838a6da3106fa55b6a2a36fd0665877f6f4e3965902c344ced3"
 }

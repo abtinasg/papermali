@@ -23,6 +23,33 @@ Part 4 locks the statistical analysis plan for future Stage126 modeling:
 - PR-AUC primary; Recall@10% / Lift@10%; calibration; paired ticker-cluster bootstrap; Holm
 - SHAP stability contract (no SHAP computation in Part 4)
 
+## Development-comparison feasibility is a target-level conjunction
+
+Development-comparison feasibility is decided per `sample_design × target` as a
+conjunction across **both** locked temporal validation windows:
+
+```text
+development_comparison_feasibility_met
+  iff fold1_validation_positive >= 5 AND fold2_validation_positive >= 5
+else development_comparison_not_supported
+```
+
+The aggregate `development` event-count row reports this conjunction result; it
+is never an independent label derived from the aggregate development positive
+count. The `fold1_train`, `fold2_train`, and `all` rows carry the neutral label
+`event_count_only_not_an_independent_claim_gate` and are never claim gates. The
+generic `eligible_for_comparative_claims` label is removed.
+
+Consequences (all four sample designs):
+
+- `FD_target_article141_only_t_plus_1` has `fold1_validation_positive = 17` but
+  `fold2_validation_positive = 3`, so development comparison is **unsupported**,
+  and with `final_test_positive ∈ {0, 1}` its final-test analysis is
+  **descriptive-only** (no comparative or inferential claim).
+- `FD_target_main_t_plus_1` and
+  `FD_target_persistent_loss_robustness_t_plus_1` remain development-supported
+  and final-test claim-eligible.
+
 ## v2 methodological correction
 
 Human supervisor rejected `revenue_growth_period_adjusted` from admitted M1
