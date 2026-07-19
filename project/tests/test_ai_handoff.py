@@ -585,6 +585,237 @@ def test_merge_commit_with_research_file_fails(synth):
     assert val.run_check(synth) == 1
 
 
+# ---- transparent GitHub-style HEAD merge (real two-parent commits) --------- #
+
+def _set_state_field(root: str, key: str, value) -> None:
+    path = os.path.join(root, "project/docs/ai/handoff_state.json")
+    state = json.load(open(path, encoding="utf-8"))
+    state[key] = value
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(state, fh, indent=2, ensure_ascii=False, sort_keys=True)
+        fh.write("\n")
+
+
+def _merge_no_ff(root: str, branch: str, message: str = "Merge branch") -> str:
+    env = {
+        **os.environ,
+        "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t",
+        "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t",
+    }
+    subprocess.run(
+        ["git", "-C", root, "merge", "--no-ff", "-m", message, branch],
+        check=True, env=env, capture_output=True, text=True,
+    )
+    return _git(root, "rev-parse", "HEAD")
+
+
+def _github_style_merge_onto_base(root: str, base_sha: str, pr_branch: str = "pr-head") -> str:
+    """Create a real two-parent merge: first=base_sha, second=current tip, tree=tip."""
+    tip = _git(root, "rev-parse", "HEAD")
+    _git(root, "branch", pr_branch, tip)
+    _git(root, "checkout", "-B", "main", base_sha)
+    return _merge_no_ff(root, pr_branch, f"Merge branch '{pr_branch}'")
+
+
+def _pr_merge_base(root: str) -> str:
+    """GitHub-like main tip: first parent of the tip handoff commit.
+
+    Using the pre-handoff parent (not the repo root) keeps ``last_stage_commit``
+    stable across a transparent merge, matching real PR merges onto main.
+    """
+    return _git(root, "rev-parse", "HEAD^")
+
+
+def test_transparent_head_merge_accepted(synth):
+    # Transparent HEAD merge: two parents, tree identical to second parent,
+    # generated_from_commit ancestor of second parent, baseline ancestor of
+    # first parent => accepted (ordinary non-Handoff rejection still intact).
+    gfc = _state(synth)["generated_from_commit"]
+    base_sha = _pr_merge_base(synth)
+    merge_sha = _github_style_merge_onto_base(synth, base_sha)
+    # baseline_commit is volatile; set on disk after merge (survives checkout).
+    _set_state_field(synth, "baseline_commit", base_sha)
+    head = _git(synth, "rev-parse", "HEAD")
+    assert merge_sha == head
+    parents = val._commit_parents(synth, merge_sha)
+    assert len(parents) == 2
+    assert val._commit_tree(synth, merge_sha) == val._commit_tree(synth, parents[1])
+    assert gen.is_ancestor(synth, gfc, parents[1])
+    assert gen.is_ancestor(synth, base_sha, parents[0])
+    assert not gen._git(synth, "diff", "--name-only", parents[1], merge_sha).strip()
+    assert val._is_transparent_head_merge(
+        synth, merge_sha, head, gfc, base_sha
+    ) is True
+    assert val.run_check(synth) == 0
+
+
+def test_merge_with_manual_resolution_tree_diff_rejected(synth):
+    gfc = _state(synth)["generated_from_commit"]
+    base_sha = _pr_merge_base(synth)
+    merge_sha = _github_style_merge_onto_base(synth, base_sha)
+    _set_state_field(synth, "baseline_commit", base_sha)
+    # Manual resolution / tree drift vs second parent, keeping a two-parent HEAD.
+    parents = val._commit_parents(synth, merge_sha)
+    _write(synth, "project/docs/ai/OPEN_TASKS.md", "manual merge resolution\n")
+    env = {
+        **os.environ,
+        "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t",
+        "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t",
+    }
+    subprocess.run(["git", "-C", synth, "add", "-A"], check=True, env=env,
+                   capture_output=True, text=True)
+    tree = _git(synth, "write-tree")
+    new_merge = subprocess.run(
+        ["git", "-C", synth, "commit-tree", tree, "-p", parents[0], "-p", parents[1],
+         "-m", "Merge with manual resolution"],
+        check=True, capture_output=True, text=True, env=env,
+    ).stdout.strip()
+    _git(synth, "reset", "--hard", new_merge)
+    _set_state_field(synth, "baseline_commit", base_sha)
+    head = _git(synth, "rev-parse", "HEAD")
+    assert val._commit_tree(synth, head) != val._commit_tree(synth, parents[1])
+    assert val._is_transparent_head_merge(
+        synth, head, head, gfc, base_sha
+    ) is False
+    assert val.run_check(synth) == 1
+    errors: list[str] = []
+    val._check_commit_anchors(synth, _state(synth), errors)
+    assert any("non-transparent merge" in e for e in errors), errors
+
+
+def test_transparent_looking_merge_not_head_rejected(synth):
+    gfc = _state(synth)["generated_from_commit"]
+    base_sha = _pr_merge_base(synth)
+    merge_sha = _github_style_merge_onto_base(synth, base_sha)
+    _set_state_field(synth, "baseline_commit", base_sha)
+    assert val.run_check(synth) == 0
+    # A further Handoff-only commit makes the prior merge no longer HEAD.
+    _write(synth, "AGENTS.md", "post-merge pointer\n")
+    _commit(synth, "handoff: post-merge pointer")
+    _set_state_field(synth, "baseline_commit", base_sha)
+    head = _git(synth, "rev-parse", "HEAD")
+    assert merge_sha != head
+    assert val._is_transparent_head_merge(
+        synth, merge_sha, head, gfc, base_sha
+    ) is False
+    assert val.run_check(synth) == 1
+    errors: list[str] = []
+    val._check_commit_anchors(synth, _state(synth), errors)
+    assert any("non-transparent merge" in e for e in errors), errors
+
+
+def test_merge_gfc_not_in_second_parent_ancestry_rejected(synth):
+    # Build a real two-parent merge whose second parent is an orphan commit
+    # that does not contain generated_from_commit in its ancestry.
+    tip = _git(synth, "rev-parse", "HEAD")
+    gfc = _state(synth)["generated_from_commit"]
+    base_sha = _pr_merge_base(synth)
+    blob = subprocess.run(
+        ["git", "-C", synth, "hash-object", "-w", "--stdin"],
+        input="orphan\n", check=True, capture_output=True, text=True,
+    ).stdout.strip()
+    orphan_tree = subprocess.run(
+        ["git", "-C", synth, "mktree"],
+        input=f"100644 blob {blob}\tunrelated.txt\n",
+        check=True, capture_output=True, text=True,
+    ).stdout.strip()
+    env = {
+        **os.environ,
+        "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t",
+        "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t",
+    }
+    unrelated = subprocess.run(
+        ["git", "-C", synth, "commit-tree", orphan_tree, "-m", "orphan: unrelated tip"],
+        check=True, capture_output=True, text=True, env=env,
+    ).stdout.strip()
+    merge_sha = subprocess.run(
+        ["git", "-C", synth, "commit-tree", orphan_tree,
+         "-p", base_sha, "-p", unrelated, "-m", "Merge unrelated orphan"],
+        check=True, capture_output=True, text=True, env=env,
+    ).stdout.strip()
+    _git(synth, "reset", "--hard", merge_sha)
+    # Restore a readable handoff_state on disk from the pre-merge tip (volatile
+    # gfc overridden below); keep baseline valid for first parent.
+    subprocess.run(
+        ["git", "-C", synth, "checkout", tip, "--", "project/docs/ai/handoff_state.json"],
+        check=True, capture_output=True, text=True,
+    )
+    # Use first parent as gfc so the ancestry-of-HEAD gate passes, but
+    # second-parent ancestry fails.
+    _set_state_field(synth, "generated_from_commit", base_sha)
+    _set_state_field(synth, "baseline_commit", base_sha)
+    head = _git(synth, "rev-parse", "HEAD")
+    parents = val._commit_parents(synth, head)
+    assert parents == [base_sha, unrelated]
+    assert gen.is_ancestor(synth, base_sha, head)
+    assert not gen.is_ancestor(synth, base_sha, unrelated)
+    assert not gen.is_ancestor(synth, gfc, unrelated)
+    assert val._is_transparent_head_merge(
+        synth, head, head, base_sha, base_sha
+    ) is False
+    errors: list[str] = []
+    val._check_commit_anchors(synth, _state(synth), errors)
+    assert any("non-transparent merge" in e for e in errors), errors
+    assert val.run_check(synth) == 1
+
+
+def test_merge_baseline_not_in_first_parent_ancestry_rejected(synth):
+    gfc = _state(synth)["generated_from_commit"]
+    base_sha = _pr_merge_base(synth)
+    merge_sha = _github_style_merge_onto_base(synth, base_sha)
+    # Baseline points at the second parent (PR tip), not an ancestor of first.
+    parents = val._commit_parents(synth, merge_sha)
+    bad_baseline = parents[1]
+    _set_state_field(synth, "baseline_commit", bad_baseline)
+    assert not gen.is_ancestor(synth, bad_baseline, parents[0])
+    head = _git(synth, "rev-parse", "HEAD")
+    assert val._is_transparent_head_merge(
+        synth, merge_sha, head, gfc, bad_baseline
+    ) is False
+    assert val.run_check(synth) == 1
+    errors: list[str] = []
+    val._check_commit_anchors(synth, _state(synth), errors)
+    assert any("non-transparent merge" in e for e in errors), errors
+
+
+def test_multiple_merge_commits_after_gfc_rejected(synth):
+    gfc = _state(synth)["generated_from_commit"]
+    base_sha = _pr_merge_base(synth)
+    # First merge onto base.
+    _github_style_merge_onto_base(synth, base_sha, pr_branch="pr-a")
+    _set_state_field(synth, "baseline_commit", base_sha)
+    assert val.run_check(synth) == 0
+    # Second merge: create another side branch tip and merge again.
+    _git(synth, "checkout", "-b", "pr-b")
+    _write(synth, "AGENTS.md", "second pr tip\n")
+    _commit(synth, "handoff: second pr tip")
+    _git(synth, "checkout", "main")
+    _merge_no_ff(synth, "pr-b", "Merge branch 'pr-b'")
+    _set_state_field(synth, "baseline_commit", base_sha)
+    # gfc still the original handoff tip; two merges exist in (gfc, HEAD].
+    head = _git(synth, "rev-parse", "HEAD")
+    between = gen._git(synth, "rev-list", f"{gfc}..{head}").splitlines()
+    merge_count = sum(1 for sha in between if len(val._commit_parents(synth, sha)) >= 2)
+    assert merge_count >= 2
+    assert val.run_check(synth) == 1
+
+
+def test_ordinary_non_handoff_after_gfc_still_rejected(synth):
+    # Ordinary non-Handoff detection must remain intact beside merge handling.
+    _write(synth, "project/src/extra_module.py", "X = 1\n")
+    _commit(synth, "research: ordinary non-handoff after gfc")
+    assert val.run_check(synth) == 1
+    errors: list[str] = []
+    val._check_commit_anchors(synth, _state(synth), errors)
+    assert any("non-Handoff commit" in e for e in errors), errors
+
+
+def test_handoff_only_after_gfc_still_accepted(synth):
+    _write(synth, "AGENTS.md", "pointer still handoff-only\n")
+    _commit(synth, "handoff: ordinary handoff-only after gfc")
+    assert val.run_check(synth) == 0
+
+
 @pytest.mark.parametrize("field,value", [
     ("current_stage", "Stage999"),
     ("current_batch", "Batch99"),

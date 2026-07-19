@@ -574,13 +574,36 @@ def is_ancestor(root: str, ancestor: str, descendant: str) -> bool:
     return proc.returncode == 0
 
 
+def _commit_parents(root: str, sha: str) -> list[str]:
+    """Return parent SHAs for ``sha`` (empty for a root commit)."""
+    parts = _git(root, "rev-list", "--parents", "-n", "1", sha).split()
+    return parts[1:]
+
+
+def _commit_tree(root: str, sha: str) -> str:
+    """Return the tree SHA for ``sha``."""
+    return _git(root, "rev-parse", f"{sha}^{{tree}}")
+
+
+def _is_content_preserving_merge(root: str, sha: str) -> bool:
+    """True when ``sha`` is a two-parent merge whose tree equals parent 2.
+
+    Such merges introduce no unique tree content of their own (typical clean
+    GitHub --no-ff merges). They must not become ``last_stage_commit``.
+    """
+    parents = _commit_parents(root, sha)
+    if len(parents) != 2:
+        return False
+    return _commit_tree(root, sha) == _commit_tree(root, parents[1])
+
+
 def _introduced_files(root: str, sha: str) -> list[str]:
     """Files a commit introduced relative to its first parent.
 
     Works for merge commits too (diff against the first parent shows what the
     merge brought in). The root commit (no parent) lists all its files.
     """
-    parents = _git(root, "rev-list", "--parents", "-n", "1", sha).split()[1:]
+    parents = _commit_parents(root, sha)
     if not parents:
         out = _git(root, "show", "--no-renames", "--name-only", "--format=", sha)
     else:
@@ -689,6 +712,11 @@ def last_stage_commit(root: str) -> str:
     needs to be real content.
     """
     for sha in _git(root, "rev-list", "HEAD").splitlines():
+        # Clean GitHub-style merges replay second-parent trees; the real
+        # content commits already exist on that parent and must remain the
+        # stage anchor (otherwise post-merge last_stage_commit drifts).
+        if _is_content_preserving_merge(root, sha):
+            continue
         files = _introduced_files(root, sha)
         if _is_stage_relevant(files):
             return sha
