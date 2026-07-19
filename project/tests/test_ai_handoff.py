@@ -104,10 +104,13 @@ def test_qc_counts_match_report():
 
 
 def test_markers_are_off():
-    # Gate B has been executed (Stage124 finalization): gate_b_started is now
-    # True. Modeling has NOT started and must remain False.
+    # Gate B has been executed (Stage124 finalization): gate_b_started is True.
+    # Stage126 M1 is human-authorized and development-fold modeling has started,
+    # so modeling_started is now True. It never implies final-test access.
     state = _state(REAL_ROOT)
-    assert state["modeling_started"] is False
+    assert state["modeling_started"] is True
+    assert state["final_test_unlocked"] is False
+    assert state["final_test_access_authorized"] is False
     assert state["gate_b_started"] is True
     assert state["verified_master_created"] is True
 
@@ -1209,9 +1212,9 @@ def test_extract_qc_workflow_markers_fail_closed_when_field_missing():
 )
 def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
-    assert state["current_stage"] == "Stage125"
+    assert state["current_stage"] == "Stage126"
     assert state["selected_qc_scope"] == (
-        "stage125_part5_readiness_closure"
+        "stage126_m1_financial_baseline"
     )
     assert state["last_completed_micro_part"] == (
         "stage125-part5-readiness-closure"
@@ -1219,49 +1222,27 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["next_research_action_id"] == (
         "stage126-m1-financial-baseline"
     )
-    assert state["part3a_protocol_locked"] is True
-    assert state["part3a_decision_locked"] is True
-    assert state["part3b0_readiness"] is True
-    assert state["part3b_started"] is True
-    assert state["part3b1_decision_locked"] is True
-    assert state["cut_a_available_at_operationalization_locked"] is True
-    assert state["predictor_document_binding_mini_pilot_completed"] is True
-    assert state["predictor_document_binding_evidence_collected"] is True
-    assert state["document_binding_resolution_decision_locked"] is True
-    assert state["conservative_six_month_lag_decision_locked"] is True
-    assert state["broad_codal_capture_stopped"] is True
-    assert state["financial_data_researcher_verified_frozen"] is True
-    assert state["conservative_availability_lag_locked"] is True
-    assert state["row_level_publish_datetime_collection_required"] is False
-    assert state["active_availability_method"] == "fixed_regulatory_lag"
-    assert state["active_availability_lag_months"] == 4
-    assert state["four_month_regulatory_lag_locked"] is True
-    assert state["six_month_lag_superseded"] is True
-    assert state["historical_six_month_decision_retained"] is True
-    assert state["historical_six_month_decision_active"] is False
-    assert state["predictor_available_at_evidence_collected"] is False
-    assert state["pilot_cutoff_provenance_resolved"] is False
-    assert state["evidence_collected"] is True
-    assert state["endpoint_probe_evidence_collected"] is True
-    assert state["candidate_value_evidence_collected"] is False
-    assert state["pair_level_evidence_collected"] is True
-    assert state["data_value_extraction_performed"] is False
-    assert state["accessibility_scoring_applied"] is False
-    assert state["part3b_completed"] is False
-    assert state["part3c_leakage_safe_finalization_completed"] is True
-    assert state["part4_statistical_analysis_plan_locked"] is True
-    assert state["stage125_part5_readiness_closure_completed"] is True
+    assert state["active_workstream"] == "stage126_m1_financial_baseline"
+    # Stage126 M1 is human-authorized and started; development-fold modeling
+    # occurred, while the final test remains fully locked.
     assert state["stage125_completed"] is True
     assert state["stage126_m1_entry_ready"] is True
-    assert state["stage126_authorized"] is False
-    assert state["stage126_started"] is False
-    assert state["modeling_authorized"] is False
-    assert state["modeling_started"] is False
+    assert state["stage126_authorized"] is True
+    assert state["stage126_started"] is True
+    assert state["development_modeling_authorized"] is True
+    assert state["modeling_authorized"] is True
+    assert state["modeling_started"] is True
+    assert state["m1_primary_development_tuning_completed"] is True
+    assert state["m1_robustness_started"] is False
+    assert state["m1_robustness_completed"] is False
     assert state["final_test_unlocked"] is False
-    assert state["network_extraction_performed"] is True
-    # Active lag must not ambiguously remain six months.
-    assert "conservative_lag_months" not in state
-    assert state["active_availability_lag_months"] == 4
+    assert state["final_test_access_authorized"] is False
+    assert state["final_test_predictor_values_inspected"] is False
+    assert state["final_test_target_values_inspected"] is False
+    assert state["final_test_evaluation_performed"] is False
+    assert state["m2_data_collected"] is False
+    assert state["m3_data_collected"] is False
+    assert state["m4_data_collected"] is False
 
 
 # ---- Stage125 Part 3B.0 artifact-only + workflow markers ------------------- #

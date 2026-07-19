@@ -1,7 +1,7 @@
 ---
 roadmap_version: 1
-active_research_workstream_id: stage125-research-design-readiness
-qc_scope: stage125-part5-readiness-closure
+active_research_workstream_id: stage126-m1-financial-baseline
+qc_scope: stage126-m1-financial-baseline
 last_completed_research_action_id: stage125-part5-readiness-closure
 next_research_action_id: stage126-m1-financial-baseline
 active_maintenance_task_id: repository-driven-ai-handoff

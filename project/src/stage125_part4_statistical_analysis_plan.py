@@ -340,6 +340,53 @@ FORBIDDEN_SURFACE_EXACT = (
     "project/stage126",
 )
 
+# Stage126 M1 development modeling is gated behind an explicit, signed human
+# authorization record. Until that record is present and valid, the entire
+# ``project/stage126/`` surface is forbidden. Once the human supervisor/data
+# owner authorizes Stage126 M1 (development only; final test still locked), the
+# directory surface becomes permitted so the authorized development-fold work
+# can live alongside the frozen Part 4 plan. The two legacy Stage126 filenames
+# below remain forbidden regardless, because they were never the sanctioned
+# entry points.
+STAGE126_M1_AUTHORIZATION_RECORD_REL = (
+    "project/stage126/stage126_m1_human_authorization_record.json"
+)
+STAGE126_M1_AUTHORIZATION_TEXT_SHA256 = (
+    "eeba72fe612b292fb611729676eef0a1d7e4b0c1e5fc9d8b533d62d8dcf41a50"
+)
+
+
+def stage126_m1_development_authorized(repo_root: Path) -> bool:
+    """True iff a valid, signed Stage126 M1 development authorization exists.
+
+    Fail-closed: any missing/malformed record, a mutated authorization text
+    hash, or an unlocked final test yields ``False`` (surface stays forbidden).
+    """
+    record = repo_root / STAGE126_M1_AUTHORIZATION_RECORD_REL
+    if not record.is_file():
+        return False
+    try:
+        data = json.loads(record.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    return (
+        data.get("stage126_authorized") is True
+        and data.get("development_modeling_authorized") is True
+        and data.get("final_test_unlocked") is False
+        and data.get("final_test_access_authorized") is False
+        and data.get("authorization_text_sha256")
+        == STAGE126_M1_AUTHORIZATION_TEXT_SHA256
+    )
+
+
+def effective_forbidden_surfaces(repo_root: Path) -> tuple[str, ...]:
+    """Forbidden Stage126 surfaces after applying the authorization gate."""
+    if stage126_m1_development_authorized(repo_root):
+        return tuple(
+            rel for rel in FORBIDDEN_SURFACE_EXACT if rel != "project/stage126"
+        )
+    return FORBIDDEN_SURFACE_EXACT
+
 
 class QCFail(RuntimeError):
     """Fail-closed Part 4 QC error."""
@@ -2570,7 +2617,10 @@ def build_qc_assertions(
     )
     _assert(
         assertions, "forbidden_surfaces_absent",
-        all(not (repo_root / rel).exists() for rel in FORBIDDEN_SURFACE_EXACT),
+        all(
+            not (repo_root / rel).exists()
+            for rel in effective_forbidden_surfaces(repo_root)
+        ),
         "absent",
     )
     content2, _ = build_all(repo_root)

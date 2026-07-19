@@ -65,6 +65,8 @@ ALLOWLIST_DIRS = (
     # Stage125 Part 1 is tracked as a maintenance task (it does not advance the
     # research stage); its deliverables live under this directory.
     "project/stage125/",
+    # Stage126 M1 primary development-fold tuning deliverables.
+    "project/stage126/",
 )
 ALLOWLIST_FILES = (
     "project/scripts/update_ai_handoff.py",
@@ -127,6 +129,10 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part5_readiness_closure.py",
     "project/run_stage125_part5.py",
     "project/tests/test_stage125_part5_readiness_closure.py",
+    # Stage126 M1 primary development-fold tuning code, runner, and tests.
+    "project/src/stage126_m1_primary_development_tuning.py",
+    "project/run_stage126_m1_primary_development_tuning.py",
+    "project/tests/test_stage126_m1_primary_development_tuning.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
@@ -331,6 +337,19 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/part5_artifact_integrity_manifest_stage125.csv",
     "project/stage125/stage125_part5_readiness_closure_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part5.json",
+    # Stage126 M1 primary development-fold tuning generated artifacts.
+    "project/stage126/stage126_m1_human_authorization_record.json",
+    "project/stage126/stage126_m1_development_access_manifest.csv",
+    "project/stage126/stage126_m1_final_test_lock_guard.json",
+    "project/stage126/stage126_m1_configuration_registry.csv",
+    "project/stage126/stage126_m1_tuning_results.csv",
+    "project/stage126/stage126_m1_selected_configurations.json",
+    "project/stage126/stage126_m1_development_oof_predictions.csv",
+    "project/stage126/stage126_m1_development_metrics.csv",
+    "project/stage126/stage126_m1_primary_development_lock.json",
+    "project/stage126/README_STAGE126_M1_PRIMARY_DEVELOPMENT_TUNING.md",
+    "project/stage126/stage126_m1_primary_development_tuning_qc_report.json",
+    "project/stage126/metadata_and_hashes_stage126_m1_primary_development_tuning.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -644,6 +663,27 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "contract_version",
         "network_extraction_performed",
     ),
+    "stage126_m1_financial_baseline": (
+        "stage125_completed",
+        "stage126_m1_entry_ready",
+        "stage126_authorized",
+        "stage126_started",
+        "development_modeling_authorized",
+        "modeling_authorized",
+        "modeling_started",
+        "final_test_unlocked",
+        "final_test_access_authorized",
+        "final_test_predictor_values_inspected",
+        "final_test_target_values_inspected",
+        "final_test_evaluation_performed",
+        "m1_primary_development_tuning_completed",
+        "m1_robustness_started",
+        "m1_robustness_completed",
+        "m2_data_collected",
+        "m3_data_collected",
+        "m4_data_collected",
+        "contract_version",
+    ),
 }
 
 
@@ -931,6 +971,10 @@ _QC_SOURCE_TEST_OVERRIDES: dict[str, tuple[str, str]] = {
     "stage125_part5_readiness_closure": (
         "project/src/stage125_part5_readiness_closure.py",
         "project/tests/test_stage125_part5_readiness_closure.py",
+    ),
+    "stage126_m1_financial_baseline": (
+        "project/src/stage126_m1_primary_development_tuning.py",
+        "project/tests/test_stage126_m1_primary_development_tuning.py",
     ),
 }
 
@@ -1321,6 +1365,24 @@ def render_current_state(record: dict) -> str:
         "accessibility_scoring_applied",
         "part3b_completed",
         "network_extraction_performed",
+    ):
+        if key in record:
+            lines.append(f"- {key}: **{record[key]}**")
+    for key in (
+        "stage125_completed",
+        "stage126_authorized",
+        "stage126_started",
+        "development_modeling_authorized",
+        "modeling_authorized",
+        "m1_primary_development_tuning_completed",
+        "m1_robustness_started",
+        "m1_robustness_completed",
+        "final_test_unlocked",
+        "final_test_access_authorized",
+        "final_test_evaluation_performed",
+        "m2_data_collected",
+        "m3_data_collected",
+        "m4_data_collected",
     ):
         if key in record:
             lines.append(f"- {key}: **{record[key]}**")
