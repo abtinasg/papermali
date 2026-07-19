@@ -11,16 +11,16 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage125_research_design_readiness`
 - **Last completed research action:** `stage125-part5-readiness-closure`
 - **Next research action:** `stage126-m1-financial-baseline`
-- **Last stage commit:** `6297545caa1acbd7ee83d1376c7085f0ffb2a36f`
-- **Generated from commit:** `5d23d8cf2083691906750be4e821b5c3c02d8d57` (branch `stage125-part5-readiness-closure`, informational)
+- **Last stage commit:** `112c753d9bd962cb1846805051119e3e41d408f9`
+- **Generated from commit:** `80266477db25f6c8598f0f0c2e3bc4e374340ba3` (branch `stage125-part5-readiness-closure`, informational)
 - **Baseline:** `origin/main` @ `5836059e2d533f4be7e1898f942937a57c0b8fef`
 
 ## QC
 
-- ✅ **59 assertions, 0 failed**, all_pass=True
+- ✅ **61 assertions, 0 failed**, all_pass=True
 - Scope: `stage125_part5_readiness_closure`
 - Report: `project/stage125/stage125_part5_readiness_closure_qc_report.json`
-- QC source commit (code): `98ef58a7197c7fbb21fa57bfecf927468afc6df3`
+- QC source commit (code): `112c753d9bd962cb1846805051119e3e41d408f9`
 
 ## Workflow markers
 
@@ -50,5 +50,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `ae6e1b445f073b4119ac66c53ea6cb5da4f053602ea7bd7b88120e0682894cab`_
-_generated_at_utc: 2026-07-19T12:56:25Z (informational)_
+_state_fingerprint: `076144bb949dd8847a9357fbcabf997877af405cdcf5e4985e9de00b92ae2e02`_
+_generated_at_utc: 2026-07-19T13:46:19Z (informational)_
