@@ -1781,9 +1781,14 @@ def build_integrity_manifest_rows(
     # Pin the Handoff-selected QC *producer* (Part 5 source) rather than the
     # Part 5 QC report itself — hashing the QC report here would create a
     # build/check cycle because this build rewrites that QC file.
+    # Once Stage126 M1 development is authorized, the live Handoff state has
+    # advanced to select the Stage126 QC report; pinning that QC file here would
+    # couple the Part 5 integrity manifest to a downstream artifact (and create a
+    # build/check cycle). In that case Part 5 pins its own QC producer (Part 5
+    # source), exactly as it does when the Handoff still selects the Part 5 QC.
     handoff_path = repo_root / HANDOFF_STATE_REL
     selected_qc_path = ""
-    if handoff_path.is_file():
+    if handoff_path.is_file() and not stage126_m1_development_authorized(repo_root):
         handoff_state = json.loads(handoff_path.read_text(encoding="utf-8"))
         selected_qc_path = str(handoff_state.get("selected_qc_path") or "")
     part5_qc_rel = f"{PART4_OUTPUT_DIR}/{F_QC}"
