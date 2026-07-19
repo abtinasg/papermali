@@ -1,10 +1,10 @@
 {
   "baseline_commit": "99def5b4c15a41ca80729d873032d8c5c81ec672",
-  "code_commit": "bde48253ba33e2dc828002030b6f95d930eed5c6",
+  "code_commit": "6297545caa1acbd7ee83d1376c7085f0ffb2a36f",
   "current_stage": "Stage125",
   "description": "Stage125 Part 3B.1C document-binding resolution decision lock (offline taxonomy/normalization/hierarchy/proposal only).",
   "document_binding_resolution_decision_locked": true,
-  "generated_at": "bde48253ba33e2dc828002030b6f95d930eed5c6",
+  "generated_at": "6297545caa1acbd7ee83d1376c7085f0ffb2a36f",
   "modeling_started": false,
   "network_requests_attempted": 0,
   "output_files_sha256": {
@@ -16,7 +16,7 @@
     "part3b1c_proposed_capture_authorization_stage125.json": "c97b17669c44969eb1fdc567e9c81f8b9de7b36ad3f63dc5ee6613f7bda17d78",
     "part3b1c_row_resolution_requirements_stage125.csv": "ebb83df39c45598abd239cab60c519061c0742062602e71058f82bacced3ff4d",
     "part3b1c_scale_up_readiness_decision_stage125.json": "ee49e9e844d2276009ce1db0daf38a39e0f40b169ada1c4e08ef9ae8546520cd",
-    "stage125_part3b1c_document_binding_resolution_qc_report.json": "afece13b4670908127d02edb1734de8881acdc50f08a9b5017d732f30a3a5abd"
+    "stage125_part3b1c_document_binding_resolution_qc_report.json": "1bd239fa9811afab8e58033b5ecb08018a93a4a48d3a24ee0660841923eccafe"
   },
   "part3b_completed": false,
   "scale_up_to_80_rows_authorized": false,
