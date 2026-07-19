@@ -109,6 +109,12 @@ Do not confuse QC selection with the research-action chain:
   `stage125/stage125_part3b1e_conservative_lag_qc_report.json` (fixed
   six-month lag; researcher-verified financials frozen; no broad CODAL
   capture; assumed availability field only; no Stage126 / modeling).
+- Stage125 Part 4 statistical analysis plan source/test/QC:
+  `src/stage125_part4_statistical_analysis_plan.py`,
+  `run_stage125_part4.py`,
+  `tests/test_stage125_part4_statistical_analysis_plan.py`,
+  `stage125/stage125_part4_statistical_analysis_plan_qc_report.json` (SAP
+  contracts; temporal splits; coverage/event gates; no modeling)
 - Stage125 Part 3C leakage-safe dataset finalization source/test/QC:
   `src/stage125_part3c_leakage_safe_dataset_finalization.py`,
   `run_stage125_part3c.py`,
@@ -142,14 +148,13 @@ See [`OPEN_TASKS.md`](OPEN_TASKS.md).
 
 See `next_research_action_id` in [`ROADMAP.md`](ROADMAP.md) and
 [`handoff_state.json`](handoff_state.json). Currently the research pointer is
-**`stage125-part4-statistical-analysis-plan`** after Part 3C leakage-safe
-dataset finalization
-(`last_completed_research_action_id=stage125-part3c-leakage-safe-dataset-finalization`).
+**`stage125-part5-readiness-closure`** after Part 4 SAP lock
+(`last_completed_research_action_id=stage125-part4-statistical-analysis-plan`).
 Broad CODAL capture is stopped; researcher-verified financial data are frozen;
 active assumed availability uses `assumed_available_at_regulatory` (four
 Jalali months; six-month methodology superseded). Stage125 performs **no**
 modeling; the frozen research contract (M1–M4 blocks, M5 removed,
-accessibility Gates) is in
+accessibility Gates, Part 4 SAP) is in
 [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
 prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.
 

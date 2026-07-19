@@ -1,0 +1,41 @@
+{
+  "continuous_pipeline": [
+    "deterministic_source_to_feature_transformation",
+    "training_fold_1st_99th_percentile_clipping",
+    "training_fold_median_imputation",
+    "missingness_indicators"
+  ],
+  "final_development_refit": {
+    "after_hyperparameter_selection": true,
+    "apply_once_to_locked_final_test": true,
+    "fit_years": [
+      1393,
+      1394,
+      1395,
+      1396,
+      1397,
+      1398,
+      1399
+    ]
+  },
+  "fit_scope": "each_temporal_training_fold_separately",
+  "forbidden_fit_on": [
+    "validation_data",
+    "final_test_data",
+    "combined_train_plus_validation_before_configuration_selection"
+  ],
+  "forbidden_selection": [
+    "univariate_screening",
+    "recursive_feature_elimination",
+    "shap_selection",
+    "p_value_feature_selection"
+  ],
+  "future_categorical_m4": {
+    "encoding": "training_only_one_hot",
+    "target_encoding": false,
+    "unknown_category": true
+  },
+  "logistic_regression_extra": "training_fold_standardization_after_imputation",
+  "random_forest_standardization": false,
+  "xgboost_standardization": false
+}

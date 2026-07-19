@@ -1,9 +1,9 @@
 ---
 roadmap_version: 1
 active_research_workstream_id: stage125-research-design-readiness
-qc_scope: stage125-part3c-leakage-safe-dataset-finalization
-last_completed_research_action_id: stage125-part3c-leakage-safe-dataset-finalization
-next_research_action_id: stage125-part4-statistical-analysis-plan
+qc_scope: stage125-part4-statistical-analysis-plan
+last_completed_research_action_id: stage125-part4-statistical-analysis-plan
+next_research_action_id: stage125-part5-readiness-closure
 active_maintenance_task_id: repository-driven-ai-handoff
 ---
 
@@ -37,7 +37,8 @@ must also appear in the body below. The validator checks that:
 13. `stage125-part3b-evidence-capture` — Part 3B accessibility feasibility probe — **superseded for expansion** by the conservative six-month lag methodology (origin probes retained as historical evidence; broad CODAL metadata / financial-statement capture stopped; PR #47 closed unmerged)
 14. `stage125-part3b-conservative-lag-decision-lock` — Human-supervisor-approved fixed conservative six-calendar-month availability lag; researcher-verified financial data frozen; no broad CODAL capture; no row-level PublishDateTime collection; assumed availability is methodological only ✅
 15. `stage125-part3c-leakage-safe-dataset-finalization` — Leakage-safe dataset finalization under the active four-Jalali-month regulatory lag (six-month methodology superseded; historical six-month decision retained; four Gate B designs audited; timing-eligible analysis-ready subsets; no feature selection; no Stage126 / modeling) ✅
-16. `stage125-part4-statistical-analysis-plan` — Lock M1–M4 feature definitions/order, primary/robustness samples, temporal CV, metrics, seeds/tuning budget; **no modeling estimation** ⬅️ **next / active**
+16. `stage125-part4-statistical-analysis-plan` — Lock M1–M4 feature definitions/order, primary/robustness samples, temporal CV, metrics, seeds/tuning budget; **no modeling estimation** ✅
+17. `stage125-part5-readiness-closure` — Stage125 closure / readiness report; keep/drop decisions; full validator + tests; **no Stage126 / modeling** ⬅️ **next / active**
 
 ## Maintenance tasks
 
@@ -54,6 +55,7 @@ must also appear in the body below. The validator checks that:
 - `stage125-part3b1c-document-binding-resolution-decision-lock` — Stage125 Part 3B.1C offline document-binding failure adjudication, normalization/source hierarchy lock, and future capture authorization proposal only; **no network, no new capture, no evidence mutation, no available_at assignment, no extraction/scoring/Gates, no 80-row scale-up, no Part 3B.2 / Stage126 / modeling**; advances no research action
 - `stage125-part3b1e-conservative-six-month-lag-decision-lock` — Stage125 Part 3B.1E offline conservative six-month availability-lag decision lock (researcher-verified financial data frozen; broad CODAL capture stopped; assumed availability field only); QC scope for the research action `stage125-part3b-conservative-lag-decision-lock`; **no network, no re-extraction, no Stage126 / modeling**
 - `stage125-part3c-leakage-safe-dataset-finalization` — Stage125 Part 3C leakage-safe dataset finalization (operationalize four-Jalali-month regulatory lag on all four frozen Gate B designs; audited pair + timing-eligible analysis-ready surfaces; candidate inventory only; offline deterministic rebuild); **no feature selection / model-feature approval, no model fitting, no Stage126**
+- `stage125-part4-statistical-analysis-plan` — Stage125 Part 4 statistical analysis plan lock (M1–M4 order, samples, temporal folds, preprocessing, finite tuning budget, PR-AUC/metrics/bootstrap/Holm/SHAP contracts); **no model fitting, no final-test predictor inspection, no Stage126**
 
 ## Notes on ordering
 
@@ -90,7 +92,9 @@ researcher-verified financials frozen; PR #47 closed unmerged).
 active four-month regulatory lag into audited pair datasets and
 timing-eligible leakage-safe analysis-ready datasets for all four Gate B
 designs (timing violations, including رمپنا 1396→1397, remain visible in
-audit only; six-month methodology superseded). Next:
-`stage125-part4-statistical-analysis-plan`. See
+audit only; six-month methodology superseded).
+`stage125-part4-statistical-analysis-plan` locked the SAP (M1–M4, samples,
+temporal folds, metrics/seeds; no fitting). Next:
+`stage125-part5-readiness-closure`. See
 [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
 prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.

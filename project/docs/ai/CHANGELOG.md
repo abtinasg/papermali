@@ -3,6 +3,19 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-19
+
+- **Stage125 Part 4 / research action
+  `stage125-part4-statistical-analysis-plan` — Statistical Analysis Plan lock.**
+  Locks M1–M4 feature order, four sample designs, target-year temporal folds,
+  preprocessing, model families, finite tuning budget, PR-AUC primary,
+  Recall@10%/Lift@10%, calibration, paired ticker-cluster bootstrap, Holm, and
+  SHAP stability contracts. Part 3C hashes pinned. **No** model fitting; **no**
+  final-test predictor inspection; **no** Stage126. Research pointers advance
+  to `last_completed_research_action_id=stage125-part4-statistical-analysis-plan`,
+  `next_research_action_id=stage125-part5-readiness-closure`. Stage125 remains
+  incomplete.
+
 ## 2026-07-18
 
 - **Stage125 Part 3C correction — audited vs analysis-ready split.** The

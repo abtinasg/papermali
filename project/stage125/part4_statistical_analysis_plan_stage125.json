@@ -1,0 +1,376 @@
+{
+  "active_availability_lag_months": 4,
+  "active_availability_method": "fixed_regulatory_lag",
+  "article141_final_test_gate": {
+    "decision": "distributional_descriptive_robustness_only;no_comparative_predictive_performance_claim;no_inferential_model_ranking",
+    "positive": 1,
+    "sample": "main_rule_a_primary",
+    "target": "FD_target_article141_only_t_plus_1"
+  },
+  "baseline_commit": "6cb27d6817bf167358d480adbccc1728ad59e109",
+  "broad_codal_capture_stopped": true,
+  "contract_version": "stage125_part4_sap_v1",
+  "final_data_admission_thresholds": {
+    "block_common_sample_coverage_min": 0.7,
+    "candidate_valid_coverage_min": 0.8,
+    "coverage_years": "development_only_1393_1399",
+    "fail_action": "not_admitted_descriptive_coverage_only",
+    "final_test_predictor_inspection_for_admission": false,
+    "min_positives_each_temporal_validation_window": 5,
+    "min_positives_locked_final_test": 10,
+    "replaces_pilot_G09_G14_for_modeling_path": true
+  },
+  "final_test_accessed_for_modeling": false,
+  "financial_data_researcher_verified_frozen": true,
+  "financial_expense_to_assets_sign_convention": {
+    "convention": "preserve_frozen_part3c_source_sign; expenses_are_nonpositive_in_researcher_verified_data; do_not_abs_or_reverse_sign",
+    "feature": "financial_expense_to_assets_period_adjusted"
+  },
+  "growth_feature_coverage_exception": {
+    "exception_authorized_in_part4_sap": true,
+    "feature": "revenue_growth_period_adjusted",
+    "overall_development_coverage_still_uses_all_rows": true,
+    "policy": "for_minimum_fold_training_and_validation_coverage_only_exclude_rows_where_fiscal_year_t_equals_ticker_first_observed_fiscal_year_in_the_analysis_ready_sample",
+    "reason": "structural_first_observation_undefined_growth"
+  },
+  "m1_coverage_gates": {
+    "audit": [
+      {
+        "admission_status": "admitted_m1_primary",
+        "coverage": "1.0000000000",
+        "development_rows": "666",
+        "feature_name": "log_total_assets",
+        "growth_coverage_exception_applied": "false",
+        "minimum_fold_training_coverage": "1.0000000000",
+        "minimum_fold_validation_coverage": "1.0000000000",
+        "negative_row_coverage": "1.0000000000",
+        "nonmissing_rows": "666",
+        "positive_row_coverage": "1.0000000000",
+        "source_column": "total_assets"
+      },
+      {
+        "admission_status": "admitted_m1_primary",
+        "coverage": "1.0000000000",
+        "development_rows": "666",
+        "feature_name": "leverage_ratio",
+        "growth_coverage_exception_applied": "false",
+        "minimum_fold_training_coverage": "1.0000000000",
+        "minimum_fold_validation_coverage": "1.0000000000",
+        "negative_row_coverage": "1.0000000000",
+        "nonmissing_rows": "666",
+        "positive_row_coverage": "1.0000000000",
+        "source_column": "leverage_ratio"
+      },
+      {
+        "admission_status": "admitted_m1_primary",
+        "coverage": "1.0000000000",
+        "development_rows": "666",
+        "feature_name": "current_ratio",
+        "growth_coverage_exception_applied": "false",
+        "minimum_fold_training_coverage": "1.0000000000",
+        "minimum_fold_validation_coverage": "1.0000000000",
+        "negative_row_coverage": "1.0000000000",
+        "nonmissing_rows": "666",
+        "positive_row_coverage": "1.0000000000",
+        "source_column": "current_ratio"
+      },
+      {
+        "admission_status": "admitted_m1_primary",
+        "coverage": "1.0000000000",
+        "development_rows": "666",
+        "feature_name": "roa_period_adjusted",
+        "growth_coverage_exception_applied": "false",
+        "minimum_fold_training_coverage": "1.0000000000",
+        "minimum_fold_validation_coverage": "1.0000000000",
+        "negative_row_coverage": "1.0000000000",
+        "nonmissing_rows": "666",
+        "positive_row_coverage": "1.0000000000",
+        "source_column": "roa_period_adjusted"
+      },
+      {
+        "admission_status": "admitted_m1_primary",
+        "coverage": "0.9714714715",
+        "development_rows": "666",
+        "feature_name": "ocf_to_assets_period_adjusted",
+        "growth_coverage_exception_applied": "false",
+        "minimum_fold_training_coverage": "0.9224489796",
+        "minimum_fold_validation_coverage": "1.0000000000",
+        "negative_row_coverage": "0.9749163880",
+        "nonmissing_rows": "647",
+        "positive_row_coverage": "0.9411764706",
+        "source_column": "ocf_to_assets_period_adjusted"
+      },
+      {
+        "admission_status": "admitted_m1_primary",
+        "coverage": "1.0000000000",
+        "development_rows": "666",
+        "feature_name": "asset_turnover_period_adjusted",
+        "growth_coverage_exception_applied": "false",
+        "minimum_fold_training_coverage": "1.0000000000",
+        "minimum_fold_validation_coverage": "1.0000000000",
+        "negative_row_coverage": "1.0000000000",
+        "nonmissing_rows": "666",
+        "positive_row_coverage": "1.0000000000",
+        "source_column": "asset_turnover_period_adjusted"
+      },
+      {
+        "admission_status": "admitted_m1_primary",
+        "coverage": "0.9939939940",
+        "development_rows": "666",
+        "feature_name": "operating_margin_period_adjusted",
+        "growth_coverage_exception_applied": "false",
+        "minimum_fold_training_coverage": "0.9955555556",
+        "minimum_fold_validation_coverage": "0.9902439024",
+        "negative_row_coverage": "0.9933110368",
+        "nonmissing_rows": "662",
+        "positive_row_coverage": "1.0000000000",
+        "source_column": "operating_margin_period_adjusted"
+      },
+      {
+        "admission_status": "admitted_m1_primary",
+        "coverage": "0.8483483483",
+        "development_rows": "666",
+        "feature_name": "revenue_growth_period_adjusted",
+        "growth_coverage_exception_applied": "true",
+        "minimum_fold_training_coverage": "0.9942196532",
+        "minimum_fold_validation_coverage": "0.9900990099",
+        "negative_row_coverage": "0.8511705686",
+        "nonmissing_rows": "565",
+        "positive_row_coverage": "0.8235294118",
+        "source_column": "revenue_growth_period_adjusted"
+      },
+      {
+        "admission_status": "admitted_m1_primary",
+        "coverage": "0.9984984985",
+        "development_rows": "666",
+        "feature_name": "financial_expense_to_assets_period_adjusted",
+        "growth_coverage_exception_applied": "false",
+        "minimum_fold_training_coverage": "1.0000000000",
+        "minimum_fold_validation_coverage": "0.9953703704",
+        "negative_row_coverage": "0.9983277592",
+        "nonmissing_rows": "665",
+        "positive_row_coverage": "1.0000000000",
+        "source_column": "financial_expense_to_assets_period_adjusted"
+      },
+      {
+        "admission_status": "admitted_m1_primary",
+        "coverage": "1.0000000000",
+        "development_rows": "666",
+        "feature_name": "accumulated_loss_to_capital_ratio",
+        "growth_coverage_exception_applied": "false",
+        "minimum_fold_training_coverage": "1.0000000000",
+        "minimum_fold_validation_coverage": "1.0000000000",
+        "negative_row_coverage": "1.0000000000",
+        "nonmissing_rows": "666",
+        "positive_row_coverage": "1.0000000000",
+        "source_column": "accumulated_loss_to_capital_ratio"
+      }
+    ],
+    "minimum_fold_training_min": 0.75,
+    "overall_development_min": 0.8
+  },
+  "m1_feature_source_mapping": {
+    "accumulated_loss_to_capital_ratio": "accumulated_loss_to_capital_ratio",
+    "asset_turnover_period_adjusted": "asset_turnover_period_adjusted",
+    "current_ratio": "current_ratio",
+    "financial_expense_to_assets_period_adjusted": "financial_expense_to_assets_period_adjusted",
+    "leverage_ratio": "leverage_ratio",
+    "log_total_assets": "total_assets",
+    "ocf_to_assets_period_adjusted": "ocf_to_assets_period_adjusted",
+    "operating_margin_period_adjusted": "operating_margin_period_adjusted",
+    "revenue_growth_period_adjusted": "revenue_growth_period_adjusted",
+    "roa_period_adjusted": "roa_period_adjusted"
+  },
+  "m1_primary_feature_order": [
+    "log_total_assets",
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "revenue_growth_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio"
+  ],
+  "m1_target_proximity_removed": [
+    "leverage_ratio",
+    "ocf_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio"
+  ],
+  "m1_target_proximity_robustness_order": [
+    "log_total_assets",
+    "current_ratio",
+    "roa_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "revenue_growth_period_adjusted",
+    "financial_expense_to_assets_period_adjusted"
+  ],
+  "m2_block": [
+    "equity_return_window",
+    "realized_volatility",
+    "amihud_illiquidity"
+  ],
+  "m2_data_collected": false,
+  "m2_definitions": {
+    "automatic_threshold_reduction": false,
+    "imputation_of_market_days": false,
+    "market_observation_date": "strictly_before_cutoff",
+    "min_valid_amihud_observations": 126,
+    "min_valid_return_observations": 126,
+    "price": "adjusted_close_only",
+    "shared_window": "12_calendar_month_pre_cutoff"
+  },
+  "m3_admitted": false,
+  "m3_block": [
+    "cpi_inflation",
+    "fx_change_official",
+    "policy_financing_rate"
+  ],
+  "m3_data_collected": false,
+  "m3_status": "not_admitted_no_authoritative_cbi_endpoint",
+  "m3_substitution_sci_or_free_market_allowed": false,
+  "m4_block": [
+    "audit_opinion_type",
+    "going_concern_flag",
+    "audit_lag_days",
+    "board_size"
+  ],
+  "m4_constraints": {
+    "ambiguity_or_missing": "null",
+    "official_structured_codal_only": true,
+    "persian_nlp": false
+  },
+  "m4_data_collected": false,
+  "m4_status": "conditional_future_variable_level_data_gate",
+  "model_fit_calls": 0,
+  "modeling_authorized": false,
+  "modeling_started": false,
+  "nested_blocks": {
+    "M1": [
+      "log_total_assets",
+      "leverage_ratio",
+      "current_ratio",
+      "roa_period_adjusted",
+      "ocf_to_assets_period_adjusted",
+      "asset_turnover_period_adjusted",
+      "operating_margin_period_adjusted",
+      "revenue_growth_period_adjusted",
+      "financial_expense_to_assets_period_adjusted",
+      "accumulated_loss_to_capital_ratio"
+    ],
+    "M2": [
+      "log_total_assets",
+      "leverage_ratio",
+      "current_ratio",
+      "roa_period_adjusted",
+      "ocf_to_assets_period_adjusted",
+      "asset_turnover_period_adjusted",
+      "operating_margin_period_adjusted",
+      "revenue_growth_period_adjusted",
+      "financial_expense_to_assets_period_adjusted",
+      "accumulated_loss_to_capital_ratio",
+      "equity_return_window",
+      "realized_volatility",
+      "amihud_illiquidity"
+    ],
+    "M3": [
+      "log_total_assets",
+      "leverage_ratio",
+      "current_ratio",
+      "roa_period_adjusted",
+      "ocf_to_assets_period_adjusted",
+      "asset_turnover_period_adjusted",
+      "operating_margin_period_adjusted",
+      "revenue_growth_period_adjusted",
+      "financial_expense_to_assets_period_adjusted",
+      "accumulated_loss_to_capital_ratio",
+      "equity_return_window",
+      "realized_volatility",
+      "amihud_illiquidity",
+      "cpi_inflation",
+      "fx_change_official",
+      "policy_financing_rate"
+    ],
+    "M4": [
+      "log_total_assets",
+      "leverage_ratio",
+      "current_ratio",
+      "roa_period_adjusted",
+      "ocf_to_assets_period_adjusted",
+      "asset_turnover_period_adjusted",
+      "operating_margin_period_adjusted",
+      "revenue_growth_period_adjusted",
+      "financial_expense_to_assets_period_adjusted",
+      "accumulated_loss_to_capital_ratio",
+      "equity_return_window",
+      "realized_volatility",
+      "amihud_illiquidity",
+      "cpi_inflation",
+      "fx_change_official",
+      "policy_financing_rate",
+      "audit_opinion_type",
+      "going_concern_flag",
+      "audit_lag_days",
+      "board_size"
+    ]
+  },
+  "part4_statistical_analysis_plan_locked": true,
+  "pinned_part3c_input_sha256": {
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_a_stage125.csv": "fbe9b29c6323b59e830ca9d2dd8c1543b9ef48b21709b01cc56a3989cd2d64d9",
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_b_stage125.csv": "2e61a282165ccdaef37bac61a460c83878f2ae633b10535945cc33897d3b4c22",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv": "5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_a_stage125.csv": "23ff63d82bbc1a5a06536783eddfa5113ad988cb0db8c1c9adb004489da22bc9",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_b_stage125.csv": "56c80ccb0a8bcbb1c030e87c892190579628c298026c6140045cbaf08ff7135f",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv": "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv": "d2d9893e40b0c3bdf876a7447fc5147985fc25c9c5add07264677f6ed817b72c"
+  },
+  "prediction_alignment": "predictor_year_t_to_target_year_t_plus_1",
+  "prediction_calls": 0,
+  "primary_sample": "main_rule_a_primary",
+  "primary_target": "FD_target_main_t_plus_1",
+  "rampna_audit_only": true,
+  "research_action_id": "stage125-part4-statistical-analysis-plan",
+  "research_pointers": {
+    "last_completed_research_action_id": "stage125-part4-statistical-analysis-plan",
+    "next_research_action_id": "stage125-part5-readiness-closure"
+  },
+  "row_level_publish_datetime_collection_required": false,
+  "sample_specs": {
+    "expanded_rule_a_company_scope_robustness": {
+      "companies": 124,
+      "negative": 976,
+      "positive": 80,
+      "role": "robustness_company_scope",
+      "rows": 1056
+    },
+    "expanded_rule_b_combined_robustness": {
+      "companies": 122,
+      "negative": 956,
+      "positive": 79,
+      "role": "robustness_combined",
+      "rows": 1035
+    },
+    "main_rule_a_primary": {
+      "companies": 119,
+      "final_test_negative": 334,
+      "final_test_pairs": 346,
+      "final_test_positive": 12,
+      "negative": 932,
+      "positive": 80,
+      "role": "primary",
+      "rows": 1012
+    },
+    "main_rule_b_listing_robustness": {
+      "companies": 117,
+      "negative": 914,
+      "positive": 79,
+      "role": "robustness_listing",
+      "rows": 993
+    }
+  },
+  "stage126_authorized": false,
+  "stage126_started": false
+}

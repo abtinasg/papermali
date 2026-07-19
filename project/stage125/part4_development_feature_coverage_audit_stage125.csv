@@ -1,0 +1,11 @@
+feature_name,source_column,development_rows,nonmissing_rows,coverage,positive_row_coverage,negative_row_coverage,minimum_fold_training_coverage,minimum_fold_validation_coverage,admission_status,growth_coverage_exception_applied
+log_total_assets,total_assets,666,666,1.0000000000,1.0000000000,1.0000000000,1.0000000000,1.0000000000,admitted_m1_primary,false
+leverage_ratio,leverage_ratio,666,666,1.0000000000,1.0000000000,1.0000000000,1.0000000000,1.0000000000,admitted_m1_primary,false
+current_ratio,current_ratio,666,666,1.0000000000,1.0000000000,1.0000000000,1.0000000000,1.0000000000,admitted_m1_primary,false
+roa_period_adjusted,roa_period_adjusted,666,666,1.0000000000,1.0000000000,1.0000000000,1.0000000000,1.0000000000,admitted_m1_primary,false
+ocf_to_assets_period_adjusted,ocf_to_assets_period_adjusted,666,647,0.9714714715,0.9411764706,0.9749163880,0.9224489796,1.0000000000,admitted_m1_primary,false
+asset_turnover_period_adjusted,asset_turnover_period_adjusted,666,666,1.0000000000,1.0000000000,1.0000000000,1.0000000000,1.0000000000,admitted_m1_primary,false
+operating_margin_period_adjusted,operating_margin_period_adjusted,666,662,0.9939939940,1.0000000000,0.9933110368,0.9955555556,0.9902439024,admitted_m1_primary,false
+revenue_growth_period_adjusted,revenue_growth_period_adjusted,666,565,0.8483483483,0.8235294118,0.8511705686,0.9942196532,0.9900990099,admitted_m1_primary,true
+financial_expense_to_assets_period_adjusted,financial_expense_to_assets_period_adjusted,666,665,0.9984984985,1.0000000000,0.9983277592,1.0000000000,0.9953703704,admitted_m1_primary,false
+accumulated_loss_to_capital_ratio,accumulated_loss_to_capital_ratio,666,666,1.0000000000,1.0000000000,1.0000000000,1.0000000000,1.0000000000,admitted_m1_primary,false

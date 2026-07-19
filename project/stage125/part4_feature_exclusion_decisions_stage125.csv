@@ -1,0 +1,23 @@
+feature_name,decision,exclusion_reasons,retained_in_frozen_datasets,available_in_audit_surface
+current_assets,excluded_from_m1_primary,numerator/denominator duplication; scale redundancy,true,true
+current_liabilities,excluded_from_m1_primary,numerator/denominator duplication; scale redundancy,true,true
+debt_to_equity,excluded_from_m1_primary,high conceptual overlap; unstable denominator,true,true
+equity,excluded_from_m1_primary,raw-level size dependence; scale redundancy,true,true
+equity_ratio,excluded_from_m1_primary,exact or near accounting identity; high conceptual overlap,true,true
+gross_margin_period_adjusted,excluded_from_m1_primary,high conceptual overlap; parsimony under low event count,true,true
+gross_profit_period_adjusted,excluded_from_m1_primary,raw-level size dependence; numerator/denominator duplication,true,true
+net_income_growth_period_adjusted,excluded_from_m1_primary,duplicate growth definition; parsimony under low event count,true,true
+net_income_period_adjusted,excluded_from_m1_primary,raw-level size dependence; target-component proximity,true,true
+net_margin_period_adjusted,excluded_from_m1_primary,high conceptual overlap; parsimony under low event count,true,true
+operating_cash_flow_period_adjusted,excluded_from_m1_primary,numerator/denominator duplication; raw-level size dependence,true,true
+operating_profit_period_adjusted,excluded_from_m1_primary,numerator/denominator duplication; raw-level size dependence,true,true
+profit_margin_period_adjusted,excluded_from_m1_primary,high conceptual overlap; parsimony under low event count,true,true
+registered_capital,excluded_from_m1_primary,raw-level size dependence; scale redundancy,true,true
+revenue_period_adjusted,excluded_from_m1_primary,raw-level size dependence; numerator/denominator duplication,true,true
+roe_period_adjusted,excluded_from_m1_primary,unstable denominator; high conceptual overlap,true,true
+sales_growth_period_adjusted,excluded_from_m1_primary,duplicate growth definition,true,true
+total_assets,excluded_from_m1_primary,raw-level size dependence; replaced by log_total_assets transform,true,true
+total_liabilities,excluded_from_m1_primary,raw-level size dependence; scale redundancy,true,true
+accumulated_loss,excluded_from_m1_primary,raw-level size dependence; target-component proximity,true,true
+financial_expense_period_adjusted,excluded_from_m1_primary,numerator/denominator duplication; raw-level size dependence,true,true
+financial_expense_to_revenue_period_adjusted,excluded_from_m1_primary,high conceptual overlap; unstable denominator,true,true

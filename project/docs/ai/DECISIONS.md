@@ -99,6 +99,28 @@ The research contract for the paper is frozen in
   test requires an explicit research decision and a new version of that contract.
 - **Stage122–Stage124 files are not rewritten or redefined during Stage125.**
 
+## Stage125 Part 4 — Statistical Analysis Plan (2026-07-19)
+
+Research action `stage125-part4-statistical-analysis-plan`:
+
+- Locks M1 primary ordered features (exactly 10), M1 target-proximity
+  robustness (exactly 7), nested M2–M4 blocks, four sample designs, target-year
+  temporal folds (development 1393–1399; final test 1400–1402), preprocessing,
+  allowed model families, finite hyperparameter budget (32/block), seeds,
+  PR-AUC primary, Recall@10%/Lift@10%, calibration, paired ticker-cluster
+  bootstrap (2000; Holm α=0.05), and SHAP stability contracts.
+- Primary paper result: `main_rule_a_primary` × `FD_target_main_t_plus_1`.
+- Part 3C analysis-ready / audited hashes are pinned; financial values and
+  targets remain frozen; رمپنا remains audit-only.
+- M3 remains not admitted (no authoritative CBI endpoint). No M2/M3/M4 data
+  collected in Part 4.
+- Article-141-only final-test event count on the primary sample is below 10
+  positives → distributional/descriptive robustness only.
+- **Non-claims:** no model fitting; no prediction; no SHAP computation; no
+  final-test predictor inspection for admission/tuning; Stage125 incomplete;
+  Stage126 and modeling unauthorized. Next:
+  `stage125-part5-readiness-closure`.
+
 ## Stage125 Part 3C — Leakage-safe dataset finalization (2026-07-18)
 
 Research action `stage125-part3c-leakage-safe-dataset-finalization`:

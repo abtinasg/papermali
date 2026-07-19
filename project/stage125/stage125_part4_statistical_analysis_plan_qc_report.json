@@ -1,0 +1,246 @@
+{
+  "accessibility_scoring_applied": false,
+  "active_availability_lag_months": 4,
+  "active_availability_method": "fixed_regulatory_lag",
+  "all_pass": true,
+  "assertion_count": 31,
+  "assertions": [
+    {
+      "assertion": "baseline_commit_pinned",
+      "detail": "6cb27d6817bf167358d480adbccc1728ad59e109",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part3c_inputs_pinned",
+      "detail": "8 hashes",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m1_feature_count_10",
+      "detail": "10",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m1_target_proximity_count_7",
+      "detail": "7",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m2_block_count_3",
+      "detail": "3",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m3_block_count_3",
+      "detail": "3",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m4_block_count_4",
+      "detail": "4",
+      "status": "PASS"
+    },
+    {
+      "assertion": "primary_metric_pr_auc",
+      "detail": "PR-AUC",
+      "status": "PASS"
+    },
+    {
+      "assertion": "topk_fraction_10pct",
+      "detail": "0.1",
+      "status": "PASS"
+    },
+    {
+      "assertion": "bootstrap_contract",
+      "detail": "2000/ticker",
+      "status": "PASS"
+    },
+    {
+      "assertion": "holm_correction_present",
+      "detail": "Holm",
+      "status": "PASS"
+    },
+    {
+      "assertion": "seed_lists_locked",
+      "detail": "seeds",
+      "status": "PASS"
+    },
+    {
+      "assertion": "hyperparameter_budget_32",
+      "detail": "32",
+      "status": "PASS"
+    },
+    {
+      "assertion": "smote_training_fold_only",
+      "detail": "train_fold_only",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m1_coverage_all_admitted",
+      "detail": "all admitted",
+      "status": "PASS"
+    },
+    {
+      "assertion": "manifest_columns_only",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "manifest_no_targets",
+      "detail": "ok",
+      "status": "PASS"
+    },
+    {
+      "assertion": "article141_descriptive_only",
+      "detail": "1",
+      "status": "PASS"
+    },
+    {
+      "assertion": "network_requests_zero",
+      "detail": "0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "model_fit_calls_zero",
+      "detail": "0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "prediction_calls_zero",
+      "detail": "0",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_not_used_for_modeling",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "modeling_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "Stage126_false",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m3_not_admitted",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "no_m2_m3_m4_collection",
+      "detail": "false",
+      "status": "PASS"
+    },
+    {
+      "assertion": "four_month_lag_active",
+      "detail": "4",
+      "status": "PASS"
+    },
+    {
+      "assertion": "forbidden_surfaces_absent",
+      "detail": "absent",
+      "status": "PASS"
+    },
+    {
+      "assertion": "deterministic_rebuild",
+      "detail": "stable",
+      "status": "PASS"
+    },
+    {
+      "assertion": "random_split_rejected",
+      "detail": "rejected",
+      "status": "PASS"
+    },
+    {
+      "assertion": "final_test_year_change_rejected",
+      "detail": "rejected",
+      "status": "PASS"
+    }
+  ],
+  "baseline_commit": "6cb27d6817bf167358d480adbccc1728ad59e109",
+  "broad_codal_capture_stopped": true,
+  "candidate_value_evidence_collected": false,
+  "conservative_availability_lag_locked": true,
+  "conservative_six_month_lag_decision_locked": true,
+  "contract_version": "stage125_part4_sap_v1",
+  "current_stage": "Stage125",
+  "cut_a_available_at_operationalization_locked": true,
+  "data_value_extraction_performed": false,
+  "document_binding_resolution_decision_locked": true,
+  "endpoint_probe_evidence_collected": true,
+  "evidence_collected": true,
+  "failed_count": 0,
+  "final_test_accessed_for_modeling": false,
+  "financial_data_researcher_verified_frozen": true,
+  "four_month_regulatory_lag_locked": true,
+  "frozen_part3c_input_sha256": {
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_a_stage125.csv": "fbe9b29c6323b59e830ca9d2dd8c1543b9ef48b21709b01cc56a3989cd2d64d9",
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_b_stage125.csv": "2e61a282165ccdaef37bac61a460c83878f2ae633b10535945cc33897d3b4c22",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv": "5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_a_stage125.csv": "23ff63d82bbc1a5a06536783eddfa5113ad988cb0db8c1c9adb004489da22bc9",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_b_stage125.csv": "56c80ccb0a8bcbb1c030e87c892190579628c298026c6140045cbaf08ff7135f",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv": "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv": "d2d9893e40b0c3bdf876a7447fc5147985fc25c9c5add07264677f6ed817b72c"
+  },
+  "historical_six_month_decision_active": false,
+  "historical_six_month_decision_retained": true,
+  "m2_data_collected": false,
+  "m3_admitted": false,
+  "m3_data_collected": false,
+  "m4_data_collected": false,
+  "model_fit_calls": 0,
+  "modeling_authorized": false,
+  "modeling_started": false,
+  "network_extraction_performed": true,
+  "network_requests_attempted": 0,
+  "output_sha256": {
+    "README_STAGE125_PART4_STATISTICAL_ANALYSIS_PLAN.md": "1e11edee04e776f82ba1b84135e13a7cfff8362807fa4914f34018897ccdb9c6",
+    "part4_development_feature_coverage_audit_stage125.csv": "f5cdcb71cf9be9e0e28f98c72b12f2f6d49244c95c858f2c3a99d7d8144a7f35",
+    "part4_event_count_gate_stage125.csv": "a1477e1d56cee83a9eeed239a3b5c8b793065f4fc1361663ce3a8e869023ff60",
+    "part4_feature_exclusion_decisions_stage125.csv": "b4faa4470248409784cb65cf942f013f0bc9de3fc1220cf5bb6997632c88045a",
+    "part4_feature_sets_stage125.csv": "1554e95e18ac818155a95a1dac2c37637d236e928a06e3c33507374d8cf88173",
+    "part4_hyperparameter_budget_stage125.json": "22d6989681a7cd59ffbf57077910615ce00adb9f171d303d5d61100a54490b40",
+    "part4_metrics_uncertainty_contract_stage125.json": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
+    "part4_model_specifications_stage125.json": "6d8b014056cb3e13212b2999b3e394bca53905e1e48e7e01d1b52430bc0df9a0",
+    "part4_preprocessing_contract_stage125.json": "ace3013155fb8435f2b30001923eba5628238ad78d01b7550ee675949bfd1750",
+    "part4_sample_target_matrix_stage125.csv": "35837e0c8b52e2b778020708f08d799a1d17398c5d8f5b8ae07b06bef24acf3a",
+    "part4_shap_stability_contract_stage125.json": "acd19339b8f998ba54c00f3cb32d5ca12d353619316ecab951b7d03f96ed5f8a",
+    "part4_statistical_analysis_plan_stage125.json": "076c4656a5200a4721d2b6d76707d4c5db1e5759ea607474c4f625950e22e56d",
+    "part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
+    "part4_temporal_split_manifest_stage125.csv": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc"
+  },
+  "pair_level_evidence_collected": true,
+  "part3a_decision_locked": true,
+  "part3a_protocol_locked": true,
+  "part3b0_readiness": true,
+  "part3b1_decision_locked": true,
+  "part3b_completed": false,
+  "part3b_started": true,
+  "part3c_leakage_safe_finalization_completed": true,
+  "part4_statistical_analysis_plan_locked": true,
+  "pilot_cutoff_provenance_resolved": false,
+  "prediction_calls": 0,
+  "predictor_available_at_evidence_collected": false,
+  "predictor_document_binding_evidence_collected": true,
+  "predictor_document_binding_mini_pilot_completed": true,
+  "research_action_id": "stage125-part4-statistical-analysis-plan",
+  "research_pointers": {
+    "last_completed_research_action_id": "stage125-part4-statistical-analysis-plan",
+    "next_research_action_id": "stage125-part5-readiness-closure"
+  },
+  "row_level_publish_datetime_collection_required": false,
+  "six_month_lag_superseded": true,
+  "source_commit": "6cb27d6817bf167358d480adbccc1728ad59e109",
+  "source_file_sha256": "2a3fe06c0b0b501736f76de558d430d78d4e116b93aef15325900049ce1bdb49",
+  "stage": "stage125_part4_statistical_analysis_plan",
+  "stage126_authorized": false,
+  "stage126_started": false,
+  "test_file_sha256": "73fed54609ea106466cd3ff15789b6a1ad7509880115eda8884e41e00cb7799d",
+  "ticker_count": 0,
+  "tickers": []
+}

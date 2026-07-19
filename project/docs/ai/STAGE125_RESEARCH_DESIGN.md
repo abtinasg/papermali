@@ -19,6 +19,26 @@ Versioned methodological addendum (does not silently rewrite Part 0 history):
 - Originally operationalized under the Part 3B.1E six-month lag
   (historical; see Addendum B).
 
+### Addendum C — Part 4 Statistical Analysis Plan (2026-07-19)
+
+Versioned methodological addendum (does not silently rewrite Part 0–3C history):
+
+- Part 4 locks the statistical analysis plan only; **no** model fitting.
+- Primary sample / target:
+  `main_rule_a_primary` × `FD_target_main_t_plus_1`.
+- M1 primary ordered features (10) and M1 target-proximity robustness (7)
+  are approved; remaining Part 3C candidates stay audit-only exclusions.
+- Nested M2–M4 blocks are defined; M3 not admitted (no authoritative CBI
+  source); no M2/M3/M4 values collected in Part 4.
+- Temporal design locked on `target_year`: development 1393–1399; folds
+  1393–1395/1396–1397 and 1393–1397/1398–1399; final test 1400–1402.
+- Primary metric PR-AUC; Recall@10% / Lift@10%; calibration; paired
+  ticker-cluster bootstrap; Holm multiplicity; finite seed/tuning budget.
+- Final-test predictor values must not be inspected for admission, tuning,
+  feature selection, or model comparison until Stage126 is authorized.
+- Stage125 remains incomplete; Stage126 and modeling remain unauthorized.
+- Next research action: `stage125-part5-readiness-closure`.
+
 ### Addendum B — Four-month regulatory lag revision (2026-07-19)
 
 Explicit human-approved revision of the active availability specification:
@@ -236,13 +256,13 @@ robustness check.
   only; column-role map + leakage audit; **no** feature approval / modeling.
 - **Part 3 (umbrella) — Accessibility, coverage & event pilot.** Parts 3A–3C;
   Part 3B expansion path superseded by conservative lag + Part 3C.
-- **Part 4 — Statistical analysis plan. (Next.)** Lock M1–M4 definitions and order; lock
-  primary/robustness samples and the common-sample rule; lock temporal CV and the
-  locked final test; lock PR-AUC / Recall@K / Lift@K / calibration; define paired
-  uncertainty/bootstrap and multiplicity control; set seeds and tuning budget.
-- **Part 5 — Stage125 closure.** Final readiness report; record all keep/drop
-  decisions; full validator + tests; open PR for review — merge only with explicit
-  user approval.
+- **Part 4 — Statistical analysis plan. (Completed.)** Locked M1–M4 definitions
+  and order; primary/robustness samples; temporal CV and locked final test;
+  PR-AUC / Recall@K / Lift@K / calibration; paired bootstrap and Holm; seeds
+  and finite tuning budget. **No** model fitting.
+- **Part 5 — Stage125 closure. (Next.)** Final readiness report; record all
+  keep/drop decisions; full validator + tests; open PR for review — merge only
+  with explicit user approval.
 
 **Gate 125.0:** contradiction-free docs, valid Handoff, green tests, clean working tree.
 
