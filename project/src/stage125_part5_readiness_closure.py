@@ -264,9 +264,12 @@ KEEP_DROP_SPEC: tuple[tuple[str, str, str, str, str], ...] = (
      "not block Stage126 M1.",
      "deferred_future_block_not_required_for_m1"),
     ("BLOCK_M3_MACRO", "DROP_CURRENT_ACTIVE_PATH", "block",
-     "M3 macro block; no authoritative CBI endpoint admitted; not "
-     "admitted on the current active path.",
-     "not_admitted_current_path_dropped"),
+     "M3 macro block; not admitted on the current active path "
+     "(no authoritative CBI endpoint). M3 is not permanently eliminated; "
+     "it may re-enter only after a new explicit versioned human decision, "
+     "an authoritative reproducible source, publication/availability-time "
+     "validation, and coverage/temporal data-Gate approval.",
+     "not_admitted_current_path_may_reenter_via_new_versioned_decision"),
     ("BLOCK_M4_AUDIT_GOVERNANCE", "DEFER_NONBLOCKING_FOR_M1", "block",
      "M4 audit/governance block; no values collected; deferred and does "
      "not block Stage126 M1.",
@@ -332,10 +335,13 @@ BLOCKER_SPEC: tuple[tuple[str, str, str, str, str, str, str], ...] = (
      "Collect M2 market/liquidity values under an authorized future "
      "extraction protocol before admitting M2 to any modeling block."),
     ("M3_AUTHORITATIVE_SOURCE_UNAVAILABLE",
-     "no_authoritative_cbi_endpoint_admitted", "false", "false",
+     "no_authoritative_cbi_endpoint_admitted_current_path", "false", "false",
      "M3", "not_admitted",
-     "Identify and authorize an authoritative CBI macro-data endpoint "
-     "before any M3 admission."),
+     "M3 may re-enter only after: (1) a new explicit versioned human "
+     "decision; (2) identification of an authoritative and reproducible "
+     "source; (3) publication/availability-time validation; (4) coverage "
+     "and temporal data-Gate approval. No M3 data collection is authorized "
+     "in Part 5."),
     ("M4_VALUES_NOT_COLLECTED", "no_values_collected", "false", "false",
      "M4", "deferred",
      "Collect M4 audit/governance values under an authorized future "
@@ -820,6 +826,54 @@ def build_blocker_register_rows() -> list[dict[str, str]]:
     return rows
 
 
+REGISTERED_M1_ROBUSTNESS_AFTER_PRIMARY_LOCK: tuple[dict[str, Any], ...] = (
+    {
+        "category_id": "m1_target_proximity_six_feature_set",
+        "feature_set": "M1_TARGET_PROXIMITY_ROBUSTNESS",
+        "feature_count": 6,
+        "features_exact_order": list(M1_TARGET_PROXIMITY_ROBUSTNESS),
+        "role": "target_proximity_feature_set_robustness",
+    },
+    {
+        "category_id": "main_rule_b_listing_robustness",
+        "sample": "main_rule_b_listing_robustness",
+        "role": "listing_timing_sample_robustness",
+    },
+    {
+        "category_id": "expanded_rule_a_company_scope_robustness",
+        "sample": "expanded_rule_a_company_scope_robustness",
+        "role": "expanded_company_scope_sample_robustness",
+    },
+    {
+        "category_id": "expanded_rule_b_combined_robustness",
+        "sample": "expanded_rule_b_combined_robustness",
+        "role": "combined_sample_robustness",
+    },
+    {
+        "category_id": "persistent_loss_robustness_target",
+        "target": SECONDARY_TARGET,
+        "role": "secondary_robustness_target",
+    },
+    {
+        "category_id": "smote_training_fold_only_robustness",
+        "imbalance_strategy": "SMOTE",
+        "role": "smote_training_fold_only_robustness",
+        "class_weighting": "disabled",
+        "second_tuning_search": False,
+        "notes": (
+            "SMOTE inside training folds only; class weighting disabled; "
+            "no second tuning search"
+        ),
+    },
+)
+
+REQUIRED_ROBUSTNESS_SAMPLES = frozenset({
+    "main_rule_b_listing_robustness",
+    "expanded_rule_a_company_scope_robustness",
+    "expanded_rule_b_combined_robustness",
+})
+
+
 def build_stage126_m1_entry_contract() -> dict[str, Any]:
     return {
         "contract_id": "stage126_m1_financial_baseline_entry_contract",
@@ -847,20 +901,7 @@ def build_stage126_m1_entry_contract() -> dict[str, Any]:
             "primary_metric": PRIMARY_METRIC,
         },
         "registered_m1_robustness_after_primary_lock": [
-            {
-                "feature_set": "M1_TARGET_PROXIMITY_ROBUSTNESS",
-                "feature_count": len(M1_TARGET_PROXIMITY_ROBUSTNESS),
-                "features_exact_order": list(M1_TARGET_PROXIMITY_ROBUSTNESS),
-                "role": "target_proximity_robustness",
-            },
-            {
-                "target": SECONDARY_TARGET,
-                "role": "secondary_robustness_target",
-            },
-            {
-                "imbalance_strategy": "SMOTE",
-                "role": "robustness_imbalance_handling",
-            },
+            dict(entry) for entry in REGISTERED_M1_ROBUSTNESS_AFTER_PRIMARY_LOCK
         ],
         "article141_excluded_from_model_estimation": True,
         "m2_m3_m4_excluded_from_immediate_stage126_m1": True,
@@ -879,61 +920,195 @@ def build_stage126_m1_entry_contract() -> dict[str, Any]:
     }
 
 
+def validate_registered_m1_robustness(entries: list[dict[str, Any]]) -> None:
+    samples = [e.get("sample") for e in entries if e.get("sample")]
+    if len(samples) != len(set(samples)):
+        raise QCFail("duplicate robustness sample entries")
+    if sorted(samples) != sorted(REQUIRED_ROBUSTNESS_SAMPLES):
+        raise QCFail(
+            f"robustness sample set mutation: {sorted(samples)} != "
+            f"{sorted(REQUIRED_ROBUSTNESS_SAMPLES)}"
+        )
+    if len(entries) != 6:
+        raise QCFail(
+            f"registered_m1_robustness must have exactly 6 categories: "
+            f"{len(entries)}"
+        )
+    if any(e.get("target") == ARTICLE141_TARGET for e in entries):
+        raise QCFail("Article-141 must not enter model-estimation robustness")
+
+
 # --------------------------------------------------------------------------- #
 # Gate 125.0 — derived readiness dimensions
 # --------------------------------------------------------------------------- #
 
-# The default-deny network sentinel only allowlists a small set of
-# read-only git subcommands (rev-parse / merge-base / ls-files / log / show /
-# check-ignore -q); "status" and "diff" are not allowlisted, and
-# "check-ignore" cannot return per-path detail without dropping "-q" (which
-# the sentinel requires). Fully reimplementing nested-.gitignore semantics
-# in pure Python is out of scope, so working-tree cleanliness is derived
-# from `git ls-files` (an allowed bare subcommand giving the tracked-file
-# set) diffed against a direct (non-recursive) listing of only the
-# directories Part 5 is authorized to write into. This deliberately does
-# not walk known-bulky/gitignored trees (.venv*, __pycache__,
-# project/stage125/part3c_outputs, project/stage125/raw_cache_*, etc.),
-# which are pre-existing, orthogonal to Part 5, and never touched by it.
-_IGNORED_FILE_SUFFIXES = (".pyc", ".pyo")
-_IGNORED_FILE_NAMES = frozenset({".DS_Store", ".env"})
-WORKING_TREE_WATCHED_DIRS = (
-    "",
-    "project",
-    "project/src",
-    "project/tests",
-    PART4_OUTPUT_DIR,
+CLOSURE_OUTCOME_READY = "READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION"
+CLOSURE_OUTCOME_NOT_READY = "NOT_READY_WITH_BLOCKERS"
+
+# Exact Part 5 generated paths authorized to be dirty during --build only.
+AUTHORIZED_PART5_GENERATED_PATHS = frozenset(
+    {f"{PART4_OUTPUT_DIR}/{name}" for name in TRACKED_CONTENT_FILES}
+    | {
+        f"{PART4_OUTPUT_DIR}/{F_QC}",
+        f"{PART4_OUTPUT_DIR}/{F_METADATA}",
+    }
 )
 
 
-def _watched_untracked_paths(repo_root: Path) -> list[str]:
-    tracked = set(_git(repo_root, "ls-files").splitlines())
-    untracked: list[str] = []
-    for rel_dir in WORKING_TREE_WATCHED_DIRS:
-        d = repo_root / rel_dir if rel_dir else repo_root
-        if not d.is_dir():
+def git_status_porcelain(repo_root: Path) -> list[str]:
+    """Read-only working-tree status via the exact allowed git status form."""
+    raw = _git(
+        repo_root, "status", "--porcelain=v1", "--untracked-files=all",
+    )
+    return [line for line in raw.splitlines() if line.strip()]
+
+
+def parse_porcelain_paths(lines: list[str]) -> list[str]:
+    """Extract paths from porcelain v1 lines (tracked mods, deletes, untracked)."""
+    paths: list[str] = []
+    for line in lines:
+        if len(line) < 4:
             continue
-        for entry in sorted(d.iterdir()):
-            if entry.is_dir():
-                continue
-            if (
-                entry.name in _IGNORED_FILE_NAMES
-                or entry.suffix in _IGNORED_FILE_SUFFIXES
-            ):
-                continue
-            rel = entry.relative_to(repo_root).as_posix()
-            if rel not in tracked:
-                untracked.append(rel)
-    return untracked
+        body = line[3:]
+        if " -> " in body:
+            body = body.split(" -> ", 1)[1]
+        paths.append(body.replace("\\", "/"))
+    return paths
 
 
-def _allowed_dirty_paths() -> frozenset[str]:
-    allowed = {SRC_REL, TEST_REL, RUN_REL}
-    for name in TRACKED_CONTENT_FILES:
-        allowed.add(f"{PART4_OUTPUT_DIR}/{name}")
-    allowed.add(f"{PART4_OUTPUT_DIR}/{F_QC}")
-    allowed.add(f"{PART4_OUTPUT_DIR}/{F_METADATA}")
-    return frozenset(allowed)
+def evaluate_working_tree_clean(
+    repo_root: Path, *, mode: str,
+) -> tuple[bool, str]:
+    """Actual git-status working-tree Gate.
+
+    --check: porcelain output must be completely empty.
+    --build: only exact authorized Part 5 generated paths may be dirty.
+    """
+    if mode not in {"build", "check"}:
+        raise QCFail(f"invalid working-tree mode: {mode}")
+    lines = git_status_porcelain(repo_root)
+    if mode == "check":
+        ok = len(lines) == 0
+        return ok, "empty" if ok else f"dirty_lines={len(lines)}"
+    paths = parse_porcelain_paths(lines)
+    unauthorized = [p for p in paths if p not in AUTHORIZED_PART5_GENERATED_PATHS]
+    ok = len(unauthorized) == 0
+    detail = (
+        "authorized_or_empty"
+        if ok else f"unauthorized={unauthorized[:8]}"
+    )
+    return ok, detail
+
+
+def load_handoff_state(repo_root: Path) -> dict[str, Any]:
+    path = repo_root / HANDOFF_STATE_REL
+    if not path.is_file():
+        raise QCFail(f"missing handoff state: {HANDOFF_STATE_REL}")
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def validate_actual_handoff(
+    repo_root: Path, *, derived_completed: bool, derived_entry_ready: bool,
+) -> tuple[bool, str]:
+    """Validate actual project/docs/ai/handoff_state.json values."""
+    try:
+        state = load_handoff_state(repo_root)
+    except QCFail as exc:
+        return False, str(exc)
+    expected_selected_qc = f"{PART4_OUTPUT_DIR}/{F_QC}"
+    checks = [
+        (
+            state.get("last_completed_micro_part") == RESEARCH_ACTION_ID,
+            "last_completed_micro_part",
+        ),
+        (
+            state.get("next_research_action_id") == RESEARCH_NEXT,
+            "next_research_action_id",
+        ),
+        (
+            state.get("selected_qc_scope") == QC_STAGE,
+            "selected_qc_scope",
+        ),
+        (
+            str(state.get("selected_qc_path", "")).replace("\\", "/")
+            == expected_selected_qc,
+            "selected_qc_path",
+        ),
+        (
+            state.get("contract_version") == CONTRACT_VERSION,
+            "contract_version",
+        ),
+        (
+            state.get("stage125_completed") is derived_completed,
+            "stage125_completed",
+        ),
+        (
+            state.get("stage126_m1_entry_ready") is derived_entry_ready,
+            "stage126_m1_entry_ready",
+        ),
+        (state.get("stage126_authorized") is False, "stage126_authorized"),
+        (state.get("stage126_started") is False, "stage126_started"),
+        (state.get("modeling_authorized") is False, "modeling_authorized"),
+        (state.get("modeling_started") is False, "modeling_started"),
+        (state.get("final_test_unlocked") is False, "final_test_unlocked"),
+        (state.get("part3b_completed") is False, "part3b_completed"),
+        (
+            state.get("active_availability_lag_months") == APPROVED_LAG_MONTHS,
+            "active_availability_lag_months",
+        ),
+    ]
+    failed = [name for ok, name in checks if not ok]
+    if failed:
+        return False, f"handoff_mismatch:{','.join(failed)}"
+    return True, "actual_handoff_state_matches_derived_closure"
+
+
+def derive_closure_flags(all_gate_pass: bool) -> dict[str, Any]:
+    return {
+        "stage125_part5_readiness_closure_completed": bool(all_gate_pass),
+        "stage125_completed": bool(all_gate_pass),
+        "stage126_m1_entry_ready": bool(all_gate_pass),
+        "stage125_gate_125_0": "PASS" if all_gate_pass else "FAIL",
+        "closure_outcome": (
+            CLOSURE_OUTCOME_READY if all_gate_pass else CLOSURE_OUTCOME_NOT_READY
+        ),
+        "stage126_authorized": False,
+        "stage126_started": False,
+        "modeling_authorized": False,
+        "modeling_started": False,
+        "final_test_unlocked": False,
+    }
+
+
+def _evaluate_contradiction_free_docs(
+    *,
+    repo_root: Path,
+    readme_text: str,
+    derived_completed: bool,
+) -> tuple[bool, str]:
+    roadmap_text = ""
+    roadmap_path = repo_root / ROADMAP_REL
+    if roadmap_path.is_file():
+        roadmap_text = roadmap_path.read_text(encoding="utf-8")
+    roadmap_lists_next = (
+        f"next_research_action_id: {RESEARCH_ACTION_ID}" in roadmap_text
+    )
+    roadmap_already_advanced = (
+        f"next_research_action_id: {RESEARCH_NEXT}" in roadmap_text
+    )
+    readme_next_ok = RESEARCH_NEXT in readme_text
+    readme_has_ready = CLOSURE_OUTCOME_READY in readme_text
+    readme_has_not_ready = CLOSURE_OUTCOME_NOT_READY in readme_text
+    if derived_completed:
+        readme_outcome_ok = readme_has_ready and not readme_has_not_ready
+    else:
+        readme_outcome_ok = readme_has_not_ready and not readme_has_ready
+    ok = (
+        (roadmap_lists_next or roadmap_already_advanced)
+        and readme_next_ok
+        and readme_outcome_ok
+    )
+    return ok, "roadmap_and_readme_outcome_consistent_with_derived_closure"
 
 
 def build_gate_125_0(
@@ -950,6 +1125,10 @@ def build_gate_125_0(
     readme_text: str,
     network_attempts: int,
     no_model_calls_detected: bool,
+    mode: str = "build",
+    derived_completed: bool | None = None,
+    derived_entry_ready: bool | None = None,
+    include_handoff_and_docs: bool = True,
 ) -> dict[str, dict[str, Any]]:
     kd = {r["item_id"]: r["decision"] for r in keep_drop_rows}
     blockers = {r["item_id"]: r for r in blocker_rows}
@@ -958,36 +1137,24 @@ def build_gate_125_0(
     def add(name: str, ok: bool, detail: str) -> None:
         gate[name] = {"pass": bool(ok), "detail": detail}
 
-    roadmap_text = ""
-    roadmap_path = repo_root / ROADMAP_REL
-    if roadmap_path.is_file():
-        roadmap_text = roadmap_path.read_text(encoding="utf-8")
-    roadmap_lists_next = (
-        f"next_research_action_id: {RESEARCH_ACTION_ID}" in roadmap_text
-    )
-    roadmap_already_advanced = (
-        f"next_research_action_id: {RESEARCH_NEXT}" in roadmap_text
-    )
-    readme_next_ok = RESEARCH_NEXT in readme_text
-    readme_outcome_ok = (
-        "READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION" in readme_text
-    )
-    add(
-        "contradiction_free_docs",
-        (roadmap_lists_next or roadmap_already_advanced)
-        and readme_next_ok and readme_outcome_ok,
-        "roadmap_next_matches_part5_or_already_advanced_and_readme_consistent",
-    )
-
-    required_markers_present = all(
-        key in _static_qc_markers()
-        for key in REQUIRED_HANDOFF_MARKER_FIELDS
-    )
-    add(
-        "valid_handoff",
-        required_markers_present,
-        "part5_qc_marker_fields_present",
-    )
+    if include_handoff_and_docs:
+        if derived_completed is None or derived_entry_ready is None:
+            raise QCFail(
+                "derived_completed and derived_entry_ready required when "
+                "include_handoff_and_docs is True"
+            )
+        docs_ok, docs_detail = _evaluate_contradiction_free_docs(
+            repo_root=repo_root,
+            readme_text=readme_text,
+            derived_completed=derived_completed,
+        )
+        add("contradiction_free_docs", docs_ok, docs_detail)
+        handoff_ok, handoff_detail = validate_actual_handoff(
+            repo_root,
+            derived_completed=derived_completed,
+            derived_entry_ready=derived_entry_ready,
+        )
+        add("valid_handoff", handoff_ok, handoff_detail)
 
     part3c_ok = (
         part3c_hashes == FROZEN_PART3C_INPUTS and len(part3c_hashes) == 8
@@ -1153,14 +1320,8 @@ def build_gate_125_0(
     )
     add("stage126_false", stage126_false_ok, "false_and_absent")
 
-    dirty = _watched_untracked_paths(repo_root)
-    allowed = _allowed_dirty_paths()
-    unauthorized_dirty = [p for p in dirty if p not in allowed]
-    add(
-        "working_tree_clean",
-        len(unauthorized_dirty) == 0,
-        "clean" if not dirty else f"authorized_dirty={len(dirty)}",
-    )
+    wt_ok, wt_detail = evaluate_working_tree_clean(repo_root, mode=mode)
+    add("working_tree_clean", wt_ok, wt_detail)
 
     return gate
 
@@ -1309,23 +1470,24 @@ def build_closure_report(
         ),
     }
     all_gate_pass = all(v["pass"] for v in gate.values())
+    flags = derive_closure_flags(all_gate_pass)
     return {
         "contract_version": CONTRACT_VERSION,
         "research_action_id": RESEARCH_ACTION_ID,
-        "stage125_part5_readiness_closure_completed": True,
-        "stage125_completed": True,
-        "stage125_gate_125_0": "PASS" if all_gate_pass else "FAIL",
-        "stage126_m1_entry_ready": True,
-        "stage126_authorized": False,
-        "stage126_started": False,
-        "modeling_authorized": False,
-        "modeling_started": False,
-        "closure_outcome": "READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION",
+        **flags,
         "part3b_completed": False,
         "part3b_expansion_disposition": (
             "superseded_not_required_for_stage125_closure"
         ),
         "part3b_incomplete_blocks_stage126_m1": False,
+        "m3_disposition": "not_admitted_on_current_active_path",
+        "m3_reentry_requirements": [
+            "new_explicit_versioned_human_decision",
+            "authoritative_and_reproducible_source",
+            "publication_availability_time_validation",
+            "coverage_and_temporal_data_gate_approval",
+        ],
+        "m3_data_collection_authorized_in_part5": False,
         "final_test_status": "locked_for_single_future_evaluation",
         "final_test_years": list(FINAL_TEST_YEARS),
         "final_test_predictor_inspection_in_part5": False,
@@ -1342,6 +1504,7 @@ def build_closure_report(
         "blocker_summary": blocker_summary,
         "stage126_m1_entry_contract_id": entry_contract["contract_id"],
         "gate_125_0": gate,
+        "all_gate_pass": all_gate_pass,
     }
 
 
@@ -1349,8 +1512,10 @@ def build_closure_report(
 # README
 # --------------------------------------------------------------------------- #
 
-def build_readme() -> str:
-    return """# Stage125 Part 5 — Readiness Closure
+def build_readme(*, closure_outcome: str) -> str:
+    if closure_outcome not in {CLOSURE_OUTCOME_READY, CLOSURE_OUTCOME_NOT_READY}:
+        raise QCFail(f"invalid closure_outcome for README: {closure_outcome}")
+    return f"""# Stage125 Part 5 — Readiness Closure
 
 **Status:** Stage125 closure / readiness report only. No modeling.
 **Contract version:** `stage125_part5_readiness_closure_v1`
@@ -1372,8 +1537,8 @@ Part 5 closes Stage125 research-design readiness:
   `modeling_started` all remain `false`
 - an artifact-integrity manifest pinning all frozen Part 3C inputs and Part 4
   outputs by SHA-256, plus Part 5's own generated outputs
-- a derived Gate 125.0 readiness gate (dimension-by-dimension, not an
-  unconditional pass)
+- a derived Gate 125.0 readiness gate (dimension-by-dimension; completion and
+  readiness fields are never unconditional constants)
 
 ## Explicit non-claims
 
@@ -1392,8 +1557,14 @@ Part 5 closes Stage125 research-design readiness:
   admitted model feature surface.
 - The Article-141-only target remains descriptive-only and excluded from
   model estimation.
-- M2 and M4 remain deferred (non-blocking for Stage126 M1); M3 remains not
-  admitted (no authoritative CBI endpoint); M5 remains removed.
+- M2 and M4 remain deferred (non-blocking for Stage126 M1).
+- M3 remains **not admitted on the current active path** (no authoritative
+  CBI endpoint). M3 is **not** permanently eliminated from all future
+  research; it may re-enter only after: (1) a new explicit versioned human
+  decision; (2) an authoritative and reproducible source; (3)
+  publication/availability-time validation; (4) coverage and temporal
+  data-Gate approval. No M3 data collection is authorized in Part 5.
+- M5 remains removed.
 - Part 3B expansion remains incomplete but superseded and non-blocking
   (`part3b_completed = false`, `part3b_incomplete_blocks_stage126_m1 =
   false`).
@@ -1407,9 +1578,11 @@ Part 5 closes Stage125 research-design readiness:
 ## Closure outcome
 
 ```
-closure_outcome = READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION
+closure_outcome = {closure_outcome}
 ```
 
+This outcome is derived from Gate 125.0 (`all_gate_pass`). A failed Gate
+cannot produce a ready/complete outcome.
 `entry_readiness` is **not** authorization. Stage126 (M1 Financial Baseline)
 begins only after an explicit separate human authorization decision.
 
@@ -1428,7 +1601,8 @@ python project/run_stage125_part5.py --check
 # QC static markers (inherited Part 4 workflow fields + Part 5 additions)
 # --------------------------------------------------------------------------- #
 
-def _static_qc_markers() -> dict[str, Any]:
+def _static_qc_markers(closure: dict[str, Any]) -> dict[str, Any]:
+    """Handoff/QC markers derived from the closure report (never unconditional)."""
     return {
         "accessibility_scoring_applied": False,
         "active_availability_method": AVAILABILITY_METHOD,
@@ -1462,9 +1636,11 @@ def _static_qc_markers() -> dict[str, Any]:
         "network_extraction_performed": True,
         "part3c_leakage_safe_finalization_completed": True,
         "part4_statistical_analysis_plan_locked": True,
-        "stage125_part5_readiness_closure_completed": True,
-        "stage125_completed": True,
-        "stage126_m1_entry_ready": True,
+        "stage125_part5_readiness_closure_completed": closure[
+            "stage125_part5_readiness_closure_completed"
+        ],
+        "stage125_completed": closure["stage125_completed"],
+        "stage126_m1_entry_ready": closure["stage126_m1_entry_ready"],
         "stage126_authorized": False,
         "stage126_started": False,
         "modeling_authorized": False,
@@ -1502,11 +1678,13 @@ REQUIRED_HANDOFF_MARKER_FIELDS = (
 # --------------------------------------------------------------------------- #
 
 def build_all(
-    repo_root: Path, *, network_attempts: int = 0,
+    repo_root: Path, *, network_attempts: int = 0, mode: str = "build",
 ) -> tuple[dict[str, str], dict[str, Any]]:
     assert_no_model_imports_in_source(repo_root)
     assert_no_analysis_ready_access_in_source(repo_root)
     assert_forbidden_surfaces_absent(repo_root)
+    if mode not in {"build", "check"}:
+        raise QCFail(f"invalid build_all mode: {mode}")
 
     keep_drop_rows = build_keep_drop_rows()
     blocker_rows = build_blocker_register_rows()
@@ -1529,9 +1707,11 @@ def build_all(
     feature_set_rows = load_part4_feature_sets(repo_root)
 
     entry_contract = build_stage126_m1_entry_contract()
-    readme_text = build_readme()
+    validate_registered_m1_robustness(
+        entry_contract["registered_m1_robustness_after_primary_lock"],
+    )
 
-    gate = build_gate_125_0(
+    gate_kwargs = dict(
         repo_root=repo_root,
         part3c_hashes=part3c_hashes,
         part4_hashes=part4_hashes,
@@ -1541,16 +1721,51 @@ def build_all(
         keep_drop_rows=keep_drop_rows,
         blocker_rows=blocker_rows,
         entry_contract=entry_contract,
-        readme_text=readme_text,
         network_attempts=network_attempts,
         no_model_calls_detected=True,
+        mode=mode,
     )
+
+    # Pass 1: core Gate dimensions (no Handoff/docs that need derived flags).
+    core_gate = build_gate_125_0(
+        **gate_kwargs,
+        readme_text="",
+        include_handoff_and_docs=False,
+    )
+    provisional_pass = all(dim["pass"] for dim in core_gate.values())
+    flags = derive_closure_flags(provisional_pass)
+    readme_text = build_readme(closure_outcome=flags["closure_outcome"])
+
+    # Pass 2: attach Handoff + docs dimensions against derived provisional flags.
+    gate = build_gate_125_0(
+        **gate_kwargs,
+        readme_text=readme_text,
+        derived_completed=flags["stage125_completed"],
+        derived_entry_ready=flags["stage126_m1_entry_ready"],
+        include_handoff_and_docs=True,
+    )
+    final_pass = all(dim["pass"] for dim in gate.values())
+    if final_pass != provisional_pass:
+        flags = derive_closure_flags(final_pass)
+        readme_text = build_readme(closure_outcome=flags["closure_outcome"])
+        gate = build_gate_125_0(
+            **gate_kwargs,
+            readme_text=readme_text,
+            derived_completed=flags["stage125_completed"],
+            derived_entry_ready=flags["stage126_m1_entry_ready"],
+            include_handoff_and_docs=True,
+        )
+
     closure_report = build_closure_report(
         keep_drop_rows=keep_drop_rows,
         blocker_rows=blocker_rows,
         part4_qc=part4_qc,
         entry_contract=entry_contract,
         gate=gate,
+    )
+    # README / markers must match the closure report's derived outcome.
+    readme_text = build_readme(
+        closure_outcome=closure_report["closure_outcome"],
     )
 
     content: dict[str, str] = {
@@ -1581,6 +1796,7 @@ def build_all(
         "gate": gate,
         "closure_report": closure_report,
         "integrity_rows": integrity_rows,
+        "mode": mode,
     }
     return content, extras
 
@@ -1787,13 +2003,27 @@ def build_qc_assertions(
         closure["part3b_completed"] is False,
         "false",
     )
+    all_gate_pass = all(v["pass"] for v in gate.values())
+    expected_flags = derive_closure_flags(all_gate_pass)
     _assert(
-        assertions, "stage125_completed_true",
-        closure["stage125_completed"] is True, "true",
+        assertions, "stage125_completed_matches_gate",
+        closure["stage125_completed"]
+        is expected_flags["stage125_completed"],
+        str(expected_flags["stage125_completed"]).lower(),
     )
     _assert(
-        assertions, "stage126_entry_ready_true",
-        closure["stage126_m1_entry_ready"] is True, "true",
+        assertions, "stage126_entry_ready_matches_gate",
+        closure["stage126_m1_entry_ready"]
+        is expected_flags["stage126_m1_entry_ready"],
+        str(expected_flags["stage126_m1_entry_ready"]).lower(),
+    )
+    _assert(
+        assertions, "part5_closure_completed_matches_gate",
+        closure["stage125_part5_readiness_closure_completed"]
+        is expected_flags["stage125_part5_readiness_closure_completed"],
+        str(
+            expected_flags["stage125_part5_readiness_closure_completed"]
+        ).lower(),
     )
     _assert(
         assertions, "stage126_authorized_false",
@@ -1857,16 +2087,29 @@ def build_qc_assertions(
             f"{spec['negative']}",
         )
     _assert(
-        assertions, "closure_outcome_string_exact",
-        closure["closure_outcome"]
-        == "READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION",
-        "exact",
+        assertions, "closure_outcome_matches_gate",
+        closure["closure_outcome"] == expected_flags["closure_outcome"]
+        and closure["stage125_gate_125_0"]
+        == expected_flags["stage125_gate_125_0"],
+        expected_flags["closure_outcome"],
     )
-    all_gate_pass = all(v["pass"] for v in gate.values())
     _assert(
         assertions, "gate_125_0_all_dimensions_pass",
         all_gate_pass and closure["stage125_gate_125_0"] == "PASS",
         f"{sum(1 for v in gate.values() if v['pass'])}/{len(gate)}",
+    )
+    try:
+        validate_registered_m1_robustness(
+            entry["registered_m1_robustness_after_primary_lock"],
+        )
+        robustness_ok = True
+    except QCFail:
+        robustness_ok = False
+    _assert(
+        assertions, "m1_robustness_registry_six_categories_exact",
+        robustness_ok
+        and len(entry["registered_m1_robustness_after_primary_lock"]) == 6,
+        "6_exact",
     )
     _assert(
         assertions, "gate_125_0_has_27_dimensions",
@@ -1889,7 +2132,7 @@ def build_qc_assertions(
         all(not (repo_root / rel).exists() for rel in FORBIDDEN_SURFACE_EXACT),
         "absent",
     )
-    content2, _ = build_all(repo_root)
+    content2, _ = build_all(repo_root, mode=extras.get("mode", "build"))
     det_ok = all(content[k] == content2[k] for k in TRACKED_CONTENT_FILES)
     _assert(assertions, "deterministic_rebuild", det_ok, "stable")
 
@@ -1973,8 +2216,9 @@ def run(
     network_attempts = 0
     files_written: dict[str, str] = {}
 
+    run_mode = "build" if build else "check"
     with p3b0.network_sentinel() as sentinel:
-        content, extras = build_all(repo_root)
+        content, extras = build_all(repo_root, mode=run_mode)
         if sentinel.calls_attempted != 0:
             raise QCFail(
                 f"network_requests_attempted_zero failed: "
@@ -2007,7 +2251,7 @@ def run(
             name: sha256_bytes(text.encode("utf-8"))
             for name, text in content.items()
         }
-        markers = _static_qc_markers()
+        markers = _static_qc_markers(extras["closure_report"])
         qc: dict[str, Any] = {
             "stage": QC_STAGE,
             "current_stage": CURRENT_STAGE,
@@ -2068,18 +2312,29 @@ def run(
             "output_files_sha256": dict(
                 sorted({**content_hashes, F_QC: qc_hash}.items())
             ),
-            "stage125_part5_readiness_closure_completed": True,
-            "stage125_completed": True,
-            "stage126_m1_entry_ready": True,
+            "stage125_part5_readiness_closure_completed": extras[
+                "closure_report"
+            ]["stage125_part5_readiness_closure_completed"],
+            "stage125_completed": extras["closure_report"][
+                "stage125_completed"
+            ],
+            "stage126_m1_entry_ready": extras["closure_report"][
+                "stage126_m1_entry_ready"
+            ],
             "stage126_authorized": False,
             "stage126_started": False,
             "modeling_authorized": False,
             "modeling_started": False,
+            "final_test_unlocked": False,
             "network_requests_attempted": network_attempts,
             "model_fit_calls": 0,
             "prediction_calls": 0,
             "shap_calls": 0,
             "research_pointers": qc["research_pointers"],
+            "closure_outcome": extras["closure_report"]["closure_outcome"],
+            "stage125_gate_125_0": extras["closure_report"][
+                "stage125_gate_125_0"
+            ],
         }
         meta_text = _json_str(meta)
         all_tracked = {**content, F_QC: qc_text, F_METADATA: meta_text}

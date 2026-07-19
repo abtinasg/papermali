@@ -200,6 +200,8 @@ BLOCK_CANDIDATES = {
 
 _GIT_ALLOWED_SUBCOMMANDS = frozenset({
     "rev-parse", "merge-base", "log", "show", "ls-files", "check-ignore",
+    # Exact read-only status form used by Stage125 Part 5 working-tree Gate.
+    "status",
 })
 _GIT_FORBIDDEN_TOKENS = frozenset({
     "--ext-diff", "--textconv", "--exec-path", "--html-path", "--man-path",
@@ -490,6 +492,9 @@ def _is_allowed_git_command(cmd: list[str]) -> bool:
             and rest[1] in _GIT_ALLOWED_FORMATS
             and not rest[2].startswith("-")
         )
+    if sub == "status":
+        # Exact argv only: git -C <repo> status --porcelain=v1 --untracked-files=all
+        return rest == ["--porcelain=v1", "--untracked-files=all"]
     return False
 
 

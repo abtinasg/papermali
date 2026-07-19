@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import socket
+import subprocess
 import sys
 from pathlib import Path
 
@@ -14,6 +15,14 @@ sys.path.insert(0, str(ROOT))
 
 from src import stage125_part3b0_evidence_readiness as p3b0  # noqa: E402
 from src import stage125_part5_readiness_closure as m  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def _clean_working_tree_for_unit_tests(monkeypatch, request):
+    """Unit tests stub porcelain unless marked to exercise real git status."""
+    if request.node.get_closest_marker("real_working_tree"):
+        return
+    monkeypatch.setattr(m, "git_status_porcelain", lambda _repo: [])
 
 
 # --------------------------------------------------------------------------- #
@@ -853,13 +862,15 @@ def test_qc_assertions_all_pass_on_real_repo():
 
 
 def test_qc_marker_fields_present():
-    markers = m._static_qc_markers()
+    ready = m.derive_closure_flags(True)
+    markers = m._static_qc_markers(ready)
     for field in m.REQUIRED_HANDOFF_MARKER_FIELDS:
         assert field in markers
 
 
 def test_qc_marker_values_exact():
-    markers = m._static_qc_markers()
+    ready = m.derive_closure_flags(True)
+    markers = m._static_qc_markers(ready)
     assert markers["stage125_part5_readiness_closure_completed"] is True
     assert markers["stage125_completed"] is True
     assert markers["stage126_m1_entry_ready"] is True
@@ -874,6 +885,17 @@ def test_qc_marker_values_exact():
     assert markers["final_test_unlocked"] is False
     assert markers["part3b_completed"] is False
     assert markers["m3_admitted"] is False
+
+
+def test_qc_markers_derive_from_failed_gate():
+    failed = m.derive_closure_flags(False)
+    markers = m._static_qc_markers(failed)
+    assert markers["stage125_part5_readiness_closure_completed"] is False
+    assert markers["stage125_completed"] is False
+    assert markers["stage126_m1_entry_ready"] is False
+    assert markers["stage126_authorized"] is False
+    assert markers["modeling_started"] is False
+    assert markers["final_test_unlocked"] is False
 
 
 # --------------------------------------------------------------------------- #
@@ -1011,3 +1033,299 @@ def test_csv_outputs_are_sorted_deterministically():
     integrity_lines = content[m.F_INTEGRITY].splitlines()[1:]
     paths = [line.split(",", 1)[0] for line in integrity_lines]
     assert paths == sorted(paths)
+
+
+# --------------------------------------------------------------------------- #
+# Derived closure from Gate 125.0 (mutation → NOT_READY)
+# --------------------------------------------------------------------------- #
+
+def _closure_from_mutated_gate(extras, dim_name: str):
+    gate = {k: dict(v) for k, v in extras["gate"].items()}
+    assert dim_name in gate, dim_name
+    gate[dim_name] = {"pass": False, "detail": f"mutated_{dim_name}"}
+    return m.build_closure_report(
+        keep_drop_rows=extras["keep_drop_rows"],
+        blocker_rows=extras["blocker_rows"],
+        part4_qc=extras["part4_qc"],
+        entry_contract=extras["entry_contract"],
+        gate=gate,
+    )
+
+
+@pytest.mark.parametrize(
+    "dim_name",
+    [
+        "part3c_hashes_unchanged",
+        "part4_hashes_unchanged",
+        "valid_handoff",
+        "final_test_still_locked",
+        "stage126_false",
+    ],
+)
+def test_gate_dimension_failure_produces_not_ready(dim_name):
+    with p3b0.network_sentinel():
+        _, extras = m.build_all(REPO_ROOT)
+    closure = _closure_from_mutated_gate(extras, dim_name)
+    assert closure["all_gate_pass"] is False
+    assert closure["stage125_completed"] is False
+    assert closure["stage126_m1_entry_ready"] is False
+    assert closure["stage125_part5_readiness_closure_completed"] is False
+    assert closure["stage125_gate_125_0"] == "FAIL"
+    assert closure["closure_outcome"] == m.CLOSURE_OUTCOME_NOT_READY
+    assert closure["stage126_authorized"] is False
+    assert closure["stage126_started"] is False
+    assert closure["modeling_authorized"] is False
+    assert closure["modeling_started"] is False
+    assert closure["final_test_unlocked"] is False
+
+
+def test_derive_closure_flags_ready_and_not_ready():
+    ready = m.derive_closure_flags(True)
+    assert ready["closure_outcome"] == m.CLOSURE_OUTCOME_READY
+    assert ready["stage125_gate_125_0"] == "PASS"
+    assert ready["stage125_completed"] is True
+    failed = m.derive_closure_flags(False)
+    assert failed["closure_outcome"] == m.CLOSURE_OUTCOME_NOT_READY
+    assert failed["stage125_gate_125_0"] == "FAIL"
+    assert failed["stage125_completed"] is False
+    assert failed["stage126_m1_entry_ready"] is False
+
+
+# --------------------------------------------------------------------------- #
+# M1 robustness registry — exact six categories / three samples
+# --------------------------------------------------------------------------- #
+
+def test_registered_m1_robustness_six_categories_exact():
+    contract = m.build_stage126_m1_entry_contract()
+    entries = contract["registered_m1_robustness_after_primary_lock"]
+    assert len(entries) == 6
+    m.validate_registered_m1_robustness(entries)
+    samples = [e["sample"] for e in entries if "sample" in e]
+    assert sorted(samples) == sorted(m.REQUIRED_ROBUSTNESS_SAMPLES)
+    by_sample = {e["sample"]: e for e in entries if "sample" in e}
+    assert by_sample["main_rule_b_listing_robustness"]["role"] == (
+        "listing_timing_sample_robustness"
+    )
+    assert by_sample["expanded_rule_a_company_scope_robustness"]["role"] == (
+        "expanded_company_scope_sample_robustness"
+    )
+    assert by_sample["expanded_rule_b_combined_robustness"]["role"] == (
+        "combined_sample_robustness"
+    )
+    smote = next(
+        e for e in entries
+        if e.get("category_id") == "smote_training_fold_only_robustness"
+    )
+    assert smote["class_weighting"] == "disabled"
+    assert smote["second_tuning_search"] is False
+    prox = next(
+        e for e in entries
+        if e.get("category_id") == "m1_target_proximity_six_feature_set"
+    )
+    assert prox["feature_count"] == 6
+    assert prox["features_exact_order"] == m.M1_TARGET_PROXIMITY_ROBUSTNESS
+    persistent = next(
+        e for e in entries
+        if e.get("category_id") == "persistent_loss_robustness_target"
+    )
+    assert persistent["target"] == m.SECONDARY_TARGET
+
+
+@pytest.mark.parametrize(
+    "missing_sample",
+    sorted(m.REQUIRED_ROBUSTNESS_SAMPLES),
+)
+def test_robustness_sample_absence_fails(missing_sample):
+    entries = [
+        dict(e) for e in m.REGISTERED_M1_ROBUSTNESS_AFTER_PRIMARY_LOCK
+        if e.get("sample") != missing_sample
+    ]
+    with pytest.raises(m.QCFail, match="robustness sample set mutation"):
+        m.validate_registered_m1_robustness(entries)
+
+
+def test_robustness_sample_rename_fails():
+    entries = [dict(e) for e in m.REGISTERED_M1_ROBUSTNESS_AFTER_PRIMARY_LOCK]
+    for e in entries:
+        if e.get("sample") == "main_rule_b_listing_robustness":
+            e["sample"] = "main_rule_b_listing_robustness_renamed"
+    with pytest.raises(m.QCFail, match="robustness sample set mutation"):
+        m.validate_registered_m1_robustness(entries)
+
+
+def test_robustness_sample_duplicate_fails():
+    entries = [dict(e) for e in m.REGISTERED_M1_ROBUSTNESS_AFTER_PRIMARY_LOCK]
+    entries.append(dict(entries[1]))
+    with pytest.raises(m.QCFail):
+        m.validate_registered_m1_robustness(entries)
+
+
+# --------------------------------------------------------------------------- #
+# Actual Handoff validation mutations
+# --------------------------------------------------------------------------- #
+
+def test_validate_actual_handoff_passes_current_state():
+    ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    assert ok is True
+    assert detail == "actual_handoff_state_matches_derived_closure"
+
+
+def test_handoff_mutation_wrong_selected_qc_scope(tmp_path, monkeypatch):
+    state = m.load_handoff_state(REPO_ROOT)
+    state["selected_qc_scope"] = "stage125_part4_statistical_analysis_plan"
+    handoff = tmp_path / "handoff_state.json"
+    handoff.write_text(json.dumps(state), encoding="utf-8")
+    monkeypatch.setattr(m, "HANDOFF_STATE_REL", str(handoff.name))
+    # Point load to tmp via monkeypatch on load_handoff_state
+    monkeypatch.setattr(
+        m, "load_handoff_state", lambda _root: state,
+    )
+    ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    assert ok is False
+    assert "selected_qc_scope" in detail
+
+
+def test_handoff_mutation_wrong_next_research_action_id(monkeypatch):
+    state = m.load_handoff_state(REPO_ROOT)
+    state["next_research_action_id"] = "stage126-unauthorized"
+    monkeypatch.setattr(m, "load_handoff_state", lambda _root: state)
+    ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    assert ok is False
+    assert "next_research_action_id" in detail
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("stage126_authorized", True),
+        ("modeling_started", True),
+        ("final_test_unlocked", True),
+        ("active_availability_lag_months", 6),
+    ],
+)
+def test_handoff_mutation_auth_and_lag_fields(monkeypatch, field, value):
+    state = m.load_handoff_state(REPO_ROOT)
+    state[field] = value
+    monkeypatch.setattr(m, "load_handoff_state", lambda _root: state)
+    ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    assert ok is False
+    assert field in detail
+
+
+# --------------------------------------------------------------------------- #
+# Working-tree control via actual git status (temp repo fixtures)
+# --------------------------------------------------------------------------- #
+
+def _init_temp_repo(tmp_path: Path) -> Path:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(
+        ["git", "init"], cwd=repo, check=True, capture_output=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.email", "test@example.com"],
+        cwd=repo, check=True, capture_output=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "test"],
+        cwd=repo, check=True, capture_output=True,
+    )
+    tracked = repo / "tracked.txt"
+    tracked.write_text("base\n", encoding="utf-8")
+    subprocess.run(
+        ["git", "add", "tracked.txt"], cwd=repo, check=True, capture_output=True,
+    )
+    subprocess.run(
+        ["git", "commit", "-m", "init"],
+        cwd=repo, check=True, capture_output=True,
+    )
+    return repo
+
+
+@pytest.mark.real_working_tree
+def test_working_tree_unauthorized_tracked_modification_fails(tmp_path):
+    repo = _init_temp_repo(tmp_path)
+    (repo / "tracked.txt").write_text("mutated\n", encoding="utf-8")
+    ok, detail = m.evaluate_working_tree_clean(repo, mode="build")
+    assert ok is False
+    assert "unauthorized" in detail
+    ok_check, _ = m.evaluate_working_tree_clean(repo, mode="check")
+    assert ok_check is False
+
+
+@pytest.mark.real_working_tree
+def test_working_tree_unauthorized_nested_untracked_fails(tmp_path):
+    repo = _init_temp_repo(tmp_path)
+    nested = repo / "project" / "stage125" / "nested"
+    nested.mkdir(parents=True)
+    (nested / "secret.txt").write_text("x\n", encoding="utf-8")
+    ok, detail = m.evaluate_working_tree_clean(repo, mode="build")
+    assert ok is False
+    assert "unauthorized" in detail
+
+
+@pytest.mark.real_working_tree
+def test_working_tree_unauthorized_deletion_fails(tmp_path):
+    repo = _init_temp_repo(tmp_path)
+    (repo / "tracked.txt").unlink()
+    ok, detail = m.evaluate_working_tree_clean(repo, mode="build")
+    assert ok is False
+    assert "unauthorized" in detail
+
+
+@pytest.mark.real_working_tree
+def test_working_tree_build_allows_only_exact_part5_paths(tmp_path):
+    repo = _init_temp_repo(tmp_path)
+    for rel in sorted(m.AUTHORIZED_PART5_GENERATED_PATHS):
+        path = repo / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("generated\n", encoding="utf-8")
+    ok, detail = m.evaluate_working_tree_clean(repo, mode="build")
+    assert ok is True, detail
+    ok_check, _ = m.evaluate_working_tree_clean(repo, mode="check")
+    assert ok_check is False
+
+
+@pytest.mark.real_working_tree
+def test_working_tree_check_requires_completely_empty(tmp_path):
+    repo = _init_temp_repo(tmp_path)
+    ok, detail = m.evaluate_working_tree_clean(repo, mode="check")
+    assert ok is True
+    assert detail == "empty"
+
+
+# --------------------------------------------------------------------------- #
+# M3 nonpermanent not-admitted wording
+# --------------------------------------------------------------------------- #
+
+def test_m3_not_permanently_eliminated_wording():
+    blockers = {r["item_id"]: r for r in m.build_blocker_register_rows()}
+    row = blockers["M3_AUTHORITATIVE_SOURCE_UNAVAILABLE"]
+    assert "re-enter" in row["required_future_action"]
+    assert "permanently" not in row["required_future_action"].lower()
+    kd = {r["item_id"]: r for r in m.build_keep_drop_rows()}
+    notes = kd["BLOCK_M3_MACRO"]["notes"]
+    assert "not permanently eliminated" in notes
+    readme = m.build_readme(closure_outcome=m.CLOSURE_OUTCOME_READY)
+    assert "not admitted on the current active path" in readme
+    assert "permanently eliminated" in readme
+    assert "M3 is **not** permanently eliminated" in readme
+    with p3b0.network_sentinel():
+        content, _ = m.build_all(REPO_ROOT)
+    closure = json.loads(content[m.F_CLOSURE_REPORT])
+    assert closure["m3_disposition"] == "not_admitted_on_current_active_path"
+    assert closure["m3_data_collection_authorized_in_part5"] is False
+    assert closure["m3_reentry_requirements"] == [
+        "new_explicit_versioned_human_decision",
+        "authoritative_and_reproducible_source",
+        "publication_availability_time_validation",
+        "coverage_and_temporal_data_gate_approval",
+    ]
