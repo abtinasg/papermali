@@ -80,8 +80,12 @@ def test_real_repo_last_stage_commit_is_a_real_content_commit():
     )
     # Every commit strictly newer than `got` must NOT be stage-relevant,
     # otherwise `got` would not be the LATEST qualifying commit.
+    # Content-preserving two-parent merges (tree == second parent) are skipped
+    # by last_stage_commit and must be skipped here for the same reason.
     newer = gen._git(REAL_ROOT, "rev-list", f"{got}..HEAD").splitlines()
     for sha in newer:
+        if gen._is_content_preserving_merge(REAL_ROOT, sha):
+            continue
         newer_files = gen._introduced_files(REAL_ROOT, sha)
         assert not gen._is_stage_relevant(newer_files), (
             f"commit {sha} is newer than last_stage_commit {got} but is "
