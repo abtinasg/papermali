@@ -74,6 +74,21 @@ BLOCK_COMMON_COVERAGE_MIN = 0.70
 MIN_VAL_POSITIVES = 5
 MIN_FINAL_TEST_POSITIVES = 10
 
+# Event-count decision vocabulary (v2 correction). Development-comparison
+# feasibility is a target-level conjunction across BOTH locked validation
+# windows; it is never an independent per-row label on aggregate rows. The
+# final-test threshold is a claim gate only. Training / all rows carry a
+# neutral event-count label and are never independent claim gates.
+DEV_COMPARISON_SUPPORTED = "development_comparison_feasibility_met"
+DEV_COMPARISON_NOT_SUPPORTED = "development_comparison_not_supported"
+FINAL_TEST_CLAIM_ELIGIBLE = "final_test_inferential_claim_eligible"
+FINAL_TEST_DESCRIPTIVE_ONLY = (
+    "distributional_descriptive_robustness_only;"
+    "no_comparative_predictive_performance_claim;"
+    "no_inferential_model_ranking"
+)
+NEUTRAL_EVENT_COUNT_LABEL = "event_count_only_not_an_independent_claim_gate"
+
 F_SAP = "part4_statistical_analysis_plan_stage125.json"
 F_FEATURE_SETS = "part4_feature_sets_stage125.csv"
 F_EXCLUSIONS = "part4_feature_exclusion_decisions_stage125.csv"
@@ -896,6 +911,38 @@ def build_split_manifest(
     return manifest
 
 
+def derive_development_comparison_feasibility(
+    fold1_validation_positive: int, fold2_validation_positive: int,
+) -> str:
+    """Target-level conjunction across BOTH locked validation windows.
+
+    Development-comparison feasibility is met only when each locked temporal
+    validation window independently has at least ``MIN_VAL_POSITIVES`` positive
+    evaluable events. It is never derived from the aggregate development
+    positive count, the all-period count, or any training/final-test count.
+    """
+    if (
+        fold1_validation_positive >= MIN_VAL_POSITIVES
+        and fold2_validation_positive >= MIN_VAL_POSITIVES
+    ):
+        return DEV_COMPARISON_SUPPORTED
+    return DEV_COMPARISON_NOT_SUPPORTED
+
+
+def derive_final_test_claim_eligibility(final_test_positive: int) -> str:
+    """Claim gate only. Never affects admission, splits, or final-test years."""
+    if final_test_positive >= MIN_FINAL_TEST_POSITIVES:
+        return FINAL_TEST_CLAIM_ELIGIBLE
+    return FINAL_TEST_DESCRIPTIVE_ONLY
+
+
+def _single_validation_window_decision(positive: int) -> str:
+    """Per-window validation feasibility (one locked validation window)."""
+    if positive >= MIN_VAL_POSITIVES:
+        return DEV_COMPARISON_SUPPORTED
+    return DEV_COMPARISON_NOT_SUPPORTED
+
+
 def build_event_counts(
     sample_rows: dict[str, list[dict[str, str]]],
 ) -> list[dict[str, str]]:
@@ -908,9 +955,11 @@ def build_event_counts(
         ("final_test", FINAL_TEST_YEARS),
         ("all", None),
     ]
+    neutral_windows = {"fold1_train", "fold2_train", "all"}
     rows_out: list[dict[str, str]] = []
     for sample, data in sorted(sample_rows.items()):
         for target in ALL_TARGETS:
+            counts_by_window: dict[str, dict[str, int]] = {}
             for window_name, years in windows:
                 if years is None:
                     subset = data
@@ -930,23 +979,44 @@ def build_event_counts(
                 # Missing must never be folded into negative.
                 if counts["negative"] > counts["evaluable_rows"]:
                     raise QCFail("missing counted as negative")
-                decision = "eligible_for_comparative_claims"
-                pos = counts["positive"]
-                if window_name == "final_test":
-                    # Claim eligibility only — never feature admission.
-                    if pos < MIN_FINAL_TEST_POSITIVES:
-                        decision = (
-                            "distributional_descriptive_robustness_only;"
-                            "no_comparative_predictive_performance_claim;"
-                            "no_inferential_model_ranking"
-                        )
-                    else:
-                        decision = "final_test_inferential_claim_eligible"
-                elif window_name in {"fold1_validation", "fold2_validation"}:
-                    if pos < MIN_VAL_POSITIVES:
-                        decision = "development_comparison_not_supported"
-                    else:
-                        decision = "development_comparison_feasibility_met"
+                counts_by_window[window_name] = counts
+
+            # Target-level conjunction across both locked validation windows.
+            fold1_validation_positive = (
+                counts_by_window["fold1_validation"]["positive"]
+            )
+            fold2_validation_positive = (
+                counts_by_window["fold2_validation"]["positive"]
+            )
+            final_test_positive = counts_by_window["final_test"]["positive"]
+            development_comparison_feasibility = (
+                derive_development_comparison_feasibility(
+                    fold1_validation_positive, fold2_validation_positive,
+                )
+            )
+            final_test_claim_eligibility = (
+                derive_final_test_claim_eligibility(final_test_positive)
+            )
+
+            for window_name, _years in windows:
+                counts = counts_by_window[window_name]
+                if window_name in neutral_windows:
+                    # Count-only rows are never independent claim gates.
+                    decision = NEUTRAL_EVENT_COUNT_LABEL
+                elif window_name == "development":
+                    # Aggregate development uses the target-level conjunction,
+                    # not its own aggregate positive count.
+                    decision = development_comparison_feasibility
+                elif window_name == "fold1_validation":
+                    decision = _single_validation_window_decision(
+                        fold1_validation_positive,
+                    )
+                elif window_name == "fold2_validation":
+                    decision = _single_validation_window_decision(
+                        fold2_validation_positive,
+                    )
+                else:  # final_test
+                    decision = final_test_claim_eligibility
                 rows_out.append({
                     "sample_design": sample,
                     "target": target,
@@ -959,6 +1029,56 @@ def build_event_counts(
                     "event_gate_decision": decision,
                 })
     return rows_out
+
+
+def build_target_comparison_decisions(
+    event_rows: list[dict[str, str]],
+) -> list[dict[str, Any]]:
+    """One unambiguous target-level decision per sample_design x target.
+
+    Twelve rows (4 sample designs x 3 targets). Development feasibility is the
+    conjunction result already stored on the aggregate development row; the
+    final-test eligibility is the claim-gate result on the final_test row.
+    """
+    by_key = {
+        (r["sample_design"], r["target"], r["window"]): r for r in event_rows
+    }
+    samples = sorted({r["sample_design"] for r in event_rows})
+    out: list[dict[str, Any]] = []
+    for sample in samples:
+        for target in ALL_TARGETS:
+            dev = by_key[(sample, target, "development")]
+            f1v = by_key[(sample, target, "fold1_validation")]
+            f2v = by_key[(sample, target, "fold2_validation")]
+            ft = by_key[(sample, target, "final_test")]
+            fold1_validation_positive = int(f1v["positive"])
+            fold2_validation_positive = int(f2v["positive"])
+            final_test_positive = int(ft["positive"])
+            expected_dev = derive_development_comparison_feasibility(
+                fold1_validation_positive, fold2_validation_positive,
+            )
+            if dev["event_gate_decision"] != expected_dev:
+                raise QCFail(
+                    "development aggregate decision does not match the "
+                    "fold conjunction"
+                )
+            expected_ft = derive_final_test_claim_eligibility(
+                final_test_positive,
+            )
+            if ft["event_gate_decision"] != expected_ft:
+                raise QCFail(
+                    "final-test decision does not match final-test positives"
+                )
+            out.append({
+                "sample_design": sample,
+                "target": target,
+                "fold1_validation_positive": fold1_validation_positive,
+                "fold2_validation_positive": fold2_validation_positive,
+                "development_comparison_feasibility": expected_dev,
+                "final_test_positive": final_test_positive,
+                "final_test_claim_eligibility": expected_ft,
+            })
+    return out
 
 
 # --------------------------------------------------------------------------- #
@@ -1046,6 +1166,26 @@ def build_sample_target_matrix(
         role = SAMPLE_SPECS[sample]["role"]
         for target in ALL_TARGETS:
             counts = count_target_states([r[target] for r in data])
+            fold1_val = count_target_states([
+                r[target] for r in data
+                if int(r["target_year"]) in FOLD1_VAL_YEARS
+            ])
+            fold2_val = count_target_states([
+                r[target] for r in data
+                if int(r["target_year"]) in FOLD2_VAL_YEARS
+            ])
+            final_test = count_target_states([
+                r[target] for r in data
+                if int(r["target_year"]) in FINAL_TEST_YEARS
+            ])
+            development_comparison_feasibility = (
+                derive_development_comparison_feasibility(
+                    fold1_val["positive"], fold2_val["positive"],
+                )
+            )
+            final_test_claim_eligibility = derive_final_test_claim_eligibility(
+                final_test["positive"],
+            )
             if target == PRIMARY_TARGET:
                 target_role = "primary"
             elif target == SECONDARY_TARGET:
@@ -1063,6 +1203,12 @@ def build_sample_target_matrix(
                 "positive": str(counts["positive"]),
                 "negative": str(counts["negative"]),
                 "missing": str(counts["missing"]),
+                "fold1_validation_positive": str(fold1_val["positive"]),
+                "fold2_validation_positive": str(fold2_val["positive"]),
+                "development_comparison_feasibility":
+                    development_comparison_feasibility,
+                "final_test_positive": str(final_test["positive"]),
+                "final_test_claim_eligibility": final_test_claim_eligibility,
                 "paper_primary_result": (
                     "true"
                     if sample == PRIMARY_SAMPLE and target == PRIMARY_TARGET
@@ -1087,6 +1233,19 @@ def build_sap_contract(
         and r["target"] == ARTICLE141_TARGET
         and r["window"] == "final_test"
     ][0]
+    target_comparison_decisions = build_target_comparison_decisions(event_rows)
+    article141_rows = [
+        d for d in target_comparison_decisions
+        if d["target"] == ARTICLE141_TARGET
+    ]
+    article141_development_comparison_supported = any(
+        d["development_comparison_feasibility"] == DEV_COMPARISON_SUPPORTED
+        for d in article141_rows
+    )
+    article141_inferential_final_test_claim_supported = any(
+        d["final_test_claim_eligibility"] == FINAL_TEST_CLAIM_ELIGIBLE
+        for d in article141_rows
+    )
     return {
         "contract_version": CONTRACT_VERSION,
         "contract_version_history": {
@@ -1203,8 +1362,21 @@ def build_sap_contract(
         "development_model_comparison_feasibility": {
             "min_positive_evaluable_each_temporal_validation_window":
                 MIN_VAL_POSITIVES,
+            "requires_both_locked_validation_windows": True,
+            "is_target_level_conjunction": True,
+            "aggregate_development_uses_fold_conjunction_not_own_count": True,
             "fail_action": "development_comparison_not_supported",
+            "supported_label": DEV_COMPARISON_SUPPORTED,
+            "not_supported_label": DEV_COMPARISON_NOT_SUPPORTED,
+            "neutral_event_count_label": NEUTRAL_EVENT_COUNT_LABEL,
+            "neutral_windows": ["fold1_train", "fold2_train", "all"],
+            "generic_comparative_claims_default_label_removed": True,
         },
+        "target_comparison_decisions": target_comparison_decisions,
+        "article141_development_comparison_supported":
+            article141_development_comparison_supported,
+        "article141_inferential_final_test_claim_supported":
+            article141_inferential_final_test_claim_supported,
         "final_test_inferential_claim_eligibility": {
             "min_positive_evaluable_locked_final_test": MIN_FINAL_TEST_POSITIVES,
             "fail_action": (
@@ -1667,6 +1839,33 @@ Part 4 locks the statistical analysis plan for future Stage126 modeling:
 - PR-AUC primary; Recall@10% / Lift@10%; calibration; paired ticker-cluster bootstrap; Holm
 - SHAP stability contract (no SHAP computation in Part 4)
 
+## Development-comparison feasibility is a target-level conjunction
+
+Development-comparison feasibility is decided per `sample_design × target` as a
+conjunction across **both** locked temporal validation windows:
+
+```text
+development_comparison_feasibility_met
+  iff fold1_validation_positive >= 5 AND fold2_validation_positive >= 5
+else development_comparison_not_supported
+```
+
+The aggregate `development` event-count row reports this conjunction result; it
+is never an independent label derived from the aggregate development positive
+count. The `fold1_train`, `fold2_train`, and `all` rows carry the neutral label
+`event_count_only_not_an_independent_claim_gate` and are never claim gates. The
+generic `eligible_for_comparative_claims` label is removed.
+
+Consequences (all four sample designs):
+
+- `FD_target_article141_only_t_plus_1` has `fold1_validation_positive = 17` but
+  `fold2_validation_positive = 3`, so development comparison is **unsupported**,
+  and with `final_test_positive ∈ {0, 1}` its final-test analysis is
+  **descriptive-only** (no comparative or inferential claim).
+- `FD_target_main_t_plus_1` and
+  `FD_target_persistent_loss_robustness_t_plus_1` remain development-supported
+  and final-test claim-eligible.
+
 ## v2 methodological correction
 
 Human supervisor rejected `revenue_growth_period_adjusted` from admitted M1
@@ -1828,7 +2027,10 @@ def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
         F_SAMPLE_TARGET: _csv_str(
             ["sample_design", "sample_role", "target", "target_role",
              "rows", "evaluable_rows", "companies", "positive", "negative",
-             "missing", "paper_primary_result"],
+             "missing", "fold1_validation_positive",
+             "fold2_validation_positive", "development_comparison_feasibility",
+             "final_test_positive", "final_test_claim_eligibility",
+             "paper_primary_result"],
             sample_target_rows,
         ),
         F_SPLIT_CONTRACT: _json_str(split_contract),
@@ -2061,6 +2263,140 @@ def build_qc_assertions(
         ] is True,
         "evaluable_recorded",
     )
+    ev_by_key = {
+        (r["sample_design"], r["target"], r["window"]): r for r in event_rows
+    }
+    samples = sorted({r["sample_design"] for r in event_rows})
+    neutral_windows = ("fold1_train", "fold2_train", "all")
+
+    def _dev_decision(sample: str, target: str) -> str:
+        return ev_by_key[(sample, target, "development")]["event_gate_decision"]
+
+    def _ft_decision(sample: str, target: str) -> str:
+        return ev_by_key[(sample, target, "final_test")]["event_gate_decision"]
+
+    _assert(
+        assertions, "target_level_development_gate_present",
+        all(
+            _dev_decision(s, t)
+            in {DEV_COMPARISON_SUPPORTED, DEV_COMPARISON_NOT_SUPPORTED}
+            for s in samples for t in ALL_TARGETS
+        ),
+        "present",
+    )
+    conjunction_ok = True
+    contradiction = False
+    for s in samples:
+        for t in ALL_TARGETS:
+            f1 = int(ev_by_key[(s, t, "fold1_validation")]["positive"])
+            f2 = int(ev_by_key[(s, t, "fold2_validation")]["positive"])
+            expected = derive_development_comparison_feasibility(f1, f2)
+            if _dev_decision(s, t) != expected:
+                conjunction_ok = False
+            if (
+                (f1 < MIN_VAL_POSITIVES or f2 < MIN_VAL_POSITIVES)
+                and _dev_decision(s, t) == DEV_COMPARISON_SUPPORTED
+            ):
+                contradiction = True
+    _assert(
+        assertions, "development_gate_uses_both_validation_windows",
+        conjunction_ok and not contradiction, "both_folds",
+    )
+    _assert(
+        assertions, "development_aggregate_decision_matches_fold_conjunction",
+        conjunction_ok, "matches_conjunction",
+    )
+    _assert(
+        assertions, "train_and_all_windows_use_neutral_event_count_label",
+        all(
+            ev_by_key[(s, t, w)]["event_gate_decision"]
+            == NEUTRAL_EVENT_COUNT_LABEL
+            for s in samples for t in ALL_TARGETS for w in neutral_windows
+        ),
+        "neutral",
+    )
+    _assert(
+        assertions, "no_generic_eligible_for_comparative_claims_label",
+        all(
+            r["event_gate_decision"] != "eligible_for_comparative_claims"
+            for r in event_rows
+        )
+        and "eligible_for_comparative_claims" not in content[F_EVENT_GATE]
+        and "eligible_for_comparative_claims" not in content[F_SAMPLE_TARGET]
+        and "eligible_for_comparative_claims" not in content[F_SAP],
+        "absent",
+    )
+    _assert(
+        assertions, "article141_development_not_supported_all_samples",
+        all(
+            _dev_decision(s, ARTICLE141_TARGET) == DEV_COMPARISON_NOT_SUPPORTED
+            for s in samples
+        )
+        and sap["article141_development_comparison_supported"] is False,
+        "not_supported_all",
+    )
+    _assert(
+        assertions, "article141_final_test_descriptive_only_all_samples",
+        all(
+            "distributional_descriptive_robustness_only"
+            in _ft_decision(s, ARTICLE141_TARGET)
+            for s in samples
+        )
+        and sap["article141_inferential_final_test_claim_supported"] is False,
+        "descriptive_all",
+    )
+    _assert(
+        assertions, "main_target_development_supported_all_samples",
+        all(
+            _dev_decision(s, PRIMARY_TARGET) == DEV_COMPARISON_SUPPORTED
+            for s in samples
+        ),
+        "supported_all",
+    )
+    _assert(
+        assertions, "main_target_final_claim_eligible_all_samples",
+        all(
+            _ft_decision(s, PRIMARY_TARGET) == FINAL_TEST_CLAIM_ELIGIBLE
+            for s in samples
+        ),
+        "eligible_all",
+    )
+    _assert(
+        assertions, "persistent_target_development_supported_all_samples",
+        all(
+            _dev_decision(s, SECONDARY_TARGET) == DEV_COMPARISON_SUPPORTED
+            for s in samples
+        ),
+        "supported_all",
+    )
+    _assert(
+        assertions, "persistent_target_final_claim_eligible_all_samples",
+        all(
+            _ft_decision(s, SECONDARY_TARGET) == FINAL_TEST_CLAIM_ELIGIBLE
+            for s in samples
+        ),
+        "eligible_all",
+    )
+    st_header = content[F_SAMPLE_TARGET].splitlines()[0]
+    _assert(
+        assertions, "sample_target_matrix_contains_target_level_decisions",
+        all(
+            col in st_header
+            for col in (
+                "fold1_validation_positive", "fold2_validation_positive",
+                "development_comparison_feasibility", "final_test_positive",
+                "final_test_claim_eligibility",
+            )
+        ),
+        "columns_present",
+    )
+    _assert(
+        assertions, "target_comparison_decisions_twelve_rows",
+        len(sap.get("target_comparison_decisions", [])) == 12
+        and len(samples) == 4,
+        "12",
+    )
+
     claim = sap["final_test_inferential_claim_eligibility"]
     _assert(
         assertions, "final_test_threshold_is_claim_gate_not_feature_admission",

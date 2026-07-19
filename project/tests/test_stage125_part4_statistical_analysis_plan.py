@@ -582,6 +582,167 @@ def test_human_decision_artifact_fields():
     assert d["evidence"]["failed_minimum_fold_training_coverage_gate"] is True
 
 
+def test_derive_development_feasibility_fold1_17_fold2_3_not_supported():
+    assert (
+        m.derive_development_comparison_feasibility(17, 3)
+        == m.DEV_COMPARISON_NOT_SUPPORTED
+    )
+
+
+def test_derive_development_feasibility_fold1_5_fold2_5_supported():
+    assert (
+        m.derive_development_comparison_feasibility(5, 5)
+        == m.DEV_COMPARISON_SUPPORTED
+    )
+
+
+def test_derive_development_feasibility_fold1_4_fold2_100_not_supported():
+    assert (
+        m.derive_development_comparison_feasibility(4, 100)
+        == m.DEV_COMPARISON_NOT_SUPPORTED
+    )
+
+
+def test_derive_development_feasibility_fold1_100_fold2_4_not_supported():
+    assert (
+        m.derive_development_comparison_feasibility(100, 4)
+        == m.DEV_COMPARISON_NOT_SUPPORTED
+    )
+
+
+def test_derive_final_test_9_descriptive_only():
+    assert (
+        m.derive_final_test_claim_eligibility(9)
+        == m.FINAL_TEST_DESCRIPTIVE_ONLY
+    )
+    assert "distributional_descriptive_robustness_only" in (
+        m.derive_final_test_claim_eligibility(9)
+    )
+
+
+def test_derive_final_test_10_inferential_claim_eligible():
+    assert (
+        m.derive_final_test_claim_eligibility(10)
+        == m.FINAL_TEST_CLAIM_ELIGIBLE
+    )
+
+
+def _event_index(events):
+    return {
+        (e["sample_design"], e["target"], e["window"]): e for e in events
+    }
+
+
+def test_aggregate_development_cannot_remain_eligible_when_one_fold_fails():
+    sample_rows = {
+        s: m.load_analysis_ready(REPO_ROOT, s) for s in m.ANALYSIS_READY_FILES
+    }
+    events = m.build_event_counts(sample_rows)
+    idx = _event_index(events)
+    samples = sorted({e["sample_design"] for e in events})
+    for s in samples:
+        for t in m.ALL_TARGETS:
+            f1 = int(idx[(s, t, "fold1_validation")]["positive"])
+            f2 = int(idx[(s, t, "fold2_validation")]["positive"])
+            dev = idx[(s, t, "development")]["event_gate_decision"]
+            expected = m.derive_development_comparison_feasibility(f1, f2)
+            assert dev == expected
+            if f1 < m.MIN_VAL_POSITIVES or f2 < m.MIN_VAL_POSITIVES:
+                assert dev == m.DEV_COMPARISON_NOT_SUPPORTED
+    # Article-141 primary: fold1=17 passes, fold2=3 fails -> not supported.
+    art = idx[(m.PRIMARY_SAMPLE, m.ARTICLE141_TARGET, "development")]
+    f1v = idx[(m.PRIMARY_SAMPLE, m.ARTICLE141_TARGET, "fold1_validation")]
+    f2v = idx[(m.PRIMARY_SAMPLE, m.ARTICLE141_TARGET, "fold2_validation")]
+    assert int(f1v["positive"]) == 17
+    assert int(f2v["positive"]) == 3
+    assert art["event_gate_decision"] == m.DEV_COMPARISON_NOT_SUPPORTED
+
+
+def test_article141_unsupported_in_all_four_samples():
+    sample_rows = {
+        s: m.load_analysis_ready(REPO_ROOT, s) for s in m.ANALYSIS_READY_FILES
+    }
+    events = m.build_event_counts(sample_rows)
+    idx = _event_index(events)
+    samples = sorted({e["sample_design"] for e in events})
+    assert len(samples) == 4
+    for s in samples:
+        dev = idx[(s, m.ARTICLE141_TARGET, "development")]
+        ft = idx[(s, m.ARTICLE141_TARGET, "final_test")]
+        assert dev["event_gate_decision"] == m.DEV_COMPARISON_NOT_SUPPORTED
+        assert "distributional_descriptive_robustness_only" in (
+            ft["event_gate_decision"]
+        )
+        assert ft["event_gate_decision"] != m.FINAL_TEST_CLAIM_ELIGIBLE
+
+
+def test_main_and_persistent_supported_in_all_four_samples():
+    sample_rows = {
+        s: m.load_analysis_ready(REPO_ROOT, s) for s in m.ANALYSIS_READY_FILES
+    }
+    events = m.build_event_counts(sample_rows)
+    idx = _event_index(events)
+    samples = sorted({e["sample_design"] for e in events})
+    assert len(samples) == 4
+    for s in samples:
+        for t in (m.PRIMARY_TARGET, m.SECONDARY_TARGET):
+            dev = idx[(s, t, "development")]
+            ft = idx[(s, t, "final_test")]
+            assert dev["event_gate_decision"] == m.DEV_COMPARISON_SUPPORTED
+            assert ft["event_gate_decision"] == m.FINAL_TEST_CLAIM_ELIGIBLE
+
+
+def test_train_and_all_windows_receive_neutral_labels():
+    sample_rows = {
+        s: m.load_analysis_ready(REPO_ROOT, s) for s in m.ANALYSIS_READY_FILES
+    }
+    events = m.build_event_counts(sample_rows)
+    for e in events:
+        if e["window"] in {"fold1_train", "fold2_train", "all"}:
+            assert e["event_gate_decision"] == m.NEUTRAL_EVENT_COUNT_LABEL
+        else:
+            assert e["event_gate_decision"] != m.NEUTRAL_EVENT_COUNT_LABEL
+
+
+def test_generic_eligible_for_comparative_claims_label_absent():
+    content, extras = m.build_all(REPO_ROOT)
+    for e in extras["event_rows"]:
+        assert e["event_gate_decision"] != "eligible_for_comparative_claims"
+    assert "eligible_for_comparative_claims" not in content[m.F_EVENT_GATE]
+    assert "eligible_for_comparative_claims" not in content[m.F_SAMPLE_TARGET]
+    assert "eligible_for_comparative_claims" not in content[m.F_SAP]
+
+
+def test_sample_target_matrix_contains_target_level_decisions():
+    content, _ = m.build_all(REPO_ROOT)
+    header = content[m.F_SAMPLE_TARGET].splitlines()[0]
+    for col in (
+        "fold1_validation_positive", "fold2_validation_positive",
+        "development_comparison_feasibility", "final_test_positive",
+        "final_test_claim_eligibility",
+    ):
+        assert col in header
+
+
+def test_target_comparison_decisions_twelve_rows_article141_flags():
+    content, extras = m.build_all(REPO_ROOT)
+    sap = extras["sap"]
+    decisions = sap["target_comparison_decisions"]
+    assert len(decisions) == 12
+    assert sap["article141_development_comparison_supported"] is False
+    assert sap["article141_inferential_final_test_claim_supported"] is False
+    art = [d for d in decisions if d["target"] == m.ARTICLE141_TARGET]
+    assert len(art) == 4
+    for d in art:
+        assert (
+            d["development_comparison_feasibility"]
+            == m.DEV_COMPARISON_NOT_SUPPORTED
+        )
+        assert (
+            d["final_test_claim_eligibility"] == m.FINAL_TEST_DESCRIPTIVE_ONLY
+        )
+
+
 def test_split_manifest_content_stable_across_rebuild():
     sample_rows = {
         s: m.load_analysis_ready(REPO_ROOT, s) for s in m.ANALYSIS_READY_FILES
