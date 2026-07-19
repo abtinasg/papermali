@@ -3,7 +3,7 @@
   "active_availability_lag_months": 4,
   "active_availability_method": "fixed_regulatory_lag",
   "all_pass": true,
-  "assertion_count": 59,
+  "assertion_count": 61,
   "assertions": [
     {
       "assertion": "baseline_commit_pinned",
@@ -141,12 +141,17 @@
       "status": "PASS"
     },
     {
-      "assertion": "stage125_completed_true",
+      "assertion": "stage125_completed_matches_gate",
       "detail": "true",
       "status": "PASS"
     },
     {
-      "assertion": "stage126_entry_ready_true",
+      "assertion": "stage126_entry_ready_matches_gate",
+      "detail": "true",
+      "status": "PASS"
+    },
+    {
+      "assertion": "part5_closure_completed_matches_gate",
       "detail": "true",
       "status": "PASS"
     },
@@ -206,13 +211,18 @@
       "status": "PASS"
     },
     {
-      "assertion": "closure_outcome_string_exact",
-      "detail": "exact",
+      "assertion": "closure_outcome_matches_gate",
+      "detail": "READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION",
       "status": "PASS"
     },
     {
       "assertion": "gate_125_0_all_dimensions_pass",
       "detail": "27/27",
+      "status": "PASS"
+    },
+    {
+      "assertion": "m1_robustness_registry_six_categories_exact",
+      "detail": "6_exact",
       "status": "PASS"
     },
     {
@@ -360,7 +370,7 @@
       "pass": true
     },
     "contradiction_free_docs": {
-      "detail": "roadmap_next_matches_part5_or_already_advanced_and_readme_consistent",
+      "detail": "roadmap_and_readme_outcome_consistent_with_derived_closure",
       "pass": true
     },
     "final_test_still_locked": {
@@ -452,11 +462,11 @@
       "pass": true
     },
     "valid_handoff": {
-      "detail": "part5_qc_marker_fields_present",
+      "detail": "actual_handoff_state_matches_derived_closure",
       "pass": true
     },
     "working_tree_clean": {
-      "detail": "clean",
+      "detail": "authorized_or_empty",
       "pass": true
     }
   },
@@ -472,12 +482,12 @@
   "network_extraction_performed": true,
   "network_requests_attempted": 0,
   "output_sha256": {
-    "README_STAGE125_PART5_READINESS_CLOSURE.md": "bb1e1e1470b4cc94cd3e5dbfe139c110cff9445380b1e118674ca6bee6e835ad",
-    "part5_artifact_integrity_manifest_stage125.csv": "682be8249f952da1bb2e86504361e38efab62fc159127ded7706cc5939d3d82c",
-    "part5_blocker_register_stage125.csv": "8793ac997555eee15b00783cf8ba63f14852c3ee76b426cf6696ebd4c046e77b",
-    "part5_keep_drop_decisions_stage125.csv": "81f59937c52a3a34d58c79f67d22312a818af869cc7f5bb67283a53c711a97f7",
-    "part5_readiness_closure_report_stage125.json": "be307f339552e25cd6bd9f0eaf77a5278134865749c8f59563b3881c43d7fdbc",
-    "part5_stage126_m1_entry_contract_stage125.json": "d52e8bb7b00f80a5c7f3319036335835fcef91b5837484075681db387d491e51"
+    "README_STAGE125_PART5_READINESS_CLOSURE.md": "a18932b695213fe64fbd1851def9c67bf8dbdc831fc2773914b1801040b6d405",
+    "part5_artifact_integrity_manifest_stage125.csv": "b730b57094da2f2f0681ce2f79d0336ca124b4941c2a6234ac7369b6023c1ecb",
+    "part5_blocker_register_stage125.csv": "32e679ed513fcbdebf114bf88225a9251fb4793648655d7f044347fdf54a35d3",
+    "part5_keep_drop_decisions_stage125.csv": "bacb202cc3404b512e71740ed6c71bfaee8a0201fb941388e0a06f484323c718",
+    "part5_readiness_closure_report_stage125.json": "199103708ae0122071a1980b355510298f5bad9a2599ac05cb031f0597f8ccc0",
+    "part5_stage126_m1_entry_contract_stage125.json": "74a2159785daeda44fa82ebd76f42870fa25aba3667846bccba6b3099ea65da5"
   },
   "pair_level_evidence_collected": true,
   "part3a_decision_locked": true,
@@ -505,8 +515,8 @@
   "row_level_publish_datetime_collection_required": false,
   "shap_calls": 0,
   "six_month_lag_superseded": true,
-  "source_commit": "98ef58a7197c7fbb21fa57bfecf927468afc6df3",
-  "source_file_sha256": "38e82d577d9e03b6d4c9ab649c5bdf9c39486864088512ca1bb302e11f2524e5",
+  "source_commit": "112c753d9bd962cb1846805051119e3e41d408f9",
+  "source_file_sha256": "d0fb4c3161ffd82bae46af9febd2120216d3f622ad12099d27298ecd4699645f",
   "stage": "stage125_part5_readiness_closure",
   "stage125_completed": true,
   "stage125_gate_125_0": "PASS",
@@ -514,7 +524,7 @@
   "stage126_authorized": false,
   "stage126_m1_entry_ready": true,
   "stage126_started": false,
-  "test_file_sha256": "f994d904e96716c47d2547c643e82856c0c8576f49fb2d95426d9f3a14bedb46",
+  "test_file_sha256": "f05682d66739434fbcb12f2f1f4755cc556a55e1dc3a8d11786d948cc9a303cf",
   "ticker_count": 0,
   "tickers": []
 }

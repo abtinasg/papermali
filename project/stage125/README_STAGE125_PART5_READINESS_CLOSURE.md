@@ -20,8 +20,8 @@ Part 5 closes Stage125 research-design readiness:
   `modeling_started` all remain `false`
 - an artifact-integrity manifest pinning all frozen Part 3C inputs and Part 4
   outputs by SHA-256, plus Part 5's own generated outputs
-- a derived Gate 125.0 readiness gate (dimension-by-dimension, not an
-  unconditional pass)
+- a derived Gate 125.0 readiness gate (dimension-by-dimension; completion and
+  readiness fields are never unconditional constants)
 
 ## Explicit non-claims
 
@@ -40,8 +40,14 @@ Part 5 closes Stage125 research-design readiness:
   admitted model feature surface.
 - The Article-141-only target remains descriptive-only and excluded from
   model estimation.
-- M2 and M4 remain deferred (non-blocking for Stage126 M1); M3 remains not
-  admitted (no authoritative CBI endpoint); M5 remains removed.
+- M2 and M4 remain deferred (non-blocking for Stage126 M1).
+- M3 remains **not admitted on the current active path** (no authoritative
+  CBI endpoint). M3 is **not** permanently eliminated from all future
+  research; it may re-enter only after: (1) a new explicit versioned human
+  decision; (2) an authoritative and reproducible source; (3)
+  publication/availability-time validation; (4) coverage and temporal
+  data-Gate approval. No M3 data collection is authorized in Part 5.
+- M5 remains removed.
 - Part 3B expansion remains incomplete but superseded and non-blocking
   (`part3b_completed = false`, `part3b_incomplete_blocks_stage126_m1 =
   false`).
@@ -58,6 +64,8 @@ Part 5 closes Stage125 research-design readiness:
 closure_outcome = READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION
 ```
 
+This outcome is derived from Gate 125.0 (`all_gate_pass`). A failed Gate
+cannot produce a ready/complete outcome.
 `entry_readiness` is **not** authorization. Stage126 (M1 Financial Baseline)
 begins only after an explicit separate human authorization decision.
 

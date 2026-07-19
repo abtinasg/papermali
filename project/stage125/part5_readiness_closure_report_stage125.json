@@ -1,6 +1,7 @@
 {
   "active_availability_lag_months": 4,
   "active_availability_method": "fixed_regulatory_lag",
+  "all_gate_pass": true,
   "blocker_summary": {
     "blocking_stage125_closure": 0,
     "blocking_stage126_m1": 0,
@@ -11,6 +12,7 @@
   "final_test_model_evaluation_in_part5": false,
   "final_test_predictor_inspection_in_part5": false,
   "final_test_status": "locked_for_single_future_evaluation",
+  "final_test_unlocked": false,
   "final_test_years": [
     1400,
     1401,
@@ -26,7 +28,7 @@
       "pass": true
     },
     "contradiction_free_docs": {
-      "detail": "roadmap_next_matches_part5_or_already_advanced_and_readme_consistent",
+      "detail": "roadmap_and_readme_outcome_consistent_with_derived_closure",
       "pass": true
     },
     "final_test_still_locked": {
@@ -118,11 +120,11 @@
       "pass": true
     },
     "valid_handoff": {
-      "detail": "part5_qc_marker_fields_present",
+      "detail": "actual_handoff_state_matches_derived_closure",
       "pass": true
     },
     "working_tree_clean": {
-      "detail": "clean",
+      "detail": "authorized_or_empty",
       "pass": true
     }
   },
@@ -137,6 +139,14 @@
     "KEEP_ROBUSTNESS": 6,
     "SUPERSEDED_HISTORICAL_ONLY": 1
   },
+  "m3_data_collection_authorized_in_part5": false,
+  "m3_disposition": "not_admitted_on_current_active_path",
+  "m3_reentry_requirements": [
+    "new_explicit_versioned_human_decision",
+    "authoritative_and_reproducible_source",
+    "publication_availability_time_validation",
+    "coverage_and_temporal_data_gate_approval"
+  ],
   "modeling_authorized": false,
   "modeling_started": false,
   "part3b_completed": false,

@@ -1,6 +1,6 @@
 item_id,current_status,blocks_stage125_closure,blocks_stage126_m1,blocks_future_block,disposition,required_future_action
 M2_VALUES_NOT_COLLECTED,no_values_collected,false,false,M2,deferred,Collect M2 market/liquidity values under an authorized future extraction protocol before admitting M2 to any modeling block.
-M3_AUTHORITATIVE_SOURCE_UNAVAILABLE,no_authoritative_cbi_endpoint_admitted,false,false,M3,not_admitted,Identify and authorize an authoritative CBI macro-data endpoint before any M3 admission.
+M3_AUTHORITATIVE_SOURCE_UNAVAILABLE,no_authoritative_cbi_endpoint_admitted_current_path,false,false,M3,not_admitted,M3 may re-enter only after: (1) a new explicit versioned human decision; (2) identification of an authoritative and reproducible source; (3) publication/availability-time validation; (4) coverage and temporal data-Gate approval. No M3 data collection is authorized in Part 5.
 M4_VALUES_NOT_COLLECTED,no_values_collected,false,false,M4,deferred,Collect M4 audit/governance values under an authorized future extraction protocol before admitting M4 to any modeling block.
 PART3B_EXPANSION_INCOMPLETE,part3b_completed_false_expansion_superseded,false,false,,superseded,None required for Stage125 closure or Stage126 M1 entry; Part 3B expansion remains historical and non-blocking.
 ARTICLE141_LOW_EVENT_COUNT,final_test_positive_1_on_primary_sample,false,false,Article141 comparative inference,descriptive_only,Treat Article-141-only results as distributional/descriptive robustness only; do not use for comparative or inferential model ranking.
