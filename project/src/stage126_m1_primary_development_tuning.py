@@ -1492,8 +1492,12 @@ def build_qc_assertions(
     folds = extras["folds_data"]
     loaded = extras["loaded"]
 
+    # Record the constant frozen baseline commit (not the live HEAD) as the
+    # detail so the QC report stays byte-stable across additive commits on the
+    # PR branch; the boolean still verifies the live HEAD contains the baseline.
     _assert(a, "baseline_commit_verified", head == EXPECTED_BASELINE_COMMIT
-            or _is_ancestor(repo_root, EXPECTED_BASELINE_COMMIT, head), head)
+            or _is_ancestor(repo_root, EXPECTED_BASELINE_COMMIT, head),
+            EXPECTED_BASELINE_COMMIT)
     _assert(a, "baseline_tree_verified",
             _git(repo_root, "rev-parse", f"{EXPECTED_BASELINE_COMMIT}^{{tree}}")
             == EXPECTED_BASELINE_TREE)
