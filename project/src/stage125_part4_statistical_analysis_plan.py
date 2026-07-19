@@ -27,7 +27,8 @@ from src import stage125_part3b0_evidence_readiness as p3b0
 QC_STAGE = "stage125_part4_statistical_analysis_plan"
 CURRENT_STAGE = "Stage125"
 EXPECTED_BASELINE_COMMIT = "6cb27d6817bf167358d480adbccc1728ad59e109"
-CONTRACT_VERSION = "stage125_part4_sap_v1"
+CONTRACT_VERSION = "stage125_part4_sap_v2"
+CONTRACT_VERSION_V1_HISTORICAL = "stage125_part4_sap_v1"
 RESEARCH_ACTION_ID = "stage125-part4-statistical-analysis-plan"
 RESEARCH_LAST_COMPLETED = RESEARCH_ACTION_ID
 RESEARCH_NEXT = "stage125-part5-readiness-closure"
@@ -35,6 +36,7 @@ RESEARCH_NEXT = "stage125-part5-readiness-closure"
 SRC_REL = "project/src/stage125_part4_statistical_analysis_plan.py"
 TEST_REL = "project/tests/test_stage125_part4_statistical_analysis_plan.py"
 RUN_REL = "project/run_stage125_part4.py"
+REVENUE_GROWTH_FEATURE = "revenue_growth_period_adjusted"
 
 PRIMARY_TARGET = "FD_target_main_t_plus_1"
 SECONDARY_TARGET = "FD_target_persistent_loss_robustness_t_plus_1"
@@ -86,14 +88,36 @@ F_HYPER = "part4_hyperparameter_budget_stage125.json"
 F_METRICS = "part4_metrics_uncertainty_contract_stage125.json"
 F_SHAP = "part4_shap_stability_contract_stage125.json"
 F_README = "README_STAGE125_PART4_STATISTICAL_ANALYSIS_PLAN.md"
+F_RG_DECISION = (
+    "part4_revenue_growth_exclusion_revision_decision_stage125.json"
+)
+F_RG_README = "README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md"
 F_QC = "stage125_part4_statistical_analysis_plan_qc_report.json"
 F_METADATA = "metadata_and_hashes_stage125_part4.json"
 
 TRACKED_CONTENT_FILES = (
     F_SAP, F_FEATURE_SETS, F_EXCLUSIONS, F_SAMPLE_TARGET, F_SPLIT_CONTRACT,
     F_SPLIT_MANIFEST, F_EVENT_GATE, F_COVERAGE, F_PREPROCESS, F_MODELS,
-    F_HYPER, F_METRICS, F_SHAP, F_README,
+    F_HYPER, F_METRICS, F_SHAP, F_README, F_RG_DECISION, F_RG_README,
 )
+
+COVERAGE_AUDIT_COLUMNS = [
+    "feature_name", "source_column", "development_rows", "nonmissing_rows",
+    "coverage", "positive_row_coverage", "negative_row_coverage",
+    "fold1_train_rows", "fold1_train_nonmissing", "fold1_train_coverage",
+    "fold1_validation_rows", "fold1_validation_nonmissing",
+    "fold1_validation_coverage",
+    "fold2_train_rows", "fold2_train_nonmissing", "fold2_train_coverage",
+    "fold2_validation_rows", "fold2_validation_nonmissing",
+    "fold2_validation_coverage",
+    "minimum_fold_training_coverage", "minimum_fold_validation_coverage",
+    "admission_status",
+]
+
+EVENT_GATE_COLUMNS = [
+    "sample_design", "target", "window", "rows", "evaluable_rows",
+    "positive", "negative", "missing", "event_gate_decision",
+]
 
 SPLIT_MANIFEST_COLUMNS = [
     "sample_design", "predictor_row_key_t", "target_row_key_t_plus_1",
@@ -151,6 +175,21 @@ SAMPLE_SPECS: dict[str, dict[str, Any]] = {
     },
 }
 
+# Pre-specified coverage-audit candidates (v1 proposed set). Admission uses
+# ordinary subset denominators; revenue_growth fails the fold-training gate.
+M1_COVERAGE_AUDIT_CANDIDATES = [
+    "log_total_assets",
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    REVENUE_GROWTH_FEATURE,
+    "financial_expense_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio",
+]
+
 M1_PRIMARY_FEATURE_ORDER = [
     "log_total_assets",
     "leverage_ratio",
@@ -159,7 +198,6 @@ M1_PRIMARY_FEATURE_ORDER = [
     "ocf_to_assets_period_adjusted",
     "asset_turnover_period_adjusted",
     "operating_margin_period_adjusted",
-    "revenue_growth_period_adjusted",
     "financial_expense_to_assets_period_adjusted",
     "accumulated_loss_to_capital_ratio",
 ]
@@ -172,7 +210,7 @@ M1_FEATURE_SOURCE = {
     "ocf_to_assets_period_adjusted": "ocf_to_assets_period_adjusted",
     "asset_turnover_period_adjusted": "asset_turnover_period_adjusted",
     "operating_margin_period_adjusted": "operating_margin_period_adjusted",
-    "revenue_growth_period_adjusted": "revenue_growth_period_adjusted",
+    REVENUE_GROWTH_FEATURE: REVENUE_GROWTH_FEATURE,
     "financial_expense_to_assets_period_adjusted":
         "financial_expense_to_assets_period_adjusted",
     "accumulated_loss_to_capital_ratio": "accumulated_loss_to_capital_ratio",
@@ -184,7 +222,6 @@ M1_TARGET_PROXIMITY_ROBUSTNESS = [
     "roa_period_adjusted",
     "asset_turnover_period_adjusted",
     "operating_margin_period_adjusted",
-    "revenue_growth_period_adjusted",
     "financial_expense_to_assets_period_adjusted",
 ]
 
@@ -270,19 +307,17 @@ M1_EXCLUSIONS: list[dict[str, str]] = [
          "numerator/denominator duplication; raw-level size dependence"},
     {"feature_name": "financial_expense_to_revenue_period_adjusted",
      "exclusion_reasons": "high conceptual overlap; unstable denominator"},
+    {
+        "feature_name": REVENUE_GROWTH_FEATURE,
+        "exclusion_reasons": (
+            "minimum temporal-fold training coverage below locked threshold; "
+            "Fold 1 training coverage 148/245 = 0.6040816327; "
+            "parsimony under low event count"
+        ),
+        "admission_status": "rejected_m1_primary_coverage_gate_failed",
+        "decision": "rejected_m1_primary_coverage_gate_failed",
+    },
 ]
-
-GROWTH_COVERAGE_EXCEPTION = {
-    "feature": "revenue_growth_period_adjusted",
-    "reason": "structural_first_observation_undefined_growth",
-    "policy": (
-        "for_minimum_fold_training_and_validation_coverage_only_exclude_rows_"
-        "where_fiscal_year_t_equals_ticker_first_observed_fiscal_year_in_the_"
-        "analysis_ready_sample"
-    ),
-    "overall_development_coverage_still_uses_all_rows": True,
-    "exception_authorized_in_part4_sap": True,
-}
 
 FORBIDDEN_SURFACE_EXACT = (
     "project/src/stage126_m1_financial_baseline.py",
@@ -386,11 +421,62 @@ def _is_missing(value: Any) -> bool:
     if value is None:
         return True
     s = str(value).strip()
-    return s == "" or s.lower() in {"nan", "none", "null"}
+    return s == "" or s.lower() in {"nan", "none", "null", "missing"}
+
+
+def classify_target_state(value: Any) -> str:
+    """Strict three-state target parser. Missing is never negative."""
+    if value is None:
+        return "missing"
+    if isinstance(value, float):
+        # NaN must not fall through to string conversion quirks.
+        if value != value:  # noqa: PLR0124 — NaN check
+            return "missing"
+        if value == 1.0:
+            return "positive"
+        if value == 0.0:
+            return "negative"
+        return "missing"
+    if isinstance(value, int) and not isinstance(value, bool):
+        if value == 1:
+            return "positive"
+        if value == 0:
+            return "negative"
+        return "missing"
+    s = str(value).strip()
+    if s in {"1", "1.0"}:
+        return "positive"
+    if s in {"0", "0.0"}:
+        return "negative"
+    return "missing"
 
 
 def _is_positive(value: Any) -> bool:
-    return str(value).strip() in {"1", "1.0", "True", "true"}
+    return classify_target_state(value) == "positive"
+
+
+def _is_negative(value: Any) -> bool:
+    return classify_target_state(value) == "negative"
+
+
+def count_target_states(values: list[Any]) -> dict[str, int]:
+    positive = negative = missing = 0
+    for value in values:
+        state = classify_target_state(value)
+        if state == "positive":
+            positive += 1
+        elif state == "negative":
+            negative += 1
+        else:
+            missing += 1
+    rows = positive + negative + missing
+    return {
+        "rows": rows,
+        "evaluable_rows": positive + negative,
+        "positive": positive,
+        "negative": negative,
+        "missing": missing,
+    }
 
 
 def _assert(
@@ -431,6 +517,57 @@ def reject_train_after_validation(train: set[int], val: set[int]) -> None:
         raise AuthorizationError(
             f"train year later than validation year: "
             f"max(train)={max(train)} >= min(val)={min(val)}"
+        )
+
+
+def reject_growth_denominator_exception(
+    *,
+    exclude_first_observed_fiscal_year_from_fold_denominator: bool = False,
+    structural_first_observation_denominator_adjustment: bool = False,
+    growth_coverage_exception: bool = False,
+) -> None:
+    if (
+        exclude_first_observed_fiscal_year_from_fold_denominator
+        or structural_first_observation_denominator_adjustment
+        or growth_coverage_exception
+    ):
+        raise AuthorizationError(
+            "growth coverage denominator exception forbidden under "
+            "stage125_part4_sap_v2"
+        )
+
+
+def reject_coverage_denominator_mutation(
+    *,
+    subset_row_count: int,
+    denominator_used: int,
+    label: str,
+) -> None:
+    if denominator_used != subset_row_count:
+        raise AuthorizationError(
+            f"coverage denominator mutation: {label} "
+            f"denominator_used={denominator_used} != "
+            f"subset_row_count={subset_row_count}"
+        )
+
+
+def reject_final_test_claim_gate_mutating_feature_admission(
+    *,
+    claim_gate_controls_feature_admission: bool,
+) -> None:
+    if claim_gate_controls_feature_admission:
+        raise AuthorizationError(
+            "final-test claim threshold cannot change feature admission"
+        )
+
+
+def reject_final_test_claim_gate_mutating_split(
+    *,
+    claim_gate_controls_temporal_split: bool,
+) -> None:
+    if claim_gate_controls_temporal_split:
+        raise AuthorizationError(
+            "final-test claim threshold cannot change temporal split"
         )
 
 
@@ -545,8 +682,9 @@ def load_analysis_ready(repo_root: Path, sample: str) -> list[dict[str, str]]:
             f"sample-count mutation: {sample} companies={len(companies)} "
             f"expected={spec['companies']}"
         )
-    pos = sum(1 for r in rows if _is_positive(r[PRIMARY_TARGET]))
-    neg = len(rows) - pos
+    counts = count_target_states([r[PRIMARY_TARGET] for r in rows])
+    pos = counts["positive"]
+    neg = counts["negative"]
     if pos != spec["positive"] or neg != spec["negative"]:
         raise QCFail(
             f"target-count mutation: {sample} pos/neg={pos}/{neg} "
@@ -569,70 +707,108 @@ def final_test_rows(rows: list[dict[str, str]]) -> list[dict[str, str]]:
     return [r for r in rows if int(r["target_year"]) in FINAL_TEST_YEARS]
 
 
+def _subset_coverage(
+    subset: list[dict[str, str]], feat: str,
+) -> tuple[int, int, float]:
+    """Ordinary coverage: denominator = all rows in the subset."""
+    n = len(subset)
+    if n == 0:
+        return 0, 0, 0.0
+    reject_coverage_denominator_mutation(
+        subset_row_count=n, denominator_used=n, label=feat,
+    )
+    nonmiss = sum(1 for r in subset if feature_present(r, feat))
+    return nonmiss, n, nonmiss / n
+
+
 def compute_m1_coverage(rows: list[dict[str, str]]) -> list[dict[str, Any]]:
-    """Development-only M1 coverage; never uses final-test feature values."""
+    """Development-only M1 candidate coverage; never uses final-test features.
+
+    Audits all pre-specified candidates. Rejected candidates remain in the
+    audit. Only final admitted M1 features must pass coverage gates.
+    """
+    reject_growth_denominator_exception()
     dev = development_rows(rows)
     if not dev:
         raise QCFail("no development rows for coverage")
-    first = first_fiscal_year_by_ticker(rows)
-    fold_train = {
-        "fold1": [r for r in dev if int(r["target_year"]) in FOLD1_TRAIN_YEARS],
-        "fold2": [r for r in dev if int(r["target_year"]) in FOLD2_TRAIN_YEARS],
+    fold_sets = {
+        "fold1_train": [
+            r for r in dev if int(r["target_year"]) in FOLD1_TRAIN_YEARS
+        ],
+        "fold1_validation": [
+            r for r in dev if int(r["target_year"]) in FOLD1_VAL_YEARS
+        ],
+        "fold2_train": [
+            r for r in dev if int(r["target_year"]) in FOLD2_TRAIN_YEARS
+        ],
+        "fold2_validation": [
+            r for r in dev if int(r["target_year"]) in FOLD2_VAL_YEARS
+        ],
     }
-    fold_val = {
-        "fold1": [r for r in dev if int(r["target_year"]) in FOLD1_VAL_YEARS],
-        "fold2": [r for r in dev if int(r["target_year"]) in FOLD2_VAL_YEARS],
+    # Locked ordinary denominators for the primary sample development folds.
+    expected_denominators = {
+        "fold1_train": 245,
+        "fold1_validation": 205,
+        "fold2_train": 450,
+        "fold2_validation": 216,
+        "development": 666,
     }
-    out: list[dict[str, Any]] = []
-    for feat in M1_PRIMARY_FEATURE_ORDER:
-        source = M1_FEATURE_SOURCE[feat]
-        nonmiss = [r for r in dev if feature_present(r, feat)]
-        pos_rows = [r for r in dev if _is_positive(r[PRIMARY_TARGET])]
-        neg_rows = [r for r in dev if not _is_positive(r[PRIMARY_TARGET])]
-        pos_nm = sum(1 for r in pos_rows if feature_present(r, feat))
-        neg_nm = sum(1 for r in neg_rows if feature_present(r, feat))
-        overall = len(nonmiss) / len(dev)
-
-        def _fold_cov(
-            subset: list[dict[str, str]], use_growth_exception: bool,
-        ) -> float:
-            if not subset:
-                return 0.0
-            if (
-                use_growth_exception
-                and feat == GROWTH_COVERAGE_EXCEPTION["feature"]
-            ):
-                eligible = [
-                    r for r in subset
-                    if int(r["fiscal_year_t"]) != first[r["ticker"]]
-                ]
-                if not eligible:
-                    return 0.0
-                return (
-                    sum(1 for r in eligible if feature_present(r, feat))
-                    / len(eligible)
-                )
-            return (
-                sum(1 for r in subset if feature_present(r, feat)) / len(subset)
+    if len(dev) != expected_denominators["development"]:
+        raise QCFail(
+            f"coverage denominator mutation: development rows={len(dev)} "
+            f"expected={expected_denominators['development']}"
+        )
+    for key, expected_n in expected_denominators.items():
+        if key == "development":
+            continue
+        got_n = len(fold_sets[key])
+        if got_n != expected_n:
+            raise QCFail(
+                f"coverage denominator mutation: {key} rows={got_n} "
+                f"expected={expected_n}"
             )
 
-        use_exc = feat == GROWTH_COVERAGE_EXCEPTION["feature"]
-        train_covs = [
-            _fold_cov(fold_train[k], use_exc) for k in ("fold1", "fold2")
+    out: list[dict[str, Any]] = []
+    for feat in M1_COVERAGE_AUDIT_CANDIDATES:
+        source = M1_FEATURE_SOURCE[feat]
+        nonmiss_n, dev_n, overall = _subset_coverage(dev, feat)
+        pos_rows = [
+            r for r in dev if classify_target_state(r[PRIMARY_TARGET]) == "positive"
         ]
-        val_covs = [_fold_cov(fold_val[k], use_exc) for k in ("fold1", "fold2")]
-        min_train = min(train_covs)
-        min_val = min(val_covs)
+        neg_rows = [
+            r for r in dev if classify_target_state(r[PRIMARY_TARGET]) == "negative"
+        ]
+        pos_nm = sum(1 for r in pos_rows if feature_present(r, feat))
+        neg_nm = sum(1 for r in neg_rows if feature_present(r, feat))
+
+        fold_stats: dict[str, tuple[int, int, float]] = {
+            key: _subset_coverage(subset, feat)
+            for key, subset in fold_sets.items()
+        }
+        min_train = min(
+            fold_stats["fold1_train"][2], fold_stats["fold2_train"][2],
+        )
+        min_val = min(
+            fold_stats["fold1_validation"][2],
+            fold_stats["fold2_validation"][2],
+        )
         ok = (
             overall >= M1_COVERAGE_OVERALL_MIN
             and min_train >= M1_COVERAGE_FOLD_TRAIN_MIN
         )
-        status = "admitted_m1_primary" if ok else "coverage_gate_failed"
+        if ok:
+            status = "admitted_m1_primary"
+        else:
+            status = "rejected_m1_primary_coverage_gate_failed"
+        f1t_nm, f1t_n, f1t_c = fold_stats["fold1_train"]
+        f1v_nm, f1v_n, f1v_c = fold_stats["fold1_validation"]
+        f2t_nm, f2t_n, f2t_c = fold_stats["fold2_train"]
+        f2v_nm, f2v_n, f2v_c = fold_stats["fold2_validation"]
         out.append({
             "feature_name": feat,
             "source_column": source,
-            "development_rows": str(len(dev)),
-            "nonmissing_rows": str(len(nonmiss)),
+            "development_rows": str(dev_n),
+            "nonmissing_rows": str(nonmiss_n),
             "coverage": f"{overall:.10f}",
             "positive_row_coverage": (
                 f"{(pos_nm / len(pos_rows)) if pos_rows else 0.0:.10f}"
@@ -640,15 +816,31 @@ def compute_m1_coverage(rows: list[dict[str, str]]) -> list[dict[str, Any]]:
             "negative_row_coverage": (
                 f"{(neg_nm / len(neg_rows)) if neg_rows else 0.0:.10f}"
             ),
+            "fold1_train_rows": str(f1t_n),
+            "fold1_train_nonmissing": str(f1t_nm),
+            "fold1_train_coverage": f"{f1t_c:.10f}",
+            "fold1_validation_rows": str(f1v_n),
+            "fold1_validation_nonmissing": str(f1v_nm),
+            "fold1_validation_coverage": f"{f1v_c:.10f}",
+            "fold2_train_rows": str(f2t_n),
+            "fold2_train_nonmissing": str(f2t_nm),
+            "fold2_train_coverage": f"{f2t_c:.10f}",
+            "fold2_validation_rows": str(f2v_n),
+            "fold2_validation_nonmissing": str(f2v_nm),
+            "fold2_validation_coverage": f"{f2v_c:.10f}",
             "minimum_fold_training_coverage": f"{min_train:.10f}",
             "minimum_fold_validation_coverage": f"{min_val:.10f}",
             "admission_status": status,
-            "growth_coverage_exception_applied": "true" if use_exc else "false",
         })
-        if not ok:
+        if feat in M1_PRIMARY_FEATURE_ORDER and not ok:
             raise QCFail(
-                f"M1 coverage gate failed for {feat}: "
+                f"M1 coverage gate failed for admitted feature {feat}: "
                 f"overall={overall:.4f} min_fold_train={min_train:.4f}"
+            )
+        if feat == REVENUE_GROWTH_FEATURE and status == "admitted_m1_primary":
+            raise QCFail(
+                "revenue_growth incorrectly admitted under ordinary "
+                "fold-training coverage denominator"
             )
     return out
 
@@ -726,11 +918,22 @@ def build_event_counts(
                     subset = [
                         r for r in data if int(r["target_year"]) in years
                     ]
-                n = len(subset)
-                pos = sum(1 for r in subset if _is_positive(r[target]))
-                neg = n - pos
+                counts = count_target_states([r[target] for r in subset])
+                if counts["rows"] != (
+                    counts["positive"] + counts["negative"] + counts["missing"]
+                ):
+                    raise QCFail("target event-count reconciliation failed")
+                if counts["evaluable_rows"] != (
+                    counts["positive"] + counts["negative"]
+                ):
+                    raise QCFail("evaluable_rows reconciliation failed")
+                # Missing must never be folded into negative.
+                if counts["negative"] > counts["evaluable_rows"]:
+                    raise QCFail("missing counted as negative")
                 decision = "eligible_for_comparative_claims"
+                pos = counts["positive"]
                 if window_name == "final_test":
+                    # Claim eligibility only — never feature admission.
                     if pos < MIN_FINAL_TEST_POSITIVES:
                         decision = (
                             "distributional_descriptive_robustness_only;"
@@ -738,19 +941,21 @@ def build_event_counts(
                             "no_inferential_model_ranking"
                         )
                     else:
-                        decision = "final_test_event_threshold_met"
+                        decision = "final_test_inferential_claim_eligible"
                 elif window_name in {"fold1_validation", "fold2_validation"}:
                     if pos < MIN_VAL_POSITIVES:
-                        decision = "validation_window_below_min_positives"
+                        decision = "development_comparison_not_supported"
                     else:
-                        decision = "validation_window_event_threshold_met"
+                        decision = "development_comparison_feasibility_met"
                 rows_out.append({
                     "sample_design": sample,
                     "target": target,
                     "window": window_name,
-                    "rows": str(n),
-                    "positive": str(pos),
-                    "negative": str(neg),
+                    "rows": str(counts["rows"]),
+                    "evaluable_rows": str(counts["evaluable_rows"]),
+                    "positive": str(counts["positive"]),
+                    "negative": str(counts["negative"]),
+                    "missing": str(counts["missing"]),
                     "event_gate_decision": decision,
                 })
     return rows_out
@@ -816,16 +1021,21 @@ def build_feature_set_rows() -> list[dict[str, str]]:
 
 
 def build_exclusion_rows() -> list[dict[str, str]]:
-    return [
-        {
+    rows: list[dict[str, str]] = []
+    for item in M1_EXCLUSIONS:
+        decision = item.get("decision", "excluded_from_m1_primary")
+        admission = item.get("admission_status", decision)
+        rows.append({
             "feature_name": item["feature_name"],
-            "decision": "excluded_from_m1_primary",
+            "decision": decision,
+            "admission_status": admission,
             "exclusion_reasons": item["exclusion_reasons"],
             "retained_in_frozen_datasets": "true",
+            "retained_in_audit": "true",
             "available_in_audit_surface": "true",
-        }
-        for item in M1_EXCLUSIONS
-    ]
+            "deleted_from_source_data": "false",
+        })
+    return rows
 
 
 def build_sample_target_matrix(
@@ -835,7 +1045,7 @@ def build_sample_target_matrix(
     for sample, data in sorted(sample_rows.items()):
         role = SAMPLE_SPECS[sample]["role"]
         for target in ALL_TARGETS:
-            pos = sum(1 for r in data if _is_positive(r[target]))
+            counts = count_target_states([r[target] for r in data])
             if target == PRIMARY_TARGET:
                 target_role = "primary"
             elif target == SECONDARY_TARGET:
@@ -847,10 +1057,12 @@ def build_sample_target_matrix(
                 "sample_role": role,
                 "target": target,
                 "target_role": target_role,
-                "rows": str(len(data)),
+                "rows": str(counts["rows"]),
+                "evaluable_rows": str(counts["evaluable_rows"]),
                 "companies": str(len({r["ticker"] for r in data})),
-                "positive": str(pos),
-                "negative": str(len(data) - pos),
+                "positive": str(counts["positive"]),
+                "negative": str(counts["negative"]),
+                "missing": str(counts["missing"]),
                 "paper_primary_result": (
                     "true"
                     if sample == PRIMARY_SAMPLE and target == PRIMARY_TARGET
@@ -877,6 +1089,18 @@ def build_sap_contract(
     ][0]
     return {
         "contract_version": CONTRACT_VERSION,
+        "contract_version_history": {
+            "v1": CONTRACT_VERSION_V1_HISTORICAL,
+            "v2": CONTRACT_VERSION,
+            "v2_changes": [
+                "removes_revenue_growth_from_admitted_M1",
+                "removes_unauthorized_denominator_exception",
+                "adds_strict_positive_negative_missing_event_accounting",
+                "clarifies_pre_imputation_missingness_indicators",
+                "separates_SMOTE_from_class_weighting",
+                "separates_predictor_admission_from_final_test_claim_eligibility",
+            ],
+        },
         "research_action_id": RESEARCH_ACTION_ID,
         "baseline_commit": EXPECTED_BASELINE_COMMIT,
         "part4_statistical_analysis_plan_locked": True,
@@ -898,10 +1122,25 @@ def build_sap_contract(
         "rampna_audit_only": True,
         "pinned_part3c_input_sha256": pinned,
         "sample_specs": SAMPLE_SPECS,
+        "m1_coverage_audit_candidates": M1_COVERAGE_AUDIT_CANDIDATES,
         "m1_primary_feature_order": M1_PRIMARY_FEATURE_ORDER,
         "m1_feature_source_mapping": M1_FEATURE_SOURCE,
         "m1_target_proximity_robustness_order": M1_TARGET_PROXIMITY_ROBUSTNESS,
         "m1_target_proximity_removed": M1_TARGET_PROXIMITY_REMOVED,
+        "revenue_growth_period_adjusted_status": {
+            "feature": REVENUE_GROWTH_FEATURE,
+            "admission_status": "rejected_m1_primary_coverage_gate_failed",
+            "retained_in_frozen_dataset": True,
+            "retained_in_coverage_audit": True,
+            "present_in_admitted_model_feature_sets": False,
+            "growth_denominator_exception_authorized": False,
+            "rejection_reason": (
+                "minimum_fold_training_coverage_below_locked_threshold; "
+                "Fold_1_training_coverage_148/245=0.6040816327; "
+                "passed_overall_development_coverage_0.8483483483_but_failed_"
+                "minimum_fold_training_threshold_0.75"
+            ),
+        },
         "financial_expense_to_assets_sign_convention": {
             "feature": "financial_expense_to_assets_period_adjusted",
             "convention": (
@@ -909,7 +1148,11 @@ def build_sap_contract(
                 "in_researcher_verified_data; do_not_abs_or_reverse_sign"
             ),
         },
-        "growth_feature_coverage_exception": GROWTH_COVERAGE_EXCEPTION,
+        "growth_feature_coverage_exception": None,
+        "growth_denominator_exception_absent": True,
+        "coverage_denominator_policy": (
+            "all_rows_belonging_to_the_relevant_development_or_fold_subset"
+        ),
         "m2_block": M2_BLOCK,
         "m2_definitions": {
             "shared_window": "12_calendar_month_pre_cutoff",
@@ -934,28 +1177,73 @@ def build_sap_contract(
             "persian_nlp": False,
             "ambiguity_or_missing": "null",
         },
-        "nested_blocks": {"M1": M1_PRIMARY_FEATURE_ORDER, "M2": m2, "M3": m3, "M4": m4},
-        "final_data_admission_thresholds": {
+        "nested_blocks": {
+            "M1": M1_PRIMARY_FEATURE_ORDER,
+            "M2": m2,
+            "M3": m3,
+            "M4": m4,
+        },
+        "nested_block_counts": {
+            "M1": len(M1_PRIMARY_FEATURE_ORDER),
+            "M2": len(m2),
+            "M3": len(m3),
+            "M4": len(m4),
+        },
+        "candidate_data_admission": {
+            "scope": "development_predictor_data_only",
             "candidate_valid_coverage_min": BLOCK_CANDIDATE_COVERAGE_MIN,
             "block_common_sample_coverage_min": BLOCK_COMMON_COVERAGE_MIN,
-            "min_positives_each_temporal_validation_window": MIN_VAL_POSITIVES,
-            "min_positives_locked_final_test": MIN_FINAL_TEST_POSITIVES,
+            "m1_overall_development_min": M1_COVERAGE_OVERALL_MIN,
+            "m1_minimum_fold_training_min": M1_COVERAGE_FOLD_TRAIN_MIN,
             "coverage_years": "development_only_1393_1399",
             "final_test_predictor_inspection_for_admission": False,
-            "fail_action": "not_admitted_descriptive_coverage_only",
+            "fail_action": "not_admitted_retained_in_coverage_audit",
             "replaces_pilot_G09_G14_for_modeling_path": True,
+        },
+        "development_model_comparison_feasibility": {
+            "min_positive_evaluable_each_temporal_validation_window":
+                MIN_VAL_POSITIVES,
+            "fail_action": "development_comparison_not_supported",
+        },
+        "final_test_inferential_claim_eligibility": {
+            "min_positive_evaluable_locked_final_test": MIN_FINAL_TEST_POSITIVES,
+            "fail_action": (
+                "distributional_descriptive_robustness_only;"
+                "no_comparative_predictive_performance_claim;"
+                "no_inferential_model_ranking"
+            ),
+            "does_not_admit_or_reject_predictors": True,
+            "does_not_admit_or_reject_data_sources": True,
+            "does_not_change_block_definitions": True,
+            "does_not_change_temporal_split": True,
+            "does_not_change_final_test_years": True,
         },
         "m1_coverage_gates": {
             "overall_development_min": M1_COVERAGE_OVERALL_MIN,
             "minimum_fold_training_min": M1_COVERAGE_FOLD_TRAIN_MIN,
+            "coverage_denominator":
+                "all_rows_belonging_to_the_relevant_development_or_fold_subset",
+            "growth_denominator_exception_authorized": False,
             "audit": coverage_rows,
+        },
+        "target_state_contract": {
+            "positive": "exact_numeric_or_string_1",
+            "negative": "exact_numeric_or_string_0",
+            "missing": "blank_null_unparseable_or_any_other_value",
+            "missing_never_counted_as_negative": True,
+            "evaluable_rows": "positive_plus_negative",
+            "target_specific_analyses_use_evaluable_rows_only": True,
         },
         "article141_final_test_gate": {
             "sample": PRIMARY_SAMPLE,
             "target": ARTICLE141_TARGET,
             "positive": int(art_ft["positive"]),
+            "evaluable_rows": int(art_ft["evaluable_rows"]),
+            "missing": int(art_ft["missing"]),
             "decision": art_ft["event_gate_decision"],
+            "gate_type": "final_test_inferential_claim_eligibility",
         },
+        "human_revenue_growth_exclusion_decision": F_RG_DECISION,
         "research_pointers": {
             "last_completed_research_action_id": RESEARCH_LAST_COMPLETED,
             "next_research_action_id": RESEARCH_NEXT,
@@ -999,14 +1287,27 @@ def build_preprocessing_contract() -> dict[str, Any]:
             "validation_data", "final_test_data",
             "combined_train_plus_validation_before_configuration_selection",
         ],
-        "continuous_pipeline": [
-            "deterministic_source_to_feature_transformation",
-            "training_fold_1st_99th_percentile_clipping",
-            "training_fold_median_imputation",
-            "missingness_indicators",
+        "continuous_pipeline_order": [
+            "1_deterministic_source_to_feature_transformation",
+            "2_capture_original_pre_imputation_missingness_mask",
+            "3_estimate_1st_99th_percentile_clipping_bounds_on_observed_training_fold_values_only",
+            "4_apply_training_derived_clipping_bounds",
+            "5_estimate_training_fold_median_on_observed_clipped_training_values",
+            "6_impute_missing_values_with_training_fold_median",
+            "7_append_missingness_indicators_from_original_pre_imputation_mask",
+            "8_logistic_regression_only_standardize_imputed_continuous_features_using_training_fold_mean_std",
         ],
+        "missingness_indicator_source": "original_pre_imputation_mask",
+        "missingness_mask_captured_before_imputation": True,
+        "missing_indicators_standardized": False,
+        "clipping_fit_on_observed_training_values_only": True,
+        "median_fit_after_training_clipping": True,
+        "do_not_compute_clipping_quantiles_after_median_imputation": True,
+        "do_not_infer_missingness_indicator_from_imputed_matrix": True,
+        "validation_and_final_test_masks_from_own_original_missing_positions": True,
+        "clipping_medians_standardization_parameters_from_training_only": True,
         "logistic_regression_extra":
-            "training_fold_standardization_after_imputation",
+            "training_fold_standardization_after_imputation_continuous_only",
         "random_forest_standardization": False,
         "xgboost_standardization": False,
         "future_categorical_m4": {
@@ -1041,24 +1342,148 @@ def build_model_specs() -> dict[str, Any]:
             "logistic_regression": {"class_weight": "balanced"},
             "random_forest": {"class_weight": "balanced_subsample"},
             "xgboost": {
-                "scale_pos_weight":
-                    "training_fold_negative_count / training_fold_positive_count",
+                "scale_pos_weight": (
+                    "training_fold_negative_evaluable_count / "
+                    "training_fold_positive_evaluable_count"
+                ),
+                "counts_exclude_missing_target_rows": True,
             },
         },
         "smote_robustness": {
             "primary": False,
             "sample": PRIMARY_SAMPLE,
             "features": "M1_PRIMARY_FEATURE_ORDER",
+            "m1_feature_count": len(M1_PRIMARY_FEATURE_ORDER),
             "models": ["Logistic", "RF", "XGBoost"],
             "apply_only_inside_training_fold": True,
             "never_before_temporal_splitting": True,
             "k_neighbors": "min(5, training_minority_count - 1)",
             "random_state": SMOTE_SEED,
-            "uses_selected_class_weighted_hyperparameters": True,
+            "uses_selected_non_weight_hyperparameters": True,
+            "class_weighting_disabled_when_smote_active": True,
+            "oversampling_and_class_weighting_combined": False,
             "second_tuning_search": False,
+            "logistic_regression": {"class_weight": None},
+            "random_forest": {"class_weight": None},
+            "xgboost": {"scale_pos_weight": 1},
         },
         "no_model_fitting_in_part4": True,
     }
+
+
+def build_revenue_growth_exclusion_decision() -> dict[str, Any]:
+    return {
+        "decision_id":
+            "stage125-part4-revenue-growth-exclusion-revision",
+        "decision_authority": "human_supervisor_data_owner",
+        "decision_status": "active",
+        "decision_date": "2026-07-19",
+        "decision_scope": "Stage125_Part4_M1_feature_admission",
+        "contract_version": CONTRACT_VERSION,
+        "supersedes_active_methodology": (
+            "admitted_m1_primary_using_unauthorized_denominator_exception"
+        ),
+        "feature": REVENUE_GROWTH_FEATURE,
+        "previous_status":
+            "admitted_m1_primary_using_unauthorized_denominator_exception",
+        "revised_status": "rejected_m1_primary_coverage_gate_failed",
+        "admission_status": "rejected_m1_primary_coverage_gate_failed",
+        "retained_in_frozen_dataset": True,
+        "retained_in_coverage_audit": True,
+        "removed_from_primary_feature_set": True,
+        "removed_from_target_proximity_robustness": True,
+        "removed_from_nested_M2_M3_M4_surfaces": True,
+        "financial_data_changed": False,
+        "sample_changed": False,
+        "target_changed": False,
+        "temporal_split_changed": False,
+        "final_test_changed": False,
+        "denominator_exception_authorized": False,
+        "first_observation_denominator_exception_authorized": False,
+        "locked_minimum_fold_training_coverage_threshold":
+            M1_COVERAGE_FOLD_TRAIN_MIN,
+        "overall_development_coverage_threshold": M1_COVERAGE_OVERALL_MIN,
+        "evidence": {
+            "development_rows": 666,
+            "development_nonmissing": 565,
+            "overall_development_coverage": 0.8483483483,
+            "fold1_training_rows": 245,
+            "fold1_training_nonmissing": 148,
+            "fold1_training_coverage": 0.6040816327,
+            "fold1_validation_rows": 205,
+            "fold1_validation_nonmissing": 203,
+            "fold1_validation_coverage": 0.9902439024,
+            "fold2_training_rows": 450,
+            "fold2_training_nonmissing": 351,
+            "fold2_training_coverage": 0.7800000000,
+            "fold2_validation_rows": 216,
+            "fold2_validation_nonmissing": 214,
+            "fold2_validation_coverage": 0.9907407407,
+            "minimum_fold_training_coverage": 0.6040816327,
+            "passed_overall_development_coverage_gate": True,
+            "failed_minimum_fold_training_coverage_gate": True,
+        },
+        "exclusion_reasons": (
+            "minimum temporal-fold training coverage below locked threshold; "
+            "Fold 1 training coverage 148/245 = 0.6040816327; "
+            "parsimony under low event count"
+        ),
+        "not_labeled_as": [
+            "source_error",
+            "financial_data_error",
+            "target_leakage",
+            "overall_development_coverage_failure",
+        ],
+        "research_pointers": {
+            "last_completed_research_action_id": RESEARCH_LAST_COMPLETED,
+            "next_research_action_id": RESEARCH_NEXT,
+        },
+        "modeling_started": False,
+        "stage126_started": False,
+    }
+
+
+def build_revenue_growth_exclusion_readme() -> str:
+    return """# Stage125 Part 4 — Revenue-Growth Exclusion Revision
+
+**Status:** active human-supervisor methodological correction.
+**Decision date:** 2026-07-19
+**Contract:** `stage125_part4_sap_v2`
+
+## Decision
+
+`revenue_growth_period_adjusted` is **rejected** from admitted M1 primary
+features because raw Fold 1 training coverage fails the locked minimum
+fold-training coverage threshold:
+
+```text
+148 / 245 = 0.6040816327  <  0.75
+```
+
+Overall development coverage passes (`565 / 666 = 0.8483483483` ≥ 0.80), but
+that is not sufficient for M1 admission.
+
+## Explicit non-authorizations
+
+- No coverage-denominator exception.
+- No first-observation exclusion from the fold denominator.
+- Missing first observations remain missing observations.
+- Imputation later in a training pipeline does **not** retroactively change
+  feature-admission coverage.
+
+## Retention
+
+- Retained in frozen Part 3C datasets.
+- Retained in the development coverage audit as
+  `rejected_m1_primary_coverage_gate_failed`.
+- Removed from `M1_PRIMARY_FEATURE_ORDER`,
+  `M1_TARGET_PROXIMITY_ROBUSTNESS`, and all nested M2–M4 modeling surfaces.
+
+## Immutable scientific state
+
+Financial values, targets, sample membership, temporal folds, final-test years,
+and Part 3C hashes are unchanged.
+"""
 
 
 def build_hyperparameter_budget() -> dict[str, Any]:
@@ -1220,6 +1645,7 @@ def build_readme() -> str:
     return """# Stage125 Part 4 — Statistical Analysis Plan
 
 **Status:** Locked research-design / contract surface only.
+**Contract version:** `stage125_part4_sap_v2` (v1 retained in Git history).
 **Research action:** `stage125-part4-statistical-analysis-plan`
 **Next:** `stage125-part5-readiness-closure`
 
@@ -1229,13 +1655,25 @@ Part 4 locks the statistical analysis plan for future Stage126 modeling:
 
 - primary sample `main_rule_a_primary` (1012 / 119 / 80 / 932)
 - primary target `FD_target_main_t_plus_1`
-- M1 primary ordered feature set (exactly 10)
-- M1 target-proximity robustness set (exactly 7)
-- nested M2–M4 blocks (conditional; no data collected here)
+- M1 primary ordered feature set (exactly 9 admitted)
+- M1 coverage-audit candidates (exactly 10, including rejected revenue growth)
+- M1 target-proximity robustness set (exactly 6)
+- nested M2–M4 blocks (9 / 12 / 15 / 19; conditional; no data collected here)
 - target-year temporal folds and locked final test 1400–1402
-- preprocessing, model families, finite hyperparameter budget, seeds
+- strict positive / negative / missing target event accounting
+- preprocessing with pre-imputation missingness masks
+- model families, finite hyperparameter budget, seeds
+- SMOTE robustness disables class weighting (no combined oversampling+weights)
 - PR-AUC primary; Recall@10% / Lift@10%; calibration; paired ticker-cluster bootstrap; Holm
 - SHAP stability contract (no SHAP computation in Part 4)
+
+## v2 methodological correction
+
+Human supervisor rejected `revenue_growth_period_adjusted` from admitted M1
+because raw Fold 1 training coverage `148/245 = 0.6040816327` is below the
+locked 0.75 threshold. The unauthorized first-observation denominator exception
+is removed. The feature remains in frozen Part 3C data and in the coverage
+audit as `rejected_m1_primary_coverage_gate_failed`.
 
 ## Explicit non-claims
 
@@ -1243,6 +1681,7 @@ Part 4 locks the statistical analysis plan for future Stage126 modeling:
 - No prediction was generated (`prediction_calls = 0`).
 - No SHAP value was calculated.
 - Final-test predictor values were not used for admission, tuning, or selection.
+- Final-test event thresholds control claim eligibility only, not feature admission.
 - Stage126 remains unauthorized and unstarted.
 - Modeling remains unstarted.
 - M3 remains unavailable pending an authoritative CBI source.
@@ -1251,15 +1690,6 @@ Part 4 locks the statistical analysis plan for future Stage126 modeling:
 - Financial data and targets remain frozen.
 - `رمپنا|1396 → رمپنا|1397` remains audit-only.
 - Part 3C outputs remain unchanged (SHA-256 pinned).
-
-## Growth coverage exception
-
-`revenue_growth_period_adjusted` uses an explicit Part 4 exception for
-**fold training/validation coverage only**: rows where `fiscal_year_t` equals
-the ticker's first observed fiscal year in the analysis-ready sample are
-excluded from the fold-coverage denominator because growth is structurally
-undefined. Overall development coverage still uses all development rows and
-must remain ≥ 0.80.
 
 ## Runners
 
@@ -1284,13 +1714,18 @@ def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
         M1_PRIMARY_FEATURE_ORDER + M1_TARGET_PROXIMITY_ROBUSTNESS
         + M2_BLOCK + M3_BLOCK + M4_BLOCK
     )
+    if REVENUE_GROWTH_FEATURE in M1_PRIMARY_FEATURE_ORDER:
+        raise QCFail("revenue_growth admitted to M1 primary")
+    if REVENUE_GROWTH_FEATURE in M1_TARGET_PROXIMITY_ROBUSTNESS:
+        raise QCFail("revenue_growth admitted to target-proximity robustness")
+    if REVENUE_GROWTH_FEATURE not in M1_COVERAGE_AUDIT_CANDIDATES:
+        raise QCFail("revenue_growth missing from coverage audit candidates")
     assert_feature_order(
         list(M1_PRIMARY_FEATURE_ORDER),
         [
             "log_total_assets", "leverage_ratio", "current_ratio",
             "roa_period_adjusted", "ocf_to_assets_period_adjusted",
             "asset_turnover_period_adjusted", "operating_margin_period_adjusted",
-            "revenue_growth_period_adjusted",
             "financial_expense_to_assets_period_adjusted",
             "accumulated_loss_to_capital_ratio",
         ],
@@ -1301,10 +1736,21 @@ def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
         [
             "log_total_assets", "current_ratio", "roa_period_adjusted",
             "asset_turnover_period_adjusted", "operating_margin_period_adjusted",
-            "revenue_growth_period_adjusted",
             "financial_expense_to_assets_period_adjusted",
         ],
         "M1_TARGET_PROXIMITY_ROBUSTNESS",
+    )
+    assert_feature_order(
+        list(M1_COVERAGE_AUDIT_CANDIDATES),
+        [
+            "log_total_assets", "leverage_ratio", "current_ratio",
+            "roa_period_adjusted", "ocf_to_assets_period_adjusted",
+            "asset_turnover_period_adjusted", "operating_margin_period_adjusted",
+            REVENUE_GROWTH_FEATURE,
+            "financial_expense_to_assets_period_adjusted",
+            "accumulated_loss_to_capital_ratio",
+        ],
+        "M1_COVERAGE_AUDIT_CANDIDATES",
     )
     if M2_BLOCK != [
         "equity_return_window", "realized_volatility", "amihud_illiquidity",
@@ -1342,12 +1788,29 @@ def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
     shap_c = build_shap_contract()
 
     ft = final_test_rows(sample_rows[PRIMARY_SAMPLE])
-    ft_pos = sum(1 for r in ft if _is_positive(r[PRIMARY_TARGET]))
-    if len(ft) != 346 or ft_pos != 12 or (len(ft) - ft_pos) != 334:
+    ft_counts = count_target_states([r[PRIMARY_TARGET] for r in ft])
+    if (
+        len(ft) != 346
+        or ft_counts["positive"] != 12
+        or ft_counts["negative"] != 334
+        or ft_counts["missing"] != 0
+    ):
         raise QCFail(
-            f"primary final-test count mutation: n={len(ft)} pos={ft_pos}"
+            f"primary final-test count mutation: n={len(ft)} "
+            f"pos/neg/miss="
+            f"{ft_counts['positive']}/{ft_counts['negative']}/"
+            f"{ft_counts['missing']}"
         )
 
+    nested = sap["nested_blocks"]
+    if REVENUE_GROWTH_FEATURE in (
+        nested["M1"] + nested["M2"] + nested["M3"] + nested["M4"]
+    ):
+        raise QCFail("revenue_growth present in nested model surfaces")
+    if len(M1_EXCLUSIONS) != 23:
+        raise QCFail(f"M1 exclusion count mutation: {len(M1_EXCLUSIONS)}")
+
+    rg_decision = build_revenue_growth_exclusion_decision()
     content = {
         F_SAP: _json_str(sap),
         F_FEATURE_SETS: _csv_str(
@@ -1356,37 +1819,30 @@ def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
             feature_rows,
         ),
         F_EXCLUSIONS: _csv_str(
-            ["feature_name", "decision", "exclusion_reasons",
-             "retained_in_frozen_datasets", "available_in_audit_surface"],
+            ["feature_name", "decision", "admission_status",
+             "exclusion_reasons", "retained_in_frozen_datasets",
+             "retained_in_audit", "available_in_audit_surface",
+             "deleted_from_source_data"],
             exclusion_rows,
         ),
         F_SAMPLE_TARGET: _csv_str(
             ["sample_design", "sample_role", "target", "target_role",
-             "rows", "companies", "positive", "negative",
-             "paper_primary_result"],
+             "rows", "evaluable_rows", "companies", "positive", "negative",
+             "missing", "paper_primary_result"],
             sample_target_rows,
         ),
         F_SPLIT_CONTRACT: _json_str(split_contract),
         F_SPLIT_MANIFEST: _csv_str(SPLIT_MANIFEST_COLUMNS, manifest_rows),
-        F_EVENT_GATE: _csv_str(
-            ["sample_design", "target", "window", "rows", "positive",
-             "negative", "event_gate_decision"],
-            event_rows,
-        ),
-        F_COVERAGE: _csv_str(
-            ["feature_name", "source_column", "development_rows",
-             "nonmissing_rows", "coverage", "positive_row_coverage",
-             "negative_row_coverage", "minimum_fold_training_coverage",
-             "minimum_fold_validation_coverage", "admission_status",
-             "growth_coverage_exception_applied"],
-            coverage_rows,
-        ),
+        F_EVENT_GATE: _csv_str(EVENT_GATE_COLUMNS, event_rows),
+        F_COVERAGE: _csv_str(COVERAGE_AUDIT_COLUMNS, coverage_rows),
         F_PREPROCESS: _json_str(preprocess),
         F_MODELS: _json_str(models),
         F_HYPER: _json_str(hyper),
         F_METRICS: _json_str(metrics),
         F_SHAP: _json_str(shap_c),
         F_README: build_readme(),
+        F_RG_DECISION: _json_str(rg_decision),
+        F_RG_README: build_revenue_growth_exclusion_readme(),
     }
     extras = {
         "sap": sap,
@@ -1409,6 +1865,15 @@ def build_qc_assertions(
 ) -> list[dict[str, str]]:
     assertions: list[dict[str, str]] = []
     sap = extras["sap"]
+    cov_by_feat = {
+        r["feature_name"]: r for r in extras["coverage_rows"]
+    }
+    rg = cov_by_feat.get(REVENUE_GROWTH_FEATURE)
+    preprocess = json.loads(content[F_PREPROCESS])
+    models = json.loads(content[F_MODELS])
+    nested = sap["nested_blocks"]
+    rg_decision = json.loads(content[F_RG_DECISION])
+
     _assert(
         assertions, "baseline_commit_pinned",
         head == EXPECTED_BASELINE_COMMIT or _is_ancestor(
@@ -1416,23 +1881,249 @@ def build_qc_assertions(
         ),
         EXPECTED_BASELINE_COMMIT,
     )
+    pinned_now = frozen_part3c_hashes(repo_root)
     _assert(
         assertions, "part3c_inputs_pinned",
-        extras["pinned"] == frozen_part3c_hashes(repo_root),
-        "8 hashes",
+        extras["pinned"] == pinned_now, "8 hashes",
     )
     _assert(
-        assertions, "m1_feature_count_10",
-        len(M1_PRIMARY_FEATURE_ORDER) == 10, str(len(M1_PRIMARY_FEATURE_ORDER)),
+        assertions, "Part3C_hashes_unchanged",
+        pinned_now == FROZEN_PART3C_INPUTS
+        and len(pinned_now) == 8,
+        "8 unchanged",
     )
     _assert(
-        assertions, "m1_target_proximity_count_7",
-        len(M1_TARGET_PROXIMITY_ROBUSTNESS) == 7,
+        assertions, "human_revenue_growth_exclusion_decision_recorded",
+        rg_decision.get("decision_authority") == "human_supervisor_data_owner"
+        and rg_decision.get("decision_status") == "active"
+        and rg_decision.get("revised_status")
+        == "rejected_m1_primary_coverage_gate_failed"
+        and rg_decision.get("feature") == REVENUE_GROWTH_FEATURE,
+        "recorded",
+    )
+    _assert(
+        assertions, "part4_contract_version_v2_active",
+        CONTRACT_VERSION == "stage125_part4_sap_v2"
+        and sap.get("contract_version") == "stage125_part4_sap_v2"
+        and sap.get("contract_version_history", {}).get("v1")
+        == CONTRACT_VERSION_V1_HISTORICAL,
+        CONTRACT_VERSION,
+    )
+    _assert(
+        assertions, "growth_denominator_exception_absent",
+        sap.get("growth_feature_coverage_exception") is None
+        and sap.get("growth_denominator_exception_absent") is True
+        and "growth_coverage_exception_applied" not in content[F_COVERAGE]
+        and sap["m1_coverage_gates"][
+            "growth_denominator_exception_authorized"
+        ] is False
+        and rg_decision.get("denominator_exception_authorized") is False
+        and rg_decision.get(
+            "first_observation_denominator_exception_authorized"
+        ) is False,
+        "absent",
+    )
+    _assert(
+        assertions, "coverage_denominator_all_subset_rows",
+        sap["m1_coverage_gates"]["coverage_denominator"]
+        == "all_rows_belonging_to_the_relevant_development_or_fold_subset"
+        and rg is not None
+        and int(rg["fold1_train_rows"]) == 245
+        and int(rg["fold1_validation_rows"]) == 205
+        and int(rg["fold2_train_rows"]) == 450
+        and int(rg["fold2_validation_rows"]) == 216
+        and int(rg["development_rows"]) == 666,
+        "ordinary_denominators",
+    )
+    _assert(
+        assertions, "revenue_growth_coverage_audit_present",
+        rg is not None
+        and REVENUE_GROWTH_FEATURE in M1_COVERAGE_AUDIT_CANDIDATES
+        and len(extras["coverage_rows"]) == 10,
+        "present",
+    )
+    _assert(
+        assertions, "revenue_growth_fold1_train_numerator_148",
+        rg is not None and int(rg["fold1_train_nonmissing"]) == 148,
+        str(rg["fold1_train_nonmissing"] if rg else None),
+    )
+    _assert(
+        assertions, "revenue_growth_fold1_train_denominator_245",
+        rg is not None and int(rg["fold1_train_rows"]) == 245,
+        str(rg["fold1_train_rows"] if rg else None),
+    )
+    _assert(
+        assertions, "revenue_growth_fold1_train_coverage_0_6040816327",
+        rg is not None
+        and abs(float(rg["fold1_train_coverage"]) - 0.6040816327) < 1e-10,
+        str(rg["fold1_train_coverage"] if rg else None),
+    )
+    _assert(
+        assertions, "revenue_growth_rejected",
+        rg is not None
+        and rg["admission_status"] == "rejected_m1_primary_coverage_gate_failed"
+        and REVENUE_GROWTH_FEATURE not in M1_PRIMARY_FEATURE_ORDER
+        and REVENUE_GROWTH_FEATURE not in nested["M1"]
+        and REVENUE_GROWTH_FEATURE not in nested["M2"]
+        and REVENUE_GROWTH_FEATURE not in nested["M3"]
+        and REVENUE_GROWTH_FEATURE not in nested["M4"],
+        "rejected_audit_only",
+    )
+    admitted = [
+        r for r in extras["coverage_rows"]
+        if r["admission_status"] == "admitted_m1_primary"
+    ]
+    rejected = [
+        r for r in extras["coverage_rows"]
+        if r["admission_status"] == "rejected_m1_primary_coverage_gate_failed"
+    ]
+    _assert(
+        assertions, "m1_coverage_decisions_exact",
+        len(admitted) == 9
+        and len(rejected) == 1
+        and rejected[0]["feature_name"] == REVENUE_GROWTH_FEATURE,
+        "9 admitted + 1 rejected revenue-growth",
+    )
+    _assert(
+        assertions, "nine_final_M1_features_pass_coverage",
+        all(
+            cov_by_feat[f]["admission_status"] == "admitted_m1_primary"
+            for f in M1_PRIMARY_FEATURE_ORDER
+        ),
+        "9 pass",
+    )
+    _assert(
+        assertions, "m1_primary_feature_count_9",
+        len(M1_PRIMARY_FEATURE_ORDER) == 9, str(len(M1_PRIMARY_FEATURE_ORDER)),
+    )
+    _assert(
+        assertions, "m1_target_proximity_count_6",
+        len(M1_TARGET_PROXIMITY_ROBUSTNESS) == 6,
         str(len(M1_TARGET_PROXIMITY_ROBUSTNESS)),
+    )
+    _assert(
+        assertions, "nested_M2_count_12",
+        len(nested["M2"]) == 12, str(len(nested["M2"])),
+    )
+    _assert(
+        assertions, "nested_M3_count_15",
+        len(nested["M3"]) == 15, str(len(nested["M3"])),
+    )
+    _assert(
+        assertions, "nested_M4_count_19",
+        len(nested["M4"]) == 19, str(len(nested["M4"])),
+    )
+    _assert(
+        assertions, "m1_exclusion_count_23",
+        len(M1_EXCLUSIONS) == 23, str(len(M1_EXCLUSIONS)),
     )
     _assert(assertions, "m2_block_count_3", len(M2_BLOCK) == 3, str(len(M2_BLOCK)))
     _assert(assertions, "m3_block_count_3", len(M3_BLOCK) == 3, str(len(M3_BLOCK)))
     _assert(assertions, "m4_block_count_4", len(M4_BLOCK) == 4, str(len(M4_BLOCK)))
+    event_rows = extras["event_rows"]
+    _assert(
+        assertions, "target_event_counts_have_missing_column",
+        event_rows
+        and all("missing" in r and "evaluable_rows" in r for r in event_rows),
+        "missing+evaluable",
+    )
+    recon_ok = all(
+        int(r["rows"])
+        == int(r["positive"]) + int(r["negative"]) + int(r["missing"])
+        and int(r["evaluable_rows"])
+        == int(r["positive"]) + int(r["negative"])
+        for r in event_rows
+    )
+    _assert(
+        assertions, "target_event_count_reconciliation_exact",
+        recon_ok, "rows=pos+neg+miss",
+    )
+    _assert(
+        assertions, "missing_never_counted_as_negative",
+        all(
+            classify_target_state("") == "missing"
+            and classify_target_state("nan") == "missing"
+            and classify_target_state("2") == "missing"
+            and classify_target_state("0") == "negative"
+            and classify_target_state("1") == "positive"
+            for _ in [0]
+        )
+        and all(
+            int(r["negative"]) <= int(r["evaluable_rows"]) for r in event_rows
+        ),
+        "strict_three_state",
+    )
+    _assert(
+        assertions, "target_specific_evaluable_rows_recorded",
+        all(int(r["evaluable_rows"]) >= 0 for r in event_rows)
+        and sap["target_state_contract"][
+            "target_specific_analyses_use_evaluable_rows_only"
+        ] is True,
+        "evaluable_recorded",
+    )
+    claim = sap["final_test_inferential_claim_eligibility"]
+    _assert(
+        assertions, "final_test_threshold_is_claim_gate_not_feature_admission",
+        claim["does_not_admit_or_reject_predictors"] is True
+        and claim["does_not_change_temporal_split"] is True
+        and "min_positives_locked_final_test"
+        not in sap.get("candidate_data_admission", {})
+        and "final_data_admission_thresholds" not in sap,
+        "claim_gate_only",
+    )
+    _assert(
+        assertions, "missingness_mask_before_imputation",
+        preprocess["missingness_mask_captured_before_imputation"] is True
+        and preprocess["missingness_indicator_source"]
+        == "original_pre_imputation_mask"
+        and preprocess["clipping_fit_on_observed_training_values_only"] is True
+        and preprocess["median_fit_after_training_clipping"] is True,
+        "pre_imputation_mask",
+    )
+    _assert(
+        assertions, "missingness_indicators_not_standardized",
+        preprocess["missing_indicators_standardized"] is False,
+        "false",
+    )
+    smote = models["smote_robustness"]
+    _assert(
+        assertions, "SMOTE_class_weighting_disabled",
+        smote["class_weighting_disabled_when_smote_active"] is True
+        and smote["oversampling_and_class_weighting_combined"] is False
+        and smote["logistic_regression"]["class_weight"] is None
+        and smote["random_forest"]["class_weight"] is None
+        and smote["xgboost"]["scale_pos_weight"] == 1,
+        "disabled",
+    )
+    _assert(
+        assertions, "SMOTE_uses_no_second_tuning_search",
+        smote["second_tuning_search"] is False
+        and smote["uses_selected_non_weight_hyperparameters"] is True,
+        "no_second_search",
+    )
+    split_c = json.loads(content[F_SPLIT_CONTRACT])
+    _assert(
+        assertions, "temporal_split_unchanged",
+        split_c["development_target_years"] == sorted(DEVELOPMENT_YEARS)
+        and split_c["final_test_target_years"] == sorted(FINAL_TEST_YEARS)
+        and split_c["temporal_validation_fold_1"]["train_target_years"]
+        == sorted(FOLD1_TRAIN_YEARS)
+        and split_c["temporal_validation_fold_1"]["validation_target_years"]
+        == sorted(FOLD1_VAL_YEARS)
+        and split_c["temporal_validation_fold_2"]["train_target_years"]
+        == sorted(FOLD2_TRAIN_YEARS)
+        and split_c["temporal_validation_fold_2"]["validation_target_years"]
+        == sorted(FOLD2_VAL_YEARS),
+        "unchanged",
+    )
+    _assert(
+        assertions, "final_test_unchanged",
+        set(FINAL_TEST_YEARS) == {1400, 1401, 1402}
+        and split_c["primary_sample_final_test_expected"]["pairs"] == 346
+        and split_c["primary_sample_final_test_expected"]["positive"] == 12
+        and split_c["primary_sample_final_test_expected"]["negative"] == 334,
+        "1400-1402",
+    )
     _assert(
         assertions, "primary_metric_pr_auc",
         PRIMARY_METRIC == "PR-AUC"
@@ -1472,20 +2163,11 @@ def build_qc_assertions(
         and hyper["grid_expansion_after_results_authorized"] is False,
         "32",
     )
-    models = json.loads(content[F_MODELS])
     _assert(
         assertions, "smote_training_fold_only",
-        models["smote_robustness"]["apply_only_inside_training_fold"] is True
-        and models["smote_robustness"]["never_before_temporal_splitting"] is True,
+        smote["apply_only_inside_training_fold"] is True
+        and smote["never_before_temporal_splitting"] is True,
         "train_fold_only",
-    )
-    _assert(
-        assertions, "m1_coverage_all_admitted",
-        all(
-            r["admission_status"] == "admitted_m1_primary"
-            for r in extras["coverage_rows"]
-        ),
-        "all admitted",
     )
     _assert(
         assertions, "manifest_columns_only",

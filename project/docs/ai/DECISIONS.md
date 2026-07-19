@@ -103,12 +103,22 @@ The research contract for the paper is frozen in
 
 Research action `stage125-part4-statistical-analysis-plan`:
 
-- Locks M1 primary ordered features (exactly 10), M1 target-proximity
-  robustness (exactly 7), nested M2–M4 blocks, four sample designs, target-year
-  temporal folds (development 1393–1399; final test 1400–1402), preprocessing,
+- Active contract: `stage125_part4_sap_v2` (v1 retained in Git history).
+- Locks M1 primary ordered features (exactly 9 admitted), M1 coverage-audit
+  candidates (10, including rejected `revenue_growth_period_adjusted`), M1
+  target-proximity robustness (exactly 6), nested M2–M4 blocks (9/12/15/19),
+  four sample designs, target-year temporal folds (development 1393–1399;
+  final test 1400–1402), preprocessing with pre-imputation missingness masks,
   allowed model families, finite hyperparameter budget (32/block), seeds,
   PR-AUC primary, Recall@10%/Lift@10%, calibration, paired ticker-cluster
   bootstrap (2000; Holm α=0.05), and SHAP stability contracts.
+- Human supervisor rejected `revenue_growth_period_adjusted` from admitted M1:
+  raw Fold 1 training coverage `148/245 = 0.6040816327` < 0.75. No
+  first-observation denominator exception. Feature retained in frozen data and
+  coverage audit as `rejected_m1_primary_coverage_gate_failed`.
+- Strict positive/negative/missing target event accounting; final-test event
+  threshold is claim eligibility only (not predictor admission). SMOTE
+  robustness disables class weighting.
 - Primary paper result: `main_rule_a_primary` × `FD_target_main_t_plus_1`.
 - Part 3C analysis-ready / audited hashes are pinned; financial values and
   targets remain frozen; رمپنا remains audit-only.

@@ -1,4 +1,4 @@
-"""Tests for Stage125 Part 4 Statistical Analysis Plan."""
+"""Tests for Stage125 Part 4 Statistical Analysis Plan (v2)."""
 from __future__ import annotations
 
 import json
@@ -38,6 +38,12 @@ def test_changed_part3c_hash_fails(monkeypatch):
         m.frozen_part3c_hashes(REPO_ROOT)
 
 
+def test_part3c_hashes_unchanged():
+    got = m.frozen_part3c_hashes(REPO_ROOT)
+    assert got == m.FROZEN_PART3C_INPUTS
+    assert len(got) == 8
+
+
 def test_sample_count_mutation_fails(monkeypatch):
     specs = {k: dict(v) for k, v in m.SAMPLE_SPECS.items()}
     specs["main_rule_a_primary"]["rows"] = 9999
@@ -63,8 +69,6 @@ def test_rampna_reentry_fails(monkeypatch):
 
     def _fake_load(repo_root, sample):
         if sample == "main_rule_a_primary":
-            # Bypass normal loader checks by returning mutated rows via
-            # direct call path used inside build — emulate detection helper.
             ramp = [
                 r for r in rows
                 if r["ticker"] == "رمپنا" and str(r["fiscal_year_t"]) == "1396"
@@ -117,7 +121,10 @@ def test_m1_target_proximity_order_mutation_fails():
 
 
 def test_m2_m3_m4_ordering_mutation_fails(monkeypatch):
-    monkeypatch.setattr(m, "M2_BLOCK", ["realized_volatility", "equity_return_window", "amihud_illiquidity"])
+    monkeypatch.setattr(
+        m, "M2_BLOCK",
+        ["realized_volatility", "equity_return_window", "amihud_illiquidity"],
+    )
     with pytest.raises(m.QCFail, match="M2 ordering mutation"):
         m.build_all(REPO_ROOT)
 
@@ -147,9 +154,7 @@ def test_train_year_later_than_validation_fails():
 def test_final_test_feature_coverage_not_used_for_selection():
     rows = m.load_analysis_ready(REPO_ROOT, "main_rule_a_primary")
     cov = m.compute_m1_coverage(rows)
-    # Development-only: coverage development_rows must equal 666 for primary.
     assert all(int(r["development_rows"]) == 666 for r in cov)
-    # Guard helper: coverage must not be computed on final-test-only rows.
     ft = m.final_test_rows(rows)
     with pytest.raises(m.QCFail, match="no development rows"):
         m.compute_m1_coverage(ft)
@@ -235,7 +240,6 @@ def test_build_all_offline_and_deterministic():
     assert set(c1) == set(m.TRACKED_CONTENT_FILES)
     for k in c1:
         assert c1[k] == c2[k]
-    # Stable ordering in JSON / CSV
     assert c1[m.F_SAP] == json.dumps(
         json.loads(c1[m.F_SAP]), indent=2, ensure_ascii=False, sort_keys=True,
     ) + "\n"
@@ -251,10 +255,10 @@ def test_run_build_and_check(tmp_path):
     assert result["qc"]["model_fit_calls"] == 0
     assert result["qc"]["prediction_calls"] == 0
     assert result["qc"]["final_test_accessed_for_modeling"] is False
+    assert result["qc"]["contract_version"] == "stage125_part4_sap_v2"
     assert result["qc"]["research_pointers"]["next_research_action_id"] == (
         "stage125-part5-readiness-closure"
     )
-    # check against tmp_path should see no drift
     result2 = m.run(
         project_dir=ROOT, output_dir=tmp_path, build=False, check=True,
     )
@@ -276,26 +280,315 @@ def test_article141_final_test_descriptive_only():
     assert "distributional_descriptive_robustness_only" in art[
         "event_gate_decision"
     ]
+    assert "missing" in art
+    assert "evaluable_rows" in art
 
 
 def test_primary_final_test_counts():
     rows = m.load_analysis_ready(REPO_ROOT, m.PRIMARY_SAMPLE)
     ft = m.final_test_rows(rows)
-    pos = sum(1 for r in ft if m._is_positive(r[m.PRIMARY_TARGET]))
+    counts = m.count_target_states([r[m.PRIMARY_TARGET] for r in ft])
     assert len(ft) == 346
-    assert pos == 12
-    assert len(ft) - pos == 334
+    assert counts["positive"] == 12
+    assert counts["negative"] == 334
+    assert counts["missing"] == 0
+    assert counts["evaluable_rows"] == 346
 
 
 def test_m1_exclusion_count():
-    assert len(m.M1_EXCLUSIONS) == 22
+    assert len(m.M1_EXCLUSIONS) == 23
+    names = {e["feature_name"] for e in m.M1_EXCLUSIONS}
+    assert m.REVENUE_GROWTH_FEATURE in names
 
 
-def test_growth_exception_allows_fold_coverage():
+def test_contract_version_v2():
+    assert m.CONTRACT_VERSION == "stage125_part4_sap_v2"
+    assert m.CONTRACT_VERSION_V1_HISTORICAL == "stage125_part4_sap_v1"
+
+
+def test_m1_primary_exact_nine_feature_order():
+    assert m.M1_PRIMARY_FEATURE_ORDER == [
+        "log_total_assets",
+        "leverage_ratio",
+        "current_ratio",
+        "roa_period_adjusted",
+        "ocf_to_assets_period_adjusted",
+        "asset_turnover_period_adjusted",
+        "operating_margin_period_adjusted",
+        "financial_expense_to_assets_period_adjusted",
+        "accumulated_loss_to_capital_ratio",
+    ]
+    assert len(m.M1_PRIMARY_FEATURE_ORDER) == 9
+    assert m.REVENUE_GROWTH_FEATURE not in m.M1_PRIMARY_FEATURE_ORDER
+
+
+def test_m1_target_proximity_exact_six_feature_order():
+    assert m.M1_TARGET_PROXIMITY_ROBUSTNESS == [
+        "log_total_assets",
+        "current_ratio",
+        "roa_period_adjusted",
+        "asset_turnover_period_adjusted",
+        "operating_margin_period_adjusted",
+        "financial_expense_to_assets_period_adjusted",
+    ]
+    assert len(m.M1_TARGET_PROXIMITY_ROBUSTNESS) == 6
+    assert m.REVENUE_GROWTH_FEATURE not in m.M1_TARGET_PROXIMITY_ROBUSTNESS
+    for prox in m.M1_TARGET_PROXIMITY_REMOVED:
+        assert prox not in m.M1_TARGET_PROXIMITY_ROBUSTNESS
+
+
+def test_nested_counts_9_12_15_19():
+    m2 = m.M1_PRIMARY_FEATURE_ORDER + m.M2_BLOCK
+    m3 = m2 + m.M3_BLOCK
+    m4 = m3 + m.M4_BLOCK
+    assert len(m.M1_PRIMARY_FEATURE_ORDER) == 9
+    assert len(m2) == 12
+    assert len(m3) == 15
+    assert len(m4) == 19
+    for surface in (m.M1_PRIMARY_FEATURE_ORDER, m2, m3, m4):
+        assert m.REVENUE_GROWTH_FEATURE not in surface
+
+
+def test_revenue_growth_raw_coverage_and_rejection():
     rows = m.load_analysis_ready(REPO_ROOT, m.PRIMARY_SAMPLE)
     cov = {r["feature_name"]: r for r in m.compute_m1_coverage(rows)}
-    g = cov["revenue_growth_period_adjusted"]
-    assert g["growth_coverage_exception_applied"] == "true"
-    assert g["admission_status"] == "admitted_m1_primary"
-    assert float(g["minimum_fold_training_coverage"]) >= 0.75
-    assert float(g["coverage"]) >= 0.80
+    g = cov[m.REVENUE_GROWTH_FEATURE]
+    assert int(g["development_rows"]) == 666
+    assert int(g["nonmissing_rows"]) == 565
+    assert abs(float(g["coverage"]) - 0.8483483483) < 1e-10
+    assert int(g["fold1_train_nonmissing"]) == 148
+    assert int(g["fold1_train_rows"]) == 245
+    assert abs(float(g["fold1_train_coverage"]) - 0.6040816327) < 1e-10
+    assert int(g["fold1_validation_nonmissing"]) == 203
+    assert int(g["fold1_validation_rows"]) == 205
+    assert abs(float(g["fold1_validation_coverage"]) - 0.9902439024) < 1e-10
+    assert int(g["fold2_train_nonmissing"]) == 351
+    assert int(g["fold2_train_rows"]) == 450
+    assert abs(float(g["fold2_train_coverage"]) - 0.7800000000) < 1e-10
+    assert int(g["fold2_validation_nonmissing"]) == 214
+    assert int(g["fold2_validation_rows"]) == 216
+    assert abs(float(g["fold2_validation_coverage"]) - 0.9907407407) < 1e-10
+    assert float(g["minimum_fold_training_coverage"]) < 0.75
+    assert g["admission_status"] == "rejected_m1_primary_coverage_gate_failed"
+    assert "growth_coverage_exception_applied" not in g
+
+
+def test_revenue_growth_remains_in_audit_and_frozen_absent_from_models():
+    rows = m.load_analysis_ready(REPO_ROOT, m.PRIMARY_SAMPLE)
+    assert m.REVENUE_GROWTH_FEATURE in rows[0]
+    cov = m.compute_m1_coverage(rows)
+    assert any(r["feature_name"] == m.REVENUE_GROWTH_FEATURE for r in cov)
+    content, extras = m.build_all(REPO_ROOT)
+    sap = extras["sap"]
+    nested = sap["nested_blocks"]
+    for block in ("M1", "M2", "M3", "M4"):
+        assert m.REVENUE_GROWTH_FEATURE not in nested[block]
+    feature_csv = content[m.F_FEATURE_SETS]
+    admitted_lines = [
+        line for line in feature_csv.splitlines()
+        if line.startswith("M1_PRIMARY_FEATURE_ORDER,")
+        or line.startswith("M1_TARGET_PROXIMITY_ROBUSTNESS,")
+        or line.startswith("M2_BLOCK,")
+        or line.startswith("M3_BLOCK,")
+        or line.startswith("M4_BLOCK,")
+    ]
+    assert all(m.REVENUE_GROWTH_FEATURE not in line for line in admitted_lines)
+    assert m.REVENUE_GROWTH_FEATURE in content[m.F_COVERAGE]
+    assert m.REVENUE_GROWTH_FEATURE in content[m.F_EXCLUSIONS]
+
+
+def test_no_growth_denominator_exception_exists():
+    content, extras = m.build_all(REPO_ROOT)
+    sap = extras["sap"]
+    assert sap["growth_feature_coverage_exception"] is None
+    assert sap["growth_denominator_exception_absent"] is True
+    assert sap["m1_coverage_gates"][
+        "growth_denominator_exception_authorized"
+    ] is False
+    assert "growth_coverage_exception_applied" not in content[m.F_COVERAGE]
+    decision = json.loads(content[m.F_RG_DECISION])
+    assert decision["denominator_exception_authorized"] is False
+    assert decision["first_observation_denominator_exception_authorized"] is False
+    # Active exception constant assignment must not exist.
+    assert not hasattr(m, "GROWTH_COVERAGE_EXCEPTION")
+
+
+def test_first_observation_denominator_exclusion_attempt_fails():
+    with pytest.raises(m.AuthorizationError, match="denominator exception"):
+        m.reject_growth_denominator_exception(
+            exclude_first_observed_fiscal_year_from_fold_denominator=True,
+        )
+    with pytest.raises(m.AuthorizationError, match="denominator exception"):
+        m.reject_growth_denominator_exception(
+            structural_first_observation_denominator_adjustment=True,
+        )
+
+
+def test_coverage_denominator_mutation_fails():
+    with pytest.raises(m.AuthorizationError, match="coverage denominator mutation"):
+        m.reject_coverage_denominator_mutation(
+            subset_row_count=245, denominator_used=148, label="fold1_train",
+        )
+
+
+def test_classify_target_states_strict():
+    assert m.classify_target_state(1) == "positive"
+    assert m.classify_target_state(1.0) == "positive"
+    assert m.classify_target_state("1") == "positive"
+    assert m.classify_target_state("1.0") == "positive"
+    assert m.classify_target_state(0) == "negative"
+    assert m.classify_target_state(0.0) == "negative"
+    assert m.classify_target_state("0") == "negative"
+    assert m.classify_target_state("0.0") == "negative"
+    assert m.classify_target_state("") == "missing"
+    assert m.classify_target_state(None) == "missing"
+    assert m.classify_target_state("nan") == "missing"
+    assert m.classify_target_state("2") == "missing"
+    assert m.classify_target_state("true") == "missing"
+    assert m.classify_target_state("yes") == "missing"
+    counts = m.count_target_states([1, 0, "", "x", "1.0", "0.0"])
+    assert counts == {
+        "rows": 6,
+        "evaluable_rows": 4,
+        "positive": 2,
+        "negative": 2,
+        "missing": 2,
+    }
+    assert counts["rows"] == (
+        counts["positive"] + counts["negative"] + counts["missing"]
+    )
+    assert counts["evaluable_rows"] == counts["positive"] + counts["negative"]
+
+
+def test_missing_target_never_counted_negative():
+    assert m.classify_target_state("") != "negative"
+    assert m._is_negative("") is False
+    assert m._is_positive("") is False
+    # Legacy trap: rows - positive would mislabel missing as negative.
+    values = ["1", "", "0"]
+    counts = m.count_target_states(values)
+    assert counts["negative"] == 1
+    assert counts["missing"] == 1
+    assert counts["negative"] != len(values) - counts["positive"]
+
+
+def test_injected_missing_robustness_target_changes_missing_not_negative():
+    sample_rows = {
+        s: m.load_analysis_ready(REPO_ROOT, s) for s in m.ANALYSIS_READY_FILES
+    }
+    primary = [dict(r) for r in sample_rows[m.PRIMARY_SAMPLE]]
+    baseline = m.build_event_counts({m.PRIMARY_SAMPLE: primary})
+    base_all = [
+        e for e in baseline
+        if e["target"] == m.SECONDARY_TARGET and e["window"] == "all"
+    ][0]
+    # Inject missing into a previously negative robustness target cell.
+    flipped = False
+    for row in primary:
+        if m.classify_target_state(row[m.SECONDARY_TARGET]) == "negative":
+            row[m.SECONDARY_TARGET] = ""
+            flipped = True
+            break
+    assert flipped
+    mutated = m.build_event_counts({m.PRIMARY_SAMPLE: primary})
+    mut_all = [
+        e for e in mutated
+        if e["target"] == m.SECONDARY_TARGET and e["window"] == "all"
+    ][0]
+    assert int(mut_all["missing"]) == int(base_all["missing"]) + 1
+    assert int(mut_all["negative"]) == int(base_all["negative"]) - 1
+    assert int(mut_all["positive"]) == int(base_all["positive"])
+    assert int(mut_all["rows"]) == int(base_all["rows"])
+    assert int(mut_all["evaluable_rows"]) == int(base_all["evaluable_rows"]) - 1
+
+
+def test_final_test_claim_threshold_cannot_change_feature_admission():
+    with pytest.raises(
+        m.AuthorizationError,
+        match="final-test claim threshold cannot change feature admission",
+    ):
+        m.reject_final_test_claim_gate_mutating_feature_admission(
+            claim_gate_controls_feature_admission=True,
+        )
+
+
+def test_final_test_claim_threshold_cannot_change_split():
+    with pytest.raises(
+        m.AuthorizationError,
+        match="final-test claim threshold cannot change temporal split",
+    ):
+        m.reject_final_test_claim_gate_mutating_split(
+            claim_gate_controls_temporal_split=True,
+        )
+
+
+def test_preprocessing_missingness_and_clipping_order():
+    p = m.build_preprocessing_contract()
+    assert p["missingness_mask_captured_before_imputation"] is True
+    assert p["missingness_indicator_source"] == "original_pre_imputation_mask"
+    assert p["missing_indicators_standardized"] is False
+    assert p["clipping_fit_on_observed_training_values_only"] is True
+    assert p["median_fit_after_training_clipping"] is True
+    order = p["continuous_pipeline_order"]
+    assert order[0].startswith("1_")
+    assert "pre_imputation_missingness_mask" in order[1]
+    assert "clipping_bounds" in order[2]
+    assert "impute" in order[5]
+    assert "missingness_indicators" in order[6]
+    assert order.index(
+        [x for x in order if "clipping_bounds_on_observed" in x][0]
+    ) < order.index([x for x in order if x.startswith("6_impute")][0])
+
+
+def test_smote_disables_class_weighting_and_keeps_nonweight_hyperparams():
+    s = m.build_model_specs()["smote_robustness"]
+    assert s["logistic_regression"]["class_weight"] is None
+    assert s["random_forest"]["class_weight"] is None
+    assert s["xgboost"]["scale_pos_weight"] == 1
+    assert s["class_weighting_disabled_when_smote_active"] is True
+    assert s["oversampling_and_class_weighting_combined"] is False
+    assert s["uses_selected_non_weight_hyperparameters"] is True
+    assert s["second_tuning_search"] is False
+    assert "uses_selected_class_weighted_hyperparameters" not in s
+    primary = m.build_model_specs()["imbalance_handling_primary"]
+    assert primary["logistic_regression"]["class_weight"] == "balanced"
+    assert primary["random_forest"]["class_weight"] == "balanced_subsample"
+    assert primary["xgboost"]["counts_exclude_missing_target_rows"] is True
+
+
+def test_smote_and_class_weighting_cannot_both_be_active():
+    s = m.build_model_specs()["smote_robustness"]
+    assert s["oversampling_and_class_weighting_combined"] is False
+    # Contract-level mutual exclusion.
+    assert not (
+        s["class_weighting_disabled_when_smote_active"] is False
+        and s.get("apply_only_inside_training_fold") is True
+    )
+
+
+def test_human_decision_artifact_fields():
+    d = m.build_revenue_growth_exclusion_decision()
+    assert d["decision_authority"] == "human_supervisor_data_owner"
+    assert d["decision_status"] == "active"
+    assert d["decision_date"] == "2026-07-19"
+    assert d["feature"] == m.REVENUE_GROWTH_FEATURE
+    assert d["revised_status"] == "rejected_m1_primary_coverage_gate_failed"
+    assert d["retained_in_frozen_dataset"] is True
+    assert d["retained_in_coverage_audit"] is True
+    assert d["removed_from_primary_feature_set"] is True
+    assert d["denominator_exception_authorized"] is False
+    assert d["evidence"]["fold1_training_coverage"] == 0.6040816327
+    assert d["evidence"]["passed_overall_development_coverage_gate"] is True
+    assert d["evidence"]["failed_minimum_fold_training_coverage_gate"] is True
+
+
+def test_split_manifest_content_stable_across_rebuild():
+    sample_rows = {
+        s: m.load_analysis_ready(REPO_ROOT, s) for s in m.ANALYSIS_READY_FILES
+    }
+    m1 = m.build_split_manifest(sample_rows)
+    m2 = m.build_split_manifest(sample_rows)
+    assert m1 == m2
+    # Role assignment locked to years; no random component.
+    years = {int(r["target_year"]) for r in m1 if r["dataset_split"] == "final_test"}
+    assert years == {1400, 1401, 1402}

@@ -76,11 +76,16 @@ row-level PublishDateTime collection.
 ### Completed research action — `stage125-part4-statistical-analysis-plan`
 
 Statistical analysis plan locked for all four analysis-ready samples under
-the active four-month regulatory lag. Primary paper result uses
+the active four-month regulatory lag. Active contract:
+`stage125_part4_sap_v2`. Primary paper result uses
 `main_rule_a_primary` × `FD_target_main_t_plus_1`. M1 primary feature order
-(10), M1 target-proximity robustness (7), nested M2–M4 blocks, temporal folds
-(development 1393–1399; final test 1400–1402), preprocessing, model families,
-finite hyperparameter budget (32 configs/block), seeds, PR-AUC primary,
+(9 admitted), M1 coverage-audit candidates (10; `revenue_growth_period_adjusted`
+rejected at Fold 1 train coverage `148/245 = 0.6040816327`), M1
+target-proximity robustness (6), nested M2–M4 blocks (9/12/15/19), temporal
+folds (development 1393–1399; final test 1400–1402), strict
+positive/negative/missing event accounting, pre-imputation missingness-mask
+preprocessing, SMOTE without class weighting, model families, finite
+hyperparameter budget (32 configs/block), seeds, PR-AUC primary,
 Recall@10%/Lift@10%, calibration, paired ticker-cluster bootstrap, Holm, and
 SHAP stability contracts are frozen. Part 3C hashes pinned. **No** model
 fitting, **no** final-test predictor inspection, **no** M2/M3/M4 data

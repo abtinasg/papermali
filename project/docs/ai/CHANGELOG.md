@@ -5,6 +5,16 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
 
 ## 2026-07-19
 
+- **Stage125 Part 4 v2 correction — revenue-growth exclusion revision.**
+  Human supervisor rejected `revenue_growth_period_adjusted` from admitted M1
+  (raw Fold 1 training coverage `148/245 = 0.6040816327` < 0.75). Removed the
+  unauthorized first-observation denominator exception. Active contract
+  `stage125_part4_sap_v2` (v1 retained in Git). M1 primary now 9 features;
+  target-proximity 6; nested 9/12/15/19; exclusions 23. Added strict
+  positive/negative/missing event accounting, pre-imputation missingness-mask
+  preprocessing, SMOTE-without-class-weighting, and separation of final-test
+  claim eligibility from predictor admission. **No** modeling; **no** Stage126.
+
 - **Stage125 Part 4 / research action
   `stage125-part4-statistical-analysis-plan` — Statistical Analysis Plan lock.**
   Locks M1–M4 feature order, four sample designs, target-year temporal folds,

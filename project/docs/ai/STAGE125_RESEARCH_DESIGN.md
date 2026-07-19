@@ -23,19 +23,26 @@ Versioned methodological addendum (does not silently rewrite Part 0 history):
 
 Versioned methodological addendum (does not silently rewrite Part 0–3C history):
 
+- Active contract: `stage125_part4_sap_v2` (v1 retained in Git history).
 - Part 4 locks the statistical analysis plan only; **no** model fitting.
 - Primary sample / target:
   `main_rule_a_primary` × `FD_target_main_t_plus_1`.
-- M1 primary ordered features (10) and M1 target-proximity robustness (7)
-  are approved; remaining Part 3C candidates stay audit-only exclusions.
-- Nested M2–M4 blocks are defined; M3 not admitted (no authoritative CBI
-  source); no M2/M3/M4 values collected in Part 4.
+- M1 primary ordered features (9 admitted) and M1 target-proximity robustness
+  (6) are approved; `revenue_growth_period_adjusted` is rejected (Fold 1
+  training coverage `148/245 = 0.6040816327` < 0.75) and retained audit-only;
+  no denominator exception. Remaining Part 3C candidates stay audit-only
+  exclusions (23 M1 exclusions total).
+- Nested M2–M4 blocks are defined (9/12/15/19); M3 not admitted (no
+  authoritative CBI source); no M2/M3/M4 values collected in Part 4.
 - Temporal design locked on `target_year`: development 1393–1399; folds
   1393–1395/1396–1397 and 1393–1397/1398–1399; final test 1400–1402.
+- Strict positive/negative/missing target accounting; pre-imputation
+  missingness-mask preprocessing; SMOTE disables class weighting.
 - Primary metric PR-AUC; Recall@10% / Lift@10%; calibration; paired
   ticker-cluster bootstrap; Holm multiplicity; finite seed/tuning budget.
 - Final-test predictor values must not be inspected for admission, tuning,
   feature selection, or model comparison until Stage126 is authorized.
+  Final-test event thresholds control claim eligibility only.
 - Stage125 remains incomplete; Stage126 and modeling remain unauthorized.
 - Next research action: `stage125-part5-readiness-closure`.
 
