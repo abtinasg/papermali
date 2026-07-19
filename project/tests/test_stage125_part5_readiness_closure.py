@@ -376,7 +376,7 @@ def test_article141_matrix_claim_eligibility_descriptive():
 
 
 def test_article141_excluded_from_entry_contract_model_estimation():
-    contract = m.build_stage126_m1_entry_contract()
+    contract = m.build_stage126_m1_entry_contract(entry_ready=True)
     assert contract["article141_excluded_from_model_estimation"] is True
 
 
@@ -480,22 +480,64 @@ def test_closure_report_stage125_and_stage126_flags():
     assert closure["stage125_gate_125_0"] == "PASS"
 
 
-def test_entry_contract_flags():
-    contract = m.build_stage126_m1_entry_contract()
+def test_entry_contract_ready_state_when_gate_passes():
+    contract = m.build_stage126_m1_entry_contract(entry_ready=True)
     assert contract["stage126_m1_entry_ready"] is True
+    assert contract["entry_readiness"] == (
+        "READY_FOR_HUMAN_AUTHORIZATION_DECISION"
+    )
+    # Authorization/boundary flags remain false in the ready state.
     assert contract["stage126_authorized"] is False
     assert contract["stage126_started"] is False
     assert contract["modeling_authorized"] is False
     assert contract["modeling_started"] is False
     assert contract["final_test_unlocked"] is False
     assert contract["final_test_predictor_values_inspected"] is False
-    assert contract["entry_readiness"] == (
-        "READY_FOR_HUMAN_AUTHORIZATION_DECISION"
+
+
+def test_entry_contract_not_ready_state_when_gate_fails():
+    contract = m.build_stage126_m1_entry_contract(entry_ready=False)
+    assert contract["stage126_m1_entry_ready"] is False
+    assert contract["entry_readiness"] == "NOT_READY_WITH_BLOCKERS"
+    # A failed Gate cannot leave any authorization/boundary flag true either.
+    assert contract["stage126_authorized"] is False
+    assert contract["stage126_started"] is False
+    assert contract["modeling_authorized"] is False
+    assert contract["modeling_started"] is False
+    assert contract["final_test_unlocked"] is False
+    assert contract["final_test_predictor_values_inspected"] is False
+    # The forbidden ready string must never appear in the not-ready contract.
+    assert "READY_FOR_HUMAN_AUTHORIZATION_DECISION" != (
+        contract["entry_readiness"]
     )
 
 
+def test_entry_contract_requires_explicit_entry_ready_argument():
+    with pytest.raises(TypeError):
+        m.build_stage126_m1_entry_contract()  # entry_ready is required
+
+
+def test_entry_boundary_gate_independent_of_readiness():
+    ready = m.build_stage126_m1_entry_contract(entry_ready=True)
+    not_ready = m.build_stage126_m1_entry_contract(entry_ready=False)
+    ok_ready, _ = m.evaluate_entry_boundary(ready)
+    ok_not_ready, detail_not_ready = m.evaluate_entry_boundary(not_ready)
+    # The structural/authorization boundary is identical regardless of
+    # readiness — it must not require stage126_m1_entry_ready=true.
+    assert ok_ready is True
+    assert ok_not_ready is True, detail_not_ready
+
+
+def test_entry_boundary_gate_rejects_authorization_breach():
+    breached = m.build_stage126_m1_entry_contract(entry_ready=True)
+    breached["stage126_authorized"] = True
+    ok, detail = m.evaluate_entry_boundary(breached)
+    assert ok is False
+    assert "stage126_authorized_false" in detail
+
+
 def test_entry_contract_primary_specification():
-    contract = m.build_stage126_m1_entry_contract()
+    contract = m.build_stage126_m1_entry_contract(entry_ready=True)
     spec = contract["primary_specification"]
     assert spec["sample"] == "main_rule_a_primary"
     assert spec["target"] == "FD_target_main_t_plus_1"
@@ -508,7 +550,7 @@ def test_entry_contract_primary_specification():
 
 
 def test_entry_contract_future_sequence_has_six_steps():
-    contract = m.build_stage126_m1_entry_contract()
+    contract = m.build_stage126_m1_entry_contract(entry_ready=True)
     steps = contract["future_stage126_sequence_recorded_not_executed"]
     assert len(steps) == 6
 
@@ -1039,17 +1081,29 @@ def test_csv_outputs_are_sorted_deterministically():
 # Derived closure from Gate 125.0 (mutation → NOT_READY)
 # --------------------------------------------------------------------------- #
 
-def _closure_from_mutated_gate(extras, dim_name: str):
+def _failed_gate_surfaces(extras, dim_name: str):
+    """Derive every readiness surface from a Gate with one dimension flipped.
+
+    Returns ``(closure, entry_contract, handoff_markers, metadata_markers,
+    readme_text)``, all built from the SAME failed final Gate result — exactly
+    as ``build_all`` derives them for a real failing Gate.
+    """
     gate = {k: dict(v) for k, v in extras["gate"].items()}
     assert dim_name in gate, dim_name
     gate[dim_name] = {"pass": False, "detail": f"mutated_{dim_name}"}
-    return m.build_closure_report(
+    final_pass = all(v["pass"] for v in gate.values())
+    entry_contract = m.build_stage126_m1_entry_contract(entry_ready=final_pass)
+    closure = m.build_closure_report(
         keep_drop_rows=extras["keep_drop_rows"],
         blocker_rows=extras["blocker_rows"],
         part4_qc=extras["part4_qc"],
-        entry_contract=extras["entry_contract"],
+        entry_contract=entry_contract,
         gate=gate,
     )
+    flags = m.derive_closure_flags(closure["all_gate_pass"])
+    markers = m._static_qc_markers(flags)  # handoff + metadata markers
+    readme_text = m.build_readme(closure_outcome=closure["closure_outcome"])
+    return closure, entry_contract, markers, readme_text
 
 
 @pytest.mark.parametrize(
@@ -1065,7 +1119,10 @@ def _closure_from_mutated_gate(extras, dim_name: str):
 def test_gate_dimension_failure_produces_not_ready(dim_name):
     with p3b0.network_sentinel():
         _, extras = m.build_all(REPO_ROOT)
-    closure = _closure_from_mutated_gate(extras, dim_name)
+    closure, entry_contract, markers, readme_text = _failed_gate_surfaces(
+        extras, dim_name,
+    )
+    # Closure report.
     assert closure["all_gate_pass"] is False
     assert closure["stage125_completed"] is False
     assert closure["stage126_m1_entry_ready"] is False
@@ -1077,6 +1134,72 @@ def test_gate_dimension_failure_produces_not_ready(dim_name):
     assert closure["modeling_authorized"] is False
     assert closure["modeling_started"] is False
     assert closure["final_test_unlocked"] is False
+    # Entry contract.
+    assert entry_contract["stage126_m1_entry_ready"] is False
+    assert entry_contract["entry_readiness"] == m.ENTRY_READINESS_NOT_READY
+    # Handoff markers.
+    assert markers["stage125_completed"] is False
+    assert markers["stage126_m1_entry_ready"] is False
+    # Metadata markers (same derived marker source as Handoff/metadata).
+    assert markers["stage125_part5_readiness_closure_completed"] is False
+    # README.
+    assert m.CLOSURE_OUTCOME_NOT_READY in readme_text
+    assert m.CLOSURE_OUTCOME_READY not in readme_text
+    # No surface may hold the ready outcome on a failed Gate.
+    ok, detail = m.validate_readiness_surface_consistency(
+        final_gate_pass=False,
+        closure_report=closure,
+        entry_contract=entry_contract,
+        readme_text=readme_text,
+    )
+    assert ok is True, detail
+
+
+# --------------------------------------------------------------------------- #
+# Cross-artifact readiness consistency (§3)
+# --------------------------------------------------------------------------- #
+
+def test_cross_artifact_readiness_consistency_on_disk():
+    ok, detail, states = m.check_cross_artifact_readiness_consistency(REPO_ROOT)
+    assert ok is True, f"{detail} :: {states}"
+    # All six surfaces must be present and ready in the canonical (passing) state.
+    assert set(states) == set(m.READINESS_SURFACE_NAMES)
+    assert all(v is True for v in states.values()), states
+
+
+def test_readiness_surface_consistency_detects_ready_leak():
+    ready_closure = {
+        "stage126_m1_entry_ready": True,
+        "stage125_completed": True,
+        "all_gate_pass": True,
+        "closure_outcome": m.CLOSURE_OUTCOME_READY,
+        "stage125_gate_125_0": "PASS",
+    }
+    # A ready closure while the final Gate failed is a fail-closed inconsistency.
+    ok, detail = m.validate_readiness_surface_consistency(
+        final_gate_pass=False, closure_report=ready_closure,
+    )
+    assert ok is False
+    assert "disagreement" in detail or "leaked" in detail
+
+
+def test_readiness_surface_consistency_all_not_ready_agree():
+    not_ready_closure = {
+        "stage126_m1_entry_ready": False,
+        "stage125_completed": False,
+        "all_gate_pass": False,
+        "closure_outcome": m.CLOSURE_OUTCOME_NOT_READY,
+        "stage125_gate_125_0": "FAIL",
+    }
+    entry = m.build_stage126_m1_entry_contract(entry_ready=False)
+    readme = m.build_readme(closure_outcome=m.CLOSURE_OUTCOME_NOT_READY)
+    ok, detail = m.validate_readiness_surface_consistency(
+        final_gate_pass=False,
+        closure_report=not_ready_closure,
+        entry_contract=entry,
+        readme_text=readme,
+    )
+    assert ok is True, detail
 
 
 def test_derive_closure_flags_ready_and_not_ready():
@@ -1096,7 +1219,7 @@ def test_derive_closure_flags_ready_and_not_ready():
 # --------------------------------------------------------------------------- #
 
 def test_registered_m1_robustness_six_categories_exact():
-    contract = m.build_stage126_m1_entry_contract()
+    contract = m.build_stage126_m1_entry_contract(entry_ready=True)
     entries = contract["registered_m1_robustness_after_primary_lock"]
     assert len(entries) == 6
     m.validate_registered_m1_robustness(entries)

@@ -874,11 +874,29 @@ REQUIRED_ROBUSTNESS_SAMPLES = frozenset({
 })
 
 
-def build_stage126_m1_entry_contract() -> dict[str, Any]:
+ENTRY_READINESS_READY = "READY_FOR_HUMAN_AUTHORIZATION_DECISION"
+ENTRY_READINESS_NOT_READY = "NOT_READY_WITH_BLOCKERS"
+
+
+def build_stage126_m1_entry_contract(*, entry_ready: bool) -> dict[str, Any]:
+    """Stage126 M1 entry contract with readiness as an explicit derived input.
+
+    ``entry_ready`` MUST be the complete final Gate 125.0 result. When the Gate
+    passes, ``entry_readiness`` is READY_FOR_HUMAN_AUTHORIZATION_DECISION and
+    ``stage126_m1_entry_ready`` is true. When any mandatory Gate dimension
+    fails, both fall to NOT_READY_WITH_BLOCKERS / false. Under no circumstance
+    may a failed Gate leave the contract in the READY state.
+
+    The authorization/boundary flags below are unconditional constants and
+    remain false in both the ready and the not-ready state.
+    """
+    entry_ready = bool(entry_ready)
     return {
         "contract_id": "stage126_m1_financial_baseline_entry_contract",
-        "entry_readiness": "READY_FOR_HUMAN_AUTHORIZATION_DECISION",
-        "stage126_m1_entry_ready": True,
+        "entry_readiness": (
+            ENTRY_READINESS_READY if entry_ready else ENTRY_READINESS_NOT_READY
+        ),
+        "stage126_m1_entry_ready": entry_ready,
         "stage126_authorized": False,
         "stage126_started": False,
         "modeling_authorized": False,
@@ -944,6 +962,80 @@ def validate_registered_m1_robustness(entries: list[dict[str, Any]]) -> None:
 
 CLOSURE_OUTCOME_READY = "READY_FOR_STAGE126_M1_HUMAN_AUTHORIZATION_DECISION"
 CLOSURE_OUTCOME_NOT_READY = "NOT_READY_WITH_BLOCKERS"
+
+EXPECTED_ENTRY_CONTRACT_ID = "stage126_m1_financial_baseline_entry_contract"
+EXPECTED_M1_MODELS = [
+    "regularized_logistic_regression", "random_forest", "xgboost",
+]
+EXPECTED_FOLD1 = {"train": "1393\u20131395", "validation": "1396\u20131397"}
+EXPECTED_FOLD2 = {"train": "1393\u20131397", "validation": "1398\u20131399"}
+EXPECTED_DEVELOPMENT_YEARS = "1393\u20131399"
+EXPECTED_LOCKED_FINAL_TEST = "1400\u20131402"
+
+
+def evaluate_entry_boundary(entry_contract: dict[str, Any]) -> tuple[bool, str]:
+    """Structural + authorization boundary Gate dimension.
+
+    This dimension MUST NOT depend on ``stage126_m1_entry_ready`` or
+    ``entry_readiness`` — readiness is attached only after the complete Gate
+    result is derived, so requiring readiness here would be circular. It
+    validates only the structural specification and the hard authorization
+    boundary that must hold regardless of readiness.
+    """
+    spec = entry_contract.get("primary_specification") or {}
+    robustness = entry_contract.get(
+        "registered_m1_robustness_after_primary_lock",
+    ) or []
+    try:
+        validate_registered_m1_robustness(list(robustness))
+        robustness_ok = len(robustness) == 6
+    except QCFail:
+        robustness_ok = False
+
+    checks = {
+        "contract_id":
+            entry_contract.get("contract_id") == EXPECTED_ENTRY_CONTRACT_ID,
+        "primary_sample": spec.get("sample") == PRIMARY_SAMPLE,
+        "primary_target": spec.get("target") == PRIMARY_TARGET,
+        "primary_feature_set":
+            spec.get("feature_set") == "M1_PRIMARY_FEATURE_ORDER",
+        "nine_features_exact":
+            spec.get("feature_count") == 9
+            and spec.get("features_exact_order") == M1_PRIMARY_FEATURE_ORDER
+            and len(M1_PRIMARY_FEATURE_ORDER) == 9,
+        "three_model_families_exact":
+            spec.get("models") == EXPECTED_M1_MODELS,
+        "development_folds_exact":
+            spec.get("development_years") == EXPECTED_DEVELOPMENT_YEARS
+            and spec.get("fold1") == EXPECTED_FOLD1
+            and spec.get("fold2") == EXPECTED_FOLD2,
+        "final_test_years_exact":
+            spec.get("locked_final_test") == EXPECTED_LOCKED_FINAL_TEST
+            and tuple(sorted(FINAL_TEST_YEARS)) == (1400, 1401, 1402),
+        "primary_metric_exact": spec.get("primary_metric") == PRIMARY_METRIC,
+        "six_robustness_categories_exact": robustness_ok,
+        "article141_excluded":
+            entry_contract.get("article141_excluded_from_model_estimation")
+            is True,
+        "m2_m3_m4_excluded":
+            entry_contract.get(
+                "m2_m3_m4_excluded_from_immediate_stage126_m1",
+            ) is True,
+        "stage126_authorized_false":
+            entry_contract.get("stage126_authorized") is False,
+        "stage126_started_false":
+            entry_contract.get("stage126_started") is False,
+        "modeling_authorized_false":
+            entry_contract.get("modeling_authorized") is False,
+        "modeling_started_false":
+            entry_contract.get("modeling_started") is False,
+        "final_test_unlocked_false":
+            entry_contract.get("final_test_unlocked") is False,
+    }
+    failed = [name for name, ok in checks.items() if not ok]
+    if failed:
+        return False, f"boundary_failed:{sorted(failed)}"
+    return True, "structural_and_authorization_boundary_valid"
 
 # Exact Part 5 generated paths authorized to be dirty during --build only.
 AUTHORIZED_PART5_GENERATED_PATHS = frozenset(
@@ -1092,6 +1184,190 @@ def derive_closure_flags(all_gate_pass: bool) -> dict[str, Any]:
     }
 
 
+# --------------------------------------------------------------------------- #
+# Cross-artifact readiness consistency
+# --------------------------------------------------------------------------- #
+
+# The six readiness surfaces that must always agree (§3). For a passing Gate
+# every surface must report ready; for a failing Gate every surface must report
+# not-ready. No surface may hold the ready outcome while all_gate_pass is false.
+READINESS_SURFACE_NAMES = (
+    "closure_report",
+    "entry_contract",
+    "qc_report",
+    "metadata",
+    "handoff_state",
+    "readme",
+)
+
+
+def _readme_reports_ready(readme_text: str) -> bool | None:
+    has_ready = CLOSURE_OUTCOME_READY in readme_text
+    has_not_ready = CLOSURE_OUTCOME_NOT_READY in readme_text
+    if has_ready and not has_not_ready:
+        return True
+    if has_not_ready and not has_ready:
+        return False
+    return None  # ambiguous / contradictory README
+
+
+def readiness_surface_states(
+    *,
+    closure_report: dict[str, Any] | None = None,
+    entry_contract: dict[str, Any] | None = None,
+    qc_report: dict[str, Any] | None = None,
+    metadata: dict[str, Any] | None = None,
+    handoff_state: dict[str, Any] | None = None,
+    readme_text: str | None = None,
+) -> dict[str, bool | None]:
+    """Reduce each provided surface to a single ready / not-ready / ambiguous.
+
+    ``True`` = surface reports the ready outcome, ``False`` = surface reports
+    not-ready, ``None`` = surface is internally inconsistent (fail-closed).
+    """
+    states: dict[str, bool | None] = {}
+
+    def _bool_ready(*flags: Any) -> bool | None:
+        if all(f is True for f in flags):
+            return True
+        if all(f is False for f in flags):
+            return False
+        return None
+
+    if closure_report is not None:
+        states["closure_report"] = _bool_ready(
+            closure_report.get("stage126_m1_entry_ready"),
+            closure_report.get("stage125_completed"),
+            closure_report.get("all_gate_pass"),
+            closure_report.get("closure_outcome") == CLOSURE_OUTCOME_READY,
+            closure_report.get("stage125_gate_125_0") == "PASS",
+        )
+    if entry_contract is not None:
+        states["entry_contract"] = _bool_ready(
+            entry_contract.get("stage126_m1_entry_ready"),
+            entry_contract.get("entry_readiness") == ENTRY_READINESS_READY,
+        )
+    if qc_report is not None:
+        states["qc_report"] = _bool_ready(
+            qc_report.get("stage126_m1_entry_ready"),
+            qc_report.get("stage125_completed"),
+            qc_report.get("stage125_gate_125_0") == "PASS",
+        )
+    if metadata is not None:
+        states["metadata"] = _bool_ready(
+            metadata.get("stage126_m1_entry_ready"),
+            metadata.get("stage125_completed"),
+            metadata.get("closure_outcome") == CLOSURE_OUTCOME_READY,
+            metadata.get("stage125_gate_125_0") == "PASS",
+        )
+    if handoff_state is not None:
+        states["handoff_state"] = _bool_ready(
+            handoff_state.get("stage126_m1_entry_ready"),
+            handoff_state.get("stage125_completed"),
+            handoff_state.get("stage125_part5_readiness_closure_completed"),
+        )
+    if readme_text is not None:
+        states["readme"] = _readme_reports_ready(readme_text)
+    return states
+
+
+def validate_readiness_surface_consistency(
+    *,
+    final_gate_pass: bool,
+    closure_report: dict[str, Any] | None = None,
+    entry_contract: dict[str, Any] | None = None,
+    qc_report: dict[str, Any] | None = None,
+    metadata: dict[str, Any] | None = None,
+    handoff_state: dict[str, Any] | None = None,
+    readme_text: str | None = None,
+) -> tuple[bool, str]:
+    """Require every provided readiness surface to agree with the final Gate.
+
+    Fail-closed: any surface that disagrees, or is internally ambiguous, or
+    holds the ready outcome while ``final_gate_pass`` is false, is a failure.
+    """
+    states = readiness_surface_states(
+        closure_report=closure_report,
+        entry_contract=entry_contract,
+        qc_report=qc_report,
+        metadata=metadata,
+        handoff_state=handoff_state,
+        readme_text=readme_text,
+    )
+    disagreeing = [
+        name for name, ready in states.items()
+        if ready is not bool(final_gate_pass)
+    ]
+    if disagreeing:
+        return False, (
+            f"readiness_surface_disagreement:final_gate_pass="
+            f"{bool(final_gate_pass)} states="
+            f"{ {k: states[k] for k in sorted(states)} } "
+            f"disagreeing={sorted(disagreeing)}"
+        )
+    if not final_gate_pass:
+        leaked = [name for name, ready in states.items() if ready is True]
+        if leaked:
+            return False, f"ready_state_leaked_on_failed_gate:{sorted(leaked)}"
+    return True, (
+        f"all_{len(states)}_readiness_surfaces_consistent_"
+        f"{'ready' if final_gate_pass else 'not_ready'}"
+    )
+
+
+def check_cross_artifact_readiness_consistency(
+    repo_root: Path, out_dir: Path | None = None,
+) -> tuple[bool, str, dict[str, bool | None]]:
+    """Read all six on-disk readiness surfaces and validate they agree.
+
+    ``final_gate_pass`` is taken from the closure report's ``all_gate_pass``.
+    Returns ``(ok, detail, per_surface_states)``.
+    """
+    out = out_dir or (repo_root / PART4_OUTPUT_DIR)
+
+    def _load_json(rel_name: str) -> dict[str, Any] | None:
+        path = out / rel_name
+        if not path.is_file():
+            return None
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    closure = _load_json(F_CLOSURE_REPORT)
+    entry = _load_json(F_ENTRY_CONTRACT)
+    qc = _load_json(F_QC)
+    metadata = _load_json(F_METADATA)
+    readme_path = out / F_README
+    readme_text = (
+        readme_path.read_text(encoding="utf-8")
+        if readme_path.is_file() else None
+    )
+    handoff_path = repo_root / HANDOFF_STATE_REL
+    handoff = (
+        json.loads(handoff_path.read_text(encoding="utf-8"))
+        if handoff_path.is_file() else None
+    )
+    if closure is None:
+        return False, "missing_closure_report", {}
+    final_gate_pass = bool(closure.get("all_gate_pass"))
+    states = readiness_surface_states(
+        closure_report=closure,
+        entry_contract=entry,
+        qc_report=qc,
+        metadata=metadata,
+        handoff_state=handoff,
+        readme_text=readme_text,
+    )
+    ok, detail = validate_readiness_surface_consistency(
+        final_gate_pass=final_gate_pass,
+        closure_report=closure,
+        entry_contract=entry,
+        qc_report=qc,
+        metadata=metadata,
+        handoff_state=handoff,
+        readme_text=readme_text,
+    )
+    return ok, detail, states
+
+
 def _evaluate_contradiction_free_docs(
     *,
     repo_root: Path,
@@ -1203,16 +1479,14 @@ def build_gate_125_0(
         blocker_ok = False
     add("blocker_register_complete", blocker_ok, f"{len(blocker_rows)} rows")
 
-    entry_boundary_ok = (
-        entry_contract.get("stage126_m1_entry_ready") is True
-        and entry_contract.get("stage126_authorized") is False
-        and entry_contract.get("stage126_started") is False
-        and entry_contract.get("modeling_authorized") is False
-        and entry_contract.get("modeling_started") is False
-        and entry_contract.get("entry_readiness")
-        == "READY_FOR_HUMAN_AUTHORIZATION_DECISION"
+    entry_boundary_ok, entry_boundary_detail = evaluate_entry_boundary(
+        entry_contract,
     )
-    add("stage126_entry_boundary_explicit", entry_boundary_ok, "explicit")
+    add(
+        "stage126_entry_boundary_explicit",
+        entry_boundary_ok,
+        entry_boundary_detail,
+    )
 
     final_test_ok = (
         entry_contract.get("final_test_unlocked") is False
@@ -1718,9 +1992,13 @@ def build_all(
     sample_matrix_rows = load_part4_sample_target_matrix(repo_root)
     feature_set_rows = load_part4_feature_sets(repo_root)
 
-    entry_contract = build_stage126_m1_entry_contract()
+    # Step 1: build a readiness-NEUTRAL Stage126 M1 specification. Readiness is
+    # not yet known, so it must never influence the Gate. The entry-boundary
+    # Gate dimension validates this spec structurally only; readiness itself is
+    # attached in step 6 once the complete Gate result is derived.
+    spec_contract = build_stage126_m1_entry_contract(entry_ready=False)
     validate_registered_m1_robustness(
-        entry_contract["registered_m1_robustness_after_primary_lock"],
+        spec_contract["registered_m1_robustness_after_primary_lock"],
     )
 
     gate_kwargs = dict(
@@ -1732,23 +2010,27 @@ def build_all(
         feature_set_rows=feature_set_rows,
         keep_drop_rows=keep_drop_rows,
         blocker_rows=blocker_rows,
-        entry_contract=entry_contract,
+        entry_contract=spec_contract,
         network_attempts=network_attempts,
         no_model_calls_detected=True,
         mode=mode,
     )
 
-    # Pass 1: core Gate dimensions (no Handoff/docs that need derived flags).
+    # Step 2: evaluate all core Gate dimensions (no Handoff/docs that need
+    # derived flags).
     core_gate = build_gate_125_0(
         **gate_kwargs,
         readme_text="",
         include_handoff_and_docs=False,
     )
     provisional_pass = all(dim["pass"] for dim in core_gate.values())
+
+    # Step 3: derive provisional closure flags from the core Gate result.
     flags = derive_closure_flags(provisional_pass)
     readme_text = build_readme(closure_outcome=flags["closure_outcome"])
 
-    # Pass 2: attach Handoff + docs dimensions against derived provisional flags.
+    # Steps 4-5: validate actual Handoff + documents, then derive the complete
+    # final Gate result.
     gate = build_gate_125_0(
         **gate_kwargs,
         readme_text=readme_text,
@@ -1767,7 +2049,16 @@ def build_all(
             derived_entry_ready=flags["stage126_m1_entry_ready"],
             include_handoff_and_docs=True,
         )
+        final_pass = all(dim["pass"] for dim in gate.values())
 
+    # Step 6: build the FINAL entry contract using the complete final Gate
+    # result. A failed Gate cannot leave the contract in the READY state.
+    entry_contract = build_stage126_m1_entry_contract(entry_ready=final_pass)
+    validate_registered_m1_robustness(
+        entry_contract["registered_m1_robustness_after_primary_lock"],
+    )
+
+    # Step 7: build closure report + README from the SAME final Gate result.
     closure_report = build_closure_report(
         keep_drop_rows=keep_drop_rows,
         blocker_rows=blocker_rows,
@@ -1775,10 +2066,29 @@ def build_all(
         entry_contract=entry_contract,
         gate=gate,
     )
-    # README / markers must match the closure report's derived outcome.
     readme_text = build_readme(
         closure_outcome=closure_report["closure_outcome"],
     )
+
+    # Step 8: revalidate cross-artifact readiness consistency across the
+    # surfaces built here (closure report, entry contract, README, actual
+    # Handoff). Fail closed if any disagree with the final Gate result.
+    handoff_state_now = (
+        load_handoff_state(repo_root)
+        if (repo_root / HANDOFF_STATE_REL).is_file() else None
+    )
+    consistent, consistency_detail = validate_readiness_surface_consistency(
+        final_gate_pass=closure_report["all_gate_pass"],
+        closure_report=closure_report,
+        entry_contract=entry_contract,
+        handoff_state=handoff_state_now,
+        readme_text=readme_text,
+    )
+    if not consistent:
+        raise QCFail(
+            f"cross-artifact readiness inconsistency (fail-closed): "
+            f"{consistency_detail}"
+        )
 
     content: dict[str, str] = {
         F_CLOSURE_REPORT: _json_str(closure_report),
@@ -1808,6 +2118,8 @@ def build_all(
         "gate": gate,
         "closure_report": closure_report,
         "integrity_rows": integrity_rows,
+        "readiness_consistency_detail": consistency_detail,
+        "final_gate_pass": closure_report["all_gate_pass"],
         "mode": mode,
     }
     return content, extras
@@ -2110,6 +2422,51 @@ def build_qc_assertions(
         all_gate_pass and closure["stage125_gate_125_0"] == "PASS",
         f"{sum(1 for v in gate.values() if v['pass'])}/{len(gate)}",
     )
+    # Entry-boundary Gate dimension must be structural/authorization only and
+    # must NOT depend on readiness (no circular logic): it passes identically
+    # for an entry-ready and a not-ready contract.
+    boundary_ready_ok, _ = evaluate_entry_boundary(
+        build_stage126_m1_entry_contract(entry_ready=True),
+    )
+    boundary_notready_ok, _ = evaluate_entry_boundary(
+        build_stage126_m1_entry_contract(entry_ready=False),
+    )
+    _assert(
+        assertions, "entry_boundary_independent_of_readiness",
+        boundary_ready_ok is True and boundary_notready_ok is True
+        and gate["stage126_entry_boundary_explicit"]["pass"] is True,
+        "structural_only",
+    )
+    # Entry-contract readiness is derived from the final Gate result and never
+    # unconditionally READY.
+    _assert(
+        assertions, "entry_contract_readiness_derived_from_gate",
+        entry["stage126_m1_entry_ready"]
+        is expected_flags["stage126_m1_entry_ready"]
+        and entry["entry_readiness"] == (
+            ENTRY_READINESS_READY if all_gate_pass else ENTRY_READINESS_NOT_READY
+        ),
+        entry["entry_readiness"],
+    )
+    # Direct cross-artifact readiness consistency over the surfaces available
+    # at QC time (closure report, entry contract, README, actual Handoff).
+    handoff_now = (
+        load_handoff_state(repo_root)
+        if (repo_root / HANDOFF_STATE_REL).is_file() else None
+    )
+    consistency_ok, consistency_detail = (
+        validate_readiness_surface_consistency(
+            final_gate_pass=all_gate_pass,
+            closure_report=closure,
+            entry_contract=entry,
+            handoff_state=handoff_now,
+            readme_text=content[F_README],
+        )
+    )
+    _assert(
+        assertions, "cross_artifact_readiness_consistency",
+        consistency_ok, consistency_detail,
+    )
     try:
         validate_registered_m1_robustness(
             entry["registered_m1_robustness_after_primary_lock"],
@@ -2350,6 +2707,28 @@ def run(
         }
         meta_text = _json_str(meta)
         all_tracked = {**content, F_QC: qc_text, F_METADATA: meta_text}
+
+        # Full six-surface cross-artifact readiness consistency (§3): closure
+        # report, entry contract, QC report, metadata, actual Handoff state and
+        # README must all agree with the final Gate result. Fail closed.
+        handoff_state_now = (
+            load_handoff_state(repo_root)
+            if (repo_root / HANDOFF_STATE_REL).is_file() else None
+        )
+        six_ok, six_detail = validate_readiness_surface_consistency(
+            final_gate_pass=extras["closure_report"]["all_gate_pass"],
+            closure_report=extras["closure_report"],
+            entry_contract=extras["entry_contract"],
+            qc_report=qc,
+            metadata=meta,
+            handoff_state=handoff_state_now,
+            readme_text=content[F_README],
+        )
+        if not six_ok:
+            raise QCFail(
+                f"cross-artifact readiness inconsistency (fail-closed): "
+                f"{six_detail}"
+            )
 
         tracked_drift = (
             _compare_drift(out_dir, all_tracked)
