@@ -113,8 +113,9 @@ Do not confuse QC selection with the research-action chain:
   `src/stage125_part4_statistical_analysis_plan.py`,
   `run_stage125_part4.py`,
   `tests/test_stage125_part4_statistical_analysis_plan.py`,
-  `stage125/stage125_part4_statistical_analysis_plan_qc_report.json` (SAP
-  contracts; temporal splits; coverage/event gates; no modeling)
+  `stage125/stage125_part4_statistical_analysis_plan_qc_report.json` (active
+  contract `stage125_part4_sap_v2`; M1=9 admitted; revenue-growth audit-only
+  rejection; temporal splits; coverage/event gates; no modeling)
 - Stage125 Part 3C leakage-safe dataset finalization source/test/QC:
   `src/stage125_part3c_leakage_safe_dataset_finalization.py`,
   `run_stage125_part3c.py`,

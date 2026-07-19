@@ -313,6 +313,8 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/part4_hyperparameter_budget_stage125.json",
     "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
     "project/stage125/part4_shap_stability_contract_stage125.json",
+    "project/stage125/part4_revenue_growth_exclusion_revision_decision_stage125.json",
+    "project/stage125/README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md",
     "project/stage125/stage125_part4_statistical_analysis_plan_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part4.json",
 )
@@ -581,6 +583,7 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "part3b_completed",
         "part3c_leakage_safe_finalization_completed",
         "part4_statistical_analysis_plan_locked",
+        "contract_version",
         "network_extraction_performed",
         "modeling_started",
     ),

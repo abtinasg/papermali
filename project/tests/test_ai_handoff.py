@@ -1356,6 +1356,8 @@ def test_stage125_part3b0_generated_files_are_artifact_only(path):
     "project/stage125/part4_hyperparameter_budget_stage125.json",
     "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
     "project/stage125/part4_shap_stability_contract_stage125.json",
+    "project/stage125/part4_revenue_growth_exclusion_revision_decision_stage125.json",
+    "project/stage125/README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md",
     "project/stage125/stage125_part4_statistical_analysis_plan_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part4.json",
 ])
@@ -1655,6 +1657,7 @@ def test_extract_qc_workflow_markers_part4_scope():
         "part3b_completed": False,
         "part3c_leakage_safe_finalization_completed": True,
         "part4_statistical_analysis_plan_locked": True,
+        "contract_version": "stage125_part4_sap_v2",
         "network_extraction_performed": True,
         "modeling_started": False,
     }
@@ -1663,6 +1666,7 @@ def test_extract_qc_workflow_markers_part4_scope():
     assert got["part3c_leakage_safe_finalization_completed"] is True
     assert got["modeling_started"] is False
     assert got["active_availability_lag_months"] == 4
+    assert got["contract_version"] == "stage125_part4_sap_v2"
 
 
 def test_qc_source_test_override_part4():
