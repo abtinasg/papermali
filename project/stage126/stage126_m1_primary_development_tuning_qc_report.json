@@ -5,7 +5,7 @@
   "assertions": [
     {
       "assertion": "baseline_commit_verified",
-      "detail": "7963e21922065a5e4690cc5897632c17ef97da1c",
+      "detail": "1e5019883ad31ec463c01d81e0908fc74893e769",
       "status": "PASS"
     },
     {
@@ -373,8 +373,8 @@
   },
   "shap_calls": 0,
   "smote_calls": 0,
-  "source_commit": "7963e21922065a5e4690cc5897632c17ef97da1c",
-  "source_file_sha256": "e959ac6c6d8bd6e039a3368f5b9bd9dcc1bf27d22bc4f51cc861cf3494c4e629",
+  "source_commit": "1e5019883ad31ec463c01d81e0908fc74893e769",
+  "source_file_sha256": "372f143ed23231c3f72a0d067f9af64fd18a56e87d08330e5493030448fbef21",
   "stage": "stage126_m1_financial_baseline",
   "stage125_completed": true,
   "stage126_authorized": true,
