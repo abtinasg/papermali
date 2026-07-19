@@ -1302,6 +1302,19 @@ def test_working_tree_check_requires_completely_empty(tmp_path):
     assert detail == "empty"
 
 
+@pytest.mark.real_working_tree
+def test_porcelain_parser_preserves_leading_space_status(tmp_path):
+    """First porcelain line often starts with a space; must not lose path[0]."""
+    repo = _init_temp_repo(tmp_path)
+    (repo / "tracked.txt").write_text("mutated-again\n", encoding="utf-8")
+    lines = m.git_status_porcelain(repo)
+    assert lines, "expected dirty status"
+    assert lines[0].startswith(" "), lines[0]
+    paths = m.parse_porcelain_paths(lines)
+    assert "tracked.txt" in paths
+    assert all(not p.startswith("racked") for p in paths)
+
+
 # --------------------------------------------------------------------------- #
 # M3 nonpermanent not-admitted wording
 # --------------------------------------------------------------------------- #

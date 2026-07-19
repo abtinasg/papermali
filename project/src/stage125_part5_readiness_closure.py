@@ -956,11 +956,25 @@ AUTHORIZED_PART5_GENERATED_PATHS = frozenset(
 
 
 def git_status_porcelain(repo_root: Path) -> list[str]:
-    """Read-only working-tree status via the exact allowed git status form."""
-    raw = _git(
-        repo_root, "status", "--porcelain=v1", "--untracked-files=all",
+    """Read-only working-tree status via the exact allowed git status form.
+
+    Must not strip leading spaces from the full stdout: porcelain v1 lines use
+    a fixed 2-char XY status plus a space, and stripping the blob would corrupt
+    the first path (e.g. `` M path`` → ``M path`` → ``ath``).
+    """
+    proc = subprocess.run(
+        [
+            "git", "-C", str(repo_root),
+            "status", "--porcelain=v1", "--untracked-files=all",
+        ],
+        capture_output=True, text=True,
     )
-    return [line for line in raw.splitlines() if line.strip()]
+    if proc.returncode != 0:
+        raise QCFail(
+            f"git status --porcelain=v1 --untracked-files=all failed: "
+            f"{proc.stderr.strip()}"
+        )
+    return [line for line in proc.stdout.splitlines() if line.strip()]
 
 
 def parse_porcelain_paths(lines: list[str]) -> list[str]:
