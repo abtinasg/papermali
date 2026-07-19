@@ -1202,11 +1202,26 @@ READINESS_SURFACE_NAMES = (
 
 
 def _readme_reports_ready(readme_text: str) -> bool | None:
-    has_ready = CLOSURE_OUTCOME_READY in readme_text
+    """Reduce the README to a single ready / not-ready / ambiguous state.
+
+    Validates BOTH readiness statements the README carries — the
+    ``closure_outcome`` and the entry-contract ``entry_readiness`` — so a
+    README can never look ready on one statement while not-ready on the other.
+
+    Ready  => contains CLOSURE_OUTCOME_READY and ENTRY_READINESS_READY, and does
+              NOT contain NOT_READY_WITH_BLOCKERS.
+    Failed => contains NOT_READY_WITH_BLOCKERS, and contains NEITHER READY
+              string.
+    Anything else (mixed / ambiguous) => None (fail-closed).
+    """
+    has_closure_ready = CLOSURE_OUTCOME_READY in readme_text
+    has_entry_ready = ENTRY_READINESS_READY in readme_text
+    # CLOSURE_OUTCOME_NOT_READY and ENTRY_READINESS_NOT_READY are the same
+    # "NOT_READY_WITH_BLOCKERS" token, so one membership test covers both.
     has_not_ready = CLOSURE_OUTCOME_NOT_READY in readme_text
-    if has_ready and not has_not_ready:
+    if has_closure_ready and has_entry_ready and not has_not_ready:
         return True
-    if has_not_ready and not has_ready:
+    if has_not_ready and not has_closure_ready and not has_entry_ready:
         return False
     return None  # ambiguous / contradictory README
 
@@ -1798,9 +1813,25 @@ def build_closure_report(
 # README
 # --------------------------------------------------------------------------- #
 
-def build_readme(*, closure_outcome: str) -> str:
+def entry_readiness_for(ready: bool) -> str:
+    """Map a final-Gate readiness bool to the entry-readiness statement."""
+    return ENTRY_READINESS_READY if ready else ENTRY_READINESS_NOT_READY
+
+
+def build_readme(*, closure_outcome: str, entry_readiness: str) -> str:
+    """Render the Part 5 README with BOTH readiness statements derived.
+
+    ``closure_outcome`` and ``entry_readiness`` must both be supplied from the
+    same final Gate 125.0 result. Each is validated against its known
+    vocabulary; a failed Gate therefore cannot leave either the closure outcome
+    or the entry-readiness statement in a READY form. Cross-statement
+    consistency is independently enforced by ``_readme_reports_ready`` and the
+    cross-artifact readiness validator.
+    """
     if closure_outcome not in {CLOSURE_OUTCOME_READY, CLOSURE_OUTCOME_NOT_READY}:
         raise QCFail(f"invalid closure_outcome for README: {closure_outcome}")
+    if entry_readiness not in {ENTRY_READINESS_READY, ENTRY_READINESS_NOT_READY}:
+        raise QCFail(f"invalid entry_readiness for README: {entry_readiness}")
     return f"""# Stage125 Part 5 — Readiness Closure
 
 **Status:** Stage125 closure / readiness report only. No modeling.
@@ -1818,7 +1849,7 @@ Part 5 closes Stage125 research-design readiness:
 - a blocker register recording every known incomplete/deferred item and
   confirming none blocks Stage125 closure or Stage126 M1 entry
 - an explicit Stage126 M1 entry contract:
-  `entry_readiness = READY_FOR_HUMAN_AUTHORIZATION_DECISION`, while
+  `entry_readiness = {entry_readiness}`, while
   `stage126_authorized`, `stage126_started`, `modeling_authorized`, and
   `modeling_started` all remain `false`
 - an artifact-integrity manifest pinning all frozen Part 3C inputs and Part 4
@@ -2027,7 +2058,10 @@ def build_all(
 
     # Step 3: derive provisional closure flags from the core Gate result.
     flags = derive_closure_flags(provisional_pass)
-    readme_text = build_readme(closure_outcome=flags["closure_outcome"])
+    readme_text = build_readme(
+        closure_outcome=flags["closure_outcome"],
+        entry_readiness=entry_readiness_for(flags["stage126_m1_entry_ready"]),
+    )
 
     # Steps 4-5: validate actual Handoff + documents, then derive the complete
     # final Gate result.
@@ -2041,7 +2075,12 @@ def build_all(
     final_pass = all(dim["pass"] for dim in gate.values())
     if final_pass != provisional_pass:
         flags = derive_closure_flags(final_pass)
-        readme_text = build_readme(closure_outcome=flags["closure_outcome"])
+        readme_text = build_readme(
+            closure_outcome=flags["closure_outcome"],
+            entry_readiness=entry_readiness_for(
+                flags["stage126_m1_entry_ready"],
+            ),
+        )
         gate = build_gate_125_0(
             **gate_kwargs,
             readme_text=readme_text,
@@ -2066,8 +2105,12 @@ def build_all(
         entry_contract=entry_contract,
         gate=gate,
     )
+    # Both README readiness statements derive from the SAME final Gate result:
+    # closure_outcome from the closure report, entry_readiness from the final
+    # entry contract (itself built from final_gate_pass).
     readme_text = build_readme(
         closure_outcome=closure_report["closure_outcome"],
+        entry_readiness=entry_contract["entry_readiness"],
     )
 
     # Step 8: revalidate cross-artifact readiness consistency across the

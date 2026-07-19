@@ -1102,7 +1102,11 @@ def _failed_gate_surfaces(extras, dim_name: str):
     )
     flags = m.derive_closure_flags(closure["all_gate_pass"])
     markers = m._static_qc_markers(flags)  # handoff + metadata markers
-    readme_text = m.build_readme(closure_outcome=closure["closure_outcome"])
+    # Both README readiness statements derive from the SAME final Gate result.
+    readme_text = m.build_readme(
+        closure_outcome=closure["closure_outcome"],
+        entry_readiness=entry_contract["entry_readiness"],
+    )
     return closure, entry_contract, markers, readme_text
 
 
@@ -1142,9 +1146,13 @@ def test_gate_dimension_failure_produces_not_ready(dim_name):
     assert markers["stage126_m1_entry_ready"] is False
     # Metadata markers (same derived marker source as Handoff/metadata).
     assert markers["stage125_part5_readiness_closure_completed"] is False
-    # README.
+    # README: contains NOT_READY_WITH_BLOCKERS and NEITHER READY string, and
+    # carries no READY entry-readiness statement.
     assert m.CLOSURE_OUTCOME_NOT_READY in readme_text
     assert m.CLOSURE_OUTCOME_READY not in readme_text
+    assert m.ENTRY_READINESS_READY not in readme_text
+    assert f"entry_readiness = {m.ENTRY_READINESS_NOT_READY}" in readme_text
+    assert m._readme_reports_ready(readme_text) is False
     # No surface may hold the ready outcome on a failed Gate.
     ok, detail = m.validate_readiness_surface_consistency(
         final_gate_pass=False,
@@ -1192,7 +1200,10 @@ def test_readiness_surface_consistency_all_not_ready_agree():
         "stage125_gate_125_0": "FAIL",
     }
     entry = m.build_stage126_m1_entry_contract(entry_ready=False)
-    readme = m.build_readme(closure_outcome=m.CLOSURE_OUTCOME_NOT_READY)
+    readme = m.build_readme(
+        closure_outcome=m.CLOSURE_OUTCOME_NOT_READY,
+        entry_readiness=m.ENTRY_READINESS_NOT_READY,
+    )
     ok, detail = m.validate_readiness_surface_consistency(
         final_gate_pass=False,
         closure_report=not_ready_closure,
@@ -1200,6 +1211,89 @@ def test_readiness_surface_consistency_all_not_ready_agree():
         readme_text=readme,
     )
     assert ok is True, detail
+
+
+# --------------------------------------------------------------------------- #
+# README readiness is derived from both closure_outcome and entry_readiness
+# --------------------------------------------------------------------------- #
+
+def test_build_readme_requires_entry_readiness_argument():
+    with pytest.raises(TypeError):
+        m.build_readme(closure_outcome=m.CLOSURE_OUTCOME_READY)
+
+
+def test_build_readme_rejects_unknown_entry_readiness():
+    with pytest.raises(m.QCFail, match="invalid entry_readiness"):
+        m.build_readme(
+            closure_outcome=m.CLOSURE_OUTCOME_READY,
+            entry_readiness="SOMETHING_ELSE",
+        )
+
+
+def test_readme_passing_gate_both_statements_ready():
+    readme = m.build_readme(
+        closure_outcome=m.CLOSURE_OUTCOME_READY,
+        entry_readiness=m.ENTRY_READINESS_READY,
+    )
+    assert m.CLOSURE_OUTCOME_READY in readme
+    assert m.ENTRY_READINESS_READY in readme
+    assert m.CLOSURE_OUTCOME_NOT_READY not in readme
+    assert f"closure_outcome = {m.CLOSURE_OUTCOME_READY}" in readme
+    assert f"entry_readiness = {m.ENTRY_READINESS_READY}" in readme
+    assert m._readme_reports_ready(readme) is True
+
+
+def test_readme_failing_gate_both_statements_not_ready():
+    readme = m.build_readme(
+        closure_outcome=m.CLOSURE_OUTCOME_NOT_READY,
+        entry_readiness=m.ENTRY_READINESS_NOT_READY,
+    )
+    assert m.CLOSURE_OUTCOME_NOT_READY in readme
+    assert m.CLOSURE_OUTCOME_READY not in readme
+    assert m.ENTRY_READINESS_READY not in readme
+    assert f"closure_outcome = {m.CLOSURE_OUTCOME_NOT_READY}" in readme
+    assert f"entry_readiness = {m.ENTRY_READINESS_NOT_READY}" in readme
+    assert m._readme_reports_ready(readme) is False
+
+
+def test_readme_reports_ready_rejects_mixed_states():
+    # closure_outcome NOT_READY but entry_readiness READY => ambiguous => None.
+    mixed = m.build_readme(
+        closure_outcome=m.CLOSURE_OUTCOME_NOT_READY,
+        entry_readiness=m.ENTRY_READINESS_READY,
+    )
+    assert m.ENTRY_READINESS_READY in mixed
+    assert m.CLOSURE_OUTCOME_NOT_READY in mixed
+    assert m._readme_reports_ready(mixed) is None
+    # The reverse mix (ready closure, not-ready entry) is also ambiguous.
+    mixed2 = m.build_readme(
+        closure_outcome=m.CLOSURE_OUTCOME_READY,
+        entry_readiness=m.ENTRY_READINESS_NOT_READY,
+    )
+    assert m._readme_reports_ready(mixed2) is None
+
+
+def test_cross_artifact_validator_fails_on_mixed_readme():
+    # A README stating closure_outcome=NOT_READY_WITH_BLOCKERS but
+    # entry_readiness=READY_FOR_HUMAN_AUTHORIZATION_DECISION is a fail-closed
+    # cross-artifact inconsistency for a failed Gate.
+    mixed_readme = m.build_readme(
+        closure_outcome=m.CLOSURE_OUTCOME_NOT_READY,
+        entry_readiness=m.ENTRY_READINESS_READY,
+    )
+    assert m.CLOSURE_OUTCOME_NOT_READY in mixed_readme
+    assert m.ENTRY_READINESS_READY in mixed_readme
+    ok, detail = m.validate_readiness_surface_consistency(
+        final_gate_pass=False,
+        readme_text=mixed_readme,
+    )
+    assert ok is False, detail
+    # And it must not pass as ready either.
+    ok_ready, _ = m.validate_readiness_surface_consistency(
+        final_gate_pass=True,
+        readme_text=mixed_readme,
+    )
+    assert ok_ready is False
 
 
 def test_derive_closure_flags_ready_and_not_ready():
@@ -1450,7 +1544,10 @@ def test_m3_not_permanently_eliminated_wording():
     kd = {r["item_id"]: r for r in m.build_keep_drop_rows()}
     notes = kd["BLOCK_M3_MACRO"]["notes"]
     assert "not permanently eliminated" in notes
-    readme = m.build_readme(closure_outcome=m.CLOSURE_OUTCOME_READY)
+    readme = m.build_readme(
+        closure_outcome=m.CLOSURE_OUTCOME_READY,
+        entry_readiness=m.ENTRY_READINESS_READY,
+    )
     assert "not admitted on the current active path" in readme
     assert "permanently eliminated" in readme
     assert "M3 is **not** permanently eliminated" in readme
