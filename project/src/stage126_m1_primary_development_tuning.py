@@ -228,9 +228,9 @@ FROZEN_PART5_OUTPUTS: dict[str, str] = {
     "project/stage125/part5_stage126_m1_entry_contract_stage125.json":
         "74a2159785daeda44fa82ebd76f42870fa25aba3667846bccba6b3099ea65da5",
     "project/stage125/part5_readiness_closure_report_stage125.json":
-        "1777a4c80ea8300e607e0ac289092710feb65dd2f10258da1bf7986d57b066f7",
+        "c6c47bfbf45e924e49797512180a04b560f764d11f95445907759e8587933cde",
     "project/stage125/stage125_part5_readiness_closure_qc_report.json":
-        "3c7d8db9b5840a23c75d8cda7a7f132ccfbc3db4bea4ea0ecc7202c6377738ab",
+        "e4d0f063b5acedafcc1942db7ab04d4a1cf14750dc4b4833e58aa1e62d47b651",
 }
 
 # --------------------------------------------------------------------------- #

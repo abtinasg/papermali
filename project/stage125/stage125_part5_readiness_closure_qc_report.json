@@ -232,7 +232,7 @@
     },
     {
       "assertion": "cross_artifact_readiness_consistency",
-      "detail": "all_3_readiness_surfaces_consistent_ready",
+      "detail": "all_4_readiness_surfaces_consistent_ready",
       "status": "PASS"
     },
     {
@@ -355,7 +355,7 @@
     "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv": "d2d9893e40b0c3bdf876a7447fc5147985fc25c9c5add07264677f6ed817b72c"
   },
   "frozen_part4_output_sha256": {
-    "project/src/stage125_part4_statistical_analysis_plan.py": "aa65779fb8566dd41c6710a3c5ef1823c14f36876b9edc255af04504ee0c5bef",
+    "project/src/stage125_part4_statistical_analysis_plan.py": "3b75764d9c2d9c2f259ed8d01dcbee8d8cb621440e18b97bca636ff8690a2d7b",
     "project/stage125/README_STAGE125_PART4_REVENUE_GROWTH_EXCLUSION_REVISION.md": "e656fdf915f7dff89173b99c14c23a73f1f6664777b12e75c98e57ef388a65e8",
     "project/stage125/README_STAGE125_PART4_STATISTICAL_ANALYSIS_PLAN.md": "b9d8a5354967e9c5dae863fd240cbca145fbc358c50c81967fa866b8babb01ac",
     "project/stage125/part4_development_feature_coverage_audit_stage125.csv": "7c18da23265d1c544bd397686518cbc064f14f6deba45ecf1af8d55c21126703",
@@ -372,7 +372,7 @@
     "project/stage125/part4_statistical_analysis_plan_stage125.json": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
     "project/stage125/part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
     "project/stage125/part4_temporal_split_manifest_stage125.csv": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc",
-    "project/stage125/stage125_part4_statistical_analysis_plan_qc_report.json": "305f634db7931e3c0d0aad3813ac9fb88b9d686cebbeb4202d545ac6d056b869",
+    "project/stage125/stage125_part4_statistical_analysis_plan_qc_report.json": "c119932134482304500f4b90d625f015245f1818113db83c82fac1cf8072a939",
     "project/tests/test_stage125_part4_statistical_analysis_plan.py": "f78aae6e8e52f838a6da3106fa55b6a2a36fd0665877f6f4e3965902c344ced3"
   },
   "gate_125_0": {
@@ -477,7 +477,7 @@
       "pass": true
     },
     "valid_handoff": {
-      "detail": "stage126_development_authorized_handoff_advanced",
+      "detail": "actual_stage126_successor_handoff_matches_authorized_transition",
       "pass": true
     },
     "working_tree_clean": {
@@ -498,10 +498,10 @@
   "network_requests_attempted": 0,
   "output_sha256": {
     "README_STAGE125_PART5_READINESS_CLOSURE.md": "a18932b695213fe64fbd1851def9c67bf8dbdc831fc2773914b1801040b6d405",
-    "part5_artifact_integrity_manifest_stage125.csv": "bb70353c888a8f0e30704e1938309cc5b53d1b4639d8e6f256128db3e224aab6",
+    "part5_artifact_integrity_manifest_stage125.csv": "1650689ffea51d78d896870ff96b9a5ca7cdebb0d22125bef269dfb76432ee56",
     "part5_blocker_register_stage125.csv": "32e679ed513fcbdebf114bf88225a9251fb4793648655d7f044347fdf54a35d3",
     "part5_keep_drop_decisions_stage125.csv": "bacb202cc3404b512e71740ed6c71bfaee8a0201fb941388e0a06f484323c718",
-    "part5_readiness_closure_report_stage125.json": "1777a4c80ea8300e607e0ac289092710feb65dd2f10258da1bf7986d57b066f7",
+    "part5_readiness_closure_report_stage125.json": "c6c47bfbf45e924e49797512180a04b560f764d11f95445907759e8587933cde",
     "part5_stage126_m1_entry_contract_stage125.json": "74a2159785daeda44fa82ebd76f42870fa25aba3667846bccba6b3099ea65da5"
   },
   "pair_level_evidence_collected": true,
@@ -530,8 +530,8 @@
   "row_level_publish_datetime_collection_required": false,
   "shap_calls": 0,
   "six_month_lag_superseded": true,
-  "source_commit": "23f60f031cb887e79d66940239728d2de54266e6",
-  "source_file_sha256": "95960d99e762c4e53f0f11505c477688a5efe4727f182e35d794ae664cc975c8",
+  "source_commit": "6f05be655dfc66e780085f8bfce10f10d0b2c46d",
+  "source_file_sha256": "cb61ea7c99b53f1988c22f5eac0af66af9cd9e46657a48bf66ccb198d654d41c",
   "stage": "stage125_part5_readiness_closure",
   "stage125_completed": true,
   "stage125_gate_125_0": "PASS",
@@ -539,7 +539,7 @@
   "stage126_authorized": false,
   "stage126_m1_entry_ready": true,
   "stage126_started": false,
-  "test_file_sha256": "879abc70988744daa0b491630bcba53386626f33336f02244195c4aaded89953",
+  "test_file_sha256": "0a117c1916ad845653e148d951a49a2c0375d13b7de23019e50ae891aee1b437",
   "ticker_count": 0,
   "tickers": []
 }
