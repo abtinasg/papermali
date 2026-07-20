@@ -975,9 +975,7 @@ _QC_SOURCE_TEST_OVERRIDES: dict[str, tuple[str, str]] = {
         "project/tests/test_stage125_part5_readiness_closure.py",
     ),
     "stage126_m1_financial_baseline": (
-        "project/src/stage126_authorization_transition_guard.py",
         "project/src/stage126_m1_primary_development_tuning.py",
-        "project/tests/test_stage126_authorization_transition_guard.py",
         "project/tests/test_stage126_m1_primary_development_tuning.py",
     ),
 }
