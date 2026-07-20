@@ -59,17 +59,17 @@
       "status": "PASS"
     },
     {
-      "assertion": "part3c_hashes_unchanged",
+      "assertion": "part3c_scientific_hashes_unchanged",
       "detail": "",
       "status": "PASS"
     },
     {
-      "assertion": "part4_hashes_unchanged",
+      "assertion": "part4_scientific_contract_hashes_unchanged_and_transition_pins_match",
       "detail": "",
       "status": "PASS"
     },
     {
-      "assertion": "part5_hashes_unchanged",
+      "assertion": "part5_entry_contract_unchanged_and_authorized_transition_hashes_match",
       "detail": "",
       "status": "PASS"
     },
@@ -357,7 +357,7 @@
     "README_STAGE126_M1_PRIMARY_DEVELOPMENT_TUNING.md": "d3a67cab445fe4344abfd50e07d42febc0053a1d08154916fc76cd53b53b2cf6",
     "stage126_m1_configuration_registry.csv": "decbf43a5c34669bdd7a0c68c0ad6aec5611efc7c3ca82b09f5e85f72d635804",
     "stage126_m1_development_access_manifest.csv": "0c2783d0e43ebba712a1c41b6889a2f8f646340bae6a75ad15902a8a0c368e39",
-    "stage126_m1_development_metrics.csv": "178c2a398268e6d62011555b17c47ebd4800330c28f13b22925a8a0eef335c38",
+    "stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
     "stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
     "stage126_m1_final_test_lock_guard.json": "509e58fc39e3c5d886993c11b954fc06c267c96d02c081d8e50b0cda52e58b03",
     "stage126_m1_human_authorization_record.json": "aa7b3ee285173374701b4e0a183e3e3d8417820ec9e7bdbae49af6b844a610a2",
@@ -373,14 +373,14 @@
   },
   "shap_calls": 0,
   "smote_calls": 0,
-  "source_commit": "052d1dab360d18d349a8ffb8358b4e78d8ed6503",
-  "source_file_sha256": "02a2ed3d6d2458313ad8eee6d0400752c9e841a12cf94af5b36c662c50ae87a2",
+  "source_commit": "9629c3841dec2b18a9ae6c9691dafea640006560",
+  "source_file_sha256": "08c2e77b5d15a5467bbf2a8f18f033c89704bd787cd5bf44cb6a1fdfa5a82bd9",
   "stage": "stage126_m1_financial_baseline",
   "stage125_completed": true,
   "stage126_authorized": true,
   "stage126_m1_entry_ready": true,
   "stage126_started": true,
-  "test_file_sha256": "6d13340ac66934988d41ce5a2ee7416b38fd23b1866aeccc486413e728a51f72",
+  "test_file_sha256": "a5672abef7b715a8aa73bdcb74159bd460f8092f9a3857864aa548bc1196bfec",
   "ticker_count": 0,
   "tickers": []
 }

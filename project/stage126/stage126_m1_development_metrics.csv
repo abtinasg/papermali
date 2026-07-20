@@ -1,10 +1,10 @@
 model_family,configuration_id,scope,n_rows,n_positive,k_top10,pr_auc,roc_auc,brier_score,recall_at_10pct,lift_at_10pct
-regularized_logistic_regression,logistic__C_0.1,fold1_validation,205,25,21,0.484040818257,0.880222222222,0.167737099569,0.44,4.295238095238
+regularized_logistic_regression,logistic__C_0.1,fold1_validation,205,25,22,0.484040818257,0.880222222222,0.167737099569,0.44,4.1
 regularized_logistic_regression,logistic__C_0.1,fold2_validation,216,10,22,0.44052213868,0.881553398058,0.137572562053,0.5,4.909090909091
-regularized_logistic_regression,logistic__C_0.1,pooled_development_oof,421,35,43,0.445756964048,0.882457438934,0.15226075728,0.485714285714,4.755481727575
-random_forest,rf__depth_3__maxfeat_'sqrt'__leaf_10,fold1_validation,205,25,21,0.486027245902,0.838888888889,0.144081827119,0.4,3.904761904762
+regularized_logistic_regression,logistic__C_0.1,pooled_development_oof,421,35,44,0.445756964048,0.882457438934,0.15226075728,0.457142857143,4.374025974026
+random_forest,rf__depth_3__maxfeat_'sqrt'__leaf_10,fold1_validation,205,25,22,0.486027245902,0.838888888889,0.144081827119,0.4,3.727272727273
 random_forest,rf__depth_3__maxfeat_'sqrt'__leaf_10,fold2_validation,216,10,22,0.339967293076,0.886893203883,0.113952642147,0.5,4.909090909091
-random_forest,rf__depth_3__maxfeat_'sqrt'__leaf_10,pooled_development_oof,421,35,43,0.40244183002,0.861954108068,0.128623622953,0.485714285714,4.755481727575
-xgboost,xgboost__lr_0.03__depth_2__mcw_1__lambda_1,fold1_validation,205,25,21,0.457454011864,0.829333333333,0.108530738978,0.4,3.904761904762
+random_forest,rf__depth_3__maxfeat_'sqrt'__leaf_10,pooled_development_oof,421,35,44,0.40244183002,0.861954108068,0.128623622953,0.428571428571,4.100649350649
+xgboost,xgboost__lr_0.03__depth_2__mcw_1__lambda_1,fold1_validation,205,25,22,0.457454011864,0.829333333333,0.108530738978,0.44,4.1
 xgboost,xgboost__lr_0.03__depth_2__mcw_1__lambda_1,fold2_validation,216,10,22,0.340958587436,0.867475728155,0.096706837349,0.5,4.909090909091
-xgboost,xgboost__lr_0.03__depth_2__mcw_1__lambda_1,pooled_development_oof,421,35,43,0.356545008162,0.841524796447,0.10246431914,0.4,3.916279069767
+xgboost,xgboost__lr_0.03__depth_2__mcw_1__lambda_1,pooled_development_oof,421,35,44,0.356545008162,0.841524796447,0.10246431914,0.457142857143,4.374025974026
