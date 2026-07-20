@@ -340,43 +340,24 @@ FORBIDDEN_SURFACE_EXACT = (
     "project/stage126",
 )
 
-# Stage126 M1 development modeling is gated behind an explicit, signed human
-# authorization record. Until that record is present and valid, the entire
-# ``project/stage126/`` surface is forbidden. Once the human supervisor/data
-# owner authorizes Stage126 M1 (development only; final test still locked), the
-# directory surface becomes permitted so the authorized development-fold work
-# can live alongside the frozen Part 4 plan. The two legacy Stage126 filenames
-# below remain forbidden regardless, because they were never the sanctioned
-# entry points.
+# Stage126 M1 development modeling is gated behind the shared exact
+# authorization transition guard. Until that record is present and fully
+# validated (Persian text byte-for-byte + recomputed SHA-256 + required flags),
+# the entire ``project/stage126/`` surface is forbidden. The two legacy Stage126
+# filenames below remain forbidden regardless.
+from src import stage126_authorization_transition_guard as _stage126_auth
+
 STAGE126_M1_AUTHORIZATION_RECORD_REL = (
-    "project/stage126/stage126_m1_human_authorization_record.json"
+    _stage126_auth.AUTHORIZATION_RECORD_REL
 )
 STAGE126_M1_AUTHORIZATION_TEXT_SHA256 = (
-    "eeba72fe612b292fb611729676eef0a1d7e4b0c1e5fc9d8b533d62d8dcf41a50"
+    _stage126_auth.AUTHORIZATION_TEXT_SHA256
 )
 
 
 def stage126_m1_development_authorized(repo_root: Path) -> bool:
-    """True iff a valid, signed Stage126 M1 development authorization exists.
-
-    Fail-closed: any missing/malformed record, a mutated authorization text
-    hash, or an unlocked final test yields ``False`` (surface stays forbidden).
-    """
-    record = repo_root / STAGE126_M1_AUTHORIZATION_RECORD_REL
-    if not record.is_file():
-        return False
-    try:
-        data = json.loads(record.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return False
-    return (
-        data.get("stage126_authorized") is True
-        and data.get("development_modeling_authorized") is True
-        and data.get("final_test_unlocked") is False
-        and data.get("final_test_access_authorized") is False
-        and data.get("authorization_text_sha256")
-        == STAGE126_M1_AUTHORIZATION_TEXT_SHA256
-    )
+    """Delegate to the shared Stage126 authorization transition guard."""
+    return _stage126_auth.stage126_m1_development_authorized(repo_root)
 
 
 def effective_forbidden_surfaces(repo_root: Path) -> tuple[str, ...]:

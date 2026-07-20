@@ -131,6 +131,47 @@ def test_final_test_access_authorized_true_fails():
         m1.assert_authorization({**rec, "final_test_access_authorized": True})
 
 
+def test_final_test_evaluation_authorized_true_fails():
+    rec = m1.build_authorization_record()
+    with pytest.raises(m1.FinalTestLockError):
+        m1.assert_authorization({**rec, "final_test_evaluation_authorized": True})
+
+
+def test_contract_change_authorized_true_fails():
+    rec = m1.build_authorization_record()
+    with pytest.raises(m1.AuthorizationError):
+        m1.assert_authorization({**rec, "contract_change_authorized": True})
+
+
+def test_m2_m3_m4_authorized_true_fails():
+    rec = m1.build_authorization_record()
+    with pytest.raises(m1.AuthorizationError):
+        m1.assert_authorization({**rec, "m2_m3_m4_authorized": True})
+
+
+def test_wrong_authorization_id_fails():
+    rec = m1.build_authorization_record()
+    with pytest.raises(m1.AuthorizationError):
+        m1.assert_authorization({**rec, "authorization_id": "wrong"})
+
+
+def test_wrong_research_action_id_fails():
+    rec = m1.build_authorization_record()
+    with pytest.raises(m1.AuthorizationError):
+        m1.assert_authorization({**rec, "research_action_id": "wrong"})
+
+
+def test_correct_hash_field_with_mutated_persian_text_fails():
+    rec = m1.build_authorization_record()
+    mutated = {
+        **rec,
+        "authorization_text_fa": rec["authorization_text_fa"] + " ",
+        "authorization_text_sha256": m1.AUTHORIZATION_TEXT_SHA256,
+    }
+    with pytest.raises(m1.AuthorizationError):
+        m1.assert_authorization(mutated)
+
+
 # --------------------------------------------------------------------------- #
 # 2. Baseline + frozen upstream
 # --------------------------------------------------------------------------- #
@@ -641,7 +682,72 @@ def test_qc_handoff_markers():
 
 
 # --------------------------------------------------------------------------- #
-# 11. Full deterministic integration (refits models; verifies zero drift)
+# 11. Per-target-year Top-K (Recall@10% / Lift@10%)
+# --------------------------------------------------------------------------- #
+
+def test_per_year_topk_differs_from_global_topk_and_uses_per_year_result():
+    """Synthetic case where global Top-K and per-year Top-K disagree.
+
+    Year A (N=10): one positive with mid probability — global K would steal a
+    slot from year B; per-year K_A=1 and K_B=1 isolate ranking by year.
+    """
+    import numpy as np
+
+    # 10 rows in year 1396, 10 rows in year 1397.
+    tickers = [f"T{i:02d}" for i in range(20)]
+    years = [1396] * 10 + [1397] * 10
+    y = np.array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0] + [1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    # Global ranking by probability alone would pick both year-1396 high scores
+    # (0.99 and 0.95) into the global top-2 of 20 (K=2), missing the year-1397
+    # positive at 0.40. Per-year K_y=1 each captures both positives.
+    p = np.array(
+        [0.99, 0.95, 0.10, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03]
+        + [0.40, 0.20, 0.19, 0.18, 0.17, 0.16, 0.15, 0.14, 0.13, 0.12]
+    )
+    per_year = m1.compute_metrics(y, p, tickers, years)
+    assert per_year["k_top10"] == 2  # ceil(0.1*10)+ceil(0.1*10)
+    assert per_year["recall_at_10pct"] == 1.0
+    # precision = 2/2 = 1.0; prevalence = 2/20 = 0.1 → Lift = 10
+    assert abs(per_year["lift_at_10pct"] - 10.0) < 1e-9
+
+    # Global Top-K (forbidden) for contrast: K=ceil(0.1*20)=2 → only year-1396.
+    order = sorted(range(20), key=lambda i: (-p[i], tickers[i]))
+    global_top = order[:2]
+    global_captured = sum(1 for i in global_top if y[i] == 1)
+    assert global_captured == 1
+    assert global_captured != int(round(per_year["recall_at_10pct"] * 2))
+
+
+def test_topk_ranking_is_isolated_by_target_year():
+    import numpy as np
+
+    # Cross-year probability inversion: year 1398's best score is lower than
+    # year 1399's worst, but each year still selects its own top ceil(0.1*N_y).
+    tickers = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"] * 2
+    years = [1398] * 10 + [1399] * 10
+    y = np.array([1] + [0] * 9 + [1] + [0] * 9)
+    p = np.array([0.30] + [0.01] * 9 + [0.90] + [0.80] * 9)
+    m = m1.compute_metrics(y, p, tickers, years)
+    assert m["k_top10"] == 2
+    # Both year-local positives must be captured despite cross-year rank order.
+    assert m["recall_at_10pct"] == 1.0
+
+
+def test_topk_ticker_tiebreak_within_year():
+    import numpy as np
+
+    tickers = ["B", "A", "C", "D", "E", "F", "G", "H", "I", "J"]
+    years = [1396] * 10
+    y = np.array([1, 1, 0, 0, 0, 0, 0, 0, 0, 0])
+    p = np.array([0.5, 0.5, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1])
+    m = m1.compute_metrics(y, p, tickers, years)
+    # K_y=1; ticker ascending prefers "A" (index 1) over "B" (index 0).
+    assert m["k_top10"] == 1
+    assert m["recall_at_10pct"] == 0.5
+
+
+# --------------------------------------------------------------------------- #
+# 12. Full deterministic integration (refits models; verifies zero drift)
 # --------------------------------------------------------------------------- #
 
 @pytest.mark.skipif(
@@ -657,7 +763,7 @@ def test_full_run_check_is_deterministic_and_clean():
 
 
 # --------------------------------------------------------------------------- #
-# 12. Runtime version recording (§16)
+# 13. Runtime version recording (§16)
 # --------------------------------------------------------------------------- #
 
 def test_runtime_versions_helper_records_required_packages():

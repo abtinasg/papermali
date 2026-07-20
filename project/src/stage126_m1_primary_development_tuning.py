@@ -36,6 +36,7 @@ import numpy as np
 
 from src import stage125_part3b0_evidence_readiness as p3b0
 from src import stage125_part5_readiness_closure as part5
+from src import stage126_authorization_transition_guard as auth_guard
 
 # --------------------------------------------------------------------------- #
 # Identity / baseline
@@ -75,18 +76,13 @@ TEST_REL = "project/tests/test_stage126_m1_primary_development_tuning.py"
 RUN_REL = "project/run_stage126_m1_primary_development_tuning.py"
 
 # --------------------------------------------------------------------------- #
-# Human authorization (byte-for-byte)
+# Human authorization (byte-for-byte) — shared transition guard
 # --------------------------------------------------------------------------- #
 
-AUTHORIZATION_TEXT_FA = (
-    "Stage126 M1 Financial Baseline را با قرارداد قفل\u200cشده Part 4 و Part 5 "
-    "مجاز می\u200cکنم؛ final test همچنان قفل بماند."
-)
-AUTHORIZATION_TEXT_SHA256 = (
-    "eeba72fe612b292fb611729676eef0a1d7e4b0c1e5fc9d8b533d62d8dcf41a50"
-)
-AUTHORIZATION_ID = "stage126_m1_financial_baseline_human_authorization_v1"
-AUTHORIZATION_DATE = "2026-07-19"
+AUTHORIZATION_TEXT_FA = auth_guard.AUTHORIZATION_TEXT_FA
+AUTHORIZATION_TEXT_SHA256 = auth_guard.AUTHORIZATION_TEXT_SHA256
+AUTHORIZATION_ID = auth_guard.AUTHORIZATION_ID
+AUTHORIZATION_DATE = auth_guard.AUTHORIZATION_DATE
 
 # --------------------------------------------------------------------------- #
 # Primary M1 specification (frozen)
@@ -425,49 +421,18 @@ def frozen_upstream_hashes(repo_root: Path) -> dict[str, str]:
 # --------------------------------------------------------------------------- #
 
 def build_authorization_record() -> dict[str, Any]:
-    digest = hashlib.sha256(AUTHORIZATION_TEXT_FA.encode("utf-8")).hexdigest()
-    if digest != AUTHORIZATION_TEXT_SHA256:
-        raise AuthorizationError(
-            f"authorization text hash mismatch: {digest} != "
-            f"{AUTHORIZATION_TEXT_SHA256}"
-        )
-    return {
-        "authorization_id": AUTHORIZATION_ID,
-        "authorization_date": AUTHORIZATION_DATE,
-        "authorizing_role": "human_supervisor_data_owner",
-        "authorization_text_fa": AUTHORIZATION_TEXT_FA,
-        "authorization_text_sha256": AUTHORIZATION_TEXT_SHA256,
-        "research_action_id": RESEARCH_ACTION_ID,
-        "stage126_authorized": True,
-        "development_modeling_authorized": True,
-        "final_test_unlocked": False,
-        "final_test_access_authorized": False,
-        "final_test_evaluation_authorized": False,
-        "contract_change_authorized": False,
-        "m2_m3_m4_authorized": False,
-    }
+    return auth_guard.build_authorization_record()
 
 
 def assert_authorization(record: dict[str, Any]) -> None:
-    if record.get("authorization_text_fa") != AUTHORIZATION_TEXT_FA:
-        raise AuthorizationError("authorization text mutated")
-    digest = hashlib.sha256(
-        record.get("authorization_text_fa", "").encode("utf-8")
-    ).hexdigest()
-    if digest != AUTHORIZATION_TEXT_SHA256:
-        raise AuthorizationError("authorization text hash mismatch")
-    if record.get("authorization_text_sha256") != AUTHORIZATION_TEXT_SHA256:
-        raise AuthorizationError("authorization hash field mutated")
-    if not record.get("stage126_authorized"):
-        raise AuthorizationError("stage126 not authorized")
-    if not record.get("development_modeling_authorized"):
-        raise AuthorizationError("development modeling not authorized")
-    if record.get("final_test_unlocked"):
-        raise FinalTestLockError("final_test_unlocked must be false")
-    if record.get("final_test_access_authorized"):
-        raise FinalTestLockError("final_test_access_authorized must be false")
-    if record.get("final_test_evaluation_authorized"):
-        raise FinalTestLockError("final_test_evaluation_authorized must be false")
+    """Validate via the shared exact authorization transition guard."""
+    try:
+        auth_guard.validate_authorization_record(record)
+    except auth_guard.AuthorizationError as exc:
+        msg = str(exc)
+        if "final_test" in msg:
+            raise FinalTestLockError(msg) from exc
+        raise AuthorizationError(msg) from exc
 
 
 # --------------------------------------------------------------------------- #
@@ -862,26 +827,56 @@ def _pr_auc(y: np.ndarray, p: np.ndarray) -> float:
 
 
 def compute_metrics(
-    y: np.ndarray, p: np.ndarray, tickers: list[str],
+    y: np.ndarray,
+    p: np.ndarray,
+    tickers: list[str],
+    target_years: list[int] | np.ndarray,
 ) -> dict[str, float]:
+    """Development metrics under the frozen Part 4 Top-K contract.
+
+    PR-AUC / ROC-AUC / Brier are computed over the complete reported scope.
+    Recall@10% and Lift@10% use the per-target-year rule:
+
+        For each target year y: K_y = ceil(0.10 × N_y)
+        Rank within year: predicted_probability desc, ticker asc tie-break
+        Recall@10% = sum_captured_positives / sum_total_positives
+        Lift@10%   = (sum_captured / sum_K_y) / overall_prevalence
+    """
     from sklearn.metrics import (
         average_precision_score, roc_auc_score, brier_score_loss,
     )
+    y = np.asarray(y)
+    p = np.asarray(p, dtype=float)
+    years = [int(t) for t in target_years]
+    if not (len(y) == len(p) == len(tickers) == len(years)):
+        raise QCFail(
+            "compute_metrics length mismatch among y/p/tickers/target_years"
+        )
     n = len(y)
     n_pos = int((y == 1).sum())
-    k = math.ceil(0.10 * n)
-    # deterministic ranking: probability desc, ticker asc tie-break
-    order = sorted(range(n), key=lambda i: (-p[i], tickers[i]))
-    top = order[:k]
-    pos_in_top = int(sum(1 for i in top if y[i] == 1))
-    recall_at_10 = (pos_in_top / n_pos) if n_pos > 0 else math.nan
+    captured = 0
+    k_sum = 0
+    # Isolate ranking by target year; never pool ranks across years.
+    for year in sorted(set(years)):
+        idxs = [i for i, yy in enumerate(years) if yy == year]
+        n_y = len(idxs)
+        k_y = math.ceil(0.10 * n_y) if n_y > 0 else 0
+        k_sum += k_y
+        order = sorted(idxs, key=lambda i: (-p[i], tickers[i]))
+        top = order[:k_y]
+        captured += int(sum(1 for i in top if y[i] == 1))
+    recall_at_10 = (captured / n_pos) if n_pos > 0 else math.nan
     base_rate = n_pos / n if n > 0 else math.nan
-    precision_top = (pos_in_top / k) if k > 0 else math.nan
-    lift_at_10 = (precision_top / base_rate) if base_rate not in (0, math.nan) else math.nan
+    precision_top = (captured / k_sum) if k_sum > 0 else math.nan
+    lift_at_10 = (
+        (precision_top / base_rate)
+        if base_rate not in (0, math.nan) and not math.isnan(base_rate)
+        else math.nan
+    )
     return {
         "n_rows": n,
         "n_positive": n_pos,
-        "k_top10": k,
+        "k_top10": k_sum,
         "pr_auc": _round(average_precision_score(y, p)),
         "roc_auc": _round(roc_auc_score(y, p)),
         "brier_score": _round(brier_score_loss(y, p)),
@@ -1057,13 +1052,15 @@ def compute_development_metrics(
         pooled_y: list[float] = []
         pooled_p: list[float] = []
         pooled_t: list[str] = []
+        pooled_years: list[int] = []
         for fspec in FOLD_SPEC.values():
             role = fspec["validation_role"]
             va = folds_data[role]
             y = va["y"]
             p = predictions[family][role]
             tickers = [m["ticker"] for m in va["meta"]]
-            m = compute_metrics(y, p, tickers)
+            years = [int(m["target_year"]) for m in va["meta"]]
+            m = compute_metrics(y, p, tickers, years)
             metrics_rows.append({
                 "model_family": family, "configuration_id": cid,
                 "scope": role, **m,
@@ -1071,8 +1068,9 @@ def compute_development_metrics(
             pooled_y.extend(y.tolist())
             pooled_p.extend(p.tolist())
             pooled_t.extend(tickers)
+            pooled_years.extend(years)
         m = compute_metrics(
-            np.array(pooled_y), np.array(pooled_p), pooled_t,
+            np.array(pooled_y), np.array(pooled_p), pooled_t, pooled_years,
         )
         metrics_rows.append({
             "model_family": family, "configuration_id": cid,
@@ -1540,13 +1538,24 @@ def build_qc_assertions(
             auth["contract_change_authorized"] is False)
     _assert(a, "m2_m3_m4_not_authorized", auth["m2_m3_m4_authorized"] is False)
 
-    # Frozen upstream integrity
-    _assert(a, "part3c_hashes_unchanged",
+    # Frozen upstream integrity (accurate transition wording — Part 4 / Part 5
+    # guard+QC sources changed under the authorization transition; scientific
+    # Part 3C artifacts and the Part 5 entry contract remain byte-identical to
+    # the merged Stage125 baseline).
+    _assert(a, "part3c_scientific_hashes_unchanged",
             all(extras["frozen"][r] == h for r, h in part5.FROZEN_PART3C_INPUTS.items()))
-    _assert(a, "part4_hashes_unchanged",
+    _assert(a, "part4_scientific_contract_hashes_unchanged_and_transition_pins_match",
             all(extras["frozen"][r] == h for r, h in part5.FROZEN_PART4_OUTPUTS.items()))
-    _assert(a, "part5_hashes_unchanged",
-            all(extras["frozen"][r] == h for r, h in FROZEN_PART5_OUTPUTS.items()))
+    entry_rel = (
+        "project/stage125/part5_stage126_m1_entry_contract_stage125.json"
+    )
+    _assert(
+        a, "part5_entry_contract_unchanged_and_authorized_transition_hashes_match",
+        extras["frozen"][entry_rel] == FROZEN_PART5_OUTPUTS[entry_rel]
+        and all(
+            extras["frozen"][r] == h for r, h in FROZEN_PART5_OUTPUTS.items()
+        ),
+    )
     _assert(a, "split_manifest_hash_pinned",
             extras["frozen"][SPLIT_MANIFEST_REL] == SPLIT_MANIFEST_SHA256)
     _assert(a, "analysis_ready_hash_pinned",

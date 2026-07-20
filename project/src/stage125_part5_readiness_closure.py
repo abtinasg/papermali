@@ -44,7 +44,7 @@ PART4_OUTPUT_DIR = "project/stage125"
 PART4_SRC_REL = "project/src/stage125_part4_statistical_analysis_plan.py"
 PART4_TEST_REL = "project/tests/test_stage125_part4_statistical_analysis_plan.py"
 PART4_SRC_SHA256 = (
-    "aa65779fb8566dd41c6710a3c5ef1823c14f36876b9edc255af04504ee0c5bef"
+    "3b75764d9c2d9c2f259ed8d01dcbee8d8cb621440e18b97bca636ff8690a2d7b"
 )
 PART4_TEST_SHA256 = (
     "f78aae6e8e52f838a6da3106fa55b6a2a36fd0665877f6f4e3965902c344ced3"
@@ -713,36 +713,21 @@ def assert_no_analysis_ready_access_in_source(
         )
 
 
+# Stage126 M1 development is gated by the shared exact authorization transition
+# guard (Persian text byte-for-byte + recomputed SHA-256 + required flags).
+from src import stage126_authorization_transition_guard as _stage126_auth
+
 STAGE126_M1_AUTHORIZATION_RECORD_REL = (
-    "project/stage126/stage126_m1_human_authorization_record.json"
+    _stage126_auth.AUTHORIZATION_RECORD_REL
 )
 STAGE126_M1_AUTHORIZATION_TEXT_SHA256 = (
-    "eeba72fe612b292fb611729676eef0a1d7e4b0c1e5fc9d8b533d62d8dcf41a50"
+    _stage126_auth.AUTHORIZATION_TEXT_SHA256
 )
 
 
 def stage126_m1_development_authorized(repo_root: Path) -> bool:
-    """True iff a valid, signed Stage126 M1 development authorization exists.
-
-    Fail-closed: any missing/malformed record, a mutated authorization text
-    hash, or an unlocked/authorized final test yields ``False`` (the
-    ``project/stage126`` surface stays forbidden).
-    """
-    record = repo_root / STAGE126_M1_AUTHORIZATION_RECORD_REL
-    if not record.is_file():
-        return False
-    try:
-        data = json.loads(record.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return False
-    return (
-        data.get("stage126_authorized") is True
-        and data.get("development_modeling_authorized") is True
-        and data.get("final_test_unlocked") is False
-        and data.get("final_test_access_authorized") is False
-        and data.get("authorization_text_sha256")
-        == STAGE126_M1_AUTHORIZATION_TEXT_SHA256
-    )
+    """Delegate to the shared Stage126 authorization transition guard."""
+    return _stage126_auth.stage126_m1_development_authorized(repo_root)
 
 
 def effective_forbidden_surfaces(repo_root: Path) -> tuple[str, ...]:
@@ -1181,20 +1166,107 @@ def validate_actual_handoff(
 ) -> tuple[bool, str]:
     """Validate actual project/docs/ai/handoff_state.json values.
 
-    Once Stage126 M1 development is human-authorized, the live Handoff state has
-    legitimately advanced to the Stage126 workstream (active scope, authorized
-    and started markers all reflect Stage126). Part 5's readiness *verdict* is
-    unchanged — Stage125 was and remains ready to enter Stage126 — so this
-    dimension no longer re-asserts the pre-Stage126 Handoff snapshot. It becomes
-    authorization-anchored and Handoff-content-independent, which also keeps the
-    closure deterministic across the Stage126 Handoff regeneration.
+    When Stage126 M1 development is human-authorized, validate the *actual*
+    authorized Stage126 successor Handoff (not a bypass). The Part 5 readiness
+    verdict (``derived_completed`` / ``derived_entry_ready``) must still hold,
+    and every Stage126 successor marker required by the transition contract must
+    match exactly. The Handoff is never excluded from this check.
     """
-    if stage126_m1_development_authorized(repo_root):
-        return True, "stage126_development_authorized_handoff_advanced"
     try:
         state = load_handoff_state(repo_root)
     except QCFail as exc:
         return False, str(exc)
+
+    if stage126_m1_development_authorized(repo_root):
+        expected_selected_qc = (
+            "project/stage126/stage126_m1_primary_development_tuning_qc_report.json"
+        )
+        checks = [
+            (state.get("current_stage") == "Stage126", "current_stage"),
+            (
+                state.get("active_workstream")
+                == "stage126_m1_financial_baseline",
+                "active_workstream",
+            ),
+            (state.get("stage125_completed") is True, "stage125_completed"),
+            (
+                state.get("stage126_m1_entry_ready") is True,
+                "stage126_m1_entry_ready",
+            ),
+            # Part 5-derived readiness must still agree with the live successor.
+            (derived_completed is True, "derived_completed"),
+            (derived_entry_ready is True, "derived_entry_ready"),
+            (state.get("stage126_authorized") is True, "stage126_authorized"),
+            (state.get("stage126_started") is True, "stage126_started"),
+            (
+                state.get("development_modeling_authorized") is True,
+                "development_modeling_authorized",
+            ),
+            (state.get("modeling_authorized") is True, "modeling_authorized"),
+            (state.get("modeling_started") is True, "modeling_started"),
+            (
+                state.get("m1_primary_development_tuning_completed") is True,
+                "m1_primary_development_tuning_completed",
+            ),
+            (
+                state.get("m1_robustness_started") is False,
+                "m1_robustness_started",
+            ),
+            (
+                state.get("m1_robustness_completed") is False,
+                "m1_robustness_completed",
+            ),
+            (state.get("m2_data_collected") is False, "m2_data_collected"),
+            (state.get("m3_data_collected") is False, "m3_data_collected"),
+            (state.get("m4_data_collected") is False, "m4_data_collected"),
+            (state.get("final_test_unlocked") is False, "final_test_unlocked"),
+            (
+                state.get("final_test_access_authorized") is False,
+                "final_test_access_authorized",
+            ),
+            (
+                state.get("final_test_predictor_values_inspected") is False,
+                "final_test_predictor_values_inspected",
+            ),
+            (
+                state.get("final_test_target_values_inspected") is False,
+                "final_test_target_values_inspected",
+            ),
+            (
+                state.get("final_test_evaluation_performed") is False,
+                "final_test_evaluation_performed",
+            ),
+            (
+                state.get("selected_qc_scope")
+                == "stage126_m1_financial_baseline",
+                "selected_qc_scope",
+            ),
+            (
+                str(state.get("selected_qc_path", "")).replace("\\", "/")
+                == expected_selected_qc,
+                "selected_qc_path",
+            ),
+            (
+                state.get("contract_version")
+                == "stage126_m1_primary_development_tuning_v1",
+                "contract_version",
+            ),
+            (
+                state.get("last_completed_micro_part")
+                == "stage125-part5-readiness-closure",
+                "last_completed_micro_part",
+            ),
+            (
+                state.get("next_research_action_id")
+                == "stage126-m1-financial-baseline",
+                "next_research_action_id",
+            ),
+        ]
+        failed = [name for ok, name in checks if not ok]
+        if failed:
+            return False, f"handoff_mismatch:{','.join(failed)}"
+        return True, "actual_stage126_successor_handoff_matches_authorized_transition"
+
     expected_selected_qc = f"{PART4_OUTPUT_DIR}/{F_QC}"
     checks = [
         (
@@ -1352,11 +1424,26 @@ def readiness_surface_states(
             metadata.get("stage125_gate_125_0") == "PASS",
         )
     if handoff_state is not None:
-        states["handoff_state"] = _bool_ready(
-            handoff_state.get("stage126_m1_entry_ready"),
-            handoff_state.get("stage125_completed"),
-            handoff_state.get("stage125_part5_readiness_closure_completed"),
-        )
+        # Stage126 successor Handoff omits Part 5-only workflow fields such as
+        # ``stage125_part5_readiness_closure_completed``; readiness agreement
+        # for the authorized successor uses the Stage126-carried readiness
+        # flags. Pre-Stage126 Handoff still requires the three Part 5 flags.
+        if (
+            handoff_state.get("stage126_authorized") is True
+            or handoff_state.get("current_stage") == "Stage126"
+            or handoff_state.get("active_workstream")
+            == "stage126_m1_financial_baseline"
+        ):
+            states["handoff_state"] = _bool_ready(
+                handoff_state.get("stage126_m1_entry_ready"),
+                handoff_state.get("stage125_completed"),
+            )
+        else:
+            states["handoff_state"] = _bool_ready(
+                handoff_state.get("stage126_m1_entry_ready"),
+                handoff_state.get("stage125_completed"),
+                handoff_state.get("stage125_part5_readiness_closure_completed"),
+            )
     if readme_text is not None:
         states["readme"] = _readme_reports_ready(readme_text)
     return states
@@ -1432,14 +1519,13 @@ def check_cross_artifact_readiness_consistency(
         if readme_path.is_file() else None
     )
     handoff_path = repo_root / HANDOFF_STATE_REL
-    # When Stage126 M1 development is authorized, the live Handoff state has
-    # legitimately advanced beyond the Part 5 snapshot; it is no longer a Part 5
-    # readiness surface and is excluded from the cross-artifact comparison.
+    # Always include the live Handoff in cross-artifact readiness consistency.
+    # When Stage126 is authorized the successor Handoff still reports
+    # stage125_completed / stage126_m1_entry_ready and must agree with Part 5's
+    # ready verdict — it is never omitted.
     handoff = (
         json.loads(handoff_path.read_text(encoding="utf-8"))
-        if handoff_path.is_file()
-        and not stage126_m1_development_authorized(repo_root)
-        else None
+        if handoff_path.is_file() else None
     )
     if closure is None:
         return False, "missing_closure_report", {}
@@ -2208,11 +2294,12 @@ def build_all(
 
     # Step 8: revalidate cross-artifact readiness consistency across the
     # surfaces built here (closure report, entry contract, README, actual
-    # Handoff). Fail closed if any disagree with the final Gate result.
+    # Handoff). Fail closed if any disagree with the final Gate result. The
+    # live Handoff is always included — never bypassed when Stage126 is
+    # authorized.
     handoff_state_now = (
         load_handoff_state(repo_root)
-        if (repo_root / HANDOFF_STATE_REL).is_file()
-        and not stage126_m1_development_authorized(repo_root) else None
+        if (repo_root / HANDOFF_STATE_REL).is_file() else None
     )
     consistent, consistency_detail = validate_readiness_surface_consistency(
         final_gate_pass=closure_report["all_gate_pass"],
@@ -2587,10 +2674,11 @@ def build_qc_assertions(
     )
     # Direct cross-artifact readiness consistency over the surfaces available
     # at QC time (closure report, entry contract, README, actual Handoff).
+    # The live Handoff is always included — never bypassed under Stage126
+    # authorization.
     handoff_now = (
         load_handoff_state(repo_root)
-        if (repo_root / HANDOFF_STATE_REL).is_file()
-        and not stage126_m1_development_authorized(repo_root) else None
+        if (repo_root / HANDOFF_STATE_REL).is_file() else None
     )
     consistency_ok, consistency_detail = (
         validate_readiness_surface_consistency(
@@ -2851,11 +2939,12 @@ def run(
 
         # Full six-surface cross-artifact readiness consistency (§3): closure
         # report, entry contract, QC report, metadata, actual Handoff state and
-        # README must all agree with the final Gate result. Fail closed.
+        # README must all agree with the final Gate result. Fail closed. The
+        # live Handoff is always included — never bypassed under Stage126
+        # authorization.
         handoff_state_now = (
             load_handoff_state(repo_root)
-            if (repo_root / HANDOFF_STATE_REL).is_file()
-            and not stage126_m1_development_authorized(repo_root) else None
+            if (repo_root / HANDOFF_STATE_REL).is_file() else None
         )
         six_ok, six_detail = validate_readiness_surface_consistency(
             final_gate_pass=extras["closure_report"]["all_gate_pass"],

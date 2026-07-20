@@ -823,24 +823,28 @@ def test_stage126_surface_forbidden_when_unauthorized(tmp_path):
 
 
 def test_stage126_surface_permitted_only_with_valid_authorization(tmp_path):
+    from src import stage126_authorization_transition_guard as auth_guard
+
     rec_dir = tmp_path / "project" / "stage126"
     rec_dir.mkdir(parents=True)
     rec = rec_dir / "stage126_m1_human_authorization_record.json"
-    payload = {
-        "stage126_authorized": True,
-        "development_modeling_authorized": True,
-        "final_test_unlocked": False,
-        "final_test_access_authorized": False,
-        "authorization_text_sha256": m.STAGE126_M1_AUTHORIZATION_TEXT_SHA256,
-    }
-    rec.write_text(json.dumps(payload), encoding="utf-8")
+    payload = auth_guard.build_authorization_record()
+    rec.write_text(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True),
+        encoding="utf-8",
+    )
     assert m.stage126_m1_development_authorized(tmp_path) is True
     assert "project/stage126" not in m.effective_forbidden_surfaces(tmp_path)
     m.assert_forbidden_surfaces_absent(tmp_path)
 
-    # A mutated authorization-text hash must re-close the gate.
-    payload["authorization_text_sha256"] = "0" * 64
-    rec.write_text(json.dumps(payload), encoding="utf-8")
+    # Correct hash field + mutated Persian text must re-close the gate.
+    payload = auth_guard.build_authorization_record()
+    payload["authorization_text_fa"] = payload["authorization_text_fa"] + "x"
+    payload["authorization_text_sha256"] = auth_guard.AUTHORIZATION_TEXT_SHA256
+    rec.write_text(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True),
+        encoding="utf-8",
+    )
     assert m.stage126_m1_development_authorized(tmp_path) is False
     with pytest.raises(m.AuthorizationError, match="forbidden Stage126 surfaces"):
         m.assert_forbidden_surfaces_absent(tmp_path)
@@ -1207,12 +1211,113 @@ def test_gate_dimension_failure_produces_not_ready(dim_name):
 def test_cross_artifact_readiness_consistency_on_disk():
     ok, detail, states = m.check_cross_artifact_readiness_consistency(REPO_ROOT)
     assert ok is True, f"{detail} :: {states}"
-    # Stage126 M1 development is authorized, so the live Handoff state has
-    # advanced beyond the Part 5 snapshot and is excluded as a readiness
-    # surface. The remaining five surfaces must all be present and ready.
-    expected = set(m.READINESS_SURFACE_NAMES) - {"handoff_state"}
-    assert set(states) == expected
+    # Handoff remains part of the six-surface readiness consistency check
+    # even when Stage126 is authorized (successor Handoff still reports ready).
+    assert set(states) == set(m.READINESS_SURFACE_NAMES)
+    assert "handoff_state" in states
     assert all(v is True for v in states.values()), states
+
+
+def test_validate_actual_handoff_passes_current_state():
+    # Stage126 M1 development is human-authorized: Part 5 must validate the
+    # actual authorized Stage126 successor Handoff (not bypass it).
+    ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    assert ok is True
+    assert detail == (
+        "actual_stage126_successor_handoff_matches_authorized_transition"
+    )
+
+
+def test_handoff_mutation_wrong_selected_qc_scope(monkeypatch):
+    state = m.load_handoff_state(REPO_ROOT)
+    state["selected_qc_scope"] = "stage125_part4_statistical_analysis_plan"
+    monkeypatch.setattr(m, "load_handoff_state", lambda _root: state)
+    ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    assert ok is False
+    assert "selected_qc_scope" in detail
+
+
+def test_handoff_mutation_wrong_next_research_action_id(monkeypatch):
+    state = m.load_handoff_state(REPO_ROOT)
+    state["next_research_action_id"] = "stage126-unauthorized"
+    monkeypatch.setattr(m, "load_handoff_state", lambda _root: state)
+    ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    assert ok is False
+    assert "next_research_action_id" in detail
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("final_test_unlocked", True),
+        ("final_test_access_authorized", True),
+        ("final_test_evaluation_performed", True),
+        ("active_workstream", "wrong_workstream"),
+        ("selected_qc_scope", "stage125_part5_readiness_closure"),
+        (
+            "selected_qc_path",
+            "project/stage125/stage125_part5_readiness_closure_qc_report.json",
+        ),
+        ("stage125_completed", False),
+        ("stage126_authorized", False),
+        ("m1_robustness_started", True),
+        ("m2_data_collected", True),
+    ],
+)
+def test_stage126_successor_handoff_mutation_fails(monkeypatch, field, value):
+    state = m.load_handoff_state(REPO_ROOT)
+    state[field] = value
+    monkeypatch.setattr(m, "load_handoff_state", lambda _root: state)
+    ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    assert ok is False
+    assert field in detail
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("stage126_authorized", True),
+        ("modeling_started", True),
+        ("final_test_unlocked", True),
+        ("active_availability_lag_months", 6),
+    ],
+)
+def test_handoff_mutation_auth_and_lag_fields(monkeypatch, field, value):
+    # Exercise the pre-Stage126 Handoff validation branch (unauthorized world).
+    monkeypatch.setattr(m, "stage126_m1_development_authorized", lambda _root: False)
+    state = m.load_handoff_state(REPO_ROOT)
+    # Seed a plausible pre-Stage126 snapshot before applying the mutation.
+    state.update({
+        "last_completed_micro_part": m.RESEARCH_ACTION_ID,
+        "next_research_action_id": m.RESEARCH_NEXT,
+        "selected_qc_scope": m.QC_STAGE,
+        "selected_qc_path": f"{m.PART4_OUTPUT_DIR}/{m.F_QC}",
+        "contract_version": m.CONTRACT_VERSION,
+        "stage125_completed": True,
+        "stage126_m1_entry_ready": True,
+        "stage126_authorized": False,
+        "stage126_started": False,
+        "modeling_authorized": False,
+        "modeling_started": False,
+        "final_test_unlocked": False,
+        "part3b_completed": False,
+        "active_availability_lag_months": m.APPROVED_LAG_MONTHS,
+    })
+    state[field] = value
+    monkeypatch.setattr(m, "load_handoff_state", lambda _root: state)
+    ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    assert ok is False
+    assert field in detail
 
 
 def test_readiness_surface_consistency_detects_ready_leak():
@@ -1415,73 +1520,6 @@ def test_robustness_sample_duplicate_fails():
     entries.append(dict(entries[1]))
     with pytest.raises(m.QCFail):
         m.validate_registered_m1_robustness(entries)
-
-
-# --------------------------------------------------------------------------- #
-# Actual Handoff validation mutations
-# --------------------------------------------------------------------------- #
-
-def test_validate_actual_handoff_passes_current_state():
-    # Stage126 M1 development is human-authorized, so the live Handoff state has
-    # legitimately advanced to the Stage126 workstream. Part 5's readiness
-    # verdict is unchanged and this dimension becomes authorization-anchored.
-    ok, detail = m.validate_actual_handoff(
-        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
-    )
-    assert ok is True
-    assert detail == "stage126_development_authorized_handoff_advanced"
-
-
-def test_handoff_mutation_wrong_selected_qc_scope(tmp_path, monkeypatch):
-    # Exercise the pre-Stage126 Handoff validation branch (unauthorized world).
-    monkeypatch.setattr(m, "stage126_m1_development_authorized", lambda _root: False)
-    state = m.load_handoff_state(REPO_ROOT)
-    state["selected_qc_scope"] = "stage125_part4_statistical_analysis_plan"
-    handoff = tmp_path / "handoff_state.json"
-    handoff.write_text(json.dumps(state), encoding="utf-8")
-    monkeypatch.setattr(m, "HANDOFF_STATE_REL", str(handoff.name))
-    # Point load to tmp via monkeypatch on load_handoff_state
-    monkeypatch.setattr(
-        m, "load_handoff_state", lambda _root: state,
-    )
-    ok, detail = m.validate_actual_handoff(
-        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
-    )
-    assert ok is False
-    assert "selected_qc_scope" in detail
-
-
-def test_handoff_mutation_wrong_next_research_action_id(monkeypatch):
-    monkeypatch.setattr(m, "stage126_m1_development_authorized", lambda _root: False)
-    state = m.load_handoff_state(REPO_ROOT)
-    state["next_research_action_id"] = "stage126-unauthorized"
-    monkeypatch.setattr(m, "load_handoff_state", lambda _root: state)
-    ok, detail = m.validate_actual_handoff(
-        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
-    )
-    assert ok is False
-    assert "next_research_action_id" in detail
-
-
-@pytest.mark.parametrize(
-    "field,value",
-    [
-        ("stage126_authorized", True),
-        ("modeling_started", True),
-        ("final_test_unlocked", True),
-        ("active_availability_lag_months", 6),
-    ],
-)
-def test_handoff_mutation_auth_and_lag_fields(monkeypatch, field, value):
-    monkeypatch.setattr(m, "stage126_m1_development_authorized", lambda _root: False)
-    state = m.load_handoff_state(REPO_ROOT)
-    state[field] = value
-    monkeypatch.setattr(m, "load_handoff_state", lambda _root: state)
-    ok, detail = m.validate_actual_handoff(
-        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
-    )
-    assert ok is False
-    assert field in detail
 
 
 # --------------------------------------------------------------------------- #
