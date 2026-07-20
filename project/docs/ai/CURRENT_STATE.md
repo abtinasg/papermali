@@ -12,7 +12,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed research action:** `stage125-part5-readiness-closure`
 - **Next research action:** `stage126-m1-financial-baseline`
 - **Last stage commit:** `9629c3841dec2b18a9ae6c9691dafea640006560`
-- **Generated from commit:** `82df2e3e57423eeee8fc4b2c438af8c9ed97a472` (branch `stage126-m1-primary-development-tuning`, informational)
+- **Generated from commit:** `5cf1e2573c5592a5116f476c526b0776100d5538` (branch `stage126-m1-primary-development-tuning`, informational)
 - **Baseline:** `origin/main` @ `5f56be5b2e49e66c54b451994a5e36c4fcc754d9`
 
 ## QC
@@ -27,6 +27,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - modeling_started: **True**
 - gate_b_started: **True**
 - verified_master_created: **True**
+- part3b_completed: **False**
 - stage125_completed: **True**
 - stage126_authorized: **True**
 - stage126_started: **True**
@@ -41,10 +42,20 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - m2_data_collected: **False**
 - m3_data_collected: **False**
 - m4_data_collected: **False**
+- financial_data_researcher_verified_frozen: **True**
+- broad_codal_capture_stopped: **True**
+- active_availability_method: **fixed_regulatory_lag**
+- active_availability_lag_months: **4**
+- four_month_regulatory_lag_locked: **True**
+- six_month_lag_superseded: **True**
+- historical_six_month_decision_retained: **True**
+- row_level_publish_datetime_collection_required: **False**
+- part3c_leakage_safe_finalization_completed: **True**
+- part4_statistical_analysis_plan_locked: **True**
 
 ## Tickers in current research scope
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `8929226e1493bcd4e95bffbb4dbdb6db876dfe0d453eeb354b6a48c4b8209806`_
-_generated_at_utc: 2026-07-20T17:11:03Z (informational)_
+_state_fingerprint: `6b64567b550407cb7e809d86953b0568fa38e1e4084ca00ab218fbcfbdf27a48`_
+_generated_at_utc: 2026-07-20T17:42:47Z (informational)_

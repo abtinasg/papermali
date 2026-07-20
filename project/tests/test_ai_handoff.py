@@ -14,6 +14,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -1243,6 +1244,189 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["m2_data_collected"] is False
     assert state["m3_data_collected"] is False
     assert state["m4_data_collected"] is False
+    # Repository-wide temporal-availability invariants carried from Stage125.
+    assert state["financial_data_researcher_verified_frozen"] is True
+    assert state["broad_codal_capture_stopped"] is True
+    assert state["active_availability_method"] == "fixed_regulatory_lag"
+    assert state["active_availability_lag_months"] == 4
+    assert state["four_month_regulatory_lag_locked"] is True
+    assert state["six_month_lag_superseded"] is True
+    assert state["historical_six_month_decision_retained"] is True
+    assert state["row_level_publish_datetime_collection_required"] is False
+    assert state["part3b_completed"] is False
+    assert state["part3c_leakage_safe_finalization_completed"] is True
+    assert state["part4_statistical_analysis_plan_locked"] is True
+
+
+@pytest.mark.skipif(
+    not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
+    reason="real-repo test requires git checkout",
+)
+def test_real_repo_roadmap_stage126_status_consistency():
+    roadmap = open(
+        os.path.join(REAL_ROOT, "project/docs/ai/ROADMAP.md"), encoding="utf-8",
+    ).read()
+    fm = gen.read_roadmap(REAL_ROOT)
+    assert fm["active_research_workstream_id"] == (
+        "stage126-m1-financial-baseline"
+    )
+    assert fm["last_completed_research_action_id"] == (
+        "stage125-part5-readiness-closure"
+    )
+    assert fm["next_research_action_id"] == (
+        "stage126-m1-financial-baseline"
+    )
+    # Isolate the Stage126 research-action row (item 18).
+    match = re.search(
+        r"18\.\s*`stage126-m1-financial-baseline`\s*—\s*([^\n]+)",
+        roadmap,
+    )
+    assert match is not None, "Stage126 research-action row missing"
+    stage126_row = match.group(1)
+    stage126_row_l = stage126_row.lower()
+    assert "human-authorized and started" in stage126_row_l
+    # Stale unauthorized/future wording must not describe the Stage126 action.
+    for banned in (
+        "**future**",
+        "blocked pending authorization",
+        "blocked pending explicit human authorization",
+        "a next-action pointer is not authorization",
+    ):
+        assert banned.lower() not in stage126_row_l, (
+            f"Stage126 ROADMAP body still contains stale phrase {banned!r}"
+        )
+    # Whole-action "not started" (historical wording), not "robustness not started".
+    assert re.search(r"(?<!robustness )\*\*not started\*\*", stage126_row_l) is None
+    assert re.search(
+        r";\s*\*\*not started\*\*", stage126_row_l,
+    ) is None
+    assert "future; blocked pending" not in stage126_row_l
+    assert stage126_row_l.strip().startswith("**future**") is False
+
+
+@pytest.mark.skipif(
+    not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
+    reason="real-repo test requires git checkout",
+)
+def test_real_repo_open_tasks_stage126_markers_match_handoff():
+    open_tasks = open(
+        os.path.join(REAL_ROOT, "project/docs/ai/OPEN_TASKS.md"),
+        encoding="utf-8",
+    ).read()
+    state = _state(REAL_ROOT)
+    assert "## Active research workstream: `stage126-m1-financial-baseline`" in (
+        open_tasks
+    )
+    assert "Stage126 M1 human-authorized = true" in open_tasks
+    assert "Stage126 started = true" in open_tasks
+    assert "development modeling authorized = true" in open_tasks
+    assert "modeling started = true" in open_tasks
+    assert "primary development tuning completed = true" in open_tasks
+    assert "M1 robustness started = false" in open_tasks
+    assert "final test unlocked = false" in open_tasks
+    assert "M2/M3/M4 data collected = false" in open_tasks
+    assert "historical state at Stage125 closure time" in open_tasks
+    # Current markers section must agree with Handoff; historical false
+    # Stage126 markers must not be presented as current.
+    current_section = open_tasks.split("### Current Stage126 markers")[1].split(
+        "**Still prohibited"
+    )[0]
+    assert "`stage126_authorized=true`" in current_section
+    assert "`stage126_started=true`" in current_section
+    assert "`modeling_authorized=true`" in current_section
+    assert "`modeling_started=true`" in current_section
+    assert "`stage126_authorized=false`" not in current_section
+    assert "`stage126_started=false`" not in current_section
+    assert state["stage126_authorized"] is True
+    assert state["stage126_started"] is True
+    assert state["modeling_authorized"] is True
+    assert state["modeling_started"] is True
+    assert state["m1_primary_development_tuning_completed"] is True
+    assert state["active_availability_method"] == "fixed_regulatory_lag"
+    assert state["active_availability_lag_months"] == 4
+    # Active OPEN_TASKS must not describe current Stage126 as unauthorized.
+    active_header = open_tasks.split("### Historical markers")[0]
+    assert "future; not authorized" not in active_header.lower()
+    assert "blocked pending explicit human authorization" not in (
+        active_header.lower()
+    )
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("active_availability_method", "fixed_conservative_lag"),
+        ("active_availability_lag_months", 6),
+        ("four_month_regulatory_lag_locked", False),
+        ("six_month_lag_superseded", False),
+        ("financial_data_researcher_verified_frozen", False),
+        ("broad_codal_capture_stopped", False),
+        ("row_level_publish_datetime_collection_required", True),
+        ("part3b_completed", True),
+    ],
+)
+@pytest.mark.skipif(
+    not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
+    reason="real-repo test requires git checkout",
+)
+def test_stage126_temporal_availability_mutation_fails_closed(
+    monkeypatch, field, value,
+):
+    state = _state(REAL_ROOT)
+    assert field in state, f"expected carried invariant {field} in handoff_state"
+    state = dict(state)
+    state[field] = value
+    monkeypatch.setattr(val, "_load_state", lambda _root: state)
+    assert val.run_check(REAL_ROOT) == 1
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "active_availability_method",
+        "active_availability_lag_months",
+        "four_month_regulatory_lag_locked",
+        "six_month_lag_superseded",
+        "financial_data_researcher_verified_frozen",
+        "broad_codal_capture_stopped",
+        "row_level_publish_datetime_collection_required",
+        "part3b_completed",
+        "historical_six_month_decision_retained",
+        "part3c_leakage_safe_finalization_completed",
+        "part4_statistical_analysis_plan_locked",
+        "stage125_completed",
+    ],
+)
+@pytest.mark.skipif(
+    not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
+    reason="real-repo test requires git checkout",
+)
+def test_stage126_temporal_availability_missing_fails_closed(monkeypatch, field):
+    state = dict(_state(REAL_ROOT))
+    assert field in state
+    del state[field]
+    monkeypatch.setattr(val, "_load_state", lambda _root: state)
+    assert val.run_check(REAL_ROOT) == 1
+
+
+def test_derive_stage125_temporal_availability_invariants_real_repo():
+    if not os.path.isdir(os.path.join(REAL_ROOT, ".git")):
+        pytest.skip("real-repo test requires git checkout")
+    got = gen.derive_stage125_temporal_availability_invariants(REAL_ROOT)
+    assert got == {
+        "financial_data_researcher_verified_frozen": True,
+        "broad_codal_capture_stopped": True,
+        "active_availability_method": "fixed_regulatory_lag",
+        "active_availability_lag_months": 4,
+        "four_month_regulatory_lag_locked": True,
+        "six_month_lag_superseded": True,
+        "historical_six_month_decision_retained": True,
+        "row_level_publish_datetime_collection_required": False,
+        "part3b_completed": False,
+        "part3c_leakage_safe_finalization_completed": True,
+        "part4_statistical_analysis_plan_locked": True,
+        "stage125_completed": True,
+    }
 
 
 # ---- Stage125 Part 3B.0 artifact-only + workflow markers ------------------- #
