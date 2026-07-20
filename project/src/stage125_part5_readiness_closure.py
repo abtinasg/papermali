@@ -202,7 +202,7 @@ FROZEN_PART4_OUTPUTS: dict[str, str] = {
     f"{PART4_OUTPUT_DIR}/part4_temporal_split_manifest_stage125.csv":
         "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc",
     f"{PART4_OUTPUT_DIR}/stage125_part4_statistical_analysis_plan_qc_report.json":
-        "305f634db7931e3c0d0aad3813ac9fb88b9d686cebbeb4202d545ac6d056b869",
+        "c119932134482304500f4b90d625f015245f1818113db83c82fac1cf8072a939",
 }
 
 # --------------------------------------------------------------------------- #
