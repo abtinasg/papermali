@@ -42,6 +42,22 @@ Removed relative to the primary nine-feature set (never loaded onto the Part 1 m
 | `xgboost` | fold2_validation | 216 | 10 | 22 | 0.322201924694 | 0.890291262136 | 0.095185246072 | 0.5 | 4.909090909091 |
 | `xgboost` | pooled_development_oof | 421 | 35 | 44 | 0.339262787141 | 0.8088823094 | 0.117443475264 | 0.342857142857 | 3.280519480519 |
 
+## Frozen Stage125 Part 5 live-successor boundary (expected)
+
+Part 1 executed successfully on the development folds. **Stage125 Part 5 remains a frozen, valid historical closure** — its source, its runner and every `project/stage125/` artifact are byte-identical.
+
+Part 5's *embedded live-Handoff successor check* terminates at the earlier Stage126 primary-development state and predates robustness execution. After a truthful Part 1 completion it therefore reports exactly these five mismatching fields:
+
+- `m1_robustness_started`
+- `selected_qc_scope`
+- `selected_qc_path`
+- `contract_version`
+- `last_completed_micro_part`
+
+`run_stage125_part5.py --check` consequently exits 1 **by design**. This is an **expected historical-contract boundary**, not a scientific failure and not Stage125 drift. It is recorded in `stage126_m1_robustness_part1_part5_successor_compatibility.json`, asserted in the Part 1 QC, and explicitly tested (historical Part 5 replay tests use a monkeypatched historical primary-successor fixture — the real Handoff file is never written — and a dedicated live test proves the boundary is exactly these five fields, with no readiness, final-test, authorization or research-pointer drift).
+
+Part 1 successor state is validated by: `stage126_m1_robustness_part0_decision_lock`, `stage126_m1_robustness_part1_qc`, `stage126_m1_robustness_part1_completion_lock`, `ai_handoff_validator`.
+
 ## Next
 
 The next registered category is `main_rule_b_listing_robustness` (Part 2). **Part 2 is not authorized and not started** — it requires its own separate explicit human authorization. The final test remains locked and untouched.

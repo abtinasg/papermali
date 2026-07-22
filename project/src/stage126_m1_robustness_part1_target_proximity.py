@@ -1007,6 +1007,32 @@ def build_readme(metrics_rows: list[dict[str, Any]]) -> str:
         )
     lines += [
         "",
+        "## Frozen Stage125 Part 5 live-successor boundary (expected)",
+        "",
+        "Part 1 executed successfully on the development folds. **Stage125 "
+        "Part 5 remains a frozen, valid historical closure** — its source, its "
+        "runner and every `project/stage125/` artifact are byte-identical.",
+        "",
+        "Part 5's *embedded live-Handoff successor check* terminates at the "
+        "earlier Stage126 primary-development state and predates robustness "
+        "execution. After a truthful Part 1 completion it therefore reports "
+        "exactly these five mismatching fields:",
+        "",
+        *[f"- `{f}`" for f in PART5_EXPECTED_LIVE_MISMATCH_FIELDS],
+        "",
+        f"`run_stage125_part5.py --check` consequently exits 1 **by design**. "
+        "This is an **expected historical-contract boundary**, not a scientific "
+        "failure and not Stage125 drift. It is recorded in "
+        f"`{F_PART5_COMPAT}`, asserted in the Part 1 QC, and explicitly tested "
+        "(historical Part 5 replay tests use a monkeypatched historical "
+        "primary-successor fixture — the real Handoff file is never written — "
+        "and a dedicated live test proves the boundary is exactly these five "
+        "fields, with no readiness, final-test, authorization or "
+        "research-pointer drift).",
+        "",
+        "Part 1 successor state is validated by: "
+        + ", ".join(f"`{s}`" for s in PART5_SUCCESSOR_VALIDATION_SURFACES) + ".",
+        "",
         "## Next",
         "",
         f"The next registered category is `{NEXT_CATEGORY_ID}` (Part 2). "

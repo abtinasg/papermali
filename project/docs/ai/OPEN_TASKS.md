@@ -162,6 +162,23 @@ select a paper winner. Handoff markers: `m1_robustness_started=true`,
 `m1_robustness_part2_authorized=false`,
 `m1_robustness_execution_authorized=false`, `m1_robustness_completed=false`.
 
+**Frozen Part 5 live-successor boundary (expected; not a failure):** Stage125
+Part 5 remains a **frozen, valid historical closure** — no Stage125 artifact or
+source was modified. Its embedded live-Handoff successor check terminates at the
+earlier primary-development state, so after Part 1 it reports exactly five
+mismatching fields (`m1_robustness_started`, `selected_qc_scope`,
+`selected_qc_path`, `contract_version`, `last_completed_micro_part`).
+`run_stage125_part5.py --check` therefore exits 1 **by design**. This is an
+expected historical-contract boundary, explicitly recorded in
+`stage126_m1_robustness_part1_part5_successor_compatibility.json`, asserted in
+the Part 1 QC and covered by dedicated tests. It is **not** a scientific
+failure, **not** Stage125 drift, and **not** a Part 1 blocker. Part 1 successor
+state is validated by the Part 0 integrity controls, the Part 1 QC, the Part 1
+completion lock and the AI Handoff validator. Handoff markers:
+`stage125_part5_frozen_artifacts_verified=true`,
+`stage125_part5_live_successor_check_applicable=false`,
+`stage125_part5_successor_compatibility_status=expected_historical_contract_boundary_after_part1`.
+
 **Next — Part 2 (`main_rule_b_listing_robustness`) is NOT authorized and NOT
 started.** It requires its own separate explicit human authorization; the
 consumed Part 1 authorization is not a standing authorization.

@@ -27,6 +27,22 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
   authorized and not started**; it requires its own separate explicit human
   authorization. Research action pointers are unchanged (Stage126 M1 remains
   the active incomplete research action).
+- **Frozen Part 5 successor-compatibility boundary recorded (no Stage125 change).**
+  Stage125 Part 5 remains a **frozen, valid historical closure**; its *embedded
+  live-Handoff successor check* terminates at the earlier primary-development
+  state and therefore cannot accept a truthful completed-Part-1 Handoff. The
+  resulting mismatch is exactly five fields — `m1_robustness_started`,
+  `selected_qc_scope`, `selected_qc_path`, `contract_version`,
+  `last_completed_micro_part` — and is now documented in
+  `stage126_m1_robustness_part1_part5_successor_compatibility.json`, asserted in
+  the Part 1 QC, and explicitly tested (historical Part 5 replay tests use a
+  monkeypatched historical primary-successor fixture; a dedicated live test
+  proves the boundary is exactly these five fields and contains no readiness,
+  final-test, authorization or research-pointer drift). **No Stage125 artifact
+  or source was modified, and the Handoff was not falsified.** Part 1 successor
+  state is validated by the Part 0 integrity controls, the Part 1 QC and the AI
+  Handoff validator. This is a verification-boundary correction only — no
+  scientific decision, probability or metric changed.
 
 ## 2026-07-22 — Stage126 M1 Robustness Part 0 Decision Lock
 

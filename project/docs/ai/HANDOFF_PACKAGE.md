@@ -214,6 +214,20 @@ untouched. Part 1 is **sensitivity-analysis evidence only**.
 is not a standing authorization; each future Part requires its own separate
 explicit human authorization.
 
+**Frozen Part 5 live-successor boundary.** Stage125 Part 5 remains a frozen,
+valid historical closure (source, runner and all `project/stage125/` artifacts
+byte-identical). Its embedded live-Handoff successor check ends at the earlier
+primary-development state, so after Part 1 `run_stage125_part5.py --check` exits
+1 with exactly five expected mismatching fields (`m1_robustness_started`,
+`selected_qc_scope`, `selected_qc_path`, `contract_version`,
+`last_completed_micro_part`). This is an **expected historical-contract
+boundary**, recorded in
+`stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json`,
+asserted in the Part 1 QC and explicitly tested — not a scientific failure and
+not Stage125 drift. Current Stage126 successor state is validated by the Part 0
+integrity controls, the Part 1 QC, the Part 1 completion lock and this Handoff
+validator.
+
 ## 11. Recent change history
 
 See [`CHANGELOG.md`](CHANGELOG.md).

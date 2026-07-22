@@ -101,6 +101,29 @@ These are stable project decisions. Change them only deliberately (and note it i
   started.** The consumed Part 1 authorization confers no standing
   authorization for any later category.
 
+### Frozen Part 5 live-successor boundary (2026-07-22)
+
+- **Stage125 Part 5 remains a frozen, valid historical closure.** Neither its
+  source, its runner, nor any `project/stage125/` artifact was modified.
+- Part 5's *embedded live-Handoff successor check* hard-codes the earlier
+  Stage126 **primary-development** state and predates robustness execution. It
+  therefore cannot accept a truthful completed-Part-1 Handoff.
+- After Part 1 the mismatch is **exactly five fields**:
+  `m1_robustness_started`, `selected_qc_scope`, `selected_qc_path`,
+  `contract_version`, `last_completed_micro_part`. This is an **expected
+  historical-contract boundary**, not a scientific failure, not Stage125 drift,
+  and not a Part 1 merge blocker.
+- It must never be "fixed" by writing false Handoff markers or by changing
+  `project/stage125/**`. It is recorded in
+  `stage126_m1_robustness_part1_part5_successor_compatibility.json`, asserted in
+  the Part 1 QC, and explicitly tested — historical Part 5 replay tests use a
+  monkeypatched historical primary-successor fixture (the real Handoff file is
+  never written), and a dedicated live test proves the boundary is exactly those
+  five fields with no readiness/final-test/authorization/research-pointer drift.
+- **Current Stage126 successor state is validated by:** the Part 0 integrity
+  controls, the Part 1 QC, the Part 1 completion lock, and the AI Handoff
+  validator.
+
 ## Verified listing master (Stage124)
 
 - `listing_master_verified_stage124.csv` **exists** and contains exactly **130

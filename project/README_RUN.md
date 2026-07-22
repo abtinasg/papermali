@@ -50,6 +50,13 @@ python run_stage126_m1_robustness_part0_decision_lock.py --check
 # 7) Stage126 M1 robustness Part 1 target-proximity (development-only; --check)
 python run_stage126_m1_robustness_part1_target_proximity.py --check
 
+# NOTE: after Part 1, `run_stage125_part5.py --check` exits 1 BY DESIGN. Part 5
+# is a frozen historical Stage125 closure whose embedded live-Handoff successor
+# check ends at the earlier primary-development state; it reports exactly five
+# expected mismatching fields. See
+# stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json.
+# This is not a scientific failure and not Stage125 drift.
+
 # 8) AI Handoff validation
 python scripts/validate_ai_handoff.py --check
 

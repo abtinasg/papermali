@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 64,
+  "assertion_count": 72,
   "assertions": [
     {
       "detail": "",
@@ -321,6 +321,46 @@
       "detail": "",
       "name": "primary_artifacts_byte_identical",
       "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_artifacts_frozen_and_unmodified",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_live_handoff_check_not_applicable_after_part1",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_historical_closure_remains_valid",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_expected_mismatch_fields_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_expected_mismatch_detail_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_forbidden_mismatch_fields_declared",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_successor_validation_surfaces",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_compat_part1_valid_and_part2_unauthorized",
+      "status": "PASS"
     }
   ],
   "base_feature_count": 6,
@@ -376,15 +416,17 @@
   "oof_rows_per_family": 421,
   "oof_rows_total": 1263,
   "output_sha256": {
-    "README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md": "b7f6caa29c1da3d70d55421deb6ff19822c5db8a95a6bd7d22b9db00f6cbb01b",
+    "README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md": "8bb7b71a46ea0e976df9c65523338f5571e52f6875fdbecca51fd7e1d085f0b3",
     "stage126_m1_robustness_part1_completion_lock.json": "c86455caac96d65e3169d4801d886b7e4b536e15d7f33bdf6b448c6e0c103a26",
     "stage126_m1_robustness_part1_execution_manifest.json": "80813ce8af9544dde736cc6b94372d2626dccbf888553cd7964625bfe12d8738",
     "stage126_m1_robustness_part1_feature_manifest.csv": "c65735795eda7dce6b4cacbc6af9dd5914b5068f44c77277035a51463cceaf90",
     "stage126_m1_robustness_part1_human_authorization_record.json": "87a4f55baeb1081eaf936e49c5e8923f67df54ec444f0abc33ec835c0c7e06f4",
     "stage126_m1_robustness_part1_metrics.csv": "c60f4b15aa40273472be98c867c73795d254f32c2a0e29b76641b1c5d5c18e98",
-    "stage126_m1_robustness_part1_oof_predictions.csv": "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31"
+    "stage126_m1_robustness_part1_oof_predictions.csv": "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31",
+    "stage126_m1_robustness_part1_part5_successor_compatibility.json": "8bd027182aa06c9f71dd52fc25a1cc101d46a7166e4785ec84baf49a6d9af893"
   },
   "part0_contract_hash_valid": true,
+  "part5_successor_compatibility_sha256": "8bd027182aa06c9f71dd52fc25a1cc101d46a7166e4785ec84baf49a6d9af893",
   "prediction_calls": 22,
   "primary_artifact_sha256": {
     "project/stage126/stage126_m1_configuration_registry.csv": "decbf43a5c34669bdd7a0c68c0ad6aec5611efc7c3ca82b09f5e85f72d635804",
@@ -405,15 +447,28 @@
   "shap_calls": 0,
   "smote_calls": 0,
   "smotenc_calls": 0,
-  "source_commit": "f5c65c89f8fc25e65eb1a3b16c0cecf1bad6647f",
-  "source_file_sha256": "f018a0902a299d70967676853a690eda5615f2b516fe26724dfb36b6d2467d16",
+  "source_commit": "0785d8aa166660263b355d6a34d7d89e9eff622b",
+  "source_file_sha256": "e4b12c69ae2467abecef1faf0ff9197f1d5bb78dcbf7bee705c10812153aba83",
   "stage": "stage126_m1_robustness_part1_target_proximity",
   "stage125_completed": true,
+  "stage125_part5_artifacts_byte_identical": true,
+  "stage125_part5_artifacts_modified": false,
+  "stage125_part5_historical_closure_valid": true,
+  "stage125_part5_live_handoff_check_applicable": false,
+  "stage125_part5_live_handoff_mismatch_expected": true,
+  "stage125_part5_live_handoff_mismatch_fields": [
+    "m1_robustness_started",
+    "selected_qc_scope",
+    "selected_qc_path",
+    "contract_version",
+    "last_completed_micro_part"
+  ],
+  "stage125_part5_source_modified": false,
   "stage126_authorized": true,
   "stage126_m1_entry_ready": true,
   "stage126_started": true,
   "target": "FD_target_main_t_plus_1",
-  "test_file_sha256": "faf8c65df609813f3f273d0973f1b23da0c5042ca3b854d67e91f8c2fb31a2ea",
+  "test_file_sha256": "44b8955aa1e8a3ef50363d78d65ad8437032ff152212aacb5ace8271ce5e481c",
   "ticker_count": 0,
   "tickers": [],
   "transformed_feature_count": 12,

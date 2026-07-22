@@ -1,0 +1,38 @@
+{
+  "contract_id": "stage126_m1_robustness_part1_part5_successor_compatibility",
+  "contract_version": "stage126_m1_robustness_part1_part5_successor_compatibility_v1",
+  "expected_live_mismatch_detail": "handoff_mismatch:m1_robustness_started,selected_qc_scope,selected_qc_path,contract_version,last_completed_micro_part",
+  "expected_live_mismatch_fields": [
+    "m1_robustness_started",
+    "selected_qc_scope",
+    "selected_qc_path",
+    "contract_version",
+    "last_completed_micro_part"
+  ],
+  "final_test_access_authorized": false,
+  "final_test_evaluation_performed": false,
+  "forbidden_live_mismatch_fields": [
+    "stage125_completed",
+    "stage126_m1_entry_ready",
+    "final_test_unlocked",
+    "final_test_access_authorized",
+    "final_test_evaluation_performed",
+    "next_research_action_id"
+  ],
+  "full_development_refit_performed": false,
+  "part1_category_id": "m1_target_proximity_six_feature_set",
+  "part1_scientific_execution_valid": true,
+  "part2_execution_authorized": false,
+  "rationale": "run_stage125_part5.py --check is a historical successor-state validator whose live-Handoff assumptions end at the primary development state. The five-field mismatch after Part 1 is expected and explicitly tested; it does not invalidate Stage125 closure, does not indicate Stage125 artifact drift, and is not a scientific failure.",
+  "stage125_part5_artifacts_frozen": true,
+  "stage125_part5_artifacts_modified": false,
+  "stage125_part5_historical_closure_remains_valid": true,
+  "stage125_part5_live_handoff_check_applicable_after_part1": false,
+  "stage125_part5_source_modified": false,
+  "successor_state_validation_surfaces": [
+    "stage126_m1_robustness_part0_decision_lock",
+    "stage126_m1_robustness_part1_qc",
+    "stage126_m1_robustness_part1_completion_lock",
+    "ai_handoff_validator"
+  ]
+}
