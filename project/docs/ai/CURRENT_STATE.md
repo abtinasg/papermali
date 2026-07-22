@@ -9,18 +9,18 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 - **Stage / Batch:** Stage126 / None
 - **Active workstream:** `stage126_m1_financial_baseline`
-- **Last completed research action:** `stage125-part5-readiness-closure`
+- **Last completed research action:** `stage126-m1-robustness-part1-target-proximity`
 - **Next research action:** `stage126-m1-financial-baseline`
-- **Last stage commit:** `8fec1dcf743c9abf1ce855933f54331f7257b9c7`
-- **Generated from commit:** `b4f1216e448af9dcc5bc37144ed8df776d239df1` (branch `stage126-m1-robustness-part0-decision-lock`, informational)
-- **Baseline:** `origin/main` @ `6a4f05da219db7faea5a27c2adbee6b55497ec01`
+- **Last stage commit:** `e8614f9934a87e9effac061c8d90f2c4f8ebf423`
+- **Generated from commit:** `e8614f9934a87e9effac061c8d90f2c4f8ebf423` (branch `stage126-m1-robustness-part1-target-proximity`, informational)
+- **Baseline:** `origin/main` @ `8e928704b77387e46321ec2b87b05d3e7ffde4a8`
 
 ## QC
 
-- ✅ **65 assertions, 0 failed**, all_pass=True
-- Scope: `stage126_m1_financial_baseline`
-- Report: `project/stage126/stage126_m1_primary_development_tuning_qc_report.json`
-- QC source commit (code): `28c4e464808a74a6d459f8236ba432cf4a66b1d5`
+- ✅ **64 assertions, 0 failed**, all_pass=True
+- Scope: `stage126_m1_robustness_part1_target_proximity`
+- Report: `project/stage126/stage126_m1_robustness_part1_qc_report.json`
+- QC source commit (code): `f5c65c89f8fc25e65eb1a3b16c0cecf1bad6647f`
 
 ## Workflow markers
 
@@ -34,7 +34,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - development_modeling_authorized: **True**
 - modeling_authorized: **True**
 - m1_primary_development_tuning_completed: **True**
-- m1_robustness_started: **False**
+- m1_robustness_started: **True**
 - m1_robustness_completed: **False**
 - final_test_unlocked: **False**
 - final_test_access_authorized: **False**
@@ -57,5 +57,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `a5677d0f731ed2091b912218dcafbdbe6ebf31b2fc8a1be839c44043f34a7b8e`_
-_generated_at_utc: 2026-07-22T14:12:43Z (informational)_
+_state_fingerprint: `9eae27c46fbdec972ee757635a00258fc8f172b4bd12d4a2ce5492bf7fe1a268`_
+_generated_at_utc: 2026-07-22T19:23:42Z (informational)_
