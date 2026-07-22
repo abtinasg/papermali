@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 45,
+  "assertion_count": 51,
   "assertions": [
     {
       "detail": "",
@@ -204,6 +204,36 @@
     },
     {
       "detail": "",
+      "name": "frozen_stage125_contract_hashes_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "frozen_stage125_contract_map_nine_paths",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "frozen_stage125_tree_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "frozen_stage125_source_commit",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "preprocessing_continuous_pipeline_order_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "preprocessing_fields_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
       "name": "network_requests_attempted_zero",
       "status": "PASS"
     },
@@ -245,17 +275,17 @@
   "model_fit_calls": 0,
   "network_requests_attempted": 0,
   "output_sha256": {
-    "README_STAGE126_M1_ROBUSTNESS_PART0_DECISION_LOCK.md": "28095c7b25e8028e00329c0182ea8bf23de3d014562da15ccf2daced8d297d3a",
-    "stage126_m1_robustness_part0_decision_record.json": "de23db72e715f3194dc8524b687a0ee6532f5328f6c595985237fede1d1dc997"
+    "README_STAGE126_M1_ROBUSTNESS_PART0_DECISION_LOCK.md": "d9541aa70da9a8ccae11ce822be72b1d2fdc2d54bc34aef050fbbf2f39fd0b85",
+    "stage126_m1_robustness_part0_decision_record.json": "9ccd7bfae8fa522cb87e94ed7bebe806324837e9a2e12783d12aabfedd07c2ee"
   },
   "prediction_calls": 0,
   "shap_calls": 0,
   "smote_calls": 0,
   "smotenc_calls": 0,
-  "source_commit": "2ae50e40584e1a0b9251c6e62cda2ab21fdefcc9",
-  "source_file_sha256": "fbf5f07d4a32538f38e46c90087dc00035df81d790afe94e7338cda6135a82b7",
+  "source_commit": "6240fa85e1c1b18e2b603894f11ceebd1d7e2829",
+  "source_file_sha256": "b7f7ff0e421b4eed36800ae3571d6f2670efdb20c293c57fad3f8f738a144586",
   "stage": "stage126_m1_robustness_part0_decision_lock",
-  "test_file_sha256": "8b109a8b7dd85eba02226b4866b30f9ddd2f066ba61fe62b2dac0ecf80ef7ddc",
+  "test_file_sha256": "31184098a48e7be207b27d5d2b93a2192b5d047ea9eefac8fcd1f63f65dad647",
   "ticker_count": 0,
   "tickers": []
 }
