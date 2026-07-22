@@ -1872,3 +1872,140 @@ def test_stage125_part3b0_full_artifact_commit_is_skipped(synth):
     got = gen.last_stage_commit(synth)
     assert got == before
     assert got != sha
+
+
+# --------------------------------------------------------------------------- #
+# Entry-document consistency tests (Stage126 current state)
+# --------------------------------------------------------------------------- #
+
+def test_readme_run_current_state_contains_stage126_authorized():
+    """README_RUN current state must contain Stage126 authorized and started."""
+    readme_path = os.path.join(REAL_ROOT, "project", "README_RUN.md")
+    with open(readme_path, encoding="utf-8") as f:
+        content = f.read()
+    assert "Stage126 M1 is human-authorized and started" in content, (
+        "README_RUN must state Stage126 M1 is human-authorized and started"
+    )
+
+
+def test_readme_run_does_not_claim_no_model_has_run():
+    """README_RUN must not claim no model has run (Stage126 M1 tuning completed)."""
+    readme_path = os.path.join(REAL_ROOT, "project", "README_RUN.md")
+    with open(readme_path, encoding="utf-8") as f:
+        content = f.read()
+    # The stale phrase "No model is run yet" must not appear
+    assert "No model is run yet" not in content, (
+        "README_RUN must not claim 'No model is run yet'"
+    )
+
+
+def test_readme_run_does_not_globally_prohibit_all_modeling():
+    """README_RUN must not globally prohibit all modeling (Stage126 M1 is authorized)."""
+    readme_path = os.path.join(REAL_ROOT, "project", "README_RUN.md")
+    with open(readme_path, encoding="utf-8") as f:
+        content = f.read()
+    # The stale phrase "Modeling remains prohibited" without qualification must not appear
+    # Allow it only in historical context (e.g., "through Stage125")
+    lines = content.split("\n")
+    for line in lines:
+        if "Modeling remains prohibited" in line and "Stage125" not in line:
+            assert False, (
+                f"README_RUN line contains unqualified 'Modeling remains prohibited': {line}"
+            )
+
+
+def test_handoff_package_current_state_contains_modeling_started_true():
+    """HANDOFF_PACKAGE current state must reflect modeling_started=true."""
+    state = _state(REAL_ROOT)
+    assert state["modeling_started"] is True, (
+        "handoff_state.json must have modeling_started=true"
+    )
+
+
+def test_handoff_package_current_state_contains_primary_m1_tuning_completed():
+    """HANDOFF_PACKAGE current state must mention primary M1 development tuning completed."""
+    package_path = os.path.join(REAL_ROOT, "project", "docs", "ai", "HANDOFF_PACKAGE.md")
+    with open(package_path, encoding="utf-8") as f:
+        content = f.read()
+    assert "Primary M1 development-fold tuning is completed" in content, (
+        "HANDOFF_PACKAGE must state primary M1 development tuning is completed"
+    )
+
+
+def test_handoff_package_does_not_describe_stage126_as_future():
+    """HANDOFF_PACKAGE must not describe current Stage126 as future, unauthorized or not started."""
+    package_path = os.path.join(REAL_ROOT, "project", "docs", "ai", "HANDOFF_PACKAGE.md")
+    with open(package_path, encoding="utf-8") as f:
+        content = f.read()
+    # These stale phrases must not appear in current-state descriptions
+    stale_phrases = [
+        "no model trained yet",
+        "future / blocked pending explicit human authorization",
+        "modeling remains prohibited until Stage126",
+    ]
+    for phrase in stale_phrases:
+        # Allow in historical quoted sections (e.g., in "Historical Stage125" labels)
+        # Check if phrase appears outside of historical context
+        if phrase in content:
+            # Simple heuristic: if the phrase appears, ensure it's in a historical context
+            # by checking for nearby historical markers
+            lines = content.split("\n")
+            for i, line in enumerate(lines):
+                if phrase in line:
+                    # Check surrounding lines for historical context markers
+                    context_start = max(0, i - 2)
+                    context_end = min(len(lines), i + 3)
+                    context = "\n".join(lines[context_start:context_end])
+                    if "Historical" not in context and "historical" not in context:
+                        assert False, (
+                            f"HANDOFF_PACKAGE contains stale phrase '{phrase}' outside historical context: {line}"
+                        )
+    # "not started" is allowed when referring to specific sub-components (e.g., "M1 robustness is not started")
+    # but not when describing Stage126 overall as not started
+    if "not started" in content:
+        lines = content.split("\n")
+        for i, line in enumerate(lines):
+            if "not started" in line:
+                # Check if this line describes Stage126 overall as not started
+                # Allow it if it's about specific sub-components
+                context_start = max(0, i - 2)
+                context_end = min(len(lines), i + 3)
+                context = "\n".join(lines[context_start:context_end])
+                # Reject if it says Stage126 is not started without qualifying sub-component
+                if "Stage126" in context and ("robustness" not in context and "M2" not in context and "M3" not in context and "M4" not in context):
+                    assert False, (
+                        f"HANDOFF_PACKAGE describes Stage126 overall as 'not started': {line}"
+                    )
+
+
+def test_decisions_current_stage126_guardrails_contain_authorized_and_started():
+    """DECISIONS current Stage126 guardrails must contain authorized and started."""
+    decisions_path = os.path.join(REAL_ROOT, "project", "docs", "ai", "DECISIONS.md")
+    with open(decisions_path, encoding="utf-8") as f:
+        content = f.read()
+    # Check the Current Stage126 M1 guardrails section
+    assert "Stage126 M1 is human-authorized and started" in content, (
+        "DECISIONS must state Stage126 M1 is human-authorized and started"
+    )
+
+
+def test_decisions_current_stage126_guardrails_contain_final_test_locked():
+    """DECISIONS current Stage126 guardrails must contain final test locked."""
+    decisions_path = os.path.join(REAL_ROOT, "project", "docs", "ai", "DECISIONS.md")
+    with open(decisions_path, encoding="utf-8") as f:
+        content = f.read()
+    assert "final test remains locked" in content, (
+        "DECISIONS must state final test remains locked"
+    )
+
+
+def test_decisions_does_not_label_current_phase_as_no_model_data_freeze():
+    """DECISIONS must not label the current phase as a no-model data-freeze phase."""
+    decisions_path = os.path.join(REAL_ROOT, "project", "docs", "ai", "DECISIONS.md")
+    with open(decisions_path, encoding="utf-8") as f:
+        content = f.read()
+    # The section title "Phase guardrails (current data-freeze phase)" is stale
+    # It should now be "Phase guardrails" with subsections
+    assert "Phase guardrails (current data-freeze phase)" not in content, (
+        "DECISIONS must not label current phase as 'current data-freeze phase'"
+    )
