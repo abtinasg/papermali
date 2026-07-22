@@ -612,6 +612,104 @@ def test_deterministic_repeated_build_output(tmp_path):
         assert on_disk == sha, f"{name} not deterministic vs committed output"
 
 
+# --------------------------------------------------------------------------- #
+# Frozen Stage125 Part 5 successor-compatibility boundary
+# --------------------------------------------------------------------------- #
+
+EXPECTED_PART5_MISMATCH_FIELDS = [
+    "m1_robustness_started",
+    "selected_qc_scope",
+    "selected_qc_path",
+    "contract_version",
+    "last_completed_micro_part",
+]
+
+
+def test_part5_compatibility_record_contract():
+    c = _read_json(p1.F_PART5_COMPAT)
+    assert c["contract_id"] == \
+        "stage126_m1_robustness_part1_part5_successor_compatibility"
+    assert c["contract_version"] == \
+        "stage126_m1_robustness_part1_part5_successor_compatibility_v1"
+    assert c["part1_category_id"] == "m1_target_proximity_six_feature_set"
+    assert c["stage125_part5_artifacts_frozen"] is True
+    assert c["stage125_part5_artifacts_modified"] is False
+    assert c["stage125_part5_source_modified"] is False
+    assert c["stage125_part5_live_handoff_check_applicable_after_part1"] is False
+    assert c["stage125_part5_historical_closure_remains_valid"] is True
+    assert c["expected_live_mismatch_fields"] == EXPECTED_PART5_MISMATCH_FIELDS
+    assert c["expected_live_mismatch_detail"] == (
+        "handoff_mismatch:" + ",".join(EXPECTED_PART5_MISMATCH_FIELDS)
+    )
+    assert c["part1_scientific_execution_valid"] is True
+    assert c["part2_execution_authorized"] is False
+    assert c["full_development_refit_performed"] is False
+    assert c["final_test_access_authorized"] is False
+    assert c["final_test_evaluation_performed"] is False
+    assert c["successor_state_validation_surfaces"] == [
+        "stage126_m1_robustness_part0_decision_lock",
+        "stage126_m1_robustness_part1_qc",
+        "stage126_m1_robustness_part1_completion_lock",
+        "ai_handoff_validator",
+    ]
+
+
+def test_qc_carries_part5_compatibility_fields():
+    qc = _read_json(p1.F_QC)
+    assert qc["stage125_part5_artifacts_byte_identical"] is True
+    assert qc["stage125_part5_live_handoff_check_applicable"] is False
+    assert qc["stage125_part5_live_handoff_mismatch_expected"] is True
+    assert qc["stage125_part5_live_handoff_mismatch_fields"] == \
+        EXPECTED_PART5_MISMATCH_FIELDS
+    assert qc["stage125_part5_historical_closure_valid"] is True
+    assert qc["stage125_part5_source_modified"] is False
+    assert qc["stage125_part5_artifacts_modified"] is False
+
+
+def test_qc_and_compatibility_record_agree_exactly():
+    qc = _read_json(p1.F_QC)
+    c = _read_json(p1.F_PART5_COMPAT)
+    assert qc["stage125_part5_live_handoff_mismatch_fields"] == \
+        c["expected_live_mismatch_fields"]
+    assert qc["stage125_part5_live_handoff_check_applicable"] == \
+        c["stage125_part5_live_handoff_check_applicable_after_part1"]
+    assert qc["stage125_part5_source_modified"] == \
+        c["stage125_part5_source_modified"]
+    assert qc["stage125_part5_artifacts_modified"] == \
+        c["stage125_part5_artifacts_modified"]
+
+
+def test_compatibility_record_sha256_pinned_in_metadata():
+    meta = _read_json(p1.F_METADATA)
+    on_disk = hashlib.sha256(
+        open(os.path.join(STAGE126, p1.F_PART5_COMPAT), "rb").read()
+    ).hexdigest()
+    assert meta["part5_successor_compatibility_sha256"] == on_disk
+    assert meta["output_files_sha256"][p1.F_PART5_COMPAT] == on_disk
+    qc = _read_json(p1.F_QC)
+    assert qc["part5_successor_compatibility_sha256"] == on_disk
+
+
+def test_frozen_part5_source_and_runner_unmodified():
+    # Must not raise: the frozen Part 5 source/runner are byte-identical.
+    p1.verify_part5_frozen_unmodified(_root())
+
+
+def test_expected_mismatch_matches_the_real_frozen_validator():
+    """The documented boundary must equal what the frozen validator reports."""
+    from src import stage125_part5_readiness_closure as p5
+    ok, detail = p5.validate_actual_handoff(
+        _root(), derived_completed=True, derived_entry_ready=True,
+    )
+    assert ok is False
+    c = _read_json(p1.F_PART5_COMPAT)
+    assert detail == c["expected_live_mismatch_detail"]
+    fields = detail.split("handoff_mismatch:", 1)[1].split(",")
+    assert sorted(fields) == sorted(EXPECTED_PART5_MISMATCH_FIELDS)
+    for forbidden in c["forbidden_live_mismatch_fields"]:
+        assert forbidden not in fields
+
+
 def test_qc_all_pass_and_required_fields():
     qc = _read_json(p1.F_QC)
     assert qc["stage"] == "stage126_m1_robustness_part1_target_proximity"

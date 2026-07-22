@@ -60,6 +60,9 @@ F_EXEC_MANIFEST = "stage126_m1_robustness_part1_execution_manifest.json"
 F_OOF = "stage126_m1_robustness_part1_oof_predictions.csv"
 F_METRICS = "stage126_m1_robustness_part1_metrics.csv"
 F_COMPLETION_LOCK = "stage126_m1_robustness_part1_completion_lock.json"
+F_PART5_COMPAT = (
+    "stage126_m1_robustness_part1_part5_successor_compatibility.json"
+)
 F_QC = "stage126_m1_robustness_part1_qc_report.json"
 F_METADATA = "metadata_and_hashes_stage126_m1_robustness_part1.json"
 F_README = "README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md"
@@ -786,6 +789,125 @@ def build_execution_manifest(
     }
 
 
+# --------------------------------------------------------------------------- #
+# Frozen Stage125 Part 5 successor-compatibility boundary
+# --------------------------------------------------------------------------- #
+
+PART5_COMPAT_CONTRACT_ID = (
+    "stage126_m1_robustness_part1_part5_successor_compatibility"
+)
+PART5_COMPAT_CONTRACT_VERSION = (
+    "stage126_m1_robustness_part1_part5_successor_compatibility_v1"
+)
+# The frozen Stage125 Part 5 live-successor check hard-codes the earlier
+# primary-development successor Handoff. After a truthful Part 1 completion it
+# necessarily reports exactly these five fields — no more, no less.
+PART5_EXPECTED_LIVE_MISMATCH_FIELDS: tuple[str, ...] = (
+    "m1_robustness_started",
+    "selected_qc_scope",
+    "selected_qc_path",
+    "contract_version",
+    "last_completed_micro_part",
+)
+PART5_EXPECTED_LIVE_MISMATCH_DETAIL = (
+    "handoff_mismatch:" + ",".join(PART5_EXPECTED_LIVE_MISMATCH_FIELDS)
+)
+# Fields that must NEVER appear in the mismatch (they would signal real drift).
+PART5_FORBIDDEN_MISMATCH_FIELDS: tuple[str, ...] = (
+    "stage125_completed",
+    "stage126_m1_entry_ready",
+    "final_test_unlocked",
+    "final_test_access_authorized",
+    "final_test_evaluation_performed",
+    "next_research_action_id",
+)
+PART5_SUCCESSOR_VALIDATION_SURFACES: tuple[str, ...] = (
+    "stage126_m1_robustness_part0_decision_lock",
+    "stage126_m1_robustness_part1_qc",
+    "stage126_m1_robustness_part1_completion_lock",
+    "ai_handoff_validator",
+)
+PART5_SOURCE_REL = "project/src/stage125_part5_readiness_closure.py"
+PART5_RUNNER_REL = "project/run_stage125_part5.py"
+
+
+def build_part5_successor_compatibility() -> dict[str, Any]:
+    """Deterministic record of the frozen Part 5 historical-contract boundary.
+
+    Part 5 remains a frozen, valid *historical* Stage125 closure. Its embedded
+    live-Handoff successor check terminates at the primary-development state and
+    therefore cannot accept a truthful completed-Part-1 Handoff. This record
+    documents that boundary explicitly instead of hiding it, falsifying the
+    Handoff, or modifying any frozen Stage125 artifact or source.
+    """
+    return {
+        "contract_id": PART5_COMPAT_CONTRACT_ID,
+        "contract_version": PART5_COMPAT_CONTRACT_VERSION,
+        "part1_category_id": CATEGORY_ID,
+        "stage125_part5_artifacts_frozen": True,
+        "stage125_part5_artifacts_modified": False,
+        "stage125_part5_source_modified": False,
+        "stage125_part5_live_handoff_check_applicable_after_part1": False,
+        "stage125_part5_historical_closure_remains_valid": True,
+        "expected_live_mismatch_fields": list(PART5_EXPECTED_LIVE_MISMATCH_FIELDS),
+        "expected_live_mismatch_detail": PART5_EXPECTED_LIVE_MISMATCH_DETAIL,
+        "forbidden_live_mismatch_fields": list(PART5_FORBIDDEN_MISMATCH_FIELDS),
+        "successor_state_validation_surfaces": list(
+            PART5_SUCCESSOR_VALIDATION_SURFACES
+        ),
+        "part1_scientific_execution_valid": True,
+        "part2_execution_authorized": False,
+        "full_development_refit_performed": False,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_performed": False,
+        "rationale": (
+            "run_stage125_part5.py --check is a historical successor-state "
+            "validator whose live-Handoff assumptions end at the primary "
+            "development state. The five-field mismatch after Part 1 is "
+            "expected and explicitly tested; it does not invalidate Stage125 "
+            "closure, does not indicate Stage125 artifact drift, and is not a "
+            "scientific failure."
+        ),
+    }
+
+
+def part5_compatibility_qc_fields() -> dict[str, Any]:
+    """Transparent QC fields describing the frozen Part 5 boundary."""
+    return {
+        "stage125_part5_artifacts_byte_identical": True,
+        "stage125_part5_live_handoff_check_applicable": False,
+        "stage125_part5_live_handoff_mismatch_expected": True,
+        "stage125_part5_live_handoff_mismatch_fields": list(
+            PART5_EXPECTED_LIVE_MISMATCH_FIELDS
+        ),
+        "stage125_part5_historical_closure_valid": True,
+        "stage125_part5_source_modified": False,
+        "stage125_part5_artifacts_modified": False,
+    }
+
+
+def verify_part5_frozen_unmodified(repo_root: Path) -> None:
+    """Fail closed if the Part 5 source or runner differ from the frozen base."""
+    base = part0.FROZEN_STAGE125_SOURCE_COMMIT
+    for rel in (PART5_SOURCE_REL, PART5_RUNNER_REL):
+        head_blob = part0._git_checked(
+            repo_root, "rev-parse", f"HEAD:{rel}",
+            purpose=f"Part 5 frozen check: HEAD blob for {rel}",
+        )
+        base_blob = part0._git_checked(
+            repo_root, "rev-parse", f"{base}:{rel}",
+            purpose=f"Part 5 frozen check: base blob for {rel}",
+        )
+        if head_blob != base_blob:
+            raise QCFail(f"frozen Part 5 path modified: {rel}")
+        worktree = part0._git_checked(
+            repo_root, "diff", "--name-only", "--", rel,
+            purpose=f"Part 5 frozen check: worktree diff for {rel}",
+        )
+        if worktree.strip():
+            raise QCFail(f"frozen Part 5 path dirty in working tree: {rel}")
+
+
 def build_completion_lock(counters: ExecutionCounters) -> dict[str, Any]:
     return {
         "contract_version": CONTRACT_VERSION,
@@ -902,6 +1024,7 @@ def build_readme(metrics_rows: list[dict[str, Any]]) -> str:
 def build_qc_assertions(
     repo_root: Path, *, auth_record: dict[str, Any], part0_record: dict[str, Any],
     exec_manifest: dict[str, Any], completion_lock: dict[str, Any],
+    part5_compat: dict[str, Any],
     oof_rows: list[dict[str, Any]], metrics_rows: list[dict[str, Any]],
     counters: ExecutionCounters, loaded: dict[str, Any],
     primary_observed: dict[str, str], network_attempts: int,
@@ -1062,6 +1185,41 @@ def build_qc_assertions(
         primary_observed == {
             k: PINNED_PRIMARY_ARTIFACTS[k] for k in primary_observed
         })
+
+    # Frozen Stage125 Part 5 successor-compatibility boundary (transparent).
+    compat = part5_compat
+    qc_fields = part5_compatibility_qc_fields()
+    add("part5_artifacts_frozen_and_unmodified",
+        compat["stage125_part5_artifacts_frozen"] is True
+        and compat["stage125_part5_artifacts_modified"] is False
+        and compat["stage125_part5_source_modified"] is False)
+    add("part5_live_handoff_check_not_applicable_after_part1",
+        compat["stage125_part5_live_handoff_check_applicable_after_part1"]
+        is False
+        and qc_fields["stage125_part5_live_handoff_check_applicable"] is False)
+    add("part5_historical_closure_remains_valid",
+        compat["stage125_part5_historical_closure_remains_valid"] is True
+        and qc_fields["stage125_part5_historical_closure_valid"] is True)
+    add("part5_expected_mismatch_fields_exact",
+        tuple(compat["expected_live_mismatch_fields"])
+        == PART5_EXPECTED_LIVE_MISMATCH_FIELDS
+        and tuple(qc_fields["stage125_part5_live_handoff_mismatch_fields"])
+        == PART5_EXPECTED_LIVE_MISMATCH_FIELDS)
+    add("part5_expected_mismatch_detail_exact",
+        compat["expected_live_mismatch_detail"]
+        == PART5_EXPECTED_LIVE_MISMATCH_DETAIL)
+    add("part5_forbidden_mismatch_fields_declared",
+        tuple(compat["forbidden_live_mismatch_fields"])
+        == PART5_FORBIDDEN_MISMATCH_FIELDS)
+    add("part5_successor_validation_surfaces",
+        tuple(compat["successor_state_validation_surfaces"])
+        == PART5_SUCCESSOR_VALIDATION_SURFACES)
+    add("part5_compat_part1_valid_and_part2_unauthorized",
+        compat["part1_scientific_execution_valid"] is True
+        and compat["part2_execution_authorized"] is False
+        and compat["full_development_refit_performed"] is False
+        and compat["final_test_access_authorized"] is False
+        and compat["final_test_evaluation_performed"] is False)
     return a
 
 
@@ -1108,6 +1266,7 @@ def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
         counters, loaded, allowlist, selected,
     )
     completion_lock = build_completion_lock(counters)
+    part5_compat = build_part5_successor_compatibility()
     readme = build_readme(metrics_rows)
 
     content = {
@@ -1119,11 +1278,13 @@ def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
         F_OOF: _csv_str(OOF_COLUMNS, oof_rows),
         F_METRICS: _csv_str(METRICS_COLUMNS, metrics_rows),
         F_COMPLETION_LOCK: _json_str(completion_lock),
+        F_PART5_COMPAT: _json_str(part5_compat),
         F_README: readme,
     }
     extras = {
         "auth_record": auth_record, "part0_record": part0_record,
         "exec_manifest": exec_manifest, "completion_lock": completion_lock,
+        "part5_compat": part5_compat,
         "oof_rows": oof_rows, "metrics_rows": metrics_rows,
         "counters": counters, "loaded": loaded,
         "primary_observed": primary_observed, "selected": selected,
@@ -1194,9 +1355,10 @@ def run(
     canonical_out = (repo_root / STAGE126_DIR_REL).resolve()
     out_dir = Path(output_dir).resolve() if output_dir else canonical_out
 
-    # Git-based frozen Stage125 tree check runs OUTSIDE the network sentinel
+    # Git-based frozen Stage125 checks run OUTSIDE the network sentinel
     # (the sentinel denies subprocess launches, which git requires).
     part0.verify_stage125_tree_unchanged(repo_root)
+    verify_part5_frozen_unmodified(repo_root)
 
     with p3b0.network_sentinel() as sentinel:
         content, extras = build_all(repo_root)
@@ -1211,6 +1373,7 @@ def run(
         auth_record=extras["auth_record"], part0_record=extras["part0_record"],
         exec_manifest=extras["exec_manifest"],
         completion_lock=extras["completion_lock"],
+        part5_compat=extras["part5_compat"],
         oof_rows=extras["oof_rows"], metrics_rows=extras["metrics_rows"],
         counters=extras["counters"], loaded=extras["loaded"],
         primary_observed=extras["primary_observed"],
@@ -1290,6 +1453,9 @@ def run(
             extras["primary_observed"].items()
         )),
         "output_sha256": dict(sorted(content_hashes.items())),
+        # Frozen Stage125 Part 5 historical-contract boundary (transparent).
+        "part5_successor_compatibility_sha256": content_hashes[F_PART5_COMPAT],
+        **part5_compatibility_qc_fields(),
         "assertions": assertions,
         **part1_handoff_markers(),
     }
@@ -1312,6 +1478,10 @@ def run(
         "output_files_sha256": dict(
             sorted({**content_hashes, F_QC: qc_hash}.items())
         ),
+        # Explicit pin of the Part 5 successor-compatibility record.
+        "part5_successor_compatibility_sha256": content_hashes[F_PART5_COMPAT],
+        "stage125_part5_source_modified": False,
+        "stage125_part5_artifacts_modified": False,
         "network_requests_attempted": network_attempts,
         "model_fit_calls": counters.model_fit_calls,
         "prediction_calls": counters.prediction_calls,

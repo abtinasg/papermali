@@ -372,6 +372,7 @@ ARTIFACT_ONLY_FILES = (
     "project/stage126/stage126_m1_robustness_part1_oof_predictions.csv",
     "project/stage126/stage126_m1_robustness_part1_metrics.csv",
     "project/stage126/stage126_m1_robustness_part1_completion_lock.json",
+    "project/stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json",
     "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md",
     "project/stage126/stage126_m1_robustness_part1_qc_report.json",
     "project/stage126/metadata_and_hashes_stage126_m1_robustness_part1.json",
@@ -1384,7 +1385,7 @@ def derive_m1_robustness_part1_markers(root: str, expected_order: list) -> dict:
             f"Part 1 next_category_id {lock.get('next_category_id')!r} != "
             f"{expected_order[1]!r}"
         )
-    return {
+    markers = {
         "m1_robustness_started": True,
         "m1_robustness_completed": False,
         "m1_robustness_part1_human_authorized": True,
@@ -1395,6 +1396,118 @@ def derive_m1_robustness_part1_markers(root: str, expected_order: list) -> dict:
         # A consumed Part 1 authorization is NOT a standing authorization.
         "m1_robustness_execution_authorized": False,
     }
+    markers.update(derive_part5_successor_compatibility_markers(root))
+    return markers
+
+
+_PART1_QC_REL = "project/stage126/stage126_m1_robustness_part1_qc_report.json"
+_PART1_PART5_COMPAT_REL = (
+    "project/stage126/"
+    "stage126_m1_robustness_part1_part5_successor_compatibility.json"
+)
+_PART5_EXPECTED_MISMATCH_FIELDS = [
+    "m1_robustness_started",
+    "selected_qc_scope",
+    "selected_qc_path",
+    "contract_version",
+    "last_completed_micro_part",
+]
+
+
+def derive_part5_successor_compatibility_markers(root: str) -> dict:
+    """Derive the frozen-Part-5 successor-compatibility markers (fail-closed).
+
+    Emitted ONLY when the Part 1 authorization record and completion lock are
+    valid (already checked by the caller), the Part 1 QC is all_pass, the
+    compatibility record is internally consistent, and the complete tracked
+    Stage125 tree is unchanged. Any inconsistency raises HandoffError rather
+    than silently asserting that the frozen Part 5 boundary is understood.
+    """
+    compat_path = os.path.join(root, _PART1_PART5_COMPAT_REL)
+    qc_path = os.path.join(root, _PART1_QC_REL)
+    if not (os.path.isfile(compat_path) and os.path.isfile(qc_path)):
+        return {}
+    try:
+        compat = json.load(open(compat_path, encoding="utf-8"))
+        qc = json.load(open(qc_path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(
+            f"unreadable Part 1 compatibility/QC artifacts: {exc}"
+        ) from exc
+
+    if qc.get("all_pass") is not True or qc.get("failed_count") != 0:
+        raise HandoffError("Part 1 QC is not all_pass (fail-closed)")
+
+    compat_exact = {
+        "contract_id":
+            "stage126_m1_robustness_part1_part5_successor_compatibility",
+        "contract_version":
+            "stage126_m1_robustness_part1_part5_successor_compatibility_v1",
+        "part1_category_id": _PART1_CATEGORY_ID,
+        "stage125_part5_artifacts_frozen": True,
+        "stage125_part5_artifacts_modified": False,
+        "stage125_part5_source_modified": False,
+        "stage125_part5_live_handoff_check_applicable_after_part1": False,
+        "stage125_part5_historical_closure_remains_valid": True,
+        "part1_scientific_execution_valid": True,
+        "part2_execution_authorized": False,
+        "full_development_refit_performed": False,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_performed": False,
+    }
+    for key, expected in compat_exact.items():
+        if compat.get(key) != expected:
+            raise HandoffError(
+                f"Part 1 compatibility record field {key}="
+                f"{compat.get(key)!r} != {expected!r}"
+            )
+    if list(compat.get("expected_live_mismatch_fields") or []) != \
+            _PART5_EXPECTED_MISMATCH_FIELDS:
+        raise HandoffError(
+            "Part 1 compatibility record expected_live_mismatch_fields "
+            "is not the exact documented five-field set"
+        )
+    # The QC must agree with the compatibility record.
+    if qc.get("stage125_part5_live_handoff_check_applicable") is not False:
+        raise HandoffError("Part 1 QC part5 applicability flag mismatch")
+    if qc.get("stage125_part5_source_modified") is not False:
+        raise HandoffError("Part 1 QC reports a modified Part 5 source")
+    if qc.get("stage125_part5_artifacts_modified") is not False:
+        raise HandoffError("Part 1 QC reports modified Part 5 artifacts")
+    if list(qc.get("stage125_part5_live_handoff_mismatch_fields") or []) != \
+            _PART5_EXPECTED_MISMATCH_FIELDS:
+        raise HandoffError("Part 1 QC mismatch-field list is not exact")
+
+    # The complete tracked Stage125 tree must be unchanged (fail-closed, git).
+    _require_stage125_tree_unchanged(root)
+
+    return {
+        "stage125_part5_frozen_artifacts_verified": True,
+        "stage125_part5_live_successor_check_applicable": False,
+        "stage125_part5_successor_compatibility_status":
+            "expected_historical_contract_boundary_after_part1",
+    }
+
+
+def _require_stage125_tree_unchanged(root: str) -> None:
+    """Fail closed unless the tracked project/stage125/ tree is unchanged."""
+    base = "6a4f05da219db7faea5a27c2adbee6b55497ec01"
+    offending: list[str] = []
+    for args, label in (
+        (["diff", "--name-only", base, "HEAD", "--", "project/stage125/"],
+         "committed"),
+        (["diff", "--cached", "--name-only", "HEAD", "--", "project/stage125/"],
+         "staged"),
+        (["diff", "--name-only", "--", "project/stage125/"], "unstaged"),
+        (["ls-files", "--others", "--exclude-standard", "--", "project/stage125/"],
+         "untracked"),
+    ):
+        out = _git(root, *args)
+        offending += [f"{label}:{p}" for p in out.splitlines() if p.strip()]
+    if offending:
+        raise HandoffError(
+            f"frozen Stage125 tree changed (fail-closed): {sorted(set(offending))}"
+        )
 
 
 def detect_markers(root: str) -> dict:

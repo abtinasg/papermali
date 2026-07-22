@@ -2427,3 +2427,89 @@ def test_part1_lock_fail_closed(tmp_path, mutate_lock):
     root = _write_part1(str(tmp_path), _valid_part1_auth(), lock)
     with pytest.raises(gen.HandoffError):
         gen.derive_m1_robustness_part1_markers(root, _PART1_ORDER)
+
+
+# --------------------------------------------------------------------------- #
+# Frozen Part 5 successor-compatibility markers
+# --------------------------------------------------------------------------- #
+
+_PART5_COMPAT_REL = (
+    "project/stage126/"
+    "stage126_m1_robustness_part1_part5_successor_compatibility.json"
+)
+_PART1_QC_REL = "project/stage126/stage126_m1_robustness_part1_qc_report.json"
+
+
+def _valid_compat() -> dict:
+    with open(os.path.join(REAL_ROOT, _PART5_COMPAT_REL), encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _valid_part1_qc() -> dict:
+    with open(os.path.join(REAL_ROOT, _PART1_QC_REL), encoding="utf-8") as f:
+        return json.load(f)
+
+
+def test_handoff_state_carries_part5_compatibility_markers():
+    state = _state(REAL_ROOT)
+    assert state["stage125_part5_frozen_artifacts_verified"] is True
+    assert state["stage125_part5_live_successor_check_applicable"] is False
+    assert state["stage125_part5_successor_compatibility_status"] == (
+        "expected_historical_contract_boundary_after_part1"
+    )
+
+
+def test_part5_compatibility_markers_absent_without_artifacts(tmp_path):
+    assert gen.derive_part5_successor_compatibility_markers(str(tmp_path)) == {}
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda c: c.update(contract_id="WRONG"),
+    lambda c: c.update(contract_version="WRONG"),
+    lambda c: c.update(part1_category_id="WRONG"),
+    lambda c: c.update(stage125_part5_artifacts_modified=True),
+    lambda c: c.update(stage125_part5_source_modified=True),
+    lambda c: c.update(stage125_part5_historical_closure_remains_valid=False),
+    lambda c: c.update(
+        stage125_part5_live_handoff_check_applicable_after_part1=True),
+    lambda c: c.update(part1_scientific_execution_valid=False),
+    lambda c: c.update(part2_execution_authorized=True),
+    lambda c: c.update(full_development_refit_performed=True),
+    lambda c: c.update(final_test_access_authorized=True),
+    lambda c: c.update(final_test_evaluation_performed=True),
+    lambda c: c.update(expected_live_mismatch_fields=["only_one_field"]),
+], ids=[
+    "wrong_contract_id", "wrong_contract_version", "wrong_category",
+    "artifacts_modified", "source_modified", "closure_invalid",
+    "check_applicable", "execution_invalid", "part2_authorized",
+    "full_refit", "final_test_access", "final_test_evaluated",
+    "wrong_mismatch_fields",
+])
+def test_part5_compatibility_fail_closed(tmp_path, mutate):
+    compat = _valid_compat()
+    mutate(compat)
+    d = os.path.join(str(tmp_path), "project", "stage126")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, os.path.basename(_PART5_COMPAT_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(compat, f, ensure_ascii=False)
+    with open(os.path.join(d, os.path.basename(_PART1_QC_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(_valid_part1_qc(), f, ensure_ascii=False)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_part5_successor_compatibility_markers(str(tmp_path))
+
+
+def test_part5_compatibility_requires_part1_qc_all_pass(tmp_path):
+    qc = _valid_part1_qc()
+    qc["all_pass"] = False
+    d = os.path.join(str(tmp_path), "project", "stage126")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, os.path.basename(_PART5_COMPAT_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(_valid_compat(), f, ensure_ascii=False)
+    with open(os.path.join(d, os.path.basename(_PART1_QC_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(qc, f, ensure_ascii=False)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_part5_successor_compatibility_markers(str(tmp_path))
