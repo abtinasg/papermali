@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed research action:** `stage125-part5-readiness-closure`
 - **Next research action:** `stage126-m1-financial-baseline`
-- **Last stage commit:** `0cff1b937c792b10d3f4682ad5535818c2fe7b7a`
-- **Generated from commit:** `0cff1b937c792b10d3f4682ad5535818c2fe7b7a` (branch `stage126-m1-primary-development-tuning`, informational)
-- **Baseline:** `origin/main` @ `5f56be5b2e49e66c54b451994a5e36c4fcc754d9`
+- **Last stage commit:** `2ae50e40584e1a0b9251c6e62cda2ab21fdefcc9`
+- **Generated from commit:** `b22306d6840fa9542b0f7816277ee618fbb48cd1` (branch `stage126-m1-robustness-part0-decision-lock`, informational)
+- **Baseline:** `origin/main` @ `6a4f05da219db7faea5a27c2adbee6b55497ec01`
 
 ## QC
 
@@ -57,5 +57,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `e5c2092e531611a40db5814fe164b2aefd5ff7339ca0c89fd3c01f980e547add`_
-_generated_at_utc: 2026-07-22T11:09:36Z (informational)_
+_state_fingerprint: `ccd2e429bba306f5570e4c92f7069fa6b8ea3494f78b44982ce361bd1cf0d820`_
+_generated_at_utc: 2026-07-22T13:17:57Z (informational)_
