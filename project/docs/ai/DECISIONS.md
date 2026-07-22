@@ -59,6 +59,31 @@ These are stable project decisions. Change them only deliberately (and note it i
 - No M2/M3/M4 data collection or modeling has occurred.
 - SHAP, SMOTE robustness and network extraction remain prohibited.
 
+### Stage126 M1 robustness Part 0 — decision lock (2026-07-22)
+
+- The robustness **execution contract is locked** in an additive record
+  (`stage126_m1_robustness_execution_contract_v1`); this is a **decision lock
+  only** and authorizes **no** robustness execution. Part 1 is not authorized or
+  started.
+- Six categories, in binding execution order: (1)
+  `m1_target_proximity_six_feature_set`, (2) `main_rule_b_listing_robustness`,
+  (3) `expanded_rule_a_company_scope_robustness`, (4)
+  `expanded_rule_b_combined_robustness`, (5) `persistent_loss_robustness_target`
+  (primary Rule A sample only), (6) `smote_training_fold_only_robustness`.
+- One factor at a time; all three model families every category; **no retuning**
+  (reuse the primary selected configurations, which robustness may not replace);
+  the two locked development folds only; metrics limited to PR-AUC, ROC-AUC,
+  Brier, Recall@10%, Lift@10%; no calibration/bootstrap/Holm/winner selection.
+- SMOTE category uses training-fold-only SMOTE/SMOTENC (SMOTENC when appended
+  binary missingness indicators are present, marked categorical), sampler
+  `random_state=20260725`, class weighting disabled.
+- All six categories are **sensitivity analyses only** — they may not change a
+  selected configuration, the primary model-family ordering, select a final
+  winner, unlock the final test, trigger a refit, or advance M2/M3/M4.
+- **Packaging:** one robustness category per micro-part PR; each future Part
+  requires a separate explicit human authorization. Primary Stage126 artifacts
+  remain byte-identical; the final test remains locked and untouched.
+
 ## Verified listing master (Stage124)
 
 - `listing_master_verified_stage124.csv` **exists** and contains exactly **130

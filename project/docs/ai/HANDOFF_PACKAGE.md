@@ -145,6 +145,15 @@ Do not confuse QC selection with the research-action chain:
   `tests/test_stage126_authorization_transition_guard.py`,
   `stage126/stage126_m1_final_test_lock_guard.json`,
   `stage126/stage126_m1_primary_development_lock.json`.
+- Stage126 M1 robustness Part 0 decision-lock source/test/QC:
+  `src/stage126_m1_robustness_part0_decision_lock.py`,
+  `run_stage126_m1_robustness_part0_decision_lock.py`,
+  `tests/test_stage126_m1_robustness_part0_decision_lock.py`,
+  `stage126/stage126_m1_robustness_part0_decision_record.json`,
+  `stage126/stage126_m1_robustness_part0_decision_lock_qc_report.json`
+  (additive robustness execution contract; **decision lock only — no robustness
+  execution; Part 1 not started**; primary artifacts byte-identical; final test
+  locked).
 
 ## 7. Done
 
@@ -180,6 +189,13 @@ human micro-part decision is required before any M1 robustness execution. M1
 robustness, full-development refit and final-test access remain unstarted and
 unauthorized. The final test remains locked and untouched; M2/M3/M4 data were not
 collected.
+
+The robustness Part 0 decision lock
+(`stage126_m1_robustness_execution_contract_v1`) records the execution contract
+for the six robustness categories (one category per micro-part PR, first
+`m1_target_proximity_six_feature_set`). It is a **decision lock only**:
+`m1_robustness_execution_authorized=false` and **Part 1 is not started**. Each
+future Part requires its own separate explicit human authorization.
 
 ## 11. Recent change history
 

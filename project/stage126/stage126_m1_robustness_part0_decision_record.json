@@ -1,0 +1,385 @@
+{
+  "authorizing_role": "human_supervisor_data_owner",
+  "categories": [
+    {
+      "category_id": "m1_target_proximity_six_feature_set",
+      "changed_dimension": "feature_set",
+      "feature_set": "M1_TARGET_PROXIMITY_ROBUSTNESS",
+      "features_exact_order": [
+        "log_total_assets",
+        "current_ratio",
+        "roa_period_adjusted",
+        "asset_turnover_period_adjusted",
+        "operating_margin_period_adjusted",
+        "financial_expense_to_assets_period_adjusted"
+      ],
+      "future_micro_part": "Part 1",
+      "imbalance_policy": "primary_class_weighting",
+      "order": 1,
+      "sample": "main_rule_a_primary",
+      "scientific_role": "target_proximity_feature_set_robustness",
+      "target": "FD_target_main_t_plus_1"
+    },
+    {
+      "category_id": "main_rule_b_listing_robustness",
+      "changed_dimension": "sample",
+      "feature_set": "M1_PRIMARY_FEATURE_ORDER",
+      "features_exact_order": [
+        "log_total_assets",
+        "leverage_ratio",
+        "current_ratio",
+        "roa_period_adjusted",
+        "ocf_to_assets_period_adjusted",
+        "asset_turnover_period_adjusted",
+        "operating_margin_period_adjusted",
+        "financial_expense_to_assets_period_adjusted",
+        "accumulated_loss_to_capital_ratio"
+      ],
+      "future_micro_part": "Part 2",
+      "imbalance_policy": "primary_class_weighting",
+      "order": 2,
+      "sample": "main_rule_b_listing_robustness",
+      "scientific_role": "listing_timing_sample_robustness",
+      "target": "FD_target_main_t_plus_1"
+    },
+    {
+      "category_id": "expanded_rule_a_company_scope_robustness",
+      "changed_dimension": "sample",
+      "feature_set": "M1_PRIMARY_FEATURE_ORDER",
+      "features_exact_order": [
+        "log_total_assets",
+        "leverage_ratio",
+        "current_ratio",
+        "roa_period_adjusted",
+        "ocf_to_assets_period_adjusted",
+        "asset_turnover_period_adjusted",
+        "operating_margin_period_adjusted",
+        "financial_expense_to_assets_period_adjusted",
+        "accumulated_loss_to_capital_ratio"
+      ],
+      "future_micro_part": "Part 3",
+      "imbalance_policy": "primary_class_weighting",
+      "order": 3,
+      "sample": "expanded_rule_a_company_scope_robustness",
+      "scientific_role": "expanded_company_scope_sample_robustness",
+      "target": "FD_target_main_t_plus_1"
+    },
+    {
+      "category_id": "expanded_rule_b_combined_robustness",
+      "changed_dimension": "sample",
+      "feature_set": "M1_PRIMARY_FEATURE_ORDER",
+      "features_exact_order": [
+        "log_total_assets",
+        "leverage_ratio",
+        "current_ratio",
+        "roa_period_adjusted",
+        "ocf_to_assets_period_adjusted",
+        "asset_turnover_period_adjusted",
+        "operating_margin_period_adjusted",
+        "financial_expense_to_assets_period_adjusted",
+        "accumulated_loss_to_capital_ratio"
+      ],
+      "future_micro_part": "Part 4",
+      "imbalance_policy": "primary_class_weighting",
+      "order": 4,
+      "sample": "expanded_rule_b_combined_robustness",
+      "scientific_role": "combined_sample_robustness",
+      "target": "FD_target_main_t_plus_1"
+    },
+    {
+      "category_id": "persistent_loss_robustness_target",
+      "changed_dimension": "target",
+      "feature_set": "M1_PRIMARY_FEATURE_ORDER",
+      "features_exact_order": [
+        "log_total_assets",
+        "leverage_ratio",
+        "current_ratio",
+        "roa_period_adjusted",
+        "ocf_to_assets_period_adjusted",
+        "asset_turnover_period_adjusted",
+        "operating_margin_period_adjusted",
+        "financial_expense_to_assets_period_adjusted",
+        "accumulated_loss_to_capital_ratio"
+      ],
+      "future_micro_part": "Part 5",
+      "imbalance_policy": "primary_class_weighting",
+      "notes": "persistent-loss target restricted to the primary Rule A sample so only the target changes; not multiplied across all four samples",
+      "order": 5,
+      "sample": "main_rule_a_primary",
+      "scientific_role": "secondary_robustness_target",
+      "target": "FD_target_persistent_loss_robustness_t_plus_1"
+    },
+    {
+      "category_id": "smote_training_fold_only_robustness",
+      "changed_dimension": "imbalance_strategy",
+      "feature_set": "M1_PRIMARY_FEATURE_ORDER",
+      "features_exact_order": [
+        "log_total_assets",
+        "leverage_ratio",
+        "current_ratio",
+        "roa_period_adjusted",
+        "ocf_to_assets_period_adjusted",
+        "asset_turnover_period_adjusted",
+        "operating_margin_period_adjusted",
+        "financial_expense_to_assets_period_adjusted",
+        "accumulated_loss_to_capital_ratio"
+      ],
+      "future_micro_part": "Part 6",
+      "imbalance_policy": "SMOTE_family_training_fold_only_robustness",
+      "order": 6,
+      "sample": "main_rule_a_primary",
+      "scientific_role": "smote_training_fold_only_robustness",
+      "smote_rules": {
+        "applied_only_inside_each_training_fold": true,
+        "class_weighting_disabled": true,
+        "final_test_never_accessed_or_resampled": true,
+        "k_neighbors": "min(5, training_minority_count - 1)",
+        "logistic_pipeline": "standardize continuous features using training-fold parameters; do not standardize indicators; then apply SMOTENC/SMOTE inside the training fold; Logistic fit is deterministic",
+        "missingness_indicator_rule": "If appended binary missingness-indicator columns are present, operationalize the registered SMOTE robustness with SMOTENC and mark all appended missingness-indicator columns as categorical; continuous features remain continuous; missingness indicators must remain binary 0/1 in synthetic observations. If no missingness-indicator columns exist in the fold matrix, standard SMOTE may be used.",
+        "rf_xgboost_pipeline": "do not standardize; use the fixed sampler random_state 20260725; use model seeds 20260719-20260723; use the same fixed resampled training matrix across the five model seeds; mean RF/XGBoost probabilities across the five model seeds",
+        "sampler_random_state": 20260725,
+        "second_tuning_search": false,
+        "uses_selected_non_weight_hyperparameters": true,
+        "validation_data_never_resampled": true,
+        "xgboost_scale_pos_weight": 1
+      },
+      "target": "FD_target_main_t_plus_1"
+    }
+  ],
+  "contract_id": "stage126_m1_robustness_execution_contract",
+  "contract_version": "stage126_m1_robustness_execution_contract_v1",
+  "decision_id": "stage126-m1-robustness-part0-decision-lock",
+  "decision_locked": true,
+  "each_part_requires_separate_human_authorization": true,
+  "execution_authorized": false,
+  "execution_order": [
+    "m1_target_proximity_six_feature_set",
+    "main_rule_b_listing_robustness",
+    "expanded_rule_a_company_scope_robustness",
+    "expanded_rule_b_combined_robustness",
+    "persistent_loss_robustness_target",
+    "smote_training_fold_only_robustness"
+  ],
+  "final_test_access_authorized": false,
+  "final_test_evaluation_authorized": false,
+  "final_test_evaluation_performed": false,
+  "final_test_unlocked": false,
+  "frozen_part4_contract_paths": [
+    "project/stage125/part4_statistical_analysis_plan_stage125.json",
+    "project/stage125/part4_model_specifications_stage125.json",
+    "project/stage125/part4_preprocessing_contract_stage125.json",
+    "project/stage125/part4_temporal_split_contract_stage125.json",
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
+    "project/stage125/part4_feature_sets_stage125.csv",
+    "project/stage125/part4_sample_target_matrix_stage125.csv",
+    "project/stage125/part4_hyperparameter_budget_stage125.json"
+  ],
+  "frozen_part5_contract_path": "project/stage125/part5_stage126_m1_entry_contract_stage125.json",
+  "frozen_stage125_contract_sha256": {
+    "project/stage125/part4_feature_sets_stage125.csv": "79e87cbcef1a6aa70fa6e4b837c4634df9e1f701e25f42a87ac34012452b850f",
+    "project/stage125/part4_hyperparameter_budget_stage125.json": "22d6989681a7cd59ffbf57077910615ce00adb9f171d303d5d61100a54490b40",
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
+    "project/stage125/part4_model_specifications_stage125.json": "ef933be3eb2f75e6f493ac1401100c629bdb83850c81950d8f235c5ccf4cdb21",
+    "project/stage125/part4_preprocessing_contract_stage125.json": "3722bd6165574c78aef1138a810ff4863b5c214f80df197889eaa40163f0e415",
+    "project/stage125/part4_sample_target_matrix_stage125.csv": "d7f026ecf0b3b2810eb95df5b912184c3b9f4e36031e9b366c00fd858b7c4792",
+    "project/stage125/part4_statistical_analysis_plan_stage125.json": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
+    "project/stage125/part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
+    "project/stage125/part5_stage126_m1_entry_contract_stage125.json": "74a2159785daeda44fa82ebd76f42870fa25aba3667846bccba6b3099ea65da5"
+  },
+  "frozen_stage125_source_commit": "6a4f05da219db7faea5a27c2adbee6b55497ec01",
+  "frozen_stage125_tree_unchanged": true,
+  "full_development_refit_authorized": false,
+  "full_development_refit_performed": false,
+  "future_micro_parts": [
+    {
+      "category_id": "m1_target_proximity_six_feature_set",
+      "micro_part": "Part 1"
+    },
+    {
+      "category_id": "main_rule_b_listing_robustness",
+      "micro_part": "Part 2"
+    },
+    {
+      "category_id": "expanded_rule_a_company_scope_robustness",
+      "micro_part": "Part 3"
+    },
+    {
+      "category_id": "expanded_rule_b_combined_robustness",
+      "micro_part": "Part 4"
+    },
+    {
+      "category_id": "persistent_loss_robustness_target",
+      "micro_part": "Part 5"
+    },
+    {
+      "category_id": "smote_training_fold_only_robustness",
+      "micro_part": "Part 6"
+    }
+  ],
+  "global_execution_rules": {
+    "metrics": {
+      "frozen_calibration_and_uncertainty_retained_for_later_stage": true,
+      "not_executed_in_robustness_micro_parts": [
+        "platt_calibration",
+        "calibration_curves",
+        "calibration_intercept_or_slope",
+        "f2_threshold_optimization",
+        "paired_bootstrap",
+        "holm_correction",
+        "p_values",
+        "new_confirmatory_families",
+        "post_hoc_multiplicity_families",
+        "winner_selection"
+      ],
+      "report": [
+        "PR-AUC",
+        "ROC-AUC",
+        "Brier_score",
+        "Recall@10%",
+        "Lift@10%"
+      ],
+      "scopes": [
+        "fold1_validation",
+        "fold2_validation",
+        "pooled_development_oof"
+      ],
+      "topk_rule": "K_y = ceil(0.10 * N_y)"
+    },
+    "model_families": [
+      "regularized_logistic_regression",
+      "random_forest",
+      "xgboost"
+    ],
+    "no_retuning": {
+      "reuse_selected_primary_configurations": true,
+      "robustness_may_not_replace_selected_configurations": true,
+      "second_tuning_search": false,
+      "selected_configurations": {
+        "random_forest": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
+        "regularized_logistic_regression": "logistic__C_0.1",
+        "xgboost": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1"
+      }
+    },
+    "non_smote_imbalance_policy": {
+      "logistic_regression": {
+        "class_weight": "balanced"
+      },
+      "random_forest": {
+        "class_weight": "balanced_subsample"
+      },
+      "weights_recomputed_from_robustness_training_fold_and_target": true,
+      "xgboost": {
+        "scale_pos_weight": "training_fold_negative_evaluable_count / training_fold_positive_evaluable_count"
+      }
+    },
+    "one_factor_at_a_time": "Each robustness category changes only its registered robustness dimension; all non-changed dimensions remain equal to the locked primary specification.",
+    "preprocessing": {
+      "continuous_pipeline_order": [
+        "1_deterministic_source_to_feature_transformation",
+        "2_capture_original_pre_imputation_missingness_mask",
+        "3_estimate_1st_99th_percentile_clipping_bounds_on_observed_training_fold_values_only",
+        "4_apply_training_derived_clipping_bounds",
+        "5_estimate_training_fold_median_on_observed_clipped_training_values",
+        "6_impute_missing_values_with_training_fold_median",
+        "7_append_missingness_indicators_from_original_pre_imputation_mask",
+        "8_logistic_regression_only_standardize_imputed_continuous_features_using_training_fold_mean_std"
+      ],
+      "fit_scope": "each_temporal_training_fold_separately",
+      "forbidden_fit_on": [
+        "validation_data",
+        "final_test_data",
+        "combined_train_plus_validation_before_configuration_selection"
+      ],
+      "frozen_preprocessing_contract_path": "project/stage125/part4_preprocessing_contract_stage125.json",
+      "logistic_regression_extra": "training_fold_standardization_after_imputation_continuous_only",
+      "missing_indicators_standardized": false,
+      "never_fit_on_validation_or_final_test": true,
+      "random_forest_standardization": false,
+      "reduced_feature_set_missingness_indicators": "create missingness indicators only for the selected base features",
+      "use_frozen_part4_training_fold_only_contract": true,
+      "validation_and_final_test_masks_from_own_original_missing_positions": true,
+      "xgboost_standardization": false
+    },
+    "scientific_interpretation": {
+      "all_categories": "sensitivity_analysis_only",
+      "may_not": [
+        "change_a_selected_configuration",
+        "change_the_locked_primary_model_family_ordering",
+        "select_a_final_paper_winner",
+        "unlock_the_final_test",
+        "trigger_an_automatic_refit",
+        "advance_m2_m3_m4"
+      ],
+      "severe_instability_reported_to_human_supervisor_not_auto_applied": true
+    },
+    "seeds_without_retuning": {
+      "logistic": "deterministic_single_fit_per_fold",
+      "no_tuning_seeds_used": true,
+      "rf_xgboost_fold_probability": "mean_across_five_fixed_model_seeds",
+      "rf_xgboost_model_seeds": [
+        20260719,
+        20260720,
+        20260721,
+        20260722,
+        20260723
+      ]
+    },
+    "temporal_folds": {
+      "fold1": {
+        "train_target_years": [
+          1393,
+          1394,
+          1395
+        ],
+        "validation_target_years": [
+          1396,
+          1397
+        ]
+      },
+      "fold2": {
+        "train_target_years": [
+          1393,
+          1394,
+          1395,
+          1396,
+          1397
+        ],
+        "validation_target_years": [
+          1398,
+          1399
+        ]
+      },
+      "only_development_years_loaded": [
+        1393,
+        1394,
+        1395,
+        1396,
+        1397,
+        1398,
+        1399
+      ]
+    }
+  },
+  "human_decision_text": "من به‌عنوان ناظر انسانی و مالک تصمیم پژوهشی پروژه، فقط ثبت و قفل‌کردن قرارداد اجرایی آزمون‌های استحکام M1 را مطابق مشخصات این دستور مجاز می‌کنم. این مجوز شامل اجرای هیچ آزمون استحکام، برازش یا پیش‌بینی مدل، بازتنظیم ابرپارامتر، بازبرازش روی کل دوره توسعه، دسترسی یا ارزیابی آزمون نهایی، SMOTE یا SMOTENC، SHAP، یا شروع M2، M3 یا M4 نیست.",
+  "human_decision_text_sha256": "79f98e4c6dc81e6362ad90b138997c0d0bc3c8bad5d471ea65615ffc49627a5b",
+  "m1_robustness_completed": false,
+  "m1_robustness_started": false,
+  "m2_m3_m4_authorized": false,
+  "one_category_per_micro_part_pr": true,
+  "packaging_policy": "one_category_per_micro_part_pr",
+  "part0_authorizes_part1": false,
+  "primary_artifact_sha256": {
+    "project/stage126/stage126_m1_configuration_registry.csv": "decbf43a5c34669bdd7a0c68c0ad6aec5611efc7c3ca82b09f5e85f72d635804",
+    "project/stage126/stage126_m1_development_access_manifest.csv": "0c2783d0e43ebba712a1c41b6889a2f8f646340bae6a75ad15902a8a0c368e39",
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_final_test_lock_guard.json": "509e58fc39e3c5d886993c11b954fc06c267c96d02c081d8e50b0cda52e58b03",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4",
+    "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e",
+    "project/stage126/stage126_m1_tuning_results.csv": "e7e1e6808e394273676709aa94bfa713bbf8a790fadabee22ea20b849adbe649"
+  },
+  "scientific_interpretation": "sensitivity_analysis_only",
+  "shap_authorized": false,
+  "source_main_commit": "6a4f05da219db7faea5a27c2adbee6b55497ec01",
+  "source_repository": "abtinasg/papermali"
+}

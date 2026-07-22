@@ -3,6 +3,38 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-22 — Stage126 M1 Robustness Part 0 Decision Lock
+
+- **Robustness execution decisions locked (decision lock only; no execution).**
+  Added the additive Stage126 M1 robustness execution contract
+  (`stage126_m1_robustness_execution_contract`, version
+  `stage126_m1_robustness_execution_contract_v1`) recording the byte-for-byte
+  human decision text (SHA-256
+  `79f98e4c6dc81e6362ad90b138997c0d0bc3c8bad5d471ea65615ffc49627a5b`), the six
+  registered robustness categories in binding execution order (one factor at a
+  time), all-three model families, no-retuning (reuse the primary selected
+  configurations), the two locked development folds, the metric list, the
+  SMOTE/SMOTENC training-fold-only rules, and the one-category-per-micro-part
+  packaging policy. **Robustness execution is NOT authorized; Part 1 is not
+  started.** No model was fit, predicted, retuned or refitted; no SMOTE/SMOTENC
+  or SHAP ran; the final test remains locked and untouched; the primary Stage126
+  artifacts are byte-identical; no historical Stage125 contract was modified.
+  Handoff now carries `m1_robustness_decision_locked=true`,
+  `m1_robustness_execution_authorized=false`,
+  `m1_robustness_next_category_id=m1_target_proximity_six_feature_set`. Research
+  action pointers are unchanged (Stage126 M1 remains the active incomplete
+  research action).
+- **Frozen Stage125 byte-integrity and fail-closed Handoff validation hardened;
+  no scientific decision changed and no execution occurred.** The nine consumed
+  Stage125 contracts are individually SHA-256 pinned to their exact frozen bytes;
+  the complete tracked `project/stage125/` tree is verified unchanged (committed,
+  staged, unstaged, untracked); the Part 4 preprocessing sequence is incorporated
+  by reference and validated for exact equality; and the Handoff generator now
+  rejects any internally inconsistent Part 0 decision record (identity, flags,
+  full execution order, and recomputed human-decision-text hash).
+  Integrity-critical Git command failures and invalid repository/base states now
+  fail closed rather than being interpreted as empty diffs.
+
 ## 2026-07-22
 
 - **Repository-entry-document consistency correction (documentation only).** Updated
