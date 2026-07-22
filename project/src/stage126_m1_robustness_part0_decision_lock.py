@@ -377,6 +377,11 @@ def recompute_decision_text_sha256(text_fa: str) -> str:
 
 
 def _git(repo_root: str | Path, *args: str) -> str:
+    """Permissive git helper for INFORMATIONAL metadata only (e.g. source_commit).
+
+    Returns "" on any git error. MUST NOT be used for integrity-critical checks —
+    use ``_git_checked`` there so a git failure never masquerades as empty output.
+    """
     try:
         out = subprocess.run(
             ["git", "-C", str(repo_root), *args],
@@ -385,6 +390,29 @@ def _git(repo_root: str | Path, *args: str) -> str:
     except (OSError, subprocess.CalledProcessError):
         return ""
     return out.stdout.strip()
+
+
+def _git_checked(repo_root: str | Path, *args: str, purpose: str) -> str:
+    """Fail-closed git helper for integrity-critical operations.
+
+    Never converts a git execution or repository-state error into empty output;
+    raises QCFail with the failed command's purpose, return code, and stderr.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(repo_root), *args],
+            check=True, capture_output=True, text=True,
+        )
+    except OSError as exc:
+        raise QCFail(f"{purpose}: unable to execute git: {exc}") from exc
+    except subprocess.CalledProcessError as exc:
+        stderr = (exc.stderr or "").strip()
+        stdout = (exc.stdout or "").strip()
+        raise QCFail(
+            f"{purpose}: git command failed; returncode={exc.returncode}; "
+            f"stdout={stdout!r}; stderr={stderr!r}"
+        ) from exc
+    return result.stdout.strip()
 
 
 def runtime_versions() -> dict[str, str]:
@@ -477,19 +505,52 @@ def verify_stage125_tree_unchanged(
     defaults to the frozen source commit and is parameterizable for testing.
     """
     root = str(repo_root)
+    purpose = "frozen Stage125 tree integrity"
+
+    # Repository/base validation FIRST — every failure fails closed, and no diff
+    # command runs until the repository and base are proven valid.
+    inside = _git_checked(
+        root, "rev-parse", "--is-inside-work-tree",
+        purpose=f"{purpose}: is-inside-work-tree",
+    )
+    if inside.strip().lower() != "true":
+        raise QCFail(f"{purpose}: not inside a git work tree (got {inside!r})")
+    _git_checked(
+        root, "rev-parse", "--verify", f"{base}^{{commit}}",
+        purpose=f"{purpose}: base '{base}' must resolve to a commit",
+    )
+    _git_checked(
+        root, "cat-file", "-e", f"{base}:project/stage125",
+        purpose=f"{purpose}: base '{base}' must contain project/stage125",
+    )
+    _git_checked(
+        root, "rev-parse", "--verify", "HEAD^{commit}",
+        purpose=f"{purpose}: HEAD must resolve to a commit",
+    )
+
     offending: list[str] = []
-    # Committed diff (base..HEAD) restricted to project/stage125/.
-    committed = _git(root, "diff", "--name-only", base, "HEAD", "--", "project/stage125/")
+    # 5.1 Committed changes (base..HEAD) restricted to project/stage125/.
+    committed = _git_checked(
+        root, "diff", "--name-only", base, "HEAD", "--", "project/stage125/",
+        purpose=f"{purpose}: committed diff",
+    )
     offending += [f"committed:{p}" for p in committed.splitlines() if p.strip()]
-    # Staged diff vs base.
-    staged = _git(root, "diff", "--cached", "--name-only", base, "--", "project/stage125/")
+    # 5.2 Staged-only changes (index vs HEAD).
+    staged = _git_checked(
+        root, "diff", "--cached", "--name-only", "HEAD", "--", "project/stage125/",
+        purpose=f"{purpose}: staged diff",
+    )
     offending += [f"staged:{p}" for p in staged.splitlines() if p.strip()]
-    # Unstaged working-tree diff vs base.
-    unstaged = _git(root, "diff", "--name-only", base, "--", "project/stage125/")
-    offending += [f"worktree:{p}" for p in unstaged.splitlines() if p.strip()]
-    # Non-ignored untracked paths under project/stage125/.
-    untracked = _git(
-        root, "ls-files", "--others", "--exclude-standard", "--", "project/stage125/"
+    # 5.3 Unstaged changes (working tree vs index).
+    unstaged = _git_checked(
+        root, "diff", "--name-only", "--", "project/stage125/",
+        purpose=f"{purpose}: unstaged diff",
+    )
+    offending += [f"unstaged:{p}" for p in unstaged.splitlines() if p.strip()]
+    # 5.4 Non-ignored untracked paths under project/stage125/.
+    untracked = _git_checked(
+        root, "ls-files", "--others", "--exclude-standard", "--", "project/stage125/",
+        purpose=f"{purpose}: untracked paths",
     )
     offending += [f"untracked:{p}" for p in untracked.splitlines() if p.strip()]
     if offending:

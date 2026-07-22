@@ -32,6 +32,8 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
   by reference and validated for exact equality; and the Handoff generator now
   rejects any internally inconsistent Part 0 decision record (identity, flags,
   full execution order, and recomputed human-decision-text hash).
+  Integrity-critical Git command failures and invalid repository/base states now
+  fail closed rather than being interpreted as empty diffs.
 
 ## 2026-07-22
 

@@ -529,6 +529,68 @@ def test_real_repo_stage125_tree_unchanged():
     p0.verify_stage125_tree_unchanged(_path())
 
 
+def test_invalid_base_ref_fails_closed(tmp_path):
+    # A valid repo but a base ref that does not resolve must fail closed.
+    root, _base = _init_temp_repo_with_stage125(tmp_path)
+    with pytest.raises(p0.QCFail):
+        p0.verify_stage125_tree_unchanged(root, base="0" * 40)
+
+
+def test_non_git_directory_fails_closed(tmp_path):
+    # A plain directory (not a git work tree) must fail closed, never pass.
+    from pathlib import Path
+    plain = Path(tmp_path) / "plain"
+    plain.mkdir()
+    with pytest.raises(p0.QCFail):
+        p0.verify_stage125_tree_unchanged(plain, base="0" * 40)
+
+
+def test_staged_only_modification_fails_closed(tmp_path):
+    import subprocess
+    root, base = _init_temp_repo_with_stage125(tmp_path)
+    p = root / NINE_CONTRACTS[0]
+    p.write_bytes(p.read_bytes() + b"X")
+    subprocess.run(["git", "-C", str(root), "add", str(p)], check=True)
+    # Staged but NOT committed — the index differs from HEAD.
+    with pytest.raises(p0.QCFail):
+        p0.verify_stage125_tree_unchanged(root, base=base)
+
+
+def test_git_execution_failure_fails_closed(tmp_path, monkeypatch):
+    # Simulate a git command returning nonzero: must raise QCFail, never accept
+    # empty output.
+    root, base = _init_temp_repo_with_stage125(tmp_path)
+    import subprocess as _sp
+    real_run = _sp.run
+
+    def fake_run(cmd, *a, **k):
+        # Let the repo/base validation succeed until the first diff command, then
+        # force a nonzero return to prove fail-closed on git execution failure.
+        if isinstance(cmd, (list, tuple)) and "diff" in cmd:
+            raise _sp.CalledProcessError(
+                returncode=128, cmd=cmd, output="", stderr="simulated git failure"
+            )
+        return real_run(cmd, *a, **k)
+
+    monkeypatch.setattr(p0.subprocess, "run", fake_run)
+    with pytest.raises(p0.QCFail):
+        p0.verify_stage125_tree_unchanged(root, base=base)
+
+
+def test_git_checked_raises_on_failure(tmp_path):
+    # Direct check of the fail-closed helper on a bad command.
+    root, _base = _init_temp_repo_with_stage125(tmp_path)
+    with pytest.raises(p0.QCFail):
+        p0._git_checked(root, "rev-parse", "--verify", "does-not-exist^{commit}",
+                        purpose="unit")
+
+
+def test_git_checked_returns_stdout_on_success(tmp_path):
+    root, _base = _init_temp_repo_with_stage125(tmp_path)
+    out = p0._git_checked(root, "rev-parse", "--is-inside-work-tree", purpose="unit")
+    assert out.strip() == "true"
+
+
 # --------------------------------------------------------------------------- #
 # Preprocessing incorporation exact equality
 # --------------------------------------------------------------------------- #
