@@ -1,0 +1,261 @@
+{
+  "all_pass": true,
+  "assertion_count": 45,
+  "assertions": [
+    {
+      "detail": "",
+      "name": "decision_locked",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "execution_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "m1_robustness_started_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "m1_robustness_completed_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "full_development_refit_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "full_development_refit_performed_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_access_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_unlocked_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_evaluation_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_evaluation_performed_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "shap_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "m2_m3_m4_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "one_category_per_micro_part_pr",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part0_does_not_authorize_part1",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "human_decision_text_sha256_recomputed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "human_decision_text_field_hash_matches",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "exactly_six_categories",
+      "status": "PASS"
+    },
+    {
+      "detail": "['m1_target_proximity_six_feature_set', 'main_rule_b_listing_robustness', 'expanded_rule_a_company_scope_robustness', 'expanded_rule_b_combined_robustness', 'persistent_loss_robustness_target', 'smote_training_fold_only_robustness']",
+      "name": "execution_order_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "category_ids_match_execution_order",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "category_order_1_to_6",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "model_families_all_three[m1_target_proximity_six_feature_set]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "model_families_all_three[main_rule_b_listing_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "model_families_all_three[expanded_rule_a_company_scope_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "model_families_all_three[expanded_rule_b_combined_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "model_families_all_three[persistent_loss_robustness_target]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "model_families_all_three[smote_training_fold_only_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_retuning",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "selected_configurations_locked",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "model_seeds_locked",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "metrics_locked",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "bootstrap_and_holm_not_executed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "winner_selection_not_permitted",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "cat1_target_proximity_features",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "cat5_persistent_loss_primary_sample_only",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "cat6_smote_class_weighting_disabled",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "cat6_smote_training_fold_only",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "cat6_smotenc_categorical_indicator_rule_present",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "cat6_sampler_random_state",
+      "status": "PASS"
+    },
+    {
+      "detail": "verified pre-QC (fail-closed)",
+      "name": "frozen_contracts_consistent",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "primary_artifacts_byte_identical",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "network_requests_attempted_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "zero_model_fit_calls",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "zero_prediction_calls",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "zero_smote_smotenc_calls",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "zero_shap_calls",
+      "status": "PASS"
+    }
+  ],
+  "contract_id": "stage126_m1_robustness_execution_contract",
+  "contract_version": "stage126_m1_robustness_execution_contract_v1",
+  "current_stage": "Stage126",
+  "decision_id": "stage126-m1-robustness-part0-decision-lock",
+  "failed_count": 0,
+  "final_test_evaluations": 0,
+  "final_test_predictor_rows_loaded": 0,
+  "final_test_target_rows_loaded": 0,
+  "m1_robustness_completed": false,
+  "m1_robustness_decision_locked": true,
+  "m1_robustness_execution_authorized": false,
+  "m1_robustness_next_category_id": "m1_target_proximity_six_feature_set",
+  "m1_robustness_packaging_policy": "one_category_per_micro_part_pr",
+  "m1_robustness_started": false,
+  "model_fit_calls": 0,
+  "network_requests_attempted": 0,
+  "output_sha256": {
+    "README_STAGE126_M1_ROBUSTNESS_PART0_DECISION_LOCK.md": "28095c7b25e8028e00329c0182ea8bf23de3d014562da15ccf2daced8d297d3a",
+    "stage126_m1_robustness_part0_decision_record.json": "de23db72e715f3194dc8524b687a0ee6532f5328f6c595985237fede1d1dc997"
+  },
+  "prediction_calls": 0,
+  "shap_calls": 0,
+  "smote_calls": 0,
+  "smotenc_calls": 0,
+  "source_commit": "2ae50e40584e1a0b9251c6e62cda2ab21fdefcc9",
+  "source_file_sha256": "fbf5f07d4a32538f38e46c90087dc00035df81d790afe94e7338cda6135a82b7",
+  "stage": "stage126_m1_robustness_part0_decision_lock",
+  "test_file_sha256": "8b109a8b7dd85eba02226b4866b30f9ddd2f066ba61fe62b2dac0ecf80ef7ddc",
+  "ticker_count": 0,
+  "tickers": []
+}
