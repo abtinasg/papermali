@@ -1,0 +1,15 @@
+{
+  "authorization_date": "2026-07-19",
+  "authorization_id": "stage126_m1_financial_baseline_human_authorization_v1",
+  "authorization_text_fa": "Stage126 M1 Financial Baseline را با قرارداد قفل‌شده Part 4 و Part 5 مجاز می‌کنم؛ final test همچنان قفل بماند.",
+  "authorization_text_sha256": "eeba72fe612b292fb611729676eef0a1d7e4b0c1e5fc9d8b533d62d8dcf41a50",
+  "authorizing_role": "human_supervisor_data_owner",
+  "contract_change_authorized": false,
+  "development_modeling_authorized": true,
+  "final_test_access_authorized": false,
+  "final_test_evaluation_authorized": false,
+  "final_test_unlocked": false,
+  "m2_m3_m4_authorized": false,
+  "research_action_id": "stage126-m1-financial-baseline",
+  "stage126_authorized": true
+}

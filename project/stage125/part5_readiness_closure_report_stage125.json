@@ -120,7 +120,7 @@
       "pass": true
     },
     "valid_handoff": {
-      "detail": "actual_handoff_state_matches_derived_closure",
+      "detail": "actual_stage126_successor_handoff_matches_authorized_transition",
       "pass": true
     },
     "working_tree_clean": {

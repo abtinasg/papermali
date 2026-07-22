@@ -14,14 +14,14 @@ with independent QC at every stage.
 
 ## 2. Final goal
 
-A defensible, fully source-documented dataset and (later) distress-prediction models
-for the paper, where **every value is traceable to a source** and nothing is guessed.
+A defensible, fully source-documented dataset and a reproducible, leakage-safe
+distress-prediction modeling pipeline, with final-test results and article claims
+produced only after their separate authorization — where **every value is traceable
+to a source** and nothing is guessed.
 
 ## 3. Current state
 
-See [`CURRENT_STATE.md`](CURRENT_STATE.md) (auto-generated). In one line: data-freeze
-phase, Stage122 & Stage123 frozen, Stage124 Gate B completed and frozen (verified
-master with 130 tickers, four sample designs); **no model trained yet**.
+See [`CURRENT_STATE.md`](CURRENT_STATE.md) (auto-generated). Stage126 M1 is human-authorized and started. Primary M1 development-fold tuning is completed on PR #52. M1 robustness is not started. No full-development refit has occurred. The final test remains locked and untouched. M2/M3/M4 data were not collected.
 
 ## 4. Firm decisions
 
@@ -34,7 +34,7 @@ See [`DECISIONS.md`](DECISIONS.md).
   hashes).
 - Stage122 / Stage123 / targets / financials / ratios / statement-scope are
   **read-only**; their hashes are checked before and after every run.
-- In this phase: **no** model / tuning / SHAP / SMOTE / calibration / report.
+- **Current Stage126 M1 prohibitions:** final-test access or evaluation; full-development refit; M1 robustness without the next explicit micro-part decision; SMOTE robustness; target-proximity robustness; Rule B / expanded-sample robustness; persistent-loss robustness; M2/M3/M4 data collection or modeling; SHAP; network extraction.
 - Bulky outputs are gitignored; only source + small QC/metadata/audit files are
   committed.
 - Two-commit workflow: **code-commit → artifact-commit → merge-commit**. QC points at
@@ -121,8 +121,11 @@ Do not confuse QC selection with the research-action chain:
   `run_stage125_part5.py`,
   `tests/test_stage125_part5_readiness_closure.py`,
   `stage125/stage125_part5_readiness_closure_qc_report.json` (Gate 125.0;
-  keep/drop/defer; Stage126 M1 entry contract readiness-only; no modeling;
-  Stage126 unauthorized)
+  keep/drop/defer; Stage126 M1 entry contract readiness-only; no modeling).
+  The entry-contract flags `stage126_authorized=false` / `modeling_authorized=false`
+  describe the **historical Stage125 closure-state artifact** at closure time; they
+  are not the current authorization state (Stage126 M1 is now human-authorized and
+  started). The frozen artifact itself is unchanged.
 - Stage125 Part 3C leakage-safe dataset finalization source/test/QC:
   `src/stage125_part3c_leakage_safe_dataset_finalization.py`,
   `run_stage125_part3c.py`,
@@ -131,13 +134,27 @@ Do not confuse QC selection with the research-action chain:
   Gate B designs; audited pair + timing-eligible analysis-ready surfaces;
   active four-Jalali-month regulatory lag; six-month methodology superseded;
   bulky outputs gitignored/hashed; no feature approval / modeling / Stage126).
+- Stage126 M1 primary development-fold tuning source/test/QC:
+  `src/stage126_m1_primary_development_tuning.py`,
+  `run_stage126_m1_primary_development_tuning.py`,
+  `tests/test_stage126_m1_primary_development_tuning.py`,
+  `stage126/stage126_m1_primary_development_tuning_qc_report.json`
+  (human-authorized M1 development-fold tuning; final test locked; no robustness).
+- Stage126 authorization transition guard source/test/QC:
+  `src/stage126_authorization_transition_guard.py`,
+  `tests/test_stage126_authorization_transition_guard.py`,
+  `stage126/stage126_m1_final_test_lock_guard.json`,
+  `stage126/stage126_m1_primary_development_lock.json`.
 
 ## 7. Done
 
 See [`CHANGELOG.md`](CHANGELOG.md) and `git log`. High level: Stage121 (legacy) →
 Stage122 freeze → Stage123 freeze → Stage124 Part1 template → Pilot15 confirmed →
 Batch02 Gate A V1→V2 → Batch02 Part 2 sealed → Part 3.1A.* research engine →
-official API verified master → Gate B readiness → rule approval → Gate B execution.
+official API verified master → Gate B readiness → rule approval → Gate B execution →
+Stage125 Part 3C leakage-safe finalization → Stage125 Part 4 SAP lock →
+Stage125 Part 5 readiness closure → Stage126 M1 human authorization →
+Stage126 primary development-fold tuning completed on PR #52.
 
 ## 8. Open tasks
 
@@ -147,26 +164,22 @@ See [`OPEN_TASKS.md`](OPEN_TASKS.md).
 
 - `project/outputs/04_models/` holds **legacy Stage121** model artifacts
   (`best_hyperparameters.json`, `final_thresholds.json`) from `run_all.py`. These do
-  **not** mean modeling has started for the current target — `modeling_started`
-  stays `false`.
+  **not** mean modeling has started for the current target — they are historical
+  artifacts only.
 - `run_all.py` is the old Stage121 baseline only; do not run it for the current
   target.
 
 ## 10. Next step
 
 See `next_research_action_id` in [`ROADMAP.md`](ROADMAP.md) and
-[`handoff_state.json`](handoff_state.json). Currently the research pointer is
-**`stage126-m1-financial-baseline`** after Part 5 readiness closure
-(`last_completed_research_action_id=stage125-part5-readiness-closure`).
-That pointer is **future / blocked pending explicit human authorization /
-not started** — readiness is not authorization. Broad CODAL capture is
-stopped; researcher-verified financial data are frozen; active assumed
-availability uses `assumed_available_at_regulatory` (four Jalali months;
-six-month methodology superseded). Stage125 performs **no** modeling; the
-frozen research contract (M1–M4 blocks, M5 removed, accessibility Gates,
-Part 4 SAP, Part 5 Gate 125.0) is in
-[`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
-prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.
+[`handoff_state.json`](handoff_state.json). Stage126 M1 is human-authorized and started;
+primary M1 development-fold tuning is completed on PR #52.
+
+The next scientific action is **not automatically authorized**. A separate explicit
+human micro-part decision is required before any M1 robustness execution. M1
+robustness, full-development refit and final-test access remain unstarted and
+unauthorized. The final test remains locked and untouched; M2/M3/M4 data were not
+collected.
 
 ## 11. Recent change history
 

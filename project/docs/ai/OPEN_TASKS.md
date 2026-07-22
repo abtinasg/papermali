@@ -3,18 +3,19 @@
 Human-maintained. The authoritative "next action" ID lives in `ROADMAP.md`
 front matter; this file is the working description.
 
-## Active research workstream: `stage125-research-design-readiness`
+## Active research workstream: `stage126-m1-financial-baseline`
 
 Authoritative research pointers live in `ROADMAP.md` front matter:
 `last_completed_research_action_id=stage125-part5-readiness-closure`,
 `next_research_action_id=stage126-m1-financial-baseline`
-(**future**; blocked pending explicit human authorization; not started —
-a pointer is not authorization).
+(active; human-authorized and started; primary M1 development-fold tuning
+completed on PR #52; research action not yet completed).
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
 Part 3B.1E is the decision-lock surface for the conservative-lag research
 action; Part 3C is the operationalization / leakage-safe dataset surface;
 Part 4 is the statistical analysis plan lock (no modeling);
-Part 5 is the Stage125 readiness closure (Gate 125.0; no Stage126 start).
+Part 5 is the Stage125 readiness closure (Gate 125.0; Stage126 entry contract
+as readiness-only at closure time).
 
 ### Completed — `stage124-gate-b-rule-approval`
 
@@ -99,22 +100,45 @@ primary sample) is distributional/descriptive robustness only.
 
 Stage125 readiness closure / Gate 125.0. Keep/drop/defer decisions recorded;
 blocker register classified; Stage126 M1 entry contract written as
-**readiness for a future authorization decision only** (Stage126 unauthorized;
+**readiness for a future authorization decision only** at Stage125 closure
+time (historical state at Stage125 closure time: Stage126 unauthorized;
 modeling unstarted; final test locked). Part 3C and Part 4 hashes unchanged.
 **No** model fitting, predictions, SHAP, SMOTE, or final-test predictor
-inspection. PR remains open pending explicit human merge approval.
+inspection in Part 5 itself.
 
-### Next research pointer — `stage126-m1-financial-baseline` (future; not authorized)
+### Active — `stage126-m1-financial-baseline`
 
-Blocked pending explicit human authorization. **Not started.** A roadmap
-next-action pointer is **not** authorization to execute modeling.
+Stage126 M1 human-authorized = true
+Stage126 started = true
+development modeling authorized = true
+modeling started = true
+primary development tuning completed = true
+
+M1 robustness started = false
+M1 robustness completed = false
+full-development refit performed = false
+
+final test unlocked = false
+final-test access authorized = false
+final-test predictor values inspected = false
+final-test target values inspected = false
+final-test evaluation performed = false
+
+M2/M3/M4 data collected = false
+
+Primary M1 development-fold tuning is completed on PR #52. The Stage126
+research action is **not yet completed** (robustness / full-development
+refit / final test remain out of scope until separately authorized).
 
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
 document-binding evidence remain as frozen scientific history; they do **not**
 authorize expansion. 80-row scale-up is cancelled. Part 3B expansion disposition
 is `superseded_not_required_for_stage125_closure` (`part3b_completed=false`).
 
-Current markers (must stay true until separately authorized otherwise):
+### Historical markers — Stage125 Part 5 closure
+(historical state at Stage125 closure time; not the current repository state)
+
+At Stage125 closure the Handoff markers were:
 
 - `broad_codal_capture_stopped=true`
 - `financial_data_researcher_verified_frozen=true`
@@ -143,16 +167,61 @@ Current markers (must stay true until separately authorized otherwise):
 - `stage125_part5_readiness_closure_completed=true`
 - `stage125_completed=true`
 - `stage126_m1_entry_ready=true`
-- `stage126_authorized=false`
-- `stage126_started=false`
-- `modeling_authorized=false`
-- `modeling_started=false`
+- `stage126_authorized=false` (historical state at Stage125 closure time)
+- `stage126_started=false` (historical state at Stage125 closure time)
+- `modeling_authorized=false` (historical state at Stage125 closure time)
+- `modeling_started=false` (historical state at Stage125 closure time)
 - `final_test_unlocked=false`
 
-**Still prohibited without explicit user authorization:** expanded CODAL/TSETMC/CBI
-network for value extraction, row-level PublishDateTime collection, real
-observed available_at assignment, 80-row / 130-company CODAL scale-up,
-Part 3B.2, Stage126, or modeling.
+### Current Stage126 markers (must match Handoff)
+
+- `broad_codal_capture_stopped=true`
+- `financial_data_researcher_verified_frozen=true`
+- `active_availability_method=fixed_regulatory_lag`
+- `active_availability_lag_months=4`
+- `four_month_regulatory_lag_locked=true`
+- `six_month_lag_superseded=true`
+- `historical_six_month_decision_retained=true`
+- `row_level_publish_datetime_collection_required=false`
+- `part3b_completed=false`
+- `part3c_leakage_safe_finalization_completed=true`
+- `part4_statistical_analysis_plan_locked=true`
+- `stage125_completed=true`
+- `stage126_m1_entry_ready=true`
+- `stage126_authorized=true`
+- `stage126_started=true`
+- `development_modeling_authorized=true`
+- `modeling_authorized=true`
+- `modeling_started=true`
+- `m1_primary_development_tuning_completed=true`
+- `m1_robustness_started=false`
+- `m1_robustness_completed=false`
+- `final_test_unlocked=false`
+- `final_test_access_authorized=false`
+- `final_test_predictor_values_inspected=false`
+- `final_test_target_values_inspected=false`
+- `final_test_evaluation_performed=false`
+- `m2_data_collected=false`
+- `m3_data_collected=false`
+- `m4_data_collected=false`
+
+**Still prohibited without the next explicit micro-part decision / authorization:**
+
+- final-test access or evaluation
+- full-development refit
+- M1 robustness execution without the next explicit micro-part decision
+- SMOTE robustness
+- target-proximity robustness
+- Rule B / expanded-sample robustness
+- persistent-loss robustness
+- M2/M3/M4 data collection or modeling
+- SHAP
+- network extraction
+- expanded CODAL/TSETMC/CBI network for value extraction
+- row-level PublishDateTime collection
+- real observed available_at assignment
+- 80-row / 130-company CODAL scale-up
+- Part 3B.2
 
 **Part 0 (done — documentation lock):** baseline after PR #20 confirmed;
 research contract recorded in human docs; Handoff regenerated by the generator;
@@ -227,10 +296,11 @@ README remains frozen). Does **not** move
 `last_completed_research_action_id` or `next_research_action_id`. Not Stage126
 admission.
 
-**Modeling remains prohibited** (no modeling, tuning, SHAP, SMOTE, calibration,
-temporal splitting, feature selection, or article result generation) through all of
-Stage125; it begins only when Stage126 (M1 Financial Baseline) is explicitly
-approved.
+**Modeling authorization (Stage125 historical):** modeling remained prohibited
+through all of Stage125; it began only when Stage126 (M1 Financial Baseline)
+was explicitly human-authorized. Stage126 M1 primary development-fold tuning
+is now authorized and started; remaining prohibitions are listed under the
+active Stage126 section above.
 
 ## Historical — `stage124-gate-b-readiness`
 
@@ -292,8 +362,10 @@ applied under `stage124-gate-b-execution` (see the active workstream above).
 
 ## Not in scope yet (do NOT start)
 
-- ❌ Modeling, tuning, SHAP, SMOTE, calibration, temporal splitting, feature
-  selection, or article reporting (blocked; begins only when Stage126 is approved)
+- ❌ Final-test access or evaluation; full-development refit; M1 robustness
+  without the next explicit micro-part decision; SMOTE / target-proximity /
+  Rule B / expanded-sample / persistent-loss robustness; M2/M3/M4 data
+  collection or modeling; SHAP; network extraction
 - ❌ Persian text / text modeling (M5) — removed from the paper and roadmap
 - ❌ Any data or analysis depending on accessibility < 3
 - ❌ Data extraction, model runs, or target/sample changes during Stage125 Part 0

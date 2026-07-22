@@ -1,17 +1,13 @@
-# Financial Distress Prediction — Current Run Guide (Stage122 → Stage123 → Stage124)
+# Financial Distress Prediction — Current Run Guide (Stage122 → Stage123 → Stage124 → Stage125 → Stage126)
 
-This project is at the **data-freeze** phase. The current, authoritative pipeline is the
-Stage122 → Stage123 → Stage124 sequence. **No model is run yet** — no Logistic
-Regression, Random Forest, XGBoost, Optuna, SHAP, SMOTE, calibration, article/report
-generation, or macro/market merge.
+**Stage125 is completed. Stage126 M1 is human-authorized and started. Primary M1 development-fold tuning is completed on PR #52. M1 robustness is not started. No full-development refit has been performed. The final test remains locked and untouched. M2/M3/M4 data collection or modeling has not started.**
 
-**Stage124 status:** Gate B is **completed and frozen**. The verified listing master
+The historical Stage122 → Stage123 → Stage124 sequence is frozen. Stage124 Gate B is **completed and frozen**. The verified listing master
 (`listing_master_verified_stage124.csv`, 130 tickers from the official TSE API) is
 canonical, and four Gate B sample designs have been produced in
 `project/stage124/gate_b_final/`. Tests are **local results** (no GitHub Actions
 configured): 58 focused tests in `test_stage124_gate_b_execution.py`, 736 passed,
-1 skipped in the full suite. **Modeling remains prohibited** until
-`stage125-modeling-readiness` is approved.
+1 skipped in the full suite.
 
 ## Correct run order
 
@@ -45,7 +41,13 @@ python run_stage125_part3c.py --check
 python run_stage125_part4.py --check
 python run_stage125_part5.py --check   # readiness closure / Gate 125.0
 
-# 5) Full test suite
+# 5) Stage126 M1 primary development-fold tuning (human-authorized; --check only)
+python run_stage126_m1_primary_development_tuning.py --check
+
+# 6) AI Handoff validation
+python scripts/validate_ai_handoff.py --check
+
+# 7) Full test suite
 python -m pytest tests/ -q
 ```
 
@@ -74,19 +76,20 @@ from the frozen Stage123 panel — both are independent of input row order.
 | Stage122 | `stage122/` | `FD_target_main` (composite operational distress target) + 2 robustness targets, target audit/definition/distribution, eligibility, t→t+1 pairs, QC, change log, metadata, workbook |
 | Stage123 | `stage123/` | statement-scope correction audit, `modeling_all_rows_stage123.csv`, `modeling_one_year_ahead_stage123.csv`, eligibility audit, company mapping, listing review, leakage manifest (3 classes), independent QC report, change log, metadata+hashes, workbook |
 | Stage124 | `stage124/` | `listing_master_verified_stage124.csv` (130 tickers, dates from official TSE API), Gate B outputs in `gate_b_final/` (four sample designs, canonical + filtered CSVs, QC report, metadata), `metadata_and_hashes_stage124_batch02_gate_b.json` |
+| Stage125 | `stage125/` | Part 3C leakage-safe analysis-ready datasets (four Gate B designs), Part 4 locked statistical analysis plan (`stage125_part4_sap_v2`), Part 5 readiness closure (Gate 125.0) with the Stage126 M1 entry contract; **no modeling within Stage125** |
+| Stage126 | `stage126/` | Human-authorized M1 development-fold tuning: three locked model families (regularized Logistic Regression, Random Forest, XGBoost), selected configurations, development OOF predictions and metrics, final-test lock guard; **no robustness, no full-development refit, no final-test evaluation** |
 
 ## `run_all.py` is the OLD Stage121 baseline
 
 `run_all.py` trains LR/RF/XGBoost on the **earlier Stage121** target
 (`distressed_target_reviewed`) using `build_dataset.py` (the old candidate selection and
 time split). It is kept only as the historical baseline and is **documented in
-[`README_STAGE121_LEGACY.md`](README_STAGE121_LEGACY.md)**. Do **not** run it for the
-current target — the modeling pipeline will be redesigned separately under
-`stage125-modeling-readiness`.
+[`README_STAGE121_LEGACY.md`](README_STAGE121_LEGACY.md)**. `run_all.py` remains the
+legacy Stage121 pipeline and must not be used for the current target. The current
+authorized modeling path is the Stage126 M1 primary development-fold tuning pipeline.
 
-## Guardrails still enforced (Stage123 + Stage124 Gate B)
+## Guardrails still enforced (Stage123 + Stage124 Gate B + Stage126 M1)
 
-- No model / tuning / SHAP / SMOTE / calibration / report in this phase.
 - No financial value, ratio, or target changed by the statement-scope correction; raw
   provenance (`source_file`, `source_url`, hashes) is untouched — the prior scope label
   lives only in the immutable correction audit.
@@ -98,5 +101,5 @@ current target — the modeling pipeline will be redesigned separately under
   failure the QC report is saved and the runner exits non-zero with no metadata file.
 - Bulky outputs (models, figures, workbooks, panels) are gitignored; only source and
   small QC/metadata/audit files are committed.
-- Stage124 Gate B is completed and frozen; modeling remains prohibited until
-  `stage125-modeling-readiness` is approved.
+- Stage124 Gate B is completed and frozen.
+- **Current Stage126 M1 prohibitions:** final-test access or evaluation; full-development refit; M1 robustness without the next explicit micro-part decision; SMOTE robustness; target-proximity robustness; Rule B / expanded-sample robustness; persistent-loss robustness; M2/M3/M4 data collection or modeling; SHAP; network extraction.

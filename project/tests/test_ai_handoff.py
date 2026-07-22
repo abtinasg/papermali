@@ -14,6 +14,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -104,10 +105,13 @@ def test_qc_counts_match_report():
 
 
 def test_markers_are_off():
-    # Gate B has been executed (Stage124 finalization): gate_b_started is now
-    # True. Modeling has NOT started and must remain False.
+    # Gate B has been executed (Stage124 finalization): gate_b_started is True.
+    # Stage126 M1 is human-authorized and development-fold modeling has started,
+    # so modeling_started is now True. It never implies final-test access.
     state = _state(REAL_ROOT)
-    assert state["modeling_started"] is False
+    assert state["modeling_started"] is True
+    assert state["final_test_unlocked"] is False
+    assert state["final_test_access_authorized"] is False
     assert state["gate_b_started"] is True
     assert state["verified_master_created"] is True
 
@@ -1209,9 +1213,9 @@ def test_extract_qc_workflow_markers_fail_closed_when_field_missing():
 )
 def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
-    assert state["current_stage"] == "Stage125"
+    assert state["current_stage"] == "Stage126"
     assert state["selected_qc_scope"] == (
-        "stage125_part5_readiness_closure"
+        "stage126_m1_financial_baseline"
     )
     assert state["last_completed_micro_part"] == (
         "stage125-part5-readiness-closure"
@@ -1219,49 +1223,210 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["next_research_action_id"] == (
         "stage126-m1-financial-baseline"
     )
-    assert state["part3a_protocol_locked"] is True
-    assert state["part3a_decision_locked"] is True
-    assert state["part3b0_readiness"] is True
-    assert state["part3b_started"] is True
-    assert state["part3b1_decision_locked"] is True
-    assert state["cut_a_available_at_operationalization_locked"] is True
-    assert state["predictor_document_binding_mini_pilot_completed"] is True
-    assert state["predictor_document_binding_evidence_collected"] is True
-    assert state["document_binding_resolution_decision_locked"] is True
-    assert state["conservative_six_month_lag_decision_locked"] is True
-    assert state["broad_codal_capture_stopped"] is True
+    assert state["active_workstream"] == "stage126_m1_financial_baseline"
+    # Stage126 M1 is human-authorized and started; development-fold modeling
+    # occurred, while the final test remains fully locked.
+    assert state["stage125_completed"] is True
+    assert state["stage126_m1_entry_ready"] is True
+    assert state["stage126_authorized"] is True
+    assert state["stage126_started"] is True
+    assert state["development_modeling_authorized"] is True
+    assert state["modeling_authorized"] is True
+    assert state["modeling_started"] is True
+    assert state["m1_primary_development_tuning_completed"] is True
+    assert state["m1_robustness_started"] is False
+    assert state["m1_robustness_completed"] is False
+    assert state["final_test_unlocked"] is False
+    assert state["final_test_access_authorized"] is False
+    assert state["final_test_predictor_values_inspected"] is False
+    assert state["final_test_target_values_inspected"] is False
+    assert state["final_test_evaluation_performed"] is False
+    assert state["m2_data_collected"] is False
+    assert state["m3_data_collected"] is False
+    assert state["m4_data_collected"] is False
+    # Repository-wide temporal-availability invariants carried from Stage125.
     assert state["financial_data_researcher_verified_frozen"] is True
-    assert state["conservative_availability_lag_locked"] is True
-    assert state["row_level_publish_datetime_collection_required"] is False
+    assert state["broad_codal_capture_stopped"] is True
     assert state["active_availability_method"] == "fixed_regulatory_lag"
     assert state["active_availability_lag_months"] == 4
     assert state["four_month_regulatory_lag_locked"] is True
     assert state["six_month_lag_superseded"] is True
     assert state["historical_six_month_decision_retained"] is True
-    assert state["historical_six_month_decision_active"] is False
-    assert state["predictor_available_at_evidence_collected"] is False
-    assert state["pilot_cutoff_provenance_resolved"] is False
-    assert state["evidence_collected"] is True
-    assert state["endpoint_probe_evidence_collected"] is True
-    assert state["candidate_value_evidence_collected"] is False
-    assert state["pair_level_evidence_collected"] is True
-    assert state["data_value_extraction_performed"] is False
-    assert state["accessibility_scoring_applied"] is False
+    assert state["row_level_publish_datetime_collection_required"] is False
     assert state["part3b_completed"] is False
     assert state["part3c_leakage_safe_finalization_completed"] is True
     assert state["part4_statistical_analysis_plan_locked"] is True
-    assert state["stage125_part5_readiness_closure_completed"] is True
-    assert state["stage125_completed"] is True
-    assert state["stage126_m1_entry_ready"] is True
-    assert state["stage126_authorized"] is False
-    assert state["stage126_started"] is False
-    assert state["modeling_authorized"] is False
-    assert state["modeling_started"] is False
-    assert state["final_test_unlocked"] is False
-    assert state["network_extraction_performed"] is True
-    # Active lag must not ambiguously remain six months.
-    assert "conservative_lag_months" not in state
+
+
+@pytest.mark.skipif(
+    not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
+    reason="real-repo test requires git checkout",
+)
+def test_real_repo_roadmap_stage126_status_consistency():
+    roadmap = open(
+        os.path.join(REAL_ROOT, "project/docs/ai/ROADMAP.md"), encoding="utf-8",
+    ).read()
+    fm = gen.read_roadmap(REAL_ROOT)
+    assert fm["active_research_workstream_id"] == (
+        "stage126-m1-financial-baseline"
+    )
+    assert fm["last_completed_research_action_id"] == (
+        "stage125-part5-readiness-closure"
+    )
+    assert fm["next_research_action_id"] == (
+        "stage126-m1-financial-baseline"
+    )
+    # Isolate the Stage126 research-action row (item 18).
+    match = re.search(
+        r"18\.\s*`stage126-m1-financial-baseline`\s*—\s*([^\n]+)",
+        roadmap,
+    )
+    assert match is not None, "Stage126 research-action row missing"
+    stage126_row = match.group(1)
+    stage126_row_l = stage126_row.lower()
+    assert "human-authorized and started" in stage126_row_l
+    # Stale unauthorized/future wording must not describe the Stage126 action.
+    for banned in (
+        "**future**",
+        "blocked pending authorization",
+        "blocked pending explicit human authorization",
+        "a next-action pointer is not authorization",
+    ):
+        assert banned.lower() not in stage126_row_l, (
+            f"Stage126 ROADMAP body still contains stale phrase {banned!r}"
+        )
+    # Whole-action "not started" (historical wording), not "robustness not started".
+    assert re.search(r"(?<!robustness )\*\*not started\*\*", stage126_row_l) is None
+    assert re.search(
+        r";\s*\*\*not started\*\*", stage126_row_l,
+    ) is None
+    assert "future; blocked pending" not in stage126_row_l
+    assert stage126_row_l.strip().startswith("**future**") is False
+
+
+@pytest.mark.skipif(
+    not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
+    reason="real-repo test requires git checkout",
+)
+def test_real_repo_open_tasks_stage126_markers_match_handoff():
+    open_tasks = open(
+        os.path.join(REAL_ROOT, "project/docs/ai/OPEN_TASKS.md"),
+        encoding="utf-8",
+    ).read()
+    state = _state(REAL_ROOT)
+    assert "## Active research workstream: `stage126-m1-financial-baseline`" in (
+        open_tasks
+    )
+    assert "Stage126 M1 human-authorized = true" in open_tasks
+    assert "Stage126 started = true" in open_tasks
+    assert "development modeling authorized = true" in open_tasks
+    assert "modeling started = true" in open_tasks
+    assert "primary development tuning completed = true" in open_tasks
+    assert "M1 robustness started = false" in open_tasks
+    assert "final test unlocked = false" in open_tasks
+    assert "M2/M3/M4 data collected = false" in open_tasks
+    assert "historical state at Stage125 closure time" in open_tasks
+    # Current markers section must agree with Handoff; historical false
+    # Stage126 markers must not be presented as current.
+    current_section = open_tasks.split("### Current Stage126 markers")[1].split(
+        "**Still prohibited"
+    )[0]
+    assert "`stage126_authorized=true`" in current_section
+    assert "`stage126_started=true`" in current_section
+    assert "`modeling_authorized=true`" in current_section
+    assert "`modeling_started=true`" in current_section
+    assert "`stage126_authorized=false`" not in current_section
+    assert "`stage126_started=false`" not in current_section
+    assert state["stage126_authorized"] is True
+    assert state["stage126_started"] is True
+    assert state["modeling_authorized"] is True
+    assert state["modeling_started"] is True
+    assert state["m1_primary_development_tuning_completed"] is True
+    assert state["active_availability_method"] == "fixed_regulatory_lag"
     assert state["active_availability_lag_months"] == 4
+    # Active OPEN_TASKS must not describe current Stage126 as unauthorized.
+    active_header = open_tasks.split("### Historical markers")[0]
+    assert "future; not authorized" not in active_header.lower()
+    assert "blocked pending explicit human authorization" not in (
+        active_header.lower()
+    )
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("active_availability_method", "fixed_conservative_lag"),
+        ("active_availability_lag_months", 6),
+        ("four_month_regulatory_lag_locked", False),
+        ("six_month_lag_superseded", False),
+        ("financial_data_researcher_verified_frozen", False),
+        ("broad_codal_capture_stopped", False),
+        ("row_level_publish_datetime_collection_required", True),
+        ("part3b_completed", True),
+    ],
+)
+@pytest.mark.skipif(
+    not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
+    reason="real-repo test requires git checkout",
+)
+def test_stage126_temporal_availability_mutation_fails_closed(
+    monkeypatch, field, value,
+):
+    state = _state(REAL_ROOT)
+    assert field in state, f"expected carried invariant {field} in handoff_state"
+    state = dict(state)
+    state[field] = value
+    monkeypatch.setattr(val, "_load_state", lambda _root: state)
+    assert val.run_check(REAL_ROOT) == 1
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "active_availability_method",
+        "active_availability_lag_months",
+        "four_month_regulatory_lag_locked",
+        "six_month_lag_superseded",
+        "financial_data_researcher_verified_frozen",
+        "broad_codal_capture_stopped",
+        "row_level_publish_datetime_collection_required",
+        "part3b_completed",
+        "historical_six_month_decision_retained",
+        "part3c_leakage_safe_finalization_completed",
+        "part4_statistical_analysis_plan_locked",
+        "stage125_completed",
+    ],
+)
+@pytest.mark.skipif(
+    not os.path.isdir(os.path.join(REAL_ROOT, ".git")),
+    reason="real-repo test requires git checkout",
+)
+def test_stage126_temporal_availability_missing_fails_closed(monkeypatch, field):
+    state = dict(_state(REAL_ROOT))
+    assert field in state
+    del state[field]
+    monkeypatch.setattr(val, "_load_state", lambda _root: state)
+    assert val.run_check(REAL_ROOT) == 1
+
+
+def test_derive_stage125_temporal_availability_invariants_real_repo():
+    if not os.path.isdir(os.path.join(REAL_ROOT, ".git")):
+        pytest.skip("real-repo test requires git checkout")
+    got = gen.derive_stage125_temporal_availability_invariants(REAL_ROOT)
+    assert got == {
+        "financial_data_researcher_verified_frozen": True,
+        "broad_codal_capture_stopped": True,
+        "active_availability_method": "fixed_regulatory_lag",
+        "active_availability_lag_months": 4,
+        "four_month_regulatory_lag_locked": True,
+        "six_month_lag_superseded": True,
+        "historical_six_month_decision_retained": True,
+        "row_level_publish_datetime_collection_required": False,
+        "part3b_completed": False,
+        "part3c_leakage_safe_finalization_completed": True,
+        "part4_statistical_analysis_plan_locked": True,
+        "stage125_completed": True,
+    }
 
 
 # ---- Stage125 Part 3B.0 artifact-only + workflow markers ------------------- #
@@ -1707,3 +1872,268 @@ def test_stage125_part3b0_full_artifact_commit_is_skipped(synth):
     got = gen.last_stage_commit(synth)
     assert got == before
     assert got != sha
+
+
+# --------------------------------------------------------------------------- #
+# Entry-document consistency tests (Stage126 current state)
+# --------------------------------------------------------------------------- #
+
+def test_readme_run_current_state_contains_stage126_authorized():
+    """README_RUN current state must contain Stage126 authorized and started."""
+    readme_path = os.path.join(REAL_ROOT, "project", "README_RUN.md")
+    with open(readme_path, encoding="utf-8") as f:
+        content = f.read()
+    assert "Stage126 M1 is human-authorized and started" in content, (
+        "README_RUN must state Stage126 M1 is human-authorized and started"
+    )
+
+
+def test_readme_run_does_not_claim_no_model_has_run():
+    """README_RUN must not claim no model has run (Stage126 M1 tuning completed)."""
+    readme_path = os.path.join(REAL_ROOT, "project", "README_RUN.md")
+    with open(readme_path, encoding="utf-8") as f:
+        content = f.read()
+    # The stale phrase "No model is run yet" must not appear
+    assert "No model is run yet" not in content, (
+        "README_RUN must not claim 'No model is run yet'"
+    )
+
+
+def test_readme_run_does_not_globally_prohibit_all_modeling():
+    """README_RUN must not globally prohibit all modeling (Stage126 M1 is authorized)."""
+    readme_path = os.path.join(REAL_ROOT, "project", "README_RUN.md")
+    with open(readme_path, encoding="utf-8") as f:
+        content = f.read()
+    # The stale phrase "Modeling remains prohibited" without qualification must not appear
+    # Allow it only in historical context (e.g., "through Stage125")
+    lines = content.split("\n")
+    for line in lines:
+        if "Modeling remains prohibited" in line and "Stage125" not in line:
+            assert False, (
+                f"README_RUN line contains unqualified 'Modeling remains prohibited': {line}"
+            )
+
+
+def test_handoff_package_current_state_contains_modeling_started_true():
+    """HANDOFF_PACKAGE current state must reflect modeling_started=true."""
+    state = _state(REAL_ROOT)
+    assert state["modeling_started"] is True, (
+        "handoff_state.json must have modeling_started=true"
+    )
+
+
+def test_handoff_package_current_state_contains_primary_m1_tuning_completed():
+    """HANDOFF_PACKAGE current state must mention primary M1 development tuning completed."""
+    package_path = os.path.join(REAL_ROOT, "project", "docs", "ai", "HANDOFF_PACKAGE.md")
+    with open(package_path, encoding="utf-8") as f:
+        content = f.read()
+    assert "Primary M1 development-fold tuning is completed" in content, (
+        "HANDOFF_PACKAGE must state primary M1 development tuning is completed"
+    )
+
+
+def test_handoff_package_does_not_describe_stage126_as_future():
+    """HANDOFF_PACKAGE must not describe current Stage126 as future, unauthorized or not started."""
+    package_path = os.path.join(REAL_ROOT, "project", "docs", "ai", "HANDOFF_PACKAGE.md")
+    with open(package_path, encoding="utf-8") as f:
+        content = f.read()
+    # These stale phrases must not appear in current-state descriptions
+    stale_phrases = [
+        "no model trained yet",
+        "future / blocked pending explicit human authorization",
+        "modeling remains prohibited until Stage126",
+    ]
+    for phrase in stale_phrases:
+        # Allow in historical quoted sections (e.g., in "Historical Stage125" labels)
+        # Check if phrase appears outside of historical context
+        if phrase in content:
+            # Simple heuristic: if the phrase appears, ensure it's in a historical context
+            # by checking for nearby historical markers
+            lines = content.split("\n")
+            for i, line in enumerate(lines):
+                if phrase in line:
+                    # Check surrounding lines for historical context markers
+                    context_start = max(0, i - 2)
+                    context_end = min(len(lines), i + 3)
+                    context = "\n".join(lines[context_start:context_end])
+                    if "Historical" not in context and "historical" not in context:
+                        assert False, (
+                            f"HANDOFF_PACKAGE contains stale phrase '{phrase}' outside historical context: {line}"
+                        )
+    # "not started" is allowed when referring to specific sub-components (e.g., "M1 robustness is not started")
+    # but not when describing Stage126 overall as not started
+    if "not started" in content:
+        lines = content.split("\n")
+        for i, line in enumerate(lines):
+            if "not started" in line:
+                # Check if this line describes Stage126 overall as not started
+                # Allow it if it's about specific sub-components
+                context_start = max(0, i - 2)
+                context_end = min(len(lines), i + 3)
+                context = "\n".join(lines[context_start:context_end])
+                # Reject if it says Stage126 is not started without qualifying sub-component
+                if "Stage126" in context and ("robustness" not in context and "M2" not in context and "M3" not in context and "M4" not in context):
+                    assert False, (
+                        f"HANDOFF_PACKAGE describes Stage126 overall as 'not started': {line}"
+                    )
+
+
+def test_decisions_current_stage126_guardrails_contain_authorized_and_started():
+    """DECISIONS current Stage126 guardrails must contain authorized and started."""
+    decisions_path = os.path.join(REAL_ROOT, "project", "docs", "ai", "DECISIONS.md")
+    with open(decisions_path, encoding="utf-8") as f:
+        content = f.read()
+    # Check the Current Stage126 M1 guardrails section
+    assert "Stage126 M1 is human-authorized and started" in content, (
+        "DECISIONS must state Stage126 M1 is human-authorized and started"
+    )
+
+
+def test_decisions_current_stage126_guardrails_contain_final_test_locked():
+    """DECISIONS current Stage126 guardrails must contain final test locked."""
+    decisions_path = os.path.join(REAL_ROOT, "project", "docs", "ai", "DECISIONS.md")
+    with open(decisions_path, encoding="utf-8") as f:
+        content = f.read()
+    assert "final test remains locked" in content, (
+        "DECISIONS must state final test remains locked"
+    )
+
+
+def test_decisions_does_not_label_current_phase_as_no_model_data_freeze():
+    """DECISIONS must not label the current phase as a no-model data-freeze phase."""
+    decisions_path = os.path.join(REAL_ROOT, "project", "docs", "ai", "DECISIONS.md")
+    with open(decisions_path, encoding="utf-8") as f:
+        content = f.read()
+    # The section title "Phase guardrails (current data-freeze phase)" is stale
+    # It should now be "Phase guardrails" with subsections
+    assert "Phase guardrails (current data-freeze phase)" not in content, (
+        "DECISIONS must not label current phase as 'current data-freeze phase'"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Section-aware entry-document consistency tests (final entry-doc correction)
+# --------------------------------------------------------------------------- #
+
+def _read_doc(*parts: str) -> str:
+    """Read a repository text file relative to REAL_ROOT."""
+    with open(os.path.join(REAL_ROOT, *parts), encoding="utf-8") as f:
+        return f.read()
+
+
+def _flat(text: str) -> str:
+    """Collapse all runs of whitespace to single spaces so that phrase checks
+    are robust to markdown hard line-wrapping."""
+    return " ".join(text.split())
+
+
+def _md_section(content: str, heading_substring: str) -> str:
+    """Return the body of the first level-1/level-2 markdown section whose
+    heading line contains ``heading_substring``.
+
+    The section runs from its heading up to (but excluding) the next level-1 or
+    level-2 heading (``#`` or ``##``); deeper ``###`` headings stay inside.
+    Raises AssertionError if the heading is not found.
+    """
+    lines = content.split("\n")
+    start = None
+    for i, line in enumerate(lines):
+        if re.match(r"^#{1,2} ", line) and heading_substring in line:
+            start = i
+            break
+    assert start is not None, (
+        f"heading containing {heading_substring!r} not found"
+    )
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if re.match(r"^#{1,2} ", lines[j]):
+            end = j
+            break
+    return "\n".join(lines[start:end])
+
+
+def test_readme_run_has_no_stale_modeling_readiness_redesign():
+    """README_RUN must not contain the stale stage125-modeling-readiness redesign."""
+    content = _read_doc("project", "README_RUN.md")
+    assert "modeling pipeline will be redesigned separately under" \
+        not in _flat(content), (
+        "README_RUN must not say the modeling pipeline will be redesigned separately"
+    )
+    assert "stage125-modeling-readiness" not in content, (
+        "README_RUN must not reference stage125-modeling-readiness"
+    )
+
+
+def test_readme_run_stage_output_table_has_stage125_and_stage126_rows():
+    """README_RUN stage-output table must include Stage125 and Stage126 rows."""
+    section = _md_section(_read_doc("project", "README_RUN.md"),
+                          "What each stage produces")
+    assert "| Stage125 |" in section, (
+        "README_RUN stage-output table must include a | Stage125 | row"
+    )
+    assert "| Stage126 |" in section, (
+        "README_RUN stage-output table must include a | Stage126 | row"
+    )
+    # Stage126 must not be implied complete.
+    assert "no full-development refit" in _flat(section), (
+        "README_RUN Stage126 row must state no full-development refit"
+    )
+
+
+def test_decisions_pipeline_section_has_no_stale_redesign_statement():
+    """DECISIONS Pipeline section must not contain the stale redesign statement."""
+    section = _flat(_md_section(_read_doc("project", "docs", "ai", "DECISIONS.md"),
+                               "Pipeline order & target"))
+    assert "current modeling pipeline will be redesigned after the Stage123 freeze" \
+        not in section, (
+        "DECISIONS Pipeline section must not say the modeling pipeline will be "
+        "redesigned after the Stage123 freeze"
+    )
+
+
+def test_decisions_pipeline_section_distinguishes_the_two_pipelines():
+    """DECISIONS Pipeline section must distinguish the two named pipelines."""
+    section = _flat(_md_section(_read_doc("project", "docs", "ai", "DECISIONS.md"),
+                               "Pipeline order & target"))
+    assert "Frozen data-preparation pipeline" in section, (
+        "DECISIONS Pipeline section must name the frozen data-preparation pipeline"
+    )
+    assert "Research-design and modeling sequence" in section, (
+        "DECISIONS Pipeline section must name the research-design and modeling "
+        "sequence"
+    )
+
+
+def test_handoff_package_final_goal_has_no_later_models_phrase():
+    """HANDOFF_PACKAGE Final goal must not contain the stale (later) models phrase."""
+    section = _flat(_md_section(
+        _read_doc("project", "docs", "ai", "HANDOFF_PACKAGE.md"), "Final goal"))
+    assert "(later) distress-prediction models" not in section, (
+        "HANDOFF_PACKAGE Final goal must not say '(later) distress-prediction models'"
+    )
+
+
+def test_handoff_package_done_section_lists_stage125_and_stage126_milestones():
+    """HANDOFF_PACKAGE Done section must list Part 5 closure and Stage126 tuning."""
+    section = _flat(_md_section(
+        _read_doc("project", "docs", "ai", "HANDOFF_PACKAGE.md"), "Done"))
+    assert "Stage125 Part 5 readiness closure" in section, (
+        "HANDOFF_PACKAGE Done section must include Stage125 Part 5 readiness closure"
+    )
+    assert "Stage126 primary development-fold tuning" in section, (
+        "HANDOFF_PACKAGE Done section must include Stage126 primary "
+        "development-fold tuning"
+    )
+
+
+def test_handoff_package_next_step_requires_explicit_human_decision():
+    """HANDOFF_PACKAGE Next step must require a separate explicit human decision."""
+    section = _flat(_md_section(
+        _read_doc("project", "docs", "ai", "HANDOFF_PACKAGE.md"), "Next step"))
+    assert "separate explicit human micro-part decision" in section, (
+        "HANDOFF_PACKAGE Next step must require a separate explicit human "
+        "micro-part decision"
+    )
+    assert "M1 robustness" in section, (
+        "HANDOFF_PACKAGE Next step must reference M1 robustness"
+    )

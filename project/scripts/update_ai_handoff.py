@@ -65,6 +65,8 @@ ALLOWLIST_DIRS = (
     # Stage125 Part 1 is tracked as a maintenance task (it does not advance the
     # research stage); its deliverables live under this directory.
     "project/stage125/",
+    # Stage126 M1 primary development-fold tuning deliverables.
+    "project/stage126/",
 )
 ALLOWLIST_FILES = (
     "project/scripts/update_ai_handoff.py",
@@ -127,6 +129,12 @@ ALLOWLIST_FILES = (
     "project/src/stage125_part5_readiness_closure.py",
     "project/run_stage125_part5.py",
     "project/tests/test_stage125_part5_readiness_closure.py",
+    # Stage126 M1 primary development-fold tuning code, runner, and tests.
+    "project/src/stage126_authorization_transition_guard.py",
+    "project/tests/test_stage126_authorization_transition_guard.py",
+    "project/src/stage126_m1_primary_development_tuning.py",
+    "project/run_stage126_m1_primary_development_tuning.py",
+    "project/tests/test_stage126_m1_primary_development_tuning.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
@@ -331,6 +339,19 @@ ARTIFACT_ONLY_FILES = (
     "project/stage125/part5_artifact_integrity_manifest_stage125.csv",
     "project/stage125/stage125_part5_readiness_closure_qc_report.json",
     "project/stage125/metadata_and_hashes_stage125_part5.json",
+    # Stage126 M1 primary development-fold tuning generated artifacts.
+    "project/stage126/stage126_m1_human_authorization_record.json",
+    "project/stage126/stage126_m1_development_access_manifest.csv",
+    "project/stage126/stage126_m1_final_test_lock_guard.json",
+    "project/stage126/stage126_m1_configuration_registry.csv",
+    "project/stage126/stage126_m1_tuning_results.csv",
+    "project/stage126/stage126_m1_selected_configurations.json",
+    "project/stage126/stage126_m1_development_oof_predictions.csv",
+    "project/stage126/stage126_m1_development_metrics.csv",
+    "project/stage126/stage126_m1_primary_development_lock.json",
+    "project/stage126/README_STAGE126_M1_PRIMARY_DEVELOPMENT_TUNING.md",
+    "project/stage126/stage126_m1_primary_development_tuning_qc_report.json",
+    "project/stage126/metadata_and_hashes_stage126_m1_primary_development_tuning.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -644,7 +665,63 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "contract_version",
         "network_extraction_performed",
     ),
+    "stage126_m1_financial_baseline": (
+        "stage125_completed",
+        "stage126_m1_entry_ready",
+        "stage126_authorized",
+        "stage126_started",
+        "development_modeling_authorized",
+        "modeling_authorized",
+        "modeling_started",
+        "final_test_unlocked",
+        "final_test_access_authorized",
+        "final_test_predictor_values_inspected",
+        "final_test_target_values_inspected",
+        "final_test_evaluation_performed",
+        "m1_primary_development_tuning_completed",
+        "m1_robustness_started",
+        "m1_robustness_completed",
+        "m2_data_collected",
+        "m3_data_collected",
+        "m4_data_collected",
+        "contract_version",
+    ),
 }
+
+# Repository-wide temporal-availability invariants carried into Stage126 Handoff
+# scope. Values are derived from frozen Stage125 contracts/artifacts (never
+# invented by the Stage126 QC report). Missing or cross-artifact conflict is
+# fatal (fail-closed).
+STAGE126_CARRIED_TEMPORAL_AVAILABILITY_FIELDS = (
+    "financial_data_researcher_verified_frozen",
+    "broad_codal_capture_stopped",
+    "active_availability_method",
+    "active_availability_lag_months",
+    "four_month_regulatory_lag_locked",
+    "six_month_lag_superseded",
+    "historical_six_month_decision_retained",
+    "row_level_publish_datetime_collection_required",
+    "part3b_completed",
+    "part3c_leakage_safe_finalization_completed",
+    "part4_statistical_analysis_plan_locked",
+    "stage125_completed",
+)
+
+_STAGE125_PART3B1E_LOCK_REL = (
+    "project/stage125/part3b1e_conservative_lag_decision_lock_stage125.json"
+)
+_STAGE125_PART3C_FOUR_MONTH_REL = (
+    "project/stage125/part3c_four_month_regulatory_lag_revision_decision_stage125.json"
+)
+_STAGE125_PART3C_CONTRACT_REL = (
+    "project/stage125/part3c_leakage_safe_dataset_contract_stage125.json"
+)
+_STAGE125_PART4_SAP_REL = (
+    "project/stage125/part4_statistical_analysis_plan_stage125.json"
+)
+_STAGE125_PART5_CLOSURE_REL = (
+    "project/stage125/part5_readiness_closure_report_stage125.json"
+)
 
 
 class HandoffError(RuntimeError):
@@ -932,6 +1009,10 @@ _QC_SOURCE_TEST_OVERRIDES: dict[str, tuple[str, str]] = {
         "project/src/stage125_part5_readiness_closure.py",
         "project/tests/test_stage125_part5_readiness_closure.py",
     ),
+    "stage126_m1_financial_baseline": (
+        "project/src/stage126_m1_primary_development_tuning.py",
+        "project/tests/test_stage126_m1_primary_development_tuning.py",
+    ),
 }
 
 
@@ -1092,6 +1173,316 @@ def extract_qc_workflow_markers(qc: dict) -> dict:
     return {key: qc[key] for key in required}
 
 
+def _require_json_artifact(root: str, rel: str) -> dict:
+    path = os.path.join(root, rel)
+    if not os.path.isfile(path):
+        raise HandoffError(
+            f"missing frozen Stage125 artifact '{rel}' (fail-closed)"
+        )
+    try:
+        data = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(
+            f"unreadable frozen Stage125 artifact '{rel}': {exc}"
+        ) from exc
+    if not isinstance(data, dict):
+        raise HandoffError(
+            f"frozen Stage125 artifact '{rel}' is not a JSON object "
+            "(fail-closed)"
+        )
+    return data
+
+
+def _require_field(artifact: dict, rel: str, key: str):
+    if key not in artifact:
+        raise HandoffError(
+            f"frozen Stage125 artifact '{rel}' missing required field "
+            f"'{key}' (fail-closed)"
+        )
+    return artifact[key]
+
+
+def _agree_or_fail(field: str, values: list[tuple[str, object]]) -> object:
+    """Require every (source, value) pair to agree; return the shared value."""
+    if not values:
+        raise HandoffError(
+            f"no sources for temporal-availability field '{field}' "
+            "(fail-closed)"
+        )
+    first_src, first_val = values[0]
+    for src, val in values[1:]:
+        if val != first_val:
+            raise HandoffError(
+                f"Stage125 temporal-availability conflict on '{field}': "
+                f"{first_src}={first_val!r} vs {src}={val!r} (fail-closed)"
+            )
+    return first_val
+
+
+def derive_stage125_temporal_availability_invariants(root: str) -> dict:
+    """Derive repository-wide temporal-availability invariants from Stage125.
+
+    Reads frozen Stage125 contracts/artifacts only. Used to carry these
+    invariants into the Stage126 Handoff scope without hardcoding them into
+    generated outputs independently of the repository.
+    """
+    part3b1e = _require_json_artifact(root, _STAGE125_PART3B1E_LOCK_REL)
+    four_month = _require_json_artifact(root, _STAGE125_PART3C_FOUR_MONTH_REL)
+    part3c = _require_json_artifact(root, _STAGE125_PART3C_CONTRACT_REL)
+    part4 = _require_json_artifact(root, _STAGE125_PART4_SAP_REL)
+    part5 = _require_json_artifact(root, _STAGE125_PART5_CLOSURE_REL)
+
+    financial_frozen = _agree_or_fail(
+        "financial_data_researcher_verified_frozen",
+        [
+            (
+                _STAGE125_PART3B1E_LOCK_REL,
+                _require_field(
+                    part3b1e,
+                    _STAGE125_PART3B1E_LOCK_REL,
+                    "financial_data_researcher_verified_frozen",
+                ),
+            ),
+            (
+                _STAGE125_PART4_SAP_REL,
+                _require_field(
+                    part4,
+                    _STAGE125_PART4_SAP_REL,
+                    "financial_data_researcher_verified_frozen",
+                ),
+            ),
+        ],
+    )
+    broad_codal_stopped = _agree_or_fail(
+        "broad_codal_capture_stopped",
+        [
+            (
+                _STAGE125_PART3B1E_LOCK_REL,
+                _require_field(
+                    part3b1e,
+                    _STAGE125_PART3B1E_LOCK_REL,
+                    "broad_codal_capture_stopped",
+                ),
+            ),
+            (
+                _STAGE125_PART4_SAP_REL,
+                _require_field(
+                    part4,
+                    _STAGE125_PART4_SAP_REL,
+                    "broad_codal_capture_stopped",
+                ),
+            ),
+        ],
+    )
+    active_method = _agree_or_fail(
+        "active_availability_method",
+        [
+            (
+                _STAGE125_PART3C_FOUR_MONTH_REL,
+                _require_field(
+                    four_month,
+                    _STAGE125_PART3C_FOUR_MONTH_REL,
+                    "active_availability_method",
+                ),
+            ),
+            (
+                _STAGE125_PART3C_CONTRACT_REL,
+                _require_field(
+                    part3c, _STAGE125_PART3C_CONTRACT_REL, "availability_method",
+                ),
+            ),
+            (
+                _STAGE125_PART4_SAP_REL,
+                _require_field(
+                    part4,
+                    _STAGE125_PART4_SAP_REL,
+                    "active_availability_method",
+                ),
+            ),
+            (
+                _STAGE125_PART5_CLOSURE_REL,
+                _require_field(
+                    part5,
+                    _STAGE125_PART5_CLOSURE_REL,
+                    "active_availability_method",
+                ),
+            ),
+        ],
+    )
+    active_lag_months = _agree_or_fail(
+        "active_availability_lag_months",
+        [
+            (
+                _STAGE125_PART3C_FOUR_MONTH_REL,
+                _require_field(
+                    four_month, _STAGE125_PART3C_FOUR_MONTH_REL, "active_lag_months",
+                ),
+            ),
+            (
+                _STAGE125_PART3C_CONTRACT_REL,
+                _require_field(
+                    part3c, _STAGE125_PART3C_CONTRACT_REL, "active_lag_months",
+                ),
+            ),
+            (
+                _STAGE125_PART4_SAP_REL,
+                _require_field(
+                    part4,
+                    _STAGE125_PART4_SAP_REL,
+                    "active_availability_lag_months",
+                ),
+            ),
+            (
+                _STAGE125_PART5_CLOSURE_REL,
+                _require_field(
+                    part5,
+                    _STAGE125_PART5_CLOSURE_REL,
+                    "active_availability_lag_months",
+                ),
+            ),
+        ],
+    )
+    four_month_locked = _require_field(
+        part3c, _STAGE125_PART3C_CONTRACT_REL, "four_month_regulatory_lag_locked",
+    )
+    six_month_superseded = _require_field(
+        part3c, _STAGE125_PART3C_CONTRACT_REL, "six_month_lag_superseded",
+    )
+    historical_six_retained = _agree_or_fail(
+        "historical_six_month_decision_retained",
+        [
+            (
+                _STAGE125_PART3C_FOUR_MONTH_REL,
+                _require_field(
+                    four_month,
+                    _STAGE125_PART3C_FOUR_MONTH_REL,
+                    "historical_six_month_decision_retained",
+                ),
+            ),
+            (
+                _STAGE125_PART3C_CONTRACT_REL,
+                _require_field(
+                    part3c,
+                    _STAGE125_PART3C_CONTRACT_REL,
+                    "historical_six_month_decision_retained",
+                ),
+            ),
+        ],
+    )
+    row_level_pub = _agree_or_fail(
+        "row_level_publish_datetime_collection_required",
+        [
+            (
+                _STAGE125_PART3B1E_LOCK_REL,
+                _require_field(
+                    part3b1e,
+                    _STAGE125_PART3B1E_LOCK_REL,
+                    "row_level_publish_datetime_collection_required",
+                ),
+            ),
+            (
+                _STAGE125_PART3C_FOUR_MONTH_REL,
+                _require_field(
+                    four_month,
+                    _STAGE125_PART3C_FOUR_MONTH_REL,
+                    "row_level_publish_datetime_collection_required",
+                ),
+            ),
+            (
+                _STAGE125_PART3C_CONTRACT_REL,
+                _require_field(
+                    part3c,
+                    _STAGE125_PART3C_CONTRACT_REL,
+                    "row_level_publish_datetime_collection_required",
+                ),
+            ),
+        ],
+    )
+    part3b_completed = _agree_or_fail(
+        "part3b_completed",
+        [
+            (
+                _STAGE125_PART3B1E_LOCK_REL,
+                _require_field(
+                    part3b1e, _STAGE125_PART3B1E_LOCK_REL, "part3b_completed",
+                ),
+            ),
+            (
+                _STAGE125_PART3C_CONTRACT_REL,
+                _require_field(
+                    part3c, _STAGE125_PART3C_CONTRACT_REL, "part3b_completed",
+                ),
+            ),
+            (
+                _STAGE125_PART5_CLOSURE_REL,
+                _require_field(
+                    part5, _STAGE125_PART5_CLOSURE_REL, "part3b_completed",
+                ),
+            ),
+        ],
+    )
+    part3c_completed = _require_field(
+        part3c,
+        _STAGE125_PART3C_CONTRACT_REL,
+        "part3c_leakage_safe_finalization_completed",
+    )
+    part4_locked = _require_field(
+        part4,
+        _STAGE125_PART4_SAP_REL,
+        "part4_statistical_analysis_plan_locked",
+    )
+    stage125_completed = _require_field(
+        part5, _STAGE125_PART5_CLOSURE_REL, "stage125_completed",
+    )
+
+    derived = {
+        "financial_data_researcher_verified_frozen": financial_frozen,
+        "broad_codal_capture_stopped": broad_codal_stopped,
+        "active_availability_method": active_method,
+        "active_availability_lag_months": active_lag_months,
+        "four_month_regulatory_lag_locked": four_month_locked,
+        "six_month_lag_superseded": six_month_superseded,
+        "historical_six_month_decision_retained": historical_six_retained,
+        "row_level_publish_datetime_collection_required": row_level_pub,
+        "part3b_completed": part3b_completed,
+        "part3c_leakage_safe_finalization_completed": part3c_completed,
+        "part4_statistical_analysis_plan_locked": part4_locked,
+        "stage125_completed": stage125_completed,
+    }
+    missing = [
+        key for key in STAGE126_CARRIED_TEMPORAL_AVAILABILITY_FIELDS
+        if key not in derived
+    ]
+    if missing:
+        raise HandoffError(
+            f"derived Stage125 temporal-availability invariants missing "
+            f"{missing} (fail-closed)"
+        )
+    return {
+        key: derived[key]
+        for key in STAGE126_CARRIED_TEMPORAL_AVAILABILITY_FIELDS
+    }
+
+
+def merge_stage126_carried_temporal_availability(
+    root: str, scope: str, qc_workflow: dict,
+) -> dict:
+    """Carry Stage125 temporal-availability invariants into Stage126 scope."""
+    if scope != "stage126_m1_financial_baseline":
+        return qc_workflow
+    carried = derive_stage125_temporal_availability_invariants(root)
+    merged = dict(qc_workflow)
+    for key, value in carried.items():
+        if key in merged and merged[key] != value:
+            raise HandoffError(
+                f"Stage126 QC workflow marker '{key}'={merged[key]!r} "
+                f"conflicts with Stage125-derived invariant {value!r} "
+                "(fail-closed)"
+            )
+        merged[key] = value
+    return merged
+
+
 def _verified_master_tickers(root: str) -> list[str] | None:
     """Read tickers from the verified master CSV if it exists."""
     vm_path = os.path.join(root, VERIFIED_MASTER_PATH)
@@ -1139,6 +1530,9 @@ def semantic_state(root: str):
     vm_tickers = _verified_master_tickers(root)
     tickers = sorted(vm_tickers) if vm_tickers is not None else sorted(qc["tickers"])
     qc_workflow = extract_qc_workflow_markers(qc)
+    qc_workflow = merge_stage126_carried_temporal_availability(
+        root, qc["stage"], qc_workflow,
+    )
 
     state = {
         "last_stage_commit": last_stage_commit(root),
@@ -1321,6 +1715,35 @@ def render_current_state(record: dict) -> str:
         "accessibility_scoring_applied",
         "part3b_completed",
         "network_extraction_performed",
+    ):
+        if key in record:
+            lines.append(f"- {key}: **{record[key]}**")
+    for key in (
+        "stage125_completed",
+        "stage126_authorized",
+        "stage126_started",
+        "development_modeling_authorized",
+        "modeling_authorized",
+        "m1_primary_development_tuning_completed",
+        "m1_robustness_started",
+        "m1_robustness_completed",
+        "final_test_unlocked",
+        "final_test_access_authorized",
+        "final_test_evaluation_performed",
+        "m2_data_collected",
+        "m3_data_collected",
+        "m4_data_collected",
+        # Stage125 temporal-availability invariants carried into Stage126.
+        "financial_data_researcher_verified_frozen",
+        "broad_codal_capture_stopped",
+        "active_availability_method",
+        "active_availability_lag_months",
+        "four_month_regulatory_lag_locked",
+        "six_month_lag_superseded",
+        "historical_six_month_decision_retained",
+        "row_level_publish_datetime_collection_required",
+        "part3c_leakage_safe_finalization_completed",
+        "part4_statistical_analysis_plan_locked",
     ):
         if key in record:
             lines.append(f"- {key}: **{record[key]}**")

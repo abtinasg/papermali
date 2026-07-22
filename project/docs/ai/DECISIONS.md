@@ -12,12 +12,20 @@ These are stable project decisions. Change them only deliberately (and note it i
 
 ## Pipeline order & target
 
-- Authoritative pipeline: **Stage122 → Stage123 → Stage124**. Each stage consumes the
-  previous stage's frozen output.
+- **Frozen data-preparation pipeline:** **Stage122 → Stage123 → Stage124**. Each stage
+  consumes the previous stage's frozen output.
+- **Research-design and modeling sequence:** **Stage125 → Stage126**.
+  - **Stage125** completed the research-design, leakage, SAP and readiness contracts
+    (Part 3C leakage-safe finalization, Part 4 statistical analysis plan lock, Part 5
+    readiness closure). Stage125 performs no modeling.
+  - **Stage126 M1** is the current human-authorized modeling workstream. Primary M1
+    development-fold tuning is completed. The Stage126 research action remains
+    incomplete.
 - Primary target: **`FD_target_main`** (composite operational distress), frozen in
   Stage122, plus two robustness targets.
 - `run_all.py` is the **legacy Stage121 baseline only**; it is not run for the current
-  target. The current modeling pipeline will be redesigned after the Stage123 freeze.
+  target. The current authorized modeling path is the Stage126 M1 primary
+  development-fold tuning pipeline.
 
 ## Freeze & read-only guarantees
 
@@ -27,16 +35,29 @@ These are stable project decisions. Change them only deliberately (and note it i
 - Frozen assets are tracked via the existing `metadata_and_hashes_stage12{2,3}.json`
   manifests (see `FROZEN_ASSETS.md`).
 
-## Phase guardrails (current data-freeze phase)
+## Phase guardrails
+
+### Historical Stage125 guardrails (data-freeze phase)
 
 - **No** model / tuning / SHAP / SMOTE / calibration / report in this phase.
 - Stage124 Gate B is **completed and frozen**: four sample designs produced,
   canonical + filtered outputs verified, 58 focused tests (736 passed, 1 skipped,
   local results — no GitHub Actions configured).
-- **Modeling remains prohibited.** Stage125 is a **Research Design & Data
-  Readiness** stage that performs **no** modeling; modeling begins only when
-  Stage126 (M1 Financial Baseline) is explicitly approved. See
+- **Modeling remains prohibited** through Stage125 (Research Design & Data
+  Readiness); modeling begins only when Stage126 (M1 Financial Baseline) is
+  explicitly approved. See
   [`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md).
+
+### Current Stage126 M1 guardrails
+
+- Stage126 M1 is human-authorized and started.
+- Primary M1 development-fold tuning is completed.
+- The Stage126 research action is not yet completed.
+- M1 robustness is not started.
+- No full-development refit has occurred.
+- The final test remains locked.
+- No M2/M3/M4 data collection or modeling has occurred.
+- SHAP, SMOTE robustness and network extraction remain prohibited.
 
 ## Verified listing master (Stage124)
 

@@ -1,7 +1,7 @@
 ---
 roadmap_version: 1
-active_research_workstream_id: stage125-research-design-readiness
-qc_scope: stage125-part5-readiness-closure
+active_research_workstream_id: stage126-m1-financial-baseline
+qc_scope: stage126-m1-financial-baseline
 last_completed_research_action_id: stage125-part5-readiness-closure
 next_research_action_id: stage126-m1-financial-baseline
 active_maintenance_task_id: repository-driven-ai-handoff
@@ -39,7 +39,7 @@ must also appear in the body below. The validator checks that:
 15. `stage125-part3c-leakage-safe-dataset-finalization` — Leakage-safe dataset finalization under the active four-Jalali-month regulatory lag (six-month methodology superseded; historical six-month decision retained; four Gate B designs audited; timing-eligible analysis-ready subsets; no feature selection; no Stage126 / modeling) ✅
 16. `stage125-part4-statistical-analysis-plan` — Lock M1–M4 feature definitions/order, primary/robustness samples, temporal CV, metrics, seeds/tuning budget; **no modeling estimation** ✅
 17. `stage125-part5-readiness-closure` — Stage125 closure / readiness report; keep/drop decisions; Gate 125.0; full validator + tests; **no Stage126 / modeling** ✅
-18. `stage126-m1-financial-baseline` — **future**; blocked pending explicit human authorization; **not started**; a next-action pointer is not authorization
+18. `stage126-m1-financial-baseline` — human-authorized and started; primary M1 development-fold tuning completed on PR #52; M1 robustness not started; full-development refit not performed; final test locked; research action not yet completed
 
 ## Maintenance tasks
 
@@ -98,9 +98,11 @@ audit only; six-month methodology superseded).
 `stage125-part4-statistical-analysis-plan` locked the SAP (M1–M4, samples,
 temporal folds, metrics/seeds; no fitting).
 `stage125-part5-readiness-closure` closes Stage125 (Gate 125.0 PASS;
-M1 ready only for a future authorization decision; Stage126 unauthorized and
-not started). Next research pointer:
-`stage126-m1-financial-baseline` (**future**; blocked pending explicit human
-authorization; not started — a pointer is not authorization). See
-[`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Modeling remains
-prohibited until Stage126 (M1 Financial Baseline) is explicitly approved.
+M1 ready only for a future authorization decision at Part 5 closure time).
+Active research workstream is now `stage126-m1-financial-baseline`:
+human-authorized and started; primary M1 development-fold tuning completed on
+PR #52; M1 robustness not started; full-development refit not performed; final
+test locked; research action not yet completed. See
+[`STAGE125_RESEARCH_DESIGN.md`](STAGE125_RESEARCH_DESIGN.md). Final-test access
+or evaluation, full-development refit, and unauthorized robustness expansions
+remain prohibited.

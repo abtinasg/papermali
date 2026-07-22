@@ -1,0 +1,38 @@
+{
+  "baseline_commit": "5f56be5b2e49e66c54b451994a5e36c4fcc754d9",
+  "baseline_tree": "d8f399e3dedac123065f6eda876dc9e71f0c36e7",
+  "code_commit": "28c4e464808a74a6d459f8236ba432cf4a66b1d5",
+  "current_stage": "Stage126",
+  "description": "Stage126 M1 primary development-fold tuning (human-authorized; development only; final test locked; no SMOTE/SHAP/robustness; no full-development refit).",
+  "final_test_evaluations": 0,
+  "final_test_predictor_rows_loaded": 0,
+  "final_test_target_rows_loaded": 0,
+  "generated_at": "28c4e464808a74a6d459f8236ba432cf4a66b1d5",
+  "network_requests_attempted": 0,
+  "output_files_sha256": {
+    "README_STAGE126_M1_PRIMARY_DEVELOPMENT_TUNING.md": "d3a67cab445fe4344abfd50e07d42febc0053a1d08154916fc76cd53b53b2cf6",
+    "stage126_m1_configuration_registry.csv": "decbf43a5c34669bdd7a0c68c0ad6aec5611efc7c3ca82b09f5e85f72d635804",
+    "stage126_m1_development_access_manifest.csv": "0c2783d0e43ebba712a1c41b6889a2f8f646340bae6a75ad15902a8a0c368e39",
+    "stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "stage126_m1_final_test_lock_guard.json": "509e58fc39e3c5d886993c11b954fc06c267c96d02c081d8e50b0cda52e58b03",
+    "stage126_m1_human_authorization_record.json": "aa7b3ee285173374701b4e0a183e3e3d8417820ec9e7bdbae49af6b844a610a2",
+    "stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4",
+    "stage126_m1_primary_development_tuning_qc_report.json": "ccda73fddca1bc22ed420d1c24d0ce1fd77f2f0f8eefcae630350786b925babc",
+    "stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e",
+    "stage126_m1_tuning_results.csv": "e7e1e6808e394273676709aa94bfa713bbf8a790fadabee22ea20b849adbe649"
+  },
+  "runtime_versions": {
+    "jdatetime": "6.0.1",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "python": "3.13.5",
+    "scikit-learn": "1.9.0",
+    "xgboost": "3.3.0"
+  },
+  "shap_calls": 0,
+  "smote_calls": 0,
+  "source_file_sha256": "ae63bee24c3b868919b008cb15a0d4f4bfb8300ee6e3002a61e1e105d9391d82",
+  "stage": "stage126_m1_financial_baseline",
+  "test_file_sha256": "a5672abef7b715a8aa73bdcb74159bd460f8092f9a3857864aa548bc1196bfec"
+}

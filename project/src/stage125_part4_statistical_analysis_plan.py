@@ -340,6 +340,34 @@ FORBIDDEN_SURFACE_EXACT = (
     "project/stage126",
 )
 
+# Stage126 M1 development modeling is gated behind the shared exact
+# authorization transition guard. Until that record is present and fully
+# validated (Persian text byte-for-byte + recomputed SHA-256 + required flags),
+# the entire ``project/stage126/`` surface is forbidden. The two legacy Stage126
+# filenames below remain forbidden regardless.
+from src import stage126_authorization_transition_guard as _stage126_auth
+
+STAGE126_M1_AUTHORIZATION_RECORD_REL = (
+    _stage126_auth.AUTHORIZATION_RECORD_REL
+)
+STAGE126_M1_AUTHORIZATION_TEXT_SHA256 = (
+    _stage126_auth.AUTHORIZATION_TEXT_SHA256
+)
+
+
+def stage126_m1_development_authorized(repo_root: Path) -> bool:
+    """Delegate to the shared Stage126 authorization transition guard."""
+    return _stage126_auth.stage126_m1_development_authorized(repo_root)
+
+
+def effective_forbidden_surfaces(repo_root: Path) -> tuple[str, ...]:
+    """Forbidden Stage126 surfaces after applying the authorization gate."""
+    if stage126_m1_development_authorized(repo_root):
+        return tuple(
+            rel for rel in FORBIDDEN_SURFACE_EXACT if rel != "project/stage126"
+        )
+    return FORBIDDEN_SURFACE_EXACT
+
 
 class QCFail(RuntimeError):
     """Fail-closed Part 4 QC error."""
@@ -2570,7 +2598,10 @@ def build_qc_assertions(
     )
     _assert(
         assertions, "forbidden_surfaces_absent",
-        all(not (repo_root / rel).exists() for rel in FORBIDDEN_SURFACE_EXACT),
+        all(
+            not (repo_root / rel).exists()
+            for rel in effective_forbidden_surfaces(repo_root)
+        ),
         "absent",
     )
     content2, _ = build_all(repo_root)

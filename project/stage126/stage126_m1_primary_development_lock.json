@@ -1,0 +1,62 @@
+{
+  "configurations_per_family": {
+    "random_forest": 12,
+    "regularized_logistic_regression": 4,
+    "xgboost": 16
+  },
+  "contract_version": "stage126_m1_primary_development_tuning_v1",
+  "development_only": true,
+  "feature_order": [
+    "log_total_assets",
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio"
+  ],
+  "feature_set": "M1_PRIMARY_FEATURE_ORDER",
+  "final_oof_seeds": [
+    20260719,
+    20260720,
+    20260721,
+    20260722,
+    20260723
+  ],
+  "final_test_access_authorized": false,
+  "final_test_evaluation_performed": false,
+  "final_test_locked": true,
+  "full_development_refit_performed": false,
+  "m1_robustness_completed": false,
+  "m1_robustness_started": false,
+  "model_families": [
+    "regularized_logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "oof_rows_total": 1263,
+  "pooled_oof_pr_auc": {
+    "random_forest": 0.40244183002,
+    "regularized_logistic_regression": 0.445756964048,
+    "xgboost": 0.356545008162
+  },
+  "pooled_oof_rows_per_family": 421,
+  "sample": "main_rule_a_primary",
+  "selected_configurations": {
+    "random_forest": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
+    "regularized_logistic_regression": "logistic__C_0.1",
+    "xgboost": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1"
+  },
+  "shap_executed": false,
+  "smote_executed": false,
+  "stage126_m1_primary_development_tuning_completed": true,
+  "target": "FD_target_main_t_plus_1",
+  "total_configurations": 32,
+  "tuning_seeds": [
+    20260719,
+    20260720,
+    20260721
+  ]
+}

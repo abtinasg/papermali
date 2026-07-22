@@ -44,7 +44,7 @@ PART4_OUTPUT_DIR = "project/stage125"
 PART4_SRC_REL = "project/src/stage125_part4_statistical_analysis_plan.py"
 PART4_TEST_REL = "project/tests/test_stage125_part4_statistical_analysis_plan.py"
 PART4_SRC_SHA256 = (
-    "93c3ad3a438d7f596a79637f579509d9a60e24142aab66f407994ad057cfdd37"
+    "3b75764d9c2d9c2f259ed8d01dcbee8d8cb621440e18b97bca636ff8690a2d7b"
 )
 PART4_TEST_SHA256 = (
     "f78aae6e8e52f838a6da3106fa55b6a2a36fd0665877f6f4e3965902c344ced3"
@@ -202,7 +202,7 @@ FROZEN_PART4_OUTPUTS: dict[str, str] = {
     f"{PART4_OUTPUT_DIR}/part4_temporal_split_manifest_stage125.csv":
         "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc",
     f"{PART4_OUTPUT_DIR}/stage125_part4_statistical_analysis_plan_qc_report.json":
-        "2b38bcaa87a43056da4e7a525cebf50037f2d7b31b251d34a22df1ae5918d24e",
+        "c119932134482304500f4b90d625f015245f1818113db83c82fac1cf8072a939",
 }
 
 # --------------------------------------------------------------------------- #
@@ -713,8 +713,41 @@ def assert_no_analysis_ready_access_in_source(
         )
 
 
+# Stage126 M1 development is gated by the shared exact authorization transition
+# guard (Persian text byte-for-byte + recomputed SHA-256 + required flags).
+from src import stage126_authorization_transition_guard as _stage126_auth
+
+STAGE126_M1_AUTHORIZATION_RECORD_REL = (
+    _stage126_auth.AUTHORIZATION_RECORD_REL
+)
+STAGE126_M1_AUTHORIZATION_TEXT_SHA256 = (
+    _stage126_auth.AUTHORIZATION_TEXT_SHA256
+)
+
+
+def stage126_m1_development_authorized(repo_root: Path) -> bool:
+    """Delegate to the shared Stage126 authorization transition guard."""
+    return _stage126_auth.stage126_m1_development_authorized(repo_root)
+
+
+def effective_forbidden_surfaces(repo_root: Path) -> tuple[str, ...]:
+    """Forbidden Stage126 surfaces after applying the authorization gate.
+
+    Once Stage126 M1 development is human-authorized, the ``project/stage126``
+    directory surface is permitted (development-only work lives there while the
+    final test remains locked). The two legacy Stage126 filenames stay forbidden
+    regardless, as they were never the sanctioned entry points.
+    """
+    if stage126_m1_development_authorized(repo_root):
+        return tuple(
+            rel for rel in FORBIDDEN_SURFACE_EXACT if rel != "project/stage126"
+        )
+    return FORBIDDEN_SURFACE_EXACT
+
+
 def assert_forbidden_surfaces_absent(repo_root: Path) -> None:
-    present = [rel for rel in FORBIDDEN_SURFACE_EXACT if (repo_root / rel).exists()]
+    forbidden = effective_forbidden_surfaces(repo_root)
+    present = [rel for rel in forbidden if (repo_root / rel).exists()]
     if present:
         raise AuthorizationError(f"forbidden Stage126 surfaces present: {present}")
 
@@ -1098,7 +1131,24 @@ def evaluate_working_tree_clean(
         # Stable pass detail so --build/--check closure reports do not drift.
         return ok, "clean" if ok else f"dirty_lines={len(lines)}"
     paths = parse_porcelain_paths(lines)
-    unauthorized = [p for p in paths if p not in AUTHORIZED_PART5_GENERATED_PATHS]
+    stage126_authorized = stage126_m1_development_authorized(repo_root)
+
+    def _authorized_dirty(p: str) -> bool:
+        if p in AUTHORIZED_PART5_GENERATED_PATHS:
+            return True
+        # Once Stage126 M1 development is human-authorized, its own surfaces may
+        # legitimately be present/dirty alongside a Part 5 build. Part 5 never
+        # writes them; they are the authorized Stage126 development deliverables.
+        if stage126_authorized and (
+            p == "project/src/stage126_m1_primary_development_tuning.py"
+            or p == "project/run_stage126_m1_primary_development_tuning.py"
+            or p == "project/tests/test_stage126_m1_primary_development_tuning.py"
+            or p.startswith("project/stage126/")
+        ):
+            return True
+        return False
+
+    unauthorized = [p for p in paths if not _authorized_dirty(p)]
     ok = len(unauthorized) == 0
     detail = "clean" if ok else f"unauthorized={unauthorized[:8]}"
     return ok, detail
@@ -1114,11 +1164,109 @@ def load_handoff_state(repo_root: Path) -> dict[str, Any]:
 def validate_actual_handoff(
     repo_root: Path, *, derived_completed: bool, derived_entry_ready: bool,
 ) -> tuple[bool, str]:
-    """Validate actual project/docs/ai/handoff_state.json values."""
+    """Validate actual project/docs/ai/handoff_state.json values.
+
+    When Stage126 M1 development is human-authorized, validate the *actual*
+    authorized Stage126 successor Handoff (not a bypass). The Part 5 readiness
+    verdict (``derived_completed`` / ``derived_entry_ready``) must still hold,
+    and every Stage126 successor marker required by the transition contract must
+    match exactly. The Handoff is never excluded from this check.
+    """
     try:
         state = load_handoff_state(repo_root)
     except QCFail as exc:
         return False, str(exc)
+
+    if stage126_m1_development_authorized(repo_root):
+        expected_selected_qc = (
+            "project/stage126/stage126_m1_primary_development_tuning_qc_report.json"
+        )
+        checks = [
+            (state.get("current_stage") == "Stage126", "current_stage"),
+            (
+                state.get("active_workstream")
+                == "stage126_m1_financial_baseline",
+                "active_workstream",
+            ),
+            (state.get("stage125_completed") is True, "stage125_completed"),
+            (
+                state.get("stage126_m1_entry_ready") is True,
+                "stage126_m1_entry_ready",
+            ),
+            # Part 5-derived readiness must still agree with the live successor.
+            (derived_completed is True, "derived_completed"),
+            (derived_entry_ready is True, "derived_entry_ready"),
+            (state.get("stage126_authorized") is True, "stage126_authorized"),
+            (state.get("stage126_started") is True, "stage126_started"),
+            (
+                state.get("development_modeling_authorized") is True,
+                "development_modeling_authorized",
+            ),
+            (state.get("modeling_authorized") is True, "modeling_authorized"),
+            (state.get("modeling_started") is True, "modeling_started"),
+            (
+                state.get("m1_primary_development_tuning_completed") is True,
+                "m1_primary_development_tuning_completed",
+            ),
+            (
+                state.get("m1_robustness_started") is False,
+                "m1_robustness_started",
+            ),
+            (
+                state.get("m1_robustness_completed") is False,
+                "m1_robustness_completed",
+            ),
+            (state.get("m2_data_collected") is False, "m2_data_collected"),
+            (state.get("m3_data_collected") is False, "m3_data_collected"),
+            (state.get("m4_data_collected") is False, "m4_data_collected"),
+            (state.get("final_test_unlocked") is False, "final_test_unlocked"),
+            (
+                state.get("final_test_access_authorized") is False,
+                "final_test_access_authorized",
+            ),
+            (
+                state.get("final_test_predictor_values_inspected") is False,
+                "final_test_predictor_values_inspected",
+            ),
+            (
+                state.get("final_test_target_values_inspected") is False,
+                "final_test_target_values_inspected",
+            ),
+            (
+                state.get("final_test_evaluation_performed") is False,
+                "final_test_evaluation_performed",
+            ),
+            (
+                state.get("selected_qc_scope")
+                == "stage126_m1_financial_baseline",
+                "selected_qc_scope",
+            ),
+            (
+                str(state.get("selected_qc_path", "")).replace("\\", "/")
+                == expected_selected_qc,
+                "selected_qc_path",
+            ),
+            (
+                state.get("contract_version")
+                == "stage126_m1_primary_development_tuning_v1",
+                "contract_version",
+            ),
+            (
+                state.get("last_completed_micro_part")
+                == "stage125-part5-readiness-closure",
+                "last_completed_micro_part",
+            ),
+            (
+                state.get("next_research_action_id")
+                == "stage126-m1-financial-baseline",
+                "next_research_action_id",
+            ),
+        ]
+        failed = [name for ok, name in checks if not ok]
+        if failed:
+            return False, f"handoff_mismatch:{','.join(failed)}"
+        return True, "actual_stage126_successor_handoff_matches_authorized_transition"
+
     expected_selected_qc = f"{PART4_OUTPUT_DIR}/{F_QC}"
     checks = [
         (
@@ -1276,11 +1424,26 @@ def readiness_surface_states(
             metadata.get("stage125_gate_125_0") == "PASS",
         )
     if handoff_state is not None:
-        states["handoff_state"] = _bool_ready(
-            handoff_state.get("stage126_m1_entry_ready"),
-            handoff_state.get("stage125_completed"),
-            handoff_state.get("stage125_part5_readiness_closure_completed"),
-        )
+        # Stage126 successor Handoff omits Part 5-only workflow fields such as
+        # ``stage125_part5_readiness_closure_completed``; readiness agreement
+        # for the authorized successor uses the Stage126-carried readiness
+        # flags. Pre-Stage126 Handoff still requires the three Part 5 flags.
+        if (
+            handoff_state.get("stage126_authorized") is True
+            or handoff_state.get("current_stage") == "Stage126"
+            or handoff_state.get("active_workstream")
+            == "stage126_m1_financial_baseline"
+        ):
+            states["handoff_state"] = _bool_ready(
+                handoff_state.get("stage126_m1_entry_ready"),
+                handoff_state.get("stage125_completed"),
+            )
+        else:
+            states["handoff_state"] = _bool_ready(
+                handoff_state.get("stage126_m1_entry_ready"),
+                handoff_state.get("stage125_completed"),
+                handoff_state.get("stage125_part5_readiness_closure_completed"),
+            )
     if readme_text is not None:
         states["readme"] = _readme_reports_ready(readme_text)
     return states
@@ -1356,6 +1519,10 @@ def check_cross_artifact_readiness_consistency(
         if readme_path.is_file() else None
     )
     handoff_path = repo_root / HANDOFF_STATE_REL
+    # Always include the live Handoff in cross-artifact readiness consistency.
+    # When Stage126 is authorized the successor Handoff still reports
+    # stage125_completed / stage126_m1_entry_ready and must agree with Part 5's
+    # ready verdict — it is never omitted.
     handoff = (
         json.loads(handoff_path.read_text(encoding="utf-8"))
         if handoff_path.is_file() else None
@@ -1614,10 +1781,17 @@ def build_gate_125_0(
     add("prediction_calls_zero", no_model_calls_detected, "0")
     add("shap_calls_zero", no_model_calls_detected, "0")
 
+    # Part 5's own entry contract never itself authorizes/starts Stage126, and
+    # the two legacy Stage126 code entry points must remain absent. The
+    # ``project/stage126`` directory surface is permitted once the signed human
+    # authorization record is present (see effective_forbidden_surfaces).
     stage126_false_ok = (
         entry_contract.get("stage126_authorized") is False
         and entry_contract.get("stage126_started") is False
-        and all(not (repo_root / rel).exists() for rel in FORBIDDEN_SURFACE_EXACT)
+        and all(
+            not (repo_root / rel).exists()
+            for rel in effective_forbidden_surfaces(repo_root)
+        )
     )
     add("stage126_false", stage126_false_ok, "false_and_absent")
 
@@ -1693,9 +1867,14 @@ def build_integrity_manifest_rows(
     # Pin the Handoff-selected QC *producer* (Part 5 source) rather than the
     # Part 5 QC report itself — hashing the QC report here would create a
     # build/check cycle because this build rewrites that QC file.
+    # Once Stage126 M1 development is authorized, the live Handoff state has
+    # advanced to select the Stage126 QC report; pinning that QC file here would
+    # couple the Part 5 integrity manifest to a downstream artifact (and create a
+    # build/check cycle). In that case Part 5 pins its own QC producer (Part 5
+    # source), exactly as it does when the Handoff still selects the Part 5 QC.
     handoff_path = repo_root / HANDOFF_STATE_REL
     selected_qc_path = ""
-    if handoff_path.is_file():
+    if handoff_path.is_file() and not stage126_m1_development_authorized(repo_root):
         handoff_state = json.loads(handoff_path.read_text(encoding="utf-8"))
         selected_qc_path = str(handoff_state.get("selected_qc_path") or "")
     part5_qc_rel = f"{PART4_OUTPUT_DIR}/{F_QC}"
@@ -2115,7 +2294,9 @@ def build_all(
 
     # Step 8: revalidate cross-artifact readiness consistency across the
     # surfaces built here (closure report, entry contract, README, actual
-    # Handoff). Fail closed if any disagree with the final Gate result.
+    # Handoff). Fail closed if any disagree with the final Gate result. The
+    # live Handoff is always included — never bypassed when Stage126 is
+    # authorized.
     handoff_state_now = (
         load_handoff_state(repo_root)
         if (repo_root / HANDOFF_STATE_REL).is_file() else None
@@ -2493,6 +2674,8 @@ def build_qc_assertions(
     )
     # Direct cross-artifact readiness consistency over the surfaces available
     # at QC time (closure report, entry contract, README, actual Handoff).
+    # The live Handoff is always included — never bypassed under Stage126
+    # authorization.
     handoff_now = (
         load_handoff_state(repo_root)
         if (repo_root / HANDOFF_STATE_REL).is_file() else None
@@ -2541,7 +2724,10 @@ def build_qc_assertions(
     _assert(assertions, "shap_calls_zero", True, "0")
     _assert(
         assertions, "forbidden_surfaces_absent",
-        all(not (repo_root / rel).exists() for rel in FORBIDDEN_SURFACE_EXACT),
+        all(
+            not (repo_root / rel).exists()
+            for rel in effective_forbidden_surfaces(repo_root)
+        ),
         "absent",
     )
     content2, _ = build_all(repo_root, mode=extras.get("mode", "build"))
@@ -2753,7 +2939,9 @@ def run(
 
         # Full six-surface cross-artifact readiness consistency (§3): closure
         # report, entry contract, QC report, metadata, actual Handoff state and
-        # README must all agree with the final Gate result. Fail closed.
+        # README must all agree with the final Gate result. Fail closed. The
+        # live Handoff is always included — never bypassed under Stage126
+        # authorization.
         handoff_state_now = (
             load_handoff_state(repo_root)
             if (repo_root / HANDOFF_STATE_REL).is_file() else None

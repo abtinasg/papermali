@@ -3,6 +3,18 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-22
+
+- **Repository-entry-document consistency correction (documentation only).** Updated
+  `README_RUN.md`, `HANDOFF_PACKAGE.md`, and `DECISIONS.md` to accurately reflect
+  the current Stage126 M1 state: Stage126 M1 is human-authorized and started;
+  primary M1 development-fold tuning is completed on PR #52; M1 robustness is not
+  started; no full-development refit has occurred; the final test remains locked
+  and untouched; M2/M3/M4 data were not collected. This is a repository-state
+  documentation correction only and does not represent a new scientific decision.
+  Historical Stage125 statements remain explicitly historical. No model was
+  refitted and no Stage126 scientific output changed.
+
 ## 2026-07-19
 
 - **Stage125 Part 5 / research action

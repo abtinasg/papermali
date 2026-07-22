@@ -1,0 +1,69 @@
+{
+  "random_forest": {
+    "configuration_id": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
+    "fold1_validation_pr_auc": 0.49381261582,
+    "fold2_validation_pr_auc": 0.337867939876,
+    "hyperparameters": {
+      "bootstrap": true,
+      "max_depth": 3,
+      "max_features": "sqrt",
+      "min_samples_leaf": 10,
+      "n_estimators": 500
+    },
+    "mean_validation_pr_auc": 0.415840277848,
+    "min_fold_pr_auc": 0.337867939876,
+    "tie_breaking_order": [
+      "higher_mean_temporal_validation_PR_AUC",
+      "higher_minimum_fold_PR_AUC",
+      "simpler_configuration",
+      "lexicographically_smaller_configuration_id"
+    ]
+  },
+  "regularized_logistic_regression": {
+    "configuration_id": "logistic__C_0.1",
+    "fold1_validation_pr_auc": 0.484040818257,
+    "fold2_validation_pr_auc": 0.44052213868,
+    "hyperparameters": {
+      "C": 0.1,
+      "max_iter": 5000,
+      "penalty": "l2",
+      "solver": "liblinear"
+    },
+    "mean_validation_pr_auc": 0.462281478468,
+    "min_fold_pr_auc": 0.44052213868,
+    "tie_breaking_order": [
+      "higher_mean_temporal_validation_PR_AUC",
+      "higher_minimum_fold_PR_AUC",
+      "simpler_configuration",
+      "lexicographically_smaller_configuration_id"
+    ]
+  },
+  "xgboost": {
+    "configuration_id": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1",
+    "fold1_validation_pr_auc": 0.460868529085,
+    "fold2_validation_pr_auc": 0.329485361522,
+    "hyperparameters": {
+      "colsample_bytree": 0.8,
+      "early_stopping": false,
+      "eval_metric": "aucpr",
+      "gamma": 0,
+      "learning_rate": 0.03,
+      "max_depth": 2,
+      "min_child_weight": 1,
+      "n_estimators": 300,
+      "n_jobs": 1,
+      "objective": "binary:logistic",
+      "reg_lambda": 1,
+      "subsample": 0.8,
+      "tree_method": "hist"
+    },
+    "mean_validation_pr_auc": 0.395176945304,
+    "min_fold_pr_auc": 0.329485361522,
+    "tie_breaking_order": [
+      "higher_mean_temporal_validation_PR_AUC",
+      "higher_minimum_fold_PR_AUC",
+      "simpler_configuration",
+      "lexicographically_smaller_configuration_id"
+    ]
+  }
+}
