@@ -175,6 +175,19 @@
     "project/stage125/part4_hyperparameter_budget_stage125.json"
   ],
   "frozen_part5_contract_path": "project/stage125/part5_stage126_m1_entry_contract_stage125.json",
+  "frozen_stage125_contract_sha256": {
+    "project/stage125/part4_feature_sets_stage125.csv": "79e87cbcef1a6aa70fa6e4b837c4634df9e1f701e25f42a87ac34012452b850f",
+    "project/stage125/part4_hyperparameter_budget_stage125.json": "22d6989681a7cd59ffbf57077910615ce00adb9f171d303d5d61100a54490b40",
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
+    "project/stage125/part4_model_specifications_stage125.json": "ef933be3eb2f75e6f493ac1401100c629bdb83850c81950d8f235c5ccf4cdb21",
+    "project/stage125/part4_preprocessing_contract_stage125.json": "3722bd6165574c78aef1138a810ff4863b5c214f80df197889eaa40163f0e415",
+    "project/stage125/part4_sample_target_matrix_stage125.csv": "d7f026ecf0b3b2810eb95df5b912184c3b9f4e36031e9b366c00fd858b7c4792",
+    "project/stage125/part4_statistical_analysis_plan_stage125.json": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
+    "project/stage125/part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
+    "project/stage125/part5_stage126_m1_entry_contract_stage125.json": "74a2159785daeda44fa82ebd76f42870fa25aba3667846bccba6b3099ea65da5"
+  },
+  "frozen_stage125_source_commit": "6a4f05da219db7faea5a27c2adbee6b55497ec01",
+  "frozen_stage125_tree_unchanged": true,
   "full_development_refit_authorized": false,
   "full_development_refit_performed": false,
   "future_micro_parts": [
@@ -261,9 +274,31 @@
     },
     "one_factor_at_a_time": "Each robustness category changes only its registered robustness dimension; all non-changed dimensions remain equal to the locked primary specification.",
     "preprocessing": {
+      "continuous_pipeline_order": [
+        "1_deterministic_source_to_feature_transformation",
+        "2_capture_original_pre_imputation_missingness_mask",
+        "3_estimate_1st_99th_percentile_clipping_bounds_on_observed_training_fold_values_only",
+        "4_apply_training_derived_clipping_bounds",
+        "5_estimate_training_fold_median_on_observed_clipped_training_values",
+        "6_impute_missing_values_with_training_fold_median",
+        "7_append_missingness_indicators_from_original_pre_imputation_mask",
+        "8_logistic_regression_only_standardize_imputed_continuous_features_using_training_fold_mean_std"
+      ],
+      "fit_scope": "each_temporal_training_fold_separately",
+      "forbidden_fit_on": [
+        "validation_data",
+        "final_test_data",
+        "combined_train_plus_validation_before_configuration_selection"
+      ],
+      "frozen_preprocessing_contract_path": "project/stage125/part4_preprocessing_contract_stage125.json",
+      "logistic_regression_extra": "training_fold_standardization_after_imputation_continuous_only",
+      "missing_indicators_standardized": false,
       "never_fit_on_validation_or_final_test": true,
+      "random_forest_standardization": false,
       "reduced_feature_set_missingness_indicators": "create missingness indicators only for the selected base features",
-      "use_frozen_part4_training_fold_only_contract": true
+      "use_frozen_part4_training_fold_only_contract": true,
+      "validation_and_final_test_masks_from_own_original_missing_positions": true,
+      "xgboost_standardization": false
     },
     "scientific_interpretation": {
       "all_categories": "sensitivity_analysis_only",

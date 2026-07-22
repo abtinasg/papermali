@@ -1176,25 +1176,67 @@ def derive_m1_robustness_decision_markers(root: str) -> dict:
         raise HandoffError(
             f"unreadable robustness decision record: {exc}"
         ) from exc
-    if record.get("decision_locked") is not True:
-        raise HandoffError("robustness decision record decision_locked != True")
-    if record.get("execution_authorized") is not False:
-        raise HandoffError("robustness decision record execution_authorized != False")
-    if record.get("m1_robustness_started") is not False:
-        raise HandoffError("robustness decision record m1_robustness_started != False")
-    order = record.get("execution_order") or []
-    if not order or order[0] != "m1_target_proximity_six_feature_set":
-        raise HandoffError("robustness decision record execution_order head unexpected")
-    if record.get("one_category_per_micro_part_pr") is not True:
+
+    # Exact identity + flag contract (fail-closed).
+    exact_fields = {
+        "contract_id": "stage126_m1_robustness_execution_contract",
+        "contract_version": "stage126_m1_robustness_execution_contract_v1",
+        "decision_id": "stage126-m1-robustness-part0-decision-lock",
+        "decision_locked": True,
+        "execution_authorized": False,
+        "m1_robustness_started": False,
+        "m1_robustness_completed": False,
+        "part0_authorizes_part1": False,
+        "one_category_per_micro_part_pr": True,
+        "each_part_requires_separate_human_authorization": True,
+        "packaging_policy": "one_category_per_micro_part_pr",
+    }
+    for key, expected in exact_fields.items():
+        if record.get(key) != expected:
+            raise HandoffError(
+                f"robustness decision record field {key}="
+                f"{record.get(key)!r} != {expected!r}"
+            )
+
+    # Exact full execution order (not just the first member).
+    expected_order = [
+        "m1_target_proximity_six_feature_set",
+        "main_rule_b_listing_robustness",
+        "expanded_rule_a_company_scope_robustness",
+        "expanded_rule_b_combined_robustness",
+        "persistent_loss_robustness_target",
+        "smote_training_fold_only_robustness",
+    ]
+    if list(record.get("execution_order") or []) != expected_order:
         raise HandoffError(
-            "robustness decision record one_category_per_micro_part_pr != True"
+            "robustness decision record execution_order is not the exact "
+            "six-member sequence"
         )
+
+    # Recompute SHA-256 of the human decision text and require equality with the
+    # pinned digest AND the record's own hash field.
+    text = record.get("human_decision_text")
+    expected_hash = (
+        "79f98e4c6dc81e6362ad90b138997c0d0bc3c8bad5d471ea65615ffc49627a5b"
+    )
+    if not isinstance(text, str):
+        raise HandoffError("robustness decision record human_decision_text missing")
+    recomputed = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    if recomputed != expected_hash:
+        raise HandoffError(
+            "robustness decision record human_decision_text SHA-256 mismatch"
+        )
+    if record.get("human_decision_text_sha256") != expected_hash:
+        raise HandoffError(
+            "robustness decision record human_decision_text_sha256 field mismatch"
+        )
+
     return {
         "m1_robustness_decision_locked": True,
         "m1_robustness_execution_authorized": False,
         "m1_robustness_started": False,
-        "m1_robustness_completed": bool(record.get("m1_robustness_completed", False)),
-        "m1_robustness_next_category_id": order[0],
+        "m1_robustness_completed": False,
+        "m1_robustness_next_category_id": expected_order[0],
         "m1_robustness_packaging_policy": "one_category_per_micro_part_pr",
     }
 

@@ -2178,3 +2178,78 @@ def test_robustness_decision_markers_derive_from_record():
     assert markers["m1_robustness_decision_locked"] is True
     assert markers["m1_robustness_execution_authorized"] is False
     assert markers["m1_robustness_next_category_id"] == "m1_target_proximity_six_feature_set"
+
+
+# --------------------------------------------------------------------------- #
+# Fail-closed Handoff derivation for the Part 0 decision record
+# --------------------------------------------------------------------------- #
+
+_ROBUSTNESS_RECORD_REL = (
+    "project/stage126/stage126_m1_robustness_part0_decision_record.json"
+)
+
+
+def _valid_robustness_record() -> dict:
+    with open(os.path.join(REAL_ROOT, _ROBUSTNESS_RECORD_REL), encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _write_record_to(tmp, record) -> str:
+    d = os.path.join(tmp, "project", "stage126")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, os.path.basename(_ROBUSTNESS_RECORD_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(record, f, ensure_ascii=False)
+    return tmp
+
+
+def test_derive_markers_positive_from_valid_synthetic(tmp_path):
+    root = _write_record_to(str(tmp_path), _valid_robustness_record())
+    markers = gen.derive_m1_robustness_decision_markers(root)
+    assert markers == {
+        "m1_robustness_decision_locked": True,
+        "m1_robustness_execution_authorized": False,
+        "m1_robustness_started": False,
+        "m1_robustness_completed": False,
+        "m1_robustness_next_category_id": "m1_target_proximity_six_feature_set",
+        "m1_robustness_packaging_policy": "one_category_per_micro_part_pr",
+    }
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda r: r.update(contract_id="WRONG"),
+    lambda r: r.update(contract_version="WRONG"),
+    lambda r: r.update(decision_id="WRONG"),
+    lambda r: r.update(decision_locked=False),
+    lambda r: r.update(execution_authorized=True),
+    lambda r: r.update(m1_robustness_started=True),
+    lambda r: r.update(m1_robustness_completed=True),
+    lambda r: r.update(part0_authorizes_part1=True),
+    lambda r: r.update(each_part_requires_separate_human_authorization=False),
+    lambda r: r.update(packaging_policy="WRONG"),
+    lambda r: r.__setitem__("execution_order", r["execution_order"][1:]),  # missing
+    lambda r: r.__setitem__(
+        "execution_order", r["execution_order"] + ["extra_category"]),  # extra
+    lambda r: r.__setitem__(
+        "execution_order", list(reversed(r["execution_order"]))),  # reordered
+    lambda r: r.update(human_decision_text="tampered text"),
+    lambda r: r.update(human_decision_text_sha256="0" * 64),
+], ids=[
+    "wrong_contract_id", "wrong_contract_version", "wrong_decision_id",
+    "decision_locked_false", "execution_authorized_true",
+    "m1_robustness_started_true", "m1_robustness_completed_true",
+    "part0_authorizes_part1_true", "each_part_requires_auth_false",
+    "wrong_packaging_policy", "missing_category", "extra_category",
+    "reordered_category", "wrong_decision_text", "wrong_decision_hash",
+])
+def test_derive_markers_fail_closed(tmp_path, mutate):
+    record = _valid_robustness_record()
+    mutate(record)
+    root = _write_record_to(str(tmp_path), record)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_m1_robustness_decision_markers(root)
+
+
+def test_derive_markers_absent_record_returns_empty(tmp_path):
+    # No decision record => empty markers (pre-Part-0 repository states).
+    assert gen.derive_m1_robustness_decision_markers(str(tmp_path)) == {}

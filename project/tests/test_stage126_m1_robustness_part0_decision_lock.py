@@ -30,7 +30,8 @@ EXPECTED_CATEGORY_ORDER = (
 
 
 def _record() -> dict:
-    return p0.build_decision_record()
+    from pathlib import Path
+    return p0.build_decision_record(Path(REAL_ROOT))
 
 
 def _on_disk_record() -> dict:
@@ -382,7 +383,6 @@ def test_load_decision_markers_from_real_record():
 
 
 def test_module_imports_no_model_or_resampling_libraries():
-    import sys
     # The Part 0 module must not have imported model/resampling/SHAP libraries.
     src_file = os.path.join(
         REAL_ROOT, "project", "src",
@@ -391,3 +391,206 @@ def test_module_imports_no_model_or_resampling_libraries():
     text = open(src_file, encoding="utf-8").read()
     for banned in ("imblearn", "SMOTE(", "SMOTENC(", "import shap", ".fit(", ".predict("):
         assert banned not in text, f"forbidden token in source: {banned}"
+
+
+# --------------------------------------------------------------------------- #
+# Frozen Stage125 byte-integrity: nine-path SHA-256 map
+# --------------------------------------------------------------------------- #
+
+NINE_CONTRACTS = (
+    "project/stage125/part5_stage126_m1_entry_contract_stage125.json",
+    "project/stage125/part4_statistical_analysis_plan_stage125.json",
+    "project/stage125/part4_model_specifications_stage125.json",
+    "project/stage125/part4_preprocessing_contract_stage125.json",
+    "project/stage125/part4_temporal_split_contract_stage125.json",
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
+    "project/stage125/part4_feature_sets_stage125.csv",
+    "project/stage125/part4_sample_target_matrix_stage125.csv",
+    "project/stage125/part4_hyperparameter_budget_stage125.json",
+)
+
+
+def test_frozen_contract_hash_map_is_exact_nine_paths():
+    assert set(p0.FROZEN_STAGE125_CONTRACT_SHA256) == set(NINE_CONTRACTS)
+    assert len(p0.FROZEN_STAGE125_CONTRACT_SHA256) == 9
+
+
+def test_observed_hashes_equal_pinned_on_real_repo():
+    observed = p0.verify_frozen_stage125_contract_hashes(_path())
+    assert observed == p0.FROZEN_STAGE125_CONTRACT_SHA256
+    # Each observed hash equals the recomputed on-disk hash.
+    for rel, pinned in p0.FROZEN_STAGE125_CONTRACT_SHA256.items():
+        assert observed[rel] == pinned
+
+
+def _mirror_nine(tmp_path):
+    """Copy the nine frozen contracts into a temp dir mirroring repo layout."""
+    import shutil
+    from pathlib import Path
+    for rel in NINE_CONTRACTS:
+        dst = Path(tmp_path) / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(os.path.join(REAL_ROOT, rel), dst)
+    return Path(tmp_path)
+
+
+def test_missing_frozen_contract_fails_closed(tmp_path):
+    from pathlib import Path
+    root = _mirror_nine(tmp_path)
+    (root / NINE_CONTRACTS[0]).unlink()
+    with pytest.raises(p0.QCFail):
+        p0.verify_frozen_stage125_contract_hashes(root)
+
+
+def test_byte_change_in_each_contract_fails_closed(tmp_path):
+    from pathlib import Path
+    for i, rel in enumerate(NINE_CONTRACTS):
+        sub = tmp_path / f"c{i}"
+        root = _mirror_nine(sub)
+        p = root / rel
+        p.write_bytes(p.read_bytes() + b"X")
+        with pytest.raises(p0.QCFail):
+            p0.verify_frozen_stage125_contract_hashes(root)
+
+
+def test_whitespace_only_change_fails_closed(tmp_path):
+    root = _mirror_nine(tmp_path)
+    p = root / NINE_CONTRACTS[0]
+    # Append a single newline (whitespace-only) — byte hash must change.
+    p.write_bytes(p.read_bytes() + b"\n")
+    with pytest.raises(p0.QCFail):
+        p0.verify_frozen_stage125_contract_hashes(root)
+
+
+# --------------------------------------------------------------------------- #
+# Frozen Stage125 tree immutability (temporary git repositories)
+# --------------------------------------------------------------------------- #
+
+def _init_temp_repo_with_stage125(tmp_path):
+    """Create a temp git repo containing a project/stage125/ tree; return (root, base)."""
+    import subprocess
+    from pathlib import Path
+    root = Path(tmp_path)
+    subprocess.run(["git", "init", "-q", str(root)], check=True)
+    subprocess.run(["git", "-C", str(root), "config", "user.email", "t@t"], check=True)
+    subprocess.run(["git", "-C", str(root), "config", "user.name", "t"], check=True)
+    _mirror_nine(root)
+    subprocess.run(["git", "-C", str(root), "add", "-A"], check=True)
+    subprocess.run(["git", "-C", str(root), "commit", "-q", "-m", "base"], check=True)
+    base = subprocess.check_output(
+        ["git", "-C", str(root), "rev-parse", "HEAD"], text=True
+    ).strip()
+    return root, base
+
+
+def test_stage125_tree_unchanged_passes_on_clean_temp_repo(tmp_path):
+    root, base = _init_temp_repo_with_stage125(tmp_path)
+    # Must not raise when nothing changed.
+    p0.verify_stage125_tree_unchanged(root, base=base)
+
+
+def test_new_tracked_stage125_path_fails_closed(tmp_path):
+    import subprocess
+    root, base = _init_temp_repo_with_stage125(tmp_path)
+    (root / "project/stage125/new_file.json").write_text("{}", encoding="utf-8")
+    subprocess.run(["git", "-C", str(root), "add", "-A"], check=True)
+    subprocess.run(["git", "-C", str(root), "commit", "-q", "-m", "add"], check=True)
+    with pytest.raises(p0.QCFail):
+        p0.verify_stage125_tree_unchanged(root, base=base)
+
+
+def test_deleted_stage125_path_fails_closed(tmp_path):
+    import subprocess
+    root, base = _init_temp_repo_with_stage125(tmp_path)
+    (root / NINE_CONTRACTS[0]).unlink()
+    subprocess.run(["git", "-C", str(root), "add", "-A"], check=True)
+    subprocess.run(["git", "-C", str(root), "commit", "-q", "-m", "del"], check=True)
+    with pytest.raises(p0.QCFail):
+        p0.verify_stage125_tree_unchanged(root, base=base)
+
+
+def test_untracked_stage125_path_fails_closed(tmp_path):
+    root, base = _init_temp_repo_with_stage125(tmp_path)
+    (root / "project/stage125/untracked.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(p0.QCFail):
+        p0.verify_stage125_tree_unchanged(root, base=base)
+
+
+def test_unstaged_stage125_modification_fails_closed(tmp_path):
+    root, base = _init_temp_repo_with_stage125(tmp_path)
+    p = root / NINE_CONTRACTS[0]
+    p.write_bytes(p.read_bytes() + b"X")
+    with pytest.raises(p0.QCFail):
+        p0.verify_stage125_tree_unchanged(root, base=base)
+
+
+def test_real_repo_stage125_tree_unchanged():
+    # On the real repo/branch, the tree must be unchanged vs the frozen commit.
+    p0.verify_stage125_tree_unchanged(_path())
+
+
+# --------------------------------------------------------------------------- #
+# Preprocessing incorporation exact equality
+# --------------------------------------------------------------------------- #
+
+def test_preprocessing_incorporation_exact_fields():
+    prep = _record()["global_execution_rules"]["preprocessing"]
+    assert prep["continuous_pipeline_order"] == list(
+        p0.EXPECTED_CONTINUOUS_PIPELINE_ORDER
+    )
+    for field, expected in p0.EXPECTED_PREPROCESSING_FIELDS.items():
+        assert prep[field] == expected
+
+
+def test_preprocessing_continuous_pipeline_exact_eight_steps():
+    prep = _record()["global_execution_rules"]["preprocessing"]
+    order = prep["continuous_pipeline_order"]
+    assert len(order) == 8
+    assert order[0] == "1_deterministic_source_to_feature_transformation"
+    assert order[-1] == (
+        "8_logistic_regression_only_standardize_imputed_continuous_features_"
+        "using_training_fold_mean_std"
+    )
+
+
+def test_reduced_feature_missingness_rule_preserved():
+    prep = _record()["global_execution_rules"]["preprocessing"]
+    assert prep["reduced_feature_set_missingness_indicators"] == (
+        "create missingness indicators only for the selected base features"
+    )
+
+
+def test_load_preprocessing_incorporation_mismatch_fails_closed(tmp_path):
+    from pathlib import Path
+    root = _mirror_nine(tmp_path)
+    p = root / p0.PREPROCESSING_CONTRACT_REL
+    import json as _json
+    data = _json.loads(p.read_text(encoding="utf-8"))
+    data["fit_scope"] = "TAMPERED"
+    p.write_text(_json.dumps(data), encoding="utf-8")
+    with pytest.raises(p0.QCFail):
+        p0.load_preprocessing_incorporation(root)
+
+
+# --------------------------------------------------------------------------- #
+# Decision record now carries the frozen-integrity fields
+# --------------------------------------------------------------------------- #
+
+def test_record_carries_frozen_integrity_fields():
+    r = _record()
+    assert r["frozen_stage125_source_commit"] == (
+        "6a4f05da219db7faea5a27c2adbee6b55497ec01"
+    )
+    assert r["frozen_stage125_tree_unchanged"] is True
+    assert r["frozen_stage125_contract_sha256"] == dict(
+        sorted(p0.FROZEN_STAGE125_CONTRACT_SHA256.items())
+    )
+
+
+def test_on_disk_record_carries_frozen_integrity_fields():
+    rec = _on_disk_record()
+    assert rec["frozen_stage125_source_commit"] == (
+        "6a4f05da219db7faea5a27c2adbee6b55497ec01"
+    )
+    assert rec["frozen_stage125_tree_unchanged"] is True
+    assert len(rec["frozen_stage125_contract_sha256"]) == 9

@@ -24,6 +24,14 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
   `m1_robustness_next_category_id=m1_target_proximity_six_feature_set`. Research
   action pointers are unchanged (Stage126 M1 remains the active incomplete
   research action).
+- **Frozen Stage125 byte-integrity and fail-closed Handoff validation hardened;
+  no scientific decision changed and no execution occurred.** The nine consumed
+  Stage125 contracts are individually SHA-256 pinned to their exact frozen bytes;
+  the complete tracked `project/stage125/` tree is verified unchanged (committed,
+  staged, unstaged, untracked); the Part 4 preprocessing sequence is incorporated
+  by reference and validated for exact equality; and the Handoff generator now
+  rejects any internally inconsistent Part 0 decision record (identity, flags,
+  full execution order, and recomputed human-decision-text hash).
 
 ## 2026-07-22
 

@@ -110,6 +110,63 @@ PRIMARY_ARTIFACT_SHA256: dict[str, str] = {
         "e7e1e6808e394273676709aa94bfa713bbf8a790fadabee22ea20b849adbe649",
 }
 
+# Exact byte-integrity SHA-256 of the nine consumed frozen Stage125 contracts,
+# computed from the frozen source-commit blobs. These pin the exact bytes (not a
+# normalized-text or semantic equivalence) so any byte or whitespace change in a
+# consumed contract fails closed.
+FROZEN_STAGE125_SOURCE_COMMIT = "6a4f05da219db7faea5a27c2adbee6b55497ec01"
+FROZEN_STAGE125_CONTRACT_SHA256: dict[str, str] = {
+    "project/stage125/part5_stage126_m1_entry_contract_stage125.json":
+        "74a2159785daeda44fa82ebd76f42870fa25aba3667846bccba6b3099ea65da5",
+    "project/stage125/part4_statistical_analysis_plan_stage125.json":
+        "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
+    "project/stage125/part4_model_specifications_stage125.json":
+        "ef933be3eb2f75e6f493ac1401100c629bdb83850c81950d8f235c5ccf4cdb21",
+    "project/stage125/part4_preprocessing_contract_stage125.json":
+        "3722bd6165574c78aef1138a810ff4863b5c214f80df197889eaa40163f0e415",
+    "project/stage125/part4_temporal_split_contract_stage125.json":
+        "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json":
+        "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
+    "project/stage125/part4_feature_sets_stage125.csv":
+        "79e87cbcef1a6aa70fa6e4b837c4634df9e1f701e25f42a87ac34012452b850f",
+    "project/stage125/part4_sample_target_matrix_stage125.csv":
+        "d7f026ecf0b3b2810eb95df5b912184c3b9f4e36031e9b366c00fd858b7c4792",
+    "project/stage125/part4_hyperparameter_budget_stage125.json":
+        "22d6989681a7cd59ffbf57077910615ce00adb9f171d303d5d61100a54490b40",
+}
+
+# Exact frozen Part 4 preprocessing-contract fields incorporated by reference and
+# validated for exact equality. The continuous pipeline must remain exactly this.
+PREPROCESSING_CONTRACT_REL = (
+    "project/stage125/part4_preprocessing_contract_stage125.json"
+)
+EXPECTED_CONTINUOUS_PIPELINE_ORDER = (
+    "1_deterministic_source_to_feature_transformation",
+    "2_capture_original_pre_imputation_missingness_mask",
+    "3_estimate_1st_99th_percentile_clipping_bounds_on_observed_training_fold_values_only",
+    "4_apply_training_derived_clipping_bounds",
+    "5_estimate_training_fold_median_on_observed_clipped_training_values",
+    "6_impute_missing_values_with_training_fold_median",
+    "7_append_missingness_indicators_from_original_pre_imputation_mask",
+    "8_logistic_regression_only_standardize_imputed_continuous_features_using_training_fold_mean_std",
+)
+# Exact required preprocessing scalar/list fields (field -> expected value).
+EXPECTED_PREPROCESSING_FIELDS: dict[str, Any] = {
+    "fit_scope": "each_temporal_training_fold_separately",
+    "forbidden_fit_on": [
+        "validation_data",
+        "final_test_data",
+        "combined_train_plus_validation_before_configuration_selection",
+    ],
+    "logistic_regression_extra":
+        "training_fold_standardization_after_imputation_continuous_only",
+    "missing_indicators_standardized": False,
+    "random_forest_standardization": False,
+    "xgboost_standardization": False,
+    "validation_and_final_test_masks_from_own_original_missing_positions": True,
+}
+
 # --------------------------------------------------------------------------- #
 # Locked contract values (cross-validated against frozen contracts at run time)
 # --------------------------------------------------------------------------- #
@@ -383,6 +440,88 @@ def verify_primary_artifacts_immutable(repo_root: Path) -> dict[str, str]:
     return observed
 
 
+def verify_frozen_stage125_contract_hashes(repo_root: Path) -> dict[str, str]:
+    """Exact byte-integrity of the nine consumed frozen Stage125 contracts.
+
+    Reads the current working-tree bytes, computes SHA-256, and fails closed on
+    any missing path or any hash difference. Returns the exact observed hash map
+    (which equals the pinned map on success). This is stronger than Git object
+    SHA-1 identity: it pins the exact content bytes independently of Git.
+    """
+    if set(FROZEN_STAGE125_CONTRACT_SHA256) != set(FROZEN_PART4_CONTRACT_PATHS) | {
+        FROZEN_PART5_ENTRY_CONTRACT_REL
+    }:
+        raise QCFail("frozen Stage125 contract hash map path set is not exact")
+    observed: dict[str, str] = {}
+    for rel, expected in sorted(FROZEN_STAGE125_CONTRACT_SHA256.items()):
+        path = repo_root / rel
+        if not path.is_file():
+            raise QCFail(f"missing frozen Stage125 contract: {rel}")
+        got = sha256_file(path)
+        observed[rel] = got
+        if got != expected:
+            raise QCFail(
+                f"frozen Stage125 contract byte change: {rel} {got} != {expected}"
+            )
+    return observed
+
+
+def verify_stage125_tree_unchanged(
+    repo_root: Path, base: str = FROZEN_STAGE125_SOURCE_COMMIT,
+) -> None:
+    """Fail-closed: the complete tracked project/stage125/ tree is unchanged.
+
+    Covers committed modifications/additions/deletions relative to the frozen
+    source commit, staged changes, unstaged changes, and non-ignored untracked
+    paths under project/stage125/. Reports the exact offending paths. ``base``
+    defaults to the frozen source commit and is parameterizable for testing.
+    """
+    root = str(repo_root)
+    offending: list[str] = []
+    # Committed diff (base..HEAD) restricted to project/stage125/.
+    committed = _git(root, "diff", "--name-only", base, "HEAD", "--", "project/stage125/")
+    offending += [f"committed:{p}" for p in committed.splitlines() if p.strip()]
+    # Staged diff vs base.
+    staged = _git(root, "diff", "--cached", "--name-only", base, "--", "project/stage125/")
+    offending += [f"staged:{p}" for p in staged.splitlines() if p.strip()]
+    # Unstaged working-tree diff vs base.
+    unstaged = _git(root, "diff", "--name-only", base, "--", "project/stage125/")
+    offending += [f"worktree:{p}" for p in unstaged.splitlines() if p.strip()]
+    # Non-ignored untracked paths under project/stage125/.
+    untracked = _git(
+        root, "ls-files", "--others", "--exclude-standard", "--", "project/stage125/"
+    )
+    offending += [f"untracked:{p}" for p in untracked.splitlines() if p.strip()]
+    if offending:
+        raise QCFail(
+            "frozen Stage125 tree changed relative to "
+            f"{base}: {sorted(set(offending))}"
+        )
+
+
+def load_preprocessing_incorporation(repo_root: Path) -> dict[str, Any]:
+    """Load and exactly validate the frozen Part 4 preprocessing contract.
+
+    Returns the exact incorporated preprocessing fields for the decision record.
+    Fails closed if any incorporated field differs from the frozen contract.
+    """
+    contract = _read_json(repo_root, PREPROCESSING_CONTRACT_REL)
+    order = contract.get("continuous_pipeline_order")
+    if tuple(order or ()) != EXPECTED_CONTINUOUS_PIPELINE_ORDER:
+        raise QCFail("preprocessing continuous_pipeline_order differs from frozen")
+    incorporated: dict[str, Any] = {
+        "continuous_pipeline_order": list(EXPECTED_CONTINUOUS_PIPELINE_ORDER),
+    }
+    for field, expected in EXPECTED_PREPROCESSING_FIELDS.items():
+        if contract.get(field) != expected:
+            raise QCFail(
+                f"preprocessing field '{field}' differs from frozen contract: "
+                f"{contract.get(field)!r} != {expected!r}"
+            )
+        incorporated[field] = expected
+    return incorporated
+
+
 def verify_against_frozen_contracts(repo_root: Path) -> None:
     """Every locked value must agree with the frozen Part 4 / Part 5 contracts.
 
@@ -492,9 +631,16 @@ def _sample_target_targets(repo_root: Path) -> list[str]:
 # Builders
 # --------------------------------------------------------------------------- #
 
-def build_decision_record() -> dict[str, Any]:
-    """Deterministic decision record. NO git/time fields (stable across builds)."""
+def build_decision_record(repo_root: Path) -> dict[str, Any]:
+    """Deterministic decision record. NO git/time fields (stable across builds).
+
+    ``repo_root`` is required so the frozen-contract integrity map and the exact
+    Part 4 preprocessing incorporation are materialized from the frozen
+    contracts themselves (fail-closed), not hardcoded independently.
+    """
     verify_decision_text()
+    frozen_hashes = verify_frozen_stage125_contract_hashes(repo_root)
+    preprocessing_incorporation = load_preprocessing_incorporation(repo_root)
     return {
         "contract_id": CONTRACT_ID,
         "contract_version": CONTRACT_VERSION,
@@ -519,8 +665,13 @@ def build_decision_record() -> dict[str, Any]:
         "source_main_commit": SOURCE_MAIN_COMMIT,
         "frozen_part4_contract_paths": list(FROZEN_PART4_CONTRACT_PATHS),
         "frozen_part5_contract_path": FROZEN_PART5_ENTRY_CONTRACT_REL,
+        "frozen_stage125_source_commit": FROZEN_STAGE125_SOURCE_COMMIT,
+        "frozen_stage125_tree_unchanged": True,
+        "frozen_stage125_contract_sha256": dict(sorted(frozen_hashes.items())),
         "primary_artifact_sha256": dict(sorted(PRIMARY_ARTIFACT_SHA256.items())),
-        "global_execution_rules": build_global_execution_rules(),
+        "global_execution_rules": build_global_execution_rules(
+            preprocessing_incorporation
+        ),
         "categories": [dict(c) for c in CATEGORY_SPECS],
         "execution_order": list(FUTURE_MICRO_PART_ORDER),
         "packaging_policy": "one_category_per_micro_part_pr",
@@ -534,7 +685,9 @@ def build_decision_record() -> dict[str, Any]:
     }
 
 
-def build_global_execution_rules() -> dict[str, Any]:
+def build_global_execution_rules(
+    preprocessing_incorporation: dict[str, Any],
+) -> dict[str, Any]:
     return {
         "one_factor_at_a_time": (
             "Each robustness category changes only its registered robustness "
@@ -555,10 +708,29 @@ def build_global_execution_rules() -> dict[str, Any]:
         },
         "preprocessing": {
             "use_frozen_part4_training_fold_only_contract": True,
+            "frozen_preprocessing_contract_path": PREPROCESSING_CONTRACT_REL,
             "reduced_feature_set_missingness_indicators": (
                 "create missingness indicators only for the selected base features"
             ),
             "never_fit_on_validation_or_final_test": True,
+            # Exact incorporation-by-reference of the frozen Part 4 preprocessing
+            # contract (materialized + validated for exact equality at build).
+            "continuous_pipeline_order":
+                preprocessing_incorporation["continuous_pipeline_order"],
+            "fit_scope": preprocessing_incorporation["fit_scope"],
+            "forbidden_fit_on": preprocessing_incorporation["forbidden_fit_on"],
+            "logistic_regression_extra":
+                preprocessing_incorporation["logistic_regression_extra"],
+            "missing_indicators_standardized":
+                preprocessing_incorporation["missing_indicators_standardized"],
+            "random_forest_standardization":
+                preprocessing_incorporation["random_forest_standardization"],
+            "xgboost_standardization":
+                preprocessing_incorporation["xgboost_standardization"],
+            "validation_and_final_test_masks_from_own_original_missing_positions":
+                preprocessing_incorporation[
+                    "validation_and_final_test_masks_from_own_original_missing_positions"
+                ],
         },
         "non_smote_imbalance_policy": {
             "logistic_regression": {"class_weight": "balanced"},
@@ -668,6 +840,19 @@ def build_readme() -> str:
         "used. Sampler `random_state=20260725`; "
         "`k_neighbors=min(5, training_minority_count - 1)`; applied only inside "
         "each training fold; validation and final-test data are never resampled.",
+        "",
+        "## Frozen Stage125 integrity (fail-closed)",
+        "",
+        "- **All frozen Stage125 tracked files are protected against change** — the "
+        "complete tracked `project/stage125/` tree is verified unchanged relative "
+        f"to `{FROZEN_STAGE125_SOURCE_COMMIT}` (committed, staged, unstaged, and "
+        "non-ignored untracked paths), fail-closed.",
+        "- **The nine consumed Stage125 contracts are individually SHA-256 pinned** "
+        "to their exact frozen bytes; any byte or whitespace change fails closed.",
+        "- **The Part 4 preprocessing sequence is incorporated exactly** — the "
+        "frozen `continuous_pipeline_order` and the training-fold-only fit-scope / "
+        "standardization / mask fields are materialized and validated for exact "
+        "equality against `part4_preprocessing_contract_stage125.json`.",
     ]
     return "\n".join(lines).rstrip("\n") + "\n"
 
@@ -765,6 +950,28 @@ def build_qc_assertions(
     add("frozen_contracts_consistent", True, "verified pre-QC (fail-closed)")
     add("primary_artifacts_byte_identical",
         primary_observed == {k: PRIMARY_ARTIFACT_SHA256[k] for k in primary_observed})
+
+    # Frozen Stage125 byte-integrity: exact nine-path SHA-256 map + tree unchanged.
+    observed_frozen = verify_frozen_stage125_contract_hashes(repo_root)
+    add("frozen_stage125_contract_hashes_exact",
+        observed_frozen == FROZEN_STAGE125_CONTRACT_SHA256
+        and record["frozen_stage125_contract_sha256"]
+        == dict(sorted(FROZEN_STAGE125_CONTRACT_SHA256.items())))
+    add("frozen_stage125_contract_map_nine_paths",
+        len(record["frozen_stage125_contract_sha256"]) == 9)
+    verify_stage125_tree_unchanged(repo_root)
+    add("frozen_stage125_tree_unchanged",
+        record["frozen_stage125_tree_unchanged"] is True)
+    add("frozen_stage125_source_commit",
+        record["frozen_stage125_source_commit"] == FROZEN_STAGE125_SOURCE_COMMIT)
+
+    # Preprocessing incorporation exactly equals the frozen Part 4 contract.
+    prep = record["global_execution_rules"]["preprocessing"]
+    add("preprocessing_continuous_pipeline_order_exact",
+        prep["continuous_pipeline_order"] == list(EXPECTED_CONTINUOUS_PIPELINE_ORDER))
+    add("preprocessing_fields_exact",
+        all(prep.get(k) == v for k, v in EXPECTED_PREPROCESSING_FIELDS.items()))
+
     add("network_requests_attempted_zero", network_attempts == 0)
 
     # No-execution counters (this module runs no models).
@@ -792,10 +999,15 @@ def robustness_decision_handoff_markers() -> dict[str, Any]:
 
 def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
     verify_decision_text()
+    # Frozen Stage125 byte-integrity (file reads) BEFORE semantic cross-validation
+    # and before any artifact generation (fail-closed). The git-based tree-unchanged
+    # check runs in the runner OUTSIDE the network sentinel (git spawns a subprocess
+    # the sentinel denies) and again in build_qc_assertions.
+    verify_frozen_stage125_contract_hashes(repo_root)
     primary_observed = verify_primary_artifacts_immutable(repo_root)
     verify_against_frozen_contracts(repo_root)
 
-    record = build_decision_record()
+    record = build_decision_record(repo_root)
     readme = build_readme()
     content = {
         F_RECORD: _json_str(record),
@@ -826,6 +1038,10 @@ def run(
     repo_root = repo_root_from(project_dir)
     canonical_out = (repo_root / STAGE126_DIR_REL).resolve()
     out_dir = Path(output_dir).resolve() if output_dir else canonical_out
+
+    # Git-based frozen Stage125 tree-immutability check runs OUTSIDE the network
+    # sentinel (the sentinel denies subprocess launches, which git requires).
+    verify_stage125_tree_unchanged(repo_root)
 
     with p3b0.network_sentinel() as sentinel:
         content, extras = build_all(repo_root)
@@ -964,9 +1180,10 @@ def load_decision_markers(repo_root: str | Path) -> dict[str, Any]:
         raise QCFail("decision record execution_authorized is not False")
     if record.get("m1_robustness_started") is not False:
         raise QCFail("decision record m1_robustness_started is not False")
-    order = record.get("execution_order") or []
-    if not order or order[0] != "m1_target_proximity_six_feature_set":
-        raise QCFail("decision record execution_order head unexpected")
+    if record.get("m1_robustness_completed") is not False:
+        raise QCFail("decision record m1_robustness_completed is not False")
+    if list(record.get("execution_order") or []) != list(FUTURE_MICRO_PART_ORDER):
+        raise QCFail("decision record execution_order is not the exact sequence")
     if record.get("one_category_per_micro_part_pr") is not True:
         raise QCFail("decision record one_category_per_micro_part_pr is not True")
 
@@ -974,7 +1191,7 @@ def load_decision_markers(repo_root: str | Path) -> dict[str, Any]:
         "m1_robustness_decision_locked": True,
         "m1_robustness_execution_authorized": False,
         "m1_robustness_started": False,
-        "m1_robustness_completed": bool(record.get("m1_robustness_completed", False)),
-        "m1_robustness_next_category_id": order[0],
+        "m1_robustness_completed": False,
+        "m1_robustness_next_category_id": FUTURE_MICRO_PART_ORDER[0],
         "m1_robustness_packaging_policy": "one_category_per_micro_part_pr",
     }

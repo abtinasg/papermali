@@ -32,3 +32,9 @@ One robustness category per micro-part PR. Each future Part requires a separate 
 ## SMOTE / SMOTENC missingness-indicator rule (Part 6)
 
 If appended binary missingness-indicator columns are present, operationalize the registered SMOTE robustness with **SMOTENC** and mark all appended missingness-indicator columns as categorical; continuous features remain continuous; missingness indicators must remain binary 0/1 in synthetic observations. If no missingness-indicator columns exist in the fold matrix, standard **SMOTE** may be used. Sampler `random_state=20260725`; `k_neighbors=min(5, training_minority_count - 1)`; applied only inside each training fold; validation and final-test data are never resampled.
+
+## Frozen Stage125 integrity (fail-closed)
+
+- **All frozen Stage125 tracked files are protected against change** — the complete tracked `project/stage125/` tree is verified unchanged relative to `6a4f05da219db7faea5a27c2adbee6b55497ec01` (committed, staged, unstaged, and non-ignored untracked paths), fail-closed.
+- **The nine consumed Stage125 contracts are individually SHA-256 pinned** to their exact frozen bytes; any byte or whitespace change fails closed.
+- **The Part 4 preprocessing sequence is incorporated exactly** — the frozen `continuous_pipeline_order` and the training-fold-only fit-scope / standardization / mask fields are materialized and validated for exact equality against `part4_preprocessing_contract_stage125.json`.
