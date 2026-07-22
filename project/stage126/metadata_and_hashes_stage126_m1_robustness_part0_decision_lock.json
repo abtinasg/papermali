@@ -1,13 +1,13 @@
 {
-  "code_commit": "6240fa85e1c1b18e2b603894f11ceebd1d7e2829",
+  "code_commit": "8fec1dcf743c9abf1ce855933f54331f7257b9c7",
   "current_stage": "Stage126",
   "description": "Stage126 M1 robustness Part 0 decision lock (decision contract only; no robustness execution; no model fit/predict; no SMOTE/SMOTENC; no SHAP; no final-test access; primary artifacts byte-identical).",
-  "generated_at": "6240fa85e1c1b18e2b603894f11ceebd1d7e2829",
+  "generated_at": "8fec1dcf743c9abf1ce855933f54331f7257b9c7",
   "model_fit_calls": 0,
   "network_requests_attempted": 0,
   "output_files_sha256": {
     "README_STAGE126_M1_ROBUSTNESS_PART0_DECISION_LOCK.md": "d9541aa70da9a8ccae11ce822be72b1d2fdc2d54bc34aef050fbbf2f39fd0b85",
-    "stage126_m1_robustness_part0_decision_lock_qc_report.json": "2a0d59a66e60e312fcf3add67c2a28d7d1e2d40b2b41ae9388d2a730440766b0",
+    "stage126_m1_robustness_part0_decision_lock_qc_report.json": "99e332303f3c4821c0777ffa4e48e8f8f7e10e59e615921e48538eb047c9671d",
     "stage126_m1_robustness_part0_decision_record.json": "9ccd7bfae8fa522cb87e94ed7bebe806324837e9a2e12783d12aabfedd07c2ee"
   },
   "prediction_calls": 0,
@@ -22,7 +22,7 @@
   "shap_calls": 0,
   "smote_calls": 0,
   "smotenc_calls": 0,
-  "source_file_sha256": "b7f7ff0e421b4eed36800ae3571d6f2670efdb20c293c57fad3f8f738a144586",
+  "source_file_sha256": "11e29e04ca9000efedc5a1d6116171c14078688f86e77370fa512701530dd93f",
   "stage": "stage126_m1_robustness_part0_decision_lock",
-  "test_file_sha256": "31184098a48e7be207b27d5d2b93a2192b5d047ea9eefac8fcd1f63f65dad647"
+  "test_file_sha256": "2ee1b549569991a35049c1e8ec226119111dfc7aa80c57ef65c90c06f26be7bd"
 }
