@@ -1,11 +1,11 @@
 {
-  "code_commit": "0785d8aa166660263b355d6a34d7d89e9eff622b",
+  "code_commit": "1b770bb08eff101aabeefbab4d411dc390110890",
   "current_stage": "Stage126",
   "description": "Stage126 M1 robustness Part 1 target-proximity six-feature set (human-authorized; development folds only; only the feature set changed; no retuning; no full-development refit; final test locked; no SMOTE/SMOTENC/SHAP; sensitivity analysis only).",
   "final_test_evaluations": 0,
   "final_test_predictor_rows_loaded": 0,
   "final_test_target_rows_loaded": 0,
-  "generated_at": "0785d8aa166660263b355d6a34d7d89e9eff622b",
+  "generated_at": "1b770bb08eff101aabeefbab4d411dc390110890",
   "model_fit_calls": 22,
   "network_requests_attempted": 0,
   "output_files_sha256": {
@@ -17,7 +17,7 @@
     "stage126_m1_robustness_part1_metrics.csv": "c60f4b15aa40273472be98c867c73795d254f32c2a0e29b76641b1c5d5c18e98",
     "stage126_m1_robustness_part1_oof_predictions.csv": "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31",
     "stage126_m1_robustness_part1_part5_successor_compatibility.json": "8bd027182aa06c9f71dd52fc25a1cc101d46a7166e4785ec84baf49a6d9af893",
-    "stage126_m1_robustness_part1_qc_report.json": "1dec16fa7c43e8af998e14fcc782a8571b2ed0dafc183e153810a6dc3187030a"
+    "stage126_m1_robustness_part1_qc_report.json": "88b74b13dbdff7e4bd6d0804b77775204e82e2f6d4a3537ad42e9c81a91f9192"
   },
   "part5_successor_compatibility_sha256": "8bd027182aa06c9f71dd52fc25a1cc101d46a7166e4785ec84baf49a6d9af893",
   "prediction_calls": 22,
