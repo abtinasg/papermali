@@ -1,0 +1,37 @@
+{
+  "code_commit": "f5c65c89f8fc25e65eb1a3b16c0cecf1bad6647f",
+  "current_stage": "Stage126",
+  "description": "Stage126 M1 robustness Part 1 target-proximity six-feature set (human-authorized; development folds only; only the feature set changed; no retuning; no full-development refit; final test locked; no SMOTE/SMOTENC/SHAP; sensitivity analysis only).",
+  "final_test_evaluations": 0,
+  "final_test_predictor_rows_loaded": 0,
+  "final_test_target_rows_loaded": 0,
+  "generated_at": "f5c65c89f8fc25e65eb1a3b16c0cecf1bad6647f",
+  "model_fit_calls": 22,
+  "network_requests_attempted": 0,
+  "output_files_sha256": {
+    "README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md": "b7f6caa29c1da3d70d55421deb6ff19822c5db8a95a6bd7d22b9db00f6cbb01b",
+    "stage126_m1_robustness_part1_completion_lock.json": "c86455caac96d65e3169d4801d886b7e4b536e15d7f33bdf6b448c6e0c103a26",
+    "stage126_m1_robustness_part1_execution_manifest.json": "80813ce8af9544dde736cc6b94372d2626dccbf888553cd7964625bfe12d8738",
+    "stage126_m1_robustness_part1_feature_manifest.csv": "c65735795eda7dce6b4cacbc6af9dd5914b5068f44c77277035a51463cceaf90",
+    "stage126_m1_robustness_part1_human_authorization_record.json": "87a4f55baeb1081eaf936e49c5e8923f67df54ec444f0abc33ec835c0c7e06f4",
+    "stage126_m1_robustness_part1_metrics.csv": "c60f4b15aa40273472be98c867c73795d254f32c2a0e29b76641b1c5d5c18e98",
+    "stage126_m1_robustness_part1_oof_predictions.csv": "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31",
+    "stage126_m1_robustness_part1_qc_report.json": "7debbed9231456817d92c1eb509453d42213edf30b08ae2e7e195526b1718029"
+  },
+  "prediction_calls": 22,
+  "runtime_versions": {
+    "jdatetime": "6.0.1",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "python": "3.13.5",
+    "scikit-learn": "1.9.0",
+    "xgboost": "3.3.0"
+  },
+  "shap_calls": 0,
+  "smote_calls": 0,
+  "smotenc_calls": 0,
+  "source_file_sha256": "f018a0902a299d70967676853a690eda5615f2b516fe26724dfb36b6d2467d16",
+  "stage": "stage126_m1_robustness_part1_target_proximity",
+  "test_file_sha256": "faf8c65df609813f3f273d0973f1b23da0c5042ca3b854d67e91f8c2fb31a2ea",
+  "tuning_search_calls": 0
+}

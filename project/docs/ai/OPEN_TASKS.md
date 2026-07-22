@@ -145,6 +145,27 @@ markers: `m1_robustness_decision_locked=true`,
 requires a separate explicit human authorization; primary Stage126 artifacts are
 byte-identical and the final test remains locked.
 
+**Robustness Part 1 — COMPLETED (2026-07-22):** `m1_target_proximity_six_feature_set`
+was explicitly human-authorized and executed on the development folds only.
+**Only the feature set changed** (six-feature `M1_TARGET_PROXIMITY_ROBUSTNESS`,
+12 transformed columns); sample, target, folds, selected configurations,
+imbalance policy, seeds and metrics were held fixed. **No retuning** (0 tuning
+searches; exactly 22 fits / 22 predictions), **no full-development refit**, and
+the **final test remains locked and untouched** (0 predictor rows, 0 target
+rows, 0 evaluations). No SMOTE/SMOTENC/SHAP/calibration/bootstrap/Holm; zero
+network. Outputs: 1263 OOF rows (421 per family) and 9 metric rows. **Part 1 is
+sensitivity-analysis evidence only** and did not replace the primary results or
+select a paper winner. Handoff markers: `m1_robustness_started=true`,
+`m1_robustness_part1_completed=true`,
+`m1_robustness_completed_category_ids=["m1_target_proximity_six_feature_set"]`,
+`m1_robustness_next_category_id=main_rule_b_listing_robustness`,
+`m1_robustness_part2_authorized=false`,
+`m1_robustness_execution_authorized=false`, `m1_robustness_completed=false`.
+
+**Next — Part 2 (`main_rule_b_listing_robustness`) is NOT authorized and NOT
+started.** It requires its own separate explicit human authorization; the
+consumed Part 1 authorization is not a standing authorization.
+
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
 document-binding evidence remain as frozen scientific history; they do **not**
 authorize expansion. 80-row scale-up is cancelled. Part 3B expansion disposition

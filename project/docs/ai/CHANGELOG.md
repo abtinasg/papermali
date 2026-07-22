@@ -3,6 +3,31 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-22 — Stage126 M1 Robustness Part 1 (target-proximity six-feature set)
+
+- **Part 1 was explicitly human-authorized and completed on the development
+  folds.** Executed the registered robustness category
+  `m1_target_proximity_six_feature_set` under the merged Part 0 execution
+  contract. **Only the feature set changed** (the six-feature
+  `M1_TARGET_PROXIMITY_ROBUSTNESS` set, 12 transformed columns after appending
+  the six missingness indicators); the sample (`main_rule_a_primary`), target
+  (`FD_target_main_t_plus_1`), the two locked temporal folds, the three primary
+  selected configurations, the class-weighting imbalance policy, the seeds and
+  the metric contract were all held fixed. **No retuning occurred**
+  (`tuning_search_calls=0`; the frozen selected configurations were reused
+  verbatim): 22 model fits and 22 predictions exactly. **No full-development
+  refit occurred.** Development-only: 666 rows, 421 pooled OOF rows per family
+  (1263 total), 9 metric rows. **The final test remains locked and untouched**
+  (zero predictor/target rows loaded, zero evaluations); no SMOTE, SMOTENC,
+  SHAP, calibration, bootstrap or Holm procedure ran; zero network requests.
+  **Part 1 is sensitivity-analysis evidence only** — it does not replace the
+  primary results, does not re-rank the primary model families and selects no
+  paper winner. Primary Stage126 artifacts and the frozen Stage125 contracts
+  remain byte-identical. **Part 2 (`main_rule_b_listing_robustness`) is not
+  authorized and not started**; it requires its own separate explicit human
+  authorization. Research action pointers are unchanged (Stage126 M1 remains
+  the active incomplete research action).
+
 ## 2026-07-22 — Stage126 M1 Robustness Part 0 Decision Lock
 
 - **Robustness execution decisions locked (decision lock only; no execution).**

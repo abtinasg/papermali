@@ -1,0 +1,120 @@
+{
+  "base_feature_count": 6,
+  "category_id": "m1_target_proximity_six_feature_set",
+  "changed_dimension": "feature_set",
+  "contract_version": "stage126_m1_robustness_part1_target_proximity_v1",
+  "development_only": true,
+  "development_rows_loaded": 666,
+  "excluded_primary_features": [
+    "leverage_ratio",
+    "ocf_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio"
+  ],
+  "feature_set": "M1_TARGET_PROXIMITY_ROBUSTNESS",
+  "feature_source_columns": {
+    "asset_turnover_period_adjusted": "asset_turnover_period_adjusted",
+    "current_ratio": "current_ratio",
+    "financial_expense_to_assets_period_adjusted": "financial_expense_to_assets_period_adjusted",
+    "log_total_assets": "total_assets",
+    "operating_margin_period_adjusted": "operating_margin_period_adjusted",
+    "roa_period_adjusted": "roa_period_adjusted"
+  },
+  "features_exact_order": [
+    "log_total_assets",
+    "current_ratio",
+    "roa_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "financial_expense_to_assets_period_adjusted"
+  ],
+  "final_test_evaluations": 0,
+  "final_test_predictor_rows_loaded": 0,
+  "final_test_rows_seen_but_not_parsed": 346,
+  "final_test_target_rows_loaded": 0,
+  "fold_counts": {
+    "fold1_train": {
+      "negative": 212,
+      "positive": 33,
+      "rows": 245
+    },
+    "fold1_validation": {
+      "negative": 180,
+      "positive": 25,
+      "rows": 205
+    },
+    "fold2_train": {
+      "negative": 392,
+      "positive": 58,
+      "rows": 450
+    },
+    "fold2_validation": {
+      "negative": 206,
+      "positive": 10,
+      "rows": 216
+    }
+  },
+  "full_development_refit_performed": false,
+  "imbalance_policy": "primary_class_weighting",
+  "logistic_deterministic_seed": 20260719,
+  "model_families": [
+    "regularized_logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "model_fit_calls": 22,
+  "model_seeds": [
+    20260719,
+    20260720,
+    20260721,
+    20260722,
+    20260723
+  ],
+  "no_retuning": true,
+  "prediction_calls": 22,
+  "prohibited_feature": "revenue_growth_period_adjusted",
+  "sample": "main_rule_a_primary",
+  "scientific_interpretation": "sensitivity_analysis_only",
+  "scientific_role": "target_proximity_feature_set_robustness",
+  "selected_configurations": {
+    "random_forest": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
+    "regularized_logistic_regression": "logistic__C_0.1",
+    "xgboost": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1"
+  },
+  "target": "FD_target_main_t_plus_1",
+  "temporal_folds": {
+    "fold1": {
+      "train_role": "fold1_train",
+      "train_target_years": [
+        1393,
+        1394,
+        1395
+      ],
+      "validation_role": "fold1_validation",
+      "validation_target_years": [
+        1396,
+        1397
+      ]
+    },
+    "fold2": {
+      "train_role": "fold2_train",
+      "train_target_years": [
+        1393,
+        1394,
+        1395,
+        1396,
+        1397
+      ],
+      "validation_role": "fold2_validation",
+      "validation_target_years": [
+        1398,
+        1399
+      ]
+    }
+  },
+  "transformed_feature_count": 12,
+  "tuning_search_calls": 0,
+  "xgboost_scale_pos_weight_by_training_fold": {
+    "fold1_train": 6.424242424242,
+    "fold2_train": 6.758620689655
+  }
+}

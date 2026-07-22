@@ -84,6 +84,23 @@ These are stable project decisions. Change them only deliberately (and note it i
   requires a separate explicit human authorization. Primary Stage126 artifacts
   remain byte-identical; the final test remains locked and untouched.
 
+### Stage126 M1 robustness Part 1 — executed (2026-07-22)
+
+- **Part 1 (`m1_target_proximity_six_feature_set`) was explicitly
+  human-authorized and completed on the development folds only.**
+- **Only the feature set changed:** the six-feature
+  `M1_TARGET_PROXIMITY_ROBUSTNESS` set (12 transformed columns). Sample, target,
+  folds, selected configurations, imbalance policy, seeds and metrics unchanged.
+- **No retuning** (frozen selected configurations reused; 0 tuning searches;
+  exactly 22 fits / 22 predictions). **No full-development refit.**
+- **Final test remains locked and untouched**; no SMOTE/SMOTENC, SHAP,
+  calibration, bootstrap or Holm; zero network access.
+- **Sensitivity analysis only** — Part 1 does not replace the primary results,
+  does not change the primary model-family ordering and selects no paper winner.
+- **Part 2 (`main_rule_b_listing_robustness`) is not authorized and not
+  started.** The consumed Part 1 authorization confers no standing
+  authorization for any later category.
+
 ## Verified listing master (Stage124)
 
 - `listing_master_verified_stage124.csv` **exists** and contains exactly **130

@@ -1,6 +1,6 @@
 # Financial Distress Prediction — Current Run Guide (Stage122 → Stage123 → Stage124 → Stage125 → Stage126)
 
-**Stage125 is completed. Stage126 M1 is human-authorized and started. Primary M1 development-fold tuning is completed on PR #52. The robustness Part 0 decision lock records the robustness execution contract (decision lock only — robustness execution is not authorized and Part 1 is not started). M1 robustness is not started. No full-development refit has been performed. The final test remains locked and untouched. M2/M3/M4 data collection or modeling has not started.**
+**Stage125 is completed. Stage126 M1 is human-authorized and started. Primary M1 development-fold tuning is completed on PR #52. The robustness Part 0 decision lock records the robustness execution contract. Robustness Part 1 (`m1_target_proximity_six_feature_set`) was explicitly human-authorized and is completed on the development folds — only the feature set changed, no retuning, sensitivity analysis only. Part 2 (`main_rule_b_listing_robustness`) is not authorized and not started. No full-development refit has been performed. The final test remains locked and untouched. M2/M3/M4 data collection or modeling has not started.**
 
 The historical Stage122 → Stage123 → Stage124 sequence is frozen. Stage124 Gate B is **completed and frozen**. The verified listing master
 (`listing_master_verified_stage124.csv`, 130 tickers from the official TSE API) is
@@ -47,10 +47,13 @@ python run_stage126_m1_primary_development_tuning.py --check
 # 6) Stage126 M1 robustness Part 0 decision lock (decision contract only; --check)
 python run_stage126_m1_robustness_part0_decision_lock.py --check
 
-# 7) AI Handoff validation
+# 7) Stage126 M1 robustness Part 1 target-proximity (development-only; --check)
+python run_stage126_m1_robustness_part1_target_proximity.py --check
+
+# 8) AI Handoff validation
 python scripts/validate_ai_handoff.py --check
 
-# 8) Full test suite
+# 9) Full test suite
 python -m pytest tests/ -q
 ```
 
@@ -80,7 +83,7 @@ from the frozen Stage123 panel — both are independent of input row order.
 | Stage123 | `stage123/` | statement-scope correction audit, `modeling_all_rows_stage123.csv`, `modeling_one_year_ahead_stage123.csv`, eligibility audit, company mapping, listing review, leakage manifest (3 classes), independent QC report, change log, metadata+hashes, workbook |
 | Stage124 | `stage124/` | `listing_master_verified_stage124.csv` (130 tickers, dates from official TSE API), Gate B outputs in `gate_b_final/` (four sample designs, canonical + filtered CSVs, QC report, metadata), `metadata_and_hashes_stage124_batch02_gate_b.json` |
 | Stage125 | `stage125/` | Part 3C leakage-safe analysis-ready datasets (four Gate B designs), Part 4 locked statistical analysis plan (`stage125_part4_sap_v2`), Part 5 readiness closure (Gate 125.0) with the Stage126 M1 entry contract; **no modeling within Stage125** |
-| Stage126 | `stage126/` | Human-authorized M1 development-fold tuning: three locked model families (regularized Logistic Regression, Random Forest, XGBoost), selected configurations, development OOF predictions and metrics, final-test lock guard; **no robustness, no full-development refit, no final-test evaluation** |
+| Stage126 | `stage126/` | Human-authorized M1 development-fold tuning: three locked model families (regularized Logistic Regression, Random Forest, XGBoost), selected configurations, development OOF predictions and metrics, final-test lock guard; robustness Part 0 decision lock; robustness Part 1 target-proximity development-fold results (sensitivity analysis only); **no full-development refit, no final-test evaluation, Part 2 not authorized** |
 
 ## `run_all.py` is the OLD Stage121 baseline
 
