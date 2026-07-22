@@ -76,15 +76,17 @@ from the frozen Stage123 panel — both are independent of input row order.
 | Stage122 | `stage122/` | `FD_target_main` (composite operational distress target) + 2 robustness targets, target audit/definition/distribution, eligibility, t→t+1 pairs, QC, change log, metadata, workbook |
 | Stage123 | `stage123/` | statement-scope correction audit, `modeling_all_rows_stage123.csv`, `modeling_one_year_ahead_stage123.csv`, eligibility audit, company mapping, listing review, leakage manifest (3 classes), independent QC report, change log, metadata+hashes, workbook |
 | Stage124 | `stage124/` | `listing_master_verified_stage124.csv` (130 tickers, dates from official TSE API), Gate B outputs in `gate_b_final/` (four sample designs, canonical + filtered CSVs, QC report, metadata), `metadata_and_hashes_stage124_batch02_gate_b.json` |
+| Stage125 | `stage125/` | Part 3C leakage-safe analysis-ready datasets (four Gate B designs), Part 4 locked statistical analysis plan (`stage125_part4_sap_v2`), Part 5 readiness closure (Gate 125.0) with the Stage126 M1 entry contract; **no modeling within Stage125** |
+| Stage126 | `stage126/` | Human-authorized M1 development-fold tuning: three locked model families (regularized Logistic Regression, Random Forest, XGBoost), selected configurations, development OOF predictions and metrics, final-test lock guard; **no robustness, no full-development refit, no final-test evaluation** |
 
 ## `run_all.py` is the OLD Stage121 baseline
 
 `run_all.py` trains LR/RF/XGBoost on the **earlier Stage121** target
 (`distressed_target_reviewed`) using `build_dataset.py` (the old candidate selection and
 time split). It is kept only as the historical baseline and is **documented in
-[`README_STAGE121_LEGACY.md`](README_STAGE121_LEGACY.md)**. Do **not** run it for the
-current target — the modeling pipeline will be redesigned separately under
-`stage125-modeling-readiness`.
+[`README_STAGE121_LEGACY.md`](README_STAGE121_LEGACY.md)**. `run_all.py` remains the
+legacy Stage121 pipeline and must not be used for the current target. The current
+authorized modeling path is the Stage126 M1 primary development-fold tuning pipeline.
 
 ## Guardrails still enforced (Stage123 + Stage124 Gate B + Stage126 M1)
 

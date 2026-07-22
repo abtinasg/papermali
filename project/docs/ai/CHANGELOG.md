@@ -3,7 +3,7 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
-## 2026-07-20
+## 2026-07-22
 
 - **Repository-entry-document consistency correction (documentation only).** Updated
   `README_RUN.md`, `HANDOFF_PACKAGE.md`, and `DECISIONS.md` to accurately reflect

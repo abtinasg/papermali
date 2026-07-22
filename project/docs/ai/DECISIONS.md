@@ -12,12 +12,20 @@ These are stable project decisions. Change them only deliberately (and note it i
 
 ## Pipeline order & target
 
-- Authoritative pipeline: **Stage122 → Stage123 → Stage124**. Each stage consumes the
-  previous stage's frozen output.
+- **Frozen data-preparation pipeline:** **Stage122 → Stage123 → Stage124**. Each stage
+  consumes the previous stage's frozen output.
+- **Research-design and modeling sequence:** **Stage125 → Stage126**.
+  - **Stage125** completed the research-design, leakage, SAP and readiness contracts
+    (Part 3C leakage-safe finalization, Part 4 statistical analysis plan lock, Part 5
+    readiness closure). Stage125 performs no modeling.
+  - **Stage126 M1** is the current human-authorized modeling workstream. Primary M1
+    development-fold tuning is completed. The Stage126 research action remains
+    incomplete.
 - Primary target: **`FD_target_main`** (composite operational distress), frozen in
   Stage122, plus two robustness targets.
 - `run_all.py` is the **legacy Stage121 baseline only**; it is not run for the current
-  target. The current modeling pipeline will be redesigned after the Stage123 freeze.
+  target. The current authorized modeling path is the Stage126 M1 primary
+  development-fold tuning pipeline.
 
 ## Freeze & read-only guarantees
 

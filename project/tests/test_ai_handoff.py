@@ -2009,3 +2009,131 @@ def test_decisions_does_not_label_current_phase_as_no_model_data_freeze():
     assert "Phase guardrails (current data-freeze phase)" not in content, (
         "DECISIONS must not label current phase as 'current data-freeze phase'"
     )
+
+
+# --------------------------------------------------------------------------- #
+# Section-aware entry-document consistency tests (final entry-doc correction)
+# --------------------------------------------------------------------------- #
+
+def _read_doc(*parts: str) -> str:
+    """Read a repository text file relative to REAL_ROOT."""
+    with open(os.path.join(REAL_ROOT, *parts), encoding="utf-8") as f:
+        return f.read()
+
+
+def _flat(text: str) -> str:
+    """Collapse all runs of whitespace to single spaces so that phrase checks
+    are robust to markdown hard line-wrapping."""
+    return " ".join(text.split())
+
+
+def _md_section(content: str, heading_substring: str) -> str:
+    """Return the body of the first level-1/level-2 markdown section whose
+    heading line contains ``heading_substring``.
+
+    The section runs from its heading up to (but excluding) the next level-1 or
+    level-2 heading (``#`` or ``##``); deeper ``###`` headings stay inside.
+    Raises AssertionError if the heading is not found.
+    """
+    lines = content.split("\n")
+    start = None
+    for i, line in enumerate(lines):
+        if re.match(r"^#{1,2} ", line) and heading_substring in line:
+            start = i
+            break
+    assert start is not None, (
+        f"heading containing {heading_substring!r} not found"
+    )
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if re.match(r"^#{1,2} ", lines[j]):
+            end = j
+            break
+    return "\n".join(lines[start:end])
+
+
+def test_readme_run_has_no_stale_modeling_readiness_redesign():
+    """README_RUN must not contain the stale stage125-modeling-readiness redesign."""
+    content = _read_doc("project", "README_RUN.md")
+    assert "modeling pipeline will be redesigned separately under" \
+        not in _flat(content), (
+        "README_RUN must not say the modeling pipeline will be redesigned separately"
+    )
+    assert "stage125-modeling-readiness" not in content, (
+        "README_RUN must not reference stage125-modeling-readiness"
+    )
+
+
+def test_readme_run_stage_output_table_has_stage125_and_stage126_rows():
+    """README_RUN stage-output table must include Stage125 and Stage126 rows."""
+    section = _md_section(_read_doc("project", "README_RUN.md"),
+                          "What each stage produces")
+    assert "| Stage125 |" in section, (
+        "README_RUN stage-output table must include a | Stage125 | row"
+    )
+    assert "| Stage126 |" in section, (
+        "README_RUN stage-output table must include a | Stage126 | row"
+    )
+    # Stage126 must not be implied complete.
+    assert "no full-development refit" in _flat(section), (
+        "README_RUN Stage126 row must state no full-development refit"
+    )
+
+
+def test_decisions_pipeline_section_has_no_stale_redesign_statement():
+    """DECISIONS Pipeline section must not contain the stale redesign statement."""
+    section = _flat(_md_section(_read_doc("project", "docs", "ai", "DECISIONS.md"),
+                               "Pipeline order & target"))
+    assert "current modeling pipeline will be redesigned after the Stage123 freeze" \
+        not in section, (
+        "DECISIONS Pipeline section must not say the modeling pipeline will be "
+        "redesigned after the Stage123 freeze"
+    )
+
+
+def test_decisions_pipeline_section_distinguishes_the_two_pipelines():
+    """DECISIONS Pipeline section must distinguish the two named pipelines."""
+    section = _flat(_md_section(_read_doc("project", "docs", "ai", "DECISIONS.md"),
+                               "Pipeline order & target"))
+    assert "Frozen data-preparation pipeline" in section, (
+        "DECISIONS Pipeline section must name the frozen data-preparation pipeline"
+    )
+    assert "Research-design and modeling sequence" in section, (
+        "DECISIONS Pipeline section must name the research-design and modeling "
+        "sequence"
+    )
+
+
+def test_handoff_package_final_goal_has_no_later_models_phrase():
+    """HANDOFF_PACKAGE Final goal must not contain the stale (later) models phrase."""
+    section = _flat(_md_section(
+        _read_doc("project", "docs", "ai", "HANDOFF_PACKAGE.md"), "Final goal"))
+    assert "(later) distress-prediction models" not in section, (
+        "HANDOFF_PACKAGE Final goal must not say '(later) distress-prediction models'"
+    )
+
+
+def test_handoff_package_done_section_lists_stage125_and_stage126_milestones():
+    """HANDOFF_PACKAGE Done section must list Part 5 closure and Stage126 tuning."""
+    section = _flat(_md_section(
+        _read_doc("project", "docs", "ai", "HANDOFF_PACKAGE.md"), "Done"))
+    assert "Stage125 Part 5 readiness closure" in section, (
+        "HANDOFF_PACKAGE Done section must include Stage125 Part 5 readiness closure"
+    )
+    assert "Stage126 primary development-fold tuning" in section, (
+        "HANDOFF_PACKAGE Done section must include Stage126 primary "
+        "development-fold tuning"
+    )
+
+
+def test_handoff_package_next_step_requires_explicit_human_decision():
+    """HANDOFF_PACKAGE Next step must require a separate explicit human decision."""
+    section = _flat(_md_section(
+        _read_doc("project", "docs", "ai", "HANDOFF_PACKAGE.md"), "Next step"))
+    assert "separate explicit human micro-part decision" in section, (
+        "HANDOFF_PACKAGE Next step must require a separate explicit human "
+        "micro-part decision"
+    )
+    assert "M1 robustness" in section, (
+        "HANDOFF_PACKAGE Next step must reference M1 robustness"
+    )
