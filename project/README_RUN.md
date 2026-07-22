@@ -1,6 +1,6 @@
 # Financial Distress Prediction — Current Run Guide (Stage122 → Stage123 → Stage124 → Stage125 → Stage126)
 
-**Stage125 is completed. Stage126 M1 is human-authorized and started. Primary M1 development-fold tuning is completed on PR #52. M1 robustness is not started. No full-development refit has been performed. The final test remains locked and untouched. M2/M3/M4 data collection or modeling has not started.**
+**Stage125 is completed. Stage126 M1 is human-authorized and started. Primary M1 development-fold tuning is completed on PR #52. The robustness Part 0 decision lock records the robustness execution contract (decision lock only — robustness execution is not authorized and Part 1 is not started). M1 robustness is not started. No full-development refit has been performed. The final test remains locked and untouched. M2/M3/M4 data collection or modeling has not started.**
 
 The historical Stage122 → Stage123 → Stage124 sequence is frozen. Stage124 Gate B is **completed and frozen**. The verified listing master
 (`listing_master_verified_stage124.csv`, 130 tickers from the official TSE API) is
@@ -44,10 +44,13 @@ python run_stage125_part5.py --check   # readiness closure / Gate 125.0
 # 5) Stage126 M1 primary development-fold tuning (human-authorized; --check only)
 python run_stage126_m1_primary_development_tuning.py --check
 
-# 6) AI Handoff validation
+# 6) Stage126 M1 robustness Part 0 decision lock (decision contract only; --check)
+python run_stage126_m1_robustness_part0_decision_lock.py --check
+
+# 7) AI Handoff validation
 python scripts/validate_ai_handoff.py --check
 
-# 7) Full test suite
+# 8) Full test suite
 python -m pytest tests/ -q
 ```
 

@@ -135,6 +135,10 @@ ALLOWLIST_FILES = (
     "project/src/stage126_m1_primary_development_tuning.py",
     "project/run_stage126_m1_primary_development_tuning.py",
     "project/tests/test_stage126_m1_primary_development_tuning.py",
+    # Stage126 M1 robustness Part 0 decision-lock code, runner, and tests.
+    "project/src/stage126_m1_robustness_part0_decision_lock.py",
+    "project/run_stage126_m1_robustness_part0_decision_lock.py",
+    "project/tests/test_stage126_m1_robustness_part0_decision_lock.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
@@ -352,6 +356,11 @@ ARTIFACT_ONLY_FILES = (
     "project/stage126/README_STAGE126_M1_PRIMARY_DEVELOPMENT_TUNING.md",
     "project/stage126/stage126_m1_primary_development_tuning_qc_report.json",
     "project/stage126/metadata_and_hashes_stage126_m1_primary_development_tuning.json",
+    # Stage126 M1 robustness Part 0 decision-lock deliverables + generated QC.
+    "project/stage126/stage126_m1_robustness_part0_decision_record.json",
+    "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART0_DECISION_LOCK.md",
+    "project/stage126/stage126_m1_robustness_part0_decision_lock_qc_report.json",
+    "project/stage126/metadata_and_hashes_stage126_m1_robustness_part0_decision_lock.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -1145,6 +1154,51 @@ def frozen_asset_report(root: str) -> list[dict]:
 # Markers
 # --------------------------------------------------------------------------- #
 
+_M1_ROBUSTNESS_DECISION_RECORD_REL = (
+    "project/stage126/stage126_m1_robustness_part0_decision_record.json"
+)
+
+
+def derive_m1_robustness_decision_markers(root: str) -> dict:
+    """Derive the six Stage126 M1 robustness-decision markers (fail-closed).
+
+    Reads only the tracked Part 0 decision record. When the record is absent
+    (repository states before the Part 0 decision lock), returns an empty dict
+    so pre-Part-0 Handoffs are unaffected. When the record is present it must be
+    internally consistent, otherwise a HandoffError is raised.
+    """
+    path = os.path.join(root, _M1_ROBUSTNESS_DECISION_RECORD_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        record = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(
+            f"unreadable robustness decision record: {exc}"
+        ) from exc
+    if record.get("decision_locked") is not True:
+        raise HandoffError("robustness decision record decision_locked != True")
+    if record.get("execution_authorized") is not False:
+        raise HandoffError("robustness decision record execution_authorized != False")
+    if record.get("m1_robustness_started") is not False:
+        raise HandoffError("robustness decision record m1_robustness_started != False")
+    order = record.get("execution_order") or []
+    if not order or order[0] != "m1_target_proximity_six_feature_set":
+        raise HandoffError("robustness decision record execution_order head unexpected")
+    if record.get("one_category_per_micro_part_pr") is not True:
+        raise HandoffError(
+            "robustness decision record one_category_per_micro_part_pr != True"
+        )
+    return {
+        "m1_robustness_decision_locked": True,
+        "m1_robustness_execution_authorized": False,
+        "m1_robustness_started": False,
+        "m1_robustness_completed": bool(record.get("m1_robustness_completed", False)),
+        "m1_robustness_next_category_id": order[0],
+        "m1_robustness_packaging_policy": "one_category_per_micro_part_pr",
+    }
+
+
 def detect_markers(root: str) -> dict:
     def any_exists(paths) -> bool:
         return any(os.path.isfile(os.path.join(root, p)) for p in paths)
@@ -1558,6 +1612,7 @@ def semantic_state(root: str):
         },
         "markers": detect_markers(root),
         "qc_workflow": qc_workflow,
+        "m1_robustness_decision": derive_m1_robustness_decision_markers(root),
         "tickers": tickers,
     }
     return state, head, qc, roadmap, frozen
@@ -1603,6 +1658,7 @@ def build_handoff_state(root: str):
         "state_fingerprint": fingerprint(state),
     }
     record.update(state["qc_workflow"])
+    record.update(state["m1_robustness_decision"])
     return record, state, frozen
 
 

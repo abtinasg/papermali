@@ -2137,3 +2137,44 @@ def test_handoff_package_next_step_requires_explicit_human_decision():
     assert "M1 robustness" in section, (
         "HANDOFF_PACKAGE Next step must reference M1 robustness"
     )
+
+
+# --------------------------------------------------------------------------- #
+# Stage126 M1 robustness Part 0 decision-lock Handoff integration
+# --------------------------------------------------------------------------- #
+
+def test_handoff_state_carries_robustness_decision_markers():
+    """handoff_state.json must carry the six robustness-decision markers."""
+    state = _state(REAL_ROOT)
+    assert state["m1_robustness_decision_locked"] is True
+    assert state["m1_robustness_execution_authorized"] is False
+    assert state["m1_robustness_started"] is False
+    assert state["m1_robustness_completed"] is False
+    assert state["m1_robustness_next_category_id"] == "m1_target_proximity_six_feature_set"
+    assert state["m1_robustness_packaging_policy"] == "one_category_per_micro_part_pr"
+
+
+def test_robustness_decision_lock_does_not_advance_research_pointers():
+    """The decision lock must not advance the research action pointers."""
+    state = _state(REAL_ROOT)
+    assert state["last_completed_micro_part"] == "stage125-part5-readiness-closure"
+    assert state["next_research_action_id"] == "stage126-m1-financial-baseline"
+    assert state["active_workstream"] == "stage126_m1_financial_baseline"
+
+
+def test_robustness_decision_lock_preserves_primary_and_final_test_state():
+    """Decision lock must not change primary or final-test state."""
+    state = _state(REAL_ROOT)
+    assert state["current_stage"] == "Stage126"
+    assert state["m1_primary_development_tuning_completed"] is True
+    assert state["final_test_unlocked"] is False
+    assert state["final_test_access_authorized"] is False
+    assert state["final_test_evaluation_performed"] is False
+
+
+def test_robustness_decision_markers_derive_from_record():
+    """Generator derivation must match the tracked decision record."""
+    markers = gen.derive_m1_robustness_decision_markers(REAL_ROOT)
+    assert markers["m1_robustness_decision_locked"] is True
+    assert markers["m1_robustness_execution_authorized"] is False
+    assert markers["m1_robustness_next_category_id"] == "m1_target_proximity_six_feature_set"

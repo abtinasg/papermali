@@ -130,6 +130,21 @@ Primary M1 development-fold tuning is completed on PR #52. The Stage126
 research action is **not yet completed** (robustness / full-development
 refit / final test remain out of scope until separately authorized).
 
+**Robustness Part 0 decision lock (maintenance; 2026-07-22):** the additive
+robustness execution contract (`stage126_m1_robustness_execution_contract_v1`)
+is locked — six categories in binding order, one factor at a time, all three
+model families, no retuning (reuse primary selected configurations), two locked
+development folds, fixed metric list, SMOTE/SMOTENC training-fold-only rules, and
+one-category-per-micro-part packaging. This is a **decision lock only**: it
+authorizes **no** robustness execution and **Part 1 is not started**. Handoff
+markers: `m1_robustness_decision_locked=true`,
+`m1_robustness_execution_authorized=false`,
+`m1_robustness_started=false`,
+`m1_robustness_next_category_id=m1_target_proximity_six_feature_set`,
+`m1_robustness_packaging_policy=one_category_per_micro_part_pr`. Each future Part
+requires a separate explicit human authorization; primary Stage126 artifacts are
+byte-identical and the final test remains locked.
+
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
 document-binding evidence remain as frozen scientific history; they do **not**
 authorize expansion. 80-row scale-up is cancelled. Part 3B expansion disposition
