@@ -2603,6 +2603,65 @@ def test_current_state_doc_separates_the_two_qc_roles():
     assert "stage126_m1_robustness_part3_qc_report.json" in micro
 
 
+def test_handoff_carries_live_vs_historical_test_boundary_markers():
+    """The historical Part 5 successor tests are recorded as NOT a live gate."""
+    state = _state(REAL_ROOT)
+    assert state["stage125_part5_historical_successor_tests"] is True
+    assert state["stage125_part5_historical_successor_test_marker"] == (
+        "live_successor_state"
+    )
+    assert state["stage125_part5_historical_successor_test_reference_commit"] == (
+        "6412b45c4adc6584a5567c7c96e0932f68f31e8a"
+    )
+    assert state["stage125_part5_historical_successor_tests_in_live_gate"] is False
+    assert state["stage126_live_test_suite_marker_expression"] == (
+        "not live_successor_state"
+    )
+    # The boundary changes nothing about current state.
+    assert state["last_completed_micro_part"] == (
+        "stage126-m1-robustness-part3-expanded-rule-a"
+    )
+    assert state["m1_robustness_completed_category_ids"] == [
+        "m1_target_proximity_six_feature_set",
+        "main_rule_b_listing_robustness",
+        "expanded_rule_a_company_scope_robustness",
+    ]
+    assert state["last_completed_micro_part_qc_path"] == (
+        "project/stage126/stage126_m1_robustness_part3_qc_report.json"
+    )
+    assert state["current_state_validation_path"] == (
+        "project/stage126/stage126_current_state_validation_report.json"
+    )
+    assert state["m1_robustness_part4_authorized"] is False
+    assert state["final_test_unlocked"] is False
+    assert state["next_research_action_id"] == "stage126-m1-financial-baseline"
+    # Stage125 Part 5 stays historical and immutable.
+    assert state["stage125_part5_mode"] == "historical_immutable"
+    assert state["stage125_part5_live_gate_active"] is False
+
+
+def test_test_boundary_markers_fail_closed_without_the_record(tmp_path):
+    assert gen.derive_live_vs_historical_test_boundary_markers(
+        str(tmp_path)
+    ) == {}
+
+
+def test_test_boundary_markers_fail_closed_on_a_tampered_record(tmp_path):
+    d = os.path.join(str(tmp_path), "project", "stage126")
+    os.makedirs(d, exist_ok=True)
+    record = json.load(open(os.path.join(
+        REAL_ROOT,
+        "project/stage126/stage126_live_vs_historical_test_boundary.json",
+    ), encoding="utf-8"))
+    record["historical_successor_tests_are_live_gate"] = True
+    with open(os.path.join(
+        d, "stage126_live_vs_historical_test_boundary.json",
+    ), "w", encoding="utf-8") as f:
+        json.dump(record, f)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_live_vs_historical_test_boundary_markers(str(tmp_path))
+
+
 def test_part5_compatibility_status_is_generic_not_part1_specific():
     """The status must describe a completed micro-part, never Part 1 specifically.
 

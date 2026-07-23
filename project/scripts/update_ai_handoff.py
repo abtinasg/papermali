@@ -151,6 +151,10 @@ ALLOWLIST_FILES = (
     "project/src/stage126_m1_robustness_part3_expanded_rule_a.py",
     "project/run_stage126_m1_robustness_part3_expanded_rule_a.py",
     "project/tests/test_stage126_m1_robustness_part3_expanded_rule_a.py",
+    # Stage126 live/historical test-suite boundary: config, runner, and tests.
+    "pytest.ini",
+    "project/run_stage125_part5_historical_successor_tests.py",
+    "project/tests/test_stage126_live_historical_test_boundary.py",
     # Stage126 independent current-state validator code, runner, and tests.
     "project/src/stage126_current_state_validator.py",
     "project/run_stage126_current_state_validator.py",
@@ -418,6 +422,7 @@ ARTIFACT_ONLY_FILES = (
     "project/stage126/stage126_validation_architecture_boundary_decision.json",
     "project/stage126/stage126_historical_boundary_manifest.json",
     "project/stage126/stage126_current_state_validation_report.json",
+    "project/stage126/stage126_live_vs_historical_test_boundary.json",
     "project/stage126/README_STAGE126_CURRENT_STATE_VALIDATION.md",
     "project/stage126/metadata_and_hashes_stage126_current_state_validator.json",
 )
@@ -1579,7 +1584,71 @@ def derive_validation_architecture_markers(root: str) -> dict:
         "prior_part_reopening_requires_explicit_human_authorization": True,
     }
     markers.update(derive_current_state_qc_markers(root))
+    markers.update(derive_live_vs_historical_test_boundary_markers(root))
     return markers
+
+
+_TEST_BOUNDARY_REL = (
+    "project/stage126/stage126_live_vs_historical_test_boundary.json"
+)
+_HISTORICAL_MARKER = "live_successor_state"
+_HISTORICAL_REFERENCE_COMMIT = "6412b45c4adc6584a5567c7c96e0932f68f31e8a"
+_FROZEN_PART5_TEST_SHA256 = (
+    "0b9413b2adbf9c44b0fb12b4f7ef2dad60be5cd4c401ccefac30d19f0905af71"
+)
+
+
+def derive_live_vs_historical_test_boundary_markers(root: str) -> dict:
+    """Derive the live-versus-historical test-suite boundary markers.
+
+    Fail-closed: emitted only when the boundary record is present, internally
+    consistent, and the frozen Stage125 Part 5 test file is still byte-identical
+    on disk. The historical successor tests are never a live gate.
+    """
+    path = os.path.join(root, _TEST_BOUNDARY_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        record = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable test-boundary record: {exc}") from exc
+
+    exact = {
+        "contract_id": "stage126_live_vs_historical_test_boundary",
+        "contract_version": "stage126_live_vs_historical_test_boundary_v1",
+        "stage125_part5_mode": "historical_immutable",
+        "historical_marker": _HISTORICAL_MARKER,
+        "historical_test_file_sha256": _FROZEN_PART5_TEST_SHA256,
+        "historical_reference_commit": _HISTORICAL_REFERENCE_COMMIT,
+        "historical_successor_tests_are_live_gate": False,
+        "stage126_live_suite_marker_expression": "not live_successor_state",
+        "current_state_validator_remains_live_gate": True,
+        "part3_scientific_artifacts_changed": False,
+        "part4_authorized": False,
+        "final_test_unlocked": False,
+        "stage125_part5_reopened_or_repinned": False,
+    }
+    for key, want in exact.items():
+        if record.get(key) != want:
+            raise HandoffError(
+                f"test-boundary record field {key}={record.get(key)!r} != {want!r}"
+            )
+    frozen = os.path.join(root, record["historical_test_file"])
+    if not os.path.isfile(frozen):
+        raise HandoffError("frozen Part 5 test file missing")
+    got = hashlib.sha256(open(frozen, "rb").read()).hexdigest()
+    if got != _FROZEN_PART5_TEST_SHA256:
+        raise HandoffError(
+            f"frozen Part 5 test file changed: {got} != {_FROZEN_PART5_TEST_SHA256}"
+        )
+    return {
+        "stage125_part5_historical_successor_tests": True,
+        "stage125_part5_historical_successor_test_marker": _HISTORICAL_MARKER,
+        "stage125_part5_historical_successor_test_reference_commit":
+            _HISTORICAL_REFERENCE_COMMIT,
+        "stage125_part5_historical_successor_tests_in_live_gate": False,
+        "stage126_live_test_suite_marker_expression": "not live_successor_state",
+    }
 
 
 _M1_ROBUSTNESS_PART1_AUTH_REL = (
