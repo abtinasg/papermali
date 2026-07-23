@@ -1,0 +1,90 @@
+{
+  "absolute_change_vs_primary": {
+    "random_forest": -0.01173950157,
+    "regularized_logistic_regression": -0.002871054194,
+    "xgboost": 1.5699388e-05
+  },
+  "automatic_scientific_action_triggered": false,
+  "category_id": "expanded_rule_a_company_scope_robustness",
+  "changed_dimension": "sample",
+  "comparison_metric": "pr_auc",
+  "comparison_scope": "pooled_development_oof",
+  "contract_version": "stage126_m1_robustness_part3_primary_comparison_v1",
+  "descriptive_part2_comparison": {
+    "claims_multiplied": false,
+    "note": "Separated descriptive context only. Part 2 (listing Rule B) and Part 3 (expanded company scope) probe DIFFERENT sample dimensions; no preferred robustness sample is selected and no additional claim is made.",
+    "part2_metrics_source": "project/stage126/stage126_m1_robustness_part2_metrics.csv",
+    "part2_observed_ordering": [
+      "regularized_logistic_regression",
+      "random_forest",
+      "xgboost"
+    ],
+    "part2_pooled_pr_auc": {
+      "random_forest": 0.401263142511,
+      "regularized_logistic_regression": 0.447170385532,
+      "xgboost": 0.34195953388
+    },
+    "part2_sample": "main_rule_b_listing_robustness",
+    "part3_minus_part2_absolute": {
+      "random_forest": -0.010560814061,
+      "regularized_logistic_regression": -0.004284475678,
+      "xgboost": 0.01460117367
+    },
+    "preferred_robustness_sample_selected": false
+  },
+  "direction_by_family": {
+    "random_forest": "declined",
+    "regularized_logistic_regression": "declined",
+    "xgboost": "improved"
+  },
+  "expanded_company_scope_materially_changes_interpretation": false,
+  "final_test_evaluation_authorized": false,
+  "full_development_refit_authorized": false,
+  "interpretation": "Development-only sample sensitivity. The expanded company scope adds negative-only development rows (29 development rows, of which 20 enter the pooled OOF surface, all with target 0), so pooled PR-AUC shifts here mainly reflect a slightly lower event rate rather than a change in discrimination. The comparison is reported descriptively and cautiously: it does not replace the primary results, does not alter the locked primary ordering used for confirmatory interpretation, does not constitute a new confirmatory model comparison and selects no paper winner.",
+  "largest_absolute_pr_auc_change": 0.01173950157,
+  "micro_part_id": "stage126-m1-robustness-part3-expanded-rule-a",
+  "new_confirmatory_model_comparison": false,
+  "paper_winner_selected": false,
+  "part3_observed_ordering": [
+    "regularized_logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "part3_pooled_pr_auc": {
+    "random_forest": 0.39070232845,
+    "regularized_logistic_regression": 0.442885909854,
+    "xgboost": 0.35656070755
+  },
+  "primary_observed_ordering": [
+    "regularized_logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "primary_ordering_lock_changed": false,
+  "primary_ordering_preserved": true,
+  "primary_reference": {
+    "locked_pooled_pr_auc": {
+      "random_forest": 0.40244183002,
+      "regularized_logistic_regression": 0.445756964048,
+      "xgboost": 0.356545008162
+    },
+    "locked_values_match_observed": true,
+    "metrics_sha256": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "metrics_source": "project/stage126/stage126_m1_development_metrics.csv",
+    "observed_pooled_pr_auc": {
+      "random_forest": 0.40244183002,
+      "regularized_logistic_regression": 0.445756964048,
+      "xgboost": 0.356545008162
+    },
+    "sample": "main_rule_a_primary"
+  },
+  "primary_results_replaced": false,
+  "relative_change_percent_vs_primary": {
+    "random_forest": -2.917067932381,
+    "regularized_logistic_regression": -0.644085101426,
+    "xgboost": 0.004403199495
+  },
+  "scientific_interpretation": "development_only_sample_sensitivity_evidence",
+  "scientific_role": "expanded_company_scope_sample_robustness",
+  "selected_configurations_changed": false
+}

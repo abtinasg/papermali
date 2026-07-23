@@ -293,10 +293,68 @@ historical hash `0a117c19…` still pinned by the frozen Part 5 metadata, the Pa
 the recomputed Part 2 current hash. All three are recorded separately in
 `stage126_m1_robustness_part2_part5_successor_compatibility.json`.
 
-**Next — Part 3 (`expanded_rule_a_company_scope_robustness`) is NOT authorized
+**Robustness Part 3 — COMPLETED (2026-07-23):**
+`expanded_rule_a_company_scope_robustness` was explicitly human-authorized
+(423-byte text, SHA-256 `f1230aa0…`) and executed on the development folds only,
+from base `main` `6412b45c`. **Only the company-scope sample changed**
+(`analysis_ready_expanded_rule_a_stage125.csv`, SHA-256 `fbe9b29c…`). Target,
+nine-feature order, preprocessing, missingness-indicator logic, selected
+configurations, folds, seeds, metrics and class weighting all unchanged.
+**No retuning** (0 searches; 22 fits / 22 predictions), **no full-development
+refit**, and the **final test remained locked** (361 identities counted only via
+the frozen split contract; 0 predictor rows, 0 target rows, 0 predictions, 0
+metrics). No calibration, threshold optimization, bootstrap, Holm, p-values,
+winner selection, SMOTE/SMOTENC or SHAP. Counts: 1056 rows / 124 companies /
+80 pos / 976 neg; development 695 (68 / 627); folds 254 / 215 / 469 / 226;
+1323 OOF rows (441 per family); 9 metric rows. Handoff markers:
+`m1_robustness_part3_human_authorized=true`,
+`m1_robustness_part3_completed=true`,
+`m1_robustness_completed_category_ids=[part1, part2, part3]`,
+`m1_robustness_next_category_id=expanded_rule_b_combined_robustness`,
+`m1_robustness_part4_authorized=false`,
+`m1_robustness_execution_authorized=false`, `m1_robustness_completed=false`.
+
+**Part 3 sample delta (row identities only):** Expanded Rule A is a **strict
+superset** of primary Rule A — 44 expanded-only rows, 0 primary-only rows, +5
+companies, +0 positive, +44 negative; +29 development rows (all negative); folds
++9 / +10 / +19 / +10; 20 added OOF identities, **all target 0**; +15 final-test
+identities.
+
+**Part 3 results (development-only sample sensitivity):** pooled PR-AUC —
+Logistic 0.442886 (−0.64%), RF 0.390702 (−2.92%), XGBoost 0.356561 (+0.00%).
+**The locked primary ordering Logistic > RF > XGBoost is preserved**; the largest
+absolute change is 0.0117. Because the additions are negative-only, the expanded
+company scope does **not** materially change interpretation. Primary results were
+not replaced, the primary ordering lock is unchanged and no paper winner was
+selected. A separated descriptive Part 2 comparison is recorded without
+multiplying claims or selecting a preferred robustness sample.
+
+**Live-versus-historical test boundary (2026-07-23):** the frozen Stage125
+Part 5 file contains historical tests explicitly marked `live_successor_state`.
+Those tests remain **byte-identical** and are verified against the frozen Part 2
+successor reference commit `6412b45c4adc6584a5567c7c96e0932f68f31e8a` by
+`project/run_stage125_part5_historical_successor_tests.py`. **They are not part
+of the current Stage126 live gate.** The default suite
+
+```bash
+PYTHONPATH=project python -m pytest project/tests -q
+```
+
+excludes only that historical marker (2472 selected / 9 deselected of 2481
+collected; 2471 passed, 1 skipped, 9 deselected, 0 failed); **all
+non-historical tests remain active**, including the rest of the frozen Part 5
+file. Exclusion is by marker expression only — no file ignore, node ID, skip,
+xfail or collection hook — and that narrowness is proven by
+`test_stage126_live_historical_test_boundary.py`. The Stage126 current-state
+validator remains the sole current-state validation surface. This is a
+consistent application of the existing validation-architecture boundary lock,
+**not** a scientific-error exception; Stage125 Part 5 was neither reopened nor
+re-pinned.
+
+**Next — Part 4 (`expanded_rule_b_combined_robustness`) is NOT authorized
 and NOT started.** It requires its own separate explicit human authorization;
-the consumed Part 2 authorization is not a standing authorization. Parts 3–6
-remain outstanding, so M1 robustness is not complete.
+the consumed Part 3 authorization is not a standing authorization. Part 3 is
+completed. Parts 4–6 remain outstanding, so M1 robustness is not complete.
 
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
 document-binding evidence remain as frozen scientific history; they do **not**

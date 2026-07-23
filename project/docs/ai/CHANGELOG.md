@@ -3,6 +3,108 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-23 — Stage126 live-versus-historical test-suite boundary
+
+Applies the already-locked Stage125 Part 5 historical-immutability decision
+consistently to the test suite. **No new scientific execution**: no model
+fitting, retuning, refit or final-test access; Part 4 not started.
+
+- The frozen Stage125 Part 5 file contains historical tests explicitly marked
+`live_successor_state`. Those tests remain **byte-identical** and are verified
+against the frozen Part 2 successor reference commit
+`6412b45c4adc6584a5567c7c96e0932f68f31e8a`. **They are not part of the current
+Stage126 live gate.** The default Stage126 repository test suite excludes only
+that historical marker — never the file, never a node ID, never a skip or
+xfail. **All non-historical tests remain active.** The Stage126 current-state
+validator remains the sole current-state validation surface.
+- **Why.** The nine marked tests assert the Handoff successor state as it stood
+  at the Part 2 reference commit. After Part 3 completed truthfully, evaluating
+  them against the *current* Handoff is a category error, not a defect. This is
+  **not** a scientific-error exception, and Stage125 Part 5 was **neither
+  reopened nor re-pinned**.
+- **Mechanism.** A new `pytest.ini` registers the marker and sets
+  `addopts = -m "not live_successor_state"`. The frozen Part 5 file stays
+  collected and still contributes its remaining ~150 tests to the live suite.
+  Live suite: **2472 selected / 9 deselected** of 2481 collected
+  (2471 passed, 1 skipped, 9 deselected, 0 failed).
+- **Historical verification.**
+  `python project/run_stage125_part5_historical_successor_tests.py` verifies the
+  frozen Part 5 test, source and runner hashes, creates a temporary detached
+  read-only worktree at the reference commit, copies the gitignored Part 3C
+  inputs read-only after verifying each against the frozen
+  `part3c_sample_summary_stage125.csv` contract, runs only the marked tests
+  there, removes the worktree on success and on failure, asserts the real branch
+  is untouched, and returns nonzero on any failure. **9 passed, 150 deselected.**
+- **Narrowness is proven.** `test_stage126_live_historical_test_boundary.py`
+  asserts fail-closed that the marker appears only in the frozen file, that the
+  frozen hash is exact, that the deselected set equals exactly the marked set,
+  that Part 3 / current-state-validator / Handoff / final-test-lock / leakage
+  tests are fully collected, and that no skip, xfail, collection hook or
+  node-ID suppression was introduced.
+- **Recorded** in `stage126_live_vs_historical_test_boundary.json` with the nine
+  exact node IDs, and surfaced in the Handoff as
+  `stage125_part5_historical_successor_tests_in_live_gate=false` and
+  `stage126_live_test_suite_marker_expression="not live_successor_state"`.
+- **Nothing scientific changed.** Part 1, Part 2 and Part 3 artifacts, the
+  Stage125 tree and the current-state validator source are all untouched.
+
+## 2026-07-23 — Stage126 M1 Robustness Part 3 (expanded Rule A company scope)
+
+- **Part 3 was explicitly human-authorized and completed on the development
+  folds.** Authorization text is 423 UTF-8 bytes, SHA-256
+  `f1230aa0dac18670695d41d99709cfd4ba5619e96e6f93c2e0678387ab28dab1`,
+  recomputed before execution. Executed the third registered robustness
+  category `expanded_rule_a_company_scope_robustness` from base `main`
+  `6412b45c4adc6584a5567c7c96e0932f68f31e8a`.
+- **Only the company-scope sample changed** — to
+  `analysis_ready_expanded_rule_a_stage125.csv`
+  (SHA-256 `fbe9b29c…`). Target, the nine-feature `M1_PRIMARY_FEATURE_ORDER`
+  set, preprocessing and missingness-indicator logic (18 model-matrix columns:
+  9 transformed features then their 9 indicators), the three selected
+  configurations, the model families, the temporal folds, the seeds, the metric
+  list, the top-10% rule and the class-weighting policy were all held fixed.
+- **Counts.** Analysis-ready 1056 rows / 124 companies / 80 positive / 976
+  negative / 0 missing target; development 695 (68 / 627); fold roles 254 / 215
+  / 469 / 226; 441 OOF rows per family (1323 total); 9 metric rows; 361
+  final-test identities counted **only** through the frozen temporal split
+  contract.
+- **Execution.** 22 model fits, 22 prediction calls, 0 tuning searches. XGBoost
+  `scale_pos_weight` recomputed inside each training fold: 221/33 =
+  6.696969696969697 and 411/58 = 7.086206896551724. No full-development refit,
+  no final-test predictor or target access, no final-test prediction or metric,
+  no calibration, threshold optimization, bootstrap, Holm correction, p-values
+  or winner selection, no SMOTE/SMOTENC, no SHAP, zero network requests.
+- **Sample delta (row identities only).** Expanded Rule A is a **strict
+  superset** of primary Rule A: 44 expanded-only rows, 0 primary-only rows;
+  +5 companies, +0 positive, +44 negative. Development +29 rows (0 positive,
+  29 negative); folds +9 / +10 / +19 / +10, all negative; OOF identities 441 vs
+  421 with 20 added, **all with target 0**; final-test identities 361 vs 346
+  with 15 added. No row-level final-test value was read.
+- **Results (development-only sample sensitivity).** Pooled development-OOF
+  PR-AUC: Logistic 0.442885909854 (−0.002871054194, −0.64%), RF 0.390702328450
+  (−0.011739501570, −2.92%), XGBoost 0.356560707550 (+0.000015699388, +0.00%).
+  **The locked primary ordering (Logistic > RF > XGBoost) is preserved.** The
+  largest absolute pooled PR-AUC change is 0.0117. Because every added
+  observation is negative, these small shifts mainly reflect a slightly lower
+  event rate rather than changed discrimination, so the expanded company scope
+  **does not materially change interpretation**. A separated, descriptive Part 2
+  comparison is recorded; it multiplies no claim and selects no preferred
+  robustness sample.
+- Part 3 is completed on development folds. Only the company-scope sample
+  changed. No retuning occurred. Primary results were not replaced. No winner was
+  selected. Part 4 is unauthorized. The final test remains locked. Stage125 Part 5
+  remains historical and immutable.
+- **Immutability.** All Part 1 and Part 2 scientific *and* verification
+  artifacts, the eight primary Stage126 artifacts and the whole Stage125 tree
+  are byte-identical. The closed-part registry retains the Part 1 and Part 2
+  entries byte-for-byte and appends a Part 3 entry (`closed_part_count = 3`,
+  `regeneration_allowed = false`).
+- **The independent current-state validator advanced generically** to
+  `completed_part_count = 3`, next category
+  `expanded_rule_b_combined_robustness`, last micro-part
+  `stage126-m1-robustness-part3-expanded-rule-a` — with **no validator source
+  change**. Parts 4-6 remain outstanding, so M1 robustness is not complete.
+
 ## 2026-07-23 — Stage126 current-state validation made fully generic
 
 Enforcement hardening of the boundary lock. No scientific execution: no model

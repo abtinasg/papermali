@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 53,
+  "assertion_count": 61,
   "assertions": [
     {
       "detail": "",
@@ -88,17 +88,17 @@
       "status": "PASS"
     },
     {
-      "detail": "['m1_target_proximity_six_feature_set', 'main_rule_b_listing_robustness']",
+      "detail": "['m1_target_proximity_six_feature_set', 'main_rule_b_listing_robustness', 'expanded_rule_a_company_scope_robustness']",
       "name": "completed_prefix_is_execution_order_prefix",
       "status": "PASS"
     },
     {
-      "detail": "2",
+      "detail": "3",
       "name": "completed_part_count_matches_discovered_packages",
       "status": "PASS"
     },
     {
-      "detail": "expanded_rule_a_company_scope_robustness",
+      "detail": "expanded_rule_b_combined_robustness",
       "name": "next_category_is_the_next_registered_entry",
       "status": "PASS"
     },
@@ -149,7 +149,47 @@
     },
     {
       "detail": "",
+      "name": "part3_lock_next_category_is_registered_successor",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part3_lock_completed_prefix_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part3_authorization_hash_recorded",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
       "name": "closed_part_registry_covers_every_completed_part",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "scientific_artifacts_pinned[expanded_rule_a_company_scope_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "verification_artifacts_pinned[expanded_rule_a_company_scope_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "code_artifacts_pinned[expanded_rule_a_company_scope_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "authorization_consumed[expanded_rule_a_company_scope_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_locked_in_lock[expanded_rule_a_company_scope_robustness]",
       "status": "PASS"
     },
     {
@@ -268,8 +308,8 @@
       "status": "PASS"
     }
   ],
-  "closed_part_count": 2,
-  "code_commit": "27943244b1c8be96eb9d5431792e72c63240785f",
+  "closed_part_count": 3,
+  "code_commit": "0923b97bc9cfc032fd5ce43f6c3da92d7051ab46",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -277,13 +317,13 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "27943244b1c8be96eb9d5431792e72c63240785f",
+  "generated_at": "0923b97bc9cfc032fd5ce43f6c3da92d7051ab46",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
-  "last_completed_micro_part": "stage126-m1-robustness-part2-listing-rule-b",
+  "last_completed_micro_part": "stage126-m1-robustness-part3-expanded-rule-a",
   "output_files_sha256": {
-    "README_STAGE126_CURRENT_STATE_VALIDATION.md": "a7e2aa7e8908d4f555369a5f71d97c1c0a45c4f75fa832ba3e95fe4468cdbdd7",
-    "stage126_closed_part_registry.json": "4dd5ff69f1a90f48918267380960b0d60258cab56d4b9527065532c54fc65a8e",
-    "stage126_current_state_validation_report.json": "d4ffa90efda41fbbf1017abf09d5f2128801a45b49e9260746b01072399dd626",
+    "README_STAGE126_CURRENT_STATE_VALIDATION.md": "41c70ecf66a33dcdd00fca7e631e1dbbc009d11eb4f834cf5f03766d8570cab4",
+    "stage126_closed_part_registry.json": "a339dde12016ae153a742aadf1125f340f1df10e8d1f9e718c7c20c3400d907d",
+    "stage126_current_state_validation_report.json": "793d72ad294ff841045e5166a96d1a3cbbc6a9970a73b8ecbe3c1d6bb98bcca6",
     "stage126_historical_boundary_manifest.json": "83eb42362d0d7416abb29db420ffd64c65725f54a359bb520aae36ad7177c988",
     "stage126_validation_architecture_boundary_decision.json": "7502405fc0c2641c7dc766f3d4a52941b4c4841295d1d3130c07718768a6e06c"
   },
@@ -303,7 +343,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "adbb8367f933a654e1ce044c365ec9425e7fc60f10a1191ec4289f80858d32bb",
+  "test_file_sha256": "7624294383a6f63e063ceb22ddde20787e445671857e5ee7ca77836ad76392c4",
   "validation_architecture": "stage126_current_state_validator_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v1"

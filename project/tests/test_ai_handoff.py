@@ -1217,10 +1217,10 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # The newest completed robustness micro-part supplies the selected QC; the
     # research-action pointers deliberately stay on the Stage126 M1 action.
     assert state["selected_qc_scope"] == (
-        "stage126_m1_robustness_part2_listing_rule_b"
+        "stage126_m1_robustness_part3_expanded_rule_a"
     )
     assert state["last_completed_micro_part"] == (
-        "stage126-m1-robustness-part2-listing-rule-b"
+        "stage126-m1-robustness-part3-expanded-rule-a"
     )
     assert state["next_research_action_id"] == (
         "stage126-m1-financial-baseline"
@@ -1236,7 +1236,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["modeling_authorized"] is True
     assert state["modeling_started"] is True
     assert state["m1_primary_development_tuning_completed"] is True
-    # Robustness Parts 1 and 2 have executed; the overall set is incomplete.
+    # Robustness Parts 1-3 have executed; the overall set is incomplete.
     assert state["m1_robustness_started"] is True
     assert state["m1_robustness_completed"] is False
     assert state["final_test_unlocked"] is False
@@ -2169,9 +2169,9 @@ def test_handoff_state_carries_robustness_decision_markers():
     assert state["m1_robustness_completed"] is False
     assert state["m1_robustness_packaging_policy"] == "one_category_per_micro_part_pr"
     assert state["m1_robustness_started"] is True
-    # Parts 1 and 2 are complete, so the next registered category is Part 3.
+    # Parts 1-3 are complete, so the next registered category is Part 4.
     assert state["m1_robustness_next_category_id"] == (
-        "expanded_rule_a_company_scope_robustness"
+        "expanded_rule_b_combined_robustness"
     )
 
 
@@ -2183,7 +2183,7 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # The micro-part pointer tracks the newest completed robustness micro-part;
     # the research-action chain deliberately stays on Stage126 M1.
     assert state["last_completed_micro_part"] == \
-        "stage126-m1-robustness-part2-listing-rule-b"
+        "stage126-m1-robustness-part3-expanded-rule-a"
 
 
 def test_robustness_decision_lock_preserves_primary_and_final_test_state():
@@ -2201,12 +2201,13 @@ def test_robustness_decision_markers_derive_from_record():
     markers = gen.derive_m1_robustness_decision_markers(REAL_ROOT)
     assert markers["m1_robustness_decision_locked"] is True
     assert markers["m1_robustness_execution_authorized"] is False
-    # Parts 1 and 2 are complete, so the next registered category is Part 3.
+    # Parts 1-3 are complete, so the next registered category is Part 4.
     assert markers["m1_robustness_next_category_id"] == (
-        "expanded_rule_a_company_scope_robustness"
+        "expanded_rule_b_combined_robustness"
     )
     assert markers["m1_robustness_part1_completed"] is True
     assert markers["m1_robustness_part2_completed"] is True
+    assert markers["m1_robustness_part3_completed"] is True
 
 
 # --------------------------------------------------------------------------- #
@@ -2336,23 +2337,40 @@ def test_handoff_state_carries_part1_markers():
     assert state["m1_robustness_completed_category_ids"] == [
         "m1_target_proximity_six_feature_set",
         "main_rule_b_listing_robustness",
+        "expanded_rule_a_company_scope_robustness",
     ]
     assert state["m1_robustness_next_category_id"] == (
-        "expanded_rule_a_company_scope_robustness"
+        "expanded_rule_b_combined_robustness"
     )
     assert state["m1_robustness_execution_authorized"] is False
 
 
 def test_handoff_state_carries_part2_markers():
+    """Part 2 markers are RETAINED (not replaced) after Part 3 completed."""
     state = _state(REAL_ROOT)
     assert state["m1_robustness_part2_human_authorized"] is True
     assert state["m1_robustness_part2_completed"] is True
+    assert state["m1_robustness_execution_authorized"] is False
+    assert state["m1_robustness_completed"] is False
+
+
+def test_handoff_state_carries_part3_markers():
+    state = _state(REAL_ROOT)
+    assert state["m1_robustness_part3_human_authorized"] is True
+    assert state["m1_robustness_part3_completed"] is True
     assert state["m1_robustness_part3_authorized"] is False
+    assert state["m1_robustness_part4_authorized"] is False
     assert state["m1_robustness_execution_authorized"] is False
     assert state["m1_robustness_completed"] is False
     assert state["contract_version"] == (
-        "stage126_m1_robustness_part2_listing_rule_b_v1"
+        "stage126_m1_robustness_part3_expanded_rule_a_v1"
     )
+    assert state["full_development_refit_performed"] is False
+    for field in ("final_test_unlocked", "final_test_access_authorized",
+                  "final_test_predictor_values_inspected",
+                  "final_test_target_values_inspected",
+                  "final_test_evaluation_performed"):
+        assert state[field] is False, field
 
 
 def test_handoff_state_carries_part2_sample_robustness_markers():
@@ -2410,11 +2428,11 @@ def test_part1_selected_qc_and_micro_part():
     """After Part 2 the NEWEST completed micro-part supplies the selected QC."""
     state = _state(REAL_ROOT)
     assert state["last_completed_micro_part"] == \
-        "stage126-m1-robustness-part2-listing-rule-b"
+        "stage126-m1-robustness-part3-expanded-rule-a"
     assert state["selected_qc_scope"] == \
-        "stage126_m1_robustness_part2_listing_rule_b"
+        "stage126_m1_robustness_part3_expanded_rule_a"
     assert state["selected_qc_path"] == \
-        "project/stage126/stage126_m1_robustness_part2_qc_report.json"
+        "project/stage126/stage126_m1_robustness_part3_qc_report.json"
 
 
 def test_part1_does_not_advance_research_pointers():
@@ -2550,12 +2568,12 @@ def test_current_state_qc_is_separate_from_scientific_micro_part_qc():
 
     # Last completed SCIENTIFIC micro-part QC — a different role.
     assert state["last_completed_micro_part_qc_scope"] == (
-        "stage126_m1_robustness_part2_listing_rule_b"
+        "stage126_m1_robustness_part3_expanded_rule_a"
     )
     assert state["last_completed_micro_part_qc_path"] == (
-        "project/stage126/stage126_m1_robustness_part2_qc_report.json"
+        "project/stage126/stage126_m1_robustness_part3_qc_report.json"
     )
-    assert state["last_completed_micro_part_qc_assertions"] == 128
+    assert state["last_completed_micro_part_qc_assertions"] == 141
     assert state["last_completed_micro_part_qc_failed"] == 0
     qc = json.load(open(os.path.join(
         REAL_ROOT, state["last_completed_micro_part_qc_path"],
@@ -2582,7 +2600,66 @@ def test_current_state_doc_separates_the_two_qc_roles():
     micro = text.split("### Last completed scientific micro-part QC", 1)[1].split(
         "## Workflow markers", 1
     )[0]
-    assert "stage126_m1_robustness_part2_qc_report.json" in micro
+    assert "stage126_m1_robustness_part3_qc_report.json" in micro
+
+
+def test_handoff_carries_live_vs_historical_test_boundary_markers():
+    """The historical Part 5 successor tests are recorded as NOT a live gate."""
+    state = _state(REAL_ROOT)
+    assert state["stage125_part5_historical_successor_tests"] is True
+    assert state["stage125_part5_historical_successor_test_marker"] == (
+        "live_successor_state"
+    )
+    assert state["stage125_part5_historical_successor_test_reference_commit"] == (
+        "6412b45c4adc6584a5567c7c96e0932f68f31e8a"
+    )
+    assert state["stage125_part5_historical_successor_tests_in_live_gate"] is False
+    assert state["stage126_live_test_suite_marker_expression"] == (
+        "not live_successor_state"
+    )
+    # The boundary changes nothing about current state.
+    assert state["last_completed_micro_part"] == (
+        "stage126-m1-robustness-part3-expanded-rule-a"
+    )
+    assert state["m1_robustness_completed_category_ids"] == [
+        "m1_target_proximity_six_feature_set",
+        "main_rule_b_listing_robustness",
+        "expanded_rule_a_company_scope_robustness",
+    ]
+    assert state["last_completed_micro_part_qc_path"] == (
+        "project/stage126/stage126_m1_robustness_part3_qc_report.json"
+    )
+    assert state["current_state_validation_path"] == (
+        "project/stage126/stage126_current_state_validation_report.json"
+    )
+    assert state["m1_robustness_part4_authorized"] is False
+    assert state["final_test_unlocked"] is False
+    assert state["next_research_action_id"] == "stage126-m1-financial-baseline"
+    # Stage125 Part 5 stays historical and immutable.
+    assert state["stage125_part5_mode"] == "historical_immutable"
+    assert state["stage125_part5_live_gate_active"] is False
+
+
+def test_test_boundary_markers_fail_closed_without_the_record(tmp_path):
+    assert gen.derive_live_vs_historical_test_boundary_markers(
+        str(tmp_path)
+    ) == {}
+
+
+def test_test_boundary_markers_fail_closed_on_a_tampered_record(tmp_path):
+    d = os.path.join(str(tmp_path), "project", "stage126")
+    os.makedirs(d, exist_ok=True)
+    record = json.load(open(os.path.join(
+        REAL_ROOT,
+        "project/stage126/stage126_live_vs_historical_test_boundary.json",
+    ), encoding="utf-8"))
+    record["historical_successor_tests_are_live_gate"] = True
+    with open(os.path.join(
+        d, "stage126_live_vs_historical_test_boundary.json",
+    ), "w", encoding="utf-8") as f:
+        json.dump(record, f)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_live_vs_historical_test_boundary_markers(str(tmp_path))
 
 
 def test_part5_compatibility_status_is_generic_not_part1_specific():
@@ -2600,13 +2677,13 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     assert "part2" not in status
     # And the state it describes is the completed Part 2 micro-part.
     assert state["last_completed_micro_part"] == (
-        "stage126-m1-robustness-part2-listing-rule-b"
+        "stage126-m1-robustness-part3-expanded-rule-a"
     )
-    assert state["m1_robustness_part2_completed"] is True
+    assert state["m1_robustness_part3_completed"] is True
     assert state["m1_robustness_next_category_id"] == (
-        "expanded_rule_a_company_scope_robustness"
+        "expanded_rule_b_combined_robustness"
     )
-    assert state["m1_robustness_part3_authorized"] is False
+    assert state["m1_robustness_part4_authorized"] is False
     assert state["final_test_unlocked"] is False
     assert state["final_test_access_authorized"] is False
     assert state["final_test_evaluation_performed"] is False
@@ -2660,7 +2737,7 @@ def test_current_state_labels_micro_part_not_research_action():
     """CURRENT_STATE must not label a micro-part as a completed research action."""
     text = _read_doc("project", "docs", "ai", "CURRENT_STATE.md")
     assert "- **Last completed micro-part:** " \
-        "`stage126-m1-robustness-part2-listing-rule-b`" in text
+        "`stage126-m1-robustness-part3-expanded-rule-a`" in text
     assert "Last completed research action" not in text, (
         "a robustness micro-part must never be labelled a research action"
     )

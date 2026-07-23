@@ -1,6 +1,6 @@
 # Financial Distress Prediction — Current Run Guide (Stage122 → Stage123 → Stage124 → Stage125 → Stage126)
 
-**Stage125 Part 5 is a frozen historical closure and is no longer the live Stage126 successor validator; the independent Stage126 current-state validator (`run_stage126_current_state_validator.py --check`) is the sole current-state validation surface. Stage125 is completed. Stage126 M1 is human-authorized and started. Primary M1 development-fold tuning is completed on PR #52. The robustness Part 0 decision lock records the robustness execution contract. Robustness Part 1 (`m1_target_proximity_six_feature_set`) was explicitly human-authorized and is completed on the development folds — only the feature set changed, no retuning, sensitivity analysis only. The observed Part 1 pooled PR-AUC ordering (XGBoost > RF > Logistic) differs from the primary ordering (Logistic > RF > XGBoost) and all three pooled values declined; this development-only sensitivity finding is reported but does not change the locked primary ordering used for confirmatory interpretation, does not replace the primary results and selects no paper winner. Robustness Part 2 (`main_rule_b_listing_robustness`) was explicitly human-authorized and is completed on the development folds — only the sample changed (the listing-timing Rule B sample), no retuning, sensitivity analysis only. The observed Part 2 pooled PR-AUC ordering (Logistic > RF > XGBoost) matches the primary ordering; it remains sensitivity evidence only and does not replace the primary results or select a paper winner. All seven Part 1 scientific artifacts remain byte-identical. Part 3 (`expanded_rule_a_company_scope_robustness`) is not authorized and not started. No full-development refit has been performed. The final test remains locked and untouched. M2/M3/M4 data collection or modeling has not started.**
+**Stage125 Part 5 is a frozen historical closure and is no longer the live Stage126 successor validator; the independent Stage126 current-state validator (`run_stage126_current_state_validator.py --check`) is the sole current-state validation surface. Stage125 is completed. Stage126 M1 is human-authorized and started. Primary M1 development-fold tuning is completed on PR #52. The robustness Part 0 decision lock records the robustness execution contract. Robustness Part 1 (`m1_target_proximity_six_feature_set`) was explicitly human-authorized and is completed on the development folds — only the feature set changed, no retuning, sensitivity analysis only. The observed Part 1 pooled PR-AUC ordering (XGBoost > RF > Logistic) differs from the primary ordering (Logistic > RF > XGBoost) and all three pooled values declined; this development-only sensitivity finding is reported but does not change the locked primary ordering used for confirmatory interpretation, does not replace the primary results and selects no paper winner. Robustness Part 3 (`expanded_rule_a_company_scope_robustness`) was explicitly human-authorized and is completed on the development folds — only the company-scope sample changed, no retuning occurred, primary results were not replaced, no winner was selected, Part 4 is unauthorized, the final test remains locked and Stage125 Part 5 remains historical and immutable. The locked primary ordering (Logistic > RF > XGBoost) is preserved and, because the added observations are negative-only, the expanded company scope does not materially change interpretation. Robustness Part 2 (`main_rule_b_listing_robustness`) was explicitly human-authorized and is completed on the development folds — only the sample changed (the listing-timing Rule B sample), no retuning, sensitivity analysis only. The observed Part 2 pooled PR-AUC ordering (Logistic > RF > XGBoost) matches the primary ordering; it remains sensitivity evidence only and does not replace the primary results or select a paper winner. All seven Part 1 scientific artifacts remain byte-identical. Part 4 (`expanded_rule_b_combined_robustness`) is not authorized and not started. No full-development refit has been performed. The final test remains locked and untouched. M2/M3/M4 data collection or modeling has not started.**
 
 The historical Stage122 → Stage123 → Stage124 sequence is frozen. Stage124 Gate B is **completed and frozen**. The verified listing master
 (`listing_master_verified_stage124.csv`, 130 tickers from the official TSE API) is
@@ -53,12 +53,29 @@ python run_stage126_m1_robustness_part1_target_proximity.py --check
 # 8) Stage126 M1 robustness Part 2 listing Rule B sample (development-only; --check)
 python run_stage126_m1_robustness_part2_listing_rule_b.py --check
 
-# 9) Stage126 independent current-state validator (the live gate).
+# 9) Stage126 M1 robustness Part 3 expanded Rule A (development-only; --check)
+python run_stage126_m1_robustness_part3_expanded_rule_a.py --check
+
+# 10) Historical Stage125 Part 5 successor tests (regression only, NOT a gate).
+# The frozen Part 5 test file contains tests explicitly marked
+# `live_successor_state` that assert the Handoff successor state as it stood at
+# the Part 2 reference commit 6412b45c. They are excluded from the default live
+# suite by marker only and are verified against that commit here, in a
+# temporary read-only worktree:
+python run_stage125_part5_historical_successor_tests.py
+
+# 11) Stage126 independent current-state validator (the live gate).
 # Derives the completed prefix, next category and last micro-part generically
 # from the registered execution order, and pins every closed part's scientific
 # AND verification artifacts by hash.
 python run_stage126_current_state_validator.py --check
 
+# NOTE: the default suite `PYTHONPATH=project python -m pytest project/tests -q`
+# runs the COMPLETE current live repository suite and excludes only tests marked
+# `live_successor_state` (9 historical Part 5 successor tests). Every other
+# test — including every Part 3, current-state-validator, Handoff,
+# final-test-lock and leakage test — remains active. See pytest.ini.
+#
 # NOTE: Stage125 Part 5 is now HISTORICAL and IMMUTABLE. `run_stage125_part5.py`
 # is NOT a routine Stage126 gate any more, and previous robustness runners are
 # not current-state gates either — previous scientific artifacts are protected
@@ -77,10 +94,10 @@ python run_stage126_current_state_validator.py --check
 # stage126/stage126_m1_robustness_part2_part5_successor_compatibility.json.
 # This is not a scientific failure and not Stage125 drift.
 
-# 8) AI Handoff validation
+# 12) AI Handoff validation
 python scripts/validate_ai_handoff.py --check
 
-# 9) Full test suite
+# 13) Full live test suite
 python -m pytest tests/ -q
 ```
 

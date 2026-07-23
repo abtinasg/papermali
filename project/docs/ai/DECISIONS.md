@@ -113,6 +113,73 @@ These are stable project decisions. Change them only deliberately (and note it i
   started.** The consumed Part 1 authorization confers no standing
   authorization for any later category.
 
+### Stage126 live-versus-historical test-suite boundary (2026-07-23)
+
+- The frozen Stage125 Part 5 file contains historical tests explicitly marked
+`live_successor_state`. Those tests remain **byte-identical** and are verified
+against the frozen Part 2 successor reference commit
+`6412b45c4adc6584a5567c7c96e0932f68f31e8a`. **They are not part of the current
+Stage126 live gate.** The default Stage126 repository test suite excludes only
+that historical marker — never the file, never a node ID, never a skip or
+xfail. **All non-historical tests remain active.** The Stage126 current-state
+validator remains the sole current-state validation surface.
+- **Governance basis.** This is a consistent application of the existing
+  `stage126-validation-architecture-boundary-lock`, **not** a scientific-error
+  exception. Stage125 Part 5 was not reopened and its pins were not changed; the
+  frozen test file is byte-identical at
+  `0b9413b2adbf9c44b0fb12b4f7ef2dad60be5cd4c401ccefac30d19f0905af71`.
+- **Live gate surfaces:** the Stage126 current-state validator, the current
+  Stage126 scientific micro-part tests, the AI Handoff validator, and every
+  non-historical repository test.
+- **Exclusion mechanism:** marker expression only. No `--ignore`, no
+  `--deselect`, no node-ID targeting, no skip/xfail, no collection hook, no
+  broad skip pattern. Proven by dedicated fail-closed tests.
+- **Historical tests are preserved, not deleted.** They are executed against the
+  reference commit by a read-only runner that never modifies the branch,
+  `main`, the Stage125 tree or the Handoff.
+
+### Stage126 M1 robustness Part 3 — executed (2026-07-23)
+
+- **Part 3 (`expanded_rule_a_company_scope_robustness`) was explicitly
+  human-authorized and completed on the development folds only.** The
+  authorization text is 423 UTF-8 bytes and hashes to
+  `f1230aa0dac18670695d41d99709cfd4ba5619e96e6f93c2e0678387ab28dab1`; it is
+  consumed by this execution and grants no standing authorization, no merge, no
+  Part 4, no refit, no final-test access or evaluation, no calibration,
+  threshold optimization, bootstrap, Holm correction, p-values or winner
+  selection, and no SMOTE/SMOTENC/SHAP/M2/M3/M4.
+- **Only the company scope changed:** 1056 analysis-ready rows across 124
+  companies (80 positive / 976 negative), 695 development rows (68 / 627), fold
+  roles 254 / 215 / 469 / 226. Target, feature definitions and order,
+  preprocessing, missingness-indicator logic, selected configurations, model
+  families, folds, seeds, metrics and class weighting all unchanged.
+- **No retuning** (0 tuning searches; exactly 22 fits / 22 predictions). **No
+  full-development refit.** XGBoost class weights recomputed per training fold
+  (221/33, 411/58) — never from validation rows and never reused from the
+  primary sample.
+- **The final test remained locked.** 361 final-test identities were counted
+  only through the frozen temporal split contract; zero predictor rows, zero
+  target rows, zero predictions and zero metrics.
+- **Sample delta:** Expanded Rule A is a strict superset of primary Rule A —
+  44 expanded-only rows, 0 primary-only rows, +5 companies, +0 positive, +44
+  negative; +29 development rows (all negative); 20 added OOF identities, all
+  with target 0; +15 final-test identities.
+- **Development-only sample-sensitivity evidence.** Pooled PR-AUC: Logistic
+  0.442885909854 (−0.64%), RF 0.390702328450 (−2.92%), XGBoost 0.356560707550
+  (+0.00%). **The locked primary ordering Logistic > RF > XGBoost is
+  preserved**, the largest absolute change is 0.0117, and because the added
+  observations are negative-only the expanded scope does not materially change
+  interpretation. Primary results were not replaced, the primary ordering lock
+  is unchanged, no paper winner was selected and this is not a new confirmatory
+  model comparison. The Part 2 comparison is separated and descriptive only.
+- **Part 4 (`expanded_rule_b_combined_robustness`) is not authorized and not
+  started.** Parts 4-6 remain outstanding.
+- **Nothing closed was touched.** Part 1 and Part 2 packages (scientific and
+  verification), the primary Stage126 artifacts and the Stage125 tree are
+  byte-identical; Stage125 Part 5 remains historical and immutable and was not
+  used as a gate. The independent current-state validator recognized Part 3
+  generically with no source change.
+
 ### Stage126 current-state validation — generic enforcement (2026-07-23)
 
 - **No hard-coded current state.** The validator derives the completed prefix,

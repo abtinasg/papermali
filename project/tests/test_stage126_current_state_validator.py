@@ -280,11 +280,12 @@ def test_part_scientific_artifacts_are_immutable(pinned, label):
 
 def test_closed_part_registry_pins_both_packages():
     registry = _read_json(v.F_CLOSED_REGISTRY)
-    assert registry["closed_part_count"] == 2
+    assert registry["closed_part_count"] == 3
     assert registry["regeneration_allowed"] is False
     parts = registry["parts"]
     assert set(parts) == {
         "m1_target_proximity_six_feature_set", "main_rule_b_listing_robustness",
+        "expanded_rule_a_company_scope_robustness",
     }
     for category, pinned in (
         ("m1_target_proximity_six_feature_set", PART1_SCIENTIFIC),
@@ -404,28 +405,32 @@ def test_completed_categories_and_next_category():
     report = _read_json(v.F_REPORT)
     assert report["completed_category_ids"] == [
         "m1_target_proximity_six_feature_set", "main_rule_b_listing_robustness",
+        "expanded_rule_a_company_scope_robustness",
     ]
-    assert report["next_category_id"] == "expanded_rule_a_company_scope_robustness"
+    assert report["next_category_id"] == "expanded_rule_b_combined_robustness"
     assert report["next_category_authorized"] is False
     assert report["standing_execution_authorization"] is False
     assert report["m1_robustness_completed"] is False
     assert report["last_completed_micro_part"] == (
-        "stage126-m1-robustness-part2-listing-rule-b"
+        "stage126-m1-robustness-part3-expanded-rule-a"
     )
 
 
-def test_part3_is_unauthorized_and_absent():
+def test_next_part_is_unauthorized_and_absent():
+    """The next registered category must be unauthorized and have no package."""
     report = _read_json(v.F_REPORT)
     assert report["next_category_authorized"] is False
+    next_index = report["completed_part_count"] + 1
     for suffix in ("_completion_lock.json", "_human_authorization_record.json",
                    "_oof_predictions.csv", "_metrics.csv"):
-        assert not os.path.isfile(
-            os.path.join(STAGE126, f"stage126_m1_robustness_part3{suffix}")
-        ), suffix
+        assert not os.path.isfile(os.path.join(
+            STAGE126,
+            f"stage126_m1_robustness_part{next_index}{suffix}",
+        )), suffix
     state = json.loads(
         (_root() / v.HANDOFF_STATE_REL).read_text(encoding="utf-8")
     )
-    assert state["m1_robustness_part3_authorized"] is False
+    assert state["m1_robustness_part4_authorized"] is False
     assert state["m1_robustness_execution_authorized"] is False
 
 
@@ -568,7 +573,7 @@ def test_handoff_timestamp_change_does_not_reopen_a_closed_part(tmp_path):
         (root / v.PART0_DECISION_RECORD_REL).read_text(encoding="utf-8")
     )["execution_order"]
     completed, ids = v.completed_prefix(root, order)
-    assert ids == order[:2]
+    assert ids == order[:3]
     after = {
         name: _sha(root / "project/stage126" / name) for name in PART2_SCIENTIFIC
     }
@@ -600,7 +605,7 @@ def test_new_current_test_hash_does_not_regenerate_a_closed_part(tmp_path):
 # Generic future-part advancement
 # --------------------------------------------------------------------------- #
 
-def _synthetic_part3(root: Path) -> str:
+def _synthetic_next_part(root: Path) -> str:
     """Write a COMPLETE, valid synthetic Part 3 package into a mirrored repo.
 
     Mirrors the real per-part package contract exactly: authorization record,
@@ -608,29 +613,29 @@ def _synthetic_part3(root: Path) -> str:
     and README. Nothing here touches Part 1, Part 2 or Stage125.
     """
     d = root / "project/stage126"
-    prefix = "stage126_m1_robustness_part3"
-    micro_id = "stage126-m1-robustness-part3-expanded-rule-a"
-    qc_scope = "stage126_m1_robustness_part3_expanded_rule_a"
+    prefix = "stage126_m1_robustness_part4"
+    micro_id = "stage126-m1-robustness-part4-expanded-rule-b"
+    qc_scope = "stage126_m1_robustness_part4_expanded_rule_b"
 
     (d / f"{prefix}_human_authorization_record.json").write_text(json.dumps({
-        "authorization_id": "stage126-m1-robustness-part3-human-authorization",
-        "authorized_category_id": "expanded_rule_a_company_scope_robustness",
-        "human_authorization_text": "synthetic part 3 authorization",
+        "authorization_id": "stage126-m1-robustness-part4-human-authorization",
+        "authorized_category_id": "expanded_rule_b_combined_robustness",
+        "human_authorization_text": "synthetic part 4 authorization",
         "human_authorization_text_sha256": hashlib.sha256(
-            b"synthetic part 3 authorization"
+            b"synthetic part 4 authorization"
         ).hexdigest(),
-        "part3_execution_authorized": True,
+        "part4_execution_authorized": True,
         "merge_authorized": False,
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     (d / f"{prefix}_completion_lock.json").write_text(json.dumps({
-        "category_id": "expanded_rule_a_company_scope_robustness",
+        "category_id": "expanded_rule_b_combined_robustness",
         "micro_part_id": micro_id,
-        "part3_human_authorized": True,
-        "part3_execution_completed": True,
+        "part4_human_authorized": True,
+        "part4_execution_completed": True,
         "authorization_consumed": True,
         "development_only": True,
-        "part4_execution_authorized": False,
+        "part5_execution_authorized": False,
         "m1_robustness_execution_authorized": False,
         "m1_robustness_started": True,
         "m1_robustness_completed": False,
@@ -647,14 +652,15 @@ def _synthetic_part3(root: Path) -> str:
             "m1_target_proximity_six_feature_set",
             "main_rule_b_listing_robustness",
             "expanded_rule_a_company_scope_robustness",
+            "expanded_rule_b_combined_robustness",
         ],
-        "next_category_id": "expanded_rule_b_combined_robustness",
+        "next_category_id": "persistent_loss_robustness_target",
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     payloads = {
         f"{prefix}_feature_manifest.csv": "feature_order,feature_name\n1,synthetic\n",
         f"{prefix}_execution_manifest.json": json.dumps(
-            {"category_id": "expanded_rule_a_company_scope_robustness"},
+            {"category_id": "expanded_rule_b_combined_robustness"},
             indent=2, sort_keys=True) + "\n",
         f"{prefix}_oof_predictions.csv": "ticker,predicted_probability\nX,0.5\n",
         f"{prefix}_metrics.csv": "model_family,scope,pr_auc\nrf,pooled,0.4\n",
@@ -684,19 +690,19 @@ def _synthetic_part3(root: Path) -> str:
         },
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (d / f"README_{prefix.upper()}.md").write_text(
-        "# Synthetic Part 3\n", encoding="utf-8")
+        "# Synthetic Part 4\n", encoding="utf-8")
 
     # A real part also ships source, runner and tests — the registry pins them.
-    (root / "project/src" / f"{prefix}_expanded_rule_a.py").write_text(
-        '"""Synthetic Part 3 implementation."""\n', encoding="utf-8")
-    (root / "project" / f"run_{prefix}_expanded_rule_a.py").write_text(
-        '"""Synthetic Part 3 runner."""\n', encoding="utf-8")
-    (root / "project/tests" / f"test_{prefix}_expanded_rule_a.py").write_text(
-        '"""Synthetic Part 3 tests."""\n', encoding="utf-8")
+    (root / "project/src" / f"{prefix}_expanded_rule_b.py").write_text(
+        '"""Synthetic Part 4 implementation."""\n', encoding="utf-8")
+    (root / "project" / f"run_{prefix}_expanded_rule_b.py").write_text(
+        '"""Synthetic Part 4 runner."""\n', encoding="utf-8")
+    (root / "project/tests" / f"test_{prefix}_expanded_rule_b.py").write_text(
+        '"""Synthetic Part 4 tests."""\n', encoding="utf-8")
     return micro_id
 
 
-def _set_handoff_to_part3(root: Path, micro_id: str) -> None:
+def _set_handoff_to_next_part(root: Path, micro_id: str) -> None:
     """Update the mirrored Handoff to the truthful Part 3-completed state."""
     path = root / v.HANDOFF_STATE_REL
     state = json.loads(path.read_text(encoding="utf-8"))
@@ -705,12 +711,13 @@ def _set_handoff_to_part3(root: Path, micro_id: str) -> None:
         "m1_target_proximity_six_feature_set",
         "main_rule_b_listing_robustness",
         "expanded_rule_a_company_scope_robustness",
+        "expanded_rule_b_combined_robustness",
     ]
     state["last_completed_micro_part_qc_scope"] = (
-        "stage126_m1_robustness_part3_expanded_rule_a"
+        "stage126_m1_robustness_part4_expanded_rule_b"
     )
     state["last_completed_micro_part_qc_path"] = (
-        "project/stage126/stage126_m1_robustness_part3_qc_report.json"
+        "project/stage126/stage126_m1_robustness_part4_qc_report.json"
     )
     state["last_completed_micro_part_qc_assertions"] = 7
     state["last_completed_micro_part_qc_failed"] = 0
@@ -718,8 +725,8 @@ def _set_handoff_to_part3(root: Path, micro_id: str) -> None:
                     encoding="utf-8")
 
 
-def test_end_to_end_synthetic_part3_build_and_check(tmp_path):
-    """FULL validator build + check on a mirrored repo with a valid Part 3.
+def test_end_to_end_synthetic_next_part_build_and_check(tmp_path):
+    """FULL validator build + check on a mirrored repo with a valid next part.
 
     Runs the real build/check code paths — no monkeypatching of any expected
     current-state constant (they no longer exist) — and proves Part 1, Part 2
@@ -736,8 +743,8 @@ def test_end_to_end_synthetic_part3_build_and_check(tmp_path):
     )
     before = {rel: _sha(root / rel) for rel in watched}
 
-    micro_id = _synthetic_part3(root)
-    _set_handoff_to_part3(root, micro_id)
+    micro_id = _synthetic_next_part(root)
+    _set_handoff_to_next_part(root, micro_id)
 
     built = v.run(project_dir=root / "project", build=True)
     assert built["metadata"]["all_pass"] is True
@@ -751,18 +758,20 @@ def test_end_to_end_synthetic_part3_build_and_check(tmp_path):
         "m1_target_proximity_six_feature_set",
         "main_rule_b_listing_robustness",
         "expanded_rule_a_company_scope_robustness",
+        "expanded_rule_b_combined_robustness",
     ]
-    assert report["completed_part_count"] == 3
-    assert report["next_category_id"] == "expanded_rule_b_combined_robustness"
+    assert report["completed_part_count"] == 4
+    assert report["next_category_id"] == "persistent_loss_robustness_target"
     assert report["last_completed_micro_part"] == micro_id
     assert report["last_completed_micro_part_qc_scope"] == (
-        "stage126_m1_robustness_part3_expanded_rule_a"
+        "stage126_m1_robustness_part4_expanded_rule_b"
     )
     assert report["last_completed_micro_part_qc_assertions"] == 7
     assert set(report["closed_part_registry"]["parts"]) == {
         "m1_target_proximity_six_feature_set",
         "main_rule_b_listing_robustness",
         "expanded_rule_a_company_scope_robustness",
+        "expanded_rule_b_combined_robustness",
     }
 
     after = {rel: _sha(root / rel) for rel in watched}
@@ -770,19 +779,19 @@ def test_end_to_end_synthetic_part3_build_and_check(tmp_path):
     assert _sha(root / v.SRC_REL) == _sha(Path(REAL_ROOT) / v.SRC_REL)
 
 
-def test_end_to_end_skipped_part3_with_part4_present_fails(tmp_path):
-    """A Part 4 package without Part 3 must fail the FULL validator."""
+def test_end_to_end_skipped_part_with_later_part_present_fails(tmp_path):
+    """A Part 5 package without Part 4 must fail the FULL validator."""
     root = _mirror(tmp_path)
     d = root / "project/stage126"
     for name, payload in (
-        ("stage126_m1_robustness_part4_human_authorization_record.json",
-         {"authorized_category_id": "expanded_rule_b_combined_robustness"}),
-        ("stage126_m1_robustness_part4_completion_lock.json",
-         {"category_id": "expanded_rule_b_combined_robustness",
-          "micro_part_id": "stage126-m1-robustness-part4",
-          "part4_execution_completed": True, "part4_human_authorized": True,
+        ("stage126_m1_robustness_part5_human_authorization_record.json",
+         {"authorized_category_id": "persistent_loss_robustness_target"}),
+        ("stage126_m1_robustness_part5_completion_lock.json",
+         {"category_id": "persistent_loss_robustness_target",
+          "micro_part_id": "stage126-m1-robustness-part5",
+          "part5_execution_completed": True, "part5_human_authorized": True,
           "authorization_consumed": True, "development_only": True,
-          "part5_execution_authorized": False}),
+          "part6_execution_authorized": False}),
     ):
         (d / name).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n",
                               encoding="utf-8")
@@ -794,12 +803,12 @@ def test_skipped_category_fails_closed(tmp_path):
     """A Part 4 package without Part 3 must fail — categories cannot be skipped."""
     root = _mirror(tmp_path)
     d = root / "project/stage126"
-    (d / "stage126_m1_robustness_part4_human_authorization_record.json").write_text(
-        json.dumps({"authorized_category_id": "expanded_rule_b_combined_robustness"}),
+    (d / "stage126_m1_robustness_part5_human_authorization_record.json").write_text(
+        json.dumps({"authorized_category_id": "persistent_loss_robustness_target"}),
         encoding="utf-8",
     )
-    (d / "stage126_m1_robustness_part4_completion_lock.json").write_text(
-        json.dumps({"category_id": "expanded_rule_b_combined_robustness"}),
+    (d / "stage126_m1_robustness_part5_completion_lock.json").write_text(
+        json.dumps({"category_id": "persistent_loss_robustness_target"}),
         encoding="utf-8",
     )
     order = json.loads(
@@ -812,18 +821,18 @@ def test_skipped_category_fails_closed(tmp_path):
 def test_half_present_part_package_fails_closed(tmp_path):
     root = _mirror(tmp_path)
     (root / "project/stage126"
-     / "stage126_m1_robustness_part3_completion_lock.json").write_text(
-        json.dumps({"category_id": "expanded_rule_a_company_scope_robustness"}),
+     / "stage126_m1_robustness_part4_completion_lock.json").write_text(
+        json.dumps({"category_id": "expanded_rule_b_combined_robustness"}),
         encoding="utf-8",
     )
     with pytest.raises(v.ValidationFail):
-        v.discover_part(root, 3, "expanded_rule_a_company_scope_robustness")
+        v.discover_part(root, 4, "expanded_rule_b_combined_robustness")
 
 
 def test_unauthorized_future_artifact_fails_closed(tmp_path):
     root = _mirror(tmp_path)
     (root / "project/stage126"
-     / "stage126_m1_robustness_part3_oof_predictions.csv").write_text(
+     / "stage126_m1_robustness_part4_oof_predictions.csv").write_text(
         "a,b\n1,2\n", encoding="utf-8",
     )
     order = json.loads(

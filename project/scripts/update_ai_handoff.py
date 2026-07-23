@@ -147,6 +147,14 @@ ALLOWLIST_FILES = (
     "project/src/stage126_m1_robustness_part2_listing_rule_b.py",
     "project/run_stage126_m1_robustness_part2_listing_rule_b.py",
     "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py",
+    # Stage126 M1 robustness Part 3 expanded-Rule-A code, runner, and tests.
+    "project/src/stage126_m1_robustness_part3_expanded_rule_a.py",
+    "project/run_stage126_m1_robustness_part3_expanded_rule_a.py",
+    "project/tests/test_stage126_m1_robustness_part3_expanded_rule_a.py",
+    # Stage126 live/historical test-suite boundary: config, runner, and tests.
+    "pytest.ini",
+    "project/run_stage125_part5_historical_successor_tests.py",
+    "project/tests/test_stage126_live_historical_test_boundary.py",
     # Stage126 independent current-state validator code, runner, and tests.
     "project/src/stage126_current_state_validator.py",
     "project/run_stage126_current_state_validator.py",
@@ -398,10 +406,23 @@ ARTIFACT_ONLY_FILES = (
     "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART2_LISTING_RULE_B.md",
     "project/stage126/stage126_m1_robustness_part2_qc_report.json",
     "project/stage126/metadata_and_hashes_stage126_m1_robustness_part2.json",
+    # Stage126 M1 robustness Part 3 generated scientific artifacts.
+    "project/stage126/stage126_m1_robustness_part3_human_authorization_record.json",
+    "project/stage126/stage126_m1_robustness_part3_feature_manifest.csv",
+    "project/stage126/stage126_m1_robustness_part3_sample_delta.csv",
+    "project/stage126/stage126_m1_robustness_part3_execution_manifest.json",
+    "project/stage126/stage126_m1_robustness_part3_oof_predictions.csv",
+    "project/stage126/stage126_m1_robustness_part3_metrics.csv",
+    "project/stage126/stage126_m1_robustness_part3_primary_comparison.json",
+    "project/stage126/stage126_m1_robustness_part3_completion_lock.json",
+    "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART3_EXPANDED_RULE_A.md",
+    "project/stage126/stage126_m1_robustness_part3_qc_report.json",
+    "project/stage126/metadata_and_hashes_stage126_m1_robustness_part3.json",
     # Stage126 validation-architecture boundary artifacts.
     "project/stage126/stage126_validation_architecture_boundary_decision.json",
     "project/stage126/stage126_historical_boundary_manifest.json",
     "project/stage126/stage126_current_state_validation_report.json",
+    "project/stage126/stage126_live_vs_historical_test_boundary.json",
     "project/stage126/README_STAGE126_CURRENT_STATE_VALIDATION.md",
     "project/stage126/metadata_and_hashes_stage126_current_state_validator.json",
 )
@@ -767,6 +788,37 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "m4_data_collected",
         "contract_version",
     ),
+    # Stage126 M1 robustness Part 3 inherits the unchanged Stage126 markers and
+    # adds the Part 3 completion state on top of the retained Part 1/2 state.
+    "stage126_m1_robustness_part3_expanded_rule_a": (
+        "stage125_completed",
+        "stage126_m1_entry_ready",
+        "stage126_authorized",
+        "stage126_started",
+        "development_modeling_authorized",
+        "modeling_authorized",
+        "modeling_started",
+        "final_test_unlocked",
+        "final_test_access_authorized",
+        "final_test_predictor_values_inspected",
+        "final_test_target_values_inspected",
+        "final_test_evaluation_performed",
+        "m1_primary_development_tuning_completed",
+        "m1_robustness_started",
+        "m1_robustness_completed",
+        "m1_robustness_part1_completed",
+        "m1_robustness_part2_completed",
+        "m1_robustness_part3_human_authorized",
+        "m1_robustness_part3_completed",
+        "m1_robustness_completed_category_ids",
+        "m1_robustness_next_category_id",
+        "m1_robustness_part4_authorized",
+        "full_development_refit_performed",
+        "m2_data_collected",
+        "m3_data_collected",
+        "m4_data_collected",
+        "contract_version",
+    ),
     # Stage126 M1 robustness Part 2 inherits the unchanged Stage126 markers and
     # adds the Part 2 completion state on top of the retained Part 1 state.
     "stage126_m1_robustness_part2_listing_rule_b": (
@@ -809,6 +861,7 @@ STAGE126_QC_SCOPES = frozenset({
     "stage126_m1_financial_baseline",
     "stage126_m1_robustness_part1_target_proximity",
     "stage126_m1_robustness_part2_listing_rule_b",
+    "stage126_m1_robustness_part3_expanded_rule_a",
 })
 
 STAGE126_CARRIED_TEMPORAL_AVAILABILITY_FIELDS = (
@@ -1140,6 +1193,10 @@ _QC_SOURCE_TEST_OVERRIDES: dict[str, tuple[str, str]] = {
         "project/src/stage126_m1_robustness_part2_listing_rule_b.py",
         "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py",
     ),
+    "stage126_m1_robustness_part3_expanded_rule_a": (
+        "project/src/stage126_m1_robustness_part3_expanded_rule_a.py",
+        "project/tests/test_stage126_m1_robustness_part3_expanded_rule_a.py",
+    ),
 }
 
 
@@ -1416,8 +1473,14 @@ def derive_current_state_qc_markers(root: str) -> dict:
         "current_state_validation_all_pass": True,
     }
 
-    # The last completed SCIENTIFIC micro-part QC, reported separately.
-    qc_rel = report.get("last_completed_micro_part_qc_path") or ""
+    # The last completed SCIENTIFIC micro-part QC, reported separately and
+    # derived from the newest DISCOVERED package (not from the report, so a
+    # newly completed part is represented truthfully before the current-state
+    # artifacts are rebuilt).
+    discovered = discover_robustness_micro_parts(root)
+    qc_rel = discovered[-1][3] if discovered else (
+        report.get("last_completed_micro_part_qc_path") or ""
+    )
     if qc_rel:
         qc_path = os.path.join(root, qc_rel)
         if not os.path.isfile(qc_path):
@@ -1428,8 +1491,13 @@ def derive_current_state_qc_markers(root: str) -> dict:
             raise HandoffError(f"unreadable micro-part QC: {exc}") from exc
         if qc.get("all_pass") is not True:
             raise HandoffError("last completed micro-part QC is not all_pass")
-        if qc.get("stage") != report.get("last_completed_micro_part_qc_scope"):
-            raise HandoffError("micro-part QC scope disagrees with the report")
+        expected_scope = discovered[-1][0] if discovered else report.get(
+            "last_completed_micro_part_qc_scope"
+        )
+        if qc.get("stage") != expected_scope:
+            raise HandoffError(
+                "micro-part QC scope disagrees with the discovered package"
+            )
         markers.update({
             "last_completed_micro_part_qc_scope": qc["stage"],
             "last_completed_micro_part_qc_path": qc_rel,
@@ -1516,7 +1584,71 @@ def derive_validation_architecture_markers(root: str) -> dict:
         "prior_part_reopening_requires_explicit_human_authorization": True,
     }
     markers.update(derive_current_state_qc_markers(root))
+    markers.update(derive_live_vs_historical_test_boundary_markers(root))
     return markers
+
+
+_TEST_BOUNDARY_REL = (
+    "project/stage126/stage126_live_vs_historical_test_boundary.json"
+)
+_HISTORICAL_MARKER = "live_successor_state"
+_HISTORICAL_REFERENCE_COMMIT = "6412b45c4adc6584a5567c7c96e0932f68f31e8a"
+_FROZEN_PART5_TEST_SHA256 = (
+    "0b9413b2adbf9c44b0fb12b4f7ef2dad60be5cd4c401ccefac30d19f0905af71"
+)
+
+
+def derive_live_vs_historical_test_boundary_markers(root: str) -> dict:
+    """Derive the live-versus-historical test-suite boundary markers.
+
+    Fail-closed: emitted only when the boundary record is present, internally
+    consistent, and the frozen Stage125 Part 5 test file is still byte-identical
+    on disk. The historical successor tests are never a live gate.
+    """
+    path = os.path.join(root, _TEST_BOUNDARY_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        record = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable test-boundary record: {exc}") from exc
+
+    exact = {
+        "contract_id": "stage126_live_vs_historical_test_boundary",
+        "contract_version": "stage126_live_vs_historical_test_boundary_v1",
+        "stage125_part5_mode": "historical_immutable",
+        "historical_marker": _HISTORICAL_MARKER,
+        "historical_test_file_sha256": _FROZEN_PART5_TEST_SHA256,
+        "historical_reference_commit": _HISTORICAL_REFERENCE_COMMIT,
+        "historical_successor_tests_are_live_gate": False,
+        "stage126_live_suite_marker_expression": "not live_successor_state",
+        "current_state_validator_remains_live_gate": True,
+        "part3_scientific_artifacts_changed": False,
+        "part4_authorized": False,
+        "final_test_unlocked": False,
+        "stage125_part5_reopened_or_repinned": False,
+    }
+    for key, want in exact.items():
+        if record.get(key) != want:
+            raise HandoffError(
+                f"test-boundary record field {key}={record.get(key)!r} != {want!r}"
+            )
+    frozen = os.path.join(root, record["historical_test_file"])
+    if not os.path.isfile(frozen):
+        raise HandoffError("frozen Part 5 test file missing")
+    got = hashlib.sha256(open(frozen, "rb").read()).hexdigest()
+    if got != _FROZEN_PART5_TEST_SHA256:
+        raise HandoffError(
+            f"frozen Part 5 test file changed: {got} != {_FROZEN_PART5_TEST_SHA256}"
+        )
+    return {
+        "stage125_part5_historical_successor_tests": True,
+        "stage125_part5_historical_successor_test_marker": _HISTORICAL_MARKER,
+        "stage125_part5_historical_successor_test_reference_commit":
+            _HISTORICAL_REFERENCE_COMMIT,
+        "stage125_part5_historical_successor_tests_in_live_gate": False,
+        "stage126_live_test_suite_marker_expression": "not live_successor_state",
+    }
 
 
 _M1_ROBUSTNESS_PART1_AUTH_REL = (
@@ -1745,7 +1877,129 @@ def derive_m1_robustness_part2_markers(root: str, expected_order: list) -> dict:
         "m1_robustness_execution_authorized": False,
     }
     markers.update(derive_part2_sample_robustness_markers(root))
+    markers.update(derive_m1_robustness_part3_markers(root, expected_order))
     return markers
+
+
+_M1_ROBUSTNESS_PART3_AUTH_REL = (
+    "project/stage126/stage126_m1_robustness_part3_human_authorization_record.json"
+)
+_M1_ROBUSTNESS_PART3_LOCK_REL = (
+    "project/stage126/stage126_m1_robustness_part3_completion_lock.json"
+)
+_PART3_CATEGORY_ID = "expanded_rule_a_company_scope_robustness"
+_PART3_MICRO_PART_ID = "stage126-m1-robustness-part3-expanded-rule-a"
+_PART3_AUTH_TEXT_SHA256 = (
+    "f1230aa0dac18670695d41d99709cfd4ba5619e96e6f93c2e0678387ab28dab1"
+)
+
+
+def derive_m1_robustness_part3_markers(root: str, expected_order: list) -> dict:
+    """Derive Part 3 completion markers (fail-closed).
+
+    Returns {} when Part 3 has not been executed. A completed and consumed
+    Part 3 authorization grants NO standing authorization for Part 4.
+    """
+    auth_path = os.path.join(root, _M1_ROBUSTNESS_PART3_AUTH_REL)
+    lock_path = os.path.join(root, _M1_ROBUSTNESS_PART3_LOCK_REL)
+    if not (os.path.isfile(auth_path) and os.path.isfile(lock_path)):
+        if os.path.isfile(auth_path) != os.path.isfile(lock_path):
+            raise HandoffError(
+                "Part 3 authorization record and completion lock must both exist"
+            )
+        return {}
+    try:
+        auth = json.load(open(auth_path, encoding="utf-8"))
+        lock = json.load(open(lock_path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable Part 3 artifacts: {exc}") from exc
+
+    auth_exact = {
+        "authorization_id": "stage126-m1-robustness-part3-human-authorization",
+        "authorized_category_id": _PART3_CATEGORY_ID,
+        "part3_execution_authorized": True,
+        "create_open_unmerged_pr_authorized": True,
+        "merge_authorized": False,
+        "part4_execution_authorized": False,
+        "full_development_refit_authorized": False,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_authorized": False,
+        "calibration_authorized": False,
+        "bootstrap_authorized": False,
+        "holm_authorized": False,
+        "winner_selection_authorized": False,
+        "smote_authorized": False,
+        "shap_authorized": False,
+    }
+    for k, v in auth_exact.items():
+        if auth.get(k) != v:
+            raise HandoffError(
+                f"Part 3 authorization field {k}={auth.get(k)!r} != {v!r}"
+            )
+    text = auth.get("human_authorization_text")
+    if not isinstance(text, str):
+        raise HandoffError("Part 3 authorization text missing")
+    if hashlib.sha256(text.encode("utf-8")).hexdigest() != _PART3_AUTH_TEXT_SHA256:
+        raise HandoffError("Part 3 authorization text SHA-256 mismatch")
+    if auth.get("human_authorization_text_sha256") != _PART3_AUTH_TEXT_SHA256:
+        raise HandoffError("Part 3 authorization hash field mismatch")
+
+    lock_exact = {
+        "category_id": _PART3_CATEGORY_ID,
+        "micro_part_id": _PART3_MICRO_PART_ID,
+        "part3_human_authorized": True,
+        "part3_execution_completed": True,
+        "authorization_consumed": True,
+        "development_only": True,
+        "replaces_primary_results": False,
+        "selects_paper_winner": False,
+        "part4_execution_authorized": False,
+        "m1_robustness_execution_authorized": False,
+        "m1_robustness_completed": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_predictor_values_inspected": False,
+        "final_test_target_values_inspected": False,
+        "final_test_evaluation_performed": False,
+        "smote_executed": False,
+        "smotenc_executed": False,
+        "shap_executed": False,
+        "calibration_executed": False,
+        "bootstrap_executed": False,
+        "holm_executed": False,
+        "winner_selected": False,
+    }
+    for k, v in lock_exact.items():
+        if lock.get(k) != v:
+            raise HandoffError(
+                f"Part 3 completion lock field {k}={lock.get(k)!r} != {v!r}"
+            )
+    completed = list(lock.get("completed_category_ids") or [])
+    if completed != list(expected_order[:3]):
+        raise HandoffError(
+            f"Part 3 completed_category_ids {completed!r} is not the exact "
+            f"three-category prefix"
+        )
+    if lock.get("next_category_id") != expected_order[3]:
+        raise HandoffError(
+            f"Part 3 next_category_id {lock.get('next_category_id')!r} != "
+            f"{expected_order[3]!r}"
+        )
+    return {
+        "m1_robustness_started": True,
+        "m1_robustness_completed": False,
+        "m1_robustness_part1_completed": True,
+        "m1_robustness_part2_completed": True,
+        "m1_robustness_part3_human_authorized": True,
+        "m1_robustness_part3_completed": True,
+        "m1_robustness_completed_category_ids": completed,
+        "m1_robustness_next_category_id": expected_order[3],
+        "m1_robustness_part3_authorized": False,
+        "m1_robustness_part4_authorized": False,
+        # A consumed Part 3 authorization is NOT a standing authorization.
+        "m1_robustness_execution_authorized": False,
+    }
 
 
 _PART2_QC_REL = "project/stage126/stage126_m1_robustness_part2_qc_report.json"
@@ -2405,13 +2659,43 @@ _PART1_QC_SCOPE = "stage126_m1_robustness_part1_target_proximity"
 _PART1_MICRO_PART_ID = "stage126-m1-robustness-part1-target-proximity"
 _PART2_QC_SCOPE = "stage126_m1_robustness_part2_listing_rule_b"
 
-# Newest-last: the last entry whose lock + QC both exist wins.
-_ROBUSTNESS_MICRO_PARTS = (
-    (_PART1_QC_SCOPE, _PART1_MICRO_PART_ID,
-     _M1_ROBUSTNESS_PART1_LOCK_REL, _PART1_QC_REL),
-    (_PART2_QC_SCOPE, _PART2_MICRO_PART_ID,
-     _M1_ROBUSTNESS_PART2_LOCK_REL, _PART2_QC_REL),
-)
+# Robustness micro-part packages are DISCOVERED by the shared naming
+# convention, newest-last, so a newly completed part is recognized without
+# adding a per-part entry here.
+_MAX_ROBUSTNESS_MICRO_PARTS = 6
+
+
+def discover_robustness_micro_parts(root: str) -> list:
+    """Completed robustness micro-part packages, oldest first.
+
+    Each entry is ``(qc_scope, micro_part_id, lock_rel, qc_rel)`` derived from
+    the part's own completion lock and QC report — never hard-coded per part.
+    """
+    found = []
+    for index in range(1, _MAX_ROBUSTNESS_MICRO_PARTS + 1):
+        prefix = f"stage126_m1_robustness_part{index}"
+        lock_rel = f"project/stage126/{prefix}_completion_lock.json"
+        qc_rel = f"project/stage126/{prefix}_qc_report.json"
+        lock_path = os.path.join(root, lock_rel)
+        qc_path = os.path.join(root, qc_rel)
+        if not (os.path.isfile(lock_path) and os.path.isfile(qc_path)):
+            continue
+        try:
+            lock = json.load(open(lock_path, encoding="utf-8"))
+            qc = json.load(open(qc_path, encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise HandoffError(
+                f"unreadable robustness part {index} artifacts: {exc}"
+            ) from exc
+        qc_scope = qc.get("stage") or ""
+        micro_id = lock.get("micro_part_id") or qc_scope.replace("_", "-")
+        if not qc_scope or not micro_id:
+            raise HandoffError(
+                f"robustness part {index} does not declare a QC scope or "
+                f"micro-part identifier (fail-closed)"
+            )
+        found.append((qc_scope, micro_id, lock_rel, qc_rel))
+    return found
 
 
 def active_micro_part_qc_scope(root: str, default_scope: str) -> str:
@@ -2421,21 +2705,14 @@ def active_micro_part_qc_scope(root: str, default_scope: str) -> str:
     This selects which QC report describes current state; it never advances the
     research-action pointers (which stay on the Stage126 M1 research action).
     """
-    scope = default_scope
-    for qc_scope, _micro_id, lock_rel, qc_rel in _ROBUSTNESS_MICRO_PARTS:
-        if (os.path.isfile(os.path.join(root, lock_rel))
-                and os.path.isfile(os.path.join(root, qc_rel))):
-            scope = qc_scope
-    return scope
+    parts = discover_robustness_micro_parts(root)
+    return parts[-1][0] if parts else default_scope
 
 
 def active_micro_part_id(root: str, default_id: str) -> str:
     """Micro-part identifier for the newest completed robustness micro-part."""
-    scope = active_micro_part_qc_scope(root, "")
-    for qc_scope, micro_id, _lock_rel, _qc_rel in _ROBUSTNESS_MICRO_PARTS:
-        if scope == qc_scope:
-            return micro_id
-    return default_id
+    parts = discover_robustness_micro_parts(root)
+    return parts[-1][1] if parts else default_id
 
 
 def semantic_state(root: str):
