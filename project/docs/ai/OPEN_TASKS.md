@@ -353,7 +353,7 @@ re-pinned.
 
 **Next — Part 4 (`expanded_rule_b_combined_robustness`) is NOT authorized
 and NOT started.** It requires its own separate explicit human authorization;
-the consumed Part 2 authorization is not a standing authorization. Part 3 is
+the consumed Part 3 authorization is not a standing authorization. Part 3 is
 completed. Parts 4–6 remain outstanding, so M1 robustness is not complete.
 
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
