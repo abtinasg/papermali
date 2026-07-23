@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed micro-part:** `stage126-m1-robustness-part2-listing-rule-b`
 - **Next research action:** `stage126-m1-financial-baseline`
-- **Last stage commit:** `e1f83d31be787b2bd111285368720366870ea04f`
-- **Generated from commit:** `e1f83d31be787b2bd111285368720366870ea04f` (branch `stage126-m1-robustness-part2-listing-rule-b`, informational)
+- **Last stage commit:** `c46457e22706a06e6b83254221d29df70de61aa9`
+- **Generated from commit:** `c46457e22706a06e6b83254221d29df70de61aa9` (branch `stage126-m1-robustness-part2-listing-rule-b`, informational)
 - **Baseline:** `origin/main` @ `f7f7c9ed1f6c9e52542c9f242e090d3ad24792c4`
 
 ## QC
@@ -57,5 +57,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `fbd15b5624a9dda6ff25b14adbea167a61a1dead4608ab9774fbd4c926caacbd`_
-_generated_at_utc: 2026-07-23T09:41:13Z (informational)_
+_state_fingerprint: `718836aebec60b83ab619c98fb58278b4ed4679c148f11d1f18b4911a8e0f527`_
+_generated_at_utc: 2026-07-23T10:32:19Z (informational)_
