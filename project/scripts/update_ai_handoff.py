@@ -1376,6 +1376,67 @@ _BOUNDARY_DECISION_SHA256 = (
     "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1"
 )
 _VALIDATION_ARCHITECTURE = "stage126_current_state_validator_v1"
+_VALIDATOR_ID = "stage126_current_state_validator"
+
+
+_CURRENT_STATE_METADATA_REL = (
+    "project/stage126/metadata_and_hashes_stage126_current_state_validator.json"
+)
+
+
+def derive_current_state_qc_markers(root: str) -> dict:
+    """Separate the CURRENT-STATE validation QC from the last scientific QC.
+
+    ``current_state_validation_*`` describes the independent Stage126
+    current-state validator — the sole current-state validation surface.
+    ``last_completed_micro_part_qc_*`` describes the newest completed
+    SCIENTIFIC micro-part. The two roles must never be conflated.
+    """
+    meta_path = os.path.join(root, _CURRENT_STATE_METADATA_REL)
+    report_path = os.path.join(root, _CURRENT_STATE_REPORT_REL)
+    if not (os.path.isfile(meta_path) and os.path.isfile(report_path)):
+        return {}
+    try:
+        meta = json.load(open(meta_path, encoding="utf-8"))
+        report = json.load(open(report_path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable current-state artifacts: {exc}") from exc
+
+    if meta.get("all_pass") is not True or meta.get("failed_count") != 0:
+        raise HandoffError("current-state validation is not all_pass (fail-closed)")
+    if report.get("current_state_validation_scope") != _VALIDATOR_ID:
+        raise HandoffError("current-state report scope mismatch")
+
+    markers = {
+        "current_state_validation_scope": _VALIDATOR_ID,
+        "current_state_validation_path": _CURRENT_STATE_REPORT_REL,
+        "current_state_validation_metadata_path": _CURRENT_STATE_METADATA_REL,
+        "current_state_validation_assertions": meta["assertion_count"],
+        "current_state_validation_failed": meta["failed_count"],
+        "current_state_validation_all_pass": True,
+    }
+
+    # The last completed SCIENTIFIC micro-part QC, reported separately.
+    qc_rel = report.get("last_completed_micro_part_qc_path") or ""
+    if qc_rel:
+        qc_path = os.path.join(root, qc_rel)
+        if not os.path.isfile(qc_path):
+            raise HandoffError(f"micro-part QC path missing: {qc_rel}")
+        try:
+            qc = json.load(open(qc_path, encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise HandoffError(f"unreadable micro-part QC: {exc}") from exc
+        if qc.get("all_pass") is not True:
+            raise HandoffError("last completed micro-part QC is not all_pass")
+        if qc.get("stage") != report.get("last_completed_micro_part_qc_scope"):
+            raise HandoffError("micro-part QC scope disagrees with the report")
+        markers.update({
+            "last_completed_micro_part_qc_scope": qc["stage"],
+            "last_completed_micro_part_qc_path": qc_rel,
+            "last_completed_micro_part_qc_assertions": qc["assertion_count"],
+            "last_completed_micro_part_qc_failed": qc["failed_count"],
+        })
+    return markers
 
 
 def derive_validation_architecture_markers(root: str) -> dict:
@@ -1445,7 +1506,7 @@ def derive_validation_architecture_markers(root: str) -> dict:
             is not False:
         raise HandoffError("validation report permits prior-part regeneration")
 
-    return {
+    markers = {
         "validation_architecture": _VALIDATION_ARCHITECTURE,
         "stage125_part5_mode": "historical_immutable",
         "stage125_part5_live_gate_active": False,
@@ -1454,6 +1515,8 @@ def derive_validation_architecture_markers(root: str) -> dict:
         "prior_part_reopening_requires_scientific_error": True,
         "prior_part_reopening_requires_explicit_human_authorization": True,
     }
+    markers.update(derive_current_state_qc_markers(root))
+    return markers
 
 
 _M1_ROBUSTNESS_PART1_AUTH_REL = (
@@ -2537,11 +2600,34 @@ def render_current_state(record: dict) -> str:
         f"(branch `{record['observed_branch']}`, informational)",
         f"- **Baseline:** `{record['baseline_branch']}` @ `{record['baseline_commit']}`",
         "",
-        "## QC\n",
+        "## Current-state validation\n",
+    ]
+    if "current_state_validation_scope" in record:
+        cs_ok = (
+            "✅" if record.get("current_state_validation_all_pass")
+            and record.get("current_state_validation_failed") == 0 else "❌"
+        )
+        lines += [
+            "_The independent Stage126 current-state validator is the SOLE "
+            "current-state validation surface._\n",
+            f"- {cs_ok} **{record['current_state_validation_assertions']} "
+            f"assertions, {record['current_state_validation_failed']} failed**, "
+            f"all_pass={record['current_state_validation_all_pass']}",
+            f"- Scope: `{record['current_state_validation_scope']}`",
+            f"- Report: `{record['current_state_validation_path']}`",
+            f"- Metadata: `{record['current_state_validation_metadata_path']}`",
+            "",
+        ]
+    else:
+        lines += ["_Not yet generated._\n", ""]
+    lines += [
+        "### Last completed scientific micro-part QC\n",
+        "_Scientific QC of the newest completed robustness micro-part — a "
+        "DIFFERENT role from current-state validation above._\n",
         f"- {qc_ok} **{record['qc_assertions']} assertions, "
         f"{record['qc_failed']} failed**, all_pass={record['qc_all_pass']}",
-        f"- Scope: `{record['selected_qc_scope']}`",
-        f"- Report: `{record['selected_qc_path']}`",
+        f"- Scope: `{record.get('last_completed_micro_part_qc_scope', record['selected_qc_scope'])}`",
+        f"- Report: `{record.get('last_completed_micro_part_qc_path', record['selected_qc_path'])}`",
         f"- QC source commit (code): `{record['qc_source_commit']}`",
         "",
         "## Workflow markers\n",

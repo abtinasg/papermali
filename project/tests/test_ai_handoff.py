@@ -2528,6 +2528,63 @@ def test_handoff_state_carries_part5_compatibility_markers():
     )
 
 
+def test_current_state_qc_is_separate_from_scientific_micro_part_qc():
+    """The two QC roles must be distinct, explicit and truthful."""
+    state = _state(REAL_ROOT)
+    # Current-state validation surface.
+    assert state["current_state_validation_scope"] == (
+        "stage126_current_state_validator"
+    )
+    assert state["current_state_validation_path"] == (
+        "project/stage126/stage126_current_state_validation_report.json"
+    )
+    assert state["current_state_validation_metadata_path"] == (
+        "project/stage126/metadata_and_hashes_stage126_current_state_validator.json"
+    )
+    assert state["current_state_validation_failed"] == 0
+    assert state["current_state_validation_all_pass"] is True
+    meta = json.load(open(os.path.join(
+        REAL_ROOT, state["current_state_validation_metadata_path"],
+    ), encoding="utf-8"))
+    assert state["current_state_validation_assertions"] == meta["assertion_count"]
+
+    # Last completed SCIENTIFIC micro-part QC — a different role.
+    assert state["last_completed_micro_part_qc_scope"] == (
+        "stage126_m1_robustness_part2_listing_rule_b"
+    )
+    assert state["last_completed_micro_part_qc_path"] == (
+        "project/stage126/stage126_m1_robustness_part2_qc_report.json"
+    )
+    assert state["last_completed_micro_part_qc_assertions"] == 128
+    assert state["last_completed_micro_part_qc_failed"] == 0
+    qc = json.load(open(os.path.join(
+        REAL_ROOT, state["last_completed_micro_part_qc_path"],
+    ), encoding="utf-8"))
+    assert state["last_completed_micro_part_qc_assertions"] == qc["assertion_count"]
+
+    # The two roles never collapse into one.
+    assert state["current_state_validation_scope"] != \
+        state["last_completed_micro_part_qc_scope"]
+    assert state["current_state_validation_path"] != \
+        state["last_completed_micro_part_qc_path"]
+
+
+def test_current_state_doc_separates_the_two_qc_roles():
+    text = _read_doc("project", "docs", "ai", "CURRENT_STATE.md")
+    assert "## Current-state validation" in text
+    assert "sole current-state validation surface" in text.lower()
+    assert "### Last completed scientific micro-part QC" in text
+    cs = text.split("## Current-state validation", 1)[1].split(
+        "### Last completed scientific micro-part QC", 1
+    )[0]
+    assert "`stage126_current_state_validator`" in cs
+    assert "stage126_current_state_validation_report.json" in cs
+    micro = text.split("### Last completed scientific micro-part QC", 1)[1].split(
+        "## Workflow markers", 1
+    )[0]
+    assert "stage126_m1_robustness_part2_qc_report.json" in micro
+
+
 def test_part5_compatibility_status_is_generic_not_part1_specific():
     """The status must describe a completed micro-part, never Part 1 specifically.
 

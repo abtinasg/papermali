@@ -53,6 +53,7 @@ F_BOUNDARY_MANIFEST = "stage126_historical_boundary_manifest.json"
 F_REPORT = "stage126_current_state_validation_report.json"
 F_METADATA = "metadata_and_hashes_stage126_current_state_validator.json"
 F_README = "README_STAGE126_CURRENT_STATE_VALIDATION.md"
+F_CLOSED_REGISTRY = "stage126_closed_part_registry.json"
 
 # --------------------------------------------------------------------------- #
 # Exact human governance decision (byte-for-byte Persian)
@@ -236,63 +237,118 @@ PART_SCIENTIFIC_SUFFIXES: tuple[str, ...] = (
     "metrics.csv",
     "primary_comparison.json",
     "completion_lock.json",
-)
-# Part 2 additionally emits an identity-only sample-delta audit.
-PART_OPTIONAL_SCIENTIFIC_SUFFIXES: tuple[str, ...] = (
+    # Emitted only by parts whose changed dimension is the sample.
     "sample_delta.csv",
 )
-
-PINNED_PART_SCIENTIFIC_ARTIFACTS: dict[str, dict[str, str]] = {
-    "m1_target_proximity_six_feature_set": {
-        "stage126_m1_robustness_part1_human_authorization_record.json":
-            "87a4f55baeb1081eaf936e49c5e8923f67df54ec444f0abc33ec835c0c7e06f4",
-        "stage126_m1_robustness_part1_feature_manifest.csv":
-            "c65735795eda7dce6b4cacbc6af9dd5914b5068f44c77277035a51463cceaf90",
-        "stage126_m1_robustness_part1_execution_manifest.json":
-            "80813ce8af9544dde736cc6b94372d2626dccbf888553cd7964625bfe12d8738",
-        "stage126_m1_robustness_part1_oof_predictions.csv":
-            "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31",
-        "stage126_m1_robustness_part1_metrics.csv":
-            "c60f4b15aa40273472be98c867c73795d254f32c2a0e29b76641b1c5d5c18e98",
-        "stage126_m1_robustness_part1_primary_comparison.json":
-            "2b58a85250420a8a18b0ff37cecdf3f2e31160c37e0cb48d027324c87a25c46a",
-        "stage126_m1_robustness_part1_completion_lock.json":
-            "964d84f2269bb35b0176f88bb12bcfc13ef2cb487817cf5b49a5c28a87e1822b",
-    },
-    "main_rule_b_listing_robustness": {
-        "stage126_m1_robustness_part2_human_authorization_record.json":
-            "0a7bba7489f62f59d3e0f07946b82d8ce4be1a49c4d098f47ca308de9466959e",
-        "stage126_m1_robustness_part2_feature_manifest.csv":
-            "58c52c17337286237779153d59f85f74c76f84d0c0415b8efadd618aa524b78f",
-        "stage126_m1_robustness_part2_sample_delta.csv":
-            "baafe97323e45f0a88b07aaf1ea97c50c4b213e43724ddb2b97f3f55144fc7d3",
-        "stage126_m1_robustness_part2_execution_manifest.json":
-            "9fc153b65a77c906339f51d7c0ad576d23eb06c5895eacb1a0ee92578b321ce8",
-        "stage126_m1_robustness_part2_oof_predictions.csv":
-            "3af630141a905370849875926fa84052cf10322cc34e18258a25d28106d47dd6",
-        "stage126_m1_robustness_part2_metrics.csv":
-            "073b8657c0ba2c40f52e05d766a102e2b5d20845821c4eb1cef1b6e53459228c",
-        "stage126_m1_robustness_part2_primary_comparison.json":
-            "9fc3b4eaf0a27fc66cd22444d92363747157743e822d3be877ecca7f153763bf",
-        "stage126_m1_robustness_part2_completion_lock.json":
-            "23d1920c4fb0a351456fe54b60616446381bbd550fb18e0bba5dab091486fec6",
-    },
-}
-
-# --------------------------------------------------------------------------- #
-# Expected current state
-# --------------------------------------------------------------------------- #
-
-EXPECTED_COMPLETED_CATEGORY_IDS: tuple[str, ...] = (
-    "m1_target_proximity_six_feature_set",
-    "main_rule_b_listing_robustness",
+# Verification-only bookkeeping. The governance decision forbids regenerating
+# these for a CLOSED part, so they are pinned exactly like the scientific
+# surface — by the closed-part registry, not by a per-part constant.
+PART_VERIFICATION_SUFFIXES: tuple[str, ...] = (
+    "qc_report.json",
+    "part5_successor_compatibility.json",
 )
-EXPECTED_NEXT_CATEGORY_ID = "expanded_rule_a_company_scope_robustness"
-EXPECTED_LAST_MICRO_PART = "stage126-m1-robustness-part2-listing-rule-b"
-ACTIVE_WORKSTREAM = "stage126_m1_financial_baseline"
-NEXT_RESEARCH_ACTION_ID = "stage126-m1-financial-baseline"
+
+
+def part_file_prefix(part_index: int) -> str:
+    """Naming convention shared by every robustness micro-part package."""
+    return f"stage126_m1_robustness_part{part_index}"
+
+
+def part_package_files(repo_root: Path, part_index: int) -> dict[str, dict[str, str]]:
+    """Discover a micro-part's COMPLETE package by convention.
+
+    Returns ``{"scientific": {...}, "verification": {...}, "code": {...}}`` with
+    repository-relative paths mapped to SHA-256. Nothing here is part-specific:
+    a future Part 3 is discovered by the same rules, with no source change.
+    """
+    prefix = part_file_prefix(part_index)
+    stage_dir = repo_root / STAGE126_DIR_REL
+
+    scientific: dict[str, str] = {}
+    for suffix in PART_SCIENTIFIC_SUFFIXES:
+        rel = f"{STAGE126_DIR_REL}/{prefix}_{suffix}"
+        if (repo_root / rel).is_file():
+            scientific[rel] = sha256_file(repo_root / rel)
+
+    verification: dict[str, str] = {}
+    for suffix in PART_VERIFICATION_SUFFIXES:
+        rel = f"{STAGE126_DIR_REL}/{prefix}_{suffix}"
+        if (repo_root / rel).is_file():
+            verification[rel] = sha256_file(repo_root / rel)
+    meta_rel = f"{STAGE126_DIR_REL}/metadata_and_hashes_{prefix}.json"
+    if (repo_root / meta_rel).is_file():
+        verification[meta_rel] = sha256_file(repo_root / meta_rel)
+    readme_prefix = f"README_{prefix.upper()}"
+    for path in sorted(stage_dir.glob("README_*.md")):
+        if path.name.upper().startswith(readme_prefix):
+            rel = f"{STAGE126_DIR_REL}/{path.name}"
+            verification[rel] = sha256_file(path)
+
+    code: dict[str, str] = {}
+    for directory, pattern in (
+        ("project/src", f"{prefix}_*.py"),
+        ("project", f"run_{prefix}_*.py"),
+        ("project/tests", f"test_{prefix}_*.py"),
+    ):
+        base = repo_root / directory
+        if not base.is_dir():
+            continue
+        for path in sorted(base.glob(pattern)):
+            rel = f"{directory}/{path.name}"
+            code[rel] = sha256_file(path)
+
+    return {
+        "scientific": dict(sorted(scientific.items())),
+        "verification": dict(sorted(verification.items())),
+        "code": dict(sorted(code.items())),
+    }
+
+
+def derive_micro_part_id(repo_root: Path, part_index: int, lock: dict[str, Any]) -> str:
+    """Deterministic micro-part identifier for a completed part.
+
+    Contract, in order: the completion lock's own ``micro_part_id``; otherwise
+    the part QC report's ``stage`` with underscores replaced by hyphens. Never a
+    hard-coded per-part string. Fails closed when neither surface supplies one.
+    """
+    declared = lock.get("micro_part_id")
+    if isinstance(declared, str) and declared:
+        return declared
+    qc_rel = f"{STAGE126_DIR_REL}/{part_file_prefix(part_index)}_qc_report.json"
+    if (repo_root / qc_rel).is_file():
+        stage = (_read_json(repo_root, qc_rel).get("stage") or "")
+        if stage:
+            return stage.replace("_", "-")
+    raise ValidationFail(
+        f"cannot derive a micro-part identifier for part {part_index} "
+        f"(no micro_part_id in the completion lock and no QC stage)"
+    )
+
 
 HANDOFF_STATE_REL = "project/docs/ai/handoff_state.json"
+
+# Architecture fields the live Handoff MUST carry, enforced inside
+# verify_handoff() itself (not merely reported).
+REQUIRED_HANDOFF_ARCHITECTURE_FIELDS: dict[str, Any] = {
+    "validation_architecture": VALIDATOR_VERSION,
+    "stage125_part5_mode": "historical_immutable",
+    "stage125_part5_live_gate_active": False,
+    "stage125_part5_future_regeneration_allowed": False,
+    "prior_robustness_verification_artifact_regeneration_allowed": False,
+    "prior_part_reopening_requires_scientific_error": True,
+    "prior_part_reopening_requires_explicit_human_authorization": True,
+}
+# Current-state validation pointers (distinct from the last scientific
+# micro-part QC — the two roles must never share one ambiguous field).
+CURRENT_STATE_QC_SCOPE = VALIDATOR_ID
+CURRENT_STATE_QC_PATH = f"{STAGE126_DIR_REL}/{F_REPORT}"
+CURRENT_STATE_QC_METADATA_PATH = f"{STAGE126_DIR_REL}/{F_METADATA}"
+
+# Research-action pointers. These are properties of the Stage126 research action
+# itself, not of how many robustness micro-parts have completed — a micro-part
+# never advances them, so they are stable across Parts 1-6.
+ACTIVE_WORKSTREAM = "stage126_m1_financial_baseline"
+NEXT_RESEARCH_ACTION_ID = "stage126-m1-financial-baseline"
 
 FINAL_TEST_LOCK_FIELDS: tuple[str, ...] = (
     "final_test_unlocked",
@@ -489,15 +545,6 @@ def build_boundary_manifest(repo_root: Path) -> dict[str, Any]:
         ),
     }
     tree = stage125_tree_hashes(repo_root)
-    parts: dict[str, Any] = {}
-    for category, pinned in sorted(PINNED_PART_SCIENTIFIC_ARTIFACTS.items()):
-        observed: dict[str, str] = {}
-        for name, expected in sorted(pinned.items()):
-            observed[name] = require_file_hash(
-                repo_root, f"{STAGE126_DIR_REL}/{name}", expected,
-                label=f"{category} scientific artifact",
-            )
-        parts[category] = observed
     return {
         "contract_id": "stage126_historical_boundary_manifest",
         "contract_version": DECISION_VERSION,
@@ -507,7 +554,6 @@ def build_boundary_manifest(repo_root: Path) -> dict[str, Any]:
         "stage125_tracked_file_count": len(tree),
         "stage125_tracked_files_sha256": dict(sorted(tree.items())),
         "stage125_tree_aggregate_sha256": stage125_tree_digest(tree),
-        "closed_micro_part_scientific_artifacts_sha256": parts,
         "primary_stage126_artifacts_sha256": dict(sorted(
             PINNED_PRIMARY_ARTIFACTS.items()
         )),
@@ -590,6 +636,7 @@ def discover_part(
     return {
         "part_index": part_index,
         "category_id": category_id,
+        "micro_part_id": derive_micro_part_id(repo_root, part_index, lock),
         "authorization_record": auth_rel,
         "completion_lock": lock_rel,
         "metadata_manifest": meta_rel if meta else "",
@@ -601,36 +648,139 @@ def discover_part(
     }
 
 
-def verify_part_scientific_artifacts(
+def closed_part_entry(
     repo_root: Path, part: dict[str, Any],
-) -> dict[str, str]:
-    """Verify a completed part's scientific surface against immutable hashes.
+) -> dict[str, Any]:
+    """Immutable package contract for one completed micro-part.
 
-    Pinned parts are checked against the boundary manifest pins. Any part —
-    pinned or not — is additionally checked against its OWN metadata manifest,
-    so a future Part 3 is protected the moment it lands, with no change here.
+    Built entirely from the part's own package by convention plus its own
+    completion lock — no per-part constant, so a future part is covered the
+    moment it lands.
     """
-    prefix = part_file_prefix(part["part_index"])
-    observed: dict[str, str] = {}
-    pinned = PINNED_PART_SCIENTIFIC_ARTIFACTS.get(part["category_id"], {})
-    for name, expected in sorted(pinned.items()):
-        observed[name] = require_file_hash(
-            repo_root, f"{STAGE126_DIR_REL}/{name}", expected,
-            label=f"{part['category_id']} scientific artifact",
+    files = part_package_files(repo_root, part["part_index"])
+    lock = part["lock"]
+    meta = part.get("metadata") or {}
+    scientific = files["scientific"]
+    if len(scientific) < 7:
+        raise ValidationFail(
+            f"part {part['part_index']} exposes only {len(scientific)} "
+            f"scientific artifacts (expected the full package)"
         )
-    meta_hashes = (part.get("metadata") or {}).get("output_files_sha256") or {}
-    for suffix in PART_SCIENTIFIC_SUFFIXES + PART_OPTIONAL_SCIENTIFIC_SUFFIXES:
-        name = f"{prefix}_{suffix}"
-        if name not in meta_hashes:
-            continue
-        got = sha256_file(repo_root / f"{STAGE126_DIR_REL}/{name}")
-        if got != meta_hashes[name]:
+    # Cross-check the part's own metadata manifest where it declares a hash.
+    for rel, got in scientific.items():
+        name = rel.rsplit("/", 1)[-1]
+        declared = (meta.get("output_files_sha256") or {}).get(name)
+        if declared is not None and declared != got:
             raise ValidationFail(
                 f"{part['category_id']} scientific artifact drifted from its "
                 f"own metadata manifest: {name}"
             )
-        observed.setdefault(name, got)
-    return observed
+    return {
+        "part_index": part["part_index"],
+        "category_id": part["category_id"],
+        "micro_part_id": part["micro_part_id"],
+        "authorization_record": part["authorization_record"],
+        "authorization_record_sha256": sha256_file(
+            repo_root / part["authorization_record"]
+        ),
+        "authorization_text_sha256": part["authorization_text_sha256"],
+        "authorization_consumed": lock.get("authorization_consumed") is True,
+        "completion_lock": part["completion_lock"],
+        "completion_lock_sha256": sha256_file(repo_root / part["completion_lock"]),
+        "next_registered_category": part["next_category_id"],
+        "final_test_lock_flags": {
+            field: lock.get(field, False)
+            for field in (
+                "final_test_unlocked", "final_test_access_authorized",
+                "final_test_evaluation_performed",
+                "full_development_refit_performed",
+            )
+        },
+        "scientific_artifacts_sha256": scientific,
+        "verification_artifacts_sha256": files["verification"],
+        "code_artifacts_sha256": files["code"],
+    }
+
+
+def micro_part_qc_pointers(
+    repo_root: Path, part: dict[str, Any] | None,
+) -> dict[str, Any]:
+    """Pointers to the last completed SCIENTIFIC micro-part QC report.
+
+    Derived from the part package by convention: the QC file lives at the part
+    prefix, and its scope is the QC report's own ``stage``. Deliberately kept
+    separate from the current-state validation pointers.
+    """
+    if not part:
+        return {"scope": "", "path": "", "assertions": 0, "failed": 0}
+    rel = f"{STAGE126_DIR_REL}/{part_file_prefix(part['part_index'])}_qc_report.json"
+    if not (repo_root / rel).is_file():
+        raise ValidationFail(f"completed part {part['part_index']} has no QC report")
+    qc = _read_json(repo_root, rel)
+    return {
+        "scope": qc.get("stage", ""),
+        "path": rel,
+        "assertions": qc.get("assertion_count", 0),
+        "failed": qc.get("failed_count", -1),
+    }
+
+
+def build_closed_part_registry(
+    repo_root: Path, completed: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Generic registry of every CLOSED micro-part package."""
+    return {
+        "contract_id": "stage126_closed_part_registry",
+        "contract_version": VALIDATOR_VERSION,
+        "decision_id": DECISION_ID,
+        "closed_part_count": len(completed),
+        "regeneration_allowed": False,
+        "parts": {
+            p["category_id"]: closed_part_entry(repo_root, p) for p in completed
+        },
+    }
+
+
+def verify_registry_immutability(
+    repo_root: Path, generated: dict[str, Any],
+) -> list[str]:
+    """Every already-registered file hash must still match, byte for byte.
+
+    Compares the freshly computed registry against the COMMITTED registry on
+    disk. Parts already recorded may never change — scientific OR
+    verification-only. New parts may be appended. Returns the drifted paths
+    (empty when clean) and raises on any drift.
+    """
+    committed_path = repo_root / STAGE126_DIR_REL / F_CLOSED_REGISTRY
+    if not committed_path.is_file():
+        return []
+    committed = json.loads(committed_path.read_text(encoding="utf-8"))
+    drifted: list[str] = []
+    for category, entry in (committed.get("parts") or {}).items():
+        fresh = (generated.get("parts") or {}).get(category)
+        if fresh is None:
+            raise ValidationFail(
+                f"closed part {category!r} disappeared from the registry — a "
+                f"completed micro-part may never be removed"
+            )
+        for bucket in ("scientific_artifacts_sha256",
+                       "verification_artifacts_sha256",
+                       "code_artifacts_sha256"):
+            for rel, want in (entry.get(bucket) or {}).items():
+                got = (fresh.get(bucket) or {}).get(rel)
+                if got != want:
+                    drifted.append(f"{bucket}:{rel}")
+        for field in ("authorization_record_sha256", "completion_lock_sha256",
+                      "authorization_text_sha256", "micro_part_id",
+                      "category_id", "part_index", "next_registered_category"):
+            if entry.get(field) != fresh.get(field):
+                drifted.append(f"{field}:{category}")
+    if drifted:
+        raise ValidationFail(
+            "closed micro-part package drift (regeneration or mutation of a "
+            f"closed part is forbidden): {sorted(drifted)}"
+        )
+    return drifted
 
 
 def completed_prefix(
@@ -732,9 +882,84 @@ def verify_selected_configurations(repo_root: Path) -> dict[str, str]:
     return expected
 
 
-def verify_handoff(repo_root: Path, completed_ids: list[str]) -> dict[str, Any]:
-    """Validate the live Handoff — WITHOUT the frozen Part 5 validator."""
+def verify_handoff(
+    repo_root: Path, completed_ids: list[str], *,
+    last_micro_part: str = "", micro_qc: dict[str, Any] | None = None,
+    strict_pointers: bool = True,
+) -> dict[str, Any]:
+    """Validate the live Handoff — WITHOUT the frozen Part 5 validator.
+
+    Enforces, fail-closed and inside this function:
+      * every required validation-architecture field, exactly;
+      * the current-state validation pointers, kept DISTINCT from the last
+        scientific micro-part QC pointers;
+      * the completed-category list and the derived last micro-part.
+
+    ``strict_pointers`` is False only during the bootstrap ``--build`` that
+    first creates these artifacts: a MISSING pointer is then tolerated, but a
+    pointer that is present and WRONG always fails.
+    """
     state = _read_json(repo_root, HANDOFF_STATE_REL)
+
+    # (1) Architecture fields — always strict, never merely reported.
+    for key, want in REQUIRED_HANDOFF_ARCHITECTURE_FIELDS.items():
+        if key not in state:
+            raise ValidationFail(
+                f"Handoff is missing required architecture field {key!r}"
+            )
+        if state.get(key) != want:
+            raise ValidationFail(
+                f"Handoff architecture field {key}={state.get(key)!r} != {want!r}"
+            )
+
+    # (2) Current-state validation pointers must be unambiguous and correct.
+    pointer_expected = {
+        "current_state_validation_scope": CURRENT_STATE_QC_SCOPE,
+        "current_state_validation_path": CURRENT_STATE_QC_PATH,
+        "current_state_validation_metadata_path": CURRENT_STATE_QC_METADATA_PATH,
+        "current_state_validation_failed": 0,
+        "current_state_validation_all_pass": True,
+    }
+    for key, want in pointer_expected.items():
+        if key not in state:
+            if strict_pointers:
+                raise ValidationFail(
+                    f"Handoff is missing current-state validation field {key!r}"
+                )
+            continue
+        if state.get(key) != want:
+            raise ValidationFail(
+                f"Handoff current-state field {key}={state.get(key)!r} != {want!r}"
+            )
+    # The scientific micro-part QC must be reported SEPARATELY and truthfully.
+    if last_micro_part:
+        mq = micro_qc or {}
+        for key, want in (
+            ("last_completed_micro_part_qc_scope", mq.get("scope")),
+            ("last_completed_micro_part_qc_path", mq.get("path")),
+            ("last_completed_micro_part_qc_assertions", mq.get("assertions")),
+            ("last_completed_micro_part_qc_failed", mq.get("failed")),
+        ):
+            if key not in state:
+                if strict_pointers:
+                    raise ValidationFail(f"Handoff is missing {key!r}")
+                continue
+            if state[key] != want:
+                raise ValidationFail(
+                    f"Handoff {key}={state[key]!r} != actual {want!r}"
+                )
+        declared = state.get("last_completed_micro_part_qc_path")
+        if declared and not (repo_root / declared).is_file():
+            raise ValidationFail(
+                f"Handoff micro-part QC path points at a missing file: {declared}"
+            )
+        if state.get("last_completed_micro_part") != last_micro_part:
+            raise ValidationFail(
+                f"Handoff last_completed_micro_part="
+                f"{state.get('last_completed_micro_part')!r} != "
+                f"{last_micro_part!r}"
+            )
+
     exact: dict[str, Any] = {
         "active_workstream": ACTIVE_WORKSTREAM,
         "next_research_action_id": NEXT_RESEARCH_ACTION_ID,
@@ -787,8 +1012,9 @@ def verify_no_unauthorized_execution(
 def build_validation_report(
     repo_root: Path, *, execution_order: list[str],
     completed: list[dict[str, Any]], completed_ids: list[str],
-    next_category: str, part_hashes: dict[str, dict[str, str]],
+    next_category: str, registry: dict[str, Any],
     primary_observed: dict[str, str], handoff: dict[str, Any],
+    last_micro_part: str, micro_qc: dict[str, Any],
 ) -> dict[str, Any]:
     return {
         "contract_id": VALIDATOR_ID,
@@ -800,6 +1026,9 @@ def build_validation_report(
         "stage125_part5_executed_by_this_validator": False,
         "stage125_part5_imported_by_this_validator": False,
         "registered_execution_order": list(execution_order),
+        # Derived, never hard-coded: execution_order[:n] and execution_order[n].
+        "completed_part_count": len(completed),
+        "expected_completed_prefix": execution_order[:len(completed)],
         "completed_category_ids": list(completed_ids),
         "completed_micro_parts": [
             {
@@ -808,6 +1037,7 @@ def build_validation_report(
                 "authorization_record": p["authorization_record"],
                 "completion_lock": p["completion_lock"],
                 "authorization_text_sha256": p["authorization_text_sha256"],
+                "micro_part_id": p["micro_part_id"],
             }
             for p in completed
         ],
@@ -822,10 +1052,18 @@ def build_validation_report(
         "final_test_predictor_values_inspected": False,
         "final_test_target_values_inspected": False,
         "final_test_evaluation_performed": False,
-        "last_completed_micro_part": handoff.get("last_completed_micro_part", ""),
+        # Derived from the newest completion lock / per-part QC contract.
+        "last_completed_micro_part": last_micro_part,
+        "current_state_validation_scope": CURRENT_STATE_QC_SCOPE,
+        "current_state_validation_path": CURRENT_STATE_QC_PATH,
+        "current_state_validation_metadata_path": CURRENT_STATE_QC_METADATA_PATH,
+        "last_completed_micro_part_qc_scope": micro_qc["scope"],
+        "last_completed_micro_part_qc_path": micro_qc["path"],
+        "last_completed_micro_part_qc_assertions": micro_qc["assertions"],
+        "last_completed_micro_part_qc_failed": micro_qc["failed"],
         "active_workstream": ACTIVE_WORKSTREAM,
         "next_research_action_id": NEXT_RESEARCH_ACTION_ID,
-        "closed_micro_part_scientific_artifacts_sha256": part_hashes,
+        "closed_part_registry": registry,
         "primary_stage126_artifacts_sha256": dict(sorted(primary_observed.items())),
         "prior_part_verification_artifact_regeneration_allowed": False,
         "prior_part_reopening_requires_scientific_error": True,
@@ -838,7 +1076,7 @@ def build_assertions(
     repo_root: Path, *, decision: dict[str, Any], manifest: dict[str, Any],
     report: dict[str, Any], execution_order: list[str],
     completed: list[dict[str, Any]], handoff: dict[str, Any],
-    source_text: str,
+    source_text: str, registry_drift: list[str],
 ) -> list[dict[str, Any]]:
     a: list[dict[str, Any]] = []
 
@@ -904,16 +1142,17 @@ def build_assertions(
         report["primary_stage126_artifacts_sha256"]
         == dict(sorted(PINNED_PRIMARY_ARTIFACTS.items())))
 
-    # Completed contiguous prefix.
-    add("completed_categories_exact",
-        tuple(report["completed_category_ids"])
-        == EXPECTED_COMPLETED_CATEGORY_IDS,
+    # Completed contiguous prefix — derived, not pinned to any part number.
+    n = report["completed_part_count"]
+    add("completed_prefix_is_execution_order_prefix",
+        list(report["completed_category_ids"]) == execution_order[:n]
+        == report["expected_completed_prefix"],
         str(report["completed_category_ids"]))
-    add("completed_prefix_is_contiguous",
-        list(report["completed_category_ids"])
-        == execution_order[:len(report["completed_category_ids"])])
-    add("next_category_exact",
-        report["next_category_id"] == EXPECTED_NEXT_CATEGORY_ID,
+    add("completed_part_count_matches_discovered_packages",
+        n == len(completed), str(n))
+    add("next_category_is_the_next_registered_entry",
+        report["next_category_id"]
+        == (execution_order[n] if n < len(execution_order) else ""),
         report["next_category_id"])
     add("next_category_not_authorized",
         report["next_category_authorized"] is False)
@@ -936,13 +1175,28 @@ def build_assertions(
             len(part["authorization_text_sha256"]) == 64)
 
     # Immutable scientific surfaces of closed micro-part packages.
-    for category, pinned in sorted(PINNED_PART_SCIENTIFIC_ARTIFACTS.items()):
-        observed = report["closed_micro_part_scientific_artifacts_sha256"].get(
-            category, {}
-        )
-        add(f"scientific_artifacts_immutable[{category}]",
-            all(observed.get(k) == v for k, v in pinned.items())
-            and len(pinned) >= 7)
+    registry_parts = report["closed_part_registry"]["parts"]
+    add("closed_part_registry_covers_every_completed_part",
+        sorted(registry_parts) == sorted(report["completed_category_ids"]))
+    for category, entry in sorted(registry_parts.items()):
+        add(f"scientific_artifacts_pinned[{category}]",
+            len(entry["scientific_artifacts_sha256"]) >= 7
+            and all(len(h) == 64
+                    for h in entry["scientific_artifacts_sha256"].values()))
+        # QC report + metadata manifest + README are the universal minimum; the
+        # Part 5 compatibility record exists only for the pre-freeze parts.
+        add(f"verification_artifacts_pinned[{category}]",
+            len(entry["verification_artifacts_sha256"]) >= 3
+            and all(len(h) == 64
+                    for h in entry["verification_artifacts_sha256"].values()))
+        add(f"code_artifacts_pinned[{category}]",
+            len(entry["code_artifacts_sha256"]) >= 1)
+        add(f"authorization_consumed[{category}]",
+            entry["authorization_consumed"] is True)
+        add(f"final_test_locked_in_lock[{category}]",
+            all(x is False for x in entry["final_test_lock_flags"].values()))
+    add("closed_part_registry_immutable", registry_drift == [],
+        str(registry_drift))
 
     # Final-test lock.
     add("final_test_locked_everywhere",
@@ -982,8 +1236,25 @@ def build_assertions(
     add("research_pointers_unchanged",
         report["active_workstream"] == ACTIVE_WORKSTREAM
         and report["next_research_action_id"] == NEXT_RESEARCH_ACTION_ID)
-    add("last_completed_micro_part_exact",
-        report["last_completed_micro_part"] == EXPECTED_LAST_MICRO_PART)
+    add("last_completed_micro_part_derived",
+        bool(report["last_completed_micro_part"])
+        and report["last_completed_micro_part"]
+        == (completed[-1]["micro_part_id"] if completed else ""))
+    # Current-state QC and the last scientific micro-part QC are separate roles.
+    add("current_state_qc_pointers_exact",
+        report["current_state_validation_scope"] == CURRENT_STATE_QC_SCOPE
+        and report["current_state_validation_path"] == CURRENT_STATE_QC_PATH
+        and report["current_state_validation_metadata_path"]
+        == CURRENT_STATE_QC_METADATA_PATH)
+    add("micro_part_qc_pointer_is_distinct_from_current_state_qc",
+        report["last_completed_micro_part_qc_scope"]
+        != report["current_state_validation_scope"]
+        and report["last_completed_micro_part_qc_path"]
+        != report["current_state_validation_path"]
+        and (repo_root / report["last_completed_micro_part_qc_path"]).is_file())
+    add("handoff_architecture_fields_enforced",
+        all(handoff.get(k) == want
+            for k, want in REQUIRED_HANDOFF_ARCHITECTURE_FIELDS.items()))
     return a
 
 
@@ -1043,6 +1314,7 @@ def build_readme(report: dict[str, Any]) -> str:
         "",
         "| field | value |",
         "|---|---|",
+        f"| completed parts | {report['completed_part_count']} |",
         f"| completed categories | {', '.join(f'`{c}`' for c in report['completed_category_ids'])} |",
         f"| next category | `{report['next_category_id']}` |",
         f"| next category authorized | {str(report['next_category_authorized']).lower()} |",
@@ -1080,7 +1352,9 @@ def build_readme(report: dict[str, Any]) -> str:
 # Build-all + run
 # --------------------------------------------------------------------------- #
 
-def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
+def build_all(
+    repo_root: Path, *, strict_pointers: bool = True,
+) -> tuple[dict[str, str], dict[str, Any]]:
     verify_decision_text()
     decision = build_decision_record()
     manifest = build_boundary_manifest(repo_root)
@@ -1092,32 +1366,37 @@ def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
     verify_final_test_lock(repo_root)
 
     completed, completed_ids = completed_prefix(repo_root, execution_order)
-    part_hashes = {
-        p["category_id"]: verify_part_scientific_artifacts(repo_root, p)
-        for p in completed
-    }
+    registry = build_closed_part_registry(repo_root, completed)
+    registry_drift = verify_registry_immutability(repo_root, registry)
+    last_micro_part = completed[-1]["micro_part_id"] if completed else ""
+    micro_qc = micro_part_qc_pointers(repo_root, completed[-1] if completed else None)
     next_category = verify_no_unauthorized_execution(
         repo_root, execution_order, completed,
     )
-    handoff = verify_handoff(repo_root, completed_ids)
+    handoff = verify_handoff(
+        repo_root, completed_ids, last_micro_part=last_micro_part,
+        micro_qc=micro_qc, strict_pointers=strict_pointers,
+    )
 
     report = build_validation_report(
         repo_root, execution_order=execution_order, completed=completed,
         completed_ids=completed_ids, next_category=next_category,
-        part_hashes=part_hashes, primary_observed=primary_observed,
-        handoff=handoff,
+        registry=registry, primary_observed=primary_observed,
+        handoff=handoff, last_micro_part=last_micro_part, micro_qc=micro_qc,
     )
     readme = build_readme(report)
     content = {
         F_DECISION: _json_str(decision),
         F_BOUNDARY_MANIFEST: _json_str(manifest),
+        F_CLOSED_REGISTRY: _json_str(registry),
         F_REPORT: _json_str(report),
         F_README: readme,
     }
     extras = {
         "decision": decision, "manifest": manifest, "report": report,
         "execution_order": execution_order, "completed": completed,
-        "handoff": handoff, "part_hashes": part_hashes,
+        "handoff": handoff, "registry": registry,
+        "registry_drift": registry_drift, "last_micro_part": last_micro_part,
     }
     return content, extras
 
@@ -1157,14 +1436,16 @@ def run(
     canonical_out = (repo_root / STAGE126_DIR_REL).resolve()
     out_dir = Path(output_dir).resolve() if output_dir else canonical_out
 
-    content, extras = build_all(repo_root)
+    # A bootstrap --build may run before the Handoff carries the new
+    # current-state pointers; a pointer that is PRESENT and wrong always fails.
+    content, extras = build_all(repo_root, strict_pointers=check)
 
     source_text = (repo_root / SRC_REL).read_text(encoding="utf-8")
     assertions = build_assertions(
         repo_root, decision=extras["decision"], manifest=extras["manifest"],
         report=extras["report"], execution_order=extras["execution_order"],
         completed=extras["completed"], handoff=extras["handoff"],
-        source_text=source_text,
+        source_text=source_text, registry_drift=extras["registry_drift"],
     )
     failed = sum(1 for x in assertions if x["status"] != "PASS")
 
@@ -1207,6 +1488,10 @@ def run(
             extras["manifest"]["stage125_tree_aggregate_sha256"],
         "stage125_part5_executed": False,
         "stage125_part5_imported": False,
+        "closed_part_count": extras["registry"]["closed_part_count"],
+        "last_completed_micro_part": extras["last_micro_part"],
+        "current_state_validation_scope": CURRENT_STATE_QC_SCOPE,
+        "current_state_validation_path": CURRENT_STATE_QC_PATH,
         "assertions": assertions,
         **boundary_handoff_markers(),
     }
@@ -1234,6 +1519,7 @@ def run(
         "report": extras["report"],
         "decision": extras["decision"],
         "manifest": extras["manifest"],
+        "registry": extras["registry"],
         "assertions": assertions,
         "output_dir": str(out_dir),
         "files": files_written,

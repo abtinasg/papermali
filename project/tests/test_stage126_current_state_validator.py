@@ -278,46 +278,82 @@ def test_part_scientific_artifacts_are_immutable(pinned, label):
         assert _sha(Path(STAGE126) / name) == want, f"{label}:{name}"
 
 
-def test_boundary_manifest_pins_both_closed_packages():
-    manifest = _read_json(v.F_BOUNDARY_MANIFEST)
-    closed = manifest["closed_micro_part_scientific_artifacts_sha256"]
-    assert set(closed) == {
+def test_closed_part_registry_pins_both_packages():
+    registry = _read_json(v.F_CLOSED_REGISTRY)
+    assert registry["closed_part_count"] == 2
+    assert registry["regeneration_allowed"] is False
+    parts = registry["parts"]
+    assert set(parts) == {
         "m1_target_proximity_six_feature_set", "main_rule_b_listing_robustness",
     }
-    assert closed["m1_target_proximity_six_feature_set"] == PART1_SCIENTIFIC
-    assert closed["main_rule_b_listing_robustness"] == PART2_SCIENTIFIC
+    for category, pinned in (
+        ("m1_target_proximity_six_feature_set", PART1_SCIENTIFIC),
+        ("main_rule_b_listing_robustness", PART2_SCIENTIFIC),
+    ):
+        recorded = parts[category]["scientific_artifacts_sha256"]
+        for name, want in pinned.items():
+            rel = f"project/stage126/{name}"
+            assert recorded[rel] == want, (category, name)
 
 
-def test_scientific_artifact_drift_fails_closed(monkeypatch):
-    bad = {k: dict(v_) for k, v_ in v.PINNED_PART_SCIENTIFIC_ARTIFACTS.items()}
-    bad["main_rule_b_listing_robustness"][
-        "stage126_m1_robustness_part2_metrics.csv"
-    ] = "0" * 64
-    monkeypatch.setattr(v, "PINNED_PART_SCIENTIFIC_ARTIFACTS", bad)
+CLOSED_VERIFICATION_ARTIFACTS = {
+    "m1_target_proximity_six_feature_set": [
+        "project/stage126/stage126_m1_robustness_part1_qc_report.json",
+        "project/stage126/metadata_and_hashes_stage126_m1_robustness_part1.json",
+        "project/stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json",
+        "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md",
+    ],
+    "main_rule_b_listing_robustness": [
+        "project/stage126/stage126_m1_robustness_part2_qc_report.json",
+        "project/stage126/metadata_and_hashes_stage126_m1_robustness_part2.json",
+        "project/stage126/stage126_m1_robustness_part2_part5_successor_compatibility.json",
+        "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART2_LISTING_RULE_B.md",
+    ],
+}
+
+
+def test_closed_verification_artifacts_are_pinned_exactly():
+    """Verification-only artifacts are pinned too — the decision forbids drift."""
+    registry = _read_json(v.F_CLOSED_REGISTRY)
+    for category, expected_paths in CLOSED_VERIFICATION_ARTIFACTS.items():
+        recorded = registry["parts"][category]["verification_artifacts_sha256"]
+        for rel in expected_paths:
+            assert rel in recorded, (category, rel)
+            assert recorded[rel] == _sha(_root() / rel), rel
+    # Source, runner and tests of the closed packages are pinned as well.
+    for category in CLOSED_VERIFICATION_ARTIFACTS:
+        code = registry["parts"][category]["code_artifacts_sha256"]
+        assert len(code) >= 3, (category, sorted(code))
+        for rel, want in code.items():
+            assert _sha(_root() / rel) == want, rel
+
+
+@pytest.mark.parametrize("victim", [
+    "project/stage126/stage126_m1_robustness_part1_qc_report.json",
+    "project/stage126/metadata_and_hashes_stage126_m1_robustness_part2.json",
+    "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md",
+    "project/stage126/stage126_m1_robustness_part2_part5_successor_compatibility.json",
+    "project/stage126/stage126_m1_robustness_part2_metrics.csv",
+], ids=["part1_qc", "part2_metadata", "part1_readme", "part2_compat",
+        "part2_scientific"])
+def test_closed_package_byte_drift_fails_full_validation(tmp_path, victim):
+    """Mutating ONE byte of a closed package must fail FULL current-state validation."""
+    root = _mirror(tmp_path)
+    target = root / victim
+    target.write_bytes(target.read_bytes() + b" ")
     with pytest.raises(v.ValidationFail):
-        v.build_boundary_manifest(_root())
+        v.build_all(root, strict_pointers=False)
 
 
 def test_prior_part_verification_artifacts_are_not_regenerated():
-    """The boundary must pin scientific artifacts WITHOUT pinning bookkeeping.
-
-    Verification-only artifacts (QC report, metadata manifest, Part 5
-    compatibility record, README) are deliberately outside the immutable set,
-    and the policy forbids regenerating them from a later part.
-    """
     manifest = _read_json(v.F_BOUNDARY_MANIFEST)
-    closed = manifest["closed_micro_part_scientific_artifacts_sha256"]
-    for category, files in closed.items():
-        for name in files:
-            assert "qc_report" not in name, (category, name)
-            assert not name.startswith("metadata_and_hashes"), (category, name)
-            assert "part5_successor_compatibility" not in name, (category, name)
-            assert not name.startswith("README"), (category, name)
     assert manifest[
         "regeneration_of_earlier_part_verification_artifacts_allowed"
     ] is False
     report = _read_json(v.F_REPORT)
     assert report["prior_part_verification_artifact_regeneration_allowed"] is False
+    registry = _read_json(v.F_CLOSED_REGISTRY)
+    assert registry["regeneration_allowed"] is False
 
 
 def test_no_closed_part_artifact_embeds_a_mutable_current_test_hash():
@@ -343,6 +379,26 @@ def test_no_closed_part_artifact_embeds_a_mutable_current_test_hash():
 # --------------------------------------------------------------------------- #
 # Current state
 # --------------------------------------------------------------------------- #
+
+def test_no_hard_coded_current_state_constants():
+    """The three current-state constants must no longer exist."""
+    for name in ("EXPECTED_COMPLETED_CATEGORY_IDS", "EXPECTED_NEXT_CATEGORY_ID",
+                 "EXPECTED_LAST_MICRO_PART"):
+        assert not hasattr(v, name), name
+    src = open(os.path.join(REAL_ROOT, v.SRC_REL), encoding="utf-8").read()
+    for name in ("EXPECTED_COMPLETED_CATEGORY_IDS", "EXPECTED_NEXT_CATEGORY_ID",
+                 "EXPECTED_LAST_MICRO_PART"):
+        assert name not in src, name
+
+
+def test_current_state_is_derived_from_the_registered_order():
+    report = _read_json(v.F_REPORT)
+    order = report["registered_execution_order"]
+    n = report["completed_part_count"]
+    assert report["completed_category_ids"] == order[:n]
+    assert report["expected_completed_prefix"] == order[:n]
+    assert report["next_category_id"] == (order[n] if n < len(order) else "")
+
 
 def test_completed_categories_and_next_category():
     report = _read_json(v.F_REPORT)
@@ -390,6 +446,65 @@ def test_research_pointers_unchanged():
     assert report["next_research_action_id"] == "stage126-m1-financial-baseline"
 
 
+@pytest.mark.parametrize("field", sorted(
+    v.REQUIRED_HANDOFF_ARCHITECTURE_FIELDS
+))
+def test_mutating_each_handoff_architecture_field_fails_the_real_validator(
+    tmp_path, field,
+):
+    """Each architecture field is enforced INSIDE verify_handoff, not just reported."""
+    root = _mirror(tmp_path)
+    path = root / v.HANDOFF_STATE_REL
+    state = json.loads(path.read_text(encoding="utf-8"))
+    original = state[field]
+    state[field] = "TAMPERED" if isinstance(original, str) else (not original)
+    path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8")
+    with pytest.raises(v.ValidationFail) as exc:
+        v.build_all(root, strict_pointers=False)
+    assert field in str(exc.value)
+
+
+@pytest.mark.parametrize("field", sorted(
+    v.REQUIRED_HANDOFF_ARCHITECTURE_FIELDS
+))
+def test_removing_each_handoff_architecture_field_fails_the_real_validator(
+    tmp_path, field,
+):
+    root = _mirror(tmp_path)
+    path = root / v.HANDOFF_STATE_REL
+    state = json.loads(path.read_text(encoding="utf-8"))
+    del state[field]
+    path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8")
+    with pytest.raises(v.ValidationFail) as exc:
+        v.build_all(root, strict_pointers=False)
+    assert field in str(exc.value)
+
+
+def test_wrong_current_state_pointer_fails_even_when_not_strict(tmp_path):
+    """A pointer that is PRESENT and wrong always fails, in either mode."""
+    root = _mirror(tmp_path)
+    path = root / v.HANDOFF_STATE_REL
+    state = json.loads(path.read_text(encoding="utf-8"))
+    state["current_state_validation_path"] = "project/stage126/WRONG.json"
+    path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8")
+    with pytest.raises(v.ValidationFail):
+        v.build_all(root, strict_pointers=False)
+
+
+def test_wrong_micro_part_qc_count_fails(tmp_path):
+    root = _mirror(tmp_path)
+    path = root / v.HANDOFF_STATE_REL
+    state = json.loads(path.read_text(encoding="utf-8"))
+    state["last_completed_micro_part_qc_assertions"] = 1
+    path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8")
+    with pytest.raises(v.ValidationFail):
+        v.build_all(root, strict_pointers=False)
+
+
 def test_handoff_carries_boundary_markers():
     state = json.loads(
         (_root() / v.HANDOFF_STATE_REL).read_text(encoding="utf-8")
@@ -420,12 +535,20 @@ def _mirror(tmp_path: Path) -> Path:
         dst = root / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copytree(src, dst)
-    # Top-level runners the boundary pins by hash.
-    for rel in (v.PART5_RUNNER_REL, v.RUN_REL):
-        src = Path(REAL_ROOT) / rel
-        if src.is_file():
-            (root / rel).parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, root / rel)
+    # Every top-level runner: the closed-part registry pins each part's runner.
+    (root / "project").mkdir(parents=True, exist_ok=True)
+    for src in sorted((Path(REAL_ROOT) / "project").glob("*.py")):
+        shutil.copy2(src, root / "project" / src.name)
+    # The validator enumerates the frozen Stage125 tree via `git ls-files`, so
+    # the mirror must be a real repository with the same ignore rules (the
+    # part3c_outputs inputs are gitignored and therefore untracked upstream).
+    shutil.copy2(Path(REAL_ROOT) / ".gitignore", root / ".gitignore")
+    import subprocess
+    for args in (["init", "-q"], ["add", "-A"],
+                 ["-c", "user.email=t@t", "-c", "user.name=t",
+                  "commit", "-qm", "mirror"]):
+        subprocess.run(["git", "-C", str(root), *args], check=True,
+                       capture_output=True)
     return root
 
 
@@ -441,11 +564,11 @@ def test_handoff_timestamp_change_does_not_reopen_a_closed_part(tmp_path):
     state["observed_repository_head_commit"] = "a" * 40
     state_path.write_text(json.dumps(state, indent=2), encoding="utf-8")
     # Current state still validates and nothing in the closed package moved.
-    completed, ids = v.completed_prefix(
-        root, list(v.EXPECTED_COMPLETED_CATEGORY_IDS)
-        + ["expanded_rule_a_company_scope_robustness"],
-    )
-    assert ids == list(v.EXPECTED_COMPLETED_CATEGORY_IDS)
+    order = json.loads(
+        (root / v.PART0_DECISION_RECORD_REL).read_text(encoding="utf-8")
+    )["execution_order"]
+    completed, ids = v.completed_prefix(root, order)
+    assert ids == order[:2]
     after = {
         name: _sha(root / "project/stage126" / name) for name in PART2_SCIENTIFIC
     }
@@ -477,24 +600,40 @@ def test_new_current_test_hash_does_not_regenerate_a_closed_part(tmp_path):
 # Generic future-part advancement
 # --------------------------------------------------------------------------- #
 
-def _synthetic_part3(root: Path) -> None:
-    """Write a minimal, VALID Part 3 package into a mirrored repository."""
+def _synthetic_part3(root: Path) -> str:
+    """Write a COMPLETE, valid synthetic Part 3 package into a mirrored repo.
+
+    Mirrors the real per-part package contract exactly: authorization record,
+    completion lock, the full scientific surface, QC report, metadata manifest
+    and README. Nothing here touches Part 1, Part 2 or Stage125.
+    """
     d = root / "project/stage126"
     prefix = "stage126_m1_robustness_part3"
+    micro_id = "stage126-m1-robustness-part3-expanded-rule-a"
+    qc_scope = "stage126_m1_robustness_part3_expanded_rule_a"
+
     (d / f"{prefix}_human_authorization_record.json").write_text(json.dumps({
         "authorization_id": "stage126-m1-robustness-part3-human-authorization",
         "authorized_category_id": "expanded_rule_a_company_scope_robustness",
-        "human_authorization_text": "synthetic",
-        "human_authorization_text_sha256": "3" * 64,
+        "human_authorization_text": "synthetic part 3 authorization",
+        "human_authorization_text_sha256": hashlib.sha256(
+            b"synthetic part 3 authorization"
+        ).hexdigest(),
         "part3_execution_authorized": True,
-    }), encoding="utf-8")
+        "merge_authorized": False,
+    }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
     (d / f"{prefix}_completion_lock.json").write_text(json.dumps({
         "category_id": "expanded_rule_a_company_scope_robustness",
+        "micro_part_id": micro_id,
         "part3_human_authorized": True,
         "part3_execution_completed": True,
         "authorization_consumed": True,
         "development_only": True,
         "part4_execution_authorized": False,
+        "m1_robustness_execution_authorized": False,
+        "m1_robustness_started": True,
+        "m1_robustness_completed": False,
         "full_development_refit_performed": False,
         "final_test_unlocked": False,
         "final_test_access_authorized": False,
@@ -510,52 +649,145 @@ def _synthetic_part3(root: Path) -> None:
             "expanded_rule_a_company_scope_robustness",
         ],
         "next_category_id": "expanded_rule_b_combined_robustness",
-    }), encoding="utf-8")
+    }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    payloads = {
+        f"{prefix}_feature_manifest.csv": "feature_order,feature_name\n1,synthetic\n",
+        f"{prefix}_execution_manifest.json": json.dumps(
+            {"category_id": "expanded_rule_a_company_scope_robustness"},
+            indent=2, sort_keys=True) + "\n",
+        f"{prefix}_oof_predictions.csv": "ticker,predicted_probability\nX,0.5\n",
+        f"{prefix}_metrics.csv": "model_family,scope,pr_auc\nrf,pooled,0.4\n",
+        f"{prefix}_primary_comparison.json": json.dumps(
+            {"scientific_role": "sample_robustness_sensitivity_only"},
+            indent=2, sort_keys=True) + "\n",
+    }
+    for name, text in payloads.items():
+        (d / name).write_text(text, encoding="utf-8")
+
+    (d / f"{prefix}_qc_report.json").write_text(json.dumps({
+        "stage": qc_scope,
+        "assertion_count": 7,
+        "failed_count": 0,
+        "all_pass": True,
+    }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    scientific_names = list(payloads) + [
+        f"{prefix}_human_authorization_record.json",
+        f"{prefix}_completion_lock.json",
+    ]
+    (d / f"metadata_and_hashes_{prefix}.json").write_text(json.dumps({
+        "stage": qc_scope,
+        "output_files_sha256": {
+            name: hashlib.sha256((d / name).read_bytes()).hexdigest()
+            for name in sorted(scientific_names)
+        },
+    }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (d / f"README_{prefix.upper()}.md").write_text(
+        "# Synthetic Part 3\n", encoding="utf-8")
+
+    # A real part also ships source, runner and tests — the registry pins them.
+    (root / "project/src" / f"{prefix}_expanded_rule_a.py").write_text(
+        '"""Synthetic Part 3 implementation."""\n', encoding="utf-8")
+    (root / "project" / f"run_{prefix}_expanded_rule_a.py").write_text(
+        '"""Synthetic Part 3 runner."""\n', encoding="utf-8")
+    (root / "project/tests" / f"test_{prefix}_expanded_rule_a.py").write_text(
+        '"""Synthetic Part 3 tests."""\n', encoding="utf-8")
+    return micro_id
 
 
-def test_hypothetical_next_completion_advances_without_touching_earlier_parts(tmp_path):
-    """A valid Part 3 must be recognized with ZERO changes to earlier files.
+def _set_handoff_to_part3(root: Path, micro_id: str) -> None:
+    """Update the mirrored Handoff to the truthful Part 3-completed state."""
+    path = root / v.HANDOFF_STATE_REL
+    state = json.loads(path.read_text(encoding="utf-8"))
+    state["last_completed_micro_part"] = micro_id
+    state["m1_robustness_completed_category_ids"] = [
+        "m1_target_proximity_six_feature_set",
+        "main_rule_b_listing_robustness",
+        "expanded_rule_a_company_scope_robustness",
+    ]
+    state["last_completed_micro_part_qc_scope"] = (
+        "stage126_m1_robustness_part3_expanded_rule_a"
+    )
+    state["last_completed_micro_part_qc_path"] = (
+        "project/stage126/stage126_m1_robustness_part3_qc_report.json"
+    )
+    state["last_completed_micro_part_qc_assertions"] = 7
+    state["last_completed_micro_part_qc_failed"] = 0
+    path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8")
 
-    This is the generic-design guarantee: no new validator branch, and no
-    Part 1, Part 2 or Stage125 file may be modified.
+
+def test_end_to_end_synthetic_part3_build_and_check(tmp_path):
+    """FULL validator build + check on a mirrored repo with a valid Part 3.
+
+    Runs the real build/check code paths — no monkeypatching of any expected
+    current-state constant (they no longer exist) — and proves Part 1, Part 2
+    and Stage125 stay byte-identical.
     """
     root = _mirror(tmp_path)
     watched = (
         [f"project/stage126/{n}" for n in
          list(PART1_SCIENTIFIC) + list(PART2_SCIENTIFIC)]
-        + [
-            "project/stage126/stage126_m1_robustness_part1_qc_report.json",
-            "project/stage126/metadata_and_hashes_stage126_m1_robustness_part1.json",
-            "project/stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json",
-            "project/stage126/stage126_m1_robustness_part2_qc_report.json",
-            "project/stage126/metadata_and_hashes_stage126_m1_robustness_part2.json",
-            "project/stage126/stage126_m1_robustness_part2_part5_successor_compatibility.json",
-            v.PART5_SOURCE_REL, v.PART5_RUNNER_REL, v.PART5_TEST_REL,
-        ]
+        + [rel for paths in CLOSED_VERIFICATION_ARTIFACTS.values() for rel in paths]
+        + [v.PART5_SOURCE_REL, v.PART5_RUNNER_REL, v.PART5_TEST_REL]
+        + [f"project/stage125/{p.name}"
+           for p in sorted((Path(REAL_ROOT) / "project/stage125").glob("*.json"))]
     )
     before = {rel: _sha(root / rel) for rel in watched}
 
-    order = json.loads(
-        (root / v.PART0_DECISION_RECORD_REL).read_text(encoding="utf-8")
-    )["execution_order"]
-    completed_before, ids_before = v.completed_prefix(root, order)
-    assert ids_before == list(v.EXPECTED_COMPLETED_CATEGORY_IDS)
+    micro_id = _synthetic_part3(root)
+    _set_handoff_to_part3(root, micro_id)
 
-    _synthetic_part3(root)
+    built = v.run(project_dir=root / "project", build=True)
+    assert built["metadata"]["all_pass"] is True
 
-    completed_after, ids_after = v.completed_prefix(root, order)
-    assert ids_after == [
+    checked = v.run(project_dir=root / "project", check=True)
+    assert checked["drift"] == []
+    assert checked["metadata"]["all_pass"] is True
+
+    report = checked["report"]
+    assert report["completed_category_ids"] == [
         "m1_target_proximity_six_feature_set",
         "main_rule_b_listing_robustness",
         "expanded_rule_a_company_scope_robustness",
     ]
-    assert len(completed_after) == len(completed_before) + 1
-    assert v.verify_no_unauthorized_execution(root, order, completed_after) == (
-        "expanded_rule_b_combined_robustness"
+    assert report["completed_part_count"] == 3
+    assert report["next_category_id"] == "expanded_rule_b_combined_robustness"
+    assert report["last_completed_micro_part"] == micro_id
+    assert report["last_completed_micro_part_qc_scope"] == (
+        "stage126_m1_robustness_part3_expanded_rule_a"
     )
-    # Not one earlier-part or Stage125 file changed.
+    assert report["last_completed_micro_part_qc_assertions"] == 7
+    assert set(report["closed_part_registry"]["parts"]) == {
+        "m1_target_proximity_six_feature_set",
+        "main_rule_b_listing_robustness",
+        "expanded_rule_a_company_scope_robustness",
+    }
+
     after = {rel: _sha(root / rel) for rel in watched}
     assert before == after
+    assert _sha(root / v.SRC_REL) == _sha(Path(REAL_ROOT) / v.SRC_REL)
+
+
+def test_end_to_end_skipped_part3_with_part4_present_fails(tmp_path):
+    """A Part 4 package without Part 3 must fail the FULL validator."""
+    root = _mirror(tmp_path)
+    d = root / "project/stage126"
+    for name, payload in (
+        ("stage126_m1_robustness_part4_human_authorization_record.json",
+         {"authorized_category_id": "expanded_rule_b_combined_robustness"}),
+        ("stage126_m1_robustness_part4_completion_lock.json",
+         {"category_id": "expanded_rule_b_combined_robustness",
+          "micro_part_id": "stage126-m1-robustness-part4",
+          "part4_execution_completed": True, "part4_human_authorized": True,
+          "authorization_consumed": True, "development_only": True,
+          "part5_execution_authorized": False}),
+    ):
+        (d / name).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n",
+                              encoding="utf-8")
+    with pytest.raises(v.ValidationFail):
+        v.run(project_dir=root / "project", build=True)
 
 
 def test_skipped_category_fails_closed(tmp_path):
