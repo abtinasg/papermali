@@ -147,6 +147,10 @@ ALLOWLIST_FILES = (
     "project/src/stage126_m1_robustness_part2_listing_rule_b.py",
     "project/run_stage126_m1_robustness_part2_listing_rule_b.py",
     "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py",
+    # Stage126 independent current-state validator code, runner, and tests.
+    "project/src/stage126_current_state_validator.py",
+    "project/run_stage126_current_state_validator.py",
+    "project/tests/test_stage126_current_state_validator.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
@@ -394,6 +398,12 @@ ARTIFACT_ONLY_FILES = (
     "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART2_LISTING_RULE_B.md",
     "project/stage126/stage126_m1_robustness_part2_qc_report.json",
     "project/stage126/metadata_and_hashes_stage126_m1_robustness_part2.json",
+    # Stage126 validation-architecture boundary artifacts.
+    "project/stage126/stage126_validation_architecture_boundary_decision.json",
+    "project/stage126/stage126_historical_boundary_manifest.json",
+    "project/stage126/stage126_current_state_validation_report.json",
+    "project/stage126/README_STAGE126_CURRENT_STATE_VALIDATION.md",
+    "project/stage126/metadata_and_hashes_stage126_current_state_validator.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -1349,7 +1359,101 @@ def derive_m1_robustness_decision_markers(root: str) -> dict:
     }
     # Layer completed-category state on top (Part 1 onward), fail-closed.
     markers.update(derive_m1_robustness_part1_markers(root, expected_order))
+    markers.update(derive_validation_architecture_markers(root))
     return markers
+
+
+_BOUNDARY_DECISION_REL = (
+    "project/stage126/stage126_validation_architecture_boundary_decision.json"
+)
+_BOUNDARY_MANIFEST_REL = (
+    "project/stage126/stage126_historical_boundary_manifest.json"
+)
+_CURRENT_STATE_REPORT_REL = (
+    "project/stage126/stage126_current_state_validation_report.json"
+)
+_BOUNDARY_DECISION_SHA256 = (
+    "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1"
+)
+_VALIDATION_ARCHITECTURE = "stage126_current_state_validator_v1"
+
+
+def derive_validation_architecture_markers(root: str) -> dict:
+    """Derive the validation-architecture boundary markers (fail-closed).
+
+    Emitted only when the boundary decision, the historical manifest and the
+    current-state validation report are all present and mutually consistent.
+    Stage125 Part 5 is recorded as historical/immutable and NOT a live gate.
+    """
+    paths = [
+        os.path.join(root, rel) for rel in (
+            _BOUNDARY_DECISION_REL, _BOUNDARY_MANIFEST_REL,
+            _CURRENT_STATE_REPORT_REL,
+        )
+    ]
+    present = [os.path.isfile(p) for p in paths]
+    if not any(present):
+        return {}
+    if not all(present):
+        raise HandoffError(
+            "validation-architecture boundary artifacts are only partially "
+            "present (fail-closed)"
+        )
+    try:
+        decision = json.load(open(paths[0], encoding="utf-8"))
+        manifest = json.load(open(paths[1], encoding="utf-8"))
+        report = json.load(open(paths[2], encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable boundary artifacts: {exc}") from exc
+
+    text = decision.get("human_decision_text")
+    if not isinstance(text, str):
+        raise HandoffError("boundary decision text missing")
+    if hashlib.sha256(text.encode("utf-8")).hexdigest() != _BOUNDARY_DECISION_SHA256:
+        raise HandoffError("boundary decision text SHA-256 mismatch")
+    if decision.get("human_decision_text_sha256") != _BOUNDARY_DECISION_SHA256:
+        raise HandoffError("boundary decision hash field mismatch")
+    if decision.get("decision_locked") is not True:
+        raise HandoffError("boundary decision is not locked")
+    for key, want in (
+        ("merge", False), ("part3_execution", False),
+        ("full_development_refit", False), ("final_test_access", False),
+        ("final_test_evaluation", False), ("new_scientific_execution", False),
+    ):
+        if (decision.get("does_not_authorize") or {}).get(key) is not want:
+            raise HandoffError(f"boundary decision must deny {key}")
+
+    arch = decision.get("architecture") or {}
+    if arch.get("stage125_part5_mode") != "historical_immutable":
+        raise HandoffError("boundary decision does not freeze Stage125 Part 5")
+    if arch.get("stage125_part5_is_live_successor_validator") is not False:
+        raise HandoffError("boundary decision still treats Part 5 as live")
+    if arch.get("stage126_current_state_validator_version") != \
+            _VALIDATION_ARCHITECTURE:
+        raise HandoffError("boundary decision validator version mismatch")
+    if manifest.get("stage125_part5_mode") != "historical_immutable":
+        raise HandoffError("boundary manifest does not freeze Stage125 Part 5")
+    if manifest.get(
+        "regeneration_of_earlier_part_verification_artifacts_allowed"
+    ) is not False:
+        raise HandoffError("boundary manifest permits prior-part regeneration")
+    if report.get("stage125_part5_live_gate_active") is not False:
+        raise HandoffError("validation report still marks Part 5 as a live gate")
+    if report.get("contract_version") != _VALIDATION_ARCHITECTURE:
+        raise HandoffError("validation report version mismatch")
+    if report.get("prior_part_verification_artifact_regeneration_allowed") \
+            is not False:
+        raise HandoffError("validation report permits prior-part regeneration")
+
+    return {
+        "validation_architecture": _VALIDATION_ARCHITECTURE,
+        "stage125_part5_mode": "historical_immutable",
+        "stage125_part5_live_gate_active": False,
+        "stage125_part5_future_regeneration_allowed": False,
+        "prior_robustness_verification_artifact_regeneration_allowed": False,
+        "prior_part_reopening_requires_scientific_error": True,
+        "prior_part_reopening_requires_explicit_human_authorization": True,
+    }
 
 
 _M1_ROBUSTNESS_PART1_AUTH_REL = (
