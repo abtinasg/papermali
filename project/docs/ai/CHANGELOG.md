@@ -3,6 +3,74 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-23 — Stage126 M1 Robustness Part 2 (listing Rule B sample)
+
+- **Part 2 was explicitly human-authorized and completed on the development
+  folds.** Executed the registered robustness category
+  `main_rule_b_listing_robustness` under the merged Part 0 execution contract.
+  **Only the sample changed** — from `main_rule_a_primary` to
+  `main_rule_b_listing_robustness`, the listing-timing robustness sample
+  (`project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv`,
+  SHA-256 `5492cf24…`). The target (`FD_target_main_t_plus_1`), the nine-feature
+  `M1_PRIMARY_FEATURE_ORDER` set (18 transformed columns after appending the
+  nine missingness indicators), the three primary selected configurations, the
+  two locked temporal folds, the class-weighting imbalance policy, the seeds and
+  the metric contract were all held fixed. **No retuning occurred**
+  (`tuning_search_calls=0`): exactly 22 model fits and 22 predictions. **No
+  full-development refit occurred.** Development-only: 993 Rule B rows (117
+  companies, 79 pos / 914 neg), 655 development rows (68 pos / 587 neg), fold
+  roles 242 / 202 / 444 / 211, 413 pooled OOF rows per family (1239 total) and 9
+  metric rows. **The final test remained locked and untouched**: 338 final-test
+  row identities were counted but never parsed, zero predictor rows and zero
+  target rows were loaded, zero evaluations ran. Aggregate final-test counts
+  were read only from the already-frozen `part4_event_count_gate_stage125.csv`,
+  never from row-level final-test values. No SMOTE, SMOTENC, SHAP, calibration,
+  bootstrap or Holm procedure ran; zero network requests.
+- **Rule A vs Rule B sample-delta audit (row identities only).** Rule B keys are
+  a **strict subset** of Rule A keys: 19 Rule A-only rows, 0 Rule B-only rows.
+  Net differences: −19 rows, −2 companies, −1 positive, −18 negative overall;
+  −11 development rows (0 positive, −11 negative); −8 OOF validation rows (0
+  positive, −8 negative); −8 final-test identities. Recorded in
+  `stage126_m1_robustness_part2_sample_delta.csv`.
+- **Part 2 results are sensitivity evidence only.** Pooled development-OOF
+  PR-AUC: Logistic 0.447170 (+0.001413, +0.32%), RF 0.401263 (−0.001179,
+  −0.29%), XGBoost 0.341960 (−0.014585, −4.09%). **The observed Part 2 ordering
+  (Logistic > RF > XGBoost) matches the primary development ordering** — unlike
+  Part 1, whose observed ordering differed. Either way this is a
+  development-only sensitivity finding: it does **not** replace the primary
+  results, does **not** alter the locked primary ordering used for confirmatory
+  interpretation, does not change the selected configurations, and selects no
+  paper winner. No automatic scientific action was triggered.
+- **Preservation.** All eight primary Stage126 artifacts, the frozen Stage125
+  tree, the Part 0 decision contract and **all seven Part 1 scientific
+  artifacts** (authorization record, feature manifest, execution manifest, OOF
+  predictions, metrics, completion lock, primary comparison) remain
+  byte-identical. `ROADMAP.md` is unchanged.
+- **Successor-test provenance migration (verification-only).** The Stage125
+  Part 5 successor-aware test file was extended so the live-successor
+  assertions describe the truthful Part 2 state (Part 1 assertions retained, no
+  negative test weakened, deleted, skipped or stubbed). Three successor-test
+  hash generations are now recorded separately in
+  `stage126_m1_robustness_part2_part5_successor_compatibility.json`: the
+  Stage125 historical hash `0a117c19…` still pinned by the frozen Part 5
+  metadata, the Part 1 completion-time hash `62cd1593…` (history — **never**
+  described as current), and the recomputed Part 2 current hash. Because Part 1's
+  QC report, metadata manifest and Part 5 compatibility record embed that
+  current hash, those three **verification-only** Part 1 files were regenerated;
+  every Part 1 scientific artifact stayed byte-identical, no Part 1 model was
+  retuned and no Part 1 probability or metric changed.
+- **Frozen Part 5 boundary unchanged.** `run_stage125_part5.py --check` still
+  exits 1 by design on exactly the same five documented fields
+  (`m1_robustness_started`, `selected_qc_scope`, `selected_qc_path`,
+  `contract_version`, `last_completed_micro_part`); no forbidden field appears.
+  Part 5's source, runner and every `project/stage125/` artifact are
+  byte-identical.
+- **Part 3 (`expanded_rule_a_company_scope_robustness`) is not authorized and
+  not started**; it requires its own separate explicit human authorization.
+  Parts 3–6 remain outstanding, so M1 robustness is **not** complete. Research
+  action pointers are unchanged (Stage126 M1 remains the active incomplete
+  research action).
+
 ## 2026-07-22 — Stage126 M1 Robustness Part 1 (target-proximity six-feature set)
 
 - **Part 1 was explicitly human-authorized and completed on the development

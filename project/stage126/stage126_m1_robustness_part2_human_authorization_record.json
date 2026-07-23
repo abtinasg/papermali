@@ -1,0 +1,23 @@
+{
+  "authorization_context": "The immediately preceding independently verified repository state merged Stage126 M1 Robustness Part 1 and identified Part 2 — main_rule_b_listing_robustness — as the next gated micro-part.",
+  "authorization_date": "2026-07-23",
+  "authorization_id": "stage126-m1-robustness-part2-human-authorization",
+  "authorization_scope_note": "Consumed by this Part 2 execution. Grants no standing authorization for any later micro-part.",
+  "authorized_category_id": "main_rule_b_listing_robustness",
+  "authorizing_role": "human_supervisor_data_owner",
+  "create_open_unmerged_pr_authorized": true,
+  "final_test_access_authorized": false,
+  "final_test_evaluation_authorized": false,
+  "full_development_refit_authorized": false,
+  "human_authorization_text": "مجوز اجرای Stage126 M1 Robustness Part 2 — `main_rule_b_listing_robustness` را می‌دهم.\n\nاین مجوز فقط برای اجرای Part 2 و ساخت یک PR باز و Merge‌نشده است و شامل Merge، Part 3، full-development refit، final test، SMOTE، SHAP یا M2/M3/M4 نمی‌شود.",
+  "human_authorization_text_sha256": "27935d31a6efcc6116f0d4007424bad5c7b8599faabcb8d39176c569bf172bcb",
+  "m2_authorized": false,
+  "m3_authorized": false,
+  "m4_authorized": false,
+  "merge_authorized": false,
+  "part2_execution_authorized": true,
+  "part3_execution_authorized": false,
+  "shap_authorized": false,
+  "smote_authorized": false,
+  "smotenc_authorized": false
+}

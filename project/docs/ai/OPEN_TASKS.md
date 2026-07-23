@@ -114,7 +114,7 @@ development modeling authorized = true
 modeling started = true
 primary development tuning completed = true
 
-M1 robustness started = false
+M1 robustness started = true
 M1 robustness completed = false
 full-development refit performed = false
 
@@ -187,7 +187,8 @@ Stage125 scientific-artifact mutation.
 **Frozen Part 5 live-successor boundary (expected; not a failure):** Stage125
 Part 5 remains a **frozen, valid historical closure** — no Stage125 artifact or
 source was modified. Its embedded live-Handoff successor check terminates at the
-earlier primary-development state, so after Part 1 it reports exactly five
+earlier primary-development state, so after Part 1 — and unchanged after Part 2
+— it reports exactly five
 mismatching fields (`m1_robustness_started`, `selected_qc_scope`,
 `selected_qc_path`, `contract_version`, `last_completed_micro_part`).
 `run_stage125_part5.py --check` therefore exits 1 **by design**. This is an
@@ -201,9 +202,67 @@ completion lock and the AI Handoff validator. Handoff markers:
 `stage125_part5_live_successor_check_applicable=false`,
 `stage125_part5_successor_compatibility_status=expected_historical_contract_boundary_after_part1`.
 
-**Next — Part 2 (`main_rule_b_listing_robustness`) is NOT authorized and NOT
-started.** It requires its own separate explicit human authorization; the
-consumed Part 1 authorization is not a standing authorization.
+**Robustness Part 2 — COMPLETED (2026-07-23):** `main_rule_b_listing_robustness`
+was explicitly human-authorized and executed on the development folds only.
+**Only the sample changed** — from `main_rule_a_primary` to the listing-timing
+robustness sample `main_rule_b_listing_robustness`
+(`analysis_ready_main_rule_b_stage125.csv`, SHA-256 `5492cf24…`). The target
+(`FD_target_main_t_plus_1`), the nine-feature `M1_PRIMARY_FEATURE_ORDER` set (18
+transformed columns), the three primary selected configurations, the two locked
+folds, the imbalance policy, the seeds and the metric contract were held fixed.
+**No retuning** (0 tuning searches; exactly 22 fits / 22 predictions), **no
+full-development refit**, and the **final test remained locked and untouched**
+(338 identities counted but never parsed; 0 predictor rows, 0 target rows, 0
+evaluations). No SMOTE/SMOTENC/SHAP/calibration/bootstrap/Holm; zero network.
+Counts: 993 Rule B rows (117 companies, 79/914), 655 development rows (68/587),
+fold roles 242 / 202 / 444 / 211, 1239 OOF rows (413 per family), 9 metric rows.
+Handoff markers: `m1_robustness_part2_human_authorized=true`,
+`m1_robustness_part2_completed=true`,
+`m1_robustness_completed_category_ids=["m1_target_proximity_six_feature_set",
+"main_rule_b_listing_robustness"]`,
+`m1_robustness_next_category_id=expanded_rule_a_company_scope_robustness`,
+`m1_robustness_part3_authorized=false`,
+`m1_robustness_execution_authorized=false`, `m1_robustness_completed=false`.
+
+**Rule A vs Rule B sample delta (row identities only):** Rule B keys are a
+**strict subset** of Rule A keys — 19 Rule A-only rows, 0 Rule B-only rows. Net:
+−19 rows, −2 companies, −1 positive, −18 negative; −11 development rows (0
+positive); −8 OOF validation rows (0 positive); −8 final-test identities.
+Aggregate final-test counts were read only from the frozen
+`part4_event_count_gate_stage125.csv`, never from row-level final-test values.
+Recorded in `stage126_m1_robustness_part2_sample_delta.csv`.
+
+**Part 2 observed ordering (reported; primary claims unchanged):** pooled
+development-OOF PR-AUC — Logistic 0.447170 (+0.32%), RF 0.401263 (−0.29%),
+XGBoost 0.341960 (−4.09%). The **observed Part 2 ordering (Logistic > RF >
+XGBoost) matches the primary development ordering**, unlike Part 1's. This
+remains **sensitivity evidence only**: it does not replace the primary results,
+does not alter the locked primary confirmatory ordering, does not change
+selected configurations and selects no paper winner. Recorded in
+`stage126_m1_robustness_part2_primary_comparison.json`; handoff markers
+`m1_robustness_part2_sample_sensitivity_reported=true`,
+`m1_robustness_part2_ordering_differs_from_primary=false`,
+`m1_primary_claim_ordering_preserved=true`. The Part 1 ordering-instability
+markers are retained unchanged.
+
+**Part 1 preservation:** all seven Part 1 scientific artifacts (authorization
+record, feature manifest, execution manifest, OOF predictions, metrics,
+completion lock, primary comparison) are byte-identical after Part 2. Only three
+**verification-only** Part 1 files were refreshed — the QC report, the metadata
+manifest and the Part 5 compatibility record — because they embed the current
+successor-test-file hash. No Part 1 model was retuned; no Part 1 probability or
+metric changed.
+
+**Successor-test hash history after Part 2 (three generations):** the Stage125
+historical hash `0a117c19…` still pinned by the frozen Part 5 metadata, the Part
+1 completion-time hash `62cd1593…` (**history — never the current hash**), and
+the recomputed Part 2 current hash. All three are recorded separately in
+`stage126_m1_robustness_part2_part5_successor_compatibility.json`.
+
+**Next — Part 3 (`expanded_rule_a_company_scope_robustness`) is NOT authorized
+and NOT started.** It requires its own separate explicit human authorization;
+the consumed Part 2 authorization is not a standing authorization. Parts 3–6
+remain outstanding, so M1 robustness is not complete.
 
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
 document-binding evidence remain as frozen scientific history; they do **not**

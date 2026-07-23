@@ -162,6 +162,17 @@ Do not confuse QC selection with the research-action chain:
   `stage126/stage126_m1_robustness_part1_metrics.csv`,
   `stage126/stage126_m1_robustness_part1_completion_lock.json`,
   `stage126/stage126_m1_robustness_part1_qc_report.json`
+- Stage126 M1 robustness Part 2 (listing Rule B sample) source/test/QC:
+  `src/stage126_m1_robustness_part2_listing_rule_b.py`,
+  `run_stage126_m1_robustness_part2_listing_rule_b.py`,
+  `tests/test_stage126_m1_robustness_part2_listing_rule_b.py`,
+  `stage126/stage126_m1_robustness_part2_human_authorization_record.json`,
+  `stage126/stage126_m1_robustness_part2_sample_delta.csv`,
+  `stage126/stage126_m1_robustness_part2_oof_predictions.csv`,
+  `stage126/stage126_m1_robustness_part2_metrics.csv`,
+  `stage126/stage126_m1_robustness_part2_primary_comparison.json`,
+  `stage126/stage126_m1_robustness_part2_completion_lock.json`,
+  `stage126/stage126_m1_robustness_part2_qc_report.json`
   (**explicitly human-authorized and completed on development folds only; only
   the feature set changed; no retuning; no full-development refit; final test
   locked; sensitivity analysis only; Part 2 not authorized**).
@@ -209,10 +220,20 @@ now completed** on the development folds — only the feature set changed, no
 retuning, no full-development refit, and the final test remains locked and
 untouched. Part 1 is **sensitivity-analysis evidence only**.
 
-**Part 2 (`main_rule_b_listing_robustness`) is not authorized and not started.**
-`m1_robustness_execution_authorized=false` — the consumed Part 1 authorization
-is not a standing authorization; each future Part requires its own separate
-explicit human authorization.
+**Part 2 (`main_rule_b_listing_robustness`) was explicitly human-authorized and
+is now completed** on the development folds — **only the sample changed** (the
+listing-timing Rule B sample: 993 rows, 117 companies, 655 development rows,
+1239 OOF rows), no retuning, no full-development refit, and the final test
+remains locked and untouched (338 identities counted, never parsed). Part 2 is
+**sensitivity-analysis evidence only**. Rule B keys are a strict subset of Rule
+A keys (19 Rule A-only rows, 0 Rule B-only rows). All seven Part 1 scientific
+artifacts remain byte-identical.
+
+**Part 3 (`expanded_rule_a_company_scope_robustness`) is not authorized and not
+started.** `m1_robustness_execution_authorized=false` — the consumed Part 2
+authorization is not a standing authorization; each future Part requires its own
+separate explicit human authorization. Parts 3–6 remain outstanding, so M1
+robustness is not complete.
 
 **Observed ordering sensitivity (reported; primary claims unchanged).** Primary
 pooled PR-AUC ordering: **Logistic > RF > XGBoost**. Part 1 observed pooled
@@ -225,19 +246,39 @@ select a paper winner. Development-only sensitivity finding, recorded in
 the human supervisor. No selected configuration changed and no automatic
 scientific action was triggered.
 
+**Part 2 observed ordering (reported; primary claims unchanged).** Pooled
+development-OOF PR-AUC: Logistic 0.447170 (+0.32%), RF 0.401263 (−0.29%),
+XGBoost 0.341960 (−4.09%). The **observed Part 2 ordering (Logistic > RF >
+XGBoost) matches the primary development ordering** — unlike Part 1's, which
+differed. It remains sensitivity evidence only: no primary result was replaced,
+the locked confirmatory ordering is unchanged, no selected configuration
+changed, and no paper winner was selected. Recorded in
+`stage126/stage126_m1_robustness_part2_primary_comparison.json`. The Part 1
+ordering-instability markers are retained unchanged.
+
 **Frozen Part 5 live-successor boundary.** Stage125 Part 5 remains a frozen,
 valid historical closure (source, runner and all `project/stage125/` artifacts
 byte-identical). Its embedded live-Handoff successor check ends at the earlier
-primary-development state, so after Part 1 `run_stage125_part5.py --check` exits
-1 with exactly five expected mismatching fields (`m1_robustness_started`,
+primary-development state, so after Part 1 — and unchanged after Part 2 —
+`run_stage125_part5.py --check` exits 1 with exactly five expected mismatching
+fields (`m1_robustness_started`,
 `selected_qc_scope`, `selected_qc_path`, `contract_version`,
 `last_completed_micro_part`). This is an **expected historical-contract
 boundary**, recorded in
-`stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json`,
-asserted in the Part 1 QC and explicitly tested — not a scientific failure and
-not Stage125 drift. Current Stage126 successor state is validated by the Part 0
-integrity controls, the Part 1 QC, the Part 1 completion lock and this Handoff
-validator.
+`stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json` and
+`stage126/stage126_m1_robustness_part2_part5_successor_compatibility.json`,
+asserted in the Part 1 and Part 2 QC reports and explicitly tested — not a
+scientific failure and not Stage125 drift. Current Stage126 successor state is
+validated by the Part 0 integrity controls, the Part 1 and Part 2 QC reports,
+the Part 2 completion lock and this Handoff validator.
+
+**Successor-test provenance (three generations).** The Part 2 compatibility
+record separates the Stage125 historical test hash `0a117c19…` (still pinned by
+the frozen Part 5 metadata), the Part 1 completion-time hash `62cd1593…`
+(history — never presented as current) and the recomputed Part 2 current hash.
+Refreshing the Part 1 QC report, metadata manifest and Part 5 compatibility
+record to carry the current hash is verification-only maintenance: every Part 1
+scientific artifact stayed byte-identical.
 
 ## 11. Recent change history
 

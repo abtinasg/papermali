@@ -1,0 +1,817 @@
+{
+  "all_pass": true,
+  "assertion_count": 119,
+  "assertions": [
+    {
+      "detail": "",
+      "name": "human_authorization_hash_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "authorized_category_is_part2",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part2_execution_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "open_unmerged_pr_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "merge_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part3_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "refit_smote_shap_m2_m3_m4_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "authorization_consumed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part0_contract_version_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part0_execution_order_places_part2_second",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "sample_changed_to_rule_b",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "primary_sample_recorded",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "changed_dimension_is_sample",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "target_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "persistent_loss_target_not_used",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "nine_feature_order_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "feature_set_name_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "base_feature_count_nine",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "transformed_feature_count_eighteen",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "prohibited_growth_feature_absent",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part1_six_feature_set_not_reused",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "selected_configurations_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "imbalance_policy_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "folds_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "seeds_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "metric_contract_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "only_sample_changed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "rule_a_analysis_ready_hash_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "rule_b_analysis_ready_hash_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "split_manifest_hash_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "frozen_event_count_gate_hash_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "primary_artifacts_byte_identical",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part1_scientific_artifacts_byte_identical",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part0_decision_contract_hash_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "primary_source_hash_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "993",
+      "name": "rule_b_total_rows",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "rule_b_companies",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "rule_b_positive",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "rule_b_negative",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "development_rows_loaded",
+      "status": "PASS"
+    },
+    {
+      "detail": "68",
+      "name": "development_positive",
+      "status": "PASS"
+    },
+    {
+      "detail": "587",
+      "name": "development_negative",
+      "status": "PASS"
+    },
+    {
+      "detail": "242/33/209",
+      "name": "fold_counts[fold1_train]",
+      "status": "PASS"
+    },
+    {
+      "detail": "202/25/177",
+      "name": "fold_counts[fold1_validation]",
+      "status": "PASS"
+    },
+    {
+      "detail": "444/58/386",
+      "name": "fold_counts[fold2_train]",
+      "status": "PASS"
+    },
+    {
+      "detail": "211/10/201",
+      "name": "fold_counts[fold2_validation]",
+      "status": "PASS"
+    },
+    {
+      "detail": "1239",
+      "name": "oof_rows_total",
+      "status": "PASS"
+    },
+    {
+      "detail": "413",
+      "name": "oof_rows_per_family[regularized_logistic_regression]",
+      "status": "PASS"
+    },
+    {
+      "detail": "202/211",
+      "name": "oof_fold_split[regularized_logistic_regression]",
+      "status": "PASS"
+    },
+    {
+      "detail": "413",
+      "name": "oof_rows_per_family[random_forest]",
+      "status": "PASS"
+    },
+    {
+      "detail": "202/211",
+      "name": "oof_fold_split[random_forest]",
+      "status": "PASS"
+    },
+    {
+      "detail": "413",
+      "name": "oof_rows_per_family[xgboost]",
+      "status": "PASS"
+    },
+    {
+      "detail": "202/211",
+      "name": "oof_fold_split[xgboost]",
+      "status": "PASS"
+    },
+    {
+      "detail": "9",
+      "name": "metrics_rows_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "oof_keys_unique",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "oof_probabilities_finite",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "oof_probabilities_in_bounds",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "oof_sample_column_is_rule_b",
+      "status": "PASS"
+    },
+    {
+      "detail": "35",
+      "name": "oof_positive_count",
+      "status": "PASS"
+    },
+    {
+      "detail": "22",
+      "name": "model_fit_calls_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "22",
+      "name": "prediction_calls_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "tuning_search_calls_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_retuning",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "smote_calls_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "smotenc_calls_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "shap_calls_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "network_requests_attempted_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "6.333333333333333",
+      "name": "xgboost_scale_pos_weight[fold1_train]",
+      "status": "PASS"
+    },
+    {
+      "detail": "6.655172413793103",
+      "name": "xgboost_scale_pos_weight[fold2_train]",
+      "status": "PASS"
+    },
+    {
+      "detail": "338",
+      "name": "final_test_identities_seen_not_parsed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_predictor_rows_loaded_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_target_rows_loaded_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_evaluations_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "full_development_refits_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_unlocked_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_access_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_final_test_year_in_model_rows",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_final_test_year_in_oof",
+      "status": "PASS"
+    },
+    {
+      "detail": "1012",
+      "name": "sample_delta_rows_emitted",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "rule_b_strict_subset_of_rule_a",
+      "status": "PASS"
+    },
+    {
+      "detail": "19",
+      "name": "rule_a_only_rows_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "sample_delta_status_counts",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "sample_delta_net_rows",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "sample_delta_net_companies",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "sample_delta_net_positive",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "sample_delta_net_negative",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "sample_delta_development_rows_removed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "sample_delta_oof_rows_removed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "sample_delta_final_test_identities_removed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "sample_delta_uses_identities_only",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "sample_delta_no_value_columns",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "sensitivity_analysis_only",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "primary_results_not_replaced",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "primary_confirmatory_ordering_not_changed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "selected_configurations_not_changed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_paper_winner_selected",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_automatic_scientific_action",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_reported_to_human_supervisor",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "comparison_derived_not_hardcoded",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "m1_robustness_started_true",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "m1_robustness_completed_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completed_category_ids_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "next_category_is_part3",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_standing_execution_authorization",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_artifacts_frozen_and_unmodified",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_historical_closure_remains_valid",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_live_check_not_applicable_after_part2",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_expected_mismatch_fields_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_expected_mismatch_detail_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_forbidden_mismatch_fields_declared",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_test_hash_history_explicit",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part1_hash_not_described_as_current",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_current_hash_diverges_from_stage125_historical",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_historical_metadata_not_modified",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_expected_bookkeeping_drift_files_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_no_unregistered_drift",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_compat_part2_valid_and_part3_unauthorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_successor_validation_surfaces_exact",
+      "status": "PASS"
+    }
+  ],
+  "base_feature_count": 9,
+  "category_id": "main_rule_b_listing_robustness",
+  "changed_dimension": "sample",
+  "contract_version": "stage126_m1_robustness_part2_listing_rule_b_v1",
+  "current_stage": "Stage126",
+  "development_modeling_authorized": true,
+  "development_negative": 587,
+  "development_positive": 68,
+  "development_rows_loaded": 655,
+  "failed_count": 0,
+  "feature_set": "M1_PRIMARY_FEATURE_ORDER",
+  "final_test_access_authorized": false,
+  "final_test_evaluation_performed": false,
+  "final_test_evaluations": 0,
+  "final_test_predictor_rows_loaded": 0,
+  "final_test_predictor_values_inspected": false,
+  "final_test_rows_seen_but_not_parsed": 338,
+  "final_test_target_rows_loaded": 0,
+  "final_test_target_values_inspected": false,
+  "final_test_unlocked": false,
+  "fold1_train_rows": 242,
+  "fold1_validation_rows": 202,
+  "fold2_train_rows": 444,
+  "fold2_validation_rows": 211,
+  "full_development_refit_performed": false,
+  "full_development_refits": 0,
+  "human_authorization_hash_valid": true,
+  "m1_primary_development_tuning_completed": true,
+  "m1_robustness_completed": false,
+  "m1_robustness_completed_category_ids": [
+    "m1_target_proximity_six_feature_set",
+    "main_rule_b_listing_robustness"
+  ],
+  "m1_robustness_execution_authorized": false,
+  "m1_robustness_next_category_id": "expanded_rule_a_company_scope_robustness",
+  "m1_robustness_part1_completed": true,
+  "m1_robustness_part2_completed": true,
+  "m1_robustness_part2_human_authorized": true,
+  "m1_robustness_part3_authorized": false,
+  "m1_robustness_started": true,
+  "m2_data_collected": false,
+  "m3_data_collected": false,
+  "m4_data_collected": false,
+  "metrics_rows": 9,
+  "micro_part_id": "stage126-m1-robustness-part2-listing-rule-b",
+  "model_fit_calls": 22,
+  "model_seeds": [
+    20260719,
+    20260720,
+    20260721,
+    20260722,
+    20260723
+  ],
+  "modeling_authorized": true,
+  "modeling_started": true,
+  "network_requests_attempted": 0,
+  "oof_rows_per_family": 413,
+  "oof_rows_total": 1239,
+  "output_sha256": {
+    "README_STAGE126_M1_ROBUSTNESS_PART2_LISTING_RULE_B.md": "82a017b7763dd3b6e20e34be72cdba75173baffa4ad4e94c28cfa982414aa548",
+    "stage126_m1_robustness_part2_completion_lock.json": "23d1920c4fb0a351456fe54b60616446381bbd550fb18e0bba5dab091486fec6",
+    "stage126_m1_robustness_part2_execution_manifest.json": "9fc153b65a77c906339f51d7c0ad576d23eb06c5895eacb1a0ee92578b321ce8",
+    "stage126_m1_robustness_part2_feature_manifest.csv": "58c52c17337286237779153d59f85f74c76f84d0c0415b8efadd618aa524b78f",
+    "stage126_m1_robustness_part2_human_authorization_record.json": "0a7bba7489f62f59d3e0f07946b82d8ce4be1a49c4d098f47ca308de9466959e",
+    "stage126_m1_robustness_part2_metrics.csv": "073b8657c0ba2c40f52e05d766a102e2b5d20845821c4eb1cef1b6e53459228c",
+    "stage126_m1_robustness_part2_oof_predictions.csv": "3af630141a905370849875926fa84052cf10322cc34e18258a25d28106d47dd6",
+    "stage126_m1_robustness_part2_part5_successor_compatibility.json": "829e88fffa6619fe413af594859e9bf421a3218bdcba458d8b7be35b563c6461",
+    "stage126_m1_robustness_part2_primary_comparison.json": "9fc3b4eaf0a27fc66cd22444d92363747157743e822d3be877ecca7f153763bf",
+    "stage126_m1_robustness_part2_sample_delta.csv": "baafe97323e45f0a88b07aaf1ea97c50c4b213e43724ddb2b97f3f55144fc7d3"
+  },
+  "part0_contract_hash_valid": true,
+  "part1_scientific_artifact_sha256": {
+    "project/stage126/stage126_m1_robustness_part1_completion_lock.json": "964d84f2269bb35b0176f88bb12bcfc13ef2cb487817cf5b49a5c28a87e1822b",
+    "project/stage126/stage126_m1_robustness_part1_execution_manifest.json": "80813ce8af9544dde736cc6b94372d2626dccbf888553cd7964625bfe12d8738",
+    "project/stage126/stage126_m1_robustness_part1_feature_manifest.csv": "c65735795eda7dce6b4cacbc6af9dd5914b5068f44c77277035a51463cceaf90",
+    "project/stage126/stage126_m1_robustness_part1_human_authorization_record.json": "87a4f55baeb1081eaf936e49c5e8923f67df54ec444f0abc33ec835c0c7e06f4",
+    "project/stage126/stage126_m1_robustness_part1_metrics.csv": "c60f4b15aa40273472be98c867c73795d254f32c2a0e29b76641b1c5d5c18e98",
+    "project/stage126/stage126_m1_robustness_part1_oof_predictions.csv": "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31",
+    "project/stage126/stage126_m1_robustness_part1_primary_comparison.json": "2b58a85250420a8a18b0ff37cecdf3f2e31160c37e0cb48d027324c87a25c46a"
+  },
+  "part5_expected_bookkeeping_drift_files": [
+    "metadata_and_hashes_stage125_part5.json",
+    "stage125_part5_readiness_closure_qc_report.json"
+  ],
+  "part5_expected_bookkeeping_drift_files_exact": true,
+  "part5_historical_test_hash_matches_frozen_metadata": true,
+  "part5_no_unregistered_drift": true,
+  "part5_part2_current_test_hash_recomputed": true,
+  "part5_scientific_artifact_drift_zero": true,
+  "part5_successor_compatibility_sha256": "829e88fffa6619fe413af594859e9bf421a3218bdcba458d8b7be35b563c6461",
+  "part5_test_hash_history_explicit": true,
+  "prediction_calls": 22,
+  "primary_artifact_sha256": {
+    "project/stage126/stage126_m1_configuration_registry.csv": "decbf43a5c34669bdd7a0c68c0ad6aec5611efc7c3ca82b09f5e85f72d635804",
+    "project/stage126/stage126_m1_development_access_manifest.csv": "0c2783d0e43ebba712a1c41b6889a2f8f646340bae6a75ad15902a8a0c368e39",
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_final_test_lock_guard.json": "509e58fc39e3c5d886993c11b954fc06c267c96d02c081d8e50b0cda52e58b03",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4",
+    "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e",
+    "project/stage126/stage126_m1_tuning_results.csv": "e7e1e6808e394273676709aa94bfa713bbf8a790fadabee22ea20b849adbe649"
+  },
+  "primary_comparison_sha256": "9fc3b4eaf0a27fc66cd22444d92363747157743e822d3be877ecca7f153763bf",
+  "primary_sample": "main_rule_a_primary",
+  "rule_a_analysis_ready_sha256": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+  "rule_b_analysis_ready_sha256": "5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480",
+  "rule_b_companies": 117,
+  "rule_b_negative": 914,
+  "rule_b_positive": 79,
+  "rule_b_total_rows": 993,
+  "sample": "main_rule_b_listing_robustness",
+  "sample_delta": {
+    "aggregate_final_test_counts_source": "project/stage125/part4_event_count_gate_stage125.csv",
+    "comparison_basis": "row_identities_only",
+    "delta_rows_emitted": 1012,
+    "final_test_values_read": false,
+    "main_rule_a_primary": {
+      "analysis_ready": {
+        "companies": 119,
+        "negative": 932,
+        "positive": 80,
+        "rows": 1012
+      },
+      "development": {
+        "negative": 598,
+        "positive": 68,
+        "rows": 666
+      },
+      "final_test_identities": 346,
+      "oof_validation": {
+        "negative": 386,
+        "positive": 35,
+        "rows": 421
+      }
+    },
+    "main_rule_b_listing_robustness": {
+      "analysis_ready": {
+        "companies": 117,
+        "negative": 914,
+        "positive": 79,
+        "rows": 993
+      },
+      "development": {
+        "negative": 587,
+        "positive": 68,
+        "rows": 655
+      },
+      "final_test_identities": 338,
+      "oof_validation": {
+        "negative": 378,
+        "positive": 35,
+        "rows": 413
+      }
+    },
+    "net_difference": {
+      "analysis_ready": {
+        "companies": -2,
+        "negative": -18,
+        "positive": -1,
+        "rows": -19
+      },
+      "development": {
+        "negative": -11,
+        "positive": 0,
+        "rows": -11
+      },
+      "final_test_identities": -8,
+      "oof_validation": {
+        "negative": -8,
+        "positive": 0,
+        "rows": -8
+      }
+    },
+    "rule_a_only_keys": 19,
+    "rule_b_is_strict_subset_of_rule_a": true,
+    "rule_b_only_keys": 0
+  },
+  "sample_delta_sha256": "baafe97323e45f0a88b07aaf1ea97c50c4b213e43724ddb2b97f3f55144fc7d3",
+  "selected_configuration_ids": {
+    "random_forest": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
+    "regularized_logistic_regression": "logistic__C_0.1",
+    "xgboost": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1"
+  },
+  "selected_configurations_changed": false,
+  "shap_calls": 0,
+  "smote_calls": 0,
+  "smotenc_calls": 0,
+  "source_commit": "be116ec50a5304b9f342f771b6e6e32e7de3e14c",
+  "source_file_sha256": "a0f9965f5ea8e26315c62542edec0524cb7703a436852e1abed2eea19608dff4",
+  "stage": "stage126_m1_robustness_part2_listing_rule_b",
+  "stage125_completed": true,
+  "stage125_part5_artifacts_byte_identical": true,
+  "stage125_part5_artifacts_modified": false,
+  "stage125_part5_historical_closure_valid": true,
+  "stage125_part5_historical_test_file_sha256": "0a117c1916ad845653e148d951a49a2c0375d13b7de23019e50ae891aee1b437",
+  "stage125_part5_live_handoff_check_applicable": false,
+  "stage125_part5_live_handoff_mismatch_expected": true,
+  "stage125_part5_live_handoff_mismatch_fields": [
+    "m1_robustness_started",
+    "selected_qc_scope",
+    "selected_qc_path",
+    "contract_version",
+    "last_completed_micro_part"
+  ],
+  "stage125_part5_source_modified": false,
+  "stage126_authorized": true,
+  "stage126_m1_entry_ready": true,
+  "stage126_part1_completion_test_file_sha256": "62cd1593e7bfafdeb1aa1c728f3fb9c22aadf50d3031e2cec964d267e752b189",
+  "stage126_part2_current_test_file_sha256": "965ed49d7858e8d537fd59a1e7a9149ac58ceaeabd57a03c69e51dea7eeb3f52",
+  "stage126_started": true,
+  "target": "FD_target_main_t_plus_1",
+  "test_file_sha256": "dfda8e6b3f2c6a6393e5f6c3f5190c114583c605d2656603b57b66a5f5b473f6",
+  "ticker_count": 0,
+  "tickers": [],
+  "transformed_feature_count": 18,
+  "tuning_search_calls": 0
+}

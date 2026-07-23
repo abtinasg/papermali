@@ -113,6 +113,56 @@ These are stable project decisions. Change them only deliberately (and note it i
   started.** The consumed Part 1 authorization confers no standing
   authorization for any later category.
 
+### Stage126 M1 robustness Part 2 — executed (2026-07-23)
+
+- **Part 2 (`main_rule_b_listing_robustness`) was explicitly human-authorized
+  and completed on the development folds only.** The authorization text hashes
+  to `27935d31a6efcc6116f0d4007424bad5c7b8599faabcb8d39176c569bf172bcb` and is
+  consumed by this execution — it grants no standing authorization, no merge,
+  no Part 3, no refit, no final-test access, no SMOTE/SMOTENC/SHAP and no
+  M2/M3/M4.
+- **Only the sample changed:** from `main_rule_a_primary` to the listing-timing
+  robustness sample `main_rule_b_listing_robustness`
+  (`analysis_ready_main_rule_b_stage125.csv`, SHA-256
+  `5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480`). Target,
+  the nine-feature `M1_PRIMARY_FEATURE_ORDER` set (18 transformed columns),
+  selected configurations, folds, imbalance policy, seeds and metrics unchanged.
+- **No retuning** (frozen selected configurations reused; 0 tuning searches;
+  exactly 22 fits / 22 predictions). **No full-development refit.**
+- **Final test remained locked and untouched**: 338 row identities counted but
+  never parsed, 0 predictor rows, 0 target rows, 0 evaluations. Aggregate
+  final-test counts were read only from the frozen
+  `part4_event_count_gate_stage125.csv`, never from row-level final-test values.
+  No SMOTE/SMOTENC, SHAP, calibration, bootstrap or Holm; zero network access.
+- **Counts:** 993 Rule B rows (117 companies, 79 pos / 914 neg); 655 development
+  rows (68 / 587); fold roles 242 / 202 / 444 / 211; 1239 OOF rows (413 per
+  family); 9 metric rows. XGBoost `scale_pos_weight` recomputed per Rule B
+  training fold: 209/33 and 386/58.
+- **Sample-delta audit (row identities only).** Rule B keys are a **strict
+  subset** of Rule A keys: 19 Rule A-only rows, 0 Rule B-only rows. Net −19 rows,
+  −2 companies, −1 positive, −18 negative; development −11 rows (0 positive);
+  OOF −8 rows (0 positive); final-test identities −8.
+- **Sensitivity analysis only** — Part 2 does not replace the primary results
+  and selects no paper winner.
+- **Observed ordering (reported, not acted upon).** Pooled development-OOF
+  PR-AUC: Logistic 0.447170385532 (+0.001413421484 / +0.32%), RF 0.401263142511
+  (−0.001178687509 / −0.29%), XGBoost 0.341959533880 (−0.014585474282 /
+  −4.09%). The **observed Part 2 ordering (Logistic > RF > XGBoost) matches the
+  primary development ordering**, unlike Part 1's, which differed. Recorded in
+  `stage126_m1_robustness_part2_primary_comparison.json`. No selected
+  configuration changed, no refit was authorized, no automatic scientific action
+  was triggered, the locked primary confirmatory ordering is unchanged and the
+  final test stays locked.
+- **Part 1 preservation.** All seven Part 1 scientific artifacts are
+  byte-identical. Only three verification-only Part 1 files (QC report, metadata
+  manifest, Part 5 compatibility record) were refreshed because they embed the
+  current successor-test-file hash; no Part 1 model was retuned and no Part 1
+  probability or metric changed.
+- **Part 3 (`expanded_rule_a_company_scope_robustness`) is not authorized and
+  not started.** The consumed Part 2 authorization confers no standing
+  authorization for any later category. Parts 3–6 remain outstanding, so M1
+  robustness is not complete.
+
 ### Frozen Part 5 live-successor boundary (2026-07-22)
 
 - **Stage125 Part 5 remains a frozen, valid historical closure.** Neither its

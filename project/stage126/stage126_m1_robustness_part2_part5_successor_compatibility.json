@@ -1,6 +1,6 @@
 {
-  "contract_id": "stage126_m1_robustness_part1_part5_successor_compatibility",
-  "contract_version": "stage126_m1_robustness_part1_part5_successor_compatibility_v1",
+  "contract_id": "stage126_m1_robustness_part2_part5_successor_compatibility",
+  "contract_version": "stage126_m1_robustness_part2_part5_successor_compatibility_v1",
   "expected_live_mismatch_detail": "handoff_mismatch:m1_robustness_started,selected_qc_scope,selected_qc_path,contract_version,last_completed_micro_part",
   "expected_live_mismatch_fields": [
     "m1_robustness_started",
@@ -20,13 +20,14 @@
     "next_research_action_id"
   ],
   "full_development_refit_performed": false,
-  "part1_category_id": "m1_target_proximity_six_feature_set",
-  "part1_scientific_execution_valid": true,
-  "part2_execution_authorized": false,
-  "rationale": "run_stage125_part5.py --check is a historical successor-state validator whose live-Handoff assumptions end at the primary development state. The five-field mismatch after Part 1 is expected and explicitly tested; it does not invalidate Stage125 closure, does not indicate Stage125 artifact drift, and is not a scientific failure.",
+  "part1_completion_hash_is_not_the_current_hash": true,
+  "part1_scientific_artifacts_byte_identical": true,
+  "part2_category_id": "main_rule_b_listing_robustness",
+  "part2_scientific_execution_valid": true,
+  "part3_execution_authorized": false,
+  "rationale": "run_stage125_part5.py --check is a historical successor-state validator whose live-Handoff assumptions end at the primary development state. The five-field mismatch after Part 2 is expected and explicitly tested; it does not invalidate Stage125 closure, does not indicate Stage125 artifact drift, and is not a scientific failure.",
   "stage125_part5_artifacts_frozen": true,
   "stage125_part5_artifacts_modified": false,
-  "stage125_part5_current_test_file_sha256": "965ed49d7858e8d537fd59a1e7a9149ac58ceaeabd57a03c69e51dea7eeb3f52",
   "stage125_part5_expected_bookkeeping_drift_files": [
     "metadata_and_hashes_stage125_part5.json",
     "stage125_part5_readiness_closure_qc_report.json"
@@ -34,7 +35,8 @@
   "stage125_part5_historical_closure_remains_valid": true,
   "stage125_part5_historical_metadata_modified": false,
   "stage125_part5_historical_test_file_sha256": "0a117c1916ad845653e148d951a49a2c0375d13b7de23019e50ae891aee1b437",
-  "stage125_part5_live_handoff_check_applicable_after_part1": false,
+  "stage125_part5_live_handoff_check_applicable_after_part2": false,
+  "stage125_part5_runner_modified": false,
   "stage125_part5_scientific_artifact_drift_expected": false,
   "stage125_part5_scientific_artifact_drift_observed": false,
   "stage125_part5_scientific_output_files": [
@@ -47,10 +49,13 @@
   ],
   "stage125_part5_source_modified": false,
   "stage125_part5_test_file_modified_for_successor_test_separation": true,
+  "stage126_part1_completion_test_file_sha256": "62cd1593e7bfafdeb1aa1c728f3fb9c22aadf50d3031e2cec964d267e752b189",
+  "stage126_part2_current_test_file_sha256": "965ed49d7858e8d537fd59a1e7a9149ac58ceaeabd57a03c69e51dea7eeb3f52",
   "successor_state_validation_surfaces": [
     "stage126_m1_robustness_part0_decision_lock",
     "stage126_m1_robustness_part1_qc",
-    "stage126_m1_robustness_part1_completion_lock",
+    "stage126_m1_robustness_part2_qc",
+    "stage126_m1_robustness_part2_completion_lock",
     "ai_handoff_validator"
   ]
 }

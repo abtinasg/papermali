@@ -1,0 +1,203 @@
+{
+  "base_feature_count": 9,
+  "category_id": "main_rule_b_listing_robustness",
+  "changed_dimension": "sample",
+  "contract_version": "stage126_m1_robustness_part2_listing_rule_b_v1",
+  "development_only": true,
+  "development_rows_loaded": 655,
+  "feature_set": "M1_PRIMARY_FEATURE_ORDER",
+  "feature_set_changed": false,
+  "feature_source_columns": {
+    "accumulated_loss_to_capital_ratio": "accumulated_loss_to_capital_ratio",
+    "asset_turnover_period_adjusted": "asset_turnover_period_adjusted",
+    "current_ratio": "current_ratio",
+    "financial_expense_to_assets_period_adjusted": "financial_expense_to_assets_period_adjusted",
+    "leverage_ratio": "leverage_ratio",
+    "log_total_assets": "total_assets",
+    "ocf_to_assets_period_adjusted": "ocf_to_assets_period_adjusted",
+    "operating_margin_period_adjusted": "operating_margin_period_adjusted",
+    "roa_period_adjusted": "roa_period_adjusted"
+  },
+  "features_exact_order": [
+    "log_total_assets",
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio"
+  ],
+  "final_test_evaluations": 0,
+  "final_test_predictor_rows_loaded": 0,
+  "final_test_rows_seen_but_not_parsed": 338,
+  "final_test_target_rows_loaded": 0,
+  "fold_counts": {
+    "fold1_train": {
+      "negative": 209,
+      "positive": 33,
+      "rows": 242
+    },
+    "fold1_validation": {
+      "negative": 177,
+      "positive": 25,
+      "rows": 202
+    },
+    "fold2_train": {
+      "negative": 386,
+      "positive": 58,
+      "rows": 444
+    },
+    "fold2_validation": {
+      "negative": 201,
+      "positive": 10,
+      "rows": 211
+    }
+  },
+  "full_development_refit_performed": false,
+  "imbalance_policy": "primary_class_weighting",
+  "imbalance_policy_changed": false,
+  "locked_final_test_target_years": [
+    1400,
+    1401,
+    1402
+  ],
+  "logistic_deterministic_seed": 20260719,
+  "model_families": [
+    "regularized_logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "model_fit_calls": 22,
+  "model_seeds": [
+    20260719,
+    20260720,
+    20260721,
+    20260722,
+    20260723
+  ],
+  "no_retuning": true,
+  "prediction_calls": 22,
+  "primary_sample": "main_rule_a_primary",
+  "primary_sample_input_file": "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv",
+  "primary_sample_input_sha256": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+  "prohibited_feature": "revenue_growth_period_adjusted",
+  "prohibited_target": "FD_target_persistent_loss_robustness_t_plus_1",
+  "sample": "main_rule_b_listing_robustness",
+  "sample_delta": {
+    "aggregate_final_test_counts_source": "project/stage125/part4_event_count_gate_stage125.csv",
+    "comparison_basis": "row_identities_only",
+    "delta_rows_emitted": 1012,
+    "final_test_values_read": false,
+    "main_rule_a_primary": {
+      "analysis_ready": {
+        "companies": 119,
+        "negative": 932,
+        "positive": 80,
+        "rows": 1012
+      },
+      "development": {
+        "negative": 598,
+        "positive": 68,
+        "rows": 666
+      },
+      "final_test_identities": 346,
+      "oof_validation": {
+        "negative": 386,
+        "positive": 35,
+        "rows": 421
+      }
+    },
+    "main_rule_b_listing_robustness": {
+      "analysis_ready": {
+        "companies": 117,
+        "negative": 914,
+        "positive": 79,
+        "rows": 993
+      },
+      "development": {
+        "negative": 587,
+        "positive": 68,
+        "rows": 655
+      },
+      "final_test_identities": 338,
+      "oof_validation": {
+        "negative": 378,
+        "positive": 35,
+        "rows": 413
+      }
+    },
+    "net_difference": {
+      "analysis_ready": {
+        "companies": -2,
+        "negative": -18,
+        "positive": -1,
+        "rows": -19
+      },
+      "development": {
+        "negative": -11,
+        "positive": 0,
+        "rows": -11
+      },
+      "final_test_identities": -8,
+      "oof_validation": {
+        "negative": -8,
+        "positive": 0,
+        "rows": -8
+      }
+    },
+    "rule_a_only_keys": 19,
+    "rule_b_is_strict_subset_of_rule_a": true,
+    "rule_b_only_keys": 0
+  },
+  "sample_input_file": "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv",
+  "sample_input_sha256": "5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480",
+  "scientific_interpretation": "sensitivity_analysis_only",
+  "scientific_role": "listing_timing_sample_robustness",
+  "selected_configurations": {
+    "random_forest": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
+    "regularized_logistic_regression": "logistic__C_0.1",
+    "xgboost": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1"
+  },
+  "selected_configurations_changed": false,
+  "target": "FD_target_main_t_plus_1",
+  "target_changed": false,
+  "temporal_folds": {
+    "fold1": {
+      "train_role": "fold1_train",
+      "train_target_years": [
+        1393,
+        1394,
+        1395
+      ],
+      "validation_role": "fold1_validation",
+      "validation_target_years": [
+        1396,
+        1397
+      ]
+    },
+    "fold2": {
+      "train_role": "fold2_train",
+      "train_target_years": [
+        1393,
+        1394,
+        1395,
+        1396,
+        1397
+      ],
+      "validation_role": "fold2_validation",
+      "validation_target_years": [
+        1398,
+        1399
+      ]
+    }
+  },
+  "temporal_folds_changed": false,
+  "transformed_feature_count": 18,
+  "tuning_search_calls": 0,
+  "xgboost_scale_pos_weight_by_training_fold": {
+    "fold1_train": 6.333333333333,
+    "fold2_train": 6.655172413793
+  }
+}
