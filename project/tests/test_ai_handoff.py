@@ -1214,11 +1214,13 @@ def test_extract_qc_workflow_markers_fail_closed_when_field_missing():
 def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
     assert state["current_stage"] == "Stage126"
+    # The newest completed robustness micro-part supplies the selected QC; the
+    # research-action pointers deliberately stay on the Stage126 M1 action.
     assert state["selected_qc_scope"] == (
-        "stage126_m1_financial_baseline"
+        "stage126_m1_robustness_part1_target_proximity"
     )
     assert state["last_completed_micro_part"] == (
-        "stage125-part5-readiness-closure"
+        "stage126-m1-robustness-part1-target-proximity"
     )
     assert state["next_research_action_id"] == (
         "stage126-m1-financial-baseline"
@@ -1234,7 +1236,8 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["modeling_authorized"] is True
     assert state["modeling_started"] is True
     assert state["m1_primary_development_tuning_completed"] is True
-    assert state["m1_robustness_started"] is False
+    # Robustness Part 1 has executed; the overall robustness set is incomplete.
+    assert state["m1_robustness_started"] is True
     assert state["m1_robustness_completed"] is False
     assert state["final_test_unlocked"] is False
     assert state["final_test_access_authorized"] is False
@@ -2144,22 +2147,30 @@ def test_handoff_package_next_step_requires_explicit_human_decision():
 # --------------------------------------------------------------------------- #
 
 def test_handoff_state_carries_robustness_decision_markers():
-    """handoff_state.json must carry the six robustness-decision markers."""
+    """handoff_state.json must carry the robustness-decision markers.
+
+    After Part 1 execution the decision lock remains in force and there is still
+    no standing execution authorization; `m1_robustness_started` is now True and
+    the next category has advanced to Part 2 (which remains unauthorized).
+    """
     state = _state(REAL_ROOT)
     assert state["m1_robustness_decision_locked"] is True
     assert state["m1_robustness_execution_authorized"] is False
-    assert state["m1_robustness_started"] is False
     assert state["m1_robustness_completed"] is False
-    assert state["m1_robustness_next_category_id"] == "m1_target_proximity_six_feature_set"
     assert state["m1_robustness_packaging_policy"] == "one_category_per_micro_part_pr"
+    assert state["m1_robustness_started"] is True
+    assert state["m1_robustness_next_category_id"] == "main_rule_b_listing_robustness"
 
 
 def test_robustness_decision_lock_does_not_advance_research_pointers():
-    """The decision lock must not advance the research action pointers."""
+    """Robustness micro-parts must not advance the research action pointers."""
     state = _state(REAL_ROOT)
-    assert state["last_completed_micro_part"] == "stage125-part5-readiness-closure"
     assert state["next_research_action_id"] == "stage126-m1-financial-baseline"
     assert state["active_workstream"] == "stage126_m1_financial_baseline"
+    # The micro-part pointer tracks the newest completed robustness micro-part;
+    # the research-action chain deliberately stays on Stage126 M1.
+    assert state["last_completed_micro_part"] == \
+        "stage126-m1-robustness-part1-target-proximity"
 
 
 def test_robustness_decision_lock_preserves_primary_and_final_test_state():
@@ -2173,11 +2184,13 @@ def test_robustness_decision_lock_preserves_primary_and_final_test_state():
 
 
 def test_robustness_decision_markers_derive_from_record():
-    """Generator derivation must match the tracked decision record."""
+    """Generator derivation must match the tracked decision + Part 1 records."""
     markers = gen.derive_m1_robustness_decision_markers(REAL_ROOT)
     assert markers["m1_robustness_decision_locked"] is True
     assert markers["m1_robustness_execution_authorized"] is False
-    assert markers["m1_robustness_next_category_id"] == "m1_target_proximity_six_feature_set"
+    # Part 1 is complete, so the next registered category is Part 2.
+    assert markers["m1_robustness_next_category_id"] == "main_rule_b_listing_robustness"
+    assert markers["m1_robustness_part1_completed"] is True
 
 
 # --------------------------------------------------------------------------- #
@@ -2253,3 +2266,321 @@ def test_derive_markers_fail_closed(tmp_path, mutate):
 def test_derive_markers_absent_record_returns_empty(tmp_path):
     # No decision record => empty markers (pre-Part-0 repository states).
     assert gen.derive_m1_robustness_decision_markers(str(tmp_path)) == {}
+
+
+# --------------------------------------------------------------------------- #
+# Stage126 M1 robustness Part 1 Handoff integration
+# --------------------------------------------------------------------------- #
+
+_PART1_AUTH_REL = (
+    "project/stage126/stage126_m1_robustness_part1_human_authorization_record.json"
+)
+_PART1_LOCK_REL = (
+    "project/stage126/stage126_m1_robustness_part1_completion_lock.json"
+)
+_PART1_ORDER = [
+    "m1_target_proximity_six_feature_set",
+    "main_rule_b_listing_robustness",
+    "expanded_rule_a_company_scope_robustness",
+    "expanded_rule_b_combined_robustness",
+    "persistent_loss_robustness_target",
+    "smote_training_fold_only_robustness",
+]
+
+
+def _valid_part1_auth() -> dict:
+    with open(os.path.join(REAL_ROOT, _PART1_AUTH_REL), encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _valid_part1_lock() -> dict:
+    with open(os.path.join(REAL_ROOT, _PART1_LOCK_REL), encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _write_part1(tmp, auth, lock) -> str:
+    d = os.path.join(tmp, "project", "stage126")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, os.path.basename(_PART1_AUTH_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(auth, f, ensure_ascii=False)
+    with open(os.path.join(d, os.path.basename(_PART1_LOCK_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(lock, f, ensure_ascii=False)
+    return tmp
+
+
+def test_handoff_state_carries_part1_markers():
+    state = _state(REAL_ROOT)
+    assert state["m1_robustness_started"] is True
+    assert state["m1_robustness_completed"] is False
+    assert state["m1_robustness_part1_human_authorized"] is True
+    assert state["m1_robustness_part1_completed"] is True
+    assert state["m1_robustness_completed_category_ids"] == [
+        "m1_target_proximity_six_feature_set"
+    ]
+    assert state["m1_robustness_next_category_id"] == "main_rule_b_listing_robustness"
+    assert state["m1_robustness_part2_authorized"] is False
+    assert state["m1_robustness_execution_authorized"] is False
+
+
+def test_part1_preserves_primary_and_final_test_state():
+    state = _state(REAL_ROOT)
+    assert state["m1_primary_development_tuning_completed"] is True
+    assert state["full_development_refit_performed"] is False
+    assert state["final_test_unlocked"] is False
+    assert state["final_test_access_authorized"] is False
+    assert state["final_test_predictor_values_inspected"] is False
+    assert state["final_test_target_values_inspected"] is False
+    assert state["final_test_evaluation_performed"] is False
+    assert state["m2_data_collected"] is False
+    assert state["m3_data_collected"] is False
+    assert state["m4_data_collected"] is False
+
+
+def test_part1_selected_qc_and_micro_part():
+    state = _state(REAL_ROOT)
+    assert state["last_completed_micro_part"] == \
+        "stage126-m1-robustness-part1-target-proximity"
+    assert state["selected_qc_scope"] == \
+        "stage126_m1_robustness_part1_target_proximity"
+    assert state["selected_qc_path"] == \
+        "project/stage126/stage126_m1_robustness_part1_qc_report.json"
+
+
+def test_part1_does_not_advance_research_pointers():
+    state = _state(REAL_ROOT)
+    assert state["next_research_action_id"] == "stage126-m1-financial-baseline"
+    assert state["active_workstream"] == "stage126_m1_financial_baseline"
+    assert state["current_stage"] == "Stage126"
+
+
+def test_part1_markers_positive_from_synthetic(tmp_path):
+    root = _write_part1(str(tmp_path), _valid_part1_auth(), _valid_part1_lock())
+    m = gen.derive_m1_robustness_part1_markers(root, _PART1_ORDER)
+    assert m["m1_robustness_started"] is True
+    assert m["m1_robustness_part1_completed"] is True
+    assert m["m1_robustness_part2_authorized"] is False
+    assert m["m1_robustness_execution_authorized"] is False
+    assert m["m1_robustness_next_category_id"] == "main_rule_b_listing_robustness"
+
+
+def test_part1_markers_absent_returns_empty(tmp_path):
+    assert gen.derive_m1_robustness_part1_markers(str(tmp_path), _PART1_ORDER) == {}
+
+
+def test_part1_half_present_fails_closed(tmp_path):
+    d = os.path.join(str(tmp_path), "project", "stage126")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, os.path.basename(_PART1_AUTH_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(_valid_part1_auth(), f, ensure_ascii=False)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_m1_robustness_part1_markers(str(tmp_path), _PART1_ORDER)
+
+
+@pytest.mark.parametrize("mutate_auth", [
+    lambda a: a.update(authorization_id="WRONG"),
+    lambda a: a.update(authorized_category_id="WRONG"),
+    lambda a: a.update(part1_execution_authorized=False),
+    lambda a: a.update(part2_execution_authorized=True),
+    lambda a: a.update(final_test_access_authorized=True),
+    lambda a: a.update(human_authorization_text="tampered"),
+    lambda a: a.update(human_authorization_text_sha256="0" * 64),
+], ids=[
+    "wrong_auth_id", "wrong_category", "part1_not_authorized",
+    "part2_authorized", "final_test_authorized", "tampered_text", "wrong_hash",
+])
+def test_part1_auth_fail_closed(tmp_path, mutate_auth):
+    auth = _valid_part1_auth()
+    mutate_auth(auth)
+    root = _write_part1(str(tmp_path), auth, _valid_part1_lock())
+    with pytest.raises(gen.HandoffError):
+        gen.derive_m1_robustness_part1_markers(root, _PART1_ORDER)
+
+
+@pytest.mark.parametrize("mutate_lock", [
+    lambda l: l.update(category_id="WRONG"),
+    lambda l: l.update(part1_execution_completed=False),
+    lambda l: l.update(authorization_consumed=False),
+    lambda l: l.update(no_retuning=False),
+    lambda l: l.update(m1_robustness_started=False),
+    lambda l: l.update(m1_robustness_completed=True),
+    lambda l: l.update(part2_execution_authorized=True),
+    lambda l: l.update(full_development_refit_performed=True),
+    lambda l: l.update(final_test_unlocked=True),
+    lambda l: l.update(final_test_evaluation_performed=True),
+    lambda l: l.update(smote_executed=True),
+    lambda l: l.update(smotenc_executed=True),
+    lambda l: l.update(shap_executed=True),
+    lambda l: l.update(completed_category_ids=[]),
+    lambda l: l.update(next_category_id="WRONG"),
+], ids=[
+    "wrong_category", "not_completed", "auth_not_consumed", "retuning",
+    "not_started", "all_completed", "part2_authorized", "full_refit",
+    "final_test_unlocked", "final_test_evaluated", "smote", "smotenc", "shap",
+    "empty_completed_ids", "wrong_next_category",
+])
+def test_part1_lock_fail_closed(tmp_path, mutate_lock):
+    lock = _valid_part1_lock()
+    mutate_lock(lock)
+    root = _write_part1(str(tmp_path), _valid_part1_auth(), lock)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_m1_robustness_part1_markers(root, _PART1_ORDER)
+
+
+# --------------------------------------------------------------------------- #
+# Frozen Part 5 successor-compatibility markers
+# --------------------------------------------------------------------------- #
+
+_PART5_COMPAT_REL = (
+    "project/stage126/"
+    "stage126_m1_robustness_part1_part5_successor_compatibility.json"
+)
+_PART1_QC_REL = "project/stage126/stage126_m1_robustness_part1_qc_report.json"
+
+
+def _valid_compat() -> dict:
+    with open(os.path.join(REAL_ROOT, _PART5_COMPAT_REL), encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _valid_part1_qc() -> dict:
+    with open(os.path.join(REAL_ROOT, _PART1_QC_REL), encoding="utf-8") as f:
+        return json.load(f)
+
+
+def test_handoff_state_carries_part5_compatibility_markers():
+    state = _state(REAL_ROOT)
+    assert state["stage125_part5_frozen_artifacts_verified"] is True
+    assert state["stage125_part5_live_successor_check_applicable"] is False
+    assert state["stage125_part5_successor_compatibility_status"] == (
+        "expected_historical_contract_boundary_after_part1"
+    )
+
+
+def test_part5_compatibility_markers_absent_without_artifacts(tmp_path):
+    assert gen.derive_part5_successor_compatibility_markers(str(tmp_path)) == {}
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda c: c.update(contract_id="WRONG"),
+    lambda c: c.update(contract_version="WRONG"),
+    lambda c: c.update(part1_category_id="WRONG"),
+    lambda c: c.update(stage125_part5_artifacts_modified=True),
+    lambda c: c.update(stage125_part5_source_modified=True),
+    lambda c: c.update(stage125_part5_historical_closure_remains_valid=False),
+    lambda c: c.update(
+        stage125_part5_live_handoff_check_applicable_after_part1=True),
+    lambda c: c.update(part1_scientific_execution_valid=False),
+    lambda c: c.update(part2_execution_authorized=True),
+    lambda c: c.update(full_development_refit_performed=True),
+    lambda c: c.update(final_test_access_authorized=True),
+    lambda c: c.update(final_test_evaluation_performed=True),
+    lambda c: c.update(expected_live_mismatch_fields=["only_one_field"]),
+], ids=[
+    "wrong_contract_id", "wrong_contract_version", "wrong_category",
+    "artifacts_modified", "source_modified", "closure_invalid",
+    "check_applicable", "execution_invalid", "part2_authorized",
+    "full_refit", "final_test_access", "final_test_evaluated",
+    "wrong_mismatch_fields",
+])
+def test_part5_compatibility_fail_closed(tmp_path, mutate):
+    compat = _valid_compat()
+    mutate(compat)
+    d = os.path.join(str(tmp_path), "project", "stage126")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, os.path.basename(_PART5_COMPAT_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(compat, f, ensure_ascii=False)
+    with open(os.path.join(d, os.path.basename(_PART1_QC_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(_valid_part1_qc(), f, ensure_ascii=False)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_part5_successor_compatibility_markers(str(tmp_path))
+
+
+def test_current_state_labels_micro_part_not_research_action():
+    """CURRENT_STATE must not label a micro-part as a completed research action."""
+    text = _read_doc("project", "docs", "ai", "CURRENT_STATE.md")
+    assert "- **Last completed micro-part:** " \
+        "`stage126-m1-robustness-part1-target-proximity`" in text
+    assert "Last completed research action" not in text, (
+        "a robustness micro-part must never be labelled a research action"
+    )
+    assert "- **Next research action:** `stage126-m1-financial-baseline`" in text
+
+
+# --------------------------------------------------------------------------- #
+# Part 1 observed-ordering instability markers
+# --------------------------------------------------------------------------- #
+
+_COMPARISON_REL = (
+    "project/stage126/stage126_m1_robustness_part1_primary_comparison.json"
+)
+
+
+def _valid_comparison() -> dict:
+    with open(os.path.join(REAL_ROOT, _COMPARISON_REL), encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _write_comparison(tmp, cmp_) -> str:
+    d = os.path.join(tmp, "project", "stage126")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, os.path.basename(_COMPARISON_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(cmp_, f, ensure_ascii=False)
+    return tmp
+
+
+def test_handoff_state_carries_ordering_instability_markers():
+    state = _state(REAL_ROOT)
+    assert state["m1_robustness_part1_ordering_instability_reported"] is True
+    assert state["m1_robustness_part1_observed_ordering"] == [
+        "xgboost", "random_forest", "regularized_logistic_regression",
+    ]
+    assert state["m1_primary_claim_ordering_preserved"] is True
+
+
+def test_ordering_markers_absent_without_comparison(tmp_path):
+    assert gen.derive_part1_ordering_instability_markers(str(tmp_path)) == {}
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda c: c.update(contract_version="WRONG"),
+    lambda c: c.update(comparison_scope="WRONG"),
+    lambda c: c.update(comparison_metric="WRONG"),
+    lambda c: c.update(observed_ordering_differs_from_primary=False),
+    lambda c: c.update(ordering_instability_reported_to_human_supervisor=False),
+    lambda c: c.update(primary_ordering_for_confirmatory_claims_changed=True),
+    lambda c: c.update(selected_configurations_changed=True),
+    lambda c: c.update(paper_winner_selected=True),
+    lambda c: c.update(automatic_scientific_action_triggered=True),
+    lambda c: c.update(part1_observed_sensitivity_ordering=["random_forest"]),
+], ids=[
+    "wrong_version", "wrong_scope", "wrong_metric", "no_difference",
+    "not_reported", "primary_ordering_changed", "configs_changed",
+    "winner_selected", "auto_action", "wrong_observed_ordering",
+])
+def test_ordering_markers_fail_closed(tmp_path, mutate):
+    cmp_ = _valid_comparison()
+    mutate(cmp_)
+    root = _write_comparison(str(tmp_path), cmp_)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_part1_ordering_instability_markers(root)
+
+
+def test_part5_compatibility_requires_part1_qc_all_pass(tmp_path):
+    qc = _valid_part1_qc()
+    qc["all_pass"] = False
+    d = os.path.join(str(tmp_path), "project", "stage126")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, os.path.basename(_PART5_COMPAT_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(_valid_compat(), f, ensure_ascii=False)
+    with open(os.path.join(d, os.path.basename(_PART1_QC_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(qc, f, ensure_ascii=False)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_part5_successor_compatibility_markers(str(tmp_path))

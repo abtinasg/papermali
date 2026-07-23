@@ -152,8 +152,19 @@ Do not confuse QC selection with the research-action chain:
   `stage126/stage126_m1_robustness_part0_decision_record.json`,
   `stage126/stage126_m1_robustness_part0_decision_lock_qc_report.json`
   (additive robustness execution contract; **decision lock only — no robustness
-  execution; Part 1 not started**; primary artifacts byte-identical; final test
-  locked).
+  execution**; primary artifacts byte-identical; final test locked).
+- Stage126 M1 robustness Part 1 (target-proximity) source/test/QC:
+  `src/stage126_m1_robustness_part1_target_proximity.py`,
+  `run_stage126_m1_robustness_part1_target_proximity.py`,
+  `tests/test_stage126_m1_robustness_part1_target_proximity.py`,
+  `stage126/stage126_m1_robustness_part1_human_authorization_record.json`,
+  `stage126/stage126_m1_robustness_part1_oof_predictions.csv`,
+  `stage126/stage126_m1_robustness_part1_metrics.csv`,
+  `stage126/stage126_m1_robustness_part1_completion_lock.json`,
+  `stage126/stage126_m1_robustness_part1_qc_report.json`
+  (**explicitly human-authorized and completed on development folds only; only
+  the feature set changed; no retuning; no full-development refit; final test
+  locked; sensitivity analysis only; Part 2 not authorized**).
 
 ## 7. Done
 
@@ -192,10 +203,41 @@ collected.
 
 The robustness Part 0 decision lock
 (`stage126_m1_robustness_execution_contract_v1`) records the execution contract
-for the six robustness categories (one category per micro-part PR, first
-`m1_target_proximity_six_feature_set`). It is a **decision lock only**:
-`m1_robustness_execution_authorized=false` and **Part 1 is not started**. Each
-future Part requires its own separate explicit human authorization.
+for the six robustness categories (one category per micro-part PR). **Part 1
+(`m1_target_proximity_six_feature_set`) was explicitly human-authorized and is
+now completed** on the development folds — only the feature set changed, no
+retuning, no full-development refit, and the final test remains locked and
+untouched. Part 1 is **sensitivity-analysis evidence only**.
+
+**Part 2 (`main_rule_b_listing_robustness`) is not authorized and not started.**
+`m1_robustness_execution_authorized=false` — the consumed Part 1 authorization
+is not a standing authorization; each future Part requires its own separate
+explicit human authorization.
+
+**Observed ordering sensitivity (reported; primary claims unchanged).** Primary
+pooled PR-AUC ordering: **Logistic > RF > XGBoost**. Part 1 observed pooled
+PR-AUC ordering: **XGBoost > RF > Logistic**. **All three pooled PR-AUC values
+declined.** The observed Part 1 sensitivity ordering differs from the primary
+development ordering; this does not change the locked primary ordering used for
+confirmatory interpretation, does not replace the primary results, and does not
+select a paper winner. Development-only sensitivity finding, recorded in
+`stage126/stage126_m1_robustness_part1_primary_comparison.json` and reported to
+the human supervisor. No selected configuration changed and no automatic
+scientific action was triggered.
+
+**Frozen Part 5 live-successor boundary.** Stage125 Part 5 remains a frozen,
+valid historical closure (source, runner and all `project/stage125/` artifacts
+byte-identical). Its embedded live-Handoff successor check ends at the earlier
+primary-development state, so after Part 1 `run_stage125_part5.py --check` exits
+1 with exactly five expected mismatching fields (`m1_robustness_started`,
+`selected_qc_scope`, `selected_qc_path`, `contract_version`,
+`last_completed_micro_part`). This is an **expected historical-contract
+boundary**, recorded in
+`stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json`,
+asserted in the Part 1 QC and explicitly tested — not a scientific failure and
+not Stage125 drift. Current Stage126 successor state is validated by the Part 0
+integrity controls, the Part 1 QC, the Part 1 completion lock and this Handoff
+validator.
 
 ## 11. Recent change history
 

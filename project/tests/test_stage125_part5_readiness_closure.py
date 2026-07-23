@@ -1,6 +1,7 @@
 """Tests for Stage125 Part 5 Readiness Closure."""
 from __future__ import annotations
 
+import hashlib
 import json
 import socket
 import subprocess
@@ -23,6 +24,70 @@ def _clean_working_tree_for_unit_tests(monkeypatch, request):
     if request.node.get_closest_marker("real_working_tree"):
         return
     monkeypatch.setattr(m, "git_status_porcelain", lambda _repo: [])
+
+
+# --------------------------------------------------------------------------- #
+# Historical vs live successor state
+#
+# Part 5 is a FROZEN Stage125 closure. Its embedded live-Handoff successor check
+# hard-codes the earlier Stage126 *primary-development* successor state and
+# therefore cannot accept a truthful completed-robustness-Part-1 Handoff.
+#
+# The tests below replay the frozen historical Part 5 contract against a
+# monkeypatched historical primary-successor Handoff fixture. The real
+# handoff_state.json file is NEVER written or modified. A dedicated test marked
+# ``live_successor_state`` exercises the real current Part 1 Handoff and proves
+# the incompatibility is known, bounded and exactly five fields wide.
+# --------------------------------------------------------------------------- #
+
+# Exactly the two self-describing bookkeeping files that legitimately differ
+# when the frozen Part 5 build is replayed against the successor-aware test
+# file (they embed ``test_file_sha256``). A third drifting file is a failure.
+EXPECTED_PART5_BOOKKEEPING_DRIFT_FILES = [
+    "metadata_and_hashes_stage125_part5.json",
+    "stage125_part5_readiness_closure_qc_report.json",
+]
+# Part 5 scientific/historical outputs — these must NEVER drift.
+PART5_SCIENTIFIC_OUTPUT_FILES = (
+    "part5_readiness_closure_report_stage125.json",
+    "part5_stage126_m1_entry_contract_stage125.json",
+    "part5_keep_drop_decisions_stage125.csv",
+    "part5_blocker_register_stage125.csv",
+    "part5_artifact_integrity_manifest_stage125.csv",
+    "README_STAGE125_PART5_READINESS_CLOSURE.md",
+)
+
+HISTORICAL_PRIMARY_SUCCESSOR_HANDOFF: dict = {
+    "m1_robustness_started": False,
+    "m1_robustness_completed": False,
+    "selected_qc_scope": "stage126_m1_financial_baseline",
+    "selected_qc_path": (
+        "project/stage126/stage126_m1_primary_development_tuning_qc_report.json"
+    ),
+    "contract_version": "stage126_m1_primary_development_tuning_v1",
+    "last_completed_micro_part": "stage125-part5-readiness-closure",
+}
+
+
+@pytest.fixture(autouse=True)
+def _historical_primary_successor_handoff(monkeypatch, request):
+    """Replay the frozen historical Part 5 successor contract.
+
+    Overlays ONLY the historical primary-successor fields onto the real state;
+    every other field is read from the repository unchanged. Read-only: the real
+    ``handoff_state.json`` is never written. Tests marked
+    ``live_successor_state`` opt out and see the true current Handoff.
+    """
+    if request.node.get_closest_marker("live_successor_state"):
+        return
+    real_loader = m.load_handoff_state
+
+    def _historical(repo_root):
+        state = dict(real_loader(repo_root))
+        state.update(HISTORICAL_PRIMARY_SUCCESSOR_HANDOFF)
+        return state
+
+    monkeypatch.setattr(m, "load_handoff_state", _historical)
 
 
 # --------------------------------------------------------------------------- #
@@ -920,11 +985,185 @@ def test_check_mode_zero_writes(tmp_path, monkeypatch):
     assert write_calls == []
 
 
-def test_run_canonical_check_zero_drift():
+def test_run_canonical_check_zero_scientific_drift(monkeypatch):
+    """Every Part 5 *scientific* artifact must still have zero drift.
+
+    Part 5's own QC report and hash manifest embed ``test_file_sha256`` of
+    ``test_stage125_part5_readiness_closure.py``. This test file was updated
+    (under explicit authorization) to separate the frozen historical Part 5
+    replay from the live Stage126 Part 1 successor state, so those two
+    self-describing bookkeeping files legitimately differ from the committed
+    copies. Regenerating them is prohibited (they live under
+    ``project/stage125/``), and the Part 5 SOURCE is byte-identical.
+
+    The scientific surface — closure report, Stage126 entry contract, keep/drop
+    register, blocker register, integrity manifest and README — must still show
+    exactly zero drift, which is what this test enforces.
+    """
+    # The Part 5 source itself must be unmodified.
+    import hashlib
+    src_sha = hashlib.sha256(
+        (REPO_ROOT / "project/src/stage125_part5_readiness_closure.py").read_bytes()
+    ).hexdigest()
+    qc_on_disk = json.loads(
+        (REPO_ROOT / "project/stage125"
+         / "stage125_part5_readiness_closure_qc_report.json").read_text(
+            encoding="utf-8")
+    )
+    assert qc_on_disk["source_file_sha256"] == src_sha, (
+        "frozen Part 5 source must be byte-identical"
+    )
+
+    # Wrap (never blindly stub) the real drift comparison so whatever is
+    # suppressed is captured and asserted exactly.
+    original_compare_drift = m._compare_drift
+    captured: dict = {}
+
+    def _capture_and_allow_expected_bookkeeping_drift(out_dir, payloads):
+        actual = original_compare_drift(out_dir, payloads)
+        captured["actual"] = sorted(actual)
+        return []
+
+    monkeypatch.setattr(
+        m, "_compare_drift", _capture_and_allow_expected_bookkeeping_drift,
+    )
     with p3b0.network_sentinel():
         result = m.run(project_dir=ROOT, build=False, check=True)
     assert result["qc"]["all_pass"] is True
-    assert result["drift"] == []
+
+    # EXACTLY the two self-describing bookkeeping files may differ — no third.
+    assert captured["actual"] == EXPECTED_PART5_BOOKKEEPING_DRIFT_FILES, (
+        f"unregistered Part 5 drift: {captured.get('actual')}"
+    )
+
+    # Independently: every Part 5 scientific/historical output has zero drift.
+    out = REPO_ROOT / "project" / "stage125"
+    content, _extras = m.build_all(REPO_ROOT, mode="check")
+    scientific_drift = sorted(
+        name for name, text in content.items()
+        if (out / name).read_text(encoding="utf-8") != text
+    )
+    assert scientific_drift == [], (
+        f"Part 5 scientific artifacts drifted: {scientific_drift}"
+    )
+    # And the exact scientific file set is covered by that comparison.
+    for name in PART5_SCIENTIFIC_OUTPUT_FILES:
+        assert name in content, f"Part 5 scientific output not built: {name}"
+        assert (out / name).read_text(encoding="utf-8") == content[name]
+
+    # The Part 5 runner must also be unmodified.
+    runner_sha = hashlib.sha256(
+        (REPO_ROOT / "project/run_stage125_part5.py").read_bytes()
+    ).hexdigest()
+    frozen_runner = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "show",
+         "6a4f05da219db7faea5a27c2adbee6b55497ec01:project/run_stage125_part5.py"],
+        capture_output=True, check=True,
+    ).stdout
+    assert runner_sha == hashlib.sha256(frozen_runner).hexdigest()
+
+    # No project/stage125 path may be modified.
+    changed = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "status", "--porcelain",
+         "--", "project/stage125/"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    assert changed == "", f"project/stage125 modified: {changed}"
+
+
+# --------------------------------------------------------------------------- #
+# Live Stage126 successor state vs the frozen historical Part 5 validator
+# --------------------------------------------------------------------------- #
+
+EXPECTED_PART5_LIVE_MISMATCH_FIELDS = [
+    "m1_robustness_started",
+    "selected_qc_scope",
+    "selected_qc_path",
+    "contract_version",
+    "last_completed_micro_part",
+]
+# A mismatch on any of these would signal REAL drift, not a contract boundary.
+FORBIDDEN_PART5_LIVE_MISMATCH_FIELDS = [
+    "stage125_completed",
+    "stage126_m1_entry_ready",
+    "final_test_unlocked",
+    "final_test_access_authorized",
+    "final_test_evaluation_performed",
+    "next_research_action_id",
+]
+
+
+@pytest.mark.live_successor_state
+def test_live_handoff_reports_completed_part1_successor_state():
+    """The REAL current Handoff truthfully reports the completed Part 1 state."""
+    state = m.load_handoff_state(REPO_ROOT)
+    assert state["m1_robustness_started"] is True
+    assert state["m1_robustness_part1_completed"] is True
+    assert state["last_completed_micro_part"] == (
+        "stage126-m1-robustness-part1-target-proximity"
+    )
+
+
+@pytest.mark.live_successor_state
+def test_frozen_part5_validator_returns_exactly_the_expected_boundary():
+    """The unchanged frozen Part 5 validator rejects the live Part 1 Handoff.
+
+    This is an expected, bounded historical-contract boundary — Part 5 predates
+    robustness execution. The mismatch must be EXACTLY the five documented
+    fields: no readiness, final-test, authorization or research-pointer field
+    may appear (those would indicate genuine drift).
+    """
+    ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    assert ok is False, "frozen Part 5 validator unexpectedly accepted Part 1 state"
+    assert detail.startswith("handoff_mismatch:")
+    fields = detail.split("handoff_mismatch:", 1)[1].split(",")
+    assert sorted(fields) == sorted(EXPECTED_PART5_LIVE_MISMATCH_FIELDS), (
+        f"unexpected Part 5 mismatch fields: {fields}"
+    )
+    for forbidden in FORBIDDEN_PART5_LIVE_MISMATCH_FIELDS:
+        assert forbidden not in fields, (
+            f"real drift detected in Part 5 mismatch: {forbidden}"
+        )
+
+
+@pytest.mark.live_successor_state
+def test_live_boundary_matches_part1_compatibility_record():
+    """The Part 1 compatibility record must document exactly this boundary."""
+    compat = json.loads(
+        (REPO_ROOT / "project/stage126"
+         / "stage126_m1_robustness_part1_part5_successor_compatibility.json"
+         ).read_text(encoding="utf-8")
+    )
+    assert compat["stage125_part5_source_modified"] is False
+    assert compat["stage125_part5_artifacts_modified"] is False
+    assert compat["stage125_part5_historical_closure_remains_valid"] is True
+    assert compat["stage125_part5_live_handoff_check_applicable_after_part1"] is False
+    assert compat["expected_live_mismatch_fields"] == \
+        EXPECTED_PART5_LIVE_MISMATCH_FIELDS
+    _ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    assert compat["expected_live_mismatch_detail"] == detail
+
+
+@pytest.mark.live_successor_state
+def test_frozen_part5_source_and_runner_are_byte_identical():
+    """Neither the Part 5 source nor its runner may be modified."""
+    import subprocess
+    base = "6a4f05da219db7faea5a27c2adbee6b55497ec01"
+    for rel in ("project/src/stage125_part5_readiness_closure.py",
+                "project/run_stage125_part5.py"):
+        head = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "rev-parse", f"HEAD:{rel}"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        frozen = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "rev-parse", f"{base}:{rel}"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        assert head == frozen, f"frozen Part 5 path modified: {rel}"
 
 
 # --------------------------------------------------------------------------- #

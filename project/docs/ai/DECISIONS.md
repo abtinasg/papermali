@@ -84,6 +84,58 @@ These are stable project decisions. Change them only deliberately (and note it i
   requires a separate explicit human authorization. Primary Stage126 artifacts
   remain byte-identical; the final test remains locked and untouched.
 
+### Stage126 M1 robustness Part 1 — executed (2026-07-22)
+
+- **Part 1 (`m1_target_proximity_six_feature_set`) was explicitly
+  human-authorized and completed on the development folds only.**
+- **Only the feature set changed:** the six-feature
+  `M1_TARGET_PROXIMITY_ROBUSTNESS` set (12 transformed columns). Sample, target,
+  folds, selected configurations, imbalance policy, seeds and metrics unchanged.
+- **No retuning** (frozen selected configurations reused; 0 tuning searches;
+  exactly 22 fits / 22 predictions). **No full-development refit.**
+- **Final test remains locked and untouched**; no SMOTE/SMOTENC, SHAP,
+  calibration, bootstrap or Holm; zero network access.
+- **Sensitivity analysis only** — Part 1 does not replace the primary results
+  and selects no paper winner.
+- **Observed ordering sensitivity (reported, not acted upon).** Primary pooled
+  PR-AUC ordering: **Logistic > RF > XGBoost**. Part 1 observed pooled PR-AUC
+  ordering: **XGBoost > RF > Logistic**. **All three pooled PR-AUC values
+  declined** (Logistic −0.127639458886 / −28.63%, RF −0.070307846896 / −17.47%,
+  XGBoost −0.017282221021 / −4.85%). The observed Part 1 sensitivity ordering
+  differs from the primary development ordering; this does **not** change the
+  locked primary ordering used for confirmatory interpretation, does **not**
+  replace the primary results, and does **not** select a paper winner. This is a
+  development-only sensitivity finding, recorded in
+  `stage126_m1_robustness_part1_primary_comparison.json` and reported to the
+  human supervisor. No selected configuration changed, no refit was authorized,
+  no automatic scientific action was triggered, and the final test stays locked.
+- **Part 2 (`main_rule_b_listing_robustness`) is not authorized and not
+  started.** The consumed Part 1 authorization confers no standing
+  authorization for any later category.
+
+### Frozen Part 5 live-successor boundary (2026-07-22)
+
+- **Stage125 Part 5 remains a frozen, valid historical closure.** Neither its
+  source, its runner, nor any `project/stage125/` artifact was modified.
+- Part 5's *embedded live-Handoff successor check* hard-codes the earlier
+  Stage126 **primary-development** state and predates robustness execution. It
+  therefore cannot accept a truthful completed-Part-1 Handoff.
+- After Part 1 the mismatch is **exactly five fields**:
+  `m1_robustness_started`, `selected_qc_scope`, `selected_qc_path`,
+  `contract_version`, `last_completed_micro_part`. This is an **expected
+  historical-contract boundary**, not a scientific failure, not Stage125 drift,
+  and not a Part 1 merge blocker.
+- It must never be "fixed" by writing false Handoff markers or by changing
+  `project/stage125/**`. It is recorded in
+  `stage126_m1_robustness_part1_part5_successor_compatibility.json`, asserted in
+  the Part 1 QC, and explicitly tested — historical Part 5 replay tests use a
+  monkeypatched historical primary-successor fixture (the real Handoff file is
+  never written), and a dedicated live test proves the boundary is exactly those
+  five fields with no readiness/final-test/authorization/research-pointer drift.
+- **Current Stage126 successor state is validated by:** the Part 0 integrity
+  controls, the Part 1 QC, the Part 1 completion lock, and the AI Handoff
+  validator.
+
 ## Verified listing master (Stage124)
 
 - `listing_master_verified_stage124.csv` **exists** and contains exactly **130

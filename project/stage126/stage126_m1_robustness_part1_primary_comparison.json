@@ -1,0 +1,45 @@
+{
+  "absolute_change": {
+    "random_forest": -0.070307846896,
+    "regularized_logistic_regression": -0.127639458886,
+    "xgboost": -0.017282221021
+  },
+  "all_families_declined": true,
+  "automatic_scientific_action_triggered": false,
+  "comparison_metric": "pr_auc",
+  "comparison_scope": "pooled_development_oof",
+  "contract_version": "stage126_m1_robustness_part1_primary_comparison_v1",
+  "interpretation": "The target-proximity six-feature sensitivity analysis produced a different observed development-only ordering and lower pooled PR-AUC for all three families. This is reported as feature-set sensitivity and does not replace the locked primary results, change selected configurations, select a paper winner, authorize refitting, or unlock the final test.",
+  "observed_ordering_differs_from_primary": true,
+  "ordering_instability_reported_to_human_supervisor": true,
+  "paper_winner_selected": false,
+  "part1_observed_sensitivity_ordering": [
+    "xgboost",
+    "random_forest",
+    "regularized_logistic_regression"
+  ],
+  "part1_pooled_pr_auc": {
+    "random_forest": 0.332133983124,
+    "regularized_logistic_regression": 0.318117505162,
+    "xgboost": 0.339262787141
+  },
+  "primary_metrics_sha256": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+  "primary_metrics_source": "project/stage126/stage126_m1_development_metrics.csv",
+  "primary_observed_ordering": [
+    "regularized_logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "primary_ordering_for_confirmatory_claims_changed": false,
+  "primary_pooled_pr_auc": {
+    "random_forest": 0.40244183002,
+    "regularized_logistic_regression": 0.445756964048,
+    "xgboost": 0.356545008162
+  },
+  "relative_change_percent": {
+    "random_forest": -17.470312887829,
+    "regularized_logistic_regression": -28.634316271109,
+    "xgboost": -4.84713588057
+  },
+  "selected_configurations_changed": false
+}

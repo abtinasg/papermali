@@ -1,0 +1,13 @@
+{
+  "authorization_context": "The immediately preceding independently verified repository state identified Stage126 M1 Robustness Part 1 — m1_target_proximity_six_feature_set — as the next gated micro-part.",
+  "authorization_date": "2026-07-22",
+  "authorization_id": "stage126-m1-robustness-part1-human-authorization",
+  "authorized_category_id": "m1_target_proximity_six_feature_set",
+  "authorizing_role": "human_supervisor_data_owner",
+  "final_test_access_authorized": false,
+  "human_authorization_text": "مجوز انجام مرحله بعدی رو میدم",
+  "human_authorization_text_sha256": "7364a67ce5761c69f6705ae0ee4b0563fc092a576e960df471ebb4581ae1b5ea",
+  "merge_authorized": false,
+  "part1_execution_authorized": true,
+  "part2_execution_authorized": false
+}

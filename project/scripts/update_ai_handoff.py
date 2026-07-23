@@ -139,6 +139,10 @@ ALLOWLIST_FILES = (
     "project/src/stage126_m1_robustness_part0_decision_lock.py",
     "project/run_stage126_m1_robustness_part0_decision_lock.py",
     "project/tests/test_stage126_m1_robustness_part0_decision_lock.py",
+    # Stage126 M1 robustness Part 1 target-proximity code, runner, and tests.
+    "project/src/stage126_m1_robustness_part1_target_proximity.py",
+    "project/run_stage126_m1_robustness_part1_target_proximity.py",
+    "project/tests/test_stage126_m1_robustness_part1_target_proximity.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
@@ -361,6 +365,18 @@ ARTIFACT_ONLY_FILES = (
     "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART0_DECISION_LOCK.md",
     "project/stage126/stage126_m1_robustness_part0_decision_lock_qc_report.json",
     "project/stage126/metadata_and_hashes_stage126_m1_robustness_part0_decision_lock.json",
+    # Stage126 M1 robustness Part 1 generated scientific artifacts.
+    "project/stage126/stage126_m1_robustness_part1_human_authorization_record.json",
+    "project/stage126/stage126_m1_robustness_part1_feature_manifest.csv",
+    "project/stage126/stage126_m1_robustness_part1_execution_manifest.json",
+    "project/stage126/stage126_m1_robustness_part1_oof_predictions.csv",
+    "project/stage126/stage126_m1_robustness_part1_metrics.csv",
+    "project/stage126/stage126_m1_robustness_part1_completion_lock.json",
+    "project/stage126/stage126_m1_robustness_part1_primary_comparison.json",
+    "project/stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json",
+    "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md",
+    "project/stage126/stage126_m1_robustness_part1_qc_report.json",
+    "project/stage126/metadata_and_hashes_stage126_m1_robustness_part1.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -695,12 +711,48 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "m4_data_collected",
         "contract_version",
     ),
+    # Stage126 M1 robustness Part 1 inherits the unchanged Stage126 markers and
+    # adds the Part 1 completion state.
+    "stage126_m1_robustness_part1_target_proximity": (
+        "stage125_completed",
+        "stage126_m1_entry_ready",
+        "stage126_authorized",
+        "stage126_started",
+        "development_modeling_authorized",
+        "modeling_authorized",
+        "modeling_started",
+        "final_test_unlocked",
+        "final_test_access_authorized",
+        "final_test_predictor_values_inspected",
+        "final_test_target_values_inspected",
+        "final_test_evaluation_performed",
+        "m1_primary_development_tuning_completed",
+        "m1_robustness_started",
+        "m1_robustness_completed",
+        "m1_robustness_part1_human_authorized",
+        "m1_robustness_part1_completed",
+        "m1_robustness_completed_category_ids",
+        "m1_robustness_next_category_id",
+        "m1_robustness_part2_authorized",
+        "full_development_refit_performed",
+        "m2_data_collected",
+        "m3_data_collected",
+        "m4_data_collected",
+        "contract_version",
+    ),
 }
 
 # Repository-wide temporal-availability invariants carried into Stage126 Handoff
 # scope. Values are derived from frozen Stage125 contracts/artifacts (never
 # invented by the Stage126 QC report). Missing or cross-artifact conflict is
 # fatal (fail-closed).
+# Every Stage126 QC scope (primary + completed robustness micro-parts) carries
+# the repository-wide Stage125 temporal-availability invariants.
+STAGE126_QC_SCOPES = frozenset({
+    "stage126_m1_financial_baseline",
+    "stage126_m1_robustness_part1_target_proximity",
+})
+
 STAGE126_CARRIED_TEMPORAL_AVAILABILITY_FIELDS = (
     "financial_data_researcher_verified_frozen",
     "broad_codal_capture_stopped",
@@ -1022,6 +1074,10 @@ _QC_SOURCE_TEST_OVERRIDES: dict[str, tuple[str, str]] = {
         "project/src/stage126_m1_primary_development_tuning.py",
         "project/tests/test_stage126_m1_primary_development_tuning.py",
     ),
+    "stage126_m1_robustness_part1_target_proximity": (
+        "project/src/stage126_m1_robustness_part1_target_proximity.py",
+        "project/tests/test_stage126_m1_robustness_part1_target_proximity.py",
+    ),
 }
 
 
@@ -1231,7 +1287,7 @@ def derive_m1_robustness_decision_markers(root: str) -> dict:
             "robustness decision record human_decision_text_sha256 field mismatch"
         )
 
-    return {
+    markers = {
         "m1_robustness_decision_locked": True,
         "m1_robustness_execution_authorized": False,
         "m1_robustness_started": False,
@@ -1239,6 +1295,275 @@ def derive_m1_robustness_decision_markers(root: str) -> dict:
         "m1_robustness_next_category_id": expected_order[0],
         "m1_robustness_packaging_policy": "one_category_per_micro_part_pr",
     }
+    # Layer completed-category state on top (Part 1 onward), fail-closed.
+    markers.update(derive_m1_robustness_part1_markers(root, expected_order))
+    return markers
+
+
+_M1_ROBUSTNESS_PART1_AUTH_REL = (
+    "project/stage126/stage126_m1_robustness_part1_human_authorization_record.json"
+)
+_M1_ROBUSTNESS_PART1_LOCK_REL = (
+    "project/stage126/stage126_m1_robustness_part1_completion_lock.json"
+)
+_PART1_CATEGORY_ID = "m1_target_proximity_six_feature_set"
+
+
+def derive_m1_robustness_part1_markers(root: str, expected_order: list) -> dict:
+    """Derive Part 1 completion markers (fail-closed).
+
+    Returns {} when Part 1 has not been executed. When the Part 1 authorization
+    record and completion lock are present they must be internally consistent
+    and mutually agreeing, otherwise a HandoffError is raised. A completed and
+    consumed Part 1 authorization grants NO standing authorization for Part 2.
+    """
+    auth_path = os.path.join(root, _M1_ROBUSTNESS_PART1_AUTH_REL)
+    lock_path = os.path.join(root, _M1_ROBUSTNESS_PART1_LOCK_REL)
+    if not (os.path.isfile(auth_path) and os.path.isfile(lock_path)):
+        if os.path.isfile(auth_path) != os.path.isfile(lock_path):
+            raise HandoffError(
+                "Part 1 authorization record and completion lock must both exist"
+            )
+        return {}
+    try:
+        auth = json.load(open(auth_path, encoding="utf-8"))
+        lock = json.load(open(lock_path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable Part 1 artifacts: {exc}") from exc
+
+    auth_exact = {
+        "authorization_id": "stage126-m1-robustness-part1-human-authorization",
+        "authorized_category_id": _PART1_CATEGORY_ID,
+        "part1_execution_authorized": True,
+        "part2_execution_authorized": False,
+        "final_test_access_authorized": False,
+    }
+    for k, v in auth_exact.items():
+        if auth.get(k) != v:
+            raise HandoffError(
+                f"Part 1 authorization field {k}={auth.get(k)!r} != {v!r}"
+            )
+    text = auth.get("human_authorization_text")
+    expected_hash = (
+        "7364a67ce5761c69f6705ae0ee4b0563fc092a576e960df471ebb4581ae1b5ea"
+    )
+    if not isinstance(text, str):
+        raise HandoffError("Part 1 authorization text missing")
+    if hashlib.sha256(text.encode("utf-8")).hexdigest() != expected_hash:
+        raise HandoffError("Part 1 authorization text SHA-256 mismatch")
+    if auth.get("human_authorization_text_sha256") != expected_hash:
+        raise HandoffError("Part 1 authorization hash field mismatch")
+
+    lock_exact = {
+        "category_id": _PART1_CATEGORY_ID,
+        "part1_human_authorized": True,
+        "part1_execution_completed": True,
+        "authorization_consumed": True,
+        "development_only": True,
+        "no_retuning": True,
+        "m1_robustness_started": True,
+        "m1_robustness_completed": False,
+        "part2_execution_authorized": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_performed": False,
+        "smote_executed": False,
+        "smotenc_executed": False,
+        "shap_executed": False,
+    }
+    for k, v in lock_exact.items():
+        if lock.get(k) != v:
+            raise HandoffError(
+                f"Part 1 completion lock field {k}={lock.get(k)!r} != {v!r}"
+            )
+    completed = lock.get("completed_category_ids") or []
+    if list(completed) != [_PART1_CATEGORY_ID]:
+        raise HandoffError("Part 1 completed_category_ids unexpected")
+    # The next category must be the next registered category after Part 1.
+    if lock.get("next_category_id") != expected_order[1]:
+        raise HandoffError(
+            f"Part 1 next_category_id {lock.get('next_category_id')!r} != "
+            f"{expected_order[1]!r}"
+        )
+    markers = {
+        "m1_robustness_started": True,
+        "m1_robustness_completed": False,
+        "m1_robustness_part1_human_authorized": True,
+        "m1_robustness_part1_completed": True,
+        "m1_robustness_completed_category_ids": [_PART1_CATEGORY_ID],
+        "m1_robustness_next_category_id": expected_order[1],
+        "m1_robustness_part2_authorized": False,
+        # A consumed Part 1 authorization is NOT a standing authorization.
+        "m1_robustness_execution_authorized": False,
+    }
+    markers.update(derive_part5_successor_compatibility_markers(root))
+    return markers
+
+
+_PART1_QC_REL = "project/stage126/stage126_m1_robustness_part1_qc_report.json"
+_PART1_PART5_COMPAT_REL = (
+    "project/stage126/"
+    "stage126_m1_robustness_part1_part5_successor_compatibility.json"
+)
+_PART5_EXPECTED_MISMATCH_FIELDS = [
+    "m1_robustness_started",
+    "selected_qc_scope",
+    "selected_qc_path",
+    "contract_version",
+    "last_completed_micro_part",
+]
+
+
+def derive_part5_successor_compatibility_markers(root: str) -> dict:
+    """Derive the frozen-Part-5 successor-compatibility markers (fail-closed).
+
+    Emitted ONLY when the Part 1 authorization record and completion lock are
+    valid (already checked by the caller), the Part 1 QC is all_pass, the
+    compatibility record is internally consistent, and the complete tracked
+    Stage125 tree is unchanged. Any inconsistency raises HandoffError rather
+    than silently asserting that the frozen Part 5 boundary is understood.
+    """
+    compat_path = os.path.join(root, _PART1_PART5_COMPAT_REL)
+    qc_path = os.path.join(root, _PART1_QC_REL)
+    if not (os.path.isfile(compat_path) and os.path.isfile(qc_path)):
+        return {}
+    try:
+        compat = json.load(open(compat_path, encoding="utf-8"))
+        qc = json.load(open(qc_path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(
+            f"unreadable Part 1 compatibility/QC artifacts: {exc}"
+        ) from exc
+
+    if qc.get("all_pass") is not True or qc.get("failed_count") != 0:
+        raise HandoffError("Part 1 QC is not all_pass (fail-closed)")
+
+    compat_exact = {
+        "contract_id":
+            "stage126_m1_robustness_part1_part5_successor_compatibility",
+        "contract_version":
+            "stage126_m1_robustness_part1_part5_successor_compatibility_v1",
+        "part1_category_id": _PART1_CATEGORY_ID,
+        "stage125_part5_artifacts_frozen": True,
+        "stage125_part5_artifacts_modified": False,
+        "stage125_part5_source_modified": False,
+        "stage125_part5_live_handoff_check_applicable_after_part1": False,
+        "stage125_part5_historical_closure_remains_valid": True,
+        "part1_scientific_execution_valid": True,
+        "part2_execution_authorized": False,
+        "full_development_refit_performed": False,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_performed": False,
+    }
+    for key, expected in compat_exact.items():
+        if compat.get(key) != expected:
+            raise HandoffError(
+                f"Part 1 compatibility record field {key}="
+                f"{compat.get(key)!r} != {expected!r}"
+            )
+    if list(compat.get("expected_live_mismatch_fields") or []) != \
+            _PART5_EXPECTED_MISMATCH_FIELDS:
+        raise HandoffError(
+            "Part 1 compatibility record expected_live_mismatch_fields "
+            "is not the exact documented five-field set"
+        )
+    # The QC must agree with the compatibility record.
+    if qc.get("stage125_part5_live_handoff_check_applicable") is not False:
+        raise HandoffError("Part 1 QC part5 applicability flag mismatch")
+    if qc.get("stage125_part5_source_modified") is not False:
+        raise HandoffError("Part 1 QC reports a modified Part 5 source")
+    if qc.get("stage125_part5_artifacts_modified") is not False:
+        raise HandoffError("Part 1 QC reports modified Part 5 artifacts")
+    if list(qc.get("stage125_part5_live_handoff_mismatch_fields") or []) != \
+            _PART5_EXPECTED_MISMATCH_FIELDS:
+        raise HandoffError("Part 1 QC mismatch-field list is not exact")
+
+    # The complete tracked Stage125 tree must be unchanged (fail-closed, git).
+    _require_stage125_tree_unchanged(root)
+
+    markers = {
+        "stage125_part5_frozen_artifacts_verified": True,
+        "stage125_part5_live_successor_check_applicable": False,
+        "stage125_part5_successor_compatibility_status":
+            "expected_historical_contract_boundary_after_part1",
+    }
+    markers.update(derive_part1_ordering_instability_markers(root))
+    return markers
+
+
+_PART1_COMPARISON_REL = (
+    "project/stage126/stage126_m1_robustness_part1_primary_comparison.json"
+)
+_PART1_EXPECTED_OBSERVED_ORDERING = [
+    "xgboost", "random_forest", "regularized_logistic_regression",
+]
+
+
+def derive_part1_ordering_instability_markers(root: str) -> dict:
+    """Derive the observed-ordering-instability markers (fail-closed).
+
+    The instability is REPORTED. It must never imply that the primary ordering,
+    selected configurations or paper winner changed — any record claiming
+    otherwise raises rather than being propagated into the Handoff.
+    """
+    path = os.path.join(root, _PART1_COMPARISON_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        cmp_ = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable Part 1 comparison artifact: {exc}") from exc
+
+    exact = {
+        "contract_version":
+            "stage126_m1_robustness_part1_primary_comparison_v1",
+        "comparison_scope": "pooled_development_oof",
+        "comparison_metric": "pr_auc",
+        "observed_ordering_differs_from_primary": True,
+        "ordering_instability_reported_to_human_supervisor": True,
+        "primary_ordering_for_confirmatory_claims_changed": False,
+        "selected_configurations_changed": False,
+        "paper_winner_selected": False,
+        "automatic_scientific_action_triggered": False,
+    }
+    for key, expected in exact.items():
+        if cmp_.get(key) != expected:
+            raise HandoffError(
+                f"Part 1 comparison field {key}={cmp_.get(key)!r} != {expected!r}"
+            )
+    observed = list(cmp_.get("part1_observed_sensitivity_ordering") or [])
+    if observed != _PART1_EXPECTED_OBSERVED_ORDERING:
+        raise HandoffError(
+            f"Part 1 observed ordering {observed!r} != "
+            f"{_PART1_EXPECTED_OBSERVED_ORDERING!r}"
+        )
+    return {
+        "m1_robustness_part1_ordering_instability_reported": True,
+        "m1_robustness_part1_observed_ordering": observed,
+        "m1_primary_claim_ordering_preserved": True,
+    }
+
+
+def _require_stage125_tree_unchanged(root: str) -> None:
+    """Fail closed unless the tracked project/stage125/ tree is unchanged."""
+    base = "6a4f05da219db7faea5a27c2adbee6b55497ec01"
+    offending: list[str] = []
+    for args, label in (
+        (["diff", "--name-only", base, "HEAD", "--", "project/stage125/"],
+         "committed"),
+        (["diff", "--cached", "--name-only", "HEAD", "--", "project/stage125/"],
+         "staged"),
+        (["diff", "--name-only", "--", "project/stage125/"], "unstaged"),
+        (["ls-files", "--others", "--exclude-standard", "--", "project/stage125/"],
+         "untracked"),
+    ):
+        out = _git(root, *args)
+        offending += [f"{label}:{p}" for p in out.splitlines() if p.strip()]
+    if offending:
+        raise HandoffError(
+            f"frozen Stage125 tree changed (fail-closed): {sorted(set(offending))}"
+        )
 
 
 def detect_markers(root: str) -> dict:
@@ -1563,8 +1888,12 @@ def derive_stage125_temporal_availability_invariants(root: str) -> dict:
 def merge_stage126_carried_temporal_availability(
     root: str, scope: str, qc_workflow: dict,
 ) -> dict:
-    """Carry Stage125 temporal-availability invariants into Stage126 scope."""
-    if scope != "stage126_m1_financial_baseline":
+    """Carry Stage125 temporal-availability invariants into Stage126 scope.
+
+    Every Stage126 scope carries the invariants, including the robustness
+    micro-part scopes (a micro-part never drops repository-wide invariants).
+    """
+    if scope not in STAGE126_QC_SCOPES:
         return qc_workflow
     carried = derive_stage125_temporal_availability_invariants(root)
     merged = dict(qc_workflow)
@@ -1596,12 +1925,42 @@ def _verified_master_tickers(root: str) -> list[str] | None:
 # State assembly + fingerprint
 # --------------------------------------------------------------------------- #
 
+_PART1_QC_SCOPE = "stage126_m1_robustness_part1_target_proximity"
+_PART1_MICRO_PART_ID = "stage126-m1-robustness-part1-target-proximity"
+
+
+def active_micro_part_qc_scope(root: str, default_scope: str) -> str:
+    """Return the QC scope of the newest completed robustness micro-part.
+
+    Falls back to ``default_scope`` when no robustness micro-part has completed.
+    This selects which QC report describes current state; it never advances the
+    research-action pointers (which stay on the Stage126 M1 research action).
+    """
+    lock = os.path.join(root, _M1_ROBUSTNESS_PART1_LOCK_REL)
+    qc = os.path.join(
+        root, "project/stage126/stage126_m1_robustness_part1_qc_report.json",
+    )
+    if os.path.isfile(lock) and os.path.isfile(qc):
+        return _PART1_QC_SCOPE
+    return default_scope
+
+
+def active_micro_part_id(root: str, default_id: str) -> str:
+    """Micro-part identifier for the newest completed robustness micro-part."""
+    if active_micro_part_qc_scope(root, "") == _PART1_QC_SCOPE:
+        return _PART1_MICRO_PART_ID
+    return default_id
+
+
 def semantic_state(root: str):
     head = head_commit(root)
     roadmap = read_roadmap(root)
     workstream = roadmap["active_research_workstream_id"].replace("-", "_")
     qc_scope_val = roadmap.get("qc_scope", "")
     qc_scope = qc_scope_val.replace("-", "_") if qc_scope_val else workstream
+    # A completed robustness micro-part supplies the newest QC for the active
+    # workstream. It never advances the research-action pointers.
+    qc_scope = active_micro_part_qc_scope(root, qc_scope)
     qc = select_qc_report(root, qc_scope, head)
     frozen = frozen_asset_report(root)
 
@@ -1685,7 +2044,11 @@ def build_handoff_state(root: str):
         "current_stage": stage,
         "current_batch": batch,
         "active_workstream": roadmap["active_research_workstream_id"].replace("-", "_"),
-        "last_completed_micro_part": roadmap["last_completed_research_action_id"],
+        # Newest completed micro-part (robustness micro-parts included). The
+        # research-action pointers below are deliberately NOT advanced.
+        "last_completed_micro_part": active_micro_part_id(
+            root, roadmap["last_completed_research_action_id"],
+        ),
         "next_research_action_id": roadmap["next_research_action_id"],
         "selected_qc_scope": qc["stage"],
         "selected_qc_path": state["selected_qc"]["path"],
@@ -1740,7 +2103,11 @@ def render_current_state(record: dict) -> str:
         "## Snapshot\n",
         f"- **Stage / Batch:** {record['current_stage']} / {record['current_batch']}",
         f"- **Active workstream:** `{record['active_workstream']}`",
-        f"- **Last completed research action:** `{record['last_completed_micro_part']}`",
+        # `last_completed_micro_part` tracks the newest completed MICRO-PART
+        # (robustness micro-parts included). It is deliberately NOT labelled a
+        # completed research action — the research-action chain is reported
+        # separately below and is never advanced by a micro-part.
+        f"- **Last completed micro-part:** `{record['last_completed_micro_part']}`",
         f"- **Next research action:** `{record['next_research_action_id']}`",
         f"- **Last stage commit:** `{record['last_stage_commit']}`",
         f"- **Generated from commit:** `{record['generated_from_commit']}` "
