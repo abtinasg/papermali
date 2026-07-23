@@ -94,10 +94,10 @@ python run_stage126_current_state_validator.py --check
 # stage126/stage126_m1_robustness_part2_part5_successor_compatibility.json.
 # This is not a scientific failure and not Stage125 drift.
 
-# 8) AI Handoff validation
+# 12) AI Handoff validation
 python scripts/validate_ai_handoff.py --check
 
-# 9) Full test suite
+# 13) Full live test suite
 python -m pytest tests/ -q
 ```
 

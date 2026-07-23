@@ -340,7 +340,8 @@ of the current Stage126 live gate.** The default suite
 PYTHONPATH=project python -m pytest project/tests -q
 ```
 
-excludes only that historical marker (2453 selected / 9 deselected); **all
+excludes only that historical marker (2472 selected / 9 deselected of 2481
+collected; 2471 passed, 1 skipped, 9 deselected, 0 failed); **all
 non-historical tests remain active**, including the rest of the frozen Part 5
 file. Exclusion is by marker expression only — no file ignore, node ID, skip,
 xfail or collection hook — and that narrowness is proven by
@@ -352,8 +353,8 @@ re-pinned.
 
 **Next — Part 4 (`expanded_rule_b_combined_robustness`) is NOT authorized
 and NOT started.** It requires its own separate explicit human authorization;
-the consumed Part 2 authorization is not a standing authorization. Parts 3–6
-remain outstanding, so M1 robustness is not complete.
+the consumed Part 2 authorization is not a standing authorization. Part 3 is
+completed. Parts 4–6 remain outstanding, so M1 robustness is not complete.
 
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
 document-binding evidence remain as frozen scientific history; they do **not**

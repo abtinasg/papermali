@@ -25,7 +25,8 @@ validator remains the sole current-state validation surface.
 - **Mechanism.** A new `pytest.ini` registers the marker and sets
   `addopts = -m "not live_successor_state"`. The frozen Part 5 file stays
   collected and still contributes its remaining ~150 tests to the live suite.
-  Live suite: **2453 selected / 9 deselected** of 2462 collected.
+  Live suite: **2472 selected / 9 deselected** of 2481 collected
+  (2471 passed, 1 skipped, 9 deselected, 0 failed).
 - **Historical verification.**
   `python project/run_stage125_part5_historical_successor_tests.py` verifies the
   frozen Part 5 test, source and runner hashes, creates a temporary detached
