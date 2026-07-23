@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 72,
+  "assertion_count": 89,
   "assertions": [
     {
       "detail": "",
@@ -361,6 +361,91 @@
       "detail": "",
       "name": "part5_compat_part1_valid_and_part2_unauthorized",
       "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_historical_test_hash_matches_frozen_metadata",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_current_test_hash_recomputed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_test_hash_divergence_explicitly_recorded",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_historical_metadata_not_modified",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_expected_bookkeeping_drift_files_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_scientific_artifact_drift_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_no_unregistered_drift",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "comparison_primary_pooled_values_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "comparison_part1_pooled_values_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "comparison_absolute_changes_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "comparison_all_families_declined",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "comparison_primary_ordering_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "comparison_part1_ordering_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "comparison_ordering_difference_detected",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "comparison_instability_reported",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "comparison_primary_claim_ordering_preserved",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "comparison_no_automatic_action_triggered",
+      "status": "PASS"
     }
   ],
   "base_feature_count": 6,
@@ -416,17 +501,28 @@
   "oof_rows_per_family": 421,
   "oof_rows_total": 1263,
   "output_sha256": {
-    "README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md": "8bb7b71a46ea0e976df9c65523338f5571e52f6875fdbecca51fd7e1d085f0b3",
-    "stage126_m1_robustness_part1_completion_lock.json": "c86455caac96d65e3169d4801d886b7e4b536e15d7f33bdf6b448c6e0c103a26",
+    "README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md": "4a963715e3a8832338743d66e643040c8858655189e36b14df8665be9f52b606",
+    "stage126_m1_robustness_part1_completion_lock.json": "964d84f2269bb35b0176f88bb12bcfc13ef2cb487817cf5b49a5c28a87e1822b",
     "stage126_m1_robustness_part1_execution_manifest.json": "80813ce8af9544dde736cc6b94372d2626dccbf888553cd7964625bfe12d8738",
     "stage126_m1_robustness_part1_feature_manifest.csv": "c65735795eda7dce6b4cacbc6af9dd5914b5068f44c77277035a51463cceaf90",
     "stage126_m1_robustness_part1_human_authorization_record.json": "87a4f55baeb1081eaf936e49c5e8923f67df54ec444f0abc33ec835c0c7e06f4",
     "stage126_m1_robustness_part1_metrics.csv": "c60f4b15aa40273472be98c867c73795d254f32c2a0e29b76641b1c5d5c18e98",
     "stage126_m1_robustness_part1_oof_predictions.csv": "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31",
-    "stage126_m1_robustness_part1_part5_successor_compatibility.json": "8bd027182aa06c9f71dd52fc25a1cc101d46a7166e4785ec84baf49a6d9af893"
+    "stage126_m1_robustness_part1_part5_successor_compatibility.json": "51955d545d51acf18d98a5e92d08ed93ad344939a3b59d918cadbc0d818a3374",
+    "stage126_m1_robustness_part1_primary_comparison.json": "2b58a85250420a8a18b0ff37cecdf3f2e31160c37e0cb48d027324c87a25c46a"
   },
   "part0_contract_hash_valid": true,
-  "part5_successor_compatibility_sha256": "8bd027182aa06c9f71dd52fc25a1cc101d46a7166e4785ec84baf49a6d9af893",
+  "part5_current_test_hash_recomputed": true,
+  "part5_expected_bookkeeping_drift_files": [
+    "metadata_and_hashes_stage125_part5.json",
+    "stage125_part5_readiness_closure_qc_report.json"
+  ],
+  "part5_expected_bookkeeping_drift_files_exact": true,
+  "part5_historical_test_hash_matches_frozen_metadata": true,
+  "part5_no_unregistered_drift": true,
+  "part5_scientific_artifact_drift_zero": true,
+  "part5_successor_compatibility_sha256": "51955d545d51acf18d98a5e92d08ed93ad344939a3b59d918cadbc0d818a3374",
+  "part5_test_hash_divergence_explicitly_recorded": true,
   "prediction_calls": 22,
   "primary_artifact_sha256": {
     "project/stage126/stage126_m1_configuration_registry.csv": "decbf43a5c34669bdd7a0c68c0ad6aec5611efc7c3ca82b09f5e85f72d635804",
@@ -438,6 +534,7 @@
     "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e",
     "project/stage126/stage126_m1_tuning_results.csv": "e7e1e6808e394273676709aa94bfa713bbf8a790fadabee22ea20b849adbe649"
   },
+  "primary_comparison_sha256": "2b58a85250420a8a18b0ff37cecdf3f2e31160c37e0cb48d027324c87a25c46a",
   "sample": "main_rule_a_primary",
   "selected_configuration_ids": {
     "random_forest": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
@@ -447,13 +544,15 @@
   "shap_calls": 0,
   "smote_calls": 0,
   "smotenc_calls": 0,
-  "source_commit": "1b770bb08eff101aabeefbab4d411dc390110890",
-  "source_file_sha256": "e4b12c69ae2467abecef1faf0ff9197f1d5bb78dcbf7bee705c10812153aba83",
+  "source_commit": "5c7b6eff2572d1535031e5fad3f7acc7ee499b4e",
+  "source_file_sha256": "12e06adf7a49b996e634910e7c6058e06494f932cfad6d8e5290a144499bf5b5",
   "stage": "stage126_m1_robustness_part1_target_proximity",
   "stage125_completed": true,
   "stage125_part5_artifacts_byte_identical": true,
   "stage125_part5_artifacts_modified": false,
+  "stage125_part5_current_test_file_sha256": "62cd1593e7bfafdeb1aa1c728f3fb9c22aadf50d3031e2cec964d267e752b189",
   "stage125_part5_historical_closure_valid": true,
+  "stage125_part5_historical_test_file_sha256": "0a117c1916ad845653e148d951a49a2c0375d13b7de23019e50ae891aee1b437",
   "stage125_part5_live_handoff_check_applicable": false,
   "stage125_part5_live_handoff_mismatch_expected": true,
   "stage125_part5_live_handoff_mismatch_fields": [
@@ -468,7 +567,7 @@
   "stage126_m1_entry_ready": true,
   "stage126_started": true,
   "target": "FD_target_main_t_plus_1",
-  "test_file_sha256": "44b8955aa1e8a3ef50363d78d65ad8437032ff152212aacb5ace8271ce5e481c",
+  "test_file_sha256": "a6fda10a770eed50d72a362ce906788d1cc705fe6d988e4ac6d7940d1f26c3fd",
   "ticker_count": 0,
   "tickers": [],
   "transformed_feature_count": 12,

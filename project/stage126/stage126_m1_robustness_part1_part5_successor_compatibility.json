@@ -26,9 +26,27 @@
   "rationale": "run_stage125_part5.py --check is a historical successor-state validator whose live-Handoff assumptions end at the primary development state. The five-field mismatch after Part 1 is expected and explicitly tested; it does not invalidate Stage125 closure, does not indicate Stage125 artifact drift, and is not a scientific failure.",
   "stage125_part5_artifacts_frozen": true,
   "stage125_part5_artifacts_modified": false,
+  "stage125_part5_current_test_file_sha256": "62cd1593e7bfafdeb1aa1c728f3fb9c22aadf50d3031e2cec964d267e752b189",
+  "stage125_part5_expected_bookkeeping_drift_files": [
+    "metadata_and_hashes_stage125_part5.json",
+    "stage125_part5_readiness_closure_qc_report.json"
+  ],
   "stage125_part5_historical_closure_remains_valid": true,
+  "stage125_part5_historical_metadata_modified": false,
+  "stage125_part5_historical_test_file_sha256": "0a117c1916ad845653e148d951a49a2c0375d13b7de23019e50ae891aee1b437",
   "stage125_part5_live_handoff_check_applicable_after_part1": false,
+  "stage125_part5_scientific_artifact_drift_expected": false,
+  "stage125_part5_scientific_artifact_drift_observed": false,
+  "stage125_part5_scientific_output_files": [
+    "part5_readiness_closure_report_stage125.json",
+    "part5_stage126_m1_entry_contract_stage125.json",
+    "part5_keep_drop_decisions_stage125.csv",
+    "part5_blocker_register_stage125.csv",
+    "part5_artifact_integrity_manifest_stage125.csv",
+    "README_STAGE125_PART5_READINESS_CLOSURE.md"
+  ],
   "stage125_part5_source_modified": false,
+  "stage125_part5_test_file_modified_for_successor_test_separation": true,
   "successor_state_validation_surfaces": [
     "stage126_m1_robustness_part0_decision_lock",
     "stage126_m1_robustness_part1_qc",

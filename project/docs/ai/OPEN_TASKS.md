@@ -162,6 +162,28 @@ select a paper winner. Handoff markers: `m1_robustness_started=true`,
 `m1_robustness_part2_authorized=false`,
 `m1_robustness_execution_authorized=false`, `m1_robustness_completed=false`.
 
+**Observed ordering sensitivity (reported; primary claims unchanged):** primary
+pooled PR-AUC ordering is **Logistic > RF > XGBoost**; the Part 1 observed pooled
+PR-AUC ordering is **XGBoost > RF > Logistic**, and **all three pooled PR-AUC
+values declined**. The observed Part 1 sensitivity ordering differs from the
+primary development ordering. This is a **development-only sensitivity finding**
+— it does not change the locked primary ordering used for confirmatory
+interpretation, does not replace the primary results, does not change selected
+configurations and selects no paper winner. It is recorded in
+`stage126_m1_robustness_part1_primary_comparison.json` and reported to the human
+supervisor; no automatic scientific action was triggered. Handoff markers:
+`m1_robustness_part1_ordering_instability_reported=true`,
+`m1_primary_claim_ordering_preserved=true`.
+
+**Successor-test-hash divergence (explicit and bounded):** the successor-aware
+Part 5 test file intentionally differs from the hash pinned in the frozen Part 5
+metadata; both hashes are recorded. Replaying the frozen Part 5 build against it
+differs in **exactly two** self-describing bookkeeping files
+(`stage125_part5_readiness_closure_qc_report.json`,
+`metadata_and_hashes_stage125_part5.json`) while **every Part 5 scientific
+artifact remains byte-identical**. Authorized successor-test evolution — not a
+Stage125 scientific-artifact mutation.
+
 **Frozen Part 5 live-successor boundary (expected; not a failure):** Stage125
 Part 5 remains a **frozen, valid historical closure** — no Stage125 artifact or
 source was modified. Its embedded live-Handoff successor check terminates at the

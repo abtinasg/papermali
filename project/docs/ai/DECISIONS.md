@@ -95,8 +95,20 @@ These are stable project decisions. Change them only deliberately (and note it i
   exactly 22 fits / 22 predictions). **No full-development refit.**
 - **Final test remains locked and untouched**; no SMOTE/SMOTENC, SHAP,
   calibration, bootstrap or Holm; zero network access.
-- **Sensitivity analysis only** — Part 1 does not replace the primary results,
-  does not change the primary model-family ordering and selects no paper winner.
+- **Sensitivity analysis only** — Part 1 does not replace the primary results
+  and selects no paper winner.
+- **Observed ordering sensitivity (reported, not acted upon).** Primary pooled
+  PR-AUC ordering: **Logistic > RF > XGBoost**. Part 1 observed pooled PR-AUC
+  ordering: **XGBoost > RF > Logistic**. **All three pooled PR-AUC values
+  declined** (Logistic −0.127639458886 / −28.63%, RF −0.070307846896 / −17.47%,
+  XGBoost −0.017282221021 / −4.85%). The observed Part 1 sensitivity ordering
+  differs from the primary development ordering; this does **not** change the
+  locked primary ordering used for confirmatory interpretation, does **not**
+  replace the primary results, and does **not** select a paper winner. This is a
+  development-only sensitivity finding, recorded in
+  `stage126_m1_robustness_part1_primary_comparison.json` and reported to the
+  human supervisor. No selected configuration changed, no refit was authorized,
+  no automatic scientific action was triggered, and the final test stays locked.
 - **Part 2 (`main_rule_b_listing_robustness`) is not authorized and not
   started.** The consumed Part 1 authorization confers no standing
   authorization for any later category.

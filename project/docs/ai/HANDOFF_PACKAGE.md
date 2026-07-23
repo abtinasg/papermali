@@ -214,6 +214,17 @@ untouched. Part 1 is **sensitivity-analysis evidence only**.
 is not a standing authorization; each future Part requires its own separate
 explicit human authorization.
 
+**Observed ordering sensitivity (reported; primary claims unchanged).** Primary
+pooled PR-AUC ordering: **Logistic > RF > XGBoost**. Part 1 observed pooled
+PR-AUC ordering: **XGBoost > RF > Logistic**. **All three pooled PR-AUC values
+declined.** The observed Part 1 sensitivity ordering differs from the primary
+development ordering; this does not change the locked primary ordering used for
+confirmatory interpretation, does not replace the primary results, and does not
+select a paper winner. Development-only sensitivity finding, recorded in
+`stage126/stage126_m1_robustness_part1_primary_comparison.json` and reported to
+the human supervisor. No selected configuration changed and no automatic
+scientific action was triggered.
+
 **Frozen Part 5 live-successor boundary.** Stage125 Part 5 remains a frozen,
 valid historical closure (source, runner and all `project/stage125/` artifacts
 byte-identical). Its embedded live-Handoff successor check ends at the earlier

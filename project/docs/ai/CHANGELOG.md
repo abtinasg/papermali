@@ -21,8 +21,17 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
   (zero predictor/target rows loaded, zero evaluations); no SMOTE, SMOTENC,
   SHAP, calibration, bootstrap or Holm procedure ran; zero network requests.
   **Part 1 is sensitivity-analysis evidence only** — it does not replace the
-  primary results, does not re-rank the primary model families and selects no
-  paper winner. Primary Stage126 artifacts and the frozen Stage125 contracts
+  primary results and selects no paper winner. **The observed Part 1 sensitivity
+  ordering differs from the primary development ordering** (primary pooled
+  PR-AUC: Logistic > RF > XGBoost; Part 1 observed: XGBoost > RF > Logistic, with
+  all three pooled PR-AUC values declining). This is a development-only
+  sensitivity finding, recorded in
+  `stage126_m1_robustness_part1_primary_comparison.json` and reported to the
+  human supervisor; it does **not** change the locked primary ordering used for
+  confirmatory interpretation, does not replace the primary results, does not
+  change selected configurations and selects no paper winner. No primary
+  conclusion or winner changed, and no automatic scientific action was
+  triggered. Primary Stage126 artifacts and the frozen Stage125 contracts
   remain byte-identical. **Part 2 (`main_rule_b_listing_robustness`) is not
   authorized and not started**; it requires its own separate explicit human
   authorization. Research action pointers are unchanged (Stage126 M1 remains
@@ -43,6 +52,17 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
   state is validated by the Part 0 integrity controls, the Part 1 QC and the AI
   Handoff validator. This is a verification-boundary correction only — no
   scientific decision, probability or metric changed.
+- **Successor-test-hash divergence recorded explicitly.** The successor-aware
+  Part 5 test file intentionally differs from the hash pinned in the frozen
+  Part 5 metadata (`0a117c19…`); both the historical and the recomputed current
+  hash are recorded in the compatibility record, the Part 1 QC and the Part 1
+  metadata. Replaying the frozen Part 5 build against it differs in **exactly
+  two** self-describing bookkeeping files
+  (`stage125_part5_readiness_closure_qc_report.json`,
+  `metadata_and_hashes_stage125_part5.json`), asserted by a test that wraps —
+  never blindly stubs — the real drift comparison; **every Part 5 scientific
+  artifact remains byte-identical**. This is an authorized successor-test
+  evolution, not a Stage125 scientific-artifact mutation.
 
 ## 2026-07-22 — Stage126 M1 Robustness Part 0 Decision Lock
 
