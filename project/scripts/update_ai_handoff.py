@@ -143,6 +143,10 @@ ALLOWLIST_FILES = (
     "project/src/stage126_m1_robustness_part1_target_proximity.py",
     "project/run_stage126_m1_robustness_part1_target_proximity.py",
     "project/tests/test_stage126_m1_robustness_part1_target_proximity.py",
+    # Stage126 M1 robustness Part 2 listing-Rule-B code, runner, and tests.
+    "project/src/stage126_m1_robustness_part2_listing_rule_b.py",
+    "project/run_stage126_m1_robustness_part2_listing_rule_b.py",
+    "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py",
     # Transition-aware historical runners (Part 3A / 3A.1) touched for Part 3B.
     # (already allowlisted above)
     # Stage124 modeling-guardrail fix — narrowest exact-file allowance.
@@ -377,6 +381,19 @@ ARTIFACT_ONLY_FILES = (
     "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md",
     "project/stage126/stage126_m1_robustness_part1_qc_report.json",
     "project/stage126/metadata_and_hashes_stage126_m1_robustness_part1.json",
+    # Stage126 M1 robustness Part 2 generated scientific artifacts.
+    "project/stage126/stage126_m1_robustness_part2_human_authorization_record.json",
+    "project/stage126/stage126_m1_robustness_part2_feature_manifest.csv",
+    "project/stage126/stage126_m1_robustness_part2_sample_delta.csv",
+    "project/stage126/stage126_m1_robustness_part2_execution_manifest.json",
+    "project/stage126/stage126_m1_robustness_part2_oof_predictions.csv",
+    "project/stage126/stage126_m1_robustness_part2_metrics.csv",
+    "project/stage126/stage126_m1_robustness_part2_completion_lock.json",
+    "project/stage126/stage126_m1_robustness_part2_primary_comparison.json",
+    "project/stage126/stage126_m1_robustness_part2_part5_successor_compatibility.json",
+    "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART2_LISTING_RULE_B.md",
+    "project/stage126/stage126_m1_robustness_part2_qc_report.json",
+    "project/stage126/metadata_and_hashes_stage126_m1_robustness_part2.json",
 )
 
 # Dependency-contract maintenance classification, INDEPENDENT of the change
@@ -740,6 +757,36 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "m4_data_collected",
         "contract_version",
     ),
+    # Stage126 M1 robustness Part 2 inherits the unchanged Stage126 markers and
+    # adds the Part 2 completion state on top of the retained Part 1 state.
+    "stage126_m1_robustness_part2_listing_rule_b": (
+        "stage125_completed",
+        "stage126_m1_entry_ready",
+        "stage126_authorized",
+        "stage126_started",
+        "development_modeling_authorized",
+        "modeling_authorized",
+        "modeling_started",
+        "final_test_unlocked",
+        "final_test_access_authorized",
+        "final_test_predictor_values_inspected",
+        "final_test_target_values_inspected",
+        "final_test_evaluation_performed",
+        "m1_primary_development_tuning_completed",
+        "m1_robustness_started",
+        "m1_robustness_completed",
+        "m1_robustness_part1_completed",
+        "m1_robustness_part2_human_authorized",
+        "m1_robustness_part2_completed",
+        "m1_robustness_completed_category_ids",
+        "m1_robustness_next_category_id",
+        "m1_robustness_part3_authorized",
+        "full_development_refit_performed",
+        "m2_data_collected",
+        "m3_data_collected",
+        "m4_data_collected",
+        "contract_version",
+    ),
 }
 
 # Repository-wide temporal-availability invariants carried into Stage126 Handoff
@@ -751,6 +798,7 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
 STAGE126_QC_SCOPES = frozenset({
     "stage126_m1_financial_baseline",
     "stage126_m1_robustness_part1_target_proximity",
+    "stage126_m1_robustness_part2_listing_rule_b",
 })
 
 STAGE126_CARRIED_TEMPORAL_AVAILABILITY_FIELDS = (
@@ -1078,6 +1126,10 @@ _QC_SOURCE_TEST_OVERRIDES: dict[str, tuple[str, str]] = {
         "project/src/stage126_m1_robustness_part1_target_proximity.py",
         "project/tests/test_stage126_m1_robustness_part1_target_proximity.py",
     ),
+    "stage126_m1_robustness_part2_listing_rule_b": (
+        "project/src/stage126_m1_robustness_part2_listing_rule_b.py",
+        "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py",
+    ),
 }
 
 
@@ -1398,7 +1450,247 @@ def derive_m1_robustness_part1_markers(root: str, expected_order: list) -> dict:
         "m1_robustness_execution_authorized": False,
     }
     markers.update(derive_part5_successor_compatibility_markers(root))
+    # Part 2 layers on top of (never replaces) the retained Part 1 state.
+    markers.update(derive_m1_robustness_part2_markers(root, expected_order))
     return markers
+
+
+_M1_ROBUSTNESS_PART2_AUTH_REL = (
+    "project/stage126/stage126_m1_robustness_part2_human_authorization_record.json"
+)
+_M1_ROBUSTNESS_PART2_LOCK_REL = (
+    "project/stage126/stage126_m1_robustness_part2_completion_lock.json"
+)
+_PART2_CATEGORY_ID = "main_rule_b_listing_robustness"
+_PART2_MICRO_PART_ID = "stage126-m1-robustness-part2-listing-rule-b"
+_PART2_AUTH_TEXT_SHA256 = (
+    "27935d31a6efcc6116f0d4007424bad5c7b8599faabcb8d39176c569bf172bcb"
+)
+
+
+def derive_m1_robustness_part2_markers(root: str, expected_order: list) -> dict:
+    """Derive Part 2 completion markers (fail-closed).
+
+    Returns {} when Part 2 has not been executed. When the Part 2 authorization
+    record and completion lock are present they must be internally consistent
+    and mutually agreeing, otherwise a HandoffError is raised. A completed and
+    consumed Part 2 authorization grants NO standing authorization for Part 3.
+    """
+    auth_path = os.path.join(root, _M1_ROBUSTNESS_PART2_AUTH_REL)
+    lock_path = os.path.join(root, _M1_ROBUSTNESS_PART2_LOCK_REL)
+    if not (os.path.isfile(auth_path) and os.path.isfile(lock_path)):
+        if os.path.isfile(auth_path) != os.path.isfile(lock_path):
+            raise HandoffError(
+                "Part 2 authorization record and completion lock must both exist"
+            )
+        return {}
+    try:
+        auth = json.load(open(auth_path, encoding="utf-8"))
+        lock = json.load(open(lock_path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable Part 2 artifacts: {exc}") from exc
+
+    auth_exact = {
+        "authorization_id": "stage126-m1-robustness-part2-human-authorization",
+        "authorized_category_id": _PART2_CATEGORY_ID,
+        "part2_execution_authorized": True,
+        "create_open_unmerged_pr_authorized": True,
+        "merge_authorized": False,
+        "part3_execution_authorized": False,
+        "full_development_refit_authorized": False,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_authorized": False,
+        "smote_authorized": False,
+        "smotenc_authorized": False,
+        "shap_authorized": False,
+        "m2_authorized": False,
+        "m3_authorized": False,
+        "m4_authorized": False,
+    }
+    for k, v in auth_exact.items():
+        if auth.get(k) != v:
+            raise HandoffError(
+                f"Part 2 authorization field {k}={auth.get(k)!r} != {v!r}"
+            )
+    text = auth.get("human_authorization_text")
+    if not isinstance(text, str):
+        raise HandoffError("Part 2 authorization text missing")
+    if hashlib.sha256(text.encode("utf-8")).hexdigest() != _PART2_AUTH_TEXT_SHA256:
+        raise HandoffError("Part 2 authorization text SHA-256 mismatch")
+    if auth.get("human_authorization_text_sha256") != _PART2_AUTH_TEXT_SHA256:
+        raise HandoffError("Part 2 authorization hash field mismatch")
+
+    lock_exact = {
+        "category_id": _PART2_CATEGORY_ID,
+        "micro_part_id": _PART2_MICRO_PART_ID,
+        "part2_human_authorized": True,
+        "part2_execution_completed": True,
+        "authorization_consumed": True,
+        "development_only": True,
+        "only_sample_changed": True,
+        "no_retuning": True,
+        "sample": _PART2_CATEGORY_ID,
+        "target": "FD_target_main_t_plus_1",
+        "feature_set": "M1_PRIMARY_FEATURE_ORDER",
+        "model_fit_calls": 22,
+        "prediction_calls": 22,
+        "m1_robustness_started": True,
+        "m1_robustness_completed": False,
+        "part3_execution_authorized": False,
+        "m1_robustness_execution_authorized": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_performed": False,
+        "smote_executed": False,
+        "smotenc_executed": False,
+        "shap_executed": False,
+        "replaces_primary_results": False,
+        "selects_paper_winner": False,
+        "part1_scientific_artifacts_byte_identical": True,
+    }
+    for k, v in lock_exact.items():
+        if lock.get(k) != v:
+            raise HandoffError(
+                f"Part 2 completion lock field {k}={lock.get(k)!r} != {v!r}"
+            )
+    completed = list(lock.get("completed_category_ids") or [])
+    if completed != [_PART1_CATEGORY_ID, _PART2_CATEGORY_ID]:
+        raise HandoffError(
+            f"Part 2 completed_category_ids {completed!r} is not the exact "
+            f"two-category sequence"
+        )
+    if lock.get("next_category_id") != expected_order[2]:
+        raise HandoffError(
+            f"Part 2 next_category_id {lock.get('next_category_id')!r} != "
+            f"{expected_order[2]!r}"
+        )
+    markers = {
+        "m1_robustness_started": True,
+        "m1_robustness_completed": False,
+        "m1_robustness_part1_completed": True,
+        "m1_robustness_part2_human_authorized": True,
+        "m1_robustness_part2_completed": True,
+        "m1_robustness_completed_category_ids": completed,
+        "m1_robustness_next_category_id": expected_order[2],
+        "m1_robustness_part3_authorized": False,
+        # A consumed Part 2 authorization is NOT a standing authorization.
+        "m1_robustness_execution_authorized": False,
+    }
+    markers.update(derive_part2_sample_robustness_markers(root))
+    return markers
+
+
+_PART2_QC_REL = "project/stage126/stage126_m1_robustness_part2_qc_report.json"
+_PART2_COMPARISON_REL = (
+    "project/stage126/stage126_m1_robustness_part2_primary_comparison.json"
+)
+_PART2_PART5_COMPAT_REL = (
+    "project/stage126/"
+    "stage126_m1_robustness_part2_part5_successor_compatibility.json"
+)
+
+
+def derive_part2_sample_robustness_markers(root: str) -> dict:
+    """Derive the Part 2 sample-robustness comparison markers (fail-closed).
+
+    The observed Part 2 ordering is REPORTED, whatever it is. It must never
+    imply that the primary results, the locked confirmatory ordering, the
+    selected configurations or a paper winner changed — any record claiming
+    otherwise raises rather than being propagated into the Handoff.
+    """
+    cmp_path = os.path.join(root, _PART2_COMPARISON_REL)
+    qc_path = os.path.join(root, _PART2_QC_REL)
+    compat_path = os.path.join(root, _PART2_PART5_COMPAT_REL)
+    if not (os.path.isfile(cmp_path) and os.path.isfile(qc_path)
+            and os.path.isfile(compat_path)):
+        return {}
+    try:
+        cmp_ = json.load(open(cmp_path, encoding="utf-8"))
+        qc = json.load(open(qc_path, encoding="utf-8"))
+        compat = json.load(open(compat_path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable Part 2 artifacts: {exc}") from exc
+
+    if qc.get("all_pass") is not True or qc.get("failed_count") != 0:
+        raise HandoffError("Part 2 QC is not all_pass (fail-closed)")
+
+    cmp_exact = {
+        "contract_version":
+            "stage126_m1_robustness_part2_primary_comparison_v1",
+        "category_id": _PART2_CATEGORY_ID,
+        "changed_dimension": "sample",
+        "scientific_role": "sample_robustness_sensitivity_only",
+        "comparison_scope": "pooled_development_oof",
+        "comparison_metric": "pr_auc",
+        "primary_results_replaced": False,
+        "primary_ordering_for_confirmatory_claims_changed": False,
+        "selected_configurations_changed": False,
+        "paper_winner_selected": False,
+        "automatic_scientific_action_triggered": False,
+        "ordering_reported_to_human_supervisor": True,
+        "full_development_refit_authorized": False,
+        "final_test_unlocked": False,
+    }
+    for key, expected in cmp_exact.items():
+        if cmp_.get(key) != expected:
+            raise HandoffError(
+                f"Part 2 comparison field {key}={cmp_.get(key)!r} != {expected!r}"
+            )
+    observed = list(cmp_.get("part2_observed_sensitivity_ordering") or [])
+    primary_order = list(cmp_.get("primary_observed_ordering") or [])
+    if sorted(observed) != sorted(primary_order) or len(observed) != 3:
+        raise HandoffError("Part 2 comparison orderings are not the three families")
+    differs = cmp_.get("observed_ordering_differs_from_primary")
+    if differs is not (observed != primary_order):
+        raise HandoffError(
+            "Part 2 comparison ordering-difference flag contradicts the orderings"
+        )
+
+    # The Part 2 QC must agree with the frozen Part 5 boundary record.
+    if qc.get("stage125_part5_live_handoff_check_applicable") is not False:
+        raise HandoffError("Part 2 QC part5 applicability flag mismatch")
+    if qc.get("stage125_part5_source_modified") is not False:
+        raise HandoffError("Part 2 QC reports a modified Part 5 source")
+    if qc.get("stage125_part5_artifacts_modified") is not False:
+        raise HandoffError("Part 2 QC reports modified Part 5 artifacts")
+    if list(qc.get("stage125_part5_live_handoff_mismatch_fields") or []) != \
+            _PART5_EXPECTED_MISMATCH_FIELDS:
+        raise HandoffError("Part 2 QC mismatch-field list is not exact")
+    if list(compat.get("expected_live_mismatch_fields") or []) != \
+            _PART5_EXPECTED_MISMATCH_FIELDS:
+        raise HandoffError(
+            "Part 2 compatibility record expected_live_mismatch_fields "
+            "is not the exact documented five-field set"
+        )
+    if compat.get("part1_completion_hash_is_not_the_current_hash") is not True:
+        raise HandoffError(
+            "Part 2 compatibility record does not separate the Part 1 "
+            "completion-time test hash from the current hash"
+        )
+    hashes = {
+        compat.get("stage125_part5_historical_test_file_sha256"),
+        compat.get("stage126_part1_completion_test_file_sha256"),
+        compat.get("stage126_part2_current_test_file_sha256"),
+    }
+    if len(hashes) != 3 or None in hashes or "" in hashes:
+        raise HandoffError(
+            "Part 2 compatibility record must carry three distinct "
+            "successor-test-file hash generations"
+        )
+    if compat.get("part1_scientific_artifacts_byte_identical") is not True:
+        raise HandoffError(
+            "Part 2 compatibility record does not assert Part 1 byte identity"
+        )
+
+    _require_stage125_tree_unchanged(root)
+
+    return {
+        "m1_robustness_part2_observed_ordering": observed,
+        "m1_robustness_part2_ordering_differs_from_primary": bool(differs),
+        "m1_robustness_part2_sample_sensitivity_reported": True,
+        "m1_primary_claim_ordering_preserved": True,
+    }
 
 
 _PART1_QC_REL = "project/stage126/stage126_m1_robustness_part1_qc_report.json"
@@ -1927,6 +2219,15 @@ def _verified_master_tickers(root: str) -> list[str] | None:
 
 _PART1_QC_SCOPE = "stage126_m1_robustness_part1_target_proximity"
 _PART1_MICRO_PART_ID = "stage126-m1-robustness-part1-target-proximity"
+_PART2_QC_SCOPE = "stage126_m1_robustness_part2_listing_rule_b"
+
+# Newest-last: the last entry whose lock + QC both exist wins.
+_ROBUSTNESS_MICRO_PARTS = (
+    (_PART1_QC_SCOPE, _PART1_MICRO_PART_ID,
+     _M1_ROBUSTNESS_PART1_LOCK_REL, _PART1_QC_REL),
+    (_PART2_QC_SCOPE, _PART2_MICRO_PART_ID,
+     _M1_ROBUSTNESS_PART2_LOCK_REL, _PART2_QC_REL),
+)
 
 
 def active_micro_part_qc_scope(root: str, default_scope: str) -> str:
@@ -1936,19 +2237,20 @@ def active_micro_part_qc_scope(root: str, default_scope: str) -> str:
     This selects which QC report describes current state; it never advances the
     research-action pointers (which stay on the Stage126 M1 research action).
     """
-    lock = os.path.join(root, _M1_ROBUSTNESS_PART1_LOCK_REL)
-    qc = os.path.join(
-        root, "project/stage126/stage126_m1_robustness_part1_qc_report.json",
-    )
-    if os.path.isfile(lock) and os.path.isfile(qc):
-        return _PART1_QC_SCOPE
-    return default_scope
+    scope = default_scope
+    for qc_scope, _micro_id, lock_rel, qc_rel in _ROBUSTNESS_MICRO_PARTS:
+        if (os.path.isfile(os.path.join(root, lock_rel))
+                and os.path.isfile(os.path.join(root, qc_rel))):
+            scope = qc_scope
+    return scope
 
 
 def active_micro_part_id(root: str, default_id: str) -> str:
     """Micro-part identifier for the newest completed robustness micro-part."""
-    if active_micro_part_qc_scope(root, "") == _PART1_QC_SCOPE:
-        return _PART1_MICRO_PART_ID
+    scope = active_micro_part_qc_scope(root, "")
+    for qc_scope, micro_id, _lock_rel, _qc_rel in _ROBUSTNESS_MICRO_PARTS:
+        if scope == qc_scope:
+            return micro_id
     return default_id
 
 
