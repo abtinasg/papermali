@@ -113,6 +113,31 @@ These are stable project decisions. Change them only deliberately (and note it i
   started.** The consumed Part 1 authorization confers no standing
   authorization for any later category.
 
+### Stage126 live-versus-historical test-suite boundary (2026-07-23)
+
+- The frozen Stage125 Part 5 file contains historical tests explicitly marked
+`live_successor_state`. Those tests remain **byte-identical** and are verified
+against the frozen Part 2 successor reference commit
+`6412b45c4adc6584a5567c7c96e0932f68f31e8a`. **They are not part of the current
+Stage126 live gate.** The default Stage126 repository test suite excludes only
+that historical marker — never the file, never a node ID, never a skip or
+xfail. **All non-historical tests remain active.** The Stage126 current-state
+validator remains the sole current-state validation surface.
+- **Governance basis.** This is a consistent application of the existing
+  `stage126-validation-architecture-boundary-lock`, **not** a scientific-error
+  exception. Stage125 Part 5 was not reopened and its pins were not changed; the
+  frozen test file is byte-identical at
+  `0b9413b2adbf9c44b0fb12b4f7ef2dad60be5cd4c401ccefac30d19f0905af71`.
+- **Live gate surfaces:** the Stage126 current-state validator, the current
+  Stage126 scientific micro-part tests, the AI Handoff validator, and every
+  non-historical repository test.
+- **Exclusion mechanism:** marker expression only. No `--ignore`, no
+  `--deselect`, no node-ID targeting, no skip/xfail, no collection hook, no
+  broad skip pattern. Proven by dedicated fail-closed tests.
+- **Historical tests are preserved, not deleted.** They are executed against the
+  reference commit by a read-only runner that never modifies the branch,
+  `main`, the Stage125 tree or the Handoff.
+
 ### Stage126 M1 robustness Part 3 — executed (2026-07-23)
 
 - **Part 3 (`expanded_rule_a_company_scope_robustness`) was explicitly

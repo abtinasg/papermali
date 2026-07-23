@@ -56,12 +56,26 @@ python run_stage126_m1_robustness_part2_listing_rule_b.py --check
 # 9) Stage126 M1 robustness Part 3 expanded Rule A (development-only; --check)
 python run_stage126_m1_robustness_part3_expanded_rule_a.py --check
 
-# 10) Stage126 independent current-state validator (the live gate).
+# 10) Historical Stage125 Part 5 successor tests (regression only, NOT a gate).
+# The frozen Part 5 test file contains tests explicitly marked
+# `live_successor_state` that assert the Handoff successor state as it stood at
+# the Part 2 reference commit 6412b45c. They are excluded from the default live
+# suite by marker only and are verified against that commit here, in a
+# temporary read-only worktree:
+python run_stage125_part5_historical_successor_tests.py
+
+# 11) Stage126 independent current-state validator (the live gate).
 # Derives the completed prefix, next category and last micro-part generically
 # from the registered execution order, and pins every closed part's scientific
 # AND verification artifacts by hash.
 python run_stage126_current_state_validator.py --check
 
+# NOTE: the default suite `PYTHONPATH=project python -m pytest project/tests -q`
+# runs the COMPLETE current live repository suite and excludes only tests marked
+# `live_successor_state` (9 historical Part 5 successor tests). Every other
+# test — including every Part 3, current-state-validator, Handoff,
+# final-test-lock and leakage test — remains active. See pytest.ini.
+#
 # NOTE: Stage125 Part 5 is now HISTORICAL and IMMUTABLE. `run_stage125_part5.py`
 # is NOT a routine Stage126 gate any more, and previous robustness runners are
 # not current-state gates either — previous scientific artifacts are protected

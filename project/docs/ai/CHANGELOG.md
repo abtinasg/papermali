@@ -3,6 +3,50 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-23 — Stage126 live-versus-historical test-suite boundary
+
+Applies the already-locked Stage125 Part 5 historical-immutability decision
+consistently to the test suite. **No new scientific execution**: no model
+fitting, retuning, refit or final-test access; Part 4 not started.
+
+- The frozen Stage125 Part 5 file contains historical tests explicitly marked
+`live_successor_state`. Those tests remain **byte-identical** and are verified
+against the frozen Part 2 successor reference commit
+`6412b45c4adc6584a5567c7c96e0932f68f31e8a`. **They are not part of the current
+Stage126 live gate.** The default Stage126 repository test suite excludes only
+that historical marker — never the file, never a node ID, never a skip or
+xfail. **All non-historical tests remain active.** The Stage126 current-state
+validator remains the sole current-state validation surface.
+- **Why.** The nine marked tests assert the Handoff successor state as it stood
+  at the Part 2 reference commit. After Part 3 completed truthfully, evaluating
+  them against the *current* Handoff is a category error, not a defect. This is
+  **not** a scientific-error exception, and Stage125 Part 5 was **neither
+  reopened nor re-pinned**.
+- **Mechanism.** A new `pytest.ini` registers the marker and sets
+  `addopts = -m "not live_successor_state"`. The frozen Part 5 file stays
+  collected and still contributes its remaining ~150 tests to the live suite.
+  Live suite: **2453 selected / 9 deselected** of 2462 collected.
+- **Historical verification.**
+  `python project/run_stage125_part5_historical_successor_tests.py` verifies the
+  frozen Part 5 test, source and runner hashes, creates a temporary detached
+  read-only worktree at the reference commit, copies the gitignored Part 3C
+  inputs read-only after verifying each against the frozen
+  `part3c_sample_summary_stage125.csv` contract, runs only the marked tests
+  there, removes the worktree on success and on failure, asserts the real branch
+  is untouched, and returns nonzero on any failure. **9 passed, 150 deselected.**
+- **Narrowness is proven.** `test_stage126_live_historical_test_boundary.py`
+  asserts fail-closed that the marker appears only in the frozen file, that the
+  frozen hash is exact, that the deselected set equals exactly the marked set,
+  that Part 3 / current-state-validator / Handoff / final-test-lock / leakage
+  tests are fully collected, and that no skip, xfail, collection hook or
+  node-ID suppression was introduced.
+- **Recorded** in `stage126_live_vs_historical_test_boundary.json` with the nine
+  exact node IDs, and surfaced in the Handoff as
+  `stage125_part5_historical_successor_tests_in_live_gate=false` and
+  `stage126_live_test_suite_marker_expression="not live_successor_state"`.
+- **Nothing scientific changed.** Part 1, Part 2 and Part 3 artifacts, the
+  Stage125 tree and the current-state validator source are all untouched.
+
 ## 2026-07-23 — Stage126 M1 Robustness Part 3 (expanded Rule A company scope)
 
 - **Part 3 was explicitly human-authorized and completed on the development

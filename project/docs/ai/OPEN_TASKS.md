@@ -329,6 +329,27 @@ not replaced, the primary ordering lock is unchanged and no paper winner was
 selected. A separated descriptive Part 2 comparison is recorded without
 multiplying claims or selecting a preferred robustness sample.
 
+**Live-versus-historical test boundary (2026-07-23):** the frozen Stage125
+Part 5 file contains historical tests explicitly marked `live_successor_state`.
+Those tests remain **byte-identical** and are verified against the frozen Part 2
+successor reference commit `6412b45c4adc6584a5567c7c96e0932f68f31e8a` by
+`project/run_stage125_part5_historical_successor_tests.py`. **They are not part
+of the current Stage126 live gate.** The default suite
+
+```bash
+PYTHONPATH=project python -m pytest project/tests -q
+```
+
+excludes only that historical marker (2453 selected / 9 deselected); **all
+non-historical tests remain active**, including the rest of the frozen Part 5
+file. Exclusion is by marker expression only — no file ignore, node ID, skip,
+xfail or collection hook — and that narrowness is proven by
+`test_stage126_live_historical_test_boundary.py`. The Stage126 current-state
+validator remains the sole current-state validation surface. This is a
+consistent application of the existing validation-architecture boundary lock,
+**not** a scientific-error exception; Stage125 Part 5 was neither reopened nor
+re-pinned.
+
 **Next — Part 4 (`expanded_rule_b_combined_robustness`) is NOT authorized
 and NOT started.** It requires its own separate explicit human authorization;
 the consumed Part 2 authorization is not a standing authorization. Parts 3–6

@@ -300,9 +300,23 @@ explicit human authorization exist. Handoff markers:
 `prior_robustness_verification_artifact_regeneration_allowed=false`,
 `prior_part_reopening_requires_scientific_error=true`,
 `prior_part_reopening_requires_explicit_human_authorization=true`.
-Live sequence: the Stage126 current-state validator, the Part 2 runner
-`--check`, the Handoff validator and the full test suite —
+Live sequence: the Stage126 current-state validator, the newest micro-part
+runner `--check`, the Handoff validator and the full test suite —
 `run_stage125_part5.py --check` is **not** a routine gate.
+
+**Live versus historical tests.** The frozen Stage125 Part 5 file contains
+historical tests explicitly marked `live_successor_state`. Those tests remain
+byte-identical and are verified against the frozen Part 2 successor reference
+commit `6412b45c4adc6584a5567c7c96e0932f68f31e8a` by
+`project/run_stage125_part5_historical_successor_tests.py`. **They are not part
+of the current Stage126 live gate.** The default repository suite excludes only
+that historical marker (`not live_successor_state`, configured in `pytest.ini`);
+**all non-historical tests remain active**, including the rest of the frozen
+Part 5 file. The Stage126 current-state validator remains the sole current-state
+validation surface. Recorded in
+`stage126/stage126_live_vs_historical_test_boundary.json`; Handoff markers
+`stage125_part5_historical_successor_tests_in_live_gate=false` and
+`stage126_live_test_suite_marker_expression="not live_successor_state"`.
 
 The validator derives current state generically: the completed prefix is
 `execution_order[:n]` over discovered per-part packages, the next category is
