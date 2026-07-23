@@ -1325,7 +1325,17 @@ def test_real_repo_open_tasks_stage126_markers_match_handoff():
     assert "development modeling authorized = true" in open_tasks
     assert "modeling started = true" in open_tasks
     assert "primary development tuning completed = true" in open_tasks
-    assert "M1 robustness started = false" in open_tasks
+    # Derived from the Handoff rather than pinned, so the OPEN_TASKS marker
+    # block cannot silently drift away from the real state as micro-parts
+    # complete. Robustness has started (Parts 1 and 2) but is not complete.
+    assert "M1 robustness started = {}".format(
+        str(state["m1_robustness_started"]).lower()
+    ) in open_tasks
+    assert "M1 robustness completed = {}".format(
+        str(state["m1_robustness_completed"]).lower()
+    ) in open_tasks
+    assert state["m1_robustness_started"] is True
+    assert state["m1_robustness_completed"] is False
     assert "final test unlocked = false" in open_tasks
     assert "M2/M3/M4 data collected = false" in open_tasks
     assert "historical state at Stage125 closure time" in open_tasks
