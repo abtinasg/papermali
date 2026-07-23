@@ -1290,6 +1290,113 @@ PART5_EXPECTED_BOOKKEEPING_DRIFT_FILES: tuple[str, ...] = (
 )
 PART5_SCIENTIFIC_OUTPUT_FILES: tuple[str, ...] = part1.PART5_SCIENTIFIC_OUTPUT_FILES
 
+# --------------------------------------------------------------------------- #
+# Truthful frozen-Part-5 runner provenance
+#
+# Two DIFFERENT things must never be conflated:
+#
+#   (a) The FULL historical runner `run_stage125_part5.py --check` exits 1 and
+#       its FIRST failure is `readiness_surface_disagreement`. Its --check path
+#       REBUILDS the closure report live; inside that transient rebuild the
+#       `valid_handoff` gate fails (see (b)), so the rebuilt `all_gate_pass`
+#       becomes false and the rebuilt readiness flags become not-ready — while
+#       the truthful live Handoff still reports Stage126 entry readiness. The
+#       cross-artifact readiness check then reports the disagreement first.
+#
+#   (b) DIRECT `validate_actual_handoff(...)` returns exactly the documented
+#       five-field historical successor mismatch, with no forbidden field.
+#
+# The COMMITTED frozen Part 5 closure report is unaffected by (a): on disk it
+# still records all_gate_pass=true / Gate 125.0 PASS / entry-ready=true. Both
+# behaviours are inherited from base main and were NOT introduced by Part 2.
+# --------------------------------------------------------------------------- #
+
+PART5_CLOSURE_REPORT_REL = (
+    "project/stage125/part5_readiness_closure_report_stage125.json"
+)
+PART5_FULL_RUNNER_EXIT_CODE = 1
+PART5_FULL_RUNNER_FIRST_FAILURE_CODE = "readiness_surface_disagreement"
+# Every failure code the frozen runner can report first. Used to parse the real
+# runner output deterministically instead of matching a single expected string
+# (so a DIFFERENT first failure is detected rather than silently ignored).
+PART5_KNOWN_FAILURE_CODES: tuple[str, ...] = (
+    "readiness_surface_disagreement",
+    "handoff_mismatch",
+    "baseline tree mismatch",
+    "Part 3C input hash mismatch",
+    "Part 4 output hash mismatch",
+    "Part 4 source hash mismatch",
+    "Part 4 test hash mismatch",
+    "check drift",
+)
+# Base main (the merged Part 1 state) that this branch was cut from. The full
+# runner already behaved this way there — see the read-only reproduction
+# recorded in the Part 2 compatibility artifact.
+BASE_MAIN_COMMIT = "f7f7c9ed1f6c9e52542c9f242e090d3ad24792c4"
+
+
+def parse_part5_first_failure_code(stderr_text: str) -> str:
+    """Return the FIRST recognized frozen-Part-5 failure code in runner stderr.
+
+    Deterministic and total: returns "" when no known code appears, so a new or
+    different failure mode surfaces as a mismatch instead of passing silently.
+    """
+    positions = [
+        (stderr_text.index(code), code)
+        for code in PART5_KNOWN_FAILURE_CODES
+        if code in stderr_text
+    ]
+    if not positions:
+        return ""
+    return min(positions)[1]
+
+
+def read_committed_part5_closure(repo_root: Path) -> dict[str, Any]:
+    """Read the COMMITTED frozen Part 5 closure report (never a live rebuild)."""
+    path = repo_root / PART5_CLOSURE_REPORT_REL
+    if not path.is_file():
+        raise QCFail(f"missing frozen Part 5 closure report: {PART5_CLOSURE_REPORT_REL}")
+    closure = json.loads(path.read_text(encoding="utf-8"))
+    exact = {
+        "all_gate_pass": True,
+        "stage125_completed": True,
+        "stage125_gate_125_0": "PASS",
+        "stage126_m1_entry_ready": True,
+    }
+    for key, want in exact.items():
+        if closure.get(key) != want:
+            raise QCFail(
+                f"committed Part 5 closure field {key}={closure.get(key)!r} "
+                f"!= {want!r}"
+            )
+    return closure
+
+
+def direct_handoff_validation_fields(repo_root: Path) -> dict[str, Any]:
+    """Direct `validate_actual_handoff` mismatch fields (never the full runner).
+
+    This is the ONLY surface that yields the documented five-field historical
+    successor mismatch. It is deliberately separate from the full runner's
+    first failure.
+    """
+    from src import stage125_part5_readiness_closure as p5
+    ok, detail = p5.validate_actual_handoff(
+        repo_root, derived_completed=True, derived_entry_ready=True,
+    )
+    if ok is not False:
+        raise QCFail(
+            "frozen Part 5 validator unexpectedly accepted the successor Handoff"
+        )
+    if not detail.startswith("handoff_mismatch:"):
+        raise QCFail(f"unexpected direct validation detail: {detail!r}")
+    fields = detail.split("handoff_mismatch:", 1)[1].split(",")
+    if sorted(fields) != sorted(PART5_EXPECTED_LIVE_MISMATCH_FIELDS):
+        raise QCFail(f"direct handoff mismatch fields are not exact: {fields}")
+    forbidden = [f for f in PART5_FORBIDDEN_MISMATCH_FIELDS if f in fields]
+    if forbidden:
+        raise QCFail(f"forbidden direct mismatch field present: {forbidden}")
+    return {"fields": fields, "detail": detail, "forbidden_present": forbidden}
+
 
 def part5_test_hash_provenance(repo_root: Path) -> dict[str, Any]:
     """Historical / Part-1-completion / current Part 5 test hashes, fail-closed.
@@ -1329,9 +1436,16 @@ def part5_test_hash_provenance(repo_root: Path) -> dict[str, Any]:
 
 def build_part5_successor_compatibility(
     test_hashes: dict[str, Any] | None = None,
+    direct_validation: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Deterministic record of the frozen Part 5 historical-contract boundary."""
+    """Deterministic record of the frozen Part 5 historical-contract boundary.
+
+    Records the FULL runner's first failure and the SEPARATE direct
+    `validate_actual_handoff` mismatch as two distinct facts, so neither can be
+    misread as the other.
+    """
     th = test_hashes or {}
+    dv = direct_validation or {}
     return {
         "contract_id": PART5_COMPAT_CONTRACT_ID,
         "contract_version": PART5_COMPAT_CONTRACT_VERSION,
@@ -1362,6 +1476,36 @@ def build_part5_successor_compatibility(
         ),
         "stage125_part5_scientific_artifact_drift_expected": False,
         "stage125_part5_scientific_artifact_drift_observed": False,
+        # --- Truthful FULL-runner provenance (distinct from the direct check).
+        "stage125_part5_full_runner_exit_code": PART5_FULL_RUNNER_EXIT_CODE,
+        "stage125_part5_full_runner_first_failure_code":
+            PART5_FULL_RUNNER_FIRST_FAILURE_CODE,
+        "stage125_part5_full_runner_first_failure_preexisting_on_base_main": True,
+        "stage125_part5_full_runner_behavior_changed_by_part2": False,
+        "stage125_part5_full_runner_base_main_commit": BASE_MAIN_COMMIT,
+        "stage125_part5_full_runner_first_failure_mechanism": (
+            "The --check path rebuilds the closure report live. Inside that "
+            "transient rebuild the valid_handoff gate fails on the documented "
+            "five-field successor mismatch, so the rebuilt all_gate_pass "
+            "becomes false and the rebuilt readiness flags become not-ready, "
+            "while the truthful live Handoff still reports Stage126 entry "
+            "readiness. The cross-artifact readiness check reports that "
+            "disagreement first. The COMMITTED closure report is unaffected."
+        ),
+        # --- COMMITTED frozen closure truth (never a live rebuild).
+        "stage125_part5_committed_closure_all_gate_pass": True,
+        "stage125_part5_committed_closure_stage125_completed": True,
+        "stage125_part5_committed_closure_stage125_gate_125_0": "PASS",
+        "stage125_part5_committed_closure_stage126_m1_entry_ready": True,
+        # --- SEPARATE direct handoff validation.
+        "stage125_part5_direct_handoff_validation_mismatch_fields": list(
+            dv.get("fields") or PART5_EXPECTED_LIVE_MISMATCH_FIELDS
+        ),
+        "stage125_part5_direct_handoff_validation_forbidden_fields_present": list(
+            dv.get("forbidden_present") or []
+        ),
+        "stage125_part5_direct_handoff_validation_detail":
+            dv.get("detail", PART5_EXPECTED_LIVE_MISMATCH_DETAIL),
         "stage125_part5_scientific_output_files": list(
             PART5_SCIENTIFIC_OUTPUT_FILES
         ),
@@ -1646,17 +1790,35 @@ def build_readme(
         "",
         "**Stage125 Part 5 remains a frozen, valid historical closure** — its "
         "source, its runner and every `project/stage125/` artifact are "
-        "byte-identical. Part 5's *embedded live-Handoff successor check* "
-        "terminates at the earlier Stage126 primary-development state and "
-        "predates robustness execution. After a truthful Part 2 completion it "
-        "reports exactly these five mismatching fields:",
+        "byte-identical, and the **committed** closure report still records "
+        "`all_gate_pass=true`, `stage125_gate_125_0=PASS`, "
+        "`stage125_completed=true` and `stage126_m1_entry_ready=true`.",
         "",
-        *[f"- `{f}`" for f in PART5_EXPECTED_LIVE_MISMATCH_FIELDS],
+        "Two **distinct** behaviours must not be conflated:",
         "",
-        "`run_stage125_part5.py --check` consequently exits 1 **by design**. "
-        "This is an **expected historical-contract boundary**, not a scientific "
-        f"failure and not Stage125 drift. It is recorded in `{F_PART5_COMPAT}`, "
-        "asserted in the Part 2 QC, and explicitly tested.",
+        "1. **Full runner.** `run_stage125_part5.py --check` exits **1** and its "
+        "**first** failure is the inherited "
+        f"`{PART5_FULL_RUNNER_FIRST_FAILURE_CODE}`. Its `--check` path rebuilds "
+        "the closure report live; inside that transient rebuild the "
+        "`valid_handoff` gate fails, so the rebuilt `all_gate_pass` becomes "
+        "false and the rebuilt readiness flags become not-ready — while the "
+        "truthful live Handoff still reports Stage126 entry readiness. The "
+        "cross-artifact readiness check reports that disagreement first. The "
+        "**committed** closure artifact is unaffected.",
+        "2. **Direct validation.** `validate_actual_handoff(...)` separately "
+        "returns exactly these five documented mismatching fields:",
+        "",
+        *[f"   - `{f}`" for f in PART5_EXPECTED_LIVE_MISMATCH_FIELDS],
+        "",
+        "with **none** of the forbidden fields present.",
+        "",
+        "**Neither behaviour was introduced by Part 2** — both were reproduced "
+        f"identically at base main `{BASE_MAIN_COMMIT}`, and no Stage125 "
+        "scientific artifact changed. This is an **expected inherited "
+        "historical-validator boundary**, not a scientific failure and not "
+        f"Stage125 drift. It is recorded in `{F_PART5_COMPAT}`, asserted in the "
+        "Part 2 QC, and covered by dedicated fail-closed tests that run the "
+        "real runner (no stub) and fail if a different failure mode appears.",
         "",
         "The successor-aware Part 5 **test file** has three recorded "
         "generations: the Stage125 historical hash pinned by the frozen Part 5 "
@@ -1692,6 +1854,7 @@ def build_qc_assertions(
     oof_rows: list[dict[str, Any]], metrics_rows: list[dict[str, Any]],
     counters: ExecutionCounters, loaded: dict[str, Any],
     primary_observed: dict[str, str], part1_observed: dict[str, str],
+    committed_closure: dict[str, Any], direct_validation: dict[str, Any],
     network_attempts: int,
 ) -> list[dict[str, Any]]:
     a: list[dict[str, Any]] = []
@@ -2047,6 +2210,51 @@ def build_qc_assertions(
     add("part5_successor_validation_surfaces_exact",
         tuple(compat["successor_state_validation_surfaces"])
         == PART5_SUCCESSOR_VALIDATION_SURFACES)
+
+    # --- Truthful Part 5 runner provenance (full runner vs direct validation).
+    add("part5_committed_closure_is_pass_and_entry_ready",
+        compat["stage125_part5_committed_closure_all_gate_pass"] is True
+        and compat["stage125_part5_committed_closure_stage125_completed"] is True
+        and compat["stage125_part5_committed_closure_stage125_gate_125_0"]
+        == "PASS"
+        and compat["stage125_part5_committed_closure_stage126_m1_entry_ready"]
+        is True)
+    add("part5_committed_closure_matches_disk",
+        committed_closure.get("all_gate_pass") is True
+        and committed_closure.get("stage125_gate_125_0") == "PASS"
+        and committed_closure.get("stage126_m1_entry_ready") is True)
+    add("part5_full_runner_exit_code_recorded",
+        compat["stage125_part5_full_runner_exit_code"]
+        == PART5_FULL_RUNNER_EXIT_CODE)
+    add("part5_full_runner_first_failure_is_readiness_surface_disagreement",
+        compat["stage125_part5_full_runner_first_failure_code"]
+        == PART5_FULL_RUNNER_FIRST_FAILURE_CODE)
+    add("part5_full_runner_first_failure_is_not_the_handoff_mismatch",
+        compat["stage125_part5_full_runner_first_failure_code"]
+        != "handoff_mismatch")
+    add("part5_full_runner_behavior_inherited_from_base_main",
+        compat[
+            "stage125_part5_full_runner_first_failure_preexisting_on_base_main"
+        ] is True
+        and compat["stage125_part5_full_runner_behavior_changed_by_part2"]
+        is False
+        and compat["stage125_part5_full_runner_base_main_commit"]
+        == BASE_MAIN_COMMIT)
+    add("part5_direct_validation_is_exactly_five_fields",
+        sorted(compat[
+            "stage125_part5_direct_handoff_validation_mismatch_fields"
+        ]) == sorted(PART5_EXPECTED_LIVE_MISMATCH_FIELDS)
+        and sorted(direct_validation["fields"])
+        == sorted(PART5_EXPECTED_LIVE_MISMATCH_FIELDS))
+    add("part5_direct_validation_has_no_forbidden_fields",
+        compat[
+            "stage125_part5_direct_handoff_validation_forbidden_fields_present"
+        ] == []
+        and direct_validation["forbidden_present"] == [])
+    add("part5_direct_validation_detail_exact",
+        compat["stage125_part5_direct_handoff_validation_detail"]
+        == PART5_EXPECTED_LIVE_MISMATCH_DETAIL
+        == direct_validation["detail"])
     return a
 
 
@@ -2151,7 +2359,11 @@ def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
     comparison = build_primary_comparison(repo_root, metrics_rows)
     completion_lock = build_completion_lock(counters, comparison)
     test_hashes = part5_test_hash_provenance(repo_root)
-    part5_compat = build_part5_successor_compatibility(test_hashes)
+    committed_closure = read_committed_part5_closure(repo_root)
+    direct_validation = direct_handoff_validation_fields(repo_root)
+    part5_compat = build_part5_successor_compatibility(
+        test_hashes, direct_validation,
+    )
     readme = build_readme(metrics_rows, comparison, delta_summary, exec_manifest)
 
     content = {
@@ -2174,6 +2386,8 @@ def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
         "part5_compat": part5_compat, "comparison": comparison,
         "test_hashes": test_hashes,
         "delta_rows": delta_rows, "delta_summary": delta_summary,
+        "committed_closure": committed_closure,
+        "direct_validation": direct_validation,
         "oof_rows": oof_rows, "metrics_rows": metrics_rows,
         "counters": counters, "loaded": loaded,
         "primary_observed": primary_observed,
@@ -2229,6 +2443,8 @@ def run(
         counters=extras["counters"], loaded=extras["loaded"],
         primary_observed=extras["primary_observed"],
         part1_observed=extras["part1_observed"],
+        committed_closure=extras["committed_closure"],
+        direct_validation=extras["direct_validation"],
         network_attempts=network_attempts,
     )
     failed = sum(1 for x in assertions if x["status"] != "PASS")
@@ -2325,6 +2541,17 @@ def run(
         "part5_successor_compatibility_sha256": content_hashes[F_PART5_COMPAT],
         "primary_comparison_sha256": content_hashes[F_COMPARISON],
         "sample_delta_sha256": content_hashes[F_SAMPLE_DELTA],
+        "stage125_part5_full_runner_exit_code": PART5_FULL_RUNNER_EXIT_CODE,
+        "stage125_part5_full_runner_first_failure_code":
+            PART5_FULL_RUNNER_FIRST_FAILURE_CODE,
+        "stage125_part5_full_runner_first_failure_preexisting_on_base_main": True,
+        "stage125_part5_full_runner_behavior_changed_by_part2": False,
+        "stage125_part5_committed_closure_all_gate_pass": True,
+        "stage125_part5_committed_closure_stage126_m1_entry_ready": True,
+        "stage125_part5_direct_handoff_validation_mismatch_fields": list(
+            extras["direct_validation"]["fields"]
+        ),
+        "stage125_part5_direct_handoff_validation_forbidden_fields_present": [],
         **part5_compatibility_qc_fields(extras["test_hashes"]),
         "assertions": assertions,
         **part2_handoff_markers(),

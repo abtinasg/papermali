@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import socket
 import subprocess
 import sys
@@ -1226,6 +1227,156 @@ def test_live_boundary_matches_part2_compatibility_record():
     assert compat["part1_completion_hash_is_not_the_current_hash"] is True
     # Part 1 scientific artifacts stay byte-identical through this migration.
     assert compat["part1_scientific_artifacts_byte_identical"] is True
+
+
+# --------------------------------------------------------------------------- #
+# Truthful FULL-runner provenance vs the SEPARATE direct handoff validation
+#
+# These must never be conflated. The full frozen runner exits 1 with an
+# INHERITED `readiness_surface_disagreement` first failure (its --check path
+# rebuilds the closure report live, the valid_handoff gate fails inside that
+# rebuild, and the rebuilt not-ready flags then disagree with the truthful live
+# Handoff). Direct validate_actual_handoff SEPARATELY returns exactly the five
+# documented fields. The COMMITTED closure report is unaffected by either.
+# --------------------------------------------------------------------------- #
+
+PART5_FULL_RUNNER_FIRST_FAILURE_CODE = "readiness_surface_disagreement"
+PART5_KNOWN_FAILURE_CODES = (
+    "readiness_surface_disagreement",
+    "handoff_mismatch",
+    "baseline tree mismatch",
+    "Part 3C input hash mismatch",
+    "Part 4 output hash mismatch",
+    "Part 4 source hash mismatch",
+    "Part 4 test hash mismatch",
+    "check drift",
+)
+BASE_MAIN_COMMIT = "f7f7c9ed1f6c9e52542c9f242e090d3ad24792c4"
+_PART2_COMPAT_REL = (
+    "project/stage126/"
+    "stage126_m1_robustness_part2_part5_successor_compatibility.json"
+)
+
+
+def _first_failure_code(stderr_text: str) -> str:
+    """First recognized failure code; "" when none matches (fail-closed)."""
+    hits = [
+        (stderr_text.index(code), code)
+        for code in PART5_KNOWN_FAILURE_CODES
+        if code in stderr_text
+    ]
+    return min(hits)[1] if hits else ""
+
+
+def test_committed_closure_report_is_pass_and_entry_ready():
+    """The COMMITTED frozen closure report is PASS — never claim otherwise.
+
+    The transient rebuild inside `--check` derives a failed gate; that must
+    never be described as the content of the committed artifact.
+    """
+    closure = json.loads(
+        (REPO_ROOT / "project/stage125"
+         / "part5_readiness_closure_report_stage125.json").read_text(
+            encoding="utf-8")
+    )
+    assert closure["all_gate_pass"] is True
+    assert closure["stage125_completed"] is True
+    assert closure["stage125_gate_125_0"] == "PASS"
+    assert closure["stage126_m1_entry_ready"] is True
+
+
+@pytest.mark.live_successor_state
+def test_full_runner_exits_1_with_the_inherited_first_failure():
+    """The REAL full runner (no stub) exits 1 on readiness_surface_disagreement.
+
+    Fails if the head introduces a DIFFERENT Part 5 failure mode: the first
+    recognized failure code must be exactly the inherited one, and must not be
+    the direct five-field handoff mismatch.
+    """
+    import subprocess
+    proc = subprocess.run(
+        [sys.executable, "project/run_stage125_part5.py", "--check"],
+        cwd=str(REPO_ROOT), capture_output=True, text=True,
+        env={**os.environ, "PYTHONPATH": "project"},
+    )
+    assert proc.returncode == 1, (
+        f"full Part 5 runner exit code {proc.returncode} != 1"
+    )
+    code = _first_failure_code(proc.stderr)
+    assert code == PART5_FULL_RUNNER_FIRST_FAILURE_CODE, (
+        f"full runner first failure {code!r} != "
+        f"{PART5_FULL_RUNNER_FIRST_FAILURE_CODE!r}; stderr={proc.stderr!r}"
+    )
+    # The full runner does NOT fail exclusively on the five handoff fields.
+    assert code != "handoff_mismatch"
+
+
+@pytest.mark.live_successor_state
+def test_full_runner_failure_mode_is_inherited_from_base_main():
+    """Part 5's source and runner are byte-identical to base main.
+
+    The full-runner failure mode is therefore produced by unchanged historical
+    validator logic — Part 2 introduced no new Part 5 failure mode. The
+    read-only reproduction at base main itself is recorded in the Part 2
+    compatibility artifact.
+    """
+    import subprocess
+    for rel in ("project/src/stage125_part5_readiness_closure.py",
+                "project/run_stage125_part5.py"):
+        head_blob = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "rev-parse", f"HEAD:{rel}"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        base_blob = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "rev-parse",
+             f"{BASE_MAIN_COMMIT}:{rel}"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        assert head_blob == base_blob, f"Part 5 path changed vs base main: {rel}"
+    changed = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "diff", "--name-only",
+         BASE_MAIN_COMMIT, "HEAD", "--", "project/stage125/"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    assert changed == "", f"project/stage125 changed vs base main: {changed}"
+
+    compat = json.loads((REPO_ROOT / _PART2_COMPAT_REL).read_text(encoding="utf-8"))
+    assert compat["stage125_part5_full_runner_exit_code"] == 1
+    assert compat["stage125_part5_full_runner_first_failure_code"] == (
+        PART5_FULL_RUNNER_FIRST_FAILURE_CODE
+    )
+    assert compat[
+        "stage125_part5_full_runner_first_failure_preexisting_on_base_main"
+    ] is True
+    assert compat["stage125_part5_full_runner_behavior_changed_by_part2"] is False
+    assert compat["stage125_part5_full_runner_base_main_commit"] == BASE_MAIN_COMMIT
+
+
+@pytest.mark.live_successor_state
+def test_direct_validation_is_separate_from_the_full_runner_failure():
+    """Direct validation yields the five fields; the runner's first failure does not."""
+    compat = json.loads((REPO_ROOT / _PART2_COMPAT_REL).read_text(encoding="utf-8"))
+    assert compat[
+        "stage125_part5_direct_handoff_validation_mismatch_fields"
+    ] == EXPECTED_PART5_LIVE_MISMATCH_FIELDS
+    assert compat[
+        "stage125_part5_direct_handoff_validation_forbidden_fields_present"
+    ] == []
+    _ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    fields = detail.split("handoff_mismatch:", 1)[1].split(",")
+    assert sorted(fields) == sorted(EXPECTED_PART5_LIVE_MISMATCH_FIELDS)
+    for forbidden in FORBIDDEN_PART5_LIVE_MISMATCH_FIELDS:
+        assert forbidden not in fields
+    # The two surfaces are genuinely different facts.
+    assert compat["stage125_part5_full_runner_first_failure_code"] != (
+        "handoff_mismatch"
+    )
+    assert compat["stage125_part5_committed_closure_all_gate_pass"] is True
+    assert compat[
+        "stage125_part5_committed_closure_stage126_m1_entry_ready"
+    ] is True
 
 
 @pytest.mark.live_successor_state

@@ -930,6 +930,117 @@ def test_expected_mismatch_matches_the_real_frozen_validator():
         assert forbidden not in fields
 
 
+def test_committed_part5_closure_is_pass_and_entry_ready():
+    """The COMMITTED frozen closure report is PASS — never claim all_gate_pass=false."""
+    closure = p2.read_committed_part5_closure(_root())
+    assert closure["all_gate_pass"] is True
+    assert closure["stage125_completed"] is True
+    assert closure["stage125_gate_125_0"] == "PASS"
+    assert closure["stage126_m1_entry_ready"] is True
+    compat = _read_json(p2.F_PART5_COMPAT)
+    assert compat["stage125_part5_committed_closure_all_gate_pass"] is True
+    assert compat["stage125_part5_committed_closure_stage125_completed"] is True
+    assert compat["stage125_part5_committed_closure_stage125_gate_125_0"] == "PASS"
+    assert compat[
+        "stage125_part5_committed_closure_stage126_m1_entry_ready"
+    ] is True
+
+
+def test_committed_closure_mutation_fails_closed(tmp_path):
+    """A closure report claiming a failed gate must fail closed, not be recorded."""
+    src = _root() / p2.PART5_CLOSURE_REPORT_REL
+    closure = json.loads(src.read_text(encoding="utf-8"))
+    closure["all_gate_pass"] = False
+    dst = tmp_path / p2.PART5_CLOSURE_REPORT_REL
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    dst.write_text(json.dumps(closure), encoding="utf-8")
+    with pytest.raises(p2.QCFail):
+        p2.read_committed_part5_closure(tmp_path)
+
+
+def test_full_runner_provenance_recorded_separately_from_direct_validation():
+    compat = _read_json(p2.F_PART5_COMPAT)
+    assert compat["stage125_part5_full_runner_exit_code"] == 1
+    assert compat["stage125_part5_full_runner_first_failure_code"] == (
+        "readiness_surface_disagreement"
+    )
+    # The full runner's first failure is NOT the five-field handoff mismatch.
+    assert compat["stage125_part5_full_runner_first_failure_code"] != (
+        "handoff_mismatch"
+    )
+    assert compat[
+        "stage125_part5_full_runner_first_failure_preexisting_on_base_main"
+    ] is True
+    assert compat["stage125_part5_full_runner_behavior_changed_by_part2"] is False
+    assert compat["stage125_part5_full_runner_base_main_commit"] == (
+        "f7f7c9ed1f6c9e52542c9f242e090d3ad24792c4"
+    )
+    assert compat[
+        "stage125_part5_direct_handoff_validation_mismatch_fields"
+    ] == EXPECTED_MISMATCH
+    assert compat[
+        "stage125_part5_direct_handoff_validation_forbidden_fields_present"
+    ] == []
+    assert compat["stage125_part5_scientific_artifact_drift_observed"] is False
+
+
+def test_direct_handoff_validation_helper_is_exact():
+    dv = p2.direct_handoff_validation_fields(_root())
+    assert sorted(dv["fields"]) == sorted(EXPECTED_MISMATCH)
+    assert dv["forbidden_present"] == []
+    assert dv["detail"] == p2.PART5_EXPECTED_LIVE_MISMATCH_DETAIL
+
+
+def test_first_failure_parser_detects_a_different_failure_mode():
+    """The parser must not silently accept an unexpected or absent failure code."""
+    assert p2.parse_part5_first_failure_code(
+        "FAIL: readiness_surface_disagreement:final_gate_pass=False"
+    ) == "readiness_surface_disagreement"
+    # A different mode is reported as itself, never coerced to the expected one.
+    assert p2.parse_part5_first_failure_code(
+        "FAIL: handoff_mismatch:m1_robustness_started"
+    ) == "handoff_mismatch"
+    # Whichever appears FIRST wins.
+    assert p2.parse_part5_first_failure_code(
+        "handoff_mismatch:x then readiness_surface_disagreement:y"
+    ) == "handoff_mismatch"
+    # An unknown failure yields "" (fail-closed), not a false positive.
+    assert p2.parse_part5_first_failure_code("FAIL: something_brand_new") == ""
+
+
+def test_qc_carries_truthful_part5_runner_provenance():
+    qc = _read_json(p2.F_QC)
+    assert qc["stage125_part5_full_runner_exit_code"] == 1
+    assert qc["stage125_part5_full_runner_first_failure_code"] == (
+        "readiness_surface_disagreement"
+    )
+    assert qc[
+        "stage125_part5_full_runner_first_failure_preexisting_on_base_main"
+    ] is True
+    assert qc["stage125_part5_full_runner_behavior_changed_by_part2"] is False
+    assert qc["stage125_part5_committed_closure_all_gate_pass"] is True
+    assert qc["stage125_part5_committed_closure_stage126_m1_entry_ready"] is True
+    assert qc[
+        "stage125_part5_direct_handoff_validation_mismatch_fields"
+    ] == EXPECTED_MISMATCH
+    assert qc[
+        "stage125_part5_direct_handoff_validation_forbidden_fields_present"
+    ] == []
+
+
+def test_readme_distinguishes_runner_failure_from_direct_validation():
+    readme = open(os.path.join(STAGE126, p2.F_README), encoding="utf-8").read()
+    assert "readiness_surface_disagreement" in readme
+    assert "validate_actual_handoff" in readme
+    assert "all_gate_pass=true" in readme
+    assert "Neither behaviour was introduced by Part 2" in readme
+    # It must not claim the runner exits only/exclusively on the five fields.
+    low = readme.lower()
+    for bad in ("exits 1 with exactly these five", "exits only on",
+                "exits exclusively"):
+        assert bad not in low, bad
+
+
 def test_part5_bookkeeping_drift_is_exactly_two_files():
     compat = _read_json(p2.F_PART5_COMPAT)
     assert compat["stage125_part5_expected_bookkeeping_drift_files"] == sorted([

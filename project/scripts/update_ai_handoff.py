@@ -1705,6 +1705,12 @@ _PART5_EXPECTED_MISMATCH_FIELDS = [
     "contract_version",
     "last_completed_micro_part",
 ]
+# The frozen Part 5 live-successor boundary is a property of having completed
+# ANY robustness micro-part — it is not Part 1-specific and must not be
+# re-pinned to whichever micro-part happens to be newest.
+_PART5_SUCCESSOR_COMPATIBILITY_STATUS = (
+    "expected_historical_contract_boundary_after_completed_robustness_micro_part"
+)
 
 
 def derive_part5_successor_compatibility_markers(root: str) -> dict:
@@ -1774,11 +1780,22 @@ def derive_part5_successor_compatibility_markers(root: str) -> dict:
     # The complete tracked Stage125 tree must be unchanged (fail-closed, git).
     _require_stage125_tree_unchanged(root)
 
+    # The boundary status may only be emitted when a completed robustness
+    # micro-part actually exists (fail-closed — never asserted speculatively).
+    if active_micro_part_qc_scope(root, "") == "":
+        raise HandoffError(
+            "Part 5 successor-compatibility status requires a completed "
+            "robustness micro-part (fail-closed)"
+        )
+
     markers = {
         "stage125_part5_frozen_artifacts_verified": True,
         "stage125_part5_live_successor_check_applicable": False,
+        # Generic, future-safe: the boundary is a property of ANY completed
+        # robustness micro-part, not of Part 1 specifically. Naming Part 1 here
+        # became untrue the moment Part 2 completed.
         "stage125_part5_successor_compatibility_status":
-            "expected_historical_contract_boundary_after_part1",
+            _PART5_SUCCESSOR_COMPATIBILITY_STATUS,
     }
     markers.update(derive_part1_ordering_instability_markers(root))
     return markers

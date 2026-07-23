@@ -2524,8 +2524,38 @@ def test_handoff_state_carries_part5_compatibility_markers():
     assert state["stage125_part5_frozen_artifacts_verified"] is True
     assert state["stage125_part5_live_successor_check_applicable"] is False
     assert state["stage125_part5_successor_compatibility_status"] == (
-        "expected_historical_contract_boundary_after_part1"
+        "expected_historical_contract_boundary_after_completed_robustness_micro_part"
     )
+
+
+def test_part5_compatibility_status_is_generic_not_part1_specific():
+    """The status must describe a completed micro-part, never Part 1 specifically.
+
+    Naming Part 1 became untrue the moment Part 2 completed; the generic value
+    stays truthful for every later micro-part.
+    """
+    state = _state(REAL_ROOT)
+    status = state["stage125_part5_successor_compatibility_status"]
+    assert status == (
+        "expected_historical_contract_boundary_after_completed_robustness_micro_part"
+    )
+    assert "part1" not in status
+    assert "part2" not in status
+    # And the state it describes is the completed Part 2 micro-part.
+    assert state["last_completed_micro_part"] == (
+        "stage126-m1-robustness-part2-listing-rule-b"
+    )
+    assert state["m1_robustness_part2_completed"] is True
+    assert state["m1_robustness_next_category_id"] == (
+        "expanded_rule_a_company_scope_robustness"
+    )
+    assert state["m1_robustness_part3_authorized"] is False
+    assert state["final_test_unlocked"] is False
+    assert state["final_test_access_authorized"] is False
+    assert state["final_test_evaluation_performed"] is False
+    # Research-action pointers stay put.
+    assert state["active_workstream"] == "stage126_m1_financial_baseline"
+    assert state["next_research_action_id"] == "stage126-m1-financial-baseline"
 
 
 def test_part5_compatibility_markers_absent_without_artifacts(tmp_path):
