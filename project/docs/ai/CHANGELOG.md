@@ -3,6 +3,53 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-24 — Stage126 M1 Robustness Part 4 (expanded Rule B combined sample)
+
+- **Part 4 was explicitly human-authorized and completed on the development
+  folds.** Authorization text is 418 UTF-8 bytes, SHA-256
+  `e40852d9e2a78cc6d9b3079379abd0fed8f4921b65bec00ecf58d5aad78fd1b4`,
+  recomputed before execution. Executed the fourth registered robustness
+  category `expanded_rule_b_combined_robustness` from base `main`
+  `853a8deff5e0953ba4018e7406230fdf5ed5a3ae`.
+- **Only the combined sample changed** — to
+  `analysis_ready_expanded_rule_b_stage125.csv`
+  (SHA-256 `2e61a282165ccdaef37bac61a460c83878f2ae633b10535945cc33897d3b4c22`).
+  Target, the nine-feature `M1_PRIMARY_FEATURE_ORDER` set, preprocessing and
+  missingness-indicator logic (18 model-matrix columns), the three selected
+  configurations, the model families, the temporal folds, the seeds, the
+  metric list, the top-10% rule and the class-weighting policy were all held
+  fixed.
+- **Counts.** Analysis-ready 1035 rows / 122 companies / 79 positive / 956
+  negative / 0 missing target. Development 682 (68 / 614); fold roles 250 /
+  211 / 461 / 221. OOF 1296 rows (432 per family); 9 metric rows. 22 model
+  fits, 22 predictions, 0 tuning searches. XGBoost `scale_pos_weight`
+  recomputed per training fold: fold1 217/33, fold2 403/58.
+- **Final test locked.** 353 identities counted only through the frozen
+  temporal split contract; 0 predictor rows, 0 target rows, 0 predictions, 0
+  metrics, 0 evaluations. No full-development refit. No calibration,
+  threshold optimization, bootstrap, Holm correction, p-values, SMOTE,
+  SMOTENC or SHAP.
+- **Three independent identity-only sample-delta audits.** Versus Part 2
+  (main Rule B): Part 4 is a strict superset (+42 rows, 0 Part2-only, +5
+  companies, +0 positive, +42 negative, all additions negative). Versus Part 3
+  (expanded Rule A): Part 4 is a strict subset (−21 rows, 0 Part4-only, −2
+  companies, −1 positive, −20 negative, all removals negative). Versus the
+  locked primary Rule A sample: neither a subset nor a superset (42 Part4-only
+  rows, 19 primary-only rows, net +23 rows, +3 companies, −1 positive, +24
+  negative, all differences negative-only).
+- **Pooled development-OOF PR-AUC:** Logistic 0.444983882478 (−0.17%), RF
+  0.396418788419 (−1.50%), XGBoost 0.355210803326 (−0.37%). The locked
+  primary ordering Logistic > RF > XGBoost is preserved and, because every
+  identity difference is negative-only, the combined sample does not
+  materially change interpretation. Primary results were not replaced, the
+  primary ordering lock is unchanged and no paper winner was selected.
+- **The closed-part registry retains the Part 1, Part 2 and Part 3 entries
+  byte-for-byte** and appends Part 4 (`closed_part_count = 4`,
+  `regeneration_allowed = false`). The boundary decision record and the
+  historical Stage125 manifest are byte-identical. No Part 1, Part 2, Part 3
+  or Stage125 file is touched by this change, and no Part 4 Stage125-Part5
+  compatibility artifact was created.
+
 ## 2026-07-23 — Stage126 live-versus-historical test-suite boundary
 
 Applies the already-locked Stage125 Part 5 historical-immutability decision

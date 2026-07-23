@@ -180,6 +180,52 @@ validator remains the sole current-state validation surface.
   used as a gate. The independent current-state validator recognized Part 3
   generically with no source change.
 
+### Stage126 M1 robustness Part 4 — executed (2026-07-24)
+
+- **Part 4 (`expanded_rule_b_combined_robustness`) was explicitly
+  human-authorized and completed on the development folds only.** The
+  authorization text is 418 UTF-8 bytes and hashes to
+  `e40852d9e2a78cc6d9b3079379abd0fed8f4921b65bec00ecf58d5aad78fd1b4`; it is
+  consumed by this execution and grants no standing authorization, no merge, no
+  Part 5, no refit, no final-test access or evaluation, no calibration,
+  threshold optimization, bootstrap, Holm correction, p-values or winner
+  selection, and no SMOTE/SMOTENC/SHAP/M2/M3/M4.
+- **Only the combined Rule B sample changed:** 1035 analysis-ready rows across
+  122 companies (79 positive / 956 negative), 682 development rows (68 / 614),
+  fold roles 250 / 211 / 461 / 221. Target, feature definitions and order,
+  preprocessing, missingness-indicator logic, selected configurations, model
+  families, folds, seeds, metrics and class weighting all unchanged.
+- **No retuning** (0 tuning searches; exactly 22 fits / 22 predictions). **No
+  full-development refit.** XGBoost class weights recomputed per training fold
+  (217/33, 403/58) — never from validation rows and never reused from any
+  other sample.
+- **The final test remained locked.** 353 final-test identities were counted
+  only through the frozen temporal split contract; zero predictor rows, zero
+  target rows, zero predictions and zero metrics.
+- **Three independently recomputed sample-delta comparisons, identities
+  only:** versus Part 2 (main Rule B) Part 4 is a strict superset (42
+  Part4-only rows, 0 Part2-only, all additions negative); versus Part 3
+  (expanded Rule A) Part 4 is a strict subset (21 Part3-only rows, 0
+  Part4-only, all removals negative); versus the locked primary sample the
+  relationship is neither a subset nor a superset (42 Part4-only, 19
+  primary-only, net +23 rows, all differences negative-only).
+- **Development-only sample-sensitivity evidence.** Pooled PR-AUC: Logistic
+  0.444983882478 (−0.17%), RF 0.396418788419 (−1.50%), XGBoost
+  0.355210803326 (−0.37%). **The locked primary ordering
+  Logistic > RF > XGBoost is preserved**, and because every identity
+  difference versus primary, Part 2 and Part 3 is negative-only the combined
+  sample does not materially change interpretation. Primary results were not
+  replaced, the primary ordering lock is unchanged, no paper winner was
+  selected and this is not a new confirmatory model comparison. The Part 2
+  and Part 3 comparisons are separated and descriptive only.
+- **Part 5 (`persistent_loss_robustness_target`) is not authorized and not
+  started.** Parts 5-6 remain outstanding.
+- **Nothing closed was touched.** Parts 1, 2 and 3 packages (scientific and
+  verification), the primary Stage126 artifacts and the Stage125 tree are
+  byte-identical; Stage125 Part 5 remains historical and immutable and was not
+  used as a gate. The independent current-state validator recognized Part 4
+  generically with no source change.
+
 ### Stage126 current-state validation — generic enforcement (2026-07-23)
 
 - **No hard-coded current state.** The validator derives the completed prefix,
@@ -198,9 +244,9 @@ validator remains the sole current-state validation surface.
 - **Two QC roles are explicit:** current-state validation versus the newest
   completed scientific micro-part. Neither is described by an ambiguous
   `selected_qc` field alone.
-- **A future part changes nothing older.** An end-to-end synthetic Part 3 builds
+- **A future part changes nothing older.** An end-to-end synthetic Part 5 builds
   and checks through the real validator without modifying validator source or
-  any Part 1, Part 2 or Stage125 file.
+  any Part 1, Part 2, Part 3, Part 4 or Stage125 file.
 
 ### Stage126 validation-architecture boundary lock (2026-07-23)
 

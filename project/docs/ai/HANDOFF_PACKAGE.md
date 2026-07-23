@@ -187,6 +187,20 @@ Do not confuse QC selection with the research-action chain:
   (**explicitly human-authorized and completed on development folds only; only
   the feature set changed; no retuning; no full-development refit; final test
   locked; sensitivity analysis only; Part 2 not authorized**).
+- Stage126 M1 robustness Part 4 (expanded Rule B combined sample) source/test/QC:
+  `src/stage126_m1_robustness_part4_expanded_rule_b.py`,
+  `run_stage126_m1_robustness_part4_expanded_rule_b.py`,
+  `tests/test_stage126_m1_robustness_part4_expanded_rule_b.py`,
+  `stage126/stage126_m1_robustness_part4_human_authorization_record.json`,
+  `stage126/stage126_m1_robustness_part4_sample_delta.csv`,
+  `stage126/stage126_m1_robustness_part4_oof_predictions.csv`,
+  `stage126/stage126_m1_robustness_part4_metrics.csv`,
+  `stage126/stage126_m1_robustness_part4_primary_comparison.json`,
+  `stage126/stage126_m1_robustness_part4_completion_lock.json`,
+  `stage126/stage126_m1_robustness_part4_qc_report.json`
+  (**explicitly human-authorized and completed on development folds only; only
+  the combined sample changed; no retuning; no full-development refit; final
+  test locked; development-only sample sensitivity; Part 5 not authorized**).
 
 ## 7. Done
 
