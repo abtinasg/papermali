@@ -9,18 +9,18 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 - **Stage / Batch:** Stage126 / None
 - **Active workstream:** `stage126_m1_financial_baseline`
-- **Last completed research action:** `stage126-m1-robustness-part1-target-proximity`
+- **Last completed micro-part:** `stage126-m1-robustness-part1-target-proximity`
 - **Next research action:** `stage126-m1-financial-baseline`
-- **Last stage commit:** `1b770bb08eff101aabeefbab4d411dc390110890`
-- **Generated from commit:** `d31492665c97f3c0807316b97dd653245d0022b6` (branch `stage126-m1-robustness-part1-target-proximity`, informational)
+- **Last stage commit:** `e3a70521366c65a77016a336b3422fb9efc1fc6c`
+- **Generated from commit:** `e3a70521366c65a77016a336b3422fb9efc1fc6c` (branch `stage126-m1-robustness-part1-target-proximity`, informational)
 - **Baseline:** `origin/main` @ `8e928704b77387e46321ec2b87b05d3e7ffde4a8`
 
 ## QC
 
-- ✅ **72 assertions, 0 failed**, all_pass=True
+- ✅ **89 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_m1_robustness_part1_target_proximity`
 - Report: `project/stage126/stage126_m1_robustness_part1_qc_report.json`
-- QC source commit (code): `1b770bb08eff101aabeefbab4d411dc390110890`
+- QC source commit (code): `5c7b6eff2572d1535031e5fad3f7acc7ee499b4e`
 
 ## Workflow markers
 
@@ -57,5 +57,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `9b011d4d358615029c597330d3629f63c50a081e24a2450de7ecc9767eda19c7`_
-_generated_at_utc: 2026-07-22T20:38:14Z (informational)_
+_state_fingerprint: `c621af6297d8d5ff33c6f38647fa23eb254faa992439199c8b906e048750b2f6`_
+_generated_at_utc: 2026-07-23T06:05:06Z (informational)_
