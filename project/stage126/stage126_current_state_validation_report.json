@@ -1,0 +1,87 @@
+{
+  "active_workstream": "stage126_m1_financial_baseline",
+  "closed_micro_part_scientific_artifacts_sha256": {
+    "m1_target_proximity_six_feature_set": {
+      "stage126_m1_robustness_part1_completion_lock.json": "964d84f2269bb35b0176f88bb12bcfc13ef2cb487817cf5b49a5c28a87e1822b",
+      "stage126_m1_robustness_part1_execution_manifest.json": "80813ce8af9544dde736cc6b94372d2626dccbf888553cd7964625bfe12d8738",
+      "stage126_m1_robustness_part1_feature_manifest.csv": "c65735795eda7dce6b4cacbc6af9dd5914b5068f44c77277035a51463cceaf90",
+      "stage126_m1_robustness_part1_human_authorization_record.json": "87a4f55baeb1081eaf936e49c5e8923f67df54ec444f0abc33ec835c0c7e06f4",
+      "stage126_m1_robustness_part1_metrics.csv": "c60f4b15aa40273472be98c867c73795d254f32c2a0e29b76641b1c5d5c18e98",
+      "stage126_m1_robustness_part1_oof_predictions.csv": "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31",
+      "stage126_m1_robustness_part1_primary_comparison.json": "2b58a85250420a8a18b0ff37cecdf3f2e31160c37e0cb48d027324c87a25c46a"
+    },
+    "main_rule_b_listing_robustness": {
+      "stage126_m1_robustness_part2_completion_lock.json": "23d1920c4fb0a351456fe54b60616446381bbd550fb18e0bba5dab091486fec6",
+      "stage126_m1_robustness_part2_execution_manifest.json": "9fc153b65a77c906339f51d7c0ad576d23eb06c5895eacb1a0ee92578b321ce8",
+      "stage126_m1_robustness_part2_feature_manifest.csv": "58c52c17337286237779153d59f85f74c76f84d0c0415b8efadd618aa524b78f",
+      "stage126_m1_robustness_part2_human_authorization_record.json": "0a7bba7489f62f59d3e0f07946b82d8ce4be1a49c4d098f47ca308de9466959e",
+      "stage126_m1_robustness_part2_metrics.csv": "073b8657c0ba2c40f52e05d766a102e2b5d20845821c4eb1cef1b6e53459228c",
+      "stage126_m1_robustness_part2_oof_predictions.csv": "3af630141a905370849875926fa84052cf10322cc34e18258a25d28106d47dd6",
+      "stage126_m1_robustness_part2_primary_comparison.json": "9fc3b4eaf0a27fc66cd22444d92363747157743e822d3be877ecca7f153763bf",
+      "stage126_m1_robustness_part2_sample_delta.csv": "baafe97323e45f0a88b07aaf1ea97c50c4b213e43724ddb2b97f3f55144fc7d3"
+    }
+  },
+  "completed_category_ids": [
+    "m1_target_proximity_six_feature_set",
+    "main_rule_b_listing_robustness"
+  ],
+  "completed_micro_parts": [
+    {
+      "authorization_record": "project/stage126/stage126_m1_robustness_part1_human_authorization_record.json",
+      "authorization_text_sha256": "7364a67ce5761c69f6705ae0ee4b0563fc092a576e960df471ebb4581ae1b5ea",
+      "category_id": "m1_target_proximity_six_feature_set",
+      "completion_lock": "project/stage126/stage126_m1_robustness_part1_completion_lock.json",
+      "part_index": 1
+    },
+    {
+      "authorization_record": "project/stage126/stage126_m1_robustness_part2_human_authorization_record.json",
+      "authorization_text_sha256": "27935d31a6efcc6116f0d4007424bad5c7b8599faabcb8d39176c569bf172bcb",
+      "category_id": "main_rule_b_listing_robustness",
+      "completion_lock": "project/stage126/stage126_m1_robustness_part2_completion_lock.json",
+      "part_index": 2
+    }
+  ],
+  "contract_id": "stage126_current_state_validator",
+  "contract_version": "stage126_current_state_validator_v1",
+  "decision_id": "stage126-validation-architecture-boundary-lock",
+  "final_test_access_authorized": false,
+  "final_test_evaluation_performed": false,
+  "final_test_predictor_values_inspected": false,
+  "final_test_target_values_inspected": false,
+  "final_test_unlocked": false,
+  "full_development_refit_performed": false,
+  "last_completed_micro_part": "stage126-m1-robustness-part2-listing-rule-b",
+  "m1_robustness_completed": false,
+  "m1_robustness_started": true,
+  "next_category_authorized": false,
+  "next_category_id": "expanded_rule_a_company_scope_robustness",
+  "next_research_action_id": "stage126-m1-financial-baseline",
+  "primary_stage126_artifacts_sha256": {
+    "project/stage126/stage126_m1_configuration_registry.csv": "decbf43a5c34669bdd7a0c68c0ad6aec5611efc7c3ca82b09f5e85f72d635804",
+    "project/stage126/stage126_m1_development_access_manifest.csv": "0c2783d0e43ebba712a1c41b6889a2f8f646340bae6a75ad15902a8a0c368e39",
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_final_test_lock_guard.json": "509e58fc39e3c5d886993c11b954fc06c267c96d02c081d8e50b0cda52e58b03",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4",
+    "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e",
+    "project/stage126/stage126_m1_tuning_results.csv": "e7e1e6808e394273676709aa94bfa713bbf8a790fadabee22ea20b849adbe649"
+  },
+  "prior_part_reopening_requires_explicit_human_authorization": true,
+  "prior_part_reopening_requires_scientific_error": true,
+  "prior_part_verification_artifact_regeneration_allowed": false,
+  "registered_execution_order": [
+    "m1_target_proximity_six_feature_set",
+    "main_rule_b_listing_robustness",
+    "expanded_rule_a_company_scope_robustness",
+    "expanded_rule_b_combined_robustness",
+    "persistent_loss_robustness_target",
+    "smote_training_fold_only_robustness"
+  ],
+  "stage125_part5_executed_by_this_validator": false,
+  "stage125_part5_imported_by_this_validator": false,
+  "stage125_part5_live_gate_active": false,
+  "stage125_part5_mode": "historical_immutable",
+  "standing_execution_authorization": false,
+  "validation_architecture": "stage126_current_state_validator_v1",
+  "validator_reopened_a_previous_part": false
+}

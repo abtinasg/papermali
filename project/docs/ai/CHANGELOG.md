@@ -3,6 +3,63 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-23 — Stage126 validation-architecture boundary lock
+
+- **Human governance decision recorded and hash-verified** (SHA-256
+  `8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1`).
+  Stage125 Part 5 is a **frozen historical closure**. It is **no longer
+responsible for validating live Stage126 successor state**. The **independent
+Stage126 current-state validator**
+(`project/run_stage126_current_state_validator.py`) is the **sole current-state
+validation surface**. Future robustness parts must **not** regenerate
+previous-part verification artifacts unless a genuine scientific error **and** a
+separate explicit human authorization exist.
+- **This is a decision lock only.** It authorizes the boundary lock, the new
+  validator, the Stage125 Part 5 freeze and the documentation/test changes the
+  boundary requires. It authorizes **no** merge, **no** Part 3 execution, **no**
+  full-development refit, **no** final-test access or evaluation and **no** new
+  scientific execution. No model was fitted, retuned or refit.
+- **Stage125 Part 5 frozen permanently.** Source `cb61ea7c…`, runner
+  `ba6bd9e8…`, test `0b9413b2…` and every tracked `project/stage125/**` file are
+  pinned in `stage126_historical_boundary_manifest.json`. Historical materials
+  are neither deleted nor rewritten; the known runner behaviour (exit 1, first
+  failure `readiness_surface_disagreement`, and a separate five-field direct
+  handoff mismatch) is retained as **historical provenance only** and is no
+  longer a required live gate.
+- **New independent validator.** `stage126_current_state_validator_v1` validates
+  the Part 0 execution-order contract, the primary Stage126 lock, the selected
+  configurations, the final-test lock guard, per-part authorization records and
+  completion locks, scientific artifact hashes, the live Handoff, the completed
+  contiguous category prefix, the next registered category, the absence of
+  standing authorization and the absence of unauthorized execution. It **never**
+  imports the Part 5 source, **never** executes its runner and **never** calls
+  its `validate_actual_handoff` — proven structurally by AST tests. 40
+  assertions, all passing.
+- **Earlier parts are closed packages.** Part 1 and Part 2 artifacts are frozen;
+  a later part must not regenerate their QC reports, metadata manifests, Part 5
+  compatibility records, READMEs, completion locks or scientific artifacts. This
+  boundary work itself changed **zero** Part 1 and Part 2 files — the coupling
+  that previously forced their regeneration is removed now that the Part 5 test
+  file is frozen and pinned.
+- **Generic future-part design.** Parts are discovered from the Part 0 registered
+  execution order by naming convention, so a future Part 3 advances current
+  state by adding only its own files. A synthetic test proves a hypothetical
+  valid Part 3 completion is recognized with **zero** changes to Part 1, Part 2
+  or Stage125 files, and a repository-level policy test fails if any robustness
+  module declares another part's verification artifacts as its outputs.
+- **Exception policy.** Reopening a completed part is **forbidden** by default.
+  An exception requires a documented scientific error, an impact assessment, an
+  explicit new human authorization and a separate corrective PR. A new Handoff
+  timestamp, branch SHA, current test hash, newly completed part, documentation
+  wording drift or historical validator successor mismatch are **not**
+  scientific errors. The validator never reopens a previous part automatically.
+- **New live verification sequence:** the Stage126 current-state validator, the
+  Part 2 runner `--check`, the Handoff validator and the full test suite.
+  `run_stage125_part5.py --check` is **not** a routine gate.
+- **No scientific output changed.** All eight Part 2 and all seven Part 1
+  scientific hashes are byte-identical. Part 3 remains unauthorized and not
+  started; the final test remains locked.
+
 ## 2026-07-23 — Stage126 M1 Robustness Part 2 (listing Rule B sample)
 
 - **Part 2 was explicitly human-authorized and completed on the development

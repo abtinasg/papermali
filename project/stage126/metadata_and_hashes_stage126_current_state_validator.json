@@ -1,0 +1,240 @@
+{
+  "all_pass": true,
+  "assertion_count": 40,
+  "assertions": [
+    {
+      "detail": "",
+      "name": "decision_text_hash_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "decision_locked",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "decision_authorizes_boundary_lock_only",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "decision_denies_merge_part3_refit_final_test",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_source_hash_pinned",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_runner_hash_pinned",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_test_hash_pinned",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "stage125_tree_fully_pinned",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_mode_is_historical_immutable",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_live_gate_inactive",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_provenance_is_not_a_live_gate",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "boundary_prohibitions_all_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "[]",
+      "name": "validator_does_not_import_or_invoke_part5",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part5_module_not_loaded_into_this_namespace",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "validator_declares_no_part5_execution",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part0_execution_order_is_six_registered_categories",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "primary_stage126_artifacts_immutable",
+      "status": "PASS"
+    },
+    {
+      "detail": "['m1_target_proximity_six_feature_set', 'main_rule_b_listing_robustness']",
+      "name": "completed_categories_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completed_prefix_is_contiguous",
+      "status": "PASS"
+    },
+    {
+      "detail": "expanded_rule_a_company_scope_robustness",
+      "name": "next_category_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "next_category_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_standing_execution_authorization",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "m1_robustness_not_completed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part1_lock_next_category_is_registered_successor",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part1_lock_completed_prefix_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part1_authorization_hash_recorded",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part2_lock_next_category_is_registered_successor",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part2_lock_completed_prefix_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part2_authorization_hash_recorded",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "scientific_artifacts_immutable[m1_target_proximity_six_feature_set]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "scientific_artifacts_immutable[main_rule_b_listing_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_locked_everywhere",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_full_development_refit",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "prior_verification_artifact_regeneration_forbidden",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "prior_part_reopening_requires_error_and_authorization",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "validator_never_reopens_a_previous_part",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "exception_policy_requirements_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "handoff_timestamp_and_test_hash_are_not_scientific_errors",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "research_pointers_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "last_completed_micro_part_exact",
+      "status": "PASS"
+    }
+  ],
+  "code_commit": "c2bbe136db0012b0256895ec2905d2a68c28e8de",
+  "current_stage": "Stage126",
+  "decision_id": "stage126-validation-architecture-boundary-lock",
+  "decision_version": "stage126_validation_architecture_boundary_v1",
+  "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
+  "failed_count": 0,
+  "generated_at": "c2bbe136db0012b0256895ec2905d2a68c28e8de",
+  "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
+  "output_files_sha256": {
+    "README_STAGE126_CURRENT_STATE_VALIDATION.md": "6aabd6bd6d558eca430362d0a6bef9e994a559b3fdd973bf1492e47bae88733f",
+    "stage126_current_state_validation_report.json": "46f3281ceabf1c0e5d391cc42739b33c0617d95f4ef4d69cba318b40e84ed3c6",
+    "stage126_historical_boundary_manifest.json": "8408aaa6c4cd57d542accb96cd5778dbad1548cdc5a90b36e0a7673aa8b40ee5",
+    "stage126_validation_architecture_boundary_decision.json": "7502405fc0c2641c7dc766f3d4a52941b4c4841295d1d3130c07718768a6e06c"
+  },
+  "prior_part_reopening_requires_explicit_human_authorization": true,
+  "prior_part_reopening_requires_scientific_error": true,
+  "prior_robustness_verification_artifact_regeneration_allowed": false,
+  "source_file_sha256": "7b67874d8e6f46ca7af951ea4c89ea26d4a83db489c519294f71561367ec8ee7",
+  "stage": "stage126_current_state_validator",
+  "stage125_part5_executed": false,
+  "stage125_part5_frozen_files_sha256": {
+    "project/run_stage125_part5.py": "ba6bd9e8e155e9cad71299e53806515caa1f95664bfcba0aebd20929f769e037",
+    "project/src/stage125_part5_readiness_closure.py": "cb61ea7c99b53f1988c22f5eac0af66af9cd9e46657a48bf66ccb198d654d41c",
+    "project/tests/test_stage125_part5_readiness_closure.py": "0b9413b2adbf9c44b0fb12b4f7ef2dad60be5cd4c401ccefac30d19f0905af71"
+  },
+  "stage125_part5_future_regeneration_allowed": false,
+  "stage125_part5_imported": false,
+  "stage125_part5_live_gate_active": false,
+  "stage125_part5_mode": "historical_immutable",
+  "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
+  "test_file_sha256": "6fb713e7e7ee6fa09e4a3131bcf3cc2628d20e02dc10be5117f17a46588969cf",
+  "validation_architecture": "stage126_current_state_validator_v1",
+  "validator_id": "stage126_current_state_validator",
+  "validator_version": "stage126_current_state_validator_v1"
+}

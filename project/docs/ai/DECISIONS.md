@@ -113,6 +113,42 @@ These are stable project decisions. Change them only deliberately (and note it i
   started.** The consumed Part 1 authorization confers no standing
   authorization for any later category.
 
+### Stage126 validation-architecture boundary lock (2026-07-23)
+
+- **Human governance decision** (SHA-256
+  `8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1`),
+  recorded verbatim in
+  `stage126_validation_architecture_boundary_decision.json`.
+- **Stage125 Part 5 is historical and immutable.** It is no longer a live
+  successor-state validator for Stage126. Its source, runner, test and the whole
+  `project/stage125/**` tree are hash-pinned in
+  `stage126_historical_boundary_manifest.json`. Historical materials are neither
+  deleted nor rewritten.
+- **The independent Stage126 current-state validator is the sole current-state
+  validation surface** (`stage126_current_state_validator_v1`). It never
+  imports the Part 5 source, never executes its runner and never calls its
+  `validate_actual_handoff`; this is proven structurally by AST-based tests
+  rather than asserted.
+- **Later parts must not regenerate earlier parts' verification artifacts.**
+  Part 1 and Part 2 are closed historical micro-part packages. The previous
+  coupling — earlier packages embedding the hash of a then-mutable current test
+  file — is resolved by freezing and pinning that file.
+- **Reopening a completed part is forbidden by default.** An exception requires
+  a documented scientific error, an impact assessment, an explicit new human
+  authorization and a separate corrective PR. A new Handoff timestamp, branch
+  SHA, current test hash, newly completed part, documentation wording drift or
+  historical validator successor mismatch are explicitly **not** scientific
+  errors. Incorrect target construction, leakage, incorrect feature
+  computation, wrong sample membership, wrong fold assignment, incorrect
+  probability/metric computation or unauthorized final-test access **may**
+  qualify. The validator never reopens a part automatically.
+- **Generic future-part design.** Parts are discovered from the Part 0
+  registered execution order by naming convention; Part 3 will advance current
+  state by adding only its own files.
+- **Authorizes nothing else.** No merge, no Part 3 execution, no
+  full-development refit, no final-test access or evaluation, no new scientific
+  execution. All Part 1 and Part 2 scientific hashes are unchanged.
+
 ### Frozen Part 5 runner provenance — corrected wording (2026-07-23)
 
 - **No Stage125 file changed.** `project/src/stage125_part5_readiness_closure.py`,

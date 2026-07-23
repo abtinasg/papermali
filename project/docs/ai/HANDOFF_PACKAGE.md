@@ -256,7 +256,27 @@ changed, and no paper winner was selected. Recorded in
 `stage126/stage126_m1_robustness_part2_primary_comparison.json`. The Part 1
 ordering-instability markers are retained unchanged.
 
-**Frozen Part 5 live-successor boundary.** Stage125 Part 5 remains a frozen,
+**Validation architecture (locked 2026-07-23).** Stage125 Part 5 is a **frozen
+historical closure**. It is **no longer responsible for validating live Stage126
+successor state**. The **independent Stage126 current-state validator**
+(`stage126_current_state_validator_v1`,
+`project/run_stage126_current_state_validator.py --check`) is the **sole
+current-state validation surface**; it never imports, executes or calls into
+Part 5. Future robustness parts must **not** regenerate previous-part
+verification artifacts unless a genuine scientific error **and** a separate
+explicit human authorization exist. Handoff markers:
+`validation_architecture=stage126_current_state_validator_v1`,
+`stage125_part5_mode=historical_immutable`,
+`stage125_part5_live_gate_active=false`,
+`stage125_part5_future_regeneration_allowed=false`,
+`prior_robustness_verification_artifact_regeneration_allowed=false`,
+`prior_part_reopening_requires_scientific_error=true`,
+`prior_part_reopening_requires_explicit_human_authorization=true`.
+Live sequence: the Stage126 current-state validator, the Part 2 runner
+`--check`, the Handoff validator and the full test suite —
+`run_stage125_part5.py --check` is **not** a routine gate.
+
+**Frozen Part 5 live-successor boundary (historical provenance only).** Stage125 Part 5 remains a frozen,
 valid historical closure (source, runner and all `project/stage125/` artifacts
 byte-identical). Its embedded live-Handoff successor check ends at the earlier
 primary-development state. The full frozen Part 5 runner exits 1 first with the inherited `readiness_surface_disagreement` during a live-successor rebuild. Separately, direct `validate_actual_handoff` returns exactly the documented five-field historical successor mismatch (`m1_robustness_started`, `selected_qc_scope`, `selected_qc_path`, `contract_version`, `last_completed_micro_part`) with no forbidden fields. Neither behaviour was introduced by Part 2, and no Stage125 scientific artifact changed.
