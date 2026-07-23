@@ -276,6 +276,16 @@ Live sequence: the Stage126 current-state validator, the Part 2 runner
 `--check`, the Handoff validator and the full test suite —
 `run_stage125_part5.py --check` is **not** a routine gate.
 
+The validator derives current state generically: the completed prefix is
+`execution_order[:n]` over discovered per-part packages, the next category is
+`execution_order[n]`, and the last completed micro-part comes from the newest
+completion lock. Closed parts — scientific **and** verification-only artifacts,
+plus their source, runner and tests — are pinned in
+`stage126/stage126_closed_part_registry.json`; byte drift in any of them fails
+validation. **Two QC roles are reported separately:**
+`current_state_validation_*` (the independent validator) and
+`last_completed_micro_part_qc_*` (the newest completed scientific part).
+
 **Frozen Part 5 live-successor boundary (historical provenance only).** Stage125 Part 5 remains a frozen,
 valid historical closure (source, runner and all `project/stage125/` artifacts
 byte-identical). Its embedded live-Handoff successor check ends at the earlier

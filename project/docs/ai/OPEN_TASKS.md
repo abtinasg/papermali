@@ -197,6 +197,15 @@ python project/scripts/validate_ai_handoff.py --check
 PYTHONPATH=project python -m pytest project/tests -q
 ```
 
+Current state is derived **generically** — completed prefix
+`execution_order[:n]`, next category `execution_order[n]`, last micro-part from
+the newest completion lock — so a future Part 3 advances state by adding only
+its own package. Closed Part 1 and Part 2 packages (scientific **and**
+verification-only artifacts, plus source/runner/tests) are pinned in
+`stage126_closed_part_registry.json` and fail validation on byte drift. The
+Handoff reports current-state validation and the newest scientific micro-part QC
+as two separate, explicit roles.
+
 `run_stage125_part5.py --check` is **not** a routine gate, and previous
 robustness runners are not current-state gates — previous scientific artifacts
 are protected by immutable hashes. Future robustness parts must **not**

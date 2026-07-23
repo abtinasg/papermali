@@ -3,6 +3,53 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-23 — Stage126 current-state validation made fully generic
+
+Enforcement hardening of the boundary lock. No scientific execution: no model
+fitting, retuning, refit, final-test access or evaluation; Part 3 not started.
+
+- **Generic future-part advancement.** The validator's three hard-coded
+  current-state constants (`EXPECTED_COMPLETED_CATEGORY_IDS`,
+  `EXPECTED_NEXT_CATEGORY_ID`, `EXPECTED_LAST_MICRO_PART`) are **removed**. The
+  completed prefix is now `execution_order[:n]` over discovered packages, the
+  next category is `execution_order[n]` (empty when all six are complete), and
+  the last completed micro-part is derived from the newest completion lock's
+  `micro_part_id`, falling back to the part QC report's `stage`. The validator
+  source needs no edit when Parts 3-6 land.
+- **Generic per-part integrity contract.** The Part 1/Part 2 hash dictionaries
+  are replaced by `stage126_closed_part_registry.json`, built from each part's
+  own package by convention: scientific artifacts, verification artifacts,
+  source/runner/tests, authorization record, completion lock, next registered
+  category, authorization-consumed and final-test lock flags. Hashes already
+  registered may never change; new parts are appended without touching earlier
+  entries.
+- **Closed verification artifacts pinned exactly.** Both parts' QC reports,
+  metadata manifests, Part 5 compatibility records and READMEs — plus their
+  source, runner and tests — are pinned, and byte drift in any of them fails
+  full current-state validation. Negative tests mutate a Part 1 QC byte, a
+  Part 2 metadata byte, a previous README, a previous compatibility record and
+  a scientific artifact, and prove full validation fails in every case.
+- **Handoff architecture fields enforced inside `verify_handoff`.** All seven
+  fields are required exactly; per-field mutation and removal tests call the
+  real validator rather than asserting standalone.
+- **Current-state QC separated from scientific micro-part QC.** The Handoff now
+  carries `current_state_validation_{scope,path,metadata_path,assertions,failed,all_pass}`
+  for the independent validator and
+  `last_completed_micro_part_qc_{scope,path,assertions,failed}` for the newest
+  completed scientific part. `CURRENT_STATE.md` reports the independent
+  validator (53 assertions) in its primary Current-state validation section and
+  the Part 2 QC (128 assertions) in a clearly separate subsection. The validator
+  fails closed if these pointers or counts disagree with the real artifacts.
+- **End-to-end future-part proof.** A synthetic but complete Part 3 package is
+  built and checked through the real validator in a mirrored git repository; the
+  report derives three completed categories, next category
+  `expanded_rule_b_combined_robustness` and the derived Part 3 micro-part id,
+  while Part 1, Part 2 and Stage125 files stay byte-identical. A matching
+  negative test rejects a Part 4 package with Part 3 missing.
+- **No scientific output changed.** All eight Part 2 and all seven Part 1
+  scientific hashes, and every Part 1/Part 2 verification artifact, are
+  byte-identical. No Stage125 path changed. Final test remains locked.
+
 ## 2026-07-23 — Stage126 validation-architecture boundary lock
 
 - **Human governance decision recorded and hash-verified** (SHA-256

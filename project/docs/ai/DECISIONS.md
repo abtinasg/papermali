@@ -113,6 +113,28 @@ These are stable project decisions. Change them only deliberately (and note it i
   started.** The consumed Part 1 authorization confers no standing
   authorization for any later category.
 
+### Stage126 current-state validation — generic enforcement (2026-07-23)
+
+- **No hard-coded current state.** The validator derives the completed prefix,
+  the next registered category and the last completed micro-part from the Part 0
+  execution order, the discovered per-part packages and their completion locks.
+  The three expected-state constants no longer exist.
+- **Closed parts are protected by a generic registry**
+  (`stage126_closed_part_registry.json`), not by per-part constants. It pins
+  each closed part's scientific artifacts, verification artifacts and
+  source/runner/tests; already-registered hashes may never change.
+- **Verification-only artifacts are immutable too**, exactly as the governance
+  decision requires — QC reports, metadata manifests, Part 5 compatibility
+  records and READMEs all fail validation on byte drift.
+- **The Handoff architecture fields are enforced inside the validator**, not
+  merely reported.
+- **Two QC roles are explicit:** current-state validation versus the newest
+  completed scientific micro-part. Neither is described by an ambiguous
+  `selected_qc` field alone.
+- **A future part changes nothing older.** An end-to-end synthetic Part 3 builds
+  and checks through the real validator without modifying validator source or
+  any Part 1, Part 2 or Stage125 file.
+
 ### Stage126 validation-architecture boundary lock (2026-07-23)
 
 - **Human governance decision** (SHA-256

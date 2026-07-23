@@ -6,27 +6,6 @@
     "future_stage126_gate_may_execute_stage125_part5_runner": false,
     "future_stage126_gate_may_import_stage125_part5_validator": false
   },
-  "closed_micro_part_scientific_artifacts_sha256": {
-    "m1_target_proximity_six_feature_set": {
-      "stage126_m1_robustness_part1_completion_lock.json": "964d84f2269bb35b0176f88bb12bcfc13ef2cb487817cf5b49a5c28a87e1822b",
-      "stage126_m1_robustness_part1_execution_manifest.json": "80813ce8af9544dde736cc6b94372d2626dccbf888553cd7964625bfe12d8738",
-      "stage126_m1_robustness_part1_feature_manifest.csv": "c65735795eda7dce6b4cacbc6af9dd5914b5068f44c77277035a51463cceaf90",
-      "stage126_m1_robustness_part1_human_authorization_record.json": "87a4f55baeb1081eaf936e49c5e8923f67df54ec444f0abc33ec835c0c7e06f4",
-      "stage126_m1_robustness_part1_metrics.csv": "c60f4b15aa40273472be98c867c73795d254f32c2a0e29b76641b1c5d5c18e98",
-      "stage126_m1_robustness_part1_oof_predictions.csv": "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31",
-      "stage126_m1_robustness_part1_primary_comparison.json": "2b58a85250420a8a18b0ff37cecdf3f2e31160c37e0cb48d027324c87a25c46a"
-    },
-    "main_rule_b_listing_robustness": {
-      "stage126_m1_robustness_part2_completion_lock.json": "23d1920c4fb0a351456fe54b60616446381bbd550fb18e0bba5dab091486fec6",
-      "stage126_m1_robustness_part2_execution_manifest.json": "9fc153b65a77c906339f51d7c0ad576d23eb06c5895eacb1a0ee92578b321ce8",
-      "stage126_m1_robustness_part2_feature_manifest.csv": "58c52c17337286237779153d59f85f74c76f84d0c0415b8efadd618aa524b78f",
-      "stage126_m1_robustness_part2_human_authorization_record.json": "0a7bba7489f62f59d3e0f07946b82d8ce4be1a49c4d098f47ca308de9466959e",
-      "stage126_m1_robustness_part2_metrics.csv": "073b8657c0ba2c40f52e05d766a102e2b5d20845821c4eb1cef1b6e53459228c",
-      "stage126_m1_robustness_part2_oof_predictions.csv": "3af630141a905370849875926fa84052cf10322cc34e18258a25d28106d47dd6",
-      "stage126_m1_robustness_part2_primary_comparison.json": "9fc3b4eaf0a27fc66cd22444d92363747157743e822d3be877ecca7f153763bf",
-      "stage126_m1_robustness_part2_sample_delta.csv": "baafe97323e45f0a88b07aaf1ea97c50c4b213e43724ddb2b97f3f55144fc7d3"
-    }
-  },
   "contract_id": "stage126_historical_boundary_manifest",
   "contract_version": "stage126_validation_architecture_boundary_v1",
   "decision_id": "stage126-validation-architecture-boundary-lock",

@@ -53,7 +53,10 @@ python run_stage126_m1_robustness_part1_target_proximity.py --check
 # 8) Stage126 M1 robustness Part 2 listing Rule B sample (development-only; --check)
 python run_stage126_m1_robustness_part2_listing_rule_b.py --check
 
-# 9) Stage126 independent current-state validator (the live gate)
+# 9) Stage126 independent current-state validator (the live gate).
+# Derives the completed prefix, next category and last micro-part generically
+# from the registered execution order, and pins every closed part's scientific
+# AND verification artifacts by hash.
 python run_stage126_current_state_validator.py --check
 
 # NOTE: Stage125 Part 5 is now HISTORICAL and IMMUTABLE. `run_stage125_part5.py`

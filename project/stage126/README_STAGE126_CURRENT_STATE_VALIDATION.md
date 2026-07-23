@@ -33,6 +33,7 @@ PYTHONPATH=project python -m pytest project/tests -q
 
 | field | value |
 |---|---|
+| completed parts | 2 |
 | completed categories | `m1_target_proximity_six_feature_set`, `main_rule_b_listing_robustness` |
 | next category | `expanded_rule_a_company_scope_robustness` |
 | next category authorized | false |
