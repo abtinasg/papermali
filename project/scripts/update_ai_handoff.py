@@ -372,6 +372,7 @@ ARTIFACT_ONLY_FILES = (
     "project/stage126/stage126_m1_robustness_part1_oof_predictions.csv",
     "project/stage126/stage126_m1_robustness_part1_metrics.csv",
     "project/stage126/stage126_m1_robustness_part1_completion_lock.json",
+    "project/stage126/stage126_m1_robustness_part1_primary_comparison.json",
     "project/stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json",
     "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md",
     "project/stage126/stage126_m1_robustness_part1_qc_report.json",
@@ -1481,11 +1482,66 @@ def derive_part5_successor_compatibility_markers(root: str) -> dict:
     # The complete tracked Stage125 tree must be unchanged (fail-closed, git).
     _require_stage125_tree_unchanged(root)
 
-    return {
+    markers = {
         "stage125_part5_frozen_artifacts_verified": True,
         "stage125_part5_live_successor_check_applicable": False,
         "stage125_part5_successor_compatibility_status":
             "expected_historical_contract_boundary_after_part1",
+    }
+    markers.update(derive_part1_ordering_instability_markers(root))
+    return markers
+
+
+_PART1_COMPARISON_REL = (
+    "project/stage126/stage126_m1_robustness_part1_primary_comparison.json"
+)
+_PART1_EXPECTED_OBSERVED_ORDERING = [
+    "xgboost", "random_forest", "regularized_logistic_regression",
+]
+
+
+def derive_part1_ordering_instability_markers(root: str) -> dict:
+    """Derive the observed-ordering-instability markers (fail-closed).
+
+    The instability is REPORTED. It must never imply that the primary ordering,
+    selected configurations or paper winner changed — any record claiming
+    otherwise raises rather than being propagated into the Handoff.
+    """
+    path = os.path.join(root, _PART1_COMPARISON_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        cmp_ = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable Part 1 comparison artifact: {exc}") from exc
+
+    exact = {
+        "contract_version":
+            "stage126_m1_robustness_part1_primary_comparison_v1",
+        "comparison_scope": "pooled_development_oof",
+        "comparison_metric": "pr_auc",
+        "observed_ordering_differs_from_primary": True,
+        "ordering_instability_reported_to_human_supervisor": True,
+        "primary_ordering_for_confirmatory_claims_changed": False,
+        "selected_configurations_changed": False,
+        "paper_winner_selected": False,
+        "automatic_scientific_action_triggered": False,
+    }
+    for key, expected in exact.items():
+        if cmp_.get(key) != expected:
+            raise HandoffError(
+                f"Part 1 comparison field {key}={cmp_.get(key)!r} != {expected!r}"
+            )
+    observed = list(cmp_.get("part1_observed_sensitivity_ordering") or [])
+    if observed != _PART1_EXPECTED_OBSERVED_ORDERING:
+        raise HandoffError(
+            f"Part 1 observed ordering {observed!r} != "
+            f"{_PART1_EXPECTED_OBSERVED_ORDERING!r}"
+        )
+    return {
+        "m1_robustness_part1_ordering_instability_reported": True,
+        "m1_robustness_part1_observed_ordering": observed,
+        "m1_primary_claim_ordering_preserved": True,
     }
 
 
@@ -2047,7 +2103,11 @@ def render_current_state(record: dict) -> str:
         "## Snapshot\n",
         f"- **Stage / Batch:** {record['current_stage']} / {record['current_batch']}",
         f"- **Active workstream:** `{record['active_workstream']}`",
-        f"- **Last completed research action:** `{record['last_completed_micro_part']}`",
+        # `last_completed_micro_part` tracks the newest completed MICRO-PART
+        # (robustness micro-parts included). It is deliberately NOT labelled a
+        # completed research action — the research-action chain is reported
+        # separately below and is never advanced by a micro-part.
+        f"- **Last completed micro-part:** `{record['last_completed_micro_part']}`",
         f"- **Next research action:** `{record['next_research_action_id']}`",
         f"- **Last stage commit:** `{record['last_stage_commit']}`",
         f"- **Generated from commit:** `{record['generated_from_commit']}` "

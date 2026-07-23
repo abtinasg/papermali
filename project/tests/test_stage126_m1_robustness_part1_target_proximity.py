@@ -710,6 +710,199 @@ def test_expected_mismatch_matches_the_real_frozen_validator():
         assert forbidden not in fields
 
 
+# --------------------------------------------------------------------------- #
+# Part 5 successor-test-hash provenance (explicit, bounded)
+# --------------------------------------------------------------------------- #
+
+HISTORICAL_PART5_TEST_SHA256 = (
+    "0a117c1916ad845653e148d951a49a2c0375d13b7de23019e50ae891aee1b437"
+)
+EXPECTED_BOOKKEEPING_DRIFT = [
+    "metadata_and_hashes_stage125_part5.json",
+    "stage125_part5_readiness_closure_qc_report.json",
+]
+
+
+def test_frozen_part5_metadata_still_pins_the_historical_test_hash():
+    meta = json.load(open(
+        os.path.join(REAL_ROOT, "project", "stage125",
+                     "metadata_and_hashes_stage125_part5.json"),
+        encoding="utf-8"))
+    assert meta["test_file_sha256"] == HISTORICAL_PART5_TEST_SHA256
+
+
+def test_part5_test_hash_provenance_recomputes_and_diverges():
+    prov = p1.part5_test_hash_provenance(_root())
+    assert prov["historical"] == HISTORICAL_PART5_TEST_SHA256
+    current_on_disk = hashlib.sha256(
+        open(os.path.join(REAL_ROOT, p1.PART5_TEST_REL), "rb").read()
+    ).hexdigest()
+    assert prov["current"] == current_on_disk
+    assert prov["current"] != prov["historical"], (
+        "successor-aware test file must diverge from the historical hash"
+    )
+
+
+def test_compatibility_record_records_both_test_hashes():
+    c = _read_json(p1.F_PART5_COMPAT)
+    assert c["stage125_part5_historical_test_file_sha256"] == \
+        HISTORICAL_PART5_TEST_SHA256
+    assert c["stage125_part5_current_test_file_sha256"] == hashlib.sha256(
+        open(os.path.join(REAL_ROOT, p1.PART5_TEST_REL), "rb").read()
+    ).hexdigest()
+    assert c["stage125_part5_current_test_file_sha256"] != \
+        c["stage125_part5_historical_test_file_sha256"]
+    assert c["stage125_part5_test_file_modified_for_successor_test_separation"] \
+        is True
+    assert c["stage125_part5_historical_metadata_modified"] is False
+    assert c["stage125_part5_expected_bookkeeping_drift_files"] == \
+        EXPECTED_BOOKKEEPING_DRIFT
+    assert c["stage125_part5_scientific_artifact_drift_expected"] is False
+    assert c["stage125_part5_scientific_artifact_drift_observed"] is False
+
+
+def test_qc_records_test_hash_divergence_fields():
+    qc = _read_json(p1.F_QC)
+    assert qc["part5_historical_test_hash_matches_frozen_metadata"] is True
+    assert qc["part5_current_test_hash_recomputed"] is True
+    assert qc["part5_test_hash_divergence_explicitly_recorded"] is True
+    assert qc["part5_expected_bookkeeping_drift_files_exact"] is True
+    assert qc["part5_scientific_artifact_drift_zero"] is True
+    assert qc["part5_no_unregistered_drift"] is True
+    assert qc["stage125_part5_historical_test_file_sha256"] == \
+        HISTORICAL_PART5_TEST_SHA256
+    assert qc["stage125_part5_current_test_file_sha256"] != \
+        HISTORICAL_PART5_TEST_SHA256
+    meta = _read_json(p1.F_METADATA)
+    assert meta["stage125_part5_historical_test_file_sha256"] == \
+        HISTORICAL_PART5_TEST_SHA256
+    assert meta["stage125_part5_current_test_file_sha256"] == \
+        qc["stage125_part5_current_test_file_sha256"]
+
+
+def test_provenance_fails_closed_if_test_hash_did_not_diverge(tmp_path,
+                                                              monkeypatch):
+    monkeypatch.setattr(
+        p1, "PART5_HISTORICAL_TEST_SHA256",
+        hashlib.sha256(
+            open(os.path.join(REAL_ROOT, p1.PART5_TEST_REL), "rb").read()
+        ).hexdigest(),
+    )
+    with pytest.raises(p1.QCFail):
+        p1.part5_test_hash_provenance(_root())
+
+
+# --------------------------------------------------------------------------- #
+# Observed model-ordering instability (reported, never acted upon)
+# --------------------------------------------------------------------------- #
+
+PRIMARY_POOLED = {
+    "regularized_logistic_regression": 0.445756964048,
+    "random_forest": 0.40244183002,
+    "xgboost": 0.356545008162,
+}
+PART1_POOLED = {
+    "regularized_logistic_regression": 0.318117505162,
+    "random_forest": 0.332133983124,
+    "xgboost": 0.339262787141,
+}
+
+
+def test_comparison_artifact_values_exact():
+    c = _read_json(p1.F_COMPARISON)
+    assert c["contract_version"] == \
+        "stage126_m1_robustness_part1_primary_comparison_v1"
+    assert c["comparison_scope"] == "pooled_development_oof"
+    assert c["comparison_metric"] == "pr_auc"
+    assert c["primary_pooled_pr_auc"] == PRIMARY_POOLED
+    assert c["part1_pooled_pr_auc"] == PART1_POOLED
+    assert c["absolute_change"] == {
+        "regularized_logistic_regression": -0.127639458886,
+        "random_forest": -0.070307846896,
+        "xgboost": -0.017282221021,
+    }
+    assert c["relative_change_percent"] == {
+        "regularized_logistic_regression": -28.634316271109,
+        "random_forest": -17.470312887829,
+        "xgboost": -4.84713588057,
+    }
+    assert c["all_families_declined"] is True
+
+
+def test_comparison_orderings_and_instability_flags():
+    c = _read_json(p1.F_COMPARISON)
+    assert c["primary_observed_ordering"] == [
+        "regularized_logistic_regression", "random_forest", "xgboost",
+    ]
+    assert c["part1_observed_sensitivity_ordering"] == [
+        "xgboost", "random_forest", "regularized_logistic_regression",
+    ]
+    assert c["observed_ordering_differs_from_primary"] is True
+    assert c["ordering_instability_reported_to_human_supervisor"] is True
+    assert c["primary_ordering_for_confirmatory_claims_changed"] is False
+    assert c["selected_configurations_changed"] is False
+    assert c["paper_winner_selected"] is False
+    assert c["automatic_scientific_action_triggered"] is False
+
+
+def test_comparison_derived_from_the_actual_pinned_sources():
+    """Values must be derived from the frozen primary metrics, not hardcoded."""
+    import csv as _csv
+    prim = {
+        r["model_family"]: float(r["pr_auc"])
+        for r in _csv.DictReader(open(
+            os.path.join(STAGE126, "stage126_m1_development_metrics.csv"),
+            encoding="utf-8-sig"))
+        if r["scope"] == "pooled_development_oof"
+    }
+    part1 = {
+        r["model_family"]: float(r["pr_auc"])
+        for r in _read_csv(p1.F_METRICS)
+        if r["scope"] == "pooled_development_oof"
+    }
+    c = _read_json(p1.F_COMPARISON)
+    assert c["primary_pooled_pr_auc"] == prim
+    assert c["part1_pooled_pr_auc"] == part1
+    for fam in prim:
+        assert abs(c["absolute_change"][fam] - (part1[fam] - prim[fam])) < 1e-12
+    # And it is pinned to the frozen primary metrics hash.
+    assert c["primary_metrics_sha256"] == \
+        "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a"
+
+
+def test_completion_lock_records_instability_without_acting():
+    lock = _read_json(p1.F_COMPLETION_LOCK)
+    assert lock["observed_sensitivity_ordering_differs_from_primary"] is True
+    assert lock["ordering_instability_reported_to_human_supervisor"] is True
+    assert lock["primary_ordering_for_confirmatory_claims_changed"] is False
+    assert lock["primary_results_replaced"] is False
+    assert lock["paper_winner_selected"] is False
+    assert lock["primary_comparison_artifact"] == p1.F_COMPARISON
+
+
+def test_comparison_artifact_pinned_in_qc_metadata_and_readme():
+    on_disk = hashlib.sha256(
+        open(os.path.join(STAGE126, p1.F_COMPARISON), "rb").read()
+    ).hexdigest()
+    assert _read_json(p1.F_QC)["primary_comparison_sha256"] == on_disk
+    meta = _read_json(p1.F_METADATA)
+    assert meta["primary_comparison_sha256"] == on_disk
+    assert meta["output_files_sha256"][p1.F_COMPARISON] == on_disk
+    readme = open(os.path.join(STAGE126, p1.F_README), encoding="utf-8").read()
+    assert p1.F_COMPARISON in readme
+
+
+def test_readme_states_both_orderings_and_preserves_primary_claim():
+    readme = open(os.path.join(STAGE126, p1.F_README), encoding="utf-8").read()
+    assert "Logistic > RF > XGBoost" in readme
+    assert "XGBoost > RF > Logistic" in readme
+    assert "All three pooled PR-AUC values declined." in readme
+    assert "development-only sensitivity finding" in readme
+    assert "No primary conclusion or winner changed." in readme
+    # The obsolete absolute claim must be gone.
+    assert "does not re-rank the primary model families" not in readme
+
+
 def test_qc_all_pass_and_required_fields():
     qc = _read_json(p1.F_QC)
     assert qc["stage"] == "stage126_m1_robustness_part1_target_proximity"

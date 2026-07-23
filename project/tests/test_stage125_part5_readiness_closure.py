@@ -1,6 +1,7 @@
 """Tests for Stage125 Part 5 Readiness Closure."""
 from __future__ import annotations
 
+import hashlib
 import json
 import socket
 import subprocess
@@ -38,6 +39,23 @@ def _clean_working_tree_for_unit_tests(monkeypatch, request):
 # ``live_successor_state`` exercises the real current Part 1 Handoff and proves
 # the incompatibility is known, bounded and exactly five fields wide.
 # --------------------------------------------------------------------------- #
+
+# Exactly the two self-describing bookkeeping files that legitimately differ
+# when the frozen Part 5 build is replayed against the successor-aware test
+# file (they embed ``test_file_sha256``). A third drifting file is a failure.
+EXPECTED_PART5_BOOKKEEPING_DRIFT_FILES = [
+    "metadata_and_hashes_stage125_part5.json",
+    "stage125_part5_readiness_closure_qc_report.json",
+]
+# Part 5 scientific/historical outputs — these must NEVER drift.
+PART5_SCIENTIFIC_OUTPUT_FILES = (
+    "part5_readiness_closure_report_stage125.json",
+    "part5_stage126_m1_entry_contract_stage125.json",
+    "part5_keep_drop_decisions_stage125.csv",
+    "part5_blocker_register_stage125.csv",
+    "part5_artifact_integrity_manifest_stage125.csv",
+    "README_STAGE125_PART5_READINESS_CLOSURE.md",
+)
 
 HISTORICAL_PRIMARY_SUCCESSOR_HANDOFF: dict = {
     "m1_robustness_started": False,
@@ -996,22 +1014,61 @@ def test_run_canonical_check_zero_scientific_drift(monkeypatch):
         "frozen Part 5 source must be byte-identical"
     )
 
-    # Compare computed vs on-disk without raising on the two self-referential
-    # bookkeeping files.
-    monkeypatch.setattr(m, "_compare_drift", lambda out_dir, payloads: [])
+    # Wrap (never blindly stub) the real drift comparison so whatever is
+    # suppressed is captured and asserted exactly.
+    original_compare_drift = m._compare_drift
+    captured: dict = {}
+
+    def _capture_and_allow_expected_bookkeeping_drift(out_dir, payloads):
+        actual = original_compare_drift(out_dir, payloads)
+        captured["actual"] = sorted(actual)
+        return []
+
+    monkeypatch.setattr(
+        m, "_compare_drift", _capture_and_allow_expected_bookkeeping_drift,
+    )
     with p3b0.network_sentinel():
         result = m.run(project_dir=ROOT, build=False, check=True)
     assert result["qc"]["all_pass"] is True
 
+    # EXACTLY the two self-describing bookkeeping files may differ — no third.
+    assert captured["actual"] == EXPECTED_PART5_BOOKKEEPING_DRIFT_FILES, (
+        f"unregistered Part 5 drift: {captured.get('actual')}"
+    )
+
+    # Independently: every Part 5 scientific/historical output has zero drift.
     out = REPO_ROOT / "project" / "stage125"
     content, _extras = m.build_all(REPO_ROOT, mode="check")
-    scientific_drift = [
+    scientific_drift = sorted(
         name for name, text in content.items()
         if (out / name).read_text(encoding="utf-8") != text
-    ]
+    )
     assert scientific_drift == [], (
         f"Part 5 scientific artifacts drifted: {scientific_drift}"
     )
+    # And the exact scientific file set is covered by that comparison.
+    for name in PART5_SCIENTIFIC_OUTPUT_FILES:
+        assert name in content, f"Part 5 scientific output not built: {name}"
+        assert (out / name).read_text(encoding="utf-8") == content[name]
+
+    # The Part 5 runner must also be unmodified.
+    runner_sha = hashlib.sha256(
+        (REPO_ROOT / "project/run_stage125_part5.py").read_bytes()
+    ).hexdigest()
+    frozen_runner = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "show",
+         "6a4f05da219db7faea5a27c2adbee6b55497ec01:project/run_stage125_part5.py"],
+        capture_output=True, check=True,
+    ).stdout
+    assert runner_sha == hashlib.sha256(frozen_runner).hexdigest()
+
+    # No project/stage125 path may be modified.
+    changed = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "status", "--porcelain",
+         "--", "project/stage125/"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    assert changed == "", f"project/stage125 modified: {changed}"
 
 
 # --------------------------------------------------------------------------- #

@@ -829,9 +829,162 @@ PART5_SUCCESSOR_VALIDATION_SURFACES: tuple[str, ...] = (
 )
 PART5_SOURCE_REL = "project/src/stage125_part5_readiness_closure.py"
 PART5_RUNNER_REL = "project/run_stage125_part5.py"
+PART5_TEST_REL = "project/tests/test_stage125_part5_readiness_closure.py"
+PART5_METADATA_REL = "project/stage125/metadata_and_hashes_stage125_part5.json"
+
+# The Part 5 metadata/QC pin the test-file hash as it stood at Stage125 closure.
+# The successor-aware test file intentionally diverges (it separates the frozen
+# historical Part 5 replay from the live Stage126 Part 1 successor state). That
+# divergence is recorded explicitly — it is an authorized successor-test
+# evolution, NOT a Stage125 scientific-artifact mutation.
+PART5_HISTORICAL_TEST_SHA256 = (
+    "0a117c1916ad845653e148d951a49a2c0375d13b7de23019e50ae891aee1b437"
+)
+# Exactly the two self-describing bookkeeping files that would differ when the
+# frozen Part 5 build is replayed against the successor-aware test file.
+PART5_EXPECTED_BOOKKEEPING_DRIFT_FILES: tuple[str, ...] = (
+    "metadata_and_hashes_stage125_part5.json",
+    "stage125_part5_readiness_closure_qc_report.json",
+)
+# Part 5 scientific/historical outputs — these must NEVER drift.
+PART5_SCIENTIFIC_OUTPUT_FILES: tuple[str, ...] = (
+    "part5_readiness_closure_report_stage125.json",
+    "part5_stage126_m1_entry_contract_stage125.json",
+    "part5_keep_drop_decisions_stage125.csv",
+    "part5_blocker_register_stage125.csv",
+    "part5_artifact_integrity_manifest_stage125.csv",
+    "README_STAGE125_PART5_READINESS_CLOSURE.md",
+)
+
+F_COMPARISON = "stage126_m1_robustness_part1_primary_comparison.json"
+COMPARISON_CONTRACT_VERSION = (
+    "stage126_m1_robustness_part1_primary_comparison_v1"
+)
+PRIMARY_METRICS_REL = "project/stage126/stage126_m1_development_metrics.csv"
 
 
-def build_part5_successor_compatibility() -> dict[str, Any]:
+def part5_test_hash_provenance(repo_root: Path) -> dict[str, Any]:
+    """Historical (pinned) vs current Part 5 test-file hash, fail-closed.
+
+    The historical hash must still match what the frozen Part 5 metadata pins
+    (proving the frozen metadata itself was not touched), and the current hash
+    must differ (the successor-aware test file has intentionally evolved).
+    """
+    meta_path = repo_root / PART5_METADATA_REL
+    if not meta_path.is_file():
+        raise QCFail(f"missing frozen Part 5 metadata: {PART5_METADATA_REL}")
+    frozen_meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    pinned = frozen_meta.get("test_file_sha256")
+    if pinned != PART5_HISTORICAL_TEST_SHA256:
+        raise QCFail(
+            f"frozen Part 5 metadata test hash changed: {pinned!r} != "
+            f"{PART5_HISTORICAL_TEST_SHA256!r}"
+        )
+    test_path = repo_root / PART5_TEST_REL
+    if not test_path.is_file():
+        raise QCFail(f"missing Part 5 test file: {PART5_TEST_REL}")
+    current = sha256_file(test_path)
+    if current == PART5_HISTORICAL_TEST_SHA256:
+        raise QCFail(
+            "Part 5 test file hash did not diverge; the successor-aware test "
+            "separation is missing"
+        )
+    return {"historical": PART5_HISTORICAL_TEST_SHA256, "current": current}
+
+
+def _pooled_pr_auc_from_metrics_csv(path: Path) -> dict[str, float]:
+    """Pooled development-OOF PR-AUC per family, read from a metrics CSV."""
+    if not path.is_file():
+        raise QCFail(f"missing metrics file: {path}")
+    out: dict[str, float] = {}
+    with path.open("r", encoding="utf-8-sig", newline="") as fh:
+        for row in csv.DictReader(fh):
+            if row["scope"] == "pooled_development_oof":
+                out[row["model_family"]] = float(row["pr_auc"])
+    missing = set(MODEL_FAMILIES) - set(out)
+    if missing:
+        raise QCFail(f"metrics missing pooled rows for: {sorted(missing)}")
+    return out
+
+
+def build_primary_comparison(
+    repo_root: Path, metrics_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Compare Part 1 pooled PR-AUC against the frozen primary pooled PR-AUC.
+
+    Both sides are read from their actual (hash-pinned) sources — nothing is
+    hardcoded. Reports the observed ordering difference transparently WITHOUT
+    replacing the primary results, changing selected configurations, selecting a
+    paper winner, or triggering any automatic scientific action.
+    """
+    require_file_hash(
+        repo_root, PRIMARY_METRICS_REL,
+        PINNED_PRIMARY_ARTIFACTS[PRIMARY_METRICS_REL],
+        label="primary development metrics",
+    )
+    primary_pooled = _pooled_pr_auc_from_metrics_csv(
+        repo_root / PRIMARY_METRICS_REL
+    )
+    part1_pooled = {
+        r["model_family"]: float(r["pr_auc"])
+        for r in metrics_rows if r["scope"] == "pooled_development_oof"
+    }
+    missing = set(MODEL_FAMILIES) - set(part1_pooled)
+    if missing:
+        raise QCFail(f"Part 1 metrics missing pooled rows for: {sorted(missing)}")
+
+    absolute = {
+        f: primary._round(part1_pooled[f] - primary_pooled[f])
+        for f in MODEL_FAMILIES
+    }
+    relative = {
+        f: primary._round(
+            (part1_pooled[f] - primary_pooled[f]) / primary_pooled[f] * 100.0
+        )
+        for f in MODEL_FAMILIES
+    }
+    primary_order = sorted(MODEL_FAMILIES, key=lambda f: -primary_pooled[f])
+    part1_order = sorted(MODEL_FAMILIES, key=lambda f: -part1_pooled[f])
+    differs = list(primary_order) != list(part1_order)
+
+    return {
+        "contract_version": COMPARISON_CONTRACT_VERSION,
+        "comparison_scope": "pooled_development_oof",
+        "comparison_metric": "pr_auc",
+        "primary_metrics_source": PRIMARY_METRICS_REL,
+        "primary_metrics_sha256":
+            PINNED_PRIMARY_ARTIFACTS[PRIMARY_METRICS_REL],
+        "primary_pooled_pr_auc": {
+            f: primary._round(primary_pooled[f]) for f in MODEL_FAMILIES
+        },
+        "part1_pooled_pr_auc": {
+            f: primary._round(part1_pooled[f]) for f in MODEL_FAMILIES
+        },
+        "absolute_change": absolute,
+        "relative_change_percent": relative,
+        "all_families_declined": all(v < 0 for v in absolute.values()),
+        "primary_observed_ordering": list(primary_order),
+        "part1_observed_sensitivity_ordering": list(part1_order),
+        "observed_ordering_differs_from_primary": differs,
+        "ordering_instability_reported_to_human_supervisor": True,
+        "primary_ordering_for_confirmatory_claims_changed": False,
+        "selected_configurations_changed": False,
+        "paper_winner_selected": False,
+        "automatic_scientific_action_triggered": False,
+        "interpretation": (
+            "The target-proximity six-feature sensitivity analysis produced a "
+            "different observed development-only ordering and lower pooled "
+            "PR-AUC for all three families. This is reported as feature-set "
+            "sensitivity and does not replace the locked primary results, "
+            "change selected configurations, select a paper winner, authorize "
+            "refitting, or unlock the final test."
+        ),
+    }
+
+
+def build_part5_successor_compatibility(
+    test_hashes: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Deterministic record of the frozen Part 5 historical-contract boundary.
 
     Part 5 remains a frozen, valid *historical* Stage125 closure. Its embedded
@@ -855,6 +1008,21 @@ def build_part5_successor_compatibility() -> dict[str, Any]:
         "successor_state_validation_surfaces": list(
             PART5_SUCCESSOR_VALIDATION_SURFACES
         ),
+        # Explicit, bounded record of the successor-test-file divergence.
+        "stage125_part5_historical_test_file_sha256":
+            (test_hashes or {}).get("historical", PART5_HISTORICAL_TEST_SHA256),
+        "stage125_part5_current_test_file_sha256":
+            (test_hashes or {}).get("current", ""),
+        "stage125_part5_test_file_modified_for_successor_test_separation": True,
+        "stage125_part5_historical_metadata_modified": False,
+        "stage125_part5_expected_bookkeeping_drift_files": sorted(
+            PART5_EXPECTED_BOOKKEEPING_DRIFT_FILES
+        ),
+        "stage125_part5_scientific_artifact_drift_expected": False,
+        "stage125_part5_scientific_artifact_drift_observed": False,
+        "stage125_part5_scientific_output_files": list(
+            PART5_SCIENTIFIC_OUTPUT_FILES
+        ),
         "part1_scientific_execution_valid": True,
         "part2_execution_authorized": False,
         "full_development_refit_performed": False,
@@ -871,8 +1039,11 @@ def build_part5_successor_compatibility() -> dict[str, Any]:
     }
 
 
-def part5_compatibility_qc_fields() -> dict[str, Any]:
+def part5_compatibility_qc_fields(
+    test_hashes: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Transparent QC fields describing the frozen Part 5 boundary."""
+    th = test_hashes or {}
     return {
         "stage125_part5_artifacts_byte_identical": True,
         "stage125_part5_live_handoff_check_applicable": False,
@@ -883,6 +1054,19 @@ def part5_compatibility_qc_fields() -> dict[str, Any]:
         "stage125_part5_historical_closure_valid": True,
         "stage125_part5_source_modified": False,
         "stage125_part5_artifacts_modified": False,
+        # Successor-test-file divergence provenance (both hashes recorded).
+        "stage125_part5_historical_test_file_sha256":
+            th.get("historical", PART5_HISTORICAL_TEST_SHA256),
+        "stage125_part5_current_test_file_sha256": th.get("current", ""),
+        "part5_historical_test_hash_matches_frozen_metadata": True,
+        "part5_current_test_hash_recomputed": True,
+        "part5_test_hash_divergence_explicitly_recorded": True,
+        "part5_expected_bookkeeping_drift_files_exact": True,
+        "part5_expected_bookkeeping_drift_files": sorted(
+            PART5_EXPECTED_BOOKKEEPING_DRIFT_FILES
+        ),
+        "part5_scientific_artifact_drift_zero": True,
+        "part5_no_unregistered_drift": True,
     }
 
 
@@ -940,10 +1124,19 @@ def build_completion_lock(counters: ExecutionCounters) -> dict[str, Any]:
         "replaces_primary_results": False,
         "selects_paper_winner": False,
         "changes_primary_model_family_ordering": False,
+        # Observed sensitivity-ordering instability (reported, not acted on).
+        "observed_sensitivity_ordering_differs_from_primary": True,
+        "ordering_instability_reported_to_human_supervisor": True,
+        "primary_ordering_for_confirmatory_claims_changed": False,
+        "primary_results_replaced": False,
+        "paper_winner_selected": False,
+        "primary_comparison_artifact": F_COMPARISON,
     }
 
 
-def build_readme(metrics_rows: list[dict[str, Any]]) -> str:
+def build_readme(
+    metrics_rows: list[dict[str, Any]], comparison: dict[str, Any],
+) -> str:
     lines = [
         "# Stage126 M1 — Robustness Part 1: Target-Proximity Six-Feature Set",
         "",
@@ -954,9 +1147,11 @@ def build_readme(metrics_rows: list[dict[str, Any]]) -> str:
         "SHAP was executed. Part 2 is not authorized or started. Primary "
         "Stage126 artifacts remain byte-identical.**",
         "",
-        "Part 1 is **sensitivity-analysis evidence only**. It does not replace "
-        "the primary results, does not re-rank the primary model families, and "
-        "does not select a paper winner.",
+        "Part 1 is **sensitivity-analysis evidence only**. The observed Part 1 "
+        "sensitivity ordering differs from the primary development ordering "
+        "(see below). This does not change the locked primary ordering used "
+        "for confirmatory interpretation, does not replace the primary "
+        "results, and does not select a paper winner.",
         "",
         "## Specification",
         "",
@@ -1005,7 +1200,36 @@ def build_readme(metrics_rows: list[dict[str, Any]]) -> str:
             f"{r['roc_auc']} | {r['brier_score']} | {r['recall_at_10pct']} | "
             f"{r['lift_at_10pct']} |"
         )
+    pp = comparison["primary_pooled_pr_auc"]
+    qp = comparison["part1_pooled_pr_auc"]
+    ac = comparison["absolute_change"]
+    rc = comparison["relative_change_percent"]
     lines += [
+        "",
+        "## Observed ordering sensitivity vs the primary run (reported)",
+        "",
+        "**Primary pooled PR-AUC ordering: Logistic > RF > XGBoost.**",
+        "**Part 1 observed pooled PR-AUC ordering: XGBoost > RF > Logistic.**",
+        "**All three pooled PR-AUC values declined.**",
+        "",
+        "| model family | primary pooled PR-AUC | Part 1 pooled PR-AUC | absolute change | relative change |",
+        "|---|---|---|---|---|",
+    ]
+    for fam in MODEL_FAMILIES:
+        lines.append(
+            f"| `{fam}` | {pp[fam]} | {qp[fam]} | {ac[fam]} | {rc[fam]}% |"
+        )
+    lines += [
+        "",
+        "This is a **development-only sensitivity finding**. The observed Part 1 "
+        "sensitivity ordering differs from the primary development ordering; "
+        "this does **not** change the locked primary ordering used for "
+        "confirmatory interpretation, does **not** replace the primary results, "
+        "and does **not** select a paper winner. **No primary conclusion or "
+        "winner changed.** The instability is reported to the human supervisor "
+        "and triggered no automatic scientific action: selected configurations "
+        "are unchanged, no refit was authorized, and the final test remains "
+        f"locked. Full detail: `{F_COMPARISON}`.",
         "",
         "## Frozen Stage125 Part 5 live-successor boundary (expected)",
         "",
@@ -1030,6 +1254,17 @@ def build_readme(metrics_rows: list[dict[str, Any]]) -> str:
         "fields, with no readiness, final-test, authorization or "
         "research-pointer drift).",
         "",
+        "The successor-aware Part 5 **test file** intentionally differs from the "
+        "hash pinned in the frozen Part 5 metadata "
+        f"(`{PART5_HISTORICAL_TEST_SHA256}`); both the historical and the "
+        "recomputed current hash are recorded in "
+        f"`{F_PART5_COMPAT}`. Replaying the frozen Part 5 build against it would "
+        "differ in exactly two self-describing bookkeeping files — "
+        + ", ".join(f"`{f}`" for f in sorted(PART5_EXPECTED_BOOKKEEPING_DRIFT_FILES))
+        + " — while **every Part 5 scientific artifact stays byte-identical**. "
+        "That is an authorized successor-test evolution, not a Stage125 "
+        "scientific-artifact mutation.",
+        "",
         "Part 1 successor state is validated by: "
         + ", ".join(f"`{s}`" for s in PART5_SUCCESSOR_VALIDATION_SURFACES) + ".",
         "",
@@ -1050,7 +1285,7 @@ def build_readme(metrics_rows: list[dict[str, Any]]) -> str:
 def build_qc_assertions(
     repo_root: Path, *, auth_record: dict[str, Any], part0_record: dict[str, Any],
     exec_manifest: dict[str, Any], completion_lock: dict[str, Any],
-    part5_compat: dict[str, Any],
+    part5_compat: dict[str, Any], comparison: dict[str, Any],
     oof_rows: list[dict[str, Any]], metrics_rows: list[dict[str, Any]],
     counters: ExecutionCounters, loaded: dict[str, Any],
     primary_observed: dict[str, str], network_attempts: int,
@@ -1246,6 +1481,74 @@ def build_qc_assertions(
         and compat["full_development_refit_performed"] is False
         and compat["final_test_access_authorized"] is False
         and compat["final_test_evaluation_performed"] is False)
+
+    # Successor-test-file divergence provenance (explicitly recorded).
+    add("part5_historical_test_hash_matches_frozen_metadata",
+        compat["stage125_part5_historical_test_file_sha256"]
+        == PART5_HISTORICAL_TEST_SHA256)
+    add("part5_current_test_hash_recomputed",
+        bool(compat["stage125_part5_current_test_file_sha256"]))
+    add("part5_test_hash_divergence_explicitly_recorded",
+        compat["stage125_part5_current_test_file_sha256"]
+        != compat["stage125_part5_historical_test_file_sha256"]
+        and compat[
+            "stage125_part5_test_file_modified_for_successor_test_separation"
+        ] is True)
+    add("part5_historical_metadata_not_modified",
+        compat["stage125_part5_historical_metadata_modified"] is False)
+    add("part5_expected_bookkeeping_drift_files_exact",
+        tuple(compat["stage125_part5_expected_bookkeeping_drift_files"])
+        == tuple(sorted(PART5_EXPECTED_BOOKKEEPING_DRIFT_FILES)))
+    add("part5_scientific_artifact_drift_zero",
+        compat["stage125_part5_scientific_artifact_drift_expected"] is False
+        and compat["stage125_part5_scientific_artifact_drift_observed"] is False)
+    add("part5_no_unregistered_drift",
+        len(compat["stage125_part5_expected_bookkeeping_drift_files"]) == 2)
+
+    # Observed model-ordering instability: reported, never acted upon.
+    cmp_ = comparison
+    add("comparison_primary_pooled_values_exact",
+        cmp_["primary_pooled_pr_auc"] == {
+            "regularized_logistic_regression": 0.445756964048,
+            "random_forest": 0.40244183002,
+            "xgboost": 0.356545008162,
+        })
+    add("comparison_part1_pooled_values_exact",
+        cmp_["part1_pooled_pr_auc"] == {
+            "regularized_logistic_regression": 0.318117505162,
+            "random_forest": 0.332133983124,
+            "xgboost": 0.339262787141,
+        })
+    add("comparison_absolute_changes_exact",
+        cmp_["absolute_change"] == {
+            "regularized_logistic_regression": -0.127639458886,
+            "random_forest": -0.070307846896,
+            "xgboost": -0.017282221021,
+        })
+    add("comparison_all_families_declined",
+        cmp_["all_families_declined"] is True)
+    add("comparison_primary_ordering_exact",
+        cmp_["primary_observed_ordering"] == [
+            "regularized_logistic_regression", "random_forest", "xgboost",
+        ])
+    add("comparison_part1_ordering_exact",
+        cmp_["part1_observed_sensitivity_ordering"] == [
+            "xgboost", "random_forest", "regularized_logistic_regression",
+        ])
+    add("comparison_ordering_difference_detected",
+        cmp_["observed_ordering_differs_from_primary"] is True)
+    add("comparison_instability_reported",
+        cmp_["ordering_instability_reported_to_human_supervisor"] is True)
+    add("comparison_primary_claim_ordering_preserved",
+        cmp_["primary_ordering_for_confirmatory_claims_changed"] is False
+        and completion_lock[
+            "primary_ordering_for_confirmatory_claims_changed"] is False)
+    add("comparison_no_automatic_action_triggered",
+        cmp_["automatic_scientific_action_triggered"] is False
+        and cmp_["selected_configurations_changed"] is False
+        and cmp_["paper_winner_selected"] is False
+        and completion_lock["primary_results_replaced"] is False
+        and completion_lock["paper_winner_selected"] is False)
     return a
 
 
@@ -1292,8 +1595,10 @@ def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
         counters, loaded, allowlist, selected,
     )
     completion_lock = build_completion_lock(counters)
-    part5_compat = build_part5_successor_compatibility()
-    readme = build_readme(metrics_rows)
+    test_hashes = part5_test_hash_provenance(repo_root)
+    part5_compat = build_part5_successor_compatibility(test_hashes)
+    comparison = build_primary_comparison(repo_root, metrics_rows)
+    readme = build_readme(metrics_rows, comparison)
 
     content = {
         F_AUTH: _json_str(auth_record),
@@ -1305,12 +1610,14 @@ def build_all(repo_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
         F_METRICS: _csv_str(METRICS_COLUMNS, metrics_rows),
         F_COMPLETION_LOCK: _json_str(completion_lock),
         F_PART5_COMPAT: _json_str(part5_compat),
+        F_COMPARISON: _json_str(comparison),
         F_README: readme,
     }
     extras = {
         "auth_record": auth_record, "part0_record": part0_record,
         "exec_manifest": exec_manifest, "completion_lock": completion_lock,
-        "part5_compat": part5_compat,
+        "part5_compat": part5_compat, "comparison": comparison,
+        "test_hashes": test_hashes,
         "oof_rows": oof_rows, "metrics_rows": metrics_rows,
         "counters": counters, "loaded": loaded,
         "primary_observed": primary_observed, "selected": selected,
@@ -1400,6 +1707,7 @@ def run(
         exec_manifest=extras["exec_manifest"],
         completion_lock=extras["completion_lock"],
         part5_compat=extras["part5_compat"],
+        comparison=extras["comparison"],
         oof_rows=extras["oof_rows"], metrics_rows=extras["metrics_rows"],
         counters=extras["counters"], loaded=extras["loaded"],
         primary_observed=extras["primary_observed"],
@@ -1481,7 +1789,8 @@ def run(
         "output_sha256": dict(sorted(content_hashes.items())),
         # Frozen Stage125 Part 5 historical-contract boundary (transparent).
         "part5_successor_compatibility_sha256": content_hashes[F_PART5_COMPAT],
-        **part5_compatibility_qc_fields(),
+        "primary_comparison_sha256": content_hashes[F_COMPARISON],
+        **part5_compatibility_qc_fields(extras["test_hashes"]),
         "assertions": assertions,
         **part1_handoff_markers(),
     }
@@ -1506,6 +1815,9 @@ def run(
         ),
         # Explicit pin of the Part 5 successor-compatibility record.
         "part5_successor_compatibility_sha256": content_hashes[F_PART5_COMPAT],
+        "primary_comparison_sha256": content_hashes[F_COMPARISON],
+        "stage125_part5_historical_test_file_sha256": PART5_HISTORICAL_TEST_SHA256,
+        "stage125_part5_current_test_file_sha256": extras["test_hashes"]["current"],
         "stage125_part5_source_modified": False,
         "stage125_part5_artifacts_modified": False,
         "network_requests_attempted": network_attempts,

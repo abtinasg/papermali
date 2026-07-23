@@ -2500,6 +2500,77 @@ def test_part5_compatibility_fail_closed(tmp_path, mutate):
         gen.derive_part5_successor_compatibility_markers(str(tmp_path))
 
 
+def test_current_state_labels_micro_part_not_research_action():
+    """CURRENT_STATE must not label a micro-part as a completed research action."""
+    text = _read_doc("project", "docs", "ai", "CURRENT_STATE.md")
+    assert "- **Last completed micro-part:** " \
+        "`stage126-m1-robustness-part1-target-proximity`" in text
+    assert "Last completed research action" not in text, (
+        "a robustness micro-part must never be labelled a research action"
+    )
+    assert "- **Next research action:** `stage126-m1-financial-baseline`" in text
+
+
+# --------------------------------------------------------------------------- #
+# Part 1 observed-ordering instability markers
+# --------------------------------------------------------------------------- #
+
+_COMPARISON_REL = (
+    "project/stage126/stage126_m1_robustness_part1_primary_comparison.json"
+)
+
+
+def _valid_comparison() -> dict:
+    with open(os.path.join(REAL_ROOT, _COMPARISON_REL), encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _write_comparison(tmp, cmp_) -> str:
+    d = os.path.join(tmp, "project", "stage126")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, os.path.basename(_COMPARISON_REL)),
+              "w", encoding="utf-8") as f:
+        json.dump(cmp_, f, ensure_ascii=False)
+    return tmp
+
+
+def test_handoff_state_carries_ordering_instability_markers():
+    state = _state(REAL_ROOT)
+    assert state["m1_robustness_part1_ordering_instability_reported"] is True
+    assert state["m1_robustness_part1_observed_ordering"] == [
+        "xgboost", "random_forest", "regularized_logistic_regression",
+    ]
+    assert state["m1_primary_claim_ordering_preserved"] is True
+
+
+def test_ordering_markers_absent_without_comparison(tmp_path):
+    assert gen.derive_part1_ordering_instability_markers(str(tmp_path)) == {}
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda c: c.update(contract_version="WRONG"),
+    lambda c: c.update(comparison_scope="WRONG"),
+    lambda c: c.update(comparison_metric="WRONG"),
+    lambda c: c.update(observed_ordering_differs_from_primary=False),
+    lambda c: c.update(ordering_instability_reported_to_human_supervisor=False),
+    lambda c: c.update(primary_ordering_for_confirmatory_claims_changed=True),
+    lambda c: c.update(selected_configurations_changed=True),
+    lambda c: c.update(paper_winner_selected=True),
+    lambda c: c.update(automatic_scientific_action_triggered=True),
+    lambda c: c.update(part1_observed_sensitivity_ordering=["random_forest"]),
+], ids=[
+    "wrong_version", "wrong_scope", "wrong_metric", "no_difference",
+    "not_reported", "primary_ordering_changed", "configs_changed",
+    "winner_selected", "auto_action", "wrong_observed_ordering",
+])
+def test_ordering_markers_fail_closed(tmp_path, mutate):
+    cmp_ = _valid_comparison()
+    mutate(cmp_)
+    root = _write_comparison(str(tmp_path), cmp_)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_part1_ordering_instability_markers(root)
+
+
 def test_part5_compatibility_requires_part1_qc_all_pass(tmp_path):
     qc = _valid_part1_qc()
     qc["all_pass"] = False
