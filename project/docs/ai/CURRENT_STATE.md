@@ -9,18 +9,18 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 - **Stage / Batch:** Stage126 / None
 - **Active workstream:** `stage126_m1_financial_baseline`
-- **Last completed micro-part:** `stage126-m1-robustness-part1-target-proximity`
+- **Last completed micro-part:** `stage126-m1-robustness-part2-listing-rule-b`
 - **Next research action:** `stage126-m1-financial-baseline`
-- **Last stage commit:** `e3a70521366c65a77016a336b3422fb9efc1fc6c`
-- **Generated from commit:** `e3a70521366c65a77016a336b3422fb9efc1fc6c` (branch `stage126-m1-robustness-part1-target-proximity`, informational)
-- **Baseline:** `origin/main` @ `8e928704b77387e46321ec2b87b05d3e7ffde4a8`
+- **Last stage commit:** `786dec123d81a5cb06ea39f0f8b0b9cc41397a62`
+- **Generated from commit:** `786dec123d81a5cb06ea39f0f8b0b9cc41397a62` (branch `stage126-m1-robustness-part2-listing-rule-b`, informational)
+- **Baseline:** `origin/main` @ `f7f7c9ed1f6c9e52542c9f242e090d3ad24792c4`
 
 ## QC
 
-- ✅ **89 assertions, 0 failed**, all_pass=True
-- Scope: `stage126_m1_robustness_part1_target_proximity`
-- Report: `project/stage126/stage126_m1_robustness_part1_qc_report.json`
-- QC source commit (code): `5c7b6eff2572d1535031e5fad3f7acc7ee499b4e`
+- ✅ **119 assertions, 0 failed**, all_pass=True
+- Scope: `stage126_m1_robustness_part2_listing_rule_b`
+- Report: `project/stage126/stage126_m1_robustness_part2_qc_report.json`
+- QC source commit (code): `be116ec50a5304b9f342f771b6e6e32e7de3e14c`
 
 ## Workflow markers
 
@@ -57,5 +57,5 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `c621af6297d8d5ff33c6f38647fa23eb254faa992439199c8b906e048750b2f6`_
-_generated_at_utc: 2026-07-23T06:05:06Z (informational)_
+_state_fingerprint: `93f8e91e1513520438e0368c39dfe53dc855f80e7b385fbbe8feb57ce05e4cfe`_
+_generated_at_utc: 2026-07-23T08:36:25Z (informational)_
