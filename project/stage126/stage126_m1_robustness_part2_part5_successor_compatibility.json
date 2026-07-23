@@ -28,10 +28,29 @@
   "rationale": "run_stage125_part5.py --check is a historical successor-state validator whose live-Handoff assumptions end at the primary development state. The five-field mismatch after Part 2 is expected and explicitly tested; it does not invalidate Stage125 closure, does not indicate Stage125 artifact drift, and is not a scientific failure.",
   "stage125_part5_artifacts_frozen": true,
   "stage125_part5_artifacts_modified": false,
+  "stage125_part5_committed_closure_all_gate_pass": true,
+  "stage125_part5_committed_closure_stage125_completed": true,
+  "stage125_part5_committed_closure_stage125_gate_125_0": "PASS",
+  "stage125_part5_committed_closure_stage126_m1_entry_ready": true,
+  "stage125_part5_direct_handoff_validation_detail": "handoff_mismatch:m1_robustness_started,selected_qc_scope,selected_qc_path,contract_version,last_completed_micro_part",
+  "stage125_part5_direct_handoff_validation_forbidden_fields_present": [],
+  "stage125_part5_direct_handoff_validation_mismatch_fields": [
+    "m1_robustness_started",
+    "selected_qc_scope",
+    "selected_qc_path",
+    "contract_version",
+    "last_completed_micro_part"
+  ],
   "stage125_part5_expected_bookkeeping_drift_files": [
     "metadata_and_hashes_stage125_part5.json",
     "stage125_part5_readiness_closure_qc_report.json"
   ],
+  "stage125_part5_full_runner_base_main_commit": "f7f7c9ed1f6c9e52542c9f242e090d3ad24792c4",
+  "stage125_part5_full_runner_behavior_changed_by_part2": false,
+  "stage125_part5_full_runner_exit_code": 1,
+  "stage125_part5_full_runner_first_failure_code": "readiness_surface_disagreement",
+  "stage125_part5_full_runner_first_failure_mechanism": "The --check path rebuilds the closure report live. Inside that transient rebuild the valid_handoff gate fails on the documented five-field successor mismatch, so the rebuilt all_gate_pass becomes false and the rebuilt readiness flags become not-ready, while the truthful live Handoff still reports Stage126 entry readiness. The cross-artifact readiness check reports that disagreement first. The COMMITTED closure report is unaffected.",
+  "stage125_part5_full_runner_first_failure_preexisting_on_base_main": true,
   "stage125_part5_historical_closure_remains_valid": true,
   "stage125_part5_historical_metadata_modified": false,
   "stage125_part5_historical_test_file_sha256": "0a117c1916ad845653e148d951a49a2c0375d13b7de23019e50ae891aee1b437",
@@ -50,7 +69,7 @@
   "stage125_part5_source_modified": false,
   "stage125_part5_test_file_modified_for_successor_test_separation": true,
   "stage126_part1_completion_test_file_sha256": "62cd1593e7bfafdeb1aa1c728f3fb9c22aadf50d3031e2cec964d267e752b189",
-  "stage126_part2_current_test_file_sha256": "965ed49d7858e8d537fd59a1e7a9149ac58ceaeabd57a03c69e51dea7eeb3f52",
+  "stage126_part2_current_test_file_sha256": "0b9413b2adbf9c44b0fb12b4f7ef2dad60be5cd4c401ccefac30d19f0905af71",
   "successor_state_validation_surfaces": [
     "stage126_m1_robustness_part0_decision_lock",
     "stage126_m1_robustness_part1_qc",

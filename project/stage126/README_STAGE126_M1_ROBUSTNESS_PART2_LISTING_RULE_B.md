@@ -85,15 +85,22 @@ This is a **development-only sensitivity finding** produced by changing the samp
 
 ## Frozen Stage125 Part 5 live-successor boundary (expected)
 
-**Stage125 Part 5 remains a frozen, valid historical closure** — its source, its runner and every `project/stage125/` artifact are byte-identical. Part 5's *embedded live-Handoff successor check* terminates at the earlier Stage126 primary-development state and predates robustness execution. After a truthful Part 2 completion it reports exactly these five mismatching fields:
+**Stage125 Part 5 remains a frozen, valid historical closure** — its source, its runner and every `project/stage125/` artifact are byte-identical, and the **committed** closure report still records `all_gate_pass=true`, `stage125_gate_125_0=PASS`, `stage125_completed=true` and `stage126_m1_entry_ready=true`.
 
-- `m1_robustness_started`
-- `selected_qc_scope`
-- `selected_qc_path`
-- `contract_version`
-- `last_completed_micro_part`
+Two **distinct** behaviours must not be conflated:
 
-`run_stage125_part5.py --check` consequently exits 1 **by design**. This is an **expected historical-contract boundary**, not a scientific failure and not Stage125 drift. It is recorded in `stage126_m1_robustness_part2_part5_successor_compatibility.json`, asserted in the Part 2 QC, and explicitly tested.
+1. **Full runner.** `run_stage125_part5.py --check` exits **1** and its **first** failure is the inherited `readiness_surface_disagreement`. Its `--check` path rebuilds the closure report live; inside that transient rebuild the `valid_handoff` gate fails, so the rebuilt `all_gate_pass` becomes false and the rebuilt readiness flags become not-ready — while the truthful live Handoff still reports Stage126 entry readiness. The cross-artifact readiness check reports that disagreement first. The **committed** closure artifact is unaffected.
+2. **Direct validation.** `validate_actual_handoff(...)` separately returns exactly these five documented mismatching fields:
+
+   - `m1_robustness_started`
+   - `selected_qc_scope`
+   - `selected_qc_path`
+   - `contract_version`
+   - `last_completed_micro_part`
+
+with **none** of the forbidden fields present.
+
+**Neither behaviour was introduced by Part 2** — both were reproduced identically at base main `f7f7c9ed1f6c9e52542c9f242e090d3ad24792c4`, and no Stage125 scientific artifact changed. This is an **expected inherited historical-validator boundary**, not a scientific failure and not Stage125 drift. It is recorded in `stage126_m1_robustness_part2_part5_successor_compatibility.json`, asserted in the Part 2 QC, and covered by dedicated fail-closed tests that run the real runner (no stub) and fail if a different failure mode appears.
 
 The successor-aware Part 5 **test file** has three recorded generations: the Stage125 historical hash pinned by the frozen Part 5 metadata (`0a117c1916ad845653e148d951a49a2c0375d13b7de23019e50ae891aee1b437`), the Part 1 completion-time hash (`62cd1593e7bfafdeb1aa1c728f3fb9c22aadf50d3031e2cec964d267e752b189`), and the recomputed Part 2 current hash. All three are recorded separately in `stage126_m1_robustness_part2_part5_successor_compatibility.json`; the Part 1 hash is history, never the current hash. Replaying the frozen Part 5 build would differ in exactly two self-describing bookkeeping files — `metadata_and_hashes_stage125_part5.json`, `stage125_part5_readiness_closure_qc_report.json` — while **every Part 5 scientific artifact stays byte-identical**.
 

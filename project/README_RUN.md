@@ -53,12 +53,18 @@ python run_stage126_m1_robustness_part1_target_proximity.py --check
 # 8) Stage126 M1 robustness Part 2 listing Rule B sample (development-only; --check)
 python run_stage126_m1_robustness_part2_listing_rule_b.py --check
 
-# NOTE: after Part 1 (and unchanged after Part 2), `run_stage125_part5.py --check`
-# exits 1 BY DESIGN on exactly the same five documented fields. Part 5
-# is a frozen historical Stage125 closure whose embedded live-Handoff successor
-# check ends at the earlier primary-development state; it reports exactly five
-# expected mismatching fields. See
-# stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json.
+# NOTE: `run_stage125_part5.py --check` exits 1 BY DESIGN. Two DISTINCT facts:
+#   (1) The FULL runner exits 1 and its FIRST failure is the inherited
+#       readiness_surface_disagreement. Its --check path rebuilds the closure
+#       report live; the valid_handoff gate fails inside that transient rebuild,
+#       so the rebuilt flags become not-ready and disagree with the truthful
+#       live Handoff. The COMMITTED closure report still records
+#       all_gate_pass=true / Gate 125.0 PASS / entry-ready=true.
+#   (2) SEPARATELY, direct validate_actual_handoff returns exactly the five
+#       documented mismatching fields, with no forbidden field.
+# Neither behaviour was introduced by Part 2 (both reproduced at base main
+# f7f7c9ed) and no Stage125 scientific artifact changed. See
+# stage126/stage126_m1_robustness_part2_part5_successor_compatibility.json.
 # This is not a scientific failure and not Stage125 drift.
 
 # 8) AI Handoff validation

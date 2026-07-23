@@ -508,7 +508,7 @@
     "stage126_m1_robustness_part1_human_authorization_record.json": "87a4f55baeb1081eaf936e49c5e8923f67df54ec444f0abc33ec835c0c7e06f4",
     "stage126_m1_robustness_part1_metrics.csv": "c60f4b15aa40273472be98c867c73795d254f32c2a0e29b76641b1c5d5c18e98",
     "stage126_m1_robustness_part1_oof_predictions.csv": "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31",
-    "stage126_m1_robustness_part1_part5_successor_compatibility.json": "14ad4a430d81cec38bb85a7e9c55860bbee331034ff502246d40cc293ce15389",
+    "stage126_m1_robustness_part1_part5_successor_compatibility.json": "ac2cca1c4ff8a1df74b385f626ea942e6d451a40c1e96fe0f3745d5dcb304987",
     "stage126_m1_robustness_part1_primary_comparison.json": "2b58a85250420a8a18b0ff37cecdf3f2e31160c37e0cb48d027324c87a25c46a"
   },
   "part0_contract_hash_valid": true,
@@ -521,7 +521,7 @@
   "part5_historical_test_hash_matches_frozen_metadata": true,
   "part5_no_unregistered_drift": true,
   "part5_scientific_artifact_drift_zero": true,
-  "part5_successor_compatibility_sha256": "14ad4a430d81cec38bb85a7e9c55860bbee331034ff502246d40cc293ce15389",
+  "part5_successor_compatibility_sha256": "ac2cca1c4ff8a1df74b385f626ea942e6d451a40c1e96fe0f3745d5dcb304987",
   "part5_test_hash_divergence_explicitly_recorded": true,
   "prediction_calls": 22,
   "primary_artifact_sha256": {
@@ -550,7 +550,7 @@
   "stage125_completed": true,
   "stage125_part5_artifacts_byte_identical": true,
   "stage125_part5_artifacts_modified": false,
-  "stage125_part5_current_test_file_sha256": "965ed49d7858e8d537fd59a1e7a9149ac58ceaeabd57a03c69e51dea7eeb3f52",
+  "stage125_part5_current_test_file_sha256": "0b9413b2adbf9c44b0fb12b4f7ef2dad60be5cd4c401ccefac30d19f0905af71",
   "stage125_part5_historical_closure_valid": true,
   "stage125_part5_historical_test_file_sha256": "0a117c1916ad845653e148d951a49a2c0375d13b7de23019e50ae891aee1b437",
   "stage125_part5_live_handoff_check_applicable": false,

@@ -1,11 +1,11 @@
 {
-  "code_commit": "be116ec50a5304b9f342f771b6e6e32e7de3e14c",
+  "code_commit": "0663af0503f2c94a78ecf251e2e8587f7052f86f",
   "current_stage": "Stage126",
   "description": "Stage126 M1 robustness Part 2 listing Rule B sample (human-authorized; development folds only; only the sample changed; no retuning; no full-development refit; final test locked; no SMOTE/SMOTENC/SHAP; sensitivity analysis only).",
   "final_test_evaluations": 0,
   "final_test_predictor_rows_loaded": 0,
   "final_test_target_rows_loaded": 0,
-  "generated_at": "be116ec50a5304b9f342f771b6e6e32e7de3e14c",
+  "generated_at": "0663af0503f2c94a78ecf251e2e8587f7052f86f",
   "input_files_sha256": {
     "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
     "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv": "5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480",
@@ -17,16 +17,16 @@
   "model_fit_calls": 22,
   "network_requests_attempted": 0,
   "output_files_sha256": {
-    "README_STAGE126_M1_ROBUSTNESS_PART2_LISTING_RULE_B.md": "82a017b7763dd3b6e20e34be72cdba75173baffa4ad4e94c28cfa982414aa548",
+    "README_STAGE126_M1_ROBUSTNESS_PART2_LISTING_RULE_B.md": "0360efa0ac21a64fcb69befd19c70480fb93b6bb2a4bcce65086b27c603ce9b8",
     "stage126_m1_robustness_part2_completion_lock.json": "23d1920c4fb0a351456fe54b60616446381bbd550fb18e0bba5dab091486fec6",
     "stage126_m1_robustness_part2_execution_manifest.json": "9fc153b65a77c906339f51d7c0ad576d23eb06c5895eacb1a0ee92578b321ce8",
     "stage126_m1_robustness_part2_feature_manifest.csv": "58c52c17337286237779153d59f85f74c76f84d0c0415b8efadd618aa524b78f",
     "stage126_m1_robustness_part2_human_authorization_record.json": "0a7bba7489f62f59d3e0f07946b82d8ce4be1a49c4d098f47ca308de9466959e",
     "stage126_m1_robustness_part2_metrics.csv": "073b8657c0ba2c40f52e05d766a102e2b5d20845821c4eb1cef1b6e53459228c",
     "stage126_m1_robustness_part2_oof_predictions.csv": "3af630141a905370849875926fa84052cf10322cc34e18258a25d28106d47dd6",
-    "stage126_m1_robustness_part2_part5_successor_compatibility.json": "829e88fffa6619fe413af594859e9bf421a3218bdcba458d8b7be35b563c6461",
+    "stage126_m1_robustness_part2_part5_successor_compatibility.json": "4ed3025839f14796f33f2f1ee3468e3be94d7f14c6e07c7e78ae3cf9ed49ba9e",
     "stage126_m1_robustness_part2_primary_comparison.json": "9fc3b4eaf0a27fc66cd22444d92363747157743e822d3be877ecca7f153763bf",
-    "stage126_m1_robustness_part2_qc_report.json": "c3da320fa9c3d8adeacc1c90c80cd0d66053b7b6e757afbf5ec3b58bd5d7a056",
+    "stage126_m1_robustness_part2_qc_report.json": "de326261e92676847c98d32fd0cde706491725d886d7cad86ad99e0e1292e8ad",
     "stage126_m1_robustness_part2_sample_delta.csv": "baafe97323e45f0a88b07aaf1ea97c50c4b213e43724ddb2b97f3f55144fc7d3"
   },
   "part1_scientific_artifact_sha256": {
@@ -38,7 +38,7 @@
     "project/stage126/stage126_m1_robustness_part1_oof_predictions.csv": "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31",
     "project/stage126/stage126_m1_robustness_part1_primary_comparison.json": "2b58a85250420a8a18b0ff37cecdf3f2e31160c37e0cb48d027324c87a25c46a"
   },
-  "part5_successor_compatibility_sha256": "829e88fffa6619fe413af594859e9bf421a3218bdcba458d8b7be35b563c6461",
+  "part5_successor_compatibility_sha256": "4ed3025839f14796f33f2f1ee3468e3be94d7f14c6e07c7e78ae3cf9ed49ba9e",
   "prediction_calls": 22,
   "primary_comparison_sha256": "9fc3b4eaf0a27fc66cd22444d92363747157743e822d3be877ecca7f153763bf",
   "runtime_versions": {
@@ -53,13 +53,13 @@
   "shap_calls": 0,
   "smote_calls": 0,
   "smotenc_calls": 0,
-  "source_file_sha256": "a0f9965f5ea8e26315c62542edec0524cb7703a436852e1abed2eea19608dff4",
+  "source_file_sha256": "405e67d027c6bd461ef3708fa0c5bd42b0e68db25feb75169d745f1e22c8dd7a",
   "stage": "stage126_m1_robustness_part2_listing_rule_b",
   "stage125_part5_artifacts_modified": false,
   "stage125_part5_historical_test_file_sha256": "0a117c1916ad845653e148d951a49a2c0375d13b7de23019e50ae891aee1b437",
   "stage125_part5_source_modified": false,
   "stage126_part1_completion_test_file_sha256": "62cd1593e7bfafdeb1aa1c728f3fb9c22aadf50d3031e2cec964d267e752b189",
-  "stage126_part2_current_test_file_sha256": "965ed49d7858e8d537fd59a1e7a9149ac58ceaeabd57a03c69e51dea7eeb3f52",
-  "test_file_sha256": "dfda8e6b3f2c6a6393e5f6c3f5190c114583c605d2656603b57b66a5f5b473f6",
+  "stage126_part2_current_test_file_sha256": "0b9413b2adbf9c44b0fb12b4f7ef2dad60be5cd4c401ccefac30d19f0905af71",
+  "test_file_sha256": "5cf94af1f5aa134b6e9b72508f00fdf861264a602b83c47f9b4e1c20c2e9eb40",
   "tuning_search_calls": 0
 }

@@ -59,11 +59,12 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
   current hash, those three **verification-only** Part 1 files were regenerated;
   every Part 1 scientific artifact stayed byte-identical, no Part 1 model was
   retuned and no Part 1 probability or metric changed.
-- **Frozen Part 5 boundary unchanged.** `run_stage125_part5.py --check` still
-  exits 1 by design on exactly the same five documented fields
-  (`m1_robustness_started`, `selected_qc_scope`, `selected_qc_path`,
-  `contract_version`, `last_completed_micro_part`); no forbidden field appears.
-  Part 5's source, runner and every `project/stage125/` artifact are
+- **Frozen Part 5 boundary unchanged (corrected wording).** The full frozen Part 5 runner exits 1 first with the inherited `readiness_surface_disagreement` during a live-successor rebuild. Separately, direct `validate_actual_handoff` returns exactly the documented five-field historical successor mismatch (`m1_robustness_started`, `selected_qc_scope`, `selected_qc_path`, `contract_version`, `last_completed_micro_part`) with no forbidden fields. Neither behaviour was introduced by Part 2, and no Stage125 scientific artifact changed.
+  The **committed** frozen closure report still records `all_gate_pass=true`,
+  `stage125_gate_125_0=PASS`, `stage125_completed=true` and
+  `stage126_m1_entry_ready=true` — the failed gate exists only inside the
+  runner's transient live rebuild and must not be attributed to the committed
+  artifact. Part 5's source, runner and every `project/stage125/` artifact are
   byte-identical.
 - **Part 3 (`expanded_rule_a_company_scope_robustness`) is not authorized and
   not started**; it requires its own separate explicit human authorization.

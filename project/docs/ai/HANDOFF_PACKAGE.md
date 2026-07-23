@@ -259,12 +259,12 @@ ordering-instability markers are retained unchanged.
 **Frozen Part 5 live-successor boundary.** Stage125 Part 5 remains a frozen,
 valid historical closure (source, runner and all `project/stage125/` artifacts
 byte-identical). Its embedded live-Handoff successor check ends at the earlier
-primary-development state, so after Part 1 — and unchanged after Part 2 —
-`run_stage125_part5.py --check` exits 1 with exactly five expected mismatching
-fields (`m1_robustness_started`,
-`selected_qc_scope`, `selected_qc_path`, `contract_version`,
-`last_completed_micro_part`). This is an **expected historical-contract
-boundary**, recorded in
+primary-development state. The full frozen Part 5 runner exits 1 first with the inherited `readiness_surface_disagreement` during a live-successor rebuild. Separately, direct `validate_actual_handoff` returns exactly the documented five-field historical successor mismatch (`m1_robustness_started`, `selected_qc_scope`, `selected_qc_path`, `contract_version`, `last_completed_micro_part`) with no forbidden fields. Neither behaviour was introduced by Part 2, and no Stage125 scientific artifact changed.
+
+The **committed** frozen closure report still records `all_gate_pass=true`,
+`stage125_gate_125_0=PASS` and `stage126_m1_entry_ready=true`; the failed gate
+exists only inside the runner's transient live rebuild. This is an **expected
+inherited historical-validator boundary**, recorded in
 `stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json` and
 `stage126/stage126_m1_robustness_part2_part5_successor_compatibility.json`,
 asserted in the Part 1 and Part 2 QC reports and explicitly tested — not a

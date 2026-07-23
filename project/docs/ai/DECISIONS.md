@@ -113,6 +113,41 @@ These are stable project decisions. Change them only deliberately (and note it i
   started.** The consumed Part 1 authorization confers no standing
   authorization for any later category.
 
+### Frozen Part 5 runner provenance — corrected wording (2026-07-23)
+
+- **No Stage125 file changed.** `project/src/stage125_part5_readiness_closure.py`,
+  `project/run_stage125_part5.py` and every `project/stage125/` artifact are
+  byte-identical to base main `f7f7c9ed`.
+- **The committed frozen closure report is PASS.** On disk it records
+  `all_gate_pass=true`, `stage125_completed=true`, `stage125_gate_125_0=PASS`
+  and `stage126_m1_entry_ready=true`. Earlier PR wording that attributed
+  `all_gate_pass=false` to the committed artifact was **wrong** and is
+  corrected here: that false gate exists only inside the runner's transient
+  live rebuild.
+- **Two distinct facts, never to be conflated:**
+  1. **Full runner** — `run_stage125_part5.py --check` exits **1** and its
+     **first** failure is the inherited `readiness_surface_disagreement`. The
+     `--check` path rebuilds the closure report live; the `valid_handoff` gate
+     fails inside that rebuild, so the rebuilt `all_gate_pass` becomes false and
+     the rebuilt readiness flags become not-ready, while the truthful live
+     Handoff still reports Stage126 entry readiness. The cross-artifact
+     readiness check reports that disagreement first.
+  2. **Direct validation** — `validate_actual_handoff(...)` separately returns
+     exactly the five documented mismatching fields, with none of the forbidden
+     fields present.
+- **Both behaviours are inherited.** Both were reproduced identically in a
+  read-only detached worktree at base main `f7f7c9ed`
+  (`exit_code=1`, first failure `readiness_surface_disagreement`, same five
+  direct fields). **Part 2 introduced no new Part 5 failure mode.** The
+  gitignored local Part 3C inputs were copied read-only into that temporary
+  worktree so the runner could execute; neither branch was modified.
+- **Handoff compatibility status made generic.** It now reads
+  `expected_historical_contract_boundary_after_completed_robustness_micro_part`
+  instead of naming Part 1, which stopped being true once Part 2 completed.
+- **No scientific change.** All eight Part 2 scientific artifacts and all seven
+  Part 1 scientific artifacts remain byte-identical; no probability, metric,
+  row set, sample delta, selected configuration or interpretation changed.
+
 ### Stage126 M1 robustness Part 2 — executed (2026-07-23)
 
 - **Part 2 (`main_rule_b_listing_robustness`) was explicitly human-authorized
@@ -170,11 +205,13 @@ These are stable project decisions. Change them only deliberately (and note it i
 - Part 5's *embedded live-Handoff successor check* hard-codes the earlier
   Stage126 **primary-development** state and predates robustness execution. It
   therefore cannot accept a truthful completed-Part-1 Handoff.
-- After Part 1 the mismatch is **exactly five fields**:
-  `m1_robustness_started`, `selected_qc_scope`, `selected_qc_path`,
-  `contract_version`, `last_completed_micro_part`. This is an **expected
-  historical-contract boundary**, not a scientific failure, not Stage125 drift,
-  and not a Part 1 merge blocker.
+- After Part 1 the **direct `validate_actual_handoff`** mismatch is **exactly
+  five fields**: `m1_robustness_started`, `selected_qc_scope`,
+  `selected_qc_path`, `contract_version`, `last_completed_micro_part`. This is
+  an **expected historical-contract boundary**, not a scientific failure, not
+  Stage125 drift, and not a Part 1 merge blocker. (See the 2026-07-23 entry
+  below: this five-field statement describes the DIRECT validator only — it was
+  never a statement about the full runner's first failure.)
 - It must never be "fixed" by writing false Handoff markers or by changing
   `project/stage125/**`. It is recorded in
   `stage126_m1_robustness_part1_part5_successor_compatibility.json`, asserted in

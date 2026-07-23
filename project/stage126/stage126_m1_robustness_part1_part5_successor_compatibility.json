@@ -26,7 +26,7 @@
   "rationale": "run_stage125_part5.py --check is a historical successor-state validator whose live-Handoff assumptions end at the primary development state. The five-field mismatch after Part 1 is expected and explicitly tested; it does not invalidate Stage125 closure, does not indicate Stage125 artifact drift, and is not a scientific failure.",
   "stage125_part5_artifacts_frozen": true,
   "stage125_part5_artifacts_modified": false,
-  "stage125_part5_current_test_file_sha256": "965ed49d7858e8d537fd59a1e7a9149ac58ceaeabd57a03c69e51dea7eeb3f52",
+  "stage125_part5_current_test_file_sha256": "0b9413b2adbf9c44b0fb12b4f7ef2dad60be5cd4c401ccefac30d19f0905af71",
   "stage125_part5_expected_bookkeeping_drift_files": [
     "metadata_and_hashes_stage125_part5.json",
     "stage125_part5_readiness_closure_qc_report.json"

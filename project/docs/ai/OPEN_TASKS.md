@@ -187,20 +187,23 @@ Stage125 scientific-artifact mutation.
 **Frozen Part 5 live-successor boundary (expected; not a failure):** Stage125
 Part 5 remains a **frozen, valid historical closure** — no Stage125 artifact or
 source was modified. Its embedded live-Handoff successor check terminates at the
-earlier primary-development state, so after Part 1 — and unchanged after Part 2
-— it reports exactly five
-mismatching fields (`m1_robustness_started`, `selected_qc_scope`,
-`selected_qc_path`, `contract_version`, `last_completed_micro_part`).
-`run_stage125_part5.py --check` therefore exits 1 **by design**. This is an
-expected historical-contract boundary, explicitly recorded in
-`stage126_m1_robustness_part1_part5_successor_compatibility.json`, asserted in
-the Part 1 QC and covered by dedicated tests. It is **not** a scientific
+earlier primary-development state. The full frozen Part 5 runner exits 1 first with the inherited `readiness_surface_disagreement` during a live-successor rebuild. Separately, direct `validate_actual_handoff` returns exactly the documented five-field historical successor mismatch (`m1_robustness_started`, `selected_qc_scope`, `selected_qc_path`, `contract_version`, `last_completed_micro_part`) with no forbidden fields. Neither behaviour was introduced by Part 2, and no Stage125 scientific artifact changed.
+The **committed** frozen closure report still records `all_gate_pass=true`,
+`stage125_gate_125_0=PASS` and `stage126_m1_entry_ready=true`; the failed gate
+exists only inside the runner's transient live rebuild. This is an expected
+inherited historical-validator boundary, explicitly recorded in
+`stage126_m1_robustness_part1_part5_successor_compatibility.json` and
+`stage126_m1_robustness_part2_part5_successor_compatibility.json`, asserted in
+the Part 1 and Part 2 QC reports and covered by dedicated fail-closed tests
+that run the real runner (no stub). It is **not** a scientific
 failure, **not** Stage125 drift, and **not** a Part 1 blocker. Part 1 successor
 state is validated by the Part 0 integrity controls, the Part 1 QC, the Part 1
 completion lock and the AI Handoff validator. Handoff markers:
 `stage125_part5_frozen_artifacts_verified=true`,
 `stage125_part5_live_successor_check_applicable=false`,
-`stage125_part5_successor_compatibility_status=expected_historical_contract_boundary_after_part1`.
+`stage125_part5_successor_compatibility_status=expected_historical_contract_boundary_after_completed_robustness_micro_part`
+(generic: the boundary is a property of having completed ANY robustness
+micro-part, not of Part 1 specifically).
 
 **Robustness Part 2 — COMPLETED (2026-07-23):** `main_rule_b_listing_robustness`
 was explicitly human-authorized and executed on the development folds only.
