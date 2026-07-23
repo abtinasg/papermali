@@ -162,6 +162,17 @@ Do not confuse QC selection with the research-action chain:
   `stage126/stage126_m1_robustness_part1_metrics.csv`,
   `stage126/stage126_m1_robustness_part1_completion_lock.json`,
   `stage126/stage126_m1_robustness_part1_qc_report.json`
+- Stage126 M1 robustness Part 3 (expanded Rule A company scope) source/test/QC:
+  `src/stage126_m1_robustness_part3_expanded_rule_a.py`,
+  `run_stage126_m1_robustness_part3_expanded_rule_a.py`,
+  `tests/test_stage126_m1_robustness_part3_expanded_rule_a.py`,
+  `stage126/stage126_m1_robustness_part3_human_authorization_record.json`,
+  `stage126/stage126_m1_robustness_part3_sample_delta.csv`,
+  `stage126/stage126_m1_robustness_part3_oof_predictions.csv`,
+  `stage126/stage126_m1_robustness_part3_metrics.csv`,
+  `stage126/stage126_m1_robustness_part3_primary_comparison.json`,
+  `stage126/stage126_m1_robustness_part3_completion_lock.json`,
+  `stage126/stage126_m1_robustness_part3_qc_report.json`
 - Stage126 M1 robustness Part 2 (listing Rule B sample) source/test/QC:
   `src/stage126_m1_robustness_part2_listing_rule_b.py`,
   `run_stage126_m1_robustness_part2_listing_rule_b.py`,
@@ -229,7 +240,24 @@ remains locked and untouched (338 identities counted, never parsed). Part 2 is
 A keys (19 Rule A-only rows, 0 Rule B-only rows). All seven Part 1 scientific
 artifacts remain byte-identical.
 
-**Part 3 (`expanded_rule_a_company_scope_robustness`) is not authorized and not
+**Part 3 (`expanded_rule_a_company_scope_robustness`) was explicitly
+human-authorized and is now completed** on the development folds — **only the
+company-scope sample changed** (1056 analysis-ready rows, 124 companies, 695
+development rows, 1323 OOF rows), no retuning, no full-development refit, and
+the final test remains locked (361 identities counted only via the frozen split
+contract). Expanded Rule A is a **strict superset** of primary Rule A: 44
+expanded-only rows, 0 primary-only, +5 companies, +0 positive, +44 negative; all
+20 added OOF identities carry target 0. Pooled PR-AUC: Logistic 0.442886
+(−0.64%), RF 0.390702 (−2.92%), XGBoost 0.356561 (+0.00%) — **the locked primary
+ordering Logistic > RF > XGBoost is preserved**, and because the additions are
+negative-only the expanded scope does **not** materially change interpretation.
+Part 3 is development-only sample-sensitivity evidence: primary results were not
+replaced, the primary ordering lock is unchanged and no paper winner was
+selected. All Part 1 and Part 2 artifacts, the primary Stage126 artifacts and
+Stage125 remain byte-identical, and the independent current-state validator
+advanced generically with no source change.
+
+**Part 4 (`expanded_rule_b_combined_robustness`) is not authorized and not
 started.** `m1_robustness_execution_authorized=false` — the consumed Part 2
 authorization is not a standing authorization; each future Part requires its own
 separate explicit human authorization. Parts 3–6 remain outstanding, so M1
