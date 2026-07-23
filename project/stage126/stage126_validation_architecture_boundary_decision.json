@@ -1,0 +1,81 @@
+{
+  "applies_from": "stage126-m1-robustness-part2-listing-rule-b",
+  "architecture": {
+    "earlier_part_reopening_requires_new_human_authorization": true,
+    "earlier_part_reopening_requires_scientific_error": true,
+    "later_part_may_regenerate_earlier_part_verification_artifacts": false,
+    "stage125_part5_is_live_successor_validator": false,
+    "stage125_part5_mode": "historical_immutable",
+    "stage126_current_state_validation_surface": "stage126_current_state_validator",
+    "stage126_current_state_validator_version": "stage126_current_state_validator_v1"
+  },
+  "authorizes": {
+    "documentation_and_test_changes_required_for_this_boundary": true,
+    "historical_stage125_part5_freeze": true,
+    "stage126_current_state_validator_creation": true,
+    "stage126_validation_architecture_boundary_lock": true
+  },
+  "boundary_prohibitions": {
+    "future_robustness_part_may_modify_part5_test": false,
+    "future_robustness_part_may_regenerate_stage125_part5_outputs": false,
+    "future_stage126_gate_may_call_validate_actual_handoff_from_part5": false,
+    "future_stage126_gate_may_execute_stage125_part5_runner": false,
+    "future_stage126_gate_may_import_stage125_part5_validator": false
+  },
+  "deciding_role": "human_supervisor_data_owner",
+  "decision_date": "2026-07-23",
+  "decision_id": "stage126-validation-architecture-boundary-lock",
+  "decision_locked": true,
+  "decision_version": "stage126_validation_architecture_boundary_v1",
+  "does_not_authorize": {
+    "final_test_access": false,
+    "final_test_evaluation": false,
+    "full_development_refit": false,
+    "merge": false,
+    "new_scientific_execution": false,
+    "part3_execution": false
+  },
+  "exception_policy": {
+    "may_qualify_as_scientific_error": [
+      "incorrect target construction",
+      "leakage",
+      "incorrect feature computation",
+      "wrong sample membership",
+      "wrong fold assignment",
+      "incorrect probability or metric computation",
+      "unauthorized final-test access"
+    ],
+    "not_a_scientific_error": [
+      "new Handoff timestamp",
+      "new branch SHA",
+      "new current test hash",
+      "new completed robustness part",
+      "documentation wording drift",
+      "historical validator successor mismatch"
+    ],
+    "prior_part_reopening_default": "forbidden",
+    "scientific_error_exception_requires": [
+      "documented_scientific_error",
+      "impact_assessment",
+      "explicit_new_human_authorization",
+      "separate_corrective_PR"
+    ],
+    "validator_may_automatically_reopen_previous_part": false
+  },
+  "human_decision_text": "اره منم با این موافقم اینو اعمال کنیم از این نقطه به بعد Stage125 Part5 فقط historical و immutable است.\nوضعیت زنده فقط با validator مستقل Stage126 کنترل می‌شود.\nتغییر هر robustness part نباید باعث بازتولید artifactهای verification-only\nPartهای قبلی شود، مگر اینکه یک خطای علمی واقعی کشف شده باشد.",
+  "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
+  "stage125_part5_historical_provenance": {
+    "direct_validate_actual_handoff_mismatch_fields": [
+      "m1_robustness_started",
+      "selected_qc_scope",
+      "selected_qc_path",
+      "contract_version",
+      "last_completed_micro_part"
+    ],
+    "executed_by_this_validator": false,
+    "first_failure_code": "readiness_surface_disagreement",
+    "full_runner_exit_code": 1,
+    "is_required_live_stage126_gate": false,
+    "status": "historical_provenance_only"
+  }
+}

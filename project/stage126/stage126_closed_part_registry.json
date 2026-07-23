@@ -1,0 +1,86 @@
+{
+  "closed_part_count": 2,
+  "contract_id": "stage126_closed_part_registry",
+  "contract_version": "stage126_current_state_validator_v1",
+  "decision_id": "stage126-validation-architecture-boundary-lock",
+  "parts": {
+    "m1_target_proximity_six_feature_set": {
+      "authorization_consumed": true,
+      "authorization_record": "project/stage126/stage126_m1_robustness_part1_human_authorization_record.json",
+      "authorization_record_sha256": "87a4f55baeb1081eaf936e49c5e8923f67df54ec444f0abc33ec835c0c7e06f4",
+      "authorization_text_sha256": "7364a67ce5761c69f6705ae0ee4b0563fc092a576e960df471ebb4581ae1b5ea",
+      "category_id": "m1_target_proximity_six_feature_set",
+      "code_artifacts_sha256": {
+        "project/run_stage126_m1_robustness_part1_target_proximity.py": "c9b3035a7f517204f8d89e84b62a52d288cd5788ef0cec52c9df670cbb20b77e",
+        "project/src/stage126_m1_robustness_part1_target_proximity.py": "12e06adf7a49b996e634910e7c6058e06494f932cfad6d8e5290a144499bf5b5",
+        "project/tests/test_stage126_m1_robustness_part1_target_proximity.py": "a6fda10a770eed50d72a362ce906788d1cc705fe6d988e4ac6d7940d1f26c3fd"
+      },
+      "completion_lock": "project/stage126/stage126_m1_robustness_part1_completion_lock.json",
+      "completion_lock_sha256": "964d84f2269bb35b0176f88bb12bcfc13ef2cb487817cf5b49a5c28a87e1822b",
+      "final_test_lock_flags": {
+        "final_test_access_authorized": false,
+        "final_test_evaluation_performed": false,
+        "final_test_unlocked": false,
+        "full_development_refit_performed": false
+      },
+      "micro_part_id": "stage126-m1-robustness-part1-target-proximity",
+      "next_registered_category": "main_rule_b_listing_robustness",
+      "part_index": 1,
+      "scientific_artifacts_sha256": {
+        "project/stage126/stage126_m1_robustness_part1_completion_lock.json": "964d84f2269bb35b0176f88bb12bcfc13ef2cb487817cf5b49a5c28a87e1822b",
+        "project/stage126/stage126_m1_robustness_part1_execution_manifest.json": "80813ce8af9544dde736cc6b94372d2626dccbf888553cd7964625bfe12d8738",
+        "project/stage126/stage126_m1_robustness_part1_feature_manifest.csv": "c65735795eda7dce6b4cacbc6af9dd5914b5068f44c77277035a51463cceaf90",
+        "project/stage126/stage126_m1_robustness_part1_human_authorization_record.json": "87a4f55baeb1081eaf936e49c5e8923f67df54ec444f0abc33ec835c0c7e06f4",
+        "project/stage126/stage126_m1_robustness_part1_metrics.csv": "c60f4b15aa40273472be98c867c73795d254f32c2a0e29b76641b1c5d5c18e98",
+        "project/stage126/stage126_m1_robustness_part1_oof_predictions.csv": "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31",
+        "project/stage126/stage126_m1_robustness_part1_primary_comparison.json": "2b58a85250420a8a18b0ff37cecdf3f2e31160c37e0cb48d027324c87a25c46a"
+      },
+      "verification_artifacts_sha256": {
+        "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART1_TARGET_PROXIMITY.md": "4a963715e3a8832338743d66e643040c8858655189e36b14df8665be9f52b606",
+        "project/stage126/metadata_and_hashes_stage126_m1_robustness_part1.json": "f3535cb34b36f45359217e93e445fa0082e87214ddf07dc8f06202def5c5ba5f",
+        "project/stage126/stage126_m1_robustness_part1_part5_successor_compatibility.json": "ac2cca1c4ff8a1df74b385f626ea942e6d451a40c1e96fe0f3745d5dcb304987",
+        "project/stage126/stage126_m1_robustness_part1_qc_report.json": "a7af913d5acb120bea0188fbcee095e00551137c4f3dfbac3e160225d04a9cc8"
+      }
+    },
+    "main_rule_b_listing_robustness": {
+      "authorization_consumed": true,
+      "authorization_record": "project/stage126/stage126_m1_robustness_part2_human_authorization_record.json",
+      "authorization_record_sha256": "0a7bba7489f62f59d3e0f07946b82d8ce4be1a49c4d098f47ca308de9466959e",
+      "authorization_text_sha256": "27935d31a6efcc6116f0d4007424bad5c7b8599faabcb8d39176c569bf172bcb",
+      "category_id": "main_rule_b_listing_robustness",
+      "code_artifacts_sha256": {
+        "project/run_stage126_m1_robustness_part2_listing_rule_b.py": "6e56630b741f87c337c4c065f0f503ca1dbb11322d577a603c1b873a81dbec79",
+        "project/src/stage126_m1_robustness_part2_listing_rule_b.py": "405e67d027c6bd461ef3708fa0c5bd42b0e68db25feb75169d745f1e22c8dd7a",
+        "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py": "5cf94af1f5aa134b6e9b72508f00fdf861264a602b83c47f9b4e1c20c2e9eb40"
+      },
+      "completion_lock": "project/stage126/stage126_m1_robustness_part2_completion_lock.json",
+      "completion_lock_sha256": "23d1920c4fb0a351456fe54b60616446381bbd550fb18e0bba5dab091486fec6",
+      "final_test_lock_flags": {
+        "final_test_access_authorized": false,
+        "final_test_evaluation_performed": false,
+        "final_test_unlocked": false,
+        "full_development_refit_performed": false
+      },
+      "micro_part_id": "stage126-m1-robustness-part2-listing-rule-b",
+      "next_registered_category": "expanded_rule_a_company_scope_robustness",
+      "part_index": 2,
+      "scientific_artifacts_sha256": {
+        "project/stage126/stage126_m1_robustness_part2_completion_lock.json": "23d1920c4fb0a351456fe54b60616446381bbd550fb18e0bba5dab091486fec6",
+        "project/stage126/stage126_m1_robustness_part2_execution_manifest.json": "9fc153b65a77c906339f51d7c0ad576d23eb06c5895eacb1a0ee92578b321ce8",
+        "project/stage126/stage126_m1_robustness_part2_feature_manifest.csv": "58c52c17337286237779153d59f85f74c76f84d0c0415b8efadd618aa524b78f",
+        "project/stage126/stage126_m1_robustness_part2_human_authorization_record.json": "0a7bba7489f62f59d3e0f07946b82d8ce4be1a49c4d098f47ca308de9466959e",
+        "project/stage126/stage126_m1_robustness_part2_metrics.csv": "073b8657c0ba2c40f52e05d766a102e2b5d20845821c4eb1cef1b6e53459228c",
+        "project/stage126/stage126_m1_robustness_part2_oof_predictions.csv": "3af630141a905370849875926fa84052cf10322cc34e18258a25d28106d47dd6",
+        "project/stage126/stage126_m1_robustness_part2_primary_comparison.json": "9fc3b4eaf0a27fc66cd22444d92363747157743e822d3be877ecca7f153763bf",
+        "project/stage126/stage126_m1_robustness_part2_sample_delta.csv": "baafe97323e45f0a88b07aaf1ea97c50c4b213e43724ddb2b97f3f55144fc7d3"
+      },
+      "verification_artifacts_sha256": {
+        "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART2_LISTING_RULE_B.md": "0360efa0ac21a64fcb69befd19c70480fb93b6bb2a4bcce65086b27c603ce9b8",
+        "project/stage126/metadata_and_hashes_stage126_m1_robustness_part2.json": "674b5654d88c9dc1ac009dab5073b06d2ceb945f454352a429298b6e25560b43",
+        "project/stage126/stage126_m1_robustness_part2_part5_successor_compatibility.json": "4ed3025839f14796f33f2f1ee3468e3be94d7f14c6e07c7e78ae3cf9ed49ba9e",
+        "project/stage126/stage126_m1_robustness_part2_qc_report.json": "de326261e92676847c98d32fd0cde706491725d886d7cad86ad99e0e1292e8ad"
+      }
+    }
+  },
+  "regeneration_allowed": false
+}

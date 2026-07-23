@@ -113,6 +113,149 @@ These are stable project decisions. Change them only deliberately (and note it i
   started.** The consumed Part 1 authorization confers no standing
   authorization for any later category.
 
+### Stage126 current-state validation — generic enforcement (2026-07-23)
+
+- **No hard-coded current state.** The validator derives the completed prefix,
+  the next registered category and the last completed micro-part from the Part 0
+  execution order, the discovered per-part packages and their completion locks.
+  The three expected-state constants no longer exist.
+- **Closed parts are protected by a generic registry**
+  (`stage126_closed_part_registry.json`), not by per-part constants. It pins
+  each closed part's scientific artifacts, verification artifacts and
+  source/runner/tests; already-registered hashes may never change.
+- **Verification-only artifacts are immutable too**, exactly as the governance
+  decision requires — QC reports, metadata manifests, Part 5 compatibility
+  records and READMEs all fail validation on byte drift.
+- **The Handoff architecture fields are enforced inside the validator**, not
+  merely reported.
+- **Two QC roles are explicit:** current-state validation versus the newest
+  completed scientific micro-part. Neither is described by an ambiguous
+  `selected_qc` field alone.
+- **A future part changes nothing older.** An end-to-end synthetic Part 3 builds
+  and checks through the real validator without modifying validator source or
+  any Part 1, Part 2 or Stage125 file.
+
+### Stage126 validation-architecture boundary lock (2026-07-23)
+
+- **Human governance decision** (SHA-256
+  `8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1`),
+  recorded verbatim in
+  `stage126_validation_architecture_boundary_decision.json`.
+- **Stage125 Part 5 is historical and immutable.** It is no longer a live
+  successor-state validator for Stage126. Its source, runner, test and the whole
+  `project/stage125/**` tree are hash-pinned in
+  `stage126_historical_boundary_manifest.json`. Historical materials are neither
+  deleted nor rewritten.
+- **The independent Stage126 current-state validator is the sole current-state
+  validation surface** (`stage126_current_state_validator_v1`). It never
+  imports the Part 5 source, never executes its runner and never calls its
+  `validate_actual_handoff`; this is proven structurally by AST-based tests
+  rather than asserted.
+- **Later parts must not regenerate earlier parts' verification artifacts.**
+  Part 1 and Part 2 are closed historical micro-part packages. The previous
+  coupling — earlier packages embedding the hash of a then-mutable current test
+  file — is resolved by freezing and pinning that file.
+- **Reopening a completed part is forbidden by default.** An exception requires
+  a documented scientific error, an impact assessment, an explicit new human
+  authorization and a separate corrective PR. A new Handoff timestamp, branch
+  SHA, current test hash, newly completed part, documentation wording drift or
+  historical validator successor mismatch are explicitly **not** scientific
+  errors. Incorrect target construction, leakage, incorrect feature
+  computation, wrong sample membership, wrong fold assignment, incorrect
+  probability/metric computation or unauthorized final-test access **may**
+  qualify. The validator never reopens a part automatically.
+- **Generic future-part design.** Parts are discovered from the Part 0
+  registered execution order by naming convention; Part 3 will advance current
+  state by adding only its own files.
+- **Authorizes nothing else.** No merge, no Part 3 execution, no
+  full-development refit, no final-test access or evaluation, no new scientific
+  execution. All Part 1 and Part 2 scientific hashes are unchanged.
+
+### Frozen Part 5 runner provenance — corrected wording (2026-07-23)
+
+- **No Stage125 file changed.** `project/src/stage125_part5_readiness_closure.py`,
+  `project/run_stage125_part5.py` and every `project/stage125/` artifact are
+  byte-identical to base main `f7f7c9ed`.
+- **The committed frozen closure report is PASS.** On disk it records
+  `all_gate_pass=true`, `stage125_completed=true`, `stage125_gate_125_0=PASS`
+  and `stage126_m1_entry_ready=true`. Earlier PR wording that attributed
+  `all_gate_pass=false` to the committed artifact was **wrong** and is
+  corrected here: that false gate exists only inside the runner's transient
+  live rebuild.
+- **Two distinct facts, never to be conflated:**
+  1. **Full runner** — `run_stage125_part5.py --check` exits **1** and its
+     **first** failure is the inherited `readiness_surface_disagreement`. The
+     `--check` path rebuilds the closure report live; the `valid_handoff` gate
+     fails inside that rebuild, so the rebuilt `all_gate_pass` becomes false and
+     the rebuilt readiness flags become not-ready, while the truthful live
+     Handoff still reports Stage126 entry readiness. The cross-artifact
+     readiness check reports that disagreement first.
+  2. **Direct validation** — `validate_actual_handoff(...)` separately returns
+     exactly the five documented mismatching fields, with none of the forbidden
+     fields present.
+- **Both behaviours are inherited.** Both were reproduced identically in a
+  read-only detached worktree at base main `f7f7c9ed`
+  (`exit_code=1`, first failure `readiness_surface_disagreement`, same five
+  direct fields). **Part 2 introduced no new Part 5 failure mode.** The
+  gitignored local Part 3C inputs were copied read-only into that temporary
+  worktree so the runner could execute; neither branch was modified.
+- **Handoff compatibility status made generic.** It now reads
+  `expected_historical_contract_boundary_after_completed_robustness_micro_part`
+  instead of naming Part 1, which stopped being true once Part 2 completed.
+- **No scientific change.** All eight Part 2 scientific artifacts and all seven
+  Part 1 scientific artifacts remain byte-identical; no probability, metric,
+  row set, sample delta, selected configuration or interpretation changed.
+
+### Stage126 M1 robustness Part 2 — executed (2026-07-23)
+
+- **Part 2 (`main_rule_b_listing_robustness`) was explicitly human-authorized
+  and completed on the development folds only.** The authorization text hashes
+  to `27935d31a6efcc6116f0d4007424bad5c7b8599faabcb8d39176c569bf172bcb` and is
+  consumed by this execution — it grants no standing authorization, no merge,
+  no Part 3, no refit, no final-test access, no SMOTE/SMOTENC/SHAP and no
+  M2/M3/M4.
+- **Only the sample changed:** from `main_rule_a_primary` to the listing-timing
+  robustness sample `main_rule_b_listing_robustness`
+  (`analysis_ready_main_rule_b_stage125.csv`, SHA-256
+  `5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480`). Target,
+  the nine-feature `M1_PRIMARY_FEATURE_ORDER` set (18 transformed columns),
+  selected configurations, folds, imbalance policy, seeds and metrics unchanged.
+- **No retuning** (frozen selected configurations reused; 0 tuning searches;
+  exactly 22 fits / 22 predictions). **No full-development refit.**
+- **Final test remained locked and untouched**: 338 row identities counted but
+  never parsed, 0 predictor rows, 0 target rows, 0 evaluations. Aggregate
+  final-test counts were read only from the frozen
+  `part4_event_count_gate_stage125.csv`, never from row-level final-test values.
+  No SMOTE/SMOTENC, SHAP, calibration, bootstrap or Holm; zero network access.
+- **Counts:** 993 Rule B rows (117 companies, 79 pos / 914 neg); 655 development
+  rows (68 / 587); fold roles 242 / 202 / 444 / 211; 1239 OOF rows (413 per
+  family); 9 metric rows. XGBoost `scale_pos_weight` recomputed per Rule B
+  training fold: 209/33 and 386/58.
+- **Sample-delta audit (row identities only).** Rule B keys are a **strict
+  subset** of Rule A keys: 19 Rule A-only rows, 0 Rule B-only rows. Net −19 rows,
+  −2 companies, −1 positive, −18 negative; development −11 rows (0 positive);
+  OOF −8 rows (0 positive); final-test identities −8.
+- **Sensitivity analysis only** — Part 2 does not replace the primary results
+  and selects no paper winner.
+- **Observed ordering (reported, not acted upon).** Pooled development-OOF
+  PR-AUC: Logistic 0.447170385532 (+0.001413421484 / +0.32%), RF 0.401263142511
+  (−0.001178687509 / −0.29%), XGBoost 0.341959533880 (−0.014585474282 /
+  −4.09%). The **observed Part 2 ordering (Logistic > RF > XGBoost) matches the
+  primary development ordering**, unlike Part 1's, which differed. Recorded in
+  `stage126_m1_robustness_part2_primary_comparison.json`. No selected
+  configuration changed, no refit was authorized, no automatic scientific action
+  was triggered, the locked primary confirmatory ordering is unchanged and the
+  final test stays locked.
+- **Part 1 preservation.** All seven Part 1 scientific artifacts are
+  byte-identical. Only three verification-only Part 1 files (QC report, metadata
+  manifest, Part 5 compatibility record) were refreshed because they embed the
+  current successor-test-file hash; no Part 1 model was retuned and no Part 1
+  probability or metric changed.
+- **Part 3 (`expanded_rule_a_company_scope_robustness`) is not authorized and
+  not started.** The consumed Part 2 authorization confers no standing
+  authorization for any later category. Parts 3–6 remain outstanding, so M1
+  robustness is not complete.
+
 ### Frozen Part 5 live-successor boundary (2026-07-22)
 
 - **Stage125 Part 5 remains a frozen, valid historical closure.** Neither its
@@ -120,11 +263,13 @@ These are stable project decisions. Change them only deliberately (and note it i
 - Part 5's *embedded live-Handoff successor check* hard-codes the earlier
   Stage126 **primary-development** state and predates robustness execution. It
   therefore cannot accept a truthful completed-Part-1 Handoff.
-- After Part 1 the mismatch is **exactly five fields**:
-  `m1_robustness_started`, `selected_qc_scope`, `selected_qc_path`,
-  `contract_version`, `last_completed_micro_part`. This is an **expected
-  historical-contract boundary**, not a scientific failure, not Stage125 drift,
-  and not a Part 1 merge blocker.
+- After Part 1 the **direct `validate_actual_handoff`** mismatch is **exactly
+  five fields**: `m1_robustness_started`, `selected_qc_scope`,
+  `selected_qc_path`, `contract_version`, `last_completed_micro_part`. This is
+  an **expected historical-contract boundary**, not a scientific failure, not
+  Stage125 drift, and not a Part 1 merge blocker. (See the 2026-07-23 entry
+  below: this five-field statement describes the DIRECT validator only — it was
+  never a statement about the full runner's first failure.)
 - It must never be "fixed" by writing false Handoff markers or by changing
   `project/stage125/**`. It is recorded in
   `stage126_m1_robustness_part1_part5_successor_compatibility.json`, asserted in

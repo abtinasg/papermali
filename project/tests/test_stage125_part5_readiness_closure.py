@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import socket
 import subprocess
 import sys
@@ -31,13 +32,16 @@ def _clean_working_tree_for_unit_tests(monkeypatch, request):
 #
 # Part 5 is a FROZEN Stage125 closure. Its embedded live-Handoff successor check
 # hard-codes the earlier Stage126 *primary-development* successor state and
-# therefore cannot accept a truthful completed-robustness-Part-1 Handoff.
+# therefore cannot accept a truthful completed-robustness Handoff (Part 1, and
+# now Part 2).
 #
 # The tests below replay the frozen historical Part 5 contract against a
 # monkeypatched historical primary-successor Handoff fixture. The real
-# handoff_state.json file is NEVER written or modified. A dedicated test marked
-# ``live_successor_state`` exercises the real current Part 1 Handoff and proves
-# the incompatibility is known, bounded and exactly five fields wide.
+# handoff_state.json file is NEVER written or modified. Dedicated tests marked
+# ``live_successor_state`` exercise the real current (Part 2) Handoff and prove
+# the incompatibility is known, bounded and exactly five fields wide — the SAME
+# five fields as after Part 1. Only the successor micro-part identity advances;
+# no negative test is weakened, skipped or stubbed.
 # --------------------------------------------------------------------------- #
 
 # Exactly the two self-describing bookkeeping files that legitimately differ
@@ -1082,6 +1086,16 @@ EXPECTED_PART5_LIVE_MISMATCH_FIELDS = [
     "contract_version",
     "last_completed_micro_part",
 ]
+# Successor-test-file provenance. THREE distinct generations exist after Part 2:
+#   * the Stage125 historical hash pinned by the frozen Part 5 metadata;
+#   * the Part 1 completion-time successor-aware hash (history, NOT current);
+#   * the current Part 2 hash, always recomputed from the file on disk.
+PART5_HISTORICAL_TEST_SHA256 = (
+    "0a117c1916ad845653e148d951a49a2c0375d13b7de23019e50ae891aee1b437"
+)
+PART5_PART1_COMPLETION_TEST_SHA256 = (
+    "62cd1593e7bfafdeb1aa1c728f3fb9c22aadf50d3031e2cec964d267e752b189"
+)
 # A mismatch on any of these would signal REAL drift, not a contract boundary.
 FORBIDDEN_PART5_LIVE_MISMATCH_FIELDS = [
     "stage125_completed",
@@ -1094,29 +1108,50 @@ FORBIDDEN_PART5_LIVE_MISMATCH_FIELDS = [
 
 
 @pytest.mark.live_successor_state
-def test_live_handoff_reports_completed_part1_successor_state():
-    """The REAL current Handoff truthfully reports the completed Part 1 state."""
+def test_live_handoff_reports_completed_part2_successor_state():
+    """The REAL current Handoff truthfully reports the completed Part 2 state.
+
+    Part 1 remains completed; Part 2 is the newest completed micro-part. The
+    Part 1 assertions are retained rather than replaced, so no previously
+    proven successor property is dropped by this migration.
+    """
     state = m.load_handoff_state(REPO_ROOT)
     assert state["m1_robustness_started"] is True
+    assert state["m1_robustness_completed"] is False
+    # Retained Part 1 property.
     assert state["m1_robustness_part1_completed"] is True
+    # New Part 2 property.
+    assert state["m1_robustness_part2_completed"] is True
+    assert state["m1_robustness_part2_human_authorized"] is True
+    assert state["m1_robustness_completed_category_ids"] == [
+        "m1_target_proximity_six_feature_set",
+        "main_rule_b_listing_robustness",
+    ]
     assert state["last_completed_micro_part"] == (
-        "stage126-m1-robustness-part1-target-proximity"
+        "stage126-m1-robustness-part2-listing-rule-b"
     )
+    # Part 3 remains unauthorized and the final test remains locked.
+    assert state["m1_robustness_part3_authorized"] is False
+    assert state["m1_robustness_execution_authorized"] is False
+    assert state["final_test_unlocked"] is False
+    assert state["final_test_access_authorized"] is False
+    assert state["final_test_evaluation_performed"] is False
 
 
 @pytest.mark.live_successor_state
 def test_frozen_part5_validator_returns_exactly_the_expected_boundary():
-    """The unchanged frozen Part 5 validator rejects the live Part 1 Handoff.
+    """The unchanged frozen Part 5 validator rejects the live Part 2 Handoff.
 
     This is an expected, bounded historical-contract boundary — Part 5 predates
     robustness execution. The mismatch must be EXACTLY the five documented
     fields: no readiness, final-test, authorization or research-pointer field
-    may appear (those would indicate genuine drift).
+    may appear (those would indicate genuine drift). The field set is unchanged
+    from Part 1; only the successor values behind it advanced.
     """
     ok, detail = m.validate_actual_handoff(
         REPO_ROOT, derived_completed=True, derived_entry_ready=True,
     )
-    assert ok is False, "frozen Part 5 validator unexpectedly accepted Part 1 state"
+    assert ok is False, "frozen Part 5 validator unexpectedly accepted Part 2 state"
     assert detail.startswith("handoff_mismatch:")
     fields = detail.split("handoff_mismatch:", 1)[1].split(",")
     assert sorted(fields) == sorted(EXPECTED_PART5_LIVE_MISMATCH_FIELDS), (
@@ -1130,7 +1165,12 @@ def test_frozen_part5_validator_returns_exactly_the_expected_boundary():
 
 @pytest.mark.live_successor_state
 def test_live_boundary_matches_part1_compatibility_record():
-    """The Part 1 compatibility record must document exactly this boundary."""
+    """The Part 1 compatibility record must still document exactly this boundary.
+
+    Retained unchanged after Part 2: the Part 1 record is a frozen historical
+    statement of the SAME five-field boundary, and it must keep matching the
+    real validator output.
+    """
     compat = json.loads(
         (REPO_ROOT / "project/stage126"
          / "stage126_m1_robustness_part1_part5_successor_compatibility.json"
@@ -1146,6 +1186,222 @@ def test_live_boundary_matches_part1_compatibility_record():
         REPO_ROOT, derived_completed=True, derived_entry_ready=True,
     )
     assert compat["expected_live_mismatch_detail"] == detail
+
+
+@pytest.mark.live_successor_state
+def test_live_boundary_matches_part2_compatibility_record():
+    """The Part 2 compatibility record documents the same boundary, plus history.
+
+    It must record THREE distinct successor-test-file hash generations and must
+    never present the Part 1 completion-time hash as the current hash.
+    """
+    import hashlib
+    compat = json.loads(
+        (REPO_ROOT / "project/stage126"
+         / "stage126_m1_robustness_part2_part5_successor_compatibility.json"
+         ).read_text(encoding="utf-8")
+    )
+    assert compat["stage125_part5_source_modified"] is False
+    assert compat["stage125_part5_artifacts_modified"] is False
+    assert compat["stage125_part5_historical_closure_remains_valid"] is True
+    assert compat["stage125_part5_live_handoff_check_applicable_after_part2"] is False
+    assert compat["expected_live_mismatch_fields"] == \
+        EXPECTED_PART5_LIVE_MISMATCH_FIELDS
+    assert compat["forbidden_live_mismatch_fields"] == \
+        FORBIDDEN_PART5_LIVE_MISMATCH_FIELDS
+    _ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    assert compat["expected_live_mismatch_detail"] == detail
+
+    historical = compat["stage125_part5_historical_test_file_sha256"]
+    part1_hash = compat["stage126_part1_completion_test_file_sha256"]
+    current = compat["stage126_part2_current_test_file_sha256"]
+    assert historical == PART5_HISTORICAL_TEST_SHA256
+    assert part1_hash == PART5_PART1_COMPLETION_TEST_SHA256
+    assert current == hashlib.sha256(
+        (REPO_ROOT / "project/tests"
+         / "test_stage125_part5_readiness_closure.py").read_bytes()
+    ).hexdigest()
+    assert len({historical, part1_hash, current}) == 3
+    assert compat["part1_completion_hash_is_not_the_current_hash"] is True
+    # Part 1 scientific artifacts stay byte-identical through this migration.
+    assert compat["part1_scientific_artifacts_byte_identical"] is True
+
+
+# --------------------------------------------------------------------------- #
+# Truthful FULL-runner provenance vs the SEPARATE direct handoff validation
+#
+# These must never be conflated. The full frozen runner exits 1 with an
+# INHERITED `readiness_surface_disagreement` first failure (its --check path
+# rebuilds the closure report live, the valid_handoff gate fails inside that
+# rebuild, and the rebuilt not-ready flags then disagree with the truthful live
+# Handoff). Direct validate_actual_handoff SEPARATELY returns exactly the five
+# documented fields. The COMMITTED closure report is unaffected by either.
+# --------------------------------------------------------------------------- #
+
+PART5_FULL_RUNNER_FIRST_FAILURE_CODE = "readiness_surface_disagreement"
+PART5_KNOWN_FAILURE_CODES = (
+    "readiness_surface_disagreement",
+    "handoff_mismatch",
+    "baseline tree mismatch",
+    "Part 3C input hash mismatch",
+    "Part 4 output hash mismatch",
+    "Part 4 source hash mismatch",
+    "Part 4 test hash mismatch",
+    "check drift",
+)
+BASE_MAIN_COMMIT = "f7f7c9ed1f6c9e52542c9f242e090d3ad24792c4"
+_PART2_COMPAT_REL = (
+    "project/stage126/"
+    "stage126_m1_robustness_part2_part5_successor_compatibility.json"
+)
+
+
+def _first_failure_code(stderr_text: str) -> str:
+    """First recognized failure code; "" when none matches (fail-closed)."""
+    hits = [
+        (stderr_text.index(code), code)
+        for code in PART5_KNOWN_FAILURE_CODES
+        if code in stderr_text
+    ]
+    return min(hits)[1] if hits else ""
+
+
+def test_committed_closure_report_is_pass_and_entry_ready():
+    """The COMMITTED frozen closure report is PASS — never claim otherwise.
+
+    The transient rebuild inside `--check` derives a failed gate; that must
+    never be described as the content of the committed artifact.
+    """
+    closure = json.loads(
+        (REPO_ROOT / "project/stage125"
+         / "part5_readiness_closure_report_stage125.json").read_text(
+            encoding="utf-8")
+    )
+    assert closure["all_gate_pass"] is True
+    assert closure["stage125_completed"] is True
+    assert closure["stage125_gate_125_0"] == "PASS"
+    assert closure["stage126_m1_entry_ready"] is True
+
+
+@pytest.mark.live_successor_state
+def test_full_runner_exits_1_with_the_inherited_first_failure():
+    """The REAL full runner (no stub) exits 1 on readiness_surface_disagreement.
+
+    Fails if the head introduces a DIFFERENT Part 5 failure mode: the first
+    recognized failure code must be exactly the inherited one, and must not be
+    the direct five-field handoff mismatch.
+    """
+    import subprocess
+    proc = subprocess.run(
+        [sys.executable, "project/run_stage125_part5.py", "--check"],
+        cwd=str(REPO_ROOT), capture_output=True, text=True,
+        env={**os.environ, "PYTHONPATH": "project"},
+    )
+    assert proc.returncode == 1, (
+        f"full Part 5 runner exit code {proc.returncode} != 1"
+    )
+    code = _first_failure_code(proc.stderr)
+    assert code == PART5_FULL_RUNNER_FIRST_FAILURE_CODE, (
+        f"full runner first failure {code!r} != "
+        f"{PART5_FULL_RUNNER_FIRST_FAILURE_CODE!r}; stderr={proc.stderr!r}"
+    )
+    # The full runner does NOT fail exclusively on the five handoff fields.
+    assert code != "handoff_mismatch"
+
+
+@pytest.mark.live_successor_state
+def test_full_runner_failure_mode_is_inherited_from_base_main():
+    """Part 5's source and runner are byte-identical to base main.
+
+    The full-runner failure mode is therefore produced by unchanged historical
+    validator logic — Part 2 introduced no new Part 5 failure mode. The
+    read-only reproduction at base main itself is recorded in the Part 2
+    compatibility artifact.
+    """
+    import subprocess
+    for rel in ("project/src/stage125_part5_readiness_closure.py",
+                "project/run_stage125_part5.py"):
+        head_blob = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "rev-parse", f"HEAD:{rel}"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        base_blob = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "rev-parse",
+             f"{BASE_MAIN_COMMIT}:{rel}"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        assert head_blob == base_blob, f"Part 5 path changed vs base main: {rel}"
+    changed = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "diff", "--name-only",
+         BASE_MAIN_COMMIT, "HEAD", "--", "project/stage125/"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    assert changed == "", f"project/stage125 changed vs base main: {changed}"
+
+    compat = json.loads((REPO_ROOT / _PART2_COMPAT_REL).read_text(encoding="utf-8"))
+    assert compat["stage125_part5_full_runner_exit_code"] == 1
+    assert compat["stage125_part5_full_runner_first_failure_code"] == (
+        PART5_FULL_RUNNER_FIRST_FAILURE_CODE
+    )
+    assert compat[
+        "stage125_part5_full_runner_first_failure_preexisting_on_base_main"
+    ] is True
+    assert compat["stage125_part5_full_runner_behavior_changed_by_part2"] is False
+    assert compat["stage125_part5_full_runner_base_main_commit"] == BASE_MAIN_COMMIT
+
+
+@pytest.mark.live_successor_state
+def test_direct_validation_is_separate_from_the_full_runner_failure():
+    """Direct validation yields the five fields; the runner's first failure does not."""
+    compat = json.loads((REPO_ROOT / _PART2_COMPAT_REL).read_text(encoding="utf-8"))
+    assert compat[
+        "stage125_part5_direct_handoff_validation_mismatch_fields"
+    ] == EXPECTED_PART5_LIVE_MISMATCH_FIELDS
+    assert compat[
+        "stage125_part5_direct_handoff_validation_forbidden_fields_present"
+    ] == []
+    _ok, detail = m.validate_actual_handoff(
+        REPO_ROOT, derived_completed=True, derived_entry_ready=True,
+    )
+    fields = detail.split("handoff_mismatch:", 1)[1].split(",")
+    assert sorted(fields) == sorted(EXPECTED_PART5_LIVE_MISMATCH_FIELDS)
+    for forbidden in FORBIDDEN_PART5_LIVE_MISMATCH_FIELDS:
+        assert forbidden not in fields
+    # The two surfaces are genuinely different facts.
+    assert compat["stage125_part5_full_runner_first_failure_code"] != (
+        "handoff_mismatch"
+    )
+    assert compat["stage125_part5_committed_closure_all_gate_pass"] is True
+    assert compat[
+        "stage125_part5_committed_closure_stage126_m1_entry_ready"
+    ] is True
+
+
+@pytest.mark.live_successor_state
+def test_part1_scientific_artifacts_are_byte_identical_after_part2():
+    """The successor-test evolution must not touch any Part 1 scientific output."""
+    import hashlib
+    expected = {
+        "stage126_m1_robustness_part1_human_authorization_record.json":
+            "87a4f55baeb1081eaf936e49c5e8923f67df54ec444f0abc33ec835c0c7e06f4",
+        "stage126_m1_robustness_part1_feature_manifest.csv":
+            "c65735795eda7dce6b4cacbc6af9dd5914b5068f44c77277035a51463cceaf90",
+        "stage126_m1_robustness_part1_execution_manifest.json":
+            "80813ce8af9544dde736cc6b94372d2626dccbf888553cd7964625bfe12d8738",
+        "stage126_m1_robustness_part1_oof_predictions.csv":
+            "1303a31a45e8293be84e7d6c3b23aa1a4c771847de0f1b0207110c33cafdba31",
+        "stage126_m1_robustness_part1_metrics.csv":
+            "c60f4b15aa40273472be98c867c73795d254f32c2a0e29b76641b1c5d5c18e98",
+        "stage126_m1_robustness_part1_primary_comparison.json":
+            "2b58a85250420a8a18b0ff37cecdf3f2e31160c37e0cb48d027324c87a25c46a",
+    }
+    for name, want in expected.items():
+        got = hashlib.sha256(
+            (REPO_ROOT / "project/stage126" / name).read_bytes()
+        ).hexdigest()
+        assert got == want, name
 
 
 @pytest.mark.live_successor_state

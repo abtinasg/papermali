@@ -3,6 +3,179 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-23 — Stage126 current-state validation made fully generic
+
+Enforcement hardening of the boundary lock. No scientific execution: no model
+fitting, retuning, refit, final-test access or evaluation; Part 3 not started.
+
+- **Generic future-part advancement.** The validator's three hard-coded
+  current-state constants (`EXPECTED_COMPLETED_CATEGORY_IDS`,
+  `EXPECTED_NEXT_CATEGORY_ID`, `EXPECTED_LAST_MICRO_PART`) are **removed**. The
+  completed prefix is now `execution_order[:n]` over discovered packages, the
+  next category is `execution_order[n]` (empty when all six are complete), and
+  the last completed micro-part is derived from the newest completion lock's
+  `micro_part_id`, falling back to the part QC report's `stage`. The validator
+  source needs no edit when Parts 3-6 land.
+- **Generic per-part integrity contract.** The Part 1/Part 2 hash dictionaries
+  are replaced by `stage126_closed_part_registry.json`, built from each part's
+  own package by convention: scientific artifacts, verification artifacts,
+  source/runner/tests, authorization record, completion lock, next registered
+  category, authorization-consumed and final-test lock flags. Hashes already
+  registered may never change; new parts are appended without touching earlier
+  entries.
+- **Closed verification artifacts pinned exactly.** Both parts' QC reports,
+  metadata manifests, Part 5 compatibility records and READMEs — plus their
+  source, runner and tests — are pinned, and byte drift in any of them fails
+  full current-state validation. Negative tests mutate a Part 1 QC byte, a
+  Part 2 metadata byte, a previous README, a previous compatibility record and
+  a scientific artifact, and prove full validation fails in every case.
+- **Handoff architecture fields enforced inside `verify_handoff`.** All seven
+  fields are required exactly; per-field mutation and removal tests call the
+  real validator rather than asserting standalone.
+- **Current-state QC separated from scientific micro-part QC.** The Handoff now
+  carries `current_state_validation_{scope,path,metadata_path,assertions,failed,all_pass}`
+  for the independent validator and
+  `last_completed_micro_part_qc_{scope,path,assertions,failed}` for the newest
+  completed scientific part. `CURRENT_STATE.md` reports the independent
+  validator (53 assertions) in its primary Current-state validation section and
+  the Part 2 QC (128 assertions) in a clearly separate subsection. The validator
+  fails closed if these pointers or counts disagree with the real artifacts.
+- **End-to-end future-part proof.** A synthetic but complete Part 3 package is
+  built and checked through the real validator in a mirrored git repository; the
+  report derives three completed categories, next category
+  `expanded_rule_b_combined_robustness` and the derived Part 3 micro-part id,
+  while Part 1, Part 2 and Stage125 files stay byte-identical. A matching
+  negative test rejects a Part 4 package with Part 3 missing.
+- **No scientific output changed.** All eight Part 2 and all seven Part 1
+  scientific hashes, and every Part 1/Part 2 verification artifact, are
+  byte-identical. No Stage125 path changed. Final test remains locked.
+
+## 2026-07-23 — Stage126 validation-architecture boundary lock
+
+- **Human governance decision recorded and hash-verified** (SHA-256
+  `8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1`).
+  Stage125 Part 5 is a **frozen historical closure**. It is **no longer
+responsible for validating live Stage126 successor state**. The **independent
+Stage126 current-state validator**
+(`project/run_stage126_current_state_validator.py`) is the **sole current-state
+validation surface**. Future robustness parts must **not** regenerate
+previous-part verification artifacts unless a genuine scientific error **and** a
+separate explicit human authorization exist.
+- **This is a decision lock only.** It authorizes the boundary lock, the new
+  validator, the Stage125 Part 5 freeze and the documentation/test changes the
+  boundary requires. It authorizes **no** merge, **no** Part 3 execution, **no**
+  full-development refit, **no** final-test access or evaluation and **no** new
+  scientific execution. No model was fitted, retuned or refit.
+- **Stage125 Part 5 frozen permanently.** Source `cb61ea7c…`, runner
+  `ba6bd9e8…`, test `0b9413b2…` and every tracked `project/stage125/**` file are
+  pinned in `stage126_historical_boundary_manifest.json`. Historical materials
+  are neither deleted nor rewritten; the known runner behaviour (exit 1, first
+  failure `readiness_surface_disagreement`, and a separate five-field direct
+  handoff mismatch) is retained as **historical provenance only** and is no
+  longer a required live gate.
+- **New independent validator.** `stage126_current_state_validator_v1` validates
+  the Part 0 execution-order contract, the primary Stage126 lock, the selected
+  configurations, the final-test lock guard, per-part authorization records and
+  completion locks, scientific artifact hashes, the live Handoff, the completed
+  contiguous category prefix, the next registered category, the absence of
+  standing authorization and the absence of unauthorized execution. It **never**
+  imports the Part 5 source, **never** executes its runner and **never** calls
+  its `validate_actual_handoff` — proven structurally by AST tests. 40
+  assertions, all passing.
+- **Earlier parts are closed packages.** Part 1 and Part 2 artifacts are frozen;
+  a later part must not regenerate their QC reports, metadata manifests, Part 5
+  compatibility records, READMEs, completion locks or scientific artifacts. This
+  boundary work itself changed **zero** Part 1 and Part 2 files — the coupling
+  that previously forced their regeneration is removed now that the Part 5 test
+  file is frozen and pinned.
+- **Generic future-part design.** Parts are discovered from the Part 0 registered
+  execution order by naming convention, so a future Part 3 advances current
+  state by adding only its own files. A synthetic test proves a hypothetical
+  valid Part 3 completion is recognized with **zero** changes to Part 1, Part 2
+  or Stage125 files, and a repository-level policy test fails if any robustness
+  module declares another part's verification artifacts as its outputs.
+- **Exception policy.** Reopening a completed part is **forbidden** by default.
+  An exception requires a documented scientific error, an impact assessment, an
+  explicit new human authorization and a separate corrective PR. A new Handoff
+  timestamp, branch SHA, current test hash, newly completed part, documentation
+  wording drift or historical validator successor mismatch are **not**
+  scientific errors. The validator never reopens a previous part automatically.
+- **New live verification sequence:** the Stage126 current-state validator, the
+  Part 2 runner `--check`, the Handoff validator and the full test suite.
+  `run_stage125_part5.py --check` is **not** a routine gate.
+- **No scientific output changed.** All eight Part 2 and all seven Part 1
+  scientific hashes are byte-identical. Part 3 remains unauthorized and not
+  started; the final test remains locked.
+
+## 2026-07-23 — Stage126 M1 Robustness Part 2 (listing Rule B sample)
+
+- **Part 2 was explicitly human-authorized and completed on the development
+  folds.** Executed the registered robustness category
+  `main_rule_b_listing_robustness` under the merged Part 0 execution contract.
+  **Only the sample changed** — from `main_rule_a_primary` to
+  `main_rule_b_listing_robustness`, the listing-timing robustness sample
+  (`project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv`,
+  SHA-256 `5492cf24…`). The target (`FD_target_main_t_plus_1`), the nine-feature
+  `M1_PRIMARY_FEATURE_ORDER` set (18 transformed columns after appending the
+  nine missingness indicators), the three primary selected configurations, the
+  two locked temporal folds, the class-weighting imbalance policy, the seeds and
+  the metric contract were all held fixed. **No retuning occurred**
+  (`tuning_search_calls=0`): exactly 22 model fits and 22 predictions. **No
+  full-development refit occurred.** Development-only: 993 Rule B rows (117
+  companies, 79 pos / 914 neg), 655 development rows (68 pos / 587 neg), fold
+  roles 242 / 202 / 444 / 211, 413 pooled OOF rows per family (1239 total) and 9
+  metric rows. **The final test remained locked and untouched**: 338 final-test
+  row identities were counted but never parsed, zero predictor rows and zero
+  target rows were loaded, zero evaluations ran. Aggregate final-test counts
+  were read only from the already-frozen `part4_event_count_gate_stage125.csv`,
+  never from row-level final-test values. No SMOTE, SMOTENC, SHAP, calibration,
+  bootstrap or Holm procedure ran; zero network requests.
+- **Rule A vs Rule B sample-delta audit (row identities only).** Rule B keys are
+  a **strict subset** of Rule A keys: 19 Rule A-only rows, 0 Rule B-only rows.
+  Net differences: −19 rows, −2 companies, −1 positive, −18 negative overall;
+  −11 development rows (0 positive, −11 negative); −8 OOF validation rows (0
+  positive, −8 negative); −8 final-test identities. Recorded in
+  `stage126_m1_robustness_part2_sample_delta.csv`.
+- **Part 2 results are sensitivity evidence only.** Pooled development-OOF
+  PR-AUC: Logistic 0.447170 (+0.001413, +0.32%), RF 0.401263 (−0.001179,
+  −0.29%), XGBoost 0.341960 (−0.014585, −4.09%). **The observed Part 2 ordering
+  (Logistic > RF > XGBoost) matches the primary development ordering** — unlike
+  Part 1, whose observed ordering differed. Either way this is a
+  development-only sensitivity finding: it does **not** replace the primary
+  results, does **not** alter the locked primary ordering used for confirmatory
+  interpretation, does not change the selected configurations, and selects no
+  paper winner. No automatic scientific action was triggered.
+- **Preservation.** All eight primary Stage126 artifacts, the frozen Stage125
+  tree, the Part 0 decision contract and **all seven Part 1 scientific
+  artifacts** (authorization record, feature manifest, execution manifest, OOF
+  predictions, metrics, completion lock, primary comparison) remain
+  byte-identical. `ROADMAP.md` is unchanged.
+- **Successor-test provenance migration (verification-only).** The Stage125
+  Part 5 successor-aware test file was extended so the live-successor
+  assertions describe the truthful Part 2 state (Part 1 assertions retained, no
+  negative test weakened, deleted, skipped or stubbed). Three successor-test
+  hash generations are now recorded separately in
+  `stage126_m1_robustness_part2_part5_successor_compatibility.json`: the
+  Stage125 historical hash `0a117c19…` still pinned by the frozen Part 5
+  metadata, the Part 1 completion-time hash `62cd1593…` (history — **never**
+  described as current), and the recomputed Part 2 current hash. Because Part 1's
+  QC report, metadata manifest and Part 5 compatibility record embed that
+  current hash, those three **verification-only** Part 1 files were regenerated;
+  every Part 1 scientific artifact stayed byte-identical, no Part 1 model was
+  retuned and no Part 1 probability or metric changed.
+- **Frozen Part 5 boundary unchanged (corrected wording).** The full frozen Part 5 runner exits 1 first with the inherited `readiness_surface_disagreement` during a live-successor rebuild. Separately, direct `validate_actual_handoff` returns exactly the documented five-field historical successor mismatch (`m1_robustness_started`, `selected_qc_scope`, `selected_qc_path`, `contract_version`, `last_completed_micro_part`) with no forbidden fields. Neither behaviour was introduced by Part 2, and no Stage125 scientific artifact changed.
+  The **committed** frozen closure report still records `all_gate_pass=true`,
+  `stage125_gate_125_0=PASS`, `stage125_completed=true` and
+  `stage126_m1_entry_ready=true` — the failed gate exists only inside the
+  runner's transient live rebuild and must not be attributed to the committed
+  artifact. Part 5's source, runner and every `project/stage125/` artifact are
+  byte-identical.
+- **Part 3 (`expanded_rule_a_company_scope_robustness`) is not authorized and
+  not started**; it requires its own separate explicit human authorization.
+  Parts 3–6 remain outstanding, so M1 robustness is **not** complete. Research
+  action pointers are unchanged (Stage126 M1 remains the active incomplete
+  research action).
+
 ## 2026-07-22 — Stage126 M1 Robustness Part 1 (target-proximity six-feature set)
 
 - **Part 1 was explicitly human-authorized and completed on the development
