@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed micro-part:** `stage126-m1-robustness-part4-expanded-rule-b`
 - **Next research action:** `stage126-m1-financial-baseline`
-- **Last stage commit:** `b8015fc61153fd53b136ef4efda042108e5665c3`
-- **Generated from commit:** `b8015fc61153fd53b136ef4efda042108e5665c3` (branch `stage126-m1-robustness-part4-expanded-rule-b`, informational)
+- **Last stage commit:** `e85fe1d4ab88440db659d338d443607df4109c3a`
+- **Generated from commit:** `e85fe1d4ab88440db659d338d443607df4109c3a` (branch `stage126-m1-robustness-part4-expanded-rule-b`, informational)
 - **Baseline:** `origin/main` @ `853a8deff5e0953ba4018e7406230fdf5ed5a3ae`
 
 ## Current-state validation
@@ -68,5 +68,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `311261de85c27ed2430a81b1c92cde513eb97b23da758b9a5fde07ab8b7ba8b2`_
-_generated_at_utc: 2026-07-24T10:31:33Z (informational)_
+_state_fingerprint: `28f1a2145d59c3b9c6f7d9754cfaefe546f155821d59ee253ee12a6167a01e34`_
+_generated_at_utc: 2026-07-24T11:49:11Z (informational)_

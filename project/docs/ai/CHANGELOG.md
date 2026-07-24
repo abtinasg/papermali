@@ -3,6 +3,40 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-24 — Stage126 Part 4 canonical runtime-provenance correction (PR #57)
+
+- **Recorded a single provenance-correction human authorization** for PR #57.
+  Exact UTF-8 text, **871 bytes**, SHA-256
+  `a39ecd3bb5d9e06c7f7e4aa253d71b5d32acad69b1bf80388e00206f87e37c44`
+  (recomputed independently, fail-closed on mismatch):
+
+  > مجوز یک‌بار اصلاح provenance محیط canonical در PR #57 را می‌دهم. این مجوز فقط برای جایگزینی ثبت نادرست Python 3.14.0 و jdatetime 5.3.0 با مقادیر canonical یعنی Python 3.13.5 و jdatetime 6.0.1 در metadata مربوط به Part 4 و به‌روزرسانی حداقلی artifactهای verification، hash registry و Handoff وابسته است.
+  >
+  > این مجوز بازپخش deterministic محاسبات تکمیل‌شده روی development folds را فقط در جریان اصلاح و verification همین PR مجاز می‌کند، اما هیچ مجوزی برای تغییر artifactهای علمی، metrics، OOF، تنظیم مدل، full-development refit، دسترسی یا ارزیابی final test، Part 5، Merge یا مرحله علمی جدید ایجاد نمی‌کند.
+
+- **Defect.** The committed Part 4 `metadata_and_hashes_…part4.json` recorded
+  the noncanonical environment (`python 3.14.0`, `jdatetime 5.3.0`) in
+  `runtime_versions`. The earlier noncanonical Python 3.14 run is **not**
+  accepted as the repository verification.
+- **Correction.** Regenerated the Part 4 package with the official runner in the
+  **canonical** environment (Python **3.13.5** / jdatetime **6.0.1**; all other
+  pins per `requirements.txt`). Deterministic development-fold replay reproduced
+  **byte-identical** scientific outputs (metrics `b217d5b2…`, OOF `e1ef3b3a…`,
+  QC, primary comparison, sample delta, execution/feature manifests, completion
+  lock, authorization record, README). Only the metadata provenance stamp
+  changed: `runtime_versions.python` 3.14.0 → 3.13.5, `runtime_versions.jdatetime`
+  5.3.0 → 6.0.1. The transitive verification hash chain (closed-part registry
+  Part 4 hash pin, current-state report, validator metadata) was updated by the
+  official current-state validator build; Parts 1–3 registry entries remain
+  byte-identical.
+- **Scope.** Provenance and transitive verification hashes only — no scientific
+  artifact, metric, OOF, source, runner, test, `pytest.ini` or environment file
+  changed; no tuning, full-development refit, final-test access/evaluation,
+  calibration/bootstrap/Holm/winner selection, SMOTE/SMOTENC/SHAP, Part 5,
+  Part 6, Merge or new scientific stage. Deterministic model replay did occur on
+  the completed development folds; this is not a zero-fit operation. The
+  authorization is consumed and creates no standing authorization.
+
 ## 2026-07-24 — Stage126 M1 Robustness Part 4 (expanded Rule B combined sample)
 
 - **Part 4 was explicitly human-authorized and completed on the development

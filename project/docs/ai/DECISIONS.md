@@ -180,6 +180,43 @@ validator remains the sole current-state validation surface.
   used as a gate. The independent current-state validator recognized Part 3
   generically with no source change.
 
+### Stage126 M1 robustness Part 4 — canonical provenance correction (2026-07-24)
+
+- **A single provenance-correction human authorization was recorded** for
+  PR #57. Exact UTF-8 text (871 bytes; SHA-256
+  `a39ecd3bb5d9e06c7f7e4aa253d71b5d32acad69b1bf80388e00206f87e37c44`, recomputed
+  independently and fail-closed on mismatch):
+
+  > مجوز یک‌بار اصلاح provenance محیط canonical در PR #57 را می‌دهم. این مجوز فقط برای جایگزینی ثبت نادرست Python 3.14.0 و jdatetime 5.3.0 با مقادیر canonical یعنی Python 3.13.5 و jdatetime 6.0.1 در metadata مربوط به Part 4 و به‌روزرسانی حداقلی artifactهای verification، hash registry و Handoff وابسته است.
+  >
+  > این مجوز بازپخش deterministic محاسبات تکمیل‌شده روی development folds را فقط در جریان اصلاح و verification همین PR مجاز می‌کند، اما هیچ مجوزی برای تغییر artifactهای علمی، metrics، OOF، تنظیم مدل، full-development refit، دسترسی یا ارزیابی final test، Part 5، Merge یا مرحله علمی جدید ایجاد نمی‌کند.
+
+- **The defect.** The committed Part 4
+  `metadata_and_hashes_stage126_m1_robustness_part4.json` recorded the
+  **noncanonical** environment from an earlier session — `python 3.14.0`,
+  `jdatetime 5.3.0` — in its `runtime_versions` block. The earlier
+  noncanonical Python 3.14 run is **not** accepted as the repository
+  verification.
+- **The correction.** The Part 4 package was regenerated with the official
+  runner in the **canonical** environment (Python **3.13.5**, jdatetime
+  **6.0.1**, all other pins per `requirements.txt`). The deterministic
+  development-fold replay reproduced **byte-identical** scientific outputs
+  (metrics `b217d5b2…`, OOF `e1ef3b3a…`, QC report, primary comparison, sample
+  delta, execution manifest, feature manifest, completion lock, authorization
+  record and README). Only the metadata provenance stamp changed:
+  `runtime_versions.python` 3.14.0 → 3.13.5 and `runtime_versions.jdatetime`
+  5.3.0 → 6.0.1. The transitive verification hash chain (closed-part registry
+  Part 4 hash pin, current-state validation report, validator metadata) was
+  updated by the official current-state validator build; Part 1, Part 2 and
+  Part 3 registry entries remain byte-identical.
+- **Scope.** Provenance and transitive verification hashes only. No scientific
+  artifact, metric, OOF prediction, source, runner, test, `pytest.ini` or
+  environment file changed. No tuning, no change in selected configurations, no
+  full-development refit, no final-test access/prediction/evaluation, no
+  calibration/bootstrap/Holm/winner selection, no SMOTE/SMOTENC/SHAP, no Part 5,
+  Part 6, Merge or new scientific stage. The authorization is consumed and
+  creates no standing authorization.
+
 ### Stage126 M1 robustness Part 4 — executed (2026-07-24)
 
 - **Part 4 (`expanded_rule_b_combined_robustness`) was explicitly
