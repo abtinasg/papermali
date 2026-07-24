@@ -230,6 +230,17 @@ EXPECTED_FT_PART4_ONLY_VS_PRIMARY = 15
 EXPECTED_FT_PRIMARY_ONLY_VS_PART4 = 8
 EXPECTED_FT_NET_DELTA_VS_PRIMARY = 7
 
+# --- Frozen final-test aggregate positive counts (never row-level) --------- #
+# These come exclusively from the frozen Part 4 event-count gate. Development
+# and pooled-OOF identity differences are target-0 (verified below), but at
+# the frozen full-sample aggregate level Part 4 has one fewer positive event
+# than Part 3 and the locked primary sample; that single event is located
+# somewhere in the locked final-test partition, which is never row-level
+# inspected.
+EXPECTED_FINAL_TEST_POSITIVE_PRIMARY = 12
+EXPECTED_FINAL_TEST_POSITIVE_PART3 = 12
+EXPECTED_FINAL_TEST_POSITIVE_PART4 = 11
+
 # --------------------------------------------------------------------------- #
 # Frozen inputs (pinned; never modified)
 # --------------------------------------------------------------------------- #
@@ -1182,6 +1193,63 @@ def build_sample_delta(
         if got != want:
             raise QCFail(f"sample-delta {label} {got} != {want}")
 
+    # ------ Frozen final-test aggregate positive counts (never row-level) --- #
+    pr_ft_gate = gate[(PRIMARY_SAMPLE, "final_test")]
+    p3_ft_gate = gate[(PART3_CATEGORY_ID, "final_test")]
+    p4_ft_gate = gate[(PART4_SAMPLE, "final_test")]
+    final_test_positive_exact = [
+        (pr_ft_gate["positive"], EXPECTED_FINAL_TEST_POSITIVE_PRIMARY,
+         "final_test_positive_primary"),
+        (p3_ft_gate["positive"], EXPECTED_FINAL_TEST_POSITIVE_PART3,
+         "final_test_positive_part3"),
+        (p4_ft_gate["positive"], EXPECTED_FINAL_TEST_POSITIVE_PART4,
+         "final_test_positive_part4"),
+    ]
+    for got, want, label in final_test_positive_exact:
+        if got != want:
+            raise QCFail(f"frozen final-test positive count {label} {got} != {want}")
+    if (p4_ft_gate["positive"] - p3_ft_gate["positive"]) != -1:
+        raise QCFail("final-test aggregate positive delta vs Part3 != -1")
+    if (p4_ft_gate["positive"] - pr_ft_gate["positive"]) != -1:
+        raise QCFail("final-test aggregate positive delta vs primary != -1")
+
+    # -- Development/OOF conservation proofs (target-0 differences) ---------- #
+    # dev_removed_vs_p3, oof_removed_vs_p3, dev_pr_only_p4 and oof_pr_only_p4
+    # are keys that belong to Part 3 or primary but NOT to Part 4, so they are
+    # absent from `dev_rows` (which only holds Part 4's own loaded targets) and
+    # can never be row-level inspected here. Target-0 for those rows is proven
+    # instead by aggregate positive-count conservation against the already
+    # established strict-subset/strict-superset identity facts above (no row
+    # is added on the Part-3 side, and Part4-only-vs-primary rows are already
+    # verified target-0 above) — never by reading a row-level value.
+    if p3_dev["positive"] != p4_dev["positive"]:
+        raise QCFail(
+            "Part4-vs-Part3 development positive counts differ in aggregate "
+            "(fail-closed conservation check)"
+        )
+    p3_oof_positive = (
+        gate[(PART3_CATEGORY_ID, "fold1_validation")]["positive"]
+        + gate[(PART3_CATEGORY_ID, "fold2_validation")]["positive"]
+    )
+    p4_oof_positive = (
+        gate[(PART4_SAMPLE, "fold1_validation")]["positive"]
+        + gate[(PART4_SAMPLE, "fold2_validation")]["positive"]
+    )
+    if p3_oof_positive != p4_oof_positive:
+        raise QCFail("Part4-vs-Part3 OOF positive counts differ in aggregate")
+
+    if pr_dev["positive"] != p4_dev["positive"]:
+        raise QCFail(
+            "Part4-vs-primary development positive counts differ in aggregate "
+            "(fail-closed conservation check)"
+        )
+    pr_oof_positive = (
+        gate[(PRIMARY_SAMPLE, "fold1_validation")]["positive"]
+        + gate[(PRIMARY_SAMPLE, "fold2_validation")]["positive"]
+    )
+    if pr_oof_positive != p4_oof_positive:
+        raise QCFail("Part4-vs-primary OOF positive counts differ in aggregate")
+
     # ------------------------------ Row emission ----------------------------- #
     union_keys = keys_pr | keys_p2 | keys_p3 | keys_p4
     rows: list[dict[str, Any]] = []
@@ -1445,6 +1513,36 @@ def build_primary_comparison(
     primary_pooled = _pooled_pr_auc_from_metrics_csv(
         repo_root / PRIMARY_METRICS_REL
     )
+
+    # Frozen full-sample and final-test aggregate positive counts (never
+    # row-level). These distinguish the always-target-0 development/OOF
+    # identity differences from the full-sample/final-test aggregate level,
+    # where Part 4 has one fewer positive event than Part 3 and primary.
+    gate = part2.read_frozen_event_counts(repo_root)
+    pr_all_ag = gate[(PRIMARY_SAMPLE, "all")]
+    p3_all_ag = gate[(PART3_CATEGORY_ID, "all")]
+    p4_all_ag = gate[(PART4_SAMPLE, "all")]
+    pr_ft_ag = gate[(PRIMARY_SAMPLE, "final_test")]
+    p3_ft_ag = gate[(PART3_CATEGORY_ID, "final_test")]
+    p4_ft_ag = gate[(PART4_SAMPLE, "final_test")]
+    full_sample_positive_delta_vs_part3 = p4_all_ag["positive"] - p3_all_ag["positive"]
+    full_sample_positive_delta_vs_primary = (
+        p4_all_ag["positive"] - pr_all_ag["positive"]
+    )
+    if full_sample_positive_delta_vs_part3 != EXPECTED_POSITIVE_DELTA_VS_PART3:
+        raise QCFail("full-sample positive delta vs Part3 != -1 (fail-closed)")
+    if full_sample_positive_delta_vs_primary != EXPECTED_POSITIVE_DELTA_VS_PRIMARY:
+        raise QCFail("full-sample positive delta vs primary != -1 (fail-closed)")
+    for got, want, label in (
+        (pr_ft_ag["positive"], EXPECTED_FINAL_TEST_POSITIVE_PRIMARY,
+         "final_test_positive_primary"),
+        (p3_ft_ag["positive"], EXPECTED_FINAL_TEST_POSITIVE_PART3,
+         "final_test_positive_part3"),
+        (p4_ft_ag["positive"], EXPECTED_FINAL_TEST_POSITIVE_PART4,
+         "final_test_positive_part4"),
+    ):
+        if got != want:
+            raise QCFail(f"frozen final-test positive count {label} {got} != {want}")
     for family, locked in LOCKED_PRIMARY_POOLED_PR_AUC.items():
         if abs(primary_pooled[family] - locked) > 1e-12:
             raise QCFail(
@@ -1529,18 +1627,34 @@ def build_primary_comparison(
         "part4_observed_ordering": list(part4_order),
         "primary_ordering_preserved": ordering_preserved,
         "combined_sample_materially_changes_interpretation": False,
+        "development_and_oof_identity_differences_negative_only": True,
+        "full_sample_identity_differences_all_negative_only": False,
+        "full_sample_positive_delta_vs_part3": full_sample_positive_delta_vs_part3,
+        "full_sample_positive_delta_vs_primary":
+            full_sample_positive_delta_vs_primary,
+        "final_test_positive_count_primary": pr_ft_ag["positive"],
+        "final_test_positive_count_part3": p3_ft_ag["positive"],
+        "final_test_positive_count_part4": p4_ft_ag["positive"],
+        "final_test_row_level_targets_inspected": False,
         "interpretation": (
             "Development-only sample sensitivity. The Rule-B combined sample is "
             "a strict subset of the Part 3 expanded scope and a strict superset "
             "of the Part 2 listing-Rule-B sample; relative to the locked "
             "primary sample it neither contains nor is contained by it. All "
-            "identity differences versus primary, Part 2 and Part 3 involve "
-            "only negative-target rows, so pooled PR-AUC shifts here mainly "
-            "reflect a slightly different event rate and company scope rather "
-            "than a change in discrimination. The comparison is reported "
-            "descriptively and cautiously: it does not replace the primary "
-            "results, does not alter the locked primary ordering used for "
-            "confirmatory interpretation, does not constitute a new "
+            "development-fold and pooled-OOF identity differences relevant to "
+            "the Part 4 predictive comparison are target-0 observations. At the "
+            "frozen full-sample aggregate level, however, Part 4 has one fewer "
+            "positive event than Part 3 and the locked primary sample "
+            f"({full_sample_positive_delta_vs_part3}); the corresponding "
+            f"final-test aggregate count is {p4_ft_ag['positive']} versus "
+            f"{p3_ft_ag['positive']} (Part 3) and {pr_ft_ag['positive']} "
+            "(primary). No row-level final-test target was accessed. Because "
+            "the pooled development-OOF ordering is preserved and the PR-AUC "
+            "changes remain small, the combined sample does not materially "
+            "change the development-only interpretation. The comparison is "
+            "reported descriptively and cautiously: it does not replace the "
+            "primary results, does not alter the locked primary ordering used "
+            "for confirmatory interpretation, does not constitute a new "
             "confirmatory model comparison and selects no paper winner."
         ),
         "descriptive_part2_comparison": {
@@ -1781,8 +1895,15 @@ def build_readme(
         "",
         "Part 4 is a **strict subset** of Part 3 "
         f"({vs3['part3_only_rows']} Part3-only rows, "
-        f"{vs3['part4_only_rows']} Part4-only rows); every removed row is "
-        "negative.",
+        f"{vs3['part4_only_rows']} Part4-only rows). Development-fold and "
+        "pooled-OOF removed rows are target-0 (verified by conservation "
+        "against the frozen development/OOF aggregate counts). At the frozen "
+        f"full-sample aggregate level Part 4 has one fewer positive event "
+        f"than Part 3 ({vs3['positive_delta']}); the frozen final-test "
+        f"aggregate count is **{EXPECTED_FINAL_TEST_POSITIVE_PART4}** versus "
+        f"**{EXPECTED_FINAL_TEST_POSITIVE_PART3}**. No row-level final-test "
+        "target was read — this single-event difference is never attributed "
+        "to an identified row.",
         "",
         "## Sample delta C — versus the locked primary Rule A sample (mixed; "
         "neither sub- nor super-set)",
@@ -1805,10 +1926,16 @@ def build_readme(
         f"{EXPECTED_FINAL_TEST_IDENTITIES} | +{vspr['final_test_net_delta']} |",
         "",
         f"Part4-only rows: **{vspr['part4_only_rows']}**; primary-only rows: "
-        f"**{vspr['primary_only_rows']}**. Every identity difference on both "
-        "sides is negative-only. Final-test rows contribute identities and "
-        f"counts only — no row-level final-test value was read. Detail: "
-        f"`{F_SAMPLE_DELTA}`.",
+        f"**{vspr['primary_only_rows']}**. Development-fold and pooled-OOF "
+        "identity differences on both sides are target-0 (verified by "
+        "conservation against the frozen development/OOF aggregate counts). "
+        "At the frozen full-sample aggregate level Part 4 has one fewer "
+        f"positive event than the locked primary sample "
+        f"({vspr['positive_delta']}); the frozen final-test aggregate count "
+        f"is **{EXPECTED_FINAL_TEST_POSITIVE_PART4}** versus "
+        f"**{EXPECTED_FINAL_TEST_POSITIVE_PRIMARY}**. Final-test rows "
+        "contribute identities and counts only — no row-level final-test "
+        f"value was read. Detail: `{F_SAMPLE_DELTA}`.",
         "",
         "## Development results (sample sensitivity only)",
         "",
@@ -1896,6 +2023,11 @@ def build_readme(
         "- Final-test metrics computed: **0**",
         "- Final-test evaluations: **0**",
         "- Full-development refits: **0**",
+        "- Frozen final-test aggregate positive events (via the frozen gate "
+        f"only; no row-level target inspected): primary "
+        f"**{EXPECTED_FINAL_TEST_POSITIVE_PRIMARY}**, Part 3 "
+        f"**{EXPECTED_FINAL_TEST_POSITIVE_PART3}**, Part 4 "
+        f"**{EXPECTED_FINAL_TEST_POSITIVE_PART4}**",
         "",
         "## Validation architecture",
         "",
@@ -2248,6 +2380,51 @@ def build_qc_assertions(
         sum(1 for r in delta_rows
             if r["present_in_expanded_rule_b_combined_robustness"] == "true")
         == EXPECTED_ROWS)
+
+    # ------------ Corrected scope: development/OOF vs full-sample ----------- #
+    # These assertions distinguish the always-target-0 development-fold and
+    # pooled-OOF identity differences from the full-sample/final-test
+    # aggregate level, where Part 4 has exactly one fewer positive event than
+    # Part 3 and the locked primary sample. No row-level final-test target is
+    # ever read to establish this; only the frozen aggregate gate is used.
+    add("part4_vs_part2_development_added_target_zero",
+        delta_summary["vs_part2"]["development_added_all_negative"] is True)
+    add("part4_vs_part2_oof_added_target_zero",
+        delta_summary["vs_part2"]["oof_identities_added_all_target_zero"]
+        is True)
+    add("part4_vs_part3_development_removed_target_zero",
+        delta_summary["vs_part3"]["development_removed_all_negative"] is True)
+    add("part4_vs_part3_oof_removed_target_zero",
+        delta_summary["vs_part3"]["oof_identities_removed"]
+        == EXPECTED_OOF_IDENTITY_DELTA_VS_PART3 * -1)
+    add("part4_vs_primary_development_differences_target_zero",
+        delta_summary["vs_primary"]["development_differences_all_target_zero"]
+        is True)
+    add("part4_vs_primary_oof_differences_target_zero",
+        delta_summary["vs_primary"]["oof_differences_all_target_zero"] is True)
+    add("full_sample_positive_delta_vs_part3_is_negative_one",
+        comparison["full_sample_positive_delta_vs_part3"] == -1
+        == EXPECTED_POSITIVE_DELTA_VS_PART3)
+    add("full_sample_positive_delta_vs_primary_is_negative_one",
+        comparison["full_sample_positive_delta_vs_primary"] == -1
+        == EXPECTED_POSITIVE_DELTA_VS_PRIMARY)
+    add("final_test_positive_counts_frozen_12_12_11",
+        comparison["final_test_positive_count_primary"]
+        == EXPECTED_FINAL_TEST_POSITIVE_PRIMARY == 12
+        and comparison["final_test_positive_count_part3"]
+        == EXPECTED_FINAL_TEST_POSITIVE_PART3 == 12
+        and comparison["final_test_positive_count_part4"]
+        == EXPECTED_FINAL_TEST_POSITIVE_PART4 == 11)
+    add("final_test_row_level_targets_never_inspected",
+        comparison["final_test_row_level_targets_inspected"] is False
+        and loaded["final_test_predictor_rows_loaded"] == 0
+        and loaded["final_test_target_rows_loaded"] == 0)
+    add("development_and_oof_negative_only_flag_true",
+        comparison["development_and_oof_identity_differences_negative_only"]
+        is True)
+    add("full_sample_negative_only_flag_correctly_false",
+        comparison["full_sample_identity_differences_all_negative_only"]
+        is False)
 
     # ---------------------------- Immutability ------------------------------- #
     add("primary_stage126_artifacts_byte_identical",

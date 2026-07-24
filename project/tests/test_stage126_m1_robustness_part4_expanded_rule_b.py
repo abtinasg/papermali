@@ -608,6 +608,109 @@ def test_interpretation_guards():
     assert cmp_["full_development_refit_authorized"] is False
 
 
+def test_comparison_corrected_aggregate_fields():
+    """The corrected comparison artifact must distinguish development/OOF
+    (always target-0) from the full-sample/final-test aggregate level (where
+    Part 4 has exactly one fewer positive event than Part 3 and primary)."""
+    cmp_ = _read_json(p4.F_COMPARISON)
+    assert cmp_["development_and_oof_identity_differences_negative_only"] is True
+    assert cmp_["full_sample_identity_differences_all_negative_only"] is False
+    assert cmp_["full_sample_positive_delta_vs_part3"] == -1
+    assert cmp_["full_sample_positive_delta_vs_primary"] == -1
+    assert cmp_["final_test_positive_count_primary"] == 12
+    assert cmp_["final_test_positive_count_part3"] == 12
+    assert cmp_["final_test_positive_count_part4"] == 11
+    assert cmp_["final_test_row_level_targets_inspected"] is False
+
+
+def test_qc_new_structured_assertions_present_and_pass():
+    qc = _read_json(p4.F_QC)
+    names = {a["name"]: a["status"] for a in qc["assertions"]}
+    required = (
+        "part4_vs_part2_development_added_target_zero",
+        "part4_vs_part2_oof_added_target_zero",
+        "part4_vs_part3_development_removed_target_zero",
+        "part4_vs_part3_oof_removed_target_zero",
+        "part4_vs_primary_development_differences_target_zero",
+        "part4_vs_primary_oof_differences_target_zero",
+        "full_sample_positive_delta_vs_part3_is_negative_one",
+        "full_sample_positive_delta_vs_primary_is_negative_one",
+        "final_test_positive_counts_frozen_12_12_11",
+        "final_test_row_level_targets_never_inspected",
+        "development_and_oof_negative_only_flag_true",
+        "full_sample_negative_only_flag_correctly_false",
+    )
+    for name in required:
+        assert name in names, name
+        assert names[name] == "PASS", name
+
+
+_BANNED_OVERBROAD_PHRASES = (
+    "every identity difference",
+    "all identity differences involve only negative-target rows",
+    "all sample differences are negative-only",
+)
+
+
+def _artifact_prose_texts() -> dict[str, str]:
+    """Human-authored prose only (README + the JSON 'interpretation'/'note'
+    strings) — excludes machine-readable JSON key names, which legitimately
+    contain tokens like '..._negative_only' as boolean-flag identifiers."""
+    cmp_ = _read_json(p4.F_COMPARISON)
+    prose = [
+        cmp_["interpretation"],
+        cmp_["descriptive_part2_comparison"]["note"],
+        cmp_["descriptive_part3_comparison"]["note"],
+    ]
+    return {
+        p4.F_README: open(
+            os.path.join(STAGE126, p4.F_README), encoding="utf-8"
+        ).read(),
+        p4.F_COMPARISON: "\n".join(prose),
+    }
+
+
+def test_no_overbroad_negative_only_claims_in_artifacts():
+    """Fails closed if a generated artifact again claims that every identity
+    difference (or every sample difference) across all three comparisons is
+    negative-only — the frozen aggregate contracts make that claim false at
+    the full-sample and final-test level (Part 4 has one fewer positive event
+    than Part 3 and primary)."""
+    for name, text in _artifact_prose_texts().items():
+        lowered = text.lower()
+        for phrase in _BANNED_OVERBROAD_PHRASES:
+            assert phrase not in lowered, f"{name} contains banned phrase: {phrase!r}"
+
+
+def _find_all(haystack: str, needle: str) -> list[int]:
+    positions = []
+    start = 0
+    while True:
+        start = haystack.find(needle, start)
+        if start == -1:
+            return positions
+        positions.append(start)
+        start += len(needle)
+
+
+def test_negative_only_mentions_are_scoped():
+    """Every remaining 'negative-only' / 'negative_only' prose mention must be
+    scoped to development, OOF/validation, or the Part 2 strict-superset
+    aggregate relationship — never to the unscoped full-sample or final-test
+    comparisons versus Part 3 or primary."""
+    allowed_scope_markers = (
+        "development", "oof", "fold", "part 2", "part2", "superset",
+    )
+    for name, text in _artifact_prose_texts().items():
+        lowered = text.lower()
+        for needle in ("negative-only", "negative_only"):
+            for idx in _find_all(lowered, needle):
+                window = lowered[max(0, idx - 200):idx + 200]
+                assert any(m in window for m in allowed_scope_markers), (
+                    f"{name}: unscoped {needle!r} mention: ...{window}..."
+                )
+
+
 def test_completion_lock_contract():
     lock = _read_json(p4.F_COMPLETION_LOCK)
     assert lock["category_id"] == "expanded_rule_b_combined_robustness"
