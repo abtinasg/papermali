@@ -33,14 +33,14 @@ PYTHONPATH=project python -m pytest project/tests -q
 
 | field | value |
 |---|---|
-| completed parts | 3 |
-| completed categories | `m1_target_proximity_six_feature_set`, `main_rule_b_listing_robustness`, `expanded_rule_a_company_scope_robustness` |
-| next category | `expanded_rule_b_combined_robustness` |
+| completed parts | 4 |
+| completed categories | `m1_target_proximity_six_feature_set`, `main_rule_b_listing_robustness`, `expanded_rule_a_company_scope_robustness`, `expanded_rule_b_combined_robustness` |
+| next category | `persistent_loss_robustness_target` |
 | next category authorized | false |
 | M1 robustness completed | false |
 | full-development refit performed | false |
 | final test unlocked | false |
-| last completed micro-part | `stage126-m1-robustness-part3-expanded-rule-a` |
+| last completed micro-part | `stage126-m1-robustness-part4-expanded-rule-b` |
 | active workstream | `stage126_m1_financial_baseline` |
 | next research action | `stage126-m1-financial-baseline` |
 

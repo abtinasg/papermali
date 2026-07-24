@@ -180,6 +180,98 @@ validator remains the sole current-state validation surface.
   used as a gate. The independent current-state validator recognized Part 3
   generically with no source change.
 
+### Stage126 M1 robustness Part 4 — canonical provenance correction (2026-07-24)
+
+- **A single provenance-correction human authorization was recorded** for
+  PR #57. Exact UTF-8 text (871 bytes; SHA-256
+  `a39ecd3bb5d9e06c7f7e4aa253d71b5d32acad69b1bf80388e00206f87e37c44`, recomputed
+  independently and fail-closed on mismatch):
+
+  > مجوز یک‌بار اصلاح provenance محیط canonical در PR #57 را می‌دهم. این مجوز فقط برای جایگزینی ثبت نادرست Python 3.14.0 و jdatetime 5.3.0 با مقادیر canonical یعنی Python 3.13.5 و jdatetime 6.0.1 در metadata مربوط به Part 4 و به‌روزرسانی حداقلی artifactهای verification، hash registry و Handoff وابسته است.
+  >
+  > این مجوز بازپخش deterministic محاسبات تکمیل‌شده روی development folds را فقط در جریان اصلاح و verification همین PR مجاز می‌کند، اما هیچ مجوزی برای تغییر artifactهای علمی، metrics، OOF، تنظیم مدل، full-development refit، دسترسی یا ارزیابی final test، Part 5، Merge یا مرحله علمی جدید ایجاد نمی‌کند.
+
+- **The defect.** The committed Part 4
+  `metadata_and_hashes_stage126_m1_robustness_part4.json` recorded the
+  **noncanonical** environment from an earlier session — `python 3.14.0`,
+  `jdatetime 5.3.0` — in its `runtime_versions` block. The earlier
+  noncanonical Python 3.14 run is **not** accepted as the repository
+  verification.
+- **The correction.** The Part 4 package was regenerated with the official
+  runner in the **canonical** environment (Python **3.13.5**, jdatetime
+  **6.0.1**, all other pins per `requirements.txt`). The deterministic
+  development-fold replay reproduced **byte-identical** scientific outputs
+  (metrics `b217d5b2…`, OOF `e1ef3b3a…`, QC report, primary comparison, sample
+  delta, execution manifest, feature manifest, completion lock, authorization
+  record and README). Only the metadata provenance stamp changed:
+  `runtime_versions.python` 3.14.0 → 3.13.5 and `runtime_versions.jdatetime`
+  5.3.0 → 6.0.1. The transitive verification hash chain (closed-part registry
+  Part 4 hash pin, current-state validation report, validator metadata) was
+  updated by the official current-state validator build; Part 1, Part 2 and
+  Part 3 registry entries remain byte-identical.
+- **Scope.** Provenance and transitive verification hashes only. No scientific
+  artifact, metric, OOF prediction, source, runner, test, `pytest.ini` or
+  environment file changed. No tuning, no change in selected configurations, no
+  full-development refit, no final-test access/prediction/evaluation, no
+  calibration/bootstrap/Holm/winner selection, no SMOTE/SMOTENC/SHAP, no Part 5,
+  Part 6, Merge or new scientific stage. The authorization is consumed and
+  creates no standing authorization.
+
+### Stage126 M1 robustness Part 4 — executed (2026-07-24)
+
+- **Part 4 (`expanded_rule_b_combined_robustness`) was explicitly
+  human-authorized and completed on the development folds only.** The
+  authorization text is 418 UTF-8 bytes and hashes to
+  `e40852d9e2a78cc6d9b3079379abd0fed8f4921b65bec00ecf58d5aad78fd1b4`; it is
+  consumed by this execution and grants no standing authorization, no merge, no
+  Part 5, no refit, no final-test access or evaluation, no calibration,
+  threshold optimization, bootstrap, Holm correction, p-values or winner
+  selection, and no SMOTE/SMOTENC/SHAP/M2/M3/M4.
+- **Only the combined Rule B sample changed:** 1035 analysis-ready rows across
+  122 companies (79 positive / 956 negative), 682 development rows (68 / 614),
+  fold roles 250 / 211 / 461 / 221. Target, feature definitions and order,
+  preprocessing, missingness-indicator logic, selected configurations, model
+  families, folds, seeds, metrics and class weighting all unchanged.
+- **No retuning** (0 tuning searches; exactly 22 fits / 22 predictions). **No
+  full-development refit.** XGBoost class weights recomputed per training fold
+  (217/33, 403/58) — never from validation rows and never reused from any
+  other sample.
+- **The final test remained locked.** 353 final-test identities were counted
+  only through the frozen temporal split contract; zero predictor rows, zero
+  target rows, zero predictions and zero metrics.
+- **Three independently recomputed sample-delta comparisons, identities
+  only:** versus Part 2 (main Rule B) Part 4 is a strict superset (42
+  Part4-only rows, 0 Part2-only; development and OOF additions are all
+  target-0, and the full-sample positive delta is 0); versus Part 3 (expanded
+  Rule A) Part 4 is a strict subset (21 Part3-only rows, 0 Part4-only;
+  development and OOF removals are all target-0, but the full-sample
+  aggregate has one fewer positive event, located in the locked final-test
+  partition — frozen final-test positive counts 11 (Part 4) vs 12 (Part 3), no
+  row-level final-test target accessed); versus the locked primary sample the
+  relationship is neither a subset nor a superset (42 Part4-only, 19
+  primary-only, net +23 rows; development and OOF differences are all
+  target-0, but the full-sample aggregate again has one fewer positive event
+  than primary — frozen final-test positive counts 11 vs 12, no row-level
+  final-test target accessed).
+- **Development-only sample-sensitivity evidence.** Pooled PR-AUC: Logistic
+  0.444983882478 (−0.17%), RF 0.396418788419 (−1.50%), XGBoost
+  0.355210803326 (−0.37%). **The locked primary ordering
+  Logistic > RF > XGBoost is preserved**; development-fold and pooled-OOF
+  identity differences versus primary, Part 2 and Part 3 are all target-0,
+  and because the full-sample/final-test aggregate shifts are small (one
+  fewer positive event, never row-level attributed) the combined sample does
+  not materially change interpretation. Primary results were not replaced,
+  the primary ordering lock is unchanged, no paper winner was selected and
+  this is not a new confirmatory model comparison. The Part 2 and Part 3
+  comparisons are separated and descriptive only.
+- **Part 5 (`persistent_loss_robustness_target`) is not authorized and not
+  started.** Parts 5-6 remain outstanding.
+- **Nothing closed was touched.** Parts 1, 2 and 3 packages (scientific and
+  verification), the primary Stage126 artifacts and the Stage125 tree are
+  byte-identical; Stage125 Part 5 remains historical and immutable and was not
+  used as a gate. The independent current-state validator recognized Part 4
+  generically with no source change.
+
 ### Stage126 current-state validation — generic enforcement (2026-07-23)
 
 - **No hard-coded current state.** The validator derives the completed prefix,
@@ -198,9 +290,9 @@ validator remains the sole current-state validation surface.
 - **Two QC roles are explicit:** current-state validation versus the newest
   completed scientific micro-part. Neither is described by an ambiguous
   `selected_qc` field alone.
-- **A future part changes nothing older.** An end-to-end synthetic Part 3 builds
+- **A future part changes nothing older.** An end-to-end synthetic Part 5 builds
   and checks through the real validator without modifying validator source or
-  any Part 1, Part 2 or Stage125 file.
+  any Part 1, Part 2, Part 3, Part 4 or Stage125 file.
 
 ### Stage126 validation-architecture boundary lock (2026-07-23)
 

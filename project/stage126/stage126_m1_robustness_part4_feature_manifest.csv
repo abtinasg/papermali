@@ -1,0 +1,10 @@
+feature_order,feature_name,source_column,transformation,missingness_indicator_appended,missingness_indicator_column_index,included_in_part4
+1,log_total_assets,total_assets,ln(total_assets) if total_assets > 0 else missing,true,10,true
+2,leverage_ratio,leverage_ratio,frozen_part3c_value,true,11,true
+3,current_ratio,current_ratio,frozen_part3c_value,true,12,true
+4,roa_period_adjusted,roa_period_adjusted,frozen_part3c_value,true,13,true
+5,ocf_to_assets_period_adjusted,ocf_to_assets_period_adjusted,frozen_part3c_value,true,14,true
+6,asset_turnover_period_adjusted,asset_turnover_period_adjusted,frozen_part3c_value,true,15,true
+7,operating_margin_period_adjusted,operating_margin_period_adjusted,frozen_part3c_value,true,16,true
+8,financial_expense_to_assets_period_adjusted,financial_expense_to_assets_period_adjusted,frozen_part3c_value_source_sign_preserved,true,17,true
+9,accumulated_loss_to_capital_ratio,accumulated_loss_to_capital_ratio,frozen_part3c_value,true,18,true

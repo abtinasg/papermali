@@ -280,12 +280,13 @@ def test_part_scientific_artifacts_are_immutable(pinned, label):
 
 def test_closed_part_registry_pins_both_packages():
     registry = _read_json(v.F_CLOSED_REGISTRY)
-    assert registry["closed_part_count"] == 3
+    assert registry["closed_part_count"] == 4
     assert registry["regeneration_allowed"] is False
     parts = registry["parts"]
     assert set(parts) == {
         "m1_target_proximity_six_feature_set", "main_rule_b_listing_robustness",
         "expanded_rule_a_company_scope_robustness",
+        "expanded_rule_b_combined_robustness",
     }
     for category, pinned in (
         ("m1_target_proximity_six_feature_set", PART1_SCIENTIFIC),
@@ -406,13 +407,14 @@ def test_completed_categories_and_next_category():
     assert report["completed_category_ids"] == [
         "m1_target_proximity_six_feature_set", "main_rule_b_listing_robustness",
         "expanded_rule_a_company_scope_robustness",
+        "expanded_rule_b_combined_robustness",
     ]
-    assert report["next_category_id"] == "expanded_rule_b_combined_robustness"
+    assert report["next_category_id"] == "persistent_loss_robustness_target"
     assert report["next_category_authorized"] is False
     assert report["standing_execution_authorization"] is False
     assert report["m1_robustness_completed"] is False
     assert report["last_completed_micro_part"] == (
-        "stage126-m1-robustness-part3-expanded-rule-a"
+        "stage126-m1-robustness-part4-expanded-rule-b"
     )
 
 
@@ -430,7 +432,7 @@ def test_next_part_is_unauthorized_and_absent():
     state = json.loads(
         (_root() / v.HANDOFF_STATE_REL).read_text(encoding="utf-8")
     )
-    assert state["m1_robustness_part4_authorized"] is False
+    assert state["m1_robustness_part5_authorized"] is False
     assert state["m1_robustness_execution_authorized"] is False
 
 
@@ -573,7 +575,7 @@ def test_handoff_timestamp_change_does_not_reopen_a_closed_part(tmp_path):
         (root / v.PART0_DECISION_RECORD_REL).read_text(encoding="utf-8")
     )["execution_order"]
     completed, ids = v.completed_prefix(root, order)
-    assert ids == order[:3]
+    assert ids == order[:4]
     after = {
         name: _sha(root / "project/stage126" / name) for name in PART2_SCIENTIFIC
     }
@@ -606,36 +608,36 @@ def test_new_current_test_hash_does_not_regenerate_a_closed_part(tmp_path):
 # --------------------------------------------------------------------------- #
 
 def _synthetic_next_part(root: Path) -> str:
-    """Write a COMPLETE, valid synthetic Part 3 package into a mirrored repo.
+    """Write a COMPLETE, valid synthetic Part 5 package into a mirrored repo.
 
     Mirrors the real per-part package contract exactly: authorization record,
     completion lock, the full scientific surface, QC report, metadata manifest
-    and README. Nothing here touches Part 1, Part 2 or Stage125.
+    and README. Nothing here touches Parts 1-4 or Stage125.
     """
     d = root / "project/stage126"
-    prefix = "stage126_m1_robustness_part4"
-    micro_id = "stage126-m1-robustness-part4-expanded-rule-b"
-    qc_scope = "stage126_m1_robustness_part4_expanded_rule_b"
+    prefix = "stage126_m1_robustness_part5"
+    micro_id = "stage126-m1-robustness-part5-persistent-loss"
+    qc_scope = "stage126_m1_robustness_part5_persistent_loss"
 
     (d / f"{prefix}_human_authorization_record.json").write_text(json.dumps({
-        "authorization_id": "stage126-m1-robustness-part4-human-authorization",
-        "authorized_category_id": "expanded_rule_b_combined_robustness",
-        "human_authorization_text": "synthetic part 4 authorization",
+        "authorization_id": "stage126-m1-robustness-part5-human-authorization",
+        "authorized_category_id": "persistent_loss_robustness_target",
+        "human_authorization_text": "synthetic part 5 authorization",
         "human_authorization_text_sha256": hashlib.sha256(
-            b"synthetic part 4 authorization"
+            b"synthetic part 5 authorization"
         ).hexdigest(),
-        "part4_execution_authorized": True,
+        "part5_execution_authorized": True,
         "merge_authorized": False,
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     (d / f"{prefix}_completion_lock.json").write_text(json.dumps({
-        "category_id": "expanded_rule_b_combined_robustness",
+        "category_id": "persistent_loss_robustness_target",
         "micro_part_id": micro_id,
-        "part4_human_authorized": True,
-        "part4_execution_completed": True,
+        "part5_human_authorized": True,
+        "part5_execution_completed": True,
         "authorization_consumed": True,
         "development_only": True,
-        "part5_execution_authorized": False,
+        "part6_execution_authorized": False,
         "m1_robustness_execution_authorized": False,
         "m1_robustness_started": True,
         "m1_robustness_completed": False,
@@ -653,14 +655,15 @@ def _synthetic_next_part(root: Path) -> str:
             "main_rule_b_listing_robustness",
             "expanded_rule_a_company_scope_robustness",
             "expanded_rule_b_combined_robustness",
+            "persistent_loss_robustness_target",
         ],
-        "next_category_id": "persistent_loss_robustness_target",
+        "next_category_id": "smote_training_fold_only_robustness",
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     payloads = {
         f"{prefix}_feature_manifest.csv": "feature_order,feature_name\n1,synthetic\n",
         f"{prefix}_execution_manifest.json": json.dumps(
-            {"category_id": "expanded_rule_b_combined_robustness"},
+            {"category_id": "persistent_loss_robustness_target"},
             indent=2, sort_keys=True) + "\n",
         f"{prefix}_oof_predictions.csv": "ticker,predicted_probability\nX,0.5\n",
         f"{prefix}_metrics.csv": "model_family,scope,pr_auc\nrf,pooled,0.4\n",
@@ -690,20 +693,20 @@ def _synthetic_next_part(root: Path) -> str:
         },
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (d / f"README_{prefix.upper()}.md").write_text(
-        "# Synthetic Part 4\n", encoding="utf-8")
+        "# Synthetic Part 5\n", encoding="utf-8")
 
     # A real part also ships source, runner and tests — the registry pins them.
-    (root / "project/src" / f"{prefix}_expanded_rule_b.py").write_text(
-        '"""Synthetic Part 4 implementation."""\n', encoding="utf-8")
-    (root / "project" / f"run_{prefix}_expanded_rule_b.py").write_text(
-        '"""Synthetic Part 4 runner."""\n', encoding="utf-8")
-    (root / "project/tests" / f"test_{prefix}_expanded_rule_b.py").write_text(
-        '"""Synthetic Part 4 tests."""\n', encoding="utf-8")
+    (root / "project/src" / f"{prefix}_persistent_loss.py").write_text(
+        '"""Synthetic Part 5 implementation."""\n', encoding="utf-8")
+    (root / "project" / f"run_{prefix}_persistent_loss.py").write_text(
+        '"""Synthetic Part 5 runner."""\n', encoding="utf-8")
+    (root / "project/tests" / f"test_{prefix}_persistent_loss.py").write_text(
+        '"""Synthetic Part 5 tests."""\n', encoding="utf-8")
     return micro_id
 
 
 def _set_handoff_to_next_part(root: Path, micro_id: str) -> None:
-    """Update the mirrored Handoff to the truthful Part 3-completed state."""
+    """Update the mirrored Handoff to the truthful Part 5-completed state."""
     path = root / v.HANDOFF_STATE_REL
     state = json.loads(path.read_text(encoding="utf-8"))
     state["last_completed_micro_part"] = micro_id
@@ -712,12 +715,13 @@ def _set_handoff_to_next_part(root: Path, micro_id: str) -> None:
         "main_rule_b_listing_robustness",
         "expanded_rule_a_company_scope_robustness",
         "expanded_rule_b_combined_robustness",
+        "persistent_loss_robustness_target",
     ]
     state["last_completed_micro_part_qc_scope"] = (
-        "stage126_m1_robustness_part4_expanded_rule_b"
+        "stage126_m1_robustness_part5_persistent_loss"
     )
     state["last_completed_micro_part_qc_path"] = (
-        "project/stage126/stage126_m1_robustness_part4_qc_report.json"
+        "project/stage126/stage126_m1_robustness_part5_qc_report.json"
     )
     state["last_completed_micro_part_qc_assertions"] = 7
     state["last_completed_micro_part_qc_failed"] = 0
@@ -729,14 +733,20 @@ def test_end_to_end_synthetic_next_part_build_and_check(tmp_path):
     """FULL validator build + check on a mirrored repo with a valid next part.
 
     Runs the real build/check code paths — no monkeypatching of any expected
-    current-state constant (they no longer exist) — and proves Part 1, Part 2
-    and Stage125 stay byte-identical.
+    current-state constant (they no longer exist) — and proves Parts 1-4 and
+    Stage125 stay byte-identical.
     """
     root = _mirror(tmp_path)
     watched = (
         [f"project/stage126/{n}" for n in
          list(PART1_SCIENTIFIC) + list(PART2_SCIENTIFIC)]
         + [rel for paths in CLOSED_VERIFICATION_ARTIFACTS.values() for rel in paths]
+        + [f"project/stage126/stage126_m1_robustness_part4_{suf}" for suf in (
+            "human_authorization_record.json", "feature_manifest.csv",
+            "sample_delta.csv", "execution_manifest.json",
+            "oof_predictions.csv", "metrics.csv", "primary_comparison.json",
+            "completion_lock.json", "qc_report.json",
+        )]
         + [v.PART5_SOURCE_REL, v.PART5_RUNNER_REL, v.PART5_TEST_REL]
         + [f"project/stage125/{p.name}"
            for p in sorted((Path(REAL_ROOT) / "project/stage125").glob("*.json"))]
@@ -759,12 +769,13 @@ def test_end_to_end_synthetic_next_part_build_and_check(tmp_path):
         "main_rule_b_listing_robustness",
         "expanded_rule_a_company_scope_robustness",
         "expanded_rule_b_combined_robustness",
+        "persistent_loss_robustness_target",
     ]
-    assert report["completed_part_count"] == 4
-    assert report["next_category_id"] == "persistent_loss_robustness_target"
+    assert report["completed_part_count"] == 5
+    assert report["next_category_id"] == "smote_training_fold_only_robustness"
     assert report["last_completed_micro_part"] == micro_id
     assert report["last_completed_micro_part_qc_scope"] == (
-        "stage126_m1_robustness_part4_expanded_rule_b"
+        "stage126_m1_robustness_part5_persistent_loss"
     )
     assert report["last_completed_micro_part_qc_assertions"] == 7
     assert set(report["closed_part_registry"]["parts"]) == {
@@ -772,6 +783,7 @@ def test_end_to_end_synthetic_next_part_build_and_check(tmp_path):
         "main_rule_b_listing_robustness",
         "expanded_rule_a_company_scope_robustness",
         "expanded_rule_b_combined_robustness",
+        "persistent_loss_robustness_target",
     }
 
     after = {rel: _sha(root / rel) for rel in watched}
@@ -821,18 +833,18 @@ def test_skipped_category_fails_closed(tmp_path):
 def test_half_present_part_package_fails_closed(tmp_path):
     root = _mirror(tmp_path)
     (root / "project/stage126"
-     / "stage126_m1_robustness_part4_completion_lock.json").write_text(
-        json.dumps({"category_id": "expanded_rule_b_combined_robustness"}),
+     / "stage126_m1_robustness_part5_completion_lock.json").write_text(
+        json.dumps({"category_id": "persistent_loss_robustness_target"}),
         encoding="utf-8",
     )
     with pytest.raises(v.ValidationFail):
-        v.discover_part(root, 4, "expanded_rule_b_combined_robustness")
+        v.discover_part(root, 5, "persistent_loss_robustness_target")
 
 
 def test_unauthorized_future_artifact_fails_closed(tmp_path):
     root = _mirror(tmp_path)
     (root / "project/stage126"
-     / "stage126_m1_robustness_part4_oof_predictions.csv").write_text(
+     / "stage126_m1_robustness_part5_oof_predictions.csv").write_text(
         "a,b\n1,2\n", encoding="utf-8",
     )
     order = json.loads(

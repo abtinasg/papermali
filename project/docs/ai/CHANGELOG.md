@@ -3,6 +3,96 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-24 — Stage126 Part 4 canonical runtime-provenance correction (PR #57)
+
+- **Recorded a single provenance-correction human authorization** for PR #57.
+  Exact UTF-8 text, **871 bytes**, SHA-256
+  `a39ecd3bb5d9e06c7f7e4aa253d71b5d32acad69b1bf80388e00206f87e37c44`
+  (recomputed independently, fail-closed on mismatch):
+
+  > مجوز یک‌بار اصلاح provenance محیط canonical در PR #57 را می‌دهم. این مجوز فقط برای جایگزینی ثبت نادرست Python 3.14.0 و jdatetime 5.3.0 با مقادیر canonical یعنی Python 3.13.5 و jdatetime 6.0.1 در metadata مربوط به Part 4 و به‌روزرسانی حداقلی artifactهای verification، hash registry و Handoff وابسته است.
+  >
+  > این مجوز بازپخش deterministic محاسبات تکمیل‌شده روی development folds را فقط در جریان اصلاح و verification همین PR مجاز می‌کند، اما هیچ مجوزی برای تغییر artifactهای علمی، metrics، OOF، تنظیم مدل، full-development refit، دسترسی یا ارزیابی final test، Part 5، Merge یا مرحله علمی جدید ایجاد نمی‌کند.
+
+- **Defect.** The committed Part 4 `metadata_and_hashes_…part4.json` recorded
+  the noncanonical environment (`python 3.14.0`, `jdatetime 5.3.0`) in
+  `runtime_versions`. The earlier noncanonical Python 3.14 run is **not**
+  accepted as the repository verification.
+- **Correction.** Regenerated the Part 4 package with the official runner in the
+  **canonical** environment (Python **3.13.5** / jdatetime **6.0.1**; all other
+  pins per `requirements.txt`). Deterministic development-fold replay reproduced
+  **byte-identical** scientific outputs (metrics `b217d5b2…`, OOF `e1ef3b3a…`,
+  QC, primary comparison, sample delta, execution/feature manifests, completion
+  lock, authorization record, README). Only the metadata provenance stamp
+  changed: `runtime_versions.python` 3.14.0 → 3.13.5, `runtime_versions.jdatetime`
+  5.3.0 → 6.0.1. The transitive verification hash chain (closed-part registry
+  Part 4 hash pin, current-state report, validator metadata) was updated by the
+  official current-state validator build; Parts 1–3 registry entries remain
+  byte-identical.
+- **Scope.** Provenance and transitive verification hashes only — no scientific
+  artifact, metric, OOF, source, runner, test, `pytest.ini` or environment file
+  changed; no tuning, full-development refit, final-test access/evaluation,
+  calibration/bootstrap/Holm/winner selection, SMOTE/SMOTENC/SHAP, Part 5,
+  Part 6, Merge or new scientific stage. Deterministic model replay did occur on
+  the completed development folds; this is not a zero-fit operation. The
+  authorization is consumed and creates no standing authorization.
+
+## 2026-07-24 — Stage126 M1 Robustness Part 4 (expanded Rule B combined sample)
+
+- **Part 4 was explicitly human-authorized and completed on the development
+  folds.** Authorization text is 418 UTF-8 bytes, SHA-256
+  `e40852d9e2a78cc6d9b3079379abd0fed8f4921b65bec00ecf58d5aad78fd1b4`,
+  recomputed before execution. Executed the fourth registered robustness
+  category `expanded_rule_b_combined_robustness` from base `main`
+  `853a8deff5e0953ba4018e7406230fdf5ed5a3ae`.
+- **Only the combined sample changed** — to
+  `analysis_ready_expanded_rule_b_stage125.csv`
+  (SHA-256 `2e61a282165ccdaef37bac61a460c83878f2ae633b10535945cc33897d3b4c22`).
+  Target, the nine-feature `M1_PRIMARY_FEATURE_ORDER` set, preprocessing and
+  missingness-indicator logic (18 model-matrix columns), the three selected
+  configurations, the model families, the temporal folds, the seeds, the
+  metric list, the top-10% rule and the class-weighting policy were all held
+  fixed.
+- **Counts.** Analysis-ready 1035 rows / 122 companies / 79 positive / 956
+  negative / 0 missing target. Development 682 (68 / 614); fold roles 250 /
+  211 / 461 / 221. OOF 1296 rows (432 per family); 9 metric rows. 22 model
+  fits, 22 predictions, 0 tuning searches. XGBoost `scale_pos_weight`
+  recomputed per training fold: fold1 217/33, fold2 403/58.
+- **Final test locked.** 353 identities counted only through the frozen
+  temporal split contract; 0 predictor rows, 0 target rows, 0 predictions, 0
+  metrics, 0 evaluations. No full-development refit. No calibration,
+  threshold optimization, bootstrap, Holm correction, p-values, SMOTE,
+  SMOTENC or SHAP.
+- **Three independent identity-only sample-delta audits.** Versus Part 2
+  (main Rule B): Part 4 is a strict superset (+42 rows, 0 Part2-only, +5
+  companies, +0 positive, +42 negative; development and OOF additions are all
+  target-0). Versus Part 3 (expanded Rule A): Part 4 is a strict subset (−21
+  rows, 0 Part4-only, −2 companies, −1 positive, −20 negative; development and
+  OOF removals are target-0, but the full-sample aggregate has one fewer
+  positive event, located in the locked final-test partition — frozen
+  final-test positive counts 11 (Part 4) vs 12 (Part 3), no row-level
+  final-test target accessed). Versus the locked primary Rule A sample:
+  neither a subset nor a superset (42 Part4-only rows, 19 primary-only rows,
+  net +23 rows, +3 companies, −1 positive, +24 negative; development and OOF
+  differences are target-0, but the full-sample aggregate again has one fewer
+  positive event than primary — frozen final-test positive counts 11 vs 12,
+  no row-level final-test target accessed).
+- **Pooled development-OOF PR-AUC:** Logistic 0.444983882478 (−0.17%), RF
+  0.396418788419 (−1.50%), XGBoost 0.355210803326 (−0.37%). The locked
+  primary ordering Logistic > RF > XGBoost is preserved; development-fold and
+  pooled-OOF identity differences versus primary, Part 2 and Part 3 are all
+  target-0, and because the full-sample/final-test aggregate shifts are small
+  (one fewer positive event, never row-level attributed), the combined sample
+  does not materially change interpretation. Primary results were not
+  replaced, the primary ordering lock is unchanged and no paper winner was
+  selected.
+- **The closed-part registry retains the Part 1, Part 2 and Part 3 entries
+  byte-for-byte** and appends Part 4 (`closed_part_count = 4`,
+  `regeneration_allowed = false`). The boundary decision record and the
+  historical Stage125 manifest are byte-identical. No Part 1, Part 2, Part 3
+  or Stage125 file is touched by this change, and no Part 4 Stage125-Part5
+  compatibility artifact was created.
+
 ## 2026-07-23 — Stage126 live-versus-historical test-suite boundary
 
 Applies the already-locked Stage125 Part 5 historical-immutability decision

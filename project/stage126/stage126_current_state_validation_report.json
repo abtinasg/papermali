@@ -1,7 +1,7 @@
 {
   "active_workstream": "stage126_m1_financial_baseline",
   "closed_part_registry": {
-    "closed_part_count": 3,
+    "closed_part_count": 4,
     "contract_id": "stage126_closed_part_registry",
     "contract_version": "stage126_current_state_validator_v1",
     "decision_id": "stage126-validation-architecture-boundary-lock",
@@ -42,6 +42,44 @@
           "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART3_EXPANDED_RULE_A.md": "4ba13f814ddb921132a426a599d155d4267a63756942caf7dfc1a85ce604d3aa",
           "project/stage126/metadata_and_hashes_stage126_m1_robustness_part3.json": "49ee00ee766e52da86498b2b42ca35455f093e9016a73f0bafe5113d7deb9e47",
           "project/stage126/stage126_m1_robustness_part3_qc_report.json": "445628ac246124b1706d5eb673f52c77e9e70e6313086b3c44742c7c0fcd7fde"
+        }
+      },
+      "expanded_rule_b_combined_robustness": {
+        "authorization_consumed": true,
+        "authorization_record": "project/stage126/stage126_m1_robustness_part4_human_authorization_record.json",
+        "authorization_record_sha256": "324a060c7b0a04dee6e7bb703bfb3938de8763b29735a59f1883812f10ba3ba0",
+        "authorization_text_sha256": "e40852d9e2a78cc6d9b3079379abd0fed8f4921b65bec00ecf58d5aad78fd1b4",
+        "category_id": "expanded_rule_b_combined_robustness",
+        "code_artifacts_sha256": {
+          "project/run_stage126_m1_robustness_part4_expanded_rule_b.py": "f96d4caea9b97353640206db1105bfc19eae36393bd9bec57f5ece190052d33b",
+          "project/src/stage126_m1_robustness_part4_expanded_rule_b.py": "c6854dd1a137b03af30c5adabb84966159c003d9f111724348ebe15cbff20952",
+          "project/tests/test_stage126_m1_robustness_part4_expanded_rule_b.py": "f54b543bdea3bc9826b1bb5ffc040272090eecee8f5dd1cdb7c7a22206e22436"
+        },
+        "completion_lock": "project/stage126/stage126_m1_robustness_part4_completion_lock.json",
+        "completion_lock_sha256": "1b3e91043a1353c6023b99da46cd2534aff9ec4b808350a274e72f792bdbf796",
+        "final_test_lock_flags": {
+          "final_test_access_authorized": false,
+          "final_test_evaluation_performed": false,
+          "final_test_unlocked": false,
+          "full_development_refit_performed": false
+        },
+        "micro_part_id": "stage126-m1-robustness-part4-expanded-rule-b",
+        "next_registered_category": "persistent_loss_robustness_target",
+        "part_index": 4,
+        "scientific_artifacts_sha256": {
+          "project/stage126/stage126_m1_robustness_part4_completion_lock.json": "1b3e91043a1353c6023b99da46cd2534aff9ec4b808350a274e72f792bdbf796",
+          "project/stage126/stage126_m1_robustness_part4_execution_manifest.json": "badbfe43893002ba806d43fd06c5f8d5ad4e71830d9953885fba7eb34cfcbb66",
+          "project/stage126/stage126_m1_robustness_part4_feature_manifest.csv": "b64ede91d633ba4866287f62a08b0780adb9895651eb8d99d7ad4aaa58e0748c",
+          "project/stage126/stage126_m1_robustness_part4_human_authorization_record.json": "324a060c7b0a04dee6e7bb703bfb3938de8763b29735a59f1883812f10ba3ba0",
+          "project/stage126/stage126_m1_robustness_part4_metrics.csv": "b217d5b2cf3bd6bcd6b71b6a9a3835e39e34583971d6274a56dce86e2bf18520",
+          "project/stage126/stage126_m1_robustness_part4_oof_predictions.csv": "e1ef3b3a8dab2597e31e9053fbeb31777d59de49b55dfc84b367836f69a69eea",
+          "project/stage126/stage126_m1_robustness_part4_primary_comparison.json": "06283e75f6500195ac4cdb3f1bad722cf4ff6476d788a427c657fef22b26bd4f",
+          "project/stage126/stage126_m1_robustness_part4_sample_delta.csv": "610684ac693c04189f93a087db2a988403a318d35bca00f536e3fbc0e9ed03b6"
+        },
+        "verification_artifacts_sha256": {
+          "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART4_EXPANDED_RULE_B.md": "b92b268d8f74a165aad8b5ecbd0acb4ed9cd504f89aff4fd45b96cdc592868e5",
+          "project/stage126/metadata_and_hashes_stage126_m1_robustness_part4.json": "8907b708c75d04c7d405b7c73b4a6a54b1afce66f044cedb7ef48fed1c01c72e",
+          "project/stage126/stage126_m1_robustness_part4_qc_report.json": "ea5f892beefd31996178969fd9321bf8762ec9fcb04ff1be89ad48882ad07251"
         }
       },
       "m1_target_proximity_six_feature_set": {
@@ -127,7 +165,8 @@
   "completed_category_ids": [
     "m1_target_proximity_six_feature_set",
     "main_rule_b_listing_robustness",
-    "expanded_rule_a_company_scope_robustness"
+    "expanded_rule_a_company_scope_robustness",
+    "expanded_rule_b_combined_robustness"
   ],
   "completed_micro_parts": [
     {
@@ -153,9 +192,17 @@
       "completion_lock": "project/stage126/stage126_m1_robustness_part3_completion_lock.json",
       "micro_part_id": "stage126-m1-robustness-part3-expanded-rule-a",
       "part_index": 3
+    },
+    {
+      "authorization_record": "project/stage126/stage126_m1_robustness_part4_human_authorization_record.json",
+      "authorization_text_sha256": "e40852d9e2a78cc6d9b3079379abd0fed8f4921b65bec00ecf58d5aad78fd1b4",
+      "category_id": "expanded_rule_b_combined_robustness",
+      "completion_lock": "project/stage126/stage126_m1_robustness_part4_completion_lock.json",
+      "micro_part_id": "stage126-m1-robustness-part4-expanded-rule-b",
+      "part_index": 4
     }
   ],
-  "completed_part_count": 3,
+  "completed_part_count": 4,
   "contract_id": "stage126_current_state_validator",
   "contract_version": "stage126_current_state_validator_v1",
   "current_state_validation_metadata_path": "project/stage126/metadata_and_hashes_stage126_current_state_validator.json",
@@ -165,7 +212,8 @@
   "expected_completed_prefix": [
     "m1_target_proximity_six_feature_set",
     "main_rule_b_listing_robustness",
-    "expanded_rule_a_company_scope_robustness"
+    "expanded_rule_a_company_scope_robustness",
+    "expanded_rule_b_combined_robustness"
   ],
   "final_test_access_authorized": false,
   "final_test_evaluation_performed": false,
@@ -173,15 +221,15 @@
   "final_test_target_values_inspected": false,
   "final_test_unlocked": false,
   "full_development_refit_performed": false,
-  "last_completed_micro_part": "stage126-m1-robustness-part3-expanded-rule-a",
-  "last_completed_micro_part_qc_assertions": 141,
+  "last_completed_micro_part": "stage126-m1-robustness-part4-expanded-rule-b",
+  "last_completed_micro_part_qc_assertions": 162,
   "last_completed_micro_part_qc_failed": 0,
-  "last_completed_micro_part_qc_path": "project/stage126/stage126_m1_robustness_part3_qc_report.json",
-  "last_completed_micro_part_qc_scope": "stage126_m1_robustness_part3_expanded_rule_a",
+  "last_completed_micro_part_qc_path": "project/stage126/stage126_m1_robustness_part4_qc_report.json",
+  "last_completed_micro_part_qc_scope": "stage126_m1_robustness_part4_expanded_rule_b",
   "m1_robustness_completed": false,
   "m1_robustness_started": true,
   "next_category_authorized": false,
-  "next_category_id": "expanded_rule_b_combined_robustness",
+  "next_category_id": "persistent_loss_robustness_target",
   "next_research_action_id": "stage126-m1-financial-baseline",
   "primary_stage126_artifacts_sha256": {
     "project/stage126/stage126_m1_configuration_registry.csv": "decbf43a5c34669bdd7a0c68c0ad6aec5611efc7c3ca82b09f5e85f72d635804",

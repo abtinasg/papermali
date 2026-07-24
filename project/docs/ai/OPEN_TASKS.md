@@ -351,10 +351,59 @@ consistent application of the existing validation-architecture boundary lock,
 **not** a scientific-error exception; Stage125 Part 5 was neither reopened nor
 re-pinned.
 
-**Next — Part 4 (`expanded_rule_b_combined_robustness`) is NOT authorized
+**Robustness Part 4 — COMPLETED (2026-07-24):**
+`expanded_rule_b_combined_robustness` was explicitly human-authorized
+(418-byte text, SHA-256 `e40852d9…`) and executed on the development folds
+only, from base `main` `853a8def…`. **Only the combined Rule B sample
+changed** (`analysis_ready_expanded_rule_b_stage125.csv`, SHA-256
+`2e61a282…`). Target, nine-feature order, preprocessing, missingness-indicator
+logic, selected configurations, folds, seeds, metrics and class weighting all
+unchanged. **No retuning** (0 searches; 22 fits / 22 predictions), **no
+full-development refit**, and the **final test remained locked** (353
+identities counted only via the frozen split contract; 0 predictor rows, 0
+target rows, 0 predictions, 0 metrics). No calibration, threshold
+optimization, bootstrap, Holm, p-values, winner selection, SMOTE/SMOTENC or
+SHAP. Counts: 1035 rows / 122 companies / 79 pos / 956 neg; development 682
+(68 / 614); folds 250 / 211 / 461 / 221; 1296 OOF rows (432 per family); 9
+metric rows. Handoff markers: `m1_robustness_part4_human_authorized=true`,
+`m1_robustness_part4_completed=true`,
+`m1_robustness_completed_category_ids=[part1, part2, part3, part4]`,
+`m1_robustness_next_category_id=persistent_loss_robustness_target`,
+`m1_robustness_part5_authorized=false`,
+`m1_robustness_execution_authorized=false`, `m1_robustness_completed=false`.
+
+**Part 4 sample delta (row identities only, three independent comparisons):**
+versus Part 2 (main Rule B) — Part 4 is a **strict superset**: 42 Part4-only
+rows, 0 Part2-only rows, +5 companies, +0 positive, +42 negative; +27
+development rows (all negative); 19 added OOF identities (all target 0); +15
+final-test identities. Versus Part 3 (expanded Rule A) — Part 4 is a **strict
+subset**: 21 Part3-only rows, 0 Part4-only rows, −2 companies, −1 positive,
+−20 negative; −13 development rows (all negative); 9 removed OOF identities;
+−8 final-test identities. Versus the locked primary Rule A sample — **neither**
+a subset nor a superset: 42 Part4-only rows, 19 primary-only rows, net +23
+rows, +3 companies, −1 positive, +24 negative; development net +16 (27
+Part4-only / 11 primary-only, all differences negative); OOF net +11 (19 / 8);
+final-test net +7 (15 / 8).
+
+**Part 4 results (development-only sample sensitivity):** pooled PR-AUC —
+Logistic 0.444984 (−0.17%), RF 0.396419 (−1.50%), XGBoost 0.355211 (−0.37%).
+**The locked primary ordering Logistic > RF > XGBoost is preserved.**
+Development-fold and pooled-OOF identity differences versus primary, Part 2
+and Part 3 are all target-0; at the frozen full-sample aggregate level,
+however, Part 4 has one fewer positive event than Part 3 and primary
+(frozen final-test positive counts 11 (Part 4) vs 12 (Part 3) vs 12
+(primary), no row-level final-test target accessed). Because the pooled
+development-OOF ordering is preserved and the PR-AUC changes remain small,
+the combined sample does **not** materially change interpretation. Primary
+results were not replaced, the primary ordering lock is unchanged and no
+paper winner was selected. Separated descriptive Part 2 and Part 3 comparisons
+are recorded without multiplying claims or selecting a preferred robustness
+sample.
+
+**Next — Part 5 (`persistent_loss_robustness_target`) is NOT authorized
 and NOT started.** It requires its own separate explicit human authorization;
-the consumed Part 3 authorization is not a standing authorization. Part 3 is
-completed. Parts 4–6 remain outstanding, so M1 robustness is not complete.
+the consumed Part 4 authorization is not a standing authorization. Parts 1–4
+are completed. Parts 5–6 remain outstanding, so M1 robustness is not complete.
 
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
 document-binding evidence remain as frozen scientific history; they do **not**
