@@ -34,7 +34,7 @@ See [`DECISIONS.md`](DECISIONS.md).
   hashes).
 - Stage122 / Stage123 / targets / financials / ratios / statement-scope are
   **read-only**; their hashes are checked before and after every run.
-- **Current Stage126 M1 prohibitions:** final-test access or evaluation; full-development refit; M1 robustness without the next explicit micro-part decision; SMOTE robustness; target-proximity robustness; Rule B / expanded-sample robustness; persistent-loss robustness; M2/M3/M4 data collection or modeling; SHAP; network extraction.
+- **Current Stage126 M1 prohibitions:** final-test access or evaluation; full-development refit; execution of any outstanding robustness category without its own separate explicit human authorization (next: Part 5 `persistent_loss_robustness_target`; Part 6 `smote_training_fold_only_robustness`); reopening, regenerating or rerunning completed Parts 1–4 without both a genuine scientific error and separate explicit human authorization; M2/M3/M4 data collection or modeling; SHAP; network extraction.
 - Bulky outputs are gitignored; only source + small QC/metadata/audit files are
   committed.
 - Two-commit workflow: **code-commit → artifact-commit → merge-commit**. QC points at
