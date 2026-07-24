@@ -31,18 +31,27 @@ Human-maintained, newest first. Record decisions and milestones (not every commi
   SMOTENC or SHAP.
 - **Three independent identity-only sample-delta audits.** Versus Part 2
   (main Rule B): Part 4 is a strict superset (+42 rows, 0 Part2-only, +5
-  companies, +0 positive, +42 negative, all additions negative). Versus Part 3
-  (expanded Rule A): Part 4 is a strict subset (−21 rows, 0 Part4-only, −2
-  companies, −1 positive, −20 negative, all removals negative). Versus the
-  locked primary Rule A sample: neither a subset nor a superset (42 Part4-only
-  rows, 19 primary-only rows, net +23 rows, +3 companies, −1 positive, +24
-  negative, all differences negative-only).
+  companies, +0 positive, +42 negative; development and OOF additions are all
+  target-0). Versus Part 3 (expanded Rule A): Part 4 is a strict subset (−21
+  rows, 0 Part4-only, −2 companies, −1 positive, −20 negative; development and
+  OOF removals are target-0, but the full-sample aggregate has one fewer
+  positive event, located in the locked final-test partition — frozen
+  final-test positive counts 11 (Part 4) vs 12 (Part 3), no row-level
+  final-test target accessed). Versus the locked primary Rule A sample:
+  neither a subset nor a superset (42 Part4-only rows, 19 primary-only rows,
+  net +23 rows, +3 companies, −1 positive, +24 negative; development and OOF
+  differences are target-0, but the full-sample aggregate again has one fewer
+  positive event than primary — frozen final-test positive counts 11 vs 12,
+  no row-level final-test target accessed).
 - **Pooled development-OOF PR-AUC:** Logistic 0.444983882478 (−0.17%), RF
   0.396418788419 (−1.50%), XGBoost 0.355210803326 (−0.37%). The locked
-  primary ordering Logistic > RF > XGBoost is preserved and, because every
-  identity difference is negative-only, the combined sample does not
-  materially change interpretation. Primary results were not replaced, the
-  primary ordering lock is unchanged and no paper winner was selected.
+  primary ordering Logistic > RF > XGBoost is preserved; development-fold and
+  pooled-OOF identity differences versus primary, Part 2 and Part 3 are all
+  target-0, and because the full-sample/final-test aggregate shifts are small
+  (one fewer positive event, never row-level attributed), the combined sample
+  does not materially change interpretation. Primary results were not
+  replaced, the primary ordering lock is unchanged and no paper winner was
+  selected.
 - **The closed-part registry retains the Part 1, Part 2 and Part 3 entries
   byte-for-byte** and appends Part 4 (`closed_part_count = 4`,
   `regeneration_allowed = false`). The boundary decision record and the

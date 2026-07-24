@@ -387,8 +387,13 @@ final-test net +7 (15 / 8).
 
 **Part 4 results (development-only sample sensitivity):** pooled PR-AUC —
 Logistic 0.444984 (−0.17%), RF 0.396419 (−1.50%), XGBoost 0.355211 (−0.37%).
-**The locked primary ordering Logistic > RF > XGBoost is preserved.** Because
-every identity difference versus primary, Part 2 and Part 3 is negative-only,
+**The locked primary ordering Logistic > RF > XGBoost is preserved.**
+Development-fold and pooled-OOF identity differences versus primary, Part 2
+and Part 3 are all target-0; at the frozen full-sample aggregate level,
+however, Part 4 has one fewer positive event than Part 3 and primary
+(frozen final-test positive counts 11 (Part 4) vs 12 (Part 3) vs 12
+(primary), no row-level final-test target accessed). Because the pooled
+development-OOF ordering is preserved and the PR-AUC changes remain small,
 the combined sample does **not** materially change interpretation. Primary
 results were not replaced, the primary ordering lock is unchanged and no
 paper winner was selected. Separated descriptive Part 2 and Part 3 comparisons

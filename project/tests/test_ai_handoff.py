@@ -2591,7 +2591,7 @@ def test_current_state_qc_is_separate_from_scientific_micro_part_qc():
     assert state["last_completed_micro_part_qc_path"] == (
         "project/stage126/stage126_m1_robustness_part4_qc_report.json"
     )
-    assert state["last_completed_micro_part_qc_assertions"] == 150
+    assert state["last_completed_micro_part_qc_assertions"] == 162
     assert state["last_completed_micro_part_qc_failed"] == 0
     qc = json.load(open(os.path.join(
         REAL_ROOT, state["last_completed_micro_part_qc_path"],

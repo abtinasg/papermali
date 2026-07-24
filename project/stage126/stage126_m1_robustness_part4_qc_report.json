@@ -4,7 +4,7 @@
   "analysis_ready_negative": 956,
   "analysis_ready_positive": 79,
   "analysis_ready_rows": 1035,
-  "assertion_count": 150,
+  "assertion_count": 162,
   "assertions": [
     {
       "detail": "418",
@@ -683,6 +683,66 @@
     },
     {
       "detail": "",
+      "name": "part4_vs_part2_development_added_target_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part4_vs_part2_oof_added_target_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part4_vs_part3_development_removed_target_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part4_vs_part3_oof_removed_target_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part4_vs_primary_development_differences_target_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part4_vs_primary_oof_differences_target_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "full_sample_positive_delta_vs_part3_is_negative_one",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "full_sample_positive_delta_vs_primary_is_negative_one",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_positive_counts_frozen_12_12_11",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_row_level_targets_never_inspected",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "development_and_oof_negative_only_flag_true",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "full_sample_negative_only_flag_correctly_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
       "name": "primary_stage126_artifacts_byte_identical",
       "status": "PASS"
     },
@@ -849,14 +909,14 @@
   "oof_rows_per_family": 432,
   "oof_rows_total": 1296,
   "output_sha256": {
-    "README_STAGE126_M1_ROBUSTNESS_PART4_EXPANDED_RULE_B.md": "ba5080011ac208205b492b4e3275b85f953436fff611dae95a452af2202e1319",
+    "README_STAGE126_M1_ROBUSTNESS_PART4_EXPANDED_RULE_B.md": "b92b268d8f74a165aad8b5ecbd0acb4ed9cd504f89aff4fd45b96cdc592868e5",
     "stage126_m1_robustness_part4_completion_lock.json": "1b3e91043a1353c6023b99da46cd2534aff9ec4b808350a274e72f792bdbf796",
     "stage126_m1_robustness_part4_execution_manifest.json": "badbfe43893002ba806d43fd06c5f8d5ad4e71830d9953885fba7eb34cfcbb66",
     "stage126_m1_robustness_part4_feature_manifest.csv": "b64ede91d633ba4866287f62a08b0780adb9895651eb8d99d7ad4aaa58e0748c",
     "stage126_m1_robustness_part4_human_authorization_record.json": "324a060c7b0a04dee6e7bb703bfb3938de8763b29735a59f1883812f10ba3ba0",
     "stage126_m1_robustness_part4_metrics.csv": "b217d5b2cf3bd6bcd6b71b6a9a3835e39e34583971d6274a56dce86e2bf18520",
     "stage126_m1_robustness_part4_oof_predictions.csv": "e1ef3b3a8dab2597e31e9053fbeb31777d59de49b55dfc84b367836f69a69eea",
-    "stage126_m1_robustness_part4_primary_comparison.json": "24cea036f081df0ebae25c8c33b836c99a9f8359b8c9039f1b88e180e6a08ef5",
+    "stage126_m1_robustness_part4_primary_comparison.json": "06283e75f6500195ac4cdb3f1bad722cf4ff6476d788a427c657fef22b26bd4f",
     "stage126_m1_robustness_part4_sample_delta.csv": "610684ac693c04189f93a087db2a988403a318d35bca00f536e3fbc0e9ed03b6"
   },
   "part0_contract_hash_valid": true,
@@ -871,7 +931,7 @@
     "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e",
     "project/stage126/stage126_m1_tuning_results.csv": "e7e1e6808e394273676709aa94bfa713bbf8a790fadabee22ea20b849adbe649"
   },
-  "primary_comparison_sha256": "24cea036f081df0ebae25c8c33b836c99a9f8359b8c9039f1b88e180e6a08ef5",
+  "primary_comparison_sha256": "06283e75f6500195ac4cdb3f1bad722cf4ff6476d788a427c657fef22b26bd4f",
   "primary_ordering_preserved": true,
   "primary_sample": "main_rule_a_primary",
   "sample": "expanded_rule_b_combined_robustness",
@@ -996,8 +1056,8 @@
     "xgboost": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1"
   },
   "selected_configurations_changed": false,
-  "source_commit": "4e7acb13980bb636482e3c8e8c31b7296ebe0969",
-  "source_file_sha256": "25eb8aa314e4addbe69178595a11a9389b1bf2985280d0a2457ea9fe96d35e0d",
+  "source_commit": "b2e9c1fc2e61c70792b405c49640d825ba6a20c9",
+  "source_file_sha256": "c6854dd1a137b03af30c5adabb84966159c003d9f111724348ebe15cbff20952",
   "stage": "stage126_m1_robustness_part4_expanded_rule_b",
   "stage125_completed": true,
   "stage125_part5_used_as_gate": false,
@@ -1005,7 +1065,7 @@
   "stage126_m1_entry_ready": true,
   "stage126_started": true,
   "target": "FD_target_main_t_plus_1",
-  "test_file_sha256": "63b48ec146a826beb14a32ecbde5cfcf0d50964957f6865c70c4ac16c9ce9f67",
+  "test_file_sha256": "f54b543bdea3bc9826b1bb5ffc040272090eecee8f5dd1cdb7c7a22206e22436",
   "ticker_count": 0,
   "tickers": [],
   "transformed_feature_count": 18,

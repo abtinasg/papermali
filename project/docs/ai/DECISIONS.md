@@ -204,20 +204,29 @@ validator remains the sole current-state validation surface.
   target rows, zero predictions and zero metrics.
 - **Three independently recomputed sample-delta comparisons, identities
   only:** versus Part 2 (main Rule B) Part 4 is a strict superset (42
-  Part4-only rows, 0 Part2-only, all additions negative); versus Part 3
-  (expanded Rule A) Part 4 is a strict subset (21 Part3-only rows, 0
-  Part4-only, all removals negative); versus the locked primary sample the
+  Part4-only rows, 0 Part2-only; development and OOF additions are all
+  target-0, and the full-sample positive delta is 0); versus Part 3 (expanded
+  Rule A) Part 4 is a strict subset (21 Part3-only rows, 0 Part4-only;
+  development and OOF removals are all target-0, but the full-sample
+  aggregate has one fewer positive event, located in the locked final-test
+  partition — frozen final-test positive counts 11 (Part 4) vs 12 (Part 3), no
+  row-level final-test target accessed); versus the locked primary sample the
   relationship is neither a subset nor a superset (42 Part4-only, 19
-  primary-only, net +23 rows, all differences negative-only).
+  primary-only, net +23 rows; development and OOF differences are all
+  target-0, but the full-sample aggregate again has one fewer positive event
+  than primary — frozen final-test positive counts 11 vs 12, no row-level
+  final-test target accessed).
 - **Development-only sample-sensitivity evidence.** Pooled PR-AUC: Logistic
   0.444983882478 (−0.17%), RF 0.396418788419 (−1.50%), XGBoost
   0.355210803326 (−0.37%). **The locked primary ordering
-  Logistic > RF > XGBoost is preserved**, and because every identity
-  difference versus primary, Part 2 and Part 3 is negative-only the combined
-  sample does not materially change interpretation. Primary results were not
-  replaced, the primary ordering lock is unchanged, no paper winner was
-  selected and this is not a new confirmatory model comparison. The Part 2
-  and Part 3 comparisons are separated and descriptive only.
+  Logistic > RF > XGBoost is preserved**; development-fold and pooled-OOF
+  identity differences versus primary, Part 2 and Part 3 are all target-0,
+  and because the full-sample/final-test aggregate shifts are small (one
+  fewer positive event, never row-level attributed) the combined sample does
+  not materially change interpretation. Primary results were not replaced,
+  the primary ordering lock is unchanged, no paper winner was selected and
+  this is not a new confirmatory model comparison. The Part 2 and Part 3
+  comparisons are separated and descriptive only.
 - **Part 5 (`persistent_loss_robustness_target`) is not authorized and not
   started.** Parts 5-6 remain outstanding.
 - **Nothing closed was touched.** Parts 1, 2 and 3 packages (scientific and

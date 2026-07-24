@@ -66,7 +66,7 @@ Part 4 is a **strict superset** of Part 2 (42 Part4-only rows, 0 Part2-only rows
 | OOF identities | 441 | 432 | -9 |
 | final-test identities | 361 | 353 | -8 |
 
-Part 4 is a **strict subset** of Part 3 (21 Part3-only rows, 0 Part4-only rows); every removed row is negative.
+Part 4 is a **strict subset** of Part 3 (21 Part3-only rows, 0 Part4-only rows). Development-fold and pooled-OOF removed rows are target-0 (verified by conservation against the frozen development/OOF aggregate counts). At the frozen full-sample aggregate level Part 4 has one fewer positive event than Part 3 (-1); the frozen final-test aggregate count is **11** versus **12**. No row-level final-test target was read — this single-event difference is never attributed to an identified row.
 
 ## Sample delta C — versus the locked primary Rule A sample (mixed; neither sub- nor super-set)
 
@@ -80,7 +80,7 @@ Part 4 is a **strict subset** of Part 3 (21 Part3-only rows, 0 Part4-only rows);
 | OOF identities | 421 | 432 | +11 |
 | final-test identities | 346 | 353 | +7 |
 
-Part4-only rows: **42**; primary-only rows: **19**. Every identity difference on both sides is negative-only. Final-test rows contribute identities and counts only — no row-level final-test value was read. Detail: `stage126_m1_robustness_part4_sample_delta.csv`.
+Part4-only rows: **42**; primary-only rows: **19**. Development-fold and pooled-OOF identity differences on both sides are target-0 (verified by conservation against the frozen development/OOF aggregate counts). At the frozen full-sample aggregate level Part 4 has one fewer positive event than the locked primary sample (-1); the frozen final-test aggregate count is **11** versus **12**. Final-test rows contribute identities and counts only — no row-level final-test value was read. Detail: `stage126_m1_robustness_part4_sample_delta.csv`.
 
 ## Development results (sample sensitivity only)
 
@@ -109,7 +109,7 @@ Part4-only rows: **42**; primary-only rows: **19**. Every identity difference on
 - **Primary ordering preserved: true**
 - Largest absolute pooled PR-AUC change: 0.006023041601
 
-**Interpretation (cautious).** Development-only sample sensitivity. The Rule-B combined sample is a strict subset of the Part 3 expanded scope and a strict superset of the Part 2 listing-Rule-B sample; relative to the locked primary sample it neither contains nor is contained by it. All identity differences versus primary, Part 2 and Part 3 involve only negative-target rows, so pooled PR-AUC shifts here mainly reflect a slightly different event rate and company scope rather than a change in discrimination. The comparison is reported descriptively and cautiously: it does not replace the primary results, does not alter the locked primary ordering used for confirmatory interpretation, does not constitute a new confirmatory model comparison and selects no paper winner.
+**Interpretation (cautious).** Development-only sample sensitivity. The Rule-B combined sample is a strict subset of the Part 3 expanded scope and a strict superset of the Part 2 listing-Rule-B sample; relative to the locked primary sample it neither contains nor is contained by it. All development-fold and pooled-OOF identity differences relevant to the Part 4 predictive comparison are target-0 observations. At the frozen full-sample aggregate level, however, Part 4 has one fewer positive event than Part 3 and the locked primary sample (-1); the corresponding final-test aggregate count is 11 versus 12 (Part 3) and 12 (primary). No row-level final-test target was accessed. Because the pooled development-OOF ordering is preserved and the PR-AUC changes remain small, the combined sample does not materially change the development-only interpretation. The comparison is reported descriptively and cautiously: it does not replace the primary results, does not alter the locked primary ordering used for confirmatory interpretation, does not constitute a new confirmatory model comparison and selects no paper winner.
 
 ## Descriptive comparison with Part 2 (separated; no additional claim)
 
@@ -140,6 +140,7 @@ Separated descriptive context only — effect of applying Rule B inside the expa
 - Final-test metrics computed: **0**
 - Final-test evaluations: **0**
 - Full-development refits: **0**
+- Frozen final-test aggregate positive events (via the frozen gate only; no row-level target inspected): primary **12**, Part 3 **12**, Part 4 **11**
 
 ## Validation architecture
 

@@ -55,14 +55,22 @@
     },
     "preferred_robustness_sample_selected": false
   },
+  "development_and_oof_identity_differences_negative_only": true,
   "direction_by_family": {
     "random_forest": "declined",
     "regularized_logistic_regression": "declined",
     "xgboost": "declined"
   },
   "final_test_evaluation_authorized": false,
+  "final_test_positive_count_part3": 12,
+  "final_test_positive_count_part4": 11,
+  "final_test_positive_count_primary": 12,
+  "final_test_row_level_targets_inspected": false,
   "full_development_refit_authorized": false,
-  "interpretation": "Development-only sample sensitivity. The Rule-B combined sample is a strict subset of the Part 3 expanded scope and a strict superset of the Part 2 listing-Rule-B sample; relative to the locked primary sample it neither contains nor is contained by it. All identity differences versus primary, Part 2 and Part 3 involve only negative-target rows, so pooled PR-AUC shifts here mainly reflect a slightly different event rate and company scope rather than a change in discrimination. The comparison is reported descriptively and cautiously: it does not replace the primary results, does not alter the locked primary ordering used for confirmatory interpretation, does not constitute a new confirmatory model comparison and selects no paper winner.",
+  "full_sample_identity_differences_all_negative_only": false,
+  "full_sample_positive_delta_vs_part3": -1,
+  "full_sample_positive_delta_vs_primary": -1,
+  "interpretation": "Development-only sample sensitivity. The Rule-B combined sample is a strict subset of the Part 3 expanded scope and a strict superset of the Part 2 listing-Rule-B sample; relative to the locked primary sample it neither contains nor is contained by it. All development-fold and pooled-OOF identity differences relevant to the Part 4 predictive comparison are target-0 observations. At the frozen full-sample aggregate level, however, Part 4 has one fewer positive event than Part 3 and the locked primary sample (-1); the corresponding final-test aggregate count is 11 versus 12 (Part 3) and 12 (primary). No row-level final-test target was accessed. Because the pooled development-OOF ordering is preserved and the PR-AUC changes remain small, the combined sample does not materially change the development-only interpretation. The comparison is reported descriptively and cautiously: it does not replace the primary results, does not alter the locked primary ordering used for confirmatory interpretation, does not constitute a new confirmatory model comparison and selects no paper winner.",
   "largest_absolute_pr_auc_change": 0.006023041601,
   "micro_part_id": "stage126-m1-robustness-part4-expanded-rule-b",
   "new_confirmatory_model_comparison": false,

@@ -52,8 +52,8 @@
         "category_id": "expanded_rule_b_combined_robustness",
         "code_artifacts_sha256": {
           "project/run_stage126_m1_robustness_part4_expanded_rule_b.py": "f96d4caea9b97353640206db1105bfc19eae36393bd9bec57f5ece190052d33b",
-          "project/src/stage126_m1_robustness_part4_expanded_rule_b.py": "25eb8aa314e4addbe69178595a11a9389b1bf2985280d0a2457ea9fe96d35e0d",
-          "project/tests/test_stage126_m1_robustness_part4_expanded_rule_b.py": "63b48ec146a826beb14a32ecbde5cfcf0d50964957f6865c70c4ac16c9ce9f67"
+          "project/src/stage126_m1_robustness_part4_expanded_rule_b.py": "c6854dd1a137b03af30c5adabb84966159c003d9f111724348ebe15cbff20952",
+          "project/tests/test_stage126_m1_robustness_part4_expanded_rule_b.py": "f54b543bdea3bc9826b1bb5ffc040272090eecee8f5dd1cdb7c7a22206e22436"
         },
         "completion_lock": "project/stage126/stage126_m1_robustness_part4_completion_lock.json",
         "completion_lock_sha256": "1b3e91043a1353c6023b99da46cd2534aff9ec4b808350a274e72f792bdbf796",
@@ -73,13 +73,13 @@
           "project/stage126/stage126_m1_robustness_part4_human_authorization_record.json": "324a060c7b0a04dee6e7bb703bfb3938de8763b29735a59f1883812f10ba3ba0",
           "project/stage126/stage126_m1_robustness_part4_metrics.csv": "b217d5b2cf3bd6bcd6b71b6a9a3835e39e34583971d6274a56dce86e2bf18520",
           "project/stage126/stage126_m1_robustness_part4_oof_predictions.csv": "e1ef3b3a8dab2597e31e9053fbeb31777d59de49b55dfc84b367836f69a69eea",
-          "project/stage126/stage126_m1_robustness_part4_primary_comparison.json": "24cea036f081df0ebae25c8c33b836c99a9f8359b8c9039f1b88e180e6a08ef5",
+          "project/stage126/stage126_m1_robustness_part4_primary_comparison.json": "06283e75f6500195ac4cdb3f1bad722cf4ff6476d788a427c657fef22b26bd4f",
           "project/stage126/stage126_m1_robustness_part4_sample_delta.csv": "610684ac693c04189f93a087db2a988403a318d35bca00f536e3fbc0e9ed03b6"
         },
         "verification_artifacts_sha256": {
-          "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART4_EXPANDED_RULE_B.md": "ba5080011ac208205b492b4e3275b85f953436fff611dae95a452af2202e1319",
-          "project/stage126/metadata_and_hashes_stage126_m1_robustness_part4.json": "bc8498666a0e9c2834ac0e69ea26a49beaf35062f59e4e567579dd51c9e2922f",
-          "project/stage126/stage126_m1_robustness_part4_qc_report.json": "4b1e63a50557317828b0ea5f26c738bdac3f292e088db000e0aa9ca63629f502"
+          "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART4_EXPANDED_RULE_B.md": "b92b268d8f74a165aad8b5ecbd0acb4ed9cd504f89aff4fd45b96cdc592868e5",
+          "project/stage126/metadata_and_hashes_stage126_m1_robustness_part4.json": "a51b54c24bfede1adfac43773f46a45720fe1226cc71fade1ff95e84638b7e4f",
+          "project/stage126/stage126_m1_robustness_part4_qc_report.json": "ea5f892beefd31996178969fd9321bf8762ec9fcb04ff1be89ad48882ad07251"
         }
       },
       "m1_target_proximity_six_feature_set": {
@@ -222,7 +222,7 @@
   "final_test_unlocked": false,
   "full_development_refit_performed": false,
   "last_completed_micro_part": "stage126-m1-robustness-part4-expanded-rule-b",
-  "last_completed_micro_part_qc_assertions": 150,
+  "last_completed_micro_part_qc_assertions": 162,
   "last_completed_micro_part_qc_failed": 0,
   "last_completed_micro_part_qc_path": "project/stage126/stage126_m1_robustness_part4_qc_report.json",
   "last_completed_micro_part_qc_scope": "stage126_m1_robustness_part4_expanded_rule_b",
