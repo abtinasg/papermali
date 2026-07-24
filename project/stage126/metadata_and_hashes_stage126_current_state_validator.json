@@ -362,8 +362,8 @@
   "last_completed_micro_part": "stage126-m1-robustness-part4-expanded-rule-b",
   "output_files_sha256": {
     "README_STAGE126_CURRENT_STATE_VALIDATION.md": "05a977027920f380633da571f8780d60d20afec8b381de304f39e728d73de03a",
-    "stage126_closed_part_registry.json": "9c09eccb10b8c8064219b104ed441b245c9c0dfac8244562ccb58dc63684c7fa",
-    "stage126_current_state_validation_report.json": "20372e5788eaaa6c58f2471c49580935a8fccfbe4e008562ac9f97267eddc926",
+    "stage126_closed_part_registry.json": "6a51b37bd1040f48619c0922cfb484dcaa4086969e5a06f2fe62806e04fc6395",
+    "stage126_current_state_validation_report.json": "558c80a03948c0afdfaea36e4ff484ff74b47e4c1374a81f67f5c7fa9df24ef1",
     "stage126_historical_boundary_manifest.json": "83eb42362d0d7416abb29db420ffd64c65725f54a359bb520aae36ad7177c988",
     "stage126_validation_architecture_boundary_decision.json": "7502405fc0c2641c7dc766f3d4a52941b4c4841295d1d3130c07718768a6e06c"
   },
