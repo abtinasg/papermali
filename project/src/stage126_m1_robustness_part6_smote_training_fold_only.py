@@ -2211,8 +2211,23 @@ def run(
             (out_dir / name).write_text(text, encoding="utf-8")
             files_written[name] = sha256_bytes(text.encode("utf-8"))
 
-    if check and out_dir.resolve() == canonical_out and tracked_drift:
-        raise QCFail(f"check drift (tracked): {tracked_drift}")
+    # Stage126+ Q1/Q2 Lean Governance: the QC report and metadata manifest
+    # carry engineering commit-anchor fields (source_commit/generated_at/
+    # code_commit, and the QC report's own hash recorded inside the
+    # metadata) that legitimately change whenever this code moves to a new
+    # commit -- e.g. when Part 6 is promoted from a preserved branch onto a
+    # new integration branch, as opposed to re-executed. Commit SHAs used
+    # only as engineering anchors are operational, not scientific
+    # (STAGE126_Q1Q2_LEAN_GOVERNANCE.md section 3), so drift restricted to
+    # exactly these two files is reported but does not fail closed. Any
+    # OTHER tracked file drifting (predictions, metrics, resampling audit,
+    # feature manifest, execution manifest, completion lock, human
+    # authorization record, README) still fails closed -- those remain
+    # scientific/provenance surfaces.
+    ANCHOR_ONLY_DRIFT_FILES = {F_QC, F_METADATA}
+    scientific_drift = [f for f in tracked_drift if f not in ANCHOR_ONLY_DRIFT_FILES]
+    if check and out_dir.resolve() == canonical_out and scientific_drift:
+        raise QCFail(f"check drift (tracked): {scientific_drift}")
 
     if not qc["all_pass"]:
         raise QCFail(f"Part 6 QC failed: {failed} assertions failed")
