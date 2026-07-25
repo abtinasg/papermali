@@ -917,6 +917,7 @@ def test_frozen_part5_source_and_runner_unmodified():
     p2.verify_part5_frozen_unmodified(_root())
 
 
+@pytest.mark.stage126_terminal_successor_state
 def test_expected_mismatch_matches_the_real_frozen_validator():
     from src import stage125_part5_readiness_closure as p5
     _ok, detail = p5.validate_actual_handoff(
@@ -984,6 +985,7 @@ def test_full_runner_provenance_recorded_separately_from_direct_validation():
     assert compat["stage125_part5_scientific_artifact_drift_observed"] is False
 
 
+@pytest.mark.stage126_terminal_successor_state
 def test_direct_handoff_validation_helper_is_exact():
     dv = p2.direct_handoff_validation_fields(_root())
     assert sorted(dv["fields"]) == sorted(EXPECTED_MISMATCH)
@@ -1109,6 +1111,7 @@ def test_metadata_pins_outputs_and_inputs():
     assert meta["final_test_evaluations"] == 0
 
 
+@pytest.mark.stage126_terminal_successor_state
 def test_deterministic_repeated_build_output(tmp_path):
     a = p2.run(project_dir=Path(REAL_ROOT) / "project",
                output_dir=tmp_path / "a", build=True)
@@ -1125,6 +1128,7 @@ def test_deterministic_repeated_build_output(tmp_path):
         assert digest == on_disk, name
 
 
+@pytest.mark.stage126_terminal_successor_state
 def test_check_mode_is_clean():
     result = p2.run(project_dir=Path(REAL_ROOT) / "project", check=True)
     assert result["drift"] == []

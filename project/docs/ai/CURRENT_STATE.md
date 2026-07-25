@@ -11,15 +11,15 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed micro-part:** `stage126-m1-robustness-part5-persistent-loss-target`
 - **Next research action:** `stage126-m1-financial-baseline`
-- **Last stage commit:** `85b77cbe7501c37d88827fcb25713bf86d3d7121`
-- **Generated from commit:** `5b240ee3d5455180d5fdd2691a338c0c34400eb5` (branch `stage126-pr59-post-merge-handoff-refresh`, informational)
-- **Baseline:** `origin/main` @ `5b240ee3d5455180d5fdd2691a338c0c34400eb5`
+- **Last stage commit:** `44b227749bd8b074551f85b20dfb242d0e942863`
+- **Generated from commit:** `44b227749bd8b074551f85b20dfb242d0e942863` (branch `stage126-legacy-validation-boundary-adaptation`, informational)
+- **Baseline:** `origin/main` @ `41c67a73fff5d96349763ec6c866799c5f2f9a01`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **77 assertions, 0 failed**, all_pass=True
+- ✅ **78 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -68,5 +68,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `53c3e50b022e4c7a96d185c6e789c22879546a5bf9f27eb0a0c64689a5e95ad2`_
-_generated_at_utc: 2026-07-25T06:52:46Z (informational)_
+_state_fingerprint: `8db40b32f722e8e9fbc1b093f0c0c3a604853b723707ca8468154d71da6944a9`_
+_generated_at_utc: 2026-07-25T21:01:04Z (informational)_

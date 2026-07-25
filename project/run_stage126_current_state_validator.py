@@ -79,8 +79,10 @@ def main(argv: list[str] | None = None) -> int:
         f"final test unlocked={report['final_test_unlocked']}"
     )
     print(
-        "Prior-part verification regeneration allowed: "
-        f"{report['prior_part_verification_artifact_regeneration_allowed']} | "
+        "Prior-part scientific artifact regeneration forbidden: "
+        f"{report['prior_part_scientific_artifact_regeneration_forbidden']} | "
+        "operational verification-artifact evolution permitted: "
+        f"{report['prior_part_operational_verification_artifact_evolution_permitted']} | "
         "reopening requires scientific error + new authorization: "
         f"{report['prior_part_reopening_requires_scientific_error']}"
     )

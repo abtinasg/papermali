@@ -367,17 +367,25 @@ ordering-instability markers are retained unchanged.
 **Validation architecture (locked 2026-07-23).** Stage125 Part 5 is a **frozen
 historical closure**. It is **no longer responsible for validating live Stage126
 successor state**. The **independent Stage126 current-state validator**
-(`stage126_current_state_validator_v1`,
+(`stage126_current_state_validator_v2_lean`,
 `project/run_stage126_current_state_validator.py --check`) is the **sole
 current-state validation surface**; it never imports, executes or calls into
-Part 5. Future robustness parts must **not** regenerate previous-part
-verification artifacts unless a genuine scientific error **and** a separate
-explicit human authorization exist. Handoff markers:
-`validation_architecture=stage126_current_state_validator_v1`,
+Part 5. Under Stage126+ Q1/Q2 Lean Governance
+(`project/docs/ai/STAGE126_Q1Q2_LEAN_GOVERNANCE.md`), a closed part's
+SCIENTIFIC artifacts may never be regenerated, but its OPERATIONAL
+verification bookkeeping (test/QC/metadata hashes) is git-versioned and may
+evolve without a scientific-error exception or new human authorization.
+Handoff markers:
+`validation_architecture=stage126_q1q2_lean_governance_v1`,
+`scientific_artifacts_hard_locked=true`,
+`operational_surfaces_git_versioned=true`,
+`single_live_current_state_authority=true`,
+`legacy_validation_boundary_adapted=true`,
 `stage125_part5_mode=historical_immutable`,
 `stage125_part5_live_gate_active=false`,
 `stage125_part5_future_regeneration_allowed=false`,
-`prior_robustness_verification_artifact_regeneration_allowed=false`,
+`prior_part_scientific_artifact_regeneration_forbidden=true`,
+`prior_part_operational_verification_artifact_evolution_permitted=true`,
 `prior_part_reopening_requires_scientific_error=true`,
 `prior_part_reopening_requires_explicit_human_authorization=true`.
 Live sequence: the Stage126 current-state validator, the newest micro-part

@@ -1520,8 +1520,22 @@ _CURRENT_STATE_REPORT_REL = (
 _BOUNDARY_DECISION_SHA256 = (
     "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1"
 )
-_VALIDATION_ARCHITECTURE = "stage126_current_state_validator_v1"
+_VALIDATION_ARCHITECTURE = "stage126_current_state_validator_v2_lean"
 _VALIDATOR_ID = "stage126_current_state_validator"
+# The validator version AS RECORDED by the frozen 2026-07-23 human decision
+# text/architecture (project/stage126/
+# stage126_validation_architecture_boundary_decision.json). That file is a
+# historical, locked governance record and must stay byte-identical to what
+# was actually decided that day, regardless of how many times the CURRENT
+# validator implementation version (_VALIDATION_ARCHITECTURE above) is bumped
+# afterward by ordinary maintenance. Never compare the two.
+_HISTORICAL_DECISION_VALIDATOR_VERSION = "stage126_current_state_validator_v1"
+# Stage126+ Q1/Q2 Lean Governance label surfaced in the Handoff's
+# `validation_architecture` field (see
+# project/docs/ai/STAGE126_Q1Q2_LEAN_GOVERNANCE.md). Distinct from
+# `_VALIDATION_ARCHITECTURE` above, which pins the validator's own code
+# contract version.
+_LEAN_GOVERNANCE_ARCHITECTURE = "stage126_q1q2_lean_governance_v1"
 
 
 _CURRENT_STATE_METADATA_REL = (
@@ -1645,29 +1659,71 @@ def derive_validation_architecture_markers(root: str) -> dict:
         raise HandoffError("boundary decision does not freeze Stage125 Part 5")
     if arch.get("stage125_part5_is_live_successor_validator") is not False:
         raise HandoffError("boundary decision still treats Part 5 as live")
+    # The decision is HISTORICAL provenance: it must still record exactly the
+    # validator version that existed when it was authorized on 2026-07-23 --
+    # never the CURRENT validator implementation version. Coupling the two
+    # would force rewriting a locked historical record every time the live
+    # validator evolves, which Stage126+ Q1/Q2 Lean Governance explicitly
+    # rules out (section 3: "validator refactor that preserves scientific
+    # gates" needs no new authorization, and section 5: earlier state must
+    # not be forced to keep matching current state).
     if arch.get("stage126_current_state_validator_version") != \
-            _VALIDATION_ARCHITECTURE:
-        raise HandoffError("boundary decision validator version mismatch")
+            _HISTORICAL_DECISION_VALIDATOR_VERSION:
+        raise HandoffError(
+            "boundary decision no longer records its ORIGINAL historical "
+            "validator version -- this historical record must never be "
+            "rewritten to track the current validator implementation"
+        )
     if manifest.get("stage125_part5_mode") != "historical_immutable":
         raise HandoffError("boundary manifest does not freeze Stage125 Part 5")
+    # Stage126+ Q1/Q2 Lean Governance: SCIENTIFIC artifact regeneration for a
+    # closed part remains forbidden; OPERATIONAL verification-artifact
+    # bookkeeping (tests/QC/metadata) is explicitly permitted to evolve
+    # without a new scientific-error exception or authorization. The old
+    # blanket `regeneration_of_earlier_part_verification_artifacts_allowed`
+    # gate conflated the two and is retired here.
     if manifest.get(
-        "regeneration_of_earlier_part_verification_artifacts_allowed"
-    ) is not False:
-        raise HandoffError("boundary manifest permits prior-part regeneration")
+        "prior_part_scientific_artifact_regeneration_forbidden"
+    ) is not True:
+        raise HandoffError(
+            "boundary manifest does not forbid scientific artifact regeneration"
+        )
+    if manifest.get(
+        "prior_part_operational_verification_artifact_evolution_permitted"
+    ) is not True:
+        raise HandoffError(
+            "boundary manifest does not permit operational verification "
+            "artifact evolution"
+        )
     if report.get("stage125_part5_live_gate_active") is not False:
         raise HandoffError("validation report still marks Part 5 as a live gate")
     if report.get("contract_version") != _VALIDATION_ARCHITECTURE:
         raise HandoffError("validation report version mismatch")
-    if report.get("prior_part_verification_artifact_regeneration_allowed") \
-            is not False:
-        raise HandoffError("validation report permits prior-part regeneration")
+    if report.get(
+        "prior_part_scientific_artifact_regeneration_forbidden"
+    ) is not True:
+        raise HandoffError(
+            "validation report does not forbid scientific artifact regeneration"
+        )
+    if report.get(
+        "prior_part_operational_verification_artifact_evolution_permitted"
+    ) is not True:
+        raise HandoffError(
+            "validation report does not permit operational verification "
+            "artifact evolution"
+        )
 
     markers = {
-        "validation_architecture": _VALIDATION_ARCHITECTURE,
+        "validation_architecture": _LEAN_GOVERNANCE_ARCHITECTURE,
+        "scientific_artifacts_hard_locked": True,
+        "operational_surfaces_git_versioned": True,
+        "single_live_current_state_authority": True,
+        "legacy_validation_boundary_adapted": True,
         "stage125_part5_mode": "historical_immutable",
         "stage125_part5_live_gate_active": False,
         "stage125_part5_future_regeneration_allowed": False,
-        "prior_robustness_verification_artifact_regeneration_allowed": False,
+        "prior_part_scientific_artifact_regeneration_forbidden": True,
+        "prior_part_operational_verification_artifact_evolution_permitted": True,
         "prior_part_reopening_requires_scientific_error": True,
         "prior_part_reopening_requires_explicit_human_authorization": True,
     }
@@ -1680,6 +1736,7 @@ _TEST_BOUNDARY_REL = (
     "project/stage126/stage126_live_vs_historical_test_boundary.json"
 )
 _HISTORICAL_MARKER = "live_successor_state"
+_TERMINAL_HISTORICAL_MARKER = "stage126_terminal_successor_state"
 _HISTORICAL_REFERENCE_COMMIT = "6412b45c4adc6584a5567c7c96e0932f68f31e8a"
 _FROZEN_PART5_TEST_SHA256 = (
     "0b9413b2adbf9c44b0fb12b4f7ef2dad60be5cd4c401ccefac30d19f0905af71"
@@ -1709,12 +1766,18 @@ def derive_live_vs_historical_test_boundary_markers(root: str) -> dict:
         "historical_test_file_sha256": _FROZEN_PART5_TEST_SHA256,
         "historical_reference_commit": _HISTORICAL_REFERENCE_COMMIT,
         "historical_successor_tests_are_live_gate": False,
-        "stage126_live_suite_marker_expression": "not live_successor_state",
+        "stage126_live_suite_marker_expression": (
+            "not live_successor_state and not stage126_terminal_successor_state"
+        ),
         "current_state_validator_remains_live_gate": True,
         "part3_scientific_artifacts_changed": False,
         "part4_authorized": False,
         "final_test_unlocked": False,
         "stage125_part5_reopened_or_repinned": False,
+        "terminal_historical_marker": _TERMINAL_HISTORICAL_MARKER,
+        "terminal_historical_marked_node_count": 5,
+        "terminal_historical_successor_tests_are_live_gate": False,
+        "whole_part1_or_part2_test_file_excluded": False,
     }
     for key, want in exact.items():
         if record.get(key) != want:
@@ -1735,7 +1798,9 @@ def derive_live_vs_historical_test_boundary_markers(root: str) -> dict:
         "stage125_part5_historical_successor_test_reference_commit":
             _HISTORICAL_REFERENCE_COMMIT,
         "stage125_part5_historical_successor_tests_in_live_gate": False,
-        "stage126_live_test_suite_marker_expression": "not live_successor_state",
+        "stage126_live_test_suite_marker_expression": (
+            "not live_successor_state and not stage126_terminal_successor_state"
+        ),
     }
 
 
