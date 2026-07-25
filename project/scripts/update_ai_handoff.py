@@ -441,6 +441,7 @@ ARTIFACT_ONLY_FILES = (
     # Stage126 validation-architecture boundary artifacts.
     "project/stage126/stage126_validation_architecture_boundary_decision.json",
     "project/stage126/stage126_historical_boundary_manifest.json",
+    "project/stage126/stage126_closed_part_registry.json",
     "project/stage126/stage126_current_state_validation_report.json",
     "project/stage126/stage126_live_vs_historical_test_boundary.json",
     "project/stage126/README_STAGE126_CURRENT_STATE_VALIDATION.md",

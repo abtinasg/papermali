@@ -9,17 +9,17 @@ _Generated from the repository (git + QC). Do not edit by hand._
 
 - **Stage / Batch:** Stage126 / None
 - **Active workstream:** `stage126_m1_financial_baseline`
-- **Last completed micro-part:** `stage126-m1-robustness-part4-expanded-rule-b`
+- **Last completed micro-part:** `stage126-m1-robustness-part5-persistent-loss-target`
 - **Next research action:** `stage126-m1-financial-baseline`
-- **Last stage commit:** `e85fe1d4ab88440db659d338d443607df4109c3a`
-- **Generated from commit:** `364640428020c78b13d81882e5a08155a1b38fe6` (branch `stage126-pr57-post-merge-handoff-refresh`, informational)
-- **Baseline:** `origin/main` @ `364640428020c78b13d81882e5a08155a1b38fe6`
+- **Last stage commit:** `85b77cbe7501c37d88827fcb25713bf86d3d7121`
+- **Generated from commit:** `f72941577575249ba9693fed894d4817ee028e8b` (branch `stage126-m1-robustness-part5-persistent-loss-target`, informational)
+- **Baseline:** `origin/main` @ `0962bfee463500ca572e9df23cd137904a24ef4b`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **69 assertions, 0 failed**, all_pass=True
+- ✅ **77 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -28,10 +28,10 @@ _The independent Stage126 current-state validator is the SOLE current-state vali
 
 _Scientific QC of the newest completed robustness micro-part — a DIFFERENT role from current-state validation above._
 
-- ✅ **162 assertions, 0 failed**, all_pass=True
-- Scope: `stage126_m1_robustness_part4_expanded_rule_b`
-- Report: `project/stage126/stage126_m1_robustness_part4_qc_report.json`
-- QC source commit (code): `b2e9c1fc2e61c70792b405c49640d825ba6a20c9`
+- ✅ **134 assertions, 0 failed**, all_pass=True
+- Scope: `stage126_m1_robustness_part5_persistent_loss_target`
+- Report: `project/stage126/stage126_m1_robustness_part5_qc_report.json`
+- QC source commit (code): `85b77cbe7501c37d88827fcb25713bf86d3d7121`
 
 ## Workflow markers
 
@@ -68,5 +68,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `28f1a2145d59c3b9c6f7d9754cfaefe546f155821d59ee253ee12a6167a01e34`_
-_generated_at_utc: 2026-07-24T16:14:42Z (informational)_
+_state_fingerprint: `53c3e50b022e4c7a96d185c6e789c22879546a5bf9f27eb0a0c64689a5e95ad2`_
+_generated_at_utc: 2026-07-25T06:14:07Z (informational)_
