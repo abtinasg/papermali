@@ -3,6 +3,45 @@
 Human-maintained, newest first. Record decisions and milestones (not every commit —
 `git log` already has those).
 
+## 2026-07-24 — Stage126 M1 Robustness Part 5 (persistent-loss target)
+
+- **Part 5 was explicitly human-authorized and completed on the development
+  folds.** Authorization text is 512 UTF-8 bytes, SHA-256
+  `e00b43d812b3da2104bfedb30a1dd63276a7f28347b93ff7f4bbcad60fd23678`,
+  recomputed before execution. Consumed by this execution; grants no standing
+  authorization, no Part 6, no merge, no refit, no final test.
+- **Only the target changed** — to `FD_target_persistent_loss_robustness_t_plus_1`.
+  Sample (`main_rule_a_primary`), nine-feature set, preprocessing,
+  missingness-indicator logic, selected configurations, folds, seeds, metric
+  list, Top-10% rule and class-weighting policy all held fixed. Sample and OOF
+  identity sets are byte-for-byte the primary M1 sets; only target values differ.
+- **Counts.** 1012 rows / 119 companies / 100 positive / 912 negative;
+  development 666 (85 / 581); folds 245 / 205 / 450 / 216; 1263 OOF rows (421 per
+  family); 9 metric rows. 22 fits, 22 predictions, 0 tuning searches. XGBoost
+  `scale_pos_weight` per training fold: fold1 203/42 = 4.833333333333, fold2
+  378/72 = 5.25.
+- **Development-only target transitions** (primary → persistent-loss, 666 rows):
+  0→0 = 581, 0→1 = 17, 1→0 = 0, 1→1 = 68 (primary 68 → persistent 85, net +17),
+  reconciled to the frozen development aggregate.
+- **Final test locked.** 346 identities counted via the frozen split contract
+  only; 0 predictor rows, 0 target rows, 0 predictions, 0 evaluations. The only
+  final-test information used is the frozen event-count gate aggregate:
+  persistent-loss 15 positive / 331 negative versus primary-target 12 / 334 — no
+  row-level final-test target accessed. No full-development refit; no
+  calibration/bootstrap/Holm/p-values/winner selection; no SMOTE/SMOTENC/SHAP.
+- **Pooled development-OOF PR-AUC:** Logistic 0.508760611404, RF 0.500501101034,
+  XGBoost 0.441491570406. The locked primary ordering Logistic > RF > XGBoost is
+  preserved. Part 5 is development-only secondary target-robustness evidence: the
+  primary target, primary metrics and primary ordering are unchanged, no paper
+  winner is selected, and the persistent-loss target is not multiplied across the
+  other three samples.
+- **The closed-part registry retains the Parts 1-4 entries byte-for-byte** and
+  appends Part 5 (`closed_part_count = 5`); next registered category
+  `smote_training_fold_only_robustness` (Part 6) is unauthorized and not started.
+  Parts 1-4, the primary Stage126 artifacts and Stage125 are byte-identical. The
+  independent current-state validator advanced generically with no source change
+  (77 assertions, 0 failed); Part 5 QC is 134 assertions, 0 failed.
+
 ## 2026-07-24 — Stage126 Part 4 canonical runtime-provenance correction (PR #57)
 
 - **Recorded a single provenance-correction human authorization** for PR #57.

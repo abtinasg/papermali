@@ -180,6 +180,60 @@ validator remains the sole current-state validation surface.
   used as a gate. The independent current-state validator recognized Part 3
   generically with no source change.
 
+### Stage126 M1 robustness Part 5 — executed (2026-07-24)
+
+- **Part 5 (`persistent_loss_robustness_target`) was explicitly human-authorized
+  and completed on the development folds only.** The authorization text is 512
+  UTF-8 bytes and hashes to
+  `e00b43d812b3da2104bfedb30a1dd63276a7f28347b93ff7f4bbcad60fd23678`; it is
+  consumed by this execution and grants no standing authorization, no merge, no
+  Part 6, no retuning, no refit, no final-test access or evaluation, no
+  calibration/threshold optimization/bootstrap/Holm/p-values/winner selection,
+  and no SMOTE/SMOTENC/SHAP/M2/M3/M4.
+- **Only the target changed** — to `FD_target_persistent_loss_robustness_t_plus_1`.
+  The primary `main_rule_a_primary` sample, the nine-feature
+  `M1_PRIMARY_FEATURE_ORDER` set (18 model-matrix columns), preprocessing,
+  missingness-indicator logic, the three selected configurations
+  (`logistic__C_0.1`, `rf__depth_3__maxfeat_'sqrt'__leaf_10`,
+  `xgboost__lr_0.03__depth_2__mcw_1__lambda_1`), the temporal folds, the seeds,
+  the metric list, the Top-10% rule and the class-weighting policy are all held
+  fixed. **Sample identities and OOF identity sets are byte-for-byte the primary
+  M1 sets** — only target values differ.
+- **Counts:** 1012 analysis-ready rows / 119 companies / 100 positive / 912
+  negative; development 666 (85 positive / 581 negative); folds 245 / 205 / 450
+  / 216; 1263 OOF rows (421 per family); 9 metric rows.
+- **Development-only target transitions** (primary → persistent-loss, computed on
+  the 666 development rows and reconciled to the frozen aggregate): 0→0 = 581,
+  0→1 = 17, 1→0 = 0, 1→1 = 68; primary positives 68 → persistent-loss positives
+  85 (net +17; every added positive is a former negative, no primary positive
+  is lost).
+- **No retuning** (0 tuning searches; exactly 22 fits / 22 predictions). **No
+  full-development refit.** XGBoost `scale_pos_weight` recomputed per training
+  fold from the Part 5 target only — fold1 203/42 = 4.833333333333, fold2 378/72
+  = 5.25 — never from validation rows and never reused from the primary target.
+- **The final test remained locked.** 346 final-test identities were counted
+  only through the frozen temporal split contract; zero predictor rows, zero
+  target rows, zero predictions, zero evaluations. The only final-test
+  information used is the frozen event-count gate aggregate: persistent-loss
+  15 positive / 331 negative versus the primary-target 12 / 334 — no row-level
+  final-test target was accessed and no final-test row identity was paired with a
+  target value.
+- **Development-only secondary target-robustness evidence.** Pooled PR-AUC:
+  Logistic 0.508760611404, RF 0.500501101034, XGBoost 0.441491570406. **The
+  locked primary ordering Logistic > RF > XGBoost is preserved.** Part 5 does
+  **not** replace the primary target, the primary metrics or the primary
+  ordering, is not a new confirmatory comparison, and **selects no paper
+  winner**. The persistent-loss target is not multiplied across the other three
+  samples.
+- **Part 6 (`smote_training_fold_only_robustness`) is not authorized and not
+  started.** Part 6 remains outstanding.
+- **Nothing closed was touched.** Parts 1-4 packages (scientific and
+  verification), the primary Stage126 artifacts and the Stage125 tree are
+  byte-identical; the closed-part registry retains the Parts 1-4 entries
+  byte-for-byte and appends Part 5 (`closed_part_count = 5`). The independent
+  current-state validator recognized Part 5 generically with no source change
+  (77 assertions, 0 failed).
+
 ### Stage126 M1 robustness Part 4 — canonical provenance correction (2026-07-24)
 
 - **A single provenance-correction human authorization was recorded** for

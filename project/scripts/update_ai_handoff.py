@@ -155,6 +155,10 @@ ALLOWLIST_FILES = (
     "project/src/stage126_m1_robustness_part4_expanded_rule_b.py",
     "project/run_stage126_m1_robustness_part4_expanded_rule_b.py",
     "project/tests/test_stage126_m1_robustness_part4_expanded_rule_b.py",
+    # Stage126 M1 robustness Part 5 persistent-loss-target code, runner, tests.
+    "project/src/stage126_m1_robustness_part5_persistent_loss_target.py",
+    "project/run_stage126_m1_robustness_part5_persistent_loss_target.py",
+    "project/tests/test_stage126_m1_robustness_part5_persistent_loss_target.py",
     # Stage126 live/historical test-suite boundary: config, runner, and tests.
     "pytest.ini",
     "project/run_stage125_part5_historical_successor_tests.py",
@@ -422,9 +426,22 @@ ARTIFACT_ONLY_FILES = (
     "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART3_EXPANDED_RULE_A.md",
     "project/stage126/stage126_m1_robustness_part3_qc_report.json",
     "project/stage126/metadata_and_hashes_stage126_m1_robustness_part3.json",
+    # Stage126 M1 robustness Part 5 generated scientific artifacts (no
+    # sample-delta artifact: the sample is unchanged from the primary sample).
+    "project/stage126/stage126_m1_robustness_part5_human_authorization_record.json",
+    "project/stage126/stage126_m1_robustness_part5_feature_manifest.csv",
+    "project/stage126/stage126_m1_robustness_part5_execution_manifest.json",
+    "project/stage126/stage126_m1_robustness_part5_oof_predictions.csv",
+    "project/stage126/stage126_m1_robustness_part5_metrics.csv",
+    "project/stage126/stage126_m1_robustness_part5_primary_comparison.json",
+    "project/stage126/stage126_m1_robustness_part5_completion_lock.json",
+    "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART5_PERSISTENT_LOSS_TARGET.md",
+    "project/stage126/stage126_m1_robustness_part5_qc_report.json",
+    "project/stage126/metadata_and_hashes_stage126_m1_robustness_part5.json",
     # Stage126 validation-architecture boundary artifacts.
     "project/stage126/stage126_validation_architecture_boundary_decision.json",
     "project/stage126/stage126_historical_boundary_manifest.json",
+    "project/stage126/stage126_closed_part_registry.json",
     "project/stage126/stage126_current_state_validation_report.json",
     "project/stage126/stage126_live_vs_historical_test_boundary.json",
     "project/stage126/README_STAGE126_CURRENT_STATE_VALIDATION.md",
@@ -855,6 +872,39 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "m4_data_collected",
         "contract_version",
     ),
+    # Stage126 M1 robustness Part 5 inherits the unchanged Stage126 markers and
+    # adds the Part 5 completion state on top of the retained Part 1/2/3/4 state.
+    "stage126_m1_robustness_part5_persistent_loss_target": (
+        "stage125_completed",
+        "stage126_m1_entry_ready",
+        "stage126_authorized",
+        "stage126_started",
+        "development_modeling_authorized",
+        "modeling_authorized",
+        "modeling_started",
+        "final_test_unlocked",
+        "final_test_access_authorized",
+        "final_test_predictor_values_inspected",
+        "final_test_target_values_inspected",
+        "final_test_evaluation_performed",
+        "m1_primary_development_tuning_completed",
+        "m1_robustness_started",
+        "m1_robustness_completed",
+        "m1_robustness_part1_completed",
+        "m1_robustness_part2_completed",
+        "m1_robustness_part3_completed",
+        "m1_robustness_part4_completed",
+        "m1_robustness_part5_human_authorized",
+        "m1_robustness_part5_completed",
+        "m1_robustness_completed_category_ids",
+        "m1_robustness_next_category_id",
+        "m1_robustness_part6_authorized",
+        "full_development_refit_performed",
+        "m2_data_collected",
+        "m3_data_collected",
+        "m4_data_collected",
+        "contract_version",
+    ),
     # Stage126 M1 robustness Part 2 inherits the unchanged Stage126 markers and
     # adds the Part 2 completion state on top of the retained Part 1 state.
     "stage126_m1_robustness_part2_listing_rule_b": (
@@ -899,6 +949,7 @@ STAGE126_QC_SCOPES = frozenset({
     "stage126_m1_robustness_part2_listing_rule_b",
     "stage126_m1_robustness_part3_expanded_rule_a",
     "stage126_m1_robustness_part4_expanded_rule_b",
+    "stage126_m1_robustness_part5_persistent_loss_target",
 })
 
 STAGE126_CARRIED_TEMPORAL_AVAILABILITY_FIELDS = (
@@ -2146,7 +2197,7 @@ def derive_m1_robustness_part4_markers(root: str, expected_order: list) -> dict:
             f"Part 4 next_category_id {lock.get('next_category_id')!r} != "
             f"{expected_order[4]!r}"
         )
-    return {
+    part4_markers = {
         "m1_robustness_started": True,
         "m1_robustness_completed": False,
         "m1_robustness_part1_completed": True,
@@ -2159,6 +2210,138 @@ def derive_m1_robustness_part4_markers(root: str, expected_order: list) -> dict:
         "m1_robustness_part4_authorized": False,
         "m1_robustness_part5_authorized": False,
         # A consumed Part 4 authorization is NOT a standing authorization.
+        "m1_robustness_execution_authorized": False,
+    }
+    # Part 5 (if executed) advances the completion prefix on top of Part 4.
+    part4_markers.update(
+        derive_m1_robustness_part5_markers(root, expected_order)
+    )
+    return part4_markers
+
+
+_M1_ROBUSTNESS_PART5_AUTH_REL = (
+    "project/stage126/stage126_m1_robustness_part5_human_authorization_record.json"
+)
+_M1_ROBUSTNESS_PART5_LOCK_REL = (
+    "project/stage126/stage126_m1_robustness_part5_completion_lock.json"
+)
+_PART5_CATEGORY_ID = "persistent_loss_robustness_target"
+_PART5_MICRO_PART_ID = "stage126-m1-robustness-part5-persistent-loss-target"
+_PART5_AUTH_TEXT_SHA256 = (
+    "e00b43d812b3da2104bfedb30a1dd63276a7f28347b93ff7f4bbcad60fd23678"
+)
+
+
+def derive_m1_robustness_part5_markers(root: str, expected_order: list) -> dict:
+    """Derive Part 5 completion markers (fail-closed).
+
+    Returns {} when Part 5 has not been executed. A completed and consumed
+    Part 5 authorization grants NO standing authorization for Part 6.
+    """
+    auth_path = os.path.join(root, _M1_ROBUSTNESS_PART5_AUTH_REL)
+    lock_path = os.path.join(root, _M1_ROBUSTNESS_PART5_LOCK_REL)
+    if not (os.path.isfile(auth_path) and os.path.isfile(lock_path)):
+        if os.path.isfile(auth_path) != os.path.isfile(lock_path):
+            raise HandoffError(
+                "Part 5 authorization record and completion lock must both exist"
+            )
+        return {}
+    try:
+        auth = json.load(open(auth_path, encoding="utf-8"))
+        lock = json.load(open(lock_path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable Part 5 artifacts: {exc}") from exc
+
+    auth_exact = {
+        "authorization_id": "stage126-m1-robustness-part5-human-authorization",
+        "authorized_category_id": _PART5_CATEGORY_ID,
+        "part5_execution_authorized": True,
+        "create_open_unmerged_pr_authorized": True,
+        "merge_authorized": False,
+        "part6_execution_authorized": False,
+        "retuning_authorized": False,
+        "full_development_refit_authorized": False,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_authorized": False,
+        "calibration_authorized": False,
+        "bootstrap_authorized": False,
+        "holm_authorized": False,
+        "winner_selection_authorized": False,
+        "smote_authorized": False,
+        "shap_authorized": False,
+    }
+    for k, v in auth_exact.items():
+        if auth.get(k) != v:
+            raise HandoffError(
+                f"Part 5 authorization field {k}={auth.get(k)!r} != {v!r}"
+            )
+    text = auth.get("human_authorization_text")
+    if not isinstance(text, str):
+        raise HandoffError("Part 5 authorization text missing")
+    if hashlib.sha256(text.encode("utf-8")).hexdigest() != _PART5_AUTH_TEXT_SHA256:
+        raise HandoffError("Part 5 authorization text SHA-256 mismatch")
+    if auth.get("human_authorization_text_sha256") != _PART5_AUTH_TEXT_SHA256:
+        raise HandoffError("Part 5 authorization hash field mismatch")
+
+    lock_exact = {
+        "category_id": _PART5_CATEGORY_ID,
+        "micro_part_id": _PART5_MICRO_PART_ID,
+        "part5_human_authorized": True,
+        "part5_execution_completed": True,
+        "authorization_consumed": True,
+        "development_only": True,
+        "only_target_changed": True,
+        "sample_changed": False,
+        "replaces_primary_results": False,
+        "replaces_primary_target": False,
+        "selects_paper_winner": False,
+        "part6_execution_authorized": False,
+        "m1_robustness_execution_authorized": False,
+        "m1_robustness_completed": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_predictor_values_inspected": False,
+        "final_test_target_values_inspected": False,
+        "final_test_evaluation_performed": False,
+        "smote_executed": False,
+        "smotenc_executed": False,
+        "shap_executed": False,
+        "calibration_executed": False,
+        "bootstrap_executed": False,
+        "holm_executed": False,
+        "winner_selected": False,
+    }
+    for k, v in lock_exact.items():
+        if lock.get(k) != v:
+            raise HandoffError(
+                f"Part 5 completion lock field {k}={lock.get(k)!r} != {v!r}"
+            )
+    completed = list(lock.get("completed_category_ids") or [])
+    if completed != list(expected_order[:5]):
+        raise HandoffError(
+            f"Part 5 completed_category_ids {completed!r} is not the exact "
+            f"five-category prefix"
+        )
+    if lock.get("next_category_id") != expected_order[5]:
+        raise HandoffError(
+            f"Part 5 next_category_id {lock.get('next_category_id')!r} != "
+            f"{expected_order[5]!r}"
+        )
+    return {
+        "m1_robustness_started": True,
+        "m1_robustness_completed": False,
+        "m1_robustness_part1_completed": True,
+        "m1_robustness_part2_completed": True,
+        "m1_robustness_part3_completed": True,
+        "m1_robustness_part4_completed": True,
+        "m1_robustness_part5_human_authorized": True,
+        "m1_robustness_part5_completed": True,
+        "m1_robustness_completed_category_ids": completed,
+        "m1_robustness_next_category_id": expected_order[5],
+        "m1_robustness_part5_authorized": False,
+        "m1_robustness_part6_authorized": False,
+        # A consumed Part 5 authorization is NOT a standing authorization.
         "m1_robustness_execution_authorized": False,
     }
 

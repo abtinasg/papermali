@@ -280,13 +280,14 @@ def test_part_scientific_artifacts_are_immutable(pinned, label):
 
 def test_closed_part_registry_pins_both_packages():
     registry = _read_json(v.F_CLOSED_REGISTRY)
-    assert registry["closed_part_count"] == 4
+    assert registry["closed_part_count"] == 5
     assert registry["regeneration_allowed"] is False
     parts = registry["parts"]
     assert set(parts) == {
         "m1_target_proximity_six_feature_set", "main_rule_b_listing_robustness",
         "expanded_rule_a_company_scope_robustness",
         "expanded_rule_b_combined_robustness",
+        "persistent_loss_robustness_target",
     }
     for category, pinned in (
         ("m1_target_proximity_six_feature_set", PART1_SCIENTIFIC),
@@ -408,13 +409,14 @@ def test_completed_categories_and_next_category():
         "m1_target_proximity_six_feature_set", "main_rule_b_listing_robustness",
         "expanded_rule_a_company_scope_robustness",
         "expanded_rule_b_combined_robustness",
+        "persistent_loss_robustness_target",
     ]
-    assert report["next_category_id"] == "persistent_loss_robustness_target"
+    assert report["next_category_id"] == "smote_training_fold_only_robustness"
     assert report["next_category_authorized"] is False
     assert report["standing_execution_authorization"] is False
     assert report["m1_robustness_completed"] is False
     assert report["last_completed_micro_part"] == (
-        "stage126-m1-robustness-part4-expanded-rule-b"
+        "stage126-m1-robustness-part5-persistent-loss-target"
     )
 
 
@@ -575,7 +577,7 @@ def test_handoff_timestamp_change_does_not_reopen_a_closed_part(tmp_path):
         (root / v.PART0_DECISION_RECORD_REL).read_text(encoding="utf-8")
     )["execution_order"]
     completed, ids = v.completed_prefix(root, order)
-    assert ids == order[:4]
+    assert ids == order[:5]
     after = {
         name: _sha(root / "project/stage126" / name) for name in PART2_SCIENTIFIC
     }
@@ -608,36 +610,40 @@ def test_new_current_test_hash_does_not_regenerate_a_closed_part(tmp_path):
 # --------------------------------------------------------------------------- #
 
 def _synthetic_next_part(root: Path) -> str:
-    """Write a COMPLETE, valid synthetic Part 5 package into a mirrored repo.
+    """Write a COMPLETE, valid synthetic Part 6 package into a mirrored repo.
 
+    Parts 1-5 are already real in the mirror; Part 6
+    (``smote_training_fold_only_robustness``) is the next registered category.
     Mirrors the real per-part package contract exactly: authorization record,
     completion lock, the full scientific surface, QC report, metadata manifest
-    and README. Nothing here touches Parts 1-4 or Stage125.
+    and README. Nothing here touches Parts 1-5 or Stage125. This synthetic
+    package is a validator fixture only: it never runs SMOTE (``smote_executed``
+    stays False), so it satisfies the generic development-only package contract.
     """
     d = root / "project/stage126"
-    prefix = "stage126_m1_robustness_part5"
-    micro_id = "stage126-m1-robustness-part5-persistent-loss"
-    qc_scope = "stage126_m1_robustness_part5_persistent_loss"
+    prefix = "stage126_m1_robustness_part6"
+    micro_id = "stage126-m1-robustness-part6-smote"
+    qc_scope = "stage126_m1_robustness_part6_smote"
 
     (d / f"{prefix}_human_authorization_record.json").write_text(json.dumps({
-        "authorization_id": "stage126-m1-robustness-part5-human-authorization",
-        "authorized_category_id": "persistent_loss_robustness_target",
-        "human_authorization_text": "synthetic part 5 authorization",
+        "authorization_id": "stage126-m1-robustness-part6-human-authorization",
+        "authorized_category_id": "smote_training_fold_only_robustness",
+        "human_authorization_text": "synthetic part 6 authorization",
         "human_authorization_text_sha256": hashlib.sha256(
-            b"synthetic part 5 authorization"
+            b"synthetic part 6 authorization"
         ).hexdigest(),
-        "part5_execution_authorized": True,
+        "part6_execution_authorized": True,
         "merge_authorized": False,
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     (d / f"{prefix}_completion_lock.json").write_text(json.dumps({
-        "category_id": "persistent_loss_robustness_target",
+        "category_id": "smote_training_fold_only_robustness",
         "micro_part_id": micro_id,
-        "part5_human_authorized": True,
-        "part5_execution_completed": True,
+        "part6_human_authorized": True,
+        "part6_execution_completed": True,
         "authorization_consumed": True,
         "development_only": True,
-        "part6_execution_authorized": False,
+        "part7_execution_authorized": False,
         "m1_robustness_execution_authorized": False,
         "m1_robustness_started": True,
         "m1_robustness_completed": False,
@@ -656,14 +662,15 @@ def _synthetic_next_part(root: Path) -> str:
             "expanded_rule_a_company_scope_robustness",
             "expanded_rule_b_combined_robustness",
             "persistent_loss_robustness_target",
+            "smote_training_fold_only_robustness",
         ],
-        "next_category_id": "smote_training_fold_only_robustness",
+        "next_category_id": "",
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     payloads = {
         f"{prefix}_feature_manifest.csv": "feature_order,feature_name\n1,synthetic\n",
         f"{prefix}_execution_manifest.json": json.dumps(
-            {"category_id": "persistent_loss_robustness_target"},
+            {"category_id": "smote_training_fold_only_robustness"},
             indent=2, sort_keys=True) + "\n",
         f"{prefix}_oof_predictions.csv": "ticker,predicted_probability\nX,0.5\n",
         f"{prefix}_metrics.csv": "model_family,scope,pr_auc\nrf,pooled,0.4\n",
@@ -693,20 +700,20 @@ def _synthetic_next_part(root: Path) -> str:
         },
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (d / f"README_{prefix.upper()}.md").write_text(
-        "# Synthetic Part 5\n", encoding="utf-8")
+        "# Synthetic Part 6\n", encoding="utf-8")
 
     # A real part also ships source, runner and tests — the registry pins them.
-    (root / "project/src" / f"{prefix}_persistent_loss.py").write_text(
-        '"""Synthetic Part 5 implementation."""\n', encoding="utf-8")
-    (root / "project" / f"run_{prefix}_persistent_loss.py").write_text(
-        '"""Synthetic Part 5 runner."""\n', encoding="utf-8")
-    (root / "project/tests" / f"test_{prefix}_persistent_loss.py").write_text(
-        '"""Synthetic Part 5 tests."""\n', encoding="utf-8")
+    (root / "project/src" / f"{prefix}_smote.py").write_text(
+        '"""Synthetic Part 6 implementation."""\n', encoding="utf-8")
+    (root / "project" / f"run_{prefix}_smote.py").write_text(
+        '"""Synthetic Part 6 runner."""\n', encoding="utf-8")
+    (root / "project/tests" / f"test_{prefix}_smote.py").write_text(
+        '"""Synthetic Part 6 tests."""\n', encoding="utf-8")
     return micro_id
 
 
 def _set_handoff_to_next_part(root: Path, micro_id: str) -> None:
-    """Update the mirrored Handoff to the truthful Part 5-completed state."""
+    """Update the mirrored Handoff to the truthful Part 6-completed state."""
     path = root / v.HANDOFF_STATE_REL
     state = json.loads(path.read_text(encoding="utf-8"))
     state["last_completed_micro_part"] = micro_id
@@ -716,12 +723,13 @@ def _set_handoff_to_next_part(root: Path, micro_id: str) -> None:
         "expanded_rule_a_company_scope_robustness",
         "expanded_rule_b_combined_robustness",
         "persistent_loss_robustness_target",
+        "smote_training_fold_only_robustness",
     ]
     state["last_completed_micro_part_qc_scope"] = (
-        "stage126_m1_robustness_part5_persistent_loss"
+        "stage126_m1_robustness_part6_smote"
     )
     state["last_completed_micro_part_qc_path"] = (
-        "project/stage126/stage126_m1_robustness_part5_qc_report.json"
+        "project/stage126/stage126_m1_robustness_part6_qc_report.json"
     )
     state["last_completed_micro_part_qc_assertions"] = 7
     state["last_completed_micro_part_qc_failed"] = 0
@@ -770,12 +778,13 @@ def test_end_to_end_synthetic_next_part_build_and_check(tmp_path):
         "expanded_rule_a_company_scope_robustness",
         "expanded_rule_b_combined_robustness",
         "persistent_loss_robustness_target",
+        "smote_training_fold_only_robustness",
     ]
-    assert report["completed_part_count"] == 5
-    assert report["next_category_id"] == "smote_training_fold_only_robustness"
+    assert report["completed_part_count"] == 6
+    assert report["next_category_id"] == ""
     assert report["last_completed_micro_part"] == micro_id
     assert report["last_completed_micro_part_qc_scope"] == (
-        "stage126_m1_robustness_part5_persistent_loss"
+        "stage126_m1_robustness_part6_smote"
     )
     assert report["last_completed_micro_part_qc_assertions"] == 7
     assert set(report["closed_part_registry"]["parts"]) == {
@@ -784,6 +793,7 @@ def test_end_to_end_synthetic_next_part_build_and_check(tmp_path):
         "expanded_rule_a_company_scope_robustness",
         "expanded_rule_b_combined_robustness",
         "persistent_loss_robustness_target",
+        "smote_training_fold_only_robustness",
     }
 
     after = {rel: _sha(root / rel) for rel in watched}
@@ -844,7 +854,7 @@ def test_half_present_part_package_fails_closed(tmp_path):
 def test_unauthorized_future_artifact_fails_closed(tmp_path):
     root = _mirror(tmp_path)
     (root / "project/stage126"
-     / "stage126_m1_robustness_part5_oof_predictions.csv").write_text(
+     / "stage126_m1_robustness_part6_oof_predictions.csv").write_text(
         "a,b\n1,2\n", encoding="utf-8",
     )
     order = json.loads(

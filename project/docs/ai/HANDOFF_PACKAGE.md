@@ -21,7 +21,7 @@ to a source** and nothing is guessed.
 
 ## 3. Current state
 
-See [`CURRENT_STATE.md`](CURRENT_STATE.md) (auto-generated). Stage126 M1 is human-authorized and started. Primary M1 development-fold tuning is completed on PR #52. M1 robustness Parts 1–4 are completed on the development folds (Part 4 `expanded_rule_b_combined_robustness` was explicitly authorized and is completed; that authorization was consumed and is not a standing authorization). Parts 5–6 remain outstanding and Part 5 is not authorized. No full-development refit has occurred. The final test remains locked and untouched. M2/M3/M4 data were not collected.
+See [`CURRENT_STATE.md`](CURRENT_STATE.md) (auto-generated). Stage126 M1 is human-authorized and started. Primary M1 development-fold tuning is completed on PR #52. M1 robustness Parts 1–5 are completed on the development folds (Part 5 `persistent_loss_robustness_target` was explicitly authorized and is completed; that authorization was consumed and is not a standing authorization). Part 6 remains outstanding and is not authorized. No full-development refit has occurred. The final test remains locked and untouched. M2/M3/M4 data were not collected.
 
 ## 4. Firm decisions
 
@@ -34,7 +34,7 @@ See [`DECISIONS.md`](DECISIONS.md).
   hashes).
 - Stage122 / Stage123 / targets / financials / ratios / statement-scope are
   **read-only**; their hashes are checked before and after every run.
-- **Current Stage126 M1 prohibitions:** final-test access or evaluation; full-development refit; execution of any outstanding robustness category without its own separate explicit human authorization (next: Part 5 `persistent_loss_robustness_target`; Part 6 `smote_training_fold_only_robustness`); reopening, regenerating or rerunning completed Parts 1–4 without both a genuine scientific error and separate explicit human authorization; M2/M3/M4 data collection or modeling; SHAP; network extraction.
+- **Current Stage126 M1 prohibitions:** final-test access or evaluation; full-development refit; execution of any outstanding robustness category without its own separate explicit human authorization (next: Part 6 `smote_training_fold_only_robustness`); reopening, regenerating or rerunning completed Parts 1–5 without both a genuine scientific error and separate explicit human authorization; M2/M3/M4 data collection or modeling; SHAP; network extraction.
 - Bulky outputs are gitignored; only source + small QC/metadata/audit files are
   committed.
 - Two-commit workflow: **code-commit → artifact-commit → merge-commit**. QC points at
@@ -201,6 +201,21 @@ Do not confuse QC selection with the research-action chain:
   (**explicitly human-authorized and completed on development folds only; only
   the combined sample changed; no retuning; no full-development refit; final
   test locked; development-only sample sensitivity; Part 5 not authorized**).
+- Stage126 M1 robustness Part 5 (persistent-loss target) source/test/QC:
+  `src/stage126_m1_robustness_part5_persistent_loss_target.py`,
+  `run_stage126_m1_robustness_part5_persistent_loss_target.py`,
+  `tests/test_stage126_m1_robustness_part5_persistent_loss_target.py`,
+  `stage126/stage126_m1_robustness_part5_human_authorization_record.json`,
+  `stage126/stage126_m1_robustness_part5_feature_manifest.csv`,
+  `stage126/stage126_m1_robustness_part5_oof_predictions.csv`,
+  `stage126/stage126_m1_robustness_part5_metrics.csv`,
+  `stage126/stage126_m1_robustness_part5_primary_comparison.json`,
+  `stage126/stage126_m1_robustness_part5_completion_lock.json`,
+  `stage126/stage126_m1_robustness_part5_qc_report.json`
+  (**explicitly human-authorized and completed on development folds only; only
+  the target changed; primary sample/features/configs unchanged; no retuning;
+  no full-development refit; final test locked; development-only secondary
+  target robustness; Part 6 not authorized**).
 
 ## 7. Done
 
@@ -293,13 +308,40 @@ authorization was **consumed** and is **not** a standing authorization
 (`m1_robustness_execution_authorized=false`). The Part 4 metadata runtime
 provenance was corrected to the canonical environment (Python 3.13.5 /
 jdatetime 6.0.1); no scientific artifact, metric or OOF prediction changed.
-**Part 5 (`persistent_loss_robustness_target`) is not authorized and not
-started**; each future Part requires its own separate explicit human
-authorization. Parts 5–6 remain outstanding, so M1 robustness is not complete.
 Stage125 Part 5 remains historical and immutable. All Part 1, Part 2 and Part 3
 artifacts, the primary Stage126 artifacts and Stage125 remain byte-identical,
 and the independent current-state validator advanced generically with no source
 change.
+
+**Part 5 (`persistent_loss_robustness_target`) was explicitly human-authorized
+and is now completed** on the development folds — **only the target changed**
+(to `FD_target_persistent_loss_robustness_t_plus_1`); the primary
+`main_rule_a_primary` sample, the nine-feature set and the selected
+configurations are unchanged, so the sample identities and OOF identity sets are
+byte-for-byte the primary M1 sets — only target values differ. No retuning, no
+full-development refit; XGBoost `scale_pos_weight` recomputed per training fold
+from the Part 5 target (fold1 203/42 = 4.833333333333, fold2 378/72 = 5.25).
+Counts: 1012 rows / 119 companies / 100 positive / 912 negative; development 666
+(85 / 581); folds 245 / 205 / 450 / 216; 1263 OOF rows. Development-only target
+transitions (primary → persistent-loss): 0→0 = 581, 0→1 = 17, 1→0 = 0, 1→1 = 68
+(primary 68 → persistent 85, net +17). The final test remains locked: 346
+identities counted only via the frozen split contract; the sole final-test
+information used is the frozen event-count gate aggregate (persistent-loss 15
+positive / 331 negative versus primary-target 12 / 334) — no row-level
+final-test target accessed. Pooled PR-AUC: Logistic 0.508761, RF 0.500501,
+XGBoost 0.441492 — **the locked primary ordering Logistic > RF > XGBoost is
+preserved**. Part 5 is **development-only secondary target-robustness
+evidence**: the primary target, primary metrics and primary ordering are
+**unchanged**, **no paper winner** was selected, and the persistent-loss target
+is not multiplied across the other three samples. The Part 5 authorization was
+**consumed** and is **not** a standing authorization
+(`m1_robustness_execution_authorized=false`). **Part 6
+(`smote_training_fold_only_robustness`) is not authorized and not started**;
+each future Part requires its own separate explicit human authorization. Part 6
+remains outstanding, so M1 robustness is not complete. All Part 1–4 artifacts,
+the primary Stage126 artifacts and Stage125 remain byte-identical, and the
+independent current-state validator advanced generically with no source change
+(77 assertions, 0 failed).
 
 **Observed ordering sensitivity (reported; primary claims unchanged).** Primary
 pooled PR-AUC ordering: **Logistic > RF > XGBoost**. Part 1 observed pooled
