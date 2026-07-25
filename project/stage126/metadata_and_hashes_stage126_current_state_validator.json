@@ -394,7 +394,7 @@
     }
   ],
   "closed_part_count": 5,
-  "code_commit": "5ce89d28d7116ef6a6105a8607732b52cead3a68",
+  "code_commit": "44b227749bd8b074551f85b20dfb242d0e942863",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -402,7 +402,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "5ce89d28d7116ef6a6105a8607732b52cead3a68",
+  "generated_at": "44b227749bd8b074551f85b20dfb242d0e942863",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part5-persistent-loss-target",
   "legacy_validation_boundary_adapted": true,
@@ -412,7 +412,7 @@
     "stage126_closed_part_registry.json": "a2a23ebe1afa44d778eee976f9380340a5556f71ac2fa47b9c65cad9e4a5120f",
     "stage126_current_state_validation_report.json": "34e69cf67a6e8b16eefc3ea03d919591291994a2d5bd6595ba99f7d594678700",
     "stage126_historical_boundary_manifest.json": "a518be27730e32b8a7de8de2d46865fc5efc1d31a5f796d00a6557d25f92a838",
-    "stage126_validation_architecture_boundary_decision.json": "96d532b341a54375baf4e6d8967454f57e567c348f23bb147911f7dcb7e66893"
+    "stage126_validation_architecture_boundary_decision.json": "7502405fc0c2641c7dc766f3d4a52941b4c4841295d1d3130c07718768a6e06c"
   },
   "prior_part_operational_verification_artifact_evolution_permitted": true,
   "prior_part_reopening_requires_explicit_human_authorization": true,
@@ -420,7 +420,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "b3b2e24be7a6d933b5f7ed3f175e70099214e871e7f71351cf3f90ed8714ac45",
+  "source_file_sha256": "3fb277c761a119e69674070da50ae5faeb987abac1b68076e59368f01a691de6",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {
@@ -433,7 +433,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "68d7d0a8b3a8e2cedf3db48d57fb70ada4d467b09001eaf8289a311b8651908f",
+  "test_file_sha256": "8a894beb8d6bd23ed4ee4247c6666fa71fdda9266dd82422e2e0f667a9552b1a",
   "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v2_lean"

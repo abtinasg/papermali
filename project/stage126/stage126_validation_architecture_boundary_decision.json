@@ -7,7 +7,7 @@
     "stage125_part5_is_live_successor_validator": false,
     "stage125_part5_mode": "historical_immutable",
     "stage126_current_state_validation_surface": "stage126_current_state_validator",
-    "stage126_current_state_validator_version": "stage126_current_state_validator_v2_lean"
+    "stage126_current_state_validator_version": "stage126_current_state_validator_v1"
   },
   "authorizes": {
     "documentation_and_test_changes_required_for_this_boundary": true,

@@ -42,6 +42,15 @@ VALIDATOR_ID = "stage126_current_state_validator"
 VALIDATOR_VERSION = "stage126_current_state_validator_v2_lean"
 DECISION_ID = "stage126-validation-architecture-boundary-lock"
 DECISION_VERSION = "stage126_validation_architecture_boundary_v1"
+# The validator version AS RECORDED by the frozen 2026-07-23 human decision
+# text/architecture. This decision is a historical, locked governance record
+# (see build_decision_record and STAGE126_Q1Q2_LEAN_GOVERNANCE.md section 3:
+# "validator refactor that preserves scientific gates" needs no new
+# authorization). It must stay byte-identical to what was actually decided
+# that day — including the validator version that existed then — regardless
+# of how many times VALIDATOR_VERSION itself is bumped afterward by ordinary
+# maintenance. Do NOT change this constant when VALIDATOR_VERSION changes.
+HISTORICAL_DECISION_VALIDATOR_VERSION = "stage126_current_state_validator_v1"
 
 # --------------------------------------------------------------------------- #
 # Stage126+ Q1/Q2 Lean Research Governance (see
@@ -498,7 +507,8 @@ def build_decision_record() -> dict[str, Any]:
             "stage125_part5_mode": "historical_immutable",
             "stage125_part5_is_live_successor_validator": False,
             "stage126_current_state_validation_surface": VALIDATOR_ID,
-            "stage126_current_state_validator_version": VALIDATOR_VERSION,
+            "stage126_current_state_validator_version":
+                HISTORICAL_DECISION_VALIDATOR_VERSION,
             "later_part_may_regenerate_earlier_part_verification_artifacts":
                 False,
             "earlier_part_reopening_requires_scientific_error": True,

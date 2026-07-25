@@ -60,6 +60,46 @@ def test_wrong_decision_text_fails_closed(monkeypatch):
         v.verify_decision_text()
 
 
+# --------------------------------------------------------------------------- #
+# Historical decision record stays decoupled from the LIVE validator version
+# --------------------------------------------------------------------------- #
+
+def test_historical_decision_records_its_own_original_validator_version():
+    """The 2026-07-23 locked decision must record v1 — the version that
+    existed when it was authorized — never the current implementation."""
+    assert v.HISTORICAL_DECISION_VALIDATOR_VERSION == (
+        "stage126_current_state_validator_v1"
+    )
+    decision = v.build_decision_record()
+    assert decision["architecture"]["stage126_current_state_validator_version"] \
+        == "stage126_current_state_validator_v1"
+
+
+def test_future_validator_version_bump_does_not_mutate_the_historical_decision(
+    monkeypatch,
+):
+    """A future VALIDATOR_VERSION bump must not change one byte of the
+    historical decision record — proving the two are decoupled."""
+    before = v.build_decision_record()
+    monkeypatch.setattr(v, "VALIDATOR_VERSION", "stage126_current_state_validator_v99_future")
+    after = v.build_decision_record()
+    assert before == after
+    assert after["architecture"]["stage126_current_state_validator_version"] == (
+        "stage126_current_state_validator_v1"
+    )
+
+
+def test_committed_historical_decision_file_matches_origin_main_exactly():
+    """The on-disk decision file must remain byte-identical to origin/main —
+    it is historical, locked provenance, not a live artifact that tracks the
+    current validator implementation."""
+    on_disk = json.loads(
+        (_root() / v.STAGE126_DIR_REL / v.F_DECISION).read_text(encoding="utf-8")
+    )
+    assert on_disk["architecture"]["stage126_current_state_validator_version"] \
+        == "stage126_current_state_validator_v1"
+
+
 def test_decision_record_authorizes_only_the_boundary():
     rec = _read_json(v.F_DECISION)
     assert rec["decision_id"] == "stage126-validation-architecture-boundary-lock"

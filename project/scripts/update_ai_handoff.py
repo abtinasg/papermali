@@ -1522,6 +1522,14 @@ _BOUNDARY_DECISION_SHA256 = (
 )
 _VALIDATION_ARCHITECTURE = "stage126_current_state_validator_v2_lean"
 _VALIDATOR_ID = "stage126_current_state_validator"
+# The validator version AS RECORDED by the frozen 2026-07-23 human decision
+# text/architecture (project/stage126/
+# stage126_validation_architecture_boundary_decision.json). That file is a
+# historical, locked governance record and must stay byte-identical to what
+# was actually decided that day, regardless of how many times the CURRENT
+# validator implementation version (_VALIDATION_ARCHITECTURE above) is bumped
+# afterward by ordinary maintenance. Never compare the two.
+_HISTORICAL_DECISION_VALIDATOR_VERSION = "stage126_current_state_validator_v1"
 # Stage126+ Q1/Q2 Lean Governance label surfaced in the Handoff's
 # `validation_architecture` field (see
 # project/docs/ai/STAGE126_Q1Q2_LEAN_GOVERNANCE.md). Distinct from
@@ -1651,9 +1659,21 @@ def derive_validation_architecture_markers(root: str) -> dict:
         raise HandoffError("boundary decision does not freeze Stage125 Part 5")
     if arch.get("stage125_part5_is_live_successor_validator") is not False:
         raise HandoffError("boundary decision still treats Part 5 as live")
+    # The decision is HISTORICAL provenance: it must still record exactly the
+    # validator version that existed when it was authorized on 2026-07-23 --
+    # never the CURRENT validator implementation version. Coupling the two
+    # would force rewriting a locked historical record every time the live
+    # validator evolves, which Stage126+ Q1/Q2 Lean Governance explicitly
+    # rules out (section 3: "validator refactor that preserves scientific
+    # gates" needs no new authorization, and section 5: earlier state must
+    # not be forced to keep matching current state).
     if arch.get("stage126_current_state_validator_version") != \
-            _VALIDATION_ARCHITECTURE:
-        raise HandoffError("boundary decision validator version mismatch")
+            _HISTORICAL_DECISION_VALIDATOR_VERSION:
+        raise HandoffError(
+            "boundary decision no longer records its ORIGINAL historical "
+            "validator version -- this historical record must never be "
+            "rewritten to track the current validator implementation"
+        )
     if manifest.get("stage125_part5_mode") != "historical_immutable":
         raise HandoffError("boundary manifest does not freeze Stage125 Part 5")
     # Stage126+ Q1/Q2 Lean Governance: SCIENTIFIC artifact regeneration for a
