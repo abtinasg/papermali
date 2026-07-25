@@ -1656,17 +1656,42 @@ def derive_validation_architecture_markers(root: str) -> dict:
         raise HandoffError("boundary decision validator version mismatch")
     if manifest.get("stage125_part5_mode") != "historical_immutable":
         raise HandoffError("boundary manifest does not freeze Stage125 Part 5")
+    # Stage126+ Q1/Q2 Lean Governance: SCIENTIFIC artifact regeneration for a
+    # closed part remains forbidden; OPERATIONAL verification-artifact
+    # bookkeeping (tests/QC/metadata) is explicitly permitted to evolve
+    # without a new scientific-error exception or authorization. The old
+    # blanket `regeneration_of_earlier_part_verification_artifacts_allowed`
+    # gate conflated the two and is retired here.
     if manifest.get(
-        "regeneration_of_earlier_part_verification_artifacts_allowed"
-    ) is not False:
-        raise HandoffError("boundary manifest permits prior-part regeneration")
+        "prior_part_scientific_artifact_regeneration_forbidden"
+    ) is not True:
+        raise HandoffError(
+            "boundary manifest does not forbid scientific artifact regeneration"
+        )
+    if manifest.get(
+        "prior_part_operational_verification_artifact_evolution_permitted"
+    ) is not True:
+        raise HandoffError(
+            "boundary manifest does not permit operational verification "
+            "artifact evolution"
+        )
     if report.get("stage125_part5_live_gate_active") is not False:
         raise HandoffError("validation report still marks Part 5 as a live gate")
     if report.get("contract_version") != _VALIDATION_ARCHITECTURE:
         raise HandoffError("validation report version mismatch")
-    if report.get("prior_part_verification_artifact_regeneration_allowed") \
-            is not False:
-        raise HandoffError("validation report permits prior-part regeneration")
+    if report.get(
+        "prior_part_scientific_artifact_regeneration_forbidden"
+    ) is not True:
+        raise HandoffError(
+            "validation report does not forbid scientific artifact regeneration"
+        )
+    if report.get(
+        "prior_part_operational_verification_artifact_evolution_permitted"
+    ) is not True:
+        raise HandoffError(
+            "validation report does not permit operational verification "
+            "artifact evolution"
+        )
 
     markers = {
         "validation_architecture": _LEAN_GOVERNANCE_ARCHITECTURE,
@@ -1677,7 +1702,8 @@ def derive_validation_architecture_markers(root: str) -> dict:
         "stage125_part5_mode": "historical_immutable",
         "stage125_part5_live_gate_active": False,
         "stage125_part5_future_regeneration_allowed": False,
-        "prior_robustness_verification_artifact_regeneration_allowed": False,
+        "prior_part_scientific_artifact_regeneration_forbidden": True,
+        "prior_part_operational_verification_artifact_evolution_permitted": True,
         "prior_part_reopening_requires_scientific_error": True,
         "prior_part_reopening_requires_explicit_human_authorization": True,
     }

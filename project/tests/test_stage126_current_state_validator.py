@@ -315,20 +315,92 @@ CLOSED_VERIFICATION_ARTIFACTS = {
 }
 
 
-def test_closed_verification_artifacts_are_pinned_exactly():
-    """Verification-only artifacts are pinned too — the decision forbids drift."""
+def test_closed_verification_artifacts_are_recorded_as_historical_provenance():
+    """Verification-only artifacts are recorded, as historical PROVENANCE.
+
+    Under Stage126+ Q1/Q2 Lean Governance these are operational bookkeeping,
+    not a live scientific gate: once a category is first registered, its
+    recorded hashes are carried forward from the committed registry rather
+    than resynchronized to current file bytes on every build, so a routine
+    test/QC/metadata edit never requires "repinning" the registry (see
+    build_closed_part_registry). This test therefore checks structure and
+    presence, not byte-for-byte equality with the CURRENT live file.
+    """
     registry = _read_json(v.F_CLOSED_REGISTRY)
     for category, expected_paths in CLOSED_VERIFICATION_ARTIFACTS.items():
         recorded = registry["parts"][category]["verification_artifacts_sha256"]
         for rel in expected_paths:
             assert rel in recorded, (category, rel)
-            assert recorded[rel] == _sha(_root() / rel), rel
-    # Source, runner and tests of the closed packages are pinned as well.
+            assert len(recorded[rel]) == 64, rel
+    # Source, runner and tests of the closed packages are recorded as well.
     for category in CLOSED_VERIFICATION_ARTIFACTS:
         code = registry["parts"][category]["code_artifacts_sha256"]
         assert len(code) >= 3, (category, sorted(code))
-        for rel, want in code.items():
-            assert _sha(_root() / rel) == want, rel
+        assert all(len(h) == 64 for h in code.values())
+
+
+def test_registry_operational_hashes_are_sticky_across_rebuilds(tmp_path):
+    """A routine operational edit must NOT require closed-registry repinning.
+
+    Editing a closed part's test file changes that file's live hash, but the
+    registry's `code_artifacts_sha256` entry for the already-closed category
+    must stay exactly what was committed — it is carried forward, not
+    resynchronized — so the routine edit needs no registry update at all.
+    """
+    root = _mirror(tmp_path)
+    category = "m1_target_proximity_six_feature_set"
+    before_registry = json.loads(
+        (root / "project/stage126" / v.F_CLOSED_REGISTRY).read_text(
+            encoding="utf-8")
+    )
+    before_code = before_registry["parts"][category]["code_artifacts_sha256"]
+
+    test_rel = (
+        "project/tests/test_stage126_m1_robustness_part1_target_proximity.py"
+    )
+    target = root / test_rel
+    target.write_text(target.read_text(encoding="utf-8") + "\n# routine edit\n",
+                       encoding="utf-8")
+
+    # The live file hash changed...
+    assert _sha(target) != before_code[test_rel]
+
+    # ...but a fresh build reproduces the SAME registry entry unchanged: no
+    # repinning was required.
+    built = v.run(project_dir=root / "project", build=True)
+    assert built["metadata"]["all_pass"] is True
+    after_registry = json.loads(
+        (root / "project/stage126" / v.F_CLOSED_REGISTRY).read_text(
+            encoding="utf-8")
+    )
+    after_code = after_registry["parts"][category]["code_artifacts_sha256"]
+    assert after_code == before_code
+
+
+def test_qc_metadata_drift_requires_no_handoff_policy_change(tmp_path):
+    """Editing a closed part's QC/metadata bookkeeping requires no Handoff
+    architecture-field or policy change: the Handoff still validates exactly
+    the same lean-governance markers, unmodified."""
+    root = _mirror(tmp_path)
+    before_handoff = json.loads(
+        (root / v.HANDOFF_STATE_REL).read_text(encoding="utf-8")
+    )
+
+    qc_rel = "project/stage126/stage126_m1_robustness_part1_qc_report.json"
+    target = root / qc_rel
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    payload["_routine_operational_note"] = "reformatted for readability"
+    target.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n",
+                       encoding="utf-8")
+
+    built = v.run(project_dir=root / "project", build=True)
+    assert built["metadata"]["all_pass"] is True
+
+    after_handoff = json.loads(
+        (root / v.HANDOFF_STATE_REL).read_text(encoding="utf-8")
+    )
+    for key in v.REQUIRED_HANDOFF_ARCHITECTURE_FIELDS:
+        assert after_handoff.get(key) == before_handoff.get(key), key
 
 
 @pytest.mark.parametrize("victim", [
@@ -367,13 +439,19 @@ def test_closed_package_operational_byte_drift_does_not_fail_full_validation(
     v.build_all(root, strict_pointers=False)  # must not raise
 
 
-def test_prior_part_verification_artifacts_are_not_regenerated():
+def test_prior_part_scientific_regeneration_forbidden_operational_permitted():
+    """Scientific regeneration stays forbidden; operational evolution is
+    explicitly permitted under Stage126+ Q1/Q2 Lean Governance."""
     manifest = _read_json(v.F_BOUNDARY_MANIFEST)
+    assert manifest["prior_part_scientific_artifact_regeneration_forbidden"] is True
     assert manifest[
-        "regeneration_of_earlier_part_verification_artifacts_allowed"
-    ] is False
+        "prior_part_operational_verification_artifact_evolution_permitted"
+    ] is True
     report = _read_json(v.F_REPORT)
-    assert report["prior_part_verification_artifact_regeneration_allowed"] is False
+    assert report["prior_part_scientific_artifact_regeneration_forbidden"] is True
+    assert report[
+        "prior_part_operational_verification_artifact_evolution_permitted"
+    ] is True
     registry = _read_json(v.F_CLOSED_REGISTRY)
     assert registry["regeneration_allowed"] is False
 
@@ -542,8 +620,11 @@ def test_handoff_carries_boundary_markers():
     assert state["stage125_part5_live_gate_active"] is False
     assert state["stage125_part5_future_regeneration_allowed"] is False
     assert state[
-        "prior_robustness_verification_artifact_regeneration_allowed"
-    ] is False
+        "prior_part_scientific_artifact_regeneration_forbidden"
+    ] is True
+    assert state[
+        "prior_part_operational_verification_artifact_evolution_permitted"
+    ] is True
     assert state["prior_part_reopening_requires_scientific_error"] is True
     assert state[
         "prior_part_reopening_requires_explicit_human_authorization"

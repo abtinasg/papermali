@@ -356,7 +356,8 @@ REQUIRED_HANDOFF_ARCHITECTURE_FIELDS: dict[str, Any] = {
     "stage125_part5_mode": "historical_immutable",
     "stage125_part5_live_gate_active": False,
     "stage125_part5_future_regeneration_allowed": False,
-    "prior_robustness_verification_artifact_regeneration_allowed": False,
+    "prior_part_scientific_artifact_regeneration_forbidden": True,
+    "prior_part_operational_verification_artifact_evolution_permitted": True,
     "prior_part_reopening_requires_scientific_error": True,
     "prior_part_reopening_requires_explicit_human_authorization": True,
 }
@@ -583,7 +584,15 @@ def build_boundary_manifest(repo_root: Path) -> dict[str, Any]:
         "stage125_part5_historical_provenance": dict(
             sorted(PART5_HISTORICAL_PROVENANCE.items())
         ),
-        "regeneration_of_earlier_part_verification_artifacts_allowed": False,
+        # Stage126+ Q1/Q2 Lean Governance: SCIENTIFIC artifact regeneration for
+        # an already-closed part remains forbidden (enforced fail-closed by
+        # verify_registry_immutability's SCIENTIFIC_GATE_BUCKETS). Operational
+        # verification bookkeeping (test/QC/metadata hashes,
+        # INFORMATIONAL_ONLY_BUCKETS) is git-versioned and mutable, and its
+        # evolution is permitted without a new scientific-error exception or
+        # human authorization.
+        "prior_part_scientific_artifact_regeneration_forbidden": True,
+        "prior_part_operational_verification_artifact_evolution_permitted": True,
     }
 
 
@@ -750,16 +759,47 @@ def micro_part_qc_pointers(
 def build_closed_part_registry(
     repo_root: Path, completed: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """Generic registry of every CLOSED micro-part package."""
+    """Generic registry of every CLOSED micro-part package.
+
+    Scientific artifact hashes and completion/authorization/category identity
+    are always recomputed fresh (they are frozen inputs, so this is a no-op
+    cross-check, not a rewrite).
+
+    Operational bookkeeping hashes (``code_artifacts_sha256`` /
+    ``verification_artifacts_sha256``) are NOT a required live-state
+    synchronization surface under Stage126+ Q1/Q2 Lean Governance: once a
+    category is first registered, its operational hashes are carried forward
+    from the COMMITTED registry unchanged rather than recomputed, so a
+    routine test/QC/metadata edit on a closed part never requires
+    "repinning" the registry. (Current, live operational-file hashes remain
+    directly readable from disk for informational reporting; they are simply
+    not written back into this registry.)
+    """
+    committed_path = repo_root / STAGE126_DIR_REL / F_CLOSED_REGISTRY
+    committed_parts: dict[str, Any] = {}
+    if committed_path.is_file():
+        committed_parts = (
+            json.loads(committed_path.read_text(encoding="utf-8")).get("parts")
+            or {}
+        )
+
+    parts: dict[str, Any] = {}
+    for p in completed:
+        entry = closed_part_entry(repo_root, p)
+        prior = committed_parts.get(p["category_id"])
+        if prior is not None:
+            for bucket in INFORMATIONAL_ONLY_BUCKETS:
+                if bucket in prior:
+                    entry[bucket] = prior[bucket]
+        parts[p["category_id"]] = entry
+
     return {
         "contract_id": "stage126_closed_part_registry",
         "contract_version": VALIDATOR_VERSION,
         "decision_id": DECISION_ID,
         "closed_part_count": len(completed),
         "regeneration_allowed": False,
-        "parts": {
-            p["category_id"]: closed_part_entry(repo_root, p) for p in completed
-        },
+        "parts": parts,
     }
 
 
@@ -1104,7 +1144,8 @@ def build_validation_report(
         "next_research_action_id": NEXT_RESEARCH_ACTION_ID,
         "closed_part_registry": registry,
         "primary_stage126_artifacts_sha256": dict(sorted(primary_observed.items())),
-        "prior_part_verification_artifact_regeneration_allowed": False,
+        "prior_part_scientific_artifact_regeneration_forbidden": True,
+        "prior_part_operational_verification_artifact_evolution_permitted": True,
         "prior_part_reopening_requires_scientific_error": True,
         "prior_part_reopening_requires_explicit_human_authorization": True,
         "validator_reopened_a_previous_part": False,
@@ -1249,12 +1290,24 @@ def build_assertions(
     add("no_full_development_refit",
         report["full_development_refit_performed"] is False)
 
-    # Earlier-part protection + exception policy.
-    add("prior_verification_artifact_regeneration_forbidden",
-        report["prior_part_verification_artifact_regeneration_allowed"] is False
+    # Earlier-part protection + exception policy. Under Stage126+ Q1/Q2 Lean
+    # Governance, only SCIENTIFIC artifact regeneration for a closed part
+    # remains forbidden (the real enforcement is
+    # verify_registry_immutability's SCIENTIFIC_GATE_BUCKETS check, which
+    # already ran and would have raised before this assertion is reached).
+    # Operational verification-artifact bookkeeping is explicitly PERMITTED
+    # to evolve without a new scientific-error exception or authorization.
+    add("prior_part_scientific_artifact_regeneration_forbidden",
+        report["prior_part_scientific_artifact_regeneration_forbidden"] is True
         and manifest[
-            "regeneration_of_earlier_part_verification_artifacts_allowed"
-        ] is False)
+            "prior_part_scientific_artifact_regeneration_forbidden"
+        ] is True)
+    add("prior_part_operational_verification_artifact_evolution_permitted",
+        report["prior_part_operational_verification_artifact_evolution_permitted"]
+        is True
+        and manifest[
+            "prior_part_operational_verification_artifact_evolution_permitted"
+        ] is True)
     add("prior_part_reopening_requires_error_and_authorization",
         report["prior_part_reopening_requires_scientific_error"] is True
         and report[

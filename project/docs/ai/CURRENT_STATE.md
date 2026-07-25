@@ -11,15 +11,15 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed micro-part:** `stage126-m1-robustness-part5-persistent-loss-target`
 - **Next research action:** `stage126-m1-financial-baseline`
-- **Last stage commit:** `85b77cbe7501c37d88827fcb25713bf86d3d7121`
-- **Generated from commit:** `41c67a73fff5d96349763ec6c866799c5f2f9a01` (branch `stage126-legacy-validation-boundary-adaptation`, informational)
+- **Last stage commit:** `5ce89d28d7116ef6a6105a8607732b52cead3a68`
+- **Generated from commit:** `5ce89d28d7116ef6a6105a8607732b52cead3a68` (branch `stage126-legacy-validation-boundary-adaptation`, informational)
 - **Baseline:** `origin/main` @ `41c67a73fff5d96349763ec6c866799c5f2f9a01`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **77 assertions, 0 failed**, all_pass=True
+- ✅ **78 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -68,5 +68,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `ad6b04e1859cc38abdae314fa8803f4fa286d2eba912c08e5d3245caed619da8`_
-_generated_at_utc: 2026-07-25T20:26:16Z (informational)_
+_state_fingerprint: `dd2497c6aafcb551a68a3a1e28b5899690c22235d256c1893bf0b1317a19246a`_
+_generated_at_utc: 2026-07-25T20:45:29Z (informational)_

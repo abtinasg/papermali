@@ -288,9 +288,10 @@
     "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e",
     "project/stage126/stage126_m1_tuning_results.csv": "e7e1e6808e394273676709aa94bfa713bbf8a790fadabee22ea20b849adbe649"
   },
+  "prior_part_operational_verification_artifact_evolution_permitted": true,
   "prior_part_reopening_requires_explicit_human_authorization": true,
   "prior_part_reopening_requires_scientific_error": true,
-  "prior_part_verification_artifact_regeneration_allowed": false,
+  "prior_part_scientific_artifact_regeneration_forbidden": true,
   "registered_execution_order": [
     "m1_target_proximity_six_feature_set",
     "main_rule_b_listing_robustness",
