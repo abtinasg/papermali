@@ -1,0 +1,117 @@
+{
+  "absolute_change_vs_primary": {
+    "random_forest": -0.031601044831,
+    "regularized_logistic_regression": -0.00253623185,
+    "xgboost": -0.054576000745
+  },
+  "automatic_scientific_action_triggered": false,
+  "category_id": "smote_training_fold_only_robustness",
+  "changed_dimension": "imbalance_strategy",
+  "class_weighting_disabled": true,
+  "comparison_metric": "pr_auc",
+  "comparison_scope": "pooled_development_oof",
+  "contract_version": "stage126_m1_robustness_part6_primary_comparison_v1",
+  "direction_by_family": {
+    "random_forest": "declined",
+    "regularized_logistic_regression": "declined",
+    "xgboost": "declined"
+  },
+  "final_test_aggregate_comparison": {
+    "final_test_identities": 346,
+    "final_test_preprocessed": false,
+    "final_test_resampled": false,
+    "final_test_row_identities_inspected": false,
+    "primary_target_negative": 334,
+    "primary_target_positive": 12,
+    "source": "project/stage125/part4_event_count_gate_stage125.csv"
+  },
+  "final_test_evaluation_authorized": false,
+  "full_development_refit_authorized": false,
+  "imbalance_policy": "SMOTE_family_training_fold_only_robustness",
+  "imbalance_policy_changed": true,
+  "imbalance_strategy_materially_changes_interpretation": false,
+  "interpretation": "Development-only imbalance-strategy robustness. The sample (`main_rule_a_primary`), the primary target (`FD_target_main_t_plus_1`), the nine-feature primary set, the three selected non-weight hyperparameters, the temporal folds and the seeds are all unchanged; ONLY the imbalance strategy changes from primary class weighting to SMOTENC applied strictly inside each training fold, with class weighting disabled. The development identities and the pooled-OOF identity sets are byte-for-byte the primary identity sets. This is secondary evidence reported descriptively and cautiously: it does not replace the primary class-weighted results or the locked primary ordering used for confirmatory interpretation, does not constitute a new confirmatory model comparison and selects no paper winner.",
+  "largest_absolute_pr_auc_change": 0.054576000745,
+  "micro_part_id": "stage126-m1-robustness-part6-smote-training-fold-only",
+  "new_confirmatory_model_comparison": false,
+  "oof_identity_sets_unchanged_vs_primary": true,
+  "paper_winner_selected": false,
+  "part6_observed_ordering": [
+    "regularized_logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "part6_perfold_pr_auc": {
+    "random_forest": {
+      "fold1_validation": 0.420109860443,
+      "fold2_validation": 0.343761816548
+    },
+    "regularized_logistic_regression": {
+      "fold1_validation": 0.47644856089,
+      "fold2_validation": 0.452738208187
+    },
+    "xgboost": {
+      "fold1_validation": 0.406955224648,
+      "fold2_validation": 0.213360278213
+    }
+  },
+  "part6_pooled_pr_auc": {
+    "random_forest": 0.370840785189,
+    "regularized_logistic_regression": 0.443220732198,
+    "xgboost": 0.301969007417
+  },
+  "part6_target": "FD_target_main_t_plus_1",
+  "primary_observed_ordering": [
+    "regularized_logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "primary_ordering_lock_changed": false,
+  "primary_ordering_preserved": true,
+  "primary_reference": {
+    "locked_pooled_pr_auc": {
+      "random_forest": 0.40244183002,
+      "regularized_logistic_regression": 0.445756964048,
+      "xgboost": 0.356545008162
+    },
+    "locked_values_match_observed": true,
+    "metrics_sha256": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "metrics_source": "project/stage126/stage126_m1_development_metrics.csv",
+    "observed_perfold_pr_auc": {
+      "random_forest": {
+        "fold1_validation": 0.486027245902,
+        "fold2_validation": 0.339967293076
+      },
+      "regularized_logistic_regression": {
+        "fold1_validation": 0.484040818257,
+        "fold2_validation": 0.44052213868
+      },
+      "xgboost": {
+        "fold1_validation": 0.457454011864,
+        "fold2_validation": 0.340958587436
+      }
+    },
+    "observed_pooled_pr_auc": {
+      "random_forest": 0.40244183002,
+      "regularized_logistic_regression": 0.445756964048,
+      "xgboost": 0.356545008162
+    },
+    "sample": "main_rule_a_primary",
+    "target": "FD_target_main_t_plus_1"
+  },
+  "primary_results_replaced": false,
+  "primary_target": "FD_target_main_t_plus_1",
+  "primary_target_replaced": false,
+  "relative_change_percent_vs_primary": {
+    "random_forest": -7.852326093793,
+    "regularized_logistic_regression": -0.568971896023,
+    "xgboost": -15.306903615434
+  },
+  "sample": "main_rule_a_primary",
+  "sample_identities_unchanged_vs_primary": true,
+  "sample_unchanged": true,
+  "scientific_interpretation": "development_only_imbalance_strategy_robustness_evidence",
+  "scientific_role": "imbalance_strategy_robustness",
+  "selected_configurations_changed": false,
+  "target_unchanged": true
+}
