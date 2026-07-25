@@ -400,10 +400,34 @@ paper winner was selected. Separated descriptive Part 2 and Part 3 comparisons
 are recorded without multiplying claims or selecting a preferred robustness
 sample.
 
-**Next — Part 5 (`persistent_loss_robustness_target`) is NOT authorized
+**Robustness Part 5 — COMPLETED (2026-07-24):**
+`persistent_loss_robustness_target` was explicitly human-authorized (512-byte
+text, SHA-256 `e00b43d8…`) and executed on the development folds only.
+**Only the target changed** (to `FD_target_persistent_loss_robustness_t_plus_1`);
+the primary `main_rule_a_primary` sample, nine-feature set and selected
+configurations are unchanged, so sample and OOF identity sets are byte-for-byte
+the primary M1 sets. No retuning (0 searches; 22 fits / 22 predictions), no
+full-development refit; XGBoost `scale_pos_weight` per training fold fold1
+203/42 = 4.833333333333, fold2 378/72 = 5.25. Counts: 1012 rows / 119 companies
+/ 100 pos / 912 neg; development 666 (85 / 581); folds 245 / 205 / 450 / 216;
+1263 OOF rows; 9 metric rows. Development-only target transitions (primary →
+persistent-loss): 0→0 = 581, 0→1 = 17, 1→0 = 0, 1→1 = 68 (net +17). Final test
+locked: 346 identities counted via the frozen split contract only; 0 predictor
+rows, 0 target rows, 0 predictions, 0 evaluations; sole final-test information
+is the frozen event-count gate aggregate (persistent-loss 15 / 331 versus
+primary-target 12 / 334), no row-level final-test target accessed. Pooled
+PR-AUC: Logistic 0.508761, RF 0.500501, XGBoost 0.441492; **the locked primary
+ordering Logistic > RF > XGBoost is preserved**. Development-only secondary
+target-robustness evidence: primary target/metrics/ordering unchanged, no
+winner selected, persistent-loss target not multiplied across other samples.
+Part 5 QC 134 assertions / 0 failed; current-state validator 77 / 0.
+`closed_part_count=5`; `m1_robustness_next_category_id=smote_training_fold_only_robustness`;
+`m1_robustness_part5_completed=true`; `m1_robustness_part6_authorized=false`.
+
+**Next — Part 6 (`smote_training_fold_only_robustness`) is NOT authorized
 and NOT started.** It requires its own separate explicit human authorization;
-the consumed Part 4 authorization is not a standing authorization. Parts 1–4
-are completed. Parts 5–6 remain outstanding, so M1 robustness is not complete.
+the consumed Part 5 authorization is not a standing authorization. Parts 1–5
+are completed. Part 6 remains outstanding, so M1 robustness is not complete.
 
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
 document-binding evidence remain as frozen scientific history; they do **not**

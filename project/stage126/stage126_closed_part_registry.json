@@ -1,5 +1,5 @@
 {
-  "closed_part_count": 4,
+  "closed_part_count": 5,
   "contract_id": "stage126_closed_part_registry",
   "contract_version": "stage126_current_state_validator_v1",
   "decision_id": "stage126-validation-architecture-boundary-lock",
@@ -155,6 +155,43 @@
         "project/stage126/metadata_and_hashes_stage126_m1_robustness_part2.json": "674b5654d88c9dc1ac009dab5073b06d2ceb945f454352a429298b6e25560b43",
         "project/stage126/stage126_m1_robustness_part2_part5_successor_compatibility.json": "4ed3025839f14796f33f2f1ee3468e3be94d7f14c6e07c7e78ae3cf9ed49ba9e",
         "project/stage126/stage126_m1_robustness_part2_qc_report.json": "de326261e92676847c98d32fd0cde706491725d886d7cad86ad99e0e1292e8ad"
+      }
+    },
+    "persistent_loss_robustness_target": {
+      "authorization_consumed": true,
+      "authorization_record": "project/stage126/stage126_m1_robustness_part5_human_authorization_record.json",
+      "authorization_record_sha256": "5b9ac4e04475695302e7c6bee01126642e36ffe2b583d89db16d5b5e5eed17ac",
+      "authorization_text_sha256": "e00b43d812b3da2104bfedb30a1dd63276a7f28347b93ff7f4bbcad60fd23678",
+      "category_id": "persistent_loss_robustness_target",
+      "code_artifacts_sha256": {
+        "project/run_stage126_m1_robustness_part5_persistent_loss_target.py": "18f1a9f3487f27c21df611a43f81e19f1707d9c28db57e397cef548606ee1b22",
+        "project/src/stage126_m1_robustness_part5_persistent_loss_target.py": "d9d2a3906dfa0c62ee888a39eb9c2ec1f792dcc22b3ea7662f59d56f99f96bae",
+        "project/tests/test_stage126_m1_robustness_part5_persistent_loss_target.py": "7035a92a6465851d47ba1fa31e3dfb52800062d8fe92042ae9612a50e6e1f515"
+      },
+      "completion_lock": "project/stage126/stage126_m1_robustness_part5_completion_lock.json",
+      "completion_lock_sha256": "c41335c377c4f58d6a710095076327aae9c5027dc83bcb377680526cd94d486b",
+      "final_test_lock_flags": {
+        "final_test_access_authorized": false,
+        "final_test_evaluation_performed": false,
+        "final_test_unlocked": false,
+        "full_development_refit_performed": false
+      },
+      "micro_part_id": "stage126-m1-robustness-part5-persistent-loss-target",
+      "next_registered_category": "smote_training_fold_only_robustness",
+      "part_index": 5,
+      "scientific_artifacts_sha256": {
+        "project/stage126/stage126_m1_robustness_part5_completion_lock.json": "c41335c377c4f58d6a710095076327aae9c5027dc83bcb377680526cd94d486b",
+        "project/stage126/stage126_m1_robustness_part5_execution_manifest.json": "bc1cfd8dbf8197b96f595235aaa74ca18ad2cb5452ea67798dd77166b5289cea",
+        "project/stage126/stage126_m1_robustness_part5_feature_manifest.csv": "d33ea2adbd73cfcc5fd1a2af7e774e8a4eab283b4c0dbd7fe79c002a145472cc",
+        "project/stage126/stage126_m1_robustness_part5_human_authorization_record.json": "5b9ac4e04475695302e7c6bee01126642e36ffe2b583d89db16d5b5e5eed17ac",
+        "project/stage126/stage126_m1_robustness_part5_metrics.csv": "a811703bf3b96acd042f63c88aa2fbcdbd541f81da34d9abc1ba0d912a3bb3cf",
+        "project/stage126/stage126_m1_robustness_part5_oof_predictions.csv": "7b721af7b9b5b5a3f88f7a957d70c87480dc1a3ca56a55b10c885e99177ad977",
+        "project/stage126/stage126_m1_robustness_part5_primary_comparison.json": "e0ddde1977ccbbdc0c892d92ef8812316373266e3a5efb5f7ac0ebaed9a81c97"
+      },
+      "verification_artifacts_sha256": {
+        "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART5_PERSISTENT_LOSS_TARGET.md": "852b552142357c350aa923c18dc0b9b282dc15046cd3dc7d6273dce2317d912a",
+        "project/stage126/metadata_and_hashes_stage126_m1_robustness_part5.json": "14fa42f0ec5cb8c07d3a10afe1d62a7c89dbc4f84d417bf4258d65df739714a6",
+        "project/stage126/stage126_m1_robustness_part5_qc_report.json": "1152fb5bad01275ffe2f9bf204ea3db0678e74261a250dfbc842e2328bed3f00"
       }
     }
   },
