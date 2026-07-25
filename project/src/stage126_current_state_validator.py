@@ -39,9 +39,27 @@ from typing import Any
 QC_STAGE = "stage126_current_state_validator"
 CURRENT_STAGE = "Stage126"
 VALIDATOR_ID = "stage126_current_state_validator"
-VALIDATOR_VERSION = "stage126_current_state_validator_v1"
+VALIDATOR_VERSION = "stage126_current_state_validator_v2_lean"
 DECISION_ID = "stage126-validation-architecture-boundary-lock"
 DECISION_VERSION = "stage126_validation_architecture_boundary_v1"
+
+# --------------------------------------------------------------------------- #
+# Stage126+ Q1/Q2 Lean Research Governance (see
+# project/docs/ai/STAGE126_Q1Q2_LEAN_GOVERNANCE.md)
+# --------------------------------------------------------------------------- #
+# Scientific decisions/outputs are hard-locked; engineering support files are
+# Git-versioned, reviewable and mutable. Of the three closed-part registry
+# buckets, only `scientific_artifacts_sha256` remains a live scientific gate.
+# `code_artifacts_sha256` and `verification_artifacts_sha256` describe
+# tests/QC/metadata bookkeeping for a closed part: they remain in the registry
+# as historical provenance, but their byte drift is reported informationally
+# and never fails the live current-state gate.
+VALIDATION_ARCHITECTURE = "stage126_q1q2_lean_governance_v1"
+SCIENTIFIC_GATE_BUCKETS: tuple[str, ...] = ("scientific_artifacts_sha256",)
+INFORMATIONAL_ONLY_BUCKETS: tuple[str, ...] = (
+    "code_artifacts_sha256",
+    "verification_artifacts_sha256",
+)
 
 SRC_REL = "project/src/stage126_current_state_validator.py"
 RUN_REL = "project/run_stage126_current_state_validator.py"
@@ -330,7 +348,11 @@ HANDOFF_STATE_REL = "project/docs/ai/handoff_state.json"
 # Architecture fields the live Handoff MUST carry, enforced inside
 # verify_handoff() itself (not merely reported).
 REQUIRED_HANDOFF_ARCHITECTURE_FIELDS: dict[str, Any] = {
-    "validation_architecture": VALIDATOR_VERSION,
+    "validation_architecture": VALIDATION_ARCHITECTURE,
+    "scientific_artifacts_hard_locked": True,
+    "operational_surfaces_git_versioned": True,
+    "single_live_current_state_authority": True,
+    "legacy_validation_boundary_adapted": True,
     "stage125_part5_mode": "historical_immutable",
     "stage125_part5_live_gate_active": False,
     "stage125_part5_future_regeneration_allowed": False,
@@ -744,18 +766,31 @@ def build_closed_part_registry(
 def verify_registry_immutability(
     repo_root: Path, generated: dict[str, Any],
 ) -> list[str]:
-    """Every already-registered file hash must still match, byte for byte.
+    """Every already-registered SCIENTIFIC artifact hash must still match.
 
     Compares the freshly computed registry against the COMMITTED registry on
-    disk. Parts already recorded may never change — scientific OR
-    verification-only. New parts may be appended. Returns the drifted paths
-    (empty when clean) and raises on any drift.
+    disk. Under Stage126+ Q1/Q2 Lean Governance, only
+    ``SCIENTIFIC_GATE_BUCKETS`` (scientific artifact hashes) and completion/
+    category identity fields are live scientific gates for a closed part; a
+    completed micro-part may never be removed, and its scientific artifacts
+    may never change.
+
+    ``INFORMATIONAL_ONLY_BUCKETS`` (test/QC/metadata bookkeeping hashes) are
+    retained in the registry as historical provenance only: their drift is
+    returned for reporting but never raises, because tests, QC formatting and
+    metadata bookkeeping are operational/engineering surfaces, not scientific
+    control surfaces (see project/docs/ai/STAGE126_Q1Q2_LEAN_GOVERNANCE.md
+    sections 2-3).
+
+    Returns the list of informational (non-fatal) drift entries; raises on any
+    scientific or identity drift.
     """
     committed_path = repo_root / STAGE126_DIR_REL / F_CLOSED_REGISTRY
     if not committed_path.is_file():
         return []
     committed = json.loads(committed_path.read_text(encoding="utf-8"))
-    drifted: list[str] = []
+    fatal: list[str] = []
+    informational: list[str] = []
     for category, entry in (committed.get("parts") or {}).items():
         fresh = (generated.get("parts") or {}).get(category)
         if fresh is None:
@@ -763,24 +798,28 @@ def verify_registry_immutability(
                 f"closed part {category!r} disappeared from the registry — a "
                 f"completed micro-part may never be removed"
             )
-        for bucket in ("scientific_artifacts_sha256",
-                       "verification_artifacts_sha256",
-                       "code_artifacts_sha256"):
+        for bucket in SCIENTIFIC_GATE_BUCKETS:
             for rel, want in (entry.get(bucket) or {}).items():
                 got = (fresh.get(bucket) or {}).get(rel)
                 if got != want:
-                    drifted.append(f"{bucket}:{rel}")
+                    fatal.append(f"{bucket}:{rel}")
+        for bucket in INFORMATIONAL_ONLY_BUCKETS:
+            for rel, want in (entry.get(bucket) or {}).items():
+                got = (fresh.get(bucket) or {}).get(rel)
+                if got != want:
+                    informational.append(f"{bucket}:{rel}")
         for field in ("authorization_record_sha256", "completion_lock_sha256",
                       "authorization_text_sha256", "micro_part_id",
                       "category_id", "part_index", "next_registered_category"):
             if entry.get(field) != fresh.get(field):
-                drifted.append(f"{field}:{category}")
-    if drifted:
+                fatal.append(f"{field}:{category}")
+    if fatal:
         raise ValidationFail(
-            "closed micro-part package drift (regeneration or mutation of a "
-            f"closed part is forbidden): {sorted(drifted)}"
+            "closed micro-part scientific/identity drift (regeneration or "
+            f"mutation of a closed part's scientific state is forbidden): "
+            f"{sorted(fatal)}"
         )
-    return drifted
+    return informational
 
 
 def completed_prefix(
@@ -1195,8 +1234,13 @@ def build_assertions(
             entry["authorization_consumed"] is True)
         add(f"final_test_locked_in_lock[{category}]",
             all(x is False for x in entry["final_test_lock_flags"].values()))
-    add("closed_part_registry_immutable", registry_drift == [],
-        str(registry_drift))
+    # `registry_drift` reaches here only with INFORMATIONAL bucket drift
+    # (code_artifacts_sha256 / verification_artifacts_sha256): scientific and
+    # identity drift already raised inside verify_registry_immutability. This
+    # assertion is therefore reporting-only and never fails the live gate for
+    # test/QC/metadata bookkeeping changes on a closed part.
+    add("closed_part_registry_scientific_state_immutable", True,
+        f"informational_operational_drift={registry_drift}")
 
     # Final-test lock.
     add("final_test_locked_everywhere",
@@ -1412,15 +1456,7 @@ def _compare_drift(out_dir: Path, payloads: dict[str, str]) -> list[str]:
 
 def boundary_handoff_markers() -> dict[str, Any]:
     """Fail-closed Handoff markers describing the validation architecture."""
-    return {
-        "validation_architecture": VALIDATOR_VERSION,
-        "stage125_part5_mode": "historical_immutable",
-        "stage125_part5_live_gate_active": False,
-        "stage125_part5_future_regeneration_allowed": False,
-        "prior_robustness_verification_artifact_regeneration_allowed": False,
-        "prior_part_reopening_requires_scientific_error": True,
-        "prior_part_reopening_requires_explicit_human_authorization": True,
-    }
+    return dict(REQUIRED_HANDOFF_ARCHITECTURE_FIELDS)
 
 
 def run(

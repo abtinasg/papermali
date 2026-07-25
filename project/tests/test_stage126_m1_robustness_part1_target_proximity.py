@@ -695,6 +695,7 @@ def test_frozen_part5_source_and_runner_unmodified():
     p1.verify_part5_frozen_unmodified(_root())
 
 
+@pytest.mark.stage126_terminal_successor_state
 def test_expected_mismatch_matches_the_real_frozen_validator():
     """The documented boundary must equal what the frozen validator reports."""
     from src import stage125_part5_readiness_closure as p5

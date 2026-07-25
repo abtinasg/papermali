@@ -3,7 +3,7 @@
   "closed_part_registry": {
     "closed_part_count": 5,
     "contract_id": "stage126_closed_part_registry",
-    "contract_version": "stage126_current_state_validator_v1",
+    "contract_version": "stage126_current_state_validator_v2_lean",
     "decision_id": "stage126-validation-architecture-boundary-lock",
     "parts": {
       "expanded_rule_a_company_scope_robustness": {
@@ -91,7 +91,7 @@
         "code_artifacts_sha256": {
           "project/run_stage126_m1_robustness_part1_target_proximity.py": "c9b3035a7f517204f8d89e84b62a52d288cd5788ef0cec52c9df670cbb20b77e",
           "project/src/stage126_m1_robustness_part1_target_proximity.py": "12e06adf7a49b996e634910e7c6058e06494f932cfad6d8e5290a144499bf5b5",
-          "project/tests/test_stage126_m1_robustness_part1_target_proximity.py": "a6fda10a770eed50d72a362ce906788d1cc705fe6d988e4ac6d7940d1f26c3fd"
+          "project/tests/test_stage126_m1_robustness_part1_target_proximity.py": "2055560a6531d6c723088d67bfd60445043bda48ce6e2809dabd812d1dde39cc"
         },
         "completion_lock": "project/stage126/stage126_m1_robustness_part1_completion_lock.json",
         "completion_lock_sha256": "964d84f2269bb35b0176f88bb12bcfc13ef2cb487817cf5b49a5c28a87e1822b",
@@ -129,7 +129,7 @@
         "code_artifacts_sha256": {
           "project/run_stage126_m1_robustness_part2_listing_rule_b.py": "6e56630b741f87c337c4c065f0f503ca1dbb11322d577a603c1b873a81dbec79",
           "project/src/stage126_m1_robustness_part2_listing_rule_b.py": "405e67d027c6bd461ef3708fa0c5bd42b0e68db25feb75169d745f1e22c8dd7a",
-          "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py": "5cf94af1f5aa134b6e9b72508f00fdf861264a602b83c47f9b4e1c20c2e9eb40"
+          "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py": "f0153b260e81dfb884925832ebbdca66855c7efcdfc20e5dc0e3904ee437b054"
         },
         "completion_lock": "project/stage126/stage126_m1_robustness_part2_completion_lock.json",
         "completion_lock_sha256": "23d1920c4fb0a351456fe54b60616446381bbd550fb18e0bba5dab091486fec6",
@@ -250,7 +250,7 @@
   ],
   "completed_part_count": 5,
   "contract_id": "stage126_current_state_validator",
-  "contract_version": "stage126_current_state_validator_v1",
+  "contract_version": "stage126_current_state_validator_v2_lean",
   "current_state_validation_metadata_path": "project/stage126/metadata_and_hashes_stage126_current_state_validator.json",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -304,6 +304,6 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "standing_execution_authorization": false,
-  "validation_architecture": "stage126_current_state_validator_v1",
+  "validation_architecture": "stage126_current_state_validator_v2_lean",
   "validator_reopened_a_previous_part": false
 }

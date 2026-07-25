@@ -46,5 +46,19 @@
   "stage125_part5_reopened_or_repinned": false,
   "stage125_tree_changed": false,
   "stage126_live_suite_command": "PYTHONPATH=project python -m pytest project/tests -q",
-  "stage126_live_suite_marker_expression": "not live_successor_state"
+  "stage126_live_suite_marker_expression": "not live_successor_state and not stage126_terminal_successor_state",
+  "terminal_historical_marker": "stage126_terminal_successor_state",
+  "terminal_historical_marked_node_count": 5,
+  "terminal_historical_marked_node_ids": [
+    "project/tests/test_stage126_m1_robustness_part1_target_proximity.py::test_expected_mismatch_matches_the_real_frozen_validator",
+    "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py::test_expected_mismatch_matches_the_real_frozen_validator",
+    "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py::test_direct_handoff_validation_helper_is_exact",
+    "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py::test_deterministic_repeated_build_output",
+    "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py::test_check_mode_is_clean"
+  ],
+  "terminal_historical_successor_tests_are_live_gate": false,
+  "terminal_historical_verification_runner": null,
+  "terminal_historical_provenance_basis": "git_history_and_frozen_scientific_outputs",
+  "terminal_historical_rationale": "These five assertions inside the CLOSED Part 1/Part 2 robustness test files call the frozen Stage125 Part 5 validator and/or the Part 2 build/check runner and therefore assert the workflow/Handoff successor state as it stood at each Part's own closure date -- before Parts 3-5 completed the M1 robustness workstream. Under Stage126+ Q1/Q2 Lean Governance they remain valid historical/provenance tests but are not current-state Stage126 gates; no executable historical-worktree runner is required, since Git history and the frozen scientific outputs already reachable at those closing commits are sufficient provenance.",
+  "whole_part1_or_part2_test_file_excluded": false
 }

@@ -12,8 +12,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part5-persistent-loss-target`
 - **Next research action:** `stage126-m1-financial-baseline`
 - **Last stage commit:** `85b77cbe7501c37d88827fcb25713bf86d3d7121`
-- **Generated from commit:** `5b240ee3d5455180d5fdd2691a338c0c34400eb5` (branch `stage126-pr59-post-merge-handoff-refresh`, informational)
-- **Baseline:** `origin/main` @ `5b240ee3d5455180d5fdd2691a338c0c34400eb5`
+- **Generated from commit:** `41c67a73fff5d96349763ec6c866799c5f2f9a01` (branch `stage126-legacy-validation-boundary-adaptation`, informational)
+- **Baseline:** `origin/main` @ `41c67a73fff5d96349763ec6c866799c5f2f9a01`
 
 ## Current-state validation
 
@@ -68,5 +68,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `53c3e50b022e4c7a96d185c6e789c22879546a5bf9f27eb0a0c64689a5e95ad2`_
-_generated_at_utc: 2026-07-25T06:52:46Z (informational)_
+_state_fingerprint: `ad6b04e1859cc38abdae314fa8803f4fa286d2eba912c08e5d3245caed619da8`_
+_generated_at_utc: 2026-07-25T20:26:16Z (informational)_

@@ -1520,8 +1520,14 @@ _CURRENT_STATE_REPORT_REL = (
 _BOUNDARY_DECISION_SHA256 = (
     "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1"
 )
-_VALIDATION_ARCHITECTURE = "stage126_current_state_validator_v1"
+_VALIDATION_ARCHITECTURE = "stage126_current_state_validator_v2_lean"
 _VALIDATOR_ID = "stage126_current_state_validator"
+# Stage126+ Q1/Q2 Lean Governance label surfaced in the Handoff's
+# `validation_architecture` field (see
+# project/docs/ai/STAGE126_Q1Q2_LEAN_GOVERNANCE.md). Distinct from
+# `_VALIDATION_ARCHITECTURE` above, which pins the validator's own code
+# contract version.
+_LEAN_GOVERNANCE_ARCHITECTURE = "stage126_q1q2_lean_governance_v1"
 
 
 _CURRENT_STATE_METADATA_REL = (
@@ -1663,7 +1669,11 @@ def derive_validation_architecture_markers(root: str) -> dict:
         raise HandoffError("validation report permits prior-part regeneration")
 
     markers = {
-        "validation_architecture": _VALIDATION_ARCHITECTURE,
+        "validation_architecture": _LEAN_GOVERNANCE_ARCHITECTURE,
+        "scientific_artifacts_hard_locked": True,
+        "operational_surfaces_git_versioned": True,
+        "single_live_current_state_authority": True,
+        "legacy_validation_boundary_adapted": True,
         "stage125_part5_mode": "historical_immutable",
         "stage125_part5_live_gate_active": False,
         "stage125_part5_future_regeneration_allowed": False,
@@ -1680,6 +1690,7 @@ _TEST_BOUNDARY_REL = (
     "project/stage126/stage126_live_vs_historical_test_boundary.json"
 )
 _HISTORICAL_MARKER = "live_successor_state"
+_TERMINAL_HISTORICAL_MARKER = "stage126_terminal_successor_state"
 _HISTORICAL_REFERENCE_COMMIT = "6412b45c4adc6584a5567c7c96e0932f68f31e8a"
 _FROZEN_PART5_TEST_SHA256 = (
     "0b9413b2adbf9c44b0fb12b4f7ef2dad60be5cd4c401ccefac30d19f0905af71"
@@ -1709,12 +1720,18 @@ def derive_live_vs_historical_test_boundary_markers(root: str) -> dict:
         "historical_test_file_sha256": _FROZEN_PART5_TEST_SHA256,
         "historical_reference_commit": _HISTORICAL_REFERENCE_COMMIT,
         "historical_successor_tests_are_live_gate": False,
-        "stage126_live_suite_marker_expression": "not live_successor_state",
+        "stage126_live_suite_marker_expression": (
+            "not live_successor_state and not stage126_terminal_successor_state"
+        ),
         "current_state_validator_remains_live_gate": True,
         "part3_scientific_artifacts_changed": False,
         "part4_authorized": False,
         "final_test_unlocked": False,
         "stage125_part5_reopened_or_repinned": False,
+        "terminal_historical_marker": _TERMINAL_HISTORICAL_MARKER,
+        "terminal_historical_marked_node_count": 5,
+        "terminal_historical_successor_tests_are_live_gate": False,
+        "whole_part1_or_part2_test_file_excluded": False,
     }
     for key, want in exact.items():
         if record.get(key) != want:
@@ -1735,7 +1752,9 @@ def derive_live_vs_historical_test_boundary_markers(root: str) -> dict:
         "stage125_part5_historical_successor_test_reference_commit":
             _HISTORICAL_REFERENCE_COMMIT,
         "stage125_part5_historical_successor_tests_in_live_gate": False,
-        "stage126_live_test_suite_marker_expression": "not live_successor_state",
+        "stage126_live_test_suite_marker_expression": (
+            "not live_successor_state and not stage126_terminal_successor_state"
+        ),
     }
 
 

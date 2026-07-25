@@ -323,8 +323,8 @@
       "status": "PASS"
     },
     {
-      "detail": "[]",
-      "name": "closed_part_registry_immutable",
+      "detail": "informational_operational_drift=[]",
+      "name": "closed_part_registry_scientific_state_immutable",
       "status": "PASS"
     },
     {
@@ -400,17 +400,21 @@
   "generated_at": "85b77cbe7501c37d88827fcb25713bf86d3d7121",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part5-persistent-loss-target",
+  "legacy_validation_boundary_adapted": true,
+  "operational_surfaces_git_versioned": true,
   "output_files_sha256": {
     "README_STAGE126_CURRENT_STATE_VALIDATION.md": "7e48c74d24b4490e35153d159aa3c01ef040b5b09a0d6e2da1b46de24f5ad0d8",
-    "stage126_closed_part_registry.json": "d425422e92e317cb7d0c3b602a0f7bd87094225d2b311985232942280c6ecbca",
-    "stage126_current_state_validation_report.json": "14059b5917728d6f69df9102975e6ce4aab7637121461dc23b711529f0cf221a",
+    "stage126_closed_part_registry.json": "a2a23ebe1afa44d778eee976f9380340a5556f71ac2fa47b9c65cad9e4a5120f",
+    "stage126_current_state_validation_report.json": "52190728c152866ef11d50e84929b992fb742c55666cef3750883b8f2d386aab",
     "stage126_historical_boundary_manifest.json": "83eb42362d0d7416abb29db420ffd64c65725f54a359bb520aae36ad7177c988",
-    "stage126_validation_architecture_boundary_decision.json": "7502405fc0c2641c7dc766f3d4a52941b4c4841295d1d3130c07718768a6e06c"
+    "stage126_validation_architecture_boundary_decision.json": "96d532b341a54375baf4e6d8967454f57e567c348f23bb147911f7dcb7e66893"
   },
   "prior_part_reopening_requires_explicit_human_authorization": true,
   "prior_part_reopening_requires_scientific_error": true,
   "prior_robustness_verification_artifact_regeneration_allowed": false,
-  "source_file_sha256": "ca14ca9fd33ae7d35a2de5493d91201cb400d580bf8ad9070e9f175360b2b3bd",
+  "scientific_artifacts_hard_locked": true,
+  "single_live_current_state_authority": true,
+  "source_file_sha256": "ef752d25e356abfb772ab10d22024ed227ead8581c4f9c95cd961ce94c883e97",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {
@@ -423,8 +427,8 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "028f22f50e45d69c531ef177d4f7678f64e4107f6c59a9ee72e6541ab90314d3",
-  "validation_architecture": "stage126_current_state_validator_v1",
+  "test_file_sha256": "8591b89b2ddfd48d788cd2738a278eccbdbf93c4ad0bd5bc6372369339353178",
+  "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
-  "validator_version": "stage126_current_state_validator_v1"
+  "validator_version": "stage126_current_state_validator_v2_lean"
 }

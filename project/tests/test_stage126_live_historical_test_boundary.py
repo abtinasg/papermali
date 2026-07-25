@@ -32,14 +32,39 @@ FROZEN_PART5_TEST_SHA256 = (
     "0b9413b2adbf9c44b0fb12b4f7ef2dad60be5cd4c401ccefac30d19f0905af71"
 )
 HISTORICAL_REFERENCE_COMMIT = "6412b45c4adc6584a5567c7c96e0932f68f31e8a"
-LIVE_MARKER_EXPRESSION = "not live_successor_state"
+
+# Stage126+ Q1/Q2 Lean Governance adds a second, disjoint historical-marker
+# class: five pre-terminal successor assertions inside the CLOSED Part 1/Part 2
+# robustness test files (see project/docs/ai/STAGE126_Q1Q2_LEAN_GOVERNANCE.md
+# section 10 and pytest.ini). Unlike the frozen Part 5 file, Part 1/Part 2
+# remain live, mutable test files: only the five named nodes are excluded, by
+# marker only, and every other test in those two files stays in the live gate.
+TERMINAL_MARKER = "stage126_terminal_successor_state"
+TERMINAL_MARKED_NODE_IDS = (
+    "project/tests/test_stage126_m1_robustness_part1_target_proximity.py"
+    "::test_expected_mismatch_matches_the_real_frozen_validator",
+    "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py"
+    "::test_expected_mismatch_matches_the_real_frozen_validator",
+    "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py"
+    "::test_direct_handoff_validation_helper_is_exact",
+    "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py"
+    "::test_deterministic_repeated_build_output",
+    "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py"
+    "::test_check_mode_is_clean",
+)
+TERMINAL_MARKED_FILES = (
+    "project/tests/test_stage126_m1_robustness_part1_target_proximity.py",
+    "project/tests/test_stage126_m1_robustness_part2_listing_rule_b.py",
+)
+
+LIVE_MARKER_EXPRESSION = (
+    "not live_successor_state and not stage126_terminal_successor_state"
+)
 PYTEST_INI_REL = "pytest.ini"
 
 # Test files whose contents must remain fully inside the live gate.
 LIVE_GATE_FILES = (
     "test_stage126_m1_robustness_part3_expanded_rule_a.py",
-    "test_stage126_m1_robustness_part2_listing_rule_b.py",
-    "test_stage126_m1_robustness_part1_target_proximity.py",
     "test_stage126_m1_robustness_part0_decision_lock.py",
     "test_stage126_current_state_validator.py",
     "test_stage126_m1_primary_development_tuning.py",
@@ -154,8 +179,11 @@ def test_pytest_config_excludes_only_the_marker():
     assert "--deselect" not in addopts
     assert "-k" not in addopts.split()
     assert FROZEN_PART5_TEST_REL not in addopts
+    assert "--deselect" not in addopts
+    assert not any(f.split("::")[0] in addopts for f in TERMINAL_MARKED_FILES)
     markers = parser.get("pytest", "markers")
     assert HISTORICAL_MARKER in markers
+    assert TERMINAL_MARKER in markers
 
 
 def test_frozen_part5_file_still_contributes_tests_to_the_live_suite():
@@ -168,11 +196,21 @@ def test_frozen_part5_file_still_contributes_tests_to_the_live_suite():
 
 
 def test_deselected_set_is_exactly_the_marked_set():
-    live = set(_collected_node_ids())
-    every = set(_collected_node_ids("-m", ""))
-    marked = set(_collected_node_ids("-m", HISTORICAL_MARKER))
-    assert every - live == marked
-    assert all(n.split("::")[0] == FROZEN_PART5_TEST_REL for n in (every - live))
+    """Restricted to the `live_successor_state` class: the frozen Part 5 file
+    is the ONLY file it ever excludes from (the disjoint
+    `stage126_terminal_successor_state` class is proven separately)."""
+    live_successor_marked = set(_collected_node_ids("-m", HISTORICAL_MARKER))
+    every_in_frozen_file = {
+        n for n in _collected_node_ids("-m", "")
+        if n.startswith(FROZEN_PART5_TEST_REL)
+    }
+    live_in_frozen_file = {
+        n for n in _collected_node_ids() if n.startswith(FROZEN_PART5_TEST_REL)
+    }
+    assert every_in_frozen_file - live_in_frozen_file == live_successor_marked
+    assert all(
+        n.split("::")[0] == FROZEN_PART5_TEST_REL for n in live_successor_marked
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -284,9 +322,80 @@ def test_boundary_record_matches_the_configuration():
     assert record["part3_scientific_artifacts_changed"] is False
     assert record["part4_authorized"] is False
     assert record["final_test_unlocked"] is False
+    assert record["terminal_historical_marker"] == TERMINAL_MARKER
+    assert record["terminal_historical_successor_tests_are_live_gate"] is False
+    assert record["whole_part1_or_part2_test_file_excluded"] is False
+    assert sorted(record["terminal_historical_marked_node_ids"]) == sorted(
+        TERMINAL_MARKED_NODE_IDS
+    )
     assert sorted(record["historical_marked_node_ids"]) == _collected_node_ids(
         "-m", HISTORICAL_MARKER
     )
+
+
+# --------------------------------------------------------------------------- #
+# 10. Stage126+ Q1/Q2 Lean Governance — the SECOND historical marker class
+#
+# Exactly the five named Part 1/Part 2 pre-terminal successor assertions are
+# excluded, by marker only, from the default live gate. Unlike the frozen
+# Part 5 file, Part 1/Part 2 remain live, mutable files: every other test in
+# them stays collected and runnable.
+# --------------------------------------------------------------------------- #
+
+def test_terminal_marker_selects_exactly_the_five_named_nodes():
+    marked = set(_collected_node_ids("-m", TERMINAL_MARKER))
+    assert marked == set(TERMINAL_MARKED_NODE_IDS), marked
+
+
+def test_terminal_marker_appears_only_in_the_two_named_part_files():
+    offenders: list[str] = []
+    for rel in _tracked_files():
+        if not rel.endswith(".py") or rel in TERMINAL_MARKED_FILES:
+            continue
+        text = (REAL_ROOT / rel).read_text(encoding="utf-8", errors="ignore")
+        if f"pytest.mark.{TERMINAL_MARKER}" in text:
+            offenders.append(rel)
+    assert offenders == [], offenders
+
+
+def test_no_whole_part1_or_part2_test_file_is_excluded():
+    """Only the five named nodes are deselected — every other Part1/Part2
+    test remains live."""
+    live = set(_collected_node_ids())
+    every = set(_collected_node_ids("-m", ""))
+    marked_terminal = set(_collected_node_ids("-m", TERMINAL_MARKER))
+    for rel in TERMINAL_MARKED_FILES:
+        file_every = {n for n in every if n.startswith(rel)}
+        file_live = {n for n in live if n.startswith(rel)}
+        file_marked = {n for n in marked_terminal if n.startswith(rel)}
+        assert file_every, rel
+        assert file_every - file_live == file_marked, rel
+        # The file still contributes non-marked tests to the live gate.
+        assert file_live, rel
+
+
+def test_terminal_and_live_successor_marker_classes_are_disjoint():
+    live_successor = set(_collected_node_ids("-m", HISTORICAL_MARKER))
+    terminal_successor = set(_collected_node_ids("-m", TERMINAL_MARKER))
+    assert not (live_successor & terminal_successor)
+
+
+def test_deselected_set_equals_union_of_both_historical_marker_classes():
+    live = set(_collected_node_ids())
+    every = set(_collected_node_ids("-m", ""))
+    live_successor = set(_collected_node_ids("-m", HISTORICAL_MARKER))
+    terminal_successor = set(_collected_node_ids("-m", TERMINAL_MARKER))
+    assert every - live == live_successor | terminal_successor
+
+
+def test_no_current_scientific_or_gate_test_carries_the_terminal_marker():
+    """No current-state-validator, final-test-lock or leakage test is ever
+    excluded via the terminal-successor marker."""
+    marked = set(_collected_node_ids("-m", TERMINAL_MARKER))
+    for node in marked:
+        assert "current_state_validator" not in node, node
+        assert "final_test" not in node.lower() or node in TERMINAL_MARKED_NODE_IDS
+        assert "leakage" not in node, node
 
 
 def test_historical_runner_exists_and_is_read_only():

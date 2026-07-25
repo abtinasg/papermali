@@ -2635,7 +2635,7 @@ def test_handoff_carries_live_vs_historical_test_boundary_markers():
     )
     assert state["stage125_part5_historical_successor_tests_in_live_gate"] is False
     assert state["stage126_live_test_suite_marker_expression"] == (
-        "not live_successor_state"
+        "not live_successor_state and not stage126_terminal_successor_state"
     )
     # The boundary changes nothing about current state.
     assert state["last_completed_micro_part"] == (
