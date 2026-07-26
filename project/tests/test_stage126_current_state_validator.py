@@ -320,7 +320,7 @@ def test_part_scientific_artifacts_are_immutable(pinned, label):
 
 def test_closed_part_registry_pins_both_packages():
     registry = _read_json(v.F_CLOSED_REGISTRY)
-    assert registry["closed_part_count"] == 5
+    assert registry["closed_part_count"] == 6
     assert registry["regeneration_allowed"] is False
     parts = registry["parts"]
     assert set(parts) == {
@@ -328,6 +328,7 @@ def test_closed_part_registry_pins_both_packages():
         "expanded_rule_a_company_scope_robustness",
         "expanded_rule_b_combined_robustness",
         "persistent_loss_robustness_target",
+        "smote_training_fold_only_robustness",
     }
     for category, pinned in (
         ("m1_target_proximity_six_feature_set", PART1_SCIENTIFIC),
@@ -547,13 +548,14 @@ def test_completed_categories_and_next_category():
         "expanded_rule_a_company_scope_robustness",
         "expanded_rule_b_combined_robustness",
         "persistent_loss_robustness_target",
+        "smote_training_fold_only_robustness",
     ]
-    assert report["next_category_id"] == "smote_training_fold_only_robustness"
+    assert report["next_category_id"] == ""
     assert report["next_category_authorized"] is False
     assert report["standing_execution_authorization"] is False
-    assert report["m1_robustness_completed"] is False
+    assert report["m1_robustness_completed"] is True
     assert report["last_completed_micro_part"] == (
-        "stage126-m1-robustness-part5-persistent-loss-target"
+        "stage126-m1-robustness-part6-smote-training-fold-only"
     )
 
 
@@ -589,7 +591,9 @@ def test_final_test_remains_locked():
 def test_research_pointers_unchanged():
     report = _read_json(v.F_REPORT)
     assert report["active_workstream"] == "stage126_m1_financial_baseline"
-    assert report["next_research_action_id"] == "stage126-m1-financial-baseline"
+    # Part 6 closed the six-category robustness set: the next research
+    # action legitimately transitioned to the closure/synthesis milestone.
+    assert report["next_research_action_id"] == "stage126-m1-robustness-closure"
 
 
 @pytest.mark.parametrize("field", sorted(
@@ -717,7 +721,7 @@ def test_handoff_timestamp_change_does_not_reopen_a_closed_part(tmp_path):
         (root / v.PART0_DECISION_RECORD_REL).read_text(encoding="utf-8")
     )["execution_order"]
     completed, ids = v.completed_prefix(root, order)
-    assert ids == order[:5]
+    assert ids == order[:6]
     after = {
         name: _sha(root / "project/stage126" / name) for name in PART2_SCIENTIFIC
     }
@@ -757,8 +761,10 @@ def _synthetic_next_part(root: Path) -> str:
     Mirrors the real per-part package contract exactly: authorization record,
     completion lock, the full scientific surface, QC report, metadata manifest
     and README. Nothing here touches Parts 1-5 or Stage125. This synthetic
-    package is a validator fixture only: it never runs SMOTE (``smote_executed``
-    stays False), so it satisfies the generic development-only package contract.
+    package is a validator fixture only: it never runs literal SMOTE
+    (``smote_executed`` stays False), but does set ``smotenc_executed=True``
+    since Part 6 is the one registered category required to have executed
+    SMOTENC (see ``SMOTE_ROBUSTNESS_CATEGORY_ID``).
     """
     d = root / "project/stage126"
     prefix = "stage126_m1_robustness_part6"
@@ -792,7 +798,7 @@ def _synthetic_next_part(root: Path) -> str:
         "final_test_access_authorized": False,
         "final_test_evaluation_performed": False,
         "smote_executed": False,
-        "smotenc_executed": False,
+        "smotenc_executed": True,
         "shap_executed": False,
         "replaces_primary_results": False,
         "selects_paper_winner": False,
@@ -873,8 +879,72 @@ def _set_handoff_to_next_part(root: Path, micro_id: str) -> None:
     )
     state["last_completed_micro_part_qc_assertions"] = 7
     state["last_completed_micro_part_qc_failed"] = 0
+    state["m1_robustness_completed"] = True
+    state["next_research_action_id"] = "stage126-m1-robustness-closure"
     path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n",
                     encoding="utf-8")
+
+
+def _revert_mirror_to_pre_part6(root: Path) -> None:
+    """Undo the real, already-closed Part 6 in a freshly mirrored repo.
+
+    `_mirror` copies the REAL repo, which now genuinely contains a completed
+    and hash-pinned Part 6. Injecting a DIFFERENT synthetic Part 6 package
+    on top of that would collide with the closed-part registry's pinned
+    scientific hashes for that same category (correctly fail-closed). This
+    helper restores the mirror to the pre-Part-6 (five completed categories)
+    state so the synthetic-next-part scenario this test exercises remains
+    meaningful, without touching the REAL repository's own Part 6 artifacts.
+    """
+    d = root / "project/stage126"
+    for pattern in (
+        "stage126_m1_robustness_part6_*",
+        "metadata_and_hashes_stage126_m1_robustness_part6*",
+        "README_STAGE126_M1_ROBUSTNESS_PART6_SMOTE_TRAINING_FOLD_ONLY*",
+    ):
+        for path in d.glob(pattern):
+            path.unlink()
+    for rel in (
+        "project/src/stage126_m1_robustness_part6_smote_training_fold_only.py",
+        "project/run_stage126_m1_robustness_part6_smote_training_fold_only.py",
+        "project/tests/test_stage126_m1_robustness_part6_smote_training_fold_only.py",
+    ):
+        (root / rel).unlink()
+
+    registry_path = d / "stage126_closed_part_registry.json"
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    registry["parts"].pop("smote_training_fold_only_robustness", None)
+    registry["closed_part_count"] = len(registry["parts"])
+    registry_path.write_text(
+        json.dumps(registry, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+
+    state_path = root / v.HANDOFF_STATE_REL
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    state["last_completed_micro_part"] = (
+        "stage126-m1-robustness-part5-persistent-loss-target"
+    )
+    state["m1_robustness_completed_category_ids"] = [
+        "m1_target_proximity_six_feature_set",
+        "main_rule_b_listing_robustness",
+        "expanded_rule_a_company_scope_robustness",
+        "expanded_rule_b_combined_robustness",
+        "persistent_loss_robustness_target",
+    ]
+    state["m1_robustness_next_category_id"] = "smote_training_fold_only_robustness"
+    state["m1_robustness_completed"] = False
+    state["next_research_action_id"] = "stage126-m1-financial-baseline"
+    state["last_completed_micro_part_qc_scope"] = (
+        "stage126_m1_robustness_part5_persistent_loss_target"
+    )
+    state["last_completed_micro_part_qc_path"] = (
+        "project/stage126/stage126_m1_robustness_part5_qc_report.json"
+    )
+    state["last_completed_micro_part_qc_assertions"] = 134
+    state["last_completed_micro_part_qc_failed"] = 0
+    state_path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n",
+                          encoding="utf-8")
 
 
 def test_end_to_end_synthetic_next_part_build_and_check(tmp_path):
@@ -885,6 +955,7 @@ def test_end_to_end_synthetic_next_part_build_and_check(tmp_path):
     Stage125 stay byte-identical.
     """
     root = _mirror(tmp_path)
+    _revert_mirror_to_pre_part6(root)
     watched = (
         [f"project/stage126/{n}" for n in
          list(PART1_SCIENTIFIC) + list(PART2_SCIENTIFIC)]
@@ -992,15 +1063,29 @@ def test_half_present_part_package_fails_closed(tmp_path):
 
 
 def test_unauthorized_future_artifact_fails_closed(tmp_path):
+    """A dangling artifact for a category beyond the completed prefix must
+    fail closed. Part 6 is now genuinely completed in the real repo, so this
+    simulates the pre-Part-6 state (only Parts 1-5 completed) and drops a
+    Part 6 oof_predictions.csv WITHOUT the rest of its package -- exactly the
+    "unauthorized future execution" scenario this guards against."""
     root = _mirror(tmp_path)
-    (root / "project/stage126"
-     / "stage126_m1_robustness_part6_oof_predictions.csv").write_text(
+    part6_dir = root / "project/stage126"
+    for path in part6_dir.glob("stage126_m1_robustness_part6_*"):
+        path.unlink()
+    for path in part6_dir.glob("metadata_and_hashes_stage126_m1_robustness_part6*"):
+        path.unlink()
+    for path in part6_dir.glob(
+        "README_STAGE126_M1_ROBUSTNESS_PART6_SMOTE_TRAINING_FOLD_ONLY*"
+    ):
+        path.unlink()
+    (part6_dir / "stage126_m1_robustness_part6_oof_predictions.csv").write_text(
         "a,b\n1,2\n", encoding="utf-8",
     )
     order = json.loads(
         (root / v.PART0_DECISION_RECORD_REL).read_text(encoding="utf-8")
     )["execution_order"]
     completed, _ids = v.completed_prefix(root, order)
+    assert len(completed) == 5
     with pytest.raises(v.ValidationFail):
         v.verify_no_unauthorized_execution(root, order, completed)
 

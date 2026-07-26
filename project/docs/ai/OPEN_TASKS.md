@@ -6,10 +6,13 @@ front matter; this file is the working description.
 ## Active research workstream: `stage126-m1-financial-baseline`
 
 Authoritative research pointers live in `ROADMAP.md` front matter:
-`last_completed_research_action_id=stage125-part5-readiness-closure`,
-`next_research_action_id=stage126-m1-financial-baseline`
+`last_completed_research_action_id=stage126-m1-financial-baseline`,
+`next_research_action_id=stage126-m1-robustness-closure`
 (active; human-authorized and started; primary M1 development-fold tuning
-completed on PR #52; research action not yet completed).
+completed on PR #52; all six registered M1 robustness categories are now
+complete; next action synthesizes the six robustness results and closes the
+robustness set — no retuning, no final-test access, no automatic winner
+selection).
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
 Part 3B.1E is the decision-lock surface for the conservative-lag research
 action; Part 3C is the operationalization / leakage-safe dataset surface;
@@ -115,7 +118,7 @@ modeling started = true
 primary development tuning completed = true
 
 M1 robustness started = true
-M1 robustness completed = false
+M1 robustness completed = true
 full-development refit performed = false
 
 final test unlocked = false
@@ -126,9 +129,11 @@ final-test evaluation performed = false
 
 M2/M3/M4 data collected = false
 
-Primary M1 development-fold tuning is completed on PR #52. The Stage126
-research action is **not yet completed** (robustness / full-development
-refit / final test remain out of scope until separately authorized).
+Primary M1 development-fold tuning is completed on PR #52. All six
+registered M1 robustness categories (Parts 1-6) are now complete. Full-
+development refit, retained-design freeze and final test remain out of scope
+until separately authorized; the next research action,
+`stage126-m1-robustness-closure`, synthesizes the six robustness results.
 
 **Robustness Part 0 decision lock (maintenance; 2026-07-22):** the additive
 robustness execution contract (`stage126_m1_robustness_execution_contract_v1`)
@@ -424,10 +429,45 @@ Part 5 QC 134 assertions / 0 failed; current-state validator 77 / 0.
 `closed_part_count=5`; `m1_robustness_next_category_id=smote_training_fold_only_robustness`;
 `m1_robustness_part5_completed=true`; `m1_robustness_part6_authorized=false`.
 
-**Next — Part 6 (`smote_training_fold_only_robustness`) is NOT authorized
-and NOT started.** It requires its own separate explicit human authorization;
-the consumed Part 5 authorization is not a standing authorization. Parts 1–5
-are completed. Part 6 remains outstanding, so M1 robustness is not complete.
+**Robustness Part 6 — COMPLETED (2026-07-25):**
+`smote_training_fold_only_robustness` was explicitly human-authorized
+(696-byte text, SHA-256 `4a3bb0d7…`) and executed on the development folds
+only. **Only the imbalance strategy changed** — from primary class
+weighting to SMOTENC applied strictly inside each training fold, with class
+weighting disabled (XGBoost `scale_pos_weight=1`); the primary
+`main_rule_a_primary` sample, target (`FD_target_main_t_plus_1`),
+nine-feature `M1_PRIMARY_FEATURE_ORDER` set, selected configurations, folds
+and seeds are all unchanged, so the development and pooled-OOF identity sets
+are byte-for-byte the primary identity sets. SMOTENC ran on the training
+fold matrix (9 continuous features + 9 binary missingness indicators = 18
+columns; categorical indices `[9,10,11,12,13,14,15,16,17]`; sampler
+`random_state=20260725`; `k_neighbors=min(5, minority_count-1)=5` both
+folds): fold 1 training rows went from 33 positive / 212 negative to 212
+positive / 212 negative (179 synthetic, 424 total); fold 2 from 58 positive
+/ 392 negative to 392 positive / 392 negative (334 synthetic, 784 total).
+Validation and the final test were **never resampled** (0 validation
+resamplings; 0 final-test rows accessed). **No retuning** (0 tuning
+searches), **no full-development refit**, and the **final test remained
+locked** (346 identities counted only via the frozen split contract; 0
+predictor rows, 0 target rows, 0 evaluations). No calibration, bootstrap,
+Holm, p-values, threshold optimization, winner selection or SHAP. Pooled
+development-OOF PR-AUC: Logistic 0.443221 (−0.0025 vs primary), RF 0.370841
+(−0.0316 vs primary), XGBoost 0.301969 (−0.0546 vs primary) — **all three
+families declined** versus primary class weighting, but **the locked
+primary ordering Logistic > RF > XGBoost is preserved**. This is
+development-only imbalance-strategy sensitivity evidence: it does not
+replace the primary class-weighted results, does not constitute a new
+confirmatory model comparison, and selects no paper winner. Part 6 QC 148
+assertions / 0 failed. Handoff markers:
+`m1_robustness_part6_human_authorized=true`,
+`m1_robustness_part6_completed=true`,
+`m1_robustness_completed_category_ids=[part1, part2, part3, part4, part5,
+part6]`, `m1_robustness_next_category_id=` (none — Part 6 is the sixth and
+final registered category), `m1_robustness_completed=true`,
+`m1_robustness_execution_authorized=false`. **This closes the six-category M1
+robustness set.** The next research action, `stage126-m1-robustness-closure`,
+synthesizes the six results; it does **not** itself authorize retuning,
+retained-design freeze, full-development refit or final-test access.
 
 Historical Part 3B / 3B.1x notes (retained): origin probes and five-row
 document-binding evidence remain as frozen scientific history; they do **not**
@@ -493,8 +533,8 @@ At Stage125 closure the Handoff markers were:
 - `modeling_authorized=true`
 - `modeling_started=true`
 - `m1_primary_development_tuning_completed=true`
-- `m1_robustness_started=false`
-- `m1_robustness_completed=false`
+- `m1_robustness_started=true`
+- `m1_robustness_completed=true`
 - `final_test_unlocked=false`
 - `final_test_access_authorized=false`
 - `final_test_predictor_values_inspected=false`
@@ -504,17 +544,14 @@ At Stage125 closure the Handoff markers were:
 - `m3_data_collected=false`
 - `m4_data_collected=false`
 
-**Still prohibited without the next explicit micro-part decision / authorization:**
+**Still prohibited without a separate explicit authorization:**
 
 - final-test access or evaluation
 - full-development refit
-- M1 robustness execution without the next explicit micro-part decision
-- SMOTE robustness
-- target-proximity robustness
-- Rule B / expanded-sample robustness
-- persistent-loss robustness
+- retained-design freeze
 - M2/M3/M4 data collection or modeling
 - SHAP
+- calibration, bootstrap, Holm, threshold optimization, paper-winner selection
 - network extraction
 - expanded CODAL/TSETMC/CBI network for value extraction
 - row-level PublishDateTime collection

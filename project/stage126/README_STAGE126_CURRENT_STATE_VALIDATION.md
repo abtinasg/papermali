@@ -33,16 +33,16 @@ PYTHONPATH=project python -m pytest project/tests -q
 
 | field | value |
 |---|---|
-| completed parts | 5 |
-| completed categories | `m1_target_proximity_six_feature_set`, `main_rule_b_listing_robustness`, `expanded_rule_a_company_scope_robustness`, `expanded_rule_b_combined_robustness`, `persistent_loss_robustness_target` |
-| next category | `smote_training_fold_only_robustness` |
+| completed parts | 6 |
+| completed categories | `m1_target_proximity_six_feature_set`, `main_rule_b_listing_robustness`, `expanded_rule_a_company_scope_robustness`, `expanded_rule_b_combined_robustness`, `persistent_loss_robustness_target`, `smote_training_fold_only_robustness` |
+| next category | `` |
 | next category authorized | false |
-| M1 robustness completed | false |
+| M1 robustness completed | true |
 | full-development refit performed | false |
 | final test unlocked | false |
-| last completed micro-part | `stage126-m1-robustness-part5-persistent-loss-target` |
+| last completed micro-part | `stage126-m1-robustness-part6-smote-training-fold-only` |
 | active workstream | `stage126_m1_financial_baseline` |
-| next research action | `stage126-m1-financial-baseline` |
+| next research action | `stage126-m1-robustness-closure` |
 
 ## Adding a future part
 

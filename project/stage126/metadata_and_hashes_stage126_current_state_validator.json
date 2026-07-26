@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 78,
+  "assertion_count": 86,
   "assertions": [
     {
       "detail": "",
@@ -88,17 +88,17 @@
       "status": "PASS"
     },
     {
-      "detail": "['m1_target_proximity_six_feature_set', 'main_rule_b_listing_robustness', 'expanded_rule_a_company_scope_robustness', 'expanded_rule_b_combined_robustness', 'persistent_loss_robustness_target']",
+      "detail": "['m1_target_proximity_six_feature_set', 'main_rule_b_listing_robustness', 'expanded_rule_a_company_scope_robustness', 'expanded_rule_b_combined_robustness', 'persistent_loss_robustness_target', 'smote_training_fold_only_robustness']",
       "name": "completed_prefix_is_execution_order_prefix",
       "status": "PASS"
     },
     {
-      "detail": "5",
+      "detail": "6",
       "name": "completed_part_count_matches_discovered_packages",
       "status": "PASS"
     },
     {
-      "detail": "smote_training_fold_only_robustness",
+      "detail": "",
       "name": "next_category_is_the_next_registered_entry",
       "status": "PASS"
     },
@@ -114,7 +114,7 @@
     },
     {
       "detail": "",
-      "name": "m1_robustness_not_completed",
+      "name": "m1_robustness_completed_state_is_derived_and_consistent",
       "status": "PASS"
     },
     {
@@ -190,6 +190,21 @@
     {
       "detail": "",
       "name": "part5_authorization_hash_recorded",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part6_lock_next_category_is_registered_successor",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part6_lock_completed_prefix_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part6_authorization_hash_recorded",
       "status": "PASS"
     },
     {
@@ -323,6 +338,31 @@
       "status": "PASS"
     },
     {
+      "detail": "",
+      "name": "scientific_artifacts_pinned[smote_training_fold_only_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "verification_artifacts_pinned[smote_training_fold_only_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "code_artifacts_pinned[smote_training_fold_only_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "authorization_consumed[smote_training_fold_only_robustness]",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_locked_in_lock[smote_training_fold_only_robustness]",
+      "status": "PASS"
+    },
+    {
       "detail": "informational_operational_drift=[]",
       "name": "closed_part_registry_scientific_state_immutable",
       "status": "PASS"
@@ -369,7 +409,7 @@
     },
     {
       "detail": "",
-      "name": "research_pointers_unchanged",
+      "name": "research_pointers_consistent_with_m1_robustness_state",
       "status": "PASS"
     },
     {
@@ -393,8 +433,8 @@
       "status": "PASS"
     }
   ],
-  "closed_part_count": 5,
-  "code_commit": "44b227749bd8b074551f85b20dfb242d0e942863",
+  "closed_part_count": 6,
+  "code_commit": "3e133edec822025a36e0dc67399eb6cec0005685",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -402,15 +442,15 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "44b227749bd8b074551f85b20dfb242d0e942863",
+  "generated_at": "3e133edec822025a36e0dc67399eb6cec0005685",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
-  "last_completed_micro_part": "stage126-m1-robustness-part5-persistent-loss-target",
+  "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
   "operational_surfaces_git_versioned": true,
   "output_files_sha256": {
-    "README_STAGE126_CURRENT_STATE_VALIDATION.md": "7e48c74d24b4490e35153d159aa3c01ef040b5b09a0d6e2da1b46de24f5ad0d8",
-    "stage126_closed_part_registry.json": "a2a23ebe1afa44d778eee976f9380340a5556f71ac2fa47b9c65cad9e4a5120f",
-    "stage126_current_state_validation_report.json": "34e69cf67a6e8b16eefc3ea03d919591291994a2d5bd6595ba99f7d594678700",
+    "README_STAGE126_CURRENT_STATE_VALIDATION.md": "56e6000e84b878b342469a44a18d1f4f0cd0c0389ca22eff036c2e493808a740",
+    "stage126_closed_part_registry.json": "bb6a269686f4f1b616b7896bbba1469eb1cf61e8514445b8f8150033f258080e",
+    "stage126_current_state_validation_report.json": "a5827fe2040011c89e8f83586742a059543d2a1cc86b545a2511de02dddc039f",
     "stage126_historical_boundary_manifest.json": "a518be27730e32b8a7de8de2d46865fc5efc1d31a5f796d00a6557d25f92a838",
     "stage126_validation_architecture_boundary_decision.json": "7502405fc0c2641c7dc766f3d4a52941b4c4841295d1d3130c07718768a6e06c"
   },
@@ -420,7 +460,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "3fb277c761a119e69674070da50ae5faeb987abac1b68076e59368f01a691de6",
+  "source_file_sha256": "eee141645bc89d7d98445abf29db65d7d0b1d3719844282bba68893c59776f70",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {
@@ -433,7 +473,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "8a894beb8d6bd23ed4ee4247c6666fa71fdda9266dd82422e2e0f667a9552b1a",
+  "test_file_sha256": "87c5f7a6085b5beb605f779eacd6af20fc38f1dba29c44821c69fc5f31a40c21",
   "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v2_lean"
