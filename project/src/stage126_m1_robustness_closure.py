@@ -29,6 +29,7 @@ import importlib.metadata as importlib_metadata
 import io
 import json
 import platform
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -118,6 +119,26 @@ def _part_artifact_rels(n: int) -> dict[str, str]:
 
 
 REGISTRY_REL = "project/stage126/stage126_closed_part_registry.json"
+SELECTED_CONFIGS_REL = "project/stage126/stage126_m1_selected_configurations.json"
+PART6_RESAMPLING_AUDIT_REL = "project/stage126/stage126_m1_robustness_part6_resampling_audit.csv"
+
+# Boolean fields that, when present in a Part's own execution_manifest.json,
+# must equal (changed_dimension == <dimension>). Field names are NOT uniform
+# across Parts (Part 1 predates several of these fields; Part 6 uses
+# `imbalance_policy_changed` for the imbalance dimension), so each dimension
+# lists every observed alias.
+_CHANGE_FLAG_ALIASES: dict[str, tuple[str, ...]] = {
+    "sample": ("sample_changed",),
+    "target": ("target_changed",),
+    "feature_set": ("feature_set_changed",),
+    "imbalance_strategy": ("imbalance_policy_changed", "imbalance_strategy_changed"),
+}
+
+FINAL_TEST_ZERO_COUNTER_KEYS = (
+    "final_test_predictor_rows_loaded",
+    "final_test_target_rows_loaded",
+    "final_test_evaluations",
+)
 
 EVIDENCE_TABLE_COLUMNS = (
     "part_index",
@@ -160,6 +181,20 @@ def sha256_bytes(data: bytes) -> str:
 
 def sha256_file(path: Path) -> str:
     return sha256_bytes(path.read_bytes())
+
+
+def _git(repo_root: str | Path, *args: str) -> str:
+    """Informational git helper only (never used for integrity decisions),
+    following the same convention as e.g.
+    stage126_m1_robustness_part6_smote_training_fold_only.py."""
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(repo_root), *args],
+            check=True, capture_output=True, text=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return ""
+    return out.stdout.strip()
 
 
 def runtime_versions() -> dict[str, str]:
@@ -238,6 +273,153 @@ def load_registered_categories(repo_root: Path) -> list[str]:
     return ids
 
 
+def load_primary_selected_configurations(repo_root: Path) -> dict[str, Any]:
+    return _read_json(repo_root, SELECTED_CONFIGS_REL)
+
+
+def _load_part_execution_manifest(repo_root: Path, n: int) -> dict[str, Any]:
+    return _read_json(repo_root, _part_artifact_rels(n)["execution_manifest"])
+
+
+def _load_part_completion_lock(repo_root: Path, n: int) -> dict[str, Any]:
+    return _read_json(repo_root, _part_artifact_rels(n)["completion_lock"])
+
+
+def derive_part_semantics(
+    part: dict[str, Any],
+    manifest: dict[str, Any],
+    completion_lock: dict[str, Any],
+    primary_selected_configs: dict[str, Any],
+) -> dict[str, bool]:
+    """Read/verify the semantic booleans for one Part from ITS OWN canonical
+    execution-manifest/completion-lock artifacts, fail-closed on disagreement.
+
+    Never invents a value: a dimension's changed-flag is read from whichever
+    alias field the Part actually recorded; if the Part predates that field
+    (Part 1), the flag is derived from the Part's own `changed_dimension`
+    (itself cross-checked against the registered ``PARTS`` table) rather than
+    a value hardcoded independently in this module.
+    """
+    n = part["part_index"]
+    expected_dimension = part["changed_dimension"]
+    manifest_dimension = manifest.get("changed_dimension")
+    if manifest_dimension != expected_dimension:
+        raise QCFail(
+            f"Part {n} changed_dimension mismatch: "
+            f"execution_manifest={manifest_dimension!r} registered={expected_dimension!r}"
+        )
+
+    flags: dict[str, bool] = {}
+    for dimension, aliases in _CHANGE_FLAG_ALIASES.items():
+        expected = dimension == expected_dimension
+        present = [a for a in aliases if a in manifest]
+        for alias in present:
+            observed = bool(manifest[alias])
+            if observed != expected:
+                raise QCFail(
+                    f"Part {n} {alias}={observed} disagrees with "
+                    f"changed_dimension={expected_dimension!r}"
+                )
+        flags[dimension] = expected
+
+    # selected_configurations_changed: independently recompute by comparing
+    # each Part's own recorded configuration_id per family against the
+    # locked primary selected-configuration file, then cross-check against
+    # any explicit `selected_configurations_changed` field the Part recorded.
+    part_selected = manifest.get("selected_configurations")
+    if not isinstance(part_selected, dict):
+        raise QCFail(f"Part {n} execution_manifest missing selected_configurations")
+    computed_changed = False
+    for fam in MODEL_FAMILIES:
+        part_cfg = part_selected.get(fam)
+        primary_cfg = primary_selected_configs.get(fam, {}).get("configuration_id")
+        if part_cfg is None or primary_cfg is None:
+            raise QCFail(f"Part {n} missing configuration_id comparison for {fam}")
+        if part_cfg != primary_cfg:
+            computed_changed = True
+    if "selected_configurations_changed" in manifest:
+        recorded = bool(manifest["selected_configurations_changed"])
+        if recorded != computed_changed:
+            raise QCFail(
+                f"Part {n} selected_configurations_changed={recorded} disagrees "
+                f"with recomputed value={computed_changed}"
+            )
+    selected_configurations_changed = computed_changed
+
+    # development_only: read (fail closed if absent or False).
+    if manifest.get("development_only") is not True:
+        raise QCFail(f"Part {n} execution_manifest development_only is not True")
+    development_only = True
+
+    # final_test_accessed_or_evaluated: derive from the frozen zero-counters
+    # already recorded by the Part, fail-closed if any is non-zero, and
+    # cross-check against the completion-lock's own final-test booleans.
+    for key in FINAL_TEST_ZERO_COUNTER_KEYS:
+        if key not in manifest:
+            raise QCFail(f"Part {n} execution_manifest missing {key}")
+        if manifest[key] != 0:
+            raise QCFail(f"Part {n} {key}={manifest[key]!r} is not 0")
+    for key in (
+        "final_test_access_authorized",
+        "final_test_evaluation_performed",
+        "final_test_unlocked",
+        "full_development_refit_performed",
+    ):
+        if key in completion_lock and completion_lock[key] is not False:
+            raise QCFail(f"Part {n} completion_lock {key}={completion_lock[key]!r} is not False")
+    for key in (
+        "paper_winner_selected",
+        "selects_paper_winner",
+        "winner_selected",
+    ):
+        if key in completion_lock and completion_lock[key] is not False:
+            raise QCFail(f"Part {n} completion_lock {key}={completion_lock[key]!r} is not False")
+    final_test_accessed_or_evaluated = False
+
+    flags["selected_configurations_changed"] = selected_configurations_changed
+    flags["development_only"] = development_only
+    flags["final_test_accessed_or_evaluated"] = final_test_accessed_or_evaluated
+    return flags
+
+
+def verify_part5_positive_counts(manifest: dict[str, Any]) -> tuple[int, int, int]:
+    """Read Part 5's own recorded development-positive transition counts and
+    fail closed unless they exactly match the reported 68/85/+17."""
+    transitions = manifest.get("development_target_transitions")
+    if not isinstance(transitions, dict):
+        raise QCFail("Part 5 execution_manifest missing development_target_transitions")
+    primary_positive = transitions.get("primary_positive")
+    persistent_positive = transitions.get("persistent_positive")
+    net_delta = transitions.get("net_positive_delta")
+    if primary_positive != 68 or persistent_positive != 85 or net_delta != 17:
+        raise QCFail(
+            "Part 5 development_target_transitions disagree with expected "
+            f"68/85/+17: primary_positive={primary_positive!r} "
+            f"persistent_positive={persistent_positive!r} net_positive_delta={net_delta!r}"
+        )
+    return primary_positive, persistent_positive, net_delta
+
+
+def verify_part6_imbalance_semantics(repo_root: Path, manifest: dict[str, Any]) -> None:
+    """Fail closed unless Part 6's own manifest + resampling audit CSV confirm
+    class weighting is disabled and SMOTENC was applied training-fold-only
+    (never to validation rows, never approaching the final test)."""
+    if manifest.get("class_weighting_disabled") is not True:
+        raise QCFail("Part 6 execution_manifest class_weighting_disabled is not True")
+    audit_rows = _read_metrics_csv(repo_root, PART6_RESAMPLING_AUDIT_REL)
+    if not audit_rows:
+        raise QCFail("Part 6 resampling audit CSV is empty")
+    for row in audit_rows:
+        if row.get("validation_resampled") != "false":
+            raise QCFail(
+                f"Part 6 resampling audit row has validation_resampled={row.get('validation_resampled')!r}"
+            )
+        if row.get("final_test_approached") != "false":
+            raise QCFail(
+                f"Part 6 resampling audit row has final_test_approached={row.get('final_test_approached')!r}"
+            )
+
+
 # --------------------------------------------------------------------------- #
 # Evidence table (18 rows = 6 parts x 3 model families)
 # --------------------------------------------------------------------------- #
@@ -245,6 +427,7 @@ def load_registered_categories(repo_root: Path) -> list[str]:
 def build_evidence_rows(
     repo_root: Path, primary_pooled: dict[str, float],
 ) -> list[dict[str, Any]]:
+    primary_selected_configs = load_primary_selected_configurations(repo_root)
     rows: list[dict[str, Any]] = []
     for part in PARTS:
         n = part["part_index"]
@@ -263,10 +446,23 @@ def build_evidence_rows(
         )
         ordering_preserved = observed_ordering == PRIMARY_ORDERING
 
-        sample_changed = changed_dimension == "sample"
-        target_changed = changed_dimension == "target"
-        feature_set_changed = changed_dimension == "feature_set"
-        imbalance_strategy_changed = changed_dimension == "imbalance_strategy"
+        manifest = _load_part_execution_manifest(repo_root, n)
+        completion_lock = _load_part_completion_lock(repo_root, n)
+        semantics = derive_part_semantics(
+            part, manifest, completion_lock, primary_selected_configs,
+        )
+        sample_changed = semantics["sample"]
+        target_changed = semantics["target"]
+        feature_set_changed = semantics["feature_set"]
+        imbalance_strategy_changed = semantics["imbalance_strategy"]
+        selected_configurations_changed = semantics["selected_configurations_changed"]
+        development_only = semantics["development_only"]
+        final_test_accessed_or_evaluated = semantics["final_test_accessed_or_evaluated"]
+
+        if n == 5:
+            verify_part5_positive_counts(manifest)
+        if n == 6:
+            verify_part6_imbalance_semantics(repo_root, manifest)
 
         for fam in MODEL_FAMILIES:
             primary_val = primary_pooled[fam]
@@ -288,9 +484,9 @@ def build_evidence_rows(
                 "target_changed": target_changed,
                 "feature_set_changed": feature_set_changed,
                 "imbalance_strategy_changed": imbalance_strategy_changed,
-                "selected_configurations_changed": False,
-                "development_only": True,
-                "final_test_accessed_or_evaluated": False,
+                "selected_configurations_changed": selected_configurations_changed,
+                "development_only": development_only,
+                "final_test_accessed_or_evaluated": final_test_accessed_or_evaluated,
                 "source_comparison_artifact": rels["comparison"],
                 "source_metric_artifact": rels["metrics"],
             })
@@ -326,6 +522,14 @@ def build_synthesis_record(
     by_part: dict[int, list[dict[str, Any]]] = {}
     for row in rows:
         by_part.setdefault(row["part_index"], []).append(row)
+
+    part5_manifest = _load_part_execution_manifest(repo_root, 5)
+    part5_primary_positive, part5_persistent_positive, part5_positive_delta = (
+        verify_part5_positive_counts(part5_manifest)
+    )
+    part6_manifest = _load_part_execution_manifest(repo_root, 6)
+    verify_part6_imbalance_semantics(repo_root, part6_manifest)
+    part6_class_weighting_disabled = part6_manifest["class_weighting_disabled"]
 
     part_summaries = []
     for part in PARTS:
@@ -390,14 +594,15 @@ def build_synthesis_record(
                 "the primary target while holding the sample, feature set, "
                 "configurations and imbalance policy fixed. Pooled PR-AUC "
                 "increases for all three model families, but the target changed "
-                "AND the development positive count increased (85 vs 68, "
-                "+17). This is treated as secondary-target sensitivity evidence "
-                "only, NOT as a same-outcome performance gain, and does not "
-                "replace or reweight the primary target."
+                f"AND the development positive count increased "
+                f"({part5_persistent_positive} vs {part5_primary_positive}, "
+                f"+{part5_positive_delta}). This is treated as secondary-target "
+                "sensitivity evidence only, NOT as a same-outcome performance "
+                "gain, and does not replace or reweight the primary target."
             ),
-            "development_positive_count_primary": 68,
-            "development_positive_count_persistent_loss": 85,
-            "development_positive_count_delta": 17,
+            "development_positive_count_primary": part5_primary_positive,
+            "development_positive_count_persistent_loss": part5_persistent_positive,
+            "development_positive_count_delta": part5_positive_delta,
         },
         "D_imbalance_strategy_sensitivity": {
             "finding": (
@@ -412,8 +617,11 @@ def build_synthesis_record(
                 "that decision belongs to the separate, future "
                 "`stage126-m1-retained-design-freeze` action."
             ),
-            "primary_ordering_preserved": True,
-            "all_three_families_declined": True,
+            "primary_ordering_preserved": by_part[6][0]["primary_ordering_preserved"],
+            "all_three_families_declined": all(
+                r["absolute_delta_vs_primary"] < 0 for r in by_part[6]
+            ),
+            "class_weighting_disabled": part6_class_weighting_disabled,
         },
         "E_overall_synthesis": {
             "finding": (
@@ -515,12 +723,59 @@ def build_completion_lock() -> dict[str, Any]:
 # Source / scientific manifest (SHA-256 pinning; no recursive hash chain)
 # --------------------------------------------------------------------------- #
 
+def build_code_provenance(repo_root: Path) -> dict[str, Any]:
+    """Code identity that produced this closure — kept intentionally minimal
+    and NON-recursive: it hashes only the closure's own source/runner files
+    (NOT the QC report or metadata manifest, and NOT this source_manifest
+    itself), avoiding the build/check self-reference cycle Part 5 already
+    documents avoiding. Commit SHAs here are engineering anchors only
+    (informational), same convention as e.g. `base_main_commit`/
+    `source_commit` in stage126_m1_robustness_part6_smote_training_fold_only.py
+    and stage126_m1_robustness_part0_decision_lock.py.
+    """
+    src_path = repo_root / SRC_REL
+    run_path = repo_root / RUN_REL
+    # The commit that last touched the CANONICAL SCIENTIFIC closure logic
+    # (this source + its runner + its test), distinct from later purely
+    # operational commits on the same branch (e.g. the follow-up commit that
+    # only updated update_ai_handoff.py / stage126_current_state_validator.py
+    # / docs to recognize this closure's completion — that commit does not
+    # change the closure's own scientific/code logic and is intentionally
+    # NOT what this field anchors to).
+    scientific_code_commit = _git(
+        repo_root, "log", "--format=%H", "-n", "1", "--", SRC_REL, RUN_REL, TEST_REL,
+    ) or _git(repo_root, "rev-parse", "HEAD")
+    return {
+        "note": (
+            "Engineering/reproducibility anchors only (informational, not a "
+            "scientific lock). `scientific_code_commit` is the last commit "
+            "that touched the closure source/runner/test (the SCIENTIFIC "
+            "closure logic) — it is intentionally NOT recomputed from later "
+            "purely-operational commits on this branch (e.g. Handoff/"
+            "validator-only bookkeeping commits) that do not change the "
+            "closure's own logic."
+        ),
+        "closure_source_path": SRC_REL,
+        "closure_source_sha256": (
+            sha256_file(src_path) if src_path.is_file() else ""
+        ),
+        "closure_runner_path": RUN_REL,
+        "closure_runner_sha256": (
+            sha256_file(run_path) if run_path.is_file() else ""
+        ),
+        "scientific_code_commit": scientific_code_commit,
+        "head_commit_at_manifest_build_time": _git(repo_root, "rev-parse", "HEAD"),
+    }
+
+
 def build_source_manifest(
     repo_root: Path, generated_hashes: dict[str, str],
 ) -> dict[str, Any]:
     consumed: dict[str, str] = {}
     consumed[PRIMARY_METRICS_REL] = sha256_file(repo_root / PRIMARY_METRICS_REL)
     consumed[REGISTRY_REL] = sha256_file(repo_root / REGISTRY_REL)
+    consumed[SELECTED_CONFIGS_REL] = sha256_file(repo_root / SELECTED_CONFIGS_REL)
+    consumed[PART6_RESAMPLING_AUDIT_REL] = sha256_file(repo_root / PART6_RESAMPLING_AUDIT_REL)
     for part in PARTS:
         rels = _part_artifact_rels(part["part_index"])
         for rel in rels.values():
@@ -540,6 +795,12 @@ def build_source_manifest(
         # This closure's own generated synthesis outputs (evidence table,
         # synthesis record, completion lock, README) — hashed once, here.
         "generated_output_sha256": dict(sorted(generated_hashes.items())),
+        # Canonical closure SCIENTIFIC/CODE provenance (this closure's own
+        # source/runner identity) — distinguished from later purely
+        # OPERATIONAL Handoff/validator-only commits, which do not touch
+        # this closure's logic and are not what `scientific_code_commit`
+        # anchors to. See build_code_provenance() docstring.
+        "code_provenance": build_code_provenance(repo_root),
         "runtime_versions": runtime_versions(),
     }
 
@@ -737,6 +998,8 @@ def verify_closed_parts_immutable(repo_root: Path) -> dict[str, str]:
     observed: dict[str, str] = {}
     observed[PRIMARY_METRICS_REL] = sha256_file(repo_root / PRIMARY_METRICS_REL)
     observed[REGISTRY_REL] = sha256_file(repo_root / REGISTRY_REL)
+    observed[SELECTED_CONFIGS_REL] = sha256_file(repo_root / SELECTED_CONFIGS_REL)
+    observed[PART6_RESAMPLING_AUDIT_REL] = sha256_file(repo_root / PART6_RESAMPLING_AUDIT_REL)
     for part in PARTS:
         for rel in _part_artifact_rels(part["part_index"]).values():
             path = repo_root / rel

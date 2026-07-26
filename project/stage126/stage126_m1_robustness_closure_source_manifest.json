@@ -1,4 +1,13 @@
 {
+  "code_provenance": {
+    "closure_runner_path": "project/run_stage126_m1_robustness_closure.py",
+    "closure_runner_sha256": "45779608ddc0b5810371893041f98ffe8b68072827633a9d9b0af3c012954b39",
+    "closure_source_path": "project/src/stage126_m1_robustness_closure.py",
+    "closure_source_sha256": "0798aa200dab83a6453fc167eef0656bded40f2f1081bb482083d4e09328dd80",
+    "head_commit_at_manifest_build_time": "915c106c6fbfa17125589feb5c0c17227f39f001",
+    "note": "Engineering/reproducibility anchors only (informational, not a scientific lock). `scientific_code_commit` is the last commit that touched the closure source/runner/test (the SCIENTIFIC closure logic) — it is intentionally NOT recomputed from later purely-operational commits on this branch (e.g. Handoff/validator-only bookkeeping commits) that do not change the closure's own logic.",
+    "scientific_code_commit": "356e4d3b9fcf1168718502b4a2369b347437c345"
+  },
   "consumed_source_artifacts_sha256": {
     "project/stage126/stage126_closed_part_registry.json": "bb6a269686f4f1b616b7896bbba1469eb1cf61e8514445b8f8150033f258080e",
     "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
@@ -31,7 +40,9 @@
     "project/stage126/stage126_m1_robustness_part6_execution_manifest.json": "84d9d3ddfc821978c04763344b1b6468b4e6cb4202e61ac26dc19a4fc462a786",
     "project/stage126/stage126_m1_robustness_part6_human_authorization_record.json": "64cac26ed0505dc8feb58459ea0f8dba449f146bc29b5cc63d850d58182b19f5",
     "project/stage126/stage126_m1_robustness_part6_metrics.csv": "577a538ad8a940d6561cbb7cd4622f7cfb2ded83e4233e6de0d582110e3844da",
-    "project/stage126/stage126_m1_robustness_part6_primary_comparison.json": "22528de44a14e24891e44a089e9b51a895b298ae20f15a6311601d0d2bface4a"
+    "project/stage126/stage126_m1_robustness_part6_primary_comparison.json": "22528de44a14e24891e44a089e9b51a895b298ae20f15a6311601d0d2bface4a",
+    "project/stage126/stage126_m1_robustness_part6_resampling_audit.csv": "6ff4c78e1c027d84af08fe5657a16829b5fe8a3df4eae66c81fc7d3feb915658",
+    "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e"
   },
   "contract_id": "stage126_m1_robustness_closure",
   "contract_version": "stage126_m1_robustness_closure_v1",
@@ -40,7 +51,7 @@
     "README_STAGE126_M1_ROBUSTNESS_CLOSURE.md": "54e420d0915958d76bfa32b55d6c0fa444d8a09221a10eecb6628455f05b7fbb",
     "stage126_m1_robustness_closure_completion_lock.json": "2e63f03ffbfc41c7207b5e28642df93d987a3054bb6f9c76dcb003a561d7ce42",
     "stage126_m1_robustness_closure_evidence_table.csv": "9dabcb4e790bd80171307d068e1d1423de497a69f85f1eb6668abe6a512639f6",
-    "stage126_m1_robustness_closure_synthesis_record.json": "a13264c910c727f93e7379c0c220cb4d3cb9d32fb91b8755bfa8bbac49ba874f"
+    "stage126_m1_robustness_closure_synthesis_record.json": "fdf8c585e6f4c38a066feec6f90094a2b6d50867ffac290195f40b9ce616846a"
   },
   "runtime_versions": {
     "numpy": "2.4.6",

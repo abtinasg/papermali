@@ -186,6 +186,7 @@
     },
     "D_imbalance_strategy_sensitivity": {
       "all_three_families_declined": true,
+      "class_weighting_disabled": true,
       "finding": "Part 6 substitutes training-fold-only SMOTENC (class weighting disabled) for the primary class-weighted imbalance policy while holding the sample, target, feature set and configurations fixed. The primary ordering is preserved, but all three pooled PR-AUC values decline relative to the locked primary class-weighted result. This is reported as imbalance-strategy sensitivity evidence. Class weighting is NOT frozen as the retained imbalance policy by this closure; that decision belongs to the separate, future `stage126-m1-retained-design-freeze` action.",
       "primary_ordering_preserved": true
     },

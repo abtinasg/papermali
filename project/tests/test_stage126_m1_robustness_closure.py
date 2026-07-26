@@ -178,6 +178,71 @@ def test_all_rows_final_test_never_accessed():
         assert r["selected_configurations_changed"] == "false"
 
 
+def test_changed_dimension_matches_each_parts_own_execution_manifest():
+    """Independently read `changed_dimension` from each Part's OWN
+    execution_manifest.json (not from closure.PARTS) and compare to the
+    on-disk evidence table."""
+    with open(STAGE126 / closure.F_EVIDENCE_TABLE, encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+    for part in closure.PARTS:
+        n = part["part_index"]
+        manifest_path = REAL_ROOT / f"project/stage126/stage126_m1_robustness_part{n}_execution_manifest.json"
+        with open(manifest_path, encoding="utf-8") as f:
+            manifest = json.load(f)
+        expected_dim = manifest["changed_dimension"]
+        part_rows = [r for r in rows if int(r["part_index"]) == n]
+        assert len(part_rows) == 3
+        for r in part_rows:
+            assert r["changed_dimension"] == expected_dim
+
+
+def test_selected_configurations_changed_matches_independent_recomputation():
+    """Independently recompute, per Part, whether each model family's
+    configuration_id (read from the Part's own execution_manifest.json)
+    differs from the locked primary selected-configuration file — without
+    using closure.derive_part_semantics — and compare to the evidence table."""
+    with open(
+        REAL_ROOT / closure.SELECTED_CONFIGS_REL, encoding="utf-8",
+    ) as f:
+        primary_selected = json.load(f)
+    with open(STAGE126 / closure.F_EVIDENCE_TABLE, encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+    for part in closure.PARTS:
+        n = part["part_index"]
+        manifest_path = REAL_ROOT / f"project/stage126/stage126_m1_robustness_part{n}_execution_manifest.json"
+        with open(manifest_path, encoding="utf-8") as f:
+            manifest = json.load(f)
+        part_selected = manifest["selected_configurations"]
+        expected_changed = any(
+            part_selected[fam] != primary_selected[fam]["configuration_id"]
+            for fam in closure.MODEL_FAMILIES
+        )
+        for r in rows:
+            if int(r["part_index"]) == n:
+                assert (r["selected_configurations_changed"] == "true") == expected_changed
+
+
+def test_final_test_accessed_or_evaluated_matches_each_parts_zero_counters():
+    """Independently read the frozen final-test zero-counters from each
+    Part's OWN execution_manifest.json and confirm they are all exactly 0,
+    then compare the derived accessed/evaluated flag to the evidence table."""
+    with open(STAGE126 / closure.F_EVIDENCE_TABLE, encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+    for part in closure.PARTS:
+        n = part["part_index"]
+        manifest_path = REAL_ROOT / f"project/stage126/stage126_m1_robustness_part{n}_execution_manifest.json"
+        with open(manifest_path, encoding="utf-8") as f:
+            manifest = json.load(f)
+        for key in (
+            "final_test_predictor_rows_loaded", "final_test_target_rows_loaded",
+            "final_test_evaluations",
+        ):
+            assert manifest[key] == 0
+        for r in rows:
+            if int(r["part_index"]) == n:
+                assert r["final_test_accessed_or_evaluated"] == "false"
+
+
 def test_changed_dimension_flags_one_factor_at_a_time():
     with open(STAGE126 / closure.F_EVIDENCE_TABLE, encoding="utf-8", newline="") as f:
         rows = list(csv.DictReader(f))
@@ -244,11 +309,57 @@ def test_synthesis_record_prohibited_actions_list():
 
 
 def test_synthesis_record_target_sensitivity_caveat():
+    """Independently re-derive Part 5's development-positive counts directly
+    from Part 5's OWN execution_manifest.json (not from the closure's
+    hardcoded constants) and compare to the synthesis record on disk."""
+    with open(
+        REAL_ROOT / "project/stage126/stage126_m1_robustness_part5_execution_manifest.json",
+        encoding="utf-8",
+    ) as f:
+        part5_manifest = json.load(f)
+    transitions = part5_manifest["development_target_transitions"]
+    expected_primary = transitions["primary_positive"]
+    expected_persistent = transitions["persistent_positive"]
+    expected_delta = transitions["net_positive_delta"]
+    # Sanity: the independently-read source values are the ones this
+    # closure's spec expects (68 / 85 / +17).
+    assert (expected_primary, expected_persistent, expected_delta) == (68, 85, 17)
+
     rec = _synthesis()
     c_finding = rec["scientific_interpretation"]["C_target_sensitivity"]
-    assert c_finding["development_positive_count_primary"] == 68
-    assert c_finding["development_positive_count_persistent_loss"] == 85
-    assert c_finding["development_positive_count_delta"] == 17
+    assert c_finding["development_positive_count_primary"] == expected_primary
+    assert c_finding["development_positive_count_persistent_loss"] == expected_persistent
+    assert c_finding["development_positive_count_delta"] == expected_delta
+
+
+def test_synthesis_record_imbalance_class_weighting_disabled_from_source():
+    """Independently re-derive Part 6's class_weighting_disabled flag from
+    Part 6's OWN execution_manifest.json, not from a closure constant."""
+    with open(
+        REAL_ROOT / "project/stage126/stage126_m1_robustness_part6_execution_manifest.json",
+        encoding="utf-8",
+    ) as f:
+        part6_manifest = json.load(f)
+    expected = part6_manifest["class_weighting_disabled"]
+    assert expected is True
+
+    rec = _synthesis()
+    d_finding = rec["scientific_interpretation"]["D_imbalance_strategy_sensitivity"]
+    assert d_finding["class_weighting_disabled"] == expected
+
+
+def test_part6_resampling_audit_never_touches_validation_or_final_test():
+    """Independently read the Part 6 resampling audit CSV (not via the
+    closure module) and confirm SMOTENC was applied training-fold-only."""
+    with open(
+        REAL_ROOT / "project/stage126/stage126_m1_robustness_part6_resampling_audit.csv",
+        encoding="utf-8", newline="",
+    ) as f:
+        audit_rows = list(csv.DictReader(f))
+    assert len(audit_rows) > 0
+    for row in audit_rows:
+        assert row["validation_resampled"] == "false"
+        assert row["final_test_approached"] == "false"
 
 
 # --------------------------------------------------------------------------- #
@@ -326,6 +437,23 @@ def test_source_manifest_pins_all_consumed_artifacts():
     # or itself.
     assert closure.F_QC not in generated
     assert closure.F_SOURCE_MANIFEST not in generated
+
+
+def test_source_manifest_code_provenance_fields():
+    with open(STAGE126 / closure.F_SOURCE_MANIFEST, encoding="utf-8") as f:
+        manifest = json.load(f)
+    prov = manifest["code_provenance"]
+    assert prov["closure_source_path"] == closure.SRC_REL
+    assert prov["closure_source_sha256"] == hashlib.sha256(
+        (REAL_ROOT / closure.SRC_REL).read_bytes()
+    ).hexdigest()
+    assert prov["closure_runner_path"] == closure.RUN_REL
+    assert prov["closure_runner_sha256"] == hashlib.sha256(
+        (REAL_ROOT / closure.RUN_REL).read_bytes()
+    ).hexdigest()
+    assert prov["scientific_code_commit"]
+    assert "runtime_versions" in manifest
+    assert "python" in manifest["runtime_versions"]
 
 
 # --------------------------------------------------------------------------- #
