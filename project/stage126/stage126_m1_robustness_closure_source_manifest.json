@@ -4,9 +4,9 @@
     "closure_runner_sha256": "45779608ddc0b5810371893041f98ffe8b68072827633a9d9b0af3c012954b39",
     "closure_source_path": "project/src/stage126_m1_robustness_closure.py",
     "closure_source_sha256": "0798aa200dab83a6453fc167eef0656bded40f2f1081bb482083d4e09328dd80",
-    "head_commit_at_manifest_build_time": "915c106c6fbfa17125589feb5c0c17227f39f001",
+    "head_commit_at_manifest_build_time": "479e49c984c5a3723d8e99a39fa667ba73fe9182",
     "note": "Engineering/reproducibility anchors only (informational, not a scientific lock). `scientific_code_commit` is the last commit that touched the closure source/runner/test (the SCIENTIFIC closure logic) — it is intentionally NOT recomputed from later purely-operational commits on this branch (e.g. Handoff/validator-only bookkeeping commits) that do not change the closure's own logic.",
-    "scientific_code_commit": "356e4d3b9fcf1168718502b4a2369b347437c345"
+    "scientific_code_commit": "479e49c984c5a3723d8e99a39fa667ba73fe9182"
   },
   "consumed_source_artifacts_sha256": {
     "project/stage126/stage126_closed_part_registry.json": "bb6a269686f4f1b616b7896bbba1469eb1cf61e8514445b8f8150033f258080e",
