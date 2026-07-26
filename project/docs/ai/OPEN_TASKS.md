@@ -6,13 +6,15 @@ front matter; this file is the working description.
 ## Active research workstream: `stage126-m1-financial-baseline`
 
 Authoritative research pointers live in `ROADMAP.md` front matter:
-`last_completed_research_action_id=stage126-m1-financial-baseline`,
-`next_research_action_id=stage126-m1-robustness-closure`
-(active; human-authorized and started; primary M1 development-fold tuning
-completed on PR #52; all six registered M1 robustness categories are now
-complete; next action synthesizes the six robustness results and closes the
-robustness set — no retuning, no final-test access, no automatic winner
-selection).
+`last_completed_research_action_id=stage126-m1-robustness-closure`,
+`next_research_action_id=stage126-m1-retained-design-freeze`
+(primary M1 development-fold tuning completed on PR #52; all six registered
+M1 robustness categories are complete; `stage126-m1-robustness-closure` has
+now synthesized the six robustness results and closed the robustness set —
+no retuning, no final-test access, no automatic winner selection, no
+retained design selected or frozen. Next action
+`stage126-m1-retained-design-freeze` requires separate, explicit, future
+human authorization).
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
 Part 3B.1E is the decision-lock surface for the conservative-lag research
 action; Part 3C is the operationalization / leakage-safe dataset surface;

@@ -2,8 +2,8 @@
 roadmap_version: 2
 active_research_workstream_id: stage126-m1-financial-baseline
 qc_scope: stage126-m1-financial-baseline
-last_completed_research_action_id: stage126-m1-financial-baseline
-next_research_action_id: stage126-m1-robustness-closure
+last_completed_research_action_id: stage126-m1-robustness-closure
+next_research_action_id: stage126-m1-retained-design-freeze
 active_maintenance_task_id: repository-driven-ai-handoff
 ---
 
@@ -33,8 +33,8 @@ From 2026-07-26 onward, Stage126+ follows [`STAGE126_Q1Q2_LEAN_GOVERNANCE.md`](S
 16. `stage125-part4-statistical-analysis-plan` — M1–M4 SAP, temporal CV, metrics, tuning budget, uncertainty plan ✅
 17. `stage125-part5-readiness-closure` — Stage125 Gate 125.0 / Stage126 M1 readiness closure ✅
 18. `stage126-m1-financial-baseline` — **COMPLETE.** Primary M1 development tuning is complete. All six registered robustness categories (Parts 1–6, including Part 6 `smote_training_fold_only_robustness`) are complete on `main`. No full-development refit; final test locked; M2/M3/M4 not started.
-19. `stage126-m1-robustness-closure` — **ACTIVE.** Verify all six pre-registered M1 robustness analyses, synthesize sensitivity evidence, and close the robustness set. **No retuning, no final-test access, no automatic winner selection.**
-20. `stage126-m1-retained-design-freeze` — freeze the exact retained M1 design using development evidence only: sample/target/features/preprocessing/configuration/metric definitions/uncertainty plan. This is the precondition for later refit; final test remains locked.
+19. `stage126-m1-robustness-closure` — **COMPLETE.** Verified all six pre-registered M1 robustness analyses (Parts 1-6), synthesized sensitivity evidence from already-committed artifacts (zero model fits/predictions/resampling/final-test access), and closed the robustness set. No retuning, no final-test access, no automatic winner selection. No retained design selected or frozen.
+20. `stage126-m1-retained-design-freeze` — **ACTIVE (not yet authorized).** Freeze the exact retained M1 design using development evidence only: sample/target/features/preprocessing/configuration/metric definitions/uncertainty plan. This is the precondition for later refit; final test remains locked. Requires separate, explicit, future human authorization.
 21. `stage127-m2-market-data-gate` — point-in-time accessibility/coverage/join/quality/event-count Gate for the pre-specified market block. **No modeling in the Gate.** A failed Gate is a reportable negative result and closes the M2 modeling path.
 22. `stage127-m2-incremental-evaluation` — **conditional on Gate pass.** Evaluate M2 vs M1 on the paired M2 common sample with the frozen temporal design and pre-specified metrics/uncertainty. No post-hoc feature search.
 23. `stage128-m3-macro-data-gate` — Gate the small theory-driven macro block for authoritative source, release timing, coverage and low temporal degrees of freedom. **No modeling in the Gate.**
@@ -75,8 +75,8 @@ The 1400–1402 holdout is a **locked temporal evaluation set**, not external va
 
 ## Notes on the current transition
 
-The current canonical state on `main` has completed M1 robustness Parts 1–5 and has not completed Part 6. The legacy closed-part/test/QC/Handoff mechanics are an engineering debt discovered at the terminal M1 transition; they are not evidence that the M1 scientific results are invalid.
+The current canonical state on this branch has completed M1 robustness Parts 1–6 and has completed the synthesis-only `stage126-m1-robustness-closure` action. The legacy closed-part/test/QC/Handoff mechanics are engineering debt discovered at the terminal M1 transition; they are not evidence that the M1 scientific results are invalid.
 
-The next scientific work remains `stage126-m1-financial-baseline`. Before Part 6 is finalized, the maintenance boundary may be simplified under the lean-governance rules so long as scientific artifacts and the final-test firewall remain unchanged.
+The next scientific work is `stage126-m1-retained-design-freeze`, which requires a separate, explicit, future human authorization. No retained design has been selected or frozen. The maintenance boundary may continue to be simplified under the lean-governance rules so long as scientific artifacts and the final-test firewall remain unchanged.
 
 No M2/M3/M4 action, full-development refit, final-test access/evaluation, SHAP execution or new tuning is authorized merely by this roadmap update.

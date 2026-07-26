@@ -163,6 +163,10 @@ ALLOWLIST_FILES = (
     "project/src/stage126_m1_robustness_part6_smote_training_fold_only.py",
     "project/run_stage126_m1_robustness_part6_smote_training_fold_only.py",
     "project/tests/test_stage126_m1_robustness_part6_smote_training_fold_only.py",
+    # Stage126 M1 robustness closure (synthesis-only) code, runner, and tests.
+    "project/src/stage126_m1_robustness_closure.py",
+    "project/run_stage126_m1_robustness_closure.py",
+    "project/tests/test_stage126_m1_robustness_closure.py",
     # Post-Part6 historical-replay overlay for the byte-frozen Part 5 test
     # file (see project/tests/conftest.py docstring); an operational test
     # fixture, not a Stage125/126 scientific or source artifact.
@@ -2614,6 +2618,61 @@ def derive_m1_robustness_part6_markers(root: str, expected_order: list) -> dict:
         # a per-part advance (see STAGE126_Q1Q2_LEAN_GOVERNANCE.md section
         # 10-11): it does not itself authorize retained-design freeze.
         "next_research_action_id": _NEXT_RESEARCH_ACTION_ID_AFTER_M1_ROBUSTNESS,
+        **derive_m1_robustness_closure_markers(root),
+    }
+
+
+_CLOSURE_LOCK_REL = (
+    "project/stage126/stage126_m1_robustness_closure_completion_lock.json"
+)
+_NEXT_RESEARCH_ACTION_ID_AFTER_ROBUSTNESS_CLOSURE = (
+    "stage126-m1-retained-design-freeze"
+)
+
+
+def derive_m1_robustness_closure_markers(root: str) -> dict:
+    """Recognize the (synthesis-only) M1 robustness closure, if completed.
+
+    Narrow, fail-closed recognition mirroring the Part 6 completion pattern:
+    if the closure completion lock is present and internally consistent, the
+    Handoff's ``next_research_action_id`` advances to
+    ``stage126-m1-retained-design-freeze`` (itself requiring a SEPARATE future
+    human authorization — this function never sets that authorization True).
+    Returns an empty dict when the closure has not yet been built, so
+    pre-closure Handoffs are unaffected.
+    """
+    path = os.path.join(root, _CLOSURE_LOCK_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        lock = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable robustness closure lock: {exc}") from exc
+
+    exact = {
+        "robustness_closure_completed": True,
+        "all_six_registered_categories_verified": True,
+        "paper_winner_selected": False,
+        "retained_design_selected": False,
+        "retained_design_freeze_authorized": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_predictor_values_inspected": False,
+        "final_test_target_values_inspected": False,
+        "final_test_evaluation_performed": False,
+    }
+    for key, want in exact.items():
+        if lock.get(key) != want:
+            raise HandoffError(
+                f"robustness closure lock field {key}={lock.get(key)!r} != {want!r}"
+            )
+    return {
+        "m1_robustness_closure_completed": True,
+        "m1_robustness_closure_paper_winner_selected": False,
+        "m1_robustness_closure_retained_design_selected": False,
+        "m1_robustness_closure_retained_design_freeze_authorized": False,
+        "next_research_action_id": _NEXT_RESEARCH_ACTION_ID_AFTER_ROBUSTNESS_CLOSURE,
     }
 
 

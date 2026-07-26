@@ -591,9 +591,11 @@ def test_final_test_remains_locked():
 def test_research_pointers_unchanged():
     report = _read_json(v.F_REPORT)
     assert report["active_workstream"] == "stage126_m1_financial_baseline"
-    # Part 6 closed the six-category robustness set: the next research
-    # action legitimately transitioned to the closure/synthesis milestone.
-    assert report["next_research_action_id"] == "stage126-m1-robustness-closure"
+    # Part 6 closed the six-category robustness set, and the synthesis-only
+    # robustness closure has since completed: the next research action
+    # legitimately transitioned to the retained-design-freeze milestone
+    # (which itself still requires a separate future human authorization).
+    assert report["next_research_action_id"] == "stage126-m1-retained-design-freeze"
 
 
 @pytest.mark.parametrize("field", sorted(
@@ -956,6 +958,15 @@ def test_end_to_end_synthetic_next_part_build_and_check(tmp_path):
     """
     root = _mirror(tmp_path)
     _revert_mirror_to_pre_part6(root)
+    # The mirror copies the REAL repo, which now also contains the
+    # synthesis-only robustness-closure completion lock. This test simulates
+    # the state immediately after Part 6 lands (closure not yet built), so
+    # remove the closure lock from the mirror -- otherwise the validator
+    # would (correctly) advance the pointer past the value this synthetic
+    # scenario expects.
+    closure_lock = root / v.ROBUSTNESS_CLOSURE_LOCK_REL
+    if closure_lock.is_file():
+        closure_lock.unlink()
     watched = (
         [f"project/stage126/{n}" for n in
          list(PART1_SCIENTIFIC) + list(PART2_SCIENTIFIC)]

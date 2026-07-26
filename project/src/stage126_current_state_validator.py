@@ -397,6 +397,52 @@ NEXT_RESEARCH_ACTION_ID = "stage126-m1-financial-baseline"
 # becomes True, and does not itself authorize retained-design freeze,
 # full-development refit or final-test access.
 NEXT_RESEARCH_ACTION_ID_AFTER_M1_ROBUSTNESS = "stage126-m1-robustness-closure"
+# Once the (synthesis-only) M1 robustness closure itself has also completed,
+# the next legitimate ROADMAP research action advances once more, to the
+# retained-design-freeze milestone. That milestone still requires a SEPARATE,
+# future, explicit human authorization -- this validator never grants it.
+NEXT_RESEARCH_ACTION_ID_AFTER_ROBUSTNESS_CLOSURE = (
+    "stage126-m1-retained-design-freeze"
+)
+ROBUSTNESS_CLOSURE_LOCK_REL = (
+    f"{STAGE126_DIR_REL}/stage126_m1_robustness_closure_completion_lock.json"
+)
+
+
+def robustness_closure_completed(repo_root: Path) -> bool:
+    """Narrow, fail-closed recognition of the M1 robustness closure.
+
+    Mirrors the existing per-part completion-lock recognition pattern: only
+    returns True when the closure completion lock exists and its exact
+    required fields hold. Never itself authorizes retained-design freeze.
+    """
+    path = repo_root / ROBUSTNESS_CLOSURE_LOCK_REL
+    if not path.is_file():
+        return False
+    try:
+        lock = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    required = {
+        "robustness_closure_completed": True,
+        "all_six_registered_categories_verified": True,
+        "paper_winner_selected": False,
+        "retained_design_selected": False,
+        "retained_design_freeze_authorized": False,
+        "final_test_unlocked": False,
+    }
+    return all(lock.get(k) == v for k, v in required.items())
+
+
+def expected_next_research_action_id(
+    repo_root: Path, m1_robustness_completed: bool,
+) -> str:
+    """The single source of truth for the current expected research pointer."""
+    if m1_robustness_completed and robustness_closure_completed(repo_root):
+        return NEXT_RESEARCH_ACTION_ID_AFTER_ROBUSTNESS_CLOSURE
+    if m1_robustness_completed:
+        return NEXT_RESEARCH_ACTION_ID_AFTER_M1_ROBUSTNESS
+    return NEXT_RESEARCH_ACTION_ID
 
 FINAL_TEST_LOCK_FIELDS: tuple[str, ...] = (
     "final_test_unlocked",
@@ -1080,9 +1126,8 @@ def verify_handoff(
 
     exact: dict[str, Any] = {
         "active_workstream": ACTIVE_WORKSTREAM,
-        "next_research_action_id": (
-            NEXT_RESEARCH_ACTION_ID_AFTER_M1_ROBUSTNESS
-            if m1_robustness_completed else NEXT_RESEARCH_ACTION_ID
+        "next_research_action_id": expected_next_research_action_id(
+            repo_root, m1_robustness_completed,
         ),
         "m1_robustness_started": True,
         "m1_robustness_completed": m1_robustness_completed,
@@ -1185,10 +1230,9 @@ def build_validation_report(
         "last_completed_micro_part_qc_assertions": micro_qc["assertions"],
         "last_completed_micro_part_qc_failed": micro_qc["failed"],
         "active_workstream": ACTIVE_WORKSTREAM,
-        "next_research_action_id": (
-            NEXT_RESEARCH_ACTION_ID_AFTER_M1_ROBUSTNESS
-            if len(completed) == len(execution_order) and len(execution_order) > 0
-            else NEXT_RESEARCH_ACTION_ID
+        "next_research_action_id": expected_next_research_action_id(
+            repo_root,
+            len(completed) == len(execution_order) and len(execution_order) > 0,
         ),
         "closed_part_registry": registry,
         "primary_stage126_artifacts_sha256": dict(sorted(primary_observed.items())),
@@ -1388,9 +1432,8 @@ def build_assertions(
     # all six registered M1 robustness categories are complete.
     add("research_pointers_consistent_with_m1_robustness_state",
         report["active_workstream"] == ACTIVE_WORKSTREAM
-        and report["next_research_action_id"] == (
-            NEXT_RESEARCH_ACTION_ID_AFTER_M1_ROBUSTNESS
-            if expected_m1_robustness_completed else NEXT_RESEARCH_ACTION_ID
+        and report["next_research_action_id"] == expected_next_research_action_id(
+            repo_root, expected_m1_robustness_completed,
         ))
     add("last_completed_micro_part_derived",
         bool(report["last_completed_micro_part"])
