@@ -266,7 +266,16 @@ PART_SCIENTIFIC_SUFFIXES: tuple[str, ...] = (
     "completion_lock.json",
     # Emitted only by parts whose changed dimension is the sample.
     "sample_delta.csv",
+    # Emitted only by Part 6, whose changed dimension is the imbalance
+    # strategy: the per-fold SMOTENC before/after resampling counts.
+    "resampling_audit.csv",
 )
+
+# The sixth and final registered M1 robustness category: the ONLY category
+# whose changed dimension is the imbalance strategy (SMOTENC applied strictly
+# inside each training fold; every other category is a non-SMOTE scientific
+# execution).
+SMOTE_ROBUSTNESS_CATEGORY_ID = "smote_training_fold_only_robustness"
 # Verification-only bookkeeping. The governance decision forbids regenerating
 # these for a CLOSED part, so they are pinned exactly like the scientific
 # surface — by the closed-part registry, not by a per-part constant.
@@ -381,6 +390,13 @@ CURRENT_STATE_QC_METADATA_PATH = f"{STAGE126_DIR_REL}/{F_METADATA}"
 # never advances them, so they are stable across Parts 1-6.
 ACTIVE_WORKSTREAM = "stage126_m1_financial_baseline"
 NEXT_RESEARCH_ACTION_ID = "stage126-m1-financial-baseline"
+# Once all six registered M1 robustness categories are complete (Part 6
+# closes the set), the next legitimate ROADMAP research action advances to
+# the synthesis/closure milestone. This is a truthful state transition, not a
+# per-part advance: it fires exactly once, when m1_robustness_completed
+# becomes True, and does not itself authorize retained-design freeze,
+# full-development refit or final-test access.
+NEXT_RESEARCH_ACTION_ID_AFTER_M1_ROBUSTNESS = "stage126-m1-robustness-closure"
 
 FINAL_TEST_LOCK_FIELDS: tuple[str, ...] = (
     "final_test_unlocked",
@@ -667,13 +683,26 @@ def discover_part(
     for field in (
         "full_development_refit_performed", "final_test_unlocked",
         "final_test_access_authorized", "final_test_evaluation_performed",
-        "smote_executed", "smotenc_executed", "shap_executed",
+        "smote_executed", "shap_executed",
         "replaces_primary_results", "selects_paper_winner",
     ):
         if lock.get(field) is not False:
             raise ValidationFail(
                 f"part {part_index} completion lock field {field} is not False"
             )
+    # Narrow Part 6 semantic rule: the sixth and final registered robustness
+    # category changes ONLY the imbalance strategy (SMOTENC applied strictly
+    # inside each training fold) — so it is the ONE category required to have
+    # executed SMOTENC. Every other registered category (Parts 1-5) remains a
+    # non-SMOTE scientific execution and must show `smotenc_executed=False`,
+    # exactly as before.
+    want_smotenc = category_id == SMOTE_ROBUSTNESS_CATEGORY_ID
+    if lock.get("smotenc_executed") is not want_smotenc:
+        raise ValidationFail(
+            f"part {part_index} ({category_id}) completion lock field "
+            f"smotenc_executed={lock.get('smotenc_executed')!r} != "
+            f"{want_smotenc!r}"
+        )
     return {
         "part_index": part_index,
         "category_id": category_id,
@@ -974,7 +1003,7 @@ def verify_selected_configurations(repo_root: Path) -> dict[str, str]:
 def verify_handoff(
     repo_root: Path, completed_ids: list[str], *,
     last_micro_part: str = "", micro_qc: dict[str, Any] | None = None,
-    strict_pointers: bool = True,
+    strict_pointers: bool = True, m1_robustness_completed: bool = False,
 ) -> dict[str, Any]:
     """Validate the live Handoff — WITHOUT the frozen Part 5 validator.
 
@@ -1051,9 +1080,12 @@ def verify_handoff(
 
     exact: dict[str, Any] = {
         "active_workstream": ACTIVE_WORKSTREAM,
-        "next_research_action_id": NEXT_RESEARCH_ACTION_ID,
+        "next_research_action_id": (
+            NEXT_RESEARCH_ACTION_ID_AFTER_M1_ROBUSTNESS
+            if m1_robustness_completed else NEXT_RESEARCH_ACTION_ID
+        ),
         "m1_robustness_started": True,
-        "m1_robustness_completed": False,
+        "m1_robustness_completed": m1_robustness_completed,
         "m1_robustness_execution_authorized": False,
         "full_development_refit_performed": False,
     }
@@ -1134,7 +1166,9 @@ def build_validation_report(
         "next_category_authorized": False,
         "standing_execution_authorization": False,
         "m1_robustness_started": True,
-        "m1_robustness_completed": False,
+        "m1_robustness_completed": (
+            len(completed) == len(execution_order) and len(execution_order) > 0
+        ),
         "full_development_refit_performed": False,
         "final_test_unlocked": False,
         "final_test_access_authorized": False,
@@ -1151,7 +1185,11 @@ def build_validation_report(
         "last_completed_micro_part_qc_assertions": micro_qc["assertions"],
         "last_completed_micro_part_qc_failed": micro_qc["failed"],
         "active_workstream": ACTIVE_WORKSTREAM,
-        "next_research_action_id": NEXT_RESEARCH_ACTION_ID,
+        "next_research_action_id": (
+            NEXT_RESEARCH_ACTION_ID_AFTER_M1_ROBUSTNESS
+            if len(completed) == len(execution_order) and len(execution_order) > 0
+            else NEXT_RESEARCH_ACTION_ID
+        ),
         "closed_part_registry": registry,
         "primary_stage126_artifacts_sha256": dict(sorted(primary_observed.items())),
         "prior_part_scientific_artifact_regeneration_forbidden": True,
@@ -1249,9 +1287,15 @@ def build_assertions(
     add("no_standing_execution_authorization",
         report["standing_execution_authorization"] is False
         and handoff.get("m1_robustness_execution_authorized") is False)
-    add("m1_robustness_not_completed",
-        report["m1_robustness_completed"] is False
-        and handoff.get("m1_robustness_completed") is False)
+    # Derived, never hard-coded to False: becomes True exactly when every
+    # registered category (all six) is completed (Part 6 closes the set).
+    expected_m1_robustness_completed = (
+        n == len(execution_order) and len(execution_order) > 0
+    )
+    add("m1_robustness_completed_state_is_derived_and_consistent",
+        report["m1_robustness_completed"] == expected_m1_robustness_completed
+        and handoff.get("m1_robustness_completed")
+        == expected_m1_robustness_completed)
 
     # Per-part locks agree with the registered order.
     for part in completed:
@@ -1339,10 +1383,15 @@ def build_assertions(
         and "new branch SHA" in NOT_A_SCIENTIFIC_ERROR
         and "new completed robustness part" in NOT_A_SCIENTIFIC_ERROR)
 
-    # Research pointers unchanged.
-    add("research_pointers_unchanged",
+    # Research pointers: the active workstream never advances per-part, but
+    # the next research action legitimately transitions exactly once, when
+    # all six registered M1 robustness categories are complete.
+    add("research_pointers_consistent_with_m1_robustness_state",
         report["active_workstream"] == ACTIVE_WORKSTREAM
-        and report["next_research_action_id"] == NEXT_RESEARCH_ACTION_ID)
+        and report["next_research_action_id"] == (
+            NEXT_RESEARCH_ACTION_ID_AFTER_M1_ROBUSTNESS
+            if expected_m1_robustness_completed else NEXT_RESEARCH_ACTION_ID
+        ))
     add("last_completed_micro_part_derived",
         bool(report["last_completed_micro_part"])
         and report["last_completed_micro_part"]
@@ -1480,9 +1529,13 @@ def build_all(
     next_category = verify_no_unauthorized_execution(
         repo_root, execution_order, completed,
     )
+    m1_robustness_completed = (
+        len(completed_ids) == len(execution_order) and len(execution_order) > 0
+    )
     handoff = verify_handoff(
         repo_root, completed_ids, last_micro_part=last_micro_part,
         micro_qc=micro_qc, strict_pointers=strict_pointers,
+        m1_robustness_completed=m1_robustness_completed,
     )
 
     report = build_validation_report(

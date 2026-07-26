@@ -935,6 +935,40 @@ QC_WORKFLOW_FIELDS_BY_SCOPE: dict[str, tuple[str, ...]] = {
         "m4_data_collected",
         "contract_version",
     ),
+    # Stage126 M1 robustness Part 6 inherits the unchanged Stage126 markers,
+    # adds the Part 6 completion state on top of the retained Part 1-5 state,
+    # and closes the six-category M1 robustness set.
+    "stage126_m1_robustness_part6_smote_training_fold_only": (
+        "stage125_completed",
+        "stage126_m1_entry_ready",
+        "stage126_authorized",
+        "stage126_started",
+        "development_modeling_authorized",
+        "modeling_authorized",
+        "modeling_started",
+        "final_test_unlocked",
+        "final_test_access_authorized",
+        "final_test_predictor_values_inspected",
+        "final_test_target_values_inspected",
+        "final_test_evaluation_performed",
+        "m1_primary_development_tuning_completed",
+        "m1_robustness_started",
+        "m1_robustness_completed",
+        "m1_robustness_part1_completed",
+        "m1_robustness_part2_completed",
+        "m1_robustness_part3_completed",
+        "m1_robustness_part4_completed",
+        "m1_robustness_part5_completed",
+        "m1_robustness_part6_human_authorized",
+        "m1_robustness_part6_completed",
+        "m1_robustness_completed_category_ids",
+        "m1_robustness_next_category_id",
+        "full_development_refit_performed",
+        "m2_data_collected",
+        "m3_data_collected",
+        "m4_data_collected",
+        "contract_version",
+    ),
 }
 
 # Repository-wide temporal-availability invariants carried into Stage126 Handoff
@@ -950,6 +984,7 @@ STAGE126_QC_SCOPES = frozenset({
     "stage126_m1_robustness_part3_expanded_rule_a",
     "stage126_m1_robustness_part4_expanded_rule_b",
     "stage126_m1_robustness_part5_persistent_loss_target",
+    "stage126_m1_robustness_part6_smote_training_fold_only",
 })
 
 STAGE126_CARRIED_TEMPORAL_AVAILABILITY_FIELDS = (
@@ -2284,6 +2319,9 @@ def derive_m1_robustness_part4_markers(root: str, expected_order: list) -> dict:
     return part4_markers
 
 
+_NEXT_RESEARCH_ACTION_ID_AFTER_M1_ROBUSTNESS = "stage126-m1-robustness-closure"
+
+
 _M1_ROBUSTNESS_PART5_AUTH_REL = (
     "project/stage126/stage126_m1_robustness_part5_human_authorization_record.json"
 )
@@ -2393,7 +2431,7 @@ def derive_m1_robustness_part5_markers(root: str, expected_order: list) -> dict:
             f"Part 5 next_category_id {lock.get('next_category_id')!r} != "
             f"{expected_order[5]!r}"
         )
-    return {
+    part5_markers = {
         "m1_robustness_started": True,
         "m1_robustness_completed": False,
         "m1_robustness_part1_completed": True,
@@ -2408,6 +2446,166 @@ def derive_m1_robustness_part5_markers(root: str, expected_order: list) -> dict:
         "m1_robustness_part6_authorized": False,
         # A consumed Part 5 authorization is NOT a standing authorization.
         "m1_robustness_execution_authorized": False,
+    }
+    # Part 6 (if executed) closes the six-category robustness set.
+    part5_markers.update(
+        derive_m1_robustness_part6_markers(root, expected_order)
+    )
+    return part5_markers
+
+
+_M1_ROBUSTNESS_PART6_AUTH_REL = (
+    "project/stage126/stage126_m1_robustness_part6_human_authorization_record.json"
+)
+_M1_ROBUSTNESS_PART6_LOCK_REL = (
+    "project/stage126/stage126_m1_robustness_part6_completion_lock.json"
+)
+_PART6_CATEGORY_ID = "smote_training_fold_only_robustness"
+_PART6_MICRO_PART_ID = "stage126-m1-robustness-part6-smote-training-fold-only"
+_PART6_AUTH_TEXT_SHA256 = (
+    "4a3bb0d722d288f754b780208b5805f264b4caac75a902f434135f56430ed269"
+)
+
+
+def derive_m1_robustness_part6_markers(root: str, expected_order: list) -> dict:
+    """Derive Part 6 completion markers (fail-closed).
+
+    Returns {} when Part 6 has not been executed. Part 6 is the sixth and
+    FINAL registered robustness category: unlike Parts 1-5, its completion
+    lock legitimately shows `smotenc_executed=True` (SMOTENC applied strictly
+    inside each training fold is the one authorized change, per
+    STAGE126_Q1Q2_LEAN_GOVERNANCE.md section 10), and there is no seventh
+    category to authorize. A completed and consumed Part 6 authorization
+    grants NO standing authorization for full-development refit, final test
+    or M2/M3/M4.
+    """
+    auth_path = os.path.join(root, _M1_ROBUSTNESS_PART6_AUTH_REL)
+    lock_path = os.path.join(root, _M1_ROBUSTNESS_PART6_LOCK_REL)
+    if not (os.path.isfile(auth_path) and os.path.isfile(lock_path)):
+        if os.path.isfile(auth_path) != os.path.isfile(lock_path):
+            raise HandoffError(
+                "Part 6 authorization record and completion lock must both exist"
+            )
+        return {}
+    try:
+        auth = json.load(open(auth_path, encoding="utf-8"))
+        lock = json.load(open(lock_path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable Part 6 artifacts: {exc}") from exc
+
+    auth_exact = {
+        "authorization_id": "stage126-m1-robustness-part6-human-authorization",
+        "authorized_category_id": _PART6_CATEGORY_ID,
+        "part6_execution_authorized": True,
+        "create_open_unmerged_pr_authorized": True,
+        "development_fold_execution_authorized": True,
+        "merge_authorized": False,
+        "retuning_authorized": False,
+        "full_development_refit_authorized": False,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_authorized": False,
+        "final_test_predictor_access_authorized": False,
+        "final_test_target_access_authorized": False,
+        "calibration_authorized": False,
+        "bootstrap_authorized": False,
+        "holm_authorized": False,
+        "winner_selection_authorized": False,
+        "shap_authorized": False,
+        "p_values_authorized": False,
+        "threshold_optimization_authorized": False,
+        "m2_authorized": False,
+        "m3_authorized": False,
+        "m4_authorized": False,
+    }
+    for k, v in auth_exact.items():
+        if auth.get(k) != v:
+            raise HandoffError(
+                f"Part 6 authorization field {k}={auth.get(k)!r} != {v!r}"
+            )
+    text = auth.get("human_authorization_text")
+    if not isinstance(text, str):
+        raise HandoffError("Part 6 authorization text missing")
+    if hashlib.sha256(text.encode("utf-8")).hexdigest() != _PART6_AUTH_TEXT_SHA256:
+        raise HandoffError("Part 6 authorization text SHA-256 mismatch")
+    if auth.get("human_authorization_text_sha256") != _PART6_AUTH_TEXT_SHA256:
+        raise HandoffError("Part 6 authorization hash field mismatch")
+    if auth.get("human_authorization_text_utf8_bytes") != 696:
+        raise HandoffError("Part 6 authorization text byte-length mismatch")
+
+    lock_exact = {
+        "category_id": _PART6_CATEGORY_ID,
+        "micro_part_id": _PART6_MICRO_PART_ID,
+        "part6_human_authorized": True,
+        "part6_execution_completed": True,
+        "authorization_consumed": True,
+        "development_only": True,
+        "only_imbalance_strategy_changed": True,
+        "sample_changed": False,
+        "target_changed": False,
+        "replaces_primary_results": False,
+        "selects_paper_winner": False,
+        "part7_execution_authorized": False,
+        "m1_robustness_execution_authorized": False,
+        "m1_robustness_completed": True,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_predictor_values_inspected": False,
+        "final_test_target_values_inspected": False,
+        "final_test_evaluation_performed": False,
+        "smote_executed": False,
+        "smotenc_executed": True,
+        "shap_executed": False,
+        "calibration_executed": False,
+        "bootstrap_executed": False,
+        "holm_executed": False,
+        "winner_selected": False,
+    }
+    for k, v in lock_exact.items():
+        if lock.get(k) != v:
+            raise HandoffError(
+                f"Part 6 completion lock field {k}={lock.get(k)!r} != {v!r}"
+            )
+    completed = list(lock.get("completed_category_ids") or [])
+    if completed != list(expected_order):
+        raise HandoffError(
+            f"Part 6 completed_category_ids {completed!r} is not the exact "
+            f"six-category full set"
+        )
+    if lock.get("next_category_id") not in (None, ""):
+        raise HandoffError(
+            f"Part 6 next_category_id {lock.get('next_category_id')!r} is not "
+            "empty -- Part 6 is the final registered category"
+        )
+    return {
+        "m1_robustness_started": True,
+        "m1_robustness_completed": True,
+        "m1_robustness_part1_completed": True,
+        "m1_robustness_part2_completed": True,
+        "m1_robustness_part3_completed": True,
+        "m1_robustness_part4_completed": True,
+        "m1_robustness_part5_completed": True,
+        "m1_robustness_part6_human_authorized": True,
+        "m1_robustness_part6_completed": True,
+        "m1_robustness_completed_category_ids": completed,
+        "m1_robustness_next_category_id": "",
+        "m1_robustness_part6_authorized": False,
+        # A consumed Part 6 authorization is NOT a standing authorization for
+        # full-development refit, final test, or M2/M3/M4.
+        "m1_robustness_execution_authorized": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_predictor_values_inspected": False,
+        "final_test_target_values_inspected": False,
+        "final_test_evaluation_performed": False,
+        "m2_data_collected": False,
+        "m3_data_collected": False,
+        "m4_data_collected": False,
+        # M1 robustness closure is a truthful, one-time state transition, not
+        # a per-part advance (see STAGE126_Q1Q2_LEAN_GOVERNANCE.md section
+        # 10-11): it does not itself authorize retained-design freeze.
+        "next_research_action_id": _NEXT_RESEARCH_ACTION_ID_AFTER_M1_ROBUSTNESS,
     }
 
 

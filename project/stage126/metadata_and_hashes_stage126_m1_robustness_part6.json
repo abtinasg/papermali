@@ -40,10 +40,10 @@
     "project/stage126/stage126_m1_robustness_part5_oof_predictions.csv": "7b721af7b9b5b5a3f88f7a957d70c87480dc1a3ca56a55b10c885e99177ad977",
     "project/stage126/stage126_m1_robustness_part5_primary_comparison.json": "e0ddde1977ccbbdc0c892d92ef8812316373266e3a5efb5f7ac0ebaed9a81c97"
   },
-  "code_commit": "30fd68fecc674a5a7bf2bacd627d5f18d5760cdc",
+  "code_commit": "01f2b8b884dd8cd58d4b726b631bdc9efe5ff3c1",
   "current_stage": "Stage126",
   "description": "Stage126 M1 robustness Part 6 SMOTE training-fold-only robustness (human-authorized; development folds only; only the imbalance strategy changed; class weighting disabled; SMOTENC applied strictly inside each training fold; no retuning; no full-development refit; final test locked; no calibration/bootstrap/Holm/winner selection; no SHAP; development-only imbalance-strategy robustness evidence; sixth and final registered M1 robustness category).",
-  "generated_at": "30fd68fecc674a5a7bf2bacd627d5f18d5760cdc",
+  "generated_at": "01f2b8b884dd8cd58d4b726b631bdc9efe5ff3c1",
   "input_files_sha256": {
     "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
     "project/stage125/part3c_sample_summary_stage125.csv": "c203ed3f31a796b769d96e586d45b9b14ab1f73a74bffdfbfcf2d975f2e512bc",
@@ -62,7 +62,7 @@
     "stage126_m1_robustness_part6_metrics.csv": "577a538ad8a940d6561cbb7cd4622f7cfb2ded83e4233e6de0d582110e3844da",
     "stage126_m1_robustness_part6_oof_predictions.csv": "18691d9f4219eea91f95e198a789b03c7e6296e476c87c5bef13060aa8d20044",
     "stage126_m1_robustness_part6_primary_comparison.json": "22528de44a14e24891e44a089e9b51a895b298ae20f15a6311601d0d2bface4a",
-    "stage126_m1_robustness_part6_qc_report.json": "2883d60a7a4ac14ab321252e0423b467fcb742f1fff33a3fb951a2408b42857e",
+    "stage126_m1_robustness_part6_qc_report.json": "45a643622b704c3c7648850ccfcb9e40d944337041c135d0b6e424de4f14267f",
     "stage126_m1_robustness_part6_resampling_audit.csv": "6ff4c78e1c027d84af08fe5657a16829b5fe8a3df4eae66c81fc7d3feb915658"
   },
   "prediction_calls": 22,
@@ -76,9 +76,9 @@
     "xgboost": "3.3.0"
   },
   "smotenc_calls": 6,
-  "source_file_sha256": "7a7f4229c611acde252c2ebd804b1f5c28a8538e110af445cf5a8359489659f8",
+  "source_file_sha256": "ff2e2644e2a25411a948c14c2c5406b9c6d62b3a5fddb34ce6513a6b487b5011",
   "stage": "stage126_m1_robustness_part6_smote_training_fold_only",
-  "test_file_sha256": "3c920af58c048af5eedfb8b625c5d3fed9d3afc22caf570263030b5686e51b1b",
+  "test_file_sha256": "5eb86c371a5f212d451e907a001af434343a2386a00cce203d03a188dda58e22",
   "zero_counters": {
     "bootstrap_calls": 0,
     "calibration_calls": 0,

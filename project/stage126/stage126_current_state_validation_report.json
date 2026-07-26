@@ -1,7 +1,7 @@
 {
   "active_workstream": "stage126_m1_financial_baseline",
   "closed_part_registry": {
-    "closed_part_count": 5,
+    "closed_part_count": 6,
     "contract_id": "stage126_closed_part_registry",
     "contract_version": "stage126_current_state_validator_v2_lean",
     "decision_id": "stage126-validation-architecture-boundary-lock",
@@ -195,6 +195,44 @@
           "project/stage126/metadata_and_hashes_stage126_m1_robustness_part5.json": "14fa42f0ec5cb8c07d3a10afe1d62a7c89dbc4f84d417bf4258d65df739714a6",
           "project/stage126/stage126_m1_robustness_part5_qc_report.json": "1152fb5bad01275ffe2f9bf204ea3db0678e74261a250dfbc842e2328bed3f00"
         }
+      },
+      "smote_training_fold_only_robustness": {
+        "authorization_consumed": true,
+        "authorization_record": "project/stage126/stage126_m1_robustness_part6_human_authorization_record.json",
+        "authorization_record_sha256": "64cac26ed0505dc8feb58459ea0f8dba449f146bc29b5cc63d850d58182b19f5",
+        "authorization_text_sha256": "4a3bb0d722d288f754b780208b5805f264b4caac75a902f434135f56430ed269",
+        "category_id": "smote_training_fold_only_robustness",
+        "code_artifacts_sha256": {
+          "project/run_stage126_m1_robustness_part6_smote_training_fold_only.py": "e078b2bb8b0a0e9425f829b5d449ad4ea365411e9a6be0ceaf49d02382d7894b",
+          "project/src/stage126_m1_robustness_part6_smote_training_fold_only.py": "ff2e2644e2a25411a948c14c2c5406b9c6d62b3a5fddb34ce6513a6b487b5011",
+          "project/tests/test_stage126_m1_robustness_part6_smote_training_fold_only.py": "5eb86c371a5f212d451e907a001af434343a2386a00cce203d03a188dda58e22"
+        },
+        "completion_lock": "project/stage126/stage126_m1_robustness_part6_completion_lock.json",
+        "completion_lock_sha256": "65c36d7e9e39013f92ece02c906a77eb3f839c452dfcbc6e8be6339d351bf813",
+        "final_test_lock_flags": {
+          "final_test_access_authorized": false,
+          "final_test_evaluation_performed": false,
+          "final_test_unlocked": false,
+          "full_development_refit_performed": false
+        },
+        "micro_part_id": "stage126-m1-robustness-part6-smote-training-fold-only",
+        "next_registered_category": "",
+        "part_index": 6,
+        "scientific_artifacts_sha256": {
+          "project/stage126/stage126_m1_robustness_part6_completion_lock.json": "65c36d7e9e39013f92ece02c906a77eb3f839c452dfcbc6e8be6339d351bf813",
+          "project/stage126/stage126_m1_robustness_part6_execution_manifest.json": "84d9d3ddfc821978c04763344b1b6468b4e6cb4202e61ac26dc19a4fc462a786",
+          "project/stage126/stage126_m1_robustness_part6_feature_manifest.csv": "7cd995e2eb17091b19b9a97a4420b5c75058addc67763d553c897ddda47c30a6",
+          "project/stage126/stage126_m1_robustness_part6_human_authorization_record.json": "64cac26ed0505dc8feb58459ea0f8dba449f146bc29b5cc63d850d58182b19f5",
+          "project/stage126/stage126_m1_robustness_part6_metrics.csv": "577a538ad8a940d6561cbb7cd4622f7cfb2ded83e4233e6de0d582110e3844da",
+          "project/stage126/stage126_m1_robustness_part6_oof_predictions.csv": "18691d9f4219eea91f95e198a789b03c7e6296e476c87c5bef13060aa8d20044",
+          "project/stage126/stage126_m1_robustness_part6_primary_comparison.json": "22528de44a14e24891e44a089e9b51a895b298ae20f15a6311601d0d2bface4a",
+          "project/stage126/stage126_m1_robustness_part6_resampling_audit.csv": "6ff4c78e1c027d84af08fe5657a16829b5fe8a3df4eae66c81fc7d3feb915658"
+        },
+        "verification_artifacts_sha256": {
+          "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART6_SMOTE_TRAINING_FOLD_ONLY.md": "722d8869c163897589c15aac2330c25dd17a4d4c3aa4ad1b3f6ab3b3b983ead4",
+          "project/stage126/metadata_and_hashes_stage126_m1_robustness_part6.json": "e87e14c189fbf0220bfb039730a49755cd1eaf2affbc51b515f6a55e86b9a212",
+          "project/stage126/stage126_m1_robustness_part6_qc_report.json": "45a643622b704c3c7648850ccfcb9e40d944337041c135d0b6e424de4f14267f"
+        }
       }
     },
     "regeneration_allowed": false
@@ -204,7 +242,8 @@
     "main_rule_b_listing_robustness",
     "expanded_rule_a_company_scope_robustness",
     "expanded_rule_b_combined_robustness",
-    "persistent_loss_robustness_target"
+    "persistent_loss_robustness_target",
+    "smote_training_fold_only_robustness"
   ],
   "completed_micro_parts": [
     {
@@ -246,9 +285,17 @@
       "completion_lock": "project/stage126/stage126_m1_robustness_part5_completion_lock.json",
       "micro_part_id": "stage126-m1-robustness-part5-persistent-loss-target",
       "part_index": 5
+    },
+    {
+      "authorization_record": "project/stage126/stage126_m1_robustness_part6_human_authorization_record.json",
+      "authorization_text_sha256": "4a3bb0d722d288f754b780208b5805f264b4caac75a902f434135f56430ed269",
+      "category_id": "smote_training_fold_only_robustness",
+      "completion_lock": "project/stage126/stage126_m1_robustness_part6_completion_lock.json",
+      "micro_part_id": "stage126-m1-robustness-part6-smote-training-fold-only",
+      "part_index": 6
     }
   ],
-  "completed_part_count": 5,
+  "completed_part_count": 6,
   "contract_id": "stage126_current_state_validator",
   "contract_version": "stage126_current_state_validator_v2_lean",
   "current_state_validation_metadata_path": "project/stage126/metadata_and_hashes_stage126_current_state_validator.json",
@@ -260,7 +307,8 @@
     "main_rule_b_listing_robustness",
     "expanded_rule_a_company_scope_robustness",
     "expanded_rule_b_combined_robustness",
-    "persistent_loss_robustness_target"
+    "persistent_loss_robustness_target",
+    "smote_training_fold_only_robustness"
   ],
   "final_test_access_authorized": false,
   "final_test_evaluation_performed": false,
@@ -268,16 +316,16 @@
   "final_test_target_values_inspected": false,
   "final_test_unlocked": false,
   "full_development_refit_performed": false,
-  "last_completed_micro_part": "stage126-m1-robustness-part5-persistent-loss-target",
-  "last_completed_micro_part_qc_assertions": 134,
+  "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
+  "last_completed_micro_part_qc_assertions": 148,
   "last_completed_micro_part_qc_failed": 0,
-  "last_completed_micro_part_qc_path": "project/stage126/stage126_m1_robustness_part5_qc_report.json",
-  "last_completed_micro_part_qc_scope": "stage126_m1_robustness_part5_persistent_loss_target",
-  "m1_robustness_completed": false,
+  "last_completed_micro_part_qc_path": "project/stage126/stage126_m1_robustness_part6_qc_report.json",
+  "last_completed_micro_part_qc_scope": "stage126_m1_robustness_part6_smote_training_fold_only",
+  "m1_robustness_completed": true,
   "m1_robustness_started": true,
   "next_category_authorized": false,
-  "next_category_id": "smote_training_fold_only_robustness",
-  "next_research_action_id": "stage126-m1-financial-baseline",
+  "next_category_id": "",
+  "next_research_action_id": "stage126-m1-robustness-closure",
   "primary_stage126_artifacts_sha256": {
     "project/stage126/stage126_m1_configuration_registry.csv": "decbf43a5c34669bdd7a0c68c0ad6aec5611efc7c3ca82b09f5e85f72d635804",
     "project/stage126/stage126_m1_development_access_manifest.csv": "0c2783d0e43ebba712a1c41b6889a2f8f646340bae6a75ad15902a8a0c368e39",

@@ -2,8 +2,8 @@
 roadmap_version: 2
 active_research_workstream_id: stage126-m1-financial-baseline
 qc_scope: stage126-m1-financial-baseline
-last_completed_research_action_id: stage125-part5-readiness-closure
-next_research_action_id: stage126-m1-financial-baseline
+last_completed_research_action_id: stage126-m1-financial-baseline
+next_research_action_id: stage126-m1-robustness-closure
 active_maintenance_task_id: repository-driven-ai-handoff
 ---
 
@@ -32,8 +32,8 @@ From 2026-07-26 onward, Stage126+ follows [`STAGE126_Q1Q2_LEAN_GOVERNANCE.md`](S
 15. `stage125-part3c-leakage-safe-dataset-finalization` — active four-Jalali-month point-in-time finalization ✅
 16. `stage125-part4-statistical-analysis-plan` — M1–M4 SAP, temporal CV, metrics, tuning budget, uncertainty plan ✅
 17. `stage125-part5-readiness-closure` — Stage125 Gate 125.0 / Stage126 M1 readiness closure ✅
-18. `stage126-m1-financial-baseline` — **ACTIVE.** Primary M1 development tuning is complete. Registered robustness Parts 1–5 are complete on `main`; Part 6 (`smote_training_fold_only_robustness`) is the only remaining registered M1 robustness sensitivity. No full-development refit; final test locked; M2/M3/M4 not started.
-19. `stage126-m1-robustness-closure` — finish Part 6, verify all six pre-registered M1 robustness analyses, synthesize sensitivity evidence, and close the robustness set. **No retuning, no final-test access, no automatic winner selection.**
+18. `stage126-m1-financial-baseline` — **COMPLETE.** Primary M1 development tuning is complete. All six registered robustness categories (Parts 1–6, including Part 6 `smote_training_fold_only_robustness`) are complete on `main`. No full-development refit; final test locked; M2/M3/M4 not started.
+19. `stage126-m1-robustness-closure` — **ACTIVE.** Verify all six pre-registered M1 robustness analyses, synthesize sensitivity evidence, and close the robustness set. **No retuning, no final-test access, no automatic winner selection.**
 20. `stage126-m1-retained-design-freeze` — freeze the exact retained M1 design using development evidence only: sample/target/features/preprocessing/configuration/metric definitions/uncertainty plan. This is the precondition for later refit; final test remains locked.
 21. `stage127-m2-market-data-gate` — point-in-time accessibility/coverage/join/quality/event-count Gate for the pre-specified market block. **No modeling in the Gate.** A failed Gate is a reportable negative result and closes the M2 modeling path.
 22. `stage127-m2-incremental-evaluation` — **conditional on Gate pass.** Evaluate M2 vs M1 on the paired M2 common sample with the frozen temporal design and pre-specified metrics/uncertainty. No post-hoc feature search.
