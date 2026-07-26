@@ -42,7 +42,7 @@ PYTHONPATH=project python -m pytest project/tests -q
 | final test unlocked | false |
 | last completed micro-part | `stage126-m1-robustness-part6-smote-training-fold-only` |
 | active workstream | `stage126_m1_financial_baseline` |
-| next research action | `stage126-m1-retained-design-freeze` |
+| next research action | `stage127-m2-market-data-gate` |
 
 ## Adding a future part
 

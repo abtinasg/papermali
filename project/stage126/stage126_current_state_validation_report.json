@@ -325,7 +325,7 @@
   "m1_robustness_started": true,
   "next_category_authorized": false,
   "next_category_id": "",
-  "next_research_action_id": "stage126-m1-retained-design-freeze",
+  "next_research_action_id": "stage127-m2-market-data-gate",
   "primary_stage126_artifacts_sha256": {
     "project/stage126/stage126_m1_configuration_registry.csv": "decbf43a5c34669bdd7a0c68c0ad6aec5611efc7c3ca82b09f5e85f72d635804",
     "project/stage126/stage126_m1_development_access_manifest.csv": "0c2783d0e43ebba712a1c41b6889a2f8f646340bae6a75ad15902a8a0c368e39",

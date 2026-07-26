@@ -591,11 +591,12 @@ def test_final_test_remains_locked():
 def test_research_pointers_unchanged():
     report = _read_json(v.F_REPORT)
     assert report["active_workstream"] == "stage126_m1_financial_baseline"
-    # Part 6 closed the six-category robustness set, and the synthesis-only
-    # robustness closure has since completed: the next research action
-    # legitimately transitioned to the retained-design-freeze milestone
-    # (which itself still requires a separate future human authorization).
-    assert report["next_research_action_id"] == "stage126-m1-retained-design-freeze"
+    # Part 6 closed the six-category robustness set, the synthesis-only
+    # robustness closure completed, and the retained-design freeze (PR #65)
+    # has since also completed: the next research action legitimately
+    # transitioned once more to the M2 market-data-gate milestone (which
+    # itself still requires a separate future human authorization).
+    assert report["next_research_action_id"] == "stage127-m2-market-data-gate"
 
 
 @pytest.mark.parametrize("field", sorted(
@@ -1196,6 +1197,53 @@ def test_check_mode_is_clean():
     result = v.run(project_dir=Path(REAL_ROOT) / "project", check=True)
     assert result["drift"] == []
     assert result["metadata"]["all_pass"] is True
+
+
+def test_anchor_only_drift_helper_tolerates_commit_anchors_only(tmp_path):
+    """The check-mode tolerance must stay narrow: anchors only, fail-closed."""
+    expected = {
+        "generated_at": "a" * 40,
+        "code_commit": "a" * 40,
+        "source_file_sha256": "b" * 64,
+        "all_pass": True,
+    }
+    path = tmp_path / "metadata.json"
+
+    def write(obj):
+        path.write_text(json.dumps(obj), encoding="utf-8")
+
+    # Only commit anchors differ -> tolerated.
+    write({**expected, "generated_at": "c" * 40, "code_commit": "c" * 40})
+    assert v._metadata_drift_is_anchor_only(path, expected) is True
+
+    # A scientific/content field differs -> NOT tolerated.
+    write({**expected, "generated_at": "c" * 40, "all_pass": False})
+    assert v._metadata_drift_is_anchor_only(path, expected) is False
+
+    # A hashed source file differs -> NOT tolerated.
+    write({**expected, "source_file_sha256": "d" * 64})
+    assert v._metadata_drift_is_anchor_only(path, expected) is False
+
+    # Identical content is not "drift" at all.
+    write(expected)
+    assert v._metadata_drift_is_anchor_only(path, expected) is False
+
+    # Added/removed keys -> NOT tolerated.
+    write({**expected, "unexpected_extra_key": 1})
+    assert v._metadata_drift_is_anchor_only(path, expected) is False
+
+    # Malformed / missing file -> fail closed.
+    path.write_text("{not json", encoding="utf-8")
+    assert v._metadata_drift_is_anchor_only(path, expected) is False
+    assert v._metadata_drift_is_anchor_only(tmp_path / "absent.json", expected) is False
+
+
+def test_anchor_tolerance_covers_only_the_metadata_file():
+    # Every other tracked output must remain fully drift-gated.
+    assert v.METADATA_COMMIT_ANCHOR_FIELDS == ("generated_at", "code_commit")
+    for name in (v.F_DECISION, v.F_BOUNDARY_MANIFEST, v.F_REPORT,
+                 v.F_README, v.F_CLOSED_REGISTRY):
+        assert name != v.F_METADATA
 
 
 def test_deterministic_repeated_build(tmp_path):

@@ -1,0 +1,35 @@
+{
+  "contract_id": "stage126_m1_retained_design_freeze",
+  "decision_id": "stage126-m1-retained-design-freeze",
+  "generated_for": "stage126-m1-retained-design-freeze",
+  "package_artifacts_sha256": {
+    "project/stage126/README_STAGE126_M1_RETAINED_DESIGN_FREEZE.md": "7995c68b15bc581c6b26a66baa9b349d89387be7db9623bc050e6172071843d5",
+    "project/stage126/stage126_m1_retained_design_freeze.json": "53beb8603de48bdeed33858093f40dc0e89bf6f86cb97534a86dff32b74a2876",
+    "project/stage126/stage126_m1_retained_design_freeze_human_authorization_record.json": "ef5740c3bb74aa736f83c30d55f947c655ba3fc4a241ebde156fc1f9d3795d72"
+  },
+  "source_artifacts_sha256": {
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
+    "project/stage125/part4_model_specifications_stage125.json": "ef933be3eb2f75e6f493ac1401100c629bdb83850c81950d8f235c5ccf4cdb21",
+    "project/stage125/part4_preprocessing_contract_stage125.json": "3722bd6165574c78aef1138a810ff4863b5c214f80df197889eaa40163f0e415",
+    "project/stage125/part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
+    "project/stage125/part5_stage126_m1_entry_contract_stage125.json": "74a2159785daeda44fa82ebd76f42870fa25aba3667846bccba6b3099ea65da5",
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_final_test_lock_guard.json": "509e58fc39e3c5d886993c11b954fc06c267c96d02c081d8e50b0cda52e58b03",
+    "project/stage126/stage126_m1_robustness_closure_completion_lock.json": "2e63f03ffbfc41c7207b5e28642df93d987a3054bb6f9c76dcb003a561d7ce42",
+    "project/stage126/stage126_m1_robustness_closure_evidence_table.csv": "9dabcb4e790bd80171307d068e1d1423de497a69f85f1eb6668abe6a512639f6",
+    "project/stage126/stage126_m1_robustness_closure_synthesis_record.json": "fdf8c585e6f4c38a066feec6f90094a2b6d50867ffac290195f40b9ce616846a",
+    "project/stage126/stage126_m1_robustness_part0_decision_record.json": "9ccd7bfae8fa522cb87e94ed7bebe806324837e9a2e12783d12aabfedd07c2ee",
+    "project/stage126/stage126_m1_robustness_part1_primary_comparison.json": "2b58a85250420a8a18b0ff37cecdf3f2e31160c37e0cb48d027324c87a25c46a",
+    "project/stage126/stage126_m1_robustness_part2_primary_comparison.json": "9fc3b4eaf0a27fc66cd22444d92363747157743e822d3be877ecca7f153763bf",
+    "project/stage126/stage126_m1_robustness_part3_primary_comparison.json": "d3173d3948c0e5f9299eacef8b93341335ef9414598da372770accd97592790d",
+    "project/stage126/stage126_m1_robustness_part4_primary_comparison.json": "06283e75f6500195ac4cdb3f1bad722cf4ff6476d788a427c657fef22b26bd4f",
+    "project/stage126/stage126_m1_robustness_part5_execution_manifest.json": "bc1cfd8dbf8197b96f595235aaa74ca18ad2cb5452ea67798dd77166b5289cea",
+    "project/stage126/stage126_m1_robustness_part5_primary_comparison.json": "e0ddde1977ccbbdc0c892d92ef8812316373266e3a5efb5f7ac0ebaed9a81c97",
+    "project/stage126/stage126_m1_robustness_part6_execution_manifest.json": "84d9d3ddfc821978c04763344b1b6468b4e6cb4202e61ac26dc19a4fc462a786",
+    "project/stage126/stage126_m1_robustness_part6_primary_comparison.json": "22528de44a14e24891e44a089e9b51a895b298ae20f15a6311601d0d2bface4a",
+    "project/stage126/stage126_m1_robustness_part6_resampling_audit.csv": "6ff4c78e1c027d84af08fe5657a16829b5fe8a3df4eae66c81fc7d3feb915658",
+    "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e"
+  },
+  "source_main_commit": "018a489ea0427ce764f06a512137cae4d29ad91d",
+  "source_repository": "abtinasg/papermali"
+}

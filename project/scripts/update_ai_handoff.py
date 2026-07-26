@@ -167,6 +167,11 @@ ALLOWLIST_FILES = (
     "project/src/stage126_m1_robustness_closure.py",
     "project/run_stage126_m1_robustness_closure.py",
     "project/tests/test_stage126_m1_robustness_closure.py",
+    # Stage126 M1 retained-design freeze (decision-freeze-only, no
+    # execution) tests. There is no src/run_ builder for this action: the
+    # freeze artifact/authorization record/metadata are hand-authored,
+    # source-derived-and-verified records, not generated outputs.
+    "project/tests/test_stage126_m1_retained_design_freeze.py",
     # Post-Part6 historical-replay overlay for the byte-frozen Part 5 test
     # file (see project/tests/conftest.py docstring); an operational test
     # fixture, not a Stage125/126 scientific or source artifact.
@@ -2673,6 +2678,89 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         "m1_robustness_closure_retained_design_selected": False,
         "m1_robustness_closure_retained_design_freeze_authorized": False,
         "next_research_action_id": _NEXT_RESEARCH_ACTION_ID_AFTER_ROBUSTNESS_CLOSURE,
+        **derive_m1_retained_design_freeze_markers(root),
+    }
+
+
+_RETAINED_DESIGN_FREEZE_REL = (
+    "project/stage126/stage126_m1_retained_design_freeze.json"
+)
+_NEXT_RESEARCH_ACTION_ID_AFTER_RETAINED_DESIGN_FREEZE = (
+    "stage127-m2-market-data-gate"
+)
+
+
+def derive_m1_retained_design_freeze_markers(root: str) -> dict:
+    """Recognize the (decision-freeze-only) M1 retained-design freeze.
+
+    Narrow, fail-closed recognition mirroring the robustness-closure
+    recognition pattern above: if the freeze artifact is present and its
+    ``status_flags`` are internally consistent (frozen, no execution, no
+    winner, firewall untouched), the Handoff's ``next_research_action_id``
+    advances to ``stage127-m2-market-data-gate`` (itself requiring a
+    SEPARATE future human authorization -- this function never sets that
+    authorization True and never marks M2 as started). Returns an empty
+    dict when the freeze artifact has not yet been built, so pre-freeze
+    Handoffs are unaffected.
+    """
+    path = os.path.join(root, _RETAINED_DESIGN_FREEZE_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        freeze = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable retained design freeze artifact: {exc}") from exc
+
+    if freeze.get("decision_id") != "stage126-m1-retained-design-freeze":
+        raise HandoffError("retained design freeze artifact decision_id mismatch")
+    if freeze.get("last_completed_research_action_id") != (
+        "stage126-m1-retained-design-freeze"
+    ):
+        raise HandoffError(
+            "retained design freeze artifact last_completed_research_action_id mismatch"
+        )
+    if freeze.get("next_research_action_id") != (
+        _NEXT_RESEARCH_ACTION_ID_AFTER_RETAINED_DESIGN_FREEZE
+    ):
+        raise HandoffError(
+            "retained design freeze artifact next_research_action_id mismatch"
+        )
+
+    sf = freeze.get("status_flags") or {}
+    exact = {
+        "retained_design_freeze_completed": True,
+        "paper_winner_selected": False,
+        "final_model_selected": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_performed": False,
+        "m2_started": False,
+    }
+    for key, want in exact.items():
+        if sf.get(key) != want:
+            raise HandoffError(
+                f"retained design freeze status_flags field {key}={sf.get(key)!r} "
+                f"!= {want!r}"
+            )
+
+    return {
+        "retained_design_freeze_completed": True,
+        "last_completed_research_action_id": (
+            "stage126-m1-retained-design-freeze"
+        ),
+        "m2_started": False,
+        "m2_authorized": False,
+        "m2_data_collected": False,
+        "paper_winner_selected": False,
+        "final_model_selected": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_predictor_values_inspected": False,
+        "final_test_target_values_inspected": False,
+        "final_test_evaluation_performed": False,
+        "next_research_action_id": _NEXT_RESEARCH_ACTION_ID_AFTER_RETAINED_DESIGN_FREEZE,
     }
 
 

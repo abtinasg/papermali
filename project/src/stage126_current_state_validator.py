@@ -434,10 +434,59 @@ def robustness_closure_completed(repo_root: Path) -> bool:
     return all(lock.get(k) == v for k, v in required.items())
 
 
+# Once the retained-design freeze itself has also completed, the next
+# legitimate ROADMAP research action advances once more, to the M2
+# market-data gate. That gate still requires a SEPARATE, future, explicit
+# human authorization -- this validator never grants it, and never marks
+# M2 as started.
+NEXT_RESEARCH_ACTION_ID_AFTER_RETAINED_DESIGN_FREEZE = (
+    "stage127-m2-market-data-gate"
+)
+RETAINED_DESIGN_FREEZE_REL = (
+    f"{STAGE126_DIR_REL}/stage126_m1_retained_design_freeze.json"
+)
+
+
+def retained_design_freeze_completed(repo_root: Path) -> bool:
+    """Narrow, fail-closed recognition of the M1 retained-design freeze.
+
+    Mirrors ``robustness_closure_completed`` above: only returns True when
+    the freeze artifact exists and its exact required ``status_flags`` hold.
+    Never itself authorizes M2, a full-development refit or final-test access.
+    """
+    path = repo_root / RETAINED_DESIGN_FREEZE_REL
+    if not path.is_file():
+        return False
+    try:
+        freeze = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    if freeze.get("decision_id") != "stage126-m1-retained-design-freeze":
+        return False
+    sf = freeze.get("status_flags") or {}
+    required = {
+        "retained_design_freeze_completed": True,
+        "paper_winner_selected": False,
+        "final_model_selected": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_performed": False,
+        "m2_started": False,
+    }
+    return all(sf.get(k) == v for k, v in required.items())
+
+
 def expected_next_research_action_id(
     repo_root: Path, m1_robustness_completed: bool,
 ) -> str:
     """The single source of truth for the current expected research pointer."""
+    if (
+        m1_robustness_completed
+        and robustness_closure_completed(repo_root)
+        and retained_design_freeze_completed(repo_root)
+    ):
+        return NEXT_RESEARCH_ACTION_ID_AFTER_RETAINED_DESIGN_FREEZE
     if m1_robustness_completed and robustness_closure_completed(repo_root):
         return NEXT_RESEARCH_ACTION_ID_AFTER_ROBUSTNESS_CLOSURE
     if m1_robustness_completed:
@@ -1604,6 +1653,33 @@ def build_all(
     return content, extras
 
 
+#: Metadata fields that embed live git HEAD purely as an engineering anchor.
+#: These go stale the moment the built file is committed and carry no
+#: scientific meaning.
+METADATA_COMMIT_ANCHOR_FIELDS: tuple[str, ...] = ("generated_at", "code_commit")
+
+
+def _metadata_drift_is_anchor_only(path: Path, expected: dict[str, Any]) -> bool:
+    """True iff the on-disk metadata differs ONLY in commit-anchor fields.
+
+    Fail-closed: an unreadable/malformed file, a missing anchor field, or any
+    difference outside ``METADATA_COMMIT_ANCHOR_FIELDS`` returns False so the
+    caller still raises.
+    """
+    try:
+        on_disk = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    if not isinstance(on_disk, dict):
+        return False
+    if set(on_disk) != set(expected):
+        return False
+    differing = [k for k in expected if on_disk.get(k) != expected[k]]
+    if not differing:
+        return False
+    return all(k in METADATA_COMMIT_ANCHOR_FIELDS for k in differing)
+
+
 def _compare_drift(out_dir: Path, payloads: dict[str, str]) -> list[str]:
     drift: list[str] = []
     for name, text in payloads.items():
@@ -1704,8 +1780,26 @@ def run(
             (out_dir / name).write_text(text, encoding="utf-8")
             files_written[name] = sha256_bytes(text.encode("utf-8"))
 
+    # Operational commit-anchor drift (same narrow tolerance already applied to
+    # Part 6 in 01f2b8b and to the robustness closure in f9a47a5). The metadata
+    # package embeds live git HEAD in `generated_at` / `code_commit`, which
+    # necessarily goes stale the instant the built file is itself committed --
+    # a self-referential anchor, not a scientific fact. Under Stage126+ Q1/Q2
+    # Lean Governance, commit SHAs used purely as engineering anchors do not
+    # fail the live gate. Tolerance is deliberately double-narrowed: only the
+    # metadata file, and only when EVERY differing field is a commit anchor.
+    # Drift in the decision, boundary manifest, validation report, README or
+    # closed-part registry -- or any non-anchor field of the metadata file --
+    # still fails closed.
     if check and out_dir.resolve() == canonical_out and tracked_drift:
-        raise ValidationFail(f"check drift (tracked): {tracked_drift}")
+        scientific_drift = [
+            name for name in tracked_drift
+            if name != F_METADATA
+            or not _metadata_drift_is_anchor_only(out_dir / name, meta)
+        ]
+        if scientific_drift:
+            raise ValidationFail(f"check drift (tracked): {scientific_drift}")
+        tracked_drift = []
     if failed:
         raise ValidationFail(f"current-state validation failed: {failed} assertions")
 
