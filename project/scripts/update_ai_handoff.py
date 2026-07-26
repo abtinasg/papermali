@@ -163,6 +163,10 @@ ALLOWLIST_FILES = (
     "project/src/stage126_m1_robustness_part6_smote_training_fold_only.py",
     "project/run_stage126_m1_robustness_part6_smote_training_fold_only.py",
     "project/tests/test_stage126_m1_robustness_part6_smote_training_fold_only.py",
+    # Stage126 M1 robustness closure (synthesis-only) code, runner, and tests.
+    "project/src/stage126_m1_robustness_closure.py",
+    "project/run_stage126_m1_robustness_closure.py",
+    "project/tests/test_stage126_m1_robustness_closure.py",
     # Post-Part6 historical-replay overlay for the byte-frozen Part 5 test
     # file (see project/tests/conftest.py docstring); an operational test
     # fixture, not a Stage125/126 scientific or source artifact.

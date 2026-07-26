@@ -1,0 +1,305 @@
+{
+  "all_pass": true,
+  "assertion_count": 55,
+  "assertions": [
+    {
+      "detail": "18",
+      "name": "exactly_18_evidence_rows",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "registered_categories_in_order",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "evidence_rows_reconcile_with_source_artifacts",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_robustness_closure_completed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_all_six_verified",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_no_winner_selected",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_no_retained_design_selected",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_no_freeze_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_no_full_dev_refit",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_final_test_locked",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_final_test_access_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_final_test_predictor_not_inspected",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_final_test_target_not_inspected",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_final_test_eval_not_performed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_zero_model_fit_calls",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_zero_prediction_calls",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_zero_tuning_search_calls",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_smote_not_executed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_smotenc_not_executed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_shap_not_executed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_calibration_not_executed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_bootstrap_not_executed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_holm_not_executed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_m2_m3_m4_not_started",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "completion_lock_next_action_is_retained_design_freeze",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "synthesis_paper_winner_not_selected",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "synthesis_retained_design_not_selected",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "synthesis_freeze_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "synthesis_primary_ordering_recorded",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "synthesis_next_action_requires_human_authorization",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part2_regularized_logistic_regression",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part2_random_forest",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part2_xgboost",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part3_regularized_logistic_regression",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part3_random_forest",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part3_xgboost",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part4_regularized_logistic_regression",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part4_random_forest",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part4_xgboost",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part5_regularized_logistic_regression",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part5_random_forest",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part5_xgboost",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part6_regularized_logistic_regression",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part6_random_forest",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "ordering_preserved_part6_xgboost",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part1_all_families_declined",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "part1_ordering_differs_from_primary",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "all_rows_final_test_not_accessed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "all_rows_development_only",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "all_rows_selected_configurations_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "network_requests_attempted_zero",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "zero_model_fit_calls",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "zero_prediction_calls",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "zero_resampling_calls",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "zero_shap_calls",
+      "status": "PASS"
+    }
+  ],
+  "contract_id": "stage126_m1_robustness_closure",
+  "contract_version": "stage126_m1_robustness_closure_v1",
+  "current_stage": "Stage126",
+  "decision_id": "stage126-m1-robustness-closure",
+  "failed_count": 0,
+  "final_test_evaluations": 0,
+  "final_test_predictor_rows_loaded": 0,
+  "final_test_target_rows_loaded": 0,
+  "model_fit_calls": 0,
+  "network_requests_attempted": 0,
+  "next_action_id": "stage126-m1-retained-design-freeze",
+  "output_sha256": {
+    "README_STAGE126_M1_ROBUSTNESS_CLOSURE.md": "54e420d0915958d76bfa32b55d6c0fa444d8a09221a10eecb6628455f05b7fbb",
+    "stage126_m1_robustness_closure_completion_lock.json": "2e63f03ffbfc41c7207b5e28642df93d987a3054bb6f9c76dcb003a561d7ce42",
+    "stage126_m1_robustness_closure_evidence_table.csv": "9dabcb4e790bd80171307d068e1d1423de497a69f85f1eb6668abe6a512639f6",
+    "stage126_m1_robustness_closure_source_manifest.json": "a3c6f4ffd5619b971b5dcfe5a16066a8bd284bfececeed75ef51649927861db6",
+    "stage126_m1_robustness_closure_synthesis_record.json": "a13264c910c727f93e7379c0c220cb4d3cb9d32fb91b8755bfa8bbac49ba874f"
+  },
+  "prediction_calls": 0,
+  "robustness_closure_completed": true,
+  "shap_calls": 0,
+  "smote_calls": 0,
+  "smotenc_calls": 0,
+  "stage": "stage126_m1_robustness_closure"
+}
