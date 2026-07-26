@@ -37,6 +37,12 @@ PREPROCESSING_CONTRACT_PATH = os.path.join(
 TEMPORAL_SPLIT_CONTRACT_PATH = os.path.join(
     STAGE125, "part4_temporal_split_contract_stage125.json"
 )
+M1_ENTRY_CONTRACT_PATH = os.path.join(
+    STAGE125, "part5_stage126_m1_entry_contract_stage125.json"
+)
+MODEL_SPECIFICATIONS_PATH = os.path.join(
+    STAGE125, "part4_model_specifications_stage125.json"
+)
 
 EXPECTED_FEATURE_ORDER = (
     "log_total_assets",
@@ -90,6 +96,18 @@ def preprocessing_contract_canonical():
 @pytest.fixture(scope="module")
 def temporal_split_contract_canonical():
     with open(TEMPORAL_SPLIT_CONTRACT_PATH, encoding="utf-8") as f:
+        return json.load(f)
+
+
+@pytest.fixture(scope="module")
+def m1_entry_contract_canonical():
+    with open(M1_ENTRY_CONTRACT_PATH, encoding="utf-8") as f:
+        return json.load(f)
+
+
+@pytest.fixture(scope="module")
+def model_specifications_canonical():
+    with open(MODEL_SPECIFICATIONS_PATH, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -357,6 +375,75 @@ def test_temporal_folds_match_canonical_source(
     assert folds["locked_final_test_target_years"] == c["final_test_target_years"]
 
 
+def test_sample_target_features_match_canonical_entry_contract(
+    freeze, m1_entry_contract_canonical
+):
+    spec = m1_entry_contract_canonical["primary_specification"]
+    assert freeze["sample"] == spec["sample"]
+    assert freeze["target"] == spec["target"]
+    assert freeze["M1_PRIMARY_FEATURE_ORDER"] == spec["features_exact_order"]
+    assert len(freeze["M1_PRIMARY_FEATURE_ORDER"]) == spec["feature_count"]
+    # Retained families must be exactly the canonical primary model set.
+    frozen_families = {
+        cfg["family"] for cfg in freeze["retained_model_families"].values()
+    }
+    assert frozen_families == set(spec["models"])
+    assert freeze["metric_definitions"]["primary_metric"] == spec["primary_metric"]
+    assert (
+        freeze["sample_target_feature_canonical_source_path"]
+        == "project/stage125/part5_stage126_m1_entry_contract_stage125.json"
+    )
+
+
+def test_imbalance_policy_matches_canonical_model_specifications(
+    freeze, model_specifications_canonical
+):
+    imb = freeze["imbalance_strategy"]
+    canonical = model_specifications_canonical["imbalance_handling_primary"]
+    assert (
+        imb["regularized_logistic_regression"]["class_weight"]
+        == canonical["logistic_regression"]["class_weight"]
+    )
+    assert (
+        imb["random_forest"]["class_weight"]
+        == canonical["random_forest"]["class_weight"]
+    )
+    assert (
+        imb["xgboost"]["scale_pos_weight"]
+        == canonical["xgboost"]["scale_pos_weight"]
+    )
+    # SMOTENC stays robustness-only in the canonical source too.
+    assert model_specifications_canonical["smote_robustness"]["primary"] is False
+    assert imb["smotenc_status"] == "robustness_only_not_retained"
+    assert (
+        imb["canonical_source_path"]
+        == "project/stage125/part4_model_specifications_stage125.json"
+    )
+
+
+def test_threshold_rule_matches_canonical_contract(
+    freeze, metrics_uncertainty_contract
+):
+    frozen = freeze["metric_definitions"]["thresholded_secondary"]
+    canonical = metrics_uncertainty_contract["thresholded_secondary"]
+    assert frozen["rule"] == canonical["rule"]
+    assert frozen["tie_break"] == canonical["tie_break"]
+    assert frozen["never_optimize_on_final_test"] is True
+    assert canonical["never_optimize_on_final_test"] is True
+
+
+def test_topk_definition_and_ranking_match_canonical_contract(
+    freeze, metrics_uncertainty_contract
+):
+    md = freeze["metric_definitions"]
+    canonical = metrics_uncertainty_contract["topk"]
+    assert md["topk_rule"] == canonical["definition"]
+    assert md["topk"]["fraction"] == canonical["fraction"]
+    assert md["topk"]["ranking_order"] == canonical["ranking_order"]
+    assert md["topk"]["optimize_K_after_results"] is False
+    assert canonical["optimize_K_after_results"] is False
+
+
 def test_non_authoritative_summaries_are_labeled(freeze):
     for key in (
         "metric_definitions",
@@ -364,6 +451,7 @@ def test_non_authoritative_summaries_are_labeled(freeze):
         "uncertainty_procedure",
         "preprocessing_contract",
         "temporal_folds",
+        "imbalance_strategy",
     ):
         assert freeze[key].get("non_authoritative_summary") is True, (
             f"{key} must be explicitly labeled non_authoritative_summary "
@@ -416,12 +504,35 @@ def test_final_test_firewall_locked(freeze):
 
 
 # --------------------------------------------------------------------------- #
-# Human decision text hash
+# Authorization provenance is referenced, never duplicated, by the freeze
 # --------------------------------------------------------------------------- #
 
-def test_human_decision_text_hash_matches(freeze):
-    got = hashlib.sha256(freeze["human_decision_text"].encode("utf-8")).hexdigest()
-    assert got == freeze["human_decision_text_sha256"]
+def test_freeze_does_not_duplicate_human_authorization_prose(freeze):
+    # The freeze artifact must not carry any field whose name implies it holds
+    # verbatim human authorization text -- the record is the single authority.
+    for banned in (
+        "human_decision_text",
+        "human_decision_text_sha256",
+        "human_authorization_text",
+        "human_authorization_text_sha256",
+        "human_source_utterance",
+    ):
+        assert banned not in freeze, f"freeze must not contain {banned}"
+
+
+def test_freeze_references_authorization_record(freeze):
+    rel = freeze["human_authorization_record_path"]
+    assert rel == (
+        "project/stage126/"
+        "stage126_m1_retained_design_freeze_human_authorization_record.json"
+    )
+    assert freeze["authorized_action_id"] == "stage126-m1-retained-design-freeze"
+    assert freeze["authorization_scope_limited_to_this_action_only"] is True
+    abs_path = os.path.join(os.path.dirname(REAL_ROOT), rel)
+    assert os.path.isfile(abs_path)
+    with open(abs_path, "rb") as f:
+        got = hashlib.sha256(f.read()).hexdigest()
+    assert got == freeze["human_authorization_record_sha256"]
 
 
 # --------------------------------------------------------------------------- #
@@ -490,12 +601,15 @@ def test_authorization_provenance_fields(auth_record):
     assert got_source != got_scope
 
 
-def test_authorization_scope_matches_freeze_decision_text(freeze, auth_record):
-    assert auth_record["normalized_authorization_scope"] == freeze["human_decision_text"]
+def test_freeze_and_record_agree_on_authorized_action(freeze, auth_record):
     assert (
-        auth_record["normalized_authorization_scope_sha256"]
-        == freeze["human_decision_text_sha256"]
+        freeze["authorized_action_id"]
+        == auth_record["resolved_authorized_action_id"]
+        == auth_record["authorized_action_id"]
+        == "stage126-m1-retained-design-freeze"
     )
+    assert freeze["authorization_scope_limited_to_this_action_only"] is True
+    assert auth_record["scope_limited_to_this_action_only"] is True
 
 
 # --------------------------------------------------------------------------- #

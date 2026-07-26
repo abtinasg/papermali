@@ -2746,8 +2746,12 @@ def derive_m1_retained_design_freeze_markers(root: str) -> dict:
 
     return {
         "retained_design_freeze_completed": True,
+        "last_completed_research_action_id": (
+            "stage126-m1-retained-design-freeze"
+        ),
         "m2_started": False,
         "m2_authorized": False,
+        "m2_data_collected": False,
         "paper_winner_selected": False,
         "final_model_selected": False,
         "full_development_refit_performed": False,

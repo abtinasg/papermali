@@ -90,7 +90,12 @@ All final-test firewall flags remain locked
 
 - `stage126_m1_retained_design_freeze.json` — the frozen design package.
 - `stage126_m1_retained_design_freeze_human_authorization_record.json` —
-  scoped human authorization record (does not extend to M2 or later work).
+  the SOLE authority for authorization provenance (does not extend to M2 or
+  later work). It stores the exact human utterance
+  (`human_source_utterance`, hashed separately) apart from the derived,
+  explicitly non-verbatim `normalized_authorization_scope`. The freeze
+  artifact does not duplicate this prose; it only references the record by
+  path and SHA-256.
 - `metadata_and_hashes_stage126_m1_retained_design_freeze.json` — SHA-256
   hashes of the artifacts in this package.
 - `project/tests/test_stage126_m1_retained_design_freeze.py` — structural and
