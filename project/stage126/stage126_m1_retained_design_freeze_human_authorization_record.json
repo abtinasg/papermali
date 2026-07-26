@@ -1,0 +1,30 @@
+{
+  "authorization_context": "Follows the merged Stage126 M1 robustness closure (PR #64), which set next_action_id = 'stage126-m1-retained-design-freeze' and explicitly left retained_design_freeze_authorized = false pending separate human authorization.",
+  "authorization_date": "2026-07-26",
+  "authorization_id": "stage126-m1-retained-design-freeze-human-authorization",
+  "authorized_action_id": "stage126-m1-retained-design-freeze",
+  "authorizing_role": "human_supervisor_data_owner",
+  "decision_type": "design_freeze_only_no_execution",
+  "does_not_extend_to": [
+    "stage127-m2-market-data-gate",
+    "m2_work_of_any_kind",
+    "full_development_refit",
+    "final_test_access",
+    "final_test_evaluation",
+    "final_model_selection",
+    "paper_winner_selection",
+    "hyperparameter_retuning",
+    "calibration_execution",
+    "paired_bootstrap_execution",
+    "holm_correction_execution",
+    "shap"
+  ],
+  "final_test_access_authorized": false,
+  "full_development_refit_authorized": false,
+  "human_authorization_text": "من به‌عنوان ناظر انسانی و مالک تصمیم پژوهشی پروژه، فقط ثبت و بسته‌بندی طراحی نگه‌داشته‌شده M1 را بر اساس شواهد استحکام قبلاً تکمیل‌شده (بخش‌های ۱ تا ۶ و بستن استحکام) مجاز می‌کنم. این مجوز فقط محدود به عملیات stage126-m1-retained-design-freeze است و شامل اجرای هیچ مدل، بازتنظیم، بازبرازش کامل دوره توسعه، دسترسی یا ارزیابی آزمون نهایی، انتخاب مدل برنده نهایی، یا شروع M2، M3 یا M4 نیست.",
+  "human_authorization_text_sha256": "495c4e0984131484c1ce0c5f78b25bdd9319f795845351cbec5b82ede98ed96b",
+  "m2_authorized": false,
+  "merge_authorized": false,
+  "retained_design_freeze_execution_authorized": true,
+  "scope_limited_to_this_action_only": true
+}
