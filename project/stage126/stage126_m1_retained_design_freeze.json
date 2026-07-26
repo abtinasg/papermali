@@ -37,8 +37,11 @@
   },
   "authorizing_role": "human_supervisor_data_owner",
   "calibration_reporting_procedure": {
+    "canonical_source_path": "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
     "executed_in_this_freeze": false,
     "isotonic_calibration_authorized": false,
+    "logit_clip_epsilon": 1e-06,
+    "non_authoritative_summary": true,
     "optional_secondary_fit": "Platt_only_on_pooled_development_OOF",
     "primary": "raw_uncalibrated_probabilities",
     "reported_diagnostics": [
@@ -46,7 +49,8 @@
       "5_bin_quantile_calibration_curve",
       "calibration_intercept",
       "calibration_slope"
-    ]
+    ],
+    "skip_recalibration_if_oof_positives_lt": 20
   },
   "contract_id": "stage126_m1_retained_design_freeze",
   "contract_version": "stage126_m1_retained_design_freeze_v1",
@@ -80,6 +84,7 @@
   "last_completed_research_action_id": "stage126-m1-retained-design-freeze",
   "metric_definitions": {
     "frozen_metrics_uncertainty_contract_path": "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
+    "non_authoritative_summary": true,
     "primary_metric": "PR-AUC",
     "scopes": [
       "fold1_validation",
@@ -92,25 +97,41 @@
       "Recall@10%",
       "Lift@10%"
     ],
+    "thresholded_secondary": {
+      "never_optimize_on_final_test": true,
+      "rule": "development_OOF_F2_maximizing_threshold",
+      "tie_break": "higher_threshold"
+    },
+    "topk": {
+      "fraction": 0.1,
+      "optimize_K_after_results": false,
+      "ranking_order": [
+        "predicted_probability_descending",
+        "ticker_ascending_deterministic_tiebreaker"
+      ]
+    },
     "topk_rule": "K_y = ceil(0.10 * N_y)"
   },
   "multiplicity_plan": {
     "alpha": 0.05,
+    "canonical_source_path": "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
     "conditionally_admitted_families_if_later_stages_proceed": [
-      "M2-M1",
-      "M3-M2",
-      "M4-M3"
+      "M2_minus_M1",
+      "M3_minus_M2",
+      "M4_minus_M3"
     ],
     "correction": "Holm",
     "executed_in_this_freeze": false,
     "families": [
-      "Logistic-RF",
-      "Logistic-XGB",
-      "RF-XGB"
-    ]
+      "Logistic_vs_RF",
+      "Logistic_vs_XGBoost",
+      "RF_vs_XGBoost"
+    ],
+    "family_names_verbatim_from_canonical_source": true
   },
   "next_research_action_id": "stage127-m2-market-data-gate",
   "preprocessing_contract": {
+    "non_authoritative_summary": true,
     "clip_bounds_trained_on": "training_fold_only",
     "clip_percentiles": [
       1,
@@ -245,6 +266,7 @@
   },
   "target": "FD_target_main_t_plus_1",
   "temporal_folds": {
+    "non_authoritative_summary": true,
     "availability_lag_jalali_months": 4,
     "fold1": {
       "train_target_years": [
@@ -278,6 +300,8 @@
     ]
   },
   "uncertainty_procedure": {
+    "canonical_source_path": "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
+    "non_authoritative_summary": true,
     "cluster_unit": "ticker",
     "executed_in_this_freeze": false,
     "interval": "95_percent_percentile_CI",

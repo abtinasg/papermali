@@ -27,6 +27,16 @@ METADATA_PATH = os.path.join(
 SELECTED_CONFIGS_PATH = os.path.join(
     STAGE126, "stage126_m1_selected_configurations.json"
 )
+STAGE125 = os.path.join(REAL_ROOT, "stage125")
+METRICS_UNCERTAINTY_CONTRACT_PATH = os.path.join(
+    STAGE125, "part4_metrics_uncertainty_contract_stage125.json"
+)
+PREPROCESSING_CONTRACT_PATH = os.path.join(
+    STAGE125, "part4_preprocessing_contract_stage125.json"
+)
+TEMPORAL_SPLIT_CONTRACT_PATH = os.path.join(
+    STAGE125, "part4_temporal_split_contract_stage125.json"
+)
 
 EXPECTED_FEATURE_ORDER = (
     "log_total_assets",
@@ -62,6 +72,24 @@ def metadata():
 @pytest.fixture(scope="module")
 def selected_configs():
     with open(SELECTED_CONFIGS_PATH, encoding="utf-8") as f:
+        return json.load(f)
+
+
+@pytest.fixture(scope="module")
+def metrics_uncertainty_contract():
+    with open(METRICS_UNCERTAINTY_CONTRACT_PATH, encoding="utf-8") as f:
+        return json.load(f)
+
+
+@pytest.fixture(scope="module")
+def preprocessing_contract_canonical():
+    with open(PREPROCESSING_CONTRACT_PATH, encoding="utf-8") as f:
+        return json.load(f)
+
+
+@pytest.fixture(scope="module")
+def temporal_split_contract_canonical():
+    with open(TEMPORAL_SPLIT_CONTRACT_PATH, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -212,8 +240,135 @@ def test_multiplicity_plan_not_executed(freeze):
     mp = freeze["multiplicity_plan"]
     assert mp["correction"] == "Holm"
     assert mp["alpha"] == 0.05
-    assert set(mp["families"]) == {"Logistic-RF", "Logistic-XGB", "RF-XGB"}
     assert mp["executed_in_this_freeze"] is False
+
+
+# --------------------------------------------------------------------------- #
+# Source-derived completeness: compare against canonical stage125 contracts,
+# not only hardcoded literals embedded in this test file. Fail-closed: if a
+# canonical source is missing or its shape changes unexpectedly, these fail
+# rather than silently passing against a stale hardcoded copy.
+# --------------------------------------------------------------------------- #
+
+def test_multiplicity_families_match_canonical_sap_exactly(
+    freeze, metrics_uncertainty_contract
+):
+    mp = freeze["multiplicity_plan"]
+    canonical = metrics_uncertainty_contract["multiplicity"]
+    assert set(mp["families"]) == set(canonical["confirmatory_family_1"])
+    assert set(mp["conditionally_admitted_families_if_later_stages_proceed"]) == set(
+        canonical["confirmatory_family_2_adjacent_block_gains_if_admitted"]
+    )
+    assert mp["correction"] == canonical["correction"]
+    assert mp["alpha"] == canonical["alpha"]
+
+
+def test_metric_definitions_match_canonical_contract(
+    freeze, metrics_uncertainty_contract
+):
+    md = freeze["metric_definitions"]
+    assert md["primary_metric"] == metrics_uncertainty_contract["primary_metric"]
+    assert set(md["secondary_metrics"]) == set(
+        metrics_uncertainty_contract["secondary_metrics"]
+    )
+    assert (
+        md["thresholded_secondary"]["rule"]
+        == metrics_uncertainty_contract["thresholded_secondary"]["rule"]
+    )
+    assert (
+        md["thresholded_secondary"]["tie_break"]
+        == metrics_uncertainty_contract["thresholded_secondary"]["tie_break"]
+    )
+    assert (
+        md["topk"]["ranking_order"]
+        == metrics_uncertainty_contract["topk"]["ranking_order"]
+    )
+    assert md["topk"]["fraction"] == metrics_uncertainty_contract["topk"]["fraction"]
+
+
+def test_uncertainty_procedure_matches_canonical_contract(
+    freeze, metrics_uncertainty_contract
+):
+    unc = freeze["uncertainty_procedure"]
+    canonical = metrics_uncertainty_contract["uncertainty"]
+    assert unc["method"] == canonical["method"]
+    assert unc["cluster_unit"] == canonical["cluster"]
+    assert unc["replicates"] == canonical["replicates"]
+    assert unc["seed"] == canonical["bootstrap_seed"]
+    assert unc["min_valid_replicates"] == canonical["min_valid_replicates"]
+    assert (
+        unc["same_resampled_rows_across_compared_models"]
+        == canonical["same_resampled_rows_for_all_compared_models"]
+    )
+    assert (
+        unc["valid_replicate_requires_both_classes"]
+        == canonical["valid_replicate_requires_both_classes"]
+    )
+
+
+def test_calibration_procedure_matches_canonical_contract(
+    freeze, metrics_uncertainty_contract
+):
+    cal = freeze["calibration_reporting_procedure"]
+    canonical = metrics_uncertainty_contract["calibration"]
+    assert cal["isotonic_calibration_authorized"] == canonical["isotonic_authorized"]
+    assert cal["logit_clip_epsilon"] == canonical["logit_clip_epsilon"]
+    assert (
+        cal["skip_recalibration_if_oof_positives_lt"]
+        == canonical["skip_recalibration_if_oof_positives_lt"]
+    )
+    assert set(cal["reported_diagnostics"]) == set(canonical["report"])
+
+
+def test_preprocessing_contract_matches_canonical_source(
+    freeze, preprocessing_contract_canonical
+):
+    pp = freeze["preprocessing_contract"]
+    assert pp["continuous_pipeline_order"] == preprocessing_contract_canonical[
+        "continuous_pipeline_order"
+    ]
+    assert pp["fit_scope"] == preprocessing_contract_canonical["fit_scope"]
+    assert (
+        pp["forbidden_fit_on"] == preprocessing_contract_canonical["forbidden_fit_on"]
+    )
+
+
+def test_temporal_folds_match_canonical_source(
+    freeze, temporal_split_contract_canonical
+):
+    folds = freeze["temporal_folds"]
+    c = temporal_split_contract_canonical
+    assert (
+        folds["fold1"]["train_target_years"]
+        == c["temporal_validation_fold_1"]["train_target_years"]
+    )
+    assert (
+        folds["fold1"]["validation_target_years"]
+        == c["temporal_validation_fold_1"]["validation_target_years"]
+    )
+    assert (
+        folds["fold2"]["train_target_years"]
+        == c["temporal_validation_fold_2"]["train_target_years"]
+    )
+    assert (
+        folds["fold2"]["validation_target_years"]
+        == c["temporal_validation_fold_2"]["validation_target_years"]
+    )
+    assert folds["locked_final_test_target_years"] == c["final_test_target_years"]
+
+
+def test_non_authoritative_summaries_are_labeled(freeze):
+    for key in (
+        "metric_definitions",
+        "calibration_reporting_procedure",
+        "uncertainty_procedure",
+        "preprocessing_contract",
+        "temporal_folds",
+    ):
+        assert freeze[key].get("non_authoritative_summary") is True, (
+            f"{key} must be explicitly labeled non_authoritative_summary "
+            "since a pinned canonical source (by path + SHA-256) exists"
+        )
 
 
 # --------------------------------------------------------------------------- #
@@ -314,9 +469,33 @@ def test_authorization_record_scope(auth_record):
     assert auth_record["merge_authorized"] is False
 
 
-def test_authorization_text_hash_matches_freeze(freeze, auth_record):
-    assert auth_record["human_authorization_text"] == freeze["human_decision_text"]
-    assert auth_record["human_authorization_text_sha256"] == freeze["human_decision_text_sha256"]
+def test_authorization_provenance_fields(auth_record):
+    # human_source_utterance is the exact human-typed message; it must be
+    # hashed SEPARATELY from the derived/normalized scope paraphrase, and
+    # the normalized scope must be explicitly labeled as non-verbatim.
+    got_source = hashlib.sha256(
+        auth_record["human_source_utterance"].encode("utf-8")
+    ).hexdigest()
+    assert got_source == auth_record["human_source_utterance_sha256"]
+    assert auth_record["resolved_authorized_action_id"] == "stage126-m1-retained-design-freeze"
+    assert (
+        auth_record["normalized_authorization_scope_is_derived_not_verbatim_human_text"]
+        is True
+    )
+    got_scope = hashlib.sha256(
+        auth_record["normalized_authorization_scope"].encode("utf-8")
+    ).hexdigest()
+    assert got_scope == auth_record["normalized_authorization_scope_sha256"]
+    # The two hashes must never collide/alias one another.
+    assert got_source != got_scope
+
+
+def test_authorization_scope_matches_freeze_decision_text(freeze, auth_record):
+    assert auth_record["normalized_authorization_scope"] == freeze["human_decision_text"]
+    assert (
+        auth_record["normalized_authorization_scope_sha256"]
+        == freeze["human_decision_text_sha256"]
+    )
 
 
 # --------------------------------------------------------------------------- #

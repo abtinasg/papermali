@@ -4,8 +4,8 @@
   "generated_for": "stage126-m1-retained-design-freeze",
   "package_artifacts_sha256": {
     "project/stage126/README_STAGE126_M1_RETAINED_DESIGN_FREEZE.md": "b7de4768b336220b5c7400d506e3a18c1858dca6e4e9a20d5e24bd3bd0a4052a",
-    "project/stage126/stage126_m1_retained_design_freeze.json": "12aac6b66ac3d1904211769f8683f4263ffd4c1f273fedb2bab56687dd9d8ab9",
-    "project/stage126/stage126_m1_retained_design_freeze_human_authorization_record.json": "c70952a9c896526c59fa0087e592a8343a8e74c4451daa156c469458f78a3e97"
+    "project/stage126/stage126_m1_retained_design_freeze.json": "5aae23a1ff34021516f3bc65c372d84fe668e89a784d3bdbbea3a8470e5d21d7",
+    "project/stage126/stage126_m1_retained_design_freeze_human_authorization_record.json": "ef5740c3bb74aa736f83c30d55f947c655ba3fc4a241ebde156fc1f9d3795d72"
   },
   "source_artifacts_sha256": {
     "project/stage125/part4_metrics_uncertainty_contract_stage125.json": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
