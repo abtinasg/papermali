@@ -7,7 +7,10 @@ front matter; this file is the working description.
 
 Authoritative research pointers live in `ROADMAP.md` front matter:
 `last_completed_research_action_id=stage126-m1-retained-design-freeze`,
-`next_research_action_id=stage127-m2-market-data-gate`
+`next_research_action_id=stage127-m2-market-data-gate` — the Gate was EXECUTED
+but returned UNRESOLVED, so it has produced no admission decision and the
+research pointer deliberately does NOT advance past it, and specifically does
+NOT advance to `stage127-m2-incremental-evaluation`
 (primary M1 development-fold tuning completed on PR #52; all six registered
 M1 robustness categories are complete; `stage126-m1-robustness-closure`
 synthesized the six robustness results and closed the robustness set; and
@@ -20,6 +23,29 @@ retuning, no final-test access, no full-development refit, no paper-winner or
 final-model selection, and no M2/M3/M4 work of any kind. Next action
 `stage127-m2-market-data-gate` requires separate, explicit, future human
 authorization; it has not started).
+
+`stage127-m2-market-data-gate` has now been EXECUTED (development-only, no
+modeling) and returned **`UNRESOLVED_M2_DATA_GATE`**. The frozen three-variable
+M2 block (`equity_return_window`, `realized_volatility`, `amihud_illiquidity`)
+was joined to the 666 frozen M1 primary development pairs (target years
+1393-1399) with per-pair 12-calendar-month pre-cutoff retrieval windows
+computed under the strict `market_observation_date < pair_cutoff_date` rule.
+The authoritative TSETMC source (`src_m2_tsetmc_market`) could not be reached
+from the execution environment: all five required endpoints failed to connect
+while unrelated public hosts were reachable. No substitute provider was
+contacted. Because no `candidate_endpoint_evidence` was captured, no
+accessibility score was assigned — the frozen R-A mapping requires
+`missing_evidence = null_or_unresolved_never_zero`, so scoring 0-2 (a hard
+drop) is prohibited: nothing about TSETMC itself was observed. Candidate
+coverage, block common coverage and event-count feasibility were therefore
+UNRESOLVED rather than FAIL, and no SAP feasibility label was asserted.
+
+**Blocking next step (human review required):** re-execute
+`python project/run_stage127_m2_market_data_gate.py --build` from an
+environment with network egress to TSETMC. The exact per-pair retrieval ranges
+are enumerated in `project/stage127/stage127_m2_development_features.csv`.
+`stage127-m2-incremental-evaluation` remains unauthorized and unstarted; the
+frozen three-variable M2 block was NOT redefined and no variable was dropped.
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
 Part 3B.1E is the decision-lock surface for the conservative-lag research
 action; Part 3C is the operationalization / leakage-safe dataset surface;

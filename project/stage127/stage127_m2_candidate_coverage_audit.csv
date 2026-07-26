@@ -1,0 +1,4 @@
+variable,candidate_id,total_development_rows,valid_rows,missing_or_unresolved_rows,overall_coverage,fold1_train_coverage,fold1_validation_coverage,fold2_train_coverage,fold2_validation_coverage,positive_row_coverage,negative_row_coverage,threshold,resolution,coverage_gate_passed
+equity_return_window,cand_m2_equity_return_window,666,,666,,,,,,,,0.8,UNRESOLVED,
+realized_volatility,cand_m2_realized_volatility,666,,666,,,,,,,,0.8,UNRESOLVED,
+amihud_illiquidity,cand_m2_amihud_illiquidity,666,,666,,,,,,,,0.8,UNRESOLVED,

@@ -1,0 +1,2 @@
+block,requires_all_three_variables,total_development_rows,common_usable_rows,common_coverage,threshold,positive_count,negative_count,resolution,common_coverage_gate_passed
+M2_BLOCK,True,666,,,0.7,,,UNRESOLVED,

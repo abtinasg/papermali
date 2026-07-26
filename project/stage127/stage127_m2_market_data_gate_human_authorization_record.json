@@ -1,0 +1,32 @@
+{
+  "authorization_id": "stage127-m2-market-data-gate-human-authorization",
+  "authorized_action_id": "stage127-m2-market-data-gate",
+  "authorizing_role": "human_supervisor_data_owner",
+  "does_not_extend_to": [
+    "stage127-m2-incremental-evaluation",
+    "any_model_fitting_or_prediction",
+    "retuning",
+    "feature_search",
+    "full_development_refit",
+    "calibration_bootstrap_holm_execution",
+    "shap",
+    "winner_or_final_model_selection",
+    "final_test_predictor_access",
+    "final_test_target_access",
+    "m3_work",
+    "m4_work",
+    "merge"
+  ],
+  "human_source_utterance": "خوب بریم مرحله بعدی",
+  "human_source_utterance_sha256": "9551e127cf6cc0c120c85eee22b3d6ee2c0db5bcd2a0bcc83413861d0550b4c2",
+  "m2_incremental_evaluation_authorized": false,
+  "merge_authorized": false,
+  "normalized_authorization_scope": "این مجوز فقط اجرای دروازه پذیرش داده‌های بازار M2 (stage127-m2-market-data-gate) را مجاز می‌کند، شامل بازیابی واقعی داده/شواهد از منبع رسمی فقط تا حدی که برای همین دروازه لازم است. این مجوز شامل stage127-m2-incremental-evaluation، هیچ برازش یا پیش‌بینی مدل، بازتنظیم، جست‌وجوی ویژگی، بازبرازش کامل دوره توسعه، اجرای کالibration/bootstrap/Holm، SHAP، انتخاب مدل برنده یا نهایی، دسترسی به پیش‌بین یا هدف آزمون نهایی، کار M3 یا M4، و ادغام (merge) نیست.",
+  "normalized_authorization_scope_is_derived_not_verbatim_human_text": true,
+  "normalized_authorization_scope_sha256": "30db6f104091a5b1ed287b5e0732e850ff465e6123a7a391e6d86a5d653aacb2",
+  "permits_real_m2_source_retrieval_for_this_gate_only": true,
+  "resolution_basis": "then_current_roadmap_next_research_action_id",
+  "resolved_authorized_action_id": "stage127-m2-market-data-gate",
+  "scope_limited_to_this_action_only": true,
+  "standing_authorization": false
+}

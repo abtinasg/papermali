@@ -1,0 +1,67 @@
+{
+  "all_pass": true,
+  "assertion_count": 14,
+  "assertions": [
+    {
+      "name": "m2_block_has_exactly_three_variables",
+      "status": "PASS"
+    },
+    {
+      "name": "development_pairs_666",
+      "status": "PASS"
+    },
+    {
+      "name": "no_final_test_rows_in_features",
+      "status": "PASS"
+    },
+    {
+      "name": "no_duplicate_pair_keys",
+      "status": "PASS"
+    },
+    {
+      "name": "zero_accepted_post_cutoff_observations",
+      "status": "PASS"
+    },
+    {
+      "name": "zero_accepted_target_year_leakage",
+      "status": "PASS"
+    },
+    {
+      "name": "no_model_fit",
+      "status": "PASS"
+    },
+    {
+      "name": "no_prediction",
+      "status": "PASS"
+    },
+    {
+      "name": "final_test_locked",
+      "status": "PASS"
+    },
+    {
+      "name": "final_test_not_inspected",
+      "status": "PASS"
+    },
+    {
+      "name": "no_substitute_source_used",
+      "status": "PASS"
+    },
+    {
+      "name": "no_accessibility_score_below_three_assigned",
+      "status": "PASS"
+    },
+    {
+      "name": "block_not_redefined",
+      "status": "PASS"
+    },
+    {
+      "name": "not_eligible_to_start_m2_modeling",
+      "status": "PASS"
+    }
+  ],
+  "decision_id": "stage127-m2-market-data-gate",
+  "failed_count": 0,
+  "gate_status": "UNRESOLVED_M2_DATA_GATE",
+  "scope": "stage127_m2_market_data_gate",
+  "stage": "Stage127"
+}

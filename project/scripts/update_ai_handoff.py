@@ -2679,6 +2679,7 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         "m1_robustness_closure_retained_design_freeze_authorized": False,
         "next_research_action_id": _NEXT_RESEARCH_ACTION_ID_AFTER_ROBUSTNESS_CLOSURE,
         **derive_m1_retained_design_freeze_markers(root),
+        **derive_stage127_m2_market_data_gate_markers(root),
     }
 
 
@@ -3953,6 +3954,100 @@ def _strip_volatile(text: str | None) -> str:
     if text is None:
         return ""
     return "\n".join(l for l in text.splitlines() if "generated_at_utc" not in l)
+
+
+_STAGE127_M2_GATE_REL = (
+    "project/stage127/stage127_m2_market_data_gate_decision.json"
+)
+_STAGE127_M2_GATE_ACTION_ID = "stage127-m2-market-data-gate"
+_STAGE127_M2_NEXT_ACTION_ON_PASS = "stage127-m2-incremental-evaluation"
+_STAGE127_GATE_PASS = "PASS_FOR_M2_INCREMENTAL_EVALUATION"
+
+
+def derive_stage127_m2_market_data_gate_markers(root: str) -> dict:
+    """Recognize an EXECUTED Stage127 M2 market-data Gate.
+
+    Narrow and fail-closed, mirroring the retained-design-freeze recognizer.
+    Critically, this function never authorizes or starts M2: it advances
+    ``next_research_action_id`` to the incremental-evaluation action ONLY when
+    the Gate artifact itself records a PASS, and even then leaves
+    ``m2_incremental_evaluation_authorized`` False, since that action requires
+    its own separate human authorization. An UNRESOLVED or FAIL Gate keeps the
+    pointer on the Gate itself (it must be re-executed / reviewed) and never
+    marks M2 data as collected. Returns {} before the Gate has been executed.
+    """
+    path = os.path.join(root, _STAGE127_M2_GATE_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        gate = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable stage127 M2 gate artifact: {exc}") from exc
+
+    if gate.get("decision_id") != _STAGE127_M2_GATE_ACTION_ID:
+        raise HandoffError("stage127 M2 gate artifact decision_id mismatch")
+
+    status = gate.get("gate_status")
+    if status not in (
+        _STAGE127_GATE_PASS, "FAIL_M2_DATA_GATE", "UNRESOLVED_M2_DATA_GATE",
+    ):
+        raise HandoffError(f"stage127 M2 gate status not recognized: {status!r}")
+
+    # The Gate must never have performed modeling, and the firewall must hold.
+    if gate.get("modeling_performed") is not False:
+        raise HandoffError("stage127 M2 gate reports modeling_performed")
+    if gate.get("model_fit_calls") != 0 or gate.get("prediction_calls") != 0:
+        raise HandoffError("stage127 M2 gate reports model fit/prediction calls")
+    fw = gate.get("final_test_firewall") or {}
+    for key in (
+        "final_test_unlocked", "final_test_access_authorized",
+        "final_test_predictor_values_inspected",
+        "final_test_target_values_inspected", "final_test_evaluation_performed",
+    ):
+        if fw.get(key) is not False:
+            raise HandoffError(f"stage127 M2 gate firewall field {key} not False")
+    if fw.get("final_test_locked") is not True:
+        raise HandoffError("stage127 M2 gate does not report final_test_locked")
+
+    passed = status == _STAGE127_GATE_PASS
+    eligible = bool(
+        (gate.get("eligibility_for_next_action") or {})
+        .get("eligible_to_start_m2_incremental_evaluation")
+    )
+    if eligible and not passed:
+        raise HandoffError(
+            "stage127 M2 gate claims eligibility without a PASS status"
+        )
+
+    markers = {
+        "stage127_m2_market_data_gate_executed": True,
+        "stage127_m2_market_data_gate_status": status,
+        "stage127_m2_market_data_gate_resolved": passed,
+        "m2_incremental_evaluation_authorized": False,
+        "m2_modeling_started": False,
+        "m2_authorized": False,
+        "m2_started": False,
+        # Zero market observations are retained by an unresolved/failed Gate.
+        "m2_data_collected": bool(passed and gate.get("observations_retained")),
+        "paper_winner_selected": False,
+        "final_model_selected": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_predictor_values_inspected": False,
+        "final_test_target_values_inspected": False,
+        "final_test_evaluation_performed": False,
+    }
+    # An UNRESOLVED or FAIL Gate produced no admission decision, so the
+    # research pointer must NOT advance past the Gate: the repository
+    # invariant is that next_research_action_id comes strictly after
+    # last_completed_research_action_id, and an unresolved Gate has not
+    # completed. Only a PASS both completes the Gate and opens the (still
+    # separately-authorized) incremental-evaluation action.
+    if passed:
+        markers["last_completed_research_action_id"] = _STAGE127_M2_GATE_ACTION_ID
+        markers["next_research_action_id"] = _STAGE127_M2_NEXT_ACTION_ON_PASS
+    return markers
 
 
 if __name__ == "__main__":

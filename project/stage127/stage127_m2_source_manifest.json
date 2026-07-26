@@ -1,0 +1,110 @@
+{
+  "authoritative_source_only": true,
+  "code_revision": "2967dcc82d30d1c7719b87db10f449c1bfc69dc8",
+  "endpoints_reached": 0,
+  "endpoints_required_for_scoring": [
+    "http://www.tsetmc.com/",
+    "https://www.tsetmc.com/",
+    "http://cdn.tsetmc.com/",
+    "http://old.tsetmc.com/",
+    "http://tsetmc.com/tsev2/data/InstTradeHistory.aspx"
+  ],
+  "field_mapping_required": {
+    "adjusted_close": "corporate-action-adjusted daily closing price; unadjusted close is NOT an acceptable substitute",
+    "traded_value_rial": "daily traded value in rial; days with V_t<=0 or missing are excluded and never imputed"
+  },
+  "field_mapping_verified": false,
+  "forbidden_substitute_sources_not_used": [
+    "yahoo_finance",
+    "kaggle",
+    "unofficial_mirror",
+    "manually_copied_third_party_dataset",
+    "alternative_market_data_provider"
+  ],
+  "observations_retrieved": 0,
+  "parser_module": "project/src/stage127_m2_market_data_gate.py",
+  "parser_module_sha256": "2f55f37d441b1802cf9f39b24b71cc06212077bf24c614d98638bc5d0ecf4c4b",
+  "probe_evidence": [
+    {
+      "attempted_at_utc": "2026-07-26T14:53:36Z",
+      "bytes": null,
+      "content_sha256": null,
+      "error_class": "TimeoutError",
+      "error_detail": "timed out",
+      "host": "www.tsetmc.com",
+      "http_status": null,
+      "machine_readable": false,
+      "resolved_ip": "46.102.143.218",
+      "source_id": "src_m2_tsetmc_market",
+      "timeout_seconds": 20,
+      "url": "http://www.tsetmc.com/"
+    },
+    {
+      "attempted_at_utc": "2026-07-26T14:53:57Z",
+      "bytes": null,
+      "content_sha256": null,
+      "error_class": "URLError",
+      "error_detail": "<urlopen error _ssl.c:1011: The handshake operation timed out>",
+      "host": "www.tsetmc.com",
+      "http_status": null,
+      "machine_readable": false,
+      "resolved_ip": "46.102.143.218",
+      "source_id": "src_m2_tsetmc_market",
+      "timeout_seconds": 20,
+      "url": "https://www.tsetmc.com/"
+    },
+    {
+      "attempted_at_utc": "2026-07-26T14:54:17Z",
+      "bytes": null,
+      "content_sha256": null,
+      "error_class": "TimeoutError",
+      "error_detail": "timed out",
+      "host": "cdn.tsetmc.com",
+      "http_status": null,
+      "machine_readable": false,
+      "resolved_ip": "46.102.143.218",
+      "source_id": "src_m2_tsetmc_market",
+      "timeout_seconds": 20,
+      "url": "http://cdn.tsetmc.com/"
+    },
+    {
+      "attempted_at_utc": "2026-07-26T14:54:37Z",
+      "bytes": null,
+      "content_sha256": null,
+      "error_class": "TimeoutError",
+      "error_detail": "timed out",
+      "host": "old.tsetmc.com",
+      "http_status": null,
+      "machine_readable": false,
+      "resolved_ip": "212.16.73.241",
+      "source_id": "src_m2_tsetmc_market",
+      "timeout_seconds": 20,
+      "url": "http://old.tsetmc.com/"
+    },
+    {
+      "attempted_at_utc": "2026-07-26T14:54:57Z",
+      "bytes": null,
+      "content_sha256": null,
+      "error_class": "TimeoutError",
+      "error_detail": "timed out",
+      "host": "tsetmc.com",
+      "http_status": null,
+      "machine_readable": false,
+      "resolved_ip": "46.102.143.218",
+      "source_id": "src_m2_tsetmc_market",
+      "timeout_seconds": 20,
+      "url": "http://tsetmc.com/tsev2/data/InstTradeHistory.aspx"
+    }
+  ],
+  "raw_cache_written": false,
+  "reproduction_note": "Rerun `python project/run_stage127_m2_market_data_gate.py --build` from an environment with egress to TSETMC. The required per-pair retrieval ranges are enumerated in stage127_m2_development_features.csv.",
+  "retrieval_environment": {
+    "egress_note": "All probes failed to reach the authoritative host from this execution environment while unrelated public hosts were reachable, and every probed hostname resolved into a single sequentially-allocated private proxy range. This is evidence about THIS environment's egress policy, not about TSETMC.",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python": "3.13.5"
+  },
+  "source_family": "TSETMC market data",
+  "source_id": "src_m2_tsetmc_market",
+  "source_universe_broadened_post_hoc": false,
+  "substitute_sources_used": []
+}
