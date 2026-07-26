@@ -1226,7 +1226,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
         "stage126-m1-robustness-part6-smote-training-fold-only"
     )
     assert state["next_research_action_id"] == (
-        "stage126-m1-retained-design-freeze"
+        "stage127-m2-market-data-gate"
     )
     assert state["active_workstream"] == "stage126_m1_financial_baseline"
     # Stage126 M1 is human-authorized and started; development-fold modeling
@@ -1276,14 +1276,15 @@ def test_real_repo_roadmap_stage126_status_consistency():
     assert fm["active_research_workstream_id"] == (
         "stage126-m1-financial-baseline"
     )
-    # Part 6 closed the six-category M1 robustness set: the completed
-    # research action and the next research action both legitimately
-    # advanced (see STAGE126_Q1Q2_LEAN_GOVERNANCE.md sections 10-11).
+    # The retained-design freeze (PR #65) completed the design-freeze action:
+    # the completed research action and the next research action both
+    # legitimately advanced once more (see
+    # STAGE126_Q1Q2_LEAN_GOVERNANCE.md sections 10-11).
     assert fm["last_completed_research_action_id"] == (
-        "stage126-m1-robustness-closure"
+        "stage126-m1-retained-design-freeze"
     )
     assert fm["next_research_action_id"] == (
-        "stage126-m1-retained-design-freeze"
+        "stage127-m2-market-data-gate"
     )
     # Isolate the Stage126 M1 research-action row (item 18) — now COMPLETE.
     match = re.search(
@@ -1322,16 +1323,24 @@ def test_real_repo_roadmap_stage126_status_consistency():
     closure_row_l = closure_match.group(1).lower()
     assert "**complete.**" in closure_row_l
 
-    # Isolate the retained-design-freeze row (item 20) — now ACTIVE, pending
-    # separate future human authorization.
+    # Isolate the retained-design-freeze row (item 20) — now COMPLETE.
     freeze_match = re.search(
         r"20\.\s*`stage126-m1-retained-design-freeze`\s*—\s*([^\n]+)",
         roadmap,
     )
     assert freeze_match is not None, "retained-design-freeze research-action row missing"
     freeze_row_l = freeze_match.group(1).lower()
-    assert "active" in freeze_row_l
-    assert "human authorization" in freeze_row_l
+    assert "**complete.**" in freeze_row_l
+
+    # Isolate the M2 market-data-gate row (item 21) — now ACTIVE, pending
+    # separate future human authorization.
+    gate_match = re.search(
+        r"21\.\s*`stage127-m2-market-data-gate`\s*—\s*([^\n]+)",
+        roadmap,
+    )
+    assert gate_match is not None, "M2 market-data-gate research-action row missing"
+    gate_row_l = gate_match.group(1).lower()
+    assert "active" in gate_row_l
 
 
 @pytest.mark.skipif(
@@ -2209,7 +2218,7 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     legitimately advanced to the closure/synthesis milestone.
     """
     state = _state(REAL_ROOT)
-    assert state["next_research_action_id"] == "stage126-m1-retained-design-freeze"
+    assert state["next_research_action_id"] == "stage127-m2-market-data-gate"
     assert state["active_workstream"] == "stage126_m1_financial_baseline"
     # The micro-part pointer tracks the newest completed robustness micro-part.
     assert state["last_completed_micro_part"] == \
@@ -2488,7 +2497,7 @@ def test_part1_does_not_advance_research_pointers():
     STAGE126_Q1Q2_LEAN_GOVERNANCE.md sections 10-11), which real-repo state
     now reflects."""
     state = _state(REAL_ROOT)
-    assert state["next_research_action_id"] == "stage126-m1-retained-design-freeze"
+    assert state["next_research_action_id"] == "stage127-m2-market-data-gate"
     assert state["active_workstream"] == "stage126_m1_financial_baseline"
     assert state["current_stage"] == "Stage126"
 
@@ -2688,7 +2697,7 @@ def test_handoff_carries_live_vs_historical_test_boundary_markers():
     )
     assert state["m1_robustness_part4_authorized"] is False
     assert state["final_test_unlocked"] is False
-    assert state["next_research_action_id"] == "stage126-m1-retained-design-freeze"
+    assert state["next_research_action_id"] == "stage127-m2-market-data-gate"
     # Stage125 Part 5 stays historical and immutable.
     assert state["stage125_part5_mode"] == "historical_immutable"
     assert state["stage125_part5_live_gate_active"] is False
@@ -2742,7 +2751,7 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # The workstream pointer stays put; the research-action pointer legitimately
     # advanced because Part 6 closed the six-category robustness set.
     assert state["active_workstream"] == "stage126_m1_financial_baseline"
-    assert state["next_research_action_id"] == "stage126-m1-retained-design-freeze"
+    assert state["next_research_action_id"] == "stage127-m2-market-data-gate"
 
 
 def test_part5_compatibility_markers_absent_without_artifacts(tmp_path):
@@ -2794,7 +2803,7 @@ def test_current_state_labels_micro_part_not_research_action():
     assert "Last completed research action" not in text, (
         "a robustness micro-part must never be labelled a research action"
     )
-    assert "- **Next research action:** `stage126-m1-retained-design-freeze`" in text
+    assert "- **Next research action:** `stage127-m2-market-data-gate`" in text
 
 
 # --------------------------------------------------------------------------- #

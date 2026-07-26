@@ -591,11 +591,12 @@ def test_final_test_remains_locked():
 def test_research_pointers_unchanged():
     report = _read_json(v.F_REPORT)
     assert report["active_workstream"] == "stage126_m1_financial_baseline"
-    # Part 6 closed the six-category robustness set, and the synthesis-only
-    # robustness closure has since completed: the next research action
-    # legitimately transitioned to the retained-design-freeze milestone
-    # (which itself still requires a separate future human authorization).
-    assert report["next_research_action_id"] == "stage126-m1-retained-design-freeze"
+    # Part 6 closed the six-category robustness set, the synthesis-only
+    # robustness closure completed, and the retained-design freeze (PR #65)
+    # has since also completed: the next research action legitimately
+    # transitioned once more to the M2 market-data-gate milestone (which
+    # itself still requires a separate future human authorization).
+    assert report["next_research_action_id"] == "stage127-m2-market-data-gate"
 
 
 @pytest.mark.parametrize("field", sorted(

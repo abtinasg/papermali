@@ -6,15 +6,20 @@ front matter; this file is the working description.
 ## Active research workstream: `stage126-m1-financial-baseline`
 
 Authoritative research pointers live in `ROADMAP.md` front matter:
-`last_completed_research_action_id=stage126-m1-robustness-closure`,
-`next_research_action_id=stage126-m1-retained-design-freeze`
+`last_completed_research_action_id=stage126-m1-retained-design-freeze`,
+`next_research_action_id=stage127-m2-market-data-gate`
 (primary M1 development-fold tuning completed on PR #52; all six registered
-M1 robustness categories are complete; `stage126-m1-robustness-closure` has
-now synthesized the six robustness results and closed the robustness set —
-no retuning, no final-test access, no automatic winner selection, no
-retained design selected or frozen. Next action
-`stage126-m1-retained-design-freeze` requires separate, explicit, future
-human authorization).
+M1 robustness categories are complete; `stage126-m1-robustness-closure`
+synthesized the six robustness results and closed the robustness set; and
+`stage126-m1-retained-design-freeze` (PR #65) has now recorded and frozen the
+retained M1 design — sample/target/9-feature order/preprocessing/three
+retained model configurations/class-weighting policy/temporal folds/metric
+definitions/uncertainty and multiplicity plans — from already-completed
+development and robustness evidence only. No model was fit or predicted, no
+retuning, no final-test access, no full-development refit, no paper-winner or
+final-model selection, and no M2/M3/M4 work of any kind. Next action
+`stage127-m2-market-data-gate` requires separate, explicit, future human
+authorization; it has not started).
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
 Part 3B.1E is the decision-lock surface for the conservative-lag research
 action; Part 3C is the operationalization / leakage-safe dataset surface;

@@ -434,10 +434,59 @@ def robustness_closure_completed(repo_root: Path) -> bool:
     return all(lock.get(k) == v for k, v in required.items())
 
 
+# Once the retained-design freeze itself has also completed, the next
+# legitimate ROADMAP research action advances once more, to the M2
+# market-data gate. That gate still requires a SEPARATE, future, explicit
+# human authorization -- this validator never grants it, and never marks
+# M2 as started.
+NEXT_RESEARCH_ACTION_ID_AFTER_RETAINED_DESIGN_FREEZE = (
+    "stage127-m2-market-data-gate"
+)
+RETAINED_DESIGN_FREEZE_REL = (
+    f"{STAGE126_DIR_REL}/stage126_m1_retained_design_freeze.json"
+)
+
+
+def retained_design_freeze_completed(repo_root: Path) -> bool:
+    """Narrow, fail-closed recognition of the M1 retained-design freeze.
+
+    Mirrors ``robustness_closure_completed`` above: only returns True when
+    the freeze artifact exists and its exact required ``status_flags`` hold.
+    Never itself authorizes M2, a full-development refit or final-test access.
+    """
+    path = repo_root / RETAINED_DESIGN_FREEZE_REL
+    if not path.is_file():
+        return False
+    try:
+        freeze = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    if freeze.get("decision_id") != "stage126-m1-retained-design-freeze":
+        return False
+    sf = freeze.get("status_flags") or {}
+    required = {
+        "retained_design_freeze_completed": True,
+        "paper_winner_selected": False,
+        "final_model_selected": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_performed": False,
+        "m2_started": False,
+    }
+    return all(sf.get(k) == v for k, v in required.items())
+
+
 def expected_next_research_action_id(
     repo_root: Path, m1_robustness_completed: bool,
 ) -> str:
     """The single source of truth for the current expected research pointer."""
+    if (
+        m1_robustness_completed
+        and robustness_closure_completed(repo_root)
+        and retained_design_freeze_completed(repo_root)
+    ):
+        return NEXT_RESEARCH_ACTION_ID_AFTER_RETAINED_DESIGN_FREEZE
     if m1_robustness_completed and robustness_closure_completed(repo_root):
         return NEXT_RESEARCH_ACTION_ID_AFTER_ROBUSTNESS_CLOSURE
     if m1_robustness_completed:

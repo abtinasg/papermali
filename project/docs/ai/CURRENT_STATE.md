@@ -10,10 +10,10 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Stage / Batch:** Stage126 / None
 - **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `stage126-m1-retained-design-freeze`
-- **Last stage commit:** `015aa7d220d1f394880e4f1df01852c8ab63cb45`
-- **Generated from commit:** `015aa7d220d1f394880e4f1df01852c8ab63cb45` (branch `stage126-m1-robustness-closure`, informational)
-- **Baseline:** `origin/main` @ `7288cc7cd299a3d9f6eee6ef59ae50754fb7f9cf`
+- **Next research action:** `stage127-m2-market-data-gate`
+- **Last stage commit:** `aa4a02d90e122d3895944ab7d0978b0c509bb026`
+- **Generated from commit:** `aa4a02d90e122d3895944ab7d0978b0c509bb026` (branch `work-freeze-fix`, informational)
+- **Baseline:** `origin/main` @ `018a489ea0427ce764f06a512137cae4d29ad91d`
 
 ## Current-state validation
 
@@ -68,5 +68,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `2ff40f5ed4c8cd68a0595e8f23c1830e9ae2022ac91cdc98449de0cd37fdcbbc`_
-_generated_at_utc: 2026-07-26T09:02:46Z (informational)_
+_state_fingerprint: `7e8053e4dccc889fe6378fc84f18af8bb3302a7b053dd09a9de22fb3dfd3c38e`_
+_generated_at_utc: 2026-07-26T11:51:24Z (informational)_
