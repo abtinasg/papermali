@@ -67,11 +67,17 @@ ALLOWLIST_DIRS = (
     "project/stage125/",
     # Stage126 M1 primary development-fold tuning deliverables.
     "project/stage126/",
+    # Stage127 M2 market-data admission Gate deliverables.
+    "project/stage127/",
 )
 ALLOWLIST_FILES = (
     "project/scripts/update_ai_handoff.py",
     "project/scripts/validate_ai_handoff.py",
     "project/tests/test_ai_handoff.py",
+    # Stage127 M2 market-data admission Gate code, runner, and tests.
+    "project/src/stage127_m2_market_data_gate.py",
+    "project/run_stage127_m2_market_data_gate.py",
+    "project/tests/test_stage127_m2_market_data_gate.py",
     # Stage125 Part 1 code, runner, and tests (maintenance task).
     "project/src/stage125_part1_data_contract.py",
     "project/run_stage125_part1.py",
