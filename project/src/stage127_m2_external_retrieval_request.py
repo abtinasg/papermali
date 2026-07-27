@@ -82,11 +82,16 @@ MAPPING_TEMPLATE_COLUMNS: tuple[str, ...] = (
     "mapping_note",
 )
 
+#: RANGE-level, not ticker-level. A ticker with two disjoint authorized ranges
+#: (e.g. `شکلر`) must produce two manifest rows, each with its own retrieval
+#: status, so a partial failure in one range cannot be masked by success in the
+#: other. ``range_id`` is therefore the leading key.
 MANIFEST_TEMPLATE_COLUMNS: tuple[str, ...] = (
-    "requested_ticker", "tsetmc_instrument_id", "requested_start_date",
-    "requested_end_date", "first_returned_date", "last_returned_date",
-    "rows_retrieved", "retrieval_status", "source_endpoint",
-    "retrieved_at_utc", "raw_response_file", "raw_response_sha256", "notes",
+    "range_id", "requested_ticker", "tsetmc_instrument_id",
+    "requested_start_date", "requested_end_date", "first_returned_date",
+    "last_returned_date", "rows_retrieved", "retrieval_status",
+    "source_endpoint", "retrieved_at_utc", "raw_response_file",
+    "raw_response_sha256", "notes",
 )
 
 ALLOWED_MAPPING_STATUS: tuple[str, ...] = ("MATCHED", "UNRESOLVED")
@@ -246,7 +251,48 @@ def build_request_manifest(
     }
 
 
-def build_external_readme(manifest: dict[str, Any]) -> str:
+def tickers_with_multiple_ranges(ranges: list[dict[str, Any]]) -> list[str]:
+    """Tickers whose authorized retrieval is split across disjoint ranges.
+
+    Derived from the generated plan, never hardcoded, so the README example
+    stays correct if the frozen development set ever changes.
+    """
+    counts: dict[str, int] = {}
+    for r in ranges:
+        counts[r["ticker"]] = counts.get(r["ticker"], 0) + 1
+    return sorted(t for t, n in counts.items() if n > 1)
+
+
+def build_external_readme(
+    manifest: dict[str, Any], ranges: list[dict[str, Any]],
+) -> str:
+    multi = tickers_with_multiple_ranges(ranges)
+    gap_count = len(multi)
+    listed = ", ".join(f"`{t}`" for t in multi)
+    if gap_count == 1:
+        gap_sentence = (
+            f"One ticker ({listed}) has **two** authorized ranges rather than "
+            "one, so the manifest has one more row than there are tickers."
+        )
+        gap_note = (
+            f"**{listed}** has **two separate authorized ranges** and must "
+            "therefore appear as **two distinct manifest rows**."
+        )
+    elif gap_count > 1:
+        gap_sentence = (
+            f"{gap_count} tickers ({listed}) have more than one authorized "
+            "range, so the manifest has more rows than there are tickers."
+        )
+        gap_note = (
+            "These tickers have **more than one authorized range** and must "
+            f"appear as one manifest row per range: {listed}."
+        )
+    else:
+        gap_sentence = "Each ticker has exactly one authorized range."
+        gap_note = (
+            "Every ticker here has exactly one authorized range, so each "
+            "appears once."
+        )
     return f"""# TSETMC historical daily data — retrieval request
 
 You do **not** need to know anything about the project this request comes from.
@@ -286,7 +332,15 @@ Scale: **{manifest['pair_count']} requests**, **{manifest['ticker_count']} ticke
 ## What to return
 
 Fill these three files (headers are fixed — do not rename, reorder or add
-columns):
+columns). Note the different granularity of each:
+
+| file | one row per |
+|---|---|
+| `{DAILY_TEMPLATE_CSV}` | ticker × trading day |
+| `{MAPPING_TEMPLATE_CSV}` | **requested ticker** ({manifest['ticker_count']} rows) |
+| `{MANIFEST_TEMPLATE_CSV}` | **retrieval range / `range_id`** ({manifest['ticker_range_count']} rows) |
+
+{gap_sentence}
 
 ### 1. `{DAILY_TEMPLATE_CSV}` — one row per ticker per trading day
 
@@ -308,17 +362,42 @@ Key fields:
 
 ### 2. `{MAPPING_TEMPLATE_CSV}` — one row per requested ticker
 
+This file **is** per ticker ({manifest['ticker_count']} rows), unlike the
+manifest below. A ticker with two retrieval ranges still gets only **one**
+mapping row, because it is still one company mapped to one instrument.
+
 How each requested ticker maps to a TSETMC instrument (`tsetmc_instrument_id` /
 InsCode, ISIN, official company name), with the evidence you used.
 
 `mapping_status` must be exactly one of: {" or ".join(f"`{s}`" for s in ALLOWED_MAPPING_STATUS)}.
 
-### 3. `{MANIFEST_TEMPLATE_CSV}` — one row per requested ticker
+### 3. `{MANIFEST_TEMPLATE_CSV}` — one row per **retrieval range**
 
-What you actually retrieved: requested vs returned date span, row count, and
-status.
+**This file is per `range_id`, not per ticker.** Read this carefully — it is the
+easiest part of the request to get wrong.
+
+- Take every `range_id` from `{TICKER_RANGES_CSV}` and give it **exactly one**
+  row here. There are **{manifest['ticker_range_count']} range_ids** across
+  **{manifest['ticker_count']} tickers**, so the finished manifest has
+  **{manifest['ticker_range_count']} rows**.
+- `range_id` is the first column. Copy it verbatim, along with that range's
+  `requested_start_date` and `requested_end_date`.
+- **Do not merge two ranges of the same ticker into one row**, even though they
+  share a ticker and instrument id.
+- {gap_note} Its ranges are separated by a deliberate gap: we do not want the
+  data in between, so please do not fill the gap in and please do not stretch
+  one range to cover both.
+- `retrieval_status` is judged **separately for each range**. One range may be
+  `SUCCESS` while another range of the same ticker is `PARTIAL` or `FAILED`.
+  That is expected and useful — please do not average or combine them.
+
+Record what you actually retrieved: requested vs returned date span, row count,
+and status.
 
 `retrieval_status` must be exactly one of: {", ".join(f"`{s}`" for s in ALLOWED_RETRIEVAL_STATUS)}.
+
+Use `UNRESOLVED_MAPPING` when the ticker could not be mapped to a TSETMC
+instrument at all (its mapping row should then also be `UNRESOLVED`).
 
 ## Rules that matter most
 
@@ -370,7 +449,7 @@ Also please do not extend the requested date ranges "to be helpful."
 
 1. 10-20 normalized daily rows in the `{DAILY_TEMPLATE_CSV}` format
 2. the matching mapping rows
-3. the matching retrieval manifest rows
+3. the matching retrieval manifest rows (one per `range_id` covered)
 4. one raw response file
 5. a short note on which endpoint(s) and fields you used
 6. a short explanation of how you produced `adjusted_close`
@@ -403,7 +482,7 @@ def build_all(repo_root: str) -> dict[str, str]:
 
     hashes = {name: gate.sha256_text(text) for name, text in sorted(files.items())}
     manifest = build_request_manifest(repo_root, requests, ranges, hashes)
-    readme = build_external_readme(manifest)
+    readme = build_external_readme(manifest, ranges)
     manifest["package_files_sha256"][EXTERNAL_README] = gate.sha256_text(readme)
 
     files[EXTERNAL_README] = readme

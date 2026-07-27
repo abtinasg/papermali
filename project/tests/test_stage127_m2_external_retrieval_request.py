@@ -281,6 +281,119 @@ def test_manifest_template_headers_exact():
     assert _headers(ext.MANIFEST_TEMPLATE_CSV) == list(ext.MANIFEST_TEMPLATE_COLUMNS)
 
 
+# --------------------------------------------------------------------------- #
+# Retrieval manifest is RANGE-level, not ticker-level
+# --------------------------------------------------------------------------- #
+
+def test_manifest_template_is_range_keyed():
+    headers = _headers(ext.MANIFEST_TEMPLATE_CSV)
+    assert headers[0] == "range_id", "range_id must be the leading key"
+    assert headers == [
+        "range_id", "requested_ticker", "tsetmc_instrument_id",
+        "requested_start_date", "requested_end_date", "first_returned_date",
+        "last_returned_date", "rows_retrieved", "retrieval_status",
+        "source_endpoint", "retrieved_at_utc", "raw_response_file",
+        "raw_response_sha256", "notes",
+    ]
+
+
+def test_retrieval_plan_has_111_unique_range_ids(ranges_rows):
+    ids = [r["range_id"] for r in ranges_rows]
+    assert len(ids) == 111
+    assert len(set(ids)) == len(ids)
+
+
+def test_range_count_exceeds_ticker_count_because_of_disjoint_ranges(ranges_rows):
+    tickers = {r["ticker"] for r in ranges_rows}
+    assert len(tickers) == EXPECTED_TICKERS
+    assert len(ranges_rows) > len(tickers), (
+        "a ticker-level manifest would silently drop a disjoint range"
+    )
+
+
+def test_every_range_belongs_to_exactly_one_ticker(ranges_rows):
+    for r in ranges_rows:
+        assert r["ticker"].strip()
+    by_id = {r["range_id"]: r["ticker"] for r in ranges_rows}
+    assert len(by_id) == len(ranges_rows)
+
+
+def test_shekelr_has_two_distinct_authorized_ranges(ranges_rows):
+    multi = ext.tickers_with_multiple_ranges(ranges_rows)
+    assert multi == ["شکلر"]
+    rows = sorted(
+        (r for r in ranges_rows if r["ticker"] == "شکلر"),
+        key=lambda r: r["requested_start_date"],
+    )
+    assert len(rows) == 2
+    assert len({r["range_id"] for r in rows}) == 2
+    # The two ranges must not touch: a real gap separates them.
+    assert rows[0]["requested_end_date"] < rows[1]["requested_start_date"]
+
+
+def test_disjoint_ranges_of_one_ticker_stay_separate_range_ids():
+    reqs = [
+        {"ticker": "X", "requested_start_date": "2013-01-01",
+         "requested_end_date": "2013-06-01"},
+        {"ticker": "X", "requested_start_date": "2019-01-01",
+         "requested_end_date": "2019-06-01"},
+    ]
+    ranges = ext.merge_ticker_ranges(reqs)
+    assert len({r["range_id"] for r in ranges}) == 2
+    assert ext.tickers_with_multiple_ranges(ranges) == ["X"]
+
+
+def test_readme_defines_manifest_as_one_row_per_range_not_per_ticker():
+    readme = open(os.path.join(EXT_DIR, ext.EXTERNAL_README), encoding="utf-8").read()
+    manifest_section = readme.split("### 3.")[1].split("## Rules")[0]
+    assert "per `range_id`, not per ticker" in manifest_section
+    assert "111 range_ids" in manifest_section
+    assert "111 rows" in manifest_section
+    assert "Do not merge two ranges of the same ticker" in manifest_section
+    assert "شکلر" in manifest_section
+    assert "two distinct manifest rows" in manifest_section
+    assert "separately for each range" in manifest_section
+
+
+def test_readme_keeps_mapping_file_ticker_level():
+    readme = open(os.path.join(EXT_DIR, ext.EXTERNAL_README), encoding="utf-8").read()
+    mapping_section = readme.split("### 2.")[1].split("### 3.")[0]
+    heading = mapping_section.splitlines()[0]
+    assert "one row per requested ticker" in heading
+    assert "only **one**" in mapping_section
+
+
+def test_readme_states_each_return_file_granularity():
+    readme = open(os.path.join(EXT_DIR, ext.EXTERNAL_README), encoding="utf-8").read()
+    assert "| file | one row per |" in readme
+    assert "**retrieval range / `range_id`** (111 rows)" in readme
+    assert "**requested ticker** (110 rows)" in readme
+
+
+def test_mapping_template_remains_ticker_level_schema():
+    # The mapping schema must NOT acquire range_id.
+    assert "range_id" not in ext.MAPPING_TEMPLATE_COLUMNS
+    assert _headers(ext.MAPPING_TEMPLATE_CSV)[0] == "requested_ticker"
+
+
+def test_daily_template_schema_unchanged():
+    # range_id in the daily file is optional and was deliberately not added:
+    # ticker + trading_date + manifest/raw provenance is already unambiguous
+    # because a ticker's authorized ranges never overlap in time.
+    assert "range_id" not in ext.DAILY_TEMPLATE_COLUMNS
+    assert _headers(ext.DAILY_TEMPLATE_CSV) == list(ext.DAILY_TEMPLATE_COLUMNS)
+
+
+def test_no_final_test_range_introduced_by_the_range_level_manifest(ranges_rows):
+    for r in ranges_rows:
+        assert date.fromisoformat(r["requested_end_date"]) < FINAL_TEST_PERIOD_START
+        assert date.fromisoformat(r["requested_start_date"]) < FINAL_TEST_PERIOD_START
+
+
+def test_manifest_json_range_count_matches_the_plan(manifest, ranges_rows):
+    assert manifest["ticker_range_count"] == len(ranges_rows) == 111
+
+
 @pytest.mark.parametrize("name", [
     ext.DAILY_TEMPLATE_CSV, ext.MAPPING_TEMPLATE_CSV, ext.MANIFEST_TEMPLATE_CSV,
 ])

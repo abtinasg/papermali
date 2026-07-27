@@ -40,11 +40,11 @@
   "imputation_authorized": false,
   "m2_data_collected": false,
   "package_files_sha256": {
-    "README_STAGE127_M2_EXTERNAL_TSETMC_RETRIEVAL.md": "b5b571a0ff384217a3d5ee4d21b560dbe634bb7d3f65ca89182ae0e870cf4195",
+    "README_STAGE127_M2_EXTERNAL_TSETMC_RETRIEVAL.md": "338e56bbcb2492aa81c1fd3e01f0bfd6863d1c7f4abad89cb5baaa817968052c",
     "stage127_m2_external_retrieval_request.csv": "12ff66a1c89899afb7f0ca8018a5cd49c9d592d173138ff8b04a64492cd42747",
     "stage127_m2_external_retrieval_ticker_ranges.csv": "4b9cfef4c3543abfcae1d3d660c9415ac3a83711dea1094998ea9c2bce5ef374",
     "stage127_m2_external_return_daily_template.csv": "e079c8f85e9f542991a705e0af72847dbbb8b838172cbaaff1d2085f1b658a37",
-    "stage127_m2_external_return_manifest_template.csv": "31bbde5736e7d39b2818d7645afb87bb3bd8d4ff3eb98473305572f577722ab2",
+    "stage127_m2_external_return_manifest_template.csv": "1ab0ad924a274afc7fe6b939ad2e0aabc526b6dfd213e00a01ae4c4a452145d0",
     "stage127_m2_external_return_mapping_template.csv": "169d965a1e806826d4afffe890221d6f0d52b5da6a94b0303489c9fa4e227dc5"
   },
   "pair_count": 666,

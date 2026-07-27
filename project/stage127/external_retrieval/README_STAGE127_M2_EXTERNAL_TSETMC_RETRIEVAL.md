@@ -37,7 +37,15 @@ Scale: **666 requests**, **110 tickers**,
 ## What to return
 
 Fill these three files (headers are fixed — do not rename, reorder or add
-columns):
+columns). Note the different granularity of each:
+
+| file | one row per |
+|---|---|
+| `stage127_m2_external_return_daily_template.csv` | ticker × trading day |
+| `stage127_m2_external_return_mapping_template.csv` | **requested ticker** (110 rows) |
+| `stage127_m2_external_return_manifest_template.csv` | **retrieval range / `range_id`** (111 rows) |
+
+One ticker (`شکلر`) has **two** authorized ranges rather than one, so the manifest has one more row than there are tickers.
 
 ### 1. `stage127_m2_external_return_daily_template.csv` — one row per ticker per trading day
 
@@ -59,17 +67,42 @@ Key fields:
 
 ### 2. `stage127_m2_external_return_mapping_template.csv` — one row per requested ticker
 
+This file **is** per ticker (110 rows), unlike the
+manifest below. A ticker with two retrieval ranges still gets only **one**
+mapping row, because it is still one company mapped to one instrument.
+
 How each requested ticker maps to a TSETMC instrument (`tsetmc_instrument_id` /
 InsCode, ISIN, official company name), with the evidence you used.
 
 `mapping_status` must be exactly one of: `MATCHED` or `UNRESOLVED`.
 
-### 3. `stage127_m2_external_return_manifest_template.csv` — one row per requested ticker
+### 3. `stage127_m2_external_return_manifest_template.csv` — one row per **retrieval range**
 
-What you actually retrieved: requested vs returned date span, row count, and
-status.
+**This file is per `range_id`, not per ticker.** Read this carefully — it is the
+easiest part of the request to get wrong.
+
+- Take every `range_id` from `stage127_m2_external_retrieval_ticker_ranges.csv` and give it **exactly one**
+  row here. There are **111 range_ids** across
+  **110 tickers**, so the finished manifest has
+  **111 rows**.
+- `range_id` is the first column. Copy it verbatim, along with that range's
+  `requested_start_date` and `requested_end_date`.
+- **Do not merge two ranges of the same ticker into one row**, even though they
+  share a ticker and instrument id.
+- **`شکلر`** has **two separate authorized ranges** and must therefore appear as **two distinct manifest rows**. Its ranges are separated by a deliberate gap: we do not want the
+  data in between, so please do not fill the gap in and please do not stretch
+  one range to cover both.
+- `retrieval_status` is judged **separately for each range**. One range may be
+  `SUCCESS` while another range of the same ticker is `PARTIAL` or `FAILED`.
+  That is expected and useful — please do not average or combine them.
+
+Record what you actually retrieved: requested vs returned date span, row count,
+and status.
 
 `retrieval_status` must be exactly one of: `SUCCESS`, `PARTIAL`, `FAILED`, `UNRESOLVED_MAPPING`.
+
+Use `UNRESOLVED_MAPPING` when the ticker could not be mapped to a TSETMC
+instrument at all (its mapping row should then also be `UNRESOLVED`).
 
 ## Rules that matter most
 
@@ -121,7 +154,7 @@ Also please do not extend the requested date ranges "to be helpful."
 
 1. 10-20 normalized daily rows in the `stage127_m2_external_return_daily_template.csv` format
 2. the matching mapping rows
-3. the matching retrieval manifest rows
+3. the matching retrieval manifest rows (one per `range_id` covered)
 4. one raw response file
 5. a short note on which endpoint(s) and fields you used
 6. a short explanation of how you produced `adjusted_close`
