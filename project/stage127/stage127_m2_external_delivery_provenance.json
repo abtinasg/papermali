@@ -11,7 +11,7 @@
   "delivered_request_matches_canonical": true,
   "external_qc_flag_trusted": false,
   "gate_module_sha256": "3088009bee31b29b5aacf0ff0bc72d703ad215f246ced13b4e1a10d9ce73f5f3",
-  "importer_module_sha256": "657cd13926318a3574f58d15f50c1490d173ea5ba7a3e6110ceba6f937cd9abe",
+  "importer_module_sha256": "fe03e988a29f1e24690649e948d7d1a073c811c686ecd30a0dcc39a3ab35b032",
   "independent_revalidation_performed_in": "project/src/stage127_m2_external_delivery_import.py",
   "market_data_period_expanded": false,
   "preserved_delivery_components": [

@@ -1,6 +1,6 @@
 {
   "authoritative_source_only": true,
-  "code_revision": "3e8e767ae64038f14f698f8bbf27121e28c48d15",
+  "code_revision": "af0b0126019ef3ac626c16e6a85b06b1efcc4fbe",
   "distinct_endpoint_urls_in_delivery": 220,
   "endpoint_families_observed_in_delivery": {
     "adjusted_price_history": "members.tsetmc.com/tsev2/chart/data/Financial.aspx",
@@ -36,7 +36,7 @@
   "observation_date_min": "2012-09-22",
   "observations_imported": 163230,
   "parser_module": "project/src/stage127_m2_external_delivery_import.py",
-  "parser_module_sha256": "657cd13926318a3574f58d15f50c1490d173ea5ba7a3e6110ceba6f937cd9abe",
+  "parser_module_sha256": "fe03e988a29f1e24690649e948d7d1a073c811c686ecd30a0dcc39a3ab35b032",
   "partial_ranges_preserved_as_delivered": {
     "RNG0008": "ثشرق",
     "RNG0010": "جم",
