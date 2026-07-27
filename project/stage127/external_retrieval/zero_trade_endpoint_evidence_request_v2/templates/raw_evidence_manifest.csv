@@ -1,0 +1,1 @@
+evidence_artifact_id,unique_request_id,ticker,InsCode,endpoint_date,evidence_type,source_endpoint,retrieval_status,retrieved_at_utc,raw_response_file,raw_response_sha256,parent_full_response_sha256,bounded_response,notes

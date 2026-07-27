@@ -1,0 +1,1 @@
+identity_evidence_id,ticker,current_InsCode,current_ISIN,candidate_historical_InsCode,candidate_historical_ISIN,candidate_valid_from,candidate_valid_to,source_endpoint,raw_response_file,raw_response_sha256,evidence_status,notes

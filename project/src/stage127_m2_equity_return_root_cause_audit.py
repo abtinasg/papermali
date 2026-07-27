@@ -64,16 +64,16 @@ RECOVERABLE_CATEGORIES = {
     CAT_RAW_TRADE_ADJUSTED_MISSING,
     CAT_OTHER_PROVEN_DEFECT,
 }
-#: F and G are the only categories the CURRENT bundle evidence can actually
-#: establish as final: F requires a resolved trading-day determination (not
-#: yet available -- see CAT_ZERO_TRADE_ENDPOINT), so it is never assigned by
-#: this module today; G (fewer than 126 valid returns with both endpoints
-#: otherwise present) follows directly from the frozen 126-observation rule
-#: and is not in question here.
+#: F is the only category the CURRENT bundle evidence can actually establish
+#: as final today (it requires a resolved trading-day determination, not yet
+#: available -- see CAT_ZERO_TRADE_ENDPOINT -- so it is never assigned by this
+#: module today). G (fewer than 126 valid returns) is deliberately NOT listed
+#: here unconditionally: whether a <126 pair is truly nonrecoverable depends
+#: on the same zero-trade-day trading-day semantics question, so it is split
+#: per pair by build_summary() using the low-return upper-bound audit instead.
 NONRECOVERABLE_CATEGORIES = {
     CAT_HISTORY_START_OR_LISTING_LIMIT,
     CAT_TRUE_MISSING_ADJUSTED,
-    CAT_FEWER_THAN_126_ONLY,
 }
 #: Cases whose classification requires authoritative TSETMC evidence this
 #: repository does not have and cannot fetch from this environment. Neither
@@ -81,6 +81,23 @@ NONRECOVERABLE_CATEGORIES = {
 PENDING_EXTERNAL_ADJUDICATION_CATEGORIES = {
     CAT_ZERO_TRADE_ENDPOINT,
 }
+
+# --------------------------------------------------------------------------- #
+# Low-return semantics upper bound (BLOCKER 1)
+# --------------------------------------------------------------------------- #
+
+#: A <126-return pair whose PRICED observation count alone -- i.e. even under
+#: the most favorable hypothetical where every zero-trade row is excluded from
+#: the trading-day sequence entirely -- cannot reach 126 valid returns. This
+#: is a mathematical ceiling, not evidence about what a zero-trade row means;
+#: it is true regardless of how the pending semantics question resolves.
+CAT_GUARANTEED_LT126 = "GUARANTEED_LT126_EVEN_IF_ALL_ZERO_TRADE_ROWS_EXCLUDED"
+#: The 126-return outcome for this pair depends on whether zero-trade rows are
+#: proven to be non-trading days. Never treated as recoverable -- only as
+#: pending the same external adjudication as the endpoint cases.
+CAT_PENDING_LOW_RETURN_SEMANTICS = (
+    "POTENTIALLY_RECOVERABLE_PENDING_ZERO_TRADE_DAY_SEMANTICS"
+)
 
 PARTIAL_RANGE_TICKERS: dict[str, str] = dict(imp.EXPECTED_PARTIAL_RANGES)
 
@@ -185,6 +202,17 @@ class RootCauseAudit:
                 if d > best:
                     best = d
         return best
+
+    def is_zero_trade_raw(self, ticker: str, iso: str) -> bool | None:
+        """True/False from raw evidence (qTotCap==0 and zTotTran==0); None if
+        no raw observation exists at all for this ticker/date."""
+        _rid, raw = self.raw_at(ticker, iso)
+        if raw is None:
+            return None
+        return (
+            float(raw.get("qTotCap") or 0) == 0
+            and float(raw.get("zTotTran") or 0) == 0
+        )
 
 
 def _endpoint_evidence(
@@ -487,13 +515,82 @@ def build_low_return_rows(
     return rows
 
 
+def build_low_return_upper_bound_rows(
+    audit: RootCauseAudit, main_rows: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """For all 90 <126-return pairs: is <126 mathematically guaranteed?
+
+    Recomputed independently from raw evidence (qTotCap/zTotTran per window
+    observation), not from the already-derived ``missing_price_day_count``
+    field, so this audit cannot silently inherit an upstream assumption.
+
+    ``max_possible_valid_returns_if_all_zero_trade_rows_are_non_trading =
+    priced_observation_count - 1`` is a pure ceiling on consecutive valid
+    returns if EVERY zero-trade row were excluded from the trading-day
+    sequence entirely. It never asserts that this is the correct semantics --
+    only whether the pair's outcome depends on that open question.
+    """
+    rows: list[dict[str, Any]] = []
+    for r in main_rows:
+        cnt = r["usable_daily_return_count"]
+        if cnt == "" or cnt is None:
+            continue
+        if int(cnt) >= gate.MIN_VALID_RETURN_OBSERVATIONS:
+            continue
+
+        ticker, cutoff = r["ticker"], r["pair_cutoff_date"]
+        obs = audit.observations.get(ticker, [])
+        win = gate.pair_scientific_window(cutoff, obs)
+        window = win.get("window", [])
+
+        zero_trade = 0
+        priced = 0
+        for o in window:
+            z = audit.is_zero_trade_raw(ticker, o["trading_date"])
+            if z:
+                zero_trade += 1
+            if o["adjusted_close"] is not None:
+                priced += 1
+
+        max_possible = priced - 1 if priced > 0 else 0
+        classification = (
+            CAT_GUARANTEED_LT126 if max_possible < gate.MIN_VALID_RETURN_OBSERVATIONS
+            else CAT_PENDING_LOW_RETURN_SEMANTICS
+        )
+        rows.append({
+            "ticker": ticker,
+            "fiscal_year_t": r["fiscal_year_t"],
+            "target_year": r["target_year"],
+            "window_observation_count": len(window),
+            "zero_trade_day_count": zero_trade,
+            "priced_observation_count": priced,
+            "current_valid_return_count": int(cnt),
+            "max_possible_valid_returns_if_all_zero_trade_rows_are_non_trading": (
+                max_possible),
+            "current_endpoint_requirements_pass": bool(
+                r["t0_adjusted_close_present"]
+                and r["t_star_adjusted_close_present"]
+            ),
+            "classification": classification,
+        })
+    return rows
+
+
 # --------------------------------------------------------------------------- #
 # Summary
 # --------------------------------------------------------------------------- #
 
 def build_summary(
-    audit: RootCauseAudit, rows: list[dict[str, Any]],
+    audit: RootCauseAudit,
+    rows: list[dict[str, Any]],
+    upper_bound_rows: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
+    upper_bound_rows = upper_bound_rows or []
+    upper_bound_by_key = {
+        (u["ticker"], u["target_year"]): u["classification"]
+        for u in upper_bound_rows
+    }
+
     unavailable = [r for r in rows if not r["equity_return_window_usable"]]
     usable = [r for r in rows if r["equity_return_window_usable"]]
 
@@ -502,10 +599,23 @@ def build_summary(
         c = r["primary_root_cause"] or CAT_UNRESOLVED
         root_cause_counts[c] = root_cause_counts.get(c, 0) + 1
 
+    def _low_return_class(r: dict[str, Any]) -> str | None:
+        if r["primary_root_cause"] != CAT_FEWER_THAN_126_ONLY:
+            return None
+        return upper_bound_by_key.get((r["ticker"], r["target_year"]))
+
+    guaranteed_low_return = sum(
+        1 for r in unavailable if _low_return_class(r) == CAT_GUARANTEED_LT126
+    )
+    pending_low_return = sum(
+        1 for r in unavailable
+        if _low_return_class(r) == CAT_PENDING_LOW_RETURN_SEMANTICS
+    )
+
     recoverable = sum(
         1 for r in unavailable if r["primary_root_cause"] in RECOVERABLE_CATEGORIES
     )
-    nonrecoverable = sum(
+    nonrecoverable = guaranteed_low_return + sum(
         1 for r in unavailable
         if r["primary_root_cause"] in NONRECOVERABLE_CATEGORIES
     )
@@ -513,11 +623,13 @@ def build_summary(
         1 for r in unavailable
         if r["primary_root_cause"] in PENDING_EXTERNAL_ADJUDICATION_CATEGORIES
     )
+    pending_total = pending_external + pending_low_return
     unresolved = sum(
         1 for r in unavailable
         if r["primary_root_cause"] not in RECOVERABLE_CATEGORIES
         and r["primary_root_cause"] not in NONRECOVERABLE_CATEGORIES
         and r["primary_root_cause"] not in PENDING_EXTERNAL_ADJUDICATION_CATEGORIES
+        and _low_return_class(r) is None
     )
 
     missing_t0 = sum(1 for r in rows if not r["t0_adjusted_close_present"] and r["t0_trading_date"])
@@ -586,18 +698,40 @@ def build_summary(
         "root_cause_counts": dict(sorted(root_cause_counts.items())),
         "recoverable_due_to_proven_data_capture_defect": recoverable,
         "nonrecoverable_under_current_frozen_contract": nonrecoverable,
-        "pending_external_tsetmc_adjudication_count": pending_external,
+        "nonrecoverable_breakdown": {
+            "guaranteed_lt126_even_if_all_zero_trade_rows_excluded": (
+                guaranteed_low_return),
+            "other_proven_nonrecoverable_categories": nonrecoverable
+            - guaranteed_low_return,
+        },
+        "pending_external_tsetmc_adjudication_count": pending_total,
+        "pending_breakdown": {
+            "pending_endpoint_semantics": pending_external,
+            "pending_low_return_sequence_semantics": pending_low_return,
+            "note": (
+                "A pair can be pending for endpoint semantics, low-return "
+                "sequence semantics, or both, but a pair's primary_root_cause "
+                "is single-valued, so these two counts do not double-count "
+                "the same pair here (a pair whose primary cause is an "
+                "endpoint failure is counted only once, under endpoint "
+                "semantics, even if it also has <126 returns)."
+            ),
+        },
         "pending_external_adjudication_note": (
-            "These pairs are NEITHER recoverable NOR nonrecoverable. The "
-            "immutable bundle shows a ClosingPriceDailyList row with "
-            "qTotCap=0 and zTotTran=0 at the endpoint date, but does not by "
-            "itself establish whether that date is a genuine trading day "
-            "with zero executions, a suspension, a non-tradable state, or a "
-            "calendar artifact. This question is deferred to authoritative "
-            "TSETMC calendar/state/trade evidence, requested separately (see "
-            "stage127_m2_zero_trade_endpoint_evidence_request.zip). All 397 "
-            "unavailable pairs are NOT definitively classified as "
-            "nonrecoverable; 391 of them are pending this external evidence."
+            "These pairs are NEITHER recoverable NOR nonrecoverable. "
+            "Endpoint pairs: the immutable bundle shows a ClosingPriceDailyList "
+            "row with qTotCap=0 and zTotTran=0 at the endpoint date, but does "
+            "not by itself establish whether that date is a genuine trading "
+            "day with zero executions, a suspension, a non-tradable state, or "
+            "a calendar artifact. Low-return pairs: whether excluding "
+            "zero-trade rows from the trading-day sequence would raise the "
+            "valid-return count above 126 depends on the same open question. "
+            "Both are deferred to authoritative TSETMC calendar/state/trade "
+            "evidence, requested separately (see "
+            "stage127_m2_zero_trade_endpoint_evidence_request_v2.zip). Of the "
+            "397 unavailable pairs, only pairs mathematically GUARANTEED to "
+            "remain unavailable under every possible resolution of that "
+            "question are counted as nonrecoverable; all others are pending."
         ),
         "unresolved_root_cause_count": unresolved,
         "partial_range_contribution": {
@@ -657,11 +791,13 @@ def run(repo_root: str, bundle_path: str) -> dict[str, Any]:
     tN_rows = build_tN_detail_rows(audit, main_rows)
     t0_rows = build_t0_detail_rows(audit, main_rows)
     low_return_rows = build_low_return_rows(audit, main_rows)
-    summary = build_summary(audit, main_rows)
+    upper_bound_rows = build_low_return_upper_bound_rows(audit, main_rows)
+    summary = build_summary(audit, main_rows, upper_bound_rows)
     return {
         "main_rows": main_rows,
         "tN_rows": tN_rows,
         "t0_rows": t0_rows,
         "low_return_rows": low_return_rows,
+        "upper_bound_rows": upper_bound_rows,
         "summary": summary,
     }

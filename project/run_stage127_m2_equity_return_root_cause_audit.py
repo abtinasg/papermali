@@ -5,6 +5,7 @@ DIAGNOSTIC ONLY. Produces:
   project/stage127/stage127_m2_equity_return_tN_detail.csv
   project/stage127/stage127_m2_equity_return_t0_detail.csv
   project/stage127/stage127_m2_equity_return_low_return_detail.csv
+  project/stage127/stage127_m2_low_return_semantics_upper_bound_audit.csv
   project/stage127/stage127_m2_equity_return_root_cause_summary.json
 
 Never modifies the canonical Gate decision or any frozen artifact.
@@ -54,6 +55,8 @@ def main() -> int:
         "stage127_m2_equity_return_t0_detail.csv": csv_text(result["t0_rows"]),
         "stage127_m2_equity_return_low_return_detail.csv": csv_text(
             result["low_return_rows"]) if result["low_return_rows"] else "",
+        "stage127_m2_low_return_semantics_upper_bound_audit.csv": csv_text(
+            result["upper_bound_rows"]) if result["upper_bound_rows"] else "",
         "stage127_m2_equity_return_root_cause_summary.json": gate.json_dumps(
             result["summary"]),
     }

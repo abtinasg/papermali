@@ -22,7 +22,11 @@
   "missing_tN_count": 253,
   "no_live_tsetmc_endpoint_queried": true,
   "no_scientific_artifact_modified_by_this_audit": true,
-  "nonrecoverable_under_current_frozen_contract": 6,
+  "nonrecoverable_breakdown": {
+    "guaranteed_lt126_even_if_all_zero_trade_rows_excluded": 3,
+    "other_proven_nonrecoverable_categories": 0
+  },
+  "nonrecoverable_under_current_frozen_contract": 3,
   "partial_range_contribution": {
     "amihud_illiquidity_failures_among_partial_tickers": 3,
     "equity_return_window_failures_among_partial_tickers": 11,
@@ -37,8 +41,13 @@
     ],
     "realized_volatility_failures_among_partial_tickers": 3
   },
-  "pending_external_adjudication_note": "These pairs are NEITHER recoverable NOR nonrecoverable. The immutable bundle shows a ClosingPriceDailyList row with qTotCap=0 and zTotTran=0 at the endpoint date, but does not by itself establish whether that date is a genuine trading day with zero executions, a suspension, a non-tradable state, or a calendar artifact. This question is deferred to authoritative TSETMC calendar/state/trade evidence, requested separately (see stage127_m2_zero_trade_endpoint_evidence_request.zip). All 397 unavailable pairs are NOT definitively classified as nonrecoverable; 391 of them are pending this external evidence.",
-  "pending_external_tsetmc_adjudication_count": 391,
+  "pending_breakdown": {
+    "note": "A pair can be pending for endpoint semantics, low-return sequence semantics, or both, but a pair's primary_root_cause is single-valued, so these two counts do not double-count the same pair here (a pair whose primary cause is an endpoint failure is counted only once, under endpoint semantics, even if it also has <126 returns).",
+    "pending_endpoint_semantics": 391,
+    "pending_low_return_sequence_semantics": 3
+  },
+  "pending_external_adjudication_note": "These pairs are NEITHER recoverable NOR nonrecoverable. Endpoint pairs: the immutable bundle shows a ClosingPriceDailyList row with qTotCap=0 and zTotTran=0 at the endpoint date, but does not by itself establish whether that date is a genuine trading day with zero executions, a suspension, a non-tradable state, or a calendar artifact. Low-return pairs: whether excluding zero-trade rows from the trading-day sequence would raise the valid-return count above 126 depends on the same open question. Both are deferred to authoritative TSETMC calendar/state/trade evidence, requested separately (see stage127_m2_zero_trade_endpoint_evidence_request_v2.zip). Of the 397 unavailable pairs, only pairs mathematically GUARANTEED to remain unavailable under every possible resolution of that question are counted as nonrecoverable; all others are pending.",
+  "pending_external_tsetmc_adjudication_count": 394,
   "recoverable_due_to_proven_data_capture_defect": 0,
   "retrieval_truncation_count": 0,
   "root_cause_counts": {
