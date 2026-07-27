@@ -1,0 +1,50 @@
+{
+  "adjusted_parser_or_join_defect_count": 0,
+  "canonical_gate_status_unchanged": "FAIL_M2_DATA_GATE",
+  "classification_evidence_source": "raw_restricted_closing_price_daily_bounded_json_and_adjusted_price_history_bounded_csv_from_the_immutable_bundle",
+  "development_pairs": 666,
+  "diagnostic_counterfactual_not_canonical_result": {
+    "assumption": "ONLY pairs whose primary_root_cause is a PROVEN data-capture defect (retrieval truncation, identity fragmentation, or a real trade with a missing adjusted price) are assumed recovered; TRUE frozen-contract missingness is left as-is.",
+    "counterfactual_equity_return_coverage": 0.4039039039,
+    "counterfactual_equity_return_usable": 269,
+    "crosses_0_80_candidate_threshold": false,
+    "label": "DIAGNOSTIC_COUNTERFACTUAL_NOT_CANONICAL_RESULT"
+  },
+  "diagnostic_only": true,
+  "does_not_alter_canonical_gate": true,
+  "equity_return_unavailable_current": 397,
+  "equity_return_usable_current": 269,
+  "fewer_than_126_count": 90,
+  "instrument_identity_fragmentation_count": 0,
+  "missing_both_count": 132,
+  "missing_endpoint_union_count": 391,
+  "missing_t0_count": 270,
+  "missing_tN_count": 253,
+  "no_live_tsetmc_endpoint_queried": true,
+  "no_scientific_artifact_modified_by_this_audit": true,
+  "nonrecoverable_under_current_frozen_contract": 397,
+  "partial_range_contribution": {
+    "amihud_illiquidity_failures_among_partial_tickers": 3,
+    "equity_return_window_failures_among_partial_tickers": 11,
+    "note": "The six PARTIAL ranges cover at most 6 of 110 tickers; they cannot explain the global 40.39% coverage and are reported here only as their actual, bounded contribution.",
+    "partial_source_tickers": [
+      "ثشرق",
+      "جم",
+      "زپارس",
+      "های وب",
+      "پارس",
+      "کویر"
+    ],
+    "realized_volatility_failures_among_partial_tickers": 3
+  },
+  "recoverable_due_to_proven_data_capture_defect": 0,
+  "retrieval_truncation_count": 0,
+  "root_cause_counts": {
+    "E_ZERO_TRADE_OR_NONTRADING_OBSERVATION_USED_AS_ENDPOINT": 391,
+    "G_FEWER_THAN_126_VALID_RETURNS_ONLY": 6
+  },
+  "true_trading_day_missing_adjusted_price_count": 0,
+  "unresolved_root_cause_count": 0,
+  "would_any_proven_data_only_correction_change_gate_result": false,
+  "zero_trade_endpoint_count": 391
+}

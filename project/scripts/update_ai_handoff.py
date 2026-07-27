@@ -82,6 +82,11 @@ ALLOWLIST_FILES = (
     # (the T* semantics audit artifacts live under project/stage127/)
     "project/src/stage127_m2_external_delivery_import.py",
     "project/tests/test_stage127_m2_external_delivery_import.py",
+    # Stage127 equity_return_window root-cause audit (DIAGNOSTIC ONLY: reads
+    # the immutable bundle and the Gate's own frozen window/feature functions;
+    # never modifies the canonical Gate decision or any frozen artifact).
+    "project/src/stage127_m2_equity_return_root_cause_audit.py",
+    "project/run_stage127_m2_equity_return_root_cause_audit.py",
     # Stage127 external TSETMC retrieval-request package code and tests.
     "project/src/stage127_m2_external_retrieval_request.py",
     "project/run_stage127_m2_external_retrieval_request.py",
