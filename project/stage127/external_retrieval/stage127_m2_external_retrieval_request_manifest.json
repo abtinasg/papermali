@@ -1,0 +1,67 @@
+{
+  "authoritative_source_only": true,
+  "canonical_sources_sha256": {
+    "project/stage125/part3b1_cutoff_available_at_contract_stage125.json": "3966addbf4f2768e139c55ff7eef7ac7b11aafa717bf7024cf115fdf956f72b2",
+    "project/stage125/part3b1_m2_feature_formula_contract_stage125.json": "6d7c8e63d04475f95da8b6f0364be326d7b4581ae21e5b2fe9df955ea7f83f82",
+    "project/stage125/part3b1_rubric_operational_mapping_stage125.json": "845681e70c79a3c9ed81844d2dd2f6c92104f2088777669ffe9018d3dfd09110",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+    "project/stage125/part4_statistical_analysis_plan_stage125.json": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
+    "project/stage125/part4_temporal_split_manifest_stage125.csv": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc"
+  },
+  "date_max": "2020-07-18",
+  "date_min": "2012-09-21",
+  "development_target_years": [
+    1393,
+    1394,
+    1395,
+    1396,
+    1397,
+    1398,
+    1399
+  ],
+  "downstream_m2_variables": [
+    "equity_return_window",
+    "realized_volatility",
+    "amihud_illiquidity"
+  ],
+  "downstream_m2_variables_computed_by": "papermali_after_ingestion",
+  "external_feature_engineering_authorized": false,
+  "external_modeling_authorized": false,
+  "external_programmer_role": "raw_authoritative_data_retrieval_only",
+  "final_test_access_authorized": false,
+  "final_test_pairs_included": 0,
+  "final_test_row_level_data_included": false,
+  "final_test_target_years_excluded": [
+    1400,
+    1401,
+    1402
+  ],
+  "gate_status_unchanged": "UNRESOLVED_M2_DATA_GATE",
+  "imputation_authorized": false,
+  "m2_data_collected": false,
+  "package_files_sha256": {
+    "README_STAGE127_M2_EXTERNAL_TSETMC_RETRIEVAL.md": "b5b571a0ff384217a3d5ee4d21b560dbe634bb7d3f65ca89182ae0e870cf4195",
+    "stage127_m2_external_retrieval_request.csv": "12ff66a1c89899afb7f0ca8018a5cd49c9d592d173138ff8b04a64492cd42747",
+    "stage127_m2_external_retrieval_ticker_ranges.csv": "4b9cfef4c3543abfcae1d3d660c9415ac3a83711dea1094998ea9c2bce5ef374",
+    "stage127_m2_external_return_daily_template.csv": "e079c8f85e9f542991a705e0af72847dbbb8b838172cbaaff1d2085f1b658a37",
+    "stage127_m2_external_return_manifest_template.csv": "31bbde5736e7d39b2818d7645afb87bb3bd8d4ff3eb98473305572f577722ab2",
+    "stage127_m2_external_return_mapping_template.csv": "169d965a1e806826d4afffe890221d6f0d52b5da6a94b0303489c9fa4e227dc5"
+  },
+  "pair_count": 666,
+  "request_scope": "development_only",
+  "required_price_field": "adjusted_close",
+  "required_value_field": "traded_value_rial",
+  "retrieval_buffer_days": 30,
+  "retrieval_buffer_does_not_alter_scientific_window": true,
+  "retrieval_buffer_is_superset_only": true,
+  "sample": "main_rule_a_primary",
+  "shared_window_calendar_months": 12,
+  "source_family": "TSETMC market data",
+  "source_id": "src_m2_tsetmc_market",
+  "substitute_sources_authorized": false,
+  "target": "FD_target_main_t_plus_1",
+  "ticker_count": 110,
+  "ticker_mapping_guessing_authorized": false,
+  "ticker_range_count": 111,
+  "window_rule": "shared_12_calendar_month_window_ending_on_last_eligible_trading_day_strictly_before_pair_cutoff_date"
+}

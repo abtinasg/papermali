@@ -40,6 +40,17 @@ drop) is prohibited: nothing about TSETMC itself was observed. Candidate
 coverage, block common coverage and event-count feasibility were therefore
 UNRESOLVED rather than FAIL, and no SAP feasibility label was asserted.
 
+**External retrieval handoff prepared (PR #66).** Because the authoritative
+TSETMC source is unreachable from the automated environment, a deterministic,
+self-contained retrieval-request package for an external Iran-based programmer
+was generated at `project/stage127/external_retrieval/` (666 development pair
+requests, 110 tickers, 111 merged ticker ranges, dates 2012-09-21..2020-07-18,
+all strictly before the Jalali 1400 final-test period). The external party
+performs RAW TSETMC RETRIEVAL ONLY: no feature engineering, no modeling, no
+final-test access, and the three M2 variables are computed inside papermali
+after ingestion. **No data has been ingested yet and the Gate result is
+unchanged.**
+
 **Blocking next step (human review required):** re-execute
 `python project/run_stage127_m2_market_data_gate.py --build` from an
 environment with network egress to TSETMC. The exact per-pair retrieval ranges

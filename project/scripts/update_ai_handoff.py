@@ -78,6 +78,10 @@ ALLOWLIST_FILES = (
     "project/src/stage127_m2_market_data_gate.py",
     "project/run_stage127_m2_market_data_gate.py",
     "project/tests/test_stage127_m2_market_data_gate.py",
+    # Stage127 external TSETMC retrieval-request package code and tests.
+    "project/src/stage127_m2_external_retrieval_request.py",
+    "project/run_stage127_m2_external_retrieval_request.py",
+    "project/tests/test_stage127_m2_external_retrieval_request.py",
     # Stage125 Part 1 code, runner, and tests (maintenance task).
     "project/src/stage125_part1_data_contract.py",
     "project/run_stage125_part1.py",

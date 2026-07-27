@@ -1,0 +1,1 @@
+requested_ticker,ticker,company_name,tsetmc_instrument_id,isin,trading_date,adjusted_close,adjusted_close_status,raw_close,last_price,open,high,low,traded_value_rial,raw_traded_value,raw_traded_value_unit,volume,trade_count,source_endpoint,retrieved_at_utc,raw_response_file,raw_response_sha256
