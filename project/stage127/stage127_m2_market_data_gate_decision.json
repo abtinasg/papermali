@@ -1,126 +1,132 @@
 {
   "answers_only": "Can the frozen M2 market variables be obtained with correct timing, quality, coverage, joins and event support?",
   "block_common_sample": {
-    "common_coverage": null,
-    "common_coverage_gate_passed": null,
-    "common_usable_rows": null,
+    "common_coverage": 0.6006006006,
+    "common_coverage_gate_passed": false,
+    "common_usable_rows": 400,
     "counts_by_fold": {
-      "fold1_train": null,
-      "fold1_validation": null,
-      "fold2_train": null,
-      "fold2_validation": null
+      "fold1_train": 111,
+      "fold1_validation": 125,
+      "fold2_train": 236,
+      "fold2_validation": 164
     },
     "counts_by_target_year": {
-      "1393": null,
-      "1394": null,
-      "1395": null,
-      "1396": null,
-      "1397": null,
-      "1398": null,
-      "1399": null
+      "1393": 30,
+      "1394": 58,
+      "1395": 23,
+      "1396": 65,
+      "1397": 60,
+      "1398": 79,
+      "1399": 85
     },
-    "negative_count": null,
-    "positive_count": null,
+    "negative_count": 361,
+    "positive_count": 39,
     "requires_all_three_m2_variables_simultaneously_usable": true,
-    "resolution": "UNRESOLVED",
+    "resolution": "PASS",
     "threshold": 0.7,
     "total_development_rows": 666
   },
   "block_not_redefined_on_candidate_failure": true,
   "block_redefinition_requires_separate_human_decision": true,
   "blocker_reasons": [
-    "No probe reached the authoritative TSETMC source from this execution environment, so no candidate_endpoint_evidence could be captured and no accessibility score could be assigned.",
-    "Zero market observations were retrieved, so candidate coverage, block common coverage and event-count feasibility could not be evaluated against the frozen thresholds.",
-    "The corporate-action-adjusted closing price field required by the frozen contract could not be verified as obtainable; unadjusted close was not substituted."
+    "B: observed development valid coverage for 'equity_return_window' is 0.6006 (400/666), below the frozen threshold 0.8",
+    "C: observed three-variable common-sample coverage is 0.6006 (400/666), below the frozen threshold 0.7"
   ],
   "candidate_coverage": {
     "amihud_illiquidity": {
-      "coverage_gate_passed": null,
-      "fold1_train_coverage": null,
-      "fold1_validation_coverage": null,
-      "fold2_train_coverage": null,
-      "fold2_validation_coverage": null,
-      "missing_or_unresolved_rows": 666,
-      "negative_row_coverage": null,
-      "overall_coverage": null,
-      "positive_row_coverage": null,
-      "resolution": "UNRESOLVED",
+      "coverage_gate_passed": true,
+      "fold1_train_coverage": 0.787755102,
+      "fold1_validation_coverage": 0.8536585366,
+      "fold2_train_coverage": 0.8177777778,
+      "fold2_validation_coverage": 0.9861111111,
+      "missing_or_unresolved_rows": 85,
+      "negative_row_coverage": 0.8695652174,
+      "overall_coverage": 0.8723723724,
+      "positive_row_coverage": 0.8970588235,
+      "resolution": "PASS",
       "threshold": 0.8,
       "total_development_rows": 666,
-      "valid_rows": null
+      "valid_rows": 581
     },
     "equity_return_window": {
-      "coverage_gate_passed": null,
-      "fold1_train_coverage": null,
-      "fold1_validation_coverage": null,
-      "fold2_train_coverage": null,
-      "fold2_validation_coverage": null,
-      "missing_or_unresolved_rows": 666,
-      "negative_row_coverage": null,
-      "overall_coverage": null,
-      "positive_row_coverage": null,
-      "resolution": "UNRESOLVED",
+      "coverage_gate_passed": false,
+      "fold1_train_coverage": 0.4530612245,
+      "fold1_validation_coverage": 0.6097560976,
+      "fold2_train_coverage": 0.5244444444,
+      "fold2_validation_coverage": 0.7592592593,
+      "missing_or_unresolved_rows": 266,
+      "negative_row_coverage": 0.6036789298,
+      "overall_coverage": 0.6006006006,
+      "positive_row_coverage": 0.5735294118,
+      "resolution": "PASS",
       "threshold": 0.8,
       "total_development_rows": 666,
-      "valid_rows": null
+      "valid_rows": 400
     },
     "realized_volatility": {
-      "coverage_gate_passed": null,
-      "fold1_train_coverage": null,
-      "fold1_validation_coverage": null,
-      "fold2_train_coverage": null,
-      "fold2_validation_coverage": null,
-      "missing_or_unresolved_rows": 666,
-      "negative_row_coverage": null,
-      "overall_coverage": null,
-      "positive_row_coverage": null,
-      "resolution": "UNRESOLVED",
+      "coverage_gate_passed": true,
+      "fold1_train_coverage": 0.787755102,
+      "fold1_validation_coverage": 0.8536585366,
+      "fold2_train_coverage": 0.8177777778,
+      "fold2_validation_coverage": 0.9861111111,
+      "missing_or_unresolved_rows": 85,
+      "negative_row_coverage": 0.8695652174,
+      "overall_coverage": 0.8723723724,
+      "positive_row_coverage": 0.8970588235,
+      "resolution": "PASS",
       "threshold": 0.8,
       "total_development_rows": 666,
-      "valid_rows": null
+      "valid_rows": 581
     }
   },
   "candidates": [
     {
       "G01_accessibility": {
-        "accessibility_score": null,
-        "basis": "no_candidate_endpoint_evidence_captured",
-        "resolution": "UNRESOLVED",
+        "accessibility_score": 5,
+        "basis": "R-A level 5: authoritative, fully reproducible, machine-readable candidate-level retrieval with verified provenance (endpoints, raw responses, SHA256 manifest, extraction code, instrument mapping evidence)",
+        "derived_from_frozen_R_A_mapping": true,
+        "endpoint_response_alone_is_insufficient": true,
+        "resolution": "PASS",
         "threshold": ">= 3"
       },
       "G02_authoritative_source": {
-        "note": "Frozen authoritative source is TSETMC (src_m2_tsetmc_market). No substitute source was used or considered.",
-        "resolution": "UNRESOLVED"
+        "note": "Every imported endpoint, provenance record and raw response cites TSETMC only (src_m2_tsetmc_market). No substitute source was used or considered.",
+        "resolution": "PASS"
       },
       "G03_reproducible_retrieval_path": {
-        "note": "No retrieval could be executed, so no reproducible retrieval path was demonstrated for this candidate.",
-        "resolution": "UNRESOLVED"
+        "note": "Candidate-level retrieval is reproducible offline from the immutable bundle: per-instrument endpoints, raw responses, a verified SHA256 manifest, a restricted-raw provenance manifest and the extraction code were all delivered and independently re-verified.",
+        "resolution": "PASS",
+        "restricted_raw_files_verified": 222
       },
       "G04_timing_verified": {
-        "note": "Timing cannot be verified without observations.",
+        "accepted_post_cutoff_observations": 0,
+        "accepted_same_calendar_day_as_cutoff": 0,
+        "note": "Every accepted observation was re-checked against its own pair cutoff; same-calendar-day observations are rejected.",
         "requirement": "market_observation_date < pair_cutoff_date",
-        "resolution": "UNRESOLVED"
+        "resolution": "PASS"
       },
       "G05_extraction_quality_controlled": {
-        "note": "Corporate-action-adjusted close could not be verified as obtainable; unadjusted close is never silently substituted.",
+        "adjusted_close_exact_date_mismatches": 0,
+        "note": "Raw->normalized field mapping was re-verified for every imported row; adjusted_close was re-verified against the raw adjusted pc on the exact same trading date. Unadjusted close is never substituted and no value was imputed.",
+        "raw_to_normalized_field_mismatches": 0,
         "required_price_field": "adjusted_close",
         "required_volume_field": "traded_value_rial",
-        "resolution": "UNRESOLVED"
+        "resolution": "PASS"
       },
       "G06_missing_means_unavailable": {
-        "note": "Enforced: no availability was inferred anywhere in this Gate.",
+        "note": "Enforced: missing adjusted price or missing traded value makes a day unusable; it is never imputed, filled or read as an observed zero.",
         "resolution": "PASS"
       },
       "G07_no_future_or_target_year_information": {
-        "note": "Enforced structurally: only development pairs (target years 1393-1399) were loaded; no final-test row was read.",
+        "note": "Enforced structurally: only development pairs (target years 1393-1399) were loaded, no final-test row was read, and every imported observation date was checked against the firewall.",
         "resolution": "PASS"
       },
       "G08_all_required_gates_pass": {
-        "note": "Cannot be asserted while G01-G05 are UNRESOLVED.",
-        "resolution": "UNRESOLVED"
+        "note": "Conjunction of G01-G07; no sub-gate may be assumed.",
+        "resolution": "PASS"
       },
-      "admission_decision": "UNRESOLVED_NOT_ADMITTED",
-      "admission_decision_is_not_a_rejection": true,
+      "admission_decision": "ADMITTED",
+      "admission_decision_is_not_a_rejection": false,
       "block": "M2_BLOCK",
       "candidate_id": "cand_m2_equity_return_window",
       "formula_id": "m2_cumulative_simple_return_W",
@@ -129,44 +135,51 @@
     },
     {
       "G01_accessibility": {
-        "accessibility_score": null,
-        "basis": "no_candidate_endpoint_evidence_captured",
-        "resolution": "UNRESOLVED",
+        "accessibility_score": 5,
+        "basis": "R-A level 5: authoritative, fully reproducible, machine-readable candidate-level retrieval with verified provenance (endpoints, raw responses, SHA256 manifest, extraction code, instrument mapping evidence)",
+        "derived_from_frozen_R_A_mapping": true,
+        "endpoint_response_alone_is_insufficient": true,
+        "resolution": "PASS",
         "threshold": ">= 3"
       },
       "G02_authoritative_source": {
-        "note": "Frozen authoritative source is TSETMC (src_m2_tsetmc_market). No substitute source was used or considered.",
-        "resolution": "UNRESOLVED"
+        "note": "Every imported endpoint, provenance record and raw response cites TSETMC only (src_m2_tsetmc_market). No substitute source was used or considered.",
+        "resolution": "PASS"
       },
       "G03_reproducible_retrieval_path": {
-        "note": "No retrieval could be executed, so no reproducible retrieval path was demonstrated for this candidate.",
-        "resolution": "UNRESOLVED"
+        "note": "Candidate-level retrieval is reproducible offline from the immutable bundle: per-instrument endpoints, raw responses, a verified SHA256 manifest, a restricted-raw provenance manifest and the extraction code were all delivered and independently re-verified.",
+        "resolution": "PASS",
+        "restricted_raw_files_verified": 222
       },
       "G04_timing_verified": {
-        "note": "Timing cannot be verified without observations.",
+        "accepted_post_cutoff_observations": 0,
+        "accepted_same_calendar_day_as_cutoff": 0,
+        "note": "Every accepted observation was re-checked against its own pair cutoff; same-calendar-day observations are rejected.",
         "requirement": "market_observation_date < pair_cutoff_date",
-        "resolution": "UNRESOLVED"
+        "resolution": "PASS"
       },
       "G05_extraction_quality_controlled": {
-        "note": "Corporate-action-adjusted close could not be verified as obtainable; unadjusted close is never silently substituted.",
+        "adjusted_close_exact_date_mismatches": 0,
+        "note": "Raw->normalized field mapping was re-verified for every imported row; adjusted_close was re-verified against the raw adjusted pc on the exact same trading date. Unadjusted close is never substituted and no value was imputed.",
+        "raw_to_normalized_field_mismatches": 0,
         "required_price_field": "adjusted_close",
         "required_volume_field": "traded_value_rial",
-        "resolution": "UNRESOLVED"
+        "resolution": "PASS"
       },
       "G06_missing_means_unavailable": {
-        "note": "Enforced: no availability was inferred anywhere in this Gate.",
+        "note": "Enforced: missing adjusted price or missing traded value makes a day unusable; it is never imputed, filled or read as an observed zero.",
         "resolution": "PASS"
       },
       "G07_no_future_or_target_year_information": {
-        "note": "Enforced structurally: only development pairs (target years 1393-1399) were loaded; no final-test row was read.",
+        "note": "Enforced structurally: only development pairs (target years 1393-1399) were loaded, no final-test row was read, and every imported observation date was checked against the firewall.",
         "resolution": "PASS"
       },
       "G08_all_required_gates_pass": {
-        "note": "Cannot be asserted while G01-G05 are UNRESOLVED.",
-        "resolution": "UNRESOLVED"
+        "note": "Conjunction of G01-G07; no sub-gate may be assumed.",
+        "resolution": "PASS"
       },
-      "admission_decision": "UNRESOLVED_NOT_ADMITTED",
-      "admission_decision_is_not_a_rejection": true,
+      "admission_decision": "ADMITTED",
+      "admission_decision_is_not_a_rejection": false,
       "block": "M2_BLOCK",
       "candidate_id": "cand_m2_realized_volatility",
       "formula_id": "m2_daily_return_stdev_sample_W",
@@ -175,44 +188,51 @@
     },
     {
       "G01_accessibility": {
-        "accessibility_score": null,
-        "basis": "no_candidate_endpoint_evidence_captured",
-        "resolution": "UNRESOLVED",
+        "accessibility_score": 5,
+        "basis": "R-A level 5: authoritative, fully reproducible, machine-readable candidate-level retrieval with verified provenance (endpoints, raw responses, SHA256 manifest, extraction code, instrument mapping evidence)",
+        "derived_from_frozen_R_A_mapping": true,
+        "endpoint_response_alone_is_insufficient": true,
+        "resolution": "PASS",
         "threshold": ">= 3"
       },
       "G02_authoritative_source": {
-        "note": "Frozen authoritative source is TSETMC (src_m2_tsetmc_market). No substitute source was used or considered.",
-        "resolution": "UNRESOLVED"
+        "note": "Every imported endpoint, provenance record and raw response cites TSETMC only (src_m2_tsetmc_market). No substitute source was used or considered.",
+        "resolution": "PASS"
       },
       "G03_reproducible_retrieval_path": {
-        "note": "No retrieval could be executed, so no reproducible retrieval path was demonstrated for this candidate.",
-        "resolution": "UNRESOLVED"
+        "note": "Candidate-level retrieval is reproducible offline from the immutable bundle: per-instrument endpoints, raw responses, a verified SHA256 manifest, a restricted-raw provenance manifest and the extraction code were all delivered and independently re-verified.",
+        "resolution": "PASS",
+        "restricted_raw_files_verified": 222
       },
       "G04_timing_verified": {
-        "note": "Timing cannot be verified without observations.",
+        "accepted_post_cutoff_observations": 0,
+        "accepted_same_calendar_day_as_cutoff": 0,
+        "note": "Every accepted observation was re-checked against its own pair cutoff; same-calendar-day observations are rejected.",
         "requirement": "market_observation_date < pair_cutoff_date",
-        "resolution": "UNRESOLVED"
+        "resolution": "PASS"
       },
       "G05_extraction_quality_controlled": {
-        "note": "Corporate-action-adjusted close could not be verified as obtainable; unadjusted close is never silently substituted.",
+        "adjusted_close_exact_date_mismatches": 0,
+        "note": "Raw->normalized field mapping was re-verified for every imported row; adjusted_close was re-verified against the raw adjusted pc on the exact same trading date. Unadjusted close is never substituted and no value was imputed.",
+        "raw_to_normalized_field_mismatches": 0,
         "required_price_field": "adjusted_close",
         "required_volume_field": "traded_value_rial",
-        "resolution": "UNRESOLVED"
+        "resolution": "PASS"
       },
       "G06_missing_means_unavailable": {
-        "note": "Enforced: no availability was inferred anywhere in this Gate.",
+        "note": "Enforced: missing adjusted price or missing traded value makes a day unusable; it is never imputed, filled or read as an observed zero.",
         "resolution": "PASS"
       },
       "G07_no_future_or_target_year_information": {
-        "note": "Enforced structurally: only development pairs (target years 1393-1399) were loaded; no final-test row was read.",
+        "note": "Enforced structurally: only development pairs (target years 1393-1399) were loaded, no final-test row was read, and every imported observation date was checked against the firewall.",
         "resolution": "PASS"
       },
       "G08_all_required_gates_pass": {
-        "note": "Cannot be asserted while G01-G05 are UNRESOLVED.",
-        "resolution": "UNRESOLVED"
+        "note": "Conjunction of G01-G07; no sub-gate may be assumed.",
+        "resolution": "PASS"
       },
-      "admission_decision": "UNRESOLVED_NOT_ADMITTED",
-      "admission_decision_is_not_a_rejection": true,
+      "admission_decision": "ADMITTED",
+      "admission_decision_is_not_a_rejection": false,
       "block": "M2_BLOCK",
       "candidate_id": "cand_m2_amihud_illiquidity",
       "formula_id": "m2_amihud_mean_abs_return_over_value_W",
@@ -233,9 +253,13 @@
   "decision_id": "stage127-m2-market-data-gate",
   "does_not_answer": "Does M2 improve prediction?",
   "eligibility_for_next_action": {
-    "data_admission_pass": false,
-    "development_comparison_feasibility_pass": false,
+    "data_admission_pass": true,
+    "development_comparison_feasibility_pass": true,
+    "eligibility_is_not_authorization": true,
     "eligible_to_start_m2_incremental_evaluation": false,
+    "m2_incremental_evaluation_authorized": false,
+    "m2_modeling_started": false,
+    "next_action_id": "stage127-m2-incremental-evaluation",
     "requires_data_admission_pass": true,
     "requires_development_comparison_feasibility_pass": true
   },
@@ -246,20 +270,57 @@
     },
     "m1_reference_is_not_the_m2_result": true,
     "m2_common_sample_negative_counts": {
-      "fold1_validation": null,
-      "fold2_validation": null
+      "fold1_validation": 107,
+      "fold2_validation": 157
     },
     "m2_common_sample_positive_counts": {
-      "fold1_validation": null,
-      "fold2_validation": null
+      "fold1_validation": 18,
+      "fold2_validation": 7
     },
     "no_model_was_fit_to_assess_this": true,
     "requires_both_locked_validation_windows": true,
-    "resolution": "UNRESOLVED",
+    "resolution": "PASS",
     "rule": "min_positive_evaluable_each_temporal_validation_window",
-    "sap_label_asserted": null,
-    "sap_label_not_asserted_reason": "The M2 common development sample could not be formed, so no M2 event count was observed. Asserting 'development_comparison_not_supported' would claim evidence of insufficient M2 event support that does not exist. This Gate therefore reports the event-count feasibility as UNRESOLVED rather than as a negative result.",
+    "sap_label_asserted": "development_comparison_feasibility_met",
+    "sap_label_not_asserted_reason": null,
     "threshold": 5
+  },
+  "evidence_mode": "offline_imported_external_evidence_bundle",
+  "external_delivery": {
+    "bundle_filename": "stage127_m2_tsetmc_full_delivery.zip",
+    "bundle_sha256": "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec",
+    "bundle_size_bytes": 13464145,
+    "canonical_request_sha256": "4b9cfef4c3543abfcae1d3d660c9415ac3a83711dea1094998ea9c2bce5ef374",
+    "external_qc_report_trusted": false,
+    "independently_revalidated_in_papermali": true,
+    "manifest_rows": 111,
+    "mapping_rows": 110,
+    "normalized_row_count": 163230,
+    "partial_ranges_preserved": {
+      "RNG0008": "ثشرق",
+      "RNG0010": "جم",
+      "RNG0033": "زپارس",
+      "RNG0094": "های وب",
+      "RNG0096": "پارس",
+      "RNG0109": "کویر"
+    },
+    "restricted_raw_file_count": 222,
+    "retrieval_status_counts": {
+      "FAILED": 0,
+      "PARTIAL": 6,
+      "SUCCESS": 105,
+      "UNRESOLVED_MAPPING": 0
+    }
+  },
+  "feature_unavailability_breakdown": {
+    "development_pairs": 666,
+    "min_valid_amihud_observations": 126,
+    "min_valid_daily_return_observations": 126,
+    "missing_values_imputed": false,
+    "pairs_failing_only_the_window_endpoint_price_requirement": 181,
+    "pairs_with_fewer_than_min_usable_amihud_days": 85,
+    "pairs_with_fewer_than_min_valid_daily_returns": 85,
+    "thresholds_reduced_to_improve_coverage": false
   },
   "final_test_firewall": {
     "final_test_access_authorized": false,
@@ -276,8 +337,20 @@
     "final_test_unlocked": false
   },
   "formula_contract_option_id": "M2-A_modified",
-  "gate_status": "UNRESOLVED_M2_DATA_GATE",
-  "gate_status_meaning": "The Gate ran to completion and returned a truthful UNRESOLVED result: the frozen M2 block is neither admitted nor rejected, because the evidence required to decide could not be obtained here. UNRESOLVED is not a negative scientific finding about TSETMC or about M2.",
+  "frozen_m2_feature_block_extra_features_computed": [],
+  "gate_decided_from_endpoint_reachability": false,
+  "gate_decision_conditions": {
+    "A_data_admission_g01_g08": true,
+    "B_each_candidate_coverage_ge_0_80": false,
+    "C_common_sample_coverage_ge_0_70": false,
+    "D_both_validation_windows_ge_5_positives": true,
+    "E_no_pit_leakage_join_provenance_blocker": true,
+    "F_all_three_frozen_m2_variables_present": true
+  },
+  "gate_decision_rule": "PASS_FOR_M2_INCREMENTAL_EVALUATION requires A AND B AND C AND D AND E AND F. Endpoint reachability, an HTTP status code, or the external party's own QC flag can never produce a PASS.",
+  "gate_status": "FAIL_M2_DATA_GATE",
+  "gate_status_meaning": "The Gate ran to completion on real imported evidence and OBSERVED a failure against a frozen requirement. This is a truthful negative result about the observed data, not missing evidence, and it is deliberately not softened into UNRESOLVED.",
+  "imputation_or_fill_applied": false,
   "join_leakage_audit": {
     "acceptance_criteria": {
       "zero_accepted_post_cutoff_observations": true,
@@ -301,15 +374,15 @@
     "final_test_rows_joined": 0,
     "final_test_rows_read": 0,
     "joined_to": "frozen_M1_primary_development_pairs",
-    "market_observations_accepted": 0,
+    "market_observations_accepted": 161819,
     "matched_pair_count": 666,
-    "note": "Unresolved ticker->instrument mapping remains unresolved and was never guessed. Leakage counters are zero because no observation was accepted at all, not because observations were validated.",
+    "note": "Leakage counters were validated against actually accepted market observations imported from the immutable external bundle.",
     "pairs_with_unresolvable_cutoff": 0,
-    "same_day_cutoff_exclusions_applied": 0,
+    "same_day_cutoff_exclusions_applied": 363,
     "sample": "main_rule_a_primary",
     "target": "FD_target_main_t_plus_1",
-    "ticker_mapping_failures": null,
-    "ticker_mapping_unresolved": 110,
+    "ticker_mapping_failures": 0,
+    "ticker_mapping_unresolved": 0,
     "unmatched_pair_count": 0
   },
   "m2_block": "M2_BLOCK",
@@ -319,13 +392,26 @@
     "realized_volatility",
     "amihud_illiquidity"
   ],
+  "m2_feature_block_changed": false,
   "m2_vs_m1_performance_compared": false,
   "model_fit_calls": 0,
   "modeling_performed": false,
+  "network_required_to_reproduce": false,
   "no_variable_dropped_from_frozen_block": true,
+  "pair_specific_window_recomputed_from_frozen_contract": true,
   "prediction_calls": 0,
   "primary_source_id": "src_m2_tsetmc_market",
+  "retrieval_buffer_days_entered_scientific_window": false,
+  "retrieval_range_used_as_scientific_window": false,
   "scope": "point_in_time_data_admission_gate_development_only",
   "source_family": "TSETMC market data",
-  "stage": "Stage127"
+  "stage": "Stage127",
+  "threshold_reduced": false,
+  "unadjusted_close_substituted": false,
+  "window_endpoint_rule": {
+    "alternative_reading_not_adopted": "Re-defining t0 as the first PRICED day of W would make the frozen endpoint requirement vacuous and would raise observed coverage. It was NOT adopted: relaxing a frozen contract to improve coverage is prohibited.",
+    "endpoint_requirement_can_fail": true,
+    "missing_endpoint_price_is_never_imputed_or_bridged": true,
+    "rule": "Per the frozen contract, W is ordered t0..tN=T* over the trading days on or after calendar date T* minus 12 calendar months, and equity_return_window REQUIRES adjusted_close present at BOTH t0 and tN. t0 is the first trading day of W, not the first priced day of W."
+  }
 }

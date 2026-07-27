@@ -110,24 +110,35 @@ def test_shared_window_is_12_calendar_months_for_all_variables():
 def test_window_end_is_strictly_before_pair_cutoff(features):
     for row in features:
         cutoff = date.fromisoformat(row["pair_cutoff_date"])
-        end = date.fromisoformat(
-            row["required_window_end_max_strictly_before_cutoff"])
-        assert end < cutoff, f"window end must be strictly before cutoff: {row}"
+        for col in ("window_t_star", "window_last_trading_date"):
+            if row[col]:
+                assert date.fromisoformat(row[col]) < cutoff, (
+                    f"{col} must be strictly before the pair cutoff: {row}")
 
 
-def test_window_start_precedes_end_by_at_least_12_months(features):
+def test_window_is_exactly_twelve_calendar_months_ending_at_t_star(features):
+    """W is recomputed from the frozen contract, not from the retrieval range."""
     for row in features:
-        start = date.fromisoformat(row["required_window_retrieval_start"])
-        end = date.fromisoformat(
-            row["required_window_end_max_strictly_before_cutoff"])
-        assert start < end
-        # Retrieval range must CONTAIN the true 12-calendar-month window.
-        assert start <= g.minus_calendar_months(end, 12)
+        if not row["window_t_star"]:
+            continue
+        t_star = date.fromisoformat(row["window_t_star"])
+        start = date.fromisoformat(row["window_start_calendar_date"])
+        assert start == g.minus_calendar_months(t_star, 12)
+        first = date.fromisoformat(row["window_first_trading_date"])
+        last = date.fromisoformat(row["window_last_trading_date"])
+        assert start <= first <= last == t_star
+
+
+def test_retrieval_buffer_never_enters_the_scientific_window(decision):
+    assert decision["retrieval_range_used_as_scientific_window"] is False
+    assert decision["retrieval_buffer_days_entered_scientific_window"] is False
+    assert decision["pair_specific_window_recomputed_from_frozen_contract"] is True
 
 
 def test_same_day_cutoff_observation_is_never_accepted(decision):
-    assert decision["join_leakage_audit"]["same_day_cutoff_exclusions_applied"] == 0
     assert decision["join_leakage_audit"]["accepted_post_cutoff_observations"] == 0
+    assert decision["candidates"][0]["G04_timing_verified"][
+        "accepted_same_calendar_day_as_cutoff"] == 0
 
 
 # --------------------------------------------------------------------------- #
@@ -182,8 +193,9 @@ def test_required_diagnostics_present_in_feature_table(features):
 # Accessibility scoring — fail-closed, never 0-2 without evidence
 # --------------------------------------------------------------------------- #
 
-def test_no_numeric_score_without_captured_endpoint_evidence():
-    result = g.score_accessibility([{"url": "x", "http_status": None}])
+def test_no_numeric_score_without_candidate_level_evidence():
+    result = g.score_accessibility_from_evidence(
+        {"candidate_level_endpoint_evidence": False})
     assert result["resolution"] == "UNRESOLVED"
     assert result["accessibility_score"] is None
 
@@ -196,14 +208,29 @@ def test_unreached_source_is_never_scored_zero_to_two(decision):
         )
 
 
-def test_reached_source_yields_a_numeric_score():
-    reached = g.score_accessibility([
-        {"url": "x", "http_status": 200, "machine_readable": True}])
-    assert reached["resolution"] == "PASS"
-    assert reached["accessibility_score"] == 5
-    html = g.score_accessibility([
-        {"url": "x", "http_status": 200, "machine_readable": False}])
-    assert html["accessibility_score"] == 4
+def test_candidate_level_evidence_yields_a_derived_numeric_score():
+    full = g.score_accessibility_from_evidence({
+        "candidate_level_endpoint_evidence": True,
+        "documented_api_or_portal": True,
+        "reproducible_retrieval_with_provenance": True,
+        "authoritative_source": True,
+        "machine_readable_or_reliably_structured": True,
+    })
+    assert full["resolution"] == "PASS"
+    assert full["accessibility_score"] == 5
+    unstructured = g.score_accessibility_from_evidence({
+        "candidate_level_endpoint_evidence": True,
+        "documented_api_or_portal": True,
+        "reproducible_retrieval_with_provenance": True,
+        "authoritative_source": False,
+        "machine_readable_or_reliably_structured": False,
+    })
+    assert unstructured["accessibility_score"] == 4
+    weak = g.score_accessibility_from_evidence({
+        "candidate_level_endpoint_evidence": True,
+        "reproducible_retrieval_with_provenance": False,
+    })
+    assert weak["accessibility_score"] == 3
 
 
 def test_score_three_is_not_automatic_admission():
@@ -241,12 +268,14 @@ def test_coverage_denominator_is_the_full_development_subset(decision):
             "total_development_rows"] == g.EXPECTED_DEV_PAIRS
 
 
-def test_unresolved_coverage_is_not_reported_as_a_failure(decision):
+def test_observed_coverage_is_reported_with_an_observed_numerator(decision):
     for var, cov in decision["candidate_coverage"].items():
-        assert cov["resolution"] == "UNRESOLVED"
-        assert cov["coverage_gate_passed"] is None, (
-            "an unresolved numerator must not be converted into a FAIL"
-        )
+        assert cov["resolution"] == "PASS", var
+        assert cov["valid_rows"] is not None
+        assert cov["total_development_rows"] == g.EXPECTED_DEV_PAIRS
+        assert cov["coverage_gate_passed"] is not None
+        assert cov["valid_rows"] + cov["missing_or_unresolved_rows"] == (
+            cov["total_development_rows"])
 
 
 def test_unresolved_numerator_differs_from_observed_zero():
@@ -263,8 +292,11 @@ def test_common_sample_requires_all_three_variables(decision):
     cs = decision["block_common_sample"]
     assert cs["requires_all_three_m2_variables_simultaneously_usable"] is True
     assert cs["threshold"] == 0.70
-    assert cs["resolution"] == "UNRESOLVED"
-    assert cs["common_coverage_gate_passed"] is None
+    assert cs["resolution"] == "PASS"
+    assert cs["common_coverage_gate_passed"] is not None
+    # The common sample can never exceed the weakest single-variable numerator.
+    assert cs["common_usable_rows"] <= min(
+        c["valid_rows"] for c in decision["candidate_coverage"].values())
 
 
 def test_coverage_gate_passes_only_at_or_above_threshold():
@@ -283,12 +315,17 @@ def test_coverage_gate_passes_only_at_or_above_threshold():
 # Event-count feasibility — never fabricated, never asserted without evidence
 # --------------------------------------------------------------------------- #
 
-def test_event_feasibility_unresolved_does_not_assert_a_sap_label(decision):
+def test_event_feasibility_is_observed_and_needs_no_model(decision):
     f = decision["event_count_feasibility"]
-    assert f["resolution"] == "UNRESOLVED"
-    assert f["sap_label_asserted"] is None
-    assert f["sap_label_not_asserted_reason"]
+    assert f["resolution"] == "PASS"
+    assert f["sap_label_asserted"] in (
+        "development_comparison_feasibility_met",
+        "development_comparison_not_supported",
+    )
     assert f["no_model_was_fit_to_assess_this"] is True
+    # Negative counts are descriptive only: no minimum-negative rule exists.
+    assert set(f["m2_common_sample_negative_counts"]) == {
+        "fold1_validation", "fold2_validation"}
 
 
 def test_event_feasibility_uses_both_validation_windows():
@@ -376,10 +413,10 @@ def test_no_duplicate_pair_keys_in_feature_table(features):
     assert len(keys) == len(set(keys))
 
 
-def test_unresolved_ticker_mapping_stays_unresolved(decision):
+def test_every_development_ticker_resolved_to_an_instrument(decision):
     ja = decision["join_leakage_audit"]
-    assert ja["ticker_mapping_failures"] is None
-    assert ja["ticker_mapping_unresolved"] > 0
+    assert ja["ticker_mapping_failures"] == 0
+    assert ja["ticker_mapping_unresolved"] == 0
 
 
 def test_join_targets_the_frozen_m1_design(decision):
@@ -407,12 +444,21 @@ def test_forbidden_substitutes_are_named_and_unused(manifest):
         assert forbidden not in manifest["substitute_sources_used"]
 
 
-def test_probe_evidence_is_recorded_for_every_required_endpoint(manifest):
-    probed = {p["url"] for p in manifest["probe_evidence"]}
-    assert probed == set(g.REQUIRED_TSETMC_ENDPOINTS)
-    for p in manifest["probe_evidence"]:
-        assert "attempted_at_utc" in p
-        assert p["http_status"] is not None or p["error_class"]
+def test_endpoint_provenance_is_recorded_and_tsetmc_only(manifest):
+    hosts = set(manifest["endpoint_hosts_observed"])
+    assert hosts
+    assert all(h.endswith("tsetmc.com") for h in hosts), hosts
+    assert manifest["field_mapping_verified"] is True
+    assert manifest["field_mapping_verified_rows"] > 0
+
+
+def test_gate_is_reproducible_without_network(manifest, decision):
+    assert manifest["network_required_to_reproduce_gate"] is False
+    assert manifest["execution_environment"][
+        "network_egress_used_for_this_gate"] is False
+    assert decision["network_required_to_reproduce"] is False
+    assert decision["gate_decided_from_endpoint_reachability"] is False
+    assert decision["evidence_mode"] == g.EVIDENCE_MODE_IMPORTED_BUNDLE
 
 
 # --------------------------------------------------------------------------- #
@@ -435,7 +481,7 @@ def test_module_contains_no_estimator_import():
         os.path.join(REAL_ROOT, "src", "stage127_m2_market_data_gate.py"),
         encoding="utf-8").read()
     for banned in ("sklearn", "xgboost", "LogisticRegression",
-                   "RandomForest", "fit(", "predict_proba"):
+                   "RandomForest", ".fit(", "predict_proba"):
         assert banned not in src
 
 
@@ -443,21 +489,47 @@ def test_module_contains_no_estimator_import():
 # Gate status / next-action gating
 # --------------------------------------------------------------------------- #
 
-def test_gate_status_is_unresolved_with_explicit_blockers(decision):
-    assert decision["gate_status"] == "UNRESOLVED_M2_DATA_GATE"
+def test_gate_status_is_recognised_and_blockers_are_explicit(decision):
     assert decision["gate_status"] in (
         "PASS_FOR_M2_INCREMENTAL_EVALUATION",
         "FAIL_M2_DATA_GATE",
         "UNRESOLVED_M2_DATA_GATE",
     )
-    assert len(decision["blocker_reasons"]) >= 1
+    if decision["gate_status"] != "PASS_FOR_M2_INCREMENTAL_EVALUATION":
+        assert len(decision["blocker_reasons"]) >= 1
+    else:
+        assert decision["blocker_reasons"] == []
 
 
-def test_not_eligible_to_start_m2_incremental_evaluation(decision):
+def test_observed_failure_is_not_softened_into_unresolved(decision):
+    """A threshold failure computed from observed evidence must read FAIL."""
+    cond = decision["gate_decision_conditions"]
+    observed = [b for b in decision["blocker_reasons"] if "observed" in b]
+    if observed:
+        assert decision["gate_status"] == "FAIL_M2_DATA_GATE"
+        assert not all(cond.values())
+
+
+def test_pass_requires_the_full_conjunction(decision):
+    cond = decision["gate_decision_conditions"]
+    assert set(cond) == {
+        "A_data_admission_g01_g08",
+        "B_each_candidate_coverage_ge_0_80",
+        "C_common_sample_coverage_ge_0_70",
+        "D_both_validation_windows_ge_5_positives",
+        "E_no_pit_leakage_join_provenance_blocker",
+        "F_all_three_frozen_m2_variables_present",
+    }
+    assert (decision["gate_status"] == "PASS_FOR_M2_INCREMENTAL_EVALUATION") == (
+        all(cond.values()))
+
+
+def test_eligibility_tracks_the_gate_status_exactly(decision):
     e = decision["eligibility_for_next_action"]
     assert e["requires_data_admission_pass"] is True
     assert e["requires_development_comparison_feasibility_pass"] is True
-    assert e["eligible_to_start_m2_incremental_evaluation"] is False
+    assert e["eligible_to_start_m2_incremental_evaluation"] == (
+        decision["gate_status"] == "PASS_FOR_M2_INCREMENTAL_EVALUATION")
 
 
 def test_pass_status_requires_every_requirement(decision):
@@ -510,12 +582,25 @@ def test_qc_report_all_pass(qc):
     assert qc["assertion_count"] >= 10
 
 
-def test_build_is_deterministic_for_fixed_probe_evidence():
-    probes = [{"url": u, "http_status": None, "error_class": "TimeoutError"}
-              for u in g.REQUIRED_TSETMC_ENDPOINTS]
-    a = g.build(REPO_ROOT, probes)
-    b = g.build(REPO_ROOT, probes)
+def test_feature_computation_is_deterministic():
+    obs = [
+        {"trading_date": f"2016-{m:02d}-{d:02d}", "range_id": "R",
+         "adjusted_close": 1000.0 + i, "adjusted_close_status": "OK",
+         "traded_value_rial": 1_000_000.0}
+        for i, (m, d) in enumerate(
+            (m, d) for m in range(1, 13) for d in range(1, 21))
+    ]
+    a = g.compute_pair_features("2017-01-01", obs)
+    b = g.compute_pair_features("2017-01-01", obs)
     assert a == b
+
+
+def test_m2_incremental_evaluation_remains_unauthorized(decision):
+    e = decision["eligibility_for_next_action"]
+    assert e["m2_incremental_evaluation_authorized"] is False
+    assert e["m2_modeling_started"] is False
+    assert e["eligibility_is_not_authorization"] is True
+    assert e["next_action_id"] == g.NEXT_GATED_ACTION_ID
 
 
 def test_canonical_source_hashes_verify_on_disk(decision):

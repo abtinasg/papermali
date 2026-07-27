@@ -78,6 +78,9 @@ ALLOWLIST_FILES = (
     "project/src/stage127_m2_market_data_gate.py",
     "project/run_stage127_m2_market_data_gate.py",
     "project/tests/test_stage127_m2_market_data_gate.py",
+    # Stage127 external TSETMC delivery import / revalidation layer and tests.
+    "project/src/stage127_m2_external_delivery_import.py",
+    "project/tests/test_stage127_m2_external_delivery_import.py",
     # Stage127 external TSETMC retrieval-request package code and tests.
     "project/src/stage127_m2_external_retrieval_request.py",
     "project/run_stage127_m2_external_retrieval_request.py",

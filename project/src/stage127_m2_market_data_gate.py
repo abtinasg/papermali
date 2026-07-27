@@ -25,6 +25,7 @@ import csv
 import hashlib
 import json
 import os
+import statistics
 from datetime import date, timedelta
 from typing import Any
 
@@ -231,6 +232,162 @@ def load_development_pairs(repo_root: str) -> list[dict[str, Any]]:
     return pairs
 
 
+def pair_scientific_window(
+    cutoff_iso: str, observations: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Derive the frozen pair-specific scientific window W from observations.
+
+    The 111 external ranges are RETRIEVAL supersets, including a 30-day buffer.
+    They are not the scientific window and are never used as one. W is
+    recomputed here from the frozen Stage125 contract for each pair:
+
+    * every market observation must satisfy
+      ``market_observation_date < pair_cutoff_date`` -- an observation on the
+      same calendar day as the cutoff is rejected;
+    * ``T*`` is the last eligible trading day strictly before the cutoff that
+      carries the required verified availability (a present ``adjusted_close``);
+    * ``W`` spans exactly 12 calendar months ending at ``T*``, starting at the
+      inclusive trading days on or after calendar date ``T* - 12 months``.
+    """
+    if not cutoff_iso:
+        return {"resolution": "UNRESOLVED_NO_PAIR_CUTOFF", "window": []}
+
+    eligible = [o for o in observations if o["trading_date"] < cutoff_iso]
+    same_day = sum(1 for o in observations if o["trading_date"] == cutoff_iso)
+    priced = [o for o in eligible if o["adjusted_close"] is not None]
+    if not priced:
+        return {
+            "resolution": "UNRESOLVED_NO_ELIGIBLE_PRICED_TRADING_DAY",
+            "window": [],
+            "same_calendar_day_as_cutoff_rejected": same_day,
+            "eligible_observation_count": len(eligible),
+        }
+
+    t_star = priced[-1]["trading_date"]
+    start = minus_calendar_months(
+        date.fromisoformat(t_star), SHARED_WINDOW_CALENDAR_MONTHS
+    ).isoformat()
+    window = [o for o in eligible if start <= o["trading_date"] <= t_star]
+    return {
+        "resolution": RESOLUTION_PASS,
+        "window": window,
+        "t_star": t_star,
+        "window_start_calendar_date": start,
+        "window_first_trading_date": window[0]["trading_date"],
+        "window_last_trading_date": window[-1]["trading_date"],
+        "same_calendar_day_as_cutoff_rejected": same_day,
+        "eligible_observation_count": len(eligible),
+    }
+
+
+def daily_simple_returns(
+    window: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Valid daily simple returns for CONSECUTIVE trading observations in W.
+
+    ``r_t = P_t / P_{t-1} - 1`` is emitted only when the two observations are
+    genuinely adjacent trading observations of the same authorized retrieval
+    range AND both adjusted prices are present. A missing adjusted price is
+    never bridged: two usable observations separated by a gap are never treated
+    as consecutive trading days.
+    """
+    out: list[dict[str, Any]] = []
+    for prev, cur in zip(window, window[1:]):
+        if prev["range_id"] != cur["range_id"]:
+            continue  # a disjoint authorized range is not a consecutive day
+        p0, p1 = prev["adjusted_close"], cur["adjusted_close"]
+        if p0 is None or p1 is None or p0 == 0:
+            continue
+        out.append({
+            "trading_date": cur["trading_date"],
+            "r_t": p1 / p0 - 1,
+            "traded_value_rial": cur["traded_value_rial"],
+        })
+    return out
+
+
+def compute_pair_features(
+    cutoff_iso: str, observations: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Compute EXACTLY the three frozen M2 variables for one development pair.
+
+    No beta, momentum, market return, turnover, extra volume feature or new
+    liquidity proxy is computed. Missing evidence yields ``None`` (unavailable),
+    never an imputed or fabricated value.
+    """
+    win = pair_scientific_window(cutoff_iso, observations)
+    base: dict[str, Any] = {
+        "equity_return_window": None,
+        "realized_volatility": None,
+        "amihud_illiquidity": None,
+        "t_star": win.get("t_star", ""),
+        "window_start_calendar_date": win.get("window_start_calendar_date", ""),
+        "window_first_trading_date": win.get("window_first_trading_date", ""),
+        "window_last_trading_date": win.get("window_last_trading_date", ""),
+        "window_trading_day_count": len(win["window"]),
+        "same_calendar_day_as_cutoff_rejected": win.get(
+            "same_calendar_day_as_cutoff_rejected", 0),
+        "missing_price_day_count": 0,
+        "zero_traded_value_day_count": 0,
+        "usable_daily_return_count": 0,
+        "usable_amihud_day_count": 0,
+        "m2_value_status": win["resolution"],
+    }
+    window = win["window"]
+    if not window:
+        return base
+
+    base["missing_price_day_count"] = sum(
+        1 for o in window if o["adjusted_close"] is None
+    )
+    base["zero_traded_value_day_count"] = sum(
+        1 for o in window if o["traded_value_rial"] == 0
+    )
+
+    returns = daily_simple_returns(window)
+    base["usable_daily_return_count"] = len(returns)
+    amihud_days = [
+        r for r in returns if r["traded_value_rial"] > 0
+    ]
+    base["usable_amihud_day_count"] = len(amihud_days)
+
+    enough_returns = len(returns) >= MIN_VALID_RETURN_OBSERVATIONS
+    p_first = window[0]["adjusted_close"]
+    p_last = window[-1]["adjusted_close"]
+
+    if enough_returns and p_first is not None and p_last is not None and p_first != 0:
+        base["equity_return_window"] = p_last / p_first - 1
+    if enough_returns:
+        base["realized_volatility"] = statistics.stdev(
+            [r["r_t"] for r in returns]
+        )
+    if len(amihud_days) >= MIN_VALID_AMIHUD_OBSERVATIONS:
+        base["amihud_illiquidity"] = statistics.fmean(
+            [abs(r["r_t"]) / r["traded_value_rial"] for r in amihud_days]
+        )
+
+    reasons: list[str] = []
+    if not enough_returns:
+        reasons.append(
+            f"usable_daily_return_count={len(returns)} < "
+            f"{MIN_VALID_RETURN_OBSERVATIONS}"
+        )
+    if p_first is None:
+        reasons.append("adjusted_close missing at window start t0")
+    if p_last is None:
+        reasons.append("adjusted_close missing at window end T*")
+    if len(amihud_days) < MIN_VALID_AMIHUD_OBSERVATIONS:
+        reasons.append(
+            f"usable_amihud_day_count={len(amihud_days)} < "
+            f"{MIN_VALID_AMIHUD_OBSERVATIONS}"
+        )
+    base["m2_value_status"] = (
+        "OBSERVED_COMPLETE" if not reasons
+        else "OBSERVED_INCOMPLETE: " + "; ".join(reasons)
+    )
+    return base
+
+
 def required_window(cutoff_iso: str) -> tuple[str, str]:
     """Required shared 12-month market window bounds for a pair cutoff.
 
@@ -275,47 +432,135 @@ GATE_STATUS_PASS = "PASS_FOR_M2_INCREMENTAL_EVALUATION"
 GATE_STATUS_FAIL = "FAIL_M2_DATA_GATE"
 GATE_STATUS_UNRESOLVED = "UNRESOLVED_M2_DATA_GATE"
 
+#: The Gate is decided from the imported immutable evidence bundle, offline.
+#: There is no reachability-based path and no silent fallback to one.
+EVIDENCE_MODE_IMPORTED_BUNDLE = "offline_imported_external_evidence_bundle"
 
-def score_accessibility(endpoint_evidence: list[dict[str, Any]]) -> dict[str, Any]:
-    """Apply the frozen R-A mapping to captured candidate_endpoint_evidence.
 
-    Fail-closed and evidence-bound: a numeric score is returned ONLY when at
-    least one endpoint probe actually reached the authoritative source (a real
-    HTTP response). A probe that never reached the source proves nothing about
-    the source -- it is missing evidence, which the frozen mapping requires be
-    recorded as UNRESOLVED and explicitly ``never_zero``.
+def score_accessibility_from_evidence(evidence: dict[str, Any]) -> dict[str, Any]:
+    """Apply the frozen Stage125 R-A mapping to imported candidate-level evidence.
+
+    The score is DERIVED from the frozen mapping, never pre-assumed. A homepage
+    or endpoint merely responding is explicitly insufficient
+    (``source_origin_probe_alone_insufficient_for_numeric_score``): a numeric
+    score requires candidate-level endpoint evidence with reproducible
+    source/provenance. Missing evidence stays ``null``/UNRESOLVED and is never
+    fabricated into a zero.
     """
-    reached = [e for e in endpoint_evidence if e.get("http_status")]
-    if not reached:
+    candidate_level = bool(evidence.get("candidate_level_endpoint_evidence"))
+    if not candidate_level:
         return {
             "resolution": RESOLUTION_UNRESOLVED,
             "accessibility_score": None,
             "score_basis": "no_candidate_endpoint_evidence_captured",
+            "evidence": evidence,
             "never_scored_zero_reason": (
                 "The frozen R-A mapping requires "
-                "missing_evidence = null_or_unresolved_never_zero. No endpoint "
-                "probe reached the authoritative source, so no property of the "
-                "source was observed. Scoring 0-2 would assert an unobserved "
-                "hard-drop property and is therefore prohibited."
+                "missing_evidence = null_or_unresolved_never_zero and states "
+                "source_origin_probe_alone_insufficient_for_numeric_score. "
+                "Without candidate-level endpoint evidence no property of the "
+                "source was observed, so scoring 0-2 (a hard drop) would "
+                "assert an unobserved property and is prohibited."
             ),
         }
-    structured = [e for e in reached if e.get("machine_readable")]
-    score = 5 if structured else 4
+
+    reproducible = bool(evidence.get("reproducible_retrieval_with_provenance"))
+    documented = bool(evidence.get("documented_api_or_portal"))
+    if not (reproducible and documented):
+        return {
+            "resolution": RESOLUTION_PASS,
+            "accessibility_score": 3,
+            "score_basis": (
+                "candidate_endpoint_evidence captured; systematic retrieval "
+                "plausible but reproducible provenance not fully demonstrated "
+                "(R-A level 3, pilot permission only)"
+            ),
+            "evidence": evidence,
+            "never_scored_zero_reason": None,
+        }
+
+    structured = bool(evidence.get("machine_readable_or_reliably_structured"))
+    authoritative = bool(evidence.get("authoritative_source"))
+    if structured and authoritative:
+        return {
+            "resolution": RESOLUTION_PASS,
+            "accessibility_score": 5,
+            "score_basis": (
+                "R-A level 5: authoritative, fully reproducible, "
+                "machine-readable candidate-level retrieval with verified "
+                "provenance (endpoints, raw responses, SHA256 manifest, "
+                "extraction code, instrument mapping evidence)"
+            ),
+            "evidence": evidence,
+            "never_scored_zero_reason": None,
+        }
     return {
         "resolution": RESOLUTION_PASS,
-        "accessibility_score": score,
-        "score_basis": "candidate_endpoint_evidence_captured",
+        "accessibility_score": 4,
+        "score_basis": (
+            "R-A level 4: documented API/portal with reproducible "
+            "candidate-level retrieval and provenance"
+        ),
+        "evidence": evidence,
         "never_scored_zero_reason": None,
     }
 
 
 def build_candidate_gate(
     variable: str, candidate_id: str, formula_id: str,
-    accessibility: dict[str, Any], retrieval_reached: bool,
+    accessibility: dict[str, Any], import_qc: dict[str, Any],
+    timing: dict[str, Any],
 ) -> dict[str, Any]:
-    """Per-candidate G01-G08 evaluation, fail-closed on missing evidence."""
-    unresolved = not retrieval_reached
-    u = RESOLUTION_UNRESOLVED
+    """Per-candidate G01-G08 evaluation from imported evidence, fail-closed.
+
+    Each sub-gate resolves from an evidence fact that was independently
+    revalidated inside this repository, never from an endpoint status code and
+    never from the external party's own QC flag.
+    """
+    score = accessibility["accessibility_score"]
+    g01 = (
+        RESOLUTION_UNRESOLVED if score is None
+        else (RESOLUTION_PASS if score >= 3 else RESOLUTION_FAIL)
+    )
+
+    g02 = (
+        RESOLUTION_PASS if import_qc["source_endpoints_tsetmc_only"]
+        else RESOLUTION_FAIL
+    )
+    g03 = (
+        RESOLUTION_PASS
+        if (import_qc["restricted_raw_hash_verification_passed"]
+            and import_qc["provenance_sha_agrees_with_raw_manifest"])
+        else RESOLUTION_FAIL
+    )
+    g04 = (
+        RESOLUTION_PASS
+        if (timing["accepted_post_cutoff_observations"] == 0
+            and timing["accepted_same_calendar_day_as_cutoff"] == 0)
+        else RESOLUTION_FAIL
+    )
+    g05 = (
+        RESOLUTION_PASS
+        if (import_qc["raw_to_normalized_field_mismatches"] == 0
+            and import_qc["adjusted_close_exact_date_mismatches"] == 0
+            and not import_qc["raw_close_substituted_for_adjusted_close"]
+            and not import_qc["imputation_or_synthetic_values_introduced"])
+        else RESOLUTION_FAIL
+    )
+    g06 = RESOLUTION_PASS
+    g07 = (
+        RESOLUTION_PASS
+        if import_qc["final_test_period_observations_imported"] == 0
+        else RESOLUTION_FAIL
+    )
+
+    required = (g01, g02, g03, g04, g05, g06, g07)
+    if RESOLUTION_FAIL in required:
+        g08 = RESOLUTION_FAIL
+    elif RESOLUTION_UNRESOLVED in required:
+        g08 = RESOLUTION_UNRESOLVED
+    else:
+        g08 = RESOLUTION_PASS
 
     return {
         "variable": variable,
@@ -324,68 +569,86 @@ def build_candidate_gate(
         "block": M2_BLOCK,
         "primary_source_id": M2_PRIMARY_SOURCE_ID,
         "G01_accessibility": {
-            "resolution": accessibility["resolution"],
-            "accessibility_score": accessibility["accessibility_score"],
+            "resolution": g01,
+            "accessibility_score": score,
             "threshold": ">= 3",
             "basis": accessibility["score_basis"],
+            "derived_from_frozen_R_A_mapping": True,
+            "endpoint_response_alone_is_insufficient": True,
         },
         "G02_authoritative_source": {
-            "resolution": u if unresolved else RESOLUTION_PASS,
+            "resolution": g02,
             "note": (
-                "Frozen authoritative source is TSETMC (src_m2_tsetmc_market). "
-                "No substitute source was used or considered."
+                "Every imported endpoint, provenance record and raw response "
+                "cites TSETMC only (src_m2_tsetmc_market). No substitute "
+                "source was used or considered."
             ),
         },
         "G03_reproducible_retrieval_path": {
-            "resolution": u if unresolved else RESOLUTION_PASS,
+            "resolution": g03,
             "note": (
-                "No retrieval could be executed, so no reproducible retrieval "
-                "path was demonstrated for this candidate."
-                if unresolved else "Retrieval path captured with provenance."
+                "Candidate-level retrieval is reproducible offline from the "
+                "immutable bundle: per-instrument endpoints, raw responses, a "
+                "verified SHA256 manifest, a restricted-raw provenance "
+                "manifest and the extraction code were all delivered and "
+                "independently re-verified."
             ),
+            "restricted_raw_files_verified": import_qc[
+                "restricted_raw_hashes_verified"],
         },
         "G04_timing_verified": {
-            "resolution": u if unresolved else RESOLUTION_PASS,
+            "resolution": g04,
             "requirement": "market_observation_date < pair_cutoff_date",
+            "accepted_post_cutoff_observations": timing[
+                "accepted_post_cutoff_observations"],
+            "accepted_same_calendar_day_as_cutoff": timing[
+                "accepted_same_calendar_day_as_cutoff"],
             "note": (
-                "Timing cannot be verified without observations."
-                if unresolved else "Verified against pair-specific cutoffs."
+                "Every accepted observation was re-checked against its own "
+                "pair cutoff; same-calendar-day observations are rejected."
             ),
         },
         "G05_extraction_quality_controlled": {
-            "resolution": u if unresolved else RESOLUTION_PASS,
+            "resolution": g05,
             "required_price_field": PRICE_FIELD,
             "required_volume_field": VOLUME_FIELD,
+            "raw_to_normalized_field_mismatches": import_qc[
+                "raw_to_normalized_field_mismatches"],
+            "adjusted_close_exact_date_mismatches": import_qc[
+                "adjusted_close_exact_date_mismatches"],
             "note": (
-                "Corporate-action-adjusted close could not be verified as "
-                "obtainable; unadjusted close is never silently substituted."
-                if unresolved else "Adjustment/unit/calendar/ticker mapping verified."
+                "Raw->normalized field mapping was re-verified for every "
+                "imported row; adjusted_close was re-verified against the raw "
+                "adjusted pc on the exact same trading date. Unadjusted close "
+                "is never substituted and no value was imputed."
             ),
         },
         "G06_missing_means_unavailable": {
-            "resolution": RESOLUTION_PASS,
+            "resolution": g06,
             "note": (
-                "Enforced: no availability was inferred anywhere in this Gate."
+                "Enforced: missing adjusted price or missing traded value "
+                "makes a day unusable; it is never imputed, filled or read as "
+                "an observed zero."
             ),
         },
         "G07_no_future_or_target_year_information": {
-            "resolution": RESOLUTION_PASS,
+            "resolution": g07,
             "note": (
                 "Enforced structurally: only development pairs (target years "
-                "1393-1399) were loaded; no final-test row was read."
+                "1393-1399) were loaded, no final-test row was read, and every "
+                "imported observation date was checked against the firewall."
             ),
         },
         "G08_all_required_gates_pass": {
-            "resolution": u if unresolved else RESOLUTION_PASS,
-            "note": (
-                "Cannot be asserted while G01-G05 are UNRESOLVED."
-                if unresolved else "All required gates passed."
-            ),
+            "resolution": g08,
+            "note": "Conjunction of G01-G07; no sub-gate may be assumed.",
         },
-        "admission_decision": (
-            "UNRESOLVED_NOT_ADMITTED" if unresolved else "ADMITTED"
-        ),
-        "admission_decision_is_not_a_rejection": bool(unresolved),
+        "admission_decision": {
+            RESOLUTION_PASS: "ADMITTED",
+            RESOLUTION_FAIL: "NOT_ADMITTED_OBSERVED_FAILURE",
+            RESOLUTION_UNRESOLVED: "UNRESOLVED_NOT_ADMITTED",
+        }[g08],
+        "admission_decision_is_not_a_rejection": g08 == RESOLUTION_UNRESOLVED,
     }
 
 
@@ -439,7 +702,8 @@ def candidate_coverage(
         valid_rows = sum(
             1 for p in pairs if (p["ticker"], p["fiscal_year_t"]) in usable_keys
         )
-        unresolved_rows = 0
+        # Observed-unavailable, not "unresolved": the numerator WAS observed.
+        unresolved_rows = total - valid_rows
 
     overall = cov(pairs)
     passed = (
@@ -647,46 +911,283 @@ def join_leakage_audit(
 # Build
 # --------------------------------------------------------------------------- #
 
-def build(repo_root: str, probe_evidence: list[dict[str, Any]]) -> dict[str, str]:
-    """Execute the Gate and return {relative_filename: file_text}."""
+def unavailability_breakdown(
+    features: dict[tuple[str, str], dict[str, Any]],
+) -> dict[str, Any]:
+    """Why each frozen M2 variable was unavailable, per observed cause.
+
+    Purely descriptive. It exists so a FAIL is fully traceable to the observed
+    evidence rather than asserted, and it never alters a threshold or a value.
+    """
+    total = len(features)
+    missing_t0 = sum(
+        1 for f in features.values()
+        if f["window_trading_day_count"] and f["window_first_trading_date"]
+        and f["missing_price_day_count"] and f["equity_return_window"] is None
+        and f["usable_daily_return_count"] >= MIN_VALID_RETURN_OBSERVATIONS
+    )
+    too_few_returns = sum(
+        1 for f in features.values()
+        if f["usable_daily_return_count"] < MIN_VALID_RETURN_OBSERVATIONS
+    )
+    too_few_amihud = sum(
+        1 for f in features.values()
+        if f["usable_amihud_day_count"] < MIN_VALID_AMIHUD_OBSERVATIONS
+    )
+    return {
+        "development_pairs": total,
+        "pairs_with_fewer_than_min_valid_daily_returns": too_few_returns,
+        "pairs_with_fewer_than_min_usable_amihud_days": too_few_amihud,
+        "pairs_failing_only_the_window_endpoint_price_requirement": missing_t0,
+        "min_valid_daily_return_observations": MIN_VALID_RETURN_OBSERVATIONS,
+        "min_valid_amihud_observations": MIN_VALID_AMIHUD_OBSERVATIONS,
+        "thresholds_reduced_to_improve_coverage": False,
+        "missing_values_imputed": False,
+    }
+
+
+def decide_gate_status(
+    candidates: list[dict[str, Any]],
+    coverage: dict[str, dict[str, Any]],
+    common_audit: dict[str, Any],
+    feasibility: dict[str, Any],
+    blocking_evidence_defects: list[str],
+) -> tuple[str, list[str], dict[str, Any]]:
+    """Explicit conjunction A AND B AND C AND D AND E AND F.
+
+    PASS is only reachable through observed evidence satisfying every frozen
+    requirement. Reachability, an HTTP status, or the external party's own QC
+    flag can never produce a PASS. An OBSERVED threshold failure is reported as
+    FAIL and is never softened into UNRESOLVED; genuinely missing evidence is
+    reported as UNRESOLVED and is never hardened into an observed zero.
+    """
+    observed_failures: list[str] = []
+    unresolved_reasons: list[str] = []
+
+    # -- A: G01-G08 data-admission conditions ------------------------------- #
+    a_states = {c["variable"]: c["G08_all_required_gates_pass"]["resolution"]
+                for c in candidates}
+    for var, state in a_states.items():
+        if state == RESOLUTION_FAIL:
+            observed_failures.append(
+                f"A: candidate '{var}' failed a required G01-G08 data-admission "
+                "condition"
+            )
+        elif state == RESOLUTION_UNRESOLVED:
+            unresolved_reasons.append(
+                f"A: candidate '{var}' has an UNRESOLVED G01-G08 condition"
+            )
+    cond_a = all(s == RESOLUTION_PASS for s in a_states.values())
+
+    # -- B: per-candidate development valid coverage >= 0.80 ---------------- #
+    cond_b = True
+    for var, cov in coverage.items():
+        if cov["resolution"] == RESOLUTION_UNRESOLVED:
+            cond_b = False
+            unresolved_reasons.append(
+                f"B: coverage for '{var}' is UNRESOLVED (no observed numerator)"
+            )
+        elif not cov["coverage_gate_passed"]:
+            cond_b = False
+            observed_failures.append(
+                f"B: observed development valid coverage for '{var}' is "
+                f"{cov['overall_coverage']:.4f} "
+                f"({cov['valid_rows']}/{cov['total_development_rows']}), below "
+                f"the frozen threshold {CANDIDATE_VALID_COVERAGE_MIN}"
+            )
+
+    # -- C: three-variable common-sample coverage >= 0.70 ------------------- #
+    if common_audit["resolution"] == RESOLUTION_UNRESOLVED:
+        cond_c = False
+        unresolved_reasons.append("C: block common sample is UNRESOLVED")
+    elif not common_audit["common_coverage_gate_passed"]:
+        cond_c = False
+        observed_failures.append(
+            "C: observed three-variable common-sample coverage is "
+            f"{common_audit['common_coverage']:.4f} "
+            f"({common_audit['common_usable_rows']}/"
+            f"{common_audit['total_development_rows']}), below the frozen "
+            f"threshold {BLOCK_COMMON_SAMPLE_COVERAGE_MIN}"
+        )
+    else:
+        cond_c = True
+
+    # -- D: >= 5 positive evaluable observations in BOTH windows ------------ #
+    if feasibility["resolution"] == RESOLUTION_UNRESOLVED:
+        cond_d = False
+        unresolved_reasons.append("D: event-count feasibility is UNRESOLVED")
+    else:
+        pos = feasibility["m2_common_sample_positive_counts"]
+        cond_d = all(
+            v >= MIN_POSITIVE_EVALUABLE_EACH_VALIDATION_WINDOW
+            for v in pos.values()
+        )
+        if not cond_d:
+            for w, v in pos.items():
+                if v < MIN_POSITIVE_EVALUABLE_EACH_VALIDATION_WINDOW:
+                    observed_failures.append(
+                        f"D: locked validation window '{w}' contains {v} "
+                        "positive evaluable observations in the common M2 "
+                        f"sample, below the frozen minimum "
+                        f"{MIN_POSITIVE_EVALUABLE_EACH_VALIDATION_WINDOW}"
+                    )
+
+    # -- E: no PIT / leakage / join / provenance blocker --------------------- #
+    cond_e = not blocking_evidence_defects
+    observed_failures.extend(f"E: {d}" for d in blocking_evidence_defects)
+
+    # -- F: all three frozen M2 variables still present --------------------- #
+    cond_f = (
+        len(candidates) == len(M2_VARIABLES)
+        and {c["variable"] for c in candidates} == {v for v, _, _ in M2_VARIABLES}
+    )
+    if not cond_f:
+        observed_failures.append(
+            "F: the frozen three-variable M2 block was not fully present"
+        )
+
+    conditions = {
+        "A_data_admission_g01_g08": cond_a,
+        "B_each_candidate_coverage_ge_0_80": cond_b,
+        "C_common_sample_coverage_ge_0_70": cond_c,
+        "D_both_validation_windows_ge_5_positives": cond_d,
+        "E_no_pit_leakage_join_provenance_blocker": cond_e,
+        "F_all_three_frozen_m2_variables_present": cond_f,
+    }
+
+    if all(conditions.values()):
+        return GATE_STATUS_PASS, [], conditions
+    if observed_failures:
+        # An observed failure is never converted into UNRESOLVED.
+        return GATE_STATUS_FAIL, observed_failures + unresolved_reasons, conditions
+    return GATE_STATUS_UNRESOLVED, unresolved_reasons, conditions
+
+
+def build(
+    repo_root: str,
+    import_qc: dict[str, Any],
+    observations: dict[str, list[dict[str, Any]]],
+    accessibility_evidence: dict[str, Any],
+) -> dict[str, Any]:
+    """Execute the Gate from the imported immutable evidence bundle.
+
+    Deterministic and OFFLINE: given the bundle, no network connection is
+    required to reproduce this decision. There is no fallback to endpoint
+    reachability.
+    """
     pairs = load_development_pairs(repo_root)
+    accessibility = score_accessibility_from_evidence(accessibility_evidence)
 
-    reached = any(e.get("http_status") for e in probe_evidence)
-    accessibility = score_accessibility(probe_evidence)
+    features: dict[tuple[str, str], dict[str, Any]] = {}
+    accepted_observations = 0
+    post_cutoff = 0
+    same_day = 0
+    target_year_leak = 0
+    tickers_without_observations: set[str] = set()
 
-    # No observation could be retrieved -> numerators are UNRESOLVED (None),
-    # which is strictly distinct from an empty set of usable pairs.
-    usable: set[tuple[str, str]] | None = None if not reached else set()
-    common: set[tuple[str, str]] | None = None if not reached else set()
+    for p in pairs:
+        obs = observations.get(p["ticker"], [])
+        if not obs:
+            tickers_without_observations.add(p["ticker"])
+        cutoff = p["pair_cutoff_date"]
+        win = pair_scientific_window(cutoff, obs)
+        f = compute_pair_features(cutoff, obs)
+        # Re-audit the ACCEPTED observations themselves rather than trusting
+        # the window construction that produced them.
+        for o in win["window"]:
+            if not cutoff or o["trading_date"] > cutoff:
+                post_cutoff += 1
+            elif o["trading_date"] == cutoff:
+                same_day += 1
+            if o["trading_date"][:4] and int(o["trading_date"][:4]) >= 2021:
+                target_year_leak += 1
+        accepted_observations += f["window_trading_day_count"]
+        features[(p["ticker"], p["fiscal_year_t"])] = f
+
+    usable_by_var: dict[str, set[tuple[str, str]]] = {}
+    for var, _, _ in M2_VARIABLES:
+        usable_by_var[var] = {
+            k for k, f in features.items() if f[var] is not None
+        }
+    common = set.intersection(*usable_by_var.values())
+
+    timing = {
+        "accepted_post_cutoff_observations": post_cutoff,
+        "accepted_same_calendar_day_as_cutoff": same_day,
+        "accepted_target_year_leakage_violations": target_year_leak,
+    }
 
     candidates = [
-        build_candidate_gate(var, cid, fid, accessibility, reached)
+        build_candidate_gate(var, cid, fid, accessibility, import_qc, timing)
         for var, cid, fid in M2_VARIABLES
     ]
-    coverage = {var: candidate_coverage(pairs, usable) for var, _, _ in M2_VARIABLES}
+    coverage = {
+        var: candidate_coverage(pairs, usable_by_var[var])
+        for var, _, _ in M2_VARIABLES
+    }
     common_audit = common_sample_audit(pairs, common)
     feasibility = event_count_feasibility(pairs, common)
-    join_audit = join_leakage_audit(pairs, None if not reached else 0)
+    join_audit = join_leakage_audit(pairs, accepted_observations)
+    join_audit.update({
+        "ticker_mapping_failures": len(tickers_without_observations),
+        "ticker_mapping_unresolved": 0,
+        "same_day_cutoff_exclusions_applied": sum(
+            f["same_calendar_day_as_cutoff_rejected"] for f in features.values()
+        ),
+        "accepted_post_cutoff_observations": post_cutoff,
+        "accepted_target_year_leakage_violations": target_year_leak,
+    })
+    join_audit["acceptance_criteria"][
+        "zero_accepted_post_cutoff_observations"] = post_cutoff == 0
+    join_audit["acceptance_criteria"][
+        "zero_accepted_target_year_leakage"] = target_year_leak == 0
+    join_audit["note"] = (
+        "Leakage counters were validated against actually accepted market "
+        "observations imported from the immutable external bundle."
+    )
 
-    blockers: list[str] = []
-    if not reached:
-        blockers.append(
-            "No probe reached the authoritative TSETMC source from this "
-            "execution environment, so no candidate_endpoint_evidence could be "
-            "captured and no accessibility score could be assigned."
+    blocking_defects: list[str] = []
+    if post_cutoff:
+        blocking_defects.append(
+            f"{post_cutoff} accepted observations fall at or after a pair cutoff"
         )
-        blockers.append(
-            "Zero market observations were retrieved, so candidate coverage, "
-            "block common coverage and event-count feasibility could not be "
-            "evaluated against the frozen thresholds."
-        )
-        blockers.append(
-            "The corporate-action-adjusted closing price field required by the "
-            "frozen contract could not be verified as obtainable; unadjusted "
-            "close was not substituted."
+    if import_qc["raw_to_normalized_field_mismatches"]:
+        blocking_defects.append("raw -> normalized field mapping mismatch")
+    if import_qc["adjusted_close_exact_date_mismatches"]:
+        blocking_defects.append("adjusted-close exact-date join mismatch")
+    if import_qc["final_test_period_observations_imported"]:
+        blocking_defects.append("final-test period observation imported")
+    if not import_qc["restricted_raw_hash_verification_passed"]:
+        blocking_defects.append("restricted raw SHA256 verification failed")
+    if tickers_without_observations:
+        blocking_defects.append(
+            f"{len(tickers_without_observations)} development tickers have no "
+            "imported market observation"
         )
 
-    gate_status = GATE_STATUS_UNRESOLVED if blockers else GATE_STATUS_PASS
+    gate_status, blockers, conditions = decide_gate_status(
+        candidates, coverage, common_audit, feasibility, blocking_defects
+    )
+
+    status_meaning = {
+        GATE_STATUS_PASS: (
+            "Observed imported evidence satisfies every frozen data-admission "
+            "condition, coverage threshold and event-support requirement. This "
+            "makes M2 incremental evaluation scientifically ELIGIBLE for a new "
+            "explicit human authorization; it does not authorize it."
+        ),
+        GATE_STATUS_FAIL: (
+            "The Gate ran to completion on real imported evidence and OBSERVED "
+            "a failure against a frozen requirement. This is a truthful "
+            "negative result about the observed data, not missing evidence, "
+            "and it is deliberately not softened into UNRESOLVED."
+        ),
+        GATE_STATUS_UNRESOLVED: (
+            "Evidence required to decide is genuinely unavailable. The frozen "
+            "M2 block is neither admitted nor rejected. UNRESOLVED is not a "
+            "negative scientific finding."
+        ),
+    }[gate_status]
 
     decision = {
         "contract_id": CONTRACT_ID,
@@ -694,14 +1195,32 @@ def build(repo_root: str, probe_evidence: list[dict[str, Any]]) -> dict[str, str
         "decision_id": ACTION_ID,
         "stage": STAGE,
         "gate_status": gate_status,
-        "gate_status_meaning": (
-            "The Gate ran to completion and returned a truthful UNRESOLVED "
-            "result: the frozen M2 block is neither admitted nor rejected, "
-            "because the evidence required to decide could not be obtained "
-            "here. UNRESOLVED is not a negative scientific finding about "
-            "TSETMC or about M2."
-        ),
+        "gate_status_meaning": status_meaning,
         "blocker_reasons": blockers,
+        "gate_decision_conditions": conditions,
+        "gate_decision_rule": (
+            "PASS_FOR_M2_INCREMENTAL_EVALUATION requires A AND B AND C AND D "
+            "AND E AND F. Endpoint reachability, an HTTP status code, or the "
+            "external party's own QC flag can never produce a PASS."
+        ),
+        "gate_decided_from_endpoint_reachability": False,
+        "evidence_mode": EVIDENCE_MODE_IMPORTED_BUNDLE,
+        "network_required_to_reproduce": False,
+        "external_delivery": {
+            "bundle_filename": import_qc["bundle_filename"],
+            "bundle_sha256": import_qc["bundle_sha256"],
+            "bundle_size_bytes": import_qc["bundle_size_bytes"],
+            "canonical_request_sha256": import_qc["canonical_request_check"][
+                "delivered_request_sha256"],
+            "mapping_rows": import_qc["mapping_rows"],
+            "manifest_rows": import_qc["manifest_rows"],
+            "retrieval_status_counts": import_qc["retrieval_status_counts"],
+            "partial_ranges_preserved": import_qc["partial_ranges_preserved"],
+            "normalized_row_count": import_qc["normalized_row_count"],
+            "restricted_raw_file_count": import_qc["restricted_raw_file_count"],
+            "external_qc_report_trusted": False,
+            "independently_revalidated_in_papermali": True,
+        },
         "scope": "point_in_time_data_admission_gate_development_only",
         "answers_only": (
             "Can the frozen M2 market variables be obtained with correct "
@@ -727,12 +1246,45 @@ def build(repo_root: str, probe_evidence: list[dict[str, Any]]) -> dict[str, str
         "prediction_calls": 0,
         "m2_vs_m1_performance_compared": False,
         "eligibility_for_next_action": {
+            "next_action_id": NEXT_GATED_ACTION_ID,
             "requires_data_admission_pass": True,
             "requires_development_comparison_feasibility_pass": True,
-            "data_admission_pass": False,
-            "development_comparison_feasibility_pass": False,
-            "eligible_to_start_m2_incremental_evaluation": False,
+            "data_admission_pass": conditions["A_data_admission_g01_g08"],
+            "development_comparison_feasibility_pass": conditions[
+                "D_both_validation_windows_ge_5_positives"],
+            "eligible_to_start_m2_incremental_evaluation": (
+                gate_status == GATE_STATUS_PASS
+            ),
+            "m2_incremental_evaluation_authorized": False,
+            "m2_modeling_started": False,
+            "eligibility_is_not_authorization": True,
         },
+        "feature_unavailability_breakdown": unavailability_breakdown(features),
+        "window_endpoint_rule": {
+            "rule": (
+                "Per the frozen contract, W is ordered t0..tN=T* over the "
+                "trading days on or after calendar date T* minus 12 calendar "
+                "months, and equity_return_window REQUIRES adjusted_close "
+                "present at BOTH t0 and tN. t0 is the first trading day of W, "
+                "not the first priced day of W."
+            ),
+            "endpoint_requirement_can_fail": True,
+            "missing_endpoint_price_is_never_imputed_or_bridged": True,
+            "alternative_reading_not_adopted": (
+                "Re-defining t0 as the first PRICED day of W would make the "
+                "frozen endpoint requirement vacuous and would raise observed "
+                "coverage. It was NOT adopted: relaxing a frozen contract to "
+                "improve coverage is prohibited."
+            ),
+        },
+        "frozen_m2_feature_block_extra_features_computed": [],
+        "m2_feature_block_changed": False,
+        "pair_specific_window_recomputed_from_frozen_contract": True,
+        "retrieval_range_used_as_scientific_window": False,
+        "retrieval_buffer_days_entered_scientific_window": False,
+        "imputation_or_fill_applied": False,
+        "unadjusted_close_substituted": False,
+        "threshold_reduced": False,
         "final_test_firewall": {
             "final_test_locked": True,
             "final_test_unlocked": False,
@@ -750,5 +1302,10 @@ def build(repo_root: str, probe_evidence: list[dict[str, Any]]) -> dict[str, str
     }
 
     return {
-        "stage127_m2_market_data_gate_decision.json": json_dumps(decision),
+        "decision": decision,
+        "pairs": pairs,
+        "features": features,
+        "accessibility": accessibility,
+        "usable_by_variable": usable_by_var,
+        "common_sample_keys": common,
     }

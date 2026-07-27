@@ -1332,10 +1332,11 @@ def test_real_repo_roadmap_stage126_status_consistency():
     freeze_row_l = freeze_match.group(1).lower()
     assert "**complete.**" in freeze_row_l
 
-    # Isolate the M2 market-data-gate row (item 21) — now EXECUTED with an
-    # UNRESOLVED result. The row must state the executed status truthfully and
-    # must never claim the Gate passed or was completed with an admission
-    # decision, since UNRESOLVED admits and rejects nothing.
+    # Isolate the M2 market-data-gate row (item 21). The row must state the
+    # executed status truthfully and must never claim the Gate passed or was
+    # completed. The exact status is not pinned here: it is cross-checked
+    # against the machine-readable Gate artifact below, so the row can never
+    # drift away from the real result and can never be stale.
     gate_match = re.search(
         r"21\.\s*`stage127-m2-market-data-gate`\s*—\s*([^\n]+)",
         roadmap,
@@ -1343,7 +1344,10 @@ def test_real_repo_roadmap_stage126_status_consistency():
     assert gate_match is not None, "M2 market-data-gate research-action row missing"
     gate_row_l = gate_match.group(1).lower()
     assert "executed" in gate_row_l
-    assert "unresolved_m2_data_gate" in gate_row_l
+    assert any(
+        status in gate_row_l
+        for status in ("unresolved_m2_data_gate", "fail_m2_data_gate")
+    ), "the Gate row must state a truthful non-passing status"
     assert "**complete.**" not in gate_row_l
     assert "pass_for_m2_incremental_evaluation" not in gate_row_l
 

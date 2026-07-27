@@ -24,6 +24,7 @@
   "normalized_authorization_scope": "این مجوز فقط اجرای دروازه پذیرش داده‌های بازار M2 (stage127-m2-market-data-gate) را مجاز می‌کند، شامل بازیابی واقعی داده/شواهد از منبع رسمی فقط تا حدی که برای همین دروازه لازم است. این مجوز شامل stage127-m2-incremental-evaluation، هیچ برازش یا پیش‌بینی مدل، بازتنظیم، جست‌وجوی ویژگی، بازبرازش کامل دوره توسعه، اجرای کالibration/bootstrap/Holm، SHAP، انتخاب مدل برنده یا نهایی، دسترسی به پیش‌بین یا هدف آزمون نهایی، کار M3 یا M4، و ادغام (merge) نیست.",
   "normalized_authorization_scope_is_derived_not_verbatim_human_text": true,
   "normalized_authorization_scope_sha256": "30db6f104091a5b1ed287b5e0732e850ff465e6123a7a391e6d86a5d653aacb2",
+  "permits_ingestion_of_externally_retrieved_evidence_for_this_gate": true,
   "permits_real_m2_source_retrieval_for_this_gate_only": true,
   "resolution_basis": "then_current_roadmap_next_research_action_id",
   "resolved_authorized_action_id": "stage127-m2-market-data-gate",

@@ -7,10 +7,11 @@ front matter; this file is the working description.
 
 Authoritative research pointers live in `ROADMAP.md` front matter:
 `last_completed_research_action_id=stage126-m1-retained-design-freeze`,
-`next_research_action_id=stage127-m2-market-data-gate` — the Gate was EXECUTED
-but returned UNRESOLVED, so it has produced no admission decision and the
-research pointer deliberately does NOT advance past it, and specifically does
-NOT advance to `stage127-m2-incremental-evaluation`
+`next_research_action_id=stage127-m2-market-data-gate` — the Gate has now been
+RE-EXECUTED and RESOLVED from imported authoritative evidence, and returned
+**`FAIL_M2_DATA_GATE`**. The research pointer therefore deliberately does NOT
+advance past it, and specifically does NOT advance to
+`stage127-m2-incremental-evaluation`
 (primary M1 development-fold tuning completed on PR #52; all six registered
 M1 robustness categories are complete; `stage126-m1-robustness-closure`
 synthesized the six robustness results and closed the robustness set; and
@@ -20,43 +21,64 @@ retained model configurations/class-weighting policy/temporal folds/metric
 definitions/uncertainty and multiplicity plans — from already-completed
 development and robustness evidence only. No model was fit or predicted, no
 retuning, no final-test access, no full-development refit, no paper-winner or
-final-model selection, and no M2/M3/M4 work of any kind. Next action
-`stage127-m2-market-data-gate` requires separate, explicit, future human
-authorization; it has not started).
+final-model selection, and no M2/M3/M4 work of any kind).
 
-`stage127-m2-market-data-gate` has now been EXECUTED (development-only, no
-modeling) and returned **`UNRESOLVED_M2_DATA_GATE`**. The frozen three-variable
-M2 block (`equity_return_window`, `realized_volatility`, `amihud_illiquidity`)
-was joined to the 666 frozen M1 primary development pairs (target years
-1393-1399) with per-pair 12-calendar-month pre-cutoff retrieval windows
-computed under the strict `market_observation_date < pair_cutoff_date` rule.
-The authoritative TSETMC source (`src_m2_tsetmc_market`) could not be reached
-from the execution environment: all five required endpoints failed to connect
-while unrelated public hosts were reachable. No substitute provider was
-contacted. Because no `candidate_endpoint_evidence` was captured, no
-accessibility score was assigned — the frozen R-A mapping requires
-`missing_evidence = null_or_unresolved_never_zero`, so scoring 0-2 (a hard
-drop) is prohibited: nothing about TSETMC itself was observed. Candidate
-coverage, block common coverage and event-count feasibility were therefore
-UNRESOLVED rather than FAIL, and no SAP feasibility label was asserted.
+## Stage127 M2 market-data Gate — current, truthful state
 
-**External retrieval handoff prepared (PR #66).** Because the authoritative
-TSETMC source is unreachable from the automated environment, a deterministic,
-self-contained retrieval-request package for an external Iran-based programmer
-was generated at `project/stage127/external_retrieval/` (666 development pair
-requests, 110 tickers, 111 merged ticker ranges, dates 2012-09-21..2020-07-18,
-all strictly before the Jalali 1400 final-test period). The external party
-performs RAW TSETMC RETRIEVAL ONLY: no feature engineering, no modeling, no
-final-test access, and the three M2 variables are computed inside papermali
-after ingestion. **No data has been ingested yet and the Gate result is
-unchanged.**
+Human authorization for `stage127-m2-market-data-gate` **already exists** and
+covers this action. The Gate was first executed with no data available and
+returned `UNRESOLVED_M2_DATA_GATE`. Authoritative TSETMC evidence has since
+been obtained externally **under that same Gate scope**, and the Gate has been
+re-executed and resolved from it. `stage127-m2-incremental-evaluation` remains
+**unauthorized and unstarted**.
 
-**Blocking next step (human review required):** re-execute
-`python project/run_stage127_m2_market_data_gate.py --build` from an
-environment with network egress to TSETMC. The exact per-pair retrieval ranges
-are enumerated in `project/stage127/stage127_m2_development_features.csv`.
-`stage127-m2-incremental-evaluation` remains unauthorized and unstarted; the
-frozen three-variable M2 block was NOT redefined and no variable was dropped.
+**Evidence.** The immutable external delivery
+`stage127_m2_tsetmc_full_delivery.zip` (SHA256
+`d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`,
+13,464,145 bytes) answers exactly the canonical PR #66 request: 110 instrument
+mappings, 111 authorized ranges (105 SUCCESS / 6 PARTIAL / 0 FAILED), 163,230
+normalized daily rows spanning 2012-09-22..2020-07-18, and 222 SHA256-verified
+restricted raw evidence files. The external QC flag was **not** trusted: the
+raw → normalized field mapping was re-verified for every row, and
+`adjusted_close` was re-verified against the raw adjusted `pc` on the exact
+same trading date, inside this repository. The six PARTIAL ranges were
+preserved as delivered — never upgraded, back-filled or widened.
+
+**Gate result: `FAIL_M2_DATA_GATE`.** This is an OBSERVED negative result
+against the frozen thresholds, not missing evidence, and it is deliberately
+not softened into `UNRESOLVED`:
+
+- `realized_volatility` — 581/666 usable, coverage 0.8724 (threshold 0.80) ✓
+- `amihud_illiquidity` — 581/666 usable, coverage 0.8724 (threshold 0.80) ✓
+- `equity_return_window` — 400/666 usable, coverage **0.6006** (threshold
+  0.80) ✗
+- three-variable common sample — 400/666, coverage **0.6006** (threshold
+  0.70) ✗
+- both locked validation windows clear the ≥5-positive rule on the common M2
+  sample (fold1_validation 18, fold2_validation 7) ✓
+- G01–G08 all PASS; accessibility scored 5, derived from the frozen R-A
+  mapping using candidate-level endpoint evidence, provenance and hashes ✓
+
+No threshold was reduced, no value imputed, no unadjusted close substituted,
+and no M2 variable dropped. The frozen three-variable block was NOT redefined;
+redefining it would require a separate explicit human decision. M2 was not
+automatically redesigned and M3 was not started.
+
+**Reproducibility.** The Gate is now a deterministic OFFLINE/IMPORT path and
+requires no network connection:
+`python project/run_stage127_m2_market_data_gate.py --build --bundle <path to
+stage127_m2_tsetmc_full_delivery.zip>`. Endpoint reachability plays no part in
+the decision and can never produce a PASS. The earlier local network-probe
+failure remains an environment egress diagnostic only; it is not a property of
+TSETMC and no longer has any bearing on the Gate.
+
+**Blocking next step (human review required):** decide how to respond to the
+observed `equity_return_window` coverage shortfall. The dominant observed
+cause is recorded in the decision artifact: 181 development pairs satisfy the
+≥126-usable-return rule but have no `adjusted_close` at the first trading day
+`t0` of their 12-month window, which the frozen contract requires. No
+remediation is authorized here.
+
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
 Part 3B.1E is the decision-lock surface for the conservative-lag research
 action; Part 3C is the operationalization / leakage-safe dataset surface;
