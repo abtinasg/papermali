@@ -42,7 +42,17 @@ CAT_RETRIEVAL_RANGE_TRUNCATION = "A_RETRIEVAL_RANGE_TRUNCATION"
 CAT_HISTORY_START_OR_LISTING_LIMIT = "B_TSETMC_HISTORY_START_OR_LISTING_LIMIT"
 CAT_IDENTITY_FRAGMENTATION = "C_INSTRUMENT_IDENTITY_OR_INSCODE_FRAGMENTATION"
 CAT_RAW_TRADE_ADJUSTED_MISSING = "D_RAW_TSETMC_TRADE_EXISTS_BUT_ADJUSTED_SERIES_MISSING"
-CAT_ZERO_TRADE_ENDPOINT = "E_ZERO_TRADE_OR_NONTRADING_OBSERVATION_USED_AS_ENDPOINT"
+#: NOT a proven final category. The immutable bundle only shows that the
+#: ClosingPriceDailyList row has qTotCap=0/zTotTran=0; it does NOT, by itself,
+#: establish whether that date was a genuine trading day with zero executions,
+#: a suspension, a non-tradable state, or a calendar artifact. This label is
+#: therefore evidence-honest: it names the open question rather than
+#: pre-deciding it, and it is EXCLUDED from both RECOVERABLE_CATEGORIES and
+#: NONRECOVERABLE_CATEGORIES until authoritative TSETMC calendar/state/trade
+#: evidence resolves it.
+CAT_ZERO_TRADE_ENDPOINT = (
+    "ZERO_TRADE_ENDPOINT_REQUIRES_TRADING_DAY_SEMANTICS_ADJUDICATION"
+)
 CAT_TRUE_MISSING_ADJUSTED = "F_TRUE_TRADING_DAY_WITH_NO_VALID_ADJUSTED_PRICE"
 CAT_FEWER_THAN_126_ONLY = "G_FEWER_THAN_126_VALID_RETURNS_ONLY"
 CAT_OTHER_PROVEN_DEFECT = "H_OTHER_PROVEN_DEFECT"
@@ -54,11 +64,22 @@ RECOVERABLE_CATEGORIES = {
     CAT_RAW_TRADE_ADJUSTED_MISSING,
     CAT_OTHER_PROVEN_DEFECT,
 }
+#: F and G are the only categories the CURRENT bundle evidence can actually
+#: establish as final: F requires a resolved trading-day determination (not
+#: yet available -- see CAT_ZERO_TRADE_ENDPOINT), so it is never assigned by
+#: this module today; G (fewer than 126 valid returns with both endpoints
+#: otherwise present) follows directly from the frozen 126-observation rule
+#: and is not in question here.
 NONRECOVERABLE_CATEGORIES = {
     CAT_HISTORY_START_OR_LISTING_LIMIT,
-    CAT_ZERO_TRADE_ENDPOINT,
     CAT_TRUE_MISSING_ADJUSTED,
     CAT_FEWER_THAN_126_ONLY,
+}
+#: Cases whose classification requires authoritative TSETMC evidence this
+#: repository does not have and cannot fetch from this environment. Neither
+#: recoverable nor nonrecoverable until external evidence returns.
+PENDING_EXTERNAL_ADJUDICATION_CATEGORIES = {
+    CAT_ZERO_TRADE_ENDPOINT,
 }
 
 PARTIAL_RANGE_TICKERS: dict[str, str] = dict(imp.EXPECTED_PARTIAL_RANGES)
@@ -488,10 +509,15 @@ def build_summary(
         1 for r in unavailable
         if r["primary_root_cause"] in NONRECOVERABLE_CATEGORIES
     )
+    pending_external = sum(
+        1 for r in unavailable
+        if r["primary_root_cause"] in PENDING_EXTERNAL_ADJUDICATION_CATEGORIES
+    )
     unresolved = sum(
         1 for r in unavailable
         if r["primary_root_cause"] not in RECOVERABLE_CATEGORIES
         and r["primary_root_cause"] not in NONRECOVERABLE_CATEGORIES
+        and r["primary_root_cause"] not in PENDING_EXTERNAL_ADJUDICATION_CATEGORIES
     )
 
     missing_t0 = sum(1 for r in rows if not r["t0_adjusted_close_present"] and r["t0_trading_date"])
@@ -530,6 +556,12 @@ def build_summary(
     true_missing_adjusted_count = root_cause_counts.get(CAT_TRUE_MISSING_ADJUSTED, 0)
     retrieval_truncation_count = root_cause_counts.get(
         CAT_RETRIEVAL_RANGE_TRUNCATION, 0)
+    # NOT a proof of absence: this is the count of pairs where the CURRENT
+    # bundle's own evidence (raw daily records + adjusted history under the
+    # CURRENT mapping) demonstrates identity fragmentation. It does not rule
+    # out a predecessor TSETMC instrument identity that this bundle never
+    # requested; that requires external historical-identity evidence (see
+    # historical_identity_evidence.csv in the evidence-request package).
     identity_fragmentation_count = root_cause_counts.get(
         CAT_IDENTITY_FRAGMENTATION, 0)
     adjusted_defect_count = root_cause_counts.get(
@@ -554,6 +586,19 @@ def build_summary(
         "root_cause_counts": dict(sorted(root_cause_counts.items())),
         "recoverable_due_to_proven_data_capture_defect": recoverable,
         "nonrecoverable_under_current_frozen_contract": nonrecoverable,
+        "pending_external_tsetmc_adjudication_count": pending_external,
+        "pending_external_adjudication_note": (
+            "These pairs are NEITHER recoverable NOR nonrecoverable. The "
+            "immutable bundle shows a ClosingPriceDailyList row with "
+            "qTotCap=0 and zTotTran=0 at the endpoint date, but does not by "
+            "itself establish whether that date is a genuine trading day "
+            "with zero executions, a suspension, a non-tradable state, or a "
+            "calendar artifact. This question is deferred to authoritative "
+            "TSETMC calendar/state/trade evidence, requested separately (see "
+            "stage127_m2_zero_trade_endpoint_evidence_request.zip). All 397 "
+            "unavailable pairs are NOT definitively classified as "
+            "nonrecoverable; 391 of them are pending this external evidence."
+        ),
         "unresolved_root_cause_count": unresolved,
         "partial_range_contribution": {
             "partial_source_tickers": sorted(partial_tickers),
@@ -589,7 +634,11 @@ def build_summary(
                 "ONLY pairs whose primary_root_cause is a PROVEN data-capture "
                 "defect (retrieval truncation, identity fragmentation, or a "
                 "real trade with a missing adjusted price) are assumed "
-                "recovered; TRUE frozen-contract missingness is left as-is."
+                "recovered; TRUE frozen-contract missingness is left as-is. "
+                "The 391 pairs pending external TSETMC adjudication are "
+                "NOT assumed recovered here -- they are excluded from this "
+                "counterfactual exactly like nonrecoverable pairs, precisely "
+                "because their status is not yet proven either way."
             ),
             "counterfactual_equity_return_usable": counterfactual_usable,
             "counterfactual_equity_return_coverage": counterfactual_coverage,

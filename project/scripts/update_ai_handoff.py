@@ -87,6 +87,12 @@ ALLOWLIST_FILES = (
     # never modifies the canonical Gate decision or any frozen artifact).
     "project/src/stage127_m2_equity_return_root_cause_audit.py",
     "project/run_stage127_m2_equity_return_root_cause_audit.py",
+    # Stage127 zero-trade endpoint semantics external evidence-REQUEST package
+    # (RETRIEVAL-REQUEST ONLY: generates a deterministic request for the
+    # already-used Iranian TSETMC retriever; requests no decision, retrieves
+    # nothing itself, and never modifies the canonical Gate).
+    "project/src/stage127_m2_zero_trade_endpoint_evidence_request.py",
+    "project/run_stage127_m2_zero_trade_endpoint_evidence_request.py",
     # Stage127 external TSETMC retrieval-request package code and tests.
     "project/src/stage127_m2_external_retrieval_request.py",
     "project/run_stage127_m2_external_retrieval_request.py",

@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage127-m2-market-data-gate`
-- **Last stage commit:** `22330423ffc224e0a31190a92c3565ab0017bc21`
-- **Generated from commit:** `1b68b8b91d26114ddef7dc8710a14d5ae7d98b2f` (branch `stage127-m2-market-data-gate`, informational)
+- **Last stage commit:** `5b8db3342ee66ee3861220ca9333c82d4b2c9e29`
+- **Generated from commit:** `5b8db3342ee66ee3861220ca9333c82d4b2c9e29` (branch `stage127-m2-market-data-gate`, informational)
 - **Baseline:** `origin/main` @ `2967dcc82d30d1c7719b87db10f449c1bfc69dc8`
 
 ## Current-state validation
@@ -81,5 +81,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `28f1d62644f530fd0c4b2f3cb37e0e2708bd1face59c71af092990bc9275430b`_
-_generated_at_utc: 2026-07-27T15:25:46Z (informational)_
+_state_fingerprint: `d30bbdeda1823df03b882b18f9f5b0307b801a2bd745bbce1704dc0a1b41cac2`_
+_generated_at_utc: 2026-07-27T16:32:49Z (informational)_
