@@ -680,3 +680,96 @@ def test_import_is_deterministic(tmp_path):
     b = validate(tmp_path)[0]
     assert json.dumps(a, sort_keys=True, default=str) == json.dumps(
         b, sort_keys=True, default=str)
+
+
+# --------------------------------------------------------------------------- #
+# Frozen shared-window end rule (T*) — the literal contract, never relaxed
+# --------------------------------------------------------------------------- #
+
+def _stage127(name: str) -> dict:
+    return json.load(open(os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "stage127", name), encoding="utf-8"))
+
+
+def test_tstar_is_the_last_eligible_trading_day_even_when_unpriced():
+    """T* follows `shared_window.end_rule`, not "the last priced day"."""
+    obs = _obs(200, missing={199})           # last eligible day has no price
+    win = g.pair_scientific_window(CUTOFF, obs)
+    assert win["t_star"] == obs[-1]["trading_date"]
+    assert win["t_star"] != obs[-2]["trading_date"]
+
+
+def test_tstar_is_never_moved_backwards_to_find_a_priced_day():
+    """A long unpriced tail must not drag T* back to the last priced day."""
+    obs = _obs(200, missing=set(range(180, 200)))
+    win = g.pair_scientific_window(CUTOFF, obs)
+    assert win["t_star"] == obs[-1]["trading_date"]
+
+
+def test_missing_tN_price_makes_equity_unavailable_but_not_volatility():
+    """The frozen `Require P_tN present` condition must be able to fail."""
+    f = g.compute_pair_features(CUTOFF, _obs(200, missing={199}))
+    assert f["missing_tN_adjusted_close"] is True
+    assert f["missing_t0_adjusted_close"] is False
+    assert f["equity_return_window"] is None
+    assert f["realized_volatility"] is not None
+    assert f["amihud_illiquidity"] is not None
+
+
+def test_t0_and_tN_endpoint_failures_are_not_collapsed():
+    only_t0 = g.compute_pair_features(CUTOFF, _obs(200, missing={0}))
+    only_tN = g.compute_pair_features(CUTOFF, _obs(200, missing={199}))
+    both = g.compute_pair_features(CUTOFF, _obs(200, missing={0, 199}))
+
+    assert (only_t0["missing_t0_adjusted_close"],
+            only_t0["missing_tN_adjusted_close"]) == (True, False)
+    assert (only_tN["missing_t0_adjusted_close"],
+            only_tN["missing_tN_adjusted_close"]) == (False, True)
+    assert (both["missing_t0_adjusted_close"],
+            both["missing_tN_adjusted_close"]) == (True, True)
+    for f in (only_t0, only_tN, both):
+        assert f["equity_return_window"] is None
+        assert f["fewer_than_126_valid_returns"] is False
+
+
+def test_tstar_endpoint_requirement_is_capable_of_failing_on_real_evidence():
+    """Regression guard against the retired last-priced-day reading.
+
+    Under that reading `missing_tN_adjusted_close` was structurally always
+    False. The frozen rule must leave it genuinely observable.
+    """
+    b = _stage127("stage127_m2_market_data_gate_decision.json")[
+        "feature_unavailability_breakdown"]
+    assert b["missing_tN_adjusted_close"] > 0
+    assert b["causes_are_not_mutually_exclusive"] is True
+    assert b["tstar_chosen_to_improve_coverage"] is False
+
+
+def test_tstar_semantics_audit_is_internally_consistent():
+    s = _stage127("stage127_m2_tstar_semantics_audit_summary.json")
+    assert s["development_pairs"] == g.EXPECTED_DEV_PAIRS
+    assert s["same_tstar_count"] + s["different_tstar_count"] == s[
+        "development_pairs"]
+    # T* differs from the last-priced day exactly when the literal T* is
+    # unpriced, so the two counts must agree.
+    assert s["literal_tstar_missing_adjusted_close_count"] == s[
+        "different_tstar_count"]
+    assert s["tstar_moved_backwards_to_find_a_priced_day"] is False
+    assert s["endpoint_price_requirement_evaluated_after_window_definition"]
+
+
+def test_admission_terminology_cannot_be_read_as_modeling_admission():
+    d = _stage127("stage127_m2_market_data_gate_decision.json")
+    for cand in d["candidates"]:
+        if "ADMITTED" in cand["admission_decision"]:
+            assert "G01_G08" in cand["admission_decision"]
+        assert cand["admission_scope"] == (
+            "source_and_data_quality_gates_G01_G08_only")
+        cov = d["candidate_coverage"][cand["variable"]]
+        assert cand["candidate_modeling_path_coverage_pass"] == cov[
+            "coverage_gate_passed"]
+        # A candidate failing the frozen coverage threshold must never read as
+        # admitted into the M2 modeling path.
+        if not cov["coverage_gate_passed"]:
+            assert cand["admitted_into_m2_modeling_path"] is False

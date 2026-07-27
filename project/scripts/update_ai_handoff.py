@@ -79,6 +79,7 @@ ALLOWLIST_FILES = (
     "project/run_stage127_m2_market_data_gate.py",
     "project/tests/test_stage127_m2_market_data_gate.py",
     # Stage127 external TSETMC delivery import / revalidation layer and tests.
+    # (the T* semantics audit artifacts live under project/stage127/)
     "project/src/stage127_m2_external_delivery_import.py",
     "project/tests/test_stage127_m2_external_delivery_import.py",
     # Stage127 external TSETMC retrieval-request package code and tests.
@@ -3673,6 +3674,41 @@ def render_current_state(record: dict) -> str:
         ]
     else:
         lines += ["_Not yet generated._\n", ""]
+    if record.get("stage127_m2_market_data_gate_executed"):
+        status = record.get("stage127_m2_market_data_gate_status", "")
+        resolved = record.get("stage127_m2_market_data_gate_resolved")
+        admitted = record.get("stage127_m2_block_admitted_for_modeling")
+        gate_ok = "✅" if admitted else "⛔"
+        lines += [
+            "## Stage127 — M2 market-data admission Gate\n",
+            "_The current scientific action. Its human authorization already "
+            "exists; the Gate has been executed and its result is reported "
+            "here. This section exists so the snapshot can never render the "
+            "project as though Stage127 had not happened._\n",
+            f"- {gate_ok} **Gate status:** `{status}`",
+            f"- **Executed:** {record['stage127_m2_market_data_gate_executed']}"
+            f" — **resolved (terminal observed decision):** {resolved}",
+            f"- **M2 block admitted for modeling:** {admitted}",
+            f"- **Terminal result pending human review:** "
+            f"{record.get('stage127_m2_market_data_gate_terminal_result_pending_human_review')}",
+            f"- **M2 market evidence collected:** "
+            f"{record.get('stage127_m2_market_data_evidence_collected')}"
+            f" — **independently validated:** "
+            f"{record.get('stage127_m2_market_data_evidence_validated')}"
+            f" ({record.get('stage127_m2_market_data_evidence_observation_count')}"
+            " normalized daily observations)",
+            f"- **Evidence bundle SHA256:** "
+            f"`{record.get('stage127_m2_market_data_evidence_bundle_sha256')}`",
+            "- Evidence collection is recorded **separately** from block "
+            "admission. `m2_data_collected` remains `false` because in this "
+            "schema it is a frozen prohibition marker meaning \"M2 data has "
+            "entered the authorized M2 modeling pipeline\" — not a statement "
+            "that no M2 evidence exists.",
+            f"- **M2 incremental evaluation authorized:** "
+            f"{record.get('m2_incremental_evaluation_authorized')} — "
+            f"**M2 modeling started:** {record.get('m2_modeling_started')}",
+            "",
+        ]
     lines += [
         "### Last completed scientific micro-part QC\n",
         "_Scientific QC of the newest completed robustness micro-part — a "
@@ -3975,6 +4011,7 @@ _STAGE127_M2_GATE_REL = (
 _STAGE127_M2_GATE_ACTION_ID = "stage127-m2-market-data-gate"
 _STAGE127_M2_NEXT_ACTION_ON_PASS = "stage127-m2-incremental-evaluation"
 _STAGE127_GATE_PASS = "PASS_FOR_M2_INCREMENTAL_EVALUATION"
+_STAGE127_GATE_FAIL = "FAIL_M2_DATA_GATE"
 
 
 def derive_stage127_m2_market_data_gate_markers(root: str) -> dict:
@@ -4023,6 +4060,13 @@ def derive_stage127_m2_market_data_gate_markers(root: str) -> dict:
         raise HandoffError("stage127 M2 gate does not report final_test_locked")
 
     passed = status == _STAGE127_GATE_PASS
+    # RESOLVED means the Gate reached a TERMINAL OBSERVED DECISION. An observed
+    # FAIL resolves the Gate just as an observed PASS does -- it is a real
+    # scientific result, not an absence of one. Only UNRESOLVED (the evidence
+    # required to decide was unavailable) leaves the Gate unresolved. Resolution
+    # is deliberately NOT a synonym for admission: see
+    # stage127_m2_block_admitted_for_modeling below.
+    resolved = status in (_STAGE127_GATE_PASS, _STAGE127_GATE_FAIL)
     eligible = bool(
         (gate.get("eligibility_for_next_action") or {})
         .get("eligible_to_start_m2_incremental_evaluation")
@@ -4032,16 +4076,55 @@ def derive_stage127_m2_market_data_gate_markers(root: str) -> dict:
             "stage127 M2 gate claims eligibility without a PASS status"
         )
 
+    # Evidence collection/validation is a SEPARATE fact from block admission.
+    # It is read from the Gate artifact's own immutable-delivery record, so a
+    # failed Gate can never erase the fact that authoritative M2 market
+    # evidence was obtained and independently revalidated.
+    delivery = gate.get("external_delivery") or {}
+    evidence_rows = int(delivery.get("normalized_row_count") or 0)
+    evidence_collected = bool(
+        evidence_rows > 0 and delivery.get("bundle_sha256")
+    )
+    evidence_validated = bool(
+        evidence_collected
+        and delivery.get("independently_revalidated_in_papermali")
+        and delivery.get("external_qc_report_trusted") is False
+    )
+
     markers = {
         "stage127_m2_market_data_gate_executed": True,
         "stage127_m2_market_data_gate_status": status,
-        "stage127_m2_market_data_gate_resolved": passed,
+        "stage127_m2_market_data_gate_resolved": resolved,
+        "stage127_m2_market_data_gate_terminal_result_pending_human_review": (
+            resolved and not passed
+        ),
+        "stage127_m2_block_admitted_for_modeling": passed,
+        # Authoritative M2 market EVIDENCE state — independent of admission.
+        "stage127_m2_market_data_evidence_collected": evidence_collected,
+        "stage127_m2_market_data_evidence_validated": evidence_validated,
+        "stage127_m2_market_data_evidence_bundle_sha256": (
+            delivery.get("bundle_sha256") or ""
+        ),
+        "stage127_m2_market_data_evidence_observation_count": evidence_rows,
         "m2_incremental_evaluation_authorized": False,
         "m2_modeling_started": False,
         "m2_authorized": False,
         "m2_started": False,
-        # Zero market observations are retained by an unresolved/failed Gate.
-        "m2_data_collected": bool(passed and gate.get("observations_retained")),
+        # NOTE ON SEMANTICS: in this schema `m2_data_collected` is a frozen
+        # PROHIBITION marker, not a data-availability flag. It is pinned False
+        # by the frozen Stage125 Part 4 SAP and the frozen Stage126 robustness
+        # closure completion lock, and Stage125 Part 5's successor validator
+        # treats flipping it to True as a handoff mutation VIOLATION. It means
+        # "M2 data has entered the authorized M2 modeling pipeline", which
+        # remains false and must remain false while M2 is unauthorized. It does
+        # NOT mean "no M2 evidence exists" and it is NOT a restatement of the
+        # Gate result -- that is what the explicit
+        # stage127_m2_market_data_evidence_* markers above record.
+        "m2_data_collected": False,
+        "m2_data_collected_semantics": (
+            "frozen_prohibition_marker_m2_data_entered_authorized_modeling_"
+            "pipeline_not_evidence_availability"
+        ),
         "paper_winner_selected": False,
         "final_model_selected": False,
         "full_development_refit_performed": False,

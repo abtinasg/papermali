@@ -1,2 +1,2 @@
 block,requires_all_three_variables,total_development_rows,common_usable_rows,common_coverage,threshold,positive_count,negative_count,resolution,common_coverage_gate_passed,two_variable_block_silently_admitted
-M2_BLOCK,True,666,400,0.6006006006,0.7,39,361,PASS,False,False
+M2_BLOCK,True,666,269,0.4039039039,0.7,23,246,PASS,False,False

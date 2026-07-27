@@ -244,26 +244,37 @@ def pair_scientific_window(
     * every market observation must satisfy
       ``market_observation_date < pair_cutoff_date`` -- an observation on the
       same calendar day as the cutoff is rejected;
-    * ``T*`` is the last eligible trading day strictly before the cutoff that
-      carries the required verified availability (a present ``adjusted_close``);
+    * ``T*`` is the LAST ELIGIBLE TRADING DAY with verified ``available_at``
+      strictly before the cutoff, per ``shared_window.end_rule``;
     * ``W`` spans exactly 12 calendar months ending at ``T*``, starting at the
       inclusive trading days on or after calendar date ``T* - 12 months``.
+
+    T* is selected INDEPENDENTLY of whether ``adjusted_close`` is present on
+    that day. The frozen CUT-A contract defines ``verified available_at`` as an
+    availability TIMESTAMP ("A feature value is usable at prediction time only
+    if it has a verified available_at and available_at <= pair_cutoff"), never
+    as "the price value is present"; and ``price_field.missing_price_rule =
+    exclude_day_from_window_computations`` keeps an unpriced trading day inside
+    W while excluding it from the computations. Choosing T* from priced days
+    only would make the frozen ``Require P_tN present`` endpoint condition
+    structurally incapable of failing, and would move T* backwards purely to
+    improve coverage. The endpoint-price requirement is therefore evaluated
+    AFTER W is defined, in :func:`compute_pair_features`.
     """
     if not cutoff_iso:
         return {"resolution": "UNRESOLVED_NO_PAIR_CUTOFF", "window": []}
 
     eligible = [o for o in observations if o["trading_date"] < cutoff_iso]
     same_day = sum(1 for o in observations if o["trading_date"] == cutoff_iso)
-    priced = [o for o in eligible if o["adjusted_close"] is not None]
-    if not priced:
+    if not eligible:
         return {
-            "resolution": "UNRESOLVED_NO_ELIGIBLE_PRICED_TRADING_DAY",
+            "resolution": "UNRESOLVED_NO_ELIGIBLE_TRADING_DAY_BEFORE_CUTOFF",
             "window": [],
             "same_calendar_day_as_cutoff_rejected": same_day,
-            "eligible_observation_count": len(eligible),
+            "eligible_observation_count": 0,
         }
 
-    t_star = priced[-1]["trading_date"]
+    t_star = eligible[-1]["trading_date"]
     start = minus_calendar_months(
         date.fromisoformat(t_star), SHARED_WINDOW_CALENDAR_MONTHS
     ).isoformat()
@@ -278,6 +289,102 @@ def pair_scientific_window(
         "same_calendar_day_as_cutoff_rejected": same_day,
         "eligible_observation_count": len(eligible),
     }
+
+
+def tstar_semantics_audit(
+    pairs: list[dict[str, Any]], observations: dict[str, list[dict[str, Any]]],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Compare the literal frozen T* against the retired last-priced-day T*.
+
+    Purely diagnostic: it records how much the two readings differ and how
+    often the literal T* carries no ``adjusted_close``. The Gate itself always
+    uses the literal frozen rule; this audit exists so an independent reader
+    can see exactly what the contract change moved, and cannot be used to pick
+    whichever reading produces a better coverage number.
+    """
+    rows: list[dict[str, Any]] = []
+    for p in sorted(pairs, key=lambda x: (x["target_year"], x["ticker"])):
+        cutoff = p["pair_cutoff_date"]
+        obs = observations.get(p["ticker"], [])
+        eligible = [o for o in obs if cutoff and o["trading_date"] < cutoff]
+        priced = [o for o in eligible if o["adjusted_close"] is not None]
+
+        literal = eligible[-1]["trading_date"] if eligible else ""
+        last_priced = priced[-1]["trading_date"] if priced else ""
+        same = bool(literal) and literal == last_priced
+        shift = (
+            (date.fromisoformat(literal) - date.fromisoformat(last_priced)).days
+            if literal and last_priced else ""
+        )
+        rows.append({
+            "sample_design": PRIMARY_SAMPLE,
+            "ticker": p["ticker"],
+            "fiscal_year_t": p["fiscal_year_t"],
+            "target_year": p["target_year"],
+            "temporal_folds": ";".join(p["folds"]),
+            "pair_cutoff_date": cutoff,
+            "last_eligible_market_observation_date_before_cutoff": literal,
+            "current_last_priced_observation_date_before_cutoff": last_priced,
+            "tstar_is_same": same,
+            "adjusted_close_status_on_last_eligible_observation": (
+                eligible[-1]["adjusted_close_status"] if eligible else ""
+            ),
+            "literal_tstar_has_adjusted_close": (
+                bool(eligible) and eligible[-1]["adjusted_close"] is not None
+            ),
+            "shift_days_literal_minus_last_priced": shift,
+            "applied_tstar_rule": (
+                "frozen_shared_window_end_rule_last_eligible_trading_day"
+            ),
+        })
+
+    differing = [r for r in rows if not r["tstar_is_same"]]
+    shifts = [
+        r["shift_days_literal_minus_last_priced"] for r in differing
+        if isinstance(r["shift_days_literal_minus_last_priced"], int)
+    ]
+
+    def _by(key: str) -> dict[str, int]:
+        out: dict[str, int] = {}
+        for r in differing:
+            if key == "temporal_folds":
+                for f in r[key].split(";"):
+                    out[f] = out.get(f, 0) + 1
+            else:
+                out[str(r[key])] = out.get(str(r[key]), 0) + 1
+        return dict(sorted(out.items()))
+
+    summary = {
+        "purpose": (
+            "Independent audit of the shared-window end rule. The Gate applies "
+            "the frozen rule literally; this record quantifies the difference "
+            "against the retired last-priced-day reading."
+        ),
+        "frozen_end_rule": (
+            "last_trading_day_with_verified_available_at_strictly_before_"
+            "pair_cutoff"
+        ),
+        "verified_available_at_means": (
+            "a verified availability timestamp for the market observation "
+            "(CUT-A), NOT the presence of an adjusted_close value"
+        ),
+        "endpoint_price_requirement_evaluated_after_window_definition": True,
+        "tstar_moved_backwards_to_find_a_priced_day": False,
+        "development_pairs": len(rows),
+        "same_tstar_count": sum(1 for r in rows if r["tstar_is_same"]),
+        "different_tstar_count": len(differing),
+        "literal_tstar_missing_adjusted_close_count": sum(
+            1 for r in rows if not r["literal_tstar_has_adjusted_close"]
+        ),
+        "max_shift_days": max(shifts) if shifts else 0,
+        "different_tstar_counts_by_target_year": _by("target_year"),
+        "different_tstar_counts_by_fold": _by("temporal_folds"),
+        "pairs_with_no_eligible_observation": sum(
+            1 for r in rows
+            if not r["last_eligible_market_observation_date_before_cutoff"]
+        ),
+    }
+    return rows, summary
 
 
 def daily_simple_returns(
@@ -331,6 +438,12 @@ def compute_pair_features(
         "zero_traded_value_day_count": 0,
         "usable_daily_return_count": 0,
         "usable_amihud_day_count": 0,
+        "t0_trading_date": "",
+        "tN_trading_date": "",
+        "missing_t0_adjusted_close": False,
+        "missing_tN_adjusted_close": False,
+        "fewer_than_126_valid_returns": True,
+        "fewer_than_126_amihud_days": True,
         "m2_value_status": win["resolution"],
     }
     window = win["window"]
@@ -352,8 +465,20 @@ def compute_pair_features(
     base["usable_amihud_day_count"] = len(amihud_days)
 
     enough_returns = len(returns) >= MIN_VALID_RETURN_OBSERVATIONS
-    p_first = window[0]["adjusted_close"]
-    p_last = window[-1]["adjusted_close"]
+    # t0 is the FIRST trading day of W and tN is T*, the LAST trading day of W.
+    # Neither endpoint is re-chosen to find a priced day.
+    t0, tN = window[0], window[-1]
+    p_first = t0["adjusted_close"]
+    p_last = tN["adjusted_close"]
+
+    base["t0_trading_date"] = t0["trading_date"]
+    base["tN_trading_date"] = tN["trading_date"]
+    base["missing_t0_adjusted_close"] = p_first is None
+    base["missing_tN_adjusted_close"] = p_last is None
+    base["fewer_than_126_valid_returns"] = not enough_returns
+    base["fewer_than_126_amihud_days"] = (
+        len(amihud_days) < MIN_VALID_AMIHUD_OBSERVATIONS
+    )
 
     if enough_returns and p_first is not None and p_last is not None and p_first != 0:
         base["equity_return_window"] = p_last / p_first - 1
@@ -643,8 +768,12 @@ def build_candidate_gate(
             "resolution": g08,
             "note": "Conjunction of G01-G07; no sub-gate may be assumed.",
         },
+        # NOTE: this is SOURCE / DATA-QUALITY admission (G01-G08) only. It is
+        # NOT admission into the M2 modeling path, which additionally requires
+        # the frozen development coverage threshold. See admission_scope and
+        # admitted_into_m2_modeling_path on the same record.
         "admission_decision": {
-            RESOLUTION_PASS: "ADMITTED",
+            RESOLUTION_PASS: "ADMITTED_G01_G08_SOURCE_AND_DATA_QUALITY_ONLY",
             RESOLUTION_FAIL: "NOT_ADMITTED_OBSERVED_FAILURE",
             RESOLUTION_UNRESOLVED: "UNRESOLVED_NOT_ADMITTED",
         }[g08],
@@ -920,29 +1049,48 @@ def unavailability_breakdown(
     evidence rather than asserted, and it never alters a threshold or a value.
     """
     total = len(features)
-    missing_t0 = sum(
-        1 for f in features.values()
-        if f["window_trading_day_count"] and f["window_first_trading_date"]
-        and f["missing_price_day_count"] and f["equity_return_window"] is None
-        and f["usable_daily_return_count"] >= MIN_VALID_RETURN_OBSERVATIONS
-    )
-    too_few_returns = sum(
-        1 for f in features.values()
-        if f["usable_daily_return_count"] < MIN_VALID_RETURN_OBSERVATIONS
-    )
-    too_few_amihud = sum(
-        1 for f in features.values()
-        if f["usable_amihud_day_count"] < MIN_VALID_AMIHUD_OBSERVATIONS
-    )
+    vals = list(features.values())
+
+    def _n(pred) -> int:
+        return sum(1 for f in vals if pred(f))
+
+    missing_t0 = _n(lambda f: f["missing_t0_adjusted_close"])
+    missing_tN = _n(lambda f: f["missing_tN_adjusted_close"])
+    too_few_returns = _n(lambda f: f["fewer_than_126_valid_returns"])
+    too_few_amihud = _n(lambda f: f["fewer_than_126_amihud_days"])
+
     return {
         "development_pairs": total,
-        "pairs_with_fewer_than_min_valid_daily_returns": too_few_returns,
-        "pairs_with_fewer_than_min_usable_amihud_days": too_few_amihud,
-        "pairs_failing_only_the_window_endpoint_price_requirement": missing_t0,
+        # The four causes are reported separately and are NOT collapsed:
+        # a pair may trip more than one, so these do not sum to the number of
+        # unavailable pairs.
+        "missing_t0_adjusted_close": missing_t0,
+        "missing_tN_adjusted_close": missing_tN,
+        "fewer_than_126_valid_returns": too_few_returns,
+        "fewer_than_126_amihud_days": too_few_amihud,
+        "causes_are_not_mutually_exclusive": True,
+        "equity_return_window_unavailable": _n(
+            lambda f: f["equity_return_window"] is None),
+        "realized_volatility_unavailable": _n(
+            lambda f: f["realized_volatility"] is None),
+        "amihud_illiquidity_unavailable": _n(
+            lambda f: f["amihud_illiquidity"] is None),
+        "pairs_failing_only_the_t0_endpoint_price_requirement": _n(
+            lambda f: f["missing_t0_adjusted_close"]
+            and not f["missing_tN_adjusted_close"]
+            and not f["fewer_than_126_valid_returns"]),
+        "pairs_failing_only_the_tN_endpoint_price_requirement": _n(
+            lambda f: f["missing_tN_adjusted_close"]
+            and not f["missing_t0_adjusted_close"]
+            and not f["fewer_than_126_valid_returns"]),
+        "pairs_missing_both_endpoint_prices": _n(
+            lambda f: f["missing_t0_adjusted_close"]
+            and f["missing_tN_adjusted_close"]),
         "min_valid_daily_return_observations": MIN_VALID_RETURN_OBSERVATIONS,
         "min_valid_amihud_observations": MIN_VALID_AMIHUD_OBSERVATIONS,
         "thresholds_reduced_to_improve_coverage": False,
         "missing_values_imputed": False,
+        "tstar_chosen_to_improve_coverage": False,
     }
 
 
@@ -1301,10 +1449,33 @@ def build(
         },
     }
 
+    tstar_rows, tstar_summary = tstar_semantics_audit(pairs, observations)
+    decision["tstar_semantics_audit"] = tstar_summary
+
+    # Terminology: G01-G08 admission is SOURCE / DATA-QUALITY admission only.
+    # It is not admission into M2 modeling, which additionally requires the
+    # frozen development coverage threshold.
+    for cand in decision["candidates"]:
+        cov = decision["candidate_coverage"][cand["variable"]]
+        cand["admission_scope"] = (
+            "source_and_data_quality_gates_G01_G08_only")
+        cand["admission_decision_does_not_mean_admitted_into_m2_modeling"] = True
+        cand["candidate_modeling_path_coverage_threshold"] = (
+            CANDIDATE_VALID_COVERAGE_MIN)
+        cand["candidate_modeling_path_coverage"] = cov["overall_coverage"]
+        cand["candidate_modeling_path_coverage_pass"] = cov[
+            "coverage_gate_passed"]
+        cand["admitted_into_m2_modeling_path"] = bool(
+            cand["G08_all_required_gates_pass"]["resolution"] == RESOLUTION_PASS
+            and cov["coverage_gate_passed"]
+        )
+
     return {
         "decision": decision,
         "pairs": pairs,
         "features": features,
+        "tstar_audit_rows": tstar_rows,
+        "tstar_audit_summary": tstar_summary,
         "accessibility": accessibility,
         "usable_by_variable": usable_by_var,
         "common_sample_keys": common,

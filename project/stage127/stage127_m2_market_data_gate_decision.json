@@ -1,26 +1,26 @@
 {
   "answers_only": "Can the frozen M2 market variables be obtained with correct timing, quality, coverage, joins and event support?",
   "block_common_sample": {
-    "common_coverage": 0.6006006006,
+    "common_coverage": 0.4039039039,
     "common_coverage_gate_passed": false,
-    "common_usable_rows": 400,
+    "common_usable_rows": 269,
     "counts_by_fold": {
-      "fold1_train": 111,
-      "fold1_validation": 125,
-      "fold2_train": 236,
-      "fold2_validation": 164
+      "fold1_train": 40,
+      "fold1_validation": 90,
+      "fold2_train": 130,
+      "fold2_validation": 139
     },
     "counts_by_target_year": {
-      "1393": 30,
-      "1394": 58,
-      "1395": 23,
-      "1396": 65,
-      "1397": 60,
-      "1398": 79,
-      "1399": 85
+      "1393": 22,
+      "1394": 7,
+      "1395": 11,
+      "1396": 42,
+      "1397": 48,
+      "1398": 63,
+      "1399": 76
     },
-    "negative_count": 361,
-    "positive_count": 39,
+    "negative_count": 246,
+    "positive_count": 23,
     "requires_all_three_m2_variables_simultaneously_usable": true,
     "resolution": "PASS",
     "threshold": 0.7,
@@ -29,54 +29,54 @@
   "block_not_redefined_on_candidate_failure": true,
   "block_redefinition_requires_separate_human_decision": true,
   "blocker_reasons": [
-    "B: observed development valid coverage for 'equity_return_window' is 0.6006 (400/666), below the frozen threshold 0.8",
-    "C: observed three-variable common-sample coverage is 0.6006 (400/666), below the frozen threshold 0.7"
+    "B: observed development valid coverage for 'equity_return_window' is 0.4039 (269/666), below the frozen threshold 0.8",
+    "C: observed three-variable common-sample coverage is 0.4039 (269/666), below the frozen threshold 0.7"
   ],
   "candidate_coverage": {
     "amihud_illiquidity": {
       "coverage_gate_passed": true,
-      "fold1_train_coverage": 0.787755102,
-      "fold1_validation_coverage": 0.8536585366,
-      "fold2_train_coverage": 0.8177777778,
+      "fold1_train_coverage": 0.7795918367,
+      "fold1_validation_coverage": 0.8390243902,
+      "fold2_train_coverage": 0.8066666667,
       "fold2_validation_coverage": 0.9861111111,
-      "missing_or_unresolved_rows": 85,
-      "negative_row_coverage": 0.8695652174,
-      "overall_coverage": 0.8723723724,
-      "positive_row_coverage": 0.8970588235,
+      "missing_or_unresolved_rows": 90,
+      "negative_row_coverage": 0.864548495,
+      "overall_coverage": 0.8648648649,
+      "positive_row_coverage": 0.8676470588,
       "resolution": "PASS",
       "threshold": 0.8,
       "total_development_rows": 666,
-      "valid_rows": 581
+      "valid_rows": 576
     },
     "equity_return_window": {
       "coverage_gate_passed": false,
-      "fold1_train_coverage": 0.4530612245,
-      "fold1_validation_coverage": 0.6097560976,
-      "fold2_train_coverage": 0.5244444444,
-      "fold2_validation_coverage": 0.7592592593,
-      "missing_or_unresolved_rows": 266,
-      "negative_row_coverage": 0.6036789298,
-      "overall_coverage": 0.6006006006,
-      "positive_row_coverage": 0.5735294118,
+      "fold1_train_coverage": 0.1632653061,
+      "fold1_validation_coverage": 0.4390243902,
+      "fold2_train_coverage": 0.2888888889,
+      "fold2_validation_coverage": 0.6435185185,
+      "missing_or_unresolved_rows": 397,
+      "negative_row_coverage": 0.4113712375,
+      "overall_coverage": 0.4039039039,
+      "positive_row_coverage": 0.3382352941,
       "resolution": "PASS",
       "threshold": 0.8,
       "total_development_rows": 666,
-      "valid_rows": 400
+      "valid_rows": 269
     },
     "realized_volatility": {
       "coverage_gate_passed": true,
-      "fold1_train_coverage": 0.787755102,
-      "fold1_validation_coverage": 0.8536585366,
-      "fold2_train_coverage": 0.8177777778,
+      "fold1_train_coverage": 0.7795918367,
+      "fold1_validation_coverage": 0.8390243902,
+      "fold2_train_coverage": 0.8066666667,
       "fold2_validation_coverage": 0.9861111111,
-      "missing_or_unresolved_rows": 85,
-      "negative_row_coverage": 0.8695652174,
-      "overall_coverage": 0.8723723724,
-      "positive_row_coverage": 0.8970588235,
+      "missing_or_unresolved_rows": 90,
+      "negative_row_coverage": 0.864548495,
+      "overall_coverage": 0.8648648649,
+      "positive_row_coverage": 0.8676470588,
       "resolution": "PASS",
       "threshold": 0.8,
       "total_development_rows": 666,
-      "valid_rows": 581
+      "valid_rows": 576
     }
   },
   "candidates": [
@@ -125,10 +125,16 @@
         "note": "Conjunction of G01-G07; no sub-gate may be assumed.",
         "resolution": "PASS"
       },
-      "admission_decision": "ADMITTED",
+      "admission_decision": "ADMITTED_G01_G08_SOURCE_AND_DATA_QUALITY_ONLY",
+      "admission_decision_does_not_mean_admitted_into_m2_modeling": true,
       "admission_decision_is_not_a_rejection": false,
+      "admission_scope": "source_and_data_quality_gates_G01_G08_only",
+      "admitted_into_m2_modeling_path": false,
       "block": "M2_BLOCK",
       "candidate_id": "cand_m2_equity_return_window",
+      "candidate_modeling_path_coverage": 0.4039039039,
+      "candidate_modeling_path_coverage_pass": false,
+      "candidate_modeling_path_coverage_threshold": 0.8,
       "formula_id": "m2_cumulative_simple_return_W",
       "primary_source_id": "src_m2_tsetmc_market",
       "variable": "equity_return_window"
@@ -178,10 +184,16 @@
         "note": "Conjunction of G01-G07; no sub-gate may be assumed.",
         "resolution": "PASS"
       },
-      "admission_decision": "ADMITTED",
+      "admission_decision": "ADMITTED_G01_G08_SOURCE_AND_DATA_QUALITY_ONLY",
+      "admission_decision_does_not_mean_admitted_into_m2_modeling": true,
       "admission_decision_is_not_a_rejection": false,
+      "admission_scope": "source_and_data_quality_gates_G01_G08_only",
+      "admitted_into_m2_modeling_path": true,
       "block": "M2_BLOCK",
       "candidate_id": "cand_m2_realized_volatility",
+      "candidate_modeling_path_coverage": 0.8648648649,
+      "candidate_modeling_path_coverage_pass": true,
+      "candidate_modeling_path_coverage_threshold": 0.8,
       "formula_id": "m2_daily_return_stdev_sample_W",
       "primary_source_id": "src_m2_tsetmc_market",
       "variable": "realized_volatility"
@@ -231,10 +243,16 @@
         "note": "Conjunction of G01-G07; no sub-gate may be assumed.",
         "resolution": "PASS"
       },
-      "admission_decision": "ADMITTED",
+      "admission_decision": "ADMITTED_G01_G08_SOURCE_AND_DATA_QUALITY_ONLY",
+      "admission_decision_does_not_mean_admitted_into_m2_modeling": true,
       "admission_decision_is_not_a_rejection": false,
+      "admission_scope": "source_and_data_quality_gates_G01_G08_only",
+      "admitted_into_m2_modeling_path": true,
       "block": "M2_BLOCK",
       "candidate_id": "cand_m2_amihud_illiquidity",
+      "candidate_modeling_path_coverage": 0.8648648649,
+      "candidate_modeling_path_coverage_pass": true,
+      "candidate_modeling_path_coverage_threshold": 0.8,
       "formula_id": "m2_amihud_mean_abs_return_over_value_W",
       "primary_source_id": "src_m2_tsetmc_market",
       "variable": "amihud_illiquidity"
@@ -270,12 +288,12 @@
     },
     "m1_reference_is_not_the_m2_result": true,
     "m2_common_sample_negative_counts": {
-      "fold1_validation": 107,
-      "fold2_validation": 157
+      "fold1_validation": 79,
+      "fold2_validation": 134
     },
     "m2_common_sample_positive_counts": {
-      "fold1_validation": 18,
-      "fold2_validation": 7
+      "fold1_validation": 11,
+      "fold2_validation": 5
     },
     "no_model_was_fit_to_assess_this": true,
     "requires_both_locked_validation_windows": true,
@@ -313,14 +331,23 @@
     }
   },
   "feature_unavailability_breakdown": {
+    "amihud_illiquidity_unavailable": 90,
+    "causes_are_not_mutually_exclusive": true,
     "development_pairs": 666,
+    "equity_return_window_unavailable": 397,
+    "fewer_than_126_amihud_days": 90,
+    "fewer_than_126_valid_returns": 90,
     "min_valid_amihud_observations": 126,
     "min_valid_daily_return_observations": 126,
+    "missing_t0_adjusted_close": 270,
+    "missing_tN_adjusted_close": 253,
     "missing_values_imputed": false,
-    "pairs_failing_only_the_window_endpoint_price_requirement": 181,
-    "pairs_with_fewer_than_min_usable_amihud_days": 85,
-    "pairs_with_fewer_than_min_valid_daily_returns": 85,
-    "thresholds_reduced_to_improve_coverage": false
+    "pairs_failing_only_the_t0_endpoint_price_requirement": 126,
+    "pairs_failing_only_the_tN_endpoint_price_requirement": 99,
+    "pairs_missing_both_endpoint_prices": 132,
+    "realized_volatility_unavailable": 90,
+    "thresholds_reduced_to_improve_coverage": false,
+    "tstar_chosen_to_improve_coverage": false
   },
   "final_test_firewall": {
     "final_test_access_authorized": false,
@@ -374,7 +401,7 @@
     "final_test_rows_joined": 0,
     "final_test_rows_read": 0,
     "joined_to": "frozen_M1_primary_development_pairs",
-    "market_observations_accepted": 161819,
+    "market_observations_accepted": 161897,
     "matched_pair_count": 666,
     "note": "Leakage counters were validated against actually accepted market observations imported from the immutable external bundle.",
     "pairs_with_unresolvable_cutoff": 0,
@@ -407,6 +434,34 @@
   "source_family": "TSETMC market data",
   "stage": "Stage127",
   "threshold_reduced": false,
+  "tstar_semantics_audit": {
+    "development_pairs": 666,
+    "different_tstar_count": 253,
+    "different_tstar_counts_by_fold": {
+      "fold1_train": 138,
+      "fold1_validation": 77,
+      "fold2_train": 215,
+      "fold2_validation": 38
+    },
+    "different_tstar_counts_by_target_year": {
+      "1393": 17,
+      "1394": 87,
+      "1395": 34,
+      "1396": 43,
+      "1397": 34,
+      "1398": 23,
+      "1399": 15
+    },
+    "endpoint_price_requirement_evaluated_after_window_definition": true,
+    "frozen_end_rule": "last_trading_day_with_verified_available_at_strictly_before_pair_cutoff",
+    "literal_tstar_missing_adjusted_close_count": 253,
+    "max_shift_days": 637,
+    "pairs_with_no_eligible_observation": 0,
+    "purpose": "Independent audit of the shared-window end rule. The Gate applies the frozen rule literally; this record quantifies the difference against the retired last-priced-day reading.",
+    "same_tstar_count": 413,
+    "tstar_moved_backwards_to_find_a_priced_day": false,
+    "verified_available_at_means": "a verified availability timestamp for the market observation (CUT-A), NOT the presence of an adjusted_close value"
+  },
   "unadjusted_close_substituted": false,
   "window_endpoint_rule": {
     "alternative_reading_not_adopted": "Re-defining t0 as the first PRICED day of W would make the frozen endpoint requirement vacuous and would raise observed coverage. It was NOT adopted: relaxing a frozen contract to improve coverage is prohibited.",

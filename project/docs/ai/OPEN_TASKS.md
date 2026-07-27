@@ -44,25 +44,54 @@ raw → normalized field mapping was re-verified for every row, and
 same trading date, inside this repository. The six PARTIAL ranges were
 preserved as delivered — never upgraded, back-filled or widened.
 
-**Gate result: `FAIL_M2_DATA_GATE`.** This is an OBSERVED negative result
-against the frozen thresholds, not missing evidence, and it is deliberately
-not softened into `UNRESOLVED`:
+**Gate result: `FAIL_M2_DATA_GATE` — terminal, resolved, pending human review.**
+This is an OBSERVED negative result against the frozen thresholds, not missing
+evidence, and it is deliberately not softened into `UNRESOLVED`:
 
-- `realized_volatility` — 581/666 usable, coverage 0.8724 (threshold 0.80) ✓
-- `amihud_illiquidity` — 581/666 usable, coverage 0.8724 (threshold 0.80) ✓
-- `equity_return_window` — 400/666 usable, coverage **0.6006** (threshold
+- `realized_volatility` — 576/666 usable, coverage 0.8649 (threshold 0.80) ✓
+- `amihud_illiquidity` — 576/666 usable, coverage 0.8649 (threshold 0.80) ✓
+- `equity_return_window` — 269/666 usable, coverage **0.4039** (threshold
   0.80) ✗
-- three-variable common sample — 400/666, coverage **0.6006** (threshold
+- three-variable common sample — 269/666, coverage **0.4039** (threshold
   0.70) ✗
 - both locked validation windows clear the ≥5-positive rule on the common M2
-  sample (fold1_validation 18, fold2_validation 7) ✓
+  sample (fold1_validation 11, fold2_validation 5) ✓
 - G01–G08 all PASS; accessibility scored 5, derived from the frozen R-A
   mapping using candidate-level endpoint evidence, provenance and hashes ✓
 
+`ADMITTED_G01_G08_SOURCE_AND_DATA_QUALITY_ONLY` on a candidate means the
+source/data-quality gates passed. It is **not** admission into the M2 modeling
+path, which additionally requires the frozen 0.80 coverage threshold;
+`equity_return_window` has `admitted_into_m2_modeling_path = false`.
+
+**Shared-window end rule (T\*) is applied literally.** `T*` is the last
+eligible trading day with verified `available_at` strictly before the pair
+cutoff, selected **independently** of whether `adjusted_close` is present. The
+frozen CUT-A contract defines `verified available_at` as an availability
+timestamp, not as the presence of a price, and `missing_price_rule =
+exclude_day_from_window_computations` keeps an unpriced trading day inside W.
+The `Require P_t0 and P_tN present` endpoint condition is therefore evaluated
+after W is defined and can genuinely fail. Audit: T* is unchanged for 413
+pairs and differs for 253 (largest shift 637 days); in all 253 the literal T*
+carries no `adjusted_close`. Endpoint causes are reported separately and are
+not collapsed: 270 pairs miss `t0`, 253 miss `tN`, 132 miss both, and 90 have
+fewer than 126 usable returns / Amihud days.
+
 No threshold was reduced, no value imputed, no unadjusted close substituted,
-and no M2 variable dropped. The frozen three-variable block was NOT redefined;
-redefining it would require a separate explicit human decision. M2 was not
-automatically redesigned and M3 was not started.
+no T* chosen to improve coverage, and no M2 variable dropped. The frozen
+three-variable block was NOT redefined; redefining it would require a separate
+explicit human decision. M2 was not automatically redesigned and M3 was not
+started.
+
+**Evidence state vs admission state.** M2 market evidence IS collected and
+independently validated (`stage127_m2_market_data_evidence_collected=true`,
+`..._validated=true`, 163,230 observations). That is recorded **separately**
+from admission, which did not occur. `m2_data_collected` remains `false`
+because in this schema it is a frozen prohibition marker meaning "M2 data has
+entered the authorized M2 modeling pipeline" — it is pinned false by the frozen
+Stage125 Part 4 SAP and the Stage126 robustness closure completion lock, and
+Stage125 Part 5's successor validator treats flipping it as a mutation
+violation. It never means "no M2 evidence exists".
 
 **Reproducibility.** The Gate is now a deterministic OFFLINE/IMPORT path and
 requires no network connection:
@@ -73,11 +102,12 @@ failure remains an environment egress diagnostic only; it is not a property of
 TSETMC and no longer has any bearing on the Gate.
 
 **Blocking next step (human review required):** decide how to respond to the
-observed `equity_return_window` coverage shortfall. The dominant observed
-cause is recorded in the decision artifact: 181 development pairs satisfy the
-≥126-usable-return rule but have no `adjusted_close` at the first trading day
-`t0` of their 12-month window, which the frozen contract requires. No
-remediation is authorized here.
+observed `equity_return_window` coverage shortfall. The observed causes are
+recorded in the decision artifact and split by endpoint: 126 pairs fail only
+the `t0` endpoint-price requirement, 99 fail only the `tN` (T*) requirement,
+132 miss both, and 90 fall below the 126-observation minimum. No remediation
+is authorized here, and the research pointer stays on
+`stage127-m2-market-data-gate`: no new scientific next action was invented.
 
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
 Part 3B.1E is the decision-lock surface for the conservative-lag research

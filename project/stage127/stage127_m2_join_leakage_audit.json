@@ -21,7 +21,7 @@
   "final_test_rows_joined": 0,
   "final_test_rows_read": 0,
   "joined_to": "frozen_M1_primary_development_pairs",
-  "market_observations_accepted": 161819,
+  "market_observations_accepted": 161897,
   "matched_pair_count": 666,
   "note": "Leakage counters were validated against actually accepted market observations imported from the immutable external bundle.",
   "pairs_with_unresolvable_cutoff": 0,

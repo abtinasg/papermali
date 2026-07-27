@@ -114,11 +114,19 @@ def build_package(repo_root: str, bundle_path: str) -> dict[str, str]:
     pairs = result["pairs"]
     features = result["features"]
     common = result["common_sample_keys"]
+    tstar_rows = result["tstar_audit_rows"]
+    tstar_summary = result["tstar_audit_summary"]
 
     files: dict[str, str] = {
         "stage127_m2_market_data_gate_decision.json": g.json_dumps(decision),
         "stage127_m2_external_delivery_import_qc.json": g.json_dumps(import_qc),
     }
+
+    # -- T* semantics audit (frozen shared-window end rule) ------------------ #
+    files["stage127_m2_tstar_semantics_audit.csv"] = csv_text(
+        list(tstar_rows[0].keys()), tstar_rows)
+    files["stage127_m2_tstar_semantics_audit_summary.json"] = g.json_dumps(
+        tstar_summary)
 
     # -- immutable external-delivery provenance ----------------------------- #
     provenance = {
@@ -183,6 +191,11 @@ def build_package(repo_root: str, bundle_path: str) -> dict[str, str]:
             "homepage_response_used_as_basis": False,
             "scored_zero_to_two": False,
             "admission_decision": cand["admission_decision"],
+            "admission_scope": cand["admission_scope"],
+            "candidate_modeling_path_coverage_pass": _f(
+                cand["candidate_modeling_path_coverage_pass"]),
+            "admitted_into_m2_modeling_path": cand[
+                "admitted_into_m2_modeling_path"],
         })
     files["stage127_m2_candidate_accessibility.csv"] = csv_text(
         list(acc_rows[0].keys()), acc_rows)
@@ -209,6 +222,12 @@ def build_package(repo_root: str, bundle_path: str) -> dict[str, str]:
             "equity_return_window": _f(f["equity_return_window"]),
             "realized_volatility": _f(f["realized_volatility"]),
             "amihud_illiquidity": _f(f["amihud_illiquidity"]),
+            "t0_trading_date": f["t0_trading_date"],
+            "tN_trading_date": f["tN_trading_date"],
+            "missing_t0_adjusted_close": f["missing_t0_adjusted_close"],
+            "missing_tN_adjusted_close": f["missing_tN_adjusted_close"],
+            "fewer_than_126_valid_returns": f["fewer_than_126_valid_returns"],
+            "fewer_than_126_amihud_days": f["fewer_than_126_amihud_days"],
             "missing_price_day_count": f["missing_price_day_count"],
             "zero_traded_value_day_count": f["zero_traded_value_day_count"],
             "usable_daily_return_count": f["usable_daily_return_count"],
@@ -238,6 +257,10 @@ def build_package(repo_root: str, bundle_path: str) -> dict[str, str]:
             "threshold": c["threshold"],
             "resolution": c["resolution"],
             "coverage_gate_passed": _f(c["coverage_gate_passed"]),
+            "admitted_into_m2_modeling_path": next(
+                cand["admitted_into_m2_modeling_path"]
+                for cand in decision["candidates"]
+                if cand["variable"] == var),
         })
     files["stage127_m2_candidate_coverage_audit.csv"] = csv_text(
         list(cov_rows[0].keys()), cov_rows)
@@ -486,11 +509,13 @@ def build_package(repo_root: str, bundle_path: str) -> dict[str, str]:
     files["stage127_m2_gate_qc_report.json"] = g.json_dumps(qc)
 
     files["README_STAGE127_M2_MARKET_DATA_GATE.md"] = write_readme(
-        files, decision, import_qc)
+        files, decision, import_qc, tstar_summary)
     return files
 
 
-def write_readme(files: dict[str, str], decision: dict, import_qc: dict) -> str:
+def write_readme(
+    files: dict[str, str], decision: dict, import_qc: dict, tstar: dict,
+) -> str:
     cs = decision["block_common_sample"]
     ev = decision["event_count_feasibility"]
     status = decision["gate_status"]
@@ -531,14 +556,17 @@ def write_readme(files: dict[str, str], decision: dict, import_qc: dict) -> str:
         "",
         "## Frozen M2 block (unchanged)",
         "",
-        "| variable | candidate_id | usable pairs | coverage |",
-        "|---|---|---:|---:|",
+        "| variable | candidate_id | usable pairs | coverage | admitted into "
+        "M2 modeling path |",
+        "|---|---|---:|---:|---|",
     ]
     for var, cid, _ in g.M2_VARIABLES:
         c = decision["candidate_coverage"][var]
+        cand = next(x for x in decision["candidates"] if x["variable"] == var)
         lines.append(
             f"| `{var}` | `{cid}` | {c['valid_rows']}/"
-            f"{c['total_development_rows']} | {c['overall_coverage']:.4f} |"
+            f"{c['total_development_rows']} | {c['overall_coverage']:.4f} | "
+            f"{'yes' if cand['admitted_into_m2_modeling_path'] else 'no'} |"
         )
     lines += [
         "",
@@ -547,7 +575,10 @@ def write_readme(files: dict[str, str], decision: dict, import_qc: dict) -> str:
         "window ending on the last eligible trading day **strictly before** "
         "each pair's cutoff; adjusted close only; >=126 usable observations; "
         "no imputation, scaling, extrapolation, annualization or threshold "
-        "reduction. The 111 external ranges are retrieval supersets and were "
+        "reduction. `ADMITTED_G01_G08_SOURCE_AND_DATA_QUALITY_ONLY` means the "
+        "source/data-quality gates passed; it is NOT admission into M2 "
+        "modeling, which additionally requires the frozen coverage threshold. "
+        "The 111 external ranges are retrieval supersets and were "
         "**not** used as scientific windows; every window W was recomputed "
         "per pair from the frozen contract.",
         "",

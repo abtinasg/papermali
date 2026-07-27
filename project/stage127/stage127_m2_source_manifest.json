@@ -1,6 +1,6 @@
 {
   "authoritative_source_only": true,
-  "code_revision": "af0b0126019ef3ac626c16e6a85b06b1efcc4fbe",
+  "code_revision": "f8d8f03d78e76f832057667e833787a6bc1817b3",
   "distinct_endpoint_urls_in_delivery": 220,
   "endpoint_families_observed_in_delivery": {
     "adjusted_price_history": "members.tsetmc.com/tsev2/chart/data/Financial.aspx",

@@ -12,7 +12,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage127-m2-market-data-gate`
 - **Last stage commit:** `76d8a9ecaa2d985af0b9027feb46a332a0d10b55`
-- **Generated from commit:** `76d8a9ecaa2d985af0b9027feb46a332a0d10b55` (branch `stage127-m2-market-data-gate`, informational)
+- **Generated from commit:** `f8d8f03d78e76f832057667e833787a6bc1817b3` (branch `stage127-m2-market-data-gate`, informational)
 - **Baseline:** `origin/main` @ `2967dcc82d30d1c7719b87db10f449c1bfc69dc8`
 
 ## Current-state validation
@@ -23,6 +23,19 @@ _The independent Stage126 current-state validator is the SOLE current-state vali
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
+
+## Stage127 — M2 market-data admission Gate
+
+_The current scientific action. Its human authorization already exists; the Gate has been executed and its result is reported here. This section exists so the snapshot can never render the project as though Stage127 had not happened._
+
+- ⛔ **Gate status:** `FAIL_M2_DATA_GATE`
+- **Executed:** True — **resolved (terminal observed decision):** True
+- **M2 block admitted for modeling:** False
+- **Terminal result pending human review:** True
+- **M2 market evidence collected:** True — **independently validated:** True (163230 normalized daily observations)
+- **Evidence bundle SHA256:** `d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`
+- Evidence collection is recorded **separately** from block admission. `m2_data_collected` remains `false` because in this schema it is a frozen prohibition marker meaning "M2 data has entered the authorized M2 modeling pipeline" — not a statement that no M2 evidence exists.
+- **M2 incremental evaluation authorized:** False — **M2 modeling started:** False
 
 ### Last completed scientific micro-part QC
 
@@ -68,5 +81,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `4dce739a40ecbfc5ef3a2deb13635b68e122771be44610dbfc4ba3415c5636e9`_
-_generated_at_utc: 2026-07-27T14:00:32Z (informational)_
+_state_fingerprint: `4f88238dc877c7c1968c10bf06e08eb43d43c0bdb3467d26e2f83d276b5def9b`_
+_generated_at_utc: 2026-07-27T14:25:52Z (informational)_

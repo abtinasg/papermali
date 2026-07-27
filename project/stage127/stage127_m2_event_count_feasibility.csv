@@ -1,3 +1,3 @@
 validation_window,sample,positive_evaluable,negative_evaluable,positive_threshold,negative_threshold,m1_development_reference_positive,resolution,model_fit_to_assess
-fold1_validation,three_variable_common_m2_sample,18,107,5,none_reported_descriptively_only,25,PASS,False
-fold2_validation,three_variable_common_m2_sample,7,157,5,none_reported_descriptively_only,10,PASS,False
+fold1_validation,three_variable_common_m2_sample,11,79,5,none_reported_descriptively_only,25,PASS,False
+fold2_validation,three_variable_common_m2_sample,5,134,5,none_reported_descriptively_only,10,PASS,False
