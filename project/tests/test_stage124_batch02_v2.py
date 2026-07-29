@@ -73,6 +73,76 @@ def test_gregorian_to_jalali_conversion():
     assert gregorian_to_jalali_str("2013-09-17") == "1392-06-26"
 
 
+# ---- Test 6a: Esfand (month 12) regression ------------------------------------
+# The month-search loop was `range(11)`, which could never select i=11, so every
+# Esfand day was emitted as month 11 with a day number running past the end of
+# Bahman (2015-03-20 -> "1393-11-59"). Round-trip tests could not catch this:
+# jalali_to_gregorian computes ((jm-7)*30+186)+jd arithmetically, so jm=11/jd=59
+# lands on the same Gregorian day as jm=12/jd=29 and the round trip still held.
+def test_gregorian_to_jalali_emits_esfand():
+    # last day of a NON-leap Jalali year (Esfand has 29 days)
+    assert gregorian_to_jalali_str("2015-03-20") == "1393-12-29"
+    # last day of a LEAP Jalali year (Esfand has 30 days)
+    assert gregorian_to_jalali_str("2017-03-20") == "1395-12-30"
+    # first and mid Esfand
+    assert gregorian_to_jalali_str("2015-02-20") == "1393-12-01"
+    assert gregorian_to_jalali_str("2015-03-06") == "1393-12-15"
+    assert gregorian_to_jalali_str("2019-03-01") == "1397-12-10"
+
+
+def test_gregorian_to_jalali_nowruz_boundaries():
+    """The Esfand/Farvardin boundary must land exactly on Nowruz."""
+    assert gregorian_to_jalali_str("2015-03-21") == "1394-01-01"
+    assert gregorian_to_jalali_str("2016-03-20") == "1395-01-01"
+    assert gregorian_to_jalali_str("2017-03-21") == "1396-01-01"
+    assert gregorian_to_jalali_str("2020-03-20") == "1399-01-01"
+
+
+def _jalali_month_length(jy: int, jm: int) -> int:
+    """Month length using the trusted FORWARD converter for the leap test."""
+    if jm <= 6:
+        return 31
+    if jm <= 11:
+        return 30
+    leap = (jalali_to_gregorian(jy + 1, 1, 1)
+            - jalali_to_gregorian(jy, 12, 30)).days == 1
+    return 30 if leap else 29
+
+
+def test_gregorian_to_jalali_never_emits_an_invalid_date():
+    """Output validity, not just round-trip consistency.
+
+    A round-trip assertion cannot detect an impossible month label, so assert
+    directly that every emitted month is 1..12 and every day is within that
+    month's real length, across a multi-year sweep that spans several Esfands.
+    """
+    from datetime import date, timedelta
+
+    day = date(2012, 1, 1)
+    end = date(2021, 1, 1)
+    months_seen = set()
+    while day <= end:
+        out = gregorian_to_jalali_str(day.isoformat())
+        jy, jm, jd = (int(x) for x in out.split("-"))
+        assert 1 <= jm <= 12, f"{day} -> {out}: month out of range"
+        assert 1 <= jd <= _jalali_month_length(jy, jm), (
+            f"{day} -> {out}: day out of range for month length "
+            f"{_jalali_month_length(jy, jm)}")
+        months_seen.add(jm)
+        day += timedelta(days=1)
+    # Esfand must actually be reachable; the defect made month 12 unreachable.
+    assert months_seen == set(range(1, 13)), f"months emitted: {sorted(months_seen)}"
+
+
+def test_gregorian_to_jalali_agrees_with_forward_converter_over_all_months():
+    """Exact agreement with the trusted forward converter, all 12 months."""
+    for jy in range(1390, 1401):
+        for jm in range(1, 13):
+            for jd in (1, 15, _jalali_month_length(jy, jm)):
+                greg = jalali_to_gregorian(jy, jm, jd).isoformat()
+                assert gregorian_to_jalali_str(greg) == f"{jy:04d}-{jm:02d}-{jd:02d}"
+
+
 # ---- Test 7: normalize_jalali -------------------------------------------------
 def test_normalize_jalali():
     assert normalize_jalali("1397/07/25") == "1397-07-25"

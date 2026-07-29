@@ -817,6 +817,26 @@ def test_h14_valid_exact_jalali_acceptable():
     assert evaluate_source_record(_reviewed_rec(), snapshot_root=None) is True
 
 
+# (14a) valid Esfand (month 12) exact dates → acceptable.
+# is_valid_exact_jalali_date validates by round-tripping through
+# gregorian_to_jalali_str, so while that converter could not emit month 12 this
+# function rejected EVERY genuine Esfand date. Guard against a regression.
+def test_h14a_valid_esfand_exact_jalali_acceptable():
+    for good in ("1380-12-01", "1393-12-15", "1393-12-29",
+                 "1395-12-30", "1397-12-10", "1399-12-06"):
+        assert is_valid_exact_jalali_date(good) is True, good
+        rec = _reviewed_rec(reviewed_date_jalali=good)
+        assert evaluate_source_record(rec, snapshot_root=None) is True, good
+
+
+# (14b) an out-of-range Esfand day must still be rejected. 1393 is NOT a leap
+# Jalali year, so Esfand has 29 days and 1393-12-30 does not exist.
+def test_h14b_out_of_range_esfand_day_rejected():
+    assert is_valid_exact_jalali_date("1393-12-30") is False
+    assert is_valid_exact_jalali_date("1395-12-30") is True  # 1395 IS leap
+    assert is_valid_exact_jalali_date("1393-12-31") is False
+
+
 # (15) credible news without publication date → ready=false
 def test_h15_news_without_pub_date_not_ready():
     rec = _news_rec()  # publication_date_explicit false by default

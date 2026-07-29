@@ -190,8 +190,14 @@ def gregorian_to_jalali_str(g: str) -> str:
     if j_day_no >= 366:
         jy += (j_day_no - 1) // 365
         j_day_no = (j_day_no - 1) % 365
-    for i in range(11):
-        if j_day_no < j_days[i + 1]:
+    # Must be range(12) -- i indexes months 0..11 (Farvardin..Esfand). With
+    # range(11) the loop can never select i=11, so every Esfand day was emitted
+    # as month 11 (Bahman) with a day number running past the end of Bahman
+    # (e.g. 2015-03-20 -> "1393-11-59" instead of "1393-12-29"). j_days has only
+    # 12 entries, so i+1 == 12 is out of range on the final month; that month is
+    # unbounded above by construction and is reached by exhausting the loop.
+    for i in range(12):
+        if i + 1 < len(j_days) and j_day_no < j_days[i + 1]:
             break
     jm = i
     jd = j_day_no - j_days[i] + 1
