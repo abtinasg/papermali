@@ -109,6 +109,17 @@ ALLOWLIST_FILES = (
     "project/src/stage127_m2_external_retrieval_request.py",
     "project/run_stage127_m2_external_retrieval_request.py",
     "project/tests/test_stage127_m2_external_retrieval_request.py",
+    # Stage124 Gregorian->Jalali Esfand converter correctness fix
+    # (CODE-CORRECTNESS ONLY: gregorian_to_jalali_str could never emit month 12,
+    # so every Esfand date was mislabelled and is_valid_exact_jalali_date
+    # rejected all of them. A read-only impact audit proved the defect produced
+    # zero stored values and rejected zero real dates in the Stage124->125->126
+    # lineage -- no canonical artifact, eligibility flag, cutoff, development
+    # pair or Gate result changes. Fix plus Esfand/leap-Esfand regression tests
+    # only.)
+    "project/src/stage124_batch02_v2.py",
+    "project/tests/test_stage124_batch02_v2.py",
+    "project/tests/test_stage124_batch02_part03.py",
     # Stage125 Part 1 code, runner, and tests (maintenance task).
     "project/src/stage125_part1_data_contract.py",
     "project/run_stage125_part1.py",
