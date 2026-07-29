@@ -1,0 +1,388 @@
+{
+  "calendar_point": {
+    "calendar_evidence_endpoint_exact": true,
+    "point_absent_from_official_instrument_calendar": 0,
+    "point_calendar_unresolved": 0,
+    "point_date_requests": 427,
+    "point_present_in_official_instrument_calendar": 427
+  },
+  "calendar_range_vs_daily": {
+    "calendar_vs_daily_date_sets_differing": 0,
+    "calendar_vs_daily_date_sets_equal": 27,
+    "differing_range_request_ids": [],
+    "range_requests": 27
+  },
+  "endpoints": {
+    "evidence_type_counts": {
+      "CALENDAR": 454,
+      "DAILY_CLOSING": 881,
+      "INSTRUMENT_HISTORY": 515,
+      "INSTRUMENT_IDENTITY": 103,
+      "STATE": 994,
+      "TRADE_HISTORY": 643
+    },
+    "exact_endpoint_verified_count": 3590,
+    "generic_endpoint_count": 0
+  },
+  "external_qc_comparison": {
+    "comparison_count": 35,
+    "comparisons": [
+      {
+        "agree": true,
+        "comparison": "requests_total",
+        "external_claimed_value": 454,
+        "papermali_derived_value": 454
+      },
+      {
+        "agree": true,
+        "comparison": "requests_point_date",
+        "external_claimed_value": 427,
+        "papermali_derived_value": 427
+      },
+      {
+        "agree": true,
+        "comparison": "requests_range",
+        "external_claimed_value": 27,
+        "papermali_derived_value": 27
+      },
+      {
+        "agree": true,
+        "comparison": "affected_tickers",
+        "external_claimed_value": 103,
+        "papermali_derived_value": 103
+      },
+      {
+        "agree": true,
+        "comparison": "raw_artifact_count",
+        "external_claimed_value": 3590,
+        "papermali_derived_value": 3590
+      },
+      {
+        "agree": true,
+        "comparison": "manifest_rows",
+        "external_claimed_value": 3590,
+        "papermali_derived_value": 3590
+      },
+      {
+        "agree": true,
+        "comparison": "unique_raw_files",
+        "external_claimed_value": 3590,
+        "papermali_derived_value": 3590
+      },
+      {
+        "agree": true,
+        "comparison": "sha256_verified",
+        "external_claimed_value": 3590,
+        "papermali_derived_value": 3590
+      },
+      {
+        "agree": true,
+        "comparison": "point_calendar_present",
+        "external_claimed_value": 427,
+        "papermali_derived_value": 427
+      },
+      {
+        "agree": true,
+        "comparison": "point_calendar_absent",
+        "external_claimed_value": 0,
+        "papermali_derived_value": 0
+      },
+      {
+        "agree": true,
+        "comparison": "calendar_vs_daily_equal",
+        "external_claimed_value": 27,
+        "papermali_derived_value": 27
+      },
+      {
+        "agree": true,
+        "comparison": "state_point",
+        "external_claimed_value": 427,
+        "papermali_derived_value": 427
+      },
+      {
+        "agree": true,
+        "comparison": "state_range",
+        "external_claimed_value": 567,
+        "papermali_derived_value": 567
+      },
+      {
+        "agree": true,
+        "comparison": "state_total",
+        "external_claimed_value": 994,
+        "papermali_derived_value": 994
+      },
+      {
+        "agree": true,
+        "comparison": "state_literal_code_counts",
+        "external_claimed_value": {
+          "'A '": 548,
+          "'AR'": 35,
+          "'AS'": 2,
+          "'I '": 23,
+          "'IS'": 385,
+          "UNRESOLVED": 1
+        },
+        "papermali_derived_value": {
+          "'A '": 548,
+          "'AR'": 35,
+          "'AS'": 2,
+          "'I '": 23,
+          "'IS'": 385,
+          "UNRESOLVED": 1
+        }
+      },
+      {
+        "agree": true,
+        "comparison": "state_meaning_unresolved",
+        "external_claimed_value": 994,
+        "papermali_derived_value": 994
+      },
+      {
+        "agree": true,
+        "comparison": "identity_unresolved",
+        "external_claimed_value": 103,
+        "papermali_derived_value": 103
+      },
+      {
+        "agree": true,
+        "comparison": "identity_none_found",
+        "external_claimed_value": 0,
+        "papermali_derived_value": 0
+      },
+      {
+        "agree": true,
+        "comparison": "trade_point_grouped",
+        "external_claimed_value": 427,
+        "papermali_derived_value": 427
+      },
+      {
+        "agree": true,
+        "comparison": "trade_range_grouped",
+        "external_claimed_value": 108,
+        "papermali_derived_value": 108
+      },
+      {
+        "agree": true,
+        "comparison": "trade_range_ungrouped",
+        "external_claimed_value": 108,
+        "papermali_derived_value": 108
+      },
+      {
+        "agree": true,
+        "comparison": "trade_artifacts_total",
+        "external_claimed_value": 643,
+        "papermali_derived_value": 643
+      },
+      {
+        "agree": true,
+        "comparison": "trade_audit_rows",
+        "external_claimed_value": 108,
+        "papermali_derived_value": 108
+      },
+      {
+        "agree": true,
+        "comparison": "daily_vs_ungrouped_mismatch",
+        "external_claimed_value": 1,
+        "papermali_derived_value": 1
+      },
+      {
+        "agree": true,
+        "comparison": "identity_tickers",
+        "external_claimed_value": 103,
+        "papermali_derived_value": 103
+      },
+      {
+        "agree": true,
+        "comparison": "identity_candidate_found",
+        "external_claimed_value": 0,
+        "papermali_derived_value": 0
+      },
+      {
+        "agree": true,
+        "comparison": "identity_isin_eq_instrumentID",
+        "external_claimed_value": 103,
+        "papermali_derived_value": 103
+      },
+      {
+        "agree": true,
+        "comparison": "identity_isin_eq_cIsin",
+        "external_claimed_value": 8,
+        "papermali_derived_value": 8
+      },
+      {
+        "agree": true,
+        "comparison": "zero_byte_total",
+        "external_claimed_value": 130,
+        "papermali_derived_value": 130
+      },
+      {
+        "agree": true,
+        "comparison": "zero_byte_success_or_cached",
+        "external_claimed_value": 0,
+        "papermali_derived_value": 0
+      },
+      {
+        "agree": true,
+        "comparison": "maximum_bounded_dEven",
+        "external_claimed_value": 20200718,
+        "papermali_derived_value": 20200718
+      },
+      {
+        "agree": true,
+        "comparison": "final_period_observations",
+        "external_claimed_value": 0,
+        "papermali_derived_value": 0
+      },
+      {
+        "agree": true,
+        "comparison": "request_mapping_rows",
+        "external_claimed_value": 3590,
+        "papermali_derived_value": 3590
+      },
+      {
+        "agree": true,
+        "comparison": "role_mapping_rows",
+        "external_claimed_value": 3644,
+        "papermali_derived_value": 3644
+      },
+      {
+        "agree": true,
+        "comparison": "unmapped_artifacts",
+        "external_claimed_value": 0,
+        "papermali_derived_value": 0
+      }
+    ],
+    "disagreement_count": 0,
+    "external_bundle_silently_repaired": false,
+    "external_report_treated_as_authority": false
+  },
+  "external_qc_report_compared": true,
+  "external_qc_report_trusted": false,
+  "firewall": {
+    "artifacts_scanned_for_dEven": 3460,
+    "dEven_at_or_after_final_test_boundary_count": 0,
+    "final_test_firewall_boundary_dEven": 20210101,
+    "final_test_rows_accessed": false,
+    "maximum_bounded_dEven": 20200718
+  },
+  "identity": {
+    "absence_of_predecessor_treated_as_proof_of_none": false,
+    "candidate_found_count": 0,
+    "current_identity_snapshot_rows": 103,
+    "evidence_status_counts": {
+      "UNRESOLVED": 103
+    },
+    "historical_probe_rows": 385,
+    "histories_concatenated": false,
+    "identity_audit_rows": 488,
+    "identity_evidence_rows": 103,
+    "identity_uncertainty_preserved": true,
+    "ins_code_zero_used_as_predecessor": false,
+    "none_found_count": 0,
+    "request_ISIN_equals_raw_cIsin": 8,
+    "request_ISIN_equals_raw_instrumentID": 103,
+    "tickers_checked": 103,
+    "unresolved_count": 103
+  },
+  "mappings": {
+    "artifacts_without_role_count": 0,
+    "generic_trade_history_role_count": 0,
+    "request_mapping_rows": 3590,
+    "role_counts": {
+      "DAILY_CLOSING": 454,
+      "DAILY_ROW_PRESENCE": 454,
+      "INSTRUMENT_CALENDAR": 454,
+      "INSTRUMENT_HISTORY": 515,
+      "INSTRUMENT_IDENTITY": 103,
+      "STATE": 994,
+      "TRADE_HISTORY_GROUPED": 535,
+      "TRADE_HISTORY_UNGROUPED": 108,
+      "ZERO_TRADE_FIELDS": 27
+    },
+    "role_mapping_rows": 3644,
+    "trade_history_generic_basename_count": 30,
+    "trade_history_role_derived_from_endpoint": true,
+    "unmapped_artifact_count": 0
+  },
+  "provenance": {
+    "bundle_edited_in_place": false,
+    "bundle_filename": "stage127_m2_zero_trade_semantics_full_delivery_v3.zip",
+    "bundle_sha256": "5e05c3ad52d582236cc9c0bbea69dae520a02385921f3dd03792e6f65c917317",
+    "bundle_sha256_verified": true,
+    "bundle_size_bytes": 1955293,
+    "bundle_size_verified": true,
+    "bundle_stored_outside_repository": true,
+    "bundle_treated_as_immutable_source_evidence": true
+  },
+  "raw": {
+    "manifest_rows": 3590,
+    "raw_artifact_count": 3590,
+    "sha256_mismatch_count": 0,
+    "sha256_recomputed_count": 3590,
+    "sha256_verified_count": 3590,
+    "unique_evidence_artifact_id_count": 3590,
+    "unique_raw_response_file_count": 3590
+  },
+  "requests": {
+    "canonical_affected_tickers": 103,
+    "canonical_endpoint_occurrences": 523,
+    "canonical_point_date_requests": 427,
+    "canonical_range_requests": 27,
+    "canonical_request_sha256": "cad5b6f9e97c8d11df65730773061b809b6494c4b7f5dcf9108694b9f6203c45",
+    "canonical_unique_requests": 454,
+    "delivery_answered_canonical_universe_exactly": true
+  },
+  "scientific_actions": {
+    "canonical_gate_modified": false,
+    "feature_engineering_performed": false,
+    "final_test_access": 0,
+    "identity_join_performed": false,
+    "model_fits": 0,
+    "predictions_generated": 0,
+    "trading_day_semantics_decided_here": false
+  },
+  "state": {
+    "literal_state_code_counts": {
+      "'A '": 548,
+      "'AR'": 35,
+      "'AS'": 2,
+      "'I '": 23,
+      "'IS'": 385,
+      "UNRESOLVED": 1
+    },
+    "state_artifacts_point": 427,
+    "state_artifacts_range": 567,
+    "state_artifacts_total": 994,
+    "state_code_semantics": "UNRESOLVED_NO_FROZEN_AUTHORITATIVE_MAPPING",
+    "state_meaning_resolved_count": 0,
+    "state_meaning_unresolved_count": 994,
+    "state_request_rows": 454,
+    "third_party_state_definition_used": false
+  },
+  "trade": {
+    "daily_vs_ungrouped_mismatch_request_ids": [
+      "UNQ0003"
+    ],
+    "daily_vs_ungrouped_mismatch_rows": 1,
+    "trade_audit_rows": 108,
+    "trade_history_artifacts_total": 643,
+    "trade_history_grouped_total": 535,
+    "trade_history_point_grouped": 427,
+    "trade_history_range_grouped": 108,
+    "trade_history_range_ungrouped": 108,
+    "trade_history_ungrouped_total": 108
+  },
+  "validator_pass": true,
+  "zero_byte": {
+    "zero_byte_artifact_count": 130,
+    "zero_byte_evidence_type_counts": {
+      "INSTRUMENT_HISTORY": 130
+    },
+    "zero_byte_semantics": "UNRESOLVED means retrieval was not demonstrated; HTTP_500 is a trusted observed upstream failure. Neither is evidence of absence.",
+    "zero_byte_status_counts": {
+      "HTTP_500": 5,
+      "UNRESOLVED": 125
+    },
+    "zero_byte_success_or_cached_count": 0
+  }
+}

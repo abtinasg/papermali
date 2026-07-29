@@ -1,0 +1,61 @@
+{
+  "authoritative_source_only": true,
+  "code_revision": "f8d8f03d78e76f832057667e833787a6bc1817b3",
+  "distinct_endpoint_urls_in_delivery": 220,
+  "endpoint_families_observed_in_delivery": {
+    "adjusted_price_history": "members.tsetmc.com/tsev2/chart/data/Financial.aspx",
+    "daily_closing_price": "cdn.tsetmc.com/api/ClosingPrice/GetClosingPriceDailyList"
+  },
+  "endpoint_hosts_observed": [
+    "cdn.tsetmc.com",
+    "members.tsetmc.com"
+  ],
+  "evidence_mode": "offline_imported_external_evidence_bundle",
+  "execution_environment": {
+    "local_network_probe_note": "A previous execution of this Gate in this environment could not reach TSETMC hosts. That remains an environment egress diagnostic only. It is not a property of TSETMC, and it no longer has any bearing on the Gate: the decision is now derived entirely from the imported immutable evidence bundle.",
+    "network_egress_used_for_this_gate": false,
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python": "3.13.5"
+  },
+  "field_mapping_required": {
+    "adjusted_close": "corporate-action-adjusted daily closing price (TSETMC Financial.aspx t=ph&a=1 field pc, joined on the exact same trading date); unadjusted close is NOT an acceptable substitute",
+    "traded_value_rial": "TSETMC qTotCap, in rial, taken verbatim and never recomputed as price x volume; days with V_t<=0 or missing are excluded and never imputed"
+  },
+  "field_mapping_verified": true,
+  "field_mapping_verified_rows": 163230,
+  "forbidden_substitute_sources_not_used": [
+    "yahoo_finance",
+    "kaggle",
+    "unofficial_mirror",
+    "manually_copied_third_party_dataset",
+    "alternative_market_data_provider"
+  ],
+  "instrument_mapping_rows": 110,
+  "network_required_to_reproduce_gate": false,
+  "observation_date_max": "2020-07-18",
+  "observation_date_min": "2012-09-22",
+  "observations_imported": 163230,
+  "parser_module": "project/src/stage127_m2_external_delivery_import.py",
+  "parser_module_sha256": "fe03e988a29f1e24690649e948d7d1a073c811c686ecd30a0dcc39a3ab35b032",
+  "partial_ranges_preserved_as_delivered": {
+    "RNG0008": "ثشرق",
+    "RNG0010": "جم",
+    "RNG0033": "زپارس",
+    "RNG0094": "های وب",
+    "RNG0096": "پارس",
+    "RNG0109": "کویر"
+  },
+  "partial_ranges_upgraded_or_backfilled": false,
+  "reproduction_note": "Rerun `python project/run_stage127_m2_market_data_gate.py --build --bundle <path-to-stage127_m2_tsetmc_full_delivery.zip>`. The bundle is verified by SHA256 (d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec) before any byte of it is used.",
+  "retrieval_ranges": 111,
+  "retrieval_status_counts": {
+    "FAILED": 0,
+    "PARTIAL": 6,
+    "SUCCESS": 105,
+    "UNRESOLVED_MAPPING": 0
+  },
+  "source_family": "TSETMC market data",
+  "source_id": "src_m2_tsetmc_market",
+  "source_universe_broadened_post_hoc": false,
+  "substitute_sources_used": []
+}

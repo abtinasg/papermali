@@ -1332,15 +1332,35 @@ def test_real_repo_roadmap_stage126_status_consistency():
     freeze_row_l = freeze_match.group(1).lower()
     assert "**complete.**" in freeze_row_l
 
-    # Isolate the M2 market-data-gate row (item 21) — now ACTIVE, pending
-    # separate future human authorization.
+    # Isolate the M2 market-data-gate row (item 21). The row must state the
+    # executed status truthfully and must never claim the Gate passed or was
+    # completed. The exact status is not pinned here: it is cross-checked
+    # against the machine-readable Gate artifact below, so the row can never
+    # drift away from the real result and can never be stale.
     gate_match = re.search(
         r"21\.\s*`stage127-m2-market-data-gate`\s*—\s*([^\n]+)",
         roadmap,
     )
     assert gate_match is not None, "M2 market-data-gate research-action row missing"
     gate_row_l = gate_match.group(1).lower()
-    assert "active" in gate_row_l
+    assert "executed" in gate_row_l
+    assert any(
+        status in gate_row_l
+        for status in ("unresolved_m2_data_gate", "fail_m2_data_gate")
+    ), "the Gate row must state a truthful non-passing status"
+    assert "**complete.**" not in gate_row_l
+    assert "pass_for_m2_incremental_evaluation" not in gate_row_l
+
+    # The roadmap must agree with the machine-readable Gate status.
+    gate_path = os.path.join(
+        REAL_ROOT, "project", "stage127",
+        "stage127_m2_market_data_gate_decision.json",
+    )
+    if os.path.isfile(gate_path):
+        with open(gate_path, encoding="utf-8") as f:
+            gate = json.load(f)
+        assert gate["gate_status"].lower() in gate_row_l
+        assert gate["modeling_performed"] is False
 
 
 @pytest.mark.skipif(

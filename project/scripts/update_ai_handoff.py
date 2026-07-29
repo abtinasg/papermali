@@ -67,11 +67,48 @@ ALLOWLIST_DIRS = (
     "project/stage125/",
     # Stage126 M1 primary development-fold tuning deliverables.
     "project/stage126/",
+    # Stage127 M2 market-data admission Gate deliverables.
+    "project/stage127/",
 )
 ALLOWLIST_FILES = (
     "project/scripts/update_ai_handoff.py",
     "project/scripts/validate_ai_handoff.py",
     "project/tests/test_ai_handoff.py",
+    # Stage127 M2 market-data admission Gate code, runner, and tests.
+    "project/src/stage127_m2_market_data_gate.py",
+    "project/run_stage127_m2_market_data_gate.py",
+    "project/tests/test_stage127_m2_market_data_gate.py",
+    # Stage127 external TSETMC delivery import / revalidation layer and tests.
+    # (the T* semantics audit artifacts live under project/stage127/)
+    "project/src/stage127_m2_external_delivery_import.py",
+    "project/tests/test_stage127_m2_external_delivery_import.py",
+    # Stage127 equity_return_window root-cause audit (DIAGNOSTIC ONLY: reads
+    # the immutable bundle and the Gate's own frozen window/feature functions;
+    # never modifies the canonical Gate decision or any frozen artifact).
+    "project/src/stage127_m2_equity_return_root_cause_audit.py",
+    "project/run_stage127_m2_equity_return_root_cause_audit.py",
+    # Stage127 zero-trade endpoint semantics external evidence-REQUEST package
+    # (RETRIEVAL-REQUEST ONLY: generates a deterministic request for the
+    # already-used Iranian TSETMC retriever; requests no decision, retrieves
+    # nothing itself, and never modifies the canonical Gate). v1 is retained
+    # as historical record only -- v2 supersedes it for actual retrieval.
+    "project/src/stage127_m2_zero_trade_endpoint_evidence_request.py",
+    "project/run_stage127_m2_zero_trade_endpoint_evidence_request.py",
+    "project/src/stage127_m2_zero_trade_endpoint_evidence_request_v2.py",
+    "project/run_stage127_m2_zero_trade_endpoint_evidence_request_v2.py",
+    # Stage127 zero-trade "trading day" SEMANTICS evidence import and
+    # frozen-contract adjudication (EVIDENCE IMPORT + ADJUDICATION ONLY:
+    # independently revalidates the immutable v3 delivery, traces the frozen
+    # Stage125 contract, and never fits a model, generates a prediction, reads
+    # a final-test row, or modifies the canonical Gate).
+    "project/src/stage127_m2_zero_trade_semantics_import.py",
+    "project/src/stage127_m2_trading_day_semantics_adjudication.py",
+    "project/run_stage127_m2_zero_trade_semantics_adjudication.py",
+    "project/tests/test_stage127_m2_zero_trade_semantics_import.py",
+    # Stage127 external TSETMC retrieval-request package code and tests.
+    "project/src/stage127_m2_external_retrieval_request.py",
+    "project/run_stage127_m2_external_retrieval_request.py",
+    "project/tests/test_stage127_m2_external_retrieval_request.py",
     # Stage125 Part 1 code, runner, and tests (maintenance task).
     "project/src/stage125_part1_data_contract.py",
     "project/run_stage125_part1.py",
@@ -2679,6 +2716,8 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         "m1_robustness_closure_retained_design_freeze_authorized": False,
         "next_research_action_id": _NEXT_RESEARCH_ACTION_ID_AFTER_ROBUSTNESS_CLOSURE,
         **derive_m1_retained_design_freeze_markers(root),
+        **derive_stage127_m2_market_data_gate_markers(root),
+        **derive_stage127_m2_zero_trade_semantics_markers(root),
     }
 
 
@@ -3659,6 +3698,85 @@ def render_current_state(record: dict) -> str:
         ]
     else:
         lines += ["_Not yet generated._\n", ""]
+    if record.get("stage127_m2_market_data_gate_executed"):
+        status = record.get("stage127_m2_market_data_gate_status", "")
+        resolved = record.get("stage127_m2_market_data_gate_resolved")
+        admitted = record.get("stage127_m2_block_admitted_for_modeling")
+        gate_ok = "✅" if admitted else "⛔"
+        lines += [
+            "## Stage127 — M2 market-data admission Gate\n",
+            "_The current scientific action. Its human authorization already "
+            "exists; the Gate has been executed and its result is reported "
+            "here. This section exists so the snapshot can never render the "
+            "project as though Stage127 had not happened._\n",
+            f"- {gate_ok} **Gate status:** `{status}`",
+            f"- **Executed:** {record['stage127_m2_market_data_gate_executed']}"
+            f" — **resolved (terminal observed decision):** {resolved}",
+            f"- **M2 block admitted for modeling:** {admitted}",
+            f"- **Terminal result pending human review:** "
+            f"{record.get('stage127_m2_market_data_gate_terminal_result_pending_human_review')}",
+            f"- **M2 market evidence collected:** "
+            f"{record.get('stage127_m2_market_data_evidence_collected')}"
+            f" — **independently validated:** "
+            f"{record.get('stage127_m2_market_data_evidence_validated')}"
+            f" ({record.get('stage127_m2_market_data_evidence_observation_count')}"
+            " normalized daily observations)",
+            f"- **Evidence bundle SHA256:** "
+            f"`{record.get('stage127_m2_market_data_evidence_bundle_sha256')}`",
+            "- Evidence collection is recorded **separately** from block "
+            "admission. `m2_data_collected` remains `false` because in this "
+            "schema it is a frozen prohibition marker meaning \"M2 data has "
+            "entered the authorized M2 modeling pipeline\" — not a statement "
+            "that no M2 evidence exists.",
+            f"- **M2 incremental evaluation authorized:** "
+            f"{record.get('m2_incremental_evaluation_authorized')} — "
+            f"**M2 modeling started:** {record.get('m2_modeling_started')}",
+            "",
+        ]
+    if record.get("stage127_m2_trading_day_semantics_adjudication_completed"):
+        outcome = record.get(
+            "stage127_m2_trading_day_semantics_adjudication_outcome", "")
+        conformant = record.get("stage127_m2_current_implementation_conformant")
+        lines += [
+            "### Stage127 — zero-trade \"trading day\" semantics adjudication\n",
+            "_Why `equity_return_window` coverage is 0.4039. This subsection "
+            "records the SEMANTIC state only; it changes no canonical "
+            "result._\n",
+            f"- **Official TSETMC evidence:** completed and independently "
+            f"validated — "
+            f"{record.get('stage127_m2_zero_trade_semantics_raw_artifacts_sha256_verified')}"
+            " raw artifacts SHA256-verified",
+            f"- **Evidence bundle SHA256:** "
+            f"`{record.get('stage127_m2_zero_trade_semantics_bundle_sha256')}`",
+            f"- **Endpoint dates that are official InstrumentCalendar members:**"
+            f" {record.get('stage127_m2_point_dates_in_official_instrument_calendar')}"
+            f" / {record.get('stage127_m2_point_date_requests')}",
+            f"- **RANGE requests with InstrumentCalendar == "
+            f"ClosingPriceDailyList date set:** "
+            f"{record.get('stage127_m2_range_calendar_vs_daily_equal')} / "
+            f"{record.get('stage127_m2_range_requests')}",
+            f"- **Adjudication outcome:** `{outcome}` (Outcome A)",
+            f"- **Current implementation conformant:** {conformant}",
+            f"- **Cases still pending external adjudication:** "
+            f"{record.get('stage127_m2_semantics_pending_count')}",
+            f"- **Canonical Gate changed by the adjudication:** "
+            f"{record.get('stage127_m2_semantics_canonical_gate_changed')} — "
+            f"Gate remains "
+            f"`{record.get('stage127_m2_market_data_gate_status')}` with "
+            "coverage 269 / 576 / 576 and common sample 269 of 666 pairs",
+            f"- **Model fits:** "
+            f"{record.get('stage127_m2_semantics_model_fits')} — "
+            f"**predictions:** "
+            f"{record.get('stage127_m2_semantics_predictions_generated')} — "
+            f"**final-test access:** "
+            f"{record.get('stage127_m2_semantics_final_test_access')}",
+            "- **No M2 modeling authorization follows from this.** The "
+            "shortfall is now established as TRUE frozen-contract missingness "
+            "rather than a data defect.",
+            "- ⏳ **Human decision still required:** which scientific roadmap "
+            "action follows the failed M2 extension.",
+            "",
+        ]
     lines += [
         "### Last completed scientific micro-part QC\n",
         "_Scientific QC of the newest completed robustness micro-part — a "
@@ -3953,6 +4071,292 @@ def _strip_volatile(text: str | None) -> str:
     if text is None:
         return ""
     return "\n".join(l for l in text.splitlines() if "generated_at_utc" not in l)
+
+
+_STAGE127_M2_GATE_REL = (
+    "project/stage127/stage127_m2_market_data_gate_decision.json"
+)
+_STAGE127_M2_GATE_ACTION_ID = "stage127-m2-market-data-gate"
+_STAGE127_M2_NEXT_ACTION_ON_PASS = "stage127-m2-incremental-evaluation"
+_STAGE127_GATE_PASS = "PASS_FOR_M2_INCREMENTAL_EVALUATION"
+_STAGE127_GATE_FAIL = "FAIL_M2_DATA_GATE"
+
+
+def derive_stage127_m2_market_data_gate_markers(root: str) -> dict:
+    """Recognize an EXECUTED Stage127 M2 market-data Gate.
+
+    Narrow and fail-closed, mirroring the retained-design-freeze recognizer.
+    Critically, this function never authorizes or starts M2: it advances
+    ``next_research_action_id`` to the incremental-evaluation action ONLY when
+    the Gate artifact itself records a PASS, and even then leaves
+    ``m2_incremental_evaluation_authorized`` False, since that action requires
+    its own separate human authorization. An UNRESOLVED or FAIL Gate keeps the
+    pointer on the Gate itself (it must be re-executed / reviewed) and never
+    marks M2 data as collected. Returns {} before the Gate has been executed.
+    """
+    path = os.path.join(root, _STAGE127_M2_GATE_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        gate = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable stage127 M2 gate artifact: {exc}") from exc
+
+    if gate.get("decision_id") != _STAGE127_M2_GATE_ACTION_ID:
+        raise HandoffError("stage127 M2 gate artifact decision_id mismatch")
+
+    status = gate.get("gate_status")
+    if status not in (
+        _STAGE127_GATE_PASS, "FAIL_M2_DATA_GATE", "UNRESOLVED_M2_DATA_GATE",
+    ):
+        raise HandoffError(f"stage127 M2 gate status not recognized: {status!r}")
+
+    # The Gate must never have performed modeling, and the firewall must hold.
+    if gate.get("modeling_performed") is not False:
+        raise HandoffError("stage127 M2 gate reports modeling_performed")
+    if gate.get("model_fit_calls") != 0 or gate.get("prediction_calls") != 0:
+        raise HandoffError("stage127 M2 gate reports model fit/prediction calls")
+    fw = gate.get("final_test_firewall") or {}
+    for key in (
+        "final_test_unlocked", "final_test_access_authorized",
+        "final_test_predictor_values_inspected",
+        "final_test_target_values_inspected", "final_test_evaluation_performed",
+    ):
+        if fw.get(key) is not False:
+            raise HandoffError(f"stage127 M2 gate firewall field {key} not False")
+    if fw.get("final_test_locked") is not True:
+        raise HandoffError("stage127 M2 gate does not report final_test_locked")
+
+    passed = status == _STAGE127_GATE_PASS
+    # RESOLVED means the Gate reached a TERMINAL OBSERVED DECISION. An observed
+    # FAIL resolves the Gate just as an observed PASS does -- it is a real
+    # scientific result, not an absence of one. Only UNRESOLVED (the evidence
+    # required to decide was unavailable) leaves the Gate unresolved. Resolution
+    # is deliberately NOT a synonym for admission: see
+    # stage127_m2_block_admitted_for_modeling below.
+    resolved = status in (_STAGE127_GATE_PASS, _STAGE127_GATE_FAIL)
+    eligible = bool(
+        (gate.get("eligibility_for_next_action") or {})
+        .get("eligible_to_start_m2_incremental_evaluation")
+    )
+    if eligible and not passed:
+        raise HandoffError(
+            "stage127 M2 gate claims eligibility without a PASS status"
+        )
+
+    # Evidence collection/validation is a SEPARATE fact from block admission.
+    # It is read from the Gate artifact's own immutable-delivery record, so a
+    # failed Gate can never erase the fact that authoritative M2 market
+    # evidence was obtained and independently revalidated.
+    delivery = gate.get("external_delivery") or {}
+    evidence_rows = int(delivery.get("normalized_row_count") or 0)
+    evidence_collected = bool(
+        evidence_rows > 0 and delivery.get("bundle_sha256")
+    )
+    evidence_validated = bool(
+        evidence_collected
+        and delivery.get("independently_revalidated_in_papermali")
+        and delivery.get("external_qc_report_trusted") is False
+    )
+
+    markers = {
+        "stage127_m2_market_data_gate_executed": True,
+        "stage127_m2_market_data_gate_status": status,
+        "stage127_m2_market_data_gate_resolved": resolved,
+        "stage127_m2_market_data_gate_terminal_result_pending_human_review": (
+            resolved and not passed
+        ),
+        "stage127_m2_block_admitted_for_modeling": passed,
+        # Authoritative M2 market EVIDENCE state — independent of admission.
+        "stage127_m2_market_data_evidence_collected": evidence_collected,
+        "stage127_m2_market_data_evidence_validated": evidence_validated,
+        "stage127_m2_market_data_evidence_bundle_sha256": (
+            delivery.get("bundle_sha256") or ""
+        ),
+        "stage127_m2_market_data_evidence_observation_count": evidence_rows,
+        "m2_incremental_evaluation_authorized": False,
+        "m2_modeling_started": False,
+        "m2_authorized": False,
+        "m2_started": False,
+        # NOTE ON SEMANTICS: in this schema `m2_data_collected` is a frozen
+        # PROHIBITION marker, not a data-availability flag. It is pinned False
+        # by the frozen Stage125 Part 4 SAP and the frozen Stage126 robustness
+        # closure completion lock, and Stage125 Part 5's successor validator
+        # treats flipping it to True as a handoff mutation VIOLATION. It means
+        # "M2 data has entered the authorized M2 modeling pipeline", which
+        # remains false and must remain false while M2 is unauthorized. It does
+        # NOT mean "no M2 evidence exists" and it is NOT a restatement of the
+        # Gate result -- that is what the explicit
+        # stage127_m2_market_data_evidence_* markers above record.
+        "m2_data_collected": False,
+        "m2_data_collected_semantics": (
+            "frozen_prohibition_marker_m2_data_entered_authorized_modeling_"
+            "pipeline_not_evidence_availability"
+        ),
+        "paper_winner_selected": False,
+        "final_model_selected": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_predictor_values_inspected": False,
+        "final_test_target_values_inspected": False,
+        "final_test_evaluation_performed": False,
+    }
+    # An UNRESOLVED or FAIL Gate produced no admission decision, so the
+    # research pointer must NOT advance past the Gate: the repository
+    # invariant is that next_research_action_id comes strictly after
+    # last_completed_research_action_id, and an unresolved Gate has not
+    # completed. Only a PASS both completes the Gate and opens the (still
+    # separately-authorized) incremental-evaluation action.
+    if passed:
+        markers["last_completed_research_action_id"] = _STAGE127_M2_GATE_ACTION_ID
+        markers["next_research_action_id"] = _STAGE127_M2_NEXT_ACTION_ON_PASS
+    return markers
+
+
+_STAGE127_SEMANTICS_ADJUDICATION_REL = (
+    "project/stage127/stage127_m2_trading_day_semantics_adjudication.json"
+)
+_STAGE127_SEMANTICS_IMPORT_QC_REL = (
+    "project/stage127/stage127_m2_zero_trade_semantics_import_qc.json"
+)
+_STAGE127_ROOT_CAUSE_REL = (
+    "project/stage127/stage127_m2_equity_return_root_cause_summary.json"
+)
+_STAGE127_SEMANTICS_OUTCOME_A = (
+    "FROZEN_CONTRACT_UNAMBIGUOUS_CURRENT_IMPLEMENTATION_CONFORMANT"
+)
+_STAGE127_SEMANTICS_OUTCOMES = (
+    _STAGE127_SEMANTICS_OUTCOME_A,
+    "FROZEN_CONTRACT_UNAMBIGUOUS_IMPLEMENTATION_DEFECT",
+    "SEMANTIC_AMBIGUITY_REQUIRES_HUMAN_DECISION",
+)
+
+
+def derive_stage127_m2_zero_trade_semantics_markers(root: str) -> dict:
+    """Recognize a COMPLETED Stage127 zero-trade trading-day adjudication.
+
+    Narrow and fail-closed, like the Gate recognizer. It records only the
+    SEMANTIC state and can never authorize M2, admit a block, or alter the
+    canonical Gate: an adjudication artifact that claims a Gate change, a model
+    fit, a prediction or final-test access is rejected outright. Returns {}
+    before the adjudication has been produced.
+    """
+    path = os.path.join(root, _STAGE127_SEMANTICS_ADJUDICATION_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        adj = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(
+            f"unreadable stage127 semantics adjudication artifact: {exc}"
+        ) from exc
+
+    outcome = adj.get("adjudication_outcome")
+    if outcome not in _STAGE127_SEMANTICS_OUTCOMES:
+        raise HandoffError(
+            f"stage127 semantics adjudication outcome not recognized: "
+            f"{outcome!r}"
+        )
+    # The adjudication is diagnostic: it may never move a canonical result.
+    for key in ("canonical_gate_changed", "t0_changed", "t_star_changed",
+                "thresholds_changed", "features_changed",
+                "frozen_stage125_contract_modified"):
+        if adj.get(key) is not False:
+            raise HandoffError(
+                f"stage127 semantics adjudication reports {key} is not False"
+            )
+    if adj.get("model_fits") != 0 or adj.get("predictions_generated") != 0:
+        raise HandoffError(
+            "stage127 semantics adjudication reports model fits/predictions"
+        )
+    if adj.get("final_test_access") != 0:
+        raise HandoffError(
+            "stage127 semantics adjudication reports final-test access"
+        )
+    if adj.get("canonical_gate_status") != _STAGE127_GATE_FAIL:
+        raise HandoffError(
+            "stage127 semantics adjudication does not preserve the canonical "
+            "Gate status"
+        )
+
+    qc_path = os.path.join(root, _STAGE127_SEMANTICS_IMPORT_QC_REL)
+    if not os.path.isfile(qc_path):
+        raise HandoffError(
+            "stage127 semantics adjudication present without its import QC"
+        )
+    try:
+        qc = json.load(open(qc_path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(
+            f"unreadable stage127 semantics import QC: {exc}"
+        ) from exc
+    if qc.get("validator_pass") is not True:
+        raise HandoffError("stage127 semantics import QC did not pass")
+    if qc.get("external_qc_report_trusted") is not False:
+        raise HandoffError(
+            "stage127 semantics import QC trusts the external QC report"
+        )
+    provenance = qc.get("provenance") or {}
+    if not (provenance.get("bundle_sha256_verified")
+            and provenance.get("bundle_size_verified")):
+        raise HandoffError(
+            "stage127 semantics evidence bundle identity was not verified"
+        )
+    calendar = qc.get("calendar_point") or {}
+    ranges = qc.get("calendar_range_vs_daily") or {}
+
+    # The root-cause surface must agree that nothing is pending any more.
+    pending = None
+    rc_path = os.path.join(root, _STAGE127_ROOT_CAUSE_REL)
+    if os.path.isfile(rc_path):
+        try:
+            rc = json.load(open(rc_path, encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise HandoffError(f"unreadable stage127 root-cause summary: {exc}") from exc
+        pending = int(rc.get("pending_external_tsetmc_adjudication_count") or 0)
+        if rc.get("canonical_gate_status_unchanged") != _STAGE127_GATE_FAIL:
+            raise HandoffError(
+                "stage127 root-cause summary does not preserve the canonical "
+                "Gate status"
+            )
+
+    conformant = adj.get("current_implementation_conformant")
+    return {
+        "stage127_m2_zero_trade_semantics_evidence_validated": True,
+        "stage127_m2_zero_trade_semantics_bundle_sha256": (
+            provenance.get("bundle_sha256") or ""
+        ),
+        "stage127_m2_zero_trade_semantics_bundle_filename": (
+            provenance.get("bundle_filename") or ""
+        ),
+        "stage127_m2_zero_trade_semantics_raw_artifacts_sha256_verified": (
+            (qc.get("raw") or {}).get("sha256_verified_count", 0)
+        ),
+        "stage127_m2_trading_day_semantics_adjudication_completed": True,
+        "stage127_m2_trading_day_semantics_adjudication_outcome": outcome,
+        "stage127_m2_current_implementation_conformant": conformant == "YES",
+        "stage127_m2_semantics_pending_count": pending if pending is not None else 0,
+        "stage127_m2_semantics_canonical_gate_changed": False,
+        "stage127_m2_semantics_model_fits": 0,
+        "stage127_m2_semantics_predictions_generated": 0,
+        "stage127_m2_semantics_final_test_access": 0,
+        "stage127_m2_point_dates_in_official_instrument_calendar": (
+            calendar.get("point_present_in_official_instrument_calendar", 0)
+        ),
+        "stage127_m2_point_date_requests": (
+            calendar.get("point_date_requests", 0)
+        ),
+        "stage127_m2_range_calendar_vs_daily_equal": (
+            ranges.get("calendar_vs_daily_date_sets_equal", 0)
+        ),
+        "stage127_m2_range_requests": ranges.get("range_requests", 0),
+        "stage127_m2_semantics_human_decision_required": True,
+        # The adjudication changes NOTHING about authorization.
+        "stage127_m2_block_admitted_for_modeling": False,
+        "m2_incremental_evaluation_authorized": False,
+        "m2_modeling_started": False,
+    }
 
 
 if __name__ == "__main__":

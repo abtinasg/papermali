@@ -1,0 +1,4 @@
+variable,candidate_id,total_development_rows,valid_rows,missing_or_unresolved_rows,overall_coverage,fold1_train_coverage,fold1_validation_coverage,fold2_train_coverage,fold2_validation_coverage,positive_row_coverage,negative_row_coverage,threshold,resolution,coverage_gate_passed,admitted_into_m2_modeling_path
+equity_return_window,cand_m2_equity_return_window,666,269,397,0.4039039039,0.1632653061,0.4390243902,0.2888888889,0.6435185185,0.3382352941,0.4113712375,0.8,PASS,False,False
+realized_volatility,cand_m2_realized_volatility,666,576,90,0.8648648649,0.7795918367,0.8390243902,0.8066666667,0.9861111111,0.8676470588,0.864548495,0.8,PASS,True,True
+amihud_illiquidity,cand_m2_amihud_illiquidity,666,576,90,0.8648648649,0.7795918367,0.8390243902,0.8066666667,0.9861111111,0.8676470588,0.864548495,0.8,PASS,True,True

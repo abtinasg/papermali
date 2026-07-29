@@ -1,0 +1,43 @@
+{
+  "artifact_sha256": {
+    "README_STAGE127_M2_ZERO_TRADE_SEMANTICS_ADJUDICATION.md": "a46a1e611c8b77322b1623f880f1cbc1397ff1056732687db420bcdc5379bc5b",
+    "stage127_m2_trading_day_semantics_adjudication.json": "2c059d70e955e06145faf4d398bce3da775decfe742bb69b40944a8a7cff3de7",
+    "stage127_m2_trading_day_semantics_contract_trace.json": "476a7162a1b79a685efb8cc99993de3ce7e6bf8b82ca71c75979f0d3912c8bcd",
+    "stage127_m2_trading_day_semantics_counterfactuals.json": "70c960f79198513b2dce93cb33ea584f419808ce6556670e454737e5f35b6ccf",
+    "stage127_m2_zero_trade_historical_identity_evidence.csv": "1b699dd155569396f15de3d6aa14de95d60e3ce39d7c123b41d27d65cd8ddc58",
+    "stage127_m2_zero_trade_point_endpoint_evidence.csv": "2e58d02c7bab639b845c49fc81c4bf4035e076653307a34b1abc66317989c8c5",
+    "stage127_m2_zero_trade_range_evidence.csv": "07137cbf1088ea5b8626506bd7d17f34d39f202a48cf642b86f0d8b91a65e65d",
+    "stage127_m2_zero_trade_semantics_delivery_provenance.json": "d26309677bfe2a3939266586a5cfac895a001fcfd1a2d17daa7f205f29dfa690",
+    "stage127_m2_zero_trade_semantics_import_qc.json": "ec169d6dacac31750137abca0089387df7c8b526638646f8044823ada0bb2943"
+  },
+  "canonical_coverage_unchanged": {
+    "amihud_illiquidity": {
+      "coverage": 0.8648648649,
+      "total": 666,
+      "usable": 576
+    },
+    "equity_return_window": {
+      "coverage": 0.4039039039,
+      "total": 666,
+      "usable": 269
+    },
+    "realized_volatility": {
+      "coverage": 0.8648648649,
+      "total": 666,
+      "usable": 576
+    },
+    "three_variable_common_sample": {
+      "coverage": 0.4039039039,
+      "total": 666,
+      "usable": 269
+    }
+  },
+  "canonical_gate_status_unchanged": "FAIL_M2_DATA_GATE",
+  "external_bundle_filename": "stage127_m2_zero_trade_semantics_full_delivery_v3.zip",
+  "external_bundle_sha256": "5e05c3ad52d582236cc9c0bbea69dae520a02385921f3dd03792e6f65c917317",
+  "external_bundle_size_bytes": 1955293,
+  "final_test_access": 0,
+  "frozen_stage125_contracts_modified": false,
+  "model_fits": 0,
+  "predictions_generated": 0
+}

@@ -434,7 +434,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "7987b97e3bf61f9d0f1cd553f54754ff6e1e69d5",
+  "code_commit": "559b0e6e209b688271427451634f4430a9bde8a7",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -442,7 +442,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "7987b97e3bf61f9d0f1cd553f54754ff6e1e69d5",
+  "generated_at": "559b0e6e209b688271427451634f4430a9bde8a7",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,

@@ -1,0 +1,28 @@
+{
+  "development_pairs": 666,
+  "different_tstar_count": 253,
+  "different_tstar_counts_by_fold": {
+    "fold1_train": 138,
+    "fold1_validation": 77,
+    "fold2_train": 215,
+    "fold2_validation": 38
+  },
+  "different_tstar_counts_by_target_year": {
+    "1393": 17,
+    "1394": 87,
+    "1395": 34,
+    "1396": 43,
+    "1397": 34,
+    "1398": 23,
+    "1399": 15
+  },
+  "endpoint_price_requirement_evaluated_after_window_definition": true,
+  "frozen_end_rule": "last_trading_day_with_verified_available_at_strictly_before_pair_cutoff",
+  "literal_tstar_missing_adjusted_close_count": 253,
+  "max_shift_days": 637,
+  "pairs_with_no_eligible_observation": 0,
+  "purpose": "Independent audit of the shared-window end rule. The Gate applies the frozen rule literally; this record quantifies the difference against the retired last-priced-day reading.",
+  "same_tstar_count": 413,
+  "tstar_moved_backwards_to_find_a_priced_day": false,
+  "verified_available_at_means": "a verified availability timestamp for the market observation (CUT-A), NOT the presence of an adjusted_close value"
+}

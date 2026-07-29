@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage127-m2-market-data-gate`
-- **Last stage commit:** `548672d73cba2c2f42302e0f3404aaa4d9e0f9a2`
-- **Generated from commit:** `548672d73cba2c2f42302e0f3404aaa4d9e0f9a2` (branch `stage126-m1-retained-design-freeze`, informational)
-- **Baseline:** `origin/main` @ `018a489ea0427ce764f06a512137cae4d29ad91d`
+- **Last stage commit:** `9b04de0c74684a55fa850ecc36129fd2700b85ed`
+- **Generated from commit:** `9b04de0c74684a55fa850ecc36129fd2700b85ed` (branch `stage127-m2-market-data-gate`, informational)
+- **Baseline:** `origin/main` @ `2967dcc82d30d1c7719b87db10f449c1bfc69dc8`
 
 ## Current-state validation
 
@@ -23,6 +23,35 @@ _The independent Stage126 current-state validator is the SOLE current-state vali
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
+
+## Stage127 — M2 market-data admission Gate
+
+_The current scientific action. Its human authorization already exists; the Gate has been executed and its result is reported here. This section exists so the snapshot can never render the project as though Stage127 had not happened._
+
+- ⛔ **Gate status:** `FAIL_M2_DATA_GATE`
+- **Executed:** True — **resolved (terminal observed decision):** True
+- **M2 block admitted for modeling:** False
+- **Terminal result pending human review:** True
+- **M2 market evidence collected:** True — **independently validated:** True (163230 normalized daily observations)
+- **Evidence bundle SHA256:** `d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`
+- Evidence collection is recorded **separately** from block admission. `m2_data_collected` remains `false` because in this schema it is a frozen prohibition marker meaning "M2 data has entered the authorized M2 modeling pipeline" — not a statement that no M2 evidence exists.
+- **M2 incremental evaluation authorized:** False — **M2 modeling started:** False
+
+### Stage127 — zero-trade "trading day" semantics adjudication
+
+_Why `equity_return_window` coverage is 0.4039. This subsection records the SEMANTIC state only; it changes no canonical result._
+
+- **Official TSETMC evidence:** completed and independently validated — 3590 raw artifacts SHA256-verified
+- **Evidence bundle SHA256:** `5e05c3ad52d582236cc9c0bbea69dae520a02385921f3dd03792e6f65c917317`
+- **Endpoint dates that are official InstrumentCalendar members:** 427 / 427
+- **RANGE requests with InstrumentCalendar == ClosingPriceDailyList date set:** 27 / 27
+- **Adjudication outcome:** `FROZEN_CONTRACT_UNAMBIGUOUS_CURRENT_IMPLEMENTATION_CONFORMANT` (Outcome A)
+- **Current implementation conformant:** True
+- **Cases still pending external adjudication:** 0
+- **Canonical Gate changed by the adjudication:** False — Gate remains `FAIL_M2_DATA_GATE` with coverage 269 / 576 / 576 and common sample 269 of 666 pairs
+- **Model fits:** 0 — **predictions:** 0 — **final-test access:** 0
+- **No M2 modeling authorization follows from this.** The shortfall is now established as TRUE frozen-contract missingness rather than a data defect.
+- ⏳ **Human decision still required:** which scientific roadmap action follows the failed M2 extension.
 
 ### Last completed scientific micro-part QC
 
@@ -68,5 +97,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `cc055fc1446ae9ae099448508b8a7195eea82df5c32a1cccae4d15ff9487d592`_
-_generated_at_utc: 2026-07-26T13:38:17Z (informational)_
+_state_fingerprint: `d2ec4e7d0497e3d8b9195d400356d6194344c99ffede6d40c99889ad00ad7520`_
+_generated_at_utc: 2026-07-29T10:24:21Z (informational)_

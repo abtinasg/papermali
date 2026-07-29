@@ -1,0 +1,31 @@
+{
+  "bundle_edited_in_place": false,
+  "bundle_filename": "stage127_m2_tsetmc_full_delivery.zip",
+  "bundle_identified_by_sha256_not_by_path": true,
+  "bundle_sha256": "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec",
+  "bundle_size_bytes": 13464145,
+  "bundle_stored_outside_repository": true,
+  "bundle_treated_as_immutable_source_evidence": true,
+  "canonical_request_file": "project/stage127/external_retrieval/stage127_m2_external_retrieval_ticker_ranges.csv",
+  "canonical_request_sha256": "4b9cfef4c3543abfcae1d3d660c9415ac3a83711dea1094998ea9c2bce5ef374",
+  "delivered_request_matches_canonical": true,
+  "external_qc_flag_trusted": false,
+  "gate_module_sha256": "8f6aca9e972c85850a5a75152068b1312b91be99fe3241746b042fd39ffc50ae",
+  "importer_module_sha256": "fe03e988a29f1e24690649e948d7d1a073c811c686ecd30a0dcc39a3ab35b032",
+  "independent_revalidation_performed_in": "project/src/stage127_m2_external_delivery_import.py",
+  "market_data_period_expanded": false,
+  "preserved_delivery_components": [
+    "README.md",
+    "input/stage127_m2_external_retrieval_ticker_ranges.csv",
+    "extraction_script/",
+    "output/stage127_m2_external_return_mapping.csv",
+    "output/stage127_m2_external_return_manifest.csv",
+    "output/restricted_raw_provenance_manifest.csv",
+    "output/raw_sha256_manifest.csv",
+    "output/full_extraction_qc_report.json",
+    "raw_restricted/"
+  ],
+  "raw_full_escrow_present": false,
+  "raw_full_escrow_requested_or_inspected": false,
+  "scientific_ingestion_bounded_to": "raw_restricted/"
+}

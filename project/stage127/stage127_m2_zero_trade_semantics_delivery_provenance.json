@@ -1,0 +1,21 @@
+{
+  "adjudication_module_sha256": "31e5ba086486a4873cd715c0b607995b57e285c4a0161111050cab785441825e",
+  "bundle_committed_to_repository": false,
+  "bundle_edited_in_place": false,
+  "bundle_filename": "stage127_m2_zero_trade_semantics_full_delivery_v3.zip",
+  "bundle_sha256": "5e05c3ad52d582236cc9c0bbea69dae520a02385921f3dd03792e6f65c917317",
+  "bundle_sha256_verified": true,
+  "bundle_size_bytes": 1955293,
+  "bundle_size_verified": true,
+  "bundle_stored_outside_repository": true,
+  "bundle_treated_as_immutable_source_evidence": true,
+  "canonical_request_file": "project/stage127/external_retrieval/zero_trade_endpoint_evidence_request_v2/stage127_m2_zero_trade_endpoint_evidence_request_v2.zip",
+  "canonical_request_sha256": "cad5b6f9e97c8d11df65730773061b809b6494c4b7f5dcf9108694b9f6203c45",
+  "delivered_request_matches_canonical": true,
+  "external_qc_flag_trusted": false,
+  "importer_module_sha256": "baa46706e26d5e17de9983c6f355ec9534c1f9ef38589a633cb050152a031ea3",
+  "independent_revalidation_performed_in": "project/src/stage127_m2_zero_trade_semantics_import.py",
+  "raw_full_escrow_present": false,
+  "raw_full_escrow_requested_or_inspected": false,
+  "scientific_ingestion_bounded_to": "full_delivery_v3/raw_bounded/"
+}

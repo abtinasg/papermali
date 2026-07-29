@@ -1,0 +1,188 @@
+{
+  "all_pass": true,
+  "assertion_count": 34,
+  "assertions": [
+    {
+      "name": "bundle_sha256_verified",
+      "status": "PASS"
+    },
+    {
+      "name": "delivered_request_matches_canonical_request",
+      "status": "PASS"
+    },
+    {
+      "name": "mapping_rows_110",
+      "status": "PASS"
+    },
+    {
+      "name": "manifest_rows_111",
+      "status": "PASS"
+    },
+    {
+      "name": "status_counts_105_success_6_partial_0_failed",
+      "status": "PASS"
+    },
+    {
+      "name": "normalized_rows_163230",
+      "status": "PASS"
+    },
+    {
+      "name": "restricted_raw_files_222",
+      "status": "PASS"
+    },
+    {
+      "name": "all_restricted_raw_sha256_verified",
+      "status": "PASS"
+    },
+    {
+      "name": "provenance_sha_agrees_with_raw_manifest",
+      "status": "PASS"
+    },
+    {
+      "name": "no_duplicate_normalized_keys",
+      "status": "PASS"
+    },
+    {
+      "name": "raw_to_normalized_field_mapping_verified_all_rows",
+      "status": "PASS"
+    },
+    {
+      "name": "adjusted_close_exact_date_verified",
+      "status": "PASS"
+    },
+    {
+      "name": "raw_close_never_substituted_for_adjusted_close",
+      "status": "PASS"
+    },
+    {
+      "name": "no_imputation_or_synthetic_values",
+      "status": "PASS"
+    },
+    {
+      "name": "source_endpoints_tsetmc_only",
+      "status": "PASS"
+    },
+    {
+      "name": "six_partial_ranges_preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_block_has_exactly_three_variables",
+      "status": "PASS"
+    },
+    {
+      "name": "no_extra_m2_feature_computed",
+      "status": "PASS"
+    },
+    {
+      "name": "development_pairs_666",
+      "status": "PASS"
+    },
+    {
+      "name": "no_final_test_rows_in_features",
+      "status": "PASS"
+    },
+    {
+      "name": "no_final_test_period_observation_imported",
+      "status": "PASS"
+    },
+    {
+      "name": "no_duplicate_pair_keys",
+      "status": "PASS"
+    },
+    {
+      "name": "zero_accepted_post_cutoff_observations",
+      "status": "PASS"
+    },
+    {
+      "name": "zero_accepted_target_year_leakage",
+      "status": "PASS"
+    },
+    {
+      "name": "gate_not_decided_from_reachability",
+      "status": "PASS"
+    },
+    {
+      "name": "no_model_fit",
+      "status": "PASS"
+    },
+    {
+      "name": "no_prediction",
+      "status": "PASS"
+    },
+    {
+      "name": "final_test_locked",
+      "status": "PASS"
+    },
+    {
+      "name": "final_test_not_inspected",
+      "status": "PASS"
+    },
+    {
+      "name": "no_substitute_source_used",
+      "status": "PASS"
+    },
+    {
+      "name": "no_accessibility_score_below_three_assigned",
+      "status": "PASS"
+    },
+    {
+      "name": "block_not_redefined",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_incremental_evaluation_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_modeling_not_started",
+      "status": "PASS"
+    }
+  ],
+  "decision_id": "stage127-m2-market-data-gate",
+  "evidence_mode": "offline_imported_external_evidence_bundle",
+  "external_bundle_sha256": "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec",
+  "failed_count": 0,
+  "gate_status": "FAIL_M2_DATA_GATE",
+  "scope": "stage127_m2_market_data_gate",
+  "stage": "Stage127",
+  "vwap_band_diagnostic": {
+    "is_blocking": false,
+    "material_threshold_relative": 0.01,
+    "material_violation_count": 0,
+    "max_relative_deviation": 0.0003682419785288336,
+    "rule": "qTotCap / qTotTran5J within raw [priceMin, priceMax]",
+    "source_data_mutated": false,
+    "violation_count": 3,
+    "violations": [
+      {
+        "implied_vwap": 5289.843290891283,
+        "range_id": "RNG0003",
+        "raw_price_max": 5289.0,
+        "raw_price_min": 5289.0,
+        "relative_deviation": 0.00015944240712474514,
+        "requested_ticker": "بموتو",
+        "trading_date": "2016-11-21"
+      },
+      {
+        "implied_vwap": 23481.95214032983,
+        "range_id": "RNG0057",
+        "raw_price_max": 23881.0,
+        "raw_price_min": 23482.0,
+        "relative_deviation": 2.038142839991955e-06,
+        "requested_ticker": "شبریز",
+        "trading_date": "2020-05-26"
+      },
+      {
+        "implied_vwap": 46021.94097222222,
+        "range_id": "RNG0074",
+        "raw_price_max": 46005.0,
+        "raw_price_min": 46000.0,
+        "relative_deviation": 0.0003682419785288336,
+        "requested_ticker": "غگل",
+        "trading_date": "2017-01-04"
+      }
+    ]
+  },
+  "vwap_band_diagnostic_is_blocking": false
+}

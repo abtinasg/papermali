@@ -7,7 +7,11 @@ front matter; this file is the working description.
 
 Authoritative research pointers live in `ROADMAP.md` front matter:
 `last_completed_research_action_id=stage126-m1-retained-design-freeze`,
-`next_research_action_id=stage127-m2-market-data-gate`
+`next_research_action_id=stage127-m2-market-data-gate` — the Gate has now been
+RE-EXECUTED and RESOLVED from imported authoritative evidence, and returned
+**`FAIL_M2_DATA_GATE`**. The research pointer therefore deliberately does NOT
+advance past it, and specifically does NOT advance to
+`stage127-m2-incremental-evaluation`
 (primary M1 development-fold tuning completed on PR #52; all six registered
 M1 robustness categories are complete; `stage126-m1-robustness-closure`
 synthesized the six robustness results and closed the robustness set; and
@@ -17,9 +21,94 @@ retained model configurations/class-weighting policy/temporal folds/metric
 definitions/uncertainty and multiplicity plans — from already-completed
 development and robustness evidence only. No model was fit or predicted, no
 retuning, no final-test access, no full-development refit, no paper-winner or
-final-model selection, and no M2/M3/M4 work of any kind. Next action
-`stage127-m2-market-data-gate` requires separate, explicit, future human
-authorization; it has not started).
+final-model selection, and no M2/M3/M4 work of any kind).
+
+## Stage127 M2 market-data Gate — current, truthful state
+
+Human authorization for `stage127-m2-market-data-gate` **already exists** and
+covers this action. The Gate was first executed with no data available and
+returned `UNRESOLVED_M2_DATA_GATE`. Authoritative TSETMC evidence has since
+been obtained externally **under that same Gate scope**, and the Gate has been
+re-executed and resolved from it. `stage127-m2-incremental-evaluation` remains
+**unauthorized and unstarted**.
+
+**Evidence.** The immutable external delivery
+`stage127_m2_tsetmc_full_delivery.zip` (SHA256
+`d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`,
+13,464,145 bytes) answers exactly the canonical PR #66 request: 110 instrument
+mappings, 111 authorized ranges (105 SUCCESS / 6 PARTIAL / 0 FAILED), 163,230
+normalized daily rows spanning 2012-09-22..2020-07-18, and 222 SHA256-verified
+restricted raw evidence files. The external QC flag was **not** trusted: the
+raw → normalized field mapping was re-verified for every row, and
+`adjusted_close` was re-verified against the raw adjusted `pc` on the exact
+same trading date, inside this repository. The six PARTIAL ranges were
+preserved as delivered — never upgraded, back-filled or widened.
+
+**Gate result: `FAIL_M2_DATA_GATE` — terminal, resolved, pending human review.**
+This is an OBSERVED negative result against the frozen thresholds, not missing
+evidence, and it is deliberately not softened into `UNRESOLVED`:
+
+- `realized_volatility` — 576/666 usable, coverage 0.8649 (threshold 0.80) ✓
+- `amihud_illiquidity` — 576/666 usable, coverage 0.8649 (threshold 0.80) ✓
+- `equity_return_window` — 269/666 usable, coverage **0.4039** (threshold
+  0.80) ✗
+- three-variable common sample — 269/666, coverage **0.4039** (threshold
+  0.70) ✗
+- both locked validation windows clear the ≥5-positive rule on the common M2
+  sample (fold1_validation 11, fold2_validation 5) ✓
+- G01–G08 all PASS; accessibility scored 5, derived from the frozen R-A
+  mapping using candidate-level endpoint evidence, provenance and hashes ✓
+
+`ADMITTED_G01_G08_SOURCE_AND_DATA_QUALITY_ONLY` on a candidate means the
+source/data-quality gates passed. It is **not** admission into the M2 modeling
+path, which additionally requires the frozen 0.80 coverage threshold;
+`equity_return_window` has `admitted_into_m2_modeling_path = false`.
+
+**Shared-window end rule (T\*) is applied literally.** `T*` is the last
+eligible trading day with verified `available_at` strictly before the pair
+cutoff, selected **independently** of whether `adjusted_close` is present. The
+frozen CUT-A contract defines `verified available_at` as an availability
+timestamp, not as the presence of a price, and `missing_price_rule =
+exclude_day_from_window_computations` keeps an unpriced trading day inside W.
+The `Require P_t0 and P_tN present` endpoint condition is therefore evaluated
+after W is defined and can genuinely fail. Audit: T* is unchanged for 413
+pairs and differs for 253 (largest shift 637 days); in all 253 the literal T*
+carries no `adjusted_close`. Endpoint causes are reported separately and are
+not collapsed: 270 pairs miss `t0`, 253 miss `tN`, 132 miss both, and 90 have
+fewer than 126 usable returns / Amihud days.
+
+No threshold was reduced, no value imputed, no unadjusted close substituted,
+no T* chosen to improve coverage, and no M2 variable dropped. The frozen
+three-variable block was NOT redefined; redefining it would require a separate
+explicit human decision. M2 was not automatically redesigned and M3 was not
+started.
+
+**Evidence state vs admission state.** M2 market evidence IS collected and
+independently validated (`stage127_m2_market_data_evidence_collected=true`,
+`..._validated=true`, 163,230 observations). That is recorded **separately**
+from admission, which did not occur. `m2_data_collected` remains `false`
+because in this schema it is a frozen prohibition marker meaning "M2 data has
+entered the authorized M2 modeling pipeline" — it is pinned false by the frozen
+Stage125 Part 4 SAP and the Stage126 robustness closure completion lock, and
+Stage125 Part 5's successor validator treats flipping it as a mutation
+violation. It never means "no M2 evidence exists".
+
+**Reproducibility.** The Gate is now a deterministic OFFLINE/IMPORT path and
+requires no network connection:
+`python project/run_stage127_m2_market_data_gate.py --build --bundle <path to
+stage127_m2_tsetmc_full_delivery.zip>`. Endpoint reachability plays no part in
+the decision and can never produce a PASS. The earlier local network-probe
+failure remains an environment egress diagnostic only; it is not a property of
+TSETMC and no longer has any bearing on the Gate.
+
+**Blocking next step (human review required):** decide how to respond to the
+observed `equity_return_window` coverage shortfall. The observed causes are
+recorded in the decision artifact and split by endpoint: 126 pairs fail only
+the `t0` endpoint-price requirement, 99 fail only the `tN` (T*) requirement,
+132 miss both, and 90 fall below the 126-observation minimum. No remediation
+is authorized here, and the research pointer stays on
+`stage127-m2-market-data-gate`: no new scientific next action was invented.
+
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
 Part 3B.1E is the decision-lock surface for the conservative-lag research
 action; Part 3C is the operationalization / leakage-safe dataset surface;
@@ -702,6 +791,85 @@ applied under `stage124-gate-b-execution` (see the active workstream above).
   (not necessarily IPO, admission, or listing dates).
 - ⚠️ `stage124-batch02-part03-1b-1` — superseded / cancelled by official TSE API
   (not completed).
+
+## Stage127 M2 zero-trade "trading day" semantics — ADJUDICATED (evidence import only)
+
+The `equity_return_window` shortfall above was traced to 391 pairs whose window
+endpoint fell on a **zero-trade** date, interim-labelled
+`ZERO_TRADE_ENDPOINT_REQUIRES_TRADING_DAY_SEMANTICS_ADJUDICATION`. That open
+question is now answered. **The canonical Gate was NOT changed by this work.**
+
+**External evidence (immutable, not committed).**
+
+- filename: `stage127_m2_zero_trade_semantics_full_delivery_v3.zip`
+- size: 1,955,293 bytes (independently verified)
+- SHA256: `5e05c3ad52d582236cc9c0bbea69dae520a02385921f3dd03792e6f65c917317`
+  (independently verified)
+
+An independent papermali-side validator
+(`project/src/stage127_m2_zero_trade_semantics_import.py`) re-derived every
+claim from the raw artifacts and fails closed on any inconsistency: 3,590 raw
+artifacts, 3,590 manifest rows, 3,590 unique files, **3,590/3,590 SHA256
+re-verified**, all endpoints exact official TSETMC API paths (0 generic), 0
+unmapped artifacts, 130 zero-byte artifacts (125 UNRESOLVED + 5 HTTP_500, 0
+zero-byte SUCCESS/CACHED), maximum bounded `dEven` 20200718 with **0**
+observations at or after the final-test boundary. The external QC report was
+**compared against, never trusted**: 35 independent comparisons, 0
+disagreements.
+
+**Factual result.** All **427/427** unique requested zero-trade endpoint dates
+ARE members of the official `ClosingPrice/GetInstrumentCalendar`
+InstrumentCalendar, and for **27/27** low-return RANGE requests the
+InstrumentCalendar date set equals the `ClosingPriceDailyList` date set. These
+dates are therefore **real official calendar dates, not retrieval or extraction
+defects**. Historical identity remains explicitly uncertain: 103 tickers,
+request_ISIN == raw instrumentID 103/103, == raw cIsin 8/103, CANDIDATE_FOUND 0,
+NONE_FOUND 0, **UNRESOLVED 103**. Histories were not concatenated and
+`insCode="0"` was never used as a predecessor. TSETMC state codes (`A `, `IS`,
+`AR`, `I `, `AS`) remain literal evidence with **UNRESOLVED** meaning, because
+the frozen project contains no authoritative mapping for them.
+
+**Adjudication outcome: `FROZEN_CONTRACT_UNAMBIGUOUS_CURRENT_IMPLEMENTATION_CONFORMANT`.**
+
+The decisive record is the FROZEN synthetic validation that locked the M2
+contract (`stage125_part3b1_decision_lock_qc_report.json`): a window of **248**
+days containing exactly **1** zero-traded-value day produced **247** usable
+daily returns (= 248 − 1) and **246** usable Amihud days (= 247 − 1). The
+zero-trade day was therefore retained in the trading-day sequence and still
+contributed returns; only Amihud excluded it. Combined with
+`diagnostics_recorded` (which requires counting zero-trade and missing-price
+days *of W*), the amihud-scoped `zero_volume_rule`, and the endpoint clause
+`If either endpoint missing => null` (which would be a dead letter if
+missing-price days were deleted from W), the frozen contract already requires
+exactly what the current code does. Full trace and per-question answers (A–G):
+`project/stage127/stage127_m2_trading_day_semantics_contract_trace.json`.
+
+"Trading day" is never *explicitly* defined as InstrumentCalendar membership
+anywhere in the frozen corpus (question A, `NOT_SPECIFIED`), but that gap is
+**non-operative here**: the calendar and daily-list date sets coincide on this
+evidence, so no computed value depends on it.
+
+**Diagnostic counterfactual — NOT a canonical result.** Under
+`INSTRUMENT_CALENDAR_MEMBERSHIP_READING` the recomputation reproduces canonical
+coverage exactly (269 / 576 / 576 / common 269). Under
+`POSITIVE_EXECUTED_TRADE_DAY_READING` it would rise to 609/666 = 0.9144 on all
+three variables. That reading is **not supported by the frozen contract** and is
+contradicted by the frozen synthetic validation; it is recorded only so a human
+reviewer can see the stakes, and it must not be adopted because it would produce
+a PASS.
+
+**Canonical state is unchanged:** Gate `FAIL_M2_DATA_GATE`;
+equity_return_window 269/666 = 0.4039; realized_volatility 576/666 = 0.8649;
+amihud_illiquidity 576/666 = 0.8649; common sample 269/666 = 0.4039. Model fits
+0, predictions 0, final-test access 0. **M2 has NOT passed and M2 modeling is
+NOT authorized.** `stage127-m2-incremental-evaluation` remains unauthorized and
+unstarted.
+
+**Blocking next step (human review required):** review
+`READY_FOR_STAGE127_SEMANTICS_REVIEW_CURRENT_IMPLEMENTATION_CONFORMANT` and
+decide how to respond to a coverage shortfall that is now established as TRUE
+frozen-contract missingness rather than a data defect. No remediation is
+authorized here.
 
 ## Not in scope yet (do NOT start)
 

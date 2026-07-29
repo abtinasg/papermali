@@ -1,0 +1,116 @@
+{
+  "canonical_coverage_unchanged": {
+    "amihud_illiquidity": {
+      "coverage": 0.8648648649,
+      "total": 666,
+      "usable": 576
+    },
+    "equity_return_window": {
+      "coverage": 0.4039039039,
+      "total": 666,
+      "usable": 269
+    },
+    "realized_volatility": {
+      "coverage": 0.8648648649,
+      "total": 666,
+      "usable": 576
+    },
+    "three_variable_common_sample": {
+      "coverage": 0.4039039039,
+      "total": 666,
+      "usable": 269
+    }
+  },
+  "canonical_gate_status_unchanged": "FAIL_M2_DATA_GATE",
+  "canonical_outputs_modified": false,
+  "label": "DIAGNOSTIC_COUNTERFACTUAL_NOT_CANONICAL_RESULT",
+  "market_bundle_sha256": "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec",
+  "purpose": "Show the consequence of the semantic choice for a human reviewer. These figures never replace a canonical output.",
+  "reading_1_reproduces_canonical_coverage": true,
+  "reading_2_status": "COUNTERFACTUAL_ONLY. The frozen contract does not support removing a zero-trade day from the trading-day sequence (questions B and C), and the frozen synthetic validation that locked the contract retained such a day. Reading 2 raises coverage and is therefore exactly the interpretation that must NOT be adopted on the basis of the Gate result it produces.",
+  "reading_2_supported_by_frozen_contract": false,
+  "readings": {
+    "INSTRUMENT_CALENDAR_MEMBERSHIP_READING": {
+      "amihud_illiquidity_coverage": 0.8648648649,
+      "amihud_illiquidity_usable": 576,
+      "development_pairs": 666,
+      "equity_return_window_coverage": 0.4039039039,
+      "equity_return_window_usable": 269,
+      "event_counts_by_locked_validation_fold": {
+        "m1_development_reference_positive_counts": {
+          "fold1_validation": 25,
+          "fold2_validation": 10
+        },
+        "m1_reference_is_not_the_m2_result": true,
+        "m2_common_sample_negative_counts": {
+          "fold1_validation": 79,
+          "fold2_validation": 134
+        },
+        "m2_common_sample_positive_counts": {
+          "fold1_validation": 11,
+          "fold2_validation": 5
+        },
+        "no_model_was_fit_to_assess_this": true,
+        "requires_both_locked_validation_windows": true,
+        "resolution": "PASS",
+        "rule": "min_positive_evaluable_each_temporal_validation_window",
+        "sap_label_asserted": "development_comparison_feasibility_met",
+        "sap_label_not_asserted_reason": null,
+        "threshold": 5
+      },
+      "final_test_access": 0,
+      "label": "DIAGNOSTIC_COUNTERFACTUAL_NOT_CANONICAL_RESULT",
+      "model_fits": 0,
+      "pr_auc_computed": false,
+      "predictions_generated": 0,
+      "reading": "INSTRUMENT_CALENDAR_MEMBERSHIP_READING",
+      "realized_volatility_coverage": 0.8648648649,
+      "realized_volatility_usable": 576,
+      "selection_performed": false,
+      "three_variable_common_sample": 269,
+      "three_variable_common_sample_coverage": 0.4039039039,
+      "threshold_weakened": false
+    },
+    "POSITIVE_EXECUTED_TRADE_DAY_READING": {
+      "amihud_illiquidity_coverage": 0.9144144144,
+      "amihud_illiquidity_usable": 609,
+      "development_pairs": 666,
+      "equity_return_window_coverage": 0.9144144144,
+      "equity_return_window_usable": 609,
+      "event_counts_by_locked_validation_fold": {
+        "m1_development_reference_positive_counts": {
+          "fold1_validation": 25,
+          "fold2_validation": 10
+        },
+        "m1_reference_is_not_the_m2_result": true,
+        "m2_common_sample_negative_counts": {
+          "fold1_validation": 163,
+          "fold2_validation": 204
+        },
+        "m2_common_sample_positive_counts": {
+          "fold1_validation": 23,
+          "fold2_validation": 10
+        },
+        "no_model_was_fit_to_assess_this": true,
+        "requires_both_locked_validation_windows": true,
+        "resolution": "PASS",
+        "rule": "min_positive_evaluable_each_temporal_validation_window",
+        "sap_label_asserted": "development_comparison_feasibility_met",
+        "sap_label_not_asserted_reason": null,
+        "threshold": 5
+      },
+      "final_test_access": 0,
+      "label": "DIAGNOSTIC_COUNTERFACTUAL_NOT_CANONICAL_RESULT",
+      "model_fits": 0,
+      "pr_auc_computed": false,
+      "predictions_generated": 0,
+      "reading": "POSITIVE_EXECUTED_TRADE_DAY_READING",
+      "realized_volatility_coverage": 0.9144144144,
+      "realized_volatility_usable": 609,
+      "selection_performed": false,
+      "three_variable_common_sample": 609,
+      "three_variable_common_sample_coverage": 0.9144144144,
+      "threshold_weakened": false
+    }
+  }
+}

@@ -1,0 +1,246 @@
+{
+  "artifact": "stage127_m2_trading_day_semantics_contract_trace",
+  "coverage_threshold_provenance": {
+    "excluded_from_trace_because": "coverage thresholds do not bear on the meaning of 'trading day'",
+    "frozen_modeling_path_thresholds": {
+      "block_common_sample_coverage_min": 0.7,
+      "candidate_valid_coverage_min": 0.8,
+      "replaces_pilot_G09_G14_for_modeling_path": true
+    },
+    "guard": "The semantic interpretation must not be chosen because of the coverage result it produces, in either direction.",
+    "historical_part3_g10_status": "pending_user_approval",
+    "modeling_path_common_sample_threshold_currently_unfrozen": false,
+    "superseded_by": "project/stage125/part4_statistical_analysis_plan_stage125.json"
+  },
+  "frozen_sources": [
+    {
+      "present": true,
+      "sha256": "6d7c8e63d04475f95da8b6f0364be326d7b4581ae21e5b2fe9df955ea7f83f82",
+      "source_file": "project/stage125/part3b1_m2_feature_formula_contract_stage125.json"
+    },
+    {
+      "present": true,
+      "sha256": "3966addbf4f2768e139c55ff7eef7ac7b11aafa717bf7024cf115fdf956f72b2",
+      "source_file": "project/stage125/part3b1_cutoff_available_at_contract_stage125.json"
+    },
+    {
+      "present": true,
+      "sha256": "a454a74da89e2d330f9c6dc34217e2eb8b0f9647a959691df43e93db078a3162",
+      "source_file": "project/stage125/part3_gate_decision_protocol_stage125.csv"
+    },
+    {
+      "present": true,
+      "sha256": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
+      "source_file": "project/stage125/part4_statistical_analysis_plan_stage125.json"
+    },
+    {
+      "present": true,
+      "sha256": "425b9bf2948ae3cbe46c5fec63bb38e959b0ee6a5f76801bf1c1875cc1ff69a1",
+      "source_file": "project/stage125/stage125_part3b1_decision_lock_qc_report.json"
+    },
+    {
+      "present": true,
+      "sha256": "8f8fcf706388c6777c71ff8d2c814a86cf35c4c5a1fd1437979c3ff84871993c",
+      "source_file": "project/stage125/part3b1_selected_decisions_stage125.csv"
+    }
+  ],
+  "frozen_sources_modified_by_this_task": false,
+  "implication_strength_counts": {
+    "DERIVED_UNAMBIGUOUSLY": 6,
+    "EXPLICIT": 4,
+    "NOT_SPECIFIED": 3
+  },
+  "inference_beyond_frozen_text_performed": false,
+  "purpose": "Trace every frozen statement bearing on the meaning of 'trading day' in the M2 shared window, and answer questions A-G from the frozen text alone.",
+  "questions": [
+    {
+      "answer": "NO_NOT_EXPLICITLY_DEFINED",
+      "implication_strength": "NOT_SPECIFIED",
+      "note": "The frozen corpus never names a calendar authority. This textual gap is NON-OPERATIVE for the imported evidence: the delivery shows the InstrumentCalendar date set equals the ClosingPriceDailyList date set for 27/27 bounded RANGE requests, and the observation universe the Gate consumes IS the daily list. The two candidate day universes therefore coincide on this dataset and no computed value depends on the gap.",
+      "question": "Does 'trading day' explicitly mean an official TSETMC InstrumentCalendar member?",
+      "question_id": "A",
+      "supporting_statements": [
+        "S11_trading_day_never_defined_as_calendar_member"
+      ]
+    },
+    {
+      "answer": "NO",
+      "implication_strength": "DERIVED_UNAMBIGUOUSLY",
+      "note": "No membership condition on executed trade exists, and the frozen synthetic validation that locked the contract retained a zero-traded-value day in the return sequence.",
+      "question": "Does 'trading day' explicitly require positive executed trade?",
+      "question_id": "B",
+      "supporting_statements": [
+        "S07_zero_volume_rule_is_amihud_scoped",
+        "S08_frozen_synthetic_validation_arithmetic",
+        "S12_trading_day_never_requires_executed_trade"
+      ]
+    },
+    {
+      "answer": "NO",
+      "implication_strength": "DERIVED_UNAMBIGUOUSLY",
+      "note": "zero_traded_value_day_count is a REQUIRED DIAGNOSTIC OF W, and the locking validation counted 247 = 248 - 1 usable returns over a window containing one zero-trade day. A removed day could neither be counted nor contribute a return.",
+      "question": "Does zero trade remove a date from W?",
+      "question_id": "C",
+      "supporting_statements": [
+        "S06_diagnostics_are_window_level",
+        "S07_zero_volume_rule_is_amihud_scoped",
+        "S08_frozen_synthetic_validation_arithmetic"
+      ]
+    },
+    {
+      "answer": "READING_2_KEEP_DAY_IN_W_EXCLUDE_FROM_CALCULATIONS",
+      "implication_strength": "DERIVED_UNAMBIGUOUSLY",
+      "note": "The rule is scoped to 'window_computations'. Reading (1) would make the frozen clause 'If either endpoint missing => null' structurally unreachable, and would make the required diagnostic missing_price_day_count identically zero.",
+      "question": "Does missing_price_rule = exclude_day_from_window_computations mean (1) remove the date from the scientific trading-day sequence, or (2) keep the day in W but exclude its missing price from calculations?",
+      "question_id": "D",
+      "supporting_statements": [
+        "S04_missing_price_rule",
+        "S05_endpoint_missing_clause",
+        "S06_diagnostics_are_window_level"
+      ]
+    },
+    {
+      "answer": "NO_BRIDGING_PERMITTED",
+      "implication_strength": "DERIVED_UNAMBIGUOUSLY",
+      "note": "'Consecutive' qualifies TRADING DAYS OF W; 'both prices present' is a filter applied to those adjacent pairs, not a re-definition of adjacency over the priced subsequence. Bridging would manufacture a return across an unobserved day, which the no-imputation rule forbids.",
+      "question": "For realized volatility, does 'consecutive trading days with both prices present' permit bridging over an intervening calendar member with no price?",
+      "question_id": "E",
+      "supporting_statements": [
+        "S09_consecutive_days_both_prices",
+        "S04_missing_price_rule",
+        "S10_no_imputation_or_threshold_relief"
+      ]
+    },
+    {
+      "answer": "FIRST_TRADING_DAY_OF_W_NOT_FIRST_PRICED_OR_TRADED_DAY",
+      "implication_strength": "DERIVED_UNAMBIGUOUSLY",
+      "note": "The start rule carries no price or trade condition, and the endpoint-missing clause presupposes that t0 may be unpriced.",
+      "question": "Is t0 the first calendar-member trading day of W, or the first positive-trade/priced day?",
+      "question_id": "F",
+      "supporting_statements": [
+        "S01_window_start_rule",
+        "S05_endpoint_missing_clause"
+      ]
+    },
+    {
+      "answer": "YES",
+      "implication_strength": "DERIVED_UNAMBIGUOUSLY",
+      "note": "The end rule is keyed to a verified availability timestamp. Selecting T* from priced days only would move T* backwards purely to obtain a usable value.",
+      "question": "Is T* defined independently of adjusted_close availability?",
+      "question_id": "G",
+      "supporting_statements": [
+        "S02_window_end_rule",
+        "S03_available_at_definition",
+        "S05_endpoint_missing_clause"
+      ]
+    }
+  ],
+  "reasoning_order": "CONTRACT -> EVIDENCE -> IMPLEMENTATION",
+  "statement_count": 13,
+  "statements": [
+    {
+      "field": "shared_window.start_rule",
+      "implication_strength": "EXPLICIT",
+      "semantic_implication": "W begins at the first TRADING DAY on or after the calendar date T* minus 12 calendar months. The start carries no price condition and no executed-trade condition.",
+      "source_file": "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
+      "statement_id": "S01_window_start_rule",
+      "verbatim": "inclusive_trading_days_on_or_after_calendar_date_T_star_minus_12_calendar_months"
+    },
+    {
+      "field": "shared_window.end_rule",
+      "implication_strength": "EXPLICIT",
+      "semantic_implication": "T* is selected by an availability TIMESTAMP condition, not by the presence of a price value.",
+      "source_file": "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
+      "statement_id": "S02_window_end_rule",
+      "verbatim": "last_trading_day_with_verified_available_at_strictly_before_pair_cutoff"
+    },
+    {
+      "field": "feature_availability.rule",
+      "implication_strength": "DERIVED_UNAMBIGUOUSLY",
+      "semantic_implication": "'verified available_at' is an availability timestamp. It is nowhere defined as 'the adjusted_close value is present', so the end rule cannot be read as 'last PRICED day'.",
+      "source_file": "project/stage125/part3b1_cutoff_available_at_contract_stage125.json",
+      "statement_id": "S03_available_at_definition",
+      "verbatim": "A feature value is usable at prediction time only if it has a verified available_at and available_at <= pair_cutoff."
+    },
+    {
+      "field": "price_field.missing_price_rule",
+      "implication_strength": "DERIVED_UNAMBIGUOUSLY",
+      "semantic_implication": "A day whose adjusted_close is missing is excluded from the COMPUTATIONS performed over W, not deleted from W itself. The rule scopes the exclusion to 'window_computations', not to window membership.",
+      "source_file": "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
+      "statement_id": "S04_missing_price_rule",
+      "verbatim": "exclude_day_from_window_computations"
+    },
+    {
+      "field": "variables.equity_return_window.formula",
+      "implication_strength": "DERIVED_UNAMBIGUOUSLY",
+      "semantic_implication": "The contract explicitly contemplates an endpoint of W whose price is MISSING. If missing-price days were deleted from W, an endpoint could never be missing and this clause would be a dead letter. Therefore missing-price days remain in W and endpoints are not re-chosen to find a priced day.",
+      "source_file": "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
+      "statement_id": "S05_endpoint_missing_clause",
+      "verbatim": "Require P_{t0} and P_{tN} present ... If either endpoint missing OR usable daily return count < 126 => null/UNRESOLVED."
+    },
+    {
+      "field": "diagnostics_recorded",
+      "implication_strength": "DERIVED_UNAMBIGUOUSLY",
+      "semantic_implication": "The contract requires COUNTING missing-price days and zero-traded-value days. Such days are therefore members of W: a day removed from W could not be counted as a day of W.",
+      "source_file": "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
+      "statement_id": "S06_diagnostics_are_window_level",
+      "verbatim": "missing_price_day_count, zero_traded_value_day_count, usable_daily_return_count, usable_amihud_day_count"
+    },
+    {
+      "field": "variables.amihud_illiquidity.zero_volume_rule",
+      "implication_strength": "EXPLICIT",
+      "semantic_implication": "Zero traded value excludes a day from the AMIHUD usable-day set only. The rule is declared inside the amihud variable block and is not declared for equity_return_window or realized_volatility.",
+      "source_file": "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
+      "statement_id": "S07_zero_volume_rule_is_amihud_scoped",
+      "verbatim": "exclude_day_never_impute"
+    },
+    {
+      "field": "assertions[synth_window_nonempty|synth_diagnostics_recorded]",
+      "implication_strength": "DERIVED_UNAMBIGUOUSLY",
+      "semantic_implication": "DECISIVE. In the frozen validation that LOCKED this contract, a window of 248 days containing 1 zero-traded-value day produced 247 usable daily returns (= 248 - 1, i.e. every adjacent pair) and 246 usable amihud days (= 247 - 1). The zero-trade day was therefore RETAINED in the trading-day sequence and still contributed daily returns; only amihud dropped it. A positive-executed-trade reading would have produced 246 returns, not 247.",
+      "source_file": "project/stage125/stage125_part3b1_decision_lock_qc_report.json",
+      "statement_id": "S08_frozen_synthetic_validation_arithmetic",
+      "verbatim": "len=248 ; {'missing_price_day_count': 0, 'zero_traded_value_day_count': 1, 'usable_daily_return_count': 247, 'usable_amihud_day_count': 246}"
+    },
+    {
+      "field": "variables.realized_volatility.formula",
+      "implication_strength": "DERIVED_UNAMBIGUOUSLY",
+      "semantic_implication": "The return is defined over pairs of CONSECUTIVE TRADING DAYS OF W, filtered to those where both prices are present. Since a missing-price day stays in W (S04-S06), two priced days separated by it are not consecutive trading days of W, so returns are not bridged across it.",
+      "source_file": "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
+      "statement_id": "S09_consecutive_days_both_prices",
+      "verbatim": "Daily simple returns r_t = (P_t / P_{t-1}) - 1 for consecutive trading days in shared window W with both prices present."
+    },
+    {
+      "field": "imputation_allowed / threshold_reduction_allowed",
+      "implication_strength": "EXPLICIT",
+      "semantic_implication": "Missing evidence may not be repaired and the 126-observation minimum may not be relaxed to obtain coverage.",
+      "source_file": "project/stage125/part3b1_m2_feature_formula_contract_stage125.json",
+      "statement_id": "S10_no_imputation_or_threshold_relief",
+      "verbatim": "false / false"
+    },
+    {
+      "field": "(absent)",
+      "implication_strength": "NOT_SPECIFIED",
+      "semantic_implication": "No frozen artifact defines 'trading day' as membership of the official TSETMC InstrumentCalendar; the terms 'InstrumentCalendar', 'market calendar' and 'calendar member' do not occur anywhere in the frozen Stage125/Stage126 corpus. The term is used but never given an operational source definition.",
+      "source_file": "ALL_FROZEN_STAGE125_STAGE126_ARTIFACTS",
+      "statement_id": "S11_trading_day_never_defined_as_calendar_member",
+      "verbatim": "(no occurrence)"
+    },
+    {
+      "field": "(absent)",
+      "implication_strength": "NOT_SPECIFIED",
+      "semantic_implication": "No frozen artifact conditions membership of the trading-day sequence on a positive executed trade. The only executed-trade condition in the corpus is amihud's V_t > 0 usable-day filter (S07), which is scoped to one variable's computation.",
+      "source_file": "ALL_FROZEN_STAGE125_STAGE126_ARTIFACTS",
+      "statement_id": "S12_trading_day_never_requires_executed_trade",
+      "verbatim": "(no occurrence)"
+    },
+    {
+      "field": "(absent)",
+      "implication_strength": "NOT_SPECIFIED",
+      "semantic_implication": "The frozen project contains no authoritative mapping for TSETMC instrument state codes ('A ', 'IS', 'AR', 'I ', 'AS'). They remain literal evidence with UNRESOLVED meaning and may not be given a third-party definition.",
+      "source_file": "ALL_FROZEN_STAGE125_STAGE126_ARTIFACTS",
+      "statement_id": "S13_no_authoritative_state_code_mapping",
+      "verbatim": "(no occurrence)"
+    }
+  ]
+}
