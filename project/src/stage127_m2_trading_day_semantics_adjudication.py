@@ -274,19 +274,35 @@ CONTRACT_STATEMENTS: tuple[dict[str, Any], ...] = (
         ),
         "implication_strength": NOT_SPECIFIED,
     },
-    {
-        "statement_id": "S14_gate_thresholds_pending_user_approval",
-        "source_file": GATE_PROTOCOL_REL,
-        "field": "G10.lock_status",
-        "verbatim": "pending_user_approval",
-        "semantic_implication": (
-            "The minimum common-sample coverage threshold is not frozen; it "
-            "may not be invented, and no semantic choice may be justified by "
-            "the coverage it produces."
-        ),
-        "implication_strength": EXPLICIT,
-    },
 )
+
+#: Deliberately NOT a traced statement. An earlier draft cited Part 3 gate G10
+#: (``lock_status = pending_user_approval``) as if the modeling-path
+#: common-sample coverage threshold were still unfrozen. That was a HISTORICAL
+#: Part 3 protocol state only: the later frozen Part 4 SAP sets
+#: ``candidate_valid_coverage_min = 0.8`` and
+#: ``block_common_sample_coverage_min = 0.7`` with
+#: ``replaces_pilot_G09_G14_for_modeling_path = true``. The statement is removed
+#: because coverage thresholds are IRRELEVANT to what "trading day" means; the
+#: prohibition it was meant to carry is recorded here instead, as a guard rather
+#: than as evidence.
+COVERAGE_THRESHOLD_PROVENANCE: dict[str, Any] = {
+    "excluded_from_trace_because": (
+        "coverage thresholds do not bear on the meaning of 'trading day'"
+    ),
+    "historical_part3_g10_status": "pending_user_approval",
+    "superseded_by": ANALYSIS_PLAN_REL,
+    "frozen_modeling_path_thresholds": {
+        "candidate_valid_coverage_min": 0.8,
+        "block_common_sample_coverage_min": 0.7,
+        "replaces_pilot_G09_G14_for_modeling_path": True,
+    },
+    "modeling_path_common_sample_threshold_currently_unfrozen": False,
+    "guard": (
+        "The semantic interpretation must not be chosen because of the "
+        "coverage result it produces, in either direction."
+    ),
+}
 
 #: The seven questions posed for this adjudication, answered ONLY from the trace.
 CONTRACT_QUESTIONS: tuple[dict[str, Any], ...] = (
@@ -455,6 +471,7 @@ def build_contract_trace(repo_root: str) -> dict[str, Any]:
         "statement_count": len(CONTRACT_STATEMENTS),
         "implication_strength_counts": dict(sorted(strengths.items())),
         "questions": list(CONTRACT_QUESTIONS),
+        "coverage_threshold_provenance": dict(COVERAGE_THRESHOLD_PROVENANCE),
         "inference_beyond_frozen_text_performed": False,
     }
 
@@ -472,10 +489,19 @@ def adjudicate(trace: dict[str, Any]) -> dict[str, Any]:
     """
     by_id = {q["question_id"]: q for q in trace["questions"]}
     governing = ("B", "C", "D", "E", "F", "G")
-    unresolved = [
-        qid for qid in governing
-        if by_id[qid]["implication_strength"] not in (EXPLICIT, DERIVED)
-    ]
+
+    def _weak(qid: str) -> bool:
+        return by_id[qid]["implication_strength"] not in (EXPLICIT, DERIVED)
+
+    # EVERY question that the frozen text does not settle, governing or not.
+    # Question A genuinely is not settled by the frozen corpus, so reporting an
+    # empty list here would misrepresent the trace.
+    unresolved = [q["question_id"] for q in trace["questions"]
+                  if _weak(q["question_id"])]
+    # Only these can force outcome C: they decide the disputed behaviour.
+    governing_unresolved = [qid for qid in governing if _weak(qid)]
+    # Unsettled but consequence-free on this evidence.
+    nonoperative = [qid for qid in unresolved if qid not in governing_unresolved]
 
     # What the frozen contract REQUIRES of the trading-day sequence.
     required = {
@@ -488,7 +514,7 @@ def adjudicate(trace: dict[str, Any]) -> dict[str, Any]:
         "zero_traded_value_excluded_from_amihud_only": True,
     }
 
-    if unresolved:
+    if governing_unresolved:
         outcome = OUTCOME_C
         conformant = "UNRESOLVED"
     else:
@@ -499,10 +525,27 @@ def adjudicate(trace: dict[str, Any]) -> dict[str, Any]:
         "adjudication_outcome": outcome,
         "governing_questions": list(governing),
         "questions_not_unambiguously_answered": unresolved,
+        "governing_questions_not_unambiguously_answered": governing_unresolved,
+        "nonoperative_ambiguities": nonoperative,
+        "nonoperative_ambiguity_note": (
+            "An ambiguity is NON-OPERATIVE when no computed value depends on "
+            "how it is resolved. Only governing ambiguities can force outcome "
+            "C."
+        ),
+        "coverage_threshold_provenance": dict(COVERAGE_THRESHOLD_PROVENANCE),
         "frozen_contract_required_behaviour": required,
         "current_implementation_conformant": conformant,
         "question_A_gap_is_operative": False,
+        "question_A_implication_strength": by_id["A"]["implication_strength"],
         "question_A_gap_note": by_id["A"]["note"],
+        "question_A_nonoperative_because": (
+            "InstrumentCalendar and ClosingPriceDailyList day sets coincide on "
+            "all 27 bounded ranges, and all 427 requested endpoint dates are "
+            "official InstrumentCalendar members. The two candidate day "
+            "universes are therefore identical on this Stage127 evidence, so "
+            "no coverage, t0, T* or return count depends on which one the "
+            "frozen text meant."
+        ),
         "justification": [
             by_id[qid]["question_id"] + ": " + by_id[qid]["answer"]
             for qid in ("A",) + governing

@@ -20,9 +20,17 @@ stage127_m2_source_manifest.json). Root-cause classification is therefore
 based entirely on the evidence already present in the immutable bundle:
 raw daily closing-price records, the official adjusted-price history, the
 restricted-raw provenance manifest, and the retrieval-range manifest. Where
-that evidence cannot distinguish two categories (e.g. "TSETMC's own calendar
-excludes this date" vs "a genuine zero-trade day"), the pair is classified
-UNRESOLVED rather than guessed.
+that evidence could not distinguish two categories (e.g. "TSETMC's own
+calendar excludes this date" vs "a genuine zero-trade day"), the pair was
+classified UNRESOLVED rather than guessed.
+
+That distinction has since been SETTLED by external evidence plus contract
+adjudication, so no pair is pending or unresolved any more: the official
+InstrumentCalendar evidence proved the dates are real calendar members, and the
+frozen contract keeps a zero-trade calendar member in the trading-day sequence.
+The affected pairs are therefore TRUE frozen-contract missingness. See
+project/stage127/stage127_m2_trading_day_semantics_adjudication.json. The
+canonical Gate is unchanged by any of this.
 """
 from __future__ import annotations
 
@@ -46,10 +54,13 @@ CAT_RAW_TRADE_ADJUSTED_MISSING = "D_RAW_TSETMC_TRADE_EXISTS_BUT_ADJUSTED_SERIES_
 #: ClosingPriceDailyList row has qTotCap=0/zTotTran=0; it does NOT, by itself,
 #: establish whether that date was a genuine trading day with zero executions,
 #: a suspension, a non-tradable state, or a calendar artifact. This label is
-#: therefore evidence-honest: it names the open question rather than
-#: pre-deciding it, and it is EXCLUDED from both RECOVERABLE_CATEGORIES and
-#: NONRECOVERABLE_CATEGORIES until authoritative TSETMC calendar/state/trade
-#: evidence resolves it.
+#: therefore evidence-honest: it named the open question rather than
+#: pre-deciding it. That question is now RESOLVED -- the authoritative TSETMC
+#: calendar/state/trade evidence arrived and the frozen contract was
+#: adjudicated -- so the label is HISTORICAL and its pairs are now classified
+#: as TRUE frozen-contract missingness (see
+#: ADJUDICATED_TRUE_MISSINGNESS_CATEGORIES below). The label string itself is
+#: kept unchanged for audit-trail continuity.
 CAT_ZERO_TRADE_ENDPOINT = (
     "ZERO_TRADE_ENDPOINT_REQUIRES_TRADING_DAY_SEMANTICS_ADJUDICATION"
 )
@@ -65,20 +76,36 @@ RECOVERABLE_CATEGORIES = {
     CAT_OTHER_PROVEN_DEFECT,
 }
 #: F is the only category the CURRENT bundle evidence can actually establish
-#: as final today (it requires a resolved trading-day determination, not yet
-#: available -- see CAT_ZERO_TRADE_ENDPOINT -- so it is never assigned by this
-#: module today). G (fewer than 126 valid returns) is deliberately NOT listed
-#: here unconditionally: whether a <126 pair is truly nonrecoverable depends
-#: on the same zero-trade-day trading-day semantics question, so it is split
-#: per pair by build_summary() using the low-return upper-bound audit instead.
+#: as final from the market-data bundle alone, so it is never assigned by this
+#: module. G (fewer than 126 valid returns) is deliberately NOT listed here
+#: unconditionally: it is still split per pair by build_summary() using the
+#: low-return upper-bound audit, so the historical sub-breakdown stays visible.
+#: Under the completed adjudication BOTH G sub-classes are nonrecoverable,
+#: because zero-trade rows may not be dropped from the trading-day sequence.
 NONRECOVERABLE_CATEGORIES = {
     CAT_HISTORY_START_OR_LISTING_LIMIT,
     CAT_TRUE_MISSING_ADJUSTED,
 }
-#: Cases whose classification requires authoritative TSETMC evidence this
-#: repository does not have and cannot fetch from this environment. Neither
-#: recoverable nor nonrecoverable until external evidence returns.
-PENDING_EXTERNAL_ADJUDICATION_CATEGORIES = {
+#: RESOLVED. The external TSETMC calendar/state/trade evidence is complete
+#: (stage127_m2_zero_trade_semantics_full_delivery_v3.zip) and the
+#: frozen-contract semantics adjudication is complete, so NOTHING is pending
+#: external adjudication any more. The set is retained (empty) so the
+#: pending-count field keeps a real derivation instead of a hardcoded zero.
+PENDING_EXTERNAL_ADJUDICATION_CATEGORIES: set[str] = set()
+
+#: The completed adjudication, accepted by the human supervisor.
+ADJUDICATION_OUTCOME = (
+    "FROZEN_CONTRACT_UNAMBIGUOUS_CURRENT_IMPLEMENTATION_CONFORMANT"
+)
+ADJUDICATION_ARTIFACT = (
+    "project/stage127/stage127_m2_trading_day_semantics_adjudication.json"
+)
+#: Under the adjudicated frozen contract a zero-traded-value InstrumentCalendar
+#: member REMAINS a trading day of W, so a zero-trade endpoint with no adjusted
+#: price is TRUE frozen-contract missingness, not an open question and not a
+#: data-capture defect.
+CURRENT_SEMANTIC_STATUS = "TRUE_FROZEN_CONTRACT_MISSINGNESS"
+ADJUDICATED_TRUE_MISSINGNESS_CATEGORIES = {
     CAT_ZERO_TRADE_ENDPOINT,
 }
 
@@ -90,11 +117,12 @@ PENDING_EXTERNAL_ADJUDICATION_CATEGORIES = {
 #: the most favorable hypothetical where every zero-trade row is excluded from
 #: the trading-day sequence entirely -- cannot reach 126 valid returns. This
 #: is a mathematical ceiling, not evidence about what a zero-trade row means;
-#: it is true regardless of how the pending semantics question resolves.
+#: it was true regardless of how the semantics question resolved.
 CAT_GUARANTEED_LT126 = "GUARANTEED_LT126_EVEN_IF_ALL_ZERO_TRADE_ROWS_EXCLUDED"
-#: The 126-return outcome for this pair depends on whether zero-trade rows are
-#: proven to be non-trading days. Never treated as recoverable -- only as
-#: pending the same external adjudication as the endpoint cases.
+#: HISTORICAL sub-class: reaching 126 returns for this pair would have
+#: required zero-trade rows to be non-trading days. The adjudication decided
+#: they ARE trading days of W, so this sub-class is nonrecoverable under the
+#: current frozen contract. Never treated as recoverable.
 CAT_PENDING_LOW_RETURN_SEMANTICS = (
     "POTENTIALLY_RECOVERABLE_PENDING_ZERO_TRADE_DAY_SEMANTICS"
 )
@@ -528,7 +556,8 @@ def build_low_return_upper_bound_rows(
     priced_observation_count - 1`` is a pure ceiling on consecutive valid
     returns if EVERY zero-trade row were excluded from the trading-day
     sequence entirely. It never asserts that this is the correct semantics --
-    only whether the pair's outcome depends on that open question.
+    only whether the pair's outcome depended on that (now adjudicated)
+    question.
     """
     rows: list[dict[str, Any]] = []
     for r in main_rows:
@@ -615,20 +644,35 @@ def build_summary(
     recoverable = sum(
         1 for r in unavailable if r["primary_root_cause"] in RECOVERABLE_CATEGORIES
     )
-    nonrecoverable = guaranteed_low_return + sum(
+    # Adjudicated: the zero-trade endpoint cases are now TRUE frozen-contract
+    # missingness. The <126 cases resolve the same way -- under the adjudicated
+    # contract a zero-trade row may NOT be dropped from the trading-day
+    # sequence, so the favourable upper bound that made some of them
+    # "potentially recoverable" is not reachable and BOTH low-return sub-classes
+    # remain unavailable. Every count below is re-derived from the rows.
+    adjudicated_true_missingness = sum(
         1 for r in unavailable
-        if r["primary_root_cause"] in NONRECOVERABLE_CATEGORIES
+        if r["primary_root_cause"] in ADJUDICATED_TRUE_MISSINGNESS_CATEGORIES
+    )
+    nonrecoverable = (
+        guaranteed_low_return
+        + pending_low_return
+        + adjudicated_true_missingness
+        + sum(
+            1 for r in unavailable
+            if r["primary_root_cause"] in NONRECOVERABLE_CATEGORIES
+        )
     )
     pending_external = sum(
         1 for r in unavailable
         if r["primary_root_cause"] in PENDING_EXTERNAL_ADJUDICATION_CATEGORIES
     )
-    pending_total = pending_external + pending_low_return
+    pending_total = pending_external
     unresolved = sum(
         1 for r in unavailable
         if r["primary_root_cause"] not in RECOVERABLE_CATEGORIES
         and r["primary_root_cause"] not in NONRECOVERABLE_CATEGORIES
-        and r["primary_root_cause"] not in PENDING_EXTERNAL_ADJUDICATION_CATEGORIES
+        and r["primary_root_cause"] not in ADJUDICATED_TRUE_MISSINGNESS_CATEGORIES
         and _low_return_class(r) is None
     )
 
@@ -699,42 +743,61 @@ def build_summary(
         "recoverable_due_to_proven_data_capture_defect": recoverable,
         "nonrecoverable_under_current_frozen_contract": nonrecoverable,
         "nonrecoverable_breakdown": {
+            "zero_trade_or_missing_adjusted_endpoint_under_frozen_sequence": (
+                adjudicated_true_missingness),
+            "fewer_than_126_valid_returns_only_under_frozen_sequence": (
+                guaranteed_low_return + pending_low_return),
             "guaranteed_lt126_even_if_all_zero_trade_rows_excluded": (
                 guaranteed_low_return),
-            "other_proven_nonrecoverable_categories": nonrecoverable
-            - guaranteed_low_return,
+            "would_have_needed_zero_trade_rows_dropped_to_reach_126": (
+                pending_low_return),
+            "other_proven_nonrecoverable_categories": sum(
+                1 for r in unavailable
+                if r["primary_root_cause"] in NONRECOVERABLE_CATEGORIES
+            ),
+            "note": (
+                "Under the adjudicated frozen contract a zero-trade "
+                "InstrumentCalendar member REMAINS a trading day of W, so "
+                "dropping zero-trade rows to reach 126 returns is not "
+                "permitted and both low-return sub-classes are unavailable."
+            ),
         },
         "pending_external_tsetmc_adjudication_count": pending_total,
         "pending_breakdown": {
             "pending_endpoint_semantics": pending_external,
-            "pending_low_return_sequence_semantics": pending_low_return,
+            "pending_low_return_sequence_semantics": 0,
             "note": (
-                "A pair can be pending for endpoint semantics, low-return "
-                "sequence semantics, or both, but a pair's primary_root_cause "
-                "is single-valued, so these two counts do not double-count "
-                "the same pair here (a pair whose primary cause is an "
-                "endpoint failure is counted only once, under endpoint "
-                "semantics, even if it also has <126 returns)."
+                "Zero. The external TSETMC calendar/state/trade evidence is "
+                "complete and the frozen-contract semantics adjudication is "
+                "complete, so no case now depends on further external "
+                "evidence. (Historically a pair could be pending for endpoint "
+                "semantics, low-return sequence semantics, or both; a pair's "
+                "primary_root_cause is single-valued, so those counts never "
+                "double-counted the same pair.)"
             ),
         },
-        "pending_external_adjudication_note": (
-            "These pairs are NEITHER recoverable NOR nonrecoverable. "
-            "Endpoint pairs: the immutable bundle shows a ClosingPriceDailyList "
-            "row with qTotCap=0 and zTotTran=0 at the endpoint date, but does "
-            "not by itself establish whether that date is a genuine trading "
-            "day with zero executions, a suspension, a non-tradable state, or "
-            "a calendar artifact. Low-return pairs: whether excluding "
-            "zero-trade rows from the trading-day sequence would raise the "
-            "valid-return count above 126 depends on the same open question. "
-            "Both are deferred to authoritative TSETMC calendar/state/trade "
-            "evidence, requested separately (see "
-            "stage127_m2_zero_trade_endpoint_evidence_request_v2.zip). Of the "
-            "397 unavailable pairs, only pairs mathematically GUARANTEED to "
-            "remain unavailable under every possible resolution of that "
-            "question are counted as nonrecoverable; all others are pending."
+        "external_adjudication_resolution_note": (
+            "RESOLVED -- these pairs are no longer pending. The official "
+            "TSETMC evidence is complete: all 427 requested zero-trade "
+            "endpoint dates ARE members of the official "
+            "ClosingPrice/GetInstrumentCalendar InstrumentCalendar, and for "
+            "all 27 bounded low-return RANGE requests the InstrumentCalendar "
+            "date set equals the ClosingPriceDailyList date set. The frozen "
+            "contract was then adjudicated: a zero-traded-value calendar "
+            "member REMAINS a trading day of W, so a zero-trade endpoint "
+            "carrying no adjusted price yields null by the frozen rule, and "
+            "zero-trade rows may not be dropped to reach 126 returns. Both "
+            "groups are therefore TRUE frozen-contract missingness under the "
+            "CURRENT frozen contract, not defects and not open questions. "
+            "Superseded prior request (historical): "
+            "stage127_m2_zero_trade_endpoint_evidence_request_v2.zip."
         ),
         "zero_trade_endpoint_label_status": {
             "label": CAT_ZERO_TRADE_ENDPOINT,
+            "label_historical": True,
+            "adjudication_status": "RESOLVED_BY_FROZEN_CONTRACT_ADJUDICATION",
+            "adjudication_outcome": ADJUDICATION_OUTCOME,
+            "current_semantic_status": CURRENT_SEMANTIC_STATUS,
             "external_calendar_state_trade_evidence": "COMPLETE",
             "evidence_delivery": (
                 "stage127_m2_zero_trade_semantics_full_delivery_v3.zip"
@@ -800,10 +863,14 @@ def build_summary(
                 "defect (retrieval truncation, identity fragmentation, or a "
                 "real trade with a missing adjusted price) are assumed "
                 "recovered; TRUE frozen-contract missingness is left as-is. "
-                "The 391 pairs pending external TSETMC adjudication are "
-                "NOT assumed recovered here -- they are excluded from this "
-                "counterfactual exactly like nonrecoverable pairs, precisely "
-                "because their status is not yet proven either way."
+                "The zero-trade endpoint pairs are NOT assumed recovered here. "
+                "That is no longer because their status is unproven -- it is "
+                "now ADJUDICATED: the official TSETMC evidence is complete and "
+                "the frozen contract retains a zero-trade calendar member as a "
+                "trading day of W, so those pairs are TRUE frozen-contract "
+                "missingness and are excluded exactly like every other "
+                "nonrecoverable pair. Recovering them would require changing "
+                "the frozen contract, which no data-only correction can do."
             ),
             "counterfactual_equity_return_usable": counterfactual_usable,
             "counterfactual_equity_return_coverage": counterfactual_coverage,
@@ -811,6 +878,12 @@ def build_summary(
                 counterfactual_coverage >= gate.CANDIDATE_VALID_COVERAGE_MIN
             ),
         },
+        "semantics_adjudication_completed": True,
+        "adjudication_outcome": ADJUDICATION_OUTCOME,
+        "adjudication_artifact": ADJUDICATION_ARTIFACT,
+        "current_semantic_status_of_zero_trade_endpoint_cases": (
+            CURRENT_SEMANTIC_STATUS),
+        "external_evidence_still_awaited": False,
         "canonical_gate_status_unchanged": "FAIL_M2_DATA_GATE",
         "no_scientific_artifact_modified_by_this_audit": True,
     }

@@ -1,5 +1,17 @@
 {
   "artifact": "stage127_m2_trading_day_semantics_contract_trace",
+  "coverage_threshold_provenance": {
+    "excluded_from_trace_because": "coverage thresholds do not bear on the meaning of 'trading day'",
+    "frozen_modeling_path_thresholds": {
+      "block_common_sample_coverage_min": 0.7,
+      "candidate_valid_coverage_min": 0.8,
+      "replaces_pilot_G09_G14_for_modeling_path": true
+    },
+    "guard": "The semantic interpretation must not be chosen because of the coverage result it produces, in either direction.",
+    "historical_part3_g10_status": "pending_user_approval",
+    "modeling_path_common_sample_threshold_currently_unfrozen": false,
+    "superseded_by": "project/stage125/part4_statistical_analysis_plan_stage125.json"
+  },
   "frozen_sources": [
     {
       "present": true,
@@ -35,7 +47,7 @@
   "frozen_sources_modified_by_this_task": false,
   "implication_strength_counts": {
     "DERIVED_UNAMBIGUOUSLY": 6,
-    "EXPLICIT": 5,
+    "EXPLICIT": 4,
     "NOT_SPECIFIED": 3
   },
   "inference_beyond_frozen_text_performed": false,
@@ -124,7 +136,7 @@
     }
   ],
   "reasoning_order": "CONTRACT -> EVIDENCE -> IMPLEMENTATION",
-  "statement_count": 14,
+  "statement_count": 13,
   "statements": [
     {
       "field": "shared_window.start_rule",
@@ -229,14 +241,6 @@
       "source_file": "ALL_FROZEN_STAGE125_STAGE126_ARTIFACTS",
       "statement_id": "S13_no_authoritative_state_code_mapping",
       "verbatim": "(no occurrence)"
-    },
-    {
-      "field": "G10.lock_status",
-      "implication_strength": "EXPLICIT",
-      "semantic_implication": "The minimum common-sample coverage threshold is not frozen; it may not be invented, and no semantic choice may be justified by the coverage it produces.",
-      "source_file": "project/stage125/part3_gate_decision_protocol_stage125.csv",
-      "statement_id": "S14_gate_thresholds_pending_user_approval",
-      "verbatim": "pending_user_approval"
     }
   ]
 }

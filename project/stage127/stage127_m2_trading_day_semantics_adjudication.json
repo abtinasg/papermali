@@ -26,6 +26,18 @@
   "canonical_gate_changed": false,
   "canonical_gate_status": "FAIL_M2_DATA_GATE",
   "contract_trace_artifact": "project/stage127/stage127_m2_trading_day_semantics_contract_trace.json",
+  "coverage_threshold_provenance": {
+    "excluded_from_trace_because": "coverage thresholds do not bear on the meaning of 'trading day'",
+    "frozen_modeling_path_thresholds": {
+      "block_common_sample_coverage_min": 0.7,
+      "candidate_valid_coverage_min": 0.8,
+      "replaces_pilot_G09_G14_for_modeling_path": true
+    },
+    "guard": "The semantic interpretation must not be chosen because of the coverage result it produces, in either direction.",
+    "historical_part3_g10_status": "pending_user_approval",
+    "modeling_path_common_sample_threshold_currently_unfrozen": false,
+    "superseded_by": "project/stage125/part4_statistical_analysis_plan_stage125.json"
+  },
   "current_implementation_conformant": "YES",
   "equity_return_window_dropped": false,
   "evidence_delivery": {
@@ -58,6 +70,7 @@
     "F",
     "G"
   ],
+  "governing_questions_not_unambiguously_answered": [],
   "human_review_required_before_any_canonical_change": true,
   "identity_result": {
     "absence_of_predecessor_treated_as_proof_of_none": false,
@@ -89,6 +102,10 @@
     "G: YES"
   ],
   "model_fits": 0,
+  "nonoperative_ambiguities": [
+    "A"
+  ],
+  "nonoperative_ambiguity_note": "An ambiguity is NON-OPERATIVE when no computed value depends on how it is resolved. Only governing ambiguities can force outcome C.",
   "official_calendar_result": {
     "calendar_evidence_endpoint_exact": true,
     "point_absent_from_official_instrument_calendar": 0,
@@ -99,7 +116,11 @@
   "predictions_generated": 0,
   "question_A_gap_is_operative": false,
   "question_A_gap_note": "The frozen corpus never names a calendar authority. This textual gap is NON-OPERATIVE for the imported evidence: the delivery shows the InstrumentCalendar date set equals the ClosingPriceDailyList date set for 27/27 bounded RANGE requests, and the observation universe the Gate consumes IS the daily list. The two candidate day universes therefore coincide on this dataset and no computed value depends on the gap.",
-  "questions_not_unambiguously_answered": [],
+  "question_A_implication_strength": "NOT_SPECIFIED",
+  "question_A_nonoperative_because": "InstrumentCalendar and ClosingPriceDailyList day sets coincide on all 27 bounded ranges, and all 427 requested endpoint dates are official InstrumentCalendar members. The two candidate day universes are therefore identical on this Stage127 evidence, so no coverage, t0, T* or return count depends on which one the frozen text meant.",
+  "questions_not_unambiguously_answered": [
+    "A"
+  ],
   "range_calendar_vs_daily_result": {
     "calendar_vs_daily_date_sets_differing": 0,
     "calendar_vs_daily_date_sets_equal": 27,

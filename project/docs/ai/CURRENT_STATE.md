@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage127-m2-market-data-gate`
-- **Last stage commit:** `42560ed198a17152e098785ee4cfb3d596e6d8b1`
-- **Generated from commit:** `363c8ad74196b391ced7f57bc968fcb928de76ea` (branch `stage127-m2-market-data-gate`, informational)
+- **Last stage commit:** `6041af8a44f198e0f14bff442e7d98a94cb56664`
+- **Generated from commit:** `6041af8a44f198e0f14bff442e7d98a94cb56664` (branch `stage127-m2-market-data-gate`, informational)
 - **Baseline:** `origin/main` @ `2967dcc82d30d1c7719b87db10f449c1bfc69dc8`
 
 ## Current-state validation
@@ -36,6 +36,22 @@ _The current scientific action. Its human authorization already exists; the Gate
 - **Evidence bundle SHA256:** `d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`
 - Evidence collection is recorded **separately** from block admission. `m2_data_collected` remains `false` because in this schema it is a frozen prohibition marker meaning "M2 data has entered the authorized M2 modeling pipeline" — not a statement that no M2 evidence exists.
 - **M2 incremental evaluation authorized:** False — **M2 modeling started:** False
+
+### Stage127 — zero-trade "trading day" semantics adjudication
+
+_Why `equity_return_window` coverage is 0.4039. This subsection records the SEMANTIC state only; it changes no canonical result._
+
+- **Official TSETMC evidence:** completed and independently validated — 3590 raw artifacts SHA256-verified
+- **Evidence bundle SHA256:** `5e05c3ad52d582236cc9c0bbea69dae520a02385921f3dd03792e6f65c917317`
+- **Endpoint dates that are official InstrumentCalendar members:** 427 / 427
+- **RANGE requests with InstrumentCalendar == ClosingPriceDailyList date set:** 27 / 27
+- **Adjudication outcome:** `FROZEN_CONTRACT_UNAMBIGUOUS_CURRENT_IMPLEMENTATION_CONFORMANT` (Outcome A)
+- **Current implementation conformant:** True
+- **Cases still pending external adjudication:** 0
+- **Canonical Gate changed by the adjudication:** False — Gate remains `FAIL_M2_DATA_GATE` with coverage 269 / 576 / 576 and common sample 269 of 666 pairs
+- **Model fits:** 0 — **predictions:** 0 — **final-test access:** 0
+- **No M2 modeling authorization follows from this.** The shortfall is now established as TRUE frozen-contract missingness rather than a data defect.
+- ⏳ **Human decision still required:** which scientific roadmap action follows the failed M2 extension.
 
 ### Last completed scientific micro-part QC
 
@@ -81,5 +97,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `22386c89d3d6a065b7b70d534747bc468f3c1076dfe0f2e0161a9189626d0211`_
-_generated_at_utc: 2026-07-29T09:36:17Z (informational)_
+_state_fingerprint: `252f285bbe546f4d66d47d0011be78b9426c75bdd8b7943c2b07708b39918ebd`_
+_generated_at_utc: 2026-07-29T10:16:06Z (informational)_

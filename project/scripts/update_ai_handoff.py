@@ -2708,6 +2708,7 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         "next_research_action_id": _NEXT_RESEARCH_ACTION_ID_AFTER_ROBUSTNESS_CLOSURE,
         **derive_m1_retained_design_freeze_markers(root),
         **derive_stage127_m2_market_data_gate_markers(root),
+        **derive_stage127_m2_zero_trade_semantics_markers(root),
     }
 
 
@@ -3723,6 +3724,50 @@ def render_current_state(record: dict) -> str:
             f"**M2 modeling started:** {record.get('m2_modeling_started')}",
             "",
         ]
+    if record.get("stage127_m2_trading_day_semantics_adjudication_completed"):
+        outcome = record.get(
+            "stage127_m2_trading_day_semantics_adjudication_outcome", "")
+        conformant = record.get("stage127_m2_current_implementation_conformant")
+        lines += [
+            "### Stage127 — zero-trade \"trading day\" semantics adjudication\n",
+            "_Why `equity_return_window` coverage is 0.4039. This subsection "
+            "records the SEMANTIC state only; it changes no canonical "
+            "result._\n",
+            f"- **Official TSETMC evidence:** completed and independently "
+            f"validated — "
+            f"{record.get('stage127_m2_zero_trade_semantics_raw_artifacts_sha256_verified')}"
+            " raw artifacts SHA256-verified",
+            f"- **Evidence bundle SHA256:** "
+            f"`{record.get('stage127_m2_zero_trade_semantics_bundle_sha256')}`",
+            f"- **Endpoint dates that are official InstrumentCalendar members:**"
+            f" {record.get('stage127_m2_point_dates_in_official_instrument_calendar')}"
+            f" / {record.get('stage127_m2_point_date_requests')}",
+            f"- **RANGE requests with InstrumentCalendar == "
+            f"ClosingPriceDailyList date set:** "
+            f"{record.get('stage127_m2_range_calendar_vs_daily_equal')} / "
+            f"{record.get('stage127_m2_range_requests')}",
+            f"- **Adjudication outcome:** `{outcome}` (Outcome A)",
+            f"- **Current implementation conformant:** {conformant}",
+            f"- **Cases still pending external adjudication:** "
+            f"{record.get('stage127_m2_semantics_pending_count')}",
+            f"- **Canonical Gate changed by the adjudication:** "
+            f"{record.get('stage127_m2_semantics_canonical_gate_changed')} — "
+            f"Gate remains "
+            f"`{record.get('stage127_m2_market_data_gate_status')}` with "
+            "coverage 269 / 576 / 576 and common sample 269 of 666 pairs",
+            f"- **Model fits:** "
+            f"{record.get('stage127_m2_semantics_model_fits')} — "
+            f"**predictions:** "
+            f"{record.get('stage127_m2_semantics_predictions_generated')} — "
+            f"**final-test access:** "
+            f"{record.get('stage127_m2_semantics_final_test_access')}",
+            "- **No M2 modeling authorization follows from this.** The "
+            "shortfall is now established as TRUE frozen-contract missingness "
+            "rather than a data defect.",
+            "- ⏳ **Human decision still required:** which scientific roadmap "
+            "action follows the failed M2 extension.",
+            "",
+        ]
     lines += [
         "### Last completed scientific micro-part QC\n",
         "_Scientific QC of the newest completed robustness micro-part — a "
@@ -4158,6 +4203,151 @@ def derive_stage127_m2_market_data_gate_markers(root: str) -> dict:
         markers["last_completed_research_action_id"] = _STAGE127_M2_GATE_ACTION_ID
         markers["next_research_action_id"] = _STAGE127_M2_NEXT_ACTION_ON_PASS
     return markers
+
+
+_STAGE127_SEMANTICS_ADJUDICATION_REL = (
+    "project/stage127/stage127_m2_trading_day_semantics_adjudication.json"
+)
+_STAGE127_SEMANTICS_IMPORT_QC_REL = (
+    "project/stage127/stage127_m2_zero_trade_semantics_import_qc.json"
+)
+_STAGE127_ROOT_CAUSE_REL = (
+    "project/stage127/stage127_m2_equity_return_root_cause_summary.json"
+)
+_STAGE127_SEMANTICS_OUTCOME_A = (
+    "FROZEN_CONTRACT_UNAMBIGUOUS_CURRENT_IMPLEMENTATION_CONFORMANT"
+)
+_STAGE127_SEMANTICS_OUTCOMES = (
+    _STAGE127_SEMANTICS_OUTCOME_A,
+    "FROZEN_CONTRACT_UNAMBIGUOUS_IMPLEMENTATION_DEFECT",
+    "SEMANTIC_AMBIGUITY_REQUIRES_HUMAN_DECISION",
+)
+
+
+def derive_stage127_m2_zero_trade_semantics_markers(root: str) -> dict:
+    """Recognize a COMPLETED Stage127 zero-trade trading-day adjudication.
+
+    Narrow and fail-closed, like the Gate recognizer. It records only the
+    SEMANTIC state and can never authorize M2, admit a block, or alter the
+    canonical Gate: an adjudication artifact that claims a Gate change, a model
+    fit, a prediction or final-test access is rejected outright. Returns {}
+    before the adjudication has been produced.
+    """
+    path = os.path.join(root, _STAGE127_SEMANTICS_ADJUDICATION_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        adj = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(
+            f"unreadable stage127 semantics adjudication artifact: {exc}"
+        ) from exc
+
+    outcome = adj.get("adjudication_outcome")
+    if outcome not in _STAGE127_SEMANTICS_OUTCOMES:
+        raise HandoffError(
+            f"stage127 semantics adjudication outcome not recognized: "
+            f"{outcome!r}"
+        )
+    # The adjudication is diagnostic: it may never move a canonical result.
+    for key in ("canonical_gate_changed", "t0_changed", "t_star_changed",
+                "thresholds_changed", "features_changed",
+                "frozen_stage125_contract_modified"):
+        if adj.get(key) is not False:
+            raise HandoffError(
+                f"stage127 semantics adjudication reports {key} is not False"
+            )
+    if adj.get("model_fits") != 0 or adj.get("predictions_generated") != 0:
+        raise HandoffError(
+            "stage127 semantics adjudication reports model fits/predictions"
+        )
+    if adj.get("final_test_access") != 0:
+        raise HandoffError(
+            "stage127 semantics adjudication reports final-test access"
+        )
+    if adj.get("canonical_gate_status") != _STAGE127_GATE_FAIL:
+        raise HandoffError(
+            "stage127 semantics adjudication does not preserve the canonical "
+            "Gate status"
+        )
+
+    qc_path = os.path.join(root, _STAGE127_SEMANTICS_IMPORT_QC_REL)
+    if not os.path.isfile(qc_path):
+        raise HandoffError(
+            "stage127 semantics adjudication present without its import QC"
+        )
+    try:
+        qc = json.load(open(qc_path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(
+            f"unreadable stage127 semantics import QC: {exc}"
+        ) from exc
+    if qc.get("validator_pass") is not True:
+        raise HandoffError("stage127 semantics import QC did not pass")
+    if qc.get("external_qc_report_trusted") is not False:
+        raise HandoffError(
+            "stage127 semantics import QC trusts the external QC report"
+        )
+    provenance = qc.get("provenance") or {}
+    if not (provenance.get("bundle_sha256_verified")
+            and provenance.get("bundle_size_verified")):
+        raise HandoffError(
+            "stage127 semantics evidence bundle identity was not verified"
+        )
+    calendar = qc.get("calendar_point") or {}
+    ranges = qc.get("calendar_range_vs_daily") or {}
+
+    # The root-cause surface must agree that nothing is pending any more.
+    pending = None
+    rc_path = os.path.join(root, _STAGE127_ROOT_CAUSE_REL)
+    if os.path.isfile(rc_path):
+        try:
+            rc = json.load(open(rc_path, encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise HandoffError(f"unreadable stage127 root-cause summary: {exc}") from exc
+        pending = int(rc.get("pending_external_tsetmc_adjudication_count") or 0)
+        if rc.get("canonical_gate_status_unchanged") != _STAGE127_GATE_FAIL:
+            raise HandoffError(
+                "stage127 root-cause summary does not preserve the canonical "
+                "Gate status"
+            )
+
+    conformant = adj.get("current_implementation_conformant")
+    return {
+        "stage127_m2_zero_trade_semantics_evidence_validated": True,
+        "stage127_m2_zero_trade_semantics_bundle_sha256": (
+            provenance.get("bundle_sha256") or ""
+        ),
+        "stage127_m2_zero_trade_semantics_bundle_filename": (
+            provenance.get("bundle_filename") or ""
+        ),
+        "stage127_m2_zero_trade_semantics_raw_artifacts_sha256_verified": (
+            (qc.get("raw") or {}).get("sha256_verified_count", 0)
+        ),
+        "stage127_m2_trading_day_semantics_adjudication_completed": True,
+        "stage127_m2_trading_day_semantics_adjudication_outcome": outcome,
+        "stage127_m2_current_implementation_conformant": conformant == "YES",
+        "stage127_m2_semantics_pending_count": pending if pending is not None else 0,
+        "stage127_m2_semantics_canonical_gate_changed": False,
+        "stage127_m2_semantics_model_fits": 0,
+        "stage127_m2_semantics_predictions_generated": 0,
+        "stage127_m2_semantics_final_test_access": 0,
+        "stage127_m2_point_dates_in_official_instrument_calendar": (
+            calendar.get("point_present_in_official_instrument_calendar", 0)
+        ),
+        "stage127_m2_point_date_requests": (
+            calendar.get("point_date_requests", 0)
+        ),
+        "stage127_m2_range_calendar_vs_daily_equal": (
+            ranges.get("calendar_vs_daily_date_sets_equal", 0)
+        ),
+        "stage127_m2_range_requests": ranges.get("range_requests", 0),
+        "stage127_m2_semantics_human_decision_required": True,
+        # The adjudication changes NOTHING about authorization.
+        "stage127_m2_block_admitted_for_modeling": False,
+        "m2_incremental_evaluation_authorized": False,
+        "m2_modeling_started": False,
+    }
 
 
 if __name__ == "__main__":

@@ -1,10 +1,13 @@
 {
+  "adjudication_artifact": "project/stage127/stage127_m2_trading_day_semantics_adjudication.json",
+  "adjudication_outcome": "FROZEN_CONTRACT_UNAMBIGUOUS_CURRENT_IMPLEMENTATION_CONFORMANT",
   "adjusted_parser_or_join_defect_count": 0,
   "canonical_gate_status_unchanged": "FAIL_M2_DATA_GATE",
   "classification_evidence_source": "raw_restricted_closing_price_daily_bounded_json_and_adjusted_price_history_bounded_csv_from_the_immutable_bundle",
+  "current_semantic_status_of_zero_trade_endpoint_cases": "TRUE_FROZEN_CONTRACT_MISSINGNESS",
   "development_pairs": 666,
   "diagnostic_counterfactual_not_canonical_result": {
-    "assumption": "ONLY pairs whose primary_root_cause is a PROVEN data-capture defect (retrieval truncation, identity fragmentation, or a real trade with a missing adjusted price) are assumed recovered; TRUE frozen-contract missingness is left as-is. The 391 pairs pending external TSETMC adjudication are NOT assumed recovered here -- they are excluded from this counterfactual exactly like nonrecoverable pairs, precisely because their status is not yet proven either way.",
+    "assumption": "ONLY pairs whose primary_root_cause is a PROVEN data-capture defect (retrieval truncation, identity fragmentation, or a real trade with a missing adjusted price) are assumed recovered; TRUE frozen-contract missingness is left as-is. The zero-trade endpoint pairs are NOT assumed recovered here. That is no longer because their status is unproven -- it is now ADJUDICATED: the official TSETMC evidence is complete and the frozen contract retains a zero-trade calendar member as a trading day of W, so those pairs are TRUE frozen-contract missingness and are excluded exactly like every other nonrecoverable pair. Recovering them would require changing the frozen contract, which no data-only correction can do.",
     "counterfactual_equity_return_coverage": 0.4039039039,
     "counterfactual_equity_return_usable": 269,
     "crosses_0_80_candidate_threshold": false,
@@ -14,6 +17,8 @@
   "does_not_alter_canonical_gate": true,
   "equity_return_unavailable_current": 397,
   "equity_return_usable_current": 269,
+  "external_adjudication_resolution_note": "RESOLVED -- these pairs are no longer pending. The official TSETMC evidence is complete: all 427 requested zero-trade endpoint dates ARE members of the official ClosingPrice/GetInstrumentCalendar InstrumentCalendar, and for all 27 bounded low-return RANGE requests the InstrumentCalendar date set equals the ClosingPriceDailyList date set. The frozen contract was then adjudicated: a zero-traded-value calendar member REMAINS a trading day of W, so a zero-trade endpoint carrying no adjusted price yields null by the frozen rule, and zero-trade rows may not be dropped to reach 126 returns. Both groups are therefore TRUE frozen-contract missingness under the CURRENT frozen contract, not defects and not open questions. Superseded prior request (historical): stage127_m2_zero_trade_endpoint_evidence_request_v2.zip.",
+  "external_evidence_still_awaited": false,
   "fewer_than_126_count": 90,
   "instrument_identity_fragmentation_count": 0,
   "missing_both_count": 132,
@@ -23,10 +28,14 @@
   "no_live_tsetmc_endpoint_queried": true,
   "no_scientific_artifact_modified_by_this_audit": true,
   "nonrecoverable_breakdown": {
+    "fewer_than_126_valid_returns_only_under_frozen_sequence": 6,
     "guaranteed_lt126_even_if_all_zero_trade_rows_excluded": 3,
-    "other_proven_nonrecoverable_categories": 0
+    "note": "Under the adjudicated frozen contract a zero-trade InstrumentCalendar member REMAINS a trading day of W, so dropping zero-trade rows to reach 126 returns is not permitted and both low-return sub-classes are unavailable.",
+    "other_proven_nonrecoverable_categories": 0,
+    "would_have_needed_zero_trade_rows_dropped_to_reach_126": 3,
+    "zero_trade_or_missing_adjusted_endpoint_under_frozen_sequence": 391
   },
-  "nonrecoverable_under_current_frozen_contract": 3,
+  "nonrecoverable_under_current_frozen_contract": 397,
   "partial_range_contribution": {
     "amihud_illiquidity_failures_among_partial_tickers": 3,
     "equity_return_window_failures_among_partial_tickers": 11,
@@ -42,28 +51,32 @@
     "realized_volatility_failures_among_partial_tickers": 3
   },
   "pending_breakdown": {
-    "note": "A pair can be pending for endpoint semantics, low-return sequence semantics, or both, but a pair's primary_root_cause is single-valued, so these two counts do not double-count the same pair here (a pair whose primary cause is an endpoint failure is counted only once, under endpoint semantics, even if it also has <126 returns).",
-    "pending_endpoint_semantics": 391,
-    "pending_low_return_sequence_semantics": 3
+    "note": "Zero. The external TSETMC calendar/state/trade evidence is complete and the frozen-contract semantics adjudication is complete, so no case now depends on further external evidence. (Historically a pair could be pending for endpoint semantics, low-return sequence semantics, or both; a pair's primary_root_cause is single-valued, so those counts never double-counted the same pair.)",
+    "pending_endpoint_semantics": 0,
+    "pending_low_return_sequence_semantics": 0
   },
-  "pending_external_adjudication_note": "These pairs are NEITHER recoverable NOR nonrecoverable. Endpoint pairs: the immutable bundle shows a ClosingPriceDailyList row with qTotCap=0 and zTotTran=0 at the endpoint date, but does not by itself establish whether that date is a genuine trading day with zero executions, a suspension, a non-tradable state, or a calendar artifact. Low-return pairs: whether excluding zero-trade rows from the trading-day sequence would raise the valid-return count above 126 depends on the same open question. Both are deferred to authoritative TSETMC calendar/state/trade evidence, requested separately (see stage127_m2_zero_trade_endpoint_evidence_request_v2.zip). Of the 397 unavailable pairs, only pairs mathematically GUARANTEED to remain unavailable under every possible resolution of that question are counted as nonrecoverable; all others are pending.",
-  "pending_external_tsetmc_adjudication_count": 394,
+  "pending_external_tsetmc_adjudication_count": 0,
   "recoverable_due_to_proven_data_capture_defect": 0,
   "retrieval_truncation_count": 0,
   "root_cause_counts": {
     "G_FEWER_THAN_126_VALID_RETURNS_ONLY": 6,
     "ZERO_TRADE_ENDPOINT_REQUIRES_TRADING_DAY_SEMANTICS_ADJUDICATION": 391
   },
+  "semantics_adjudication_completed": true,
   "true_trading_day_missing_adjusted_price_count": 0,
   "unresolved_root_cause_count": 0,
   "would_any_proven_data_only_correction_change_gate_result": false,
   "zero_trade_endpoint_count": 391,
   "zero_trade_endpoint_label_status": {
+    "adjudication_outcome": "FROZEN_CONTRACT_UNAMBIGUOUS_CURRENT_IMPLEMENTATION_CONFORMANT",
+    "adjudication_status": "RESOLVED_BY_FROZEN_CONTRACT_ADJUDICATION",
+    "current_semantic_status": "TRUE_FROZEN_CONTRACT_MISSINGNESS",
     "established_fact": "All 427 unique requested zero-trade endpoint dates ARE members of the official TSETMC ClosingPrice/GetInstrumentCalendar InstrumentCalendar, and for all 27 bounded low-return RANGE requests the InstrumentCalendar date set equals the ClosingPriceDailyList date set. These dates are therefore real official calendar dates, not retrieval or extraction defects.",
     "evidence_delivery": "stage127_m2_zero_trade_semantics_full_delivery_v3.zip",
     "external_calendar_state_trade_evidence": "COMPLETE",
     "factual_evidence_in": "project/stage127/stage127_m2_zero_trade_point_endpoint_evidence.csv",
     "label": "ZERO_TRADE_ENDPOINT_REQUIRES_TRADING_DAY_SEMANTICS_ADJUDICATION",
+    "label_historical": true,
     "note": "The word ADJUDICATION in this label named an OPEN question when the label was first assigned. That question is now answered against the frozen Stage125 contract; see the adjudication artifact. The label is retained unchanged so the audit trail stays stable, and the pairs remain unavailable under the frozen contract.",
     "semantics_adjudicated_in": "project/stage127/stage127_m2_trading_day_semantics_adjudication.json"
   }

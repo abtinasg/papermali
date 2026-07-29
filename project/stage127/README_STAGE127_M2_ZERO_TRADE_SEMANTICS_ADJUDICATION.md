@@ -45,7 +45,7 @@ absence of a demonstrated predecessor is NOT treated as proof that none exists.
 
 ## 5. Frozen-contract semantics trace
 
-14 frozen statements were traced ({'DERIVED_UNAMBIGUOUSLY': 6, 'EXPLICIT': 5, 'NOT_SPECIFIED': 3}). Answers:
+13 frozen statements were traced ({'DERIVED_UNAMBIGUOUSLY': 6, 'EXPLICIT': 4, 'NOT_SPECIFIED': 3}). Answers:
 
 - **A.** Does 'trading day' explicitly mean an official TSETMC InstrumentCalendar member?  
   → `NO_NOT_EXPLICITLY_DEFINED` (NOT_SPECIFIED)

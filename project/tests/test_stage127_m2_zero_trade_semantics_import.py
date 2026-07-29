@@ -813,7 +813,11 @@ def test_adjudication_outcome_is_derived_only_from_the_trace():
     result = adj.adjudicate(trace)
     assert result["adjudication_outcome"] == adj.OUTCOME_A
     assert result["current_implementation_conformant"] == "YES"
-    assert result["questions_not_unambiguously_answered"] == []
+    # A is genuinely unsettled by the frozen text and must be reported as such,
+    # but it is not a GOVERNING question, so it cannot force outcome C.
+    assert result["questions_not_unambiguously_answered"] == ["A"]
+    assert result["governing_questions_not_unambiguously_answered"] == []
+    assert result["nonoperative_ambiguities"] == ["A"]
     assert result["interpretation_chosen_to_obtain_PASS"] is False
 
 
@@ -827,6 +831,9 @@ def test_ambiguous_governing_question_forces_human_decision():
     assert result["adjudication_outcome"] == adj.OUTCOME_C
     assert result["current_implementation_conformant"] == "UNRESOLVED"
     assert result["canonical_gate_changed"] is False
+    assert "C" in result["governing_questions_not_unambiguously_answered"]
+    assert "C" in result["questions_not_unambiguously_answered"]
+    assert "C" not in result["nonoperative_ambiguities"]
 
 
 def test_no_canonical_gate_change_during_adjudication():
@@ -882,3 +889,229 @@ def test_published_counterfactual_artifact_does_not_replace_canonical():
         assert reading["predictions_generated"] == 0
         assert reading["final_test_access"] == 0
         assert reading["threshold_weakened"] is False
+
+
+# --------------------------------------------------------------------------- #
+# Post-adjudication internal consistency of the repository surfaces
+# --------------------------------------------------------------------------- #
+
+CANONICAL_COVERAGE_USABLE = {
+    "equity_return_window": 269,
+    "realized_volatility": 576,
+    "amihud_illiquidity": 576,
+}
+CANONICAL_COMMON_SAMPLE = 269
+CANONICAL_DEVELOPMENT_PAIRS = 666
+
+#: Wording that must NOT survive anywhere in the adjudicated surfaces: the
+#: external evidence is complete and the semantics question is closed.
+STALE_PENDING_PHRASES = (
+    "still pending",
+    "remain pending",
+    "remains pending",
+    "not yet proven",
+    "deferred to authoritative",
+    "deferred to future external",
+    "pending external TSETMC adjudication",
+    "awaiting external",
+)
+
+
+def _load(rel: str):
+    path = os.path.join(_repo_root(), rel)
+    if not os.path.isfile(path):
+        pytest.skip(f"{rel} not built in this checkout")
+    return json.load(open(path, encoding="utf-8"))
+
+
+def _root_cause_summary():
+    return _load(
+        "project/stage127/stage127_m2_equity_return_root_cause_summary.json")
+
+
+def test_root_cause_pending_semantics_count_is_zero_after_adjudication():
+    rc = _root_cause_summary()
+    assert rc["pending_external_tsetmc_adjudication_count"] == 0
+    assert rc["pending_breakdown"]["pending_endpoint_semantics"] == 0
+    assert rc["pending_breakdown"]["pending_low_return_sequence_semantics"] == 0
+    assert rc["unresolved_root_cause_count"] == 0
+    assert rc["recoverable_due_to_proven_data_capture_defect"] == 0
+    assert rc["external_evidence_still_awaited"] is False
+    assert rc["semantics_adjudication_completed"] is True
+    assert rc["adjudication_outcome"] == adj.OUTCOME_A
+
+
+def test_root_cause_unavailable_pairs_fully_accounted_as_frozen_missingness():
+    rc = _root_cause_summary()
+    unavailable = rc["equity_return_unavailable_current"]
+    assert rc["nonrecoverable_under_current_frozen_contract"] == unavailable
+    breakdown = rc["nonrecoverable_breakdown"]
+    endpoint = breakdown[
+        "zero_trade_or_missing_adjusted_endpoint_under_frozen_sequence"]
+    low_return = breakdown[
+        "fewer_than_126_valid_returns_only_under_frozen_sequence"]
+    assert endpoint + low_return + breakdown[
+        "other_proven_nonrecoverable_categories"] == unavailable
+    # Nothing is left in a limbo state between recoverable and nonrecoverable.
+    assert (rc["recoverable_due_to_proven_data_capture_defect"]
+            + rc["nonrecoverable_under_current_frozen_contract"]
+            + rc["pending_external_tsetmc_adjudication_count"]
+            + rc["unresolved_root_cause_count"]) == unavailable
+
+
+def test_historical_zero_trade_label_is_marked_resolved():
+    rc = _root_cause_summary()
+    status = rc["zero_trade_endpoint_label_status"]
+    assert status["label_historical"] is True
+    assert status["adjudication_status"] == (
+        "RESOLVED_BY_FROZEN_CONTRACT_ADJUDICATION")
+    assert status["current_semantic_status"] == "TRUE_FROZEN_CONTRACT_MISSINGNESS"
+    assert "stage127_m2_trading_day_semantics_adjudication.json" in (
+        status["semantics_adjudicated_in"])
+
+
+def test_no_stale_pending_prose_in_adjudicated_artifacts():
+    """No adjudicated surface may still claim the question is open."""
+    for rel in (
+        "project/stage127/stage127_m2_equity_return_root_cause_summary.json",
+        "project/stage127/stage127_m2_trading_day_semantics_adjudication.json",
+        "project/stage127/stage127_m2_trading_day_semantics_contract_trace.json",
+    ):
+        path = os.path.join(_repo_root(), rel)
+        if not os.path.isfile(path):
+            pytest.skip(f"{rel} not built in this checkout")
+        text = open(path, encoding="utf-8").read()
+        for phrase in STALE_PENDING_PHRASES:
+            assert phrase.lower() not in text.lower(), (
+                f"{rel} still contains stale pending prose: {phrase!r}")
+
+
+def test_question_A_is_not_specified_but_nonoperative():
+    trace = adj.build_contract_trace(_repo_root())
+    question_a = {q["question_id"]: q for q in trace["questions"]}["A"]
+    assert question_a["implication_strength"] == adj.NOT_SPECIFIED
+    result = adj.adjudicate(trace)
+    assert "A" in result["questions_not_unambiguously_answered"]
+    assert "A" in result["nonoperative_ambiguities"]
+    assert "A" not in result["governing_questions_not_unambiguously_answered"]
+    assert result["question_A_gap_is_operative"] is False
+    assert result["question_A_implication_strength"] == adj.NOT_SPECIFIED
+    assert result["adjudication_outcome"] == adj.OUTCOME_A
+
+
+def test_part4_coverage_thresholds_not_represented_as_pending():
+    """The modeling-path coverage thresholds are frozen by the Part 4 SAP."""
+    trace = adj.build_contract_trace(_repo_root())
+    # The historical Part 3 G10 statement must not be traced as semantics.
+    assert not any(
+        s["statement_id"].startswith("S14") for s in trace["statements"])
+    for statement in trace["statements"]:
+        assert "pending_user_approval" not in statement["verbatim"]
+    provenance = trace["coverage_threshold_provenance"]
+    assert provenance[
+        "modeling_path_common_sample_threshold_currently_unfrozen"] is False
+    frozen = provenance["frozen_modeling_path_thresholds"]
+    assert frozen["candidate_valid_coverage_min"] == 0.8
+    assert frozen["block_common_sample_coverage_min"] == 0.7
+    assert frozen["replaces_pilot_G09_G14_for_modeling_path"] is True
+
+    # …and the claim must match the frozen SAP itself, not just our summary.
+    sap = _load(adj.ANALYSIS_PLAN_REL)["candidate_data_admission"]
+    assert sap["candidate_valid_coverage_min"] == frozen[
+        "candidate_valid_coverage_min"]
+    assert sap["block_common_sample_coverage_min"] == frozen[
+        "block_common_sample_coverage_min"]
+    assert sap["replaces_pilot_G09_G14_for_modeling_path"] is True
+
+
+def test_handoff_state_exposes_completed_adjudication():
+    state = _load("project/docs/ai/handoff_state.json")
+    assert state["stage127_m2_zero_trade_semantics_evidence_validated"] is True
+    assert state["stage127_m2_zero_trade_semantics_bundle_sha256"] == (
+        imp.BUNDLE_SHA256)
+    assert state[
+        "stage127_m2_trading_day_semantics_adjudication_completed"] is True
+    assert state[
+        "stage127_m2_trading_day_semantics_adjudication_outcome"] == adj.OUTCOME_A
+    assert state["stage127_m2_current_implementation_conformant"] is True
+    assert state["stage127_m2_semantics_pending_count"] == 0
+    assert state["stage127_m2_semantics_canonical_gate_changed"] is False
+    assert state["stage127_m2_semantics_model_fits"] == 0
+    assert state["stage127_m2_semantics_final_test_access"] == 0
+
+
+def test_handoff_state_keeps_m2_unauthorized():
+    state = _load("project/docs/ai/handoff_state.json")
+    assert state["stage127_m2_market_data_gate_status"] == "FAIL_M2_DATA_GATE"
+    assert state["stage127_m2_block_admitted_for_modeling"] is False
+    assert state["m2_incremental_evaluation_authorized"] is False
+    assert state["m2_modeling_started"] is False
+
+
+def test_current_state_carries_the_semantics_subsection():
+    path = os.path.join(_repo_root(), "project/docs/ai/CURRENT_STATE.md")
+    if not os.path.isfile(path):
+        pytest.skip("CURRENT_STATE.md not present")
+    text = open(path, encoding="utf-8").read()
+    for needle in (
+        "semantics adjudication",
+        adj.OUTCOME_A,
+        "427 / 427",
+        "27 / 27",
+        "FAIL_M2_DATA_GATE",
+        "Human decision still required",
+    ):
+        assert needle in text, f"CURRENT_STATE.md missing: {needle!r}"
+
+
+def test_canonical_gate_and_coverage_unchanged_across_surfaces():
+    """The repair must not have moved a single canonical number."""
+    decision = _load(
+        "project/stage127/stage127_m2_market_data_gate_decision.json")
+    assert decision["gate_status"] == "FAIL_M2_DATA_GATE"
+    assert decision["modeling_performed"] is False
+    assert decision["model_fit_calls"] == 0
+    assert decision["prediction_calls"] == 0
+
+    counterfactuals = _load(
+        "project/stage127/"
+        "stage127_m2_trading_day_semantics_counterfactuals.json")
+    canonical = counterfactuals["canonical_coverage_unchanged"]
+    for variable, usable in CANONICAL_COVERAGE_USABLE.items():
+        assert canonical[variable]["usable"] == usable
+        assert canonical[variable]["total"] == CANONICAL_DEVELOPMENT_PAIRS
+    assert canonical["three_variable_common_sample"]["usable"] == (
+        CANONICAL_COMMON_SAMPLE)
+    assert counterfactuals["canonical_gate_status_unchanged"] == (
+        "FAIL_M2_DATA_GATE")
+
+    reading_1 = counterfactuals["readings"][adj.READING_1]
+    assert reading_1["equity_return_window_usable"] == CANONICAL_COVERAGE_USABLE[
+        "equity_return_window"]
+    assert reading_1["three_variable_common_sample"] == CANONICAL_COMMON_SAMPLE
+    assert counterfactuals["reading_1_reproduces_canonical_coverage"] is True
+
+    rc = _root_cause_summary()
+    assert rc["equity_return_usable_current"] == CANONICAL_COVERAGE_USABLE[
+        "equity_return_window"]
+    assert rc["development_pairs"] == CANONICAL_DEVELOPMENT_PAIRS
+    assert rc["canonical_gate_status_unchanged"] == "FAIL_M2_DATA_GATE"
+
+
+def test_no_model_or_final_test_access_anywhere_in_the_semantics_surfaces():
+    for rel in (
+        "project/stage127/stage127_m2_trading_day_semantics_adjudication.json",
+        "project/stage127/"
+        "stage127_m2_trading_day_semantics_counterfactuals.json",
+        "project/stage127/stage127_m2_zero_trade_semantics_import_qc.json",
+    ):
+        data = _load(rel)
+        flat = json.dumps(data)
+        assert '"model_fits": 0' in flat or "model_fits" not in flat
+        assert '"final_test_access": 0' in flat or "final_test_access" not in flat
+    adjudication = _load(
+        "project/stage127/stage127_m2_trading_day_semantics_adjudication.json")
+    assert adjudication["model_fits"] == 0
+    assert adjudication["predictions_generated"] == 0
+    assert adjudication["final_test_access"] == 0
+    assert adjudication["canonical_gate_changed"] is False
