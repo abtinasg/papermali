@@ -96,6 +96,15 @@ ALLOWLIST_FILES = (
     "project/run_stage127_m2_zero_trade_endpoint_evidence_request.py",
     "project/src/stage127_m2_zero_trade_endpoint_evidence_request_v2.py",
     "project/run_stage127_m2_zero_trade_endpoint_evidence_request_v2.py",
+    # Stage127 zero-trade "trading day" SEMANTICS evidence import and
+    # frozen-contract adjudication (EVIDENCE IMPORT + ADJUDICATION ONLY:
+    # independently revalidates the immutable v3 delivery, traces the frozen
+    # Stage125 contract, and never fits a model, generates a prediction, reads
+    # a final-test row, or modifies the canonical Gate).
+    "project/src/stage127_m2_zero_trade_semantics_import.py",
+    "project/src/stage127_m2_trading_day_semantics_adjudication.py",
+    "project/run_stage127_m2_zero_trade_semantics_adjudication.py",
+    "project/tests/test_stage127_m2_zero_trade_semantics_import.py",
     # Stage127 external TSETMC retrieval-request package code and tests.
     "project/src/stage127_m2_external_retrieval_request.py",
     "project/run_stage127_m2_external_retrieval_request.py",
