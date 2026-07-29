@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage127-m2-market-data-gate`
-- **Last stage commit:** `9b04de0c74684a55fa850ecc36129fd2700b85ed`
-- **Generated from commit:** `5e0b25190232bc2fec3794dc585558357a3311d9` (branch `stage124-calendar-esfand-converter-fix`, informational)
-- **Baseline:** `origin/main` @ `5e0b25190232bc2fec3794dc585558357a3311d9`
+- **Last stage commit:** `c9ece6282e2c5f209fe671adcce38f29eec3cded`
+- **Generated from commit:** `c467cde024bfd2be853f28372fdf1ea5e17ba894` (branch `handoff-refresh-after-pr67`, informational)
+- **Baseline:** `origin/main` @ `c467cde024bfd2be853f28372fdf1ea5e17ba894`
 
 ## Current-state validation
 
@@ -97,5 +97,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `d2ec4e7d0497e3d8b9195d400356d6194344c99ffede6d40c99889ad00ad7520`_
-_generated_at_utc: 2026-07-29T20:10:08Z (informational)_
+_state_fingerprint: `07a27b9144138bfaf2b57d726d95b79348ccbb5c5e41f58bde22d18ae95b5176`_
+_generated_at_utc: 2026-07-29T21:03:54Z (informational)_
