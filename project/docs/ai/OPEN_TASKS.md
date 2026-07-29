@@ -792,6 +792,85 @@ applied under `stage124-gate-b-execution` (see the active workstream above).
 - ⚠️ `stage124-batch02-part03-1b-1` — superseded / cancelled by official TSE API
   (not completed).
 
+## Stage127 M2 zero-trade "trading day" semantics — ADJUDICATED (evidence import only)
+
+The `equity_return_window` shortfall above was traced to 391 pairs whose window
+endpoint fell on a **zero-trade** date, interim-labelled
+`ZERO_TRADE_ENDPOINT_REQUIRES_TRADING_DAY_SEMANTICS_ADJUDICATION`. That open
+question is now answered. **The canonical Gate was NOT changed by this work.**
+
+**External evidence (immutable, not committed).**
+
+- filename: `stage127_m2_zero_trade_semantics_full_delivery_v3.zip`
+- size: 1,955,293 bytes (independently verified)
+- SHA256: `5e05c3ad52d582236cc9c0bbea69dae520a02385921f3dd03792e6f65c917317`
+  (independently verified)
+
+An independent papermali-side validator
+(`project/src/stage127_m2_zero_trade_semantics_import.py`) re-derived every
+claim from the raw artifacts and fails closed on any inconsistency: 3,590 raw
+artifacts, 3,590 manifest rows, 3,590 unique files, **3,590/3,590 SHA256
+re-verified**, all endpoints exact official TSETMC API paths (0 generic), 0
+unmapped artifacts, 130 zero-byte artifacts (125 UNRESOLVED + 5 HTTP_500, 0
+zero-byte SUCCESS/CACHED), maximum bounded `dEven` 20200718 with **0**
+observations at or after the final-test boundary. The external QC report was
+**compared against, never trusted**: 35 independent comparisons, 0
+disagreements.
+
+**Factual result.** All **427/427** unique requested zero-trade endpoint dates
+ARE members of the official `ClosingPrice/GetInstrumentCalendar`
+InstrumentCalendar, and for **27/27** low-return RANGE requests the
+InstrumentCalendar date set equals the `ClosingPriceDailyList` date set. These
+dates are therefore **real official calendar dates, not retrieval or extraction
+defects**. Historical identity remains explicitly uncertain: 103 tickers,
+request_ISIN == raw instrumentID 103/103, == raw cIsin 8/103, CANDIDATE_FOUND 0,
+NONE_FOUND 0, **UNRESOLVED 103**. Histories were not concatenated and
+`insCode="0"` was never used as a predecessor. TSETMC state codes (`A `, `IS`,
+`AR`, `I `, `AS`) remain literal evidence with **UNRESOLVED** meaning, because
+the frozen project contains no authoritative mapping for them.
+
+**Adjudication outcome: `FROZEN_CONTRACT_UNAMBIGUOUS_CURRENT_IMPLEMENTATION_CONFORMANT`.**
+
+The decisive record is the FROZEN synthetic validation that locked the M2
+contract (`stage125_part3b1_decision_lock_qc_report.json`): a window of **248**
+days containing exactly **1** zero-traded-value day produced **247** usable
+daily returns (= 248 − 1) and **246** usable Amihud days (= 247 − 1). The
+zero-trade day was therefore retained in the trading-day sequence and still
+contributed returns; only Amihud excluded it. Combined with
+`diagnostics_recorded` (which requires counting zero-trade and missing-price
+days *of W*), the amihud-scoped `zero_volume_rule`, and the endpoint clause
+`If either endpoint missing => null` (which would be a dead letter if
+missing-price days were deleted from W), the frozen contract already requires
+exactly what the current code does. Full trace and per-question answers (A–G):
+`project/stage127/stage127_m2_trading_day_semantics_contract_trace.json`.
+
+"Trading day" is never *explicitly* defined as InstrumentCalendar membership
+anywhere in the frozen corpus (question A, `NOT_SPECIFIED`), but that gap is
+**non-operative here**: the calendar and daily-list date sets coincide on this
+evidence, so no computed value depends on it.
+
+**Diagnostic counterfactual — NOT a canonical result.** Under
+`INSTRUMENT_CALENDAR_MEMBERSHIP_READING` the recomputation reproduces canonical
+coverage exactly (269 / 576 / 576 / common 269). Under
+`POSITIVE_EXECUTED_TRADE_DAY_READING` it would rise to 609/666 = 0.9144 on all
+three variables. That reading is **not supported by the frozen contract** and is
+contradicted by the frozen synthetic validation; it is recorded only so a human
+reviewer can see the stakes, and it must not be adopted because it would produce
+a PASS.
+
+**Canonical state is unchanged:** Gate `FAIL_M2_DATA_GATE`;
+equity_return_window 269/666 = 0.4039; realized_volatility 576/666 = 0.8649;
+amihud_illiquidity 576/666 = 0.8649; common sample 269/666 = 0.4039. Model fits
+0, predictions 0, final-test access 0. **M2 has NOT passed and M2 modeling is
+NOT authorized.** `stage127-m2-incremental-evaluation` remains unauthorized and
+unstarted.
+
+**Blocking next step (human review required):** review
+`READY_FOR_STAGE127_SEMANTICS_REVIEW_CURRENT_IMPLEMENTATION_CONFORMANT` and
+decide how to respond to a coverage shortfall that is now established as TRUE
+frozen-contract missingness rather than a data defect. No remediation is
+authorized here.
+
 ## Not in scope yet (do NOT start)
 
 - ❌ Final-test access or evaluation; full-development refit; M1 robustness

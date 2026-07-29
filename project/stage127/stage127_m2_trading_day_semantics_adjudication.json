@@ -1,0 +1,113 @@
+{
+  "adjudication_outcome": "FROZEN_CONTRACT_UNAMBIGUOUS_CURRENT_IMPLEMENTATION_CONFORMANT",
+  "artifact": "stage127_m2_trading_day_semantics_adjudication",
+  "canonical_coverage_unchanged": {
+    "amihud_illiquidity": {
+      "coverage": 0.8648648649,
+      "total": 666,
+      "usable": 576
+    },
+    "equity_return_window": {
+      "coverage": 0.4039039039,
+      "total": 666,
+      "usable": 269
+    },
+    "realized_volatility": {
+      "coverage": 0.8648648649,
+      "total": 666,
+      "usable": 576
+    },
+    "three_variable_common_sample": {
+      "coverage": 0.4039039039,
+      "total": 666,
+      "usable": 269
+    }
+  },
+  "canonical_gate_changed": false,
+  "canonical_gate_status": "FAIL_M2_DATA_GATE",
+  "contract_trace_artifact": "project/stage127/stage127_m2_trading_day_semantics_contract_trace.json",
+  "current_implementation_conformant": "YES",
+  "equity_return_window_dropped": false,
+  "evidence_delivery": {
+    "bundle_edited_in_place": false,
+    "bundle_filename": "stage127_m2_zero_trade_semantics_full_delivery_v3.zip",
+    "bundle_sha256": "5e05c3ad52d582236cc9c0bbea69dae520a02385921f3dd03792e6f65c917317",
+    "bundle_sha256_verified": true,
+    "bundle_size_bytes": 1955293,
+    "bundle_size_verified": true,
+    "bundle_stored_outside_repository": true,
+    "bundle_treated_as_immutable_source_evidence": true
+  },
+  "features_changed": false,
+  "final_test_access": 0,
+  "frozen_contract_required_behaviour": {
+    "endpoint_missing_price_yields_null": true,
+    "missing_price_day_remains_a_trading_day_in_W": true,
+    "returns_bridged_across_unpriced_days": false,
+    "t0_is_first_trading_day_of_W": true,
+    "tN_is_T_star_selected_independently_of_price": true,
+    "zero_trade_calendar_day_remains_a_trading_day_in_W": true,
+    "zero_traded_value_excluded_from_amihud_only": true
+  },
+  "frozen_stage125_contract_modified": false,
+  "governing_questions": [
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G"
+  ],
+  "human_review_required_before_any_canonical_change": true,
+  "identity_result": {
+    "absence_of_predecessor_treated_as_proof_of_none": false,
+    "candidate_found_count": 0,
+    "current_identity_snapshot_rows": 103,
+    "evidence_status_counts": {
+      "UNRESOLVED": 103
+    },
+    "historical_probe_rows": 385,
+    "histories_concatenated": false,
+    "identity_audit_rows": 488,
+    "identity_evidence_rows": 103,
+    "identity_uncertainty_preserved": true,
+    "ins_code_zero_used_as_predecessor": false,
+    "none_found_count": 0,
+    "request_ISIN_equals_raw_cIsin": 8,
+    "request_ISIN_equals_raw_instrumentID": 103,
+    "tickers_checked": 103,
+    "unresolved_count": 103
+  },
+  "interpretation_chosen_to_obtain_PASS": false,
+  "justification": [
+    "A: NO_NOT_EXPLICITLY_DEFINED",
+    "B: NO",
+    "C: NO",
+    "D: READING_2_KEEP_DAY_IN_W_EXCLUDE_FROM_CALCULATIONS",
+    "E: NO_BRIDGING_PERMITTED",
+    "F: FIRST_TRADING_DAY_OF_W_NOT_FIRST_PRICED_OR_TRADED_DAY",
+    "G: YES"
+  ],
+  "model_fits": 0,
+  "official_calendar_result": {
+    "calendar_evidence_endpoint_exact": true,
+    "point_absent_from_official_instrument_calendar": 0,
+    "point_calendar_unresolved": 0,
+    "point_date_requests": 427,
+    "point_present_in_official_instrument_calendar": 427
+  },
+  "predictions_generated": 0,
+  "question_A_gap_is_operative": false,
+  "question_A_gap_note": "The frozen corpus never names a calendar authority. This textual gap is NON-OPERATIVE for the imported evidence: the delivery shows the InstrumentCalendar date set equals the ClosingPriceDailyList date set for 27/27 bounded RANGE requests, and the observation universe the Gate consumes IS the daily list. The two candidate day universes therefore coincide on this dataset and no computed value depends on the gap.",
+  "questions_not_unambiguously_answered": [],
+  "range_calendar_vs_daily_result": {
+    "calendar_vs_daily_date_sets_differing": 0,
+    "calendar_vs_daily_date_sets_equal": 27,
+    "differing_range_request_ids": [],
+    "range_requests": 27
+  },
+  "review_label": "READY_FOR_STAGE127_SEMANTICS_REVIEW_CURRENT_IMPLEMENTATION_CONFORMANT",
+  "t0_changed": false,
+  "t_star_changed": false,
+  "thresholds_changed": false
+}

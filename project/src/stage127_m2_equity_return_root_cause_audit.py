@@ -733,6 +733,37 @@ def build_summary(
             "remain unavailable under every possible resolution of that "
             "question are counted as nonrecoverable; all others are pending."
         ),
+        "zero_trade_endpoint_label_status": {
+            "label": CAT_ZERO_TRADE_ENDPOINT,
+            "external_calendar_state_trade_evidence": "COMPLETE",
+            "evidence_delivery": (
+                "stage127_m2_zero_trade_semantics_full_delivery_v3.zip"
+            ),
+            "established_fact": (
+                "All 427 unique requested zero-trade endpoint dates ARE members "
+                "of the official TSETMC ClosingPrice/GetInstrumentCalendar "
+                "InstrumentCalendar, and for all 27 bounded low-return RANGE "
+                "requests the InstrumentCalendar date set equals the "
+                "ClosingPriceDailyList date set. These dates are therefore real "
+                "official calendar dates, not retrieval or extraction defects."
+            ),
+            "semantics_adjudicated_in": (
+                "project/stage127/"
+                "stage127_m2_trading_day_semantics_adjudication.json"
+            ),
+            "factual_evidence_in": (
+                "project/stage127/stage127_m2_zero_trade_point_endpoint_"
+                "evidence.csv"
+            ),
+            "note": (
+                "The word ADJUDICATION in this label named an OPEN question "
+                "when the label was first assigned. That question is now "
+                "answered against the frozen Stage125 contract; see the "
+                "adjudication artifact. The label is retained unchanged so the "
+                "audit trail stays stable, and the pairs remain unavailable "
+                "under the frozen contract."
+            ),
+        },
         "unresolved_root_cause_count": unresolved,
         "partial_range_contribution": {
             "partial_source_tickers": sorted(partial_tickers),
