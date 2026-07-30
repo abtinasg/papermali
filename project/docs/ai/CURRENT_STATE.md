@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m2_d2_boundary_month_equity_return`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m2-d2-gate-rerun`
-- **Last stage commit:** `a6bbc1f971a76a6526fcf2c316e524710b126cad`
-- **Generated from commit:** `98ee95b71c0a868fdc250eaec9f101eb8a07f886` (branch `stage128-m2-boundary-month-return-design-freeze`, informational)
+- **Last stage commit:** `5bc8d22ea361116935ae9da0358aa457ef127ac2`
+- **Generated from commit:** `5bc8d22ea361116935ae9da0358aa457ef127ac2` (branch `stage128-m2-boundary-month-return-design-freeze`, informational)
 - **Baseline:** `origin/main` @ `b25804ab764258c846b391f4823f089552c855e3`
 
 ## Current-state validation
@@ -111,5 +111,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `e1864a1e0c5c0304734c372a614704d1f8f79bd5038f0bbef6a5eb97b471a9dc`_
-_generated_at_utc: 2026-07-30T18:58:39Z (informational)_
+_state_fingerprint: `3723384406adb33326618653da36a6eb742cfdddeb6f806dd64ed42826401c79`_
+_generated_at_utc: 2026-07-30T19:02:45Z (informational)_
