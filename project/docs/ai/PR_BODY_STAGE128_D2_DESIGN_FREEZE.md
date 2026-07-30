@@ -57,7 +57,7 @@ PYTHONPATH=project python -m pytest project/tests/test_ai_handoff.py project/tes
 
 Result: **765 passed, 8 failed, 26 skipped**. All 8 failures are the identical pre-existing `FileNotFoundError` for a gitignored, untracked input (`project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv`), confirmed present in an identical clean checkout of the PR base commit (`b25804ab764258c846b391f4823f089552c855e3`) — an environment/untracked-asset limitation, not a regression from this change.
 
-Full-suite base-vs-head comparison (`--junitxml`, same machine/environment): base `b25804ab764258c846b391f4823f089552c855e3` = 2529 passed / 289 failed / 75 errored / 26 skipped; head (this branch) = see final response. `new_failure_nodeids` / `new_error_nodeids` after fixing the pointer-transition regression tests (`test_ai_handoff.py`, `test_stage126_current_state_validator.py`) that legitimately needed updating for the new research pointer = **0**.
+Full-suite base-vs-head comparison (`--junitxml`, same machine/environment): base `b25804ab764258c846b391f4823f089552c855e3` = 2529 passed / 289 failed / 75 errored / 26 skipped; head (`d65731b`) = 2575 passed / 289 failed / 75 errored / 26 skipped. `new_failure_nodeids = 0`, `new_error_nodeids = 0`, `resolved_failure_nodeids = 0` (the +46 passed are the new Stage128 tests; the pointer-transition regression tests in `test_ai_handoff.py`/`test_stage126_current_state_validator.py` were updated to match the legitimately-advanced pointer and remain in the passing set on both sides after that update).
 
 ## Research pointers
 

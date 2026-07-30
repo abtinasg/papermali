@@ -3,7 +3,7 @@
   "decision_id": "stage128-m2-boundary-month-return-design-freeze",
   "generated_for": "stage128-m2-boundary-month-return-design-freeze",
   "package_artifacts_sha256": {
-    "project/docs/ai/PR_BODY_STAGE128_D2_DESIGN_FREEZE.md": "c12df14a673645b81d86f56ff0d55da3e18f64a0a8b0a0322f06ea6697dd6ea8",
+    "project/docs/ai/PR_BODY_STAGE128_D2_DESIGN_FREEZE.md": "ade4de0007c8a8512fb35b8a372f947542807706afe3fdef84575894a0354f69",
     "project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md": "4b18f054ec86f961a00fadd27846151e6e792419bd40abd4f88095ba7cbd42a5",
     "project/src/stage128_m2_d2_boundary_month_equity_return.py": "27a3e5dfe36c7e89df386f9ee803ad43b73fd741517d7637c627896a12581a57",
     "project/stage128/reproduce_prelock_predictor_only_feasibility.py": "bee6ba410f640624224f7bce6759078feb5fecd342e243978cca5d9f1f4a76c1",
