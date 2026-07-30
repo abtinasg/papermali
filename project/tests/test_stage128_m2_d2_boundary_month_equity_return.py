@@ -210,6 +210,67 @@ def test_d2_unavailable_on_empty_window():
 
 
 # --------------------------------------------------------------------------- #
+# Endpoint adjusted-close validity semantics (frozen, inherited from D0)
+# --------------------------------------------------------------------------- #
+
+def test_start_boundary_zero_price_is_treated_as_ineligible_denominator_guard():
+    # Start (denominator) adjusted_close == 0 must not be selected: it would
+    # divide by zero. This is a nonzero guard specific to the denominator
+    # position, not a general ">0" eligibility rule.
+    win, window = full_synthetic_pair(n_days=300)
+    window = list(window)
+    month = window[0]["trading_date"][:7]
+    zeroed = []
+    for o in window:
+        if o["trading_date"][:7] == month and o == window[0]:
+            zeroed.append(obs(o["trading_date"], 0.0))
+        else:
+            zeroed.append(o)
+    returns = g.daily_simple_returns(window)
+    result = d2.compute_d2_equity_return(zeroed, len(returns))
+    # find_start_boundary_price itself does not reject 0.0 (adjusted_close is
+    # not None), but compute_d2_equity_return's denominator guard must.
+    assert result["equity_return_d2"] is None
+    assert "zero" in result["d2_status"].lower()
+
+
+def test_end_boundary_zero_price_is_permitted_not_rejected():
+    # A literal 0.0 adjusted_close at the numerator (end boundary) position
+    # is permitted under the inherited D0 not-None-only eligibility rule; it
+    # is NOT silently upgraded to an "adjusted_close > 0" requirement.
+    window = [
+        obs("2026-01-30", 50.0),
+        obs("2026-01-31", 51.0),
+    ] + [obs(d, 52.0 + i * 0.01) for i, d in enumerate(
+        daily_business_dates("2026-02-02", 200))]
+    window[-1] = obs(window[-1]["trading_date"], 0.0)
+    returns = g.daily_simple_returns(window)
+    end = d2.find_end_boundary_price(window, window[-1]["trading_date"])
+    assert end == {
+        "trading_date": window[-1]["trading_date"], "adjusted_close": 0.0,
+    }
+    result = d2.compute_d2_equity_return(window, len(returns))
+    # R_D2 = 0 / start - 1 = -1, a valid (if extreme) observed return, not an
+    # "unavailable" status -- the end boundary is not rejected for being 0.
+    if len(returns) >= d2.MIN_USABLE_DAILY_RETURNS_D2:
+        assert result["equity_return_d2"] == pytest.approx(-1.0)
+        assert result["d2_status"] == "OBSERVED_COMPLETE"
+
+
+def test_eligibility_rule_is_not_none_not_greater_than_zero():
+    # A negative-but-non-None adjusted_close (pathological synthetic input)
+    # is still "eligible" under the inherited not-None rule at a non-start
+    # boundary -- this module never imposes its own ">0" filter beyond the
+    # documented start-boundary division guard.
+    window = [obs("2026-04-01", -5.0), obs("2026-04-02", 10.0)]
+    start = d2.find_start_boundary_price(window, "2026-04-01")
+    # -5.0 is not None, so it is selected as start's candidate price by the
+    # boundary-search function; the caller-level zero-only guard in
+    # compute_d2_equity_return does not reject negative values either.
+    assert start == {"trading_date": "2026-04-01", "adjusted_close": -5.0}
+
+
+# --------------------------------------------------------------------------- #
 # No model invocation / no canonical Gate execution guarantees
 # --------------------------------------------------------------------------- #
 

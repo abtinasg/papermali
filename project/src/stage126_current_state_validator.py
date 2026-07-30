@@ -477,10 +477,81 @@ def retained_design_freeze_completed(repo_root: Path) -> bool:
     return all(sf.get(k) == v for k, v in required.items())
 
 
+# Once the Stage127 M2 market-data Gate has ALSO been executed and the
+# Stage128 M2 D2 boundary-month design freeze completes on top of it, the
+# next legitimate ROADMAP research action advances once more, to the D2 Gate
+# re-run. That action still requires a SEPARATE, future, explicit human
+# authorization -- this validator never grants it, and never marks M2 as
+# admitted or started. An UNRESOLVED/FAIL Gate result is unaffected: the
+# freeze amends only the D0 equity-return measurement component for FUTURE
+# Gate execution and never rewrites the historical Gate outcome.
+NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_DESIGN_FREEZE = (
+    "stage128-m2-d2-gate-rerun"
+)
+STAGE128_M2_D2_DESIGN_FREEZE_REL = (
+    "project/stage128/stage128_m2_d2_design_freeze.json"
+)
+
+
+def stage128_m2_d2_design_freeze_completed(repo_root: Path) -> bool:
+    """Narrow, fail-closed recognition of the Stage128 M2 D2 design freeze.
+
+    Mirrors ``retained_design_freeze_completed`` above: only returns True
+    when the freeze artifact exists and its exact required
+    ``status_flags``/no-execution fields hold, and the historical Stage127
+    D0 Gate result is preserved. Never itself authorizes a Gate re-run, M2
+    admission or final-test access.
+    """
+    path = repo_root / STAGE128_M2_D2_DESIGN_FREEZE_REL
+    if not path.is_file():
+        return False
+    try:
+        freeze = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    if freeze.get("decision_id") != (
+        "stage128-m2-boundary-month-return-design-freeze"
+    ):
+        return False
+    if freeze.get("historical_D0_gate_status") != "FAIL_M2_DATA_GATE":
+        return False
+    sf = freeze.get("status_flags") or {}
+    required_status_flags = {
+        "design_freeze_completed": True,
+        "canonical_gate_executed": False,
+        "m2_admitted": False,
+        "m2_started": False,
+        "m3_started": False,
+        "m4_started": False,
+        "final_model_selected": False,
+        "paper_winner_selected": False,
+        "merged": False,
+    }
+    if not all(sf.get(k) == v for k, v in required_status_flags.items()):
+        return False
+    required_exact = {
+        "canonical_gate_executed_in_this_action": False,
+        "M2_admitted_in_this_action": False,
+        "model_fits": 0,
+        "predictions": 0,
+        "final_test_access": 0,
+        "target_values_accessed": 0,
+        "stage128_m2_d2_gate_rerun_authorized": False,
+    }
+    return all(freeze.get(k) == v for k, v in required_exact.items())
+
+
 def expected_next_research_action_id(
     repo_root: Path, m1_robustness_completed: bool,
 ) -> str:
     """The single source of truth for the current expected research pointer."""
+    if (
+        m1_robustness_completed
+        and robustness_closure_completed(repo_root)
+        and retained_design_freeze_completed(repo_root)
+        and stage128_m2_d2_design_freeze_completed(repo_root)
+    ):
+        return NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_DESIGN_FREEZE
     if (
         m1_robustness_completed
         and robustness_closure_completed(repo_root)

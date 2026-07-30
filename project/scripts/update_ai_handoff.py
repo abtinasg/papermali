@@ -69,6 +69,11 @@ ALLOWLIST_DIRS = (
     "project/stage126/",
     # Stage127 M2 market-data admission Gate deliverables.
     "project/stage127/",
+    # Stage128 M2 D2 boundary-month equity-return design-freeze deliverables
+    # (machine-readable freeze record, human authorization record, QC report,
+    # metadata/hashes manifest, feasibility provenance and reproduction
+    # artifacts). Design-freeze/contract only -- no canonical Gate execution.
+    "project/stage128/",
 )
 ALLOWLIST_FILES = (
     "project/scripts/update_ai_handoff.py",
@@ -109,6 +114,15 @@ ALLOWLIST_FILES = (
     "project/src/stage127_m2_external_retrieval_request.py",
     "project/run_stage127_m2_external_retrieval_request.py",
     "project/tests/test_stage127_m2_external_retrieval_request.py",
+    # Stage128 M2 D2 boundary-month equity-return design-freeze code and
+    # tests (narrowest exact-file allowance; the generated freeze artifacts
+    # themselves live under the already-allowlisted project/stage128/
+    # directory, not here). Pure endpoint-selection function library built on
+    # top of the unchanged, frozen Stage127 window/adjacency primitives; no
+    # canonical Gate execution, no model fit, no prediction.
+    "project/src/stage128_m2_d2_boundary_month_equity_return.py",
+    "project/tests/test_stage128_m2_d2_boundary_month_equity_return.py",
+    "project/tests/test_stage128_m2_d2_design_freeze_package.py",
     # Stage124 Gregorian->Jalali Esfand converter correctness fix
     # (CODE-CORRECTNESS ONLY: gregorian_to_jalali_str could never emit month 12,
     # so every Esfand date was mislabelled and is_valid_exact_jalali_date
@@ -2729,6 +2743,7 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         **derive_m1_retained_design_freeze_markers(root),
         **derive_stage127_m2_market_data_gate_markers(root),
         **derive_stage127_m2_zero_trade_semantics_markers(root),
+        **derive_stage128_m2_d2_design_freeze_markers(root),
     }
 
 
@@ -4367,6 +4382,135 @@ def derive_stage127_m2_zero_trade_semantics_markers(root: str) -> dict:
         "stage127_m2_block_admitted_for_modeling": False,
         "m2_incremental_evaluation_authorized": False,
         "m2_modeling_started": False,
+    }
+
+
+_STAGE128_M2_D2_FREEZE_REL = (
+    "project/stage128/stage128_m2_d2_design_freeze.json"
+)
+_STAGE128_M2_D2_FREEZE_ACTION_ID = (
+    "stage128-m2-boundary-month-return-design-freeze"
+)
+_NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_FREEZE = (
+    "stage128-m2-d2-gate-rerun"
+)
+
+
+def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
+    """Recognize the (design-freeze-only) Stage128 M2 D2 amendment.
+
+    Narrow, fail-closed recognition mirroring the Stage126 retained-design-
+    freeze / Stage127 Gate recognizers above: if the freeze artifact is
+    present and internally consistent (no canonical Gate execution, no M2
+    admission, no model fit/prediction, no final-test access, historical
+    Stage127 D0 result preserved), the Handoff's
+    ``next_research_action_id`` advances to ``stage128-m2-d2-gate-rerun`` --
+    itself requiring a SEPARATE future human authorization; this function
+    never sets that authorization True and never marks M2 admitted or
+    started. It never overwrites the historical
+    ``stage127_m2_market_data_gate_status`` / ``..._block_admitted_for_
+    modeling`` markers set above, which remain the D0 historical record.
+    Returns {} before the freeze artifact has been built, so pre-freeze
+    Handoffs (and any branch without ``project/stage128/``) are unaffected.
+    """
+    path = os.path.join(root, _STAGE128_M2_D2_FREEZE_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        freeze = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable stage128 M2 D2 freeze artifact: {exc}") from exc
+
+    if freeze.get("decision_id") != _STAGE128_M2_D2_FREEZE_ACTION_ID:
+        raise HandoffError("stage128 M2 D2 freeze artifact decision_id mismatch")
+    if freeze.get("last_completed_research_action_id_if_this_pr_is_merged") != (
+        _STAGE128_M2_D2_FREEZE_ACTION_ID
+    ):
+        raise HandoffError(
+            "stage128 M2 D2 freeze artifact "
+            "last_completed_research_action_id_if_this_pr_is_merged mismatch"
+        )
+    if freeze.get("next_research_action_id_if_this_pr_is_merged") != (
+        _NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_FREEZE
+    ):
+        raise HandoffError(
+            "stage128 M2 D2 freeze artifact "
+            "next_research_action_id_if_this_pr_is_merged mismatch"
+        )
+    if freeze.get("historical_D0_gate_status") != _STAGE127_GATE_FAIL:
+        raise HandoffError(
+            "stage128 M2 D2 freeze artifact does not preserve the historical "
+            "Stage127 D0 Gate status"
+        )
+
+    exact = {
+        "canonical_gate_executed_in_this_action": False,
+        "M2_admitted_in_this_action": False,
+        "model_fits": 0,
+        "predictions": 0,
+        "final_test_access": 0,
+        "target_values_accessed": 0,
+        "shared_window_changed": False,
+        "t0_changed": False,
+        "T_star_changed": False,
+        "trading_day_sequence_changed": False,
+        "daily_return_adjacency_changed": False,
+        "realized_volatility_changed": False,
+        "amihud_illiquidity_changed": False,
+        "stage128_m2_d2_gate_rerun_authorized": False,
+        "M2_admitted": False,
+        "M2_incremental_evaluation_authorized": False,
+        "final_test_unlocked": False,
+        "next_action_identified_does_not_mean_authorized": True,
+    }
+    for key, want in exact.items():
+        if freeze.get(key) != want:
+            raise HandoffError(
+                f"stage128 M2 D2 freeze field {key}={freeze.get(key)!r} != {want!r}"
+            )
+
+    fw = freeze.get("final_test_firewall") or {}
+    for key in (
+        "final_test_unlocked", "final_test_access_authorized",
+        "final_test_predictor_values_inspected",
+        "final_test_target_values_inspected", "final_test_evaluation_performed",
+    ):
+        if fw.get(key) is not False:
+            raise HandoffError(f"stage128 M2 D2 freeze firewall field {key} not False")
+    if fw.get("final_test_locked") is not True:
+        raise HandoffError("stage128 M2 D2 freeze does not report final_test_locked")
+
+    sf = freeze.get("status_flags") or {}
+    for key in (
+        "canonical_gate_executed", "m2_admitted", "m2_started", "m3_started",
+        "m4_started", "final_model_selected", "paper_winner_selected", "merged",
+    ):
+        if sf.get(key) is not False:
+            raise HandoffError(f"stage128 M2 D2 freeze status_flags.{key} not False")
+    if sf.get("design_freeze_completed") is not True:
+        raise HandoffError(
+            "stage128 M2 D2 freeze status_flags.design_freeze_completed not True"
+        )
+
+    return {
+        "stage128_m2_d2_design_freeze_completed": True,
+        "stage128_m2_d2_gate_rerun_authorized": False,
+        "last_completed_research_action_id": _STAGE128_M2_D2_FREEZE_ACTION_ID,
+        "next_research_action_id": (
+            _NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_FREEZE
+        ),
+        "m2_incremental_evaluation_authorized": False,
+        "m2_modeling_started": False,
+        "m2_authorized": False,
+        "m2_started": False,
+        "paper_winner_selected": False,
+        "final_model_selected": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_predictor_values_inspected": False,
+        "final_test_target_values_inspected": False,
+        "final_test_evaluation_performed": False,
     }
 
 

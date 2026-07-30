@@ -592,11 +592,13 @@ def test_research_pointers_unchanged():
     report = _read_json(v.F_REPORT)
     assert report["active_workstream"] == "stage126_m1_financial_baseline"
     # Part 6 closed the six-category robustness set, the synthesis-only
-    # robustness closure completed, and the retained-design freeze (PR #65)
+    # robustness closure completed, the retained-design freeze (PR #65)
+    # completed, and the Stage128 M2 D2 boundary-month design freeze (PR #69)
     # has since also completed: the next research action legitimately
-    # transitioned once more to the M2 market-data-gate milestone (which
-    # itself still requires a separate future human authorization).
-    assert report["next_research_action_id"] == "stage127-m2-market-data-gate"
+    # transitioned once more to the D2 Gate re-run pointer (which itself
+    # still requires a separate future human authorization -- see
+    # STAGE128_M2_D2_DESIGN_FREEZE.md §8-9).
+    assert report["next_research_action_id"] == "stage128-m2-d2-gate-rerun"
 
 
 @pytest.mark.parametrize("field", sorted(
@@ -685,8 +687,8 @@ def test_handoff_carries_boundary_markers():
 def _mirror(tmp_path: Path) -> Path:
     """Copy the Stage126/Stage125/docs surfaces the validator reads."""
     root = tmp_path / "repo"
-    for rel in ("project/stage126", "project/stage125", "project/docs/ai",
-                "project/src", "project/tests"):
+    for rel in ("project/stage126", "project/stage125", "project/stage128",
+                "project/docs/ai", "project/src", "project/tests"):
         src = Path(REAL_ROOT) / rel
         dst = root / rel
         dst.parent.mkdir(parents=True, exist_ok=True)

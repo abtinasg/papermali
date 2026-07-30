@@ -1,0 +1,178 @@
+{
+  "all_pass": true,
+  "assertion_count": 42,
+  "assertions": [
+    {
+      "name": "decision_id_matches_authorization",
+      "status": "PASS"
+    },
+    {
+      "name": "authorized_action_id_matches_authorization",
+      "status": "PASS"
+    },
+    {
+      "name": "merge_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "name": "d2_gate_rerun_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_incremental_evaluation_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "name": "modeling_authorized_by_this_action_false",
+      "status": "PASS"
+    },
+    {
+      "name": "final_test_access_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "name": "shared_window_W_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "t0_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "T_star_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "daily_return_adjacency_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "minimum_usable_daily_returns_126_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "realized_volatility_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "amihud_illiquidity_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "no_fourth_primary_market_feature_added",
+      "status": "PASS"
+    },
+    {
+      "name": "zero_trade_day_ratio_not_primary",
+      "status": "PASS"
+    },
+    {
+      "name": "calendar_convention_gregorian",
+      "status": "PASS"
+    },
+    {
+      "name": "no_cross_month_fallback",
+      "status": "PASS"
+    },
+    {
+      "name": "no_imputation_forward_fill_backward_fill",
+      "status": "PASS"
+    },
+    {
+      "name": "no_interpolation_extrapolation",
+      "status": "PASS"
+    },
+    {
+      "name": "no_unadjusted_close_substitution",
+      "status": "PASS"
+    },
+    {
+      "name": "no_synthetic_adjusted_prices",
+      "status": "PASS"
+    },
+    {
+      "name": "endpoint_validity_semantics_documented",
+      "status": "PASS"
+    },
+    {
+      "name": "d0_historical_fail_status_preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "d1_marked_diagnostic_only",
+      "status": "PASS"
+    },
+    {
+      "name": "d3_marked_not_adopted",
+      "status": "PASS"
+    },
+    {
+      "name": "jalali_marked_not_adopted",
+      "status": "PASS"
+    },
+    {
+      "name": "d0_reproduction_matches_authorizing_utterance",
+      "status": "PASS"
+    },
+    {
+      "name": "d1_d2_d3_jalali_marked_not_independently_reproduced",
+      "status": "PASS"
+    },
+    {
+      "name": "no_synthetic_data_manufactured_as_reproduction",
+      "status": "PASS"
+    },
+    {
+      "name": "feasibility_provenance_artifact_present",
+      "status": "PASS"
+    },
+    {
+      "name": "eligibility_audit_contract_present_not_executed",
+      "status": "PASS"
+    },
+    {
+      "name": "historical_stage127_artifacts_untouched",
+      "status": "PASS"
+    },
+    {
+      "name": "canonical_gate_executed_in_this_action_false",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_admitted_in_this_action_false",
+      "status": "PASS"
+    },
+    {
+      "name": "target_values_accessed_zero",
+      "status": "PASS"
+    },
+    {
+      "name": "model_fits_zero",
+      "status": "PASS"
+    },
+    {
+      "name": "predictions_zero",
+      "status": "PASS"
+    },
+    {
+      "name": "final_test_access_zero",
+      "status": "PASS"
+    },
+    {
+      "name": "next_action_identified_does_not_imply_authorized",
+      "status": "PASS"
+    },
+    {
+      "name": "focused_stage128_tests_pass",
+      "status": "PASS"
+    },
+    {
+      "name": "relevant_suite_tests_pass",
+      "status": "PASS"
+    }
+  ],
+  "contract_id": "stage128_m2_d2_boundary_month_equity_return_design_freeze",
+  "decision_id": "stage128-m2-boundary-month-return-design-freeze",
+  "generated_for": "stage128-m2-boundary-month-return-design-freeze",
+  "scope_note": "This QC report checks internal consistency of the Stage128 design-freeze package itself (authorization scope, frozen-vs-changed invariants, historical preservation, provenance honesty, and the no-execution guarantees). It is not a re-run of the canonical M2 Gate and does not itself constitute a Gate decision."
+}

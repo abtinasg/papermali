@@ -1,0 +1,88 @@
+{
+  "audit_table_path": "stage128/stage128_m2_d0_reproduction_audit_table.csv",
+  "audit_table_row_count": 666,
+  "audit_table_sha256": "7e11fccedea83370773b4f8a3c3acf61b7913a8b265a4de76e6fd92d927d8740",
+  "audit_table_target_free": true,
+  "canonical_gate_executions_in_this_reproduction": 0,
+  "d0_independently_reproduced_in_repository": true,
+  "d0_reproduction": {
+    "amihud_illiquidity_usable": 576,
+    "d0_equity_return_window_usable": 269,
+    "development_pair_count": 666,
+    "realized_volatility_usable": 576,
+    "target_or_distress_column_present": false,
+    "target_values_accessed": 0,
+    "three_variable_common_sample_usable": 269
+  },
+  "d0_reproduction_matches_authorizing_utterance": true,
+  "d1_d2_d3_jalali_independently_reproduced_in_repository": false,
+  "d1_d2_d3_jalali_non_reproduction_reason": "D1/D2/D3/Jalali usability requires raw per-day adjusted-close market observations across each pair's 12-calendar-month window. Those raw daily rows are not committed to this repository; only aggregate per-pair columns (used for the D0 reproduction above) and external-bundle SHA256 provenance are present. Fabricating synthetic daily prices to reproduce these externally-supplied counts would manufacture false provenance for numbers that must match real historical evidence, so they are instead recorded verbatim as externally-supplied historical evidence, anchored to the authorizing human utterance.",
+  "development_pair_count": 666,
+  "externally_supplied_evidence_provenance": "stage128_m2_d2_human_authorization_record.json:human_source_utterance_sha256",
+  "externally_supplied_feasibility_evidence": {
+    "D0": {
+      "total": 666,
+      "usable": 269
+    },
+    "D1_diagnostic_upper_bound": {
+      "total": 666,
+      "usable": 576
+    },
+    "D2_gregorian": {
+      "total": 666,
+      "usable": 539
+    },
+    "D2_three_feature_common": {
+      "total": 666,
+      "usable": 539
+    },
+    "D3_monthly_as_of": {
+      "common": 553,
+      "total": 666,
+      "usable": 555
+    },
+    "d2_failure_taxonomy_non_exclusive": {
+      "LT126_VALID_RETURNS": 90,
+      "NO_END_BOUNDARY_PRICE": 17,
+      "NO_START_BOUNDARY_PRICE": 55
+    },
+    "d2_unusable_total": 127,
+    "dual_usable_return_value_difference": 0,
+    "dual_usable_under_both_calendars": 456,
+    "gregorian_jalali_usability_switches": 86,
+    "jalali_boundary_diagnostic": {
+      "total": 666,
+      "usable": 459
+    },
+    "temporal_fold_coverage": {
+      "fold1_train": {
+        "total": 245,
+        "usable": 173
+      },
+      "fold1_validation": {
+        "total": 205,
+        "usable": 159
+      },
+      "fold2_train": {
+        "total": 450,
+        "usable": 332
+      },
+      "fold2_validation": {
+        "total": 216,
+        "usable": 207
+      }
+    }
+  },
+  "final_test_access": 0,
+  "input_bundle": "stage127_m2_tsetmc_full_delivery.zip",
+  "input_bundle_present_in_repository": false,
+  "input_bundle_sha256": "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec",
+  "label": "REPRODUCTION_OF_PRELOCK_PREDICTOR_ONLY_FEASIBILITY",
+  "model_fits": 0,
+  "new_candidate_design_introduced": false,
+  "new_threshold_introduced": false,
+  "predictions": 0,
+  "purpose": "Independent in-repository reproduction check for the predictor-only feasibility counts referenced by the Stage128 D2 design freeze. Evaluates only already-defined D0/D1/D2/D3/Jalali definitions; introduces no new candidate design, threshold, target access, or model.",
+  "starting_scientific_lineage_source_main_commit": "b25804ab764258c846b391f4823f089552c855e3",
+  "target_columns_accessed": 0
+}

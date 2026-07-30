@@ -147,10 +147,37 @@ After this design lock, but **before** interpreting any M2 predictive result, a 
 
 ## 7. Historical Stage127 reference
 
-`project/docs/ai/CURRENT_STATE.md`, `project/docs/ai/handoff_state.json`, and `project/stage127/README_STAGE127_M2_MARKET_DATA_GATE.md` continue to record the historical D0 Gate outcome `FAIL_M2_DATA_GATE` unchanged by this document. This freeze does not update `next_research_action_id`, does not mark the M2 Gate as passed, and does not mark M2 admitted for modeling.
+`project/stage127/README_STAGE127_M2_MARKET_DATA_GATE.md` and all other historical Stage127 artifacts continue to record, byte-for-byte unchanged, the historical D0 Gate outcome `FAIL_M2_DATA_GATE`. This freeze does not mark the M2 Gate as passed and does not mark M2 admitted for modeling. `project/docs/ai/ROADMAP.md`, `project/docs/ai/OPEN_TASKS.md`, and (via the canonical generator only) `project/docs/ai/handoff_state.json`/`CURRENT_STATE.md` are updated to represent the *resulting* research-pointer state **if and only if this PR is merged** — see §9. Until merge, the live pointers on `main` are unaffected by this PR.
 
 ## 8. Next state (explicitly not authorized by this freeze)
 
-This design-freeze PR, once separately audited and explicitly merged, may become the completed research action for `stage128-m2-boundary-month-return-design-freeze`. It does **not** itself authorize `stage128-m2-d2-gate-rerun` or any equivalent successor. After this freeze PR is complete, the next action remains a future, separately authorized canonical D2 Gate execution.
+This design-freeze PR, once separately audited and explicitly merged, becomes the completed research action for `stage128-m2-boundary-month-return-design-freeze`. It does **not** itself authorize `stage128-m2-d2-gate-rerun` or any equivalent successor — that identification is a pointer only, not an authorization. After this freeze PR is complete, the next action remains a future, separately authorized canonical D2 Gate execution.
+
+## 9. Machine-readable freeze package
+
+The human-readable contract above is mirrored, with additional machine-checkable detail, under [`project/stage128/`](../../stage128/):
+
+- [`stage128_m2_d2_design_freeze.json`](../../stage128/stage128_m2_d2_design_freeze.json) — the full machine-readable freeze record (authorization scope, D2 formula contract, unchanged/changed invariants, endpoint-validity semantics, D0/D1/D3/Jalali status, eligibility-audit contract, and the resulting-if-merged research pointers).
+- [`stage128_m2_d2_human_authorization_record.json`](../../stage128/stage128_m2_d2_human_authorization_record.json) — the verbatim authorizing human utterance, its SHA256, and the separately labeled derived (non-verbatim) normalized scope.
+- [`stage128_m2_d2_design_freeze_qc_report.json`](../../stage128/stage128_m2_d2_design_freeze_qc_report.json) — internal-consistency assertions for this package (not a Gate re-run).
+- [`metadata_and_hashes_stage128_m2_d2_design_freeze.json`](../../stage128/metadata_and_hashes_stage128_m2_d2_design_freeze.json) — SHA256 manifest of every package and referenced source artifact.
+- [`stage128_m2_d2_feasibility_provenance.json`](../../stage128/stage128_m2_d2_feasibility_provenance.json) and [`reproduce_prelock_predictor_only_feasibility.py`](../../stage128/reproduce_prelock_predictor_only_feasibility.py) — see §10.
+
+## 10. Feasibility provenance and reproduction — honest limitation
+
+The D0 count (269/666) is **independently and exactly reproduced in this repository** from the already-committed, target-free `project/stage127/stage127_m2_development_features.csv` (666 rows; no distress/target label column) by `reproduce_prelock_predictor_only_feasibility.py`, labeled `REPRODUCTION_OF_PRELOCK_PREDICTOR_ONLY_FEASIBILITY`.
+
+The D1, D2 (Gregorian), D3, and Jalali-boundary-diagnostic counts in §5 require raw **per-day** adjusted-close observations across each pair's 12-calendar-month window. That raw daily data was never committed to this repository — only aggregate per-pair columns and the external-bundle SHA256 provenance (`d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`) are present. These four counts are therefore recorded as **externally-supplied historical evidence**, explicitly flagged `d1_d2_d3_jalali_independently_reproduced_in_repository = false` in `stage128_m2_d2_feasibility_provenance.json`, and are **not** independently re-derived here. No synthetic daily-price data was fabricated to manufacture an artificial reproduction of these counts.
+
+## 11. Endpoint adjusted-close validity semantics (frozen, disambiguated)
+
+Endpoint eligibility inherits the exact D0 rule (`project/src/stage127_m2_market_data_gate.py: compute_pair_features`): an observation is eligible when `adjusted_close is not None`. A literal `adjusted_close == 0.0` is **not** separately rejected by that rule.
+
+D2 therefore applies:
+
+- **Start boundary (`d_start`, denominator of `R_D2`)**: `adjusted_close is not None` **and** `adjusted_close != 0` — the nonzero guard exists only because `d_start`'s price is the division denominator, mirroring D0's own `p_first != 0` guard.
+- **End boundary (`d_end`, numerator of `R_D2`)**: `adjusted_close is not None` only. A literal `0.0` at the end boundary is permitted under the inherited D0 semantics and is **not** silently upgraded to `adjusted_close > 0`.
+
+This does not change the observed 539/666 D2 Gregorian universe recorded in §5.
 
 Required values for this task: target values accessed = 0; model fits = 0; predictions = 0; final-test access = 0; canonical Gate executions = 0; canonical Gate changed = NO; M2 admitted = NO.

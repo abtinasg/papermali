@@ -5,8 +5,13 @@ front matter; this file is the working description.
 
 ## Active research workstream: `stage126-m1-financial-baseline`
 
-Authoritative research pointers live in `ROADMAP.md` front matter:
-`last_completed_research_action_id=stage126-m1-retained-design-freeze`,
+Authoritative research pointers live in `ROADMAP.md` front matter. **If and
+when PR #69 is merged**, they become
+`last_completed_research_action_id=stage128-m2-boundary-month-return-design-freeze`,
+`next_research_action_id=stage128-m2-d2-gate-rerun` (a pointer only — see
+"Stage128 D2 design freeze" below; `stage128-m2-d2-gate-rerun` is explicitly
+**not** authorized by that freeze). Until merge, the pointers live on `main`
+remain `last_completed_research_action_id=stage126-m1-retained-design-freeze`,
 `next_research_action_id=stage127-m2-market-data-gate` — the Gate has now been
 RE-EXECUTED and RESOLVED from imported authoritative evidence, and returned
 **`FAIL_M2_DATA_GATE`**. The research pointer therefore deliberately does NOT
@@ -108,6 +113,44 @@ the `t0` endpoint-price requirement, 99 fail only the `tN` (T*) requirement,
 132 miss both, and 90 fall below the 126-observation minimum. No remediation
 is authorized here, and the research pointer stays on
 `stage127-m2-market-data-gate`: no new scientific next action was invented.
+
+## Stage128 D2 boundary-month equity-return design freeze — current, truthful state (PR #69, unmerged)
+
+`stage128-m2-boundary-month-return-design-freeze` is a **design-freeze/contract
+action only** (PR #69, unmerged). It freezes
+`BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN` (Gregorian calendar convention) as
+the new PRIMARY M2 equity-return construct, replacing only the D0
+exact-endpoint measurement component. `W`, `t0`, `T*`, trading-day sequence,
+daily-return adjacency, the 126-return floor, `realized_volatility` and
+`amihud_illiquidity` are unchanged; no fourth primary market feature is added
+and `zero_trade_day_ratio_W` remains diagnostic-only. Full contract:
+[`STAGE128_M2_D2_DESIGN_FREEZE.md`](STAGE128_M2_D2_DESIGN_FREEZE.md) and
+`project/stage128/`.
+
+**Historical D0 result preserved, unchanged.** The Stage127 Gate result above
+(`FAIL_M2_DATA_GATE`, `equity_return_window` 269/666) is untouched by this
+freeze. This freeze does not rerun that Gate, does not mark it PASS, and does
+not admit M2 into modeling.
+
+**Feasibility provenance, reproduced honestly.** D0 (269/666) is independently
+reproduced in-repository from the already-committed, target-free
+`stage127_m2_development_features.csv` by
+`project/stage128/reproduce_prelock_predictor_only_feasibility.py`. D1/D2
+(Gregorian, 539/666)/D3/the Jalali-boundary diagnostic each require raw
+per-day price data that was never committed to this repository (only the
+external bundle's SHA256 is referenced); those four counts are recorded as
+externally-supplied historical evidence only, explicitly flagged as not
+independently re-derived in-repo — no synthetic data was fabricated to
+manufacture a fake reproduction.
+
+**Not authorized by this freeze:** canonical M2 Gate rerun
+(`stage128-m2-d2-gate-rerun`), M2 incremental evaluation, model fitting,
+prediction generation, final-test access, M3/M4 start, or merge of PR #69
+without a later, separate, explicit authorization. See
+`project/stage128/stage128_m2_d2_human_authorization_record.json` for the
+exact authorization scope and
+`project/stage128/stage128_m2_d2_design_freeze.json` for the full
+machine-readable record.
 
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
 Part 3B.1E is the decision-lock surface for the conservative-lag research
