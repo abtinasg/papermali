@@ -3729,12 +3729,39 @@ def render_current_state(record: dict) -> str:
         resolved = record.get("stage127_m2_market_data_gate_resolved")
         admitted = record.get("stage127_m2_block_admitted_for_modeling")
         gate_ok = "✅" if admitted else "⛔"
+        # Once the Stage128 D2 design freeze is recognized as completed, the
+        # Stage127 Gate is no longer the CURRENT scientific action and is no
+        # longer awaiting a human decision: it is a HISTORICAL, completed and
+        # resolved Gate whose terminal FAIL result stands unchanged.
+        stage128_freeze = record.get("stage128_m2_d2_design_freeze_completed")
+        if stage128_freeze:
+            heading = (
+                "## Stage127 — M2 market-data admission Gate "
+                "(HISTORICAL — COMPLETED AND RESOLVED)\n"
+            )
+            preamble = (
+                "_Historical record, **not** the current scientific action. "
+                "The Gate was executed under its own pre-existing human "
+                "authorization and returned a terminal, resolved result. The "
+                "human review it originally required has since been completed: "
+                "it was discharged by the separately authorized "
+                "`stage128-m2-boundary-month-return-design-freeze` action "
+                "(see the Stage128 section below), which is the answer to "
+                "\"which scientific action follows the failed M2 extension\". "
+                "The historical D0 Gate result below remains "
+                "`FAIL_M2_DATA_GATE` and is **never** rewritten to PASS._\n"
+            )
+        else:
+            heading = "## Stage127 — M2 market-data admission Gate\n"
+            preamble = (
+                "_The current scientific action. Its human authorization "
+                "already exists; the Gate has been executed and its result is "
+                "reported here. This section exists so the snapshot can never "
+                "render the project as though Stage127 had not happened._\n"
+            )
         lines += [
-            "## Stage127 — M2 market-data admission Gate\n",
-            "_The current scientific action. Its human authorization already "
-            "exists; the Gate has been executed and its result is reported "
-            "here. This section exists so the snapshot can never render the "
-            "project as though Stage127 had not happened._\n",
+            heading,
+            preamble,
             f"- {gate_ok} **Gate status:** `{status}`",
             f"- **Executed:** {record['stage127_m2_market_data_gate_executed']}"
             f" — **resolved (terminal observed decision):** {resolved}",
@@ -3799,8 +3826,66 @@ def render_current_state(record: dict) -> str:
             "- **No M2 modeling authorization follows from this.** The "
             "shortfall is now established as TRUE frozen-contract missingness "
             "rather than a data defect.",
-            "- ⏳ **Human decision still required:** which scientific roadmap "
-            "action follows the failed M2 extension.",
+        ]
+        if record.get("stage128_m2_d2_design_freeze_completed"):
+            lines += [
+                "- ✅ **Human decision COMPLETED (historical).** A human "
+                "decision on which scientific roadmap action follows the "
+                "failed M2 extension was originally required "
+                "(`stage127_m2_human_review_originally_required=true`). It was "
+                "made and discharged by the separately authorized "
+                "`stage128-m2-boundary-month-return-design-freeze` action; "
+                "`stage127_m2_semantics_human_decision_required` is therefore "
+                "now `false`. The historical Gate result is unchanged.",
+            ]
+        else:
+            lines += [
+                "- ⏳ **Human decision still required:** which scientific "
+                "roadmap action follows the failed M2 extension.",
+            ]
+        lines += [""]
+    if record.get("stage128_m2_d2_design_freeze_completed"):
+        lines += [
+            "## Stage128 — M2 D2 boundary-month equity-return design freeze "
+            "(CURRENT)\n",
+            "_The current scientific state. This is a DESIGN-FREEZE / "
+            "CONTRACT action only: no canonical Gate was executed, no model "
+            "was fit, no prediction was generated and no final-test row was "
+            "read._\n",
+            "- ✅ **D2 design freeze completed:** "
+            f"{record['stage128_m2_d2_design_freeze_completed']}",
+            "- **Frozen primary M2 equity-return construct:** "
+            "`BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN` — calendar "
+            "convention **GREGORIAN** (selected for coherence with the frozen "
+            "Gregorian market-time axis, not because it clears a coverage "
+            "threshold)",
+            "- ⛔ **Historical D0 Gate remains** "
+            f"`{record.get('stage127_m2_market_data_gate_status')}` — "
+            "preserved unchanged; never rewritten to PASS",
+            # NB: deliberately NOT phrased "Last completed research action" —
+            # that exact phrase is reserved by test_ai_handoff so a robustness
+            # micro-part can never be mislabelled as a research action.
+            "- **Research action completed by this freeze:** "
+            f"`{record['last_completed_research_action_id']}`",
+            "- **Next research action (pointer only):** "
+            f"`{record['next_research_action_id']}` — the canonical M2 Gate "
+            "re-run under the frozen D2 construct",
+            "- ⛔ **D2 Gate rerun authorized:** "
+            f"{record.get('stage128_m2_d2_gate_rerun_authorized')} — "
+            "identifying the next action is NOT an authorization to execute "
+            "it; that requires a separate, explicit human authorization",
+            f"- ⛔ **M2 admitted:** {record.get('m2_authorized')} — "
+            f"**M2 incremental evaluation authorized:** "
+            f"{record.get('m2_incremental_evaluation_authorized')} — "
+            f"**M2 modeling started:** {record.get('m2_modeling_started')}",
+            "- 🔒 **Final test locked:** final_test_unlocked="
+            f"{record.get('final_test_unlocked')}, "
+            f"final_test_access_authorized="
+            f"{record.get('final_test_access_authorized')}, "
+            f"final_test_evaluation_performed="
+            f"{record.get('final_test_evaluation_performed')}",
+            "- Contract: `project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md`; "
+            "machine-readable package: `project/stage128/`",
             "",
         ]
     lines += [
@@ -4495,6 +4580,27 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
     return {
         "stage128_m2_d2_design_freeze_completed": True,
         "stage128_m2_d2_gate_rerun_authorized": False,
+        # --- Stage127 human-review closure -------------------------------- #
+        # Stage127's terminal FAIL result DID require a human decision about
+        # which scientific roadmap action follows it. That decision has now
+        # been made: the human supervisor separately authorized the Stage128
+        # D2 boundary-month design freeze, which IS the answer to that
+        # question. Once this freeze is recognized as completed, it is no
+        # longer true that Stage127 is pending human review — so these two
+        # markers are flipped False here (this recognizer is merged LAST, so
+        # it overrides the Stage127 recognizers above). The historical facts
+        # are preserved, not erased: `stage127_m2_market_data_gate_status`
+        # remains FAIL_M2_DATA_GATE and is never touched here, and the two
+        # markers below record that the review was originally required and
+        # by which action it was discharged.
+        "stage127_m2_market_data_gate_terminal_result_pending_human_review": (
+            False
+        ),
+        "stage127_m2_semantics_human_decision_required": False,
+        "stage127_m2_human_review_originally_required": True,
+        "stage127_m2_human_review_resolved_by_action_id": (
+            _STAGE128_M2_D2_FREEZE_ACTION_ID
+        ),
         "last_completed_research_action_id": _STAGE128_M2_D2_FREEZE_ACTION_ID,
         "next_research_action_id": (
             _NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_FREEZE

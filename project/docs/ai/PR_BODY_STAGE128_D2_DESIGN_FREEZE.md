@@ -16,7 +16,7 @@ This is a **design-freeze / contract PR only**. It adds:
 - [`project/src/stage128_m2_d2_boundary_month_equity_return.py`](../../src/stage128_m2_d2_boundary_month_equity_return.py) — pure-function D2 endpoint-selection and return-construction logic, built on top of the unchanged, frozen `pair_scientific_window` / `daily_simple_returns` from `project/src/stage127_m2_market_data_gate.py`. It does not touch `realized_volatility` or `amihud_illiquidity`.
 - [`project/tests/test_stage128_m2_d2_boundary_month_equity_return.py`](../../tests/test_stage128_m2_d2_boundary_month_equity_return.py) and [`project/tests/test_stage128_m2_d2_design_freeze_package.py`](../../tests/test_stage128_m2_d2_design_freeze_package.py) — development-side/synthetic fixtures and package-consistency checks only.
 - [`STAGE128_M2_D2_DESIGN_FREEZE.md`](STAGE128_M2_D2_DESIGN_FREEZE.md) — the human-readable contract (authorization scope, D2 formula, Gregorian lock rationale, D0/D1/D3 historical/diagnostic status, feasibility provenance, endpoint validity semantics, failure taxonomy, temporal-availability limitation, and the post-lock eligibility-audit contract).
-- `project/stage128/` — the machine-readable governance package: `stage128_m2_d2_design_freeze.json`, `stage128_m2_d2_human_authorization_record.json` (verbatim authorizing utterance + SHA256), `stage128_m2_d2_design_freeze_qc_report.json` (42/42 assertions PASS), `metadata_and_hashes_stage128_m2_d2_design_freeze.json`, `stage128_m2_d2_feasibility_provenance.json` and `reproduce_prelock_predictor_only_feasibility.py` (labeled `REPRODUCTION_OF_PRELOCK_PREDICTOR_ONLY_FEASIBILITY`), and `stage128_m2_d0_reproduction_audit_table.csv` (target-free, 666 rows).
+- `project/stage128/` — the machine-readable governance package: `stage128_m2_d2_design_freeze.json`, `stage128_m2_d2_human_authorization_record.json` (verbatim authorizing utterance + SHA256), `stage128_m2_d2_design_freeze_qc_report.json` (43/43 REQUIRED freeze-package assertions PASS — `all_pass` means the required package assertions, including the no-new-regressions-vs-base check; it does **not** claim the relevant suite had zero failures), `metadata_and_hashes_stage128_m2_d2_design_freeze.json`, `stage128_m2_d2_feasibility_provenance.json` and `d0_reproduction_and_prelock_feasibility_archival_record.py` (labeled `D0_REPRODUCTION_PLUS_ARCHIVAL_RECORD_OF_PRELOCK_EXTERNAL_FEASIBILITY_EVIDENCE`), and `stage128_m2_d0_reproduction_audit_table.csv` (target-free, 666 rows).
 - Allowlist update in `project/scripts/update_ai_handoff.py`: `project/stage128/` added to `ALLOWLIST_DIRS`; the two Stage128 `project/src/`/`project/tests/` files added by exact path to `ALLOWLIST_FILES` (no broad `project/src/`/`project/tests/` allowance).
 - A new `derive_stage128_m2_d2_design_freeze_markers` recognizer in `update_ai_handoff.py`, and a matching `stage128_m2_d2_design_freeze_completed` recognizer in `project/src/stage126_current_state_validator.py`, both narrow and fail-closed (mirroring the existing Stage126 retained-design-freeze pattern): they advance the research pointer ONLY when the freeze artifact is present and internally consistent, never authorize the Gate re-run, and never touch the historical Stage127 D0 markers.
 - Governance-surface updates: `ROADMAP.md` (new items 22-23, front-matter pointers updated to represent the state *if this PR is merged*, with an explicit not-yet-live note), `OPEN_TASKS.md`, `DECISIONS.md`.
@@ -37,7 +37,21 @@ No frozen Stage125/Stage127 scientific artifact is modified; the historical `FAI
 
 ## Feasibility provenance (honest limitation)
 
-D0 (269/666) is **independently and exactly reproduced in-repository** from the already-committed, target-free `stage127_m2_development_features.csv`. D1/D2 (Gregorian, 539/666)/D3/the Jalali diagnostic require raw per-day price data that was **never committed to this repository** (only the external bundle's SHA256 is referenced); these four are recorded as externally-supplied historical evidence only, explicitly flagged `d1_d2_d3_jalali_independently_reproduced_in_repository = false` — no synthetic data was fabricated to manufacture a fake reproduction.
+D0 (269/666) is **independently and exactly reproduced in-repository** from the already-committed, target-free `stage127_m2_development_features.csv`. D1/D2 (Gregorian, 539/666)/D3/the Jalali diagnostic require raw per-day price data that was **never committed to this repository** (only the external bundle's SHA256 is referenced); these four are ARCHIVED as **externally supplied historical feasibility evidence** only, explicitly flagged `d1_d2_d3_jalali_independently_reproduced_in_repository = false` — no synthetic data was fabricated to manufacture a fake reproduction.
+
+Recorded separately in `stage128_m2_d2_feasibility_provenance.json`:
+
+- `historical_counts_transmitted_by_human = true` — the human authorization text is the **transmission channel** for those counts, not the scientific source of truth (`externally_supplied_evidence_is_scientific_source_of_truth = false`).
+- `external_market_bundle_sha256 = d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`; `raw_bundle_present_in_repository = false`.
+- `prelock_D2_count_independently_verified_in_repository = false`.
+- `canonical_confirmation_deferred_to = stage128-m2-d2-gate-rerun` — which remains **unauthorized**.
+- `original_prelock_feasibility_script_not_preserved = true` — the original pre-lock scratchpad feasibility script/output are not preserved and cannot be hashed; no substitute provenance is manufactured.
+
+## Authorization provenance
+
+`stage128_m2_d2_human_authorization_record.json` records the **ORIGINAL Stage128 D2 scientific authorization** (`authorization_class = ORIGINAL_SCIENTIFIC_AUTHORIZATION`) — the human-supervisor message beginning "I explicitly authorize the following scientific research action ONLY:" and authorizing `stage128-m2-boundary-month-equity-return-design-freeze`. It is **not** the later PR #69 governance-package continuation instruction: those later instructions requested repository-governance work only and created **no** new scientific decision (`later_pr69_governance_continuation_created_new_scientific_decision = false`).
+
+One unrelated trailing sentence belonging to the earlier PR #68 merge context ("The next scientific action — Gregorian D2 design amendment/freeze — is separate and is NOT authorized by this merge.") was removed from the recorded verbatim text, and `human_source_utterance_sha256` plus every dependent hash were recomputed. Corrected `human_source_utterance_sha256`: `dd462fa29ef3ec494bf0f76a725f958ae94a52651ed4f84411d962af9d4504a6`.
 
 ## Test plan
 
@@ -55,9 +69,9 @@ Relevant suite (Stage127 Gate primitives, external-delivery/import controls, tra
 PYTHONPATH=project python -m pytest project/tests/test_ai_handoff.py project/tests/test_stage126_current_state_validator.py project/tests/test_stage128_m2_d2_boundary_month_equity_return.py project/tests/test_stage128_m2_d2_design_freeze_package.py project/tests/test_stage127_m2_market_data_gate.py project/tests/test_stage127_m2_external_delivery_import.py project/tests/test_stage127_m2_zero_trade_semantics_import.py project/tests/test_stage127_m2_external_retrieval_request.py -q
 ```
 
-Result: **765 passed, 8 failed, 26 skipped**. All 8 failures are the identical pre-existing `FileNotFoundError` for a gitignored, untracked input (`project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv`), confirmed present in an identical clean checkout of the PR base commit (`b25804ab764258c846b391f4823f089552c855e3`) — an environment/untracked-asset limitation, not a regression from this change.
+__RELEVANT_SUITE_RESULT__
 
-Full-suite base-vs-head comparison (`--junitxml`, same machine/environment): base `b25804ab764258c846b391f4823f089552c855e3` = 2529 passed / 289 failed / 75 errored / 26 skipped; head (`d65731b`) = 2575 passed / 289 failed / 75 errored / 26 skipped. `new_failure_nodeids = 0`, `new_error_nodeids = 0`, `resolved_failure_nodeids = 0` (the +46 passed are the new Stage128 tests; the pointer-transition regression tests in `test_ai_handoff.py`/`test_stage126_current_state_validator.py` were updated to match the legitimately-advanced pointer and remain in the passing set on both sides after that update).
+__FULL_SUITE_RESULT__
 
 ## Research pointers
 

@@ -1,6 +1,7 @@
 {
   "all_pass": true,
-  "assertion_count": 42,
+  "all_pass_semantics": "all_pass means: every REQUIRED freeze-package assertion listed in `assertions` passed, INCLUDING the no-new-regressions-vs-base check. It does NOT mean the entire relevant test suite literally had zero failures -- it did not. See `test_evidence` for the literal, unhidden suite counts.",
+  "assertion_count": 43,
   "assertions": [
     {
       "name": "decision_id_matches_authorization",
@@ -167,12 +168,30 @@
       "status": "PASS"
     },
     {
-      "name": "relevant_suite_tests_pass",
+      "detail": "no new failures and no new errors versus the exact PR base commit b25804ab764258c846b391f4823f089552c855e3 on the same machine/environment. This assertion is a REGRESSION check; it does NOT assert that the relevant suite had zero failures (it did not -- see test_evidence).",
+      "name": "relevant_suite_regression_check_pass",
+      "status": "PASS"
+    },
+    {
+      "detail": "the 8 relevant-suite failures are the identical pre-existing FileNotFoundError present at base",
+      "name": "relevant_suite_known_environment_failures_unchanged_vs_base",
       "status": "PASS"
     }
   ],
   "contract_id": "stage128_m2_d2_boundary_month_equity_return_design_freeze",
   "decision_id": "stage128-m2-boundary-month-return-design-freeze",
   "generated_for": "stage128-m2-boundary-month-return-design-freeze",
-  "scope_note": "This QC report checks internal consistency of the Stage128 design-freeze package itself (authorization scope, frozen-vs-changed invariants, historical preservation, provenance honesty, and the no-execution guarantees). It is not a re-run of the canonical M2 Gate and does not itself constitute a Gate decision."
+  "required_freeze_package_assertions_all_pass": true,
+  "scope_note": "This QC report checks internal consistency of the Stage128 design-freeze package itself (authorization scope, frozen-vs-changed invariants, historical preservation, provenance honesty, and the no-execution guarantees). It is not a re-run of the canonical M2 Gate and does not itself constitute a Gate decision.",
+  "test_evidence": {
+    "focused_stage128_tests_command": "PYTHONPATH=project python -m pytest project/tests/test_stage128_m2_d2_boundary_month_equity_return.py project/tests/test_stage128_m2_d2_design_freeze_package.py -q",
+    "focused_stage128_tests_pass": true,
+    "known_environment_failure_limitation": "All 8 relevant-suite failures are the identical pre-existing FileNotFoundError for the gitignored, untracked Stage125 input project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv. The identical 8 failures are present in a clean checkout of the PR base commit b25804ab764258c846b391f4823f089552c855e3 on the same machine/environment, so they are an environment/untracked-asset limitation of this checkout, not a regression introduced by this PR. They are recorded, not hidden.",
+    "relevant_suite_all_pass": false,
+    "relevant_suite_baseline_ref": "b25804ab764258c846b391f4823f089552c855e3",
+    "relevant_suite_known_environment_failures": 8,
+    "relevant_suite_new_errors_vs_base": 0,
+    "relevant_suite_new_failures_vs_base": 0,
+    "relevant_suite_regression_check_pass": true
+  }
 }

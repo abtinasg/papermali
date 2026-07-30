@@ -1362,3 +1362,93 @@ def test_informational_drift_reported_but_never_fails_build_assertions():
     names = {a["name"]: a for a in meta["assertions"]}
     assert "closed_part_registry_scientific_state_immutable" in names
     assert names["closed_part_registry_scientific_state_immutable"]["status"] == "PASS"
+
+
+# --------------------------------------------------------------------------- #
+# Stage127 human-review closure after the Stage128 D2 design freeze
+# --------------------------------------------------------------------------- #
+
+def _live_handoff() -> dict:
+    return json.loads(
+        (_root() / v.HANDOFF_STATE_REL).read_text(encoding="utf-8")
+    )
+
+
+def test_stage128_freeze_forbids_stale_stage127_pending_human_review():
+    """The contradiction this guard exists for must be detected.
+
+    Once the Stage128 D2 design freeze is completed, the freeze IS the human
+    decision the terminal Stage127 FAIL result was waiting for, so neither
+    Stage127 pending-human-review marker may still be True.
+    """
+    ok = dict(_live_handoff())
+    assert v.stage127_human_review_closure_consistent(
+        ok, freeze_completed=True) is True
+
+    for field in (
+        "stage127_m2_market_data_gate_terminal_result_pending_human_review",
+        "stage127_m2_semantics_human_decision_required",
+    ):
+        contradictory = dict(ok)
+        contradictory[field] = True
+        assert v.stage127_human_review_closure_consistent(
+            contradictory, freeze_completed=True) is False, field
+        # Before the freeze the same state is legitimate history.
+        assert v.stage127_human_review_closure_consistent(
+            contradictory, freeze_completed=False) is True, field
+
+
+def test_live_handoff_has_no_stage127_human_review_contradiction():
+    state = _live_handoff()
+    if state.get("stage128_m2_d2_design_freeze_completed"):
+        assert state[
+            "stage127_m2_market_data_gate_terminal_result_pending_human_review"
+        ] is False
+        assert state["stage127_m2_semantics_human_decision_required"] is False
+        # The history is preserved, not erased.
+        assert state["stage127_m2_human_review_originally_required"] is True
+        assert state["stage127_m2_human_review_resolved_by_action_id"] == (
+            "stage128-m2-boundary-month-return-design-freeze"
+        )
+
+
+def test_historical_d0_gate_status_never_rewritten():
+    state = _live_handoff()
+    assert state["stage127_m2_market_data_gate_status"] == "FAIL_M2_DATA_GATE"
+    assert v.stage127_historical_d0_gate_status_preserved(state) is True
+    for bad in ("PASS_M2_DATA_GATE", "PASS", "UNRESOLVED"):
+        tampered = dict(state)
+        tampered["stage127_m2_market_data_gate_status"] = bad
+        assert v.stage127_historical_d0_gate_status_preserved(tampered) is False
+
+
+def test_current_state_renders_stage128_section_after_freeze():
+    state = _live_handoff()
+    text = (_root() / v.CURRENT_STATE_MD_REL).read_text(encoding="utf-8")
+    if state.get("stage128_m2_d2_design_freeze_completed"):
+        assert (
+            "## Stage128 — M2 D2 boundary-month equity-return design freeze"
+            in text
+        )
+        # Stage127 is rendered as HISTORICAL, not as the current action.
+        assert "(HISTORICAL — COMPLETED AND RESOLVED)" in text
+        assert (
+            "_The current scientific action. Its human authorization already "
+            "exists" not in text
+        )
+        assert "Human decision still required" not in text
+        assert "`FAIL_M2_DATA_GATE`" in text
+
+
+def test_new_stage127_closure_assertions_present_and_passing():
+    meta = _read_json(v.F_METADATA)
+    names = {a["name"]: a for a in meta["assertions"]}
+    for name in (
+        "stage128_freeze_closes_stage127_pending_human_review",
+        "stage127_human_review_history_not_erased",
+        "stage127_historical_d0_gate_status_preserved",
+        "current_state_renders_stage128_section_after_freeze",
+        "current_state_does_not_call_stage127_the_current_action_after_freeze",
+    ):
+        assert name in names, name
+        assert names[name]["status"] == "PASS", name

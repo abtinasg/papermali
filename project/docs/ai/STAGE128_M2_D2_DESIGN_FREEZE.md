@@ -161,13 +161,21 @@ The human-readable contract above is mirrored, with additional machine-checkable
 - [`stage128_m2_d2_human_authorization_record.json`](../../stage128/stage128_m2_d2_human_authorization_record.json) — the verbatim authorizing human utterance, its SHA256, and the separately labeled derived (non-verbatim) normalized scope.
 - [`stage128_m2_d2_design_freeze_qc_report.json`](../../stage128/stage128_m2_d2_design_freeze_qc_report.json) — internal-consistency assertions for this package (not a Gate re-run).
 - [`metadata_and_hashes_stage128_m2_d2_design_freeze.json`](../../stage128/metadata_and_hashes_stage128_m2_d2_design_freeze.json) — SHA256 manifest of every package and referenced source artifact.
-- [`stage128_m2_d2_feasibility_provenance.json`](../../stage128/stage128_m2_d2_feasibility_provenance.json) and [`reproduce_prelock_predictor_only_feasibility.py`](../../stage128/reproduce_prelock_predictor_only_feasibility.py) — see §10.
+- [`stage128_m2_d2_feasibility_provenance.json`](../../stage128/stage128_m2_d2_feasibility_provenance.json) and [`d0_reproduction_and_prelock_feasibility_archival_record.py`](../../stage128/d0_reproduction_and_prelock_feasibility_archival_record.py) — see §10.
 
-## 10. Feasibility provenance and reproduction — honest limitation
+## 10. Feasibility provenance — D0 reproduction plus archival record of external evidence
 
-The D0 count (269/666) is **independently and exactly reproduced in this repository** from the already-committed, target-free `project/stage127/stage127_m2_development_features.csv` (666 rows; no distress/target label column) by `reproduce_prelock_predictor_only_feasibility.py`, labeled `REPRODUCTION_OF_PRELOCK_PREDICTOR_ONLY_FEASIBILITY`.
+The D0 count (269/666) is **independently and exactly reproduced in this repository** from the already-committed, target-free `project/stage127/stage127_m2_development_features.csv` (666 rows; no distress/target label column) by `d0_reproduction_and_prelock_feasibility_archival_record.py`, labeled `D0_REPRODUCTION_PLUS_ARCHIVAL_RECORD_OF_PRELOCK_EXTERNAL_FEASIBILITY_EVIDENCE`. That script claims **only** the D0 reproduction; it does **not** claim to independently reproduce D1/D2/D3/Jalali.
 
-The D1, D2 (Gregorian), D3, and Jalali-boundary-diagnostic counts in §5 require raw **per-day** adjusted-close observations across each pair's 12-calendar-month window. That raw daily data was never committed to this repository — only aggregate per-pair columns and the external-bundle SHA256 provenance (`d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`) are present. These four counts are therefore recorded as **externally-supplied historical evidence**, explicitly flagged `d1_d2_d3_jalali_independently_reproduced_in_repository = false` in `stage128_m2_d2_feasibility_provenance.json`, and are **not** independently re-derived here. No synthetic daily-price data was fabricated to manufacture an artificial reproduction of these counts.
+The D1, D2 (Gregorian), D3, and Jalali-boundary-diagnostic counts in §5 require raw **per-day** adjusted-close observations across each pair's 12-calendar-month window. That raw daily data was never committed to this repository — only aggregate per-pair columns and the external-bundle SHA256 provenance (`d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`) are present. These four counts are therefore recorded as **externally supplied historical feasibility evidence**, explicitly flagged `d1_d2_d3_jalali_independently_reproduced_in_repository = false` in `stage128_m2_d2_feasibility_provenance.json`, and are **not** independently re-derived here. No synthetic daily-price data was fabricated to manufacture an artificial reproduction of these counts.
+
+Provenance discipline recorded in `stage128_m2_d2_feasibility_provenance.json`:
+
+- `historical_counts_transmitted_by_human = true` — the counts were transmitted into the repository by the human supervisor. The authorization text is the **transmission channel**, not the scientific source of truth (`externally_supplied_evidence_is_scientific_source_of_truth = false`).
+- `external_market_bundle_sha256 = d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`, `raw_bundle_present_in_repository = false`.
+- `prelock_D2_count_independently_verified_in_repository = false` — the pre-lock 539/666 D2 count is **not** independently verified here.
+- `canonical_confirmation_deferred_to = stage128-m2-d2-gate-rerun`, which remains **unauthorized** (`canonical_confirmation_action_authorized = false`).
+- `original_prelock_feasibility_script_not_preserved = true` — the original pre-lock scratchpad feasibility script and its output are not preserved in this repository and cannot be hashed; no substitute or reconstructed provenance is recorded in their place.
 
 ## 11. Endpoint adjusted-close validity semantics (frozen, disambiguated)
 

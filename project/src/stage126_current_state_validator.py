@@ -362,6 +362,11 @@ def derive_micro_part_id(repo_root: Path, part_index: int, lock: dict[str, Any])
 
 
 HANDOFF_STATE_REL = "project/docs/ai/handoff_state.json"
+CURRENT_STATE_MD_REL = "project/docs/ai/CURRENT_STATE.md"
+#: The historical Stage127 D0 Gate outcome. It is a HISTORICAL record: the
+#: Stage128 D2 design freeze amends only the equity-return measurement
+#: component for FUTURE Gate execution and must never rewrite this to PASS.
+STAGE127_HISTORICAL_D0_GATE_STATUS = "FAIL_M2_DATA_GATE"
 
 # Architecture fields the live Handoff MUST carry, enforced inside
 # verify_handoff() itself (not merely reported).
@@ -539,6 +544,38 @@ def stage128_m2_d2_design_freeze_completed(repo_root: Path) -> bool:
         "stage128_m2_d2_gate_rerun_authorized": False,
     }
     return all(freeze.get(k) == v for k, v in required_exact.items())
+
+
+def stage127_human_review_closure_consistent(
+    handoff: dict[str, Any], *, freeze_completed: bool,
+) -> bool:
+    """False when the repository contradicts itself about Stage127.
+
+    A completed Stage128 D2 design freeze IS the human decision the terminal
+    Stage127 ``FAIL_M2_DATA_GATE`` result was waiting for. So once
+    ``stage128_m2_d2_design_freeze_completed`` is True, it can no longer also
+    be true that Stage127's terminal result is pending human review or that a
+    Stage127 semantics human decision is still required. Before the freeze,
+    those markers are unconstrained by this function.
+    """
+    if not freeze_completed:
+        return True
+    return (
+        handoff.get(
+            "stage127_m2_market_data_gate_terminal_result_pending_human_review"
+        ) is False
+        and handoff.get("stage127_m2_semantics_human_decision_required") is False
+    )
+
+
+def stage127_historical_d0_gate_status_preserved(handoff: dict[str, Any]) -> bool:
+    """The historical D0 Gate outcome may never be rewritten (e.g. to PASS)."""
+    if not handoff.get("stage127_m2_market_data_gate_executed"):
+        return True
+    return (
+        handoff.get("stage127_m2_market_data_gate_status")
+        == STAGE127_HISTORICAL_D0_GATE_STATUS
+    )
 
 
 def expected_next_research_action_id(
@@ -1574,6 +1611,47 @@ def build_assertions(
     add("handoff_architecture_fields_enforced",
         all(handoff.get(k) == want
             for k, want in REQUIRED_HANDOFF_ARCHITECTURE_FIELDS.items()))
+
+    # --- Stage127 human-review closure ------------------------------------ #
+    # A completed Stage128 D2 design freeze IS the human decision that the
+    # terminal Stage127 FAIL result was waiting for. The repository must not
+    # simultaneously claim that the freeze is complete AND that Stage127 is
+    # still pending human review / still requires a human decision: that is an
+    # internal contradiction, and this assertion fails on it. The historical
+    # D0 Gate result itself is never allowed to change.
+    freeze_done = stage128_m2_d2_design_freeze_completed(repo_root)
+    add("stage128_freeze_closes_stage127_pending_human_review",
+        stage127_human_review_closure_consistent(
+            handoff, freeze_completed=freeze_done),
+        "stage128_m2_d2_design_freeze_completed=True requires both Stage127 "
+        "pending-human-review markers to be False")
+    add("stage127_human_review_history_not_erased",
+        (not freeze_done)
+        or (handoff.get("stage127_m2_human_review_originally_required") is True
+            and handoff.get("stage127_m2_human_review_resolved_by_action_id")
+            == "stage128-m2-boundary-month-return-design-freeze"),
+        "the historical fact that Stage127 originally required human review "
+        "must be preserved, together with the action that discharged it")
+    add("stage127_historical_d0_gate_status_preserved",
+        stage127_historical_d0_gate_status_preserved(handoff),
+        f"historical D0 Gate status must remain "
+        f"{STAGE127_HISTORICAL_D0_GATE_STATUS}")
+    current_state_text = ""
+    cs_path = repo_root / CURRENT_STATE_MD_REL
+    if cs_path.is_file():
+        current_state_text = cs_path.read_text(encoding="utf-8")
+    add("current_state_renders_stage128_section_after_freeze",
+        (not freeze_done)
+        or ("## Stage128 — M2 D2 boundary-month equity-return design freeze"
+            in current_state_text),
+        "CURRENT_STATE.md must render an explicit Stage128 D2 design-freeze "
+        "section once the freeze is completed")
+    add("current_state_does_not_call_stage127_the_current_action_after_freeze",
+        (not freeze_done)
+        or ("_The current scientific action. Its human authorization already "
+            "exists" not in current_state_text),
+        "after the freeze, Stage127 must be rendered as a HISTORICAL "
+        "completed/resolved Gate, not as the current scientific action")
     return a
 
 

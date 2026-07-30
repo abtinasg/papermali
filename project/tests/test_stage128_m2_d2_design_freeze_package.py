@@ -266,10 +266,45 @@ def test_research_action_ids_internally_consistent(freeze):
 # QC report
 # --------------------------------------------------------------------------- #
 
-def test_qc_report_all_pass(qc):
+def test_qc_report_required_assertions_all_pass(qc):
+    """`all_pass` means REQUIRED freeze-package assertions, not a clean suite."""
     assert qc["all_pass"] is True
+    assert qc["required_freeze_package_assertions_all_pass"] is True
     assert qc["assertion_count"] == len(qc["assertions"])
     assert all(a["status"] == "PASS" for a in qc["assertions"])
+    # The semantics of `all_pass` must be stated, not assumed.
+    assert "REQUIRED" in qc["all_pass_semantics"]
+    assert "zero failures" in qc["all_pass_semantics"]
+
+
+def test_qc_report_does_not_claim_a_clean_relevant_suite(qc):
+    """The untruthful `relevant_suite_tests_pass` assertion must be gone.
+
+    765 passed / 8 failed / 26 skipped is NOT "the relevant suite passes".
+    The 8 failures are recorded explicitly instead of being hidden behind a
+    misleading assertion name.
+    """
+    names = {a["name"] for a in qc["assertions"]}
+    assert "relevant_suite_tests_pass" not in names
+    assert "relevant_suite_regression_check_pass" in names
+    assert "focused_stage128_tests_pass" in names
+
+
+def test_qc_report_records_literal_test_evidence(qc):
+    ev = qc["test_evidence"]
+    assert ev["focused_stage128_tests_pass"] is True
+    assert ev["relevant_suite_all_pass"] is False
+    assert ev["relevant_suite_known_environment_failures"] == 8
+    assert ev["relevant_suite_new_failures_vs_base"] == 0
+    assert ev["relevant_suite_new_errors_vs_base"] == 0
+    assert ev["relevant_suite_regression_check_pass"] is True
+    assert ev["relevant_suite_baseline_ref"] == (
+        "b25804ab764258c846b391f4823f089552c855e3"
+    )
+    # The exact known limitation is named, not paraphrased away.
+    limitation = ev["known_environment_failure_limitation"]
+    assert "FileNotFoundError" in limitation
+    assert "analysis_ready_main_rule_a_stage125.csv" in limitation
 
 
 # --------------------------------------------------------------------------- #
@@ -329,3 +364,97 @@ def test_provenance_matches_authorizing_utterance_counts(provenance):
         "NO_START_BOUNDARY_PRICE": 55,
         "NO_END_BOUNDARY_PRICE": 17,
     }
+
+
+# --------------------------------------------------------------------------- #
+# Feasibility provenance: D0 reproduction vs ARCHIVED external evidence
+# --------------------------------------------------------------------------- #
+
+def test_provenance_label_does_not_claim_full_reproduction(provenance):
+    assert provenance["label"] == (
+        "D0_REPRODUCTION_PLUS_ARCHIVAL_RECORD_OF_PRELOCK_EXTERNAL_"
+        "FEASIBILITY_EVIDENCE"
+    )
+    purpose = provenance["purpose"]
+    assert "INDEPENDENTLY REPRODUCE D0" in purpose
+    assert "NOT independently reproduced" in purpose
+
+
+def test_provenance_script_is_named_and_present(provenance):
+    rel = provenance["script_path"]
+    assert rel == (
+        "project/stage128/"
+        "d0_reproduction_and_prelock_feasibility_archival_record.py"
+    )
+    assert os.path.isfile(
+        os.path.join(os.path.dirname(os.path.dirname(STAGE128)), rel)
+    )
+
+
+def test_external_counts_are_archival_not_independently_verified(provenance):
+    assert provenance["historical_counts_transmitted_by_human"] is True
+    assert provenance[
+        "externally_supplied_evidence_is_scientific_source_of_truth"
+    ] is False
+    assert provenance["external_market_bundle_sha256"] == (
+        "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec"
+    )
+    assert provenance["raw_bundle_present_in_repository"] is False
+    assert provenance[
+        "prelock_D2_count_independently_verified_in_repository"
+    ] is False
+    assert provenance["canonical_confirmation_deferred_to"] == (
+        "stage128-m2-d2-gate-rerun"
+    )
+    assert provenance["canonical_confirmation_action_authorized"] is False
+
+
+def test_original_prelock_feasibility_script_not_preserved(provenance):
+    """No fake historical provenance is manufactured for the lost script."""
+    assert provenance["original_prelock_feasibility_script_not_preserved"] is True
+    assert provenance["original_prelock_feasibility_script_sha256"] is None
+    assert provenance["original_prelock_feasibility_output_sha256"] is None
+
+
+def test_freeze_record_points_at_the_renamed_script(freeze):
+    assert freeze["feasibility_reproduction_script_path"] == (
+        "project/stage128/"
+        "d0_reproduction_and_prelock_feasibility_archival_record.py"
+    )
+    assert freeze["feasibility_reproduction_label"] == (
+        "D0_REPRODUCTION_PLUS_ARCHIVAL_RECORD_OF_PRELOCK_EXTERNAL_"
+        "FEASIBILITY_EVIDENCE"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Authorization provenance exactness
+# --------------------------------------------------------------------------- #
+
+def test_authorization_is_the_original_scientific_authorization(auth):
+    assert auth["authorization_class"] == "ORIGINAL_SCIENTIFIC_AUTHORIZATION"
+    text = auth["human_source_utterance"]
+    assert text.startswith(
+        "I explicitly authorize the following scientific research action ONLY:"
+    )
+    assert "stage128-m2-boundary-month-equity-return-design-freeze" in text
+    # It is the ORIGINAL D2 authorization, not the continuation instruction.
+    src = auth["human_source_utterance_source"]
+    assert "ORIGINAL" in src
+    assert "NOT the later PR #69 governance-package continuation" in src
+
+
+def test_unrelated_merge_context_sentence_removed(auth):
+    """The trailing PR #68 merge-context sentence is not part of this text."""
+    text = auth["human_source_utterance"]
+    assert "is NOT authorized by this merge" not in text
+    assert text.rstrip().endswith("Do NOT execute D2 Gate.")
+    assert auth[
+        "human_source_utterance_unrelated_trailing_text_removed"
+    ] is True
+
+
+def test_continuation_instructions_created_no_new_scientific_decision(auth):
+    assert auth[
+        "later_pr69_governance_continuation_created_new_scientific_decision"
+    ] is False

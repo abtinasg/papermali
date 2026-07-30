@@ -1,11 +1,19 @@
-"""REPRODUCTION_OF_PRELOCK_PREDICTOR_ONLY_FEASIBILITY
+"""D0_REPRODUCTION_PLUS_ARCHIVAL_RECORD_OF_PRELOCK_EXTERNAL_FEASIBILITY_EVIDENCE
 
-Independent, in-repository reproduction of the D0/D1/D2/D3/Jalali
-predictor-only feasibility counts referenced by the Stage128 D2 design
-freeze. This is NOT a new design search: it evaluates only the
-already-defined D0/D1/D2/D3/Jalali definitions that were historically
-examined before this freeze. No new thresholds, no new candidate design,
-no target/distress value is read, and no model is fit or run here.
+This script does exactly TWO things, and deliberately does not claim to do
+more:
+
+1. it **independently reproduces D0** in this repository from the committed,
+   target-free development-features table; and
+2. it **archives** the D1 / D2 (Gregorian) / D3 / Jalali pre-lock counts as
+   EXTERNALLY SUPPLIED historical feasibility evidence -- transmitted to this
+   repository by the human supervisor, NOT independently reproduced or
+   independently verified here.
+
+It is NOT a new design search: it evaluates only the already-defined
+D0/D1/D2/D3/Jalali definitions that were historically examined before this
+freeze. No new thresholds, no new candidate design, no target/distress value
+is read, and no model is fit or run here.
 
 Honest scope limitation (recorded, not concealed):
 
@@ -32,13 +40,27 @@ numbers that must match real historical evidence), this script:
 1. independently and exactly reproduces the D0 count from the committed
    development-features table;
 2. records the D1/D2/D3/Jalali counts as EXTERNALLY-SUPPLIED historical
-   evidence, explicitly flagged as NOT independently re-derived in this
-   repository, anchored only by the authorizing human utterance that
-   supplied them (see
-   ``stage128_m2_d2_human_authorization_record.json``).
+   feasibility evidence, explicitly flagged as NOT independently reproduced
+   and NOT independently verified in this repository.
+
+Provenance discipline for those archived counts:
+
+* they were transmitted to the repository by the human supervisor
+  (``historical_counts_transmitted_by_human = true``);
+* the human authorization text is the TRANSMISSION CHANNEL for them, not the
+  scientific source of truth
+  (``externally_supplied_evidence_is_scientific_source_of_truth = false``);
+* the pre-lock D2 count in particular is recorded as NOT independently
+  verified in-repository
+  (``prelock_D2_count_independently_verified_in_repository = false``);
+* canonical confirmation is deferred to the future, separately authorized
+  ``stage128-m2-d2-gate-rerun`` -- which remains UNAUTHORIZED;
+* the original pre-lock scratchpad feasibility script and its output were not
+  preserved in this repository, and no substitute provenance is manufactured
+  (``original_prelock_feasibility_script_not_preserved = true``).
 
 Run: ``PYTHONPATH=project python project/stage128/
-reproduce_prelock_predictor_only_feasibility.py``
+d0_reproduction_and_prelock_feasibility_archival_record.py``
 """
 from __future__ import annotations
 
@@ -173,13 +195,23 @@ def build_provenance_record() -> dict:
     d0 = reproduce_d0()
     audit_path = write_audit_table()
     return {
-        "label": "REPRODUCTION_OF_PRELOCK_PREDICTOR_ONLY_FEASIBILITY",
+        "label": (
+            "D0_REPRODUCTION_PLUS_ARCHIVAL_RECORD_OF_PRELOCK_EXTERNAL_"
+            "FEASIBILITY_EVIDENCE"
+        ),
         "purpose": (
-            "Independent in-repository reproduction check for the "
-            "predictor-only feasibility counts referenced by the Stage128 "
-            "D2 design freeze. Evaluates only already-defined D0/D1/D2/D3/"
-            "Jalali definitions; introduces no new candidate design, "
-            "threshold, target access, or model."
+            "Two things only: (1) INDEPENDENTLY REPRODUCE D0 in this "
+            "repository from the committed, target-free development-features "
+            "table; and (2) ARCHIVE the D1/D2/D3/Jalali pre-lock counts as "
+            "EXTERNALLY SUPPLIED historical feasibility evidence transmitted "
+            "by the human supervisor -- NOT independently reproduced and NOT "
+            "independently verified here. Evaluates only already-defined "
+            "D0/D1/D2/D3/Jalali definitions; introduces no new candidate "
+            "design, threshold, target access, or model."
+        ),
+        "script_path": (
+            "project/stage128/"
+            "d0_reproduction_and_prelock_feasibility_archival_record.py"
         ),
         "input_bundle": "stage127_m2_tsetmc_full_delivery.zip",
         "input_bundle_sha256": (
@@ -209,16 +241,47 @@ def build_provenance_record() -> dict:
             "present. Fabricating synthetic daily prices to reproduce "
             "these externally-supplied counts would manufacture false "
             "provenance for numbers that must match real historical "
-            "evidence, so they are instead recorded verbatim as "
-            "externally-supplied historical evidence, anchored to the "
-            "authorizing human utterance."
+            "evidence, so they are instead ARCHIVED as externally supplied "
+            "historical feasibility evidence, explicitly labeled as neither "
+            "independently reproduced nor independently verified in this "
+            "repository."
         ),
         "externally_supplied_feasibility_evidence": (
             EXTERNAL_FEASIBILITY_EVIDENCE
         ),
-        "externally_supplied_evidence_provenance": (
+        "externally_supplied_evidence_label": (
+            "EXTERNALLY_SUPPLIED_HISTORICAL_FEASIBILITY_EVIDENCE"
+        ),
+        "historical_counts_transmitted_by_human": True,
+        "externally_supplied_evidence_transmission_channel": (
             "stage128_m2_d2_human_authorization_record.json:"
             "human_source_utterance_sha256"
+        ),
+        "externally_supplied_evidence_is_scientific_source_of_truth": False,
+        "externally_supplied_evidence_provenance_note": (
+            "The human authorization text is the TRANSMISSION CHANNEL that "
+            "carried these historical counts into the repository. It is NOT "
+            "the scientific source of truth for them: the scientific source "
+            "is the external raw per-day TSETMC market bundle, which is not "
+            "present in this repository. Canonical confirmation is deferred "
+            "to the future, separately authorized stage128-m2-d2-gate-rerun."
+        ),
+        "external_market_bundle_sha256": (
+            "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6"
+            "c6ec"
+        ),
+        "raw_bundle_present_in_repository": False,
+        "prelock_D2_count_independently_verified_in_repository": False,
+        "canonical_confirmation_deferred_to": "stage128-m2-d2-gate-rerun",
+        "canonical_confirmation_action_authorized": False,
+        "original_prelock_feasibility_script_not_preserved": True,
+        "original_prelock_feasibility_script_sha256": None,
+        "original_prelock_feasibility_output_sha256": None,
+        "original_prelock_feasibility_provenance_note": (
+            "The original pre-lock scratchpad feasibility script and its "
+            "output are not preserved in this repository and no copy is "
+            "available to hash. No substitute or reconstructed provenance is "
+            "recorded in their place."
         ),
         "audit_table_path": os.path.relpath(audit_path, REPO_ROOT),
         "audit_table_row_count": EXPECTED_PAIR_COUNT,

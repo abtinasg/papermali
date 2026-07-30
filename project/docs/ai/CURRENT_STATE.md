@@ -11,27 +11,27 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m2-d2-gate-rerun`
-- **Last stage commit:** `9ad8bc76be25756640d905cf4098a6a5367ba9c0`
-- **Generated from commit:** `9ad8bc76be25756640d905cf4098a6a5367ba9c0` (branch `stage128-m2-boundary-month-return-design-freeze`, informational)
+- **Last stage commit:** `83ba34b024ba22a9cc47ac4c7c12fa605fbd5f40`
+- **Generated from commit:** `83ba34b024ba22a9cc47ac4c7c12fa605fbd5f40` (branch `stage128-m2-boundary-month-return-design-freeze`, informational)
 - **Baseline:** `origin/main` @ `b25804ab764258c846b391f4823f089552c855e3`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **86 assertions, 0 failed**, all_pass=True
+- ✅ **91 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
 
-## Stage127 — M2 market-data admission Gate
+## Stage127 — M2 market-data admission Gate (HISTORICAL — COMPLETED AND RESOLVED)
 
-_The current scientific action. Its human authorization already exists; the Gate has been executed and its result is reported here. This section exists so the snapshot can never render the project as though Stage127 had not happened._
+_Historical record, **not** the current scientific action. The Gate was executed under its own pre-existing human authorization and returned a terminal, resolved result. The human review it originally required has since been completed: it was discharged by the separately authorized `stage128-m2-boundary-month-return-design-freeze` action (see the Stage128 section below), which is the answer to "which scientific action follows the failed M2 extension". The historical D0 Gate result below remains `FAIL_M2_DATA_GATE` and is **never** rewritten to PASS._
 
 - ⛔ **Gate status:** `FAIL_M2_DATA_GATE`
 - **Executed:** True — **resolved (terminal observed decision):** True
 - **M2 block admitted for modeling:** False
-- **Terminal result pending human review:** True
+- **Terminal result pending human review:** False
 - **M2 market evidence collected:** True — **independently validated:** True (163230 normalized daily observations)
 - **Evidence bundle SHA256:** `d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`
 - Evidence collection is recorded **separately** from block admission. `m2_data_collected` remains `false` because in this schema it is a frozen prohibition marker meaning "M2 data has entered the authorized M2 modeling pipeline" — not a statement that no M2 evidence exists.
@@ -51,7 +51,21 @@ _Why `equity_return_window` coverage is 0.4039. This subsection records the SEMA
 - **Canonical Gate changed by the adjudication:** False — Gate remains `FAIL_M2_DATA_GATE` with coverage 269 / 576 / 576 and common sample 269 of 666 pairs
 - **Model fits:** 0 — **predictions:** 0 — **final-test access:** 0
 - **No M2 modeling authorization follows from this.** The shortfall is now established as TRUE frozen-contract missingness rather than a data defect.
-- ⏳ **Human decision still required:** which scientific roadmap action follows the failed M2 extension.
+- ✅ **Human decision COMPLETED (historical).** A human decision on which scientific roadmap action follows the failed M2 extension was originally required (`stage127_m2_human_review_originally_required=true`). It was made and discharged by the separately authorized `stage128-m2-boundary-month-return-design-freeze` action; `stage127_m2_semantics_human_decision_required` is therefore now `false`. The historical Gate result is unchanged.
+
+## Stage128 — M2 D2 boundary-month equity-return design freeze (CURRENT)
+
+_The current scientific state. This is a DESIGN-FREEZE / CONTRACT action only: no canonical Gate was executed, no model was fit, no prediction was generated and no final-test row was read._
+
+- ✅ **D2 design freeze completed:** True
+- **Frozen primary M2 equity-return construct:** `BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN` — calendar convention **GREGORIAN** (selected for coherence with the frozen Gregorian market-time axis, not because it clears a coverage threshold)
+- ⛔ **Historical D0 Gate remains** `FAIL_M2_DATA_GATE` — preserved unchanged; never rewritten to PASS
+- **Research action completed by this freeze:** `stage128-m2-boundary-month-return-design-freeze`
+- **Next research action (pointer only):** `stage128-m2-d2-gate-rerun` — the canonical M2 Gate re-run under the frozen D2 construct
+- ⛔ **D2 Gate rerun authorized:** False — identifying the next action is NOT an authorization to execute it; that requires a separate, explicit human authorization
+- ⛔ **M2 admitted:** False — **M2 incremental evaluation authorized:** False — **M2 modeling started:** False
+- 🔒 **Final test locked:** final_test_unlocked=False, final_test_access_authorized=False, final_test_evaluation_performed=False
+- Contract: `project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md`; machine-readable package: `project/stage128/`
 
 ### Last completed scientific micro-part QC
 
@@ -97,5 +111,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `aad4a0c0353c9b554303d5640f9e504671865bcee35ce24ebc033093cbe8fb4f`_
-_generated_at_utc: 2026-07-30T05:58:41Z (informational)_
+_state_fingerprint: `8e0e23a9d63535988e945c4674733f8be0c9ab40449ba301b05af049d86608e5`_
+_generated_at_utc: 2026-07-30T17:26:41Z (informational)_
