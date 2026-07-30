@@ -186,9 +186,45 @@
   "test_evidence": {
     "focused_stage128_tests_command": "PYTHONPATH=project python -m pytest project/tests/test_stage128_m2_d2_boundary_month_equity_return.py project/tests/test_stage128_m2_d2_design_freeze_package.py -q",
     "focused_stage128_tests_pass": true,
-    "known_environment_failure_limitation": "All 8 relevant-suite failures are the identical pre-existing FileNotFoundError for the gitignored, untracked Stage125 input project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv. The identical 8 failures are present in a clean checkout of the PR base commit b25804ab764258c846b391f4823f089552c855e3 on the same machine/environment, so they are an environment/untracked-asset limitation of this checkout, not a regression introduced by this PR. They are recorded, not hidden.",
+    "focused_stage128_tests_result": "56 passed",
+    "full_suite_base_vs_head": {
+      "base_preexisting_failure_nodeids": [
+        "project/tests/test_stage125_part5_readiness_closure.py::test_run_canonical_check_zero_scientific_drift",
+        "project/tests/test_stage126_m1_robustness_closure.py::test_on_disk_artifacts_match_fresh_build"
+      ],
+      "base_ref": "b25804ab764258c846b391f4823f089552c855e3",
+      "base_result": {
+        "deselected": 14,
+        "errors": 0,
+        "failed": 2,
+        "passed": 2916,
+        "skipped": 1
+      },
+      "environment": "same machine and environment, identical working directory, gitignored inputs present",
+      "head_result": {
+        "deselected": 14,
+        "errors": 0,
+        "failed": 2,
+        "passed": 2977,
+        "skipped": 1
+      },
+      "new_error_nodeids": 0,
+      "new_failure_nodeids": 0,
+      "resolved_failure_nodeids": 0
+    },
     "relevant_suite_all_pass": false,
+    "relevant_suite_all_pass_scope": "FALSE as scoped to the ORIGINALLY REPORTED environment for this PR, in which the gitignored, untracked Stage125 input project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv is ABSENT. In that environment the relevant suite was 765 passed / 8 failed / 26 skipped, so it is NOT truthful to assert that the relevant suite passes. See relevant_suite_final_head_run for the separate final-head environment in which that input IS present.",
     "relevant_suite_baseline_ref": "b25804ab764258c846b391f4823f089552c855e3",
+    "relevant_suite_command": "PYTHONPATH=project python -m pytest project/tests/test_ai_handoff.py project/tests/test_stage126_current_state_validator.py project/tests/test_stage128_m2_d2_boundary_month_equity_return.py project/tests/test_stage128_m2_d2_design_freeze_package.py project/tests/test_stage127_m2_market_data_gate.py project/tests/test_stage127_m2_external_delivery_import.py project/tests/test_stage127_m2_zero_trade_semantics_import.py project/tests/test_stage127_m2_external_retrieval_request.py -q",
+    "relevant_suite_final_head_run": {
+      "all_pass": true,
+      "environment": "final-head checkout WITH the gitignored Stage125 input present",
+      "failed": 0,
+      "note": "With the previously missing gitignored input present, the 8 known environment failures do not occur and the relevant suite is literally all-pass on the final head. Both environments are recorded so neither result is overstated.",
+      "passed": 813,
+      "skipped": 1
+    },
+    "relevant_suite_known_environment_failure_limitation": "All 8 failures are the identical pre-existing FileNotFoundError for the gitignored, untracked Stage125 input project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv. The identical 8 failures occur in a clean checkout of the PR base commit b25804ab764258c846b391f4823f089552c855e3 in the same environment. They are an environment/untracked-asset limitation of that checkout, not a regression introduced by this PR. They are recorded, not hidden.",
     "relevant_suite_known_environment_failures": 8,
     "relevant_suite_new_errors_vs_base": 0,
     "relevant_suite_new_failures_vs_base": 0,

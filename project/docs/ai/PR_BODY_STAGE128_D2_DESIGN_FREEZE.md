@@ -1,5 +1,15 @@
 # Stage128 — M2 D2 Boundary-Month Equity-Return Design Freeze
 
+## Governance/provenance consistency closure (latest commits)
+
+This PR was continued for a governance-only closure. **No scientific content changed** — D2 formula, Gregorian convention, the 539/666 historical feasibility record, the 126-return floor, `W`, `t0`, `T*`, daily-return adjacency, realized volatility, Amihud, the eligibility contract and the final-test firewall are all untouched; no Gate execution, no model, no prediction, no target or final-test access.
+
+1. **Current state now reflects the human decision already made.** A completed Stage128 D2 freeze IS the human decision the terminal Stage127 FAIL result was waiting for, so once the freeze is recognized, `stage127_m2_market_data_gate_terminal_result_pending_human_review` and `stage127_m2_semantics_human_decision_required` are both `false`, while `stage127_m2_market_data_gate_status` remains `FAIL_M2_DATA_GATE` and the history is preserved (`stage127_m2_human_review_originally_required = true`, `stage127_m2_human_review_resolved_by_action_id = stage128-m2-boundary-month-return-design-freeze`). `CURRENT_STATE.md` renders Stage127 as **HISTORICAL — COMPLETED AND RESOLVED** and adds an explicit Stage128 D2 design-freeze section; ROADMAP item 21, the current-transition note and `OPEN_TASKS.md` are updated to match.
+2. **QC claims are literally true** — see the Test plan below.
+3. **Authorization provenance is exact** — see Authorization provenance below.
+4. **Feasibility provenance no longer overclaims** — see Feasibility provenance below.
+5. **The current-state validator fails closed on the contradiction**, with tests covering it (`stage128_freeze_closes_stage127_pending_human_review`, `stage127_human_review_history_not_erased`, `stage127_historical_d0_gate_status_preserved`, `current_state_renders_stage128_section_after_freeze`, `current_state_does_not_call_stage127_the_current_action_after_freeze`).
+
 ## Merge status
 
 - Branch: `stage128-m2-boundary-month-return-design-freeze`
@@ -61,7 +71,7 @@ Focused Stage128 (function library + freeze-package consistency):
 PYTHONPATH=project python -m pytest project/tests/test_stage128_m2_d2_boundary_month_equity_return.py project/tests/test_stage128_m2_d2_design_freeze_package.py -q
 ```
 
-Result: **46 passed**.
+Result on the final head: **56 passed**.
 
 Relevant suite (Stage127 Gate primitives, external-delivery/import controls, trading-day semantics, Stage128, Handoff/current-state, allowlist/change-guard):
 
@@ -69,9 +79,20 @@ Relevant suite (Stage127 Gate primitives, external-delivery/import controls, tra
 PYTHONPATH=project python -m pytest project/tests/test_ai_handoff.py project/tests/test_stage126_current_state_validator.py project/tests/test_stage128_m2_d2_boundary_month_equity_return.py project/tests/test_stage128_m2_d2_design_freeze_package.py project/tests/test_stage127_m2_market_data_gate.py project/tests/test_stage127_m2_external_delivery_import.py project/tests/test_stage127_m2_zero_trade_semantics_import.py project/tests/test_stage127_m2_external_retrieval_request.py -q
 ```
 
-__RELEVANT_SUITE_RESULT__
+Two environments are reported, because the result differs and neither is hidden:
 
-__FULL_SUITE_RESULT__
+- **Originally reported environment** (the gitignored, untracked Stage125 input `project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv` is **absent**): **765 passed, 8 failed, 26 skipped** — `relevant_suite_all_pass = false`. All 8 failures are the identical pre-existing `FileNotFoundError` for that missing input, present identically in a clean checkout of the PR base commit (`b25804ab764258c846b391f4823f089552c855e3`) — an environment/untracked-asset limitation, not a regression. `relevant_suite_new_failures_vs_base = 0`, `relevant_suite_new_errors_vs_base = 0`, `relevant_suite_regression_check_pass = true`.
+- **Final-head environment** (that input **present**): **813 passed, 0 failed, 1 skipped** — literally all-pass.
+
+The QC report no longer carries the untruthful `relevant_suite_tests_pass` assertion. It now carries `relevant_suite_regression_check_pass` plus an explicit `test_evidence` block recording both environments, and `all_pass_semantics` states that `all_pass` means all REQUIRED freeze-package assertions passed (including no new regressions vs base) — **not** that the entire relevant suite had zero failures.
+
+Full-suite base-vs-head comparison (`--junitxml`, same machine/environment, identical working directory with gitignored inputs present, run on the FINAL head):
+
+- base `b25804ab764258c846b391f4823f089552c855e3` = **2916 passed / 2 failed / 0 errored / 1 skipped / 14 deselected**
+- head = **2977 passed / 2 failed / 0 errored / 1 skipped / 14 deselected**
+- `new_failure_nodeids = 0`, `new_error_nodeids = 0`, `resolved_failure_nodeids = 0`
+
+The 2 base failures are pre-existing and identical on both sides: `test_stage125_part5_readiness_closure.py::test_run_canonical_check_zero_scientific_drift` and `test_stage126_m1_robustness_closure.py::test_on_disk_artifacts_match_fresh_build`.
 
 ## Research pointers
 

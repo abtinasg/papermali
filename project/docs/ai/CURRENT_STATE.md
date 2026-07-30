@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage126_m1_financial_baseline`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m2-d2-gate-rerun`
-- **Last stage commit:** `83ba34b024ba22a9cc47ac4c7c12fa605fbd5f40`
-- **Generated from commit:** `83ba34b024ba22a9cc47ac4c7c12fa605fbd5f40` (branch `stage128-m2-boundary-month-return-design-freeze`, informational)
+- **Last stage commit:** `02ed256a15dbc6cc2b6a8e45515cf6a4ad779e13`
+- **Generated from commit:** `02ed256a15dbc6cc2b6a8e45515cf6a4ad779e13` (branch `stage128-m2-boundary-month-return-design-freeze`, informational)
 - **Baseline:** `origin/main` @ `b25804ab764258c846b391f4823f089552c855e3`
 
 ## Current-state validation
@@ -111,5 +111,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `8e0e23a9d63535988e945c4674733f8be0c9ab40449ba301b05af049d86608e5`_
-_generated_at_utc: 2026-07-30T17:26:41Z (informational)_
+_state_fingerprint: `ed16049050d189cc2cd57a53b31ebfe98454e5ff19f1d312c8a3ca073c3d313d`_
+_generated_at_utc: 2026-07-30T18:10:28Z (informational)_

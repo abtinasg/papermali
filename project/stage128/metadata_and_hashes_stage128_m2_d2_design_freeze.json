@@ -3,13 +3,13 @@
   "decision_id": "stage128-m2-boundary-month-return-design-freeze",
   "generated_for": "stage128-m2-boundary-month-return-design-freeze",
   "package_artifacts_sha256": {
-    "project/docs/ai/PR_BODY_STAGE128_D2_DESIGN_FREEZE.md": "0d20eb0499a63628cda28695cad94c5c13417eeba9fe1255f201b0e79be03d7d",
+    "project/docs/ai/PR_BODY_STAGE128_D2_DESIGN_FREEZE.md": "1d2d80d6b865b8d3e2c03032c64e791392c08bf82509484fb964cf2e4739bb5a",
     "project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md": "3e1b833da5424a440a668e2c5b5cf0923213c7c3aedffd77a5dc8b9bd9bc8e27",
     "project/src/stage128_m2_d2_boundary_month_equity_return.py": "27a3e5dfe36c7e89df386f9ee803ad43b73fd741517d7637c627896a12581a57",
     "project/stage128/d0_reproduction_and_prelock_feasibility_archival_record.py": "d226c2dbbb2d3e943e2df23685599967be9139694460e2aaa06021908c436141",
     "project/stage128/stage128_m2_d0_reproduction_audit_table.csv": "7e11fccedea83370773b4f8a3c3acf61b7913a8b265a4de76e6fd92d927d8740",
     "project/stage128/stage128_m2_d2_design_freeze.json": "a27a8eeee75b3bd7abf0c55e55d072b55b963b67d2453033e9c2c481d5a6395a",
-    "project/stage128/stage128_m2_d2_design_freeze_qc_report.json": "8611fbdbbbbb655ecfcb4c887a660a15d6e601c162acfcdc3f515bf51953793a",
+    "project/stage128/stage128_m2_d2_design_freeze_qc_report.json": "47d0baa9d8d78a65d098c24a4fba12d035ed31800962836d5786976005c7df49",
     "project/stage128/stage128_m2_d2_feasibility_provenance.json": "2275d8420be1e3da673dc73983390cb583d549d713b93f7ae2bd2bb227a088d5",
     "project/stage128/stage128_m2_d2_human_authorization_record.json": "2d5e5711cf41d0490fb662cc2d8cfc24038453deaa14962d368c4c5de28f5b8c",
     "project/tests/test_stage128_m2_d2_boundary_month_equity_return.py": "d984a0b97ca6117e0fc12acd181c95642fa457795daef1b03ca3b9ad647bd292"

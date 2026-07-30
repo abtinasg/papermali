@@ -302,9 +302,19 @@ def test_qc_report_records_literal_test_evidence(qc):
         "b25804ab764258c846b391f4823f089552c855e3"
     )
     # The exact known limitation is named, not paraphrased away.
-    limitation = ev["known_environment_failure_limitation"]
+    limitation = ev["relevant_suite_known_environment_failure_limitation"]
     assert "FileNotFoundError" in limitation
     assert "analysis_ready_main_rule_a_stage125.csv" in limitation
+    # The final-head environment (input present) is reported separately, so
+    # neither the failing nor the passing environment is overstated.
+    final = ev["relevant_suite_final_head_run"]
+    assert final["failed"] == 0
+    assert final["all_pass"] is True
+    # Full-suite regression proof against the exact base.
+    full = ev["full_suite_base_vs_head"]
+    assert full["base_ref"] == "b25804ab764258c846b391f4823f089552c855e3"
+    assert full["new_failure_nodeids"] == 0
+    assert full["new_error_nodeids"] == 0
 
 
 # --------------------------------------------------------------------------- #
