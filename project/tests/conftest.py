@@ -39,6 +39,21 @@ _ROADMAP_REL = "project/docs/ai/ROADMAP.md"
 _HISTORICAL_ROADMAP_NEXT_ACTION_LINE = (
     "next_research_action_id: stage126-m1-financial-baseline\n"
 )
+#: The successor Handoff fields the frozen Part 5 file hard-codes, replayed at
+#: their Part 5-closure values. `next_research_action_id` was the first to need
+#: this (post Part 6). The Stage128 M2 D2 boundary-month design freeze then
+#: advanced the LIVE current-state labels too: `current_stage` and
+#: `active_workstream` describe the workstream that is live NOW, so leaving them
+#: at Stage126 / stage126_m1_financial_baseline once that freeze completed would
+#: have made the live snapshot self-contradictory. The live values are therefore
+#: truthfully Stage128 / stage128_m2_d2_boundary_month_equity_return, and the
+#: frozen historical Part 5 contract replays its own Stage126-era values here
+#: instead — same mechanism, same scope, frozen file still byte-untouched.
+_HISTORICAL_SUCCESSOR_HANDOFF_OVERLAY = {
+    "next_research_action_id": "stage126-m1-financial-baseline",
+    "current_stage": "Stage126",
+    "active_workstream": "stage126_m1_financial_baseline",
+}
 
 
 @pytest.fixture(autouse=True)
@@ -53,7 +68,7 @@ def _part5_post_part6_historical_successor_overlay(monkeypatch, request):
 
     def _historical_loader(repo_root):
         state = dict(real_loader(repo_root))
-        state["next_research_action_id"] = "stage126-m1-financial-baseline"
+        state.update(_HISTORICAL_SUCCESSOR_HANDOFF_OVERLAY)
         return state
 
     monkeypatch.setattr(m, "load_handoff_state", _historical_loader)
