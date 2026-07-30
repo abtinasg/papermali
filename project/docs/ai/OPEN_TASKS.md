@@ -3,10 +3,34 @@
 Human-maintained. The authoritative "next action" ID lives in `ROADMAP.md`
 front matter; this file is the working description.
 
-## Active research workstream: `stage126-m1-financial-baseline`
+## Active research workstream: `stage128-m2-d2-boundary-month-equity-return`
 
-Authoritative research pointers live in `ROADMAP.md` front matter:
-`last_completed_research_action_id=stage126-m1-retained-design-freeze`,
+The CURRENT workstream is the Stage128 M2 D2 boundary-month equity-return
+workstream — a stable machine-readable label **derived from** the already-frozen
+action `stage128-m2-boundary-month-return-design-freeze`, not a new scientific
+action. The authoritative research-action pointers are unchanged
+(`last_completed_research_action_id=stage128-m2-boundary-month-return-design-freeze`,
+`next_research_action_id=stage128-m2-d2-gate-rerun`, the latter a pointer only
+and **not** authorized). `stage126-m1-financial-baseline` remains correct
+**history** for the completed M1 financial-baseline workstream (see the
+historical section below); it is no longer the current workstream.
+
+### Current scientific action
+
+The current scientific action is
+`stage128-m2-boundary-month-return-design-freeze` (PR #69, unmerged) — a
+design-freeze/contract action only. `stage127-m2-market-data-gate` is
+HISTORICAL, completed and resolved; it is no longer the current action and is
+no longer awaiting a human decision. Its terminal result remains
+`FAIL_M2_DATA_GATE`, unchanged.
+
+Authoritative research pointers live in `ROADMAP.md` front matter. **If and
+when PR #69 is merged**, they become
+`last_completed_research_action_id=stage128-m2-boundary-month-return-design-freeze`,
+`next_research_action_id=stage128-m2-d2-gate-rerun` (a pointer only — see
+"Stage128 D2 design freeze" below; `stage128-m2-d2-gate-rerun` is explicitly
+**not** authorized by that freeze). Until merge, the pointers live on `main`
+remain `last_completed_research_action_id=stage126-m1-retained-design-freeze`,
 `next_research_action_id=stage127-m2-market-data-gate` — the Gate has now been
 RE-EXECUTED and RESOLVED from imported authoritative evidence, and returned
 **`FAIL_M2_DATA_GATE`**. The research pointer therefore deliberately does NOT
@@ -44,7 +68,11 @@ raw → normalized field mapping was re-verified for every row, and
 same trading date, inside this repository. The six PARTIAL ranges were
 preserved as delivered — never upgraded, back-filled or widened.
 
-**Gate result: `FAIL_M2_DATA_GATE` — terminal, resolved, pending human review.**
+**Gate result: `FAIL_M2_DATA_GATE` — terminal, resolved, and HISTORICAL. The
+human review it originally required has been completed** by the separately
+authorized `stage128-m2-boundary-month-return-design-freeze` action (see
+"Stage128 D2 ... design freeze" below); the historical D0 Gate result remains
+`FAIL_M2_DATA_GATE` and is never rewritten.
 This is an OBSERVED negative result against the frozen thresholds, not missing
 evidence, and it is deliberately not softened into `UNRESOLVED`:
 
@@ -101,13 +129,66 @@ the decision and can never produce a PASS. The earlier local network-probe
 failure remains an environment egress diagnostic only; it is not a property of
 TSETMC and no longer has any bearing on the Gate.
 
-**Blocking next step (human review required):** decide how to respond to the
-observed `equity_return_window` coverage shortfall. The observed causes are
-recorded in the decision artifact and split by endpoint: 126 pairs fail only
-the `t0` endpoint-price requirement, 99 fail only the `tN` (T*) requirement,
-132 miss both, and 90 fall below the 126-observation minimum. No remediation
-is authorized here, and the research pointer stays on
-`stage127-m2-market-data-gate`: no new scientific next action was invented.
+**Human review COMPLETED (historical).** The question this Gate raised — how to
+respond to the observed `equity_return_window` coverage shortfall — was decided
+by the human supervisor, who separately authorized
+`stage128-m2-boundary-month-return-design-freeze`. The observed causes remain
+recorded in the decision artifact and split by endpoint: 126 pairs fail only the
+`t0` endpoint-price requirement, 99 fail only the `tN` (T*) requirement, 132 miss
+both, and 90 fall below the 126-observation minimum. Nothing was remediated
+inside Stage127 itself, and the historical Gate result is unchanged.
+
+## Stage128 D2 boundary-month equity-return design freeze — current, truthful state (PR #69, unmerged)
+
+`stage128-m2-boundary-month-return-design-freeze` is the **current scientific
+action** and a **design-freeze/contract action only** (PR #69, unmerged). It is
+the human supervisor's separately authorized answer to the human-review question
+raised by the historical Stage127 Gate above. It freezes
+`BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN` (Gregorian calendar convention) as
+the new PRIMARY M2 equity-return construct, replacing only the D0
+exact-endpoint measurement component. `W`, `t0`, `T*`, trading-day sequence,
+daily-return adjacency, the 126-return floor, `realized_volatility` and
+`amihud_illiquidity` are unchanged; no fourth primary market feature is added
+and `zero_trade_day_ratio_W` remains diagnostic-only. Full contract:
+[`STAGE128_M2_D2_DESIGN_FREEZE.md`](STAGE128_M2_D2_DESIGN_FREEZE.md) and
+`project/stage128/`.
+
+**Historical D0 result preserved, unchanged.** The Stage127 Gate result above
+(`FAIL_M2_DATA_GATE`, `equity_return_window` 269/666) is untouched by this
+freeze. This freeze does not rerun that Gate, does not mark it PASS, and does
+not admit M2 into modeling.
+
+**Feasibility provenance, reproduced honestly.** D0 (269/666) is independently
+reproduced in-repository from the already-committed, target-free
+`stage127_m2_development_features.csv` by
+`project/stage128/d0_reproduction_and_prelock_feasibility_archival_record.py`.
+D1/D2
+(Gregorian, 539/666)/D3/the Jalali-boundary diagnostic each require raw
+per-day price data that was never committed to this repository (only the
+external bundle's SHA256 is referenced); those four counts are recorded as
+externally-supplied historical evidence only, explicitly flagged as not
+independently re-derived in-repo — no synthetic data was fabricated to
+manufacture a fake reproduction. Those counts were transmitted into the
+repository by the human supervisor
+(`historical_counts_transmitted_by_human = true`); the authorization text is
+the transmission channel, not the scientific source of truth. The raw market
+bundle (`external_market_bundle_sha256 =
+d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`) is not
+present in the repository, the pre-lock D2 count is **not** independently
+verified here
+(`prelock_D2_count_independently_verified_in_repository = false`), canonical
+confirmation is deferred to the still-unauthorized `stage128-m2-d2-gate-rerun`,
+and the original pre-lock feasibility script/output was not preserved
+(`original_prelock_feasibility_script_not_preserved = true`).
+
+**Not authorized by this freeze:** canonical M2 Gate rerun
+(`stage128-m2-d2-gate-rerun`), M2 incremental evaluation, model fitting,
+prediction generation, final-test access, M3/M4 start, or merge of PR #69
+without a later, separate, explicit authorization. See
+`project/stage128/stage128_m2_d2_human_authorization_record.json` for the
+exact authorization scope and
+`project/stage128/stage128_m2_d2_design_freeze.json` for the full
+machine-readable record.
 
 Part 3B.1 / 3B.1A / 3B.1B / 3B.1C remain historical **maintenance** locks;
 Part 3B.1E is the decision-lock surface for the conservative-lag research
@@ -205,7 +286,7 @@ modeling unstarted; final test locked). Part 3C and Part 4 hashes unchanged.
 **No** model fitting, predictions, SHAP, SMOTE, or final-test predictor
 inspection in Part 5 itself.
 
-### Active — `stage126-m1-financial-baseline`
+### Historical (completed) — `stage126-m1-financial-baseline`
 
 Stage126 M1 human-authorized = true
 Stage126 started = true
@@ -865,11 +946,14 @@ amihud_illiquidity 576/666 = 0.8649; common sample 269/666 = 0.4039. Model fits
 NOT authorized.** `stage127-m2-incremental-evaluation` remains unauthorized and
 unstarted.
 
-**Blocking next step (human review required):** review
-`READY_FOR_STAGE127_SEMANTICS_REVIEW_CURRENT_IMPLEMENTATION_CONFORMANT` and
-decide how to respond to a coverage shortfall that is now established as TRUE
-frozen-contract missingness rather than a data defect. No remediation is
-authorized here.
+**Human review COMPLETED (historical).**
+`READY_FOR_STAGE127_SEMANTICS_REVIEW_CURRENT_IMPLEMENTATION_CONFORMANT` was
+reviewed by the human supervisor, who responded to the coverage shortfall — now
+established as TRUE frozen-contract missingness rather than a data defect — by
+separately authorizing `stage128-m2-boundary-month-return-design-freeze`.
+`stage127_m2_semantics_human_decision_required` is therefore now `false`. No
+remediation was performed inside Stage127 and the adjudication outcome is
+unchanged.
 
 ## Not in scope yet (do NOT start)
 

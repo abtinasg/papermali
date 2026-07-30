@@ -760,6 +760,34 @@ advance research action pointers.
   `true` (Part 3A.1). `part3b_started` is `false`. No network extraction was
   performed.** Modeling begins only when Stage126 is approved.
 
+## Stage128 — M2 D2 boundary-month equity-return design freeze (2026-07-30, PR #69, unmerged)
+
+- Freezes `BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN` (Gregorian calendar
+  convention) as the new PRIMARY M2 equity-return construct, replacing only the
+  D0 exact-endpoint `equity_return_window` measurement component. `W`, `t0`,
+  `T*`, trading-day sequence, daily-return adjacency, the 126-usable-return
+  floor, `realized_volatility` and `amihud_illiquidity` are unchanged.
+- Chosen prospectively — after predictor-only feasibility assessment and
+  before any outcome/model evaluation — for coherence with the frozen
+  Gregorian market-time axis, **not** because 539/666 clears the Gate.
+- The historical Stage127 D0 Gate result (`FAIL_M2_DATA_GATE`, 269/666) is
+  preserved byte-for-byte, unchanged, and is not rewritten to appear as if D2
+  existed ex ante.
+- D1 (576/666) remains diagnostic-upper-bound-only and is never adopted as a
+  specification. D3 (555/666) is **not** adopted: it breaks the shared M2
+  information-window construct. The Jalali-boundary diagnostic (459/666) is
+  **not** adopted: it changes eligibility, not measured returns among
+  dual-usable observations.
+- This is a **design-freeze/contract decision only**: no canonical M2 Gate
+  rerun, no model fit, no prediction, no final-test access, and no M2
+  admission occurred as part of freezing this decision.
+- Full record: [`STAGE128_M2_D2_DESIGN_FREEZE.md`](STAGE128_M2_D2_DESIGN_FREEZE.md),
+  `project/stage128/stage128_m2_d2_design_freeze.json`,
+  `project/stage128/stage128_m2_d2_human_authorization_record.json`.
+- **Not yet merged.** Until PR #69 is merged, this decision is not live and
+  the frozen construct above is not yet the repository's operative M2
+  equity-return definition.
+
 ## Ranking & evidence (Stage124 Batch02)
 
 - Tiered **lexicographic** ranking (A–E), not a weighted score.

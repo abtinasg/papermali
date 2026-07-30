@@ -1,0 +1,29 @@
+{
+  "contract_id": "stage128_m2_d2_boundary_month_equity_return_design_freeze",
+  "decision_id": "stage128-m2-boundary-month-return-design-freeze",
+  "generated_for": "stage128-m2-boundary-month-return-design-freeze",
+  "package_artifacts_sha256": {
+    "project/docs/ai/PR_BODY_STAGE128_D2_DESIGN_FREEZE.md": "73c1905b15ad1396693a86f8a8463fa7b2b2c71a7cee11cbf8248599e9d6f553",
+    "project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md": "3e1b833da5424a440a668e2c5b5cf0923213c7c3aedffd77a5dc8b9bd9bc8e27",
+    "project/src/stage128_m2_d2_boundary_month_equity_return.py": "27a3e5dfe36c7e89df386f9ee803ad43b73fd741517d7637c627896a12581a57",
+    "project/stage128/d0_reproduction_and_prelock_feasibility_archival_record.py": "d226c2dbbb2d3e943e2df23685599967be9139694460e2aaa06021908c436141",
+    "project/stage128/stage128_m2_d0_reproduction_audit_table.csv": "7e11fccedea83370773b4f8a3c3acf61b7913a8b265a4de76e6fd92d927d8740",
+    "project/stage128/stage128_m2_d2_design_freeze.json": "a27a8eeee75b3bd7abf0c55e55d072b55b963b67d2453033e9c2c481d5a6395a",
+    "project/stage128/stage128_m2_d2_design_freeze_qc_report.json": "47d0baa9d8d78a65d098c24a4fba12d035ed31800962836d5786976005c7df49",
+    "project/stage128/stage128_m2_d2_feasibility_provenance.json": "2275d8420be1e3da673dc73983390cb583d549d713b93f7ae2bd2bb227a088d5",
+    "project/stage128/stage128_m2_d2_human_authorization_record.json": "2d5e5711cf41d0490fb662cc2d8cfc24038453deaa14962d368c4c5de28f5b8c",
+    "project/tests/test_stage128_m2_d2_boundary_month_equity_return.py": "d984a0b97ca6117e0fc12acd181c95642fa457795daef1b03ca3b9ad647bd292"
+  },
+  "pr_number": 69,
+  "source_artifacts_sha256": {
+    "project/src/stage127_m2_market_data_gate.py": "8f6aca9e972c85850a5a75152068b1312b91be99fe3241746b042fd39ffc50ae",
+    "project/stage125/part3b1_m2_feature_formula_contract_stage125.json": "6d7c8e63d04475f95da8b6f0364be326d7b4581ae21e5b2fe9df955ea7f83f82",
+    "project/stage127/README_STAGE127_M2_MARKET_DATA_GATE.md": "8b6a549f5780c0dbcff0f8d1d7a903946bbc4bd8898258c61f57d320a3113dc5",
+    "project/stage127/metadata_and_hashes_stage127_m2_market_data_gate.json": "6ba07151f3b6eb5c627cc036a6544230f57898d1336ba37db036cdba23b9c409",
+    "project/stage127/stage127_m2_development_features.csv": "b6f380196c49924d5e45038b215e1f1d7ae9d0d86b33f50cb62c49787c36f1bd",
+    "project/stage127/stage127_m2_external_delivery_provenance.json": "39526f144d18dad92d78964d1037f6ba72463d7b054d9d376ce71ce813d2b2f3",
+    "project/stage127/stage127_m2_market_data_gate_decision.json": "c4181fe0fb0c02e262afa8b9a0d6b9fb39802f286a083af692b1a37311b7e26e"
+  },
+  "source_main_commit": "b25804ab764258c846b391f4823f089552c855e3",
+  "source_repository": "abtinasg/papermali"
+}

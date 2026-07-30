@@ -1059,9 +1059,28 @@ def test_current_state_carries_the_semantics_subsection():
         "427 / 427",
         "27 / 27",
         "FAIL_M2_DATA_GATE",
-        "Human decision still required",
     ):
         assert needle in text, f"CURRENT_STATE.md missing: {needle!r}"
+
+    # The human-decision line is STATE-DEPENDENT, and both states must be
+    # rendered truthfully. Before the Stage128 D2 design freeze, the terminal
+    # Stage127 FAIL result was genuinely awaiting a human decision. The freeze
+    # IS that decision, so once it is complete CURRENT_STATE must no longer
+    # claim a decision is still required — it must record the decision as
+    # historically completed instead. The canonical Gate result checked above
+    # is unchanged in either state.
+    state = json.loads(
+        open(
+            os.path.join(_repo_root(), "project/docs/ai/handoff_state.json"),
+            encoding="utf-8",
+        ).read()
+    )
+    if state.get("stage128_m2_d2_design_freeze_completed"):
+        assert "Human decision still required" not in text
+        assert "Human decision COMPLETED (historical)" in text
+        assert "stage128-m2-boundary-month-return-design-freeze" in text
+    else:
+        assert "Human decision still required" in text
 
 
 def test_canonical_gate_and_coverage_unchanged_across_surfaces():

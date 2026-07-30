@@ -1213,7 +1213,10 @@ def test_extract_qc_workflow_markers_fail_closed_when_field_missing():
 )
 def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
-    assert state["current_stage"] == "Stage126"
+    # `current_stage` is a CURRENT-state field and advanced with the freeze;
+    # the Stage126 label survives in the separate micro-part QC role.
+    assert state["current_stage"] == "Stage128"
+    assert state["selected_qc_scope"].startswith("stage126")
     # The newest completed robustness micro-part supplies the selected QC.
     # Part 6 closes the six-category robustness set, so the research-action
     # pointer legitimately transitions to the closure/synthesis milestone
@@ -1226,9 +1229,15 @@ def test_real_repo_handoff_part3b_workflow_markers():
         "stage126-m1-robustness-part6-smote-training-fold-only"
     )
     assert state["next_research_action_id"] == (
-        "stage127-m2-market-data-gate"
+        "stage128-m2-d2-gate-rerun"
     )
-    assert state["active_workstream"] == "stage126_m1_financial_baseline"
+    # The live workstream label advanced with the live state: the Stage128
+    # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
+    # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
+    # HISTORY for the completed M1 baseline workstream, not current state.
+    assert state["active_workstream"] == (
+        "stage128_m2_d2_boundary_month_equity_return"
+    )
     # Stage126 M1 is human-authorized and started; development-fold modeling
     # occurred, while the final test remains fully locked.
     assert state["stage125_completed"] is True
@@ -1274,17 +1283,25 @@ def test_real_repo_roadmap_stage126_status_consistency():
     ).read()
     fm = gen.read_roadmap(REAL_ROOT)
     assert fm["active_research_workstream_id"] == (
-        "stage126-m1-financial-baseline"
+        "stage128-m2-d2-boundary-month-equity-return"
     )
-    # The retained-design freeze (PR #65) completed the design-freeze action:
-    # the completed research action and the next research action both
-    # legitimately advanced once more (see
-    # STAGE126_Q1Q2_LEAN_GOVERNANCE.md sections 10-11).
+    # The workstream label is derived from the frozen action and never
+    # substitutes for a research-action id.
     assert fm["last_completed_research_action_id"] == (
-        "stage126-m1-retained-design-freeze"
+        "stage128-m2-boundary-month-return-design-freeze"
+    )
+    assert fm["next_research_action_id"] == "stage128-m2-d2-gate-rerun"
+    # The Stage128 M2 D2 boundary-month design freeze (PR #69) completed the
+    # design-freeze action: the completed research action and the next
+    # research action both legitimately advanced once more (see
+    # STAGE126_Q1Q2_LEAN_GOVERNANCE.md sections 10-11 and
+    # STAGE128_M2_D2_DESIGN_FREEZE.md §8-9). `stage128-m2-d2-gate-rerun` is a
+    # pointer only, not an authorization.
+    assert fm["last_completed_research_action_id"] == (
+        "stage128-m2-boundary-month-return-design-freeze"
     )
     assert fm["next_research_action_id"] == (
-        "stage127-m2-market-data-gate"
+        "stage128-m2-d2-gate-rerun"
     )
     # Isolate the Stage126 M1 research-action row (item 18) — now COMPLETE.
     match = re.search(
@@ -1373,8 +1390,19 @@ def test_real_repo_open_tasks_stage126_markers_match_handoff():
         encoding="utf-8",
     ).read()
     state = _state(REAL_ROOT)
-    assert "## Active research workstream: `stage126-m1-financial-baseline`" in (
-        open_tasks
+    # OPEN_TASKS names the CURRENT workstream, which advanced with the
+    # Stage128 D2 design freeze; the Stage126 M1 baseline is retained below it
+    # as an explicitly HISTORICAL (completed) section.
+    assert (
+        "## Active research workstream: "
+        "`stage128-m2-d2-boundary-month-equity-return`" in open_tasks
+    )
+    assert (
+        "### Historical (completed) — `stage126-m1-financial-baseline`"
+        in open_tasks
+    )
+    assert state["active_workstream"] == (
+        "stage128_m2_d2_boundary_month_equity_return"
     )
     assert "Stage126 M1 human-authorized = true" in open_tasks
     assert "Stage126 started = true" in open_tasks
@@ -2238,8 +2266,14 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     legitimately advanced to the closure/synthesis milestone.
     """
     state = _state(REAL_ROOT)
-    assert state["next_research_action_id"] == "stage127-m2-market-data-gate"
-    assert state["active_workstream"] == "stage126_m1_financial_baseline"
+    assert state["next_research_action_id"] == "stage128-m2-d2-gate-rerun"
+    # The live workstream label advanced with the live state: the Stage128
+    # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
+    # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
+    # HISTORY for the completed M1 baseline workstream, not current state.
+    assert state["active_workstream"] == (
+        "stage128_m2_d2_boundary_month_equity_return"
+    )
     # The micro-part pointer tracks the newest completed robustness micro-part.
     assert state["last_completed_micro_part"] == \
         "stage126-m1-robustness-part6-smote-training-fold-only"
@@ -2248,7 +2282,10 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
 def test_robustness_decision_lock_preserves_primary_and_final_test_state():
     """Decision lock must not change primary or final-test state."""
     state = _state(REAL_ROOT)
-    assert state["current_stage"] == "Stage126"
+    # `current_stage` is a CURRENT-state field and advanced with the freeze;
+    # the Stage126 label survives in the separate micro-part QC role.
+    assert state["current_stage"] == "Stage128"
+    assert state["selected_qc_scope"].startswith("stage126")
     assert state["m1_primary_development_tuning_completed"] is True
     assert state["final_test_unlocked"] is False
     assert state["final_test_access_authorized"] is False
@@ -2517,9 +2554,18 @@ def test_part1_does_not_advance_research_pointers():
     STAGE126_Q1Q2_LEAN_GOVERNANCE.md sections 10-11), which real-repo state
     now reflects."""
     state = _state(REAL_ROOT)
-    assert state["next_research_action_id"] == "stage127-m2-market-data-gate"
-    assert state["active_workstream"] == "stage126_m1_financial_baseline"
-    assert state["current_stage"] == "Stage126"
+    assert state["next_research_action_id"] == "stage128-m2-d2-gate-rerun"
+    # The live workstream label advanced with the live state: the Stage128
+    # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
+    # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
+    # HISTORY for the completed M1 baseline workstream, not current state.
+    assert state["active_workstream"] == (
+        "stage128_m2_d2_boundary_month_equity_return"
+    )
+    # `current_stage` is a CURRENT-state field and advanced with the freeze;
+    # the Stage126 label survives in the separate micro-part QC role.
+    assert state["current_stage"] == "Stage128"
+    assert state["selected_qc_scope"].startswith("stage126")
 
 
 def test_part1_markers_positive_from_synthetic(tmp_path):
@@ -2717,7 +2763,7 @@ def test_handoff_carries_live_vs_historical_test_boundary_markers():
     )
     assert state["m1_robustness_part4_authorized"] is False
     assert state["final_test_unlocked"] is False
-    assert state["next_research_action_id"] == "stage127-m2-market-data-gate"
+    assert state["next_research_action_id"] == "stage128-m2-d2-gate-rerun"
     # Stage125 Part 5 stays historical and immutable.
     assert state["stage125_part5_mode"] == "historical_immutable"
     assert state["stage125_part5_live_gate_active"] is False
@@ -2770,8 +2816,14 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     assert state["final_test_evaluation_performed"] is False
     # The workstream pointer stays put; the research-action pointer legitimately
     # advanced because Part 6 closed the six-category robustness set.
-    assert state["active_workstream"] == "stage126_m1_financial_baseline"
-    assert state["next_research_action_id"] == "stage127-m2-market-data-gate"
+    # The live workstream label advanced with the live state: the Stage128
+    # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
+    # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
+    # HISTORY for the completed M1 baseline workstream, not current state.
+    assert state["active_workstream"] == (
+        "stage128_m2_d2_boundary_month_equity_return"
+    )
+    assert state["next_research_action_id"] == "stage128-m2-d2-gate-rerun"
 
 
 def test_part5_compatibility_markers_absent_without_artifacts(tmp_path):
@@ -2823,7 +2875,7 @@ def test_current_state_labels_micro_part_not_research_action():
     assert "Last completed research action" not in text, (
         "a robustness micro-part must never be labelled a research action"
     )
-    assert "- **Next research action:** `stage127-m2-market-data-gate`" in text
+    assert "- **Next research action:** `stage128-m2-d2-gate-rerun`" in text
 
 
 # --------------------------------------------------------------------------- #

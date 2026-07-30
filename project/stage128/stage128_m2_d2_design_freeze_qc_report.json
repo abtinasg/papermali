@@ -1,0 +1,233 @@
+{
+  "all_pass": true,
+  "all_pass_semantics": "all_pass means: every REQUIRED freeze-package assertion listed in `assertions` passed, INCLUDING the no-new-regressions-vs-base check. It does NOT mean the entire relevant test suite literally had zero failures -- it did not. See `test_evidence` for the literal, unhidden suite counts.",
+  "assertion_count": 43,
+  "assertions": [
+    {
+      "name": "decision_id_matches_authorization",
+      "status": "PASS"
+    },
+    {
+      "name": "authorized_action_id_matches_authorization",
+      "status": "PASS"
+    },
+    {
+      "name": "merge_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "name": "d2_gate_rerun_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_incremental_evaluation_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "name": "modeling_authorized_by_this_action_false",
+      "status": "PASS"
+    },
+    {
+      "name": "final_test_access_authorized_false",
+      "status": "PASS"
+    },
+    {
+      "name": "shared_window_W_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "t0_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "T_star_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "daily_return_adjacency_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "minimum_usable_daily_returns_126_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "realized_volatility_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "amihud_illiquidity_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "no_fourth_primary_market_feature_added",
+      "status": "PASS"
+    },
+    {
+      "name": "zero_trade_day_ratio_not_primary",
+      "status": "PASS"
+    },
+    {
+      "name": "calendar_convention_gregorian",
+      "status": "PASS"
+    },
+    {
+      "name": "no_cross_month_fallback",
+      "status": "PASS"
+    },
+    {
+      "name": "no_imputation_forward_fill_backward_fill",
+      "status": "PASS"
+    },
+    {
+      "name": "no_interpolation_extrapolation",
+      "status": "PASS"
+    },
+    {
+      "name": "no_unadjusted_close_substitution",
+      "status": "PASS"
+    },
+    {
+      "name": "no_synthetic_adjusted_prices",
+      "status": "PASS"
+    },
+    {
+      "name": "endpoint_validity_semantics_documented",
+      "status": "PASS"
+    },
+    {
+      "name": "d0_historical_fail_status_preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "d1_marked_diagnostic_only",
+      "status": "PASS"
+    },
+    {
+      "name": "d3_marked_not_adopted",
+      "status": "PASS"
+    },
+    {
+      "name": "jalali_marked_not_adopted",
+      "status": "PASS"
+    },
+    {
+      "name": "d0_reproduction_matches_authorizing_utterance",
+      "status": "PASS"
+    },
+    {
+      "name": "d1_d2_d3_jalali_marked_not_independently_reproduced",
+      "status": "PASS"
+    },
+    {
+      "name": "no_synthetic_data_manufactured_as_reproduction",
+      "status": "PASS"
+    },
+    {
+      "name": "feasibility_provenance_artifact_present",
+      "status": "PASS"
+    },
+    {
+      "name": "eligibility_audit_contract_present_not_executed",
+      "status": "PASS"
+    },
+    {
+      "name": "historical_stage127_artifacts_untouched",
+      "status": "PASS"
+    },
+    {
+      "name": "canonical_gate_executed_in_this_action_false",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_admitted_in_this_action_false",
+      "status": "PASS"
+    },
+    {
+      "name": "target_values_accessed_zero",
+      "status": "PASS"
+    },
+    {
+      "name": "model_fits_zero",
+      "status": "PASS"
+    },
+    {
+      "name": "predictions_zero",
+      "status": "PASS"
+    },
+    {
+      "name": "final_test_access_zero",
+      "status": "PASS"
+    },
+    {
+      "name": "next_action_identified_does_not_imply_authorized",
+      "status": "PASS"
+    },
+    {
+      "name": "focused_stage128_tests_pass",
+      "status": "PASS"
+    },
+    {
+      "detail": "no new failures and no new errors versus the exact PR base commit b25804ab764258c846b391f4823f089552c855e3 on the same machine/environment. This assertion is a REGRESSION check; it does NOT assert that the relevant suite had zero failures (it did not -- see test_evidence).",
+      "name": "relevant_suite_regression_check_pass",
+      "status": "PASS"
+    },
+    {
+      "detail": "the 8 relevant-suite failures are the identical pre-existing FileNotFoundError present at base",
+      "name": "relevant_suite_known_environment_failures_unchanged_vs_base",
+      "status": "PASS"
+    }
+  ],
+  "contract_id": "stage128_m2_d2_boundary_month_equity_return_design_freeze",
+  "decision_id": "stage128-m2-boundary-month-return-design-freeze",
+  "generated_for": "stage128-m2-boundary-month-return-design-freeze",
+  "required_freeze_package_assertions_all_pass": true,
+  "scope_note": "This QC report checks internal consistency of the Stage128 design-freeze package itself (authorization scope, frozen-vs-changed invariants, historical preservation, provenance honesty, and the no-execution guarantees). It is not a re-run of the canonical M2 Gate and does not itself constitute a Gate decision.",
+  "test_evidence": {
+    "focused_stage128_tests_command": "PYTHONPATH=project python -m pytest project/tests/test_stage128_m2_d2_boundary_month_equity_return.py project/tests/test_stage128_m2_d2_design_freeze_package.py -q",
+    "focused_stage128_tests_pass": true,
+    "focused_stage128_tests_result": "56 passed",
+    "full_suite_base_vs_head": {
+      "base_preexisting_failure_nodeids": [
+        "project/tests/test_stage125_part5_readiness_closure.py::test_run_canonical_check_zero_scientific_drift",
+        "project/tests/test_stage126_m1_robustness_closure.py::test_on_disk_artifacts_match_fresh_build"
+      ],
+      "base_ref": "b25804ab764258c846b391f4823f089552c855e3",
+      "base_result": {
+        "deselected": 14,
+        "errors": 0,
+        "failed": 2,
+        "passed": 2916,
+        "skipped": 1
+      },
+      "environment": "same machine and environment, identical working directory, gitignored inputs present",
+      "head_result": {
+        "deselected": 14,
+        "errors": 0,
+        "failed": 2,
+        "passed": 2977,
+        "skipped": 1
+      },
+      "new_error_nodeids": 0,
+      "new_failure_nodeids": 0,
+      "resolved_failure_nodeids": 0
+    },
+    "relevant_suite_all_pass": false,
+    "relevant_suite_all_pass_scope": "FALSE as scoped to the ORIGINALLY REPORTED environment for this PR, in which the gitignored, untracked Stage125 input project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv is ABSENT. In that environment the relevant suite was 765 passed / 8 failed / 26 skipped, so it is NOT truthful to assert that the relevant suite passes. See relevant_suite_final_head_run for the separate final-head environment in which that input IS present.",
+    "relevant_suite_baseline_ref": "b25804ab764258c846b391f4823f089552c855e3",
+    "relevant_suite_command": "PYTHONPATH=project python -m pytest project/tests/test_ai_handoff.py project/tests/test_stage126_current_state_validator.py project/tests/test_stage128_m2_d2_boundary_month_equity_return.py project/tests/test_stage128_m2_d2_design_freeze_package.py project/tests/test_stage127_m2_market_data_gate.py project/tests/test_stage127_m2_external_delivery_import.py project/tests/test_stage127_m2_zero_trade_semantics_import.py project/tests/test_stage127_m2_external_retrieval_request.py -q",
+    "relevant_suite_final_head_run": {
+      "all_pass": true,
+      "environment": "final-head checkout WITH the gitignored Stage125 input present",
+      "failed": 0,
+      "note": "With the previously missing gitignored input present, the 8 known environment failures do not occur and the relevant suite is literally all-pass on the final head. Both environments are recorded so neither result is overstated.",
+      "passed": 813,
+      "skipped": 1
+    },
+    "relevant_suite_known_environment_failure_limitation": "All 8 failures are the identical pre-existing FileNotFoundError for the gitignored, untracked Stage125 input project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv. The identical 8 failures occur in a clean checkout of the PR base commit b25804ab764258c846b391f4823f089552c855e3 in the same environment. They are an environment/untracked-asset limitation of that checkout, not a regression introduced by this PR. They are recorded, not hidden.",
+    "relevant_suite_known_environment_failures": 8,
+    "relevant_suite_new_errors_vs_base": 0,
+    "relevant_suite_new_failures_vs_base": 0,
+    "relevant_suite_regression_check_pass": true
+  }
+}

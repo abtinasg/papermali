@@ -590,13 +590,17 @@ def test_final_test_remains_locked():
 
 def test_research_pointers_unchanged():
     report = _read_json(v.F_REPORT)
-    assert report["active_workstream"] == "stage126_m1_financial_baseline"
+    assert report["active_workstream"] == (
+        "stage128_m2_d2_boundary_month_equity_return"
+    )
     # Part 6 closed the six-category robustness set, the synthesis-only
-    # robustness closure completed, and the retained-design freeze (PR #65)
+    # robustness closure completed, the retained-design freeze (PR #65)
+    # completed, and the Stage128 M2 D2 boundary-month design freeze (PR #69)
     # has since also completed: the next research action legitimately
-    # transitioned once more to the M2 market-data-gate milestone (which
-    # itself still requires a separate future human authorization).
-    assert report["next_research_action_id"] == "stage127-m2-market-data-gate"
+    # transitioned once more to the D2 Gate re-run pointer (which itself
+    # still requires a separate future human authorization -- see
+    # STAGE128_M2_D2_DESIGN_FREEZE.md §8-9).
+    assert report["next_research_action_id"] == "stage128-m2-d2-gate-rerun"
 
 
 @pytest.mark.parametrize("field", sorted(
@@ -685,8 +689,8 @@ def test_handoff_carries_boundary_markers():
 def _mirror(tmp_path: Path) -> Path:
     """Copy the Stage126/Stage125/docs surfaces the validator reads."""
     root = tmp_path / "repo"
-    for rel in ("project/stage126", "project/stage125", "project/docs/ai",
-                "project/src", "project/tests"):
+    for rel in ("project/stage126", "project/stage125", "project/stage128",
+                "project/docs/ai", "project/src", "project/tests"):
         src = Path(REAL_ROOT) / rel
         dst = root / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
@@ -1360,3 +1364,186 @@ def test_informational_drift_reported_but_never_fails_build_assertions():
     names = {a["name"]: a for a in meta["assertions"]}
     assert "closed_part_registry_scientific_state_immutable" in names
     assert names["closed_part_registry_scientific_state_immutable"]["status"] == "PASS"
+
+
+# --------------------------------------------------------------------------- #
+# Stage127 human-review closure after the Stage128 D2 design freeze
+# --------------------------------------------------------------------------- #
+
+def _live_handoff() -> dict:
+    return json.loads(
+        (_root() / v.HANDOFF_STATE_REL).read_text(encoding="utf-8")
+    )
+
+
+def test_stage128_freeze_forbids_stale_stage127_pending_human_review():
+    """The contradiction this guard exists for must be detected.
+
+    Once the Stage128 D2 design freeze is completed, the freeze IS the human
+    decision the terminal Stage127 FAIL result was waiting for, so neither
+    Stage127 pending-human-review marker may still be True.
+    """
+    ok = dict(_live_handoff())
+    assert v.stage127_human_review_closure_consistent(
+        ok, freeze_completed=True) is True
+
+    for field in (
+        "stage127_m2_market_data_gate_terminal_result_pending_human_review",
+        "stage127_m2_semantics_human_decision_required",
+    ):
+        contradictory = dict(ok)
+        contradictory[field] = True
+        assert v.stage127_human_review_closure_consistent(
+            contradictory, freeze_completed=True) is False, field
+        # Before the freeze the same state is legitimate history.
+        assert v.stage127_human_review_closure_consistent(
+            contradictory, freeze_completed=False) is True, field
+
+
+def test_live_handoff_has_no_stage127_human_review_contradiction():
+    state = _live_handoff()
+    if state.get("stage128_m2_d2_design_freeze_completed"):
+        assert state[
+            "stage127_m2_market_data_gate_terminal_result_pending_human_review"
+        ] is False
+        assert state["stage127_m2_semantics_human_decision_required"] is False
+        # The history is preserved, not erased.
+        assert state["stage127_m2_human_review_originally_required"] is True
+        assert state["stage127_m2_human_review_resolved_by_action_id"] == (
+            "stage128-m2-boundary-month-return-design-freeze"
+        )
+
+
+def test_historical_d0_gate_status_never_rewritten():
+    state = _live_handoff()
+    assert state["stage127_m2_market_data_gate_status"] == "FAIL_M2_DATA_GATE"
+    assert v.stage127_historical_d0_gate_status_preserved(state) is True
+    for bad in ("PASS_M2_DATA_GATE", "PASS", "UNRESOLVED"):
+        tampered = dict(state)
+        tampered["stage127_m2_market_data_gate_status"] = bad
+        assert v.stage127_historical_d0_gate_status_preserved(tampered) is False
+
+
+def test_current_state_renders_stage128_section_after_freeze():
+    state = _live_handoff()
+    text = (_root() / v.CURRENT_STATE_MD_REL).read_text(encoding="utf-8")
+    if state.get("stage128_m2_d2_design_freeze_completed"):
+        assert (
+            "## Stage128 — M2 D2 boundary-month equity-return design freeze"
+            in text
+        )
+        # Stage127 is rendered as HISTORICAL, not as the current action.
+        assert "(HISTORICAL — COMPLETED AND RESOLVED)" in text
+        assert (
+            "_The current scientific action. Its human authorization already "
+            "exists" not in text
+        )
+        assert "Human decision still required" not in text
+        assert "`FAIL_M2_DATA_GATE`" in text
+
+
+def test_new_stage127_closure_assertions_present_and_passing():
+    meta = _read_json(v.F_METADATA)
+    names = {a["name"]: a for a in meta["assertions"]}
+    for name in (
+        "stage128_freeze_closes_stage127_pending_human_review",
+        "stage127_human_review_history_not_erased",
+        "stage127_historical_d0_gate_status_preserved",
+        "current_state_renders_stage128_section_after_freeze",
+        "current_state_does_not_call_stage127_the_current_action_after_freeze",
+    ):
+        assert name in names, name
+        assert names[name]["status"] == "PASS", name
+
+
+# --------------------------------------------------------------------------- #
+# Live current-state labels must not go stale after the Stage128 D2 freeze
+# --------------------------------------------------------------------------- #
+
+def test_stage128_freeze_forbids_stale_stage126_current_labels():
+    """`current_stage` / `active_workstream` describe the CURRENT state.
+
+    Leaving them at `Stage126` / `stage126_m1_financial_baseline` once the
+    Stage128 D2 design freeze is complete produces an ambiguous live state:
+    a snapshot naming the Stage126 M1 workstream beside canonical pointers
+    that have advanced to `stage128-m2-d2-gate-rerun`.
+    """
+    ok = dict(_live_handoff())
+    assert v.current_state_labels_are_not_stale(
+        ok, freeze_completed=True) is True
+
+    for field, stale in (
+        ("current_stage", "Stage126"),
+        ("active_workstream", "stage126_m1_financial_baseline"),
+    ):
+        contradictory = dict(ok)
+        contradictory[field] = stale
+        assert v.current_state_labels_are_not_stale(
+            contradictory, freeze_completed=True) is False, field
+        # Before the freeze the same values are the correct live state.
+        assert v.current_state_labels_are_not_stale(
+            contradictory, freeze_completed=False) is True, field
+
+
+def test_live_handoff_labels_match_the_live_research_state():
+    state = _live_handoff()
+    if state.get("stage128_m2_d2_design_freeze_completed"):
+        assert state["current_stage"] == "Stage128"
+        assert state["active_workstream"] == (
+            "stage128_m2_d2_boundary_month_equity_return"
+        )
+        # The authoritative research-action ids are UNCHANGED by the label fix.
+        assert state["last_completed_research_action_id"] == (
+            "stage128-m2-boundary-month-return-design-freeze"
+        )
+        assert state["next_research_action_id"] == "stage128-m2-d2-gate-rerun"
+        # And nothing further is authorized by advancing a label.
+        for field in (
+            "stage128_m2_d2_gate_rerun_authorized",
+            "m2_incremental_evaluation_authorized",
+            "m2_modeling_started",
+            "final_test_unlocked",
+        ):
+            assert state[field] is False, field
+        assert state["stage127_m2_market_data_gate_status"] == (
+            "FAIL_M2_DATA_GATE"
+        )
+
+
+def test_expected_labels_are_state_dependent_not_hardcoded():
+    root = _root()
+    assert v.expected_current_stage(root) == "Stage128"
+    assert v.expected_active_workstream(root) == (
+        "stage128_m2_d2_boundary_month_equity_return"
+    )
+    # The Stage126 constants survive as the pre-freeze expectation.
+    assert v.ACTIVE_WORKSTREAM == "stage126_m1_financial_baseline"
+    assert v.STAGE126_CURRENT_STAGE == "Stage126"
+
+
+def test_current_state_snapshot_renders_stage128_labels():
+    state = _live_handoff()
+    text = (_root() / v.CURRENT_STATE_MD_REL).read_text(encoding="utf-8")
+    if state.get("stage128_m2_d2_design_freeze_completed"):
+        assert "- **Stage / Batch:** Stage128 /" in text
+        assert (
+            "- **Active workstream:** `stage128_m2_d2_boundary_month_equity_return`"
+            in text
+        )
+        assert "- **Next research action:** `stage128-m2-d2-gate-rerun`" in text
+        assert (
+            "## Stage128 — M2 D2 boundary-month equity-return design freeze"
+            in text
+        )
+
+
+def test_stale_label_assertions_present_and_passing():
+    meta = _read_json(v.F_METADATA)
+    names = {a["name"]: a for a in meta["assertions"]}
+    for name in (
+        "current_state_labels_not_stale_after_stage128_freeze",
+        "stage128_workstream_id_does_not_replace_research_action_ids",
+        "stage128_freeze_authorizes_nothing_further",
+    ):
+        assert name in names, name
+        assert names[name]["status"] == "PASS", name

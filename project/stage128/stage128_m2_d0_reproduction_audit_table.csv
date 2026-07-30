@@ -1,0 +1,667 @@
+ticker,fiscal_year_t,pair_cutoff_date,t0_trading_date,tN_trading_date,window_trading_day_count,usable_daily_return_count,d0_equity_return_window_usable,realized_volatility_usable,amihud_illiquidity_usable,in_three_variable_common_sample,m2_value_status
+بموتو,1392,2014-01-20,2013-01-19,2014-01-18,242,169,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+ثنوسا,1392,2014-01-20,2013-01-19,2014-01-18,242,160,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+حپترو,1392,2014-07-20,2013-07-16,2014-07-16,245,209,True,True,True,True,OBSERVED_COMPLETE
+حکشتی,1392,2013-10-22,2012-10-21,2013-10-21,241,196,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+خاذین,1392,2014-07-20,2013-07-16,2014-07-16,245,224,True,True,True,True,OBSERVED_COMPLETE
+خبهمن,1392,2014-07-20,2013-07-16,2014-07-16,245,235,True,True,True,True,OBSERVED_COMPLETE
+ختوقا,1392,2014-07-20,2013-07-16,2014-07-16,245,221,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خرینگ,1392,2014-07-20,2013-07-16,2014-07-16,245,205,True,True,True,True,OBSERVED_COMPLETE
+خمحور,1392,2014-07-20,2013-07-16,2014-07-16,245,201,True,True,True,True,OBSERVED_COMPLETE
+خمهر,1392,2014-07-20,2013-07-16,2014-07-16,245,212,True,True,True,True,OBSERVED_COMPLETE
+خنصیر,1392,2014-07-20,2013-07-16,2014-07-16,245,140,True,True,True,True,OBSERVED_COMPLETE
+خوساز,1392,2014-07-20,2013-07-16,2014-07-16,245,207,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خچرخش,1392,2014-07-20,2013-07-16,2014-07-16,245,139,True,True,True,True,OBSERVED_COMPLETE
+خکمک,1392,2014-07-20,2013-07-16,2014-07-16,245,216,True,True,True,True,OBSERVED_COMPLETE
+دروز,1392,2014-07-20,2013-07-16,2014-07-16,245,54,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=54 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=54 < 126
+دسبحا,1392,2014-07-20,2013-07-16,2014-07-16,245,231,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+دیران,1392,2014-07-20,2013-07-16,2014-07-16,245,213,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+رانفور,1392,2014-07-20,2013-07-16,2014-07-16,245,235,True,True,True,True,OBSERVED_COMPLETE
+زمگسا,1392,2014-07-20,2013-07-16,2014-07-16,245,229,True,True,True,True,OBSERVED_COMPLETE
+ساراب,1392,2014-07-20,2013-07-16,2014-07-16,245,233,True,True,True,True,OBSERVED_COMPLETE
+سبهان,1392,2014-07-20,2013-07-16,2014-07-16,245,230,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سخزر,1392,2014-07-20,2013-07-16,2014-07-16,245,162,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+سدشت,1392,2014-01-20,2013-01-19,2014-01-18,242,19,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=19 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=19 < 126
+سدور,1392,2014-07-20,2013-07-16,2014-07-16,245,214,True,True,True,True,OBSERVED_COMPLETE
+سرود,1392,2014-07-20,2013-07-16,2014-07-16,245,219,True,True,True,True,OBSERVED_COMPLETE
+سشرق,1392,2014-01-20,2013-01-19,2014-01-18,242,214,True,True,True,True,OBSERVED_COMPLETE
+سقاین,1392,2014-07-20,2013-07-16,2014-07-16,245,187,True,True,True,True,OBSERVED_COMPLETE
+سمازن,1392,2014-07-20,2013-07-16,2014-07-16,245,157,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+سهگمت,1392,2014-05-20,2013-05-19,2014-05-19,244,229,True,True,True,True,OBSERVED_COMPLETE
+سپاها,1392,2014-01-20,2013-01-19,2014-01-18,242,227,True,True,True,True,OBSERVED_COMPLETE
+سکرد,1392,2014-01-20,2013-01-19,2014-01-18,242,193,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+سیلام,1392,2014-05-20,2013-05-19,2014-05-19,244,193,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+غبهنوش,1392,2014-07-20,2013-07-16,2014-07-16,245,141,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+غدام,1392,2014-04-19,2013-04-16,2014-04-16,245,88,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=88 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=88 < 126
+غسالم,1392,2014-07-20,2013-07-16,2014-07-16,245,168,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+غشان,1392,2014-07-20,2013-07-16,2014-07-16,245,219,True,True,True,True,OBSERVED_COMPLETE
+غشهد,1392,2014-07-20,2013-07-16,2014-07-16,245,133,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+غنوش,1392,2014-07-20,2013-07-16,2014-07-16,245,92,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=92 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=92 < 126
+غگل,1392,2014-01-20,2013-01-19,2014-01-18,242,60,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=60 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=60 < 126
+کبافق,1392,2014-07-20,2013-07-16,2014-07-16,245,169,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+کرازی,1392,2014-07-20,2013-07-16,2014-07-16,245,228,True,True,True,True,OBSERVED_COMPLETE
+کفرا,1392,2014-07-20,2013-07-16,2014-07-16,245,200,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+کفپارس,1392,2014-04-19,2013-04-16,2014-04-16,245,99,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=99 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=99 < 126
+کهمدا,1392,2013-10-22,2012-10-21,2013-10-21,241,205,True,True,True,True,OBSERVED_COMPLETE
+کگاز,1392,2014-07-20,2013-07-16,2014-07-16,245,206,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+کگل,1392,2014-07-20,2013-07-16,2014-07-16,245,221,True,True,True,True,OBSERVED_COMPLETE
+بالبر,1393,2015-01-20,2014-01-20,2015-01-19,242,212,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+بترانس,1393,2015-07-20,2014-07-20,2015-07-19,241,225,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+بموتو,1393,2015-01-20,2014-01-20,2015-01-19,242,205,True,True,True,True,OBSERVED_COMPLETE
+بکاب,1393,2015-01-20,2014-01-20,2015-01-19,242,109,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=109 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=109 < 126
+بکام,1393,2015-07-20,2014-07-20,2015-07-19,241,216,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+تپمپی,1393,2014-10-22,2013-10-21,2014-10-21,244,126,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+تکمبا,1393,2015-07-20,2014-07-20,2015-07-19,241,198,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ثشرق,1393,2015-01-20,2014-05-11,2015-01-19,169,125,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=125 < 126; adjusted_close missing at window start t0; usable_amihud_day_count=125 < 126
+ثنوسا,1393,2015-01-20,2014-01-20,2015-01-19,242,213,True,True,True,True,OBSERVED_COMPLETE
+حپترو,1393,2015-07-20,2014-07-20,2015-07-19,241,236,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+حکشتی,1393,2014-10-22,2013-10-21,2014-10-21,244,181,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+خاذین,1393,2015-07-20,2014-07-20,2015-07-19,241,166,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+خبهمن,1393,2015-07-20,2014-07-20,2015-07-19,241,230,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ختوقا,1393,2015-07-20,2014-07-20,2015-07-19,241,211,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+خرینگ,1393,2015-07-20,2014-07-20,2015-07-19,241,230,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+خمحور,1393,2015-07-20,2014-07-20,2015-07-19,241,217,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+خمهر,1393,2015-07-20,2014-07-20,2015-07-19,241,236,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+خنصیر,1393,2015-07-20,2014-07-20,2015-07-19,241,201,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+خوساز,1393,2015-07-20,2014-07-20,2015-07-19,241,219,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+خچرخش,1393,2015-07-20,2014-07-20,2015-07-19,241,210,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+خکمک,1393,2015-07-20,2014-07-20,2015-07-19,241,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ددام,1393,2015-07-20,2014-07-20,2015-07-19,241,205,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+دروز,1393,2015-07-20,2014-07-20,2015-07-19,241,97,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=97 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=97 < 126
+دسبحا,1393,2015-07-20,2014-07-20,2015-07-19,241,223,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+دسینا,1393,2015-07-20,2014-07-20,2015-07-19,241,216,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+دشیمی,1393,2015-07-20,2014-07-20,2015-07-19,241,157,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+دیران,1393,2015-07-20,2014-07-20,2015-07-19,241,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+رانفور,1393,2015-07-20,2014-07-20,2015-07-19,241,233,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+زمگسا,1393,2015-07-20,2014-07-20,2015-07-19,241,196,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ساراب,1393,2015-07-20,2014-07-20,2015-07-19,241,211,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ساربیل,1393,2015-04-19,2014-04-19,2015-04-18,242,60,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=60 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=60 < 126
+ساروم,1393,2015-07-20,2014-07-20,2015-07-19,241,134,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+سبجنو,1393,2015-07-20,2014-07-20,2015-07-19,241,47,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=47 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=47 < 126
+سبهان,1393,2015-07-20,2014-07-20,2015-07-19,241,168,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ستران,1393,2015-07-20,2014-07-20,2015-07-19,241,231,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+سخاش,1393,2015-07-20,2014-07-20,2015-07-19,241,110,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=110 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=110 < 126
+سخزر,1393,2015-07-20,2014-07-20,2015-07-19,241,139,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+سدشت,1393,2015-01-20,2014-01-20,2015-01-19,242,87,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=87 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=87 < 126
+سدور,1393,2015-07-20,2014-07-20,2015-07-19,241,105,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=105 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=105 < 126
+سرود,1393,2015-07-20,2014-07-20,2015-07-19,241,219,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+سشرق,1393,2015-01-20,2014-01-20,2015-01-19,242,212,True,True,True,True,OBSERVED_COMPLETE
+سصفها,1393,2015-07-20,2014-07-20,2015-07-19,241,62,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=62 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=62 < 126
+سغرب,1393,2015-07-20,2014-07-20,2015-07-19,241,229,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+سقاین,1393,2015-07-20,2014-07-20,2015-07-19,241,118,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=118 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=118 < 126
+سمازن,1393,2015-07-20,2014-07-20,2015-07-19,241,50,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=50 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=50 < 126
+سنیر,1393,2015-07-20,2014-07-20,2015-07-19,241,13,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=13 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=13 < 126
+سهگمت,1393,2015-05-20,2014-05-19,2015-05-19,242,199,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+سپاها,1393,2015-01-20,2014-01-20,2015-01-19,242,234,True,True,True,True,OBSERVED_COMPLETE
+سکرد,1393,2015-01-20,2014-01-20,2015-01-19,242,174,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سیلام,1393,2015-05-20,2014-05-19,2015-05-19,242,91,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=91 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=91 < 126
+شاراک,1393,2015-07-20,2014-07-20,2015-07-19,241,233,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+شبریز,1393,2015-07-20,2014-07-20,2015-07-19,241,71,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=71 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=71 < 126
+شبندر,1393,2015-07-20,2014-07-20,2015-07-19,241,70,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=70 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=70 < 126
+شدوص,1393,2015-07-20,2014-07-20,2015-07-19,241,219,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+شفارس,1393,2015-07-20,2014-07-20,2015-07-19,241,215,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+شلعاب,1393,2015-07-20,2014-07-20,2015-07-19,241,205,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+شپارس,1393,2015-01-20,2014-01-20,2015-01-19,242,118,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=118 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=118 < 126
+شپنا,1393,2015-07-20,2014-07-20,2015-07-19,241,71,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=71 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=71 < 126
+شکربن,1393,2015-07-20,2014-07-20,2015-07-19,241,226,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+شکلر,1393,2015-01-20,2014-01-20,2015-01-19,242,206,True,True,True,True,OBSERVED_COMPLETE
+شیران,1393,2015-04-19,2014-04-19,2015-04-18,242,227,True,True,True,True,OBSERVED_COMPLETE
+غبهنوش,1393,2015-07-20,2014-07-20,2015-07-19,241,204,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+غدام,1393,2015-04-19,2014-04-19,2015-04-18,242,107,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=107 < 126; adjusted_close missing at window start t0; usable_amihud_day_count=107 < 126
+غسالم,1393,2015-07-20,2014-07-20,2015-07-19,241,97,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=97 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=97 < 126
+غشان,1393,2015-07-20,2014-07-20,2015-07-19,241,187,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+غشهد,1393,2015-07-20,2014-07-20,2015-07-19,241,154,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+غنوش,1393,2015-07-20,2014-07-20,2015-07-19,241,13,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=13 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=13 < 126
+غگل,1393,2015-01-20,2014-01-20,2015-01-19,242,21,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=21 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=21 < 126
+فاذر,1393,2015-07-20,2014-07-20,2015-07-19,241,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+فایرا,1393,2015-07-20,2014-07-20,2015-07-19,241,187,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فباهنر,1393,2015-07-20,2014-07-20,2015-07-19,241,219,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+فجام,1393,2015-07-20,2014-07-20,2015-07-19,241,169,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فجر,1393,2015-07-20,2014-07-20,2015-07-19,241,44,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=44 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=44 < 126
+فخوز,1393,2015-07-20,2014-07-20,2015-07-19,241,207,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+فرآور,1393,2015-07-20,2014-07-20,2015-07-19,241,229,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+فسرب,1393,2015-07-20,2014-07-20,2015-07-19,241,206,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+فسپا,1393,2015-07-20,2014-07-20,2015-07-19,241,34,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=34 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=34 < 126
+فمراد,1393,2015-07-20,2014-07-20,2015-07-19,241,75,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=75 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=75 < 126
+فملی,1393,2015-07-20,2014-07-20,2015-07-19,241,210,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+فنورد,1393,2015-07-20,2014-07-20,2015-07-19,241,100,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=100 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=100 < 126
+فولاژ,1393,2015-07-20,2014-07-20,2015-07-19,241,225,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+فپنتا,1393,2015-07-20,2014-07-20,2015-07-19,241,122,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=122 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=122 < 126
+لابسا,1393,2015-07-20,2014-07-20,2015-07-19,241,207,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+لبوتان,1393,2015-07-20,2014-07-20,2015-07-19,241,142,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+لخزر,1393,2015-07-20,2014-07-20,2015-07-19,241,178,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+لسرما,1393,2015-07-20,2014-07-20,2015-07-19,241,209,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+پدرخش,1393,2015-07-20,2014-07-20,2015-07-19,241,148,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+پسهند,1393,2015-07-20,2014-07-20,2015-07-19,241,216,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+پلاسک,1393,2015-07-20,2014-07-20,2015-07-19,241,215,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+چافست,1393,2015-01-20,2014-01-20,2015-01-19,242,137,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+چکارن,1393,2015-07-20,2014-07-20,2015-07-19,241,204,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+کبافق,1393,2015-07-20,2014-07-20,2015-07-19,241,230,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+کرازی,1393,2015-07-20,2014-07-20,2015-07-19,241,200,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+کفرا,1393,2015-07-20,2014-07-20,2015-07-19,241,222,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+کفپارس,1393,2015-04-19,2014-04-19,2015-04-18,242,57,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=57 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=57 < 126
+کهمدا,1393,2014-10-22,2013-10-21,2014-10-21,244,229,True,True,True,True,OBSERVED_COMPLETE
+کگاز,1393,2015-07-20,2014-07-20,2015-07-19,241,220,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+کگل,1393,2015-07-20,2014-07-20,2015-07-19,241,218,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+بالبر,1394,2016-01-20,2015-01-19,2016-01-19,246,81,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=81 < 126; adjusted_close missing at window start t0; usable_amihud_day_count=81 < 126
+بترانس,1394,2016-07-19,2015-07-19,2016-07-18,247,234,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+بموتو,1394,2016-01-20,2015-01-19,2016-01-19,246,157,True,True,True,True,OBSERVED_COMPLETE
+بکاب,1394,2016-01-20,2015-01-19,2016-01-19,246,198,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+بکام,1394,2016-07-19,2015-07-19,2016-07-18,247,214,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+تپمپی,1394,2015-10-22,2014-10-21,2015-10-21,245,173,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+تکمبا,1394,2016-07-19,2015-07-19,2016-07-18,247,236,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+ثشرق,1394,2016-01-20,2015-01-19,2016-01-19,246,233,True,True,True,True,OBSERVED_COMPLETE
+ثنوسا,1394,2016-01-20,2015-01-19,2016-01-19,246,223,True,True,True,True,OBSERVED_COMPLETE
+جم,1394,2016-07-19,2015-08-08,2016-07-18,233,226,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+حپترو,1394,2016-07-19,2015-07-19,2016-07-18,247,241,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+حکشتی,1394,2015-10-22,2014-10-21,2015-10-21,245,179,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+خاذین,1394,2016-07-19,2015-07-19,2016-07-18,247,216,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+خبهمن,1394,2016-07-19,2015-07-19,2016-07-18,247,236,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+ختوقا,1394,2016-07-19,2015-07-19,2016-07-18,247,217,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خرینگ,1394,2016-07-19,2015-07-19,2016-07-18,247,205,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خمحور,1394,2016-07-19,2015-07-19,2016-07-18,247,194,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خمهر,1394,2016-07-19,2015-07-19,2016-07-18,247,220,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خنصیر,1394,2016-07-19,2015-07-19,2016-07-18,247,185,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خوساز,1394,2016-07-19,2015-07-19,2016-07-18,247,218,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خچرخش,1394,2016-07-19,2015-07-19,2016-07-18,247,182,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خکمک,1394,2016-07-19,2015-07-19,2016-07-18,247,232,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+ددام,1394,2016-07-19,2015-07-19,2016-07-18,247,136,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+دروز,1394,2016-07-19,2015-07-19,2016-07-18,247,179,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+دسبحا,1394,2016-07-19,2015-07-19,2016-07-18,247,236,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+دسینا,1394,2016-07-19,2015-07-19,2016-07-18,247,202,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+دشیمی,1394,2016-07-19,2015-07-19,2016-07-18,247,163,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+دیران,1394,2016-07-19,2015-07-19,2016-07-18,247,231,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+رانفور,1394,2016-07-19,2015-07-19,2016-07-18,247,240,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+زمگسا,1394,2016-07-19,2015-07-19,2016-07-18,247,233,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+ساراب,1394,2016-07-19,2015-07-19,2016-07-18,247,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+ساربیل,1394,2016-04-18,2015-04-18,2016-04-17,246,13,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=13 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=13 < 126
+ساروم,1394,2016-07-19,2015-07-19,2016-07-18,247,103,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=103 < 126; adjusted_close missing at window start t0; usable_amihud_day_count=103 < 126
+سبجنو,1394,2016-07-19,2015-07-19,2016-07-18,247,52,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=52 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=52 < 126
+سبهان,1394,2016-07-19,2015-07-19,2016-07-18,247,150,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+ستران,1394,2016-07-19,2015-07-19,2016-07-18,247,226,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سخاش,1394,2016-07-19,2015-07-19,2016-07-18,247,82,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=82 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=82 < 126
+سخزر,1394,2016-07-19,2015-07-19,2016-07-18,247,106,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=106 < 126; adjusted_close missing at window start t0; usable_amihud_day_count=106 < 126
+سخوز,1394,2016-07-19,2015-07-19,2016-07-18,247,234,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سدشت,1394,2016-01-20,2015-01-19,2016-01-19,246,26,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=26 < 126; adjusted_close missing at window start t0; usable_amihud_day_count=26 < 126
+سدور,1394,2016-07-19,2015-07-19,2016-07-18,247,161,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سرود,1394,2016-07-19,2015-07-19,2016-07-18,247,220,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سشرق,1394,2016-01-20,2015-01-19,2016-01-19,246,206,True,True,True,True,OBSERVED_COMPLETE
+سصفها,1394,2016-07-19,2015-07-19,2016-07-18,247,18,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=18 < 126; adjusted_close missing at window start t0; usable_amihud_day_count=18 < 126
+سغرب,1394,2016-07-19,2015-07-19,2016-07-18,247,215,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سقاین,1394,2016-07-19,2015-07-19,2016-07-18,247,162,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سمازن,1394,2016-07-19,2015-07-19,2016-07-18,247,15,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=15 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=15 < 126
+سنیر,1394,2016-07-19,2015-07-19,2016-07-18,247,6,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=6 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=6 < 126
+سهگمت,1394,2016-05-19,2015-05-18,2016-05-18,249,158,True,True,True,True,OBSERVED_COMPLETE
+سپاها,1394,2016-01-20,2015-01-19,2016-01-19,246,232,True,True,True,True,OBSERVED_COMPLETE
+سکرد,1394,2016-01-20,2015-01-19,2016-01-19,246,175,True,True,True,True,OBSERVED_COMPLETE
+سیلام,1394,2016-05-19,2015-05-18,2016-05-18,249,28,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=28 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=28 < 126
+شاراک,1394,2016-07-19,2015-07-19,2016-07-18,247,208,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شبریز,1394,2016-07-19,2015-07-19,2016-07-18,247,209,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شبندر,1394,2016-07-19,2015-07-19,2016-07-18,247,189,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شدوص,1394,2016-07-19,2015-07-19,2016-07-18,247,214,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شفارس,1394,2016-07-19,2015-07-19,2016-07-18,247,195,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شلعاب,1394,2016-07-19,2015-07-19,2016-07-18,247,200,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شپارس,1394,2016-01-20,2015-01-19,2016-01-19,246,91,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=91 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=91 < 126
+شپنا,1394,2016-07-19,2015-07-19,2016-07-18,247,228,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شکربن,1394,2016-07-19,2015-07-19,2016-07-18,247,215,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شکلر,1394,2016-01-20,2015-01-19,2016-01-19,246,215,True,True,True,True,OBSERVED_COMPLETE
+شیران,1394,2016-04-18,2015-04-18,2016-04-17,246,228,True,True,True,True,OBSERVED_COMPLETE
+غبهنوش,1394,2016-07-19,2015-07-19,2016-07-18,247,183,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+غدام,1394,2016-04-18,2015-04-18,2016-04-17,246,6,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=6 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=6 < 126
+غسالم,1394,2016-07-19,2015-07-19,2016-07-18,247,115,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=115 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=115 < 126
+غشان,1394,2016-07-19,2015-07-19,2016-07-18,247,216,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+غشهد,1394,2016-07-19,2015-07-19,2016-07-18,247,113,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=113 < 126; adjusted_close missing at window start t0; usable_amihud_day_count=113 < 126
+غنوش,1394,2016-07-19,2015-07-19,2016-07-18,247,0,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=0 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=0 < 126
+غگل,1394,2016-01-20,2015-01-19,2016-01-19,246,46,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=46 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=46 < 126
+فاذر,1394,2016-07-19,2015-07-19,2016-07-18,247,216,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فایرا,1394,2016-07-19,2015-07-19,2016-07-18,247,60,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=60 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=60 < 126
+فباهنر,1394,2016-07-19,2015-07-19,2016-07-18,247,239,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فجام,1394,2016-07-19,2015-07-19,2016-07-18,247,133,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فجر,1394,2016-07-19,2015-07-19,2016-07-18,247,36,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=36 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=36 < 126
+فخوز,1394,2016-07-19,2015-07-19,2016-07-18,247,183,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فرآور,1394,2016-07-19,2015-07-19,2016-07-18,247,200,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فسرب,1394,2016-07-19,2015-07-19,2016-07-18,247,230,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فسپا,1394,2016-07-19,2015-07-19,2016-07-18,247,21,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=21 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=21 < 126
+فمراد,1394,2016-07-19,2015-07-19,2016-07-18,247,222,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فملی,1394,2016-07-19,2015-07-19,2016-07-18,247,215,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فنورد,1394,2016-07-19,2015-07-19,2016-07-18,247,72,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=72 < 126; adjusted_close missing at window start t0; usable_amihud_day_count=72 < 126
+فولاژ,1394,2016-07-19,2015-07-19,2016-07-18,247,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فپنتا,1394,2016-07-19,2015-07-19,2016-07-18,247,144,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+لابسا,1394,2016-07-19,2015-07-19,2016-07-18,247,225,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+لبوتان,1394,2016-07-19,2015-07-19,2016-07-18,247,149,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+لخزر,1394,2016-07-19,2015-07-19,2016-07-18,247,219,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+لسرما,1394,2016-07-19,2015-07-19,2016-07-18,247,227,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+همراه,1394,2016-07-19,2015-07-19,2016-07-18,247,239,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+پدرخش,1394,2016-07-19,2015-07-19,2016-07-18,247,179,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+پسهند,1394,2016-07-19,2015-07-19,2016-07-18,247,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+پلاسک,1394,2016-07-19,2015-07-19,2016-07-18,247,232,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+چافست,1394,2016-01-20,2015-01-19,2016-01-19,246,227,True,True,True,True,OBSERVED_COMPLETE
+چکارن,1394,2016-07-19,2015-07-19,2016-07-18,247,204,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کبافق,1394,2016-07-19,2015-07-19,2016-07-18,247,210,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کرازی,1394,2016-07-19,2015-07-19,2016-07-18,247,227,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کفرا,1394,2016-07-19,2015-07-19,2016-07-18,247,209,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کفپارس,1394,2016-04-18,2015-04-18,2016-04-17,246,173,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+کهمدا,1394,2015-10-22,2014-10-21,2015-10-21,245,230,True,True,True,True,OBSERVED_COMPLETE
+کگاز,1394,2016-07-19,2015-07-19,2016-07-18,247,208,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کگل,1394,2016-07-19,2015-07-19,2016-07-18,247,205,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+بالبر,1395,2017-01-19,2016-01-18,2017-01-18,246,215,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+بترانس,1395,2017-07-21,2016-07-19,2017-07-19,243,221,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+بموتو,1395,2017-01-19,2016-01-18,2017-01-18,246,204,True,True,True,True,OBSERVED_COMPLETE
+بکاب,1395,2017-01-19,2016-01-18,2017-01-18,246,226,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+بکام,1395,2017-07-21,2016-07-19,2017-07-19,243,200,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+تپمپی,1395,2016-10-21,2015-10-19,2016-10-19,245,180,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+تکمبا,1395,2017-07-21,2016-07-19,2017-07-19,243,225,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+ثشرق,1395,2017-01-19,2016-01-18,2017-01-18,246,229,True,True,True,True,OBSERVED_COMPLETE
+ثنوسا,1395,2017-01-19,2016-01-18,2017-01-18,246,204,True,True,True,True,OBSERVED_COMPLETE
+جم,1395,2017-07-21,2016-07-19,2017-07-19,243,225,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+حپترو,1395,2017-07-21,2016-07-19,2017-07-19,243,205,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+حکشتی,1395,2016-10-21,2015-10-19,2016-10-19,245,233,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+خاذین,1395,2017-07-21,2016-07-19,2017-07-19,243,208,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خبهمن,1395,2017-07-21,2016-07-19,2017-07-19,243,210,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ختوقا,1395,2017-07-21,2016-07-19,2017-07-19,243,228,True,True,True,True,OBSERVED_COMPLETE
+خرینگ,1395,2017-07-21,2016-07-19,2017-07-19,243,204,True,True,True,True,OBSERVED_COMPLETE
+خمحور,1395,2017-07-21,2016-07-19,2017-07-19,243,198,True,True,True,True,OBSERVED_COMPLETE
+خمهر,1395,2017-07-21,2016-07-19,2017-07-19,243,233,True,True,True,True,OBSERVED_COMPLETE
+خنصیر,1395,2017-07-21,2016-07-19,2017-07-19,243,192,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+خوساز,1395,2017-07-21,2016-07-19,2017-07-19,243,130,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+خچرخش,1395,2017-07-21,2016-07-19,2017-07-19,243,232,True,True,True,True,OBSERVED_COMPLETE
+خکمک,1395,2017-07-21,2016-07-19,2017-07-19,243,133,True,True,True,True,OBSERVED_COMPLETE
+ددام,1395,2017-07-21,2016-07-19,2017-07-19,243,145,True,True,True,True,OBSERVED_COMPLETE
+دروز,1395,2017-07-21,2016-07-19,2017-07-19,243,147,True,True,True,True,OBSERVED_COMPLETE
+دسبحا,1395,2017-07-21,2016-07-19,2017-07-19,243,225,True,True,True,True,OBSERVED_COMPLETE
+دسینا,1395,2017-07-21,2016-07-19,2017-07-19,243,211,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+دشیمی,1395,2017-07-21,2016-07-19,2017-07-19,243,173,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+دیران,1395,2017-07-21,2016-07-19,2017-07-19,243,210,True,True,True,True,OBSERVED_COMPLETE
+رانفور,1395,2017-07-21,2016-07-19,2017-07-19,243,226,True,True,True,True,OBSERVED_COMPLETE
+زمگسا,1395,2017-07-21,2016-07-19,2017-07-19,243,220,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ساراب,1395,2017-07-21,2016-07-19,2017-07-19,243,230,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ساربیل,1395,2017-04-19,2016-04-18,2017-04-18,244,17,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=17 < 126; usable_amihud_day_count=17 < 126
+ساروم,1395,2017-07-21,2016-07-19,2017-07-19,243,185,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سبجنو,1395,2017-07-21,2016-07-19,2017-07-19,243,105,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=105 < 126; usable_amihud_day_count=105 < 126
+سبهان,1395,2017-07-21,2016-07-19,2017-07-19,243,177,True,True,True,True,OBSERVED_COMPLETE
+ستران,1395,2017-07-21,2016-07-19,2017-07-19,243,187,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+سخاش,1395,2017-07-21,2016-07-19,2017-07-19,243,105,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=105 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=105 < 126
+سخزر,1395,2017-07-21,2016-07-19,2017-07-19,243,98,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=98 < 126; usable_amihud_day_count=98 < 126
+سخوز,1395,2017-07-21,2016-07-19,2017-07-19,243,198,True,True,True,True,OBSERVED_COMPLETE
+سدشت,1395,2017-01-19,2016-01-18,2017-01-18,246,42,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=42 < 126; adjusted_close missing at window start t0; usable_amihud_day_count=42 < 126
+سدور,1395,2017-07-21,2016-07-19,2017-07-19,243,204,True,True,True,True,OBSERVED_COMPLETE
+سرود,1395,2017-07-21,2016-07-19,2017-07-19,243,213,True,True,True,True,OBSERVED_COMPLETE
+سشرق,1395,2017-01-19,2016-01-18,2017-01-18,246,205,True,True,True,True,OBSERVED_COMPLETE
+سصفها,1395,2017-07-21,2016-07-19,2017-07-19,243,79,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=79 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=79 < 126
+سغرب,1395,2017-07-21,2016-07-19,2017-07-19,243,217,True,True,True,True,OBSERVED_COMPLETE
+سقاین,1395,2017-07-21,2016-07-19,2017-07-19,243,147,True,True,True,True,OBSERVED_COMPLETE
+سمازن,1395,2017-04-19,2016-04-18,2017-04-18,244,53,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=53 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=53 < 126
+سنیر,1395,2017-07-21,2016-07-19,2017-07-19,243,9,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=9 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=9 < 126
+سهگمت,1395,2017-05-20,2016-05-17,2017-05-17,243,169,True,True,True,True,OBSERVED_COMPLETE
+سپاها,1395,2017-01-19,2016-01-18,2017-01-18,246,223,True,True,True,True,OBSERVED_COMPLETE
+سکرد,1395,2017-01-19,2016-01-18,2017-01-18,246,184,True,True,True,True,OBSERVED_COMPLETE
+سیلام,1395,2017-05-20,2016-05-17,2017-05-17,243,55,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=55 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=55 < 126
+شاراک,1395,2017-07-21,2016-07-19,2017-07-19,243,220,True,True,True,True,OBSERVED_COMPLETE
+شبریز,1395,2017-07-21,2016-07-19,2017-07-19,243,182,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+شبندر,1395,2017-07-21,2016-07-19,2017-07-19,243,194,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+شدوص,1395,2017-07-21,2016-07-19,2017-07-19,243,60,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=60 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=60 < 126
+شفارس,1395,2017-07-21,2016-07-19,2017-07-19,243,226,True,True,True,True,OBSERVED_COMPLETE
+شلعاب,1395,2017-07-21,2016-07-19,2017-07-19,243,215,True,True,True,True,OBSERVED_COMPLETE
+شپارس,1395,2017-01-19,2016-01-18,2017-01-18,246,179,True,True,True,True,OBSERVED_COMPLETE
+شپنا,1395,2017-07-21,2016-07-19,2017-07-19,243,213,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+شکربن,1395,2017-07-21,2016-07-19,2017-07-19,243,221,True,True,True,True,OBSERVED_COMPLETE
+شکلر,1395,2017-01-19,2016-01-18,2017-01-18,246,227,True,True,True,True,OBSERVED_COMPLETE
+شیران,1395,2017-04-19,2016-04-18,2017-04-18,244,223,True,True,True,True,OBSERVED_COMPLETE
+غبهنوش,1395,2017-07-21,2016-07-19,2017-07-19,243,151,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+غدام,1395,2017-04-19,2016-04-18,2017-04-18,244,24,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=24 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=24 < 126
+غسالم,1395,2017-07-21,2016-07-19,2017-07-19,243,89,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=89 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=89 < 126
+غشان,1395,2017-07-21,2016-07-19,2017-07-19,243,183,True,True,True,True,OBSERVED_COMPLETE
+غشهد,1395,2017-07-21,2016-07-19,2017-07-19,243,113,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=113 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=113 < 126
+غنوش,1395,2017-07-21,2016-07-19,2017-07-19,243,6,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=6 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=6 < 126
+غگل,1395,2017-01-19,2016-01-18,2017-01-18,246,221,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فاذر,1395,2017-07-21,2016-07-19,2017-07-19,243,208,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فایرا,1395,2017-07-21,2016-07-19,2017-07-19,243,0,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=0 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=0 < 126
+فباهنر,1395,2017-07-21,2016-07-19,2017-07-19,243,192,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+فجام,1395,2017-07-21,2016-07-19,2017-07-19,243,148,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فجر,1395,2017-07-21,2016-07-19,2017-07-19,243,159,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فخوز,1395,2017-07-21,2016-07-19,2017-07-19,243,205,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فرآور,1395,2017-07-21,2016-07-19,2017-07-19,243,208,True,True,True,True,OBSERVED_COMPLETE
+فسرب,1395,2017-07-21,2016-07-19,2017-07-19,243,217,True,True,True,True,OBSERVED_COMPLETE
+فسپا,1395,2017-07-21,2016-07-19,2017-07-19,243,94,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=94 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=94 < 126
+فمراد,1395,2017-07-21,2016-07-19,2017-07-19,243,174,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فملی,1395,2017-07-21,2016-07-19,2017-07-19,243,204,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فنورد,1395,2017-07-21,2016-07-19,2017-07-19,243,103,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=103 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=103 < 126
+فولاژ,1395,2017-07-21,2016-07-19,2017-07-19,243,225,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فپنتا,1395,2017-07-21,2016-07-19,2017-07-19,243,162,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+لابسا,1395,2017-07-21,2016-07-19,2017-07-19,243,219,True,True,True,True,OBSERVED_COMPLETE
+لبوتان,1395,2017-07-21,2016-07-19,2017-07-19,243,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+لخزر,1395,2017-07-21,2016-07-19,2017-07-19,243,231,True,True,True,True,OBSERVED_COMPLETE
+لسرما,1395,2017-07-21,2016-07-19,2017-07-19,243,191,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+همراه,1395,2017-07-21,2016-07-19,2017-07-19,243,226,True,True,True,True,OBSERVED_COMPLETE
+پدرخش,1395,2017-07-21,2016-07-19,2017-07-19,243,229,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+پسهند,1395,2017-07-21,2016-07-19,2017-07-19,243,211,True,True,True,True,OBSERVED_COMPLETE
+پلاسک,1395,2017-07-21,2016-07-19,2017-07-19,243,215,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+چافست,1395,2017-01-19,2016-01-18,2017-01-18,246,224,True,True,True,True,OBSERVED_COMPLETE
+چکارن,1395,2017-07-21,2016-07-19,2017-07-19,243,189,True,True,True,True,OBSERVED_COMPLETE
+کبافق,1395,2017-07-21,2016-07-19,2017-07-19,243,202,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+کرازی,1395,2017-07-21,2016-07-19,2017-07-19,243,220,True,True,True,True,OBSERVED_COMPLETE
+کفرا,1395,2017-07-21,2016-07-19,2017-07-19,243,195,True,True,True,True,OBSERVED_COMPLETE
+کفپارس,1395,2017-04-19,2016-04-18,2017-04-18,244,230,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+کهمدا,1395,2016-10-21,2015-10-19,2016-10-19,245,232,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کگاز,1395,2017-07-21,2016-07-19,2017-07-19,243,95,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=95 < 126; usable_amihud_day_count=95 < 126
+کگل,1395,2017-07-21,2016-07-19,2017-07-19,243,211,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+بالبر,1396,2018-01-20,2017-01-17,2018-01-17,245,221,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+بترانس,1396,2018-07-20,2017-07-18,2018-07-18,242,229,True,True,True,True,OBSERVED_COMPLETE
+بموتو,1396,2018-01-20,2017-01-17,2018-01-17,245,231,True,True,True,True,OBSERVED_COMPLETE
+بکاب,1396,2018-01-20,2017-01-17,2018-01-17,245,227,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+بکام,1396,2018-07-20,2017-07-18,2018-07-18,242,180,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+تپمپی,1396,2017-10-22,2016-10-22,2017-10-21,242,204,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+تکمبا,1396,2018-07-20,2017-07-18,2018-07-18,242,212,True,True,True,True,OBSERVED_COMPLETE
+ثشرق,1396,2018-01-20,2017-01-17,2018-01-17,245,228,True,True,True,True,OBSERVED_COMPLETE
+ثنوسا,1396,2018-01-20,2017-01-17,2018-01-17,245,210,True,True,True,True,OBSERVED_COMPLETE
+جم,1396,2018-07-20,2017-07-18,2018-07-18,242,227,True,True,True,True,OBSERVED_COMPLETE
+حپترو,1396,2018-07-20,2017-07-18,2018-07-18,242,226,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+حکشتی,1396,2017-10-22,2016-10-22,2017-10-21,242,220,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+خاذین,1396,2018-07-20,2017-07-18,2018-07-18,242,228,True,True,True,True,OBSERVED_COMPLETE
+خبهمن,1396,2018-07-20,2017-07-18,2018-07-18,242,210,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+ختوقا,1396,2018-07-20,2017-07-18,2018-07-18,242,234,True,True,True,True,OBSERVED_COMPLETE
+خرینگ,1396,2018-07-20,2017-07-18,2018-07-18,242,223,True,True,True,True,OBSERVED_COMPLETE
+خمحور,1396,2018-07-20,2017-07-18,2018-07-18,242,233,True,True,True,True,OBSERVED_COMPLETE
+خمهر,1396,2018-07-20,2017-07-18,2018-07-18,242,234,True,True,True,True,OBSERVED_COMPLETE
+خنصیر,1396,2018-07-20,2017-07-18,2018-07-18,242,217,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خوساز,1396,2018-07-20,2017-07-18,2018-07-18,242,226,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خچرخش,1396,2018-07-20,2017-07-18,2018-07-18,242,234,True,True,True,True,OBSERVED_COMPLETE
+خکمک,1396,2018-07-20,2017-07-18,2018-07-18,242,233,True,True,True,True,OBSERVED_COMPLETE
+ددام,1396,2018-07-20,2017-07-18,2018-07-18,242,200,True,True,True,True,OBSERVED_COMPLETE
+دروز,1396,2018-07-20,2017-07-18,2018-07-18,242,155,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+دسبحا,1396,2018-07-20,2017-07-18,2018-07-18,242,223,True,True,True,True,OBSERVED_COMPLETE
+دسینا,1396,2018-07-20,2017-07-18,2018-07-18,242,220,True,True,True,True,OBSERVED_COMPLETE
+دشیمی,1396,2018-07-20,2017-07-18,2018-07-18,242,173,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+دیران,1396,2018-07-20,2017-07-18,2018-07-18,242,211,True,True,True,True,OBSERVED_COMPLETE
+رانفور,1396,2018-07-20,2017-07-18,2018-07-18,242,235,True,True,True,True,OBSERVED_COMPLETE
+زمگسا,1396,2018-07-20,2017-07-18,2018-07-18,242,226,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ساراب,1396,2018-07-20,2017-07-18,2018-07-18,242,230,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+ساربیل,1396,2018-04-19,2017-04-18,2018-04-18,243,33,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=33 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=33 < 126
+ساروم,1396,2018-07-20,2017-07-18,2018-07-18,242,223,True,True,True,True,OBSERVED_COMPLETE
+سبجنو,1396,2018-07-20,2017-07-18,2018-07-18,242,119,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=119 < 126; usable_amihud_day_count=119 < 126
+سبهان,1396,2018-07-20,2017-07-18,2018-07-18,242,152,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+ستران,1396,2018-07-20,2017-07-18,2018-07-18,242,228,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+سخاش,1396,2018-07-20,2017-07-18,2018-07-18,242,74,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=74 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=74 < 126
+سخزر,1396,2018-07-20,2017-07-18,2018-07-18,242,64,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=64 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=64 < 126
+سخوز,1396,2018-07-20,2017-07-18,2018-07-18,242,219,True,True,True,True,OBSERVED_COMPLETE
+سدشت,1396,2018-01-20,2017-01-17,2018-01-17,245,47,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=47 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=47 < 126
+سدور,1396,2018-07-20,2017-07-18,2018-07-18,242,207,True,True,True,True,OBSERVED_COMPLETE
+سرود,1396,2018-07-20,2017-07-18,2018-07-18,242,229,True,True,True,True,OBSERVED_COMPLETE
+سشرق,1396,2018-01-20,2017-01-17,2018-01-17,245,235,True,True,True,True,OBSERVED_COMPLETE
+سصفها,1396,2018-07-20,2017-07-18,2018-07-18,242,78,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=78 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=78 < 126
+سغرب,1396,2018-07-20,2017-07-18,2018-07-18,242,224,True,True,True,True,OBSERVED_COMPLETE
+سقاین,1396,2018-07-20,2017-07-18,2018-07-18,242,157,True,True,True,True,OBSERVED_COMPLETE
+سمازن,1396,2018-04-19,2017-04-18,2018-04-18,243,29,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=29 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=29 < 126
+سنیر,1396,2018-07-20,2017-07-18,2018-07-18,242,16,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=16 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=16 < 126
+سهگمت,1396,2018-05-20,2017-05-20,2018-05-19,242,232,True,True,True,True,OBSERVED_COMPLETE
+سپاها,1396,2018-01-20,2017-01-17,2018-01-17,245,229,True,True,True,True,OBSERVED_COMPLETE
+سکرد,1396,2018-01-20,2017-01-17,2018-01-17,245,211,True,True,True,True,OBSERVED_COMPLETE
+سیلام,1396,2018-05-20,2017-05-20,2018-05-19,242,139,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+شاراک,1396,2018-07-20,2017-07-18,2018-07-18,242,235,True,True,True,True,OBSERVED_COMPLETE
+شبریز,1396,2018-07-20,2017-07-18,2018-07-18,242,219,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شبندر,1396,2018-07-20,2017-07-18,2018-07-18,242,227,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+شدوص,1396,2018-07-20,2017-07-18,2018-07-18,242,185,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شفارس,1396,2018-07-20,2017-07-18,2018-07-18,242,233,True,True,True,True,OBSERVED_COMPLETE
+شلعاب,1396,2018-07-20,2017-07-18,2018-07-18,242,224,True,True,True,True,OBSERVED_COMPLETE
+شپارس,1396,2018-01-20,2017-01-17,2018-01-17,245,222,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+شپنا,1396,2018-07-20,2017-07-18,2018-07-18,242,223,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+شکربن,1396,2018-07-20,2017-07-18,2018-07-18,242,224,True,True,True,True,OBSERVED_COMPLETE
+شکلر,1396,2018-01-20,2017-01-17,2018-01-17,245,232,True,True,True,True,OBSERVED_COMPLETE
+شیران,1396,2018-04-19,2017-04-18,2018-04-18,243,236,True,True,True,True,OBSERVED_COMPLETE
+غبهنوش,1396,2018-07-20,2017-07-18,2018-07-18,242,227,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+غدام,1396,2018-04-19,2017-04-18,2018-04-18,243,62,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=62 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=62 < 126
+غسالم,1396,2018-07-20,2017-07-18,2018-07-18,242,147,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+غشان,1396,2018-07-20,2017-07-18,2018-07-18,242,234,True,True,True,True,OBSERVED_COMPLETE
+غشهد,1396,2018-07-20,2017-07-18,2018-07-18,242,191,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+غنوش,1396,2018-07-20,2017-07-18,2018-07-18,242,4,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=4 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=4 < 126
+غگل,1396,2018-01-20,2017-01-17,2018-01-17,245,208,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فاذر,1396,2018-07-20,2017-07-18,2018-07-18,242,0,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=0 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=0 < 126
+فایرا,1396,2018-07-20,2017-07-18,2018-07-18,242,207,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فباهنر,1396,2018-07-20,2017-07-18,2018-07-18,242,227,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فجام,1396,2018-07-20,2017-07-18,2018-07-18,242,91,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=91 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=91 < 126
+فجر,1396,2018-07-20,2017-07-18,2018-07-18,242,80,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=80 < 126; adjusted_close missing at window start t0; usable_amihud_day_count=80 < 126
+فخوز,1396,2018-07-20,2017-07-18,2018-07-18,242,223,True,True,True,True,OBSERVED_COMPLETE
+فرآور,1396,2018-07-20,2017-07-18,2018-07-18,242,230,True,True,True,True,OBSERVED_COMPLETE
+فسرب,1396,2018-07-20,2017-07-18,2018-07-18,242,230,True,True,True,True,OBSERVED_COMPLETE
+فسپا,1396,2018-07-20,2017-07-18,2018-07-18,242,189,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+فمراد,1396,2018-07-20,2017-07-18,2018-07-18,242,133,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+فملی,1396,2018-07-20,2017-07-18,2018-07-18,242,218,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فنورد,1396,2018-07-20,2017-07-18,2018-07-18,242,106,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=106 < 126; adjusted_close missing at window end T*; usable_amihud_day_count=106 < 126
+فولاژ,1396,2018-07-20,2017-07-18,2018-07-18,242,226,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فپنتا,1396,2018-07-20,2017-07-18,2018-07-18,242,171,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+لابسا,1396,2018-07-20,2017-07-18,2018-07-18,242,233,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+لبوتان,1396,2018-07-20,2017-07-18,2018-07-18,242,233,True,True,True,True,OBSERVED_COMPLETE
+لخزر,1396,2018-07-20,2017-07-18,2018-07-18,242,232,True,True,True,True,OBSERVED_COMPLETE
+لسرما,1396,2018-07-20,2017-07-18,2018-07-18,242,208,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+های وب,1396,2018-07-20,2017-08-27,2018-07-18,215,31,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=31 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=31 < 126
+همراه,1396,2018-07-20,2017-07-18,2018-07-18,242,232,True,True,True,True,OBSERVED_COMPLETE
+پدرخش,1396,2018-07-20,2017-07-18,2018-07-18,242,216,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+پرداخت,1396,2018-07-20,2017-07-18,2018-07-18,242,226,True,True,True,True,OBSERVED_COMPLETE
+پسهند,1396,2018-07-20,2017-07-18,2018-07-18,242,226,True,True,True,True,OBSERVED_COMPLETE
+پلاسک,1396,2018-07-20,2017-07-18,2018-07-18,242,234,True,True,True,True,OBSERVED_COMPLETE
+چافست,1396,2018-01-20,2017-01-17,2018-01-17,245,224,True,True,True,True,OBSERVED_COMPLETE
+چکارن,1396,2018-07-20,2017-07-18,2018-07-18,242,203,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+کاوه,1396,2018-07-20,2017-07-18,2018-07-18,242,172,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کبافق,1396,2018-07-20,2017-07-18,2018-07-18,242,228,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کرازی,1396,2018-07-20,2017-07-18,2018-07-18,242,220,True,True,True,True,OBSERVED_COMPLETE
+کفرا,1396,2018-07-20,2017-07-18,2018-07-18,242,229,True,True,True,True,OBSERVED_COMPLETE
+کفپارس,1396,2018-04-19,2017-04-18,2018-04-18,243,165,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+کهمدا,1396,2017-10-22,2016-10-22,2017-10-21,242,230,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+کگاز,1396,2018-07-20,2017-07-18,2018-07-18,242,215,True,True,True,True,OBSERVED_COMPLETE
+کگل,1396,2018-07-20,2017-07-18,2018-07-18,242,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+بالبر,1397,2019-01-20,2018-01-20,2019-01-19,243,233,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+بترانس,1397,2019-07-20,2018-07-17,2019-07-17,246,236,True,True,True,True,OBSERVED_COMPLETE
+بموتو,1397,2019-01-20,2018-01-20,2019-01-19,243,217,True,True,True,True,OBSERVED_COMPLETE
+بکاب,1397,2019-01-20,2018-01-20,2019-01-19,243,225,True,True,True,True,OBSERVED_COMPLETE
+بکام,1397,2019-07-20,2018-07-17,2019-07-17,246,228,True,True,True,True,OBSERVED_COMPLETE
+تپمپی,1397,2018-10-22,2017-10-21,2018-10-21,246,214,True,True,True,True,OBSERVED_COMPLETE
+تکمبا,1397,2019-07-20,2018-07-17,2019-07-17,246,235,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ثشرق,1397,2019-01-20,2018-01-20,2019-01-19,243,232,True,True,True,True,OBSERVED_COMPLETE
+ثنوسا,1397,2019-01-20,2018-01-20,2019-01-19,243,223,True,True,True,True,OBSERVED_COMPLETE
+جم,1397,2019-07-20,2018-07-17,2019-07-17,246,219,True,True,True,True,OBSERVED_COMPLETE
+حپترو,1397,2019-07-20,2018-07-17,2019-07-17,246,222,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+حکشتی,1397,2018-10-22,2017-10-21,2018-10-21,246,230,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خاذین,1397,2019-07-20,2018-07-17,2019-07-17,246,233,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+خبهمن,1397,2019-07-20,2018-07-17,2019-07-17,246,240,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+ختوقا,1397,2019-07-20,2018-07-17,2019-07-17,246,226,True,True,True,True,OBSERVED_COMPLETE
+خرینگ,1397,2019-07-20,2018-07-17,2019-07-17,246,236,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+خمحور,1397,2019-07-20,2018-07-17,2019-07-17,246,230,True,True,True,True,OBSERVED_COMPLETE
+خمهر,1397,2019-07-20,2018-07-17,2019-07-17,246,231,True,True,True,True,OBSERVED_COMPLETE
+خنصیر,1397,2019-07-20,2018-07-17,2019-07-17,246,216,True,True,True,True,OBSERVED_COMPLETE
+خوساز,1397,2019-07-20,2018-07-17,2019-07-17,246,192,True,True,True,True,OBSERVED_COMPLETE
+خچرخش,1397,2019-07-20,2018-07-17,2019-07-17,246,234,True,True,True,True,OBSERVED_COMPLETE
+خکمک,1397,2019-07-20,2018-07-17,2019-07-17,246,228,True,True,True,True,OBSERVED_COMPLETE
+ددام,1397,2019-07-20,2018-07-17,2019-07-17,246,196,True,True,True,True,OBSERVED_COMPLETE
+دروز,1397,2019-07-20,2018-07-17,2019-07-17,246,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+دسبحا,1397,2019-07-20,2018-07-17,2019-07-17,246,231,True,True,True,True,OBSERVED_COMPLETE
+دسینا,1397,2019-07-20,2018-07-17,2019-07-17,246,228,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+دشیمی,1397,2019-07-20,2018-07-17,2019-07-17,246,230,True,True,True,True,OBSERVED_COMPLETE
+دیران,1397,2019-07-20,2018-07-17,2019-07-17,246,227,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+رانفور,1397,2019-07-20,2018-07-17,2019-07-17,246,232,True,True,True,True,OBSERVED_COMPLETE
+رمپنا,1397,2018-08-22,2017-08-21,2018-08-21,245,171,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+زمگسا,1397,2019-07-20,2018-07-17,2019-07-17,246,222,True,True,True,True,OBSERVED_COMPLETE
+زپارس,1397,2019-04-19,2018-05-05,2019-04-17,234,114,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=114 < 126; adjusted_close missing at window start t0; adjusted_close missing at window end T*; usable_amihud_day_count=114 < 126
+ساراب,1397,2019-07-20,2018-07-17,2019-07-17,246,238,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ساربیل,1397,2019-04-19,2018-04-17,2019-04-17,245,134,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+ساروم,1397,2019-07-20,2018-07-17,2019-07-17,246,237,True,True,True,True,OBSERVED_COMPLETE
+سبجنو,1397,2019-07-20,2018-07-17,2019-07-17,246,230,True,True,True,True,OBSERVED_COMPLETE
+سبهان,1397,2019-07-20,2018-07-17,2019-07-17,246,222,True,True,True,True,OBSERVED_COMPLETE
+ستران,1397,2019-07-20,2018-07-17,2019-07-17,246,204,True,True,True,True,OBSERVED_COMPLETE
+سخاش,1397,2019-07-20,2018-07-17,2019-07-17,246,195,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سخزر,1397,2019-07-20,2018-07-17,2019-07-17,246,203,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سخوز,1397,2019-07-20,2018-07-17,2019-07-17,246,227,True,True,True,True,OBSERVED_COMPLETE
+سدشت,1397,2019-01-20,2018-01-20,2019-01-19,243,109,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=109 < 126; adjusted_close missing at window start t0; usable_amihud_day_count=109 < 126
+سدور,1397,2019-07-20,2018-07-17,2019-07-17,246,234,True,True,True,True,OBSERVED_COMPLETE
+سرود,1397,2019-07-20,2018-07-17,2019-07-17,246,229,True,True,True,True,OBSERVED_COMPLETE
+سشرق,1397,2019-01-20,2018-01-20,2019-01-19,243,225,True,True,True,True,OBSERVED_COMPLETE
+سصفها,1397,2019-07-20,2018-07-17,2019-07-17,246,230,True,True,True,True,OBSERVED_COMPLETE
+سغرب,1397,2019-07-20,2018-07-17,2019-07-17,246,219,True,True,True,True,OBSERVED_COMPLETE
+سقاین,1397,2019-07-20,2018-07-17,2019-07-17,246,233,True,True,True,True,OBSERVED_COMPLETE
+سمازن,1397,2019-04-19,2018-04-17,2019-04-17,245,172,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سنیر,1397,2019-07-20,2018-07-17,2019-07-17,246,172,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سهگمت,1397,2019-05-20,2018-05-19,2019-05-19,245,226,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+سپاها,1397,2019-01-20,2018-01-20,2019-01-19,243,218,True,True,True,True,OBSERVED_COMPLETE
+سکرد,1397,2019-01-20,2018-01-20,2019-01-19,243,217,True,True,True,True,OBSERVED_COMPLETE
+سیلام,1397,2019-05-20,2018-05-19,2019-05-19,245,203,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+شاراک,1397,2019-07-20,2018-07-17,2019-07-17,246,237,True,True,True,True,OBSERVED_COMPLETE
+شبریز,1397,2019-07-20,2018-07-17,2019-07-17,246,232,True,True,True,True,OBSERVED_COMPLETE
+شبندر,1397,2019-07-20,2018-07-17,2019-07-17,246,231,True,True,True,True,OBSERVED_COMPLETE
+شدوص,1397,2019-07-20,2018-07-17,2019-07-17,246,199,True,True,True,True,OBSERVED_COMPLETE
+شفارس,1397,2019-07-20,2018-07-17,2019-07-17,246,230,True,True,True,True,OBSERVED_COMPLETE
+شلعاب,1397,2019-07-20,2018-07-17,2019-07-17,246,231,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+شپارس,1397,2019-01-20,2018-01-20,2019-01-19,243,219,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شپنا,1397,2019-07-20,2018-07-17,2019-07-17,246,229,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+شکربن,1397,2019-07-20,2018-07-17,2019-07-17,246,225,True,True,True,True,OBSERVED_COMPLETE
+شیران,1397,2019-04-19,2018-04-17,2019-04-17,245,231,True,True,True,True,OBSERVED_COMPLETE
+غبهنوش,1397,2019-07-20,2018-07-17,2019-07-17,246,231,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+غدام,1397,2019-04-19,2018-04-17,2019-04-17,245,146,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+غسالم,1397,2019-07-20,2018-07-17,2019-07-17,246,185,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+غشان,1397,2019-07-20,2018-07-17,2019-07-17,246,217,True,True,True,True,OBSERVED_COMPLETE
+غشهد,1397,2019-07-20,2018-07-17,2019-07-17,246,149,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+غنوش,1397,2019-07-20,2018-07-17,2019-07-17,246,2,False,False,False,False,OBSERVED_INCOMPLETE: usable_daily_return_count=2 < 126; usable_amihud_day_count=2 < 126
+غگل,1397,2019-01-20,2018-01-20,2019-01-19,243,219,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فاذر,1397,2019-07-20,2018-07-17,2019-07-17,246,221,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فایرا,1397,2019-07-20,2018-07-17,2019-07-17,246,237,True,True,True,True,OBSERVED_COMPLETE
+فباهنر,1397,2019-07-20,2018-07-17,2019-07-17,246,235,True,True,True,True,OBSERVED_COMPLETE
+فجام,1397,2019-07-20,2018-07-17,2019-07-17,246,197,True,True,True,True,OBSERVED_COMPLETE
+فجر,1397,2019-07-20,2018-07-17,2019-07-17,246,197,True,True,True,True,OBSERVED_COMPLETE
+فخوز,1397,2019-07-20,2018-07-17,2019-07-17,246,232,True,True,True,True,OBSERVED_COMPLETE
+فرآور,1397,2019-07-20,2018-07-17,2019-07-17,246,231,True,True,True,True,OBSERVED_COMPLETE
+فسرب,1397,2019-07-20,2018-07-17,2019-07-17,246,234,True,True,True,True,OBSERVED_COMPLETE
+فسپا,1397,2019-07-20,2018-07-17,2019-07-17,246,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فمراد,1397,2019-07-20,2018-07-17,2019-07-17,246,230,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فملی,1397,2019-07-20,2018-07-17,2019-07-17,246,230,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+فنورد,1397,2019-07-20,2018-07-17,2019-07-17,246,202,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+فولاژ,1397,2019-07-20,2018-07-17,2019-07-17,246,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فپنتا,1397,2019-07-20,2018-07-17,2019-07-17,246,232,True,True,True,True,OBSERVED_COMPLETE
+لابسا,1397,2019-07-20,2018-07-17,2019-07-17,246,213,True,True,True,True,OBSERVED_COMPLETE
+لبوتان,1397,2019-07-20,2018-07-17,2019-07-17,246,228,True,True,True,True,OBSERVED_COMPLETE
+لخزر,1397,2019-07-20,2018-07-17,2019-07-17,246,238,True,True,True,True,OBSERVED_COMPLETE
+لسرما,1397,2019-07-20,2018-07-17,2019-07-17,246,207,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+های وب,1397,2019-07-20,2018-07-17,2019-07-17,246,192,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+همراه,1397,2019-07-20,2018-07-17,2019-07-17,246,224,True,True,True,True,OBSERVED_COMPLETE
+پارس,1397,2019-07-20,2018-07-17,2019-07-17,246,237,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+پدرخش,1397,2019-07-20,2018-07-17,2019-07-17,246,224,True,True,True,True,OBSERVED_COMPLETE
+پرداخت,1397,2019-07-20,2018-07-17,2019-07-17,246,231,True,True,True,True,OBSERVED_COMPLETE
+پسهند,1397,2019-07-20,2018-07-17,2019-07-17,246,232,True,True,True,True,OBSERVED_COMPLETE
+پلاسک,1397,2019-07-20,2018-07-17,2019-07-17,246,234,True,True,True,True,OBSERVED_COMPLETE
+چافست,1397,2019-01-20,2018-01-20,2019-01-19,243,226,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+چکارن,1397,2019-07-20,2018-07-17,2019-07-17,246,213,True,True,True,True,OBSERVED_COMPLETE
+کاوه,1397,2019-07-20,2018-07-17,2019-07-17,246,234,True,True,True,True,OBSERVED_COMPLETE
+کبافق,1397,2019-07-20,2018-07-17,2019-07-17,246,130,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+کرازی,1397,2019-07-20,2018-07-17,2019-07-17,246,224,True,True,True,True,OBSERVED_COMPLETE
+کفرا,1397,2019-07-20,2018-07-17,2019-07-17,246,231,True,True,True,True,OBSERVED_COMPLETE
+کفپارس,1397,2019-04-19,2018-04-17,2019-04-17,245,180,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کهمدا,1397,2018-10-22,2017-10-21,2018-10-21,246,220,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کگاز,1397,2019-07-20,2018-07-17,2019-07-17,246,222,True,True,True,True,OBSERVED_COMPLETE
+کگل,1397,2019-07-20,2018-07-17,2019-07-17,246,227,True,True,True,True,OBSERVED_COMPLETE
+بالبر,1398,2020-01-20,2019-01-19,2020-01-19,240,223,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+بترانس,1398,2020-07-19,2019-07-20,2020-07-18,240,217,True,True,True,True,OBSERVED_COMPLETE
+بموتو,1398,2020-01-20,2019-01-19,2020-01-19,240,228,True,True,True,True,OBSERVED_COMPLETE
+بکاب,1398,2020-01-20,2019-01-19,2020-01-19,240,225,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+بکام,1398,2020-07-19,2019-07-20,2020-07-18,240,202,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+تپمپی,1398,2019-10-22,2018-10-21,2019-10-21,241,234,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+تکمبا,1398,2020-07-19,2019-07-20,2020-07-18,240,228,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+ثشرق,1398,2020-01-20,2019-01-19,2020-01-19,240,227,True,True,True,True,OBSERVED_COMPLETE
+ثنوسا,1398,2020-01-20,2019-01-19,2020-01-19,240,196,True,True,True,True,OBSERVED_COMPLETE
+جم,1398,2020-07-19,2019-07-20,2020-07-18,240,219,True,True,True,True,OBSERVED_COMPLETE
+جم پیلن,1398,2020-07-19,2019-07-20,2020-07-18,240,227,True,True,True,True,OBSERVED_COMPLETE
+حپترو,1398,2020-07-19,2019-07-20,2020-07-18,240,231,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+حکشتی,1398,2019-10-22,2018-10-21,2019-10-21,241,239,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+خاذین,1398,2020-07-19,2019-07-20,2020-07-18,240,228,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خبهمن,1398,2020-07-19,2019-07-20,2020-07-18,240,223,True,True,True,True,OBSERVED_COMPLETE
+ختوقا,1398,2020-07-19,2019-07-20,2020-07-18,240,203,True,True,True,True,OBSERVED_COMPLETE
+خرینگ,1398,2020-07-19,2019-07-20,2020-07-18,240,223,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+خمحور,1398,2020-07-19,2019-07-20,2020-07-18,240,229,True,True,True,True,OBSERVED_COMPLETE
+خمهر,1398,2020-07-19,2019-07-20,2020-07-18,240,225,True,True,True,True,OBSERVED_COMPLETE
+خنصیر,1398,2020-07-19,2019-07-20,2020-07-18,240,225,True,True,True,True,OBSERVED_COMPLETE
+خوساز,1398,2020-07-19,2019-07-20,2020-07-18,240,225,True,True,True,True,OBSERVED_COMPLETE
+خچرخش,1398,2020-07-19,2019-07-20,2020-07-18,240,232,True,True,True,True,OBSERVED_COMPLETE
+خکمک,1398,2020-07-19,2019-07-20,2020-07-18,240,219,True,True,True,True,OBSERVED_COMPLETE
+ددام,1398,2020-07-19,2019-07-20,2020-07-18,240,228,True,True,True,True,OBSERVED_COMPLETE
+دروز,1398,2020-07-19,2019-07-20,2020-07-18,240,231,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+دسبحا,1398,2020-07-19,2019-07-20,2020-07-18,240,228,True,True,True,True,OBSERVED_COMPLETE
+دسینا,1398,2020-07-19,2019-07-20,2020-07-18,240,226,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+دشیمی,1398,2020-07-19,2019-07-20,2020-07-18,240,226,True,True,True,True,OBSERVED_COMPLETE
+دیران,1398,2020-04-18,2019-04-15,2020-04-15,241,222,True,True,True,True,OBSERVED_COMPLETE
+رانفور,1398,2020-07-19,2019-07-20,2020-07-18,240,232,True,True,True,True,OBSERVED_COMPLETE
+رمپنا,1398,2019-08-22,2018-08-21,2019-08-21,242,217,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+زمگسا,1398,2020-07-19,2019-07-20,2020-07-18,240,225,True,True,True,True,OBSERVED_COMPLETE
+زپارس,1398,2020-04-18,2019-04-15,2020-04-15,241,229,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+ساراب,1398,2020-07-19,2019-07-20,2020-07-18,240,233,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+ساربیل,1398,2020-04-18,2019-04-15,2020-04-15,241,233,True,True,True,True,OBSERVED_COMPLETE
+ساروم,1398,2020-07-19,2019-07-20,2020-07-18,240,225,True,True,True,True,OBSERVED_COMPLETE
+سبجنو,1398,2020-07-19,2019-07-20,2020-07-18,240,229,True,True,True,True,OBSERVED_COMPLETE
+سبهان,1398,2020-07-19,2019-07-20,2020-07-18,240,222,True,True,True,True,OBSERVED_COMPLETE
+ستران,1398,2020-07-19,2019-07-20,2020-07-18,240,220,True,True,True,True,OBSERVED_COMPLETE
+سخاش,1398,2020-07-19,2019-07-20,2020-07-18,240,225,True,True,True,True,OBSERVED_COMPLETE
+سخزر,1398,2020-07-19,2019-07-20,2020-07-18,240,230,True,True,True,True,OBSERVED_COMPLETE
+سخوز,1398,2020-07-19,2019-07-20,2020-07-18,240,229,True,True,True,True,OBSERVED_COMPLETE
+سدشت,1398,2020-01-20,2019-01-19,2020-01-19,240,222,True,True,True,True,OBSERVED_COMPLETE
+سدور,1398,2020-07-19,2019-07-20,2020-07-18,240,229,True,True,True,True,OBSERVED_COMPLETE
+سرود,1398,2020-07-19,2019-07-20,2020-07-18,240,229,True,True,True,True,OBSERVED_COMPLETE
+سشرق,1398,2020-01-20,2019-01-19,2020-01-19,240,227,True,True,True,True,OBSERVED_COMPLETE
+سصفها,1398,2020-07-19,2019-07-20,2020-07-18,240,223,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سغرب,1398,2020-07-19,2019-07-20,2020-07-18,240,231,True,True,True,True,OBSERVED_COMPLETE
+سقاین,1398,2020-07-19,2019-07-20,2020-07-18,240,229,True,True,True,True,OBSERVED_COMPLETE
+سمازن,1398,2020-04-18,2019-04-15,2020-04-15,241,232,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+سنیر,1398,2020-07-19,2019-07-20,2020-07-18,240,231,True,True,True,True,OBSERVED_COMPLETE
+سهگمت,1398,2020-05-19,2019-05-18,2020-05-18,242,227,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+سپاها,1398,2020-01-20,2019-01-19,2020-01-19,240,235,True,True,True,True,OBSERVED_COMPLETE
+سکرد,1398,2020-01-20,2019-01-19,2020-01-19,240,222,True,True,True,True,OBSERVED_COMPLETE
+سیلام,1398,2020-05-19,2019-05-18,2020-05-18,242,228,True,True,True,True,OBSERVED_COMPLETE
+شاراک,1398,2020-07-19,2019-07-20,2020-07-18,240,231,True,True,True,True,OBSERVED_COMPLETE
+شبریز,1398,2020-07-19,2019-07-20,2020-07-18,240,217,True,True,True,True,OBSERVED_COMPLETE
+شبندر,1398,2020-07-19,2019-07-20,2020-07-18,240,221,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شدوص,1398,2020-07-19,2019-07-20,2020-07-18,240,227,True,True,True,True,OBSERVED_COMPLETE
+شفارس,1398,2020-07-19,2019-07-20,2020-07-18,240,233,True,True,True,True,OBSERVED_COMPLETE
+شلعاب,1398,2020-07-19,2019-07-20,2020-07-18,240,217,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+شپارس,1398,2020-01-20,2019-01-19,2020-01-19,240,230,True,True,True,True,OBSERVED_COMPLETE
+شپنا,1398,2020-07-19,2019-07-20,2020-07-18,240,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+شکربن,1398,2020-07-19,2019-07-20,2020-07-18,240,229,True,True,True,True,OBSERVED_COMPLETE
+شکلر,1398,2019-12-21,2018-12-18,2019-12-18,241,231,True,True,True,True,OBSERVED_COMPLETE
+شیران,1398,2020-04-18,2019-04-15,2020-04-15,241,220,True,True,True,True,OBSERVED_COMPLETE
+غبهنوش,1398,2020-07-19,2019-07-20,2020-07-18,240,222,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+غدام,1398,2020-04-18,2019-04-15,2020-04-15,241,238,True,True,True,True,OBSERVED_COMPLETE
+غسالم,1398,2020-07-19,2019-07-20,2020-07-18,240,216,True,True,True,True,OBSERVED_COMPLETE
+غشان,1398,2020-07-19,2019-07-20,2020-07-18,240,218,True,True,True,True,OBSERVED_COMPLETE
+غشهد,1398,2020-07-19,2019-07-20,2020-07-18,240,207,True,True,True,True,OBSERVED_COMPLETE
+غنوش,1398,2020-07-19,2019-07-20,2020-07-18,240,142,True,True,True,True,OBSERVED_COMPLETE
+غگل,1398,2020-01-20,2019-01-19,2020-01-19,240,228,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فاذر,1398,2020-07-19,2019-07-20,2020-07-18,240,212,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فایرا,1398,2020-07-19,2019-07-20,2020-07-18,240,223,True,True,True,True,OBSERVED_COMPLETE
+فباهنر,1398,2020-07-19,2019-07-20,2020-07-18,240,206,True,True,True,True,OBSERVED_COMPLETE
+فجام,1398,2020-07-19,2019-07-20,2020-07-18,240,231,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+فجر,1398,2020-07-19,2019-07-20,2020-07-18,240,231,True,True,True,True,OBSERVED_COMPLETE
+فخوز,1398,2020-07-19,2019-07-20,2020-07-18,240,236,True,True,True,True,OBSERVED_COMPLETE
+فرآور,1398,2020-07-19,2019-07-20,2020-07-18,240,207,True,True,True,True,OBSERVED_COMPLETE
+فسرب,1398,2020-07-19,2019-07-20,2020-07-18,240,226,True,True,True,True,OBSERVED_COMPLETE
+فسپا,1398,2020-07-19,2019-07-20,2020-07-18,240,236,True,True,True,True,OBSERVED_COMPLETE
+فمراد,1398,2020-07-19,2019-07-20,2020-07-18,240,221,True,True,True,True,OBSERVED_COMPLETE
+فملی,1398,2020-07-19,2019-07-20,2020-07-18,240,227,True,True,True,True,OBSERVED_COMPLETE
+فنورد,1398,2020-07-19,2019-07-20,2020-07-18,240,223,True,True,True,True,OBSERVED_COMPLETE
+فولاژ,1398,2020-07-19,2019-07-20,2020-07-18,240,226,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+فپنتا,1398,2020-07-19,2019-07-20,2020-07-18,240,235,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window end T*
+لابسا,1398,2020-07-19,2019-07-20,2020-07-18,240,237,True,True,True,True,OBSERVED_COMPLETE
+لبوتان,1398,2020-07-19,2019-07-20,2020-07-18,240,233,True,True,True,True,OBSERVED_COMPLETE
+لخزر,1398,2020-07-19,2019-07-20,2020-07-18,240,205,True,True,True,True,OBSERVED_COMPLETE
+لسرما,1398,2020-07-19,2019-07-20,2020-07-18,240,228,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+نوری,1398,2020-07-19,2019-07-20,2020-07-18,240,217,True,True,True,True,OBSERVED_COMPLETE
+های وب,1398,2020-07-19,2019-07-20,2020-07-18,240,224,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+همراه,1398,2020-07-19,2019-07-20,2020-07-18,240,233,True,True,True,True,OBSERVED_COMPLETE
+پارس,1398,2020-07-19,2019-07-20,2020-07-18,240,228,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+پدرخش,1398,2020-07-19,2019-07-20,2020-07-18,240,226,True,True,True,True,OBSERVED_COMPLETE
+پرداخت,1398,2020-07-19,2019-07-20,2020-07-18,240,235,True,True,True,True,OBSERVED_COMPLETE
+پسهند,1398,2020-07-19,2019-07-20,2020-07-18,240,227,True,True,True,True,OBSERVED_COMPLETE
+پلاسک,1398,2020-07-19,2019-07-20,2020-07-18,240,229,True,True,True,True,OBSERVED_COMPLETE
+چافست,1398,2020-01-20,2019-01-19,2020-01-19,240,220,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+چکارن,1398,2020-07-19,2019-07-20,2020-07-18,240,195,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کاوه,1398,2020-07-19,2019-07-20,2020-07-18,240,216,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0; adjusted_close missing at window end T*
+کبافق,1398,2020-07-19,2019-07-20,2020-07-18,240,206,True,True,True,True,OBSERVED_COMPLETE
+کرازی,1398,2020-07-19,2019-07-20,2020-07-18,240,226,True,True,True,True,OBSERVED_COMPLETE
+کفرا,1398,2020-07-19,2019-07-20,2020-07-18,240,215,True,True,True,True,OBSERVED_COMPLETE
+کفپارس,1398,2020-04-18,2019-04-15,2020-04-15,241,209,True,True,True,True,OBSERVED_COMPLETE
+کهمدا,1398,2019-10-22,2018-10-21,2019-10-21,241,237,True,True,True,True,OBSERVED_COMPLETE
+کویر,1398,2020-07-19,2019-09-24,2020-07-18,196,172,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کگاز,1398,2020-07-19,2019-07-20,2020-07-18,240,222,False,True,True,False,OBSERVED_INCOMPLETE: adjusted_close missing at window start t0
+کگل,1398,2020-07-19,2019-07-20,2020-07-18,240,218,True,True,True,True,OBSERVED_COMPLETE
