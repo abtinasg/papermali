@@ -3619,6 +3619,15 @@ def build_handoff_state(root: str):
     derived_stage, derived_batch = derive_stage_batch(qc["stage"])
     stage = qc.get("current_stage") or derived_stage
     batch = qc.get("current_batch") or derived_batch
+    # `current_stage` claims to describe the CURRENT live research state, so it
+    # cannot keep naming Stage126 once the Stage128 D2 boundary-month design
+    # freeze is complete — that would leave the snapshot saying "Stage126"
+    # beside pointers that have advanced to `stage128-m2-d2-gate-rerun`. The
+    # Stage126 label survives, truthfully, in the SEPARATE micro-part QC role
+    # below (`selected_qc_scope` / `last_completed_micro_part*`), which is about
+    # the newest completed robustness micro-part, not the live stage.
+    if derive_stage128_m2_d2_design_freeze_markers(root):
+        stage = _STAGE128_CURRENT_STAGE
     record = {
         "schema_version": GENERATOR_VERSION,
         "repository": derive_repository(root),
@@ -4479,6 +4488,12 @@ _STAGE128_M2_D2_FREEZE_ACTION_ID = (
 _NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_FREEZE = (
     "stage128-m2-d2-gate-rerun"
 )
+#: Live stage/workstream labels once the freeze is complete. The workstream id
+#: is DERIVED FROM the frozen action and names the M2 D2 boundary-month
+#: equity-return workstream it opened; it is not a new scientific action and
+#: never substitutes for a research-action id.
+_STAGE128_CURRENT_STAGE = "Stage128"
+_STAGE128_ACTIVE_WORKSTREAM_ID = "stage128-m2-d2-boundary-month-equity-return"
 
 
 def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
@@ -4526,6 +4541,16 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
         raise HandoffError(
             "stage128 M2 D2 freeze artifact does not preserve the historical "
             "Stage127 D0 Gate status"
+        )
+    # Fail closed on a stale live workstream label: once the freeze is
+    # recognized, the ROADMAP's CURRENT workstream pointer may not still name
+    # the completed Stage126 M1 baseline.
+    roadmap_workstream = read_roadmap(root)["active_research_workstream_id"]
+    if roadmap_workstream != _STAGE128_ACTIVE_WORKSTREAM_ID:
+        raise HandoffError(
+            f"stage128 M2 D2 freeze is complete but ROADMAP "
+            f"active_research_workstream_id={roadmap_workstream!r} != "
+            f"{_STAGE128_ACTIVE_WORKSTREAM_ID!r}"
         )
 
     exact = {

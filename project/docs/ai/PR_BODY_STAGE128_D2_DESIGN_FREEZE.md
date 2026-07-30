@@ -10,6 +10,10 @@ This PR was continued for a governance-only closure. **No scientific content cha
 4. **Feasibility provenance no longer overclaims** — see Feasibility provenance below.
 5. **The current-state validator fails closed on the contradiction**, with tests covering it (`stage128_freeze_closes_stage127_pending_human_review`, `stage127_human_review_history_not_erased`, `stage127_historical_d0_gate_status_preserved`, `current_state_renders_stage128_section_after_freeze`, `current_state_does_not_call_stage127_the_current_action_after_freeze`).
 
+## Live current-state labels (latest commit)
+
+`current_stage` and `active_workstream` claim to describe the CURRENT live research state, so they no longer name the completed Stage126 M1 baseline once the Stage128 D2 freeze is recognized. `current_stage = Stage128` and `active_workstream = stage128_m2_d2_boundary_month_equity_return` — a stable, machine-readable workstream label **derived from** the frozen action `stage128-m2-boundary-month-return-design-freeze`. It is **not** a new scientific action, authorizes nothing, and never substitutes for a research-action id: `last_completed_research_action_id` and `next_research_action_id` are unchanged. `stage126-m1-financial-baseline` is retained as history (ROADMAP items 1-20, OPEN_TASKS historical section) and `qc_scope` still points at the last completed micro-part's QC scope. The generator fails closed if the ROADMAP workstream pointer is stale, and the current-state validator fails if `stage128_m2_d2_design_freeze_completed = true` while `current_stage == Stage126` or `active_workstream == stage126_m1_financial_baseline`.
+
 ## Merge status
 
 - Branch: `stage128-m2-boundary-month-return-design-freeze`

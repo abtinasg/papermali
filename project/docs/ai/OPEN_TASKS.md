@@ -3,7 +3,17 @@
 Human-maintained. The authoritative "next action" ID lives in `ROADMAP.md`
 front matter; this file is the working description.
 
-## Active research workstream: `stage126-m1-financial-baseline`
+## Active research workstream: `stage128-m2-d2-boundary-month-equity-return`
+
+The CURRENT workstream is the Stage128 M2 D2 boundary-month equity-return
+workstream — a stable machine-readable label **derived from** the already-frozen
+action `stage128-m2-boundary-month-return-design-freeze`, not a new scientific
+action. The authoritative research-action pointers are unchanged
+(`last_completed_research_action_id=stage128-m2-boundary-month-return-design-freeze`,
+`next_research_action_id=stage128-m2-d2-gate-rerun`, the latter a pointer only
+and **not** authorized). `stage126-m1-financial-baseline` remains correct
+**history** for the completed M1 financial-baseline workstream (see the
+historical section below); it is no longer the current workstream.
 
 ### Current scientific action
 
@@ -276,7 +286,7 @@ modeling unstarted; final test locked). Part 3C and Part 4 hashes unchanged.
 **No** model fitting, predictions, SHAP, SMOTE, or final-test predictor
 inspection in Part 5 itself.
 
-### Active — `stage126-m1-financial-baseline`
+### Historical (completed) — `stage126-m1-financial-baseline`
 
 Stage126 M1 human-authorized = true
 Stage126 started = true

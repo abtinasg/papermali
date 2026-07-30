@@ -394,6 +394,18 @@ CURRENT_STATE_QC_METADATA_PATH = f"{STAGE126_DIR_REL}/{F_METADATA}"
 # itself, not of how many robustness micro-parts have completed — a micro-part
 # never advances them, so they are stable across Parts 1-6.
 ACTIVE_WORKSTREAM = "stage126_m1_financial_baseline"
+#: The canonical Stage128 workstream identifier. It is DERIVED FROM the already
+#: frozen action `stage128-m2-boundary-month-return-design-freeze` and names the
+#: M2 D2 boundary-month equity-return workstream that action opened; it is NOT a
+#: new scientific action and it never replaces a research-action id. The
+#: authoritative research-action pointers remain
+#: `stage128-m2-boundary-month-return-design-freeze` (last completed) and
+#: `stage128-m2-d2-gate-rerun` (next, unauthorized).
+STAGE128_ACTIVE_WORKSTREAM = "stage128_m2_d2_boundary_month_equity_return"
+#: `current_stage` once the Stage128 D2 design freeze is complete. Before it,
+#: the live stage label remains the Stage126 M1 baseline.
+STAGE126_CURRENT_STAGE = "Stage126"
+STAGE128_CURRENT_STAGE = "Stage128"
 NEXT_RESEARCH_ACTION_ID = "stage126-m1-financial-baseline"
 # Once all six registered M1 robustness categories are complete (Part 6
 # closes the set), the next legitimate ROADMAP research action advances to
@@ -544,6 +556,47 @@ def stage128_m2_d2_design_freeze_completed(repo_root: Path) -> bool:
         "stage128_m2_d2_gate_rerun_authorized": False,
     }
     return all(freeze.get(k) == v for k, v in required_exact.items())
+
+
+def expected_active_workstream(repo_root: Path) -> str:
+    """The single source of truth for the CURRENT live workstream label.
+
+    `active_workstream` claims to describe the workstream that is live NOW. It
+    must therefore advance with the live research state: once the Stage128 D2
+    boundary-month design freeze is complete, the live workstream is the
+    Stage128 M2 D2 one, not the Stage126 M1 financial baseline. The Stage126
+    value remains correct history, but it is no longer the CURRENT value.
+    """
+    if stage128_m2_d2_design_freeze_completed(repo_root):
+        return STAGE128_ACTIVE_WORKSTREAM
+    return ACTIVE_WORKSTREAM
+
+
+def expected_current_stage(repo_root: Path) -> str:
+    """The single source of truth for the CURRENT live stage label."""
+    if stage128_m2_d2_design_freeze_completed(repo_root):
+        return STAGE128_CURRENT_STAGE
+    return STAGE126_CURRENT_STAGE
+
+
+def current_state_labels_are_not_stale(
+    handoff: dict[str, Any], *, freeze_completed: bool,
+) -> bool:
+    """False when the live labels still claim Stage126 after the freeze.
+
+    Guards the exact ambiguity this check exists for: a snapshot that says
+    `Stage126 / stage126_m1_financial_baseline` while the same canonical state
+    says the Stage128 D2 design freeze is complete and the research pointers
+    have advanced to `stage128-m2-d2-gate-rerun`. `current_stage` and
+    `active_workstream` are CURRENT-state fields, so after the freeze they may
+    not carry the Stage126 M1 values.
+    """
+    if not freeze_completed:
+        return True
+    return (
+        handoff.get("current_stage") == STAGE128_CURRENT_STAGE
+        and handoff.get("active_workstream") == STAGE128_ACTIVE_WORKSTREAM
+    )
 
 
 def stage127_human_review_closure_consistent(
@@ -1282,7 +1335,7 @@ def verify_handoff(
             )
 
     exact: dict[str, Any] = {
-        "active_workstream": ACTIVE_WORKSTREAM,
+        "active_workstream": expected_active_workstream(repo_root),
         "next_research_action_id": expected_next_research_action_id(
             repo_root, m1_robustness_completed,
         ),
@@ -1386,7 +1439,7 @@ def build_validation_report(
         "last_completed_micro_part_qc_path": micro_qc["path"],
         "last_completed_micro_part_qc_assertions": micro_qc["assertions"],
         "last_completed_micro_part_qc_failed": micro_qc["failed"],
-        "active_workstream": ACTIVE_WORKSTREAM,
+        "active_workstream": expected_active_workstream(repo_root),
         "next_research_action_id": expected_next_research_action_id(
             repo_root,
             len(completed) == len(execution_order) and len(execution_order) > 0,
@@ -1588,7 +1641,7 @@ def build_assertions(
     # the next research action legitimately transitions exactly once, when
     # all six registered M1 robustness categories are complete.
     add("research_pointers_consistent_with_m1_robustness_state",
-        report["active_workstream"] == ACTIVE_WORKSTREAM
+        report["active_workstream"] == expected_active_workstream(repo_root)
         and report["next_research_action_id"] == expected_next_research_action_id(
             repo_root, expected_m1_robustness_completed,
         ))
@@ -1625,6 +1678,30 @@ def build_assertions(
             handoff, freeze_completed=freeze_done),
         "stage128_m2_d2_design_freeze_completed=True requires both Stage127 "
         "pending-human-review markers to be False")
+    # --- Live labels must not be stale ------------------------------------ #
+    # `current_stage` / `active_workstream` claim to describe the CURRENT live
+    # research state. Leaving them at Stage126 / stage126_m1_financial_baseline
+    # after the Stage128 D2 freeze completes produces exactly the ambiguity
+    # this guard forbids: a snapshot naming the Stage126 M1 workstream beside a
+    # canonical state whose pointers have advanced to stage128-m2-d2-gate-rerun.
+    add("current_state_labels_not_stale_after_stage128_freeze",
+        current_state_labels_are_not_stale(
+            handoff, freeze_completed=freeze_done),
+        f"stage128_m2_d2_design_freeze_completed=True requires "
+        f"current_stage={STAGE128_CURRENT_STAGE} and "
+        f"active_workstream={STAGE128_ACTIVE_WORKSTREAM}")
+    # The workstream label is a WORKSTREAM name derived from the frozen action;
+    # it must never be substituted for either authoritative research-action id.
+    add("stage128_workstream_id_does_not_replace_research_action_ids",
+        (not freeze_done)
+        or (handoff.get("last_completed_research_action_id")
+            not in (STAGE128_ACTIVE_WORKSTREAM,
+                    STAGE128_ACTIVE_WORKSTREAM.replace("_", "-"))
+            and handoff.get("next_research_action_id")
+            not in (STAGE128_ACTIVE_WORKSTREAM,
+                    STAGE128_ACTIVE_WORKSTREAM.replace("_", "-"))),
+        "the Stage128 workstream label is derived from the frozen action and "
+        "must never be used as, or alter, a research-action id")
     add("stage127_human_review_history_not_erased",
         (not freeze_done)
         or (handoff.get("stage127_m2_human_review_originally_required") is True
@@ -1632,6 +1709,16 @@ def build_assertions(
             == "stage128-m2-boundary-month-return-design-freeze"),
         "the historical fact that Stage127 originally required human review "
         "must be preserved, together with the action that discharged it")
+    add("stage128_freeze_authorizes_nothing_further",
+        (not freeze_done)
+        or all(handoff.get(k) is False for k in (
+            "stage128_m2_d2_gate_rerun_authorized",
+            "m2_incremental_evaluation_authorized",
+            "m2_modeling_started",
+            "final_test_unlocked",
+        )),
+        "advancing the live stage/workstream labels must not authorize the D2 "
+        "Gate re-run, M2 evaluation, M2 modeling or final-test access")
     add("stage127_historical_d0_gate_status_preserved",
         stage127_historical_d0_gate_status_preserved(handoff),
         f"historical D0 Gate status must remain "

@@ -1,6 +1,6 @@
 ---
 roadmap_version: 2
-active_research_workstream_id: stage126-m1-financial-baseline
+active_research_workstream_id: stage128-m2-d2-boundary-month-equity-return
 qc_scope: stage126-m1-financial-baseline
 last_completed_research_action_id: stage128-m2-boundary-month-return-design-freeze
 next_research_action_id: stage128-m2-d2-gate-rerun
@@ -10,6 +10,8 @@ active_maintenance_task_id: repository-driven-ai-handoff
 # ROADMAP
 
 The front matter above is the **machine-readable** roadmap pointer. Research work and maintenance work remain separate: maintenance never advances a research action.
+
+**Workstream identifier note.** `active_research_workstream_id` names the workstream that is live **now**. Since the Stage128 D2 boundary-month design freeze completed (item 22), that is `stage128-m2-d2-boundary-month-equity-return` — a stable, machine-readable label **derived from** the already-frozen action `stage128-m2-boundary-month-return-design-freeze`, naming the M2 D2 boundary-month equity-return workstream it opened. It is **not** a new scientific action, it introduces no new candidate, threshold or authorization, and it never replaces a research-action id: the authoritative pointers remain `last_completed_research_action_id: stage128-m2-boundary-month-return-design-freeze` and `next_research_action_id: stage128-m2-d2-gate-rerun` (a pointer only, **not** authorized). The previous value, `stage126-m1-financial-baseline`, remains correct **history** for the completed M1 financial-baseline workstream (items 1-20) — it is simply no longer the CURRENT workstream. `qc_scope` is a separate role and still points at the last completed scientific micro-part's QC scope (`stage126-m1-financial-baseline`).
 
 **Pointer state note (as of PR #69):** the front matter above reflects the pointer state that becomes live only **if and when PR #69 is merged**. Identifying `stage128-m2-d2-gate-rerun` as `next_research_action_id` is a pointer only — it is **not** an authorization to execute that Gate; see [`STAGE128_M2_D2_DESIGN_FREEZE.md`](STAGE128_M2_D2_DESIGN_FREEZE.md) §8 and `project/stage128/stage128_m2_d2_design_freeze.json:stage128_m2_d2_gate_rerun_authorized` (`false`). Until PR #69 is merged, the pointer live on `main` remains `next_research_action_id: stage127-m2-market-data-gate` as set by PR #65.
 

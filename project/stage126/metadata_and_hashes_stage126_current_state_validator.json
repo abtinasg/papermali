@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 91,
+  "assertion_count": 94,
   "assertions": [
     {
       "detail": "",
@@ -438,8 +438,23 @@
       "status": "PASS"
     },
     {
+      "detail": "stage128_m2_d2_design_freeze_completed=True requires current_stage=Stage128 and active_workstream=stage128_m2_d2_boundary_month_equity_return",
+      "name": "current_state_labels_not_stale_after_stage128_freeze",
+      "status": "PASS"
+    },
+    {
+      "detail": "the Stage128 workstream label is derived from the frozen action and must never be used as, or alter, a research-action id",
+      "name": "stage128_workstream_id_does_not_replace_research_action_ids",
+      "status": "PASS"
+    },
+    {
       "detail": "the historical fact that Stage127 originally required human review must be preserved, together with the action that discharged it",
       "name": "stage127_human_review_history_not_erased",
+      "status": "PASS"
+    },
+    {
+      "detail": "advancing the live stage/workstream labels must not authorize the D2 Gate re-run, M2 evaluation, M2 modeling or final-test access",
+      "name": "stage128_freeze_authorizes_nothing_further",
       "status": "PASS"
     },
     {
@@ -459,7 +474,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "d65731baf88e850e7f6854369e3e471744664690",
+  "code_commit": "02ed256a15dbc6cc2b6a8e45515cf6a4ad779e13",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -467,15 +482,15 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "d65731baf88e850e7f6854369e3e471744664690",
+  "generated_at": "02ed256a15dbc6cc2b6a8e45515cf6a4ad779e13",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
   "operational_surfaces_git_versioned": true,
   "output_files_sha256": {
-    "README_STAGE126_CURRENT_STATE_VALIDATION.md": "458a5660c2f18926aa5d10b5db05c79a04509b15d634faec300c678cb4076962",
+    "README_STAGE126_CURRENT_STATE_VALIDATION.md": "e21999f4e8bd338c24b9865aafd9ecf5e6918df75d8ccb6da3f9d6157b0da381",
     "stage126_closed_part_registry.json": "bb6a269686f4f1b616b7896bbba1469eb1cf61e8514445b8f8150033f258080e",
-    "stage126_current_state_validation_report.json": "ea3e625b43d44538dbfe7854a1206c7264296c5b0d585d0dc89014baffbfdf5f",
+    "stage126_current_state_validation_report.json": "5c7ea340605432fdcb737033428987f59751186ff1661de616c38db14281a027",
     "stage126_historical_boundary_manifest.json": "a518be27730e32b8a7de8de2d46865fc5efc1d31a5f796d00a6557d25f92a838",
     "stage126_validation_architecture_boundary_decision.json": "7502405fc0c2641c7dc766f3d4a52941b4c4841295d1d3130c07718768a6e06c"
   },
@@ -485,7 +500,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "accfc51fac815cda12e87534ca13c798a3ca7e9270494843e13eec6d4e80a972",
+  "source_file_sha256": "962e1df43e267c68dc2f0cd6073bfd1fdbfab388bbafa9a87111411261b7159e",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {
@@ -498,7 +513,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "2e3e4e778d64b00be0936cf5747d4f1b9117139d6d78ea7abeca71916e767540",
+  "test_file_sha256": "35fd909b055d030c6c7e6960f2042d0b0dc1035b9fec21a253fac0b4391411fc",
   "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v2_lean"
