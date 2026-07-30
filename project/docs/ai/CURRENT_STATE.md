@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m2_d2_boundary_month_equity_return`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m2-d2-gate-rerun`
-- **Last stage commit:** `5bc8d22ea361116935ae9da0358aa457ef127ac2`
-- **Generated from commit:** `5bc8d22ea361116935ae9da0358aa457ef127ac2` (branch `stage128-m2-boundary-month-return-design-freeze`, informational)
+- **Last stage commit:** `f38739aed9a4a4304ddeeae3fd0581b598ed2579`
+- **Generated from commit:** `f38739aed9a4a4304ddeeae3fd0581b598ed2579` (branch `stage128-m2-boundary-month-return-design-freeze`, informational)
 - **Baseline:** `origin/main` @ `b25804ab764258c846b391f4823f089552c855e3`
 
 ## Current-state validation
@@ -111,5 +111,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `3723384406adb33326618653da36a6eb742cfdddeb6f806dd64ed42826401c79`_
-_generated_at_utc: 2026-07-30T19:02:45Z (informational)_
+_state_fingerprint: `543ac4b3ee2846f5d98f483d2018b59a8041e9a876436fe875e4414fd8c96a72`_
+_generated_at_utc: 2026-07-30T19:12:05Z (informational)_
