@@ -1559,3 +1559,124 @@ def test_stale_label_assertions_present_and_passing():
     ):
         assert name in names, name
         assert names[name]["status"] == "PASS", name
+
+
+# --------------------------------------------------------------------------- #
+# Stage128 D2 Gate re-run — current-state rendering must fail closed
+# --------------------------------------------------------------------------- #
+
+_CURRENT_STATE = os.path.join(REAL_ROOT, "project", "docs", "ai",
+                              "CURRENT_STATE.md")
+_ROADMAP = os.path.join(REAL_ROOT, v.ROADMAP_MD_REL)
+
+_RERUN_RENDERING_ASSERTIONS = (
+    "current_state_freeze_section_not_current_after_gate_rerun",
+    "current_state_has_exactly_one_current_scientific_action_section",
+    "current_state_current_section_is_the_gate_rerun",
+    "current_state_freeze_section_claims_only_its_own_action",
+    "current_state_freeze_section_does_not_claim_the_gate_rerun",
+    "current_state_does_not_call_incremental_evaluation_the_gate_rerun",
+    "current_state_renders_a_single_live_next_action_pointer",
+    "current_state_next_pointer_is_eligible_but_unauthorized",
+    "next_pointer_flags_are_false_when_pointer_is_incremental_evaluation",
+    "gate_rerun_complete_implies_current_action_is_the_gate_rerun",
+    "roadmap_prose_agrees_with_front_matter_pointers",
+    "roadmap_prose_does_not_contradict_front_matter_pointers",
+    "roadmap_prose_does_not_call_incremental_evaluation_the_gate_rerun",
+)
+
+
+def test_gate_rerun_rendering_guards_exist_and_pass():
+    meta = _read_json(v.F_METADATA)
+    by_name = {a["name"]: a for a in meta["assertions"]}
+    for name in _RERUN_RENDERING_ASSERTIONS:
+        assert name in by_name, name
+        assert by_name[name]["status"] == "PASS", name
+
+
+def test_current_state_presents_exactly_one_current_section():
+    text = open(_CURRENT_STATE, encoding="utf-8").read()
+    current = [ln for ln in text.splitlines()
+               if ln.startswith("## ") and "(CURRENT)" in ln]
+    assert len(current) == 1, current
+    assert "Gate RE-RUN" in current[0]
+
+
+def test_design_freeze_section_is_historical_after_the_gate_rerun():
+    text = open(_CURRENT_STATE, encoding="utf-8").read()
+    assert (
+        "## Stage128 — M2 D2 boundary-month equity-return design freeze "
+        "(COMPLETED DESIGN CONTRACT)" in text
+    )
+    assert (
+        "## Stage128 — M2 D2 boundary-month equity-return design freeze "
+        "(CURRENT)" not in text
+    )
+    assert (
+        "- **Research action completed by this freeze:** "
+        "`stage128-m2-boundary-month-return-design-freeze`" in text
+    )
+    assert (
+        "Research action completed by this freeze:** "
+        "`stage128-m2-d2-gate-rerun`" not in text
+    )
+
+
+def test_sole_live_next_pointer_is_eligible_pointer_only_unauthorized():
+    text = open(_CURRENT_STATE, encoding="utf-8").read()
+    pointers = [ln for ln in text.splitlines()
+                if ln.startswith("- **Next research action (pointer only):**")]
+    assert len(pointers) == 1, pointers
+    line = pointers[0]
+    assert "`stage127-m2-incremental-evaluation`" in line
+    assert "ELIGIBLE" in line
+    assert "POINTER ONLY" in line
+    assert "not authorized" in line
+    assert "not started" in line
+
+
+def test_incremental_evaluation_is_never_called_the_gate_rerun():
+    for path in (_CURRENT_STATE, _ROADMAP):
+        text = open(path, encoding="utf-8").read()
+        assert not v._describes_incremental_evaluation_as_gate_rerun(text), path
+
+
+def test_helper_detects_the_conflation_and_allows_the_negation():
+    bad = (
+        "- **Next research action (pointer only):** "
+        "`stage127-m2-incremental-evaluation` — the canonical M2 Gate re-run "
+        "under the frozen D2 construct"
+    )
+    good = (
+        "- **Next research action (pointer only):** "
+        "`stage127-m2-incremental-evaluation` — it is NOT the canonical M2 "
+        "Gate re-run"
+    )
+    assert v._describes_incremental_evaluation_as_gate_rerun(bad) is True
+    assert v._describes_incremental_evaluation_as_gate_rerun(good) is False
+
+
+def test_roadmap_front_matter_matches_handoff_pointers():
+    text = open(_ROADMAP, encoding="utf-8").read()
+    fm = v._roadmap_front_matter(text)
+    assert fm["last_completed_research_action_id"] == (
+        "stage128-m2-d2-gate-rerun"
+    )
+    assert fm["next_research_action_id"] == "stage127-m2-incremental-evaluation"
+    state = json.loads(open(
+        os.path.join(REAL_ROOT, "project", "docs", "ai",
+                     "handoff_state.json"), encoding="utf-8").read())
+    assert fm["last_completed_research_action_id"] == (
+        state["last_completed_research_action_id"]
+    )
+    assert fm["next_research_action_id"] == state["next_research_action_id"]
+
+
+def test_roadmap_prose_drops_the_superseded_pointer_pair_claim():
+    text = open(_ROADMAP, encoding="utf-8").read()
+    assert (
+        "the authoritative pointers remain "
+        "`last_completed_research_action_id: "
+        "stage128-m2-boundary-month-return-design-freeze`" not in text
+    )
+    assert "historical pre-rerun" in text

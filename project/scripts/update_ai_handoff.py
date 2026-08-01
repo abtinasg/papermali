@@ -3865,13 +3865,37 @@ def render_current_state(record: dict) -> str:
             ]
         lines += [""]
     if record.get("stage128_m2_d2_design_freeze_completed"):
+        # Once the canonical Gate re-run has executed AND resolved, the
+        # Gate re-run section below is the SOLE CURRENT scientific-action
+        # section. This section then renders as historical, completed,
+        # frozen-design context: it must not stay marked (CURRENT), must not
+        # inherit the global `last_completed_research_action_id`, and must not
+        # carry a live "next action" pointer.
+        freeze_is_historical = bool(
+            record.get("stage128_m2_d2_gate_rerun_executed")
+            and record.get("stage128_m2_d2_gate_rerun_resolved")
+        )
+        if freeze_is_historical:
+            lines += [
+                "## Stage128 — M2 D2 boundary-month equity-return design "
+                "freeze (COMPLETED DESIGN CONTRACT)\n",
+                "_Historical, completed frozen-design context — **not** the "
+                "current scientific action. This was a DESIGN-FREEZE / "
+                "CONTRACT action only: no canonical Gate was executed, no "
+                "model was fit, no prediction was generated and no "
+                "final-test row was read. The canonical Gate re-run section "
+                "below is the current scientific action._\n",
+            ]
+        else:
+            lines += [
+                "## Stage128 — M2 D2 boundary-month equity-return design "
+                "freeze (CURRENT)\n",
+                "_The current scientific state. This is a DESIGN-FREEZE / "
+                "CONTRACT action only: no canonical Gate was executed, no "
+                "model was fit, no prediction was generated and no "
+                "final-test row was read._\n",
+            ]
         lines += [
-            "## Stage128 — M2 D2 boundary-month equity-return design freeze "
-            "(CURRENT)\n",
-            "_The current scientific state. This is a DESIGN-FREEZE / "
-            "CONTRACT action only: no canonical Gate was executed, no model "
-            "was fit, no prediction was generated and no final-test row was "
-            "read._\n",
             "- ✅ **D2 design freeze completed:** "
             f"{record['stage128_m2_d2_design_freeze_completed']}",
             "- **Frozen primary M2 equity-return construct:** "
@@ -3885,15 +3909,38 @@ def render_current_state(record: dict) -> str:
             # NB: deliberately NOT phrased "Last completed research action" —
             # that exact phrase is reserved by test_ai_handoff so a robustness
             # micro-part can never be mislabelled as a research action.
+            # The action completed BY THIS FREEZE is a fixed historical fact.
+            # It must never inherit the global
+            # `last_completed_research_action_id`, which advances with every
+            # later research action.
             "- **Research action completed by this freeze:** "
-            f"`{record['last_completed_research_action_id']}`",
-            "- **Next research action (pointer only):** "
-            f"`{record['next_research_action_id']}` — the canonical M2 Gate "
-            "re-run under the frozen D2 construct",
-            "- ⛔ **D2 Gate rerun authorized:** "
+            f"`{_STAGE128_M2_D2_FREEZE_ACTION_ID}`",
+        ]
+        if freeze_is_historical:
+            # Historical successor statement only. The SOLE live next-action
+            # pointer is rendered in the Gate re-run CURRENT section below.
+            lines += [
+                "- **Immediate successor of this freeze (historical):** "
+                f"`{_NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_FREEZE}` — "
+                "the canonical M2 Gate re-run under the frozen D2 construct, "
+                "now COMPLETED (see the current section below). This line is "
+                "historical: it is not the branch's live next-action pointer.",
+            ]
+        else:
+            lines += [
+                "- **Next research action (pointer only):** "
+                f"`{record['next_research_action_id']}` — the canonical M2 "
+                "Gate re-run under the frozen D2 construct",
+            ]
+        lines += [
+            "- ⛔ **D2 Gate rerun authorized (standing):** "
             f"{record.get('stage128_m2_d2_gate_rerun_authorized')} — "
-            "identifying the next action is NOT an authorization to execute "
-            "it; that requires a separate, explicit human authorization",
+            + ("the one-action authorization that executed the Gate re-run "
+               "was consumed by that execution and is not standing"
+               if freeze_is_historical else
+               "identifying the next action is NOT an authorization to "
+               "execute it; that requires a separate, explicit human "
+               "authorization"),
             f"- ⛔ **M2 admitted:** {record.get('m2_authorized')} — "
             f"**M2 incremental evaluation authorized:** "
             f"{record.get('m2_incremental_evaluation_authorized')} — "
@@ -3946,9 +3993,18 @@ def render_current_state(record: dict) -> str:
             f"**M2 modeling started:** {record.get('m2_modeling_started')} — "
             f"**M2 block admitted for modeling:** "
             f"{record.get('m2_block_admitted_for_modeling')}",
+            # The SOLE live next-action pointer on this branch.
             "- **Next research action (pointer only):** "
-            f"`{record['next_research_action_id']}` — a pointer is NOT an "
-            "authorization; it requires a new, explicit human authorization",
+            f"`{record['next_research_action_id']}` — scientifically "
+            "ELIGIBLE after this data-admission PASS; a POINTER ONLY, "
+            "**not authorized** "
+            "(`m2_incremental_evaluation_authorized="
+            f"{record.get('m2_incremental_evaluation_authorized')}`) and "
+            "**not started** "
+            f"(`m2_modeling_started={record.get('m2_modeling_started')}`). "
+            "It requires a new, explicit human authorization. It is the M2 "
+            "incremental evaluation action — it is NOT the canonical M2 Gate "
+            "re-run, which is the completed action reported in this section.",
             "- The post-lock eligibility audit frozen by the design-freeze "
             "contract remains REQUIRED before any M2 predictive result is "
             "interpreted. It was not executed by this Gate.",

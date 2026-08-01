@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 97,
+  "assertion_count": 110,
   "assertions": [
     {
       "detail": "",
@@ -486,10 +486,75 @@
       "detail": "after the freeze, Stage127 must be rendered as a HISTORICAL completed/resolved Gate, not as the current scientific action",
       "name": "current_state_does_not_call_stage127_the_current_action_after_freeze",
       "status": "PASS"
+    },
+    {
+      "detail": "once the D2 Gate re-run is executed and resolved, the design-freeze section must render as historical/completed frozen-design context, never as (CURRENT)",
+      "name": "current_state_freeze_section_not_current_after_gate_rerun",
+      "status": "PASS"
+    },
+    {
+      "detail": "exactly one scientific-action section may be presented as (CURRENT); found 1: ['## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 (CURRENT)']",
+      "name": "current_state_has_exactly_one_current_scientific_action_section",
+      "status": "PASS"
+    },
+    {
+      "detail": "when the Gate re-run is complete, the sole CURRENT section must be the Gate re-run section",
+      "name": "current_state_current_section_is_the_gate_rerun",
+      "status": "PASS"
+    },
+    {
+      "detail": "the design-freeze section must always name `stage128-m2-boundary-month-return-design-freeze` as the action it completed, and must never inherit the global last_completed_research_action_id",
+      "name": "current_state_freeze_section_claims_only_its_own_action",
+      "status": "PASS"
+    },
+    {
+      "detail": "the design freeze did not complete the Gate re-run",
+      "name": "current_state_freeze_section_does_not_claim_the_gate_rerun",
+      "status": "PASS"
+    },
+    {
+      "detail": "`stage127-m2-incremental-evaluation` is the M2 incremental evaluation action, never the canonical M2 Gate re-run",
+      "name": "current_state_does_not_call_incremental_evaluation_the_gate_rerun",
+      "status": "PASS"
+    },
+    {
+      "detail": "after the Gate re-run only the CURRENT Gate-re-run section may carry a live next-action pointer; found 1",
+      "name": "current_state_renders_a_single_live_next_action_pointer",
+      "status": "PASS"
+    },
+    {
+      "detail": "the live next-action pointer must state: scientifically eligible, pointer only, not authorized, not started",
+      "name": "current_state_next_pointer_is_eligible_but_unauthorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "pointing at the M2 incremental evaluation never authorizes or starts it",
+      "name": "next_pointer_flags_are_false_when_pointer_is_incremental_evaluation",
+      "status": "PASS"
+    },
+    {
+      "detail": "a completed Gate re-run must be the last completed research action",
+      "name": "gate_rerun_complete_implies_current_action_is_the_gate_rerun",
+      "status": "PASS"
+    },
+    {
+      "detail": "ROADMAP prose naming the authoritative pointers must name exactly the front-matter pair (stage128-m2-d2-gate-rerun / stage127-m2-incremental-evaluation)",
+      "name": "roadmap_prose_agrees_with_front_matter_pointers",
+      "status": "PASS"
+    },
+    {
+      "detail": "ROADMAP prose must not claim a superseded pointer pair still 'remains' authoritative",
+      "name": "roadmap_prose_does_not_contradict_front_matter_pointers",
+      "status": "PASS"
+    },
+    {
+      "detail": "`stage127-m2-incremental-evaluation` is the M2 incremental evaluation action, never the canonical Gate re-run",
+      "name": "roadmap_prose_does_not_call_incremental_evaluation_the_gate_rerun",
+      "status": "PASS"
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "5bc8d22ea361116935ae9da0358aa457ef127ac2",
+  "code_commit": "a96a2cb4e8b4b28c183fdfd16d3ed33f5b3e676b",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -497,7 +562,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "5bc8d22ea361116935ae9da0358aa457ef127ac2",
+  "generated_at": "a96a2cb4e8b4b28c183fdfd16d3ed33f5b3e676b",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -515,7 +580,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "c7872bcac77fb0057415274efcaed887cabec79a873fcdb845a148bd7421a813",
+  "source_file_sha256": "79e1410c3e0fdb758c91573c9fcae1ad2b37c0afe0f4f37c95c7d60f077646ff",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {
@@ -528,7 +593,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "b48e36b523665abc503ed116a8ee3b1e95c51ea1fae6203ac47d366e511385fb",
+  "test_file_sha256": "611c6e1902762cf564e43a19f6a6d8babaa84e399ed7fe0240787bb09173e636",
   "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v2_lean"

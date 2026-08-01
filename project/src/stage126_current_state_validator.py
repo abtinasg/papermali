@@ -646,6 +646,49 @@ STAGE128_M2_D2_GATE_RERUN_FAIL = "FAIL_M2_DATA_GATE"
 NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_GATE_RERUN_PASS = (
     "stage127-m2-incremental-evaluation"
 )
+#: The design-freeze action the Gate re-run executed. Rendering must always
+#: attribute the freeze to THIS id and never to a later research action.
+_STAGE128_M2_D2_FREEZE_ACTION_ID = (
+    "stage128-m2-boundary-month-return-design-freeze"
+)
+ROADMAP_MD_REL = "project/docs/ai/ROADMAP.md"
+
+
+def _roadmap_front_matter(text: str) -> dict[str, str]:
+    """Parse the simple ``key: value`` ROADMAP YAML front matter."""
+    if not text.startswith("---"):
+        return {}
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        return {}
+    fm: dict[str, str] = {}
+    for line in parts[1].splitlines():
+        if ":" in line:
+            k, _, v = line.partition(":")
+            fm[k.strip()] = v.strip()
+    return fm
+
+
+def _describes_incremental_evaluation_as_gate_rerun(text: str) -> bool:
+    """True if prose calls the M2 incremental evaluation the Gate re-run.
+
+    The successor action is the M2 INCREMENTAL EVALUATION. Describing it as
+    "the canonical M2 Gate re-run" conflates it with the already-completed
+    ``stage128-m2-d2-gate-rerun`` and is a fail-closed rendering defect. The
+    explicit negation ("it is NOT the canonical M2 Gate re-run") is allowed.
+    """
+    target = NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_GATE_RERUN_PASS
+    for line in text.splitlines():
+        if target not in line:
+            continue
+        lowered = line.lower()
+        if "gate re-run" not in lowered and "gate rerun" not in lowered:
+            continue
+        if "not the canonical m2 gate re-run" in lowered:
+            continue
+        if "the canonical m2 gate re-run" in lowered:
+            return True
+    return False
 
 
 def _stage128_m2_d2_gate_rerun_decision(repo_root: Path) -> dict[str, Any]:
@@ -1841,6 +1884,119 @@ def build_assertions(
             "exists" not in current_state_text),
         "after the freeze, Stage127 must be rendered as a HISTORICAL "
         "completed/resolved Gate, not as the current scientific action")
+    # --- exactly one CURRENT scientific-action section after the rerun ---- #
+    # `rerun_done` is derived from the decision artifact; the rendered
+    # narrative must agree with it or the validator fails closed.
+    rerun_complete = bool(
+        rerun_done
+        and handoff.get("stage128_m2_d2_gate_rerun_executed") is True
+        and handoff.get("stage128_m2_d2_gate_rerun_resolved") is True
+    )
+    current_headings = [
+        ln for ln in current_state_text.splitlines()
+        if ln.startswith("## ") and "(CURRENT)" in ln
+    ]
+    add("current_state_freeze_section_not_current_after_gate_rerun",
+        (not rerun_complete)
+        or ("## Stage128 — M2 D2 boundary-month equity-return design freeze "
+            "(CURRENT)" not in current_state_text),
+        "once the D2 Gate re-run is executed and resolved, the design-freeze "
+        "section must render as historical/completed frozen-design context, "
+        "never as (CURRENT)")
+    add("current_state_has_exactly_one_current_scientific_action_section",
+        (not rerun_complete) or len(current_headings) == 1,
+        "exactly one scientific-action section may be presented as "
+        f"(CURRENT); found {len(current_headings)}: {current_headings}")
+    add("current_state_current_section_is_the_gate_rerun",
+        (not rerun_complete)
+        or (len(current_headings) == 1
+            and "Gate RE-RUN" in current_headings[0]),
+        "when the Gate re-run is complete, the sole CURRENT section must be "
+        "the Gate re-run section")
+    add("current_state_freeze_section_claims_only_its_own_action",
+        (not freeze_done)
+        or (f"- **Research action completed by this freeze:** "
+            f"`{_STAGE128_M2_D2_FREEZE_ACTION_ID}`" in current_state_text),
+        "the design-freeze section must always name "
+        f"`{_STAGE128_M2_D2_FREEZE_ACTION_ID}` as the action it completed, "
+        "and must never inherit the global last_completed_research_action_id")
+    add("current_state_freeze_section_does_not_claim_the_gate_rerun",
+        "- **Research action completed by this freeze:** "
+        f"`{STAGE128_M2_D2_GATE_RERUN_ACTION_ID}`" not in current_state_text,
+        "the design freeze did not complete the Gate re-run")
+    add("current_state_does_not_call_incremental_evaluation_the_gate_rerun",
+        not _describes_incremental_evaluation_as_gate_rerun(
+            current_state_text),
+        f"`{NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_GATE_RERUN_PASS}` is "
+        "the M2 incremental evaluation action, never the canonical M2 Gate "
+        "re-run")
+    next_pointer_lines = [
+        ln for ln in current_state_text.splitlines()
+        if ln.startswith("- **Next research action (pointer only):**")
+    ]
+    add("current_state_renders_a_single_live_next_action_pointer",
+        (not rerun_complete) or len(next_pointer_lines) == 1,
+        "after the Gate re-run only the CURRENT Gate-re-run section may "
+        f"carry a live next-action pointer; found {len(next_pointer_lines)}")
+    add("current_state_next_pointer_is_eligible_but_unauthorized",
+        (not rerun_complete)
+        or (len(next_pointer_lines) == 1
+            and NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_GATE_RERUN_PASS
+            in next_pointer_lines[0]
+            and "ELIGIBLE" in next_pointer_lines[0]
+            and "POINTER ONLY" in next_pointer_lines[0]
+            and "not authorized" in next_pointer_lines[0]
+            and "not started" in next_pointer_lines[0]),
+        "the live next-action pointer must state: scientifically eligible, "
+        "pointer only, not authorized, not started")
+    add("next_pointer_flags_are_false_when_pointer_is_incremental_evaluation",
+        (handoff.get("next_research_action_id")
+         != NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_GATE_RERUN_PASS)
+        or (handoff.get("m2_incremental_evaluation_authorized") is False
+            and handoff.get("m2_modeling_started") is False),
+        "pointing at the M2 incremental evaluation never authorizes or "
+        "starts it")
+    add("gate_rerun_complete_implies_current_action_is_the_gate_rerun",
+        (not rerun_complete)
+        or (handoff.get("last_completed_research_action_id")
+            == STAGE128_M2_D2_GATE_RERUN_ACTION_ID),
+        "a completed Gate re-run must be the last completed research action")
+    # --- ROADMAP front matter must agree with its own explanatory prose --- #
+    roadmap_text = ""
+    rm_path = repo_root / ROADMAP_MD_REL
+    if rm_path.is_file():
+        roadmap_text = rm_path.read_text(encoding="utf-8")
+    fm = _roadmap_front_matter(roadmap_text)
+    body = roadmap_text.split("---", 2)[-1] if fm else roadmap_text
+    stale_pair = (
+        "the authoritative pointers remain "
+        f"`last_completed_research_action_id: "
+        f"{_STAGE128_M2_D2_FREEZE_ACTION_ID}`"
+    )
+    # ROADMAP-INTERNAL consistency: the explanatory prose must name the same
+    # authoritative pointer pair as the machine-readable front matter.
+    fm_last = fm.get("last_completed_research_action_id", "")
+    fm_next = fm.get("next_research_action_id", "")
+    authoritative_prose = [
+        ln for ln in body.splitlines()
+        if "authoritative pointers" in ln
+    ]
+    add("roadmap_prose_agrees_with_front_matter_pointers",
+        (not fm)
+        or all(f"`last_completed_research_action_id: {fm_last}`" in ln
+               and f"`next_research_action_id: {fm_next}`" in ln
+               for ln in authoritative_prose),
+        "ROADMAP prose naming the authoritative pointers must name exactly "
+        f"the front-matter pair ({fm_last} / {fm_next})")
+    add("roadmap_prose_does_not_contradict_front_matter_pointers",
+        stale_pair not in body,
+        "ROADMAP prose must not claim a superseded pointer pair still "
+        "'remains' authoritative")
+    add("roadmap_prose_does_not_call_incremental_evaluation_the_gate_rerun",
+        not _describes_incremental_evaluation_as_gate_rerun(body),
+        f"`{NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_GATE_RERUN_PASS}` is "
+        "the M2 incremental evaluation action, never the canonical Gate "
+        "re-run")
     return a
 
 
