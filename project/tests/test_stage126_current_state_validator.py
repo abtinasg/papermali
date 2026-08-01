@@ -600,7 +600,12 @@ def test_research_pointers_unchanged():
     # transitioned once more to the D2 Gate re-run pointer (which itself
     # still requires a separate future human authorization -- see
     # STAGE128_M2_D2_DESIGN_FREEZE.md §8-9).
-    assert report["next_research_action_id"] == "stage128-m2-d2-gate-rerun"
+    # The canonical D2 Gate re-run has since been executed under its own
+    # explicit one-action authorization and PASSED data admission, so the
+    # pointer advanced once more — to a POINTER, not an authorization.
+    assert report["next_research_action_id"] == (
+        "stage127-m2-incremental-evaluation"
+    )
 
 
 @pytest.mark.parametrize("field", sorted(
@@ -1466,7 +1471,7 @@ def test_stage128_freeze_forbids_stale_stage126_current_labels():
     Leaving them at `Stage126` / `stage126_m1_financial_baseline` once the
     Stage128 D2 design freeze is complete produces an ambiguous live state:
     a snapshot naming the Stage126 M1 workstream beside canonical pointers
-    that have advanced to `stage128-m2-d2-gate-rerun`.
+    that have advanced past the Stage126 M1 baseline.
     """
     ok = dict(_live_handoff())
     assert v.current_state_labels_are_not_stale(
@@ -1492,11 +1497,15 @@ def test_live_handoff_labels_match_the_live_research_state():
         assert state["active_workstream"] == (
             "stage128_m2_d2_boundary_month_equity_return"
         )
-        # The authoritative research-action ids are UNCHANGED by the label fix.
+        # The authoritative research-action ids advance only with real
+        # scientific actions, never with a label fix. The D2 design freeze,
+        # then the executed D2 Gate re-run, each advanced them once.
         assert state["last_completed_research_action_id"] == (
-            "stage128-m2-boundary-month-return-design-freeze"
+            "stage128-m2-d2-gate-rerun"
         )
-        assert state["next_research_action_id"] == "stage128-m2-d2-gate-rerun"
+        assert state["next_research_action_id"] == (
+            "stage127-m2-incremental-evaluation"
+        )
         # And nothing further is authorized by advancing a label.
         for field in (
             "stage128_m2_d2_gate_rerun_authorized",
@@ -1530,7 +1539,10 @@ def test_current_state_snapshot_renders_stage128_labels():
             "- **Active workstream:** `stage128_m2_d2_boundary_month_equity_return`"
             in text
         )
-        assert "- **Next research action:** `stage128-m2-d2-gate-rerun`" in text
+        assert (
+            "- **Next research action:** `stage127-m2-incremental-evaluation`"
+            in text
+        )
         assert (
             "## Stage128 — M2 D2 boundary-month equity-return design freeze"
             in text

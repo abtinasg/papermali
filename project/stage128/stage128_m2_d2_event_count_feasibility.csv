@@ -1,0 +1,3 @@
+validation_window,positive_evaluable_in_common_sample,negative_evaluable_in_common_sample,threshold,condition_met,m1_development_reference_positive_count
+fold1_validation,18,141,5,True,25
+fold2_validation,10,197,5,True,10

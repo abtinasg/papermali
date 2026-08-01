@@ -1,0 +1,4 @@
+variable,candidate_id,measurement_specification,total_development_rows,valid_rows,missing_or_unresolved_rows,overall_coverage,threshold,coverage_gate_passed,fold1_train_coverage,fold1_validation_coverage,fold2_train_coverage,fold2_validation_coverage,positive_row_coverage,negative_row_coverage,resolution
+equity_return_window,cand_m2_equity_return_window,BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN,666,539,127,0.8093093093,0.8,True,0.706122449,0.7756097561,0.7377777778,0.9583333333,0.8088235294,0.8093645485,PASS
+realized_volatility,cand_m2_realized_volatility,unchanged_from_stage125_frozen_contract,666,576,90,0.8648648649,0.8,True,0.7795918367,0.8390243902,0.8066666667,0.9861111111,0.8676470588,0.864548495,PASS
+amihud_illiquidity,cand_m2_amihud_illiquidity,unchanged_from_stage125_frozen_contract,666,576,90,0.8648648649,0.8,True,0.7795918367,0.8390243902,0.8066666667,0.9861111111,0.8676470588,0.864548495,PASS

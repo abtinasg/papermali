@@ -10,16 +10,16 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Stage / Batch:** Stage128 / None
 - **Active workstream:** `stage128_m2_d2_boundary_month_equity_return`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `stage128-m2-d2-gate-rerun`
+- **Next research action:** `stage127-m2-incremental-evaluation`
 - **Last stage commit:** `f38739aed9a4a4304ddeeae3fd0581b598ed2579`
-- **Generated from commit:** `f38739aed9a4a4304ddeeae3fd0581b598ed2579` (branch `stage128-m2-boundary-month-return-design-freeze`, informational)
-- **Baseline:** `origin/main` @ `b25804ab764258c846b391f4823f089552c855e3`
+- **Generated from commit:** `6e71b40882e94a05436bf66e2d8141783806b6b5` (branch `stage128-m2-d2-gate-rerun`, informational)
+- **Baseline:** `origin/main` @ `6e71b40882e94a05436bf66e2d8141783806b6b5`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **94 assertions, 0 failed**, all_pass=True
+- ✅ **97 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -60,12 +60,26 @@ _The current scientific state. This is a DESIGN-FREEZE / CONTRACT action only: n
 - ✅ **D2 design freeze completed:** True
 - **Frozen primary M2 equity-return construct:** `BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN` — calendar convention **GREGORIAN** (selected for coherence with the frozen Gregorian market-time axis, not because it clears a coverage threshold)
 - ⛔ **Historical D0 Gate remains** `FAIL_M2_DATA_GATE` — preserved unchanged; never rewritten to PASS
-- **Research action completed by this freeze:** `stage128-m2-boundary-month-return-design-freeze`
-- **Next research action (pointer only):** `stage128-m2-d2-gate-rerun` — the canonical M2 Gate re-run under the frozen D2 construct
+- **Research action completed by this freeze:** `stage128-m2-d2-gate-rerun`
+- **Next research action (pointer only):** `stage127-m2-incremental-evaluation` — the canonical M2 Gate re-run under the frozen D2 construct
 - ⛔ **D2 Gate rerun authorized:** False — identifying the next action is NOT an authorization to execute it; that requires a separate, explicit human authorization
 - ⛔ **M2 admitted:** False — **M2 incremental evaluation authorized:** False — **M2 modeling started:** False
 - 🔒 **Final test locked:** final_test_unlocked=False, final_test_access_authorized=False, final_test_evaluation_performed=False
 - Contract: `project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md`; machine-readable package: `project/stage128/`
+
+## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 (CURRENT)
+
+_The canonical M2 data-admission Gate, re-executed ONCE under the already-frozen Gregorian D2 equity-return specification, offline from the same immutable TSETMC bundle. The one-action human authorization was consumed by this execution. No model was fit, no prediction generated, no predictive metric computed and no final-test row read._
+
+- ✅ **Gate re-run status:** `PASS_FOR_M2_INCREMENTAL_EVALUATION`
+- **Executed:** True — **resolved (terminal observed decision):** True
+- **D2 equity return:** 539/666 = 0.8093093093 — **three-variable common sample:** 539/666 = 0.8093093093
+- ⛔ **Historical Stage127 D0 Gate remains** `FAIL_M2_DATA_GATE` — preserved unchanged in its own Stage127 artifacts; this re-run never rewrites it
+- **Authorization consumed by this execution:** True — **D2 Gate rerun authorized (standing):** False
+- **This is DATA ADMISSION only.** It does not say M2 improves prediction. **M2 incremental evaluation authorized:** False — **M2 modeling started:** False — **M2 block admitted for modeling:** False
+- **Next research action (pointer only):** `stage127-m2-incremental-evaluation` — a pointer is NOT an authorization; it requires a new, explicit human authorization
+- The post-lock eligibility audit frozen by the design-freeze contract remains REQUIRED before any M2 predictive result is interpreted. It was not executed by this Gate.
+- Package: `project/stage128/`; interpretation: `project/stage128/README_STAGE128_M2_D2_GATE_RERUN.md`
 
 ### Last completed scientific micro-part QC
 
@@ -111,5 +125,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `543ac4b3ee2846f5d98f483d2018b59a8041e9a876436fe875e4414fd8c96a72`_
-_generated_at_utc: 2026-07-30T19:12:05Z (informational)_
+_state_fingerprint: `747f1655b07e7d58c1a50e89f43ba52c5d5bc79e0e5cc271496865520a495b53`_
+_generated_at_utc: 2026-08-01T04:22:07Z (informational)_

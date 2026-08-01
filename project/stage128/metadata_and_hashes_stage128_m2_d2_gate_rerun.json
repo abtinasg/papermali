@@ -1,0 +1,52 @@
+{
+  "canonical_gate_rerun_of": "stage127-m2-market-data-gate",
+  "canonical_request_sha256": "4b9cfef4c3543abfcae1d3d660c9415ac3a83711dea1094998ea9c2bce5ef374",
+  "canonical_sources_sha256": {
+    "project/stage125/part3b1_cutoff_available_at_contract_stage125.json": "3966addbf4f2768e139c55ff7eef7ac7b11aafa717bf7024cf115fdf956f72b2",
+    "project/stage125/part3b1_m2_feature_formula_contract_stage125.json": "6d7c8e63d04475f95da8b6f0364be326d7b4581ae21e5b2fe9df955ea7f83f82",
+    "project/stage125/part3b1_rubric_operational_mapping_stage125.json": "845681e70c79a3c9ed81844d2dd2f6c92104f2088777669ffe9018d3dfd09110",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+    "project/stage125/part4_statistical_analysis_plan_stage125.json": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
+    "project/stage125/part4_temporal_split_manifest_stage125.csv": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc"
+  },
+  "composed_module_sha256": {
+    "project/src/stage127_m2_external_delivery_import.py": "fe03e988a29f1e24690649e948d7d1a073c811c686ecd30a0dcc39a3ab35b032",
+    "project/src/stage127_m2_market_data_gate.py": "8f6aca9e972c85850a5a75152068b1312b91be99fe3241746b042fd39ffc50ae",
+    "project/src/stage128_m2_d2_boundary_month_equity_return.py": "27a3e5dfe36c7e89df386f9ee803ad43b73fd741517d7637c627896a12581a57",
+    "project/src/stage128_m2_d2_gate_rerun.py": "1be3ea1cbb89bd5574e028aa285006c1e080177e9109fb4d6fc130e160f53697"
+  },
+  "contract_id": "stage128_m2_d2_gate_rerun",
+  "contract_version": "stage128_m2_d2_gate_rerun_v1",
+  "decision_id": "stage128-m2-d2-gate-rerun",
+  "design_freeze_action_id": "stage128-m2-boundary-month-return-design-freeze",
+  "equity_return_measurement_specification": "BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN",
+  "evidence_mode": "offline_imported_external_evidence_bundle",
+  "execution_environment": {
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python_version": "3.13.5"
+  },
+  "external_bundle_filename": "stage127_m2_tsetmc_full_delivery.zip",
+  "external_bundle_sha256": "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec",
+  "external_bundle_size_bytes": 13464145,
+  "gate_status": "PASS_FOR_M2_INCREMENTAL_EVALUATION",
+  "historical_stage127_d0_artifacts_modified": false,
+  "human_source_utterance_sha256": "8abbeac68868b859cc3a9fcda893af8f80eaf7d1f5c9471135bbeb4537ee9e95",
+  "package_artifacts_sha256": {
+    "project/stage128/README_STAGE128_M2_D2_GATE_RERUN.md": "cfdfe234a22a9f31c33670adab4e11af0872ca48b6d99c61f49bd14d4a81e40b",
+    "project/stage128/stage128_m2_d2_candidate_coverage_audit.csv": "0d014eaf6ffb75bcea42dcfd7a0f8af06e33e8692d76372a4d5356d3930885f9",
+    "project/stage128/stage128_m2_d2_common_sample_audit.json": "19d505899303a5290cc64c7d2dc79e4c103059ddc428c248ebcaf3e9472fbef6",
+    "project/stage128/stage128_m2_d2_development_features.csv": "068519065fc4c36594a892b14c9242471a088e7b33484fbd5453b12391af2583",
+    "project/stage128/stage128_m2_d2_endpoint_failure_taxonomy.json": "ea7b4d29a9a44ed4a9749562fb1c2878ef4bf55cb23ffbaae23851d431ec9a4c",
+    "project/stage128/stage128_m2_d2_event_count_feasibility.csv": "b9e78de6a4b2208d3ab5a0c8958aa7c2604a051b9e167cb5c74b1ec12c655668",
+    "project/stage128/stage128_m2_d2_event_count_feasibility.json": "b1b4e0840ff5a6ca07e9523b706a697bb2ab0035b48e008a42f80d18e2936364",
+    "project/stage128/stage128_m2_d2_gate_rerun_bundle_integrity.json": "6cbb8e17f56c25d637d9325eeb3d50fb64033d87ae29fde26dba1d9c91faf670",
+    "project/stage128/stage128_m2_d2_gate_rerun_decision.json": "29247e87362b641a3c9b740eb4839622f0de6247c60e75ee3acf847c7988bf8a",
+    "project/stage128/stage128_m2_d2_gate_rerun_human_authorization_record.json": "fabf68cf91db6eec1a9e1e891fdb475f3b66fa79aa5082ed6505d156b3d22219",
+    "project/stage128/stage128_m2_d2_gate_rerun_import_qc.json": "6a1d5985a2609779199092e5332bd6fe0576e1c5cecea027e6854fb4e4c46226",
+    "project/stage128/stage128_m2_d2_gate_rerun_qc_report.json": "a0eff23e6a13b1c4a44529a58b161100e46ee553ba8336fbca21509dacdb30f5",
+    "project/stage128/stage128_m2_d2_join_leakage_audit.json": "445a58c82744c49069e29d334ad8d24621acbc5eb8bcdb18e52d6bfeb06ca1bc"
+  },
+  "source_main_commit": "6e71b40882e94a05436bf66e2d8141783806b6b5",
+  "source_repository": "abtinasg/papermali",
+  "stage": "Stage128"
+}

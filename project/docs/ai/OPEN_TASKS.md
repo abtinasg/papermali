@@ -8,29 +8,51 @@ front matter; this file is the working description.
 The CURRENT workstream is the Stage128 M2 D2 boundary-month equity-return
 workstream — a stable machine-readable label **derived from** the already-frozen
 action `stage128-m2-boundary-month-return-design-freeze`, not a new scientific
-action. The authoritative research-action pointers are unchanged
-(`last_completed_research_action_id=stage128-m2-boundary-month-return-design-freeze`,
-`next_research_action_id=stage128-m2-d2-gate-rerun`, the latter a pointer only
-and **not** authorized). `stage126-m1-financial-baseline` remains correct
+action. The authoritative research-action pointers are
+`last_completed_research_action_id=stage128-m2-d2-gate-rerun` and
+`next_research_action_id=stage127-m2-incremental-evaluation`, the latter a
+pointer only and **not** authorized. `stage126-m1-financial-baseline` remains correct
 **history** for the completed M1 financial-baseline workstream (see the
 historical section below); it is no longer the current workstream.
 
 ### Current scientific action
 
-The current scientific action is
-`stage128-m2-boundary-month-return-design-freeze` (PR #69, unmerged) — a
-design-freeze/contract action only. `stage127-m2-market-data-gate` is
-HISTORICAL, completed and resolved; it is no longer the current action and is
-no longer awaiting a human decision. Its terminal result remains
-`FAIL_M2_DATA_GATE`, unchanged.
+The current scientific action is `stage128-m2-d2-gate-rerun` — the canonical
+M2 data-admission Gate, re-executed exactly ONCE under its own explicit,
+one-action human authorization (consumed by that execution), offline from the
+same immutable TSETMC bundle, with only the equity-return measurement replaced
+by the already-frozen Gregorian D2 construct.
+
+**Terminal observed result: `PASS_FOR_M2_INCREMENTAL_EVALUATION` — DATA
+ADMISSION ONLY.** Observed: D2 equity return 539/666 = 0.8093 (threshold 0.80),
+realized volatility 576/666 = 0.8649, Amihud 576/666 = 0.8649, three-variable
+common sample 539/666 = 0.8093 (threshold 0.70), and both locked validation
+windows clear the ≥5-positive rule (fold1_validation 18, fold2_validation 10).
+Conditions A–F all PASS. This says **nothing** about whether M2 improves
+prediction: no model was fit, no prediction generated, no predictive metric
+computed, and the final test remains locked.
+
+`stage127-m2-incremental-evaluation` is now scientifically ELIGIBLE and is
+identified as a **pointer only**. Eligibility is not authorization: it needs a
+NEW, explicit human authorization
+(`m2_incremental_evaluation_authorized = false`, `m2_modeling_started = false`).
+The post-lock eligibility audit frozen by the design-freeze contract remains
+REQUIRED before any M2 predictive result is interpreted; it was not executed by
+this Gate.
+
+`stage128-m2-boundary-month-return-design-freeze` is complete — it is the design
+this Gate executed. `stage127-m2-market-data-gate` is HISTORICAL, completed and
+resolved; its terminal result remains `FAIL_M2_DATA_GATE`, unchanged, in its own
+Stage127 artifacts.
 
 Authoritative research pointers live in `ROADMAP.md` front matter. **If and
-when PR #69 is merged**, they become
+when the Stage128 D2 Gate re-run PR is merged**, they become
+`last_completed_research_action_id=stage128-m2-d2-gate-rerun`,
+`next_research_action_id=stage127-m2-incremental-evaluation` (a pointer only —
+explicitly **not** authorized). Until merge, the pointers live on `main` remain
 `last_completed_research_action_id=stage128-m2-boundary-month-return-design-freeze`,
-`next_research_action_id=stage128-m2-d2-gate-rerun` (a pointer only — see
-"Stage128 D2 design freeze" below; `stage128-m2-d2-gate-rerun` is explicitly
-**not** authorized by that freeze). Until merge, the pointers live on `main`
-remain `last_completed_research_action_id=stage126-m1-retained-design-freeze`,
+`next_research_action_id=stage128-m2-d2-gate-rerun`. The older pre-PR#69 values were
+`last_completed_research_action_id=stage126-m1-retained-design-freeze`,
 `next_research_action_id=stage127-m2-market-data-gate` — the Gate has now been
 RE-EXECUTED and RESOLVED from imported authoritative evidence, and returned
 **`FAIL_M2_DATA_GATE`**. The research pointer therefore deliberately does NOT

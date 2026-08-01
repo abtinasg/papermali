@@ -1,0 +1,63 @@
+{
+  "d2_effective_span_summary": {
+    "descriptive_only_no_span_threshold_created": true,
+    "maximum_span_days": 366,
+    "mean_span_days": 362.194805,
+    "median_span_days": 364,
+    "minimum_effective_span_threshold_added": false,
+    "minimum_span_days": 342,
+    "usable_pairs_with_measurable_span": 539
+  },
+  "d2_failure_taxonomy": {
+    "LT126_VALID_RETURNS": 90,
+    "NO_END_BOUNDARY_PRICE": 17,
+    "NO_START_BOUNDARY_PRICE": 55,
+    "ZERO_START_BOUNDARY_PRICE": 0,
+    "boundary_tolerance_days_added": 0,
+    "causes_are_not_mutually_exclusive": true,
+    "cross_month_fallback_used": false,
+    "d2_unusable_total": 127,
+    "development_pairs": 666,
+    "diagnostics_used_as_tuning_input": false,
+    "minimum_usable_daily_returns": 126,
+    "missing_values_imputed": false,
+    "pairs_failing_only_lt126": 61,
+    "pairs_failing_only_no_end_boundary_price": 4,
+    "pairs_failing_only_no_start_boundary_price": 32,
+    "pairs_missing_both_boundary_prices": 6,
+    "thresholds_reduced_to_improve_coverage": false
+  },
+  "diagnostics_are_descriptive_only": true,
+  "feature_unavailability_breakdown": {
+    "amihud_illiquidity_unavailable": 90,
+    "causes_are_not_mutually_exclusive": true,
+    "development_pairs": 666,
+    "equity_return_window_unavailable": 127,
+    "fewer_than_126_amihud_days": 90,
+    "fewer_than_126_valid_returns": 90,
+    "min_valid_amihud_observations": 126,
+    "min_valid_daily_return_observations": 126,
+    "missing_t0_adjusted_close": 270,
+    "missing_tN_adjusted_close": 253,
+    "missing_values_imputed": false,
+    "pairs_failing_only_the_t0_endpoint_price_requirement": 126,
+    "pairs_failing_only_the_tN_endpoint_price_requirement": 99,
+    "pairs_missing_both_endpoint_prices": 132,
+    "realized_volatility_unavailable": 90,
+    "thresholds_reduced_to_improve_coverage": false,
+    "tstar_chosen_to_improve_coverage": false
+  },
+  "no_threshold_created_from_diagnostics": true,
+  "prelock_cross_check": {
+    "canonical_observed_usable": 539,
+    "d2_specification_altered_to_force_agreement": false,
+    "difference_vs_prelock_reference": 0,
+    "discrepancy_triggers_investigation_not_design_search": true,
+    "matches_prelock_reference": true,
+    "prelock_reference_hardcoded_as_gate_outcome": false,
+    "prelock_reference_is_predictor_only_historical_evidence": true,
+    "prelock_reference_total": 666,
+    "prelock_reference_usable": 539,
+    "prelock_reference_used_as_gate_input": false
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "m1_development_reference_positive_counts": {
+    "fold1_validation": 25,
+    "fold2_validation": 10
+  },
+  "m1_reference_is_not_the_m2_result": true,
+  "m2_common_sample_negative_counts": {
+    "fold1_validation": 141,
+    "fold2_validation": 197
+  },
+  "m2_common_sample_positive_counts": {
+    "fold1_validation": 18,
+    "fold2_validation": 10
+  },
+  "no_model_was_fit_to_assess_this": true,
+  "requires_both_locked_validation_windows": true,
+  "resolution": "PASS",
+  "rule": "min_positive_evaluable_each_temporal_validation_window",
+  "sap_label_asserted": "development_comparison_feasibility_met",
+  "sap_label_not_asserted_reason": null,
+  "threshold": 5
+}
