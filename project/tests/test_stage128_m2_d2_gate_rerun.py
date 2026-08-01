@@ -11,6 +11,7 @@ import csv
 import hashlib
 import json
 import os
+import sys
 from datetime import date
 
 import pytest
@@ -736,3 +737,144 @@ def test_readme_states_target_use_literally():
     assert "target values accessed for predictive use = 0" not in text, (
         "the old absolute no-access phrasing is not literally true"
     )
+
+
+# --------------------------------------------------------------------------- #
+# Original authorized-execution provenance is immutable
+# --------------------------------------------------------------------------- #
+
+import importlib.util  # noqa: E402
+
+ORIGINAL_EXECUTION_COMMIT = "a96a2cb4e8b4b28c183fdfd16d3ed33f5b3e676b"
+ORIGINAL_EXECUTION_PYTHON = "3.13.5"
+ORIGINAL_EXECUTION_PLATFORM = "macOS-26.5.2-arm64-arm-64bit-Mach-O"
+
+
+def _runner_module():
+    """Import the Gate-rerun runner as a module for provenance tests."""
+    spec = importlib.util.spec_from_file_location(
+        "stage128_gate_rerun_runner", RERUN_RUNNER)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+@requires_package
+def test_metadata_records_original_authorized_execution_provenance():
+    oe = _load(META_PATH)["original_authorized_gate_execution"]
+    assert oe["commit"] == ORIGINAL_EXECUTION_COMMIT
+    assert oe["python_version"] == ORIGINAL_EXECUTION_PYTHON
+    assert oe["platform"] == ORIGINAL_EXECUTION_PLATFORM
+    assert oe["gate_execution_count"] == 1
+    assert oe["scientific_decision_count"] == 1
+    assert oe["immutable_provenance"] is True
+    assert oe["derived_dynamically_from_current_interpreter"] is False
+    assert oe["overwritten_by_maintenance_regeneration"] is False
+
+
+@requires_package
+def test_metadata_has_no_undifferentiated_execution_environment_field():
+    """The ambiguous field that a rebuild silently overwrote must be gone."""
+    meta = _load(META_PATH)
+    assert "execution_environment" not in meta
+    assert "latest_package_maintenance_regeneration" in meta
+    assert "original_authorized_gate_execution" in meta
+
+
+@requires_package
+def test_maintenance_regeneration_environment_is_labelled_non_scientific():
+    m = _load(META_PATH)["latest_package_maintenance_regeneration"]
+    assert m["role"] == "provenance_qc_documentation_regeneration_only"
+    assert m["scientific_execution"] is False
+    assert m["new_gate_decision"] is False
+    assert m["new_human_authorization"] is False
+    assert m["is_the_gate_execution_environment"] is False
+
+
+@requires_package
+def test_canonical_execution_counts_stay_one():
+    meta = _load(META_PATH)
+    assert meta["canonical_gate_executions_in_this_action"] == 1
+    assert meta["scientific_decisions_in_this_action"] == 1
+
+
+def test_original_execution_provenance_is_a_locked_constant():
+    mod = _runner_module()
+    oe = mod.ORIGINAL_AUTHORIZED_GATE_EXECUTION
+    assert oe["commit"] == ORIGINAL_EXECUTION_COMMIT
+    assert oe["python_version"] == ORIGINAL_EXECUTION_PYTHON
+    assert oe["platform"] == ORIGINAL_EXECUTION_PLATFORM
+    # Locked, not sampled: the recorded values must not equal whatever the
+    # current interpreter happens to report unless that is genuinely the
+    # original environment.
+    src = open(RERUN_RUNNER, encoding="utf-8").read()
+    tree = ast.parse(src)
+    assign = next(
+        n for n in tree.body
+        if isinstance(n, ast.Assign)
+        and any(getattr(t, "id", "") == "ORIGINAL_AUTHORIZED_GATE_EXECUTION"
+                for t in n.targets)
+    )
+    for node in ast.walk(assign):
+        assert not isinstance(node, ast.Call), (
+            "the original execution provenance must be literal constants, "
+            "never derived from a call such as platform.python_version()"
+        )
+
+
+def test_simulated_regeneration_under_another_python_leaves_original_intact(
+        monkeypatch):
+    """A maintenance rebuild under Python 3.15 must not rewrite provenance."""
+    mod = _runner_module()
+    monkeypatch.setattr(mod.platform, "python_version", lambda: "3.15.0")
+    monkeypatch.setattr(
+        mod.platform, "platform", lambda: "Linux-9.9-x86_64-with-glibc2.99")
+
+    meta = mod.metadata_record(
+        REPO_ROOT,
+        {"stage128_m2_d2_gate_rerun_decision.json": "{}"},
+        {
+            "gate_status": "PASS_FOR_M2_INCREMENTAL_EVALUATION",
+            "canonical_sources_sha256": {},
+            "composed_module_sha256": {},
+        },
+    )
+    oe = meta["original_authorized_gate_execution"]
+    assert oe["commit"] == ORIGINAL_EXECUTION_COMMIT
+    assert oe["python_version"] == ORIGINAL_EXECUTION_PYTHON
+    assert oe["platform"] == ORIGINAL_EXECUTION_PLATFORM
+    assert oe["gate_execution_count"] == 1
+    assert oe["scientific_decision_count"] == 1
+    # The simulated environment lands ONLY in the maintenance field.
+    m = meta["latest_package_maintenance_regeneration"]
+    assert m["python_version"] == "3.15.0"
+    assert m["platform"] == "Linux-9.9-x86_64-with-glibc2.99"
+    assert m["scientific_execution"] is False
+    assert meta["canonical_gate_executions_in_this_action"] == 1
+    assert meta["scientific_decisions_in_this_action"] == 1
+
+
+@requires_package
+def test_check_does_not_rewrite_original_execution_provenance(monkeypatch):
+    """`--check` compares package files and never touches the metadata file."""
+    before = open(META_PATH, "rb").read()
+    mod = _runner_module()
+    monkeypatch.setattr(mod.platform, "python_version", lambda: "3.15.0")
+    bundle = os.environ.get(mod.DEFAULT_BUNDLE_ENV, "")
+    if not bundle or not os.path.isfile(bundle):
+        pytest.skip("external evidence bundle not available in this checkout")
+    monkeypatch.setattr(sys, "argv", [
+        "run_stage128_m2_d2_gate_rerun.py", "--check", "--bundle", bundle])
+    assert mod.main() == 0
+    assert open(META_PATH, "rb").read() == before
+
+
+@requires_package
+def test_qc_report_asserts_locked_execution_provenance(qc):
+    names = {a["name"]: a for a in qc["assertions"]}
+    for name in (
+        "original_authorized_gate_execution_provenance_is_locked",
+        "canonical_gate_execution_and_decision_counts_remain_one",
+        "maintenance_regeneration_is_not_a_scientific_execution",
+    ):
+        assert names[name]["status"] == "PASS", name

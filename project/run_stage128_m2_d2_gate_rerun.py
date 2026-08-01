@@ -50,6 +50,51 @@ HUMAN_SOURCE_UTTERANCE_SHA256 = (
 #: utterance was made and never changes what was authorized.
 AUTHORIZATION_DATE = "2026-08-01"
 
+#: IMMUTABLE provenance of the ONE authorized scientific Gate execution.
+#:
+#: These values are a LOCKED CONSTANT, deliberately NOT derived from
+#: ``platform.python_version()`` / ``platform.platform()``. The canonical
+#: scientific provenance of the authorized execution must not change merely
+#: because a later ``--build`` or ``--check`` (a documentation / provenance-QC
+#: regeneration) happens to run under a different interpreter. A future run
+#: under Python 3.15 must leave the recorded 3.13.5 execution environment
+#: exactly as it is.
+ORIGINAL_AUTHORIZED_GATE_EXECUTION = {
+    "role": (
+        "the environment of the ORIGINAL one-action authorized canonical M2 "
+        "Gate execution under the frozen Gregorian D2 specification"
+    ),
+    "commit": "a96a2cb4e8b4b28c183fdfd16d3ed33f5b3e676b",
+    "python_version": "3.13.5",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "gate_execution_count": 1,
+    "scientific_decision_count": 1,
+    "immutable_provenance": True,
+    "derived_dynamically_from_current_interpreter": False,
+    "overwritten_by_maintenance_regeneration": False,
+    "authorization_consumed_by_this_execution": True,
+}
+
+
+def maintenance_regeneration_environment() -> dict[str, object]:
+    """The environment of the CURRENT, explicitly NON-SCIENTIFIC rebuild.
+
+    A ``--build`` after the authorized execution is provenance/QC/document
+    maintenance: it re-derives the same package from the same immutable
+    bundle. It is never a Gate execution environment, never a second
+    authorization and never a second scientific decision, so it is recorded
+    under its own clearly-labelled field.
+    """
+    return {
+        "role": "provenance_qc_documentation_regeneration_only",
+        "scientific_execution": False,
+        "new_gate_decision": False,
+        "new_human_authorization": False,
+        "is_the_gate_execution_environment": False,
+        "python_version": platform.python_version(),
+        "platform": platform.platform(),
+    }
+
 
 def _git(repo_root: str, *args: str) -> str:
     try:
@@ -423,6 +468,24 @@ def qc_report(
     add("authorization_utterance_sha256_verified",
         hashlib.sha256(auth["human_source_utterance"].encode("utf-8")).hexdigest()
         == HUMAN_SOURCE_UTTERANCE_SHA256)
+    oe = ORIGINAL_AUTHORIZED_GATE_EXECUTION
+    add("original_authorized_gate_execution_provenance_is_locked",
+        oe["commit"] == "a96a2cb4e8b4b28c183fdfd16d3ed33f5b3e676b"
+        and oe["python_version"] == "3.13.5"
+        and oe["platform"] == "macOS-26.5.2-arm64-arm-64bit-Mach-O"
+        and oe["immutable_provenance"] is True
+        and oe["derived_dynamically_from_current_interpreter"] is False
+        and oe["overwritten_by_maintenance_regeneration"] is False,
+        "the original authorized execution environment is a locked constant")
+    add("canonical_gate_execution_and_decision_counts_remain_one",
+        oe["gate_execution_count"] == 1
+        and oe["scientific_decision_count"] == 1)
+    add("maintenance_regeneration_is_not_a_scientific_execution",
+        maintenance_regeneration_environment()["scientific_execution"] is False
+        and maintenance_regeneration_environment()["new_gate_decision"]
+        is False
+        and maintenance_regeneration_environment()[
+            "is_the_gate_execution_environment"] is False)
     add("authorization_date_is_the_recorded_issue_date",
         auth["authorization_date"] == AUTHORIZATION_DATE,
         f"expected {AUTHORIZATION_DATE}, got {auth['authorization_date']}")
@@ -844,7 +907,33 @@ def main() -> int:
         with open(os.path.join(out_dir, name), "w", encoding="utf-8") as f:
             f.write(text)
 
-    meta = {
+    meta = metadata_record(repo_root, files, decision)
+    with open(os.path.join(
+            out_dir,
+            "metadata_and_hashes_stage128_m2_d2_gate_rerun.json"),
+            "w", encoding="utf-8") as f:
+        f.write(g.json_dumps(meta))
+
+    cs = decision["block_common_sample"]
+    print(f"Stage128 D2 Gate re-run: status={decision['gate_status']}")
+    print(f"  bundle sha256 verified: {imp.BUNDLE_SHA256}")
+    print(f"  development pairs: {cs['total_development_rows']}")
+    for var, _, _ in g.M2_VARIABLES:
+        c = decision["candidate_coverage"][var]
+        print(f"  {var}: {c['valid_rows']}/{c['total_development_rows']} "
+              f"= {c['overall_coverage']:.4f}")
+    print(f"  common sample: {cs['common_usable_rows']}/"
+          f"{cs['total_development_rows']} = {cs['common_coverage']:.4f}")
+    for k, v in decision["gate_decision_conditions"].items():
+        print(f"  {k}: {v}")
+    return 0
+
+
+def metadata_record(
+    repo_root: str, files: dict[str, str], decision: dict,
+) -> dict[str, object]:
+    """Package metadata. Scientific provenance here is LOCKED, not sampled."""
+    return {
         "contract_id": r.CONTRACT_ID,
         "contract_version": r.CONTRACT_VERSION,
         "decision_id": r.ACTION_ID,
@@ -868,30 +957,17 @@ def main() -> int:
         "historical_stage127_d0_artifacts_modified": False,
         "source_main_commit": _git(repo_root, "rev-parse", "origin/main"),
         "source_repository": "abtinasg/papermali",
-        "execution_environment": {
-            "python_version": platform.python_version(),
-            "platform": platform.platform(),
-        },
+        # Immutable: the environment of the ONE authorized Gate execution.
+        # Never sampled from the interpreter running this rebuild.
+        "original_authorized_gate_execution": dict(
+            ORIGINAL_AUTHORIZED_GATE_EXECUTION),
+        # Separate, explicitly non-scientific: the environment of whichever
+        # maintenance rebuild last wrote this file.
+        "latest_package_maintenance_regeneration":
+            maintenance_regeneration_environment(),
+        "canonical_gate_executions_in_this_action": 1,
+        "scientific_decisions_in_this_action": 1,
     }
-    with open(os.path.join(
-            out_dir,
-            "metadata_and_hashes_stage128_m2_d2_gate_rerun.json"),
-            "w", encoding="utf-8") as f:
-        f.write(g.json_dumps(meta))
-
-    cs = decision["block_common_sample"]
-    print(f"Stage128 D2 Gate re-run: status={decision['gate_status']}")
-    print(f"  bundle sha256 verified: {imp.BUNDLE_SHA256}")
-    print(f"  development pairs: {cs['total_development_rows']}")
-    for var, _, _ in g.M2_VARIABLES:
-        c = decision["candidate_coverage"][var]
-        print(f"  {var}: {c['valid_rows']}/{c['total_development_rows']} "
-              f"= {c['overall_coverage']:.4f}")
-    print(f"  common sample: {cs['common_usable_rows']}/"
-          f"{cs['total_development_rows']} = {cs['common_coverage']:.4f}")
-    for k, v in decision["gate_decision_conditions"].items():
-        print(f"  {k}: {v}")
-    return 0
 
 
 if __name__ == "__main__":

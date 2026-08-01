@@ -1,11 +1,26 @@
 {
   "all_pass": true,
   "all_pass_semantics": "all_pass means every REQUIRED internal-consistency assertion of this Gate re-run package passed. It is NOT a statement about the Gate outcome itself: the Gate result is reported separately in gate_status and is decided only by the observed evidence.",
-  "assertion_count": 44,
+  "assertion_count": 47,
   "assertions": [
     {
       "detail": "",
       "name": "authorization_utterance_sha256_verified",
+      "status": "PASS"
+    },
+    {
+      "detail": "the original authorized execution environment is a locked constant",
+      "name": "original_authorized_gate_execution_provenance_is_locked",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "canonical_gate_execution_and_decision_counts_remain_one",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "maintenance_regeneration_is_not_a_scientific_execution",
       "status": "PASS"
     },
     {

@@ -1,4 +1,5 @@
 {
+  "canonical_gate_executions_in_this_action": 1,
   "canonical_gate_rerun_of": "stage127-m2-market-data-gate",
   "canonical_request_sha256": "4b9cfef4c3543abfcae1d3d660c9415ac3a83711dea1094998ea9c2bce5ef374",
   "canonical_sources_sha256": {
@@ -21,16 +22,33 @@
   "design_freeze_action_id": "stage128-m2-boundary-month-return-design-freeze",
   "equity_return_measurement_specification": "BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN",
   "evidence_mode": "offline_imported_external_evidence_bundle",
-  "execution_environment": {
-    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
-    "python_version": "3.14.0"
-  },
   "external_bundle_filename": "stage127_m2_tsetmc_full_delivery.zip",
   "external_bundle_sha256": "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec",
   "external_bundle_size_bytes": 13464145,
   "gate_status": "PASS_FOR_M2_INCREMENTAL_EVALUATION",
   "historical_stage127_d0_artifacts_modified": false,
   "human_source_utterance_sha256": "8abbeac68868b859cc3a9fcda893af8f80eaf7d1f5c9471135bbeb4537ee9e95",
+  "latest_package_maintenance_regeneration": {
+    "is_the_gate_execution_environment": false,
+    "new_gate_decision": false,
+    "new_human_authorization": false,
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python_version": "3.14.0",
+    "role": "provenance_qc_documentation_regeneration_only",
+    "scientific_execution": false
+  },
+  "original_authorized_gate_execution": {
+    "authorization_consumed_by_this_execution": true,
+    "commit": "a96a2cb4e8b4b28c183fdfd16d3ed33f5b3e676b",
+    "derived_dynamically_from_current_interpreter": false,
+    "gate_execution_count": 1,
+    "immutable_provenance": true,
+    "overwritten_by_maintenance_regeneration": false,
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python_version": "3.13.5",
+    "role": "the environment of the ORIGINAL one-action authorized canonical M2 Gate execution under the frozen Gregorian D2 specification",
+    "scientific_decision_count": 1
+  },
   "package_artifacts_sha256": {
     "project/stage128/README_STAGE128_M2_D2_GATE_RERUN.md": "85036001617ac89176a89f01492a92447283434e8fbd369d78e88665c84c96b8",
     "project/stage128/stage128_m2_d2_candidate_coverage_audit.csv": "0d014eaf6ffb75bcea42dcfd7a0f8af06e33e8692d76372a4d5356d3930885f9",
@@ -43,9 +61,10 @@
     "project/stage128/stage128_m2_d2_gate_rerun_decision.json": "c1d2d844813bc12a34f50780187706f98c13957f7926aa2117c049f98887ee13",
     "project/stage128/stage128_m2_d2_gate_rerun_human_authorization_record.json": "d5966c699f686989776d0ead1eec0eeb747e6732375684933b5cc89eddd8c135",
     "project/stage128/stage128_m2_d2_gate_rerun_import_qc.json": "6a1d5985a2609779199092e5332bd6fe0576e1c5cecea027e6854fb4e4c46226",
-    "project/stage128/stage128_m2_d2_gate_rerun_qc_report.json": "a78402ea57d4fb0461c39cd7a02fd811f79f385d1a987af75933462d43db1e4a",
+    "project/stage128/stage128_m2_d2_gate_rerun_qc_report.json": "24702a5afd1e14a2863ed630aed24d448ca60658e08cbe57ccfeb652a3099fc6",
     "project/stage128/stage128_m2_d2_join_leakage_audit.json": "445a58c82744c49069e29d334ad8d24621acbc5eb8bcdb18e52d6bfeb06ca1bc"
   },
+  "scientific_decisions_in_this_action": 1,
   "source_main_commit": "6e71b40882e94a05436bf66e2d8141783806b6b5",
   "source_repository": "abtinasg/papermali",
   "stage": "Stage128"
