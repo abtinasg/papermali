@@ -1,0 +1,91 @@
+{
+  "configurations": {
+    "random_forest": {
+      "configuration_id": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
+      "hyperparameters": {
+        "bootstrap": true,
+        "class_weight": "balanced_subsample",
+        "max_depth": 3,
+        "max_features": "sqrt",
+        "min_samples_leaf": 10,
+        "n_estimators": 500
+      },
+      "seed_policy": "mean_of_5_frozen_final_oof_seeds"
+    },
+    "regularized_logistic_regression": {
+      "configuration_id": "logistic__C_0.1",
+      "hyperparameters": {
+        "C": 0.1,
+        "class_weight": "balanced",
+        "max_iter": 5000,
+        "penalty": "l2",
+        "solver": "liblinear"
+      },
+      "seed_policy": "deterministic_single_fit"
+    },
+    "xgboost": {
+      "configuration_id": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1",
+      "hyperparameters": {
+        "colsample_bytree": 0.8,
+        "early_stopping": false,
+        "eval_metric": "aucpr",
+        "gamma": 0,
+        "learning_rate": 0.03,
+        "max_depth": 2,
+        "min_child_weight": 1,
+        "n_estimators": 300,
+        "n_jobs": 1,
+        "objective": "binary:logistic",
+        "reg_lambda": 1,
+        "subsample": 0.8,
+        "tree_method": "hist"
+      },
+      "seed_policy": "mean_of_5_frozen_final_oof_seeds"
+    }
+  },
+  "equity_return_window_implementation": "BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN",
+  "equity_return_window_source": "project/stage128/stage128_m2_d2_development_features.csv:equity_return_d2",
+  "extra_market_features_added": [],
+  "forbidden_market_features_absent": [
+    "zero_trade_day_ratio_W",
+    "equity_return_window_d1",
+    "equity_return_window_d3",
+    "equity_return_window_jalali",
+    "equity_return_window_d0_historical",
+    "raw_close",
+    "unadjusted_close"
+  ],
+  "m1_feature_count": 9,
+  "m1_feature_order": [
+    "log_total_assets",
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio"
+  ],
+  "m2_feature_count": 12,
+  "m2_feature_order": [
+    "log_total_assets",
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio",
+    "equity_return_window",
+    "realized_volatility",
+    "amihud_illiquidity"
+  ],
+  "m2_is_nested_superset_of_m1": true,
+  "m2_market_features": [
+    "equity_return_window",
+    "realized_volatility",
+    "amihud_illiquidity"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "additional_post_hoc_hypothesis_family_authorized": false,
+  "available_members_in_this_action": [
+    "M2_minus_M1"
+  ],
+  "confirmatory_family": [
+    "M2_minus_M1",
+    "M3_minus_M2",
+    "M4_minus_M3"
+  ],
+  "confirmatory_family_2_member": "M2_minus_M1",
+  "confirmatory_family_size": 3,
+  "family_redefined_as_one_hypothesis": false,
+  "holm_adjustment_executed_in_this_action": false,
+  "holm_family_complete": false,
+  "holm_final_adjustment_deferred": true,
+  "note": "The frozen adjacent-block confirmatory family has three members; only M2_minus_M1 is observable in this action. No family-level Holm adjustment is reported, and the family is NOT silently redefined as a single-hypothesis family. Final adjustment stays deferred until the status of M3_minus_M2 and M4_minus_M3 is known.",
+  "one_comparison_holm_reported_as_complete_family": false,
+  "pending_members": [
+    "M3_minus_M2",
+    "M4_minus_M3"
+  ],
+  "raw_paired_uncertainty_preserved": true
+}

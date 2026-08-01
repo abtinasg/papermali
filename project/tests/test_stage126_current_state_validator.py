@@ -600,11 +600,11 @@ def test_research_pointers_unchanged():
     # transitioned once more to the D2 Gate re-run pointer (which itself
     # still requires a separate future human authorization -- see
     # STAGE128_M2_D2_DESIGN_FREEZE.md §8-9).
-    # The canonical D2 Gate re-run has since been executed under its own
-    # explicit one-action authorization and PASSED data admission, so the
-    # pointer advanced once more — to a POINTER, not an authorization.
+    # The authorized paired M2-vs-M1 incremental evaluation has since been
+    # executed and COMPLETED, so the pointer advanced once more — to a human
+    # retained-block review, which is a POINTER, not an authorization.
     assert report["next_research_action_id"] == (
-        "stage127-m2-incremental-evaluation"
+        "stage128-m2-retained-block-human-decision"
     )
 
 
@@ -1501,19 +1501,24 @@ def test_live_handoff_labels_match_the_live_research_state():
         # scientific actions, never with a label fix. The D2 design freeze,
         # then the executed D2 Gate re-run, each advanced them once.
         assert state["last_completed_research_action_id"] == (
-            "stage128-m2-d2-gate-rerun"
-        )
-        assert state["next_research_action_id"] == (
             "stage127-m2-incremental-evaluation"
         )
-        # And nothing further is authorized by advancing a label.
+        assert state["next_research_action_id"] == (
+            "stage128-m2-retained-block-human-decision"
+        )
+        # And nothing further is AUTHORIZED by advancing a label.
         for field in (
             "stage128_m2_d2_gate_rerun_authorized",
             "m2_incremental_evaluation_authorized",
-            "m2_modeling_started",
             "final_test_unlocked",
         ):
             assert state[field] is False, field
+        # `m2_modeling_started` is an EXECUTION fact, not an authorization: it
+        # is True because the separately authorized paired M2 evaluation
+        # actually ran. A label fix never sets it, and a consumed
+        # authorization never unsets it.
+        assert state["m2_modeling_started"] is True
+        assert state["m2_block_retained"] is False
         assert state["stage127_m2_market_data_gate_status"] == (
             "FAIL_M2_DATA_GATE"
         )
@@ -1540,8 +1545,8 @@ def test_current_state_snapshot_renders_stage128_labels():
             in text
         )
         assert (
-            "- **Next research action:** `stage127-m2-incremental-evaluation`"
-            in text
+            "- **Next research action:** "
+            "`stage128-m2-retained-block-human-decision`" in text
         )
         assert (
             "## Stage128 — M2 D2 boundary-month equity-return design freeze"
@@ -1572,14 +1577,28 @@ _ROADMAP = os.path.join(REAL_ROOT, v.ROADMAP_MD_REL)
 _RERUN_RENDERING_ASSERTIONS = (
     "current_state_freeze_section_not_current_after_gate_rerun",
     "current_state_has_exactly_one_current_scientific_action_section",
-    "current_state_current_section_is_the_gate_rerun",
+    "current_state_current_section_is_the_live_action",
+    "current_state_gate_rerun_section_not_current_after_successor",
+    "m2_incremental_evaluation_authorization_is_consumed_not_standing",
+    "m2_evaluation_selects_no_winner_and_retains_no_block",
+    "completed_m2_evaluation_with_44_fits_implies_modeling_started",
+    "m2_evaluation_consumed_authorization_stays_false",
+    "m2_block_retained_remains_false_pending_human_decision",
+    "m3_and_m4_remain_unauthorized_and_unstarted",
+    "final_test_remains_locked_after_the_m2_evaluation",
+    "completed_m2_evaluation_implies_market_data_collected_and_materialized",
+    "frozen_stage125_m2_data_collected_is_never_rendered_as_live_state",
+    "frozen_stage125_m2_data_collected_value_is_not_mutated",
+    "current_state_final_test_wording_is_literally_precise",
+    "m2_evaluation_records_a_required_human_retained_block_decision",
     "current_state_freeze_section_claims_only_its_own_action",
     "current_state_freeze_section_does_not_claim_the_gate_rerun",
     "current_state_does_not_call_incremental_evaluation_the_gate_rerun",
     "current_state_renders_a_single_live_next_action_pointer",
-    "current_state_next_pointer_is_eligible_but_unauthorized",
+    "current_state_next_pointer_is_a_pointer_not_an_authorization",
     "next_pointer_flags_are_false_when_pointer_is_incremental_evaluation",
-    "gate_rerun_complete_implies_current_action_is_the_gate_rerun",
+    "gate_rerun_complete_implies_current_action_is_the_gate_rerun_"
+    "or_a_recognized_successor",
     "roadmap_prose_agrees_with_front_matter_pointers",
     "roadmap_prose_does_not_contradict_front_matter_pointers",
     "roadmap_prose_does_not_call_incremental_evaluation_the_gate_rerun",
@@ -1599,7 +1618,11 @@ def test_current_state_presents_exactly_one_current_section():
     current = [ln for ln in text.splitlines()
                if ln.startswith("## ") and "(CURRENT)" in ln]
     assert len(current) == 1, current
-    assert "Gate RE-RUN" in current[0]
+    assert "paired M2 vs M1 incremental evaluation" in current[0]
+    assert (
+        "## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 (CURRENT)"
+        not in open(_CURRENT_STATE, encoding="utf-8").read()
+    )
 
 
 def test_design_freeze_section_is_historical_after_the_gate_rerun():
@@ -1622,17 +1645,14 @@ def test_design_freeze_section_is_historical_after_the_gate_rerun():
     )
 
 
-def test_sole_live_next_pointer_is_eligible_pointer_only_unauthorized():
+def test_sole_live_next_pointer_is_a_pointer_not_an_authorization():
     text = open(_CURRENT_STATE, encoding="utf-8").read()
     pointers = [ln for ln in text.splitlines()
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1, pointers
     line = pointers[0]
-    assert "`stage127-m2-incremental-evaluation`" in line
-    assert "ELIGIBLE" in line
-    assert "POINTER ONLY" in line
-    assert "not authorized" in line
-    assert "not started" in line
+    assert "`stage128-m2-retained-block-human-decision`" in line
+    assert "pointer is **not** an authorization" in line
 
 
 def test_incremental_evaluation_is_never_called_the_gate_rerun():
@@ -1660,9 +1680,11 @@ def test_roadmap_front_matter_matches_handoff_pointers():
     text = open(_ROADMAP, encoding="utf-8").read()
     fm = v._roadmap_front_matter(text)
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m2-d2-gate-rerun"
+        "stage127-m2-incremental-evaluation"
     )
-    assert fm["next_research_action_id"] == "stage127-m2-incremental-evaluation"
+    assert fm["next_research_action_id"] == (
+        "stage128-m2-retained-block-human-decision"
+    )
     state = json.loads(open(
         os.path.join(REAL_ROOT, "project", "docs", "ai",
                      "handoff_state.json"), encoding="utf-8").read())
@@ -1679,4 +1701,91 @@ def test_roadmap_prose_drops_the_superseded_pointer_pair_claim():
         "`last_completed_research_action_id: "
         "stage128-m2-boundary-month-return-design-freeze`" not in text
     )
-    assert "historical pre-rerun" in text
+    assert "are now **historical** pointer state" in text
+
+
+def test_live_m2_state_distinguishes_authorization_execution_and_retention():
+    """Consumed authorization must not erase the executed M2 modeling."""
+    state = json.loads(open(
+        os.path.join(REAL_ROOT, "project", "docs", "ai",
+                     "handoff_state.json"), encoding="utf-8").read())
+    # Executed.
+    assert state["stage127_m2_incremental_evaluation_executed"] is True
+    assert state["stage127_m2_incremental_evaluation_completed"] is True
+    assert state[
+        "stage127_m2_incremental_evaluation_authorization_consumed"] is True
+    assert state["stage127_m2_incremental_evaluation_primary_model_fits"] == 44
+    assert state["m2_started"] is True
+    assert state["m2_modeling_started"] is True
+    assert state["m2_block_admitted_for_modeling"] is True
+    assert state[
+        "m2_block_admitted_for_authorized_incremental_evaluation"] is True
+    # Authorization consumed.
+    assert state["m2_incremental_evaluation_authorized"] is False
+    # Retention undecided; successors and the final test untouched.
+    assert state["m2_block_retained"] is False
+    assert state["m2_retained_block_decision_required"] is True
+    for field in (
+        "m3_authorized", "m3_started", "m4_authorized", "m4_started",
+        "final_test_unlocked", "final_test_access_authorized",
+        "final_test_evaluation_performed",
+    ):
+        assert state[field] is False, field
+
+
+def test_current_state_does_not_report_modeling_as_never_started():
+    text = open(_CURRENT_STATE, encoding="utf-8").read()
+    assert "**M2 modeling started (executed):** True" in text
+    assert "**M2 block admitted for modeling:** True" in text
+    assert "does **not** mean the modeling never happened" in text
+
+
+def test_live_m2_data_state_is_true_and_historical_marker_is_labelled():
+    """The frozen Part 4 marker must not masquerade as live state."""
+    state = json.loads(open(
+        os.path.join(REAL_ROOT, "project", "docs", "ai",
+                     "handoff_state.json"), encoding="utf-8").read())
+    # 1. completed evaluation implies collected + materialized
+    for field in (
+        "m2_market_data_evidence_collected",
+        "m2_market_data_evidence_validated",
+        "m2_data_entered_authorized_incremental_modeling_pipeline",
+        "m2_incremental_evaluation_data_materialized",
+    ):
+        assert state[field] is True, field
+    # 2. the frozen Part 4 value is preserved and explicitly labelled
+    assert state["m2_data_collected"] is False
+    assert state["stage125_part4_m2_data_collected_historical"] is False
+    assert "not a live data-availability or execution marker" in state[
+        "stage125_part4_m2_data_collected_historical_semantics"]
+    # 3-7. the surrounding distinctions are unchanged
+    assert state["m2_incremental_evaluation_authorized"] is False
+    assert state["m2_started"] is True
+    assert state["m2_modeling_started"] is True
+    assert state["m2_block_retained"] is False
+    assert state["m2_retained_block_decision_required"] is True
+    for field in (
+        "m3_authorized", "m3_started", "m4_authorized", "m4_started",
+        "final_test_unlocked", "final_test_access_authorized",
+        "final_test_evaluation_performed",
+    ):
+        assert state[field] is False, field
+
+
+def test_current_state_never_renders_bare_m2_data_collected_as_live():
+    text = open(_CURRENT_STATE, encoding="utf-8").read()
+    live = text.split("## Workflow markers")[1].split("## ")[0]
+    assert "- m2_data_collected: " not in live
+    assert "- m3_data_collected: " in live
+    # It is republished only under the clearly titled historical heading.
+    assert (
+        "## Historical / legacy frozen schema markers (NOT live state)" in text
+    )
+    assert "stage125_part4_m2_data_collected_historical" in text
+
+
+def test_current_state_reports_the_live_m2_market_data_state():
+    text = open(_CURRENT_STATE, encoding="utf-8").read()
+    assert "**M2 market data (live):** evidence collected=True" in text
+    assert "entered the authorized incremental modeling pipeline=True" in text
+    assert "evaluation data materialized=True" in text

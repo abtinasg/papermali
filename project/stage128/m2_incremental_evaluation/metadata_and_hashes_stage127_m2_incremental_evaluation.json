@@ -1,0 +1,118 @@
+{
+  "active_workstream": "stage128_m2_d2_boundary_month_equity_return",
+  "authorization_date": "2026-08-01",
+  "composed_module_sha256": {
+    "project/run_stage127_m2_incremental_evaluation.py": "9a9883f6345afaaa530f7f9cab8e5deaa87eeab3794c697f5784b628d1df8478",
+    "project/src/stage126_m1_primary_development_tuning.py": "ae63bee24c3b868919b008cb15a0d4f4bfb8300ee6e3002a61e1e105d9391d82",
+    "project/src/stage127_m2_incremental_evaluation.py": "cb5fcfbfb10d064c7fcf2c1e348ea0a2f9dcb94bf412ab66c168a89ce870fa49"
+  },
+  "contract_id": "stage127_m2_incremental_evaluation",
+  "contract_version": "stage127_m2_incremental_evaluation_v1",
+  "decision_id": "stage127-m2-incremental-evaluation",
+  "execution_count_semantics": {
+    "canonical_authorized_scientific_executions": 1,
+    "canonical_primary_predictive_fits_in_that_execution": 44,
+    "deterministic_verification_recomputation_is_not_a_new_execution": true,
+    "note": "44 is the CANONICAL SCIENTIFIC fit count of the single authorized execution of this action — not a lifetime count of CPU-level estimator fits. `--check` and the test suite deterministically RECOMPUTE the same models to verify the committed artifacts; those recomputations are verification, not new scientific executions, they make no new scientific decision, they consume no new human authorization, and they never change the canonical counts.",
+    "scientific_decisions": 1,
+    "verification_recomputation_changes_canonical_counts": false
+  },
+  "external_bundle_sha256": "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec",
+  "final_test_firewall_summary": {
+    "final_test_evaluation_performed": false,
+    "final_test_identity_and_split_fields_read_for_exclusion": true,
+    "final_test_keys_in_scientific_artifacts": 0,
+    "final_test_model_fits": 0,
+    "final_test_predictions": 0,
+    "final_test_predictor_values_parsed_or_inspected": 0,
+    "final_test_row_records_structurally_identified": 346,
+    "final_test_target_values_parsed_or_inspected": 0,
+    "final_test_values_used_for_preprocessing": 0,
+    "statement": "The frozen streaming loader read only the row-identity and split fields required to identify and exclude 346 locked-final-test records. It did not parse, inspect, store, preprocess, fit on, predict from, evaluate, summarize or export any final-test predictor or target value."
+  },
+  "frozen_authority_sha256": {
+    "project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md": "3e1b833da5424a440a668e2c5b5cf0923213c7c3aedffd77a5dc8b9bd9bc8e27",
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
+    "project/stage125/part4_model_specifications_stage125.json": "ef933be3eb2f75e6f493ac1401100c629bdb83850c81950d8f235c5ccf4cdb21",
+    "project/stage125/part4_preprocessing_contract_stage125.json": "3722bd6165574c78aef1138a810ff4863b5c214f80df197889eaa40163f0e415",
+    "project/stage125/part4_statistical_analysis_plan_stage125.json": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
+    "project/stage125/part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
+    "project/stage125/part4_temporal_split_manifest_stage125.csv": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc",
+    "project/stage126/stage126_m1_retained_design_freeze.json": "53beb8603de48bdeed33858093f40dc0e89bf6f86cb97534a86dff32b74a2876",
+    "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e",
+    "project/stage128/stage128_m2_d2_common_sample_audit.json": "19d505899303a5290cc64c7d2dc79e4c103059ddc428c248ebcaf3e9472fbef6",
+    "project/stage128/stage128_m2_d2_development_features.csv": "068519065fc4c36594a892b14c9242471a088e7b33484fbd5453b12391af2583",
+    "project/stage128/stage128_m2_d2_event_count_feasibility.json": "b1b4e0840ff5a6ca07e9523b706a697bb2ab0035b48e008a42f80d18e2936364",
+    "project/stage128/stage128_m2_d2_gate_rerun_decision.json": "c1d2d844813bc12a34f50780187706f98c13957f7926aa2117c049f98887ee13"
+  },
+  "frozen_sources_sha256": {
+    "project/src/stage127_m2_market_data_gate.py": "8f6aca9e972c85850a5a75152068b1312b91be99fe3241746b042fd39ffc50ae",
+    "project/src/stage128_m2_d2_boundary_month_equity_return.py": "27a3e5dfe36c7e89df386f9ee803ad43b73fd741517d7637c627896a12581a57"
+  },
+  "gate_status_consumed": "PASS_FOR_M2_INCREMENTAL_EVALUATION",
+  "historical_d0_gate_status": "FAIL_M2_DATA_GATE",
+  "human_source_utterance_sha256": "a9999c0cab0ec43d200cbc2d00112132e27c4bd7ed52e0db92ef0d5eb6c3cdc6",
+  "latest_non_scientific_verification_environment": {
+    "is_original_authorized_execution_environment": false,
+    "new_human_authorization": false,
+    "new_scientific_decision": false,
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python_version": "3.14.0",
+    "role": "verification_or_maintenance_regeneration_only",
+    "runtime_versions": {
+      "jdatetime": "5.3.0",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "python": "3.14.0",
+      "scikit-learn": "1.9.0",
+      "xgboost": "3.3.0"
+    },
+    "scientific_execution": false
+  },
+  "original_authorized_scientific_execution": {
+    "action_id": "stage127-m2-incremental-evaluation",
+    "authorization_sha256": "a9999c0cab0ec43d200cbc2d00112132e27c4bd7ed52e0db92ef0d5eb6c3cdc6",
+    "canonical_authorized_execution_count": 1,
+    "canonical_primary_predictive_fit_count": 44,
+    "canonical_scientific_artifact_commit": "96a1d6b19b91756b6a0257344c50754fb6d38c7d",
+    "derived_dynamically_from_current_interpreter": false,
+    "immutable_provenance": true,
+    "overwritten_by_verification_or_maintenance": false,
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python_version": "3.14.0",
+    "runtime_versions": {
+      "jdatetime": "5.3.0",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "python": "3.14.0",
+      "scikit-learn": "1.9.0",
+      "xgboost": "3.3.0"
+    },
+    "scientific_decision_count": 1,
+    "source_base_commit": "fb5f0e13cb806e0ba28f0372b3b2264881564950"
+  },
+  "package_artifacts_sha256": {
+    "project/stage128/m2_incremental_evaluation/README_STAGE127_M2_INCREMENTAL_EVALUATION.md": "4d6eb765cac5f6d3fe40c4e85bb0b3f5dfc6bc18a6880f74fadba594bf57e1f9",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_block_model_metrics.csv": "b28f2fa4fe2852680ad970399276241b5921784a4c546e5aa9a2e556757b9d87",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_calibration_report.json": "a5cd52777f5353942a94ddfdb898e1eca9538695b8b66a601286c44e980225af",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_common_sample_join_audit.json": "e6da66d96810ef7491ab5db0018909419ecc7760000e8f390b5bbadb0ef3c159",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_feature_configuration_manifest.json": "f39d99933aeb6822b84ed6228f97b6c57dc5a4205c67d71180b1242389561da9",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_final_test_firewall_audit.json": "6f9cef17d6c77736bd0e890619e4d0b389ba39a90bea55ccaa66f7ce4effb718",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_decision.json": "bda5fa054b4e00876b7be2b8ddd8726efc20c21117361e22a819d662e18814de",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_execution_contract.json": "9087212d3fcbd06bd5438200fb976fa1cf5b178de52f9e20f759a6af4d9f3063",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_human_authorization_record.json": "b30a9b71a79be664ccac28e10ceb13a6c1c773ddd2450cc3212e174e42223f55",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_qc_report.json": "58b40c9bb5e1bd2c4233345cfe566fc71403ed6a8a5c8e99690613a3c012f476",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_multiplicity_family_status.json": "6c20ed4f64321b8d5083359fd3079283bbf006f62958d576b6e5090d43c88459",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_paired_bootstrap_delta_summary.json": "1c4d4275c938d9d80e24d8746b16c669ecb822d884921a2ee05811220c061a6d",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_paired_oof_predictions.csv": "923ce0929693cc07fbf5a81e16295334624ead19447ff87d6a49e7a6f2a26ceb",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_parent_to_common_sample_attrition_audit.json": "005e0c26c8dbcc8b0847d3ad0588f8d77d532514c5d8a409bae0afe97e358b4c",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_post_lock_d2_eligibility_audit.json": "77631e97b417ca83d1a8a35170de9c3e99c3590df880f53cfc0ddd3cdee5a307",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_post_lock_d2_eligibility_smd.csv": "9cd801b060679cdb6080c8c3fee477708fb37e178df27d9652144c8a6ac53b80",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_predictive_fit_count_audit.json": "96f05b62eadbf64e7e38c0d78c3236f95ae47a37746ddfb2934116bc89c6b970"
+  },
+  "package_location": "project/stage128/m2_incremental_evaluation",
+  "primary_predictive_model_fits": 44,
+  "source_repository": "abtinasg/papermali",
+  "stage": "Stage128",
+  "stage127_historical_artifacts_modified": false
+}

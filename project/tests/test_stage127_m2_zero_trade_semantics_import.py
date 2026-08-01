@@ -1045,7 +1045,14 @@ def test_handoff_state_keeps_m2_unauthorized():
     assert state["stage127_m2_market_data_gate_status"] == "FAIL_M2_DATA_GATE"
     assert state["stage127_m2_block_admitted_for_modeling"] is False
     assert state["m2_incremental_evaluation_authorized"] is False
-    assert state["m2_modeling_started"] is False
+    # `m2_modeling_started` is an EXECUTION fact, not an authorization. It is
+    # True because the separately authorized stage127-m2-incremental-evaluation
+    # action actually fitted its 44 canonical development models. Nothing in
+    # THIS zero-trade semantics adjudication started or authorized any of it,
+    # and the consumed authorization above remains False.
+    assert state["m2_modeling_started"] is True
+    assert state["stage127_m2_semantics_model_fits"] == 0
+    assert state["m2_block_retained"] is False
 
 
 def test_current_state_carries_the_semantics_subsection():

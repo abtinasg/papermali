@@ -1,0 +1,34 @@
+{
+  "canonical_row_identity": [
+    "ticker",
+    "fiscal_year_t",
+    "predictor_row_key_t",
+    "target_row_key_t_plus_1",
+    "target_year",
+    "temporal_fold_role"
+  ],
+  "common_negative": 484,
+  "common_positive": 55,
+  "common_rows": 539,
+  "d2_rows": 666,
+  "duplicate_join_keys": 0,
+  "duplicate_joins_rejected": true,
+  "final_test_rows_in_join": 0,
+  "final_test_rows_loaded": 0,
+  "final_test_rows_seen_and_skipped": 346,
+  "fold_role_disagreements": 0,
+  "join_is_one_to_one": true,
+  "join_keys": [
+    "ticker",
+    "fiscal_year_t"
+  ],
+  "many_to_many_joins": 0,
+  "many_to_many_rejected": true,
+  "matched_rows": 666,
+  "parent_rows": 666,
+  "pooled_oof_positive": 28,
+  "pooled_oof_rows": 366,
+  "target_year_disagreements": 0,
+  "unmatched_d2_rows": 0,
+  "unmatched_parent_rows": 0
+}
