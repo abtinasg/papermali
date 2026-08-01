@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m2_d2_boundary_month_equity_return`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3-macro-data-gate`
-- **Last stage commit:** `625dee18c760fd686977353eebd67fba9711bdeb`
-- **Generated from commit:** `625dee18c760fd686977353eebd67fba9711bdeb` (branch `stage128-m2-retained-block-human-decision`, informational)
-- **Baseline:** `origin/main` @ `bdac807788b377690be0a879765cfe4ac148970d`
+- **Last stage commit:** `6a75c6e3c8d67b1fa7367f3777e6d15f7f031a0f`
+- **Generated from commit:** `6a75c6e3c8d67b1fa7367f3777e6d15f7f031a0f` (branch `stage128-m3-macro-data-gate`, informational)
+- **Baseline:** `origin/main` @ `35aaf4b70e9341704ee38be6f8cf2e2519c70bb2`
 
 ## Current-state validation
 
@@ -112,6 +112,20 @@ _The human governance decision that the paired evaluation deliberately left open
 - **Next research action (pointer only):** `stage128-m3-macro-data-gate` — the M3 macro data Gate. A pointer is **not** an authorization: no macro data was collected, no M3 variable created, no M3 Gate executed and no M3 model fit.
 - Package: `project/stage128/m2_retained_block_human_decision/`; interpretation: `project/stage128/m2_retained_block_human_decision/README_STAGE128_M2_RETAINED_BLOCK_HUMAN_DECISION.md`
 
+### Stage128 — M3 macro DATA Gate (data admission only)
+
+_The data-admission Gate for the exact frozen three-variable M3 macro block (`cpi_inflation`, `fx_change_official`, `policy_financing_rate`). It asks only whether that block can be obtained from authoritative, reproducible, point-in-time-safe sources. It does NOT ask, and does not answer, whether M3 improves prediction._
+
+- ⛔ **Gate status:** `UNRESOLVED_M3_DATA_GATE`
+- ✅ **Executed:** True — **authorization consumed:** True (one action only, not standing)
+- ⛔ **Zero modeling in the Gate:** 0 model fits, 0 predictions, 0 predictive metrics, 0 M3-versus-M2 comparisons, 0 bootstrap/Holm/SHAP/SMOTE executions
+- **Gate denominator:** the retained-M2 development common sample, 539 rows — **not** the 666-row M1 development universe
+- ⛔ **M3 block admitted for incremental evaluation:** False — no partial block was admitted and no candidate was dropped or substituted
+- ⛔ **M3 incremental evaluation authorized:** False — **M3 modeling started:** False. The data workstream started; the MODELING did not.
+- ⛔ **M4:** authorized=False, started=False — **final test locked:** True
+- ⛔ **Research pointer NOT advanced** — `m3_macro_data_gate_human_review_required` = True; 8 recorded blocker/unresolved reasons. Missing evidence was recorded as null, never scored as zero, and never converted into an observed failure.
+- Package: `project/stage128/m3_macro_data_gate/`; interpretation: `project/stage128/m3_macro_data_gate/README_STAGE128_M3_MACRO_DATA_GATE.md`
+
 ### Last completed scientific micro-part QC
 
 _Scientific QC of the newest completed robustness micro-part — a DIFFERENT role from current-state validation above._
@@ -161,5 +175,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `e6ebb605dedeb5591f7502d987d7637825886355a823752faf1d44907baa2157`_
-_generated_at_utc: 2026-08-01T14:12:31Z (informational)_
+_state_fingerprint: `287a450a51025105c3946e911a244dae56c97e91cac70e8d64cd6ff1e5b30a5f`_
+_generated_at_utc: 2026-08-01T15:13:13Z (informational)_
