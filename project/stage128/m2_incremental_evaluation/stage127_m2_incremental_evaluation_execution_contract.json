@@ -1,0 +1,119 @@
+{
+  "action_id": "stage127-m2-incremental-evaluation",
+  "action_id_renamed": false,
+  "active_workstream": "stage128_m2_d2_boundary_month_equity_return",
+  "blocks": [
+    "M1",
+    "M2"
+  ],
+  "configuration_reselection_performed": false,
+  "configurations_reused_from": "project/stage126/stage126_m1_selected_configurations.json",
+  "contract_id": "stage127_m2_incremental_evaluation",
+  "contract_version": "stage127_m2_incremental_evaluation_v1",
+  "early_stopping_used": false,
+  "equity_return_calendar_convention": "GREGORIAN",
+  "equity_return_contract_field": "equity_return_window",
+  "equity_return_measurement_specification": "BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN",
+  "equity_return_source_column": "equity_return_d2",
+  "expected_primary_predictive_fit_count": 44,
+  "feature_search_performed": false,
+  "final_oof_seeds": [
+    20260719,
+    20260720,
+    20260721,
+    20260722,
+    20260723
+  ],
+  "final_test_access": false,
+  "forbidden_market_features": [
+    "zero_trade_day_ratio_W",
+    "equity_return_window_d1",
+    "equity_return_window_d3",
+    "equity_return_window_jalali",
+    "equity_return_window_d0_historical",
+    "raw_close",
+    "unadjusted_close"
+  ],
+  "frozen_inputs": {
+    "equity_return_calendar_convention": "GREGORIAN",
+    "equity_return_measurement_specification": "BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN",
+    "external_bundle_sha256": "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec",
+    "frozen_authority_sha256": {
+      "project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md": "3e1b833da5424a440a668e2c5b5cf0923213c7c3aedffd77a5dc8b9bd9bc8e27",
+      "project/stage125/part4_metrics_uncertainty_contract_stage125.json": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
+      "project/stage125/part4_model_specifications_stage125.json": "ef933be3eb2f75e6f493ac1401100c629bdb83850c81950d8f235c5ccf4cdb21",
+      "project/stage125/part4_preprocessing_contract_stage125.json": "3722bd6165574c78aef1138a810ff4863b5c214f80df197889eaa40163f0e415",
+      "project/stage125/part4_statistical_analysis_plan_stage125.json": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
+      "project/stage125/part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
+      "project/stage125/part4_temporal_split_manifest_stage125.csv": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc",
+      "project/stage126/stage126_m1_retained_design_freeze.json": "53beb8603de48bdeed33858093f40dc0e89bf6f86cb97534a86dff32b74a2876",
+      "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e",
+      "project/stage128/stage128_m2_d2_common_sample_audit.json": "19d505899303a5290cc64c7d2dc79e4c103059ddc428c248ebcaf3e9472fbef6",
+      "project/stage128/stage128_m2_d2_development_features.csv": "068519065fc4c36594a892b14c9242471a088e7b33484fbd5453b12391af2583",
+      "project/stage128/stage128_m2_d2_event_count_feasibility.json": "b1b4e0840ff5a6ca07e9523b706a697bb2ab0035b48e008a42f80d18e2936364",
+      "project/stage128/stage128_m2_d2_gate_rerun_decision.json": "c1d2d844813bc12a34f50780187706f98c13957f7926aa2117c049f98887ee13"
+    },
+    "frozen_sources_sha256": {
+      "project/src/stage127_m2_market_data_gate.py": "8f6aca9e972c85850a5a75152068b1312b91be99fe3241746b042fd39ffc50ae",
+      "project/src/stage128_m2_d2_boundary_month_equity_return.py": "27a3e5dfe36c7e89df386f9ee803ad43b73fd741517d7637c627896a12581a57"
+    },
+    "gate_decision_modified": false,
+    "gate_status": "PASS_FOR_M2_INCREMENTAL_EVALUATION",
+    "historical_d0_gate_status": "FAIL_M2_DATA_GATE",
+    "pr70_merge_commit": "fb5f0e13cb806e0ba28f0372b3b2264881564950",
+    "pr70_merge_commit_is_ancestor_of_head": true,
+    "stage127_historical_artifacts_modified": false
+  },
+  "grid_search_performed": false,
+  "historical_d0_equity_return_used_as_predictor": false,
+  "k_optimized_after_seeing_results": false,
+  "m2_is_nested_superset_of_m1": true,
+  "model_families": [
+    "regularized_logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "package_location": "project/stage128/m2_incremental_evaluation",
+  "preprocessing": {
+    "estimated_inside_each_temporal_training_fold_only": true,
+    "feature_screening_performed": false,
+    "final_test_influenced_preprocessing": false,
+    "financial_expense_absolute_value_taken": false,
+    "financial_expense_sign_preserved": true,
+    "missingness_indicators_standardized": false,
+    "parameters_estimated_on_combined_train_and_validation": false,
+    "random_forest_standardized": false,
+    "steps": [
+      "deterministic_source_to_feature_transformation",
+      "capture_original_pre_imputation_missingness_mask",
+      "training_fold_1st_99th_percentile_clipping_bounds",
+      "apply_training_derived_clipping_bounds",
+      "training_fold_median_after_clipping",
+      "median_imputation",
+      "append_missingness_indicators_from_original_mask",
+      "standardize_imputed_continuous_predictors_for_logistic_only"
+    ],
+    "xgboost_standardized": false
+  },
+  "primary_metric": "pr_auc",
+  "scope": "development_only",
+  "secondary_metrics": [
+    "roc_auc",
+    "brier_score",
+    "recall_at_10pct",
+    "lift_at_10pct"
+  ],
+  "smote_used": false,
+  "stage": "Stage128",
+  "top_k_rule": "per target year: K_y = ceil(0.10 * N_y); rank by predicted probability descending; deterministic tie-break ticker ascending",
+  "tuning_performed": false,
+  "tuning_seeds_used": false,
+  "uncertainty": {
+    "cluster": "ticker",
+    "confidence_interval": 0.95,
+    "method": "paired_company_cluster_bootstrap",
+    "minimum_valid_replicates": 1000,
+    "replicates": 2000,
+    "seed": 20260724
+  }
+}

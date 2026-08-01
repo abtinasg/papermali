@@ -1,0 +1,356 @@
+{
+  "all_pass": true,
+  "all_pass_semantics": "all_pass means every REQUIRED fail-closed assertion of this action passed. It is NOT a scientific verdict on M2: the observed paired evidence is reported separately and selects no winner.",
+  "assertion_count": 69,
+  "assertions": [
+    {
+      "detail": "",
+      "name": "authorization_utterance_verbatim",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "authorization_sha256_recomputed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "authorization_date_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "authorization_is_one_action_only",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "authorization_not_standing",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "merge_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "m3_m4_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "normalized_scope_never_replaces_original_text",
+      "status": "PASS"
+    },
+    {
+      "detail": "fb5f0e13cb806e0ba28f0372b3b2264881564950",
+      "name": "pr70_merge_commit_is_ancestor",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "d2_gate_status_is_pass",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "external_bundle_sha256_matches",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "frozen_source_hashes_recorded",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "gate_decision_artifact_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "historical_d0_gate_remains_fail",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "stage127_historical_artifacts_not_modified",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "parent_development_rows_666",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "common_rows_539",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "common_composition_55_positive_484_negative",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "common_fold_counts_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "common_validation_positives_18_and_10",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "pooled_oof_rows_366",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "pooled_oof_positives_28",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_duplicate_or_many_to_many_joins",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_final_test_keys_in_join",
+      "status": "PASS"
+    },
+    {
+      "detail": "each paired OOF row carries both block probabilities for one row",
+      "name": "m1_and_m2_share_identical_row_identities",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "paired_rows_carry_both_block_probabilities",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "m1_and_m2_temporal_roles_match",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "m1_comparator_refitted_on_common_sample_training_rows",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_reuse_of_unpaired_original_m1_oof_predictions",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "m1_feature_order_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "m2_feature_order_exact_nested_twelve",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "d2_is_the_active_equity_return_implementation",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_extra_market_feature",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "exactly_three_model_families",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "frozen_configurations_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_tuning_or_grid_search",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_smote",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_early_stopping",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "primary_predictive_fit_count_is_44",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "frozen_seed_list_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "scale_pos_weight_from_training_fold_only",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_final_test_model_call",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "primary_metric_is_pr_auc",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "secondary_metrics_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "metrics_reported_for_m1_m2_and_delta",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "bootstrap_contract_exact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "bootstrap_uses_same_resampled_rows_for_both_blocks",
+      "status": "PASS"
+    },
+    {
+      "detail": "{\"regularized_logistic_regression\": 2000, \"random_forest\": 2000, \"xgboost\": 2000}",
+      "name": "bootstrap_valid_replicate_rule_met",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_silent_one_member_holm_family",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "isotonic_calibration_not_executed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "raw_probabilities_are_the_primary_surface",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "calibration_reported_for_every_family_and_block",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "post_lock_eligibility_audit_executed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "all_required_audit_dimensions_attempted",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "smd_threshold_is_descriptive_only",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_row_removed_by_smd",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "distress_rate_comparison_is_descriptive_only",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "audit_cannot_alter_d2_or_the_model",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "zero_trade_day_ratio_used_only_in_the_audit",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "attrition_reported_not_concealed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_firewall_intact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_full_development_refit",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_m3_or_m4_execution",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_shap_execution",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_winner_or_retained_block_selected",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_new_pass_fail_threshold_created",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_superiority_or_causal_claim",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "human_retained_block_decision_recorded_as_required",
+      "status": "PASS"
+    }
+  ],
+  "contract_id": "stage127_m2_incremental_evaluation",
+  "decision_id": "stage127-m2-incremental-evaluation",
+  "failed_count": 0,
+  "stage": "Stage128"
+}

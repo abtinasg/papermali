@@ -1,0 +1,193 @@
+{
+  "audit_id": "stage127-m2-post-lock-d2-eligibility-audit",
+  "audit_stops_model_execution": false,
+  "boundary_rule_changed_by_audit": false,
+  "comparison_count": 53,
+  "dimension_count": 6,
+  "eligible_definition": "development pairs inside the terminal Stage128 D2 three-variable M2 common sample",
+  "eligible_rows": 539,
+  "executed_before_interpreting_predictive_results": true,
+  "flagged_comparison_count": 35,
+  "flagged_comparisons": [
+    {
+      "smd": 0.113094882018,
+      "variable": "target_year=1393"
+    },
+    {
+      "smd": -0.312775085451,
+      "variable": "target_year=1394"
+    },
+    {
+      "smd": -0.390815051958,
+      "variable": "target_year=1395"
+    },
+    {
+      "smd": -0.108449713526,
+      "variable": "target_year=1397"
+    },
+    {
+      "smd": 0.441599069896,
+      "variable": "target_year=1398"
+    },
+    {
+      "smd": 0.579494388626,
+      "variable": "target_year=1399"
+    },
+    {
+      "smd": 0.162221421131,
+      "variable": "industry=استخراج کانه‌های فلزی / معادن"
+    },
+    {
+      "smd": 0.118320797245,
+      "variable": "industry=انبوه‌سازی، املاک و مستغلات"
+    },
+    {
+      "smd": 0.162221421131,
+      "variable": "industry=حمل و نقل"
+    },
+    {
+      "smd": 0.302838285749,
+      "variable": "industry=خودرو و ساخت قطعات"
+    },
+    {
+      "smd": 0.162221421131,
+      "variable": "industry=رایانه و فعالیت‌های وابسته"
+    },
+    {
+      "smd": 0.105801842379,
+      "variable": "industry=رایانه و فعالیت‌های وابسته به آن / خدمات پرداخت"
+    },
+    {
+      "smd": -0.304977499989,
+      "variable": "industry=سیمان، آهک و گچ"
+    },
+    {
+      "smd": 0.162221421131,
+      "variable": "industry=شیشه و محصولات شیشه‌ای"
+    },
+    {
+      "smd": -0.215342579951,
+      "variable": "industry=فلزات اساسی"
+    },
+    {
+      "smd": 0.150046896984,
+      "variable": "industry=ماشین‌آلات و تجهیزات / تجهیزات برقی"
+    },
+    {
+      "smd": 0.162221421131,
+      "variable": "industry=ماشین‌آلات و تجهیزات / دستگاه‌های برقی"
+    },
+    {
+      "smd": 0.231118802809,
+      "variable": "industry=محصولات شیمیایی"
+    },
+    {
+      "smd": -0.131341570318,
+      "variable": "industry=محصولات غذایی"
+    },
+    {
+      "smd": -0.247501550584,
+      "variable": "industry=محصولات غذایی / خوراک دام"
+    },
+    {
+      "smd": -0.235204227128,
+      "variable": "industry=محصولات غذایی و آشامیدنی به جز قند و شکر"
+    },
+    {
+      "smd": 0.150046896984,
+      "variable": "industry=محصولات لاستیکی و پلاستیکی"
+    },
+    {
+      "smd": 0.150046896984,
+      "variable": "industry=محصولات پلاستیکی"
+    },
+    {
+      "smd": 0.136845137876,
+      "variable": "industry=مخابرات"
+    },
+    {
+      "smd": 0.265429587104,
+      "variable": "industry=مواد و محصولات دارویی"
+    },
+    {
+      "smd": 0.150046896984,
+      "variable": "industry=کاشی و سرامیک / محصولات کانی غیرفلزی"
+    },
+    {
+      "smd": -0.193167845196,
+      "variable": "industry=کانی غیرفلزی / نسوز"
+    },
+    {
+      "smd": 0.352347032035,
+      "variable": "log_total_assets"
+    },
+    {
+      "smd": -2.06585102722,
+      "variable": "zero_trade_day_ratio_W"
+    },
+    {
+      "smd": 0.128598092811,
+      "variable": "window_trading_day_count"
+    },
+    {
+      "smd": 2.137678571624,
+      "variable": "usable_daily_return_count"
+    },
+    {
+      "smd": 2.137678571624,
+      "variable": "usable_amihud_day_count"
+    },
+    {
+      "smd": -2.054655762079,
+      "variable": "missing_price_day_count"
+    },
+    {
+      "smd": -2.054655762079,
+      "variable": "zero_traded_value_day_count"
+    },
+    {
+      "smd": -0.10387475126,
+      "variable": "ocf_to_assets_period_adjusted__observed"
+    }
+  ],
+  "gate_result_revised_by_audit": false,
+  "ineligible_rows": 127,
+  "interpretation_consequence": "Imbalance flags limit INTERPRETATION only. They are recorded in the limitations of the decision artifact and never remove a row, reweight the sample, alter D2, alter the model or revise the Gate.",
+  "m2_feature_changed_by_audit": false,
+  "matching_applied": false,
+  "model_design_changed_by_audit": false,
+  "post_lock_outcome_side_comparison": {
+    "difference_eligible_minus_ineligible": -0.000321388398,
+    "eligible_distress_rate": 0.102040816327,
+    "eligible_positive": 55,
+    "eligible_rows": 539,
+    "ineligible_distress_rate": 0.102362204724,
+    "ineligible_positive": 13,
+    "ineligible_rows": 127,
+    "is_descriptive_only": true,
+    "label": "post_lock_descriptive_distress_rate_comparison",
+    "permitted_because_design_is_locked": true,
+    "separated_from_predictor_side_audit": true,
+    "used_to_change_d2": false,
+    "used_to_change_interpretation_protocol": false,
+    "used_to_change_model_configuration": false,
+    "used_to_change_sample_rule": false
+  },
+  "required_dimensions": [
+    "prediction_cohort_target_year",
+    "industry",
+    "firm_size",
+    "zero_trade_day_ratio_W",
+    "market_activity_and_traded_value_diagnostics",
+    "m1_predictor_availability"
+  ],
+  "required_dimensions_attempted": true,
+  "rows_removed_due_to_smd": 0,
+  "sample_repair_applied": false,
+  "smd_flag_threshold": 0.1,
+  "smd_is_descriptive_flag_only": true,
+  "smd_is_not_an_exclusion_threshold": true,
+  "unavailable_field_count": 0,
+  "unavailable_fields": [],
+  "weighting_applied": false
+}

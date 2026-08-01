@@ -1,0 +1,195 @@
+{
+  "by_family": {
+    "random_forest": {
+      "clusters": 108,
+      "configuration_id": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
+      "metrics": {
+        "brier_score": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": true,
+          "ci_lower": 0.00828144421,
+          "ci_upper": 0.016074612257,
+          "m1_estimate": 0.120971193682,
+          "m2_estimate": 0.13309563301,
+          "m2_minus_m1_delta": 0.012124439328
+        },
+        "lift_at_10pct": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": false,
+          "ci_lower": -1.064400584795,
+          "ci_upper": 0.672953386315,
+          "m1_estimate": 4.592664092664,
+          "m2_estimate": 4.239382239382,
+          "m2_minus_m1_delta": -0.353281853282
+        },
+        "pr_auc": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": false,
+          "ci_lower": -0.049131999282,
+          "ci_upper": 0.031850216682,
+          "m1_estimate": 0.355559464623,
+          "m2_estimate": 0.348246304466,
+          "m2_minus_m1_delta": -0.007313160157
+        },
+        "recall_at_10pct": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": false,
+          "ci_lower": -0.111111111111,
+          "ci_upper": 0.069027093597,
+          "m1_estimate": 0.464285714286,
+          "m2_estimate": 0.428571428571,
+          "m2_minus_m1_delta": -0.035714285715
+        },
+        "roc_auc": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": false,
+          "ci_lower": -0.031906748414,
+          "ci_upper": 0.01636269254,
+          "m1_estimate": 0.859784446323,
+          "m2_estimate": 0.854501267963,
+          "m2_minus_m1_delta": -0.00528317836
+        }
+      },
+      "minimum_valid_replicates_met": true,
+      "rows": 366,
+      "valid_replicate_fraction": 1.0,
+      "valid_replicates": 2000
+    },
+    "regularized_logistic_regression": {
+      "clusters": 108,
+      "configuration_id": "logistic__C_0.1",
+      "metrics": {
+        "brier_score": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": true,
+          "ci_lower": -0.018046801637,
+          "ci_upper": -0.008320590368,
+          "m1_estimate": 0.146469586865,
+          "m2_estimate": 0.133500240879,
+          "m2_minus_m1_delta": -0.012969345986
+        },
+        "lift_at_10pct": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": false,
+          "ci_lower": -0.906153734379,
+          "ci_upper": 0.439434889435,
+          "m1_estimate": 4.945945945946,
+          "m2_estimate": 4.592664092664,
+          "m2_minus_m1_delta": -0.353281853282
+        },
+        "pr_auc": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": false,
+          "ci_lower": -0.021177343686,
+          "ci_upper": 0.035281506756,
+          "m1_estimate": 0.477497460644,
+          "m2_estimate": 0.486027725756,
+          "m2_minus_m1_delta": 0.008530265112
+        },
+        "recall_at_10pct": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": false,
+          "ci_lower": -0.095238095238,
+          "ci_upper": 0.045454545455,
+          "m1_estimate": 0.5,
+          "m2_estimate": 0.464285714286,
+          "m2_minus_m1_delta": -0.035714285714
+        },
+        "roc_auc": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": false,
+          "ci_lower": -0.017319584432,
+          "ci_upper": 0.016964081207,
+          "m1_estimate": 0.88482671175,
+          "m2_estimate": 0.884087066779,
+          "m2_minus_m1_delta": -0.000739644971
+        }
+      },
+      "minimum_valid_replicates_met": true,
+      "rows": 366,
+      "valid_replicate_fraction": 1.0,
+      "valid_replicates": 2000
+    },
+    "xgboost": {
+      "clusters": 108,
+      "configuration_id": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1",
+      "metrics": {
+        "brier_score": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": true,
+          "ci_lower": -0.014603116726,
+          "ci_upper": -0.005935722692,
+          "m1_estimate": 0.094515816614,
+          "m2_estimate": 0.084532023382,
+          "m2_minus_m1_delta": -0.009983793232
+        },
+        "lift_at_10pct": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": false,
+          "ci_lower": -0.356798245613,
+          "ci_upper": 1.282882637628,
+          "m1_estimate": 4.592664092664,
+          "m2_estimate": 5.299227799228,
+          "m2_minus_m1_delta": 0.706563706564
+        },
+        "pr_auc": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": false,
+          "ci_lower": -0.026163341118,
+          "ci_upper": 0.072970509355,
+          "m1_estimate": 0.355762083254,
+          "m2_estimate": 0.374564150798,
+          "m2_minus_m1_delta": 0.018802067544
+        },
+        "recall_at_10pct": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": false,
+          "ci_lower": -0.037037037038,
+          "ci_upper": 0.136363636363,
+          "m1_estimate": 0.464285714286,
+          "m2_estimate": 0.535714285714,
+          "m2_minus_m1_delta": 0.071428571428
+        },
+        "roc_auc": {
+          "bootstrap_delta_replicates": 2000,
+          "ci_estimable": true,
+          "ci_excludes_zero": false,
+          "ci_lower": -0.065138496614,
+          "ci_upper": 0.005656672606,
+          "m1_estimate": 0.853021978022,
+          "m2_estimate": 0.829353338969,
+          "m2_minus_m1_delta": -0.023668639053
+        }
+      },
+      "minimum_valid_replicates_met": true,
+      "rows": 366,
+      "valid_replicate_fraction": 1.0,
+      "valid_replicates": 2000
+    }
+  },
+  "cluster": "ticker",
+  "confidence_interval": 0.95,
+  "interval_type": "percentile",
+  "method": "paired_company_cluster_bootstrap",
+  "minimum_valid_replicates": 1000,
+  "models_refit_during_bootstrap": false,
+  "primary_metric": "pr_auc",
+  "replicates_attempted": 2000,
+  "same_resampled_rows_for_both_blocks": true,
+  "seed": 20260724,
+  "valid_replicate_requires_both_classes": true
+}

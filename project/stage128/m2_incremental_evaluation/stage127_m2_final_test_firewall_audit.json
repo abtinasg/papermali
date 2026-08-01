@@ -1,0 +1,25 @@
+{
+  "feature_search_executions": 0,
+  "final_test_access_authorized": false,
+  "final_test_evaluation_performed": false,
+  "final_test_keys_in_any_artifact": 0,
+  "final_test_locked": true,
+  "final_test_model_fits": 0,
+  "final_test_predictions": 0,
+  "final_test_predictor_values_read": 0,
+  "final_test_rows_seen_and_skipped_without_parsing": 346,
+  "final_test_target_values_read": 0,
+  "final_test_target_years_excluded": [
+    1400,
+    1401,
+    1402
+  ],
+  "final_test_unlocked": false,
+  "full_development_refits": 0,
+  "grid_search_executions": 0,
+  "hyperparameter_tuning_executions": 0,
+  "m3_executions": 0,
+  "m4_executions": 0,
+  "shap_executions": 0,
+  "smote_executions": 0
+}

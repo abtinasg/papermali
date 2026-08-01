@@ -1,0 +1,217 @@
+{
+  "attrition_fraction": 0.190690690691,
+  "attrition_is_not_model_improvement": true,
+  "attrition_is_reported_not_concealed": true,
+  "attrition_rows": 127,
+  "by_target_year": {
+    "1393": {
+      "common": {
+        "companies": 40,
+        "event_rate": 0.175,
+        "negative": 33,
+        "positive": 7,
+        "rows": 40
+      },
+      "parent": {
+        "companies": 46,
+        "event_rate": 0.173913043478,
+        "negative": 38,
+        "positive": 8,
+        "rows": 46
+      }
+    },
+    "1394": {
+      "common": {
+        "companies": 67,
+        "event_rate": 0.134328358209,
+        "negative": 58,
+        "positive": 9,
+        "rows": 67
+      },
+      "parent": {
+        "companies": 98,
+        "event_rate": 0.112244897959,
+        "negative": 87,
+        "positive": 11,
+        "rows": 98
+      }
+    },
+    "1395": {
+      "common": {
+        "companies": 66,
+        "event_rate": 0.166666666667,
+        "negative": 55,
+        "positive": 11,
+        "rows": 66
+      },
+      "parent": {
+        "companies": 101,
+        "event_rate": 0.138613861386,
+        "negative": 87,
+        "positive": 14,
+        "rows": 101
+      }
+    },
+    "1396": {
+      "common": {
+        "companies": 79,
+        "event_rate": 0.126582278481,
+        "negative": 69,
+        "positive": 10,
+        "rows": 79
+      },
+      "parent": {
+        "companies": 101,
+        "event_rate": 0.158415841584,
+        "negative": 85,
+        "positive": 16,
+        "rows": 101
+      }
+    },
+    "1397": {
+      "common": {
+        "companies": 80,
+        "event_rate": 0.1,
+        "negative": 72,
+        "positive": 8,
+        "rows": 80
+      },
+      "parent": {
+        "companies": 104,
+        "event_rate": 0.086538461538,
+        "negative": 95,
+        "positive": 9,
+        "rows": 104
+      }
+    },
+    "1398": {
+      "common": {
+        "companies": 100,
+        "event_rate": 0.06,
+        "negative": 94,
+        "positive": 6,
+        "rows": 100
+      },
+      "parent": {
+        "companies": 106,
+        "event_rate": 0.056603773585,
+        "negative": 100,
+        "positive": 6,
+        "rows": 106
+      }
+    },
+    "1399": {
+      "common": {
+        "companies": 107,
+        "event_rate": 0.03738317757,
+        "negative": 103,
+        "positive": 4,
+        "rows": 107
+      },
+      "parent": {
+        "companies": 110,
+        "event_rate": 0.036363636364,
+        "negative": 106,
+        "positive": 4,
+        "rows": 110
+      }
+    }
+  },
+  "common_fold_counts": {
+    "fold1_train": {
+      "companies": 84,
+      "event_rate": 0.156069364162,
+      "negative": 146,
+      "positive": 27,
+      "rows": 173
+    },
+    "fold1_validation": {
+      "companies": 87,
+      "event_rate": 0.11320754717,
+      "negative": 141,
+      "positive": 18,
+      "rows": 159
+    },
+    "fold2_train": {
+      "companies": 92,
+      "event_rate": 0.135542168675,
+      "negative": 287,
+      "positive": 45,
+      "rows": 332
+    },
+    "fold2_validation": {
+      "companies": 108,
+      "event_rate": 0.048309178744,
+      "negative": 197,
+      "positive": 10,
+      "rows": 207
+    }
+  },
+  "common_pooled_oof": {
+    "companies": 108,
+    "event_rate": 0.07650273224,
+    "negative": 338,
+    "positive": 28,
+    "rows": 366
+  },
+  "common_sample": {
+    "companies": 108,
+    "event_rate": 0.102040816327,
+    "negative": 484,
+    "positive": 55,
+    "rows": 539
+  },
+  "dropped_by_d2_ineligibility": {
+    "companies": 53,
+    "event_rate": 0.102362204724,
+    "negative": 114,
+    "positive": 13,
+    "rows": 127
+  },
+  "interpretation_note": "The M2 common sample is a strict subset of the parent M1 development surface. Any metric difference against the ORIGINAL 666-row M1 results reflects sample restriction, not model improvement; that comparison is deliberately not made here. Only the paired same-row M1-versus-M2 comparison is interpreted.",
+  "parent_development": {
+    "companies": 110,
+    "event_rate": 0.102102102102,
+    "negative": 598,
+    "positive": 68,
+    "rows": 666
+  },
+  "parent_fold_counts": {
+    "fold1_train": {
+      "companies": 101,
+      "event_rate": 0.134693877551,
+      "negative": 212,
+      "positive": 33,
+      "rows": 245
+    },
+    "fold1_validation": {
+      "companies": 104,
+      "event_rate": 0.121951219512,
+      "negative": 180,
+      "positive": 25,
+      "rows": 205
+    },
+    "fold2_train": {
+      "companies": 104,
+      "event_rate": 0.128888888889,
+      "negative": 392,
+      "positive": 58,
+      "rows": 450
+    },
+    "fold2_validation": {
+      "companies": 110,
+      "event_rate": 0.046296296296,
+      "negative": 206,
+      "positive": 10,
+      "rows": 216
+    }
+  },
+  "parent_pooled_oof": {
+    "companies": 110,
+    "event_rate": 0.083135391924,
+    "negative": 386,
+    "positive": 35,
+    "rows": 421
+  },
+  "parent_surface": "stage126-m1-financial-baseline development surface"
+}
