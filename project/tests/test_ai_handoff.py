@@ -2281,7 +2281,12 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     )
     assert state["m2_block_retained"] is False
     assert state["m2_incremental_evaluation_authorized"] is False
-    assert state["m2_modeling_started"] is False
+    # The one-action authorization was CONSUMED, which is why the flag above
+    # is False. That never erases the executed modeling: the authorized
+    # paired M2 evaluation really did fit 44 canonical development models.
+    assert state["m2_modeling_started"] is True
+    assert state["stage127_m2_incremental_evaluation_primary_model_fits"] == 44
+    assert state["m2_block_retained"] is False
     # The live workstream label advanced with the live state: the Stage128
     # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
     # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
@@ -2580,7 +2585,12 @@ def test_part1_does_not_advance_research_pointers():
     )
     assert state["m2_block_retained"] is False
     assert state["m2_incremental_evaluation_authorized"] is False
-    assert state["m2_modeling_started"] is False
+    # The one-action authorization was CONSUMED, which is why the flag above
+    # is False. That never erases the executed modeling: the authorized
+    # paired M2 evaluation really did fit 44 canonical development models.
+    assert state["m2_modeling_started"] is True
+    assert state["stage127_m2_incremental_evaluation_primary_model_fits"] == 44
+    assert state["m2_block_retained"] is False
     # The live workstream label advanced with the live state: the Stage128
     # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
     # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
@@ -2800,7 +2810,12 @@ def test_handoff_carries_live_vs_historical_test_boundary_markers():
     )
     assert state["m2_block_retained"] is False
     assert state["m2_incremental_evaluation_authorized"] is False
-    assert state["m2_modeling_started"] is False
+    # The one-action authorization was CONSUMED, which is why the flag above
+    # is False. That never erases the executed modeling: the authorized
+    # paired M2 evaluation really did fit 44 canonical development models.
+    assert state["m2_modeling_started"] is True
+    assert state["stage127_m2_incremental_evaluation_primary_model_fits"] == 44
+    assert state["m2_block_retained"] is False
     # Stage125 Part 5 stays historical and immutable.
     assert state["stage125_part5_mode"] == "historical_immutable"
     assert state["stage125_part5_live_gate_active"] is False
@@ -2871,7 +2886,12 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     )
     assert state["m2_block_retained"] is False
     assert state["m2_incremental_evaluation_authorized"] is False
-    assert state["m2_modeling_started"] is False
+    # The one-action authorization was CONSUMED, which is why the flag above
+    # is False. That never erases the executed modeling: the authorized
+    # paired M2 evaluation really did fit 44 canonical development models.
+    assert state["m2_modeling_started"] is True
+    assert state["stage127_m2_incremental_evaluation_primary_model_fits"] == 44
+    assert state["m2_block_retained"] is False
 
 
 def test_part5_compatibility_markers_absent_without_artifacts(tmp_path):

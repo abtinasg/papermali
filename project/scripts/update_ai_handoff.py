@@ -121,6 +121,15 @@ ALLOWLIST_FILES = (
     # top of the unchanged, frozen Stage127 window/adjacency primitives; no
     # canonical Gate execution, no model fit, no prediction.
     "project/src/stage128_m2_d2_boundary_month_equity_return.py",
+    # Stage127 M2 paired incremental-evaluation code, runner and tests. The
+    # action id keeps its `stage127-` prefix while its generated artifacts
+    # live under the already-allowlisted project/stage128/ workstream
+    # directory. Development-only paired comparison of the frozen M2 block
+    # against the frozen M1 block: it retunes nothing, searches no feature,
+    # selects no winner and reads no final-test predictor or target value.
+    "project/src/stage127_m2_incremental_evaluation.py",
+    "project/run_stage127_m2_incremental_evaluation.py",
+    "project/tests/test_stage127_m2_incremental_evaluation.py",
     "project/tests/test_stage128_m2_d2_boundary_month_equity_return.py",
     "project/tests/test_stage128_m2_d2_design_freeze_package.py",
     # Stage128 canonical M2 Gate RE-RUN under the frozen Gregorian D2
@@ -3802,9 +3811,13 @@ def render_current_state(record: dict) -> str:
             "schema it is a frozen prohibition marker meaning \"M2 data has "
             "entered the authorized M2 modeling pipeline\" — not a statement "
             "that no M2 evidence exists.",
-            f"- **M2 incremental evaluation authorized:** "
+            f"- **M2 incremental evaluation authorized (live):** "
             f"{record.get('m2_incremental_evaluation_authorized')} — "
-            f"**M2 modeling started:** {record.get('m2_modeling_started')}",
+            f"**M2 modeling started (live):** "
+            f"{record.get('m2_modeling_started')}. These are CURRENT global "
+            "markers, not statements about this historical Gate: this Gate "
+            "fitted no model. Any `True` above was produced by a later, "
+            "separately authorized action.",
             "",
         ]
     if record.get("stage127_m2_trading_day_semantics_adjudication_completed"):
@@ -3945,7 +3958,9 @@ def render_current_state(record: dict) -> str:
             f"- ⛔ **M2 admitted:** {record.get('m2_authorized')} — "
             f"**M2 incremental evaluation authorized:** "
             f"{record.get('m2_incremental_evaluation_authorized')} — "
-            f"**M2 modeling started:** {record.get('m2_modeling_started')}",
+            "**this freeze started no modeling** (it is a design contract "
+            "only; any live M2 execution marker was set by a later, "
+            "separately authorized action)",
             "- 🔒 **Final test locked:** final_test_unlocked="
             f"{record.get('final_test_unlocked')}, "
             f"final_test_access_authorized="
@@ -4003,9 +4018,10 @@ def render_current_state(record: dict) -> str:
             "- **This is DATA ADMISSION only.** It does not say M2 improves "
             "prediction. **M2 incremental evaluation authorized:** "
             f"{record.get('m2_incremental_evaluation_authorized')} — "
-            f"**M2 modeling started:** {record.get('m2_modeling_started')} — "
-            f"**M2 block admitted for modeling:** "
-            f"{record.get('m2_block_admitted_for_modeling')}",
+            "**this Gate fitted no model and started no modeling**; it made "
+            "the successor eligible, nothing more. Any live M2 execution or "
+            "block-admission marker was set by the later, separately "
+            "authorized paired evaluation.",
             # The SOLE live next-action pointer while this Gate is CURRENT.
             (
                 "- **Immediate successor of this Gate (historical):** "
@@ -4062,10 +4078,16 @@ def render_current_state(record: dict) -> str:
             "retained-block decision is REQUIRED** "
             f"(`m2_retained_block_decision_required="
             f"{record.get('m2_retained_block_decision_required')}`)",
+            "- \u2705 **M2 modeling started (executed):** "
+            f"{record.get('m2_modeling_started')} — **M2 block admitted for "
+            "modeling:** "
+            f"{record.get('m2_block_admitted_for_modeling')}. The authorized "
+            "development modeling for this comparison WAS executed.",
             "- \u26d4 **M2 incremental evaluation authorized:** "
-            f"{record.get('m2_incremental_evaluation_authorized')} (the "
-            "one-action authorization was consumed and is not standing) — "
-            f"**M2 modeling started:** {record.get('m2_modeling_started')}",
+            f"{record.get('m2_incremental_evaluation_authorized')} — the "
+            "one-action authorization was CONSUMED by this execution and is "
+            "not standing. A consumed authorization is `false`; it does "
+            "**not** mean the modeling never happened.",
             "- \u26d4 **Historical Stage127 D0 Gate remains** "
             f"`{record.get('stage127_m2_market_data_gate_status')}`; the "
             "terminal Stage128 D2 Gate result "
@@ -5096,15 +5118,23 @@ def derive_stage127_m2_incremental_evaluation_markers(root: str) -> dict:
             _NEXT_RESEARCH_ACTION_ID_AFTER_M2_INCREMENTAL_EVALUATION
         ),
         "next_research_action_pointer_is_not_authorization": True,
-        # The one-action authorization was CONSUMED by this execution and is
-        # never left standing.
+        # AUTHORIZATION, EXECUTION and RETENTION are three different things.
+        #
+        # The one-action authorization was CONSUMED by this execution, so the
+        # authorization flag is False again. That False must never be read as
+        # "M2 modeling never happened": the authorized development modeling
+        # WAS executed (44 canonical primary fits), so the execution flags are
+        # True. Retention remains undecided and stays False.
         "m2_incremental_evaluation_authorized": False,
-        "m2_modeling_started": False,
+        "m2_started": True,
+        "m2_modeling_started": True,
         "m2_block_retained": False,
         "m2_retained_block_decision_required": True,
         "m2_authorized": False,
-        "m2_started": False,
-        "m2_block_admitted_for_modeling": False,
+        # Truthful live admission field: the D2 Gate passed and the authorized
+        # incremental models were actually fitted on the admitted block.
+        "m2_block_admitted_for_modeling": True,
+        "m2_block_admitted_for_authorized_incremental_evaluation": True,
         "paper_winner_selected": False,
         "final_model_selected": False,
         "full_development_refit_performed": False,

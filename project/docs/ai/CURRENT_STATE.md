@@ -12,14 +12,14 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m2-retained-block-human-decision`
 - **Last stage commit:** `02b5e216a6614f7ac92a81f0d707c2dc960d53f6`
-- **Generated from commit:** `02b5e216a6614f7ac92a81f0d707c2dc960d53f6` (branch `stage127-m2-incremental-evaluation`, informational)
+- **Generated from commit:** `e96fe83067f8dced987f5293472669d214e6e099` (branch `stage127-m2-incremental-evaluation`, informational)
 - **Baseline:** `origin/main` @ `fb5f0e13cb806e0ba28f0372b3b2264881564950`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **114 assertions, 0 failed**, all_pass=True
+- ✅ **119 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -35,7 +35,7 @@ _Historical record, **not** the current scientific action. The Gate was executed
 - **M2 market evidence collected:** True — **independently validated:** True (163230 normalized daily observations)
 - **Evidence bundle SHA256:** `d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`
 - Evidence collection is recorded **separately** from block admission. `m2_data_collected` remains `false` because in this schema it is a frozen prohibition marker meaning "M2 data has entered the authorized M2 modeling pipeline" — not a statement that no M2 evidence exists.
-- **M2 incremental evaluation authorized:** False — **M2 modeling started:** False
+- **M2 incremental evaluation authorized (live):** False — **M2 modeling started (live):** True. These are CURRENT global markers, not statements about this historical Gate: this Gate fitted no model. Any `True` above was produced by a later, separately authorized action.
 
 ### Stage127 — zero-trade "trading day" semantics adjudication
 
@@ -63,7 +63,7 @@ _Historical, completed frozen-design context — **not** the current scientific 
 - **Research action completed by this freeze:** `stage128-m2-boundary-month-return-design-freeze`
 - **Immediate successor of this freeze (historical):** `stage128-m2-d2-gate-rerun` — the canonical M2 Gate re-run under the frozen D2 construct, now COMPLETED (see the current section below). This line is historical: it is not the branch's live next-action pointer.
 - ⛔ **D2 Gate rerun authorized (standing):** False — the one-action authorization that executed the Gate re-run was consumed by that execution and is not standing
-- ⛔ **M2 admitted:** False — **M2 incremental evaluation authorized:** False — **M2 modeling started:** False
+- ⛔ **M2 admitted:** False — **M2 incremental evaluation authorized:** False — **this freeze started no modeling** (it is a design contract only; any live M2 execution marker was set by a later, separately authorized action)
 - 🔒 **Final test locked:** final_test_unlocked=False, final_test_access_authorized=False, final_test_evaluation_performed=False
 - Contract: `project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md`; machine-readable package: `project/stage128/`
 
@@ -76,7 +76,7 @@ _The canonical M2 data-admission Gate, re-executed ONCE under the already-frozen
 - **D2 equity return:** 539/666 = 0.8093093093 — **three-variable common sample:** 539/666 = 0.8093093093
 - ⛔ **Historical Stage127 D0 Gate remains** `FAIL_M2_DATA_GATE` — preserved unchanged in its own Stage127 artifacts; this re-run never rewrites it
 - **Authorization consumed by this execution:** True — **D2 Gate rerun authorized (standing):** False
-- **This is DATA ADMISSION only.** It does not say M2 improves prediction. **M2 incremental evaluation authorized:** False — **M2 modeling started:** False — **M2 block admitted for modeling:** False
+- **This is DATA ADMISSION only.** It does not say M2 improves prediction. **M2 incremental evaluation authorized:** False — **this Gate fitted no model and started no modeling**; it made the successor eligible, nothing more. Any live M2 execution or block-admission marker was set by the later, separately authorized paired evaluation.
 - **Immediate successor of this Gate (historical):** `stage127-m2-incremental-evaluation` — the paired M2 incremental evaluation, since AUTHORIZED and COMPLETED (see the current section below). This line is historical: it is not the branch's live next-action pointer.
 - The post-lock eligibility audit frozen by the design-freeze contract remains REQUIRED before any M2 predictive result is interpreted. It was not executed by this Gate.
 - Package: `project/stage128/`; interpretation: `project/stage128/README_STAGE128_M2_D2_GATE_RERUN.md`
@@ -89,7 +89,8 @@ _The paired, development-only comparison of the frozen M2 block against the froz
 - **Paired common sample:** 539 rows — **pooled locked-validation OOF rows:** 366
 - **Primary predictive model fits:** 44 (both blocks refitted on identical common-sample training rows)
 - ⛔ **M2 block retained:** False — this action reports OBSERVED development evidence only and selects no winner; a **human retained-block decision is REQUIRED** (`m2_retained_block_decision_required=True`)
-- ⛔ **M2 incremental evaluation authorized:** False (the one-action authorization was consumed and is not standing) — **M2 modeling started:** False
+- ✅ **M2 modeling started (executed):** True — **M2 block admitted for modeling:** True. The authorized development modeling for this comparison WAS executed.
+- ⛔ **M2 incremental evaluation authorized:** False — the one-action authorization was CONSUMED by this execution and is not standing. A consumed authorization is `false`; it does **not** mean the modeling never happened.
 - ⛔ **Historical Stage127 D0 Gate remains** `FAIL_M2_DATA_GATE`; the terminal Stage128 D2 Gate result `PASS_FOR_M2_INCREMENTAL_EVALUATION` is preserved unchanged
 - 🔒 **Final test locked:** final_test_unlocked=False, final_test_access_authorized=False, final_test_evaluation_performed=False — **M3 started:** False — **M4 started:** False
 - **Next research action (pointer only):** `stage128-m2-retained-block-human-decision` — a human retained-block review. A pointer is **not** an authorization.
@@ -139,5 +140,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `39a8014fbdedca497874c767e6b3edc98fb5d20ad0db9acc3ace439addb6a492`_
-_generated_at_utc: 2026-08-01T10:48:26Z (informational)_
+_state_fingerprint: `1b586204c8c1e3924502518a0657a980c8736bfe298aab64e1bacc04400d47ac`_
+_generated_at_utc: 2026-08-01T11:37:08Z (informational)_

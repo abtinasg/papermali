@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 114,
+  "assertion_count": 119,
   "assertions": [
     {
       "detail": "",
@@ -463,7 +463,7 @@
       "status": "PASS"
     },
     {
-      "detail": "a DATA-ADMISSION PASS makes the successor eligible, never authorized: no M2 authorization, no modeling, no final-test unlock",
+      "detail": "a DATA-ADMISSION PASS makes the successor eligible, never authorized: no M2 authorization, no modeling, no final-test unlock. Modeling that a LATER separately-authorized action actually executed is a different fact and is asserted separately.",
       "name": "stage128_d2_gate_rerun_pass_does_not_authorize_m2",
       "status": "PASS"
     },
@@ -515,6 +515,31 @@
     {
       "detail": "the paired development comparison retains nothing, selects no winner, unlocks no final test and starts no successor block",
       "name": "m2_evaluation_selects_no_winner_and_retains_no_block",
+      "status": "PASS"
+    },
+    {
+      "detail": "a completed incremental evaluation with 44 canonical primary fits must report M2 modeling as STARTED and the block as admitted; a consumed authorization never erases the executed modeling",
+      "name": "completed_m2_evaluation_with_44_fits_implies_modeling_started",
+      "status": "PASS"
+    },
+    {
+      "detail": "the consumed one-action authorization must remain False",
+      "name": "m2_evaluation_consumed_authorization_stays_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "retention stays undecided until a human decides it",
+      "name": "m2_block_retained_remains_false_pending_human_decision",
+      "status": "PASS"
+    },
+    {
+      "detail": "the completed M2 evaluation starts and authorizes no successor block",
+      "name": "m3_and_m4_remain_unauthorized_and_unstarted",
+      "status": "PASS"
+    },
+    {
+      "detail": "the final test remains locked after the paired evaluation",
+      "name": "final_test_remains_locked_after_the_m2_evaluation",
       "status": "PASS"
     },
     {
@@ -574,7 +599,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "deba21ab8f4b0d6aed0036ff7cc877a4dc59b9da",
+  "code_commit": "02b5e216a6614f7ac92a81f0d707c2dc960d53f6",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -582,7 +607,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "deba21ab8f4b0d6aed0036ff7cc877a4dc59b9da",
+  "generated_at": "02b5e216a6614f7ac92a81f0d707c2dc960d53f6",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -600,7 +625,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "bc38578b4274cb9badb7b786ad7bbc043732d9f6531121e4cd5c91fd9d307508",
+  "source_file_sha256": "a559d3c741033dd6a19a8154bef5d7827cea7d06ce08c35694b1450be889c5b6",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {
@@ -613,7 +638,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "147e2eb293fb77447dc798286e73d90310571e59b006f64d62cc411ee7fcc7df",
+  "test_file_sha256": "25ab87b96334fbbc791f6ab01ef4079c3b7f768d27fb6a5f00edf17803ad23f6",
   "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v2_lean"

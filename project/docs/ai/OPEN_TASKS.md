@@ -58,8 +58,21 @@ claim is made. The confirmatory family (`M2_minus_M1`, `M3_minus_M2`,
 `M4_minus_M3`) is INCOMPLETE: `holm_family_complete = false`,
 `holm_final_adjustment_deferred = true`.
 
-No model was fit on final-test rows, no final-test predictor or target value
-was read, no full-development refit occurred, and M3/M4 were not started.
+No final-test predictor or target value was parsed, inspected, stored in an
+action artifact, used for preprocessing, used for fitting, used for prediction
+or used for evaluation. The frozen streaming loader structurally encountered
+346 final-test row records and rejected them before value parsing — a
+structural skip, not a read. No model was fit on a final-test row and no
+full-development refit occurred, and M3/M4 were not started.
+
+**Live-state note.** The authorized M2 development modeling WAS executed: 44
+canonical primary predictive fits. The one-action authorization was CONSUMED,
+so `m2_incremental_evaluation_authorized = false` again — that is an
+AUTHORIZATION fact and does not mean the modeling never happened.
+`m2_started = true`, `m2_modeling_started = true` and
+`m2_block_admitted_for_modeling = true` record the execution;
+`m2_block_retained = false` with `m2_retained_block_decision_required = true`
+records that retention is still undecided.
 
 ### What is open now
 

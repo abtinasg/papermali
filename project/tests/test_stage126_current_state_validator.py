@@ -1506,14 +1506,19 @@ def test_live_handoff_labels_match_the_live_research_state():
         assert state["next_research_action_id"] == (
             "stage128-m2-retained-block-human-decision"
         )
-        # And nothing further is authorized by advancing a label.
+        # And nothing further is AUTHORIZED by advancing a label.
         for field in (
             "stage128_m2_d2_gate_rerun_authorized",
             "m2_incremental_evaluation_authorized",
-            "m2_modeling_started",
             "final_test_unlocked",
         ):
             assert state[field] is False, field
+        # `m2_modeling_started` is an EXECUTION fact, not an authorization: it
+        # is True because the separately authorized paired M2 evaluation
+        # actually ran. A label fix never sets it, and a consumed
+        # authorization never unsets it.
+        assert state["m2_modeling_started"] is True
+        assert state["m2_block_retained"] is False
         assert state["stage127_m2_market_data_gate_status"] == (
             "FAIL_M2_DATA_GATE"
         )
@@ -1576,6 +1581,11 @@ _RERUN_RENDERING_ASSERTIONS = (
     "current_state_gate_rerun_section_not_current_after_successor",
     "m2_incremental_evaluation_authorization_is_consumed_not_standing",
     "m2_evaluation_selects_no_winner_and_retains_no_block",
+    "completed_m2_evaluation_with_44_fits_implies_modeling_started",
+    "m2_evaluation_consumed_authorization_stays_false",
+    "m2_block_retained_remains_false_pending_human_decision",
+    "m3_and_m4_remain_unauthorized_and_unstarted",
+    "final_test_remains_locked_after_the_m2_evaluation",
     "m2_evaluation_records_a_required_human_retained_block_decision",
     "current_state_freeze_section_claims_only_its_own_action",
     "current_state_freeze_section_does_not_claim_the_gate_rerun",
@@ -1688,3 +1698,39 @@ def test_roadmap_prose_drops_the_superseded_pointer_pair_claim():
         "stage128-m2-boundary-month-return-design-freeze`" not in text
     )
     assert "are now **historical** pointer state" in text
+
+
+def test_live_m2_state_distinguishes_authorization_execution_and_retention():
+    """Consumed authorization must not erase the executed M2 modeling."""
+    state = json.loads(open(
+        os.path.join(REAL_ROOT, "project", "docs", "ai",
+                     "handoff_state.json"), encoding="utf-8").read())
+    # Executed.
+    assert state["stage127_m2_incremental_evaluation_executed"] is True
+    assert state["stage127_m2_incremental_evaluation_completed"] is True
+    assert state[
+        "stage127_m2_incremental_evaluation_authorization_consumed"] is True
+    assert state["stage127_m2_incremental_evaluation_primary_model_fits"] == 44
+    assert state["m2_started"] is True
+    assert state["m2_modeling_started"] is True
+    assert state["m2_block_admitted_for_modeling"] is True
+    assert state[
+        "m2_block_admitted_for_authorized_incremental_evaluation"] is True
+    # Authorization consumed.
+    assert state["m2_incremental_evaluation_authorized"] is False
+    # Retention undecided; successors and the final test untouched.
+    assert state["m2_block_retained"] is False
+    assert state["m2_retained_block_decision_required"] is True
+    for field in (
+        "m3_authorized", "m3_started", "m4_authorized", "m4_started",
+        "final_test_unlocked", "final_test_access_authorized",
+        "final_test_evaluation_performed",
+    ):
+        assert state[field] is False, field
+
+
+def test_current_state_does_not_report_modeling_as_never_started():
+    text = open(_CURRENT_STATE, encoding="utf-8").read()
+    assert "**M2 modeling started (executed):** True" in text
+    assert "**M2 block admitted for modeling:** True" in text
+    assert "does **not** mean the modeling never happened" in text

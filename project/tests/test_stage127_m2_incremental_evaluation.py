@@ -6,11 +6,13 @@ retuned and no winner is selected.
 """
 from __future__ import annotations
 
+import ast
 import csv
 import hashlib
 import json
 import math
 import os
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -667,10 +669,221 @@ def test_handoff_markers_do_not_re_authorize_anything():
     markers = ev.handoff_markers({"fit_audit": {
         "observed_primary_predictive_fit_count": 44}})
     assert markers["stage127_m2_incremental_evaluation_completed"] is True
+    # Consumed authorization -> False. That is an AUTHORIZATION fact and must
+    # never be read as "the modeling never happened".
     assert markers["m2_incremental_evaluation_authorized"] is False
-    assert markers["m2_modeling_started"] is False
     assert markers["m2_block_retained"] is False
     assert markers["m2_retained_block_decision_required"] is True
+    # Execution facts: the authorized development modeling WAS executed.
+    assert markers["m2_started"] is True
+    assert markers["m2_modeling_started"] is True
+    assert markers[
+        "m2_block_admitted_for_authorized_incremental_evaluation"] is True
+    assert markers[
+        "stage127_m2_incremental_evaluation_primary_model_fits"] == 44
     assert markers["final_test_unlocked"] is False
     assert markers["m3_started"] is False and markers["m3_authorized"] is False
     assert markers["m4_started"] is False and markers["m4_authorized"] is False
+
+
+# --------------------------------------------------------------------------- #
+# Immutable original authorized-execution provenance
+# --------------------------------------------------------------------------- #
+
+import platform as _platform  # noqa: E402
+
+ORIGINAL_BASE_COMMIT = "fb5f0e13cb806e0ba28f0372b3b2264881564950"
+ORIGINAL_ARTIFACT_COMMIT = "96a1d6b19b91756b6a0257344c50754fb6d38c7d"
+ORIGINAL_PYTHON = "3.14.0"
+ORIGINAL_PLATFORM = "macOS-26.5.2-arm64-arm-64bit-Mach-O"
+ORIGINAL_RUNTIME_VERSIONS = {
+    "jdatetime": "5.3.0",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "python": "3.14.0",
+    "scikit-learn": "1.9.0",
+    "xgboost": "3.3.0",
+}
+
+
+def _assert_original_provenance(oe: dict) -> None:
+    assert oe["action_id"] == "stage127-m2-incremental-evaluation"
+    assert oe["authorization_sha256"] == ev.AUTHORIZATION_TEXT_SHA256
+    assert oe["source_base_commit"] == ORIGINAL_BASE_COMMIT
+    assert oe["canonical_scientific_artifact_commit"] == ORIGINAL_ARTIFACT_COMMIT
+    assert oe["python_version"] == ORIGINAL_PYTHON
+    assert oe["platform"] == ORIGINAL_PLATFORM
+    assert oe["runtime_versions"] == ORIGINAL_RUNTIME_VERSIONS
+    assert oe["canonical_authorized_execution_count"] == 1
+    assert oe["scientific_decision_count"] == 1
+    assert oe["canonical_primary_predictive_fit_count"] == 44
+    assert oe["immutable_provenance"] is True
+    assert oe["derived_dynamically_from_current_interpreter"] is False
+    assert oe["overwritten_by_verification_or_maintenance"] is False
+
+
+def test_original_provenance_matches_the_committed_original_metadata():
+    """The locked values are the ones the canonical artifact commit wrote."""
+    out = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "show",
+         f"{ORIGINAL_ARTIFACT_COMMIT}:{ev.OUT_DIR_REL}/{ev.F_METADATA}"],
+        capture_output=True, text=True,
+    )
+    if out.returncode != 0:
+        pytest.skip("canonical artifact commit not present in this checkout")
+    committed = json.loads(out.stdout)
+    assert committed["execution_environment"]["python_version"] == (
+        ORIGINAL_PYTHON)
+    assert committed["execution_environment"]["platform"] == ORIGINAL_PLATFORM
+    assert committed["runtime_versions"] == ORIGINAL_RUNTIME_VERSIONS
+    assert committed["source_main_commit"] == ORIGINAL_BASE_COMMIT
+    assert committed["primary_predictive_model_fits"] == 44
+    _assert_original_provenance(ev.ORIGINAL_AUTHORIZED_SCIENTIFIC_EXECUTION)
+
+
+@requires_package
+def test_written_metadata_carries_the_immutable_provenance_record():
+    meta = _load(ev.F_METADATA)
+    _assert_original_provenance(meta["original_authorized_scientific_execution"])
+    # The ambiguous dynamic fields must be gone.
+    assert "execution_environment" not in meta
+    assert "runtime_versions" not in meta
+    assert "source_main_commit" not in meta
+    assert "latest_non_scientific_verification_environment" in meta
+
+
+@requires_package
+def test_verification_environment_is_labelled_non_scientific():
+    v = _load(ev.F_METADATA)["latest_non_scientific_verification_environment"]
+    assert v["scientific_execution"] is False
+    assert v["new_scientific_decision"] is False
+    assert v["new_human_authorization"] is False
+    assert v["is_original_authorized_execution_environment"] is False
+
+
+def test_original_provenance_contains_no_dynamic_call():
+    """The locked record must be literals, never re-derived at write time."""
+    src = (REPO_ROOT / ev.SRC_REL).read_text(encoding="utf-8")
+    tree = ast.parse(src)
+    assign = next(
+        n for n in tree.body
+        if isinstance(n, ast.AnnAssign | ast.Assign)
+        and ev.__name__ is not None
+        and "ORIGINAL_AUTHORIZED_SCIENTIFIC_EXECUTION" in ast.dump(n)
+    )
+    for node in ast.walk(assign):
+        assert not isinstance(node, ast.Call), (
+            "original execution provenance must be literal constants, never "
+            "derived from platform/importlib/git at write time"
+        )
+
+
+@requires_package
+def test_simulated_upgrade_and_moved_main_leave_provenance_unchanged(
+        monkeypatch):
+    """Monkeypatch interpreter, platform, packages and origin/main."""
+    monkeypatch.setattr(ev.platform, "python_version", lambda: "3.15.0")
+    monkeypatch.setattr(
+        ev.platform, "platform", lambda: "Linux-9.9-x86_64-with-glibc2.99")
+    monkeypatch.setattr(ev.m1, "runtime_versions", lambda: {
+        "python": "3.15.0", "numpy": "9.9.9", "pandas": "9.9.9",
+        "scikit-learn": "9.9.9", "xgboost": "9.9.9", "jdatetime": "9.9.9",
+    })
+    monkeypatch.setattr(
+        ev, "_git", lambda *a, **k: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+    meta = ev.build_metadata(
+        REPO_ROOT,
+        {ev.F_DECISION: "{}"},
+        {"frozen": {"frozen_authority_sha256": {}, "frozen_sources_sha256": {}},
+         "fit_audit": {"observed_primary_predictive_fit_count": 44}},
+    )
+    # 4. every original field is unchanged
+    _assert_original_provenance(meta["original_authorized_scientific_execution"])
+    # 5. the changed runtime values appear ONLY in the non-scientific record
+    v = meta["latest_non_scientific_verification_environment"]
+    assert v["python_version"] == "3.15.0"
+    assert v["platform"] == "Linux-9.9-x86_64-with-glibc2.99"
+    assert v["runtime_versions"]["numpy"] == "9.9.9"
+    assert v["scientific_execution"] is False
+    assert v["is_original_authorized_execution_environment"] is False
+    # A moved origin/main never reaches the locked provenance.
+    assert meta["original_authorized_scientific_execution"][
+        "source_base_commit"] == ORIGINAL_BASE_COMMIT
+    assert "deadbeef" not in json.dumps(
+        meta["original_authorized_scientific_execution"])
+    # 7-9. canonical counts are untouched
+    sem = meta["execution_count_semantics"]
+    assert sem["canonical_authorized_scientific_executions"] == 1
+    assert sem["scientific_decisions"] == 1
+    assert sem["canonical_primary_predictive_fits_in_that_execution"] == 44
+
+
+@requires_package
+def test_check_rewrites_no_committed_file(monkeypatch):
+    """6. `--check` recomputes and verifies; it writes nothing."""
+    before = {
+        name: (OUT / name).read_bytes()
+        for name in list(ev.TRACKED_CONTENT_FILES) + [ev.F_METADATA]
+    }
+    monkeypatch.setattr(ev.platform, "python_version", lambda: "3.15.0")
+    result = ev.run(project_dir=REPO_ROOT / "project", check=True)
+    assert result["mode"] == "check"
+    assert result["drift"] == []
+    for name, data in before.items():
+        assert (OUT / name).read_bytes() == data, name
+
+
+def test_execution_count_semantics_separate_verification_from_execution():
+    sem = ev.EXECUTION_COUNT_SEMANTICS
+    assert sem["canonical_authorized_scientific_executions"] == 1
+    assert sem["scientific_decisions"] == 1
+    assert sem["canonical_primary_predictive_fits_in_that_execution"] == 44
+    assert sem[
+        "deterministic_verification_recomputation_is_not_a_new_execution"
+    ] is True
+    assert sem["verification_recomputation_changes_canonical_counts"] is False
+    assert "not a lifetime count" in sem["note"]
+
+
+# --------------------------------------------------------------------------- #
+# Precise final-test wording
+# --------------------------------------------------------------------------- #
+
+@requires_package
+def test_final_test_rows_are_structurally_encountered_but_never_parsed():
+    f = _load(ev.F_FIREWALL)
+    assert ev.FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED == 346
+    assert f["final_test_rows_seen_and_skipped_without_parsing"] == 346
+    assert f["final_test_predictor_values_read"] == 0
+    assert f["final_test_target_values_read"] == 0
+    assert f["final_test_predictions"] == 0
+    assert f["final_test_model_fits"] == 0
+    assert f["final_test_evaluation_performed"] is False
+    assert f["final_test_keys_in_any_artifact"] == 0
+
+
+@requires_package
+def test_readme_states_the_final_test_claim_precisely():
+    text = (OUT / ev.F_README).read_text(encoding="utf-8")
+    assert "structurally encountered" in text
+    assert "346 final-test row records" in text
+    assert "rejected them before value parsing" in text
+    assert "parsed, inspected, stored in an action artifact" in text
+    # The imprecise absolute claim must not appear.
+    assert "no final-test row was read" not in text.lower()
+
+
+@requires_package
+def test_readme_reports_the_canonical_company_counts():
+    text = (OUT / ev.F_README).read_text(encoding="utf-8")
+    attr = _load(ev.F_ATTRITION)
+    assert attr["parent_development"]["companies"] == 110
+    assert attr["common_sample"]["companies"] == 108
+    assert attr["dropped_by_d2_ineligibility"]["companies"] == 53
+    assert "666 rows (68 positive, 598 negative, 110 companies)" in text
+    assert "539 rows (55 positive, 484 negative, 108 companies)" in text
+    assert "127 rows (13 positive, 114 negative), involving 53" in text
+    # The fabricated counts must never reappear on a human-facing surface.
+    assert "130 companies" not in text
+    assert "129 companies" not in text

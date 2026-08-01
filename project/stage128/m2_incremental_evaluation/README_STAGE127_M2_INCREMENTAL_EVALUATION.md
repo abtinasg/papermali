@@ -2,14 +2,15 @@
 
 **Action:** `stage127-m2-incremental-evaluation` — one authorized execution, consumed.
 
-**Development-only.** No final-test predictor or target value was read, no final-test model was fit, no configuration was retuned, no feature was searched, no winner was selected and M3/M4 were not started.
+**Development-only.** No final-test predictor or target value was parsed, inspected, stored in an action artifact, used for preprocessing, used for fitting, used for prediction or used for evaluation. The frozen streaming loader structurally encountered 346 final-test row records and rejected them before value parsing — that is a structural skip, not a read. No configuration was retuned, no feature was searched, no winner was selected and M3/M4 were not started.
 
 ## What was compared, and on which rows
 
 Both blocks were REFITTED on exactly the same common-sample training rows and evaluated on exactly the same common-sample validation rows. The original 666-row M1 results are NOT compared against these 539-row M2 results; that comparison would confound sample restriction with model change and is deliberately not made.
 
-- Parent M1 development surface: 666 rows (68 positive, 110 companies)
+- Parent M1 development surface: 666 rows (68 positive, 598 negative, 110 companies)
 - M2 three-variable common sample: 539 rows (55 positive, 484 negative, 108 companies)
+- Dropped by D2 ineligibility: 127 rows (13 positive, 114 negative), involving 53 distinct companies
 - Attrition: 127 rows (0.190690690691) — reported, never interpreted as model improvement
 - Pooled locked-validation OOF rows: 366 (28 positive)
 
@@ -55,4 +56,4 @@ This action reports OBSERVED development evidence. It creates no new PASS/FAIL t
 
 ## Counters
 
-primary predictive model fits = 44; final-test predictor values read = 0; final-test target values read = 0; final-test predictions = 0; full-development refits = 0; M3 executions = 0; M4 executions = 0; winners selected = 0.
+canonical primary predictive model fits = 44 (the canonical SCIENTIFIC fit count of the one authorized execution — `--check` and the test suite deterministically recompute the same models to verify the committed artifacts, which is verification, not a new scientific execution); canonical authorized scientific executions = 1; scientific decisions = 1; final-test predictor values parsed/inspected = 0; final-test target values parsed/inspected = 0; final-test fits = 0; final-test predictions = 0; final-test evaluation = 0; final-test keys in scientific artifacts = 0; final-test row records structurally encountered and rejected before value parsing = 346; full-development refits = 0; M3 executions = 0; M4 executions = 0; winners selected = 0.

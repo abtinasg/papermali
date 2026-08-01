@@ -4,14 +4,18 @@
   "composed_module_sha256": {
     "project/run_stage127_m2_incremental_evaluation.py": "9a9883f6345afaaa530f7f9cab8e5deaa87eeab3794c697f5784b628d1df8478",
     "project/src/stage126_m1_primary_development_tuning.py": "ae63bee24c3b868919b008cb15a0d4f4bfb8300ee6e3002a61e1e105d9391d82",
-    "project/src/stage127_m2_incremental_evaluation.py": "01b594708f17aa2a549238516d23d9faf3ac2de51aad585b96eaecbb51a742b4"
+    "project/src/stage127_m2_incremental_evaluation.py": "c72207134694b5a73a467dab22fb89fa29d8a1301212fd40b2d709e9cf2201b5"
   },
   "contract_id": "stage127_m2_incremental_evaluation",
   "contract_version": "stage127_m2_incremental_evaluation_v1",
   "decision_id": "stage127-m2-incremental-evaluation",
-  "execution_environment": {
-    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
-    "python_version": "3.14.0"
+  "execution_count_semantics": {
+    "canonical_authorized_scientific_executions": 1,
+    "canonical_primary_predictive_fits_in_that_execution": 44,
+    "deterministic_verification_recomputation_is_not_a_new_execution": true,
+    "note": "44 is the CANONICAL SCIENTIFIC fit count of the single authorized execution of this action — not a lifetime count of CPU-level estimator fits. `--check` and the test suite deterministically RECOMPUTE the same models to verify the committed artifacts; those recomputations are verification, not new scientific executions, they make no new scientific decision, they consume no new human authorization, and they never change the canonical counts.",
+    "scientific_decisions": 1,
+    "verification_recomputation_changes_canonical_counts": false
   },
   "external_bundle_sha256": "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec",
   "frozen_authority_sha256": {
@@ -36,8 +40,47 @@
   "gate_status_consumed": "PASS_FOR_M2_INCREMENTAL_EVALUATION",
   "historical_d0_gate_status": "FAIL_M2_DATA_GATE",
   "human_source_utterance_sha256": "a9999c0cab0ec43d200cbc2d00112132e27c4bd7ed52e0db92ef0d5eb6c3cdc6",
+  "latest_non_scientific_verification_environment": {
+    "is_original_authorized_execution_environment": false,
+    "new_human_authorization": false,
+    "new_scientific_decision": false,
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python_version": "3.14.0",
+    "role": "verification_or_maintenance_regeneration_only",
+    "runtime_versions": {
+      "jdatetime": "5.3.0",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "python": "3.14.0",
+      "scikit-learn": "1.9.0",
+      "xgboost": "3.3.0"
+    },
+    "scientific_execution": false
+  },
+  "original_authorized_scientific_execution": {
+    "action_id": "stage127-m2-incremental-evaluation",
+    "authorization_sha256": "a9999c0cab0ec43d200cbc2d00112132e27c4bd7ed52e0db92ef0d5eb6c3cdc6",
+    "canonical_authorized_execution_count": 1,
+    "canonical_primary_predictive_fit_count": 44,
+    "canonical_scientific_artifact_commit": "96a1d6b19b91756b6a0257344c50754fb6d38c7d",
+    "derived_dynamically_from_current_interpreter": false,
+    "immutable_provenance": true,
+    "overwritten_by_verification_or_maintenance": false,
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python_version": "3.14.0",
+    "runtime_versions": {
+      "jdatetime": "5.3.0",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "python": "3.14.0",
+      "scikit-learn": "1.9.0",
+      "xgboost": "3.3.0"
+    },
+    "scientific_decision_count": 1,
+    "source_base_commit": "fb5f0e13cb806e0ba28f0372b3b2264881564950"
+  },
   "package_artifacts_sha256": {
-    "project/stage128/m2_incremental_evaluation/README_STAGE127_M2_INCREMENTAL_EVALUATION.md": "665d45ca99d87e44cd1f6e8d0fe1be88db34f796d87ccff7650fb83edddf8c7c",
+    "project/stage128/m2_incremental_evaluation/README_STAGE127_M2_INCREMENTAL_EVALUATION.md": "abc37ac93d8bd9ed7dda3cac1433e4f2747732038cfc2f920b2a4271629b636a",
     "project/stage128/m2_incremental_evaluation/stage127_m2_block_model_metrics.csv": "b28f2fa4fe2852680ad970399276241b5921784a4c546e5aa9a2e556757b9d87",
     "project/stage128/m2_incremental_evaluation/stage127_m2_calibration_report.json": "a5cd52777f5353942a94ddfdb898e1eca9538695b8b66a601286c44e980225af",
     "project/stage128/m2_incremental_evaluation/stage127_m2_common_sample_join_audit.json": "e6da66d96810ef7491ab5db0018909419ecc7760000e8f390b5bbadb0ef3c159",
@@ -46,7 +89,7 @@
     "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_decision.json": "bda5fa054b4e00876b7be2b8ddd8726efc20c21117361e22a819d662e18814de",
     "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_execution_contract.json": "9087212d3fcbd06bd5438200fb976fa1cf5b178de52f9e20f759a6af4d9f3063",
     "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_human_authorization_record.json": "b30a9b71a79be664ccac28e10ceb13a6c1c773ddd2450cc3212e174e42223f55",
-    "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_qc_report.json": "fd782364e84aec99cd93906a1257495b7313988a45bc87740d8cb7ab7e860ef5",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_qc_report.json": "7ca670d3f0c4dfd98dc5d42cbf62f5d967b521f1362e2f76e8fd284314d34990",
     "project/stage128/m2_incremental_evaluation/stage127_m2_multiplicity_family_status.json": "6c20ed4f64321b8d5083359fd3079283bbf006f62958d576b6e5090d43c88459",
     "project/stage128/m2_incremental_evaluation/stage127_m2_paired_bootstrap_delta_summary.json": "1c4d4275c938d9d80e24d8746b16c669ecb822d884921a2ee05811220c061a6d",
     "project/stage128/m2_incremental_evaluation/stage127_m2_paired_oof_predictions.csv": "923ce0929693cc07fbf5a81e16295334624ead19447ff87d6a49e7a6f2a26ceb",
@@ -57,15 +100,6 @@
   },
   "package_location": "project/stage128/m2_incremental_evaluation",
   "primary_predictive_model_fits": 44,
-  "runtime_versions": {
-    "jdatetime": "5.3.0",
-    "numpy": "2.4.6",
-    "pandas": "3.0.3",
-    "python": "3.14.0",
-    "scikit-learn": "1.9.0",
-    "xgboost": "3.3.0"
-  },
-  "source_main_commit": "fb5f0e13cb806e0ba28f0372b3b2264881564950",
   "source_repository": "abtinasg/papermali",
   "stage": "Stage128",
   "stage127_historical_artifacts_modified": false

@@ -1,7 +1,7 @@
 {
   "all_pass": true,
   "all_pass_semantics": "all_pass means every REQUIRED fail-closed assertion of this action passed. It is NOT a scientific verdict on M2: the observed paired evidence is reported separately and selects no winner.",
-  "assertion_count": 69,
+  "assertion_count": 74,
   "assertions": [
     {
       "detail": "",
@@ -326,6 +326,31 @@
     {
       "detail": "",
       "name": "no_shap_execution",
+      "status": "PASS"
+    },
+    {
+      "detail": "the loader structurally encounters final-test row records and rejects them before value parsing; values read remain 0",
+      "name": "final_test_rows_structurally_encountered_but_never_parsed",
+      "status": "PASS"
+    },
+    {
+      "detail": "the original authorized execution environment is a locked constant",
+      "name": "original_authorized_execution_provenance_is_locked",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "canonical_execution_and_decision_counts_remain_one",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "canonical_primary_fit_count_is_locked_at_44",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "verification_recomputation_is_not_a_scientific_execution",
       "status": "PASS"
     },
     {

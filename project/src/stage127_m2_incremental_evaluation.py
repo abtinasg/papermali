@@ -19,9 +19,12 @@ Development-only. This module:
   company-cluster bootstrap uncertainty;
 * records the multiplicity-family status with the family left incomplete.
 
-It fits no model on final-test rows, reads no final-test predictor or target
-value, performs no tuning, no grid search, no feature search, no SMOTE, no
-design change, no winner selection and no successor action.
+It parses, inspects, stores, preprocesses, fits, predicts and evaluates NO
+final-test predictor or target value. The frozen two-pass streaming loader
+does structurally encounter the final-test row records and rejects them before
+value parsing; that is a structural skip, not a read. It performs no tuning,
+no grid search, no feature search, no SMOTE, no design change, no winner
+selection and no successor action.
 """
 from __future__ import annotations
 
@@ -271,6 +274,71 @@ LOGISTIC_FIT_SEED = FINAL_OOF_SEEDS[0]
 #: 2 blocks x 2 folds x (1 logistic + 5 RF + 5 XGB).
 EXPECTED_PRIMARY_FIT_COUNT = 44
 
+#: IMMUTABLE provenance of the ONE authorized scientific execution of this
+#: action. Every value is a LOCKED CONSTANT verified against the metadata
+#: committed by the canonical scientific artifact commit. None of it is
+#: derived from ``platform``, ``importlib.metadata`` or ``origin/main``, so a
+#: later ``--check``, maintenance regeneration, interpreter upgrade or
+#: post-merge run cannot overwrite it.
+ORIGINAL_AUTHORIZED_SCIENTIFIC_EXECUTION: dict[str, Any] = {
+    "action_id": ACTION_ID,
+    "authorization_sha256": AUTHORIZATION_TEXT_SHA256,
+    "source_base_commit": "fb5f0e13cb806e0ba28f0372b3b2264881564950",
+    "canonical_scientific_artifact_commit": (
+        "96a1d6b19b91756b6a0257344c50754fb6d38c7d"
+    ),
+    "python_version": "3.14.0",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "runtime_versions": {
+        "jdatetime": "5.3.0",
+        "numpy": "2.4.6",
+        "pandas": "3.0.3",
+        "python": "3.14.0",
+        "scikit-learn": "1.9.0",
+        "xgboost": "3.3.0",
+    },
+    "canonical_authorized_execution_count": 1,
+    "scientific_decision_count": 1,
+    "canonical_primary_predictive_fit_count": EXPECTED_PRIMARY_FIT_COUNT,
+    "immutable_provenance": True,
+    "derived_dynamically_from_current_interpreter": False,
+    "overwritten_by_verification_or_maintenance": False,
+}
+
+#: What the counters above do and do not mean.
+EXECUTION_COUNT_SEMANTICS = {
+    "canonical_authorized_scientific_executions": 1,
+    "scientific_decisions": 1,
+    "canonical_primary_predictive_fits_in_that_execution": (
+        EXPECTED_PRIMARY_FIT_COUNT
+    ),
+    "note": (
+        "44 is the CANONICAL SCIENTIFIC fit count of the single authorized "
+        "execution of this action — not a lifetime count of CPU-level "
+        "estimator fits. `--check` and the test suite deterministically "
+        "RECOMPUTE the same models to verify the committed artifacts; those "
+        "recomputations are verification, not new scientific executions, "
+        "they make no new scientific decision, they consume no new human "
+        "authorization, and they never change the canonical counts."
+    ),
+    "deterministic_verification_recomputation_is_not_a_new_execution": True,
+    "verification_recomputation_changes_canonical_counts": False,
+}
+
+
+def latest_non_scientific_verification_environment() -> dict[str, Any]:
+    """Environment of the CURRENT, explicitly non-scientific rebuild/check."""
+    return {
+        "role": "verification_or_maintenance_regeneration_only",
+        "scientific_execution": False,
+        "new_scientific_decision": False,
+        "new_human_authorization": False,
+        "is_original_authorized_execution_environment": False,
+        "python_version": platform.python_version(),
+        "platform": platform.platform(),
+        "runtime_versions": m1.runtime_versions(),
+    }
+
 # --------------------------------------------------------------------------- #
 # Frozen sample expectations (fail closed; never used to relax loading)
 # --------------------------------------------------------------------------- #
@@ -291,6 +359,12 @@ EXPECTED_COMMON_VALIDATION_POSITIVES = {
 }
 EXPECTED_POOLED_OOF_ROWS = 366
 EXPECTED_POOLED_OOF_POSITIVE = 28
+
+#: The frozen streaming loader structurally encounters these final-test row
+#: records and rejects them BEFORE parsing any predictor or target value.
+#: Recording the number keeps the firewall claim literally precise: values
+#: read = 0, rows structurally encountered != 0.
+FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED = 346
 
 D2_FEATURES_REL = "project/stage128/stage128_m2_d2_development_features.csv"
 GATE_DECISION_REL = "project/stage128/stage128_m2_d2_gate_rerun_decision.json"
@@ -1884,6 +1958,49 @@ def build_qc_report(
     add("no_m3_or_m4_execution",
         firewall["m3_executions"] == 0 and firewall["m4_executions"] == 0)
     add("no_shap_execution", firewall["shap_executions"] == 0)
+    add("final_test_rows_structurally_encountered_but_never_parsed",
+        firewall["final_test_rows_seen_and_skipped_without_parsing"]
+        == FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED
+        and firewall["final_test_predictor_values_read"] == 0
+        and firewall["final_test_target_values_read"] == 0,
+        "the loader structurally encounters final-test row records and "
+        "rejects them before value parsing; values read remain 0")
+
+    # -- immutable original-execution provenance ---------------------------- #
+    oe = ORIGINAL_AUTHORIZED_SCIENTIFIC_EXECUTION
+    add("original_authorized_execution_provenance_is_locked",
+        oe["action_id"] == ACTION_ID
+        and oe["authorization_sha256"] == AUTHORIZATION_TEXT_SHA256
+        and oe["source_base_commit"] == EXPECTED_BASE_MERGE_COMMIT
+        and oe["canonical_scientific_artifact_commit"]
+        == "96a1d6b19b91756b6a0257344c50754fb6d38c7d"
+        and oe["python_version"] == "3.14.0"
+        and oe["platform"] == "macOS-26.5.2-arm64-arm-64bit-Mach-O"
+        and oe["immutable_provenance"] is True
+        and oe["derived_dynamically_from_current_interpreter"] is False
+        and oe["overwritten_by_verification_or_maintenance"] is False,
+        "the original authorized execution environment is a locked constant")
+    add("canonical_execution_and_decision_counts_remain_one",
+        oe["canonical_authorized_execution_count"] == 1
+        and oe["scientific_decision_count"] == 1
+        and EXECUTION_COUNT_SEMANTICS[
+            "canonical_authorized_scientific_executions"] == 1
+        and EXECUTION_COUNT_SEMANTICS["scientific_decisions"] == 1)
+    add("canonical_primary_fit_count_is_locked_at_44",
+        oe["canonical_primary_predictive_fit_count"]
+        == EXPECTED_PRIMARY_FIT_COUNT
+        and EXECUTION_COUNT_SEMANTICS[
+            "canonical_primary_predictive_fits_in_that_execution"] == 44)
+    add("verification_recomputation_is_not_a_scientific_execution",
+        EXECUTION_COUNT_SEMANTICS[
+            "deterministic_verification_recomputation_is_not_a_new_execution"]
+        is True
+        and EXECUTION_COUNT_SEMANTICS[
+            "verification_recomputation_changes_canonical_counts"] is False
+        and latest_non_scientific_verification_environment()[
+            "scientific_execution"] is False
+        and latest_non_scientific_verification_environment()[
+            "is_original_authorized_execution_environment"] is False)
 
     # -- interpretation --------------------------------------------------------- #
     add("no_winner_or_retained_block_selected",
@@ -1931,9 +2048,13 @@ def build_readme(
         f"**Action:** `{ACTION_ID}` — one authorized execution, consumed.",
         "",
         "**Development-only.** No final-test predictor or target value was "
-        "read, no final-test model was fit, no configuration was retuned, no "
-        "feature was searched, no winner was selected and M3/M4 were not "
-        "started.",
+        "parsed, inspected, stored in an action artifact, used for "
+        "preprocessing, used for fitting, used for prediction or used for "
+        "evaluation. The frozen streaming loader structurally encountered "
+        f"{FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED} final-test row records "
+        "and rejected them before value parsing — that is a structural skip, "
+        "not a read. No configuration was retuned, no feature was searched, "
+        "no winner was selected and M3/M4 were not started.",
         "",
         "## What was compared, and on which rows",
         "",
@@ -1946,12 +2067,19 @@ def build_readme(
         f"- Parent M1 development surface: "
         f"{attrition['parent_development']['rows']} rows "
         f"({attrition['parent_development']['positive']} positive, "
+        f"{attrition['parent_development']['negative']} negative, "
         f"{attrition['parent_development']['companies']} companies)",
         f"- M2 three-variable common sample: "
         f"{attrition['common_sample']['rows']} rows "
         f"({attrition['common_sample']['positive']} positive, "
         f"{attrition['common_sample']['negative']} negative, "
         f"{attrition['common_sample']['companies']} companies)",
+        f"- Dropped by D2 ineligibility: "
+        f"{attrition['dropped_by_d2_ineligibility']['rows']} rows "
+        f"({attrition['dropped_by_d2_ineligibility']['positive']} positive, "
+        f"{attrition['dropped_by_d2_ineligibility']['negative']} negative), "
+        f"involving {attrition['dropped_by_d2_ineligibility']['companies']} "
+        "distinct companies",
         f"- Attrition: {attrition['attrition_rows']} rows "
         f"({attrition['attrition_fraction']}) — reported, never interpreted "
         "as model improvement",
@@ -2032,11 +2160,20 @@ def build_readme(
         "",
         "## Counters",
         "",
-        f"primary predictive model fits = "
-        f"{decision['primary_predictive_model_fits']}; final-test predictor "
-        "values read = 0; final-test target values read = 0; final-test "
-        "predictions = 0; full-development refits = 0; M3 executions = 0; "
-        "M4 executions = 0; winners selected = 0.",
+        f"canonical primary predictive model fits = "
+        f"{decision['primary_predictive_model_fits']} (the canonical "
+        "SCIENTIFIC fit count of the one authorized execution — `--check` and "
+        "the test suite deterministically recompute the same models to verify "
+        "the committed artifacts, which is verification, not a new scientific "
+        "execution); canonical authorized scientific executions = 1; "
+        "scientific decisions = 1; final-test predictor values "
+        "parsed/inspected = 0; final-test target values parsed/inspected = 0; "
+        "final-test fits = 0; final-test predictions = 0; final-test "
+        "evaluation = 0; final-test keys in scientific artifacts = 0; "
+        "final-test row records structurally encountered and rejected before "
+        f"value parsing = {FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED}; "
+        "full-development refits = 0; M3 executions = 0; M4 executions = 0; "
+        "winners selected = 0.",
         "",
     ]
     return "\n".join(lines)
@@ -2142,12 +2279,17 @@ def build_metadata(
         },
         "stage127_historical_artifacts_modified": False,
         "source_repository": "abtinasg/papermali",
-        "source_main_commit": _git(repo_root, "rev-parse", "origin/main"),
-        "runtime_versions": m1.runtime_versions(),
-        "execution_environment": {
-            "python_version": platform.python_version(),
-            "platform": platform.platform(),
-        },
+        # Immutable provenance of the ONE authorized scientific execution.
+        # Locked constants — never sampled from the interpreter, package set
+        # or `origin/main` of a later --check, maintenance regeneration or
+        # post-merge run.
+        "original_authorized_scientific_execution": dict(
+            ORIGINAL_AUTHORIZED_SCIENTIFIC_EXECUTION),
+        # Separate and explicitly NON-scientific: whichever verification or
+        # maintenance run last wrote this file.
+        "latest_non_scientific_verification_environment":
+            latest_non_scientific_verification_environment(),
+        "execution_count_semantics": EXECUTION_COUNT_SEMANTICS,
     }
 
 
@@ -2157,8 +2299,13 @@ def handoff_markers(extras: dict[str, Any]) -> dict[str, Any]:
         "stage127_m2_incremental_evaluation_executed": True,
         "stage127_m2_incremental_evaluation_completed": True,
         "stage127_m2_incremental_evaluation_authorization_consumed": True,
+        # The one-action authorization was CONSUMED. A consumed
+        # authorization is False; it never erases the historical FACT that
+        # the authorized M2 modeling was executed.
         "m2_incremental_evaluation_authorized": False,
-        "m2_modeling_started": False,
+        "m2_started": True,
+        "m2_modeling_started": True,
+        "m2_block_admitted_for_authorized_incremental_evaluation": True,
         "m2_block_retained": False,
         "m2_retained_block_decision_required": True,
         "stage127_m2_incremental_evaluation_primary_model_fits": extras[
