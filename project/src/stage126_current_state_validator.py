@@ -558,6 +558,67 @@ def stage128_m2_d2_design_freeze_completed(repo_root: Path) -> bool:
     return all(freeze.get(k) == v for k, v in required_exact.items())
 
 
+STAGE128_M3_ACTIVE_WORKSTREAM = "stage128_m3_macro_data_gate"
+
+_STAGE128_M3_GATE_DECISION_REL = (
+    "project/stage128/m3_macro_data_gate/"
+    "stage128_m3_macro_data_gate_decision.json"
+)
+
+
+def stage128_m3_macro_data_gate_executed(repo_root: Path) -> bool:
+    """True once the M3 macro DATA Gate has been executed.
+
+    Gate execution is a DATA workstream event, never modeling. Fail closed if
+    the artifact contradicts the no-modeling invariants.
+    """
+    path = repo_root / _STAGE128_M3_GATE_DECISION_REL
+    if not path.is_file():
+        return False
+    decision = json.loads(path.read_text(encoding="utf-8"))
+    if decision.get("action_id") != "stage128-m3-macro-data-gate":
+        raise ValidationFail("stage128 M3 Gate decision action_id mismatch")
+    if not decision.get("m3_macro_data_gate_executed"):
+        return False
+    for field, expected in (
+        ("m3_modeling_started", False),
+        ("m3_incremental_evaluation_authorized", False),
+        ("m4_authorized", False),
+        ("m4_started", False),
+        ("final_test_locked", True),
+    ):
+        if decision.get(field) is not expected:
+            raise ValidationFail(
+                f"stage128 M3 Gate executed but {field} != {expected}")
+    return True
+
+
+def m3_gate_state_is_self_consistent(
+    handoff: dict[str, Any], *, m3_gate_executed: bool,
+) -> bool:
+    """False on the exact contradiction the reviewed head contained.
+
+    The reviewed head simultaneously recorded ``m3_macro_data_gate_executed``
+    and ``m3_data_workstream_started`` as true while still labelling the live
+    workstream as the M2 D2 one and narrating the M3 Gate as "not executed" /
+    "not started". Once the Gate has executed, the CURRENT-state fields must
+    say so, and the no-modeling invariants must still hold.
+    """
+    if not m3_gate_executed:
+        return handoff.get("m3_macro_data_gate_executed") is not True
+    return (
+        handoff.get("m3_macro_data_gate_executed") is True
+        and handoff.get("m3_data_workstream_started") is True
+        and handoff.get("active_workstream") == STAGE128_M3_ACTIVE_WORKSTREAM
+        and handoff.get("m3_modeling_started") is False
+        and handoff.get("m3_incremental_evaluation_authorized") is False
+        and handoff.get("m3_block_admitted_for_incremental_evaluation") is False
+        and handoff.get("m3_macro_data_gate_status") in (
+            "PASS_FOR_M3_INCREMENTAL_EVALUATION", "FAIL_M3_DATA_GATE",
+            "UNRESOLVED_M3_DATA_GATE")
+    )
+
+
 def expected_active_workstream(repo_root: Path) -> str:
     """The single source of truth for the CURRENT live workstream label.
 
@@ -567,6 +628,8 @@ def expected_active_workstream(repo_root: Path) -> str:
     Stage128 M2 D2 one, not the Stage126 M1 financial baseline. The Stage126
     value remains correct history, but it is no longer the CURRENT value.
     """
+    if stage128_m3_macro_data_gate_executed(repo_root):
+        return STAGE128_M3_ACTIVE_WORKSTREAM
     if stage128_m2_d2_design_freeze_completed(repo_root):
         return STAGE128_ACTIVE_WORKSTREAM
     return ACTIVE_WORKSTREAM
@@ -593,10 +656,13 @@ def current_state_labels_are_not_stale(
     """
     if not freeze_completed:
         return True
-    return (
-        handoff.get("current_stage") == STAGE128_CURRENT_STAGE
-        and handoff.get("active_workstream") == STAGE128_ACTIVE_WORKSTREAM
-    )
+    if handoff.get("current_stage") != STAGE128_CURRENT_STAGE:
+        return False
+    # After the M3 Gate has executed the live workstream is the M3 Gate; the
+    # M2 D2 label becomes predecessor context and is stale as a CURRENT value.
+    if handoff.get("m3_macro_data_gate_executed") is True:
+        return handoff.get("active_workstream") == STAGE128_M3_ACTIVE_WORKSTREAM
+    return handoff.get("active_workstream") == STAGE128_ACTIVE_WORKSTREAM
 
 
 def stage127_human_review_closure_consistent(

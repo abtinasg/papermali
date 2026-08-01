@@ -5,6 +5,11 @@
   "candidate_silently_dropped": false,
   "contract_id": "stage128_m3_macro_data_gate",
   "contract_version": "stage128_m3_macro_data_gate_v1",
+  "executed_steps": [
+    "official_source_discovery",
+    "metadata_only_prospective_lock_attempt",
+    "unresolved_decision_recording"
+  ],
   "final_test_access_authorized": false,
   "final_test_evaluation_performed": false,
   "final_test_firewall_audit": {
@@ -63,14 +68,9 @@
   ],
   "gate_type": "macro_data_admission_gate_only_no_predictive_modeling",
   "human_decision_request": {
+    "a_new_human_selected_contract_is_the_only_route": false,
     "decisions_required_from_the_human": [
       {
-        "ambiguity_classes": [
-          "index_base_year_not_frozen",
-          "inflation_transformation_not_frozen_point_to_point_vs_moving_average_vs_month_on_month",
-          "transformation_window_not_frozen",
-          "release_calendar_and_publication_lag_not_frozen"
-        ],
         "candidate_id": "cand_m3_cpi_inflation",
         "unresolved_lock_fields": [
           "official_series_title",
@@ -88,15 +88,15 @@
           "missing_value_policy",
           "same_day_cutoff_policy"
         ],
+        "unverified_candidate_ambiguity_classes": [
+          "index_base_year_not_frozen",
+          "inflation_transformation_not_frozen_point_to_point_vs_moving_average_vs_month_on_month",
+          "transformation_window_not_frozen",
+          "release_calendar_and_publication_lag_not_frozen"
+        ],
         "variable_name": "cpi_inflation"
       },
       {
-        "ambiguity_classes": [
-          "which_official_rate_not_frozen",
-          "fx_change_transformation_not_frozen",
-          "transformation_window_not_frozen",
-          "official_rate_regime_changes_across_development_period_not_frozen"
-        ],
         "candidate_id": "cand_m3_fx_change_official",
         "unresolved_lock_fields": [
           "official_series_title",
@@ -114,15 +114,15 @@
           "missing_value_policy",
           "same_day_cutoff_policy"
         ],
+        "unverified_candidate_ambiguity_classes": [
+          "which_official_rate_not_frozen",
+          "fx_change_transformation_not_frozen",
+          "transformation_window_not_frozen",
+          "official_rate_regime_changes_across_development_period_not_frozen"
+        ],
         "variable_name": "fx_change_official"
       },
       {
-        "ambiguity_classes": [
-          "which_policy_or_financing_rate_not_frozen",
-          "rate_is_administered_stepwise_and_effective_date_rule_not_frozen",
-          "transformation_and_as_of_rule_not_frozen",
-          "release_or_circular_date_field_not_frozen"
-        ],
         "candidate_id": "cand_m3_policy_financing_rate",
         "unresolved_lock_fields": [
           "official_series_title",
@@ -140,23 +140,37 @@
           "missing_value_policy",
           "same_day_cutoff_policy"
         ],
+        "unverified_candidate_ambiguity_classes": [
+          "which_policy_or_financing_rate_not_frozen",
+          "rate_is_administered_stepwise_and_effective_date_rule_not_frozen",
+          "transformation_and_as_of_rule_not_frozen",
+          "release_or_circular_date_field_not_frozen"
+        ],
         "variable_name": "policy_financing_rate"
       }
     ],
     "evidence_summary": {
+      "access_probe_classification_independently_verifiable": false,
+      "access_probe_evidence_status": "UNVERIFIED_CAPTURE_METADATA_ONLY",
+      "access_probe_raw_bytes_available": false,
       "any_authoritative_data_evidence_obtained": false,
-      "authoritative_data_evidence_count": 0,
-      "byte_reproducible_probe_count": 0,
+      "any_authoritative_data_evidence_obtained_basis": "No official CBI data artifact is committed in this repository. This is a property of the committed tree, not of the non-verifiable capture metadata.",
+      "authoritative_data_evidence_committed_count": 0,
       "captcha_never_solved_or_bypassed": true,
-      "evidence_note": "Every official CBI URL that responded returned either a WAF 'Request Rejected' page or a JavaScript/CAPTCHA bot-protection challenge; the Time Series Database hosts did not respond at all. No probe returned a macro data series. No two identical requests returned identical bytes, so no reproducible retrieval path exists. The CAPTCHA was never solved or bypassed.",
+      "evidence_note": "Every probe targeted an official cbi.ir host, and that is verifiable from the committed URL list. Nothing else about the responses is independently verifiable: the response bodies were not retained and no headers or stderr logs were captured, so the recorded SHA-256 values, byte lengths, status codes and WAF/CAPTCHA/reproducibility classifications are programmer-reported capture metadata only. They are NOT used as G02, G03 or G04 evidence. The Gate is UNRESOLVED because no independently verifiable official source evidence exists and the operational definition lock is incomplete.",
       "official_hosts_only": true,
+      "official_hosts_only_is_verified_from_committed_urls": true,
       "probe_count": 11,
-      "probes_containing_macro_data_series": 0,
-      "probes_returning_bot_challenge": 2,
-      "probes_returning_captcha": 2,
-      "probes_returning_waf_rejection": 6,
-      "probes_unreachable": 3,
+      "programmer_reported_only": {
+        "note": "Programmer-reported observation from the completed capture session. The raw bytes are unavailable for independent audit, so none of these counts may be used as G01-G08 evidence and none is asserted as fact.",
+        "reported_byte_identical_on_repeat_count": 0,
+        "reported_probes_returning_bot_or_captcha_challenge": 2,
+        "reported_probes_returning_waf_rejection": 6,
+        "reported_probes_unreachable": 3
+      },
+      "response_headers_captured": false,
       "sci_substitution_used": false,
+      "stderr_logs_captured": false,
       "unofficial_or_aggregator_source_used": false
     },
     "not_a_menu_this_action_may_choose_from": true,
@@ -172,14 +186,19 @@
       "It did not drop or substitute any candidate.",
       "It did not substitute a non-CBI source such as SCI or a free-market FX rate.",
       "It did not proceed to value-level execution.",
-      "It did not score missing evidence as zero."
+      "It did not score missing evidence as zero.",
+      "It did not treat non-verifiable capture metadata as evidence.",
+      "It did not claim the Gate could not have passed with official access."
     ],
     "why_unresolved": [
-      "The frozen Stage125 contracts register the three M3 candidate names but do not uniquely determine, for any candidate, the official series identity, the transformation formula, the transformation window, the calendar, the release-date field, the as-of selection rule or the revision/vintage policy.",
-      "No authoritative Central Bank of Iran artifact could be retrieved: every responding official URL returned a WAF rejection or a bot-protection CAPTCHA, and the Time Series Database hosts did not respond. The CAPTCHA was not solved or bypassed.",
-      "Retrieval is not byte-reproducible: two identical requests to the same official URL returned different bytes."
+      "FROZEN-CONTRACT INCOMPLETENESS: the frozen Stage125 contracts register the three M3 candidate names but do not uniquely determine, for any candidate, the official series identity, the transformation formula, the transformation window, the calendar, the release-date field, the as-of selection rule or the revision/vintage policy.",
+      "OFFICIAL-METADATA UNAVAILABILITY: no independently verifiable official Central Bank of Iran documentation or data artifact is committed, so the prospective lock could not be completed from official sources in this execution. Official documentation could potentially have completed it; that is not ruled out.",
+      "NON-VERIFIABLE ACCESS EVIDENCE: the access-probe capture metadata cannot be independently audited (raw response bytes unavailable, no headers or stderr logs captured), so it supplies no G02/G03/G04 evidence.",
+      "NO VALUE-LEVEL EXECUTION: coverage, join, event-count and temporal-support assessment were never executed."
     ]
   },
+  "implementation_is_a_complete_executable_pass_fail_gate": false,
+  "implementation_scope": "PHASE_A_TERMINAL_UNRESOLVED_SNAPSHOT",
   "last_completed_research_action_id": "stage128-m2-retained-block-human-decision",
   "m3_block": [
     "cpi_inflation",
@@ -206,20 +225,35 @@
   "model_fits": 0,
   "next_research_action_id": "stage128-m3-macro-data-gate",
   "next_research_action_pointer_is_not_authorization": true,
+  "not_executed_steps": [
+    "value_level_retrieval",
+    "value_level_coverage_assessment",
+    "value_level_join",
+    "value_level_event_count_assessment",
+    "value_level_temporal_support_assessment"
+  ],
   "official_evidence_assessment": {
+    "access_probe_classification_independently_verifiable": false,
+    "access_probe_evidence_status": "UNVERIFIED_CAPTURE_METADATA_ONLY",
+    "access_probe_raw_bytes_available": false,
     "any_authoritative_data_evidence_obtained": false,
-    "authoritative_data_evidence_count": 0,
-    "byte_reproducible_probe_count": 0,
+    "any_authoritative_data_evidence_obtained_basis": "No official CBI data artifact is committed in this repository. This is a property of the committed tree, not of the non-verifiable capture metadata.",
+    "authoritative_data_evidence_committed_count": 0,
     "captcha_never_solved_or_bypassed": true,
-    "evidence_note": "Every official CBI URL that responded returned either a WAF 'Request Rejected' page or a JavaScript/CAPTCHA bot-protection challenge; the Time Series Database hosts did not respond at all. No probe returned a macro data series. No two identical requests returned identical bytes, so no reproducible retrieval path exists. The CAPTCHA was never solved or bypassed.",
+    "evidence_note": "Every probe targeted an official cbi.ir host, and that is verifiable from the committed URL list. Nothing else about the responses is independently verifiable: the response bodies were not retained and no headers or stderr logs were captured, so the recorded SHA-256 values, byte lengths, status codes and WAF/CAPTCHA/reproducibility classifications are programmer-reported capture metadata only. They are NOT used as G02, G03 or G04 evidence. The Gate is UNRESOLVED because no independently verifiable official source evidence exists and the operational definition lock is incomplete.",
     "official_hosts_only": true,
+    "official_hosts_only_is_verified_from_committed_urls": true,
     "probe_count": 11,
-    "probes_containing_macro_data_series": 0,
-    "probes_returning_bot_challenge": 2,
-    "probes_returning_captcha": 2,
-    "probes_returning_waf_rejection": 6,
-    "probes_unreachable": 3,
+    "programmer_reported_only": {
+      "note": "Programmer-reported observation from the completed capture session. The raw bytes are unavailable for independent audit, so none of these counts may be used as G01-G08 evidence and none is asserted as fact.",
+      "reported_byte_identical_on_repeat_count": 0,
+      "reported_probes_returning_bot_or_captcha_challenge": 2,
+      "reported_probes_returning_waf_rejection": 6,
+      "reported_probes_unreachable": 3
+    },
+    "response_headers_captured": false,
     "sci_substitution_used": false,
+    "stderr_logs_captured": false,
     "unofficial_or_aggregator_source_used": false
   },
   "parent_surface": {
@@ -283,13 +317,13 @@
       "definition_uniquely_determined": false,
       "failed_rules": [],
       "gate_rule_detail": {
-        "G01": "accessibility score unresolved: no official CBI artifact was retrievable, so no score may be assigned; a missing score is never scored as zero",
-        "G02": "authoritative source unresolved: the required authority Central Bank of Iran was reachable only through bot protection, so no authoritative artifact was obtained",
-        "G03": "reproducible retrieval path unresolved: identical repeated requests returned different bytes (per-session challenge tokens) and no data artifact was ever returned",
-        "G04": "published_at / available_at unverified: no release metadata could be retrieved",
-        "G05": "extraction, unit, calendar and join error control unresolved: no values were extracted",
-        "G06": "missing availability means unavailable: applied, but there are no observations to which to apply it",
-        "G07": "no future or target-year information: satisfied vacuously, no observation was retrieved or materialized"
+        "G01": "accessibility score UNRESOLVED: no official CBI artifact is committed, so no score may be assigned. A missing score is never scored as zero.",
+        "G02": "authoritative source UNRESOLVED: no independently verifiable artifact from Central Bank of Iran is committed. The non-verifiable access-probe metadata is deliberately NOT used to decide this rule.",
+        "G03": "reproducible retrieval path UNRESOLVED: no reproducible retrieval was demonstrated on committed evidence. The reported non-reproducibility of the capture session is programmer-reported only and is NOT used to decide this rule.",
+        "G04": "published_at / available_at UNRESOLVED: no release metadata is committed for any observation.",
+        "G05": "extraction, unit, calendar and join error control UNRESOLVED: no value was extracted.",
+        "G06": "missing availability means unavailable: the rule is registered, but there is no observation to apply it to.",
+        "G07": "no future or target-year information: satisfied vacuously -- no observation was retrieved or materialized."
       },
       "gate_rule_results": {
         "G01": null,
@@ -301,6 +335,7 @@
         "G07": null,
         "G08": null
       },
+      "rules_decided_from_non_verifiable_capture_metadata": false,
       "status": "UNRESOLVED",
       "unresolved_rules": [
         "G01",
@@ -318,13 +353,13 @@
       "definition_uniquely_determined": false,
       "failed_rules": [],
       "gate_rule_detail": {
-        "G01": "accessibility score unresolved: no official CBI artifact was retrievable, so no score may be assigned; a missing score is never scored as zero",
-        "G02": "authoritative source unresolved: the required authority Central Bank of Iran was reachable only through bot protection, so no authoritative artifact was obtained",
-        "G03": "reproducible retrieval path unresolved: identical repeated requests returned different bytes (per-session challenge tokens) and no data artifact was ever returned",
-        "G04": "published_at / available_at unverified: no release metadata could be retrieved",
-        "G05": "extraction, unit, calendar and join error control unresolved: no values were extracted",
-        "G06": "missing availability means unavailable: applied, but there are no observations to which to apply it",
-        "G07": "no future or target-year information: satisfied vacuously, no observation was retrieved or materialized"
+        "G01": "accessibility score UNRESOLVED: no official CBI artifact is committed, so no score may be assigned. A missing score is never scored as zero.",
+        "G02": "authoritative source UNRESOLVED: no independently verifiable artifact from Central Bank of Iran is committed. The non-verifiable access-probe metadata is deliberately NOT used to decide this rule.",
+        "G03": "reproducible retrieval path UNRESOLVED: no reproducible retrieval was demonstrated on committed evidence. The reported non-reproducibility of the capture session is programmer-reported only and is NOT used to decide this rule.",
+        "G04": "published_at / available_at UNRESOLVED: no release metadata is committed for any observation.",
+        "G05": "extraction, unit, calendar and join error control UNRESOLVED: no value was extracted.",
+        "G06": "missing availability means unavailable: the rule is registered, but there is no observation to apply it to.",
+        "G07": "no future or target-year information: satisfied vacuously -- no observation was retrieved or materialized."
       },
       "gate_rule_results": {
         "G01": null,
@@ -336,6 +371,7 @@
         "G07": null,
         "G08": null
       },
+      "rules_decided_from_non_verifiable_capture_metadata": false,
       "status": "UNRESOLVED",
       "unresolved_rules": [
         "G01",
@@ -353,13 +389,13 @@
       "definition_uniquely_determined": false,
       "failed_rules": [],
       "gate_rule_detail": {
-        "G01": "accessibility score unresolved: no official CBI artifact was retrievable, so no score may be assigned; a missing score is never scored as zero",
-        "G02": "authoritative source unresolved: the required authority Central Bank of Iran was reachable only through bot protection, so no authoritative artifact was obtained",
-        "G03": "reproducible retrieval path unresolved: identical repeated requests returned different bytes (per-session challenge tokens) and no data artifact was ever returned",
-        "G04": "published_at / available_at unverified: no release metadata could be retrieved",
-        "G05": "extraction, unit, calendar and join error control unresolved: no values were extracted",
-        "G06": "missing availability means unavailable: applied, but there are no observations to which to apply it",
-        "G07": "no future or target-year information: satisfied vacuously, no observation was retrieved or materialized"
+        "G01": "accessibility score UNRESOLVED: no official CBI artifact is committed, so no score may be assigned. A missing score is never scored as zero.",
+        "G02": "authoritative source UNRESOLVED: no independently verifiable artifact from Central Bank of Iran is committed. The non-verifiable access-probe metadata is deliberately NOT used to decide this rule.",
+        "G03": "reproducible retrieval path UNRESOLVED: no reproducible retrieval was demonstrated on committed evidence. The reported non-reproducibility of the capture session is programmer-reported only and is NOT used to decide this rule.",
+        "G04": "published_at / available_at UNRESOLVED: no release metadata is committed for any observation.",
+        "G05": "extraction, unit, calendar and join error control UNRESOLVED: no value was extracted.",
+        "G06": "missing availability means unavailable: the rule is registered, but there is no observation to apply it to.",
+        "G07": "no future or target-year information: satisfied vacuously -- no observation was retrieved or materialized."
       },
       "gate_rule_results": {
         "G01": null,
@@ -371,6 +407,7 @@
         "G07": null,
         "G08": null
       },
+      "rules_decided_from_non_verifiable_capture_metadata": false,
       "status": "UNRESOLVED",
       "unresolved_rules": [
         "G01",
@@ -384,16 +421,18 @@
     }
   ],
   "phase_a_definition_lock_path": "project/stage128/m3_macro_data_gate/stage128_m3_macro_source_definition_lock.json",
-  "phase_a_definition_lock_sha256": "073ed083a8c9a62e5c86af5faa5ce51d15dfc5b16bd8e9aa6f1df44f647c663f",
+  "phase_a_definition_lock_sha256": "1ccd3fd3da890511c981db695b2fb8faf993b1a50372163b5b49bdac8bd048e2",
   "phase_a_lock_status": "UNRESOLVED_DEFINITION_LOCK",
   "phase_a_locked_before_value_level_execution": true,
   "phase_b_executed": false,
+  "phase_b_implementation_present": false,
+  "phase_b_not_executed_reason": "official_metadata_unavailable_and_definition_lock_unresolved",
   "phase_b_permitted": false,
   "predecessor_action_id": "stage128-m2-retained-block-human-decision",
   "predictions": 0,
   "predictive_metrics_computed": 0,
   "protected_baseline_commit": "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2",
-  "protected_file_count": 331,
+  "protected_file_count": 328,
   "protected_files_sha256": {
     "project/stage125/README_STAGE125_PART1_DATA_CONTRACT.md": "34fc241c4e9cc99983a5e05b8468f12bd1cde1c18b0318b158ac10285a481c2b",
     "project/stage125/README_STAGE125_PART2_PREDICTION_TIME_CONTRACT.md": "437310452392bfcea448452fa1a65c745dce52d52b2df2fccdbb406b1abd5518",
@@ -537,7 +576,6 @@
     "project/stage125/stage125_part3c_leakage_safe_dataset_qc_report.json": "a9e9d81756aff3b79170f39d561b4bda3875b23b67da12d03f2a314252e5ccad",
     "project/stage125/stage125_part4_statistical_analysis_plan_qc_report.json": "c119932134482304500f4b90d625f015245f1818113db83c82fac1cf8072a939",
     "project/stage125/stage125_part5_readiness_closure_qc_report.json": "886e6d3766ad2d0da02228fcf56d81cbbe9f68d22cf2dd98e53d7388449f8df1",
-    "project/stage126/README_STAGE126_CURRENT_STATE_VALIDATION.md": "aa31ccfeb66130f441304aebcfe9538919cfd6bc2757437c400d28191363ce48",
     "project/stage126/README_STAGE126_M1_PRIMARY_DEVELOPMENT_TUNING.md": "d3a67cab445fe4344abfd50e07d42febc0053a1d08154916fc76cd53b53b2cf6",
     "project/stage126/README_STAGE126_M1_RETAINED_DESIGN_FREEZE.md": "7995c68b15bc581c6b26a66baa9b349d89387be7db9623bc050e6172071843d5",
     "project/stage126/README_STAGE126_M1_ROBUSTNESS_CLOSURE.md": "54e420d0915958d76bfa32b55d6c0fa444d8a09221a10eecb6628455f05b7fbb",
@@ -548,7 +586,6 @@
     "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART4_EXPANDED_RULE_B.md": "b92b268d8f74a165aad8b5ecbd0acb4ed9cd504f89aff4fd45b96cdc592868e5",
     "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART5_PERSISTENT_LOSS_TARGET.md": "852b552142357c350aa923c18dc0b9b282dc15046cd3dc7d6273dce2317d912a",
     "project/stage126/README_STAGE126_M1_ROBUSTNESS_PART6_SMOTE_TRAINING_FOLD_ONLY.md": "722d8869c163897589c15aac2330c25dd17a4d4c3aa4ad1b3f6ab3b3b983ead4",
-    "project/stage126/metadata_and_hashes_stage126_current_state_validator.json": "51936e12980c6b8c9e1aa9aa6938825d345fb78f39f7a9c419d72ac2e2e63e2e",
     "project/stage126/metadata_and_hashes_stage126_m1_primary_development_tuning.json": "c19235fca319001fd77c7fc26769eff188bb8ecb158a284251773c0d564783f5",
     "project/stage126/metadata_and_hashes_stage126_m1_retained_design_freeze.json": "58336f014f430dbb79267a21a3bf1aebc560835d841730dd91ba1ebde43bef3f",
     "project/stage126/metadata_and_hashes_stage126_m1_robustness_part0_decision_lock.json": "83e34582a890dec74954664b242967faa22f1e58cabc944731d14ecb1946c418",
@@ -559,7 +596,6 @@
     "project/stage126/metadata_and_hashes_stage126_m1_robustness_part5.json": "14fa42f0ec5cb8c07d3a10afe1d62a7c89dbc4f84d417bf4258d65df739714a6",
     "project/stage126/metadata_and_hashes_stage126_m1_robustness_part6.json": "e87e14c189fbf0220bfb039730a49755cd1eaf2affbc51b515f6a55e86b9a212",
     "project/stage126/stage126_closed_part_registry.json": "bb6a269686f4f1b616b7896bbba1469eb1cf61e8514445b8f8150033f258080e",
-    "project/stage126/stage126_current_state_validation_report.json": "16c65cefff312c970418b57b00983019de3314bb1580dc2970c01b4b1628d245",
     "project/stage126/stage126_historical_boundary_manifest.json": "a518be27730e32b8a7de8de2d46865fc5efc1d31a5f796d00a6557d25f92a838",
     "project/stage126/stage126_live_vs_historical_test_boundary.json": "361657594b9e1a1109d0f071a8d0fdb1668941f997d05904af5eabda17ba3d26",
     "project/stage126/stage126_m1_configuration_registry.csv": "decbf43a5c34669bdd7a0c68c0ad6aec5611efc7c3ca82b09f5e85f72d635804",
@@ -751,12 +787,18 @@
     "source_contract_sha256": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e"
   },
   "unofficial_or_sci_source_used": false,
+  "unresolved_causes": {
+    "frozen_contract_incompleteness": true,
+    "official_metadata_unavailability": true,
+    "value_level_execution_absent": true
+  },
+  "unresolved_causes_note": "These three causes are distinct and must not be conflated. The frozen contracts alone do not uniquely determine the operational series. Official source documentation could potentially have completed the prospective definition lock, but no independently verifiable official metadata was available in this execution. Separately, no value-level assessment was executed at all. It is NOT established that the Gate could not have passed with official access; a new human-selected contract is one possible future route, and an authorized, reproducible official CBI documentation and data package is another.",
   "unresolved_or_blocker_reasons": [
     "cand_m3_cpi_inflation: operational series and transformation not uniquely determined (14 of 20 required lock fields unresolved)",
     "cand_m3_fx_change_official: operational series and transformation not uniquely determined (14 of 20 required lock fields unresolved)",
     "cand_m3_policy_financing_rate: operational series and transformation not uniquely determined (14 of 20 required lock fields unresolved)",
-    "no authoritative CBI data artifact was obtained: 6 WAF rejections, 2 CAPTCHA challenges, 3 unreachable hosts across 11 official-host probes",
-    "no reproducible retrieval path: identical repeated requests to the same official URL returned different bytes",
+    "official-metadata unavailability: no official CBI data or documentation artifact is committed in this repository, so the prospective definition lock could not be completed from official sources in this execution",
+    "the access-probe capture metadata is not independently verifiable (raw response bytes unavailable, no headers or stderr logs captured), so it cannot supply G02/G03/G04 evidence",
     "cand_m3_cpi_inflation: G-rules unresolved ['G01', 'G02', 'G03', 'G04', 'G05', 'G06', 'G07']",
     "cand_m3_fx_change_official: G-rules unresolved ['G01', 'G02', 'G03', 'G04', 'G05', 'G06', 'G07']",
     "cand_m3_policy_financing_rate: G-rules unresolved ['G01', 'G02', 'G03', 'G04', 'G05', 'G06', 'G07']"

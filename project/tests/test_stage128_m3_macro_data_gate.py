@@ -484,17 +484,24 @@ def test_every_probe_targeted_an_official_cbi_host(evidence_manifest):
         assert host == "cbi.ir" or host.endswith(".cbi.ir"), host
 
 
-def test_no_probe_returned_authoritative_data_evidence(evidence_manifest):
+def test_no_probe_is_claimed_as_authoritative_data_evidence(evidence_manifest):
     for probe in evidence_manifest["probes"]:
         assert probe["usable_as_authoritative_data_evidence"] is False
-        assert probe["contains_macro_data_series"] is False
+        assert probe["reported_contains_macro_data_series"] is False
 
 
-def test_retrieval_is_not_byte_reproducible(evidence_manifest, decision):
+def test_byte_reproducibility_is_reported_only_never_asserted_as_proven(
+        evidence_manifest, decision):
+    """The non-reproducibility claim must be downgraded, not proven."""
     for probe in evidence_manifest["probes"]:
-        assert probe["byte_identical_on_repeat"] is False
-    assert decision["official_evidence_assessment"][
-        "byte_reproducible_probe_count"] == 0
+        assert "byte_identical_on_repeat" not in probe
+        assert probe["reported_byte_identical_on_repeat"] is False
+    assessment = decision["official_evidence_assessment"]
+    assert "byte_reproducible_probe_count" not in assessment
+    assert assessment["programmer_reported_only"][
+        "reported_byte_identical_on_repeat_count"] == 0
+    downgraded = evidence_manifest["claims_downgraded"]
+    assert "two exact requests are proven non-reproducible" in downgraded
 
 
 def test_captcha_was_never_solved_or_bypassed(evidence_manifest, decision):
@@ -658,7 +665,27 @@ def test_protected_path_set_is_enumerated_from_the_baseline_commit():
     assert tuple(sorted(paths)) == paths
     listed = _git("ls-tree", "-r", "--name-only", g.BASELINE_COMMIT, "--",
                   *g.PROTECTED_TREES).split()
-    assert set(paths) == set(listed) | set(g.PROTECTED_EXTRA_FILES)
+    expected = ((set(listed) | set(g.PROTECTED_EXTRA_FILES))
+                - set(g.PROTECTED_OPERATIONAL_EXCLUSIONS))
+    assert set(paths) == expected
+
+
+def test_operational_exclusions_are_a_closed_justified_list():
+    """Only the validator's own regenerable outputs may be excluded."""
+    assert g.PROTECTED_OPERATIONAL_EXCLUSIONS == (
+        "project/stage126/README_STAGE126_CURRENT_STATE_VALIDATION.md",
+        "project/stage126/"
+        "metadata_and_hashes_stage126_current_state_validator.json",
+        "project/stage126/stage126_current_state_validation_report.json")
+    # every exclusion is an operational artifact PR #72 itself regenerated
+    for rel in g.PROTECTED_OPERATIONAL_EXCLUSIONS:
+        changed = _git("log", "--oneline",
+                       "bdac807788b377690be0a879765cfe4ac148970d.."
+                       + g.BASELINE_COMMIT, "--", rel).strip()
+        assert changed, rel
+    # no scientific decision/gate/metrics artifact may ever be excluded
+    for rel in g.PROTECTED_OPERATIONAL_EXCLUSIONS:
+        assert "decision" not in rel and "gate" not in rel.lower()
 
 
 def test_complete_protected_manifest_is_committed(decision, metadata):
@@ -800,15 +827,19 @@ def test_unresolved_was_not_converted_from_an_observed_failure(decision):
 
 
 def test_fail_status_would_require_observed_evidence():
-    """A FAIL is only reachable when authoritative evidence exists."""
+    """Decision-vocabulary UNIT test over a pure function.
+
+    This exercises determine_gate_status only. It is NOT evidence that an
+    executable Phase-B PASS/FAIL pipeline exists — none does; see
+    IMPLEMENTATION_SCOPE = PHASE_A_TERMINAL_UNRESOLVED_SNAPSHOT.
+    """
     lock = {"lock_status": g.LOCK_STATUS_RESOLVED,
             "candidates": [{"candidate_id": c, "uniquely_determined": True,
                             "unresolved_lock_field_count": 0}
                            for c in g.M3_CANDIDATE_IDS]}
     evidence = {"any_authoritative_data_evidence_obtained": True,
-                "byte_reproducible_probe_count": 3, "probe_count": 3,
-                "probes_returning_waf_rejection": 0,
-                "probes_returning_captcha": 0, "probes_unreachable": 0}
+                "access_probe_classification_independently_verifiable": True,
+                "probe_count": 3}
     results = [{"candidate_id": c, "unresolved_rules": [],
                 "failed_rules": ["G01"], "status": "FAIL"}
                for c in g.M3_CANDIDATE_IDS]
@@ -818,7 +849,11 @@ def test_fail_status_would_require_observed_evidence():
 
 
 def test_pass_requires_every_candidate_and_the_whole_block():
-    """A partial block can never produce PASS."""
+    """Decision-vocabulary UNIT test over a pure function.
+
+    A partial block can never produce PASS. This is not proof that a
+    value-level Phase-B pipeline exists.
+    """
     lock = {"lock_status": g.LOCK_STATUS_RESOLVED,
             "candidates": [{"candidate_id": c,
                             "uniquely_determined": c != "cand_m3_"
@@ -826,9 +861,8 @@ def test_pass_requires_every_candidate_and_the_whole_block():
                             "unresolved_lock_field_count": 0}
                            for c in g.M3_CANDIDATE_IDS]}
     evidence = {"any_authoritative_data_evidence_obtained": True,
-                "byte_reproducible_probe_count": 3, "probe_count": 3,
-                "probes_returning_waf_rejection": 0,
-                "probes_returning_captcha": 0, "probes_unreachable": 0}
+                "access_probe_classification_independently_verifiable": True,
+                "probe_count": 3}
     results = [{"candidate_id": c, "unresolved_rules": [], "failed_rules": [],
                 "status": "PASS"} for c in g.M3_CANDIDATE_IDS]
     lock["lock_status"] = g.LOCK_STATUS_UNRESOLVED
@@ -980,3 +1014,190 @@ def test_readme_states_the_gate_status_and_the_no_superiority_scope():
     assert "UNRESOLVED_M3_DATA_GATE" in readme
     assert "does **not** answer whether M3 improves prediction" in readme
     assert "No partial block was admitted." in readme
+
+
+# --------------------------------------------------------------------------- #
+# Correction: contract-determined fields, Phase-A scope, evidence downgrade
+# --------------------------------------------------------------------------- #
+
+def test_contract_determined_fields_stay_populated_when_evidence_is_absent(
+        lock):
+    """The four frozen-contract fields are never null in the committed lock."""
+    for candidate in lock["candidates"]:
+        fields = candidate["lock_fields"]
+        assert fields["official_source_id"] == "src_m3_cbi_macro"
+        assert fields["official_source_owner"] == "Central Bank of Iran"
+        assert fields["frequency"] is not None
+        assert fields["unit"] is not None
+
+
+def test_contract_determined_fields_stay_populated_with_mocked_evidence():
+    """Availability of official evidence must never un-determine a contract.
+
+    Mocks ``any_authoritative_data_evidence_obtained = True`` — the exact
+    condition under which the previous implementation wrongly nulled these
+    four frozen fields.
+    """
+    evidence = dict(g.assess_official_evidence(REPO_ROOT))
+    evidence["any_authoritative_data_evidence_obtained"] = True
+    rebuilt = g.build_definition_lock(REPO_ROOT, evidence)
+    for candidate in rebuilt["candidates"]:
+        fields = candidate["lock_fields"]
+        assert fields["official_source_id"] == "src_m3_cbi_macro", (
+            "official_source_id must not become null when official evidence "
+            "is available")
+        assert fields["official_source_owner"] == "Central Bank of Iran"
+        assert fields["frequency"] is not None
+        assert fields["unit"] is not None
+        for field in ("candidate_id", "variable_name"):
+            assert fields[field] is not None
+
+
+def test_implementation_scope_is_declared_phase_a_only(decision, qc):
+    assert g.IMPLEMENTATION_SCOPE == "PHASE_A_TERMINAL_UNRESOLVED_SNAPSHOT"
+    assert decision["implementation_scope"] == g.IMPLEMENTATION_SCOPE
+    assert decision["phase_b_implementation_present"] is False
+    assert decision["phase_b_executed"] is False
+    assert decision["phase_b_not_executed_reason"] == (
+        "official_metadata_unavailable_and_definition_lock_unresolved")
+    assert decision[
+        "implementation_is_a_complete_executable_pass_fail_gate"] is False
+    assert qc["phase_b_pass_fail_execution_is_implemented_or_tested"] is False
+
+
+def test_executed_and_not_executed_steps_are_recorded(decision):
+    assert decision["executed_steps"] == [
+        "official_source_discovery",
+        "metadata_only_prospective_lock_attempt",
+        "unresolved_decision_recording"]
+    for step in ("value_level_retrieval", "value_level_coverage_assessment",
+                 "value_level_join", "value_level_event_count_assessment",
+                 "value_level_temporal_support_assessment"):
+        assert step in decision["not_executed_steps"]
+
+
+def test_the_three_unresolved_causes_are_distinguished(decision, lock):
+    causes = decision["unresolved_causes"]
+    assert causes["frozen_contract_incompleteness"] is True
+    assert causes["official_metadata_unavailability"] is True
+    assert causes["value_level_execution_absent"] is True
+    assert lock["a_new_human_selected_contract_is_the_only_route"] is False
+
+
+def test_no_claim_that_the_gate_could_not_have_passed():
+    """The unsupported counterfactual must never be ASSERTED.
+
+    The phrase may appear only inside an explicit negation ("it is NOT
+    established that ... could not have passed"), never as a claim.
+    """
+    asserted_forms = (
+        "The Gate could not have passed even with network access",
+        "the Gate could not have passed even with network access",
+        "could not have passed even with",
+    )
+    for rel in (g.README_REL, g.DECISION_REL, g.LOCK_REL, g.QC_REL):
+        text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        for form in asserted_forms:
+            assert form not in text, (rel, form)
+    src = SRC_PATH.read_text(encoding="utf-8")
+    for form in asserted_forms:
+        assert form not in src, form
+    # and the negation IS recorded
+    decision = _load(g.DECISION_REL)
+    assert "NOT established that the Gate could not have passed" in (
+        decision["unresolved_causes_note"])
+
+
+def test_access_probe_evidence_is_downgraded(decision, evidence_manifest):
+    assessment = decision["official_evidence_assessment"]
+    assert assessment["access_probe_raw_bytes_available"] is False
+    assert assessment[
+        "access_probe_classification_independently_verifiable"] is False
+    assert assessment["access_probe_evidence_status"] == (
+        "UNVERIFIED_CAPTURE_METADATA_ONLY")
+    assert assessment["response_headers_captured"] is False
+    assert assessment["stderr_logs_captured"] is False
+    assert evidence_manifest["access_probe_raw_bytes_available"] is False
+    assert evidence_manifest[
+        "access_probe_classification_independently_verifiable"] is False
+    assert evidence_manifest["access_probe_evidence_status"] == (
+        "UNVERIFIED_CAPTURE_METADATA_ONLY")
+    assert evidence_manifest["used_as_g01_to_g08_evidence"] is False
+
+
+def test_downgraded_probe_fields_are_prefixed_reported(evidence_manifest):
+    for probe in evidence_manifest["probes"]:
+        assert probe["classification_independently_verifiable"] is False
+        assert probe["raw_bytes_available"] is False
+        # bare, verified-looking names must not exist
+        for bare in ("is_waf_request_rejected", "is_captcha_challenge",
+                     "byte_identical_on_repeat", "response_sha256",
+                     "http_status", "byte_length"):
+            assert bare not in probe, bare
+        assert "source_url" in probe  # the one verifiable field
+
+
+def test_no_gate_rule_is_decided_from_non_verifiable_metadata(decision):
+    for result in decision["per_candidate_gate_rule_results"]:
+        assert result[
+            "rules_decided_from_non_verifiable_capture_metadata"] is False
+        # G02/G03/G04 in particular must remain unresolved, not False
+        for rule in ("G02", "G03", "G04"):
+            assert result["gate_rule_results"][rule] is None
+
+
+def test_manifest_claiming_verifiability_fails_closed(tmp_path):
+    manifest = json.loads((REPO_ROOT / g.RAW_EVIDENCE_REL).read_text("utf-8"))
+    for key in ("raw_bodies_committed",
+                "access_probe_raw_bytes_available",
+                "access_probe_classification_independently_verifiable",
+                "used_as_g01_to_g08_evidence"):
+        tampered = dict(manifest)
+        tampered[key] = True
+        root = tmp_path / key
+        (root / Path(g.RAW_EVIDENCE_REL).parent).mkdir(parents=True)
+        (root / g.RAW_EVIDENCE_REL).write_text(
+            json.dumps(tampered), encoding="utf-8")
+        with pytest.raises(g.M3MacroDataGateError):
+            g.assess_official_evidence(root)
+
+
+def test_probe_exposing_a_bare_verified_field_fails_closed(tmp_path):
+    manifest = json.loads((REPO_ROOT / g.RAW_EVIDENCE_REL).read_text("utf-8"))
+    manifest["probes"][0]["is_captcha_challenge"] = True
+    root = tmp_path / "bare"
+    (root / Path(g.RAW_EVIDENCE_REL).parent).mkdir(parents=True)
+    (root / g.RAW_EVIDENCE_REL).write_text(
+        json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(g.M3MacroDataGateError, match="downgraded metadata"):
+        g.assess_official_evidence(root)
+
+
+def test_ambiguity_classes_are_labelled_unverified(lock):
+    for candidate in lock["candidates"]:
+        assert candidate[
+            "ambiguity_classes_verified_against_official_documentation"] is False
+        assert "unverified_candidate_ambiguity_classes" in candidate
+        assert "ambiguity_classes" not in candidate
+
+
+def test_gate_status_vocabulary_tests_are_unit_level_only(qc):
+    """The vocabulary checks must not be sold as proof of a Phase-B pipeline."""
+    assert "decision-vocabulary unit checks" in qc["scope_note"]
+    assert qc["implementation_scope"] == "PHASE_A_TERMINAL_UNRESOLVED_SNAPSHOT"
+
+
+def test_no_new_network_request_is_reachable_from_this_code():
+    """Static proof: the Gate module performs no HTTP request."""
+    src = SRC_PATH.read_text(encoding="utf-8")
+    for banned in ("requests.", "urllib.request", "urlopen", "httpx",
+                   "http.client", "socket.", "curl"):
+        assert banned not in src, banned
+    tree = ast.parse(src)
+    imported: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported.update(a.name.split(".")[0] for a in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported.add(node.module.split(".")[0])
+    assert imported & {"requests", "urllib", "httpx", "http", "socket"} == set()

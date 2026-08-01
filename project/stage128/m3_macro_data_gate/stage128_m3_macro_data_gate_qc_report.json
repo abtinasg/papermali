@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 44,
+  "assertion_count": 49,
   "assertions": [
     {
       "name": "authorization_byte_length_is_28",
@@ -123,7 +123,7 @@
       "status": "PASS"
     },
     {
-      "detail": "331 protected upstream files at baseline 35aaf4b70e9341704ee38be6f8cf2e2519c70bb2 verified byte-identical against committed history",
+      "detail": "328 protected upstream files at baseline 35aaf4b70e9341704ee38be6f8cf2e2519c70bb2 verified byte-identical against committed history",
       "name": "upstream_scientific_artifacts_byte_identical",
       "status": "PASS"
     },
@@ -141,6 +141,29 @@
     },
     {
       "name": "unresolved_requires_explicit_unresolved_evidence_reason",
+      "status": "PASS"
+    },
+    {
+      "detail": "raw response bytes are unavailable, so the capture metadata is recorded as programmer-reported only and supplies no G01-G08 evidence",
+      "name": "access_probe_evidence_is_downgraded_not_used_as_gate_evidence",
+      "status": "PASS"
+    },
+    {
+      "detail": "this code implements Phase A only; it is not a complete executable PASS/FAIL Gate and QC does not claim Phase B is implemented or tested",
+      "name": "implementation_scope_is_declared_phase_a_only",
+      "status": "PASS"
+    },
+    {
+      "name": "unresolved_causes_are_distinguished_not_conflated",
+      "status": "PASS"
+    },
+    {
+      "detail": "frozen-contract values never become null, regardless of whether official evidence is available",
+      "name": "contract_determined_lock_fields_are_always_populated",
+      "status": "PASS"
+    },
+    {
+      "name": "ambiguity_classes_are_labelled_unverified",
       "status": "PASS"
     },
     {
@@ -185,6 +208,9 @@
   "failed_count": 0,
   "gate_status": "UNRESOLVED_M3_DATA_GATE",
   "generated_for": "stage128-m3-macro-data-gate",
+  "implementation_scope": "PHASE_A_TERMINAL_UNRESOLVED_SNAPSHOT",
+  "phase_b_implementation_present": false,
+  "phase_b_pass_fail_execution_is_implemented_or_tested": false,
   "protected_immutability": {
     "protected_baseline_commit": "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2",
     "protected_bytes_match_baseline": true,
@@ -192,7 +218,13 @@
     "protected_extra_files": [
       "project/stage128/stage128_m2_d2_development_features.csv"
     ],
-    "protected_file_count": 331,
+    "protected_file_count": 328,
+    "protected_operational_exclusions": [
+      "project/stage126/README_STAGE126_CURRENT_STATE_VALIDATION.md",
+      "project/stage126/metadata_and_hashes_stage126_current_state_validator.json",
+      "project/stage126/stage126_current_state_validation_report.json"
+    ],
+    "protected_operational_exclusions_are_not_scientific_artifacts": true,
     "protected_paths_match_baseline": true,
     "protected_tree_has_no_new_tracked_files": true,
     "protected_trees": [
@@ -203,5 +235,5 @@
       "project/stage128/m2_retained_block_human_decision"
     ]
   },
-  "scope_note": "This QC report checks the internal consistency of the Stage128 M3 macro DATA-ADMISSION Gate: the exact human authorization, the prospective source/definition lock, the exact three-variable block, the frozen Part 4 thresholds, the retained-M2 parent surface, point-in-time and vintage rules, the temporal-degrees distinction, the final-test firewall, upstream immutability and the no-modeling guarantees. It computes no predictive metric and constitutes no scientific result about whether M3 improves prediction."
+  "scope_note": "This QC report checks the internal consistency of the Stage128 M3 macro DATA-ADMISSION Gate: the exact human authorization, the prospective source/definition lock, the exact three-variable block, the frozen Part 4 thresholds, the retained-M2 parent surface, point-in-time and vintage rules, the temporal-degrees distinction, the final-test firewall, upstream immutability and the no-modeling guarantees. It computes no predictive metric and constitutes no scientific result about whether M3 improves prediction. It does NOT claim that a value-level Phase-B PASS/FAIL pipeline is implemented or tested: this code is a PHASE_A_TERMINAL_UNRESOLVED_SNAPSHOT. Checks over the Gate-status vocabulary are decision-vocabulary unit checks over pure functions, not proof that an executable Phase-B pipeline exists."
 }

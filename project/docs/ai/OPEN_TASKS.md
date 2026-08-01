@@ -3,25 +3,46 @@
 Human-maintained. The authoritative "next action" ID lives in `ROADMAP.md`
 front matter; this file is the working description.
 
-## Active research workstream: `stage128-m2-d2-boundary-month-equity-return`
+## Active research workstream: `stage128-m3-macro-data-gate`
 
-The CURRENT workstream is the Stage128 M2 D2 boundary-month equity-return
-workstream — a stable machine-readable label **derived from** the already-frozen
-action `stage128-m2-boundary-month-return-design-freeze`, not a new scientific
-action. The authoritative research-action pointers are
+The CURRENT workstream is the Stage128 **M3 macro DATA** workstream. It is
+started (`m3_data_workstream_started=true`) because the M3 macro data Gate has
+been EXECUTED once as a data-admission Gate under its own consumed one-action
+authorization, returning `UNRESOLVED_M3_DATA_GATE` and awaiting human review.
+
+**Gate execution is a DATA workstream, not modeling:**
+`m3_modeling_started=false`, `m3_incremental_evaluation_authorized=false`,
+`m3_block_admitted_for_incremental_evaluation=false`.
+
+The authoritative research-action pointers are
 `last_completed_research_action_id=stage128-m2-retained-block-human-decision`
-and `next_research_action_id=stage128-m3-macro-data-gate`, the latter
-a pointer only and **not** authorized. `stage126-m1-financial-baseline` remains
-correct **history** for the completed M1 financial-baseline workstream (see the
-historical section below); it is no longer the current workstream.
+— correctly **unchanged**, because the Gate is unresolved and awaiting human
+review — and `next_research_action_id=stage128-m3-macro-data-gate`, a pointer
+only; a pointer is **never** an authorization.
+
+`stage128-m2-d2-boundary-month-equity-return` is now
+**historical/predecessor context**, not the current workstream; it was correct
+while the M2 D2 boundary-month workstream was live.
+`stage126-m1-financial-baseline` likewise remains correct **history** for the
+completed M1 financial-baseline workstream (see the historical section below).
 
 ### Current scientific action
 
-The current scientific action is `stage127-m2-incremental-evaluation` — the
-paired, development-only comparison of the frozen M2 block against the frozen
-M1 block, executed exactly ONCE under its own explicit, one-action human
+The current scientific action is `stage128-m3-macro-data-gate` — the M3 macro
+**data-admission Gate only**, executed once and terminal at
+`UNRESOLVED_M3_DATA_GATE`, pending human review. It asks only whether the exact
+frozen three-variable macro block can be obtained from authoritative,
+reproducible, point-in-time-safe sources; it does not ask, and does not answer,
+whether M3 improves prediction.
+
+### Predecessor scientific action (HISTORICAL)
+
+`stage127-m2-incremental-evaluation` is **historical**, not the current action —
+the paired, development-only comparison of the frozen M2 block against the
+frozen M1 block, executed exactly ONCE under its own explicit, one-action human
 authorization (`بریم مرحله بعد`, SHA-256 `a9999c0c…c3cdc6`, 2026-08-01),
-consumed by that execution.
+consumed by that execution. The description that follows was accurate for that
+completed action and is preserved unchanged as history.
 
 **The mandatory post-lock D2 eligibility audit ran first.** 53 predictor-side
 comparisons across 6 dimensions (prediction cohort, industry, firm size,
@@ -120,16 +141,34 @@ did **not** ask, and does not answer, whether M3 improves prediction: 0 model
 fits, 0 predictions, 0 predictive metrics, 0 M3-versus-M2 comparisons.
 
 It is UNRESOLVED — not FAILED — because the evidence is insufficient to reach
-either PASS or FAIL: (a) the frozen Stage125 contracts register the three
-candidate names but do not uniquely determine any candidate's official series,
-transformation, calendar, release-date field, as-of rule or revision/vintage
-policy, so the prospective Phase-A definition lock could not be completed; and
-(b) no authoritative Central Bank of Iran artifact could be retrieved — every
-responding official URL returned a WAF rejection or a bot-protection CAPTCHA,
-the Time Series Database hosts did not respond, and two identical requests to
-the same official URL returned different bytes, so there is no reproducible
-retrieval path. Missing evidence was recorded as null and was never scored as
-zero, and was never converted into an observed failure.
+either PASS or FAIL. Three distinct causes, deliberately not conflated:
+
+1. **Frozen-contract incompleteness.** The frozen Stage125 contracts register
+   the three candidate names but do not uniquely determine any candidate's
+   official series, transformation, calendar, release-date field, as-of rule or
+   revision/vintage policy, so the prospective Phase-A definition lock could not
+   be completed.
+2. **Official-metadata unavailability.** No independently verifiable official
+   Central Bank of Iran documentation or data artifact is committed.
+3. **No value-level execution.** Coverage, join, event counts and temporal
+   support were never assessed.
+
+**Access-probe evidence is downgraded.** The raw response bodies from the
+capture session were not retained, and no headers or stderr logs were captured,
+so `access_probe_evidence_status = UNVERIFIED_CAPTURE_METADATA_ONLY`. Only the
+targeted URL set (all official `cbi.ir` hosts) is independently verifiable. The
+reported WAF / CAPTCHA / non-reproducibility classifications are
+**programmer-reported observations, raw bytes unavailable for independent
+audit**, and are **not** used as G02/G03/G04 evidence.
+
+It is **not** established that the Gate could not have passed with official
+access: official source documentation could potentially have completed the
+prospective definition lock. A new human-selected contract is one possible
+future route; an authorized, reproducible official CBI documentation and data
+package is another.
+
+Missing evidence was recorded as null, was never scored as zero, and was never
+converted into an observed failure.
 
 No candidate was dropped or substituted, no smaller block was allowed to pass,
 and no non-CBI source (SCI, free-market FX, aggregator, mirror or news) was

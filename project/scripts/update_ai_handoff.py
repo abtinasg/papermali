@@ -3666,6 +3666,8 @@ def build_handoff_state(root: str):
         "current_stage": stage,
         "current_batch": batch,
         "active_workstream": roadmap["active_research_workstream_id"].replace("-", "_"),
+        "active_workstream_predecessor_context": (
+            "stage128_m2_d2_boundary_month_equity_return"),
         # Newest completed micro-part (robustness micro-parts included). The
         # research-action pointers below are deliberately NOT advanced.
         "last_completed_micro_part": active_micro_part_id(
@@ -4207,11 +4209,22 @@ def render_current_state(record: dict) -> str:
             f"{record.get('m3_authorized')}, started={record.get('m3_started')}"
             " — **M4:** authorized="
             f"{record.get('m4_authorized')}, started={record.get('m4_started')}",
-            "- **Next research action (pointer only):** "
-            f"`{record['next_research_action_id']}` — the M3 macro data "
-            "Gate. A pointer is **not** an authorization: no macro data was "
-            "collected, no M3 variable created, no M3 Gate executed and no M3 "
-            "model fit.",
+            (
+                "- **Next research action (pointer only):** "
+                f"`{record['next_research_action_id']}` — the M3 macro data "
+                "Gate, which has since been EXECUTED as a data-admission Gate "
+                "only (see the M3 section below). A pointer is **not** an "
+                "authorization, and the Gate execution started no modeling: "
+                "`m3_modeling_started=False`, "
+                "`m3_incremental_evaluation_authorized=False`."
+                if record.get("stage128_m3_macro_data_gate_executed")
+                else
+                "- **Next research action (pointer only):** "
+                f"`{record['next_research_action_id']}` — the M3 macro data "
+                "Gate. A pointer is **not** an authorization: no macro data "
+                "was collected, no M3 variable created, no M3 Gate executed "
+                "and no M3 model fit."
+            ),
             "- Package: "
             "`project/stage128/m2_retained_block_human_decision/`; "
             "interpretation: "
@@ -4949,15 +4962,26 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
             "stage128 M2 D2 freeze artifact does not preserve the historical "
             "Stage127 D0 Gate status"
         )
-    # Fail closed on a stale live workstream label: once the freeze is
-    # recognized, the ROADMAP's CURRENT workstream pointer may not still name
-    # the completed Stage126 M1 baseline.
+    # Fail closed on a stale live workstream label. Once the freeze is
+    # recognized the ROADMAP's CURRENT workstream pointer may not still name
+    # the completed Stage126 M1 baseline. The M2 D2 label is correct only
+    # while M2 D2 is the live workstream; once the M3 macro data Gate has been
+    # EXECUTED, the live data workstream is the M3 Gate and the M2 D2 label
+    # becomes predecessor context.
     roadmap_workstream = read_roadmap(root)["active_research_workstream_id"]
-    if roadmap_workstream != _STAGE128_ACTIVE_WORKSTREAM_ID:
+    m3_gate_executed = bool(
+        derive_stage128_m3_macro_data_gate_markers(root).get(
+            "stage128_m3_macro_data_gate_executed"))
+    allowed = (_STAGE128_M3_ACTIVE_WORKSTREAM_ID if m3_gate_executed
+               else _STAGE128_ACTIVE_WORKSTREAM_ID)
+    if roadmap_workstream != allowed:
         raise HandoffError(
             f"stage128 M2 D2 freeze is complete but ROADMAP "
             f"active_research_workstream_id={roadmap_workstream!r} != "
-            f"{_STAGE128_ACTIVE_WORKSTREAM_ID!r}"
+            f"{allowed!r}"
+            + (" (the M3 macro data Gate has executed, so the live workstream "
+               "is the M3 Gate and the M2 D2 label is predecessor context)"
+               if m3_gate_executed else "")
         )
 
     exact = {
@@ -5353,6 +5377,10 @@ def derive_stage127_m2_incremental_evaluation_markers(root: str) -> dict:
         "m4_authorized": False,
     }
 
+
+#: Once the M3 macro data Gate has EXECUTED, this is the live research/data
+#: workstream label. Gate execution is a DATA workstream, never modeling.
+_STAGE128_M3_ACTIVE_WORKSTREAM_ID = "stage128-m3-macro-data-gate"
 
 _STAGE128_M3_MACRO_DATA_GATE_REL = (
     "project/stage128/m3_macro_data_gate/"

@@ -8,11 +8,11 @@ _Generated from the repository (git + QC). Do not edit by hand._
 ## Snapshot
 
 - **Stage / Batch:** Stage128 / None
-- **Active workstream:** `stage128_m2_d2_boundary_month_equity_return`
+- **Active workstream:** `stage128_m3_macro_data_gate`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3-macro-data-gate`
 - **Last stage commit:** `6a75c6e3c8d67b1fa7367f3777e6d15f7f031a0f`
-- **Generated from commit:** `6a75c6e3c8d67b1fa7367f3777e6d15f7f031a0f` (branch `stage128-m3-macro-data-gate`, informational)
+- **Generated from commit:** `924d609eebb17ad76cf1bebde0fadbf9cef4a621` (branch `stage128-m3-macro-data-gate`, informational)
 - **Baseline:** `origin/main` @ `35aaf4b70e9341704ee38be6f8cf2e2519c70bb2`
 
 ## Current-state validation
@@ -109,7 +109,7 @@ _The human governance decision that the paired evaluation deliberately left open
 - ⛔ **Holm family:** complete=False, final adjustment deferred=True — the incomplete confirmatory family stays incomplete
 - 🔒 **Final test locked:** final_test_unlocked=False, final_test_access_authorized=False, predictor values inspected=False, target values inspected=False
 - ⛔ **M3:** authorized=False, started=False — **M4:** authorized=False, started=False
-- **Next research action (pointer only):** `stage128-m3-macro-data-gate` — the M3 macro data Gate. A pointer is **not** an authorization: no macro data was collected, no M3 variable created, no M3 Gate executed and no M3 model fit.
+- **Next research action (pointer only):** `stage128-m3-macro-data-gate` — the M3 macro data Gate, which has since been EXECUTED as a data-admission Gate only (see the M3 section below). A pointer is **not** an authorization, and the Gate execution started no modeling: `m3_modeling_started=False`, `m3_incremental_evaluation_authorized=False`.
 - Package: `project/stage128/m2_retained_block_human_decision/`; interpretation: `project/stage128/m2_retained_block_human_decision/README_STAGE128_M2_RETAINED_BLOCK_HUMAN_DECISION.md`
 
 ### Stage128 — M3 macro DATA Gate (data admission only)
@@ -175,5 +175,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `287a450a51025105c3946e911a244dae56c97e91cac70e8d64cd6ff1e5b30a5f`_
-_generated_at_utc: 2026-08-01T15:13:13Z (informational)_
+_state_fingerprint: `d11ec85fe2dbdbc58a362107ad0865c634909b627ee9dd46ccfb5cc4037d3d70`_
+_generated_at_utc: 2026-08-01T15:46:16Z (informational)_

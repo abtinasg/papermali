@@ -33,8 +33,8 @@ Required source id `src_m3_cbi_macro`, required authority
 * cand_m3_cpi_inflation: operational series and transformation not uniquely determined (14 of 20 required lock fields unresolved)
 * cand_m3_fx_change_official: operational series and transformation not uniquely determined (14 of 20 required lock fields unresolved)
 * cand_m3_policy_financing_rate: operational series and transformation not uniquely determined (14 of 20 required lock fields unresolved)
-* no authoritative CBI data artifact was obtained: 6 WAF rejections, 2 CAPTCHA challenges, 3 unreachable hosts across 11 official-host probes
-* no reproducible retrieval path: identical repeated requests to the same official URL returned different bytes
+* official-metadata unavailability: no official CBI data or documentation artifact is committed in this repository, so the prospective definition lock could not be completed from official sources in this execution
+* the access-probe capture metadata is not independently verifiable (raw response bytes unavailable, no headers or stderr logs captured), so it cannot supply G02/G03/G04 evidence
 * cand_m3_cpi_inflation: G-rules unresolved ['G01', 'G02', 'G03', 'G04', 'G05', 'G06', 'G07']
 * cand_m3_fx_change_official: G-rules unresolved ['G01', 'G02', 'G03', 'G04', 'G05', 'G06', 'G07']
 * cand_m3_policy_financing_rate: G-rules unresolved ['G01', 'G02', 'G03', 'G04', 'G05', 'G06', 'G07']
@@ -59,14 +59,70 @@ Because the lock is unresolved, `assert_phase_b_permitted` fail-closes and
 **Phase B never executed**. That guard is what prevents an opportunistic
 definition choice or a sequential search for a series with better coverage.
 
-## Official evidence
+## What this code actually implements
 
-Every official CBI URL that responded returned either a WAF 'Request Rejected' page or a JavaScript/CAPTCHA bot-protection challenge; the Time Series Database hosts did not respond at all. No probe returned a macro data series. No two identical requests returned identical bytes, so no reproducible retrieval path exists. The CAPTCHA was never solved or bypassed.
+`implementation_scope` = **`PHASE_A_TERMINAL_UNRESOLVED_SNAPSHOT`**.
 
-All 11 probes targeted official `cbi.ir` hosts only. No
+This repository code is **not** a complete executable PASS/FAIL data Gate.
+`phase_b_implementation_present` = **false**. What executed here was:
+
+* official-source discovery,
+* a **metadata-only** prospective definition-lock attempt,
+* recording of the UNRESOLVED decision.
+
+What did **not** execute: value-level retrieval, coverage, join, event-count
+and temporal-support assessment. Those outputs are null. Implementing and
+running Phase B would require official metadata **and a new explicit
+authorization after human review**.
+
+## Official evidence — downgraded, not independently verifiable
+
+**`access_probe_evidence_status` = `UNVERIFIED_CAPTURE_METADATA_ONLY`.**
+
+Only one thing about the access attempt is independently verifiable from
+committed data: all 11 probes targeted official
+`cbi.ir` hosts, which can be checked against the committed URL list. No
 unofficial source, aggregator, mirror, news article, SCI series or free-market
-FX rate was used or consulted as evidence. The CAPTCHA was never solved or
-bypassed.
+FX rate was used, and the CAPTCHA was never solved or bypassed.
+
+Everything else is **programmer-reported capture metadata, raw bytes
+unavailable for independent audit**:
+
+* `access_probe_raw_bytes_available` = **false** — the response bodies from the
+  capture session were not retained;
+* `response_headers_captured` = **false**, `stderr_logs_captured` = **false**;
+* the recorded SHA-256 values, byte lengths, status codes, and the
+  WAF / CAPTCHA / byte-reproducibility classifications **cannot be
+  re-derived** from committed bytes.
+
+Accordingly this package does **not** assert that the responses were definitely
+CAPTCHA pages, that they definitely contained no macro series, that every
+responding URL definitely returned "Request Rejected", or that
+non-reproducibility is proven. Those remain programmer-reported observations
+only, and **none of them is used as G02, G03 or G04 evidence**.
+
+## Why the Gate is UNRESOLVED
+
+Three distinct causes, deliberately not conflated:
+
+1. **Frozen-contract incompleteness** — the frozen contracts alone do not
+   uniquely determine the operational series for any candidate.
+2. **Official-metadata unavailability** — no independently verifiable official
+   CBI documentation or data artifact is committed, so the prospective lock
+   could not be completed from official sources in this execution.
+3. **No value-level execution** — coverage, join, event counts and temporal
+   support were never assessed.
+
+It is **not** established that the Gate could not have passed with official
+access. Official source documentation could potentially have completed the
+prospective definition lock. A new human-selected contract is one possible
+future route; an authorized, reproducible official CBI documentation and data
+package is another.
+
+The candidate ambiguity classes recorded in the lock are **unverified**
+(`ambiguity_classes_verified_against_official_documentation` = false). They are
+derived from what the incomplete frozen contract leaves open and must not be
+read as verified facts about CBI series.
 
 ## Parent sample
 

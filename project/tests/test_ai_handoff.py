@@ -1288,10 +1288,12 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["m3_authorized"] is False
     assert state["m3_started"] is False
     # The live workstream label advanced with the live state: the Stage128
-    # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
-    # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
-    # HISTORY for the completed M1 baseline workstream, not current state.
-    assert state["active_workstream"] == (
+    # The M3 macro DATA Gate has EXECUTED, so the CURRENT workstream is the
+    # M3 Gate. `stage128_m2_d2_boundary_month_equity_return` is now
+    # predecessor context and `stage126_m1_financial_baseline` remains correct
+    # HISTORY for the completed M1 baseline workstream — neither is current.
+    assert state["active_workstream"] == "stage128_m3_macro_data_gate"
+    assert state["active_workstream_predecessor_context"] == (
         "stage128_m2_d2_boundary_month_equity_return"
     )
     # Stage126 M1 is human-authorized and started; development-fold modeling
@@ -1338,7 +1340,9 @@ def test_real_repo_roadmap_stage126_status_consistency():
         os.path.join(REAL_ROOT, "project/docs/ai/ROADMAP.md"), encoding="utf-8",
     ).read()
     fm = gen.read_roadmap(REAL_ROOT)
-    assert fm["active_research_workstream_id"] == (
+    # The M3 macro data Gate has executed, so the live workstream is the Gate.
+    assert fm["active_research_workstream_id"] == "stage128-m3-macro-data-gate"
+    assert fm["predecessor_research_workstream_id"] == (
         "stage128-m2-d2-boundary-month-equity-return"
     )
     # The workstream label is derived from the frozen action and never
@@ -1446,15 +1450,13 @@ def test_real_repo_open_tasks_stage126_markers_match_handoff():
     # as an explicitly HISTORICAL (completed) section.
     assert (
         "## Active research workstream: "
-        "`stage128-m2-d2-boundary-month-equity-return`" in open_tasks
+        "`stage128-m3-macro-data-gate`" in open_tasks
     )
     assert (
         "### Historical (completed) — `stage126-m1-financial-baseline`"
         in open_tasks
     )
-    assert state["active_workstream"] == (
-        "stage128_m2_d2_boundary_month_equity_return"
-    )
+    assert state["active_workstream"] == "stage128_m3_macro_data_gate"
     assert "Stage126 M1 human-authorized = true" in open_tasks
     assert "Stage126 started = true" in open_tasks
     assert "development modeling authorized = true" in open_tasks
@@ -2338,10 +2340,12 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     assert state["stage127_m2_incremental_evaluation_primary_model_fits"] == 44
     assert state["m2_block_retained"] is True
     # The live workstream label advanced with the live state: the Stage128
-    # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
-    # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
-    # HISTORY for the completed M1 baseline workstream, not current state.
-    assert state["active_workstream"] == (
+    # The M3 macro DATA Gate has EXECUTED, so the CURRENT workstream is the
+    # M3 Gate. `stage128_m2_d2_boundary_month_equity_return` is now
+    # predecessor context and `stage126_m1_financial_baseline` remains correct
+    # HISTORY for the completed M1 baseline workstream — neither is current.
+    assert state["active_workstream"] == "stage128_m3_macro_data_gate"
+    assert state["active_workstream_predecessor_context"] == (
         "stage128_m2_d2_boundary_month_equity_return"
     )
     # The micro-part pointer tracks the newest completed robustness micro-part.
@@ -2645,10 +2649,12 @@ def test_part1_does_not_advance_research_pointers():
     assert state["stage127_m2_incremental_evaluation_primary_model_fits"] == 44
     assert state["m2_block_retained"] is True
     # The live workstream label advanced with the live state: the Stage128
-    # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
-    # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
-    # HISTORY for the completed M1 baseline workstream, not current state.
-    assert state["active_workstream"] == (
+    # The M3 macro DATA Gate has EXECUTED, so the CURRENT workstream is the
+    # M3 Gate. `stage128_m2_d2_boundary_month_equity_return` is now
+    # predecessor context and `stage126_m1_financial_baseline` remains correct
+    # HISTORY for the completed M1 baseline workstream — neither is current.
+    assert state["active_workstream"] == "stage128_m3_macro_data_gate"
+    assert state["active_workstream_predecessor_context"] == (
         "stage128_m2_d2_boundary_month_equity_return"
     )
     # `current_stage` is a CURRENT-state field and advanced with the freeze;
@@ -2925,10 +2931,12 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # The workstream pointer stays put; the research-action pointer legitimately
     # advanced because Part 6 closed the six-category robustness set.
     # The live workstream label advanced with the live state: the Stage128
-    # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
-    # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
-    # HISTORY for the completed M1 baseline workstream, not current state.
-    assert state["active_workstream"] == (
+    # The M3 macro DATA Gate has EXECUTED, so the CURRENT workstream is the
+    # M3 Gate. `stage128_m2_d2_boundary_month_equity_return` is now
+    # predecessor context and `stage126_m1_financial_baseline` remains correct
+    # HISTORY for the completed M1 baseline workstream — neither is current.
+    assert state["active_workstream"] == "stage128_m3_macro_data_gate"
+    assert state["active_workstream_predecessor_context"] == (
         "stage128_m2_d2_boundary_month_equity_return"
     )
     # The human retained-block decision
@@ -3081,3 +3089,129 @@ def test_part5_compatibility_requires_part1_qc_all_pass(tmp_path):
         json.dump(qc, f, ensure_ascii=False)
     with pytest.raises(gen.HandoffError):
         gen.derive_part5_successor_compatibility_markers(str(tmp_path))
+
+
+# --------------------------------------------------------------------------- #
+# M3 macro data Gate — canonical state consistency (no contradictions)
+# --------------------------------------------------------------------------- #
+
+def _handoff_state() -> dict:
+    with open(os.path.join(REAL_ROOT, "project/docs/ai/handoff_state.json"),
+              encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def _roadmap_text() -> str:
+    with open(os.path.join(REAL_ROOT, "project/docs/ai/ROADMAP.md"),
+              encoding="utf-8") as fh:
+        return fh.read()
+
+
+def _open_tasks_text() -> str:
+    with open(os.path.join(REAL_ROOT, "project/docs/ai/OPEN_TASKS.md"),
+              encoding="utf-8") as fh:
+        return fh.read()
+
+
+def test_active_workstream_identifies_the_m3_macro_gate():
+    state = _handoff_state()
+    assert state["m3_macro_data_gate_executed"] is True
+    assert state["active_workstream"] == "stage128_m3_macro_data_gate"
+    assert state["active_workstream"] != (
+        "stage128_m2_d2_boundary_month_equity_return")
+
+
+def test_m3_data_workstream_started_but_modeling_did_not():
+    state = _handoff_state()
+    assert state["m3_data_workstream_started"] is True
+    assert state["m3_modeling_started"] is False
+    assert state["m3_incremental_evaluation_authorized"] is False
+    assert state["m3_block_admitted_for_incremental_evaluation"] is False
+    assert state["m3_macro_data_gate_human_review_required"] is True
+    assert state["m3_macro_data_gate_status"] == "UNRESOLVED_M3_DATA_GATE"
+    assert state["stage128_m3_macro_data_gate_authorization_consumed"] is True
+
+
+def test_pointers_are_unchanged_because_the_gate_is_unresolved():
+    state = _handoff_state()
+    assert state["last_completed_research_action_id"] == (
+        "stage128-m2-retained-block-human-decision")
+    assert state["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    assert state["next_research_action_id"] != (
+        "stage128-m3-incremental-evaluation")
+
+
+def test_current_state_does_not_say_the_m3_gate_was_not_executed():
+    """The exact contradiction present in the reviewed head must be gone."""
+    text = _current_state_text()
+    for stale in ("no M3 Gate executed",
+                  "no M3 Gate was executed",
+                  "M3 Gate not executed",
+                  "M3 Gate not started",
+                  "M3 Gate not authorized"):
+        assert stale not in text, stale
+
+
+def test_current_state_says_the_m3_gate_was_executed():
+    text = _current_state_text()
+    assert "M3 macro DATA Gate" in text
+    assert "**Executed:** True" in text
+    assert "UNRESOLVED_M3_DATA_GATE" in text
+    assert "**Active workstream:** `stage128_m3_macro_data_gate`" in text
+
+
+def test_current_state_cannot_both_assert_and_deny_gate_execution():
+    text = _current_state_text()
+    executed = "**Executed:** True" in text
+    denied = "no M3 Gate executed" in text
+    assert not (executed and denied)
+    assert executed
+
+
+def test_roadmap_no_longer_labels_the_m3_gate_unauthorized_or_unstarted():
+    text = _roadmap_text()
+    front = text.split("---")[1]
+    assert "active_research_workstream_id: stage128-m3-macro-data-gate" in front
+    assert ("predecessor_research_workstream_id: "
+            "stage128-m2-d2-boundary-month-equity-return") in front
+    # the stale live-workstream label must not be the ACTIVE one
+    assert ("active_research_workstream_id: "
+            "stage128-m2-d2-boundary-month-equity-return") not in front
+    # item 25 must not still call the Gate a pointer-only, unstarted action
+    assert "NEXT POINTER ONLY; NOT authorized and NOT started" not in text
+    assert "EXECUTED once as a DATA-ADMISSION GATE ONLY" in text
+
+
+def test_open_tasks_no_longer_calls_stage127_m2_the_current_action():
+    text = _open_tasks_text()
+    assert ("The current scientific action is `stage127-m2-incremental-"
+            "evaluation`") not in text
+    assert ("The current scientific action is `stage128-m3-macro-data-gate`"
+            in text)
+    assert "## Active research workstream: `stage128-m3-macro-data-gate`" in text
+    assert ("## Active research workstream: "
+            "`stage128-m2-d2-boundary-month-equity-return`") not in text
+    # the M2 description is preserved, but explicitly as history
+    assert "### Predecessor scientific action (HISTORICAL)" in text
+
+
+def test_handoff_fields_and_roadmap_front_matter_agree():
+    state = _handoff_state()
+    front = _roadmap_text().split("---")[1]
+    front_map = dict(
+        line.split(":", 1) for line in front.strip().splitlines() if ":" in line)
+    front_map = {k.strip(): v.strip() for k, v in front_map.items()}
+    assert front_map["active_research_workstream_id"].replace("-", "_") == (
+        state["active_workstream"])
+    assert front_map["last_completed_research_action_id"] == (
+        state["last_completed_research_action_id"])
+    assert front_map["next_research_action_id"] == (
+        state["next_research_action_id"])
+    assert front_map["m3_macro_data_gate_status"] == (
+        state["m3_macro_data_gate_status"])
+
+
+def test_access_probe_evidence_downgrade_is_reflected_in_open_tasks():
+    text = _open_tasks_text()
+    assert "UNVERIFIED_CAPTURE_METADATA_ONLY" in text
+    assert "programmer-reported" in text.lower()
