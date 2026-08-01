@@ -9,8 +9,8 @@ The CURRENT workstream is the Stage128 M2 D2 boundary-month equity-return
 workstream — a stable machine-readable label **derived from** the already-frozen
 action `stage128-m2-boundary-month-return-design-freeze`, not a new scientific
 action. The authoritative research-action pointers are
-`last_completed_research_action_id=stage127-m2-incremental-evaluation` and
-`next_research_action_id=stage128-m2-retained-block-human-decision`, the latter
+`last_completed_research_action_id=stage128-m2-retained-block-human-decision`
+and `next_research_action_id=stage128-m3-macro-data-gate`, the latter
 a pointer only and **not** authorized. `stage126-m1-financial-baseline` remains
 correct **history** for the completed M1 financial-baseline workstream (see the
 historical section below); it is no longer the current workstream.
@@ -71,8 +71,9 @@ so `m2_incremental_evaluation_authorized = false` again — that is an
 AUTHORIZATION fact and does not mean the modeling never happened.
 `m2_started = true`, `m2_modeling_started = true` and
 `m2_block_admitted_for_modeling = true` record the execution;
-`m2_block_retained = false` with `m2_retained_block_decision_required = true`
-records that retention is still undecided.
+`m2_block_retained = true` with `m2_retained_block_decision_required = false`
+records that the human retained-block decision has since been made (see
+below); retention is a governance decision and establishes no superiority.
 
 **M2 data state.** The live fields are `m2_market_data_evidence_collected =
 true`, `m2_market_data_evidence_validated = true`,
@@ -86,15 +87,32 @@ as `stage125_part4_m2_data_collected_historical`.
 
 ### What is open now
 
-`stage128-m2-retained-block-human-decision` is a **pointer only** and **not**
-authorized. The retained-block question — should the M2 market block be carried
-into the confirmatory programme? — is deliberately left open for the human
-supervisor, who must weigh the 127-row common-sample attrition, the 28 pooled
-validation positives, the flagged D2 eligibility imbalance, temporal
-heterogeneity, the wide bootstrap intervals and the disagreement in
-point-estimate sign across model families. Nothing in the completed action
-retains M2, selects a winner, unlocks the final test or authorizes
-`stage128-m3-macro-data-gate`.
+`stage128-m2-retained-block-human-decision` is **COMPLETE**. Under its own
+explicit one-action human authorization (240 UTF-8 bytes, SHA-256
+`91edbdedbf69fd3af4ec5a378b1b0506ed4df941f1331be91755068c6fb6e2b4`; the exact
+utterance lives only in the package's authorization record), the human
+supervisor recorded
+`RETAIN_M2_AS_INTERMEDIATE_CONFIRMATORY_BLOCK`, weighing the 127-row
+common-sample attrition, the 28 pooled validation positives, the flagged D2
+eligibility imbalance (53 comparisons / 35 flags), temporal heterogeneity, the
+wide bootstrap intervals and the disagreement in point-estimate sign across
+model families.
+
+M2 stays the **intermediate** block of the preregistered nested chain
+M1→M2→M3→M4 and the comparator for a future paired `M3 − M2` evaluation —
+**only** if the M3 data Gate is separately authorized and passes. This is a
+retained-block decision, **not** a superiority decision: the observed
+development evidence remains approximately null, and retention implies no
+predictive improvement, no statistical significance, no paper winner, no final
+model, no full-development refit and no final-test unlock or access. The
+confirmatory family stays unchanged and INCOMPLETE, with the final Holm
+adjustment deferred. The one-action authorization was CONSUMED by the
+recording.
+
+`stage128-m3-macro-data-gate` is now the `next_research_action_id`. It is a
+**pointer only** and **not** authorized: no macro data has been collected, no
+M3 variable created, no M3 Gate executed and no M3 model fit. M4 is likewise
+unauthorized and unstarted.
 
 `stage128-m2-d2-gate-rerun` is complete — it is the data admission this
 evaluation consumed; its terminal result `PASS_FOR_M2_INCREMENTAL_EVALUATION`
@@ -105,12 +123,13 @@ completed and resolved; its terminal result remains `FAIL_M2_DATA_GATE`,
 unchanged, in its own Stage127 artifacts.
 
 Authoritative research pointers live in `ROADMAP.md` front matter. **If and
-when the Stage127 M2 incremental-evaluation PR is merged**, they become
+when the Stage128 M2 retained-block human-decision PR is merged**, they become
+`last_completed_research_action_id=stage128-m2-retained-block-human-decision`,
+`next_research_action_id=stage128-m3-macro-data-gate` (a pointer only —
+explicitly **not** authorized). Until merge, the pointers live on `main` remain
 `last_completed_research_action_id=stage127-m2-incremental-evaluation`,
-`next_research_action_id=stage128-m2-retained-block-human-decision` (a pointer
-only — explicitly **not** authorized). Until merge, the pointers live on `main`
-remain `last_completed_research_action_id=stage128-m2-d2-gate-rerun`,
-`next_research_action_id=stage127-m2-incremental-evaluation` as set by PR #70.
+`next_research_action_id=stage128-m2-retained-block-human-decision` as set by
+PR #71.
 
 ## Stage127 M2 market-data Gate — current, truthful state
 

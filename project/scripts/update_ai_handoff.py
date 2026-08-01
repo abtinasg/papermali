@@ -2765,6 +2765,7 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         **derive_stage128_m2_d2_design_freeze_markers(root),
         **derive_stage128_m2_d2_gate_rerun_markers(root),
         **derive_stage127_m2_incremental_evaluation_markers(root),
+        **derive_stage128_m2_retained_block_human_decision_markers(root),
     }
 
 
@@ -4059,9 +4060,14 @@ def render_current_state(record: dict) -> str:
             "",
         ]
     if record.get("stage127_m2_incremental_evaluation_completed"):
+        _eval_heading_suffix = (
+            "" if record.get(
+                "stage128_m2_retained_block_human_decision_completed")
+            else " (CURRENT)"
+        )
         lines += [
-            "## Stage127 — paired M2 vs M1 incremental evaluation "
-            "(CURRENT)\n",
+            "## Stage127 — paired M2 vs M1 incremental evaluation"
+            f"{_eval_heading_suffix}\n",
             "_The paired, development-only comparison of the frozen M2 block "
             "against the frozen M1 block on the exact three-variable D2 "
             "common sample, under the locked temporal folds, retained "
@@ -4084,12 +4090,24 @@ def render_current_state(record: dict) -> str:
             "- **Primary predictive model fits:** "
             f"{record.get('stage127_m2_incremental_evaluation_primary_model_fits')}"
             " (both blocks refitted on identical common-sample training rows)",
-            "- \u26d4 **M2 block retained:** "
-            f"{record.get('m2_block_retained')} — this action reports OBSERVED "
-            "development evidence only and selects no winner; a **human "
-            "retained-block decision is REQUIRED** "
-            f"(`m2_retained_block_decision_required="
-            f"{record.get('m2_retained_block_decision_required')}`)",
+            (
+                "- \\u26d4 **M2 block retained BY THIS ACTION:** false \u2014 it "
+                "reports OBSERVED development evidence only and selects no "
+                "winner. The retained-block question was answered "
+                "separately, by the human decision reported below "
+                f"(`m2_block_retained={record.get('m2_block_retained')}`, "
+                "`m2_retained_block_decision_required="
+                f"{record.get('m2_retained_block_decision_required')}`)"
+                if record.get(
+                    "stage128_m2_retained_block_human_decision_completed")
+                else
+                "- \\u26d4 **M2 block retained:** "
+                f"{record.get('m2_block_retained')} \u2014 this action reports "
+                "OBSERVED development evidence only and selects no winner; "
+                "a **human retained-block decision is REQUIRED** "
+                f"(`m2_retained_block_decision_required="
+                f"{record.get('m2_retained_block_decision_required')}`)"
+            ),
             "- \u2705 **M2 market data (live):** evidence collected="
             f"{record.get('m2_market_data_evidence_collected')}, validated="
             f"{record.get('m2_market_data_evidence_validated')}, entered the "
@@ -4123,12 +4141,81 @@ def render_current_state(record: dict) -> str:
             f"{record.get('final_test_evaluation_performed')} — "
             f"**M3 started:** {record.get('m3_started')} — "
             f"**M4 started:** {record.get('m4_started')}",
-            "- **Next research action (pointer only):** "
-            f"`{record['next_research_action_id']}` — a human retained-block "
-            "review. A pointer is **not** an authorization.",
+            (
+                "- **Successor to THIS action:** the human retained-block "
+                "decision `stage128-m2-retained-block-human-decision`, "
+                "now COMPLETE and reported in its own section below."
+                if record.get(
+                    "stage128_m2_retained_block_human_decision_completed")
+                else
+                "- **Next research action (pointer only):** "
+                f"`{record['next_research_action_id']}` — a human "
+                "retained-block review. A pointer is **not** an "
+                "authorization."
+            ),
             "- Package: `project/stage128/m2_incremental_evaluation/`; "
             "interpretation: `project/stage128/m2_incremental_evaluation/"
             "README_STAGE127_M2_INCREMENTAL_EVALUATION.md`",
+            "",
+        ]
+    if record.get("stage128_m2_retained_block_human_decision_completed"):
+        lines += [
+            "## Stage128 — M2 retained-block HUMAN decision (CURRENT)\n",
+            "_The human governance decision that the paired evaluation "
+            "deliberately left open, recorded from already-committed evidence "
+            "under its own one-action human authorization. Zero model fits, "
+            "zero predictions, zero resampling, zero refits and zero "
+            "final-test values read. This is a **retained-block decision, not "
+            "a superiority decision**._\n",
+            "- ✅ **Decision outcome:** "
+            f"`{record.get('stage128_m2_retained_block_human_decision_outcome')}`"
+            " — **authorization consumed:** "
+            f"{record.get('stage128_m2_retained_block_human_decision_authorization_consumed')}",
+            "- ✅ **M2 block retained:** "
+            f"{record.get('m2_block_retained')} — as the INTERMEDIATE "
+            "block of the preregistered nested chain M1→M2→M3→M4 "
+            "and the comparator for a future paired `M3 − M2` evaluation, "
+            "conditional on a separately authorized M3 data Gate that passes",
+            "- **Retention basis:** "
+            f"`{record.get('stage128_m2_retention_basis')}`",
+            "- ⛔ **M2 predictive superiority claim supported:** "
+            f"{record.get('m2_predictive_superiority_claim_supported')} — "
+            "the observed development evidence stays approximately null (all "
+            "three 95% paired-bootstrap PR-AUC intervals include zero and the "
+            "point-estimate signs disagree across model families). Retention "
+            "implies no predictive improvement and no statistical "
+            "significance.",
+            "- ⛔ **No winner, no final model:** paper_winner_selected="
+            f"{record.get('paper_winner_selected')}, final_model_selected="
+            f"{record.get('final_model_selected')}, "
+            "full_development_refit_performed="
+            f"{record.get('full_development_refit_performed')}",
+            "- ⛔ **Holm family:** complete="
+            f"{record.get('holm_family_complete')}, final adjustment "
+            f"deferred={record.get('holm_final_adjustment_deferred')} — "
+            "the incomplete confirmatory family stays incomplete",
+            "- 🔒 **Final test locked:** final_test_unlocked="
+            f"{record.get('final_test_unlocked')}, "
+            "final_test_access_authorized="
+            f"{record.get('final_test_access_authorized')}, "
+            "predictor values inspected="
+            f"{record.get('final_test_predictor_values_inspected')}, "
+            "target values inspected="
+            f"{record.get('final_test_target_values_inspected')}",
+            "- ⛔ **M3:** authorized="
+            f"{record.get('m3_authorized')}, started={record.get('m3_started')}"
+            " — **M4:** authorized="
+            f"{record.get('m4_authorized')}, started={record.get('m4_started')}",
+            "- **Next research action (pointer only):** "
+            f"`{record['next_research_action_id']}` — the M3 macro data "
+            "Gate. A pointer is **not** an authorization: no macro data was "
+            "collected, no M3 variable created, no M3 Gate executed and no M3 "
+            "model fit.",
+            "- Package: "
+            "`project/stage128/m2_retained_block_human_decision/`; "
+            "interpretation: "
+            "`project/stage128/m2_retained_block_human_decision/"
+            "README_STAGE128_M2_RETAINED_BLOCK_HUMAN_DECISION.md`",
             "",
         ]
     lines += [
@@ -5206,6 +5293,148 @@ def derive_stage127_m2_incremental_evaluation_markers(root: str) -> dict:
         "m3_authorized": False,
         "m4_started": False,
         "m4_authorized": False,
+    }
+
+
+_STAGE128_M2_RETAINED_BLOCK_DECISION_REL = (
+    "project/stage128/m2_retained_block_human_decision/"
+    "stage128_m2_retained_block_human_decision.json"
+)
+_STAGE128_M2_RETAINED_BLOCK_DECISION_ACTION_ID = (
+    "stage128-m2-retained-block-human-decision"
+)
+_STAGE128_M2_RETAINED_BLOCK_DECISION_OUTCOME = (
+    "RETAIN_M2_AS_INTERMEDIATE_CONFIRMATORY_BLOCK"
+)
+#: After the human retained-block decision the live pointer is the M3 data
+#: Gate. It is a pointer ONLY: M3 is not authorized and not started.
+_NEXT_RESEARCH_ACTION_ID_AFTER_M2_RETAINED_BLOCK_DECISION = (
+    "stage128-m3-macro-data-gate"
+)
+
+
+def derive_stage128_m2_retained_block_human_decision_markers(
+    root: str,
+) -> dict:
+    """Recognize the recorded HUMAN retained-block decision.
+
+    Narrow and fail-closed. The decision is a governance/design decision only:
+
+    * M2 is RETAINED as the intermediate confirmatory block, and that retention
+      is explicitly NOT a superiority claim, a winner, or a final model;
+    * nothing was fit, predicted, resampled or refitted;
+    * the final test stays locked and M3/M4 stay unauthorized and unstarted;
+    * its one-action human authorization is CONSUMED by the recording.
+
+    Returns {} before the decision has been recorded.
+    """
+    path = os.path.join(root, _STAGE128_M2_RETAINED_BLOCK_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        d = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(
+            f"unreadable stage128 M2 retained-block decision: {exc}") from exc
+
+    if d.get("decision_id") != _STAGE128_M2_RETAINED_BLOCK_DECISION_ACTION_ID:
+        raise HandoffError("stage128 M2 retained-block decision_id mismatch")
+    if d.get("decision_outcome") != _STAGE128_M2_RETAINED_BLOCK_DECISION_OUTCOME:
+        raise HandoffError(
+            "stage128 M2 retained-block decision_outcome mismatch")
+
+    exact = {
+        "m2_block_retained": True,
+        "m2_retained_block_decision_required": False,
+        "m2_retained_block_human_decision_completed": True,
+        "m2_retained_block_human_decision_authorization_consumed": True,
+        "m2_predictive_superiority_claim_supported": False,
+        "paper_winner_selected": False,
+        "final_model_selected": False,
+        "full_development_refit_performed": False,
+        "final_test_locked": True,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_performed": False,
+        "m3_authorized": False,
+        "m3_started": False,
+        "m4_authorized": False,
+        "m4_started": False,
+        "holm_family_complete": False,
+        "holm_final_adjustment_deferred": True,
+        "authorization_consumed": True,
+        "authorizes_next_action": False,
+        "next_research_action_pointer_is_not_authorization": True,
+    }
+    for key, want in exact.items():
+        if d.get(key) != want:
+            raise HandoffError(
+                f"stage128 M2 retained-block decision field {key}="
+                f"{d.get(key)!r} != {want!r}"
+            )
+
+    audit = d.get("execution_audit") or {}
+    for key in (
+        "model_fits", "predictions", "new_oof_rows_generated",
+        "resampling_executions", "bootstrap_executions",
+        "holm_adjustment_executions", "p_value_computations",
+        "calibration_executions", "shap_executions",
+        "full_development_refits", "final_test_predictor_values_read",
+        "final_test_target_values_read", "final_test_predictions",
+        "final_test_evaluations", "m3_executions", "m4_executions",
+        "scientific_artifacts_regenerated",
+    ):
+        if audit.get(key) != 0:
+            raise HandoffError(
+                f"stage128 M2 retained-block execution audit {key}="
+                f"{audit.get(key)!r} != 0"
+            )
+    if d.get("next_research_action_id") != (
+        _NEXT_RESEARCH_ACTION_ID_AFTER_M2_RETAINED_BLOCK_DECISION
+    ):
+        raise HandoffError(
+            "stage128 M2 retained-block next_research_action_id mismatch")
+
+    return {
+        "stage128_m2_retained_block_human_decision_completed": True,
+        "stage128_m2_retained_block_human_decision_outcome": (
+            _STAGE128_M2_RETAINED_BLOCK_DECISION_OUTCOME
+        ),
+        "stage128_m2_retained_block_human_decision_authorization_consumed":
+            True,
+        "stage128_m2_retention_basis": d.get("m2_retention_basis"),
+        # RETENTION and SUPERIORITY are different things. M2 is retained as the
+        # intermediate confirmatory block; the observed development evidence
+        # stays approximately null and no superiority claim is supported.
+        "m2_block_retained": True,
+        "m2_retained_block_decision_required": False,
+        "m2_retained_block_human_decision_completed": True,
+        "m2_retained_block_human_decision_authorization_consumed": True,
+        "m2_predictive_superiority_claim_supported": False,
+        "m2_evaluation_completed": True,
+        "m2_superiority_established": False,
+        "m2_winner_selected": False,
+        "holm_family_complete": False,
+        "holm_final_adjustment_deferred": True,
+        "last_completed_research_action_id": (
+            _STAGE128_M2_RETAINED_BLOCK_DECISION_ACTION_ID
+        ),
+        "next_research_action_id": (
+            _NEXT_RESEARCH_ACTION_ID_AFTER_M2_RETAINED_BLOCK_DECISION
+        ),
+        "next_research_action_pointer_is_not_authorization": True,
+        "paper_winner_selected": False,
+        "final_model_selected": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_predictor_values_inspected": False,
+        "final_test_target_values_inspected": False,
+        "final_test_evaluation_performed": False,
+        "m3_authorized": False,
+        "m3_started": False,
+        "m3_data_collected": False,
+        "m4_authorized": False,
+        "m4_started": False,
     }
 
 

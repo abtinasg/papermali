@@ -1,0 +1,166 @@
+{
+  "all_pass": true,
+  "assertion_count": 38,
+  "assertions": [
+    {
+      "name": "authorization_byte_length_is_240",
+      "status": "PASS"
+    },
+    {
+      "name": "authorization_sha256_matches",
+      "status": "PASS"
+    },
+    {
+      "name": "authorization_record_reproduces_byte_length_and_sha",
+      "status": "PASS"
+    },
+    {
+      "name": "verbatim_and_normalized_authorization_are_separate_fields",
+      "status": "PASS"
+    },
+    {
+      "name": "decision_artifact_does_not_duplicate_the_human_utterance",
+      "status": "PASS"
+    },
+    {
+      "name": "decision_references_authorization_record_by_path_and_sha",
+      "status": "PASS"
+    },
+    {
+      "name": "baseline_commit_is_the_canonical_main_sha",
+      "status": "PASS"
+    },
+    {
+      "name": "decision_outcome_is_retain_m2_as_intermediate_block",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_block_retained_is_true",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_superiority_claim_is_false",
+      "status": "PASS"
+    },
+    {
+      "name": "no_paper_winner_selected",
+      "status": "PASS"
+    },
+    {
+      "name": "no_final_model_selected",
+      "status": "PASS"
+    },
+    {
+      "name": "retention_is_governance_not_superiority",
+      "status": "PASS"
+    },
+    {
+      "name": "zero_model_fits_and_predictions",
+      "status": "PASS"
+    },
+    {
+      "name": "zero_resampling_and_new_uncertainty_execution",
+      "status": "PASS"
+    },
+    {
+      "name": "zero_full_development_refits",
+      "status": "PASS"
+    },
+    {
+      "name": "builder_imports_no_estimator_runtime",
+      "status": "PASS"
+    },
+    {
+      "name": "final_test_remains_locked",
+      "status": "PASS"
+    },
+    {
+      "name": "final_test_predictor_and_target_values_uninspected",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_remains_unauthorized_and_unstarted",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_remains_unauthorized_and_unstarted",
+      "status": "PASS"
+    },
+    {
+      "name": "exact_m1_and_m2_feature_lists",
+      "status": "PASS"
+    },
+    {
+      "name": "frozen_d2_equity_return_semantics_preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "zero_trade_day_ratio_remains_audit_only",
+      "status": "PASS"
+    },
+    {
+      "name": "exact_common_sample_counts",
+      "status": "PASS"
+    },
+    {
+      "name": "exact_attrition_counts",
+      "status": "PASS"
+    },
+    {
+      "name": "exact_pooled_oof_counts",
+      "status": "PASS"
+    },
+    {
+      "name": "exact_pr_auc_deltas_and_intervals",
+      "status": "PASS"
+    },
+    {
+      "name": "all_primary_intervals_include_zero",
+      "status": "PASS"
+    },
+    {
+      "name": "model_family_point_estimate_signs_disagree",
+      "status": "PASS"
+    },
+    {
+      "name": "observed_evidence_recorded_as_approximately_null",
+      "status": "PASS"
+    },
+    {
+      "name": "eligibility_audit_counts_53_and_35",
+      "status": "PASS"
+    },
+    {
+      "name": "holm_family_remains_incomplete_and_deferred",
+      "status": "PASS"
+    },
+    {
+      "detail": "recomputed SHA-256 of every pinned PR #71 and upstream artifact equals the SHA recorded in this package",
+      "name": "pinned_scientific_artifacts_are_byte_identical",
+      "status": "PASS"
+    },
+    {
+      "name": "all_pr71_artifacts_pinned",
+      "status": "PASS"
+    },
+    {
+      "name": "next_pointer_is_m3_gate_and_is_not_authorization",
+      "status": "PASS"
+    },
+    {
+      "name": "one_action_authorization_is_consumed_not_standing",
+      "status": "PASS"
+    },
+    {
+      "name": "merge_is_not_authorized",
+      "status": "PASS"
+    }
+  ],
+  "checks_28_requirement_note": "Roadmap/Handoff agreement (27) and clean working tree (28) are verified by the focused test file and the official validators, which run outside this in-process QC builder: project/tests/test_stage128_m2_retained_block_human_decision.py, project/run_stage126_current_state_validator.py --check and project/scripts/validate_ai_handoff.py --check.",
+  "contract_id": "stage128_m2_retained_block_human_decision",
+  "decision_id": "stage128-m2-retained-block-human-decision",
+  "failed_assertions": [],
+  "failed_count": 0,
+  "generated_for": "stage128-m2-retained-block-human-decision",
+  "scope_note": "This QC report checks the internal consistency of the Stage128 retained-block decision package: the exact human authorization, the separation of verbatim and derived text, the source-derived evidence, the frozen retained M2 definition, the immutability of the PR #71 scientific artifacts, and the no-execution and final-test-firewall guarantees. It re-runs no scientific computation and constitutes no scientific result."
+}

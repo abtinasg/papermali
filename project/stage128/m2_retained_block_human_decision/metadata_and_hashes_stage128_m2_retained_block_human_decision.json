@@ -1,0 +1,33 @@
+{
+  "contract_id": "stage128_m2_retained_block_human_decision",
+  "decision_id": "stage128-m2-retained-block-human-decision",
+  "generated_for": "stage128-m2-retained-block-human-decision",
+  "immutability_requirement": "Every artifact listed in source_artifacts_sha256 must remain byte-identical. No historical D0 Gate or D2 Gate result may be rewritten by this action.",
+  "package_artifacts_sha256": {
+    "project/stage128/m2_retained_block_human_decision/README_STAGE128_M2_RETAINED_BLOCK_HUMAN_DECISION.md": "88cf1e73b019a5766387b8855db002d41f4feca7fd489e35b39f04abdba49495",
+    "project/stage128/m2_retained_block_human_decision/stage128_m2_retained_block_human_authorization_record.json": "4520b17a413bb9dbcc1566f546a6235341a75087fc00314ca62f9b948dcf0a42",
+    "project/stage128/m2_retained_block_human_decision/stage128_m2_retained_block_human_decision.json": "a184d6878f12c0e301a200a03414272ea9169c7473dc64e83ed6f1282935b7ff"
+  },
+  "source_artifacts_sha256": {
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
+    "project/stage126/stage126_m1_retained_design_freeze.json": "53beb8603de48bdeed33858093f40dc0e89bf6f86cb97534a86dff32b74a2876",
+    "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_block_model_metrics.csv": "b28f2fa4fe2852680ad970399276241b5921784a4c546e5aa9a2e556757b9d87",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_calibration_report.json": "a5cd52777f5353942a94ddfdb898e1eca9538695b8b66a601286c44e980225af",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_common_sample_join_audit.json": "e6da66d96810ef7491ab5db0018909419ecc7760000e8f390b5bbadb0ef3c159",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_feature_configuration_manifest.json": "f39d99933aeb6822b84ed6228f97b6c57dc5a4205c67d71180b1242389561da9",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_final_test_firewall_audit.json": "6f9cef17d6c77736bd0e890619e4d0b389ba39a90bea55ccaa66f7ce4effb718",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_decision.json": "bda5fa054b4e00876b7be2b8ddd8726efc20c21117361e22a819d662e18814de",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_multiplicity_family_status.json": "6c20ed4f64321b8d5083359fd3079283bbf006f62958d576b6e5090d43c88459",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_paired_bootstrap_delta_summary.json": "1c4d4275c938d9d80e24d8746b16c669ecb822d884921a2ee05811220c061a6d",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_paired_oof_predictions.csv": "923ce0929693cc07fbf5a81e16295334624ead19447ff87d6a49e7a6f2a26ceb",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_parent_to_common_sample_attrition_audit.json": "005e0c26c8dbcc8b0847d3ad0588f8d77d532514c5d8a409bae0afe97e358b4c",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_post_lock_d2_eligibility_audit.json": "77631e97b417ca83d1a8a35170de9c3e99c3590df880f53cfc0ddd3cdee5a307",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_post_lock_d2_eligibility_smd.csv": "9cd801b060679cdb6080c8c3fee477708fb37e178df27d9652144c8a6ac53b80",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_predictive_fit_count_audit.json": "96f05b62eadbf64e7e38c0d78c3236f95ae47a37746ddfb2934116bc89c6b970",
+    "project/stage128/stage128_m2_d2_development_features.csv": "068519065fc4c36594a892b14c9242471a088e7b33484fbd5453b12391af2583"
+  },
+  "source_main_branch": "main",
+  "source_main_commit": "bdac807788b377690be0a879765cfe4ac148970d",
+  "source_repository": "abtinasg/papermali"
+}

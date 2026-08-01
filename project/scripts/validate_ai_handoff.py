@@ -72,7 +72,15 @@ def _research_action_order(root: str) -> list[str]:
     body = re.sub(r"^---\s*\n.*?\n---\s*\n", "", text, flags=re.DOTALL)
     section = re.search(r"##\s*Research actions.*?(?=\n##\s|\Z)", body, re.DOTALL)
     scope = section.group(0) if section else body
-    ids = re.findall(r"`([a-z0-9]+(?:-[a-z0-9]+)+)`", scope)
+    # Ordering comes from the numbered ITEMS, not from prose. An item's id is
+    # the first backticked id on its own numbered line ("24b. `...`"); ids that
+    # merely appear inside another item's explanatory prose (cross-references,
+    # naming notes) must never reorder the list. Falls back to the historical
+    # first-mention scan only if no numbered item is found.
+    ids = re.findall(
+        r"^\s*\d+[a-z]?\.\s+`([a-z0-9]+(?:-[a-z0-9]+)+)`", scope, re.MULTILINE)
+    if not ids:
+        ids = re.findall(r"`([a-z0-9]+(?:-[a-z0-9]+)+)`", scope)
     seen, ordered = set(), []
     for i in ids:
         if i not in seen:

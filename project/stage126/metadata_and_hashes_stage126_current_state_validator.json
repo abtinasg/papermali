@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 123,
+  "assertion_count": 134,
   "assertions": [
     {
       "detail": "",
@@ -493,13 +493,18 @@
       "status": "PASS"
     },
     {
-      "detail": "exactly one scientific-action section may be presented as (CURRENT); found 1: ['## Stage127 — paired M2 vs M1 incremental evaluation (CURRENT)']",
+      "detail": "exactly one scientific-action section may be presented as (CURRENT); found 1: ['## Stage128 — M2 retained-block HUMAN decision (CURRENT)']",
       "name": "current_state_has_exactly_one_current_scientific_action_section",
       "status": "PASS"
     },
     {
-      "detail": "the sole CURRENT section must be the newest completed scientific action (expected marker: 'paired M2 vs M1 incremental evaluation')",
+      "detail": "the sole CURRENT section must be the newest completed scientific action (expected marker: 'M2 retained-block HUMAN decision')",
       "name": "current_state_current_section_is_the_live_action",
+      "status": "PASS"
+    },
+    {
+      "detail": "once the human retained-block decision is recorded, the paired evaluation section becomes historical evidence context",
+      "name": "current_state_m2_evaluation_section_not_current_after_decision",
       "status": "PASS"
     },
     {
@@ -568,6 +573,56 @@
       "status": "PASS"
     },
     {
+      "detail": "a retained-block decision may only follow the completed paired M2 evaluation whose evidence it cites",
+      "name": "retained_block_decision_requires_a_completed_m2_evaluation",
+      "status": "PASS"
+    },
+    {
+      "detail": "the recorded decision must report M2 as retained and the retained-block question as closed",
+      "name": "retained_block_decision_is_recorded_as_retained_and_closed",
+      "status": "PASS"
+    },
+    {
+      "detail": "the one-action retained-block authorization is consumed by the recording and must never be left standing",
+      "name": "retained_block_authorization_is_consumed_not_standing",
+      "status": "PASS"
+    },
+    {
+      "detail": "retaining M2 as the intermediate confirmatory block is a governance decision and supports no predictive-superiority claim",
+      "name": "retained_block_decision_claims_no_superiority",
+      "status": "PASS"
+    },
+    {
+      "detail": "retention selects no winner, no final model and authorizes no full-development refit",
+      "name": "retained_block_decision_selects_no_winner_and_no_final_model",
+      "status": "PASS"
+    },
+    {
+      "detail": "the final test remains locked and uninspected after the decision",
+      "name": "retained_block_decision_leaves_final_test_locked",
+      "status": "PASS"
+    },
+    {
+      "detail": "the retained-block decision authorizes and starts neither M3 nor M4",
+      "name": "retained_block_decision_starts_and_authorizes_no_successor",
+      "status": "PASS"
+    },
+    {
+      "detail": "the incomplete confirmatory family stays incomplete and its final adjustment stays deferred",
+      "name": "retained_block_decision_keeps_holm_family_incomplete",
+      "status": "PASS"
+    },
+    {
+      "detail": "after the decision the pointer is the M3 macro data Gate, and a pointer is never an authorization",
+      "name": "retained_block_next_pointer_is_the_m3_gate_and_is_not_authorization",
+      "status": "PASS"
+    },
+    {
+      "detail": "CURRENT_STATE.md must render an explicit retained-block decision section once the decision is recorded",
+      "name": "current_state_renders_the_retained_block_decision_section",
+      "status": "PASS"
+    },
+    {
       "detail": "the design-freeze section must always name `stage128-m2-boundary-month-return-design-freeze` as the action it completed, and must never inherit the global last_completed_research_action_id",
       "name": "current_state_freeze_section_claims_only_its_own_action",
       "status": "PASS"
@@ -603,7 +658,7 @@
       "status": "PASS"
     },
     {
-      "detail": "ROADMAP prose naming the authoritative pointers must name exactly the front-matter pair (stage127-m2-incremental-evaluation / stage128-m2-retained-block-human-decision)",
+      "detail": "ROADMAP prose naming the authoritative pointers must name exactly the front-matter pair (stage128-m2-retained-block-human-decision / stage128-m3-macro-data-gate)",
       "name": "roadmap_prose_agrees_with_front_matter_pointers",
       "status": "PASS"
     },
@@ -619,7 +674,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "070f13ad5da44375b246b00040913bd8d1c9fbba",
+  "code_commit": "adcec96085f4fb6ff4c465b7a43c79e9285d3178",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -627,15 +682,15 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "070f13ad5da44375b246b00040913bd8d1c9fbba",
+  "generated_at": "adcec96085f4fb6ff4c465b7a43c79e9285d3178",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
   "operational_surfaces_git_versioned": true,
   "output_files_sha256": {
-    "README_STAGE126_CURRENT_STATE_VALIDATION.md": "26198465a15bff3f9e252af337b3145ff26cba8b0677ecac00a6cf00ac313417",
+    "README_STAGE126_CURRENT_STATE_VALIDATION.md": "aa31ccfeb66130f441304aebcfe9538919cfd6bc2757437c400d28191363ce48",
     "stage126_closed_part_registry.json": "bb6a269686f4f1b616b7896bbba1469eb1cf61e8514445b8f8150033f258080e",
-    "stage126_current_state_validation_report.json": "3eed3a75169c27c53e1bf73661025cd5dd9792df0abbd956f7b7a2bcc73c6fac",
+    "stage126_current_state_validation_report.json": "16c65cefff312c970418b57b00983019de3314bb1580dc2970c01b4b1628d245",
     "stage126_historical_boundary_manifest.json": "a518be27730e32b8a7de8de2d46865fc5efc1d31a5f796d00a6557d25f92a838",
     "stage126_validation_architecture_boundary_decision.json": "7502405fc0c2641c7dc766f3d4a52941b4c4841295d1d3130c07718768a6e06c"
   },
@@ -645,7 +700,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "f3eeafd6369e644071278bdc8c9dda386549c4f46c2bcf3a0933bed1d7ab40e7",
+  "source_file_sha256": "a6ab5c7a9707d1cb0109ec336fc380df38a0ccbcae4f9c5b1d402387e204aab3",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {
@@ -658,7 +713,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "a5a739d5874381a5b60596c5c5cdf591e35cda21e027f70daa515b3dfae59f79",
+  "test_file_sha256": "88c6ddd63b8a38708051bbf59d5c565ef590fa5d0defef5f67e221e52d5cf668",
   "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v2_lean"
