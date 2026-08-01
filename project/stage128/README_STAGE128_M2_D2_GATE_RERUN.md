@@ -57,6 +57,16 @@ The Gate PASSED **data admission only**. It does not say that M2 improves predic
 
 The post-lock eligibility audit frozen by the design-freeze contract remains REQUIRED before any M2 predictive result is interpreted. It was not executed here and is not a condition of this Gate.
 
+## How development target labels were used (literal statement)
+
+Development target labels **were** read by this Gate, through the unchanged frozen Stage127 machinery. They were used for exactly three limited descriptive / event-support audits:
+
+1. condition-D positive evaluable event counts in the two locked validation windows;
+2. target-stratified descriptive candidate coverage (`positive_row_coverage` / `negative_row_coverage`);
+3. the descriptive positive/negative composition of the three-variable common sample (55 positive / 484 negative of 539).
+
+Nothing else. Explicitly: no predictive performance metric, no model fit, no prediction, no target-based design selection, no target-based feature selection, no threshold tuning, no target value written into the pair-level predictor artifact (`stage128_m2_d2_development_features.csv` carries no target column), and no final-test target or predictor access. The machine readable form is `development_target_label_use.declared_uses` in the decision JSON (`declared_uses_are_exhaustive = True`).
+
 ## Counters
 
-target values accessed for predictive use = 0; model fits = 0; predictions = 0; final-test access = 0; canonical Gate executions in this action = 1 (the authorized re-run); historical D0 Gate changed = NO; M2 admitted for modeling = DATA ADMISSION ONLY.
+development target labels accessed for the three declared descriptive/event-support audits above = YES; target values used for any predictive, design, feature-selection or tuning purpose = NONE; model fits = 0; predictions = 0; final-test access = 0; canonical Gate executions in this action = 1 (the authorized re-run); historical D0 Gate changed = NO; M2 admitted for modeling = DATA ADMISSION ONLY.

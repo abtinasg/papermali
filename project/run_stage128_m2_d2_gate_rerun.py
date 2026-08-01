@@ -45,6 +45,10 @@ HUMAN_SOURCE_UTTERANCE = (
 HUMAN_SOURCE_UTTERANCE_SHA256 = (
     "8abbeac68868b859cc3a9fcda893af8f80eaf7d1f5c9471135bbeb4537ee9e95"
 )
+#: The calendar date on which the human supervisor issued the authorization
+#: above. Provenance metadata only: it records WHEN the single authorizing
+#: utterance was made and never changes what was authorized.
+AUTHORIZATION_DATE = "2026-08-01"
 
 
 def _git(repo_root: str, *args: str) -> str:
@@ -110,7 +114,7 @@ def authorization_record() -> dict:
         "authorized_action_id": r.ACTION_ID,
         "authorization_class": "ORIGINAL_SCIENTIFIC_AUTHORIZATION",
         "authorizing_role": "human_supervisor_data_owner",
-        "authorization_date": "2026-07-30",
+        "authorization_date": AUTHORIZATION_DATE,
         "human_source_utterance": HUMAN_SOURCE_UTTERANCE,
         "human_source_utterance_sha256": HUMAN_SOURCE_UTTERANCE_SHA256,
         "human_source_utterance_language": "fa",
@@ -419,6 +423,9 @@ def qc_report(
     add("authorization_utterance_sha256_verified",
         hashlib.sha256(auth["human_source_utterance"].encode("utf-8")).hexdigest()
         == HUMAN_SOURCE_UTTERANCE_SHA256)
+    add("authorization_date_is_the_recorded_issue_date",
+        auth["authorization_date"] == AUTHORIZATION_DATE,
+        f"expected {AUTHORIZATION_DATE}, got {auth['authorization_date']}")
     add("authorization_is_one_action_only", auth["one_action_only"] is True)
     add("authorization_not_standing", auth["standing_authorization"] is False)
     add("authorization_consumed_by_this_execution",
@@ -520,11 +527,46 @@ def qc_report(
         and fw["final_test_evaluation_performed"] is False)
     add("final_test_target_years_excluded",
         fw["final_test_target_years_excluded"] == [1400, 1401, 1402])
-    add("development_targets_used_only_for_event_counts",
-        decision["development_target_label_use"][
-            "predictive_performance_computed"] is False
-        and decision["development_target_label_use"][
-            "target_values_written_into_predictor_artifacts"] is False)
+    # Literal, verifiable statement of how development target labels were
+    # used. It validates the DECLARED uses against the artifacts that actually
+    # carry target-stratified values, instead of asserting two negative flags.
+    tlu = decision["development_target_label_use"]
+    declared = {u["use_id"] for u in tlu["declared_uses"]}
+    feas_ = decision["event_count_feasibility"]
+    actual = set()
+    if feas_["m2_common_sample_positive_counts"] or feas_[
+            "m2_common_sample_negative_counts"]:
+        actual.add("condition_d_validation_window_event_counts")
+    if any(cov[v].get("positive_row_coverage") is not None
+           or cov[v].get("negative_row_coverage") is not None
+           for v, _, _ in g.M2_VARIABLES):
+        actual.add("target_stratified_candidate_coverage")
+    if cs.get("positive_count") is not None or cs.get(
+            "negative_count") is not None:
+        actual.add("common_sample_positive_negative_composition")
+    add("development_target_use_limited_to_canonical_gate_"
+        "descriptive_and_event_support_audits",
+        tlu["development_target_labels_accessed"] is True
+        and tlu["declared_uses_are_exhaustive"] is True
+        and actual <= declared
+        and declared <= actual,
+        f"declared={sorted(declared)} actual={sorted(actual)}")
+    add("development_targets_not_used_for_prediction_design_or_tuning",
+        all(tlu[k] is False for k in (
+            "predictive_performance_computed",
+            "predictive_metric_computed",
+            "model_fit_on_targets",
+            "prediction_generated",
+            "target_based_feature_selection",
+            "target_based_design_change",
+            "target_based_threshold_tuning",
+            "target_values_written_into_predictor_artifacts",
+            "final_test_target_values_accessed",
+            "final_test_predictor_values_accessed",
+        ))
+        and decision["predictive_metric_computed"] is False
+        and decision["model_fit_calls"] == 0
+        and decision["prediction_calls"] == 0)
     add("post_lock_eligibility_audit_not_executed_and_not_a_gate_condition",
         decision["post_lock_eligibility_audit"]["executed_in_this_action"]
         is False
@@ -710,11 +752,41 @@ def write_readme(decision: dict, auth: dict) -> str:
             "is no fallback to D3/D1/Jalali, and M3 is not started. The "
             "action STOPS here for human review.",
         ]
+    tlu = decision["development_target_label_use"]
     lines += [
+        "",
+        "## How development target labels were used (literal statement)",
+        "",
+        "Development target labels **were** read by this Gate, through the "
+        "unchanged frozen Stage127 machinery. They were used for exactly "
+        "three limited descriptive / event-support audits:",
+        "",
+        "1. condition-D positive evaluable event counts in the two locked "
+        "validation windows;",
+        "2. target-stratified descriptive candidate coverage "
+        "(`positive_row_coverage` / `negative_row_coverage`);",
+        "3. the descriptive positive/negative composition of the "
+        "three-variable common sample "
+        f"({cs['positive_count']} positive / {cs['negative_count']} negative "
+        f"of {cs['common_usable_rows']}).",
+        "",
+        "Nothing else. Explicitly: no predictive performance metric, no model "
+        "fit, no prediction, no target-based design selection, no "
+        "target-based feature selection, no threshold tuning, no target value "
+        "written into the pair-level predictor artifact "
+        "(`stage128_m2_d2_development_features.csv` carries no target "
+        "column), and no final-test target or predictor access. The machine "
+        "readable form is `development_target_label_use.declared_uses` in the "
+        "decision JSON "
+        f"(`declared_uses_are_exhaustive = "
+        f"{tlu['declared_uses_are_exhaustive']}`).",
         "",
         "## Counters",
         "",
-        "target values accessed for predictive use = 0; model fits = 0; "
+        "development target labels accessed for the three declared "
+        "descriptive/event-support audits above = YES; target values used "
+        "for any predictive, design, feature-selection or tuning purpose = "
+        "NONE; model fits = 0; "
         "predictions = 0; final-test access = 0; canonical Gate executions in "
         "this action = 1 (the authorized re-run); historical D0 Gate changed "
         "= NO; M2 admitted for modeling = "

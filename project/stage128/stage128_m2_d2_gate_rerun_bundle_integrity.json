@@ -16,7 +16,7 @@
   "expected_bundle_sha256": "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec",
   "external_qc_flag_trusted": false,
   "fresher_dataset_retrieved": false,
-  "gate_rerun_module_sha256": "1be3ea1cbb89bd5574e028aa285006c1e080177e9109fb4d6fc130e160f53697",
+  "gate_rerun_module_sha256": "f9ad7d11519c43219b2d694877f857fe157a55f5329edbeccc43b4d4443df100",
   "importer_module_sha256": "fe03e988a29f1e24690649e948d7d1a073c811c686ecd30a0dcc39a3ab35b032",
   "independently_revalidated_in_papermali": true,
   "manifest_rows": 111,

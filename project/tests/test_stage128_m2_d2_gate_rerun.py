@@ -559,3 +559,180 @@ def test_gate_result_is_terminal_and_internally_consistent(decision):
     else:
         assert not all(cond.values())
         assert decision["blocker_reasons"]
+
+
+# --------------------------------------------------------------------------- #
+# Authorization provenance — the recorded issue date
+# --------------------------------------------------------------------------- #
+
+#: The date on which the human supervisor issued the single Stage128 D2
+#: Gate-rerun authorization. Provenance metadata only: correcting it changes
+#: nothing about WHAT was authorized.
+AUTHORIZATION_DATE = "2026-08-01"
+
+
+@requires_package
+def test_gate_rerun_authorization_date_is_exact(auth):
+    assert auth["authorization_date"] == AUTHORIZATION_DATE
+
+
+def test_gate_rerun_authorization_date_constant_in_runner():
+    src = open(RERUN_RUNNER, encoding="utf-8").read()
+    tree = ast.parse(src)
+    found = {}
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and isinstance(
+                node.value, ast.Constant):
+            for t in node.targets:
+                if isinstance(t, ast.Name):
+                    found[t.id] = node.value.value
+    assert found.get("AUTHORIZATION_DATE") == AUTHORIZATION_DATE
+    assert "2026-07-30" not in src, (
+        "the Stage128 D2 Gate-rerun authorization date must not regress"
+    )
+
+
+@requires_package
+def test_gate_rerun_authorization_utterance_and_sha_unchanged(auth):
+    assert auth["human_source_utterance"] == AUTHORIZATION_TEXT
+    assert auth["human_source_utterance_sha256"] == AUTHORIZATION_SHA256
+    assert hashlib.sha256(
+        auth["human_source_utterance"].encode("utf-8")
+    ).hexdigest() == AUTHORIZATION_SHA256
+    # The date correction is provenance maintenance, not a new authorization.
+    assert auth["authorization_class"] == "ORIGINAL_SCIENTIFIC_AUTHORIZATION"
+    assert auth["authorized_action_id"] == r.ACTION_ID
+    assert auth["one_action_only"] is True
+    assert auth["standing_authorization"] is False
+    assert auth["authorization_consumed_by_this_execution"] is True
+
+
+@requires_package
+def test_qc_report_asserts_the_authorization_date(qc):
+    names = {a["name"]: a for a in qc["assertions"]}
+    assert names[
+        "authorization_date_is_the_recorded_issue_date"]["status"] == "PASS"
+
+
+# --------------------------------------------------------------------------- #
+# Development target-label use — literally true, exhaustively declared
+# --------------------------------------------------------------------------- #
+
+_DECLARED_TARGET_USES = {
+    "condition_d_validation_window_event_counts",
+    "target_stratified_candidate_coverage",
+    "common_sample_positive_negative_composition",
+}
+
+
+@requires_package
+def test_target_use_declaration_is_literal_and_exhaustive(decision):
+    tlu = decision["development_target_label_use"]
+    # The Gate DOES read development labels; concealing that is the defect
+    # this assertion exists to prevent.
+    assert tlu["development_target_labels_accessed"] is True
+    assert tlu["declared_uses_are_exhaustive"] is True
+    assert {u["use_id"] for u in tlu["declared_uses"]} == _DECLARED_TARGET_USES
+    assert "event-count" not in tlu["used_only_for"] or "descriptive" in tlu[
+        "used_only_for"], "the statement must not claim event counts only"
+
+
+@requires_package
+def test_declared_target_uses_cover_every_actual_target_stratified_output(
+        decision):
+    """Every target-stratified value in the package has a declared use."""
+    tlu = decision["development_target_label_use"]
+    declared = {u["use_id"] for u in tlu["declared_uses"]}
+
+    feas = decision["event_count_feasibility"]
+    assert feas["m2_common_sample_positive_counts"]
+    assert feas["m2_common_sample_negative_counts"]
+    assert "condition_d_validation_window_event_counts" in declared
+
+    for var, _, _ in g.M2_VARIABLES:
+        cov = decision["candidate_coverage"][var]
+        assert "positive_row_coverage" in cov
+        assert "negative_row_coverage" in cov
+    assert "target_stratified_candidate_coverage" in declared
+
+    cs = decision["block_common_sample"]
+    assert cs["positive_count"] is not None
+    assert cs["negative_count"] is not None
+    assert "common_sample_positive_negative_composition" in declared
+
+
+@requires_package
+def test_no_predictive_metric_or_model_action_from_targets(decision):
+    tlu = decision["development_target_label_use"]
+    for field in (
+        "predictive_performance_computed",
+        "predictive_metric_computed",
+        "model_fit_on_targets",
+        "prediction_generated",
+        "target_based_feature_selection",
+        "target_based_design_change",
+        "target_based_threshold_tuning",
+        "target_values_written_into_predictor_artifacts",
+        "final_test_target_values_accessed",
+        "final_test_predictor_values_accessed",
+    ):
+        assert tlu[field] is False, field
+    assert decision["predictive_metric_computed"] is False
+    assert decision["m2_vs_m1_performance_compared"] is False
+    assert decision["modeling_performed"] is False
+    assert decision["model_fit_calls"] == 0
+    assert decision["prediction_calls"] == 0
+    assert decision["d0_d1_d2_d3_jalali_selection_reopened"] is False
+    assert decision["new_design_decision_made_in_this_action"] is False
+    assert decision["gate_thresholds_changed"] is False
+    assert decision["threshold_reduced"] is False
+
+
+@requires_package
+def test_predictor_artifact_carries_no_raw_target_column():
+    with open(FEATURES_PATH, encoding="utf-8", newline="") as f:
+        header = next(csv.reader(f))
+    forbidden = {
+        "target", "y", "label", "distress", "distress_label",
+        "target_label", "outcome", "event", "is_positive", "positive",
+    }
+    assert forbidden.isdisjoint({c.lower() for c in header})
+    # `target_year` is a temporal key, not a label value.
+    assert "target_year" in header
+
+
+@requires_package
+def test_final_test_labels_remain_untouched(decision):
+    fw = decision["final_test_firewall"]
+    assert fw["final_test_locked"] is True
+    assert fw["final_test_unlocked"] is False
+    assert fw["final_test_access_authorized"] is False
+    assert fw["final_test_target_values_inspected"] is False
+    assert fw["final_test_predictor_values_inspected"] is False
+    assert fw["final_test_evaluation_performed"] is False
+    assert fw["final_test_target_years_excluded"] == [1400, 1401, 1402]
+
+
+@requires_package
+def test_qc_report_replaces_the_misleading_target_use_assertion(qc):
+    names = {a["name"]: a for a in qc["assertions"]}
+    assert "development_targets_used_only_for_event_counts" not in names
+    for name in (
+        "development_target_use_limited_to_canonical_gate_"
+        "descriptive_and_event_support_audits",
+        "development_targets_not_used_for_prediction_design_or_tuning",
+    ):
+        assert names[name]["status"] == "PASS", name
+
+
+@requires_package
+def test_readme_states_target_use_literally():
+    text = open(
+        os.path.join(STAGE128, "README_STAGE128_M2_D2_GATE_RERUN.md"),
+        encoding="utf-8").read()
+    assert "How development target labels were used" in text
+    assert "**were** read by this Gate" in text
+    assert "no predictive performance metric" in text
+    assert "target values accessed for predictive use = 0" not in text, (
+        "the old absolute no-access phrasing is not literally true"
+    )

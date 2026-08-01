@@ -272,7 +272,7 @@
     "project/src/stage127_m2_external_delivery_import.py": "fe03e988a29f1e24690649e948d7d1a073c811c686ecd30a0dcc39a3ab35b032",
     "project/src/stage127_m2_market_data_gate.py": "8f6aca9e972c85850a5a75152068b1312b91be99fe3241746b042fd39ffc50ae",
     "project/src/stage128_m2_d2_boundary_month_equity_return.py": "27a3e5dfe36c7e89df386f9ee803ad43b73fd741517d7637c627896a12581a57",
-    "project/src/stage128_m2_d2_gate_rerun.py": "1be3ea1cbb89bd5574e028aa285006c1e080177e9109fb4d6fc130e160f53697"
+    "project/src/stage128_m2_d2_gate_rerun.py": "f9ad7d11519c43219b2d694877f857fe157a55f5329edbeccc43b4d4443df100"
   },
   "contract_id": "stage128_m2_d2_gate_rerun",
   "contract_version": "stage128_m2_d2_gate_rerun_v1",
@@ -309,11 +309,45 @@
   "decision_id": "stage128-m2-d2-gate-rerun",
   "design_freeze_action_id": "stage128-m2-boundary-month-return-design-freeze",
   "development_target_label_use": {
+    "declared_uses": [
+      {
+        "artifact_fields": [
+          "event_count_feasibility.m2_common_sample_positive_counts",
+          "event_count_feasibility.m2_common_sample_negative_counts"
+        ],
+        "role": "frozen_gate_condition_d_event_support",
+        "use_id": "condition_d_validation_window_event_counts"
+      },
+      {
+        "artifact_fields": [
+          "candidate_coverage.*.positive_row_coverage",
+          "candidate_coverage.*.negative_row_coverage"
+        ],
+        "role": "descriptive_only",
+        "use_id": "target_stratified_candidate_coverage"
+      },
+      {
+        "artifact_fields": [
+          "block_common_sample.positive_count",
+          "block_common_sample.negative_count"
+        ],
+        "role": "descriptive_only",
+        "use_id": "common_sample_positive_negative_composition"
+      }
+    ],
+    "declared_uses_are_exhaustive": true,
+    "development_target_labels_accessed": true,
+    "final_test_predictor_values_accessed": false,
+    "final_test_target_values_accessed": false,
+    "model_fit_on_targets": false,
+    "prediction_generated": false,
+    "predictive_metric_computed": false,
     "predictive_performance_computed": false,
     "target_based_design_change": false,
     "target_based_feature_selection": false,
+    "target_based_threshold_tuning": false,
     "target_values_written_into_predictor_artifacts": false,
-    "used_only_for": "the frozen condition-D event-count feasibility counts over the locked validation windows"
+    "used_only_for": "the frozen canonical Gate's limited descriptive and event-support audits: (1) condition-D positive evaluable event counts in the two locked validation windows, (2) target-stratified descriptive candidate coverage, and (3) the descriptive positive/negative composition of the three-variable common sample"
   },
   "does_not_answer": "Does M2 improve prediction?",
   "eligibility_for_next_action": {

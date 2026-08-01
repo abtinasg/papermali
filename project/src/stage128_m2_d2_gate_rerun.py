@@ -32,9 +32,14 @@ amendment explicitly, and the historical D0 value is carried alongside the D2
 value for audit (never mixed into the Gate decision).
 
 This module performs no model fit, no prediction, no target-based comparison,
-and reads no final-test row. Development target labels are touched only via
-the frozen ``event_count_feasibility`` counting rule that condition D has
-always required.
+and reads no final-test row. Development target labels ARE read, by the
+unchanged frozen Stage127 machinery, for three limited audits only: the
+condition-D event counts in the two locked validation windows, the
+target-stratified descriptive candidate coverage, and the descriptive
+positive/negative composition of the common sample. They drive no predictive
+metric, no model fit, no prediction, no design or feature selection, and no
+threshold tuning, and no target value is written into the pair-level
+predictor artifact. See ``development_target_label_use`` in the decision.
 """
 
 from __future__ import annotations
@@ -531,14 +536,59 @@ def build(
             "final_test_rows_structurally_excluded_before_value_load": True,
         },
         "development_target_label_use": {
+            # Literal, non-euphemistic statement. Development target labels
+            # ARE read by this Gate — the frozen canonical Stage127 machinery
+            # computes target-stratified descriptive audits in addition to the
+            # condition-D event counts. Enumerating them honestly is what
+            # makes the surrounding negative claims verifiable.
+            "development_target_labels_accessed": True,
             "used_only_for": (
-                "the frozen condition-D event-count feasibility counts over "
-                "the locked validation windows"
+                "the frozen canonical Gate's limited descriptive and "
+                "event-support audits: (1) condition-D positive evaluable "
+                "event counts in the two locked validation windows, "
+                "(2) target-stratified descriptive candidate coverage, and "
+                "(3) the descriptive positive/negative composition of the "
+                "three-variable common sample"
             ),
+            "declared_uses": [
+                {
+                    "use_id": "condition_d_validation_window_event_counts",
+                    "artifact_fields": [
+                        "event_count_feasibility."
+                        "m2_common_sample_positive_counts",
+                        "event_count_feasibility."
+                        "m2_common_sample_negative_counts",
+                    ],
+                    "role": "frozen_gate_condition_d_event_support",
+                },
+                {
+                    "use_id": "target_stratified_candidate_coverage",
+                    "artifact_fields": [
+                        "candidate_coverage.*.positive_row_coverage",
+                        "candidate_coverage.*.negative_row_coverage",
+                    ],
+                    "role": "descriptive_only",
+                },
+                {
+                    "use_id": "common_sample_positive_negative_composition",
+                    "artifact_fields": [
+                        "block_common_sample.positive_count",
+                        "block_common_sample.negative_count",
+                    ],
+                    "role": "descriptive_only",
+                },
+            ],
+            "declared_uses_are_exhaustive": True,
             "predictive_performance_computed": False,
+            "predictive_metric_computed": False,
+            "model_fit_on_targets": False,
+            "prediction_generated": False,
             "target_based_feature_selection": False,
             "target_based_design_change": False,
+            "target_based_threshold_tuning": False,
             "target_values_written_into_predictor_artifacts": False,
+            "final_test_target_values_accessed": False,
+            "final_test_predictor_values_accessed": False,
         },
         "canonical_sources_sha256": {
             rel: g.sha256_file(os.path.join(repo_root, rel))
