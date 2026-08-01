@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3_macro_data_gate`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3-macro-data-gate`
-- **Last stage commit:** `6a75c6e3c8d67b1fa7367f3777e6d15f7f031a0f`
-- **Generated from commit:** `924d609eebb17ad76cf1bebde0fadbf9cef4a621` (branch `stage128-m3-macro-data-gate`, informational)
+- **Last stage commit:** `6b133f00ded0c7ee543bc78c7eabc3052e2c85f0`
+- **Generated from commit:** `6b133f00ded0c7ee543bc78c7eabc3052e2c85f0` (branch `stage128-m3-macro-data-gate`, informational)
 - **Baseline:** `origin/main` @ `35aaf4b70e9341704ee38be6f8cf2e2519c70bb2`
 
 ## Current-state validation
@@ -175,5 +175,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `d11ec85fe2dbdbc58a362107ad0865c634909b627ee9dd46ccfb5cc4037d3d70`_
-_generated_at_utc: 2026-08-01T15:46:16Z (informational)_
+_state_fingerprint: `73200e2eda262e5176fe9aa05b5936c639bafb8029682f95cc4ce690f3705a9a`_
+_generated_at_utc: 2026-08-01T15:48:44Z (informational)_
