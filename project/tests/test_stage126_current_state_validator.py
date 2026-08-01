@@ -600,12 +600,11 @@ def test_research_pointers_unchanged():
     # transitioned once more to the D2 Gate re-run pointer (which itself
     # still requires a separate future human authorization -- see
     # STAGE128_M2_D2_DESIGN_FREEZE.md §8-9).
-    # The authorized paired M2-vs-M1 incremental evaluation has since been
-    # executed and COMPLETED, so the pointer advanced once more — to a human
-    # retained-block review, which is a POINTER, not an authorization.
-    assert report["next_research_action_id"] == (
-        "stage128-m2-retained-block-human-decision"
-    )
+    # The authorized paired M2-vs-M1 incremental evaluation was executed and
+    # COMPLETED, and the human retained-block decision has since been RECORDED,
+    # so the pointer advanced once more — to the M3 macro data Gate, which is a
+    # POINTER, not an authorization.
+    assert report["next_research_action_id"] == "stage128-m3-macro-data-gate"
 
 
 @pytest.mark.parametrize("field", sorted(
@@ -1501,10 +1500,10 @@ def test_live_handoff_labels_match_the_live_research_state():
         # scientific actions, never with a label fix. The D2 design freeze,
         # then the executed D2 Gate re-run, each advanced them once.
         assert state["last_completed_research_action_id"] == (
-            "stage127-m2-incremental-evaluation"
+            "stage128-m2-retained-block-human-decision"
         )
         assert state["next_research_action_id"] == (
-            "stage128-m2-retained-block-human-decision"
+            "stage128-m3-macro-data-gate"
         )
         # And nothing further is AUTHORIZED by advancing a label.
         for field in (
@@ -1518,7 +1517,10 @@ def test_live_handoff_labels_match_the_live_research_state():
         # actually ran. A label fix never sets it, and a consumed
         # authorization never unsets it.
         assert state["m2_modeling_started"] is True
-        assert state["m2_block_retained"] is False
+        # Retention is now DECIDED (a governance decision), and it authorizes
+        # nothing further: superiority stays unclaimed and M3 stays unstarted.
+        assert state["m2_block_retained"] is True
+        assert state["m2_predictive_superiority_claim_supported"] is False
         assert state["stage127_m2_market_data_gate_status"] == (
             "FAIL_M2_DATA_GATE"
         )
@@ -1546,7 +1548,7 @@ def test_current_state_snapshot_renders_stage128_labels():
         )
         assert (
             "- **Next research action:** "
-            "`stage128-m2-retained-block-human-decision`" in text
+            "`stage128-m3-macro-data-gate`" in text
         )
         assert (
             "## Stage128 — M2 D2 boundary-month equity-return design freeze"
@@ -1618,7 +1620,11 @@ def test_current_state_presents_exactly_one_current_section():
     current = [ln for ln in text.splitlines()
                if ln.startswith("## ") and "(CURRENT)" in ln]
     assert len(current) == 1, current
-    assert "paired M2 vs M1 incremental evaluation" in current[0]
+    assert "M2 retained-block HUMAN decision" in current[0]
+    assert (
+        "## Stage127 — paired M2 vs M1 incremental evaluation (CURRENT)"
+        not in text
+    )
     assert (
         "## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 (CURRENT)"
         not in open(_CURRENT_STATE, encoding="utf-8").read()
@@ -1651,7 +1657,7 @@ def test_sole_live_next_pointer_is_a_pointer_not_an_authorization():
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1, pointers
     line = pointers[0]
-    assert "`stage128-m2-retained-block-human-decision`" in line
+    assert "`stage128-m3-macro-data-gate`" in line
     assert "pointer is **not** an authorization" in line
 
 
@@ -1680,11 +1686,9 @@ def test_roadmap_front_matter_matches_handoff_pointers():
     text = open(_ROADMAP, encoding="utf-8").read()
     fm = v._roadmap_front_matter(text)
     assert fm["last_completed_research_action_id"] == (
-        "stage127-m2-incremental-evaluation"
-    )
-    assert fm["next_research_action_id"] == (
         "stage128-m2-retained-block-human-decision"
     )
+    assert fm["next_research_action_id"] == "stage128-m3-macro-data-gate"
     state = json.loads(open(
         os.path.join(REAL_ROOT, "project", "docs", "ai",
                      "handoff_state.json"), encoding="utf-8").read())
@@ -1722,9 +1726,14 @@ def test_live_m2_state_distinguishes_authorization_execution_and_retention():
         "m2_block_admitted_for_authorized_incremental_evaluation"] is True
     # Authorization consumed.
     assert state["m2_incremental_evaluation_authorized"] is False
-    # Retention undecided; successors and the final test untouched.
-    assert state["m2_block_retained"] is False
-    assert state["m2_retained_block_decision_required"] is True
+    # Retention DECIDED by a separate human governance action; successors and
+    # the final test remain untouched, and no superiority is claimed.
+    assert state["m2_block_retained"] is True
+    assert state["m2_retained_block_decision_required"] is False
+    assert state["m2_retained_block_human_decision_completed"] is True
+    assert state["m2_predictive_superiority_claim_supported"] is False
+    assert state["m2_superiority_established"] is False
+    assert state["m2_winner_selected"] is False
     for field in (
         "m3_authorized", "m3_started", "m4_authorized", "m4_started",
         "final_test_unlocked", "final_test_access_authorized",
@@ -1762,8 +1771,8 @@ def test_live_m2_data_state_is_true_and_historical_marker_is_labelled():
     assert state["m2_incremental_evaluation_authorized"] is False
     assert state["m2_started"] is True
     assert state["m2_modeling_started"] is True
-    assert state["m2_block_retained"] is False
-    assert state["m2_retained_block_decision_required"] is True
+    assert state["m2_block_retained"] is True
+    assert state["m2_retained_block_decision_required"] is False
     for field in (
         "m3_authorized", "m3_started", "m4_authorized", "m4_started",
         "final_test_unlocked", "final_test_access_authorized",

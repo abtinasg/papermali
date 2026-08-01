@@ -133,6 +133,52 @@ def test_no_forbidden_phrases():
     assert errors == [], errors
 
 
+def _current_state_text() -> str:
+    with open(os.path.join(REAL_ROOT, "project/docs/ai/CURRENT_STATE.md"),
+              encoding="utf-8") as fh:
+        return fh.read()
+
+
+def test_current_state_has_no_literal_unicode_escapes():
+    """The generator must emit real symbols, never their escape text."""
+    text = _current_state_text()
+    assert "\\u26d4" not in text
+    # no literal \\uXXXX escape survives anywhere in the generated snapshot
+    assert re.search(r"\\u[0-9a-fA-F]{4}", text) is None
+
+
+def test_current_state_retained_block_line_uses_the_actual_symbol():
+    assert (
+        "- ⛔ **M2 block retained BY THIS ACTION:** false"
+        in _current_state_text())
+
+
+def test_generator_source_has_no_double_escaped_unicode():
+    with open(os.path.join(REAL_ROOT, "project/scripts/update_ai_handoff.py"),
+              encoding="utf-8") as fh:
+        source = fh.read()
+    assert "\\\\u26d4" not in source
+
+
+def test_retained_block_wording_and_semantics_are_unchanged():
+    """Fixing the symbol must not change what the snapshot claims."""
+    text = _current_state_text()
+    for fragment in (
+        "it reports OBSERVED development evidence only and selects no winner",
+        "The retained-block question was answered separately, by the human "
+        "decision reported below",
+        "`m2_block_retained=True`",
+        "`m2_retained_block_decision_required=False`",
+        "**M2 predictive superiority claim supported:** False",
+        "**No winner, no final model:** paper_winner_selected=False",
+        "final_model_selected=False",
+        "full_development_refit_performed=False",
+    ):
+        assert fragment in text, fragment
+    assert "**M3:** authorized=False, started=False" in text
+    assert "**M4:** authorized=False, started=False" in text
+
+
 def test_roadmap_ordering():
     errors: list[str] = []
     val._check_roadmap(REAL_ROOT, errors)
@@ -1228,16 +1274,19 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["last_completed_micro_part"] == (
         "stage126-m1-robustness-part6-smote-training-fold-only"
     )
-    # The authorized paired M2-vs-M1 incremental evaluation
-    # (stage127-m2-incremental-evaluation) has since been executed under its
-    # own explicit one-action authorization and COMPLETED, so the pointer
-    # legitimately advanced once more -- to a human retained-block review.
-    # A pointer is not an authorization: m2_incremental_evaluation_authorized
-    # and m2_modeling_started both remain False, and M2 is not retained.
-    assert state["next_research_action_id"] == (
-        "stage128-m2-retained-block-human-decision"
-    )
-    assert state["m2_block_retained"] is False
+    # The human retained-block decision
+    # (stage128-m2-retained-block-human-decision) has since been RECORDED
+    # under its own explicit one-action authorization, so the pointer
+    # legitimately advanced once more -- to the M3 macro data Gate. A pointer
+    # is not an authorization: M3 stays unauthorized and unstarted. M2 is
+    # retained as the INTERMEDIATE confirmatory block, which is a governance
+    # decision and establishes no predictive superiority.
+    assert state["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    assert state["next_research_action_pointer_is_not_authorization"] is True
+    assert state["m2_block_retained"] is True
+    assert state["m2_predictive_superiority_claim_supported"] is False
+    assert state["m3_authorized"] is False
+    assert state["m3_started"] is False
     # The live workstream label advanced with the live state: the Stage128
     # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
     # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
@@ -1295,11 +1344,9 @@ def test_real_repo_roadmap_stage126_status_consistency():
     # The workstream label is derived from the frozen action and never
     # substitutes for a research-action id.
     assert fm["last_completed_research_action_id"] == (
-        "stage127-m2-incremental-evaluation"
-    )
-    assert fm["next_research_action_id"] == (
         "stage128-m2-retained-block-human-decision"
     )
+    assert fm["next_research_action_id"] == "stage128-m3-macro-data-gate"
     # The Stage128 M2 D2 design freeze completed, and the canonical D2 Gate
     # re-run has since been EXECUTED under its own explicit one-action
     # authorization and PASSED data admission, so both pointers legitimately
@@ -2270,23 +2317,26 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     legitimately advanced to the closure/synthesis milestone.
     """
     state = _state(REAL_ROOT)
-    # The authorized paired M2-vs-M1 incremental evaluation
-    # (stage127-m2-incremental-evaluation) has since been executed under its
-    # own explicit one-action authorization and COMPLETED, so the pointer
-    # legitimately advanced once more -- to a human retained-block review.
-    # A pointer is not an authorization: m2_incremental_evaluation_authorized
-    # and m2_modeling_started both remain False, and M2 is not retained.
-    assert state["next_research_action_id"] == (
-        "stage128-m2-retained-block-human-decision"
-    )
-    assert state["m2_block_retained"] is False
+    # The human retained-block decision
+    # (stage128-m2-retained-block-human-decision) has since been RECORDED
+    # under its own explicit one-action authorization, so the pointer
+    # legitimately advanced once more -- to the M3 macro data Gate. A pointer
+    # is not an authorization: M3 stays unauthorized and unstarted. M2 is
+    # retained as the INTERMEDIATE confirmatory block, which is a governance
+    # decision and establishes no predictive superiority.
+    assert state["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    assert state["next_research_action_pointer_is_not_authorization"] is True
+    assert state["m2_block_retained"] is True
+    assert state["m2_predictive_superiority_claim_supported"] is False
+    assert state["m3_authorized"] is False
+    assert state["m3_started"] is False
     assert state["m2_incremental_evaluation_authorized"] is False
     # The one-action authorization was CONSUMED, which is why the flag above
     # is False. That never erases the executed modeling: the authorized
     # paired M2 evaluation really did fit 44 canonical development models.
     assert state["m2_modeling_started"] is True
     assert state["stage127_m2_incremental_evaluation_primary_model_fits"] == 44
-    assert state["m2_block_retained"] is False
+    assert state["m2_block_retained"] is True
     # The live workstream label advanced with the live state: the Stage128
     # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
     # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
@@ -2574,23 +2624,26 @@ def test_part1_does_not_advance_research_pointers():
     STAGE126_Q1Q2_LEAN_GOVERNANCE.md sections 10-11), which real-repo state
     now reflects."""
     state = _state(REAL_ROOT)
-    # The authorized paired M2-vs-M1 incremental evaluation
-    # (stage127-m2-incremental-evaluation) has since been executed under its
-    # own explicit one-action authorization and COMPLETED, so the pointer
-    # legitimately advanced once more -- to a human retained-block review.
-    # A pointer is not an authorization: m2_incremental_evaluation_authorized
-    # and m2_modeling_started both remain False, and M2 is not retained.
-    assert state["next_research_action_id"] == (
-        "stage128-m2-retained-block-human-decision"
-    )
-    assert state["m2_block_retained"] is False
+    # The human retained-block decision
+    # (stage128-m2-retained-block-human-decision) has since been RECORDED
+    # under its own explicit one-action authorization, so the pointer
+    # legitimately advanced once more -- to the M3 macro data Gate. A pointer
+    # is not an authorization: M3 stays unauthorized and unstarted. M2 is
+    # retained as the INTERMEDIATE confirmatory block, which is a governance
+    # decision and establishes no predictive superiority.
+    assert state["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    assert state["next_research_action_pointer_is_not_authorization"] is True
+    assert state["m2_block_retained"] is True
+    assert state["m2_predictive_superiority_claim_supported"] is False
+    assert state["m3_authorized"] is False
+    assert state["m3_started"] is False
     assert state["m2_incremental_evaluation_authorized"] is False
     # The one-action authorization was CONSUMED, which is why the flag above
     # is False. That never erases the executed modeling: the authorized
     # paired M2 evaluation really did fit 44 canonical development models.
     assert state["m2_modeling_started"] is True
     assert state["stage127_m2_incremental_evaluation_primary_model_fits"] == 44
-    assert state["m2_block_retained"] is False
+    assert state["m2_block_retained"] is True
     # The live workstream label advanced with the live state: the Stage128
     # M2 D2 boundary-month design freeze completed, so the CURRENT workstream
     # is the Stage128 one. `stage126_m1_financial_baseline` remains correct
@@ -2799,23 +2852,26 @@ def test_handoff_carries_live_vs_historical_test_boundary_markers():
     )
     assert state["m1_robustness_part4_authorized"] is False
     assert state["final_test_unlocked"] is False
-    # The authorized paired M2-vs-M1 incremental evaluation
-    # (stage127-m2-incremental-evaluation) has since been executed under its
-    # own explicit one-action authorization and COMPLETED, so the pointer
-    # legitimately advanced once more -- to a human retained-block review.
-    # A pointer is not an authorization: m2_incremental_evaluation_authorized
-    # and m2_modeling_started both remain False, and M2 is not retained.
-    assert state["next_research_action_id"] == (
-        "stage128-m2-retained-block-human-decision"
-    )
-    assert state["m2_block_retained"] is False
+    # The human retained-block decision
+    # (stage128-m2-retained-block-human-decision) has since been RECORDED
+    # under its own explicit one-action authorization, so the pointer
+    # legitimately advanced once more -- to the M3 macro data Gate. A pointer
+    # is not an authorization: M3 stays unauthorized and unstarted. M2 is
+    # retained as the INTERMEDIATE confirmatory block, which is a governance
+    # decision and establishes no predictive superiority.
+    assert state["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    assert state["next_research_action_pointer_is_not_authorization"] is True
+    assert state["m2_block_retained"] is True
+    assert state["m2_predictive_superiority_claim_supported"] is False
+    assert state["m3_authorized"] is False
+    assert state["m3_started"] is False
     assert state["m2_incremental_evaluation_authorized"] is False
     # The one-action authorization was CONSUMED, which is why the flag above
     # is False. That never erases the executed modeling: the authorized
     # paired M2 evaluation really did fit 44 canonical development models.
     assert state["m2_modeling_started"] is True
     assert state["stage127_m2_incremental_evaluation_primary_model_fits"] == 44
-    assert state["m2_block_retained"] is False
+    assert state["m2_block_retained"] is True
     # Stage125 Part 5 stays historical and immutable.
     assert state["stage125_part5_mode"] == "historical_immutable"
     assert state["stage125_part5_live_gate_active"] is False
@@ -2875,23 +2931,26 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     assert state["active_workstream"] == (
         "stage128_m2_d2_boundary_month_equity_return"
     )
-    # The authorized paired M2-vs-M1 incremental evaluation
-    # (stage127-m2-incremental-evaluation) has since been executed under its
-    # own explicit one-action authorization and COMPLETED, so the pointer
-    # legitimately advanced once more -- to a human retained-block review.
-    # A pointer is not an authorization: m2_incremental_evaluation_authorized
-    # and m2_modeling_started both remain False, and M2 is not retained.
-    assert state["next_research_action_id"] == (
-        "stage128-m2-retained-block-human-decision"
-    )
-    assert state["m2_block_retained"] is False
+    # The human retained-block decision
+    # (stage128-m2-retained-block-human-decision) has since been RECORDED
+    # under its own explicit one-action authorization, so the pointer
+    # legitimately advanced once more -- to the M3 macro data Gate. A pointer
+    # is not an authorization: M3 stays unauthorized and unstarted. M2 is
+    # retained as the INTERMEDIATE confirmatory block, which is a governance
+    # decision and establishes no predictive superiority.
+    assert state["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    assert state["next_research_action_pointer_is_not_authorization"] is True
+    assert state["m2_block_retained"] is True
+    assert state["m2_predictive_superiority_claim_supported"] is False
+    assert state["m3_authorized"] is False
+    assert state["m3_started"] is False
     assert state["m2_incremental_evaluation_authorized"] is False
     # The one-action authorization was CONSUMED, which is why the flag above
     # is False. That never erases the executed modeling: the authorized
     # paired M2 evaluation really did fit 44 canonical development models.
     assert state["m2_modeling_started"] is True
     assert state["stage127_m2_incremental_evaluation_primary_model_fits"] == 44
-    assert state["m2_block_retained"] is False
+    assert state["m2_block_retained"] is True
 
 
 def test_part5_compatibility_markers_absent_without_artifacts(tmp_path):
@@ -2945,7 +3004,7 @@ def test_current_state_labels_micro_part_not_research_action():
     )
     assert (
         "- **Next research action:** "
-        "`stage128-m2-retained-block-human-decision`" in text
+        "`stage128-m3-macro-data-gate`" in text
     )
 
 

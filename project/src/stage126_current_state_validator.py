@@ -783,10 +783,86 @@ def stage127_m2_incremental_evaluation_completed(repo_root: Path) -> bool:
     )
 
 
+STAGE128_M2_RETAINED_BLOCK_DECISION_REL = (
+    "project/stage128/m2_retained_block_human_decision/"
+    "stage128_m2_retained_block_human_decision.json"
+)
+STAGE128_M2_RETAINED_BLOCK_DECISION_ACTION_ID = (
+    "stage128-m2-retained-block-human-decision"
+)
+STAGE128_M2_RETAINED_BLOCK_DECISION_OUTCOME = (
+    "RETAIN_M2_AS_INTERMEDIATE_CONFIRMATORY_BLOCK"
+)
+#: The M3 macro data Gate, identified as a POINTER only. Retaining M2 as the
+#: intermediate confirmatory block never authorizes or starts M3.
+NEXT_RESEARCH_ACTION_ID_AFTER_M2_RETAINED_BLOCK_DECISION = (
+    "stage128-m3-macro-data-gate"
+)
+
+
+def stage128_m2_retained_block_decision_completed(repo_root: Path) -> bool:
+    """Narrow, fail-closed recognition of the recorded retained-block decision.
+
+    A retained-block decision is a GOVERNANCE decision. It is recognized only
+    when the artifact simultaneously records retention AND the absence of any
+    superiority claim, winner, final model, refit, final-test access or
+    successor-block start, and reports zero scientific execution.
+    """
+    path = repo_root / STAGE128_M2_RETAINED_BLOCK_DECISION_REL
+    if not path.is_file():
+        return False
+    try:
+        d = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    if d.get("decision_id") != STAGE128_M2_RETAINED_BLOCK_DECISION_ACTION_ID:
+        return False
+    if d.get("decision_outcome") != STAGE128_M2_RETAINED_BLOCK_DECISION_OUTCOME:
+        return False
+    required = {
+        "m2_block_retained": True,
+        "m2_retained_block_decision_required": False,
+        "m2_retained_block_human_decision_completed": True,
+        "m2_retained_block_human_decision_authorization_consumed": True,
+        "m2_predictive_superiority_claim_supported": False,
+        "paper_winner_selected": False,
+        "final_model_selected": False,
+        "full_development_refit_performed": False,
+        "final_test_locked": True,
+        "final_test_access_authorized": False,
+        "final_test_evaluation_performed": False,
+        "m3_authorized": False,
+        "m3_started": False,
+        "m4_authorized": False,
+        "m4_started": False,
+        "holm_family_complete": False,
+        "holm_final_adjustment_deferred": True,
+        "authorizes_next_action": False,
+    }
+    if not all(d.get(k) == v for k, v in required.items()):
+        return False
+    audit = d.get("execution_audit") or {}
+    return all(audit.get(k) == 0 for k in (
+        "model_fits", "predictions", "resampling_executions",
+        "full_development_refits", "final_test_predictor_values_read",
+        "final_test_target_values_read", "m3_executions", "m4_executions",
+    ))
+
+
 def expected_next_research_action_id(
     repo_root: Path, m1_robustness_completed: bool,
 ) -> str:
     """The single source of truth for the current expected research pointer."""
+    if (
+        m1_robustness_completed
+        and robustness_closure_completed(repo_root)
+        and retained_design_freeze_completed(repo_root)
+        and stage128_m2_d2_design_freeze_completed(repo_root)
+        and stage128_m2_d2_gate_rerun_executed(repo_root)
+        and stage127_m2_incremental_evaluation_completed(repo_root)
+        and stage128_m2_retained_block_decision_completed(repo_root)
+    ):
+        return NEXT_RESEARCH_ACTION_ID_AFTER_M2_RETAINED_BLOCK_DECISION
     if (
         m1_robustness_completed
         and robustness_closure_completed(repo_root)
@@ -1980,8 +2056,14 @@ def build_assertions(
         "exactly one scientific-action section may be presented as "
         f"(CURRENT); found {len(current_headings)}: {current_headings}")
     m2_eval_done = m2_evaluation_done
+    # The HUMAN retained-block decision is a separate, later action. Until it
+    # is recorded, retention must stay open; once it is recorded, retention is
+    # decided and the assertions below flip to the decided-state expectations.
+    retained_block_done = stage128_m2_retained_block_decision_completed(
+        repo_root)
     expected_current = (
-        "paired M2 vs M1 incremental evaluation" if m2_eval_done
+        "M2 retained-block HUMAN decision" if retained_block_done
+        else "paired M2 vs M1 incremental evaluation" if m2_eval_done
         else "Gate RE-RUN"
     )
     add("current_state_current_section_is_the_live_action",
@@ -1990,6 +2072,12 @@ def build_assertions(
             and expected_current in current_headings[0]),
         "the sole CURRENT section must be the newest completed scientific "
         f"action (expected marker: {expected_current!r})")
+    add("current_state_m2_evaluation_section_not_current_after_decision",
+        (not retained_block_done)
+        or ("## Stage127 — paired M2 vs M1 incremental evaluation (CURRENT)"
+            not in current_state_text),
+        "once the human retained-block decision is recorded, the paired "
+        "evaluation section becomes historical evidence context")
     add("current_state_gate_rerun_section_not_current_after_successor",
         (not m2_eval_done)
         or ("## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 "
@@ -2011,7 +2099,8 @@ def build_assertions(
     add("m2_evaluation_selects_no_winner_and_retains_no_block",
         (not m2_eval_done)
         or all(handoff.get(k) is False for k in (
-            "m2_block_retained", "paper_winner_selected",
+            *(() if retained_block_done else ("m2_block_retained",)),
+            "paper_winner_selected",
             "final_model_selected",
             "full_development_refit_performed",
             "final_test_unlocked", "final_test_access_authorized",
@@ -2038,7 +2127,7 @@ def build_assertions(
             is True),
         "the consumed one-action authorization must remain False")
     add("m2_block_retained_remains_false_pending_human_decision",
-        (not m2_eval_done)
+        (not m2_eval_done) or retained_block_done
         or (handoff.get("m2_block_retained") is False
             and handoff.get("m2_retained_block_decision_required") is True),
         "retention stays undecided until a human decides it")
@@ -2094,9 +2183,85 @@ def build_assertions(
             "final_test_evaluation_performed")),
         "the final test remains locked after the paired evaluation")
     add("m2_evaluation_records_a_required_human_retained_block_decision",
-        (not m2_eval_done)
+        (not m2_eval_done) or retained_block_done
         or handoff.get("m2_retained_block_decision_required") is True,
         "the retained-block question must stay explicitly open for a human")
+    # --- Stage128 human retained-block decision --------------------------- #
+    # Retention is a GOVERNANCE decision. It may never be rendered, recorded
+    # or implied as superiority, a winner, a final model, a refit, a
+    # final-test unlock or a successor-block start.
+    add("retained_block_decision_requires_a_completed_m2_evaluation",
+        (not retained_block_done) or m2_eval_done,
+        "a retained-block decision may only follow the completed paired M2 "
+        "evaluation whose evidence it cites")
+    add("retained_block_decision_is_recorded_as_retained_and_closed",
+        (not retained_block_done)
+        or (handoff.get("m2_block_retained") is True
+            and handoff.get("m2_retained_block_decision_required") is False
+            and handoff.get(
+                "m2_retained_block_human_decision_completed") is True),
+        "the recorded decision must report M2 as retained and the "
+        "retained-block question as closed")
+    add("retained_block_authorization_is_consumed_not_standing",
+        (not retained_block_done)
+        or handoff.get(
+            "m2_retained_block_human_decision_authorization_consumed") is True,
+        "the one-action retained-block authorization is consumed by the "
+        "recording and must never be left standing")
+    add("retained_block_decision_claims_no_superiority",
+        (not retained_block_done)
+        or (handoff.get("m2_predictive_superiority_claim_supported") is False
+            and handoff.get("m2_superiority_established") is False),
+        "retaining M2 as the intermediate confirmatory block is a governance "
+        "decision and supports no predictive-superiority claim")
+    add("retained_block_decision_selects_no_winner_and_no_final_model",
+        (not retained_block_done)
+        or all(handoff.get(k) is False for k in (
+            "paper_winner_selected", "m2_winner_selected",
+            "final_model_selected", "full_development_refit_performed")),
+        "retention selects no winner, no final model and authorizes no "
+        "full-development refit")
+    add("retained_block_decision_leaves_final_test_locked",
+        (not retained_block_done)
+        or all(handoff.get(k) is False for k in FINAL_TEST_LOCK_FIELDS),
+        "the final test remains locked and uninspected after the decision")
+    add("retained_block_decision_starts_and_authorizes_no_successor",
+        (not retained_block_done)
+        or all(handoff.get(k) is False for k in (
+            "m3_authorized", "m3_started", "m3_data_collected",
+            "m4_authorized", "m4_started")),
+        "the retained-block decision authorizes and starts neither M3 nor M4")
+    add("retained_block_decision_keeps_holm_family_incomplete",
+        (not retained_block_done)
+        or (handoff.get("holm_family_complete") is False
+            and handoff.get("holm_final_adjustment_deferred") is True),
+        "the incomplete confirmatory family stays incomplete and its final "
+        "adjustment stays deferred")
+    # Only meaningful when the derived pointer chain has actually reached the
+    # decision; a deliberately rewound (synthetic/historical) scenario keeps an
+    # earlier expected pointer and must not be judged against this one.
+    _retained_block_is_the_live_pointer_state = (
+        retained_block_done
+        and expected_next_research_action_id(
+            repo_root, expected_m1_robustness_completed)
+        == NEXT_RESEARCH_ACTION_ID_AFTER_M2_RETAINED_BLOCK_DECISION
+    )
+    add("retained_block_next_pointer_is_the_m3_gate_and_is_not_authorization",
+        (not _retained_block_is_the_live_pointer_state)
+        or (handoff.get("next_research_action_id")
+            == NEXT_RESEARCH_ACTION_ID_AFTER_M2_RETAINED_BLOCK_DECISION
+            and handoff.get("last_completed_research_action_id")
+            == STAGE128_M2_RETAINED_BLOCK_DECISION_ACTION_ID
+            and handoff.get("next_research_action_pointer_is_not_authorization")
+            is True),
+        "after the decision the pointer is the M3 macro data Gate, and a "
+        "pointer is never an authorization")
+    add("current_state_renders_the_retained_block_decision_section",
+        (not retained_block_done)
+        or ("## Stage128 — M2 retained-block HUMAN decision"
+            in current_state_text),
+        "CURRENT_STATE.md must render an explicit retained-block decision "
+        "section once the decision is recorded")
     add("current_state_freeze_section_claims_only_its_own_action",
         (not freeze_done)
         or (f"- **Research action completed by this freeze:** "
@@ -2157,7 +2322,10 @@ def build_assertions(
             == STAGE128_M2_D2_GATE_RERUN_ACTION_ID)
         or (m2_eval_done
             and handoff.get("last_completed_research_action_id")
-            == STAGE127_M2_INCREMENTAL_EVALUATION_ACTION_ID),
+            == STAGE127_M2_INCREMENTAL_EVALUATION_ACTION_ID)
+        or (retained_block_done
+            and handoff.get("last_completed_research_action_id")
+            == STAGE128_M2_RETAINED_BLOCK_DECISION_ACTION_ID),
         "after the Gate re-run, the last completed research action must be "
         "the Gate re-run itself or a recognized, completed successor action")
     # --- ROADMAP front matter must agree with its own explanatory prose --- #

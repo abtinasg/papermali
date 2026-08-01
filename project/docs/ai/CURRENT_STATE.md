@@ -10,16 +10,16 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Stage / Batch:** Stage128 / None
 - **Active workstream:** `stage128_m2_d2_boundary_month_equity_return`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `stage128-m2-retained-block-human-decision`
-- **Last stage commit:** `adcec96085f4fb6ff4c465b7a43c79e9285d3178`
-- **Generated from commit:** `adcec96085f4fb6ff4c465b7a43c79e9285d3178` (branch `stage127-m2-incremental-evaluation`, informational)
-- **Baseline:** `origin/main` @ `fb5f0e13cb806e0ba28f0372b3b2264881564950`
+- **Next research action:** `stage128-m3-macro-data-gate`
+- **Last stage commit:** `625dee18c760fd686977353eebd67fba9711bdeb`
+- **Generated from commit:** `625dee18c760fd686977353eebd67fba9711bdeb` (branch `stage128-m2-retained-block-human-decision`, informational)
+- **Baseline:** `origin/main` @ `bdac807788b377690be0a879765cfe4ac148970d`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **123 assertions, 0 failed**, all_pass=True
+- ✅ **134 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -81,21 +81,36 @@ _The canonical M2 data-admission Gate, re-executed ONCE under the already-frozen
 - The post-lock eligibility audit frozen by the design-freeze contract remains REQUIRED before any M2 predictive result is interpreted. It was not executed by this Gate.
 - Package: `project/stage128/`; interpretation: `project/stage128/README_STAGE128_M2_D2_GATE_RERUN.md`
 
-## Stage127 — paired M2 vs M1 incremental evaluation (CURRENT)
+## Stage127 — paired M2 vs M1 incremental evaluation
 
 _The paired, development-only comparison of the frozen M2 block against the frozen M1 block on the exact three-variable D2 common sample, under the locked temporal folds, retained configurations, frozen metrics and frozen uncertainty procedure. The one-action human authorization was consumed by this execution. The frozen streaming loader read only the row-identity and split fields required to identify and exclude 346 locked-final-test records; it did not parse, inspect, store, preprocess, fit on, predict from, evaluate, summarize or export any final-test predictor or target value. Nothing was retuned and NO winner or retained block was selected._
 
 - ✅ **Executed and completed:** True — **authorization consumed:** True
 - **Paired common sample:** 539 rows — **pooled locked-validation OOF rows:** 366
 - **Primary predictive model fits:** 44 (both blocks refitted on identical common-sample training rows)
-- ⛔ **M2 block retained:** False — this action reports OBSERVED development evidence only and selects no winner; a **human retained-block decision is REQUIRED** (`m2_retained_block_decision_required=True`)
+- ⛔ **M2 block retained BY THIS ACTION:** false — it reports OBSERVED development evidence only and selects no winner. The retained-block question was answered separately, by the human decision reported below (`m2_block_retained=True`, `m2_retained_block_decision_required=False`)
 - ✅ **M2 market data (live):** evidence collected=True, validated=True, entered the authorized incremental modeling pipeline=True, evaluation data materialized=True. (The frozen Stage125 Part 4 marker `m2_data_collected` stays `false` as immutable historical schema state; it is not live state — see the historical/legacy section below.)
 - ✅ **M2 modeling started (executed):** True — **M2 block admitted for modeling:** True. The authorized development modeling for this comparison WAS executed.
 - ⛔ **M2 incremental evaluation authorized:** False — the one-action authorization was CONSUMED by this execution and is not standing. A consumed authorization is `false`; it does **not** mean the modeling never happened.
 - ⛔ **Historical Stage127 D0 Gate remains** `FAIL_M2_DATA_GATE`; the terminal Stage128 D2 Gate result `PASS_FOR_M2_INCREMENTAL_EVALUATION` is preserved unchanged
 - 🔒 **Final test locked:** final_test_unlocked=False, final_test_access_authorized=False, final_test_evaluation_performed=False — **M3 started:** False — **M4 started:** False
-- **Next research action (pointer only):** `stage128-m2-retained-block-human-decision` — a human retained-block review. A pointer is **not** an authorization.
+- **Successor to THIS action:** the human retained-block decision `stage128-m2-retained-block-human-decision`, now COMPLETE and reported in its own section below.
 - Package: `project/stage128/m2_incremental_evaluation/`; interpretation: `project/stage128/m2_incremental_evaluation/README_STAGE127_M2_INCREMENTAL_EVALUATION.md`
+
+## Stage128 — M2 retained-block HUMAN decision (CURRENT)
+
+_The human governance decision that the paired evaluation deliberately left open, recorded from already-committed evidence under its own one-action human authorization. Zero model fits, zero predictions, zero resampling, zero refits and zero final-test values read. This is a **retained-block decision, not a superiority decision**._
+
+- ✅ **Decision outcome:** `RETAIN_M2_AS_INTERMEDIATE_CONFIRMATORY_BLOCK` — **authorization consumed:** True
+- ✅ **M2 block retained:** True — as the INTERMEDIATE block of the preregistered nested chain M1→M2→M3→M4 and the comparator for a future paired `M3 − M2` evaluation, conditional on a separately authorized M3 data Gate that passes
+- **Retention basis:** `preregistered_nested_confirmatory_architecture_preservation_not_observed_predictive_superiority`
+- ⛔ **M2 predictive superiority claim supported:** False — the observed development evidence stays approximately null (all three 95% paired-bootstrap PR-AUC intervals include zero and the point-estimate signs disagree across model families). Retention implies no predictive improvement and no statistical significance.
+- ⛔ **No winner, no final model:** paper_winner_selected=False, final_model_selected=False, full_development_refit_performed=False
+- ⛔ **Holm family:** complete=False, final adjustment deferred=True — the incomplete confirmatory family stays incomplete
+- 🔒 **Final test locked:** final_test_unlocked=False, final_test_access_authorized=False, predictor values inspected=False, target values inspected=False
+- ⛔ **M3:** authorized=False, started=False — **M4:** authorized=False, started=False
+- **Next research action (pointer only):** `stage128-m3-macro-data-gate` — the M3 macro data Gate. A pointer is **not** an authorization: no macro data was collected, no M3 variable created, no M3 Gate executed and no M3 model fit.
+- Package: `project/stage128/m2_retained_block_human_decision/`; interpretation: `project/stage128/m2_retained_block_human_decision/README_STAGE128_M2_RETAINED_BLOCK_HUMAN_DECISION.md`
 
 ### Last completed scientific micro-part QC
 
@@ -146,5 +161,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `ba94f4215b2635831bcd345060262a999b12988beaa1d0cca74a5bc2d69598dd`_
-_generated_at_utc: 2026-08-01T12:42:22Z (informational)_
+_state_fingerprint: `e6ebb605dedeb5591f7502d987d7637825886355a823752faf1d44907baa2157`_
+_generated_at_utc: 2026-08-01T14:12:31Z (informational)_
