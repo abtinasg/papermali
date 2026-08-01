@@ -3807,10 +3807,15 @@ def render_current_state(record: dict) -> str:
             f"- **Evidence bundle SHA256:** "
             f"`{record.get('stage127_m2_market_data_evidence_bundle_sha256')}`",
             "- Evidence collection is recorded **separately** from block "
-            "admission. `m2_data_collected` remains `false` because in this "
-            "schema it is a frozen prohibition marker meaning \"M2 data has "
-            "entered the authorized M2 modeling pipeline\" — not a statement "
-            "that no M2 evidence exists.",
+            "admission. The frozen Stage125 Part 4 marker `m2_data_collected` "
+            "is pinned `false` as **historical schema state** — in that "
+            "schema it is a prohibition marker meaning \"M2 data has entered "
+            "the authorized M2 modeling pipeline\", and flipping it would "
+            "mutate a frozen scientific artifact. It is NOT live state and "
+            "NOT a statement that no M2 evidence exists: the live fields are "
+            "`m2_market_data_evidence_collected`, "
+            "`m2_market_data_evidence_validated` and "
+            "`m2_data_entered_authorized_incremental_modeling_pipeline`.",
             f"- **M2 incremental evaluation authorized (live):** "
             f"{record.get('m2_incremental_evaluation_authorized')} — "
             f"**M2 modeling started (live):** "
@@ -3897,8 +3902,9 @@ def render_current_state(record: dict) -> str:
                 "current scientific action. This was a DESIGN-FREEZE / "
                 "CONTRACT action only: no canonical Gate was executed, no "
                 "model was fit, no prediction was generated and no "
-                "final-test row was read. The canonical Gate re-run section "
-                "below is the current scientific action._\n",
+                "final-test predictor or target value was parsed, inspected "
+                "or used. The canonical Gate re-run section below is the "
+                "current scientific action._\n",
             ]
         else:
             lines += [
@@ -3907,7 +3913,8 @@ def render_current_state(record: dict) -> str:
                 "_The current scientific state. This is a DESIGN-FREEZE / "
                 "CONTRACT action only: no canonical Gate was executed, no "
                 "model was fit, no prediction was generated and no "
-                "final-test row was read._\n",
+                "final-test predictor or target value was parsed, inspected "
+                "or used._\n",
             ]
         lines += [
             "- ✅ **D2 design freeze completed:** "
@@ -3995,7 +4002,8 @@ def render_current_state(record: dict) -> str:
             "offline from the same immutable TSETMC bundle. The one-action "
             "human authorization was consumed by this execution. No model was "
             "fit, no prediction generated, no predictive metric computed and "
-            "no final-test row read._\n",
+            "no final-test predictor or target value parsed, inspected or "
+            "used._\n",
             f"- {rerun_ok} **Gate re-run status:** `{rerun_status}`",
             "- **Executed:** "
             f"{record['stage128_m2_d2_gate_rerun_executed']} — **resolved "
@@ -4059,8 +4067,12 @@ def render_current_state(record: dict) -> str:
             "common sample, under the locked temporal folds, retained "
             "configurations, frozen metrics and frozen uncertainty procedure. "
             "The one-action human authorization was consumed by this "
-            "execution. No final-test row was read, nothing was retuned and "
-            "NO winner or retained block was selected._\n",
+            "execution. The frozen streaming loader read only the "
+            "row-identity and split fields required to identify and exclude "
+            "346 locked-final-test records; it did not parse, inspect, "
+            "store, preprocess, fit on, predict from, evaluate, summarize or "
+            "export any final-test predictor or target value. Nothing was "
+            "retuned and NO winner or retained block was selected._\n",
             "- \u2705 **Executed and completed:** "
             f"{record['stage127_m2_incremental_evaluation_completed']} — "
             "**authorization consumed:** "
@@ -4078,6 +4090,16 @@ def render_current_state(record: dict) -> str:
             "retained-block decision is REQUIRED** "
             f"(`m2_retained_block_decision_required="
             f"{record.get('m2_retained_block_decision_required')}`)",
+            "- \u2705 **M2 market data (live):** evidence collected="
+            f"{record.get('m2_market_data_evidence_collected')}, validated="
+            f"{record.get('m2_market_data_evidence_validated')}, entered the "
+            "authorized incremental modeling pipeline="
+            f"{record.get('m2_data_entered_authorized_incremental_modeling_pipeline')}"
+            ", evaluation data materialized="
+            f"{record.get('m2_incremental_evaluation_data_materialized')}. "
+            "(The frozen Stage125 Part 4 marker `m2_data_collected` stays "
+            "`false` as immutable historical schema state; it is not live "
+            "state — see the historical/legacy section below.)",
             "- \u2705 **M2 modeling started (executed):** "
             f"{record.get('m2_modeling_started')} — **M2 block admitted for "
             "modeling:** "
@@ -4193,7 +4215,12 @@ def render_current_state(record: dict) -> str:
         "final_test_unlocked",
         "final_test_access_authorized",
         "final_test_evaluation_performed",
-        "m2_data_collected",
+        # NB: `m2_data_collected` is deliberately NOT rendered here. It is a
+        # frozen Stage125 Part 4 prohibition marker, not live state, and
+        # printing a bare `m2_data_collected: False` beside an executed M2
+        # evaluation reads as a contradiction. It is republished below under
+        # the historical/legacy heading, and the live data-state markers are
+        # rendered with the current scientific action.
         "m3_data_collected",
         "m4_data_collected",
         # Stage125 temporal-availability invariants carried into Stage126.
@@ -4210,6 +4237,20 @@ def render_current_state(record: dict) -> str:
     ):
         if key in record:
             lines.append(f"- {key}: **{record[key]}**")
+    if "stage125_part4_m2_data_collected_historical" in record:
+        lines.extend([
+            "",
+            "## Historical / legacy frozen schema markers (NOT live state)\n",
+            "_Frozen Stage125 Part 4 contract values, republished verbatim "
+            "for audit. They record what that SAP froze when it was created "
+            "and are **not** live data-availability or execution markers. The "
+            "live M2 data and execution state is rendered with the current "
+            "scientific action above._\n",
+            "- stage125_part4_m2_data_collected_historical (frozen Part 4 "
+            f"value): **{record['stage125_part4_m2_data_collected_historical']}**"
+            " — "
+            f"{record.get('stage125_part4_m2_data_collected_historical_semantics', '')}",
+        ])
     lines.extend([
         "",
         "## Tickers in current research scope\n",
@@ -4524,6 +4565,15 @@ def derive_stage127_m2_market_data_gate_markers(root: str) -> dict:
         "m2_data_collected_semantics": (
             "frozen_prohibition_marker_m2_data_entered_authorized_modeling_"
             "pipeline_not_evidence_availability"
+        ),
+        # Explicit HISTORICAL restatement of the same frozen Part 4 value, so
+        # no reader can mistake it for live state. The live data-state fields
+        # are the m2_market_data_evidence_* /
+        # m2_data_entered_authorized_incremental_modeling_pipeline markers.
+        "stage125_part4_m2_data_collected_historical": False,
+        "stage125_part4_m2_data_collected_historical_semantics": (
+            "Frozen Stage125 Part4 state at the time that SAP was created; "
+            "not a live data-availability or execution marker."
         ),
         "paper_winner_selected": False,
         "final_model_selected": False,
@@ -5104,6 +5154,15 @@ def derive_stage127_m2_incremental_evaluation_markers(root: str) -> dict:
         "stage127_m2_incremental_evaluation_executed": True,
         "stage127_m2_incremental_evaluation_completed": True,
         "stage127_m2_incremental_evaluation_authorization_consumed": True,
+        # LIVE, unambiguous data-state fields. The frozen Stage125 Part 4
+        # marker `m2_data_collected` stays False because flipping it is a
+        # handoff-mutation violation of a frozen scientific artifact; it is
+        # NOT the live truth and is republished only as clearly-labelled
+        # historical schema state.
+        "m2_market_data_evidence_collected": True,
+        "m2_market_data_evidence_validated": True,
+        "m2_data_entered_authorized_incremental_modeling_pipeline": True,
+        "m2_incremental_evaluation_data_materialized": True,
         "stage127_m2_incremental_evaluation_common_sample_rows": d.get(
             "common_sample_rows"),
         "stage127_m2_incremental_evaluation_pooled_oof_rows": d.get(

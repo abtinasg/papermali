@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 119,
+  "assertion_count": 123,
   "assertions": [
     {
       "detail": "",
@@ -538,6 +538,26 @@
       "status": "PASS"
     },
     {
+      "detail": "a completed M2 evaluation implies the market evidence was collected, validated and materialized into the authorized modeling pipeline",
+      "name": "completed_m2_evaluation_implies_market_data_collected_and_materialized",
+      "status": "PASS"
+    },
+    {
+      "detail": "the frozen Stage125 Part 4 `m2_data_collected` marker must not appear among the live workflow markers; it is republished only under the historical/legacy heading",
+      "name": "frozen_stage125_m2_data_collected_is_never_rendered_as_live_state",
+      "status": "PASS"
+    },
+    {
+      "detail": "the frozen Part 4 marker keeps its frozen value; only its presentation changes",
+      "name": "frozen_stage125_m2_data_collected_value_is_not_mutated",
+      "status": "PASS"
+    },
+    {
+      "detail": "the final-test claim must state that only identity/split fields were read to exclude 346 records, and must not claim that no row was read or that the exclusion was 'not a read'",
+      "name": "current_state_final_test_wording_is_literally_precise",
+      "status": "PASS"
+    },
+    {
       "detail": "the final test remains locked after the paired evaluation",
       "name": "final_test_remains_locked_after_the_m2_evaluation",
       "status": "PASS"
@@ -599,7 +619,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "02b5e216a6614f7ac92a81f0d707c2dc960d53f6",
+  "code_commit": "070f13ad5da44375b246b00040913bd8d1c9fbba",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -607,7 +627,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "02b5e216a6614f7ac92a81f0d707c2dc960d53f6",
+  "generated_at": "070f13ad5da44375b246b00040913bd8d1c9fbba",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -625,7 +645,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "a559d3c741033dd6a19a8154bef5d7827cea7d06ce08c35694b1450be889c5b6",
+  "source_file_sha256": "f3eeafd6369e644071278bdc8c9dda386549c4f46c2bcf3a0933bed1d7ab40e7",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {
@@ -638,7 +658,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "25ab87b96334fbbc791f6ab01ef4079c3b7f768d27fb6a5f00edf17803ad23f6",
+  "test_file_sha256": "a5a739d5874381a5b60596c5c5cdf591e35cda21e027f70daa515b3dfae59f79",
   "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v2_lean"

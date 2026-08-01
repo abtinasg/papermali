@@ -12,14 +12,14 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m2-retained-block-human-decision`
 - **Last stage commit:** `070f13ad5da44375b246b00040913bd8d1c9fbba`
-- **Generated from commit:** `070f13ad5da44375b246b00040913bd8d1c9fbba` (branch `stage127-m2-incremental-evaluation`, informational)
+- **Generated from commit:** `1cd37da4ba84c513650d4da89df3a00f7a53a245` (branch `stage127-m2-incremental-evaluation`, informational)
 - **Baseline:** `origin/main` @ `fb5f0e13cb806e0ba28f0372b3b2264881564950`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **119 assertions, 0 failed**, all_pass=True
+- ✅ **123 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -34,7 +34,7 @@ _Historical record, **not** the current scientific action. The Gate was executed
 - **Terminal result pending human review:** False
 - **M2 market evidence collected:** True — **independently validated:** True (163230 normalized daily observations)
 - **Evidence bundle SHA256:** `d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`
-- Evidence collection is recorded **separately** from block admission. `m2_data_collected` remains `false` because in this schema it is a frozen prohibition marker meaning "M2 data has entered the authorized M2 modeling pipeline" — not a statement that no M2 evidence exists.
+- Evidence collection is recorded **separately** from block admission. The frozen Stage125 Part 4 marker `m2_data_collected` is pinned `false` as **historical schema state** — in that schema it is a prohibition marker meaning "M2 data has entered the authorized M2 modeling pipeline", and flipping it would mutate a frozen scientific artifact. It is NOT live state and NOT a statement that no M2 evidence exists: the live fields are `m2_market_data_evidence_collected`, `m2_market_data_evidence_validated` and `m2_data_entered_authorized_incremental_modeling_pipeline`.
 - **M2 incremental evaluation authorized (live):** False — **M2 modeling started (live):** True. These are CURRENT global markers, not statements about this historical Gate: this Gate fitted no model. Any `True` above was produced by a later, separately authorized action.
 
 ### Stage127 — zero-trade "trading day" semantics adjudication
@@ -55,7 +55,7 @@ _Why `equity_return_window` coverage is 0.4039. This subsection records the SEMA
 
 ## Stage128 — M2 D2 boundary-month equity-return design freeze (COMPLETED DESIGN CONTRACT)
 
-_Historical, completed frozen-design context — **not** the current scientific action. This was a DESIGN-FREEZE / CONTRACT action only: no canonical Gate was executed, no model was fit, no prediction was generated and no final-test row was read. The canonical Gate re-run section below is the current scientific action._
+_Historical, completed frozen-design context — **not** the current scientific action. This was a DESIGN-FREEZE / CONTRACT action only: no canonical Gate was executed, no model was fit, no prediction was generated and no final-test predictor or target value was parsed, inspected or used. The canonical Gate re-run section below is the current scientific action._
 
 - ✅ **D2 design freeze completed:** True
 - **Frozen primary M2 equity-return construct:** `BOUNDARY_MONTH_ASOF_TRAILING_EQUITY_RETURN` — calendar convention **GREGORIAN** (selected for coherence with the frozen Gregorian market-time axis, not because it clears a coverage threshold)
@@ -69,7 +69,7 @@ _Historical, completed frozen-design context — **not** the current scientific 
 
 ## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 (COMPLETED DATA-ADMISSION GATE)
 
-_The canonical M2 data-admission Gate, re-executed ONCE under the already-frozen Gregorian D2 equity-return specification, offline from the same immutable TSETMC bundle. The one-action human authorization was consumed by this execution. No model was fit, no prediction generated, no predictive metric computed and no final-test row read._
+_The canonical M2 data-admission Gate, re-executed ONCE under the already-frozen Gregorian D2 equity-return specification, offline from the same immutable TSETMC bundle. The one-action human authorization was consumed by this execution. No model was fit, no prediction generated, no predictive metric computed and no final-test predictor or target value parsed, inspected or used._
 
 - ✅ **Gate re-run status:** `PASS_FOR_M2_INCREMENTAL_EVALUATION`
 - **Executed:** True — **resolved (terminal observed decision):** True
@@ -83,12 +83,13 @@ _The canonical M2 data-admission Gate, re-executed ONCE under the already-frozen
 
 ## Stage127 — paired M2 vs M1 incremental evaluation (CURRENT)
 
-_The paired, development-only comparison of the frozen M2 block against the frozen M1 block on the exact three-variable D2 common sample, under the locked temporal folds, retained configurations, frozen metrics and frozen uncertainty procedure. The one-action human authorization was consumed by this execution. No final-test row was read, nothing was retuned and NO winner or retained block was selected._
+_The paired, development-only comparison of the frozen M2 block against the frozen M1 block on the exact three-variable D2 common sample, under the locked temporal folds, retained configurations, frozen metrics and frozen uncertainty procedure. The one-action human authorization was consumed by this execution. The frozen streaming loader read only the row-identity and split fields required to identify and exclude 346 locked-final-test records; it did not parse, inspect, store, preprocess, fit on, predict from, evaluate, summarize or export any final-test predictor or target value. Nothing was retuned and NO winner or retained block was selected._
 
 - ✅ **Executed and completed:** True — **authorization consumed:** True
 - **Paired common sample:** 539 rows — **pooled locked-validation OOF rows:** 366
 - **Primary predictive model fits:** 44 (both blocks refitted on identical common-sample training rows)
 - ⛔ **M2 block retained:** False — this action reports OBSERVED development evidence only and selects no winner; a **human retained-block decision is REQUIRED** (`m2_retained_block_decision_required=True`)
+- ✅ **M2 market data (live):** evidence collected=True, validated=True, entered the authorized incremental modeling pipeline=True, evaluation data materialized=True. (The frozen Stage125 Part 4 marker `m2_data_collected` stays `false` as immutable historical schema state; it is not live state — see the historical/legacy section below.)
 - ✅ **M2 modeling started (executed):** True — **M2 block admitted for modeling:** True. The authorized development modeling for this comparison WAS executed.
 - ⛔ **M2 incremental evaluation authorized:** False — the one-action authorization was CONSUMED by this execution and is not standing. A consumed authorization is `false`; it does **not** mean the modeling never happened.
 - ⛔ **Historical Stage127 D0 Gate remains** `FAIL_M2_DATA_GATE`; the terminal Stage128 D2 Gate result `PASS_FOR_M2_INCREMENTAL_EVALUATION` is preserved unchanged
@@ -122,7 +123,6 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 - final_test_unlocked: **False**
 - final_test_access_authorized: **False**
 - final_test_evaluation_performed: **False**
-- m2_data_collected: **False**
 - m3_data_collected: **False**
 - m4_data_collected: **False**
 - financial_data_researcher_verified_frozen: **True**
@@ -136,9 +136,15 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 - part3c_leakage_safe_finalization_completed: **True**
 - part4_statistical_analysis_plan_locked: **True**
 
+## Historical / legacy frozen schema markers (NOT live state)
+
+_Frozen Stage125 Part 4 contract values, republished verbatim for audit. They record what that SAP froze when it was created and are **not** live data-availability or execution markers. The live M2 data and execution state is rendered with the current scientific action above._
+
+- stage125_part4_m2_data_collected_historical (frozen Part 4 value): **False** — Frozen Stage125 Part4 state at the time that SAP was created; not a live data-availability or execution marker.
+
 ## Tickers in current research scope
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `c5d0e73bb6616c32aba8baf590bb62f6b8221664990d3aad22384789054912f3`_
-_generated_at_utc: 2026-08-01T11:46:36Z (informational)_
+_state_fingerprint: `b49f40819d016e44fa648b07fbb6a140faf6b566edcfefa2f0a59b02f16a7db9`_
+_generated_at_utc: 2026-08-01T12:17:08Z (informational)_

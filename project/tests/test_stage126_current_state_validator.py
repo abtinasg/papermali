@@ -1586,6 +1586,10 @@ _RERUN_RENDERING_ASSERTIONS = (
     "m2_block_retained_remains_false_pending_human_decision",
     "m3_and_m4_remain_unauthorized_and_unstarted",
     "final_test_remains_locked_after_the_m2_evaluation",
+    "completed_m2_evaluation_implies_market_data_collected_and_materialized",
+    "frozen_stage125_m2_data_collected_is_never_rendered_as_live_state",
+    "frozen_stage125_m2_data_collected_value_is_not_mutated",
+    "current_state_final_test_wording_is_literally_precise",
     "m2_evaluation_records_a_required_human_retained_block_decision",
     "current_state_freeze_section_claims_only_its_own_action",
     "current_state_freeze_section_does_not_claim_the_gate_rerun",
@@ -1734,3 +1738,54 @@ def test_current_state_does_not_report_modeling_as_never_started():
     assert "**M2 modeling started (executed):** True" in text
     assert "**M2 block admitted for modeling:** True" in text
     assert "does **not** mean the modeling never happened" in text
+
+
+def test_live_m2_data_state_is_true_and_historical_marker_is_labelled():
+    """The frozen Part 4 marker must not masquerade as live state."""
+    state = json.loads(open(
+        os.path.join(REAL_ROOT, "project", "docs", "ai",
+                     "handoff_state.json"), encoding="utf-8").read())
+    # 1. completed evaluation implies collected + materialized
+    for field in (
+        "m2_market_data_evidence_collected",
+        "m2_market_data_evidence_validated",
+        "m2_data_entered_authorized_incremental_modeling_pipeline",
+        "m2_incremental_evaluation_data_materialized",
+    ):
+        assert state[field] is True, field
+    # 2. the frozen Part 4 value is preserved and explicitly labelled
+    assert state["m2_data_collected"] is False
+    assert state["stage125_part4_m2_data_collected_historical"] is False
+    assert "not a live data-availability or execution marker" in state[
+        "stage125_part4_m2_data_collected_historical_semantics"]
+    # 3-7. the surrounding distinctions are unchanged
+    assert state["m2_incremental_evaluation_authorized"] is False
+    assert state["m2_started"] is True
+    assert state["m2_modeling_started"] is True
+    assert state["m2_block_retained"] is False
+    assert state["m2_retained_block_decision_required"] is True
+    for field in (
+        "m3_authorized", "m3_started", "m4_authorized", "m4_started",
+        "final_test_unlocked", "final_test_access_authorized",
+        "final_test_evaluation_performed",
+    ):
+        assert state[field] is False, field
+
+
+def test_current_state_never_renders_bare_m2_data_collected_as_live():
+    text = open(_CURRENT_STATE, encoding="utf-8").read()
+    live = text.split("## Workflow markers")[1].split("## ")[0]
+    assert "- m2_data_collected: " not in live
+    assert "- m3_data_collected: " in live
+    # It is republished only under the clearly titled historical heading.
+    assert (
+        "## Historical / legacy frozen schema markers (NOT live state)" in text
+    )
+    assert "stage125_part4_m2_data_collected_historical" in text
+
+
+def test_current_state_reports_the_live_m2_market_data_state():
+    text = open(_CURRENT_STATE, encoding="utf-8").read()
+    assert "**M2 market data (live):** evidence collected=True" in text
+    assert "entered the authorized incremental modeling pipeline=True" in text
+    assert "evaluation data materialized=True" in text

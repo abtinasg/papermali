@@ -4,7 +4,7 @@
   "composed_module_sha256": {
     "project/run_stage127_m2_incremental_evaluation.py": "9a9883f6345afaaa530f7f9cab8e5deaa87eeab3794c697f5784b628d1df8478",
     "project/src/stage126_m1_primary_development_tuning.py": "ae63bee24c3b868919b008cb15a0d4f4bfb8300ee6e3002a61e1e105d9391d82",
-    "project/src/stage127_m2_incremental_evaluation.py": "c72207134694b5a73a467dab22fb89fa29d8a1301212fd40b2d709e9cf2201b5"
+    "project/src/stage127_m2_incremental_evaluation.py": "cb5fcfbfb10d064c7fcf2c1e348ea0a2f9dcb94bf412ab66c168a89ce870fa49"
   },
   "contract_id": "stage127_m2_incremental_evaluation",
   "contract_version": "stage127_m2_incremental_evaluation_v1",
@@ -18,6 +18,18 @@
     "verification_recomputation_changes_canonical_counts": false
   },
   "external_bundle_sha256": "d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec",
+  "final_test_firewall_summary": {
+    "final_test_evaluation_performed": false,
+    "final_test_identity_and_split_fields_read_for_exclusion": true,
+    "final_test_keys_in_scientific_artifacts": 0,
+    "final_test_model_fits": 0,
+    "final_test_predictions": 0,
+    "final_test_predictor_values_parsed_or_inspected": 0,
+    "final_test_row_records_structurally_identified": 346,
+    "final_test_target_values_parsed_or_inspected": 0,
+    "final_test_values_used_for_preprocessing": 0,
+    "statement": "The frozen streaming loader read only the row-identity and split fields required to identify and exclude 346 locked-final-test records. It did not parse, inspect, store, preprocess, fit on, predict from, evaluate, summarize or export any final-test predictor or target value."
+  },
   "frozen_authority_sha256": {
     "project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md": "3e1b833da5424a440a668e2c5b5cf0923213c7c3aedffd77a5dc8b9bd9bc8e27",
     "project/stage125/part4_metrics_uncertainty_contract_stage125.json": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
@@ -80,7 +92,7 @@
     "source_base_commit": "fb5f0e13cb806e0ba28f0372b3b2264881564950"
   },
   "package_artifacts_sha256": {
-    "project/stage128/m2_incremental_evaluation/README_STAGE127_M2_INCREMENTAL_EVALUATION.md": "abc37ac93d8bd9ed7dda3cac1433e4f2747732038cfc2f920b2a4271629b636a",
+    "project/stage128/m2_incremental_evaluation/README_STAGE127_M2_INCREMENTAL_EVALUATION.md": "4d6eb765cac5f6d3fe40c4e85bb0b3f5dfc6bc18a6880f74fadba594bf57e1f9",
     "project/stage128/m2_incremental_evaluation/stage127_m2_block_model_metrics.csv": "b28f2fa4fe2852680ad970399276241b5921784a4c546e5aa9a2e556757b9d87",
     "project/stage128/m2_incremental_evaluation/stage127_m2_calibration_report.json": "a5cd52777f5353942a94ddfdb898e1eca9538695b8b66a601286c44e980225af",
     "project/stage128/m2_incremental_evaluation/stage127_m2_common_sample_join_audit.json": "e6da66d96810ef7491ab5db0018909419ecc7760000e8f390b5bbadb0ef3c159",
@@ -89,7 +101,7 @@
     "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_decision.json": "bda5fa054b4e00876b7be2b8ddd8726efc20c21117361e22a819d662e18814de",
     "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_execution_contract.json": "9087212d3fcbd06bd5438200fb976fa1cf5b178de52f9e20f759a6af4d9f3063",
     "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_human_authorization_record.json": "b30a9b71a79be664ccac28e10ceb13a6c1c773ddd2450cc3212e174e42223f55",
-    "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_qc_report.json": "7ca670d3f0c4dfd98dc5d42cbf62f5d967b521f1362e2f76e8fd284314d34990",
+    "project/stage128/m2_incremental_evaluation/stage127_m2_incremental_evaluation_qc_report.json": "58b40c9bb5e1bd2c4233345cfe566fc71403ed6a8a5c8e99690613a3c012f476",
     "project/stage128/m2_incremental_evaluation/stage127_m2_multiplicity_family_status.json": "6c20ed4f64321b8d5083359fd3079283bbf006f62958d576b6e5090d43c88459",
     "project/stage128/m2_incremental_evaluation/stage127_m2_paired_bootstrap_delta_summary.json": "1c4d4275c938d9d80e24d8746b16c669ecb822d884921a2ee05811220c061a6d",
     "project/stage128/m2_incremental_evaluation/stage127_m2_paired_oof_predictions.csv": "923ce0929693cc07fbf5a81e16295334624ead19447ff87d6a49e7a6f2a26ceb",

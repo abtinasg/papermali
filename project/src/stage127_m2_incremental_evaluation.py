@@ -19,12 +19,12 @@ Development-only. This module:
   company-cluster bootstrap uncertainty;
 * records the multiplicity-family status with the family left incomplete.
 
-It parses, inspects, stores, preprocesses, fits, predicts and evaluates NO
-final-test predictor or target value. The frozen two-pass streaming loader
-does structurally encounter the final-test row records and rejects them before
-value parsing; that is a structural skip, not a read. It performs no tuning,
-no grid search, no feature search, no SMOTE, no design change, no winner
-selection and no successor action.
+The frozen two-pass streaming loader reads only the row-identity and split
+fields required to identify and exclude the 346 locked-final-test records. It
+does not parse, inspect, store, preprocess, fit on, predict from, evaluate,
+summarize or export any final-test predictor or target value. It performs no
+tuning, no grid search, no feature search, no SMOTE, no design change, no
+winner selection and no successor action.
 """
 from __future__ import annotations
 
@@ -360,10 +360,11 @@ EXPECTED_COMMON_VALIDATION_POSITIVES = {
 EXPECTED_POOLED_OOF_ROWS = 366
 EXPECTED_POOLED_OOF_POSITIVE = 28
 
-#: The frozen streaming loader structurally encounters these final-test row
-#: records and rejects them BEFORE parsing any predictor or target value.
-#: Recording the number keeps the firewall claim literally precise: values
-#: read = 0, rows structurally encountered != 0.
+#: The frozen streaming loader reads the row-identity and split fields of
+#: these locked-final-test records in order to IDENTIFY and EXCLUDE them, and
+#: never parses their predictor or target values. Recording the number keeps
+#: the firewall claim literally precise: identity/split fields of 346 records
+#: are read, predictor/target values parsed or inspected = 0.
 FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED = 346
 
 D2_FEATURES_REL = "project/stage128/stage128_m2_d2_development_features.csv"
@@ -1963,8 +1964,9 @@ def build_qc_report(
         == FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED
         and firewall["final_test_predictor_values_read"] == 0
         and firewall["final_test_target_values_read"] == 0,
-        "the loader structurally encounters final-test row records and "
-        "rejects them before value parsing; values read remain 0")
+        "the loader reads only identity/split fields to identify and "
+        "exclude locked-final-test records; predictor/target values parsed "
+        "or inspected remain 0")
 
     # -- immutable original-execution provenance ---------------------------- #
     oe = ORIGINAL_AUTHORIZED_SCIENTIFIC_EXECUTION
@@ -2047,14 +2049,13 @@ def build_readme(
         "",
         f"**Action:** `{ACTION_ID}` — one authorized execution, consumed.",
         "",
-        "**Development-only.** No final-test predictor or target value was "
-        "parsed, inspected, stored in an action artifact, used for "
-        "preprocessing, used for fitting, used for prediction or used for "
-        "evaluation. The frozen streaming loader structurally encountered "
-        f"{FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED} final-test row records "
-        "and rejected them before value parsing — that is a structural skip, "
-        "not a read. No configuration was retuned, no feature was searched, "
-        "no winner was selected and M3/M4 were not started.",
+        "**Development-only.** The frozen streaming loader read only the "
+        "row-identity and split fields required to identify and exclude "
+        f"{FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED} locked-final-test "
+        "records. It did not parse, inspect, store, preprocess, fit on, "
+        "predict from, evaluate, summarize or export any final-test "
+        "predictor or target value. No configuration was retuned, no feature "
+        "was searched, no winner was selected and M3/M4 were not started.",
         "",
         "## What was compared, and on which rows",
         "",
@@ -2170,8 +2171,10 @@ def build_readme(
         "parsed/inspected = 0; final-test target values parsed/inspected = 0; "
         "final-test fits = 0; final-test predictions = 0; final-test "
         "evaluation = 0; final-test keys in scientific artifacts = 0; "
-        "final-test row records structurally encountered and rejected before "
-        f"value parsing = {FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED}; "
+        "locked-final-test row records structurally identified and excluded "
+        "from the modeling surface (identity/split fields only, before any "
+        "predictor or target value was parsed) = "
+        f"{FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED}; "
         "full-development refits = 0; M3 executions = 0; M4 executions = 0; "
         "winners selected = 0.",
         "",
@@ -2290,6 +2293,31 @@ def build_metadata(
         "latest_non_scientific_verification_environment":
             latest_non_scientific_verification_environment(),
         "execution_count_semantics": EXECUTION_COUNT_SEMANTICS,
+        # Precisely-named restatement of the firewall facts recorded inside
+        # the (byte-frozen) decision and firewall artifacts. The names here
+        # are the literal ones; the underlying values are unchanged.
+        "final_test_firewall_summary": {
+            "final_test_row_records_structurally_identified": (
+                FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED
+            ),
+            "final_test_identity_and_split_fields_read_for_exclusion": True,
+            "final_test_predictor_values_parsed_or_inspected": 0,
+            "final_test_target_values_parsed_or_inspected": 0,
+            "final_test_values_used_for_preprocessing": 0,
+            "final_test_model_fits": 0,
+            "final_test_predictions": 0,
+            "final_test_evaluation_performed": False,
+            "final_test_keys_in_scientific_artifacts": 0,
+            "statement": (
+                "The frozen streaming loader read only the row-identity and "
+                "split fields required to identify and exclude "
+                f"{FINAL_TEST_ROWS_STRUCTURALLY_ENCOUNTERED} "
+                "locked-final-test records. It did not parse, inspect, "
+                "store, preprocess, fit on, predict from, evaluate, "
+                "summarize or export any final-test predictor or target "
+                "value."
+            ),
+        },
     }
 
 

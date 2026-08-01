@@ -863,15 +863,93 @@ def test_final_test_rows_are_structurally_encountered_but_never_parsed():
     assert f["final_test_keys_in_any_artifact"] == 0
 
 
+#: Every current human-facing / generated surface that carries the final-test
+#: claim for THIS action. Historical Stage127 artifacts are deliberately NOT
+#: in this list: they are frozen and are never rewritten to modernize wording.
+FINAL_TEST_WORDING_SURFACES = (
+    "project/stage128/m2_incremental_evaluation/"
+    "README_STAGE127_M2_INCREMENTAL_EVALUATION.md",
+    "project/docs/ai/CURRENT_STATE.md",
+    "project/docs/ai/ROADMAP.md",
+    "project/docs/ai/OPEN_TASKS.md",
+    "project/src/stage127_m2_incremental_evaluation.py",
+    "project/scripts/update_ai_handoff.py",
+)
+
+#: The two inaccurate formulations that must not survive anywhere.
+FORBIDDEN_FINAL_TEST_PHRASES = (
+    "no final-test row was read",
+    "no final-test row read",
+    "no final-test row is read",
+    "not a read",
+)
+
+
+@pytest.mark.parametrize("rel", FINAL_TEST_WORDING_SURFACES)
+def test_no_surface_claims_no_row_was_read_or_not_a_read(rel):
+    text = (REPO_ROOT / rel).read_text(encoding="utf-8").lower()
+    for phrase in FORBIDDEN_FINAL_TEST_PHRASES:
+        assert phrase not in text, f"{rel}: {phrase!r}"
+
+
 @requires_package
 def test_readme_states_the_final_test_claim_precisely():
     text = (OUT / ev.F_README).read_text(encoding="utf-8")
-    assert "structurally encountered" in text
-    assert "346 final-test row records" in text
-    assert "rejected them before value parsing" in text
-    assert "parsed, inspected, stored in an action artifact" in text
-    # The imprecise absolute claim must not appear.
-    assert "no final-test row was read" not in text.lower()
+    assert "read only the row-identity and split fields" in text
+    assert "identify and exclude 346 locked-final-test records" in text
+    assert (
+        "did not parse, inspect, store, preprocess, fit on, predict from, "
+        "evaluate, summarize or export any final-test predictor or target "
+        "value" in text
+    )
+    assert "final-test predictor values parsed/inspected = 0" in text
+    assert "final-test target values parsed/inspected = 0" in text
+
+
+def test_current_state_states_the_final_test_claim_precisely():
+    text = (REPO_ROOT / "project/docs/ai/CURRENT_STATE.md").read_text(
+        encoding="utf-8")
+    current = text.split("## Stage127 — paired M2 vs M1 incremental "
+                         "evaluation (CURRENT)")[1]
+    assert "identify and exclude 346 locked-final-test records" in current
+    assert (
+        "did not parse, inspect, store, preprocess, fit on, predict from, "
+        "evaluate, summarize or export any final-test predictor or target "
+        "value" in current
+    )
+
+
+def test_roadmap_and_open_tasks_state_the_claim_precisely():
+    for rel in ("project/docs/ai/ROADMAP.md", "project/docs/ai/OPEN_TASKS.md"):
+        text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        assert "identify and exclude 346 locked-final-test records" in text, rel
+
+
+@requires_package
+def test_metadata_restates_the_firewall_facts_with_literal_names():
+    f = _load(ev.F_METADATA)["final_test_firewall_summary"]
+    assert f["final_test_row_records_structurally_identified"] == 346
+    assert f["final_test_identity_and_split_fields_read_for_exclusion"] is True
+    assert f["final_test_predictor_values_parsed_or_inspected"] == 0
+    assert f["final_test_target_values_parsed_or_inspected"] == 0
+    assert f["final_test_values_used_for_preprocessing"] == 0
+    assert f["final_test_model_fits"] == 0
+    assert f["final_test_predictions"] == 0
+    assert f["final_test_evaluation_performed"] is False
+    assert f["final_test_keys_in_scientific_artifacts"] == 0
+    assert "not a read" not in f["statement"]
+
+
+def test_historical_stage127_artifacts_are_not_rewritten_for_wording():
+    """Frozen Stage127 artifacts keep their original text, whatever it says."""
+    out = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "diff", "--name-only",
+         "fb5f0e13cb806e0ba28f0372b3b2264881564950", "HEAD",
+         "--", "project/stage127"],
+        capture_output=True, text=True,
+    )
+    assert out.returncode == 0
+    assert out.stdout.strip() == "", out.stdout
 
 
 @requires_package

@@ -58,12 +58,12 @@ claim is made. The confirmatory family (`M2_minus_M1`, `M3_minus_M2`,
 `M4_minus_M3`) is INCOMPLETE: `holm_family_complete = false`,
 `holm_final_adjustment_deferred = true`.
 
-No final-test predictor or target value was parsed, inspected, stored in an
-action artifact, used for preprocessing, used for fitting, used for prediction
-or used for evaluation. The frozen streaming loader structurally encountered
-346 final-test row records and rejected them before value parsing — a
-structural skip, not a read. No model was fit on a final-test row and no
-full-development refit occurred, and M3/M4 were not started.
+The frozen streaming loader read only the row-identity and split fields
+required to identify and exclude 346 locked-final-test records. It did not
+parse, inspect, store, preprocess, fit on, predict from, evaluate, summarize
+or export any final-test predictor or target value. No model was fit on a
+final-test row and no full-development refit occurred, and M3/M4 were not
+started.
 
 **Live-state note.** The authorized M2 development modeling WAS executed: 44
 canonical primary predictive fits. The one-action authorization was CONSUMED,
@@ -73,6 +73,16 @@ AUTHORIZATION fact and does not mean the modeling never happened.
 `m2_block_admitted_for_modeling = true` record the execution;
 `m2_block_retained = false` with `m2_retained_block_decision_required = true`
 records that retention is still undecided.
+
+**M2 data state.** The live fields are `m2_market_data_evidence_collected =
+true`, `m2_market_data_evidence_validated = true`,
+`m2_data_entered_authorized_incremental_modeling_pipeline = true` and
+`m2_incremental_evaluation_data_materialized = true`. The frozen Stage125
+Part 4 marker `m2_data_collected = false` is **historical schema state**, not
+live state: it records what that SAP froze when it was created, flipping it
+would be a handoff-mutation violation of a frozen scientific artifact, and it
+is republished only under the historical/legacy heading of `CURRENT_STATE.md`
+as `stage125_part4_m2_data_collected_historical`.
 
 ### What is open now
 

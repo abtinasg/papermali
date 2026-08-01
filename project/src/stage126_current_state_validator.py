@@ -2047,6 +2047,44 @@ def build_assertions(
         or all(handoff.get(k) is False for k in (
             "m3_started", "m3_authorized", "m4_started", "m4_authorized")),
         "the completed M2 evaluation starts and authorizes no successor block")
+    add("completed_m2_evaluation_implies_market_data_collected_and_"
+        "materialized",
+        (not m2_eval_done)
+        or all(handoff.get(k) is True for k in (
+            "m2_market_data_evidence_collected",
+            "m2_market_data_evidence_validated",
+            "m2_data_entered_authorized_incremental_modeling_pipeline",
+            "m2_incremental_evaluation_data_materialized",
+        )),
+        "a completed M2 evaluation implies the market evidence was collected, "
+        "validated and materialized into the authorized modeling pipeline")
+    add("frozen_stage125_m2_data_collected_is_never_rendered_as_live_state",
+        ("- m2_data_collected: " not in current_state_text)
+        and ((not m2_eval_done)
+             or ("stage125_part4_m2_data_collected_historical"
+                 in current_state_text)),
+        "the frozen Stage125 Part 4 `m2_data_collected` marker must not "
+        "appear among the live workflow markers; it is republished only "
+        "under the historical/legacy heading")
+    add("frozen_stage125_m2_data_collected_value_is_not_mutated",
+        handoff.get("m2_data_collected") is False
+        and ((not m2_eval_done)
+             or handoff.get("stage125_part4_m2_data_collected_historical")
+             is False),
+        "the frozen Part 4 marker keeps its frozen value; only its "
+        "presentation changes")
+    add("current_state_final_test_wording_is_literally_precise",
+        (not m2_eval_done)
+        or ("No final-test row was read" not in current_state_text
+            and "not a read" not in current_state_text
+            and "identify and exclude 346 locked-final-test records"
+            in current_state_text
+            and "did not parse, inspect, store, preprocess, fit on, predict "
+            "from, evaluate, summarize or export any final-test predictor or "
+            "target value" in current_state_text),
+        "the final-test claim must state that only identity/split fields "
+        "were read to exclude 346 records, and must not claim that no row "
+        "was read or that the exclusion was 'not a read'")
     add("final_test_remains_locked_after_the_m2_evaluation",
         (not m2_eval_done)
         or all(handoff.get(k) is False for k in (

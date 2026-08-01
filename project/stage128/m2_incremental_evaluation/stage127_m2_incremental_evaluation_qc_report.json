@@ -329,7 +329,7 @@
       "status": "PASS"
     },
     {
-      "detail": "the loader structurally encounters final-test row records and rejects them before value parsing; values read remain 0",
+      "detail": "the loader reads only identity/split fields to identify and exclude locked-final-test records; predictor/target values parsed or inspected remain 0",
       "name": "final_test_rows_structurally_encountered_but_never_parsed",
       "status": "PASS"
     },
