@@ -2755,6 +2755,7 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         **derive_stage127_m2_zero_trade_semantics_markers(root),
         **derive_stage128_m2_d2_design_freeze_markers(root),
         **derive_stage128_m2_d2_gate_rerun_markers(root),
+        **derive_stage127_m2_incremental_evaluation_markers(root),
     }
 
 
@@ -3959,9 +3960,21 @@ def render_current_state(record: dict) -> str:
         rerun_status = record.get("stage128_m2_d2_gate_rerun_status", "")
         admitted = record.get("stage128_m2_d2_block_data_admission_passed")
         rerun_ok = "✅" if admitted else "⛔"
-        lines += [
+        # Once the authorized successor (the paired M2-vs-M1 incremental
+        # evaluation) has itself completed, this Gate becomes historical
+        # context and its section must stop being marked (CURRENT) and stop
+        # carrying the branch's live next-action pointer.
+        rerun_is_historical = bool(
+            record.get("stage127_m2_incremental_evaluation_completed"))
+        rerun_heading = (
             "## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 "
-            "(CURRENT)\n",
+            "(COMPLETED DATA-ADMISSION GATE)\n"
+            if rerun_is_historical else
+            "## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 "
+            "(CURRENT)\n"
+        )
+        lines += [
+            rerun_heading,
             "_The canonical M2 data-admission Gate, re-executed ONCE under "
             "the already-frozen Gregorian D2 equity-return specification, "
             "offline from the same immutable TSETMC bundle. The one-action "
@@ -3993,23 +4006,85 @@ def render_current_state(record: dict) -> str:
             f"**M2 modeling started:** {record.get('m2_modeling_started')} — "
             f"**M2 block admitted for modeling:** "
             f"{record.get('m2_block_admitted_for_modeling')}",
-            # The SOLE live next-action pointer on this branch.
-            "- **Next research action (pointer only):** "
-            f"`{record['next_research_action_id']}` — scientifically "
-            "ELIGIBLE after this data-admission PASS; a POINTER ONLY, "
-            "**not authorized** "
-            "(`m2_incremental_evaluation_authorized="
-            f"{record.get('m2_incremental_evaluation_authorized')}`) and "
-            "**not started** "
-            f"(`m2_modeling_started={record.get('m2_modeling_started')}`). "
-            "It requires a new, explicit human authorization. It is the M2 "
-            "incremental evaluation action — it is NOT the canonical M2 Gate "
-            "re-run, which is the completed action reported in this section.",
+            # The SOLE live next-action pointer while this Gate is CURRENT.
+            (
+                "- **Immediate successor of this Gate (historical):** "
+                "`stage127-m2-incremental-evaluation` — the paired M2 "
+                "incremental evaluation, since AUTHORIZED and COMPLETED (see "
+                "the current section below). This line is historical: it is "
+                "not the branch's live next-action pointer."
+                if rerun_is_historical else
+                "- **Next research action (pointer only):** "
+                f"`{record['next_research_action_id']}` — scientifically "
+                "ELIGIBLE after this data-admission PASS; a POINTER ONLY, "
+                "**not authorized** "
+                "(`m2_incremental_evaluation_authorized="
+                f"{record.get('m2_incremental_evaluation_authorized')}`) and "
+                "**not started** "
+                f"(`m2_modeling_started={record.get('m2_modeling_started')}`)"
+                ". It requires a new, explicit human authorization. It is the "
+                "M2 incremental evaluation action — it is NOT the canonical "
+                "M2 Gate re-run, which is the completed action reported in "
+                "this section."
+            ),
             "- The post-lock eligibility audit frozen by the design-freeze "
             "contract remains REQUIRED before any M2 predictive result is "
             "interpreted. It was not executed by this Gate.",
             "- Package: `project/stage128/`; interpretation: "
             "`project/stage128/README_STAGE128_M2_D2_GATE_RERUN.md`",
+            "",
+        ]
+    if record.get("stage127_m2_incremental_evaluation_completed"):
+        lines += [
+            "## Stage127 — paired M2 vs M1 incremental evaluation "
+            "(CURRENT)\n",
+            "_The paired, development-only comparison of the frozen M2 block "
+            "against the frozen M1 block on the exact three-variable D2 "
+            "common sample, under the locked temporal folds, retained "
+            "configurations, frozen metrics and frozen uncertainty procedure. "
+            "The one-action human authorization was consumed by this "
+            "execution. No final-test row was read, nothing was retuned and "
+            "NO winner or retained block was selected._\n",
+            "- \u2705 **Executed and completed:** "
+            f"{record['stage127_m2_incremental_evaluation_completed']} — "
+            "**authorization consumed:** "
+            f"{record.get('stage127_m2_incremental_evaluation_authorization_consumed')}",
+            "- **Paired common sample:** "
+            f"{record.get('stage127_m2_incremental_evaluation_common_sample_rows')}"
+            " rows — **pooled locked-validation OOF rows:** "
+            f"{record.get('stage127_m2_incremental_evaluation_pooled_oof_rows')}",
+            "- **Primary predictive model fits:** "
+            f"{record.get('stage127_m2_incremental_evaluation_primary_model_fits')}"
+            " (both blocks refitted on identical common-sample training rows)",
+            "- \u26d4 **M2 block retained:** "
+            f"{record.get('m2_block_retained')} — this action reports OBSERVED "
+            "development evidence only and selects no winner; a **human "
+            "retained-block decision is REQUIRED** "
+            f"(`m2_retained_block_decision_required="
+            f"{record.get('m2_retained_block_decision_required')}`)",
+            "- \u26d4 **M2 incremental evaluation authorized:** "
+            f"{record.get('m2_incremental_evaluation_authorized')} (the "
+            "one-action authorization was consumed and is not standing) — "
+            f"**M2 modeling started:** {record.get('m2_modeling_started')}",
+            "- \u26d4 **Historical Stage127 D0 Gate remains** "
+            f"`{record.get('stage127_m2_market_data_gate_status')}`; the "
+            "terminal Stage128 D2 Gate result "
+            f"`{record.get('stage128_m2_d2_gate_rerun_status')}` is preserved "
+            "unchanged",
+            "- \U0001f512 **Final test locked:** final_test_unlocked="
+            f"{record.get('final_test_unlocked')}, "
+            f"final_test_access_authorized="
+            f"{record.get('final_test_access_authorized')}, "
+            f"final_test_evaluation_performed="
+            f"{record.get('final_test_evaluation_performed')} — "
+            f"**M3 started:** {record.get('m3_started')} — "
+            f"**M4 started:** {record.get('m4_started')}",
+            "- **Next research action (pointer only):** "
+            f"`{record['next_research_action_id']}` — a human retained-block "
+            "review. A pointer is **not** an authorization.",
+            "- Package: `project/stage128/m2_incremental_evaluation/`; "
+            "interpretation: `project/stage128/m2_incremental_evaluation/"
+            "README_STAGE127_M2_INCREMENTAL_EVALUATION.md`",
             "",
         ]
     lines += [
@@ -4899,6 +4974,149 @@ def derive_stage128_m2_d2_gate_rerun_markers(root: str) -> dict:
         "final_test_predictor_values_inspected": False,
         "final_test_target_values_inspected": False,
         "final_test_evaluation_performed": False,
+    }
+
+
+_STAGE127_M2_INCREMENTAL_EVALUATION_REL = (
+    "project/stage128/m2_incremental_evaluation/"
+    "stage127_m2_incremental_evaluation_decision.json"
+)
+_STAGE127_M2_INCREMENTAL_EVALUATION_ACTION_ID = (
+    "stage127-m2-incremental-evaluation"
+)
+#: After the paired M2-versus-M1 development comparison, the live question is a
+#: HUMAN retained-block decision. Identifying it is a pointer only: it is not a
+#: scientific authorization, it does not retain M2, and it never starts M3.
+_NEXT_RESEARCH_ACTION_ID_AFTER_M2_INCREMENTAL_EVALUATION = (
+    "stage128-m2-retained-block-human-decision"
+)
+
+
+def derive_stage127_m2_incremental_evaluation_markers(root: str) -> dict:
+    """Recognize the executed, authorized paired M2-versus-M1 evaluation.
+
+    Narrow and fail-closed. The action reports OBSERVED development evidence:
+
+    * it never retains or rejects the M2 block — that stays a human decision;
+    * it never selects a winner and never claims superiority;
+    * its one-action human authorization is CONSUMED, so
+      ``m2_incremental_evaluation_authorized`` returns to False afterwards;
+    * it never unlocks the final test and never starts M3 or M4.
+
+    Returns {} before the action has been executed.
+    """
+    path = os.path.join(root, _STAGE127_M2_INCREMENTAL_EVALUATION_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        d = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(
+            f"unreadable stage127 M2 incremental evaluation decision: {exc}"
+        ) from exc
+
+    if d.get("decision_id") != _STAGE127_M2_INCREMENTAL_EVALUATION_ACTION_ID:
+        raise HandoffError("stage127 M2 incremental evaluation decision_id mismatch")
+    if d.get("gate_status_consumed") != _STAGE128_GATE_RERUN_PASS:
+        raise HandoffError(
+            "stage127 M2 incremental evaluation did not consume a passing D2 Gate"
+        )
+    if d.get("historical_d0_gate_status") != _STAGE127_GATE_FAIL:
+        raise HandoffError(
+            "stage127 M2 incremental evaluation does not preserve the historical "
+            "D0 Gate status"
+        )
+
+    exact = {
+        "winner_selected": False,
+        "retained_block_selected": False,
+        "m2_automatically_retained": False,
+        "m2_automatically_rejected": False,
+        "superiority_claimed": False,
+        "causal_interpretation_made": False,
+        "new_pass_fail_threshold_created": False,
+        "design_changed_after_seeing_results": False,
+        "authorizes_next_action": False,
+        "m3_started": False,
+        "m4_started": False,
+        "merge_authorized": False,
+        "human_retained_block_decision_required": True,
+    }
+    for key, want in exact.items():
+        if d.get(key) != want:
+            raise HandoffError(
+                f"stage127 M2 incremental evaluation field {key}="
+                f"{d.get(key)!r} != {want!r}"
+            )
+
+    fw = d.get("firewall") or {}
+    for key in (
+        "final_test_predictor_values_read", "final_test_target_values_read",
+        "final_test_predictions", "final_test_model_fits",
+        "full_development_refits", "m3_executions", "m4_executions",
+    ):
+        if fw.get(key) != 0:
+            raise HandoffError(
+                f"stage127 M2 incremental evaluation firewall {key}={fw.get(key)!r}"
+            )
+    for key in (
+        "final_test_unlocked", "final_test_access_authorized",
+        "final_test_evaluation_performed",
+    ):
+        if fw.get(key) is not False:
+            raise HandoffError(
+                f"stage127 M2 incremental evaluation firewall {key} not False"
+            )
+    if fw.get("final_test_locked") is not True:
+        raise HandoffError(
+            "stage127 M2 incremental evaluation does not report final_test_locked"
+        )
+
+    fits = d.get("primary_predictive_model_fits")
+    if fits != 44:
+        raise HandoffError(
+            f"stage127 M2 incremental evaluation primary fit count {fits!r} != 44"
+        )
+
+    return {
+        "stage127_m2_incremental_evaluation_executed": True,
+        "stage127_m2_incremental_evaluation_completed": True,
+        "stage127_m2_incremental_evaluation_authorization_consumed": True,
+        "stage127_m2_incremental_evaluation_common_sample_rows": d.get(
+            "common_sample_rows"),
+        "stage127_m2_incremental_evaluation_pooled_oof_rows": d.get(
+            "pooled_oof_rows"),
+        "stage127_m2_incremental_evaluation_primary_model_fits": fits,
+        "stage127_m2_families_agree_on_direction": d.get(
+            "families_agree_on_direction"),
+        "last_completed_research_action_id": (
+            _STAGE127_M2_INCREMENTAL_EVALUATION_ACTION_ID
+        ),
+        "next_research_action_id": (
+            _NEXT_RESEARCH_ACTION_ID_AFTER_M2_INCREMENTAL_EVALUATION
+        ),
+        "next_research_action_pointer_is_not_authorization": True,
+        # The one-action authorization was CONSUMED by this execution and is
+        # never left standing.
+        "m2_incremental_evaluation_authorized": False,
+        "m2_modeling_started": False,
+        "m2_block_retained": False,
+        "m2_retained_block_decision_required": True,
+        "m2_authorized": False,
+        "m2_started": False,
+        "m2_block_admitted_for_modeling": False,
+        "paper_winner_selected": False,
+        "final_model_selected": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_predictor_values_inspected": False,
+        "final_test_target_values_inspected": False,
+        "final_test_evaluation_performed": False,
+        "m3_started": False,
+        "m3_authorized": False,
+        "m4_started": False,
+        "m4_authorized": False,
     }
 
 

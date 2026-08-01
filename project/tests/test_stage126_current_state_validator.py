@@ -600,11 +600,11 @@ def test_research_pointers_unchanged():
     # transitioned once more to the D2 Gate re-run pointer (which itself
     # still requires a separate future human authorization -- see
     # STAGE128_M2_D2_DESIGN_FREEZE.md §8-9).
-    # The canonical D2 Gate re-run has since been executed under its own
-    # explicit one-action authorization and PASSED data admission, so the
-    # pointer advanced once more — to a POINTER, not an authorization.
+    # The authorized paired M2-vs-M1 incremental evaluation has since been
+    # executed and COMPLETED, so the pointer advanced once more — to a human
+    # retained-block review, which is a POINTER, not an authorization.
     assert report["next_research_action_id"] == (
-        "stage127-m2-incremental-evaluation"
+        "stage128-m2-retained-block-human-decision"
     )
 
 
@@ -1501,10 +1501,10 @@ def test_live_handoff_labels_match_the_live_research_state():
         # scientific actions, never with a label fix. The D2 design freeze,
         # then the executed D2 Gate re-run, each advanced them once.
         assert state["last_completed_research_action_id"] == (
-            "stage128-m2-d2-gate-rerun"
+            "stage127-m2-incremental-evaluation"
         )
         assert state["next_research_action_id"] == (
-            "stage127-m2-incremental-evaluation"
+            "stage128-m2-retained-block-human-decision"
         )
         # And nothing further is authorized by advancing a label.
         for field in (
@@ -1540,8 +1540,8 @@ def test_current_state_snapshot_renders_stage128_labels():
             in text
         )
         assert (
-            "- **Next research action:** `stage127-m2-incremental-evaluation`"
-            in text
+            "- **Next research action:** "
+            "`stage128-m2-retained-block-human-decision`" in text
         )
         assert (
             "## Stage128 — M2 D2 boundary-month equity-return design freeze"
@@ -1572,14 +1572,19 @@ _ROADMAP = os.path.join(REAL_ROOT, v.ROADMAP_MD_REL)
 _RERUN_RENDERING_ASSERTIONS = (
     "current_state_freeze_section_not_current_after_gate_rerun",
     "current_state_has_exactly_one_current_scientific_action_section",
-    "current_state_current_section_is_the_gate_rerun",
+    "current_state_current_section_is_the_live_action",
+    "current_state_gate_rerun_section_not_current_after_successor",
+    "m2_incremental_evaluation_authorization_is_consumed_not_standing",
+    "m2_evaluation_selects_no_winner_and_retains_no_block",
+    "m2_evaluation_records_a_required_human_retained_block_decision",
     "current_state_freeze_section_claims_only_its_own_action",
     "current_state_freeze_section_does_not_claim_the_gate_rerun",
     "current_state_does_not_call_incremental_evaluation_the_gate_rerun",
     "current_state_renders_a_single_live_next_action_pointer",
-    "current_state_next_pointer_is_eligible_but_unauthorized",
+    "current_state_next_pointer_is_a_pointer_not_an_authorization",
     "next_pointer_flags_are_false_when_pointer_is_incremental_evaluation",
-    "gate_rerun_complete_implies_current_action_is_the_gate_rerun",
+    "gate_rerun_complete_implies_current_action_is_the_gate_rerun_"
+    "or_a_recognized_successor",
     "roadmap_prose_agrees_with_front_matter_pointers",
     "roadmap_prose_does_not_contradict_front_matter_pointers",
     "roadmap_prose_does_not_call_incremental_evaluation_the_gate_rerun",
@@ -1599,7 +1604,11 @@ def test_current_state_presents_exactly_one_current_section():
     current = [ln for ln in text.splitlines()
                if ln.startswith("## ") and "(CURRENT)" in ln]
     assert len(current) == 1, current
-    assert "Gate RE-RUN" in current[0]
+    assert "paired M2 vs M1 incremental evaluation" in current[0]
+    assert (
+        "## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 (CURRENT)"
+        not in open(_CURRENT_STATE, encoding="utf-8").read()
+    )
 
 
 def test_design_freeze_section_is_historical_after_the_gate_rerun():
@@ -1622,17 +1631,14 @@ def test_design_freeze_section_is_historical_after_the_gate_rerun():
     )
 
 
-def test_sole_live_next_pointer_is_eligible_pointer_only_unauthorized():
+def test_sole_live_next_pointer_is_a_pointer_not_an_authorization():
     text = open(_CURRENT_STATE, encoding="utf-8").read()
     pointers = [ln for ln in text.splitlines()
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1, pointers
     line = pointers[0]
-    assert "`stage127-m2-incremental-evaluation`" in line
-    assert "ELIGIBLE" in line
-    assert "POINTER ONLY" in line
-    assert "not authorized" in line
-    assert "not started" in line
+    assert "`stage128-m2-retained-block-human-decision`" in line
+    assert "pointer is **not** an authorization" in line
 
 
 def test_incremental_evaluation_is_never_called_the_gate_rerun():
@@ -1660,9 +1666,11 @@ def test_roadmap_front_matter_matches_handoff_pointers():
     text = open(_ROADMAP, encoding="utf-8").read()
     fm = v._roadmap_front_matter(text)
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m2-d2-gate-rerun"
+        "stage127-m2-incremental-evaluation"
     )
-    assert fm["next_research_action_id"] == "stage127-m2-incremental-evaluation"
+    assert fm["next_research_action_id"] == (
+        "stage128-m2-retained-block-human-decision"
+    )
     state = json.loads(open(
         os.path.join(REAL_ROOT, "project", "docs", "ai",
                      "handoff_state.json"), encoding="utf-8").read())
@@ -1679,4 +1687,4 @@ def test_roadmap_prose_drops_the_superseded_pointer_pair_claim():
         "`last_completed_research_action_id: "
         "stage128-m2-boundary-month-return-design-freeze`" not in text
     )
-    assert "historical pre-rerun" in text
+    assert "are now **historical** pointer state" in text

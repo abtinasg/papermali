@@ -9,65 +9,85 @@ The CURRENT workstream is the Stage128 M2 D2 boundary-month equity-return
 workstream — a stable machine-readable label **derived from** the already-frozen
 action `stage128-m2-boundary-month-return-design-freeze`, not a new scientific
 action. The authoritative research-action pointers are
-`last_completed_research_action_id=stage128-m2-d2-gate-rerun` and
-`next_research_action_id=stage127-m2-incremental-evaluation`, the latter a
-pointer only and **not** authorized. `stage126-m1-financial-baseline` remains correct
-**history** for the completed M1 financial-baseline workstream (see the
+`last_completed_research_action_id=stage127-m2-incremental-evaluation` and
+`next_research_action_id=stage128-m2-retained-block-human-decision`, the latter
+a pointer only and **not** authorized. `stage126-m1-financial-baseline` remains
+correct **history** for the completed M1 financial-baseline workstream (see the
 historical section below); it is no longer the current workstream.
 
 ### Current scientific action
 
-The current scientific action is `stage128-m2-d2-gate-rerun` — the canonical
-M2 data-admission Gate, re-executed exactly ONCE under its own explicit,
-one-action human authorization (consumed by that execution), offline from the
-same immutable TSETMC bundle, with only the equity-return measurement replaced
-by the already-frozen Gregorian D2 construct.
+The current scientific action is `stage127-m2-incremental-evaluation` — the
+paired, development-only comparison of the frozen M2 block against the frozen
+M1 block, executed exactly ONCE under its own explicit, one-action human
+authorization (`بریم مرحله بعد`, SHA-256 `a9999c0c…c3cdc6`, 2026-08-01),
+consumed by that execution.
 
-**Terminal observed result: `PASS_FOR_M2_INCREMENTAL_EVALUATION` — DATA
-ADMISSION ONLY.** Observed: D2 equity return 539/666 = 0.8093 (threshold 0.80),
-realized volatility 576/666 = 0.8649, Amihud 576/666 = 0.8649, three-variable
-common sample 539/666 = 0.8093 (threshold 0.70), and both locked validation
-windows clear the ≥5-positive rule (fold1_validation 18, fold2_validation 10).
-Conditions A–F all PASS. This says **nothing** about whether M2 improves
-prediction: no model was fit, no prediction generated, no predictive metric
-computed, and the final test remains locked.
+**The mandatory post-lock D2 eligibility audit ran first.** 53 predictor-side
+comparisons across 6 dimensions (prediction cohort, industry, firm size,
+`zero_trade_day_ratio_W`, market-activity/traded-value diagnostics, M1
+predictor availability); 35 carry |SMD| ≥ 0.10. Those are **descriptive flags
+only**: no row was removed, no weighting or matching was introduced, and D2,
+the Gate, the sample rule and the model design are all unchanged. The flags
+limit INTERPRETATION and are recorded in the decision limitations. A separate,
+clearly-labelled post-lock distress-rate comparison is descriptive only
+(eligible 10.20%, ineligible 10.24%).
 
-`stage127-m2-incremental-evaluation` is now scientifically ELIGIBLE and is
-identified as a **pointer only**. Eligibility is not authorization: it needs a
-NEW, explicit human authorization
-(`m2_incremental_evaluation_authorized = false`, `m2_modeling_started = false`).
-The post-lock eligibility audit frozen by the design-freeze contract remains
-REQUIRED before any M2 predictive result is interpreted; it was not executed by
-this Gate.
+**Paired comparison.** The exact three-variable M2 common sample: 539 of 666
+development pairs (55 positive / 484 negative; folds 173 / 159 / 332 / 207;
+validation positives 18 and 10; pooled locked-validation OOF 366 rows with 28
+positives). BOTH blocks were REFITTED on identical common-sample training rows
+and evaluated on identical common-sample validation rows — 44 primary
+predictive model fits, no tuning, no grid search, no feature search, no SMOTE,
+no early stopping. The original 666-row M1 OOF predictions were NOT reused, and
+the 666-row M1 results are deliberately NOT compared against these 539-row
+results: that comparison would confound sample restriction with model change.
 
-`stage128-m2-boundary-month-return-design-freeze` is complete — it is the design
-this Gate executed. `stage127-m2-market-data-gate` is HISTORICAL, completed and
-resolved; its terminal result remains `FAIL_M2_DATA_GATE`, unchanged, in its own
-Stage127 artifacts.
+**Observed pooled PR-AUC deltas (M2 − M1)** with paired company-cluster
+bootstrap (ticker clusters, 2000 replicates, seed 20260724, 2000/2000 valid,
+percentile 95% CI):
+
+- regularized logistic regression: +0.0085 [−0.0212, +0.0353]
+- random forest: −0.0073 [−0.0491, +0.0319]
+- XGBoost: +0.0188 [−0.0262, +0.0730]
+
+**All three intervals include zero — the observed development evidence is
+approximately null.** No new PASS/FAIL threshold was created, no winner was
+selected, M2 was neither retained nor rejected, and no superiority or causal
+claim is made. The confirmatory family (`M2_minus_M1`, `M3_minus_M2`,
+`M4_minus_M3`) is INCOMPLETE: `holm_family_complete = false`,
+`holm_final_adjustment_deferred = true`.
+
+No model was fit on final-test rows, no final-test predictor or target value
+was read, no full-development refit occurred, and M3/M4 were not started.
+
+### What is open now
+
+`stage128-m2-retained-block-human-decision` is a **pointer only** and **not**
+authorized. The retained-block question — should the M2 market block be carried
+into the confirmatory programme? — is deliberately left open for the human
+supervisor, who must weigh the 127-row common-sample attrition, the 28 pooled
+validation positives, the flagged D2 eligibility imbalance, temporal
+heterogeneity, the wide bootstrap intervals and the disagreement in
+point-estimate sign across model families. Nothing in the completed action
+retains M2, selects a winner, unlocks the final test or authorizes
+`stage128-m3-macro-data-gate`.
+
+`stage128-m2-d2-gate-rerun` is complete — it is the data admission this
+evaluation consumed; its terminal result `PASS_FOR_M2_INCREMENTAL_EVALUATION`
+(DATA ADMISSION ONLY) is preserved unchanged.
+`stage128-m2-boundary-month-return-design-freeze` is complete — it is the
+design that Gate executed. `stage127-m2-market-data-gate` is HISTORICAL,
+completed and resolved; its terminal result remains `FAIL_M2_DATA_GATE`,
+unchanged, in its own Stage127 artifacts.
 
 Authoritative research pointers live in `ROADMAP.md` front matter. **If and
-when the Stage128 D2 Gate re-run PR is merged**, they become
-`last_completed_research_action_id=stage128-m2-d2-gate-rerun`,
-`next_research_action_id=stage127-m2-incremental-evaluation` (a pointer only —
-explicitly **not** authorized). Until merge, the pointers live on `main` remain
-`last_completed_research_action_id=stage128-m2-boundary-month-return-design-freeze`,
-`next_research_action_id=stage128-m2-d2-gate-rerun`. The older pre-PR#69 values were
-`last_completed_research_action_id=stage126-m1-retained-design-freeze`,
-`next_research_action_id=stage127-m2-market-data-gate` — the Gate has now been
-RE-EXECUTED and RESOLVED from imported authoritative evidence, and returned
-**`FAIL_M2_DATA_GATE`**. The research pointer therefore deliberately does NOT
-advance past it, and specifically does NOT advance to
-`stage127-m2-incremental-evaluation`
-(primary M1 development-fold tuning completed on PR #52; all six registered
-M1 robustness categories are complete; `stage126-m1-robustness-closure`
-synthesized the six robustness results and closed the robustness set; and
-`stage126-m1-retained-design-freeze` (PR #65) has now recorded and frozen the
-retained M1 design — sample/target/9-feature order/preprocessing/three
-retained model configurations/class-weighting policy/temporal folds/metric
-definitions/uncertainty and multiplicity plans — from already-completed
-development and robustness evidence only. No model was fit or predicted, no
-retuning, no final-test access, no full-development refit, no paper-winner or
-final-model selection, and no M2/M3/M4 work of any kind).
+when the Stage127 M2 incremental-evaluation PR is merged**, they become
+`last_completed_research_action_id=stage127-m2-incremental-evaluation`,
+`next_research_action_id=stage128-m2-retained-block-human-decision` (a pointer
+only — explicitly **not** authorized). Until merge, the pointers live on `main`
+remain `last_completed_research_action_id=stage128-m2-d2-gate-rerun`,
+`next_research_action_id=stage127-m2-incremental-evaluation` as set by PR #70.
 
 ## Stage127 M2 market-data Gate — current, truthful state
 
@@ -75,8 +95,10 @@ Human authorization for `stage127-m2-market-data-gate` **already exists** and
 covers this action. The Gate was first executed with no data available and
 returned `UNRESOLVED_M2_DATA_GATE`. Authoritative TSETMC evidence has since
 been obtained externally **under that same Gate scope**, and the Gate has been
-re-executed and resolved from it. `stage127-m2-incremental-evaluation` remains
-**unauthorized and unstarted**.
+re-executed and resolved from it. `stage127-m2-incremental-evaluation` has
+since been separately authorized and COMPLETED on the D2 common sample (see the
+current-action section above); it is **not** authorized again — that one-action
+authorization was consumed.
 
 **Evidence.** The immutable external delivery
 `stage127_m2_tsetmc_full_delivery.zip` (SHA256
@@ -199,7 +221,8 @@ d8456b50b7813b44789b556efcdd9ed81ee0318f85e3d9127b27807f75c6c6ec`) is not
 present in the repository, the pre-lock D2 count is **not** independently
 verified here
 (`prelock_D2_count_independently_verified_in_repository = false`), canonical
-confirmation is deferred to the still-unauthorized `stage128-m2-d2-gate-rerun`,
+confirmation was deferred to `stage128-m2-d2-gate-rerun`, since authorized and
+executed,
 and the original pre-lock feasibility script/output was not preserved
 (`original_prelock_feasibility_script_not_preserved = true`).
 

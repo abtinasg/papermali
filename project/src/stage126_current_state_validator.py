@@ -737,10 +737,65 @@ def stage128_m2_d2_gate_rerun_next_action_id(repo_root: Path) -> str:
     return STAGE128_M2_D2_GATE_RERUN_ACTION_ID
 
 
+STAGE127_M2_INCREMENTAL_EVALUATION_REL = (
+    "project/stage128/m2_incremental_evaluation/"
+    "stage127_m2_incremental_evaluation_decision.json"
+)
+STAGE127_M2_INCREMENTAL_EVALUATION_ACTION_ID = (
+    "stage127-m2-incremental-evaluation"
+)
+#: A human retained-block review, identified as a POINTER only.
+NEXT_RESEARCH_ACTION_ID_AFTER_M2_INCREMENTAL_EVALUATION = (
+    "stage128-m2-retained-block-human-decision"
+)
+
+
+def stage127_m2_incremental_evaluation_completed(repo_root: Path) -> bool:
+    """Narrow, fail-closed recognition of the completed paired evaluation."""
+    path = repo_root / STAGE127_M2_INCREMENTAL_EVALUATION_REL
+    if not path.is_file():
+        return False
+    try:
+        d = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    if d.get("decision_id") != STAGE127_M2_INCREMENTAL_EVALUATION_ACTION_ID:
+        return False
+    if d.get("historical_d0_gate_status") != STAGE127_HISTORICAL_D0_GATE_STATUS:
+        return False
+    required = {
+        "winner_selected": False,
+        "retained_block_selected": False,
+        "superiority_claimed": False,
+        "authorizes_next_action": False,
+        "m3_started": False,
+        "m4_started": False,
+        "human_retained_block_decision_required": True,
+    }
+    if not all(d.get(k) == v for k, v in required.items()):
+        return False
+    fw = d.get("firewall") or {}
+    return (
+        fw.get("final_test_predictor_values_read") == 0
+        and fw.get("final_test_target_values_read") == 0
+        and fw.get("final_test_model_fits") == 0
+        and fw.get("full_development_refits") == 0
+    )
+
+
 def expected_next_research_action_id(
     repo_root: Path, m1_robustness_completed: bool,
 ) -> str:
     """The single source of truth for the current expected research pointer."""
+    if (
+        m1_robustness_completed
+        and robustness_closure_completed(repo_root)
+        and retained_design_freeze_completed(repo_root)
+        and stage128_m2_d2_design_freeze_completed(repo_root)
+        and stage128_m2_d2_gate_rerun_executed(repo_root)
+        and stage127_m2_incremental_evaluation_completed(repo_root)
+    ):
+        return NEXT_RESEARCH_ACTION_ID_AFTER_M2_INCREMENTAL_EVALUATION
     if (
         m1_robustness_completed
         and robustness_closure_completed(repo_root)
@@ -1907,12 +1962,47 @@ def build_assertions(
         (not rerun_complete) or len(current_headings) == 1,
         "exactly one scientific-action section may be presented as "
         f"(CURRENT); found {len(current_headings)}: {current_headings}")
-    add("current_state_current_section_is_the_gate_rerun",
+    m2_eval_done = stage127_m2_incremental_evaluation_completed(repo_root)
+    expected_current = (
+        "paired M2 vs M1 incremental evaluation" if m2_eval_done
+        else "Gate RE-RUN"
+    )
+    add("current_state_current_section_is_the_live_action",
         (not rerun_complete)
         or (len(current_headings) == 1
-            and "Gate RE-RUN" in current_headings[0]),
-        "when the Gate re-run is complete, the sole CURRENT section must be "
-        "the Gate re-run section")
+            and expected_current in current_headings[0]),
+        "the sole CURRENT section must be the newest completed scientific "
+        f"action (expected marker: {expected_current!r})")
+    add("current_state_gate_rerun_section_not_current_after_successor",
+        (not m2_eval_done)
+        or ("## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 "
+            "(CURRENT)" not in current_state_text),
+        "once the authorized paired M2 evaluation completes, the Gate re-run "
+        "section becomes historical data-admission context")
+    add("m2_incremental_evaluation_authorization_is_consumed_not_standing",
+        (not m2_eval_done)
+        or (handoff.get("m2_incremental_evaluation_authorized") is False
+            and handoff.get(
+                "stage127_m2_incremental_evaluation_authorization_consumed")
+            is True),
+        "the one-action M2 evaluation authorization is consumed by its "
+        "execution and must never be left standing")
+    add("m2_evaluation_selects_no_winner_and_retains_no_block",
+        (not m2_eval_done)
+        or all(handoff.get(k) is False for k in (
+            "m2_block_retained", "paper_winner_selected",
+            "final_model_selected", "m2_modeling_started",
+            "full_development_refit_performed",
+            "final_test_unlocked", "final_test_access_authorized",
+            "final_test_evaluation_performed",
+            "m3_started", "m3_authorized", "m4_started", "m4_authorized",
+        )),
+        "the paired development comparison retains nothing, selects no "
+        "winner, unlocks no final test and starts no successor block")
+    add("m2_evaluation_records_a_required_human_retained_block_decision",
+        (not m2_eval_done)
+        or handoff.get("m2_retained_block_decision_required") is True,
+        "the retained-block question must stay explicitly open for a human")
     add("current_state_freeze_section_claims_only_its_own_action",
         (not freeze_done)
         or (f"- **Research action completed by this freeze:** "
@@ -1938,17 +2028,27 @@ def build_assertions(
         (not rerun_complete) or len(next_pointer_lines) == 1,
         "after the Gate re-run only the CURRENT Gate-re-run section may "
         f"carry a live next-action pointer; found {len(next_pointer_lines)}")
-    add("current_state_next_pointer_is_eligible_but_unauthorized",
+    # Internal consistency of the rendered snapshot: the section-level live
+    # pointer must name the SAME action as the snapshot header and must say,
+    # in the same line, that a pointer is not an authorization.
+    header_pointers = [
+        ln for ln in current_state_text.splitlines()
+        if ln.startswith("- **Next research action:** `")
+    ]
+    header_id = (
+        header_pointers[0].split("`")[1] if header_pointers else ""
+    )
+    add("current_state_next_pointer_is_a_pointer_not_an_authorization",
         (not rerun_complete)
         or (len(next_pointer_lines) == 1
-            and NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_GATE_RERUN_PASS
-            in next_pointer_lines[0]
-            and "ELIGIBLE" in next_pointer_lines[0]
-            and "POINTER ONLY" in next_pointer_lines[0]
-            and "not authorized" in next_pointer_lines[0]
-            and "not started" in next_pointer_lines[0]),
-        "the live next-action pointer must state: scientifically eligible, "
-        "pointer only, not authorized, not started")
+            and header_id
+            and f"`{header_id}`" in next_pointer_lines[0]
+            and ("not an authorization"
+                 in next_pointer_lines[0].replace("**", "")
+                 or "not authorized"
+                 in next_pointer_lines[0].replace("**", ""))),
+        "the live next-action pointer must name the same action as the "
+        "snapshot header and state that a pointer is not an authorization")
     add("next_pointer_flags_are_false_when_pointer_is_incremental_evaluation",
         (handoff.get("next_research_action_id")
          != NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_GATE_RERUN_PASS)
@@ -1956,11 +2056,16 @@ def build_assertions(
             and handoff.get("m2_modeling_started") is False),
         "pointing at the M2 incremental evaluation never authorizes or "
         "starts it")
-    add("gate_rerun_complete_implies_current_action_is_the_gate_rerun",
+    add("gate_rerun_complete_implies_current_action_is_the_gate_rerun_"
+        "or_a_recognized_successor",
         (not rerun_complete)
         or (handoff.get("last_completed_research_action_id")
-            == STAGE128_M2_D2_GATE_RERUN_ACTION_ID),
-        "a completed Gate re-run must be the last completed research action")
+            == STAGE128_M2_D2_GATE_RERUN_ACTION_ID)
+        or (m2_eval_done
+            and handoff.get("last_completed_research_action_id")
+            == STAGE127_M2_INCREMENTAL_EVALUATION_ACTION_ID),
+        "after the Gate re-run, the last completed research action must be "
+        "the Gate re-run itself or a recognized, completed successor action")
     # --- ROADMAP front matter must agree with its own explanatory prose --- #
     roadmap_text = ""
     rm_path = repo_root / ROADMAP_MD_REL

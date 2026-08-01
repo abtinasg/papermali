@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 110,
+  "assertion_count": 114,
   "assertions": [
     {
       "detail": "",
@@ -493,13 +493,33 @@
       "status": "PASS"
     },
     {
-      "detail": "exactly one scientific-action section may be presented as (CURRENT); found 1: ['## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 (CURRENT)']",
+      "detail": "exactly one scientific-action section may be presented as (CURRENT); found 1: ['## Stage127 — paired M2 vs M1 incremental evaluation (CURRENT)']",
       "name": "current_state_has_exactly_one_current_scientific_action_section",
       "status": "PASS"
     },
     {
-      "detail": "when the Gate re-run is complete, the sole CURRENT section must be the Gate re-run section",
-      "name": "current_state_current_section_is_the_gate_rerun",
+      "detail": "the sole CURRENT section must be the newest completed scientific action (expected marker: 'paired M2 vs M1 incremental evaluation')",
+      "name": "current_state_current_section_is_the_live_action",
+      "status": "PASS"
+    },
+    {
+      "detail": "once the authorized paired M2 evaluation completes, the Gate re-run section becomes historical data-admission context",
+      "name": "current_state_gate_rerun_section_not_current_after_successor",
+      "status": "PASS"
+    },
+    {
+      "detail": "the one-action M2 evaluation authorization is consumed by its execution and must never be left standing",
+      "name": "m2_incremental_evaluation_authorization_is_consumed_not_standing",
+      "status": "PASS"
+    },
+    {
+      "detail": "the paired development comparison retains nothing, selects no winner, unlocks no final test and starts no successor block",
+      "name": "m2_evaluation_selects_no_winner_and_retains_no_block",
+      "status": "PASS"
+    },
+    {
+      "detail": "the retained-block question must stay explicitly open for a human",
+      "name": "m2_evaluation_records_a_required_human_retained_block_decision",
       "status": "PASS"
     },
     {
@@ -523,8 +543,8 @@
       "status": "PASS"
     },
     {
-      "detail": "the live next-action pointer must state: scientifically eligible, pointer only, not authorized, not started",
-      "name": "current_state_next_pointer_is_eligible_but_unauthorized",
+      "detail": "the live next-action pointer must name the same action as the snapshot header and state that a pointer is not an authorization",
+      "name": "current_state_next_pointer_is_a_pointer_not_an_authorization",
       "status": "PASS"
     },
     {
@@ -533,12 +553,12 @@
       "status": "PASS"
     },
     {
-      "detail": "a completed Gate re-run must be the last completed research action",
-      "name": "gate_rerun_complete_implies_current_action_is_the_gate_rerun",
+      "detail": "after the Gate re-run, the last completed research action must be the Gate re-run itself or a recognized, completed successor action",
+      "name": "gate_rerun_complete_implies_current_action_is_the_gate_rerun_or_a_recognized_successor",
       "status": "PASS"
     },
     {
-      "detail": "ROADMAP prose naming the authoritative pointers must name exactly the front-matter pair (stage128-m2-d2-gate-rerun / stage127-m2-incremental-evaluation)",
+      "detail": "ROADMAP prose naming the authoritative pointers must name exactly the front-matter pair (stage127-m2-incremental-evaluation / stage128-m2-retained-block-human-decision)",
       "name": "roadmap_prose_agrees_with_front_matter_pointers",
       "status": "PASS"
     },
@@ -568,9 +588,9 @@
   "legacy_validation_boundary_adapted": true,
   "operational_surfaces_git_versioned": true,
   "output_files_sha256": {
-    "README_STAGE126_CURRENT_STATE_VALIDATION.md": "5069b03662ef555c4aed70e4f97a70e3b948949eb5347f46f3e85ba719285dc7",
+    "README_STAGE126_CURRENT_STATE_VALIDATION.md": "26198465a15bff3f9e252af337b3145ff26cba8b0677ecac00a6cf00ac313417",
     "stage126_closed_part_registry.json": "bb6a269686f4f1b616b7896bbba1469eb1cf61e8514445b8f8150033f258080e",
-    "stage126_current_state_validation_report.json": "73a5801bd4c1ed2149d71e0a6f46e44d5b9d0bba3d41e8c59f8fe4f200862e2d",
+    "stage126_current_state_validation_report.json": "3eed3a75169c27c53e1bf73661025cd5dd9792df0abbd956f7b7a2bcc73c6fac",
     "stage126_historical_boundary_manifest.json": "a518be27730e32b8a7de8de2d46865fc5efc1d31a5f796d00a6557d25f92a838",
     "stage126_validation_architecture_boundary_decision.json": "7502405fc0c2641c7dc766f3d4a52941b4c4841295d1d3130c07718768a6e06c"
   },
@@ -580,7 +600,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "79e1410c3e0fdb758c91573c9fcae1ad2b37c0afe0f4f37c95c7d60f077646ff",
+  "source_file_sha256": "bc38578b4274cb9badb7b786ad7bbc043732d9f6531121e4cd5c91fd9d307508",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {
@@ -593,7 +613,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "611c6e1902762cf564e43a19f6a6d8babaa84e399ed7fe0240787bb09173e636",
+  "test_file_sha256": "147e2eb293fb77447dc798286e73d90310571e59b006f64d62cc411ee7fcc7df",
   "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v2_lean"

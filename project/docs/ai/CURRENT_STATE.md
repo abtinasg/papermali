@@ -10,16 +10,16 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Stage / Batch:** Stage128 / None
 - **Active workstream:** `stage128_m2_d2_boundary_month_equity_return`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `stage127-m2-incremental-evaluation`
+- **Next research action:** `stage128-m2-retained-block-human-decision`
 - **Last stage commit:** `6864174f38dfa80e28fe9ae17719d4ad1933d2e5`
-- **Generated from commit:** `6864174f38dfa80e28fe9ae17719d4ad1933d2e5` (branch `stage128-m2-d2-gate-rerun`, informational)
-- **Baseline:** `origin/main` @ `6e71b40882e94a05436bf66e2d8141783806b6b5`
+- **Generated from commit:** `fb5f0e13cb806e0ba28f0372b3b2264881564950` (branch `stage127-m2-incremental-evaluation`, informational)
+- **Baseline:** `origin/main` @ `fb5f0e13cb806e0ba28f0372b3b2264881564950`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **110 assertions, 0 failed**, all_pass=True
+- ✅ **114 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -67,7 +67,7 @@ _Historical, completed frozen-design context — **not** the current scientific 
 - 🔒 **Final test locked:** final_test_unlocked=False, final_test_access_authorized=False, final_test_evaluation_performed=False
 - Contract: `project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md`; machine-readable package: `project/stage128/`
 
-## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 (CURRENT)
+## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 (COMPLETED DATA-ADMISSION GATE)
 
 _The canonical M2 data-admission Gate, re-executed ONCE under the already-frozen Gregorian D2 equity-return specification, offline from the same immutable TSETMC bundle. The one-action human authorization was consumed by this execution. No model was fit, no prediction generated, no predictive metric computed and no final-test row read._
 
@@ -77,9 +77,23 @@ _The canonical M2 data-admission Gate, re-executed ONCE under the already-frozen
 - ⛔ **Historical Stage127 D0 Gate remains** `FAIL_M2_DATA_GATE` — preserved unchanged in its own Stage127 artifacts; this re-run never rewrites it
 - **Authorization consumed by this execution:** True — **D2 Gate rerun authorized (standing):** False
 - **This is DATA ADMISSION only.** It does not say M2 improves prediction. **M2 incremental evaluation authorized:** False — **M2 modeling started:** False — **M2 block admitted for modeling:** False
-- **Next research action (pointer only):** `stage127-m2-incremental-evaluation` — scientifically ELIGIBLE after this data-admission PASS; a POINTER ONLY, **not authorized** (`m2_incremental_evaluation_authorized=False`) and **not started** (`m2_modeling_started=False`). It requires a new, explicit human authorization. It is the M2 incremental evaluation action — it is NOT the canonical M2 Gate re-run, which is the completed action reported in this section.
+- **Immediate successor of this Gate (historical):** `stage127-m2-incremental-evaluation` — the paired M2 incremental evaluation, since AUTHORIZED and COMPLETED (see the current section below). This line is historical: it is not the branch's live next-action pointer.
 - The post-lock eligibility audit frozen by the design-freeze contract remains REQUIRED before any M2 predictive result is interpreted. It was not executed by this Gate.
 - Package: `project/stage128/`; interpretation: `project/stage128/README_STAGE128_M2_D2_GATE_RERUN.md`
+
+## Stage127 — paired M2 vs M1 incremental evaluation (CURRENT)
+
+_The paired, development-only comparison of the frozen M2 block against the frozen M1 block on the exact three-variable D2 common sample, under the locked temporal folds, retained configurations, frozen metrics and frozen uncertainty procedure. The one-action human authorization was consumed by this execution. No final-test row was read, nothing was retuned and NO winner or retained block was selected._
+
+- ✅ **Executed and completed:** True — **authorization consumed:** True
+- **Paired common sample:** 539 rows — **pooled locked-validation OOF rows:** 366
+- **Primary predictive model fits:** 44 (both blocks refitted on identical common-sample training rows)
+- ⛔ **M2 block retained:** False — this action reports OBSERVED development evidence only and selects no winner; a **human retained-block decision is REQUIRED** (`m2_retained_block_decision_required=True`)
+- ⛔ **M2 incremental evaluation authorized:** False (the one-action authorization was consumed and is not standing) — **M2 modeling started:** False
+- ⛔ **Historical Stage127 D0 Gate remains** `FAIL_M2_DATA_GATE`; the terminal Stage128 D2 Gate result `PASS_FOR_M2_INCREMENTAL_EVALUATION` is preserved unchanged
+- 🔒 **Final test locked:** final_test_unlocked=False, final_test_access_authorized=False, final_test_evaluation_performed=False — **M3 started:** False — **M4 started:** False
+- **Next research action (pointer only):** `stage128-m2-retained-block-human-decision` — a human retained-block review. A pointer is **not** an authorization.
+- Package: `project/stage128/m2_incremental_evaluation/`; interpretation: `project/stage128/m2_incremental_evaluation/README_STAGE127_M2_INCREMENTAL_EVALUATION.md`
 
 ### Last completed scientific micro-part QC
 
@@ -125,5 +139,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `b026c469f194ad11b14da80e9f9686c53b11e93fb2262fb97644479000fb2eb1`_
-_generated_at_utc: 2026-08-01T09:04:18Z (informational)_
+_state_fingerprint: `9c5e415fc3699c2bdee382fc0b1d5376c1c13c11a01c8bd77f4cc57b7c14b27d`_
+_generated_at_utc: 2026-08-01T10:40:16Z (informational)_
