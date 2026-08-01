@@ -12,7 +12,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3-macro-data-gate`
 - **Last stage commit:** `0cddf845b1f3e8952cb353e12b542913110605d3`
-- **Generated from commit:** `0cddf845b1f3e8952cb353e12b542913110605d3` (branch `stage128-m2-retained-block-human-decision`, informational)
+- **Generated from commit:** `69e7c2b852dc8cf0b60b166b236424c045b3f75c` (branch `stage128-m2-retained-block-human-decision`, informational)
 - **Baseline:** `origin/main` @ `bdac807788b377690be0a879765cfe4ac148970d`
 
 ## Current-state validation
@@ -88,7 +88,7 @@ _The paired, development-only comparison of the frozen M2 block against the froz
 - ✅ **Executed and completed:** True — **authorization consumed:** True
 - **Paired common sample:** 539 rows — **pooled locked-validation OOF rows:** 366
 - **Primary predictive model fits:** 44 (both blocks refitted on identical common-sample training rows)
-- \u26d4 **M2 block retained BY THIS ACTION:** false — it reports OBSERVED development evidence only and selects no winner. The retained-block question was answered separately, by the human decision reported below (`m2_block_retained=True`, `m2_retained_block_decision_required=False`)
+- ⛔ **M2 block retained BY THIS ACTION:** false — it reports OBSERVED development evidence only and selects no winner. The retained-block question was answered separately, by the human decision reported below (`m2_block_retained=True`, `m2_retained_block_decision_required=False`)
 - ✅ **M2 market data (live):** evidence collected=True, validated=True, entered the authorized incremental modeling pipeline=True, evaluation data materialized=True. (The frozen Stage125 Part 4 marker `m2_data_collected` stays `false` as immutable historical schema state; it is not live state — see the historical/legacy section below.)
 - ✅ **M2 modeling started (executed):** True — **M2 block admitted for modeling:** True. The authorized development modeling for this comparison WAS executed.
 - ⛔ **M2 incremental evaluation authorized:** False — the one-action authorization was CONSUMED by this execution and is not standing. A consumed authorization is `false`; it does **not** mean the modeling never happened.
@@ -162,4 +162,4 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
 _state_fingerprint: `d456b8aaaf3e926222c9bb0870dfaf6e0ac44e8d4c0257e2fb038fedaa95593a`_
-_generated_at_utc: 2026-08-01T13:45:28Z (informational)_
+_generated_at_utc: 2026-08-01T14:08:33Z (informational)_

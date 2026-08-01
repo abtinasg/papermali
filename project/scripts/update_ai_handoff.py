@@ -4091,7 +4091,7 @@ def render_current_state(record: dict) -> str:
             f"{record.get('stage127_m2_incremental_evaluation_primary_model_fits')}"
             " (both blocks refitted on identical common-sample training rows)",
             (
-                "- \\u26d4 **M2 block retained BY THIS ACTION:** false \u2014 it "
+                "- \u26d4 **M2 block retained BY THIS ACTION:** false \u2014 it "
                 "reports OBSERVED development evidence only and selects no "
                 "winner. The retained-block question was answered "
                 "separately, by the human decision reported below "
@@ -4101,7 +4101,7 @@ def render_current_state(record: dict) -> str:
                 if record.get(
                     "stage128_m2_retained_block_human_decision_completed")
                 else
-                "- \\u26d4 **M2 block retained:** "
+                "- \u26d4 **M2 block retained:** "
                 f"{record.get('m2_block_retained')} \u2014 this action reports "
                 "OBSERVED development evidence only and selects no winner; "
                 "a **human retained-block decision is REQUIRED** "

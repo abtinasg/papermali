@@ -133,6 +133,52 @@ def test_no_forbidden_phrases():
     assert errors == [], errors
 
 
+def _current_state_text() -> str:
+    with open(os.path.join(REAL_ROOT, "project/docs/ai/CURRENT_STATE.md"),
+              encoding="utf-8") as fh:
+        return fh.read()
+
+
+def test_current_state_has_no_literal_unicode_escapes():
+    """The generator must emit real symbols, never their escape text."""
+    text = _current_state_text()
+    assert "\\u26d4" not in text
+    # no literal \\uXXXX escape survives anywhere in the generated snapshot
+    assert re.search(r"\\u[0-9a-fA-F]{4}", text) is None
+
+
+def test_current_state_retained_block_line_uses_the_actual_symbol():
+    assert (
+        "- ⛔ **M2 block retained BY THIS ACTION:** false"
+        in _current_state_text())
+
+
+def test_generator_source_has_no_double_escaped_unicode():
+    with open(os.path.join(REAL_ROOT, "project/scripts/update_ai_handoff.py"),
+              encoding="utf-8") as fh:
+        source = fh.read()
+    assert "\\\\u26d4" not in source
+
+
+def test_retained_block_wording_and_semantics_are_unchanged():
+    """Fixing the symbol must not change what the snapshot claims."""
+    text = _current_state_text()
+    for fragment in (
+        "it reports OBSERVED development evidence only and selects no winner",
+        "The retained-block question was answered separately, by the human "
+        "decision reported below",
+        "`m2_block_retained=True`",
+        "`m2_retained_block_decision_required=False`",
+        "**M2 predictive superiority claim supported:** False",
+        "**No winner, no final model:** paper_winner_selected=False",
+        "final_model_selected=False",
+        "full_development_refit_performed=False",
+    ):
+        assert fragment in text, fragment
+    assert "**M3:** authorized=False, started=False" in text
+    assert "**M4:** authorized=False, started=False" in text
+
+
 def test_roadmap_ordering():
     errors: list[str] = []
     val._check_roadmap(REAL_ROOT, errors)

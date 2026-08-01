@@ -29,6 +29,21 @@ def _load(rel: str) -> dict:
     return json.loads((REPO_ROOT / rel).read_text(encoding="utf-8"))
 
 
+def _git(*args: str) -> str:
+    """Read-only git in the repository root, computed here independently."""
+    import subprocess
+
+    out = subprocess.run(
+        ["git", *args], cwd=REPO_ROOT, capture_output=True, text=True)
+    assert out.returncode == 0, out.stderr
+    return out.stdout
+
+
+@pytest.fixture(scope="module")
+def metadata() -> dict:
+    return _load(d.METADATA_REL)
+
+
 @pytest.fixture(scope="module")
 def decision() -> dict:
     return _load(d.DECISION_REL)
@@ -404,21 +419,162 @@ def test_all_required_pr71_artifacts_are_pinned(decision):
         assert rel in pinned
 
 
-def test_whole_pr71_package_is_pinned_or_unchanged_vs_git():
-    """Every tracked file of the PR #71 package must be unmodified."""
+def test_protected_path_set_is_enumerated_from_the_baseline_commit():
+    """The scope comes from the baseline commit, never from the worktree."""
+    paths = d.enumerate_protected_baseline_files(REPO_ROOT)
+    assert len(paths) == len(set(paths)) > 0
+    assert tuple(sorted(paths)) == paths
+    for rel in d.PROTECTED_EXTRA_FILES:
+        assert rel in paths
+    for rel in paths:
+        assert rel in d.PROTECTED_EXTRA_FILES or rel.startswith(
+            tuple(t + "/" for t in d.PROTECTED_TREES)), rel
+    # independent enumeration, computed here, not read from the artifact
+    listed = _git("ls-tree", "-r", "--name-only", d.BASELINE_COMMIT, "--",
+                  *d.PROTECTED_TREES).split()
+    assert set(paths) == set(listed) | set(d.PROTECTED_EXTRA_FILES)
+
+
+def test_complete_protected_manifest_is_committed_in_the_package(
+        decision, metadata):
+    """Every protected baseline file has a committed SHA-256, not just 17."""
+    paths = d.enumerate_protected_baseline_files(REPO_ROOT)
+    for artifact in (decision, metadata):
+        assert artifact["protected_baseline_commit"] == d.BASELINE_COMMIT
+        assert artifact["protected_file_count"] == len(paths)
+        manifest = artifact["protected_files_sha256"]
+        assert len(manifest) == len(paths)
+        assert tuple(sorted(manifest)) == paths
+    assert decision["protected_files_sha256"] == metadata[
+        "protected_files_sha256"]
+    # the manifest is strictly larger than the re-derivation subset
+    assert len(decision["protected_files_sha256"]) > len(
+        decision["source_artifacts_sha256"])
+
+
+def test_stored_manifest_equals_the_baseline_blob_hashes(decision):
+    baseline = d.baseline_protected_manifest(REPO_ROOT)
+    assert decision["protected_files_sha256"] == baseline
+
+
+def test_every_protected_file_matches_baseline_bytes_on_this_branch(decision):
+    for rel, sha in decision["protected_files_sha256"].items():
+        path = REPO_ROOT / rel
+        assert path.is_file(), rel
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == sha, rel
+
+
+def test_protected_immutability_verifies_against_committed_history(decision):
+    report = d.verify_protected_immutability(
+        REPO_ROOT, decision["protected_files_sha256"])
+    assert report["protected_baseline_commit"] == d.BASELINE_COMMIT
+    assert report["protected_file_count"] == len(
+        decision["protected_files_sha256"])
+    assert report["protected_paths_match_baseline"] is True
+    assert report["protected_bytes_match_baseline"] is True
+    assert report["protected_tree_has_no_new_tracked_files"] is True
+    assert report["protected_committed_history_diff_empty"] is True
+
+
+def test_committed_history_not_worktree_is_compared_against_the_baseline():
+    """The guard must compare BASELINE..HEAD, not the working tree vs HEAD."""
+    source = (REPO_ROOT / "project/src"
+              / "stage128_m2_retained_block_human_decision.py").read_text(
+                  encoding="utf-8")
+    assert f'f"{{BASELINE_COMMIT}}..HEAD"' in source
+    # the ineffective working-tree-only guard must be gone from both files
+    tests = Path(__file__).read_text(encoding="utf-8")
+    # assembled at runtime so this assertion cannot match its own source line
+    worktree_only = '", "'.join(["diff", "--name-only", "HEAD", '--"'])
+    for text in (source, tests):
+        assert ('"' + worktree_only) not in text
+    changed = _git("diff", "--name-only", f"{d.BASELINE_COMMIT}..HEAD", "--",
+                   *d.enumerate_protected_baseline_files(REPO_ROOT))
+    assert changed.strip() == ""
+
+
+# --------------------------------------------------------------------------- #
+# 25b. Negative immutability tests — the guard must actually detect violations
+# --------------------------------------------------------------------------- #
+
+def _sandbox(tmp_path: Path) -> Path:
+    """A shared-object clone of this repository, safe to mutate and commit."""
     import subprocess
 
-    out = subprocess.run(
-        ["git", "diff", "--name-only", "HEAD", "--",
-         "project/stage128/m2_incremental_evaluation", "project/stage127",
-         "project/stage126/stage126_m1_retained_design_freeze.json",
-         "project/stage126/stage126_m1_selected_configurations.json",
-         "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
-         "project/stage128/stage128_m2_d2_development_features.csv"],
-        cwd=REPO_ROOT, capture_output=True, text=True,
+    dest = tmp_path / "clone"
+    subprocess.run(
+        ["git", "clone", "--quiet", "--shared", str(REPO_ROOT), str(dest)],
+        check=True, capture_output=True,
     )
-    assert out.returncode == 0
-    assert out.stdout.strip() == ""
+    for key, value in (("user.email", "qc@example.invalid"),
+                       ("user.name", "qc")):
+        subprocess.run(["git", "config", key, value], cwd=dest, check=True)
+    return dest
+
+
+def _commit(root: Path, message: str) -> None:
+    import subprocess
+
+    subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+    subprocess.run(["git", "commit", "--quiet", "-m", message],
+                   cwd=root, check=True, capture_output=True)
+
+
+@pytest.fixture(scope="module")
+def manifest(decision) -> dict:
+    return dict(decision["protected_files_sha256"])
+
+
+def test_negative_committing_a_changed_protected_file_is_detected(
+        tmp_path, manifest):
+    root = _sandbox(tmp_path)
+    target = next(iter(sorted(manifest)))
+    (root / target).write_bytes(
+        (root / target).read_bytes() + b"\n# tampered\n")
+    _commit(root, "tamper: modify a protected file")
+    with pytest.raises(d.RetainedBlockDecisionError) as exc:
+        d.verify_protected_immutability(root, manifest)
+    assert target in str(exc.value)
+
+
+def test_negative_deleting_a_protected_file_is_detected(tmp_path, manifest):
+    root = _sandbox(tmp_path)
+    target = next(iter(sorted(manifest)))
+    (root / target).unlink()
+    _commit(root, "tamper: delete a protected file")
+    with pytest.raises(d.RetainedBlockDecisionError) as exc:
+        d.verify_protected_immutability(root, manifest)
+    assert target in str(exc.value)
+
+
+def test_negative_adding_a_tracked_file_in_a_protected_tree_is_detected(
+        tmp_path, manifest):
+    root = _sandbox(tmp_path)
+    intruder = f"{d.PROTECTED_TREES[0]}/intruder.json"
+    (root / intruder).write_text("{}\n", encoding="utf-8")
+    _commit(root, "tamper: add a tracked file inside a protected tree")
+    with pytest.raises(d.RetainedBlockDecisionError) as exc:
+        d.verify_protected_immutability(root, manifest)
+    assert "new tracked file" in str(exc.value)
+    assert intruder in str(exc.value)
+
+
+def test_negative_changing_a_stored_hash_is_detected(manifest):
+    tampered = dict(manifest)
+    target = next(iter(sorted(tampered)))
+    tampered[target] = "0" * 64
+    with pytest.raises(d.RetainedBlockDecisionError) as exc:
+        d.verify_protected_immutability(REPO_ROOT, tampered)
+    assert target in str(exc.value)
+
+
+def test_negative_dropping_a_manifest_entry_is_detected(manifest):
+    tampered = dict(manifest)
+    target = next(iter(sorted(tampered)))
+    del tampered[target]
+    with pytest.raises(d.RetainedBlockDecisionError) as exc:
+        d.verify_protected_immutability(REPO_ROOT, tampered)
+    assert "count" in str(exc.value) or "path set differs" in str(exc.value)
 
 
 def test_historical_gate_results_are_not_rewritten():

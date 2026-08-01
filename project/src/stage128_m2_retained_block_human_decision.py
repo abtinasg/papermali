@@ -534,6 +534,170 @@ def source_artifact_hashes(root: Path) -> dict[str, str]:
 
 
 # --------------------------------------------------------------------------- #
+# Whole-tree protected immutability manifest
+# --------------------------------------------------------------------------- #
+
+#: Every tracked file under these trees, AS OF ``BASELINE_COMMIT``, is
+#: protected. New tracked files appearing inside them are a violation too.
+PROTECTED_TREES: tuple[str, ...] = (
+    "project/stage128/m2_incremental_evaluation",
+    "project/stage127",
+)
+
+#: Individually protected files outside the protected trees.
+PROTECTED_EXTRA_FILES: tuple[str, ...] = (
+    "project/stage128/stage128_m2_d2_development_features.csv",
+    "project/stage126/stage126_m1_retained_design_freeze.json",
+    "project/stage126/stage126_m1_selected_configurations.json",
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
+)
+
+
+def _git(root: Path, *args: str) -> str:
+    """Run a read-only git command; fail closed on a non-zero exit."""
+    import subprocess
+
+    proc = subprocess.run(
+        ["git", *args], cwd=str(root), capture_output=True, text=True,
+    )
+    if proc.returncode != 0:
+        raise RetainedBlockDecisionError(
+            f"git {' '.join(args)} failed: {proc.stderr.strip()}")
+    return proc.stdout
+
+
+def _tracked_files_under(root: Path, commit: str) -> tuple[str, ...]:
+    """Tracked paths under :data:`PROTECTED_TREES` at ``commit``."""
+    out = _git(root, "ls-tree", "-r", "--name-only", "-z", commit, "--",
+               *PROTECTED_TREES)
+    return tuple(sorted(p for p in out.split("\0") if p))
+
+
+def enumerate_protected_baseline_files(root: Path) -> tuple[str, ...]:
+    """The complete protected path set, enumerated FROM the baseline commit.
+
+    Never derived from the working tree. Each extra file must also exist at
+    the baseline commit, otherwise the enumeration fails closed.
+    """
+    paths = set(_tracked_files_under(root, BASELINE_COMMIT))
+    for rel in PROTECTED_EXTRA_FILES:
+        try:
+            _git(root, "cat-file", "-e", f"{BASELINE_COMMIT}:{rel}")
+        except RetainedBlockDecisionError as exc:
+            raise RetainedBlockDecisionError(
+                f"protected extra file absent at baseline {BASELINE_COMMIT}: "
+                f"{rel}") from exc
+        paths.add(rel)
+    if not paths:
+        raise RetainedBlockDecisionError(
+            "protected baseline enumeration produced no files")
+    return tuple(sorted(paths))
+
+
+def baseline_protected_manifest(root: Path) -> dict[str, str]:
+    """SHA-256 of the BASELINE bytes of every protected path.
+
+    Baseline blobs are hashed as opaque bytes. They are never parsed, decoded
+    or evaluated, so no final-test predictor or target value is ever read.
+    """
+    import subprocess
+
+    paths = enumerate_protected_baseline_files(root)
+    proc = subprocess.run(
+        ["git", "cat-file", "--batch"],
+        cwd=str(root), capture_output=True,
+        input="".join(f"{BASELINE_COMMIT}:{rel}\n" for rel in paths
+                      ).encode("utf-8"),
+    )
+    if proc.returncode != 0:
+        raise RetainedBlockDecisionError(
+            f"git cat-file --batch failed: {proc.stderr.decode()!r}")
+    manifest: dict[str, str] = {}
+    buf = proc.stdout
+    pos = 0
+    for rel in paths:
+        nl = buf.find(b"\n", pos)
+        if nl < 0:
+            raise RetainedBlockDecisionError(
+                f"truncated git cat-file output at {rel}")
+        header = buf[pos:nl].decode("utf-8").split()
+        if len(header) != 3 or header[1] != "blob":
+            raise RetainedBlockDecisionError(
+                f"protected baseline path is not a blob: {rel} ({header})")
+        size = int(header[2])
+        start = nl + 1
+        manifest[rel] = hashlib.sha256(buf[start:start + size]).hexdigest()
+        pos = start + size + 1  # trailing newline
+    if len(manifest) != len(paths):  # pragma: no cover - defensive
+        raise RetainedBlockDecisionError("incomplete baseline manifest")
+    return dict(sorted(manifest.items()))
+
+
+def verify_protected_immutability(
+    root: Path, manifest: dict[str, str],
+) -> dict[str, Any]:
+    """Fail closed unless the branch reproduces the baseline byte-for-byte.
+
+    Checks, in order:
+
+    * the persisted manifest count equals the independently enumerated count;
+    * the persisted path set equals the baseline path set;
+    * every protected baseline file still exists on this branch;
+    * every protected file's current bytes hash to the baseline SHA-256;
+    * no NEW tracked file appeared inside a protected tree;
+    * ``git diff --name-only BASELINE..HEAD -- <protected paths>`` is empty.
+    """
+    expected_paths = enumerate_protected_baseline_files(root)
+    expected = baseline_protected_manifest(root)
+
+    if len(manifest) != len(expected_paths):
+        raise RetainedBlockDecisionError(
+            f"protected manifest count {len(manifest)} != enumerated "
+            f"{len(expected_paths)}")
+    if tuple(sorted(manifest)) != expected_paths:
+        missing = sorted(set(expected_paths) - set(manifest))
+        extra = sorted(set(manifest) - set(expected_paths))
+        raise RetainedBlockDecisionError(
+            f"protected path set differs: missing={missing} extra={extra}")
+
+    for rel in expected_paths:
+        if manifest[rel] != expected[rel]:
+            raise RetainedBlockDecisionError(
+                f"stored protected hash differs from baseline blob: {rel}")
+        path = root / rel
+        if not path.is_file():
+            raise RetainedBlockDecisionError(
+                f"protected baseline file is absent on this branch: {rel}")
+        if _sha256_file(path) != expected[rel]:
+            raise RetainedBlockDecisionError(
+                f"protected file bytes differ from baseline: {rel}")
+
+    head_tree = set(_tracked_files_under(root, "HEAD"))
+    added = sorted(head_tree - set(expected_paths))
+    if added:
+        raise RetainedBlockDecisionError(
+            f"new tracked file(s) inside a protected tree: {added}")
+
+    changed = [p for p in _git(
+        root, "diff", "--name-only", f"{BASELINE_COMMIT}..HEAD", "--",
+        *expected_paths).splitlines() if p.strip()]
+    if changed:
+        raise RetainedBlockDecisionError(
+            f"protected paths changed in committed history: {sorted(changed)}")
+
+    return {
+        "protected_baseline_commit": BASELINE_COMMIT,
+        "protected_trees": list(PROTECTED_TREES),
+        "protected_extra_files": list(PROTECTED_EXTRA_FILES),
+        "protected_file_count": len(expected_paths),
+        "protected_paths_match_baseline": True,
+        "protected_bytes_match_baseline": True,
+        "protected_tree_has_no_new_tracked_files": True,
+        "protected_committed_history_diff_empty": True,
+    }
+
+
+# --------------------------------------------------------------------------- #
 # Decision rationale (source-derived, never rewritten as positive support)
 # --------------------------------------------------------------------------- #
 
@@ -666,9 +830,15 @@ def build_authorization_record() -> dict[str, Any]:
     }
 
 
-def build_decision(root: Path, authorization_sha256: str) -> dict[str, Any]:
+def build_decision(
+    root: Path,
+    authorization_sha256: str,
+    protected_manifest: dict[str, str] | None = None,
+) -> dict[str, Any]:
     """The main decision artifact. It never duplicates the human utterance."""
     evidence = read_source_evidence(root)
+    if protected_manifest is None:
+        protected_manifest = baseline_protected_manifest(root)
     return {
         "action_id": ACTION_ID,
         "contract_id": CONTRACT_ID,
@@ -717,6 +887,24 @@ def build_decision(root: Path, authorization_sha256: str) -> dict[str, Any]:
         "decision_rationale": list(RATIONALE),
         "source_derived_evidence": evidence,
         "source_artifacts_sha256": source_artifact_hashes(root),
+
+        # --- whole-tree protected immutability manifest -------------------- #
+        "protected_baseline_commit": BASELINE_COMMIT,
+        "protected_trees": list(PROTECTED_TREES),
+        "protected_extra_files": list(PROTECTED_EXTRA_FILES),
+        "protected_file_count": len(protected_manifest),
+        "protected_files_sha256": dict(protected_manifest),
+        "protected_manifest_note": (
+            "protected_files_sha256 is the COMPLETE SHA-256 manifest of every "
+            f"tracked file that existed at baseline commit {BASELINE_COMMIT} "
+            "under the protected trees, plus the individually protected extra "
+            "files. The paths were enumerated from the baseline commit itself, "
+            "not from the working tree, and the baseline blobs were hashed as "
+            "opaque bytes without parsing or evaluating their contents. "
+            "source_artifacts_sha256 above is the smaller subset of pinned "
+            "artifacts whose values this decision re-derives; it is NOT the "
+            "immutability scope."
+        ),
 
         # --- frozen retained M2 definition -------------------------------- #
         "retained_m2_definition": {
@@ -787,8 +975,16 @@ def build_decision(root: Path, authorization_sha256: str) -> dict[str, Any]:
 
 def build_metadata(
     root: Path, package_sha256: dict[str, str],
+    protected_manifest: dict[str, str] | None = None,
 ) -> dict[str, Any]:
+    if protected_manifest is None:
+        protected_manifest = baseline_protected_manifest(root)
     return {
+        "protected_baseline_commit": BASELINE_COMMIT,
+        "protected_trees": list(PROTECTED_TREES),
+        "protected_extra_files": list(PROTECTED_EXTRA_FILES),
+        "protected_file_count": len(protected_manifest),
+        "protected_files_sha256": dict(protected_manifest),
         "contract_id": CONTRACT_ID,
         "decision_id": DECISION_ID,
         "generated_for": ACTION_ID,
@@ -798,9 +994,14 @@ def build_metadata(
         "source_main_branch": BASELINE_BRANCH,
         "source_main_commit": BASELINE_COMMIT,
         "immutability_requirement": (
-            "Every artifact listed in source_artifacts_sha256 must remain "
-            "byte-identical. No historical D0 Gate or D2 Gate result may be "
-            "rewritten by this action."
+            "Every path listed in protected_files_sha256 must remain "
+            "byte-identical to its baseline bytes, no protected path may be "
+            "deleted, and no new tracked file may appear inside a protected "
+            "tree. protected_files_sha256 is the authoritative and complete "
+            "immutability scope; source_artifacts_sha256 is only the smaller "
+            "subset of artifacts whose numeric values this action re-derives. "
+            "No historical D0 Gate or D2 Gate result may be rewritten by this "
+            "action."
         ),
     }
 
@@ -900,6 +1101,34 @@ resampling procedure.
 The M3 Gate is a pointer only. It is not authorized, no macro data was
 collected, no M3 variable was created, no M3 Gate was executed and no M3 model
 was fit.
+
+## Protected immutability scope
+
+The immutability guarantee covers **every tracked file that existed at baseline
+commit `{BASELINE_COMMIT}`** under `project/stage128/m2_incremental_evaluation/`
+and `project/stage127/`, plus these individually protected files:
+
+* `project/stage128/stage128_m2_d2_development_features.csv`
+* `project/stage126/stage126_m1_retained_design_freeze.json`
+* `project/stage126/stage126_m1_selected_configurations.json`
+* `project/stage125/part4_metrics_uncertainty_contract_stage125.json`
+
+The path set is enumerated **from the baseline commit itself**, never from the
+working tree, and the complete SHA-256 manifest of the baseline bytes is
+committed as `protected_files_sha256` in both the decision artifact and the
+metadata artifact (`protected_baseline_commit`, `protected_file_count`,
+`protected_files_sha256`). Verification requires: every protected path still
+present, every protected file byte-identical to baseline, no new tracked file
+inside a protected tree, an identical path set, a manifest count equal to the
+independently enumerated count, and an empty
+`git diff --name-only {BASELINE_COMMIT}..HEAD` over the protected paths — a
+**committed-history** comparison, not a working-tree comparison.
+
+Baseline blobs are hashed as **opaque bytes only**. They are never parsed,
+decoded or evaluated, so no final-test predictor or target value is read.
+
+The smaller `source_artifacts_sha256` field lists only the artifacts whose
+numeric values this decision re-derives. It is **not** the immutability scope.
 
 ## Package
 
@@ -1088,6 +1317,30 @@ def build_qc_report(
     check("all_pr71_artifacts_pinned",
           all(rel in hashes for rel in PINNED_PR71_SOURCES)
           and all(rel in hashes for rel in PINNED_EXTERNAL_SOURCES))
+    # 25b complete whole-tree protected immutability manifest
+    enumerated = enumerate_protected_baseline_files(root)
+    stored_manifest = decision.get("protected_files_sha256") or {}
+    check("protected_manifest_is_complete_and_matches_baseline_enumeration",
+          decision.get("protected_baseline_commit") == BASELINE_COMMIT
+          and decision.get("protected_file_count") == len(enumerated)
+          and len(stored_manifest) == len(enumerated)
+          and tuple(sorted(stored_manifest)) == enumerated,
+          f"{len(enumerated)} protected files enumerated from baseline "
+          f"{BASELINE_COMMIT}; the manifest count and path set match exactly")
+    try:
+        immutability = verify_protected_immutability(root, stored_manifest)
+        immutability_ok, immutability_detail = True, ""
+    except RetainedBlockDecisionError as exc:
+        immutability = {}
+        immutability_ok, immutability_detail = False, str(exc)
+    check("protected_tree_is_byte_identical_to_baseline_in_committed_history",
+          immutability_ok,
+          immutability_detail or (
+              "every protected baseline path exists, every protected file's "
+              "current bytes equal the baseline bytes, no new tracked file "
+              "appeared inside a protected tree, and "
+              f"git diff {BASELINE_COMMIT}..HEAD over the protected paths is "
+              "empty"))
     # 26 pointer
     check("next_pointer_is_m3_gate_and_is_not_authorization",
           decision["next_research_action_id"] == NEXT_RESEARCH_ACTION_ID
@@ -1119,12 +1372,19 @@ def build_qc_report(
         "failed_assertions": failed,
         "all_pass": not failed,
         "assertions": assertions,
+        "protected_immutability": immutability or {
+            "protected_baseline_commit": BASELINE_COMMIT,
+            "protected_file_count": len(enumerated),
+            "verification_error": immutability_detail,
+        },
         "scope_note": (
             "This QC report checks the internal consistency of the Stage128 "
             "retained-block decision package: the exact human authorization, "
             "the separation of verbatim and derived text, the source-derived "
-            "evidence, the frozen retained M2 definition, the immutability of "
-            "the PR #71 scientific artifacts, and the no-execution and "
+            "evidence, the frozen retained M2 definition, the complete "
+            f"whole-tree byte-level immutability of the {len(enumerated)} "
+            f"protected files enumerated at baseline {BASELINE_COMMIT}, and "
+            "the no-execution and "
             "final-test-firewall guarantees. It re-runs no scientific "
             "computation and constitutes no scientific result."
         ),
@@ -1169,13 +1429,15 @@ def build_package(
     verify_human_authorization()
 
     pinned_before = source_artifact_hashes(root)
+    protected_manifest = baseline_protected_manifest(root)
+    verify_protected_immutability(root, protected_manifest)
 
     authorization = build_authorization_record()
     auth_text = json.dumps(
         authorization, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     auth_sha = _sha256_text(auth_text)
 
-    decision = build_decision(root, auth_sha)
+    decision = build_decision(root, auth_sha, protected_manifest)
     decision_text = json.dumps(
         decision, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
@@ -1184,7 +1446,7 @@ def build_package(
         AUTHORIZATION_REL: auth_sha,
         DECISION_REL: _sha256_text(decision_text),
     }
-    metadata = build_metadata(root, package_sha256)
+    metadata = build_metadata(root, package_sha256, protected_manifest)
     metadata_text = json.dumps(
         metadata, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 

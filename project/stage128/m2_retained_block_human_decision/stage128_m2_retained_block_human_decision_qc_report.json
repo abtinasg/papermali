@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 38,
+  "assertion_count": 40,
   "assertions": [
     {
       "name": "authorization_byte_length_is_240",
@@ -144,6 +144,16 @@
       "status": "PASS"
     },
     {
+      "detail": "88 protected files enumerated from baseline bdac807788b377690be0a879765cfe4ac148970d; the manifest count and path set match exactly",
+      "name": "protected_manifest_is_complete_and_matches_baseline_enumeration",
+      "status": "PASS"
+    },
+    {
+      "detail": "every protected baseline path exists, every protected file's current bytes equal the baseline bytes, no new tracked file appeared inside a protected tree, and git diff bdac807788b377690be0a879765cfe4ac148970d..HEAD over the protected paths is empty",
+      "name": "protected_tree_is_byte_identical_to_baseline_in_committed_history",
+      "status": "PASS"
+    },
+    {
       "name": "next_pointer_is_m3_gate_and_is_not_authorization",
       "status": "PASS"
     },
@@ -162,5 +172,23 @@
   "failed_assertions": [],
   "failed_count": 0,
   "generated_for": "stage128-m2-retained-block-human-decision",
-  "scope_note": "This QC report checks the internal consistency of the Stage128 retained-block decision package: the exact human authorization, the separation of verbatim and derived text, the source-derived evidence, the frozen retained M2 definition, the immutability of the PR #71 scientific artifacts, and the no-execution and final-test-firewall guarantees. It re-runs no scientific computation and constitutes no scientific result."
+  "protected_immutability": {
+    "protected_baseline_commit": "bdac807788b377690be0a879765cfe4ac148970d",
+    "protected_bytes_match_baseline": true,
+    "protected_committed_history_diff_empty": true,
+    "protected_extra_files": [
+      "project/stage128/stage128_m2_d2_development_features.csv",
+      "project/stage126/stage126_m1_retained_design_freeze.json",
+      "project/stage126/stage126_m1_selected_configurations.json",
+      "project/stage125/part4_metrics_uncertainty_contract_stage125.json"
+    ],
+    "protected_file_count": 88,
+    "protected_paths_match_baseline": true,
+    "protected_tree_has_no_new_tracked_files": true,
+    "protected_trees": [
+      "project/stage128/m2_incremental_evaluation",
+      "project/stage127"
+    ]
+  },
+  "scope_note": "This QC report checks the internal consistency of the Stage128 retained-block decision package: the exact human authorization, the separation of verbatim and derived text, the source-derived evidence, the frozen retained M2 definition, the complete whole-tree byte-level immutability of the 88 protected files enumerated at baseline bdac807788b377690be0a879765cfe4ac148970d, and the no-execution and final-test-firewall guarantees. It re-runs no scientific computation and constitutes no scientific result."
 }

@@ -102,6 +102,34 @@ The M3 Gate is a pointer only. It is not authorized, no macro data was
 collected, no M3 variable was created, no M3 Gate was executed and no M3 model
 was fit.
 
+## Protected immutability scope
+
+The immutability guarantee covers **every tracked file that existed at baseline
+commit `bdac807788b377690be0a879765cfe4ac148970d`** under `project/stage128/m2_incremental_evaluation/`
+and `project/stage127/`, plus these individually protected files:
+
+* `project/stage128/stage128_m2_d2_development_features.csv`
+* `project/stage126/stage126_m1_retained_design_freeze.json`
+* `project/stage126/stage126_m1_selected_configurations.json`
+* `project/stage125/part4_metrics_uncertainty_contract_stage125.json`
+
+The path set is enumerated **from the baseline commit itself**, never from the
+working tree, and the complete SHA-256 manifest of the baseline bytes is
+committed as `protected_files_sha256` in both the decision artifact and the
+metadata artifact (`protected_baseline_commit`, `protected_file_count`,
+`protected_files_sha256`). Verification requires: every protected path still
+present, every protected file byte-identical to baseline, no new tracked file
+inside a protected tree, an identical path set, a manifest count equal to the
+independently enumerated count, and an empty
+`git diff --name-only bdac807788b377690be0a879765cfe4ac148970d..HEAD` over the protected paths — a
+**committed-history** comparison, not a working-tree comparison.
+
+Baseline blobs are hashed as **opaque bytes only**. They are never parsed,
+decoded or evaluated, so no final-test predictor or target value is read.
+
+The smaller `source_artifacts_sha256` field lists only the artifacts whose
+numeric values this decision re-derives. It is **not** the immutability scope.
+
 ## Package
 
 * `stage128_m2_retained_block_human_decision.json` — the decision
