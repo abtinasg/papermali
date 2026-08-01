@@ -1,0 +1,35 @@
+{
+  "authorization_type": "one_action_authorization",
+  "authorized_action_id": "stage128-m3-macro-data-gate",
+  "consumed_when": "the Gate result has been recorded and verified",
+  "contract_id": "stage128_m3_macro_data_gate",
+  "creates_standing_authorization": false,
+  "does_not_permit": [
+    "M3 predictive modeling",
+    "M3-versus-M2 evaluation",
+    "retuning",
+    "final-test access",
+    "any M4 action",
+    "merge"
+  ],
+  "generated_for": "stage128-m3-macro-data-gate",
+  "human_source_utterance": "بریم مرحله بعدی",
+  "human_source_utterance_byte_length": 28,
+  "human_source_utterance_encoding": "utf-8",
+  "human_source_utterance_has_trailing_newline": false,
+  "human_source_utterance_is_verbatim_human_text": true,
+  "human_source_utterance_sha256": "d4acc9698f160ed0f252fd3f2a698b2b17916144d3dc182333cd2892a5d23068",
+  "merge_authorized": false,
+  "normalized_authorization_scope": "The human supervisor authorizes exactly one execution of stage128-m3-macro-data-gate: official-source discovery, prospective source/definition locking, development-only retrieval, construction and data-admission assessment of the exact frozen three-variable M3 macro block. This authorization permits no M3 predictive modeling, no M3-vs-M2 evaluation, no retuning, no final-test access, no M4 action and no merge.",
+  "normalized_authorization_scope_is_derived_not_verbatim_human_text": true,
+  "normalized_authorization_scope_sha256": "fce2510d1d6b4cd08b01f5264c0e65b487c7438e0b1502e497662525d9a9c33d",
+  "permits": [
+    "official-source discovery for the exact frozen M3 macro block",
+    "prospective source and definition locking",
+    "development-only retrieval, construction and data-admission assessment"
+  ],
+  "scope_limited_to_this_action_only": true,
+  "source_main_branch": "main",
+  "source_main_commit": "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2",
+  "source_repository": "abtinasg/papermali"
+}
