@@ -1,0 +1,5 @@
+fold,role,target_years,parent_surface_id,m3_common_sample_rows,m3_common_sample_positive,m3_common_sample_negative,min_positive_required,meets_positive_floor,status,counts_are_null_not_zero,unresolved_reason
+fold1,train,1393;1394;1395,retained_m2_development_common_sample,,,,,,UNRESOLVED,True,phase_b_not_executed_definition_lock_unresolved
+fold1,validation,1396;1397,retained_m2_development_common_sample,,,,5,,UNRESOLVED,True,phase_b_not_executed_definition_lock_unresolved
+fold2,train,1393;1394;1395;1396;1397,retained_m2_development_common_sample,,,,,,UNRESOLVED,True,phase_b_not_executed_definition_lock_unresolved
+fold2,validation,1398;1399,retained_m2_development_common_sample,,,,5,,UNRESOLVED,True,phase_b_not_executed_definition_lock_unresolved

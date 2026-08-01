@@ -1,0 +1,53 @@
+{
+  "audit_status": "UNRESOLVED",
+  "company_year_rows_reported_as_independent_macro_observations": false,
+  "company_year_sample_size": 539,
+  "contract_id": "stage128_m3_macro_data_gate",
+  "distinct_pair_cutoff_dates_in_parent_surface": 37,
+  "distinction_note": "Macro observations are shared across many company-year rows. The 539 company-year rows of the retained-M2 parent surface are NOT independent macro observations, and this action never reports them as such. The independent temporal macro support is unresolved because no macro observation was retrieved.",
+  "generated_for": "stage128-m3-macro-data-gate",
+  "independent_temporal_macro_support": null,
+  "joint_m3_state_vector": {
+    "maximum_row_share_held_by_one_state": null,
+    "rows_per_macro_state": null,
+    "unique_joint_macro_state_vectors": null,
+    "unique_states_by_fold": null,
+    "unique_states_by_target_year": null
+  },
+  "low_temporal_degrees_is_a_mandatory_interpretation_limitation": true,
+  "low_temporal_degrees_used_to_search_more_macro_variables": false,
+  "new_numeric_temporal_degrees_threshold_invented": false,
+  "per_candidate": {
+    "cand_m3_cpi_inflation": {
+      "maximum_row_share_held_by_one_state": null,
+      "rows_per_macro_state": null,
+      "unique_available_at_dates": null,
+      "unique_observation_periods": null,
+      "unique_official_release_dates": null,
+      "unique_states_by_fold": null,
+      "unique_states_by_target_year": null,
+      "unique_values": null
+    },
+    "cand_m3_fx_change_official": {
+      "maximum_row_share_held_by_one_state": null,
+      "rows_per_macro_state": null,
+      "unique_available_at_dates": null,
+      "unique_observation_periods": null,
+      "unique_official_release_dates": null,
+      "unique_states_by_fold": null,
+      "unique_states_by_target_year": null,
+      "unique_values": null
+    },
+    "cand_m3_policy_financing_rate": {
+      "maximum_row_share_held_by_one_state": null,
+      "rows_per_macro_state": null,
+      "unique_available_at_dates": null,
+      "unique_observation_periods": null,
+      "unique_official_release_dates": null,
+      "unique_states_by_fold": null,
+      "unique_states_by_target_year": null,
+      "unique_values": null
+    }
+  },
+  "unresolved_reason": "phase_b_not_executed_definition_lock_unresolved"
+}

@@ -109,10 +109,44 @@ confirmatory family stays unchanged and INCOMPLETE, with the final Holm
 adjustment deferred. The one-action authorization was CONSUMED by the
 recording.
 
-`stage128-m3-macro-data-gate` is now the `next_research_action_id`. It is a
-**pointer only** and **not** authorized: no macro data has been collected, no
-M3 variable created, no M3 Gate executed and no M3 model fit. M4 is likewise
-unauthorized and unstarted.
+`stage128-m3-macro-data-gate` has now been **EXECUTED once as a
+data-admission Gate only**, under its own explicit one-action human
+authorization (28 UTF-8 bytes, SHA-256 `d4acc969…d23068`), which was CONSUMED
+by that execution. Its observed result is **`UNRESOLVED_M3_DATA_GATE`**.
+
+The Gate answered only whether the exact frozen three-variable macro block can
+be obtained from authoritative, reproducible, point-in-time-safe sources. It
+did **not** ask, and does not answer, whether M3 improves prediction: 0 model
+fits, 0 predictions, 0 predictive metrics, 0 M3-versus-M2 comparisons.
+
+It is UNRESOLVED — not FAILED — because the evidence is insufficient to reach
+either PASS or FAIL: (a) the frozen Stage125 contracts register the three
+candidate names but do not uniquely determine any candidate's official series,
+transformation, calendar, release-date field, as-of rule or revision/vintage
+policy, so the prospective Phase-A definition lock could not be completed; and
+(b) no authoritative Central Bank of Iran artifact could be retrieved — every
+responding official URL returned a WAF rejection or a bot-protection CAPTCHA,
+the Time Series Database hosts did not respond, and two identical requests to
+the same official URL returned different bytes, so there is no reproducible
+retrieval path. Missing evidence was recorded as null and was never scored as
+zero, and was never converted into an observed failure.
+
+No candidate was dropped or substituted, no smaller block was allowed to pass,
+and no non-CBI source (SCI, free-market FX, aggregator, mirror or news) was
+used. The CAPTCHA was never solved or bypassed. Phase B never executed.
+
+Because the Gate did not PASS, the research pointer **did not advance**:
+`stage128-m3-incremental-evaluation` was **not** created and remains
+unauthorized, and `m3_macro_data_gate_human_review_required = true`. M3
+modeling remains unauthorized and unstarted; M4 is likewise unauthorized and
+unstarted; the final test remains locked.
+
+A precise human decision request is recorded in the Gate decision artifact: it
+asks the supervisor either to supply an authorized reproducible official CBI
+access path, or to import official CBI artifacts as immutable checksummed raw
+evidence, or to freeze each candidate's series identity and transformation
+prospectively in a new authorized contract. It is deliberately **not** a menu
+this action was permitted to choose from.
 
 `stage128-m2-d2-gate-rerun` is complete — it is the data admission this
 evaluation consumed; its terminal result `PASS_FOR_M2_INCREMENTAL_EVALUATION`
@@ -122,14 +156,14 @@ design that Gate executed. `stage127-m2-market-data-gate` is HISTORICAL,
 completed and resolved; its terminal result remains `FAIL_M2_DATA_GATE`,
 unchanged, in its own Stage127 artifacts.
 
-Authoritative research pointers live in `ROADMAP.md` front matter. **If and
-when the Stage128 M2 retained-block human-decision PR is merged**, they become
+Authoritative research pointers live in `ROADMAP.md` front matter. PR #72 is
+**merged** on `main` (`35aaf4b70e9341704ee38be6f8cf2e2519c70bb2`), so those
+pointers are live, not conditional:
 `last_completed_research_action_id=stage128-m2-retained-block-human-decision`,
-`next_research_action_id=stage128-m3-macro-data-gate` (a pointer only —
-explicitly **not** authorized). Until merge, the pointers live on `main` remain
-`last_completed_research_action_id=stage127-m2-incremental-evaluation`,
-`next_research_action_id=stage128-m2-retained-block-human-decision` as set by
-PR #71.
+`next_research_action_id=stage128-m3-macro-data-gate`. The M3 data Gate has now
+been executed and returned `UNRESOLVED_M3_DATA_GATE`, so
+`last_completed_research_action_id` is **unchanged** and awaits human review of
+the observed Gate result.
 
 ## Stage127 M2 market-data Gate — current, truthful state
 

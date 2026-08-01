@@ -1,0 +1,33 @@
+{
+  "contract_id": "stage128_m3_macro_data_gate",
+  "development_target_years": [
+    "1393",
+    "1394",
+    "1395",
+    "1396",
+    "1397",
+    "1398",
+    "1399"
+  ],
+  "final_test_access_authorized": false,
+  "final_test_evaluations": 0,
+  "final_test_events_counted": false,
+  "final_test_locked": true,
+  "final_test_macro_coverage_inspected": false,
+  "final_test_macro_values_materialized": 0,
+  "final_test_predictions": 0,
+  "final_test_predictor_values_read": 0,
+  "final_test_rows_in_parent_surface": 0,
+  "final_test_rows_loaded": 0,
+  "final_test_target_values_read": 0,
+  "final_test_target_years": [
+    "1400",
+    "1401",
+    "1402"
+  ],
+  "final_test_unlocked": false,
+  "generated_for": "stage128-m3-macro-data-gate",
+  "max_development_pair_cutoff_date": "2020-07-19",
+  "retrieval_upper_bound_policy": "Any official retrieval must be date-bounded and end at the maximum development cutoff 2020-07-19. No retrieval occurred, so no record relevant only to a final-test cutoff was ever requested, decoded, logged, summarized or exported.",
+  "row_identity_and_split_metadata_used_only_to_exclude_final_test": true
+}
