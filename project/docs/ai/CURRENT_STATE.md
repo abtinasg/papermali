@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m2_d2_boundary_month_equity_return`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage127-m2-incremental-evaluation`
-- **Last stage commit:** `f38739aed9a4a4304ddeeae3fd0581b598ed2579`
-- **Generated from commit:** `6e71b40882e94a05436bf66e2d8141783806b6b5` (branch `stage128-m2-d2-gate-rerun`, informational)
+- **Last stage commit:** `a96a2cb4e8b4b28c183fdfd16d3ed33f5b3e676b`
+- **Generated from commit:** `a96a2cb4e8b4b28c183fdfd16d3ed33f5b3e676b` (branch `stage128-m2-d2-gate-rerun`, informational)
 - **Baseline:** `origin/main` @ `6e71b40882e94a05436bf66e2d8141783806b6b5`
 
 ## Current-state validation
@@ -125,5 +125,5 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `747f1655b07e7d58c1a50e89f43ba52c5d5bc79e0e5cc271496865520a495b53`_
-_generated_at_utc: 2026-08-01T04:22:07Z (informational)_
+_state_fingerprint: `1ef25b659616c184c9765f12f55c8f3f19f7fe5e3fcd912e158baf8785c8ea7a`_
+_generated_at_utc: 2026-08-01T04:25:54Z (informational)_
