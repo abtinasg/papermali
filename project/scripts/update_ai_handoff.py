@@ -123,6 +123,16 @@ ALLOWLIST_FILES = (
     "project/src/stage128_m2_d2_boundary_month_equity_return.py",
     "project/tests/test_stage128_m2_d2_boundary_month_equity_return.py",
     "project/tests/test_stage128_m2_d2_design_freeze_package.py",
+    # Stage128 canonical M2 Gate RE-RUN under the frozen Gregorian D2
+    # specification (action `stage128-m2-d2-gate-rerun`, one authorized
+    # execution). Narrowest exact-file allowance; the Gate-rerun artifacts
+    # themselves live under the already-allowlisted project/stage128/. The
+    # module composes the frozen Stage127 importer/window/volatility/Amihud
+    # primitives and the frozen Stage128 D2 endpoint selection -- it fits no
+    # model, generates no prediction and reads no final-test row.
+    "project/src/stage128_m2_d2_gate_rerun.py",
+    "project/run_stage128_m2_d2_gate_rerun.py",
+    "project/tests/test_stage128_m2_d2_gate_rerun.py",
     # Stage124 Gregorian->Jalali Esfand converter correctness fix
     # (CODE-CORRECTNESS ONLY: gregorian_to_jalali_str could never emit month 12,
     # so every Esfand date was mislabelled and is_valid_exact_jalali_date
@@ -2744,6 +2754,7 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         **derive_stage127_m2_market_data_gate_markers(root),
         **derive_stage127_m2_zero_trade_semantics_markers(root),
         **derive_stage128_m2_d2_design_freeze_markers(root),
+        **derive_stage128_m2_d2_gate_rerun_markers(root),
     }
 
 
@@ -3854,13 +3865,37 @@ def render_current_state(record: dict) -> str:
             ]
         lines += [""]
     if record.get("stage128_m2_d2_design_freeze_completed"):
+        # Once the canonical Gate re-run has executed AND resolved, the
+        # Gate re-run section below is the SOLE CURRENT scientific-action
+        # section. This section then renders as historical, completed,
+        # frozen-design context: it must not stay marked (CURRENT), must not
+        # inherit the global `last_completed_research_action_id`, and must not
+        # carry a live "next action" pointer.
+        freeze_is_historical = bool(
+            record.get("stage128_m2_d2_gate_rerun_executed")
+            and record.get("stage128_m2_d2_gate_rerun_resolved")
+        )
+        if freeze_is_historical:
+            lines += [
+                "## Stage128 — M2 D2 boundary-month equity-return design "
+                "freeze (COMPLETED DESIGN CONTRACT)\n",
+                "_Historical, completed frozen-design context — **not** the "
+                "current scientific action. This was a DESIGN-FREEZE / "
+                "CONTRACT action only: no canonical Gate was executed, no "
+                "model was fit, no prediction was generated and no "
+                "final-test row was read. The canonical Gate re-run section "
+                "below is the current scientific action._\n",
+            ]
+        else:
+            lines += [
+                "## Stage128 — M2 D2 boundary-month equity-return design "
+                "freeze (CURRENT)\n",
+                "_The current scientific state. This is a DESIGN-FREEZE / "
+                "CONTRACT action only: no canonical Gate was executed, no "
+                "model was fit, no prediction was generated and no "
+                "final-test row was read._\n",
+            ]
         lines += [
-            "## Stage128 — M2 D2 boundary-month equity-return design freeze "
-            "(CURRENT)\n",
-            "_The current scientific state. This is a DESIGN-FREEZE / "
-            "CONTRACT action only: no canonical Gate was executed, no model "
-            "was fit, no prediction was generated and no final-test row was "
-            "read._\n",
             "- ✅ **D2 design freeze completed:** "
             f"{record['stage128_m2_d2_design_freeze_completed']}",
             "- **Frozen primary M2 equity-return construct:** "
@@ -3874,15 +3909,38 @@ def render_current_state(record: dict) -> str:
             # NB: deliberately NOT phrased "Last completed research action" —
             # that exact phrase is reserved by test_ai_handoff so a robustness
             # micro-part can never be mislabelled as a research action.
+            # The action completed BY THIS FREEZE is a fixed historical fact.
+            # It must never inherit the global
+            # `last_completed_research_action_id`, which advances with every
+            # later research action.
             "- **Research action completed by this freeze:** "
-            f"`{record['last_completed_research_action_id']}`",
-            "- **Next research action (pointer only):** "
-            f"`{record['next_research_action_id']}` — the canonical M2 Gate "
-            "re-run under the frozen D2 construct",
-            "- ⛔ **D2 Gate rerun authorized:** "
+            f"`{_STAGE128_M2_D2_FREEZE_ACTION_ID}`",
+        ]
+        if freeze_is_historical:
+            # Historical successor statement only. The SOLE live next-action
+            # pointer is rendered in the Gate re-run CURRENT section below.
+            lines += [
+                "- **Immediate successor of this freeze (historical):** "
+                f"`{_NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_FREEZE}` — "
+                "the canonical M2 Gate re-run under the frozen D2 construct, "
+                "now COMPLETED (see the current section below). This line is "
+                "historical: it is not the branch's live next-action pointer.",
+            ]
+        else:
+            lines += [
+                "- **Next research action (pointer only):** "
+                f"`{record['next_research_action_id']}` — the canonical M2 "
+                "Gate re-run under the frozen D2 construct",
+            ]
+        lines += [
+            "- ⛔ **D2 Gate rerun authorized (standing):** "
             f"{record.get('stage128_m2_d2_gate_rerun_authorized')} — "
-            "identifying the next action is NOT an authorization to execute "
-            "it; that requires a separate, explicit human authorization",
+            + ("the one-action authorization that executed the Gate re-run "
+               "was consumed by that execution and is not standing"
+               if freeze_is_historical else
+               "identifying the next action is NOT an authorization to "
+               "execute it; that requires a separate, explicit human "
+               "authorization"),
             f"- ⛔ **M2 admitted:** {record.get('m2_authorized')} — "
             f"**M2 incremental evaluation authorized:** "
             f"{record.get('m2_incremental_evaluation_authorized')} — "
@@ -3895,6 +3953,63 @@ def render_current_state(record: dict) -> str:
             f"{record.get('final_test_evaluation_performed')}",
             "- Contract: `project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md`; "
             "machine-readable package: `project/stage128/`",
+            "",
+        ]
+    if record.get("stage128_m2_d2_gate_rerun_executed"):
+        rerun_status = record.get("stage128_m2_d2_gate_rerun_status", "")
+        admitted = record.get("stage128_m2_d2_block_data_admission_passed")
+        rerun_ok = "✅" if admitted else "⛔"
+        lines += [
+            "## Stage128 — canonical M2 Gate RE-RUN under Gregorian D2 "
+            "(CURRENT)\n",
+            "_The canonical M2 data-admission Gate, re-executed ONCE under "
+            "the already-frozen Gregorian D2 equity-return specification, "
+            "offline from the same immutable TSETMC bundle. The one-action "
+            "human authorization was consumed by this execution. No model was "
+            "fit, no prediction generated, no predictive metric computed and "
+            "no final-test row read._\n",
+            f"- {rerun_ok} **Gate re-run status:** `{rerun_status}`",
+            "- **Executed:** "
+            f"{record['stage128_m2_d2_gate_rerun_executed']} — **resolved "
+            f"(terminal observed decision):** "
+            f"{record.get('stage128_m2_d2_gate_rerun_resolved')}",
+            "- **D2 equity return:** "
+            f"{record.get('stage128_m2_d2_equity_return_valid_rows')}/666 = "
+            f"{record.get('stage128_m2_d2_equity_return_coverage')} — "
+            "**three-variable common sample:** "
+            f"{record.get('stage128_m2_d2_common_sample_rows')}/666 = "
+            f"{record.get('stage128_m2_d2_common_sample_coverage')}",
+            "- ⛔ **Historical Stage127 D0 Gate remains** "
+            f"`{record.get('stage127_m2_market_data_gate_status')}` — "
+            "preserved unchanged in its own Stage127 artifacts; this re-run "
+            "never rewrites it",
+            "- **Authorization consumed by this execution:** "
+            f"{record.get('stage128_m2_d2_gate_rerun_authorization_consumed')}"
+            " — **D2 Gate rerun authorized (standing):** "
+            f"{record.get('stage128_m2_d2_gate_rerun_authorized')}",
+            "- **This is DATA ADMISSION only.** It does not say M2 improves "
+            "prediction. **M2 incremental evaluation authorized:** "
+            f"{record.get('m2_incremental_evaluation_authorized')} — "
+            f"**M2 modeling started:** {record.get('m2_modeling_started')} — "
+            f"**M2 block admitted for modeling:** "
+            f"{record.get('m2_block_admitted_for_modeling')}",
+            # The SOLE live next-action pointer on this branch.
+            "- **Next research action (pointer only):** "
+            f"`{record['next_research_action_id']}` — scientifically "
+            "ELIGIBLE after this data-admission PASS; a POINTER ONLY, "
+            "**not authorized** "
+            "(`m2_incremental_evaluation_authorized="
+            f"{record.get('m2_incremental_evaluation_authorized')}`) and "
+            "**not started** "
+            f"(`m2_modeling_started={record.get('m2_modeling_started')}`). "
+            "It requires a new, explicit human authorization. It is the M2 "
+            "incremental evaluation action — it is NOT the canonical M2 Gate "
+            "re-run, which is the completed action reported in this section.",
+            "- The post-lock eligibility audit frozen by the design-freeze "
+            "contract remains REQUIRED before any M2 predictive result is "
+            "interpreted. It was not executed by this Gate.",
+            "- Package: `project/stage128/`; interpretation: "
+            "`project/stage128/README_STAGE128_M2_D2_GATE_RERUN.md`",
             "",
         ]
     lines += [
@@ -4630,6 +4745,148 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
         "next_research_action_id": (
             _NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_FREEZE
         ),
+        "m2_incremental_evaluation_authorized": False,
+        "m2_modeling_started": False,
+        "m2_authorized": False,
+        "m2_started": False,
+        "paper_winner_selected": False,
+        "final_model_selected": False,
+        "full_development_refit_performed": False,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_predictor_values_inspected": False,
+        "final_test_target_values_inspected": False,
+        "final_test_evaluation_performed": False,
+    }
+
+
+_STAGE128_M2_D2_GATE_RERUN_REL = (
+    "project/stage128/stage128_m2_d2_gate_rerun_decision.json"
+)
+_STAGE128_M2_D2_GATE_RERUN_ACTION_ID = "stage128-m2-d2-gate-rerun"
+_STAGE128_GATE_RERUN_PASS = "PASS_FOR_M2_INCREMENTAL_EVALUATION"
+_STAGE128_GATE_RERUN_FAIL = "FAIL_M2_DATA_GATE"
+#: Identified ONLY as a pointer if the re-run PASSes. A pointer is never an
+#: authorization: `m2_incremental_evaluation_authorized` stays False.
+_NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_GATE_RERUN_PASS = (
+    "stage127-m2-incremental-evaluation"
+)
+#: On FAIL the pointer stays on the Gate re-run itself: inventing a new
+#: scientific action in response to an observed negative result is exactly the
+#: silent-redesign this recognizer must never perform.
+_NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_GATE_RERUN_FAIL = (
+    _STAGE128_M2_D2_GATE_RERUN_ACTION_ID
+)
+
+
+def derive_stage128_m2_d2_gate_rerun_markers(root: str) -> dict:
+    """Recognize the executed Stage128 canonical M2 Gate re-run under D2.
+
+    Narrow and fail-closed, mirroring the recognizers above. The Gate re-run
+    is a DATA-ADMISSION decision only:
+
+    * it never sets ``m2_incremental_evaluation_authorized`` or
+      ``m2_modeling_started`` — a PASS makes the successor scientifically
+      eligible for a NEW explicit human authorization, nothing more;
+    * it never unlocks the final test;
+    * it never touches ``stage127_m2_market_data_gate_status``, which remains
+      the historical D0 ``FAIL_M2_DATA_GATE`` record;
+    * the one-action human authorization is CONSUMED by the execution, so
+      ``stage128_m2_d2_gate_rerun_authorized`` stays False afterwards and is
+      never left standing.
+
+    Returns {} before the Gate has been executed, so pre-rerun Handoffs are
+    unaffected.
+    """
+    path = os.path.join(root, _STAGE128_M2_D2_GATE_RERUN_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        d = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(f"unreadable stage128 D2 Gate rerun decision: {exc}") from exc
+
+    if d.get("decision_id") != _STAGE128_M2_D2_GATE_RERUN_ACTION_ID:
+        raise HandoffError("stage128 D2 Gate rerun decision_id mismatch")
+    status = d.get("gate_status")
+    if status not in (_STAGE128_GATE_RERUN_PASS, _STAGE128_GATE_RERUN_FAIL):
+        raise HandoffError(
+            f"stage128 D2 Gate rerun status {status!r} is not terminal"
+        )
+    if d.get("historical_d0_gate_status") != _STAGE127_GATE_FAIL:
+        raise HandoffError(
+            "stage128 D2 Gate rerun does not preserve the historical Stage127 "
+            "D0 Gate status"
+        )
+    if d.get("historical_d0_artifacts_rewritten") is not False:
+        raise HandoffError("stage128 D2 Gate rerun claims to rewrite D0 artifacts")
+
+    exact = {
+        "modeling_performed": False,
+        "model_fit_calls": 0,
+        "prediction_calls": 0,
+        "predictive_metric_computed": False,
+        "m2_vs_m1_performance_compared": False,
+        "gate_thresholds_changed": False,
+        "gate_criteria_added_or_removed": False,
+        "new_design_decision_made_in_this_action": False,
+        "d0_d1_d2_d3_jalali_selection_reopened": False,
+        "gate_outcome_used_to_redesign_d2": False,
+    }
+    for key, want in exact.items():
+        if d.get(key) != want:
+            raise HandoffError(
+                f"stage128 D2 Gate rerun field {key}={d.get(key)!r} != {want!r}"
+            )
+
+    fw = d.get("final_test_firewall") or {}
+    for key in (
+        "final_test_unlocked", "final_test_access_authorized",
+        "final_test_predictor_values_inspected",
+        "final_test_target_values_inspected", "final_test_evaluation_performed",
+    ):
+        if fw.get(key) is not False:
+            raise HandoffError(f"stage128 D2 Gate rerun firewall {key} not False")
+    if fw.get("final_test_locked") is not True:
+        raise HandoffError("stage128 D2 Gate rerun does not report final_test_locked")
+
+    elig = d.get("eligibility_for_next_action") or {}
+    if elig.get("m2_incremental_evaluation_authorized") is not False:
+        raise HandoffError(
+            "stage128 D2 Gate rerun must not authorize M2 incremental evaluation"
+        )
+    if elig.get("m2_modeling_started") is not False:
+        raise HandoffError("stage128 D2 Gate rerun must not start M2 modeling")
+
+    passed = status == _STAGE128_GATE_RERUN_PASS
+    cov = (d.get("candidate_coverage") or {}).get("equity_return_window") or {}
+    common = d.get("block_common_sample") or {}
+
+    return {
+        "stage128_m2_d2_gate_rerun_executed": True,
+        "stage128_m2_d2_gate_rerun_resolved": True,
+        "stage128_m2_d2_gate_rerun_status": status,
+        # The one-action authorization was CONSUMED by this execution. It is
+        # never left standing, whatever the outcome.
+        "stage128_m2_d2_gate_rerun_authorized": False,
+        "stage128_m2_d2_gate_rerun_authorization_consumed": True,
+        "stage128_m2_d2_equity_return_valid_rows": cov.get("valid_rows"),
+        "stage128_m2_d2_equity_return_coverage": cov.get("overall_coverage"),
+        "stage128_m2_d2_common_sample_rows": common.get("common_usable_rows"),
+        "stage128_m2_d2_common_sample_coverage": common.get("common_coverage"),
+        # DATA admission only — never a statement that M2 improves prediction.
+        "stage128_m2_d2_block_data_admission_passed": passed,
+        "m2_block_admitted_for_modeling": False,
+        "last_completed_research_action_id": (
+            _STAGE128_M2_D2_GATE_RERUN_ACTION_ID
+        ),
+        "next_research_action_id": (
+            _NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_GATE_RERUN_PASS
+            if passed
+            else _NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_GATE_RERUN_FAIL
+        ),
+        "next_research_action_pointer_is_not_authorization": True,
+        # Nothing below is ever advanced by a data-admission Gate.
         "m2_incremental_evaluation_authorized": False,
         "m2_modeling_started": False,
         "m2_authorized": False,

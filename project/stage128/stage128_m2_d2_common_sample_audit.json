@@ -1,0 +1,26 @@
+{
+  "common_coverage": 0.8093093093,
+  "common_coverage_gate_passed": true,
+  "common_usable_rows": 539,
+  "counts_by_fold": {
+    "fold1_train": 173,
+    "fold1_validation": 159,
+    "fold2_train": 332,
+    "fold2_validation": 207
+  },
+  "counts_by_target_year": {
+    "1393": 40,
+    "1394": 67,
+    "1395": 66,
+    "1396": 79,
+    "1397": 80,
+    "1398": 100,
+    "1399": 107
+  },
+  "negative_count": 484,
+  "positive_count": 55,
+  "requires_all_three_m2_variables_simultaneously_usable": true,
+  "resolution": "PASS",
+  "threshold": 0.7,
+  "total_development_rows": 666
+}

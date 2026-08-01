@@ -1,0 +1,248 @@
+{
+  "all_pass": true,
+  "all_pass_semantics": "all_pass means every REQUIRED internal-consistency assertion of this Gate re-run package passed. It is NOT a statement about the Gate outcome itself: the Gate result is reported separately in gate_status and is decided only by the observed evidence.",
+  "assertion_count": 47,
+  "assertions": [
+    {
+      "detail": "",
+      "name": "authorization_utterance_sha256_verified",
+      "status": "PASS"
+    },
+    {
+      "detail": "the original authorized execution environment is a locked constant",
+      "name": "original_authorized_gate_execution_provenance_is_locked",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "canonical_gate_execution_and_decision_counts_remain_one",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "maintenance_regeneration_is_not_a_scientific_execution",
+      "status": "PASS"
+    },
+    {
+      "detail": "expected 2026-08-01, got 2026-08-01",
+      "name": "authorization_date_is_the_recorded_issue_date",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "authorization_is_one_action_only",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "authorization_not_standing",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "authorization_consumed_by_this_execution",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "merge_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "m2_incremental_evaluation_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "bundle_sha256_matches_immutable_evidence",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "bundle_filename_matches",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "normalized_row_count_matches_historical_delivery",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "restricted_raw_files_match_historical_delivery",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "restricted_raw_hash_verification_passed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "evidence_mode_is_offline_imported_bundle",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "network_not_required_to_reproduce",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "gate_not_decided_from_reachability",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "development_pairs_666",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "three_frozen_m2_variables_present",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "zero_trade_day_ratio_not_added",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "equity_return_measured_under_frozen_d2",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "only_equity_return_measurement_replaced",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "realized_volatility_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "amihud_illiquidity_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "shared_window_t0_tstar_adjacency_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "126_floors_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_imputation_or_substitution",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "gate_thresholds_unchanged",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "gate_criteria_not_added_or_removed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_fold_specific_coverage_threshold",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "design_selection_not_reopened",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "gate_outcome_not_used_to_redesign_d2",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "prelock_reference_not_used_as_gate_input",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "historical_d0_status_preserved",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_model_fit",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_prediction",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_predictive_metric_computed",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_firewall_intact",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "final_test_target_years_excluded",
+      "status": "PASS"
+    },
+    {
+      "detail": "declared=['common_sample_positive_negative_composition', 'condition_d_validation_window_event_counts', 'target_stratified_candidate_coverage'] actual=['common_sample_positive_negative_composition', 'condition_d_validation_window_event_counts', 'target_stratified_candidate_coverage']",
+      "name": "development_target_use_limited_to_canonical_gate_descriptive_and_event_support_audits",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "development_targets_not_used_for_prediction_design_or_tuning",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "post_lock_eligibility_audit_not_executed_and_not_a_gate_condition",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "d2_taxonomy_causes_non_exclusive",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "no_cross_month_fallback",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "gate_status_is_terminal",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "name": "d2_usable_count_equals_observed_feature_count",
+      "status": "PASS"
+    }
+  ],
+  "contract_id": "stage128_m2_d2_gate_rerun",
+  "decision_id": "stage128-m2-d2-gate-rerun",
+  "failed_count": 0,
+  "gate_status": "PASS_FOR_M2_INCREMENTAL_EVALUATION",
+  "scope_note": "Internal consistency of the Stage128 D2 Gate re-run package: authorization scope, immutable-evidence integrity, frozen invariants, threshold immutability, firewall and no-execution guarantees. It is not itself a Gate decision.",
+  "stage": "Stage128"
+}
