@@ -1,0 +1,38 @@
+{
+  "contract_id": "stage128_m3_intl_macro_contract_lock",
+  "coverage_calculations": 0,
+  "future_rules": [
+    "M3I-2 passes only if both CPI inflation and FX change pass.",
+    "A reduced one-variable M3I-1 cannot pass.",
+    "Failure of either M3I-2 candidate rejects M3I-2.",
+    "M3I-3 may be considered only if M3I-2 passed, the financing metadata lock was completed prospectively, and financing independently passed the same candidate Gate.",
+    "Financing failure does not invalidate a passing M3I-2.",
+    "No alternative series may be tried after coverage inspection."
+  ],
+  "gate_executed": false,
+  "gate_result": "NOT_EXECUTED",
+  "generated_for": "stage128-m3i2-prospective-contract-lock",
+  "observed_values": {
+    "block_common_sample_coverage": null,
+    "candidate_valid_coverage": null,
+    "common_sample_negative": null,
+    "common_sample_positive": null,
+    "common_sample_rows": null,
+    "positive_events_each_locked_validation_window": null
+  },
+  "reduced_one_variable_block_can_pass": false,
+  "thresholds": {
+    "block_common_sample_coverage_min": 0.7,
+    "candidate_valid_coverage_min": 0.8,
+    "coverage_scope": "development_only",
+    "denominator": "retained_M2_development_common_sample",
+    "expected_parent_companies": 108,
+    "expected_parent_negative": 484,
+    "expected_parent_positive": 55,
+    "expected_parent_rows": 539,
+    "final_test_access_for_admission": false,
+    "minimum_positive_evaluable_each_locked_validation_window": 5
+  },
+  "thresholds_inherited_not_redesigned": true,
+  "unresolved_values_are_null_not_zero": true
+}

@@ -1,0 +1,39 @@
+{
+  "M3I_inserted_into_original_family": false,
+  "comparisons_executed": 0,
+  "confirmatory_superiority_claim_permitted": false,
+  "contract_id": "stage128_m3_intl_macro_contract_lock",
+  "generated_for": "stage128-m3i2-prospective-contract-lock",
+  "holm_executions": 0,
+  "original_confirmatory_family": [
+    "M2_minus_M1",
+    "M3_CBI_minus_M2",
+    "M4_minus_M3_CBI"
+  ],
+  "original_confirmatory_family_changed_by_this_action": false,
+  "original_confirmatory_family_complete": false,
+  "results_label": "supplementary_robustness_only",
+  "supplementary_family": [
+    {
+      "comparison": "M3I_2_minus_retained_M2",
+      "exists_now": false,
+      "exists_only_if": "M3I-2 later passes the Data Gate",
+      "hypothesis_id": "S1"
+    },
+    {
+      "comparison": "M3I_3_minus_M3I_2",
+      "exists_now": false,
+      "exists_only_if": "financing later receives a prospective exact lock and passes its Gate",
+      "hypothesis_id": "S2"
+    }
+  ],
+  "supplementary_family_rules": [
+    "S1 exists only if M3I-2 later passes the Data Gate.",
+    "S2 exists only if financing later receives a prospective exact lock and passes its Gate.",
+    "If only S1 exists, supplementary_family_size = 1 and the Holm adjustment is mathematically unnecessary, but the family identity remains recorded.",
+    "If S1 and S2 exist, Holm is applied across exactly S1 and S2.",
+    "All results must be labelled supplementary/robustness.",
+    "No confirmatory superiority claim is permitted."
+  ],
+  "supplementary_family_size_now": 0
+}

@@ -1,0 +1,27 @@
+{
+  "contract_id": "stage128_m3_intl_macro_contract_lock",
+  "current_value_treated_as_historically_available": false,
+  "date_only_release_on_cutoff_date_is_excluded": true,
+  "fiscal_year_label_only_mapping_allowed": false,
+  "frozen_project_prediction_cutoff": "The earliest verified available_at timestamp of the predictor-year financial statement for each t -> t+1 pair.",
+  "frozen_project_prediction_cutoff_changed_by_this_action": false,
+  "fx_same_vintage_rule": "Both annual exchange-rate levels used in the log change must come from the same selected vintage.",
+  "generated_for": "stage128-m3i2-prospective-contract-lock",
+  "jalali_and_gregorian_dates_preserved_separately": true,
+  "macro_availability_rule": "macro_release_available_at < pair_prediction_cutoff",
+  "no_pre_cutoff_vintage_verified_yields_null": true,
+  "observations_timestamped_in_this_action": 0,
+  "vintages_applied_in_this_action": 0,
+  "wdi_as_of_rules": [
+    "Use the latest official WDI Database Archive release strictly before the pair cutoff.",
+    "Use only values contained in that archived release.",
+    "available_at is the verified release timestamp of that WDI edition.",
+    "A later archive edition is a new vintage and never overwrites an earlier vintage.",
+    "If exact time is unavailable but the release date is verified, available_at = 00:00:00 UTC on the next calendar day.",
+    "Therefore a date-only release on the same calendar date as the cutoff is excluded.",
+    "If no pre-cutoff vintage can be verified, the feature value is null.",
+    "No mapping based only on fiscal-year labels is allowed.",
+    "Jalali and Gregorian dates must remain separately preserved with provenance.",
+    "No current WDI value may be treated as historically available merely because its observation year precedes the cutoff."
+  ]
+}

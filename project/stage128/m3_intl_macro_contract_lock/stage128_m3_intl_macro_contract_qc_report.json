@@ -1,0 +1,234 @@
+{
+  "all_pass": true,
+  "assertion_count": 46,
+  "assertions": [
+    {
+      "name": "authorization_byte_length_is_28",
+      "status": "PASS"
+    },
+    {
+      "name": "authorization_sha256_matches",
+      "status": "PASS"
+    },
+    {
+      "name": "verbatim_and_normalized_authorization_are_separated",
+      "status": "PASS"
+    },
+    {
+      "name": "authorization_is_one_action_and_consumed",
+      "status": "PASS"
+    },
+    {
+      "name": "scope_not_identified_by_repeated_hash_alone",
+      "status": "PASS"
+    },
+    {
+      "name": "exact_pr73_head_baseline",
+      "status": "PASS"
+    },
+    {
+      "name": "live_main_commit_recorded",
+      "status": "PASS"
+    },
+    {
+      "name": "stacked_pr_base_is_not_main",
+      "status": "PASS"
+    },
+    {
+      "name": "pr_is_draft_and_unmerged",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_cbi_block_order_and_source_preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_cbi_contract_unchanged_by_this_action",
+      "status": "PASS"
+    },
+    {
+      "name": "m3i_is_a_distinct_supplementary_family",
+      "status": "PASS"
+    },
+    {
+      "name": "m3i_source_ids_are_new_and_never_reused",
+      "status": "PASS"
+    },
+    {
+      "name": "source_reference_urls_recorded_but_not_fetched",
+      "status": "PASS"
+    },
+    {
+      "name": "cpi_indicator_code_is_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "fx_indicator_code_is_exact_and_not_atls",
+      "status": "PASS"
+    },
+    {
+      "name": "fx_transformation_is_exactly_the_locked_log_change",
+      "status": "PASS"
+    },
+    {
+      "name": "m3i2_block_is_never_reduced_to_one_variable",
+      "status": "PASS"
+    },
+    {
+      "name": "cpi_forbidden_alternatives_recorded",
+      "status": "PASS"
+    },
+    {
+      "name": "fx_forbidden_alternatives_recorded",
+      "status": "PASS"
+    },
+    {
+      "name": "both_m3i2_candidates_uniquely_determined",
+      "status": "PASS"
+    },
+    {
+      "name": "no_m3i2_candidate_is_admitted_without_a_gate",
+      "status": "PASS"
+    },
+    {
+      "name": "financing_not_admitted_while_metadata_is_null",
+      "status": "PASS"
+    },
+    {
+      "name": "financing_construct_is_not_a_forbidden_proxy",
+      "status": "PASS"
+    },
+    {
+      "name": "financing_metadata_fields_are_all_null",
+      "status": "PASS"
+    },
+    {
+      "name": "financing_stop_rule_recorded",
+      "status": "PASS"
+    },
+    {
+      "name": "original_confirmatory_family_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "supplementary_family_is_separate_and_empty_now",
+      "status": "PASS"
+    },
+    {
+      "name": "no_confirmatory_superiority_claim_is_permitted",
+      "status": "PASS"
+    },
+    {
+      "name": "unresolved_gate_values_are_null_not_zero",
+      "status": "PASS"
+    },
+    {
+      "name": "gate_thresholds_are_inherited_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "gate_is_recorded_as_not_executed",
+      "status": "PASS"
+    },
+    {
+      "name": "frozen_prediction_cutoff_preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "wdi_as_of_rules_complete",
+      "status": "PASS"
+    },
+    {
+      "name": "missing_value_contract_forbids_imputation",
+      "status": "PASS"
+    },
+    {
+      "name": "no_network_or_api_execution_path",
+      "status": "PASS"
+    },
+    {
+      "name": "no_observation_ingestion_path",
+      "status": "PASS"
+    },
+    {
+      "name": "no_estimator_or_prediction_path",
+      "status": "PASS"
+    },
+    {
+      "name": "no_final_test_file_or_target_access_path",
+      "status": "PASS"
+    },
+    {
+      "name": "no_m4_start_or_authorization_flag",
+      "status": "PASS"
+    },
+    {
+      "name": "no_merge_authorized_flag",
+      "status": "PASS"
+    },
+    {
+      "name": "final_test_remains_locked",
+      "status": "PASS"
+    },
+    {
+      "name": "protected_prior_scientific_artifacts_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "execution_counters_are_all_zero",
+      "status": "PASS"
+    },
+    {
+      "name": "no_data_collection_claim",
+      "status": "PASS"
+    },
+    {
+      "name": "next_action_pointer_is_not_an_authorization",
+      "status": "PASS"
+    }
+  ],
+  "contract_id": "stage128_m3_intl_macro_contract_lock",
+  "contract_status": "PROSPECTIVELY_LOCKED_NO_DATA",
+  "execution_counters": {
+    "Holm_calculations": 0,
+    "company_rows_loaded": 0,
+    "coverage_calculations": 0,
+    "data_files_downloaded": 0,
+    "final_test_rows_loaded": 0,
+    "macro_observations_read": 0,
+    "model_fits": 0,
+    "network_requests": 0,
+    "predictions": 0,
+    "predictive_metrics": 0
+  },
+  "failed_assertions": [],
+  "failed_count": 0,
+  "generated_for": "stage128-m3i2-prospective-contract-lock",
+  "protected_immutability": {
+    "protected_baseline_branch": "stage128-m3-macro-data-gate",
+    "protected_baseline_commit": "e6db63fb7d105f0d3a39db101c9e364161c367e9",
+    "protected_bytes_match_baseline": true,
+    "protected_committed_history_diff_empty": true,
+    "protected_extra_files": [
+      "project/stage128/stage128_m2_d2_development_features.csv"
+    ],
+    "protected_file_count": 343,
+    "protected_operational_exclusions": [
+      "project/stage126/README_STAGE126_CURRENT_STATE_VALIDATION.md",
+      "project/stage126/metadata_and_hashes_stage126_current_state_validator.json",
+      "project/stage126/stage126_current_state_validation_report.json"
+    ],
+    "protected_operational_exclusions_are_not_scientific_artifacts": true,
+    "protected_paths_match_baseline": true,
+    "protected_tree_has_no_new_tracked_files": true,
+    "protected_trees": [
+      "project/stage125",
+      "project/stage126",
+      "project/stage127",
+      "project/stage128/m2_incremental_evaluation",
+      "project/stage128/m2_retained_block_human_decision",
+      "project/stage128/m3_macro_data_gate"
+    ]
+  },
+  "scope_note": "This QC report checks the internal consistency of a METADATA-ONLY prospective contract lock. It retrieved no macro observation, executed no Data Gate, fit no model and produced no scientific result about whether M3I-2 improves prediction. M3I-2 is a supplementary/robustness family and is never confirmatory M3."
+}
