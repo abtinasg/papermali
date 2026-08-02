@@ -1281,7 +1281,10 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # is not an authorization: M3 stays unauthorized and unstarted. M2 is
     # retained as the INTERMEDIATE confirmatory block, which is a governance
     # decision and establishes no predictive superiority.
-    assert state["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    # ...and once more when the supplementary M3I-2 contract was locked; the
+    # pointer now names an evidence-capture action that is NOT authorized.
+    assert state["next_research_action_id"] == (
+        "stage128-m3i2-official-source-evidence-capture")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -1292,9 +1295,12 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # M3 Gate. `stage128_m2_d2_boundary_month_equity_return` is now
     # predecessor context and `stage126_m1_financial_baseline` remains correct
     # HISTORY for the completed M1 baseline workstream — neither is current.
-    assert state["active_workstream"] == "stage128_m3_macro_data_gate"
+    # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
+    # as the live workstream; the Gate is now predecessor context.
+    assert state["active_workstream"] == (
+        "stage128_m3i2_prospective_contract_lock")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m2_d2_boundary_month_equity_return"
+        "stage128_m3_macro_data_gate"
     )
     # Stage126 M1 is human-authorized and started; development-fold modeling
     # occurred, while the final test remains fully locked.
@@ -1341,16 +1347,18 @@ def test_real_repo_roadmap_stage126_status_consistency():
     ).read()
     fm = gen.read_roadmap(REAL_ROOT)
     # The M3 macro data Gate has executed, so the live workstream is the Gate.
-    assert fm["active_research_workstream_id"] == "stage128-m3-macro-data-gate"
+    assert fm["active_research_workstream_id"] == (
+        "stage128-m3i2-prospective-contract-lock")
     assert fm["predecessor_research_workstream_id"] == (
-        "stage128-m2-d2-boundary-month-equity-return"
+        "stage128-m3-macro-data-gate"
     )
     # The workstream label is derived from the frozen action and never
     # substitutes for a research-action id.
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m2-retained-block-human-decision"
+        "stage128-m3i2-prospective-contract-lock"
     )
-    assert fm["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    assert fm["next_research_action_id"] == (
+        "stage128-m3i2-official-source-evidence-capture")
     # The Stage128 M2 D2 design freeze completed, and the canonical D2 Gate
     # re-run has since been EXECUTED under its own explicit one-action
     # authorization and PASSED data admission, so both pointers legitimately
@@ -1450,13 +1458,14 @@ def test_real_repo_open_tasks_stage126_markers_match_handoff():
     # as an explicitly HISTORICAL (completed) section.
     assert (
         "## Active research workstream: "
-        "`stage128-m3-macro-data-gate`" in open_tasks
+        "`stage128-m3i2-prospective-contract-lock`" in open_tasks
     )
     assert (
         "### Historical (completed) — `stage126-m1-financial-baseline`"
         in open_tasks
     )
-    assert state["active_workstream"] == "stage128_m3_macro_data_gate"
+    assert state["active_workstream"] == (
+        "stage128_m3i2_prospective_contract_lock")
     assert "Stage126 M1 human-authorized = true" in open_tasks
     assert "Stage126 started = true" in open_tasks
     assert "development modeling authorized = true" in open_tasks
@@ -2326,7 +2335,10 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # is not an authorization: M3 stays unauthorized and unstarted. M2 is
     # retained as the INTERMEDIATE confirmatory block, which is a governance
     # decision and establishes no predictive superiority.
-    assert state["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    # ...and once more when the supplementary M3I-2 contract was locked; the
+    # pointer now names an evidence-capture action that is NOT authorized.
+    assert state["next_research_action_id"] == (
+        "stage128-m3i2-official-source-evidence-capture")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2344,9 +2356,12 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # M3 Gate. `stage128_m2_d2_boundary_month_equity_return` is now
     # predecessor context and `stage126_m1_financial_baseline` remains correct
     # HISTORY for the completed M1 baseline workstream — neither is current.
-    assert state["active_workstream"] == "stage128_m3_macro_data_gate"
+    # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
+    # as the live workstream; the Gate is now predecessor context.
+    assert state["active_workstream"] == (
+        "stage128_m3i2_prospective_contract_lock")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m2_d2_boundary_month_equity_return"
+        "stage128_m3_macro_data_gate"
     )
     # The micro-part pointer tracks the newest completed robustness micro-part.
     assert state["last_completed_micro_part"] == \
@@ -2635,7 +2650,10 @@ def test_part1_does_not_advance_research_pointers():
     # is not an authorization: M3 stays unauthorized and unstarted. M2 is
     # retained as the INTERMEDIATE confirmatory block, which is a governance
     # decision and establishes no predictive superiority.
-    assert state["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    # ...and once more when the supplementary M3I-2 contract was locked; the
+    # pointer now names an evidence-capture action that is NOT authorized.
+    assert state["next_research_action_id"] == (
+        "stage128-m3i2-official-source-evidence-capture")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2653,9 +2671,12 @@ def test_part1_does_not_advance_research_pointers():
     # M3 Gate. `stage128_m2_d2_boundary_month_equity_return` is now
     # predecessor context and `stage126_m1_financial_baseline` remains correct
     # HISTORY for the completed M1 baseline workstream — neither is current.
-    assert state["active_workstream"] == "stage128_m3_macro_data_gate"
+    # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
+    # as the live workstream; the Gate is now predecessor context.
+    assert state["active_workstream"] == (
+        "stage128_m3i2_prospective_contract_lock")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m2_d2_boundary_month_equity_return"
+        "stage128_m3_macro_data_gate"
     )
     # `current_stage` is a CURRENT-state field and advanced with the freeze;
     # the Stage126 label survives in the separate micro-part QC role.
@@ -2865,7 +2886,10 @@ def test_handoff_carries_live_vs_historical_test_boundary_markers():
     # is not an authorization: M3 stays unauthorized and unstarted. M2 is
     # retained as the INTERMEDIATE confirmatory block, which is a governance
     # decision and establishes no predictive superiority.
-    assert state["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    # ...and once more when the supplementary M3I-2 contract was locked; the
+    # pointer now names an evidence-capture action that is NOT authorized.
+    assert state["next_research_action_id"] == (
+        "stage128-m3i2-official-source-evidence-capture")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2935,9 +2959,12 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # M3 Gate. `stage128_m2_d2_boundary_month_equity_return` is now
     # predecessor context and `stage126_m1_financial_baseline` remains correct
     # HISTORY for the completed M1 baseline workstream — neither is current.
-    assert state["active_workstream"] == "stage128_m3_macro_data_gate"
+    # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
+    # as the live workstream; the Gate is now predecessor context.
+    assert state["active_workstream"] == (
+        "stage128_m3i2_prospective_contract_lock")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m2_d2_boundary_month_equity_return"
+        "stage128_m3_macro_data_gate"
     )
     # The human retained-block decision
     # (stage128-m2-retained-block-human-decision) has since been RECORDED
@@ -2946,7 +2973,10 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # is not an authorization: M3 stays unauthorized and unstarted. M2 is
     # retained as the INTERMEDIATE confirmatory block, which is a governance
     # decision and establishes no predictive superiority.
-    assert state["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    # ...and once more when the supplementary M3I-2 contract was locked; the
+    # pointer now names an evidence-capture action that is NOT authorized.
+    assert state["next_research_action_id"] == (
+        "stage128-m3i2-official-source-evidence-capture")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -3012,7 +3042,7 @@ def test_current_state_labels_micro_part_not_research_action():
     )
     assert (
         "- **Next research action:** "
-        "`stage128-m3-macro-data-gate`" in text
+        "`stage128-m3i2-official-source-evidence-capture`" in text
     )
 
 
@@ -3116,9 +3146,15 @@ def _open_tasks_text() -> str:
 def test_active_workstream_identifies_the_m3_macro_gate():
     state = _handoff_state()
     assert state["m3_macro_data_gate_executed"] is True
-    assert state["active_workstream"] == "stage128_m3_macro_data_gate"
-    assert state["active_workstream"] != (
-        "stage128_m2_d2_boundary_month_equity_return")
+    # The live label is the supplementary M3I-2 contract lock, which succeeded
+    # the CBI M3 Gate; neither older label may be the CURRENT one.
+    assert state["active_workstream"] == (
+        "stage128_m3i2_prospective_contract_lock")
+    assert state["active_workstream"] not in (
+        "stage128_m2_d2_boundary_month_equity_return",
+        "stage128_m3_macro_data_gate")
+    assert state["active_workstream_predecessor_context"] == (
+        "stage128_m3_macro_data_gate")
 
 
 def test_m3_data_workstream_started_but_modeling_did_not():
@@ -3133,12 +3169,20 @@ def test_m3_data_workstream_started_but_modeling_did_not():
 
 
 def test_pointers_are_unchanged_because_the_gate_is_unresolved():
+    """The UNRESOLVED CBI Gate never advanced the pointer to its own successor.
+
+    The pointer did advance later, but only because a DIFFERENT, separately
+    authorized action — the supplementary M3I-2 contract lock — completed. The
+    CBI Gate's own successor was never created.
+    """
     state = _handoff_state()
     assert state["last_completed_research_action_id"] == (
-        "stage128-m2-retained-block-human-decision")
-    assert state["next_research_action_id"] == "stage128-m3-macro-data-gate"
+        "stage128-m3i2-prospective-contract-lock")
+    assert state["next_research_action_id"] == (
+        "stage128-m3i2-official-source-evidence-capture")
     assert state["next_research_action_id"] != (
         "stage128-m3-incremental-evaluation")
+    assert state["m3_macro_data_gate_human_review_required"] is True
 
 
 def test_current_state_does_not_say_the_m3_gate_was_not_executed():
@@ -3157,7 +3201,8 @@ def test_current_state_says_the_m3_gate_was_executed():
     assert "M3 macro DATA Gate" in text
     assert "**Executed:** True" in text
     assert "UNRESOLVED_M3_DATA_GATE" in text
-    assert "**Active workstream:** `stage128_m3_macro_data_gate`" in text
+    assert ("**Active workstream:** "
+            "`stage128_m3i2_prospective_contract_lock`") in text
 
 
 def test_current_state_cannot_both_assert_and_deny_gate_execution():
@@ -3171,9 +3216,10 @@ def test_current_state_cannot_both_assert_and_deny_gate_execution():
 def test_roadmap_no_longer_labels_the_m3_gate_unauthorized_or_unstarted():
     text = _roadmap_text()
     front = text.split("---")[1]
-    assert "active_research_workstream_id: stage128-m3-macro-data-gate" in front
+    assert ("active_research_workstream_id: "
+            "stage128-m3i2-prospective-contract-lock") in front
     assert ("predecessor_research_workstream_id: "
-            "stage128-m2-d2-boundary-month-equity-return") in front
+            "stage128-m3-macro-data-gate") in front
     # the stale live-workstream label must not be the ACTIVE one
     assert ("active_research_workstream_id: "
             "stage128-m2-d2-boundary-month-equity-return") not in front
@@ -3186,9 +3232,10 @@ def test_open_tasks_no_longer_calls_stage127_m2_the_current_action():
     text = _open_tasks_text()
     assert ("The current scientific action is `stage127-m2-incremental-"
             "evaluation`") not in text
-    assert ("The current scientific action is `stage128-m3-macro-data-gate`"
+    assert ("`stage128-m3i2-prospective-contract-lock` — **COMPLETE**"
             in text)
-    assert "## Active research workstream: `stage128-m3-macro-data-gate`" in text
+    assert ("## Active research workstream: "
+            "`stage128-m3i2-prospective-contract-lock`") in text
     assert ("## Active research workstream: "
             "`stage128-m2-d2-boundary-month-equity-return`") not in text
     # the M2 description is preserved, but explicitly as history
@@ -3215,3 +3262,88 @@ def test_access_probe_evidence_downgrade_is_reflected_in_open_tasks():
     text = _open_tasks_text()
     assert "UNVERIFIED_CAPTURE_METADATA_ONLY" in text
     assert "programmer-reported" in text.lower()
+
+
+# --------------------------------------------------------------------------- #
+# Stage128 — supplementary M3I-2 prospective contract lock
+# --------------------------------------------------------------------------- #
+
+def test_m3i2_contract_lock_markers_are_recognized():
+    state = _handoff_state()
+    assert state["stage128_m3i2_contract_lock_executed"] is True
+    assert state["stage128_m3i2_contract_status"] == (
+        "PROSPECTIVELY_LOCKED_NO_DATA")
+    assert state["stage128_m3i2_contract_lock_authorization_consumed"] is True
+    assert state["m3i2_retrieval_started"] is False
+    assert state["m3i2_data_gate_executed"] is False
+    assert state["m3i2_block_admitted"] is False
+    assert state["m3i2_incremental_evaluation_authorized"] is False
+    assert state["m3i2_modeling_started"] is False
+    assert state["m3i3_financing_lock"] == "UNRESOLVED_METADATA_LOCK"
+    assert state["m3i3_admitted"] is False
+    assert state["m3i_is_supplementary_not_confirmatory_m3"] is True
+
+
+def test_m3i2_contract_lock_preserves_the_cbi_block_and_the_firewall():
+    state = _handoff_state()
+    assert state["m3_macro_data_gate_status"] == "UNRESOLVED_M3_DATA_GATE"
+    assert state["m3_block_admitted_for_incremental_evaluation"] is False
+    assert state["m3_incremental_evaluation_authorized"] is False
+    assert state["m3_modeling_started"] is False
+    assert state["m4_authorized"] is False and state["m4_started"] is False
+    assert state["final_test_locked"] is True
+    assert state["next_research_action_authorized"] is False
+
+
+def test_m3i2_contract_lock_is_stacked_on_the_unmerged_pr73_head():
+    state = _handoff_state()
+    assert state["stage128_m3i2_baseline_pr_number"] == 73
+    assert state["stage128_m3i2_baseline_commit"] == (
+        "e6db63fb7d105f0d3a39db101c9e364161c367e9")
+    assert state["stage128_m3i2_pr_base_branch"] == (
+        "stage128-m3-macro-data-gate")
+    assert state["stage128_m3i2_pr_base_branch"] != "main"
+
+
+def test_m3i2_marker_derivation_fails_closed_on_a_contradictory_artifact(
+    tmp_path,
+):
+    rel = gen._STAGE128_M3I2_CONTRACT_LOCK_REL
+    src = os.path.join(REAL_ROOT, rel)
+    payload = json.load(open(src, encoding="utf-8"))
+    assert gen.derive_stage128_m3i2_contract_lock_markers(REAL_ROOT)
+
+    for field, bad in (
+        ("m3i2_data_gate_executed", True),
+        ("m3i2_modeling_started", True),
+        ("m3i3_admitted", True),
+        ("m3_cbi_contract_changed", True),
+        ("merge_authorized", True),
+        ("m4_started", True),
+        ("final_test_locked", False),
+        ("macro_observations_read", 12),
+        ("m3_cbi_gate_status", "PASS_FOR_M3_INCREMENTAL_EVALUATION"),
+        ("pr_base_branch", "main"),
+        ("next_action_authorized", True),
+    ):
+        root = tmp_path / field.replace("/", "_")
+        (root / os.path.dirname(rel)).mkdir(parents=True, exist_ok=True)
+        broken = dict(payload)
+        broken[field] = bad
+        (root / rel).write_text(
+            json.dumps(broken, ensure_ascii=False), encoding="utf-8")
+        with pytest.raises(gen.HandoffError):
+            gen.derive_stage128_m3i2_contract_lock_markers(str(root))
+
+
+def test_current_state_renders_the_m3i2_contract_lock_section():
+    text = _current_state_text()
+    assert "M3I-2 prospective contract lock" in text
+    assert "PROSPECTIVELY_LOCKED_NO_DATA" in text
+    assert "UNRESOLVED_METADATA_LOCK" in text
+    assert "e6db63fb7d105f0d3a39db101c9e364161c367e9" in text
+    # exactly one live next-action pointer, and it is not an authorization
+    pointers = [ln for ln in text.splitlines()
+                if ln.startswith("- **Next research action (pointer only):**")]
+    assert len(pointers) == 1
+    assert "stage128-m3i2-official-source-evidence-capture" in pointers[0]
