@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import copy
 import json
+import zipfile
 import os
 import sys
 from pathlib import Path
@@ -378,47 +379,135 @@ LISTING_FIXTURE = """
 <a href="http://databank.worldbank.org/data/download/archive/WDI_2009_05.zip">May</a>
 """
 
-
-def test_a_day_precision_edition_gets_a_verified_available_at():
-    editions = m.parse_wdi_archive_listing(
-        LISTING_FIXTURE, "https://datatopics.worldbank.org/x", "a" * 64, "t")
-    dated = [e for e in editions if e["archive_edition_id"] == "WDI_2019_06_28"]
-    assert len(dated) == 1
-    assert dated[0]["release_date_verified"] is True
-    assert dated[0]["listed_release_date"] == "2019-06-28"
-    assert dated[0]["derived_release_available_at_utc"] == "2019-06-29T00:00:00Z"
-    assert dated[0]["date_only_next_day_rule_applied"] is True
+#: Retained bytes that DO explicitly call a date a release date.
+STATED_RELEASE_TEXTS = {
+    "wb_wdi_archive_listing":
+        "The 2019-06-28 edition was released on that date.",
+}
 
 
-def test_a_month_only_edition_stays_unresolved_and_unusable():
-    """A month is not a release date; the parser refuses to invent a day."""
-    editions = m.parse_wdi_archive_listing(
-        LISTING_FIXTURE, "https://datatopics.worldbank.org/x", "a" * 64, "t")
-    for edition_id in ("WDI_2015_04", "WDI_2009_05"):
-        edition = next(e for e in editions
-                       if e["archive_edition_id"] == edition_id)
+def _editions_from_fixture(retained=None):
+    return m.parse_wdi_archive_listing(
+        LISTING_FIXTURE, "https://datatopics.worldbank.org/x", "a" * 64, "t",
+        retained_texts=retained)
+
+
+def test_a_filename_date_is_only_a_token_not_a_release_date():
+    """The core of blocker 1: a token in a filename proves nothing by itself."""
+    edition = next(e for e in _editions_from_fixture()
+                   if e["archive_edition_id"] == "WDI_2019_06_28")
+    assert edition["edition_date_token"] == "2019-06-28"
+    assert edition["edition_date_token_source"] == (
+        "official_listing_download_filename")
+    assert edition["edition_date_token_exact"] is True
+    assert edition["release_date_explicitly_stated_by_official_source"] is False
+    assert edition["release_date_verified"] is False
+    assert edition["derived_release_available_at_utc"] is None
+    assert edition["release_available_at_derivation_status"] == (
+        "UNRESOLVED_FILENAME_DATE_TOKEN_NOT_VERIFIED_AS_RELEASE_DATE")
+    assert edition["release_date_evidence_artifact"] == ""
+    assert edition["release_date_evidence_locator"] == ""
+
+
+def test_an_explicit_official_statement_does_verify_the_release_date():
+    edition = next(e for e in _editions_from_fixture(STATED_RELEASE_TEXTS)
+                   if e["archive_edition_id"] == "WDI_2019_06_28")
+    assert edition["release_date_explicitly_stated_by_official_source"] is True
+    assert edition["release_date_verified"] is True
+    assert edition["derived_release_available_at_utc"] == (
+        "2019-06-29T00:00:00Z")
+    assert edition["release_date_evidence_artifact"] == (
+        "wb_wdi_archive_listing")
+    assert edition["release_date_evidence_locator"]
+    assert "token=2019-06-28" in edition["release_date_evidence_locator"]
+
+
+def test_a_month_only_token_can_never_be_verified():
+    for retained in (None, STATED_RELEASE_TEXTS):
+        editions = _editions_from_fixture(retained)
+        for edition_id in ("WDI_2015_04", "WDI_2009_05"):
+            edition = next(e for e in editions
+                           if e["archive_edition_id"] == edition_id)
+            assert edition["edition_date_token_exact"] is False
+            assert edition["release_date_verified"] is False
+            assert edition["derived_release_available_at_utc"] is None
+
+
+def test_an_unverified_token_never_yields_an_available_at():
+    for edition in _editions_from_fixture():
         assert edition["release_date_verified"] is False
-        assert edition["derived_release_available_at_utc"] == ""
-        assert edition["unresolved_reason"]
+        assert edition["derived_release_available_at_utc"] is None
         assert m.select_edition_for_cutoff(
-            "2020-01-01T00:00:00Z", [edition]) is None
+            "2026-01-01T00:00:00Z", [edition]) is None
 
 
-def test_listing_urls_are_upgraded_to_https_on_the_same_official_host():
-    editions = m.parse_wdi_archive_listing(
-        LISTING_FIXTURE, "https://datatopics.worldbank.org/x", "a" * 64, "t")
-    for edition in editions:
-        assert edition["official_download_url"].startswith("https://")
-        assert cap.is_official_host(edition["official_download_url"])
+def test_release_time_may_never_come_from_a_timestamp_or_header():
+    for edition in _editions_from_fixture():
+        joined = edition["non_evidence_for_release_time"]
+        for banned in ("retrieval timestamp", "HTTP Last-Modified header",
+                       "ZIP member timestamp",
+                       "workbook document properties"):
+            assert banned in joined
 
 
-def test_only_required_editions_become_download_targets():
-    editions = m.parse_wdi_archive_listing(
-        LISTING_FIXTURE, "https://datatopics.worldbank.org/x", "a" * 64, "t")
-    targets = m.required_edition_download_targets(
-        [{"archive_edition_id": "WDI_2019_06_28"}], editions)
-    assert len(targets) == 1
-    assert "WDI_excel_2019_06_28.zip" in targets[0]["url"]
+def test_the_provenance_fields_reach_the_committed_csv(built):
+    """An evidence field that never lands in the artifact is not evidence."""
+    text = built["artifact_texts"][m.RELEASE_MANIFEST_REL]
+    header = text.splitlines()[0].split(",")
+    for field in ("edition_date_token", "edition_date_token_source",
+                  "edition_date_token_exact",
+                  "release_date_explicitly_stated_by_official_source",
+                  "release_date_evidence_artifact",
+                  "release_date_evidence_locator", "release_date_verified",
+                  "release_available_at_derivation_status",
+                  "release_date_source"):
+        assert field in header, field
+
+
+def test_the_real_capture_verifies_no_release_date_at_all(built):
+    """Recomputed from retained bytes — not preserved by expectation."""
+    summary = built["evidence_summary"]
+    assert summary["editions_with_verified_release_date"] == 0
+    assert summary["wdi_editions_discovered"] > 0
+    assert summary["editions_with_unverified_filename_date_token"] == (
+        summary["wdi_editions_discovered"])
+    for edition in built["release_manifest"]:
+        assert edition["release_date_verified"] is False
+        assert not edition["derived_release_available_at_utc"]
+
+
+def test_every_cutoff_is_unresolved_and_nothing_is_hard_coded(built):
+    summary = built["evidence_summary"]
+    plan = built["cutoff_plan"]
+    assert summary["required_editions_total"] == 0
+    assert summary["cutoffs_without_verified_pre_cutoff_edition"] == len(plan)
+    assert summary["cutoffs_with_verified_pre_cutoff_edition"] == 0
+    assert summary["development_pairs_without_verified_pre_cutoff_edition"] == (
+        m.EXPECTED_DEVELOPMENT_PAIRS)
+    for row in plan:
+        assert row["selection_reason"] == "NO_VERIFIED_PRE_CUTOFF_EDITION"
+        assert row["selected_wdi_archive_edition_id"] == ""
+
+
+def test_resolved_cutoff_counts_are_recomputed_not_constants():
+    """A hard-coded '18 resolved' would survive this; a recomputation cannot."""
+    source = (ROOT / "project/src"
+              / "stage128_m3i2_official_source_evidence_capture.py").read_text(
+                  encoding="utf-8")
+    for frozen in ("cutoffs_with_verified_pre_cutoff_edition = 18",
+                   "resolved_cutoffs = 18", "= 18\n"):
+        assert frozen not in source
+
+
+def test_archives_are_still_held_even_though_undatable(built):
+    """Being unable to date an edition is not the same as not having it."""
+    summary = built["evidence_summary"]
+    assert summary["archive_editions_captured"] == 16
+    assert summary["locked_series_rows_extracted"] > 0
+    for entry in built["captured_editions"]:
+        assert entry["download_status"] == "SUCCESS"
+        assert entry["usable_as_pre_cutoff_vintage"] is False
+        assert entry["raw_artifact_sha256"]
 
 
 # --------------------------------------------------------------------------- #
@@ -507,6 +596,236 @@ def test_cpi_and_fx_required_interpretations_are_declared():
     assert "GDP-deflator inflation" in m.CPI_FORBIDDEN_INTERPRETATIONS
     assert "period average" in m.FX_REQUIRED_INTERPRETATION
     assert "LCU per US dollar" in m.FX_REQUIRED_INTERPRETATION
+
+
+# --------------------------------------------------------------------------- #
+# Blocker 2 — FX continuity evidence
+# --------------------------------------------------------------------------- #
+
+def _fx_row(**overrides):
+    row = {
+        "indicator_code": m.FX_INDICATOR_CODE,
+        "compatibility_status": "PASS",
+        "fx_pair_semantic_compatibility_status": "PASS",
+        "currency_denomination_verified": True,
+        "valuation_definition_verified": True,
+        "no_redenomination_or_unit_break_verified": True,
+        "currency_denomination_evidence_locator": "loc-a",
+        "valuation_definition_evidence_locator": "loc-b",
+        "redenomination_or_unit_break_evidence_locator": "loc-c",
+    }
+    row.update(overrides)
+    return row
+
+
+def test_a_fully_evidenced_fx_row_may_pass():
+    m.assert_fx_pass_has_continuity_evidence(_fx_row())
+
+
+@pytest.mark.parametrize("gap", [
+    {"currency_denomination_verified": False},
+    {"valuation_definition_verified": False},
+    {"no_redenomination_or_unit_break_verified": False},
+    {"currency_denomination_verified": ""},
+    {"valuation_definition_verified": None},
+])
+def test_fx_pass_without_continuity_evidence_fails_closed(gap):
+    with pytest.raises(ERROR):
+        m.assert_fx_pass_has_continuity_evidence(_fx_row(**gap))
+
+
+@pytest.mark.parametrize("locator", [
+    "currency_denomination_evidence_locator",
+    "valuation_definition_evidence_locator",
+    "redenomination_or_unit_break_evidence_locator",
+])
+def test_fx_pass_without_an_evidence_locator_fails_closed(locator):
+    with pytest.raises(ERROR):
+        m.assert_fx_pass_has_continuity_evidence(_fx_row(**{locator: ""}))
+
+
+def test_the_archived_title_alone_is_not_complete_fx_evidence():
+    """A generic 'LCU per US$, period average' settles construct and unit
+    label only — never denomination, valuation or absence of a unit break."""
+    meta = {
+        "series_title": "Official exchange rate (LCU per US$, period average)",
+        "periodicity": "Annual",
+        "unit": "",
+        "statistical_concept": (
+            "The exchange rate is the price of one currency in terms of "
+            "another. Official exchange rates and exchange rate arrangements "
+            "are established by governments."),
+    }
+    rows = [{"indicator_code_raw": m.FX_INDICATOR_CODE,
+             "observation_year": "2015"}]
+    row = m._semantic_row("WDI_X", "", "b" * 64, m.FX_INDICATOR_CODE, meta,
+                          True, rows)
+    assert row["compatibility_status"] == "UNRESOLVED"
+    assert row["fx_pair_semantic_compatibility_status"] == "UNRESOLVED"
+    assert row["currency_denomination_verified"] is False
+    assert row["valuation_definition_verified"] is False
+    assert row["no_redenomination_or_unit_break_verified"] is False
+    assert "generic construct and unit label only" in row["unresolved_reason"]
+
+
+def test_a_stated_redenomination_is_fail_integrity_not_unresolved():
+    meta = {
+        "series_title": "Official exchange rate (LCU per US$, period average)",
+        "periodicity": "Annual", "unit": "LCU per US$",
+        "statistical_concept": "A redenomination occurred during this period.",
+    }
+    rows = [{"indicator_code_raw": m.FX_INDICATOR_CODE,
+             "observation_year": "2015"}]
+    row = m._semantic_row("WDI_X", "", "b" * 64, m.FX_INDICATOR_CODE, meta,
+                          True, rows)
+    assert row["compatibility_status"] == "FAIL_INTEGRITY"
+
+
+def test_silence_about_a_break_is_never_proof_of_absence():
+    meta = {"series_title": "Official exchange rate (LCU per US$, period "
+                            "average)", "periodicity": "Annual", "unit": ""}
+    rows = [{"indicator_code_raw": m.FX_INDICATOR_CODE,
+             "observation_year": "2015"}]
+    row = m._semantic_row("WDI_X", "", "b" * 64, m.FX_INDICATOR_CODE, meta,
+                          True, rows)
+    assert row["no_redenomination_or_unit_break_verified"] is False
+
+
+def test_every_real_fx_row_is_unresolved_and_recomputed(built):
+    fx = [r for r in built["semantic_compatibility"]
+          if r["indicator_code"] == m.FX_INDICATOR_CODE]
+    assert fx, "FX rows must exist"
+    assert built["evidence_summary"]["fx_semantic_pass_count"] == 0
+    assert built["evidence_summary"]["fx_semantic_unresolved_count"] == len(fx)
+    for row in fx:
+        assert row["compatibility_status"] == "UNRESOLVED"
+        assert row["currency_denomination_verified"] is False
+        assert row["no_redenomination_or_unit_break_verified"] is False
+
+
+def test_cpi_rows_stay_pass_with_their_unit_provenance_disclosed(built):
+    cpi = [r for r in built["semantic_compatibility"]
+           if r["indicator_code"] == m.CPI_INDICATOR_CODE]
+    assert cpi
+    for row in cpi:
+        assert row["compatibility_status"] == "PASS"
+        assert row["unit_evidence_source"]
+        assert row["calendar_year_evidence_locator"]
+    text = built["artifact_texts"][m.SEMANTIC_REL]
+    assert "unit_evidence_source" in text.splitlines()[0]
+
+
+def test_semantic_counts_are_not_hard_coded():
+    source = (ROOT / "project/src"
+              / "stage128_m3i2_official_source_evidence_capture.py").read_text(
+                  encoding="utf-8")
+    assert "semantic_pass_count = 32" not in source
+    assert "= 32\n" not in source
+
+
+# --------------------------------------------------------------------------- #
+# Section 5 — the two capture invocations
+# --------------------------------------------------------------------------- #
+
+def test_both_invocations_are_disclosed_in_the_committed_package(built):
+    record = built["continuation_record"]
+    assert record["capture_invocations"] == 2
+    assert record["invocation_1_role"] == "discovery_only"
+    assert record["invocation_1_request_count"] == 5
+    assert record["invocation_1_closed"] is True
+    assert record["invocation_2_role"] == "required_archive_completion"
+    assert record["invocation_2_request_count"] == 16
+    assert record["invocation_2_closed"] is True
+    assert m.CONTINUATION_REL in built["artifact_texts"]
+
+
+def test_the_continuation_decision_is_recorded_verbatim(built):
+    record = built["continuation_record"]
+    assert record["continuation_was_explicitly_requested_from_human"] is True
+    assert record["continuation_selected_option_text"] == (
+        "capture را کامل کن (پیشنهادی)")
+    assert record["continuation_question_context"]
+    assert record["continuation_scope_changed"] is False
+    assert record["continuation_authorized_new_scientific_action"] is False
+    assert record[
+        "continuation_authorized_only_completion_of_same_capture"] is True
+
+
+def test_no_timestamp_is_invented_for_the_continuation(built):
+    record = built["continuation_record"]
+    assert record["continuation_timestamp_status"] == (
+        "UNRESOLVED_EXACT_TIMESTAMP")
+
+
+def test_the_initial_authorization_record_is_preserved(built):
+    assert m.AUTHORIZATION_REL in built["artifact_texts"]
+    assert built["continuation_record"][
+        "supplements_but_does_not_replace"].endswith(
+        "human_authorization_record.json")
+    assert built["authorization_record"]["authorization_sha256"] == (
+        m.HUMAN_AUTHORIZATION_SHA256)
+
+
+def test_a_second_invocation_without_continuation_authorization_fails():
+    with pytest.raises(ERROR):
+        m.assert_continuation_record_is_sound({
+            "capture_invocations": 2,
+            "continuation_was_explicitly_requested_from_human": False,
+            "third_invocation_present": False})
+
+
+@pytest.mark.parametrize("bad", [
+    {"continuation_scope_changed": True},
+    {"continuation_authorized_new_scientific_action": True},
+    {"continuation_authorized_only_completion_of_same_capture": False},
+    {"continuation_selected_option_text": ""},
+])
+def test_a_widened_continuation_fails_closed(bad):
+    record = {
+        "capture_invocations": 2,
+        "continuation_was_explicitly_requested_from_human": True,
+        "continuation_selected_option_text": "x",
+        "continuation_scope_changed": False,
+        "continuation_authorized_new_scientific_action": False,
+        "continuation_authorized_only_completion_of_same_capture": True,
+        "third_invocation_present": False,
+    }
+    record.update(bad)
+    with pytest.raises(ERROR):
+        m.assert_continuation_record_is_sound(record)
+
+
+@pytest.mark.parametrize("record", [
+    {"capture_invocations": 3, "third_invocation_present": False},
+    {"capture_invocations": 2, "third_invocation_present": True,
+     "continuation_was_explicitly_requested_from_human": True,
+     "continuation_selected_option_text": "x",
+     "continuation_scope_changed": False,
+     "continuation_authorized_new_scientific_action": False,
+     "continuation_authorized_only_completion_of_same_capture": True},
+])
+def test_a_third_invocation_fails_closed(record):
+    with pytest.raises(ERROR):
+        m.assert_continuation_record_is_sound(record)
+
+
+# --------------------------------------------------------------------------- #
+# Section 2 — the captured evidence itself is frozen
+# --------------------------------------------------------------------------- #
+
+def test_capture_manifests_are_byte_identical_to_the_correction_base():
+    result = m.assert_capture_manifests_unchanged(ROOT)
+    assert result["frozen_against_head"] == (
+        "4c7c6114dcda7b3b1382ee3eb48367522d1fd2a2")
+    assert result["no_new_network_requests"] is True
+
+
+def test_the_original_21_requests_are_unchanged(built):
+    assert len(built["response_manifest"]) == 21
+    assert all(r["capture_result"] == "SUCCESS"
+               for r in built["response_manifest"])
+    assert built["evidence_summary"]["official_responses_retained"] == 21
+    assert built["evidence_summary"]["raw_bytes_total"] == 1066295643
 
 
 # --------------------------------------------------------------------------- #
@@ -672,6 +991,71 @@ def test_a_missing_bundle_part_fails_closed(tmp_path):
             {"bundle_parts": [{"filename": "absent.zip", "sha256": "0" * 64}]},
             tmp_path)
     assert "STOP_RAW_BYTES_NOT_RETAINED" in str(exc.value)
+
+
+def test_multipart_parts_are_valid_bounded_zips(tmp_path):
+    capture = tmp_path / "capture"
+    (capture / "raw").mkdir(parents=True)
+    for name in ("a.bin", "b.bin", "c.bin"):
+        (capture / "raw" / name).write_bytes(name.encode() * 1000)
+    manifest = m.build_multipart_handoff_bundle(capture, tmp_path / "mp")
+    assert manifest["multipart_total_parts"] >= 1
+    assert manifest["every_member_assigned_exactly_once"] is True
+    assert manifest["parts_are_valid_zip_archives"] is True
+    for part in manifest["multipart_parts"]:
+        assert part["byte_size"] <= m.MULTIPART_MAX_BYTES
+        path = tmp_path / "mp" / part["filename"]
+        with zipfile.ZipFile(path) as zf:      # a real ZIP, not a byte slice
+            assert zf.testzip() is None
+            assert m.MULTIPART_HANDOFF_MANIFEST_MEMBER in zf.namelist()
+    assert (tmp_path / "mp" / "SHA256SUMS.txt").is_file()
+    # originals untouched
+    assert (capture / "raw" / "a.bin").read_bytes() == b"a.bin" * 1000
+
+
+def test_multipart_allocation_covers_every_member_exactly_once(tmp_path):
+    capture = tmp_path / "capture"
+    capture.mkdir()
+    for i in range(5):
+        (capture / f"f{i}.bin").write_bytes(bytes([i]) * 500)
+    manifest = m.build_multipart_handoff_bundle(capture, tmp_path / "mp")
+    allocated = [mem["member_path"]
+                 for part in manifest["multipart_parts"]
+                 for mem in part["members"]]
+    assert sorted(allocated) == sorted(f"f{i}.bin" for i in range(5))
+    assert len(allocated) == len(set(allocated))
+    assert all(mem["primary_member"] is True
+               for part in manifest["multipart_parts"]
+               for mem in part["members"])
+
+
+def test_multipart_is_deterministic(tmp_path):
+    capture = tmp_path / "capture"
+    capture.mkdir()
+    (capture / "x.bin").write_bytes(b"x" * 4096)
+    first = m.build_multipart_handoff_bundle(capture, tmp_path / "one")
+    second = m.build_multipart_handoff_bundle(capture, tmp_path / "two")
+    assert [p["sha256"] for p in first["multipart_parts"]] == (
+        [p["sha256"] for p in second["multipart_parts"]])
+
+
+def test_a_tampered_part_fails_closed(tmp_path):
+    capture = tmp_path / "capture"
+    capture.mkdir()
+    (capture / "x.bin").write_bytes(b"x" * 100)
+    manifest = m.build_multipart_handoff_bundle(capture, tmp_path / "mp")
+    manifest["multipart_parts"][0]["sha256"] = "0" * 64
+    with pytest.raises(ERROR) as exc:
+        m.verify_multipart_bundle(manifest, tmp_path / "mp")
+    assert "STOP_EXTERNAL_BUNDLE_HASH_MISMATCH" in str(exc.value)
+
+
+def test_independent_verification_is_not_claimed_before_delivery(built):
+    manifest = built["bundle_manifest"]
+    assert manifest.get("independently_verified_by_auditor") is False
+    assert manifest.get("delivered_to_independent_auditor") is False
+    assert manifest.get("files_the_human_must_upload")
+    assert manifest.get("original_single_bundle_retained") is True
 
 
 def test_raw_bytes_are_never_committed_to_git(built):
@@ -872,10 +1256,10 @@ def test_every_required_artifact_is_produced(built):
         m.REQUIRED_EDITIONS_REL, m.REQUEST_MANIFEST_REL,
         m.RESPONSE_MANIFEST_REL, m.LOCKED_SERIES_REL, m.SEMANTIC_REL,
         m.IMF_CATALOG_REL, m.FINANCING_EVIDENCE_REL, m.BUNDLE_MANIFEST_REL,
-        m.DECISION_REL, m.QC_REL, m.METADATA_REL,
+        m.DECISION_REL, m.QC_REL, m.METADATA_REL, m.CONTINUATION_REL,
     }
     assert set(built["artifact_texts"]) == required
-    assert len(required) == 17
+    assert len(required) == 18
 
 
 def test_offline_rebuild_is_deterministic():
