@@ -52,26 +52,106 @@ from typing import Any
 
 ACTION_ID = "stage128-m3i2-prospective-contract-lock"
 CONTRACT_ID = "stage128_m3_intl_macro_contract_lock"
-CONTRACT_VERSION = "stage128_m3_intl_macro_contract_lock_v1_1"
-#: v1_1 closes the two independent-audit blockers: the observation-year
+CONTRACT_VERSION = "stage128_m3_intl_macro_contract_lock_v1_2"
+#: v1_1 closed the two independent-audit blockers: the observation-year
 #: selection rule inside a vintage, and historical-vintage semantic /
-#: currency-unit compatibility. No scope was widened.
+#: currency-unit compatibility.
+#: v1_2 aligns the PR topology after PR #73 was merged and PR #74 was
+#: retargeted to main. It is a GOVERNANCE-ONLY change: no candidate,
+#: transformation, threshold, Holm family, missing-value rule or
+#: point-in-time rule was touched, and no scope was widened.
 CONTRACT_TYPE = "prospective_contract_lock_only_no_data_no_gate_no_modeling"
 
 REPOSITORY = "abtinasg/papermali"
 
-#: Live ``origin/main`` at the time this action was authorized. This action is
-#: NOT based on main: PR #73 is still open and unmerged.
-MAIN_BRANCH = "main"
-MAIN_COMMIT = "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2"
+# --------------------------------------------------------------------------- #
+# Topology
+#
+# TWO DIFFERENT THINGS, deliberately kept apart:
+#
+# * SCIENTIFIC PROVENANCE — the exact PR #73 head this contract was locked
+#   against. It is immutable. Protected scientific hashes are verified against
+#   it forever, and the merge of PR #73 does NOT move it. A retarget is a
+#   GitHub fact, not a scientific one.
+# * LIVE PR TOPOLOGY — where PR #74 actually sits right now. PR #73 has since
+#   been merged into main, and PR #74 was retargeted to main afterwards, so
+#   the live base is main and the "may not target main" rule no longer holds.
+#
+# Conflating the two is exactly the post-merge blocker this section fixes.
+# --------------------------------------------------------------------------- #
 
-#: The exact PR #73 head this branch is stacked on.
-BASELINE_BRANCH = "stage128-m3-macro-data-gate"
-BASELINE_COMMIT = "e6db63fb7d105f0d3a39db101c9e364161c367e9"
-BASELINE_PR_NUMBER = 73
+# --- immutable scientific provenance --------------------------------------- #
 
-HEAD_BRANCH = "stage128-m3i2-prospective-contract-lock"
-PR_BASE_BRANCH = BASELINE_BRANCH
+SCIENTIFIC_PROVENANCE_BASELINE_BRANCH = "stage128-m3-macro-data-gate"
+SCIENTIFIC_PROVENANCE_BASELINE_COMMIT = (
+    "e6db63fb7d105f0d3a39db101c9e364161c367e9")
+SCIENTIFIC_PROVENANCE_BASELINE_PR_NUMBER = 73
+
+#: Retained names. Every protected-artifact hash is verified against
+#: ``BASELINE_COMMIT``, which is and stays the PR #73 HEAD — never the merge
+#: commit that later carried PR #73 into main.
+BASELINE_BRANCH = SCIENTIFIC_PROVENANCE_BASELINE_BRANCH
+BASELINE_COMMIT = SCIENTIFIC_PROVENANCE_BASELINE_COMMIT
+BASELINE_PR_NUMBER = SCIENTIFIC_PROVENANCE_BASELINE_PR_NUMBER
+
+# --- live PR topology ------------------------------------------------------ #
+
+LIVE_MAIN_BRANCH = "main"
+LIVE_MAIN_COMMIT = "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a"
+
+LIVE_PR_NUMBER = 74
+LIVE_PR_BASE_BRANCH = "main"
+LIVE_PR_BASE_COMMIT = "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a"
+LIVE_PR_HEAD_BRANCH = "stage128-m3i2-prospective-contract-lock"
+LIVE_PR_HEAD_COMMIT_AT_ALIGNMENT_START = (
+    "22b747d4c55febe6839685ef9805d795eb9d8fa6")
+LIVE_PR_IS_DRAFT = True
+LIVE_PR_MERGED = False
+
+PREDECESSOR_PR_NUMBER = 73
+PREDECESSOR_PR_HEAD_COMMIT = "e6db63fb7d105f0d3a39db101c9e364161c367e9"
+PREDECESSOR_PR_MERGED = True
+PREDECESSOR_PR_MERGE_COMMIT = "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a"
+
+PR_IS_STACKED_ON_OPEN_PREDECESSOR = False
+RETARGETED_TO_MAIN_AFTER_PREDECESSOR_MERGE_VERIFIED = True
+MAY_TARGET_MAIN = True
+
+#: No merge authorization has been issued for PR #74, in any topology state.
+MERGE_AUTHORIZED = False
+
+# --- historical, pre-merge topology (kept, never silently dropped) --------- #
+
+#: What the contract correctly described BEFORE PR #73 was merged. Retained as
+#: history so no field is deleted without a migration; it is explicitly marked
+#: superseded and must never be read as current.
+HISTORICAL_PRE_MERGE_TOPOLOGY: dict[str, Any] = {
+    "superseded": True,
+    "superseded_by": "post_predecessor_merge_retarget_to_main",
+    "describes_current_state": False,
+    "main_branch_at_contract_lock": "main",
+    "main_commit_at_contract_lock":
+        "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2",
+    "pr_base_branch_at_contract_lock": "stage128-m3-macro-data-gate",
+    "pr_base_commit_at_contract_lock":
+        "e6db63fb7d105f0d3a39db101c9e364161c367e9",
+    "pr_was_stacked_on_then_open_predecessor": True,
+    "predecessor_pr_number": 73,
+    "predecessor_pr_was_merged_at_contract_lock": False,
+    "may_target_main_at_contract_lock": False,
+    "note": (
+        "These values were accurate at the M3I-2 contract lock and are kept "
+        "for provenance only. PR #73 was merged by "
+        "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a and PR #74 was retargeted "
+        "to main afterwards; the live_* fields are authoritative."),
+}
+
+#: Retained for readers of the historical narrative only.
+MAIN_BRANCH = LIVE_MAIN_BRANCH
+MAIN_COMMIT_AT_CONTRACT_LOCK = "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2"
+
+HEAD_BRANCH = LIVE_PR_HEAD_BRANCH
+PR_BASE_BRANCH = LIVE_PR_BASE_BRANCH
 
 PREDECESSOR_ACTION_ID = "stage128-m3-macro-data-gate"
 
@@ -85,7 +165,11 @@ PACKAGE_DIR_REL = "project/stage128/m3_intl_macro_contract_lock"
 CORRECTED_FROM_COMMIT = "6351381283c14b248b4349b1d5ca240dde5cfe3f"
 PR_NUMBER = 74
 RESULT_CODE = (
-    "M3I2_PROSPECTIVE_CONTRACT_LOCK_READY_FOR_INDEPENDENT_REAUDIT")
+    "M3I2_POST_PREDECESSOR_MERGE_TOPOLOGY_ALIGNED_READY_FOR_INDEPENDENT_"
+    "AUDIT")
+#: The head that the previous independent audit examined, before this
+#: topology-only alignment.
+ALIGNED_FROM_COMMIT = "22b747d4c55febe6839685ef9805d795eb9d8fa6"
 CORRECTION_BLOCKERS_CLOSED: tuple[str, ...] = (
     "observation_year_selection_rule_inside_the_selected_wdi_vintage",
     "historical_archive_vintage_semantic_and_currency_unit_compatibility",
@@ -1006,7 +1090,24 @@ def _walk(payload: Any, prefix: str = "") -> list[tuple[str, Any]]:
 
 
 _M4_START_KEY = re.compile(r"m4_.*(start|authoriz)", re.IGNORECASE)
-_MERGE_KEY = re.compile(r"merge", re.IGNORECASE)
+
+#: Rule 17 targets merge *AUTHORIZATION*, not the factual record that the
+#: PREDECESSOR was merged. Since PR #73 merged, keys such as
+#: ``predecessor_pr_merged`` and
+#: ``retargeted_to_main_after_predecessor_merge_verified`` are legitimately
+#: true; a blanket /merge/ match would have made recording reality impossible.
+#: The pattern therefore matches permission-shaped keys only.
+_MERGE_AUTHORIZATION_KEY = re.compile(
+    r"(merge_authoriz|authoriz\w*_to_merge|may_merge|merge_allowed|"
+    r"merge_permitted|merge_approved|merge_enabled|auto_merge|"
+    r"ready_to_merge|merge_ok)", re.IGNORECASE)
+
+#: Factual merge-state keys that are allowed to be true. CLOSED list.
+FACTUAL_MERGE_STATE_KEYS: tuple[str, ...] = (
+    "predecessor_pr_merged",
+    "predecessor_pr_was_merged_at_contract_lock",
+    "retargeted_to_main_after_predecessor_merge_verified",
+)
 
 
 def assert_no_m4_start_flag(payload: Any) -> None:
@@ -1018,11 +1119,41 @@ def assert_no_m4_start_flag(payload: Any) -> None:
 
 
 def assert_no_merge_authorized_flag(payload: Any) -> None:
-    """Validator rule 17 — no merge-authorized flag may be true anywhere."""
-    bad = [path for path, value in _walk(payload)
-           if value is True and _MERGE_KEY.search(path.rsplit(".", 1)[-1])]
+    """Validator rule 17 — no merge-AUTHORIZATION flag may be true anywhere.
+
+    Recording that the PREDECESSOR merged is a fact and is permitted. Claiming
+    that THIS PR may be merged is not.
+    """
+    bad: list[str] = []
+    for path, value in _walk(payload):
+        key = path.rsplit(".", 1)[-1]
+        if value is not True:
+            continue
+        if key in FACTUAL_MERGE_STATE_KEYS:
+            continue
+        if _MERGE_AUTHORIZATION_KEY.search(key):
+            bad.append(path)
     if bad:
         raise M3IntlMacroContractLockError(f"merge-authorized flag: {bad}")
+    # And the explicit field must exist and be false wherever it appears.
+    explicit = [path for path, value in _walk(payload)
+                if path.rsplit(".", 1)[-1] == "merge_authorized"
+                and value is not False]
+    if explicit:
+        raise M3IntlMacroContractLockError(
+            f"merge_authorized must be false everywhere: {explicit}")
+
+
+def assert_this_pr_is_not_merged_or_ready(payload: Any) -> None:
+    """PR #74 itself must stay Draft and unmerged in every artifact."""
+    bad = [f"{path}={value!r}" for path, value in _walk(payload)
+           if path.rsplit(".", 1)[-1] == "live_pr_merged" and value is not False]
+    bad += [f"{path}={value!r}" for path, value in _walk(payload)
+            if path.rsplit(".", 1)[-1] == "live_pr_is_draft"
+            and value is not True]
+    if bad:
+        raise M3IntlMacroContractLockError(
+            f"PR #{LIVE_PR_NUMBER} must remain a Draft and unmerged: {bad}")
 
 
 def assert_unresolved_values_are_null_not_zero(gate: dict[str, Any]) -> None:
@@ -1337,18 +1468,109 @@ def assert_confirmatory_family_unchanged(mult: dict[str, Any]) -> None:
             "no Holm adjustment may be executed in this action")
 
 
-def assert_pr_base_is_not_main(decision: dict[str, Any]) -> None:
-    """Rule 18 — no direct base on ``main`` while PR #73 remains open."""
-    if decision.get("pr_base_branch") != PR_BASE_BRANCH:
+def assert_live_pr_topology(topology: dict[str, Any]) -> None:
+    """Rule 18 (post-merge form) — the base rule is STATE-DEPENDENT.
+
+    The old rule was unconditional ("never base on main"). It was correct only
+    while PR #73 was open. Now that PR #73 is merged and PR #74 was retargeted,
+    an unconditional rule would reject the live, correct topology. Both states
+    are therefore validated explicitly, and each fails closed.
+
+    What is NOT state-dependent: the PR stays Draft, stays unmerged, and no
+    merge authorization exists — in either branch of the logic.
+    """
+    merged = topology.get("predecessor_pr_merged")
+    # Identity, not equality: 1 == True in Python, and "roughly a boolean" is
+    # not good enough for a flag that selects which topology rule applies.
+    if merged is not True and merged is not False:
         raise M3IntlMacroContractLockError(
-            f"the stacked PR base must be {PR_BASE_BRANCH}; got "
-            f"{decision.get('pr_base_branch')!r}")
-    if decision.get("pr_base_branch") == MAIN_BRANCH:
+            f"predecessor_pr_merged must be an explicit boolean; got "
+            f"{merged!r}")
+
+    base = topology.get("live_pr_base_branch")
+    stacked = topology.get("pr_is_stacked_on_open_predecessor")
+    may_main = topology.get("may_target_main")
+
+    if merged is False:
+        # --- predecessor still open: the original stacked rule holds ------ #
+        if base != SCIENTIFIC_PROVENANCE_BASELINE_BRANCH:
+            raise M3IntlMacroContractLockError(
+                f"while PR #{PREDECESSOR_PR_NUMBER} is open the base must be "
+                f"{SCIENTIFIC_PROVENANCE_BASELINE_BRANCH}; got {base!r}")
+        if stacked is not True:
+            raise M3IntlMacroContractLockError(
+                "while the predecessor is open the PR is stacked on it")
+        if may_main is not False:
+            raise M3IntlMacroContractLockError(
+                "the PR may not target main while the predecessor is open")
+    else:
+        # --- predecessor merged: the retarget to main is the correct state  #
+        merge_commit = topology.get("predecessor_pr_merge_commit")
+        if not merge_commit:
+            raise M3IntlMacroContractLockError(
+                "the predecessor is marked merged without a merge commit")
+        if merge_commit != PREDECESSOR_PR_MERGE_COMMIT:
+            raise M3IntlMacroContractLockError(
+                f"predecessor merge commit must be "
+                f"{PREDECESSOR_PR_MERGE_COMMIT}; got {merge_commit!r}")
+        if topology.get("live_main_commit") != PREDECESSOR_PR_MERGE_COMMIT:
+            raise M3IntlMacroContractLockError(
+                f"live main must be the predecessor merge commit "
+                f"{PREDECESSOR_PR_MERGE_COMMIT}; got "
+                f"{topology.get('live_main_commit')!r}")
+        if base == SCIENTIFIC_PROVENANCE_BASELINE_BRANCH:
+            raise M3IntlMacroContractLockError(
+                "the base still names the merged predecessor branch; after "
+                "the predecessor merged the base must be main")
+        if base != LIVE_MAIN_BRANCH:
+            raise M3IntlMacroContractLockError(
+                f"after the predecessor merged the base must be "
+                f"{LIVE_MAIN_BRANCH}; got {base!r}")
+        if topology.get("live_pr_base_commit") != PREDECESSOR_PR_MERGE_COMMIT:
+            raise M3IntlMacroContractLockError(
+                f"the live PR base commit must equal current main "
+                f"{PREDECESSOR_PR_MERGE_COMMIT}; got "
+                f"{topology.get('live_pr_base_commit')!r}")
+        if stacked is not False:
+            raise M3IntlMacroContractLockError(
+                "the predecessor is merged, so the PR is no longer stacked "
+                "on an open predecessor")
+        if topology.get(
+                "retargeted_to_main_after_predecessor_merge_verified") is not (
+                True):
+            raise M3IntlMacroContractLockError(
+                "the retarget to main must be recorded as verified only "
+                "AFTER the predecessor merge was verified")
+        if may_main is not True:
+            raise M3IntlMacroContractLockError(
+                "after the predecessor merged the PR may target main")
+
+    # --- invariant in BOTH states ----------------------------------------- #
+    if topology.get("scientific_provenance_baseline_commit") != (
+            SCIENTIFIC_PROVENANCE_BASELINE_COMMIT):
         raise M3IntlMacroContractLockError(
-            "this PR may not target main while PR #73 is open")
-    if decision.get("predecessor_pr_merged") is not False:
+            f"the scientific provenance baseline must remain the PR #"
+            f"{PREDECESSOR_PR_NUMBER} head "
+            f"{SCIENTIFIC_PROVENANCE_BASELINE_COMMIT}; got "
+            f"{topology.get('scientific_provenance_baseline_commit')!r}")
+    if topology.get("scientific_provenance_baseline_commit") == (
+            PREDECESSOR_PR_MERGE_COMMIT):
         raise M3IntlMacroContractLockError(
-            "PR #73 is recorded as unmerged; a merged claim is a scope breach")
+            "the scientific provenance baseline was overwritten by the merge "
+            "commit; a merge does not move the audited baseline")
+    if topology.get("scientific_provenance_baseline_branch") != (
+            SCIENTIFIC_PROVENANCE_BASELINE_BRANCH):
+        raise M3IntlMacroContractLockError(
+            "the scientific provenance baseline branch was altered")
+    if topology.get("live_pr_is_draft") is not True:
+        raise M3IntlMacroContractLockError(
+            "PR #74 must remain a Draft; marking it ready is not authorized")
+    if topology.get("live_pr_merged") is not False:
+        raise M3IntlMacroContractLockError(
+            "PR #74 must remain unmerged")
+    if topology.get("merge_authorized") is not False:
+        raise M3IntlMacroContractLockError(
+            "no merge authorization has been issued for PR #74")
 
 
 def assert_scope_not_identified_by_hash_alone(auth: dict[str, Any]) -> None:
@@ -1598,10 +1820,54 @@ def build_authorization_record() -> dict[str, Any]:
         "merge_authorized": False,
 
         "source_repository": REPOSITORY,
-        "source_main_branch": MAIN_BRANCH,
-        "source_main_commit": MAIN_COMMIT,
+        "source_main_branch": LIVE_MAIN_BRANCH,
+        "source_main_commit": LIVE_MAIN_COMMIT,
+        "main_commit_at_contract_lock": MAIN_COMMIT_AT_CONTRACT_LOCK,
         "branch_baseline_branch": BASELINE_BRANCH,
         "branch_baseline_commit": BASELINE_COMMIT,
+    }
+
+
+def build_live_topology() -> dict[str, Any]:
+    """The CURRENT PR topology, kept strictly apart from scientific provenance."""
+    return {
+        # immutable scientific provenance — a merge never moves this
+        "scientific_provenance_baseline_branch":
+            SCIENTIFIC_PROVENANCE_BASELINE_BRANCH,
+        "scientific_provenance_baseline_commit":
+            SCIENTIFIC_PROVENANCE_BASELINE_COMMIT,
+        "scientific_provenance_baseline_pr_number":
+            SCIENTIFIC_PROVENANCE_BASELINE_PR_NUMBER,
+        "protected_hashes_verified_against":
+            SCIENTIFIC_PROVENANCE_BASELINE_COMMIT,
+        "branch_rebased_after_retarget": False,
+
+        # live topology
+        "live_main_branch": LIVE_MAIN_BRANCH,
+        "live_main_commit": LIVE_MAIN_COMMIT,
+        "live_pr_number": LIVE_PR_NUMBER,
+        "live_pr_base_branch": LIVE_PR_BASE_BRANCH,
+        "live_pr_base_commit": LIVE_PR_BASE_COMMIT,
+        "live_pr_head_branch": LIVE_PR_HEAD_BRANCH,
+        "live_pr_head_commit_at_alignment_start":
+            LIVE_PR_HEAD_COMMIT_AT_ALIGNMENT_START,
+        "live_pr_is_draft": LIVE_PR_IS_DRAFT,
+        "live_pr_merged": LIVE_PR_MERGED,
+
+        # predecessor
+        "predecessor_pr_number": PREDECESSOR_PR_NUMBER,
+        "predecessor_pr_head_commit": PREDECESSOR_PR_HEAD_COMMIT,
+        "predecessor_pr_merged": PREDECESSOR_PR_MERGED,
+        "predecessor_pr_merge_commit": PREDECESSOR_PR_MERGE_COMMIT,
+
+        "pr_is_stacked_on_open_predecessor":
+            PR_IS_STACKED_ON_OPEN_PREDECESSOR,
+        "retargeted_to_main_after_predecessor_merge_verified":
+            RETARGETED_TO_MAIN_AFTER_PREDECESSOR_MERGE_VERIFIED,
+        "may_target_main": MAY_TARGET_MAIN,
+        "merge_authorized": MERGE_AUTHORIZED,
+
+        "historical_pre_merge_topology": dict(HISTORICAL_PRE_MERGE_TOPOLOGY),
     }
 
 
@@ -1611,19 +1877,20 @@ def build_governance_boundary() -> dict[str, Any]:
         "generated_for": ACTION_ID,
         "contract_type": CONTRACT_TYPE,
         "repository": REPOSITORY,
-        "main_branch": MAIN_BRANCH,
-        "main_commit": MAIN_COMMIT,
+        "live_topology": build_live_topology(),
+        "main_branch": LIVE_MAIN_BRANCH,
+        "main_commit": LIVE_MAIN_COMMIT,
         "baseline_pr_number": BASELINE_PR_NUMBER,
         "baseline_branch": BASELINE_BRANCH,
         "baseline_commit": BASELINE_COMMIT,
         "head_branch": HEAD_BRANCH,
-        "pr_base_branch": PR_BASE_BRANCH,
-        "pr_is_draft": True,
-        "pr_is_stacked_on_open_pr": True,
+        "pr_base_branch": LIVE_PR_BASE_BRANCH,
+        "pr_is_draft": LIVE_PR_IS_DRAFT,
+        "pr_is_stacked_on_open_pr": PR_IS_STACKED_ON_OPEN_PREDECESSOR,
         "predecessor_action_id": PREDECESSOR_ACTION_ID,
-        "predecessor_pr_merged": False,
-        "may_target_main": False,
-        "merge_authorized": False,
+        "predecessor_pr_merged": PREDECESSOR_PR_MERGED,
+        "may_target_main": MAY_TARGET_MAIN,
+        "merge_authorized": MERGE_AUTHORIZED,
 
         # the preserved CBI block
         "m3_cbi_block": {
@@ -1838,22 +2105,25 @@ def build_decision(
         "decision": "M3I2_CONTRACT_PROSPECTIVELY_LOCKED",
         "result_code": RESULT_CODE,
         "correction_of_prior_head": CORRECTED_FROM_COMMIT,
+        "topology_aligned_from_head": ALIGNED_FROM_COMMIT,
+        "topology_alignment_changed_scientific_contract": False,
         "correction_closes_audit_blockers": list(CORRECTION_BLOCKERS_CLOSED),
         "correction_widened_scope": False,
 
         # topology
         "repository": REPOSITORY,
-        "source_main_branch": MAIN_BRANCH,
-        "source_main_commit": MAIN_COMMIT,
+        "live_topology": build_live_topology(),
+        "source_main_branch": LIVE_MAIN_BRANCH,
+        "source_main_commit": LIVE_MAIN_COMMIT,
         "baseline_pr_number": BASELINE_PR_NUMBER,
         "baseline_branch": BASELINE_BRANCH,
         "baseline_commit": BASELINE_COMMIT,
         "head_branch": HEAD_BRANCH,
-        "pr_base_branch": PR_BASE_BRANCH,
-        "pr_is_draft": True,
+        "pr_base_branch": LIVE_PR_BASE_BRANCH,
+        "pr_is_draft": LIVE_PR_IS_DRAFT,
         "predecessor_action_id": PREDECESSOR_ACTION_ID,
-        "predecessor_pr_merged": False,
-        "may_target_main": False,
+        "predecessor_pr_merged": PREDECESSOR_PR_MERGED,
+        "may_target_main": MAY_TARGET_MAIN,
 
         # the preserved CBI contract
         "m3_cbi_gate_status": M3_CBI_STATUS,
@@ -1960,18 +2230,52 @@ def build_qc_report(
           lambda: assert_scope_not_identified_by_hash_alone(authorization))
 
     # -- topology ---------------------------------------------------------- #
-    check("exact_pr73_head_baseline",
+    topology = decision["live_topology"]
+    check("scientific_provenance_baseline_is_still_the_pr73_head",
           decision["baseline_commit"] == BASELINE_COMMIT
           == "e6db63fb7d105f0d3a39db101c9e364161c367e9"
-          and decision["baseline_branch"] == BASELINE_BRANCH)
-    check("live_main_commit_recorded",
-          decision["source_main_commit"] == MAIN_COMMIT)
-    # rule 18
-    guard("stacked_pr_base_is_not_main",
-          lambda: assert_pr_base_is_not_main(decision))
-    check("pr_is_draft_and_unmerged",
-          decision["pr_is_draft"] is True
-          and decision["predecessor_pr_merged"] is False)
+          and decision["baseline_branch"] == BASELINE_BRANCH
+          and topology["scientific_provenance_baseline_commit"]
+          == "e6db63fb7d105f0d3a39db101c9e364161c367e9"
+          and topology["protected_hashes_verified_against"]
+          == "e6db63fb7d105f0d3a39db101c9e364161c367e9")
+    check("provenance_baseline_was_not_replaced_by_the_merge_commit",
+          topology["scientific_provenance_baseline_commit"]
+          != PREDECESSOR_PR_MERGE_COMMIT
+          and topology["branch_rebased_after_retarget"] is False)
+    check("predecessor_merge_is_recorded_with_its_merge_commit",
+          topology["predecessor_pr_merged"] is True
+          and topology["predecessor_pr_merge_commit"]
+          == PREDECESSOR_PR_MERGE_COMMIT
+          and topology["predecessor_pr_head_commit"]
+          == PREDECESSOR_PR_HEAD_COMMIT)
+    check("live_main_equals_the_predecessor_merge_commit",
+          topology["live_main_commit"] == LIVE_MAIN_COMMIT
+          == PREDECESSOR_PR_MERGE_COMMIT
+          and decision["source_main_commit"] == LIVE_MAIN_COMMIT)
+    check("live_base_is_main_and_equals_current_main",
+          topology["live_pr_base_branch"] == LIVE_MAIN_BRANCH
+          and topology["live_pr_base_commit"] == LIVE_MAIN_COMMIT
+          and decision["pr_base_branch"] == LIVE_MAIN_BRANCH)
+    check("no_artifact_still_calls_the_predecessor_open_or_unmerged",
+          topology["pr_is_stacked_on_open_predecessor"] is False
+          and topology["retargeted_to_main_after_predecessor_merge_verified"]
+          is True
+          and governance["pr_is_stacked_on_open_pr"] is False
+          and governance["predecessor_pr_merged"] is True)
+    check("historical_pre_merge_topology_is_kept_but_marked_superseded",
+          topology["historical_pre_merge_topology"]["superseded"] is True
+          and topology["historical_pre_merge_topology"][
+              "describes_current_state"] is False
+          and topology["historical_pre_merge_topology"][
+              "main_commit_at_contract_lock"] == MAIN_COMMIT_AT_CONTRACT_LOCK)
+    # rule 18, post-merge state-dependent form
+    guard("live_pr_topology_matches_the_predecessor_merge_state",
+          lambda: assert_live_pr_topology(topology))
+    check("pr_remains_draft_and_unmerged",
+          topology["live_pr_is_draft"] is True
+          and topology["live_pr_merged"] is False
+          and decision["pr_is_draft"] is True)
 
     # -- rule 1: M3-CBI preserved ------------------------------------------ #
     guard("m3_cbi_block_order_and_source_preserved",
@@ -2181,6 +2485,8 @@ def build_qc_report(
           lambda: assert_no_m4_start_flag(payload))
     guard("no_merge_authorized_flag",
           lambda: assert_no_merge_authorized_flag(payload))
+    guard("this_pr_is_never_recorded_as_ready_or_merged",
+          lambda: assert_this_pr_is_not_merged_or_ready(payload))
     check("final_test_remains_locked",
           decision["final_test_locked"] is True
           and decision["final_test_access_authorized"] is False
@@ -2276,8 +2582,9 @@ def build_metadata(package_sha256: dict[str, str],
         "protected_file_count": len(protected_manifest),
         "protected_files_sha256": dict(protected_manifest),
         "source_repository": REPOSITORY,
-        "source_main_branch": MAIN_BRANCH,
-        "source_main_commit": MAIN_COMMIT,
+        "source_main_branch": LIVE_MAIN_BRANCH,
+        "source_main_commit": LIVE_MAIN_COMMIT,
+        "live_topology": build_live_topology(),
         "immutability_requirement": (
             "Every path listed in protected_files_sha256 must remain "
             "byte-identical to its bytes at the exact PR #73 head "
@@ -2293,8 +2600,16 @@ def render_readme(decision: dict[str, Any], qc: dict[str, Any]) -> str:
 **Action id:** `{ACTION_ID}`
 **Contract type:** `{CONTRACT_TYPE}`
 **Contract status:** `{decision["m3i2_contract_status"]}`
-**Stacked on:** PR #{BASELINE_PR_NUMBER} head `{BASELINE_COMMIT}`
-(branch `{BASELINE_BRANCH}`), which is **not merged**.
+**Scientific provenance baseline:** PR #{SCIENTIFIC_PROVENANCE_BASELINE_PR_NUMBER}
+head `{SCIENTIFIC_PROVENANCE_BASELINE_COMMIT}` (branch
+`{SCIENTIFIC_PROVENANCE_BASELINE_BRANCH}`). Every protected scientific hash is
+verified against that commit, permanently.
+**Live PR topology:** PR #{PREDECESSOR_PR_NUMBER} **was merged** by merge commit
+`{PREDECESSOR_PR_MERGE_COMMIT}`. PR #{LIVE_PR_NUMBER} was subsequently
+**retargeted to `{LIVE_MAIN_BRANCH}`** (base `{LIVE_PR_BASE_COMMIT}`, the
+current main) and **remains a Draft**. The branch was **not rebased**: a
+retarget moves the PR base, it does not move the audited baseline. **No merge
+authorization has been issued for PR #{LIVE_PR_NUMBER}.**
 
 ```text
 CONTRACT LOCK ONLY
@@ -2454,6 +2769,25 @@ all_pass = **{qc["all_pass"]}**.
 * `m4_authorized` = **false**, `m4_started` = **false**,
   `final_test_locked` = **true**
 * `merge_authorized` = **false**
+
+## Topology, before and after the predecessor merge
+
+The base rule is **state-dependent**, not unconditional. While
+PR #{PREDECESSOR_PR_NUMBER} was open the base had to be
+`{SCIENTIFIC_PROVENANCE_BASELINE_BRANCH}` and `may_target_main` was false. Now
+that PR #{PREDECESSOR_PR_NUMBER} is merged, the base must be
+`{LIVE_MAIN_BRANCH}`, `pr_is_stacked_on_open_predecessor` is false and
+`may_target_main` is true — while `live_pr_is_draft` = true,
+`live_pr_merged` = false and `merge_authorized` = false hold in **both**
+states. The pre-merge values are retained under
+`historical_pre_merge_topology` (marked `superseded`, `describes_current_state`
+= false); nothing was deleted.
+
+This alignment is **governance only**. No candidate identity, transformation,
+threshold, Holm family, missing-value rule or point-in-time rule changed, and
+the two audited scientific corrections — maximum eligible completed Gregorian
+observation-year selection, and historical-vintage semantic / currency
+compatibility — are intact.
 
 Next pointer (informational only): `{NEXT_ACTION_ID}` with
 `next_action_authorized` = **false**. Data collection has **not** started.

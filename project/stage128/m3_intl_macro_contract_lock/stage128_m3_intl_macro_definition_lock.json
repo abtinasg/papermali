@@ -1,6 +1,6 @@
 {
   "contract_id": "stage128_m3_intl_macro_contract_lock",
-  "contract_version": "stage128_m3_intl_macro_contract_lock_v1_1",
+  "contract_version": "stage128_m3_intl_macro_contract_lock_v1_2",
   "generated_for": "stage128-m3i2-prospective-contract-lock",
   "lock_type": "prospective_metadata_only_definition_lock",
   "locked_before_any_value_level_work": true,

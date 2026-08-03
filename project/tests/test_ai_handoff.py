@@ -12,6 +12,7 @@ Two groups:
 from __future__ import annotations
 
 import hashlib
+import copy
 import json
 import os
 import re
@@ -3295,14 +3296,42 @@ def test_m3i2_contract_lock_preserves_the_cbi_block_and_the_firewall():
     assert state["next_research_action_authorized"] is False
 
 
-def test_m3i2_contract_lock_is_stacked_on_the_unmerged_pr73_head():
+def test_m3i2_provenance_baseline_is_still_the_pr73_head():
+    """The PR #73 merge does not move the audited scientific baseline."""
     state = _handoff_state()
     assert state["stage128_m3i2_baseline_pr_number"] == 73
     assert state["stage128_m3i2_baseline_commit"] == (
         "e6db63fb7d105f0d3a39db101c9e364161c367e9")
-    assert state["stage128_m3i2_pr_base_branch"] == (
-        "stage128-m3-macro-data-gate")
-    assert state["stage128_m3i2_pr_base_branch"] != "main"
+    assert state["stage128_m3i2_provenance_baseline_commit"] == (
+        "e6db63fb7d105f0d3a39db101c9e364161c367e9")
+    assert state["stage128_m3i2_provenance_baseline_commit"] != (
+        "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")
+
+
+def test_m3i2_live_topology_is_the_post_merge_retargeted_state():
+    state = _handoff_state()
+    assert state["stage128_m3i2_predecessor_pr_merged"] is True
+    assert state["stage128_m3i2_predecessor_pr_merge_commit"] == (
+        "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")
+    assert state["stage128_m3i2_live_pr_number"] == 74
+    assert state["stage128_m3i2_live_pr_base_branch"] == "main"
+    assert state["stage128_m3i2_live_pr_base_commit"] == (
+        "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")
+    assert state["stage128_m3i2_live_main_commit"] == (
+        "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")
+    assert state["stage128_m3i2_pr_is_stacked_on_open_predecessor"] is False
+    assert state[
+        "stage128_m3i2_retargeted_to_main_after_predecessor_merge_verified"
+    ] is True
+    assert state["stage128_m3i2_may_target_main"] is True
+
+
+def test_m3i2_pr74_stays_draft_unmerged_and_unauthorized():
+    state = _handoff_state()
+    assert state["stage128_m3i2_live_pr_is_draft"] is True
+    assert state["stage128_m3i2_live_pr_merged"] is False
+    assert state["stage128_m3i2_merge_authorized"] is False
+    assert state["next_research_action_authorized"] is False
 
 
 def test_m3i2_marker_derivation_fails_closed_on_a_contradictory_artifact(
@@ -3323,7 +3352,6 @@ def test_m3i2_marker_derivation_fails_closed_on_a_contradictory_artifact(
         ("final_test_locked", False),
         ("macro_observations_read", 12),
         ("m3_cbi_gate_status", "PASS_FOR_M3_INCREMENTAL_EVALUATION"),
-        ("pr_base_branch", "main"),
         ("next_action_authorized", True),
     ):
         root = tmp_path / field.replace("/", "_")
@@ -3334,6 +3362,39 @@ def test_m3i2_marker_derivation_fails_closed_on_a_contradictory_artifact(
             json.dumps(broken, ensure_ascii=False), encoding="utf-8")
         with pytest.raises(gen.HandoffError):
             gen.derive_stage128_m3i2_contract_lock_markers(str(root))
+
+
+@pytest.mark.parametrize("mutation", [
+    # predecessor merged but the base still names the predecessor branch
+    {"live_pr_base_branch": "stage128-m3-macro-data-gate"},
+    # predecessor unmerged while the base is main
+    {"predecessor_pr_merged": False, "live_pr_base_branch": "main"},
+    # merged without / with the wrong merge commit
+    {"predecessor_pr_merge_commit": None},
+    {"predecessor_pr_merge_commit": "0" * 40},
+    # live base SHA not equal to current main
+    {"live_pr_base_commit": "e6db63fb7d105f0d3a39db101c9e364161c367e9"},
+    # provenance baseline replaced by the merge commit
+    {"scientific_provenance_baseline_commit":
+        "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a"},
+    # PR marked ready or merged, or merge authorized
+    {"live_pr_is_draft": False},
+    {"live_pr_merged": True},
+    {"merge_authorized": True},
+])
+def test_m3i2_topology_mutations_fail_closed(tmp_path, mutation):
+    rel = gen._STAGE128_M3I2_CONTRACT_LOCK_REL
+    src = os.path.join(REAL_ROOT, rel)
+    payload = json.load(open(src, encoding="utf-8"))
+
+    root = tmp_path / "topology"
+    (root / os.path.dirname(rel)).mkdir(parents=True, exist_ok=True)
+    broken = copy.deepcopy(payload)
+    broken["live_topology"].update(mutation)
+    (root / rel).write_text(
+        json.dumps(broken, ensure_ascii=False), encoding="utf-8")
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage128_m3i2_contract_lock_markers(str(root))
 
 
 def test_current_state_renders_the_m3i2_contract_lock_section():

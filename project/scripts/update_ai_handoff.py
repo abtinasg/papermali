@@ -4340,11 +4340,19 @@ def render_current_state(record: dict) -> str:
             "- **M3-CBI preserved unchanged:** Gate status "
             f"`{record.get('m3_macro_data_gate_status')}`, block admitted "
             f"{record.get('m3_block_admitted_for_incremental_evaluation')}",
-            "- **Stacked PR:** base "
-            f"`{record.get('stage128_m3i2_pr_base_branch')}` over PR #"
+            "- **Scientific provenance baseline:** PR #"
             f"{record.get('stage128_m3i2_baseline_pr_number')} head "
-            f"`{record.get('stage128_m3i2_baseline_commit')}` — **not** "
-            "retargeted to `main` while PR #73 is unmerged; no merge "
+            f"`{record.get('stage128_m3i2_baseline_commit')}` — protected "
+            "hashes are verified against that commit permanently; a merge or "
+            "retarget never moves it",
+            "- **Live PR topology:** PR #73 **was merged** by merge commit "
+            f"`{record.get('stage128_m3i2_predecessor_pr_merge_commit')}`; "
+            f"PR #{record.get('stage128_m3i2_live_pr_number')} was "
+            "subsequently retargeted to "
+            f"`{record.get('stage128_m3i2_live_pr_base_branch')}` (base "
+            f"`{record.get('stage128_m3i2_live_pr_base_commit')}`) and "
+            "remains a **Draft** — "
+            f"merged = {record.get('stage128_m3i2_live_pr_merged')}, no merge "
             "authorization",
             "- **Next research action (pointer only):** "
             f"`{record.get('next_research_action_id')}` — it is **not "
@@ -5454,6 +5462,12 @@ def derive_stage127_m2_incremental_evaluation_markers(root: str) -> dict:
 
 #: Once the M3 macro data Gate has EXECUTED, this is the live research/data
 #: workstream label. Gate execution is a DATA workstream, never modeling.
+_STAGE128_M3I2_MAIN_BRANCH = "main"
+_STAGE128_M3I2_PREDECESSOR_BRANCH = "stage128-m3-macro-data-gate"
+_STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT = (
+    "e6db63fb7d105f0d3a39db101c9e364161c367e9")
+_STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT = (
+    "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")
 _STAGE128_M3_ACTIVE_WORKSTREAM_ID = "stage128-m3-macro-data-gate"
 
 _STAGE128_M3_MACRO_DATA_GATE_REL = (
@@ -5625,8 +5639,6 @@ def derive_stage128_m3i2_contract_lock_markers(root: str) -> dict:
         ("merge_authorized", False),
         ("data_collection_started", False),
         ("pr_is_draft", True),
-        ("predecessor_pr_merged", False),
-        ("may_target_main", False),
     ):
         if d.get(field) is not expected:
             raise HandoffError(
@@ -5654,10 +5666,76 @@ def derive_stage128_m3i2_contract_lock_markers(root: str) -> dict:
     if d.get("next_action_authorized") is not False:
         raise HandoffError(
             "the action after the M3I-2 contract lock is NOT authorized")
-    if d.get("pr_base_branch") == "main":
+    # The base rule is STATE-DEPENDENT. It was "never main" only while PR #73
+    # was open; PR #73 has since been merged and PR #74 was retargeted to main.
+    topo = d.get("live_topology") or {}
+    merged = topo.get("predecessor_pr_merged", d.get("predecessor_pr_merged"))
+    base = topo.get("live_pr_base_branch", d.get("pr_base_branch"))
+    if merged is False:
+        if base == _STAGE128_M3I2_MAIN_BRANCH:
+            raise HandoffError(
+                "the M3I-2 contract-lock PR may not target main while PR #73 "
+                "is open")
+        if base != _STAGE128_M3I2_PREDECESSOR_BRANCH:
+            raise HandoffError(
+                "while PR #73 is open the M3I-2 contract-lock PR base must be "
+                f"{_STAGE128_M3I2_PREDECESSOR_BRANCH}")
+        if topo.get("pr_is_stacked_on_open_predecessor") is False:
+            raise HandoffError(
+                "PR #73 is open, so the M3I-2 PR is stacked on it")
+    elif merged is True:
+        if topo.get("predecessor_pr_merge_commit") != (
+                _STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT):
+            raise HandoffError(
+                "the M3I-2 contract lock records PR #73 as merged without the "
+                "verified merge commit "
+                f"{_STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT}")
+        if topo.get("live_main_commit") != (
+                _STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT):
+            raise HandoffError(
+                "live main must equal the PR #73 merge commit")
+        if base == _STAGE128_M3I2_PREDECESSOR_BRANCH:
+            raise HandoffError(
+                "PR #73 is merged; the M3I-2 PR base may not still name the "
+                "merged predecessor branch")
+        if base != _STAGE128_M3I2_MAIN_BRANCH:
+            raise HandoffError(
+                "after PR #73 merged the M3I-2 contract-lock PR base must be "
+                "main")
+        if topo.get("live_pr_base_commit") != (
+                _STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT):
+            raise HandoffError(
+                "the live PR base commit must equal current main")
+        if topo.get("pr_is_stacked_on_open_predecessor") is not False:
+            raise HandoffError(
+                "PR #73 is merged, so the M3I-2 PR is no longer stacked on an "
+                "open predecessor")
+        if topo.get(
+                "retargeted_to_main_after_predecessor_merge_verified") is not (
+                True):
+            raise HandoffError(
+                "the retarget to main must be recorded as verified after the "
+                "PR #73 merge")
+        if topo.get("may_target_main") is not True:
+            raise HandoffError(
+                "after PR #73 merged the M3I-2 PR may target main")
+    else:
         raise HandoffError(
-            "the M3I-2 contract-lock PR may not target main while PR #73 is "
-            "open")
+            "the M3I-2 contract lock must record predecessor_pr_merged "
+            "explicitly")
+    # In BOTH states the scientific provenance baseline stays the PR #73 HEAD,
+    # never the merge commit, and PR #74 stays a Draft with no merge rights.
+    if topo.get("scientific_provenance_baseline_commit") != (
+            _STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT):
+        raise HandoffError(
+            "the M3I-2 scientific provenance baseline must remain the PR #73 "
+            f"head {_STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT}")
+    if topo.get("live_pr_is_draft") is not True:
+        raise HandoffError("PR #74 must remain a Draft")
+    if topo.get("live_pr_merged") is not False:
+        raise HandoffError("PR #74 must remain unmerged")
+    if topo.get("merge_authorized") is not False:
+        raise HandoffError("no merge authorization exists for PR #74")
 
     return {
         "stage128_m3i2_contract_lock_executed": True,
@@ -5666,6 +5744,24 @@ def derive_stage128_m3i2_contract_lock_markers(root: str) -> dict:
         "stage128_m3i2_baseline_pr_number": d.get("baseline_pr_number"),
         "stage128_m3i2_baseline_commit": d.get("baseline_commit"),
         "stage128_m3i2_pr_base_branch": d.get("pr_base_branch"),
+        "stage128_m3i2_provenance_baseline_commit": topo.get(
+            "scientific_provenance_baseline_commit"),
+        "stage128_m3i2_live_pr_number": topo.get("live_pr_number"),
+        "stage128_m3i2_live_pr_base_branch": topo.get("live_pr_base_branch"),
+        "stage128_m3i2_live_pr_base_commit": topo.get("live_pr_base_commit"),
+        "stage128_m3i2_live_main_commit": topo.get("live_main_commit"),
+        "stage128_m3i2_live_pr_is_draft": topo.get("live_pr_is_draft"),
+        "stage128_m3i2_live_pr_merged": topo.get("live_pr_merged"),
+        "stage128_m3i2_predecessor_pr_merged": topo.get(
+            "predecessor_pr_merged"),
+        "stage128_m3i2_predecessor_pr_merge_commit": topo.get(
+            "predecessor_pr_merge_commit"),
+        "stage128_m3i2_pr_is_stacked_on_open_predecessor": topo.get(
+            "pr_is_stacked_on_open_predecessor"),
+        "stage128_m3i2_retargeted_to_main_after_predecessor_merge_verified":
+            topo.get("retargeted_to_main_after_predecessor_merge_verified"),
+        "stage128_m3i2_may_target_main": topo.get("may_target_main"),
+        "stage128_m3i2_merge_authorized": False,
         # A CONTRACT lock is not data and not modeling.
         "m3i2_contract_lock_executed": True,
         "m3i2_contract_status": _STAGE128_M3I2_CONTRACT_STATUS,

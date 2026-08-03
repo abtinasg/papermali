@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 65,
+  "assertion_count": 71,
   "assertions": [
     {
       "name": "authorization_byte_length_is_28",
@@ -23,19 +23,39 @@
       "status": "PASS"
     },
     {
-      "name": "exact_pr73_head_baseline",
+      "name": "scientific_provenance_baseline_is_still_the_pr73_head",
       "status": "PASS"
     },
     {
-      "name": "live_main_commit_recorded",
+      "name": "provenance_baseline_was_not_replaced_by_the_merge_commit",
       "status": "PASS"
     },
     {
-      "name": "stacked_pr_base_is_not_main",
+      "name": "predecessor_merge_is_recorded_with_its_merge_commit",
       "status": "PASS"
     },
     {
-      "name": "pr_is_draft_and_unmerged",
+      "name": "live_main_equals_the_predecessor_merge_commit",
+      "status": "PASS"
+    },
+    {
+      "name": "live_base_is_main_and_equals_current_main",
+      "status": "PASS"
+    },
+    {
+      "name": "no_artifact_still_calls_the_predecessor_open_or_unmerged",
+      "status": "PASS"
+    },
+    {
+      "name": "historical_pre_merge_topology_is_kept_but_marked_superseded",
+      "status": "PASS"
+    },
+    {
+      "name": "live_pr_topology_matches_the_predecessor_merge_state",
+      "status": "PASS"
+    },
+    {
+      "name": "pr_remains_draft_and_unmerged",
       "status": "PASS"
     },
     {
@@ -240,6 +260,10 @@
     },
     {
       "name": "no_merge_authorized_flag",
+      "status": "PASS"
+    },
+    {
+      "name": "this_pr_is_never_recorded_as_ready_or_merged",
       "status": "PASS"
     },
     {

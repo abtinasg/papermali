@@ -674,7 +674,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "6b133f00ded0c7ee543bc78c7eabc3052e2c85f0",
+  "code_commit": "e0c5788c7d31f64dc5b59706fb2697b5103c7270",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -682,7 +682,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "6b133f00ded0c7ee543bc78c7eabc3052e2c85f0",
+  "generated_at": "e0c5788c7d31f64dc5b59706fb2697b5103c7270",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -700,7 +700,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "326c3a1b369428a59efdf01e58eb572a7fb9915293602bb8a962980a25976f9e",
+  "source_file_sha256": "42d0005f806b6183ba5bec1140a4c76baa809bbe70a3d6f990046210134b3778",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {
@@ -713,7 +713,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "0bc183c029ee2e1cc7bd198dde52555d9f48d6a6cdcd9a5bc2a46a1d26ec585b",
+  "test_file_sha256": "6d37585c0739f0f9b20d1db4436df3d30f7b1ac0df170cedd2230f7566ec89ec",
   "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v2_lean"

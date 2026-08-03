@@ -43,11 +43,34 @@ def test_action_identity():
     assert m.PREDECESSOR_ACTION_ID == "stage128-m3-macro-data-gate"
 
 
-def test_baseline_is_the_exact_pr73_head_not_main():
-    assert m.BASELINE_COMMIT == "e6db63fb7d105f0d3a39db101c9e364161c367e9"
-    assert m.BASELINE_BRANCH == "stage128-m3-macro-data-gate"
-    assert m.MAIN_COMMIT == "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2"
-    assert m.PR_BASE_BRANCH == m.BASELINE_BRANCH != m.MAIN_BRANCH
+def test_scientific_provenance_baseline_is_the_pr73_head():
+    assert m.SCIENTIFIC_PROVENANCE_BASELINE_COMMIT == (
+        "e6db63fb7d105f0d3a39db101c9e364161c367e9")
+    assert m.SCIENTIFIC_PROVENANCE_BASELINE_BRANCH == (
+        "stage128-m3-macro-data-gate")
+    assert m.SCIENTIFIC_PROVENANCE_BASELINE_PR_NUMBER == 73
+    # retained aliases still point at the audited baseline, not the merge
+    assert m.BASELINE_COMMIT == m.SCIENTIFIC_PROVENANCE_BASELINE_COMMIT
+    assert m.BASELINE_BRANCH == m.SCIENTIFIC_PROVENANCE_BASELINE_BRANCH
+    assert m.BASELINE_COMMIT != m.PREDECESSOR_PR_MERGE_COMMIT
+    # main at the ORIGINAL contract lock is kept as history only
+    assert m.MAIN_COMMIT_AT_CONTRACT_LOCK == (
+        "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2")
+
+
+def test_live_topology_constants_after_the_predecessor_merge():
+    assert m.LIVE_MAIN_BRANCH == "main"
+    assert m.LIVE_MAIN_COMMIT == "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a"
+    assert m.LIVE_PR_NUMBER == 74
+    assert m.LIVE_PR_BASE_BRANCH == "main"
+    assert m.LIVE_PR_BASE_COMMIT == m.LIVE_MAIN_COMMIT
+    assert m.PREDECESSOR_PR_MERGED is True
+    assert m.PREDECESSOR_PR_MERGE_COMMIT == m.LIVE_MAIN_COMMIT
+    assert m.PR_IS_STACKED_ON_OPEN_PREDECESSOR is False
+    assert m.RETARGETED_TO_MAIN_AFTER_PREDECESSOR_MERGE_VERIFIED is True
+    assert m.MAY_TARGET_MAIN is True
+    assert m.MERGE_AUTHORIZED is False
+    assert m.PR_BASE_BRANCH == m.LIVE_MAIN_BRANCH
 
 
 def test_human_authorization_is_byte_exact():
@@ -885,24 +908,197 @@ def test_final_test_stays_locked(built):
 # Rule 18 — the stacked PR may not target main
 # --------------------------------------------------------------------------- #
 
-def test_pr_base_is_the_open_pr73_branch(built):
-    d = built["decision"]
-    assert d["pr_base_branch"] == "stage128-m3-macro-data-gate"
-    assert d["pr_is_draft"] is True
-    assert d["predecessor_pr_merged"] is False
-    assert d["may_target_main"] is False
-    m.assert_pr_base_is_not_main(d)
+MERGE_COMMIT = "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a"
+PROVENANCE_BASELINE = "e6db63fb7d105f0d3a39db101c9e364161c367e9"
+
+
+def _pre_merge_topology(built):
+    """The topology as it correctly stood while PR #73 was still open."""
+    topo = copy.deepcopy(built["decision"]["live_topology"])
+    topo.update({
+        "predecessor_pr_merged": False,
+        "predecessor_pr_merge_commit": None,
+        "live_main_commit": "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2",
+        "live_pr_base_branch": "stage128-m3-macro-data-gate",
+        "live_pr_base_commit": PROVENANCE_BASELINE,
+        "pr_is_stacked_on_open_predecessor": True,
+        "retargeted_to_main_after_predecessor_merge_verified": False,
+        "may_target_main": False,
+    })
+    return topo
+
+
+# --- positive: the live, post-merge topology ------------------------------- #
+
+def test_live_topology_is_the_post_merge_retargeted_state(built):
+    topo = built["decision"]["live_topology"]
+    m.assert_live_pr_topology(topo)
+    assert topo["predecessor_pr_number"] == 73
+    assert topo["predecessor_pr_merged"] is True
+    assert topo["predecessor_pr_merge_commit"] == MERGE_COMMIT
+    assert topo["predecessor_pr_head_commit"] == PROVENANCE_BASELINE
+    assert topo["live_pr_number"] == 74
+    assert topo["live_pr_base_branch"] == "main"
+    assert topo["live_pr_base_commit"] == MERGE_COMMIT
+    assert topo["live_main_branch"] == "main"
+    assert topo["live_main_commit"] == MERGE_COMMIT
+    assert topo["live_pr_head_branch"] == (
+        "stage128-m3i2-prospective-contract-lock")
+    assert topo["live_pr_head_commit_at_alignment_start"] == (
+        "22b747d4c55febe6839685ef9805d795eb9d8fa6")
+    assert topo["pr_is_stacked_on_open_predecessor"] is False
+    assert topo["retargeted_to_main_after_predecessor_merge_verified"] is True
+    assert topo["may_target_main"] is True
+
+
+def test_the_pre_merge_stacked_topology_still_validates(built):
+    """The old state is not "wrong" — it is simply no longer current."""
+    m.assert_live_pr_topology(_pre_merge_topology(built))
+
+
+def test_scientific_provenance_baseline_survives_the_merge(built):
+    topo = built["decision"]["live_topology"]
+    assert topo["scientific_provenance_baseline_branch"] == (
+        "stage128-m3-macro-data-gate")
+    assert topo["scientific_provenance_baseline_commit"] == PROVENANCE_BASELINE
+    assert topo["scientific_provenance_baseline_pr_number"] == 73
+    assert topo["protected_hashes_verified_against"] == PROVENANCE_BASELINE
+    assert topo["scientific_provenance_baseline_commit"] != MERGE_COMMIT
+    assert topo["branch_rebased_after_retarget"] is False
+    # the module still hashes protected blobs against the PR #73 head
+    assert m.BASELINE_COMMIT == PROVENANCE_BASELINE
+    assert built["metadata"]["protected_baseline_commit"] == (
+        PROVENANCE_BASELINE)
+
+
+def test_pr74_remains_draft_and_unmerged(built):
+    topo = built["decision"]["live_topology"]
+    assert topo["live_pr_is_draft"] is True
+    assert topo["live_pr_merged"] is False
+    assert topo["merge_authorized"] is False
+    assert built["decision"]["merge_authorized"] is False
+    m.assert_this_pr_is_not_merged_or_ready(built)
+
+
+def test_no_artifact_describes_pr73_as_open_or_unmerged(built):
+    gov = built["governance_boundary"]
+    assert gov["predecessor_pr_merged"] is True
+    assert gov["pr_is_stacked_on_open_pr"] is False
+    assert gov["may_target_main"] is True
+    assert gov["pr_base_branch"] == "main"
+    assert built["decision"]["predecessor_pr_merged"] is True
+    assert built["decision"]["pr_base_branch"] == "main"
+
+
+def test_historical_pre_merge_topology_is_preserved_and_labelled(built):
+    hist = built["decision"]["live_topology"]["historical_pre_merge_topology"]
+    assert hist["superseded"] is True
+    assert hist["describes_current_state"] is False
+    assert hist["main_commit_at_contract_lock"] == (
+        "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2")
+    assert hist["pr_base_branch_at_contract_lock"] == (
+        "stage128-m3-macro-data-gate")
+    assert hist["predecessor_pr_was_merged_at_contract_lock"] is False
+    assert hist["may_target_main_at_contract_lock"] is False
+
+
+# --- negative: every way the topology can be wrong ------------------------- #
+
+@pytest.mark.parametrize("mutation", [
+    # predecessor merged but the base still names the predecessor branch
+    {"live_pr_base_branch": "stage128-m3-macro-data-gate"},
+    # predecessor merged but still described as stacked on an open PR
+    {"pr_is_stacked_on_open_predecessor": True},
+    # merged without a merge commit
+    {"predecessor_pr_merge_commit": None},
+    {"predecessor_pr_merge_commit": ""},
+    # merge commit that is not the one that produced current main
+    {"predecessor_pr_merge_commit": "0" * 40},
+    # live main not equal to the merge commit
+    {"live_main_commit": "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2"},
+    # live base SHA not equal to current main
+    {"live_pr_base_commit": "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2"},
+    {"live_pr_base_commit": PROVENANCE_BASELINE},
+    # retarget claimed without the merge being verified first
+    {"retargeted_to_main_after_predecessor_merge_verified": False},
+    # main still forbidden as a base after the predecessor merged
+    {"may_target_main": False},
+    # a base that is neither main nor the predecessor
+    {"live_pr_base_branch": "some-other-branch"},
+])
+def test_post_merge_topology_mutations_fail_closed(built, mutation):
+    topo = copy.deepcopy(built["decision"]["live_topology"])
+    topo.update(mutation)
+    with pytest.raises(ERROR):
+        m.assert_live_pr_topology(topo)
 
 
 @pytest.mark.parametrize("mutation", [
-    {"pr_base_branch": "main"},
-    {"predecessor_pr_merged": True},
+    # predecessor unmerged but the base is already main
+    {"live_pr_base_branch": "main"},
+    # predecessor unmerged but not described as stacked
+    {"pr_is_stacked_on_open_predecessor": False},
+    # main permitted as a base before the predecessor merged
+    {"may_target_main": True},
 ])
-def test_retargeting_to_main_fails_closed(built, mutation):
-    d = copy.deepcopy(built["decision"])
-    d.update(mutation)
+def test_pre_merge_topology_mutations_fail_closed(built, mutation):
+    topo = _pre_merge_topology(built)
+    topo.update(mutation)
     with pytest.raises(ERROR):
-        m.assert_pr_base_is_not_main(d)
+        m.assert_live_pr_topology(topo)
+
+
+@pytest.mark.parametrize("bad", [None, "true", 1, "MERGED"])
+def test_a_non_boolean_predecessor_merge_state_fails_closed(built, bad):
+    topo = copy.deepcopy(built["decision"]["live_topology"])
+    topo["predecessor_pr_merged"] = bad
+    with pytest.raises(ERROR):
+        m.assert_live_pr_topology(topo)
+
+
+@pytest.mark.parametrize("topology_name", ["post_merge", "pre_merge"])
+@pytest.mark.parametrize("mutation", [
+    # the provenance baseline overwritten by the merge commit
+    {"scientific_provenance_baseline_commit": MERGE_COMMIT},
+    {"scientific_provenance_baseline_commit": "0" * 40},
+    {"scientific_provenance_baseline_branch": "main"},
+    # PR marked ready
+    {"live_pr_is_draft": False},
+    # PR marked merged
+    {"live_pr_merged": True},
+    # merge authorized
+    {"merge_authorized": True},
+])
+def test_invariants_fail_closed_in_both_states(built, topology_name, mutation):
+    topo = (copy.deepcopy(built["decision"]["live_topology"])
+            if topology_name == "post_merge" else _pre_merge_topology(built))
+    topo.update(mutation)
+    with pytest.raises(ERROR):
+        m.assert_live_pr_topology(topo)
+
+
+def test_a_merge_authorization_flag_still_fails_closed_anywhere(built):
+    payload = copy.deepcopy(built["decision"])
+    payload["may_merge"] = True
+    with pytest.raises(ERROR):
+        m.assert_no_merge_authorized_flag(payload)
+
+
+def test_factual_predecessor_merge_records_are_not_merge_authorizations(built):
+    """Recording that PR #73 merged must not itself trip rule 17."""
+    m.assert_no_merge_authorized_flag(built["decision"])
+    assert built["decision"]["live_topology"]["predecessor_pr_merged"] is True
+
+
+@pytest.mark.parametrize("mutation", [
+    {"live_pr_merged": True},
+    {"live_pr_is_draft": False},
+])
+def test_marking_pr74_ready_or_merged_fails_closed(built, mutation):
+    payload = copy.deepcopy(built["decision"])
+    payload["live_topology"].update(mutation)
+    with pytest.raises(ERROR):
+        m.assert_this_pr_is_not_merged_or_ready(payload)
 
 
 # --------------------------------------------------------------------------- #
@@ -964,7 +1160,7 @@ def test_qc_passes_and_counts_every_execution_as_zero(built):
     qc = built["qc_report"]
     assert qc["all_pass"] is True
     assert qc["failed_count"] == 0
-    assert qc["assertion_count"] >= 60
+    assert qc["assertion_count"] >= 70
     assert qc["execution_counters"] == {
         "network_requests": 0,
         "data_files_downloaded": 0,
@@ -992,7 +1188,11 @@ def test_decision_records_the_contract_state(built):
     assert d["m4_authorized"] is False and d["m4_started"] is False
     assert d["data_collection_started"] is False
     assert d["result_code"] == (
-        "M3I2_PROSPECTIVE_CONTRACT_LOCK_READY_FOR_INDEPENDENT_REAUDIT")
+        "M3I2_POST_PREDECESSOR_MERGE_TOPOLOGY_ALIGNED_READY_FOR_INDEPENDENT_"
+        "AUDIT")
+    assert d["topology_aligned_from_head"] == (
+        "22b747d4c55febe6839685ef9805d795eb9d8fa6")
+    assert d["topology_alignment_changed_scientific_contract"] is False
     assert d["correction_of_prior_head"] == (
         "6351381283c14b248b4349b1d5ca240dde5cfe3f")
     assert d["correction_widened_scope"] is False

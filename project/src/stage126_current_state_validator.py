@@ -656,7 +656,95 @@ def stage128_m3i2_contract_lock_completed(repo_root: Path) -> bool:
     if decision.get("m3_cbi_gate_status") != "UNRESOLVED_M3_DATA_GATE":
         raise ValidationFail(
             "stage128 M3I-2 contract lock must preserve the M3-CBI Gate status")
+    _assert_m3i2_live_topology(decision)
     return True
+
+
+#: PR #73 was merged into main by this commit; PR #74 was retargeted after.
+STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT = (
+    "e6db63fb7d105f0d3a39db101c9e364161c367e9")
+STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT = (
+    "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")
+STAGE128_M3I2_PREDECESSOR_BRANCH = "stage128-m3-macro-data-gate"
+STAGE128_M3I2_MAIN_BRANCH = "main"
+
+
+def _assert_m3i2_live_topology(decision: dict) -> None:
+    """Validate the PR topology in a STATE-DEPENDENT way.
+
+    "Never base on main" held only while the predecessor PR was open. Now that
+    PR #73 is merged, that rule would reject the correct live topology, so each
+    predecessor state is validated on its own terms. In both states the
+    scientific provenance baseline stays the PR #73 HEAD, PR #74 stays a Draft
+    and unmerged, and no merge authorization exists.
+    """
+    topo = decision.get("live_topology") or {}
+    if not topo:
+        raise ValidationFail(
+            "stage128 M3I-2 contract lock must record its live PR topology")
+    merged = topo.get("predecessor_pr_merged")
+    base = topo.get("live_pr_base_branch")
+
+    if merged is False:
+        if base != STAGE128_M3I2_PREDECESSOR_BRANCH:
+            raise ValidationFail(
+                "while the predecessor PR is open the M3I-2 PR base must be "
+                f"{STAGE128_M3I2_PREDECESSOR_BRANCH}")
+        if topo.get("pr_is_stacked_on_open_predecessor") is not True:
+            raise ValidationFail(
+                "while the predecessor PR is open the M3I-2 PR is stacked")
+        if topo.get("may_target_main") is not False:
+            raise ValidationFail(
+                "the M3I-2 PR may not target main while the predecessor is "
+                "open")
+    elif merged is True:
+        if topo.get("predecessor_pr_merge_commit") != (
+                STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT):
+            raise ValidationFail(
+                "the predecessor is marked merged without the verified merge "
+                f"commit {STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT}")
+        if topo.get("live_main_commit") != (
+                STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT):
+            raise ValidationFail(
+                "live main must equal the predecessor merge commit")
+        if base == STAGE128_M3I2_PREDECESSOR_BRANCH:
+            raise ValidationFail(
+                "the M3I-2 PR base still names the merged predecessor branch")
+        if base != STAGE128_M3I2_MAIN_BRANCH:
+            raise ValidationFail(
+                "after the predecessor merged the M3I-2 PR base must be main")
+        if topo.get("live_pr_base_commit") != (
+                STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT):
+            raise ValidationFail(
+                "the live PR base commit must equal current main")
+        if topo.get("pr_is_stacked_on_open_predecessor") is not False:
+            raise ValidationFail(
+                "the predecessor is merged; the M3I-2 PR is no longer stacked "
+                "on an open predecessor")
+        if topo.get(
+                "retargeted_to_main_after_predecessor_merge_verified") is not (
+                True):
+            raise ValidationFail(
+                "the retarget to main must be verified after the predecessor "
+                "merge")
+        if topo.get("may_target_main") is not True:
+            raise ValidationFail(
+                "after the predecessor merged the M3I-2 PR may target main")
+    else:
+        raise ValidationFail(
+            "predecessor_pr_merged must be recorded explicitly")
+
+    if topo.get("scientific_provenance_baseline_commit") != (
+            STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT):
+        raise ValidationFail(
+            "the M3I-2 scientific provenance baseline must remain the "
+            f"predecessor PR head {STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT}")
+    if topo.get("live_pr_is_draft") is not True:
+        raise ValidationFail("the M3I-2 PR must remain a Draft")
+    if topo.get("live_pr_merged") is not False:
+        raise ValidationFail("the M3I-2 PR must remain unmerged")
+    if topo.get("merge_authorized") is not False:
+        raise ValidationFail("no merge authorization exists for the M3I-2 PR")
 
 
 def m3_gate_state_is_self_consistent(

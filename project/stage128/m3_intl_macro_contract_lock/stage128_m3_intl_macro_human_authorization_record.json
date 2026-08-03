@@ -34,6 +34,7 @@
   "identical_text_hash_used_for_prior_distinct_action": true,
   "m3i_incremental_evaluation_authorized": false,
   "m4_authorized": false,
+  "main_commit_at_contract_lock": "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2",
   "merge_authorized": false,
   "modeling_authorized": false,
   "normalized_authorization_scope": "Create and validate the prospective source/definition/statistical contract lock for the supplementary M3I-2 block, with a contingent but unresolved M3I-3 financing component.",
@@ -49,7 +50,7 @@
   "scope_limited_to_this_action_only": true,
   "scope_resolution_basis": "The immediately preceding assistant message identified the next action as formal prospective lock of M3I-2 only.",
   "source_main_branch": "main",
-  "source_main_commit": "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2",
+  "source_main_commit": "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a",
   "source_repository": "abtinasg/papermali",
   "standing_authorization": false
 }

@@ -3,8 +3,16 @@
 **Action id:** `stage128-m3i2-prospective-contract-lock`
 **Contract type:** `prospective_contract_lock_only_no_data_no_gate_no_modeling`
 **Contract status:** `PROSPECTIVELY_LOCKED_NO_DATA`
-**Stacked on:** PR #73 head `e6db63fb7d105f0d3a39db101c9e364161c367e9`
-(branch `stage128-m3-macro-data-gate`), which is **not merged**.
+**Scientific provenance baseline:** PR #73
+head `e6db63fb7d105f0d3a39db101c9e364161c367e9` (branch
+`stage128-m3-macro-data-gate`). Every protected scientific hash is
+verified against that commit, permanently.
+**Live PR topology:** PR #73 **was merged** by merge commit
+`b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`. PR #74 was subsequently
+**retargeted to `main`** (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`, the
+current main) and **remains a Draft**. The branch was **not rebased**: a
+retarget moves the PR base, it does not move the audited baseline. **No merge
+authorization has been issued for PR #74.**
 
 ```text
 CONTRACT LOCK ONLY
@@ -148,7 +156,7 @@ All zero: network requests, data files downloaded, macro observations read,
 company rows loaded, final-test rows loaded, model fits, predictions,
 predictive metrics, coverage calculations, Holm calculations.
 
-QC: **65 assertions, 0 failed**,
+QC: **71 assertions, 0 failed**,
 all_pass = **True**.
 
 ## State
@@ -164,6 +172,25 @@ all_pass = **True**.
 * `m4_authorized` = **false**, `m4_started` = **false**,
   `final_test_locked` = **true**
 * `merge_authorized` = **false**
+
+## Topology, before and after the predecessor merge
+
+The base rule is **state-dependent**, not unconditional. While
+PR #73 was open the base had to be
+`stage128-m3-macro-data-gate` and `may_target_main` was false. Now
+that PR #73 is merged, the base must be
+`main`, `pr_is_stacked_on_open_predecessor` is false and
+`may_target_main` is true — while `live_pr_is_draft` = true,
+`live_pr_merged` = false and `merge_authorized` = false hold in **both**
+states. The pre-merge values are retained under
+`historical_pre_merge_topology` (marked `superseded`, `describes_current_state`
+= false); nothing was deleted.
+
+This alignment is **governance only**. No candidate identity, transformation,
+threshold, Holm family, missing-value rule or point-in-time rule changed, and
+the two audited scientific corrections — maximum eligible completed Gregorian
+observation-year selection, and historical-vintage semantic / currency
+compatibility — are intact.
 
 Next pointer (informational only): `stage128-m3i2-official-source-evidence-capture` with
 `next_action_authorized` = **false**. Data collection has **not** started.

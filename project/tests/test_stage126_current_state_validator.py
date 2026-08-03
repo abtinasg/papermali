@@ -1950,6 +1950,86 @@ def test_m3i2_next_pointer_is_the_unauthorized_evidence_capture():
         "stage128-m3i2-official-source-evidence-capture")
 
 
+def test_m3i2_live_topology_is_the_post_merge_retargeted_state():
+    rel = v._STAGE128_M3I2_DECISION_REL
+    topo = json.loads((_root() / rel).read_text(encoding="utf-8"))[
+        "live_topology"]
+    v._assert_m3i2_live_topology({"live_topology": topo})
+    assert topo["predecessor_pr_merged"] is True
+    assert topo["predecessor_pr_merge_commit"] == (
+        v.STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT)
+    assert topo["live_pr_base_branch"] == "main"
+    assert topo["live_pr_base_commit"] == topo["live_main_commit"]
+    assert topo["pr_is_stacked_on_open_predecessor"] is False
+    assert topo["may_target_main"] is True
+    # the audited baseline is NOT the merge commit
+    assert topo["scientific_provenance_baseline_commit"] == (
+        v.STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT)
+    assert topo["scientific_provenance_baseline_commit"] != (
+        v.STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT)
+    assert topo["live_pr_is_draft"] is True
+    assert topo["live_pr_merged"] is False
+    assert topo["merge_authorized"] is False
+
+
+def test_m3i2_pre_merge_topology_still_validates():
+    """The stacked state was correct then; it is simply no longer current."""
+    rel = v._STAGE128_M3I2_DECISION_REL
+    topo = json.loads((_root() / rel).read_text(encoding="utf-8"))[
+        "live_topology"]
+    topo.update({
+        "predecessor_pr_merged": False,
+        "predecessor_pr_merge_commit": None,
+        "live_pr_base_branch": v.STAGE128_M3I2_PREDECESSOR_BRANCH,
+        "live_pr_base_commit": v.STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT,
+        "pr_is_stacked_on_open_predecessor": True,
+        "may_target_main": False,
+    })
+    v._assert_m3i2_live_topology({"live_topology": topo})
+
+
+@pytest.mark.parametrize("mutation", [
+    # predecessor merged but base still names the merged predecessor branch
+    {"live_pr_base_branch": "stage128-m3-macro-data-gate"},
+    # predecessor unmerged but base is main
+    {"predecessor_pr_merged": False, "live_pr_base_branch": "main"},
+    # missing / wrong merge commit
+    {"predecessor_pr_merge_commit": None},
+    {"predecessor_pr_merge_commit": "0" * 40},
+    # merge commit differs from current main
+    {"live_main_commit": "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2"},
+    # live base SHA differs from current main
+    {"live_pr_base_commit": "e6db63fb7d105f0d3a39db101c9e364161c367e9"},
+    # still described as stacked on an open predecessor
+    {"pr_is_stacked_on_open_predecessor": True},
+    # retarget claimed without verifying the merge first
+    {"retargeted_to_main_after_predecessor_merge_verified": False},
+    # main still forbidden after the merge
+    {"may_target_main": False},
+    # provenance baseline replaced by the merge commit
+    {"scientific_provenance_baseline_commit":
+        "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a"},
+    # PR marked ready / merged / merge-authorized
+    {"live_pr_is_draft": False},
+    {"live_pr_merged": True},
+    {"merge_authorized": True},
+    # merge state not recorded explicitly
+    {"predecessor_pr_merged": None},
+])
+def test_m3i2_topology_mutations_fail_closed(mutation):
+    rel = v._STAGE128_M3I2_DECISION_REL
+    topo = json.loads((_root() / rel).read_text(encoding="utf-8"))[
+        "live_topology"]
+    topo.update(mutation)
+    with pytest.raises(v.ValidationFail):
+        v._assert_m3i2_live_topology({"live_topology": topo})
+
+
+def test_m3i2_recognizer_requires_a_live_topology():
+    with pytest.raises(v.ValidationFail):
+        v._assert_m3i2_live_topology({})
+
+
 @pytest.mark.parametrize("field,bad", [
     ("m3i2_data_gate_executed", True),
     ("m3i2_modeling_started", True),
