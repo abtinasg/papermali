@@ -50,6 +50,34 @@ What it locked, prospectively and before any value-level work:
   reverse-repo volumes, standing-facility amounts and relabelled policy rates
   are forbidden proxies. If no exact IMF series ever passes metadata and
   coverage review, M3I-3 stays unavailable and **M3I-2 is not invalidated**.
+- **Observation-year selection inside the vintage** (added by the correction
+  of the independent audit of PR #74). Selecting a pre-cutoff WDI archive
+  *vintage* does not say which annual *observation* it contributes, so both
+  candidates now carry an exact rule: an annual period ends on **December 31
+  of the labelled Gregorian observation year**, only a period that finished
+  **strictly before** the pair cutoff is eligible, and among eligible years
+  the **maximum** is taken (`selected_observation_tie_breaker =
+  maximum_observation_year`) — never the first or earliest. A fiscal-year
+  label may never be a direct WDI year lookup, no eligible observation yields
+  **null**, and no alternative indicator may be tried. For FX the maximum
+  eligible year additionally requires `E_y` and `E_(y-1)` present, positive,
+  consecutive, same vintage, and same currency denomination and valuation.
+- **Historical-vintage semantic compatibility** (added by the same
+  correction). The WDI archive warns that one indicator code may have carried
+  a different base year or local-currency valuation in earlier releases, and
+  that *current* metadata can be shown alongside *archived* data. So
+  `historical_archive_metadata_assumed_identical_to_current=false` and
+  `semantic_compatibility_evidence_required_before_value_use=true`: per
+  edition, a later evidence-capture action must verify the archive edition
+  identifier, release date/time, Iran economy identity, indicator code,
+  archived series title, annual frequency, unit, calendar-year semantics and
+  the raw artifact SHA-256. CPI must stay an annual inflation-**rate** series
+  in percent (not an index level or GDP deflator); FX requires one currency
+  denomination and one valuation convention across the pair with no
+  redenomination or unit break. Any mismatch is
+  `null_and_invalid_for_coverage`, an **unverified vintage never counts
+  towards coverage**, and no alternative series may be tried after a mismatch.
+  Status in this action: `NOT_EXECUTED` — zero archive editions downloaded.
 - **Data Gate contract** — thresholds INHERITED unchanged (0.80 candidate
   coverage, 0.70 block common sample, ≥5 positives per locked validation
   window, development-only over the retained-M2 539-row common sample). The
