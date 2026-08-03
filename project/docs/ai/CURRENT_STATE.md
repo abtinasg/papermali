@@ -8,12 +8,12 @@ _Generated from the repository (git + QC). Do not edit by hand._
 ## Snapshot
 
 - **Stage / Batch:** Stage128 / None
-- **Active workstream:** `stage128_m3i2_prospective_contract_lock`
+- **Active workstream:** `stage128_m3i2_official_source_evidence_capture`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `stage128-m3i2-official-source-evidence-capture`
-- **Last stage commit:** `4a88a24ea9cbcf362967c518e9f7232c86fe3940`
-- **Generated from commit:** `22b747d4c55febe6839685ef9805d795eb9d8fa6` (branch `stage128-m3i2-prospective-contract-lock`, informational)
-- **Baseline:** `origin/main` @ `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`
+- **Next research action:** `stage128-m3i2-official-source-evidence-review`
+- **Last stage commit:** `297d275e3cb5df06935813102cb1eba37cff0129`
+- **Generated from commit:** `cf23771a383bf9ad8f7ff2855c216c9a240647ff` (branch `stage128-m3i2-official-source-evidence-capture`, informational)
+- **Baseline:** `origin/main` @ `cf23771a383bf9ad8f7ff2855c216c9a240647ff`
 
 ## Current-state validation
 
@@ -137,7 +137,7 @@ _A metadata-only, PROSPECTIVE source/definition/statistical contract lock for th
 - **M3-CBI preserved unchanged:** Gate status `UNRESOLVED_M3_DATA_GATE`, block admitted False
 - **Scientific provenance baseline:** PR #73 head `e6db63fb7d105f0d3a39db101c9e364161c367e9` — protected hashes are verified against that commit permanently; a merge or retarget never moves it
 - **Live PR topology:** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and remains a **Draft** — merged = False, no merge authorization
-- **Next research action (pointer only):** `stage128-m3i2-official-source-evidence-capture` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False). Data collection has **not** started.
+- **Next research action (pointer only):** `stage128-m3i2-official-source-evidence-review` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False). Data collection has **not** started.
 - Package: `project/stage128/m3_intl_macro_contract_lock/`; interpretation: `project/stage128/m3_intl_macro_contract_lock/README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`
 
 ### Last completed scientific micro-part QC
@@ -189,5 +189,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `9f90c95e127a179337687e7d5dd98c3f4c6269760901db9662ebfa23a33cf847`_
-_generated_at_utc: 2026-08-03T09:22:45Z (informational)_
+_state_fingerprint: `27ea1dfc92c831e52159095ae62f07f6654135a52c7080fbfd0445499870a058`_
+_generated_at_utc: 2026-08-03T12:27:08Z (informational)_
