@@ -90,11 +90,30 @@ What it locked, prospectively and before any value-level work:
   hypothesis exists yet, and all future M3I results are supplementary /
   robustness only.
 
-Governance: the PR is a **Draft stacked on the unmerged PR #73 head**
-`e6db63fb7d105f0d3a39db101c9e364161c367e9` and must not be retargeted to `main`
-until PR #73 is separately authorized, merged and independently verified. No
-merge is authorized. M4 remains unauthorized and unstarted; the final test
-remains locked.
+Governance (updated after the predecessor merge). **Scientific provenance is
+immutable**: this contract was locked against the PR #73 head
+`e6db63fb7d105f0d3a39db101c9e364161c367e9` on branch
+`stage128-m3-macro-data-gate`, and every protected scientific hash is verified
+against that commit permanently — a merge or retarget never moves it, and the
+branch was **not** rebased.
+
+**Live PR topology**: PR #73 **was merged** into `main` by merge commit
+`b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`, and PR #74 was afterwards
+**retargeted to `main`** (`live_pr_base_branch: main`, `live_pr_base_commit` =
+`live_main_commit` = `b94f73fa…db516a`, `pr_is_stacked_on_open_predecessor:
+false`, `retargeted_to_main_after_predecessor_merge_verified: true`,
+`may_target_main: true`). The pre-merge values are retained under
+`historical_pre_merge_topology`, marked `superseded` and
+`describes_current_state: false`. No artifact still describes PR #73 as open or
+unmerged.
+
+The base rule is **state-dependent**, not unconditional: while the predecessor
+is open the base must be `stage128-m3-macro-data-gate` with `may_target_main:
+false`; once it is merged the base must be `main`, the merge commit must equal
+live `main`, and the retarget must be verified. In **both** states PR #74 stays
+`live_pr_is_draft: true`, `live_pr_merged: false` and `merge_authorized:
+false` — it has **not** been marked ready and **no merge authorization has been
+issued**.
 
 Package: `project/stage128/m3_intl_macro_contract_lock/`.
 
