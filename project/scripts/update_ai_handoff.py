@@ -2767,6 +2767,9 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         **derive_stage127_m2_incremental_evaluation_markers(root),
         **derive_stage128_m2_retained_block_human_decision_markers(root),
         **derive_stage128_m3_macro_data_gate_markers(root),
+        # Must come last: the supplementary M3I-2 contract lock succeeds the
+        # CBI M3 Gate as the live action and owns the research pointers.
+        **derive_stage128_m3i2_contract_lock_markers(root),
     }
 
 
@@ -3666,8 +3669,14 @@ def build_handoff_state(root: str):
         "current_stage": stage,
         "current_batch": batch,
         "active_workstream": roadmap["active_research_workstream_id"].replace("-", "_"),
+        # The workstream the live one succeeded. Once the supplementary M3I-2
+        # contract lock is live, its predecessor is the CBI M3 macro data
+        # Gate, not the older M2 D2 boundary-month workstream.
         "active_workstream_predecessor_context": (
-            "stage128_m2_d2_boundary_month_equity_return"),
+            _STAGE128_M3_ACTIVE_WORKSTREAM_ID.replace("-", "_")
+            if derive_stage128_m3i2_contract_lock_markers(root).get(
+                "stage128_m3i2_contract_lock_executed")
+            else "stage128_m2_d2_boundary_month_equity_return"),
         # Newest completed micro-part (robustness micro-parts included). The
         # research-action pointers below are deliberately NOT advanced.
         "last_completed_micro_part": active_micro_part_id(
@@ -4210,6 +4219,19 @@ def render_current_state(record: dict) -> str:
             " — **M4:** authorized="
             f"{record.get('m4_authorized')}, started={record.get('m4_started')}",
             (
+                # The live pointer moved on: it is rendered once, by the
+                # newest completed action's own section below. Here it is
+                # recorded only as the historical pointer this decision
+                # published.
+                "- **Pointer published by this decision (historical):** "
+                "`stage128-m3-macro-data-gate` — the M3 macro data Gate, "
+                "which has since been EXECUTED as a data-admission Gate only "
+                "(see the M3 section below). A pointer was **not** an "
+                "authorization, and the Gate execution started no modeling: "
+                "`m3_modeling_started=False`, "
+                "`m3_incremental_evaluation_authorized=False`."
+                if record.get("stage128_m3i2_contract_lock_executed")
+                else
                 "- **Next research action (pointer only):** "
                 f"`{record['next_research_action_id']}` — the M3 macro data "
                 "Gate, which has since been EXECUTED as a data-admission Gate "
@@ -4287,6 +4309,60 @@ def render_current_state(record: dict) -> str:
             "- Package: `project/stage128/m3_macro_data_gate/`; "
             "interpretation: `project/stage128/m3_macro_data_gate/"
             "README_STAGE128_M3_MACRO_DATA_GATE.md`",
+            "",
+        ]
+    if record.get("stage128_m3i2_contract_lock_executed"):
+        lines += [
+            "### Stage128 — M3I-2 prospective contract lock (contract only)\n",
+            "_A metadata-only, PROSPECTIVE source/definition/statistical "
+            "contract lock for the SUPPLEMENTARY international-macro block "
+            "M3I-2 (`intl_cpi_inflation_annual`, "
+            "`intl_fx_change_official_annual`), plus a contingent, UNRESOLVED "
+            "M3I-3 financing shell. It is not a substitution, correction or "
+            "continuation of the frozen M3-CBI block, and it is never "
+            "confirmatory M3._\n",
+            "- ✅ **Contract status:** "
+            f"`{record.get('stage128_m3i2_contract_status')}` — "
+            "authorization consumed: "
+            f"{record.get('stage128_m3i2_contract_lock_authorization_consumed')}"
+            " (one action only, not standing)",
+            "- ⛔ **No data, no Gate, no modeling:** 0 network requests, "
+            "0 macro observations read, 0 company rows loaded, 0 coverage "
+            "calculations, 0 model fits, 0 predictions, 0 Holm calculations",
+            "- ⛔ **M3I-2 retrieval started:** "
+            f"{record.get('m3i2_retrieval_started')} — **Data Gate executed:** "
+            f"{record.get('m3i2_data_gate_executed')} — **block admitted:** "
+            f"{record.get('m3i2_block_admitted')} — **modeling started:** "
+            f"{record.get('m3i2_modeling_started')}",
+            "- ⛔ **M3I-3 financing metadata lock:** "
+            f"`{record.get('m3i3_financing_lock')}` — **admitted:** "
+            f"{record.get('m3i3_admitted')}",
+            "- **M3-CBI preserved unchanged:** Gate status "
+            f"`{record.get('m3_macro_data_gate_status')}`, block admitted "
+            f"{record.get('m3_block_admitted_for_incremental_evaluation')}",
+            "- **Scientific provenance baseline:** PR #"
+            f"{record.get('stage128_m3i2_baseline_pr_number')} head "
+            f"`{record.get('stage128_m3i2_baseline_commit')}` — protected "
+            "hashes are verified against that commit permanently; a merge or "
+            "retarget never moves it",
+            "- **Live PR topology:** PR #73 **was merged** by merge commit "
+            f"`{record.get('stage128_m3i2_predecessor_pr_merge_commit')}`; "
+            f"PR #{record.get('stage128_m3i2_live_pr_number')} was "
+            "subsequently retargeted to "
+            f"`{record.get('stage128_m3i2_live_pr_base_branch')}` (base "
+            f"`{record.get('stage128_m3i2_live_pr_base_commit')}`) and "
+            "remains a **Draft** — "
+            f"merged = {record.get('stage128_m3i2_live_pr_merged')}, no merge "
+            "authorization",
+            "- **Next research action (pointer only):** "
+            f"`{record.get('next_research_action_id')}` — it is **not "
+            "authorized** and a pointer is **not** an authorization "
+            "(`next_research_action_authorized` = "
+            f"{record.get('next_research_action_authorized')}). Data "
+            "collection has **not** started.",
+            "- Package: `project/stage128/m3_intl_macro_contract_lock/`; "
+            "interpretation: `project/stage128/m3_intl_macro_contract_lock/"
+            "README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`",
             "",
         ]
     lines += [
@@ -4972,8 +5048,14 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
     m3_gate_executed = bool(
         derive_stage128_m3_macro_data_gate_markers(root).get(
             "stage128_m3_macro_data_gate_executed"))
-    allowed = (_STAGE128_M3_ACTIVE_WORKSTREAM_ID if m3_gate_executed
-               else _STAGE128_ACTIVE_WORKSTREAM_ID)
+    m3i2_locked = bool(
+        derive_stage128_m3i2_contract_lock_markers(root).get(
+            "stage128_m3i2_contract_lock_executed"))
+    if m3i2_locked:
+        allowed = _STAGE128_M3I2_ACTIVE_WORKSTREAM_ID
+    else:
+        allowed = (_STAGE128_M3_ACTIVE_WORKSTREAM_ID if m3_gate_executed
+                   else _STAGE128_ACTIVE_WORKSTREAM_ID)
     if roadmap_workstream != allowed:
         raise HandoffError(
             f"stage128 M2 D2 freeze is complete but ROADMAP "
@@ -5380,6 +5462,12 @@ def derive_stage127_m2_incremental_evaluation_markers(root: str) -> dict:
 
 #: Once the M3 macro data Gate has EXECUTED, this is the live research/data
 #: workstream label. Gate execution is a DATA workstream, never modeling.
+_STAGE128_M3I2_MAIN_BRANCH = "main"
+_STAGE128_M3I2_PREDECESSOR_BRANCH = "stage128-m3-macro-data-gate"
+_STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT = (
+    "e6db63fb7d105f0d3a39db101c9e364161c367e9")
+_STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT = (
+    "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")
 _STAGE128_M3_ACTIVE_WORKSTREAM_ID = "stage128-m3-macro-data-gate"
 
 _STAGE128_M3_MACRO_DATA_GATE_REL = (
@@ -5485,6 +5573,222 @@ def derive_stage128_m3_macro_data_gate_markers(root: str) -> dict:
             _NEXT_RESEARCH_ACTION_ID_AFTER_M3_GATE_PASS)
         markers["next_research_action_pointer_is_not_authorization"] = True
     return markers
+
+
+#: Once the supplementary M3I-2 contract has been prospectively locked, this
+#: is the live workstream label. A CONTRACT lock is metadata only: no macro
+#: observation is retrieved, no Data Gate runs and no modeling starts.
+_STAGE128_M3I2_ACTIVE_WORKSTREAM_ID = "stage128-m3i2-prospective-contract-lock"
+
+_STAGE128_M3I2_CONTRACT_LOCK_REL = (
+    "project/stage128/m3_intl_macro_contract_lock/"
+    "stage128_m3_intl_macro_contract_decision.json"
+)
+_STAGE128_M3I2_ACTION_ID = "stage128-m3i2-prospective-contract-lock"
+_STAGE128_M3I2_CONTRACT_STATUS = "PROSPECTIVELY_LOCKED_NO_DATA"
+_STAGE128_M3I3_FINANCING_LOCK_STATUS = "UNRESOLVED_METADATA_LOCK"
+#: Informational pointer only, and explicitly NOT authorized.
+_NEXT_RESEARCH_ACTION_ID_AFTER_M3I2_CONTRACT_LOCK = (
+    "stage128-m3i2-official-source-evidence-capture"
+)
+
+
+def derive_stage128_m3i2_contract_lock_markers(root: str) -> dict:
+    """Recognize the prospective M3I-2 supplementary contract lock.
+
+    Narrow and fail-closed. The lock is a CONTRACT event only:
+
+    * it retrieves no macro observation and creates no dataset row;
+    * it executes no Data Gate and computes no coverage;
+    * it fits no model, predicts nothing and runs no M3I-versus-M2 comparison;
+    * it never admits a block and never authorizes an evaluation;
+    * the frozen CBI M3 contract is preserved unchanged, and M3I is a
+      SUPPLEMENTARY family that is never presented as confirmatory M3;
+    * M3I-3 financing stays UNRESOLVED and inadmissible;
+    * M4 and the final test are untouched.
+
+    Returns {} before the contract lock exists.
+    """
+    path = os.path.join(root, _STAGE128_M3I2_CONTRACT_LOCK_REL)
+    if not os.path.isfile(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        d = json.load(fh)
+
+    if d.get("action_id") != _STAGE128_M3I2_ACTION_ID:
+        raise HandoffError("stage128 M3I-2 contract-lock action_id mismatch")
+    if d.get("m3i2_contract_lock_executed") is not True:
+        return {}
+    if d.get("m3i2_contract_status") != _STAGE128_M3I2_CONTRACT_STATUS:
+        raise HandoffError(
+            "stage128 M3I-2 contract status must be "
+            f"{_STAGE128_M3I2_CONTRACT_STATUS}")
+    for field, expected in (
+        ("m3i2_retrieval_started", False),
+        ("m3i2_data_gate_executed", False),
+        ("m3i2_block_admitted", False),
+        ("m3i2_incremental_evaluation_authorized", False),
+        ("m3i2_modeling_started", False),
+        ("m3i3_admitted", False),
+        ("m3_cbi_contract_changed", False),
+        ("m3_cbi_block_admitted", False),
+        ("m4_authorized", False),
+        ("m4_started", False),
+        ("final_test_locked", True),
+        ("final_test_access_authorized", False),
+        ("merge_authorized", False),
+        ("data_collection_started", False),
+        ("pr_is_draft", True),
+    ):
+        if d.get(field) is not expected:
+            raise HandoffError(
+                f"stage128 M3I-2 contract lock {field} must be {expected}")
+    for field in ("network_requests", "data_files_downloaded",
+                  "macro_observations_read", "company_rows_loaded",
+                  "final_test_rows_loaded", "model_fits", "predictions",
+                  "predictive_metrics", "coverage_calculations",
+                  "holm_calculations"):
+        if d.get(field) != 0:
+            raise HandoffError(
+                f"stage128 M3I-2 contract lock {field} must be 0")
+    if d.get("m3_cbi_gate_status") != "UNRESOLVED_M3_DATA_GATE":
+        raise HandoffError(
+            "stage128 M3I-2 contract lock must preserve the M3-CBI Gate "
+            "status UNRESOLVED_M3_DATA_GATE")
+    if d.get("m3i3_financing_lock") != _STAGE128_M3I3_FINANCING_LOCK_STATUS:
+        raise HandoffError(
+            "stage128 M3I-3 financing metadata lock must remain "
+            f"{_STAGE128_M3I3_FINANCING_LOCK_STATUS}")
+    if d.get("next_research_action_id") != (
+            _NEXT_RESEARCH_ACTION_ID_AFTER_M3I2_CONTRACT_LOCK):
+        raise HandoffError(
+            "stage128 M3I-2 contract lock next_research_action_id mismatch")
+    if d.get("next_action_authorized") is not False:
+        raise HandoffError(
+            "the action after the M3I-2 contract lock is NOT authorized")
+    # The base rule is STATE-DEPENDENT. It was "never main" only while PR #73
+    # was open; PR #73 has since been merged and PR #74 was retargeted to main.
+    topo = d.get("live_topology") or {}
+    merged = topo.get("predecessor_pr_merged", d.get("predecessor_pr_merged"))
+    base = topo.get("live_pr_base_branch", d.get("pr_base_branch"))
+    if merged is False:
+        if base == _STAGE128_M3I2_MAIN_BRANCH:
+            raise HandoffError(
+                "the M3I-2 contract-lock PR may not target main while PR #73 "
+                "is open")
+        if base != _STAGE128_M3I2_PREDECESSOR_BRANCH:
+            raise HandoffError(
+                "while PR #73 is open the M3I-2 contract-lock PR base must be "
+                f"{_STAGE128_M3I2_PREDECESSOR_BRANCH}")
+        if topo.get("pr_is_stacked_on_open_predecessor") is False:
+            raise HandoffError(
+                "PR #73 is open, so the M3I-2 PR is stacked on it")
+    elif merged is True:
+        if topo.get("predecessor_pr_merge_commit") != (
+                _STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT):
+            raise HandoffError(
+                "the M3I-2 contract lock records PR #73 as merged without the "
+                "verified merge commit "
+                f"{_STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT}")
+        if topo.get("live_main_commit") != (
+                _STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT):
+            raise HandoffError(
+                "live main must equal the PR #73 merge commit")
+        if base == _STAGE128_M3I2_PREDECESSOR_BRANCH:
+            raise HandoffError(
+                "PR #73 is merged; the M3I-2 PR base may not still name the "
+                "merged predecessor branch")
+        if base != _STAGE128_M3I2_MAIN_BRANCH:
+            raise HandoffError(
+                "after PR #73 merged the M3I-2 contract-lock PR base must be "
+                "main")
+        if topo.get("live_pr_base_commit") != (
+                _STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT):
+            raise HandoffError(
+                "the live PR base commit must equal current main")
+        if topo.get("pr_is_stacked_on_open_predecessor") is not False:
+            raise HandoffError(
+                "PR #73 is merged, so the M3I-2 PR is no longer stacked on an "
+                "open predecessor")
+        if topo.get(
+                "retargeted_to_main_after_predecessor_merge_verified") is not (
+                True):
+            raise HandoffError(
+                "the retarget to main must be recorded as verified after the "
+                "PR #73 merge")
+        if topo.get("may_target_main") is not True:
+            raise HandoffError(
+                "after PR #73 merged the M3I-2 PR may target main")
+    else:
+        raise HandoffError(
+            "the M3I-2 contract lock must record predecessor_pr_merged "
+            "explicitly")
+    # In BOTH states the scientific provenance baseline stays the PR #73 HEAD,
+    # never the merge commit, and PR #74 stays a Draft with no merge rights.
+    if topo.get("scientific_provenance_baseline_commit") != (
+            _STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT):
+        raise HandoffError(
+            "the M3I-2 scientific provenance baseline must remain the PR #73 "
+            f"head {_STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT}")
+    if topo.get("live_pr_is_draft") is not True:
+        raise HandoffError("PR #74 must remain a Draft")
+    if topo.get("live_pr_merged") is not False:
+        raise HandoffError("PR #74 must remain unmerged")
+    if topo.get("merge_authorized") is not False:
+        raise HandoffError("no merge authorization exists for PR #74")
+
+    return {
+        "stage128_m3i2_contract_lock_executed": True,
+        "stage128_m3i2_contract_status": _STAGE128_M3I2_CONTRACT_STATUS,
+        "stage128_m3i2_contract_lock_authorization_consumed": True,
+        "stage128_m3i2_baseline_pr_number": d.get("baseline_pr_number"),
+        "stage128_m3i2_baseline_commit": d.get("baseline_commit"),
+        "stage128_m3i2_pr_base_branch": d.get("pr_base_branch"),
+        "stage128_m3i2_provenance_baseline_commit": topo.get(
+            "scientific_provenance_baseline_commit"),
+        "stage128_m3i2_live_pr_number": topo.get("live_pr_number"),
+        "stage128_m3i2_live_pr_base_branch": topo.get("live_pr_base_branch"),
+        "stage128_m3i2_live_pr_base_commit": topo.get("live_pr_base_commit"),
+        "stage128_m3i2_live_main_commit": topo.get("live_main_commit"),
+        "stage128_m3i2_live_pr_is_draft": topo.get("live_pr_is_draft"),
+        "stage128_m3i2_live_pr_merged": topo.get("live_pr_merged"),
+        "stage128_m3i2_predecessor_pr_merged": topo.get(
+            "predecessor_pr_merged"),
+        "stage128_m3i2_predecessor_pr_merge_commit": topo.get(
+            "predecessor_pr_merge_commit"),
+        "stage128_m3i2_pr_is_stacked_on_open_predecessor": topo.get(
+            "pr_is_stacked_on_open_predecessor"),
+        "stage128_m3i2_retargeted_to_main_after_predecessor_merge_verified":
+            topo.get("retargeted_to_main_after_predecessor_merge_verified"),
+        "stage128_m3i2_may_target_main": topo.get("may_target_main"),
+        "stage128_m3i2_merge_authorized": False,
+        # A CONTRACT lock is not data and not modeling.
+        "m3i2_contract_lock_executed": True,
+        "m3i2_contract_status": _STAGE128_M3I2_CONTRACT_STATUS,
+        "m3i2_retrieval_started": False,
+        "m3i2_data_gate_executed": False,
+        "m3i2_block_admitted": False,
+        "m3i2_incremental_evaluation_authorized": False,
+        "m3i2_modeling_started": False,
+        "m3i3_financing_lock": _STAGE128_M3I3_FINANCING_LOCK_STATUS,
+        "m3i3_admitted": False,
+        "m3i_is_supplementary_not_confirmatory_m3": True,
+        # The frozen CBI block is untouched.
+        "m3_macro_data_gate_status": d.get("m3_cbi_gate_status"),
+        "m3_block_admitted_for_incremental_evaluation": False,
+        "m3_incremental_evaluation_authorized": False,
+        "m3_modeling_started": False,
+        "m4_authorized": False,
+        "m4_started": False,
+        "final_test_locked": True,
+        # Pointers. The lock IS a completed research action; the pointer it
+        # publishes is informational and explicitly unauthorized.
+        "last_completed_research_action_id": _STAGE128_M3I2_ACTION_ID,
+        "next_research_action_id": (
+            _NEXT_RESEARCH_ACTION_ID_AFTER_M3I2_CONTRACT_LOCK),
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
+    }
 
 
 _STAGE128_M2_RETAINED_BLOCK_DECISION_REL = (

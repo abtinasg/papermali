@@ -593,6 +593,160 @@ def stage128_m3_macro_data_gate_executed(repo_root: Path) -> bool:
     return True
 
 
+#: The live workstream once the supplementary M3I-2 contract has been
+#: prospectively locked. The lock is a CONTRACT event: no macro observation is
+#: retrieved, no Data Gate is executed and no modeling starts.
+STAGE128_M3I2_ACTIVE_WORKSTREAM = "stage128_m3i2_prospective_contract_lock"
+
+STAGE128_M3I2_ACTION_ID = "stage128-m3i2-prospective-contract-lock"
+STAGE128_M3I2_CONTRACT_STATUS = "PROSPECTIVELY_LOCKED_NO_DATA"
+NEXT_RESEARCH_ACTION_ID_AFTER_M3I2_CONTRACT_LOCK = (
+    "stage128-m3i2-official-source-evidence-capture"
+)
+
+_STAGE128_M3I2_DECISION_REL = (
+    "project/stage128/m3_intl_macro_contract_lock/"
+    "stage128_m3_intl_macro_contract_decision.json"
+)
+
+
+def stage128_m3i2_contract_lock_completed(repo_root: Path) -> bool:
+    """True once the supplementary M3I-2 contract has been locked.
+
+    A contract lock is metadata only. Fail closed if the artifact claims data
+    retrieval, Gate execution, modeling, M4, final-test access or a merge.
+    """
+    path = repo_root / _STAGE128_M3I2_DECISION_REL
+    if not path.is_file():
+        return False
+    decision = json.loads(path.read_text(encoding="utf-8"))
+    if decision.get("action_id") != STAGE128_M3I2_ACTION_ID:
+        raise ValidationFail("stage128 M3I-2 contract-lock action_id mismatch")
+    if not decision.get("m3i2_contract_lock_executed"):
+        return False
+    if decision.get("m3i2_contract_status") != STAGE128_M3I2_CONTRACT_STATUS:
+        raise ValidationFail(
+            "stage128 M3I-2 contract status must be "
+            f"{STAGE128_M3I2_CONTRACT_STATUS}")
+    for field, expected in (
+        ("m3i2_retrieval_started", False),
+        ("m3i2_data_gate_executed", False),
+        ("m3i2_block_admitted", False),
+        ("m3i2_incremental_evaluation_authorized", False),
+        ("m3i2_modeling_started", False),
+        ("m3i3_admitted", False),
+        ("m3_cbi_contract_changed", False),
+        ("m4_authorized", False),
+        ("m4_started", False),
+        ("final_test_locked", True),
+        ("merge_authorized", False),
+        ("data_collection_started", False),
+    ):
+        if decision.get(field) is not expected:
+            raise ValidationFail(
+                f"stage128 M3I-2 contract lock {field} != {expected}")
+    for field in ("network_requests", "macro_observations_read",
+                  "model_fits", "predictions", "coverage_calculations",
+                  "holm_calculations"):
+        if decision.get(field) != 0:
+            raise ValidationFail(
+                f"stage128 M3I-2 contract lock {field} must be 0")
+    # The frozen CBI block is preserved, never replaced by the supplementary
+    # international family.
+    if decision.get("m3_cbi_gate_status") != "UNRESOLVED_M3_DATA_GATE":
+        raise ValidationFail(
+            "stage128 M3I-2 contract lock must preserve the M3-CBI Gate status")
+    _assert_m3i2_live_topology(decision)
+    return True
+
+
+#: PR #73 was merged into main by this commit; PR #74 was retargeted after.
+STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT = (
+    "e6db63fb7d105f0d3a39db101c9e364161c367e9")
+STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT = (
+    "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")
+STAGE128_M3I2_PREDECESSOR_BRANCH = "stage128-m3-macro-data-gate"
+STAGE128_M3I2_MAIN_BRANCH = "main"
+
+
+def _assert_m3i2_live_topology(decision: dict) -> None:
+    """Validate the PR topology in a STATE-DEPENDENT way.
+
+    "Never base on main" held only while the predecessor PR was open. Now that
+    PR #73 is merged, that rule would reject the correct live topology, so each
+    predecessor state is validated on its own terms. In both states the
+    scientific provenance baseline stays the PR #73 HEAD, PR #74 stays a Draft
+    and unmerged, and no merge authorization exists.
+    """
+    topo = decision.get("live_topology") or {}
+    if not topo:
+        raise ValidationFail(
+            "stage128 M3I-2 contract lock must record its live PR topology")
+    merged = topo.get("predecessor_pr_merged")
+    base = topo.get("live_pr_base_branch")
+
+    if merged is False:
+        if base != STAGE128_M3I2_PREDECESSOR_BRANCH:
+            raise ValidationFail(
+                "while the predecessor PR is open the M3I-2 PR base must be "
+                f"{STAGE128_M3I2_PREDECESSOR_BRANCH}")
+        if topo.get("pr_is_stacked_on_open_predecessor") is not True:
+            raise ValidationFail(
+                "while the predecessor PR is open the M3I-2 PR is stacked")
+        if topo.get("may_target_main") is not False:
+            raise ValidationFail(
+                "the M3I-2 PR may not target main while the predecessor is "
+                "open")
+    elif merged is True:
+        if topo.get("predecessor_pr_merge_commit") != (
+                STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT):
+            raise ValidationFail(
+                "the predecessor is marked merged without the verified merge "
+                f"commit {STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT}")
+        if topo.get("live_main_commit") != (
+                STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT):
+            raise ValidationFail(
+                "live main must equal the predecessor merge commit")
+        if base == STAGE128_M3I2_PREDECESSOR_BRANCH:
+            raise ValidationFail(
+                "the M3I-2 PR base still names the merged predecessor branch")
+        if base != STAGE128_M3I2_MAIN_BRANCH:
+            raise ValidationFail(
+                "after the predecessor merged the M3I-2 PR base must be main")
+        if topo.get("live_pr_base_commit") != (
+                STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT):
+            raise ValidationFail(
+                "the live PR base commit must equal current main")
+        if topo.get("pr_is_stacked_on_open_predecessor") is not False:
+            raise ValidationFail(
+                "the predecessor is merged; the M3I-2 PR is no longer stacked "
+                "on an open predecessor")
+        if topo.get(
+                "retargeted_to_main_after_predecessor_merge_verified") is not (
+                True):
+            raise ValidationFail(
+                "the retarget to main must be verified after the predecessor "
+                "merge")
+        if topo.get("may_target_main") is not True:
+            raise ValidationFail(
+                "after the predecessor merged the M3I-2 PR may target main")
+    else:
+        raise ValidationFail(
+            "predecessor_pr_merged must be recorded explicitly")
+
+    if topo.get("scientific_provenance_baseline_commit") != (
+            STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT):
+        raise ValidationFail(
+            "the M3I-2 scientific provenance baseline must remain the "
+            f"predecessor PR head {STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT}")
+    if topo.get("live_pr_is_draft") is not True:
+        raise ValidationFail("the M3I-2 PR must remain a Draft")
+    if topo.get("live_pr_merged") is not False:
+        raise ValidationFail("the M3I-2 PR must remain unmerged")
+    if topo.get("merge_authorized") is not False:
+        raise ValidationFail("no merge authorization exists for the M3I-2 PR")
+
+
 def m3_gate_state_is_self_consistent(
     handoff: dict[str, Any], *, m3_gate_executed: bool,
 ) -> bool:
@@ -609,7 +763,11 @@ def m3_gate_state_is_self_consistent(
     return (
         handoff.get("m3_macro_data_gate_executed") is True
         and handoff.get("m3_data_workstream_started") is True
-        and handoff.get("active_workstream") == STAGE128_M3_ACTIVE_WORKSTREAM
+        # The live workstream is the M3 Gate until the supplementary M3I-2
+        # contract lock succeeds it; both are M3-family DATA/CONTRACT labels
+        # and neither implies modeling.
+        and handoff.get("active_workstream") in (
+            STAGE128_M3_ACTIVE_WORKSTREAM, STAGE128_M3I2_ACTIVE_WORKSTREAM)
         and handoff.get("m3_modeling_started") is False
         and handoff.get("m3_incremental_evaluation_authorized") is False
         and handoff.get("m3_block_admitted_for_incremental_evaluation") is False
@@ -628,6 +786,8 @@ def expected_active_workstream(repo_root: Path) -> str:
     Stage128 M2 D2 one, not the Stage126 M1 financial baseline. The Stage126
     value remains correct history, but it is no longer the CURRENT value.
     """
+    if stage128_m3i2_contract_lock_completed(repo_root):
+        return STAGE128_M3I2_ACTIVE_WORKSTREAM
     if stage128_m3_macro_data_gate_executed(repo_root):
         return STAGE128_M3_ACTIVE_WORKSTREAM
     if stage128_m2_d2_design_freeze_completed(repo_root):
@@ -658,6 +818,12 @@ def current_state_labels_are_not_stale(
         return True
     if handoff.get("current_stage") != STAGE128_CURRENT_STAGE:
         return False
+    # Once the supplementary M3I-2 contract has been locked, the live
+    # workstream is that contract lock and the CBI-only M3 Gate label becomes
+    # predecessor context — stale as a CURRENT value.
+    if handoff.get("stage128_m3i2_contract_lock_executed") is True:
+        return handoff.get("active_workstream") == (
+            STAGE128_M3I2_ACTIVE_WORKSTREAM)
     # After the M3 Gate has executed the live workstream is the M3 Gate; the
     # M2 D2 label becomes predecessor context and is stale as a CURRENT value.
     if handoff.get("m3_macro_data_gate_executed") is True:
@@ -919,6 +1085,19 @@ def expected_next_research_action_id(
     repo_root: Path, m1_robustness_completed: bool,
 ) -> str:
     """The single source of truth for the current expected research pointer."""
+    if (
+        m1_robustness_completed
+        and robustness_closure_completed(repo_root)
+        and retained_design_freeze_completed(repo_root)
+        and stage128_m2_d2_design_freeze_completed(repo_root)
+        and stage128_m2_d2_gate_rerun_executed(repo_root)
+        and stage127_m2_incremental_evaluation_completed(repo_root)
+        and stage128_m2_retained_block_decision_completed(repo_root)
+        and stage128_m3i2_contract_lock_completed(repo_root)
+    ):
+        # A pointer is never an authorization: the evidence-capture action
+        # named here is explicitly NOT authorized by the contract lock.
+        return NEXT_RESEARCH_ACTION_ID_AFTER_M3I2_CONTRACT_LOCK
     if (
         m1_robustness_completed
         and robustness_closure_completed(repo_root)
@@ -2391,7 +2570,10 @@ def build_assertions(
             == STAGE127_M2_INCREMENTAL_EVALUATION_ACTION_ID)
         or (retained_block_done
             and handoff.get("last_completed_research_action_id")
-            == STAGE128_M2_RETAINED_BLOCK_DECISION_ACTION_ID),
+            == STAGE128_M2_RETAINED_BLOCK_DECISION_ACTION_ID)
+        or (stage128_m3i2_contract_lock_completed(repo_root)
+            and handoff.get("last_completed_research_action_id")
+            == STAGE128_M3I2_ACTION_ID),
         "after the Gate re-run, the last completed research action must be "
         "the Gate re-run itself or a recognized, completed successor action")
     # --- ROADMAP front matter must agree with its own explanatory prose --- #

@@ -8,12 +8,12 @@ _Generated from the repository (git + QC). Do not edit by hand._
 ## Snapshot
 
 - **Stage / Batch:** Stage128 / None
-- **Active workstream:** `stage128_m3_macro_data_gate`
+- **Active workstream:** `stage128_m3i2_prospective_contract_lock`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `stage128-m3-macro-data-gate`
-- **Last stage commit:** `6b133f00ded0c7ee543bc78c7eabc3052e2c85f0`
-- **Generated from commit:** `6b133f00ded0c7ee543bc78c7eabc3052e2c85f0` (branch `stage128-m3-macro-data-gate`, informational)
-- **Baseline:** `origin/main` @ `35aaf4b70e9341704ee38be6f8cf2e2519c70bb2`
+- **Next research action:** `stage128-m3i2-official-source-evidence-capture`
+- **Last stage commit:** `4a88a24ea9cbcf362967c518e9f7232c86fe3940`
+- **Generated from commit:** `22b747d4c55febe6839685ef9805d795eb9d8fa6` (branch `stage128-m3i2-prospective-contract-lock`, informational)
+- **Baseline:** `origin/main` @ `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`
 
 ## Current-state validation
 
@@ -109,7 +109,7 @@ _The human governance decision that the paired evaluation deliberately left open
 - ⛔ **Holm family:** complete=False, final adjustment deferred=True — the incomplete confirmatory family stays incomplete
 - 🔒 **Final test locked:** final_test_unlocked=False, final_test_access_authorized=False, predictor values inspected=False, target values inspected=False
 - ⛔ **M3:** authorized=False, started=False — **M4:** authorized=False, started=False
-- **Next research action (pointer only):** `stage128-m3-macro-data-gate` — the M3 macro data Gate, which has since been EXECUTED as a data-admission Gate only (see the M3 section below). A pointer is **not** an authorization, and the Gate execution started no modeling: `m3_modeling_started=False`, `m3_incremental_evaluation_authorized=False`.
+- **Pointer published by this decision (historical):** `stage128-m3-macro-data-gate` — the M3 macro data Gate, which has since been EXECUTED as a data-admission Gate only (see the M3 section below). A pointer was **not** an authorization, and the Gate execution started no modeling: `m3_modeling_started=False`, `m3_incremental_evaluation_authorized=False`.
 - Package: `project/stage128/m2_retained_block_human_decision/`; interpretation: `project/stage128/m2_retained_block_human_decision/README_STAGE128_M2_RETAINED_BLOCK_HUMAN_DECISION.md`
 
 ### Stage128 — M3 macro DATA Gate (data admission only)
@@ -125,6 +125,20 @@ _The data-admission Gate for the exact frozen three-variable M3 macro block (`cp
 - ⛔ **M4:** authorized=False, started=False — **final test locked:** True
 - ⛔ **Research pointer NOT advanced** — `m3_macro_data_gate_human_review_required` = True; 8 recorded blocker/unresolved reasons. Missing evidence was recorded as null, never scored as zero, and never converted into an observed failure.
 - Package: `project/stage128/m3_macro_data_gate/`; interpretation: `project/stage128/m3_macro_data_gate/README_STAGE128_M3_MACRO_DATA_GATE.md`
+
+### Stage128 — M3I-2 prospective contract lock (contract only)
+
+_A metadata-only, PROSPECTIVE source/definition/statistical contract lock for the SUPPLEMENTARY international-macro block M3I-2 (`intl_cpi_inflation_annual`, `intl_fx_change_official_annual`), plus a contingent, UNRESOLVED M3I-3 financing shell. It is not a substitution, correction or continuation of the frozen M3-CBI block, and it is never confirmatory M3._
+
+- ✅ **Contract status:** `PROSPECTIVELY_LOCKED_NO_DATA` — authorization consumed: True (one action only, not standing)
+- ⛔ **No data, no Gate, no modeling:** 0 network requests, 0 macro observations read, 0 company rows loaded, 0 coverage calculations, 0 model fits, 0 predictions, 0 Holm calculations
+- ⛔ **M3I-2 retrieval started:** False — **Data Gate executed:** False — **block admitted:** False — **modeling started:** False
+- ⛔ **M3I-3 financing metadata lock:** `UNRESOLVED_METADATA_LOCK` — **admitted:** False
+- **M3-CBI preserved unchanged:** Gate status `UNRESOLVED_M3_DATA_GATE`, block admitted False
+- **Scientific provenance baseline:** PR #73 head `e6db63fb7d105f0d3a39db101c9e364161c367e9` — protected hashes are verified against that commit permanently; a merge or retarget never moves it
+- **Live PR topology:** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and remains a **Draft** — merged = False, no merge authorization
+- **Next research action (pointer only):** `stage128-m3i2-official-source-evidence-capture` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False). Data collection has **not** started.
+- Package: `project/stage128/m3_intl_macro_contract_lock/`; interpretation: `project/stage128/m3_intl_macro_contract_lock/README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`
 
 ### Last completed scientific micro-part QC
 
@@ -175,5 +189,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `73200e2eda262e5176fe9aa05b5936c639bafb8029682f95cc4ce690f3705a9a`_
-_generated_at_utc: 2026-08-01T15:48:44Z (informational)_
+_state_fingerprint: `9f90c95e127a179337687e7d5dd98c3f4c6269760901db9662ebfa23a33cf847`_
+_generated_at_utc: 2026-08-03T09:22:45Z (informational)_

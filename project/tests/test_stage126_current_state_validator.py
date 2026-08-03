@@ -590,8 +590,10 @@ def test_final_test_remains_locked():
 
 def test_research_pointers_unchanged():
     report = _read_json(v.F_REPORT)
+    # The live workstream advanced once more when the supplementary M3I-2
+    # contract was prospectively locked. A contract lock is metadata only.
     assert report["active_workstream"] == (
-        "stage128_m3_macro_data_gate"
+        "stage128_m3i2_prospective_contract_lock"
     )
     # Part 6 closed the six-category robustness set, the synthesis-only
     # robustness closure completed, the retained-design freeze (PR #65)
@@ -604,7 +606,12 @@ def test_research_pointers_unchanged():
     # COMPLETED, and the human retained-block decision has since been RECORDED,
     # so the pointer advanced once more — to the M3 macro data Gate, which is a
     # POINTER, not an authorization.
-    assert report["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    # The M3-CBI Gate returned UNRESOLVED and the supplementary M3I-2
+    # contract has since been prospectively locked, so the pointer advanced
+    # once more — to an evidence-capture action that is NOT authorized.
+    assert report["next_research_action_id"] == (
+        "stage128-m3i2-official-source-evidence-capture"
+    )
 
 
 @pytest.mark.parametrize("field", sorted(
@@ -1494,16 +1501,16 @@ def test_live_handoff_labels_match_the_live_research_state():
     if state.get("stage128_m2_d2_design_freeze_completed"):
         assert state["current_stage"] == "Stage128"
         assert state["active_workstream"] == (
-            "stage128_m3_macro_data_gate"
+            "stage128_m3i2_prospective_contract_lock"
         )
         # The authoritative research-action ids advance only with real
         # scientific actions, never with a label fix. The D2 design freeze,
         # then the executed D2 Gate re-run, each advanced them once.
         assert state["last_completed_research_action_id"] == (
-            "stage128-m2-retained-block-human-decision"
+            "stage128-m3i2-prospective-contract-lock"
         )
         assert state["next_research_action_id"] == (
-            "stage128-m3-macro-data-gate"
+            "stage128-m3i2-official-source-evidence-capture"
         )
         # And nothing further is AUTHORIZED by advancing a label.
         for field in (
@@ -1530,7 +1537,7 @@ def test_expected_labels_are_state_dependent_not_hardcoded():
     root = _root()
     assert v.expected_current_stage(root) == "Stage128"
     assert v.expected_active_workstream(root) == (
-        "stage128_m3_macro_data_gate"
+        "stage128_m3i2_prospective_contract_lock"
     )
     # The Stage126 constants survive as the pre-freeze expectation.
     assert v.ACTIVE_WORKSTREAM == "stage126_m1_financial_baseline"
@@ -1543,12 +1550,13 @@ def test_current_state_snapshot_renders_stage128_labels():
     if state.get("stage128_m2_d2_design_freeze_completed"):
         assert "- **Stage / Batch:** Stage128 /" in text
         assert (
-            "- **Active workstream:** `stage128_m3_macro_data_gate`"
+            "- **Active workstream:** "
+            "`stage128_m3i2_prospective_contract_lock`"
             in text
         )
         assert (
             "- **Next research action:** "
-            "`stage128-m3-macro-data-gate`" in text
+            "`stage128-m3i2-official-source-evidence-capture`" in text
         )
         assert (
             "## Stage128 — M2 D2 boundary-month equity-return design freeze"
@@ -1657,7 +1665,7 @@ def test_sole_live_next_pointer_is_a_pointer_not_an_authorization():
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1, pointers
     line = pointers[0]
-    assert "`stage128-m3-macro-data-gate`" in line
+    assert "`stage128-m3i2-official-source-evidence-capture`" in line
     assert "pointer is **not** an authorization" in line
 
 
@@ -1686,9 +1694,11 @@ def test_roadmap_front_matter_matches_handoff_pointers():
     text = open(_ROADMAP, encoding="utf-8").read()
     fm = v._roadmap_front_matter(text)
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m2-retained-block-human-decision"
+        "stage128-m3i2-prospective-contract-lock"
     )
-    assert fm["next_research_action_id"] == "stage128-m3-macro-data-gate"
+    assert fm["next_research_action_id"] == (
+        "stage128-m3i2-official-source-evidence-capture"
+    )
     state = json.loads(open(
         os.path.join(REAL_ROOT, "project", "docs", "ai",
                      "handoff_state.json"), encoding="utf-8").read())
@@ -1809,9 +1819,13 @@ def test_m3_gate_executed_is_recognized():
 
 
 def test_expected_active_workstream_advances_to_the_m3_gate():
-    assert v.expected_active_workstream(_root()) == (
-        "stage128_m3_macro_data_gate")
+    # The M3 Gate label is the expectation until the supplementary M3I-2
+    # contract lock succeeds it; on this branch the lock is complete.
     assert v.STAGE128_M3_ACTIVE_WORKSTREAM == "stage128_m3_macro_data_gate"
+    assert v.expected_active_workstream(_root()) == (
+        "stage128_m3i2_prospective_contract_lock")
+    assert v.STAGE128_M3I2_ACTIVE_WORKSTREAM == (
+        "stage128_m3i2_prospective_contract_lock")
 
 
 def test_stale_m2_d2_workstream_label_is_rejected_after_the_m3_gate():
@@ -1890,3 +1904,150 @@ def test_live_handoff_state_is_self_consistent_about_the_m3_gate():
     state = json.loads(
         (_root() / "project/docs/ai/handoff_state.json").read_text("utf-8"))
     assert v.m3_gate_state_is_self_consistent(state, m3_gate_executed=True)
+
+
+# --------------------------------------------------------------------------- #
+# Stage128 — supplementary M3I-2 prospective contract lock
+# --------------------------------------------------------------------------- #
+
+def test_m3i2_contract_lock_is_recognized():
+    assert v.stage128_m3i2_contract_lock_completed(_root()) is True
+
+
+def test_m3i2_lock_makes_the_cbi_gate_label_stale():
+    """Once the contract is locked, the CBI Gate label is predecessor context."""
+    stale = {
+        "current_stage": v.STAGE128_CURRENT_STAGE,
+        "active_workstream": v.STAGE128_M3_ACTIVE_WORKSTREAM,
+        "m3_macro_data_gate_executed": True,
+        "stage128_m3i2_contract_lock_executed": True,
+    }
+    assert v.current_state_labels_are_not_stale(
+        stale, freeze_completed=True) is False
+    live = dict(stale)
+    live["active_workstream"] = v.STAGE128_M3I2_ACTIVE_WORKSTREAM
+    assert v.current_state_labels_are_not_stale(
+        live, freeze_completed=True) is True
+
+
+def test_m3i2_workstream_is_accepted_by_the_m3_self_consistency_check():
+    state = {
+        "m3_macro_data_gate_executed": True,
+        "m3_data_workstream_started": True,
+        "active_workstream": v.STAGE128_M3I2_ACTIVE_WORKSTREAM,
+        "m3_modeling_started": False,
+        "m3_incremental_evaluation_authorized": False,
+        "m3_block_admitted_for_incremental_evaluation": False,
+        "m3_macro_data_gate_status": "UNRESOLVED_M3_DATA_GATE",
+    }
+    assert v.m3_gate_state_is_self_consistent(state, m3_gate_executed=True)
+
+
+def test_m3i2_next_pointer_is_the_unauthorized_evidence_capture():
+    assert v.NEXT_RESEARCH_ACTION_ID_AFTER_M3I2_CONTRACT_LOCK == (
+        "stage128-m3i2-official-source-evidence-capture")
+    assert v.expected_next_research_action_id(_root(), True) == (
+        "stage128-m3i2-official-source-evidence-capture")
+
+
+def test_m3i2_live_topology_is_the_post_merge_retargeted_state():
+    rel = v._STAGE128_M3I2_DECISION_REL
+    topo = json.loads((_root() / rel).read_text(encoding="utf-8"))[
+        "live_topology"]
+    v._assert_m3i2_live_topology({"live_topology": topo})
+    assert topo["predecessor_pr_merged"] is True
+    assert topo["predecessor_pr_merge_commit"] == (
+        v.STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT)
+    assert topo["live_pr_base_branch"] == "main"
+    assert topo["live_pr_base_commit"] == topo["live_main_commit"]
+    assert topo["pr_is_stacked_on_open_predecessor"] is False
+    assert topo["may_target_main"] is True
+    # the audited baseline is NOT the merge commit
+    assert topo["scientific_provenance_baseline_commit"] == (
+        v.STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT)
+    assert topo["scientific_provenance_baseline_commit"] != (
+        v.STAGE128_M3I2_PREDECESSOR_MERGE_COMMIT)
+    assert topo["live_pr_is_draft"] is True
+    assert topo["live_pr_merged"] is False
+    assert topo["merge_authorized"] is False
+
+
+def test_m3i2_pre_merge_topology_still_validates():
+    """The stacked state was correct then; it is simply no longer current."""
+    rel = v._STAGE128_M3I2_DECISION_REL
+    topo = json.loads((_root() / rel).read_text(encoding="utf-8"))[
+        "live_topology"]
+    topo.update({
+        "predecessor_pr_merged": False,
+        "predecessor_pr_merge_commit": None,
+        "live_pr_base_branch": v.STAGE128_M3I2_PREDECESSOR_BRANCH,
+        "live_pr_base_commit": v.STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT,
+        "pr_is_stacked_on_open_predecessor": True,
+        "may_target_main": False,
+    })
+    v._assert_m3i2_live_topology({"live_topology": topo})
+
+
+@pytest.mark.parametrize("mutation", [
+    # predecessor merged but base still names the merged predecessor branch
+    {"live_pr_base_branch": "stage128-m3-macro-data-gate"},
+    # predecessor unmerged but base is main
+    {"predecessor_pr_merged": False, "live_pr_base_branch": "main"},
+    # missing / wrong merge commit
+    {"predecessor_pr_merge_commit": None},
+    {"predecessor_pr_merge_commit": "0" * 40},
+    # merge commit differs from current main
+    {"live_main_commit": "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2"},
+    # live base SHA differs from current main
+    {"live_pr_base_commit": "e6db63fb7d105f0d3a39db101c9e364161c367e9"},
+    # still described as stacked on an open predecessor
+    {"pr_is_stacked_on_open_predecessor": True},
+    # retarget claimed without verifying the merge first
+    {"retargeted_to_main_after_predecessor_merge_verified": False},
+    # main still forbidden after the merge
+    {"may_target_main": False},
+    # provenance baseline replaced by the merge commit
+    {"scientific_provenance_baseline_commit":
+        "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a"},
+    # PR marked ready / merged / merge-authorized
+    {"live_pr_is_draft": False},
+    {"live_pr_merged": True},
+    {"merge_authorized": True},
+    # merge state not recorded explicitly
+    {"predecessor_pr_merged": None},
+])
+def test_m3i2_topology_mutations_fail_closed(mutation):
+    rel = v._STAGE128_M3I2_DECISION_REL
+    topo = json.loads((_root() / rel).read_text(encoding="utf-8"))[
+        "live_topology"]
+    topo.update(mutation)
+    with pytest.raises(v.ValidationFail):
+        v._assert_m3i2_live_topology({"live_topology": topo})
+
+
+def test_m3i2_recognizer_requires_a_live_topology():
+    with pytest.raises(v.ValidationFail):
+        v._assert_m3i2_live_topology({})
+
+
+@pytest.mark.parametrize("field,bad", [
+    ("m3i2_data_gate_executed", True),
+    ("m3i2_modeling_started", True),
+    ("m3i2_block_admitted", True),
+    ("m3i3_admitted", True),
+    ("m3_cbi_contract_changed", True),
+    ("merge_authorized", True),
+    ("m4_started", True),
+    ("final_test_locked", False),
+    ("model_fits", 3),
+    ("m3_cbi_gate_status", "PASS_FOR_M3_INCREMENTAL_EVALUATION"),
+])
+def test_m3i2_recognizer_fails_closed(tmp_path, field, bad):
+    rel = v._STAGE128_M3I2_DECISION_REL
+    payload = json.loads((_root() / rel).read_text(encoding="utf-8"))
+    payload[field] = bad
+    (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+    (tmp_path / rel).write_text(
+        json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    with pytest.raises(v.ValidationFail):
+        v.stage128_m3i2_contract_lock_completed(tmp_path)

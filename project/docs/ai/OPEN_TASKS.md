@@ -3,9 +3,124 @@
 Human-maintained. The authoritative "next action" ID lives in `ROADMAP.md`
 front matter; this file is the working description.
 
-## Active research workstream: `stage128-m3-macro-data-gate`
+## Active research workstream: `stage128-m3i2-prospective-contract-lock`
 
-The CURRENT workstream is the Stage128 **M3 macro DATA** workstream. It is
+The CURRENT workstream is the Stage128 **M3I-2 supplementary international
+macro CONTRACT** workstream. A contract lock is **metadata only**: no macro
+observation was retrieved, no dataset row was created, no Data Gate ran, no
+coverage was computed, no model was fit and no comparison was executed
+(`m3i2_data_retrieval_started=false`, `m3i2_data_gate_executed=false`,
+`m3i2_modeling_started=false`, `m3i2_block_admitted=false`).
+
+The authoritative research-action pointers are
+`last_completed_research_action_id=stage128-m3i2-prospective-contract-lock`
+and `next_research_action_id=stage128-m3i2-official-source-evidence-capture`
+with `next_research_action_authorized=false` — a pointer is **never** an
+authorization.
+
+`stage128-m3-macro-data-gate` is now **predecessor context**, not the current
+workstream. Its result is preserved unchanged and is described below as
+history; the M3-CBI block remains `UNRESOLVED_M3_DATA_GATE` and unadmitted,
+and **M3I-2 does not replace, correct or continue it**.
+
+### Current scientific action
+
+`stage128-m3i2-prospective-contract-lock` — **COMPLETE**, recorded once under
+its own explicit one-action human authorization (28 UTF-8 bytes, SHA-256
+`d4acc969…d23068`, 2026-08-02), which was CONSUMED by the recording. The same
+text and hash were used earlier for a **different** action, so the scope of
+this occurrence is identified by the preceding assistant message, never by the
+hash alone (`scope_identified_by_hash_alone=false`).
+
+What it locked, prospectively and before any value-level work:
+
+- **M3I-2** (supplementary, never confirmatory M3):
+  `intl_cpi_inflation_annual` — World Bank WDI `FP.CPI.TOTL.ZG` (upstream IMF
+  IFS), annual, percent, transformation `identity`; and
+  `intl_fx_change_official_annual` — WDI `PA.NUS.FCRF`, annual, LCU per US
+  dollar, transformation exactly `100 * ln(E_y / E_(y-1))` over two
+  consecutive annual observations **from the same vintage**, fail-closed to
+  null on missing, non-positive, non-consecutive or cross-vintage inputs.
+  `PA.NUS.ATLS`, free-market/unofficial rates, aggregators and any post-hoc
+  indicator or transformation change are forbidden.
+- **M3I-3** financing — a contract **shell** only, against IMF
+  `IMF.STA:MFS_IR`. Every operational metadata field is `null`,
+  `candidate_selection_status=UNRESOLVED_METADATA_LOCK`, `admitted=false`.
+  Deposit rates, deposit-rate ceilings, real rates, spreads, repo /
+  reverse-repo volumes, standing-facility amounts and relabelled policy rates
+  are forbidden proxies. If no exact IMF series ever passes metadata and
+  coverage review, M3I-3 stays unavailable and **M3I-2 is not invalidated**.
+- **Observation-year selection inside the vintage** (added by the correction
+  of the independent audit of PR #74). Selecting a pre-cutoff WDI archive
+  *vintage* does not say which annual *observation* it contributes, so both
+  candidates now carry an exact rule: an annual period ends on **December 31
+  of the labelled Gregorian observation year**, only a period that finished
+  **strictly before** the pair cutoff is eligible, and among eligible years
+  the **maximum** is taken (`selected_observation_tie_breaker =
+  maximum_observation_year`) — never the first or earliest. A fiscal-year
+  label may never be a direct WDI year lookup, no eligible observation yields
+  **null**, and no alternative indicator may be tried. For FX the maximum
+  eligible year additionally requires `E_y` and `E_(y-1)` present, positive,
+  consecutive, same vintage, and same currency denomination and valuation.
+- **Historical-vintage semantic compatibility** (added by the same
+  correction). The WDI archive warns that one indicator code may have carried
+  a different base year or local-currency valuation in earlier releases, and
+  that *current* metadata can be shown alongside *archived* data. So
+  `historical_archive_metadata_assumed_identical_to_current=false` and
+  `semantic_compatibility_evidence_required_before_value_use=true`: per
+  edition, a later evidence-capture action must verify the archive edition
+  identifier, release date/time, Iran economy identity, indicator code,
+  archived series title, annual frequency, unit, calendar-year semantics and
+  the raw artifact SHA-256. CPI must stay an annual inflation-**rate** series
+  in percent (not an index level or GDP deflator); FX requires one currency
+  denomination and one valuation convention across the pair with no
+  redenomination or unit break. Any mismatch is
+  `null_and_invalid_for_coverage`, an **unverified vintage never counts
+  towards coverage**, and no alternative series may be tried after a mismatch.
+  Status in this action: `NOT_EXECUTED` — zero archive editions downloaded.
+- **Data Gate contract** — thresholds INHERITED unchanged (0.80 candidate
+  coverage, 0.70 block common sample, ≥5 positives per locked validation
+  window, development-only over the retained-M2 539-row common sample). The
+  Gate is `NOT_EXECUTED` and every coverage / common-sample / event-count
+  value is `null`, **never zero**.
+- **Multiplicity** — the original confirmatory Holm family (`M2_minus_M1`,
+  `M3_CBI_minus_M2`, `M4_minus_M3_CBI`) is unchanged and INCOMPLETE, and no
+  M3I comparison was inserted into it. A separate supplementary family
+  `S1 = M3I_2_minus_retained_M2` / `S2 = M3I_3_minus_M3I_2` is defined; neither
+  hypothesis exists yet, and all future M3I results are supplementary /
+  robustness only.
+
+Governance (updated after the predecessor merge). **Scientific provenance is
+immutable**: this contract was locked against the PR #73 head
+`e6db63fb7d105f0d3a39db101c9e364161c367e9` on branch
+`stage128-m3-macro-data-gate`, and every protected scientific hash is verified
+against that commit permanently — a merge or retarget never moves it, and the
+branch was **not** rebased.
+
+**Live PR topology**: PR #73 **was merged** into `main` by merge commit
+`b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`, and PR #74 was afterwards
+**retargeted to `main`** (`live_pr_base_branch: main`, `live_pr_base_commit` =
+`live_main_commit` = `b94f73fa…db516a`, `pr_is_stacked_on_open_predecessor:
+false`, `retargeted_to_main_after_predecessor_merge_verified: true`,
+`may_target_main: true`). The pre-merge values are retained under
+`historical_pre_merge_topology`, marked `superseded` and
+`describes_current_state: false`. No artifact still describes PR #73 as open or
+unmerged.
+
+The base rule is **state-dependent**, not unconditional: while the predecessor
+is open the base must be `stage128-m3-macro-data-gate` with `may_target_main:
+false`; once it is merged the base must be `main`, the merge commit must equal
+live `main`, and the retarget must be verified. In **both** states PR #74 stays
+`live_pr_is_draft: true`, `live_pr_merged: false` and `merge_authorized:
+false` — it has **not** been marked ready and **no merge authorization has been
+issued**.
+
+Package: `project/stage128/m3_intl_macro_contract_lock/`.
+
+### Predecessor workstream (HISTORICAL): `stage128-m3-macro-data-gate`
+
+The description below was accurate for that completed action and is preserved
+as history. The Stage128 **M3 macro DATA** workstream is
 started (`m3_data_workstream_started=true`) because the M3 macro data Gate has
 been EXECUTED once as a data-admission Gate under its own consumed one-action
 authorization, returning `UNRESOLVED_M3_DATA_GATE` and awaiting human review.
@@ -26,10 +141,9 @@ while the M2 D2 boundary-month workstream was live.
 `stage126-m1-financial-baseline` likewise remains correct **history** for the
 completed M1 financial-baseline workstream (see the historical section below).
 
-### Current scientific action
+### Predecessor scientific action (HISTORICAL)
 
-The current scientific action is `stage128-m3-macro-data-gate` — the M3 macro
-**data-admission Gate only**, executed once and terminal at
+`stage128-m3-macro-data-gate` — the M3 macro **data-admission Gate only**, executed once and terminal at
 `UNRESOLVED_M3_DATA_GATE`, pending human review. It asks only whether the exact
 frozen three-variable macro block can be obtained from authoritative,
 reproducible, point-in-time-safe sources; it does not ask, and does not answer,
@@ -198,11 +312,12 @@ unchanged, in its own Stage127 artifacts.
 Authoritative research pointers live in `ROADMAP.md` front matter. PR #72 is
 **merged** on `main` (`35aaf4b70e9341704ee38be6f8cf2e2519c70bb2`), so those
 pointers are live, not conditional:
-`last_completed_research_action_id=stage128-m2-retained-block-human-decision`,
-`next_research_action_id=stage128-m3-macro-data-gate`. The M3 data Gate has now
-been executed and returned `UNRESOLVED_M3_DATA_GATE`, so
-`last_completed_research_action_id` is **unchanged** and awaits human review of
-the observed Gate result.
+`last_completed_research_action_id=stage128-m3i2-prospective-contract-lock`,
+`next_research_action_id=stage128-m3i2-official-source-evidence-capture`
+(`next_research_action_authorized=false`). The M3-CBI data Gate was executed
+and returned `UNRESOLVED_M3_DATA_GATE`; that result is unchanged and still
+awaits human review, and the supplementary M3I-2 contract lock neither
+resolves it nor replaces it.
 
 ## Stage127 M2 market-data Gate — current, truthful state
 
@@ -1121,6 +1236,12 @@ unchanged.
   without the next explicit micro-part decision; SMOTE / target-proximity /
   Rule B / expanded-sample / persistent-loss robustness; M2/M3/M4 data
   collection or modeling; SHAP; network extraction
+- ❌ M3I-2 / M3I-3 data retrieval of any kind (World Bank, IMF, SCI, CBI,
+  FRED, ALFRED or any other API), macro observation creation, joining macro
+  values to company-year rows, coverage calculation, M3I Data Gate execution,
+  M3I modeling or any M3I-versus-M2 comparison — the contract lock authorizes
+  none of these, and `stage128-m3i2-official-source-evidence-capture` is a
+  pointer, not an authorization
 - ❌ Persian text / text modeling (M5) — removed from the paper and roadmap
 - ❌ Any data or analysis depending on accessibility < 3
 - ❌ Data extraction, model runs, or target/sample changes during Stage125 Part 0
