@@ -2771,6 +2771,9 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # CBI M3 Gate as the live action and owns the research pointers.
         **derive_stage128_m3i2_contract_lock_markers(root),
         **derive_stage128_m3i2_evidence_capture_markers(root),
+        # Post-capture, read-only bundle audit: integrity only, so it may add
+        # audit markers but must never move the scientific state.
+        **derive_stage128_m3i2_independent_bundle_audit_markers(root),
     }
 
 
@@ -4369,6 +4372,57 @@ def render_current_state(record: dict) -> str:
             "README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`",
             "",
         ]
+    if record.get("stage128_m3i2_independent_audit_completed"):
+        lines += [
+            "### Stage128 — M3I-2 independent bundle integrity audit "
+            "(integrity only)\n",
+            "_A post-capture, read-only audit of the external evidence "
+            "bundle by an auditor independent of the PR author and of the "
+            "bundle creator. Its scope is bytes, not science: SHA-256, ZIP "
+            "CRC, multipart structure, manifest consistency, official-source "
+            "restrictions and raw-member integrity. It is **not** coverage, "
+            "**not** the Data Gate, **not** an M3I-2 admission, **not** "
+            "modeling and **not** Final Test access._\n",
+            "- ✅ **Result:** "
+            f"`{record.get('stage128_m3i2_independent_bundle_integrity_audit')}`"
+            " — verification type "
+            f"`{record.get('stage128_m3i2_independent_bundle_audit_verification_type')}`",
+            "- ✅ **Independence:** independent of PR author = "
+            f"{record.get('stage128_m3i2_auditor_independent_from_pr_author')}"
+            " — independent of bundle creator = "
+            f"{record.get('stage128_m3i2_auditor_independent_from_bundle_creator')}"
+            " — participated in artifact creation = "
+            f"{record.get('stage128_m3i2_auditor_participated_in_artifact_creation')}"
+            " — identity disclosure: "
+            f"`{record.get('stage128_m3i2_auditor_identity_disclosure_status')}`",
+            "- **Audited object:** PR #"
+            f"{record.get('stage128_m3i2_audited_pr_number')} head "
+            f"`{record.get('stage128_m3i2_audited_pr_head_sha')}` — primary "
+            "members expected/found "
+            f"{record.get('stage128_m3i2_audit_primary_members_expected')}/"
+            f"{record.get('stage128_m3i2_audit_primary_members_found')}",
+            "- **Capture-time provenance retained:** the bundle manifest "
+            "still records `delivered_to_independent_auditor` = False and "
+            "`independently_verified_by_auditor` = False. Those were true of "
+            "the moment the bundle was built, are kept unmodified, and are "
+            "**superseded — not corrected** — by the post-capture audit "
+            "record.",
+            "- ⛔ **Nothing scientific moved:** M3I-2 evidence status "
+            f"`{record.get('stage128_m3i2_evidence_status')}` — admitted "
+            f"{record.get('m3i2_block_admitted')} — Data Gate executed "
+            f"{record.get('m3i2_data_gate_executed')} — modeling started "
+            f"{record.get('m3i2_modeling_started')} — Final Test locked "
+            f"{record.get('final_test_locked')} — M4 authorized "
+            f"{record.get('m4_authorized')} — merge authorized "
+            f"{record.get('stage128_m3i2_merge_authorized')}",
+            "- ⛔ A passing integrity audit does **not** resolve the "
+            "historical-vintage evidence problem and does **not** admit "
+            "M3I-2.",
+            "- Attestation: `project/stage128/"
+            "m3i2_official_source_evidence_capture/"
+            "stage128_m3i2_independent_bundle_integrity_audit_attestation.md`",
+            "",
+        ]
     lines += [
         "### Last completed scientific micro-part QC\n",
         "_Scientific QC of the newest completed robustness micro-part — a "
@@ -5676,6 +5730,108 @@ def derive_stage128_m3i2_evidence_capture_markers(root: str) -> dict:
         "next_research_action_id": d.get("next_research_action_id"),
         "next_research_action_authorized": False,
         "next_research_action_pointer_is_not_authorization": True,
+    }
+
+
+_STAGE128_M3I2_INDEPENDENT_AUDIT_REL = (
+    "project/stage128/m3i2_official_source_evidence_capture/"
+    "stage128_m3i2_independent_bundle_integrity_audit_record.json"
+)
+_STAGE128_M3I2_INDEPENDENT_AUDIT_RECORD_TYPE = (
+    "post_capture_independent_bundle_integrity_audit")
+_STAGE128_M3I2_INDEPENDENT_AUDIT_VERIFICATION_TYPE = (
+    "external_independent_bundle_integrity_audit")
+_STAGE128_M3I2_INDEPENDENT_AUDIT_PASS = (
+    "INDEPENDENT_BUNDLE_INTEGRITY_AUDIT_PASS")
+
+
+def derive_stage128_m3i2_independent_bundle_audit_markers(root: str) -> dict:
+    """Markers for the post-capture independent bundle-integrity audit.
+
+    The audit is a read-only integrity check of the already-produced external
+    evidence bundle, performed by an auditor independent of the PR author and
+    of the bundle creator. Integrity is not admission: a PASS says the bytes
+    are the bytes that were captured, and says nothing about coverage, the
+    Data Gate, M3I-2 admission, modeling or the Final Test. Fail-closed — the
+    record must restate every excluded marker at its unmoved value.
+    """
+    path = os.path.join(root, _STAGE128_M3I2_INDEPENDENT_AUDIT_REL)
+    if not os.path.isfile(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        d = json.load(fh)
+
+    if d.get("record_type") != _STAGE128_M3I2_INDEPENDENT_AUDIT_RECORD_TYPE:
+        raise HandoffError("M3I-2 independent audit record_type mismatch")
+    if d.get("verification_type") != (
+            _STAGE128_M3I2_INDEPENDENT_AUDIT_VERIFICATION_TYPE):
+        raise HandoffError("M3I-2 independent audit verification_type mismatch")
+    if d.get("overall_result") != _STAGE128_M3I2_INDEPENDENT_AUDIT_PASS:
+        raise HandoffError("unknown M3I-2 independent audit overall_result")
+    for field, expected in (
+        ("independent_audit_completed", True),
+        ("independently_verified_by_auditor", True),
+        ("auditor_independent_from_pr_author", True),
+        ("auditor_independent_from_bundle_creator", True),
+        ("auditor_participated_in_artifact_creation", False),
+        # Integrity only — the scientific state stays exactly where the
+        # evidence capture left it.
+        ("m3i2_admitted", False),
+        ("data_gate_executed", False),
+        ("final_test_locked", True),
+        ("merge_authorized", False),
+        ("m4_authorized", False),
+        ("modeling_started", False),
+        ("historical_vintage_problem_resolved", False),
+        # Provenance: capture-time manifest values are retained, not rewritten.
+        ("capture_time_manifest_retained_unmodified", True),
+        ("capture_time_delivered_to_independent_auditor", False),
+        ("capture_time_independently_verified_by_auditor", False),
+    ):
+        if d.get(field) is not expected:
+            raise HandoffError(
+                f"M3I-2 independent bundle audit {field} must be {expected}")
+    if d.get("m3i2_evidence_status") != "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE":
+        raise HandoffError(
+            "the M3I-2 independent bundle audit must preserve the UNRESOLVED "
+            "official-source evidence status")
+    for field in ("network_requests", "company_macro_joins",
+                  "feature_materializations", "coverage_calculations",
+                  "data_gate_executions", "model_fits", "predictions",
+                  "predictive_metrics", "holm_calculations",
+                  "final_test_rows_read"):
+        if d.get(field) != 0:
+            raise HandoffError(
+                f"M3I-2 independent bundle audit {field} must be 0")
+
+    return {
+        "stage128_m3i2_independent_bundle_integrity_audit":
+            _STAGE128_M3I2_INDEPENDENT_AUDIT_PASS,
+        "stage128_m3i2_independent_bundle_audit_verification_type":
+            _STAGE128_M3I2_INDEPENDENT_AUDIT_VERIFICATION_TYPE,
+        "stage128_m3i2_independent_audit_completed": True,
+        "stage128_m3i2_independently_verified_by_auditor": True,
+        "stage128_m3i2_auditor_independent_from_pr_author": True,
+        "stage128_m3i2_auditor_independent_from_bundle_creator": True,
+        "stage128_m3i2_auditor_participated_in_artifact_creation": False,
+        "stage128_m3i2_auditor_identity_disclosure_status": d.get(
+            "auditor_identity_disclosure_status"),
+        "stage128_m3i2_audited_pr_number": d.get("pr_number"),
+        "stage128_m3i2_audited_pr_head_sha": d.get("audited_pr_head_sha"),
+        "stage128_m3i2_audit_primary_members_expected": d.get(
+            "primary_members_expected"),
+        "stage128_m3i2_audit_primary_members_found": d.get(
+            "primary_members_found"),
+        "stage128_m3i2_audit_capture_time_manifest_superseded": d.get(
+            "capture_time_values_superseded_by_this_record"),
+        # An integrity PASS moves nothing scientific.
+        "stage128_m3i2_evidence_status": d.get("m3i2_evidence_status"),
+        "m3i2_block_admitted": False,
+        "m3i2_data_gate_executed": False,
+        "m3i2_modeling_started": False,
+        "stage128_m3i2_merge_authorized": False,
+        "m4_authorized": False,
+        "final_test_locked": True,
     }
 
 

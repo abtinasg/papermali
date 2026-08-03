@@ -12,7 +12,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3i2-official-source-evidence-review`
 - **Last stage commit:** `d34e8f1491d433cda67a5fdb52a3963d2d7337b9`
-- **Generated from commit:** `28d256a496b0aa642b68fd01db8847c69a29b61e` (branch `stage128-m3i2-official-source-evidence-capture`, informational)
+- **Generated from commit:** `187c628a17f6e429fbf6455412f5f655d2f3602e` (branch `stage128-m3i2-official-source-evidence-capture`, informational)
 - **Baseline:** `origin/main` @ `cf23771a383bf9ad8f7ff2855c216c9a240647ff`
 
 ## Current-state validation
@@ -140,6 +140,18 @@ _A metadata-only, PROSPECTIVE source/definition/statistical contract lock for th
 - **Next research action (pointer only):** `stage128-m3i2-official-source-evidence-review` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False). Data collection has **not** started.
 - Package: `project/stage128/m3_intl_macro_contract_lock/`; interpretation: `project/stage128/m3_intl_macro_contract_lock/README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`
 
+### Stage128 — M3I-2 independent bundle integrity audit (integrity only)
+
+_A post-capture, read-only audit of the external evidence bundle by an auditor independent of the PR author and of the bundle creator. Its scope is bytes, not science: SHA-256, ZIP CRC, multipart structure, manifest consistency, official-source restrictions and raw-member integrity. It is **not** coverage, **not** the Data Gate, **not** an M3I-2 admission, **not** modeling and **not** Final Test access._
+
+- ✅ **Result:** `INDEPENDENT_BUNDLE_INTEGRITY_AUDIT_PASS` — verification type `external_independent_bundle_integrity_audit`
+- ✅ **Independence:** independent of PR author = True — independent of bundle creator = True — participated in artifact creation = False — identity disclosure: `WITHHELD_BY_HUMAN_SUPERVISOR`
+- **Audited object:** PR #75 head `187c628a17f6e429fbf6455412f5f655d2f3602e` — primary members expected/found 24/24
+- **Capture-time provenance retained:** the bundle manifest still records `delivered_to_independent_auditor` = False and `independently_verified_by_auditor` = False. Those were true of the moment the bundle was built, are kept unmodified, and are **superseded — not corrected** — by the post-capture audit record.
+- ⛔ **Nothing scientific moved:** M3I-2 evidence status `UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE` — admitted False — Data Gate executed False — modeling started False — Final Test locked True — M4 authorized False — merge authorized False
+- ⛔ A passing integrity audit does **not** resolve the historical-vintage evidence problem and does **not** admit M3I-2.
+- Attestation: `project/stage128/m3i2_official_source_evidence_capture/stage128_m3i2_independent_bundle_integrity_audit_attestation.md`
+
 ### Last completed scientific micro-part QC
 
 _Scientific QC of the newest completed robustness micro-part — a DIFFERENT role from current-state validation above._
@@ -189,5 +201,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `6836c2084192f00532fd30630845468f711744bf2d4ded49db66a4c45872456c`_
-_generated_at_utc: 2026-08-03T16:02:27Z (informational)_
+_state_fingerprint: `b10b304ebfa6e63076bf51df2a667feeec0877bc51a41536abcec3643cb066a5`_
+_generated_at_utc: 2026-08-03T16:51:38Z (informational)_
