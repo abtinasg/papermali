@@ -713,7 +713,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "689b6149d8334b32235e3414cc5eb4dc003e0ca907b15f7087a0354e2797fd76",
+  "test_file_sha256": "109d1d8b8827a4ee53b7ec88ba11ee8731f6eec988c796b5f53e56cf02964fb4",
   "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v2_lean"
