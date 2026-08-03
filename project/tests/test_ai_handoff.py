@@ -3408,3 +3408,191 @@ def test_current_state_renders_the_m3i2_contract_lock_section():
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1
     assert "stage128-m3i2-official-source-evidence-review" in pointers[0]
+
+
+# --------------------------------------------------------------------------- #
+# Stage128 — M3I-2 post-capture independent bundle integrity audit
+# --------------------------------------------------------------------------- #
+
+def _audit_record() -> dict:
+    with open(os.path.join(REAL_ROOT, gen._STAGE128_M3I2_INDEPENDENT_AUDIT_REL),
+              encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def _audit_root(tmp_path, name: str, payload: dict) -> str:
+    """Write ``payload`` as the only audit record under a fresh temp root."""
+    rel = gen._STAGE128_M3I2_INDEPENDENT_AUDIT_REL
+    root = tmp_path / name
+    (root / os.path.dirname(rel)).mkdir(parents=True, exist_ok=True)
+    (root / rel).write_text(
+        json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    return str(root)
+
+
+def test_m3i2_independent_bundle_audit_markers_are_recognized():
+    state = _handoff_state()
+    assert state["stage128_m3i2_independent_bundle_integrity_audit"] == (
+        "INDEPENDENT_BUNDLE_INTEGRITY_AUDIT_PASS")
+    assert state["stage128_m3i2_independent_bundle_audit_verification_type"] \
+        == "external_independent_bundle_integrity_audit"
+    assert state["stage128_m3i2_independent_audit_completed"] is True
+    assert state["stage128_m3i2_independently_verified_by_auditor"] is True
+    assert state["stage128_m3i2_auditor_independent_from_pr_author"] is True
+    assert state["stage128_m3i2_auditor_independent_from_bundle_creator"] \
+        is True
+    assert state["stage128_m3i2_auditor_participated_in_artifact_creation"] \
+        is False
+    assert state["stage128_m3i2_audited_pr_number"] == 75
+    assert state["stage128_m3i2_audited_pr_head_sha"] == (
+        "187c628a17f6e429fbf6455412f5f655d2f3602e")
+    assert state["stage128_m3i2_audit_primary_members_expected"] == 24
+    assert state["stage128_m3i2_audit_primary_members_found"] == 24
+
+
+def test_the_committed_audit_record_derives_cleanly():
+    """The positive case: the real record passes every fail-closed check."""
+    markers = gen.derive_stage128_m3i2_independent_bundle_audit_markers(
+        REAL_ROOT)
+    assert markers["stage128_m3i2_independent_bundle_integrity_audit"] == (
+        "INDEPENDENT_BUNDLE_INTEGRITY_AUDIT_PASS")
+    assert markers["stage128_m3i2_evidence_status"] == (
+        "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE")
+
+
+def test_a_missing_audit_record_yields_no_markers(tmp_path):
+    """Absence is silent; only a PRESENT-but-wrong record is an error."""
+    assert gen.derive_stage128_m3i2_independent_bundle_audit_markers(
+        str(tmp_path / "empty")) == {}
+
+
+#: Every integrity, provenance and firewall claim the audit record makes.
+#: A wrong value — and, for booleans, a missing key — must fail closed.
+_AUDIT_MUTATIONS = [
+    # hash / CRC / ZIP structure
+    {"all_part_hashes_match": False},
+    {"all_zip_crc_checks_pass": False},
+    {"all_zip_structures_valid": False},
+    # member counts and uniqueness
+    {"primary_members_expected": 23},
+    {"primary_members_found": 23},
+    {"primary_members_unique": False},
+    {"all_member_hashes_match": False},
+    {"all_member_sizes_match": False},
+    # request / response counts
+    {"request_count": 20},
+    {"response_count": 20},
+    {"successful_response_count": 20},
+    {"failed_response_count": 1},
+    # invocation and host restrictions
+    {"capture_invocations": 3},
+    {"third_invocation_present": True},
+    {"official_hosts_only": False},
+    # original single bundle
+    {"original_single_bundle_present": False},
+    {"original_single_bundle_directly_rechecked": False},
+    {"original_single_bundle_hash_match": False},
+    # audited PR / head
+    {"pr_number": 74},
+    {"audited_pr_head_sha": "0" * 40},
+    # audit scope
+    {"audit_scope_includes": ["bundle_integrity"]},
+    {"audit_scope_includes": [
+        "bundle_integrity", "sha256", "zip_crc", "multipart_structure",
+        "manifest_consistency", "official_source_restrictions",
+        "raw_member_integrity", "coverage"]},
+    {"audit_scope_excludes": ["coverage"]},
+    {"audit_scope_excludes": [
+        "coverage", "data_gate", "modeling", "final_test"]},
+    # scientific firewalls — an integrity PASS may never move these
+    {"m3i2_admitted": True},
+    {"m3i2_evidence_status": "RESOLVED_OFFICIAL_SOURCE_EVIDENCE"},
+    {"data_gate_executed": True},
+    {"final_test_locked": False},
+    {"merge_authorized": True},
+    {"m4_authorized": True},
+    {"modeling_started": True},
+    {"historical_vintage_problem_resolved": True},
+    {"data_gate_executions": 1},
+    {"model_fits": 1},
+    {"network_requests": 1},
+    {"coverage_calculations": 1},
+    {"final_test_rows_read": 1},
+    # independence and audit provenance
+    {"independent_audit_completed": False},
+    {"independently_verified_by_auditor": False},
+    {"auditor_independent_from_pr_author": False},
+    {"auditor_independent_from_bundle_creator": False},
+    {"auditor_participated_in_artifact_creation": True},
+    {"capture_time_manifest_retained_unmodified": False},
+    {"capture_time_delivered_to_independent_auditor": True},
+    {"capture_time_independently_verified_by_auditor": True},
+    {"capture_time_values_superseded_by_this_record": False},
+    {"audit_result_relies_on_prior_session_execution_by_auditor": False},
+    # taxonomy of the record itself
+    {"record_type": "developer_side_check"},
+    {"verification_type":
+     "developer_side_deterministic_verification_not_independent_audit"},
+    {"overall_result": "INDEPENDENT_BUNDLE_INTEGRITY_AUDIT_FAIL"},
+]
+
+
+@pytest.mark.parametrize("mutation", _AUDIT_MUTATIONS)
+def test_audit_record_mutations_fail_closed(tmp_path, mutation):
+    broken = copy.deepcopy(_audit_record())
+    broken.update(mutation)
+    root = _audit_root(tmp_path, "mutated", broken)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage128_m3i2_independent_bundle_audit_markers(root)
+
+
+@pytest.mark.parametrize("field", sorted(
+    {key for mutation in _AUDIT_MUTATIONS for key in mutation}))
+def test_a_dropped_audit_field_fails_closed(tmp_path, field):
+    """No optimistic defaults: a missing claim is as bad as a false one."""
+    broken = copy.deepcopy(_audit_record())
+    broken.pop(field)
+    root = _audit_root(tmp_path, "dropped", broken)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage128_m3i2_independent_bundle_audit_markers(root)
+
+
+def test_current_state_renders_the_m3i2_evidence_capture_section():
+    text = _current_state_text()
+    assert "### Stage128 — M3I-2 official-source evidence capture" in text
+    assert "21 requests" in text and "21 successful responses" in text
+    assert "1,066,295,643" in text
+    assert "16 captured and held out of 110 discovered" in text
+    assert "verified release dates 0 of 110" in text
+    assert "cutoffs 37 of 37" in text
+    assert "development pairs 539 of 539" in text
+    assert "CPI 16 PASS" in text and "FX 16 UNRESOLVED" in text
+    assert "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE" in text
+    assert "NOT_EXECUTED" in text
+
+
+def test_current_state_marks_the_contract_lock_section_as_historical():
+    text = _current_state_text()
+    assert "M3I-2 prospective contract lock (HISTORICAL, contract-time)" \
+        in text
+    assert "This section describes CONTRACT-TIME state" in text
+    # the stale live-state claims are gone
+    assert "Data collection has **not** started" not in text
+    assert "Data collection has not started" not in text
+    assert "- **Live PR topology:**" not in text
+
+
+def test_current_state_does_not_present_pr74_as_the_live_draft():
+    text = _current_state_text()
+    assert "PR #74 is the **historical contract-lock PR**" in text
+    assert "carried by **PR #75** (the evidence-capture PR)" in text
+    for line in text.splitlines():
+        if "PR #74" in line:
+            assert "historical" in line.lower(), line
+
+
+def test_current_state_audit_section_moves_nothing_scientific():
+    text = _current_state_text()
+    assert "M3I-2 independent bundle integrity audit (integrity only)" in text
+    assert "does **not** resolve the historical-vintage evidence problem" \
+        in text

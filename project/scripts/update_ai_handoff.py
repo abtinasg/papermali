@@ -4320,7 +4320,8 @@ def render_current_state(record: dict) -> str:
         ]
     if record.get("stage128_m3i2_contract_lock_executed"):
         lines += [
-            "### Stage128 — M3I-2 prospective contract lock (contract only)\n",
+            "### Stage128 — M3I-2 prospective contract lock "
+            "(HISTORICAL, contract-time)\n",
             "_A metadata-only, PROSPECTIVE source/definition/statistical "
             "contract lock for the SUPPLEMENTARY international-macro block "
             "M3I-2 (`intl_cpi_inflation_annual`, "
@@ -4328,6 +4329,14 @@ def render_current_state(record: dict) -> str:
             "M3I-3 financing shell. It is not a substitution, correction or "
             "continuation of the frozen M3-CBI block, and it is never "
             "confirmatory M3._\n",
+            "> **This section describes CONTRACT-TIME state and is retained "
+            "as history.** Every retrieval/PR-topology statement below was "
+            "true at the moment of the contract lock. The retrieval and "
+            "PR-topology facts were later superseded by the independent "
+            "action `stage128-m3i2-official-source-evidence-capture` "
+            "(see the evidence-capture section below). The **scientific "
+            "contract itself is unchanged** — it remains "
+            "`PROSPECTIVELY_LOCKED_NO_DATA`, unadmitted and ungated.\n",
             "- ✅ **Contract status:** "
             f"`{record.get('stage128_m3i2_contract_status')}` — "
             "authorization consumed: "
@@ -4336,8 +4345,10 @@ def render_current_state(record: dict) -> str:
             "- ⛔ **No data, no Gate, no modeling:** 0 network requests, "
             "0 macro observations read, 0 company rows loaded, 0 coverage "
             "calculations, 0 model fits, 0 predictions, 0 Holm calculations",
-            "- ⛔ **M3I-2 retrieval started:** "
-            f"{record.get('m3i2_retrieval_started')} — **Data Gate executed:** "
+            "- ⛔ **At contract-lock time — M3I-2 retrieval started:** "
+            f"{record.get('m3i2_retrieval_started')} (superseded: official-"
+            "source evidence was captured later under a separate action) — "
+            "**Data Gate executed:** "
             f"{record.get('m3i2_data_gate_executed')} — **block admitted:** "
             f"{record.get('m3i2_block_admitted')} — **modeling started:** "
             f"{record.get('m3i2_modeling_started')}",
@@ -4352,24 +4363,86 @@ def render_current_state(record: dict) -> str:
             f"`{record.get('stage128_m3i2_baseline_commit')}` — protected "
             "hashes are verified against that commit permanently; a merge or "
             "retarget never moves it",
-            "- **Live PR topology:** PR #73 **was merged** by merge commit "
+            "- **PR topology at contract-lock time (historical):** PR #73 "
+            "**was merged** by merge commit "
             f"`{record.get('stage128_m3i2_predecessor_pr_merge_commit')}`; "
             f"PR #{record.get('stage128_m3i2_live_pr_number')} was "
             "subsequently retargeted to "
             f"`{record.get('stage128_m3i2_live_pr_base_branch')}` (base "
-            f"`{record.get('stage128_m3i2_live_pr_base_commit')}`) and "
-            "remains a **Draft** — "
+            f"`{record.get('stage128_m3i2_live_pr_base_commit')}`) and never "
+            "merged under this action — "
             f"merged = {record.get('stage128_m3i2_live_pr_merged')}, no merge "
-            "authorization",
+            "authorization. PR #"
+            f"{record.get('stage128_m3i2_live_pr_number')} is the "
+            "**historical contract-lock PR**, not the current draft; the "
+            "evidence-capture PR is identified in the evidence-capture "
+            "section below.",
             "- **Next research action (pointer only):** "
             f"`{record.get('next_research_action_id')}` — it is **not "
             "authorized** and a pointer is **not** an authorization "
             "(`next_research_action_authorized` = "
-            f"{record.get('next_research_action_authorized')}). Data "
-            "collection has **not** started.",
+            f"{record.get('next_research_action_authorized')}).",
             "- Package: `project/stage128/m3_intl_macro_contract_lock/`; "
             "interpretation: `project/stage128/m3_intl_macro_contract_lock/"
             "README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`",
+            "",
+        ]
+    if record.get("stage128_m3i2_evidence_capture_executed"):
+        lines += [
+            "### Stage128 — M3I-2 official-source evidence capture\n",
+            "_The action that supersedes the contract-time \"no retrieval\" "
+            "statements above. It is ACQUISITION ONLY: official bytes were "
+            "requested, retained and hashed. Every count below is an "
+            "input-integrity count and **never coverage**. Capture is not "
+            "admission — it answers nothing about coverage, the Data Gate or "
+            "modeling._\n",
+            "- ✅ **Evidence capture executed:** True — action "
+            f"`{record.get('last_completed_research_action_id')}`, carried by "
+            "**PR #"
+            f"{record.get('stage128_m3i2_audited_pr_number', 'n/a')}** "
+            "(the evidence-capture PR)",
+            "- **Official traffic:** "
+            f"{record.get('stage128_m3i2_official_requests_attempted')} "
+            "requests — "
+            f"{record.get('stage128_m3i2_official_responses_successful')} "
+            "successful responses — "
+            f"{record.get('stage128_m3i2_official_responses_retained')} "
+            "responses retained — raw bytes retained "
+            f"{record.get('stage128_m3i2_raw_bytes_retained'):,}",
+            "- **Archive editions:** "
+            f"{record.get('stage128_m3i2_archive_editions_captured')} captured "
+            "and held out of "
+            f"{record.get('stage128_m3i2_wdi_editions_discovered')} "
+            "discovered — verified required editions "
+            f"{record.get('stage128_m3i2_required_editions_captured')} of "
+            f"{record.get('stage128_m3i2_required_editions_total')} — "
+            "verified release dates "
+            f"{record.get('stage128_m3i2_editions_with_verified_release_date')}"
+            f" of {record.get('stage128_m3i2_wdi_editions_discovered')}",
+            "- ⛔ **Unresolved:** cutoffs "
+            f"{record.get('stage128_m3i2_cutoffs_without_verified_pre_cutoff_edition')}"
+            f" of {record.get('stage128_m3i2_unique_development_cutoffs')} — "
+            "development pairs "
+            f"{record.get('stage128_m3i2_development_pairs_without_verified_pre_cutoff_edition')}"
+            f" of {record.get('stage128_m3i2_development_pairs_behind_cutoff_plan')}",
+            "- **Semantic compatibility:** CPI "
+            f"{record.get('stage128_m3i2_cpi_semantic_pass_count')} PASS — FX "
+            f"{record.get('stage128_m3i2_fx_semantic_unresolved_count')} "
+            "UNRESOLVED",
+            "- ⛔ **Evidence status:** "
+            f"`{record.get('stage128_m3i2_evidence_status')}` — result code "
+            f"`{record.get('stage128_m3i2_evidence_result_code')}`",
+            "- ⛔ **Data Gate:** NOT_EXECUTED (`m3i2_data_gate_executed` = "
+            f"{record.get('m3i2_data_gate_executed')}) — **M3I-2 admitted:** "
+            f"{record.get('m3i2_block_admitted')} — **modeling started:** "
+            f"{record.get('m3i2_modeling_started')} — **Final Test locked:** "
+            f"{record.get('final_test_locked')} — **M4 authorized:** "
+            f"{record.get('m4_authorized')} — **merge authorized:** "
+            f"{record.get('stage128_m3i2_merge_authorized')}",
+            "- Package: `project/stage128/"
+            "m3i2_official_source_evidence_capture/`; interpretation: "
+            "`project/stage128/m3i2_official_source_evidence_capture/"
+            "README_STAGE128_M3I2_OFFICIAL_SOURCE_EVIDENCE_CAPTURE.md`",
             "",
         ]
     if record.get("stage128_m3i2_independent_audit_completed"):
@@ -5709,6 +5782,29 @@ def derive_stage128_m3i2_evidence_capture_markers(root: str) -> dict:
             "m3i3_financing_metadata_decision"),
         "stage128_m3i2_official_responses_retained": summary.get(
             "official_responses_retained"),
+        "stage128_m3i2_official_requests_attempted": summary.get(
+            "official_requests_attempted"),
+        "stage128_m3i2_official_responses_successful": summary.get(
+            "official_responses_successful"),
+        "stage128_m3i2_archive_editions_captured": summary.get(
+            "archive_editions_captured"),
+        "stage128_m3i2_wdi_editions_discovered": summary.get(
+            "wdi_editions_discovered"),
+        "stage128_m3i2_editions_with_verified_release_date": summary.get(
+            "editions_with_verified_release_date"),
+        "stage128_m3i2_unique_development_cutoffs": summary.get(
+            "unique_development_cutoffs"),
+        "stage128_m3i2_development_pairs_behind_cutoff_plan": summary.get(
+            "development_pairs_behind_cutoff_plan"),
+        "stage128_m3i2_development_pairs_without_verified_pre_cutoff_edition":
+            summary.get(
+                "development_pairs_without_verified_pre_cutoff_edition"),
+        "stage128_m3i2_cpi_semantic_pass_count": summary.get(
+            "cpi_semantic_pass_count"),
+        "stage128_m3i2_fx_semantic_unresolved_count": summary.get(
+            "fx_semantic_unresolved_count"),
+        "stage128_m3i2_locked_series_rows_extracted": summary.get(
+            "locked_series_rows_extracted"),
         "stage128_m3i2_raw_bytes_retained": summary.get("raw_bytes_total"),
         "stage128_m3i2_required_editions_total": summary.get(
             "required_editions_total"),
@@ -5743,6 +5839,28 @@ _STAGE128_M3I2_INDEPENDENT_AUDIT_VERIFICATION_TYPE = (
     "external_independent_bundle_integrity_audit")
 _STAGE128_M3I2_INDEPENDENT_AUDIT_PASS = (
     "INDEPENDENT_BUNDLE_INTEGRITY_AUDIT_PASS")
+#: The audited object is pinned: this PR, at this head, and nothing else.
+_STAGE128_M3I2_AUDITED_PR_NUMBER = 75
+_STAGE128_M3I2_AUDITED_PR_HEAD_SHA = (
+    "187c628a17f6e429fbf6455412f5f655d2f3602e")
+#: Integrity only — the audit may claim exactly this scope, no more.
+_STAGE128_M3I2_AUDIT_SCOPE_INCLUDES = (
+    "bundle_integrity",
+    "sha256",
+    "zip_crc",
+    "multipart_structure",
+    "manifest_consistency",
+    "official_source_restrictions",
+    "raw_member_integrity",
+)
+#: ...and must keep exactly these outside its scope.
+_STAGE128_M3I2_AUDIT_SCOPE_EXCLUDES = (
+    "coverage",
+    "data_gate",
+    "m3i2_admission",
+    "modeling",
+    "final_test",
+)
 
 
 def derive_stage128_m3i2_independent_bundle_audit_markers(root: str) -> dict:
@@ -5771,6 +5889,22 @@ def derive_stage128_m3i2_independent_bundle_audit_markers(root: str) -> dict:
     for field, expected in (
         ("independent_audit_completed", True),
         ("independently_verified_by_auditor", True),
+        # Integrity findings — every one must be an explicit PASS. A missing
+        # field is a failure, never an optimistic default.
+        ("all_part_hashes_match", True),
+        ("all_zip_crc_checks_pass", True),
+        ("all_zip_structures_valid", True),
+        ("primary_members_unique", True),
+        ("all_member_hashes_match", True),
+        ("all_member_sizes_match", True),
+        ("third_invocation_present", False),
+        ("official_hosts_only", True),
+        ("original_single_bundle_present", True),
+        ("original_single_bundle_directly_rechecked", True),
+        ("original_single_bundle_hash_match", True),
+        # Provenance of the audit claim itself.
+        ("capture_time_values_superseded_by_this_record", True),
+        ("audit_result_relies_on_prior_session_execution_by_auditor", True),
         ("auditor_independent_from_pr_author", True),
         ("auditor_independent_from_bundle_creator", True),
         ("auditor_participated_in_artifact_creation", False),
@@ -5791,6 +5925,33 @@ def derive_stage128_m3i2_independent_bundle_audit_markers(root: str) -> dict:
         if d.get(field) is not expected:
             raise HandoffError(
                 f"M3I-2 independent bundle audit {field} must be {expected}")
+    for field, expected in (
+        # Member accounting: all 24 primary members expected and found.
+        ("primary_members_expected", 24),
+        ("primary_members_found", 24),
+        # Official traffic: 21 requests, 21 responses, all successful.
+        ("request_count", 21),
+        ("response_count", 21),
+        ("successful_response_count", 21),
+        ("failed_response_count", 0),
+        # Exactly the two recorded capture invocations, no third.
+        ("capture_invocations", 2),
+        # The audited object is pinned; an audit of some other head is not
+        # an audit of this PR.
+        ("pr_number", _STAGE128_M3I2_AUDITED_PR_NUMBER),
+        ("audited_pr_head_sha", _STAGE128_M3I2_AUDITED_PR_HEAD_SHA),
+    ):
+        if d.get(field) != expected:
+            raise HandoffError(
+                f"M3I-2 independent bundle audit {field} must be {expected!r}")
+    if d.get("audit_scope_includes") != list(
+            _STAGE128_M3I2_AUDIT_SCOPE_INCLUDES):
+        raise HandoffError(
+            "M3I-2 independent bundle audit scope_includes mismatch")
+    if d.get("audit_scope_excludes") != list(
+            _STAGE128_M3I2_AUDIT_SCOPE_EXCLUDES):
+        raise HandoffError(
+            "M3I-2 independent bundle audit scope_excludes mismatch")
     if d.get("m3i2_evidence_status") != "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE":
         raise HandoffError(
             "the M3I-2 independent bundle audit must preserve the UNRESOLVED "
