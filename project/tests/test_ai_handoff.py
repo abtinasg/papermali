@@ -3308,17 +3308,20 @@ def test_m3i2_provenance_baseline_is_still_the_pr73_head():
         "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")
 
 
-def test_m3i2_live_topology_is_the_post_merge_retargeted_state():
+def test_m3i2_contract_time_topology_is_the_post_merge_retargeted_state():
+    """PR #74 topology is retained ONLY under contract-time field names."""
     state = _handoff_state()
     assert state["stage128_m3i2_predecessor_pr_merged"] is True
     assert state["stage128_m3i2_predecessor_pr_merge_commit"] == (
         "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")
-    assert state["stage128_m3i2_live_pr_number"] == 74
-    assert state["stage128_m3i2_live_pr_base_branch"] == "main"
-    assert state["stage128_m3i2_live_pr_base_commit"] == (
+    assert state["stage128_m3i2_contract_time_pr_number"] == 74
+    assert state["stage128_m3i2_contract_time_pr_base_branch"] == "main"
+    assert state["stage128_m3i2_contract_time_pr_base_commit"] == (
         "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")
-    assert state["stage128_m3i2_live_main_commit"] == (
+    assert state["stage128_m3i2_contract_time_main_commit"] == (
         "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")
+    assert state["stage128_m3i2_contract_time_pr_semantics"] == (
+        "historical_contract_lock_topology_superseded_by_pr75")
     assert state["stage128_m3i2_pr_is_stacked_on_open_predecessor"] is False
     assert state[
         "stage128_m3i2_retargeted_to_main_after_predecessor_merge_verified"
@@ -3326,10 +3329,10 @@ def test_m3i2_live_topology_is_the_post_merge_retargeted_state():
     assert state["stage128_m3i2_may_target_main"] is True
 
 
-def test_m3i2_pr74_stays_draft_unmerged_and_unauthorized():
+def test_m3i2_contract_time_pr74_stays_draft_unmerged_and_unauthorized():
     state = _handoff_state()
-    assert state["stage128_m3i2_live_pr_is_draft"] is True
-    assert state["stage128_m3i2_live_pr_merged"] is False
+    assert state["stage128_m3i2_contract_time_pr_is_draft"] is True
+    assert state["stage128_m3i2_contract_time_pr_merged"] is False
     assert state["stage128_m3i2_merge_authorized"] is False
     assert state["next_research_action_authorized"] is False
 
@@ -3395,6 +3398,133 @@ def test_m3i2_topology_mutations_fail_closed(tmp_path, mutation):
         json.dumps(broken, ensure_ascii=False), encoding="utf-8")
     with pytest.raises(gen.HandoffError):
         gen.derive_stage128_m3i2_contract_lock_markers(str(root))
+
+
+# --------------------------------------------------------------------------- #
+# Stage128 — historical (PR #74) vs LIVE (PR #75) M3I-2 PR topology
+# --------------------------------------------------------------------------- #
+
+def test_pr74_is_only_historical_and_never_live():
+    """No field and no phrase may present PR #74 as the live PR."""
+    state = _handoff_state()
+    assert state["stage128_m3i2_contract_time_pr_number"] == 74
+    assert state["stage128_m3i2_contract_time_pr_semantics"] == (
+        "historical_contract_lock_topology_superseded_by_pr75")
+    # every live/current field that carries a PR number must name 75, not 74
+    for key, value in state.items():
+        if key.startswith("stage128_m3i2_live_"):
+            assert value != 74, key
+            assert value != "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a", key
+    text = _current_state_text()
+    for phrase in ("PR #74 is the live", "live PR #74", "current draft PR #74",
+                   "PR #74 (the LIVE", "PR #74 (the evidence-capture PR)"):
+        assert phrase not in text
+    assert "PR #74 is the **historical contract-lock PR**" in text
+
+
+def test_live_pr_topology_is_pr75_on_main():
+    state = _handoff_state()
+    assert state["stage128_m3i2_live_pr_number"] == 75
+    assert state["stage128_m3i2_live_pr_base_branch"] == "main"
+    assert state["stage128_m3i2_live_pr_base_commit"] == (
+        "cf23771a383bf9ad8f7ff2855c216c9a240647ff")
+    assert state["stage128_m3i2_live_main_commit"] == (
+        "cf23771a383bf9ad8f7ff2855c216c9a240647ff")
+    assert state["stage128_m3i2_live_pr_is_draft"] is True
+    assert state["stage128_m3i2_live_pr_merged"] is False
+    assert state["stage128_m3i2_live_pr_role"] == (
+        "official_source_evidence_capture_pr")
+
+
+def test_live_pr_head_is_derived_from_the_repository_head_not_pinned():
+    state = _handoff_state()
+    assert state["stage128_m3i2_live_pr_head_commit_source"] == (
+        "observed_repository_head_commit_at_generation")
+    # HEAD-relative, therefore excluded from the semantic projection
+    assert "stage128_m3i2_live_pr_head_commit" in gen.VOLATILE_FIELDS
+    assert "stage128_m3i2_live_pr_head_commit" not in gen.projection(state)
+    # and it must never be pinned to a superseded audited head
+    assert state.get("stage128_m3i2_live_pr_head_commit") != (
+        state["stage128_m3i2_live_pr_base_commit"])
+
+
+def test_evidence_capture_and_retrieval_are_recorded_as_completed():
+    state = _handoff_state()
+    assert state["stage128_m3i2_evidence_capture_executed"] is True
+    assert state["stage128_m3i2_official_source_retrieval_completed"] is True
+
+
+def test_contract_time_retrieval_marker_is_kept_false_with_semantics():
+    state = _handoff_state()
+    assert state["m3i2_retrieval_started"] is False
+    assert state["m3i2_retrieval_started_semantics"] == (
+        "contract_lock_time_marker_superseded_by_official_source_evidence"
+        "_capture")
+
+
+def test_topology_correction_admits_nothing():
+    """Distinguishing history from live state moves no scientific state."""
+    state = _handoff_state()
+    assert state["m3i2_data_gate_executed"] is False
+    assert state["m3i2_block_admitted"] is False
+    assert state["m3i2_modeling_started"] is False
+    assert state["m3i2_incremental_evaluation_authorized"] is False
+    assert state["stage128_m3i2_evidence_status"] == (
+        "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE")
+    assert state["final_test_locked"] is True
+    assert state["m4_authorized"] is False and state["m4_started"] is False
+    assert state["stage128_m3i2_merge_authorized"] is False
+
+
+def test_live_pr_topology_derivation_fails_closed(tmp_path):
+    decision_rel = gen._STAGE128_M3I2_EVIDENCE_DECISION_REL
+    boundary_rel = gen._STAGE128_M3I2_GOVERNANCE_BOUNDARY_REL
+    audit_rel = gen._STAGE128_M3I2_INDEPENDENT_AUDIT_REL
+    sources = {rel: json.load(open(os.path.join(REAL_ROOT, rel),
+                                   encoding="utf-8"))
+               for rel in (decision_rel, boundary_rel, audit_rel)}
+    assert gen.derive_stage128_m3i2_live_pr_topology_markers(REAL_ROOT)
+
+    def _build(name, mutations=(), drop=()):
+        root = tmp_path / name
+        for rel, payload in sources.items():
+            if rel in drop:
+                continue
+            body = copy.deepcopy(payload)
+            for rel_target, field, value in mutations:
+                if rel_target == rel:
+                    body[field] = value
+            (root / os.path.dirname(rel)).mkdir(parents=True, exist_ok=True)
+            (root / rel).write_text(
+                json.dumps(body, ensure_ascii=False), encoding="utf-8")
+        return str(root)
+
+    # a missing corroborating artifact is fatal, never a silent default
+    for rel in (boundary_rel, audit_rel):
+        with pytest.raises(gen.HandoffError):
+            gen.derive_stage128_m3i2_live_pr_topology_markers(
+                _build("drop_" + os.path.basename(rel), drop=(rel,)))
+
+    for name, mutation in (
+        # base branch disagreement / non-main base
+        ("branch", (boundary_rel, "pr_base_branch", "stage128-m3-macro-data-gate")),
+        ("branch_audit", (audit_rel, "audited_pr_base_branch", "dev")),
+        # base commit disagreement (e.g. the superseded PR #74 base)
+        ("base", (audit_rel, "audited_pr_base_sha",
+                  "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")),
+        ("base_decision", (decision_rel, "baseline_commit",
+                           "b94f73fab99b5c3bc5c55ea7c14736f2bddb516a")),
+        # the live PR marked ready, merged-authorized, or not a successor
+        ("draft", (decision_rel, "pr_is_draft", False)),
+        ("merge", (boundary_rel, "merge_authorized", True)),
+        ("number", (audit_rel, "pr_number", 74)),
+        ("number_type", (audit_rel, "pr_number", "75")),
+        # main base claimed while the predecessor PR is not merged
+        ("predecessor", (decision_rel, "predecessor_pr_merged", False)),
+    ):
+        with pytest.raises(gen.HandoffError):
+            gen.derive_stage128_m3i2_live_pr_topology_markers(
+                _build(name, mutations=(mutation,)))
 
 
 def test_current_state_renders_the_m3i2_contract_lock_section():
@@ -3579,13 +3709,19 @@ def test_current_state_marks_the_contract_lock_section_as_historical():
     # the stale live-state claims are gone
     assert "Data collection has **not** started" not in text
     assert "Data collection has not started" not in text
-    assert "- **Live PR topology:**" not in text
+    # the live topology belongs to the evidence-capture section, never to the
+    # historical contract-lock section
+    contract_section = text.split(
+        "### Stage128 — M3I-2 prospective contract lock", 1)[1].split(
+        "### Stage128 — M3I-2 official-source evidence capture", 1)[0]
+    assert "- **Live PR topology:**" not in contract_section
+    assert "- **Live PR topology:** PR #75" in text
 
 
 def test_current_state_does_not_present_pr74_as_the_live_draft():
     text = _current_state_text()
     assert "PR #74 is the **historical contract-lock PR**" in text
-    assert "carried by **PR #75** (the evidence-capture PR)" in text
+    assert "carried by **PR #75** (the LIVE evidence-capture PR)" in text
     for line in text.splitlines():
         if "PR #74" in line:
             assert "historical" in line.lower(), line

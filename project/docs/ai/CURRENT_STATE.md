@@ -12,7 +12,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3i2-official-source-evidence-review`
 - **Last stage commit:** `650757555953569a33dd5034ffd8010720dbc56b`
-- **Generated from commit:** `650757555953569a33dd5034ffd8010720dbc56b` (branch `stage128-m3i2-official-source-evidence-capture`, informational)
+- **Generated from commit:** `b75f351f2263d394eb92e040115b9e8992bc8933` (branch `stage128-m3i2-official-source-evidence-capture`, informational)
 - **Baseline:** `origin/main` @ `cf23771a383bf9ad8f7ff2855c216c9a240647ff`
 
 ## Current-state validation
@@ -134,11 +134,11 @@ _A metadata-only, PROSPECTIVE source/definition/statistical contract lock for th
 
 - ✅ **Contract status:** `PROSPECTIVELY_LOCKED_NO_DATA` — authorization consumed: True (one action only, not standing)
 - ⛔ **No data, no Gate, no modeling:** 0 network requests, 0 macro observations read, 0 company rows loaded, 0 coverage calculations, 0 model fits, 0 predictions, 0 Holm calculations
-- ⛔ **At contract-lock time — M3I-2 retrieval started:** False (superseded: official-source evidence was captured later under a separate action) — **Data Gate executed:** False — **block admitted:** False — **modeling started:** False
+- ⛔ **At contract-lock time — M3I-2 retrieval started:** False (`contract_lock_time_marker_superseded_by_official_source_evidence_capture` — the contract-time marker is retained for compatibility; official-source evidence WAS captured later under a separate action, see `stage128_m3i2_official_source_retrieval_completed`) — **Data Gate executed:** False — **block admitted:** False — **modeling started:** False
 - ⛔ **M3I-3 financing metadata lock:** `UNRESOLVED_METADATA_LOCK` — **admitted:** False
 - **M3-CBI preserved unchanged:** Gate status `UNRESOLVED_M3_DATA_GATE`, block admitted False
 - **Scientific provenance baseline:** PR #73 head `e6db63fb7d105f0d3a39db101c9e364161c367e9` — protected hashes are verified against that commit permanently; a merge or retarget never moves it
-- **PR topology at contract-lock time (historical):** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and never merged under this action — merged = False, no merge authorization. PR #74 is the **historical contract-lock PR**, not the current draft; the evidence-capture PR is identified in the evidence-capture section below.
+- **PR topology at contract-lock time (HISTORICAL, not live):** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and never merged under this action — merged = False, no merge authorization. Semantics: `historical_contract_lock_topology_superseded_by_pr75`. PR #74 is the **historical contract-lock PR**, never the current draft; the live evidence-capture PR is identified in the evidence-capture section below.
 - **Next research action (pointer only):** `stage128-m3i2-official-source-evidence-review` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
 - Package: `project/stage128/m3_intl_macro_contract_lock/`; interpretation: `project/stage128/m3_intl_macro_contract_lock/README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`
 
@@ -146,7 +146,9 @@ _A metadata-only, PROSPECTIVE source/definition/statistical contract lock for th
 
 _The action that supersedes the contract-time "no retrieval" statements above. It is ACQUISITION ONLY: official bytes were requested, retained and hashed. Every count below is an input-integrity count and **never coverage**. Capture is not admission — it answers nothing about coverage, the Data Gate or modeling._
 
-- ✅ **Evidence capture executed:** True — action `stage128-m3i2-official-source-evidence-capture`, carried by **PR #75** (the evidence-capture PR)
+- ✅ **Evidence capture executed:** True — action `stage128-m3i2-official-source-evidence-capture`, carried by **PR #75** (the LIVE evidence-capture PR)
+- ✅ **Official-source retrieval completed:** True — this is acquisition only and is **not** a Data Gate, **not** coverage and **not** an admission
+- **Live PR topology:** PR #75 → base `main` @ `cf23771a383bf9ad8f7ff2855c216c9a240647ff` — draft = True, merged = False, head derived from `observed_repository_head_commit_at_generation` (never pinned)
 - **Official traffic:** 21 requests — 21 successful responses — 21 responses retained — raw bytes retained 1,066,295,643
 - **Archive editions:** 16 captured and held out of 110 discovered — verified required editions 0 of 0 — verified release dates 0 of 110
 - ⛔ **Unresolved:** cutoffs 37 of 37 — development pairs 539 of 539
@@ -216,5 +218,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `6f1dfe05a0c18a4e18e348f1ba2c2800e1af616a2b022e73c149cd27917a4c93`_
-_generated_at_utc: 2026-08-03T17:19:23Z (informational)_
+_state_fingerprint: `49d46c008ad686dc2fc8588c76280fc00789de7c2577d4e3813d2d2060eb88aa`_
+_generated_at_utc: 2026-08-03T21:40:58Z (informational)_

@@ -598,6 +598,9 @@ VOLATILE_FIELDS = frozenset({
     "observed_repository_head_commit",
     "generated_from_commit",
     "baseline_commit",
+    # The live evidence-capture PR head is the CURRENT repository head, so it
+    # is HEAD-relative by construction and must never be pinned to a stale SHA.
+    "stage128_m3i2_live_pr_head_commit",
 })
 
 GENERATOR_VERSION = 2
@@ -2774,6 +2777,9 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # Post-capture, read-only bundle audit: integrity only, so it may add
         # audit markers but must never move the scientific state.
         **derive_stage128_m3i2_independent_bundle_audit_markers(root),
+        # Must come last: it publishes the LIVE evidence-capture PR topology
+        # and demotes the contract-lock topology to explicit history.
+        **derive_stage128_m3i2_live_pr_topology_markers(root),
     }
 
 
@@ -3704,6 +3710,11 @@ def build_handoff_state(root: str):
     }
     record.update(state["qc_workflow"])
     record.update(state["m1_robustness_decision"])
+    # The live M3I-2 PR head is the CURRENT repository head: informational and
+    # HEAD-relative (see VOLATILE_FIELDS), never pinned to a superseded SHA and
+    # never part of the fingerprinted semantic state.
+    if record.get("stage128_m3i2_live_pr_number") is not None:
+        record["stage128_m3i2_live_pr_head_commit"] = head
     return record, state, frozen
 
 
@@ -4346,8 +4357,11 @@ def render_current_state(record: dict) -> str:
             "0 macro observations read, 0 company rows loaded, 0 coverage "
             "calculations, 0 model fits, 0 predictions, 0 Holm calculations",
             "- ⛔ **At contract-lock time — M3I-2 retrieval started:** "
-            f"{record.get('m3i2_retrieval_started')} (superseded: official-"
-            "source evidence was captured later under a separate action) — "
+            f"{record.get('m3i2_retrieval_started')} "
+            f"(`{record.get('m3i2_retrieval_started_semantics')}` — the "
+            "contract-time marker is retained for compatibility; official-"
+            "source evidence WAS captured later under a separate action, see "
+            "`stage128_m3i2_official_source_retrieval_completed`) — "
             "**Data Gate executed:** "
             f"{record.get('m3i2_data_gate_executed')} — **block admitted:** "
             f"{record.get('m3i2_block_admitted')} — **modeling started:** "
@@ -4363,19 +4377,20 @@ def render_current_state(record: dict) -> str:
             f"`{record.get('stage128_m3i2_baseline_commit')}` — protected "
             "hashes are verified against that commit permanently; a merge or "
             "retarget never moves it",
-            "- **PR topology at contract-lock time (historical):** PR #73 "
-            "**was merged** by merge commit "
+            "- **PR topology at contract-lock time (HISTORICAL, not live):** "
+            "PR #73 **was merged** by merge commit "
             f"`{record.get('stage128_m3i2_predecessor_pr_merge_commit')}`; "
-            f"PR #{record.get('stage128_m3i2_live_pr_number')} was "
+            f"PR #{record.get('stage128_m3i2_contract_time_pr_number')} was "
             "subsequently retargeted to "
-            f"`{record.get('stage128_m3i2_live_pr_base_branch')}` (base "
-            f"`{record.get('stage128_m3i2_live_pr_base_commit')}`) and never "
-            "merged under this action — "
-            f"merged = {record.get('stage128_m3i2_live_pr_merged')}, no merge "
-            "authorization. PR #"
-            f"{record.get('stage128_m3i2_live_pr_number')} is the "
-            "**historical contract-lock PR**, not the current draft; the "
-            "evidence-capture PR is identified in the evidence-capture "
+            f"`{record.get('stage128_m3i2_contract_time_pr_base_branch')}` "
+            f"(base `{record.get('stage128_m3i2_contract_time_pr_base_commit')}`"
+            ") and never merged under this action — merged = "
+            f"{record.get('stage128_m3i2_contract_time_pr_merged')}, no merge "
+            "authorization. Semantics: "
+            f"`{record.get('stage128_m3i2_contract_time_pr_semantics')}`. "
+            f"PR #{record.get('stage128_m3i2_contract_time_pr_number')} is the "
+            "**historical contract-lock PR**, never the current draft; the "
+            "live evidence-capture PR is identified in the evidence-capture "
             "section below.",
             "- **Next research action (pointer only):** "
             f"`{record.get('next_research_action_id')}` — it is **not "
@@ -4399,8 +4414,20 @@ def render_current_state(record: dict) -> str:
             "- ✅ **Evidence capture executed:** True — action "
             f"`{record.get('last_completed_research_action_id')}`, carried by "
             "**PR #"
-            f"{record.get('stage128_m3i2_audited_pr_number', 'n/a')}** "
-            "(the evidence-capture PR)",
+            f"{record.get('stage128_m3i2_live_pr_number', 'n/a')}** "
+            "(the LIVE evidence-capture PR)",
+            "- ✅ **Official-source retrieval completed:** "
+            f"{record.get('stage128_m3i2_official_source_retrieval_completed')}"
+            " — this is acquisition only and is **not** a Data Gate, **not** "
+            "coverage and **not** an admission",
+            "- **Live PR topology:** PR #"
+            f"{record.get('stage128_m3i2_live_pr_number')} → base "
+            f"`{record.get('stage128_m3i2_live_pr_base_branch')}` @ "
+            f"`{record.get('stage128_m3i2_live_pr_base_commit')}` — draft = "
+            f"{record.get('stage128_m3i2_live_pr_is_draft')}, merged = "
+            f"{record.get('stage128_m3i2_live_pr_merged')}, head derived from "
+            f"`{record.get('stage128_m3i2_live_pr_head_commit_source')}` "
+            "(never pinned)",
             "- **Official traffic:** "
             f"{record.get('stage128_m3i2_official_requests_attempted')} "
             "requests — "
@@ -5721,6 +5748,11 @@ _STAGE128_M3I2_EVIDENCE_WORKSTREAM_ID = (
 _STAGE128_M3I2_EVIDENCE_DECISION_REL = (
     "project/stage128/m3i2_official_source_evidence_capture/"
     "stage128_m3i2_official_source_evidence_decision.json")
+#: `m3i2_retrieval_started` is a CONTRACT-LOCK-TIME marker that is retained at
+#: False for retrieval compatibility. It does NOT mean "no official source was
+#: ever retrieved" — the separate evidence-capture action superseded it.
+_STAGE128_M3I2_RETRIEVAL_MARKER_SEMANTICS = (
+    "contract_lock_time_marker_superseded_by_official_source_evidence_capture")
 _STAGE128_M3I2_EVIDENCE_STATUSES = (
     "EVIDENCE_COMPLETE_FOR_SEPARATE_M3I2_DATA_GATE_REVIEW",
     "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE",
@@ -5776,6 +5808,14 @@ def derive_stage128_m3i2_evidence_capture_markers(root: str) -> dict:
     summary = d.get("evidence_summary") or {}
     return {
         "stage128_m3i2_evidence_capture_executed": True,
+        # LIVE retrieval fact. Official-source material WAS requested, retained
+        # and hashed under this separate action. This is acquisition only: it
+        # is not a Data Gate, not coverage and not an admission.
+        "stage128_m3i2_official_source_retrieval_completed": True,
+        # The contract-time marker `m3i2_retrieval_started` stays False for
+        # backwards compatibility; this field says what that False means.
+        "m3i2_retrieval_started_semantics": (
+            _STAGE128_M3I2_RETRIEVAL_MARKER_SEMANTICS),
         "stage128_m3i2_evidence_status": status,
         "stage128_m3i2_evidence_result_code": d.get("result_code"),
         "stage128_m3i2_financing_metadata_decision": d.get(
@@ -5996,6 +6036,152 @@ def derive_stage128_m3i2_independent_bundle_audit_markers(root: str) -> dict:
     }
 
 
+_STAGE128_M3I2_GOVERNANCE_BOUNDARY_REL = (
+    "project/stage128/m3i2_official_source_evidence_capture/"
+    "stage128_m3i2_evidence_capture_governance_boundary.json")
+_STAGE128_M3I2_LIVE_BASE_BRANCH = "main"
+
+
+def derive_stage128_m3i2_live_pr_topology_markers(root: str) -> dict:
+    """Publish the LIVE (evidence-capture) M3I-2 PR topology.
+
+    The contract-lock artifact records the topology that was live *at contract
+    time* (PR #74). That is history. The live draft is the separate
+    evidence-capture PR, and this function derives it — fail-closed — from the
+    evidence-capture artifacts themselves:
+
+    * the evidence decision and the governance boundary agree on the base
+      branch, the base commit and the Draft/no-merge posture;
+    * the independent bundle-integrity audit record names the PR number, which
+      must be a *successor* of the contract-time PR;
+    * the live head is taken from the CURRENT repository head, never pinned.
+
+    Returns {} before the evidence capture exists. Publishing a live topology
+    is pure metadata: it admits nothing and moves no scientific state.
+    """
+    decision_path = os.path.join(root, _STAGE128_M3I2_EVIDENCE_DECISION_REL)
+    if not os.path.isfile(decision_path):
+        return {}
+    with open(decision_path, encoding="utf-8") as fh:
+        decision = json.load(fh)
+    if decision.get("action_id") != _STAGE128_M3I2_EVIDENCE_ACTION_ID:
+        raise HandoffError("stage128 M3I-2 evidence-capture action_id mismatch")
+
+    boundary_path = os.path.join(root, _STAGE128_M3I2_GOVERNANCE_BOUNDARY_REL)
+    audit_path = os.path.join(root, _STAGE128_M3I2_INDEPENDENT_AUDIT_REL)
+    for path in (boundary_path, audit_path):
+        if not os.path.isfile(path):
+            raise HandoffError(
+                "the M3I-2 live PR topology cannot be derived without "
+                f"{os.path.relpath(path, root)}")
+    with open(boundary_path, encoding="utf-8") as fh:
+        boundary = json.load(fh)
+    with open(audit_path, encoding="utf-8") as fh:
+        audit = json.load(fh)
+
+    # 1. Base branch: all three artifacts must agree, and it must be main.
+    branches = {
+        decision.get("pr_base_branch"),
+        boundary.get("pr_base_branch"),
+        audit.get("audited_pr_base_branch"),
+    }
+    if branches != {_STAGE128_M3I2_LIVE_BASE_BRANCH}:
+        raise HandoffError(
+            "the live M3I-2 PR base branch is inconsistent across the "
+            f"evidence-capture artifacts: {sorted(map(str, branches))}")
+
+    # 2. Base commit: the merge commit of the contract-time predecessor PR is
+    #    current main, and it is the live base of the evidence-capture PR.
+    commits = {
+        decision.get("baseline_commit"),
+        decision.get("predecessor_pr_merge_commit"),
+        boundary.get("baseline_commit"),
+        boundary.get("predecessor_pr_merge_commit"),
+        audit.get("audited_pr_base_sha"),
+    }
+    if len(commits) != 1:
+        raise HandoffError(
+            "the live M3I-2 PR base commit is inconsistent across the "
+            f"evidence-capture artifacts: {sorted(map(str, commits))}")
+    base_commit = commits.pop()
+    if not (isinstance(base_commit, str) and len(base_commit) == 40):
+        raise HandoffError(
+            "the live M3I-2 PR base commit must be a full 40-hex SHA")
+
+    # 3. The live PR is a Draft, unmerged and carries no merge authorization.
+    for source, artifact in (("evidence decision", decision),
+                             ("governance boundary", boundary)):
+        if artifact.get("pr_is_draft") is not True:
+            raise HandoffError(
+                f"the live M3I-2 PR must remain a Draft ({source})")
+        if artifact.get("merge_authorized") is not False:
+            raise HandoffError(
+                f"no merge authorization exists for the live M3I-2 PR "
+                f"({source})")
+    if audit.get("merge_authorized") is not False:
+        raise HandoffError(
+            "no merge authorization exists for the live M3I-2 PR (audit)")
+
+    # 4. The live PR number is a strict successor of the contract-time PR.
+    live_number = audit.get("pr_number")
+    predecessor_numbers = {
+        decision.get("predecessor_pr_number"),
+        boundary.get("predecessor_pr_number"),
+    }
+    if len(predecessor_numbers) != 1:
+        raise HandoffError(
+            "the M3I-2 contract-time predecessor PR number is inconsistent")
+    predecessor_number = predecessor_numbers.pop()
+    if not isinstance(live_number, int) or isinstance(live_number, bool):
+        raise HandoffError("the live M3I-2 PR number must be an integer")
+    if not isinstance(predecessor_number, int):
+        raise HandoffError(
+            "the M3I-2 contract-time predecessor PR number must be an integer")
+    if live_number <= predecessor_number:
+        raise HandoffError(
+            f"the live M3I-2 PR #{live_number} must succeed the contract-time "
+            f"PR #{predecessor_number}")
+    if decision.get("predecessor_pr_merged") is not True or boundary.get(
+            "predecessor_pr_merged") is not True:
+        raise HandoffError(
+            "the live M3I-2 PR targets main, so the contract-time PR must be "
+            "recorded as merged")
+
+    # The live head is NOT published here: it is the CURRENT repository head,
+    # so it is HEAD-relative and must stay out of the fingerprinted semantic
+    # state. `build_handoff_state` attaches it to the record as a VOLATILE
+    # field derived from the repository head — never a pinned SHA.
+    return {
+        "stage128_m3i2_live_pr_number": live_number,
+        "stage128_m3i2_live_pr_base_branch": _STAGE128_M3I2_LIVE_BASE_BRANCH,
+        "stage128_m3i2_live_pr_base_commit": base_commit,
+        "stage128_m3i2_live_main_commit": base_commit,
+        "stage128_m3i2_live_pr_is_draft": True,
+        "stage128_m3i2_live_pr_merged": False,
+        "stage128_m3i2_live_pr_head_commit_source": (
+            "observed_repository_head_commit_at_generation"),
+        "stage128_m3i2_live_pr_role": "official_source_evidence_capture_pr",
+        "stage128_m3i2_contract_time_pr_number": predecessor_number,
+        "stage128_m3i2_contract_time_pr_semantics": (
+            "historical_contract_lock_topology_superseded_by_pr"
+            f"{live_number}"),
+        "stage128_m3i2_merge_authorized": False,
+        # Topology metadata never moves the scientific state.
+        "m3i2_data_gate_executed": False,
+        "m3i2_block_admitted": False,
+        "m3i2_modeling_started": False,
+        "m4_authorized": False,
+        "final_test_locked": True,
+    }
+
+
+#: Semantics label for the CONTRACT-TIME PR topology. It is history, never the
+#: live draft. When the superseding evidence-capture PR is recognizable the
+#: live-topology deriver replaces it with the explicit
+#: ``..._superseded_by_pr<N>`` form (N derived, never hard-coded).
+_STAGE128_M3I2_CONTRACT_TIME_PR_SEMANTICS_BASE = (
+    "historical_contract_lock_topology_not_live")
+
 _STAGE128_M3I2_ACTIVE_WORKSTREAM_ID = "stage128-m3i2-prospective-contract-lock"
 
 _STAGE128_M3I2_CONTRACT_LOCK_REL = (
@@ -6164,12 +6350,20 @@ def derive_stage128_m3i2_contract_lock_markers(root: str) -> dict:
         "stage128_m3i2_pr_base_branch": d.get("pr_base_branch"),
         "stage128_m3i2_provenance_baseline_commit": topo.get(
             "scientific_provenance_baseline_commit"),
-        "stage128_m3i2_live_pr_number": topo.get("live_pr_number"),
-        "stage128_m3i2_live_pr_base_branch": topo.get("live_pr_base_branch"),
-        "stage128_m3i2_live_pr_base_commit": topo.get("live_pr_base_commit"),
-        "stage128_m3i2_live_main_commit": topo.get("live_main_commit"),
-        "stage128_m3i2_live_pr_is_draft": topo.get("live_pr_is_draft"),
-        "stage128_m3i2_live_pr_merged": topo.get("live_pr_merged"),
+        # CONTRACT-TIME topology. These values were live at the moment of the
+        # contract lock and are retained as HISTORY only; they are never the
+        # current draft. The live evidence-capture PR topology is published
+        # separately by `derive_stage128_m3i2_live_pr_topology_markers`.
+        "stage128_m3i2_contract_time_pr_number": topo.get("live_pr_number"),
+        "stage128_m3i2_contract_time_pr_base_branch": topo.get(
+            "live_pr_base_branch"),
+        "stage128_m3i2_contract_time_pr_base_commit": topo.get(
+            "live_pr_base_commit"),
+        "stage128_m3i2_contract_time_main_commit": topo.get("live_main_commit"),
+        "stage128_m3i2_contract_time_pr_is_draft": topo.get("live_pr_is_draft"),
+        "stage128_m3i2_contract_time_pr_merged": topo.get("live_pr_merged"),
+        "stage128_m3i2_contract_time_pr_semantics": (
+            _STAGE128_M3I2_CONTRACT_TIME_PR_SEMANTICS_BASE),
         "stage128_m3i2_predecessor_pr_merged": topo.get(
             "predecessor_pr_merged"),
         "stage128_m3i2_predecessor_pr_merge_commit": topo.get(
