@@ -102,6 +102,8 @@ SEMANTIC_REL = (
 IMF_CATALOG_REL = f"{PACKAGE_DIR_REL}/stage128_m3i3_imf_mfs_ir_catalog.csv"
 FINANCING_EVIDENCE_REL = (
     f"{PACKAGE_DIR_REL}/stage128_m3i3_financing_metadata_evidence.json")
+CONTINUATION_REL = (
+    f"{PACKAGE_DIR_REL}/stage128_m3i2_capture_continuation_record.json")
 BUNDLE_MANIFEST_REL = (
     f"{PACKAGE_DIR_REL}/stage128_m3i2_external_bundle_manifest.json")
 DECISION_REL = (
@@ -176,6 +178,133 @@ NORMALIZED_AUTHORIZATION_SCOPE = (
     "materializing no feature, computing no coverage, executing no Data Gate, "
     "fitting no model, starting no M4, opening no final test and merging no "
     "PR.")
+
+
+#: The capture ran in TWO invocations. The archive URLs live inside the
+#: official listing, so they cannot be known until that listing is captured;
+#: the programmer's runner closed its manifest after discovery, stopped, and
+#: put the question to the human rather than starting a second capture on its
+#: own authority. The human chose to complete the same capture.
+CAPTURE_INVOCATIONS = 2
+INVOCATION_1_ROLE = "discovery_only"
+INVOCATION_1_REQUEST_COUNT = 5
+INVOCATION_1_CLOSED = True
+INVOCATION_2_ROLE = "required_archive_completion"
+INVOCATION_2_REQUEST_COUNT = 16
+INVOCATION_2_CLOSED = True
+
+CONTINUATION_WAS_EXPLICITLY_REQUESTED_FROM_HUMAN = True
+CONTINUATION_SCOPE_CHANGED = False
+CONTINUATION_AUTHORIZED_NEW_SCIENTIFIC_ACTION = False
+CONTINUATION_AUTHORIZED_ONLY_COMPLETION_OF_SAME_CAPTURE = True
+
+#: The exact option text the human selected, verbatim.
+CONTINUATION_SELECTED_OPTION_TEXT = "capture را کامل کن (پیشنهادی)"
+CONTINUATION_QUESTION_CONTEXT = (
+    "The programmer reported that invocation 1 captured only the five "
+    "official discovery objects and closed its manifest, that the 16 required "
+    "archive-edition URLs are only knowable after parsing the captured "
+    "listing, and that section 7 of the canonical prompt forbids a second "
+    "live capture after the authorization is consumed. The human was offered "
+    "exactly two options: complete the same capture, or stop and report with "
+    "required_editions_captured = 0.")
+#: No exact wall-clock timestamp for the human's selection is retained.
+CONTINUATION_TIMESTAMP_STATUS = "UNRESOLVED_EXACT_TIMESTAMP"
+CONTINUATION_OBSERVED_REQUEST_WINDOW = (
+    "invocation 1 discovery requests and invocation 2 archive requests are "
+    "separated in the retained request manifest; the selection occurred "
+    "between them")
+
+
+def build_continuation_record(requests_rows: list[dict[str, Any]]
+                              ) -> dict[str, Any]:
+    """Disclose BOTH capture invocations in the committed package.
+
+    The external bundle is not the only place this belongs: an auditor reading
+    the repository alone must be able to see that the capture ran twice and on
+    whose say-so.
+    """
+    discovery = [r for r in requests_rows
+                 if not str(r.get("object_id", "")).startswith("wdi_archive_")]
+    archives = [r for r in requests_rows
+                if str(r.get("object_id", "")).startswith("wdi_archive_")]
+    times = sorted(str(r.get("started_utc") or "") for r in requests_rows
+                   if r.get("started_utc"))
+    return {
+        "package_id": PACKAGE_ID,
+        "generated_for": ACTION_ID,
+        "record_type": "supplementary_continuation_record",
+        "supplements_but_does_not_replace":
+            "stage128_m3i2_evidence_capture_human_authorization_record.json",
+
+        "capture_invocations": CAPTURE_INVOCATIONS,
+        "invocation_1_role": INVOCATION_1_ROLE,
+        "invocation_1_request_count": INVOCATION_1_REQUEST_COUNT,
+        "invocation_1_closed": INVOCATION_1_CLOSED,
+        "invocation_1_observed_request_count": len(discovery),
+        "invocation_2_role": INVOCATION_2_ROLE,
+        "invocation_2_request_count": INVOCATION_2_REQUEST_COUNT,
+        "invocation_2_closed": INVOCATION_2_CLOSED,
+        "invocation_2_observed_request_count": len(archives),
+
+        "continuation_was_explicitly_requested_from_human":
+            CONTINUATION_WAS_EXPLICITLY_REQUESTED_FROM_HUMAN,
+        "continuation_selected_option_text":
+            CONTINUATION_SELECTED_OPTION_TEXT,
+        "continuation_selected_option_text_is_verbatim_human_selection": True,
+        "continuation_question_context": CONTINUATION_QUESTION_CONTEXT,
+        "continuation_timestamp_status": CONTINUATION_TIMESTAMP_STATUS,
+        "continuation_observed_request_window":
+            CONTINUATION_OBSERVED_REQUEST_WINDOW,
+        "first_recorded_request_started_utc": times[0] if times else "",
+        "last_recorded_request_started_utc": times[-1] if times else "",
+
+        "continuation_scope_changed": CONTINUATION_SCOPE_CHANGED,
+        "continuation_authorized_new_scientific_action":
+            CONTINUATION_AUTHORIZED_NEW_SCIENTIFIC_ACTION,
+        "continuation_authorized_only_completion_of_same_capture":
+            CONTINUATION_AUTHORIZED_ONLY_COMPLETION_OF_SAME_CAPTURE,
+        "third_invocation_present": False,
+        "programmer_stopped_and_asked_rather_than_recapturing": True,
+        "raw_bytes_from_both_invocations_retained": True,
+        "no_invocation_1_evidence_deleted_or_rewritten": True,
+    }
+
+
+def assert_continuation_record_is_sound(record: dict[str, Any]) -> None:
+    """Fail closed on an undisclosed, unauthorized or widened continuation."""
+    invocations = record.get("capture_invocations")
+    if invocations is None or invocations < 1:
+        raise M3I2EvidenceCaptureError(
+            "the capture-invocation count must be recorded")
+    if invocations > 2:
+        raise M3I2EvidenceCaptureError(
+            f"a third capture invocation appeared ({invocations}); only the "
+            "discovery invocation and its authorized completion exist")
+    if invocations == 2:
+        if record.get(
+                "continuation_was_explicitly_requested_from_human") is not True:
+            raise M3I2EvidenceCaptureError(
+                "a second capture invocation without an explicit human "
+                "continuation decision is unauthorized")
+        if not record.get("continuation_selected_option_text"):
+            raise M3I2EvidenceCaptureError(
+                "the human's continuation selection must be recorded verbatim")
+        if record.get("continuation_scope_changed") is not False:
+            raise M3I2EvidenceCaptureError(
+                "the continuation may not widen scope")
+        if record.get(
+                "continuation_authorized_new_scientific_action") is not False:
+            raise M3I2EvidenceCaptureError(
+                "the continuation authorized no new scientific action")
+        if record.get(
+                "continuation_authorized_only_completion_of_same_capture"
+        ) is not True:
+            raise M3I2EvidenceCaptureError(
+                "the continuation authorized only completion of the same "
+                "capture")
+    if record.get("third_invocation_present") is not False:
+        raise M3I2EvidenceCaptureError("a third invocation is not authorized")
 
 
 def verify_human_authorization() -> dict[str, Any]:
@@ -517,6 +646,75 @@ FORBIDDEN_SOURCE_TOKENS: tuple[str, ...] = (
 # Release-availability rule (section 8) — inherited from the merged contract
 # --------------------------------------------------------------------------- #
 
+#: A date embedded in an official filename is an EDITION DATE TOKEN. It is not
+#: a release date until retained official bytes say so in words. The audit that
+#: forced this distinction was right: the World Bank archive listing publishes
+#: "Year | Month(s)" plus hyperlinks, and nowhere states that the date inside a
+#: filename is the publication, release or update date of that edition.
+EDITION_DATE_TOKEN_SOURCE_FILENAME = "official_listing_download_filename"
+
+RELEASE_DATE_UNRESOLVED_STATUS = (
+    "UNRESOLVED_FILENAME_DATE_TOKEN_NOT_VERIFIED_AS_RELEASE_DATE")
+RELEASE_DATE_VERIFIED_STATUS = (
+    "VERIFIED_RELEASE_DATE_EXPLICITLY_STATED_BY_OFFICIAL_SOURCE")
+RELEASE_DATE_ABSENT_STATUS = "UNRESOLVED_NO_DATE_TOKEN_AND_NO_STATED_RELEASE"
+
+#: Wordings that would make a date an explicit release/publication/update date.
+#: Searched against RETAINED bytes only.
+RELEASE_STATEMENT_PATTERNS: tuple[str, ...] = (
+    r"release[ds]?\s*(date|on)?",
+    r"publish(ed|ication)\s*(date|on)?",
+    r"last\s+updated",
+    r"data\s+updated",
+    r"update[ds]?\s+on",
+)
+
+#: Things that can NEVER establish a historical release time (section 3 rule 4).
+NON_EVIDENCE_FOR_RELEASE_TIME: tuple[str, ...] = (
+    "retrieval timestamp",
+    "HTTP Last-Modified header",
+    "ZIP member timestamp",
+    "workbook document properties",
+    "file-system mtime",
+    "the observation years present in the file",
+)
+
+
+def find_explicit_release_date_statement(
+    edition_date_token: str, retained_texts: dict[str, str],
+) -> tuple[bool, str, str]:
+    """Search RETAINED bytes for an explicit release/publication statement.
+
+    Returns ``(verified, evidence_artifact, evidence_locator)``. A hit counts
+    only when release/publication/update wording appears in the immediate
+    neighbourhood of the edition's own date token, in an official retained
+    object. Nothing is inferred from a header, a timestamp or a filename.
+    """
+    if not edition_date_token:
+        return False, "", ""
+    slash = edition_date_token.replace("-", "/")
+    compact = edition_date_token.replace("-", "")
+    needles = (edition_date_token, slash, compact)
+
+    for artifact, text in sorted(retained_texts.items()):
+        lowered = text.lower()
+        for needle in needles:
+            start = 0
+            while True:
+                index = lowered.find(needle.lower(), start)
+                if index < 0:
+                    break
+                window = lowered[max(0, index - 300):index + 300]
+                for pattern in RELEASE_STATEMENT_PATTERNS:
+                    if re.search(pattern, window):
+                        line = lowered.count("\n", 0, index) + 1
+                        return True, artifact, (
+                            f"{artifact}#offset={index};line={line};"
+                            f"token={edition_date_token}")
+                start = index + 1
+    return False, "", ""
+
+
 def derive_release_available_at(
     listed_release_date: str, listed_release_time: str | None,
 ) -> tuple[str, bool]:
@@ -625,13 +823,37 @@ FX_REQUIRED_INTERPRETATION = (
     "Official exchange rate, LCU per US dollar, period average, annual")
 
 SEMANTIC_EVIDENCE_FIELDS: tuple[str, ...] = (
-    "archive_edition_id", "release_available_at_utc",
+    "archive_edition_id", "indicator_code", "release_available_at_utc",
     "economy_identity_verified", "indicator_code_verified",
     "archived_series_title_raw", "title_compatibility", "frequency_raw",
     "frequency_annual_verified", "unit_raw", "unit_compatibility",
-    "calendar_year_semantics_verified", "raw_archive_sha256",
-    "evidence_locator", "compatibility_status", "unresolved_reason",
-    "indicator_code", "unit_evidence_source",
+    # provenance of the unit claim was previously computed but NOT committed;
+    # an evidence field that never reaches the artifact is not evidence.
+    "unit_evidence_source",
+    "calendar_year_semantics_verified", "calendar_year_evidence_locator",
+    # --- FX continuity evidence (section 4) --------------------------------
+    "currency_denomination_raw", "currency_denomination_evidence_artifact",
+    "currency_denomination_evidence_locator", "currency_denomination_verified",
+    "local_currency_valuation_definition_raw",
+    "valuation_definition_evidence_artifact",
+    "valuation_definition_evidence_locator", "valuation_definition_verified",
+    "redenomination_or_unit_break_evidence_raw",
+    "redenomination_or_unit_break_evidence_artifact",
+    "redenomination_or_unit_break_evidence_locator",
+    "no_redenomination_or_unit_break_verified",
+    "fx_pair_semantic_compatibility_status",
+    "raw_archive_sha256", "evidence_locator", "compatibility_status",
+    "unresolved_reason",
+)
+
+#: Fields an FX row must ALL evidence before it may be PASS. The archived
+#: title supports the generic construct and the unit label; it says nothing
+#: about which currency unit Iran was denominated in for a given vintage, nor
+#: whether a redenomination fell between two adjacent years.
+FX_CONTINUITY_REQUIRED_FIELDS: tuple[str, ...] = (
+    "currency_denomination_verified",
+    "valuation_definition_verified",
+    "no_redenomination_or_unit_break_verified",
 )
 
 
@@ -660,15 +882,49 @@ def classify_semantic_compatibility(evidence: dict[str, Any]) -> str:
     return "PASS"
 
 
+def assert_fx_pass_has_continuity_evidence(row: dict[str, Any]) -> None:
+    """An FX row may be PASS only with all three continuity facts evidenced."""
+    if row.get("indicator_code") != FX_INDICATOR_CODE:
+        return
+    if row.get("compatibility_status") != "PASS":
+        return
+    missing = [f for f in FX_CONTINUITY_REQUIRED_FIELDS
+               if row.get(f) is not True]
+    if missing:
+        raise M3I2EvidenceCaptureError(
+            f"FX semantic PASS without continuity evidence: {missing}")
+    for field in ("currency_denomination_evidence_locator",
+                  "valuation_definition_evidence_locator",
+                  "redenomination_or_unit_break_evidence_locator"):
+        if not row.get(field):
+            raise M3I2EvidenceCaptureError(
+                f"FX semantic PASS without an evidence locator: {field}")
+    if row.get("fx_pair_semantic_compatibility_status") != "PASS":
+        raise M3I2EvidenceCaptureError(
+            "fx_pair_semantic_compatibility_status must agree with the row")
+
+
+#: Evidence every PASS row must carry, whichever indicator it describes. The
+#: FX-only continuity fields are checked separately, against FX rows only.
+SEMANTIC_CORE_EVIDENCE_FIELDS: tuple[str, ...] = (
+    "archive_edition_id", "indicator_code", "economy_identity_verified",
+    "indicator_code_verified", "archived_series_title_raw",
+    "title_compatibility", "frequency_raw", "frequency_annual_verified",
+    "unit_raw", "unit_evidence_source", "unit_compatibility",
+    "calendar_year_semantics_verified", "calendar_year_evidence_locator",
+    "raw_archive_sha256", "evidence_locator", "compatibility_status",
+)
+
+
 def assert_semantic_pass_is_fully_evidenced(row: dict[str, Any]) -> None:
     """QC rule — a PASS that lacks any required evidence is a QC failure."""
     if row.get("compatibility_status") != "PASS":
         return
-    missing = [f for f in SEMANTIC_EVIDENCE_FIELDS
-               if f != "unresolved_reason" and not row.get(f)]
+    missing = [f for f in SEMANTIC_CORE_EVIDENCE_FIELDS if not row.get(f)]
     if missing:
         raise M3I2EvidenceCaptureError(
             f"semantic PASS without complete evidence: {missing}")
+    assert_fx_pass_has_continuity_evidence(row)
 
 
 # --------------------------------------------------------------------------- #
@@ -1111,6 +1367,170 @@ def build_external_bundle(
     }
 
 
+MULTIPART_MAX_BYTES = 200_000_000
+MULTIPART_HANDOFF_MANIFEST_MEMBER = "handoff_manifest.json"
+
+
+def build_multipart_handoff_bundle(
+    capture_dir: str | os.PathLike[str], bundle_dir: str | os.PathLike[str],
+) -> dict[str, Any]:
+    """Split the evidence into valid, deterministic ZIP parts for handoff.
+
+    Each part is a real ZIP, not a byte-slice of a larger one, so an auditor can
+    open any part on its own. Every original member is assigned to exactly one
+    part as a primary member, with its bytes and SHA-256 unchanged. A small
+    global handoff manifest is copied into every part so no part is orphaned.
+
+    The original single-file bundle and the capture directory are left in place.
+    """
+    src = Path(capture_dir)
+    dest = Path(bundle_dir)
+    dest.mkdir(parents=True, exist_ok=True)
+
+    members = sorted(
+        (p for p in src.rglob("*")
+         if p.is_file() and p.name != "SHA256SUMS.txt"),
+        key=lambda p: str(p.relative_to(src)))
+    if not members:
+        raise M3I2EvidenceCaptureError(
+            "STOP_RAW_BYTES_NOT_RETAINED: the capture directory is empty")
+
+    # Deterministic sequential packing over the sorted member order.
+    parts: list[list[Path]] = [[]]
+    sizes: list[int] = [0]
+    for path in members:
+        size = path.stat().st_size
+        if size > MULTIPART_MAX_BYTES:
+            raise M3I2EvidenceCaptureError(
+                f"a single member exceeds the part limit: {path.name}")
+        if sizes[-1] and sizes[-1] + size > MULTIPART_MAX_BYTES:
+            parts.append([])
+            sizes.append(0)
+        parts[-1].append(path)
+        sizes[-1] += size
+
+    total_parts = len(parts)
+    global_manifest = {
+        "bundle_basename": BUNDLE_BASENAME,
+        "total_parts": total_parts,
+        "part_max_bytes": MULTIPART_MAX_BYTES,
+        "action_id": ACTION_ID,
+        "note": (
+            "Each part is a standalone valid ZIP. Every original member "
+            "appears in exactly one part as a primary member; this manifest is "
+            "copied into every part for orientation."),
+    }
+    manifest_bytes = (json.dumps(global_manifest, ensure_ascii=False, indent=2,
+                                 sort_keys=True) + "\n").encode("utf-8")
+
+    part_records: list[dict[str, Any]] = []
+    assigned: list[str] = []
+    for index, group in enumerate(parts, start=1):
+        name = f"{BUNDLE_BASENAME}_part{index:03d}.zip"
+        path = dest / name
+        member_records: list[dict[str, Any]] = []
+        with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as zf:
+            info = zipfile.ZipInfo(MULTIPART_HANDOFF_MANIFEST_MEMBER,
+                                   date_time=(1980, 1, 1, 0, 0, 0))
+            info.external_attr = 0o644 << 16
+            zf.writestr(info, manifest_bytes)
+            for member in group:
+                rel = str(member.relative_to(src))
+                data = member.read_bytes()
+                entry = zipfile.ZipInfo(rel, date_time=(1980, 1, 1, 0, 0, 0))
+                entry.external_attr = 0o644 << 16
+                entry.compress_type = zipfile.ZIP_DEFLATED
+                zf.writestr(entry, data)
+                digest = hashlib.sha256(data).hexdigest()
+                member_records.append({
+                    "member_path": rel,
+                    "member_bytes": len(data),
+                    "member_sha256": digest,
+                    "primary_member": True,
+                })
+                assigned.append(rel)
+        blob = path.read_bytes()
+        part_records.append({
+            "filename": name,
+            "part_number": index,
+            "total_parts": total_parts,
+            "byte_size": len(blob),
+            "sha256": hashlib.sha256(blob).hexdigest(),
+            "primary_member_count": len(member_records),
+            "members": member_records,
+            "copied_global_manifest": MULTIPART_HANDOFF_MANIFEST_MEMBER,
+        })
+
+    # Every original member assigned exactly once.
+    expected = [str(m.relative_to(src)) for m in members]
+    if sorted(assigned) != sorted(expected):
+        raise M3I2EvidenceCaptureError(
+            "multipart member allocation does not cover every member exactly "
+            "once")
+    duplicates = sorted({m for m in assigned if assigned.count(m) > 1})
+    if duplicates:
+        raise M3I2EvidenceCaptureError(
+            f"member assigned to more than one part: {duplicates}")
+
+    lines = [f"{r['sha256']}  {r['filename']}" for r in part_records]
+    (dest / "SHA256SUMS.txt").write_text("\n".join(lines) + "\n",
+                                         encoding="utf-8")
+
+    manifest = {
+        "multipart_basename": BUNDLE_BASENAME,
+        "multipart_total_parts": total_parts,
+        "multipart_part_max_bytes": MULTIPART_MAX_BYTES,
+        "multipart_parts": part_records,
+        "multipart_total_bytes": sum(r["byte_size"] for r in part_records),
+        "multipart_member_count": len(expected),
+        "every_member_assigned_exactly_once": True,
+        "parts_are_valid_zip_archives": True,
+        "deterministic_member_order": True,
+        "normalized_member_timestamps": True,
+        "sha256sums_file": "SHA256SUMS.txt",
+        "original_single_bundle_retained": True,
+        "capture_directory_retained": str(src),
+        "independently_verified_by_auditor": False,
+        "independent_verification_note": (
+            "Independent verification cannot be claimed until every part has "
+            "actually been provided to the auditor."),
+    }
+    verify_multipart_bundle(manifest, dest)
+    return manifest
+
+
+def verify_multipart_bundle(manifest: dict[str, Any],
+                            bundle_dir: str | os.PathLike[str]) -> None:
+    """Re-open and re-hash every part; anything off is a hard stop."""
+    dest = Path(bundle_dir)
+    for part in manifest.get("multipart_parts", []):
+        path = dest / part["filename"]
+        if not path.is_file():
+            raise M3I2EvidenceCaptureError(
+                f"STOP_RAW_BYTES_NOT_RETAINED: {part['filename']}")
+        if hashlib.sha256(path.read_bytes()).hexdigest() != part["sha256"]:
+            raise M3I2EvidenceCaptureError(
+                f"STOP_EXTERNAL_BUNDLE_HASH_MISMATCH: {part['filename']}")
+        if part["byte_size"] > MULTIPART_MAX_BYTES:
+            raise M3I2EvidenceCaptureError(
+                f"part exceeds the size limit: {part['filename']}")
+        with zipfile.ZipFile(path) as zf:          # must be a VALID zip
+            if zf.testzip() is not None:
+                raise M3I2EvidenceCaptureError(
+                    f"corrupt part: {part['filename']}")
+            names = set(zf.namelist())
+            for member in part["members"]:
+                if member["member_path"] not in names:
+                    raise M3I2EvidenceCaptureError(
+                        f"part {part['filename']} is missing declared member "
+                        f"{member['member_path']}")
+                data = zf.read(member["member_path"])
+                if hashlib.sha256(data).hexdigest() != member["member_sha256"]:
+                    raise M3I2EvidenceCaptureError(
+                        f"member bytes changed inside {part['filename']}: "
+                        f"{member['member_path']}")
+
+
 def verify_bundle_manifest(manifest: dict[str, Any],
                            bundle_dir: str | os.PathLike[str]) -> None:
     """Recompute every part hash; a mismatch is a hard stop."""
@@ -1157,15 +1577,26 @@ CUTOFF_PLAN_COLUMNS: tuple[str, ...] = (
 
 RELEASE_MANIFEST_COLUMNS: tuple[str, ...] = (
     "archive_edition_id", "archive_year", "archive_month",
-    "official_listing_url", "official_download_url", "listed_release_date",
-    "listed_release_time", "release_time_exact",
+    "official_listing_url", "official_download_url",
+    # the filename date token, kept strictly apart from a release date
+    "edition_date_token", "edition_date_token_source",
+    "edition_date_token_exact",
+    # release-date provenance
+    "release_date_explicitly_stated_by_official_source",
+    "release_date_evidence_artifact", "release_date_evidence_locator",
+    "release_date_source", "listed_release_date", "listed_release_time",
+    "release_time_exact", "release_date_verified",
+    "release_available_at_derivation_status",
     "derived_release_available_at_utc", "date_only_next_day_rule_applied",
-    "release_date_verified", "discovery_chain_artifact", "raw_listing_sha256",
+    "non_evidence_for_release_time",
+    "discovery_chain_artifact", "raw_listing_sha256",
     "retrieval_timestamp_utc", "unresolved_reason",
 )
 
 REQUIRED_EDITIONS_COLUMNS: tuple[str, ...] = (
-    "archive_edition_id", "release_available_at_utc",
+    "archive_edition_id", "edition_date_token", "release_date_verified",
+    "release_available_at_derivation_status", "release_available_at_utc",
+    "usable_as_pre_cutoff_vintage",
     "minimum_cutoff_using_edition", "maximum_cutoff_using_edition",
     "development_pair_count_using_edition", "download_required",
     "download_status", "raw_artifact_filename", "raw_artifact_sha256",
@@ -1193,6 +1624,37 @@ IMF_CATALOG_COLUMNS: tuple[str, ...] = (
 # --------------------------------------------------------------------------- #
 # Artifact builders
 # --------------------------------------------------------------------------- #
+
+#: The head this offline correction started from. The captured evidence is
+#: frozen at that commit: a correction may reinterpret what the bytes PROVE,
+#: but it may never change what was requested or what came back.
+CORRECTION_BASE_HEAD = "4c7c6114dcda7b3b1382ee3eb48367522d1fd2a2"
+
+FROZEN_CAPTURE_MANIFESTS: tuple[str, ...] = (
+    REQUEST_MANIFEST_REL,
+    RESPONSE_MANIFEST_REL,
+)
+
+
+def assert_capture_manifests_unchanged(root: Path) -> dict[str, Any]:
+    """Fail closed unless the request/response manifests are byte-identical.
+
+    This is the anti-tampering guard for an offline correction: reclassifying
+    evidence is allowed, quietly editing what was requested or returned is not.
+    """
+    out: dict[str, Any] = {
+        "frozen_against_head": CORRECTION_BASE_HEAD,
+        "no_new_network_requests": True,
+    }
+    for rel in FROZEN_CAPTURE_MANIFESTS:
+        committed = _git(root, "show", f"{CORRECTION_BASE_HEAD}:{rel}")
+        current = (root / rel).read_text(encoding="utf-8")
+        if current != committed:
+            raise M3I2EvidenceCaptureError(
+                f"capture manifest changed since {CORRECTION_BASE_HEAD}: {rel}")
+        out[f"{rel}_sha256"] = _sha256_text(current)
+    return out
+
 
 def build_authorization_record() -> dict[str, Any]:
     """Section 0 — the one consumed authorization, recorded verbatim."""
@@ -1403,7 +1865,8 @@ def build_decision(root: Path, summary: dict[str, Any],
         "next_research_action_authorized": False,
         "next_action_pointer_is_not_authorization": True,
 
-        "evidence_summary": dict(sorted(summary.items())),
+        "evidence_summary": dict(sorted(
+            (k, v) for k, v in summary.items() if not k.startswith("_"))),
         "protected_immutability": immutability,
     }
     for field in EXECUTION_COUNTER_FIELDS:
@@ -1448,6 +1911,30 @@ def build_qc_report(root: Path, decision: dict[str, Any],
           lambda: read_merged_contract(root))
     check("contract_not_modified_by_this_action",
           decision["m3i3_contract_null_fields_populated"] is False)
+
+    # -- the captured evidence itself is frozen ----------------------------- #
+    guard("capture_manifests_byte_identical_to_the_correction_base",
+          lambda: assert_capture_manifests_unchanged(root))
+    guard("capture_continuation_record_is_sound",
+          lambda: assert_continuation_record_is_sound(
+              summary.get("_continuation_record") or {}))
+    check("both_capture_invocations_are_disclosed_in_the_package",
+          summary.get("capture_invocations") == 2)
+
+    # -- release-date provenance (blocker 1) -------------------------------- #
+    check("no_release_date_is_verified_from_a_filename_token_alone",
+          summary.get("editions_with_verified_release_date", 0)
+          == summary.get("editions_with_release_statement_evidence", 0))
+    check("unverified_date_tokens_yield_no_available_at",
+          summary.get("editions_with_unverified_filename_date_token", 0)
+          == summary.get("editions_without_available_at", 0))
+
+    # -- FX continuity evidence (blocker 2) --------------------------------- #
+    for row in semantic_rows:
+        if row.get("indicator_code") == FX_INDICATOR_CODE:
+            guard(f"fx_pass_requires_continuity_evidence:"
+                  f"{row.get('archive_edition_id')}",
+                  lambda r=row: assert_fx_pass_has_continuity_evidence(r))
 
     # -- firewalls ---------------------------------------------------------- #
     guard("offline_layer_has_no_network_import",
@@ -1515,7 +2002,8 @@ def build_qc_report(root: Path, decision: dict[str, Any],
         "failed_assertions": failed,
         "all_pass": not failed,
         "assertions": assertions,
-        "evidence_counts": dict(sorted(summary.items())),
+        "evidence_counts": dict(sorted(
+            (k, v) for k, v in summary.items() if not k.startswith("_"))),
         "forbidden_execution_counters": dict(sorted(zero.items())),
         "counts_are_integrity_counts_not_coverage": True,
         "scope_note": (
@@ -1548,6 +2036,46 @@ def build_metadata(package_sha256: dict[str, str],
 # Offline build from retained bytes (section 16.2)
 # --------------------------------------------------------------------------- #
 
+#: Fields that are booleans in the payload and must survive a CSV round-trip
+#: as booleans. Reading them back as the STRING "False" - which is truthy -
+#: would silently invert an evidence claim, which is exactly the kind of thing
+#: this package exists to prevent.
+_BOOLEAN_CSV_FIELDS: tuple[str, ...] = (
+    "edition_date_token_exact",
+    "release_date_explicitly_stated_by_official_source",
+    "release_date_verified",
+    "release_time_exact",
+    "date_only_next_day_rule_applied",
+    "economy_identity_verified",
+    "indicator_code_verified",
+    "frequency_annual_verified",
+    "calendar_year_semantics_verified",
+    "currency_denomination_verified",
+    "valuation_definition_verified",
+    "no_redenomination_or_unit_break_verified",
+    "usable_as_pre_cutoff_vintage",
+    "download_required",
+)
+
+
+def _coerce_csv_booleans(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Restore real booleans after a CSV round-trip; keep blanks blank."""
+    for row in rows:
+        for field in _BOOLEAN_CSV_FIELDS:
+            if field not in row:
+                continue
+            value = row[field]
+            if isinstance(value, bool) or value is None:
+                continue
+            text = str(value).strip()
+            if text == "True":
+                row[field] = True
+            elif text == "False":
+                row[field] = False
+            # an empty cell stays empty: "not applicable" is not "false"
+    return rows
+
+
 def _read_csv_rows(path: Path) -> list[dict[str, Any]]:
     if not path.is_file() or not path.read_text(encoding="utf-8").strip():
         return []
@@ -1557,26 +2085,23 @@ def _read_csv_rows(path: Path) -> list[dict[str, Any]]:
 
 def parse_wdi_archive_listing(
     raw_html: str, listing_url: str, raw_sha256: str,
-    retrieved_utc: str,
+    retrieved_utc: str, retained_texts: dict[str, str] | None = None,
 ) -> list[dict[str, Any]]:
     """Derive archive editions from the OFFICIAL listing bytes only.
 
-    The official listing publishes one ``.zip`` per edition under
-    ``databank.worldbank.org/data/download/[Aa]rchive/``. Two filename
-    conventions appear, and they differ in a way that matters:
+    The listing publishes one ``.zip`` per edition under
+    ``databank.worldbank.org/data/download/[Aa]rchive/``, in two filename
+    conventions: ``WDI_excel_YYYY_MM_DD.zip`` (a day token) and
+    ``WDI_excel_YYYY_MM.zip`` / ``WDI_YYYY_MM.zip`` (a month token).
 
-    * ``WDI_excel_YYYY_MM_DD.zip`` — carries a **day**, so the listing states a
-      full release date. The contract's date-only rule then applies and
-      ``available_at`` becomes 00:00:00 UTC on the NEXT calendar day.
-    * ``WDI_excel_YYYY_MM.zip`` / ``WDI_YYYY_MM.zip`` — carries year and month
-      only. A month is **not** a release date. Such an edition is recorded with
-      ``release_date_verified = False`` and an ``unresolved_reason``, and can
-      never be used as a verified pre-cutoff vintage.
-
-    Nothing is inferred from a file-system timestamp, an HTTP header,
-    spreadsheet properties or the observation years. Where the listing does not
-    state a day, this function refuses to invent one.
+    A date in a filename is recorded as an ``edition_date_token`` and nothing
+    more. It becomes a release date only if retained official bytes explicitly
+    call that date a release, publication or update date. Where they do not,
+    the edition carries no ``available_at`` at all and can never serve as a
+    pre-cutoff vintage. Retrieval time, ``Last-Modified``, ZIP timestamps and
+    workbook properties are never accepted as substitutes.
     """
+    retained_texts = retained_texts or {}
     urls = sorted(set(re.findall(
         r"https?://[^\"']*?[Aa]rchive/[^\"']+\.zip", raw_html)))
     dated = re.compile(
@@ -1586,71 +2111,82 @@ def parse_wdi_archive_listing(
 
     editions: dict[str, dict[str, Any]] = {}
     for url in urls:
-        # The listing publishes some older links over http on the same official
-        # host. The scheme is upgraded to https for capture; the host, path and
-        # filename - and therefore the edition identity - are untouched.
+        # Some older links are published over http on the same official host.
+        # Only the scheme is normalized; host, path and filename - and so the
+        # edition identity and its date token - are untouched.
         canonical = "https://" + url.split("://", 1)[1]
         is_excel = "excel" in url.lower()
 
         hit = dated.search(url)
+        month_hit = None if hit else month_only.search(url)
         if hit:
             year, month, day = hit.groups()
             edition_id = f"WDI_{year}_{month}_{day}"
-            release_date = f"{year}-{month}-{day}"
-            available_at, next_day = derive_release_available_at(
-                release_date, None)
-            record = {
-                "archive_edition_id": edition_id,
-                "archive_year": year,
-                "archive_month": month,
-                "official_listing_url": listing_url,
-                "official_download_url": canonical,
-                "listed_release_date": release_date,
-                "listed_release_time": "",
-                "release_time_exact": False,
-                "derived_release_available_at_utc": available_at,
-                "date_only_next_day_rule_applied": next_day,
-                "release_date_verified": True,
-                "release_date_source":
-                    "official_listing_download_filename_date",
-                "discovery_chain_artifact": "wb_wdi_archive_listing",
-                "raw_listing_sha256": raw_sha256,
-                "retrieval_timestamp_utc": retrieved_utc,
-                "unresolved_reason": "",
-            }
-        else:
-            hit = month_only.search(url)
-            if not hit:
-                continue
-            year, month = hit.groups()
+            token = f"{year}-{month}-{day}"
+            token_exact = True
+        elif month_hit:
+            year, month = month_hit.groups()
             edition_id = f"WDI_{year}_{month}"
-            record = {
-                "archive_edition_id": edition_id,
-                "archive_year": year,
-                "archive_month": month,
-                "official_listing_url": listing_url,
-                "official_download_url": canonical,
-                "listed_release_date": "",
-                "listed_release_time": "",
-                "release_time_exact": False,
-                "derived_release_available_at_utc": "",
-                "date_only_next_day_rule_applied": False,
-                "release_date_verified": False,
-                "release_date_source": "",
-                "discovery_chain_artifact": "wb_wdi_archive_listing",
-                "raw_listing_sha256": raw_sha256,
-                "retrieval_timestamp_utc": retrieved_utc,
-                "unresolved_reason": (
-                    "the official listing states year and month only for this "
-                    "edition; a month is not a release date, so no "
-                    "available_at can be verified and the edition cannot serve "
-                    "as a pre-cutoff vintage"),
-            }
-        # Prefer the Excel distribution when both exist for one edition.
-        existing = editions.get(record["archive_edition_id"])
+            token = f"{year}-{month}"
+            token_exact = False
+        else:
+            continue
+
+        verified, artifact, locator = find_explicit_release_date_statement(
+            token, retained_texts)
+
+        if verified and token_exact:
+            available_at, next_day = derive_release_available_at(token, None)
+            status = RELEASE_DATE_VERIFIED_STATUS
+            unresolved_reason = ""
+        else:
+            available_at, next_day = None, False
+            status = (RELEASE_DATE_UNRESOLVED_STATUS if token
+                      else RELEASE_DATE_ABSENT_STATUS)
+            unresolved_reason = (
+                "the official listing exposes a date token inside the download "
+                "filename but no retained official bytes state that this date "
+                "is the edition's release, publication or update date"
+                if token_exact else
+                "the official listing states year and month only for this "
+                "edition; a month is not a release date")
+            verified = False
+
+        record = {
+            "archive_edition_id": edition_id,
+            "archive_year": year,
+            "archive_month": month,
+            "official_listing_url": listing_url,
+            "official_download_url": canonical,
+            # --- the date token, kept strictly separate from a release date --
+            "edition_date_token": token,
+            "edition_date_token_source": EDITION_DATE_TOKEN_SOURCE_FILENAME,
+            "edition_date_token_exact": token_exact,
+            # --- release-date provenance ------------------------------------
+            "release_date_explicitly_stated_by_official_source": verified,
+            "release_date_evidence_artifact": artifact,
+            "release_date_evidence_locator": locator,
+            "listed_release_date": token if verified and token_exact else "",
+            "listed_release_time": "",
+            "release_time_exact": False,
+            "release_date_verified": verified and token_exact,
+            "release_available_at_derivation_status": status,
+            "derived_release_available_at_utc": available_at,
+            "date_only_next_day_rule_applied": next_day,
+            "release_date_source": (
+                "official_bytes_explicit_release_statement" if verified
+                else ""),
+            "non_evidence_for_release_time": "; ".join(
+                NON_EVIDENCE_FOR_RELEASE_TIME),
+            "discovery_chain_artifact": "wb_wdi_archive_listing",
+            "raw_listing_sha256": raw_sha256,
+            "retrieval_timestamp_utc": retrieved_utc,
+            "unresolved_reason": unresolved_reason,
+        }
+        existing = editions.get(edition_id)
         if existing is None or (is_excel and "excel"
                                 not in existing["official_download_url"].lower()):
-            editions[record["archive_edition_id"]] = record
+            editions[edition_id] = record
 
     return [editions[k] for k in sorted(editions)]
 
@@ -1708,11 +2244,13 @@ def build_package(
         requests_rows = _read_csv_rows(root / REQUEST_MANIFEST_REL)
         responses_rows = _read_csv_rows(root / RESPONSE_MANIFEST_REL)
         locked_series = _read_csv_rows(root / LOCKED_SERIES_REL)
-        semantic_rows = _read_csv_rows(root / SEMANTIC_REL)
-        editions = _read_csv_rows(root / RELEASE_MANIFEST_REL)
+        semantic_rows = _coerce_csv_booleans(
+            _read_csv_rows(root / SEMANTIC_REL))
+        editions = _coerce_csv_booleans(
+            _read_csv_rows(root / RELEASE_MANIFEST_REL))
         for row in editions:
-            row["release_date_verified"] = (
-                str(row.get("release_date_verified", "")).strip() == "True")
+            if not row.get("derived_release_available_at_utc"):
+                row["derived_release_available_at_utc"] = None
         imf_catalog = _read_csv_rows(root / IMF_CATALOG_REL)
         session_rel = root / GOVERNANCE_REL
         if session_rel.is_file():
@@ -1752,10 +2290,25 @@ def build_package(
         if listing:
             blob = capture / "raw" / listing["raw_body_filename"]
             if blob.is_file():
+                # Every retained TEXT object is offered to the release-date
+                # search, so a statement living on any official page we kept
+                # would be found - not just the listing.
+                retained_texts: dict[str, str] = {}
+                for record in responses_rows:
+                    if record.get("capture_result") != "SUCCESS":
+                        continue
+                    if "html" not in (record.get("content_type") or "").lower():
+                        continue
+                    candidate = capture / "raw" / record["raw_body_filename"]
+                    if candidate.is_file():
+                        retained_texts[record["object_id"]] = (
+                            candidate.read_text(encoding="utf-8",
+                                                errors="replace"))
                 editions = parse_wdi_archive_listing(
                     blob.read_text(encoding="utf-8", errors="replace"),
                     listing["request_url"], listing["sha256"],
-                    listing.get("retrieval_timestamp_utc", ""))
+                    listing.get("retrieval_timestamp_utc", ""),
+                    retained_texts=retained_texts)
 
     cutoff_plan, required_editions = plan_required_editions(
         cutoff_plan, editions)
@@ -1764,47 +2317,64 @@ def build_package(
         "edition_switched_after_missing_value_inspection": False,
     })
 
-    if not rebuilding_from_raw_bytes:
-        # Overlay the committed capture outcome so the verification rebuild
-        # reproduces the committed rows exactly.
-        committed = {r["archive_edition_id"]: r
-                     for r in _read_csv_rows(root / REQUIRED_EDITIONS_REL)}
-        for entry in required_editions:
-            record = committed.get(entry["archive_edition_id"])
-            if not record:
-                continue
-            entry["download_status"] = record.get("download_status", "")
-            entry["raw_artifact_filename"] = record.get(
-                "raw_artifact_filename", "")
-            entry["raw_artifact_sha256"] = record.get("raw_artifact_sha256", "")
-            entry["raw_artifact_bytes"] = int(
-                record.get("raw_artifact_bytes") or 0)
+    # "Captured" and "required" are now different questions. An edition we hold
+    # bytes for is captured; an edition that can serve a cutoff is required.
+    # With no verified release date, nothing is required - but the bytes we
+    # already hold are still evidence and are still extracted and classified.
+    captured_editions: list[dict[str, Any]] = []
+    by_object = {r["object_id"]: r for r in responses_rows
+                 if r.get("capture_result") == "SUCCESS"}
+    for record in sorted(by_object.values(),
+                         key=lambda r: str(r.get("object_id"))):
+        object_id = str(record.get("object_id") or "")
+        if not object_id.startswith("wdi_archive_"):
+            continue
+        edition_id = object_id[len("wdi_archive_"):]
+        edition = next((e for e in editions
+                        if e["archive_edition_id"] == edition_id), None)
+        captured_editions.append({
+            "archive_edition_id": edition_id,
+            "release_available_at_utc": (
+                (edition or {}).get("derived_release_available_at_utc") or ""),
+            "release_available_at_derivation_status": (
+                (edition or {}).get("release_available_at_derivation_status")
+                or RELEASE_DATE_UNRESOLVED_STATUS),
+            "edition_date_token": (edition or {}).get("edition_date_token", ""),
+            "release_date_verified": bool(
+                (edition or {}).get("release_date_verified")),
+            "minimum_cutoff_using_edition": "",
+            "maximum_cutoff_using_edition": "",
+            "development_pair_count_using_edition": 0,
+            "download_required": False,
+            "download_status": "SUCCESS",
+            "raw_artifact_filename": record["raw_body_filename"],
+            "raw_artifact_sha256": record["sha256"],
+            "raw_artifact_bytes": int(record.get("byte_length") or 0),
+            "usable_as_pre_cutoff_vintage": bool(
+                (edition or {}).get("release_date_verified")),
+        })
 
-    # Attach the capture outcome to each REQUIRED edition, then extract the two
-    # locked Iran series and the per-edition semantics from the retained bytes.
+    if not rebuilding_from_raw_bytes:
+        committed = {r["archive_edition_id"]: r for r in _coerce_csv_booleans(
+            _read_csv_rows(root / REQUIRED_EDITIONS_REL))}
+        for entry in captured_editions:
+            record = committed.get(entry["archive_edition_id"])
+            if record:
+                entry["download_status"] = record.get(
+                    "download_status", entry["download_status"])
+
     if capture and capture.is_dir():
-        by_object = {
-            r["object_id"]: r for r in responses_rows
-            if r.get("capture_result") == "SUCCESS"}
-        for entry in required_editions:
-            record = by_object.get(
-                f"wdi_archive_{entry['archive_edition_id']}")
-            if not record:
-                entry["download_status"] = "NOT_CAPTURED"
-                continue
-            blob = capture / "raw" / record["raw_body_filename"]
-            entry["download_status"] = (
-                "SUCCESS" if blob.is_file() else "RAW_BYTES_MISSING")
-            entry["raw_artifact_filename"] = record["raw_body_filename"]
-            entry["raw_artifact_sha256"] = record["sha256"]
-            entry["raw_artifact_bytes"] = int(record.get("byte_length") or 0)
+        for entry in captured_editions:
+            blob = capture / "raw" / entry["raw_artifact_filename"]
             if not blob.is_file():
+                entry["download_status"] = "RAW_BYTES_MISSING"
                 integrity_violations.append(
-                    f"STOP_RAW_BYTES_NOT_RETAINED: {record['raw_body_filename']}")
+                    f"STOP_RAW_BYTES_NOT_RETAINED: "
+                    f"{entry['raw_artifact_filename']}")
                 continue
             rows, semantics = extract_locked_series_from_archive(
                 blob, entry["archive_edition_id"],
-                entry["release_available_at_utc"], record["sha256"])
+                entry["release_available_at_utc"], entry["raw_artifact_sha256"])
             locked_series.extend(rows)
             semantic_rows.extend(semantics)
 
@@ -1828,6 +2398,20 @@ def build_package(
             bundle_manifest = json.loads(
                 manifest_path.read_text(encoding="utf-8"))
             verify_bundle_manifest(bundle_manifest, bundle_dir)
+        multipart_path = Path(bundle_dir) / "multipart_manifest.json"
+        if multipart_path.is_file():
+            multipart = json.loads(multipart_path.read_text(encoding="utf-8"))
+            verify_multipart_bundle(multipart, bundle_dir)
+            bundle_manifest.update(multipart)
+        # The bytes exist and are ready to hand over. That is NOT the same as
+        # an auditor having received and checked them, so both are recorded.
+        bundle_manifest["multipart_handoff_available"] = bool(
+            bundle_manifest.get("multipart_parts"))
+        bundle_manifest["delivered_to_independent_auditor"] = False
+        bundle_manifest["independently_verified_by_auditor"] = False
+        bundle_manifest["files_the_human_must_upload"] = [
+            r["filename"] for r in bundle_manifest.get("multipart_parts", [])
+        ] + ["SHA256SUMS.txt", "multipart_manifest.json"]
     elif not rebuilding_from_raw_bytes:
         committed_manifest = root / BUNDLE_MANIFEST_REL
         if committed_manifest.is_file():
@@ -1866,10 +2450,21 @@ def build_package(
     unresolved_cutoffs = [r for r in cutoff_plan
                           if r["selection_reason"] ==
                           "NO_VERIFIED_PRE_CUTOFF_EDITION"]
-    captured_editions = sum(
-        1 for e in required_editions if e["download_status"] == "SUCCESS")
+    captured_count = sum(
+        1 for e in captured_editions if e["download_status"] == "SUCCESS")
     verified_editions = sum(
         1 for e in required_editions if e["release_available_at_utc"])
+    editions_with_verified_release_date = sum(
+        1 for e in editions if e.get("release_date_verified"))
+    editions_with_unverified_date_token = sum(
+        1 for e in editions
+        if e.get("edition_date_token") and not e.get("release_date_verified"))
+    fx_rows = [r for r in semantic_rows
+               if r.get("indicator_code") == FX_INDICATOR_CODE]
+    cpi_rows = [r for r in semantic_rows
+                if r.get("indicator_code") == CPI_INDICATOR_CODE]
+    continuation = build_continuation_record(requests_rows)
+    assert_continuation_record_is_sound(continuation)
     summary: dict[str, Any] = {
         "counts_are_integrity_counts_not_coverage": True,
         "official_requests_attempted": len(requests_rows),
@@ -1899,7 +2494,35 @@ def build_package(
         "required_editions_total": len(required_editions),
         "required_editions_with_verified_release_available_at":
             verified_editions,
-        "required_editions_captured": captured_editions,
+        "required_editions_captured": sum(
+            1 for e in required_editions
+            if e.get("download_status") == "SUCCESS"),
+        "archive_editions_captured": captured_count,
+        "editions_with_verified_release_date":
+            editions_with_verified_release_date,
+        "editions_with_unverified_filename_date_token":
+            editions_with_unverified_date_token,
+        "cpi_semantic_pass_count": sum(
+            1 for r in cpi_rows if r["compatibility_status"] == "PASS"),
+        "cpi_semantic_unresolved_count": sum(
+            1 for r in cpi_rows if r["compatibility_status"] == "UNRESOLVED"),
+        "cpi_semantic_fail_integrity_count": sum(
+            1 for r in cpi_rows
+            if r["compatibility_status"] == "FAIL_INTEGRITY"),
+        "fx_semantic_pass_count": sum(
+            1 for r in fx_rows if r["compatibility_status"] == "PASS"),
+        "fx_semantic_unresolved_count": sum(
+            1 for r in fx_rows if r["compatibility_status"] == "UNRESOLVED"),
+        "fx_semantic_fail_integrity_count": sum(
+            1 for r in fx_rows
+            if r["compatibility_status"] == "FAIL_INTEGRITY"),
+        "capture_invocations": continuation["capture_invocations"],
+        "editions_with_release_statement_evidence": sum(
+            1 for e in editions
+            if e.get("release_date_explicitly_stated_by_official_source")),
+        "editions_without_available_at": sum(
+            1 for e in editions
+            if not e.get("derived_release_available_at_utc")),
         "locked_series_rows_extracted": len(locked_series),
         "indicator_substitution_occurred": False,
         "semantic_pass_count": sum(
@@ -1921,6 +2544,7 @@ def build_package(
     for field in EXECUTION_COUNTER_FIELDS:
         summary[field] = 0
 
+    summary["_continuation_record"] = continuation
     decision = build_decision(root, summary, financing_decision)
     status = decision["m3i2_official_source_evidence_status"]
     governance = build_governance_boundary(status)
@@ -1934,7 +2558,8 @@ def build_package(
         CUTOFF_PLAN_REL: _csv_text(CUTOFF_PLAN_COLUMNS, cutoff_plan),
         RELEASE_MANIFEST_REL: _csv_text(RELEASE_MANIFEST_COLUMNS, editions),
         REQUIRED_EDITIONS_REL: _csv_text(
-            REQUIRED_EDITIONS_COLUMNS, required_editions),
+            REQUIRED_EDITIONS_COLUMNS, captured_editions),
+        CONTINUATION_REL: _json_text(continuation),
         REQUEST_MANIFEST_REL: _csv_text(
             list(requests_rows[0]) if requests_rows else
             ["object_id", "role", "request_url", "request_method",
@@ -1981,6 +2606,8 @@ def build_package(
         "semantic_compatibility": semantic_rows,
         "imf_catalog": imf_catalog,
         "financing_evidence": financing_evidence,
+        "continuation_record": continuation,
+        "captured_editions": captured_editions,
         "bundle_manifest": bundle_manifest,
         "decision": decision,
         "qc_report": qc,
@@ -2096,19 +2723,76 @@ never evidence.
 * raw bytes retained: {summary["raw_bytes_total"]} bytes across
   {summary["raw_bytes_retained_objects"]} objects
 * WDI editions discovered: {summary["wdi_editions_discovered"]}
-* required editions: {summary["required_editions_total"]}
-  (verified release `available_at`:
-  {summary["required_editions_with_verified_release_available_at"]},
-  captured: {summary["required_editions_captured"]})
+* editions with a **verified** release date:
+  **{summary["editions_with_verified_release_date"]}** — unverified filename
+  date tokens: {summary["editions_with_unverified_filename_date_token"]}
+* required (servable) editions: **{summary["required_editions_total"]}** —
+  archive editions actually captured and held:
+  {summary["archive_editions_captured"]}
+* cutoffs without a verified pre-cutoff vintage:
+  **{summary["cutoffs_without_verified_pre_cutoff_edition"]}** of
+  {summary["unique_development_cutoffs"]}
+  ({summary["development_pairs_without_verified_pre_cutoff_edition"]} of 539
+  development pairs)
 * locked-series rows extracted: {summary["locked_series_rows_extracted"]}
-* semantic compatibility — PASS {summary["semantic_pass_count"]},
-  UNRESOLVED {summary["semantic_unresolved_count"]},
-  FAIL_INTEGRITY {summary["semantic_fail_integrity_count"]}
+* semantic compatibility — CPI PASS {summary["cpi_semantic_pass_count"]} /
+  UNRESOLVED {summary["cpi_semantic_unresolved_count"]} / FAIL_INTEGRITY
+  {summary["cpi_semantic_fail_integrity_count"]}; **FX** PASS
+  {summary["fx_semantic_pass_count"]} / UNRESOLVED
+  {summary["fx_semantic_unresolved_count"]} / FAIL_INTEGRITY
+  {summary["fx_semantic_fail_integrity_count"]}
+* capture invocations: {summary["capture_invocations"]}
 * IMF catalog entries: {summary["imf_catalog_entries_captured"]}
 * financing metadata decision: `{summary["financing_metadata_decision"]}`
 
 Unresolved evidence is **never** converted into zero coverage or into an
 observed failure. Missing proof is `UNRESOLVED`, not `FAIL`.
+
+## Why nothing has a verified release date
+
+The official archive listing publishes a table of `Year | Month(s)` and a
+hyperlink per edition. The date inside a filename such as
+`WDI_excel_2017_09_19.zip` is recorded as an **`edition_date_token`** — and
+that is all it is. The retained listing bytes contain **no** occurrence of
+"release", "released", "publish", "published", "last updated" or "revision",
+and no retained archive states an edition-level release date either. So no
+retained official bytes describe that token as a release, publication or update
+date.
+
+Under the locked rule, that means `release_date_verified = false`,
+`derived_release_available_at_utc = null` and
+`release_available_at_derivation_status =
+{RELEASE_DATE_UNRESOLVED_STATUS}` for every edition. Retrieval time,
+`Last-Modified`, ZIP member timestamps and workbook properties are explicitly
+not accepted as substitutes.
+
+An edition with no verified `available_at` can never be a pre-cutoff vintage,
+so **every** development cutoff is unresolved. The archives themselves are
+still held and still extracted — being unable to date an edition is not the
+same as not having it.
+
+## Why every FX row is UNRESOLVED
+
+The archived `PA.NUS.FCRF` metadata gives a generic construct
+("Official exchange rate (LCU per US$, period average)", `Periodicity: Annual`,
+`Unit of measure` empty) and a generic methodology note about exchange-rate
+arrangements. Section 4 permits an archived title to support the construct and
+the **unit label** — but not the three continuity facts a log change depends
+on:
+
+1. which currency unit the local-currency figures are denominated in;
+2. the local-currency valuation definition for that vintage;
+3. that no redenomination or currency-unit break falls across the pair.
+
+The archived metadata names no currency, no denomination and no unit break, and
+silence is not proof of absence. All three therefore stay unverified and every
+FX row is `UNRESOLVED`. Continuity is **not** inferred from smooth values, and
+the current metadata page — which states it was updated on a 2026 date — is not
+used as proof about historical editions.
+
+CPI rows remain `PASS` where the archived title, annual periodicity, percent
+rate and calendar-year columns are each evidenced; the provenance of the unit
+claim now travels in the committed CSV as `unit_evidence_source`.
 
 ## Forbidden execution counters — all zero
 
@@ -2294,6 +2978,14 @@ def _extract_series_metadata(workbook) -> dict[str, dict[str, str]]:
             "base_period": field(row, "Base Period"),
             "short_definition": field(row, "Short definition"),
             "long_definition": field(row, "Long definition"),
+            # carried so the FX continuity search can look at what the ARCHIVE
+            # itself says, rather than at current metadata
+            "statistical_concept": field(
+                row, "Statistical concept and methodology"),
+            "other_notes": field(row, "Other notes"),
+            "limitations": field(row, "Limitations and exceptions"),
+            "notes_from_original_source": field(
+                row, "Notes from original source"),
         }
     return out
 
@@ -2329,21 +3021,99 @@ def _unresolved_semantics(edition_id: str, release_available_at: str,
     return row
 
 
+def _fx_continuity_evidence(meta: dict[str, str], edition_id: str,
+                            artifact_sha: str) -> dict[str, Any]:
+    """Look in the ARCHIVED metadata for the three FX continuity facts.
+
+    Requires, per edition:
+
+    * which currency unit the local-currency figures are denominated in;
+    * the local-currency valuation definition;
+    * that no redenomination or currency-unit break falls across the pair.
+
+    The archived Series metadata for ``PA.NUS.FCRF`` carries a generic
+    exchange-rate methodology and an empty ``Unit of measure``. It names no
+    currency, no denomination and no unit break, so none of the three can be
+    verified from it. This function reports that rather than reading the
+    generic label as if it settled the question.
+    """
+    haystack = " ".join(
+        str(meta.get(k) or "") for k in
+        ("series_title", "unit", "base_period", "short_definition",
+         "long_definition", "statistical_concept", "other_notes",
+         "limitations")).strip()
+    lowered = haystack.lower()
+    locator_base = f"{WDI_SERIES_SHEET}!{FX_INDICATOR_CODE}@{edition_id}"
+
+    # Deliberately NOT "currency unit"/"denomination" on their own: the generic
+    # WDI definition says "local currency units relative to the U.S. dollar",
+    # which is the unit LABEL and names no currency. Verifying denomination
+    # from that phrase would be exactly the over-claim this correction removes.
+    denomination_terms = ("rial", " irr", "toman", "denominated in",
+                          "denomination of")
+    denomination_hits = [w for w in denomination_terms if w in lowered]
+    denomination_raw = haystack if denomination_hits else ""
+
+    valuation_terms = ("valuation", "official rate", "principal rate",
+                       "secondary rate", "tertiary rate", "multiple exchange")
+    valuation_hits = [w for w in valuation_terms if w in lowered]
+    # A generic mention that multiple arrangements EXIST is not a statement of
+    # which one this vintage used for Iran.
+    valuation_states_this_vintage = False
+
+    break_terms = ("redenomination", "redenominated", "currency reform",
+                   "unit break", "rebase of the currency")
+    break_hits = [w for w in break_terms if w in lowered]
+
+    return {
+        "currency_denomination_raw": denomination_raw,
+        "currency_denomination_evidence_artifact": (
+            artifact_sha if denomination_hits else ""),
+        "currency_denomination_evidence_locator": (
+            f"{locator_base}#denomination" if denomination_hits else ""),
+        "currency_denomination_verified": bool(denomination_hits),
+
+        "local_currency_valuation_definition_raw": (
+            meta.get("statistical_concept", "") if valuation_hits else ""),
+        "valuation_definition_evidence_artifact": (
+            artifact_sha if valuation_states_this_vintage else ""),
+        "valuation_definition_evidence_locator": (
+            f"{locator_base}#valuation" if valuation_states_this_vintage
+            else ""),
+        "valuation_definition_verified": valuation_states_this_vintage,
+
+        "redenomination_or_unit_break_evidence_raw": (
+            haystack if break_hits else ""),
+        "redenomination_or_unit_break_evidence_artifact": (
+            artifact_sha if break_hits else ""),
+        "redenomination_or_unit_break_evidence_locator": (
+            f"{locator_base}#redenomination" if break_hits else ""),
+        # Silence is not proof of absence: an archive that never mentions a
+        # redenomination has not established that none occurred.
+        "no_redenomination_or_unit_break_verified": False,
+        "_denomination_hits": denomination_hits,
+        "_valuation_hits": valuation_hits,
+        "_break_hits": break_hits,
+    }
+
+
 def _semantic_row(edition_id: str, release_available_at: str,
                   artifact_sha256: str, code: str,
                   meta: dict[str, str] | None, economy_verified: bool,
                   rows: list[dict[str, Any]]) -> dict[str, Any]:
     """Build one per-edition, per-code compatibility record.
 
-    PASS requires the archive's own metadata to support the locked meaning.
+    PASS requires the ARCHIVE's own metadata to support the locked meaning.
     Missing metadata yields UNRESOLVED. Metadata that positively contradicts
-    the locked meaning yields FAIL_INTEGRITY.
+    the locked meaning yields FAIL_INTEGRITY. For FX, the three continuity
+    facts must each be evidenced on top of the construct and unit label.
     """
     meta = meta or {}
     title = meta.get("series_title", "")
     unit = meta.get("unit", "")
     periodicity = meta.get("periodicity", "")
     present = [r for r in rows if r["indicator_code_raw"] == code]
+    years = sorted({r["observation_year"] for r in present})
 
     reasons: list[str] = []
     contradiction = False
@@ -2363,10 +3133,9 @@ def _semantic_row(edition_id: str, release_available_at: str,
         unit_ok = bool(unit) and ("%" in unit or "percent" in unit.lower())
         if not unit_ok and ("annual %" in title.lower()
                             or "annual percent" in title.lower()):
-            # The archive leaves "Unit of measure" blank for this code but
-            # states the unit inside its own series title. That is still the
-            # archive describing itself, so it counts as unit evidence - and
-            # the source of the evidence is recorded rather than glossed over.
+            # The archive leaves "Unit of measure" blank but states the unit
+            # inside its own series title. Section 4 permits the archived title
+            # to support the unit LABEL; the provenance is recorded, not hidden.
             unit_ok = True
             unit_source = "archived_series_title"
     else:
@@ -2379,6 +3148,13 @@ def _semantic_row(edition_id: str, release_available_at: str,
         if not unit_ok and "lcu per us$" in title.lower():
             unit_ok = True
             unit_source = "archived_series_title"
+
+    calendar_ok = bool(present) and bool(periodicity) and (
+        "annual" in periodicity.lower()) and all(
+        y.isdigit() and len(y) == 4 for y in years)
+    calendar_locator = (
+        f"{WDI_DATA_SHEET}!calendar_year_columns[{years[0]}..{years[-1]}]"
+        if years else "")
 
     frequency_ok = bool(periodicity) and "annual" in periodicity.lower()
     if not title:
@@ -2396,7 +3172,7 @@ def _semantic_row(edition_id: str, release_available_at: str,
         "economy_identity_verified": economy_verified,
         "indicator_code_verified": bool(present),
         "frequency_annual_verified": frequency_ok,
-        "calendar_year_semantics_verified": bool(present),
+        "calendar_year_semantics_verified": calendar_ok,
         "title_compatibility": "COMPATIBLE" if (title and title_ok) else "",
         "unit_compatibility": "COMPATIBLE" if unit_ok else "",
         "raw_archive_sha256": artifact_sha256,
@@ -2404,9 +3180,10 @@ def _semantic_row(edition_id: str, release_available_at: str,
     }
     status = classify_semantic_compatibility(evidence)
 
-    return {
+    row: dict[str, Any] = {
         "archive_edition_id": edition_id,
-        "release_available_at_utc": release_available_at,
+        "indicator_code": code,
+        "release_available_at_utc": release_available_at or "",
         "economy_identity_verified": economy_verified,
         "indicator_code_verified": bool(present),
         "archived_series_title_raw": title,
@@ -2417,14 +3194,65 @@ def _semantic_row(edition_id: str, release_available_at: str,
                              else ""),
         "unit_evidence_source": unit_source,
         "unit_compatibility": evidence["unit_compatibility"] or "UNRESOLVED",
-        "calendar_year_semantics_verified":
-            evidence["calendar_year_semantics_verified"],
+        "calendar_year_semantics_verified": calendar_ok,
+        "calendar_year_evidence_locator": calendar_locator,
         "raw_archive_sha256": artifact_sha256,
         "evidence_locator": f"{WDI_EXCEL_MEMBER}!{WDI_SERIES_SHEET}!{code}",
         "compatibility_status": status,
-        "unresolved_reason": "; ".join(reasons),
-        "indicator_code": code,
+        "unresolved_reason": "",
+        # FX-only fields stay blank for CPI rather than absent
+        "currency_denomination_raw": "",
+        "currency_denomination_evidence_artifact": "",
+        "currency_denomination_evidence_locator": "",
+        "currency_denomination_verified": "",
+        "local_currency_valuation_definition_raw": "",
+        "valuation_definition_evidence_artifact": "",
+        "valuation_definition_evidence_locator": "",
+        "valuation_definition_verified": "",
+        "redenomination_or_unit_break_evidence_raw": "",
+        "redenomination_or_unit_break_evidence_artifact": "",
+        "redenomination_or_unit_break_evidence_locator": "",
+        "no_redenomination_or_unit_break_verified": "",
+        "fx_pair_semantic_compatibility_status": "",
     }
+
+    if code == FX_INDICATOR_CODE:
+        continuity = _fx_continuity_evidence(meta, edition_id, artifact_sha256)
+        missing = [f for f in FX_CONTINUITY_REQUIRED_FIELDS
+                   if continuity.get(f) is not True]
+        for key, value in continuity.items():
+            if not key.startswith("_"):
+                row[key] = value
+        if continuity["_break_hits"] and status != "FAIL_INTEGRITY":
+            # An archive that DOES describe a break is stronger evidence than
+            # one that is silent, and it contradicts pair continuity.
+            status = "FAIL_INTEGRITY"
+            reasons.append(
+                "the archived metadata describes a redenomination or "
+                "currency-unit break")
+        if missing:
+            if not continuity["_denomination_hits"]:
+                reasons.append(
+                    "the archived metadata names no currency denomination for "
+                    "the local-currency figures")
+            if not continuity["_valuation_hits"]:
+                reasons.append(
+                    "the archived metadata states no local-currency valuation "
+                    "definition for this vintage")
+            reasons.append(
+                "the archived metadata does not establish that no "
+                "redenomination or currency-unit break falls across the pair")
+            reasons.append(
+                "the archived title supports the generic construct and unit "
+                "label only; it cannot by itself evidence pair continuity")
+            if status == "PASS":
+                status = "UNRESOLVED"
+        row["fx_pair_semantic_compatibility_status"] = status
+        row["compatibility_status"] = status
+
+    row["compatibility_status"] = status
+    row["unresolved_reason"] = "; ".join(reasons)
+    return row
 
 
 def _extract_from_csv_layout(
@@ -2498,6 +3326,13 @@ def _extract_from_csv_layout(
                         (record.get("Short definition") or "").strip(),
                     "long_definition":
                         (record.get("Long definition") or "").strip(),
+                    "statistical_concept": (record.get(
+                        "Statistical concept and methodology") or "").strip(),
+                    "other_notes": (record.get("Other notes") or "").strip(),
+                    "limitations": (record.get(
+                        "Limitations and exceptions") or "").strip(),
+                    "notes_from_original_source": (record.get(
+                        "Notes from original source") or "").strip(),
                 }
 
     economy_verified = bool(economy_names) and any(

@@ -128,8 +128,27 @@ def _summarize(built: dict) -> None:
           f"{summary['official_responses_retained']} "
           f"(successful {summary['official_responses_successful']})")
     print(f"raw bytes retained: {summary['raw_bytes_total']}")
-    print(f"required editions: {summary['required_editions_total']} "
-          f"captured {summary['required_editions_captured']}")
+    print(f"editions discovered: {summary['wdi_editions_discovered']} | "
+          f"with a VERIFIED release date: "
+          f"{summary['editions_with_verified_release_date']} | "
+          f"unverified filename date tokens: "
+          f"{summary['editions_with_unverified_filename_date_token']}")
+    print(f"required editions (servable): "
+          f"{summary['required_editions_total']} | archive editions captured: "
+          f"{summary['archive_editions_captured']}")
+    print(f"cutoffs without a verified pre-cutoff vintage: "
+          f"{summary['cutoffs_without_verified_pre_cutoff_edition']}"
+          f"/{summary['unique_development_cutoffs']} "
+          f"({summary['development_pairs_without_verified_pre_cutoff_edition']}"
+          f"/539 pairs)")
+    print(f"CPI semantic PASS/UNRESOLVED/FAIL: "
+          f"{summary['cpi_semantic_pass_count']}/"
+          f"{summary['cpi_semantic_unresolved_count']}/"
+          f"{summary['cpi_semantic_fail_integrity_count']} | "
+          f"FX: {summary['fx_semantic_pass_count']}/"
+          f"{summary['fx_semantic_unresolved_count']}/"
+          f"{summary['fx_semantic_fail_integrity_count']}")
+    print(f"capture invocations: {summary['capture_invocations']}")
     print("company joins: {} | feature materializations: {} | coverage: {} | "
           "gate executions: {}".format(
               decision["company_macro_joins"],
