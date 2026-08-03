@@ -1,0 +1,4 @@
+candidate_id,variable_name,official_source_id,official_source_owner,official_series_title,official_series_code_or_table_id,official_source_url_or_endpoint,source_artifact_type,frequency,unit,calendar,observation_period_definition,publication_or_release_date_field,available_at_definition,revision_or_vintage_policy,as_of_selection_rule,transformation_formula,transformation_window,missing_value_policy,same_day_cutoff_policy,lock_status,unresolved_lock_field_count
+cand_m3_cpi_inflation,cpi_inflation,src_m3_cbi_macro,Central Bank of Iran,,,,,monthly,percent,,,,,,,,,,,UNRESOLVED_DEFINITION_LOCK,14
+cand_m3_fx_change_official,fx_change_official,src_m3_cbi_macro,Central Bank of Iran,,,,,monthly,percent,,,,,,,,,,,UNRESOLVED_DEFINITION_LOCK,14
+cand_m3_policy_financing_rate,policy_financing_rate,src_m3_cbi_macro,Central Bank of Iran,,,,,monthly,percent,,,,,,,,,,,UNRESOLVED_DEFINITION_LOCK,14

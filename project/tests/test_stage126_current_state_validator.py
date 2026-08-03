@@ -591,7 +591,7 @@ def test_final_test_remains_locked():
 def test_research_pointers_unchanged():
     report = _read_json(v.F_REPORT)
     assert report["active_workstream"] == (
-        "stage128_m2_d2_boundary_month_equity_return"
+        "stage128_m3_macro_data_gate"
     )
     # Part 6 closed the six-category robustness set, the synthesis-only
     # robustness closure completed, the retained-design freeze (PR #65)
@@ -1494,7 +1494,7 @@ def test_live_handoff_labels_match_the_live_research_state():
     if state.get("stage128_m2_d2_design_freeze_completed"):
         assert state["current_stage"] == "Stage128"
         assert state["active_workstream"] == (
-            "stage128_m2_d2_boundary_month_equity_return"
+            "stage128_m3_macro_data_gate"
         )
         # The authoritative research-action ids advance only with real
         # scientific actions, never with a label fix. The D2 design freeze,
@@ -1530,7 +1530,7 @@ def test_expected_labels_are_state_dependent_not_hardcoded():
     root = _root()
     assert v.expected_current_stage(root) == "Stage128"
     assert v.expected_active_workstream(root) == (
-        "stage128_m2_d2_boundary_month_equity_return"
+        "stage128_m3_macro_data_gate"
     )
     # The Stage126 constants survive as the pre-freeze expectation.
     assert v.ACTIVE_WORKSTREAM == "stage126_m1_financial_baseline"
@@ -1543,7 +1543,7 @@ def test_current_state_snapshot_renders_stage128_labels():
     if state.get("stage128_m2_d2_design_freeze_completed"):
         assert "- **Stage / Batch:** Stage128 /" in text
         assert (
-            "- **Active workstream:** `stage128_m2_d2_boundary_month_equity_return`"
+            "- **Active workstream:** `stage128_m3_macro_data_gate`"
             in text
         )
         assert (
@@ -1798,3 +1798,95 @@ def test_current_state_reports_the_live_m2_market_data_state():
     assert "**M2 market data (live):** evidence collected=True" in text
     assert "entered the authorized incremental modeling pipeline=True" in text
     assert "evaluation data materialized=True" in text
+
+
+# --------------------------------------------------------------------------- #
+# M3 macro data Gate — the validator must reject contradictory current state
+# --------------------------------------------------------------------------- #
+
+def test_m3_gate_executed_is_recognized():
+    assert v.stage128_m3_macro_data_gate_executed(_root()) is True
+
+
+def test_expected_active_workstream_advances_to_the_m3_gate():
+    assert v.expected_active_workstream(_root()) == (
+        "stage128_m3_macro_data_gate")
+    assert v.STAGE128_M3_ACTIVE_WORKSTREAM == "stage128_m3_macro_data_gate"
+
+
+def test_stale_m2_d2_workstream_label_is_rejected_after_the_m3_gate():
+    """The exact contradiction in the reviewed head must now fail closed."""
+    contradictory = {
+        "current_stage": v.STAGE128_CURRENT_STAGE,
+        # the reviewed head's stale label, alongside an executed M3 Gate
+        "active_workstream": v.STAGE128_ACTIVE_WORKSTREAM,
+        "m3_macro_data_gate_executed": True,
+    }
+    assert v.current_state_labels_are_not_stale(
+        contradictory, freeze_completed=True) is False
+
+
+def test_m3_workstream_label_is_accepted_after_the_m3_gate():
+    consistent = {
+        "current_stage": v.STAGE128_CURRENT_STAGE,
+        "active_workstream": v.STAGE128_M3_ACTIVE_WORKSTREAM,
+        "m3_macro_data_gate_executed": True,
+    }
+    assert v.current_state_labels_are_not_stale(
+        consistent, freeze_completed=True) is True
+
+
+def test_m3_gate_state_self_consistency_rejects_the_reviewed_head_state():
+    """Gate executed + M2 D2 label + started-data flags is contradictory."""
+    reviewed_head_state = {
+        "m3_macro_data_gate_executed": True,
+        "m3_data_workstream_started": True,
+        # the reviewed head's STALE label -- must be rejected
+        "active_workstream": "stage128_m2_d2_boundary_month_equity_return",
+        "m3_modeling_started": False,
+        "m3_incremental_evaluation_authorized": False,
+        "m3_block_admitted_for_incremental_evaluation": False,
+        "m3_macro_data_gate_status": "UNRESOLVED_M3_DATA_GATE",
+    }
+    assert v.m3_gate_state_is_self_consistent(
+        reviewed_head_state, m3_gate_executed=True) is False
+
+
+def test_m3_gate_state_self_consistency_accepts_the_corrected_state():
+    corrected = {
+        "m3_macro_data_gate_executed": True,
+        "m3_data_workstream_started": True,
+        "active_workstream": "stage128_m3_macro_data_gate",
+        "m3_modeling_started": False,
+        "m3_incremental_evaluation_authorized": False,
+        "m3_block_admitted_for_incremental_evaluation": False,
+        "m3_macro_data_gate_status": "UNRESOLVED_M3_DATA_GATE",
+    }
+    assert v.m3_gate_state_is_self_consistent(
+        corrected, m3_gate_executed=True) is True
+
+
+@pytest.mark.parametrize("field", [
+    "m3_modeling_started",
+    "m3_incremental_evaluation_authorized",
+    "m3_block_admitted_for_incremental_evaluation",
+])
+def test_m3_gate_state_rejects_any_modeling_leak(field):
+    leaked = {
+        "m3_macro_data_gate_executed": True,
+        "m3_data_workstream_started": True,
+        "active_workstream": "stage128_m3_macro_data_gate",
+        "m3_modeling_started": False,
+        "m3_incremental_evaluation_authorized": False,
+        "m3_block_admitted_for_incremental_evaluation": False,
+        "m3_macro_data_gate_status": "UNRESOLVED_M3_DATA_GATE",
+    }
+    leaked[field] = True
+    assert v.m3_gate_state_is_self_consistent(
+        leaked, m3_gate_executed=True) is False
+
+
+def test_live_handoff_state_is_self_consistent_about_the_m3_gate():
+    state = json.loads(
+        (_root() / "project/docs/ai/handoff_state.json").read_text("utf-8"))
+    assert v.m3_gate_state_is_self_consistent(state, m3_gate_executed=True)

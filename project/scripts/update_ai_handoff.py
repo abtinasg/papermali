@@ -2766,6 +2766,7 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         **derive_stage128_m2_d2_gate_rerun_markers(root),
         **derive_stage127_m2_incremental_evaluation_markers(root),
         **derive_stage128_m2_retained_block_human_decision_markers(root),
+        **derive_stage128_m3_macro_data_gate_markers(root),
     }
 
 
@@ -3665,6 +3666,8 @@ def build_handoff_state(root: str):
         "current_stage": stage,
         "current_batch": batch,
         "active_workstream": roadmap["active_research_workstream_id"].replace("-", "_"),
+        "active_workstream_predecessor_context": (
+            "stage128_m2_d2_boundary_month_equity_return"),
         # Newest completed micro-part (robustness micro-parts included). The
         # research-action pointers below are deliberately NOT advanced.
         "last_completed_micro_part": active_micro_part_id(
@@ -4206,16 +4209,84 @@ def render_current_state(record: dict) -> str:
             f"{record.get('m3_authorized')}, started={record.get('m3_started')}"
             " — **M4:** authorized="
             f"{record.get('m4_authorized')}, started={record.get('m4_started')}",
-            "- **Next research action (pointer only):** "
-            f"`{record['next_research_action_id']}` — the M3 macro data "
-            "Gate. A pointer is **not** an authorization: no macro data was "
-            "collected, no M3 variable created, no M3 Gate executed and no M3 "
-            "model fit.",
+            (
+                "- **Next research action (pointer only):** "
+                f"`{record['next_research_action_id']}` — the M3 macro data "
+                "Gate, which has since been EXECUTED as a data-admission Gate "
+                "only (see the M3 section below). A pointer is **not** an "
+                "authorization, and the Gate execution started no modeling: "
+                "`m3_modeling_started=False`, "
+                "`m3_incremental_evaluation_authorized=False`."
+                if record.get("stage128_m3_macro_data_gate_executed")
+                else
+                "- **Next research action (pointer only):** "
+                f"`{record['next_research_action_id']}` — the M3 macro data "
+                "Gate. A pointer is **not** an authorization: no macro data "
+                "was collected, no M3 variable created, no M3 Gate executed "
+                "and no M3 model fit."
+            ),
             "- Package: "
             "`project/stage128/m2_retained_block_human_decision/`; "
             "interpretation: "
             "`project/stage128/m2_retained_block_human_decision/"
             "README_STAGE128_M2_RETAINED_BLOCK_HUMAN_DECISION.md`",
+            "",
+        ]
+    if record.get("stage128_m3_macro_data_gate_executed"):
+        m3_status = record.get("stage128_m3_macro_data_gate_status")
+        m3_passed = m3_status == "PASS_FOR_M3_INCREMENTAL_EVALUATION"
+        m3_mark = "\u2705" if m3_passed else "\u26d4"
+        lines += [
+            "### Stage128 — M3 macro DATA Gate (data admission only)\n",
+            "_The data-admission Gate for the exact frozen three-variable M3 "
+            "macro block (`cpi_inflation`, `fx_change_official`, "
+            "`policy_financing_rate`). It asks only whether that block can be "
+            "obtained from authoritative, reproducible, point-in-time-safe "
+            "sources. It does NOT ask, and does not answer, whether M3 "
+            "improves prediction._\n",
+            f"- {m3_mark} **Gate status:** `{m3_status}`",
+            "- \u2705 **Executed:** True — **authorization consumed:** "
+            f"{record.get('stage128_m3_macro_data_gate_authorization_consumed')}"
+            " (one action only, not standing)",
+            "- \u26d4 **Zero modeling in the Gate:** 0 model fits, 0 "
+            "predictions, 0 predictive metrics, 0 M3-versus-M2 comparisons, 0 "
+            "bootstrap/Holm/SHAP/SMOTE executions",
+            "- **Gate denominator:** the retained-M2 development common "
+            f"sample, {record.get('m3_macro_data_gate_parent_rows')} rows — "
+            "**not** the 666-row M1 development universe",
+            "- \u26d4 **M3 block admitted for incremental evaluation:** "
+            f"{record.get('m3_block_admitted_for_incremental_evaluation')}"
+            + ("" if m3_passed else
+               " — no partial block was admitted and no candidate was dropped "
+               "or substituted"),
+            "- \u26d4 **M3 incremental evaluation authorized:** "
+            f"{record.get('m3_incremental_evaluation_authorized')} — **M3 "
+            f"modeling started:** {record.get('m3_modeling_started')}. The "
+            "data workstream started; the MODELING did not.",
+            "- \u26d4 **M4:** authorized="
+            f"{record.get('m4_authorized')}, started="
+            f"{record.get('m4_started')} — **final test locked:** "
+            f"{record.get('final_test_locked')}",
+        ]
+        if m3_passed:
+            lines.append(
+                "- **Next research action (pointer only):** "
+                f"`{record.get('next_research_action_id')}`. A PASS is **data "
+                "admission only** — it does not mean M3 improves prediction, "
+                "and a pointer is **not** an authorization.")
+        else:
+            lines.append(
+                "- \u26d4 **Research pointer NOT advanced** — "
+                "`m3_macro_data_gate_human_review_required` = "
+                f"{record.get('m3_macro_data_gate_human_review_required')}; "
+                f"{record.get('m3_macro_data_gate_unresolved_reason_count')} "
+                "recorded blocker/unresolved reasons. Missing evidence was "
+                "recorded as null, never scored as zero, and never converted "
+                "into an observed failure.")
+        lines += [
+            "- Package: `project/stage128/m3_macro_data_gate/`; "
+            "interpretation: `project/stage128/m3_macro_data_gate/"
+            "README_STAGE128_M3_MACRO_DATA_GATE.md`",
             "",
         ]
     lines += [
@@ -4891,15 +4962,26 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
             "stage128 M2 D2 freeze artifact does not preserve the historical "
             "Stage127 D0 Gate status"
         )
-    # Fail closed on a stale live workstream label: once the freeze is
-    # recognized, the ROADMAP's CURRENT workstream pointer may not still name
-    # the completed Stage126 M1 baseline.
+    # Fail closed on a stale live workstream label. Once the freeze is
+    # recognized the ROADMAP's CURRENT workstream pointer may not still name
+    # the completed Stage126 M1 baseline. The M2 D2 label is correct only
+    # while M2 D2 is the live workstream; once the M3 macro data Gate has been
+    # EXECUTED, the live data workstream is the M3 Gate and the M2 D2 label
+    # becomes predecessor context.
     roadmap_workstream = read_roadmap(root)["active_research_workstream_id"]
-    if roadmap_workstream != _STAGE128_ACTIVE_WORKSTREAM_ID:
+    m3_gate_executed = bool(
+        derive_stage128_m3_macro_data_gate_markers(root).get(
+            "stage128_m3_macro_data_gate_executed"))
+    allowed = (_STAGE128_M3_ACTIVE_WORKSTREAM_ID if m3_gate_executed
+               else _STAGE128_ACTIVE_WORKSTREAM_ID)
+    if roadmap_workstream != allowed:
         raise HandoffError(
             f"stage128 M2 D2 freeze is complete but ROADMAP "
             f"active_research_workstream_id={roadmap_workstream!r} != "
-            f"{_STAGE128_ACTIVE_WORKSTREAM_ID!r}"
+            f"{allowed!r}"
+            + (" (the M3 macro data Gate has executed, so the live workstream "
+               "is the M3 Gate and the M2 D2 label is predecessor context)"
+               if m3_gate_executed else "")
         )
 
     exact = {
@@ -5294,6 +5376,115 @@ def derive_stage127_m2_incremental_evaluation_markers(root: str) -> dict:
         "m4_started": False,
         "m4_authorized": False,
     }
+
+
+#: Once the M3 macro data Gate has EXECUTED, this is the live research/data
+#: workstream label. Gate execution is a DATA workstream, never modeling.
+_STAGE128_M3_ACTIVE_WORKSTREAM_ID = "stage128-m3-macro-data-gate"
+
+_STAGE128_M3_MACRO_DATA_GATE_REL = (
+    "project/stage128/m3_macro_data_gate/"
+    "stage128_m3_macro_data_gate_decision.json"
+)
+_STAGE128_M3_MACRO_DATA_GATE_ACTION_ID = "stage128-m3-macro-data-gate"
+_STAGE128_M3_GATE_STATUS_VOCABULARY = (
+    "PASS_FOR_M3_INCREMENTAL_EVALUATION",
+    "FAIL_M3_DATA_GATE",
+    "UNRESOLVED_M3_DATA_GATE",
+)
+#: Advanced ONLY when the Gate PASSES. A pointer is never an authorization.
+_NEXT_RESEARCH_ACTION_ID_AFTER_M3_GATE_PASS = (
+    "stage128-m3-incremental-evaluation"
+)
+
+
+def derive_stage128_m3_macro_data_gate_markers(root: str) -> dict:
+    """Recognize the executed M3 macro DATA-ADMISSION Gate.
+
+    Narrow and fail-closed. The Gate is data admission only:
+
+    * it never fits a model, predicts, or computes a predictive metric;
+    * it never executes an M3-versus-M2 comparison;
+    * a PASS would be data admission, never a superiority claim;
+    * the research pointer advances ONLY on PASS;
+    * M3 modeling, M4 and the final test are untouched in every outcome.
+
+    Returns {} before the Gate has been executed.
+    """
+    path = os.path.join(root, _STAGE128_M3_MACRO_DATA_GATE_REL)
+    if not os.path.isfile(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        d = json.load(fh)
+
+    if d.get("action_id") != _STAGE128_M3_MACRO_DATA_GATE_ACTION_ID:
+        raise HandoffError("stage128 M3 macro data Gate action_id mismatch")
+    status = d.get("gate_status")
+    if status not in _STAGE128_M3_GATE_STATUS_VOCABULARY:
+        raise HandoffError(
+            f"stage128 M3 macro data Gate status {status!r} outside the "
+            f"locked vocabulary {_STAGE128_M3_GATE_STATUS_VOCABULARY}")
+    passed = status == "PASS_FOR_M3_INCREMENTAL_EVALUATION"
+
+    for field, expected in (
+        ("m3_incremental_evaluation_authorized", False),
+        ("m3_modeling_started", False),
+        ("m4_authorized", False),
+        ("m4_started", False),
+        ("final_test_locked", True),
+        ("final_test_access_authorized", False),
+        ("final_test_evaluation_performed", False),
+        ("m3_macro_data_gate_authorization_consumed", True),
+    ):
+        if d.get(field) is not expected:
+            raise HandoffError(
+                f"stage128 M3 macro data Gate {field} must be {expected}")
+    for field in ("model_fits", "predictions", "predictive_metrics_computed",
+                  "m3_versus_m2_evaluations"):
+        if d.get(field) != 0:
+            raise HandoffError(
+                f"stage128 M3 macro data Gate {field} must be 0")
+    if d.get("m3_block_admitted_for_incremental_evaluation") is not passed:
+        raise HandoffError(
+            "stage128 M3 block admission must track the PASS status exactly")
+    if passed and d.get("next_research_action_id") != (
+            _NEXT_RESEARCH_ACTION_ID_AFTER_M3_GATE_PASS):
+        raise HandoffError(
+            "stage128 M3 Gate PASS must point at "
+            f"{_NEXT_RESEARCH_ACTION_ID_AFTER_M3_GATE_PASS}")
+    if not passed and d.get("next_research_action_id") == (
+            _NEXT_RESEARCH_ACTION_ID_AFTER_M3_GATE_PASS):
+        raise HandoffError(
+            "stage128 M3 Gate did not PASS, so the research pointer must not "
+            "advance to the incremental evaluation")
+
+    parent = d.get("parent_surface") or {}
+    markers = {
+        "stage128_m3_macro_data_gate_executed": True,
+        "stage128_m3_macro_data_gate_status": status,
+        "stage128_m3_macro_data_gate_authorization_consumed": True,
+        "m3_macro_data_gate_executed": True,
+        "m3_macro_data_gate_status": status,
+        "m3_data_workstream_started": True,
+        # Gate execution is NOT modeling. These stay false in every outcome.
+        "m3_incremental_evaluation_authorized": False,
+        "m3_modeling_started": False,
+        "m3_block_admitted_for_incremental_evaluation": passed,
+        "m3_macro_data_gate_human_review_required": not passed,
+        "m3_macro_data_gate_parent_rows": parent.get("parent_rows"),
+        "m3_macro_data_gate_unresolved_reason_count": len(
+            d.get("unresolved_or_blocker_reasons") or []),
+        "m4_authorized": False,
+        "m4_started": False,
+        "final_test_locked": True,
+    }
+    if passed:
+        markers["last_completed_research_action_id"] = (
+            _STAGE128_M3_MACRO_DATA_GATE_ACTION_ID)
+        markers["next_research_action_id"] = (
+            _NEXT_RESEARCH_ACTION_ID_AFTER_M3_GATE_PASS)
+        markers["next_research_action_pointer_is_not_authorization"] = True
+    return markers
 
 
 _STAGE128_M2_RETAINED_BLOCK_DECISION_REL = (

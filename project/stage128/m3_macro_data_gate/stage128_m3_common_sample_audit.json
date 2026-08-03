@@ -1,0 +1,76 @@
+{
+  "candidate_dropped_to_let_smaller_block_pass": false,
+  "common_sample_coverage_threshold": 0.7,
+  "common_sample_meets_threshold": null,
+  "common_sample_status": "UNRESOLVED",
+  "contract_id": "stage128_m3_macro_data_gate",
+  "counts_by_locked_fold": null,
+  "counts_by_target_year": null,
+  "coverage_is_null_not_zero": true,
+  "exact_three_variable_common_sample_companies": null,
+  "exact_three_variable_common_sample_coverage": null,
+  "exact_three_variable_common_sample_negative": null,
+  "exact_three_variable_common_sample_positive": null,
+  "exact_three_variable_common_sample_rows": null,
+  "generated_for": "stage128-m3-macro-data-gate",
+  "m3_block": [
+    "cpi_inflation",
+    "fx_change_official",
+    "policy_financing_rate"
+  ],
+  "parent_surface": {
+    "counts_by_locked_fold": {
+      "fold1_train,fold2_train": 173,
+      "fold1_validation,fold2_train": 159,
+      "fold2_validation": 207
+    },
+    "counts_by_target_year": {
+      "1393": 40,
+      "1394": 67,
+      "1395": 66,
+      "1396": 79,
+      "1397": 80,
+      "1398": 100,
+      "1399": 107
+    },
+    "derived_from": "project/stage128/stage128_m2_d2_development_features.csv",
+    "derived_from_sha256": "068519065fc4c36594a892b14c9242471a088e7b33484fbd5453b12391af2583",
+    "development_target_years": [
+      "1393",
+      "1394",
+      "1395",
+      "1396",
+      "1397",
+      "1398",
+      "1399"
+    ],
+    "distinct_pair_cutoff_dates": 37,
+    "final_test_rows_in_parent_surface": 0,
+    "fuzzy_matching_permitted": false,
+    "m1_development_universe_rows": 666,
+    "m1_universe_not_used_as_m3_gate_denominator": true,
+    "m1_universe_reconciliation_is_audit_only": true,
+    "max_pair_cutoff_date": "2020-07-19",
+    "membership_altered": false,
+    "membership_derived_programmatically_not_hand_reproduced": true,
+    "min_pair_cutoff_date": "2013-10-22",
+    "parent_companies": 108,
+    "parent_negative": 484,
+    "parent_positive": 55,
+    "parent_row_identity_sha256": "d84fc22f3610ddc129499bcf7c8d569d856e1c2efbb8869a6f2f7f05342c0d36",
+    "parent_rows": 539,
+    "parent_surface_id": "retained_m2_development_common_sample",
+    "parent_surface_is_the_m3_gate_denominator": true,
+    "reconciled_against": "project/stage128/m2_incremental_evaluation/stage127_m2_common_sample_join_audit.json",
+    "reconciled_against_sha256": "e6da66d96810ef7491ab5db0018909419ecc7760000e8f390b5bbadb0ef3c159",
+    "required_join_keys": [
+      "predictor_row_key_t",
+      "target_row_key_t_plus_1",
+      "ticker",
+      "fiscal_year_t",
+      "target_year"
+    ]
+  },
+  "partial_block_admission": false,
+  "unresolved_reason": "phase_b_not_executed_definition_lock_unresolved"
+}
