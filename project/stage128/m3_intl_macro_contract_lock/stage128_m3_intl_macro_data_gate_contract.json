@@ -1,4 +1,5 @@
 {
+  "alternative_series_after_mismatch_allowed": false,
   "contract_id": "stage128_m3_intl_macro_contract_lock",
   "coverage_calculations": 0,
   "future_rules": [
@@ -7,7 +8,9 @@
     "Failure of either M3I-2 candidate rejects M3I-2.",
     "M3I-3 may be considered only if M3I-2 passed, the financing metadata lock was completed prospectively, and financing independently passed the same candidate Gate.",
     "Financing failure does not invalidate a passing M3I-2.",
-    "No alternative series may be tried after coverage inspection."
+    "No alternative series may be tried after coverage inspection.",
+    "A value drawn from an archive vintage whose semantic compatibility was not verified is null and does not count towards candidate coverage.",
+    "A semantic or currency-unit mismatch is null and invalid for coverage; no alternative series may be tried after the mismatch."
   ],
   "gate_executed": false,
   "gate_result": "NOT_EXECUTED",
@@ -21,6 +24,7 @@
     "positive_events_each_locked_validation_window": null
   },
   "reduced_one_variable_block_can_pass": false,
+  "semantic_mismatch_policy": "null_and_invalid_for_coverage",
   "thresholds": {
     "block_common_sample_coverage_min": 0.7,
     "candidate_valid_coverage_min": 0.8,
@@ -34,5 +38,6 @@
     "minimum_positive_evaluable_each_locked_validation_window": 5
   },
   "thresholds_inherited_not_redesigned": true,
-  "unresolved_values_are_null_not_zero": true
+  "unresolved_values_are_null_not_zero": true,
+  "unverified_vintage_counts_as_valid_coverage": false
 }

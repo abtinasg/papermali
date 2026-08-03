@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 46,
+  "assertion_count": 65,
   "assertions": [
     {
       "name": "authorization_byte_length_is_28",
@@ -80,6 +80,82 @@
     },
     {
       "name": "fx_forbidden_alternatives_recorded",
+      "status": "PASS"
+    },
+    {
+      "name": "cpi_observation_year_selection_rule_is_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "fx_observation_year_selection_rule_is_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "cpi_uniqueness_requires_the_selection_rule",
+      "status": "PASS"
+    },
+    {
+      "name": "fx_uniqueness_requires_the_selection_rule",
+      "status": "PASS"
+    },
+    {
+      "name": "observation_year_tie_breaker_is_the_maximum_eligible_year",
+      "status": "PASS"
+    },
+    {
+      "name": "only_completed_annual_periods_before_the_cutoff_are_eligible",
+      "status": "PASS"
+    },
+    {
+      "name": "fiscal_year_label_alone_never_drives_the_wdi_year_lookup",
+      "status": "PASS"
+    },
+    {
+      "name": "no_eligible_observation_yields_null",
+      "status": "PASS"
+    },
+    {
+      "name": "prediction_time_contract_carries_both_selection_rules",
+      "status": "PASS"
+    },
+    {
+      "name": "fx_eligibility_conditions_are_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "cpi_vintage_semantic_compatibility_is_required",
+      "status": "PASS"
+    },
+    {
+      "name": "fx_vintage_semantic_compatibility_is_required",
+      "status": "PASS"
+    },
+    {
+      "name": "fx_currency_denomination_and_valuation_must_match_across_the_pair",
+      "status": "PASS"
+    },
+    {
+      "name": "an_unverified_vintage_never_counts_as_valid_coverage",
+      "status": "PASS"
+    },
+    {
+      "name": "current_metadata_is_not_assumed_to_describe_historical_vintages",
+      "status": "PASS"
+    },
+    {
+      "name": "compatibility_verification_is_not_executed_in_this_action",
+      "status": "PASS"
+    },
+    {
+      "name": "no_alternative_series_after_a_semantic_mismatch",
+      "status": "PASS"
+    },
+    {
+      "name": "cpi_must_stay_an_annual_inflation_rate_series",
+      "status": "PASS"
+    },
+    {
+      "name": "fx_redenomination_or_unit_break_is_null_and_invalid",
       "status": "PASS"
     },
     {

@@ -52,7 +52,10 @@ from typing import Any
 
 ACTION_ID = "stage128-m3i2-prospective-contract-lock"
 CONTRACT_ID = "stage128_m3_intl_macro_contract_lock"
-CONTRACT_VERSION = "stage128_m3_intl_macro_contract_lock_v1"
+CONTRACT_VERSION = "stage128_m3_intl_macro_contract_lock_v1_1"
+#: v1_1 closes the two independent-audit blockers: the observation-year
+#: selection rule inside a vintage, and historical-vintage semantic /
+#: currency-unit compatibility. No scope was widened.
 CONTRACT_TYPE = "prospective_contract_lock_only_no_data_no_gate_no_modeling"
 
 REPOSITORY = "abtinasg/papermali"
@@ -77,6 +80,16 @@ NEXT_ACTION_ID = "stage128-m3i2-official-source-evidence-capture"
 NEXT_ACTION_AUTHORIZED = False
 
 PACKAGE_DIR_REL = "project/stage128/m3_intl_macro_contract_lock"
+
+#: This branch head as independently audited before the correction.
+CORRECTED_FROM_COMMIT = "6351381283c14b248b4349b1d5ca240dde5cfe3f"
+PR_NUMBER = 74
+RESULT_CODE = (
+    "M3I2_PROSPECTIVE_CONTRACT_LOCK_READY_FOR_INDEPENDENT_REAUDIT")
+CORRECTION_BLOCKERS_CLOSED: tuple[str, ...] = (
+    "observation_year_selection_rule_inside_the_selected_wdi_vintage",
+    "historical_archive_vintage_semantic_and_currency_unit_compatibility",
+)
 
 README_REL = (
     f"{PACKAGE_DIR_REL}/README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md")
@@ -361,6 +374,152 @@ FX_FAIL_CLOSED_CONDITIONS: tuple[str, ...] = (
     "vintages differ -> null",
 )
 
+# --- Blocker 1 correction: the observation-year selection rule ------------- #
+#
+# Selecting a pre-cutoff archive VINTAGE is not enough: it does not say which
+# annual observation INSIDE that vintage is assigned to a given company-year
+# cutoff. Without this, neither candidate is operationally unique. These fields
+# close that gap prospectively; no observation is read here.
+
+ANNUAL_PERIOD_END_DEFINITION = (
+    "December 31 of the labelled Gregorian observation year")
+COMPLETED_ANNUAL_PERIOD_REQUIRED = True
+FISCAL_YEAR_LABEL_ONLY_MAPPING_ALLOWED = False
+OBSERVATION_YEAR_TIE_BREAKER = "maximum_observation_year"
+CURRENT_OR_FUTURE_INCOMPLETE_CALENDAR_YEAR_ALLOWED = False
+
+#: Every field a candidate must carry before it may claim uniqueness.
+OBSERVATION_YEAR_REQUIRED_FIELDS: tuple[str, ...] = (
+    "annual_period_end_definition",
+    "completed_annual_period_required",
+    "fiscal_year_label_only_mapping_allowed",
+    "observation_year_selection_rule",
+    "observation_year_operational_definition",
+    "selected_observation_tie_breaker",
+    "current_or_future_incomplete_calendar_year_allowed",
+    "no_eligible_observation_policy",
+)
+
+CPI_OBSERVATION_YEAR_SELECTION_RULE = (
+    "Within the selected pre-cutoff WDI archive vintage, choose the maximum "
+    "Gregorian observation year y for which FP.CPI.TOTL.ZG[y] is non-missing "
+    "and December 31 of y is strictly earlier than the pair prediction cutoff.")
+
+CPI_OBSERVATION_YEAR_OPERATIONAL_DEFINITION: tuple[str, ...] = (
+    "selected_vintage = latest official WDI archive release with "
+    "release_available_at < pair_cutoff",
+    "y = max {year: FP.CPI.TOTL.ZG[year] is non-missing in selected_vintage "
+    "and Dec-31(year) < pair_cutoff}",
+    "intl_cpi_inflation_annual = FP.CPI.TOTL.ZG[y] from selected_vintage",
+    "If the set is empty, return null.",
+    "Do not use fiscal year as a direct year lookup.",
+    "Do not use an observation whose annual period has not finished before "
+    "cutoff.",
+    "Do not try another indicator.",
+)
+
+FX_OBSERVATION_YEAR_SELECTION_RULE = (
+    "Within the selected pre-cutoff WDI archive vintage, choose the maximum "
+    "Gregorian observation year y such that E_y and E_(y-1) are both "
+    "non-missing, positive, consecutive annual observations, December 31 of y "
+    "is strictly earlier than the pair prediction cutoff, and both "
+    "observations have the same verified currency denomination and valuation "
+    "definition.")
+
+FX_OBSERVATION_YEAR_ELIGIBILITY: tuple[str, ...] = (
+    "E_y present",
+    "E_(y-1) present",
+    "E_y > 0",
+    "E_(y-1) > 0",
+    "years consecutive",
+    "same selected vintage",
+    "Dec-31(y) < pair_cutoff",
+    "same verified currency denomination",
+    "same verified local-currency valuation definition",
+)
+
+FX_OBSERVATION_YEAR_OPERATIONAL_DEFINITION: tuple[str, ...] = (
+    "selected_vintage = latest official WDI archive release with "
+    "release_available_at < pair_cutoff",
+    "eligible y requires every condition in "
+    "observation_year_eligibility_conditions",
+    "selected y = maximum eligible y",
+    "intl_fx_change_official_annual = 100 * ln(E_y / E_(y-1))",
+    "If no eligible pair exists, return null.",
+    "Do not use fiscal year as a direct year lookup.",
+    "Do not use an observation whose annual period has not finished before "
+    "cutoff.",
+    "Do not try another indicator.",
+)
+
+# --- Blocker 2 correction: historical-vintage semantic compatibility ------- #
+#
+# The World Bank WDI archive warns that the same indicator code may have
+# represented different base years or local-currency valuations in historical
+# releases, and that CURRENT metadata may be displayed alongside ARCHIVED data.
+# A vintage is therefore not self-describing. Nothing is downloaded here: this
+# is a prospective obligation on the later evidence-capture action.
+
+VINTAGE_SEMANTIC_COMPATIBILITY_REQUIRED = True
+VINTAGE_SEMANTIC_COMPATIBILITY_STATUS = "NOT_EXECUTED"
+HISTORICAL_ARCHIVE_METADATA_ASSUMED_IDENTICAL_TO_CURRENT = False
+SEMANTIC_COMPATIBILITY_EVIDENCE_REQUIRED_BEFORE_VALUE_USE = True
+SEMANTIC_MISMATCH_POLICY = "null_and_invalid_for_coverage"
+ALTERNATIVE_SERIES_AFTER_MISMATCH_ALLOWED = False
+UNVERIFIED_VINTAGE_COUNTS_AS_VALID_COVERAGE = False
+
+#: Evidence that must be verified for EACH selected archive edition before any
+#: value from it may be used. Verification happens in a later, separate action.
+VINTAGE_EVIDENCE_REQUIRED_FIELDS: tuple[str, ...] = (
+    "archive edition identifier",
+    "release date and, if available, release time",
+    "Iran economy identity",
+    "indicator code",
+    "series title or archived label compatible with the locked title",
+    "frequency = annual",
+    "unit compatible with the locked unit",
+    "calendar-year observation semantics",
+    "raw archive artifact SHA-256",
+)
+
+#: Every compatibility field a candidate must carry.
+VINTAGE_COMPATIBILITY_REQUIRED_FIELDS: tuple[str, ...] = (
+    "vintage_semantic_compatibility_required",
+    "vintage_semantic_compatibility_status",
+    "historical_archive_metadata_assumed_identical_to_current",
+    "semantic_compatibility_evidence_required_before_value_use",
+    "semantic_mismatch_policy",
+    "alternative_series_after_mismatch_allowed",
+    "vintage_evidence_required_fields",
+)
+
+CPI_SEMANTIC_COMPATIBILITY_REQUIREMENT = (
+    "FP.CPI.TOTL.ZG must remain an annual CPI inflation-RATE series in "
+    "percent in the selected archive vintage. An index-level, GDP-deflator or "
+    "otherwise differently defined inflation series is a semantic mismatch.")
+
+CPI_SEMANTIC_MISMATCH_EXAMPLES: tuple[str, ...] = (
+    "index level instead of annual rate",
+    "GDP-deflator inflation instead of consumer-price inflation",
+    "a differently defined inflation construct under the same code",
+)
+
+#: FX-only compatibility fields (currency denomination and valuation).
+FX_CURRENCY_COMPATIBILITY_REQUIRED_FIELDS: tuple[str, ...] = (
+    "same_currency_denomination_required_across_pair",
+    "same_local_currency_valuation_definition_required_across_pair",
+    "redenomination_or_unit_break_policy",
+)
+
+REDENOMINATION_OR_UNIT_BREAK_POLICY = "null_and_invalid_for_coverage"
+
+FX_PAIR_COMPATIBILITY_VERIFICATION: tuple[str, ...] = (
+    "E_y and E_(y-1) use identical currency denomination",
+    "E_y and E_(y-1) use identical local-currency valuation convention",
+    "no currency-unit break or redenomination exists across the pair",
+    "E_y and E_(y-1) belong to the same archive vintage",
+)
+
 CPI_CANDIDATE: dict[str, Any] = {
     "candidate_id": "cand_m3i_cpi_inflation_annual",
     "variable_name": "intl_cpi_inflation_annual",
@@ -379,6 +538,37 @@ CPI_CANDIDATE: dict[str, Any] = {
     "transformation_formula": "identity",
     "transformation_window": "none",
     "higher_value_interpretation": "higher consumer-price inflation",
+
+    # observation-year selection (blocker 1)
+    "annual_period_end_definition": ANNUAL_PERIOD_END_DEFINITION,
+    "completed_annual_period_required": COMPLETED_ANNUAL_PERIOD_REQUIRED,
+    "fiscal_year_label_only_mapping_allowed":
+        FISCAL_YEAR_LABEL_ONLY_MAPPING_ALLOWED,
+    "observation_year_selection_rule": CPI_OBSERVATION_YEAR_SELECTION_RULE,
+    "observation_year_operational_definition": list(
+        CPI_OBSERVATION_YEAR_OPERATIONAL_DEFINITION),
+    "selected_observation_tie_breaker": OBSERVATION_YEAR_TIE_BREAKER,
+    "current_or_future_incomplete_calendar_year_allowed":
+        CURRENT_OR_FUTURE_INCOMPLETE_CALENDAR_YEAR_ALLOWED,
+    "no_eligible_observation_policy": None,
+
+    # historical-vintage semantic compatibility (blocker 2)
+    "vintage_semantic_compatibility_required":
+        VINTAGE_SEMANTIC_COMPATIBILITY_REQUIRED,
+    "vintage_semantic_compatibility_status":
+        VINTAGE_SEMANTIC_COMPATIBILITY_STATUS,
+    "historical_archive_metadata_assumed_identical_to_current":
+        HISTORICAL_ARCHIVE_METADATA_ASSUMED_IDENTICAL_TO_CURRENT,
+    "semantic_compatibility_evidence_required_before_value_use":
+        SEMANTIC_COMPATIBILITY_EVIDENCE_REQUIRED_BEFORE_VALUE_USE,
+    "semantic_mismatch_policy": SEMANTIC_MISMATCH_POLICY,
+    "alternative_series_after_mismatch_allowed":
+        ALTERNATIVE_SERIES_AFTER_MISMATCH_ALLOWED,
+    "vintage_evidence_required_fields": list(VINTAGE_EVIDENCE_REQUIRED_FIELDS),
+    "semantic_compatibility_requirement":
+        CPI_SEMANTIC_COMPATIBILITY_REQUIREMENT,
+    "semantic_mismatch_examples": list(CPI_SEMANTIC_MISMATCH_EXAMPLES),
+
     "uniquely_determined": True,
     "admitted": False,
     "retrieval_status": "not_authorized",
@@ -407,6 +597,44 @@ FX_CANDIDATE: dict[str, Any] = {
         "two consecutive annual observations from the same vintage",
     "higher_value_interpretation":
         "local-currency depreciation against the US dollar",
+
+    # observation-year selection (blocker 1)
+    "annual_period_end_definition": ANNUAL_PERIOD_END_DEFINITION,
+    "completed_annual_period_required": COMPLETED_ANNUAL_PERIOD_REQUIRED,
+    "fiscal_year_label_only_mapping_allowed":
+        FISCAL_YEAR_LABEL_ONLY_MAPPING_ALLOWED,
+    "observation_year_selection_rule": FX_OBSERVATION_YEAR_SELECTION_RULE,
+    "observation_year_eligibility_conditions": list(
+        FX_OBSERVATION_YEAR_ELIGIBILITY),
+    "observation_year_operational_definition": list(
+        FX_OBSERVATION_YEAR_OPERATIONAL_DEFINITION),
+    "selected_observation_tie_breaker": OBSERVATION_YEAR_TIE_BREAKER,
+    "current_or_future_incomplete_calendar_year_allowed":
+        CURRENT_OR_FUTURE_INCOMPLETE_CALENDAR_YEAR_ALLOWED,
+    "no_eligible_observation_policy": None,
+
+    # historical-vintage semantic compatibility (blocker 2)
+    "vintage_semantic_compatibility_required":
+        VINTAGE_SEMANTIC_COMPATIBILITY_REQUIRED,
+    "vintage_semantic_compatibility_status":
+        VINTAGE_SEMANTIC_COMPATIBILITY_STATUS,
+    "historical_archive_metadata_assumed_identical_to_current":
+        HISTORICAL_ARCHIVE_METADATA_ASSUMED_IDENTICAL_TO_CURRENT,
+    "semantic_compatibility_evidence_required_before_value_use":
+        SEMANTIC_COMPATIBILITY_EVIDENCE_REQUIRED_BEFORE_VALUE_USE,
+    "semantic_mismatch_policy": SEMANTIC_MISMATCH_POLICY,
+    "alternative_series_after_mismatch_allowed":
+        ALTERNATIVE_SERIES_AFTER_MISMATCH_ALLOWED,
+    "vintage_evidence_required_fields": list(VINTAGE_EVIDENCE_REQUIRED_FIELDS),
+
+    # FX-only currency compatibility (blocker 2)
+    "same_currency_denomination_required_across_pair": True,
+    "same_local_currency_valuation_definition_required_across_pair": True,
+    "redenomination_or_unit_break_policy":
+        REDENOMINATION_OR_UNIT_BREAK_POLICY,
+    "pair_compatibility_verification_required": list(
+        FX_PAIR_COMPATIBILITY_VERIFICATION),
+
     "uniquely_determined": True,
     "admitted": False,
     "retrieval_status": "not_authorized",
@@ -555,6 +783,10 @@ M3I_GATE_FUTURE_RULES: tuple[str, ...] = (
     "same candidate Gate.",
     "Financing failure does not invalidate a passing M3I-2.",
     "No alternative series may be tried after coverage inspection.",
+    "A value drawn from an archive vintage whose semantic compatibility was "
+    "not verified is null and does not count towards candidate coverage.",
+    "A semantic or currency-unit mismatch is null and invalid for coverage; "
+    "no alternative series may be tried after the mismatch.",
 )
 
 #: Fields that must be null (never zero) while the Gate has not executed.
@@ -881,6 +1113,163 @@ def assert_fx_transformation(candidate: dict[str, Any]) -> None:
     if conditions != FX_FAIL_CLOSED_CONDITIONS:
         raise M3IntlMacroContractLockError(
             "the FX fail-closed transformation conditions were altered")
+
+
+def assert_observation_year_selection_rule(candidate: dict[str, Any]) -> None:
+    """Blocker 1 — the observation year inside a vintage must be exact.
+
+    Fails closed when the rule is absent, when the tie-breaker is anything
+    other than ``maximum_observation_year``, when an unfinished calendar year
+    is permitted, when a fiscal-year label alone may drive the lookup, or when
+    ``uniquely_determined`` is claimed without the rule being present.
+    """
+    cid = candidate.get("candidate_id")
+    missing = [f for f in OBSERVATION_YEAR_REQUIRED_FIELDS
+               if f not in candidate]
+    if missing:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: observation-year selection fields absent: {missing}")
+
+    rule = candidate.get("observation_year_selection_rule")
+    if not isinstance(rule, str) or not rule.strip():
+        raise M3IntlMacroContractLockError(
+            f"{cid}: observation_year_selection_rule must be a non-empty "
+            f"rule; got {rule!r}")
+    steps = tuple(candidate.get("observation_year_operational_definition")
+                  or ())
+    if not steps:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: the observation-year rule needs an operational "
+            f"definition")
+
+    if candidate.get("selected_observation_tie_breaker") != (
+            OBSERVATION_YEAR_TIE_BREAKER):
+        raise M3IntlMacroContractLockError(
+            f"{cid}: the observation-year tie-breaker must be "
+            f"{OBSERVATION_YEAR_TIE_BREAKER!r}; got "
+            f"{candidate.get('selected_observation_tie_breaker')!r}. "
+            f"Selecting the first/earliest eligible year is forbidden.")
+    if candidate.get(
+            "current_or_future_incomplete_calendar_year_allowed") is not False:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: an annual period that has not finished strictly before "
+            f"the cutoff may never be selected")
+    if candidate.get("completed_annual_period_required") is not True:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: completed_annual_period_required must be true")
+    if candidate.get("annual_period_end_definition") != (
+            ANNUAL_PERIOD_END_DEFINITION):
+        raise M3IntlMacroContractLockError(
+            f"{cid}: annual_period_end_definition must be "
+            f"{ANNUAL_PERIOD_END_DEFINITION!r}")
+    if candidate.get("fiscal_year_label_only_mapping_allowed") is not False:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: a fiscal-year label alone may never drive the WDI year "
+            f"lookup")
+    if candidate.get("no_eligible_observation_policy") is not None:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: when no eligible observation exists the value is null; "
+            f"got {candidate.get('no_eligible_observation_policy')!r}")
+
+
+def assert_uniqueness_requires_selection_rule(
+    candidate: dict[str, Any],
+) -> None:
+    """Blocker 1 — ``uniquely_determined`` is void without the exact rule."""
+    has_rule = bool(
+        isinstance(candidate.get("observation_year_selection_rule"), str)
+        and candidate.get("observation_year_selection_rule", "").strip()
+        and candidate.get("observation_year_operational_definition"))
+    if candidate.get("uniquely_determined") is True and not has_rule:
+        raise M3IntlMacroContractLockError(
+            f"{candidate.get('candidate_id')}: uniquely_determined=true "
+            f"claimed without an exact observation-year selection rule")
+
+
+def assert_vintage_semantic_compatibility(candidate: dict[str, Any]) -> None:
+    """Blocker 2 — archived vintages are never assumed to match today."""
+    cid = candidate.get("candidate_id")
+    missing = [f for f in VINTAGE_COMPATIBILITY_REQUIRED_FIELDS
+               if f not in candidate]
+    if missing:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: vintage-compatibility fields absent: {missing}")
+    if candidate.get("vintage_semantic_compatibility_required") is not True:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: vintage_semantic_compatibility_required must be true")
+    if candidate.get(
+            "historical_archive_metadata_assumed_identical_to_current") is not (
+            False):
+        raise M3IntlMacroContractLockError(
+            f"{cid}: current WDI metadata may never be assumed to describe "
+            f"every historical archive vintage")
+    if candidate.get(
+            "semantic_compatibility_evidence_required_before_value_use") is not (
+            True):
+        raise M3IntlMacroContractLockError(
+            f"{cid}: compatibility evidence is required before any value use")
+    if candidate.get("semantic_mismatch_policy") != SEMANTIC_MISMATCH_POLICY:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: a semantic mismatch must be "
+            f"{SEMANTIC_MISMATCH_POLICY!r}; got "
+            f"{candidate.get('semantic_mismatch_policy')!r}")
+    if candidate.get("alternative_series_after_mismatch_allowed") is not False:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: no alternative series may be tried after a mismatch")
+    if candidate.get("vintage_semantic_compatibility_status") != (
+            VINTAGE_SEMANTIC_COMPATIBILITY_STATUS):
+        raise M3IntlMacroContractLockError(
+            f"{cid}: compatibility verification must be recorded as "
+            f"{VINTAGE_SEMANTIC_COMPATIBILITY_STATUS} in this action")
+    evidence = tuple(candidate.get("vintage_evidence_required_fields") or ())
+    if evidence != VINTAGE_EVIDENCE_REQUIRED_FIELDS:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: the required per-vintage evidence list was altered")
+
+
+def assert_fx_currency_compatibility(candidate: dict[str, Any]) -> None:
+    """Blocker 2 — a redenomination or valuation break voids the FX pair."""
+    cid = candidate.get("candidate_id")
+    missing = [f for f in FX_CURRENCY_COMPATIBILITY_REQUIRED_FIELDS
+               if f not in candidate]
+    if missing:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: FX currency-compatibility fields absent: {missing}")
+    if candidate.get("same_currency_denomination_required_across_pair") is not (
+            True):
+        raise M3IntlMacroContractLockError(
+            f"{cid}: E_y and E_(y-1) must share one currency denomination")
+    if candidate.get(
+            "same_local_currency_valuation_definition_required_across_pair"
+    ) is not True:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: E_y and E_(y-1) must share one local-currency valuation "
+            f"definition")
+    if candidate.get("redenomination_or_unit_break_policy") != (
+            REDENOMINATION_OR_UNIT_BREAK_POLICY):
+        raise M3IntlMacroContractLockError(
+            f"{cid}: a redenomination or unit break must be "
+            f"{REDENOMINATION_OR_UNIT_BREAK_POLICY!r}; got "
+            f"{candidate.get('redenomination_or_unit_break_policy')!r}")
+    checks = tuple(candidate.get("pair_compatibility_verification_required")
+                   or ())
+    if checks != FX_PAIR_COMPATIBILITY_VERIFICATION:
+        raise M3IntlMacroContractLockError(
+            f"{cid}: the FX pair-compatibility verification list was altered")
+
+
+def assert_unverified_vintage_is_not_valid_coverage(
+    gate: dict[str, Any],
+) -> None:
+    """Blocker 2 — an unverified vintage can never count as valid coverage."""
+    if gate.get("unverified_vintage_counts_as_valid_coverage") is not False:
+        raise M3IntlMacroContractLockError(
+            "a vintage whose semantic compatibility is unverified may never "
+            "count towards candidate coverage")
+    if gate.get("semantic_mismatch_policy") != SEMANTIC_MISMATCH_POLICY:
+        raise M3IntlMacroContractLockError(
+            f"the Gate must record the semantic-mismatch policy as "
+            f"{SEMANTIC_MISMATCH_POLICY!r}")
 
 
 def assert_m3i2_block_not_reduced(block: list[str] | tuple[str, ...]) -> None:
@@ -1323,7 +1712,61 @@ def build_prediction_time_contract() -> dict[str, Any]:
         "fiscal_year_label_only_mapping_allowed": False,
         "jalali_and_gregorian_dates_preserved_separately": True,
         "current_value_treated_as_historically_available": False,
+
+        # --- blocker 1: which observation year inside the vintage --------- #
+        "annual_period_end_definition": ANNUAL_PERIOD_END_DEFINITION,
+        "completed_annual_period_required": COMPLETED_ANNUAL_PERIOD_REQUIRED,
+        "selected_observation_tie_breaker": OBSERVATION_YEAR_TIE_BREAKER,
+        "current_or_future_incomplete_calendar_year_allowed":
+            CURRENT_OR_FUTURE_INCOMPLETE_CALENDAR_YEAR_ALLOWED,
+        "no_eligible_observation_policy": None,
+        "observation_year_selection_rules": {
+            "cand_m3i_cpi_inflation_annual": {
+                "observation_year_selection_rule":
+                    CPI_OBSERVATION_YEAR_SELECTION_RULE,
+                "observation_year_operational_definition": list(
+                    CPI_OBSERVATION_YEAR_OPERATIONAL_DEFINITION),
+            },
+            "cand_m3i_fx_change_official_annual": {
+                "observation_year_selection_rule":
+                    FX_OBSERVATION_YEAR_SELECTION_RULE,
+                "observation_year_eligibility_conditions": list(
+                    FX_OBSERVATION_YEAR_ELIGIBILITY),
+                "observation_year_operational_definition": list(
+                    FX_OBSERVATION_YEAR_OPERATIONAL_DEFINITION),
+            },
+        },
+
+        # --- blocker 2: historical-vintage semantic compatibility --------- #
+        "vintage_semantic_compatibility_required":
+            VINTAGE_SEMANTIC_COMPATIBILITY_REQUIRED,
+        "vintage_semantic_compatibility_status":
+            VINTAGE_SEMANTIC_COMPATIBILITY_STATUS,
+        "historical_archive_metadata_assumed_identical_to_current":
+            HISTORICAL_ARCHIVE_METADATA_ASSUMED_IDENTICAL_TO_CURRENT,
+        "semantic_compatibility_evidence_required_before_value_use":
+            SEMANTIC_COMPATIBILITY_EVIDENCE_REQUIRED_BEFORE_VALUE_USE,
+        "semantic_mismatch_policy": SEMANTIC_MISMATCH_POLICY,
+        "alternative_series_after_mismatch_allowed":
+            ALTERNATIVE_SERIES_AFTER_MISMATCH_ALLOWED,
+        "vintage_evidence_required_fields": list(
+            VINTAGE_EVIDENCE_REQUIRED_FIELDS),
+        "cpi_semantic_compatibility_requirement":
+            CPI_SEMANTIC_COMPATIBILITY_REQUIREMENT,
+        "fx_same_currency_denomination_required_across_pair": True,
+        "fx_same_local_currency_valuation_definition_required_across_pair":
+            True,
+        "fx_redenomination_or_unit_break_policy":
+            REDENOMINATION_OR_UNIT_BREAK_POLICY,
+        "fx_pair_compatibility_verification_required": list(
+            FX_PAIR_COMPATIBILITY_VERIFICATION),
+        "unverified_vintage_counts_as_valid_coverage":
+            UNVERIFIED_VINTAGE_COUNTS_AS_VALID_COVERAGE,
+
         "vintages_applied_in_this_action": 0,
+        "observation_years_selected_in_this_action": 0,
+        "vintage_compatibility_verifications_in_this_action": 0,
+        "archive_editions_downloaded_in_this_action": 0,
         "observations_timestamped_in_this_action": 0,
     }
 
@@ -1349,6 +1792,12 @@ def build_data_gate_contract() -> dict[str, Any]:
         },
         "future_rules": list(M3I_GATE_FUTURE_RULES),
         "reduced_one_variable_block_can_pass": False,
+        # blocker 2 — an unverified vintage is not evidence of coverage
+        "unverified_vintage_counts_as_valid_coverage":
+            UNVERIFIED_VINTAGE_COUNTS_AS_VALID_COVERAGE,
+        "semantic_mismatch_policy": SEMANTIC_MISMATCH_POLICY,
+        "alternative_series_after_mismatch_allowed":
+            ALTERNATIVE_SERIES_AFTER_MISMATCH_ALLOWED,
         "gate_result": GATE_RESULT_NOT_EXECUTED,
         "gate_executed": False,
         "coverage_calculations": 0,
@@ -1387,8 +1836,10 @@ def build_decision(
         "contract_type": CONTRACT_TYPE,
         "contract_version": CONTRACT_VERSION,
         "decision": "M3I2_CONTRACT_PROSPECTIVELY_LOCKED",
-        "result_code": "M3I2_PROSPECTIVE_CONTRACT_LOCK_READY_FOR_INDEPENDENT_"
-                       "AUDIT",
+        "result_code": RESULT_CODE,
+        "correction_of_prior_head": CORRECTED_FROM_COMMIT,
+        "correction_closes_audit_blockers": list(CORRECTION_BLOCKERS_CLOSED),
+        "correction_widened_scope": False,
 
         # topology
         "repository": REPOSITORY,
@@ -1557,6 +2008,89 @@ def build_qc_report(
           tuple(cpi["forbidden_alternatives"]) == CPI_FORBIDDEN_ALTERNATIVES)
     check("fx_forbidden_alternatives_recorded",
           tuple(fx["forbidden_alternatives"]) == FX_FORBIDDEN_ALTERNATIVES)
+    # -- blocker 1: the observation-year selection rule -------------------- #
+    guard("cpi_observation_year_selection_rule_is_exact",
+          lambda: assert_observation_year_selection_rule(cpi))
+    guard("fx_observation_year_selection_rule_is_exact",
+          lambda: assert_observation_year_selection_rule(fx))
+    guard("cpi_uniqueness_requires_the_selection_rule",
+          lambda: assert_uniqueness_requires_selection_rule(cpi))
+    guard("fx_uniqueness_requires_the_selection_rule",
+          lambda: assert_uniqueness_requires_selection_rule(fx))
+    check("observation_year_tie_breaker_is_the_maximum_eligible_year",
+          cpi["selected_observation_tie_breaker"]
+          == fx["selected_observation_tie_breaker"]
+          == OBSERVATION_YEAR_TIE_BREAKER)
+    check("only_completed_annual_periods_before_the_cutoff_are_eligible",
+          cpi["completed_annual_period_required"] is True
+          and fx["completed_annual_period_required"] is True
+          and cpi["current_or_future_incomplete_calendar_year_allowed"]
+          is False
+          and fx["current_or_future_incomplete_calendar_year_allowed"]
+          is False
+          and cpi["annual_period_end_definition"]
+          == ANNUAL_PERIOD_END_DEFINITION)
+    check("fiscal_year_label_alone_never_drives_the_wdi_year_lookup",
+          cpi["fiscal_year_label_only_mapping_allowed"] is False
+          and fx["fiscal_year_label_only_mapping_allowed"] is False
+          and prediction_time["fiscal_year_label_only_mapping_allowed"]
+          is False)
+    check("no_eligible_observation_yields_null",
+          cpi["no_eligible_observation_policy"] is None
+          and fx["no_eligible_observation_policy"] is None
+          and prediction_time["no_eligible_observation_policy"] is None)
+    check("prediction_time_contract_carries_both_selection_rules",
+          prediction_time["observation_year_selection_rules"][
+              "cand_m3i_cpi_inflation_annual"][
+              "observation_year_selection_rule"]
+          == CPI_OBSERVATION_YEAR_SELECTION_RULE
+          and prediction_time["observation_year_selection_rules"][
+              "cand_m3i_fx_change_official_annual"][
+              "observation_year_selection_rule"]
+          == FX_OBSERVATION_YEAR_SELECTION_RULE)
+    check("fx_eligibility_conditions_are_exact",
+          tuple(fx["observation_year_eligibility_conditions"])
+          == FX_OBSERVATION_YEAR_ELIGIBILITY)
+
+    # -- blocker 2: historical-vintage semantic compatibility -------------- #
+    guard("cpi_vintage_semantic_compatibility_is_required",
+          lambda: assert_vintage_semantic_compatibility(cpi))
+    guard("fx_vintage_semantic_compatibility_is_required",
+          lambda: assert_vintage_semantic_compatibility(fx))
+    guard("fx_currency_denomination_and_valuation_must_match_across_the_pair",
+          lambda: assert_fx_currency_compatibility(fx))
+    guard("an_unverified_vintage_never_counts_as_valid_coverage",
+          lambda: assert_unverified_vintage_is_not_valid_coverage(gate))
+    check("current_metadata_is_not_assumed_to_describe_historical_vintages",
+          cpi["historical_archive_metadata_assumed_identical_to_current"]
+          is False
+          and fx["historical_archive_metadata_assumed_identical_to_current"]
+          is False
+          and prediction_time[
+              "historical_archive_metadata_assumed_identical_to_current"]
+          is False)
+    check("compatibility_verification_is_not_executed_in_this_action",
+          cpi["vintage_semantic_compatibility_status"]
+          == fx["vintage_semantic_compatibility_status"]
+          == VINTAGE_SEMANTIC_COMPATIBILITY_STATUS
+          and prediction_time[
+              "vintage_compatibility_verifications_in_this_action"] == 0
+          and prediction_time["archive_editions_downloaded_in_this_action"]
+          == 0
+          and prediction_time["observation_years_selected_in_this_action"]
+          == 0)
+    check("no_alternative_series_after_a_semantic_mismatch",
+          cpi["alternative_series_after_mismatch_allowed"] is False
+          and fx["alternative_series_after_mismatch_allowed"] is False
+          and gate["alternative_series_after_mismatch_allowed"] is False)
+    check("cpi_must_stay_an_annual_inflation_rate_series",
+          cpi["semantic_compatibility_requirement"]
+          == CPI_SEMANTIC_COMPATIBILITY_REQUIREMENT)
+    check("fx_redenomination_or_unit_break_is_null_and_invalid",
+          fx["redenomination_or_unit_break_policy"]
+          == REDENOMINATION_OR_UNIT_BREAK_POLICY
+          == prediction_time["fx_redenomination_or_unit_break_policy"])
+
     check("both_m3i2_candidates_uniquely_determined",
           cpi["uniquely_determined"] is True
           and fx["uniquely_determined"] is True)
@@ -1808,6 +2342,53 @@ confirmatory M3**.
 `PA.NUS.ATLS`, free-market/unofficial rates, aggregators, crypto-implied rates
 and manual regime splices are forbidden, as is any alternative indicator or
 transformation chosen **after** coverage or model inspection.
+
+## Which observation year, inside the selected vintage
+
+Choosing a pre-cutoff archive **vintage** does not say which annual
+**observation** that vintage contributes. Both candidates therefore carry an
+exact, operationally unique selection rule.
+
+An annual period ends on **{ANNUAL_PERIOD_END_DEFINITION}**, and only a period
+that has *finished* strictly before the pair cutoff is eligible
+(`completed_annual_period_required` = true,
+`current_or_future_incomplete_calendar_year_allowed` = false). Among eligible
+years the **maximum** is taken
+(`selected_observation_tie_breaker` = `{OBSERVATION_YEAR_TIE_BREAKER}`) — never
+the first or earliest. A fiscal-year label may never be used as a direct WDI
+year lookup, and if no eligible observation exists the value is **null**
+(`no_eligible_observation_policy` = `null`). No alternative indicator may be
+tried instead.
+
+* CPI — {CPI_OBSERVATION_YEAR_SELECTION_RULE}
+* FX — {FX_OBSERVATION_YEAR_SELECTION_RULE}
+
+## Historical-vintage semantic and currency compatibility
+
+The WDI archive warns that one indicator code may have carried a different base
+year or local-currency valuation in earlier releases, and that **current**
+metadata can be displayed alongside **archived** data. An archived vintage is
+therefore not self-describing:
+`historical_archive_metadata_assumed_identical_to_current` = **false**, and
+`semantic_compatibility_evidence_required_before_value_use` = **true**.
+
+Before any value from a selected edition may be used, a later evidence-capture
+action must verify, per edition: {", ".join(VINTAGE_EVIDENCE_REQUIRED_FIELDS)}.
+
+For CPI: {CPI_SEMANTIC_COMPATIBILITY_REQUIREMENT}
+
+For FX, `E_y` and `E_(y-1)` must additionally share one currency denomination
+and one local-currency valuation convention, with no redenomination or
+unit break across the pair.
+
+Any mismatch — semantic, unit or redenomination — is
+`{SEMANTIC_MISMATCH_POLICY}`, an unverified vintage never counts towards
+candidate coverage, and **no alternative series or source may be tried after a
+mismatch or after coverage inspection**.
+
+In this action: `{VINTAGE_SEMANTIC_COMPATIBILITY_STATUS}` — zero archive
+editions downloaded, zero observation years selected, zero compatibility
+verifications performed.
 
 ## M3I-3 — contingent and unresolved
 

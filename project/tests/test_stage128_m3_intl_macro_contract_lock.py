@@ -272,6 +272,295 @@ def test_forbidden_alternatives_are_recorded(built):
     assert "manual Iranian regime splice" in fx["forbidden_alternatives"]
 
 
+# --------------------------------------------------------------------------- #
+# Blocker 1 — the observation year INSIDE the selected vintage
+# --------------------------------------------------------------------------- #
+
+
+def test_both_candidates_carry_an_exact_observation_year_rule(built):
+    for cand in built["definition_lock"]["m3i2_candidates"]:
+        m.assert_observation_year_selection_rule(cand)
+        m.assert_uniqueness_requires_selection_rule(cand)
+        assert cand["annual_period_end_definition"] == (
+            "December 31 of the labelled Gregorian observation year")
+        assert cand["completed_annual_period_required"] is True
+        assert cand["selected_observation_tie_breaker"] == (
+            "maximum_observation_year")
+        assert cand["current_or_future_incomplete_calendar_year_allowed"] is (
+            False)
+        assert cand["fiscal_year_label_only_mapping_allowed"] is False
+        assert cand["no_eligible_observation_policy"] is None
+        assert cand["observation_year_operational_definition"]
+
+
+def test_cpi_observation_year_rule_text_is_exact(built):
+    cpi = built["definition_lock"]["m3i2_candidates"][0]
+    assert cpi["observation_year_selection_rule"] == (
+        "Within the selected pre-cutoff WDI archive vintage, choose the "
+        "maximum Gregorian observation year y for which FP.CPI.TOTL.ZG[y] is "
+        "non-missing and December 31 of y is strictly earlier than the pair "
+        "prediction cutoff.")
+    steps = cpi["observation_year_operational_definition"]
+    assert any(s.startswith("y = max {year:") for s in steps)
+    assert "If the set is empty, return null." in steps
+    assert "Do not use fiscal year as a direct year lookup." in steps
+    assert "Do not try another indicator." in steps
+
+
+def test_fx_observation_year_rule_text_and_eligibility_are_exact(built):
+    fx = built["definition_lock"]["m3i2_candidates"][1]
+    assert fx["observation_year_selection_rule"] == (
+        "Within the selected pre-cutoff WDI archive vintage, choose the "
+        "maximum Gregorian observation year y such that E_y and E_(y-1) are "
+        "both non-missing, positive, consecutive annual observations, "
+        "December 31 of y is strictly earlier than the pair prediction "
+        "cutoff, and both observations have the same verified currency "
+        "denomination and valuation definition.")
+    assert fx["observation_year_eligibility_conditions"] == [
+        "E_y present", "E_(y-1) present", "E_y > 0", "E_(y-1) > 0",
+        "years consecutive", "same selected vintage",
+        "Dec-31(y) < pair_cutoff", "same verified currency denomination",
+        "same verified local-currency valuation definition",
+    ]
+    steps = fx["observation_year_operational_definition"]
+    assert "selected y = maximum eligible y" in steps
+    assert "If no eligible pair exists, return null." in steps
+
+
+@pytest.mark.parametrize("index", [0, 1])
+@pytest.mark.parametrize("mutation", [
+    # the first/earliest available year selected instead of the maximum
+    {"selected_observation_tie_breaker": "first_available_observation_year"},
+    {"selected_observation_tie_breaker": "minimum_observation_year"},
+    # a fiscal-year label mapped directly onto the WDI year
+    {"fiscal_year_label_only_mapping_allowed": True},
+    # an annual period that ends on or after the cutoff
+    {"current_or_future_incomplete_calendar_year_allowed": True},
+    {"completed_annual_period_required": False},
+    {"annual_period_end_definition": "the fiscal year-end of the company"},
+    # "no eligible observation" silently resolved to something other than null
+    {"no_eligible_observation_policy": "use_nearest_available_year"},
+    {"no_eligible_observation_policy": "carry_forward_last_value"},
+    # the rule itself removed
+    {"observation_year_selection_rule": ""},
+    {"observation_year_operational_definition": []},
+])
+def test_observation_year_rule_mutations_fail_closed(built, index, mutation):
+    cand = copy.deepcopy(built["definition_lock"]["m3i2_candidates"][index])
+    cand.update(mutation)
+    with pytest.raises(ERROR):
+        m.assert_observation_year_selection_rule(cand)
+
+
+@pytest.mark.parametrize("index", [0, 1])
+@pytest.mark.parametrize("field", [
+    "observation_year_selection_rule",
+    "observation_year_operational_definition",
+    "selected_observation_tie_breaker",
+    "current_or_future_incomplete_calendar_year_allowed",
+    "no_eligible_observation_policy",
+    "annual_period_end_definition",
+    "completed_annual_period_required",
+    "fiscal_year_label_only_mapping_allowed",
+])
+def test_a_deleted_observation_year_field_fails_closed(built, index, field):
+    cand = copy.deepcopy(built["definition_lock"]["m3i2_candidates"][index])
+    cand.pop(field)
+    with pytest.raises(ERROR):
+        m.assert_observation_year_selection_rule(cand)
+
+
+@pytest.mark.parametrize("index", [0, 1])
+def test_uniqueness_claimed_after_rule_removal_fails_closed(built, index):
+    cand = copy.deepcopy(built["definition_lock"]["m3i2_candidates"][index])
+    assert cand["uniquely_determined"] is True
+    cand.pop("observation_year_selection_rule")
+    with pytest.raises(ERROR):
+        m.assert_uniqueness_requires_selection_rule(cand)
+
+    other = copy.deepcopy(built["definition_lock"]["m3i2_candidates"][index])
+    other["observation_year_operational_definition"] = []
+    with pytest.raises(ERROR):
+        m.assert_uniqueness_requires_selection_rule(other)
+
+
+def test_an_arbitrary_consecutive_fx_pair_is_not_eligible(built):
+    """Only the MAXIMUM eligible pair may be used, never any pair."""
+    fx = copy.deepcopy(built["definition_lock"]["m3i2_candidates"][1])
+    fx["observation_year_selection_rule"] = (
+        "Use any two consecutive annual observations available in the "
+        "selected vintage.")
+    fx["selected_observation_tie_breaker"] = "any_consecutive_pair"
+    with pytest.raises(ERROR):
+        m.assert_observation_year_selection_rule(fx)
+
+
+def test_prediction_time_contract_carries_the_selection_rules(built):
+    pt = built["prediction_time_contract"]
+    rules = pt["observation_year_selection_rules"]
+    assert set(rules) == {"cand_m3i_cpi_inflation_annual",
+                          "cand_m3i_fx_change_official_annual"}
+    assert pt["selected_observation_tie_breaker"] == (
+        "maximum_observation_year")
+    assert pt["current_or_future_incomplete_calendar_year_allowed"] is False
+    assert pt["no_eligible_observation_policy"] is None
+    assert pt["observation_years_selected_in_this_action"] == 0
+
+
+# --------------------------------------------------------------------------- #
+# Blocker 2 — historical-vintage semantic / currency-unit compatibility
+# --------------------------------------------------------------------------- #
+
+
+def test_both_candidates_require_vintage_semantic_compatibility(built):
+    for cand in built["definition_lock"]["m3i2_candidates"]:
+        m.assert_vintage_semantic_compatibility(cand)
+        assert cand["vintage_semantic_compatibility_required"] is True
+        assert cand["vintage_semantic_compatibility_status"] == "NOT_EXECUTED"
+        assert cand[
+            "historical_archive_metadata_assumed_identical_to_current"] is (
+            False)
+        assert cand[
+            "semantic_compatibility_evidence_required_before_value_use"] is True
+        assert cand["semantic_mismatch_policy"] == (
+            "null_and_invalid_for_coverage")
+        assert cand["alternative_series_after_mismatch_allowed"] is False
+        assert cand["vintage_evidence_required_fields"] == [
+            "archive edition identifier",
+            "release date and, if available, release time",
+            "Iran economy identity",
+            "indicator code",
+            "series title or archived label compatible with the locked title",
+            "frequency = annual",
+            "unit compatible with the locked unit",
+            "calendar-year observation semantics",
+            "raw archive artifact SHA-256",
+        ]
+
+
+def test_cpi_must_remain_an_annual_inflation_rate_series(built):
+    cpi = built["definition_lock"]["m3i2_candidates"][0]
+    text = cpi["semantic_compatibility_requirement"]
+    assert "inflation-RATE" in text and "percent" in text
+    assert "index-level" in text and "GDP-deflator" in text
+    assert "index level instead of annual rate" in cpi[
+        "semantic_mismatch_examples"]
+
+
+@pytest.mark.parametrize("index", [0, 1])
+@pytest.mark.parametrize("mutation", [
+    # the compatibility requirement switched off
+    {"vintage_semantic_compatibility_required": False},
+    {"semantic_compatibility_evidence_required_before_value_use": False},
+    # current metadata silently assumed to describe every historical vintage
+    {"historical_archive_metadata_assumed_identical_to_current": True},
+    # a mismatch tolerated instead of nulled
+    {"semantic_mismatch_policy": "use_value_anyway"},
+    {"semantic_mismatch_policy": "rescale_to_the_current_base_year"},
+    # a mismatch followed by an alternative-series selection
+    {"alternative_series_after_mismatch_allowed": True},
+    # verification falsely claimed complete in this metadata-only action
+    {"vintage_semantic_compatibility_status": "VERIFIED"},
+    # the evidence list quietly shortened
+    {"vintage_evidence_required_fields": ["indicator code"]},
+])
+def test_vintage_compatibility_mutations_fail_closed(built, index, mutation):
+    cand = copy.deepcopy(built["definition_lock"]["m3i2_candidates"][index])
+    cand.update(mutation)
+    with pytest.raises(ERROR):
+        m.assert_vintage_semantic_compatibility(cand)
+
+
+@pytest.mark.parametrize("index", [0, 1])
+@pytest.mark.parametrize("field", [
+    "vintage_semantic_compatibility_required",
+    "vintage_semantic_compatibility_status",
+    "historical_archive_metadata_assumed_identical_to_current",
+    "semantic_compatibility_evidence_required_before_value_use",
+    "semantic_mismatch_policy",
+    "alternative_series_after_mismatch_allowed",
+    "vintage_evidence_required_fields",
+])
+def test_an_absent_compatibility_field_fails_closed(built, index, field):
+    cand = copy.deepcopy(built["definition_lock"]["m3i2_candidates"][index])
+    cand.pop(field)
+    with pytest.raises(ERROR):
+        m.assert_vintage_semantic_compatibility(cand)
+
+
+def test_fx_pair_must_share_currency_denomination_and_valuation(built):
+    fx = built["definition_lock"]["m3i2_candidates"][1]
+    m.assert_fx_currency_compatibility(fx)
+    assert fx["same_currency_denomination_required_across_pair"] is True
+    assert fx[
+        "same_local_currency_valuation_definition_required_across_pair"] is True
+    assert fx["redenomination_or_unit_break_policy"] == (
+        "null_and_invalid_for_coverage")
+    assert fx["pair_compatibility_verification_required"] == [
+        "E_y and E_(y-1) use identical currency denomination",
+        "E_y and E_(y-1) use identical local-currency valuation convention",
+        "no currency-unit break or redenomination exists across the pair",
+        "E_y and E_(y-1) belong to the same archive vintage",
+    ]
+
+
+@pytest.mark.parametrize("mutation", [
+    # a currency-denomination mismatch tolerated
+    {"same_currency_denomination_required_across_pair": False},
+    # a valuation-definition mismatch tolerated
+    {"same_local_currency_valuation_definition_required_across_pair": False},
+    # a redenomination or unit break accepted instead of nulled
+    {"redenomination_or_unit_break_policy": "rescale_by_the_conversion_factor"},
+    {"redenomination_or_unit_break_policy": "accept"},
+    # the verification list shortened
+    {"pair_compatibility_verification_required": []},
+])
+def test_fx_currency_compatibility_mutations_fail_closed(built, mutation):
+    fx = copy.deepcopy(built["definition_lock"]["m3i2_candidates"][1])
+    fx.update(mutation)
+    with pytest.raises(ERROR):
+        m.assert_fx_currency_compatibility(fx)
+
+
+@pytest.mark.parametrize("field", m.FX_CURRENCY_COMPATIBILITY_REQUIRED_FIELDS)
+def test_an_absent_fx_currency_field_fails_closed(built, field):
+    fx = copy.deepcopy(built["definition_lock"]["m3i2_candidates"][1])
+    fx.pop(field)
+    with pytest.raises(ERROR):
+        m.assert_fx_currency_compatibility(fx)
+
+
+def test_an_unverified_vintage_is_never_valid_coverage(built):
+    gate = built["data_gate_contract"]
+    m.assert_unverified_vintage_is_not_valid_coverage(gate)
+    assert gate["unverified_vintage_counts_as_valid_coverage"] is False
+    assert gate["semantic_mismatch_policy"] == "null_and_invalid_for_coverage"
+    assert gate["alternative_series_after_mismatch_allowed"] is False
+
+
+@pytest.mark.parametrize("mutation", [
+    {"unverified_vintage_counts_as_valid_coverage": True},
+    {"semantic_mismatch_policy": "count_as_valid"},
+])
+def test_counting_an_unverified_vintage_fails_closed(built, mutation):
+    gate = copy.deepcopy(built["data_gate_contract"])
+    gate.update(mutation)
+    with pytest.raises(ERROR):
+        m.assert_unverified_vintage_is_not_valid_coverage(gate)
+
+
+def test_prediction_time_contract_records_zero_vintage_work(built):
+    pt = built["prediction_time_contract"]
+    assert pt["vintage_semantic_compatibility_required"] is True
+    assert pt["vintage_semantic_compatibility_status"] == "NOT_EXECUTED"
+    assert pt["historical_archive_metadata_assumed_identical_to_current"] is (
+        False)
+    assert pt["unverified_vintage_counts_as_valid_coverage"] is False
+    assert pt["vintage_compatibility_verifications_in_this_action"] == 0
+    assert pt["archive_editions_downloaded_in_this_action"] == 0
+    assert pt["vintages_applied_in_this_action"] == 0
+
+
 def test_a_reduced_one_variable_block_fails_closed():
     m.assert_m3i2_block_not_reduced(m.M3I2_BLOCK)
     with pytest.raises(ERROR):
@@ -675,7 +964,7 @@ def test_qc_passes_and_counts_every_execution_as_zero(built):
     qc = built["qc_report"]
     assert qc["all_pass"] is True
     assert qc["failed_count"] == 0
-    assert qc["assertion_count"] >= 35
+    assert qc["assertion_count"] >= 60
     assert qc["execution_counters"] == {
         "network_requests": 0,
         "data_files_downloaded": 0,
@@ -703,7 +992,14 @@ def test_decision_records_the_contract_state(built):
     assert d["m4_authorized"] is False and d["m4_started"] is False
     assert d["data_collection_started"] is False
     assert d["result_code"] == (
-        "M3I2_PROSPECTIVE_CONTRACT_LOCK_READY_FOR_INDEPENDENT_AUDIT")
+        "M3I2_PROSPECTIVE_CONTRACT_LOCK_READY_FOR_INDEPENDENT_REAUDIT")
+    assert d["correction_of_prior_head"] == (
+        "6351381283c14b248b4349b1d5ca240dde5cfe3f")
+    assert d["correction_widened_scope"] is False
+    assert d["correction_closes_audit_blockers"] == [
+        "observation_year_selection_rule_inside_the_selected_wdi_vintage",
+        "historical_archive_vintage_semantic_and_currency_unit_compatibility",
+    ]
 
 
 def test_next_pointer_is_informational_only(built):

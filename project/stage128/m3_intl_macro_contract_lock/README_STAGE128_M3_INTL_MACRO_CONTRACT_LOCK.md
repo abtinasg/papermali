@@ -53,6 +53,53 @@ confirmatory M3**.
 and manual regime splices are forbidden, as is any alternative indicator or
 transformation chosen **after** coverage or model inspection.
 
+## Which observation year, inside the selected vintage
+
+Choosing a pre-cutoff archive **vintage** does not say which annual
+**observation** that vintage contributes. Both candidates therefore carry an
+exact, operationally unique selection rule.
+
+An annual period ends on **December 31 of the labelled Gregorian observation year**, and only a period
+that has *finished* strictly before the pair cutoff is eligible
+(`completed_annual_period_required` = true,
+`current_or_future_incomplete_calendar_year_allowed` = false). Among eligible
+years the **maximum** is taken
+(`selected_observation_tie_breaker` = `maximum_observation_year`) — never
+the first or earliest. A fiscal-year label may never be used as a direct WDI
+year lookup, and if no eligible observation exists the value is **null**
+(`no_eligible_observation_policy` = `null`). No alternative indicator may be
+tried instead.
+
+* CPI — Within the selected pre-cutoff WDI archive vintage, choose the maximum Gregorian observation year y for which FP.CPI.TOTL.ZG[y] is non-missing and December 31 of y is strictly earlier than the pair prediction cutoff.
+* FX — Within the selected pre-cutoff WDI archive vintage, choose the maximum Gregorian observation year y such that E_y and E_(y-1) are both non-missing, positive, consecutive annual observations, December 31 of y is strictly earlier than the pair prediction cutoff, and both observations have the same verified currency denomination and valuation definition.
+
+## Historical-vintage semantic and currency compatibility
+
+The WDI archive warns that one indicator code may have carried a different base
+year or local-currency valuation in earlier releases, and that **current**
+metadata can be displayed alongside **archived** data. An archived vintage is
+therefore not self-describing:
+`historical_archive_metadata_assumed_identical_to_current` = **false**, and
+`semantic_compatibility_evidence_required_before_value_use` = **true**.
+
+Before any value from a selected edition may be used, a later evidence-capture
+action must verify, per edition: archive edition identifier, release date and, if available, release time, Iran economy identity, indicator code, series title or archived label compatible with the locked title, frequency = annual, unit compatible with the locked unit, calendar-year observation semantics, raw archive artifact SHA-256.
+
+For CPI: FP.CPI.TOTL.ZG must remain an annual CPI inflation-RATE series in percent in the selected archive vintage. An index-level, GDP-deflator or otherwise differently defined inflation series is a semantic mismatch.
+
+For FX, `E_y` and `E_(y-1)` must additionally share one currency denomination
+and one local-currency valuation convention, with no redenomination or
+unit break across the pair.
+
+Any mismatch — semantic, unit or redenomination — is
+`null_and_invalid_for_coverage`, an unverified vintage never counts towards
+candidate coverage, and **no alternative series or source may be tried after a
+mismatch or after coverage inspection**.
+
+In this action: `NOT_EXECUTED` — zero archive
+editions downloaded, zero observation years selected, zero compatibility
+verifications performed.
+
 ## M3I-3 — contingent and unresolved
 
 `intl_financing_rate` exists only as a contract shell against
@@ -101,7 +148,7 @@ All zero: network requests, data files downloaded, macro observations read,
 company rows loaded, final-test rows loaded, model fits, predictions,
 predictive metrics, coverage calculations, Holm calculations.
 
-QC: **46 assertions, 0 failed**,
+QC: **65 assertions, 0 failed**,
 all_pass = **True**.
 
 ## State

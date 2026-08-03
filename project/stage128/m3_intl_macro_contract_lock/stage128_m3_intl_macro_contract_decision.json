@@ -6,7 +6,13 @@
   "company_rows_loaded": 0,
   "contract_id": "stage128_m3_intl_macro_contract_lock",
   "contract_type": "prospective_contract_lock_only_no_data_no_gate_no_modeling",
-  "contract_version": "stage128_m3_intl_macro_contract_lock_v1",
+  "contract_version": "stage128_m3_intl_macro_contract_lock_v1_1",
+  "correction_closes_audit_blockers": [
+    "observation_year_selection_rule_inside_the_selected_wdi_vintage",
+    "historical_archive_vintage_semantic_and_currency_unit_compatibility"
+  ],
+  "correction_of_prior_head": "6351381283c14b248b4349b1d5ca240dde5cfe3f",
+  "correction_widened_scope": false,
   "coverage_calculations": 0,
   "data_collection_started": false,
   "data_files_downloaded": 0,
@@ -80,7 +86,7 @@
     ]
   },
   "repository": "abtinasg/papermali",
-  "result_code": "M3I2_PROSPECTIVE_CONTRACT_LOCK_READY_FOR_INDEPENDENT_AUDIT",
+  "result_code": "M3I2_PROSPECTIVE_CONTRACT_LOCK_READY_FOR_INDEPENDENT_REAUDIT",
   "source_main_branch": "main",
   "source_main_commit": "35aaf4b70e9341704ee38be6f8cf2e2519c70bb2"
 }
