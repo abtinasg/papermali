@@ -1,0 +1,38 @@
+cutoff_id,pair_prediction_cutoff_utc,pair_prediction_cutoff_date,number_of_development_pairs_sharing_cutoff,selected_wdi_archive_edition_id,selected_wdi_archive_release_available_at,selection_reason
+cut_2013-10-22,2013-10-22T00:00:00Z,2013-10-22,2,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2014-01-20,2014-01-20T00:00:00Z,2014-01-20,5,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2014-05-20,2014-05-20T00:00:00Z,2014-05-20,2,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2014-07-20,2014-07-20T00:00:00Z,2014-07-20,31,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2014-10-22,2014-10-22T00:00:00Z,2014-10-22,2,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2015-01-20,2015-01-20T00:00:00Z,2015-01-20,8,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2015-04-19,2015-04-19T00:00:00Z,2015-04-19,1,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2015-05-20,2015-05-20T00:00:00Z,2015-05-20,1,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2015-07-20,2015-07-20T00:00:00Z,2015-07-20,55,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2015-10-22,2015-10-22T00:00:00Z,2015-10-22,3,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2016-01-20,2016-01-20T00:00:00Z,2016-01-20,8,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2016-04-18,2016-04-18T00:00:00Z,2016-04-18,1,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2016-05-19,2016-05-19T00:00:00Z,2016-05-19,1,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2016-07-19,2016-07-19T00:00:00Z,2016-07-19,53,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2016-10-21,2016-10-21T00:00:00Z,2016-10-21,3,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2017-01-19,2017-01-19T00:00:00Z,2017-01-19,12,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2017-04-19,2017-04-19T00:00:00Z,2017-04-19,2,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2017-05-20,2017-05-20T00:00:00Z,2017-05-20,1,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2017-07-21,2017-07-21T00:00:00Z,2017-07-21,61,,,NO_VERIFIED_PRE_CUTOFF_EDITION
+cut_2017-10-22,2017-10-22T00:00:00Z,2017-10-22,3,WDI_2017_09_19,2017-09-20T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2018-01-20,2018-01-20T00:00:00Z,2018-01-20,12,WDI_2017_12_22,2017-12-23T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2018-04-19,2018-04-19T00:00:00Z,2018-04-19,1,WDI_2018_02_22,2018-02-23T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2018-05-20,2018-05-20T00:00:00Z,2018-05-20,2,WDI_2018_04_18,2018-04-19T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2018-07-20,2018-07-20T00:00:00Z,2018-07-20,62,WDI_2018_05_21,2018-05-22T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2018-08-22,2018-08-22T00:00:00Z,2018-08-22,1,WDI_2018_07_27,2018-07-28T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2018-10-22,2018-10-22T00:00:00Z,2018-10-22,3,WDI_2018_10_18,2018-10-19T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2019-01-20,2019-01-20T00:00:00Z,2019-01-20,11,WDI_2018_11_14,2018-11-15T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2019-04-19,2019-04-19T00:00:00Z,2019-04-19,4,WDI_2019_03_21,2019-03-22T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2019-05-20,2019-05-20T00:00:00Z,2019-05-20,2,WDI_2019_04_24,2019-04-25T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2019-07-20,2019-07-20T00:00:00Z,2019-07-20,79,WDI_2019_06_28,2019-06-29T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2019-08-22,2019-08-22T00:00:00Z,2019-08-22,1,WDI_2019_06_28,2019-06-29T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2019-10-22,2019-10-22T00:00:00Z,2019-10-22,3,WDI_2019_09_24,2019-09-25T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2019-12-21,2019-12-21T00:00:00Z,2019-12-21,1,WDI_2019_10_28,2019-10-29T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2020-01-20,2020-01-20T00:00:00Z,2020-01-20,12,WDI_2019_12_20,2019-12-21T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2020-04-18,2020-04-18T00:00:00Z,2020-04-18,7,WDI_2020_04_09,2020-04-10T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2020-05-19,2020-05-19T00:00:00Z,2020-05-19,2,WDI_2020_04_09,2020-04-10T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff
+cut_2020-07-19,2020-07-19T00:00:00Z,2020-07-19,81,WDI_2020_07_01,2020-07-02T00:00:00Z,latest verified WDI archive release with release_available_at < pair_prediction_cutoff

@@ -1,0 +1,31 @@
+{
+  "catalog_entries_captured": 0,
+  "contract_null_fields_populated": false,
+  "coverage_calculated": false,
+  "dataset_id": "IMF.STA:MFS_IR",
+  "dataset_title": "Monetary and Financial Statistics (MFS), Interest Rate",
+  "economy": "Iran",
+  "financing_metadata_decision": "NO_EXACT_CANDIDATE_IDENTIFIED_UNRESOLVED_METADATA_LOCK",
+  "forbidden_proxies": [
+    "deposit interest rate",
+    "deposit-rate ceiling",
+    "real interest rate",
+    "interest-rate spread",
+    "repo transaction volume",
+    "reverse-repo transaction volume",
+    "standing-facility transaction amount",
+    "currency-volume series",
+    "a differently defined policy rate relabelled as financing rate",
+    "World Bank FR.INR.LEND admitted without a separate Gate"
+  ],
+  "generated_for": "stage128-m3i2-official-source-evidence-capture",
+  "identification_status": null,
+  "identified_series_code": null,
+  "identified_series_title": null,
+  "m3i3_admitted": false,
+  "m3i3_lock_status": "UNRESOLVED_METADATA_LOCK",
+  "package_id": "stage128_m3i2_official_source_evidence_capture",
+  "predefined_acceptable_construct": "An exact official Iran rate representing the cost of bank lending/financing to the private sector, or an explicitly named financing/facility rate with the same economic construct.",
+  "selection_used_predictive_outcomes_or_coverage": false,
+  "series_values_joined": false
+}

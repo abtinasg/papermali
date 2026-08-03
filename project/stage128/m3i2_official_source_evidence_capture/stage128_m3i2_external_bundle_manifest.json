@@ -1,0 +1,142 @@
+{
+  "bundle_basename": "papermali_stage128_m3i2_official_source_evidence_bundle_v1",
+  "bundle_member_count": 24,
+  "bundle_members": [
+    {
+      "member_bytes": 1503,
+      "member_path": "capture_session_manifest.json",
+      "member_sha256": "3831a3a962d1816716b51604a5137d2ef41baa2e1d98d375b1eeb961c01c849d"
+    },
+    {
+      "member_bytes": 8721,
+      "member_path": "official_request_manifest.csv",
+      "member_sha256": "a13a68991766c3bbee22904d4ba1e89fb88f8f32d92b1632a56da7ef3cd485a1"
+    },
+    {
+      "member_bytes": 29002,
+      "member_path": "official_response_manifest.csv",
+      "member_sha256": "c4a4a688b99e29bf02dd7bbae381865afa573d3b974e8ce563e641317d135551"
+    },
+    {
+      "member_bytes": 68648651,
+      "member_path": "raw/0d8bb621494aeb6d__WDI_excel_2019_04_24.zip.attempt1",
+      "member_sha256": "0d8bb621494aeb6dc867538211ae4d8a98230552b96398f43d14a0fdc87148d3"
+    },
+    {
+      "member_bytes": 71312,
+      "member_path": "raw/100f3ad8efef9483__wdi-archives.html.attempt1",
+      "member_sha256": "100f3ad8efef9483206306115876f972e1a117b8af1863a0e5ae27ffe8defd8e"
+    },
+    {
+      "member_bytes": 65132872,
+      "member_path": "raw/319224671ad12a03__WDI_excel_2020_04_09.zip.attempt1",
+      "member_sha256": "319224671ad12a0326fbee05d798192fdf9459a96f4f22a5f2567085046e742b"
+    },
+    {
+      "member_bytes": 68997371,
+      "member_path": "raw/37043431fb5f2a29__WDI_excel_2018_11_14.zip.attempt1",
+      "member_sha256": "37043431fb5f2a296f33dec9dd23c2a3c2afa48dfe2569e905a2f9bad753c08d"
+    },
+    {
+      "member_bytes": 67859088,
+      "member_path": "raw/3725227a85ac0f16__WDI_excel_2019_03_21.zip.attempt1",
+      "member_sha256": "3725227a85ac0f16e76de7906b0d1369b179d3c052f3fa01a780770b12a36405"
+    },
+    {
+      "member_bytes": 64949696,
+      "member_path": "raw/3fd132cf8dc3ca5a__WDI_excel_2018_04_18.zip.attempt1",
+      "member_sha256": "3fd132cf8dc3ca5a96e9205ff4e47288b1abbd673662d57e0bff5de36ce1b2b7"
+    },
+    {
+      "member_bytes": 67238622,
+      "member_path": "raw/4a46abe6242d3227__WDI_excel_2018_07_27.zip.attempt1",
+      "member_sha256": "4a46abe6242d322733bc4be5e3023b8004643e73ab260525a00eace751063463"
+    },
+    {
+      "member_bytes": 53192,
+      "member_path": "raw/5ab69a3434038e64__FP.CPI.TOTL.ZG.attempt1",
+      "member_sha256": "5ab69a3434038e64caf85ad48894cf5920ffceebae7a7aa0e4faed57acbbe0d9"
+    },
+    {
+      "member_bytes": 64787514,
+      "member_path": "raw/61369fffef6abbae__WDI_excel_2019_10_28.zip.attempt1",
+      "member_sha256": "61369fffef6abbae3ba24689bed2268f70c127144d227cf590a92b419f291e65"
+    },
+    {
+      "member_bytes": 56469,
+      "member_path": "raw/725322492323cb62__PA.NUS.FCRF.attempt1",
+      "member_sha256": "725322492323cb62e054cbdf077286428ec4f2bb199c4b12c6d0dd03e8116ff2"
+    },
+    {
+      "member_bytes": 64662263,
+      "member_path": "raw/7919e43045833232__WDI_excel_2017_12_22.zip.attempt1",
+      "member_sha256": "7919e43045833232e97ce906c97d496703a70db302075e8b8e1393777ed78fb6"
+    },
+    {
+      "member_bytes": 67681097,
+      "member_path": "raw/7fd181a477eeb88f__WDI_excel_2018_05_21.zip.attempt1",
+      "member_sha256": "7fd181a477eeb88f952cd8f653ffe676a0097e70b6abe8088511745cf69c9df0"
+    },
+    {
+      "member_bytes": 69724643,
+      "member_path": "raw/8387106a5aa5de17__WDI_excel_2019_06_28.zip.attempt1",
+      "member_sha256": "8387106a5aa5de174aeeec58bb925f266cb72345427ef8cd5570d893516d4bca"
+    },
+    {
+      "member_bytes": 263155,
+      "member_path": "raw/8d267f5a73b42b72__IMF.STA_3AMFS_IR.attempt1",
+      "member_sha256": "8d267f5a73b42b727b905f1d793e0678c38bb274691ec2ead9d54c45869fa1f0"
+    },
+    {
+      "member_bytes": 66268535,
+      "member_path": "raw/99008d3a12c9054b__WDI_excel_2020_07_01.zip.attempt1",
+      "member_sha256": "99008d3a12c9054b12b161f23d017b3a09971734a601f52844c7d544c86b42c8"
+    },
+    {
+      "member_bytes": 64818326,
+      "member_path": "raw/c43c055ebb9b969e__WDI_excel_2019_12_20.zip.attempt1",
+      "member_sha256": "c43c055ebb9b969e01b315416573e537da82cce656bbb87aa16f71c83f284c7e"
+    },
+    {
+      "member_bytes": 64333467,
+      "member_path": "raw/c50764e75ef9b955__WDI_excel_2017_09_19.zip.attempt1",
+      "member_sha256": "c50764e75ef9b95515283f9b69a8f70d20fc9527ccdf00b74ce632089729c6c5"
+    },
+    {
+      "member_bytes": 55991,
+      "member_path": "raw/d2a8a0ed63e7dc77__archives.attempt1",
+      "member_sha256": "d2a8a0ed63e7dc778d62f02ba861c08bae957526f8c20b9cd293ca7898f1e81d"
+    },
+    {
+      "member_bytes": 69636291,
+      "member_path": "raw/d771e9fdfe82a6ee__WDI_excel_2019_09_24.zip.attempt1",
+      "member_sha256": "d771e9fdfe82a6eeac7bcdc0b9840677033b6cbe0e3edf1faa35a7b89ffc4454"
+    },
+    {
+      "member_bytes": 63156170,
+      "member_path": "raw/eb26afca7c7ce997__WDI_excel_2018_02_22.zip.attempt1",
+      "member_sha256": "eb26afca7c7ce997c8a012b872b6053c51683a5c30300db873b2ac51f3ebed12"
+    },
+    {
+      "member_bytes": 67900918,
+      "member_path": "raw/f1efbbc719ca7e77__WDI_excel_2018_10_18.zip.attempt1",
+      "member_sha256": "f1efbbc719ca7e770958514e1d661e8a26e702b48b9d31cf749b1a87d69b5b8f"
+    }
+  ],
+  "bundle_parts": [
+    {
+      "byte_size": 1066004147,
+      "filename": "papermali_stage128_m3i2_official_source_evidence_bundle_v1.zip",
+      "part_number": 1,
+      "sha256": "4f47586803d9578024e1be88cc353c59be2fa7d8b0ca4f8e3f6aa5d81e9b481c",
+      "total_parts": 1
+    }
+  ],
+  "bundle_total_bytes": 1066004147,
+  "deterministic_member_order": true,
+  "local_capture_directory_preserved": "/private/tmp/claude-501/-Users-aliehpourdast-Desktop-papermali/1c3fc809-9a91-44ba-b866-991384587593/scratchpad/m3i2_capture",
+  "normalized_member_timestamps": true,
+  "raw_bytes_available_for_independent_handoff": true,
+  "raw_bytes_committed_to_git": false,
+  "raw_bytes_deleted_after_hashing": false
+}

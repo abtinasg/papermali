@@ -1,0 +1,277 @@
+{
+  "all_pass": true,
+  "assertion_count": 53,
+  "assertions": [
+    {
+      "name": "human_authorization_is_byte_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "authorization_is_one_action_and_consumed",
+      "status": "PASS"
+    },
+    {
+      "name": "authorization_not_inferred_from_a_pointer",
+      "status": "PASS"
+    },
+    {
+      "name": "merged_contract_package_is_byte_identical",
+      "status": "PASS"
+    },
+    {
+      "name": "merged_contract_reads_back_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "contract_not_modified_by_this_action",
+      "status": "PASS"
+    },
+    {
+      "name": "offline_layer_has_no_network_import",
+      "status": "PASS"
+    },
+    {
+      "name": "no_model_or_estimator_path",
+      "status": "PASS"
+    },
+    {
+      "name": "no_forbidden_computation_path",
+      "status": "PASS"
+    },
+    {
+      "name": "no_unofficial_source_referenced",
+      "status": "PASS"
+    },
+    {
+      "detail": "{\"company_macro_joins\": 0, \"coverage_calculations\": 0, \"data_gate_executions\": 0, \"feature_materializations\": 0, \"final_test_rows_read\": 0, \"holm_calculations\": 0, \"model_fits\": 0, \"predictions\": 0, \"predictive_metrics\": 0}",
+      "name": "every_forbidden_execution_counter_is_zero",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2017_09_19",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2017_09_19",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2017_12_22",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2017_12_22",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2018_02_22",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2018_02_22",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2018_04_18",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2018_04_18",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2018_05_21",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2018_05_21",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2018_07_27",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2018_07_27",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2018_10_18",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2018_10_18",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2018_11_14",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2018_11_14",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2019_03_21",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2019_03_21",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2019_04_24",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2019_04_24",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2019_06_28",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2019_06_28",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2019_09_24",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2019_09_24",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2019_10_28",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2019_10_28",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2019_12_20",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2019_12_20",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2020_04_09",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2020_04_09",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2020_07_01",
+      "status": "PASS"
+    },
+    {
+      "name": "semantic_pass_is_fully_evidenced:WDI_2020_07_01",
+      "status": "PASS"
+    },
+    {
+      "name": "every_semantic_status_is_in_the_allowed_vocabulary",
+      "status": "PASS"
+    },
+    {
+      "name": "absence_of_metadata_is_unresolved_not_fail",
+      "status": "PASS"
+    },
+    {
+      "name": "evidence_status_is_in_the_allowed_vocabulary",
+      "status": "PASS"
+    },
+    {
+      "name": "result_code_matches_the_evidence_status",
+      "status": "PASS"
+    },
+    {
+      "name": "no_data_gate_or_admission_claim",
+      "status": "PASS"
+    },
+    {
+      "name": "next_pointer_is_unauthorized",
+      "status": "PASS"
+    },
+    {
+      "name": "final_test_remains_locked",
+      "status": "PASS"
+    },
+    {
+      "name": "merge_is_not_authorized",
+      "status": "PASS"
+    },
+    {
+      "name": "predecessor_pr_recorded_as_merged_history",
+      "status": "PASS"
+    },
+    {
+      "name": "row_counts_are_labelled_integrity_not_coverage",
+      "status": "PASS"
+    }
+  ],
+  "counts_are_integrity_counts_not_coverage": true,
+  "evidence_counts": {
+    "capture_session_closed": true,
+    "company_macro_joins": 0,
+    "counts_are_integrity_counts_not_coverage": true,
+    "coverage_calculations": 0,
+    "cutoffs_with_verified_pre_cutoff_edition": 18,
+    "cutoffs_without_verified_pre_cutoff_edition": 19,
+    "data_gate_executions": 0,
+    "development_pairs_behind_cutoff_plan": 539,
+    "development_pairs_without_verified_pre_cutoff_edition": 252,
+    "earliest_development_cutoff": "2013-10-22T00:00:00Z",
+    "earliest_verified_archive_edition_available_at": "2017-09-20T00:00:00Z",
+    "external_bundle_available_for_handoff": true,
+    "feature_materializations": 0,
+    "final_test_rows_read": 0,
+    "financing_metadata_decision": "NO_EXACT_CANDIDATE_IDENTIFIED_UNRESOLVED_METADATA_LOCK",
+    "holm_calculations": 0,
+    "imf_catalog_entries_captured": 0,
+    "indicator_substitution_occurred": false,
+    "integrity_violations": [],
+    "locked_series_rows_extracted": 1878,
+    "model_fits": 0,
+    "official_requests_attempted": 21,
+    "official_responses_retained": 21,
+    "official_responses_successful": 21,
+    "offline_rebuild_reproduces_committed_artifacts": true,
+    "predictions": 0,
+    "predictive_metrics": 0,
+    "raw_bytes_retained_for_every_capture_claim": true,
+    "raw_bytes_retained_objects": 21,
+    "raw_bytes_total": 1066295643,
+    "raw_hashes_verified": true,
+    "required_editions_captured": 16,
+    "required_editions_total": 16,
+    "required_editions_with_verified_release_available_at": 16,
+    "semantic_fail_integrity_count": 0,
+    "semantic_pass_count": 32,
+    "semantic_unresolved_count": 0,
+    "unique_development_cutoffs": 37,
+    "wdi_editions_discovered": 110
+  },
+  "failed_assertions": [],
+  "failed_count": 0,
+  "forbidden_execution_counters": {
+    "company_macro_joins": 0,
+    "coverage_calculations": 0,
+    "data_gate_executions": 0,
+    "feature_materializations": 0,
+    "final_test_rows_read": 0,
+    "holm_calculations": 0,
+    "model_fits": 0,
+    "predictions": 0,
+    "predictive_metrics": 0
+  },
+  "generated_for": "stage128-m3i2-official-source-evidence-capture",
+  "package_id": "stage128_m3i2_official_source_evidence_capture",
+  "scope_note": "This QC checks an EVIDENCE package. Source-level row counts are input-integrity counts and are never candidate coverage. No company-panel join, feature materialization, coverage calculation, Data Gate, model fit or final-test read occurred."
+}
