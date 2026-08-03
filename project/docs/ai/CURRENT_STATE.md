@@ -8,12 +8,12 @@ _Generated from the repository (git + QC). Do not edit by hand._
 ## Snapshot
 
 - **Stage / Batch:** Stage128 / None
-- **Active workstream:** `stage128_m3i2_prospective_contract_lock`
+- **Active workstream:** `stage128_m3i2_official_source_evidence_capture`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `stage128-m3i2-official-source-evidence-capture`
-- **Last stage commit:** `4a88a24ea9cbcf362967c518e9f7232c86fe3940`
-- **Generated from commit:** `22b747d4c55febe6839685ef9805d795eb9d8fa6` (branch `stage128-m3i2-prospective-contract-lock`, informational)
-- **Baseline:** `origin/main` @ `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`
+- **Next research action:** `stage128-m3i2-official-source-evidence-review`
+- **Last stage commit:** `650757555953569a33dd5034ffd8010720dbc56b`
+- **Generated from commit:** `b75f351f2263d394eb92e040115b9e8992bc8933` (branch `stage128-m3i2-official-source-evidence-capture`, informational)
+- **Baseline:** `origin/main` @ `cf23771a383bf9ad8f7ff2855c216c9a240647ff`
 
 ## Current-state validation
 
@@ -126,19 +126,48 @@ _The data-admission Gate for the exact frozen three-variable M3 macro block (`cp
 - ⛔ **Research pointer NOT advanced** — `m3_macro_data_gate_human_review_required` = True; 8 recorded blocker/unresolved reasons. Missing evidence was recorded as null, never scored as zero, and never converted into an observed failure.
 - Package: `project/stage128/m3_macro_data_gate/`; interpretation: `project/stage128/m3_macro_data_gate/README_STAGE128_M3_MACRO_DATA_GATE.md`
 
-### Stage128 — M3I-2 prospective contract lock (contract only)
+### Stage128 — M3I-2 prospective contract lock (HISTORICAL, contract-time)
 
 _A metadata-only, PROSPECTIVE source/definition/statistical contract lock for the SUPPLEMENTARY international-macro block M3I-2 (`intl_cpi_inflation_annual`, `intl_fx_change_official_annual`), plus a contingent, UNRESOLVED M3I-3 financing shell. It is not a substitution, correction or continuation of the frozen M3-CBI block, and it is never confirmatory M3._
 
+> **This section describes CONTRACT-TIME state and is retained as history.** Every retrieval/PR-topology statement below was true at the moment of the contract lock. The retrieval and PR-topology facts were later superseded by the independent action `stage128-m3i2-official-source-evidence-capture` (see the evidence-capture section below). The **scientific contract itself is unchanged** — it remains `PROSPECTIVELY_LOCKED_NO_DATA`, unadmitted and ungated.
+
 - ✅ **Contract status:** `PROSPECTIVELY_LOCKED_NO_DATA` — authorization consumed: True (one action only, not standing)
 - ⛔ **No data, no Gate, no modeling:** 0 network requests, 0 macro observations read, 0 company rows loaded, 0 coverage calculations, 0 model fits, 0 predictions, 0 Holm calculations
-- ⛔ **M3I-2 retrieval started:** False — **Data Gate executed:** False — **block admitted:** False — **modeling started:** False
+- ⛔ **At contract-lock time — M3I-2 retrieval started:** False (`contract_lock_time_marker_superseded_by_official_source_evidence_capture` — the contract-time marker is retained for compatibility; official-source evidence WAS captured later under a separate action, see `stage128_m3i2_official_source_retrieval_completed`) — **Data Gate executed:** False — **block admitted:** False — **modeling started:** False
 - ⛔ **M3I-3 financing metadata lock:** `UNRESOLVED_METADATA_LOCK` — **admitted:** False
 - **M3-CBI preserved unchanged:** Gate status `UNRESOLVED_M3_DATA_GATE`, block admitted False
 - **Scientific provenance baseline:** PR #73 head `e6db63fb7d105f0d3a39db101c9e364161c367e9` — protected hashes are verified against that commit permanently; a merge or retarget never moves it
-- **Live PR topology:** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and remains a **Draft** — merged = False, no merge authorization
-- **Next research action (pointer only):** `stage128-m3i2-official-source-evidence-capture` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False). Data collection has **not** started.
+- **PR topology at contract-lock time (HISTORICAL, not live):** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and never merged under this action — merged = False, no merge authorization. Semantics: `historical_contract_lock_topology_superseded_by_pr75`. PR #74 is the **historical contract-lock PR**, never the current draft; the live evidence-capture PR is identified in the evidence-capture section below.
+- **Next research action (pointer only):** `stage128-m3i2-official-source-evidence-review` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
 - Package: `project/stage128/m3_intl_macro_contract_lock/`; interpretation: `project/stage128/m3_intl_macro_contract_lock/README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`
+
+### Stage128 — M3I-2 official-source evidence capture
+
+_The action that supersedes the contract-time "no retrieval" statements above. It is ACQUISITION ONLY: official bytes were requested, retained and hashed. Every count below is an input-integrity count and **never coverage**. Capture is not admission — it answers nothing about coverage, the Data Gate or modeling._
+
+- ✅ **Evidence capture executed:** True — action `stage128-m3i2-official-source-evidence-capture`, carried by **PR #75** (the LIVE evidence-capture PR)
+- ✅ **Official-source retrieval completed:** True — this is acquisition only and is **not** a Data Gate, **not** coverage and **not** an admission
+- **Live PR topology:** PR #75 → base `main` @ `cf23771a383bf9ad8f7ff2855c216c9a240647ff` — draft = True, merged = False, head derived from `observed_repository_head_commit_at_generation` (never pinned)
+- **Official traffic:** 21 requests — 21 successful responses — 21 responses retained — raw bytes retained 1,066,295,643
+- **Archive editions:** 16 captured and held out of 110 discovered — verified required editions 0 of 0 — verified release dates 0 of 110
+- ⛔ **Unresolved:** cutoffs 37 of 37 — development pairs 539 of 539
+- **Semantic compatibility:** CPI 16 PASS — FX 16 UNRESOLVED
+- ⛔ **Evidence status:** `UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE` — result code `M3I2_OFFICIAL_SOURCE_EVIDENCE_CAPTURE_UNRESOLVED_READY_FOR_INDEPENDENT_AUDIT`
+- ⛔ **Data Gate:** NOT_EXECUTED (`m3i2_data_gate_executed` = False) — **M3I-2 admitted:** False — **modeling started:** False — **Final Test locked:** True — **M4 authorized:** False — **merge authorized:** False
+- Package: `project/stage128/m3i2_official_source_evidence_capture/`; interpretation: `project/stage128/m3i2_official_source_evidence_capture/README_STAGE128_M3I2_OFFICIAL_SOURCE_EVIDENCE_CAPTURE.md`
+
+### Stage128 — M3I-2 independent bundle integrity audit (integrity only)
+
+_A post-capture, read-only audit of the external evidence bundle by an auditor independent of the PR author and of the bundle creator. Its scope is bytes, not science: SHA-256, ZIP CRC, multipart structure, manifest consistency, official-source restrictions and raw-member integrity. It is **not** coverage, **not** the Data Gate, **not** an M3I-2 admission, **not** modeling and **not** Final Test access._
+
+- ✅ **Result:** `INDEPENDENT_BUNDLE_INTEGRITY_AUDIT_PASS` — verification type `external_independent_bundle_integrity_audit`
+- ✅ **Independence:** independent of PR author = True — independent of bundle creator = True — participated in artifact creation = False — identity disclosure: `WITHHELD_BY_HUMAN_SUPERVISOR`
+- **Audited object:** PR #75 head `187c628a17f6e429fbf6455412f5f655d2f3602e` — primary members expected/found 24/24
+- **Capture-time provenance retained:** the bundle manifest still records `delivered_to_independent_auditor` = False and `independently_verified_by_auditor` = False. Those were true of the moment the bundle was built, are kept unmodified, and are **superseded — not corrected** — by the post-capture audit record.
+- ⛔ **Nothing scientific moved:** M3I-2 evidence status `UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE` — admitted False — Data Gate executed False — modeling started False — Final Test locked True — M4 authorized False — merge authorized False
+- ⛔ A passing integrity audit does **not** resolve the historical-vintage evidence problem and does **not** admit M3I-2.
+- Attestation: `project/stage128/m3i2_official_source_evidence_capture/stage128_m3i2_independent_bundle_integrity_audit_attestation.md`
 
 ### Last completed scientific micro-part QC
 
@@ -189,5 +218,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `9f90c95e127a179337687e7d5dd98c3f4c6269760901db9662ebfa23a33cf847`_
-_generated_at_utc: 2026-08-03T09:22:45Z (informational)_
+_state_fingerprint: `49d46c008ad686dc2fc8588c76280fc00789de7c2577d4e3813d2d2060eb88aa`_
+_generated_at_utc: 2026-08-03T21:40:58Z (informational)_

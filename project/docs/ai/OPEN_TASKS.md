@@ -3,7 +3,7 @@
 Human-maintained. The authoritative "next action" ID lives in `ROADMAP.md`
 front matter; this file is the working description.
 
-## Active research workstream: `stage128-m3i2-prospective-contract-lock`
+## Active research workstream: `stage128-m3i2-official-source-evidence-capture`
 
 The CURRENT workstream is the Stage128 **M3I-2 supplementary international
 macro CONTRACT** workstream. A contract lock is **metadata only**: no macro
@@ -24,6 +24,60 @@ history; the M3-CBI block remains `UNRESOLVED_M3_DATA_GATE` and unadmitted,
 and **M3I-2 does not replace, correct or continue it**.
 
 ### Current scientific action
+
+`stage128-m3i2-official-source-evidence-capture` — **COMPLETE**, recorded under
+its own explicit one-action human authorization (695 UTF-8 bytes, SHA-256
+`eb0230b0…d95b06`, 2026-08-03), which was CONSUMED by the recording. The
+authorization names this action and the expected baseline SHA explicitly; it
+was **not** inferred from a pointer, a branch name or a prior prompt hash.
+
+**Evidence status: `UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE`.**
+
+What was captured, from official hosts only, in one controlled session
+(HTTPS-only, descriptive User-Agent, ≤3 attempts per request, every redirect
+recorded):
+
+- **21 objects requested, 21 successful, 1,066,295,643 raw bytes retained and
+  hashed.** Nothing was deleted after hashing. The external bundle
+  `papermali_stage128_m3i2_official_source_evidence_bundle_v1.zip`
+  (1,066,004,147 bytes, SHA-256 `4f47586803d9578024e1be88cc353c59be2fa7d8b0ca4f8e3f6aa5d81e9b481c`,
+  24 members) is available for independent handoff; raw bytes are **not**
+  committed to Git.
+- **37 unique development cutoffs over 539 pairs** — an input-integrity count,
+  **never coverage**. Cutoffs came only from
+  `project/stage128/stage128_m2_d2_development_features.csv`, reading only pair
+  identity, target year and `pair_cutoff_date`. No target, financial, market or
+  macro column was read; no final-test directory was searched.
+- **110 archive editions discovered** from the official listing; 66 carry a
+  day-precision release date, 44 only year+month. A month is not a release
+  date, so those can never be a verified pre-cutoff vintage.
+- **16 required editions selected value-blind and all 16 captured**, yielding
+  **1,878 locked-series rows** for Iran (`IRN`), restricted to
+  `FP.CPI.TOTL.ZG` and `PA.NUS.FCRF`, and **32/32 semantic-compatibility rows
+  PASS**.
+
+**Why the status is UNRESOLVED.** The earliest verified archive edition is
+available at `2017-09-20T00:00:00Z`, but the earliest development cutoff is
+`2013-10-22`. **19 of 37 cutoffs — 252 of 539 development pairs — have no
+verified pre-cutoff vintage.** That gap is recorded as UNRESOLVED; it is never
+turned into zero coverage and never reported as an observed failure.
+
+**Financing.** `NO_EXACT_CANDIDATE_IDENTIFIED_UNRESOLVED_METADATA_LOCK`. M3I-3
+stays `UNRESOLVED_METADATA_LOCK`, `admitted=false`, and the merged contract's
+null fields were **not** populated. Financing being unresolved does not
+invalidate the M3I-2 evidence.
+
+**Unchanged.** `project/stage128/m3_intl_macro_contract_lock/**` is
+byte-identical to `cf23771a…0647ff`. M3-CBI stays `UNRESOLVED_M3_DATA_GATE`,
+not admitted. Execution audit, all zero: company macro joins, feature
+materializations, coverage calculations, Data Gate executions, model fits,
+predictions, predictive metrics, Holm calculations, final-test rows read.
+
+**Evidence capture is not admission.** It does not authorize the Data Gate. The
+next pointer is `stage128-m3i2-official-source-evidence-review` with
+`next_research_action_authorized=false`.
+
+### Predecessor scientific action
 
 `stage128-m3i2-prospective-contract-lock` — **COMPLETE**, recorded once under
 its own explicit one-action human authorization (28 UTF-8 bytes, SHA-256

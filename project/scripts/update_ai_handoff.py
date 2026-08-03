@@ -598,6 +598,9 @@ VOLATILE_FIELDS = frozenset({
     "observed_repository_head_commit",
     "generated_from_commit",
     "baseline_commit",
+    # The live evidence-capture PR head is the CURRENT repository head, so it
+    # is HEAD-relative by construction and must never be pinned to a stale SHA.
+    "stage128_m3i2_live_pr_head_commit",
 })
 
 GENERATOR_VERSION = 2
@@ -2770,6 +2773,13 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # Must come last: the supplementary M3I-2 contract lock succeeds the
         # CBI M3 Gate as the live action and owns the research pointers.
         **derive_stage128_m3i2_contract_lock_markers(root),
+        **derive_stage128_m3i2_evidence_capture_markers(root),
+        # Post-capture, read-only bundle audit: integrity only, so it may add
+        # audit markers but must never move the scientific state.
+        **derive_stage128_m3i2_independent_bundle_audit_markers(root),
+        # Must come last: it publishes the LIVE evidence-capture PR topology
+        # and demotes the contract-lock topology to explicit history.
+        **derive_stage128_m3i2_live_pr_topology_markers(root),
     }
 
 
@@ -3673,7 +3683,10 @@ def build_handoff_state(root: str):
         # contract lock is live, its predecessor is the CBI M3 macro data
         # Gate, not the older M2 D2 boundary-month workstream.
         "active_workstream_predecessor_context": (
-            _STAGE128_M3_ACTIVE_WORKSTREAM_ID.replace("-", "_")
+            _STAGE128_M3I2_ACTIVE_WORKSTREAM_ID.replace("-", "_")
+            if derive_stage128_m3i2_evidence_capture_markers(root).get(
+                "stage128_m3i2_evidence_capture_executed")
+            else _STAGE128_M3_ACTIVE_WORKSTREAM_ID.replace("-", "_")
             if derive_stage128_m3i2_contract_lock_markers(root).get(
                 "stage128_m3i2_contract_lock_executed")
             else "stage128_m2_d2_boundary_month_equity_return"),
@@ -3697,6 +3710,11 @@ def build_handoff_state(root: str):
     }
     record.update(state["qc_workflow"])
     record.update(state["m1_robustness_decision"])
+    # The live M3I-2 PR head is the CURRENT repository head: informational and
+    # HEAD-relative (see VOLATILE_FIELDS), never pinned to a superseded SHA and
+    # never part of the fingerprinted semantic state.
+    if record.get("stage128_m3i2_live_pr_number") is not None:
+        record["stage128_m3i2_live_pr_head_commit"] = head
     return record, state, frozen
 
 
@@ -4313,7 +4331,8 @@ def render_current_state(record: dict) -> str:
         ]
     if record.get("stage128_m3i2_contract_lock_executed"):
         lines += [
-            "### Stage128 — M3I-2 prospective contract lock (contract only)\n",
+            "### Stage128 — M3I-2 prospective contract lock "
+            "(HISTORICAL, contract-time)\n",
             "_A metadata-only, PROSPECTIVE source/definition/statistical "
             "contract lock for the SUPPLEMENTARY international-macro block "
             "M3I-2 (`intl_cpi_inflation_annual`, "
@@ -4321,6 +4340,14 @@ def render_current_state(record: dict) -> str:
             "M3I-3 financing shell. It is not a substitution, correction or "
             "continuation of the frozen M3-CBI block, and it is never "
             "confirmatory M3._\n",
+            "> **This section describes CONTRACT-TIME state and is retained "
+            "as history.** Every retrieval/PR-topology statement below was "
+            "true at the moment of the contract lock. The retrieval and "
+            "PR-topology facts were later superseded by the independent "
+            "action `stage128-m3i2-official-source-evidence-capture` "
+            "(see the evidence-capture section below). The **scientific "
+            "contract itself is unchanged** — it remains "
+            "`PROSPECTIVELY_LOCKED_NO_DATA`, unadmitted and ungated.\n",
             "- ✅ **Contract status:** "
             f"`{record.get('stage128_m3i2_contract_status')}` — "
             "authorization consumed: "
@@ -4329,8 +4356,13 @@ def render_current_state(record: dict) -> str:
             "- ⛔ **No data, no Gate, no modeling:** 0 network requests, "
             "0 macro observations read, 0 company rows loaded, 0 coverage "
             "calculations, 0 model fits, 0 predictions, 0 Holm calculations",
-            "- ⛔ **M3I-2 retrieval started:** "
-            f"{record.get('m3i2_retrieval_started')} — **Data Gate executed:** "
+            "- ⛔ **At contract-lock time — M3I-2 retrieval started:** "
+            f"{record.get('m3i2_retrieval_started')} "
+            f"(`{record.get('m3i2_retrieval_started_semantics')}` — the "
+            "contract-time marker is retained for compatibility; official-"
+            "source evidence WAS captured later under a separate action, see "
+            "`stage128_m3i2_official_source_retrieval_completed`) — "
+            "**Data Gate executed:** "
             f"{record.get('m3i2_data_gate_executed')} — **block admitted:** "
             f"{record.get('m3i2_block_admitted')} — **modeling started:** "
             f"{record.get('m3i2_modeling_started')}",
@@ -4345,24 +4377,150 @@ def render_current_state(record: dict) -> str:
             f"`{record.get('stage128_m3i2_baseline_commit')}` — protected "
             "hashes are verified against that commit permanently; a merge or "
             "retarget never moves it",
-            "- **Live PR topology:** PR #73 **was merged** by merge commit "
+            "- **PR topology at contract-lock time (HISTORICAL, not live):** "
+            "PR #73 **was merged** by merge commit "
             f"`{record.get('stage128_m3i2_predecessor_pr_merge_commit')}`; "
-            f"PR #{record.get('stage128_m3i2_live_pr_number')} was "
+            f"PR #{record.get('stage128_m3i2_contract_time_pr_number')} was "
             "subsequently retargeted to "
-            f"`{record.get('stage128_m3i2_live_pr_base_branch')}` (base "
-            f"`{record.get('stage128_m3i2_live_pr_base_commit')}`) and "
-            "remains a **Draft** — "
-            f"merged = {record.get('stage128_m3i2_live_pr_merged')}, no merge "
-            "authorization",
+            f"`{record.get('stage128_m3i2_contract_time_pr_base_branch')}` "
+            f"(base `{record.get('stage128_m3i2_contract_time_pr_base_commit')}`"
+            ") and never merged under this action — merged = "
+            f"{record.get('stage128_m3i2_contract_time_pr_merged')}, no merge "
+            "authorization. Semantics: "
+            f"`{record.get('stage128_m3i2_contract_time_pr_semantics')}`. "
+            f"PR #{record.get('stage128_m3i2_contract_time_pr_number')} is the "
+            "**historical contract-lock PR**, never the current draft; the "
+            "live evidence-capture PR is identified in the evidence-capture "
+            "section below.",
             "- **Next research action (pointer only):** "
             f"`{record.get('next_research_action_id')}` — it is **not "
             "authorized** and a pointer is **not** an authorization "
             "(`next_research_action_authorized` = "
-            f"{record.get('next_research_action_authorized')}). Data "
-            "collection has **not** started.",
+            f"{record.get('next_research_action_authorized')}).",
             "- Package: `project/stage128/m3_intl_macro_contract_lock/`; "
             "interpretation: `project/stage128/m3_intl_macro_contract_lock/"
             "README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`",
+            "",
+        ]
+    if record.get("stage128_m3i2_evidence_capture_executed"):
+        lines += [
+            "### Stage128 — M3I-2 official-source evidence capture\n",
+            "_The action that supersedes the contract-time \"no retrieval\" "
+            "statements above. It is ACQUISITION ONLY: official bytes were "
+            "requested, retained and hashed. Every count below is an "
+            "input-integrity count and **never coverage**. Capture is not "
+            "admission — it answers nothing about coverage, the Data Gate or "
+            "modeling._\n",
+            "- ✅ **Evidence capture executed:** True — action "
+            f"`{record.get('last_completed_research_action_id')}`, carried by "
+            "**PR #"
+            f"{record.get('stage128_m3i2_live_pr_number', 'n/a')}** "
+            "(the LIVE evidence-capture PR)",
+            "- ✅ **Official-source retrieval completed:** "
+            f"{record.get('stage128_m3i2_official_source_retrieval_completed')}"
+            " — this is acquisition only and is **not** a Data Gate, **not** "
+            "coverage and **not** an admission",
+            "- **Live PR topology:** PR #"
+            f"{record.get('stage128_m3i2_live_pr_number')} → base "
+            f"`{record.get('stage128_m3i2_live_pr_base_branch')}` @ "
+            f"`{record.get('stage128_m3i2_live_pr_base_commit')}` — draft = "
+            f"{record.get('stage128_m3i2_live_pr_is_draft')}, merged = "
+            f"{record.get('stage128_m3i2_live_pr_merged')}, head derived from "
+            f"`{record.get('stage128_m3i2_live_pr_head_commit_source')}` "
+            "(never pinned)",
+            "- **Official traffic:** "
+            f"{record.get('stage128_m3i2_official_requests_attempted')} "
+            "requests — "
+            f"{record.get('stage128_m3i2_official_responses_successful')} "
+            "successful responses — "
+            f"{record.get('stage128_m3i2_official_responses_retained')} "
+            "responses retained — raw bytes retained "
+            f"{record.get('stage128_m3i2_raw_bytes_retained'):,}",
+            "- **Archive editions:** "
+            f"{record.get('stage128_m3i2_archive_editions_captured')} captured "
+            "and held out of "
+            f"{record.get('stage128_m3i2_wdi_editions_discovered')} "
+            "discovered — verified required editions "
+            f"{record.get('stage128_m3i2_required_editions_captured')} of "
+            f"{record.get('stage128_m3i2_required_editions_total')} — "
+            "verified release dates "
+            f"{record.get('stage128_m3i2_editions_with_verified_release_date')}"
+            f" of {record.get('stage128_m3i2_wdi_editions_discovered')}",
+            "- ⛔ **Unresolved:** cutoffs "
+            f"{record.get('stage128_m3i2_cutoffs_without_verified_pre_cutoff_edition')}"
+            f" of {record.get('stage128_m3i2_unique_development_cutoffs')} — "
+            "development pairs "
+            f"{record.get('stage128_m3i2_development_pairs_without_verified_pre_cutoff_edition')}"
+            f" of {record.get('stage128_m3i2_development_pairs_behind_cutoff_plan')}",
+            "- **Semantic compatibility:** CPI "
+            f"{record.get('stage128_m3i2_cpi_semantic_pass_count')} PASS — FX "
+            f"{record.get('stage128_m3i2_fx_semantic_unresolved_count')} "
+            "UNRESOLVED",
+            "- ⛔ **Evidence status:** "
+            f"`{record.get('stage128_m3i2_evidence_status')}` — result code "
+            f"`{record.get('stage128_m3i2_evidence_result_code')}`",
+            "- ⛔ **Data Gate:** NOT_EXECUTED (`m3i2_data_gate_executed` = "
+            f"{record.get('m3i2_data_gate_executed')}) — **M3I-2 admitted:** "
+            f"{record.get('m3i2_block_admitted')} — **modeling started:** "
+            f"{record.get('m3i2_modeling_started')} — **Final Test locked:** "
+            f"{record.get('final_test_locked')} — **M4 authorized:** "
+            f"{record.get('m4_authorized')} — **merge authorized:** "
+            f"{record.get('stage128_m3i2_merge_authorized')}",
+            "- Package: `project/stage128/"
+            "m3i2_official_source_evidence_capture/`; interpretation: "
+            "`project/stage128/m3i2_official_source_evidence_capture/"
+            "README_STAGE128_M3I2_OFFICIAL_SOURCE_EVIDENCE_CAPTURE.md`",
+            "",
+        ]
+    if record.get("stage128_m3i2_independent_audit_completed"):
+        lines += [
+            "### Stage128 — M3I-2 independent bundle integrity audit "
+            "(integrity only)\n",
+            "_A post-capture, read-only audit of the external evidence "
+            "bundle by an auditor independent of the PR author and of the "
+            "bundle creator. Its scope is bytes, not science: SHA-256, ZIP "
+            "CRC, multipart structure, manifest consistency, official-source "
+            "restrictions and raw-member integrity. It is **not** coverage, "
+            "**not** the Data Gate, **not** an M3I-2 admission, **not** "
+            "modeling and **not** Final Test access._\n",
+            "- ✅ **Result:** "
+            f"`{record.get('stage128_m3i2_independent_bundle_integrity_audit')}`"
+            " — verification type "
+            f"`{record.get('stage128_m3i2_independent_bundle_audit_verification_type')}`",
+            "- ✅ **Independence:** independent of PR author = "
+            f"{record.get('stage128_m3i2_auditor_independent_from_pr_author')}"
+            " — independent of bundle creator = "
+            f"{record.get('stage128_m3i2_auditor_independent_from_bundle_creator')}"
+            " — participated in artifact creation = "
+            f"{record.get('stage128_m3i2_auditor_participated_in_artifact_creation')}"
+            " — identity disclosure: "
+            f"`{record.get('stage128_m3i2_auditor_identity_disclosure_status')}`",
+            "- **Audited object:** PR #"
+            f"{record.get('stage128_m3i2_audited_pr_number')} head "
+            f"`{record.get('stage128_m3i2_audited_pr_head_sha')}` — primary "
+            "members expected/found "
+            f"{record.get('stage128_m3i2_audit_primary_members_expected')}/"
+            f"{record.get('stage128_m3i2_audit_primary_members_found')}",
+            "- **Capture-time provenance retained:** the bundle manifest "
+            "still records `delivered_to_independent_auditor` = False and "
+            "`independently_verified_by_auditor` = False. Those were true of "
+            "the moment the bundle was built, are kept unmodified, and are "
+            "**superseded — not corrected** — by the post-capture audit "
+            "record.",
+            "- ⛔ **Nothing scientific moved:** M3I-2 evidence status "
+            f"`{record.get('stage128_m3i2_evidence_status')}` — admitted "
+            f"{record.get('m3i2_block_admitted')} — Data Gate executed "
+            f"{record.get('m3i2_data_gate_executed')} — modeling started "
+            f"{record.get('m3i2_modeling_started')} — Final Test locked "
+            f"{record.get('final_test_locked')} — M4 authorized "
+            f"{record.get('m4_authorized')} — merge authorized "
+            f"{record.get('stage128_m3i2_merge_authorized')}",
+            "- ⛔ A passing integrity audit does **not** resolve the "
+            "historical-vintage evidence problem and does **not** admit "
+            "M3I-2.",
+            "- Attestation: `project/stage128/"
+            "m3i2_official_source_evidence_capture/"
+            "stage128_m3i2_independent_bundle_integrity_audit_attestation.md`",
             "",
         ]
     lines += [
@@ -5051,7 +5209,12 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
     m3i2_locked = bool(
         derive_stage128_m3i2_contract_lock_markers(root).get(
             "stage128_m3i2_contract_lock_executed"))
-    if m3i2_locked:
+    m3i2_evidence = bool(
+        derive_stage128_m3i2_evidence_capture_markers(root).get(
+            "stage128_m3i2_evidence_capture_executed"))
+    if m3i2_evidence:
+        allowed = _STAGE128_M3I2_EVIDENCE_WORKSTREAM_ID
+    elif m3i2_locked:
         allowed = _STAGE128_M3I2_ACTIVE_WORKSTREAM_ID
     else:
         allowed = (_STAGE128_M3_ACTIVE_WORKSTREAM_ID if m3_gate_executed
@@ -5578,6 +5741,447 @@ def derive_stage128_m3_macro_data_gate_markers(root: str) -> dict:
 #: Once the supplementary M3I-2 contract has been prospectively locked, this
 #: is the live workstream label. A CONTRACT lock is metadata only: no macro
 #: observation is retrieved, no Data Gate runs and no modeling starts.
+_STAGE128_M3I2_EVIDENCE_ACTION_ID = (
+    "stage128-m3i2-official-source-evidence-capture")
+_STAGE128_M3I2_EVIDENCE_WORKSTREAM_ID = (
+    "stage128-m3i2-official-source-evidence-capture")
+_STAGE128_M3I2_EVIDENCE_DECISION_REL = (
+    "project/stage128/m3i2_official_source_evidence_capture/"
+    "stage128_m3i2_official_source_evidence_decision.json")
+#: `m3i2_retrieval_started` is a CONTRACT-LOCK-TIME marker that is retained at
+#: False for retrieval compatibility. It does NOT mean "no official source was
+#: ever retrieved" — the separate evidence-capture action superseded it.
+_STAGE128_M3I2_RETRIEVAL_MARKER_SEMANTICS = (
+    "contract_lock_time_marker_superseded_by_official_source_evidence_capture")
+_STAGE128_M3I2_EVIDENCE_STATUSES = (
+    "EVIDENCE_COMPLETE_FOR_SEPARATE_M3I2_DATA_GATE_REVIEW",
+    "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE",
+    "INVALID_OFFICIAL_SOURCE_EVIDENCE_CAPTURE",
+)
+
+
+def derive_stage128_m3i2_evidence_capture_markers(root: str) -> dict:
+    """Markers for the M3I-2 official-source evidence capture.
+
+    Evidence capture is acquisition, not admission: it produces hashed official
+    source material and answers nothing about coverage, the Data Gate or
+    modeling. Every marker below therefore keeps the scientific state exactly
+    where the contract lock left it.
+    """
+    path = os.path.join(root, _STAGE128_M3I2_EVIDENCE_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        d = json.load(fh)
+
+    if d.get("action_id") != _STAGE128_M3I2_EVIDENCE_ACTION_ID:
+        raise HandoffError("stage128 M3I-2 evidence-capture action_id mismatch")
+    status = d.get("m3i2_official_source_evidence_status")
+    if status not in _STAGE128_M3I2_EVIDENCE_STATUSES:
+        raise HandoffError(f"unknown M3I-2 evidence status {status!r}")
+    for field, expected in (
+        ("data_gate_passed", False),
+        ("m3i2_admitted", False),
+        ("m3i3_admitted", False),
+        ("m3i3_contract_null_fields_populated", False),
+        ("final_test_locked", True),
+        ("final_test_access_authorized", False),
+        ("m4_authorized", False),
+        ("m4_started", False),
+        ("merge_authorized", False),
+        ("next_research_action_authorized", False),
+    ):
+        if d.get(field) is not expected:
+            raise HandoffError(
+                f"stage128 M3I-2 evidence capture {field} must be {expected}")
+    for field in ("company_macro_joins", "feature_materializations",
+                  "coverage_calculations", "data_gate_executions",
+                  "model_fits", "predictions", "predictive_metrics",
+                  "holm_calculations", "final_test_rows_read"):
+        if d.get(field) != 0:
+            raise HandoffError(
+                f"stage128 M3I-2 evidence capture {field} must be 0")
+    if d.get("m3_cbi_status") != "UNRESOLVED_M3_DATA_GATE":
+        raise HandoffError(
+            "the M3I-2 evidence capture must preserve the M3-CBI Gate status")
+
+    summary = d.get("evidence_summary") or {}
+    return {
+        "stage128_m3i2_evidence_capture_executed": True,
+        # LIVE retrieval fact. Official-source material WAS requested, retained
+        # and hashed under this separate action. This is acquisition only: it
+        # is not a Data Gate, not coverage and not an admission.
+        "stage128_m3i2_official_source_retrieval_completed": True,
+        # The contract-time marker `m3i2_retrieval_started` stays False for
+        # backwards compatibility; this field says what that False means.
+        "m3i2_retrieval_started_semantics": (
+            _STAGE128_M3I2_RETRIEVAL_MARKER_SEMANTICS),
+        "stage128_m3i2_evidence_status": status,
+        "stage128_m3i2_evidence_result_code": d.get("result_code"),
+        "stage128_m3i2_financing_metadata_decision": d.get(
+            "m3i3_financing_metadata_decision"),
+        "stage128_m3i2_official_responses_retained": summary.get(
+            "official_responses_retained"),
+        "stage128_m3i2_official_requests_attempted": summary.get(
+            "official_requests_attempted"),
+        "stage128_m3i2_official_responses_successful": summary.get(
+            "official_responses_successful"),
+        "stage128_m3i2_archive_editions_captured": summary.get(
+            "archive_editions_captured"),
+        "stage128_m3i2_wdi_editions_discovered": summary.get(
+            "wdi_editions_discovered"),
+        "stage128_m3i2_editions_with_verified_release_date": summary.get(
+            "editions_with_verified_release_date"),
+        "stage128_m3i2_unique_development_cutoffs": summary.get(
+            "unique_development_cutoffs"),
+        "stage128_m3i2_development_pairs_behind_cutoff_plan": summary.get(
+            "development_pairs_behind_cutoff_plan"),
+        "stage128_m3i2_development_pairs_without_verified_pre_cutoff_edition":
+            summary.get(
+                "development_pairs_without_verified_pre_cutoff_edition"),
+        "stage128_m3i2_cpi_semantic_pass_count": summary.get(
+            "cpi_semantic_pass_count"),
+        "stage128_m3i2_fx_semantic_unresolved_count": summary.get(
+            "fx_semantic_unresolved_count"),
+        "stage128_m3i2_locked_series_rows_extracted": summary.get(
+            "locked_series_rows_extracted"),
+        "stage128_m3i2_raw_bytes_retained": summary.get("raw_bytes_total"),
+        "stage128_m3i2_required_editions_total": summary.get(
+            "required_editions_total"),
+        "stage128_m3i2_required_editions_captured": summary.get(
+            "required_editions_captured"),
+        "stage128_m3i2_cutoffs_without_verified_pre_cutoff_edition":
+            summary.get("cutoffs_without_verified_pre_cutoff_edition"),
+        "stage128_m3i2_external_bundle_available_for_handoff": summary.get(
+            "external_bundle_available_for_handoff"),
+        # Acquisition never moves the scientific state.
+        "m3i2_data_gate_executed": False,
+        "m3i2_block_admitted": False,
+        "m3i2_modeling_started": False,
+        "m3i3_admitted": False,
+        "m4_authorized": False,
+        "m4_started": False,
+        "final_test_locked": True,
+        "last_completed_research_action_id": _STAGE128_M3I2_EVIDENCE_ACTION_ID,
+        "next_research_action_id": d.get("next_research_action_id"),
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
+    }
+
+
+_STAGE128_M3I2_INDEPENDENT_AUDIT_REL = (
+    "project/stage128/m3i2_official_source_evidence_capture/"
+    "stage128_m3i2_independent_bundle_integrity_audit_record.json"
+)
+_STAGE128_M3I2_INDEPENDENT_AUDIT_RECORD_TYPE = (
+    "post_capture_independent_bundle_integrity_audit")
+_STAGE128_M3I2_INDEPENDENT_AUDIT_VERIFICATION_TYPE = (
+    "external_independent_bundle_integrity_audit")
+_STAGE128_M3I2_INDEPENDENT_AUDIT_PASS = (
+    "INDEPENDENT_BUNDLE_INTEGRITY_AUDIT_PASS")
+#: The audited object is pinned: this PR, at this head, and nothing else.
+_STAGE128_M3I2_AUDITED_PR_NUMBER = 75
+_STAGE128_M3I2_AUDITED_PR_HEAD_SHA = (
+    "187c628a17f6e429fbf6455412f5f655d2f3602e")
+#: Integrity only — the audit may claim exactly this scope, no more.
+_STAGE128_M3I2_AUDIT_SCOPE_INCLUDES = (
+    "bundle_integrity",
+    "sha256",
+    "zip_crc",
+    "multipart_structure",
+    "manifest_consistency",
+    "official_source_restrictions",
+    "raw_member_integrity",
+)
+#: ...and must keep exactly these outside its scope.
+_STAGE128_M3I2_AUDIT_SCOPE_EXCLUDES = (
+    "coverage",
+    "data_gate",
+    "m3i2_admission",
+    "modeling",
+    "final_test",
+)
+
+
+def derive_stage128_m3i2_independent_bundle_audit_markers(root: str) -> dict:
+    """Markers for the post-capture independent bundle-integrity audit.
+
+    The audit is a read-only integrity check of the already-produced external
+    evidence bundle, performed by an auditor independent of the PR author and
+    of the bundle creator. Integrity is not admission: a PASS says the bytes
+    are the bytes that were captured, and says nothing about coverage, the
+    Data Gate, M3I-2 admission, modeling or the Final Test. Fail-closed — the
+    record must restate every excluded marker at its unmoved value.
+    """
+    path = os.path.join(root, _STAGE128_M3I2_INDEPENDENT_AUDIT_REL)
+    if not os.path.isfile(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        d = json.load(fh)
+
+    if d.get("record_type") != _STAGE128_M3I2_INDEPENDENT_AUDIT_RECORD_TYPE:
+        raise HandoffError("M3I-2 independent audit record_type mismatch")
+    if d.get("verification_type") != (
+            _STAGE128_M3I2_INDEPENDENT_AUDIT_VERIFICATION_TYPE):
+        raise HandoffError("M3I-2 independent audit verification_type mismatch")
+    if d.get("overall_result") != _STAGE128_M3I2_INDEPENDENT_AUDIT_PASS:
+        raise HandoffError("unknown M3I-2 independent audit overall_result")
+    for field, expected in (
+        ("independent_audit_completed", True),
+        ("independently_verified_by_auditor", True),
+        # Integrity findings — every one must be an explicit PASS. A missing
+        # field is a failure, never an optimistic default.
+        ("all_part_hashes_match", True),
+        ("all_zip_crc_checks_pass", True),
+        ("all_zip_structures_valid", True),
+        ("primary_members_unique", True),
+        ("all_member_hashes_match", True),
+        ("all_member_sizes_match", True),
+        ("third_invocation_present", False),
+        ("official_hosts_only", True),
+        ("original_single_bundle_present", True),
+        ("original_single_bundle_directly_rechecked", True),
+        ("original_single_bundle_hash_match", True),
+        # Provenance of the audit claim itself.
+        ("capture_time_values_superseded_by_this_record", True),
+        ("audit_result_relies_on_prior_session_execution_by_auditor", True),
+        ("auditor_independent_from_pr_author", True),
+        ("auditor_independent_from_bundle_creator", True),
+        ("auditor_participated_in_artifact_creation", False),
+        # Integrity only — the scientific state stays exactly where the
+        # evidence capture left it.
+        ("m3i2_admitted", False),
+        ("data_gate_executed", False),
+        ("final_test_locked", True),
+        ("merge_authorized", False),
+        ("m4_authorized", False),
+        ("modeling_started", False),
+        ("historical_vintage_problem_resolved", False),
+        # Provenance: capture-time manifest values are retained, not rewritten.
+        ("capture_time_manifest_retained_unmodified", True),
+        ("capture_time_delivered_to_independent_auditor", False),
+        ("capture_time_independently_verified_by_auditor", False),
+    ):
+        if d.get(field) is not expected:
+            raise HandoffError(
+                f"M3I-2 independent bundle audit {field} must be {expected}")
+    for field, expected in (
+        # Member accounting: all 24 primary members expected and found.
+        ("primary_members_expected", 24),
+        ("primary_members_found", 24),
+        # Official traffic: 21 requests, 21 responses, all successful.
+        ("request_count", 21),
+        ("response_count", 21),
+        ("successful_response_count", 21),
+        ("failed_response_count", 0),
+        # Exactly the two recorded capture invocations, no third.
+        ("capture_invocations", 2),
+        # The audited object is pinned; an audit of some other head is not
+        # an audit of this PR.
+        ("pr_number", _STAGE128_M3I2_AUDITED_PR_NUMBER),
+        ("audited_pr_head_sha", _STAGE128_M3I2_AUDITED_PR_HEAD_SHA),
+    ):
+        if d.get(field) != expected:
+            raise HandoffError(
+                f"M3I-2 independent bundle audit {field} must be {expected!r}")
+    if d.get("audit_scope_includes") != list(
+            _STAGE128_M3I2_AUDIT_SCOPE_INCLUDES):
+        raise HandoffError(
+            "M3I-2 independent bundle audit scope_includes mismatch")
+    if d.get("audit_scope_excludes") != list(
+            _STAGE128_M3I2_AUDIT_SCOPE_EXCLUDES):
+        raise HandoffError(
+            "M3I-2 independent bundle audit scope_excludes mismatch")
+    if d.get("m3i2_evidence_status") != "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE":
+        raise HandoffError(
+            "the M3I-2 independent bundle audit must preserve the UNRESOLVED "
+            "official-source evidence status")
+    for field in ("network_requests", "company_macro_joins",
+                  "feature_materializations", "coverage_calculations",
+                  "data_gate_executions", "model_fits", "predictions",
+                  "predictive_metrics", "holm_calculations",
+                  "final_test_rows_read"):
+        if d.get(field) != 0:
+            raise HandoffError(
+                f"M3I-2 independent bundle audit {field} must be 0")
+
+    return {
+        "stage128_m3i2_independent_bundle_integrity_audit":
+            _STAGE128_M3I2_INDEPENDENT_AUDIT_PASS,
+        "stage128_m3i2_independent_bundle_audit_verification_type":
+            _STAGE128_M3I2_INDEPENDENT_AUDIT_VERIFICATION_TYPE,
+        "stage128_m3i2_independent_audit_completed": True,
+        "stage128_m3i2_independently_verified_by_auditor": True,
+        "stage128_m3i2_auditor_independent_from_pr_author": True,
+        "stage128_m3i2_auditor_independent_from_bundle_creator": True,
+        "stage128_m3i2_auditor_participated_in_artifact_creation": False,
+        "stage128_m3i2_auditor_identity_disclosure_status": d.get(
+            "auditor_identity_disclosure_status"),
+        "stage128_m3i2_audited_pr_number": d.get("pr_number"),
+        "stage128_m3i2_audited_pr_head_sha": d.get("audited_pr_head_sha"),
+        "stage128_m3i2_audit_primary_members_expected": d.get(
+            "primary_members_expected"),
+        "stage128_m3i2_audit_primary_members_found": d.get(
+            "primary_members_found"),
+        "stage128_m3i2_audit_capture_time_manifest_superseded": d.get(
+            "capture_time_values_superseded_by_this_record"),
+        # An integrity PASS moves nothing scientific.
+        "stage128_m3i2_evidence_status": d.get("m3i2_evidence_status"),
+        "m3i2_block_admitted": False,
+        "m3i2_data_gate_executed": False,
+        "m3i2_modeling_started": False,
+        "stage128_m3i2_merge_authorized": False,
+        "m4_authorized": False,
+        "final_test_locked": True,
+    }
+
+
+_STAGE128_M3I2_GOVERNANCE_BOUNDARY_REL = (
+    "project/stage128/m3i2_official_source_evidence_capture/"
+    "stage128_m3i2_evidence_capture_governance_boundary.json")
+_STAGE128_M3I2_LIVE_BASE_BRANCH = "main"
+
+
+def derive_stage128_m3i2_live_pr_topology_markers(root: str) -> dict:
+    """Publish the LIVE (evidence-capture) M3I-2 PR topology.
+
+    The contract-lock artifact records the topology that was live *at contract
+    time* (PR #74). That is history. The live draft is the separate
+    evidence-capture PR, and this function derives it — fail-closed — from the
+    evidence-capture artifacts themselves:
+
+    * the evidence decision and the governance boundary agree on the base
+      branch, the base commit and the Draft/no-merge posture;
+    * the independent bundle-integrity audit record names the PR number, which
+      must be a *successor* of the contract-time PR;
+    * the live head is taken from the CURRENT repository head, never pinned.
+
+    Returns {} before the evidence capture exists. Publishing a live topology
+    is pure metadata: it admits nothing and moves no scientific state.
+    """
+    decision_path = os.path.join(root, _STAGE128_M3I2_EVIDENCE_DECISION_REL)
+    if not os.path.isfile(decision_path):
+        return {}
+    with open(decision_path, encoding="utf-8") as fh:
+        decision = json.load(fh)
+    if decision.get("action_id") != _STAGE128_M3I2_EVIDENCE_ACTION_ID:
+        raise HandoffError("stage128 M3I-2 evidence-capture action_id mismatch")
+
+    boundary_path = os.path.join(root, _STAGE128_M3I2_GOVERNANCE_BOUNDARY_REL)
+    audit_path = os.path.join(root, _STAGE128_M3I2_INDEPENDENT_AUDIT_REL)
+    for path in (boundary_path, audit_path):
+        if not os.path.isfile(path):
+            raise HandoffError(
+                "the M3I-2 live PR topology cannot be derived without "
+                f"{os.path.relpath(path, root)}")
+    with open(boundary_path, encoding="utf-8") as fh:
+        boundary = json.load(fh)
+    with open(audit_path, encoding="utf-8") as fh:
+        audit = json.load(fh)
+
+    # 1. Base branch: all three artifacts must agree, and it must be main.
+    branches = {
+        decision.get("pr_base_branch"),
+        boundary.get("pr_base_branch"),
+        audit.get("audited_pr_base_branch"),
+    }
+    if branches != {_STAGE128_M3I2_LIVE_BASE_BRANCH}:
+        raise HandoffError(
+            "the live M3I-2 PR base branch is inconsistent across the "
+            f"evidence-capture artifacts: {sorted(map(str, branches))}")
+
+    # 2. Base commit: the merge commit of the contract-time predecessor PR is
+    #    current main, and it is the live base of the evidence-capture PR.
+    commits = {
+        decision.get("baseline_commit"),
+        decision.get("predecessor_pr_merge_commit"),
+        boundary.get("baseline_commit"),
+        boundary.get("predecessor_pr_merge_commit"),
+        audit.get("audited_pr_base_sha"),
+    }
+    if len(commits) != 1:
+        raise HandoffError(
+            "the live M3I-2 PR base commit is inconsistent across the "
+            f"evidence-capture artifacts: {sorted(map(str, commits))}")
+    base_commit = commits.pop()
+    if not (isinstance(base_commit, str) and len(base_commit) == 40):
+        raise HandoffError(
+            "the live M3I-2 PR base commit must be a full 40-hex SHA")
+
+    # 3. The live PR is a Draft, unmerged and carries no merge authorization.
+    for source, artifact in (("evidence decision", decision),
+                             ("governance boundary", boundary)):
+        if artifact.get("pr_is_draft") is not True:
+            raise HandoffError(
+                f"the live M3I-2 PR must remain a Draft ({source})")
+        if artifact.get("merge_authorized") is not False:
+            raise HandoffError(
+                f"no merge authorization exists for the live M3I-2 PR "
+                f"({source})")
+    if audit.get("merge_authorized") is not False:
+        raise HandoffError(
+            "no merge authorization exists for the live M3I-2 PR (audit)")
+
+    # 4. The live PR number is a strict successor of the contract-time PR.
+    live_number = audit.get("pr_number")
+    predecessor_numbers = {
+        decision.get("predecessor_pr_number"),
+        boundary.get("predecessor_pr_number"),
+    }
+    if len(predecessor_numbers) != 1:
+        raise HandoffError(
+            "the M3I-2 contract-time predecessor PR number is inconsistent")
+    predecessor_number = predecessor_numbers.pop()
+    if not isinstance(live_number, int) or isinstance(live_number, bool):
+        raise HandoffError("the live M3I-2 PR number must be an integer")
+    if not isinstance(predecessor_number, int):
+        raise HandoffError(
+            "the M3I-2 contract-time predecessor PR number must be an integer")
+    if live_number <= predecessor_number:
+        raise HandoffError(
+            f"the live M3I-2 PR #{live_number} must succeed the contract-time "
+            f"PR #{predecessor_number}")
+    if decision.get("predecessor_pr_merged") is not True or boundary.get(
+            "predecessor_pr_merged") is not True:
+        raise HandoffError(
+            "the live M3I-2 PR targets main, so the contract-time PR must be "
+            "recorded as merged")
+
+    # The live head is NOT published here: it is the CURRENT repository head,
+    # so it is HEAD-relative and must stay out of the fingerprinted semantic
+    # state. `build_handoff_state` attaches it to the record as a VOLATILE
+    # field derived from the repository head — never a pinned SHA.
+    return {
+        "stage128_m3i2_live_pr_number": live_number,
+        "stage128_m3i2_live_pr_base_branch": _STAGE128_M3I2_LIVE_BASE_BRANCH,
+        "stage128_m3i2_live_pr_base_commit": base_commit,
+        "stage128_m3i2_live_main_commit": base_commit,
+        "stage128_m3i2_live_pr_is_draft": True,
+        "stage128_m3i2_live_pr_merged": False,
+        "stage128_m3i2_live_pr_head_commit_source": (
+            "observed_repository_head_commit_at_generation"),
+        "stage128_m3i2_live_pr_role": "official_source_evidence_capture_pr",
+        "stage128_m3i2_contract_time_pr_number": predecessor_number,
+        "stage128_m3i2_contract_time_pr_semantics": (
+            "historical_contract_lock_topology_superseded_by_pr"
+            f"{live_number}"),
+        "stage128_m3i2_merge_authorized": False,
+        # Topology metadata never moves the scientific state.
+        "m3i2_data_gate_executed": False,
+        "m3i2_block_admitted": False,
+        "m3i2_modeling_started": False,
+        "m4_authorized": False,
+        "final_test_locked": True,
+    }
+
+
+#: Semantics label for the CONTRACT-TIME PR topology. It is history, never the
+#: live draft. When the superseding evidence-capture PR is recognizable the
+#: live-topology deriver replaces it with the explicit
+#: ``..._superseded_by_pr<N>`` form (N derived, never hard-coded).
+_STAGE128_M3I2_CONTRACT_TIME_PR_SEMANTICS_BASE = (
+    "historical_contract_lock_topology_not_live")
+
 _STAGE128_M3I2_ACTIVE_WORKSTREAM_ID = "stage128-m3i2-prospective-contract-lock"
 
 _STAGE128_M3I2_CONTRACT_LOCK_REL = (
@@ -5746,12 +6350,20 @@ def derive_stage128_m3i2_contract_lock_markers(root: str) -> dict:
         "stage128_m3i2_pr_base_branch": d.get("pr_base_branch"),
         "stage128_m3i2_provenance_baseline_commit": topo.get(
             "scientific_provenance_baseline_commit"),
-        "stage128_m3i2_live_pr_number": topo.get("live_pr_number"),
-        "stage128_m3i2_live_pr_base_branch": topo.get("live_pr_base_branch"),
-        "stage128_m3i2_live_pr_base_commit": topo.get("live_pr_base_commit"),
-        "stage128_m3i2_live_main_commit": topo.get("live_main_commit"),
-        "stage128_m3i2_live_pr_is_draft": topo.get("live_pr_is_draft"),
-        "stage128_m3i2_live_pr_merged": topo.get("live_pr_merged"),
+        # CONTRACT-TIME topology. These values were live at the moment of the
+        # contract lock and are retained as HISTORY only; they are never the
+        # current draft. The live evidence-capture PR topology is published
+        # separately by `derive_stage128_m3i2_live_pr_topology_markers`.
+        "stage128_m3i2_contract_time_pr_number": topo.get("live_pr_number"),
+        "stage128_m3i2_contract_time_pr_base_branch": topo.get(
+            "live_pr_base_branch"),
+        "stage128_m3i2_contract_time_pr_base_commit": topo.get(
+            "live_pr_base_commit"),
+        "stage128_m3i2_contract_time_main_commit": topo.get("live_main_commit"),
+        "stage128_m3i2_contract_time_pr_is_draft": topo.get("live_pr_is_draft"),
+        "stage128_m3i2_contract_time_pr_merged": topo.get("live_pr_merged"),
+        "stage128_m3i2_contract_time_pr_semantics": (
+            _STAGE128_M3I2_CONTRACT_TIME_PR_SEMANTICS_BASE),
         "stage128_m3i2_predecessor_pr_merged": topo.get(
             "predecessor_pr_merged"),
         "stage128_m3i2_predecessor_pr_merge_commit": topo.get(
