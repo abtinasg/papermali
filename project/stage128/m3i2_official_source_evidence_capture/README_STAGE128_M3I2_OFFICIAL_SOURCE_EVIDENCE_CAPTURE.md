@@ -100,19 +100,76 @@ never evidence.
 * raw bytes retained: 1066295643 bytes across
   21 objects
 * WDI editions discovered: 110
-* required editions: 16
-  (verified release `available_at`:
-  16,
-  captured: 16)
+* editions with a **verified** release date:
+  **0** — unverified filename
+  date tokens: 110
+* required (servable) editions: **0** —
+  archive editions actually captured and held:
+  16
+* cutoffs without a verified pre-cutoff vintage:
+  **37** of
+  37
+  (539 of 539
+  development pairs)
 * locked-series rows extracted: 1878
-* semantic compatibility — PASS 32,
-  UNRESOLVED 0,
-  FAIL_INTEGRITY 0
+* semantic compatibility — CPI PASS 16 /
+  UNRESOLVED 0 / FAIL_INTEGRITY
+  0; **FX** PASS
+  0 / UNRESOLVED
+  16 / FAIL_INTEGRITY
+  0
+* capture invocations: 2
 * IMF catalog entries: 0
 * financing metadata decision: `NO_EXACT_CANDIDATE_IDENTIFIED_UNRESOLVED_METADATA_LOCK`
 
 Unresolved evidence is **never** converted into zero coverage or into an
 observed failure. Missing proof is `UNRESOLVED`, not `FAIL`.
+
+## Why nothing has a verified release date
+
+The official archive listing publishes a table of `Year | Month(s)` and a
+hyperlink per edition. The date inside a filename such as
+`WDI_excel_2017_09_19.zip` is recorded as an **`edition_date_token`** — and
+that is all it is. The retained listing bytes contain **no** occurrence of
+"release", "released", "publish", "published", "last updated" or "revision",
+and no retained archive states an edition-level release date either. So no
+retained official bytes describe that token as a release, publication or update
+date.
+
+Under the locked rule, that means `release_date_verified = false`,
+`derived_release_available_at_utc = null` and
+`release_available_at_derivation_status =
+UNRESOLVED_FILENAME_DATE_TOKEN_NOT_VERIFIED_AS_RELEASE_DATE` for every edition. Retrieval time,
+`Last-Modified`, ZIP member timestamps and workbook properties are explicitly
+not accepted as substitutes.
+
+An edition with no verified `available_at` can never be a pre-cutoff vintage,
+so **every** development cutoff is unresolved. The archives themselves are
+still held and still extracted — being unable to date an edition is not the
+same as not having it.
+
+## Why every FX row is UNRESOLVED
+
+The archived `PA.NUS.FCRF` metadata gives a generic construct
+("Official exchange rate (LCU per US$, period average)", `Periodicity: Annual`,
+`Unit of measure` empty) and a generic methodology note about exchange-rate
+arrangements. Section 4 permits an archived title to support the construct and
+the **unit label** — but not the three continuity facts a log change depends
+on:
+
+1. which currency unit the local-currency figures are denominated in;
+2. the local-currency valuation definition for that vintage;
+3. that no redenomination or currency-unit break falls across the pair.
+
+The archived metadata names no currency, no denomination and no unit break, and
+silence is not proof of absence. All three therefore stay unverified and every
+FX row is `UNRESOLVED`. Continuity is **not** inferred from smooth values, and
+the current metadata page — which states it was updated on a 2026 date — is not
+used as proof about historical editions.
+
+CPI rows remain `PASS` where the archived title, annual periodicity, percent
+rate and calendar-year columns are each evidenced; the provenance of the unit
+claim now travels in the committed CSV as `unit_evidence_source`.
 
 ## Forbidden execution counters — all zero
 
@@ -120,7 +177,7 @@ company macro joins, feature materializations, coverage calculations, Data Gate
 executions, model fits, predictions, predictive metrics, Holm calculations,
 final-test rows read.
 
-QC: **53 assertions, 0 failed**,
+QC: **74 assertions, 0 failed**,
 all_pass = **True**.
 
 ## State after this action

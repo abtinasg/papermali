@@ -16,7 +16,16 @@ from pathlib import Path
 
 import pytest
 
-from src import stage126_current_state_validator as v
+# This module imports `src.*`, so `project/` must be importable. It used to
+# rely on some OTHER test module being collected first and inserting that path,
+# which made the file unrunnable on its own (`pytest <this file>` failed with
+# ModuleNotFoundError). Bootstrapping it here is minimal and self-contained.
+import sys
+
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src import stage126_current_state_validator as v  # noqa: E402
 
 REAL_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 STAGE126 = os.path.join(REAL_ROOT, "project", "stage126")
