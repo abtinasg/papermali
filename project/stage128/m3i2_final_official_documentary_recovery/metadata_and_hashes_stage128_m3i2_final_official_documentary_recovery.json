@@ -1,0 +1,121 @@
+{
+  "action_id": "stage128-m3i2-final-official-documentary-recovery-initiation",
+  "baseline_commit": "b3627809dbfde8429d0308bec5d1c8541a161188",
+  "file_count": 28,
+  "files": {
+    "project/stage128/m3i2_final_official_documentary_recovery/README_STAGE128_M3I2_FINAL_OFFICIAL_DOCUMENTARY_RECOVERY.md": {
+      "bytes": 7290,
+      "sha256": "b6752045c0ab9800c6d2c7695bbbc2087e92574934012d04ae71226186cbe4f0"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/m3i2_world_bank_inquiry_edition_inventory.csv": {
+      "bytes": 31457,
+      "sha256": "5c4739482d685ad4a1fd13c6a82d16cacb882d7e07996535671bb2f267b3a35b"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/m3i2_world_bank_inquiry_fx_semantic_questions.md": {
+      "bytes": 2204,
+      "sha256": "2cc118c224b43acdfa7abcee23c3b2a7ddd7dc0809a9ee072f29aad02276cf94"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/_search_log.json": {
+      "bytes": 14459,
+      "sha256": "7599d0b2a667a1cce90b6ed9a4c4d6e031b2181e8b6c8f33283aa0cd3d8f1bbe"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wb_data_pa_nus_fcrf_irn.html": {
+      "bytes": 1147563,
+      "sha256": "4277ca3f819b021a81b2073d17e0aaa2a3495b5417db40a4fef5f3b3d0707ea7"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wb_documents_search_iran_rial.html": {
+      "bytes": 30752,
+      "sha256": "cedd8a37b2d851e80e12b55261c87dca80def06b1cd2323646b950abe4cf624d"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wb_helpdesk_all_articles_index.html": {
+      "bytes": 263983,
+      "sha256": "2649685e1f4fff12d0f86c600b229109a64ace58074ea3a604cb4853fb7e5204"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wb_helpdesk_contact_support.html": {
+      "bytes": 2050,
+      "sha256": "fb3236eec85ca7f84930ba2c48a7d5993100ab42d258d19e8e885f426f92e6ae"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wb_helpdesk_data_updates_topic.html": {
+      "bytes": 231961,
+      "sha256": "38177b55a60c1b83ed2049a5a53c768e449bcc9d07b82a73a89e8b4555f2e192"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wb_helpdesk_knowledgebase_root.html": {
+      "bytes": 262290,
+      "sha256": "8876e56a20131e160565a9aeac5e832e8d3181c7285c4538b3daffedb1d8c286"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wb_helpdesk_methodology_topic.html": {
+      "bytes": 233967,
+      "sha256": "a23310788c2085512f079c9d04e96e716e50db496d2ddbfa2dc09d6f573a8d51"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wb_helpdesk_wdi_topic.html": {
+      "bytes": 233525,
+      "sha256": "72e81439b5588b79d18d6d2eb90f0a6b18767e0741811676d347a85d67b15b17"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wb_kb_atlas_method_detailed.html": {
+      "bytes": 247684,
+      "sha256": "5e6d853a8a9e6fd7ed63c50a4c97687e57851c2d609c0c3ba8886415c8518e42"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wb_kb_calendar_year_reporting.html": {
+      "bytes": 232871,
+      "sha256": "cfddbed21c93134c0a8f1a6fb5372fab98465ab5f1b7601d7bb1a9e38cbe9d1c"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wb_kb_data_updates_and_errata.html": {
+      "bytes": 340548,
+      "sha256": "2da8b1bd692ed0d5778a3e8b673b58cf6adf4c3c71e02b2bdf4257ad214413d7"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wb_kb_dec_conversion_factor.html": {
+      "bytes": 232256,
+      "sha256": "d0c149345b0e67bd9a773be7f37bd802cb3a28aaf166bc021565a90af4dca4f3"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/raw_official_documents/wdi_release_note_toc.html": {
+      "bytes": 74106,
+      "sha256": "483022eee912ee04df6ea703ef23be2b1e5639e59d87769f250339b4e0d42360"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3_lag_partial_local_execution_supersession_record.json": {
+      "bytes": 1922,
+      "sha256": "2d0b3d58f31a1e72803411dcbee169f4b2e21fd16164730c9483f0c160a5424a"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_final_official_documentary_evidence_manifest.csv": {
+      "bytes": 9351,
+      "sha256": "fd3c18d20050c86643fd5330edb62348d0972ac0a1ea7cca642dfcda8e822642"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_final_official_documentary_recovery_baseline.json": {
+      "bytes": 1744,
+      "sha256": "f6d9521aa5589863340b25876821cb908991844609e27b8b749fab86f678a0b5"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_final_official_documentary_recovery_contract.json": {
+      "bytes": 3860,
+      "sha256": "6ad99f654f19b36fa2396d17f80b37bf070cdb183146bd9499ada53e3301b94d"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_final_official_documentary_recovery_decision.json": {
+      "bytes": 2918,
+      "sha256": "50445bbb12c0fb36f2a79c992dca31148e681ac535d362e67c1495946093a927"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_final_official_documentary_recovery_governance_boundary.json": {
+      "bytes": 1650,
+      "sha256": "a8f879ed0d53e8c0894f84a345e0dec693d2e86ed9f70c6438a56ef697b0a35c"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_final_official_documentary_recovery_human_authorization_record.json": {
+      "bytes": 1411,
+      "sha256": "e1100777c0739a93dbef994a6ff960862252284ea83af6064b3aa397ddf6f531"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_final_official_documentary_recovery_qc_report.json": {
+      "bytes": 7281,
+      "sha256": "c95fb30a00de1070b80526c1a7b58f116745f14a3cff1bf772ee56f4784efa99"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_final_official_documentary_search_log.csv": {
+      "bytes": 10882,
+      "sha256": "3df820c0cf73e23459db6db15157473cea996573a8645bc96c00ee8d614c54c4"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_world_bank_inquiry_request.md": {
+      "bytes": 2270,
+      "sha256": "dd82929f8098061d501c51b65cac6f3e3ed203cb00ff5689ae0e66f9f2f1e8b5"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_world_bank_inquiry_submission_record.json": {
+      "bytes": 3235,
+      "sha256": "6b9ac88d69d0fc4a33d79851a4e8f446fbf3e28e7dd3c489b96a8d621c0c0c24"
+    }
+  },
+  "package_id": "stage128_m3i2_final_official_documentary_recovery",
+  "raw_archive_zip_objects_committed": 0
+}

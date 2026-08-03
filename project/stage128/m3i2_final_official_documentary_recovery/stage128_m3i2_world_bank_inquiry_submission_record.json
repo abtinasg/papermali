@@ -1,0 +1,56 @@
+{
+  "action_id": "stage128-m3i2-final-official-documentary-recovery-initiation",
+  "attachments": [
+    {
+      "contains_company_predictor_values": false,
+      "contains_credentials": false,
+      "contains_final_test_rows": false,
+      "contains_personal_information": false,
+      "contains_target_values": false,
+      "name": "m3i2_world_bank_inquiry_edition_inventory.csv",
+      "sha256": "5c4739482d685ad4a1fd13c6a82d16cacb882d7e07996535671bb2f267b3a35b"
+    },
+    {
+      "contains_company_predictor_values": false,
+      "contains_credentials": false,
+      "contains_final_test_rows": false,
+      "contains_personal_information": false,
+      "contains_target_values": false,
+      "name": "m3i2_world_bank_inquiry_fx_semantic_questions.md",
+      "sha256": "2cc118c224b43acdfa7abcee23c3b2a7ddd7dc0809a9ee072f29aad02276cf94"
+    }
+  ],
+  "automatic_follow_up_authorized": false,
+  "captcha_bypassed": false,
+  "credentials_used_by_automation": false,
+  "edition_inventory_sha256": "5c4739482d685ad4a1fd13c6a82d16cacb882d7e07996535671bb2f267b3a35b",
+  "external_raw_confirmation_present": false,
+  "external_raw_confirmation_sha256": null,
+  "follow_up_authorized_now": false,
+  "follow_up_max_count": 1,
+  "fx_questions_sha256": "2cc118c224b43acdfa7abcee23c3b2a7ddd7dc0809a9ee072f29aad02276cf94",
+  "human_submission_instructions": [
+    "1. Open https://datahelpdesk.worldbank.org/ and use Contact support (a signed-in account is required).",
+    "2. Paste the subject line and the body of stage128_m3i2_world_bank_inquiry_request.md byte-for-byte.",
+    "3. Attach m3i2_world_bank_inquiry_edition_inventory.csv and m3i2_world_bank_inquiry_fx_semantic_questions.md unchanged.",
+    "4. Submit exactly once; do not send a follow-up.",
+    "5. Save the raw confirmation page OUTSIDE the repository.",
+    "6. Report back: submission timestamp (UTC), redacted ticket id, SHA-256 of the ticket id, SHA-256 of the external raw confirmation, and whether the pasted body hash still equals dd82929f8098061d501c51b65cac6f3e3ed203cb00ff5689ae0e66f9f2f1e8b5."
+  ],
+  "initial_inquiries_attempted": 0,
+  "initial_inquiries_successfully_submitted": 0,
+  "initial_inquiry_max_count": 1,
+  "official_support_channel": "World Bank Data Help Desk Contact support",
+  "official_support_root": "https://datahelpdesk.worldbank.org/",
+  "pii_committed_to_git": false,
+  "response_adjudication_authorized": false,
+  "submission_blocked_because": "the Data Help Desk exposes no public support form; opening a ticket requires a signed-in account, which would mean using a personal credential and a personal e-mail address. Automation must not create an account, sign in, supply personal data or bypass any human-verification step, so the inquiry is prepared for a human supervisor instead",
+  "submission_status": "HUMAN_SUBMISSION_REQUIRED",
+  "submission_timestamp_utc": null,
+  "submitted_body_sha256": "dd82929f8098061d501c51b65cac6f3e3ed203cb00ff5689ae0e66f9f2f1e8b5",
+  "ticket_id_fabricated": false,
+  "ticket_id_redacted": null,
+  "ticket_id_sha256": null,
+  "waiting_period_business_day_definition": "Monday through Friday only; the submission day is excluded; public holidays are not modeled",
+  "waiting_period_business_days": 10
+}

@@ -1,0 +1,32 @@
+{
+  "action_id": "stage128-m3i2-final-official-documentary-recovery-initiation",
+  "authorization_consumed": true,
+  "authorization_covers": [
+    "read_only_review_of_existing_artifacts",
+    "bounded_official_world_bank_documentary_search",
+    "preparation_of_one_official_inquiry",
+    "at_most_one_initial_inquiry_submission_attempt",
+    "documentation_of_the_submission_outcome_or_human_submission_need"
+  ],
+  "authorization_excludes": [
+    "follow_up_request",
+    "response_ingestion",
+    "response_adjudication",
+    "archive_zip_redownload",
+    "data_gate",
+    "coverage",
+    "feature_materialization",
+    "modeling",
+    "m3_lag_wdi_contract_lock",
+    "final_test_access",
+    "merge"
+  ],
+  "authorization_sha256": "a1878df0e6ce46673ee426e2da19dfe14e6724b394978499d4ef09b90e9d9e97",
+  "authorization_text": "منم با این چیزی که گفتی موافقم همین کارو انجام بدیم  من پرامپ قبلی رو به برنامه نویس اصلی گقتم اجرا نکنه پرامپ جدیدو برام ارسال کن که بهش بدم",
+  "authorization_type": "one_action_authorization",
+  "authorization_utf8_bytes": 252,
+  "authorized_action_id": "stage128-m3i2-final-official-documentary-recovery-initiation",
+  "expected_baseline_sha": "b3627809dbfde8429d0308bec5d1c8541a161188",
+  "scope_identified_by_hash_alone": false,
+  "standing_authorization": false
+}

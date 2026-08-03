@@ -1,0 +1,326 @@
+{
+  "action_id": "stage128-m3i2-final-official-documentary-recovery-initiation",
+  "all_pass": true,
+  "assertion_count": 79,
+  "assertions": [
+    {
+      "assertion": "baseline_commit_is_the_pr75_merge_commit",
+      "passed": true
+    },
+    {
+      "assertion": "predecessor_pr_75_is_merged",
+      "passed": true
+    },
+    {
+      "assertion": "baseline_scientific_state_reverified",
+      "passed": true
+    },
+    {
+      "assertion": "authorization_sha256_matches",
+      "passed": true
+    },
+    {
+      "assertion": "authorization_utf8_bytes_match",
+      "passed": true
+    },
+    {
+      "assertion": "authorization_consumed_exactly_once",
+      "passed": true
+    },
+    {
+      "assertion": "standing_authorization_false",
+      "passed": true
+    },
+    {
+      "assertion": "prior_m3_lag_local_partial_execution_detected",
+      "passed": true
+    },
+    {
+      "assertion": "prior_m3_lag_authoritative_contract_not_locked",
+      "passed": true
+    },
+    {
+      "assertion": "prior_m3_lag_zero_commits",
+      "passed": true
+    },
+    {
+      "assertion": "prior_m3_lag_no_remote_branch",
+      "passed": true
+    },
+    {
+      "assertion": "prior_m3_lag_no_pull_request",
+      "passed": true
+    },
+    {
+      "assertion": "prior_m3_lag_authorization_not_reusable",
+      "passed": true
+    },
+    {
+      "assertion": "prior_m3_lag_no_scientific_operation",
+      "passed": true
+    },
+    {
+      "assertion": "prior_m3_lag_not_completed_or_committed",
+      "passed": true
+    },
+    {
+      "assertion": "quarantine_hashes_recorded",
+      "passed": true
+    },
+    {
+      "assertion": "quarantine_location_not_committed_to_git",
+      "passed": true
+    },
+    {
+      "assertion": "original_dirty_worktree_not_cleaned_or_deleted",
+      "passed": true
+    },
+    {
+      "assertion": "recovery_ran_in_a_clean_separate_worktree",
+      "passed": true
+    },
+    {
+      "assertion": "exactly_two_blockers_targeted",
+      "passed": true
+    },
+    {
+      "assertion": "documentary_get_requests_within_ceiling",
+      "passed": true
+    },
+    {
+      "assertion": "no_duplicate_of_prior_captured_url",
+      "passed": true
+    },
+    {
+      "assertion": "no_duplicate_within_this_action",
+      "passed": true
+    },
+    {
+      "assertion": "no_archive_zip_download",
+      "passed": true
+    },
+    {
+      "assertion": "archive_zip_counters_zero",
+      "passed": true
+    },
+    {
+      "assertion": "official_hosts_only",
+      "passed": true
+    },
+    {
+      "assertion": "every_retained_document_is_hashed",
+      "passed": true
+    },
+    {
+      "assertion": "no_document_resolves_a_blocker",
+      "passed": true
+    },
+    {
+      "assertion": "filename_token_not_release_evidence",
+      "passed": true
+    },
+    {
+      "assertion": "no_unproven_previous_month_fallback",
+      "passed": true
+    },
+    {
+      "assertion": "official_month_only_next_month_rule_locked",
+      "passed": true
+    },
+    {
+      "assertion": "availability_rules_a_to_e_present",
+      "passed": true
+    },
+    {
+      "assertion": "rule_b_next_day",
+      "passed": true
+    },
+    {
+      "assertion": "rule_c_first_day_of_next_month",
+      "passed": true
+    },
+    {
+      "assertion": "rule_d_token_only_is_null",
+      "passed": true
+    },
+    {
+      "assertion": "no_edition_gained_a_verified_release_date",
+      "passed": true
+    },
+    {
+      "assertion": "initial_inquiry_ceiling_is_one",
+      "passed": true
+    },
+    {
+      "assertion": "at_most_one_initial_inquiry_attempted",
+      "passed": true
+    },
+    {
+      "assertion": "inquiry_body_hash_matches",
+      "passed": true
+    },
+    {
+      "assertion": "edition_inventory_hash_matches",
+      "passed": true
+    },
+    {
+      "assertion": "fx_questions_hash_matches",
+      "passed": true
+    },
+    {
+      "assertion": "inquiry_covers_both_blockers",
+      "passed": true
+    },
+    {
+      "assertion": "no_fabricated_ticket",
+      "passed": true
+    },
+    {
+      "assertion": "no_credentials_used_by_automation",
+      "passed": true
+    },
+    {
+      "assertion": "no_captcha_bypassed",
+      "passed": true
+    },
+    {
+      "assertion": "no_pii_committed_to_git",
+      "passed": true
+    },
+    {
+      "assertion": "attachments_declare_no_sensitive_content",
+      "passed": true
+    },
+    {
+      "assertion": "waiting_period_is_ten_business_days",
+      "passed": true
+    },
+    {
+      "assertion": "follow_up_ceiling_is_one_and_unauthorized",
+      "passed": true
+    },
+    {
+      "assertion": "response_adjudication_not_authorized",
+      "passed": true
+    },
+    {
+      "assertion": "m3i2_remains_unresolved",
+      "passed": true
+    },
+    {
+      "assertion": "m3i2_remains_unadmitted",
+      "passed": true
+    },
+    {
+      "assertion": "m3i2_data_gate_not_executed",
+      "passed": true
+    },
+    {
+      "assertion": "m3_cbi_preserved",
+      "passed": true
+    },
+    {
+      "assertion": "m3i3_preserved",
+      "passed": true
+    },
+    {
+      "assertion": "m3_lag_wdi_remains_not_locked",
+      "passed": true
+    },
+    {
+      "assertion": "bundle_integrity_pass_is_not_vintage_resolution",
+      "passed": true
+    },
+    {
+      "assertion": "partial_recovery_cannot_admit_m3i2",
+      "passed": true
+    },
+    {
+      "assertion": "final_test_locked",
+      "passed": true
+    },
+    {
+      "assertion": "m4_unauthorized",
+      "passed": true
+    },
+    {
+      "assertion": "merge_unauthorized",
+      "passed": true
+    },
+    {
+      "assertion": "pr_is_draft",
+      "passed": true
+    },
+    {
+      "assertion": "next_pointer_is_not_authorization",
+      "passed": true
+    },
+    {
+      "assertion": "counter_company_macro_joins_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_feature_materializations_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_coverage_calculations_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_data_gate_executions_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_model_fits_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_predictions_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_predictive_metrics_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_bootstrap_executions_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_holm_calculations_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_target_values_read_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_final_test_rows_read_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_final_test_predictor_values_inspected_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_final_test_target_values_inspected_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_m3i2_admission_decisions_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_m3_lag_wdi_contract_locks_is_zero",
+      "passed": true
+    },
+    {
+      "assertion": "counter_m3_lag_wdi_data_retrievals_is_zero",
+      "passed": true
+    }
+  ],
+  "failed_assertions": [],
+  "failed_count": 0,
+  "package_id": "stage128_m3i2_final_official_documentary_recovery"
+}

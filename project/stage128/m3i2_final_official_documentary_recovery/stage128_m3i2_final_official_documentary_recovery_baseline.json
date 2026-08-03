@@ -1,0 +1,43 @@
+{
+  "action_id": "stage128-m3i2-final-official-documentary-recovery-initiation",
+  "baseline_branch": "main",
+  "baseline_commit": "b3627809dbfde8429d0308bec5d1c8541a161188",
+  "bundle_integrity_pass_is_not_historical_vintage_resolution": true,
+  "executed_in_separate_clean_worktree": true,
+  "predecessor_pr_merge_commit": "b3627809dbfde8429d0308bec5d1c8541a161188",
+  "predecessor_pr_merged": true,
+  "predecessor_pr_number": 75,
+  "prior_capture_repeated": false,
+  "prior_findings_carried_read_only": {
+    "archive_editions_already_captured": 16,
+    "archive_editions_discovered": 110,
+    "cpi_semantic_pass_count": 16,
+    "cutoffs_with_verified_pre_cutoff_edition": 0,
+    "development_parent_rows": 539,
+    "editions_total_for_release_date_verification": 110,
+    "editions_with_verified_release_date": 0,
+    "fx_semantic_unresolved_count": 16,
+    "locked_iran_series_rows_already_extracted": 1878,
+    "official_requests_already_completed": 21,
+    "successful_responses_already_retained": 21,
+    "unique_cutoffs_total": 37,
+    "unique_development_cutoffs": 37,
+    "unresolved_cutoffs": 37,
+    "unresolved_development_pairs": 539
+  },
+  "prior_findings_recomputed": false,
+  "repository": "abtinasg/papermali",
+  "verified_merged_scientific_state": {
+    "final_test_locked": true,
+    "independent_bundle_integrity_audit": "INDEPENDENT_BUNDLE_INTEGRITY_AUDIT_PASS",
+    "m3_cbi_admitted": false,
+    "m3_cbi_status": "UNRESOLVED_M3_DATA_GATE",
+    "m3i2_admitted": false,
+    "m3i2_data_gate_executed": false,
+    "m3i2_evidence_status": "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE",
+    "m3i3_admitted": false,
+    "m3i3_status": "UNRESOLVED_METADATA_LOCK",
+    "m4_authorized": false
+  },
+  "worktree_was_clean_at_start": true
+}
