@@ -2770,6 +2770,7 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # Must come last: the supplementary M3I-2 contract lock succeeds the
         # CBI M3 Gate as the live action and owns the research pointers.
         **derive_stage128_m3i2_contract_lock_markers(root),
+        **derive_stage128_m3i2_evidence_capture_markers(root),
     }
 
 
@@ -3673,7 +3674,10 @@ def build_handoff_state(root: str):
         # contract lock is live, its predecessor is the CBI M3 macro data
         # Gate, not the older M2 D2 boundary-month workstream.
         "active_workstream_predecessor_context": (
-            _STAGE128_M3_ACTIVE_WORKSTREAM_ID.replace("-", "_")
+            _STAGE128_M3I2_ACTIVE_WORKSTREAM_ID.replace("-", "_")
+            if derive_stage128_m3i2_evidence_capture_markers(root).get(
+                "stage128_m3i2_evidence_capture_executed")
+            else _STAGE128_M3_ACTIVE_WORKSTREAM_ID.replace("-", "_")
             if derive_stage128_m3i2_contract_lock_markers(root).get(
                 "stage128_m3i2_contract_lock_executed")
             else "stage128_m2_d2_boundary_month_equity_return"),
@@ -5051,7 +5055,12 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
     m3i2_locked = bool(
         derive_stage128_m3i2_contract_lock_markers(root).get(
             "stage128_m3i2_contract_lock_executed"))
-    if m3i2_locked:
+    m3i2_evidence = bool(
+        derive_stage128_m3i2_evidence_capture_markers(root).get(
+            "stage128_m3i2_evidence_capture_executed"))
+    if m3i2_evidence:
+        allowed = _STAGE128_M3I2_EVIDENCE_WORKSTREAM_ID
+    elif m3i2_locked:
         allowed = _STAGE128_M3I2_ACTIVE_WORKSTREAM_ID
     else:
         allowed = (_STAGE128_M3_ACTIVE_WORKSTREAM_ID if m3_gate_executed
@@ -5578,6 +5587,98 @@ def derive_stage128_m3_macro_data_gate_markers(root: str) -> dict:
 #: Once the supplementary M3I-2 contract has been prospectively locked, this
 #: is the live workstream label. A CONTRACT lock is metadata only: no macro
 #: observation is retrieved, no Data Gate runs and no modeling starts.
+_STAGE128_M3I2_EVIDENCE_ACTION_ID = (
+    "stage128-m3i2-official-source-evidence-capture")
+_STAGE128_M3I2_EVIDENCE_WORKSTREAM_ID = (
+    "stage128-m3i2-official-source-evidence-capture")
+_STAGE128_M3I2_EVIDENCE_DECISION_REL = (
+    "project/stage128/m3i2_official_source_evidence_capture/"
+    "stage128_m3i2_official_source_evidence_decision.json")
+_STAGE128_M3I2_EVIDENCE_STATUSES = (
+    "EVIDENCE_COMPLETE_FOR_SEPARATE_M3I2_DATA_GATE_REVIEW",
+    "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE",
+    "INVALID_OFFICIAL_SOURCE_EVIDENCE_CAPTURE",
+)
+
+
+def derive_stage128_m3i2_evidence_capture_markers(root: str) -> dict:
+    """Markers for the M3I-2 official-source evidence capture.
+
+    Evidence capture is acquisition, not admission: it produces hashed official
+    source material and answers nothing about coverage, the Data Gate or
+    modeling. Every marker below therefore keeps the scientific state exactly
+    where the contract lock left it.
+    """
+    path = os.path.join(root, _STAGE128_M3I2_EVIDENCE_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        d = json.load(fh)
+
+    if d.get("action_id") != _STAGE128_M3I2_EVIDENCE_ACTION_ID:
+        raise HandoffError("stage128 M3I-2 evidence-capture action_id mismatch")
+    status = d.get("m3i2_official_source_evidence_status")
+    if status not in _STAGE128_M3I2_EVIDENCE_STATUSES:
+        raise HandoffError(f"unknown M3I-2 evidence status {status!r}")
+    for field, expected in (
+        ("data_gate_passed", False),
+        ("m3i2_admitted", False),
+        ("m3i3_admitted", False),
+        ("m3i3_contract_null_fields_populated", False),
+        ("final_test_locked", True),
+        ("final_test_access_authorized", False),
+        ("m4_authorized", False),
+        ("m4_started", False),
+        ("merge_authorized", False),
+        ("next_research_action_authorized", False),
+    ):
+        if d.get(field) is not expected:
+            raise HandoffError(
+                f"stage128 M3I-2 evidence capture {field} must be {expected}")
+    for field in ("company_macro_joins", "feature_materializations",
+                  "coverage_calculations", "data_gate_executions",
+                  "model_fits", "predictions", "predictive_metrics",
+                  "holm_calculations", "final_test_rows_read"):
+        if d.get(field) != 0:
+            raise HandoffError(
+                f"stage128 M3I-2 evidence capture {field} must be 0")
+    if d.get("m3_cbi_status") != "UNRESOLVED_M3_DATA_GATE":
+        raise HandoffError(
+            "the M3I-2 evidence capture must preserve the M3-CBI Gate status")
+
+    summary = d.get("evidence_summary") or {}
+    return {
+        "stage128_m3i2_evidence_capture_executed": True,
+        "stage128_m3i2_evidence_status": status,
+        "stage128_m3i2_evidence_result_code": d.get("result_code"),
+        "stage128_m3i2_financing_metadata_decision": d.get(
+            "m3i3_financing_metadata_decision"),
+        "stage128_m3i2_official_responses_retained": summary.get(
+            "official_responses_retained"),
+        "stage128_m3i2_raw_bytes_retained": summary.get("raw_bytes_total"),
+        "stage128_m3i2_required_editions_total": summary.get(
+            "required_editions_total"),
+        "stage128_m3i2_required_editions_captured": summary.get(
+            "required_editions_captured"),
+        "stage128_m3i2_cutoffs_without_verified_pre_cutoff_edition":
+            summary.get("cutoffs_without_verified_pre_cutoff_edition"),
+        "stage128_m3i2_external_bundle_available_for_handoff": summary.get(
+            "external_bundle_available_for_handoff"),
+        # Acquisition never moves the scientific state.
+        "m3i2_data_gate_executed": False,
+        "m3i2_block_admitted": False,
+        "m3i2_modeling_started": False,
+        "m3i3_admitted": False,
+        "m4_authorized": False,
+        "m4_started": False,
+        "final_test_locked": True,
+        "last_completed_research_action_id": _STAGE128_M3I2_EVIDENCE_ACTION_ID,
+        "next_research_action_id": d.get("next_research_action_id"),
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
+    }
+
+
 _STAGE128_M3I2_ACTIVE_WORKSTREAM_ID = "stage128-m3i2-prospective-contract-lock"
 
 _STAGE128_M3I2_CONTRACT_LOCK_REL = (

@@ -593,7 +593,7 @@ def test_research_pointers_unchanged():
     # The live workstream advanced once more when the supplementary M3I-2
     # contract was prospectively locked. A contract lock is metadata only.
     assert report["active_workstream"] == (
-        "stage128_m3i2_prospective_contract_lock"
+        "stage128_m3i2_official_source_evidence_capture"
     )
     # Part 6 closed the six-category robustness set, the synthesis-only
     # robustness closure completed, the retained-design freeze (PR #65)
@@ -610,7 +610,7 @@ def test_research_pointers_unchanged():
     # contract has since been prospectively locked, so the pointer advanced
     # once more — to an evidence-capture action that is NOT authorized.
     assert report["next_research_action_id"] == (
-        "stage128-m3i2-official-source-evidence-capture"
+        "stage128-m3i2-official-source-evidence-review"
     )
 
 
@@ -1501,16 +1501,16 @@ def test_live_handoff_labels_match_the_live_research_state():
     if state.get("stage128_m2_d2_design_freeze_completed"):
         assert state["current_stage"] == "Stage128"
         assert state["active_workstream"] == (
-            "stage128_m3i2_prospective_contract_lock"
+            "stage128_m3i2_official_source_evidence_capture"
         )
         # The authoritative research-action ids advance only with real
         # scientific actions, never with a label fix. The D2 design freeze,
         # then the executed D2 Gate re-run, each advanced them once.
         assert state["last_completed_research_action_id"] == (
-            "stage128-m3i2-prospective-contract-lock"
+            "stage128-m3i2-official-source-evidence-capture"
         )
         assert state["next_research_action_id"] == (
-            "stage128-m3i2-official-source-evidence-capture"
+            "stage128-m3i2-official-source-evidence-review"
         )
         # And nothing further is AUTHORIZED by advancing a label.
         for field in (
@@ -1537,7 +1537,7 @@ def test_expected_labels_are_state_dependent_not_hardcoded():
     root = _root()
     assert v.expected_current_stage(root) == "Stage128"
     assert v.expected_active_workstream(root) == (
-        "stage128_m3i2_prospective_contract_lock"
+        "stage128_m3i2_official_source_evidence_capture"
     )
     # The Stage126 constants survive as the pre-freeze expectation.
     assert v.ACTIVE_WORKSTREAM == "stage126_m1_financial_baseline"
@@ -1551,12 +1551,12 @@ def test_current_state_snapshot_renders_stage128_labels():
         assert "- **Stage / Batch:** Stage128 /" in text
         assert (
             "- **Active workstream:** "
-            "`stage128_m3i2_prospective_contract_lock`"
+            "`stage128_m3i2_official_source_evidence_capture`"
             in text
         )
         assert (
             "- **Next research action:** "
-            "`stage128-m3i2-official-source-evidence-capture`" in text
+            "`stage128-m3i2-official-source-evidence-review`" in text
         )
         assert (
             "## Stage128 — M2 D2 boundary-month equity-return design freeze"
@@ -1665,7 +1665,7 @@ def test_sole_live_next_pointer_is_a_pointer_not_an_authorization():
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1, pointers
     line = pointers[0]
-    assert "`stage128-m3i2-official-source-evidence-capture`" in line
+    assert "`stage128-m3i2-official-source-evidence-review`" in line
     assert "pointer is **not** an authorization" in line
 
 
@@ -1694,10 +1694,10 @@ def test_roadmap_front_matter_matches_handoff_pointers():
     text = open(_ROADMAP, encoding="utf-8").read()
     fm = v._roadmap_front_matter(text)
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m3i2-prospective-contract-lock"
+        "stage128-m3i2-official-source-evidence-capture"
     )
     assert fm["next_research_action_id"] == (
-        "stage128-m3i2-official-source-evidence-capture"
+        "stage128-m3i2-official-source-evidence-review"
     )
     state = json.loads(open(
         os.path.join(REAL_ROOT, "project", "docs", "ai",
@@ -1823,9 +1823,11 @@ def test_expected_active_workstream_advances_to_the_m3_gate():
     # contract lock succeeds it; on this branch the lock is complete.
     assert v.STAGE128_M3_ACTIVE_WORKSTREAM == "stage128_m3_macro_data_gate"
     assert v.expected_active_workstream(_root()) == (
-        "stage128_m3i2_prospective_contract_lock")
+        "stage128_m3i2_official_source_evidence_capture")
     assert v.STAGE128_M3I2_ACTIVE_WORKSTREAM == (
         "stage128_m3i2_prospective_contract_lock")
+    assert v.STAGE128_M3I2_EVIDENCE_ACTIVE_WORKSTREAM == (
+        "stage128_m3i2_official_source_evidence_capture")
 
 
 def test_stale_m2_d2_workstream_label_is_rejected_after_the_m3_gate():
@@ -1947,7 +1949,7 @@ def test_m3i2_next_pointer_is_the_unauthorized_evidence_capture():
     assert v.NEXT_RESEARCH_ACTION_ID_AFTER_M3I2_CONTRACT_LOCK == (
         "stage128-m3i2-official-source-evidence-capture")
     assert v.expected_next_research_action_id(_root(), True) == (
-        "stage128-m3i2-official-source-evidence-capture")
+        "stage128-m3i2-official-source-evidence-review")
 
 
 def test_m3i2_live_topology_is_the_post_merge_retargeted_state():
