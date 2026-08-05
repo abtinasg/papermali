@@ -722,6 +722,67 @@ def stage128_m3i2_evidence_capture_completed(repo_root: Path) -> bool:
     return True
 
 
+STAGE128_M3I2_RECOVERY_ACTION_ID = (
+    "stage128-m3i2-final-official-documentary-recovery-initiation")
+STAGE128_M3I2_RECOVERY_ACTIVE_WORKSTREAM = (
+    "stage128_m3i2_final_official_documentary_recovery")
+_STAGE128_M3I2_RECOVERY_DECISION_REL = (
+    "project/stage128/m3i2_final_official_documentary_recovery/"
+    "stage128_m3i2_final_official_documentary_recovery_decision.json")
+STAGE128_M3I2_RECOVERY_INITIATION_STATUSES = (
+    "OFFICIAL_INQUIRY_SUBMITTED_PENDING_RESPONSE",
+    "HUMAN_SUBMISSION_REQUIRED",
+)
+
+
+def stage128_m3i2_final_documentary_recovery_initiated(repo_root: Path) -> bool:
+    """True once the M3I-2 final official documentary recovery is recorded.
+
+    The action is an INITIATION: a bounded official documentary search plus at
+    most one prepared inquiry. It admits nothing, executes no Data Gate and
+    never contract-locks M3-LAG-WDI, so this recognizer fails closed on any
+    artifact that claims otherwise.
+    """
+    path = repo_root / _STAGE128_M3I2_RECOVERY_DECISION_REL
+    if not path.is_file():
+        return False
+    decision = json.loads(path.read_text(encoding="utf-8"))
+    if decision.get("action_id") != STAGE128_M3I2_RECOVERY_ACTION_ID:
+        raise ValidationFail("stage128 M3I-2 recovery action_id mismatch")
+    status = decision.get("initiation_status")
+    if status not in STAGE128_M3I2_RECOVERY_INITIATION_STATUSES:
+        raise ValidationFail(
+            f"unknown M3I-2 recovery initiation status {status!r}")
+    for field, expected in (
+        ("m3i2_admitted", False),
+        ("m3i2_data_gate_executed", False),
+        ("m3i2_modeling_started", False),
+        ("m3_lag_wdi_exploratory_contract_locked", False),
+        ("m3_lag_wdi_data_retrieval_started", False),
+        ("final_test_locked", True),
+        ("m4_authorized", False),
+        ("merge_authorized", False),
+        ("next_research_action_authorized", False),
+    ):
+        if decision.get(field) is not expected:
+            raise ValidationFail(
+                f"stage128 M3I-2 recovery {field} != {expected}")
+    if decision.get("m3_lag_wdi_authoritative_contract_status") != "NOT_LOCKED":
+        raise ValidationFail("M3-LAG-WDI must remain NOT_LOCKED")
+    if decision.get("m3i2_evidence_status") != (
+            "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE"):
+        raise ValidationFail(
+            "the M3I-2 recovery initiation must preserve the unresolved "
+            "official-source evidence status")
+    if decision.get("m3_cbi_status") != "UNRESOLVED_M3_DATA_GATE":
+        raise ValidationFail(
+            "the M3I-2 recovery must preserve the M3-CBI Gate status")
+    if decision.get("m3i3_lock_status") != "UNRESOLVED_METADATA_LOCK":
+        raise ValidationFail(
+            "M3I-3 must remain UNRESOLVED_METADATA_LOCK")
+    return True
+
+
 #: PR #73 was merged into main by this commit; PR #74 was retargeted after.
 STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT = (
     "e6db63fb7d105f0d3a39db101c9e364161c367e9")
@@ -830,7 +891,8 @@ def m3_gate_state_is_self_consistent(
         # and neither implies modeling.
         and handoff.get("active_workstream") in (
             STAGE128_M3_ACTIVE_WORKSTREAM, STAGE128_M3I2_ACTIVE_WORKSTREAM,
-            STAGE128_M3I2_EVIDENCE_ACTIVE_WORKSTREAM)
+            STAGE128_M3I2_EVIDENCE_ACTIVE_WORKSTREAM,
+            STAGE128_M3I2_RECOVERY_ACTIVE_WORKSTREAM)
         and handoff.get("m3_modeling_started") is False
         and handoff.get("m3_incremental_evaluation_authorized") is False
         and handoff.get("m3_block_admitted_for_incremental_evaluation") is False
@@ -849,6 +911,8 @@ def expected_active_workstream(repo_root: Path) -> str:
     Stage128 M2 D2 one, not the Stage126 M1 financial baseline. The Stage126
     value remains correct history, but it is no longer the CURRENT value.
     """
+    if stage128_m3i2_final_documentary_recovery_initiated(repo_root):
+        return STAGE128_M3I2_RECOVERY_ACTIVE_WORKSTREAM
     if stage128_m3i2_evidence_capture_completed(repo_root):
         return STAGE128_M3I2_EVIDENCE_ACTIVE_WORKSTREAM
     if stage128_m3i2_contract_lock_completed(repo_root):
@@ -888,6 +952,13 @@ def current_state_labels_are_not_stale(
     # predecessor context — stale as a CURRENT value.
     # The evidence capture is the newest completed action, so it - not the
     # contract lock - is the CURRENT workstream once it has been recorded.
+    # ...and the final official documentary recovery is newer still: once it
+    # is INITIATED it is the CURRENT workstream and the evidence capture
+    # becomes predecessor context.
+    if handoff.get(
+            "stage128_m3i2_final_documentary_recovery_initiated") is True:
+        return handoff.get("active_workstream") == (
+            STAGE128_M3I2_RECOVERY_ACTIVE_WORKSTREAM)
     if handoff.get("stage128_m3i2_evidence_capture_executed") is True:
         return handoff.get("active_workstream") == (
             STAGE128_M3I2_EVIDENCE_ACTIVE_WORKSTREAM)
@@ -1168,6 +1239,11 @@ def expected_next_research_action_id(
         # A pointer is never an authorization. Once the evidence capture has
         # itself been recorded, the pointer advances to whatever that capture's
         # OWN decision names - still unauthorized.
+        if stage128_m3i2_final_documentary_recovery_initiated(repo_root):
+            decision = json.loads(
+                (repo_root / _STAGE128_M3I2_RECOVERY_DECISION_REL).read_text(
+                    encoding="utf-8"))
+            return decision["next_research_action_id"]
         if stage128_m3i2_evidence_capture_completed(repo_root):
             decision = json.loads(
                 (repo_root / _STAGE128_M3I2_EVIDENCE_DECISION_REL).read_text(
@@ -2647,6 +2723,9 @@ def build_assertions(
         or (retained_block_done
             and handoff.get("last_completed_research_action_id")
             == STAGE128_M2_RETAINED_BLOCK_DECISION_ACTION_ID)
+        or (stage128_m3i2_final_documentary_recovery_initiated(repo_root)
+            and handoff.get("last_completed_research_action_id")
+            == STAGE128_M3I2_RECOVERY_ACTION_ID)
         or (stage128_m3i2_evidence_capture_completed(repo_root)
             and handoff.get("last_completed_research_action_id")
             == STAGE128_M3I2_EVIDENCE_ACTION_ID)

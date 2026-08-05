@@ -1,0 +1,141 @@
+{
+  "artifact_id": "stage128_m3i2_full_suite_baseline_comparison",
+  "baseline_errors": 0,
+  "baseline_failed": 8,
+  "baseline_failure_node_ids": [
+    "project/tests/test_stage125_part3b1_decision_lock.py::test_qc_all_pass_offline_evidence_based",
+    "project/tests/test_stage125_part5_readiness_closure.py::test_run_canonical_check_zero_scientific_drift",
+    "project/tests/test_stage126_m1_robustness_closure.py::test_on_disk_artifacts_match_fresh_build",
+    "project/tests/test_stage127_m2_incremental_evaluation.py::test_current_state_states_the_final_test_claim_precisely",
+    "project/tests/test_stage127_m2_zero_trade_semantics_import.py::test_handoff_state_keeps_m2_unauthorized",
+    "project/tests/test_stage128_m2_retained_block_human_decision.py::test_current_state_renders_the_decision_without_a_superiority_claim",
+    "project/tests/test_stage128_m2_retained_block_human_decision.py::test_no_m3_artifact_was_created",
+    "project/tests/test_stage128_m2_retained_block_human_decision.py::test_roadmap_and_handoff_agree_on_the_decided_state"
+  ],
+  "baseline_passed": 3829,
+  "baseline_sha": "b3627809dbfde8429d0308bec5d1c8541a161188",
+  "baseline_skipped": 27,
+  "baseline_tests_collected": 3864,
+  "candidate_correction_head": "458dbf6459764d1c5be7ea55a6f5096453bdbcfe",
+  "candidate_errors": 0,
+  "candidate_failed": 8,
+  "candidate_failure_node_ids": [
+    "project/tests/test_stage125_part3b1_decision_lock.py::test_qc_all_pass_offline_evidence_based",
+    "project/tests/test_stage125_part5_readiness_closure.py::test_run_canonical_check_zero_scientific_drift",
+    "project/tests/test_stage126_m1_robustness_closure.py::test_on_disk_artifacts_match_fresh_build",
+    "project/tests/test_stage127_m2_incremental_evaluation.py::test_current_state_states_the_final_test_claim_precisely",
+    "project/tests/test_stage127_m2_zero_trade_semantics_import.py::test_handoff_state_keeps_m2_unauthorized",
+    "project/tests/test_stage128_m2_retained_block_human_decision.py::test_current_state_renders_the_decision_without_a_superiority_claim",
+    "project/tests/test_stage128_m2_retained_block_human_decision.py::test_no_m3_artifact_was_created",
+    "project/tests/test_stage128_m2_retained_block_human_decision.py::test_roadmap_and_handoff_agree_on_the_decided_state"
+  ],
+  "candidate_passed": 3915,
+  "candidate_skipped": 27,
+  "candidate_tests_collected": 3950,
+  "comparison_result": "PASS_NO_PR_INTRODUCED_FULL_SUITE_FAILURES",
+  "environment_equivalence_note": "Both runs used the same interpreter, the same pinned dependencies, the same pytest.ini/marker deselection, the same inherited environment and the same set of gitignored frozen assets, each from the root of a linked git worktree of the same repository. The two invocations differ only in the JUnit report output path, which is written outside the repository and cannot affect test selection or outcome.",
+  "failure_details": [
+    {
+      "exception_class": "AssertionError",
+      "exception_class_source": "parsed_from_failure_text",
+      "first_meaningful_failure_line": "AssertionError: [{'assertion': 'changed_path_exact_allowlist', 'detail': \"offenders=['project/run_stage128_m2_retained_block_human_dec...roject/src/stage128_m3_intl_macro_contract_lock.py', 'project/src/stage128_m3_macro_data_gate.py']\", 'status': 'FAIL'}]",
+      "node_id": "project/tests/test_stage125_part3b1_decision_lock.py::test_qc_all_pass_offline_evidence_based",
+      "present_on_baseline": true,
+      "present_on_candidate": true
+    },
+    {
+      "exception_class": "AssertionError",
+      "exception_class_source": "parsed_from_failure_text",
+      "first_meaningful_failure_line": "AssertionError: unregistered Part 5 drift: ['metadata_and_hashes_stage125_part5.json', 'part5_artifact_integrity_manifest_stage125.csv', 'stage125_part5_readiness_closure_qc_report.json']",
+      "node_id": "project/tests/test_stage125_part5_readiness_closure.py::test_run_canonical_check_zero_scientific_drift",
+      "present_on_baseline": true,
+      "present_on_candidate": true
+    },
+    {
+      "exception_class": "AssertionError",
+      "exception_class_source": "parsed_from_failure_text",
+      "first_meaningful_failure_line": "AssertionError: drift in stage126_m1_robustness_closure_source_manifest.json",
+      "node_id": "project/tests/test_stage126_m1_robustness_closure.py::test_on_disk_artifacts_match_fresh_build",
+      "present_on_baseline": true,
+      "present_on_candidate": true
+    },
+    {
+      "exception_class": "IndexError",
+      "exception_class_source": "parsed_from_failure_text",
+      "first_meaningful_failure_line": "IndexError: list index out of range",
+      "node_id": "project/tests/test_stage127_m2_incremental_evaluation.py::test_current_state_states_the_final_test_claim_precisely",
+      "present_on_baseline": true,
+      "present_on_candidate": true
+    },
+    {
+      "exception_class": "AssertionError",
+      "exception_class_source": "parsed_from_failure_text",
+      "first_meaningful_failure_line": "assert True is False",
+      "node_id": "project/tests/test_stage127_m2_zero_trade_semantics_import.py::test_handoff_state_keeps_m2_unauthorized",
+      "present_on_baseline": true,
+      "present_on_candidate": true
+    },
+    {
+      "exception_class": "AssertionError",
+      "exception_class_source": "parsed_from_failure_text",
+      "first_meaningful_failure_line": "AssertionError: assert 'improves prediction' not in '\\n\\n_the hu...efe5ff3c1`\\n'",
+      "node_id": "project/tests/test_stage128_m2_retained_block_human_decision.py::test_current_state_renders_the_decision_without_a_superiority_claim",
+      "present_on_baseline": true,
+      "present_on_candidate": true
+    },
+    {
+      "exception_class": "AssertionError",
+      "exception_class_source": "parsed_from_failure_text",
+      "first_meaningful_failure_line": "AssertionError: assert [PosixPath('/...e.json'), ...] == []",
+      "node_id": "project/tests/test_stage128_m2_retained_block_human_decision.py::test_no_m3_artifact_was_created",
+      "present_on_baseline": true,
+      "present_on_candidate": true
+    },
+    {
+      "exception_class": "AssertionError",
+      "exception_class_source": "parsed_from_failure_text",
+      "first_meaningful_failure_line": "AssertionError: assert 'last_completed_research_action_id: stage128-m2-retained-block-human-decision' in '\\nroadmap_version: 2\\nactive_research_workstream_id: stage128-m3i2-final-official-documentary-recovery\\npredecessor_r...IRED\\nm3_lag_wdi_authoritative_contract_status: NOT_LOCKED\\nactive",
+      "node_id": "project/tests/test_stage128_m2_retained_block_human_decision.py::test_roadmap_and_handoff_agree_on_the_decided_state",
+      "present_on_baseline": true,
+      "present_on_candidate": true
+    }
+  ],
+  "final_test_locked": true,
+  "inquiry_submission_status": "HUMAN_SUBMISSION_REQUIRED",
+  "jdatetime_version": "6.0.1",
+  "m3_lag_wdi_authoritative_contract_status": "NOT_LOCKED",
+  "m3i2_admitted": false,
+  "m3i2_data_gate_executed": false,
+  "m3i2_evidence_status": "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE",
+  "m4_authorized": false,
+  "merge_authorized": false,
+  "network_requests_during_verification": 0,
+  "new_failure_node_ids": [],
+  "new_failures_count": 0,
+  "no_test_was_deleted_or_weakened_to_hide_a_failure": true,
+  "preexisting_failure_node_ids": [
+    "project/tests/test_stage125_part3b1_decision_lock.py::test_qc_all_pass_offline_evidence_based",
+    "project/tests/test_stage125_part5_readiness_closure.py::test_run_canonical_check_zero_scientific_drift",
+    "project/tests/test_stage126_m1_robustness_closure.py::test_on_disk_artifacts_match_fresh_build",
+    "project/tests/test_stage127_m2_incremental_evaluation.py::test_current_state_states_the_final_test_claim_precisely",
+    "project/tests/test_stage127_m2_zero_trade_semantics_import.py::test_handoff_state_keeps_m2_unauthorized",
+    "project/tests/test_stage128_m2_retained_block_human_decision.py::test_current_state_renders_the_decision_without_a_superiority_claim",
+    "project/tests/test_stage128_m2_retained_block_human_decision.py::test_no_m3_artifact_was_created",
+    "project/tests/test_stage128_m2_retained_block_human_decision.py::test_roadmap_and_handoff_agree_on_the_decided_state"
+  ],
+  "preexisting_failures_count": 8,
+  "pytest_command": "python -m pytest -q --junitxml=<report path outside the repository>",
+  "pytest_version": "8.4.2",
+  "python_version": "3.13.5",
+  "record_type": "verification_record_only_no_scientific_effect",
+  "report_commit_self_reference_avoided": true,
+  "report_commit_self_reference_note": "This record evaluates the candidate correction head only. The commit that carries this file is NOT the commit that was tested, and this record makes no claim about its own SHA.",
+  "resolved_failure_node_ids": [],
+  "resolved_failures_count": 0,
+  "same_assets": true,
+  "same_environment_variables": true,
+  "same_pytest_command": true,
+  "same_working_directory_semantics": true,
+  "scientific_effect": "NONE_AUTHORITATIVE",
+  "tests_added_by_candidate": 86
+}

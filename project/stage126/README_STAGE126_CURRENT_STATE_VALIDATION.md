@@ -41,8 +41,8 @@ PYTHONPATH=project python -m pytest project/tests -q
 | full-development refit performed | false |
 | final test unlocked | false |
 | last completed micro-part | `stage126-m1-robustness-part6-smote-training-fold-only` |
-| active workstream | `stage128_m3i2_official_source_evidence_capture` |
-| next research action | `stage128-m3i2-official-source-evidence-review` |
+| active workstream | `stage128_m3i2_final_official_documentary_recovery` |
+| next research action | `stage128-m3i2-final-official-inquiry-human-submission` |
 
 ## Adding a future part
 

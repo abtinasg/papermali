@@ -2780,6 +2780,13 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # Must come last: it publishes the LIVE evidence-capture PR topology
         # and demotes the contract-lock topology to explicit history.
         **derive_stage128_m3i2_live_pr_topology_markers(root),
+        # Must come last: the final official documentary recovery succeeds the
+        # (now merged) evidence capture as the live action and owns both the
+        # research pointers and the live PR topology.
+        **derive_stage128_m3i2_final_documentary_recovery_markers(root),
+        # Verification record only: it reports how the suite behaved, and is
+        # never allowed to move a scientific marker.
+        **derive_stage128_m3i2_full_suite_comparison_markers(root),
     }
 
 
@@ -3683,7 +3690,10 @@ def build_handoff_state(root: str):
         # contract lock is live, its predecessor is the CBI M3 macro data
         # Gate, not the older M2 D2 boundary-month workstream.
         "active_workstream_predecessor_context": (
-            _STAGE128_M3I2_ACTIVE_WORKSTREAM_ID.replace("-", "_")
+            _STAGE128_M3I2_EVIDENCE_WORKSTREAM_ID.replace("-", "_")
+            if derive_stage128_m3i2_final_documentary_recovery_markers(
+                root).get("stage128_m3i2_final_documentary_recovery_initiated")
+            else _STAGE128_M3I2_ACTIVE_WORKSTREAM_ID.replace("-", "_")
             if derive_stage128_m3i2_evidence_capture_markers(root).get(
                 "stage128_m3i2_evidence_capture_executed")
             else _STAGE128_M3_ACTIVE_WORKSTREAM_ID.replace("-", "_")
@@ -4390,8 +4400,7 @@ def render_current_state(record: dict) -> str:
             f"`{record.get('stage128_m3i2_contract_time_pr_semantics')}`. "
             f"PR #{record.get('stage128_m3i2_contract_time_pr_number')} is the "
             "**historical contract-lock PR**, never the current draft; the "
-            "live evidence-capture PR is identified in the evidence-capture "
-            "section below.",
+            "live Draft PR is identified in the live-action section below.",
             "- **Next research action (pointer only):** "
             f"`{record.get('next_research_action_id')}` — it is **not "
             "authorized** and a pointer is **not** an authorization "
@@ -4411,23 +4420,46 @@ def render_current_state(record: dict) -> str:
             "input-integrity count and **never coverage**. Capture is not "
             "admission — it answers nothing about coverage, the Data Gate or "
             "modeling._\n",
-            "- ✅ **Evidence capture executed:** True — action "
-            f"`{record.get('last_completed_research_action_id')}`, carried by "
-            "**PR #"
-            f"{record.get('stage128_m3i2_live_pr_number', 'n/a')}** "
-            "(the LIVE evidence-capture PR)",
+            # Once the final documentary recovery is initiated, THIS action is
+            # no longer the live one: it keeps its own action id and its own
+            # (now merged) PR, and the live PR topology moves to the recovery
+            # section below. A merged predecessor is never the live Draft.
+            ("- ✅ **Evidence capture executed:** True — action "
+             f"`{_STAGE128_M3I2_EVIDENCE_ACTION_ID}`, carried by "
+             "**PR #"
+             f"{record.get('stage128_m3i2_evidence_capture_pr_number', 'n/a')}"
+             "** (the MERGED predecessor PR, no longer the live Draft)"
+             if record.get(
+                 "stage128_m3i2_final_documentary_recovery_initiated")
+             else
+             "- ✅ **Evidence capture executed:** True — action "
+             f"`{record.get('last_completed_research_action_id')}`, carried by "
+             "**PR #"
+             f"{record.get('stage128_m3i2_live_pr_number', 'n/a')}** "
+             "(the LIVE evidence-capture PR)"),
             "- ✅ **Official-source retrieval completed:** "
             f"{record.get('stage128_m3i2_official_source_retrieval_completed')}"
             " — this is acquisition only and is **not** a Data Gate, **not** "
             "coverage and **not** an admission",
-            "- **Live PR topology:** PR #"
-            f"{record.get('stage128_m3i2_live_pr_number')} → base "
-            f"`{record.get('stage128_m3i2_live_pr_base_branch')}` @ "
-            f"`{record.get('stage128_m3i2_live_pr_base_commit')}` — draft = "
-            f"{record.get('stage128_m3i2_live_pr_is_draft')}, merged = "
-            f"{record.get('stage128_m3i2_live_pr_merged')}, head derived from "
-            f"`{record.get('stage128_m3i2_live_pr_head_commit_source')}` "
-            "(never pinned)",
+            ("- **PR topology at capture time (HISTORICAL, not live):** PR #"
+             f"{record.get('stage128_m3i2_evidence_capture_pr_number')} "
+             "**was merged** by merge commit "
+             f"`{record.get('stage128_m3i2_evidence_capture_pr_merge_commit')}`"
+             f" — semantics: "
+             f"`{record.get('stage128_m3i2_evidence_capture_pr_semantics')}`. "
+             "The live Draft PR is identified in the final official "
+             "documentary recovery section below."
+             if record.get(
+                 "stage128_m3i2_final_documentary_recovery_initiated")
+             else
+             "- **Live PR topology:** PR #"
+             f"{record.get('stage128_m3i2_live_pr_number')} → base "
+             f"`{record.get('stage128_m3i2_live_pr_base_branch')}` @ "
+             f"`{record.get('stage128_m3i2_live_pr_base_commit')}` — draft = "
+             f"{record.get('stage128_m3i2_live_pr_is_draft')}, merged = "
+             f"{record.get('stage128_m3i2_live_pr_merged')}, head derived from "
+             f"`{record.get('stage128_m3i2_live_pr_head_commit_source')}` "
+             "(never pinned)"),
             "- **Official traffic:** "
             f"{record.get('stage128_m3i2_official_requests_attempted')} "
             "requests — "
@@ -4521,6 +4553,134 @@ def render_current_state(record: dict) -> str:
             "- Attestation: `project/stage128/"
             "m3i2_official_source_evidence_capture/"
             "stage128_m3i2_independent_bundle_integrity_audit_attestation.md`",
+            "",
+        ]
+    if record.get("stage128_m3i2_final_documentary_recovery_initiated"):
+        lines += [
+            "### Stage128 — M3I-2 final official documentary recovery "
+            "(INITIATION ONLY)\n",
+            "_The LIVE action. A bounded search of OFFICIAL World Bank Group "
+            "sources for the two remaining M3I-2 blockers, plus preparation "
+            "of exactly ONE official Data Help Desk inquiry. Acquiring "
+            "DOCUMENTS is not admitting DATA: it answers nothing about "
+            "coverage, the Data Gate or modeling._\n",
+            "- ✅ **Initiated:** True — action "
+            f"`{record.get('last_completed_research_action_id')}`, carried by "
+            f"**PR #{record.get('stage128_m3i2_live_pr_number')}** (the LIVE "
+            "Draft PR) on base "
+            f"`{record.get('stage128_m3i2_live_pr_base_branch')}` @ "
+            f"`{record.get('stage128_m3i2_live_pr_base_commit')}`",
+            "- **Live PR topology:** PR #"
+            f"{record.get('stage128_m3i2_live_pr_number')} → base "
+            f"`{record.get('stage128_m3i2_live_pr_base_branch')}` @ "
+            f"`{record.get('stage128_m3i2_live_pr_base_commit')}` — draft = "
+            f"{record.get('stage128_m3i2_live_pr_is_draft')}, merged = "
+            f"{record.get('stage128_m3i2_live_pr_merged')}, head derived from "
+            f"`{record.get('stage128_m3i2_live_pr_head_commit_source')}` "
+            "(never pinned)",
+            "- **Merged predecessor:** PR #"
+            f"{record.get('stage128_m3i2_evidence_capture_pr_number')} "
+            "(official-source evidence capture) — merged = "
+            f"{record.get('stage128_m3i2_evidence_capture_pr_merged')}, merge "
+            "commit "
+            f"`{record.get('stage128_m3i2_evidence_capture_pr_merge_commit')}`",
+            "- **Bounded search:** "
+            f"{record.get('stage128_m3i2_documentary_get_requests')} of a "
+            "maximum "
+            f"{record.get('stage128_m3i2_documentary_get_requests_max')} "
+            "official documentary GET requests — archive ZIP downloads "
+            f"{record.get('stage128_m3i2_archive_zip_downloads')}, "
+            "redownloads "
+            f"{record.get('stage128_m3i2_archive_zip_redownloads')}, prior "
+            "capture repeated "
+            f"{record.get('stage128_m3i2_prior_capture_repeated')}",
+            "- ⛔ **Outcome:** "
+            f"`{record.get('stage128_m3i2_bounded_search_outcome')}` — "
+            "blocker 1 (archive release availability) resolved "
+            f"{record.get('stage128_m3i2_blocker_1_archive_release_resolved')}"
+            " — blocker 2 (FX semantic continuity) resolved "
+            f"{record.get('stage128_m3i2_blocker_2_fx_semantic_resolved')}",
+            "- ⛔ **Release-date discipline unchanged:** filename token is "
+            "release evidence = "
+            f"{record.get('stage128_m3i2_filename_token_is_release_evidence')}"
+            " — unproven previous-month fallback used = "
+            f"{record.get('stage128_m3i2_unproven_previous_month_fallback_used')}"
+            " — official-month → first day of the NEXT month rule locked = "
+            f"{record.get('stage128_m3i2_official_month_only_next_month_rule_locked')}",
+            "- **Official inquiry:** status "
+            f"`{record.get('stage128_m3i2_inquiry_submission_status')}` — "
+            "initial attempts "
+            f"{record.get('stage128_m3i2_inquiry_initial_attempts')} / "
+            "submitted "
+            f"{record.get('stage128_m3i2_inquiry_initial_submitted')} (maximum "
+            "1) — body SHA-256 "
+            f"`{record.get('stage128_m3i2_inquiry_body_sha256')}` — ticket id "
+            f"{record.get('stage128_m3i2_inquiry_ticket_id_redacted')} (none "
+            "invented) — PII committed to Git = "
+            f"{record.get('stage128_m3i2_inquiry_pii_committed_to_git')}",
+            "- **Stopping rule:** waiting period "
+            f"{record.get('stage128_m3i2_inquiry_waiting_period_business_days')}"
+            " business days — follow-up authorized now = "
+            f"{record.get('stage128_m3i2_inquiry_follow_up_authorized_now')} — "
+            "response adjudication authorized = "
+            f"{record.get('stage128_m3i2_response_adjudication_authorized')}",
+            "- ⛔ **M3-LAG-WDI-EXPLORATORY:** authoritative contract status "
+            f"`{record.get('stage128_m3_lag_wdi_authoritative_contract_status')}`"
+            " — a local, uncommitted partial draft was detected "
+            f"({record.get('stage128_m3_lag_wdi_local_partial_draft_detected')})"
+            " and quarantined outside the repository "
+            f"({record.get('stage128_m3_lag_wdi_local_partial_draft_quarantined')})"
+            "; it is not authoritative "
+            f"({record.get('stage128_m3_lag_wdi_local_partial_draft_authoritative')})"
+            ", its authorization is not reusable "
+            f"({record.get('stage128_m3_lag_wdi_prior_authorization_reusable')})"
+            ", retrieval started = "
+            f"{record.get('stage128_m3_lag_wdi_data_retrieval_started')}",
+            "- ⛔ **Nothing scientific moved:** M3I-2 evidence status "
+            f"`{record.get('stage128_m3i2_evidence_status')}` — admitted "
+            f"{record.get('m3i2_block_admitted')} — Data Gate executed "
+            f"{record.get('m3i2_data_gate_executed')} — modeling started "
+            f"{record.get('m3i2_modeling_started')} — Final Test locked "
+            f"{record.get('final_test_locked')} — M4 authorized "
+            f"{record.get('m4_authorized')} — merge authorized "
+            f"{record.get('stage128_m3i2_merge_authorized')}",
+            "- Package: `project/stage128/"
+            "m3i2_final_official_documentary_recovery/`; interpretation: "
+            "`project/stage128/m3i2_final_official_documentary_recovery/"
+            "README_STAGE128_M3I2_FINAL_OFFICIAL_DOCUMENTARY_RECOVERY.md`",
+            "",
+        ]
+    if record.get("full_suite_baseline_comparison_completed"):
+        lines += [
+            "### Stage128 — M3I-2 full-suite baseline comparison "
+            "(VERIFICATION ONLY)\n",
+            "_A test-evidence record, not a scientific one. It states only "
+            "that the same suite was run on the baseline and on the candidate "
+            "correction head in the same environment. It admits nothing, "
+            "moves no pointer and resolves no evidence question._\n",
+            "- ✅ **Comparison completed:** True — result "
+            f"`{record.get('full_suite_comparison_result')}` — **new failures "
+            f"{record.get('full_suite_new_failures')}**",
+            "- **Baseline** `"
+            f"{record.get('full_suite_baseline_sha')}`: "
+            f"{record.get('full_suite_baseline_passed')} passed / "
+            f"{record.get('full_suite_baseline_failed')} failed — "
+            "**candidate correction head** `"
+            f"{record.get('full_suite_candidate_correction_head')}`: "
+            f"{record.get('full_suite_candidate_passed')} passed / "
+            f"{record.get('full_suite_candidate_failed')} failed",
+            "- **Pre-existing failures carried by both:** "
+            f"{record.get('full_suite_preexisting_failures')} — they are not "
+            "introduced by this PR and no test was deleted or weakened to "
+            "hide one",
+            "- ⛔ **Not science:** verification-only = "
+            f"{record.get('full_suite_comparison_is_verification_not_science')}"
+            " — the record never claims to have tested the commit that "
+            "carries it (self-reference avoided = "
+            f"{record.get('full_suite_comparison_self_reference_avoided')})",
+            "- Record: `project/stage128/"
+            "m3i2_final_official_documentary_recovery/"
+            "stage128_m3i2_full_suite_baseline_comparison.json`",
             "",
         ]
     lines += [
@@ -5212,7 +5372,12 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
     m3i2_evidence = bool(
         derive_stage128_m3i2_evidence_capture_markers(root).get(
             "stage128_m3i2_evidence_capture_executed"))
-    if m3i2_evidence:
+    m3i2_recovery = bool(
+        derive_stage128_m3i2_final_documentary_recovery_markers(root).get(
+            "stage128_m3i2_final_documentary_recovery_initiated"))
+    if m3i2_recovery:
+        allowed = _STAGE128_M3I2_RECOVERY_WORKSTREAM_ID
+    elif m3i2_evidence:
         allowed = _STAGE128_M3I2_EVIDENCE_WORKSTREAM_ID
     elif m3i2_locked:
         allowed = _STAGE128_M3I2_ACTIVE_WORKSTREAM_ID
@@ -6035,6 +6200,419 @@ def derive_stage128_m3i2_independent_bundle_audit_markers(root: str) -> dict:
         "final_test_locked": True,
     }
 
+
+_STAGE128_M3I2_RECOVERY_PKG = (
+    "project/stage128/m3i2_final_official_documentary_recovery")
+_STAGE128_M3I2_RECOVERY_ACTION_ID = (
+    "stage128-m3i2-final-official-documentary-recovery-initiation")
+_STAGE128_M3I2_RECOVERY_WORKSTREAM_ID = (
+    "stage128-m3i2-final-official-documentary-recovery")
+_STAGE128_M3I2_RECOVERY_DECISION_REL = (
+    f"{_STAGE128_M3I2_RECOVERY_PKG}/"
+    "stage128_m3i2_final_official_documentary_recovery_decision.json")
+_STAGE128_M3I2_RECOVERY_CONTRACT_REL = (
+    f"{_STAGE128_M3I2_RECOVERY_PKG}/"
+    "stage128_m3i2_final_official_documentary_recovery_contract.json")
+_STAGE128_M3I2_RECOVERY_SUBMISSION_REL = (
+    f"{_STAGE128_M3I2_RECOVERY_PKG}/"
+    "stage128_m3i2_world_bank_inquiry_submission_record.json")
+_STAGE128_M3I2_RECOVERY_SUPERSESSION_REL = (
+    f"{_STAGE128_M3I2_RECOVERY_PKG}/"
+    "stage128_m3_lag_partial_local_execution_supersession_record.json")
+_STAGE128_M3I2_RECOVERY_QC_REL = (
+    f"{_STAGE128_M3I2_RECOVERY_PKG}/"
+    "stage128_m3i2_final_official_documentary_recovery_qc_report.json")
+_STAGE128_M3I2_RECOVERY_TOPOLOGY_REL = (
+    f"{_STAGE128_M3I2_RECOVERY_PKG}/"
+    "stage128_m3i2_final_official_documentary_recovery_pr_topology.json")
+
+#: Submission outcomes this initiation may legitimately record.
+_STAGE128_M3I2_RECOVERY_SUBMISSION_STATUSES = (
+    "OFFICIAL_INQUIRY_SUBMITTED_PENDING_RESPONSE",
+    "HUMAN_SUBMISSION_REQUIRED",
+)
+_STAGE128_M3I2_RECOVERY_SEARCH_OUTCOMES = (
+    "OFFICIAL_DOCUMENTARY_EVIDENCE_FOUND_DURING_BOUNDED_SEARCH",
+    "NO_NEW_DOCUMENTARY_EVIDENCE_IN_BOUNDED_SEARCH",
+)
+#: Pointer only, and explicitly NOT an authorization.
+_NEXT_ACTION_AFTER_RECOVERY_BY_SUBMISSION_STATUS = {
+    "OFFICIAL_INQUIRY_SUBMITTED_PENDING_RESPONSE":
+        "stage128-m3i2-final-official-response-adjudication",
+    "HUMAN_SUBMISSION_REQUIRED":
+        "stage128-m3i2-final-official-inquiry-human-submission",
+}
+
+
+def derive_stage128_m3i2_final_documentary_recovery_markers(root: str) -> dict:
+    """Recognize the M3I-2 final official documentary recovery INITIATION.
+
+    Narrow and fail-closed. The action is an INITIATION only:
+
+    * it repeats no part of the prior capture and re-downloads no archive ZIP;
+    * it runs a bounded official documentary search (ceiling enforced here as
+      well as in the capture layer) and may attempt at most ONE inquiry;
+    * it executes no Data Gate, computes no coverage, materializes no feature,
+      fits no model and never touches the Final Test;
+    * it never admits M3I-2 and never contract-locks M3-LAG-WDI;
+    * the superseded local M3-LAG draft stays non-authoritative.
+
+    Returns {} before the recovery package exists.
+    """
+    decision_path = os.path.join(root, _STAGE128_M3I2_RECOVERY_DECISION_REL)
+    if not os.path.isfile(decision_path):
+        return {}
+    parts = {}
+    for key, rel in (
+        ("decision", _STAGE128_M3I2_RECOVERY_DECISION_REL),
+        ("contract", _STAGE128_M3I2_RECOVERY_CONTRACT_REL),
+        ("submission", _STAGE128_M3I2_RECOVERY_SUBMISSION_REL),
+        ("supersession", _STAGE128_M3I2_RECOVERY_SUPERSESSION_REL),
+        ("qc", _STAGE128_M3I2_RECOVERY_QC_REL),
+        ("topology", _STAGE128_M3I2_RECOVERY_TOPOLOGY_REL),
+    ):
+        path = os.path.join(root, rel)
+        if not os.path.isfile(path):
+            raise HandoffError(
+                f"the M3I-2 documentary recovery package is missing {rel}")
+        with open(path, encoding="utf-8") as fh:
+            parts[key] = json.load(fh)
+    decision, contract = parts["decision"], parts["contract"]
+    submission, supersession = parts["submission"], parts["supersession"]
+    qc, topology = parts["qc"], parts["topology"]
+
+    if decision.get("action_id") != _STAGE128_M3I2_RECOVERY_ACTION_ID:
+        raise HandoffError("M3I-2 documentary recovery action_id mismatch")
+    if qc.get("all_pass") is not True or qc.get("failed_count") != 0:
+        raise HandoffError("the M3I-2 documentary recovery QC must be green")
+
+    status = submission.get("submission_status")
+    if status not in _STAGE128_M3I2_RECOVERY_SUBMISSION_STATUSES:
+        raise HandoffError(f"unknown M3I-2 inquiry submission status {status!r}")
+    outcome = decision.get("bounded_search_outcome")
+    if outcome not in _STAGE128_M3I2_RECOVERY_SEARCH_OUTCOMES:
+        raise HandoffError(f"unknown bounded-search outcome {outcome!r}")
+
+    # Bounds.
+    executed = contract.get("official_documentary_get_requests_executed")
+    ceiling = contract.get("official_documentary_get_requests_max")
+    if ceiling != 20 or not isinstance(executed, int) or executed > ceiling:
+        raise HandoffError(
+            "the bounded documentary search ceiling (20) is violated")
+    if submission.get("initial_inquiry_max_count") != 1:
+        raise HandoffError("at most ONE initial inquiry may ever be attempted")
+    for field in ("initial_inquiries_attempted",
+                  "initial_inquiries_successfully_submitted"):
+        if submission.get(field) not in (0, 1):
+            raise HandoffError(f"M3I-2 inquiry {field} must be 0 or 1")
+    if status == "HUMAN_SUBMISSION_REQUIRED":
+        if submission.get("initial_inquiries_successfully_submitted") != 0:
+            raise HandoffError(
+                "a human submission is required, so nothing was submitted")
+        for field in ("submission_timestamp_utc", "ticket_id_redacted",
+                      "ticket_id_sha256"):
+            if submission.get(field) is not None:
+                raise HandoffError(
+                    f"no {field} may exist without a successful submission")
+
+    # Nothing may be fabricated, bypassed or leaked.
+    for field, expected in (
+        ("pii_committed_to_git", False),
+        ("credentials_used_by_automation", False),
+        ("captcha_bypassed", False),
+        ("ticket_id_fabricated", False),
+        ("automatic_follow_up_authorized", False),
+        ("follow_up_authorized_now", False),
+        ("response_adjudication_authorized", False),
+    ):
+        if submission.get(field) is not expected:
+            raise HandoffError(
+                f"M3I-2 inquiry {field} must be {expected}")
+    if submission.get("follow_up_max_count") != 1:
+        raise HandoffError("the follow-up ceiling is exactly one")
+    if submission.get("waiting_period_business_days") != 10:
+        raise HandoffError("the waiting period is 10 business days")
+
+    # The two blockers, and only those two, and neither resolved by this action.
+    if decision.get("blocker_1_resolved") is not False or decision.get(
+            "blocker_2_resolved") is not False:
+        raise HandoffError(
+            "this initiation cannot resolve a blocker on its own")
+    for field, expected in (
+        ("filename_token_is_release_evidence", False),
+        ("unproven_previous_month_fallback_permitted", False),
+        ("official_month_only_next_month_rule_locked", True),
+        ("partial_documentary_recovery_can_admit_m3i2", False),
+        ("release_date_recovery_alone_can_admit_m3i2", False),
+        ("fx_semantic_recovery_alone_can_admit_m3i2", False),
+        ("final_test_locked", True),
+        ("final_test_access_authorized", False),
+        ("m4_authorized", False),
+        ("m4_started", False),
+        ("merge_authorized", False),
+        ("next_research_action_authorized", False),
+    ):
+        if contract.get(field) is not expected:
+            raise HandoffError(
+                f"M3I-2 documentary recovery contract {field} must be "
+                f"{expected}")
+    for field in ("archive_zip_downloads", "archive_zip_redownloads",
+                  "company_macro_joins", "feature_materializations",
+                  "coverage_calculations", "data_gate_executions",
+                  "model_fits", "predictions", "predictive_metrics",
+                  "bootstrap_executions", "holm_calculations",
+                  "target_values_read", "final_test_rows_read",
+                  "final_test_predictor_values_inspected",
+                  "final_test_target_values_inspected",
+                  "m3i2_admission_decisions", "m3_lag_wdi_contract_locks",
+                  "m3_lag_wdi_data_retrievals"):
+        if contract.get(field) != 0:
+            raise HandoffError(
+                f"M3I-2 documentary recovery {field} must be 0")
+    if decision.get("m3i2_evidence_status") != (
+            "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE"):
+        raise HandoffError("M3I-2 evidence must remain UNRESOLVED")
+    if decision.get("m3_cbi_status") != "UNRESOLVED_M3_DATA_GATE":
+        raise HandoffError("the M3-CBI Gate status must be preserved")
+
+    # The superseded local M3-LAG draft is never authoritative.
+    for field, expected in (
+        ("local_partial_execution_detected", True),
+        ("authoritative_repository_contract_locked", False),
+        ("scientific_effective_contract_locked", False),
+        ("remote_branch_created", False),
+        ("pull_request_created", False),
+        ("data_retrieval_started", False),
+        ("data_gate_executed", False),
+        ("modeling_started", False),
+        ("final_test_accessed", False),
+        ("prior_authorization_reusable", False),
+        ("completion_authorized", False),
+        ("commit_authorized", False),
+        ("quarantine_created", True),
+        ("quarantine_location_committed_to_git", False),
+        ("original_dirty_worktree_cleaned_or_deleted", False),
+    ):
+        if supersession.get(field) is not expected:
+            raise HandoffError(
+                f"M3-LAG supersession record {field} must be {expected}")
+    if supersession.get("commits_created") != 0 or supersession.get(
+            "network_requests") != 0:
+        raise HandoffError(
+            "the local M3-LAG draft created no commit and no network request")
+
+    # LIVE PR topology: this Draft PR, on main, unmerged; PR #75 is history.
+    live_number = topology.get("live_pr_number")
+    predecessor_number = topology.get("predecessor_pr_number")
+    if not isinstance(live_number, int) or isinstance(live_number, bool):
+        raise HandoffError("the live recovery PR number must be an integer")
+    if predecessor_number != _STAGE128_M3I2_EVIDENCE_CAPTURE_PR_NUMBER:
+        raise HandoffError(
+            "the merged predecessor of the recovery PR is PR "
+            f"#{_STAGE128_M3I2_EVIDENCE_CAPTURE_PR_NUMBER}")
+    if live_number <= predecessor_number:
+        raise HandoffError(
+            "the live recovery PR must succeed the merged evidence-capture PR")
+    if topology.get("predecessor_pr_merged") is not True:
+        raise HandoffError("PR #75 must be recorded as merged")
+    if topology.get("live_pr_base_branch") != _STAGE128_M3I2_MAIN_BRANCH:
+        raise HandoffError("the recovery PR must target main")
+    if topology.get("live_pr_base_commit") != topology.get(
+            "predecessor_pr_merge_commit"):
+        raise HandoffError(
+            "the recovery PR base must equal the PR #75 merge commit")
+    if topology.get("live_pr_is_draft") is not True:
+        raise HandoffError("the recovery PR must remain a Draft")
+    if topology.get("live_pr_merged") is not False:
+        raise HandoffError("the recovery PR must remain unmerged")
+    if topology.get("merge_authorized") is not False:
+        raise HandoffError("no merge authorization exists for the recovery PR")
+    if topology.get("live_pr_head_commit_pinned") is not False:
+        raise HandoffError("the live PR head must never be pinned")
+
+    next_action = _NEXT_ACTION_AFTER_RECOVERY_BY_SUBMISSION_STATUS[status]
+    if decision.get("next_research_action_id") != next_action:
+        raise HandoffError(
+            f"with submission status {status} the next research action is "
+            f"{next_action}")
+
+    return {
+        "stage128_m3i2_final_documentary_recovery_initiated": True,
+        "stage128_m3i2_final_documentary_recovery_status":
+            decision.get("initiation_status"),
+        "stage128_m3i2_final_documentary_recovery_result_code":
+            decision.get("result_code"),
+        "stage128_m3i2_bounded_search_outcome": outcome,
+        "stage128_m3i2_documentary_get_requests": executed,
+        "stage128_m3i2_documentary_get_requests_max": ceiling,
+        "stage128_m3i2_archive_zip_downloads": 0,
+        "stage128_m3i2_archive_zip_redownloads": 0,
+        "stage128_m3i2_prior_capture_repeated": False,
+        "stage128_m3i2_inquiry_submission_status": status,
+        "stage128_m3i2_inquiry_initial_attempts":
+            submission.get("initial_inquiries_attempted"),
+        "stage128_m3i2_inquiry_initial_submitted":
+            submission.get("initial_inquiries_successfully_submitted"),
+        "stage128_m3i2_inquiry_body_sha256":
+            submission.get("submitted_body_sha256"),
+        "stage128_m3i2_inquiry_edition_inventory_sha256":
+            submission.get("edition_inventory_sha256"),
+        "stage128_m3i2_inquiry_fx_questions_sha256":
+            submission.get("fx_questions_sha256"),
+        "stage128_m3i2_inquiry_ticket_id_redacted":
+            submission.get("ticket_id_redacted"),
+        "stage128_m3i2_inquiry_pii_committed_to_git": False,
+        "stage128_m3i2_inquiry_follow_up_authorized_now": False,
+        "stage128_m3i2_inquiry_waiting_period_business_days": 10,
+        "stage128_m3i2_response_adjudication_authorized": False,
+        "stage128_m3i2_blocker_1_archive_release_resolved": False,
+        "stage128_m3i2_blocker_2_fx_semantic_resolved": False,
+        "stage128_m3i2_filename_token_is_release_evidence": False,
+        "stage128_m3i2_unproven_previous_month_fallback_used": False,
+        "stage128_m3i2_official_month_only_next_month_rule_locked": True,
+        # The superseded local M3-LAG draft.
+        "stage128_m3_lag_wdi_local_partial_draft_detected": True,
+        "stage128_m3_lag_wdi_local_partial_draft_quarantined": True,
+        "stage128_m3_lag_wdi_local_partial_draft_authoritative": False,
+        "stage128_m3_lag_wdi_prior_authorization_reusable": False,
+        "stage128_m3_lag_wdi_exploratory_contract_locked": False,
+        "stage128_m3_lag_wdi_authoritative_contract_status": "NOT_LOCKED",
+        "stage128_m3_lag_wdi_data_retrieval_started": False,
+        "stage128_m3_lag_wdi_data_gate_executed": False,
+        "stage128_m3_lag_wdi_modeling_started": False,
+        # LIVE PR topology; PR #75 becomes the merged predecessor.
+        "stage128_m3i2_live_pr_number": live_number,
+        "stage128_m3i2_live_pr_base_branch": _STAGE128_M3I2_MAIN_BRANCH,
+        "stage128_m3i2_live_pr_base_commit":
+            topology.get("live_pr_base_commit"),
+        "stage128_m3i2_live_main_commit": topology.get("live_pr_base_commit"),
+        "stage128_m3i2_live_pr_is_draft": True,
+        "stage128_m3i2_live_pr_merged": False,
+        "stage128_m3i2_live_pr_role": topology.get("live_pr_role"),
+        "stage128_m3i2_evidence_capture_pr_number": predecessor_number,
+        "stage128_m3i2_evidence_capture_pr_merged": True,
+        "stage128_m3i2_evidence_capture_pr_merge_commit":
+            topology.get("predecessor_pr_merge_commit"),
+        "stage128_m3i2_evidence_capture_pr_semantics":
+            "merged_predecessor_superseded_by_pr" f"{live_number}",
+        "stage128_m3i2_merge_authorized": False,
+        # Acquisition of DOCUMENTS is not admission of DATA.
+        "stage128_m3i2_evidence_status": "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE",
+        "m3i2_block_admitted": False,
+        "m3i2_data_gate_executed": False,
+        "m3i2_modeling_started": False,
+        "m3i3_admitted": False,
+        "m4_authorized": False,
+        "m4_started": False,
+        "final_test_locked": True,
+        # Pointers. The initiation IS a completed research action; the pointer
+        # it publishes is informational and explicitly unauthorized.
+        "last_completed_research_action_id":
+            _STAGE128_M3I2_RECOVERY_ACTION_ID,
+        "next_research_action_id": next_action,
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
+    }
+
+
+_STAGE128_M3I2_SUITE_COMPARISON_REL = (
+    f"{_STAGE128_M3I2_RECOVERY_PKG}/"
+    "stage128_m3i2_full_suite_baseline_comparison.json")
+
+
+def derive_stage128_m3i2_full_suite_comparison_markers(root: str) -> dict:
+    """Recognize the baseline-versus-candidate full-suite comparison record.
+
+    A VERIFICATION record, not a scientific one: it says only that the same
+    suite was run on the baseline and on the candidate correction head in the
+    same environment, and that the candidate introduced no new failure. It
+    admits nothing and moves no pointer.
+
+    Fail-closed. The record must evaluate the declared baseline, must not
+    claim to have tested the commit that carries it, and must agree with its
+    own node-id sets — a record that says "no new failures" while listing some
+    is a broken record, not a passing one.
+
+    Returns {} before the comparison record exists.
+    """
+    path = os.path.join(root, _STAGE128_M3I2_SUITE_COMPARISON_REL)
+    if not os.path.isfile(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        rec = json.load(fh)
+    decision_path = os.path.join(root, _STAGE128_M3I2_RECOVERY_DECISION_REL)
+    with open(decision_path, encoding="utf-8") as fh:
+        expected_baseline = json.load(fh).get("baseline_commit")
+    if rec.get("baseline_sha") != expected_baseline:
+        raise HandoffError(
+            "the full-suite comparison must be measured against the baseline "
+            "commit the recovery decision records")
+    if not rec.get("report_commit_self_reference_avoided"):
+        raise HandoffError(
+            "the full-suite comparison must not claim to have tested the "
+            "commit that carries it")
+    new_ids = rec.get("new_failure_node_ids")
+    if not isinstance(new_ids, list):
+        raise HandoffError("new_failure_node_ids must be a list")
+    if rec.get("new_failures_count") != len(new_ids):
+        raise HandoffError(
+            "new_failures_count disagrees with new_failure_node_ids")
+    base_ids = set(rec.get("baseline_failure_node_ids") or [])
+    cand_ids = set(rec.get("candidate_failure_node_ids") or [])
+    if set(new_ids) != cand_ids - base_ids:
+        raise HandoffError(
+            "new_failure_node_ids is not candidate minus baseline")
+    if set(rec.get("preexisting_failure_node_ids") or []) != base_ids & cand_ids:
+        raise HandoffError(
+            "preexisting_failure_node_ids is not the baseline/candidate "
+            "intersection")
+    if set(rec.get("resolved_failure_node_ids") or []) != base_ids - cand_ids:
+        raise HandoffError(
+            "resolved_failure_node_ids is not baseline minus candidate")
+    if new_ids and rec.get("comparison_result") == (
+            "PASS_NO_PR_INTRODUCED_FULL_SUITE_FAILURES"):
+        raise HandoffError(
+            "a PASS comparison result cannot carry new failures")
+    for field in ("same_pytest_command", "same_assets",
+                  "same_environment_variables",
+                  "same_working_directory_semantics",
+                  "no_test_was_deleted_or_weakened_to_hide_a_failure"):
+        if rec.get(field) is not True:
+            raise HandoffError(f"full-suite comparison {field} must be True")
+    # A verification record may never move the scientific state.
+    for field, expected in (
+        ("m3i2_admitted", False),
+        ("m3i2_data_gate_executed", False),
+        ("final_test_locked", True),
+        ("m4_authorized", False),
+        ("merge_authorized", False),
+    ):
+        if rec.get(field) is not expected:
+            raise HandoffError(
+                f"full-suite comparison {field} != {expected}")
+    if rec.get("m3_lag_wdi_authoritative_contract_status") != "NOT_LOCKED":
+        raise HandoffError(
+            "the full-suite comparison must keep M3-LAG-WDI NOT_LOCKED")
+    return {
+        "full_suite_baseline_comparison_completed": True,
+        "full_suite_new_failures": len(new_ids),
+        "full_suite_baseline_sha": rec.get("baseline_sha"),
+        "full_suite_candidate_correction_head": rec.get(
+            "candidate_correction_head"),
+        "full_suite_comparison_result": rec.get("comparison_result"),
+        "full_suite_baseline_failed": rec.get("baseline_failed"),
+        "full_suite_candidate_failed": rec.get("candidate_failed"),
+        "full_suite_baseline_passed": rec.get("baseline_passed"),
+        "full_suite_candidate_passed": rec.get("candidate_passed"),
+        "full_suite_preexisting_failures": len(
+            rec.get("preexisting_failure_node_ids") or []),
+        "full_suite_comparison_is_verification_not_science": True,
+        "full_suite_comparison_self_reference_avoided": True,
+    }
+
+
+#: The evidence-capture PR, merged into main and now the predecessor context.
+_STAGE128_M3I2_EVIDENCE_CAPTURE_PR_NUMBER = 75
 
 _STAGE128_M3I2_GOVERNANCE_BOUNDARY_REL = (
     "project/stage128/m3i2_official_source_evidence_capture/"
