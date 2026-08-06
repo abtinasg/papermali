@@ -3749,3 +3749,236 @@ def test_current_state_audit_section_moves_nothing_scientific():
     assert "M3I-2 independent bundle integrity audit (integrity only)" in text
     assert "does **not** resolve the historical-vintage evidence problem" \
         in text
+
+
+# --------------------------------------------------------------------------- #
+# Stage128 — ROADMAP item 25b must agree with the MERGED PR #75 artifacts
+#
+# Item 25b is prose about a merged, immutable evidence-capture package. Prose
+# drifts; the artifacts do not. These tests read the four authoritative
+# artifacts of that package and fail closed when the ROADMAP claims anything
+# the artifacts do not support — in either direction. They are a documentation
+# gate only: they retrieve nothing, admit nothing and never touch a Gate.
+# --------------------------------------------------------------------------- #
+
+_M3I2_CAPTURE_DIR = "project/stage128/m3i2_official_source_evidence_capture"
+_M3I2_CAPTURE_DECISION_REL = (
+    f"{_M3I2_CAPTURE_DIR}/stage128_m3i2_official_source_evidence_decision.json")
+_M3I2_RELEASE_MANIFEST_REL = (
+    f"{_M3I2_CAPTURE_DIR}/stage128_m3i2_wdi_archive_release_manifest.csv")
+_M3I2_SEMANTIC_REL = (
+    f"{_M3I2_CAPTURE_DIR}/stage128_m3i2_wdi_vintage_semantic_compatibility.csv")
+_M3I2_INTEGRITY_AUDIT_REL = (
+    f"{_M3I2_CAPTURE_DIR}/"
+    "stage128_m3i2_independent_bundle_integrity_audit_record.json")
+_M3I2_CUTOFF_PLAN_REL = (
+    f"{_M3I2_CAPTURE_DIR}/stage128_m3i2_unique_cutoff_plan.csv")
+_M3I2_REQUIRED_EDITIONS_REL = (
+    f"{_M3I2_CAPTURE_DIR}/stage128_m3i2_required_wdi_editions.csv")
+_M3I2_LOCKED_SERIES_REL = (
+    f"{_M3I2_CAPTURE_DIR}/stage128_m3i2_wdi_irn_locked_series_extract.csv")
+
+#: Claims that were once in item 25b and are contradicted by the artifacts.
+#: They must never come back — not even softened, and not as live fact.
+_M3I2_SUPERSEDED_ROADMAP_CLAIMS = (
+    "66 carry",
+    "66 editions",
+    "16 required editions were selected",
+    "32/32 semantic",
+    "earliest verified archive edition",
+    "19 of 37",
+    "252 of 539",
+)
+
+
+def _csv_rows(rel: str) -> list[dict]:
+    import csv
+    with open(os.path.join(REAL_ROOT, rel), newline="", encoding="utf-8") as fh:
+        return list(csv.DictReader(fh))
+
+
+def _json_artifact(rel: str) -> dict:
+    with open(os.path.join(REAL_ROOT, rel), encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def _roadmap_item_25b() -> str:
+    """Item 25b only — a claim elsewhere in the ROADMAP is a different claim."""
+    text = _roadmap_text()
+    start = text.index(
+        "25b. `stage128-m3i2-official-source-evidence-capture`")
+    end = text.index("\n25c.", start)
+    return text[start:end]
+
+
+def test_m3i2_capture_artifacts_are_the_ones_the_roadmap_is_checked_against():
+    """Guard the guard: a renamed or missing artifact must fail, not skip."""
+    for rel in (
+        _M3I2_CAPTURE_DECISION_REL, _M3I2_RELEASE_MANIFEST_REL,
+        _M3I2_SEMANTIC_REL, _M3I2_INTEGRITY_AUDIT_REL,
+        _M3I2_CUTOFF_PLAN_REL, _M3I2_REQUIRED_EDITIONS_REL,
+        _M3I2_LOCKED_SERIES_REL,
+    ):
+        assert os.path.isfile(os.path.join(REAL_ROOT, rel)), rel
+
+
+def test_roadmap_25b_records_the_edition_counts_the_artifacts_support():
+    """110 discovered / 16 captured — and ZERO of either verified."""
+    editions = _csv_rows(_M3I2_RELEASE_MANIFEST_REL)
+    required = _csv_rows(_M3I2_REQUIRED_EDITIONS_REL)
+    assert len(editions) == 110
+    assert len(required) == 16
+    # Not one edition has a verified release date, in either artifact.
+    assert sum(
+        1 for r in editions if r["release_date_verified"] == "True") == 0
+    assert sum(
+        1 for r in required if r["release_date_verified"] == "True") == 0
+    assert sum(1 for r in editions if r["derived_release_available_at_utc"]) == 0
+    assert sum(1 for r in required if r["release_available_at_utc"]) == 0
+    # ...and none may serve as a pre-cutoff vintage.
+    assert sum(
+        1 for r in required
+        if r["usable_as_pre_cutoff_vintage"] == "True") == 0
+
+    item = _roadmap_item_25b()
+    assert "110 archive editions were discovered" in item
+    assert "16 were captured and held" in item
+    assert "`release_date_verified` is False for all 110" in item
+    assert "editions with a verified `available_at` = 0" in item
+
+
+def test_roadmap_25b_records_every_cutoff_and_pair_as_unresolved():
+    """0 of 37 served; 37 of 37 and 539 of 539 unresolved."""
+    plan = _csv_rows(_M3I2_CUTOFF_PLAN_REL)
+    assert len(plan) == 37
+    assert sum(
+        int(r["number_of_development_pairs_sharing_cutoff"]) for r in plan
+    ) == 539
+    served = [r for r in plan if r["selected_wdi_archive_edition_id"]]
+    assert served == []
+    assert {r["selection_reason"] for r in plan} == {
+        "NO_VERIFIED_PRE_CUTOFF_EDITION"}
+
+    item = _roadmap_item_25b()
+    assert "cutoffs with a verified pre-cutoff edition = 0 of 37" in item
+    assert "all 37 cutoffs and all 539 development pairs" in item
+    assert "are UNRESOLVED" in item
+    # unresolved is never the same statement as zero coverage
+    assert "never zero coverage" in item
+
+
+def test_roadmap_25b_records_the_locked_series_row_count():
+    assert len(_csv_rows(_M3I2_LOCKED_SERIES_REL)) == 1878
+    assert "1,878 locked-series rows" in _roadmap_item_25b()
+
+
+def test_roadmap_25b_records_cpi_pass_and_fx_unresolved_separately():
+    """CPI 16/0/0 and FX 0/16/0 — one resolved indicator is not two."""
+    rows = _csv_rows(_M3I2_SEMANTIC_REL)
+    assert len(rows) == 32
+    tally = {}
+    for r in rows:
+        tally.setdefault(r["indicator_code"], []).append(r["compatibility_status"])
+    cpi = tally["FP.CPI.TOTL.ZG"]
+    fx = tally["PA.NUS.FCRF"]
+    assert (cpi.count("PASS"), cpi.count("UNRESOLVED"),
+            cpi.count("FAIL_INTEGRITY")) == (16, 0, 0)
+    assert (fx.count("PASS"), fx.count("UNRESOLVED"),
+            fx.count("FAIL_INTEGRITY")) == (0, 16, 0)
+
+    item = _roadmap_item_25b()
+    assert "16 CPI PASS / 0 UNRESOLVED / 0 FAIL_INTEGRITY" in item
+    assert "0 FX PASS / 16 FX UNRESOLVED / 0 FAIL_INTEGRITY" in item
+    # FX must be named as its own open blocker, not folded into the vintage gap
+    assert "independent, still-open blocker" in item
+
+
+def test_roadmap_25b_records_the_unresolved_unadmitted_scientific_state():
+    decision = _json_artifact(_M3I2_CAPTURE_DECISION_REL)
+    assert decision["m3i2_official_source_evidence_status"] == (
+        "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE")
+    assert decision["m3i2_admitted"] is False
+    assert decision["data_gate_executions"] == 0
+    assert decision["data_gate_passed"] is False
+
+    item = _roadmap_item_25b()
+    assert "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE" in item
+    assert "The Data Gate is `NOT_EXECUTED`" in item
+    assert "`m3i2_admitted` is false" in item
+
+
+def test_roadmap_25b_keeps_integrity_pass_separate_from_vintage_resolution():
+    audit = _json_artifact(_M3I2_INTEGRITY_AUDIT_REL)
+    assert audit["overall_result"] == "INDEPENDENT_BUNDLE_INTEGRITY_AUDIT_PASS"
+    # the audit itself refuses to be read as an evidence resolution
+    assert audit["m3i2_evidence_status"] == (
+        "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE")
+
+    item = _roadmap_item_25b()
+    assert "INDEPENDENT_BUNDLE_INTEGRITY_AUDIT_PASS" in item
+    assert "integrity** result only" in item
+    assert "does **not** resolve the historical-vintage problem" in item
+    assert "does not create a verified release date" in item
+
+
+def test_roadmap_25b_denies_that_a_filename_token_is_release_evidence():
+    """The 66/44 split is token exactness, never a day-precision release date."""
+    editions = _csv_rows(_M3I2_RELEASE_MANIFEST_REL)
+    assert sum(
+        1 for r in editions
+        if r["release_date_explicitly_stated_by_official_source"] == "True"
+    ) == 0
+    assert {r["release_available_at_derivation_status"] for r in editions} == {
+        "UNRESOLVED_FILENAME_DATE_TOKEN_NOT_VERIFIED_AS_RELEASE_DATE"}
+
+    item = _roadmap_item_25b()
+    assert "A filename date token is **not** a release date" in item
+    assert "was never a day-precision release date" in item
+
+
+@pytest.mark.parametrize("claim", _M3I2_SUPERSEDED_ROADMAP_CLAIMS)
+def test_superseded_m3i2_claims_never_return_to_the_roadmap(claim):
+    """Each of these was contradicted by the artifacts and must stay gone."""
+    assert claim not in _roadmap_text(), (
+        f"superseded M3I-2 evidence-capture claim reintroduced: {claim!r}"
+    )
+
+
+def test_roadmap_front_matter_pins_the_live_recovery_workstream():
+    fm = gen.read_roadmap(REAL_ROOT)
+    assert fm["active_research_workstream_id"] == (
+        "stage128-m3i2-final-official-documentary-recovery")
+    assert fm["predecessor_research_workstream_id"] == (
+        "stage128-m3i2-official-source-evidence-capture")
+    assert fm["last_completed_research_action_id"] == (
+        "stage128-m3i2-final-official-documentary-recovery-initiation")
+    assert fm["next_research_action_id"] == (
+        "stage128-m3i2-final-official-inquiry-human-submission")
+    # the front-matter reader hands back the raw scalar; unauthorized either way
+    assert fm["next_research_action_authorized"] in (False, "false")
+
+
+def test_roadmap_marks_the_evidence_capture_paragraph_as_historical():
+    """PR #75 is the merged predecessor; PR #76 is the live Draft."""
+    text = _roadmap_text()
+    para = [ln for ln in text.splitlines()
+            if ln.startswith("**Workstream identifier note (HISTORICAL")]
+    assert len(para) == 1, "the evidence-capture note must be marked HISTORICAL"
+    note = para[0]
+    assert "was live at that time" in note
+    assert "retained only as historical state" in note
+    assert "merged predecessor** (PR #75)" in note
+    assert "the live Draft **PR #76**" in note
+    # and it may no longer claim to be the current workstream
+    assert "names the workstream that is live **now**. That is now " \
+        "`stage128-m3i2-official-source-evidence-capture`" not in text
+
+
+def test_handoff_agrees_the_capture_pr_is_merged_and_the_recovery_is_live():
+    state = _handoff_state()
+    assert state["stage128_m3i2_evidence_capture_pr_number"] == 75
+    assert state["stage128_m3i2_evidence_capture_pr_merged"] is True
+    assert state["stage128_m3i2_live_pr_number"] == 76
+    assert state["stage128_m3i2_live_pr_is_draft"] is True
+    assert state["stage128_m3i2_live_pr_merged"] is False
+    assert state["stage128_m3i2_merge_authorized"] is False
