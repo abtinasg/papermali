@@ -3982,3 +3982,157 @@ def test_handoff_agrees_the_capture_pr_is_merged_and_the_recovery_is_live():
     assert state["stage128_m3i2_live_pr_is_draft"] is True
     assert state["stage128_m3i2_live_pr_merged"] is False
     assert state["stage128_m3i2_merge_authorized"] is False
+
+
+# --------------------------------------------------------------------------- #
+# Stage128 — the full-suite baseline comparison is a VERIFICATION record
+#
+# It reports how the test suite behaved on the baseline and on the candidate
+# correction head. It must never become a scientific claim, must never claim
+# to have tested the commit that carries it, and must be internally consistent
+# — a record asserting "no new failures" while listing some is broken, and
+# fails closed here rather than being trusted.
+# --------------------------------------------------------------------------- #
+
+_M3I2_SUITE_COMPARISON_REL = (
+    "project/stage128/m3i2_final_official_documentary_recovery/"
+    "stage128_m3i2_full_suite_baseline_comparison.json")
+
+
+def _suite_comparison() -> dict:
+    return _json_artifact(_M3I2_SUITE_COMPARISON_REL)
+
+
+def _comparison_root(tmp_path, name: str, record: dict) -> str:
+    """A minimal root carrying a mutated comparison record."""
+    root = tmp_path / name
+    pkg = root / "project/stage128/m3i2_final_official_documentary_recovery"
+    pkg.mkdir(parents=True)
+    for rel in (_M3I2_SUITE_COMPARISON_REL,
+                gen._STAGE128_M3I2_RECOVERY_DECISION_REL):
+        src = os.path.join(REAL_ROOT, rel)
+        with open(src, encoding="utf-8") as fh:
+            payload = json.load(fh)
+        if rel == _M3I2_SUITE_COMPARISON_REL:
+            payload = record
+        with open(os.path.join(str(root), rel), "w", encoding="utf-8") as fh:
+            json.dump(payload, fh, indent=2, sort_keys=True)
+    return str(root)
+
+
+def test_suite_comparison_evaluates_the_candidate_not_its_own_commit():
+    rec = _suite_comparison()
+    assert rec["report_commit_self_reference_avoided"] is True
+    assert rec["baseline_sha"] == (
+        "b3627809dbfde8429d0308bec5d1c8541a161188")
+    # the candidate head is a real commit, and it is NOT the baseline
+    assert re.fullmatch(r"[0-9a-f]{40}", rec["candidate_correction_head"])
+    assert rec["candidate_correction_head"] != rec["baseline_sha"]
+
+
+def test_suite_comparison_reports_no_new_failures():
+    rec = _suite_comparison()
+    base = set(rec["baseline_failure_node_ids"])
+    cand = set(rec["candidate_failure_node_ids"])
+    assert set(rec["new_failure_node_ids"]) == cand - base
+    assert set(rec["preexisting_failure_node_ids"]) == base & cand
+    assert set(rec["resolved_failure_node_ids"]) == base - cand
+    assert rec["new_failure_node_ids"] == []
+    assert rec["new_failures_count"] == 0
+    assert rec["comparison_result"] == (
+        "PASS_NO_PR_INTRODUCED_FULL_SUITE_FAILURES")
+
+
+def test_suite_comparison_ran_both_sides_the_same_way():
+    rec = _suite_comparison()
+    assert rec["python_version"] == "3.13.5"
+    assert rec["jdatetime_version"] == "6.0.1"
+    for field in ("same_pytest_command", "same_assets",
+                  "same_environment_variables",
+                  "same_working_directory_semantics"):
+        assert rec[field] is True, field
+    # a comparison is only meaningful if the suite actually grew or held
+    assert rec["candidate_tests_collected"] >= rec["baseline_tests_collected"]
+
+
+def test_suite_comparison_hides_no_failure_by_deleting_a_test():
+    rec = _suite_comparison()
+    assert rec["no_test_was_deleted_or_weakened_to_hide_a_failure"] is True
+    # every failure carries the evidence needed to check that claim by hand
+    for row in rec["failure_details"]:
+        assert row["node_id"]
+        assert row["exception_class"]
+        assert row["first_meaningful_failure_line"]
+        assert isinstance(row["present_on_baseline"], bool)
+        assert isinstance(row["present_on_candidate"], bool)
+    covered = {row["node_id"] for row in rec["failure_details"]}
+    assert covered == set(rec["baseline_failure_node_ids"]) | set(
+        rec["candidate_failure_node_ids"])
+
+
+def test_suite_comparison_moves_nothing_scientific():
+    rec = _suite_comparison()
+    assert rec["m3i2_evidence_status"] == "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE"
+    assert rec["m3i2_admitted"] is False
+    assert rec["m3i2_data_gate_executed"] is False
+    assert rec["m3_lag_wdi_authoritative_contract_status"] == "NOT_LOCKED"
+    assert rec["final_test_locked"] is True
+    assert rec["m4_authorized"] is False
+    assert rec["merge_authorized"] is False
+    assert rec["inquiry_submission_status"] == "HUMAN_SUBMISSION_REQUIRED"
+    assert rec["network_requests_during_verification"] == 0
+    assert rec["scientific_effect"] == "NONE_AUTHORITATIVE"
+
+
+def test_handoff_publishes_the_comparison_as_verification_only():
+    state = _handoff_state()
+    assert state["full_suite_baseline_comparison_completed"] is True
+    assert state["full_suite_new_failures"] == 0
+    assert state["full_suite_comparison_is_verification_not_science"] is True
+    assert state["full_suite_comparison_self_reference_avoided"] is True
+    # and it changed nothing about the scientific state
+    assert state["m3i2_block_admitted"] is False
+    assert state["m3i2_data_gate_executed"] is False
+    assert state["final_test_locked"] is True
+    assert state["stage128_m3_lag_wdi_authoritative_contract_status"] == (
+        "NOT_LOCKED")
+
+
+_COMPARISON_MUTATIONS = (
+    {"new_failure_node_ids": ["project/tests/test_x.py::test_y"]},
+    {"new_failures_count": 3},
+    {"report_commit_self_reference_avoided": False},
+    {"baseline_sha": "0" * 40},
+    {"same_assets": False},
+    {"no_test_was_deleted_or_weakened_to_hide_a_failure": False},
+    {"final_test_locked": False},
+    {"merge_authorized": True},
+    {"m3i2_admitted": True},
+    {"m3_lag_wdi_authoritative_contract_status": "LOCKED"},
+    {"preexisting_failure_node_ids": []},
+)
+
+
+@pytest.mark.parametrize("mutation", _COMPARISON_MUTATIONS)
+def test_a_dishonest_comparison_record_fails_closed(tmp_path, mutation):
+    broken = copy.deepcopy(_suite_comparison())
+    broken.update(mutation)
+    root = _comparison_root(tmp_path, "broken", broken)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage128_m3i2_full_suite_comparison_markers(root)
+
+
+def test_the_unmutated_comparison_record_is_accepted(tmp_path):
+    """The mutation tests above are only meaningful if the real one passes."""
+    root = _comparison_root(tmp_path, "clean", _suite_comparison())
+    markers = gen.derive_stage128_m3i2_full_suite_comparison_markers(root)
+    assert markers["full_suite_baseline_comparison_completed"] is True
+    assert markers["full_suite_new_failures"] == 0
+
+
+def test_absent_comparison_record_yields_no_markers(tmp_path):
+    """Before the record exists the generator must stay silent, not guess."""
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    assert gen.derive_stage128_m3i2_full_suite_comparison_markers(
+        str(empty)) == {}

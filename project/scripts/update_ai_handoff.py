@@ -2784,6 +2784,9 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # (now merged) evidence capture as the live action and owns both the
         # research pointers and the live PR topology.
         **derive_stage128_m3i2_final_documentary_recovery_markers(root),
+        # Verification record only: it reports how the suite behaved, and is
+        # never allowed to move a scientific marker.
+        **derive_stage128_m3i2_full_suite_comparison_markers(root),
     }
 
 
@@ -4647,6 +4650,39 @@ def render_current_state(record: dict) -> str:
             "README_STAGE128_M3I2_FINAL_OFFICIAL_DOCUMENTARY_RECOVERY.md`",
             "",
         ]
+    if record.get("full_suite_baseline_comparison_completed"):
+        lines += [
+            "### Stage128 — M3I-2 full-suite baseline comparison "
+            "(VERIFICATION ONLY)\n",
+            "_A test-evidence record, not a scientific one. It states only "
+            "that the same suite was run on the baseline and on the candidate "
+            "correction head in the same environment. It admits nothing, "
+            "moves no pointer and resolves no evidence question._\n",
+            "- ✅ **Comparison completed:** True — result "
+            f"`{record.get('full_suite_comparison_result')}` — **new failures "
+            f"{record.get('full_suite_new_failures')}**",
+            "- **Baseline** `"
+            f"{record.get('full_suite_baseline_sha')}`: "
+            f"{record.get('full_suite_baseline_passed')} passed / "
+            f"{record.get('full_suite_baseline_failed')} failed — "
+            "**candidate correction head** `"
+            f"{record.get('full_suite_candidate_correction_head')}`: "
+            f"{record.get('full_suite_candidate_passed')} passed / "
+            f"{record.get('full_suite_candidate_failed')} failed",
+            "- **Pre-existing failures carried by both:** "
+            f"{record.get('full_suite_preexisting_failures')} — they are not "
+            "introduced by this PR and no test was deleted or weakened to "
+            "hide one",
+            "- ⛔ **Not science:** verification-only = "
+            f"{record.get('full_suite_comparison_is_verification_not_science')}"
+            " — the record never claims to have tested the commit that "
+            "carries it (self-reference avoided = "
+            f"{record.get('full_suite_comparison_self_reference_avoided')})",
+            "- Record: `project/stage128/"
+            "m3i2_final_official_documentary_recovery/"
+            "stage128_m3i2_full_suite_baseline_comparison.json`",
+            "",
+        ]
     lines += [
         "### Last completed scientific micro-part QC\n",
         "_Scientific QC of the newest completed robustness micro-part — a "
@@ -6476,6 +6512,102 @@ def derive_stage128_m3i2_final_documentary_recovery_markers(root: str) -> dict:
         "next_research_action_id": next_action,
         "next_research_action_authorized": False,
         "next_research_action_pointer_is_not_authorization": True,
+    }
+
+
+_STAGE128_M3I2_SUITE_COMPARISON_REL = (
+    f"{_STAGE128_M3I2_RECOVERY_PKG}/"
+    "stage128_m3i2_full_suite_baseline_comparison.json")
+
+
+def derive_stage128_m3i2_full_suite_comparison_markers(root: str) -> dict:
+    """Recognize the baseline-versus-candidate full-suite comparison record.
+
+    A VERIFICATION record, not a scientific one: it says only that the same
+    suite was run on the baseline and on the candidate correction head in the
+    same environment, and that the candidate introduced no new failure. It
+    admits nothing and moves no pointer.
+
+    Fail-closed. The record must evaluate the declared baseline, must not
+    claim to have tested the commit that carries it, and must agree with its
+    own node-id sets — a record that says "no new failures" while listing some
+    is a broken record, not a passing one.
+
+    Returns {} before the comparison record exists.
+    """
+    path = os.path.join(root, _STAGE128_M3I2_SUITE_COMPARISON_REL)
+    if not os.path.isfile(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        rec = json.load(fh)
+    decision_path = os.path.join(root, _STAGE128_M3I2_RECOVERY_DECISION_REL)
+    with open(decision_path, encoding="utf-8") as fh:
+        expected_baseline = json.load(fh).get("baseline_commit")
+    if rec.get("baseline_sha") != expected_baseline:
+        raise HandoffError(
+            "the full-suite comparison must be measured against the baseline "
+            "commit the recovery decision records")
+    if not rec.get("report_commit_self_reference_avoided"):
+        raise HandoffError(
+            "the full-suite comparison must not claim to have tested the "
+            "commit that carries it")
+    new_ids = rec.get("new_failure_node_ids")
+    if not isinstance(new_ids, list):
+        raise HandoffError("new_failure_node_ids must be a list")
+    if rec.get("new_failures_count") != len(new_ids):
+        raise HandoffError(
+            "new_failures_count disagrees with new_failure_node_ids")
+    base_ids = set(rec.get("baseline_failure_node_ids") or [])
+    cand_ids = set(rec.get("candidate_failure_node_ids") or [])
+    if set(new_ids) != cand_ids - base_ids:
+        raise HandoffError(
+            "new_failure_node_ids is not candidate minus baseline")
+    if set(rec.get("preexisting_failure_node_ids") or []) != base_ids & cand_ids:
+        raise HandoffError(
+            "preexisting_failure_node_ids is not the baseline/candidate "
+            "intersection")
+    if set(rec.get("resolved_failure_node_ids") or []) != base_ids - cand_ids:
+        raise HandoffError(
+            "resolved_failure_node_ids is not baseline minus candidate")
+    if new_ids and rec.get("comparison_result") == (
+            "PASS_NO_PR_INTRODUCED_FULL_SUITE_FAILURES"):
+        raise HandoffError(
+            "a PASS comparison result cannot carry new failures")
+    for field in ("same_pytest_command", "same_assets",
+                  "same_environment_variables",
+                  "same_working_directory_semantics",
+                  "no_test_was_deleted_or_weakened_to_hide_a_failure"):
+        if rec.get(field) is not True:
+            raise HandoffError(f"full-suite comparison {field} must be True")
+    # A verification record may never move the scientific state.
+    for field, expected in (
+        ("m3i2_admitted", False),
+        ("m3i2_data_gate_executed", False),
+        ("final_test_locked", True),
+        ("m4_authorized", False),
+        ("merge_authorized", False),
+    ):
+        if rec.get(field) is not expected:
+            raise HandoffError(
+                f"full-suite comparison {field} != {expected}")
+    if rec.get("m3_lag_wdi_authoritative_contract_status") != "NOT_LOCKED":
+        raise HandoffError(
+            "the full-suite comparison must keep M3-LAG-WDI NOT_LOCKED")
+    return {
+        "full_suite_baseline_comparison_completed": True,
+        "full_suite_new_failures": len(new_ids),
+        "full_suite_baseline_sha": rec.get("baseline_sha"),
+        "full_suite_candidate_correction_head": rec.get(
+            "candidate_correction_head"),
+        "full_suite_comparison_result": rec.get("comparison_result"),
+        "full_suite_baseline_failed": rec.get("baseline_failed"),
+        "full_suite_candidate_failed": rec.get("candidate_failed"),
+        "full_suite_baseline_passed": rec.get("baseline_passed"),
+        "full_suite_candidate_passed": rec.get("candidate_passed"),
+        "full_suite_preexisting_failures": len(
+            rec.get("preexisting_failure_node_ids") or []),
+        "full_suite_comparison_is_verification_not_science": True,
+        "full_suite_comparison_self_reference_avoided": True,
     }
 
 

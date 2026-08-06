@@ -12,7 +12,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3i2-final-official-inquiry-human-submission`
 - **Last stage commit:** `8ef6fac5e0a9a75d032ff808e5946bb1b4b5d065`
-- **Generated from commit:** `8ef6fac5e0a9a75d032ff808e5946bb1b4b5d065` (branch `stage128-m3i2-final-official-documentary-recovery`, informational)
+- **Generated from commit:** `458dbf6459764d1c5be7ea55a6f5096453bdbcfe` (branch `stage128-m3i2-final-official-documentary-recovery`, informational)
 - **Baseline:** `origin/main` @ `b3627809dbfde8429d0308bec5d1c8541a161188`
 
 ## Current-state validation
@@ -185,6 +185,16 @@ _The LIVE action. A bounded search of OFFICIAL World Bank Group sources for the 
 - ⛔ **Nothing scientific moved:** M3I-2 evidence status `UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE` — admitted False — Data Gate executed False — modeling started False — Final Test locked True — M4 authorized False — merge authorized False
 - Package: `project/stage128/m3i2_final_official_documentary_recovery/`; interpretation: `project/stage128/m3i2_final_official_documentary_recovery/README_STAGE128_M3I2_FINAL_OFFICIAL_DOCUMENTARY_RECOVERY.md`
 
+### Stage128 — M3I-2 full-suite baseline comparison (VERIFICATION ONLY)
+
+_A test-evidence record, not a scientific one. It states only that the same suite was run on the baseline and on the candidate correction head in the same environment. It admits nothing, moves no pointer and resolves no evidence question._
+
+- ✅ **Comparison completed:** True — result `PASS_NO_PR_INTRODUCED_FULL_SUITE_FAILURES` — **new failures 0**
+- **Baseline** `b3627809dbfde8429d0308bec5d1c8541a161188`: 3829 passed / 8 failed — **candidate correction head** `458dbf6459764d1c5be7ea55a6f5096453bdbcfe`: 3915 passed / 8 failed
+- **Pre-existing failures carried by both:** 8 — they are not introduced by this PR and no test was deleted or weakened to hide one
+- ⛔ **Not science:** verification-only = True — the record never claims to have tested the commit that carries it (self-reference avoided = True)
+- Record: `project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_full_suite_baseline_comparison.json`
+
 ### Last completed scientific micro-part QC
 
 _Scientific QC of the newest completed robustness micro-part — a DIFFERENT role from current-state validation above._
@@ -234,5 +244,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `18fa8b3a6ac09a676f8f885146baeb2da7c3d6ae44500872f392d517cb312f41`_
-_generated_at_utc: 2026-08-06T07:13:54Z (informational)_
+_state_fingerprint: `9964811fe6ad99c2382ce55435caa643306992ceb487df9d0ec52efaaca973e4`_
+_generated_at_utc: 2026-08-06T07:48:43Z (informational)_

@@ -1,7 +1,7 @@
 {
   "action_id": "stage128-m3i2-final-official-documentary-recovery-initiation",
   "baseline_commit": "b3627809dbfde8429d0308bec5d1c8541a161188",
-  "file_count": 29,
+  "file_count": 30,
   "files": {
     "project/stage128/m3i2_final_official_documentary_recovery/README_STAGE128_M3I2_FINAL_OFFICIAL_DOCUMENTARY_RECOVERY.md": {
       "bytes": 7290,
@@ -110,6 +110,10 @@
     "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_final_official_documentary_search_log.csv": {
       "bytes": 10882,
       "sha256": "3df820c0cf73e23459db6db15157473cea996573a8645bc96c00ee8d614c54c4"
+    },
+    "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_full_suite_baseline_comparison.json": {
+      "bytes": 9062,
+      "sha256": "bad46e253d892e2c4edf37315049277766131fdaf85546da2f2e8c31c35d9993"
     },
     "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_world_bank_inquiry_request.md": {
       "bytes": 2270,
