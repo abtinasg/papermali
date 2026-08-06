@@ -4136,3 +4136,75 @@ def test_absent_comparison_record_yields_no_markers(tmp_path):
     empty.mkdir()
     assert gen.derive_stage128_m3i2_full_suite_comparison_markers(
         str(empty)) == {}
+
+
+# --------------------------------------------------------------------------- #
+# Stage128 — no stale M3I-2 gap claim may survive anywhere in the ROADMAP
+#
+# Item 25b was corrected against the merged PR #75 artifacts, but a downstream
+# pointer (item 25e) still described the older, narrower reading: a "pre-2017
+# vintage gap" affecting 19 of 37 cutoffs. The artifacts support no such
+# partition — nothing is verified, so everything is unresolved. These guards
+# sweep the WHOLE file, because a corrected paragraph is worth nothing while a
+# neighbouring one still contradicts it.
+# --------------------------------------------------------------------------- #
+
+#: Every phrasing of the superseded partial-gap reading.
+_M3I2_SUPERSEDED_GAP_CLAIMS = (
+    "unresolved pre-2017 vintage gap",
+    "pre-2017 vintage gap",
+    "pre-2017",
+    "19 unservable cutoffs",
+    "19 of 37",
+    "252 of 539",
+    "earliest verified archive edition",
+)
+
+
+@pytest.mark.parametrize("claim", _M3I2_SUPERSEDED_GAP_CLAIMS)
+def test_no_stale_m3i2_gap_claim_survives_anywhere_in_the_roadmap(claim):
+    assert claim not in _roadmap_text(), (
+        f"superseded M3I-2 vintage-gap claim present in ROADMAP: {claim!r}"
+    )
+
+
+def test_roadmap_states_the_authoritative_unresolved_totals():
+    """Nothing verified means everything unresolved — no middle partition."""
+    text = _roadmap_text()
+    assert "cutoffs with a verified pre-cutoff edition = 0 of 37" in text
+    assert "all 37 cutoffs and all 539 development pairs" in text
+    assert "0 of 37 cutoffs has a verified pre-cutoff edition" in text
+    assert "all 37 cutoffs and all 539 development pairs remain unresolved" \
+        in text
+    assert "editions with a verified `available_at` = 0" in text
+    assert "`release_date_verified` is False for all 110" in text
+
+
+def test_item_25e_is_historical_superseded_and_unauthorized():
+    text = _roadmap_text()
+    item = text[text.index("25e. `stage128-m3i2-official-source-evidence-"
+                           "review`"):]
+    item = item.split("\n26.", 1)[0]
+    assert "HISTORICAL / SUPERSEDED POINTER ONLY" in item
+    assert "NOT AUTHORIZED" in item
+    assert "NOT the current next action" in item
+    assert "retained only as historical state" in item or \
+        "retained only as historical roadmap state" in item
+    assert "authorizes no review, no Data Gate and no modeling" in item
+    # it must hand the live pointer over to the action that really is next
+    assert "stage128-m3i2-final-official-inquiry-human-submission" in item
+    # and the superseded reading must not survive inside the item either
+    for claim in _M3I2_SUPERSEDED_GAP_CLAIMS:
+        assert claim not in item, claim
+
+
+def test_the_current_next_pointer_is_the_human_submission_and_unauthorized():
+    fm = gen.read_roadmap(REAL_ROOT)
+    assert fm["next_research_action_id"] == (
+        "stage128-m3i2-final-official-inquiry-human-submission")
+    assert fm["next_research_action_authorized"] in (False, "false")
+    state = _handoff_state()
+    assert state["next_research_action_id"] == (
+        "stage128-m3i2-final-official-inquiry-human-submission")
+    assert state["next_research_action_authorized"] is False
+    assert state["next_research_action_pointer_is_not_authorization"] is True
