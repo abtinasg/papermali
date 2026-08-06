@@ -1282,10 +1282,12 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # is not an authorization: M3 stays unauthorized and unstarted. M2 is
     # retained as the INTERMEDIATE confirmatory block, which is a governance
     # decision and establishes no predictive superiority.
-    # ...and once more when the supplementary M3I-2 contract was locked; the
-    # pointer now names an evidence-capture action that is NOT authorized.
+    # ...and once more when the supplementary M3I-2 contract was locked, the
+    # official-source evidence capture completed and the final official
+    # documentary recovery was INITIATED; the pointer now names a human
+    # inquiry-submission action that is NOT authorized.
     assert state["next_research_action_id"] == (
-        "stage128-m3i2-official-source-evidence-review")
+        "stage128-m3i2-final-official-inquiry-human-submission")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -1299,9 +1301,9 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage128_m3i2_official_source_evidence_capture")
+        "stage128_m3i2_final_official_documentary_recovery")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m3i2_prospective_contract_lock"
+        "stage128_m3i2_official_source_evidence_capture"
     )
     # Stage126 M1 is human-authorized and started; development-fold modeling
     # occurred, while the final test remains fully locked.
@@ -1349,17 +1351,17 @@ def test_real_repo_roadmap_stage126_status_consistency():
     fm = gen.read_roadmap(REAL_ROOT)
     # The M3 macro data Gate has executed, so the live workstream is the Gate.
     assert fm["active_research_workstream_id"] == (
-        "stage128-m3i2-official-source-evidence-capture")
+        "stage128-m3i2-final-official-documentary-recovery")
     assert fm["predecessor_research_workstream_id"] == (
-        "stage128-m3-macro-data-gate"
+        "stage128-m3i2-official-source-evidence-capture"
     )
     # The workstream label is derived from the frozen action and never
     # substitutes for a research-action id.
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m3i2-official-source-evidence-capture"
+        "stage128-m3i2-final-official-documentary-recovery-initiation"
     )
     assert fm["next_research_action_id"] == (
-        "stage128-m3i2-official-source-evidence-review")
+        "stage128-m3i2-final-official-inquiry-human-submission")
     # The Stage128 M2 D2 design freeze completed, and the canonical D2 Gate
     # re-run has since been EXECUTED under its own explicit one-action
     # authorization and PASSED data admission, so both pointers legitimately
@@ -1459,14 +1461,14 @@ def test_real_repo_open_tasks_stage126_markers_match_handoff():
     # as an explicitly HISTORICAL (completed) section.
     assert (
         "## Active research workstream: "
-        "`stage128-m3i2-official-source-evidence-capture`" in open_tasks
+        "`stage128-m3i2-final-official-documentary-recovery`" in open_tasks
     )
     assert (
         "### Historical (completed) — `stage126-m1-financial-baseline`"
         in open_tasks
     )
     assert state["active_workstream"] == (
-        "stage128_m3i2_official_source_evidence_capture")
+        "stage128_m3i2_final_official_documentary_recovery")
     assert "Stage126 M1 human-authorized = true" in open_tasks
     assert "Stage126 started = true" in open_tasks
     assert "development modeling authorized = true" in open_tasks
@@ -2336,10 +2338,12 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # is not an authorization: M3 stays unauthorized and unstarted. M2 is
     # retained as the INTERMEDIATE confirmatory block, which is a governance
     # decision and establishes no predictive superiority.
-    # ...and once more when the supplementary M3I-2 contract was locked; the
-    # pointer now names an evidence-capture action that is NOT authorized.
+    # ...and once more when the supplementary M3I-2 contract was locked, the
+    # official-source evidence capture completed and the final official
+    # documentary recovery was INITIATED; the pointer now names a human
+    # inquiry-submission action that is NOT authorized.
     assert state["next_research_action_id"] == (
-        "stage128-m3i2-official-source-evidence-review")
+        "stage128-m3i2-final-official-inquiry-human-submission")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2360,9 +2364,9 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage128_m3i2_official_source_evidence_capture")
+        "stage128_m3i2_final_official_documentary_recovery")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m3i2_prospective_contract_lock"
+        "stage128_m3i2_official_source_evidence_capture"
     )
     # The micro-part pointer tracks the newest completed robustness micro-part.
     assert state["last_completed_micro_part"] == \
@@ -2651,10 +2655,12 @@ def test_part1_does_not_advance_research_pointers():
     # is not an authorization: M3 stays unauthorized and unstarted. M2 is
     # retained as the INTERMEDIATE confirmatory block, which is a governance
     # decision and establishes no predictive superiority.
-    # ...and once more when the supplementary M3I-2 contract was locked; the
-    # pointer now names an evidence-capture action that is NOT authorized.
+    # ...and once more when the supplementary M3I-2 contract was locked, the
+    # official-source evidence capture completed and the final official
+    # documentary recovery was INITIATED; the pointer now names a human
+    # inquiry-submission action that is NOT authorized.
     assert state["next_research_action_id"] == (
-        "stage128-m3i2-official-source-evidence-review")
+        "stage128-m3i2-final-official-inquiry-human-submission")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2675,9 +2681,9 @@ def test_part1_does_not_advance_research_pointers():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage128_m3i2_official_source_evidence_capture")
+        "stage128_m3i2_final_official_documentary_recovery")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m3i2_prospective_contract_lock"
+        "stage128_m3i2_official_source_evidence_capture"
     )
     # `current_stage` is a CURRENT-state field and advanced with the freeze;
     # the Stage126 label survives in the separate micro-part QC role.
@@ -2887,10 +2893,12 @@ def test_handoff_carries_live_vs_historical_test_boundary_markers():
     # is not an authorization: M3 stays unauthorized and unstarted. M2 is
     # retained as the INTERMEDIATE confirmatory block, which is a governance
     # decision and establishes no predictive superiority.
-    # ...and once more when the supplementary M3I-2 contract was locked; the
-    # pointer now names an evidence-capture action that is NOT authorized.
+    # ...and once more when the supplementary M3I-2 contract was locked, the
+    # official-source evidence capture completed and the final official
+    # documentary recovery was INITIATED; the pointer now names a human
+    # inquiry-submission action that is NOT authorized.
     assert state["next_research_action_id"] == (
-        "stage128-m3i2-official-source-evidence-review")
+        "stage128-m3i2-final-official-inquiry-human-submission")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2963,9 +2971,9 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage128_m3i2_official_source_evidence_capture")
+        "stage128_m3i2_final_official_documentary_recovery")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m3i2_prospective_contract_lock"
+        "stage128_m3i2_official_source_evidence_capture"
     )
     # The human retained-block decision
     # (stage128-m2-retained-block-human-decision) has since been RECORDED
@@ -2974,10 +2982,12 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # is not an authorization: M3 stays unauthorized and unstarted. M2 is
     # retained as the INTERMEDIATE confirmatory block, which is a governance
     # decision and establishes no predictive superiority.
-    # ...and once more when the supplementary M3I-2 contract was locked; the
-    # pointer now names an evidence-capture action that is NOT authorized.
+    # ...and once more when the supplementary M3I-2 contract was locked, the
+    # official-source evidence capture completed and the final official
+    # documentary recovery was INITIATED; the pointer now names a human
+    # inquiry-submission action that is NOT authorized.
     assert state["next_research_action_id"] == (
-        "stage128-m3i2-official-source-evidence-review")
+        "stage128-m3i2-final-official-inquiry-human-submission")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -3043,7 +3053,7 @@ def test_current_state_labels_micro_part_not_research_action():
     )
     assert (
         "- **Next research action:** "
-        "`stage128-m3i2-official-source-evidence-review`" in text
+        "`stage128-m3i2-final-official-inquiry-human-submission`" in text
     )
 
 
@@ -3150,12 +3160,12 @@ def test_active_workstream_identifies_the_m3_macro_gate():
     # The live label is the supplementary M3I-2 contract lock, which succeeded
     # the CBI M3 Gate; neither older label may be the CURRENT one.
     assert state["active_workstream"] == (
-        "stage128_m3i2_official_source_evidence_capture")
+        "stage128_m3i2_final_official_documentary_recovery")
     assert state["active_workstream"] not in (
         "stage128_m2_d2_boundary_month_equity_return",
         "stage128_m3_macro_data_gate")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m3i2_prospective_contract_lock")
+        "stage128_m3i2_official_source_evidence_capture")
 
 
 def test_m3_data_workstream_started_but_modeling_did_not():
@@ -3178,9 +3188,9 @@ def test_pointers_are_unchanged_because_the_gate_is_unresolved():
     """
     state = _handoff_state()
     assert state["last_completed_research_action_id"] == (
-        "stage128-m3i2-official-source-evidence-capture")
+        "stage128-m3i2-final-official-documentary-recovery-initiation")
     assert state["next_research_action_id"] == (
-        "stage128-m3i2-official-source-evidence-review")
+        "stage128-m3i2-final-official-inquiry-human-submission")
     assert state["next_research_action_id"] != (
         "stage128-m3-incremental-evaluation")
     assert state["m3_macro_data_gate_human_review_required"] is True
@@ -3203,7 +3213,7 @@ def test_current_state_says_the_m3_gate_was_executed():
     assert "**Executed:** True" in text
     assert "UNRESOLVED_M3_DATA_GATE" in text
     assert ("**Active workstream:** "
-            "`stage128_m3i2_official_source_evidence_capture`") in text
+            "`stage128_m3i2_final_official_documentary_recovery`") in text
 
 
 def test_current_state_cannot_both_assert_and_deny_gate_execution():
@@ -3218,9 +3228,9 @@ def test_roadmap_no_longer_labels_the_m3_gate_unauthorized_or_unstarted():
     text = _roadmap_text()
     front = text.split("---")[1]
     assert ("active_research_workstream_id: "
-            "stage128-m3i2-official-source-evidence-capture") in front
+            "stage128-m3i2-final-official-documentary-recovery") in front
     assert ("predecessor_research_workstream_id: "
-            "stage128-m3-macro-data-gate") in front
+            "stage128-m3i2-official-source-evidence-capture") in front
     # the stale live-workstream label must not be the ACTIVE one
     assert ("active_research_workstream_id: "
             "stage128-m2-d2-boundary-month-equity-return") not in front
@@ -3236,7 +3246,7 @@ def test_open_tasks_no_longer_calls_stage127_m2_the_current_action():
     assert ("`stage128-m3i2-prospective-contract-lock` — **COMPLETE**"
             in text)
     assert ("## Active research workstream: "
-            "`stage128-m3i2-official-source-evidence-capture`") in text
+            "`stage128-m3i2-final-official-documentary-recovery`") in text
     assert ("## Active research workstream: "
             "`stage128-m2-d2-boundary-month-equity-return`") not in text
     # the M2 description is preserved, but explicitly as history
@@ -3422,18 +3432,23 @@ def test_pr74_is_only_historical_and_never_live():
     assert "PR #74 is the **historical contract-lock PR**" in text
 
 
-def test_live_pr_topology_is_pr75_on_main():
+def test_live_pr_topology_is_pr76_on_main():
+    # PR #75 was merged and is now the predecessor; the LIVE Draft PR is the
+    # final official documentary recovery PR, on `main` @ the PR #75 merge
+    # commit. Draft and unmerged in both states; a merged PR is never live.
     state = _handoff_state()
-    assert state["stage128_m3i2_live_pr_number"] == 75
+    assert state["stage128_m3i2_live_pr_number"] == 76
     assert state["stage128_m3i2_live_pr_base_branch"] == "main"
     assert state["stage128_m3i2_live_pr_base_commit"] == (
-        "cf23771a383bf9ad8f7ff2855c216c9a240647ff")
-    assert state["stage128_m3i2_live_main_commit"] == (
-        "cf23771a383bf9ad8f7ff2855c216c9a240647ff")
+        "b3627809dbfde8429d0308bec5d1c8541a161188")
     assert state["stage128_m3i2_live_pr_is_draft"] is True
     assert state["stage128_m3i2_live_pr_merged"] is False
     assert state["stage128_m3i2_live_pr_role"] == (
-        "official_source_evidence_capture_pr")
+        "final_official_documentary_recovery_initiation_pr")
+    assert state["stage128_m3i2_evidence_capture_pr_number"] == 75
+    assert state["stage128_m3i2_evidence_capture_pr_merged"] is True
+    assert state["stage128_m3i2_evidence_capture_pr_merge_commit"] == (
+        "b3627809dbfde8429d0308bec5d1c8541a161188")
 
 
 def test_live_pr_head_is_derived_from_the_repository_head_not_pinned():
@@ -3537,7 +3552,7 @@ def test_current_state_renders_the_m3i2_contract_lock_section():
     pointers = [ln for ln in text.splitlines()
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1
-    assert "stage128-m3i2-official-source-evidence-review" in pointers[0]
+    assert "stage128-m3i2-final-official-inquiry-human-submission" in pointers[0]
 
 
 # --------------------------------------------------------------------------- #
@@ -3715,13 +3730,15 @@ def test_current_state_marks_the_contract_lock_section_as_historical():
         "### Stage128 — M3I-2 prospective contract lock", 1)[1].split(
         "### Stage128 — M3I-2 official-source evidence capture", 1)[0]
     assert "- **Live PR topology:**" not in contract_section
-    assert "- **Live PR topology:** PR #75" in text
+    assert "- **Live PR topology:** PR #76" in text
 
 
 def test_current_state_does_not_present_pr74_as_the_live_draft():
     text = _current_state_text()
     assert "PR #74 is the **historical contract-lock PR**" in text
-    assert "carried by **PR #75** (the LIVE evidence-capture PR)" in text
+    assert ("carried by **PR #76** (the LIVE Draft PR)") in text
+    # the merged evidence-capture PR must never be presented as the live one
+    assert "carried by **PR #75** (the LIVE evidence-capture PR)" not in text
     for line in text.splitlines():
         if "PR #74" in line:
             assert "historical" in line.lower(), line

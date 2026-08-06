@@ -3,7 +3,78 @@
 Human-maintained. The authoritative "next action" ID lives in `ROADMAP.md`
 front matter; this file is the working description.
 
-## Active research workstream: `stage128-m3i2-official-source-evidence-capture`
+## Active research workstream: `stage128-m3i2-final-official-documentary-recovery`
+
+The CURRENT workstream is the Stage128 **M3I-2 final official documentary
+recovery**. It is an **INITIATION**: a bounded official documentary search plus
+the preparation of exactly ONE official World Bank Data Help Desk inquiry. It
+retrieved no macro observation, created no dataset row, ran no Data Gate,
+computed no coverage, materialized no feature, fit no model and read no
+Final Test row.
+
+The authoritative research-action pointers are
+`last_completed_research_action_id=stage128-m3i2-final-official-documentary-recovery-initiation`
+and `next_research_action_id=stage128-m3i2-final-official-inquiry-human-submission`
+with `next_research_action_authorized=false` — a pointer is **never** an
+authorization.
+
+### Current scientific action
+
+`stage128-m3i2-final-official-documentary-recovery-initiation` — **COMPLETE**,
+recorded under its own explicit one-action human authorization (252 UTF-8
+bytes, SHA-256 `a1878df0…9e97`), which was CONSUMED by the recording. It ran in
+a clean separate worktree from `main @ b3627809…161188`, the merge commit of
+**PR #75 — the merged predecessor**.
+
+**Bounds honoured.** 14 documentary GET requests of a maximum of 20; World Bank
+Group hosts only; **0 archive ZIP downloads, 0 redownloads**; **0 repeats** of
+any URL in the prior capture manifest (a fail-closed guard refuses duplicates,
+archive ZIPs, unofficial hosts and non-HTTPS). Every retained response is
+hashed and committed under `raw_official_documents/`.
+
+**The two blockers — both still open.**
+
+1. *Archive release availability.* Official WDI release notes exist only from
+   **December 2024** onward. The official Data Updates and Errata page
+   announces dated **database** updates, not archive-edition publications, and
+   several announced dates differ from the archive filename tokens. The full
+   official Help Desk article index contains no archive-release article.
+2. *Historical FX semantic continuity for `PA.NUS.FCRF` / `IRN`.* The indicator
+   page confirms only the series title and the IMF IFS source; the DEC
+   conversion-factor article confirms the official rate is the IFS rate on a
+   calendar-year basis. Neither states the Iranian denomination, the valuation
+   convention, any redenomination or any unit break.
+
+Bounded-search outcome: `NO_NEW_DOCUMENTARY_EVIDENCE_IN_BOUNDED_SEARCH`.
+**Rule D therefore stands for every edition:** `available_at = null`,
+`release_date_verified = false`; the filename token is never release evidence
+and no unproven previous-month fallback was used.
+
+**Submission status: `HUMAN_SUBMISSION_REQUIRED`.** The Help Desk exposes no
+public support form and opening a ticket requires a signed-in account, so the
+inquiry body and both public attachments were prepared and hashed instead of
+submitted. **No ticket was opened, none was invented, no credential was used
+and no human-verification step was bypassed.**
+
+**Open item for the human supervisor.** Submit the prepared inquiry exactly
+once through the official channel, then report the submission timestamp (UTC),
+the redacted ticket id, the SHA-256 of the ticket id and the SHA-256 of the raw
+confirmation kept **outside** the repository. Stopping rule: initial inquiry
+maximum 1, waiting period **10 business days** (Mon-Fri, submission day
+excluded), follow-up maximum 1 and only under a separate explicit
+authorization, automatic follow-up forbidden, and any response is ingested and
+adjudicated only in a **separate** action. Terminal status if it stays
+insufficient: `UNRESOLVED_AFTER_FINAL_OFFICIAL_INQUIRY`.
+
+**M3-LAG-WDI-EXPLORATORY is NOT locked.** A local, uncommitted draft of that
+exploratory contract was partially materialized before the human supervisor
+superseded the path. It produced no data retrieval, Gate, modeling or Final
+Test access and never became an authoritative repository contract. It is
+quarantined outside the repository and left untouched — not deleted, not
+cleaned, not committed — its authorization is consumed and not reusable, and
+the authoritative status is `NOT_LOCKED`.
+
+## Predecessor research workstream (HISTORICAL): `stage128-m3i2-official-source-evidence-capture`
 
 The CURRENT workstream is the Stage128 **M3I-2 supplementary international
 macro CONTRACT** workstream. A contract lock is **metadata only**: no macro

@@ -8,12 +8,12 @@ _Generated from the repository (git + QC). Do not edit by hand._
 ## Snapshot
 
 - **Stage / Batch:** Stage128 / None
-- **Active workstream:** `stage128_m3i2_official_source_evidence_capture`
+- **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `stage128-m3i2-official-source-evidence-review`
-- **Last stage commit:** `650757555953569a33dd5034ffd8010720dbc56b`
-- **Generated from commit:** `b75f351f2263d394eb92e040115b9e8992bc8933` (branch `stage128-m3i2-official-source-evidence-capture`, informational)
-- **Baseline:** `origin/main` @ `cf23771a383bf9ad8f7ff2855c216c9a240647ff`
+- **Next research action:** `stage128-m3i2-final-official-inquiry-human-submission`
+- **Last stage commit:** `472f7cb3238835bb835d1be151b2c110bd3ad6a1`
+- **Generated from commit:** `472f7cb3238835bb835d1be151b2c110bd3ad6a1` (branch `stage128-m3i2-final-official-documentary-recovery`, informational)
+- **Baseline:** `origin/main` @ `b3627809dbfde8429d0308bec5d1c8541a161188`
 
 ## Current-state validation
 
@@ -138,17 +138,17 @@ _A metadata-only, PROSPECTIVE source/definition/statistical contract lock for th
 - ⛔ **M3I-3 financing metadata lock:** `UNRESOLVED_METADATA_LOCK` — **admitted:** False
 - **M3-CBI preserved unchanged:** Gate status `UNRESOLVED_M3_DATA_GATE`, block admitted False
 - **Scientific provenance baseline:** PR #73 head `e6db63fb7d105f0d3a39db101c9e364161c367e9` — protected hashes are verified against that commit permanently; a merge or retarget never moves it
-- **PR topology at contract-lock time (HISTORICAL, not live):** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and never merged under this action — merged = False, no merge authorization. Semantics: `historical_contract_lock_topology_superseded_by_pr75`. PR #74 is the **historical contract-lock PR**, never the current draft; the live evidence-capture PR is identified in the evidence-capture section below.
-- **Next research action (pointer only):** `stage128-m3i2-official-source-evidence-review` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
+- **PR topology at contract-lock time (HISTORICAL, not live):** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and never merged under this action — merged = False, no merge authorization. Semantics: `historical_contract_lock_topology_superseded_by_pr75`. PR #74 is the **historical contract-lock PR**, never the current draft; the live Draft PR is identified in the live-action section below.
+- **Next research action (pointer only):** `stage128-m3i2-final-official-inquiry-human-submission` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
 - Package: `project/stage128/m3_intl_macro_contract_lock/`; interpretation: `project/stage128/m3_intl_macro_contract_lock/README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`
 
 ### Stage128 — M3I-2 official-source evidence capture
 
 _The action that supersedes the contract-time "no retrieval" statements above. It is ACQUISITION ONLY: official bytes were requested, retained and hashed. Every count below is an input-integrity count and **never coverage**. Capture is not admission — it answers nothing about coverage, the Data Gate or modeling._
 
-- ✅ **Evidence capture executed:** True — action `stage128-m3i2-official-source-evidence-capture`, carried by **PR #75** (the LIVE evidence-capture PR)
+- ✅ **Evidence capture executed:** True — action `stage128-m3i2-official-source-evidence-capture`, carried by **PR #75** (the MERGED predecessor PR, no longer the live Draft)
 - ✅ **Official-source retrieval completed:** True — this is acquisition only and is **not** a Data Gate, **not** coverage and **not** an admission
-- **Live PR topology:** PR #75 → base `main` @ `cf23771a383bf9ad8f7ff2855c216c9a240647ff` — draft = True, merged = False, head derived from `observed_repository_head_commit_at_generation` (never pinned)
+- **PR topology at capture time (HISTORICAL, not live):** PR #75 **was merged** by merge commit `b3627809dbfde8429d0308bec5d1c8541a161188` — semantics: `merged_predecessor_superseded_by_pr76`. The live Draft PR is identified in the final official documentary recovery section below.
 - **Official traffic:** 21 requests — 21 successful responses — 21 responses retained — raw bytes retained 1,066,295,643
 - **Archive editions:** 16 captured and held out of 110 discovered — verified required editions 0 of 0 — verified release dates 0 of 110
 - ⛔ **Unresolved:** cutoffs 37 of 37 — development pairs 539 of 539
@@ -168,6 +168,22 @@ _A post-capture, read-only audit of the external evidence bundle by an auditor i
 - ⛔ **Nothing scientific moved:** M3I-2 evidence status `UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE` — admitted False — Data Gate executed False — modeling started False — Final Test locked True — M4 authorized False — merge authorized False
 - ⛔ A passing integrity audit does **not** resolve the historical-vintage evidence problem and does **not** admit M3I-2.
 - Attestation: `project/stage128/m3i2_official_source_evidence_capture/stage128_m3i2_independent_bundle_integrity_audit_attestation.md`
+
+### Stage128 — M3I-2 final official documentary recovery (INITIATION ONLY)
+
+_The LIVE action. A bounded search of OFFICIAL World Bank Group sources for the two remaining M3I-2 blockers, plus preparation of exactly ONE official Data Help Desk inquiry. Acquiring DOCUMENTS is not admitting DATA: it answers nothing about coverage, the Data Gate or modeling._
+
+- ✅ **Initiated:** True — action `stage128-m3i2-final-official-documentary-recovery-initiation`, carried by **PR #76** (the LIVE Draft PR) on base `main` @ `b3627809dbfde8429d0308bec5d1c8541a161188`
+- **Live PR topology:** PR #76 → base `main` @ `b3627809dbfde8429d0308bec5d1c8541a161188` — draft = True, merged = False, head derived from `observed_repository_head_commit_at_generation` (never pinned)
+- **Merged predecessor:** PR #75 (official-source evidence capture) — merged = True, merge commit `b3627809dbfde8429d0308bec5d1c8541a161188`
+- **Bounded search:** 14 of a maximum 20 official documentary GET requests — archive ZIP downloads 0, redownloads 0, prior capture repeated False
+- ⛔ **Outcome:** `NO_NEW_DOCUMENTARY_EVIDENCE_IN_BOUNDED_SEARCH` — blocker 1 (archive release availability) resolved False — blocker 2 (FX semantic continuity) resolved False
+- ⛔ **Release-date discipline unchanged:** filename token is release evidence = False — unproven previous-month fallback used = False — official-month → first day of the NEXT month rule locked = True
+- **Official inquiry:** status `HUMAN_SUBMISSION_REQUIRED` — initial attempts 0 / submitted 0 (maximum 1) — body SHA-256 `dd82929f8098061d501c51b65cac6f3e3ed203cb00ff5689ae0e66f9f2f1e8b5` — ticket id None (none invented) — PII committed to Git = False
+- **Stopping rule:** waiting period 10 business days — follow-up authorized now = False — response adjudication authorized = False
+- ⛔ **M3-LAG-WDI-EXPLORATORY:** authoritative contract status `NOT_LOCKED` — a local, uncommitted partial draft was detected (True) and quarantined outside the repository (True); it is not authoritative (False), its authorization is not reusable (False), retrieval started = False
+- ⛔ **Nothing scientific moved:** M3I-2 evidence status `UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE` — admitted False — Data Gate executed False — modeling started False — Final Test locked True — M4 authorized False — merge authorized False
+- Package: `project/stage128/m3i2_final_official_documentary_recovery/`; interpretation: `project/stage128/m3i2_final_official_documentary_recovery/README_STAGE128_M3I2_FINAL_OFFICIAL_DOCUMENTARY_RECOVERY.md`
 
 ### Last completed scientific micro-part QC
 
@@ -218,5 +234,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `49d46c008ad686dc2fc8588c76280fc00789de7c2577d4e3813d2d2060eb88aa`_
-_generated_at_utc: 2026-08-03T21:40:58Z (informational)_
+_state_fingerprint: `d9d6b40bf9e5de909f6d56c2511daf2b23e05575faf946cef67675e7e9a98efb`_
+_generated_at_utc: 2026-08-06T06:12:02Z (informational)_
