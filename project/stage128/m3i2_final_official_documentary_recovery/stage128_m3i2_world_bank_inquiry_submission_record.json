@@ -1,4 +1,6 @@
 {
+  "acknowledgement_is_not_a_substantive_response": true,
+  "acknowledgement_received": true,
   "action_id": "stage128-m3i2-final-official-documentary-recovery-initiation",
   "attachments": [
     {
@@ -20,15 +22,51 @@
       "sha256": "2cc118c224b43acdfa7abcee23c3b2a7ddd7dc0809a9ee072f29aad02276cf94"
     }
   ],
+  "attachments_selected_before_submission": true,
+  "attachments_server_confirmation_enumerated": false,
   "automatic_follow_up_authorized": false,
+  "automatic_follow_up_forbidden": true,
+  "body_hash_byte_verified_from_raw_email_source": false,
+  "body_submission_evidence_status": "CANONICAL_BODY_VISUALLY_CONFIRMED_NOT_RAW_BYTE_VERIFIED",
+  "canonical_body_sha256": "dd82929f8098061d501c51b65cac6f3e3ed203cb00ff5689ae0e66f9f2f1e8b5",
   "captcha_bypassed": false,
   "credentials_used_by_automation": false,
   "edition_inventory_sha256": "5c4739482d685ad4a1fd13c6a82d16cacb882d7e07996535671bb2f267b3a35b",
-  "external_raw_confirmation_present": false,
-  "external_raw_confirmation_sha256": null,
+  "external_confirmation_evidence": [
+    {
+      "byte_size": 631880,
+      "committed_to_git": false,
+      "contains_personal_information": true,
+      "kind": "web_confirmation_page_uploaded_copy",
+      "sha256": "14060eef17ccb52838433d8186b3e476d1a703d2476bb37cbd9b5aa8e0a931f6",
+      "stored_outside_repository": true
+    },
+    {
+      "byte_size": 383457,
+      "committed_to_git": false,
+      "contains_personal_information": true,
+      "kind": "confirmation_email_uploaded_copy_part_1",
+      "sha256": "8841e6ab32115c21e2b994f5b80ac0311e826853e3059bc7c188a15a5a2f1e85",
+      "stored_outside_repository": true
+    },
+    {
+      "byte_size": 339376,
+      "committed_to_git": false,
+      "contains_personal_information": true,
+      "kind": "confirmation_email_uploaded_copy_part_2",
+      "sha256": "dd95e54919f6809d5f07a2248e73dffc919b31465351c2a02c56c6eb1c626ca7",
+      "stored_outside_repository": true
+    }
+  ],
+  "external_raw_confirmation_present": true,
+  "external_raw_confirmation_sha256": "14060eef17ccb52838433d8186b3e476d1a703d2476bb37cbd9b5aa8e0a931f6",
+  "follow_up_attempted": 0,
   "follow_up_authorized_now": false,
+  "follow_up_before_2026_08_21_forbidden": true,
+  "follow_up_earliest_calendar_date": "2026-08-21",
   "follow_up_max_count": 1,
   "fx_questions_sha256": "2cc118c224b43acdfa7abcee23c3b2a7ddd7dc0809a9ee072f29aad02276cf94",
+  "human_authenticated_submission": true,
   "human_submission_instructions": [
     "1. Open https://datahelpdesk.worldbank.org/ and use Contact support (a signed-in account is required).",
     "2. Paste the subject line and the body of stage128_m3i2_world_bank_inquiry_request.md byte-for-byte.",
@@ -37,20 +75,32 @@
     "5. Save the raw confirmation page OUTSIDE the repository.",
     "6. Report back: submission timestamp (UTC), redacted ticket id, SHA-256 of the ticket id, SHA-256 of the external raw confirmation, and whether the pasted body hash still equals dd82929f8098061d501c51b65cac6f3e3ed203cb00ff5689ae0e66f9f2f1e8b5."
   ],
-  "initial_inquiries_attempted": 0,
-  "initial_inquiries_successfully_submitted": 0,
+  "human_submission_instructions_status": "EXECUTED_BY_THE_HUMAN_SUPERVISOR",
+  "initial_inquiries_attempted": 1,
+  "initial_inquiries_successfully_submitted": 1,
   "initial_inquiry_max_count": 1,
+  "official_support_category": "Data Compilation Methodology",
   "official_support_channel": "World Bank Data Help Desk Contact support",
   "official_support_root": "https://datahelpdesk.worldbank.org/",
   "pii_committed_to_git": false,
+  "pre_submission_automation_block_reason": "the Data Help Desk exposes no public support form; opening a ticket requires a signed-in account, which would mean using a personal credential and a personal e-mail address. Automation must not create an account, sign in, supply personal data or bypass any human-verification step, so the inquiry is prepared for a human supervisor instead",
   "response_adjudication_authorized": false,
-  "submission_blocked_because": "the Data Help Desk exposes no public support form; opening a ticket requires a signed-in account, which would mean using a personal credential and a personal e-mail address. Automation must not create an account, sign in, supply personal data or bypass any human-verification step, so the inquiry is prepared for a human supervisor instead",
-  "submission_status": "HUMAN_SUBMISSION_REQUIRED",
+  "submission_blocked_because": null,
+  "submission_calendar_date": "2026-08-06",
+  "submission_status": "SUBMITTED_ACKNOWLEDGED_WAITING_FOR_SUBSTANTIVE_RESPONSE",
+  "submission_subject": "Request for official historical WDI archive release dates and PA.NUS.FCRF unit continuity for Iran",
+  "submission_timestamp_display_timezone": null,
+  "submission_timestamp_displayed": "2026-08-06T14:03:00",
   "submission_timestamp_utc": null,
+  "submission_timestamp_utc_status": "UNRESOLVED_CONFIRMATION_UI_DID_NOT_DISPLAY_TIMEZONE",
   "submitted_body_sha256": "dd82929f8098061d501c51b65cac6f3e3ed203cb00ff5689ae0e66f9f2f1e8b5",
+  "substantive_response_received": false,
   "ticket_id_fabricated": false,
+  "ticket_id_present": false,
   "ticket_id_redacted": null,
   "ticket_id_sha256": null,
   "waiting_period_business_day_definition": "Monday through Friday only; the submission day is excluded; public holidays are not modeled",
-  "waiting_period_business_days": 10
+  "waiting_period_business_days": 10,
+  "waiting_period_completion_date": "2026-08-20",
+  "waiting_period_status": "ACTIVE"
 }

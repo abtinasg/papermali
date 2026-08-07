@@ -10,10 +10,10 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Stage / Batch:** Stage128 / None
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `stage128-m3i2-final-official-inquiry-human-submission`
-- **Last stage commit:** `a9ba6e46ed96039e76ebbf5a3ee5c6e8e67e905f`
-- **Generated from commit:** `56a26179c26c9c68d9a32bccdcc247c3412187d8` (branch `HEAD`, informational)
-- **Baseline:** `origin/main` @ `b3627809dbfde8429d0308bec5d1c8541a161188`
+- **Next research action:** `stage128-m3i2-final-official-inquiry-response-ingestion`
+- **Last stage commit:** `724a1b5ae8163eea4e406f1aa9527f3a05a8a938`
+- **Generated from commit:** `48aeb7a336aed40d3d926897af14c67b97cc5e29` (branch `stage128-m3i2-final-official-inquiry-human-submission`, informational)
+- **Baseline:** `origin/main` @ `89d8e6ff2d12ec82903cd28aa7ab839eb946b658`
 
 ## Current-state validation
 
@@ -139,7 +139,7 @@ _A metadata-only, PROSPECTIVE source/definition/statistical contract lock for th
 - **M3-CBI preserved unchanged:** Gate status `UNRESOLVED_M3_DATA_GATE`, block admitted False
 - **Scientific provenance baseline:** PR #73 head `e6db63fb7d105f0d3a39db101c9e364161c367e9` — protected hashes are verified against that commit permanently; a merge or retarget never moves it
 - **PR topology at contract-lock time (HISTORICAL, not live):** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and never merged under this action — merged = False, no merge authorization. Semantics: `historical_contract_lock_topology_superseded_by_pr75`. PR #74 is the **historical contract-lock PR**, never the current draft; the live Draft PR is identified in the live-action section below.
-- **Next research action (pointer only):** `stage128-m3i2-final-official-inquiry-human-submission` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
+- **Next research action (pointer only):** `stage128-m3i2-final-official-inquiry-response-ingestion` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
 - Package: `project/stage128/m3_intl_macro_contract_lock/`; interpretation: `project/stage128/m3_intl_macro_contract_lock/README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`
 
 ### Stage128 — M3I-2 official-source evidence capture
@@ -148,7 +148,7 @@ _The action that supersedes the contract-time "no retrieval" statements above. I
 
 - ✅ **Evidence capture executed:** True — action `stage128-m3i2-official-source-evidence-capture`, carried by **PR #75** (the MERGED predecessor PR, no longer the live Draft)
 - ✅ **Official-source retrieval completed:** True — this is acquisition only and is **not** a Data Gate, **not** coverage and **not** an admission
-- **PR topology at capture time (HISTORICAL, not live):** PR #75 **was merged** by merge commit `b3627809dbfde8429d0308bec5d1c8541a161188` — semantics: `merged_predecessor_superseded_by_pr76`. The live Draft PR is identified in the final official documentary recovery section below.
+- **PR topology at capture time (HISTORICAL, not live):** PR #75 **was merged** by merge commit `b3627809dbfde8429d0308bec5d1c8541a161188` — semantics: `merged_predecessor_superseded_by_pr76`. The LIVE Draft PR is **PR #77**, identified in full below.
 - **Official traffic:** 21 requests — 21 successful responses — 21 responses retained — raw bytes retained 1,066,295,643
 - **Archive editions:** 16 captured and held out of 110 discovered — verified required editions 0 of 0 — verified release dates 0 of 110
 - ⛔ **Unresolved:** cutoffs 37 of 37 — development pairs 539 of 539
@@ -171,16 +171,18 @@ _A post-capture, read-only audit of the external evidence bundle by an auditor i
 
 ### Stage128 — M3I-2 final official documentary recovery (INITIATION ONLY)
 
-_The LIVE action. A bounded search of OFFICIAL World Bank Group sources for the two remaining M3I-2 blockers, plus preparation of exactly ONE official Data Help Desk inquiry. Acquiring DOCUMENTS is not admitting DATA: it answers nothing about coverage, the Data Gate or modeling._
+_A COMPLETED predecessor action, superseded by the human submission recorded below. A bounded search of OFFICIAL World Bank Group sources for the two remaining M3I-2 blockers, plus preparation of exactly ONE official Data Help Desk inquiry. Acquiring DOCUMENTS is not admitting DATA: it answers nothing about coverage, the Data Gate or modeling._
 
-- ✅ **Initiated:** True — action `stage128-m3i2-final-official-documentary-recovery-initiation`, carried by **PR #76** (the LIVE Draft PR) on base `main` @ `b3627809dbfde8429d0308bec5d1c8541a161188`
-- **Live PR topology:** PR #76 → base `main` @ `b3627809dbfde8429d0308bec5d1c8541a161188` — draft = True, merged = False, head derived from `observed_repository_head_commit_at_generation` (never pinned)
+- ✅ **Initiated:** True — action `stage128-m3i2-final-official-documentary-recovery-initiation`, carried by **PR #76**, which **was merged** by merge commit `89d8e6ff2d12ec82903cd28aa7ab839eb946b658` — it is the MERGED predecessor, no longer the live Draft PR
+- **PR topology at recovery time (HISTORICAL, not live):** PR #76 **was merged** — semantics: `merged_predecessor_superseded_by_pr77`. The LIVE Draft PR is identified in the human-submission section below.
 - **Merged predecessor:** PR #75 (official-source evidence capture) — merged = True, merge commit `b3627809dbfde8429d0308bec5d1c8541a161188`
 - **Bounded search:** 14 of a maximum 20 official documentary GET requests — archive ZIP downloads 0, redownloads 0, prior capture repeated False
 - ⛔ **Outcome:** `NO_NEW_DOCUMENTARY_EVIDENCE_IN_BOUNDED_SEARCH` — blocker 1 (archive release availability) resolved False — blocker 2 (FX semantic continuity) resolved False
 - ⛔ **Release-date discipline unchanged:** filename token is release evidence = False — unproven previous-month fallback used = False — official-month → first day of the NEXT month rule locked = True
-- **Official inquiry:** status `HUMAN_SUBMISSION_REQUIRED` — initial attempts 0 / submitted 0 (maximum 1) — body SHA-256 `dd82929f8098061d501c51b65cac6f3e3ed203cb00ff5689ae0e66f9f2f1e8b5` — ticket id None (none invented) — PII committed to Git = False
-- **Stopping rule:** waiting period 10 business days — follow-up authorized now = False — response adjudication authorized = False
+- **Official inquiry:** status `SUBMITTED_ACKNOWLEDGED_WAITING_FOR_SUBSTANTIVE_RESPONSE` — initial attempts 1 / submitted 1 (maximum 1) — body SHA-256 `dd82929f8098061d501c51b65cac6f3e3ed203cb00ff5689ae0e66f9f2f1e8b5` — ticket id None (none invented) — PII committed to Git = False
+- **Human submission:** submitted by the human supervisor = True — displayed timestamp `2026-08-06T14:03:00` (calendar date `2026-08-06`) — UTC instant `UNRESOLVED_CONFIRMATION_UI_DID_NOT_DISPLAY_TIMEZONE`, never guessed — acknowledgement received = True, substantive response received = False — ticket id present = False, fabricated = False — raw confirmation kept outside Git, SHA-256 `14060eef17ccb52838433d8186b3e476d1a703d2476bb37cbd9b5aa8e0a931f6` — body evidence `CANONICAL_BODY_VISUALLY_CONFIRMED_NOT_RAW_BYTE_VERIFIED`, attachments server-enumerated = False
+- **Stopping rule:** waiting period 10 business days — status `ACTIVE` through `2026-08-20` — earliest possible follow-up `2026-08-21` — follow-ups attempted 0 — follow-up authorized now = False — response adjudication authorized = False
+- **LIVE PR topology:** the LIVE Draft PR is **PR #77** (`final_official_inquiry_human_submission_recording_pr`) → base `main` @ `89d8e6ff2d12ec82903cd28aa7ab839eb946b658` — draft = True, merged = False, ready-for-review authorized = False, merge authorized = False. The head shown for it is a GENERATION ANCHOR (`repository_head_at_generation_not_github_pr_head`), never pinned and **not** the instantaneous GitHub PR head. PR #76 is HISTORICAL: merged = True by merge commit `89d8e6ff2d12ec82903cd28aa7ab839eb946b658`
 - ⛔ **M3-LAG-WDI-EXPLORATORY:** authoritative contract status `NOT_LOCKED` — a local, uncommitted partial draft was detected (True) and quarantined outside the repository (True); it is not authoritative (False), its authorization is not reusable (False), retrieval started = False
 - ⛔ **Nothing scientific moved:** M3I-2 evidence status `UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE` — admitted False — Data Gate executed False — modeling started False — Final Test locked True — M4 authorized False — merge authorized False
 - Package: `project/stage128/m3i2_final_official_documentary_recovery/`; interpretation: `project/stage128/m3i2_final_official_documentary_recovery/README_STAGE128_M3I2_FINAL_OFFICIAL_DOCUMENTARY_RECOVERY.md`
@@ -244,5 +246,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `7659f44b117e352bb9e2d1775c1924457d4a8736715811d7e3c8aa5824496a60`_
-_generated_at_utc: 2026-08-06T11:11:09Z (informational)_
+_state_fingerprint: `760a7679bfabbd61c7fbedb5b1ab2560ae6ffedebec797847e5bc8751c260d86`_
+_generated_at_utc: 2026-08-08T07:56:52Z (informational)_

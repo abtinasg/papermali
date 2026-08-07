@@ -1287,7 +1287,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # documentary recovery was INITIATED; the pointer now names a human
     # inquiry-submission action that is NOT authorized.
     assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission")
+        "stage128-m3i2-final-official-inquiry-response-ingestion")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -1358,10 +1358,10 @@ def test_real_repo_roadmap_stage126_status_consistency():
     # The workstream label is derived from the frozen action and never
     # substitutes for a research-action id.
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m3i2-final-official-documentary-recovery-initiation"
+        "stage128-m3i2-final-official-inquiry-human-submission"
     )
     assert fm["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission")
+        "stage128-m3i2-final-official-inquiry-response-ingestion")
     # The Stage128 M2 D2 design freeze completed, and the canonical D2 Gate
     # re-run has since been EXECUTED under its own explicit one-action
     # authorization and PASSED data admission, so both pointers legitimately
@@ -2343,7 +2343,7 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # documentary recovery was INITIATED; the pointer now names a human
     # inquiry-submission action that is NOT authorized.
     assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission")
+        "stage128-m3i2-final-official-inquiry-response-ingestion")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2660,7 +2660,7 @@ def test_part1_does_not_advance_research_pointers():
     # documentary recovery was INITIATED; the pointer now names a human
     # inquiry-submission action that is NOT authorized.
     assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission")
+        "stage128-m3i2-final-official-inquiry-response-ingestion")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2898,7 +2898,7 @@ def test_handoff_carries_live_vs_historical_test_boundary_markers():
     # documentary recovery was INITIATED; the pointer now names a human
     # inquiry-submission action that is NOT authorized.
     assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission")
+        "stage128-m3i2-final-official-inquiry-response-ingestion")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2987,7 +2987,7 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # documentary recovery was INITIATED; the pointer now names a human
     # inquiry-submission action that is NOT authorized.
     assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission")
+        "stage128-m3i2-final-official-inquiry-response-ingestion")
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -3053,7 +3053,7 @@ def test_current_state_labels_micro_part_not_research_action():
     )
     assert (
         "- **Next research action:** "
-        "`stage128-m3i2-final-official-inquiry-human-submission`" in text
+        "`stage128-m3i2-final-official-inquiry-response-ingestion`" in text
     )
 
 
@@ -3188,9 +3188,9 @@ def test_pointers_are_unchanged_because_the_gate_is_unresolved():
     """
     state = _handoff_state()
     assert state["last_completed_research_action_id"] == (
-        "stage128-m3i2-final-official-documentary-recovery-initiation")
-    assert state["next_research_action_id"] == (
         "stage128-m3i2-final-official-inquiry-human-submission")
+    assert state["next_research_action_id"] == (
+        "stage128-m3i2-final-official-inquiry-response-ingestion")
     assert state["next_research_action_id"] != (
         "stage128-m3-incremental-evaluation")
     assert state["m3_macro_data_gate_human_review_required"] is True
@@ -3432,29 +3432,50 @@ def test_pr74_is_only_historical_and_never_live():
     assert "PR #74 is the **historical contract-lock PR**" in text
 
 
-def test_live_pr_topology_is_pr76_on_main():
-    # PR #75 was merged and is now the predecessor; the LIVE Draft PR is the
-    # final official documentary recovery PR, on `main` @ the PR #75 merge
-    # commit. Draft and unmerged in both states; a merged PR is never live.
+def test_live_pr_topology_is_pr77_on_main():
+    # PR #76 was merged into `main` and is now the predecessor; the LIVE Draft
+    # PR is the human-submission recording PR, on `main` @ the PR #76 merge
+    # commit. A MERGED PR is never the live Draft.
     state = _handoff_state()
-    assert state["stage128_m3i2_live_pr_number"] == 76
+    assert state["stage128_m3i2_live_pr_number"] == 77
     assert state["stage128_m3i2_live_pr_base_branch"] == "main"
     assert state["stage128_m3i2_live_pr_base_commit"] == (
-        "b3627809dbfde8429d0308bec5d1c8541a161188")
+        "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
+    assert state["stage128_m3i2_live_main_commit"] == (
+        "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
     assert state["stage128_m3i2_live_pr_is_draft"] is True
     assert state["stage128_m3i2_live_pr_merged"] is False
+    assert state["stage128_m3i2_live_pr_ready_for_review_authorized"] is False
     assert state["stage128_m3i2_live_pr_role"] == (
-        "final_official_documentary_recovery_initiation_pr")
+        "final_official_inquiry_human_submission_recording_pr")
+    # The recovery PR is HISTORY, and says so.
+    assert state["stage128_m3i2_recovery_pr_number"] == 76
+    assert state["stage128_m3i2_recovery_pr_merged"] is True
+    assert state["stage128_m3i2_recovery_pr_merge_commit"] == (
+        "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
+    assert state["stage128_m3i2_recovery_pr_semantics"] == (
+        "merged_predecessor_superseded_by_pr77")
     assert state["stage128_m3i2_evidence_capture_pr_number"] == 75
     assert state["stage128_m3i2_evidence_capture_pr_merged"] is True
     assert state["stage128_m3i2_evidence_capture_pr_merge_commit"] == (
         "b3627809dbfde8429d0308bec5d1c8541a161188")
 
 
+def test_current_state_never_calls_a_merged_pr_the_live_draft():
+    text = _current_state_text()
+    assert "PR #76 **was merged**" in text
+    assert "the LIVE Draft PR is **PR #77**" in text
+    # the merged predecessors must never be rendered as the live Draft
+    assert "**PR #76** (the LIVE Draft PR)" not in text
+    assert "**PR #75** (the LIVE Draft PR)" not in text
+
+
 def test_live_pr_head_is_derived_from_the_repository_head_not_pinned():
     state = _handoff_state()
+    # An engineering anchor, labelled as such: it is the repository head at
+    # generation time, NOT the instantaneous GitHub PR head.
     assert state["stage128_m3i2_live_pr_head_commit_source"] == (
-        "observed_repository_head_commit_at_generation")
+        "repository_head_at_generation_not_github_pr_head")
     # HEAD-relative, therefore excluded from the semantic projection
     assert "stage128_m3i2_live_pr_head_commit" in gen.VOLATILE_FIELDS
     assert "stage128_m3i2_live_pr_head_commit" not in gen.projection(state)
@@ -3552,7 +3573,7 @@ def test_current_state_renders_the_m3i2_contract_lock_section():
     pointers = [ln for ln in text.splitlines()
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1
-    assert "stage128-m3i2-final-official-inquiry-human-submission" in pointers[0]
+    assert "stage128-m3i2-final-official-inquiry-response-ingestion" in pointers[0]
 
 
 # --------------------------------------------------------------------------- #
@@ -3730,15 +3751,16 @@ def test_current_state_marks_the_contract_lock_section_as_historical():
         "### Stage128 — M3I-2 prospective contract lock", 1)[1].split(
         "### Stage128 — M3I-2 official-source evidence capture", 1)[0]
     assert "- **Live PR topology:**" not in contract_section
-    assert "- **Live PR topology:** PR #76" in text
+    assert "- **LIVE PR topology:** the LIVE Draft PR is **PR #77**" in text
 
 
 def test_current_state_does_not_present_pr74_as_the_live_draft():
     text = _current_state_text()
     assert "PR #74 is the **historical contract-lock PR**" in text
-    assert ("carried by **PR #76** (the LIVE Draft PR)") in text
-    # the merged evidence-capture PR must never be presented as the live one
+    assert "the LIVE Draft PR is **PR #77**" in text
+    # no merged PR may ever be presented as the live one
     assert "carried by **PR #75** (the LIVE evidence-capture PR)" not in text
+    assert "carried by **PR #76** (the LIVE Draft PR)" not in text
     for line in text.splitlines():
         if "PR #74" in line:
             assert "historical" in line.lower(), line
@@ -3951,9 +3973,9 @@ def test_roadmap_front_matter_pins_the_live_recovery_workstream():
     assert fm["predecessor_research_workstream_id"] == (
         "stage128-m3i2-official-source-evidence-capture")
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m3i2-final-official-documentary-recovery-initiation")
-    assert fm["next_research_action_id"] == (
         "stage128-m3i2-final-official-inquiry-human-submission")
+    assert fm["next_research_action_id"] == (
+        "stage128-m3i2-final-official-inquiry-response-ingestion")
     # the front-matter reader hands back the raw scalar; unauthorized either way
     assert fm["next_research_action_authorized"] in (False, "false")
 
@@ -3974,11 +3996,15 @@ def test_roadmap_marks_the_evidence_capture_paragraph_as_historical():
         "`stage128-m3i2-official-source-evidence-capture`" not in text
 
 
-def test_handoff_agrees_the_capture_pr_is_merged_and_the_recovery_is_live():
+def test_handoff_agrees_the_capture_and_recovery_prs_are_merged():
+    # Both predecessors are merged; the live Draft is the submission recording
+    # PR. Merged and live are mutually exclusive, in every state field.
     state = _handoff_state()
     assert state["stage128_m3i2_evidence_capture_pr_number"] == 75
     assert state["stage128_m3i2_evidence_capture_pr_merged"] is True
-    assert state["stage128_m3i2_live_pr_number"] == 76
+    assert state["stage128_m3i2_recovery_pr_number"] == 76
+    assert state["stage128_m3i2_recovery_pr_merged"] is True
+    assert state["stage128_m3i2_live_pr_number"] == 77
     assert state["stage128_m3i2_live_pr_is_draft"] is True
     assert state["stage128_m3i2_live_pr_merged"] is False
     assert state["stage128_m3i2_merge_authorized"] is False
@@ -4192,19 +4218,19 @@ def test_item_25e_is_historical_superseded_and_unauthorized():
         "retained only as historical roadmap state" in item
     assert "authorizes no review, no Data Gate and no modeling" in item
     # it must hand the live pointer over to the action that really is next
-    assert "stage128-m3i2-final-official-inquiry-human-submission" in item
+    assert "stage128-m3i2-final-official-inquiry-response-ingestion" in item
     # and the superseded reading must not survive inside the item either
     for claim in _M3I2_SUPERSEDED_GAP_CLAIMS:
         assert claim not in item, claim
 
 
-def test_the_current_next_pointer_is_the_human_submission_and_unauthorized():
+def test_the_current_next_pointer_is_response_ingestion_and_unauthorized():
     fm = gen.read_roadmap(REAL_ROOT)
     assert fm["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission")
+        "stage128-m3i2-final-official-inquiry-response-ingestion")
     assert fm["next_research_action_authorized"] in (False, "false")
     state = _handoff_state()
     assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission")
+        "stage128-m3i2-final-official-inquiry-response-ingestion")
     assert state["next_research_action_authorized"] is False
     assert state["next_research_action_pointer_is_not_authorization"] is True

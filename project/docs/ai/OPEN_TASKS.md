@@ -12,11 +12,19 @@ retrieved no macro observation, created no dataset row, ran no Data Gate,
 computed no coverage, materialized no feature, fit no model and read no
 Final Test row.
 
+The prepared inquiry has since been **submitted once by a human supervisor** and
+that submission has been recorded, so the live inquiry status is
+**`SUBMITTED_ACKNOWLEDGED_WAITING_FOR_SUBSTANTIVE_RESPONSE`** — the human
+submission is **no longer outstanding**.
+
 The authoritative research-action pointers are
-`last_completed_research_action_id=stage128-m3i2-final-official-documentary-recovery-initiation`
-and `next_research_action_id=stage128-m3i2-final-official-inquiry-human-submission`
+`last_completed_research_action_id=stage128-m3i2-final-official-inquiry-human-submission`
+and `next_research_action_id=stage128-m3i2-final-official-inquiry-response-ingestion`
 with `next_research_action_authorized=false` — a pointer is **never** an
-authorization.
+authorization. A separate conditional pointer
+`conditional_follow_up_action_id=stage128-m3i2-final-official-inquiry-one-follow-up`
+carries `conditional_follow_up_earliest_date=2026-08-21` and
+`conditional_follow_up_authorized=false`.
 
 ### Current scientific action
 
@@ -50,21 +58,49 @@ Bounded-search outcome: `NO_NEW_DOCUMENTARY_EVIDENCE_IN_BOUNDED_SEARCH`.
 `release_date_verified = false`; the filename token is never release evidence
 and no unproven previous-month fallback was used.
 
-**Submission status: `HUMAN_SUBMISSION_REQUIRED`.** The Help Desk exposes no
-public support form and opening a ticket requires a signed-in account, so the
-inquiry body and both public attachments were prepared and hashed instead of
-submitted. **No ticket was opened, none was invented, no credential was used
-and no human-verification step was bypassed.**
+**Initiation-time submission status: `HUMAN_SUBMISSION_REQUIRED`** (historical).
+The Help Desk exposes no public support form and opening a ticket requires a
+signed-in account, so the initiation prepared and hashed the inquiry body and
+both public attachments instead of submitting. **No ticket was opened, none was
+invented, no credential was used and no human-verification step was bypassed.**
 
-**Open item for the human supervisor.** Submit the prepared inquiry exactly
-once through the official channel, then report the submission timestamp (UTC),
-the redacted ticket id, the SHA-256 of the ticket id and the SHA-256 of the raw
-confirmation kept **outside** the repository. Stopping rule: initial inquiry
-maximum 1, waiting period **10 business days** (Mon-Fri, submission day
-excluded), follow-up maximum 1 and only under a separate explicit
-authorization, automatic follow-up forbidden, and any response is ingested and
-adjudicated only in a **separate** action. Terminal status if it stays
-insufficient: `UNRESOLVED_AFTER_FINAL_OFFICIAL_INQUIRY`.
+### Live submission status — `SUBMITTED_ACKNOWLEDGED_WAITING_FOR_SUBSTANTIVE_RESPONSE`
+
+`stage128-m3i2-final-official-inquiry-human-submission` — **COMPLETE.** A human
+supervisor submitted the prepared inquiry **exactly once** through the official
+World Bank Data Help Desk *Contact support* channel, category *Data Compilation
+Methodology*, with both public attachments visibly selected. It was recorded
+under its own explicit one-action human authorization (95 UTF-8 bytes, SHA-256
+`4562e480…7978`), which the recording CONSUMED.
+
+* **Acknowledgement received; it is NOT a substantive response.** The
+  confirmation page reported the message as received and the confirmation
+  e-mail promised a later reply. Neither blocker is resolved.
+* **No ticket id.** None was displayed and none was fabricated —
+  `ticket_id_present: false`, `ticket_id_redacted: null`,
+  `ticket_id_sha256: null`.
+* **UTC instant unresolved.** The UI showed `2026-08-06 14:03` with no
+  timezone, so `submission_timestamp_utc: null` under
+  `UNRESOLVED_CONFIRMATION_UI_DID_NOT_DISPLAY_TIMEZONE`. Only the official
+  displayed calendar date `2026-08-06` drives the waiting period.
+* **Weak claims kept weak.** Body evidence is
+  `CANONICAL_BODY_VISUALLY_CONFIRMED_NOT_RAW_BYTE_VERIFIED`, and the
+  attachments were selected but **not** server-enumerated.
+* **Raw confirmation is external only.** Three copies (`14060eef…31f6`,
+  631,880 bytes; `8841e6ab…1e85`, 383,457 bytes; `dd95e549…6ca9`, 339,376
+  bytes) are stored outside the repository; only hashes and sizes are in Git.
+
+**Waiting period ACTIVE.** Business day 1 `2026-08-07`, business day 10
+`2026-08-20`, completion **2026-08-20**, earliest possible follow-up
+**2026-08-21**. Initial inquiry maximum 1 (used), follow-up maximum 1 and only
+under a separate explicit authorization, **automatic follow-up forbidden**, and
+any response is ingested and adjudicated only in a **separate**, currently
+unauthorized action. Terminal status if it stays insufficient:
+`UNRESOLVED_AFTER_FINAL_OFFICIAL_INQUIRY`.
+
+**Open item for the human supervisor.** Wait. Do not reply, resubmit or follow
+up. If a substantive response arrives, it needs a new explicit authorization
+before anything is read into the repository.
 
 **M3-LAG-WDI-EXPLORATORY is NOT locked.** A local, uncommitted draft of that
 exploratory contract was partially materialized before the human supervisor

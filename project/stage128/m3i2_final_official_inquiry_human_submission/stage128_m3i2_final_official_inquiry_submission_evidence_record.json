@@ -1,0 +1,78 @@
+{
+  "action_id": "stage128-m3i2-final-official-inquiry-human-submission",
+  "attachments": [
+    {
+      "name": "m3i2_world_bank_inquiry_edition_inventory.csv",
+      "sha256": "5c4739482d685ad4a1fd13c6a82d16cacb882d7e07996535671bb2f267b3a35b",
+      "unchanged_since_preparation": true
+    },
+    {
+      "name": "m3i2_world_bank_inquiry_fx_semantic_questions.md",
+      "sha256": "2cc118c224b43acdfa7abcee23c3b2a7ddd7dc0809a9ee072f29aad02276cf94",
+      "unchanged_since_preparation": true
+    }
+  ],
+  "attachments_selected_before_submission": true,
+  "attachments_server_confirmation_enumerated": false,
+  "attachment_evidence_note": "the pre-submission form visibly showed both attachments selected; the confirmation e-mail did not enumerate them, so server-side receipt of the attachments is NOT proven",
+  "acknowledgement_received": true,
+  "acknowledgement_is_substantive_response": false,
+  "body_hash_byte_verified_from_raw_email_source": false,
+  "body_submission_evidence_status": "CANONICAL_BODY_VISUALLY_CONFIRMED_NOT_RAW_BYTE_VERIFIED",
+  "canonical_body_sha256": "dd82929f8098061d501c51b65cac6f3e3ed203cb00ff5689ae0e66f9f2f1e8b5",
+  "confirmation_email_text": "Thank you for your question. One of our data support specialists will reply as soon as possible.",
+  "confirmation_page_text": "Your message has been received. We'll get back to you shortly.",
+  "external_confirmation_evidence": [
+    {
+      "byte_size": 631880,
+      "committed_to_git": false,
+      "contains_personal_information": true,
+      "kind": "web_confirmation_page_uploaded_copy",
+      "sha256": "14060eef17ccb52838433d8186b3e476d1a703d2476bb37cbd9b5aa8e0a931f6",
+      "stored_outside_repository": true
+    },
+    {
+      "byte_size": 383457,
+      "committed_to_git": false,
+      "contains_personal_information": true,
+      "kind": "confirmation_email_uploaded_copy_part_1",
+      "sha256": "8841e6ab32115c21e2b994f5b80ac0311e826853e3059bc7c188a15a5a2f1e85",
+      "stored_outside_repository": true
+    },
+    {
+      "byte_size": 339376,
+      "committed_to_git": false,
+      "contains_personal_information": true,
+      "kind": "confirmation_email_uploaded_copy_part_2",
+      "sha256": "dd95e54919f6809d5f07a2248e73dffc919b31465351c2a02c56c6eb1c626ca7",
+      "stored_outside_repository": true
+    }
+  ],
+  "external_raw_confirmation_present": true,
+  "external_raw_confirmation_sha256": "14060eef17ccb52838433d8186b3e476d1a703d2476bb37cbd9b5aa8e0a931f6",
+  "human_authenticated_submission": true,
+  "initial_inquiries_attempted": 1,
+  "initial_inquiries_successfully_submitted": 1,
+  "initial_inquiry_max_count": 1,
+  "official_support_category": "Data Compilation Methodology",
+  "official_support_channel": "World Bank Data Help Desk — Contact support",
+  "pii_committed_to_git": false,
+  "pii_recovery_from_screenshots_attempted": false,
+  "submission_calendar_date": "2026-08-06",
+  "submission_subject": "Request for official historical WDI archive release dates and PA.NUS.FCRF unit continuity for Iran",
+  "submission_timestamp_display_timezone": null,
+  "submission_timestamp_displayed": "2026-08-06T14:03:00",
+  "submission_timestamp_utc": null,
+  "submission_timestamp_utc_status": "UNRESOLVED_CONFIRMATION_UI_DID_NOT_DISPLAY_TIMEZONE",
+  "submission_timestamp_utc_derivation_forbidden_from": [
+    "guessing",
+    "user_location",
+    "system_clock",
+    "screenshot_filename"
+  ],
+  "substantive_response_received": false,
+  "ticket_id_fabricated": false,
+  "ticket_id_present": false,
+  "ticket_id_redacted": null,
+  "ticket_id_sha256": null
+}

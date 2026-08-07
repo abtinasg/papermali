@@ -619,7 +619,7 @@ def test_research_pointers_unchanged():
     # contract has since been prospectively locked, so the pointer advanced
     # once more — to an evidence-capture action that is NOT authorized.
     assert report["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission"
+        "stage128-m3i2-final-official-inquiry-response-ingestion"
     )
 
 
@@ -1516,10 +1516,10 @@ def test_live_handoff_labels_match_the_live_research_state():
         # scientific actions, never with a label fix. The D2 design freeze,
         # then the executed D2 Gate re-run, each advanced them once.
         assert state["last_completed_research_action_id"] == (
-            "stage128-m3i2-final-official-documentary-recovery-initiation"
+            "stage128-m3i2-final-official-inquiry-human-submission"
         )
         assert state["next_research_action_id"] == (
-            "stage128-m3i2-final-official-inquiry-human-submission"
+            "stage128-m3i2-final-official-inquiry-response-ingestion"
         )
         # And nothing further is AUTHORIZED by advancing a label.
         for field in (
@@ -1565,7 +1565,7 @@ def test_current_state_snapshot_renders_stage128_labels():
         )
         assert (
             "- **Next research action:** "
-            "`stage128-m3i2-final-official-inquiry-human-submission`" in text
+            "`stage128-m3i2-final-official-inquiry-response-ingestion`" in text
         )
         assert (
             "## Stage128 — M2 D2 boundary-month equity-return design freeze"
@@ -1674,7 +1674,7 @@ def test_sole_live_next_pointer_is_a_pointer_not_an_authorization():
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1, pointers
     line = pointers[0]
-    assert ("`stage128-m3i2-final-official-inquiry-human-submission`"
+    assert ("`stage128-m3i2-final-official-inquiry-response-ingestion`"
             in line)
     assert "pointer is **not** an authorization" in line
 
@@ -1704,10 +1704,10 @@ def test_roadmap_front_matter_matches_handoff_pointers():
     text = open(_ROADMAP, encoding="utf-8").read()
     fm = v._roadmap_front_matter(text)
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m3i2-final-official-documentary-recovery-initiation"
+        "stage128-m3i2-final-official-inquiry-human-submission"
     )
     assert fm["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission"
+        "stage128-m3i2-final-official-inquiry-response-ingestion"
     )
     state = json.loads(open(
         os.path.join(REAL_ROOT, "project", "docs", "ai",
@@ -1960,8 +1960,10 @@ def test_m3i2_workstream_is_accepted_by_the_m3_self_consistency_check():
 def test_m3i2_next_pointer_is_the_unauthorized_evidence_capture():
     assert v.NEXT_RESEARCH_ACTION_ID_AFTER_M3I2_CONTRACT_LOCK == (
         "stage128-m3i2-official-source-evidence-capture")
+    # the human submission has been performed and recorded, so the live
+    # pointer has advanced past it - and is still not an authorization
     assert v.expected_next_research_action_id(_root(), True) == (
-        "stage128-m3i2-final-official-inquiry-human-submission")
+        "stage128-m3i2-final-official-inquiry-response-ingestion")
 
 
 def test_m3i2_live_topology_is_the_post_merge_retargeted_state():

@@ -1,0 +1,22 @@
+{
+  "action_id": "stage128-m3i2-final-official-inquiry-human-submission",
+  "auto_merge": false,
+  "executed_in_separate_clean_worktree": true,
+  "live_pr_base_branch": "main",
+  "live_pr_base_commit": "89d8e6ff2d12ec82903cd28aa7ab839eb946b658",
+  "live_pr_head_commit_pinned": false,
+  "live_pr_head_is_github_pr_head": false,
+  "live_pr_head_semantics": "repository_head_at_generation_not_github_pr_head",
+  "live_pr_is_draft": true,
+  "live_pr_merged": false,
+  "live_pr_number": 77,
+  "live_pr_role": "final_official_inquiry_human_submission_recording_pr",
+  "merge_authorized": false,
+  "pr_is_stacked_on_open_predecessor": false,
+  "predecessor_pr_merge_commit": "89d8e6ff2d12ec82903cd28aa7ab839eb946b658",
+  "predecessor_pr_merged": true,
+  "predecessor_pr_number": 76,
+  "predecessor_pr_role": "merged_predecessor_final_official_documentary_recovery_initiation",
+  "ready_for_review_authorized": false,
+  "repository": "abtinasg/papermali"
+}

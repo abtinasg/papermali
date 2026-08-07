@@ -1,0 +1,41 @@
+{
+  "action_id": "stage128-m3i2-final-official-inquiry-human-submission",
+  "archive_release_blocker_resolved": false,
+  "blocker_1_resolved": false,
+  "blocker_2_resolved": false,
+  "cpi_semantic_compatibility": {
+    "fail_integrity": 0,
+    "pass": 16,
+    "unresolved": 0
+  },
+  "data_gate_status": "NOT_EXECUTED",
+  "decision": "RECORD_THE_COMPLETED_HUMAN_SUBMISSION_AND_WAIT",
+  "final_test_locked": true,
+  "fx_semantic_compatibility": {
+    "fail_integrity": 0,
+    "pass": 0,
+    "unresolved": 16
+  },
+  "fx_semantic_continuity_blocker_resolved": false,
+  "last_completed_research_action_id": "stage128-m3i2-final-official-inquiry-human-submission",
+  "m3_cbi_status": "UNRESOLVED_M3_DATA_GATE",
+  "m3_lag_wdi_authoritative_contract_status": "NOT_LOCKED",
+  "m3i2_admitted": false,
+  "m3i2_evidence_status": "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE",
+  "m4_authorized": false,
+  "merge_authorized": false,
+  "next_research_action_authorized": false,
+  "next_research_action_id": "stage128-m3i2-final-official-inquiry-response-ingestion",
+  "paper_winner_selected": false,
+  "result_code": "HUMAN_INQUIRY_SUBMITTED_ONCE_ACKNOWLEDGED_ONLY",
+  "scientific_effect": "NONE",
+  "submission_status": "SUBMITTED_ACKNOWLEDGED_WAITING_FOR_SUBSTANTIVE_RESPONSE",
+  "unresolved_development_pairs": 539,
+  "unresolved_development_pairs_total": 539,
+  "unresolved_cutoffs": 37,
+  "unresolved_cutoffs_total": 37,
+  "verified_pre_cutoff_editions": 0,
+  "verified_wdi_release_dates": 0,
+  "waiting_period_completion_date": "2026-08-20",
+  "waiting_period_status": "ACTIVE"
+}
