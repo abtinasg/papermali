@@ -102,13 +102,101 @@ unauthorized action. Terminal status if it stays insufficient:
 up. If a substantive response arrives, it needs a new explicit authorization
 before anything is read into the repository.
 
-**M3-LAG-WDI-EXPLORATORY is NOT locked.** A local, uncommitted draft of that
-exploratory contract was partially materialized before the human supervisor
-superseded the path. It produced no data retrieval, Gate, modeling or Final
-Test access and never became an authoritative repository contract. It is
-quarantined outside the repository and left untouched — not deleted, not
-cleaned, not committed — its authorization is consumed and not reusable, and
-the authoritative status is `NOT_LOCKED`.
+## TWO PARALLEL TRACKS
+
+**TRACK A — World Bank official inquiry: still waiting.** Everything above
+stands unchanged. Status
+`SUBMITTED_ACKNOWLEDGED_WAITING_FOR_SUBSTANTIVE_RESPONSE`, waiting period
+**ACTIVE through 2026-08-20**, earliest possible follow-up **2026-08-21**,
+follow-up **not authorized**, response ingestion and adjudication **not
+authorized**. Track A owns the authoritative research pointers.
+
+**TRACK B — M3-LAG-WDI-EXPLORATORY: contract LOCKED, pre-retrieval.**
+`m3_lag_wdi_authoritative_contract_status:
+AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL` (item 25h), recorded under a NEW
+explicit one-action human authorization (158 UTF-8 bytes, SHA-256
+`0c1e1049…995b`) that was CONSUMED by the lock and is **not** reusable for
+retrieval, for the Data Gate or for modeling.
+
+* **Role, frozen:** `supplementary_exploratory_robustness_block`. Not
+  confirmatory M3, not a replacement or repair of M3-CBI, not a continuation of
+  M3I-2, not proof of point-in-time availability, and not able by itself to
+  select the paper winner. M2 stays
+  `RETAIN_M2_AS_INTERMEDIATE_CONFIRMATORY_BLOCK`.
+* **Exactly two features, frozen:** `intl_cpi_inflation_lag1_wdi`
+  (`FP.CPI.TOTL.ZG`, `IRN`, observation year `t-1`, identity) and
+  `intl_fx_change_official_lag1_wdi` (`PA.NUS.FCRF`, `IRN`,
+  `FX_LAG1_t = 100 * ln(E_(t-1) / E_(t-2))`, NULL unless both observations are
+  present, numeric, strictly positive and consecutive). No third macro feature,
+  no financing-rate feature, no indicator search, no imputation, no alternative
+  FX series after a failure.
+* **Architecture, frozen:** retained-M2 **539-row** development parent sample,
+  **12** M2 features versus **14** M3-LAG-WDI features, complete cases for both
+  new features, both models refitted on the identical resulting common sample,
+  and the 666-row M1 results are **not** a valid comparator.
+* **Gate, frozen but NOT executed:** inherited thresholds (`>= 0.80` candidate
+  coverage, `>= 0.70` block coverage, `>= 5` positives in each locked
+  validation window), development-only, every observed coverage value `null`
+  and **not** zero. A PASS would be **data admission only**.
+* **Honest limitation:** the future retrieval uses the then-current/latest
+  **revised** WDI. Historical-vintage and point-in-time availability are
+  explicitly **not** claimed, and the one-year lag does not turn revised WDI
+  into point-in-time data. That is exactly why the block is
+  exploratory/supplementary.
+* **Separate family:** the exploratory comparison never enters the confirmatory
+  Holm family `M2_minus_M1`, `M3_CBI_minus_M2`, `M4_minus_M3_CBI`.
+
+**Open item for the human supervisor on Track B.** Nothing may be retrieved
+yet. The immediate pointer is **retrieval ONLY**:
+`m3_lag_wdi_next_action_id: stage128-m3-lag-wdi-exploratory-data-retrieval`,
+`m3_lag_wdi_next_action_scope: retrieval_only`,
+`m3_lag_wdi_next_action_authorized: false`,
+`m3_lag_wdi_next_action_executes_data_gate: false`.
+
+**Retrieval, the Data Gate and modeling are three SEPARATE actions.** An
+authorization boundary only exists where an action boundary exists, so they are
+never bundled and never share an identity:
+
+| Step | Action id | Authorized |
+| --- | --- | --- |
+| A | `stage128-m3-lag-wdi-exploratory-contract-lock` (DONE, item 25h) | consumed |
+| B | `stage128-m3-lag-wdi-exploratory-data-retrieval` — retrieval only | **false** |
+| C | `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — audit/state recording, **no Gate** | **false** |
+| D | `stage128-m3-lag-wdi-exploratory-data-gate` — the Data Gate | **false** |
+| E | `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — modeling | **false** |
+
+* An authorization to **retrieve** is **not** an authorization to execute the
+  Data Gate: `m3_lag_wdi_retrieval_authorization_implies_gate_authorization:
+  false`.
+* A **combined** retrieval-and-Gate action is forbidden:
+  `m3_lag_wdi_combined_retrieval_and_gate_action_permitted: false`.
+* A **pointer** to the Data Gate is not an authorization to execute it. Step D
+  needs its own NEW explicit human authorization.
+* A Gate **PASS** is **DATA ADMISSION ONLY**
+  (`m3_lag_wdi_gate_pass_is_data_admission_only: true`) and authorizes no model
+  fit (`m3_lag_wdi_gate_pass_authorizes_modeling: false`). Step E needs
+  ANOTHER separate explicit human authorization.
+* None of A–E unlocks the Final Test.
+
+**PR history, pinned (not re-derived from adjacency).** PR **#76** =
+`stage128-m3i2-final-official-documentary-recovery-initiation`, MERGED by
+`89d8e6ff2d12ec82903cd28aa7ab839eb946b658`. PR **#77** = the later, separate
+HUMAN World Bank inquiry submission RECORDING
+(`stage128-m3i2-final-official-inquiry-human-submission`), MERGED by
+`93de6bae9344ce893b0261f818abce8a991cf842`. PR **#78** = the current **LIVE
+Draft**, the M3-LAG-WDI exploratory contract lock. "The recovery PR" always
+means PR #76 — it never slides forward to mean whichever PR merged most
+recently, and the three roles may not be collapsed or shifted.
+
+**HISTORICAL — superseded by the new explicit human authorization.** Until item
+25h this file recorded: *"M3-LAG-WDI-EXPLORATORY is NOT locked … the
+authoritative status is `NOT_LOCKED`,"* and that the path could only be
+considered after the official inquiry terminated in
+`UNRESOLVED_AFTER_FINAL_OFFICIAL_INQUIRY`. Only that wait-for-terminal-inquiry
+restriction is superseded. The earlier local, uncommitted partial draft is
+still quarantined outside the repository and left untouched — not deleted, not
+cleaned, not committed — it is still not authoritative, and its old
+authorization is still consumed and not reusable.
 
 ## Predecessor research workstream (HISTORICAL): `stage128-m3i2-official-source-evidence-capture`
 

@@ -2791,6 +2791,11 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # Verification record only: it reports how the suite behaved, and is
         # never allowed to move a scientific marker.
         **derive_stage128_m3i2_full_suite_comparison_markers(root),
+        # Must come last: Track B (the M3-LAG-WDI exploratory contract lock)
+        # runs in PARALLEL with the still-active World Bank inquiry. It owns
+        # the live PR topology, and it owns nothing else: it never advances a
+        # Track A pointer and never terminates the inquiry.
+        **derive_stage128_m3_lag_wdi_exploratory_markers(root),
     }
 
 
@@ -4698,15 +4703,36 @@ def render_current_state(record: dict) -> str:
             f"{record.get('stage128_m3i2_merge_authorized')}. The head shown "
             "for it is a GENERATION ANCHOR "
             f"(`{record.get('stage128_m3i2_live_pr_head_commit_source')}`), "
-            "never pinned and **not** the instantaneous GitHub PR head. "
+            "never pinned and **not** the instantaneous GitHub PR head",
+            # Each historical PR keeps its OWN role. "The recovery PR" is PR
+            # #76 forever; it never slides forward to mean whatever merged
+            # most recently.
+            "- **HISTORICAL PR roles (pinned, never re-derived):** PR #"
+            f"{record.get('stage128_m3i2_recovery_pr_number')} = "
+            f"`{record.get('stage128_m3i2_recovery_pr_role')}` (action "
+            f"`{record.get('stage128_m3i2_recovery_pr_action_id')}`) — merged "
+            f"= {record.get('stage128_m3i2_recovery_pr_merged')} by merge "
+            f"commit `{record.get('stage128_m3i2_recovery_pr_merge_commit')}`"
+            " — semantics "
+            f"`{record.get('stage128_m3i2_recovery_pr_semantics')}`. PR #"
+            f"{record.get('stage128_m3i2_human_submission_pr_number')} = "
+            f"`{record.get('stage128_m3i2_human_submission_pr_role')}` "
+            "(action "
+            f"`{record.get('stage128_m3i2_human_submission_pr_action_id')}`) "
+            "— merged = "
+            f"{record.get('stage128_m3i2_human_submission_pr_merged')} by "
+            "merge commit "
+            f"`{record.get('stage128_m3i2_human_submission_pr_merge_commit')}`"
+            " — semantics "
+            f"`{record.get('stage128_m3i2_human_submission_pr_semantics')}`. "
             "PR #"
-            f"{record.get('stage128_m3i2_recovery_pr_number')} is HISTORICAL: "
-            "merged = "
-            f"{record.get('stage128_m3i2_recovery_pr_merged')} by merge "
-            f"commit `{record.get('stage128_m3i2_recovery_pr_merge_commit')}`",
+            f"{record.get('stage128_m3i2_live_pr_number')} = "
+            f"`{record.get('stage128_m3i2_live_pr_role')}`, the current LIVE "
+            "Draft. Roles are historical facts, not positions "
+            f"({record.get('stage128_m3i2_pr_roles_are_historical_facts_not_positional')})",
             "- ⛔ **M3-LAG-WDI-EXPLORATORY:** authoritative contract status "
             f"`{record.get('stage128_m3_lag_wdi_authoritative_contract_status')}`"
-            " — a local, uncommitted partial draft was detected "
+            " — the earlier local, uncommitted partial draft was detected "
             f"({record.get('stage128_m3_lag_wdi_local_partial_draft_detected')})"
             " and quarantined outside the repository "
             f"({record.get('stage128_m3_lag_wdi_local_partial_draft_quarantined')})"
@@ -4761,6 +4787,123 @@ def render_current_state(record: dict) -> str:
             "- Record: `project/stage128/"
             "m3i2_final_official_documentary_recovery/"
             "stage128_m3i2_full_suite_baseline_comparison.json`",
+            "",
+        ]
+    if record.get("stage128_m3_lag_wdi_exploratory_contract_locked"):
+        lines += [
+            "### Stage128 — TRACK B: M3-LAG-WDI-EXPLORATORY contract lock "
+            "(PRE-RETRIEVAL)\n",
+            "_Two tracks now run in PARALLEL. **Track A** is the World Bank "
+            "official inquiry, still waiting for a substantive response. "
+            "**Track B** is this exploratory contract lock. Activating Track "
+            "B does NOT mean the inquiry failed, terminated, was abandoned or "
+            "became unnecessary, and a locked contract is NOT an "
+            "authorization to retrieve anything._\n",
+            "- ✅ **Contract status:** "
+            f"`{record.get('stage128_m3_lag_wdi_authoritative_contract_status')}`"
+            " — role "
+            f"`{record.get('stage128_m3_lag_wdi_scientific_role')}`, "
+            "confirmatory M3 = "
+            f"{record.get('stage128_m3_lag_wdi_is_confirmatory_m3')} — "
+            "authorization SHA-256 "
+            f"`{record.get('stage128_m3_lag_wdi_authorization_sha256')}` "
+            f"({record.get('stage128_m3_lag_wdi_authorization_utf8_bytes')} "
+            "UTF-8 bytes), consumed = "
+            f"{record.get('stage128_m3_lag_wdi_authorization_consumed')}",
+            "- **Exactly two lagged WDI features** "
+            f"({record.get('stage128_m3_lag_wdi_additional_feature_count')}): "
+            f"`{record.get('stage128_m3_lag_wdi_cpi_indicator_code')}` "
+            "(identity) and "
+            f"`{record.get('stage128_m3_lag_wdi_fx_indicator_code')}` "
+            f"(`{record.get('stage128_m3_lag_wdi_fx_transformation')}`), "
+            "country `IRN`, observation year "
+            f"`{record.get('stage128_m3_lag_wdi_observation_year_rule')}` — "
+            "M2 comparator "
+            f"{record.get('stage128_m3_lag_wdi_m2_comparator_feature_count')} "
+            "features, M3-LAG-WDI "
+            f"{record.get('stage128_m3_lag_wdi_feature_count')} features on "
+            "the retained-M2 "
+            f"{record.get('stage128_m3_lag_wdi_parent_sample_rows')}-row "
+            "development sample",
+            "- ⛔ **No point-in-time claim:** point-in-time availability "
+            "claimed = "
+            f"{record.get('stage128_m3_lag_wdi_point_in_time_availability_claimed')}"
+            " — the future retrieval uses the CURRENT/LATEST revised WDI "
+            f"({record.get('stage128_m3_lag_wdi_current_revised_wdi_semantics')})"
+            ", and the one-year lag does not turn revised WDI into "
+            "point-in-time data",
+            "- ⛔ **Separate family:** exploratory comparison family "
+            f"`{record.get('stage128_m3_lag_wdi_comparison_family_id')}` — in "
+            "the confirmatory Holm family = "
+            f"{record.get('stage128_m3_lag_wdi_in_confirmatory_holm_family')}",
+            "- ⛔ **Nothing executed:** retrieval started "
+            f"{record.get('stage128_m3_lag_wdi_data_retrieval_started')} — "
+            "Data Gate "
+            f"`{record.get('stage128_m3_lag_wdi_data_gate_result')}` "
+            "(executed "
+            f"{record.get('stage128_m3_lag_wdi_data_gate_executed')}) — "
+            "modeling started "
+            f"{record.get('stage128_m3_lag_wdi_modeling_started')} "
+            "(authorized "
+            f"{record.get('stage128_m3_lag_wdi_modeling_authorized')}) — "
+            "Final Test rows read "
+            f"{record.get('stage128_m3_lag_wdi_final_test_rows_read')}",
+            "- **Track B next action — RETRIEVAL ONLY:** "
+            f"`{record.get('stage128_m3_lag_wdi_next_action_id')}` — scope "
+            f"`{record.get('stage128_m3_lag_wdi_next_action_scope')}`, "
+            "authorized = "
+            f"{record.get('stage128_m3_lag_wdi_next_action_authorized')}, "
+            "executes the Data Gate = "
+            f"{record.get('stage128_m3_lag_wdi_next_action_executes_data_gate')}"
+            ". A pointer is never an authorization",
+            # Retrieval, the Gate and modeling are three separate actions, so
+            # an authorization for one can never be read as authorizing the
+            # next. Rendering them as one line would erase that boundary.
+            "- ⛔ **Separated future actions (each needs its OWN new explicit "
+            "human authorization):** (B) "
+            f"`{record.get('stage128_m3_lag_wdi_retrieval_action_id')}` — "
+            "authorized "
+            f"{record.get('stage128_m3_lag_wdi_retrieval_authorized')}, "
+            "executes Gate "
+            f"{record.get('stage128_m3_lag_wdi_retrieval_executes_data_gate')}"
+            "; (C) "
+            f"`{record.get('stage128_m3_lag_wdi_post_retrieval_audit_action_id')}`"
+            " — authorized "
+            f"{record.get('stage128_m3_lag_wdi_post_retrieval_audit_authorized')}"
+            ", executes Gate "
+            f"{record.get('stage128_m3_lag_wdi_post_retrieval_audit_executes_data_gate')}"
+            "; (D) "
+            f"`{record.get('stage128_m3_lag_wdi_data_gate_action_id')}` — "
+            "authorized "
+            f"{record.get('stage128_m3_lag_wdi_data_gate_authorized')}; (E) "
+            f"`{record.get('stage128_m3_lag_wdi_modeling_action_id')}` — "
+            "authorized "
+            f"{record.get('stage128_m3_lag_wdi_modeling_authorized')}",
+            "- ⛔ **Authorization boundaries:** a retrieval authorization "
+            "implies a Gate authorization = "
+            f"{record.get('stage128_m3_lag_wdi_retrieval_authorization_implies_gate_authorization')}"
+            " — a combined retrieval-and-Gate action is permitted = "
+            f"{record.get('stage128_m3_lag_wdi_combined_retrieval_and_gate_action_permitted')}"
+            " — a Gate PASS is data admission only = "
+            f"{record.get('stage128_m3_lag_wdi_gate_pass_is_data_admission_only')}"
+            " and authorizes modeling = "
+            f"{record.get('stage128_m3_lag_wdi_gate_pass_authorizes_modeling')}",
+            "- **Prior restriction:** "
+            f"`{record.get('stage128_m3_lag_wdi_prior_restriction_status')}` "
+            "— the old \"only after "
+            "`UNRESOLVED_AFTER_FINAL_OFFICIAL_INQUIRY`\" rule is retained as "
+            "HISTORY, not deleted",
+            "- ⛔ **Track A untouched:** the inquiry was NOT terminated by "
+            "this action "
+            f"({record.get('stage128_m3i2_inquiry_terminated_by_track_b')}) — "
+            "follow-up authorized now "
+            f"{record.get('stage128_m3i2_inquiry_follow_up_authorized_now')}, "
+            "response adjudication authorized "
+            f"{record.get('stage128_m3i2_response_adjudication_authorized')}",
+            "- Package: `project/stage128/"
+            "m3_lag_wdi_exploratory_contract_lock/`; interpretation: "
+            "`project/stage128/m3_lag_wdi_exploratory_contract_lock/"
+            "README_STAGE128_M3_LAG_WDI_EXPLORATORY_CONTRACT_LOCK.md`",
             "",
         ]
     lines += [
@@ -7093,6 +7236,906 @@ def derive_stage128_m3i2_full_suite_comparison_markers(root: str) -> dict:
             rec.get("preexisting_failure_node_ids") or []),
         "full_suite_comparison_is_verification_not_science": True,
         "full_suite_comparison_self_reference_avoided": True,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# Stage128 — M3-LAG-WDI exploratory contract lock (Track B)
+# --------------------------------------------------------------------------- #
+
+_STAGE128_M3_LAG_PKG = (
+    "project/stage128/m3_lag_wdi_exploratory_contract_lock")
+_STAGE128_M3_LAG_ACTION_ID = "stage128-m3-lag-wdi-exploratory-contract-lock"
+_STAGE128_M3_LAG_CONTRACT_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/stage128_m3_lag_wdi_exploratory_contract.json")
+_STAGE128_M3_LAG_DECISION_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/"
+    "stage128_m3_lag_wdi_exploratory_contract_decision.json")
+_STAGE128_M3_LAG_BOUNDARY_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/"
+    "stage128_m3_lag_wdi_exploratory_governance_boundary.json")
+_STAGE128_M3_LAG_GATE_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/"
+    "stage128_m3_lag_wdi_exploratory_data_gate_contract.json")
+_STAGE128_M3_LAG_MODELING_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/"
+    "stage128_m3_lag_wdi_exploratory_modeling_contract.json")
+_STAGE128_M3_LAG_AUDIT_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/"
+    "stage128_m3_lag_wdi_exploratory_execution_audit.json")
+_STAGE128_M3_LAG_AUTHORIZATION_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/"
+    "stage128_m3_lag_wdi_exploratory_human_authorization_record.json")
+_STAGE128_M3_LAG_TOPOLOGY_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/"
+    "stage128_m3_lag_wdi_exploratory_pr_topology.json")
+
+#: The ONLY status a satisfied M3-LAG-WDI contract lock may publish.
+_STAGE128_M3_LAG_LOCKED_STATUS = "AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL"
+_STAGE128_M3_LAG_ROLE = "supplementary_exploratory_robustness_block"
+#: Track B's future actions, each a SEPARATE action with its own identity and
+#: its own future authorization. Retrieval is the immediate pointer and it is
+#: retrieval ONLY: it does not execute the Data Gate, and an authorization to
+#: retrieve is not an authorization to Gate. The Gate, in turn, is DATA
+#: ADMISSION ONLY and does not authorize modeling. Collapsing any two of these
+#: into one action erases an authorization boundary, so the identities are
+#: pinned here and every surface is derived from them.
+_STAGE128_M3_LAG_NEXT_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-data-retrieval")
+_STAGE128_M3_LAG_RETRIEVAL_ACTION_ID = _STAGE128_M3_LAG_NEXT_ACTION_ID
+_STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-post-retrieval-audit")
+_STAGE128_M3_LAG_DATA_GATE_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-data-gate")
+_STAGE128_M3_LAG_MODELING_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-incremental-evaluation")
+#: The immediate pointer's scope. "retrieval_only" is the ONLY accepted value:
+#: anything that also names the Gate is a conflated action.
+_STAGE128_M3_LAG_NEXT_ACTION_SCOPE = "retrieval_only"
+#: (step, action_id, executes_retrieval, executes_gate, executes_modeling)
+_STAGE128_M3_LAG_ACTION_SEQUENCE = (
+    ("A", "stage128-m3-lag-wdi-exploratory-contract-lock", False, False, False),
+    ("B", _STAGE128_M3_LAG_RETRIEVAL_ACTION_ID, True, False, False),
+    ("C", _STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID, False, False, False),
+    ("D", _STAGE128_M3_LAG_DATA_GATE_ACTION_ID, False, True, False),
+    ("E", _STAGE128_M3_LAG_MODELING_ACTION_ID, False, False, True),
+)
+#: The two features, in the exact locked order, with their exact identities.
+_STAGE128_M3_LAG_FEATURES = (
+    ("intl_cpi_inflation_lag1_wdi", "FP.CPI.TOTL.ZG"),
+    ("intl_fx_change_official_lag1_wdi", "PA.NUS.FCRF"),
+)
+_STAGE128_M3_LAG_FX_FORMULA = "FX_LAG1_t = 100 * ln(E_y / E_(y-1))"
+_STAGE128_M3_LAG_FX_FORMULA_EQUIVALENT = "100 * ln(E_(t-1) / E_(t-2))"
+_STAGE128_M3_LAG_CONFIRMATORY_FAMILY = (
+    "M2_minus_M1", "M3_CBI_minus_M2", "M4_minus_M3_CBI")
+#: PR #77 (the M3I-2 human-submission recording) was merged into main by this
+#: commit. Pinning BOTH halves is what stops a merged PR from being re-rendered
+#: as the live Draft: "live > predecessor" alone would accept a topology that
+#: renamed #77 the live PR and demoted #76 in its place.
+_STAGE128_M3_LAG_MERGED_PREDECESSOR_PR = 77
+_STAGE128_M3_LAG_MERGED_PREDECESSOR_COMMIT = (
+    "93de6bae9344ce893b0261f818abce8a991cf842")
+
+#: HISTORICAL PR ROLES — pinned facts, never re-derived from adjacency.
+#:
+#: "The recovery PR" is a NAME for a specific historical action, not a moving
+#: label for "whatever merged most recently". PR #76 carried the final official
+#: documentary recovery INITIATION and PR #77 carried the later HUMAN inquiry
+#: submission RECORDING; they are two different actions and each keeps its own
+#: identity forever. Re-anchoring the live topology onto a newer Draft must
+#: never shift either of them, so both are pinned here and validated against
+#: the topology artifact fail-closed.
+_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR = 76
+_STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT = (
+    "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
+_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE = (
+    "final_official_documentary_recovery_initiation_pr")
+_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ACTION_ID = (
+    "stage128-m3i2-final-official-documentary-recovery-initiation")
+#: The documentary-recovery PR was superseded by the human-submission PR — not
+#: by whatever Draft happens to be live now.
+_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_SEMANTICS = (
+    "merged_predecessor_superseded_by_pr77")
+_STAGE128_M3I2_HUMAN_SUBMISSION_PR = 77
+_STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT = (
+    "93de6bae9344ce893b0261f818abce8a991cf842")
+_STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE = (
+    "final_official_inquiry_human_submission_recording_pr")
+_STAGE128_M3I2_HUMAN_SUBMISSION_PR_ACTION_ID = (
+    "stage128-m3i2-final-official-inquiry-human-submission")
+
+
+def derive_stage128_m3_lag_wdi_exploratory_markers(root: str) -> dict:
+    """Recognize the M3-LAG-WDI-EXPLORATORY authoritative contract lock.
+
+    Narrow and fail-closed. The action is a CONTRACT LOCK ONLY: it retrieves
+    nothing, inspects no value, executes no Data Gate, materializes no feature,
+    fits no model and reads no Final Test row. A ``LOCKED`` status may
+    therefore exist only if the authoritative contract still says every one of
+    those things, still describes the exact two lagged WDI features, still
+    keeps the exploratory comparison out of the confirmatory Holm family, and
+    still leaves the World Bank inquiry active and unresolved. Anything else
+    fails closed rather than being rendered.
+
+    Returns an empty dict before the package exists, so pre-lock Handoffs are
+    unaffected.
+    """
+    path = os.path.join(root, _STAGE128_M3_LAG_CONTRACT_REL)
+    if not os.path.isfile(path):
+        return {}
+    contract = _require_json_artifact(root, _STAGE128_M3_LAG_CONTRACT_REL)
+    decision = _require_json_artifact(root, _STAGE128_M3_LAG_DECISION_REL)
+    boundary = _require_json_artifact(root, _STAGE128_M3_LAG_BOUNDARY_REL)
+    gate = _require_json_artifact(root, _STAGE128_M3_LAG_GATE_REL)
+    modeling = _require_json_artifact(root, _STAGE128_M3_LAG_MODELING_REL)
+    audit = _require_json_artifact(root, _STAGE128_M3_LAG_AUDIT_REL)
+    authorization = _require_json_artifact(
+        root, _STAGE128_M3_LAG_AUTHORIZATION_REL)
+    topology = _require_json_artifact(root, _STAGE128_M3_LAG_TOPOLOGY_REL)
+
+    for artifact, rel in ((contract, _STAGE128_M3_LAG_CONTRACT_REL),
+                          (decision, _STAGE128_M3_LAG_DECISION_REL),
+                          (boundary, _STAGE128_M3_LAG_BOUNDARY_REL),
+                          (audit, _STAGE128_M3_LAG_AUDIT_REL),
+                          (authorization, _STAGE128_M3_LAG_AUTHORIZATION_REL),
+                          (topology, _STAGE128_M3_LAG_TOPOLOGY_REL)):
+        if artifact.get("action_id") != _STAGE128_M3_LAG_ACTION_ID:
+            raise HandoffError(
+                f"{rel} must name action {_STAGE128_M3_LAG_ACTION_ID}")
+
+    # --- Exploratory role, never confirmatory ---------------------------- #
+    if contract.get("scientific_role") != _STAGE128_M3_LAG_ROLE:
+        raise HandoffError(
+            f"M3-LAG-WDI must stay a {_STAGE128_M3_LAG_ROLE}")
+    for field in ("is_confirmatory_m3", "is_replacement_for_m3_cbi",
+                  "is_repair_of_m3_cbi",
+                  "is_continuation_or_replacement_of_m3i2",
+                  "is_real_time_wdi", "is_historical_vintage_wdi",
+                  "in_original_confirmatory_holm_family",
+                  "can_select_paper_winner_alone",
+                  "proves_historical_point_in_time_wdi_availability",
+                  "one_year_lag_establishes_point_in_time_availability",
+                  "exploratory_result_can_rewrite_main_confirmatory_conclusion",
+                  "reuses_m3i2_historical_vintage_availability_logic",
+                  "third_macro_feature_permitted",
+                  "financing_rate_feature_permitted",
+                  "indicator_search_permitted", "imputation_permitted",
+                  "feature_selection_permitted",
+                  "feature_substitution_permitted",
+                  "new_proxy_search_permitted", "feature_search_permitted"):
+        if contract.get(field) is not False:
+            raise HandoffError(f"M3-LAG-WDI contract {field} must be False")
+    if contract.get(
+            "one_year_lag_is_conservative_temporal_separation_design_only"
+    ) is not True:
+        raise HandoffError(
+            "the one-year lag is a conservative temporal-separation design "
+            "only")
+
+    # --- Exactly two features, exact identities, exact lag rule ---------- #
+    features = contract.get("features") or []
+    if len(features) != 2 or contract.get(
+            "additional_macro_feature_count") != 2:
+        raise HandoffError(
+            "M3-LAG-WDI contains EXACTLY two additional macro features")
+    for feature, (feature_id, code) in zip(
+            features, _STAGE128_M3_LAG_FEATURES):
+        if feature.get("feature_id") != feature_id:
+            raise HandoffError(
+                f"M3-LAG-WDI feature id must be {feature_id}")
+        if feature.get("indicator_code") != code:
+            raise HandoffError(
+                f"{feature_id} must use indicator {code}")
+        if feature.get("country_code") != "IRN":
+            raise HandoffError(f"{feature_id} must use country IRN")
+        if feature.get("source_identity") != "World Bank WDI":
+            raise HandoffError(f"{feature_id} must come from World Bank WDI")
+        if feature.get("lag_years") != 1:
+            raise HandoffError(f"{feature_id} must be lagged by one year")
+        if feature.get("same_year_t_observation_permitted") is not False:
+            raise HandoffError(
+                f"{feature_id} may not use a same-year t observation")
+        for field in ("alternative_indicator_after_failure_permitted",
+                      "imputation_permitted"):
+            if feature.get(field) is not False:
+                raise HandoffError(f"{feature_id} {field} must be False")
+    cpi, fx = features
+    if cpi.get("observation_year_rule") != "t - 1":
+        raise HandoffError("the CPI observation year rule must be t - 1")
+    if cpi.get("transformation") != "identity":
+        raise HandoffError("the CPI transformation must be the identity")
+    if cpi.get("required_observation_years") != ["t-1"]:
+        raise HandoffError("CPI requires exactly the t-1 observation")
+    if cpi.get("worked_example") != {"predictor_year": 2019,
+                                     "wdi_observation_year": 2018}:
+        raise HandoffError("predictor year 2019 maps to CPI year 2018")
+    if fx.get("observation_year_rule") != "y = t - 1":
+        raise HandoffError("the FX observation year rule must be y = t - 1")
+    if fx.get("transformation") != _STAGE128_M3_LAG_FX_FORMULA:
+        raise HandoffError(
+            f"the FX transformation must be {_STAGE128_M3_LAG_FX_FORMULA}")
+    if fx.get("transformation_equivalent") != (
+            _STAGE128_M3_LAG_FX_FORMULA_EQUIVALENT):
+        raise HandoffError(
+            "the FX transformation must equal "
+            f"{_STAGE128_M3_LAG_FX_FORMULA_EQUIVALENT}")
+    if fx.get("required_observation_years") != ["t-1", "t-2"]:
+        raise HandoffError("FX requires exactly the t-1 and t-2 observations")
+    if list(fx.get("observation_requirements") or []) != [
+            "present", "numeric", "strictly_positive",
+            "consecutive_gregorian_annual_observations"]:
+        raise HandoffError(
+            "both FX observations must be present, numeric, strictly "
+            "positive and consecutive annual observations")
+    if "PA.NUS.ATLS" not in (fx.get("forbidden_substitutions") or []):
+        raise HandoffError(
+            "PA.NUS.ATLS must remain an explicitly forbidden substitution")
+
+    # --- Sample and feature architecture --------------------------------- #
+    parent = contract.get("parent_sample") or {}
+    if parent.get("expected_parent_rows") != 539:
+        raise HandoffError(
+            "the parent sample is the retained-M2 539-row development sample")
+    if parent.get("original_666_row_m1_comparison_sample_permitted") is not (
+            False):
+        raise HandoffError(
+            "the original 666-row M1 comparison sample may not be used")
+    if parent.get("scope") != "development_only":
+        raise HandoffError("the parent sample scope is development only")
+    comparator = contract.get("m2_comparator") or {}
+    if comparator.get("feature_count") != 12 or len(
+            comparator.get("feature_order") or []) != 12:
+        raise HandoffError("the M2 comparator has exactly 12 features")
+    if comparator.get("m2_status") != (
+            "RETAIN_M2_AS_INTERMEDIATE_CONFIRMATORY_BLOCK"):
+        raise HandoffError(
+            "M2 remains RETAIN_M2_AS_INTERMEDIATE_CONFIRMATORY_BLOCK")
+    order = contract.get("m3_lag_wdi_feature_order") or []
+    if contract.get("feature_count_total") != 14 or len(order) != 14:
+        raise HandoffError("M3-LAG-WDI has exactly 14 features")
+    if order[:12] != list(comparator.get("feature_order") or []):
+        raise HandoffError(
+            "M3-LAG-WDI must be the M2 feature set plus the two lagged WDI "
+            "features")
+    if order[12:] != [fid for fid, _ in _STAGE128_M3_LAG_FEATURES]:
+        raise HandoffError(
+            "the last two M3-LAG-WDI features are the locked lagged WDI pair")
+    complete_case = contract.get("complete_case_policy") or {}
+    for field in ("both_lagged_wdi_features_required_complete",
+                  "m2_and_m3_lag_wdi_refit_on_the_same_resulting_common_"
+                  "sample"):
+        if complete_case.get(field) is not True:
+            raise HandoffError(f"complete-case policy {field} must be True")
+    for field in ("imputation_permitted",
+                  "previous_666_row_m1_results_reusable_as_comparator"):
+        if complete_case.get(field) is not False:
+            raise HandoffError(f"complete-case policy {field} must be False")
+
+    # --- WDI vintage semantics: the honest limitation -------------------- #
+    vintage = contract.get("wdi_vintage_semantics") or {}
+    for field in ("current_or_latest_revised_wdi_allowed",
+                  "retrieval_uses_then_current_official_latest_wdi_values",
+                  "revisions_may_be_present",
+                  "limitation_is_why_the_analysis_is_exploratory_"
+                  "supplementary"):
+        if vintage.get(field) is not True:
+            raise HandoffError(f"WDI vintage semantics {field} must be True")
+    for field in ("historical_vintage_availability_claimed",
+                  "point_in_time_availability_claimed",
+                  "lagging_transforms_revised_wdi_into_point_in_time_data",
+                  "release_date_proof_attempted"):
+        if vintage.get(field) is not False:
+            raise HandoffError(f"WDI vintage semantics {field} must be False")
+
+    # --- Data Gate: frozen, inherited thresholds, NOT executed ----------- #
+    thresholds = gate.get("thresholds") or {}
+    if thresholds.get("candidate_valid_coverage_min") != 0.8:
+        raise HandoffError("individual candidate coverage must be >= 0.80")
+    if thresholds.get("block_common_sample_coverage_min") != 0.7:
+        raise HandoffError("block common-sample coverage must be >= 0.70")
+    if thresholds.get(
+            "minimum_positive_evaluable_each_locked_validation_window") != 5:
+        raise HandoffError(
+            ">= 5 positive outcomes are required in EACH locked validation "
+            "window")
+    if thresholds.get("expected_parent_rows") != 539:
+        raise HandoffError("the Gate denominator is the 539-row sample")
+    if thresholds.get("coverage_scope") != "development_only":
+        raise HandoffError("the Gate is development-only")
+    if gate.get("thresholds_inherited_not_redesigned") is not True:
+        raise HandoffError("the Gate thresholds are inherited, not redesigned")
+    if gate.get("gate_executed") is not False or gate.get(
+            "gate_result") != "NOT_EXECUTED":
+        raise HandoffError("the M3-LAG-WDI Data Gate must be NOT_EXECUTED")
+    if gate.get("gate_pass_is_data_admission_only") is not True:
+        raise HandoffError("a Gate PASS is data admission only")
+    for field in ("gate_pass_authorizes_modeling",
+                  "gate_pass_unlocks_final_test"):
+        if gate.get(field) is not False:
+            raise HandoffError(f"M3-LAG-WDI Gate {field} must be False")
+    if gate.get("unresolved_values_are_null_not_zero") is not True:
+        raise HandoffError("unresolved coverage values are null, not zero")
+    for name, value in (gate.get("observed_values") or {}).items():
+        if value is not None:
+            raise HandoffError(
+                f"observed Gate value {name} must stay null before execution")
+
+    # --- Modeling: three frozen families, separate family, no Holm ------- #
+    if list(modeling.get("model_families") or []) != [
+            "regularized_logistic_regression", "random_forest", "xgboost"]:
+        raise HandoffError(
+            "the future evaluation uses exactly the three retained M2 model "
+            "families")
+    for field in ("retuning_permitted", "grid_search_permitted",
+                  "hyperparameter_search_permitted",
+                  "model_family_search_permitted",
+                  "new_secondary_metrics_defined_by_this_action",
+                  "exploratory_comparison_inserted_into_confirmatory_holm_"
+                  "family",
+                  "confirmatory_holm_family_changed_by_this_action",
+                  "confirmatory_superiority_claim_permitted",
+                  "modeling_authorized", "modeling_started"):
+        if modeling.get(field) is not False:
+            raise HandoffError(f"M3-LAG-WDI modeling contract {field} is False")
+    for field in ("inherits_canonical_metric_definitions",
+                  "inherits_locked_validation_architecture",
+                  "inherits_seed_policy",
+                  "inherits_bootstrap_and_paired_comparison_machinery",
+                  "retained_configurations_used_unchanged"):
+        if modeling.get(field) is not True:
+            raise HandoffError(f"M3-LAG-WDI modeling contract {field} is True")
+    if tuple(modeling.get("confirmatory_holm_family") or ()) != (
+            _STAGE128_M3_LAG_CONFIRMATORY_FAMILY):
+        raise HandoffError(
+            "the confirmatory Holm family must stay "
+            f"{list(_STAGE128_M3_LAG_CONFIRMATORY_FAMILY)}")
+    family_id = modeling.get("comparison_family_id")
+    if not family_id or family_id in _STAGE128_M3_LAG_CONFIRMATORY_FAMILY:
+        raise HandoffError(
+            "the exploratory comparison needs its OWN family identity")
+    for field in ("comparisons_executed", "holm_executions",
+                  "bootstrap_executions", "model_fits",
+                  "supplementary_family_size_now"):
+        if modeling.get(field) != 0:
+            raise HandoffError(f"M3-LAG-WDI modeling {field} must be 0")
+
+    # --- Zero execution -------------------------------------------------- #
+    for field in ("retrieval_started", "data_gate_executed",
+                  "modeling_started",
+                  "earlier_historical_vintage_bundle_used_as_value_input"):
+        if audit.get(field) is not False:
+            raise HandoffError(f"M3-LAG-WDI execution audit {field} is False")
+    for field in ("final_test_rows_read", "final_test_predictor_values_read",
+                  "final_test_target_values_read",
+                  "scientific_artifacts_regenerated"):
+        if audit.get(field) != 0:
+            raise HandoffError(f"M3-LAG-WDI execution audit {field} must be 0")
+    counters = audit.get("counters") or {}
+    if not counters:
+        raise HandoffError("the M3-LAG-WDI execution audit must be explicit")
+    for name, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"M3-LAG-WDI execution counter {name} must be 0")
+
+    # --- Governance: Track A untouched, Track B locked but unauthorized -- #
+    if boundary.get("m3_lag_wdi_authoritative_contract_status") != (
+            _STAGE128_M3_LAG_LOCKED_STATUS):
+        raise HandoffError(
+            "the M3-LAG-WDI contract status must be "
+            f"{_STAGE128_M3_LAG_LOCKED_STATUS}")
+    if boundary.get("m3_lag_wdi_exploratory_contract_locked") is not True:
+        raise HandoffError("the M3-LAG-WDI contract must be locked")
+    if boundary.get("world_bank_inquiry_status") != (
+            _STAGE128_M3I2_HUMAN_SUBMITTED_STATUS):
+        raise HandoffError(
+            "the World Bank inquiry must stay "
+            f"{_STAGE128_M3I2_HUMAN_SUBMITTED_STATUS}")
+    if boundary.get("world_bank_waiting_period_status") != "ACTIVE":
+        raise HandoffError("the World Bank waiting period must stay ACTIVE")
+    if boundary.get("world_bank_waiting_period_completion_date") != (
+            "2026-08-20"):
+        raise HandoffError("the waiting period completes on 2026-08-20")
+    if boundary.get(
+            "world_bank_waiting_period_earliest_follow_up_date") != (
+            "2026-08-21"):
+        raise HandoffError("the earliest possible follow-up is 2026-08-21")
+    for field in ("world_bank_inquiry_terminated_by_this_action",
+                  "world_bank_follow_up_authorized",
+                  "world_bank_response_ingestion_authorized",
+                  "parallel_activation_implies_inquiry_failed",
+                  "parallel_activation_implies_inquiry_terminated",
+                  "parallel_activation_implies_inquiry_unnecessary",
+                  "m3_lag_wdi_data_retrieval_started",
+                  "m3_lag_wdi_data_gate_executed",
+                  "m3_lag_wdi_modeling_started",
+                  "m3_lag_wdi_next_action_authorized",
+                  "m3_lag_wdi_local_partial_draft_authoritative",
+                  "m3_lag_wdi_local_partial_draft_modified_by_this_action",
+                  "m3_lag_wdi_local_partial_draft_committed_by_this_action",
+                  "m3_lag_wdi_prior_authorization_reusable",
+                  "m3_cbi_modified_by_this_action",
+                  "m3i2_conclusions_modified_by_this_action",
+                  "observed_m1_m2_results_modified_by_this_action",
+                  "final_test_access_authorized",
+                  "final_test_unlock_implied_by_contract_lock",
+                  "final_test_unlock_implied_by_gate_pass",
+                  "final_test_unlock_implied_by_successful_retrieval",
+                  "m4_authorized", "m4_started", "merge_authorized",
+                  "auto_merge", "ready_for_review_authorized",
+                  "paper_winner_selected"):
+        if boundary.get(field) is not False:
+            raise HandoffError(
+                f"M3-LAG-WDI governance boundary {field} must be False")
+    if boundary.get("final_test_locked") is not True:
+        raise HandoffError("the Final Test must stay locked")
+    if boundary.get("m3_cbi_status") != "UNRESOLVED_M3_DATA_GATE":
+        raise HandoffError("the M3-CBI Gate status must be preserved")
+    if boundary.get("m3i2_evidence_status") != (
+            "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE"):
+        raise HandoffError("M3I-2 evidence must remain UNRESOLVED")
+    if boundary.get("prior_restriction_status") != (
+            "SUPERSEDED_BY_NEW_EXPLICIT_HUMAN_AUTHORIZATION"):
+        raise HandoffError(
+            "the prior wait-only restriction is superseded by the new "
+            "explicit human authorization")
+    if boundary.get("prior_restriction_retained_as_history") is not True:
+        raise HandoffError(
+            "the prior restriction must be retained as history, not deleted")
+    if boundary.get("m3_lag_wdi_next_action_id") != (
+            _STAGE128_M3_LAG_NEXT_ACTION_ID):
+        raise HandoffError(
+            "the Track B next action is "
+            f"{_STAGE128_M3_LAG_NEXT_ACTION_ID}")
+
+    # --- Authorization: new, one-action, consumed, never reusable -------- #
+    for field in ("authorization_consumed",
+                  "authorization_consumed_by_this_contract_lock",
+                  "supersedes_only_the_prior_wait_for_terminal_inquiry_"
+                  "restriction"):
+        if authorization.get(field) is not True:
+            raise HandoffError(f"M3-LAG-WDI authorization {field} must be True")
+    for field in ("standing_authorization", "scope_identified_by_hash_alone",
+                  "authorization_is_reusable_for_retrieval",
+                  "authorization_is_reusable_for_data_gate",
+                  "authorization_is_reusable_for_modeling",
+                  "prior_local_draft_authorization_reused",
+                  "terminates_or_resolves_the_world_bank_inquiry",
+                  "merge_authorized"):
+        if authorization.get(field) is not False:
+            raise HandoffError(
+                f"M3-LAG-WDI authorization {field} must be False")
+    if authorization.get("expected_baseline_sha") != decision.get(
+            "expected_baseline_sha"):
+        raise HandoffError(
+            "the authorization and the decision must name the same baseline")
+    auth_sha = authorization.get("authorization_sha256")
+    if not (isinstance(auth_sha, str) and len(auth_sha) == 64):
+        raise HandoffError("the authorization SHA-256 must be a 64-hex digest")
+    auth_text = authorization.get("authorization_text")
+    if not isinstance(auth_text, str) or not auth_text:
+        raise HandoffError("the exact human authorization text is required")
+    recomputed = hashlib.sha256(auth_text.encode("utf-8"))
+    if recomputed.hexdigest() != auth_sha:
+        raise HandoffError(
+            "the recorded authorization SHA-256 does not match its text")
+    if authorization.get("authorization_utf8_bytes") != len(
+            auth_text.encode("utf-8")):
+        raise HandoffError(
+            "the recorded authorization byte length does not match its text")
+
+    # --- Decision: scientific effect NONE, pointers unmoved -------------- #
+    if decision.get("scientific_effect") != "NONE":
+        raise HandoffError("a contract lock has no scientific effect")
+    if decision.get("contract_status") != _STAGE128_M3_LAG_LOCKED_STATUS:
+        raise HandoffError(
+            "the decision must publish the locked contract status")
+    for field in ("authorizes_next_action", "track_b_next_action_authorized",
+                  "next_research_action_authorized", "merge_authorized",
+                  "m4_authorized", "paper_winner_selected"):
+        if decision.get(field) is not False:
+            raise HandoffError(f"M3-LAG-WDI decision {field} must be False")
+    if decision.get("final_test_locked") is not True:
+        raise HandoffError("the M3-LAG-WDI decision keeps the Final Test locked")
+    # Track A owns the research pointers; a parallel Track B lock never moves
+    # them, and it never advances the World Bank inquiry.
+    if decision.get("last_completed_research_action_id") != (
+            _STAGE128_M3I2_INQUIRY_SUBMISSION_ACTION_ID):
+        raise HandoffError(
+            "Track B does not take over the Track A research pointers")
+    if decision.get("next_research_action_id") != (
+            _STAGE128_M3I2_INQUIRY_RESPONSE_INGESTION_ACTION_ID):
+        raise HandoffError(
+            "the live research pointer stays "
+            f"{_STAGE128_M3I2_INQUIRY_RESPONSE_INGESTION_ACTION_ID}")
+    if decision.get("verified_wdi_release_dates") != 0 or decision.get(
+            "verified_pre_cutoff_editions") != 0:
+        raise HandoffError(
+            "a contract lock verifies no release date and no edition")
+    if decision.get("unresolved_cutoffs") != decision.get(
+            "unresolved_cutoffs_total"):
+        raise HandoffError("every M3I-2 cutoff must remain unresolved")
+    if decision.get("unresolved_development_pairs") != decision.get(
+            "unresolved_development_pairs_total"):
+        raise HandoffError("every M3I-2 development pair must remain unresolved")
+
+    # --- LIVE PR topology: a MERGED PR is never the live Draft ----------- #
+    live_number = topology.get("live_pr_number")
+    predecessor_number = topology.get("predecessor_pr_number")
+    for value, label in ((live_number, "live"),
+                         (predecessor_number, "predecessor")):
+        if not isinstance(value, int) or isinstance(value, bool):
+            raise HandoffError(
+                f"the M3-LAG-WDI {label} PR number must be an integer")
+    if predecessor_number != _STAGE128_M3_LAG_MERGED_PREDECESSOR_PR:
+        raise HandoffError(
+            "the merged predecessor of the M3-LAG-WDI PR is PR "
+            f"#{_STAGE128_M3_LAG_MERGED_PREDECESSOR_PR}")
+    if live_number <= predecessor_number:
+        raise HandoffError(
+            f"the live PR #{live_number} must succeed the merged predecessor "
+            f"PR #{predecessor_number}")
+    base_commit = topology.get("live_pr_base_commit")
+    merge_commit = topology.get("predecessor_pr_merge_commit")
+    for value, label in ((base_commit, "live PR base"),
+                         (merge_commit, "predecessor merge")):
+        if not (isinstance(value, str) and len(value) == 40):
+            raise HandoffError(
+                f"the M3-LAG-WDI {label} commit must be a full 40-hex SHA")
+    if merge_commit != _STAGE128_M3_LAG_MERGED_PREDECESSOR_COMMIT:
+        raise HandoffError(
+            f"PR #{_STAGE128_M3_LAG_MERGED_PREDECESSOR_PR} was merged by "
+            f"{_STAGE128_M3_LAG_MERGED_PREDECESSOR_COMMIT}")
+    if base_commit != merge_commit:
+        raise HandoffError(
+            "the live M3-LAG-WDI PR must be based on the merge commit of its "
+            "merged predecessor")
+    if topology.get("live_pr_base_branch") != _STAGE128_M3I2_LIVE_BASE_BRANCH:
+        raise HandoffError(
+            f"the live PR must target {_STAGE128_M3I2_LIVE_BASE_BRANCH}")
+    for field, expected in (
+        ("predecessor_pr_merged", True),
+        ("live_pr_is_draft", True),
+        ("live_pr_merged", False),
+        ("merge_authorized", False),
+        ("auto_merge", False),
+        ("ready_for_review_authorized", False),
+        ("pr_is_stacked_on_open_predecessor", False),
+        ("live_pr_head_commit_pinned", False),
+        ("live_pr_head_is_github_pr_head", False),
+    ):
+        if topology.get(field) is not expected:
+            raise HandoffError(
+                f"M3-LAG-WDI topology {field} must be {expected}")
+    if topology.get("live_pr_head_semantics") != (
+            _STAGE128_M3I2_LIVE_PR_HEAD_SEMANTICS):
+        raise HandoffError(
+            "the live PR head semantics must be "
+            f"{_STAGE128_M3I2_LIVE_PR_HEAD_SEMANTICS}")
+
+    # --- HISTORICAL PR ROLES: pinned, never re-derived from adjacency ---- #
+    # Re-anchoring the LIVE topology onto PR #78 must not shift what PR #76
+    # and PR #77 *were*. Each historical role is checked against its pinned
+    # fact, and the three roles are required to stay three distinct PRs.
+    for field, expected, label in (
+        ("documentary_recovery_pr_number",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR,
+         "the documentary-recovery INITIATION PR number"),
+        ("documentary_recovery_pr_merge_commit",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT,
+         "the documentary-recovery PR merge commit"),
+        ("documentary_recovery_pr_role",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE,
+         "the documentary-recovery PR role"),
+        ("documentary_recovery_pr_action_id",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ACTION_ID,
+         "the documentary-recovery PR action id"),
+        ("documentary_recovery_pr_semantics",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_SEMANTICS,
+         "the documentary-recovery PR supersession semantics"),
+        ("human_submission_pr_number", _STAGE128_M3I2_HUMAN_SUBMISSION_PR,
+         "the human-submission RECORDING PR number"),
+        ("human_submission_pr_merge_commit",
+         _STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT,
+         "the human-submission PR merge commit"),
+        ("human_submission_pr_role", _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE,
+         "the human-submission PR role"),
+        ("human_submission_pr_action_id",
+         _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ACTION_ID,
+         "the human-submission PR action id"),
+    ):
+        if topology.get(field) != expected:
+            raise HandoffError(f"{label} is pinned to {expected!r}")
+    for field in ("documentary_recovery_pr_merged",
+                  "human_submission_pr_merged",
+                  "pr_roles_are_historical_facts_not_positional",
+                  "recovery_pr_role_is_pinned_to_pr76"):
+        if topology.get(field) is not True:
+            raise HandoffError(f"M3-LAG-WDI topology {field} must be True")
+    if topology.get("pr_roles_re_derived_from_adjacency") is not False:
+        raise HandoffError(
+            "PR roles may never be re-derived from adjacency: 'the recovery "
+            "PR' is PR #76, not 'the PR that merged most recently'")
+    recovery_number = topology.get("documentary_recovery_pr_number")
+    submission_number = topology.get("human_submission_pr_number")
+    if not (recovery_number < submission_number < live_number):
+        raise HandoffError(
+            "the three PR roles must stay three distinct PRs in order: "
+            f"#{recovery_number} (documentary recovery initiation) -> "
+            f"#{submission_number} (human submission recording) -> "
+            f"#{live_number} (live Draft contract lock)")
+    if topology.get("documentary_recovery_pr_merge_commit") == topology.get(
+            "human_submission_pr_merge_commit"):
+        raise HandoffError(
+            "the documentary-recovery and human-submission PRs were merged by "
+            "two DIFFERENT commits")
+    sequence = topology.get("pr_role_sequence") or []
+    expected_sequence = [
+        (_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR,
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE, True,
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT),
+        (_STAGE128_M3I2_HUMAN_SUBMISSION_PR,
+         _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE, True,
+         _STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT),
+        (live_number, topology.get("live_pr_role"), False, None),
+    ]
+    if [(entry.get("pr_number"), entry.get("role"), entry.get("merged"),
+         entry.get("merge_commit")) for entry in sequence] != (
+            expected_sequence):
+        raise HandoffError(
+            "the published PR role sequence must be exactly "
+            f"#{_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR} -> "
+            f"#{_STAGE128_M3I2_HUMAN_SUBMISSION_PR} -> #{live_number}")
+
+    # --- Retrieval, the Data Gate and modeling are SEPARATE actions ------ #
+    # An authorization boundary only exists where an action boundary exists.
+    # The immediate Track B pointer is retrieval ONLY; the Gate is its own
+    # action needing its own new human authorization; and a Gate PASS admits
+    # data without authorizing a single model fit.
+    for field, expected, source, label in (
+        ("m3_lag_wdi_next_action_id", _STAGE128_M3_LAG_NEXT_ACTION_ID,
+         boundary, "the immediate Track B pointer"),
+        ("m3_lag_wdi_next_action_scope", _STAGE128_M3_LAG_NEXT_ACTION_SCOPE,
+         boundary, "the immediate Track B pointer scope"),
+        ("m3_lag_wdi_retrieval_action_id",
+         _STAGE128_M3_LAG_RETRIEVAL_ACTION_ID, boundary,
+         "the retrieval action id"),
+        ("m3_lag_wdi_post_retrieval_audit_action_id",
+         _STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID, boundary,
+         "the post-retrieval audit action id"),
+        ("m3_lag_wdi_data_gate_action_id",
+         _STAGE128_M3_LAG_DATA_GATE_ACTION_ID, boundary,
+         "the Data Gate action id"),
+        ("m3_lag_wdi_modeling_action_id", _STAGE128_M3_LAG_MODELING_ACTION_ID,
+         boundary, "the modeling action id"),
+        ("gate_action_id", _STAGE128_M3_LAG_DATA_GATE_ACTION_ID, gate,
+         "the Gate contract's own action id"),
+        ("retrieval_action_id", _STAGE128_M3_LAG_RETRIEVAL_ACTION_ID, gate,
+         "the Gate contract's retrieval action id"),
+        ("modeling_action_id", _STAGE128_M3_LAG_MODELING_ACTION_ID, modeling,
+         "the modeling contract's action id"),
+        ("gate_action_id", _STAGE128_M3_LAG_DATA_GATE_ACTION_ID, modeling,
+         "the modeling contract's Gate action id"),
+    ):
+        if source.get(field) != expected:
+            raise HandoffError(f"{label} must be {expected}")
+    if _STAGE128_M3_LAG_RETRIEVAL_ACTION_ID == (
+            _STAGE128_M3_LAG_DATA_GATE_ACTION_ID):
+        raise HandoffError(
+            "retrieval and the Data Gate may not share one action identity")
+    # Nothing anywhere may say that retrieving authorizes or executes the Gate,
+    # that the Gate may be bundled into retrieval, or that a PASS authorizes
+    # modeling.
+    for field, source, label in (
+        ("m3_lag_wdi_retrieval_action_authorized", boundary, "boundary"),
+        ("m3_lag_wdi_retrieval_action_executes_data_gate", boundary,
+         "boundary"),
+        ("m3_lag_wdi_next_action_executes_data_gate", boundary, "boundary"),
+        ("m3_lag_wdi_retrieval_authorization_implies_gate_authorization",
+         boundary, "boundary"),
+        ("m3_lag_wdi_combined_retrieval_and_gate_action_permitted", boundary,
+         "boundary"),
+        ("m3_lag_wdi_data_gate_action_authorized", boundary, "boundary"),
+        ("m3_lag_wdi_post_retrieval_audit_action_authorized", boundary,
+         "boundary"),
+        ("m3_lag_wdi_post_retrieval_audit_executes_data_gate", boundary,
+         "boundary"),
+        ("m3_lag_wdi_gate_pass_authorizes_modeling", boundary, "boundary"),
+        ("gate_executed_by_retrieval_action", gate, "Gate contract"),
+        ("retrieval_authorization_implies_gate_authorization", gate,
+         "Gate contract"),
+        ("combined_retrieval_and_gate_action_permitted", gate,
+         "Gate contract"),
+        ("post_retrieval_audit_action_executes_gate", gate, "Gate contract"),
+        ("gate_action_authorized", gate, "Gate contract"),
+        ("gate_pass_authorizes_modeling", gate, "Gate contract"),
+        ("gate_pass_authorizes_modeling", modeling, "modeling contract"),
+        ("modeling_authorized_by_gate_pass", modeling, "modeling contract"),
+    ):
+        if source.get(field) is not False:
+            raise HandoffError(f"the {label} field {field} must be False")
+    for field, source, label in (
+        ("m3_lag_wdi_data_gate_is_a_separate_action_from_retrieval", boundary,
+         "boundary"),
+        ("m3_lag_wdi_data_gate_requires_new_explicit_human_authorization",
+         boundary, "boundary"),
+        ("m3_lag_wdi_retrieval_requires_new_explicit_human_authorization",
+         boundary, "boundary"),
+        ("m3_lag_wdi_modeling_requires_new_explicit_human_authorization",
+         boundary, "boundary"),
+        ("m3_lag_wdi_gate_pass_is_data_admission_only", boundary, "boundary"),
+        ("m3_lag_wdi_gate_pointer_is_not_authorization", boundary,
+         "boundary"),
+        ("gate_is_a_separate_action_from_retrieval", gate, "Gate contract"),
+        ("gate_requires_new_explicit_human_authorization", gate,
+         "Gate contract"),
+        ("gate_pointer_is_not_authorization", gate, "Gate contract"),
+        ("gate_pass_is_data_admission_only", gate, "Gate contract"),
+        ("modeling_requires_separate_explicit_human_authorization", gate,
+         "Gate contract"),
+        ("gate_pass_is_data_admission_only", modeling, "modeling contract"),
+        ("modeling_requires_new_explicit_human_authorization", modeling,
+         "modeling contract"),
+    ):
+        if source.get(field) is not True:
+            raise HandoffError(f"the {label} field {field} must be True")
+    published_sequence = boundary.get("m3_lag_wdi_action_sequence") or []
+    if [(entry.get("step"), entry.get("action_id"),
+         entry.get("executes_retrieval"), entry.get("executes_data_gate"),
+         entry.get("executes_modeling"))
+            for entry in published_sequence] != list(
+                _STAGE128_M3_LAG_ACTION_SEQUENCE):
+        raise HandoffError(
+            "the Track B action sequence must separate contract lock -> "
+            "retrieval -> post-retrieval audit -> Data Gate -> modeling, with "
+            "exactly one executing step each")
+    for entry in published_sequence:
+        if entry.get("executes_retrieval") and entry.get(
+                "executes_data_gate"):
+            raise HandoffError(
+                f"action {entry.get('action_id')!r} both retrieves and "
+                "executes the Data Gate: that is a conflated action")
+        if entry.get("step") != "A" and entry.get("authorized") is not False:
+            raise HandoffError(
+                f"future Track B action {entry.get('action_id')!r} must be "
+                "unauthorized")
+
+    return {
+        # Track B: the contract is LOCKED, and locked is not authorized.
+        "stage128_m3_lag_wdi_exploratory_contract_locked": True,
+        "stage128_m3_lag_wdi_authoritative_contract_status":
+            _STAGE128_M3_LAG_LOCKED_STATUS,
+        "stage128_m3_lag_wdi_scientific_role": _STAGE128_M3_LAG_ROLE,
+        "stage128_m3_lag_wdi_is_confirmatory_m3": False,
+        "stage128_m3_lag_wdi_feature_count": 14,
+        "stage128_m3_lag_wdi_additional_feature_count": 2,
+        "stage128_m3_lag_wdi_m2_comparator_feature_count": 12,
+        "stage128_m3_lag_wdi_parent_sample_rows": 539,
+        "stage128_m3_lag_wdi_cpi_indicator_code": _STAGE128_M3_LAG_FEATURES[0][1],
+        "stage128_m3_lag_wdi_fx_indicator_code": _STAGE128_M3_LAG_FEATURES[1][1],
+        "stage128_m3_lag_wdi_observation_year_rule": "t - 1",
+        "stage128_m3_lag_wdi_fx_transformation":
+            _STAGE128_M3_LAG_FX_FORMULA_EQUIVALENT,
+        "stage128_m3_lag_wdi_point_in_time_availability_claimed": False,
+        "stage128_m3_lag_wdi_current_revised_wdi_semantics": True,
+        "stage128_m3_lag_wdi_comparison_family_id": family_id,
+        "stage128_m3_lag_wdi_in_confirmatory_holm_family": False,
+        "stage128_m3_lag_wdi_data_retrieval_started": False,
+        "stage128_m3_lag_wdi_data_gate_executed": False,
+        "stage128_m3_lag_wdi_data_gate_result": "NOT_EXECUTED",
+        "stage128_m3_lag_wdi_modeling_started": False,
+        "stage128_m3_lag_wdi_modeling_authorized": False,
+        "stage128_m3_lag_wdi_final_test_rows_read": 0,
+        # The immediate pointer is RETRIEVAL ONLY. The Data Gate and modeling
+        # are separate later actions, each with its own identity and its own
+        # required new human authorization.
+        "stage128_m3_lag_wdi_next_action_id": _STAGE128_M3_LAG_NEXT_ACTION_ID,
+        "stage128_m3_lag_wdi_next_action_authorized": False,
+        "stage128_m3_lag_wdi_next_action_scope":
+            _STAGE128_M3_LAG_NEXT_ACTION_SCOPE,
+        "stage128_m3_lag_wdi_next_action_executes_data_gate": False,
+        "stage128_m3_lag_wdi_retrieval_action_id":
+            _STAGE128_M3_LAG_RETRIEVAL_ACTION_ID,
+        "stage128_m3_lag_wdi_retrieval_authorized": False,
+        "stage128_m3_lag_wdi_retrieval_executes_data_gate": False,
+        "stage128_m3_lag_wdi_retrieval_requires_new_human_authorization": True,
+        "stage128_m3_lag_wdi_post_retrieval_audit_action_id":
+            _STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID,
+        "stage128_m3_lag_wdi_post_retrieval_audit_authorized": False,
+        "stage128_m3_lag_wdi_post_retrieval_audit_executes_data_gate": False,
+        "stage128_m3_lag_wdi_data_gate_action_id":
+            _STAGE128_M3_LAG_DATA_GATE_ACTION_ID,
+        "stage128_m3_lag_wdi_data_gate_authorized": False,
+        "stage128_m3_lag_wdi_data_gate_is_a_separate_action": True,
+        "stage128_m3_lag_wdi_data_gate_requires_new_human_authorization": True,
+        "stage128_m3_lag_wdi_data_gate_pointer_is_not_authorization": True,
+        "stage128_m3_lag_wdi_retrieval_authorization_implies_gate_"
+        "authorization": False,
+        "stage128_m3_lag_wdi_combined_retrieval_and_gate_action_permitted":
+            False,
+        "stage128_m3_lag_wdi_gate_pass_is_data_admission_only": True,
+        "stage128_m3_lag_wdi_gate_pass_authorizes_modeling": False,
+        "stage128_m3_lag_wdi_modeling_action_id":
+            _STAGE128_M3_LAG_MODELING_ACTION_ID,
+        "stage128_m3_lag_wdi_modeling_requires_new_human_authorization": True,
+        "stage128_m3_lag_wdi_action_sequence": [
+            {
+                "step": step,
+                "action_id": action_id,
+                "executes_retrieval": executes_retrieval,
+                "executes_data_gate": executes_gate,
+                "executes_modeling": executes_modeling,
+                "authorized": step == "A",
+            }
+            for (step, action_id, executes_retrieval, executes_gate,
+                 executes_modeling) in _STAGE128_M3_LAG_ACTION_SEQUENCE
+        ],
+        "stage128_m3_lag_wdi_authorization_sha256": auth_sha,
+        "stage128_m3_lag_wdi_authorization_utf8_bytes":
+            authorization.get("authorization_utf8_bytes"),
+        "stage128_m3_lag_wdi_authorization_consumed": True,
+        "stage128_m3_lag_wdi_prior_restriction_status":
+            boundary.get("prior_restriction_status"),
+        # The quarantined draft stays quarantined and untouched.
+        "stage128_m3_lag_wdi_local_partial_draft_detected": True,
+        "stage128_m3_lag_wdi_local_partial_draft_quarantined": True,
+        "stage128_m3_lag_wdi_local_partial_draft_authoritative": False,
+        "stage128_m3_lag_wdi_prior_authorization_reusable": False,
+        # Track A is untouched and still waiting.
+        "stage128_m3i2_inquiry_terminated_by_track_b": False,
+        "stage128_m3i2_response_adjudication_authorized": False,
+        "stage128_m3i2_inquiry_follow_up_authorized_now": False,
+        # LIVE topology re-anchored onto THIS Draft PR; PR #77 is history.
+        "stage128_m3i2_live_pr_number": live_number,
+        "stage128_m3i2_live_pr_base_branch":
+            topology.get("live_pr_base_branch"),
+        "stage128_m3i2_live_pr_base_commit": base_commit,
+        "stage128_m3i2_live_main_commit": base_commit,
+        "stage128_m3i2_live_pr_is_draft": True,
+        "stage128_m3i2_live_pr_merged": False,
+        "stage128_m3i2_live_pr_role": topology.get("live_pr_role"),
+        "stage128_m3i2_live_pr_head_commit_source":
+            _STAGE128_M3I2_LIVE_PR_HEAD_SEMANTICS,
+        "stage128_m3i2_live_pr_ready_for_review_authorized": False,
+        # HISTORY IS PINNED, NOT RE-DERIVED. "The recovery PR" names the
+        # documentary-recovery INITIATION carried by PR #76; it does NOT mean
+        # "the PR that merged immediately before the live one". The later
+        # human-submission RECORDING carried by PR #77 keeps its own separate
+        # identity, and PR #78 is the live Draft. Three actions, three PRs.
+        "stage128_m3i2_recovery_pr_number":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR,
+        "stage128_m3i2_recovery_pr_merged": True,
+        "stage128_m3i2_recovery_pr_merge_commit":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT,
+        "stage128_m3i2_recovery_pr_role":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE,
+        "stage128_m3i2_recovery_pr_action_id":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ACTION_ID,
+        "stage128_m3i2_recovery_pr_semantics":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_SEMANTICS,
+        "stage128_m3i2_human_submission_pr_number":
+            _STAGE128_M3I2_HUMAN_SUBMISSION_PR,
+        "stage128_m3i2_human_submission_pr_merged": True,
+        "stage128_m3i2_human_submission_pr_merge_commit":
+            _STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT,
+        "stage128_m3i2_human_submission_pr_role":
+            _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE,
+        "stage128_m3i2_human_submission_pr_action_id":
+            _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ACTION_ID,
+        "stage128_m3i2_human_submission_pr_semantics": (
+            "merged_predecessor_superseded_by_pr" f"{live_number}"),
+        "stage128_m3i2_pr_roles_are_historical_facts_not_positional": True,
+        "stage128_m3i2_pr_role_sequence": [
+            {
+                "pr_number": entry[0],
+                "role": entry[1],
+                "merged": entry[2],
+                "merge_commit": entry[3],
+            }
+            for entry in expected_sequence
+        ],
+        "stage128_m3i2_merge_authorized": False,
     }
 
 
