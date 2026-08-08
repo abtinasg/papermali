@@ -4822,6 +4822,22 @@ def render_current_state(record: dict) -> str:
             "",
         ]
     if record.get("stage128_m3_lag_wdi_exploratory_contract_locked"):
+        # Historical vs standing retrieval authorization, kept separate so a
+        # consumed one-time authorization can never render as a live one.
+        # Before the retrieval both fall back to the generic (standing)
+        # field, which is False until a new authorization is granted.
+        _rtrv_generic = record.get("stage128_m3_lag_wdi_retrieval_authorized")
+        _rtrv_was = record.get(
+            "stage128_m3_lag_wdi_retrieval_was_authorized", _rtrv_generic)
+        _rtrv_now = record.get(
+            "stage128_m3_lag_wdi_retrieval_authorized_now", _rtrv_generic)
+        _rtrv_consumed = record.get(
+            "stage128_m3_lag_wdi_retrieval_authorization_consumed", False)
+        _rtrv_reusable = record.get(
+            "stage128_m3_lag_wdi_retrieval_authorization_reusable", False)
+        _rtrv_new_auth = record.get(
+            "stage128_m3_lag_wdi_further_retrieval_requires_new_human_"
+            "authorization", True)
         lines += [
             "### Stage128 — TRACK B: M3-LAG-WDI-EXPLORATORY contract lock "
             "(PRE-RETRIEVAL)\n",
@@ -4897,11 +4913,18 @@ def render_current_state(record: dict) -> str:
             # Retrieval, the Gate and modeling are three separate actions, so
             # an authorization for one can never be read as authorizing the
             # next. Rendering them as one line would erase that boundary.
+            # Step B renders HISTORICAL and STANDING authorization separately:
+            # after execution its one-time authorization is consumed, and a
+            # reader must never mistake that spent authorization for a live
+            # permission to issue another World Bank request.
             "- ⛔ **Separated future actions (each needs its OWN new explicit "
             "human authorization):** (B) "
             f"`{record.get('stage128_m3_lag_wdi_retrieval_action_id')}` — "
-            "authorized "
-            f"{record.get('stage128_m3_lag_wdi_retrieval_authorized')}, "
+            f"was authorized (historical) {_rtrv_was}, "
+            f"authorized NOW (standing) {_rtrv_now} — one-time "
+            f"authorization consumed = {_rtrv_consumed}, "
+            f"reusable = {_rtrv_reusable}, further retrieval requires NEW "
+            f"human authorization = {_rtrv_new_auth}, "
             "executes Gate "
             f"{record.get('stage128_m3_lag_wdi_retrieval_executes_data_gate')}"
             "; (C) "
@@ -8434,10 +8457,17 @@ def derive_stage128_m3_lag_wdi_data_retrieval_markers(root: str) -> dict:
             _STAGE128_M3_LAG_RETRIEVAL_AUTH_SHA256,
         "stage128_m3_lag_wdi_retrieval_authorization_utf8_bytes":
             _STAGE128_M3_LAG_RETRIEVAL_AUTH_BYTES,
-        # This action WAS authorized — once. Published together with the
-        # consumed/non-reusable pair so "authorized" can never be misread as a
-        # standing permission to retrieve again.
-        "stage128_m3_lag_wdi_retrieval_authorized": True,
+        # HISTORICAL vs STANDING authorization are published as two separate
+        # facts so neither can be misread as the other. The retrieval WAS
+        # explicitly authorized — once — and that authorization was CONSUMED
+        # by the executed retrieval, so no standing permission to issue
+        # another World Bank request exists NOW. The generic
+        # ``retrieval_authorized`` field carries the STANDING meaning and is
+        # therefore False after consumption; the historical fact lives only
+        # in ``retrieval_was_authorized``.
+        "stage128_m3_lag_wdi_retrieval_was_authorized": True,
+        "stage128_m3_lag_wdi_retrieval_authorized_now": False,
+        "stage128_m3_lag_wdi_retrieval_authorized": False,
         "stage128_m3_lag_wdi_retrieval_authorization_consumed": True,
         "stage128_m3_lag_wdi_retrieval_authorization_reusable": False,
         "stage128_m3_lag_wdi_further_retrieval_requires_new_human_"
@@ -8476,7 +8506,11 @@ def derive_stage128_m3_lag_wdi_data_retrieval_markers(root: str) -> dict:
                 "executes_retrieval": executes_retrieval,
                 "executes_data_gate": executes_gate,
                 "executes_modeling": executes_modeling,
-                "authorized": step in ("A", "B"),
+                # "authorized" is STANDING: consumed one-time authorizations
+                # (A, B) are history, recorded in "was_authorized" only.
+                "was_authorized": step in ("A", "B"),
+                "authorized_now": False,
+                "authorized": False,
                 "status": "COMPLETE" if step in ("A", "B")
                           else "NOT_AUTHORIZED",
             }

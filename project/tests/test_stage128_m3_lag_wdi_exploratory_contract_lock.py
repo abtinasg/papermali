@@ -1123,14 +1123,22 @@ def test_the_next_action_is_a_separated_step_and_never_the_gate(handoff):
     assert handoff[
         "stage128_m3_lag_wdi_next_action_executes_data_gate"] is False
     assert handoff["stage128_m3_lag_wdi_retrieval_executes_data_gate"] is False
-    # retrieval may have been authorized once, but never as a standing grant
-    if handoff["stage128_m3_lag_wdi_retrieval_authorized"] is True:
+    # retrieval may have been authorized once, but never as a standing
+    # grant: the generic field carries the STANDING meaning, so an executed
+    # retrieval keeps its historical was-authorized fact while the standing
+    # authorization stays False (consumed, non-reusable).
+    if handoff["stage128_m3_lag_wdi_data_retrieval_started"] is True:
+        assert handoff[
+            "stage128_m3_lag_wdi_retrieval_was_authorized"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_retrieval_authorized_now"] is False
+        assert handoff["stage128_m3_lag_wdi_retrieval_authorized"] is False
         assert handoff[
             "stage128_m3_lag_wdi_retrieval_authorization_consumed"] is True
         assert handoff[
             "stage128_m3_lag_wdi_retrieval_authorization_reusable"] is False
     else:
-        assert handoff["stage128_m3_lag_wdi_data_retrieval_started"] is False
+        assert handoff["stage128_m3_lag_wdi_retrieval_authorized"] is False
 
 
 def test_the_data_gate_is_a_separate_unauthorized_action(handoff):
@@ -1199,7 +1207,17 @@ def test_the_published_action_sequence_separates_every_step(handoff):
     by_step = {e["step"]: e for e in sequence}
     for step in ("C", "D", "E"):
         assert by_step[step]["authorized"] is False, step
-    assert by_step["A"]["authorized"] is True
+    # Step A was carried out under its own (now consumed) authorization. Once
+    # the sequence separates HISTORICAL from STANDING authorization, the
+    # standing field must be False for every step — a consumed one-time
+    # authorization may never read as a live one.
+    step_a = by_step["A"]
+    if "was_authorized" in step_a:
+        assert step_a["was_authorized"] is True
+        assert step_a["authorized"] is False
+        assert step_a["authorized_now"] is False
+    else:
+        assert step_a["authorized"] is True
 
 
 def test_the_docs_separate_retrieval_from_the_gate():

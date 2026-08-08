@@ -360,7 +360,13 @@ def test_the_handoff_pointer_advanced_to_an_unauthorized_audit(handoff):
 
 
 def test_the_handoff_marks_the_authorization_spent(handoff):
-    assert handoff["stage128_m3_lag_wdi_retrieval_authorized"] is True
+    # HISTORICAL fact: the retrieval WAS explicitly authorized, once.
+    assert handoff["stage128_m3_lag_wdi_retrieval_was_authorized"] is True
+    # STANDING fact: that authorization is consumed, so nothing NOW permits
+    # another World Bank request. The generic field carries the standing
+    # meaning and must therefore be False after consumption.
+    assert handoff["stage128_m3_lag_wdi_retrieval_authorized_now"] is False
+    assert handoff["stage128_m3_lag_wdi_retrieval_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_retrieval_authorization_consumed"] is (
         True)
     assert handoff["stage128_m3_lag_wdi_retrieval_authorization_reusable"] is (
@@ -368,6 +374,44 @@ def test_the_handoff_marks_the_authorization_spent(handoff):
     assert handoff[
         "stage128_m3_lag_wdi_further_retrieval_requires_new_human_"
         "authorization"] is True
+
+
+def test_a_consumed_authorization_never_reads_as_standing(handoff):
+    """FAIL-CLOSED: consumed one-time authorizations may not look standing.
+
+    Whatever else the Handoff publishes about the executed retrieval, no
+    combination of fields may simultaneously say "consumed" and "authorized
+    now". If a future edit flips the generic field back to True while the
+    authorization stays consumed, this test refuses.
+    """
+    consumed = handoff[
+        "stage128_m3_lag_wdi_retrieval_authorization_consumed"]
+    if consumed is True:
+        assert handoff[
+            "stage128_m3_lag_wdi_retrieval_authorized_now"] is False
+        assert handoff["stage128_m3_lag_wdi_retrieval_authorized"] is False
+        assert handoff[
+            "stage128_m3_lag_wdi_retrieval_authorization_reusable"] is False
+        assert handoff[
+            "stage128_m3_lag_wdi_further_retrieval_requires_new_human_"
+            "authorization"] is True
+
+
+def test_current_state_never_renders_step_b_as_currently_authorized():
+    """FAIL-CLOSED: the generated state must separate WAS from NOW.
+
+    A human reading CURRENT_STATE.md must not be able to interpret the old
+    (consumed) retrieval authorization as permission to issue another World
+    Bank request. The historical fact stays visible; the ambiguous
+    "(B) `<action>` — authorized True" rendering must never come back.
+    """
+    with open(os.path.join(REPO_ROOT, "project/docs/ai/CURRENT_STATE.md"),
+              encoding="utf-8") as fh:
+        text = fh.read()
+    assert f"`{_ACTION_ID}` — authorized True" not in text
+    assert f"`{_ACTION_ID}` — was authorized (historical) True" in text
+    assert "authorized NOW (standing) False" in text
+    assert "further retrieval requires NEW human authorization = True" in text
 
 
 def test_the_action_sequence_still_separates_every_step(handoff):
@@ -380,7 +424,12 @@ def test_the_action_sequence_still_separates_every_step(handoff):
     assert by_step["E"]["action_id"] == _MODEL_ACTION
     for step in ("C", "D", "E"):
         assert by_step[step]["authorized"] is False, step
+        assert by_step[step]["was_authorized"] is False, step
         assert by_step[step]["status"] == "NOT_AUTHORIZED", step
+    # completed steps stay history: nothing in the sequence is standing
+    for entry in sequence:
+        assert entry["authorized"] is False, entry["step"]
+        assert entry["authorized_now"] is False, entry["step"]
     # no single step both retrieves and gates
     for entry in sequence:
         assert not (entry["executes_retrieval"] and entry["executes_data_gate"])
