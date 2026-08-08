@@ -1,0 +1,300 @@
+{
+  "bins": 5,
+  "by_family": {
+    "random_forest": {
+      "M2": {
+        "brier_score": 0.13309563301,
+        "calibration_curve_quantile_bins": [
+          {
+            "bin": 1,
+            "mean_predicted_probability": 0.151061633199,
+            "n_positive": 1,
+            "n_rows": 74,
+            "observed_event_rate": 0.013513513514
+          },
+          {
+            "bin": 2,
+            "mean_predicted_probability": 0.223920051382,
+            "n_positive": 0,
+            "n_rows": 73,
+            "observed_event_rate": 0.0
+          },
+          {
+            "bin": 3,
+            "mean_predicted_probability": 0.298167313403,
+            "n_positive": 1,
+            "n_rows": 73,
+            "observed_event_rate": 0.013698630137
+          },
+          {
+            "bin": 4,
+            "mean_predicted_probability": 0.402693766168,
+            "n_positive": 6,
+            "n_rows": 73,
+            "observed_event_rate": 0.082191780822
+          },
+          {
+            "bin": 5,
+            "mean_predicted_probability": 0.613440354229,
+            "n_positive": 20,
+            "n_rows": 73,
+            "observed_event_rate": 0.27397260274
+          }
+        ],
+        "calibration_intercept": -1.948890462036,
+        "calibration_slope": 1.849169673183,
+        "estimable": true,
+        "n_positive": 28,
+        "n_rows": 366,
+        "reason": "",
+        "unstable": false
+      },
+      "M3_LAG_WDI": {
+        "brier_score": 0.131721036198,
+        "calibration_curve_quantile_bins": [
+          {
+            "bin": 1,
+            "mean_predicted_probability": 0.152912013213,
+            "n_positive": 1,
+            "n_rows": 74,
+            "observed_event_rate": 0.013513513514
+          },
+          {
+            "bin": 2,
+            "mean_predicted_probability": 0.224146764713,
+            "n_positive": 0,
+            "n_rows": 73,
+            "observed_event_rate": 0.0
+          },
+          {
+            "bin": 3,
+            "mean_predicted_probability": 0.292817407496,
+            "n_positive": 1,
+            "n_rows": 73,
+            "observed_event_rate": 0.013698630137
+          },
+          {
+            "bin": 4,
+            "mean_predicted_probability": 0.397466030488,
+            "n_positive": 6,
+            "n_rows": 73,
+            "observed_event_rate": 0.082191780822
+          },
+          {
+            "bin": 5,
+            "mean_predicted_probability": 0.613792700129,
+            "n_positive": 20,
+            "n_rows": 73,
+            "observed_event_rate": 0.27397260274
+          }
+        ],
+        "calibration_intercept": -1.938638153531,
+        "calibration_slope": 1.858281031503,
+        "estimable": true,
+        "n_positive": 28,
+        "n_rows": 366,
+        "reason": "",
+        "unstable": false
+      }
+    },
+    "regularized_logistic_regression": {
+      "M2": {
+        "brier_score": 0.133500240879,
+        "calibration_curve_quantile_bins": [
+          {
+            "bin": 1,
+            "mean_predicted_probability": 0.076021339663,
+            "n_positive": 0,
+            "n_rows": 74,
+            "observed_event_rate": 0.0
+          },
+          {
+            "bin": 2,
+            "mean_predicted_probability": 0.166572370937,
+            "n_positive": 1,
+            "n_rows": 73,
+            "observed_event_rate": 0.013698630137
+          },
+          {
+            "bin": 3,
+            "mean_predicted_probability": 0.26807933151,
+            "n_positive": 1,
+            "n_rows": 73,
+            "observed_event_rate": 0.013698630137
+          },
+          {
+            "bin": 4,
+            "mean_predicted_probability": 0.380533447869,
+            "n_positive": 5,
+            "n_rows": 73,
+            "observed_event_rate": 0.068493150685
+          },
+          {
+            "bin": 5,
+            "mean_predicted_probability": 0.737343072239,
+            "n_positive": 21,
+            "n_rows": 73,
+            "observed_event_rate": 0.287671232877
+          }
+        ],
+        "calibration_intercept": -2.455445930227,
+        "calibration_slope": 0.949015343665,
+        "estimable": true,
+        "n_positive": 28,
+        "n_rows": 366,
+        "reason": "",
+        "unstable": false
+      },
+      "M3_LAG_WDI": {
+        "brier_score": 0.128899832705,
+        "calibration_curve_quantile_bins": [
+          {
+            "bin": 1,
+            "mean_predicted_probability": 0.078456901088,
+            "n_positive": 0,
+            "n_rows": 74,
+            "observed_event_rate": 0.0
+          },
+          {
+            "bin": 2,
+            "mean_predicted_probability": 0.164709648836,
+            "n_positive": 1,
+            "n_rows": 73,
+            "observed_event_rate": 0.013698630137
+          },
+          {
+            "bin": 3,
+            "mean_predicted_probability": 0.256964196534,
+            "n_positive": 1,
+            "n_rows": 73,
+            "observed_event_rate": 0.013698630137
+          },
+          {
+            "bin": 4,
+            "mean_predicted_probability": 0.360946400729,
+            "n_positive": 4,
+            "n_rows": 73,
+            "observed_event_rate": 0.054794520548
+          },
+          {
+            "bin": 5,
+            "mean_predicted_probability": 0.728840409003,
+            "n_positive": 22,
+            "n_rows": 73,
+            "observed_event_rate": 0.301369863014
+          }
+        ],
+        "calibration_intercept": -2.402173819719,
+        "calibration_slope": 0.934979112281,
+        "estimable": true,
+        "n_positive": 28,
+        "n_rows": 366,
+        "reason": "",
+        "unstable": false
+      }
+    },
+    "xgboost": {
+      "M2": {
+        "brier_score": 0.084532023382,
+        "calibration_curve_quantile_bins": [
+          {
+            "bin": 1,
+            "mean_predicted_probability": 0.011336203892,
+            "n_positive": 2,
+            "n_rows": 74,
+            "observed_event_rate": 0.027027027027
+          },
+          {
+            "bin": 2,
+            "mean_predicted_probability": 0.021655518648,
+            "n_positive": 0,
+            "n_rows": 73,
+            "observed_event_rate": 0.0
+          },
+          {
+            "bin": 3,
+            "mean_predicted_probability": 0.041383948264,
+            "n_positive": 2,
+            "n_rows": 73,
+            "observed_event_rate": 0.027397260274
+          },
+          {
+            "bin": 4,
+            "mean_predicted_probability": 0.146209640127,
+            "n_positive": 4,
+            "n_rows": 73,
+            "observed_event_rate": 0.054794520548
+          },
+          {
+            "bin": 5,
+            "mean_predicted_probability": 0.612666170197,
+            "n_positive": 20,
+            "n_rows": 73,
+            "observed_event_rate": 0.27397260274
+          }
+        ],
+        "calibration_intercept": -1.555835076433,
+        "calibration_slope": 0.625678529518,
+        "estimable": true,
+        "n_positive": 28,
+        "n_rows": 366,
+        "reason": "",
+        "unstable": false
+      },
+      "M3_LAG_WDI": {
+        "brier_score": 0.084395512595,
+        "calibration_curve_quantile_bins": [
+          {
+            "bin": 1,
+            "mean_predicted_probability": 0.01060870111,
+            "n_positive": 2,
+            "n_rows": 74,
+            "observed_event_rate": 0.027027027027
+          },
+          {
+            "bin": 2,
+            "mean_predicted_probability": 0.021167843404,
+            "n_positive": 0,
+            "n_rows": 73,
+            "observed_event_rate": 0.0
+          },
+          {
+            "bin": 3,
+            "mean_predicted_probability": 0.040297282722,
+            "n_positive": 2,
+            "n_rows": 73,
+            "observed_event_rate": 0.027397260274
+          },
+          {
+            "bin": 4,
+            "mean_predicted_probability": 0.145055317011,
+            "n_positive": 4,
+            "n_rows": 73,
+            "observed_event_rate": 0.054794520548
+          },
+          {
+            "bin": 5,
+            "mean_predicted_probability": 0.612251612544,
+            "n_positive": 20,
+            "n_rows": 73,
+            "observed_event_rate": 0.27397260274
+          }
+        ],
+        "calibration_intercept": -1.551659219773,
+        "calibration_slope": 0.624144184193,
+        "estimable": true,
+        "n_positive": 28,
+        "n_rows": 366,
+        "reason": "",
+        "unstable": false
+      }
+    }
+  },
+  "isotonic_calibration_allowed": false,
+  "isotonic_calibration_executed": false,
+  "platt_recalibration_executed": false,
+  "primary_probabilities_are_raw": true,
+  "probability_surface": "raw_locked_pipeline_probabilities",
+  "recalibrated_probabilities_used_as_primary_surface": false,
+  "recalibration_influenced_conclusion": false
+}

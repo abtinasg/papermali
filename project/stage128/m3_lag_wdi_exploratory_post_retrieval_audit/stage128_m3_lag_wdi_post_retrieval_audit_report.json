@@ -1,0 +1,141 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-post-retrieval-audit",
+  "admission_decision_made": false,
+  "audit_level": "series_level_only_never_sample_level",
+  "authorized_scope": "post_retrieval_audit_only",
+  "binding_constraint_indicator": "PA.NUS.FCRF",
+  "block_coverage_computed": false,
+  "both_features_constructible_predictor_year_first": 1962,
+  "both_features_constructible_predictor_year_last": 2024,
+  "both_features_constructible_predictor_years": 63,
+  "candidate_coverage_computed": false,
+  "company_rows_touched": 0,
+  "coverage_thresholds_applied": false,
+  "feature_availability": [
+    {
+      "constructible_predictor_year_first": 1961,
+      "constructible_predictor_year_last": 2026,
+      "constructible_predictor_years": 66,
+      "feature_id": "intl_cpi_inflation_lag1_wdi",
+      "indicator_code": "FP.CPI.TOTL.ZG",
+      "positivity_required": false,
+      "required_observation_years": [
+        "t-1"
+      ],
+      "transformation": "identity"
+    },
+    {
+      "constructible_predictor_year_first": 1962,
+      "constructible_predictor_year_last": 2024,
+      "constructible_predictor_years": 63,
+      "degenerate_zero_change_predictor_year_list": [
+        1962,
+        1963,
+        1964,
+        1965,
+        1966,
+        1967,
+        1968,
+        1969,
+        1970,
+        1971,
+        1980,
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "degenerate_zero_change_predictor_years": 15,
+      "feature_id": "intl_fx_change_official_lag1_wdi",
+      "indicator_code": "PA.NUS.FCRF",
+      "longest_consecutive_zero_change_run": 10,
+      "positivity_required": true,
+      "required_observation_years": [
+        "t-1",
+        "t-2"
+      ],
+      "trailing_zero_change_predictor_year_list": [
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "trailing_zero_change_predictor_years": 4,
+      "transformation": "FX_LAG1_t = 100 * ln(E_(t-1) / E_(t-2))"
+    }
+  ],
+  "retained_payload_identity": [
+    {
+      "bytes_modified_by_this_action": false,
+      "identity_matches_committed_manifest": true,
+      "indicator_code": "FP.CPI.TOTL.ZG",
+      "raw_artifact_bytes": 15805,
+      "raw_artifact_filename": "f62292c52088df71__FP.CPI.TOTL.ZG.attempt1.json",
+      "raw_artifact_sha256": "f62292c52088df714c34846a6865ddc47306d49796ea9ec9014441893d553add"
+    },
+    {
+      "bytes_modified_by_this_action": false,
+      "identity_matches_committed_manifest": true,
+      "indicator_code": "PA.NUS.FCRF",
+      "raw_artifact_bytes": 16482,
+      "raw_artifact_filename": "74b585734cc48dd2__PA.NUS.FCRF.attempt1.json",
+      "raw_artifact_sha256": "74b585734cc48dd2e9d063e955d95a619dbaa5e4bbff283b128da21b339d63d4"
+    }
+  ],
+  "series": [
+    {
+      "calendar_gaps": [],
+      "country_code": "IRN",
+      "findings": [],
+      "indicator_code": "FP.CPI.TOTL.ZG",
+      "indicator_name": "Inflation, consumer prices (annual %)",
+      "non_numeric_observation_years": [],
+      "null_observation_years": [],
+      "numeric_observation_year_first": 1960,
+      "numeric_observation_year_last": 2025,
+      "observation_status_flags": [],
+      "observation_year_first": 1960,
+      "observation_year_last": 2025,
+      "observation_years_distinct": 66,
+      "observations_null": 0,
+      "observations_numeric": 66,
+      "observations_returned": 66,
+      "response_pages": 1,
+      "response_total": 66,
+      "source_id": "2",
+      "source_last_updated": "2026-07-13",
+      "trailing_null_observation_years": []
+    },
+    {
+      "calendar_gaps": [],
+      "country_code": "IRN",
+      "findings": [
+        "the most recent observation years carry no value: [2024, 2025]"
+      ],
+      "indicator_code": "PA.NUS.FCRF",
+      "indicator_name": "Official exchange rate (LCU per US$, period average)",
+      "non_numeric_observation_years": [],
+      "null_observation_years": [
+        2024,
+        2025
+      ],
+      "numeric_observation_year_first": 1960,
+      "numeric_observation_year_last": 2023,
+      "observation_status_flags": [],
+      "observation_year_first": 1960,
+      "observation_year_last": 2025,
+      "observation_years_distinct": 66,
+      "observations_null": 2,
+      "observations_numeric": 64,
+      "observations_returned": 66,
+      "response_pages": 1,
+      "response_total": 66,
+      "source_id": "2",
+      "source_last_updated": "2026-07-13",
+      "trailing_null_observation_years": [
+        2024,
+        2025
+      ]
+    }
+  ]
+}

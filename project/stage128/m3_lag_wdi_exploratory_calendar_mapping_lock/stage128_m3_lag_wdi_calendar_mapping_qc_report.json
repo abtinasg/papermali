@@ -1,0 +1,88 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-calendar-mapping-lock",
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "timing_evidence_recomputed_from_committed_bytes",
+      "pass": true
+    },
+    {
+      "check": "locked_offset_has_zero_timing_violations",
+      "pass": true
+    },
+    {
+      "check": "rejected_offset_has_timing_violations",
+      "pass": true
+    },
+    {
+      "check": "locked_offset_is_admissible",
+      "pass": true
+    },
+    {
+      "check": "denominator_is_the_539_row_development_sample",
+      "pass": true
+    },
+    {
+      "check": "no_feature_value_read",
+      "pass": true
+    },
+    {
+      "check": "no_outcome_value_read",
+      "pass": true
+    },
+    {
+      "check": "no_final_test_row_read",
+      "pass": true
+    },
+    {
+      "check": "no_new_world_bank_request",
+      "pass": true
+    },
+    {
+      "check": "no_model_fit",
+      "pass": true
+    },
+    {
+      "check": "no_feature_value_table_materialized",
+      "pass": true
+    },
+    {
+      "check": "selection_independent_of_model_performance",
+      "pass": true
+    },
+    {
+      "check": "authoritative_contract_not_edited",
+      "pass": true
+    },
+    {
+      "check": "gate_result_unchanged",
+      "pass": true
+    },
+    {
+      "check": "gate_coverage_unchanged",
+      "pass": true
+    },
+    {
+      "check": "gate_not_rerun",
+      "pass": true
+    },
+    {
+      "check": "modeling_still_unauthorized",
+      "pass": true
+    },
+    {
+      "check": "lock_is_not_step_e_authorization",
+      "pass": true
+    },
+    {
+      "check": "final_test_still_locked",
+      "pass": true
+    },
+    {
+      "check": "point_in_time_limitation_preserved",
+      "pass": true
+    }
+  ],
+  "checks_failed": 0,
+  "checks_total": 20
+}

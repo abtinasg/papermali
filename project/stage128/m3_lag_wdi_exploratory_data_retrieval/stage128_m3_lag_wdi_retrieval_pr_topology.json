@@ -1,0 +1,67 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-data-retrieval",
+  "auto_merge": false,
+  "contract_lock_pr_action_id": "stage128-m3-lag-wdi-exploratory-contract-lock",
+  "contract_lock_pr_merge_commit": "175e7949e009eeecdd66aedab31ec4b48e9d3c7d",
+  "contract_lock_pr_merged": true,
+  "contract_lock_pr_number": 78,
+  "contract_lock_pr_role": "m3_lag_wdi_exploratory_contract_lock_pr",
+  "documentary_recovery_pr_merge_commit": "89d8e6ff2d12ec82903cd28aa7ab839eb946b658",
+  "documentary_recovery_pr_merged": true,
+  "documentary_recovery_pr_number": 76,
+  "documentary_recovery_pr_role": "final_official_documentary_recovery_initiation_pr",
+  "documentary_recovery_pr_semantics": "merged_predecessor_superseded_by_pr77",
+  "executed_in_separate_clean_worktree": true,
+  "human_submission_pr_merge_commit": "93de6bae9344ce893b0261f818abce8a991cf842",
+  "human_submission_pr_merged": true,
+  "human_submission_pr_number": 77,
+  "human_submission_pr_role": "final_official_inquiry_human_submission_recording_pr",
+  "human_submission_pr_semantics": "merged_predecessor_superseded_by_pr78",
+  "live_pr_base_branch": "main",
+  "live_pr_base_commit": "175e7949e009eeecdd66aedab31ec4b48e9d3c7d",
+  "live_pr_head_commit_pinned": false,
+  "live_pr_head_is_github_pr_head": false,
+  "live_pr_head_semantics": "repository_head_at_generation_not_github_pr_head",
+  "live_pr_is_draft": true,
+  "live_pr_merged": false,
+  "live_pr_number": 79,
+  "live_pr_role": "m3_lag_wdi_exploratory_data_retrieval_pr",
+  "merge_authorized": false,
+  "pr_is_stacked_on_open_predecessor": false,
+  "pr_role_sequence": [
+    {
+      "merge_commit": "89d8e6ff2d12ec82903cd28aa7ab839eb946b658",
+      "merged": true,
+      "pr_number": 76,
+      "role": "final_official_documentary_recovery_initiation_pr"
+    },
+    {
+      "merge_commit": "93de6bae9344ce893b0261f818abce8a991cf842",
+      "merged": true,
+      "pr_number": 77,
+      "role": "final_official_inquiry_human_submission_recording_pr"
+    },
+    {
+      "merge_commit": "175e7949e009eeecdd66aedab31ec4b48e9d3c7d",
+      "merged": true,
+      "pr_number": 78,
+      "role": "m3_lag_wdi_exploratory_contract_lock_pr"
+    },
+    {
+      "merge_commit": null,
+      "merged": false,
+      "pr_number": 79,
+      "role": "m3_lag_wdi_exploratory_data_retrieval_pr"
+    }
+  ],
+  "pr_roles_are_historical_facts_not_positional": true,
+  "pr_roles_re_derived_from_adjacency": false,
+  "predecessor_pr_merge_commit": "175e7949e009eeecdd66aedab31ec4b48e9d3c7d",
+  "predecessor_pr_merged": true,
+  "predecessor_pr_number": 78,
+  "predecessor_pr_role": "m3_lag_wdi_exploratory_contract_lock_pr",
+  "predecessor_pr_semantics": "merged_predecessor_superseded_by_pr79",
+  "ready_for_review_authorized": false,
+  "recovery_pr_role_is_pinned_to_pr76": true,
+  "repository": "abtinasg/papermali"
+}

@@ -1,0 +1,70 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-data-gate",
+  "admission_is_data_admission_only": true,
+  "admission_scope": "development_only",
+  "alternative_indicator_tried": false,
+  "authorized_scope": "data_gate_only",
+  "authorizes_next_action": false,
+  "block_formally_admitted": true,
+  "calendar_mapping_lock_required_before_modeling": true,
+  "criteria_strengthened_after_seeing_result": false,
+  "criteria_weakened": false,
+  "exclusions": [],
+  "features_excluded": [],
+  "gate_pass_authorizes_modeling": false,
+  "gate_pass_is_information_content_claim": false,
+  "gate_pass_unlocks_final_test": false,
+  "gate_result": "PASS_M3_LAG_WDI_DATA_GATE",
+  "gate_result_vocabulary": [
+    "PASS_M3_LAG_WDI_DATA_GATE",
+    "FAIL_M3_LAG_WDI_DATA_GATE",
+    "UNRESOLVED_M3_LAG_WDI_DATA_GATE"
+  ],
+  "imputation_used": false,
+  "material_limitations": [
+    "the formal Gate PASS is a coverage statement only; it does not make the FX feature informative: step C's finding stands that the FX log-ratio is defined but identically ZERO for predictor years 2021-2024 (outside the development sample, which ends at predictor year 2020 at the latest under either calendar convention)",
+    "PA.NUS.FCRF carries no value for observation years 2024-2025, so the jointly constructible predictor-year ceiling remains 2024; this does not bind the 539-row development sample but caps any future extension of the block",
+    "the WDI `lastupdated` value is a revision marker, not point-in-time availability proof; no historical-vintage or point-in-time claim is made and the one-year lag does not create one",
+    "the locked contract does not fix the Jalali-to-Gregorian mapping for predictor_year_t; the Gate verdict is invariant to the two admissible conventions, but feature VALUES are not, so the mapping must be human-locked before any modeling feature table is built"
+  ],
+  "next_action_authorized": false,
+  "next_action_id": "stage128-m3-lag-wdi-exploratory-incremental-evaluation",
+  "next_action_scope": "modeling_requires_new_human_authorization",
+  "rows_excluded": 0,
+  "scientific_distinctions": {
+    "A_syntactic_availability_and_coverage": {
+      "is_information_content_claim": false,
+      "statement": "All 539 development rows carry numerically constructible values for both locked features under both admissible calendar conventions; block common-sample coverage is 1.0000."
+    },
+    "B_pre_defined_thresholds_satisfied": {
+      "statement": "Every inherited locked threshold is satisfied: candidate coverage >= 0.80 for both features, block common-sample coverage >= 0.70, and >= 5 positive evaluable outcomes in each locked validation window.",
+      "threshold_checks": {
+        "block_common_sample_coverage_meets_threshold": true,
+        "cpi_candidate_coverage_meets_threshold": true,
+        "every_validation_window_meets_positive_floor": true,
+        "fx_candidate_coverage_meets_threshold": true
+      }
+    },
+    "C_information_content_limitation_from_step_c": {
+      "converted_into_a_different_claim": false,
+      "statement": "Step C established that the FX feature is defined but identically ZERO for predictor years 2021-2024 (trailing zero-change years: [2021, 2022, 2023, 2024]), because the official rate is pegged at 42000 for the 2019-2023 observations. That finding is preserved unchanged.",
+      "step_c_finding_preserved": true
+    },
+    "D_effect_on_the_formal_gate_decision": {
+      "new_rejection_criterion_created": false,
+      "statement": "The degeneracy does NOT affect the formal Gate decision under the pre-existing rules, for two independent reasons: (1) the locked contract contains no zero-change or information-content admission criterion, and none was invented; (2) the development rows land on predictor years no later than 2020 under either calendar convention, so the degenerate 2021-2024 window lies outside the development sample (0 development rows are zero-change)."
+    },
+    "E_remaining_scientific_limitation": {
+      "limitation_survives_the_pass": true,
+      "statement": "The limitation remains scientifically real despite the formal PASS: the FX feature carries no cross-time information for predictor years 2021-2024, PA.NUS.FCRF is null for 2024-2025 (capping the jointly constructible ceiling at predictor year 2024), the WDI lastupdated value is a revision marker and not point-in-time availability proof, and the Jalali-to-Gregorian predictor-year mapping is not locked by the contract. Any use of this block beyond the development window, and any modeling use at all, must confront these limitations explicitly."
+    }
+  },
+  "step_c_material_limitations_preserved": [
+    "PA.NUS.FCRF carries no value for its most recent observation years [2024, 2025], which caps the predictor years the FX feature can cover at 2024",
+    "the official exchange rate is repeated unchanged across the most recent usable years, so the contract-locked log-ratio transform is defined but identically ZERO for predictor years [2021, 2022, 2023, 2024] — i.e. the LAST 4 usable predictor years carry a complete but information-free FX feature (zero-change years overall: [1962, 1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1980, 2021, 2022, 2023, 2024])",
+    "the WDI vintage is a revision marker (`lastupdated 2026-07-13`), not evidence of what was published at any past moment; no point-in-time or historical-vintage availability is established"
+  ],
+  "step_c_result_preserved": "PASS_WITH_MATERIAL_FINDINGS",
+  "thresholds_changed_to_obtain_result": false,
+  "years_excluded": []
+}

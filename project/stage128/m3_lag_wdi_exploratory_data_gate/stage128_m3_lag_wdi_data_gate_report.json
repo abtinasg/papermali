@@ -1,0 +1,134 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-data-gate",
+  "admission_decision_made": true,
+  "authorized_scope": "data_gate_only",
+  "company_rows_touched": 539,
+  "coverage_thresholds_applied": true,
+  "final_test_rows_read": 0,
+  "final_test_target_values_read": 0,
+  "gate_computation": {
+    "block_common_sample_coverage": 1.0,
+    "block_common_sample_coverage_min": 0.7,
+    "both_constructible_rows": 539,
+    "candidate_valid_coverage_min": 0.8,
+    "cpi_candidate_coverage": 1.0,
+    "cpi_constructible_rows": 539,
+    "development_predictor_year_spans_gregorian": {
+      "offset621": {
+        "first": 2013,
+        "last": 2019
+      },
+      "offset622": {
+        "first": 2014,
+        "last": 2020
+      }
+    },
+    "fx_candidate_coverage": 1.0,
+    "fx_constructible_rows": 539,
+    "fx_zero_change_rows": 0,
+    "minimum_positive_evaluable_each_locked_validation_window": 5,
+    "rows": 539,
+    "status_invariant_across_calendar_conventions": true,
+    "threshold_checks": {
+      "block_common_sample_coverage_meets_threshold": true,
+      "cpi_candidate_coverage_meets_threshold": true,
+      "every_validation_window_meets_positive_floor": true,
+      "fx_candidate_coverage_meets_threshold": true
+    },
+    "validation_windows": {
+      "fold1_validation": {
+        "meets_positive_floor": true,
+        "minimum_positive_required": 5,
+        "positive_evaluable_in_m3_lag_wdi_common_sample": 18,
+        "target_years": [
+          "1396",
+          "1397"
+        ],
+        "validation_positive": 18,
+        "validation_rows": 159
+      },
+      "fold2_validation": {
+        "meets_positive_floor": true,
+        "minimum_positive_required": 5,
+        "positive_evaluable_in_m3_lag_wdi_common_sample": 10,
+        "target_years": [
+          "1398",
+          "1399"
+        ],
+        "validation_positive": 10,
+        "validation_rows": 207
+      }
+    },
+    "verdict": "PASS_M3_LAG_WDI_DATA_GATE"
+  },
+  "gate_level": "sample_level_development_only",
+  "human_authorization_sha256": "2397a5ad92387bf59ba68674be8864a164f5717739afb07af1fdc2d99a0a4fea",
+  "locked_feature_contract": {
+    "alternative_indicator_after_failure_permitted": false,
+    "contract_source": "project/stage128/m3_lag_wdi_exploratory_contract_lock/stage128_m3_lag_wdi_exploratory_contract.json",
+    "contract_source_sha256": "61d3158bc79633b1e5e4c8dfdb9ec6a5f95ee5789fa2a6109158d0f39d20b8b5",
+    "contract_version": "stage128_m3_lag_wdi_exploratory_contract_lock_v1",
+    "cpi_indicator_code": "FP.CPI.TOTL.ZG",
+    "cpi_transformation": "identity",
+    "fx_indicator_code": "PA.NUS.FCRF",
+    "fx_transformation": "FX_LAG1_t = 100 * ln(E_y / E_(y-1))",
+    "imputation_permitted": false,
+    "observation_year_rule": "t - 1",
+    "predictor_year_calendar_mapping_locked_by_contract": false,
+    "same_year_t_observation_permitted": false
+  },
+  "locked_thresholds": {
+    "block_common_sample_coverage_min": 0.7,
+    "candidate_valid_coverage_min": 0.8,
+    "coverage_scope": "development_only",
+    "denominator": "retained_M2_development_common_sample",
+    "minimum_positive_evaluable_each_locked_validation_window": 5,
+    "thresholds_changed_by_this_action": false,
+    "thresholds_inherited_from": "project/stage128/m3_intl_macro_contract_lock/stage128_m3_intl_macro_data_gate_contract.json",
+    "thresholds_inherited_from_sha256": "800ae595b5cf46095d9423145f3728115bdc537482f813ef1eab967b658fee91",
+    "thresholds_inherited_not_redesigned": true,
+    "thresholds_source": "project/stage128/m3_lag_wdi_exploratory_contract_lock/stage128_m3_lag_wdi_exploratory_data_gate_contract.json",
+    "thresholds_source_sha256": "9eba4c248e76445bce0be356c04b994d925acd0e33f46bd92fd6ef20561d5bb6"
+  },
+  "parent_surface": {
+    "derived_from": "project/stage128/stage128_m2_d2_development_features.csv",
+    "derived_from_sha256": "068519065fc4c36594a892b14c9242471a088e7b33484fbd5453b12391af2583",
+    "development_target_years": [
+      "1393",
+      "1394",
+      "1395",
+      "1396",
+      "1397",
+      "1398",
+      "1399"
+    ],
+    "final_test_rows_in_parent_surface": 0,
+    "jalali_fiscal_year_first": "1392",
+    "jalali_fiscal_year_last": "1398",
+    "membership_altered": false,
+    "membership_derived_programmatically_not_hand_reproduced": true,
+    "parent_companies": 108,
+    "parent_negative": 484,
+    "parent_positive": 55,
+    "parent_rows": 539,
+    "parent_surface_id": "retained_m2_development_common_sample",
+    "reconciled_against": "project/stage128/m2_incremental_evaluation/stage127_m2_common_sample_join_audit.json",
+    "reconciled_against_sha256": "e6da66d96810ef7491ab5db0018909419ecc7760000e8f390b5bbadb0ef3c159"
+  },
+  "validation_target_provenance": {
+    "reconciled_against": "project/stage128/m2_incremental_evaluation/stage127_m2_parent_to_common_sample_attrition_audit.json",
+    "reconciled_against_sha256": "005e0c26c8dbcc8b0847d3ad0588f8d77d532514c5d8a409bae0afe97e358b4c",
+    "source": "project/stage128/m2_incremental_evaluation/stage127_m2_paired_oof_predictions.csv",
+    "source_sha256": "923ce0929693cc07fbf5a81e16295334624ead19447ff87d6a49e7a6f2a26ceb",
+    "window_counts": {
+      "fold1_validation": {
+        "positive": 18,
+        "rows": 159
+      },
+      "fold2_validation": {
+        "positive": 10,
+        "rows": 207
+      }
+    }
+  }
+}

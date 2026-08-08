@@ -1,0 +1,25 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-post-retrieval-audit",
+  "admission_decision_made": false,
+  "audit_result": "PASS_WITH_MATERIAL_FINDINGS",
+  "authorized_scope": "post_retrieval_audit_only",
+  "authorizes_next_action": false,
+  "coverage_decision_made": false,
+  "evidence_integrity_verified": true,
+  "findings": [
+    "the most recent observation years carry no value: [2024, 2025]"
+  ],
+  "gate_decision_made": false,
+  "material_limitations": [
+    "PA.NUS.FCRF carries no value for its most recent observation years [2024, 2025], which caps the predictor years the FX feature can cover at 2024",
+    "the official exchange rate is repeated unchanged across the most recent usable years, so the contract-locked log-ratio transform is defined but identically ZERO for predictor years [2021, 2022, 2023, 2024] — i.e. the LAST 4 usable predictor years carry a complete but information-free FX feature (zero-change years overall: [1962, 1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1980, 2021, 2022, 2023, 2024])",
+    "the WDI vintage is a revision marker (`lastupdated 2026-07-13`), not evidence of what was published at any past moment; no point-in-time or historical-vintage availability is established"
+  ],
+  "modeling_decision_made": false,
+  "next_action_authorized": false,
+  "next_action_id": "stage128-m3-lag-wdi-exploratory-data-gate",
+  "next_action_scope": "data_gate_only",
+  "schema_conforms_to_world_bank_v2": true,
+  "scientific_effect": "NONE",
+  "series_match_locked_contract": true
+}

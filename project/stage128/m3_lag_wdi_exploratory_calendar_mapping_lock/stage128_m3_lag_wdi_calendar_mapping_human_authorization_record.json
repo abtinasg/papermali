@@ -1,0 +1,22 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-calendar-mapping-lock",
+  "authorization_covers_audit_rerun": false,
+  "authorization_covers_feature_value_table": false,
+  "authorization_covers_final_test": false,
+  "authorization_covers_gate_rerun": false,
+  "authorization_covers_merge": false,
+  "authorization_covers_model_fitting": false,
+  "authorization_covers_modeling": false,
+  "authorization_covers_new_retrieval": false,
+  "authorization_covers_ready_for_review": false,
+  "authorization_covers_step_e": false,
+  "authorization_is_single_use": true,
+  "authorization_sha256": "bf1827a1310e6a176fa3693939f4020ca29f899898f206f517ab561ddfab8c5e",
+  "authorization_text": "HUMAN SCIENTIFIC DECISION — AUTHORIZE CALENDAR-MAPPING LOCK ONLY\n\nI accept the independently audited recommendation:\n\nRECOMMEND_LOCK_JALALI_PLUS_621\n\nI explicitly authorize ONLY the new calendar-mapping lock action:\n\nstage128-m3-lag-wdi-exploratory-calendar-mapping-lock",
+  "authorization_utf8_bytes": 272,
+  "authorized_scope": "calendar_mapping_lock_only",
+  "prior_data_gate_authorization_reused": false,
+  "prior_retrieval_authorization_reused": false,
+  "prior_step_c_authorization_reused": false,
+  "standing_authorization": false
+}

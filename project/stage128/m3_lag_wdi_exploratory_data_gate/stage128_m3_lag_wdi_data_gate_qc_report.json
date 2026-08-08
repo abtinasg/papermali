@@ -1,0 +1,72 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-data-gate",
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "payload_identity_proven_before_decode",
+      "pass": true
+    },
+    {
+      "check": "thresholds_read_from_locked_contract_not_redefined",
+      "pass": true
+    },
+    {
+      "check": "parent_surface_is_the_539_row_retained_m2_sample",
+      "pass": true
+    },
+    {
+      "check": "no_final_test_row_read",
+      "pass": true
+    },
+    {
+      "check": "no_new_world_bank_request",
+      "pass": true
+    },
+    {
+      "check": "no_model_fit",
+      "pass": true
+    },
+    {
+      "check": "no_feature_value_table_materialized",
+      "pass": true
+    },
+    {
+      "check": "verdict_in_vocabulary",
+      "pass": true
+    },
+    {
+      "check": "verdict_invariant_across_calendar_conventions",
+      "pass": true
+    },
+    {
+      "check": "no_exclusions_made",
+      "pass": true
+    },
+    {
+      "check": "no_criteria_weakened",
+      "pass": true
+    },
+    {
+      "check": "step_c_findings_preserved",
+      "pass": true
+    },
+    {
+      "check": "gate_pass_not_published_as_modeling_authorization",
+      "pass": true
+    },
+    {
+      "check": "modeling_still_unauthorized",
+      "pass": true
+    },
+    {
+      "check": "final_test_still_locked",
+      "pass": true
+    },
+    {
+      "check": "five_way_scientific_distinction_recorded",
+      "pass": true
+    }
+  ],
+  "checks_failed": 0,
+  "checks_total": 16
+}
