@@ -349,14 +349,22 @@ def test_only_one_initial_inquiry_is_permitted_and_none_was_faked():
     assert submission["initial_inquiries_successfully_submitted"] <= 1
     assert submission["submission_status"] in (
         "OFFICIAL_INQUIRY_SUBMITTED_PENDING_RESPONSE",
-        "HUMAN_SUBMISSION_REQUIRED")
+        "HUMAN_SUBMISSION_REQUIRED",
+        # written only by the SEPARATE human-submission recording action
+        "SUBMITTED_ACKNOWLEDGED_WAITING_FOR_SUBSTANTIVE_RESPONSE")
     if submission["submission_status"] == "HUMAN_SUBMISSION_REQUIRED":
         assert submission["initial_inquiries_successfully_submitted"] == 0
         assert submission["submission_timestamp_utc"] is None
         assert submission["ticket_id_redacted"] is None
         assert submission["ticket_id_sha256"] is None
         assert submission["external_raw_confirmation_present"] is False
-        assert submission["human_submission_instructions"]
+    else:
+        # a human submitted it: exactly once, and still nothing invented
+        assert submission["initial_inquiries_successfully_submitted"] == 1
+        assert submission["ticket_id_fabricated"] is False
+    # the prepared instructions survive either way, as the record of what was
+    # asked of the human supervisor
+    assert submission["human_submission_instructions"]
 
 
 def test_no_credentials_no_captcha_bypass_and_no_pii_in_git():

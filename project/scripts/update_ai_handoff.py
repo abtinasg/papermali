@@ -2784,6 +2784,10 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # (now merged) evidence capture as the live action and owns both the
         # research pointers and the live PR topology.
         **derive_stage128_m3i2_final_documentary_recovery_markers(root),
+        # Must come after it: the human submission the recovery pointed at has
+        # HAPPENED, so this recording owns the research pointers. It still
+        # admits nothing and authorizes nothing.
+        **derive_stage128_m3i2_inquiry_human_submission_markers(root),
         # Verification record only: it reports how the suite behaved, and is
         # never allowed to move a scientific marker.
         **derive_stage128_m3i2_full_suite_comparison_markers(root),
@@ -4618,9 +4622,39 @@ def render_current_state(record: dict) -> str:
             f"{record.get('stage128_m3i2_inquiry_ticket_id_redacted')} (none "
             "invented) — PII committed to Git = "
             f"{record.get('stage128_m3i2_inquiry_pii_committed_to_git')}",
+            "- **Human submission:** submitted by the human supervisor = "
+            f"{record.get('stage128_m3i2_inquiry_human_authenticated_submission')}"
+            " — displayed timestamp "
+            f"`{record.get('stage128_m3i2_inquiry_submission_timestamp_displayed')}`"
+            " (calendar date "
+            f"`{record.get('stage128_m3i2_inquiry_submission_calendar_date')}`)"
+            " — UTC instant "
+            f"`{record.get('stage128_m3i2_inquiry_submission_timestamp_utc_status')}`"
+            ", never guessed — acknowledgement received = "
+            f"{record.get('stage128_m3i2_inquiry_acknowledgement_received')}, "
+            "substantive response received = "
+            f"{record.get('stage128_m3i2_inquiry_substantive_response_received')}"
+            " — ticket id present = "
+            f"{record.get('stage128_m3i2_inquiry_ticket_id_present')}, "
+            "fabricated = "
+            f"{record.get('stage128_m3i2_inquiry_ticket_id_fabricated')} — "
+            "raw confirmation kept outside Git, SHA-256 "
+            f"`{record.get('stage128_m3i2_inquiry_external_raw_confirmation_sha256')}`"
+            " — body evidence "
+            f"`{record.get('stage128_m3i2_inquiry_body_submission_evidence_status')}`"
+            ", attachments server-enumerated = "
+            f"{record.get('stage128_m3i2_inquiry_attachments_server_enumerated')}",
             "- **Stopping rule:** waiting period "
             f"{record.get('stage128_m3i2_inquiry_waiting_period_business_days')}"
-            " business days — follow-up authorized now = "
+            " business days — status "
+            f"`{record.get('stage128_m3i2_inquiry_waiting_period_status')}` "
+            "through "
+            f"`{record.get('stage128_m3i2_inquiry_waiting_period_completion_date')}`"
+            " — earliest possible follow-up "
+            f"`{record.get('stage128_m3i2_inquiry_follow_up_earliest_calendar_date')}`"
+            " — follow-ups attempted "
+            f"{record.get('stage128_m3i2_inquiry_follow_up_attempted')} — "
+            "follow-up authorized now = "
             f"{record.get('stage128_m3i2_inquiry_follow_up_authorized_now')} — "
             "response adjudication authorized = "
             f"{record.get('stage128_m3i2_response_adjudication_authorized')}",
@@ -6226,20 +6260,33 @@ _STAGE128_M3I2_RECOVERY_TOPOLOGY_REL = (
     f"{_STAGE128_M3I2_RECOVERY_PKG}/"
     "stage128_m3i2_final_official_documentary_recovery_pr_topology.json")
 
-#: Submission outcomes this initiation may legitimately record.
+#: Submission outcomes this initiation may legitimately record. The third value
+#: is written only by the SEPARATE human-submission recording action: the
+#: initiation itself could never reach it, because automation must not sign in.
 _STAGE128_M3I2_RECOVERY_SUBMISSION_STATUSES = (
     "OFFICIAL_INQUIRY_SUBMITTED_PENDING_RESPONSE",
     "HUMAN_SUBMISSION_REQUIRED",
+    "SUBMITTED_ACKNOWLEDGED_WAITING_FOR_SUBSTANTIVE_RESPONSE",
 )
+#: An acknowledgement is a receipt, never an answer.
+_STAGE128_M3I2_HUMAN_SUBMITTED_STATUS = (
+    "SUBMITTED_ACKNOWLEDGED_WAITING_FOR_SUBSTANTIVE_RESPONSE")
 _STAGE128_M3I2_RECOVERY_SEARCH_OUTCOMES = (
     "OFFICIAL_DOCUMENTARY_EVIDENCE_FOUND_DURING_BOUNDED_SEARCH",
     "NO_NEW_DOCUMENTARY_EVIDENCE_IN_BOUNDED_SEARCH",
 )
-#: Pointer only, and explicitly NOT an authorization.
+#: Pointer only, and explicitly NOT an authorization. This maps the LIVE
+#: submission status onto the pointer the FROZEN initiation decision recorded,
+#: so the decision record is never rewritten when the world moves on: once a
+#: human has submitted, the initiation's own "next action" is still the human
+#: submission — that action is simply COMPLETE. The live pointer that succeeds
+#: it is derived from the human-submission package instead.
 _NEXT_ACTION_AFTER_RECOVERY_BY_SUBMISSION_STATUS = {
     "OFFICIAL_INQUIRY_SUBMITTED_PENDING_RESPONSE":
         "stage128-m3i2-final-official-response-adjudication",
     "HUMAN_SUBMISSION_REQUIRED":
+        "stage128-m3i2-final-official-inquiry-human-submission",
+    _STAGE128_M3I2_HUMAN_SUBMITTED_STATUS:
         "stage128-m3i2-final-official-inquiry-human-submission",
 }
 
@@ -6314,6 +6361,68 @@ def derive_stage128_m3i2_final_documentary_recovery_markers(root: str) -> dict:
             if submission.get(field) is not None:
                 raise HandoffError(
                     f"no {field} may exist without a successful submission")
+    elif status == _STAGE128_M3I2_HUMAN_SUBMITTED_STATUS:
+        # A human submitted it exactly once. Everything the Help Desk did NOT
+        # show must stay absent rather than be reconstructed.
+        for field, expected in (
+            ("initial_inquiries_attempted", 1),
+            ("initial_inquiries_successfully_submitted", 1),
+            ("acknowledgement_received", True),
+            ("substantive_response_received", False),
+            ("human_authenticated_submission", True),
+            ("external_raw_confirmation_present", True),
+            ("ticket_id_present", False),
+            ("follow_up_attempted", 0),
+            ("attachments_selected_before_submission", True),
+            # the confirmation e-mail never enumerated the attachments, and the
+            # body was seen but not verified byte-for-byte from raw source
+            ("attachments_server_confirmation_enumerated", False),
+            ("body_hash_byte_verified_from_raw_email_source", False),
+            ("automatic_follow_up_forbidden", True),
+            ("follow_up_before_2026_08_21_forbidden", True),
+            ("waiting_period_status", "ACTIVE"),
+        ):
+            if submission.get(field) != expected:
+                raise HandoffError(
+                    f"M3I-2 inquiry {field} must be {expected!r} once the "
+                    "human submission is recorded")
+        # The confirmation UI displayed no timezone, so no UTC instant exists.
+        for field in ("submission_timestamp_utc",
+                      "submission_timestamp_display_timezone",
+                      "ticket_id_redacted", "ticket_id_sha256"):
+            if submission.get(field) is not None:
+                raise HandoffError(
+                    f"{field} was never displayed and must not be invented")
+        if submission.get("submission_timestamp_utc_status") != (
+                "UNRESOLVED_CONFIRMATION_UI_DID_NOT_DISPLAY_TIMEZONE"):
+            raise HandoffError(
+                "the unresolved UTC timestamp status must be recorded exactly")
+        if submission.get("submission_calendar_date") != "2026-08-06":
+            raise HandoffError("the displayed submission date is 2026-08-06")
+        if submission.get("waiting_period_completion_date") != "2026-08-20":
+            raise HandoffError(
+                "10 business days from 2026-08-06 completes on 2026-08-20")
+        if submission.get("follow_up_earliest_calendar_date") != "2026-08-21":
+            raise HandoffError(
+                "the earliest possible follow-up date is 2026-08-21")
+        if submission.get("canonical_body_sha256") != submission.get(
+                "submitted_body_sha256"):
+            raise HandoffError(
+                "the canonical inquiry body hash must not have changed")
+        if submission.get("external_raw_confirmation_sha256") != (
+                "14060eef17ccb52838433d8186b3e476d1a703d2476bb37cbd9b5aa8e0a9"
+                "31f6"):
+            raise HandoffError(
+                "the external raw confirmation hash must match exactly")
+        evidence = submission.get("external_confirmation_evidence")
+        if not isinstance(evidence, list) or len(evidence) != 3:
+            raise HandoffError(
+                "three external confirmation copies were recorded")
+        for row in evidence:
+            if row.get("stored_outside_repository") is not True or row.get(
+                    "committed_to_git") is not False:
+                raise HandoffError(
+                    "raw confirmation evidence stays outside Git")
 
     # Nothing may be fabricated, bypassed or leaked.
     for field, expected in (
@@ -6461,6 +6570,39 @@ def derive_stage128_m3i2_final_documentary_recovery_markers(root: str) -> dict:
             submission.get("fx_questions_sha256"),
         "stage128_m3i2_inquiry_ticket_id_redacted":
             submission.get("ticket_id_redacted"),
+        "stage128_m3i2_inquiry_ticket_id_present":
+            bool(submission.get("ticket_id_present")),
+        "stage128_m3i2_inquiry_ticket_id_fabricated": False,
+        "stage128_m3i2_inquiry_acknowledgement_received":
+            bool(submission.get("acknowledgement_received")),
+        "stage128_m3i2_inquiry_substantive_response_received":
+            bool(submission.get("substantive_response_received")),
+        "stage128_m3i2_inquiry_human_authenticated_submission":
+            bool(submission.get("human_authenticated_submission")),
+        "stage128_m3i2_inquiry_external_raw_confirmation_present":
+            bool(submission.get("external_raw_confirmation_present")),
+        "stage128_m3i2_inquiry_external_raw_confirmation_sha256":
+            submission.get("external_raw_confirmation_sha256"),
+        "stage128_m3i2_inquiry_submission_timestamp_displayed":
+            submission.get("submission_timestamp_displayed"),
+        "stage128_m3i2_inquiry_submission_timestamp_utc":
+            submission.get("submission_timestamp_utc"),
+        "stage128_m3i2_inquiry_submission_timestamp_utc_status":
+            submission.get("submission_timestamp_utc_status"),
+        "stage128_m3i2_inquiry_submission_calendar_date":
+            submission.get("submission_calendar_date"),
+        "stage128_m3i2_inquiry_body_submission_evidence_status":
+            submission.get("body_submission_evidence_status"),
+        "stage128_m3i2_inquiry_attachments_server_enumerated":
+            bool(submission.get("attachments_server_confirmation_enumerated")),
+        "stage128_m3i2_inquiry_waiting_period_status":
+            submission.get("waiting_period_status"),
+        "stage128_m3i2_inquiry_waiting_period_completion_date":
+            submission.get("waiting_period_completion_date"),
+        "stage128_m3i2_inquiry_follow_up_earliest_calendar_date":
+            submission.get("follow_up_earliest_calendar_date"),
+        "stage128_m3i2_inquiry_follow_up_attempted":
+            submission.get("follow_up_attempted", 0),
         "stage128_m3i2_inquiry_pii_committed_to_git": False,
         "stage128_m3i2_inquiry_follow_up_authorized_now": False,
         "stage128_m3i2_inquiry_waiting_period_business_days": 10,
@@ -6510,6 +6652,211 @@ def derive_stage128_m3i2_final_documentary_recovery_markers(root: str) -> dict:
         "last_completed_research_action_id":
             _STAGE128_M3I2_RECOVERY_ACTION_ID,
         "next_research_action_id": next_action,
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
+    }
+
+
+_STAGE128_M3I2_INQUIRY_SUBMISSION_PKG = (
+    "project/stage128/m3i2_final_official_inquiry_human_submission")
+_STAGE128_M3I2_INQUIRY_SUBMISSION_ACTION_ID = (
+    "stage128-m3i2-final-official-inquiry-human-submission")
+_STAGE128_M3I2_INQUIRY_SUBMISSION_DECISION_REL = (
+    f"{_STAGE128_M3I2_INQUIRY_SUBMISSION_PKG}/"
+    "stage128_m3i2_final_official_inquiry_submission_decision.json")
+_STAGE128_M3I2_INQUIRY_SUBMISSION_BOUNDARY_REL = (
+    f"{_STAGE128_M3I2_INQUIRY_SUBMISSION_PKG}/"
+    "stage128_m3i2_final_official_inquiry_governance_boundary.json")
+_STAGE128_M3I2_INQUIRY_SUBMISSION_AUTHORIZATION_REL = (
+    f"{_STAGE128_M3I2_INQUIRY_SUBMISSION_PKG}/"
+    "stage128_m3i2_final_official_inquiry_human_authorization_record.json")
+_STAGE128_M3I2_INQUIRY_RESPONSE_INGESTION_ACTION_ID = (
+    "stage128-m3i2-final-official-inquiry-response-ingestion")
+_STAGE128_M3I2_INQUIRY_FOLLOW_UP_ACTION_ID = (
+    "stage128-m3i2-final-official-inquiry-one-follow-up")
+
+
+def derive_stage128_m3i2_inquiry_human_submission_markers(root: str) -> dict:
+    """Recognize the sanitized recording of the HUMAN inquiry submission.
+
+    The action is a RECORDING: a human supervisor submitted the prepared
+    inquiry exactly once and an acknowledgement came back. An acknowledgement
+    is a receipt, not an answer, so this deriver admits nothing, resolves
+    neither blocker and authorizes neither a follow-up nor any ingestion of a
+    response. It fails closed on any artifact that claims otherwise, and in
+    particular on any attempt to invent the ticket id or the UTC instant that
+    the confirmation UI never displayed.
+
+    Returns {} before the submission recording exists.
+    """
+    path = os.path.join(root, _STAGE128_M3I2_INQUIRY_SUBMISSION_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        decision = json.load(fh)
+    with open(os.path.join(
+            root, _STAGE128_M3I2_INQUIRY_SUBMISSION_BOUNDARY_REL),
+            encoding="utf-8") as fh:
+        boundary = json.load(fh)
+    with open(os.path.join(
+            root, _STAGE128_M3I2_INQUIRY_SUBMISSION_AUTHORIZATION_REL),
+            encoding="utf-8") as fh:
+        authorization = json.load(fh)
+
+    for record, label in ((decision, "decision"), (boundary, "boundary"),
+                          (authorization, "authorization")):
+        if record.get("action_id") != (
+                _STAGE128_M3I2_INQUIRY_SUBMISSION_ACTION_ID):
+            raise HandoffError(
+                f"M3I-2 inquiry submission {label} action_id mismatch")
+
+    if decision.get("submission_status") != (
+            _STAGE128_M3I2_HUMAN_SUBMITTED_STATUS):
+        raise HandoffError(
+            "the recorded M3I-2 inquiry submission status must be "
+            f"{_STAGE128_M3I2_HUMAN_SUBMITTED_STATUS}")
+
+    # The authorization is identified by its text, never by its hash alone,
+    # and this recording consumes it. It authorizes no merge.
+    text = authorization.get("authorization_text") or ""
+    if len(text.encode("utf-8")) != authorization.get(
+            "authorization_utf8_bytes"):
+        raise HandoffError(
+            "the recorded authorization byte length must match its text")
+    if hashlib.sha256(text.encode("utf-8")).hexdigest() != (
+            authorization.get("authorization_sha256")):
+        raise HandoffError(
+            "the recorded authorization hash must match its text")
+    for field, expected in (
+        ("scope_identified_by_hash_alone", False),
+        ("authorization_consumed_by_this_recording", True),
+        ("standing_authorization", False),
+        ("merge_authorized", False),
+    ):
+        if authorization.get(field) is not expected:
+            raise HandoffError(
+                f"M3I-2 inquiry submission authorization {field} must be "
+                f"{expected}")
+
+    # Nothing executed, nothing sent again, nothing personal touched.
+    for field in ("coverage_calculations", "feature_materializations",
+                  "data_gate_executions", "model_fits", "predictions",
+                  "predictive_metrics", "wdi_archive_downloads",
+                  "network_requests"):
+        if boundary.get(field) != 0:
+            raise HandoffError(
+                f"M3I-2 inquiry submission recording {field} must be 0")
+    for field, expected in (
+        ("resubmission_executed", False),
+        ("new_documentary_search_executed", False),
+        ("gmail_or_personal_account_accessed", False),
+        ("response_ingestion_authorized", False),
+        ("response_adjudication_authorized", False),
+        ("conditional_follow_up_authorized", False),
+        ("follow_up_authorized_now", False),
+        ("follow_up_before_2026_08_21_forbidden", True),
+        ("ready_for_review_authorized", False),
+        ("merge_authorized", False),
+        ("next_research_action_authorized", False),
+        ("final_test_locked", True),
+        ("m4_authorized", False),
+        ("m3i2_admitted", False),
+    ):
+        if boundary.get(field) is not expected:
+            raise HandoffError(
+                f"M3I-2 inquiry submission boundary {field} must be "
+                f"{expected}")
+    if boundary.get("conditional_follow_up_action_id") != (
+            _STAGE128_M3I2_INQUIRY_FOLLOW_UP_ACTION_ID):
+        raise HandoffError(
+            "the conditional follow-up pointer id must be "
+            f"{_STAGE128_M3I2_INQUIRY_FOLLOW_UP_ACTION_ID}")
+    if boundary.get("conditional_follow_up_earliest_date") != "2026-08-21":
+        raise HandoffError("the earliest possible follow-up date is 2026-08-21")
+
+    # An acknowledgement moves no science.
+    if decision.get("scientific_effect") != "NONE":
+        raise HandoffError(
+            "recording an acknowledgement has no scientific effect")
+    for field, expected in (
+        ("archive_release_blocker_resolved", False),
+        ("fx_semantic_continuity_blocker_resolved", False),
+        ("blocker_1_resolved", False),
+        ("blocker_2_resolved", False),
+        ("m3i2_admitted", False),
+        ("final_test_locked", True),
+        ("m4_authorized", False),
+        ("merge_authorized", False),
+        ("next_research_action_authorized", False),
+        ("paper_winner_selected", False),
+    ):
+        if decision.get(field) is not expected:
+            raise HandoffError(
+                f"M3I-2 inquiry submission decision {field} must be "
+                f"{expected}")
+    if decision.get("m3i2_evidence_status") != (
+            "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE"):
+        raise HandoffError("M3I-2 evidence must remain UNRESOLVED")
+    if decision.get("m3_cbi_status") != "UNRESOLVED_M3_DATA_GATE":
+        raise HandoffError("the M3-CBI Gate status must be preserved")
+    if decision.get("m3_lag_wdi_authoritative_contract_status") != "NOT_LOCKED":
+        raise HandoffError("M3-LAG-WDI must remain NOT_LOCKED")
+    if decision.get("data_gate_status") != "NOT_EXECUTED":
+        raise HandoffError("the Data Gate must remain NOT_EXECUTED")
+    if decision.get("verified_wdi_release_dates") != 0 or decision.get(
+            "verified_pre_cutoff_editions") != 0:
+        raise HandoffError(
+            "an acknowledgement verifies no release date and no edition")
+    if decision.get("unresolved_cutoffs") != decision.get(
+            "unresolved_cutoffs_total"):
+        raise HandoffError("every cutoff must remain unresolved")
+    if decision.get("unresolved_development_pairs") != decision.get(
+            "unresolved_development_pairs_total"):
+        raise HandoffError("every development pair must remain unresolved")
+    cpi = decision.get("cpi_semantic_compatibility") or {}
+    fx = decision.get("fx_semantic_compatibility") or {}
+    if cpi.get("fail_integrity") or fx.get("fail_integrity"):
+        raise HandoffError(
+            "no semantic-compatibility integrity failure may appear here")
+    if fx.get("pass"):
+        raise HandoffError(
+            "FX semantic continuity is still UNRESOLVED for every edition")
+
+    if decision.get("next_research_action_id") != (
+            _STAGE128_M3I2_INQUIRY_RESPONSE_INGESTION_ACTION_ID):
+        raise HandoffError(
+            "the pointer after the human submission is "
+            f"{_STAGE128_M3I2_INQUIRY_RESPONSE_INGESTION_ACTION_ID}")
+    if decision.get("last_completed_research_action_id") != (
+            _STAGE128_M3I2_INQUIRY_SUBMISSION_ACTION_ID):
+        raise HandoffError(
+            "the human submission is the last completed research action")
+
+    return {
+        "stage128_m3i2_inquiry_human_submission_recorded": True,
+        "stage128_m3i2_inquiry_human_submission_result_code":
+            decision.get("result_code"),
+        "stage128_m3i2_inquiry_authorization_sha256":
+            authorization.get("authorization_sha256"),
+        "stage128_m3i2_inquiry_authorization_utf8_bytes":
+            authorization.get("authorization_utf8_bytes"),
+        "stage128_m3i2_inquiry_authorization_consumed": True,
+        "stage128_m3i2_inquiry_resubmission_executed": False,
+        "stage128_m3i2_inquiry_response_ingestion_authorized": False,
+        "stage128_m3i2_inquiry_conditional_follow_up_action_id":
+            _STAGE128_M3I2_INQUIRY_FOLLOW_UP_ACTION_ID,
+        "stage128_m3i2_inquiry_conditional_follow_up_earliest_date":
+            boundary.get("conditional_follow_up_earliest_date"),
+        "stage128_m3i2_inquiry_conditional_follow_up_authorized": False,
+        "stage128_m3i2_inquiry_gmail_or_personal_account_accessed": False,
+        "stage128_m3i2_inquiry_submission_recording_pr_is_draft": True,
+        "stage128_m3i2_inquiry_submission_recording_merge_authorized": False,
+        # Pointers. The human submission IS a completed research action; what
+        # it publishes is informational and explicitly unauthorized.
+        "last_completed_research_action_id":
+            _STAGE128_M3I2_INQUIRY_SUBMISSION_ACTION_ID,
+        "next_research_action_id":
+            _STAGE128_M3I2_INQUIRY_RESPONSE_INGESTION_ACTION_ID,
         "next_research_action_authorized": False,
         "next_research_action_pointer_is_not_authorization": True,
     }

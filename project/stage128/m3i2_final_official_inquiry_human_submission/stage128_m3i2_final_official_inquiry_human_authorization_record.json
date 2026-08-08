@@ -1,0 +1,39 @@
+{
+  "action_id": "stage128-m3i2-final-official-inquiry-human-submission",
+  "authorization_consumed": true,
+  "authorization_consumed_by_this_recording": true,
+  "authorization_covers": [
+    "recording_of_the_already_completed_human_inquiry_submission",
+    "sanitized_hash_only_registration_of_external_confirmation_evidence",
+    "update_of_the_canonical_world_bank_inquiry_submission_record",
+    "roadmap_and_open_tasks_pointer_update",
+    "creation_of_one_draft_pull_request"
+  ],
+  "authorization_excludes": [
+    "resubmission_of_the_inquiry",
+    "reply_or_follow_up",
+    "gmail_or_personal_account_access",
+    "receipt_or_adjudication_of_a_world_bank_response",
+    "new_documentary_search",
+    "wdi_archive_download",
+    "data_gate",
+    "coverage",
+    "feature_materialization",
+    "modeling",
+    "final_test_access",
+    "m3_lag_wdi_contract_lock",
+    "m4",
+    "ready_for_review",
+    "merge"
+  ],
+  "authorization_scope": "stage128-m3i2-final-official-inquiry-human-submission",
+  "authorization_sha256": "4562e480db041f93bdd9f565ee65d6e3664243e12f00126a8d42759bb3717978",
+  "authorization_text": "ثبت ارسال استعلام بانک جهانی در GitHub را مجاز می‌دانم.",
+  "authorization_type": "one_action_authorization",
+  "authorization_utf8_bytes": 95,
+  "authorized_action_id": "stage128-m3i2-final-official-inquiry-human-submission",
+  "expected_baseline_sha": "89d8e6ff2d12ec82903cd28aa7ab839eb946b658",
+  "merge_authorized": false,
+  "scope_identified_by_hash_alone": false,
+  "standing_authorization": false
+}

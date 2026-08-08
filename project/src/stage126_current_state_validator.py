@@ -783,6 +783,86 @@ def stage128_m3i2_final_documentary_recovery_initiated(repo_root: Path) -> bool:
     return True
 
 
+STAGE128_M3I2_INQUIRY_SUBMISSION_ACTION_ID = (
+    "stage128-m3i2-final-official-inquiry-human-submission")
+_STAGE128_M3I2_INQUIRY_SUBMISSION_DECISION_REL = (
+    "project/stage128/m3i2_final_official_inquiry_human_submission/"
+    "stage128_m3i2_final_official_inquiry_submission_decision.json")
+STAGE128_M3I2_INQUIRY_SUBMITTED_STATUS = (
+    "SUBMITTED_ACKNOWLEDGED_WAITING_FOR_SUBSTANTIVE_RESPONSE")
+#: 10 business days, Mon-Fri, submission day excluded, holidays not modeled.
+STAGE128_M3I2_INQUIRY_SUBMISSION_CALENDAR_DATE = "2026-08-06"
+STAGE128_M3I2_INQUIRY_WAITING_PERIOD_COMPLETION_DATE = "2026-08-20"
+STAGE128_M3I2_INQUIRY_FOLLOW_UP_EARLIEST_DATE = "2026-08-21"
+
+
+def stage128_m3i2_inquiry_human_submission_recorded(repo_root: Path) -> bool:
+    """True once the HUMAN submission of the M3I-2 inquiry has been recorded.
+
+    The recording is sanitized and governance-only: a human submitted the
+    prepared inquiry exactly once, an acknowledgement came back, and that is
+    all. It admits nothing, resolves neither blocker, executes no Data Gate and
+    authorizes no follow-up, so this recognizer fails closed on any artifact
+    that claims otherwise.
+    """
+    path = repo_root / _STAGE128_M3I2_INQUIRY_SUBMISSION_DECISION_REL
+    if not path.is_file():
+        return False
+    decision = json.loads(path.read_text(encoding="utf-8"))
+    if decision.get("action_id") != STAGE128_M3I2_INQUIRY_SUBMISSION_ACTION_ID:
+        raise ValidationFail("stage128 M3I-2 inquiry submission action_id "
+                             "mismatch")
+    if decision.get("submission_status") != (
+            STAGE128_M3I2_INQUIRY_SUBMITTED_STATUS):
+        raise ValidationFail(
+            "the recorded M3I-2 inquiry submission status must be "
+            f"{STAGE128_M3I2_INQUIRY_SUBMITTED_STATUS}")
+    for field, expected in (
+        ("m3i2_admitted", False),
+        ("archive_release_blocker_resolved", False),
+        ("fx_semantic_continuity_blocker_resolved", False),
+        ("final_test_locked", True),
+        ("m4_authorized", False),
+        ("merge_authorized", False),
+        ("next_research_action_authorized", False),
+    ):
+        if decision.get(field) is not expected:
+            raise ValidationFail(
+                f"stage128 M3I-2 inquiry submission {field} != {expected}")
+    if decision.get("m3i2_evidence_status") != (
+            "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE"):
+        raise ValidationFail(
+            "an acknowledged inquiry is not evidence: M3I-2 must stay "
+            "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE")
+    if decision.get("m3_lag_wdi_authoritative_contract_status") != "NOT_LOCKED":
+        raise ValidationFail("M3-LAG-WDI must remain NOT_LOCKED")
+    if decision.get("m3_cbi_status") != "UNRESOLVED_M3_DATA_GATE":
+        raise ValidationFail(
+            "the M3I-2 inquiry submission must preserve the M3-CBI Gate "
+            "status")
+    if decision.get("data_gate_status") != "NOT_EXECUTED":
+        raise ValidationFail("the Data Gate must remain NOT_EXECUTED")
+    if decision.get("verified_wdi_release_dates") != 0 or decision.get(
+            "verified_pre_cutoff_editions") != 0:
+        raise ValidationFail(
+            "an acknowledgement verifies no release date and no edition")
+    if decision.get("unresolved_cutoffs") != decision.get(
+            "unresolved_cutoffs_total"):
+        raise ValidationFail("every cutoff must remain unresolved")
+    if decision.get("unresolved_development_pairs") != decision.get(
+            "unresolved_development_pairs_total"):
+        raise ValidationFail("every development pair must remain unresolved")
+    if decision.get("waiting_period_status") != "ACTIVE":
+        raise ValidationFail("the M3I-2 inquiry waiting period must be ACTIVE")
+    if decision.get("waiting_period_completion_date") != (
+            STAGE128_M3I2_INQUIRY_WAITING_PERIOD_COMPLETION_DATE):
+        raise ValidationFail(
+            "10 business days from "
+            f"{STAGE128_M3I2_INQUIRY_SUBMISSION_CALENDAR_DATE} complete on "
+            f"{STAGE128_M3I2_INQUIRY_WAITING_PERIOD_COMPLETION_DATE}")
+    return True
+
+
 #: PR #73 was merged into main by this commit; PR #74 was retargeted after.
 STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT = (
     "e6db63fb7d105f0d3a39db101c9e364161c367e9")
@@ -1239,6 +1319,15 @@ def expected_next_research_action_id(
         # A pointer is never an authorization. Once the evidence capture has
         # itself been recorded, the pointer advances to whatever that capture's
         # OWN decision names - still unauthorized.
+        # The human submission the recovery pointed at has since HAPPENED, so
+        # the live pointer advances past it to whatever the submission
+        # recording's OWN decision names - still unauthorized.
+        if stage128_m3i2_inquiry_human_submission_recorded(repo_root):
+            decision = json.loads(
+                (repo_root
+                 / _STAGE128_M3I2_INQUIRY_SUBMISSION_DECISION_REL).read_text(
+                    encoding="utf-8"))
+            return decision["next_research_action_id"]
         if stage128_m3i2_final_documentary_recovery_initiated(repo_root):
             decision = json.loads(
                 (repo_root / _STAGE128_M3I2_RECOVERY_DECISION_REL).read_text(
@@ -2723,6 +2812,9 @@ def build_assertions(
         or (retained_block_done
             and handoff.get("last_completed_research_action_id")
             == STAGE128_M2_RETAINED_BLOCK_DECISION_ACTION_ID)
+        or (stage128_m3i2_inquiry_human_submission_recorded(repo_root)
+            and handoff.get("last_completed_research_action_id")
+            == STAGE128_M3I2_INQUIRY_SUBMISSION_ACTION_ID)
         or (stage128_m3i2_final_documentary_recovery_initiated(repo_root)
             and handoff.get("last_completed_research_action_id")
             == STAGE128_M3I2_RECOVERY_ACTION_ID)

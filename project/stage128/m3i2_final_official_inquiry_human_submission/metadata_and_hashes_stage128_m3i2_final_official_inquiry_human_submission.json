@@ -1,0 +1,42 @@
+{
+  "action_id": "stage128-m3i2-final-official-inquiry-human-submission",
+  "authorization_sha256": "4562e480db041f93bdd9f565ee65d6e3664243e12f00126a8d42759bb3717978",
+  "authorization_utf8_bytes": 95,
+  "baseline_commit": "89d8e6ff2d12ec82903cd28aa7ab839eb946b658",
+  "canonical_submission_record": {
+    "bytes": 5640,
+    "path": "project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_world_bank_inquiry_submission_record.json",
+    "sha256": "5e464d17ad32be0f7dc99e3b5563a54f2182acf1897d5241c72c9f970bf37b1d"
+  },
+  "external_confirmation_hashes_only": true,
+  "package_files": {
+    "README_STAGE128_M3I2_FINAL_OFFICIAL_INQUIRY_HUMAN_SUBMISSION.md": {
+      "bytes": 4937,
+      "sha256": "e256472548e7b4d812b070d060bbefceae82920a6d59a392ffcf516ff1f42dde"
+    },
+    "stage128_m3i2_final_official_inquiry_governance_boundary.json": {
+      "bytes": 2146,
+      "sha256": "a997ea08791d27bdcc724137c73295364c31ce68d80dc8d5b40c43422f0d8466"
+    },
+    "stage128_m3i2_final_official_inquiry_human_authorization_record.json": {
+      "bytes": 1568,
+      "sha256": "3d110f151ae03360996558b4eb41f46c4a71ba12ee313bbcc3f2af93192cf2a7"
+    },
+    "stage128_m3i2_final_official_inquiry_submission_decision.json": {
+      "bytes": 1563,
+      "sha256": "c8e2ae15faceaf4cbce0cbe61a13f7e8427415d7da0df815bd6b7c39601f8d6a"
+    },
+    "stage128_m3i2_final_official_inquiry_submission_evidence_record.json": {
+      "bytes": 3562,
+      "sha256": "b9e3e47018b0116ecec1250212c3b4edcc218af414029a37d7dbd3dc0d785cea"
+    },
+    "stage128_m3i2_final_official_inquiry_submission_qc_report.json": {
+      "bytes": 3812,
+      "sha256": "d19d866239dbe4a9afd327b2cff88bc4e208da8ea819d1f48a8d40155b1aa3dc"
+    }
+  },
+  "package_id": "stage128_m3i2_final_official_inquiry_human_submission",
+  "pii_committed_to_git": false,
+  "raw_emails_committed": 0,
+  "raw_screenshots_committed": 0
+}

@@ -1,0 +1,153 @@
+{
+  "action_id": "stage128-m3i2-final-official-inquiry-human-submission",
+  "all_pass": true,
+  "checks": [
+    {
+      "id": "QC01",
+      "name": "exactly one initial inquiry was attempted",
+      "observed": 1,
+      "status": "PASS"
+    },
+    {
+      "id": "QC02",
+      "name": "exactly one initial inquiry was successfully submitted",
+      "observed": 1,
+      "status": "PASS"
+    },
+    {
+      "id": "QC03",
+      "name": "the initial-inquiry ceiling is still exactly one",
+      "observed": 1,
+      "status": "PASS"
+    },
+    {
+      "id": "QC04",
+      "name": "an acknowledgement was received",
+      "observed": true,
+      "status": "PASS"
+    },
+    {
+      "id": "QC05",
+      "name": "no substantive World Bank response was received",
+      "observed": false,
+      "status": "PASS"
+    },
+    {
+      "id": "QC06",
+      "name": "no ticket id was displayed and none was fabricated",
+      "observed": null,
+      "status": "PASS"
+    },
+    {
+      "id": "QC07",
+      "name": "no ticket id hash was fabricated",
+      "observed": null,
+      "status": "PASS"
+    },
+    {
+      "id": "QC08",
+      "name": "the external raw confirmation hash is recorded exactly",
+      "observed": "14060eef17ccb52838433d8186b3e476d1a703d2476bb37cbd9b5aa8e0a931f6",
+      "status": "PASS"
+    },
+    {
+      "id": "QC09",
+      "name": "no screenshot or e-mail file was committed to Git",
+      "observed": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "QC10",
+      "name": "no personal name or e-mail address appears in committed files",
+      "observed": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "QC11",
+      "name": "the body-hash claim is not overstated",
+      "observed": "CANONICAL_BODY_VISUALLY_CONFIRMED_NOT_RAW_BYTE_VERIFIED",
+      "status": "PASS"
+    },
+    {
+      "id": "QC12",
+      "name": "both attachment hashes are unchanged",
+      "observed": 2,
+      "status": "PASS"
+    },
+    {
+      "id": "QC13",
+      "name": "attachments were selected but not server-enumerated",
+      "observed": false,
+      "status": "PASS"
+    },
+    {
+      "id": "QC14",
+      "name": "the UTC instant is unresolved and was not guessed",
+      "observed": "UNRESOLVED_CONFIRMATION_UI_DID_NOT_DISPLAY_TIMEZONE",
+      "status": "PASS"
+    },
+    {
+      "id": "QC15",
+      "name": "the waiting period completes on 2026-08-20",
+      "observed": "2026-08-20",
+      "status": "PASS"
+    },
+    {
+      "id": "QC16",
+      "name": "the earliest possible follow-up date is 2026-08-21",
+      "observed": "2026-08-21",
+      "status": "PASS"
+    },
+    {
+      "id": "QC17",
+      "name": "no follow-up is authorized and none was attempted",
+      "observed": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "QC18",
+      "name": "response ingestion and adjudication remain unauthorized",
+      "observed": false,
+      "status": "PASS"
+    },
+    {
+      "id": "QC19",
+      "name": "no scientific blocker was resolved",
+      "observed": false,
+      "status": "PASS"
+    },
+    {
+      "id": "QC20",
+      "name": "M3I-2 remains unresolved and unadmitted",
+      "observed": "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE",
+      "status": "PASS"
+    },
+    {
+      "id": "QC21",
+      "name": "the Data Gate remains NOT_EXECUTED",
+      "observed": "NOT_EXECUTED",
+      "status": "PASS"
+    },
+    {
+      "id": "QC22",
+      "name": "M3-LAG-WDI remains NOT_LOCKED",
+      "observed": "NOT_LOCKED",
+      "status": "PASS"
+    },
+    {
+      "id": "QC23",
+      "name": "the Final Test remains locked and M4 unauthorized",
+      "observed": true,
+      "status": "PASS"
+    },
+    {
+      "id": "QC24",
+      "name": "no merge is authorized and the PR stays a Draft",
+      "observed": false,
+      "status": "PASS"
+    }
+  ],
+  "failed_count": 0,
+  "passed_count": 24,
+  "total_count": 24
+}
