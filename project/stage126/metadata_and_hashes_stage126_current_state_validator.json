@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 142,
+  "assertion_count": 149,
   "assertions": [
     {
       "detail": "",
@@ -698,6 +698,41 @@
       "status": "PASS"
     },
     {
+      "detail": "the immediate Track B pointer is retrieval ONLY, it does not execute the Data Gate, and it is not authorized",
+      "name": "m3_lag_wdi_next_action_is_retrieval_only",
+      "status": "PASS"
+    },
+    {
+      "detail": "the M3-LAG-WDI Data Gate is a SEPARATE action with its own identity, it is unauthorized, and it requires a new explicit human authorization",
+      "name": "m3_lag_wdi_data_gate_is_a_separate_unauthorized_action",
+      "status": "PASS"
+    },
+    {
+      "detail": "an authorization to retrieve is never an authorization to execute the Data Gate, and the two may not be combined into one action",
+      "name": "m3_lag_wdi_retrieval_authorization_never_authorizes_the_gate",
+      "status": "PASS"
+    },
+    {
+      "detail": "a Data Gate PASS is DATA ADMISSION ONLY and authorizes no modeling",
+      "name": "m3_lag_wdi_gate_pass_admits_data_and_authorizes_no_modeling",
+      "status": "PASS"
+    },
+    {
+      "detail": "the documentary-recovery INITIATION is PR #76, merged by 89d8e6ff2d12ec82903cd28aa7ab839eb946b658, whatever is live now",
+      "name": "m3i2_documentary_recovery_pr_stays_pr76",
+      "status": "PASS"
+    },
+    {
+      "detail": "the human inquiry submission RECORDING keeps its own separate identity as PR #77",
+      "name": "m3i2_human_submission_pr_stays_separately_represented",
+      "status": "PASS"
+    },
+    {
+      "detail": "the documentary recovery, the human submission and the live Draft stay three distinct PRs with three distinct roles",
+      "name": "m3i2_three_pr_roles_are_never_collapsed_or_shifted",
+      "status": "PASS"
+    },
+    {
       "detail": "ROADMAP prose naming the authoritative pointers must name exactly the front-matter pair (stage128-m3i2-final-official-inquiry-human-submission / stage128-m3i2-final-official-inquiry-response-ingestion)",
       "name": "roadmap_prose_agrees_with_front_matter_pointers",
       "status": "PASS"
@@ -714,7 +749,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "724a1b5ae8163eea4e406f1aa9527f3a05a8a938",
+  "code_commit": "9d530fcbf7cfc767a6bc755277a4f3188802bf2b",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -722,7 +757,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "724a1b5ae8163eea4e406f1aa9527f3a05a8a938",
+  "generated_at": "9d530fcbf7cfc767a6bc755277a4f3188802bf2b",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -740,7 +775,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "8ffb5fa524beda0ab6d6433156b62f7111aa50228e0beb33501c759af7661bb6",
+  "source_file_sha256": "2320a635a8b77db837d2b01b1b72882b517a1c7057f906befa92d98ef262a4f4",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {

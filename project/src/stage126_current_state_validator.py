@@ -905,6 +905,46 @@ STAGE128_M3_LAG_MERGED_PREDECESSOR_PR = 77
 STAGE128_M3_LAG_MERGED_PREDECESSOR_COMMIT = (
     "93de6bae9344ce893b0261f818abce8a991cf842")
 
+#: HISTORICAL PR ROLES — pinned facts. PR #76 carried the final official
+#: documentary recovery INITIATION; PR #77 carried the later HUMAN inquiry
+#: submission RECORDING. Two different actions, two different PRs, two
+#: different merge commits. "The recovery PR" is a name for the first of them,
+#: never a moving label for "whatever merged most recently", so re-anchoring
+#: the live topology onto a newer Draft may not shift either role.
+STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR = 76
+STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT = (
+    "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
+STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE = (
+    "final_official_documentary_recovery_initiation_pr")
+STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_SEMANTICS = (
+    "merged_predecessor_superseded_by_pr77")
+STAGE128_M3I2_HUMAN_SUBMISSION_PR = 77
+STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT = (
+    "93de6bae9344ce893b0261f818abce8a991cf842")
+STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE = (
+    "final_official_inquiry_human_submission_recording_pr")
+
+#: Track B's future actions. Each is SEPARATE, and each needs its own new
+#: explicit human authorization: retrieving does not authorize the Gate, and a
+#: Gate PASS is data admission only and does not authorize modeling.
+STAGE128_M3_LAG_RETRIEVAL_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-data-retrieval")
+STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-post-retrieval-audit")
+STAGE128_M3_LAG_DATA_GATE_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-data-gate")
+STAGE128_M3_LAG_MODELING_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-incremental-evaluation")
+STAGE128_M3_LAG_NEXT_ACTION_SCOPE = "retrieval_only"
+#: (step, action_id, executes_retrieval, executes_gate, executes_modeling)
+STAGE128_M3_LAG_ACTION_SEQUENCE = (
+    ("A", "stage128-m3-lag-wdi-exploratory-contract-lock", False, False, False),
+    ("B", STAGE128_M3_LAG_RETRIEVAL_ACTION_ID, True, False, False),
+    ("C", STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID, False, False, False),
+    ("D", STAGE128_M3_LAG_DATA_GATE_ACTION_ID, False, True, False),
+    ("E", STAGE128_M3_LAG_MODELING_ACTION_ID, False, False, True),
+)
+
 
 def stage128_m3_lag_wdi_exploratory_contract_locked(repo_root: Path) -> bool:
     """True once the M3-LAG-WDI exploratory contract is authoritatively locked.
@@ -1171,6 +1211,145 @@ def stage128_m3_lag_wdi_exploratory_contract_locked(repo_root: Path) -> bool:
             "predecessor_pr_merge_commit"):
         raise ValidationFail(
             "the live PR base must equal the predecessor merge commit")
+
+    # Historical PR roles are pinned facts, never re-derived from adjacency.
+    for field, expected, label in (
+        ("documentary_recovery_pr_number",
+         STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR,
+         "the documentary-recovery INITIATION PR"),
+        ("documentary_recovery_pr_merge_commit",
+         STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT,
+         "the documentary-recovery PR merge commit"),
+        ("documentary_recovery_pr_role",
+         STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE,
+         "the documentary-recovery PR role"),
+        ("documentary_recovery_pr_semantics",
+         STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_SEMANTICS,
+         "the documentary-recovery PR supersession semantics"),
+        ("human_submission_pr_number", STAGE128_M3I2_HUMAN_SUBMISSION_PR,
+         "the human-submission RECORDING PR"),
+        ("human_submission_pr_merge_commit",
+         STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT,
+         "the human-submission PR merge commit"),
+        ("human_submission_pr_role", STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE,
+         "the human-submission PR role"),
+    ):
+        if topology.get(field) != expected:
+            raise ValidationFail(f"{label} is pinned to {expected!r}")
+    if topology.get("pr_roles_re_derived_from_adjacency") is not False:
+        raise ValidationFail(
+            "PR roles may never be re-derived from adjacency")
+    if topology.get("pr_roles_are_historical_facts_not_positional") is not (
+            True):
+        raise ValidationFail("PR roles must be recorded as historical facts")
+    if not (STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR
+            < STAGE128_M3I2_HUMAN_SUBMISSION_PR < live_number):
+        raise ValidationFail(
+            "the documentary recovery, the human submission and the live "
+            "Draft must stay three distinct PRs in order")
+    if topology.get("documentary_recovery_pr_merge_commit") == topology.get(
+            "human_submission_pr_merge_commit"):
+        raise ValidationFail(
+            "the two merged historical PRs have two DIFFERENT merge commits")
+    if [(entry.get("pr_number"), entry.get("role"), entry.get("merged"))
+            for entry in (topology.get("pr_role_sequence") or [])] != [
+        (STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR,
+         STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE, True),
+        (STAGE128_M3I2_HUMAN_SUBMISSION_PR,
+         STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE, True),
+        (live_number, topology.get("live_pr_role"), False),
+    ]:
+        raise ValidationFail(
+            "the PR role sequence must be exactly "
+            f"#{STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR} -> "
+            f"#{STAGE128_M3I2_HUMAN_SUBMISSION_PR} -> #{live_number}")
+
+    # Retrieval, the Data Gate and modeling are SEPARATE authorized actions.
+    for field, expected, source, label in (
+        ("m3_lag_wdi_next_action_id", STAGE128_M3_LAG_RETRIEVAL_ACTION_ID,
+         boundary, "the immediate Track B pointer"),
+        ("m3_lag_wdi_next_action_scope", STAGE128_M3_LAG_NEXT_ACTION_SCOPE,
+         boundary, "the immediate Track B pointer scope"),
+        ("m3_lag_wdi_retrieval_action_id",
+         STAGE128_M3_LAG_RETRIEVAL_ACTION_ID, boundary,
+         "the retrieval action id"),
+        ("m3_lag_wdi_data_gate_action_id", STAGE128_M3_LAG_DATA_GATE_ACTION_ID,
+         boundary, "the Data Gate action id"),
+        ("m3_lag_wdi_post_retrieval_audit_action_id",
+         STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID, boundary,
+         "the post-retrieval audit action id"),
+        ("m3_lag_wdi_modeling_action_id", STAGE128_M3_LAG_MODELING_ACTION_ID,
+         boundary, "the modeling action id"),
+        ("gate_action_id", STAGE128_M3_LAG_DATA_GATE_ACTION_ID, gate,
+         "the Gate contract's action id"),
+        ("retrieval_action_id", STAGE128_M3_LAG_RETRIEVAL_ACTION_ID, gate,
+         "the Gate contract's retrieval action id"),
+    ):
+        if source.get(field) != expected:
+            raise ValidationFail(f"{label} must be {expected}")
+    if STAGE128_M3_LAG_RETRIEVAL_ACTION_ID == (
+            STAGE128_M3_LAG_DATA_GATE_ACTION_ID):
+        raise ValidationFail(
+            "retrieval and the Data Gate may not share one action identity")
+    for field, source in (
+        ("m3_lag_wdi_retrieval_action_authorized", boundary),
+        ("m3_lag_wdi_retrieval_action_executes_data_gate", boundary),
+        ("m3_lag_wdi_next_action_executes_data_gate", boundary),
+        ("m3_lag_wdi_retrieval_authorization_implies_gate_authorization",
+         boundary),
+        ("m3_lag_wdi_combined_retrieval_and_gate_action_permitted", boundary),
+        ("m3_lag_wdi_data_gate_action_authorized", boundary),
+        ("m3_lag_wdi_post_retrieval_audit_action_authorized", boundary),
+        ("m3_lag_wdi_post_retrieval_audit_executes_data_gate", boundary),
+        ("m3_lag_wdi_gate_pass_authorizes_modeling", boundary),
+        ("gate_executed_by_retrieval_action", gate),
+        ("retrieval_authorization_implies_gate_authorization", gate),
+        ("combined_retrieval_and_gate_action_permitted", gate),
+        ("post_retrieval_audit_action_executes_gate", gate),
+        ("gate_action_authorized", gate),
+        ("gate_pass_authorizes_modeling", gate),
+        ("gate_pass_authorizes_modeling", modeling),
+        ("modeling_authorized_by_gate_pass", modeling),
+    ):
+        if source.get(field) is not False:
+            raise ValidationFail(f"M3-LAG-WDI {field} must be False")
+    for field, source in (
+        ("m3_lag_wdi_data_gate_is_a_separate_action_from_retrieval", boundary),
+        ("m3_lag_wdi_data_gate_requires_new_explicit_human_authorization",
+         boundary),
+        ("m3_lag_wdi_retrieval_requires_new_explicit_human_authorization",
+         boundary),
+        ("m3_lag_wdi_modeling_requires_new_explicit_human_authorization",
+         boundary),
+        ("m3_lag_wdi_gate_pass_is_data_admission_only", boundary),
+        ("m3_lag_wdi_gate_pointer_is_not_authorization", boundary),
+        ("gate_is_a_separate_action_from_retrieval", gate),
+        ("gate_requires_new_explicit_human_authorization", gate),
+        ("gate_pointer_is_not_authorization", gate),
+        ("gate_pass_is_data_admission_only", gate),
+        ("gate_pass_is_data_admission_only", modeling),
+        ("modeling_requires_new_explicit_human_authorization", modeling),
+    ):
+        if source.get(field) is not True:
+            raise ValidationFail(f"M3-LAG-WDI {field} must be True")
+    sequence = boundary.get("m3_lag_wdi_action_sequence") or []
+    if [(entry.get("step"), entry.get("action_id"),
+         entry.get("executes_retrieval"), entry.get("executes_data_gate"),
+         entry.get("executes_modeling")) for entry in sequence] != list(
+            STAGE128_M3_LAG_ACTION_SEQUENCE):
+        raise ValidationFail(
+            "the Track B action sequence must separate contract lock -> "
+            "retrieval -> post-retrieval audit -> Data Gate -> modeling")
+    for entry in sequence:
+        if entry.get("executes_retrieval") and entry.get(
+                "executes_data_gate"):
+            raise ValidationFail(
+                f"action {entry.get('action_id')!r} both retrieves and "
+                "executes the Data Gate: that is a conflated action")
+        if entry.get("step") != "A" and entry.get("authorized") is not False:
+            raise ValidationFail(
+                f"future Track B action {entry.get('action_id')!r} must be "
+                "unauthorized")
     return True
 
 
@@ -3211,6 +3390,93 @@ def build_assertions(
             and handoff.get("m4_authorized") is False),
         "the Track B lock changes no M3-CBI or M3I-2 conclusion, unlocks no "
         "Final Test and authorizes no M4")
+    # Retrieval and the Data Gate are two actions, not one. If the published
+    # pointer named a single action that both retrieves and Gates, the human
+    # authorization for retrieval would silently become an authorization to
+    # admit data. The Handoff must publish them separated and unauthorized.
+    add("m3_lag_wdi_next_action_is_retrieval_only",
+        (not m3_lag_locked)
+        or (handoff.get("stage128_m3_lag_wdi_next_action_id")
+            == STAGE128_M3_LAG_RETRIEVAL_ACTION_ID
+            and handoff.get("stage128_m3_lag_wdi_next_action_scope")
+            == STAGE128_M3_LAG_NEXT_ACTION_SCOPE
+            and handoff.get(
+                "stage128_m3_lag_wdi_next_action_executes_data_gate") is False
+            and handoff.get("stage128_m3_lag_wdi_next_action_authorized")
+            is False),
+        "the immediate Track B pointer is retrieval ONLY, it does not execute "
+        "the Data Gate, and it is not authorized")
+    add("m3_lag_wdi_data_gate_is_a_separate_unauthorized_action",
+        (not m3_lag_locked)
+        or (handoff.get("stage128_m3_lag_wdi_data_gate_action_id")
+            == STAGE128_M3_LAG_DATA_GATE_ACTION_ID
+            and handoff.get("stage128_m3_lag_wdi_data_gate_action_id")
+            != handoff.get("stage128_m3_lag_wdi_retrieval_action_id")
+            and handoff.get("stage128_m3_lag_wdi_data_gate_authorized")
+            is False
+            and handoff.get(
+                "stage128_m3_lag_wdi_data_gate_requires_new_human_"
+                "authorization") is True),
+        "the M3-LAG-WDI Data Gate is a SEPARATE action with its own identity, "
+        "it is unauthorized, and it requires a new explicit human "
+        "authorization")
+    add("m3_lag_wdi_retrieval_authorization_never_authorizes_the_gate",
+        (not m3_lag_locked)
+        or (handoff.get(
+            "stage128_m3_lag_wdi_retrieval_authorization_implies_gate_"
+            "authorization") is False
+            and handoff.get(
+                "stage128_m3_lag_wdi_combined_retrieval_and_gate_action_"
+                "permitted") is False
+            and handoff.get("stage128_m3_lag_wdi_retrieval_executes_data_gate")
+            is False),
+        "an authorization to retrieve is never an authorization to execute "
+        "the Data Gate, and the two may not be combined into one action")
+    add("m3_lag_wdi_gate_pass_admits_data_and_authorizes_no_modeling",
+        (not m3_lag_locked)
+        or (handoff.get("stage128_m3_lag_wdi_gate_pass_is_data_admission_only")
+            is True
+            and handoff.get("stage128_m3_lag_wdi_gate_pass_authorizes_"
+                            "modeling") is False
+            and handoff.get("stage128_m3_lag_wdi_modeling_requires_new_human_"
+                            "authorization") is True),
+        "a Data Gate PASS is DATA ADMISSION ONLY and authorizes no modeling")
+    # History: PR #76 initiated the documentary recovery and PR #77 recorded
+    # the human submission. Re-anchoring the live topology onto PR #78 must
+    # never collapse those two roles into one, nor slide either forward.
+    add("m3i2_documentary_recovery_pr_stays_pr76",
+        (not m3_lag_locked)
+        or (handoff.get("stage128_m3i2_recovery_pr_number")
+            == STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR
+            and handoff.get("stage128_m3i2_recovery_pr_merge_commit")
+            == STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT
+            and handoff.get("stage128_m3i2_recovery_pr_role")
+            == STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE),
+        "the documentary-recovery INITIATION is PR "
+        f"#{STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR}, merged by "
+        f"{STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT}, whatever is live "
+        "now")
+    add("m3i2_human_submission_pr_stays_separately_represented",
+        (not m3_lag_locked)
+        or (handoff.get("stage128_m3i2_human_submission_pr_number")
+            == STAGE128_M3I2_HUMAN_SUBMISSION_PR
+            and handoff.get("stage128_m3i2_human_submission_pr_merge_commit")
+            == STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT
+            and handoff.get("stage128_m3i2_human_submission_pr_role")
+            == STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE),
+        "the human inquiry submission RECORDING keeps its own separate "
+        f"identity as PR #{STAGE128_M3I2_HUMAN_SUBMISSION_PR}")
+    add("m3i2_three_pr_roles_are_never_collapsed_or_shifted",
+        (not m3_lag_locked)
+        or (handoff.get("stage128_m3i2_recovery_pr_number")
+            < handoff.get("stage128_m3i2_human_submission_pr_number", 0)
+            < handoff.get("stage128_m3i2_live_pr_number", 0)
+            and handoff.get("stage128_m3i2_recovery_pr_merge_commit")
+            != handoff.get("stage128_m3i2_human_submission_pr_merge_commit")
+            and handoff.get("stage128_m3i2_live_pr_is_draft") is True
+            and handoff.get("stage128_m3i2_live_pr_merged") is False),
+        "the documentary recovery, the human submission and the live Draft "
+        "stay three distinct PRs with three distinct roles")
 
     # --- ROADMAP front matter must agree with its own explanatory prose --- #
     roadmap_text = ""

@@ -4703,12 +4703,33 @@ def render_current_state(record: dict) -> str:
             f"{record.get('stage128_m3i2_merge_authorized')}. The head shown "
             "for it is a GENERATION ANCHOR "
             f"(`{record.get('stage128_m3i2_live_pr_head_commit_source')}`), "
-            "never pinned and **not** the instantaneous GitHub PR head. "
+            "never pinned and **not** the instantaneous GitHub PR head",
+            # Each historical PR keeps its OWN role. "The recovery PR" is PR
+            # #76 forever; it never slides forward to mean whatever merged
+            # most recently.
+            "- **HISTORICAL PR roles (pinned, never re-derived):** PR #"
+            f"{record.get('stage128_m3i2_recovery_pr_number')} = "
+            f"`{record.get('stage128_m3i2_recovery_pr_role')}` (action "
+            f"`{record.get('stage128_m3i2_recovery_pr_action_id')}`) — merged "
+            f"= {record.get('stage128_m3i2_recovery_pr_merged')} by merge "
+            f"commit `{record.get('stage128_m3i2_recovery_pr_merge_commit')}`"
+            " — semantics "
+            f"`{record.get('stage128_m3i2_recovery_pr_semantics')}`. PR #"
+            f"{record.get('stage128_m3i2_human_submission_pr_number')} = "
+            f"`{record.get('stage128_m3i2_human_submission_pr_role')}` "
+            "(action "
+            f"`{record.get('stage128_m3i2_human_submission_pr_action_id')}`) "
+            "— merged = "
+            f"{record.get('stage128_m3i2_human_submission_pr_merged')} by "
+            "merge commit "
+            f"`{record.get('stage128_m3i2_human_submission_pr_merge_commit')}`"
+            " — semantics "
+            f"`{record.get('stage128_m3i2_human_submission_pr_semantics')}`. "
             "PR #"
-            f"{record.get('stage128_m3i2_recovery_pr_number')} is HISTORICAL: "
-            "merged = "
-            f"{record.get('stage128_m3i2_recovery_pr_merged')} by merge "
-            f"commit `{record.get('stage128_m3i2_recovery_pr_merge_commit')}`",
+            f"{record.get('stage128_m3i2_live_pr_number')} = "
+            f"`{record.get('stage128_m3i2_live_pr_role')}`, the current LIVE "
+            "Draft. Roles are historical facts, not positions "
+            f"({record.get('stage128_m3i2_pr_roles_are_historical_facts_not_positional')})",
             "- ⛔ **M3-LAG-WDI-EXPLORATORY:** authoritative contract status "
             f"`{record.get('stage128_m3_lag_wdi_authoritative_contract_status')}`"
             " — the earlier local, uncommitted partial draft was detected "
@@ -4827,11 +4848,46 @@ def render_current_state(record: dict) -> str:
             f"{record.get('stage128_m3_lag_wdi_modeling_authorized')}) — "
             "Final Test rows read "
             f"{record.get('stage128_m3_lag_wdi_final_test_rows_read')}",
-            "- **Track B next action:** "
-            f"`{record.get('stage128_m3_lag_wdi_next_action_id')}` — "
+            "- **Track B next action — RETRIEVAL ONLY:** "
+            f"`{record.get('stage128_m3_lag_wdi_next_action_id')}` — scope "
+            f"`{record.get('stage128_m3_lag_wdi_next_action_scope')}`, "
             "authorized = "
-            f"{record.get('stage128_m3_lag_wdi_next_action_authorized')}. A "
-            "pointer is never an authorization",
+            f"{record.get('stage128_m3_lag_wdi_next_action_authorized')}, "
+            "executes the Data Gate = "
+            f"{record.get('stage128_m3_lag_wdi_next_action_executes_data_gate')}"
+            ". A pointer is never an authorization",
+            # Retrieval, the Gate and modeling are three separate actions, so
+            # an authorization for one can never be read as authorizing the
+            # next. Rendering them as one line would erase that boundary.
+            "- ⛔ **Separated future actions (each needs its OWN new explicit "
+            "human authorization):** (B) "
+            f"`{record.get('stage128_m3_lag_wdi_retrieval_action_id')}` — "
+            "authorized "
+            f"{record.get('stage128_m3_lag_wdi_retrieval_authorized')}, "
+            "executes Gate "
+            f"{record.get('stage128_m3_lag_wdi_retrieval_executes_data_gate')}"
+            "; (C) "
+            f"`{record.get('stage128_m3_lag_wdi_post_retrieval_audit_action_id')}`"
+            " — authorized "
+            f"{record.get('stage128_m3_lag_wdi_post_retrieval_audit_authorized')}"
+            ", executes Gate "
+            f"{record.get('stage128_m3_lag_wdi_post_retrieval_audit_executes_data_gate')}"
+            "; (D) "
+            f"`{record.get('stage128_m3_lag_wdi_data_gate_action_id')}` — "
+            "authorized "
+            f"{record.get('stage128_m3_lag_wdi_data_gate_authorized')}; (E) "
+            f"`{record.get('stage128_m3_lag_wdi_modeling_action_id')}` — "
+            "authorized "
+            f"{record.get('stage128_m3_lag_wdi_modeling_authorized')}",
+            "- ⛔ **Authorization boundaries:** a retrieval authorization "
+            "implies a Gate authorization = "
+            f"{record.get('stage128_m3_lag_wdi_retrieval_authorization_implies_gate_authorization')}"
+            " — a combined retrieval-and-Gate action is permitted = "
+            f"{record.get('stage128_m3_lag_wdi_combined_retrieval_and_gate_action_permitted')}"
+            " — a Gate PASS is data admission only = "
+            f"{record.get('stage128_m3_lag_wdi_gate_pass_is_data_admission_only')}"
+            " and authorizes modeling = "
+            f"{record.get('stage128_m3_lag_wdi_gate_pass_authorizes_modeling')}",
             "- **Prior restriction:** "
             f"`{record.get('stage128_m3_lag_wdi_prior_restriction_status')}` "
             "— the old \"only after "
@@ -7217,8 +7273,33 @@ _STAGE128_M3_LAG_TOPOLOGY_REL = (
 #: The ONLY status a satisfied M3-LAG-WDI contract lock may publish.
 _STAGE128_M3_LAG_LOCKED_STATUS = "AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL"
 _STAGE128_M3_LAG_ROLE = "supplementary_exploratory_robustness_block"
+#: Track B's future actions, each a SEPARATE action with its own identity and
+#: its own future authorization. Retrieval is the immediate pointer and it is
+#: retrieval ONLY: it does not execute the Data Gate, and an authorization to
+#: retrieve is not an authorization to Gate. The Gate, in turn, is DATA
+#: ADMISSION ONLY and does not authorize modeling. Collapsing any two of these
+#: into one action erases an authorization boundary, so the identities are
+#: pinned here and every surface is derived from them.
 _STAGE128_M3_LAG_NEXT_ACTION_ID = (
     "stage128-m3-lag-wdi-exploratory-data-retrieval")
+_STAGE128_M3_LAG_RETRIEVAL_ACTION_ID = _STAGE128_M3_LAG_NEXT_ACTION_ID
+_STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-post-retrieval-audit")
+_STAGE128_M3_LAG_DATA_GATE_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-data-gate")
+_STAGE128_M3_LAG_MODELING_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-incremental-evaluation")
+#: The immediate pointer's scope. "retrieval_only" is the ONLY accepted value:
+#: anything that also names the Gate is a conflated action.
+_STAGE128_M3_LAG_NEXT_ACTION_SCOPE = "retrieval_only"
+#: (step, action_id, executes_retrieval, executes_gate, executes_modeling)
+_STAGE128_M3_LAG_ACTION_SEQUENCE = (
+    ("A", "stage128-m3-lag-wdi-exploratory-contract-lock", False, False, False),
+    ("B", _STAGE128_M3_LAG_RETRIEVAL_ACTION_ID, True, False, False),
+    ("C", _STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID, False, False, False),
+    ("D", _STAGE128_M3_LAG_DATA_GATE_ACTION_ID, False, True, False),
+    ("E", _STAGE128_M3_LAG_MODELING_ACTION_ID, False, False, True),
+)
 #: The two features, in the exact locked order, with their exact identities.
 _STAGE128_M3_LAG_FEATURES = (
     ("intl_cpi_inflation_lag1_wdi", "FP.CPI.TOTL.ZG"),
@@ -7235,6 +7316,34 @@ _STAGE128_M3_LAG_CONFIRMATORY_FAMILY = (
 _STAGE128_M3_LAG_MERGED_PREDECESSOR_PR = 77
 _STAGE128_M3_LAG_MERGED_PREDECESSOR_COMMIT = (
     "93de6bae9344ce893b0261f818abce8a991cf842")
+
+#: HISTORICAL PR ROLES — pinned facts, never re-derived from adjacency.
+#:
+#: "The recovery PR" is a NAME for a specific historical action, not a moving
+#: label for "whatever merged most recently". PR #76 carried the final official
+#: documentary recovery INITIATION and PR #77 carried the later HUMAN inquiry
+#: submission RECORDING; they are two different actions and each keeps its own
+#: identity forever. Re-anchoring the live topology onto a newer Draft must
+#: never shift either of them, so both are pinned here and validated against
+#: the topology artifact fail-closed.
+_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR = 76
+_STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT = (
+    "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
+_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE = (
+    "final_official_documentary_recovery_initiation_pr")
+_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ACTION_ID = (
+    "stage128-m3i2-final-official-documentary-recovery-initiation")
+#: The documentary-recovery PR was superseded by the human-submission PR — not
+#: by whatever Draft happens to be live now.
+_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_SEMANTICS = (
+    "merged_predecessor_superseded_by_pr77")
+_STAGE128_M3I2_HUMAN_SUBMISSION_PR = 77
+_STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT = (
+    "93de6bae9344ce893b0261f818abce8a991cf842")
+_STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE = (
+    "final_official_inquiry_human_submission_recording_pr")
+_STAGE128_M3I2_HUMAN_SUBMISSION_PR_ACTION_ID = (
+    "stage128-m3i2-final-official-inquiry-human-submission")
 
 
 def derive_stage128_m3_lag_wdi_exploratory_markers(root: str) -> dict:
@@ -7705,6 +7814,193 @@ def derive_stage128_m3_lag_wdi_exploratory_markers(root: str) -> dict:
             "the live PR head semantics must be "
             f"{_STAGE128_M3I2_LIVE_PR_HEAD_SEMANTICS}")
 
+    # --- HISTORICAL PR ROLES: pinned, never re-derived from adjacency ---- #
+    # Re-anchoring the LIVE topology onto PR #78 must not shift what PR #76
+    # and PR #77 *were*. Each historical role is checked against its pinned
+    # fact, and the three roles are required to stay three distinct PRs.
+    for field, expected, label in (
+        ("documentary_recovery_pr_number",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR,
+         "the documentary-recovery INITIATION PR number"),
+        ("documentary_recovery_pr_merge_commit",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT,
+         "the documentary-recovery PR merge commit"),
+        ("documentary_recovery_pr_role",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE,
+         "the documentary-recovery PR role"),
+        ("documentary_recovery_pr_action_id",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ACTION_ID,
+         "the documentary-recovery PR action id"),
+        ("documentary_recovery_pr_semantics",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_SEMANTICS,
+         "the documentary-recovery PR supersession semantics"),
+        ("human_submission_pr_number", _STAGE128_M3I2_HUMAN_SUBMISSION_PR,
+         "the human-submission RECORDING PR number"),
+        ("human_submission_pr_merge_commit",
+         _STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT,
+         "the human-submission PR merge commit"),
+        ("human_submission_pr_role", _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE,
+         "the human-submission PR role"),
+        ("human_submission_pr_action_id",
+         _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ACTION_ID,
+         "the human-submission PR action id"),
+    ):
+        if topology.get(field) != expected:
+            raise HandoffError(f"{label} is pinned to {expected!r}")
+    for field in ("documentary_recovery_pr_merged",
+                  "human_submission_pr_merged",
+                  "pr_roles_are_historical_facts_not_positional",
+                  "recovery_pr_role_is_pinned_to_pr76"):
+        if topology.get(field) is not True:
+            raise HandoffError(f"M3-LAG-WDI topology {field} must be True")
+    if topology.get("pr_roles_re_derived_from_adjacency") is not False:
+        raise HandoffError(
+            "PR roles may never be re-derived from adjacency: 'the recovery "
+            "PR' is PR #76, not 'the PR that merged most recently'")
+    recovery_number = topology.get("documentary_recovery_pr_number")
+    submission_number = topology.get("human_submission_pr_number")
+    if not (recovery_number < submission_number < live_number):
+        raise HandoffError(
+            "the three PR roles must stay three distinct PRs in order: "
+            f"#{recovery_number} (documentary recovery initiation) -> "
+            f"#{submission_number} (human submission recording) -> "
+            f"#{live_number} (live Draft contract lock)")
+    if topology.get("documentary_recovery_pr_merge_commit") == topology.get(
+            "human_submission_pr_merge_commit"):
+        raise HandoffError(
+            "the documentary-recovery and human-submission PRs were merged by "
+            "two DIFFERENT commits")
+    sequence = topology.get("pr_role_sequence") or []
+    expected_sequence = [
+        (_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR,
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE, True,
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT),
+        (_STAGE128_M3I2_HUMAN_SUBMISSION_PR,
+         _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE, True,
+         _STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT),
+        (live_number, topology.get("live_pr_role"), False, None),
+    ]
+    if [(entry.get("pr_number"), entry.get("role"), entry.get("merged"),
+         entry.get("merge_commit")) for entry in sequence] != (
+            expected_sequence):
+        raise HandoffError(
+            "the published PR role sequence must be exactly "
+            f"#{_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR} -> "
+            f"#{_STAGE128_M3I2_HUMAN_SUBMISSION_PR} -> #{live_number}")
+
+    # --- Retrieval, the Data Gate and modeling are SEPARATE actions ------ #
+    # An authorization boundary only exists where an action boundary exists.
+    # The immediate Track B pointer is retrieval ONLY; the Gate is its own
+    # action needing its own new human authorization; and a Gate PASS admits
+    # data without authorizing a single model fit.
+    for field, expected, source, label in (
+        ("m3_lag_wdi_next_action_id", _STAGE128_M3_LAG_NEXT_ACTION_ID,
+         boundary, "the immediate Track B pointer"),
+        ("m3_lag_wdi_next_action_scope", _STAGE128_M3_LAG_NEXT_ACTION_SCOPE,
+         boundary, "the immediate Track B pointer scope"),
+        ("m3_lag_wdi_retrieval_action_id",
+         _STAGE128_M3_LAG_RETRIEVAL_ACTION_ID, boundary,
+         "the retrieval action id"),
+        ("m3_lag_wdi_post_retrieval_audit_action_id",
+         _STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID, boundary,
+         "the post-retrieval audit action id"),
+        ("m3_lag_wdi_data_gate_action_id",
+         _STAGE128_M3_LAG_DATA_GATE_ACTION_ID, boundary,
+         "the Data Gate action id"),
+        ("m3_lag_wdi_modeling_action_id", _STAGE128_M3_LAG_MODELING_ACTION_ID,
+         boundary, "the modeling action id"),
+        ("gate_action_id", _STAGE128_M3_LAG_DATA_GATE_ACTION_ID, gate,
+         "the Gate contract's own action id"),
+        ("retrieval_action_id", _STAGE128_M3_LAG_RETRIEVAL_ACTION_ID, gate,
+         "the Gate contract's retrieval action id"),
+        ("modeling_action_id", _STAGE128_M3_LAG_MODELING_ACTION_ID, modeling,
+         "the modeling contract's action id"),
+        ("gate_action_id", _STAGE128_M3_LAG_DATA_GATE_ACTION_ID, modeling,
+         "the modeling contract's Gate action id"),
+    ):
+        if source.get(field) != expected:
+            raise HandoffError(f"{label} must be {expected}")
+    if _STAGE128_M3_LAG_RETRIEVAL_ACTION_ID == (
+            _STAGE128_M3_LAG_DATA_GATE_ACTION_ID):
+        raise HandoffError(
+            "retrieval and the Data Gate may not share one action identity")
+    # Nothing anywhere may say that retrieving authorizes or executes the Gate,
+    # that the Gate may be bundled into retrieval, or that a PASS authorizes
+    # modeling.
+    for field, source, label in (
+        ("m3_lag_wdi_retrieval_action_authorized", boundary, "boundary"),
+        ("m3_lag_wdi_retrieval_action_executes_data_gate", boundary,
+         "boundary"),
+        ("m3_lag_wdi_next_action_executes_data_gate", boundary, "boundary"),
+        ("m3_lag_wdi_retrieval_authorization_implies_gate_authorization",
+         boundary, "boundary"),
+        ("m3_lag_wdi_combined_retrieval_and_gate_action_permitted", boundary,
+         "boundary"),
+        ("m3_lag_wdi_data_gate_action_authorized", boundary, "boundary"),
+        ("m3_lag_wdi_post_retrieval_audit_action_authorized", boundary,
+         "boundary"),
+        ("m3_lag_wdi_post_retrieval_audit_executes_data_gate", boundary,
+         "boundary"),
+        ("m3_lag_wdi_gate_pass_authorizes_modeling", boundary, "boundary"),
+        ("gate_executed_by_retrieval_action", gate, "Gate contract"),
+        ("retrieval_authorization_implies_gate_authorization", gate,
+         "Gate contract"),
+        ("combined_retrieval_and_gate_action_permitted", gate,
+         "Gate contract"),
+        ("post_retrieval_audit_action_executes_gate", gate, "Gate contract"),
+        ("gate_action_authorized", gate, "Gate contract"),
+        ("gate_pass_authorizes_modeling", gate, "Gate contract"),
+        ("gate_pass_authorizes_modeling", modeling, "modeling contract"),
+        ("modeling_authorized_by_gate_pass", modeling, "modeling contract"),
+    ):
+        if source.get(field) is not False:
+            raise HandoffError(f"the {label} field {field} must be False")
+    for field, source, label in (
+        ("m3_lag_wdi_data_gate_is_a_separate_action_from_retrieval", boundary,
+         "boundary"),
+        ("m3_lag_wdi_data_gate_requires_new_explicit_human_authorization",
+         boundary, "boundary"),
+        ("m3_lag_wdi_retrieval_requires_new_explicit_human_authorization",
+         boundary, "boundary"),
+        ("m3_lag_wdi_modeling_requires_new_explicit_human_authorization",
+         boundary, "boundary"),
+        ("m3_lag_wdi_gate_pass_is_data_admission_only", boundary, "boundary"),
+        ("m3_lag_wdi_gate_pointer_is_not_authorization", boundary,
+         "boundary"),
+        ("gate_is_a_separate_action_from_retrieval", gate, "Gate contract"),
+        ("gate_requires_new_explicit_human_authorization", gate,
+         "Gate contract"),
+        ("gate_pointer_is_not_authorization", gate, "Gate contract"),
+        ("gate_pass_is_data_admission_only", gate, "Gate contract"),
+        ("modeling_requires_separate_explicit_human_authorization", gate,
+         "Gate contract"),
+        ("gate_pass_is_data_admission_only", modeling, "modeling contract"),
+        ("modeling_requires_new_explicit_human_authorization", modeling,
+         "modeling contract"),
+    ):
+        if source.get(field) is not True:
+            raise HandoffError(f"the {label} field {field} must be True")
+    published_sequence = boundary.get("m3_lag_wdi_action_sequence") or []
+    if [(entry.get("step"), entry.get("action_id"),
+         entry.get("executes_retrieval"), entry.get("executes_data_gate"),
+         entry.get("executes_modeling"))
+            for entry in published_sequence] != list(
+                _STAGE128_M3_LAG_ACTION_SEQUENCE):
+        raise HandoffError(
+            "the Track B action sequence must separate contract lock -> "
+            "retrieval -> post-retrieval audit -> Data Gate -> modeling, with "
+            "exactly one executing step each")
+    for entry in published_sequence:
+        if entry.get("executes_retrieval") and entry.get(
+                "executes_data_gate"):
+            raise HandoffError(
+                f"action {entry.get('action_id')!r} both retrieves and "
+                "executes the Data Gate: that is a conflated action")
+        if entry.get("step") != "A" and entry.get("authorized") is not False:
+            raise HandoffError(
+                f"future Track B action {entry.get('action_id')!r} must be "
+                "unauthorized")
+
     return {
         # Track B: the contract is LOCKED, and locked is not authorized.
         "stage128_m3_lag_wdi_exploratory_contract_locked": True,
@@ -7731,8 +8027,50 @@ def derive_stage128_m3_lag_wdi_exploratory_markers(root: str) -> dict:
         "stage128_m3_lag_wdi_modeling_started": False,
         "stage128_m3_lag_wdi_modeling_authorized": False,
         "stage128_m3_lag_wdi_final_test_rows_read": 0,
+        # The immediate pointer is RETRIEVAL ONLY. The Data Gate and modeling
+        # are separate later actions, each with its own identity and its own
+        # required new human authorization.
         "stage128_m3_lag_wdi_next_action_id": _STAGE128_M3_LAG_NEXT_ACTION_ID,
         "stage128_m3_lag_wdi_next_action_authorized": False,
+        "stage128_m3_lag_wdi_next_action_scope":
+            _STAGE128_M3_LAG_NEXT_ACTION_SCOPE,
+        "stage128_m3_lag_wdi_next_action_executes_data_gate": False,
+        "stage128_m3_lag_wdi_retrieval_action_id":
+            _STAGE128_M3_LAG_RETRIEVAL_ACTION_ID,
+        "stage128_m3_lag_wdi_retrieval_authorized": False,
+        "stage128_m3_lag_wdi_retrieval_executes_data_gate": False,
+        "stage128_m3_lag_wdi_retrieval_requires_new_human_authorization": True,
+        "stage128_m3_lag_wdi_post_retrieval_audit_action_id":
+            _STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID,
+        "stage128_m3_lag_wdi_post_retrieval_audit_authorized": False,
+        "stage128_m3_lag_wdi_post_retrieval_audit_executes_data_gate": False,
+        "stage128_m3_lag_wdi_data_gate_action_id":
+            _STAGE128_M3_LAG_DATA_GATE_ACTION_ID,
+        "stage128_m3_lag_wdi_data_gate_authorized": False,
+        "stage128_m3_lag_wdi_data_gate_is_a_separate_action": True,
+        "stage128_m3_lag_wdi_data_gate_requires_new_human_authorization": True,
+        "stage128_m3_lag_wdi_data_gate_pointer_is_not_authorization": True,
+        "stage128_m3_lag_wdi_retrieval_authorization_implies_gate_"
+        "authorization": False,
+        "stage128_m3_lag_wdi_combined_retrieval_and_gate_action_permitted":
+            False,
+        "stage128_m3_lag_wdi_gate_pass_is_data_admission_only": True,
+        "stage128_m3_lag_wdi_gate_pass_authorizes_modeling": False,
+        "stage128_m3_lag_wdi_modeling_action_id":
+            _STAGE128_M3_LAG_MODELING_ACTION_ID,
+        "stage128_m3_lag_wdi_modeling_requires_new_human_authorization": True,
+        "stage128_m3_lag_wdi_action_sequence": [
+            {
+                "step": step,
+                "action_id": action_id,
+                "executes_retrieval": executes_retrieval,
+                "executes_data_gate": executes_gate,
+                "executes_modeling": executes_modeling,
+                "authorized": step == "A",
+            }
+            for (step, action_id, executes_retrieval, executes_gate,
+                 executes_modeling) in _STAGE128_M3_LAG_ACTION_SEQUENCE
+        ],
         "stage128_m3_lag_wdi_authorization_sha256": auth_sha,
         "stage128_m3_lag_wdi_authorization_utf8_bytes":
             authorization.get("authorization_utf8_bytes"),
@@ -7760,11 +8098,43 @@ def derive_stage128_m3_lag_wdi_exploratory_markers(root: str) -> dict:
         "stage128_m3i2_live_pr_head_commit_source":
             _STAGE128_M3I2_LIVE_PR_HEAD_SEMANTICS,
         "stage128_m3i2_live_pr_ready_for_review_authorized": False,
-        "stage128_m3i2_recovery_pr_number": predecessor_number,
+        # HISTORY IS PINNED, NOT RE-DERIVED. "The recovery PR" names the
+        # documentary-recovery INITIATION carried by PR #76; it does NOT mean
+        # "the PR that merged immediately before the live one". The later
+        # human-submission RECORDING carried by PR #77 keeps its own separate
+        # identity, and PR #78 is the live Draft. Three actions, three PRs.
+        "stage128_m3i2_recovery_pr_number":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR,
         "stage128_m3i2_recovery_pr_merged": True,
-        "stage128_m3i2_recovery_pr_merge_commit": merge_commit,
-        "stage128_m3i2_recovery_pr_semantics": (
+        "stage128_m3i2_recovery_pr_merge_commit":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT,
+        "stage128_m3i2_recovery_pr_role":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE,
+        "stage128_m3i2_recovery_pr_action_id":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ACTION_ID,
+        "stage128_m3i2_recovery_pr_semantics":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_SEMANTICS,
+        "stage128_m3i2_human_submission_pr_number":
+            _STAGE128_M3I2_HUMAN_SUBMISSION_PR,
+        "stage128_m3i2_human_submission_pr_merged": True,
+        "stage128_m3i2_human_submission_pr_merge_commit":
+            _STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT,
+        "stage128_m3i2_human_submission_pr_role":
+            _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE,
+        "stage128_m3i2_human_submission_pr_action_id":
+            _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ACTION_ID,
+        "stage128_m3i2_human_submission_pr_semantics": (
             "merged_predecessor_superseded_by_pr" f"{live_number}"),
+        "stage128_m3i2_pr_roles_are_historical_facts_not_positional": True,
+        "stage128_m3i2_pr_role_sequence": [
+            {
+                "pr_number": entry[0],
+                "role": entry[1],
+                "merged": entry[2],
+                "merge_commit": entry[3],
+            }
+            for entry in expected_sequence
+        ],
         "stage128_m3i2_merge_authorized": False,
     }
 

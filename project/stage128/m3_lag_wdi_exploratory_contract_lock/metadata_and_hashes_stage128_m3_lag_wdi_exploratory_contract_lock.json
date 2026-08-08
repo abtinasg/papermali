@@ -21,8 +21,8 @@
   "inherited_inputs_modified_by_this_action": false,
   "package_files": {
     "README_STAGE128_M3_LAG_WDI_EXPLORATORY_CONTRACT_LOCK.md": {
-      "bytes": 10010,
-      "sha256": "afc19ccf0851120b2ff44c51e2cb80b58d2477f73588ac25d6219bc796c82ec5"
+      "bytes": 12141,
+      "sha256": "d4f4ffae68b999d964c252582bfa59639546a6a596e1177f0f877dc677ceede7"
     },
     "stage128_m3_lag_wdi_exploratory_contract.json": {
       "bytes": 6456,
@@ -37,28 +37,28 @@
       "sha256": "deeb96c0de6bef35b86809aa5e15f85daa6ebfe718b923463d7831914ebf2eda"
     },
     "stage128_m3_lag_wdi_exploratory_data_gate_contract.json": {
-      "bytes": 2092,
-      "sha256": "081227c2cea53351c866041734bf5ad60ce3bb3f8f4b9a56ad0007ea77aca299"
+      "bytes": 3221,
+      "sha256": "9eba4c248e76445bce0be356c04b994d925acd0e33f46bd92fd6ef20561d5bb6"
     },
     "stage128_m3_lag_wdi_exploratory_execution_audit.json": {
       "bytes": 1734,
       "sha256": "5cbaf41dcf59c41e83b63ac3e2467302e1329af569cabbe61958490d5f5ea214"
     },
     "stage128_m3_lag_wdi_exploratory_governance_boundary.json": {
-      "bytes": 3157,
-      "sha256": "a4bc5e5d94f01e34d039903e6ce7ad94e7b1ce3fbe3692d0d369868e33579232"
+      "bytes": 5911,
+      "sha256": "24408046e962a4db2058f5178200d1ec31f913b0ca0532c4b002f994acae0190"
     },
     "stage128_m3_lag_wdi_exploratory_human_authorization_record.json": {
       "bytes": 2754,
       "sha256": "27a206c958e5eb1e8edcb20a50d08b6d5d2e99976b594e4999839601f90b69ab"
     },
     "stage128_m3_lag_wdi_exploratory_modeling_contract.json": {
-      "bytes": 1936,
-      "sha256": "e8415ebb74f4cd98a16e9ea5cf0abaccefc243861c8816749cbaccae6e9fc664"
+      "bytes": 2276,
+      "sha256": "14f48d20c3b59ae9e8bc68cfaa6cdb6ff7e30cb97f0817291c2d9f21549a817d"
     },
     "stage128_m3_lag_wdi_exploratory_pr_topology.json": {
-      "bytes": 927,
-      "sha256": "d3e82c2b01c52587f079af8aeccf3fc9b9317bf99e3d3c767dfdc5dd90afcc53"
+      "bytes": 2478,
+      "sha256": "8b2bbada2ba4cd0fbd1d33ea7120ffa5402bf7917bb4b653102a1f86afe1b528"
     }
   },
   "package_id": "stage128_m3_lag_wdi_exploratory_contract_lock",

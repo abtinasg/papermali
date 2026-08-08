@@ -39,7 +39,31 @@ Nothing else moved. The two tracks now run **in parallel**:
   adjudication are **unauthorized**. This activation does **not** imply the
   inquiry failed, terminated, was abandoned or became unnecessary.
 * **Track B — M3-LAG-WDI-EXPLORATORY.** Contract **locked**. The next possible
-  action is data retrieval / Data Gate, and it is **not authorized yet**.
+  action is data retrieval **only** (`stage128-m3-lag-wdi-exploratory-data-
+  retrieval`), and it is **not authorized yet**. It does **not** execute the
+  Data Gate: the Gate is a separate later action (see below).
+
+## Future actions — retrieval, the Data Gate and modeling are SEPARATE
+
+An authorization boundary only exists where an action boundary exists, so these
+are never bundled and never share an identity:
+
+| Step | Action id | Authorized |
+| --- | --- | --- |
+| A | `stage128-m3-lag-wdi-exploratory-contract-lock` (this action) | consumed |
+| B | `stage128-m3-lag-wdi-exploratory-data-retrieval` — retrieval only | **false** |
+| C | `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — audit/state recording, **no Gate** | **false** |
+| D | `stage128-m3-lag-wdi-exploratory-data-gate` — the Data Gate | **false** |
+| E | `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — modeling | **false** |
+
+* An authorization to **retrieve** is **not** an authorization to execute the
+  Data Gate.
+* A **combined** retrieval-and-Gate action is forbidden.
+* A **pointer** to the Data Gate is not an authorization to execute it: step D
+  needs its own NEW explicit human authorization.
+* A Gate **PASS** is **DATA ADMISSION ONLY** and authorizes **no** model fit:
+  step E needs ANOTHER separate explicit human authorization.
+* None of A–E unlocks the Final Test.
 
 ## Scientific role — locked explicitly
 
@@ -159,14 +183,23 @@ non-reusable, and it was **not** promoted or committed. It was left untouched.
 This contract derives instead from the current merged repository state and the
 new explicit human authorization above.
 
-## PR topology
+## PR topology — history is pinned, not re-derived
 
-PR #77 is **MERGED/CLOSED** (merge commit
-`93de6bae9344ce893b0261f818abce8a991cf842`) and is a historical predecessor — it
-is no longer the live Draft PR. The Draft PR opened by this action is the new
-**live** Draft. Generation anchors (the repository head shown for the live PR)
-are explicitly informational and volatile, never pinned and never the
-instantaneous GitHub PR head.
+Three PRs, three different actions, three different roles. Re-anchoring the
+LIVE topology onto this Draft does **not** rewrite what an older PR *was*, and
+"the recovery PR" is a **name for a specific historical action**, never a
+moving label for "whatever merged most recently":
+
+| PR | Role | State |
+| --- | --- | --- |
+| **#76** | `stage128-m3i2-final-official-documentary-recovery-initiation` — the documentary recovery **INITIATION** | MERGED by `89d8e6ff2d12ec82903cd28aa7ab839eb946b658`; superseded by PR #77 |
+| **#77** | `stage128-m3i2-final-official-inquiry-human-submission` — the later, separate **HUMAN inquiry submission RECORDING** | MERGED by `93de6bae9344ce893b0261f818abce8a991cf842`; superseded by PR #78 |
+| **#78** | `m3_lag_wdi_exploratory_contract_lock_pr` — this action | the current **LIVE Draft**; merged = false, ready-for-review and merge **unauthorized** |
+
+PR #77 is the immediate merged predecessor and the base of this PR; it is
+**not** the documentary recovery. Generation anchors (the repository head shown
+for the live PR) are explicitly informational and volatile, never pinned and
+never the instantaneous GitHub PR head.
 
 ## Package contents
 

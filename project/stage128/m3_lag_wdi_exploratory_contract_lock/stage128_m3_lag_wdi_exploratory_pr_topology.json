@@ -1,7 +1,19 @@
 {
   "action_id": "stage128-m3-lag-wdi-exploratory-contract-lock",
   "auto_merge": false,
+  "documentary_recovery_pr_action_id": "stage128-m3i2-final-official-documentary-recovery-initiation",
+  "documentary_recovery_pr_merge_commit": "89d8e6ff2d12ec82903cd28aa7ab839eb946b658",
+  "documentary_recovery_pr_merged": true,
+  "documentary_recovery_pr_number": 76,
+  "documentary_recovery_pr_role": "final_official_documentary_recovery_initiation_pr",
+  "documentary_recovery_pr_semantics": "merged_predecessor_superseded_by_pr77",
   "executed_in_separate_clean_worktree": true,
+  "human_submission_pr_action_id": "stage128-m3i2-final-official-inquiry-human-submission",
+  "human_submission_pr_merge_commit": "93de6bae9344ce893b0261f818abce8a991cf842",
+  "human_submission_pr_merged": true,
+  "human_submission_pr_number": 77,
+  "human_submission_pr_role": "final_official_inquiry_human_submission_recording_pr",
+  "human_submission_pr_semantics": "merged_predecessor_superseded_by_pr78",
   "live_pr_base_branch": "main",
   "live_pr_base_commit": "93de6bae9344ce893b0261f818abce8a991cf842",
   "live_pr_head_commit_pinned": false,
@@ -13,10 +25,33 @@
   "live_pr_role": "m3_lag_wdi_exploratory_contract_lock_pr",
   "merge_authorized": false,
   "pr_is_stacked_on_open_predecessor": false,
+  "pr_role_sequence": [
+    {
+      "merge_commit": "89d8e6ff2d12ec82903cd28aa7ab839eb946b658",
+      "merged": true,
+      "pr_number": 76,
+      "role": "final_official_documentary_recovery_initiation_pr"
+    },
+    {
+      "merge_commit": "93de6bae9344ce893b0261f818abce8a991cf842",
+      "merged": true,
+      "pr_number": 77,
+      "role": "final_official_inquiry_human_submission_recording_pr"
+    },
+    {
+      "merge_commit": null,
+      "merged": false,
+      "pr_number": 78,
+      "role": "m3_lag_wdi_exploratory_contract_lock_pr"
+    }
+  ],
+  "pr_roles_are_historical_facts_not_positional": true,
+  "pr_roles_re_derived_from_adjacency": false,
   "predecessor_pr_merge_commit": "93de6bae9344ce893b0261f818abce8a991cf842",
   "predecessor_pr_merged": true,
   "predecessor_pr_number": 77,
   "predecessor_pr_role": "merged_predecessor_m3i2_final_official_inquiry_human_submission",
   "ready_for_review_authorized": false,
+  "recovery_pr_role_is_pinned_to_pr76": true,
   "repository": "abtinasg/papermali"
 }

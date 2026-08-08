@@ -495,10 +495,15 @@ def test_the_handoff_publishes_the_new_pr_as_live_and_pr_77_as_history(
     assert handoff["stage128_m3i2_live_pr_number"] == topo["live_pr_number"]
     assert handoff["stage128_m3i2_live_pr_is_draft"] is True
     assert handoff["stage128_m3i2_live_pr_merged"] is False
-    assert handoff["stage128_m3i2_recovery_pr_number"] == (
+    # PR #77 is history under its OWN role — the human inquiry submission
+    # recording. It is NOT the documentary-recovery PR: that is PR #76, and
+    # `stage128_m3i2_recovery_pr_*` keeps naming it (see the PR-role tests
+    # below).
+    assert handoff["stage128_m3i2_human_submission_pr_number"] == (
         _MERGED_PREDECESSOR_PR)
-    assert handoff["stage128_m3i2_recovery_pr_merged"] is True
-    assert handoff["stage128_m3i2_recovery_pr_merge_commit"] == _BASELINE
+    assert handoff["stage128_m3i2_human_submission_pr_merged"] is True
+    assert handoff["stage128_m3i2_human_submission_pr_merge_commit"] == (
+        _BASELINE)
 
 
 # --------------------------------------------------------------------------- #
@@ -846,6 +851,425 @@ def test_topology_drift_fails_closed(tmp_path, label, mutate):
     root = _root(tmp_path, label, _mutated(_TOPOLOGY_REL, mutate))
     with pytest.raises(gen.HandoffError):
         gen.derive_stage128_m3_lag_wdi_exploratory_markers(root)
+
+
+# --------------------------------------------------------------------------- #
+# BLOCKER 1 REGRESSION — the three historical PR roles are pinned facts
+#
+# PR #76 initiated the final official documentary RECOVERY; PR #77 recorded the
+# later HUMAN inquiry SUBMISSION; PR #78 is the current LIVE Draft contract
+# lock. Three actions, three PRs, three merge states. "The recovery PR" is a
+# NAME for the first of them — it must never be re-derived to mean "whichever
+# PR merged immediately before the live one", because that quietly rewrites
+# history every time a new Draft is opened.
+# --------------------------------------------------------------------------- #
+
+_RECOVERY_PR = 76
+_RECOVERY_MERGE_COMMIT = "89d8e6ff2d12ec82903cd28aa7ab839eb946b658"
+_HUMAN_SUBMISSION_PR = 77
+_HUMAN_SUBMISSION_MERGE_COMMIT = "93de6bae9344ce893b0261f818abce8a991cf842"
+_LIVE_PR = 78
+
+
+def test_the_three_historical_pr_roles_are_recorded_separately():
+    topo = _read_json(_TOPOLOGY_REL)
+    assert topo["documentary_recovery_pr_number"] == _RECOVERY_PR
+    assert topo["documentary_recovery_pr_merged"] is True
+    assert topo["documentary_recovery_pr_merge_commit"] == (
+        _RECOVERY_MERGE_COMMIT)
+    assert topo["documentary_recovery_pr_action_id"] == (
+        "stage128-m3i2-final-official-documentary-recovery-initiation")
+    assert topo["documentary_recovery_pr_semantics"] == (
+        "merged_predecessor_superseded_by_pr77")
+    assert topo["human_submission_pr_number"] == _HUMAN_SUBMISSION_PR
+    assert topo["human_submission_pr_merged"] is True
+    assert topo["human_submission_pr_merge_commit"] == (
+        _HUMAN_SUBMISSION_MERGE_COMMIT)
+    assert topo["human_submission_pr_action_id"] == (
+        "stage128-m3i2-final-official-inquiry-human-submission")
+    assert topo["live_pr_number"] == _LIVE_PR
+    assert topo["live_pr_is_draft"] is True
+    assert topo["live_pr_merged"] is False
+    # the two merged PRs are two different merges, not one relabelled twice
+    assert (topo["documentary_recovery_pr_merge_commit"]
+            != topo["human_submission_pr_merge_commit"])
+    assert topo["pr_roles_re_derived_from_adjacency"] is False
+    assert topo["pr_roles_are_historical_facts_not_positional"] is True
+    assert [(e["pr_number"], e["merged"]) for e in topo["pr_role_sequence"]] \
+        == [(_RECOVERY_PR, True), (_HUMAN_SUBMISSION_PR, True),
+            (_LIVE_PR, False)]
+
+
+def test_the_handoff_keeps_pr76_as_the_documentary_recovery(handoff):
+    """The regression this test exists for: #76's fields becoming #77's."""
+    assert handoff["stage128_m3i2_recovery_pr_number"] == _RECOVERY_PR
+    assert handoff["stage128_m3i2_recovery_pr_merged"] is True
+    assert handoff["stage128_m3i2_recovery_pr_merge_commit"] == (
+        _RECOVERY_MERGE_COMMIT)
+    assert handoff["stage128_m3i2_recovery_pr_role"] == (
+        "final_official_documentary_recovery_initiation_pr")
+    # superseded by the human-submission PR, NOT by whatever is live now
+    assert handoff["stage128_m3i2_recovery_pr_semantics"] == (
+        "merged_predecessor_superseded_by_pr77")
+
+
+def test_the_handoff_keeps_pr77_as_the_human_submission_recording(handoff):
+    assert handoff["stage128_m3i2_human_submission_pr_number"] == (
+        _HUMAN_SUBMISSION_PR)
+    assert handoff["stage128_m3i2_human_submission_pr_merged"] is True
+    assert handoff["stage128_m3i2_human_submission_pr_merge_commit"] == (
+        _HUMAN_SUBMISSION_MERGE_COMMIT)
+    assert handoff["stage128_m3i2_human_submission_pr_role"] == (
+        "final_official_inquiry_human_submission_recording_pr")
+
+
+def test_the_handoff_keeps_pr78_as_the_live_draft(handoff):
+    assert handoff["stage128_m3i2_live_pr_number"] == _LIVE_PR
+    assert handoff["stage128_m3i2_live_pr_is_draft"] is True
+    assert handoff["stage128_m3i2_live_pr_merged"] is False
+    assert handoff["stage128_m3i2_live_pr_role"] == (
+        "m3_lag_wdi_exploratory_contract_lock_pr")
+    assert handoff["stage128_m3i2_live_pr_ready_for_review_authorized"] is (
+        False)
+    assert handoff["stage128_m3i2_merge_authorized"] is False
+
+
+def test_the_three_pr_roles_cannot_be_collapsed_or_shifted(handoff):
+    numbers = (handoff["stage128_m3i2_recovery_pr_number"],
+               handoff["stage128_m3i2_human_submission_pr_number"],
+               handoff["stage128_m3i2_live_pr_number"])
+    assert numbers == (_RECOVERY_PR, _HUMAN_SUBMISSION_PR, _LIVE_PR)
+    assert len(set(numbers)) == 3
+    assert (handoff["stage128_m3i2_recovery_pr_merge_commit"]
+            != handoff["stage128_m3i2_human_submission_pr_merge_commit"])
+    assert handoff["stage128_m3i2_pr_roles_are_historical_facts_not_"
+                   "positional"] is True
+    assert [(e["pr_number"], e["role"]) for e
+            in handoff["stage128_m3i2_pr_role_sequence"]] == [
+        (_RECOVERY_PR, "final_official_documentary_recovery_initiation_pr"),
+        (_HUMAN_SUBMISSION_PR,
+         "final_official_inquiry_human_submission_recording_pr"),
+        (_LIVE_PR, "m3_lag_wdi_exploratory_contract_lock_pr")]
+
+
+def test_the_docs_state_the_pr_roles_explicitly():
+    for rel in _DOCS:
+        body = _read_text(rel)
+        assert _RECOVERY_MERGE_COMMIT in body, rel
+        assert _HUMAN_SUBMISSION_MERGE_COMMIT in body, rel
+        assert (
+            "stage128-m3i2-final-official-documentary-recovery-initiation"
+            in body), rel
+        assert (
+            "stage128-m3i2-final-official-inquiry-human-submission"
+            in body), rel
+
+
+_PR_ROLE_DRIFTS = (
+    # the exact regression that PR #78 shipped: the recovery fields slid from
+    # PR #76 onto the immediately preceding PR #77
+    ("the_recovery_pr_slides_onto_pr77",
+     lambda p: p.update({
+         "documentary_recovery_pr_number": 77,
+         "documentary_recovery_pr_merge_commit": (
+             _HUMAN_SUBMISSION_MERGE_COMMIT)})),
+    ("the_recovery_merge_commit_is_replaced_by_the_submission_merge",
+     lambda p: p.update({
+         "documentary_recovery_pr_merge_commit": (
+             _HUMAN_SUBMISSION_MERGE_COMMIT)})),
+    ("the_recovery_semantics_are_re_anchored_onto_the_live_pr",
+     lambda p: p.update({
+         "documentary_recovery_pr_semantics":
+             "merged_predecessor_superseded_by_pr78"})),
+    ("the_recovery_role_is_relabelled_as_the_human_submission",
+     lambda p: p.update({
+         "documentary_recovery_pr_role":
+             "final_official_inquiry_human_submission_recording_pr"})),
+    ("the_human_submission_pr_is_dropped",
+     lambda p: p.pop("human_submission_pr_number")),
+    ("the_human_submission_pr_is_collapsed_into_the_recovery_pr",
+     lambda p: p.update({
+         "human_submission_pr_number": 76,
+         "human_submission_pr_merge_commit": _RECOVERY_MERGE_COMMIT})),
+    ("the_two_merged_prs_are_given_one_merge_commit",
+     lambda p: p.update({
+         "human_submission_pr_merge_commit": _RECOVERY_MERGE_COMMIT})),
+    ("roles_are_declared_re_derivable_from_adjacency",
+     lambda p: p.update({"pr_roles_re_derived_from_adjacency": True})),
+    ("the_role_sequence_drops_the_recovery_pr",
+     lambda p: p.update({
+         "pr_role_sequence": p["pr_role_sequence"][1:]})),
+    ("the_role_sequence_is_reordered",
+     lambda p: p.update({
+         "pr_role_sequence": list(reversed(p["pr_role_sequence"]))})),
+)
+
+
+@pytest.mark.parametrize("label,mutate", _PR_ROLE_DRIFTS,
+                         ids=[label for label, _ in _PR_ROLE_DRIFTS])
+def test_pr_role_drift_fails_closed(tmp_path, label, mutate):
+    root = _root(tmp_path, label, _mutated(_TOPOLOGY_REL, mutate))
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage128_m3_lag_wdi_exploratory_markers(root)
+
+
+@pytest.mark.parametrize("label,mutate", _PR_ROLE_DRIFTS,
+                         ids=[label for label, _ in _PR_ROLE_DRIFTS])
+def test_pr_role_drift_fails_closed_in_the_validator(tmp_path, label, mutate):
+    from pathlib import Path
+    root = _root(tmp_path, f"v_{label}", _mutated(_TOPOLOGY_REL, mutate))
+    with pytest.raises(v.ValidationFail):
+        v.stage128_m3_lag_wdi_exploratory_contract_locked(Path(root))
+
+
+# --------------------------------------------------------------------------- #
+# BLOCKER 2 REGRESSION — retrieval, the Data Gate and modeling are SEPARATE
+#
+# An authorization boundary only exists where an action boundary exists. If one
+# action both retrieved and Gated, the human authorization to retrieve would
+# silently become an authorization to ADMIT data; if a Gate PASS authorized
+# modeling, admission would silently become evaluation. Each of these tests
+# asserts that a surface which erases one of those boundaries fails closed.
+# --------------------------------------------------------------------------- #
+
+_RETRIEVAL_ACTION_ID = "stage128-m3-lag-wdi-exploratory-data-retrieval"
+_POST_RETRIEVAL_AUDIT_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-post-retrieval-audit")
+_DATA_GATE_ACTION_ID = "stage128-m3-lag-wdi-exploratory-data-gate"
+_MODELING_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-incremental-evaluation")
+
+
+def test_the_next_action_is_retrieval_only_and_never_the_gate(handoff):
+    assert handoff["stage128_m3_lag_wdi_next_action_id"] == (
+        _RETRIEVAL_ACTION_ID)
+    assert handoff["stage128_m3_lag_wdi_next_action_scope"] == "retrieval_only"
+    assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
+    assert handoff[
+        "stage128_m3_lag_wdi_next_action_executes_data_gate"] is False
+    assert handoff["stage128_m3_lag_wdi_retrieval_authorized"] is False
+    assert handoff["stage128_m3_lag_wdi_retrieval_executes_data_gate"] is False
+
+
+def test_the_data_gate_is_a_separate_unauthorized_action(handoff):
+    assert handoff["stage128_m3_lag_wdi_data_gate_action_id"] == (
+        _DATA_GATE_ACTION_ID)
+    assert (handoff["stage128_m3_lag_wdi_data_gate_action_id"]
+            != handoff["stage128_m3_lag_wdi_retrieval_action_id"])
+    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+    assert handoff["stage128_m3_lag_wdi_data_gate_is_a_separate_action"] is True
+    assert handoff[
+        "stage128_m3_lag_wdi_data_gate_requires_new_human_authorization"] is (
+            True)
+    # a pointer to the Gate is not an authorization to execute it
+    assert handoff[
+        "stage128_m3_lag_wdi_data_gate_pointer_is_not_authorization"] is True
+    assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
+    assert handoff["stage128_m3_lag_wdi_data_gate_result"] == "NOT_EXECUTED"
+
+
+def test_a_retrieval_authorization_never_authorizes_the_gate(handoff):
+    assert handoff[
+        "stage128_m3_lag_wdi_retrieval_authorization_implies_gate_"
+        "authorization"] is False
+    assert handoff[
+        "stage128_m3_lag_wdi_combined_retrieval_and_gate_action_permitted"] is (
+            False)
+
+
+def test_a_gate_pass_admits_data_and_authorizes_no_modeling(handoff, gate,
+                                                            modeling):
+    assert handoff[
+        "stage128_m3_lag_wdi_gate_pass_is_data_admission_only"] is True
+    assert handoff["stage128_m3_lag_wdi_gate_pass_authorizes_modeling"] is (
+        False)
+    assert handoff["stage128_m3_lag_wdi_modeling_action_id"] == (
+        _MODELING_ACTION_ID)
+    assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
+    assert handoff[
+        "stage128_m3_lag_wdi_modeling_requires_new_human_authorization"] is (
+            True)
+    assert gate["gate_pass_authorizes_modeling"] is False
+    assert gate["gate_pass_is_data_admission_only"] is True
+    assert modeling["gate_pass_authorizes_modeling"] is False
+    assert modeling["modeling_authorized_by_gate_pass"] is False
+
+
+def test_the_published_action_sequence_separates_every_step(handoff):
+    sequence = handoff["stage128_m3_lag_wdi_action_sequence"]
+    assert [(e["step"], e["action_id"]) for e in sequence] == [
+        ("A", _ACTION_ID),
+        ("B", _RETRIEVAL_ACTION_ID),
+        ("C", _POST_RETRIEVAL_AUDIT_ACTION_ID),
+        ("D", _DATA_GATE_ACTION_ID),
+        ("E", _MODELING_ACTION_ID)]
+    # exactly one step retrieves, exactly one Gates, exactly one models, and
+    # no single step does two of them
+    assert sum(e["executes_retrieval"] for e in sequence) == 1
+    assert sum(e["executes_data_gate"] for e in sequence) == 1
+    assert sum(e["executes_modeling"] for e in sequence) == 1
+    for entry in sequence:
+        assert sum((entry["executes_retrieval"], entry["executes_data_gate"],
+                    entry["executes_modeling"])) <= 1, entry["action_id"]
+    # every FUTURE step is unauthorized; only the completed lock is authorized
+    assert [e["authorized"] for e in sequence] == [True, False, False, False,
+                                                   False]
+
+
+def test_the_docs_separate_retrieval_from_the_gate():
+    for rel in _DOCS:
+        body = _read_text(rel)
+        assert _DATA_GATE_ACTION_ID in body, rel
+        assert _MODELING_ACTION_ID in body, rel
+        assert (
+            "m3_lag_wdi_retrieval_authorization_implies_gate_authorization: "
+            "false" in body
+            or "m3_lag_wdi_retrieval_authorization_implies_gate_authorization:"
+            "\n  false" in body
+            or "`m3_lag_wdi_retrieval_authorization_implies_gate_"
+               "authorization:\n  false`" in body), rel
+    roadmap = _read_text("project/docs/ai/ROADMAP.md")
+    assert "m3_lag_wdi_next_action_scope: retrieval_only" in roadmap
+    assert "m3_lag_wdi_data_gate_authorized: false" in roadmap
+    assert "m3_lag_wdi_gate_pass_authorizes_modeling: false" in roadmap
+
+
+_GATE_SEPARATION_DRIFTS = (
+    ("retrieval_authorization_is_said_to_authorize_the_gate",
+     lambda p: p.update({
+         "retrieval_authorization_implies_gate_authorization": True})),
+    ("the_retrieval_action_is_said_to_execute_the_gate",
+     lambda p: p.update({"gate_executed_by_retrieval_action": True})),
+    ("a_combined_retrieval_and_gate_action_is_permitted",
+     lambda p: p.update({
+         "combined_retrieval_and_gate_action_permitted": True})),
+    ("the_gate_is_given_the_retrieval_action_identity",
+     lambda p: p.update({"gate_action_id": _RETRIEVAL_ACTION_ID})),
+    ("the_gate_becomes_authorized",
+     lambda p: p.update({"gate_action_authorized": True})),
+    ("the_gate_stops_needing_its_own_human_authorization",
+     lambda p: p.update({
+         "gate_requires_new_explicit_human_authorization": False})),
+    ("the_gate_pointer_is_treated_as_an_authorization",
+     lambda p: p.update({"gate_pointer_is_not_authorization": False})),
+    ("a_gate_pass_is_said_to_authorize_modeling",
+     lambda p: p.update({"gate_pass_authorizes_modeling": True})),
+    ("a_gate_pass_stops_being_data_admission_only",
+     lambda p: p.update({"gate_pass_is_data_admission_only": False})),
+    ("the_post_retrieval_audit_is_said_to_execute_the_gate",
+     lambda p: p.update({"post_retrieval_audit_action_executes_gate": True})),
+)
+
+
+@pytest.mark.parametrize("label,mutate", _GATE_SEPARATION_DRIFTS,
+                         ids=[label for label, _ in _GATE_SEPARATION_DRIFTS])
+def test_gate_separation_drift_fails_closed(tmp_path, label, mutate):
+    root = _root(tmp_path, label, _mutated(_GATE_REL, mutate))
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage128_m3_lag_wdi_exploratory_markers(root)
+
+
+@pytest.mark.parametrize("label,mutate", _GATE_SEPARATION_DRIFTS,
+                         ids=[label for label, _ in _GATE_SEPARATION_DRIFTS])
+def test_gate_separation_drift_fails_closed_in_the_validator(tmp_path, label,
+                                                             mutate):
+    from pathlib import Path
+    root = _root(tmp_path, f"v_{label}", _mutated(_GATE_REL, mutate))
+    with pytest.raises(v.ValidationFail):
+        v.stage128_m3_lag_wdi_exploratory_contract_locked(Path(root))
+
+
+def _conflated_sequence(payload: dict) -> None:
+    """One action that both retrieves and Gates — the boundary erased."""
+    payload["m3_lag_wdi_action_sequence"] = [
+        {"step": "A", "action_id": _ACTION_ID, "authorized": True,
+         "executes_retrieval": False, "executes_data_gate": False,
+         "executes_modeling": False},
+        {"step": "B", "action_id": _RETRIEVAL_ACTION_ID, "authorized": False,
+         "executes_retrieval": True, "executes_data_gate": True,
+         "executes_modeling": False},
+    ]
+
+
+_BOUNDARY_SEPARATION_DRIFTS = (
+    ("the_pointer_scope_grows_to_include_the_gate",
+     lambda p: p.update({
+         "m3_lag_wdi_next_action_scope": "retrieval_and_data_gate"})),
+    ("the_pointer_is_said_to_execute_the_gate",
+     lambda p: p.update({
+         "m3_lag_wdi_next_action_executes_data_gate": True})),
+    ("the_retrieval_action_is_said_to_execute_the_gate",
+     lambda p: p.update({
+         "m3_lag_wdi_retrieval_action_executes_data_gate": True})),
+    ("retrieval_authorization_implies_gate_authorization",
+     lambda p: p.update({
+         "m3_lag_wdi_retrieval_authorization_implies_gate_authorization":
+             True})),
+    ("a_combined_retrieval_and_gate_action_is_permitted",
+     lambda p: p.update({
+         "m3_lag_wdi_combined_retrieval_and_gate_action_permitted": True})),
+    ("the_gate_becomes_authorized",
+     lambda p: p.update({"m3_lag_wdi_data_gate_action_authorized": True})),
+    ("retrieval_becomes_authorized",
+     lambda p: p.update({"m3_lag_wdi_retrieval_action_authorized": True})),
+    ("the_gate_and_retrieval_share_one_action_identity",
+     lambda p: p.update({
+         "m3_lag_wdi_data_gate_action_id": _RETRIEVAL_ACTION_ID})),
+    ("a_gate_pass_is_said_to_authorize_modeling",
+     lambda p: p.update({
+         "m3_lag_wdi_gate_pass_authorizes_modeling": True})),
+    ("a_gate_pass_stops_being_data_admission_only",
+     lambda p: p.update({
+         "m3_lag_wdi_gate_pass_is_data_admission_only": False})),
+    ("the_gate_stops_needing_its_own_human_authorization",
+     lambda p: p.update({
+         "m3_lag_wdi_data_gate_requires_new_explicit_human_authorization":
+             False})),
+    ("one_action_both_retrieves_and_gates", _conflated_sequence),
+    ("a_future_action_is_marked_authorized",
+     lambda p: p["m3_lag_wdi_action_sequence"][3].update(
+         {"authorized": True})),
+    ("the_gate_step_is_dropped_from_the_sequence",
+     lambda p: p.update({
+         "m3_lag_wdi_action_sequence": [
+             e for e in p["m3_lag_wdi_action_sequence"]
+             if e["step"] != "D"]})),
+)
+
+
+@pytest.mark.parametrize("label,mutate", _BOUNDARY_SEPARATION_DRIFTS,
+                         ids=[label for label, _ in
+                              _BOUNDARY_SEPARATION_DRIFTS])
+def test_boundary_separation_drift_fails_closed(tmp_path, label, mutate):
+    root = _root(tmp_path, label, _mutated(_BOUNDARY_REL, mutate))
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage128_m3_lag_wdi_exploratory_markers(root)
+
+
+@pytest.mark.parametrize("label,mutate", _BOUNDARY_SEPARATION_DRIFTS,
+                         ids=[label for label, _ in
+                              _BOUNDARY_SEPARATION_DRIFTS])
+def test_boundary_separation_drift_fails_closed_in_the_validator(
+        tmp_path, label, mutate):
+    from pathlib import Path
+    root = _root(tmp_path, f"v_{label}", _mutated(_BOUNDARY_REL, mutate))
+    with pytest.raises(v.ValidationFail):
+        v.stage128_m3_lag_wdi_exploratory_contract_locked(Path(root))
+
+
+def test_modeling_contract_drift_on_gate_pass_fails_closed(tmp_path):
+    for label, mutate in (
+        ("gate_pass_authorizes_modeling",
+         lambda p: p.update({"gate_pass_authorizes_modeling": True})),
+        ("modeling_authorized_by_gate_pass",
+         lambda p: p.update({"modeling_authorized_by_gate_pass": True})),
+        ("modeling_stops_needing_its_own_authorization",
+         lambda p: p.update({
+             "modeling_requires_new_explicit_human_authorization": False})),
+    ):
+        root = _root(tmp_path, f"m_{label}", _mutated(_MODELING_REL, mutate))
+        with pytest.raises(gen.HandoffError):
+            gen.derive_stage128_m3_lag_wdi_exploratory_markers(root)
 
 
 def test_a_forged_authorization_digest_fails_closed(tmp_path):

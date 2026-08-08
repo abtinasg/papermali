@@ -3448,13 +3448,21 @@ def test_live_pr_topology_is_the_track_b_pr_on_main():
     assert state["stage128_m3i2_live_pr_ready_for_review_authorized"] is False
     assert state["stage128_m3i2_live_pr_role"] == (
         "m3_lag_wdi_exploratory_contract_lock_pr")
-    # The human-submission recording PR is HISTORY, and says so.
-    assert state["stage128_m3i2_recovery_pr_number"] == 77
+    # The human-submission recording PR is HISTORY under its OWN role.
+    assert state["stage128_m3i2_human_submission_pr_number"] == 77
+    assert state["stage128_m3i2_human_submission_pr_merged"] is True
+    assert state["stage128_m3i2_human_submission_pr_merge_commit"] == (
+        "93de6bae9344ce893b0261f818abce8a991cf842")
+    assert state["stage128_m3i2_human_submission_pr_semantics"] == (
+        "merged_predecessor_superseded_by_pr78")
+    # Re-anchoring the LIVE topology onto PR #78 must NOT shift the older
+    # documentary-recovery role forward: that is PR #76, permanently.
+    assert state["stage128_m3i2_recovery_pr_number"] == 76
     assert state["stage128_m3i2_recovery_pr_merged"] is True
     assert state["stage128_m3i2_recovery_pr_merge_commit"] == (
-        "93de6bae9344ce893b0261f818abce8a991cf842")
+        "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
     assert state["stage128_m3i2_recovery_pr_semantics"] == (
-        "merged_predecessor_superseded_by_pr78")
+        "merged_predecessor_superseded_by_pr77")
     assert state["stage128_m3i2_evidence_capture_pr_number"] == 75
     assert state["stage128_m3i2_evidence_capture_pr_merged"] is True
     assert state["stage128_m3i2_evidence_capture_pr_merge_commit"] == (
@@ -3463,7 +3471,13 @@ def test_live_pr_topology_is_the_track_b_pr_on_main():
 
 def test_current_state_never_calls_a_merged_pr_the_live_draft():
     text = _current_state_text()
-    assert "PR #77 is HISTORICAL: merged = True" in text
+    # Both merged PRs are rendered as history, each under its own role, and
+    # neither is re-labelled as the other.
+    assert "**HISTORICAL PR roles (pinned, never re-derived):**" in text
+    assert ("PR #76 = `final_official_documentary_recovery_initiation_pr`"
+            in text)
+    assert ("PR #77 = `final_official_inquiry_human_submission_recording_pr`"
+            in text)
     assert "the LIVE Draft PR is **PR #78**" in text
     # the merged predecessors must never be rendered as the live Draft
     assert "**PR #77** (the LIVE Draft PR)" not in text
@@ -4003,8 +4017,10 @@ def test_handoff_agrees_the_capture_and_recovery_prs_are_merged():
     state = _handoff_state()
     assert state["stage128_m3i2_evidence_capture_pr_number"] == 75
     assert state["stage128_m3i2_evidence_capture_pr_merged"] is True
-    assert state["stage128_m3i2_recovery_pr_number"] == 77
+    assert state["stage128_m3i2_recovery_pr_number"] == 76
     assert state["stage128_m3i2_recovery_pr_merged"] is True
+    assert state["stage128_m3i2_human_submission_pr_number"] == 77
+    assert state["stage128_m3i2_human_submission_pr_merged"] is True
     assert state["stage128_m3i2_live_pr_number"] == 78
     assert state["stage128_m3i2_live_pr_is_draft"] is True
     assert state["stage128_m3i2_live_pr_merged"] is False
