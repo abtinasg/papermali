@@ -1353,6 +1353,178 @@ def stage128_m3_lag_wdi_exploratory_contract_locked(repo_root: Path) -> bool:
     return True
 
 
+# --------------------------------------------------------------------------- #
+# Stage128 — Track B step B: the M3-LAG-WDI exploratory DATA RETRIEVAL
+# --------------------------------------------------------------------------- #
+
+_STAGE128_M3_LAG_RETRIEVAL_PKG = (
+    "project/stage128/m3_lag_wdi_exploratory_data_retrieval")
+STAGE128_M3_LAG_RETRIEVAL_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-data-retrieval")
+STAGE128_M3_LAG_RETRIEVAL_SCOPE = "retrieval_only"
+STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-post-retrieval-audit")
+STAGE128_M3_LAG_RETRIEVAL_AUTH_SHA256 = (
+    "b409e0a53d255955199c59005d39f911ae272713dbf85c38651cd0dcfd5ba604")
+STAGE128_M3_LAG_RETRIEVAL_AUTH_BYTES = 125
+_STAGE128_M3_LAG_RETRIEVAL_MANIFEST_REL = (
+    f"{_STAGE128_M3_LAG_RETRIEVAL_PKG}/"
+    "stage128_m3_lag_wdi_retrieval_source_manifest.json")
+_STAGE128_M3_LAG_RETRIEVAL_AUDIT_REL = (
+    f"{_STAGE128_M3_LAG_RETRIEVAL_PKG}/"
+    "stage128_m3_lag_wdi_retrieval_execution_audit.json")
+_STAGE128_M3_LAG_RETRIEVAL_BOUNDARY_REL = (
+    f"{_STAGE128_M3_LAG_RETRIEVAL_PKG}/"
+    "stage128_m3_lag_wdi_retrieval_governance_boundary.json")
+_STAGE128_M3_LAG_RETRIEVAL_AUTH_REL = (
+    f"{_STAGE128_M3_LAG_RETRIEVAL_PKG}/"
+    "stage128_m3_lag_wdi_retrieval_human_authorization_record.json")
+
+#: Counters a retrieval-only action must still leave at zero.
+_STAGE128_M3_LAG_RETRIEVAL_ZERO = (
+    "wdi_value_inspections", "wdi_observations_read",
+    "alternative_indicators_searched", "alternative_indicators_retrieved",
+    "proxy_or_substitute_series_retrieved", "coverage_calculations",
+    "candidate_coverage_evaluations", "block_coverage_evaluations",
+    "data_gate_executions", "data_gate_results_returned",
+    "admission_decisions", "company_row_macro_joins",
+    "feature_materializations", "fx_transformation_calculations",
+    "common_sample_constructions", "model_fits", "predictions",
+    "predictive_metrics", "bootstrap_executions", "holm_calculations",
+    "shap_executions", "final_test_rows_read",
+    "final_test_predictor_values_read", "final_test_target_values_read",
+)
+
+
+def stage128_m3_lag_wdi_data_retrieval_executed(repo_root: Path) -> bool:
+    """True once the retrieval-only action has acquired the locked payloads.
+
+    An ``executed`` retrieval may exist ONLY if it stayed strictly inside
+    ``retrieval_only``: exactly the two locked indicator codes, the locked
+    country, official HTTPS World Bank API URLs, no payload parsing, no value
+    read, no coverage, no Gate, no admission, no join, no model, no Final Test
+    row — and with the post-retrieval audit, the Data Gate and modeling each
+    still unauthorized. Anything else raises, so the validator can never report
+    a retrieval that quietly did more than acquire bytes.
+    """
+    path = repo_root / _STAGE128_M3_LAG_RETRIEVAL_MANIFEST_REL
+    if not path.is_file():
+        return False
+    manifest = _read_json(repo_root, _STAGE128_M3_LAG_RETRIEVAL_MANIFEST_REL)
+    audit = _read_json(repo_root, _STAGE128_M3_LAG_RETRIEVAL_AUDIT_REL)
+    boundary = _read_json(repo_root, _STAGE128_M3_LAG_RETRIEVAL_BOUNDARY_REL)
+    authorization = _read_json(repo_root, _STAGE128_M3_LAG_RETRIEVAL_AUTH_REL)
+
+    if manifest.get("action_id") != STAGE128_M3_LAG_RETRIEVAL_ACTION_ID:
+        raise ValidationFail("M3-LAG-WDI retrieval action_id mismatch")
+    if manifest.get("authorized_scope") != STAGE128_M3_LAG_RETRIEVAL_SCOPE:
+        raise ValidationFail(
+            f"the retrieval scope must be {STAGE128_M3_LAG_RETRIEVAL_SCOPE}")
+
+    # A NEW single-use authorization, byte-exact and distinct from the lock's.
+    if authorization.get("authorization_sha256") != (
+            STAGE128_M3_LAG_RETRIEVAL_AUTH_SHA256):
+        raise ValidationFail("the retrieval authorization digest is wrong")
+    if authorization.get("authorization_utf8_bytes") != (
+            STAGE128_M3_LAG_RETRIEVAL_AUTH_BYTES):
+        raise ValidationFail("the retrieval authorization byte length is wrong")
+    text = authorization.get("authorization_text") or ""
+    if hashlib.sha256(text.encode("utf-8")).hexdigest() != (
+            STAGE128_M3_LAG_RETRIEVAL_AUTH_SHA256):
+        raise ValidationFail(
+            "the retrieval authorization digest does not match its own text")
+    for field in ("authorization_is_reusable_for_post_retrieval_audit",
+                  "authorization_is_reusable_for_data_gate",
+                  "authorization_is_reusable_for_modeling",
+                  "standing_authorization",
+                  "prior_contract_lock_authorization_reused"):
+        if authorization.get(field) is not False:
+            raise ValidationFail(f"retrieval authorization {field} must be "
+                                 "False")
+
+    # Exactly the two locked indicators, locked country, official API only.
+    indicators = manifest.get("indicators") or []
+    if [entry.get("indicator_code") for entry in indicators] != [
+            STAGE128_M3_LAG_CPI_CODE, STAGE128_M3_LAG_FX_CODE]:
+        raise ValidationFail(
+            "retrieval must cover exactly the two locked indicators")
+    for entry in indicators:
+        if entry.get("country_code") != "IRN":
+            raise ValidationFail("both retrieved indicators are for IRN")
+        if not (entry.get("request_url") or "").startswith(
+                "https://api.worldbank.org/v2/"):
+            raise ValidationFail(
+                "retrieval must use the official World Bank WDI API over "
+                "HTTPS")
+        if entry.get("payload_parsed") is not False:
+            raise ValidationFail("a retrieval-only action parses no payload")
+        # Unresolved stays null, never 0: a 0 here would be a CLAIM about the
+        # data ("we looked and found none"), which acquisition may not make.
+        for field in ("observations_read", "values_inspected",
+                      "coverage_calculated"):
+            if entry.get(field) is not None:
+                raise ValidationFail(
+                    f"{field} must stay null after a retrieval-only action, "
+                    "not zero and not a value")
+    if manifest.get("point_in_time_availability_claimed") is not False:
+        raise ValidationFail(
+            "retrieval never establishes point-in-time availability")
+    if manifest.get("raw_payloads_committed_to_git") != 0:
+        raise ValidationFail("raw WDI payloads stay OUTSIDE Git")
+
+    # Retrieval happened; nothing downstream of it did.
+    if audit.get("retrieval_started") is not True:
+        raise ValidationFail("the retrieval audit must record retrieval")
+    for counter in _STAGE128_M3_LAG_RETRIEVAL_ZERO:
+        if audit.get(counter) != 0:
+            raise ValidationFail(
+                f"retrieval-only: counter {counter} must be 0")
+    for field in ("payload_json_decoded", "post_retrieval_audit_executed",
+                  "quarantined_local_draft_used_as_input"):
+        if audit.get(field) is not False:
+            raise ValidationFail(f"retrieval audit {field} must be False")
+
+    # The boundary it stopped at: C, D and E all still closed.
+    if boundary.get("m3_lag_wdi_next_action_id") != (
+            STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID):
+        raise ValidationFail(
+            "the pointer after retrieval is the post-retrieval audit")
+    for field in ("m3_lag_wdi_next_action_authorized",
+                  "m3_lag_wdi_post_retrieval_audit_action_authorized",
+                  "m3_lag_wdi_data_gate_action_authorized",
+                  "m3_lag_wdi_data_gate_executed",
+                  "m3_lag_wdi_gate_pass_authorizes_modeling",
+                  "m3_lag_wdi_modeling_authorized",
+                  "m3_lag_wdi_modeling_started",
+                  "retrieval_executed_data_gate",
+                  "combined_retrieval_and_gate_action_permitted",
+                  "retrieval_authorization_implies_gate_authorization",
+                  "retrieval_authorization_reusable",
+                  "m3_lag_wdi_block_admitted",
+                  "world_bank_inquiry_terminated_by_this_action",
+                  "world_bank_follow_up_authorized",
+                  "world_bank_response_ingestion_authorized",
+                  "final_test_access_authorized", "m4_authorized",
+                  "merge_authorized", "pii_committed_to_git",
+                  "credentials_committed_to_git"):
+        if boundary.get(field) is not False:
+            raise ValidationFail(
+                f"retrieval governance boundary {field} must be False")
+    if boundary.get("final_test_locked") is not True:
+        raise ValidationFail("the Final Test stays locked after retrieval")
+    if boundary.get("m3_lag_wdi_authoritative_contract_status") != (
+            STAGE128_M3_LAG_LOCKED_STATUS):
+        raise ValidationFail(
+            "retrieval does not change the authoritative contract status")
+    if boundary.get("world_bank_inquiry_status") != (
+            STAGE128_M3I2_INQUIRY_SUBMITTED_STATUS):
+        raise ValidationFail(
+            "Track A must stay "
+            f"{STAGE128_M3I2_INQUIRY_SUBMITTED_STATUS} after a Track B "
+            "retrieval")
+    return True
+
+
 #: PR #73 was merged into main by this commit; PR #74 was retargeted after.
 STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT = (
     "e6db63fb7d105f0d3a39db101c9e364161c367e9")
@@ -3339,14 +3511,60 @@ def build_assertions(
             is True),
         "a locked M3-LAG-WDI contract must be published as locked, not as "
         "NOT_LOCKED")
-    add("m3_lag_wdi_lock_executes_nothing",
+    # Retrieval (step B) is a SEPARATE, later, separately authorized action, so
+    # `data_retrieval_started` is owned by the retrieval recognizer below and is
+    # deliberately NOT asserted here. What the lock itself must never have done
+    # — Gate, modeling, Final Test — is still asserted unconditionally, and the
+    # retrieval-only firewall is asserted separately.
+    m3_lag_retrieved = stage128_m3_lag_wdi_data_retrieval_executed(repo_root)
+    add("m3_lag_wdi_lock_executes_no_gate_no_model_no_final_test",
         (not m3_lag_locked)
-        or (handoff.get("stage128_m3_lag_wdi_data_retrieval_started") is False
-            and handoff.get("stage128_m3_lag_wdi_data_gate_executed") is False
+        or (handoff.get("stage128_m3_lag_wdi_data_gate_executed") is False
             and handoff.get("stage128_m3_lag_wdi_modeling_started") is False
             and handoff.get("stage128_m3_lag_wdi_final_test_rows_read") == 0),
-        "a contract lock retrieves nothing, executes no Gate, fits no model "
-        "and reads no Final Test row")
+        "the contract lock executes no Gate, fits no model and reads no Final "
+        "Test row")
+    add("m3_lag_wdi_retrieval_started_only_with_its_own_action",
+        (handoff.get("stage128_m3_lag_wdi_data_retrieval_started") is not True)
+        or m3_lag_retrieved,
+        "the Handoff may publish retrieval as started only when the "
+        "retrieval-only action package justifies it")
+    add("m3_lag_wdi_retrieval_is_published_when_it_exists",
+        (not m3_lag_retrieved)
+        or (handoff.get("stage128_m3_lag_wdi_data_retrieval_started") is True
+            and handoff.get("stage128_m3_lag_wdi_retrieval_scope")
+            == STAGE128_M3_LAG_RETRIEVAL_SCOPE),
+        "an executed retrieval must be published as executed, and as "
+        "retrieval_only")
+    add("m3_lag_wdi_retrieval_executed_nothing_downstream",
+        (not m3_lag_retrieved)
+        or (handoff.get("stage128_m3_lag_wdi_data_gate_executed") is False
+            and handoff.get("stage128_m3_lag_wdi_data_gate_authorized")
+            is False
+            and handoff.get("stage128_m3_lag_wdi_post_retrieval_audit_executed")
+            is False
+            and handoff.get("stage128_m3_lag_wdi_modeling_started") is False
+            and handoff.get("stage128_m3_lag_wdi_modeling_authorized") is False
+            and handoff.get("stage128_m3_lag_wdi_block_admitted") is False
+            and handoff.get("stage128_m3_lag_wdi_final_test_rows_read") == 0),
+        "acquisition is not admission: retrieval executes no audit, no Gate "
+        "and no model, admits nothing and reads no Final Test row")
+    add("m3_lag_wdi_retrieval_never_read_a_value",
+        (not m3_lag_retrieved)
+        or (handoff.get("stage128_m3_lag_wdi_payload_json_decoded") is False
+            and handoff.get("stage128_m3_lag_wdi_wdi_observations_read") == 0
+            and handoff.get(
+                "stage128_m3_lag_wdi_alternative_indicators_retrieved") == 0),
+        "a retrieval-only action stops at the byte boundary and retrieves no "
+        "alternative indicator")
+    add("m3_lag_wdi_retrieval_points_at_an_unauthorized_audit",
+        (not m3_lag_retrieved)
+        or (handoff.get("stage128_m3_lag_wdi_next_action_id")
+            == STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID
+            and handoff.get("stage128_m3_lag_wdi_next_action_authorized")
+            is False),
+        "after retrieval the Track B pointer is the post-retrieval audit, and "
+        "a pointer is never an authorization")
     add("m3_lag_wdi_lock_is_exploratory_not_confirmatory",
         (not m3_lag_locked)
         or (handoff.get("stage128_m3_lag_wdi_scientific_role")
@@ -3394,18 +3612,33 @@ def build_assertions(
     # pointer named a single action that both retrieves and Gates, the human
     # authorization for retrieval would silently become an authorization to
     # admit data. The Handoff must publish them separated and unauthorized.
-    add("m3_lag_wdi_next_action_is_retrieval_only",
+    # The pointer ADVANCES as Track B steps complete (retrieval -> audit ->
+    # ...), so pinning it to one action id would encode a moment rather than
+    # the rule. The invariant that must hold at EVERY step is asserted instead:
+    # whatever the pointer names, it is a step of the separated sequence, it
+    # never executes the Data Gate, and it is never itself an authorization.
+    _m3_lag_pointer = handoff.get("stage128_m3_lag_wdi_next_action_id")
+    add("m3_lag_wdi_next_action_is_a_separated_unauthorized_step",
         (not m3_lag_locked)
-        or (handoff.get("stage128_m3_lag_wdi_next_action_id")
-            == STAGE128_M3_LAG_RETRIEVAL_ACTION_ID
-            and handoff.get("stage128_m3_lag_wdi_next_action_scope")
-            == STAGE128_M3_LAG_NEXT_ACTION_SCOPE
+        or (_m3_lag_pointer in (STAGE128_M3_LAG_RETRIEVAL_ACTION_ID,
+                                STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID,
+                                STAGE128_M3_LAG_DATA_GATE_ACTION_ID,
+                                STAGE128_M3_LAG_MODELING_ACTION_ID)
+            and _m3_lag_pointer != STAGE128_M3_LAG_DATA_GATE_ACTION_ID
             and handoff.get(
                 "stage128_m3_lag_wdi_next_action_executes_data_gate") is False
             and handoff.get("stage128_m3_lag_wdi_next_action_authorized")
             is False),
-        "the immediate Track B pointer is retrieval ONLY, it does not execute "
-        "the Data Gate, and it is not authorized")
+        "the immediate Track B pointer is a single separated step, it never "
+        "executes the Data Gate, and it is not authorized")
+    add("m3_lag_wdi_pointer_is_retrieval_only_until_retrieval_runs",
+        (not m3_lag_locked)
+        or handoff.get("stage128_m3_lag_wdi_data_retrieval_started") is True
+        or (_m3_lag_pointer == STAGE128_M3_LAG_RETRIEVAL_ACTION_ID
+            and handoff.get("stage128_m3_lag_wdi_next_action_scope")
+            == STAGE128_M3_LAG_NEXT_ACTION_SCOPE),
+        "before retrieval has run, the immediate Track B pointer is the "
+        "retrieval action with scope retrieval_only")
     add("m3_lag_wdi_data_gate_is_a_separate_unauthorized_action",
         (not m3_lag_locked)
         or (handoff.get("stage128_m3_lag_wdi_data_gate_action_id")

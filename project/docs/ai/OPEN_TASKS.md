@@ -146,47 +146,58 @@ retrieval, for the Data Gate or for modeling.
 * **Separate family:** the exploratory comparison never enters the confirmatory
   Holm family `M2_minus_M1`, `M3_CBI_minus_M2`, `M4_minus_M3_CBI`.
 
-**Open item for the human supervisor on Track B.** Nothing may be retrieved
-yet. The immediate pointer is **retrieval ONLY**:
-`m3_lag_wdi_next_action_id: stage128-m3-lag-wdi-exploratory-data-retrieval`,
-`m3_lag_wdi_next_action_scope: retrieval_only`,
-`m3_lag_wdi_next_action_authorized: false`,
-`m3_lag_wdi_next_action_executes_data_gate: false`.
+**TRACK B step B is DONE: the locked source data has been RETRIEVED (item 25i).**
+Under its own new one-action authorization (125 UTF-8 bytes, SHA-256
+`b409e0a5…a604`, now **consumed**), the two locked WDI series were acquired
+from the official World Bank WDI API: `FP.CPI.TOTL.ZG` and `PA.NUS.FCRF`, both
+`IRN` — 2 requests, 2 successes, 2 raw artifacts, 32,287 bytes. Raw payloads
+live **outside** the repository; only byte counts and SHA-256 digests are
+committed.
 
-**Retrieval, the Data Gate and modeling are three SEPARATE actions.** An
-authorization boundary only exists where an action boundary exists, so they are
-never bundled and never share an identity:
+**Acquiring bytes is not admitting data.** The payloads were never decoded or
+parsed, no observation was read, no coverage was computed, no Gate ran, nothing
+was admitted, nothing was joined to a company row, no model was fit and no
+Final Test row was read. The authoritative contract is unchanged.
 
-| Step | Action id | Authorized |
+**Open item for the human supervisor on Track B.** The next eligible action is
+`m3_lag_wdi_next_action_id: stage128-m3-lag-wdi-exploratory-post-retrieval-audit`
+with `m3_lag_wdi_post_retrieval_audit_authorized: false`. Eligibility is not
+authorization. The remaining steps stay three separate decisions:
+
+* **C — post-retrieval audit** (`…-post-retrieval-audit`): reads what is inside
+  the retained bytes. **Not authorized.** It executes no Gate.
+* **D — Data Gate** (`…-data-gate`): needs a **NEW explicit human
+  authorization**. A retrieval authorization never authorized it, and it was
+  not executed.
+* **E — modeling** (`…-incremental-evaluation`): only if the Gate returns PASS,
+  and only under **another** explicit authorization. A Gate PASS would be
+  **data admission only**.
+
+None of them unlocks the Final Test.
+
+| Step | Action | Authorized |
 | --- | --- | --- |
-| A | `stage128-m3-lag-wdi-exploratory-contract-lock` (DONE, item 25h) | consumed |
-| B | `stage128-m3-lag-wdi-exploratory-data-retrieval` — retrieval only | **false** |
-| C | `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — audit/state recording, **no Gate** | **false** |
+| B | `stage128-m3-lag-wdi-exploratory-data-retrieval` — retrieval | **COMPLETE** (authorization consumed) |
+| C | `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — audit | **false** |
 | D | `stage128-m3-lag-wdi-exploratory-data-gate` — the Data Gate | **false** |
 | E | `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — modeling | **false** |
 
-* An authorization to **retrieve** is **not** an authorization to execute the
-  Data Gate: `m3_lag_wdi_retrieval_authorization_implies_gate_authorization:
-  false`.
-* A **combined** retrieval-and-Gate action is forbidden:
-  `m3_lag_wdi_combined_retrieval_and_gate_action_permitted: false`.
-* A **pointer** to the Data Gate is not an authorization to execute it. Step D
-  needs its own NEW explicit human authorization.
-* A Gate **PASS** is **DATA ADMISSION ONLY**
-  (`m3_lag_wdi_gate_pass_is_data_admission_only: true`) and authorizes no model
-  fit (`m3_lag_wdi_gate_pass_authorizes_modeling: false`). Step E needs
-  ANOTHER separate explicit human authorization.
-* None of A–E unlocks the Final Test.
+A retrieval authorization did **not** authorize the Data Gate
+(`m3_lag_wdi_retrieval_authorization_implies_gate_authorization: false`,
+`m3_lag_wdi_combined_retrieval_and_gate_action_permitted: false`), and a
+Data Gate PASS would be **data admission only** and would **not** authorize
+modeling (`m3_lag_wdi_gate_pass_authorizes_modeling: false`).
 
-**PR history, pinned (not re-derived from adjacency).** PR **#76** =
-`stage128-m3i2-final-official-documentary-recovery-initiation`, MERGED by
+**PR roles are pinned historical facts, not positional labels.** PR **#76** =
+the final official documentary recovery INITIATION
+(`stage128-m3i2-final-official-documentary-recovery-initiation`), MERGED by
 `89d8e6ff2d12ec82903cd28aa7ab839eb946b658`. PR **#77** = the later, separate
-HUMAN World Bank inquiry submission RECORDING
+human World Bank inquiry submission RECORDING
 (`stage128-m3i2-final-official-inquiry-human-submission`), MERGED by
-`93de6bae9344ce893b0261f818abce8a991cf842`. PR **#78** = the current **LIVE
-Draft**, the M3-LAG-WDI exploratory contract lock. "The recovery PR" always
-means PR #76 — it never slides forward to mean whichever PR merged most
-recently, and the three roles may not be collapsed or shifted.
+`93de6bae9344ce893b0261f818abce8a991cf842`. PR **#78** = the M3-LAG-WDI
+exploratory contract lock, MERGED by
+`175e7949e009eeecdd66aedab31ec4b48e9d3c7d`. "The recovery PR" means PR #76
+specifically — never "whichever PR merged most recently".
 
 **HISTORICAL — superseded by the new explicit human authorization.** Until item
 25h this file recorded: *"M3-LAG-WDI-EXPLORATORY is NOT locked … the

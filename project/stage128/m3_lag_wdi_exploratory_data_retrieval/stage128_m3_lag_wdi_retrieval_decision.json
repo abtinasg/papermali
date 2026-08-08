@@ -1,0 +1,23 @@
+{
+  "acquisition_is_not_admission": true,
+  "action_id": "stage128-m3-lag-wdi-exploratory-data-retrieval",
+  "admission_decision_made": false,
+  "authorized_scope": "retrieval_only",
+  "authorizes_next_action": false,
+  "coverage_decision_made": false,
+  "data_gate_action_id": "stage128-m3-lag-wdi-exploratory-data-gate",
+  "data_gate_authorized": false,
+  "expected_baseline_sha": "175e7949e009eeecdd66aedab31ec4b48e9d3c7d",
+  "final_test_locked": true,
+  "gate_decision_made": false,
+  "m4_authorized": false,
+  "merge_authorized": false,
+  "modeling_action_id": "stage128-m3-lag-wdi-exploratory-incremental-evaluation",
+  "modeling_authorized": false,
+  "modeling_decision_made": false,
+  "next_action_authorized": false,
+  "next_action_id": "stage128-m3-lag-wdi-exploratory-post-retrieval-audit",
+  "paper_winner_selected": false,
+  "retrieval_status": "RETRIEVAL_COMPLETED_RAW_SOURCE_RETAINED",
+  "scientific_effect": "NONE"
+}

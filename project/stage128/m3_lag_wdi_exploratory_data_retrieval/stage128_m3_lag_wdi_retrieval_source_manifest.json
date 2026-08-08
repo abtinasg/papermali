@@ -1,0 +1,51 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-data-retrieval",
+  "authorized_scope": "retrieval_only",
+  "country_code": "IRN",
+  "historical_vintage_availability_claimed": false,
+  "indicator_count": 2,
+  "indicators": [
+    {
+      "attempts": 1,
+      "content_type": "application/json;charset=utf-8",
+      "country_code": "IRN",
+      "coverage_calculated": null,
+      "http_status_code": 200,
+      "indicator_code": "FP.CPI.TOTL.ZG",
+      "observations_read": null,
+      "payload_parsed": false,
+      "raw_artifact_bytes": 15805,
+      "raw_artifact_filename": "f62292c52088df71__FP.CPI.TOTL.ZG.attempt1.json",
+      "raw_artifact_sha256": "f62292c52088df714c34846a6865ddc47306d49796ea9ec9014441893d553add",
+      "request_url": "https://api.worldbank.org/v2/country/IRN/indicator/FP.CPI.TOTL.ZG?format=json&per_page=20000",
+      "retrieval_result": "SUCCESS",
+      "retrieval_timestamp_utc": "2026-08-08T15:22:39Z",
+      "successful_attempts": 1,
+      "values_inspected": null
+    },
+    {
+      "attempts": 1,
+      "content_type": "application/json;charset=utf-8",
+      "country_code": "IRN",
+      "coverage_calculated": null,
+      "http_status_code": 200,
+      "indicator_code": "PA.NUS.FCRF",
+      "observations_read": null,
+      "payload_parsed": false,
+      "raw_artifact_bytes": 16482,
+      "raw_artifact_filename": "74b585734cc48dd2__PA.NUS.FCRF.attempt1.json",
+      "raw_artifact_sha256": "74b585734cc48dd2e9d063e955d95a619dbaa5e4bbff283b128da21b339d63d4",
+      "request_url": "https://api.worldbank.org/v2/country/IRN/indicator/PA.NUS.FCRF?format=json&per_page=20000",
+      "retrieval_result": "SUCCESS",
+      "retrieval_timestamp_utc": "2026-08-08T15:22:40Z",
+      "successful_attempts": 1,
+      "values_inspected": null
+    }
+  ],
+  "official_source": "World Bank WDI API (api.worldbank.org)",
+  "point_in_time_availability_claimed": false,
+  "raw_payloads_committed_to_git": 0,
+  "raw_payloads_retained_outside_git": 2,
+  "unresolved_values_are_null_not_zero": true,
+  "wdi_vintage": "current_or_latest_revised"
+}

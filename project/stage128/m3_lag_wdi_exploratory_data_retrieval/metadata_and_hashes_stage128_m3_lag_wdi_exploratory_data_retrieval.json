@@ -1,0 +1,61 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-data-retrieval",
+  "authorization_sha256": "b409e0a53d255955199c59005d39f911ae272713dbf85c38651cd0dcfd5ba604",
+  "authorization_utf8_bytes": 125,
+  "authorized_scope": "retrieval_only",
+  "baseline_commit": "175e7949e009eeecdd66aedab31ec4b48e9d3c7d",
+  "credentials_committed_to_git": false,
+  "inherited_inputs": {
+    "project/stage128/m3_lag_wdi_exploratory_contract_lock/stage128_m3_lag_wdi_exploratory_contract.json": {
+      "bytes": 6456,
+      "sha256": "61d3158bc79633b1e5e4c8dfdb9ec6a5f95ee5789fa2a6109158d0f39d20b8b5"
+    },
+    "project/stage128/m3_lag_wdi_exploratory_contract_lock/stage128_m3_lag_wdi_exploratory_data_gate_contract.json": {
+      "bytes": 3221,
+      "sha256": "9eba4c248e76445bce0be356c04b994d925acd0e33f46bd92fd6ef20561d5bb6"
+    },
+    "project/stage128/m3_lag_wdi_exploratory_contract_lock/stage128_m3_lag_wdi_exploratory_governance_boundary.json": {
+      "bytes": 5911,
+      "sha256": "24408046e962a4db2058f5178200d1ec31f913b0ca0532c4b002f994acae0190"
+    }
+  },
+  "inherited_inputs_modified_by_this_action": false,
+  "package_files": {
+    "README_STAGE128_M3_LAG_WDI_EXPLORATORY_DATA_RETRIEVAL.md": {
+      "bytes": 2912,
+      "sha256": "888aa08c8a1c2bfefc1e6863cbac4afd556d0168faeb787a8ed561a90cde68ea"
+    },
+    "stage128_m3_lag_wdi_retrieval_decision.json": {
+      "bytes": 933,
+      "sha256": "701fcd13aacbab8eaa97698ac752600ab5ede8262c67e6d51f1bf071a0febd05"
+    },
+    "stage128_m3_lag_wdi_retrieval_execution_audit.json": {
+      "bytes": 1377,
+      "sha256": "d48ca05320438ea42af826a223dc4db403d375b032f8f2d956bb609d3dbf7212"
+    },
+    "stage128_m3_lag_wdi_retrieval_governance_boundary.json": {
+      "bytes": 3624,
+      "sha256": "aaa681bb4953e24e54223b4486154b657302c8a93d05c810777db3c538537c44"
+    },
+    "stage128_m3_lag_wdi_retrieval_human_authorization_record.json": {
+      "bytes": 2031,
+      "sha256": "c3d9c12f9d3e97ab69e0d0b41918b9f12b6a33119788c1716141e6ee2487f0fa"
+    },
+    "stage128_m3_lag_wdi_retrieval_pr_topology.json": {
+      "bytes": 1401,
+      "sha256": "b1143841a12d6e381c9491802996fc206baf6e97de405b27f22000bee57641dc"
+    },
+    "stage128_m3_lag_wdi_retrieval_qc_report.json": {
+      "bytes": 2022,
+      "sha256": "3ed6dae2d1eb4f24b89227ffd2e658946203a9642c050f4b752efdc2c0f6ebf6"
+    },
+    "stage128_m3_lag_wdi_retrieval_source_manifest.json": {
+      "bytes": 2061,
+      "sha256": "0b3f9278bae4c65e0c57ef868366d8cc16d0202a5a0e2fccbd6ba3da4c537284"
+    }
+  },
+  "package_id": "stage128_m3_lag_wdi_exploratory_data_retrieval",
+  "pii_committed_to_git": false,
+  "raw_wdi_payloads_committed_to_git": 0,
+  "wdi_value_files_committed": 0
+}

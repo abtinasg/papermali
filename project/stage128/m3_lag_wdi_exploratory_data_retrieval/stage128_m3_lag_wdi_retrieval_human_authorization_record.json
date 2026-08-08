@@ -1,0 +1,43 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-data-retrieval",
+  "authorization_consumed": true,
+  "authorization_consumed_by_this_retrieval": true,
+  "authorization_covers": [
+    "acquisition_of_the_two_locked_wdi_indicator_payloads_for_irn",
+    "faithful_retention_of_the_raw_source_bytes",
+    "mechanical_acquisition_metadata_url_status_bytes_hash",
+    "fail_closed_validators_and_tests"
+  ],
+  "authorization_excludes": [
+    "post_retrieval_audit",
+    "wdi_value_or_observation_inspection",
+    "coverage_calculation",
+    "data_gate_execution",
+    "data_admission",
+    "feature_materialization_or_company_row_join",
+    "fx_transformation_calculation",
+    "modeling_or_predictive_evaluation",
+    "final_test_access",
+    "track_a_follow_up_or_response_adjudication",
+    "ready_for_review_or_merge"
+  ],
+  "authorization_is_reusable_for_data_gate": false,
+  "authorization_is_reusable_for_modeling": false,
+  "authorization_is_reusable_for_post_retrieval_audit": false,
+  "authorization_scope": "retrieval_only",
+  "authorization_sha256": "b409e0a53d255955199c59005d39f911ae272713dbf85c38651cd0dcfd5ba604",
+  "authorization_text": "مجوز اجرای stage128-m3-lag-wdi-exploratory-data-retrieval را فقط در محدوده retrieval_only می‌دهم",
+  "authorization_type": "one_action_authorization",
+  "authorization_utf8_bytes": 125,
+  "authorized_action_id": "stage128-m3-lag-wdi-exploratory-data-retrieval",
+  "expected_baseline_sha": "175e7949e009eeecdd66aedab31ec4b48e9d3c7d",
+  "merge_authorized": false,
+  "prior_contract_lock_authorization_reused": false,
+  "prior_contract_lock_authorization_sha256": "0c1e10496bfba98d5ae4a6a3a8bf593a42258388fce1003c4cc36e6cdee4995b",
+  "prior_contract_lock_authorization_status": "HISTORICAL_AND_CONSUMED_BY_THE_CONTRACT_LOCK",
+  "scope_identified_by_hash_alone": false,
+  "standing_authorization": false,
+  "timestamp_independently_establishable": false,
+  "timestamp_utc": null,
+  "timestamp_utc_status": "NOT_INDEPENDENTLY_ESTABLISHABLE_NOT_INVENTED"
+}

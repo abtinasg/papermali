@@ -528,7 +528,10 @@ def test_the_handoff_publishes_the_locked_contract(handoff):
 
 
 def test_the_handoff_records_zero_execution(handoff):
-    assert handoff["stage128_m3_lag_wdi_data_retrieval_started"] is False
+    # Retrieval (step B) is a SEPARATE, later, separately authorized action, so
+    # whether it has run is owned by its own test module, not by the lock's.
+    # What the LOCK must never have caused is asserted here and stays asserted
+    # for the whole life of the branch.
     assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
     assert handoff["stage128_m3_lag_wdi_data_gate_result"] == "NOT_EXECUTED"
     assert handoff["stage128_m3_lag_wdi_modeling_started"] is False
@@ -1040,15 +1043,26 @@ _MODELING_ACTION_ID = (
     "stage128-m3-lag-wdi-exploratory-incremental-evaluation")
 
 
-def test_the_next_action_is_retrieval_only_and_never_the_gate(handoff):
-    assert handoff["stage128_m3_lag_wdi_next_action_id"] == (
-        _RETRIEVAL_ACTION_ID)
-    assert handoff["stage128_m3_lag_wdi_next_action_scope"] == "retrieval_only"
+def test_the_next_action_is_a_separated_step_and_never_the_gate(handoff):
+    # The pointer ADVANCES as Track B steps complete, so pinning it to one
+    # action id would encode a moment. The rule that must hold at every step:
+    # the pointer is one of the separated steps, it is never the Data Gate
+    # itself, it never executes the Gate, and it is never an authorization.
+    assert handoff["stage128_m3_lag_wdi_next_action_id"] in (
+        _RETRIEVAL_ACTION_ID, _POST_RETRIEVAL_AUDIT_ACTION_ID)
+    assert handoff["stage128_m3_lag_wdi_next_action_id"] != _DATA_GATE_ACTION_ID
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
     assert handoff[
         "stage128_m3_lag_wdi_next_action_executes_data_gate"] is False
-    assert handoff["stage128_m3_lag_wdi_retrieval_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_retrieval_executes_data_gate"] is False
+    # retrieval may have been authorized once, but never as a standing grant
+    if handoff["stage128_m3_lag_wdi_retrieval_authorized"] is True:
+        assert handoff[
+            "stage128_m3_lag_wdi_retrieval_authorization_consumed"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_retrieval_authorization_reusable"] is False
+    else:
+        assert handoff["stage128_m3_lag_wdi_data_retrieval_started"] is False
 
 
 def test_the_data_gate_is_a_separate_unauthorized_action(handoff):
@@ -1111,9 +1125,13 @@ def test_the_published_action_sequence_separates_every_step(handoff):
     for entry in sequence:
         assert sum((entry["executes_retrieval"], entry["executes_data_gate"],
                     entry["executes_modeling"])) <= 1, entry["action_id"]
-    # every FUTURE step is unauthorized; only the completed lock is authorized
-    assert [e["authorized"] for e in sequence] == [True, False, False, False,
-                                                   False]
+    # every step that has NOT been carried out under its own authorization is
+    # unauthorized; steps C, D and E are always unauthorized here, whatever has
+    # already completed
+    by_step = {e["step"]: e for e in sequence}
+    for step in ("C", "D", "E"):
+        assert by_step[step]["authorized"] is False, step
+    assert by_step["A"]["authorized"] is True
 
 
 def test_the_docs_separate_retrieval_from_the_gate():
@@ -1129,7 +1147,13 @@ def test_the_docs_separate_retrieval_from_the_gate():
             or "`m3_lag_wdi_retrieval_authorization_implies_gate_"
                "authorization:\n  false`" in body), rel
     roadmap = _read_text("project/docs/ai/ROADMAP.md")
-    assert "m3_lag_wdi_next_action_scope: retrieval_only" in roadmap
+    # The pointer scope advances with the sequence, so what must always hold is
+    # that retrieval keeps its OWN action id, separate from the Gate's, and
+    # that the current pointer never claims to execute the Gate.
+    assert f"m3_lag_wdi_retrieval_action_id: {_RETRIEVAL_ACTION_ID}" in roadmap
+    assert f"m3_lag_wdi_data_gate_action_id: {_DATA_GATE_ACTION_ID}" in roadmap
+    assert "m3_lag_wdi_data_gate_authorized: false" in roadmap
+    assert "m3_lag_wdi_next_action_executes_data_gate: false" in roadmap
     assert "m3_lag_wdi_data_gate_authorized: false" in roadmap
     assert "m3_lag_wdi_gate_pass_authorizes_modeling: false" in roadmap
 

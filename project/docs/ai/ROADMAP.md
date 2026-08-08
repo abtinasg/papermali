@@ -21,13 +21,15 @@ m3i2_official_source_evidence_status: UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE
 m3i2_final_documentary_recovery_status: HUMAN_SUBMISSION_REQUIRED
 m3_lag_wdi_authoritative_contract_status: AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL
 m3_lag_wdi_exploratory_track: PARALLEL_ACTIVE
-m3_lag_wdi_last_completed_action_id: stage128-m3-lag-wdi-exploratory-contract-lock
-m3_lag_wdi_next_action_id: stage128-m3-lag-wdi-exploratory-data-retrieval
-m3_lag_wdi_next_action_scope: retrieval_only
+m3_lag_wdi_last_completed_action_id: stage128-m3-lag-wdi-exploratory-data-retrieval
+m3_lag_wdi_next_action_id: stage128-m3-lag-wdi-exploratory-post-retrieval-audit
+m3_lag_wdi_next_action_scope: post_retrieval_audit_only
 m3_lag_wdi_next_action_authorized: false
 m3_lag_wdi_next_action_executes_data_gate: false
 m3_lag_wdi_retrieval_action_id: stage128-m3-lag-wdi-exploratory-data-retrieval
-m3_lag_wdi_retrieval_authorized: false
+m3_lag_wdi_retrieval_status: RETRIEVAL_COMPLETED_RAW_SOURCE_RETAINED
+m3_lag_wdi_retrieval_authorization_consumed: true
+m3_lag_wdi_further_retrieval_authorized: false
 m3_lag_wdi_post_retrieval_audit_action_id: stage128-m3-lag-wdi-exploratory-post-retrieval-audit
 m3_lag_wdi_post_retrieval_audit_authorized: false
 m3_lag_wdi_data_gate_action_id: stage128-m3-lag-wdi-exploratory-data-gate
@@ -38,7 +40,7 @@ m3_lag_wdi_gate_pass_is_data_admission_only: true
 m3_lag_wdi_gate_pass_authorizes_modeling: false
 m3_lag_wdi_modeling_action_id: stage128-m3-lag-wdi-exploratory-incremental-evaluation
 m3_lag_wdi_modeling_authorized: false
-m3_lag_wdi_data_retrieval_started: false
+m3_lag_wdi_data_retrieval_started: true
 m3_lag_wdi_data_gate_executed: false
 m3_lag_wdi_modeling_started: false
 m3i2_documentary_recovery_pr_number: 76
@@ -127,9 +129,9 @@ From 2026-07-26 onward, Stage126+ follows [`STAGE126_Q1Q2_LEAN_GOVERNANCE.md`](S
 
 **TRACK B FUTURE SEQUENCE — RETRIEVAL, THE DATA GATE AND MODELING ARE THREE SEPARATE ACTIONS.** An authorization boundary only exists where an action boundary exists, so these are never bundled and never share an identity. **Retrieving is not Gating, and Gating is not modeling.** An authorization to retrieve is **not** an authorization to execute the Data Gate (`m3_lag_wdi_retrieval_authorization_implies_gate_authorization: false`); a combined retrieval-and-Gate action is forbidden (`m3_lag_wdi_combined_retrieval_and_gate_action_permitted: false`); and a Gate PASS is **data admission only** (`m3_lag_wdi_gate_pass_is_data_admission_only: true`, `m3_lag_wdi_gate_pass_authorizes_modeling: false`). Every one of items 25i–25l is a **pointer**, and a pointer is **never** an authorization.
 
-25i. `stage128-m3-lag-wdi-exploratory-data-retrieval` — **TRACK B POINTER ONLY; RETRIEVAL ONLY; NOT AUTHORIZED.** The next possible Track B action is retrieval of the two locked WDI series (`FP.CPI.TOTL.ZG` and `PA.NUS.FCRF`, `IRN`) under the contract locked at item 25h. Scope `m3_lag_wdi_next_action_scope: retrieval_only`, `m3_lag_wdi_next_action_authorized: false`, `m3_lag_wdi_retrieval_authorized: false`. **This action does NOT execute the Data Gate** (`m3_lag_wdi_next_action_executes_data_gate: false`) — the Gate is item 25k, a separate action under a separate authorization. Retrieval may not begin without its own separate explicit human authorization, computes no coverage, admits no data, fits no model and may not read a Final Test row.
+25i. `stage128-m3-lag-wdi-exploratory-data-retrieval` — **COMPLETE; TRACK B; RECORDED UNDER ITS OWN NEW EXPLICIT ONE-ACTION HUMAN AUTHORIZATION (125 UTF-8 bytes, SHA-256 `b409e0a5…a604`), which was CONSUMED by this retrieval; RETRIEVAL ONLY, zero interpretation.** The two locked WDI series were acquired from the official World Bank WDI API over HTTPS (`api.worldbank.org`): `FP.CPI.TOTL.ZG` and `PA.NUS.FCRF`, both for `IRN`, **2 API requests, 2 successful responses, 2 raw artifacts retained, 32,287 raw bytes**. Raw payloads are retained **outside the repository**; only their byte counts and SHA-256 digests are committed (`raw_payloads_committed_to_git: 0`). **Acquiring bytes is not admitting data.** The payload was **never decoded or parsed** (`payload_json_decoded: false`, `wdi_observations_read: 0`): reading what is inside the retained bytes is item 25j, which is NOT authorized. Execution audit, all zero: WDI value inspections, alternative/proxy indicators searched or retrieved, coverage calculations, candidate and block coverage evaluations, Data Gate executions, admission decisions, company-row macro joins, feature materializations, FX transformation calculations, common-sample constructions, model fits, predictions, predictive metrics, bootstrap executions, Holm calculations, SHAP executions, tuning runs, **final-test rows read**. No indicator search, no substitution and no post-hoc alternative series: the retrieval layer structurally cannot build a URL for any code outside the two locked ones or any country outside `IRN`. The authoritative contract is unchanged and still `AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL`; the retrieval authorization is **consumed** and is **not** reusable for item 25j, 25k or 25l. Track A is untouched. See `project/stage128/m3_lag_wdi_exploratory_data_retrieval/README_STAGE128_M3_LAG_WDI_EXPLORATORY_DATA_RETRIEVAL.md`.
 
-25j. `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — **TRACK B POINTER ONLY; NOT AUTHORIZED.** If and only if retrieval has happened, a post-retrieval audit and state recording may follow: provenance, byte counts, hashes and the recorded fact of what was retrieved. `m3_lag_wdi_post_retrieval_audit_authorized: false`. **It executes NO Data Gate** (`m3_lag_wdi_post_retrieval_audit_executes_data_gate: false`), computes no admission decision, admits nothing and reads no Final Test row.
+25j. `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — **TRACK B POINTER ONLY; THE IMMEDIATE NEXT POINTER; NOT AUTHORIZED.** Retrieval has now happened (item 25i), so this is the next eligible Track B action — and eligibility is not authorization (`m3_lag_wdi_post_retrieval_audit_authorized: false`). A post-retrieval audit and state recording may follow: provenance, byte counts, hashes and the recorded fact of what was retrieved. `m3_lag_wdi_post_retrieval_audit_authorized: false`. **It executes NO Data Gate** (`m3_lag_wdi_post_retrieval_audit_executes_data_gate: false`), computes no admission decision, admits nothing and reads no Final Test row.
 
 25k. `stage128-m3-lag-wdi-exploratory-data-gate` — **TRACK B POINTER ONLY; SEPARATE ACTION; NOT AUTHORIZED; REQUIRES A NEW EXPLICIT HUMAN AUTHORIZATION.** The development-only Data Gate against the thresholds inherited and frozen at item 25h (candidate coverage `>= 0.80`, block coverage `>= 0.70`, `>= 5` positives in each locked validation window; every observed coverage value is `null`, not zero). `m3_lag_wdi_data_gate_action_id: stage128-m3-lag-wdi-exploratory-data-gate`, `m3_lag_wdi_data_gate_authorized: false`, `m3_lag_wdi_data_gate_executed: false`. **Having retrieved the data does not authorize this Gate**, and **this pointer is not an authorization to execute it**. A PASS would be **DATA ADMISSION ONLY**: it would admit the two features and **would not authorize a single model fit**, and it would not unlock the Final Test.
 
