@@ -1,0 +1,166 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-contract-lock",
+  "additional_macro_feature_count": 2,
+  "block_id": "M3-LAG-WDI",
+  "can_select_paper_winner_alone": false,
+  "complete_case_policy": {
+    "both_lagged_wdi_features_required_complete": true,
+    "imputation_permitted": false,
+    "m2_and_m3_lag_wdi_refit_on_the_same_resulting_common_sample": true,
+    "previous_666_row_m1_results_reusable_as_comparator": false,
+    "scope": "development_only"
+  },
+  "contract_id": "stage128_m3_lag_wdi_exploratory_contract_lock",
+  "contract_status": "AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL",
+  "contract_version": "stage128_m3_lag_wdi_exploratory_contract_lock_v1",
+  "exploratory_result_can_rewrite_main_confirmatory_conclusion": false,
+  "feature_count_total": 14,
+  "feature_search_permitted": false,
+  "feature_selection_permitted": false,
+  "feature_substitution_permitted": false,
+  "features": [
+    {
+      "alternative_indicator_after_failure_permitted": false,
+      "block_position": 1,
+      "country_code": "IRN",
+      "feature_id": "intl_cpi_inflation_lag1_wdi",
+      "forbidden_substitutions": [
+        "FP.CPI.TOTL index-level conversion",
+        "monthly inflation",
+        "point-to-point inflation",
+        "GDP-deflator inflation",
+        "any alternative inflation indicator after a failure"
+      ],
+      "frequency": "annual",
+      "imputation_permitted": false,
+      "indicator_code": "FP.CPI.TOTL.ZG",
+      "lag_years": 1,
+      "null_policy": "If the WDI observation for year t-1 is missing or non-numeric the feature is NULL. No imputation and no alternative indicator.",
+      "observation_year_formula": "wdi_observation_year = predictor_year_t - 1",
+      "observation_year_rule": "t - 1",
+      "required_observation_years": [
+        "t-1"
+      ],
+      "same_year_t_observation_permitted": false,
+      "source_identity": "World Bank WDI",
+      "transformation": "identity",
+      "worked_example": {
+        "predictor_year": 2019,
+        "wdi_observation_year": 2018
+      }
+    },
+    {
+      "alternative_indicator_after_failure_permitted": false,
+      "block_position": 2,
+      "country_code": "IRN",
+      "feature_id": "intl_fx_change_official_lag1_wdi",
+      "forbidden_substitutions": [
+        "PA.NUS.ATLS",
+        "free-market exchange rates",
+        "unofficial rates",
+        "aggregator-derived rates",
+        "post-hoc alternative transformations"
+      ],
+      "frequency": "annual",
+      "imputation_permitted": false,
+      "indicator_code": "PA.NUS.FCRF",
+      "lag_years": 1,
+      "null_policy": "If either required observation is missing, non-numeric, not strictly positive, or the two are not consecutive Gregorian annual observations, the feature is NULL. No imputation, and no alternative FX indicator may be tried after a failure.",
+      "observation_requirements": [
+        "present",
+        "numeric",
+        "strictly_positive",
+        "consecutive_gregorian_annual_observations"
+      ],
+      "observation_year_formula": "y = predictor_year_t - 1",
+      "observation_year_rule": "y = t - 1",
+      "required_observation_years": [
+        "t-1",
+        "t-2"
+      ],
+      "same_year_t_observation_permitted": false,
+      "source_identity": "World Bank WDI",
+      "transformation": "FX_LAG1_t = 100 * ln(E_y / E_(y-1))",
+      "transformation_equivalent": "100 * ln(E_(t-1) / E_(t-2))",
+      "worked_example": {
+        "e_previous_year": 2017,
+        "e_year": 2018,
+        "predictor_year": 2019
+      }
+    }
+  ],
+  "financing_rate_feature_permitted": false,
+  "generated_for": "stage128-m3-lag-wdi-exploratory-contract-lock",
+  "imputation_permitted": false,
+  "in_original_confirmatory_holm_family": false,
+  "indicator_search_permitted": false,
+  "is_confirmatory_m3": false,
+  "is_continuation_or_replacement_of_m3i2": false,
+  "is_historical_vintage_wdi": false,
+  "is_real_time_wdi": false,
+  "is_repair_of_m3_cbi": false,
+  "is_replacement_for_m3_cbi": false,
+  "lock_type": "authoritative_contract_lock_before_any_retrieval",
+  "locked_before_any_value_level_work": true,
+  "m2_comparator": {
+    "feature_count": 12,
+    "feature_order": [
+      "log_total_assets",
+      "leverage_ratio",
+      "current_ratio",
+      "roa_period_adjusted",
+      "ocf_to_assets_period_adjusted",
+      "asset_turnover_period_adjusted",
+      "operating_margin_period_adjusted",
+      "financial_expense_to_assets_period_adjusted",
+      "accumulated_loss_to_capital_ratio",
+      "equity_return_window",
+      "realized_volatility",
+      "amihud_illiquidity"
+    ],
+    "m2_status": "RETAIN_M2_AS_INTERMEDIATE_CONFIRMATORY_BLOCK",
+    "source": "project/stage128/m2_incremental_evaluation/stage127_m2_feature_configuration_manifest.json"
+  },
+  "m3_lag_wdi_feature_order": [
+    "log_total_assets",
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio",
+    "equity_return_window",
+    "realized_volatility",
+    "amihud_illiquidity",
+    "intl_cpi_inflation_lag1_wdi",
+    "intl_fx_change_official_lag1_wdi"
+  ],
+  "new_proxy_search_permitted": false,
+  "one_year_lag_establishes_point_in_time_availability": false,
+  "one_year_lag_is_conservative_temporal_separation_design_only": true,
+  "parent_sample": {
+    "denominator": "retained_M2_development_common_sample",
+    "expected_parent_companies": 108,
+    "expected_parent_negative": 484,
+    "expected_parent_positive": 55,
+    "expected_parent_rows": 539,
+    "original_666_row_m1_comparison_sample_permitted": false,
+    "scope": "development_only"
+  },
+  "proves_historical_point_in_time_wdi_availability": false,
+  "reuses_m3i2_historical_vintage_availability_logic": false,
+  "scientific_role": "supplementary_exploratory_robustness_block",
+  "third_macro_feature_permitted": false,
+  "wdi_vintage_semantics": {
+    "current_or_latest_revised_wdi_allowed": true,
+    "historical_vintage_availability_claimed": false,
+    "lagging_transforms_revised_wdi_into_point_in_time_data": false,
+    "limitation_is_why_the_analysis_is_exploratory_supplementary": true,
+    "point_in_time_availability_claimed": false,
+    "release_date_proof_attempted": false,
+    "retrieval_uses_then_current_official_latest_wdi_values": true,
+    "revisions_may_be_present": true
+  }
+}

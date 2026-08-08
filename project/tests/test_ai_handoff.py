@@ -3432,29 +3432,29 @@ def test_pr74_is_only_historical_and_never_live():
     assert "PR #74 is the **historical contract-lock PR**" in text
 
 
-def test_live_pr_topology_is_pr77_on_main():
-    # PR #76 was merged into `main` and is now the predecessor; the LIVE Draft
-    # PR is the human-submission recording PR, on `main` @ the PR #76 merge
-    # commit. A MERGED PR is never the live Draft.
+def test_live_pr_topology_is_the_track_b_pr_on_main():
+    # PR #77 has since been merged into `main` and is now the predecessor; the
+    # LIVE Draft PR is the Track B M3-LAG-WDI contract-lock PR, on `main` @ the
+    # PR #77 merge commit. A MERGED PR is never the live Draft.
     state = _handoff_state()
-    assert state["stage128_m3i2_live_pr_number"] == 77
+    assert state["stage128_m3i2_live_pr_number"] == 78
     assert state["stage128_m3i2_live_pr_base_branch"] == "main"
     assert state["stage128_m3i2_live_pr_base_commit"] == (
-        "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
+        "93de6bae9344ce893b0261f818abce8a991cf842")
     assert state["stage128_m3i2_live_main_commit"] == (
-        "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
+        "93de6bae9344ce893b0261f818abce8a991cf842")
     assert state["stage128_m3i2_live_pr_is_draft"] is True
     assert state["stage128_m3i2_live_pr_merged"] is False
     assert state["stage128_m3i2_live_pr_ready_for_review_authorized"] is False
     assert state["stage128_m3i2_live_pr_role"] == (
-        "final_official_inquiry_human_submission_recording_pr")
-    # The recovery PR is HISTORY, and says so.
-    assert state["stage128_m3i2_recovery_pr_number"] == 76
+        "m3_lag_wdi_exploratory_contract_lock_pr")
+    # The human-submission recording PR is HISTORY, and says so.
+    assert state["stage128_m3i2_recovery_pr_number"] == 77
     assert state["stage128_m3i2_recovery_pr_merged"] is True
     assert state["stage128_m3i2_recovery_pr_merge_commit"] == (
-        "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
+        "93de6bae9344ce893b0261f818abce8a991cf842")
     assert state["stage128_m3i2_recovery_pr_semantics"] == (
-        "merged_predecessor_superseded_by_pr77")
+        "merged_predecessor_superseded_by_pr78")
     assert state["stage128_m3i2_evidence_capture_pr_number"] == 75
     assert state["stage128_m3i2_evidence_capture_pr_merged"] is True
     assert state["stage128_m3i2_evidence_capture_pr_merge_commit"] == (
@@ -3463,9 +3463,10 @@ def test_live_pr_topology_is_pr77_on_main():
 
 def test_current_state_never_calls_a_merged_pr_the_live_draft():
     text = _current_state_text()
-    assert "PR #76 **was merged**" in text
-    assert "the LIVE Draft PR is **PR #77**" in text
+    assert "PR #77 is HISTORICAL: merged = True" in text
+    assert "the LIVE Draft PR is **PR #78**" in text
     # the merged predecessors must never be rendered as the live Draft
+    assert "**PR #77** (the LIVE Draft PR)" not in text
     assert "**PR #76** (the LIVE Draft PR)" not in text
     assert "**PR #75** (the LIVE Draft PR)" not in text
 
@@ -3751,13 +3752,13 @@ def test_current_state_marks_the_contract_lock_section_as_historical():
         "### Stage128 — M3I-2 prospective contract lock", 1)[1].split(
         "### Stage128 — M3I-2 official-source evidence capture", 1)[0]
     assert "- **Live PR topology:**" not in contract_section
-    assert "- **LIVE PR topology:** the LIVE Draft PR is **PR #77**" in text
+    assert "- **LIVE PR topology:** the LIVE Draft PR is **PR #78**" in text
 
 
 def test_current_state_does_not_present_pr74_as_the_live_draft():
     text = _current_state_text()
     assert "PR #74 is the **historical contract-lock PR**" in text
-    assert "the LIVE Draft PR is **PR #77**" in text
+    assert "the LIVE Draft PR is **PR #78**" in text
     # no merged PR may ever be presented as the live one
     assert "carried by **PR #75** (the LIVE evidence-capture PR)" not in text
     assert "carried by **PR #76** (the LIVE Draft PR)" not in text
@@ -4002,9 +4003,9 @@ def test_handoff_agrees_the_capture_and_recovery_prs_are_merged():
     state = _handoff_state()
     assert state["stage128_m3i2_evidence_capture_pr_number"] == 75
     assert state["stage128_m3i2_evidence_capture_pr_merged"] is True
-    assert state["stage128_m3i2_recovery_pr_number"] == 76
+    assert state["stage128_m3i2_recovery_pr_number"] == 77
     assert state["stage128_m3i2_recovery_pr_merged"] is True
-    assert state["stage128_m3i2_live_pr_number"] == 77
+    assert state["stage128_m3i2_live_pr_number"] == 78
     assert state["stage128_m3i2_live_pr_is_draft"] is True
     assert state["stage128_m3i2_live_pr_merged"] is False
     assert state["stage128_m3i2_merge_authorized"] is False
@@ -4120,8 +4121,16 @@ def test_handoff_publishes_the_comparison_as_verification_only():
     assert state["m3i2_block_admitted"] is False
     assert state["m3i2_data_gate_executed"] is False
     assert state["final_test_locked"] is True
+    # The comparison record itself still says NOT_LOCKED and always will: it is
+    # a frozen verification artifact from before Track B was authorized. The
+    # LIVE status has since advanced, under a separate explicit human
+    # authorization, to the pre-retrieval contract lock — and the point of this
+    # assertion is that the verification record did not move it.
     assert state["stage128_m3_lag_wdi_authoritative_contract_status"] == (
-        "NOT_LOCKED")
+        "AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL")
+    assert state["stage128_m3_lag_wdi_data_retrieval_started"] is False
+    assert state["stage128_m3_lag_wdi_data_gate_executed"] is False
+    assert state["stage128_m3_lag_wdi_modeling_started"] is False
 
 
 _COMPARISON_MUTATIONS = (

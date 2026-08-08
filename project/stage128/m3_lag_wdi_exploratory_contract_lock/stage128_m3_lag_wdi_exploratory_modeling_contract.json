@@ -1,0 +1,48 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-contract-lock",
+  "bootstrap_executions": 0,
+  "comparison_family_id": "M3_LAG_WDI_EXPLORATORY_SUPPLEMENTARY",
+  "comparisons_executed": 0,
+  "confirmatory_holm_family": [
+    "M2_minus_M1",
+    "M3_CBI_minus_M2",
+    "M4_minus_M3_CBI"
+  ],
+  "confirmatory_holm_family_changed_by_this_action": false,
+  "confirmatory_superiority_claim_permitted": false,
+  "contract_id": "stage128_m3_lag_wdi_exploratory_contract_lock",
+  "exploratory_comparison_inserted_into_confirmatory_holm_family": false,
+  "generated_for": "stage128-m3-lag-wdi-exploratory-contract-lock",
+  "grid_search_permitted": false,
+  "holm_executions": 0,
+  "hyperparameter_search_permitted": false,
+  "inherited_from": "project/stage128/m2_incremental_evaluation/stage127_m2_feature_configuration_manifest.json",
+  "inherits_bootstrap_and_paired_comparison_machinery": true,
+  "inherits_canonical_metric_definitions": true,
+  "inherits_locked_validation_architecture": true,
+  "inherits_seed_policy": true,
+  "model_families": [
+    "regularized_logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "model_family_search_permitted": false,
+  "model_fits": 0,
+  "modeling_authorized": false,
+  "modeling_started": false,
+  "new_secondary_metrics_defined_by_this_action": false,
+  "primary_comparison": "M3_LAG_WDI_minus_retained_M2",
+  "primary_comparison_sample": "identical_post_complete_case_development_sample_for_both_models",
+  "results_label": "supplementary_exploratory_robustness_only",
+  "retained_configurations_used_unchanged": true,
+  "retuning_permitted": false,
+  "supplementary_family": [
+    {
+      "comparison": "M3_LAG_WDI_minus_retained_M2",
+      "exists_now": false,
+      "exists_only_if": "the M3-LAG-WDI Data Gate later passes AND a separate explicit human authorization for predictive evaluation is given",
+      "hypothesis_id": "E1"
+    }
+  ],
+  "supplementary_family_size_now": 0
+}

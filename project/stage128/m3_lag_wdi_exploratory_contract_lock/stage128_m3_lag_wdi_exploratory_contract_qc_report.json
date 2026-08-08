@@ -1,0 +1,179 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-contract-lock",
+  "all_pass": true,
+  "assertion_count": 42,
+  "checks": [
+    {
+      "name": "role_is_supplementary_exploratory_robustness_block",
+      "pass": true
+    },
+    {
+      "name": "role_is_not_confirmatory_m3",
+      "pass": true
+    },
+    {
+      "name": "exactly_two_additional_wdi_features",
+      "pass": true
+    },
+    {
+      "name": "cpi_indicator_code_is_FP_CPI_TOTL_ZG",
+      "pass": true
+    },
+    {
+      "name": "fx_indicator_code_is_PA_NUS_FCRF",
+      "pass": true
+    },
+    {
+      "name": "country_is_IRN_for_both_features",
+      "pass": true
+    },
+    {
+      "name": "cpi_observation_year_is_t_minus_1",
+      "pass": true
+    },
+    {
+      "name": "fx_formula_is_100_ln_E_t_minus_1_over_E_t_minus_2",
+      "pass": true
+    },
+    {
+      "name": "no_same_year_t_observation_permitted",
+      "pass": true
+    },
+    {
+      "name": "no_third_macro_feature",
+      "pass": true
+    },
+    {
+      "name": "no_financing_rate_feature",
+      "pass": true
+    },
+    {
+      "name": "no_indicator_search",
+      "pass": true
+    },
+    {
+      "name": "no_imputation",
+      "pass": true
+    },
+    {
+      "name": "parent_sample_is_the_retained_m2_539_row_development_sample",
+      "pass": true
+    },
+    {
+      "name": "m2_comparator_has_12_features",
+      "pass": true
+    },
+    {
+      "name": "m3_lag_wdi_has_14_features",
+      "pass": true
+    },
+    {
+      "name": "complete_case_policy_requires_both_lagged_features",
+      "pass": true
+    },
+    {
+      "name": "both_models_refit_on_the_same_common_sample",
+      "pass": true
+    },
+    {
+      "name": "666_row_m1_results_not_reusable_as_comparator",
+      "pass": true
+    },
+    {
+      "name": "gate_thresholds_inherited_not_redesigned",
+      "pass": true
+    },
+    {
+      "name": "gate_coverage_values_are_null_not_zero",
+      "pass": true
+    },
+    {
+      "name": "gate_not_executed",
+      "pass": true
+    },
+    {
+      "name": "gate_pass_is_data_admission_only",
+      "pass": true
+    },
+    {
+      "name": "three_frozen_model_families_only",
+      "pass": true
+    },
+    {
+      "name": "no_retuning_or_hyperparameter_search",
+      "pass": true
+    },
+    {
+      "name": "exploratory_comparison_family_is_separate",
+      "pass": true
+    },
+    {
+      "name": "exploratory_comparison_not_in_confirmatory_holm_family",
+      "pass": true
+    },
+    {
+      "name": "point_in_time_availability_not_claimed",
+      "pass": true
+    },
+    {
+      "name": "current_or_latest_revised_wdi_semantics_recorded",
+      "pass": true
+    },
+    {
+      "name": "retrieval_started_false",
+      "pass": true
+    },
+    {
+      "name": "data_gate_executed_false",
+      "pass": true
+    },
+    {
+      "name": "modeling_started_false",
+      "pass": true
+    },
+    {
+      "name": "final_test_rows_read_zero",
+      "pass": true
+    },
+    {
+      "name": "m4_unauthorized",
+      "pass": true
+    },
+    {
+      "name": "world_bank_inquiry_still_active_and_unresolved",
+      "pass": true
+    },
+    {
+      "name": "world_bank_follow_up_unauthorized",
+      "pass": true
+    },
+    {
+      "name": "world_bank_response_ingestion_unauthorized",
+      "pass": true
+    },
+    {
+      "name": "pr_77_is_merged_and_historical",
+      "pass": true
+    },
+    {
+      "name": "new_pr_is_the_live_draft",
+      "pass": true
+    },
+    {
+      "name": "prior_wait_only_restriction_retained_as_history",
+      "pass": true
+    },
+    {
+      "name": "quarantined_local_draft_left_untouched",
+      "pass": true
+    },
+    {
+      "name": "no_pii_or_credentials_committed",
+      "pass": true
+    }
+  ],
+  "contract_id": "stage128_m3_lag_wdi_exploratory_contract_lock",
+  "failed_count": 0,
+  "package_id": "stage128_m3_lag_wdi_exploratory_contract_lock",
+  "qc_type": "contract_lock_qc_no_data_no_execution"
+}

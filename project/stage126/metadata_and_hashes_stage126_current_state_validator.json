@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 134,
+  "assertion_count": 142,
   "assertions": [
     {
       "detail": "",
@@ -658,6 +658,46 @@
       "status": "PASS"
     },
     {
+      "detail": "the Handoff may publish AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL only when the authoritative M3-LAG-WDI contract satisfies every frozen requirement",
+      "name": "m3_lag_wdi_locked_status_requires_the_authoritative_contract",
+      "status": "PASS"
+    },
+    {
+      "detail": "a locked M3-LAG-WDI contract must be published as locked, not as NOT_LOCKED",
+      "name": "m3_lag_wdi_contract_lock_is_published_when_it_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "a contract lock retrieves nothing, executes no Gate, fits no model and reads no Final Test row",
+      "name": "m3_lag_wdi_lock_executes_nothing",
+      "status": "PASS"
+    },
+    {
+      "detail": "M3-LAG-WDI stays a supplementary exploratory robustness block outside the confirmatory Holm family",
+      "name": "m3_lag_wdi_lock_is_exploratory_not_confirmatory",
+      "status": "PASS"
+    },
+    {
+      "detail": "the one-year lag never becomes a point-in-time availability claim",
+      "name": "m3_lag_wdi_lock_claims_no_point_in_time_availability",
+      "status": "PASS"
+    },
+    {
+      "detail": "a locked contract authorizes neither retrieval, nor the Data Gate, nor modeling",
+      "name": "m3_lag_wdi_lock_is_not_an_authorization",
+      "status": "PASS"
+    },
+    {
+      "detail": "activating Track B in parallel never terminates, resolves or authorizes anything on the still-active World Bank inquiry",
+      "name": "m3_lag_wdi_lock_does_not_terminate_the_world_bank_inquiry",
+      "status": "PASS"
+    },
+    {
+      "detail": "the Track B lock changes no M3-CBI or M3I-2 conclusion, unlocks no Final Test and authorizes no M4",
+      "name": "m3_lag_wdi_lock_preserves_m3_cbi_and_m3i2",
+      "status": "PASS"
+    },
+    {
       "detail": "ROADMAP prose naming the authoritative pointers must name exactly the front-matter pair (stage128-m3i2-final-official-inquiry-human-submission / stage128-m3i2-final-official-inquiry-response-ingestion)",
       "name": "roadmap_prose_agrees_with_front_matter_pointers",
       "status": "PASS"
@@ -674,7 +714,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "8ef6fac5e0a9a75d032ff808e5946bb1b4b5d065",
+  "code_commit": "724a1b5ae8163eea4e406f1aa9527f3a05a8a938",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -682,7 +722,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "8ef6fac5e0a9a75d032ff808e5946bb1b4b5d065",
+  "generated_at": "724a1b5ae8163eea4e406f1aa9527f3a05a8a938",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -700,7 +740,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "65f94d7ce71b180b65a1daa3abacc9c471f176c7e4d02ebfa72b32b786267921",
+  "source_file_sha256": "8ffb5fa524beda0ab6d6433156b62f7111aa50228e0beb33501c759af7661bb6",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {

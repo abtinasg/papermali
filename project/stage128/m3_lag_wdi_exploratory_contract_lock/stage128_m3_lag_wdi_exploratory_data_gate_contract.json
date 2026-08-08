@@ -1,0 +1,46 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-contract-lock",
+  "contract_id": "stage128_m3_lag_wdi_exploratory_contract_lock",
+  "coverage_calculations": 0,
+  "future_rules": [
+    "The Gate is development-only.",
+    "If the Gate does not pass, NO M3-LAG-WDI model may be fit.",
+    "A Data Gate PASS is DATA ADMISSION ONLY and does not authorize modeling.",
+    "Future predictive evaluation requires its own separate explicit human authorization.",
+    "Both lagged WDI features must satisfy individual candidate coverage.",
+    "No imputation may be used to reach a threshold.",
+    "No alternative indicator may be tried after coverage inspection.",
+    "No final-test row may be read by the Gate."
+  ],
+  "gate_executed": false,
+  "gate_pass_authorizes_modeling": false,
+  "gate_pass_is_data_admission_only": true,
+  "gate_pass_unlocks_final_test": false,
+  "gate_result": "NOT_EXECUTED",
+  "generated_for": "stage128-m3-lag-wdi-exploratory-contract-lock",
+  "modeling_requires_separate_explicit_human_authorization": true,
+  "observed_values": {
+    "block_common_sample_coverage": null,
+    "candidate_valid_coverage_intl_cpi_inflation_lag1_wdi": null,
+    "candidate_valid_coverage_intl_fx_change_official_lag1_wdi": null,
+    "common_sample_negative": null,
+    "common_sample_positive": null,
+    "common_sample_rows": null,
+    "positive_events_each_locked_validation_window": null
+  },
+  "thresholds": {
+    "block_common_sample_coverage_min": 0.7,
+    "candidate_valid_coverage_min": 0.8,
+    "coverage_scope": "development_only",
+    "denominator": "retained_M2_development_common_sample",
+    "expected_parent_companies": 108,
+    "expected_parent_negative": 484,
+    "expected_parent_positive": 55,
+    "expected_parent_rows": 539,
+    "final_test_access_for_admission": false,
+    "minimum_positive_evaluable_each_locked_validation_window": 5
+  },
+  "thresholds_inherited_from": "project/stage128/m3_intl_macro_contract_lock/stage128_m3_intl_macro_data_gate_contract.json",
+  "thresholds_inherited_not_redesigned": true,
+  "unresolved_values_are_null_not_zero": true
+}

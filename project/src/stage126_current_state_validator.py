@@ -863,6 +863,317 @@ def stage128_m3i2_inquiry_human_submission_recorded(repo_root: Path) -> bool:
     return True
 
 
+# --------------------------------------------------------------------------- #
+# Stage128 — Track B: the M3-LAG-WDI-EXPLORATORY contract lock
+# --------------------------------------------------------------------------- #
+
+_STAGE128_M3_LAG_PKG = "project/stage128/m3_lag_wdi_exploratory_contract_lock"
+STAGE128_M3_LAG_ACTION_ID = "stage128-m3-lag-wdi-exploratory-contract-lock"
+_STAGE128_M3_LAG_CONTRACT_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/stage128_m3_lag_wdi_exploratory_contract.json")
+_STAGE128_M3_LAG_BOUNDARY_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/"
+    "stage128_m3_lag_wdi_exploratory_governance_boundary.json")
+_STAGE128_M3_LAG_GATE_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/"
+    "stage128_m3_lag_wdi_exploratory_data_gate_contract.json")
+_STAGE128_M3_LAG_MODELING_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/"
+    "stage128_m3_lag_wdi_exploratory_modeling_contract.json")
+_STAGE128_M3_LAG_AUDIT_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/"
+    "stage128_m3_lag_wdi_exploratory_execution_audit.json")
+_STAGE128_M3_LAG_TOPOLOGY_REL = (
+    f"{_STAGE128_M3_LAG_PKG}/stage128_m3_lag_wdi_exploratory_pr_topology.json")
+
+STAGE128_M3_LAG_LOCKED_STATUS = "AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL"
+STAGE128_M3_LAG_ROLE = "supplementary_exploratory_robustness_block"
+STAGE128_M3_LAG_CPI_CODE = "FP.CPI.TOTL.ZG"
+STAGE128_M3_LAG_FX_CODE = "PA.NUS.FCRF"
+STAGE128_M3_LAG_FX_FORMULA = "FX_LAG1_t = 100 * ln(E_y / E_(y-1))"
+STAGE128_M3_LAG_FX_FORMULA_EQUIVALENT = "100 * ln(E_(t-1) / E_(t-2))"
+STAGE128_M3_LAG_PARENT_ROWS = 539
+STAGE128_M3_LAG_M2_FEATURES = 12
+STAGE128_M3_LAG_TOTAL_FEATURES = 14
+STAGE128_M3_LAG_CONFIRMATORY_FAMILY = (
+    "M2_minus_M1", "M3_CBI_minus_M2", "M4_minus_M3_CBI")
+STAGE128_M3_LAG_WAITING_PERIOD_COMPLETION_DATE = "2026-08-20"
+STAGE128_M3_LAG_EARLIEST_FOLLOW_UP_DATE = "2026-08-21"
+#: PR #77 (the M3I-2 human-submission recording) was merged into main by this
+#: commit, and is therefore historical, not the live Draft.
+STAGE128_M3_LAG_MERGED_PREDECESSOR_PR = 77
+STAGE128_M3_LAG_MERGED_PREDECESSOR_COMMIT = (
+    "93de6bae9344ce893b0261f818abce8a991cf842")
+
+
+def stage128_m3_lag_wdi_exploratory_contract_locked(repo_root: Path) -> bool:
+    """True once the M3-LAG-WDI exploratory contract is authoritatively locked.
+
+    A ``LOCKED`` status may exist ONLY if the authoritative contract still
+    satisfies every frozen requirement: exploratory-only role, exactly the two
+    lagged WDI features with their exact indicator codes and lag rules, the
+    retained-M2 539-row parent sample, 12 M2 features against 14 M3-LAG-WDI
+    features, the inherited Gate thresholds, the three frozen model families, a
+    SEPARATE exploratory comparison family, no point-in-time claim, and zero
+    retrieval / Gate / modeling / Final-Test execution — while the World Bank
+    inquiry stays active and unresolved. Anything else raises, so the validator
+    can never report a locked contract that has quietly drifted.
+    """
+    path = repo_root / _STAGE128_M3_LAG_CONTRACT_REL
+    if not path.is_file():
+        return False
+    contract = _read_json(repo_root, _STAGE128_M3_LAG_CONTRACT_REL)
+    boundary = _read_json(repo_root, _STAGE128_M3_LAG_BOUNDARY_REL)
+    gate = _read_json(repo_root, _STAGE128_M3_LAG_GATE_REL)
+    modeling = _read_json(repo_root, _STAGE128_M3_LAG_MODELING_REL)
+    audit = _read_json(repo_root, _STAGE128_M3_LAG_AUDIT_REL)
+    topology = _read_json(repo_root, _STAGE128_M3_LAG_TOPOLOGY_REL)
+
+    if contract.get("action_id") != STAGE128_M3_LAG_ACTION_ID:
+        raise ValidationFail("stage128 M3-LAG-WDI contract action_id mismatch")
+    if contract.get("contract_status") != STAGE128_M3_LAG_LOCKED_STATUS:
+        raise ValidationFail(
+            "the M3-LAG-WDI contract status must be "
+            f"{STAGE128_M3_LAG_LOCKED_STATUS}")
+
+    # Exploratory only — never confirmatory, never a repair of M3-CBI.
+    if contract.get("scientific_role") != STAGE128_M3_LAG_ROLE:
+        raise ValidationFail(
+            f"M3-LAG-WDI must stay a {STAGE128_M3_LAG_ROLE}")
+    for field in ("is_confirmatory_m3", "is_replacement_for_m3_cbi",
+                  "is_repair_of_m3_cbi",
+                  "is_continuation_or_replacement_of_m3i2",
+                  "in_original_confirmatory_holm_family",
+                  "can_select_paper_winner_alone",
+                  "proves_historical_point_in_time_wdi_availability",
+                  "one_year_lag_establishes_point_in_time_availability",
+                  "third_macro_feature_permitted",
+                  "financing_rate_feature_permitted",
+                  "indicator_search_permitted", "imputation_permitted"):
+        if contract.get(field) is not False:
+            raise ValidationFail(f"M3-LAG-WDI contract {field} must be False")
+
+    # Exactly two features, exact identities, exact temporal rules.
+    features = contract.get("features") or []
+    if len(features) != 2 or contract.get(
+            "additional_macro_feature_count") != 2:
+        raise ValidationFail(
+            "M3-LAG-WDI contains EXACTLY two additional macro features")
+    cpi, fx = features
+    if cpi.get("indicator_code") != STAGE128_M3_LAG_CPI_CODE:
+        raise ValidationFail(
+            f"the CPI indicator must be {STAGE128_M3_LAG_CPI_CODE}")
+    if fx.get("indicator_code") != STAGE128_M3_LAG_FX_CODE:
+        raise ValidationFail(
+            f"the FX indicator must be {STAGE128_M3_LAG_FX_CODE}")
+    for feature in features:
+        if feature.get("country_code") != "IRN":
+            raise ValidationFail("both M3-LAG-WDI features are for IRN")
+        if feature.get("lag_years") != 1:
+            raise ValidationFail("both M3-LAG-WDI features are lagged 1 year")
+        if feature.get("same_year_t_observation_permitted") is not False:
+            raise ValidationFail(
+                "no same-year t observation is permitted")
+    if cpi.get("observation_year_rule") != "t - 1":
+        raise ValidationFail("the CPI observation year rule must be t - 1")
+    if cpi.get("transformation") != "identity":
+        raise ValidationFail("the CPI transformation must be the identity")
+    if fx.get("observation_year_rule") != "y = t - 1":
+        raise ValidationFail("the FX observation year rule must be y = t - 1")
+    if fx.get("transformation") != STAGE128_M3_LAG_FX_FORMULA:
+        raise ValidationFail(
+            f"the FX transformation must be {STAGE128_M3_LAG_FX_FORMULA}")
+    if fx.get("transformation_equivalent") != (
+            STAGE128_M3_LAG_FX_FORMULA_EQUIVALENT):
+        raise ValidationFail(
+            "the FX transformation must equal "
+            f"{STAGE128_M3_LAG_FX_FORMULA_EQUIVALENT}")
+    if fx.get("required_observation_years") != ["t-1", "t-2"]:
+        raise ValidationFail("FX requires exactly the t-1 and t-2 observations")
+
+    # Sample and feature architecture.
+    parent = contract.get("parent_sample") or {}
+    if parent.get("expected_parent_rows") != STAGE128_M3_LAG_PARENT_ROWS:
+        raise ValidationFail(
+            "the parent sample is the retained-M2 "
+            f"{STAGE128_M3_LAG_PARENT_ROWS}-row development sample")
+    if parent.get("original_666_row_m1_comparison_sample_permitted") is not (
+            False):
+        raise ValidationFail(
+            "the original 666-row M1 comparison sample may not be used")
+    comparator = contract.get("m2_comparator") or {}
+    if comparator.get("feature_count") != STAGE128_M3_LAG_M2_FEATURES:
+        raise ValidationFail(
+            f"the M2 comparator has {STAGE128_M3_LAG_M2_FEATURES} features")
+    if contract.get("feature_count_total") != STAGE128_M3_LAG_TOTAL_FEATURES:
+        raise ValidationFail(
+            f"M3-LAG-WDI has {STAGE128_M3_LAG_TOTAL_FEATURES} features")
+    complete_case = contract.get("complete_case_policy") or {}
+    if complete_case.get("both_lagged_wdi_features_required_complete") is not (
+            True):
+        raise ValidationFail(
+            "complete cases are required for BOTH lagged WDI features")
+    if complete_case.get(
+            "m2_and_m3_lag_wdi_refit_on_the_same_resulting_common_sample"
+    ) is not True:
+        raise ValidationFail(
+            "M2 and M3-LAG-WDI must be refitted on the same common sample")
+    if complete_case.get(
+            "previous_666_row_m1_results_reusable_as_comparator") is not False:
+        raise ValidationFail(
+            "the previous 666-row M1 results are not a valid comparator")
+
+    # WDI vintage semantics — the honest limitation must stay explicit.
+    vintage = contract.get("wdi_vintage_semantics") or {}
+    if vintage.get("current_or_latest_revised_wdi_allowed") is not True:
+        raise ValidationFail(
+            "the contract must state that current/latest revised WDI is used")
+    for field in ("historical_vintage_availability_claimed",
+                  "point_in_time_availability_claimed",
+                  "lagging_transforms_revised_wdi_into_point_in_time_data"):
+        if vintage.get(field) is not False:
+            raise ValidationFail(f"WDI vintage semantics {field} must be False")
+
+    # Inherited Data Gate thresholds, frozen and NOT executed.
+    thresholds = gate.get("thresholds") or {}
+    if thresholds.get("candidate_valid_coverage_min") != 0.8:
+        raise ValidationFail("individual candidate coverage must be >= 0.80")
+    if thresholds.get("block_common_sample_coverage_min") != 0.7:
+        raise ValidationFail("block common-sample coverage must be >= 0.70")
+    if thresholds.get(
+            "minimum_positive_evaluable_each_locked_validation_window") != 5:
+        raise ValidationFail(
+            ">= 5 positive outcomes are required in EACH locked validation "
+            "window")
+    if gate.get("gate_executed") is not False or gate.get(
+            "gate_result") != "NOT_EXECUTED":
+        raise ValidationFail("the M3-LAG-WDI Data Gate must be NOT_EXECUTED")
+    for name, value in (gate.get("observed_values") or {}).items():
+        if value is not None:
+            raise ValidationFail(
+                f"observed Gate value {name} must stay null, not zero")
+
+    # Three frozen model families, in a SEPARATE exploratory family.
+    if list(modeling.get("model_families") or []) != [
+            "regularized_logistic_regression", "random_forest", "xgboost"]:
+        raise ValidationFail(
+            "exactly the three retained M2 model families may be used")
+    if modeling.get(
+            "exploratory_comparison_inserted_into_confirmatory_holm_family"
+    ) is not False:
+        raise ValidationFail(
+            "the exploratory comparison may never enter the confirmatory Holm "
+            "family")
+    if tuple(modeling.get("confirmatory_holm_family") or ()) != (
+            STAGE128_M3_LAG_CONFIRMATORY_FAMILY):
+        raise ValidationFail(
+            "the confirmatory Holm family must stay "
+            f"{list(STAGE128_M3_LAG_CONFIRMATORY_FAMILY)}")
+    family_id = modeling.get("comparison_family_id")
+    if not family_id or family_id in STAGE128_M3_LAG_CONFIRMATORY_FAMILY:
+        raise ValidationFail(
+            "the exploratory comparison needs its OWN family identity")
+
+    # Zero execution, and a hard Final-Test firewall.
+    for field in ("retrieval_started", "data_gate_executed",
+                  "modeling_started",
+                  "earlier_historical_vintage_bundle_used_as_value_input"):
+        if audit.get(field) is not False:
+            raise ValidationFail(f"M3-LAG-WDI {field} must be False")
+    for field in ("final_test_rows_read", "final_test_predictor_values_read",
+                  "final_test_target_values_read"):
+        if audit.get(field) != 0:
+            raise ValidationFail(f"M3-LAG-WDI {field} must be 0")
+    for name, value in (audit.get("counters") or {}).items():
+        if value != 0:
+            raise ValidationFail(
+                f"M3-LAG-WDI execution counter {name} must be 0")
+
+    # Track A stays active: a parallel lock never terminates the inquiry.
+    if boundary.get("world_bank_inquiry_status") != (
+            STAGE128_M3I2_INQUIRY_SUBMITTED_STATUS):
+        raise ValidationFail(
+            "the World Bank inquiry must stay "
+            f"{STAGE128_M3I2_INQUIRY_SUBMITTED_STATUS}")
+    if boundary.get("world_bank_waiting_period_status") != "ACTIVE":
+        raise ValidationFail("the World Bank waiting period must stay ACTIVE")
+    if boundary.get("world_bank_waiting_period_completion_date") != (
+            STAGE128_M3_LAG_WAITING_PERIOD_COMPLETION_DATE):
+        raise ValidationFail(
+            "the waiting period completes on "
+            f"{STAGE128_M3_LAG_WAITING_PERIOD_COMPLETION_DATE}")
+    if boundary.get(
+            "world_bank_waiting_period_earliest_follow_up_date") != (
+            STAGE128_M3_LAG_EARLIEST_FOLLOW_UP_DATE):
+        raise ValidationFail(
+            "the earliest possible follow-up stays "
+            f"{STAGE128_M3_LAG_EARLIEST_FOLLOW_UP_DATE}")
+    for field in ("world_bank_inquiry_terminated_by_this_action",
+                  "world_bank_follow_up_authorized",
+                  "world_bank_response_ingestion_authorized",
+                  "parallel_activation_implies_inquiry_failed",
+                  "parallel_activation_implies_inquiry_terminated",
+                  "parallel_activation_implies_inquiry_unnecessary",
+                  "m3_lag_wdi_data_retrieval_started",
+                  "m3_lag_wdi_data_gate_executed",
+                  "m3_lag_wdi_modeling_started",
+                  "m3_lag_wdi_next_action_authorized",
+                  "m4_authorized", "merge_authorized",
+                  "final_test_access_authorized"):
+        if boundary.get(field) is not False:
+            raise ValidationFail(
+                f"M3-LAG-WDI governance boundary {field} must be False")
+    if boundary.get("final_test_locked") is not True:
+        raise ValidationFail("the Final Test must stay locked")
+    if boundary.get("m3_cbi_status") != "UNRESOLVED_M3_DATA_GATE":
+        raise ValidationFail("the M3-CBI Gate status must be preserved")
+    if boundary.get("m3i2_evidence_status") != (
+            "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE"):
+        raise ValidationFail("M3I-2 evidence must remain UNRESOLVED")
+    if boundary.get("prior_restriction_retained_as_history") is not True:
+        raise ValidationFail(
+            "the superseded wait-only restriction must be retained as history")
+
+    # A MERGED PR is never the live Draft.
+    if topology.get("predecessor_pr_merged") is not True:
+        raise ValidationFail(
+            "the predecessor PR must be recorded as merged")
+    if topology.get("live_pr_is_draft") is not True:
+        raise ValidationFail("the M3-LAG-WDI PR must remain a Draft")
+    if topology.get("live_pr_merged") is not False:
+        raise ValidationFail("the M3-LAG-WDI PR must remain unmerged")
+    if topology.get("merge_authorized") is not False:
+        raise ValidationFail("no merge authorization exists for this PR")
+    live_number = topology.get("live_pr_number")
+    predecessor_number = topology.get("predecessor_pr_number")
+    if not isinstance(live_number, int) or isinstance(live_number, bool):
+        raise ValidationFail("the live PR number must be an integer")
+    if not isinstance(predecessor_number, int) or isinstance(
+            predecessor_number, bool):
+        raise ValidationFail("the predecessor PR number must be an integer")
+    # Pinning the merged predecessor is what stops a MERGED PR from being
+    # re-rendered as the live Draft: "live > predecessor" alone would accept a
+    # topology that promoted PR #77 back to live and demoted #76 in its place.
+    if predecessor_number != STAGE128_M3_LAG_MERGED_PREDECESSOR_PR:
+        raise ValidationFail(
+            "the merged predecessor is PR "
+            f"#{STAGE128_M3_LAG_MERGED_PREDECESSOR_PR}")
+    if topology.get("predecessor_pr_merge_commit") != (
+            STAGE128_M3_LAG_MERGED_PREDECESSOR_COMMIT):
+        raise ValidationFail(
+            f"PR #{STAGE128_M3_LAG_MERGED_PREDECESSOR_PR} was merged by "
+            f"{STAGE128_M3_LAG_MERGED_PREDECESSOR_COMMIT}")
+    if live_number <= predecessor_number:
+        raise ValidationFail(
+            f"the live PR #{live_number} must succeed the merged predecessor "
+            f"PR #{predecessor_number}")
+    if topology.get("live_pr_base_commit") != topology.get(
+            "predecessor_pr_merge_commit"):
+        raise ValidationFail(
+            "the live PR base must equal the predecessor merge commit")
+    return True
+
+
 #: PR #73 was merged into main by this commit; PR #74 was retargeted after.
 STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT = (
     "e6db63fb7d105f0d3a39db101c9e364161c367e9")
@@ -2826,6 +3137,81 @@ def build_assertions(
             == STAGE128_M3I2_ACTION_ID),
         "after the Gate re-run, the last completed research action must be "
         "the Gate re-run itself or a recognized, completed successor action")
+    # --- Track B: the M3-LAG-WDI exploratory contract lock ---------------- #
+    # `stage128_m3_lag_wdi_exploratory_contract_locked(...)` above raises on
+    # ANY drift in the frozen contract, so reaching this point already proves
+    # the contract still satisfies every locked requirement. What is asserted
+    # here is the *agreement* between that contract and the published Handoff:
+    # a locked status may never appear in the snapshot while the contract that
+    # justifies it is absent, and the parallel Track B lock may never be
+    # rendered as having moved Track A.
+    m3_lag_locked = stage128_m3_lag_wdi_exploratory_contract_locked(repo_root)
+    add("m3_lag_wdi_locked_status_requires_the_authoritative_contract",
+        (handoff.get("stage128_m3_lag_wdi_authoritative_contract_status")
+         != STAGE128_M3_LAG_LOCKED_STATUS) or m3_lag_locked,
+        "the Handoff may publish "
+        f"{STAGE128_M3_LAG_LOCKED_STATUS} only when the authoritative "
+        "M3-LAG-WDI contract satisfies every frozen requirement")
+    add("m3_lag_wdi_contract_lock_is_published_when_it_exists",
+        (not m3_lag_locked)
+        or (handoff.get("stage128_m3_lag_wdi_authoritative_contract_status")
+            == STAGE128_M3_LAG_LOCKED_STATUS
+            and handoff.get("stage128_m3_lag_wdi_exploratory_contract_locked")
+            is True),
+        "a locked M3-LAG-WDI contract must be published as locked, not as "
+        "NOT_LOCKED")
+    add("m3_lag_wdi_lock_executes_nothing",
+        (not m3_lag_locked)
+        or (handoff.get("stage128_m3_lag_wdi_data_retrieval_started") is False
+            and handoff.get("stage128_m3_lag_wdi_data_gate_executed") is False
+            and handoff.get("stage128_m3_lag_wdi_modeling_started") is False
+            and handoff.get("stage128_m3_lag_wdi_final_test_rows_read") == 0),
+        "a contract lock retrieves nothing, executes no Gate, fits no model "
+        "and reads no Final Test row")
+    add("m3_lag_wdi_lock_is_exploratory_not_confirmatory",
+        (not m3_lag_locked)
+        or (handoff.get("stage128_m3_lag_wdi_scientific_role")
+            == STAGE128_M3_LAG_ROLE
+            and handoff.get("stage128_m3_lag_wdi_is_confirmatory_m3") is False
+            and handoff.get("stage128_m3_lag_wdi_in_confirmatory_holm_family")
+            is False),
+        "M3-LAG-WDI stays a supplementary exploratory robustness block outside "
+        "the confirmatory Holm family")
+    add("m3_lag_wdi_lock_claims_no_point_in_time_availability",
+        (not m3_lag_locked)
+        or handoff.get(
+            "stage128_m3_lag_wdi_point_in_time_availability_claimed") is False,
+        "the one-year lag never becomes a point-in-time availability claim")
+    add("m3_lag_wdi_lock_is_not_an_authorization",
+        (not m3_lag_locked)
+        or (handoff.get("stage128_m3_lag_wdi_next_action_authorized") is False
+            and handoff.get("stage128_m3_lag_wdi_modeling_authorized")
+            is False),
+        "a locked contract authorizes neither retrieval, nor the Data Gate, "
+        "nor modeling")
+    add("m3_lag_wdi_lock_does_not_terminate_the_world_bank_inquiry",
+        (not m3_lag_locked)
+        or (handoff.get("stage128_m3i2_inquiry_waiting_period_status")
+            == "ACTIVE"
+            and handoff.get("stage128_m3i2_inquiry_substantive_response_"
+                            "received") is False
+            and handoff.get("stage128_m3i2_response_adjudication_authorized")
+            is False
+            and handoff.get("stage128_m3i2_inquiry_follow_up_authorized_now")
+            is False),
+        "activating Track B in parallel never terminates, resolves or "
+        "authorizes anything on the still-active World Bank inquiry")
+    add("m3_lag_wdi_lock_preserves_m3_cbi_and_m3i2",
+        (not m3_lag_locked)
+        or (handoff.get("stage128_m3i2_evidence_status")
+            == "UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE"
+            and handoff.get("m3i2_block_admitted") is False
+            and handoff.get("m3i2_data_gate_executed") is False
+            and handoff.get("final_test_locked") is True
+            and handoff.get("m4_authorized") is False),
+        "the Track B lock changes no M3-CBI or M3I-2 conclusion, unlocks no "
+        "Final Test and authorizes no M4")
+
     # --- ROADMAP front matter must agree with its own explanatory prose --- #
     roadmap_text = ""
     rm_path = repo_root / ROADMAP_MD_REL
