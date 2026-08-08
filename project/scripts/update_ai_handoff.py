@@ -2891,6 +2891,14 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # topology onto the retrieval Draft PR #79 while carrying every pinned
         # historical PR role forward unchanged. Metadata only.
         **derive_stage128_m3_lag_wdi_retrieval_live_pr_topology_markers(root),
+        # Must come last of all: the Track A waiting-period termination and
+        # M3-LAG-WDI final-disposition decision succeeds every action above
+        # on BOTH pointer chains. It owns neither PR topology (it carries no
+        # topology of its own) nor any scientific artifact — it only
+        # confirms, cross-checked against disk, that step E's result is
+        # unmoved, and converges both the Track A and Track B pointers on
+        # `human_decision_required`.
+        **derive_stage128_m3i2_track_a_waiting_termination_markers(root),
     })
 
 
@@ -5341,6 +5349,79 @@ def render_current_state(record: dict) -> str:
             "m3_lag_wdi_exploratory_contract_lock/`; interpretation: "
             "`project/stage128/m3_lag_wdi_exploratory_contract_lock/"
             "README_STAGE128_M3_LAG_WDI_EXPLORATORY_CONTRACT_LOCK.md`",
+            "",
+        ]
+    if record.get("stage128_track_a_waiting_termination_recorded"):
+        lines += [
+            "### Stage128 — TRACK A waiting-period termination and "
+            "M3-LAG-WDI final disposition (DECISION RECORDING ONLY)\n",
+            "_An explicit human governance decision, not a one-action "
+            "execution authorization. Zero data, zero network access, zero "
+            "model fits, zero Final Test rows read._\n",
+            "- ✅ **Waiting period:** "
+            f"`{record.get('stage128_track_a_waiting_period_status')}` on "
+            f"`{record.get('stage128_track_a_waiting_termination_date')}` — "
+            "the previously locked completion date "
+            f"`{record.get('stage128_track_a_waiting_period_original_completion_date')}`"
+            " is preserved as history and is **no longer an active "
+            "blocker**.",
+            "- ⛔ **Not recorded as World Bank non-response:** "
+            "`world_bank_will_not_respond_claim_made` = "
+            f"{record.get('stage128_track_a_world_bank_will_not_respond_claim_made')}."
+            " Recorded exactly: "
+            f"`{record.get('stage128_track_a_world_bank_response_characterization')}`.",
+            "- ⛔ **No further Track A action authorized:** further "
+            "follow-up authorized = "
+            f"{record.get('stage128_track_a_further_followup_authorized')}"
+            " — further WDI retrieval authorized = "
+            f"{record.get('stage128_track_a_further_wdi_retrieval_authorized')}"
+            " — historical release-date inference/backfill authorized = "
+            f"{record.get('stage128_track_a_release_date_inference_or_backfill_authorized')}.",
+            "- ⚠️ **Point-in-time WDI availability:** "
+            f"`{record.get('stage128_m3_lag_wdi_point_in_time_availability_status')}`"
+            " — treated as "
+            f"`{record.get('stage128_m3_lag_wdi_point_in_time_availability_treated_as')}`,"
+            " never as a task that blocks the research programme.",
+            "- ✅ **M3-LAG-WDI final research disposition:** "
+            f"`{record.get('stage128_m3_lag_wdi_final_research_disposition')}`"
+            " — promoted to the confirmatory model = "
+            f"{record.get('stage128_m3_lag_wdi_promoted_to_confirmatory_model')}."
+            " A future unsolicited World Bank response auto-reopens M3 = "
+            f"{record.get('stage128_m3_lag_wdi_unsolicited_future_response_auto_reopens')}"
+            " (using it for anything requires a new explicit human decision "
+            "= "
+            f"{record.get('stage128_m3_lag_wdi_future_response_requires_new_human_decision')}).",
+            "- ✅ **Step E result PRESERVED EXACTLY, re-verified against the "
+            "committed artifact by this recording:** "
+            f"`{record.get('stage128_m3_lag_wdi_e1_conclusion')}` — paired "
+            "PR-AUC deltas (M3-LAG-WDI minus retained M2) logistic "
+            "+0.000862 [-0.028237, +0.032186], random forest -0.002720 "
+            "[-0.029157, +0.011924], XGBoost +0.002749 [-0.007437, "
+            "+0.014554] (all three 95% intervals include zero); secondary "
+            "Brier deltas logistic -0.004600 [-0.006147, -0.003066] and "
+            "random forest -0.001375 [-0.002229, -0.000566] (calibration "
+            "only, non-confirmatory).",
+            "- ⛔ **Unchanged:** M4 authorized "
+            f"{record.get('m4_authorized')} — Final Test locked "
+            f"{record.get('final_test_locked')}, rows read "
+            f"{record.get('stage128_m3_lag_wdi_final_test_rows_read', 0)} — "
+            "confirmatory Holm family unchanged and unexecuted — paper "
+            f"winner selected {record.get('paper_winner_selected')}.",
+            "- **Both pointer chains converge on the same human decision:** "
+            f"`{record.get('next_research_action_id')}` — scope "
+            f"`{record.get('next_research_action_scope')}`, authorized = "
+            f"{record.get('next_research_action_authorized')}. Track B: "
+            f"`{record.get('stage128_m3_lag_wdi_next_action_id')}` — scope "
+            f"`{record.get('stage128_m3_lag_wdi_next_action_scope')}`, "
+            "authorized = "
+            f"{record.get('stage128_m3_lag_wdi_next_action_authorized')}. A "
+            "pointer is never an authorization.",
+            "- Package: `project/stage128/"
+            "m3i2_track_a_waiting_termination_and_m3_disposition/`; "
+            "interpretation: `project/stage128/"
+            "m3i2_track_a_waiting_termination_and_m3_disposition/"
+            "README_STAGE128_M3I2_TRACK_A_WAITING_TERMINATION_AND_M3_"
+            "DISPOSITION.md`",
             "",
         ]
     lines += [
@@ -10500,6 +10581,371 @@ def derive_stage128_m3_lag_wdi_retrieval_live_pr_topology_markers(
         "m3i2_modeling_started": False,
         "m4_authorized": False,
         "final_test_locked": True,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# Stage128 — Track A waiting-period termination and M3-LAG-WDI final
+# disposition (governance DECISION RECORDING, not a one-action authorization)
+# --------------------------------------------------------------------------- #
+
+_STAGE128_TRACK_A_TERMINATION_PKG = (
+    "project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition")
+_STAGE128_TRACK_A_TERMINATION_ACTION_ID = (
+    "stage128-m3i2-track-a-waiting-termination-and-m3-disposition")
+_STAGE128_TRACK_A_TERMINATION_DECISION_REL = (
+    f"{_STAGE128_TRACK_A_TERMINATION_PKG}/"
+    "stage128_m3i2_track_a_waiting_termination_decision.json")
+_STAGE128_TRACK_A_TERMINATION_BOUNDARY_REL = (
+    f"{_STAGE128_TRACK_A_TERMINATION_PKG}/"
+    "stage128_m3i2_track_a_waiting_termination_governance_boundary.json")
+_STAGE128_TRACK_A_TERMINATION_HUMAN_DECISION_REL = (
+    f"{_STAGE128_TRACK_A_TERMINATION_PKG}/"
+    "stage128_m3i2_track_a_waiting_termination_human_decision_record.json")
+#: The exact decision text this recording is genuinely hashing — recomputed
+#: below, never trusted from the artifact alone.
+_STAGE128_TRACK_A_TERMINATION_TEXT = (
+    "As of 2026-08-08, no response resolving the point-in-time availability "
+    "question had been obtained, and the human researcher elected to "
+    "terminate the waiting period and adjudicate the M3-LAG-WDI evidence "
+    "using the currently available evidence.")
+_STAGE128_TRACK_A_TERMINATION_TEXT_SHA256 = (
+    "ddfd7f094adc910597fdc49cea8ae39bc6c487cf6611978c353f2f802ae70811")
+#: The step-E result this decision preserves exactly. Read once here, at
+#: module import, purely as an audit constant to compare against — it is
+#: still the committed artifact under
+#: ``_STAGE128_M3_LAG_EVAL_DECISION_REL`` that is re-read and re-validated
+#: inside the deriver below; this is not a substitute for that read.
+_STAGE128_TRACK_A_TERMINATION_STEP_E_E1_CONCLUSION = (
+    "E1_NULL_NO_DETECTABLE_INCREMENTAL_CONTRIBUTION")
+_STAGE128_TRACK_A_TERMINATION_ORIGINAL_WAITING_COMPLETION_DATE = "2026-08-20"
+_STAGE128_TRACK_A_TERMINATION_DATE = "2026-08-08"
+
+
+def derive_stage128_m3i2_track_a_waiting_termination_markers(
+        root: str) -> dict:
+    """Recognize the human decision that ends Track A's wait and freezes M3.
+
+    This is a DECISION RECORDING, not an "authorize one action" grant: no
+    network request, model fit, Data Gate, or Final Test read needed
+    authorizing, so nothing here carries ``authorization_consumed`` /
+    ``authorized_now`` standing-permission fields. It is fail-closed on the
+    one thing decision recordings can silently get wrong: overclaiming.
+
+    In particular it refuses to publish anything as true that the decision
+    text does not say. The World Bank is never recorded as "will not
+    respond" — only that no substantive response had been obtained as of
+    the decision date. It refuses to publish the M3-LAG-WDI step E result as
+    modified, refuses to publish any further Track A or Track B action as
+    authorized, and refuses to publish M3-LAG-WDI as promoted into the
+    confirmatory family. A future unsolicited World Bank response is
+    recorded as requiring its own new explicit human decision before it may
+    be used for anything.
+
+    Returns {} before the package exists, so pre-decision Handoffs are
+    unaffected.
+    """
+    path = os.path.join(root, _STAGE128_TRACK_A_TERMINATION_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    decision = _require_json_artifact(
+        root, _STAGE128_TRACK_A_TERMINATION_DECISION_REL)
+    boundary = _require_json_artifact(
+        root, _STAGE128_TRACK_A_TERMINATION_BOUNDARY_REL)
+    human_decision = _require_json_artifact(
+        root, _STAGE128_TRACK_A_TERMINATION_HUMAN_DECISION_REL)
+
+    for record, label in ((decision, "decision"), (boundary, "boundary"),
+                          (human_decision, "human decision record")):
+        if record.get("action_id") != _STAGE128_TRACK_A_TERMINATION_ACTION_ID:
+            raise HandoffError(
+                f"Track A waiting-termination {label} action_id mismatch")
+
+    # --- the decision text is genuinely hashed, never trusted verbatim ---- #
+    text = human_decision.get("human_decision_text") or ""
+    if text != _STAGE128_TRACK_A_TERMINATION_TEXT:
+        raise HandoffError(
+            "the recorded Track A waiting-termination decision text does "
+            "not match the pinned decision text")
+    if len(text.encode("utf-8")) != human_decision.get(
+            "human_decision_text_utf8_bytes"):
+        raise HandoffError(
+            "the Track A waiting-termination decision byte length must "
+            "match its text")
+    recomputed = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    if recomputed != _STAGE128_TRACK_A_TERMINATION_TEXT_SHA256:
+        raise HandoffError(
+            "the pinned Track A waiting-termination decision hash does not "
+            "match the recomputed hash of the pinned text")
+    if human_decision.get("human_decision_text_sha256") != recomputed:
+        raise HandoffError(
+            "the recorded Track A waiting-termination decision hash field "
+            "does not match its own text")
+    for field, expected in (
+        ("standing_authorization", False),
+        ("one_time_action_authorization_grant", False),
+        ("authorizes_any_future_action", False),
+        ("authorizes_world_bank_followup", False),
+        ("authorizes_wdi_retrieval", False),
+        ("authorizes_repeated_requests", False),
+        ("authorizes_historical_release_date_inference_or_backfill", False),
+        ("authorizes_m3_lag_wdi_promotion_to_confirmatory", False),
+        ("authorizes_m4", False),
+        ("authorizes_final_test_access", False),
+        ("authorizes_merge", False),
+        ("scope_identified_by_hash_alone", False),
+        ("next_action_requires_new_explicit_human_decision", True),
+    ):
+        if human_decision.get(field) is not expected:
+            raise HandoffError(
+                f"Track A waiting-termination human decision record {field} "
+                f"must be {expected}")
+
+    # --- overclaim refusal: the World Bank is never "will not respond" ---- #
+    if decision.get("world_bank_will_not_respond_claim_made") is not False:
+        raise HandoffError(
+            "this decision may never claim the World Bank will not respond")
+    if decision.get("world_bank_non_response_asserted_as_proven_fact") is not (
+            False):
+        raise HandoffError(
+            "World Bank non-response may never be asserted as proven fact")
+    if decision.get("world_bank_response_characterization") != (
+            "AS_OF_2026_08_08_NO_RESPONSE_RESOLVING_THE_POINT_IN_TIME_"
+            "AVAILABILITY_QUESTION_HAD_BEEN_OBTAINED"):
+        raise HandoffError(
+            "the World Bank response characterization must state exactly "
+            "what is true: no response had been obtained as of the "
+            "decision date, nothing stronger")
+
+    # --- waiting period: terminated early, history preserved -------------- #
+    if decision.get("waiting_period_original_completion_date") != (
+            _STAGE128_TRACK_A_TERMINATION_ORIGINAL_WAITING_COMPLETION_DATE):
+        raise HandoffError(
+            "the original waiting-period completion date "
+            f"{_STAGE128_TRACK_A_TERMINATION_ORIGINAL_WAITING_COMPLETION_DATE} "
+            "must be preserved as history")
+    if decision.get("waiting_period_original_completion_date_preserved_as_"
+                     "history") is not True:
+        raise HandoffError(
+            "the original waiting-period completion date must be preserved, "
+            "not deleted, even though it is no longer an active blocker")
+    if decision.get("waiting_period_termination_date") != (
+            _STAGE128_TRACK_A_TERMINATION_DATE):
+        raise HandoffError(
+            "the waiting-period termination date must be "
+            f"{_STAGE128_TRACK_A_TERMINATION_DATE}")
+    for field, expected in (
+        ("waiting_period_was_active", True),
+        ("waiting_period_terminated_early", True),
+    ):
+        if decision.get(field) is not expected:
+            raise HandoffError(
+                f"Track A waiting-termination decision {field} must be "
+                f"{expected}")
+    if decision.get("waiting_period_status") != (
+            "VOLUNTARILY_TERMINATED_BY_EXPLICIT_HUMAN_DECISION"):
+        raise HandoffError(
+            "the waiting-period status must record a voluntary termination "
+            "by explicit human decision, never an inferred World Bank "
+            "silence")
+
+    # --- no further Track A action, no inference, no backfill ------------- #
+    for field in (
+        "further_world_bank_followup_authorized",
+        "further_world_bank_followup_requested",
+        "further_wdi_api_retrieval_authorized",
+        "further_wdi_archive_retrieval_authorized",
+        "repeated_requests_authorized",
+        "historical_release_date_inference_attempted",
+        "historical_release_date_backfill_attempted",
+        "historical_release_date_manufacture_attempted",
+        "point_in_time_wdi_availability_resolved_by_this_decision",
+        "unsolicited_future_world_bank_response_auto_reopens_m3",
+        "unsolicited_future_world_bank_response_auto_reruns_m3",
+        "m3_lag_wdi_promoted_to_confirmatory_model",
+        "m3_lag_wdi_promotion_to_confirmatory_model_authorized",
+        "m3_lag_wdi_step_e_artifacts_modified_by_this_decision",
+        "confirmatory_holm_family_changed_by_this_decision",
+        "confirmatory_holm_family_executed_by_this_decision",
+        "confirmatory_holm_state_modified_by_this_decision",
+        "m4_authorized", "m4_started", "final_test_access_authorized",
+        "paper_winner_selected", "merge_authorized",
+        "next_research_action_authorized", "track_b_next_action_authorized",
+    ):
+        if decision.get(field) is not False:
+            raise HandoffError(
+                f"Track A waiting-termination decision {field} must be "
+                "False")
+    for field, expected in (
+        ("using_a_future_unsolicited_response_requires_new_explicit_human_"
+         "decision", True),
+        ("final_test_locked", True),
+        ("m3_lag_wdi_step_e_result_preserved_exactly", True),
+        ("next_action_pointer_is_not_authorization", True),
+    ):
+        if decision.get(field) is not expected:
+            raise HandoffError(
+                f"Track A waiting-termination decision {field} must be "
+                f"{expected}")
+    if decision.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Track A waiting-termination decision must read 0 Final Test "
+            "rows")
+    if decision.get("point_in_time_wdi_availability_status") != (
+            "UNVERIFIED_WITH_CURRENTLY_AVAILABLE_EVIDENCE"):
+        raise HandoffError(
+            "point-in-time WDI availability must remain UNVERIFIED")
+    if decision.get("point_in_time_wdi_availability_treated_as") != (
+            "EVIDENCE_LIMITATION_NOT_A_BLOCKING_TASK"):
+        raise HandoffError(
+            "the unverified point-in-time availability must be treated as "
+            "an evidence limitation, not a blocking task")
+
+    # --- M3-LAG-WDI final disposition: supplementary/exploratory only ----- #
+    if decision.get("m3_lag_wdi_final_research_disposition") != (
+            "SUPPLEMENTARY_EXPLORATORY_ONLY"):
+        raise HandoffError(
+            "the M3-LAG-WDI final research disposition must be "
+            "SUPPLEMENTARY_EXPLORATORY_ONLY")
+    if decision.get("m3_lag_wdi_scientific_role") != (
+            _STAGE128_M3_LAG_ROLE):
+        raise HandoffError(
+            f"the M3-LAG-WDI scientific role must stay {_STAGE128_M3_LAG_ROLE}")
+    if decision.get("m3_lag_wdi_in_confirmatory_holm_family") is not False:
+        raise HandoffError(
+            "M3-LAG-WDI must stay outside the confirmatory Holm family")
+    if list(decision.get("confirmatory_holm_family") or []) != list(
+            _STAGE128_M3_LAG_CONFIRMATORY_FAMILY):
+        raise HandoffError(
+            "the confirmatory Holm family membership changed at this "
+            "decision")
+
+    # --- step E is cross-checked, not merely trusted ----------------------- #
+    if not _stage128_m3_lag_modeling_started(root):
+        raise HandoffError(
+            "step E must have already executed before this decision can "
+            "preserve its result")
+    step_e_decision = _require_json_artifact(
+        root, _STAGE128_M3_LAG_EVAL_DECISION_REL)
+    if step_e_decision.get("e1_conclusion") != (
+            _STAGE128_TRACK_A_TERMINATION_STEP_E_E1_CONCLUSION):
+        raise HandoffError(
+            "the step E result on disk no longer matches the result this "
+            "decision claims to preserve exactly — step E artifacts must "
+            "never be touched by this action")
+    if decision.get("m3_lag_wdi_step_e_e1_conclusion") != (
+            step_e_decision.get("e1_conclusion")):
+        raise HandoffError(
+            "the decision's own copy of the step E conclusion disagrees "
+            "with the step E artifact it claims to preserve")
+
+    # --- execution audit: zero everything ---------------------------------- #
+    for field in (
+        "world_bank_requests", "world_bank_followup_sent",
+        "world_bank_new_inquiry_submitted", "wdi_api_requests",
+        "wdi_archive_downloads", "wdi_archive_redownloads",
+        "network_requests", "coverage_calculations",
+        "feature_materializations", "data_gate_executions", "model_fits",
+        "predictions", "predictive_metrics", "bootstrap_executions",
+        "holm_executions", "shap_executions", "final_test_rows_read",
+        "final_test_predictor_values_read", "final_test_target_values_read",
+    ):
+        if boundary.get(field) != 0:
+            raise HandoffError(
+                f"Track A waiting-termination boundary {field} must be 0")
+    for field, expected in (
+        ("gmail_or_personal_account_accessed", False),
+        ("new_documentary_search_executed", False),
+        ("resubmission_executed", False),
+        ("response_ingestion_executed", False),
+        ("response_adjudication_executed", False),
+        ("release_date_inference_executed", False),
+        ("release_date_backfill_executed", False),
+        ("calendar_mapping_lock_rerun", False),
+        ("step_c_artifacts_modified", False),
+        ("step_d_artifacts_modified", False),
+        ("step_e_artifacts_modified", False),
+        ("m3_lag_wdi_contract_edited_by_this_action", False),
+        ("m3_lag_wdi_gate_thresholds_modified_by_this_action", False),
+        ("m3i2_evidence_capture_artifacts_modified", False),
+        ("m3i2_documentary_recovery_artifacts_modified", False),
+        ("m3i2_inquiry_submission_artifacts_modified", False),
+        ("confirmatory_holm_family_modified", False),
+        ("confirmatory_holm_family_changed", False),
+        ("confirmatory_holm_executed", False),
+        ("paper_winner_selected", False),
+        ("m3_lag_wdi_promoted_to_confirmatory", False),
+        ("final_test_access_authorized", False),
+        ("m4_authorized", False), ("m4_started", False),
+        ("next_research_action_authorized", False),
+        ("track_b_next_action_authorized", False),
+        ("ready_for_review_authorized", False),
+        ("merge_authorized", False), ("auto_merge", False),
+        ("pii_committed_to_git", False),
+        ("credentials_committed_to_git", False),
+        ("prior_stage128_m3_lag_wdi_artifacts_modified_by_this_action",
+         False),
+        ("prior_stage128_m3i2_artifacts_modified_by_this_action", False),
+        ("final_test_locked", True),
+    ):
+        if boundary.get(field) is not expected:
+            raise HandoffError(
+                f"Track A waiting-termination boundary {field} must be "
+                f"{expected}")
+
+    return {
+        "stage128_track_a_waiting_termination_recorded": True,
+        "stage128_track_a_waiting_termination_action_id":
+            _STAGE128_TRACK_A_TERMINATION_ACTION_ID,
+        "stage128_track_a_waiting_termination_date":
+            _STAGE128_TRACK_A_TERMINATION_DATE,
+        "stage128_track_a_waiting_period_status":
+            "VOLUNTARILY_TERMINATED_BY_EXPLICIT_HUMAN_DECISION",
+        "stage128_track_a_waiting_period_original_completion_date":
+            _STAGE128_TRACK_A_TERMINATION_ORIGINAL_WAITING_COMPLETION_DATE,
+        "stage128_track_a_world_bank_response_characterization":
+            decision.get("world_bank_response_characterization"),
+        "stage128_track_a_world_bank_will_not_respond_claim_made": False,
+        "stage128_track_a_further_followup_authorized": False,
+        "stage128_track_a_further_wdi_retrieval_authorized": False,
+        "stage128_track_a_release_date_inference_or_backfill_authorized":
+            False,
+        "stage128_m3_lag_wdi_point_in_time_availability_status":
+            "UNVERIFIED_WITH_CURRENTLY_AVAILABLE_EVIDENCE",
+        "stage128_m3_lag_wdi_point_in_time_availability_treated_as":
+            "EVIDENCE_LIMITATION_NOT_A_BLOCKING_TASK",
+        "stage128_m3_lag_wdi_final_research_disposition":
+            "SUPPLEMENTARY_EXPLORATORY_ONLY",
+        "stage128_m3_lag_wdi_promoted_to_confirmatory_model": False,
+        "stage128_m3_lag_wdi_unsolicited_future_response_auto_reopens":
+            False,
+        "stage128_m3_lag_wdi_future_response_requires_new_human_decision":
+            True,
+        "stage128_track_a_termination_human_decision_text_sha256":
+            _STAGE128_TRACK_A_TERMINATION_TEXT_SHA256,
+        "stage128_track_a_termination_human_decision_text_utf8_bytes":
+            human_decision.get("human_decision_text_utf8_bytes"),
+        # Both pointer chains now converge on the same human decision point.
+        "last_completed_research_action_id":
+            _STAGE128_TRACK_A_TERMINATION_ACTION_ID,
+        # Hyphenated to match the `stage128-...` action-id convention: this
+        # is the value published in ROADMAP.md's front matter
+        # `next_research_action_id`, which the validator requires to be a
+        # real, listed item id (item 25n) — not the underscored status-value
+        # convention used by scope/enum fields such as
+        # `stage128_m3_lag_wdi_next_action_id` below.
+        "next_research_action_id": "human-decision-required",
+        "next_research_action_scope": "no_further_action_is_authorized",
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
+        "stage128_m3_lag_wdi_next_action_id": "human_decision_required",
+        "stage128_m3_lag_wdi_next_action_authorized": False,
+        "stage128_m3_lag_wdi_next_action_scope":
+            "no_further_action_is_authorized",
+        "m4_authorized": False,
+        "final_test_locked": True,
+        "merge_authorized": False,
+        "paper_winner_selected": False,
     }
 
 

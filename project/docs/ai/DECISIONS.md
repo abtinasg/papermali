@@ -788,6 +788,44 @@ advance research action pointers.
   the frozen construct above is not yet the repository's operative M2
   equity-return definition.
 
+## Stage128 — Track A waiting-period termination and M3-LAG-WDI final disposition (2026-08-08)
+
+- The human researcher decided to voluntarily **terminate early** the Track A World Bank
+  Data Help Desk waiting period rather than wait for the previously locked completion date
+  **2026-08-20**. This is **not** recorded as "the World Bank will not respond" — that claim
+  is unproven and is not made. What is recorded, verbatim: *"As of 2026-08-08, no response
+  resolving the point-in-time availability question had been obtained, and the human
+  researcher elected to terminate the waiting period and adjudicate the M3-LAG-WDI evidence
+  using the currently available evidence."*
+- **No further Track A action is authorized:** no World Bank follow-up, no repeated request,
+  no additional WDI API or archive retrieval, and no attempt to infer, manufacture or backfill
+  a historical WDI release date.
+- Historical point-in-time availability of the two WDI observations used by M3-LAG-WDI
+  (`FP.CPI.TOTL.ZG`, `PA.NUS.FCRF`) **remains unverified** with currently available evidence.
+  This is recorded as an evidence limitation, not as a blocking task.
+- If an unsolicited World Bank response arrives later, it does **not** automatically reopen or
+  rerun M3. Using such future evidence for anything would require a **new**, separate,
+  explicit human decision.
+- **M3-LAG-WDI's final research disposition is SUPPLEMENTARY / EXPLORATORY ONLY.** It is not
+  promoted into the main confirmatory model and stays outside the confirmatory Holm family
+  (`M2_minus_M1`, `M3_CBI_minus_M2`, `M4_minus_M3_CBI`).
+- The already-completed Step E result (`stage128-m3-lag-wdi-exploratory-incremental-evaluation`,
+  item 25l) is **preserved exactly, byte-for-byte** — no artifact under
+  `project/stage128/m3_lag_wdi_exploratory_incremental_evaluation/` was touched:
+  `E1_NULL_NO_DETECTABLE_INCREMENTAL_CONTRIBUTION`; paired PR-AUC deltas logistic +0.000862
+  `[-0.028237, +0.032186]`, random forest -0.002720 `[-0.029157, +0.011924]`, XGBoost
+  +0.002749 `[-0.007437, +0.014554]` (all three intervals include zero); secondary Brier
+  deltas logistic -0.004600 `[-0.006147, -0.003066]` and random forest -0.001375
+  `[-0.002229, -0.000566]` (calibration only, non-confirmatory).
+- M4 remains **not authorized**. The Final Test remains **locked**, 0 rows read. The
+  confirmatory Holm family is unchanged. No paper winner is selected.
+- The next action on both the Track A and Track B pointer chains is the same:
+  `next_research_action_id: human_decision_required`,
+  `next_research_action_scope: no_further_action_is_authorized`,
+  `next_research_action_authorized: false`.
+- Full record: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/`,
+  `README_STAGE128_M3I2_TRACK_A_WAITING_TERMINATION_AND_M3_DISPOSITION.md`.
+
 ## Ranking & evidence (Stage124 Batch02)
 
 - Tiered **lexicographic** ranking (A–E), not a weighted score.

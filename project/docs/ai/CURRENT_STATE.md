@@ -10,9 +10,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Stage / Batch:** Stage128 / None
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `stage128-m3i2-final-official-inquiry-response-ingestion`
+- **Next research action:** `human-decision-required`
 - **Last stage commit:** `702da7bdf78ed76cc55097906ad96eaa8bd2332e`
-- **Generated from commit:** `702da7bdf78ed76cc55097906ad96eaa8bd2332e` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
+- **Generated from commit:** `05631042a6d3616d4d6b6a180d44130e6538ce96` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
 - **Baseline:** `origin/main` @ `175e7949e009eeecdd66aedab31ec4b48e9d3c7d`
 
 ## Current-state validation
@@ -139,7 +139,7 @@ _A metadata-only, PROSPECTIVE source/definition/statistical contract lock for th
 - **M3-CBI preserved unchanged:** Gate status `UNRESOLVED_M3_DATA_GATE`, block admitted False
 - **Scientific provenance baseline:** PR #73 head `e6db63fb7d105f0d3a39db101c9e364161c367e9` — protected hashes are verified against that commit permanently; a merge or retarget never moves it
 - **PR topology at contract-lock time (HISTORICAL, not live):** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and never merged under this action — merged = False, no merge authorization. Semantics: `historical_contract_lock_topology_superseded_by_pr75`. PR #74 is the **historical contract-lock PR**, never the current draft; the live Draft PR is identified in the live-action section below.
-- **Next research action (pointer only):** `stage128-m3i2-final-official-inquiry-response-ingestion` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
+- **Next research action (pointer only):** `human-decision-required` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
 - Package: `project/stage128/m3_intl_macro_contract_lock/`; interpretation: `project/stage128/m3_intl_macro_contract_lock/README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`
 
 ### Stage128 — M3I-2 official-source evidence capture
@@ -227,6 +227,20 @@ _Two tracks now run in PARALLEL. **Track A** is the World Bank official inquiry,
 - Package: `project/stage128/m3_lag_wdi_exploratory_data_gate/`; interpretation: `project/stage128/m3_lag_wdi_exploratory_data_gate/README_STAGE128_M3_LAG_WDI_EXPLORATORY_DATA_GATE.md`
 - Package: `project/stage128/m3_lag_wdi_exploratory_contract_lock/`; interpretation: `project/stage128/m3_lag_wdi_exploratory_contract_lock/README_STAGE128_M3_LAG_WDI_EXPLORATORY_CONTRACT_LOCK.md`
 
+### Stage128 — TRACK A waiting-period termination and M3-LAG-WDI final disposition (DECISION RECORDING ONLY)
+
+_An explicit human governance decision, not a one-action execution authorization. Zero data, zero network access, zero model fits, zero Final Test rows read._
+
+- ✅ **Waiting period:** `VOLUNTARILY_TERMINATED_BY_EXPLICIT_HUMAN_DECISION` on `2026-08-08` — the previously locked completion date `2026-08-20` is preserved as history and is **no longer an active blocker**.
+- ⛔ **Not recorded as World Bank non-response:** `world_bank_will_not_respond_claim_made` = False. Recorded exactly: `AS_OF_2026_08_08_NO_RESPONSE_RESOLVING_THE_POINT_IN_TIME_AVAILABILITY_QUESTION_HAD_BEEN_OBTAINED`.
+- ⛔ **No further Track A action authorized:** further follow-up authorized = False — further WDI retrieval authorized = False — historical release-date inference/backfill authorized = False.
+- ⚠️ **Point-in-time WDI availability:** `UNVERIFIED_WITH_CURRENTLY_AVAILABLE_EVIDENCE` — treated as `EVIDENCE_LIMITATION_NOT_A_BLOCKING_TASK`, never as a task that blocks the research programme.
+- ✅ **M3-LAG-WDI final research disposition:** `SUPPLEMENTARY_EXPLORATORY_ONLY` — promoted to the confirmatory model = False. A future unsolicited World Bank response auto-reopens M3 = False (using it for anything requires a new explicit human decision = True).
+- ✅ **Step E result PRESERVED EXACTLY, re-verified against the committed artifact by this recording:** `E1_NULL_NO_DETECTABLE_INCREMENTAL_CONTRIBUTION` — paired PR-AUC deltas (M3-LAG-WDI minus retained M2) logistic +0.000862 [-0.028237, +0.032186], random forest -0.002720 [-0.029157, +0.011924], XGBoost +0.002749 [-0.007437, +0.014554] (all three 95% intervals include zero); secondary Brier deltas logistic -0.004600 [-0.006147, -0.003066] and random forest -0.001375 [-0.002229, -0.000566] (calibration only, non-confirmatory).
+- ⛔ **Unchanged:** M4 authorized False — Final Test locked True, rows read 0 — confirmatory Holm family unchanged and unexecuted — paper winner selected False.
+- **Both pointer chains converge on the same human decision:** `human-decision-required` — scope `no_further_action_is_authorized`, authorized = False. Track B: `human_decision_required` — scope `no_further_action_is_authorized`, authorized = False. A pointer is never an authorization.
+- Package: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/`; interpretation: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/README_STAGE128_M3I2_TRACK_A_WAITING_TERMINATION_AND_M3_DISPOSITION.md`
+
 ### Last completed scientific micro-part QC
 
 _Scientific QC of the newest completed robustness micro-part — a DIFFERENT role from current-state validation above._
@@ -276,5 +290,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `5ac9449b10169a3e131c71ca90cc30d45704a9971b01e99e3a1e6fea180386e9`_
-_generated_at_utc: 2026-08-08T16:59:48Z (informational)_
+_state_fingerprint: `ceee817291754e1c9089a9c22de9c85a50fcc4315433aeaa62dd737a051c06c9`_
+_generated_at_utc: 2026-08-08T22:00:46Z (informational)_

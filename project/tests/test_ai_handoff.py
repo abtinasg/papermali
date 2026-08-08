@@ -1286,8 +1286,11 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # official-source evidence capture completed and the final official
     # documentary recovery was INITIATED; the pointer now names a human
     # inquiry-submission action that is NOT authorized.
-    assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-response-ingestion")
+    # The human supervisor has since voluntarily terminated the Track A
+    # waiting period early (2026-08-08) and frozen M3-LAG-WDI's final
+    # disposition as supplementary/exploratory only; both pointer chains now
+    # converge on the same human-decision-required state.
+    assert state["next_research_action_id"] == "human-decision-required"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -1358,10 +1361,9 @@ def test_real_repo_roadmap_stage126_status_consistency():
     # The workstream label is derived from the frozen action and never
     # substitutes for a research-action id.
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission"
+        "stage128-m3i2-track-a-waiting-termination-and-m3-disposition"
     )
-    assert fm["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-response-ingestion")
+    assert fm["next_research_action_id"] == "human-decision-required"
     # The Stage128 M2 D2 design freeze completed, and the canonical D2 Gate
     # re-run has since been EXECUTED under its own explicit one-action
     # authorization and PASSED data admission, so both pointers legitimately
@@ -2342,8 +2344,11 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # official-source evidence capture completed and the final official
     # documentary recovery was INITIATED; the pointer now names a human
     # inquiry-submission action that is NOT authorized.
-    assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-response-ingestion")
+    # ...and once more when the human supervisor voluntarily terminated the
+    # Track A waiting period and froze M3-LAG-WDI's final disposition
+    # (2026-08-08); both pointer chains now converge on
+    # `human-decision-required`.
+    assert state["next_research_action_id"] == "human-decision-required"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2659,8 +2664,11 @@ def test_part1_does_not_advance_research_pointers():
     # official-source evidence capture completed and the final official
     # documentary recovery was INITIATED; the pointer now names a human
     # inquiry-submission action that is NOT authorized.
-    assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-response-ingestion")
+    # ...and once more when the human supervisor voluntarily terminated the
+    # Track A waiting period and froze M3-LAG-WDI's final disposition
+    # (2026-08-08); both pointer chains now converge on
+    # `human-decision-required`.
+    assert state["next_research_action_id"] == "human-decision-required"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2897,8 +2905,11 @@ def test_handoff_carries_live_vs_historical_test_boundary_markers():
     # official-source evidence capture completed and the final official
     # documentary recovery was INITIATED; the pointer now names a human
     # inquiry-submission action that is NOT authorized.
-    assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-response-ingestion")
+    # ...and once more when the human supervisor voluntarily terminated the
+    # Track A waiting period and froze M3-LAG-WDI's final disposition
+    # (2026-08-08); both pointer chains now converge on
+    # `human-decision-required`.
+    assert state["next_research_action_id"] == "human-decision-required"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2986,8 +2997,11 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # official-source evidence capture completed and the final official
     # documentary recovery was INITIATED; the pointer now names a human
     # inquiry-submission action that is NOT authorized.
-    assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-response-ingestion")
+    # ...and once more when the human supervisor voluntarily terminated the
+    # Track A waiting period and froze M3-LAG-WDI's final disposition
+    # (2026-08-08); both pointer chains now converge on
+    # `human-decision-required`.
+    assert state["next_research_action_id"] == "human-decision-required"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -3053,7 +3067,7 @@ def test_current_state_labels_micro_part_not_research_action():
     )
     assert (
         "- **Next research action:** "
-        "`stage128-m3i2-final-official-inquiry-response-ingestion`" in text
+        "`human-decision-required`" in text
     )
 
 
@@ -3187,10 +3201,13 @@ def test_pointers_are_unchanged_because_the_gate_is_unresolved():
     CBI Gate's own successor was never created.
     """
     state = _handoff_state()
+    # The pointer has since advanced once more: the human supervisor
+    # voluntarily terminated the Track A waiting period and froze M3-LAG-WDI's
+    # final disposition (2026-08-08), which is its own separately recorded
+    # decision — not the CBI Gate's successor either.
     assert state["last_completed_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission")
-    assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-response-ingestion")
+        "stage128-m3i2-track-a-waiting-termination-and-m3-disposition")
+    assert state["next_research_action_id"] == "human-decision-required"
     assert state["next_research_action_id"] != (
         "stage128-m3-incremental-evaluation")
     assert state["m3_macro_data_gate_human_review_required"] is True
@@ -3601,7 +3618,7 @@ def test_current_state_renders_the_m3i2_contract_lock_section():
     pointers = [ln for ln in text.splitlines()
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1
-    assert "stage128-m3i2-final-official-inquiry-response-ingestion" in pointers[0]
+    assert "human-decision-required" in pointers[0]
 
 
 # --------------------------------------------------------------------------- #
@@ -4001,9 +4018,8 @@ def test_roadmap_front_matter_pins_the_live_recovery_workstream():
     assert fm["predecessor_research_workstream_id"] == (
         "stage128-m3i2-official-source-evidence-capture")
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-human-submission")
-    assert fm["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-response-ingestion")
+        "stage128-m3i2-track-a-waiting-termination-and-m3-disposition")
+    assert fm["next_research_action_id"] == "human-decision-required"
     # the front-matter reader hands back the raw scalar; unauthorized either way
     assert fm["next_research_action_authorized"] in (False, "false")
 
@@ -4365,13 +4381,19 @@ def test_item_25e_is_historical_superseded_and_unauthorized():
         assert claim not in item, claim
 
 
-def test_the_current_next_pointer_is_response_ingestion_and_unauthorized():
+def test_the_current_next_pointer_is_human_decision_required_and_unauthorized():
+    """Both pointer chains converge on human-decision-required (2026-08-08).
+
+    The Track A waiting period was voluntarily terminated early and
+    M3-LAG-WDI's final disposition was frozen as supplementary/exploratory
+    only, superseding the earlier `...-response-ingestion` pointer (which
+    remains valid roadmap history) and confirming the already-exhausted
+    Track B sequence.
+    """
     fm = gen.read_roadmap(REAL_ROOT)
-    assert fm["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-response-ingestion")
+    assert fm["next_research_action_id"] == "human-decision-required"
     assert fm["next_research_action_authorized"] in (False, "false")
     state = _handoff_state()
-    assert state["next_research_action_id"] == (
-        "stage128-m3i2-final-official-inquiry-response-ingestion")
+    assert state["next_research_action_id"] == "human-decision-required"
     assert state["next_research_action_authorized"] is False
     assert state["next_research_action_pointer_is_not_authorization"] is True
