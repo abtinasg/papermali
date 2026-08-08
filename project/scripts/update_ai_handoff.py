@@ -2774,6 +2774,70 @@ def _assert_no_consumed_authorization_is_standing(state: dict) -> dict:
     return state
 
 
+def _assert_stage128_action_sequence_and_track_a_invariants(
+        state: dict) -> dict:
+    """Fail closed on the invariants that Bug 1/Bug 3 fixes must hold.
+
+    * Every step published in ``stage128_m3_lag_wdi_action_sequence`` keeps
+      ``authorized`` / ``authorized_now`` False, whatever its
+      ``was_authorized`` / ``status`` say — a one-time execution is history,
+      never a standing permission. This must hold for the WHOLE sequence,
+      not only for step E, so a future step F cannot reintroduce the drift.
+    * Once ``stage128_m3_lag_wdi_modeling_started`` is True, the sequence
+      must actually contain a COMPLETE / was_authorized step E entry — this
+      is the direct regression guard for the stale-cap bug where the
+      calendar-mapping-lock deriver's D-capped list silently won the merge.
+    * Once the Track A waiting-period termination package is recorded, the
+      historical ``stage128_m3i2_inquiry_waiting_period_status`` field may
+      never be the only status a consumer sees: the historical-superseded
+      flag and the current termination status must both be published.
+    """
+    sequence = state.get("stage128_m3_lag_wdi_action_sequence") or []
+    for step_item in sequence:
+        step = step_item.get("step")
+        if step_item.get("authorized_now") is not False:
+            raise HandoffError(
+                f"action-sequence step {step!r} authorized_now must stay "
+                "False: execution history is never a standing authorization")
+        if step_item.get("authorized") is not False:
+            raise HandoffError(
+                f"action-sequence step {step!r} authorized must stay False: "
+                "execution history is never a standing authorization")
+
+    if state.get("stage128_m3_lag_wdi_modeling_started") is True:
+        e_entry = next(
+            (item for item in sequence if item.get("step") == "E"), None)
+        if e_entry is None:
+            raise HandoffError(
+                "stage128_m3_lag_wdi_modeling_started is True, so the "
+                "action sequence must contain a step E entry")
+        if e_entry.get("status") != "COMPLETE":
+            raise HandoffError(
+                "stage128_m3_lag_wdi_modeling_started is True, so step E's "
+                "action-sequence status must be COMPLETE, not "
+                f"{e_entry.get('status')!r}")
+        if e_entry.get("was_authorized") is not True:
+            raise HandoffError(
+                "stage128_m3_lag_wdi_modeling_started is True, so step E's "
+                "action-sequence was_authorized must be True")
+
+    if state.get("stage128_track_a_waiting_termination_recorded") is True:
+        if not state.get(
+                "stage128_m3i2_inquiry_waiting_period_status_is_historical_"
+                "superseded_by_termination"):
+            raise HandoffError(
+                "Track A termination is recorded, so "
+                "stage128_m3i2_inquiry_waiting_period_status must be marked "
+                "historical/superseded via the companion flag")
+        if state.get("stage128_track_a_waiting_period_status") != (
+                "VOLUNTARILY_TERMINATED_BY_EXPLICIT_HUMAN_DECISION"):
+            raise HandoffError(
+                "Track A termination is recorded, so "
+                "stage128_track_a_waiting_period_status must be "
+                "VOLUNTARILY_TERMINATED_BY_EXPLICIT_HUMAN_DECISION")
+    return state
+
+
 def derive_m1_robustness_closure_markers(root: str) -> dict:
     """Recognize the (synthesis-only) M1 robustness closure, if completed.
 
@@ -2811,7 +2875,8 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
             raise HandoffError(
                 f"robustness closure lock field {key}={lock.get(key)!r} != {want!r}"
             )
-    return _assert_no_consumed_authorization_is_standing({
+    return _assert_no_consumed_authorization_is_standing(
+        _assert_stage128_action_sequence_and_track_a_invariants({
         "m1_robustness_closure_completed": True,
         "m1_robustness_closure_paper_winner_selected": False,
         "m1_robustness_closure_retained_design_selected": False,
@@ -2899,7 +2964,7 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # unmoved, and converges both the Track A and Track B pointers on
         # `human_decision_required`.
         **derive_stage128_m3i2_track_a_waiting_termination_markers(root),
-    })
+        }))
 
 
 _RETAINED_DESIGN_FREEZE_REL = (
@@ -4812,7 +4877,17 @@ def render_current_state(record: dict) -> str:
             "follow-up authorized now = "
             f"{record.get('stage128_m3i2_inquiry_follow_up_authorized_now')} — "
             "response adjudication authorized = "
-            f"{record.get('stage128_m3i2_response_adjudication_authorized')}",
+            f"{record.get('stage128_m3i2_response_adjudication_authorized')}"
+            + (
+                " — **superseded "
+                f"{record.get('stage128_track_a_waiting_termination_date')}"
+                " by explicit human decision to voluntarily terminate the "
+                "waiting period early; see the Track A section below for "
+                "current status**"
+                if record.get(
+                    "stage128_track_a_waiting_termination_recorded")
+                else ""
+            ),
             "- **LIVE PR topology:** the LIVE Draft PR is **PR #"
             f"{record.get('stage128_m3i2_live_pr_number')}** "
             f"(`{record.get('stage128_m3i2_live_pr_role')}`) → base "
@@ -5039,6 +5114,21 @@ def render_current_state(record: dict) -> str:
             "stage128_m3_lag_wdi_data_gate_authorization_consumed", False)
         _gate_reusable = record.get(
             "stage128_m3_lag_wdi_data_gate_authorization_reusable", False)
+        # Step E authorization, pulled from the published action sequence
+        # rather than hard-coded: the sequence is the single place every
+        # step's historical-vs-standing authorization is kept in sync, and
+        # a step E entry only exists there once the step E deriver runs.
+        _e_seq_entry = next(
+            (item for item in
+             (record.get("stage128_m3_lag_wdi_action_sequence") or [])
+             if item.get("step") == "E"), {})
+        _e_was = _e_seq_entry.get("was_authorized", False)
+        _e_now = _e_seq_entry.get("authorized_now", False)
+        _e_consumed = record.get(
+            "stage128_m3_lag_wdi_modeling_authorization_consumed", False)
+        _e_reusable = record.get(
+            "stage128_m3_lag_wdi_modeling_authorization_reusable", False)
+        _e_status = _e_seq_entry.get("status", "NOT_AUTHORIZED")
         # Step D. The single most dangerous thing this section could do is
         # render a coverage PASS in a way that reads as scientific
         # endorsement or as permission to model, so the verdict is never
@@ -5174,8 +5264,16 @@ def render_current_state(record: dict) -> str:
                     f"{record.get('stage128_m3_lag_wdi_calendar_mapping_unresolved_limitation_count')}"
                     " limitations survive it (point-in-time WDI availability "
                     "UNPROVEN, the FX 2021–2024 degeneracy and the "
-                    "`PA.NUS.FCRF` 2024–2025 missingness all stand). Step E "
-                    "still requires its own NEW explicit human authorization",
+                    "`PA.NUS.FCRF` 2024–2025 missingness all stand). "
+                    "**As of the calendar-mapping lock,** step E still "
+                    "requires its own NEW explicit human authorization"
+                    + (
+                        " — **step E has since executed, see the Step E "
+                        "section below**"
+                        if record.get(
+                            "stage128_m3_lag_wdi_modeling_started")
+                        else ""
+                    ),
                     "- Package: `project/stage128/"
                     "m3_lag_wdi_exploratory_calendar_mapping_lock/`; "
                     "interpretation: `project/stage128/"
@@ -5319,8 +5417,10 @@ def render_current_state(record: dict) -> str:
             f"(standing) {_gate_now} — one-time authorization consumed = "
             f"{_gate_consumed}, reusable = {_gate_reusable}; (E) "
             f"`{record.get('stage128_m3_lag_wdi_modeling_action_id')}` — "
-            "authorized "
-            f"{record.get('stage128_m3_lag_wdi_modeling_authorized')}",
+            f"was authorized (historical) {_e_was}, "
+            f"authorized NOW (standing) {_e_now} — one-time authorization "
+            f"consumed = {_e_consumed}, reusable = {_e_reusable}, "
+            f"status {_e_status}",
             "- ⛔ **Authorization boundaries:** a retrieval authorization "
             "implies a Gate authorization = "
             f"{record.get('stage128_m3_lag_wdi_retrieval_authorization_implies_gate_authorization')}"
@@ -5335,13 +5435,31 @@ def render_current_state(record: dict) -> str:
             "— the old \"only after "
             "`UNRESOLVED_AFTER_FINAL_OFFICIAL_INQUIRY`\" rule is retained as "
             "HISTORY, not deleted",
-            "- ⛔ **Track A untouched:** the inquiry was NOT terminated by "
-            "this action "
-            f"({record.get('stage128_m3i2_inquiry_terminated_by_track_b')}) — "
-            "follow-up authorized now "
-            f"{record.get('stage128_m3i2_inquiry_follow_up_authorized_now')}, "
-            "response adjudication authorized "
-            f"{record.get('stage128_m3i2_response_adjudication_authorized')}",
+            (
+                "- ⛔ **Track A voluntarily terminated:** as of the "
+                "calendar-mapping lock the inquiry was not terminated by "
+                "this action "
+                f"({record.get('stage128_m3i2_inquiry_terminated_by_track_b')})"
+                " — Track A had not yet been touched; it has since been "
+                "voluntarily terminated by explicit human decision on "
+                f"`{record.get('stage128_track_a_waiting_termination_date')}`"
+                " (status "
+                f"`{record.get('stage128_track_a_waiting_period_status')}`), "
+                "see the Track A waiting-period termination section below "
+                "— follow-up authorized now "
+                f"{record.get('stage128_m3i2_inquiry_follow_up_authorized_now')}, "
+                "response adjudication authorized "
+                f"{record.get('stage128_m3i2_response_adjudication_authorized')}"
+                if record.get("stage128_track_a_waiting_termination_recorded")
+                else
+                "- ⛔ **Track A untouched:** the inquiry was NOT terminated by "
+                "this action "
+                f"({record.get('stage128_m3i2_inquiry_terminated_by_track_b')}) — "
+                "follow-up authorized now "
+                f"{record.get('stage128_m3i2_inquiry_follow_up_authorized_now')}, "
+                "response adjudication authorized "
+                f"{record.get('stage128_m3i2_response_adjudication_authorized')}"
+            ),
             *_custody_lines,
             *_audit_lines,
             *_gate_lines,
@@ -10314,6 +10432,26 @@ def derive_stage128_m3_lag_wdi_incremental_evaluation_markers(
         "stage128_m3_lag_wdi_next_action_executes_data_gate_semantics":
             "no_next_action_is_named_so_nothing_is_described",
         "stage128_m3_lag_wdi_track_b_sequence_complete": True,
+        "stage128_m3_lag_wdi_action_sequence": [
+            {
+                "step": step,
+                "action_id": action_id,
+                "executes_retrieval": executes_retrieval,
+                "executes_data_gate": executes_gate,
+                "executes_modeling": executes_modeling,
+                # "authorized" is STANDING: consumed one-time authorizations
+                # (A, B, C, D, E) are history, recorded in "was_authorized"
+                # only. Step E fitting a model does not make its one-time
+                # authorization reusable or standing.
+                "was_authorized": step in ("A", "B", "C", "D", "E"),
+                "authorized_now": False,
+                "authorized": False,
+                "status": "COMPLETE" if step in ("A", "B", "C", "D", "E")
+                          else "NOT_AUTHORIZED",
+            }
+            for (step, action_id, executes_retrieval, executes_gate,
+                 executes_modeling) in _STAGE128_M3_LAG_ACTION_SEQUENCE
+        ],
     }
 
 
@@ -10925,6 +11063,13 @@ def derive_stage128_m3i2_track_a_waiting_termination_markers(
             _STAGE128_TRACK_A_TERMINATION_TEXT_SHA256,
         "stage128_track_a_termination_human_decision_text_utf8_bytes":
             human_decision.get("human_decision_text_utf8_bytes"),
+        # The human-submission action's `stage128_m3i2_inquiry_waiting_
+        # period_status` field is left untouched (it is the historically
+        # accurate value that action itself asserted), but a consumer of
+        # that key alone would see a stale "ACTIVE" with no signal that a
+        # later action superseded it. This key is that signal.
+        "stage128_m3i2_inquiry_waiting_period_status_is_historical_"
+        "superseded_by_termination": True,
         # Both pointer chains now converge on the same human decision point.
         "last_completed_research_action_id":
             _STAGE128_TRACK_A_TERMINATION_ACTION_ID,
