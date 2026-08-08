@@ -54,6 +54,7 @@ _ALL_RELS = (_REPORT_REL, _EXEC_REL, _BOUNDARY_REL, _DECISION_REL, _AUTH_REL,
 
 _ACTION_ID = "stage128-m3-lag-wdi-exploratory-post-retrieval-audit"
 _GATE_ACTION = "stage128-m3-lag-wdi-exploratory-data-gate"
+_NO_NEXT_ACTION = "human_decision_required"
 _MODELING_ACTION = "stage128-m3-lag-wdi-exploratory-incremental-evaluation"
 _CPI = "FP.CPI.TOTL.ZG"
 _FX = "PA.NUS.FCRF"
@@ -339,8 +340,10 @@ def test_the_handoff_publishes_the_audit_and_advances_the_pointer(handoff):
     # it runs the pointer legitimately advances again. What the AUDIT must
     # never have caused is that the Gate ran on the audit's authorization.
     gated = handoff["stage128_m3_lag_wdi_data_gate_executed"]
+    modeled = handoff["stage128_m3_lag_wdi_modeling_started"]
     assert handoff["stage128_m3_lag_wdi_next_action_id"] == (
-        _MODELING_ACTION if gated else _GATE_ACTION)
+        _NO_NEXT_ACTION if modeled
+        else _MODELING_ACTION if gated else _GATE_ACTION)
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
     if not gated:
@@ -418,7 +421,16 @@ def test_next_action_executes_data_gate_describes_the_named_action(handoff):
     pointer = handoff["stage128_m3_lag_wdi_next_action_id"]
     sequence = handoff["stage128_m3_lag_wdi_action_sequence"]
     canonical = {e["action_id"]: e["executes_data_gate"] for e in sequence}
-    assert pointer in canonical
+    # Once step E has run the locked sequence is exhausted, so the pointer
+    # names no action at all. "No named action" describes nothing, so the flag
+    # is False — which is a statement about the absence of an action, not a
+    # claim that some action gates or does not gate.
+    if pointer not in canonical:
+        assert pointer == _NO_NEXT_ACTION
+        assert handoff["stage128_m3_lag_wdi_modeling_started"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_next_action_executes_data_gate"] is False
+        return
     assert handoff["stage128_m3_lag_wdi_next_action_executes_data_gate"] is (
         canonical[pointer]), (
             "the pointer's executes-the-Gate flag must equal the locked "

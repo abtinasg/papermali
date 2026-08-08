@@ -1,0 +1,109 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-incremental-evaluation",
+  "authorized_scope": "exploratory_incremental_evaluation_only",
+  "authorizes_next_action": false,
+  "block_promoted_to_confirmatory": false,
+  "comparison": "M3_LAG_WDI_minus_retained_M2",
+  "comparison_family": "M3_LAG_WDI_EXPLORATORY_SUPPLEMENTARY",
+  "confirmatory_conclusions_changed": false,
+  "confirmatory_holm_family_changed": false,
+  "confirmatory_superiority_claim_made": false,
+  "e1_any_family_interval_excludes_zero": false,
+  "e1_conclusion": "E1_NULL_NO_DETECTABLE_INCREMENTAL_CONTRIBUTION",
+  "e1_conclusion_statement": "Adding the two lagged WDI macro features to the retained M2 block produced no detectable change in out-of-fold DISCRIMINATION on the identical 539-row development sample. In every one of the three frozen model families the paired pr_auc difference is small and its 95% paired company-cluster bootstrap interval includes zero. This conclusion is about the PRIMARY metric. It is not a claim that nothing moved anywhere: regularized_logistic_regression brier_score -0.004600 [-0.006147, -0.003066] favouring M3_LAG_WDI; random_forest brier_score -0.001375 [-0.002229, -0.000566] favouring M3_LAG_WDI. Brier score measures CALIBRATION, not ranking, so a better Brier alongside an unchanged PR-AUC is the coherent reading that the macro features shift the probability LEVEL within a year without improving the company-level ORDERING inside it — which is exactly what year-constant features would be expected to do, and is not evidence of incremental discriminative value. It remains exploratory and supplementary, and it is not a confirmatory claim.",
+  "e1_direction_by_family": {
+    "random_forest": "approximately_null_interval_includes_zero",
+    "regularized_logistic_regression": "approximately_null_interval_includes_zero",
+    "xgboost": "approximately_null_interval_includes_zero"
+  },
+  "e1_primary_metric": "pr_auc",
+  "e1_secondary_metric_intervals_excluding_zero": [
+    {
+      "ci_lower": -0.006146938469,
+      "ci_upper": -0.00306575698,
+      "delta": -0.004600408174,
+      "favours": "M3_LAG_WDI",
+      "lower_is_better": true,
+      "metric": "brier_score",
+      "model_family": "regularized_logistic_regression"
+    },
+    {
+      "ci_lower": -0.002229138666,
+      "ci_upper": -0.000566103973,
+      "delta": -0.001374596812,
+      "favours": "M3_LAG_WDI",
+      "lower_is_better": true,
+      "metric": "brier_score",
+      "model_family": "random_forest"
+    }
+  ],
+  "e1_secondary_metric_signal_is_confirmatory": false,
+  "e1_secondary_metric_signal_present": true,
+  "exploratory_interpretation": {
+    "register": "2_exploratory_supplementary_interpretation",
+    "statement": "This result belongs to the supplementary exploratory family `M3_LAG_WDI_EXPLORATORY_SUPPLEMENTARY` and is labelled `supplementary_exploratory_robustness_only`. It is not a confirmatory test, it was not inserted into the confirmatory Holm family, and it neither supports nor retires any confirmatory conclusion. The block's frozen role as a `supplementary_exploratory_robustness_block` is unchanged by it."
+  },
+  "final_test_remains_locked": true,
+  "hypothesis_id": "E1",
+  "limitations": [
+    {
+      "erased_by_a_favourable_predictive_result": false,
+      "id": "point_in_time_wdi_availability_unproven",
+      "resolved_by_this_action": false,
+      "statement": "The retained WDI values are the CURRENT/REVISED series. WDI `lastupdated` is a revision marker, not evidence of what was published at any past date, so historical point-in-time availability remains UNPROVEN."
+    },
+    {
+      "erased_by_a_favourable_predictive_result": false,
+      "id": "lagging_does_not_create_point_in_time_data",
+      "resolved_by_this_action": false,
+      "statement": "The one-year lag is a conservative temporal-separation design only. Lagging a revised series does not convert it into point-in-time data, and the locked +621 calendar mapping does not either."
+    },
+    {
+      "erased_by_a_favourable_predictive_result": false,
+      "id": "fx_degenerate_2021_2024",
+      "resolved_by_this_action": false,
+      "statement": "The FX log-ratio is defined but identically ZERO for predictor years 2021-2024, because the official rate is pegged at 42000 across the 2019-2023 observations. Under the locked mapping the development sample spans predictor years 2013-2019, so 0 of 539 rows are zero-change here — the degeneracy binds any extension of the block, not this evaluation."
+    },
+    {
+      "erased_by_a_favourable_predictive_result": false,
+      "id": "fx_missing_2024_2025",
+      "resolved_by_this_action": false,
+      "statement": "PA.NUS.FCRF carries no value for observation years 2024-2025, capping the jointly constructible predictor-year ceiling at 2024. This does not bind the development sample but caps any future extension of the block."
+    },
+    {
+      "erased_by_a_favourable_predictive_result": false,
+      "id": "exploratory_role_is_frozen",
+      "resolved_by_this_action": false,
+      "statement": "The block's role is frozen as `supplementary_exploratory_robustness_block`. It is not confirmatory M3, not a replacement for or repair of M3-CBI, not a replacement for M3I-2, not historical-vintage or real-time WDI, not part of the confirmatory Holm family, and not independently capable of selecting the paper winner."
+    },
+    {
+      "erased_by_a_favourable_predictive_result": false,
+      "id": "macro_features_are_year_level_not_company_level",
+      "resolved_by_this_action": false,
+      "statement": "Both features are NATIONAL annual series, so within a predictor year every company carries the same value: across the 539 rows they take only 7 and 7 distinct values respectively, one per predictor year 2013-2019. Because the temporal folds make training and validation years DISJOINT by construction, every value the block sees in a validation window is one it never saw in training. The block can therefore shift or rescale predictions within a validation year but cannot contribute company-level discrimination inside it, which is what the ranking metrics measure. This is a structural property of the design, not an artefact of the observed result, and it constrains the interpretation of E1 in either direction."
+    },
+    {
+      "erased_by_a_favourable_predictive_result": false,
+      "id": "two_validation_windows_few_positives",
+      "resolved_by_this_action": false,
+      "statement": "The paired comparison rests on 366 pooled out-of-fold rows carrying 28 positives across two temporal windows. Interval width, not point estimates, is the honest summary at this event count."
+    }
+  ],
+  "m3_cbi_repaired_by_this_action": false,
+  "m3i2_replaced_by_this_action": false,
+  "next_action_authorized": false,
+  "next_action_id": "human_decision_required",
+  "next_action_scope": "no_further_action_is_authorized",
+  "paper_winner_selected": false,
+  "predictive_result": {
+    "register": "1_predictive_result",
+    "statement": "On the identical post-complete-case development sample of 539 rows (55 positives, 108 companies; 366 pooled out-of-fold rows carrying 28 positives), the 14-feature M3-LAG-WDI block was compared against the refit 12-feature retained M2 block. Paired pr_auc differences by family: regularized_logistic_regression +0.000862, random_forest -0.002720, xgboost +0.002749."
+  },
+  "results_label": "supplementary_exploratory_robustness_only",
+  "scientific_role": "supplementary_exploratory_robustness_block",
+  "statistical_uncertainty": {
+    "register": "3_statistical_uncertainty",
+    "seed_changed_after_seeing_results": false,
+    "statement": "Uncertainty is quantified by the frozen paired paired_company_cluster_bootstrap on `ticker` with 2000 replicates at seed 20260724, percentile intervals at 0.95, with the same resampled companies and rows used for both blocks in every replicate and no model refit inside the bootstrap. With 28 pooled out-of-fold positives the intervals are wide relative to the observed differences; an interval that includes zero is evidence of an undetectably small effect at this event count, not proof that the effect is exactly zero."
+  }
+}

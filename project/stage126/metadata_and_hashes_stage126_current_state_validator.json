@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 170,
+  "assertion_count": 178,
   "assertions": [
     {
       "detail": "",
@@ -698,7 +698,7 @@
       "status": "PASS"
     },
     {
-      "detail": "the Track B pointer advances one separated step at a time — to the audit after retrieval, to the Data Gate after the audit, to modeling after the Gate — and a pointer is never an authorization",
+      "detail": "the Track B pointer advances one separated step at a time — to the audit after retrieval, to the Data Gate after the audit, to modeling after the Gate, and to NO named action after step E — and a pointer is never an authorization",
       "name": "m3_lag_wdi_pointer_advances_but_never_authorizes",
       "status": "PASS"
     },
@@ -758,7 +758,7 @@
       "status": "PASS"
     },
     {
-      "detail": "no M3-LAG-WDI modeling feature-value table may be materialized while the Jalali-to-Gregorian mapping is unlocked, because feature values are not invariant to it (found: [])",
+      "detail": "no M3-LAG-WDI modeling feature-value table may be materialized while the Jalali-to-Gregorian mapping is unlocked, because feature values are not invariant to it (found: ['project/stage128/m3_lag_wdi_exploratory_incremental_evaluation/stage128_m3_lag_wdi_evaluation_feature_values.csv'])",
       "name": "m3_lag_wdi_no_feature_value_table_without_a_locked_calendar_mapping",
       "status": "PASS"
     },
@@ -780,6 +780,46 @@
     {
       "detail": "a locked contract authorizes neither retrieval, nor the Data Gate, nor modeling",
       "name": "m3_lag_wdi_lock_is_not_an_authorization",
+      "status": "PASS"
+    },
+    {
+      "detail": "the Handoff may publish modeling as started only when step E's own exploratory-evaluation-only package justifies it",
+      "name": "m3_lag_wdi_modeling_started_only_with_its_own_action",
+      "status": "PASS"
+    },
+    {
+      "detail": "an executed step E must be published as executed",
+      "name": "m3_lag_wdi_modeling_is_published_when_it_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "a completed step E is consumed and non-reusable; its grant is history and may never read as a standing permission",
+      "name": "m3_lag_wdi_modeling_authorization_is_consumed_never_standing",
+      "status": "PASS"
+    },
+    {
+      "detail": "E1 belongs to the supplementary exploratory family and is never inserted into, or allowed to modify, the confirmatory Holm family",
+      "name": "m3_lag_wdi_result_stays_in_the_exploratory_family",
+      "status": "PASS"
+    },
+    {
+      "detail": "a predictive result — favourable or not — never becomes a confirmatory superiority claim and never selects the paper winner",
+      "name": "m3_lag_wdi_result_makes_no_confirmatory_claim",
+      "status": "PASS"
+    },
+    {
+      "detail": "both blocks are refit on ONE identical 539-row development sample, 12 features versus 14, in exactly 44 primary predictive fits",
+      "name": "m3_lag_wdi_evaluation_used_one_identical_sample_and_12_vs_14",
+      "status": "PASS"
+    },
+    {
+      "detail": "fitting a model resolves none of the block's data limitations, and never turns revised WDI into point-in-time data",
+      "name": "m3_lag_wdi_evaluation_keeps_the_vintage_limitation",
+      "status": "PASS"
+    },
+    {
+      "detail": "step E reads no Final Test row and authorizes no next action",
+      "name": "m3_lag_wdi_evaluation_reads_no_final_test_row",
       "status": "PASS"
     },
     {
@@ -854,7 +894,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "2f0b23848a98fff41a6841c5ffe8764079bdfc53",
+  "code_commit": "9c87674c692600195a94c2ba862ace9d604fdc46",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -862,7 +902,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "2f0b23848a98fff41a6841c5ffe8764079bdfc53",
+  "generated_at": "9c87674c692600195a94c2ba862ace9d604fdc46",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -880,7 +920,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "65b74448d764ca9b26aa445d81889a986f753d7bc9372779b7727d62ed50f418",
+  "source_file_sha256": "d2f90a5e49d7ed9cdcff172a37b51305e24e5fe962b6be991285d3cedb70d403",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {

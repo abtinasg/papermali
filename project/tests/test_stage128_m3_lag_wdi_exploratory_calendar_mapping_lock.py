@@ -393,10 +393,23 @@ def test_the_handoff_publishes_the_locked_mapping(handoff):
 
 def test_the_handoff_keeps_step_e_closed_after_the_lock(handoff):
     assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
-    assert handoff["stage128_m3_lag_wdi_modeling_started"] is False
+    # A RULE, not a snapshot: step E is the separately authorized action that
+    # legitimately makes modeling started, so pinning it False here would
+    # encode the pre-step-E MOMENT and fail the instant a legitimate step E
+    # ran. What holds at EVERY step is that modeling was not started BY THIS
+    # action, and that no STANDING modeling permission ever exists.
+    if handoff["stage128_m3_lag_wdi_modeling_started"] is True:
+        assert handoff["stage128_m3_lag_wdi_modeling_executed"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_modeling_authorization_consumed"] is True
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
+    # The pointer names step E until step E runs; after that the locked
+    # sequence is exhausted and it names no action at all. Pinning it to step E
+    # forever would encode the pre-step-E MOMENT.
     assert handoff["stage128_m3_lag_wdi_next_action_id"] == (
-        "stage128-m3-lag-wdi-exploratory-incremental-evaluation")
+        "human_decision_required"
+        if handoff["stage128_m3_lag_wdi_modeling_started"] is True
+        else "stage128-m3-lag-wdi-exploratory-incremental-evaluation")
     assert handoff["final_test_locked"] is True
     assert handoff["stage128_m3_lag_wdi_final_test_rows_read"] == 0
 

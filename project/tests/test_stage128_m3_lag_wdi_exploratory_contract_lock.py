@@ -539,7 +539,15 @@ def test_the_handoff_records_zero_execution(handoff):
     # would fail the instant a legitimate step D executed. What the LOCK must
     # never have caused — modeling, an authorized pointer, a Final Test read —
     # is asserted here and stays asserted for the whole life of the branch.
-    assert handoff["stage128_m3_lag_wdi_modeling_started"] is False
+    # A RULE, not a snapshot: step E is the separately authorized action that
+    # legitimately makes modeling started, so pinning it False here would
+    # encode the pre-step-E MOMENT and fail the instant a legitimate step E
+    # ran. What holds at EVERY step is that modeling was not started BY THIS
+    # action, and that no STANDING modeling permission ever exists.
+    if handoff["stage128_m3_lag_wdi_modeling_started"] is True:
+        assert handoff["stage128_m3_lag_wdi_modeling_executed"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_modeling_authorization_consumed"] is True
     assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_final_test_rows_read"] == 0
@@ -1110,6 +1118,9 @@ _POST_RETRIEVAL_AUDIT_ACTION_ID = (
 _DATA_GATE_ACTION_ID = "stage128-m3-lag-wdi-exploratory-data-gate"
 _MODELING_ACTION_ID = (
     "stage128-m3-lag-wdi-exploratory-incremental-evaluation")
+#: Step E is the last action in the locked sequence, so once it has run the
+#: pointer names no Track B action at all — only a human decision.
+_NO_NEXT_ACTION_ID = "human_decision_required"
 
 
 def test_the_next_action_is_a_separated_step_and_never_the_gate(handoff):
@@ -1119,7 +1130,11 @@ def test_the_next_action_is_a_separated_step_and_never_the_gate(handoff):
     # itself, it never executes the Gate, and it is never an authorization.
     assert handoff["stage128_m3_lag_wdi_next_action_id"] in (
         _RETRIEVAL_ACTION_ID, _POST_RETRIEVAL_AUDIT_ACTION_ID,
-        _DATA_GATE_ACTION_ID, _MODELING_ACTION_ID)
+        _DATA_GATE_ACTION_ID, _MODELING_ACTION_ID,
+        # Step E is the last step in the locked sequence, so once it has run
+        # the pointer names no action at all. That is the strongest possible
+        # form of "not authorized", not a break in the chain.
+        _NO_NEXT_ACTION_ID)
     # Once the audit has completed, the pointer legitimately NAMES the Data
     # Gate. What must never happen is the Gate becoming authorized or executed
     # merely because the pointer reached it — a pointer is not an
@@ -1137,7 +1152,20 @@ def test_the_next_action_is_a_separated_step_and_never_the_gate(handoff):
         assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
         assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
         assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
-        assert handoff["stage128_m3_lag_wdi_modeling_started"] is False
+    # And once step E has completed, the locked sequence is exhausted and the
+    # pointer names no action at all. A RULE, not a snapshot: pinning
+    # "modeling never started" would encode the pre-step-E MOMENT and fail the
+    # instant a legitimate step E ran. What holds at EVERY step is that
+    # modeling was not started BY THIS lock, that a started step E is a
+    # consumed one, and that no STANDING modeling permission ever exists.
+    if handoff["stage128_m3_lag_wdi_next_action_id"] == _NO_NEXT_ACTION_ID:
+        assert handoff["stage128_m3_lag_wdi_modeling_started"] is True
+        assert handoff["stage128_m3_lag_wdi_modeling_executed"] is True
+    if handoff["stage128_m3_lag_wdi_modeling_started"] is True:
+        assert handoff["stage128_m3_lag_wdi_modeling_executed"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_modeling_authorization_consumed"] is True
+    assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
     # Descriptive, not a safety flag: True exactly when the pointer names the
     # Gate action. The safety property is that it is never AUTHORIZED (above)

@@ -65,6 +65,7 @@ _CPI = "FP.CPI.TOTL.ZG"
 _FX = "PA.NUS.FCRF"
 _AUDIT_ACTION = "stage128-m3-lag-wdi-exploratory-post-retrieval-audit"
 _GATE_ACTION = "stage128-m3-lag-wdi-exploratory-data-gate"
+_NO_NEXT_ACTION = "human_decision_required"
 _MODEL_ACTION = "stage128-m3-lag-wdi-exploratory-incremental-evaluation"
 
 
@@ -352,7 +353,15 @@ def test_the_handoff_publishes_retrieval_and_nothing_more(handoff):
         assert handoff["stage128_m3_lag_wdi_block_admitted"] is (
             handoff["stage128_m3_lag_wdi_data_gate_result"]
             == "PASS_M3_LAG_WDI_DATA_GATE")
-    assert handoff["stage128_m3_lag_wdi_modeling_started"] is False
+    # A RULE, not a snapshot: step E is the separately authorized action that
+    # legitimately makes modeling started, so pinning it False here would
+    # encode the pre-step-E MOMENT and fail the instant a legitimate step E
+    # ran. What holds at EVERY step is that modeling was not started BY THIS
+    # action, and that no STANDING modeling permission ever exists.
+    if handoff["stage128_m3_lag_wdi_modeling_started"] is True:
+        assert handoff["stage128_m3_lag_wdi_modeling_executed"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_modeling_authorization_consumed"] is True
     assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_final_test_rows_read"] == 0
     assert handoff["final_test_locked"] is True
@@ -369,7 +378,9 @@ def test_the_handoff_pointer_advanced_to_an_unauthorized_next_step(handoff):
     """
     audited = handoff["stage128_m3_lag_wdi_post_retrieval_audit_executed"]
     gated = handoff["stage128_m3_lag_wdi_data_gate_executed"]
-    expected = (_MODEL_ACTION if gated
+    modeled = handoff["stage128_m3_lag_wdi_modeling_started"]
+    expected = (_NO_NEXT_ACTION if modeled
+                else _MODEL_ACTION if gated
                 else _GATE_ACTION if audited else _AUDIT_ACTION)
     assert handoff["stage128_m3_lag_wdi_next_action_id"] == expected
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False

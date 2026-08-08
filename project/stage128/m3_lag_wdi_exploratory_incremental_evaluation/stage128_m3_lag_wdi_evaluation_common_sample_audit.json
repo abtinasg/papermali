@@ -1,0 +1,171 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-incremental-evaluation",
+  "attrition_from_parent": {
+    "attrition_follows_mechanically_from_the_frozen_complete_case_rule": true,
+    "dropped_by_incomplete_cpi": 0,
+    "dropped_by_incomplete_fx": 0,
+    "dropped_rows": 0,
+    "exclusions_outside_the_frozen_complete_case_rule": 0,
+    "feature_substitution_used": false,
+    "imputation_used": false,
+    "parent_rows": 539,
+    "step_e_rows": 539
+  },
+  "calendar_mapping_rule": "jalali_fiscal_year_t_plus_621",
+  "calendar_mapping_rule_formula": "predictor_year_t = jalali_fiscal_year_t + 621",
+  "composition": {
+    "companies": 108,
+    "event_rate": 0.102040816327,
+    "fold_counts": {
+      "fold1_train": 173,
+      "fold1_validation": 159,
+      "fold2_train": 332,
+      "fold2_validation": 207
+    },
+    "negative": 484,
+    "pooled_oof_positive": 28,
+    "pooled_oof_rows": 366,
+    "positive": 55,
+    "rows": 539,
+    "validation_positives": {
+      "fold1_validation": 18,
+      "fold2_validation": 10
+    }
+  },
+  "cpi_observation_year_first": 2012,
+  "cpi_observation_year_last": 2018,
+  "cpi_observation_year_rule": "t-1",
+  "final_test_rows_in_sample": 0,
+  "fx_observation_year_denominator_first": 2011,
+  "fx_observation_year_denominator_last": 2017,
+  "fx_observation_year_numerator_first": 2012,
+  "fx_observation_year_numerator_last": 2018,
+  "fx_observation_year_rule": "t-1 (numerator) and t-2 (denominator)",
+  "fx_zero_change_rows": 0,
+  "identical_sample_for_both_blocks": true,
+  "missingness_after_construction": {
+    "complete_case_required_features": [
+      "intl_cpi_inflation_lag1_wdi",
+      "intl_fx_change_official_lag1_wdi",
+      "equity_return_window",
+      "realized_volatility",
+      "amihud_illiquidity"
+    ],
+    "complete_case_violations": 0,
+    "m1_financial_features": {
+      "accumulated_loss_to_capital_ratio": 0,
+      "asset_turnover_period_adjusted": 0,
+      "current_ratio": 0,
+      "financial_expense_to_assets_period_adjusted": 1,
+      "leverage_ratio": 0,
+      "log_total_assets": 0,
+      "ocf_to_assets_period_adjusted": 17,
+      "operating_margin_period_adjusted": 3,
+      "roa_period_adjusted": 0
+    },
+    "m1_missingness_handled_by": "the inherited frozen preprocessor: training-fold-only clip to the 1st/99th percentile, median imputation, and a per-feature missingness indicator column",
+    "m1_missingness_introduced_by_this_action": false,
+    "m1_missingness_is_pre_existing_and_identical_for_both_blocks": true,
+    "m1_pre_existing_missing_values": 21,
+    "m2_market_features": {
+      "amihud_illiquidity": 0,
+      "equity_return_window": 0,
+      "realized_volatility": 0
+    },
+    "new_imputation_introduced_by_this_action": false,
+    "new_wdi_feature_missing_values": 0,
+    "new_wdi_features": {
+      "intl_cpi_inflation_lag1_wdi": 0,
+      "intl_fx_change_official_lag1_wdi": 0
+    }
+  },
+  "parent_join_audit": {
+    "canonical_row_identity": [
+      "ticker",
+      "fiscal_year_t",
+      "predictor_row_key_t",
+      "target_row_key_t_plus_1",
+      "target_year",
+      "temporal_fold_role"
+    ],
+    "common_negative": 484,
+    "common_positive": 55,
+    "common_rows": 539,
+    "d2_rows": 666,
+    "duplicate_join_keys": 0,
+    "duplicate_joins_rejected": true,
+    "final_test_rows_in_join": 0,
+    "final_test_rows_loaded": 0,
+    "final_test_rows_seen_and_skipped": 346,
+    "fold_role_disagreements": 0,
+    "join_is_one_to_one": true,
+    "join_keys": [
+      "ticker",
+      "fiscal_year_t"
+    ],
+    "many_to_many_joins": 0,
+    "many_to_many_rejected": true,
+    "matched_rows": 666,
+    "parent_rows": 666,
+    "pooled_oof_positive": 28,
+    "pooled_oof_rows": 366,
+    "target_year_disagreements": 0,
+    "unmatched_d2_rows": 0,
+    "unmatched_parent_rows": 0
+  },
+  "parent_surface": "retained_m2_development_common_sample",
+  "predictor_year_first": 2013,
+  "predictor_year_last": 2019,
+  "predictor_years": [
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019
+  ],
+  "same_year_t_observations_read": 0,
+  "wdi_distinct_values": {
+    "intl_cpi_inflation_lag1_wdi": 7,
+    "intl_fx_change_official_lag1_wdi": 7
+  },
+  "wdi_features_are_constant_within_a_predictor_year": true,
+  "wdi_values_by_predictor_year": {
+    "2013": {
+      "intl_cpi_inflation_lag1_wdi": 27.256812724291,
+      "intl_fx_change_official_lag1_wdi": 13.703843265919,
+      "rows": 40
+    },
+    "2014": {
+      "intl_cpi_inflation_lag1_wdi": 36.603035519103,
+      "intl_fx_change_official_lag1_wdi": 41.370596008709,
+      "rows": 67
+    },
+    "2015": {
+      "intl_cpi_inflation_lag1_wdi": 16.606553235745,
+      "intl_fx_change_official_lag1_wdi": 34.271475600933,
+      "rows": 66
+    },
+    "2016": {
+      "intl_cpi_inflation_lag1_wdi": 12.484681561153,
+      "intl_fx_change_official_lag1_wdi": 11.184167544081,
+      "rows": 79
+    },
+    "2017": {
+      "intl_cpi_inflation_lag1_wdi": 7.24542548953,
+      "intl_fx_change_official_lag1_wdi": 6.354472391228,
+      "rows": 80
+    },
+    "2018": {
+      "intl_cpi_inflation_lag1_wdi": 8.044924376603,
+      "intl_fx_change_official_lag1_wdi": 7.210494559912,
+      "rows": 100
+    },
+    "2019": {
+      "intl_cpi_inflation_lag1_wdi": 18.014118337187,
+      "intl_fx_change_official_lag1_wdi": 20.691585576232,
+      "rows": 107
+    }
+  }
+}

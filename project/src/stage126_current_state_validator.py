@@ -936,6 +936,10 @@ STAGE128_M3_LAG_DATA_GATE_ACTION_ID = (
 STAGE128_M3_LAG_MODELING_ACTION_ID = (
     "stage128-m3-lag-wdi-exploratory-incremental-evaluation")
 STAGE128_M3_LAG_NEXT_ACTION_SCOPE = "retrieval_only"
+#: The pointer value once the locked Track B sequence is exhausted. Step E is
+#: the last action in it, so after step E there is no next Track B action to
+#: name — only a human decision.
+STAGE128_M3_LAG_NO_NEXT_ACTION_ID = "human_decision_required"
 #: (step, action_id, executes_retrieval, executes_gate, executes_modeling)
 STAGE128_M3_LAG_ACTION_SEQUENCE = (
     ("A", "stage128-m3-lag-wdi-exploratory-contract-lock", False, False, False),
@@ -1570,6 +1574,196 @@ _STAGE128_M3_LAG_GATE_ZERO = (
     "model_selections", "final_test_rows_read",
     "final_test_predictor_values_read", "final_test_target_values_read",
 )
+
+
+#: Track B step E — the exploratory incremental evaluation.
+_STAGE128_M3_LAG_EVAL_PKG = (
+    "project/stage128/m3_lag_wdi_exploratory_incremental_evaluation")
+_STAGE128_M3_LAG_EVAL_DECISION_REL = (
+    f"{_STAGE128_M3_LAG_EVAL_PKG}/"
+    "stage128_m3_lag_wdi_evaluation_decision.json")
+_STAGE128_M3_LAG_EVAL_BOUNDARY_REL = (
+    f"{_STAGE128_M3_LAG_EVAL_PKG}/"
+    "stage128_m3_lag_wdi_evaluation_governance_boundary.json")
+_STAGE128_M3_LAG_EVAL_AUDIT_REL = (
+    f"{_STAGE128_M3_LAG_EVAL_PKG}/"
+    "stage128_m3_lag_wdi_evaluation_execution_audit.json")
+_STAGE128_M3_LAG_EVAL_SAMPLE_REL = (
+    f"{_STAGE128_M3_LAG_EVAL_PKG}/"
+    "stage128_m3_lag_wdi_evaluation_common_sample_audit.json")
+_STAGE128_M3_LAG_EVAL_FITS_REL = (
+    f"{_STAGE128_M3_LAG_EVAL_PKG}/"
+    "stage128_m3_lag_wdi_evaluation_predictive_fit_count_audit.json")
+_STAGE128_M3_LAG_EVAL_MULTIPLICITY_REL = (
+    f"{_STAGE128_M3_LAG_EVAL_PKG}/"
+    "stage128_m3_lag_wdi_evaluation_multiplicity_family_status.json")
+
+STAGE128_M3_LAG_EVAL_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-incremental-evaluation")
+STAGE128_M3_LAG_EVAL_SCOPE = "exploratory_incremental_evaluation_only"
+STAGE128_M3_LAG_EVAL_FAMILY_ID = "M3_LAG_WDI_EXPLORATORY_SUPPLEMENTARY"
+STAGE128_M3_LAG_EVAL_RESULTS_LABEL = (
+    "supplementary_exploratory_robustness_only")
+STAGE128_M3_LAG_EVAL_ROLE = "supplementary_exploratory_robustness_block"
+STAGE128_M3_LAG_EVAL_ROWS = 539
+STAGE128_M3_LAG_EVAL_M2_FEATURES = 12
+STAGE128_M3_LAG_EVAL_M3_FEATURES = 14
+STAGE128_M3_LAG_EVAL_FIT_COUNT = 44
+STAGE128_M3_LAG_CONFIRMATORY_FAMILY = (
+    "M2_minus_M1", "M3_CBI_minus_M2", "M4_minus_M3_CBI")
+
+#: Counters step E must STILL leave at zero. It fits models — that is its job —
+#: but it retrieves nothing, re-runs nothing, tunes nothing, searches nothing,
+#: adjusts no confirmatory family and reads no Final Test row.
+_STAGE128_M3_LAG_EVAL_ZERO = (
+    "world_bank_api_requests", "new_payloads_retrieved",
+    "alternative_indicators_searched", "alternative_indicators_retrieved",
+    "step_c_reruns", "step_d_reruns", "data_gate_executions",
+    "calendar_mapping_lock_reruns", "calendar_mapping_changes",
+    "third_macro_features_added", "feature_searches", "feature_selections",
+    "feature_substitutions", "imputations",
+    "rows_excluded_outside_frozen_complete_case_rule",
+    "tuning_runs", "grid_searches", "hyperparameter_searches",
+    "model_family_searches", "model_selections",
+    "metric_definitions_created", "metric_definitions_changed",
+    "validation_windows_changed", "thresholds_changed", "seed_policy_changes",
+    "shap_executions", "holm_calculations", "confirmatory_holm_executions",
+    "confirmatory_family_modifications", "paper_winner_selections",
+    "final_test_rows_read", "final_test_predictor_values_read",
+    "final_test_target_values_read", "final_test_unlocks", "m4_actions",
+    "pr_ready_for_review_transitions", "pr_merges",
+)
+
+
+def stage128_m3_lag_wdi_modeling_executed(repo_root: Path) -> bool:
+    """True once step E has been executed inside its own boundary.
+
+    An ``executed`` step E may exist ONLY if it stayed strictly inside
+    ``exploratory_incremental_evaluation_only``: exactly 44 primary fits over a
+    12-feature comparator and a 14-feature block on ONE identical 539-row
+    development sample, under the locked +621 mapping, with no retuning, no
+    search, no imputation, no SHAP, no Final Test row — and, above all, with
+    the result confined to the exploratory family and the confirmatory Holm
+    family untouched. Anything else raises, so the validator can never report
+    a step E that quietly turned a supplementary result into a confirmatory
+    one.
+    """
+    path = repo_root / _STAGE128_M3_LAG_EVAL_DECISION_REL
+    if not path.is_file():
+        return False
+    decision = _read_json(repo_root, _STAGE128_M3_LAG_EVAL_DECISION_REL)
+    boundary = _read_json(repo_root, _STAGE128_M3_LAG_EVAL_BOUNDARY_REL)
+    audit = _read_json(repo_root, _STAGE128_M3_LAG_EVAL_AUDIT_REL)
+    sample = _read_json(repo_root, _STAGE128_M3_LAG_EVAL_SAMPLE_REL)
+    fits = _read_json(repo_root, _STAGE128_M3_LAG_EVAL_FITS_REL)
+    multiplicity = _read_json(
+        repo_root, _STAGE128_M3_LAG_EVAL_MULTIPLICITY_REL)
+
+    if decision.get("action_id") != STAGE128_M3_LAG_EVAL_ACTION_ID:
+        raise ValidationFail("M3-LAG-WDI step E action_id mismatch")
+    if decision.get("authorized_scope") != STAGE128_M3_LAG_EVAL_SCOPE:
+        raise ValidationFail(
+            f"the step E scope must be {STAGE128_M3_LAG_EVAL_SCOPE}")
+
+    # The result stayed exploratory. This is the single most valuable check
+    # here: moving E1 into the confirmatory family is exactly how a
+    # supplementary robustness note would become a paper-level claim.
+    if decision.get("comparison_family") != STAGE128_M3_LAG_EVAL_FAMILY_ID:
+        raise ValidationFail(
+            "the step E comparison must live in the exploratory family")
+    if decision.get("results_label") != STAGE128_M3_LAG_EVAL_RESULTS_LABEL:
+        raise ValidationFail(
+            "step E results must be labelled supplementary exploratory only")
+    if decision.get("scientific_role") != STAGE128_M3_LAG_EVAL_ROLE:
+        raise ValidationFail(
+            "the M3-LAG-WDI scientific role may not change at step E")
+    if tuple(multiplicity.get("confirmatory_holm_family") or ()) != (
+            STAGE128_M3_LAG_CONFIRMATORY_FAMILY):
+        raise ValidationFail(
+            "the confirmatory Holm family membership changed at step E")
+    for field in ("exploratory_comparison_inserted_into_confirmatory_family",
+                  "confirmatory_holm_family_changed_by_this_action",
+                  "confirmatory_holm_executed_by_this_action",
+                  "confirmatory_holm_modified_by_this_action",
+                  "e1_is_confirmatory", "confirmatory_superiority_claim_made",
+                  "paper_winner_selected_by_this_action",
+                  "main_confirmatory_conclusion_changed_by_this_action"):
+        if multiplicity.get(field) is not False:
+            raise ValidationFail(
+                f"step E multiplicity field {field} must be False")
+
+    # One sample, two nested blocks, 12 versus 14, 44 fits.
+    if sample.get("identical_sample_for_both_blocks") is not True:
+        raise ValidationFail(
+            "step E must evaluate both blocks on the identical sample")
+    composition = sample.get("composition") or {}
+    if composition.get("rows") != STAGE128_M3_LAG_EVAL_ROWS:
+        raise ValidationFail(
+            f"the step E sample must be {STAGE128_M3_LAG_EVAL_ROWS} rows")
+    if (sample.get("attrition_from_parent") or {}).get(
+            "exclusions_outside_the_frozen_complete_case_rule") != 0:
+        raise ValidationFail(
+            "step E excluded rows outside the frozen complete-case rule")
+    if sample.get("same_year_t_observations_read") != 0:
+        raise ValidationFail("step E read a same-year t macro observation")
+    if sample.get("final_test_rows_in_sample") != 0:
+        raise ValidationFail("a final-test row reached the step E sample")
+    if fits.get("primary_predictive_fits") != STAGE128_M3_LAG_EVAL_FIT_COUNT:
+        raise ValidationFail(
+            f"step E must record exactly {STAGE128_M3_LAG_EVAL_FIT_COUNT} "
+            "primary predictive fits")
+    counts = fits.get("feature_counts_by_block") or {}
+    if counts.get("M2") != [STAGE128_M3_LAG_EVAL_M2_FEATURES]:
+        raise ValidationFail("the M2 comparator must be fit on 12 features")
+    if counts.get("M3_LAG_WDI") != [STAGE128_M3_LAG_EVAL_M3_FEATURES]:
+        raise ValidationFail("the M3-LAG-WDI block must be fit on 14 features")
+
+    # Nothing moved because of what the result showed.
+    for counter in _STAGE128_M3_LAG_EVAL_ZERO:
+        if audit.get(counter) != 0:
+            raise ValidationFail(
+                f"exploratory-evaluation-only: counter {counter} must be 0")
+    for field in ("retuning_executed", "grid_search_executed",
+                  "model_family_search_executed", "feature_search_executed",
+                  "imputation_executed", "metric_definition_changed",
+                  "validation_architecture_changed", "seed_policy_changed",
+                  "thresholds_changed", "shap_executed",
+                  "calendar_mapping_changed_by_this_action",
+                  "step_c_rerun_by_this_action", "step_d_rerun_by_this_action",
+                  "confirmatory_holm_family_changed_by_this_action",
+                  "confirmatory_superiority_claim_made",
+                  "main_confirmatory_conclusion_changed_by_this_action",
+                  "paper_winner_selected_by_this_action",
+                  "m3_lag_wdi_modeling_authorized_now",
+                  "m3_lag_wdi_modeling_authorization_reusable",
+                  "final_test_access_authorized",
+                  "final_test_unlocked_by_this_action",
+                  "merge_authorized", "ready_for_review_authorized",
+                  "m4_authorized", "m3_lag_wdi_next_action_authorized"):
+        if boundary.get(field) is not False:
+            raise ValidationFail(
+                f"step E governance boundary {field} must be False")
+    for field in ("m3_lag_wdi_modeling_action_authorized",
+                  "m3_lag_wdi_modeling_executed",
+                  "m3_lag_wdi_modeling_authorization_consumed",
+                  "final_test_locked"):
+        if boundary.get(field) is not True:
+            raise ValidationFail(
+                f"step E governance boundary {field} must be True")
+    if boundary.get("final_test_rows_read") != 0:
+        raise ValidationFail("step E must read 0 Final Test rows")
+
+    # A modeling action resolves no data limitation.
+    for item in decision.get("limitations") or []:
+        if item.get("resolved_by_this_action") is not False:
+            raise ValidationFail(
+                f"step E limitation {item.get('id')!r} may not be marked "
+                "resolved by a modeling action")
+        if item.get("erased_by_a_favourable_predictive_result") is not False:
+            raise ValidationFail(
+                f"step E limitation {item.get('id')!r} may not be erased by a "
+                "favourable predictive result")
+    return True
 
 
 def stage128_m3_lag_wdi_data_gate_executed(repo_root: Path) -> bool:
@@ -3859,11 +4053,18 @@ def build_assertions(
     # by the Gate action's own package, and no step ever fits a model or
     # reads a Final Test row.
     m3_lag_gated = stage128_m3_lag_wdi_data_gate_executed(repo_root)
+    # Step E is the action that legitimately makes "modeling started" true.
+    # Every earlier step pinned it False, which was the pre-step-E MOMENT,
+    # not a rule. The rule that holds at EVERY step is asserted instead:
+    # modeling may be published as started only when step E's own package
+    # justifies it, and no step ever holds a STANDING modeling permission.
+    m3_lag_modeled = stage128_m3_lag_wdi_modeling_executed(repo_root)
     add("m3_lag_wdi_lock_executes_no_gate_no_model_no_final_test",
         (not m3_lag_locked)
         or ((handoff.get("stage128_m3_lag_wdi_data_gate_executed") is False
              or m3_lag_gated)
-            and handoff.get("stage128_m3_lag_wdi_modeling_started") is False
+            and (handoff.get("stage128_m3_lag_wdi_modeling_started")
+                 is not True or m3_lag_modeled)
             and handoff.get("stage128_m3_lag_wdi_final_test_rows_read") == 0),
         "the contract lock executes no Gate — only the separately authorized "
         "Gate action may — and no step fits a model or reads a Final Test row")
@@ -3900,7 +4101,8 @@ def build_assertions(
               and handoff.get("stage128_m3_lag_wdi_block_admitted")
               is (handoff.get("stage128_m3_lag_wdi_data_gate_result")
                   == STAGE128_M3_LAG_GATE_PASS)))
-            and handoff.get("stage128_m3_lag_wdi_modeling_started") is False
+            and (handoff.get("stage128_m3_lag_wdi_modeling_started")
+                 is not True or m3_lag_modeled)
             and handoff.get("stage128_m3_lag_wdi_modeling_authorized") is False
             and handoff.get("stage128_m3_lag_wdi_final_test_rows_read") == 0),
         "acquisition is not admission: only the separately authorized Data "
@@ -3933,14 +4135,16 @@ def build_assertions(
     add("m3_lag_wdi_pointer_advances_but_never_authorizes",
         (not m3_lag_retrieved)
         or (handoff.get("stage128_m3_lag_wdi_next_action_id")
-            == (STAGE128_M3_LAG_MODELING_ACTION_ID if m3_lag_gated
+            == (STAGE128_M3_LAG_NO_NEXT_ACTION_ID if m3_lag_modeled
+                else STAGE128_M3_LAG_MODELING_ACTION_ID if m3_lag_gated
                 else STAGE128_M3_LAG_DATA_GATE_ACTION_ID if m3_lag_audited
                 else STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID)
             and handoff.get("stage128_m3_lag_wdi_next_action_authorized")
             is False),
         "the Track B pointer advances one separated step at a time — to the "
         "audit after retrieval, to the Data Gate after the audit, to modeling "
-        "after the Gate — and a pointer is never an authorization")
+        "after the Gate, and to NO named action after step E — and a pointer "
+        "is never an authorization")
     # Step C, once executed, is history: authorized ONCE, consumed, never
     # standing, and never readable as permission for the Data Gate.
     add("m3_lag_wdi_completed_audit_is_consumed_and_not_a_gate_authorization",
@@ -3988,7 +4192,8 @@ def build_assertions(
             and handoff.get(
                 "stage128_m3_lag_wdi_gate_pass_authorizes_modeling") is False
             and handoff.get("stage128_m3_lag_wdi_modeling_authorized") is False
-            and handoff.get("stage128_m3_lag_wdi_modeling_started") is False),
+            and (handoff.get("stage128_m3_lag_wdi_modeling_started")
+                 is not True or m3_lag_modeled)),
         "a completed Data Gate is consumed, non-reusable and never an "
         "authorization to fit a model")
     # A coverage PASS is not a scientific endorsement, and the limitation that
@@ -4055,7 +4260,8 @@ def build_assertions(
                 "stage128_m3_lag_wdi_calendar_mapping_lock_authorizes_feature_"
                 "table") is False
             and handoff.get("stage128_m3_lag_wdi_modeling_authorized") is False
-            and handoff.get("stage128_m3_lag_wdi_modeling_started") is False
+            and (handoff.get("stage128_m3_lag_wdi_modeling_started")
+                 is not True or m3_lag_modeled)
             and handoff.get("stage128_m3_lag_wdi_next_action_authorized")
             is False),
         "locking a timing convention is not permission to build a feature "
@@ -4150,6 +4356,92 @@ def build_assertions(
             is False),
         "a locked contract authorizes neither retrieval, nor the Data Gate, "
         "nor modeling")
+    # ---- step E: the exploratory incremental evaluation ------------------ #
+    # These are RULES, not a snapshot of the current result. They hold whether
+    # E1 came out positive, negative or null — which is the point: the danger
+    # a modeling step introduces is not a wrong number, it is a supplementary
+    # number quietly acquiring confirmatory standing.
+    add("m3_lag_wdi_modeling_started_only_with_its_own_action",
+        (handoff.get("stage128_m3_lag_wdi_modeling_started") is not True)
+        or m3_lag_modeled,
+        "the Handoff may publish modeling as started only when step E's own "
+        "exploratory-evaluation-only package justifies it")
+    add("m3_lag_wdi_modeling_is_published_when_it_exists",
+        (not m3_lag_modeled)
+        or (handoff.get("stage128_m3_lag_wdi_modeling_started") is True
+            and handoff.get("stage128_m3_lag_wdi_modeling_executed") is True),
+        "an executed step E must be published as executed")
+    add("m3_lag_wdi_modeling_authorization_is_consumed_never_standing",
+        (not m3_lag_modeled)
+        or (handoff.get("stage128_m3_lag_wdi_modeling_was_authorized") is True
+            and handoff.get("stage128_m3_lag_wdi_modeling_authorized")
+            is False
+            and handoff.get("stage128_m3_lag_wdi_modeling_authorized_now")
+            is False
+            and handoff.get(
+                "stage128_m3_lag_wdi_modeling_authorization_consumed") is True
+            and handoff.get(
+                "stage128_m3_lag_wdi_modeling_authorization_reusable")
+            is False),
+        "a completed step E is consumed and non-reusable; its grant is "
+        "history and may never read as a standing permission")
+    add("m3_lag_wdi_result_stays_in_the_exploratory_family",
+        (not m3_lag_modeled)
+        or (handoff.get("stage128_m3_lag_wdi_exploratory_family_id")
+            == STAGE128_M3_LAG_EVAL_FAMILY_ID
+            and handoff.get("stage128_m3_lag_wdi_results_label")
+            == STAGE128_M3_LAG_EVAL_RESULTS_LABEL
+            and handoff.get("stage128_m3_lag_wdi_in_confirmatory_holm_family")
+            is False
+            and handoff.get(
+                "stage128_m3_lag_wdi_confirmatory_holm_family_changed")
+            is False
+            and handoff.get("stage128_m3_lag_wdi_confirmatory_holm_executed")
+            is False),
+        "E1 belongs to the supplementary exploratory family and is never "
+        "inserted into, or allowed to modify, the confirmatory Holm family")
+    add("m3_lag_wdi_result_makes_no_confirmatory_claim",
+        (not m3_lag_modeled)
+        or (handoff.get(
+            "stage128_m3_lag_wdi_confirmatory_superiority_claim_made")
+            is False
+            and handoff.get("stage128_m3_lag_wdi_paper_winner_selected")
+            is False
+            and handoff.get("stage128_m3_lag_wdi_scientific_role")
+            == STAGE128_M3_LAG_EVAL_ROLE),
+        "a predictive result — favourable or not — never becomes a "
+        "confirmatory superiority claim and never selects the paper winner")
+    add("m3_lag_wdi_evaluation_used_one_identical_sample_and_12_vs_14",
+        (not m3_lag_modeled)
+        or (handoff.get(
+            "stage128_m3_lag_wdi_evaluation_identical_sample_for_both_blocks")
+            is True
+            and handoff.get("stage128_m3_lag_wdi_evaluation_rows")
+            == STAGE128_M3_LAG_EVAL_ROWS
+            and handoff.get("stage128_m3_lag_wdi_m2_feature_count")
+            == STAGE128_M3_LAG_EVAL_M2_FEATURES
+            and handoff.get("stage128_m3_lag_wdi_block_feature_count")
+            == STAGE128_M3_LAG_EVAL_M3_FEATURES
+            and handoff.get("stage128_m3_lag_wdi_primary_predictive_fits")
+            == STAGE128_M3_LAG_EVAL_FIT_COUNT),
+        "both blocks are refit on ONE identical 539-row development sample, "
+        "12 features versus 14, in exactly 44 primary predictive fits")
+    add("m3_lag_wdi_evaluation_keeps_the_vintage_limitation",
+        (not m3_lag_modeled)
+        or ((handoff.get("stage128_m3_lag_wdi_evaluation_limitation_count")
+             or 0) > 0
+            and handoff.get(
+                "stage128_m3_lag_wdi_point_in_time_availability_claimed")
+            is False),
+        "fitting a model resolves none of the block's data limitations, and "
+        "never turns revised WDI into point-in-time data")
+    add("m3_lag_wdi_evaluation_reads_no_final_test_row",
+        (not m3_lag_modeled)
+        or (handoff.get("stage128_m3_lag_wdi_final_test_rows_read") == 0
+            and handoff.get("stage128_m3_lag_wdi_next_action_authorized")
+            is False),
+        "step E reads no Final Test row and authorizes no next action")
+
     add("m3_lag_wdi_lock_does_not_terminate_the_world_bank_inquiry",
         (not m3_lag_locked)
         or (handoff.get("stage128_m3i2_inquiry_waiting_period_status")
@@ -4187,7 +4479,13 @@ def build_assertions(
         or (_m3_lag_pointer in (STAGE128_M3_LAG_RETRIEVAL_ACTION_ID,
                                 STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID,
                                 STAGE128_M3_LAG_DATA_GATE_ACTION_ID,
-                                STAGE128_M3_LAG_MODELING_ACTION_ID)
+                                STAGE128_M3_LAG_MODELING_ACTION_ID,
+                                # After step E the locked sequence is
+                                # exhausted, so the pointer names no action at
+                                # all. "No next action" is the strongest
+                                # possible form of "not authorized", not a gap
+                                # in the chain.
+                                STAGE128_M3_LAG_NO_NEXT_ACTION_ID)
             # Once the audit has run, the pointer legitimately NAMES the Data
             # Gate, and `next_action_executes_data_gate` is a DESCRIPTIVE
             # property of the named action — so it becomes True exactly when
@@ -4656,7 +4954,12 @@ def run(
             raise ValidationFail(f"check drift (tracked): {scientific_drift}")
         tracked_drift = []
     if failed:
-        raise ValidationFail(f"current-state validation failed: {failed} assertions")
+        # Name them. A bare count tells the next reader that something is
+        # wrong but not what, which is the least useful moment to be terse.
+        names = ", ".join(
+            a["name"] for a in assertions if a["status"] != "PASS")
+        raise ValidationFail(
+            f"current-state validation failed: {failed} assertions [{names}]")
 
     return {
         "metadata": meta,

@@ -1,0 +1,509 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-incremental-evaluation",
+  "all_pass": true,
+  "assertions": 100,
+  "checks": [
+    {
+      "check": "common_sample_is_539_rows",
+      "detail": "539",
+      "pass": true
+    },
+    {
+      "check": "composition_55_positive_484_negative",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "companies_108",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "pooled_oof_366_rows_28_positive",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "validation_positives_18_and_10",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "zero_attrition_from_the_admitted_gate_sample",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "no_exclusions_outside_the_frozen_complete_case_rule",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "identical_sample_for_both_blocks",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "no_final_test_rows_in_sample",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "m2_has_exactly_12_features",
+      "detail": "12",
+      "pass": true
+    },
+    {
+      "check": "m3_lag_wdi_has_exactly_14_features",
+      "detail": "14",
+      "pass": true
+    },
+    {
+      "check": "exactly_two_wdi_features_added",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "m2_is_nested_in_m3_lag_wdi",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "no_new_wdi_feature_missing_values",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "no_new_imputation_introduced",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "calendar_mapping_is_plus_621",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "no_same_year_t_observation_read",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "predictor_years_2013_to_2019",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "primary_predictive_fits_44",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "22_fits_per_block",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "m2_fit_on_12_features",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "m3_lag_wdi_fit_on_14_features",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "no_tuning_or_grid_search_fits",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "no_final_test_fits",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "refit_m2_reproduces_committed_retained_m2",
+      "detail": "0 mismatches over 45 values",
+      "pass": true
+    },
+    {
+      "check": "m1_666_row_results_not_used_as_comparator",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "bootstrap_seed_is_the_frozen_one",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "bootstrap_2000_replicates",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "every_family_meets_the_valid_replicate_floor",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "same_resampled_rows_for_both_blocks",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "models_not_refit_during_bootstrap",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "bootstrap_seed_not_changed_after_seeing_results",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "e1_is_in_the_exploratory_family",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "e1_not_inserted_into_confirmatory_holm_family",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "confirmatory_holm_family_unchanged",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "confirmatory_holm_not_executed",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "confirmatory_holm_family_is_the_three_frozen_members",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "no_confirmatory_superiority_claim",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "no_paper_winner_selected",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "results_labelled_supplementary_exploratory_only",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "secondary_metric_signals_are_enumerated_not_hidden",
+      "detail": "2 secondary interval(s) exclude zero",
+      "pass": true
+    },
+    {
+      "check": "secondary_metric_signal_is_not_confirmatory",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "limitation_preserved__point_in_time_wdi_availability_unproven",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "limitation_preserved__lagging_does_not_create_point_in_time_data",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "limitation_preserved__fx_degenerate_2021_2024",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "limitation_preserved__fx_missing_2024_2025",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "limitation_preserved__exploratory_role_is_frozen",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "limitation_preserved__macro_features_are_year_level_not_company_level",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "no_limitation_marked_resolved_by_this_action",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "no_limitation_erased_by_a_favourable_result",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__world_bank_api_requests",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__new_payloads_retrieved",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__alternative_indicators_searched",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__alternative_indicators_retrieved",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__step_c_reruns",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__step_d_reruns",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__data_gate_executions",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__calendar_mapping_lock_reruns",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__calendar_mapping_changes",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__third_macro_features_added",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__feature_searches",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__feature_selections",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__feature_substitutions",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__imputations",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__rows_excluded_outside_frozen_complete_case_rule",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__tuning_runs",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__grid_searches",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__hyperparameter_searches",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__model_family_searches",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__model_selections",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__metric_definitions_created",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__metric_definitions_changed",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__validation_windows_changed",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__thresholds_changed",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__seed_policy_changes",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__shap_executions",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__holm_calculations",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__confirmatory_holm_executions",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__confirmatory_family_modifications",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__paper_winner_selections",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__final_test_rows_read",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__final_test_predictor_values_read",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__final_test_target_values_read",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__final_test_unlocks",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__m4_actions",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__pr_ready_for_review_transitions",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "zero_counter__pr_merges",
+      "detail": "0",
+      "pass": true
+    },
+    {
+      "check": "final_test_rows_read_is_zero",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "final_test_target_values_read_is_zero",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "final_test_locked",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "final_test_not_unlocked",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "firewall_intact",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "modeling_authorization_consumed",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "modeling_authorization_not_standing",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "modeling_authorization_not_reusable",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "no_prior_authorization_reused",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "next_action_not_authorized",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "merge_not_authorized",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "ready_for_review_not_authorized",
+      "detail": "",
+      "pass": true
+    },
+    {
+      "check": "m4_not_authorized",
+      "detail": "",
+      "pass": true
+    }
+  ],
+  "failed": 0,
+  "failed_checks": []
+}

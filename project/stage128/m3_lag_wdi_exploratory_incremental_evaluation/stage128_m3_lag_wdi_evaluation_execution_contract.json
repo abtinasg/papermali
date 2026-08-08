@@ -1,0 +1,187 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-incremental-evaluation",
+  "authorized_scope": "exploratory_incremental_evaluation_only",
+  "blocks": {
+    "comparator": {
+      "block_id": "M2",
+      "block_name": "retained_m2",
+      "feature_count": 12,
+      "feature_order": [
+        "log_total_assets",
+        "leverage_ratio",
+        "current_ratio",
+        "roa_period_adjusted",
+        "ocf_to_assets_period_adjusted",
+        "asset_turnover_period_adjusted",
+        "operating_margin_period_adjusted",
+        "financial_expense_to_assets_period_adjusted",
+        "accumulated_loss_to_capital_ratio",
+        "equity_return_window",
+        "realized_volatility",
+        "amihud_illiquidity"
+      ],
+      "refit_on_step_e_sample": true,
+      "reused_666_row_m1_results_as_comparator": false
+    },
+    "exploratory": {
+      "added_feature_count": 2,
+      "added_features": [
+        "intl_cpi_inflation_lag1_wdi",
+        "intl_fx_change_official_lag1_wdi"
+      ],
+      "block_id": "M3_LAG_WDI",
+      "block_name": "m3_lag_wdi_exploratory",
+      "feature_count": 14,
+      "feature_order": [
+        "log_total_assets",
+        "leverage_ratio",
+        "current_ratio",
+        "roa_period_adjusted",
+        "ocf_to_assets_period_adjusted",
+        "asset_turnover_period_adjusted",
+        "operating_margin_period_adjusted",
+        "financial_expense_to_assets_period_adjusted",
+        "accumulated_loss_to_capital_ratio",
+        "equity_return_window",
+        "realized_volatility",
+        "amihud_illiquidity",
+        "intl_cpi_inflation_lag1_wdi",
+        "intl_fx_change_official_lag1_wdi"
+      ],
+      "nested_in_comparator": true
+    }
+  },
+  "bootstrap": {
+    "cluster": "ticker",
+    "confidence_interval": 0.95,
+    "method": "paired_company_cluster_bootstrap",
+    "minimum_valid_replicates": 1000,
+    "replicates": 2000,
+    "seed": 20260724
+  },
+  "contract_id": "stage128_m3_lag_wdi_exploratory_incremental_evaluation",
+  "deterministic_families": [
+    "regularized_logistic_regression"
+  ],
+  "execution_count_semantics": {
+    "canonical_authorized_scientific_executions": 1,
+    "canonical_primary_predictive_fits_in_that_execution": 44,
+    "deterministic_verification_recomputation_is_not_a_new_execution": true,
+    "note": "44 is the CANONICAL SCIENTIFIC fit count of the single authorized execution of this action. `--check` and the test suite deterministically RECOMPUTE the same models to verify the committed artifacts; those recomputations are verification, not new scientific executions, they consume no new human authorization and they never change the canonical counts. This action makes NO new scientific design decision at all: every rule it applies was frozen before it ran.",
+    "scientific_decisions": 0,
+    "verification_recomputation_changes_canonical_counts": false
+  },
+  "expected_primary_fit_count": 44,
+  "final_oof_seeds": [
+    20260719,
+    20260720,
+    20260721,
+    20260722,
+    20260723
+  ],
+  "frozen_configurations": {
+    "random_forest": {
+      "configuration_id": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
+      "hyperparameters": {
+        "bootstrap": true,
+        "class_weight": "balanced_subsample",
+        "max_depth": 3,
+        "max_features": "sqrt",
+        "min_samples_leaf": 10,
+        "n_estimators": 500
+      }
+    },
+    "regularized_logistic_regression": {
+      "configuration_id": "logistic__C_0.1",
+      "hyperparameters": {
+        "C": 0.1,
+        "class_weight": "balanced",
+        "max_iter": 5000,
+        "penalty": "l2",
+        "solver": "liblinear"
+      }
+    },
+    "xgboost": {
+      "configuration_id": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1",
+      "hyperparameters": {
+        "colsample_bytree": 0.8,
+        "early_stopping": false,
+        "eval_metric": "aucpr",
+        "gamma": 0,
+        "learning_rate": 0.03,
+        "max_depth": 2,
+        "min_child_weight": 1,
+        "n_estimators": 300,
+        "n_jobs": 1,
+        "objective": "binary:logistic",
+        "reg_lambda": 1,
+        "subsample": 0.8,
+        "tree_method": "hist"
+      }
+    }
+  },
+  "identical_sample_for_both_blocks": true,
+  "inherited_from": "stage127-m2-incremental-evaluation",
+  "inherits_bootstrap_and_paired_comparison_machinery": true,
+  "inherits_canonical_metric_definitions": true,
+  "inherits_locked_validation_architecture": true,
+  "inherits_seed_policy": true,
+  "logistic_fit_seed": 20260719,
+  "model_families": [
+    "regularized_logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "original_authorized_scientific_execution": {
+    "new_human_authorization": false,
+    "new_scientific_decision": true,
+    "platform": "macOS-26.6.1-arm64-arm-64bit-Mach-O",
+    "python_version": "3.14.0",
+    "role": "original_authorized_scientific_execution",
+    "runtime_versions": {
+      "jdatetime": "6.0.1",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "python": "3.14.0",
+      "scikit-learn": "1.9.0",
+      "xgboost": "3.3.0"
+    },
+    "scientific_execution": true
+  },
+  "preconditions": {
+    "calendar_lock_artifacts_modified": false,
+    "calendar_mapping_changed_by_this_action": false,
+    "calendar_mapping_locked_offset": 621,
+    "calendar_mapping_rejected_offset": 622,
+    "calendar_mapping_rule": "jalali_fiscal_year_t_plus_621",
+    "calendar_mapping_rule_formula": "predictor_year_t = jalali_fiscal_year_t + 621",
+    "calendar_mapping_source": "project/stage128/m3_lag_wdi_exploratory_calendar_mapping_lock/stage128_m3_lag_wdi_calendar_mapping_decision.json",
+    "calendar_mapping_source_sha256": "8ab2d89e76489421764c97ac9ec42ca05dff475ea9e6898d02babeaba43ebecc",
+    "contract_source": "project/stage128/m3_lag_wdi_exploratory_contract_lock/stage128_m3_lag_wdi_exploratory_contract.json",
+    "contract_source_sha256": "61d3158bc79633b1e5e4c8dfdb9ec6a5f95ee5789fa2a6109158d0f39d20b8b5",
+    "cpi_observation_year_rule": "t-1",
+    "feature_substitution_permitted": false,
+    "fx_observation_year_rule": "t-1 and t-2",
+    "gate_decision_source": "project/stage128/m3_lag_wdi_exploratory_data_gate/stage128_m3_lag_wdi_data_gate_decision.json",
+    "gate_decision_source_sha256": "254a06095a890dc1a950da2b12f98abf9b5abb3b014508edfa92eced3ba53a90",
+    "gate_result": "PASS_M3_LAG_WDI_DATA_GATE",
+    "imputation_permitted": false,
+    "modeling_contract_source": "project/stage128/m3_lag_wdi_exploratory_contract_lock/stage128_m3_lag_wdi_exploratory_modeling_contract.json",
+    "modeling_contract_source_sha256": "14f48d20c3b59ae9e8bc68cfaa6cdb6ff7e30cb97f0817291c2d9f21549a817d",
+    "same_year_t_observation_permitted": false,
+    "shap_executed": false,
+    "shap_required_by_frozen_contract": false,
+    "step_c_artifacts_modified": false,
+    "step_d_artifacts_modified": false,
+    "third_macro_feature_permitted": false,
+    "thresholds_changed_by_this_action": false
+  },
+  "primary_metric": "pr_auc",
+  "retained_configurations_used_unchanged": true,
+  "secondary_metrics": [
+    "roc_auc",
+    "brier_score",
+    "recall_at_10pct",
+    "lift_at_10pct"
+  ]
+}
