@@ -1,0 +1,68 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-post-retrieval-audit",
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "payload_identity_verified_before_decode",
+      "pass": true
+    },
+    {
+      "check": "both_locked_indicators_audited",
+      "pass": true
+    },
+    {
+      "check": "schema_is_world_bank_v2",
+      "pass": true
+    },
+    {
+      "check": "no_new_world_bank_request",
+      "pass": true
+    },
+    {
+      "check": "retained_bytes_unmodified",
+      "pass": true
+    },
+    {
+      "check": "no_coverage_calculation",
+      "pass": true
+    },
+    {
+      "check": "no_data_gate_execution",
+      "pass": true
+    },
+    {
+      "check": "no_admission_decision",
+      "pass": true
+    },
+    {
+      "check": "no_company_row_join",
+      "pass": true
+    },
+    {
+      "check": "no_model_fit",
+      "pass": true
+    },
+    {
+      "check": "no_final_test_row_read",
+      "pass": true
+    },
+    {
+      "check": "data_gate_still_unauthorized",
+      "pass": true
+    },
+    {
+      "check": "modeling_still_unauthorized",
+      "pass": true
+    },
+    {
+      "check": "audit_pass_is_not_gate_authorization",
+      "pass": true
+    },
+    {
+      "check": "material_findings_recorded",
+      "pass": true
+    }
+  ],
+  "checks_failed": 0,
+  "checks_total": 15
+}

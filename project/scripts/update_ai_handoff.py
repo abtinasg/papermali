@@ -2802,6 +2802,12 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # is not admission, and it never touches the Gate, modeling, the Final
         # Test or Track A.
         **derive_stage128_m3_lag_wdi_data_retrieval_markers(root),
+        # Step C. Must come after the retrieval markers: the audit is the newer
+        # Track B action and moves the pointer from the audit to the (still
+        # unauthorized) Data Gate. Reading what is inside the bytes admits
+        # nothing — it executes no Gate, computes no coverage against any
+        # threshold and returns no admission decision.
+        **derive_stage128_m3_lag_wdi_post_retrieval_audit_markers(root),
         # Must come last: PR #78 (the contract lock) has been MERGED, so the
         # contract-lock topology above is history. This re-anchors the LIVE
         # topology onto the retrieval Draft PR #79 while carrying every pinned
@@ -4871,6 +4877,50 @@ def render_current_state(record: dict) -> str:
                 "identity remains the committed filename + byte count + "
                 "SHA-256",
             ]
+        # Step C. Rendered with its findings attached: a published "PASS" that
+        # hid the limitations would be the whole failure mode this section
+        # exists to prevent.
+        _audit_lines = []
+        if record.get("stage128_m3_lag_wdi_post_retrieval_audit_executed"):
+            _a_result = record.get(
+                "stage128_m3_lag_wdi_post_retrieval_audit_result")
+            _a_obs = record.get("stage128_m3_lag_wdi_wdi_observations_read")
+            _a_first = record.get(
+                "stage128_m3_lag_wdi_both_features_predictor_year_first")
+            _a_last = record.get(
+                "stage128_m3_lag_wdi_both_features_predictor_year_last")
+            _a_bind = record.get(
+                "stage128_m3_lag_wdi_binding_constraint_indicator")
+            _a_zero = record.get(
+                "stage128_m3_lag_wdi_fx_trailing_zero_change_predictor_years")
+            _a_lims = record.get(
+                "stage128_m3_lag_wdi_post_retrieval_audit_material_"
+                "limitations") or []
+            _audit_lines = [
+                "- ✅ **Step C post-retrieval audit EXECUTED** — result "
+                f"`{_a_result}`; {_a_obs} WDI observations read (the first "
+                "authorized decode). Audited evidence modified = "
+                f"{record.get('stage128_m3_lag_wdi_audited_evidence_modified')}"
+                ". Its one-time authorization is consumed = "
+                f"{record.get('stage128_m3_lag_wdi_post_retrieval_audit_authorization_consumed')}"
+                ", reusable = "
+                f"{record.get('stage128_m3_lag_wdi_post_retrieval_audit_authorization_reusable')}"
+                ", authorized NOW (standing) = "
+                f"{record.get('stage128_m3_lag_wdi_post_retrieval_audit_authorized_now')}",
+                "- ⛔ **Reading is not admitting:** the audit executed NO Data "
+                "Gate, applied NO coverage threshold, made NO admission "
+                "decision and touched 0 company rows. Both contract features "
+                f"are constructible at SERIES level for {_a_first}–{_a_last}, "
+                f"bound by `{_a_bind}` — a series-level statement, NOT "
+                "coverage and NOT an admission",
+                "- ⚠️ **Material findings recorded "
+                f"({len(_a_lims)}):** "
+                + " | ".join(_a_lims),
+                "- ⚠️ **FX feature degeneracy:** the log-ratio transform is "
+                f"defined but identically ZERO for the last {_a_zero} usable "
+                "predictor years (the official rate is repeated unchanged), "
+                "so completeness there does not imply information",
+            ]
         lines += [
             "### Stage128 — TRACK B: M3-LAG-WDI-EXPLORATORY contract lock "
             "(PRE-RETRIEVAL)\n",
@@ -4995,6 +5045,7 @@ def render_current_state(record: dict) -> str:
             "response adjudication authorized "
             f"{record.get('stage128_m3i2_response_adjudication_authorized')}",
             *_custody_lines,
+            *_audit_lines,
             "- Package: `project/stage128/"
             "m3_lag_wdi_exploratory_contract_lock/`; interpretation: "
             "`project/stage128/m3_lag_wdi_exploratory_contract_lock/"
@@ -8609,6 +8660,208 @@ def derive_stage128_m3_lag_wdi_data_retrieval_markers(root: str) -> dict:
                 "authorized_now": False,
                 "authorized": False,
                 "status": "COMPLETE" if step in ("A", "B")
+                          else "NOT_AUTHORIZED",
+            }
+            for (step, action_id, executes_retrieval, executes_gate,
+                 executes_modeling) in _STAGE128_M3_LAG_ACTION_SEQUENCE
+        ],
+    }
+
+
+#: Stage128 Track B step C — the post-retrieval audit package.
+_STAGE128_M3_LAG_AUDIT_PKG = (
+    "project/stage128/m3_lag_wdi_exploratory_post_retrieval_audit")
+_STAGE128_M3_LAG_AUDIT_REPORT_REL = (
+    f"{_STAGE128_M3_LAG_AUDIT_PKG}/"
+    "stage128_m3_lag_wdi_post_retrieval_audit_report.json")
+_STAGE128_M3_LAG_AUDIT_EXEC_REL = (
+    f"{_STAGE128_M3_LAG_AUDIT_PKG}/"
+    "stage128_m3_lag_wdi_post_retrieval_audit_execution_audit.json")
+_STAGE128_M3_LAG_AUDIT_BOUNDARY_REL = (
+    f"{_STAGE128_M3_LAG_AUDIT_PKG}/"
+    "stage128_m3_lag_wdi_post_retrieval_audit_governance_boundary.json")
+_STAGE128_M3_LAG_AUDIT_DECISION_REL = (
+    f"{_STAGE128_M3_LAG_AUDIT_PKG}/"
+    "stage128_m3_lag_wdi_post_retrieval_audit_decision.json")
+
+#: Counters a post-retrieval audit must still leave at zero. It decodes a
+#: series; it does not touch the sample, the Gate, the models or the Final Test.
+_STAGE128_M3_LAG_AUDIT_ZERO_COUNTERS = (
+    "world_bank_api_requests", "new_payloads_retrieved",
+    "alternative_indicators_retrieved", "coverage_calculations",
+    "candidate_coverage_evaluations", "block_coverage_evaluations",
+    "coverage_threshold_comparisons", "data_gate_executions",
+    "admission_decisions", "company_row_macro_joins",
+    "feature_materializations", "common_sample_constructions", "model_fits",
+    "predictions", "predictive_metrics", "bootstrap_executions",
+    "holm_calculations", "shap_executions", "final_test_rows_read",
+)
+
+
+def derive_stage128_m3_lag_wdi_post_retrieval_audit_markers(
+        root: str) -> dict:
+    """Publish Track B step C — the M3-LAG-WDI POST-RETRIEVAL AUDIT.
+
+    Step C is the first action allowed to DECODE the retained payloads, and
+    the only thing it may conclude is what the evidence contains. Fail-closed
+    on exactly the confusion that would matter: an audit that quietly ran the
+    Gate, computed coverage against a threshold, admitted the block, or let a
+    PASS read as permission for step D.
+
+    A material finding is never allowed to vanish. If the audit recorded
+    limitations, they are republished here rather than being summarised away
+    into a bare "PASS".
+
+    Returns {} before the audit package exists.
+    """
+    report_path = os.path.join(root, _STAGE128_M3_LAG_AUDIT_REPORT_REL)
+    if not os.path.isfile(report_path):
+        return {}
+    report = _require_json_artifact(root, _STAGE128_M3_LAG_AUDIT_REPORT_REL)
+    audit = _require_json_artifact(root, _STAGE128_M3_LAG_AUDIT_EXEC_REL)
+    boundary = _require_json_artifact(
+        root, _STAGE128_M3_LAG_AUDIT_BOUNDARY_REL)
+    decision = _require_json_artifact(
+        root, _STAGE128_M3_LAG_AUDIT_DECISION_REL)
+
+    if report.get("action_id") != _STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID:
+        raise HandoffError("the step C action id is wrong")
+    if report.get("authorized_scope") != "post_retrieval_audit_only":
+        raise HandoffError("step C scope must be post_retrieval_audit_only")
+
+    # The audit decoded bytes — and did ONLY that.
+    if audit.get("post_retrieval_audit_executed") is not True:
+        raise HandoffError("the step C audit must record that it executed")
+    if audit.get("payload_json_decoded") is not True:
+        raise HandoffError(
+            "a post-retrieval audit that decoded nothing audited nothing")
+    for counter in _STAGE128_M3_LAG_AUDIT_ZERO_COUNTERS:
+        if audit.get(counter) != 0:
+            raise HandoffError(
+                f"post-retrieval-audit-only: counter {counter} must be 0")
+    for field in ("retained_bytes_modified", "deposited_evidence_modified"):
+        if audit.get(field) is not False:
+            raise HandoffError(
+                f"the audit may not mutate the evidence it audits ({field})")
+
+    # Reading is not admitting, and passing is not authorizing.
+    for field in ("m3_lag_wdi_post_retrieval_audit_executes_data_gate",
+                  "post_retrieval_audit_authorization_implies_gate_"
+                  "authorization",
+                  "post_retrieval_audit_pass_is_gate_authorization",
+                  "post_retrieval_audit_pass_is_admission",
+                  "m3_lag_wdi_next_action_authorized",
+                  "m3_lag_wdi_data_gate_action_authorized",
+                  "m3_lag_wdi_data_gate_executed",
+                  "m3_lag_wdi_gate_pass_authorizes_modeling",
+                  "m3_lag_wdi_modeling_authorized",
+                  "m3_lag_wdi_modeling_started",
+                  "m3_lag_wdi_block_admitted",
+                  "m3_lag_wdi_contract_modified_by_this_action",
+                  "retrieval_authorized_now",
+                  "retrieval_authorization_reusable",
+                  "new_world_bank_request_made_by_this_action",
+                  "world_bank_inquiry_terminated_by_this_action",
+                  "final_test_access_authorized", "m4_authorized",
+                  "merge_authorized", "ready_for_review_authorized",
+                  "pii_committed_to_git", "credentials_committed_to_git"):
+        if boundary.get(field) is not False:
+            raise HandoffError(
+                f"step C governance boundary {field} must be False")
+    for field in ("m3_lag_wdi_post_retrieval_audit_action_authorized",
+                  "m3_lag_wdi_post_retrieval_audit_executed",
+                  "m3_lag_wdi_post_retrieval_audit_authorization_consumed",
+                  "retrieval_was_authorized",
+                  "retrieval_authorization_consumed",
+                  "further_retrieval_requires_new_human_authorization",
+                  "final_test_locked"):
+        if boundary.get(field) is not True:
+            raise HandoffError(
+                f"step C governance boundary {field} must be True")
+    if boundary.get(
+            "m3_lag_wdi_post_retrieval_audit_authorization_reusable") is not (
+                False):
+        raise HandoffError(
+            "the step C authorization is single-use and is now consumed")
+    if boundary.get("m3_lag_wdi_next_action_id") != (
+            _STAGE128_M3_LAG_DATA_GATE_ACTION_ID):
+        raise HandoffError(
+            "the Track B pointer after step C is the Data Gate")
+    if decision.get("scientific_effect") != "NONE":
+        raise HandoffError("an audit has no scientific effect")
+    if decision.get("authorizes_next_action") is not False:
+        raise HandoffError("step C authorizes nothing")
+    if report.get("admission_decision_made") is not False:
+        raise HandoffError("step C admits nothing")
+    if report.get("coverage_thresholds_applied") is not False:
+        raise HandoffError("applying a coverage threshold is the Data Gate")
+    if report.get("company_rows_touched") != 0:
+        raise HandoffError("step C touches no company row")
+
+    limitations = decision.get("material_limitations") or []
+    result = decision.get("audit_result")
+    if result not in ("PASS", "PASS_WITH_MATERIAL_FINDINGS", "FAIL"):
+        raise HandoffError(f"unrecognized step C audit result {result!r}")
+    # A result that claims a clean PASS while carrying material limitations
+    # would launder the findings out of the published state.
+    if result == "PASS" and limitations:
+        raise HandoffError(
+            "material limitations were recorded, so the result may not be "
+            "published as a bare PASS")
+
+    cpi_avail, fx_avail = report["feature_availability"]
+    return {
+        "stage128_m3_lag_wdi_post_retrieval_audit_executed": True,
+        "stage128_m3_lag_wdi_post_retrieval_audit_authorized": True,
+        "stage128_m3_lag_wdi_post_retrieval_audit_was_authorized": True,
+        "stage128_m3_lag_wdi_post_retrieval_audit_authorized_now": False,
+        "stage128_m3_lag_wdi_post_retrieval_audit_authorization_consumed":
+            True,
+        "stage128_m3_lag_wdi_post_retrieval_audit_authorization_reusable":
+            False,
+        "stage128_m3_lag_wdi_post_retrieval_audit_result": result,
+        "stage128_m3_lag_wdi_post_retrieval_audit_material_limitations":
+            limitations,
+        "stage128_m3_lag_wdi_post_retrieval_audit_material_limitation_count":
+            len(limitations),
+        "stage128_m3_lag_wdi_payload_json_decoded": True,
+        "stage128_m3_lag_wdi_wdi_observations_read":
+            audit.get("wdi_observations_read"),
+        "stage128_m3_lag_wdi_cpi_constructible_predictor_year_first":
+            cpi_avail.get("constructible_predictor_year_first"),
+        "stage128_m3_lag_wdi_cpi_constructible_predictor_year_last":
+            cpi_avail.get("constructible_predictor_year_last"),
+        "stage128_m3_lag_wdi_fx_constructible_predictor_year_first":
+            fx_avail.get("constructible_predictor_year_first"),
+        "stage128_m3_lag_wdi_fx_constructible_predictor_year_last":
+            fx_avail.get("constructible_predictor_year_last"),
+        "stage128_m3_lag_wdi_fx_trailing_zero_change_predictor_years":
+            fx_avail.get("trailing_zero_change_predictor_years"),
+        "stage128_m3_lag_wdi_both_features_predictor_year_first":
+            report.get("both_features_constructible_predictor_year_first"),
+        "stage128_m3_lag_wdi_both_features_predictor_year_last":
+            report.get("both_features_constructible_predictor_year_last"),
+        "stage128_m3_lag_wdi_binding_constraint_indicator":
+            report.get("binding_constraint_indicator"),
+        "stage128_m3_lag_wdi_audited_evidence_modified": False,
+        # The pointer advances to the Data Gate — still a pointer, still not
+        # an authorization.
+        "stage128_m3_lag_wdi_next_action_id":
+            _STAGE128_M3_LAG_DATA_GATE_ACTION_ID,
+        "stage128_m3_lag_wdi_next_action_authorized": False,
+        "stage128_m3_lag_wdi_next_action_scope": "data_gate_only",
+        "stage128_m3_lag_wdi_next_action_executes_data_gate": False,
+        "stage128_m3_lag_wdi_action_sequence": [
+            {
+                "step": step,
+                "action_id": action_id,
+                "executes_retrieval": executes_retrieval,
+                "executes_data_gate": executes_gate,
+                "executes_modeling": executes_modeling,
+                "was_authorized": step in ("A", "B", "C"),
+                "authorized_now": False,
+                "authorized": False,
+                "status": "COMPLETE" if step in ("A", "B", "C")
                           else "NOT_AUTHORIZED",
             }
             for (step, action_id, executes_retrieval, executes_gate,

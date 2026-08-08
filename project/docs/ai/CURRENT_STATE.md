@@ -12,14 +12,14 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3i2-final-official-inquiry-response-ingestion`
 - **Last stage commit:** `e53fd099cff286add5f391793fa0b6cc1c46061d`
-- **Generated from commit:** `e53fd099cff286add5f391793fa0b6cc1c46061d` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
+- **Generated from commit:** `ea537b5e13cd3eb9650e02e06f8c25fde534861c` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
 - **Baseline:** `origin/main` @ `175e7949e009eeecdd66aedab31ec4b48e9d3c7d`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **155 assertions, 0 failed**, all_pass=True
+- ✅ **157 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -207,12 +207,16 @@ _Two tracks now run in PARALLEL. **Track A** is the World Bank official inquiry,
 - ⛔ **No point-in-time claim:** point-in-time availability claimed = False — the future retrieval uses the CURRENT/LATEST revised WDI (True), and the one-year lag does not turn revised WDI into point-in-time data
 - ⛔ **Separate family:** exploratory comparison family `M3_LAG_WDI_EXPLORATORY_SUPPLEMENTARY` — in the confirmatory Holm family = False
 - ⛔ **Nothing executed:** retrieval started True — Data Gate `NOT_EXECUTED` (executed False) — modeling started False (authorized False) — Final Test rows read 0
-- **Track B next action (pointer only, NOT an authorization):** `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — scope `post_retrieval_audit_only`, authorized = False, executes the Data Gate = False. A pointer is never an authorization
-- ⛔ **Separated future actions (each needs its OWN new explicit human authorization):** (B) `stage128-m3-lag-wdi-exploratory-data-retrieval` — was authorized (historical) True, authorized NOW (standing) False — one-time authorization consumed = True, reusable = False, further retrieval requires NEW human authorization = True, executes Gate False; (C) `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — authorized False, executes Gate False; (D) `stage128-m3-lag-wdi-exploratory-data-gate` — authorized False; (E) `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — authorized False
+- **Track B next action (pointer only, NOT an authorization):** `stage128-m3-lag-wdi-exploratory-data-gate` — scope `data_gate_only`, authorized = False, executes the Data Gate = False. A pointer is never an authorization
+- ⛔ **Separated future actions (each needs its OWN new explicit human authorization):** (B) `stage128-m3-lag-wdi-exploratory-data-retrieval` — was authorized (historical) True, authorized NOW (standing) False — one-time authorization consumed = True, reusable = False, further retrieval requires NEW human authorization = True, executes Gate False; (C) `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — authorized True, executes Gate False; (D) `stage128-m3-lag-wdi-exploratory-data-gate` — authorized False; (E) `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — authorized False
 - ⛔ **Authorization boundaries:** a retrieval authorization implies a Gate authorization = False — a combined retrieval-and-Gate action is permitted = False — a Gate PASS is data admission only = True and authorizes modeling = False
 - **Prior restriction:** `SUPERSEDED_BY_NEW_EXPLICIT_HUMAN_AUTHORIZATION` — the old "only after `UNRESOLVED_AFTER_FINAL_OFFICIAL_INQUIRY`" rule is retained as HISTORY, not deleted
 - ⛔ **Track A untouched:** the inquiry was NOT terminated by this action (False) — follow-up authorized now False, response adjudication authorized False
 - ✅ **Raw-evidence custody is durably resolvable:** the retained bundle `papermali_stage128_m3_lag_wdi_retrieval_bundle_20260808T152237Z` is deposited in `public_archival_repository_zenodo` — version DOI (immutable) `10.5281/zenodo.21844636`, concept DOI `10.5281/zenodo.21844635`, record https://zenodo.org/records/21844636 — 5 artifacts deposited. Recovery requires a new World Bank request = False; depends on a developer filesystem = False. The DOI LOCATES; identity remains the committed filename + byte count + SHA-256
+- ✅ **Step C post-retrieval audit EXECUTED** — result `PASS_WITH_MATERIAL_FINDINGS`; 132 WDI observations read (the first authorized decode). Audited evidence modified = False. Its one-time authorization is consumed = True, reusable = False, authorized NOW (standing) = False
+- ⛔ **Reading is not admitting:** the audit executed NO Data Gate, applied NO coverage threshold, made NO admission decision and touched 0 company rows. Both contract features are constructible at SERIES level for 1962–2024, bound by `PA.NUS.FCRF` — a series-level statement, NOT coverage and NOT an admission
+- ⚠️ **Material findings recorded (3):** PA.NUS.FCRF carries no value for its most recent observation years [2024, 2025], which caps the predictor years the FX feature can cover at 2024 | the official exchange rate is repeated unchanged across the most recent usable years, so the contract-locked log-ratio transform is defined but identically ZERO for predictor years [2021, 2022, 2023, 2024] — i.e. the LAST 4 usable predictor years carry a complete but information-free FX feature (zero-change years overall: [1962, 1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1980, 2021, 2022, 2023, 2024]) | the WDI vintage is a revision marker (`lastupdated 2026-07-13`), not evidence of what was published at any past moment; no point-in-time or historical-vintage availability is established
+- ⚠️ **FX feature degeneracy:** the log-ratio transform is defined but identically ZERO for the last 4 usable predictor years (the official rate is repeated unchanged), so completeness there does not imply information
 - Package: `project/stage128/m3_lag_wdi_exploratory_contract_lock/`; interpretation: `project/stage128/m3_lag_wdi_exploratory_contract_lock/README_STAGE128_M3_LAG_WDI_EXPLORATORY_CONTRACT_LOCK.md`
 
 ### Last completed scientific micro-part QC
@@ -264,5 +268,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `6642cbe4c19f7a89b5354f9fdd810a3f526546978fbe7a82bbf62b538a822f23`_
-_generated_at_utc: 2026-08-08T22:01:03Z (informational)_
+_state_fingerprint: `2b547348e583b8a47dc3510ba48d7246f476a3d3718a8cc97e3431d698b85c17`_
+_generated_at_utc: 2026-08-08T22:34:55Z (informational)_

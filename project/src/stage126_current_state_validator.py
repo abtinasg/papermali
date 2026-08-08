@@ -3541,30 +3541,78 @@ def build_assertions(
         or (handoff.get("stage128_m3_lag_wdi_data_gate_executed") is False
             and handoff.get("stage128_m3_lag_wdi_data_gate_authorized")
             is False
-            and handoff.get("stage128_m3_lag_wdi_post_retrieval_audit_executed")
-            is False
             and handoff.get("stage128_m3_lag_wdi_modeling_started") is False
             and handoff.get("stage128_m3_lag_wdi_modeling_authorized") is False
             and handoff.get("stage128_m3_lag_wdi_block_admitted") is False
             and handoff.get("stage128_m3_lag_wdi_final_test_rows_read") == 0),
-        "acquisition is not admission: retrieval executes no audit, no Gate "
-        "and no model, admits nothing and reads no Final Test row")
-    add("m3_lag_wdi_retrieval_never_read_a_value",
+        "acquisition is not admission: neither retrieval nor the audit "
+        "executes a Gate or a model, admits anything or reads a Final Test row")
+    # The byte boundary belongs to step B alone. Step C is the separately
+    # authorized action that MAY decode, so pinning "decoded nothing" to the
+    # retrieval marker would encode the pre-audit moment and would fail the
+    # instant a legitimate step C ran. What must hold at EVERY step is the
+    # rule: nothing may decode before the audit is authorized, and no step may
+    # substitute an alternative indicator.
+    m3_lag_audited = handoff.get(
+        "stage128_m3_lag_wdi_post_retrieval_audit_executed") is True
+    add("m3_lag_wdi_values_are_read_only_by_an_authorized_audit",
         (not m3_lag_retrieved)
-        or (handoff.get("stage128_m3_lag_wdi_payload_json_decoded") is False
-            and handoff.get("stage128_m3_lag_wdi_wdi_observations_read") == 0
-            and handoff.get(
-                "stage128_m3_lag_wdi_alternative_indicators_retrieved") == 0),
-        "a retrieval-only action stops at the byte boundary and retrieves no "
-        "alternative indicator")
-    add("m3_lag_wdi_retrieval_points_at_an_unauthorized_audit",
+        or (handoff.get(
+            "stage128_m3_lag_wdi_alternative_indicators_retrieved") == 0
+            and ((handoff.get("stage128_m3_lag_wdi_payload_json_decoded")
+                  is False
+                  and handoff.get(
+                      "stage128_m3_lag_wdi_wdi_observations_read") == 0)
+                 if not m3_lag_audited else
+                 (handoff.get(
+                     "stage128_m3_lag_wdi_post_retrieval_audit_was_authorized")
+                  is True
+                  and handoff.get(
+                      "stage128_m3_lag_wdi_wdi_observations_read") > 0))),
+        "values are read only by an authorized post-retrieval audit, and no "
+        "step ever retrieves an alternative indicator")
+    add("m3_lag_wdi_pointer_advances_but_never_authorizes",
         (not m3_lag_retrieved)
         or (handoff.get("stage128_m3_lag_wdi_next_action_id")
-            == STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID
+            == (STAGE128_M3_LAG_DATA_GATE_ACTION_ID if m3_lag_audited
+                else STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID)
             and handoff.get("stage128_m3_lag_wdi_next_action_authorized")
             is False),
-        "after retrieval the Track B pointer is the post-retrieval audit, and "
-        "a pointer is never an authorization")
+        "the Track B pointer advances one separated step at a time — to the "
+        "audit after retrieval, to the Data Gate after the audit — and a "
+        "pointer is never an authorization")
+    # Step C, once executed, is history: authorized ONCE, consumed, never
+    # standing, and never readable as permission for the Data Gate.
+    add("m3_lag_wdi_completed_audit_is_consumed_and_not_a_gate_authorization",
+        (not m3_lag_audited)
+        or (handoff.get(
+            "stage128_m3_lag_wdi_post_retrieval_audit_was_authorized") is True
+            and handoff.get(
+                "stage128_m3_lag_wdi_post_retrieval_audit_authorized_now")
+            is False
+            and handoff.get(
+                "stage128_m3_lag_wdi_post_retrieval_audit_authorization_"
+                "consumed") is True
+            and handoff.get(
+                "stage128_m3_lag_wdi_post_retrieval_audit_authorization_"
+                "reusable") is False
+            and handoff.get("stage128_m3_lag_wdi_data_gate_authorized")
+            is False
+            and handoff.get("stage128_m3_lag_wdi_data_gate_executed")
+            is False),
+        "a completed post-retrieval audit is consumed, non-reusable and never "
+        "an authorization for the Data Gate")
+    # A finding that disappears is worse than no audit at all.
+    add("m3_lag_wdi_audit_findings_are_not_laundered_away",
+        (not m3_lag_audited)
+        or (handoff.get("stage128_m3_lag_wdi_post_retrieval_audit_result")
+            in ("PASS", "PASS_WITH_MATERIAL_FINDINGS", "FAIL")
+            and (handoff.get("stage128_m3_lag_wdi_post_retrieval_audit_result")
+                 != "PASS"
+                 or handoff.get(
+                     "stage128_m3_lag_wdi_post_retrieval_audit_material_"
+                     "limitation_count") == 0)),
+        "recorded material findings may never be published as a bare PASS")
     add("m3_lag_wdi_lock_is_exploratory_not_confirmatory",
         (not m3_lag_locked)
         or (handoff.get("stage128_m3_lag_wdi_scientific_role")
@@ -3624,11 +3672,17 @@ def build_assertions(
                                 STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID,
                                 STAGE128_M3_LAG_DATA_GATE_ACTION_ID,
                                 STAGE128_M3_LAG_MODELING_ACTION_ID)
-            and _m3_lag_pointer != STAGE128_M3_LAG_DATA_GATE_ACTION_ID
+            # Once the audit has run, the pointer legitimately NAMES the Data
+            # Gate. Forbidding that would encode the pre-audit moment; the rule
+            # that actually protects the boundary is that the pointer never
+            # EXECUTES the Gate and is never itself an authorization.
             and handoff.get(
                 "stage128_m3_lag_wdi_next_action_executes_data_gate") is False
             and handoff.get("stage128_m3_lag_wdi_next_action_authorized")
-            is False),
+            is False
+            and (_m3_lag_pointer != STAGE128_M3_LAG_DATA_GATE_ACTION_ID
+                 or handoff.get("stage128_m3_lag_wdi_data_gate_authorized")
+                 is False)),
         "the immediate Track B pointer is a single separated step, it never "
         "executes the Data Gate, and it is not authorized")
     add("m3_lag_wdi_pointer_is_retrieval_only_until_retrieval_runs",

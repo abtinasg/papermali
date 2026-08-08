@@ -1117,8 +1117,17 @@ def test_the_next_action_is_a_separated_step_and_never_the_gate(handoff):
     # the pointer is one of the separated steps, it is never the Data Gate
     # itself, it never executes the Gate, and it is never an authorization.
     assert handoff["stage128_m3_lag_wdi_next_action_id"] in (
-        _RETRIEVAL_ACTION_ID, _POST_RETRIEVAL_AUDIT_ACTION_ID)
-    assert handoff["stage128_m3_lag_wdi_next_action_id"] != _DATA_GATE_ACTION_ID
+        _RETRIEVAL_ACTION_ID, _POST_RETRIEVAL_AUDIT_ACTION_ID,
+        _DATA_GATE_ACTION_ID)
+    # Once the audit has completed, the pointer legitimately NAMES the Data
+    # Gate. What must never happen is the Gate becoming authorized or executed
+    # merely because the pointer reached it — a pointer is not an
+    # authorization, which is precisely why naming it is safe.
+    if handoff["stage128_m3_lag_wdi_next_action_id"] == _DATA_GATE_ACTION_ID:
+        assert handoff[
+            "stage128_m3_lag_wdi_post_retrieval_audit_executed"] is True
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+        assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
     assert handoff[
         "stage128_m3_lag_wdi_next_action_executes_data_gate"] is False

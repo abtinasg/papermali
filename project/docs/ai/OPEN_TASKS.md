@@ -160,12 +160,28 @@ was admitted, nothing was joined to a company row, no model was fit and no
 Final Test row was read. The authoritative contract is unchanged.
 
 **Open item for the human supervisor on Track B.** The next eligible action is
-`m3_lag_wdi_next_action_id: stage128-m3-lag-wdi-exploratory-post-retrieval-audit`
-with `m3_lag_wdi_post_retrieval_audit_authorized: false`. Eligibility is not
-authorization. The remaining steps stay three separate decisions:
+`m3_lag_wdi_next_action_id: stage128-m3-lag-wdi-exploratory-data-gate`
+with `m3_lag_wdi_data_gate_authorized: false`. Eligibility is not
+authorization, and the completed step C audit is **not** a Gate authorization.
+
+**What step C found, for whoever weighs authorizing the Gate.** The retained
+evidence is authentic (identity re-verified against the immutable Zenodo record
+`10.5281/zenodo.21844636` before decoding) and schema-conformant. But two
+limitations are now on the record: `PA.NUS.FCRF` has no value for 2024-2025, so
+the block is capped at predictor year 2024; and the official rate is repeated
+unchanged across the most recent usable years, so the contract-locked
+`100 * ln(E_(t-1)/E_(t-2))` transform is **defined but identically zero** for
+predictor years 2021-2024. A coverage-only reading would score those years as
+present and would not reveal that they carry no information.
+
+The remaining steps stay separate decisions:
 
 * **C — post-retrieval audit** (`…-post-retrieval-audit`): reads what is inside
-  the retained bytes. **Not authorized.** It executes no Gate.
+  the retained bytes. **COMPLETE** — executed once under its own single-use
+  authorization, now consumed. Result `PASS_WITH_MATERIAL_FINDINGS`: the
+  evidence is authentic and schema-conformant, but the FX series ends in 2023
+  (capping the block at predictor year 2024) and the FX log-ratio is
+  identically **zero** for predictor years 2021-2024. It executed no Gate.
 * **D — Data Gate** (`…-data-gate`): needs a **NEW explicit human
   authorization**. A retrieval authorization never authorized it, and it was
   not executed.
@@ -178,7 +194,7 @@ None of them unlocks the Final Test.
 | Step | Action | Authorized |
 | --- | --- | --- |
 | B | `stage128-m3-lag-wdi-exploratory-data-retrieval` — retrieval | **COMPLETE** (authorization consumed) |
-| C | `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — audit | **false** |
+| C | `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — audit | **COMPLETE** (authorization consumed) |
 | D | `stage128-m3-lag-wdi-exploratory-data-gate` — the Data Gate | **false** |
 | E | `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — modeling | **false** |
 

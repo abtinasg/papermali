@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 155,
+  "assertion_count": 157,
   "assertions": [
     {
       "detail": "",
@@ -683,18 +683,28 @@
       "status": "PASS"
     },
     {
-      "detail": "acquisition is not admission: retrieval executes no audit, no Gate and no model, admits nothing and reads no Final Test row",
+      "detail": "acquisition is not admission: neither retrieval nor the audit executes a Gate or a model, admits anything or reads a Final Test row",
       "name": "m3_lag_wdi_retrieval_executed_nothing_downstream",
       "status": "PASS"
     },
     {
-      "detail": "a retrieval-only action stops at the byte boundary and retrieves no alternative indicator",
-      "name": "m3_lag_wdi_retrieval_never_read_a_value",
+      "detail": "values are read only by an authorized post-retrieval audit, and no step ever retrieves an alternative indicator",
+      "name": "m3_lag_wdi_values_are_read_only_by_an_authorized_audit",
       "status": "PASS"
     },
     {
-      "detail": "after retrieval the Track B pointer is the post-retrieval audit, and a pointer is never an authorization",
-      "name": "m3_lag_wdi_retrieval_points_at_an_unauthorized_audit",
+      "detail": "the Track B pointer advances one separated step at a time — to the audit after retrieval, to the Data Gate after the audit — and a pointer is never an authorization",
+      "name": "m3_lag_wdi_pointer_advances_but_never_authorizes",
+      "status": "PASS"
+    },
+    {
+      "detail": "a completed post-retrieval audit is consumed, non-reusable and never an authorization for the Data Gate",
+      "name": "m3_lag_wdi_completed_audit_is_consumed_and_not_a_gate_authorization",
+      "status": "PASS"
+    },
+    {
+      "detail": "recorded material findings may never be published as a bare PASS",
+      "name": "m3_lag_wdi_audit_findings_are_not_laundered_away",
       "status": "PASS"
     },
     {
@@ -779,7 +789,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "7f91f64706db694240301ae746b6a911259420dd",
+  "code_commit": "1fdb671579d0792d827d58305d3e6bbaf26a09bd",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -787,7 +797,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "7f91f64706db694240301ae746b6a911259420dd",
+  "generated_at": "1fdb671579d0792d827d58305d3e6bbaf26a09bd",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -805,7 +815,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "fa40d91cce08e2857b2947602e61e7d9da7e8877fedefdbbd1b8ea13eb66a4cd",
+  "source_file_sha256": "59210b300fbf269b94ff2063a2b9030490a7770aee05ebbecea0694d44e40b91",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {

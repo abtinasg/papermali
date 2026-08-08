@@ -350,13 +350,24 @@ def test_the_handoff_publishes_retrieval_and_nothing_more(handoff):
     assert handoff["final_test_locked"] is True
 
 
-def test_the_handoff_pointer_advanced_to_an_unauthorized_audit(handoff):
-    assert handoff["stage128_m3_lag_wdi_next_action_id"] == _AUDIT_ACTION
+def test_the_handoff_pointer_advanced_to_an_unauthorized_next_step(handoff):
+    """The pointer advances one separated step at a time, never authorized.
+
+    Pinning this to the audit would encode the pre-audit MOMENT: step C has
+    since been separately authorized and executed, which legitimately moves
+    the pointer on to the Data Gate. The rule that must hold at every step is
+    that the pointer names exactly one separated step, executes no Gate, and
+    is never itself an authorization.
+    """
+    audited = handoff["stage128_m3_lag_wdi_post_retrieval_audit_executed"]
+    expected = _GATE_ACTION if audited else _AUDIT_ACTION
+    assert handoff["stage128_m3_lag_wdi_next_action_id"] == expected
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_next_action_executes_data_gate"] is (
         False)
-    assert handoff["stage128_m3_lag_wdi_post_retrieval_audit_executed"] is (
-        False)
+    # whatever the pointer names, the Gate itself stays closed
+    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+    assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
 
 
 def test_the_handoff_marks_the_authorization_spent(handoff):
@@ -422,10 +433,14 @@ def test_the_action_sequence_still_separates_every_step(handoff):
     assert by_step["C"]["action_id"] == _AUDIT_ACTION
     assert by_step["D"]["action_id"] == _GATE_ACTION
     assert by_step["E"]["action_id"] == _MODEL_ACTION
-    for step in ("C", "D", "E"):
+    # Steps D and E are always unauthorized here. Step C is NOT pinned: it may
+    # since have been separately authorized and completed, and asserting it is
+    # forever unauthorized would encode a moment rather than the rule.
+    for step in ("D", "E"):
         assert by_step[step]["authorized"] is False, step
         assert by_step[step]["was_authorized"] is False, step
         assert by_step[step]["status"] == "NOT_AUTHORIZED", step
+    assert by_step["C"]["status"] in ("COMPLETE", "NOT_AUTHORIZED")
     # completed steps stay history: nothing in the sequence is standing
     for entry in sequence:
         assert entry["authorized"] is False, entry["step"]
