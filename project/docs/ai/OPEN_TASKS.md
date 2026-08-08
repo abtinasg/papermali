@@ -189,13 +189,27 @@ limitations survive it, and one is new:
   sample but caps any future extension of the block;
 * the WDI `lastupdated` value is a **revision marker**, not point-in-time
   availability proof, and the one-year lag does not create one;
-* **NEW (recorded by step D):** the locked contract does not fix the
-  Jalali-to-Gregorian mapping for `predictor_year_t`. The Gate refused to
-  invent it and computed every row's status under **both** admissible
-  conventions, which agreed — so the verdict is well-defined. But feature
-  **values** differ between them, so **no feature-value table was
-  materialized** and the mapping must be **human-locked before any modeling
-  feature table is built**.
+* ~~the locked contract does not fix the Jalali-to-Gregorian mapping for
+  `predictor_year_t`~~ — **RESOLVED.** Recorded by step D, then locked by a
+  separate human scientific decision
+  (`stage128-m3-lag-wdi-exploratory-calendar-mapping-lock`, authorization now
+  consumed): **`predictor_year_t = jalali_fiscal_year_t + 621`**, the
+  Gregorian year in which the Jalali year begins. Selected on timing alone —
+  `+622` would require a macro observation year still incomplete at the
+  prediction cutoff for **22 of 539** rows across every fiscal-year cohort
+  (worst case 131 days late), while `+621` does so for **0 of 539**
+  (minimum margin 234 days). Development predictor years are **2013–2019**.
+  The lock is fail-closed: the runner recomputes the evidence from committed
+  bytes and refuses any offset with a timing violation, so `+622` is
+  structurally unlockable. **It resolved the blocker; it authorized nothing.**
+
+**Open item for the human supervisor on Track B — Step E.** Both
+prerequisites are now met (Gate PASS, calendar mapping locked), and meeting
+prerequisites is **not** authorization. Step E
+(`stage128-m3-lag-wdi-exploratory-incremental-evaluation`) requires its own
+new explicit human authorization; neither the Gate PASS nor the calendar lock
+propagates to it. The FX 2021–2024 degeneracy, the `PA.NUS.FCRF` 2024–2025
+missingness and the unproven point-in-time availability all still stand.
 
 The remaining step stays a separate decision:
 
@@ -211,6 +225,7 @@ Neither the Gate nor its PASS unlocks the Final Test
 | B | `stage128-m3-lag-wdi-exploratory-data-retrieval` — retrieval | **COMPLETE** (authorization consumed) |
 | C | `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — audit | **COMPLETE** (authorization consumed) |
 | D | `stage128-m3-lag-wdi-exploratory-data-gate` — the Data Gate | **COMPLETE** (authorization consumed) |
+| D-bis | `stage128-m3-lag-wdi-exploratory-calendar-mapping-lock` — the calendar mapping | **COMPLETE** (authorization consumed) |
 | E | `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — modeling | **false** |
 
 A retrieval authorization did **not** authorize the Data Gate

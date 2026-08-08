@@ -12,14 +12,14 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3i2-final-official-inquiry-response-ingestion`
 - **Last stage commit:** `0d8af9dcffd271eb54b9076a346a151c5d76b97b`
-- **Generated from commit:** `0d8af9dcffd271eb54b9076a346a151c5d76b97b` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
+- **Generated from commit:** `b1d20c3795fa256e901f86413076c7d70e160d57` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
 - **Baseline:** `origin/main` @ `175e7949e009eeecdd66aedab31ec4b48e9d3c7d`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **162 assertions, 0 failed**, all_pass=True
+- ✅ **168 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -221,7 +221,7 @@ _Two tracks now run in PARALLEL. **Track A** is the World Bank official inquiry,
 - **Coverage against the LOCKED, INHERITED thresholds** (thresholds changed by this action = False, criteria weakened = False): CPI 539/539, FX 539/539 (each vs >= 0.8); block common sample 539/539 (vs >= 0.7); positive evaluable per locked validation window 18 and 10 (vs >= 5); rows excluded = 0
 - ⚠️ **A coverage PASS is NOT an information-content claim** (published as one = False). The step C finding stands unchanged (step C result `PASS_WITH_MATERIAL_FINDINGS`, findings preserved = True): the FX log-ratio is identically ZERO for predictor years 2021–2024. Those years fall OUTSIDE the development sample, which carries 0 zero-change rows — so the degeneracy does not change the formal verdict under the PRE-EXISTING rules, and no new rejection criterion was invented to make it do so
 - ⚠️ **Limitations that SURVIVE the verdict (4):** the formal Gate PASS is a coverage statement only; it does not make the FX feature informative: step C's finding stands that the FX log-ratio is defined but identically ZERO for predictor years 2021-2024 (outside the development sample, which ends at predictor year 2020 at the latest under either calendar convention) | PA.NUS.FCRF carries no value for observation years 2024-2025, so the jointly constructible predictor-year ceiling remains 2024; this does not bind the 539-row development sample but caps any future extension of the block | the WDI `lastupdated` value is a revision marker, not point-in-time availability proof; no historical-vintage or point-in-time claim is made and the one-year lag does not create one | the locked contract does not fix the Jalali-to-Gregorian mapping for predictor_year_t; the Gate verdict is invariant to the two admissible conventions, but feature VALUES are not, so the mapping must be human-locked before any modeling feature table is built
-- ⛔ **Calendar mapping still unlocked:** the locked contract does not fix the Jalali→Gregorian mapping for `predictor_year_t` (locked = False). The verdict is invariant across BOTH admissible conventions (invariant = True), so it is well-defined despite the gap — but feature VALUES are not invariant, so no feature-value table was materialized and the mapping must be human-locked before any modeling table exists
+- ⛔ **Calendar mapping still unlocked:** the locked contract does not fix the Jalali→Gregorian mapping for `predictor_year_t` (locked = True). The verdict is invariant across BOTH admissible conventions (invariant = True), so it is well-defined despite the gap — but feature VALUES are not invariant, so no feature-value table was materialized and the mapping must be human-locked before any modeling table exists
 - Package: `project/stage128/m3_lag_wdi_exploratory_data_gate/`; interpretation: `project/stage128/m3_lag_wdi_exploratory_data_gate/README_STAGE128_M3_LAG_WDI_EXPLORATORY_DATA_GATE.md`
 - Package: `project/stage128/m3_lag_wdi_exploratory_contract_lock/`; interpretation: `project/stage128/m3_lag_wdi_exploratory_contract_lock/README_STAGE128_M3_LAG_WDI_EXPLORATORY_CONTRACT_LOCK.md`
 
@@ -274,5 +274,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `043694d39903c4038b178c2b37c9170dae25b427b3c603a2c2de2cc771de1d8b`_
-_generated_at_utc: 2026-08-09T09:34:21Z (informational)_
+_state_fingerprint: `ead7adf0f911d237cb627e44bcbaba267e843d1252bad8c9d79a6e66a7a09363`_
+_generated_at_utc: 2026-08-08T14:09:47Z (informational)_

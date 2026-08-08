@@ -2869,6 +2869,13 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # model fit, makes no claim that the FX feature is informative, and
         # never propagates authorization to step E.
         **derive_stage128_m3_lag_wdi_data_gate_markers(root),
+        # The calendar-mapping lock. Must come after the Gate markers: it is
+        # the newer Track B action, and it resolves the gap step D exposed.
+        # It moves NO scientific result — the Gate verdict, coverage and
+        # limitations are carried forward untouched — and it authorizes
+        # nothing: locking a timing convention is not permission to build a
+        # feature table, fit a model or start step E.
+        **derive_stage128_m3_lag_wdi_calendar_mapping_lock_markers(root),
         # Must come last: PR #78 (the contract lock) has been MERGED, so the
         # contract-lock topology above is history. This re-anchors the LIVE
         # topology onto the retrieval Draft PR #79 while carrying every pinned
@@ -9468,6 +9475,282 @@ def derive_stage128_m3_lag_wdi_data_gate_markers(root: str) -> dict:
             for (step, action_id, executes_retrieval, executes_gate,
                  executes_modeling) in _STAGE128_M3_LAG_ACTION_SEQUENCE
         ],
+    }
+
+
+#: Stage128 Track B — the calendar-mapping lock package.
+_STAGE128_M3_LAG_CALMAP_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-calendar-mapping-lock")
+_STAGE128_M3_LAG_CALMAP_PKG = (
+    "project/stage128/m3_lag_wdi_exploratory_calendar_mapping_lock")
+_STAGE128_M3_LAG_CALMAP_DECISION_REL = (
+    f"{_STAGE128_M3_LAG_CALMAP_PKG}/"
+    "stage128_m3_lag_wdi_calendar_mapping_decision.json")
+_STAGE128_M3_LAG_CALMAP_EVIDENCE_REL = (
+    f"{_STAGE128_M3_LAG_CALMAP_PKG}/"
+    "stage128_m3_lag_wdi_calendar_mapping_timing_evidence.json")
+_STAGE128_M3_LAG_CALMAP_AUDIT_REL = (
+    f"{_STAGE128_M3_LAG_CALMAP_PKG}/"
+    "stage128_m3_lag_wdi_calendar_mapping_execution_audit.json")
+_STAGE128_M3_LAG_CALMAP_BOUNDARY_REL = (
+    f"{_STAGE128_M3_LAG_CALMAP_PKG}/"
+    "stage128_m3_lag_wdi_calendar_mapping_governance_boundary.json")
+
+#: The only mapping the repository may publish as locked, and the one it must
+#: publish as rejected. Pinned independently of the lock package so a swapped
+#: constant there cannot validate itself here.
+_STAGE128_M3_LAG_CALMAP_LOCKED_OFFSET = 621
+_STAGE128_M3_LAG_CALMAP_LOCKED_RULE = "jalali_fiscal_year_t_plus_621"
+_STAGE128_M3_LAG_CALMAP_REJECTED_OFFSET = 622
+
+#: Counters a calendar-mapping lock must leave at zero.
+_STAGE128_M3_LAG_CALMAP_ZERO_COUNTERS = (
+    "world_bank_api_requests", "new_payloads_retrieved",
+    "alternative_indicators_retrieved", "feature_value_tables_materialized",
+    "feature_values_computed", "data_gate_executions",
+    "post_retrieval_audit_executions", "coverage_calculations",
+    "admission_decisions", "model_fits", "predictions", "predictive_metrics",
+    "bootstrap_executions", "holm_calculations", "shap_executions",
+    "tuning_runs", "cross_validation_runs", "model_selections",
+    "final_test_rows_read", "final_test_predictor_values_read",
+    "final_test_target_values_read",
+)
+
+
+def derive_stage128_m3_lag_wdi_calendar_mapping_lock_markers(
+        root: str) -> dict:
+    """Publish the M3-LAG-WDI calendar-mapping lock.
+
+    Step D's Gate verdict is invariant to the two admissible Jalali-to-
+    Gregorian mappings, but the feature VALUES are not — so the mapping had to
+    be locked by a human scientific decision before any modeling table could
+    exist. This publishes that lock, and fail-closes on the ways it could
+    become something it is not:
+
+    * a locked offset other than the one the timing evidence permits — the
+      single most valuable check here, because swapping the offset is exactly
+      how a leaking convention would be smuggled in;
+    * a lock whose own evidence no longer supports it (the rejected offset
+      suddenly showing no violation, or the locked one showing some);
+    * a selection made on model performance, coverage or feature values;
+    * a lock that reads as authorization for a feature table, for modeling,
+      for step E or for the Final Test;
+    * a lock that edits the frozen contract instead of amending it, or that
+      erases the historical unlocked state;
+    * a lock that quietly claims point-in-time availability it does not have.
+
+    Returns {} before the lock package exists.
+    """
+    decision_path = os.path.join(
+        root, _STAGE128_M3_LAG_CALMAP_DECISION_REL)
+    if not os.path.isfile(decision_path):
+        return {}
+    decision = _require_json_artifact(
+        root, _STAGE128_M3_LAG_CALMAP_DECISION_REL)
+    evidence = _require_json_artifact(
+        root, _STAGE128_M3_LAG_CALMAP_EVIDENCE_REL)
+    audit = _require_json_artifact(root, _STAGE128_M3_LAG_CALMAP_AUDIT_REL)
+    boundary = _require_json_artifact(
+        root, _STAGE128_M3_LAG_CALMAP_BOUNDARY_REL)
+
+    if decision.get("action_id") != _STAGE128_M3_LAG_CALMAP_ACTION_ID:
+        raise HandoffError("the calendar-mapping lock action id is wrong")
+    if decision.get("authorized_scope") != "calendar_mapping_lock_only":
+        raise HandoffError(
+            "the calendar-mapping lock scope must be "
+            "calendar_mapping_lock_only")
+
+    # ---- the locked rule is the one the evidence permits ------------------ #
+    if decision.get("calendar_mapping_locked") is not True:
+        raise HandoffError(
+            "a calendar-mapping lock package must publish the mapping as "
+            "locked")
+    locked_offset = decision.get("calendar_mapping_locked_offset")
+    if locked_offset != _STAGE128_M3_LAG_CALMAP_LOCKED_OFFSET:
+        raise HandoffError(
+            f"the locked calendar offset is {locked_offset}, not the "
+            f"scientifically decided {_STAGE128_M3_LAG_CALMAP_LOCKED_OFFSET}; "
+            "changing it requires a new explicit human scientific decision")
+    if decision.get("calendar_mapping_rule") != (
+            _STAGE128_M3_LAG_CALMAP_LOCKED_RULE):
+        raise HandoffError(
+            "the published calendar-mapping rule id does not match the "
+            "locked offset")
+    if decision.get("rejected_offset") != (
+            _STAGE128_M3_LAG_CALMAP_REJECTED_OFFSET):
+        raise HandoffError(
+            "the rejected calendar offset must be "
+            f"{_STAGE128_M3_LAG_CALMAP_REJECTED_OFFSET}")
+
+    per_offset = evidence.get("per_offset") or {}
+    selected = per_offset.get(str(locked_offset))
+    rejected = per_offset.get(str(_STAGE128_M3_LAG_CALMAP_REJECTED_OFFSET))
+    if not selected or not rejected:
+        raise HandoffError(
+            "the timing evidence must evaluate BOTH admissible mappings")
+    if selected.get("timing_violation_rows") != 0 or selected.get(
+            "satisfies_necessary_timing_condition") is not True:
+        raise HandoffError(
+            "the locked mapping must have ZERO timing violations: a mapping "
+            "that needs an incomplete observation year admits future "
+            "information")
+    if rejected.get("timing_violation_rows", 0) <= 0 or rejected.get(
+            "satisfies_necessary_timing_condition") is not False:
+        raise HandoffError(
+            "the recorded rejection basis is stale: the rejected mapping no "
+            "longer shows a timing violation, so the lock would rest on a "
+            "justification its own evidence contradicts")
+    for field, expected in (
+            ("locked_offset_timing_violation_rows",
+             selected["timing_violation_rows"]),
+            ("rejected_offset_timing_violation_rows",
+             rejected["timing_violation_rows"])):
+        if decision.get(field) != expected:
+            raise HandoffError(
+                f"{field} disagrees with the recomputed timing evidence")
+    if evidence.get("denominator_rows") != _STAGE128_M3_LAG_PARENT_ROWS:
+        raise HandoffError(
+            "the calendar-mapping evidence must be computed over the "
+            f"{_STAGE128_M3_LAG_PARENT_ROWS}-row development sample")
+
+    # ---- a timing decision, not an outcome-driven one --------------------- #
+    for field in ("selection_used_model_performance",
+                  "selection_used_coverage_comparison",
+                  "selection_used_feature_values",
+                  "selection_reversible_by_a_better_predictive_result",
+                  "point_in_time_availability_established_by_this_lock",
+                  "historical_unlocked_state_erased",
+                  "authorizes_next_action", "next_action_authorized",
+                  "calendar_mapping_lock_required_before_modeling"):
+        if decision.get(field) is not False:
+            raise HandoffError(
+                f"calendar-mapping decision {field} must be False")
+    for field in ("amends_but_does_not_edit",
+                  "changing_the_locked_mapping_requires_new_explicit_human_"
+                  "decision"):
+        if decision.get(field) is not True:
+            raise HandoffError(
+                f"calendar-mapping decision {field} must be True")
+    if not (decision.get("unresolved_limitations") or []):
+        raise HandoffError(
+            "locking a calendar mapping resolves no data limitation, so the "
+            "surviving limitations may not be published as none")
+
+    # ---- it built nothing and authorized nothing -------------------------- #
+    if audit.get("calendar_mapping_lock_executed") is not True:
+        raise HandoffError("the calendar-mapping audit must record execution")
+    if audit.get("calendar_mapping_lock_executions") != 1:
+        raise HandoffError("the calendar mapping is locked exactly once")
+    for counter in _STAGE128_M3_LAG_CALMAP_ZERO_COUNTERS:
+        if audit.get(counter) != 0:
+            raise HandoffError(
+                f"calendar-mapping-lock-only: counter {counter} must be 0")
+    for field in ("authoritative_contract_edited",
+                  "data_gate_artifacts_modified",
+                  "post_retrieval_audit_artifacts_modified",
+                  "retained_bytes_modified", "deposited_evidence_modified"):
+        if audit.get(field) is not False:
+            raise HandoffError(
+                f"the calendar-mapping lock may not mutate {field}")
+    for field in ("calendar_mapping_lock_is_modeling_authorization",
+                  "calendar_mapping_lock_authorizes_feature_value_table",
+                  "calendar_mapping_lock_propagates_to_step_e",
+                  "calendar_mapping_lock_is_final_test_unlock",
+                  "calendar_mapping_lock_changed_the_gate_result",
+                  "m3_lag_wdi_calendar_mapping_lock_authorized_now",
+                  "m3_lag_wdi_calendar_mapping_lock_authorization_reusable",
+                  "m3_lag_wdi_calendar_mapping_lock_required_before_modeling",
+                  "m3_lag_wdi_next_action_authorized",
+                  "m3_lag_wdi_modeling_authorized",
+                  "m3_lag_wdi_modeling_started",
+                  "m3_lag_wdi_data_gate_rerun_by_this_action",
+                  "m3_lag_wdi_post_retrieval_audit_rerun_by_this_action",
+                  "m3_lag_wdi_contract_edited_by_this_action",
+                  "m3_lag_wdi_gate_thresholds_modified_by_this_action",
+                  "point_in_time_availability_claimed",
+                  "retrieval_authorized_now",
+                  "new_world_bank_request_made_by_this_action",
+                  "world_bank_inquiry_terminated_by_this_action",
+                  "final_test_access_authorized", "m4_authorized",
+                  "merge_authorized", "ready_for_review_authorized",
+                  "pii_committed_to_git", "credentials_committed_to_git"):
+        if boundary.get(field) is not False:
+            raise HandoffError(
+                f"calendar-mapping governance boundary {field} must be False")
+    for field in ("m3_lag_wdi_calendar_mapping_locked",
+                  "m3_lag_wdi_calendar_mapping_lock_action_authorized",
+                  "m3_lag_wdi_calendar_mapping_lock_executed",
+                  "m3_lag_wdi_calendar_mapping_lock_authorization_consumed",
+                  "m3_lag_wdi_modeling_requires_new_explicit_human_"
+                  "authorization",
+                  "m3_lag_wdi_block_admission_is_data_admission_only",
+                  "step_c_material_findings_preserved", "final_test_locked"):
+        if boundary.get(field) is not True:
+            raise HandoffError(
+                f"calendar-mapping governance boundary {field} must be True")
+    if boundary.get("m3_lag_wdi_data_gate_result") != (
+            "PASS_M3_LAG_WDI_DATA_GATE"):
+        raise HandoffError(
+            "the calendar-mapping lock must carry the accepted Gate verdict "
+            "forward unchanged")
+
+    limitations = decision["unresolved_limitations"]
+    return {
+        "stage128_m3_lag_wdi_calendar_mapping_locked": True,
+        "stage128_m3_lag_wdi_calendar_mapping_rule":
+            decision["calendar_mapping_rule"],
+        "stage128_m3_lag_wdi_calendar_mapping_rule_formula":
+            decision["calendar_mapping_rule_formula"],
+        "stage128_m3_lag_wdi_calendar_mapping_locked_offset": locked_offset,
+        "stage128_m3_lag_wdi_calendar_mapping_lock_action_id":
+            _STAGE128_M3_LAG_CALMAP_ACTION_ID,
+        "stage128_m3_lag_wdi_calendar_mapping_lock_required_before_modeling":
+            False,
+        "stage128_m3_lag_wdi_calendar_mapping_lock_executed": True,
+        # Its own one-time authorization: historical, consumed, never standing.
+        "stage128_m3_lag_wdi_calendar_mapping_lock_was_authorized": True,
+        "stage128_m3_lag_wdi_calendar_mapping_lock_authorized": False,
+        "stage128_m3_lag_wdi_calendar_mapping_lock_authorized_now": False,
+        "stage128_m3_lag_wdi_calendar_mapping_lock_authorization_consumed":
+            True,
+        "stage128_m3_lag_wdi_calendar_mapping_lock_authorization_reusable":
+            False,
+        # The evidence, republished so the rejection cannot quietly vanish.
+        "stage128_m3_lag_wdi_calendar_mapping_rejected_offset":
+            _STAGE128_M3_LAG_CALMAP_REJECTED_OFFSET,
+        "stage128_m3_lag_wdi_calendar_mapping_rejected_offset_violations":
+            rejected["timing_violation_rows"],
+        "stage128_m3_lag_wdi_calendar_mapping_rejected_offset_worst_days":
+            rejected["worst_violation_days_after_cutoff"],
+        "stage128_m3_lag_wdi_calendar_mapping_locked_offset_violations": 0,
+        "stage128_m3_lag_wdi_calendar_mapping_locked_offset_margin_days_min":
+            selected["margin_days_min"],
+        "stage128_m3_lag_wdi_calendar_mapping_predictor_year_first":
+            selected["predictor_year_first"],
+        "stage128_m3_lag_wdi_calendar_mapping_predictor_year_last":
+            selected["predictor_year_last"],
+        "stage128_m3_lag_wdi_calendar_mapping_observation_year_first":
+            selected["observation_year_first"],
+        "stage128_m3_lag_wdi_calendar_mapping_observation_year_last":
+            selected["observation_year_last"],
+        "stage128_m3_lag_wdi_calendar_mapping_selection_used_model_"
+        "performance": False,
+        "stage128_m3_lag_wdi_calendar_mapping_changing_requires_new_human_"
+        "decision": True,
+        "stage128_m3_lag_wdi_calendar_mapping_amends_but_does_not_edit": True,
+        "stage128_m3_lag_wdi_calendar_mapping_unresolved_limitations":
+            limitations,
+        "stage128_m3_lag_wdi_calendar_mapping_unresolved_limitation_count":
+            len(limitations),
+        "stage128_m3_lag_wdi_fiscal_year_t_semantics":
+            decision["fiscal_year_semantics"]["fiscal_year_t_labels"],
+        # Locking a timing convention authorizes nothing downstream.
+        "stage128_m3_lag_wdi_calendar_mapping_lock_authorizes_modeling": False,
+        "stage128_m3_lag_wdi_calendar_mapping_lock_authorizes_feature_table":
+            False,
+        "stage128_m3_lag_wdi_modeling_authorized": False,
+        "stage128_m3_lag_wdi_modeling_started": False,
+        "stage128_m3_lag_wdi_next_action_authorized": False,
     }
 
 

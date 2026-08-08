@@ -1745,6 +1745,106 @@ def stage128_m3_lag_wdi_data_gate_executed(repo_root: Path) -> bool:
     return True
 
 
+# --------------------------------------------------------------------------- #
+# Stage128 Track B — the M3-LAG-WDI calendar-mapping lock
+# --------------------------------------------------------------------------- #
+
+STAGE128_M3_LAG_CALMAP_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-calendar-mapping-lock")
+_STAGE128_M3_LAG_CALMAP_PKG = (
+    "project/stage128/m3_lag_wdi_exploratory_calendar_mapping_lock")
+_STAGE128_M3_LAG_CALMAP_DECISION_REL = (
+    f"{_STAGE128_M3_LAG_CALMAP_PKG}/"
+    "stage128_m3_lag_wdi_calendar_mapping_decision.json")
+_STAGE128_M3_LAG_CALMAP_EVIDENCE_REL = (
+    f"{_STAGE128_M3_LAG_CALMAP_PKG}/"
+    "stage128_m3_lag_wdi_calendar_mapping_timing_evidence.json")
+
+#: Pinned independently of the lock package, so a swapped constant there
+#: cannot validate itself through this validator too.
+STAGE128_M3_LAG_CALMAP_LOCKED_OFFSET = 621
+STAGE128_M3_LAG_CALMAP_LOCKED_RULE = "jalali_fiscal_year_t_plus_621"
+STAGE128_M3_LAG_CALMAP_REJECTED_OFFSET = 622
+
+
+def stage128_m3_lag_wdi_calendar_mapping_locked(repo_root: Path) -> bool:
+    """True once the Jalali-to-Gregorian mapping has been locked properly.
+
+    A locked mapping may exist ONLY if the timing evidence in its own package
+    supports it: zero timing violations for the locked offset, and a real
+    violation for the rejected one. That makes the leaking mapping structurally
+    unlockable rather than merely deprecated — the check that matters, because
+    swapping the offset is exactly how future-period information would enter.
+    """
+    path = repo_root / _STAGE128_M3_LAG_CALMAP_DECISION_REL
+    if not path.is_file():
+        return False
+    decision = _read_json(repo_root, _STAGE128_M3_LAG_CALMAP_DECISION_REL)
+    evidence = _read_json(repo_root, _STAGE128_M3_LAG_CALMAP_EVIDENCE_REL)
+
+    if decision.get("action_id") != STAGE128_M3_LAG_CALMAP_ACTION_ID:
+        raise ValidationFail("calendar-mapping lock action_id mismatch")
+    if decision.get("authorized_scope") != "calendar_mapping_lock_only":
+        raise ValidationFail(
+            "the calendar-mapping lock scope must be calendar_mapping_lock_"
+            "only")
+    if decision.get("calendar_mapping_locked") is not True:
+        raise ValidationFail("the calendar-mapping package must lock a rule")
+    if decision.get("calendar_mapping_locked_offset") != (
+            STAGE128_M3_LAG_CALMAP_LOCKED_OFFSET):
+        raise ValidationFail(
+            "the locked calendar offset must be "
+            f"{STAGE128_M3_LAG_CALMAP_LOCKED_OFFSET}; changing it requires a "
+            "new explicit human scientific decision")
+    if decision.get("calendar_mapping_rule") != (
+            STAGE128_M3_LAG_CALMAP_LOCKED_RULE):
+        raise ValidationFail("the calendar-mapping rule id is wrong")
+    if decision.get("rejected_offset") != (
+            STAGE128_M3_LAG_CALMAP_REJECTED_OFFSET):
+        raise ValidationFail(
+            "the rejected calendar offset must be "
+            f"{STAGE128_M3_LAG_CALMAP_REJECTED_OFFSET}")
+
+    per_offset = evidence.get("per_offset") or {}
+    selected = per_offset.get(str(STAGE128_M3_LAG_CALMAP_LOCKED_OFFSET))
+    rejected = per_offset.get(str(STAGE128_M3_LAG_CALMAP_REJECTED_OFFSET))
+    if not selected or not rejected:
+        raise ValidationFail(
+            "the calendar-mapping evidence must evaluate BOTH mappings")
+    if selected.get("timing_violation_rows") != 0:
+        raise ValidationFail(
+            "the locked mapping must have zero timing violations")
+    if rejected.get("timing_violation_rows", 0) <= 0:
+        raise ValidationFail(
+            "the recorded rejection basis is stale: the rejected mapping "
+            "shows no timing violation")
+    if evidence.get("denominator_rows") != STAGE128_M3_LAG_PARENT_ROWS:
+        raise ValidationFail(
+            "the calendar-mapping evidence must cover the "
+            f"{STAGE128_M3_LAG_PARENT_ROWS}-row development sample")
+    if evidence.get("feature_values_read") != 0:
+        raise ValidationFail("the calendar-mapping lock reads no feature value")
+
+    for field in ("selection_used_model_performance",
+                  "selection_used_coverage_comparison",
+                  "selection_used_feature_values",
+                  "point_in_time_availability_established_by_this_lock",
+                  "historical_unlocked_state_erased",
+                  "next_action_authorized",
+                  "calendar_mapping_lock_required_before_modeling"):
+        if decision.get(field) is not False:
+            raise ValidationFail(
+                f"calendar-mapping decision {field} must be False")
+    if decision.get("amends_but_does_not_edit") is not True:
+        raise ValidationFail(
+            "the calendar-mapping lock amends the frozen contract; it does "
+            "not edit it")
+    if not (decision.get("unresolved_limitations") or []):
+        raise ValidationFail(
+            "locking a calendar mapping resolves no data limitation")
+    return True
+
+
 #: PR #73 was merged into main by this commit; PR #74 was retargeted after.
 STAGE128_M3I2_PROVENANCE_BASELINE_COMMIT = (
     "e6db63fb7d105f0d3a39db101c9e364161c367e9")
@@ -3895,6 +3995,82 @@ def build_assertions(
             > 0),
         "a coverage PASS never becomes an information-content claim, and the "
         "step C findings survive it")
+    # The calendar-mapping lock. Feature VALUES are not invariant to the
+    # Jalali-to-Gregorian mapping (the Gate verdict is), so the rule that must
+    # hold at every step is: no modeling feature-value table may exist while
+    # the mapping is unlocked, and the locked mapping must be the one its own
+    # timing evidence permits.
+    m3_lag_calmap_locked = stage128_m3_lag_wdi_calendar_mapping_locked(
+        repo_root)
+    add("m3_lag_wdi_calendar_mapping_locked_only_with_its_own_action",
+        (handoff.get("stage128_m3_lag_wdi_calendar_mapping_locked")
+         is not True) or m3_lag_calmap_locked,
+        "the Handoff may publish the calendar mapping as locked only when the "
+        "calendar-mapping-lock action package justifies it")
+    add("m3_lag_wdi_locked_calendar_mapping_is_the_timing_feasible_one",
+        (not m3_lag_calmap_locked)
+        or (handoff.get("stage128_m3_lag_wdi_calendar_mapping_rule")
+            == STAGE128_M3_LAG_CALMAP_LOCKED_RULE
+            and handoff.get(
+                "stage128_m3_lag_wdi_calendar_mapping_locked_offset")
+            == STAGE128_M3_LAG_CALMAP_LOCKED_OFFSET
+            and handoff.get(
+                "stage128_m3_lag_wdi_calendar_mapping_locked_offset_violations")
+            == 0
+            and (handoff.get(
+                "stage128_m3_lag_wdi_calendar_mapping_rejected_offset_"
+                "violations") or 0) > 0),
+        "the locked Jalali-to-Gregorian mapping is the one with zero timing "
+        "violations, and the rejected one really does violate the timing rule")
+    add("m3_lag_wdi_calendar_mapping_was_not_chosen_on_model_performance",
+        (not m3_lag_calmap_locked)
+        or (handoff.get(
+            "stage128_m3_lag_wdi_calendar_mapping_selection_used_model_"
+            "performance") is False
+            and handoff.get(
+                "stage128_m3_lag_wdi_calendar_mapping_changing_requires_new_"
+                "human_decision") is True),
+        "the calendar mapping was selected on temporal semantics alone, and "
+        "changing it requires a new explicit human scientific decision")
+    add("m3_lag_wdi_calendar_mapping_lock_authorizes_nothing_downstream",
+        (not m3_lag_calmap_locked)
+        or (handoff.get(
+            "stage128_m3_lag_wdi_calendar_mapping_lock_authorizes_modeling")
+            is False
+            and handoff.get(
+                "stage128_m3_lag_wdi_calendar_mapping_lock_authorizes_feature_"
+                "table") is False
+            and handoff.get("stage128_m3_lag_wdi_modeling_authorized") is False
+            and handoff.get("stage128_m3_lag_wdi_modeling_started") is False
+            and handoff.get("stage128_m3_lag_wdi_next_action_authorized")
+            is False),
+        "locking a timing convention is not permission to build a feature "
+        "table, fit a model or start step E")
+    add("m3_lag_wdi_calendar_mapping_lock_keeps_the_vintage_limitation",
+        (not m3_lag_calmap_locked)
+        or ((handoff.get(
+            "stage128_m3_lag_wdi_calendar_mapping_unresolved_limitation_count")
+            or 0) > 0
+            and handoff.get(
+                "stage128_m3_lag_wdi_point_in_time_availability_claimed")
+            is False),
+        "locking the calendar mapping establishes no point-in-time WDI "
+        "availability, and the surviving limitations stay published")
+    # No feature-value table may exist while the mapping is unlocked. Checked
+    # against the tree, not against a self-report.
+    _m3_lag_feature_tables = sorted(
+        str(p.relative_to(repo_root))
+        for tree in (repo_root / "project/stage128").glob(
+            "m3_lag_wdi_exploratory_*")
+        if tree.is_dir()
+        for p in tree.iterdir()
+        if "development_features" in p.name or "feature_values" in p.name)
+    add("m3_lag_wdi_no_feature_value_table_without_a_locked_calendar_mapping",
+        (not _m3_lag_feature_tables)
+        or handoff.get("stage128_m3_lag_wdi_calendar_mapping_locked") is True,
+        "no M3-LAG-WDI modeling feature-value table may be materialized while "
+        "the Jalali-to-Gregorian mapping is unlocked, because feature values "
+        f"are not invariant to it (found: {_m3_lag_feature_tables})")
     add("m3_lag_wdi_gate_thresholds_and_admission_were_not_engineered",
         (not m3_lag_gated)
         or (handoff.get(

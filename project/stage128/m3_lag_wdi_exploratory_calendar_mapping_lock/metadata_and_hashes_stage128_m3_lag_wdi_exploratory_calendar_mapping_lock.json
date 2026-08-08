@@ -1,0 +1,42 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-calendar-mapping-lock",
+  "amends_but_does_not_edit": true,
+  "amends_contract": "project/stage128/m3_lag_wdi_exploratory_contract_lock/stage128_m3_lag_wdi_exploratory_contract.json",
+  "authorization_sha256": "bf1827a1310e6a176fa3693939f4020ca29f899898f206f517ab561ddfab8c5e",
+  "authorization_utf8_bytes": 272,
+  "authorized_scope": "calendar_mapping_lock_only",
+  "credentials_committed_to_git": false,
+  "feature_value_tables_materialized": 0,
+  "package_files": {
+    "README_STAGE128_M3_LAG_WDI_EXPLORATORY_CALENDAR_MAPPING_LOCK.md": {
+      "bytes": 4661,
+      "sha256": "2e99069ad103fe819248be0a517f7cbbecf3624b64bfcb7c76aadb19d9fff121"
+    },
+    "stage128_m3_lag_wdi_calendar_mapping_decision.json": {
+      "bytes": 4928,
+      "sha256": "8ab2d89e76489421764c97ac9ec42ca05dff475ea9e6898d02babeaba43ebecc"
+    },
+    "stage128_m3_lag_wdi_calendar_mapping_execution_audit.json": {
+      "bytes": 1253,
+      "sha256": "80e9b88c8959afac1bd35773916489ff3c96c1709c0a28e25b315bce4c8d7222"
+    },
+    "stage128_m3_lag_wdi_calendar_mapping_governance_boundary.json": {
+      "bytes": 2435,
+      "sha256": "62a32b643dc2766ea2247faed0ed00037e8e45a4d3921eab3c99952be6365568"
+    },
+    "stage128_m3_lag_wdi_calendar_mapping_human_authorization_record.json": {
+      "bytes": 1233,
+      "sha256": "d2325266ce113b3b1961b399ff1addb673e4421adc8091797d9ae653a2344032"
+    },
+    "stage128_m3_lag_wdi_calendar_mapping_qc_report.json": {
+      "bytes": 1758,
+      "sha256": "d89801d545613d3c82196763925597913c029ca0b1a7c947543cd99016dda4c0"
+    },
+    "stage128_m3_lag_wdi_calendar_mapping_timing_evidence.json": {
+      "bytes": 7428,
+      "sha256": "0e4513ac8380c586a243703fcc7cf08b1f1309cbb42a4cf43ccc120b837fae72"
+    }
+  },
+  "package_id": "stage128_m3_lag_wdi_exploratory_calendar_mapping_lock",
+  "pii_committed_to_git": false
+}
