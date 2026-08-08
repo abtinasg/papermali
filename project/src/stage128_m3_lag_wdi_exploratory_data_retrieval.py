@@ -63,6 +63,37 @@ RAW_RETENTION_BUNDLE_ID = (
     "papermali_stage128_m3_lag_wdi_retrieval_bundle_20260808T152237Z")
 RAW_RETENTION_MECHANISM = "raw_bundle_retained_outside_git_content_addressed"
 
+#: DURABLE CUSTODY. The bundle above was deposited into Zenodo, a public
+#: archival repository, and published on 2026-08-08. That closes the gap the
+#: bundle id alone left open: a bundle IDENTIFIER says WHICH bytes are
+#: authoritative, but not WHERE a future auditor can obtain them. The DOI does.
+#:
+#: Resolution is by DOI, so it survives this or any other developer worktree,
+#: tmp directory, shell session and machine disappearing, and it never depends
+#: on a local absolute path. Crucially, recovery does NOT mean re-requesting
+#: the World Bank API: a new request would return the CURRENT series and would
+#: silently audit different bytes. The archived record returns the ORIGINAL
+#: captured bytes.
+#:
+#: Identity is still ultimately by CONTENT. The DOI is a locator; the
+#: filename + byte count + SHA-256 already recorded per indicator remain the
+#: proof. A copy that resolves but does not reproduce those digests is not
+#: this evidence.
+RAW_RETENTION_CUSTODY_CLASS = "public_archival_repository_zenodo"
+#: Version-specific (immutable) DOI — pins THIS deposit, not "latest".
+RAW_RETENTION_VERSION_DOI = "10.5281/zenodo.21844636"
+#: Concept DOI — the all-versions identifier; resolves to the newest version.
+RAW_RETENTION_CONCEPT_DOI = "10.5281/zenodo.21844635"
+RAW_RETENTION_RECORD_URL = "https://zenodo.org/records/21844636"
+RAW_RETENTION_DOI_RESOLVER = "https://doi.org/10.5281/zenodo.21844636"
+#: Five artifacts: the two raw payloads plus three provenance/custody files.
+#: The bundle's response manifest was deliberately EXCLUDED from the deposit —
+#: it stores Cloudflare set-cookie and CF-Ray response headers, which are
+#: client-tracking and region-disclosing and are not evidence. Nothing needed
+#: to establish identity was lost: filename, byte count and SHA-256 are all
+#: reproduced in the deposited custody manifest.
+RAW_RETENTION_DEPOSITED_ARTIFACTS = 5
+
 #: The NEW single-use human authorization for THIS action. It is recorded
 #: independently of the contract-lock authorization, which stays historical and
 #: consumed and is never reused here.
@@ -330,6 +361,19 @@ def build_source_manifest(bundle: dict[str, Any]) -> dict[str, Any]:
         "raw_retention_bundle_id": RAW_RETENTION_BUNDLE_ID,
         "raw_retention_mechanism": RAW_RETENTION_MECHANISM,
         "raw_artifacts_identified_by_content_not_path": True,
+        # Durable custody: WHERE a future authorized auditor obtains the
+        # original bytes, without a new World Bank request and without this
+        # developer's filesystem existing.
+        "raw_retention_custody_class": RAW_RETENTION_CUSTODY_CLASS,
+        "raw_retention_version_doi": RAW_RETENTION_VERSION_DOI,
+        "raw_retention_concept_doi": RAW_RETENTION_CONCEPT_DOI,
+        "raw_retention_record_url": RAW_RETENTION_RECORD_URL,
+        "raw_retention_doi_resolver": RAW_RETENTION_DOI_RESOLVER,
+        "raw_retention_deposited_artifact_count": (
+            RAW_RETENTION_DEPOSITED_ARTIFACTS),
+        "raw_retention_durably_resolvable": True,
+        "raw_retention_depends_on_developer_filesystem": False,
+        "raw_retention_recovery_requires_new_world_bank_request": False,
         "unresolved_values_are_null_not_zero": True,
     }
 

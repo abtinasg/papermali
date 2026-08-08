@@ -865,6 +865,119 @@ def test_the_custody_locator_is_not_a_filesystem_path():
     assert "~" not in bundle_id
 
 
+# --------------------------------------------------------------------------- #
+# DURABLE CUSTODY — the bundle id must RESOLVE, not merely name
+#
+# A bundle identifier says WHICH bytes are authoritative. It does not say where
+# a future auditor can obtain them, and an auditor who cannot obtain them has
+# only two bad options: trust the digests blindly, or re-request the World Bank
+# API and silently audit a NEWER response. The published archival DOI closes
+# that gap. Identity stays content-addressed: the DOI locates, it never
+# identifies.
+# --------------------------------------------------------------------------- #
+
+def test_the_retained_bundle_has_a_durable_archival_locator():
+    manifest = _read_json(_MANIFEST_REL)
+    assert manifest["raw_retention_durably_resolvable"] is True
+    assert manifest["raw_retention_custody_class"] == (
+        "public_archival_repository_zenodo")
+    # The version DOI is immutable and pins THIS deposit; the concept DOI is
+    # the all-versions identifier. They must be different, or "immutable"
+    # would silently mean "whatever is newest".
+    assert manifest["raw_retention_version_doi"] == "10.5281/zenodo.21844636"
+    assert manifest["raw_retention_concept_doi"] == "10.5281/zenodo.21844635"
+    assert (manifest["raw_retention_version_doi"]
+            != manifest["raw_retention_concept_doi"])
+    assert manifest["raw_retention_record_url"] == (
+        "https://zenodo.org/records/21844636")
+    assert manifest["raw_retention_deposited_artifact_count"] == 5
+
+
+def test_recovery_never_routes_back_to_the_world_bank_api():
+    """Re-requesting the API returns the CURRENT series, not these bytes."""
+    manifest = _read_json(_MANIFEST_REL)
+    assert manifest[
+        "raw_retention_recovery_requires_new_world_bank_request"] is False
+    assert manifest["raw_retention_depends_on_developer_filesystem"] is False
+
+
+def test_the_doi_locates_but_content_still_identifies():
+    manifest = _read_json(_MANIFEST_REL)
+    # Even with a durable locator, identity stays byte-level.
+    assert manifest["raw_artifacts_identified_by_content_not_path"] is True
+    for entry in manifest["indicators"]:
+        assert entry["raw_artifact_sha256"]
+        assert entry["raw_artifact_bytes"] > 0
+    # and the payloads still are not in git
+    assert manifest["raw_payloads_committed_to_git"] == 0
+
+
+@pytest.mark.parametrize("field", [
+    "raw_retention_version_doi",
+    "raw_retention_concept_doi",
+    "raw_retention_record_url",
+    "raw_retention_custody_class",
+])
+def test_no_custody_field_is_a_local_path_or_secret(field):
+    """Custody metadata is public and non-secret by construction."""
+    value = _read_json(_MANIFEST_REL)[field]
+    assert isinstance(value, str) and value.strip()
+    assert not value.startswith(("/", "~", "."))
+    assert "\\" not in value
+    # no credential-ish material and no account name ever reaches git
+    lowered = value.lower()
+    for forbidden in ("token", "secret", "password", "apikey", "api_key",
+                      "access_key", "bearer", "@", "users/"):
+        assert forbidden not in lowered, (field, forbidden)
+
+
+def test_the_handoff_publishes_the_durable_custody_locator(handoff):
+    assert handoff[
+        "stage128_m3_lag_wdi_raw_evidence_durably_resolvable"] is True
+    assert handoff["stage128_m3_lag_wdi_raw_retention_version_doi"] == (
+        "10.5281/zenodo.21844636")
+    assert handoff["stage128_m3_lag_wdi_raw_retention_concept_doi"] == (
+        "10.5281/zenodo.21844635")
+    assert handoff[
+        "stage128_m3_lag_wdi_raw_evidence_recovery_requires_new_world_bank_"
+        "request"] is False
+    assert handoff[
+        "stage128_m3_lag_wdi_raw_evidence_depends_on_developer_"
+        "filesystem"] is False
+
+
+@pytest.mark.parametrize("name,mutate", [
+    # claiming durable custody with no locator at all
+    ("durable_custody_claimed_without_a_doi",
+     lambda p: p.update(raw_retention_version_doi="")),
+    ("durable_custody_claimed_without_a_record_url",
+     lambda p: p.update(raw_retention_record_url="   ")),
+    # a locator that is really somebody's laptop
+    ("locator_is_an_absolute_path",
+     lambda p: p.update(raw_retention_record_url="/local/path/to/bundle")),
+    ("locator_is_a_home_relative_path",
+     lambda p: p.update(raw_retention_version_doi="~/bundle")),
+    # a "DOI" that is not a DOI
+    ("version_doi_is_not_a_doi",
+     lambda p: p.update(raw_retention_version_doi="zenodo-21844636")),
+    # recovery quietly routed back to the live API
+    ("recovery_requires_a_new_world_bank_request",
+     lambda p: p.update(
+         raw_retention_recovery_requires_new_world_bank_request=True)),
+    # custody that still needs the developer's machine
+    ("custody_depends_on_a_developer_filesystem",
+     lambda p: p.update(raw_retention_depends_on_developer_filesystem=True)),
+    # a DOI used to replace, rather than locate, content identity
+    ("content_addressing_dropped_in_favour_of_the_doi",
+     lambda p: p.update(raw_artifacts_identified_by_content_not_path=False)),
+])
+def test_a_false_custody_claim_is_refused(tmp_path, name, mutate):
+    """FAIL-CLOSED: durable custody is publishable only when it is real."""
+    root = _root(tmp_path, name, _mutated(_MANIFEST_REL, mutate))
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage128_m3_lag_wdi_data_retrieval_markers(root)
+
+
 def test_every_retained_artifact_is_pinned_by_bytes_and_sha256():
     manifest = _read_json(_MANIFEST_REL)
     expected = {

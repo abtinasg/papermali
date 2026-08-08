@@ -4838,6 +4838,39 @@ def render_current_state(record: dict) -> str:
         _rtrv_new_auth = record.get(
             "stage128_m3_lag_wdi_further_retrieval_requires_new_human_"
             "authorization", True)
+        # Durable custody of the retained raw bytes, rendered only once it is
+        # real. Before the deposit existed this stayed absent rather than
+        # showing a promise the repository could not keep.
+        _custody_lines = []
+        if record.get("stage128_m3_lag_wdi_raw_evidence_durably_resolvable"):
+            _cst = record.get(
+                "stage128_m3_lag_wdi_raw_retention_custody_class")
+            _bundle = record.get(
+                "stage128_m3_lag_wdi_raw_retention_bundle_id")
+            _vdoi = record.get(
+                "stage128_m3_lag_wdi_raw_retention_version_doi")
+            _cdoi = record.get(
+                "stage128_m3_lag_wdi_raw_retention_concept_doi")
+            _rec_url = record.get(
+                "stage128_m3_lag_wdi_raw_retention_record_url")
+            _dep_n = record.get(
+                "stage128_m3_lag_wdi_raw_retention_deposited_artifact_count")
+            _needs_wb = record.get(
+                "stage128_m3_lag_wdi_raw_evidence_recovery_requires_new_"
+                "world_bank_request")
+            _needs_fs = record.get(
+                "stage128_m3_lag_wdi_raw_evidence_depends_on_developer_"
+                "filesystem")
+            _custody_lines = [
+                "- ✅ **Raw-evidence custody is durably resolvable:** the "
+                f"retained bundle `{_bundle}` is deposited in `{_cst}` — "
+                f"version DOI (immutable) `{_vdoi}`, concept DOI `{_cdoi}`, "
+                f"record {_rec_url} — {_dep_n} artifacts deposited. Recovery "
+                f"requires a new World Bank request = {_needs_wb}; depends on "
+                f"a developer filesystem = {_needs_fs}. The DOI LOCATES; "
+                "identity remains the committed filename + byte count + "
+                "SHA-256",
+            ]
         lines += [
             "### Stage128 — TRACK B: M3-LAG-WDI-EXPLORATORY contract lock "
             "(PRE-RETRIEVAL)\n",
@@ -4961,6 +4994,7 @@ def render_current_state(record: dict) -> str:
             f"{record.get('stage128_m3i2_inquiry_follow_up_authorized_now')}, "
             "response adjudication authorized "
             f"{record.get('stage128_m3i2_response_adjudication_authorized')}",
+            *_custody_lines,
             "- Package: `project/stage128/"
             "m3_lag_wdi_exploratory_contract_lock/`; interpretation: "
             "`project/stage128/m3_lag_wdi_exploratory_contract_lock/"
@@ -8370,6 +8404,47 @@ def derive_stage128_m3_lag_wdi_data_retrieval_markers(root: str) -> dict:
     if manifest.get("raw_payloads_committed_to_git") != 0:
         raise HandoffError("raw WDI payloads are retained OUTSIDE Git")
 
+    # --- Durable custody may be CLAIMED only when it is real -------------- #
+    # A bundle id says WHICH bytes are authoritative, not WHERE to get them.
+    # "Durably resolvable" is therefore only publishable together with a real
+    # locator that a stranger can resolve. Fail-closed: claiming the flag
+    # without the DOI, or with a locator that is really a filesystem path,
+    # raises rather than publishing a custody promise the repository cannot
+    # keep.
+    if manifest.get("raw_retention_durably_resolvable") is True:
+        for field in ("raw_retention_version_doi",
+                      "raw_retention_concept_doi",
+                      "raw_retention_record_url",
+                      "raw_retention_custody_class"):
+            value = manifest.get(field)
+            if not isinstance(value, str) or not value.strip():
+                raise HandoffError(
+                    f"durable custody claimed without {field}")
+            if value.startswith(("/", "~", ".")) or "\\" in value:
+                raise HandoffError(
+                    f"{field} looks like a local filesystem path, which is "
+                    "not a durable locator")
+        if not manifest.get("raw_retention_version_doi", "").startswith("10."):
+            raise HandoffError(
+                "the durable custody locator must be a DOI")
+        # Recovery must never route back to the live API: a new request would
+        # return the CURRENT series, silently auditing different bytes.
+        if manifest.get(
+                "raw_retention_recovery_requires_new_world_bank_request"
+        ) is not False:
+            raise HandoffError(
+                "re-requesting the World Bank API is not a recovery mechanism")
+        if manifest.get(
+                "raw_retention_depends_on_developer_filesystem") is not False:
+            raise HandoffError(
+                "durable custody may not depend on a developer filesystem")
+        # The DOI locates; content still identifies.
+        if manifest.get("raw_artifacts_identified_by_content_not_path") is not (
+                True):
+            raise HandoffError(
+                "a DOI is a locator, not an identity: content addressing must "
+                "stay in force")
+
     # --- Retrieval happened; NOTHING downstream of it did ----------------- #
     if audit.get("retrieval_started") is not True:
         raise HandoffError("the retrieval audit must record retrieval started")
@@ -8482,6 +8557,28 @@ def derive_stage128_m3_lag_wdi_data_retrieval_markers(root: str) -> dict:
         "stage128_m3_lag_wdi_raw_bytes_retained":
             audit.get("raw_bytes_retained"),
         "stage128_m3_lag_wdi_raw_payloads_committed_to_git": 0,
+        # DURABLE CUSTODY of the retained bytes. Published so a future audit
+        # session can resolve the bundle id to real bytes without this
+        # developer's machine and without a new World Bank request.
+        "stage128_m3_lag_wdi_raw_retention_bundle_id":
+            manifest.get("raw_retention_bundle_id"),
+        "stage128_m3_lag_wdi_raw_retention_custody_class":
+            manifest.get("raw_retention_custody_class"),
+        "stage128_m3_lag_wdi_raw_retention_version_doi":
+            manifest.get("raw_retention_version_doi"),
+        "stage128_m3_lag_wdi_raw_retention_concept_doi":
+            manifest.get("raw_retention_concept_doi"),
+        "stage128_m3_lag_wdi_raw_retention_record_url":
+            manifest.get("raw_retention_record_url"),
+        "stage128_m3_lag_wdi_raw_retention_deposited_artifact_count":
+            manifest.get("raw_retention_deposited_artifact_count"),
+        "stage128_m3_lag_wdi_raw_evidence_durably_resolvable":
+            manifest.get("raw_retention_durably_resolvable") is True,
+        "stage128_m3_lag_wdi_raw_evidence_recovery_requires_new_world_bank_"
+        "request": manifest.get(
+            "raw_retention_recovery_requires_new_world_bank_request"),
+        "stage128_m3_lag_wdi_raw_evidence_depends_on_developer_filesystem":
+            manifest.get("raw_retention_depends_on_developer_filesystem"),
         "stage128_m3_lag_wdi_payload_json_decoded": False,
         "stage128_m3_lag_wdi_wdi_observations_read": 0,
         "stage128_m3_lag_wdi_alternative_indicators_retrieved": 0,

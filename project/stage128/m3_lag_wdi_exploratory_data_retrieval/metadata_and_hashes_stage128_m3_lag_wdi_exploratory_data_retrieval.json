@@ -22,8 +22,8 @@
   "inherited_inputs_modified_by_this_action": false,
   "package_files": {
     "README_STAGE128_M3_LAG_WDI_EXPLORATORY_DATA_RETRIEVAL.md": {
-      "bytes": 2912,
-      "sha256": "888aa08c8a1c2bfefc1e6863cbac4afd556d0168faeb787a8ed561a90cde68ea"
+      "bytes": 4018,
+      "sha256": "98d18818ce5462478d1c8c84a38c390330fc1a99b1a55239b7f830f9b534ca3c"
     },
     "stage128_m3_lag_wdi_retrieval_decision.json": {
       "bytes": 933,
@@ -50,8 +50,8 @@
       "sha256": "3ed6dae2d1eb4f24b89227ffd2e658946203a9642c050f4b752efdc2c0f6ebf6"
     },
     "stage128_m3_lag_wdi_retrieval_source_manifest.json": {
-      "bytes": 2295,
-      "sha256": "96ee312da6cdb41620123fa955f57f196d0121dd4c258bd286f51774685b78dd"
+      "bytes": 2841,
+      "sha256": "d09d4b58f47cc4e5971c7eb9576e10db0348e0e91d8f7cc58d4e0d43efec6319"
     }
   },
   "package_id": "stage128_m3_lag_wdi_exploratory_data_retrieval",

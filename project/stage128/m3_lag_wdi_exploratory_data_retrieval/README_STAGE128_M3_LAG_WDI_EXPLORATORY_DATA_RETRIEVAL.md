@@ -22,6 +22,32 @@ Raw payloads are retained **outside the repository**; only their byte counts
 and SHA-256 digests are committed
 (`raw_payloads_committed_to_git: 0`).
 
+## Durable custody of the raw bytes
+
+The retained bundle `papermali_stage128_m3_lag_wdi_retrieval_bundle_20260808T152237Z` is deposited in a
+public archival repository and published, so a future authorized auditor can
+obtain the **original captured bytes** without this developer's filesystem and
+without a new World Bank request:
+
+| Field | Value |
+| --- | --- |
+| Custody class | `public_archival_repository_zenodo` |
+| Version DOI (immutable, pins THIS deposit) | `10.5281/zenodo.21844636` |
+| Concept DOI (all versions) | `10.5281/zenodo.21844635` |
+| Record | https://zenodo.org/records/21844636 |
+| Resolver | https://doi.org/10.5281/zenodo.21844636 |
+| Deposited artifacts | 5 |
+
+Recovery requires a new World Bank request:
+`False` —
+re-requesting the API would return the **current** series and would silently
+audit different bytes. Resolution depends on a developer filesystem:
+`False`.
+
+The DOI is a **locator**, not the identity. Identity stays the filename, byte
+count and SHA-256 recorded per indicator above: a copy that resolves but does
+not reproduce those digests is not this evidence.
+
 ## Where this action stopped
 
 The payload was **never decoded or parsed**

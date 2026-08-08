@@ -128,6 +128,32 @@ Raw payloads are retained **outside the repository**; only their byte counts
 and SHA-256 digests are committed
 (`raw_payloads_committed_to_git: {manifest['raw_payloads_committed_to_git']}`).
 
+## Durable custody of the raw bytes
+
+The retained bundle `{manifest['raw_retention_bundle_id']}` is deposited in a
+public archival repository and published, so a future authorized auditor can
+obtain the **original captured bytes** without this developer's filesystem and
+without a new World Bank request:
+
+| Field | Value |
+| --- | --- |
+| Custody class | `{manifest['raw_retention_custody_class']}` |
+| Version DOI (immutable, pins THIS deposit) | `{manifest['raw_retention_version_doi']}` |
+| Concept DOI (all versions) | `{manifest['raw_retention_concept_doi']}` |
+| Record | {manifest['raw_retention_record_url']} |
+| Resolver | {manifest['raw_retention_doi_resolver']} |
+| Deposited artifacts | {manifest['raw_retention_deposited_artifact_count']} |
+
+Recovery requires a new World Bank request:
+`{manifest['raw_retention_recovery_requires_new_world_bank_request']}` —
+re-requesting the API would return the **current** series and would silently
+audit different bytes. Resolution depends on a developer filesystem:
+`{manifest['raw_retention_depends_on_developer_filesystem']}`.
+
+The DOI is a **locator**, not the identity. Identity stays the filename, byte
+count and SHA-256 recorded per indicator above: a copy that resolves but does
+not reproduce those digests is not this evidence.
+
 ## Where this action stopped
 
 The payload was **never decoded or parsed**

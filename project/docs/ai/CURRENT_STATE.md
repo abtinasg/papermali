@@ -12,7 +12,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3i2-final-official-inquiry-response-ingestion`
 - **Last stage commit:** `9a82b392777781063c223e6ca5bd527051cdfc90`
-- **Generated from commit:** `9a82b392777781063c223e6ca5bd527051cdfc90` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
+- **Generated from commit:** `d9a07baef3989b3f0215b42609b60394f2a3b479` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
 - **Baseline:** `origin/main` @ `175e7949e009eeecdd66aedab31ec4b48e9d3c7d`
 
 ## Current-state validation
@@ -212,6 +212,7 @@ _Two tracks now run in PARALLEL. **Track A** is the World Bank official inquiry,
 - ⛔ **Authorization boundaries:** a retrieval authorization implies a Gate authorization = False — a combined retrieval-and-Gate action is permitted = False — a Gate PASS is data admission only = True and authorizes modeling = False
 - **Prior restriction:** `SUPERSEDED_BY_NEW_EXPLICIT_HUMAN_AUTHORIZATION` — the old "only after `UNRESOLVED_AFTER_FINAL_OFFICIAL_INQUIRY`" rule is retained as HISTORY, not deleted
 - ⛔ **Track A untouched:** the inquiry was NOT terminated by this action (False) — follow-up authorized now False, response adjudication authorized False
+- ✅ **Raw-evidence custody is durably resolvable:** the retained bundle `papermali_stage128_m3_lag_wdi_retrieval_bundle_20260808T152237Z` is deposited in `public_archival_repository_zenodo` — version DOI (immutable) `10.5281/zenodo.21844636`, concept DOI `10.5281/zenodo.21844635`, record https://zenodo.org/records/21844636 — 5 artifacts deposited. Recovery requires a new World Bank request = False; depends on a developer filesystem = False. The DOI LOCATES; identity remains the committed filename + byte count + SHA-256
 - Package: `project/stage128/m3_lag_wdi_exploratory_contract_lock/`; interpretation: `project/stage128/m3_lag_wdi_exploratory_contract_lock/README_STAGE128_M3_LAG_WDI_EXPLORATORY_CONTRACT_LOCK.md`
 
 ### Last completed scientific micro-part QC
@@ -263,5 +264,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `7dc1cd8fd4ac95821b5de951ec949ea9d3f8debc18f5f2b40634748cc8f8f806`_
-_generated_at_utc: 2026-08-08T21:02:41Z (informational)_
+_state_fingerprint: `d0b5cc2c4651472884a04214d354fb1af787b5214aea99decf2096edc2367b76`_
+_generated_at_utc: 2026-08-08T21:58:09Z (informational)_
