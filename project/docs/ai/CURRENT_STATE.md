@@ -11,15 +11,15 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3i2-final-official-inquiry-response-ingestion`
-- **Last stage commit:** `724a1b5ae8163eea4e406f1aa9527f3a05a8a938`
-- **Generated from commit:** `48aeb7a336aed40d3d926897af14c67b97cc5e29` (branch `stage128-m3i2-final-official-inquiry-human-submission`, informational)
-- **Baseline:** `origin/main` @ `89d8e6ff2d12ec82903cd28aa7ab839eb946b658`
+- **Last stage commit:** `9d530fcbf7cfc767a6bc755277a4f3188802bf2b`
+- **Generated from commit:** `9d530fcbf7cfc767a6bc755277a4f3188802bf2b` (branch `stage128-m3-lag-wdi-exploratory-contract-lock`, informational)
+- **Baseline:** `origin/main` @ `93de6bae9344ce893b0261f818abce8a991cf842`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **134 assertions, 0 failed**, all_pass=True
+- ✅ **142 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -148,7 +148,7 @@ _The action that supersedes the contract-time "no retrieval" statements above. I
 
 - ✅ **Evidence capture executed:** True — action `stage128-m3i2-official-source-evidence-capture`, carried by **PR #75** (the MERGED predecessor PR, no longer the live Draft)
 - ✅ **Official-source retrieval completed:** True — this is acquisition only and is **not** a Data Gate, **not** coverage and **not** an admission
-- **PR topology at capture time (HISTORICAL, not live):** PR #75 **was merged** by merge commit `b3627809dbfde8429d0308bec5d1c8541a161188` — semantics: `merged_predecessor_superseded_by_pr76`. The LIVE Draft PR is **PR #77**, identified in full below.
+- **PR topology at capture time (HISTORICAL, not live):** PR #75 **was merged** by merge commit `b3627809dbfde8429d0308bec5d1c8541a161188` — semantics: `merged_predecessor_superseded_by_pr76`. The LIVE Draft PR is **PR #78**, identified in full below.
 - **Official traffic:** 21 requests — 21 successful responses — 21 responses retained — raw bytes retained 1,066,295,643
 - **Archive editions:** 16 captured and held out of 110 discovered — verified required editions 0 of 0 — verified release dates 0 of 110
 - ⛔ **Unresolved:** cutoffs 37 of 37 — development pairs 539 of 539
@@ -173,8 +173,8 @@ _A post-capture, read-only audit of the external evidence bundle by an auditor i
 
 _A COMPLETED predecessor action, superseded by the human submission recorded below. A bounded search of OFFICIAL World Bank Group sources for the two remaining M3I-2 blockers, plus preparation of exactly ONE official Data Help Desk inquiry. Acquiring DOCUMENTS is not admitting DATA: it answers nothing about coverage, the Data Gate or modeling._
 
-- ✅ **Initiated:** True — action `stage128-m3i2-final-official-documentary-recovery-initiation`, carried by **PR #76**, which **was merged** by merge commit `89d8e6ff2d12ec82903cd28aa7ab839eb946b658` — it is the MERGED predecessor, no longer the live Draft PR
-- **PR topology at recovery time (HISTORICAL, not live):** PR #76 **was merged** — semantics: `merged_predecessor_superseded_by_pr77`. The LIVE Draft PR is identified in the human-submission section below.
+- ✅ **Initiated:** True — action `stage128-m3i2-final-official-documentary-recovery-initiation`, carried by **PR #77**, which **was merged** by merge commit `93de6bae9344ce893b0261f818abce8a991cf842` — it is the MERGED predecessor, no longer the live Draft PR
+- **PR topology at recovery time (HISTORICAL, not live):** PR #77 **was merged** — semantics: `merged_predecessor_superseded_by_pr78`. The LIVE Draft PR is identified in the human-submission section below.
 - **Merged predecessor:** PR #75 (official-source evidence capture) — merged = True, merge commit `b3627809dbfde8429d0308bec5d1c8541a161188`
 - **Bounded search:** 14 of a maximum 20 official documentary GET requests — archive ZIP downloads 0, redownloads 0, prior capture repeated False
 - ⛔ **Outcome:** `NO_NEW_DOCUMENTARY_EVIDENCE_IN_BOUNDED_SEARCH` — blocker 1 (archive release availability) resolved False — blocker 2 (FX semantic continuity) resolved False
@@ -182,8 +182,8 @@ _A COMPLETED predecessor action, superseded by the human submission recorded bel
 - **Official inquiry:** status `SUBMITTED_ACKNOWLEDGED_WAITING_FOR_SUBSTANTIVE_RESPONSE` — initial attempts 1 / submitted 1 (maximum 1) — body SHA-256 `dd82929f8098061d501c51b65cac6f3e3ed203cb00ff5689ae0e66f9f2f1e8b5` — ticket id None (none invented) — PII committed to Git = False
 - **Human submission:** submitted by the human supervisor = True — displayed timestamp `2026-08-06T14:03:00` (calendar date `2026-08-06`) — UTC instant `UNRESOLVED_CONFIRMATION_UI_DID_NOT_DISPLAY_TIMEZONE`, never guessed — acknowledgement received = True, substantive response received = False — ticket id present = False, fabricated = False — raw confirmation kept outside Git, SHA-256 `14060eef17ccb52838433d8186b3e476d1a703d2476bb37cbd9b5aa8e0a931f6` — body evidence `CANONICAL_BODY_VISUALLY_CONFIRMED_NOT_RAW_BYTE_VERIFIED`, attachments server-enumerated = False
 - **Stopping rule:** waiting period 10 business days — status `ACTIVE` through `2026-08-20` — earliest possible follow-up `2026-08-21` — follow-ups attempted 0 — follow-up authorized now = False — response adjudication authorized = False
-- **LIVE PR topology:** the LIVE Draft PR is **PR #77** (`final_official_inquiry_human_submission_recording_pr`) → base `main` @ `89d8e6ff2d12ec82903cd28aa7ab839eb946b658` — draft = True, merged = False, ready-for-review authorized = False, merge authorized = False. The head shown for it is a GENERATION ANCHOR (`repository_head_at_generation_not_github_pr_head`), never pinned and **not** the instantaneous GitHub PR head. PR #76 is HISTORICAL: merged = True by merge commit `89d8e6ff2d12ec82903cd28aa7ab839eb946b658`
-- ⛔ **M3-LAG-WDI-EXPLORATORY:** authoritative contract status `NOT_LOCKED` — a local, uncommitted partial draft was detected (True) and quarantined outside the repository (True); it is not authoritative (False), its authorization is not reusable (False), retrieval started = False
+- **LIVE PR topology:** the LIVE Draft PR is **PR #78** (`m3_lag_wdi_exploratory_contract_lock_pr`) → base `main` @ `93de6bae9344ce893b0261f818abce8a991cf842` — draft = True, merged = False, ready-for-review authorized = False, merge authorized = False. The head shown for it is a GENERATION ANCHOR (`repository_head_at_generation_not_github_pr_head`), never pinned and **not** the instantaneous GitHub PR head. PR #77 is HISTORICAL: merged = True by merge commit `93de6bae9344ce893b0261f818abce8a991cf842`
+- ⛔ **M3-LAG-WDI-EXPLORATORY:** authoritative contract status `AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL` — the earlier local, uncommitted partial draft was detected (True) and quarantined outside the repository (True); it is not authoritative (False), its authorization is not reusable (False), retrieval started = False
 - ⛔ **Nothing scientific moved:** M3I-2 evidence status `UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE` — admitted False — Data Gate executed False — modeling started False — Final Test locked True — M4 authorized False — merge authorized False
 - Package: `project/stage128/m3i2_final_official_documentary_recovery/`; interpretation: `project/stage128/m3i2_final_official_documentary_recovery/README_STAGE128_M3I2_FINAL_OFFICIAL_DOCUMENTARY_RECOVERY.md`
 
@@ -196,6 +196,20 @@ _A test-evidence record, not a scientific one. It states only that the same suit
 - **Pre-existing failures carried by both:** 8 — they are not introduced by this PR and no test was deleted or weakened to hide one
 - ⛔ **Not science:** verification-only = True — the record never claims to have tested the commit that carries it (self-reference avoided = True)
 - Record: `project/stage128/m3i2_final_official_documentary_recovery/stage128_m3i2_full_suite_baseline_comparison.json`
+
+### Stage128 — TRACK B: M3-LAG-WDI-EXPLORATORY contract lock (PRE-RETRIEVAL)
+
+_Two tracks now run in PARALLEL. **Track A** is the World Bank official inquiry, still waiting for a substantive response. **Track B** is this exploratory contract lock. Activating Track B does NOT mean the inquiry failed, terminated, was abandoned or became unnecessary, and a locked contract is NOT an authorization to retrieve anything._
+
+- ✅ **Contract status:** `AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL` — role `supplementary_exploratory_robustness_block`, confirmatory M3 = False — authorization SHA-256 `0c1e10496bfba98d5ae4a6a3a8bf593a42258388fce1003c4cc36e6cdee4995b` (158 UTF-8 bytes), consumed = True
+- **Exactly two lagged WDI features** (2): `FP.CPI.TOTL.ZG` (identity) and `PA.NUS.FCRF` (`100 * ln(E_(t-1) / E_(t-2))`), country `IRN`, observation year `t - 1` — M2 comparator 12 features, M3-LAG-WDI 14 features on the retained-M2 539-row development sample
+- ⛔ **No point-in-time claim:** point-in-time availability claimed = False — the future retrieval uses the CURRENT/LATEST revised WDI (True), and the one-year lag does not turn revised WDI into point-in-time data
+- ⛔ **Separate family:** exploratory comparison family `M3_LAG_WDI_EXPLORATORY_SUPPLEMENTARY` — in the confirmatory Holm family = False
+- ⛔ **Nothing executed:** retrieval started False — Data Gate `NOT_EXECUTED` (executed False) — modeling started False (authorized False) — Final Test rows read 0
+- **Track B next action:** `stage128-m3-lag-wdi-exploratory-data-retrieval` — authorized = False. A pointer is never an authorization
+- **Prior restriction:** `SUPERSEDED_BY_NEW_EXPLICIT_HUMAN_AUTHORIZATION` — the old "only after `UNRESOLVED_AFTER_FINAL_OFFICIAL_INQUIRY`" rule is retained as HISTORY, not deleted
+- ⛔ **Track A untouched:** the inquiry was NOT terminated by this action (False) — follow-up authorized now False, response adjudication authorized False
+- Package: `project/stage128/m3_lag_wdi_exploratory_contract_lock/`; interpretation: `project/stage128/m3_lag_wdi_exploratory_contract_lock/README_STAGE128_M3_LAG_WDI_EXPLORATORY_CONTRACT_LOCK.md`
 
 ### Last completed scientific micro-part QC
 
@@ -246,5 +260,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `760a7679bfabbd61c7fbedb5b1ab2560ae6ffedebec797847e5bc8751c260d86`_
-_generated_at_utc: 2026-08-08T07:56:52Z (informational)_
+_state_fingerprint: `856d9f49ae9f170b87b2c90c9d5f6183dd9a79d588f036b47d516af9851d00d3`_
+_generated_at_utc: 2026-08-08T09:47:57Z (informational)_
