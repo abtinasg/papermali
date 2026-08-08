@@ -38,6 +38,31 @@ BASELINE_BRANCH = "main"
 #: baseline this retrieval was authorized against.
 BASELINE_COMMIT = "175e7949e009eeecdd66aedab31ec4b48e9d3c7d"
 
+#: PR #78 carried the M3-LAG-WDI exploratory CONTRACT LOCK and is now MERGED
+#: history. PR #79 carries THIS retrieval and is the current LIVE Draft. Both
+#: halves are pinned: "live > predecessor" alone would accept a topology that
+#: re-published the merged #78 as the live Draft and demoted #77 in its place.
+CONTRACT_LOCK_PR_NUMBER = 78
+LIVE_PR_NUMBER = 79
+
+#: CUSTODY LOCATOR for the retained raw WDI payloads.
+#:
+#: The raw bytes captured during the authorized retrieval are retained OUTSIDE
+#: git (the repository commits only their filenames, byte counts and SHA-256
+#: digests — never a payload). This names the retention bundle so a later,
+#: separately authorized post-retrieval audit can find the EXACT bytes that
+#: were captured, rather than re-requesting the API and silently auditing a
+#: newer response.
+#:
+#: It is a bundle IDENTIFIER, not a filesystem path: absolute paths are
+#: machine-specific and would embed a local account name, which the package's
+#: no-PII rule forbids. Identity is ultimately by CONTENT — filename + byte
+#: count + SHA-256 — so a relocated or copied bundle is still recognizable and
+#: a substituted one is not.
+RAW_RETENTION_BUNDLE_ID = (
+    "papermali_stage128_m3_lag_wdi_retrieval_bundle_20260808T152237Z")
+RAW_RETENTION_MECHANISM = "raw_bundle_retained_outside_git_content_addressed"
+
 #: The NEW single-use human authorization for THIS action. It is recorded
 #: independently of the contract-lock authorization, which stays historical and
 #: consumed and is never reused here.
@@ -302,6 +327,9 @@ def build_source_manifest(bundle: dict[str, Any]) -> dict[str, Any]:
         "historical_vintage_availability_claimed": False,
         "raw_payloads_committed_to_git": 0,
         "raw_payloads_retained_outside_git": len(bundle["responses"]),
+        "raw_retention_bundle_id": RAW_RETENTION_BUNDLE_ID,
+        "raw_retention_mechanism": RAW_RETENTION_MECHANISM,
+        "raw_artifacts_identified_by_content_not_path": True,
         "unresolved_values_are_null_not_zero": True,
     }
 
@@ -481,6 +509,7 @@ def build_pr_topology() -> dict[str, Any]:
         "executed_in_separate_clean_worktree": True,
         "live_pr_base_branch": "main",
         "live_pr_base_commit": BASELINE_COMMIT,
+        "live_pr_number": LIVE_PR_NUMBER,
         "live_pr_is_draft": True,
         "live_pr_merged": False,
         "live_pr_role": "m3_lag_wdi_exploratory_data_retrieval_pr",
@@ -492,24 +521,68 @@ def build_pr_topology() -> dict[str, Any]:
         "auto_merge": False,
         "ready_for_review_authorized": False,
         "pr_is_stacked_on_open_predecessor": False,
-        "predecessor_pr_number": 78,
+        "predecessor_pr_number": CONTRACT_LOCK_PR_NUMBER,
         "predecessor_pr_merged": True,
         "predecessor_pr_merge_commit": BASELINE_COMMIT,
         "predecessor_pr_role": "m3_lag_wdi_exploratory_contract_lock_pr",
+        "predecessor_pr_semantics":
+            f"merged_predecessor_superseded_by_pr{LIVE_PR_NUMBER}",
         # The pinned historical roles are carried forward unchanged: they are
         # facts about what each PR was, not labels for whatever merged last.
         "documentary_recovery_pr_number": 76,
+        "documentary_recovery_pr_merged": True,
         "documentary_recovery_pr_merge_commit":
             "89d8e6ff2d12ec82903cd28aa7ab839eb946b658",
         "documentary_recovery_pr_role":
             "final_official_documentary_recovery_initiation_pr",
+        "documentary_recovery_pr_semantics":
+            "merged_predecessor_superseded_by_pr77",
         "human_submission_pr_number": 77,
+        "human_submission_pr_merged": True,
         "human_submission_pr_merge_commit":
             "93de6bae9344ce893b0261f818abce8a991cf842",
         "human_submission_pr_role":
             "final_official_inquiry_human_submission_recording_pr",
+        "human_submission_pr_semantics":
+            "merged_predecessor_superseded_by_pr78",
+        "contract_lock_pr_number": CONTRACT_LOCK_PR_NUMBER,
+        "contract_lock_pr_merged": True,
+        "contract_lock_pr_merge_commit": BASELINE_COMMIT,
+        "contract_lock_pr_role": "m3_lag_wdi_exploratory_contract_lock_pr",
+        "contract_lock_pr_action_id":
+            "stage128-m3-lag-wdi-exploratory-contract-lock",
+        "recovery_pr_role_is_pinned_to_pr76": True,
         "pr_roles_are_historical_facts_not_positional": True,
         "pr_roles_re_derived_from_adjacency": False,
+        # Four actions, four PRs, in order. Every entry that carries a merge
+        # commit is MERGED history; only the final entry is the live Draft.
+        "pr_role_sequence": [
+            {
+                "pr_number": 76,
+                "role": "final_official_documentary_recovery_initiation_pr",
+                "merged": True,
+                "merge_commit": "89d8e6ff2d12ec82903cd28aa7ab839eb946b658",
+            },
+            {
+                "pr_number": 77,
+                "role":
+                    "final_official_inquiry_human_submission_recording_pr",
+                "merged": True,
+                "merge_commit": "93de6bae9344ce893b0261f818abce8a991cf842",
+            },
+            {
+                "pr_number": CONTRACT_LOCK_PR_NUMBER,
+                "role": "m3_lag_wdi_exploratory_contract_lock_pr",
+                "merged": True,
+                "merge_commit": BASELINE_COMMIT,
+            },
+            {
+                "pr_number": LIVE_PR_NUMBER,
+                "role": "m3_lag_wdi_exploratory_data_retrieval_pr",
+                "merged": False,
+                "merge_commit": None,
+            },
+        ],
     }
 
 

@@ -44,8 +44,11 @@
   ],
   "official_source": "World Bank WDI API (api.worldbank.org)",
   "point_in_time_availability_claimed": false,
+  "raw_artifacts_identified_by_content_not_path": true,
   "raw_payloads_committed_to_git": 0,
   "raw_payloads_retained_outside_git": 2,
+  "raw_retention_bundle_id": "papermali_stage128_m3_lag_wdi_retrieval_bundle_20260808T152237Z",
+  "raw_retention_mechanism": "raw_bundle_retained_outside_git_content_addressed",
   "unresolved_values_are_null_not_zero": true,
   "wdi_vintage": "current_or_latest_revised"
 }

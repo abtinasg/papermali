@@ -47,7 +47,11 @@ m3i2_documentary_recovery_pr_number: 76
 m3i2_documentary_recovery_pr_merge_commit: 89d8e6ff2d12ec82903cd28aa7ab839eb946b658
 m3i2_human_submission_pr_number: 77
 m3i2_human_submission_pr_merge_commit: 93de6bae9344ce893b0261f818abce8a991cf842
-m3i2_live_draft_pr_number: 78
+m3_lag_contract_lock_pr_number: 78
+m3_lag_contract_lock_pr_merged: true
+m3_lag_contract_lock_pr_merge_commit: 175e7949e009eeecdd66aedab31ec4b48e9d3c7d
+m3_lag_data_retrieval_pr_number: 79
+m3i2_live_draft_pr_number: 79
 active_maintenance_task_id: repository-driven-ai-handoff
 ---
 
@@ -67,11 +71,14 @@ The front matter above is the **machine-readable** roadmap pointer. Research wor
 
 Activating Track B does **not** mean the World Bank inquiry failed, terminated, was abandoned or became unnecessary. Track A stays open on its own timetable.
 
-**PR HISTORY IS PINNED, NOT RE-DERIVED (item 25h).** Three PRs, three different actions, three different roles. Re-anchoring the LIVE topology onto a newer Draft never rewrites what an older PR *was*, and "the recovery PR" is a **name for a specific historical action**, never a moving label for "whatever merged most recently":
+**PR HISTORY IS PINNED, NOT RE-DERIVED (item 25h; live topology re-anchored at item 25i).** Four PRs, four different actions, four different roles. Re-anchoring the LIVE topology onto a newer Draft never rewrites what an older PR *was*, and "the recovery PR" is a **name for a specific historical action**, never a moving label for "whatever merged most recently":
 
 * **PR #76** — `stage128-m3i2-final-official-documentary-recovery-initiation`, the final official documentary recovery **INITIATION**. MERGED by merge commit `89d8e6ff2d12ec82903cd28aa7ab839eb946b658`; semantics `merged_predecessor_superseded_by_pr77`. This is the PR that `m3i2_documentary_recovery_pr_number` / `stage128_m3i2_recovery_pr_number` names, permanently.
 * **PR #77** — `stage128-m3i2-final-official-inquiry-human-submission`, the later **HUMAN World Bank inquiry submission RECORDING**, a separate action from the initiation above. MERGED by merge commit `93de6bae9344ce893b0261f818abce8a991cf842`; semantics `merged_predecessor_superseded_by_pr78`. It is the immediate merged predecessor of the live PR, and it is **not** the documentary recovery.
-* **PR #78** — `m3_lag_wdi_exploratory_contract_lock_pr`, the M3-LAG-WDI exploratory contract lock. The **current LIVE Draft**: draft = true, merged = false, ready-for-review **not** authorized, merge **not** authorized.
+* **PR #78** — `m3_lag_wdi_exploratory_contract_lock_pr`, the M3-LAG-WDI exploratory contract lock. **MERGED** by merge commit `175e7949e009eeecdd66aedab31ec4b48e9d3c7d`; semantics `merged_predecessor_superseded_by_pr79`. It is the immediate merged predecessor of the live PR and is **no longer** the live Draft.
+* **PR #79** — `m3_lag_wdi_exploratory_data_retrieval_pr`, the M3-LAG-WDI exploratory data retrieval (item 25i). The **current LIVE Draft**: base `main` @ `175e7949e009eeecdd66aedab31ec4b48e9d3c7d`, draft = true, merged = false, ready-for-review **not** authorized, merge **not** authorized.
+
+A merged predecessor may never be re-published as the live Draft. The generator, the contract-lock suite and the independent current-state validator all pin **both** halves of each merge — the PR number *and* its merge commit — and fail closed if a PR recorded as merged reappears as the open Draft.
 
 The three roles may never be collapsed into one another or shifted forward, and both the Handoff generator and the independent current-state validator fail closed if any of them moves.
 

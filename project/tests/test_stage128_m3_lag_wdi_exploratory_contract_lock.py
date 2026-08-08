@@ -492,7 +492,11 @@ def test_pr_77_is_merged_history_and_the_new_pr_is_the_live_draft():
 def test_the_handoff_publishes_the_new_pr_as_live_and_pr_77_as_history(
         handoff):
     topo = _read_json(_TOPOLOGY_REL)
-    assert handoff["stage128_m3i2_live_pr_number"] == topo["live_pr_number"]
+    # The contract-lock topology is contract-lock-TIME history: it names the
+    # PR that was live then. The live PR *now* is a strict successor of it,
+    # because that PR has since merged. Anchoring on ">" rather than "==" is
+    # the point: the handoff must never simply echo a superseded artifact.
+    assert handoff["stage128_m3i2_live_pr_number"] > topo["live_pr_number"]
     assert handoff["stage128_m3i2_live_pr_is_draft"] is True
     assert handoff["stage128_m3i2_live_pr_merged"] is False
     # PR #77 is history under its OWN role — the human inquiry submission
@@ -871,7 +875,16 @@ _RECOVERY_PR = 76
 _RECOVERY_MERGE_COMMIT = "89d8e6ff2d12ec82903cd28aa7ab839eb946b658"
 _HUMAN_SUBMISSION_PR = 77
 _HUMAN_SUBMISSION_MERGE_COMMIT = "93de6bae9344ce893b0261f818abce8a991cf842"
-_LIVE_PR = 78
+#: HISTORICAL: PR #78 carried the contract lock and was the live Draft *at
+#: contract-lock time*. The contract-lock ARTIFACT still records it that way,
+#: and that record is a permanent historical fact about that action.
+_CONTRACT_LOCK_PR = 78
+#: PR #78 has since been MERGED into main by this commit.
+_CONTRACT_LOCK_MERGE_COMMIT = "175e7949e009eeecdd66aedab31ec4b48e9d3c7d"
+#: CURRENT: the live Draft *now* is the retrieval PR. A merged PR is never the
+#: live Draft, so the handoff must publish this number, not _CONTRACT_LOCK_PR.
+_LIVE_PR = 79
+_LIVE_PR_ROLE = "m3_lag_wdi_exploratory_data_retrieval_pr"
 
 
 def test_the_three_historical_pr_roles_are_recorded_separately():
@@ -890,7 +903,10 @@ def test_the_three_historical_pr_roles_are_recorded_separately():
         _HUMAN_SUBMISSION_MERGE_COMMIT)
     assert topo["human_submission_pr_action_id"] == (
         "stage128-m3i2-final-official-inquiry-human-submission")
-    assert topo["live_pr_number"] == _LIVE_PR
+    # The contract-lock ARTIFACT records contract-lock-TIME topology, where
+    # PR #78 was the live Draft. That stays true of the artifact forever; what
+    # is live NOW is asserted against the handoff, not against this file.
+    assert topo["live_pr_number"] == _CONTRACT_LOCK_PR
     assert topo["live_pr_is_draft"] is True
     assert topo["live_pr_merged"] is False
     # the two merged PRs are two different merges, not one relabelled twice
@@ -900,7 +916,7 @@ def test_the_three_historical_pr_roles_are_recorded_separately():
     assert topo["pr_roles_are_historical_facts_not_positional"] is True
     assert [(e["pr_number"], e["merged"]) for e in topo["pr_role_sequence"]] \
         == [(_RECOVERY_PR, True), (_HUMAN_SUBMISSION_PR, True),
-            (_LIVE_PR, False)]
+            (_CONTRACT_LOCK_PR, False)]
 
 
 def test_the_handoff_keeps_pr76_as_the_documentary_recovery(handoff):
@@ -926,23 +942,48 @@ def test_the_handoff_keeps_pr77_as_the_human_submission_recording(handoff):
         "final_official_inquiry_human_submission_recording_pr")
 
 
-def test_the_handoff_keeps_pr78_as_the_live_draft(handoff):
+def test_the_handoff_keeps_pr78_as_merged_history_not_the_live_draft(handoff):
+    """Replaces `test_the_handoff_keeps_pr78_as_the_live_draft`.
+
+    PR #78 has been MERGED into main by `175e7949…`. The old test asserted it
+    was still the live Draft, so it enforced a claim that is now false. What
+    must hold instead is the pair: #78 is merged history WITH its merge commit
+    pinned, and the live Draft is the strictly later retrieval PR #79.
+    """
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_number"] == (
+        _CONTRACT_LOCK_PR)
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_merged"] is True
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_merge_commit"] == (
+        _CONTRACT_LOCK_MERGE_COMMIT)
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_role"] == (
+        "m3_lag_wdi_exploratory_contract_lock_pr")
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_semantics"] == (
+        f"merged_predecessor_superseded_by_pr{_LIVE_PR}")
+    # ... and it is emphatically NOT the live Draft any more.
+    assert handoff["stage128_m3i2_live_pr_number"] != _CONTRACT_LOCK_PR
+
+
+def test_the_handoff_publishes_pr79_as_the_current_live_draft(handoff):
     assert handoff["stage128_m3i2_live_pr_number"] == _LIVE_PR
     assert handoff["stage128_m3i2_live_pr_is_draft"] is True
     assert handoff["stage128_m3i2_live_pr_merged"] is False
-    assert handoff["stage128_m3i2_live_pr_role"] == (
-        "m3_lag_wdi_exploratory_contract_lock_pr")
+    assert handoff["stage128_m3i2_live_pr_role"] == _LIVE_PR_ROLE
+    assert handoff["stage128_m3i2_live_pr_base_commit"] == (
+        _CONTRACT_LOCK_MERGE_COMMIT)
     assert handoff["stage128_m3i2_live_pr_ready_for_review_authorized"] is (
         False)
     assert handoff["stage128_m3i2_merge_authorized"] is False
 
 
-def test_the_three_pr_roles_cannot_be_collapsed_or_shifted(handoff):
+def test_the_four_pr_roles_cannot_be_collapsed_or_shifted(handoff):
     numbers = (handoff["stage128_m3i2_recovery_pr_number"],
                handoff["stage128_m3i2_human_submission_pr_number"],
+               handoff["stage128_m3_lag_wdi_contract_lock_pr_number"],
                handoff["stage128_m3i2_live_pr_number"])
-    assert numbers == (_RECOVERY_PR, _HUMAN_SUBMISSION_PR, _LIVE_PR)
-    assert len(set(numbers)) == 3
+    assert numbers == (_RECOVERY_PR, _HUMAN_SUBMISSION_PR, _CONTRACT_LOCK_PR,
+                       _LIVE_PR)
+    assert len(set(numbers)) == 4
+    assert numbers == tuple(sorted(numbers))
     assert (handoff["stage128_m3i2_recovery_pr_merge_commit"]
             != handoff["stage128_m3i2_human_submission_pr_merge_commit"])
     assert handoff["stage128_m3i2_pr_roles_are_historical_facts_not_"
@@ -952,7 +993,34 @@ def test_the_three_pr_roles_cannot_be_collapsed_or_shifted(handoff):
         (_RECOVERY_PR, "final_official_documentary_recovery_initiation_pr"),
         (_HUMAN_SUBMISSION_PR,
          "final_official_inquiry_human_submission_recording_pr"),
-        (_LIVE_PR, "m3_lag_wdi_exploratory_contract_lock_pr")]
+        (_CONTRACT_LOCK_PR, "m3_lag_wdi_exploratory_contract_lock_pr"),
+        (_LIVE_PR, _LIVE_PR_ROLE)]
+
+
+def test_no_merged_pr_is_ever_published_as_the_live_draft(handoff):
+    """The general invariant, not a per-number spot check.
+
+    Whatever the published sequence is, every entry that carries a merge
+    commit is merged history and the live PR number may not be one of them.
+    This is what would have caught the stale `PR #78 is the live Draft`
+    claim without anyone having to remember that #78 specifically had merged.
+    """
+    sequence = handoff["stage128_m3i2_pr_role_sequence"]
+    merged = {e["pr_number"] for e in sequence if e["merged"] is True}
+    live = handoff["stage128_m3i2_live_pr_number"]
+    assert live not in merged
+    assert handoff["stage128_m3i2_live_pr_merged"] is False
+    # every merged entry must actually record its merge commit, and every
+    # unmerged entry must not pretend to have one
+    for entry in sequence:
+        if entry["merged"] is True:
+            assert entry["merge_commit"], entry
+        else:
+            assert entry["merge_commit"] is None, entry
+    # the live Draft is the last entry, and it is the only unmerged one
+    assert sequence[-1]["pr_number"] == live
+    assert [e["merged"] for e in sequence] == (
+        [True] * (len(sequence) - 1) + [False])
 
 
 def test_the_docs_state_the_pr_roles_explicitly():

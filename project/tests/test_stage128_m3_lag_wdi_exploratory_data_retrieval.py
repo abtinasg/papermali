@@ -623,3 +623,222 @@ def test_the_runner_imports_the_capture_layer_only_on_the_retrieve_path():
     # it must sit INSIDE the _retrieve function, never at module scope
     assert not any(line.startswith(import_line)
                    for line in text.splitlines())
+
+
+# --------------------------------------------------------------------------- #
+# BLOCKER 1 REGRESSION — a MERGED predecessor may never be the live Draft
+#
+# PR #78 (the contract lock) merged into main by 175e7949…, so the live Draft
+# is now the retrieval PR #79. The failure this guards against is the stale
+# claim "PR #78 is still the live Draft": a merged PR re-published as the open
+# Draft. Both halves of each merge are pinned — the PR number AND its merge
+# commit — because "live > predecessor" alone would happily accept a topology
+# that renamed the merged #78 the live PR and demoted #77 in its place.
+# --------------------------------------------------------------------------- #
+
+_CONTRACT_LOCK_PR = 78
+_CONTRACT_LOCK_MERGE_COMMIT = "175e7949e009eeecdd66aedab31ec4b48e9d3c7d"
+_RETRIEVAL_LIVE_PR = 79
+_RETRIEVAL_LIVE_PR_ROLE = "m3_lag_wdi_exploratory_data_retrieval_pr"
+
+
+def test_the_retrieval_topology_makes_pr78_merged_history_and_pr79_live():
+    topo = _read_json(_TOPOLOGY_REL)
+    assert topo["predecessor_pr_number"] == _CONTRACT_LOCK_PR
+    assert topo["predecessor_pr_merged"] is True
+    assert topo["predecessor_pr_merge_commit"] == _CONTRACT_LOCK_MERGE_COMMIT
+    assert topo["predecessor_pr_role"] == (
+        "m3_lag_wdi_exploratory_contract_lock_pr")
+    assert topo["live_pr_number"] == _RETRIEVAL_LIVE_PR
+    assert topo["live_pr_role"] == _RETRIEVAL_LIVE_PR_ROLE
+    assert topo["live_pr_is_draft"] is True
+    assert topo["live_pr_merged"] is False
+    assert topo["live_pr_base_branch"] == "main"
+    # the live PR is based on exactly the merge commit of its predecessor
+    assert topo["live_pr_base_commit"] == _CONTRACT_LOCK_MERGE_COMMIT
+    assert topo["pr_is_stacked_on_open_predecessor"] is False
+    assert topo["merge_authorized"] is False
+    assert topo["ready_for_review_authorized"] is False
+    # the head is a generation anchor, never pinned
+    assert topo["live_pr_head_commit_pinned"] is False
+    assert topo["live_pr_head_is_github_pr_head"] is False
+
+
+def test_the_pinned_historical_roles_survive_the_re_anchoring():
+    """Re-anchoring onto #79 must not shift what #76/#77/#78 *were*."""
+    topo = _read_json(_TOPOLOGY_REL)
+    assert topo["documentary_recovery_pr_number"] == 76
+    assert topo["documentary_recovery_pr_merged"] is True
+    assert topo["documentary_recovery_pr_merge_commit"] == (
+        "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
+    # #76 was superseded by #77 — not by whatever Draft is live now
+    assert topo["documentary_recovery_pr_semantics"] == (
+        "merged_predecessor_superseded_by_pr77")
+    assert topo["human_submission_pr_number"] == 77
+    assert topo["human_submission_pr_merged"] is True
+    assert topo["human_submission_pr_merge_commit"] == (
+        "93de6bae9344ce893b0261f818abce8a991cf842")
+    assert topo["human_submission_pr_semantics"] == (
+        "merged_predecessor_superseded_by_pr78")
+    assert topo["contract_lock_pr_number"] == _CONTRACT_LOCK_PR
+    assert topo["contract_lock_pr_action_id"] == (
+        "stage128-m3-lag-wdi-exploratory-contract-lock")
+    assert topo["recovery_pr_role_is_pinned_to_pr76"] is True
+    assert topo["pr_roles_re_derived_from_adjacency"] is False
+    assert topo["pr_roles_are_historical_facts_not_positional"] is True
+    # four distinct PRs, in order, only the last unmerged
+    sequence = [(e["pr_number"], e["merged"]) for e in topo["pr_role_sequence"]]
+    assert sequence == [(76, True), (77, True), (_CONTRACT_LOCK_PR, True),
+                        (_RETRIEVAL_LIVE_PR, False)]
+
+
+def test_the_handoff_publishes_pr79_live_and_pr78_merged(handoff):
+    assert handoff["stage128_m3i2_live_pr_number"] == _RETRIEVAL_LIVE_PR
+    assert handoff["stage128_m3i2_live_pr_role"] == _RETRIEVAL_LIVE_PR_ROLE
+    assert handoff["stage128_m3i2_live_pr_is_draft"] is True
+    assert handoff["stage128_m3i2_live_pr_merged"] is False
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_number"] == (
+        _CONTRACT_LOCK_PR)
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_merged"] is True
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_merge_commit"] == (
+        _CONTRACT_LOCK_MERGE_COMMIT)
+
+
+def _republish_merged_predecessor_as_live(payload: dict) -> None:
+    """The exact stale claim: the merged PR #78 back as the live Draft."""
+    payload["live_pr_number"] = _CONTRACT_LOCK_PR
+    payload["live_pr_role"] = "m3_lag_wdi_exploratory_contract_lock_pr"
+    payload["predecessor_pr_number"] = 77
+    payload["predecessor_pr_merge_commit"] = (
+        "93de6bae9344ce893b0261f818abce8a991cf842")
+
+
+def _live_pr_also_marked_merged(payload: dict) -> None:
+    payload["live_pr_merged"] = True
+    for entry in payload["pr_role_sequence"]:
+        if entry["pr_number"] == _RETRIEVAL_LIVE_PR:
+            entry["merged"] = True
+            entry["merge_commit"] = _CONTRACT_LOCK_MERGE_COMMIT
+
+
+def _sequence_republishes_a_merged_pr_last(payload: dict) -> None:
+    payload["pr_role_sequence"][-1] = {
+        "pr_number": _CONTRACT_LOCK_PR,
+        "role": "m3_lag_wdi_exploratory_contract_lock_pr",
+        "merged": True,
+        "merge_commit": _CONTRACT_LOCK_MERGE_COMMIT,
+    }
+
+
+_RETRIEVAL_TOPOLOGY_DRIFTS = (
+    # THE regression this block exists for
+    ("the_merged_pr78_is_republished_as_the_live_draft",
+     _republish_merged_predecessor_as_live),
+    ("the_live_pr_is_also_marked_merged", _live_pr_also_marked_merged),
+    ("the_sequence_ends_on_a_merged_pr", _sequence_republishes_a_merged_pr_last),
+    ("the_merged_predecessor_is_called_unmerged",
+     lambda p: p.update({"predecessor_pr_merged": False})),
+    ("the_predecessor_merge_commit_is_wrong",
+     lambda p: p.update({"predecessor_pr_merge_commit": "0" * 40})),
+    ("the_live_pr_precedes_its_merged_predecessor",
+     lambda p: p.update({"live_pr_number": 77})),
+    ("the_live_pr_is_marked_ready_instead_of_draft",
+     lambda p: p.update({"live_pr_is_draft": False})),
+    ("the_live_head_is_pinned",
+     lambda p: p.update({"live_pr_head_commit_pinned": True})),
+    ("the_pr_stops_targeting_main",
+     lambda p: p.update({"live_pr_base_branch": "stage128-something"})),
+    ("merge_becomes_authorized", lambda p: p.update({"merge_authorized": True})),
+    ("ready_for_review_becomes_authorized",
+     lambda p: p.update({"ready_for_review_authorized": True})),
+    # the pinned historical roles must not slide forward
+    ("the_recovery_role_slides_onto_pr77",
+     lambda p: p.update({"documentary_recovery_pr_number": 77})),
+    ("the_recovery_semantics_slide_onto_the_live_pr",
+     lambda p: p.update({"documentary_recovery_pr_semantics":
+                         "merged_predecessor_superseded_by_pr79"})),
+    ("the_contract_lock_role_slides_onto_the_live_pr",
+     lambda p: p.update({"contract_lock_pr_number": _RETRIEVAL_LIVE_PR})),
+    ("roles_become_positional",
+     lambda p: p.update({"pr_roles_re_derived_from_adjacency": True})),
+)
+
+
+@pytest.mark.parametrize("label,mutate", _RETRIEVAL_TOPOLOGY_DRIFTS,
+                         ids=[label for label, _ in _RETRIEVAL_TOPOLOGY_DRIFTS])
+def test_retrieval_topology_drift_fails_closed(tmp_path, label, mutate):
+    root = _root(tmp_path, f"topo_{label}", _mutated(_TOPOLOGY_REL, mutate))
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage128_m3_lag_wdi_retrieval_live_pr_topology_markers(root)
+
+
+def test_the_unmutated_retrieval_topology_is_accepted(tmp_path):
+    """The drift tests above are only meaningful if the real one passes."""
+    root = _root(tmp_path, "topo_clean", {})
+    markers = gen.derive_stage128_m3_lag_wdi_retrieval_live_pr_topology_markers(
+        root)
+    assert markers["stage128_m3i2_live_pr_number"] == _RETRIEVAL_LIVE_PR
+    assert markers["stage128_m3_lag_wdi_contract_lock_pr_merged"] is True
+    # publishing a live topology moves NOTHING scientific
+    assert markers["m3i2_data_gate_executed"] is False
+    assert markers["m3i2_block_admitted"] is False
+    assert markers["m3i2_modeling_started"] is False
+    assert markers["m4_authorized"] is False
+    assert markers["final_test_locked"] is True
+
+
+# --------------------------------------------------------------------------- #
+# BLOCKER 2 — the retained raw bytes stay locatable and content-addressed
+#
+# The future post-retrieval audit must be able to read the EXACT bytes captured
+# during the authorized retrieval, not a later API response. The repository
+# therefore commits a custody record (filename + byte count + SHA-256 + bundle
+# id) and never the payload itself.
+# --------------------------------------------------------------------------- #
+
+def test_the_custody_record_locates_the_retained_raw_bytes():
+    manifest = _read_json(_MANIFEST_REL)
+    assert manifest["raw_payloads_committed_to_git"] == 0
+    assert manifest["raw_payloads_retained_outside_git"] == 2
+    assert manifest["raw_retention_bundle_id"] == (
+        "papermali_stage128_m3_lag_wdi_retrieval_bundle_20260808T152237Z")
+    assert manifest["raw_retention_mechanism"] == (
+        "raw_bundle_retained_outside_git_content_addressed")
+    assert manifest["raw_artifacts_identified_by_content_not_path"] is True
+
+
+def test_the_custody_locator_is_not_a_filesystem_path():
+    """An absolute path would be machine-specific and embed an account name."""
+    manifest = _read_json(_MANIFEST_REL)
+    bundle_id = manifest["raw_retention_bundle_id"]
+    assert not bundle_id.startswith("/")
+    assert "/" not in bundle_id and "\\" not in bundle_id
+    assert "~" not in bundle_id
+
+
+def test_every_retained_artifact_is_pinned_by_bytes_and_sha256():
+    manifest = _read_json(_MANIFEST_REL)
+    expected = {
+        "FP.CPI.TOTL.ZG": (
+            "f62292c52088df71__FP.CPI.TOTL.ZG.attempt1.json", 15805,
+            "f62292c52088df714c34846a6865ddc47306d497"
+            "96ea9ec9014441893d553add"),
+        "PA.NUS.FCRF": (
+            "74b585734cc48dd2__PA.NUS.FCRF.attempt1.json", 16482,
+            "74b585734cc48dd2e9d063e955d95a619dbaa5e4"
+            "bbff283b128da21b339d63d4"),
+    }
+    total = 0
+    for entry in manifest["indicators"]:
+        filename, size, digest = expected[entry["indicator_code"]]
+        assert entry["raw_artifact_filename"] == filename
+        assert entry["raw_artifact_bytes"] == size
+        assert entry["raw_artifact_sha256"] == digest
+        assert len(entry["raw_artifact_sha256"]) == 64
+        # custody metadata only: nothing inside the bytes was ever looked at
+        assert entry["payload_parsed"] is False
+        assert entry["observations_read"] is None
+        assert entry["values_inspected"] is None
+        assert entry["coverage_calculated"] is None
+        total += entry["raw_artifact_bytes"]
+    assert total == 32287

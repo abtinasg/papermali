@@ -2798,10 +2798,15 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         **derive_stage128_m3_lag_wdi_exploratory_markers(root),
         # Must come last within Track B: the retrieval is the newest Track B
         # action. It moves the Track B pointer from retrieval to the (still
-        # unauthorized) post-retrieval audit and owns the live PR topology. It
-        # admits nothing: acquisition is not admission, and it never touches
-        # the Gate, modeling, the Final Test or Track A.
+        # unauthorized) post-retrieval audit. It admits nothing: acquisition
+        # is not admission, and it never touches the Gate, modeling, the Final
+        # Test or Track A.
         **derive_stage128_m3_lag_wdi_data_retrieval_markers(root),
+        # Must come last: PR #78 (the contract lock) has been MERGED, so the
+        # contract-lock topology above is history. This re-anchors the LIVE
+        # topology onto the retrieval Draft PR #79 while carrying every pinned
+        # historical PR role forward unchanged. Metadata only.
+        **derive_stage128_m3_lag_wdi_retrieval_live_pr_topology_markers(root),
     }
 
 
@@ -4574,6 +4579,26 @@ def render_current_state(record: dict) -> str:
     if record.get("stage128_m3i2_final_documentary_recovery_initiated"):
         submission_recorded = bool(
             record.get("stage128_m3i2_inquiry_human_submission_recorded"))
+        # Once the Track B contract-lock PR is itself merged it stops being
+        # the live Draft and joins the pinned historical roles. Rendered only
+        # when that merge is actually recorded, so the line never asserts a
+        # merge that has not happened.
+        contract_lock_pr_clause = ""
+        if record.get("stage128_m3_lag_wdi_contract_lock_pr_merged") is True:
+            contract_lock_pr_clause = (
+                "PR #"
+                f"{record.get('stage128_m3_lag_wdi_contract_lock_pr_number')}"
+                " = "
+                f"`{record.get('stage128_m3_lag_wdi_contract_lock_pr_role')}`"
+                " (action "
+                f"`{record.get('stage128_m3_lag_wdi_contract_lock_pr_action_id')}`)"
+                " — merged = "
+                f"{record.get('stage128_m3_lag_wdi_contract_lock_pr_merged')}"
+                " by merge commit "
+                f"`{record.get('stage128_m3_lag_wdi_contract_lock_pr_merge_commit')}`"
+                " — semantics "
+                f"`{record.get('stage128_m3_lag_wdi_contract_lock_pr_semantics')}`. "
+            )
         lines += [
             "### Stage128 — M3I-2 final official documentary recovery "
             "(INITIATION ONLY)\n",
@@ -4731,6 +4756,7 @@ def render_current_state(record: dict) -> str:
             f"`{record.get('stage128_m3i2_human_submission_pr_merge_commit')}`"
             " — semantics "
             f"`{record.get('stage128_m3i2_human_submission_pr_semantics')}`. "
+            f"{contract_lock_pr_clause}"
             "PR #"
             f"{record.get('stage128_m3i2_live_pr_number')} = "
             f"`{record.get('stage128_m3i2_live_pr_role')}`, the current LIVE "
@@ -4854,7 +4880,13 @@ def render_current_state(record: dict) -> str:
             f"{record.get('stage128_m3_lag_wdi_modeling_authorized')}) — "
             "Final Test rows read "
             f"{record.get('stage128_m3_lag_wdi_final_test_rows_read')}",
-            "- **Track B next action — RETRIEVAL ONLY:** "
+            # The label must describe the NEXT action, never the one just
+            # completed. Retrieval is done and its authorization is consumed,
+            # so the pointer is rendered with its own published scope instead
+            # of a hard-coded phrase that would go stale the moment Track B
+            # advances.
+            "- **Track B next action (pointer only, NOT an "
+            "authorization):** "
             f"`{record.get('stage128_m3_lag_wdi_next_action_id')}` — scope "
             f"`{record.get('stage128_m3_lag_wdi_next_action_scope')}`, "
             "authorized = "
@@ -8162,6 +8194,25 @@ _STAGE128_M3_LAG_RETRIEVAL_AUTH_REL = (
 _STAGE128_M3_LAG_RETRIEVAL_DECISION_REL = (
     f"{_STAGE128_M3_LAG_RETRIEVAL_PKG}/"
     "stage128_m3_lag_wdi_retrieval_decision.json")
+_STAGE128_M3_LAG_RETRIEVAL_TOPOLOGY_REL = (
+    f"{_STAGE128_M3_LAG_RETRIEVAL_PKG}/"
+    "stage128_m3_lag_wdi_retrieval_pr_topology.json")
+
+#: PR #78 (the M3-LAG-WDI exploratory CONTRACT LOCK) was merged into main by
+#: this commit, and PR #79 (this retrieval) is the current LIVE Draft. Both
+#: halves are pinned, because "live > predecessor" alone would still accept a
+#: topology that re-published the merged #78 as the live Draft.
+_STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_PR = 78
+_STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_COMMIT = (
+    "175e7949e009eeecdd66aedab31ec4b48e9d3c7d")
+_STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_ROLE = (
+    "m3_lag_wdi_exploratory_contract_lock_pr")
+_STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-contract-lock")
+_STAGE128_M3_LAG_RETRIEVAL_LIVE_PR_ROLE = (
+    "m3_lag_wdi_exploratory_data_retrieval_pr")
+_STAGE128_M3_LAG_RETRIEVAL_ACTION_ID = (
+    "stage128-m3-lag-wdi-exploratory-data-retrieval")
 
 _STAGE128_M3_LAG_RETRIEVAL_AUTH_SHA256 = (
     "b409e0a53d255955199c59005d39f911ae272713dbf85c38651cd0dcfd5ba604")
@@ -8432,6 +8483,273 @@ def derive_stage128_m3_lag_wdi_data_retrieval_markers(root: str) -> dict:
             for (step, action_id, executes_retrieval, executes_gate,
                  executes_modeling) in _STAGE128_M3_LAG_ACTION_SEQUENCE
         ],
+    }
+
+
+def derive_stage128_m3_lag_wdi_retrieval_live_pr_topology_markers(
+        root: str) -> dict:
+    """Publish the LIVE (retrieval) PR topology and demote PR #78 to history.
+
+    The contract-lock artifact records the topology that was live *at contract
+    time*: PR #78 as the live Draft, based on the merge commit of PR #77. That
+    is now history — PR #78 has since been MERGED into ``main`` by
+    ``175e7949…``, and the live Draft is the separate retrieval PR #79.
+
+    Fail-closed, and deliberately narrow:
+
+    * the merged predecessor is pinned to PR #78 **and** to its merge commit,
+      so a merged PR can never be re-published as the live Draft;
+    * the live PR must be a strict successor of it, must be an open Draft, and
+      must be based on exactly that merge commit;
+    * every historical role (#76 documentary-recovery initiation, #77 human
+      submission recording, #78 contract lock) is pinned and carried forward
+      unchanged — roles are facts about actions, never labels for "whatever
+      merged most recently";
+    * any entry in the published role sequence that carries a merge commit is
+      MERGED history, and only the final entry may be the live Draft.
+
+    Returns {} before the retrieval package exists. Publishing a live topology
+    is pure metadata: it admits nothing and moves no scientific state.
+    """
+    topology_path = os.path.join(
+        root, _STAGE128_M3_LAG_RETRIEVAL_TOPOLOGY_REL)
+    if not os.path.isfile(topology_path):
+        return {}
+    topology = _require_json_artifact(
+        root, _STAGE128_M3_LAG_RETRIEVAL_TOPOLOGY_REL)
+    if topology.get("action_id") != _STAGE128_M3_LAG_RETRIEVAL_ACTION_ID:
+        raise HandoffError(
+            "the M3-LAG-WDI retrieval PR topology names another action")
+
+    live_number = topology.get("live_pr_number")
+    predecessor_number = topology.get("predecessor_pr_number")
+    for value, label in ((live_number, "live"),
+                         (predecessor_number, "predecessor")):
+        if not isinstance(value, int) or isinstance(value, bool):
+            raise HandoffError(
+                f"the M3-LAG-WDI retrieval {label} PR number must be an "
+                "integer")
+    if predecessor_number != _STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_PR:
+        raise HandoffError(
+            "the merged predecessor of the M3-LAG-WDI retrieval PR is PR "
+            f"#{_STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_PR}")
+    if live_number <= predecessor_number:
+        raise HandoffError(
+            f"the live PR #{live_number} must succeed the merged predecessor "
+            f"PR #{predecessor_number}")
+
+    merge_commit = topology.get("predecessor_pr_merge_commit")
+    base_commit = topology.get("live_pr_base_commit")
+    for value, label in ((merge_commit, "predecessor merge"),
+                         (base_commit, "live PR base")):
+        if not (isinstance(value, str) and len(value) == 40):
+            raise HandoffError(
+                f"the M3-LAG-WDI retrieval {label} commit must be a full "
+                "40-hex SHA")
+    if merge_commit != _STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_COMMIT:
+        raise HandoffError(
+            f"PR #{_STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_PR} was "
+            f"merged by {_STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_COMMIT}")
+    if base_commit != merge_commit:
+        raise HandoffError(
+            "the live M3-LAG-WDI retrieval PR must be based on the merge "
+            "commit of its merged predecessor")
+    if topology.get("live_pr_base_branch") != _STAGE128_M3I2_LIVE_BASE_BRANCH:
+        raise HandoffError(
+            f"the live PR must target {_STAGE128_M3I2_LIVE_BASE_BRANCH}")
+    if topology.get("live_pr_role") != (
+            _STAGE128_M3_LAG_RETRIEVAL_LIVE_PR_ROLE):
+        raise HandoffError(
+            "the live M3-LAG-WDI retrieval PR role must be "
+            f"{_STAGE128_M3_LAG_RETRIEVAL_LIVE_PR_ROLE}")
+    if topology.get("predecessor_pr_role") != (
+            _STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_ROLE):
+        raise HandoffError(
+            f"PR #{_STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_PR} keeps "
+            f"the role {_STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_ROLE}")
+
+    for field, expected in (
+        ("predecessor_pr_merged", True),
+        ("contract_lock_pr_merged", True),
+        ("documentary_recovery_pr_merged", True),
+        ("human_submission_pr_merged", True),
+        ("pr_roles_are_historical_facts_not_positional", True),
+        ("recovery_pr_role_is_pinned_to_pr76", True),
+        ("live_pr_is_draft", True),
+        ("live_pr_merged", False),
+        ("merge_authorized", False),
+        ("auto_merge", False),
+        ("ready_for_review_authorized", False),
+        ("pr_is_stacked_on_open_predecessor", False),
+        ("live_pr_head_commit_pinned", False),
+        ("live_pr_head_is_github_pr_head", False),
+        ("pr_roles_re_derived_from_adjacency", False),
+    ):
+        if topology.get(field) is not expected:
+            raise HandoffError(
+                f"M3-LAG-WDI retrieval topology {field} must be {expected}")
+    if topology.get("live_pr_head_semantics") != (
+            _STAGE128_M3I2_LIVE_PR_HEAD_SEMANTICS):
+        raise HandoffError(
+            "the live PR head semantics must be "
+            f"{_STAGE128_M3I2_LIVE_PR_HEAD_SEMANTICS}")
+
+    # --- HISTORICAL PR ROLES: pinned, never re-derived from adjacency ---- #
+    for field, expected, label in (
+        ("documentary_recovery_pr_number",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR,
+         "the documentary-recovery INITIATION PR number"),
+        ("documentary_recovery_pr_merge_commit",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT,
+         "the documentary-recovery PR merge commit"),
+        ("documentary_recovery_pr_role",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE,
+         "the documentary-recovery PR role"),
+        ("documentary_recovery_pr_semantics",
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_SEMANTICS,
+         "the documentary-recovery PR supersession semantics"),
+        ("human_submission_pr_number", _STAGE128_M3I2_HUMAN_SUBMISSION_PR,
+         "the human-submission RECORDING PR number"),
+        ("human_submission_pr_merge_commit",
+         _STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT,
+         "the human-submission PR merge commit"),
+        ("human_submission_pr_role", _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE,
+         "the human-submission PR role"),
+        ("contract_lock_pr_number",
+         _STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_PR,
+         "the M3-LAG-WDI contract-lock PR number"),
+        ("contract_lock_pr_merge_commit",
+         _STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_COMMIT,
+         "the M3-LAG-WDI contract-lock PR merge commit"),
+        ("contract_lock_pr_role",
+         _STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_ROLE,
+         "the M3-LAG-WDI contract-lock PR role"),
+        ("contract_lock_pr_action_id",
+         _STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_ACTION_ID,
+         "the M3-LAG-WDI contract-lock PR action id"),
+    ):
+        if topology.get(field) != expected:
+            raise HandoffError(f"{label} is pinned to {expected!r}")
+
+    recovery_number = topology.get("documentary_recovery_pr_number")
+    submission_number = topology.get("human_submission_pr_number")
+    if not (recovery_number < submission_number < predecessor_number
+            < live_number):
+        raise HandoffError(
+            "the four PR roles must stay four distinct PRs in order: "
+            f"#{recovery_number} (documentary recovery initiation) -> "
+            f"#{submission_number} (human submission recording) -> "
+            f"#{predecessor_number} (contract lock, merged) -> "
+            f"#{live_number} (live Draft retrieval)")
+
+    # --- A MERGED PR MAY NEVER BE REPUBLISHED AS THE LIVE DRAFT ---------- #
+    # This is the regression guard. Every sequence entry carrying a merge
+    # commit is merged history; only the final entry may be the open Draft,
+    # and the live PR number may never collide with a merged one.
+    sequence = topology.get("pr_role_sequence") or []
+    expected_sequence = [
+        (_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR,
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE, True,
+         _STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT),
+        (_STAGE128_M3I2_HUMAN_SUBMISSION_PR,
+         _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE, True,
+         _STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT),
+        (_STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_PR,
+         _STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_ROLE, True,
+         _STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_COMMIT),
+        (live_number, _STAGE128_M3_LAG_RETRIEVAL_LIVE_PR_ROLE, False, None),
+    ]
+    if [(entry.get("pr_number"), entry.get("role"), entry.get("merged"),
+         entry.get("merge_commit")) for entry in sequence] != (
+            expected_sequence):
+        raise HandoffError(
+            "the published PR role sequence must be exactly "
+            f"#{_STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR} -> "
+            f"#{_STAGE128_M3I2_HUMAN_SUBMISSION_PR} -> "
+            f"#{_STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_PR} -> "
+            f"#{live_number}")
+    merged_numbers = {entry.get("pr_number") for entry in sequence
+                      if entry.get("merged") is True}
+    if live_number in merged_numbers:
+        raise HandoffError(
+            f"PR #{live_number} is recorded as MERGED and therefore may never "
+            "be published as the live Draft")
+    for entry in sequence:
+        if entry.get("merged") is True and not entry.get("merge_commit"):
+            raise HandoffError(
+                f"merged PR #{entry.get('pr_number')} must record its merge "
+                "commit")
+        if entry.get("merged") is False and entry.get("merge_commit"):
+            raise HandoffError(
+                f"unmerged PR #{entry.get('pr_number')} must not record a "
+                "merge commit")
+
+    return {
+        # LIVE topology re-anchored onto THIS Draft PR; PR #78 is now history.
+        "stage128_m3i2_live_pr_number": live_number,
+        "stage128_m3i2_live_pr_base_branch":
+            topology.get("live_pr_base_branch"),
+        "stage128_m3i2_live_pr_base_commit": base_commit,
+        "stage128_m3i2_live_main_commit": base_commit,
+        "stage128_m3i2_live_pr_is_draft": True,
+        "stage128_m3i2_live_pr_merged": False,
+        "stage128_m3i2_live_pr_role": topology.get("live_pr_role"),
+        "stage128_m3i2_live_pr_head_commit_source":
+            _STAGE128_M3I2_LIVE_PR_HEAD_SEMANTICS,
+        "stage128_m3i2_live_pr_ready_for_review_authorized": False,
+        # PR #78 is the MERGED predecessor now, with its merge commit pinned.
+        "stage128_m3_lag_wdi_contract_lock_pr_number": predecessor_number,
+        "stage128_m3_lag_wdi_contract_lock_pr_merged": True,
+        "stage128_m3_lag_wdi_contract_lock_pr_merge_commit": merge_commit,
+        "stage128_m3_lag_wdi_contract_lock_pr_role":
+            _STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_ROLE,
+        "stage128_m3_lag_wdi_contract_lock_pr_action_id":
+            _STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_ACTION_ID,
+        "stage128_m3_lag_wdi_contract_lock_pr_semantics": (
+            f"merged_predecessor_superseded_by_pr{live_number}"),
+        "stage128_m3_lag_wdi_retrieval_pr_number": live_number,
+        # The pinned historical roles are unchanged by this re-anchoring.
+        "stage128_m3i2_recovery_pr_number":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR,
+        "stage128_m3i2_recovery_pr_merged": True,
+        "stage128_m3i2_recovery_pr_merge_commit":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_MERGE_COMMIT,
+        "stage128_m3i2_recovery_pr_role":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ROLE,
+        "stage128_m3i2_recovery_pr_action_id":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_ACTION_ID,
+        "stage128_m3i2_recovery_pr_semantics":
+            _STAGE128_M3I2_DOCUMENTARY_RECOVERY_PR_SEMANTICS,
+        "stage128_m3i2_human_submission_pr_number":
+            _STAGE128_M3I2_HUMAN_SUBMISSION_PR,
+        "stage128_m3i2_human_submission_pr_merged": True,
+        "stage128_m3i2_human_submission_pr_merge_commit":
+            _STAGE128_M3I2_HUMAN_SUBMISSION_MERGE_COMMIT,
+        "stage128_m3i2_human_submission_pr_role":
+            _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ROLE,
+        "stage128_m3i2_human_submission_pr_action_id":
+            _STAGE128_M3I2_HUMAN_SUBMISSION_PR_ACTION_ID,
+        # #77 was superseded by #78, NOT by whatever Draft is live now.
+        "stage128_m3i2_human_submission_pr_semantics": (
+            "merged_predecessor_superseded_by_pr"
+            f"{_STAGE128_M3_LAG_RETRIEVAL_MERGED_PREDECESSOR_PR}"),
+        "stage128_m3i2_pr_roles_are_historical_facts_not_positional": True,
+        "stage128_m3i2_pr_role_sequence": [
+            {
+                "pr_number": entry[0],
+                "role": entry[1],
+                "merged": entry[2],
+                "merge_commit": entry[3],
+            }
+            for entry in expected_sequence
+        ],
+        "stage128_m3i2_merge_authorized": False,
+        # Topology metadata never moves the scientific state.
+        "m3i2_data_gate_executed": False,
+        "m3i2_block_admitted": False,
+        "m3i2_modeling_started": False,
+        "m4_authorized": False,
+        "final_test_locked": True,
     }
 
 
