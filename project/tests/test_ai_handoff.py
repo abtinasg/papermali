@@ -3432,29 +3432,50 @@ def test_pr74_is_only_historical_and_never_live():
     assert "PR #74 is the **historical contract-lock PR**" in text
 
 
-def test_live_pr_topology_is_pr76_on_main():
-    # PR #75 was merged and is now the predecessor; the LIVE Draft PR is the
-    # final official documentary recovery PR, on `main` @ the PR #75 merge
-    # commit. Draft and unmerged in both states; a merged PR is never live.
+def test_live_pr_topology_is_pr77_on_main():
+    # PR #76 was merged into `main` and is now the predecessor; the LIVE Draft
+    # PR is the human-submission recording PR, on `main` @ the PR #76 merge
+    # commit. A MERGED PR is never the live Draft.
     state = _handoff_state()
-    assert state["stage128_m3i2_live_pr_number"] == 76
+    assert state["stage128_m3i2_live_pr_number"] == 77
     assert state["stage128_m3i2_live_pr_base_branch"] == "main"
     assert state["stage128_m3i2_live_pr_base_commit"] == (
-        "b3627809dbfde8429d0308bec5d1c8541a161188")
+        "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
+    assert state["stage128_m3i2_live_main_commit"] == (
+        "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
     assert state["stage128_m3i2_live_pr_is_draft"] is True
     assert state["stage128_m3i2_live_pr_merged"] is False
+    assert state["stage128_m3i2_live_pr_ready_for_review_authorized"] is False
     assert state["stage128_m3i2_live_pr_role"] == (
-        "final_official_documentary_recovery_initiation_pr")
+        "final_official_inquiry_human_submission_recording_pr")
+    # The recovery PR is HISTORY, and says so.
+    assert state["stage128_m3i2_recovery_pr_number"] == 76
+    assert state["stage128_m3i2_recovery_pr_merged"] is True
+    assert state["stage128_m3i2_recovery_pr_merge_commit"] == (
+        "89d8e6ff2d12ec82903cd28aa7ab839eb946b658")
+    assert state["stage128_m3i2_recovery_pr_semantics"] == (
+        "merged_predecessor_superseded_by_pr77")
     assert state["stage128_m3i2_evidence_capture_pr_number"] == 75
     assert state["stage128_m3i2_evidence_capture_pr_merged"] is True
     assert state["stage128_m3i2_evidence_capture_pr_merge_commit"] == (
         "b3627809dbfde8429d0308bec5d1c8541a161188")
 
 
+def test_current_state_never_calls_a_merged_pr_the_live_draft():
+    text = _current_state_text()
+    assert "PR #76 **was merged**" in text
+    assert "the LIVE Draft PR is **PR #77**" in text
+    # the merged predecessors must never be rendered as the live Draft
+    assert "**PR #76** (the LIVE Draft PR)" not in text
+    assert "**PR #75** (the LIVE Draft PR)" not in text
+
+
 def test_live_pr_head_is_derived_from_the_repository_head_not_pinned():
     state = _handoff_state()
+    # An engineering anchor, labelled as such: it is the repository head at
+    # generation time, NOT the instantaneous GitHub PR head.
     assert state["stage128_m3i2_live_pr_head_commit_source"] == (
-        "observed_repository_head_commit_at_generation")
+        "repository_head_at_generation_not_github_pr_head")
     # HEAD-relative, therefore excluded from the semantic projection
     assert "stage128_m3i2_live_pr_head_commit" in gen.VOLATILE_FIELDS
     assert "stage128_m3i2_live_pr_head_commit" not in gen.projection(state)
@@ -3730,15 +3751,16 @@ def test_current_state_marks_the_contract_lock_section_as_historical():
         "### Stage128 — M3I-2 prospective contract lock", 1)[1].split(
         "### Stage128 — M3I-2 official-source evidence capture", 1)[0]
     assert "- **Live PR topology:**" not in contract_section
-    assert "- **Live PR topology:** PR #76" in text
+    assert "- **LIVE PR topology:** the LIVE Draft PR is **PR #77**" in text
 
 
 def test_current_state_does_not_present_pr74_as_the_live_draft():
     text = _current_state_text()
     assert "PR #74 is the **historical contract-lock PR**" in text
-    assert ("carried by **PR #76** (the LIVE Draft PR)") in text
-    # the merged evidence-capture PR must never be presented as the live one
+    assert "the LIVE Draft PR is **PR #77**" in text
+    # no merged PR may ever be presented as the live one
     assert "carried by **PR #75** (the LIVE evidence-capture PR)" not in text
+    assert "carried by **PR #76** (the LIVE Draft PR)" not in text
     for line in text.splitlines():
         if "PR #74" in line:
             assert "historical" in line.lower(), line
@@ -3974,11 +3996,15 @@ def test_roadmap_marks_the_evidence_capture_paragraph_as_historical():
         "`stage128-m3i2-official-source-evidence-capture`" not in text
 
 
-def test_handoff_agrees_the_capture_pr_is_merged_and_the_recovery_is_live():
+def test_handoff_agrees_the_capture_and_recovery_prs_are_merged():
+    # Both predecessors are merged; the live Draft is the submission recording
+    # PR. Merged and live are mutually exclusive, in every state field.
     state = _handoff_state()
     assert state["stage128_m3i2_evidence_capture_pr_number"] == 75
     assert state["stage128_m3i2_evidence_capture_pr_merged"] is True
-    assert state["stage128_m3i2_live_pr_number"] == 76
+    assert state["stage128_m3i2_recovery_pr_number"] == 76
+    assert state["stage128_m3i2_recovery_pr_merged"] is True
+    assert state["stage128_m3i2_live_pr_number"] == 77
     assert state["stage128_m3i2_live_pr_is_draft"] is True
     assert state["stage128_m3i2_live_pr_merged"] is False
     assert state["stage128_m3i2_merge_authorized"] is False

@@ -4451,8 +4451,9 @@ def render_current_state(record: dict) -> str:
              f"`{record.get('stage128_m3i2_evidence_capture_pr_merge_commit')}`"
              f" — semantics: "
              f"`{record.get('stage128_m3i2_evidence_capture_pr_semantics')}`. "
-             "The live Draft PR is identified in the final official "
-             "documentary recovery section below."
+             "The LIVE Draft PR is **PR #"
+             f"{record.get('stage128_m3i2_live_pr_number')}**, identified in "
+             "full below."
              if record.get(
                  "stage128_m3i2_final_documentary_recovery_initiated")
              else
@@ -4560,28 +4561,54 @@ def render_current_state(record: dict) -> str:
             "",
         ]
     if record.get("stage128_m3i2_final_documentary_recovery_initiated"):
+        submission_recorded = bool(
+            record.get("stage128_m3i2_inquiry_human_submission_recorded"))
         lines += [
             "### Stage128 — M3I-2 final official documentary recovery "
             "(INITIATION ONLY)\n",
-            "_The LIVE action. A bounded search of OFFICIAL World Bank Group "
-            "sources for the two remaining M3I-2 blockers, plus preparation "
-            "of exactly ONE official Data Help Desk inquiry. Acquiring "
-            "DOCUMENTS is not admitting DATA: it answers nothing about "
-            "coverage, the Data Gate or modeling._\n",
-            "- ✅ **Initiated:** True — action "
-            f"`{record.get('last_completed_research_action_id')}`, carried by "
-            f"**PR #{record.get('stage128_m3i2_live_pr_number')}** (the LIVE "
-            "Draft PR) on base "
-            f"`{record.get('stage128_m3i2_live_pr_base_branch')}` @ "
-            f"`{record.get('stage128_m3i2_live_pr_base_commit')}`",
-            "- **Live PR topology:** PR #"
-            f"{record.get('stage128_m3i2_live_pr_number')} → base "
-            f"`{record.get('stage128_m3i2_live_pr_base_branch')}` @ "
-            f"`{record.get('stage128_m3i2_live_pr_base_commit')}` — draft = "
-            f"{record.get('stage128_m3i2_live_pr_is_draft')}, merged = "
-            f"{record.get('stage128_m3i2_live_pr_merged')}, head derived from "
-            f"`{record.get('stage128_m3i2_live_pr_head_commit_source')}` "
-            "(never pinned)",
+            ("_A COMPLETED predecessor action, superseded by the human "
+             "submission recorded below. A bounded search of OFFICIAL World "
+             "Bank Group sources for the two remaining M3I-2 blockers, plus "
+             "preparation of exactly ONE official Data Help Desk inquiry. "
+             "Acquiring DOCUMENTS is not admitting DATA: it answers nothing "
+             "about coverage, the Data Gate or modeling._\n"
+             if submission_recorded else
+             "_The LIVE action. A bounded search of OFFICIAL World Bank Group "
+             "sources for the two remaining M3I-2 blockers, plus preparation "
+             "of exactly ONE official Data Help Desk inquiry. Acquiring "
+             "DOCUMENTS is not admitting DATA: it answers nothing about "
+             "coverage, the Data Gate or modeling._\n"),
+            # Once the human submission is recorded, the PR that carried this
+            # initiation has itself been MERGED. It is history from that point
+            # on and must never be rendered as the live Draft.
+            ("- ✅ **Initiated:** True — action "
+             "`stage128-m3i2-final-official-documentary-recovery-initiation`, "
+             "carried by **PR #"
+             f"{record.get('stage128_m3i2_recovery_pr_number')}**, which "
+             "**was merged** by merge commit "
+             f"`{record.get('stage128_m3i2_recovery_pr_merge_commit')}` — it "
+             "is the MERGED predecessor, no longer the live Draft PR"
+             if submission_recorded else
+             "- ✅ **Initiated:** True — action "
+             f"`{record.get('last_completed_research_action_id')}`, carried by "
+             f"**PR #{record.get('stage128_m3i2_live_pr_number')}** (the LIVE "
+             "Draft PR) on base "
+             f"`{record.get('stage128_m3i2_live_pr_base_branch')}` @ "
+             f"`{record.get('stage128_m3i2_live_pr_base_commit')}`"),
+            ("- **PR topology at recovery time (HISTORICAL, not live):** PR #"
+             f"{record.get('stage128_m3i2_recovery_pr_number')} **was merged** "
+             f"— semantics: "
+             f"`{record.get('stage128_m3i2_recovery_pr_semantics')}`. The LIVE "
+             "Draft PR is identified in the human-submission section below."
+             if submission_recorded else
+             "- **Live PR topology:** PR #"
+             f"{record.get('stage128_m3i2_live_pr_number')} → base "
+             f"`{record.get('stage128_m3i2_live_pr_base_branch')}` @ "
+             f"`{record.get('stage128_m3i2_live_pr_base_commit')}` — draft = "
+             f"{record.get('stage128_m3i2_live_pr_is_draft')}, merged = "
+             f"{record.get('stage128_m3i2_live_pr_merged')}, head derived from "
+             f"`{record.get('stage128_m3i2_live_pr_head_commit_source')}` "
+             "(never pinned)"),
             "- **Merged predecessor:** PR #"
             f"{record.get('stage128_m3i2_evidence_capture_pr_number')} "
             "(official-source evidence capture) — merged = "
@@ -4658,6 +4685,25 @@ def render_current_state(record: dict) -> str:
             f"{record.get('stage128_m3i2_inquiry_follow_up_authorized_now')} — "
             "response adjudication authorized = "
             f"{record.get('stage128_m3i2_response_adjudication_authorized')}",
+            "- **LIVE PR topology:** the LIVE Draft PR is **PR #"
+            f"{record.get('stage128_m3i2_live_pr_number')}** "
+            f"(`{record.get('stage128_m3i2_live_pr_role')}`) → base "
+            f"`{record.get('stage128_m3i2_live_pr_base_branch')}` @ "
+            f"`{record.get('stage128_m3i2_live_pr_base_commit')}` — draft = "
+            f"{record.get('stage128_m3i2_live_pr_is_draft')}, merged = "
+            f"{record.get('stage128_m3i2_live_pr_merged')}, ready-for-review "
+            "authorized = "
+            f"{record.get('stage128_m3i2_live_pr_ready_for_review_authorized')}"
+            ", merge authorized = "
+            f"{record.get('stage128_m3i2_merge_authorized')}. The head shown "
+            "for it is a GENERATION ANCHOR "
+            f"(`{record.get('stage128_m3i2_live_pr_head_commit_source')}`), "
+            "never pinned and **not** the instantaneous GitHub PR head. "
+            "PR #"
+            f"{record.get('stage128_m3i2_recovery_pr_number')} is HISTORICAL: "
+            "merged = "
+            f"{record.get('stage128_m3i2_recovery_pr_merged')} by merge "
+            f"commit `{record.get('stage128_m3i2_recovery_pr_merge_commit')}`",
             "- ⛔ **M3-LAG-WDI-EXPLORATORY:** authoritative contract status "
             f"`{record.get('stage128_m3_lag_wdi_authoritative_contract_status')}`"
             " — a local, uncommitted partial draft was detected "
@@ -6670,6 +6716,15 @@ _STAGE128_M3I2_INQUIRY_SUBMISSION_BOUNDARY_REL = (
 _STAGE128_M3I2_INQUIRY_SUBMISSION_AUTHORIZATION_REL = (
     f"{_STAGE128_M3I2_INQUIRY_SUBMISSION_PKG}/"
     "stage128_m3i2_final_official_inquiry_human_authorization_record.json")
+_STAGE128_M3I2_INQUIRY_SUBMISSION_TOPOLOGY_REL = (
+    f"{_STAGE128_M3I2_INQUIRY_SUBMISSION_PKG}/"
+    "stage128_m3i2_final_official_inquiry_submission_pr_topology.json")
+#: The head published for the live PR is the repository head observed at
+#: GENERATION time. It is an engineering anchor for the snapshot, NOT the
+#: instantaneous GitHub PR head, and pinning it would make the record
+#: self-referential the instant it is committed.
+_STAGE128_M3I2_LIVE_PR_HEAD_SEMANTICS = (
+    "repository_head_at_generation_not_github_pr_head")
 _STAGE128_M3I2_INQUIRY_RESPONSE_INGESTION_ACTION_ID = (
     "stage128-m3i2-final-official-inquiry-response-ingestion")
 _STAGE128_M3I2_INQUIRY_FOLLOW_UP_ACTION_ID = (
@@ -6702,9 +6757,18 @@ def derive_stage128_m3i2_inquiry_human_submission_markers(root: str) -> dict:
             root, _STAGE128_M3I2_INQUIRY_SUBMISSION_AUTHORIZATION_REL),
             encoding="utf-8") as fh:
         authorization = json.load(fh)
+    topology_path = os.path.join(
+        root, _STAGE128_M3I2_INQUIRY_SUBMISSION_TOPOLOGY_REL)
+    if not os.path.isfile(topology_path):
+        raise HandoffError(
+            "the M3I-2 inquiry submission package is missing "
+            f"{_STAGE128_M3I2_INQUIRY_SUBMISSION_TOPOLOGY_REL}")
+    with open(topology_path, encoding="utf-8") as fh:
+        topology = json.load(fh)
 
     for record, label in ((decision, "decision"), (boundary, "boundary"),
-                          (authorization, "authorization")):
+                          (authorization, "authorization"),
+                          (topology, "topology")):
         if record.get("action_id") != (
                 _STAGE128_M3I2_INQUIRY_SUBMISSION_ACTION_ID):
             raise HandoffError(
@@ -6832,8 +6896,82 @@ def derive_stage128_m3i2_inquiry_human_submission_markers(root: str) -> dict:
         raise HandoffError(
             "the human submission is the last completed research action")
 
+    # --- LIVE PR topology. A MERGED PR is never the live Draft. ---------- #
+    # The recovery initiation published itself as the live Draft PR; it has
+    # since been merged, so this recording re-anchors the live topology onto
+    # its OWN PR and demotes the recovery PR to a merged predecessor. Every
+    # value is read from the topology record and validated here, so a stale
+    # or self-contradictory topology fails closed rather than being rendered.
+    live_number = topology.get("live_pr_number")
+    predecessor_number = topology.get("predecessor_pr_number")
+    for value, label in ((live_number, "live"),
+                         (predecessor_number, "predecessor")):
+        if not isinstance(value, int) or isinstance(value, bool):
+            raise HandoffError(
+                f"the M3I-2 {label} PR number must be an integer")
+    if live_number <= predecessor_number:
+        raise HandoffError(
+            f"the live M3I-2 PR #{live_number} must succeed the merged "
+            f"predecessor PR #{predecessor_number}")
+    base_commit = topology.get("live_pr_base_commit")
+    merge_commit = topology.get("predecessor_pr_merge_commit")
+    for value, label in ((base_commit, "live PR base"),
+                         (merge_commit, "predecessor merge")):
+        if not (isinstance(value, str) and len(value) == 40):
+            raise HandoffError(
+                f"the M3I-2 {label} commit must be a full 40-hex SHA")
+    # The live PR targets `main`, and `main` IS the predecessor's merge
+    # commit: that identity is what makes the predecessor merged and gone.
+    if base_commit != merge_commit:
+        raise HandoffError(
+            "the live M3I-2 PR must be based on the merge commit of its "
+            "merged predecessor")
+    if topology.get("live_pr_base_branch") != _STAGE128_M3I2_LIVE_BASE_BRANCH:
+        raise HandoffError(
+            "the live M3I-2 PR must target "
+            f"{_STAGE128_M3I2_LIVE_BASE_BRANCH}")
+    for field, expected in (
+        ("predecessor_pr_merged", True),
+        ("live_pr_is_draft", True),
+        ("live_pr_merged", False),
+        ("merge_authorized", False),
+        ("auto_merge", False),
+        ("ready_for_review_authorized", False),
+        ("pr_is_stacked_on_open_predecessor", False),
+        ("live_pr_head_commit_pinned", False),
+        ("live_pr_head_is_github_pr_head", False),
+    ):
+        if topology.get(field) is not expected:
+            raise HandoffError(
+                f"M3I-2 inquiry submission topology {field} must be "
+                f"{expected}")
+    if topology.get("live_pr_head_semantics") != (
+            _STAGE128_M3I2_LIVE_PR_HEAD_SEMANTICS):
+        raise HandoffError(
+            "the live M3I-2 PR head semantics must be "
+            f"{_STAGE128_M3I2_LIVE_PR_HEAD_SEMANTICS}")
+
     return {
         "stage128_m3i2_inquiry_human_submission_recorded": True,
+        # The live topology, re-anchored onto THIS Draft PR.
+        "stage128_m3i2_live_pr_number": live_number,
+        "stage128_m3i2_live_pr_base_branch":
+            topology.get("live_pr_base_branch"),
+        "stage128_m3i2_live_pr_base_commit": base_commit,
+        "stage128_m3i2_live_main_commit": base_commit,
+        "stage128_m3i2_live_pr_is_draft": True,
+        "stage128_m3i2_live_pr_merged": False,
+        "stage128_m3i2_live_pr_role": topology.get("live_pr_role"),
+        "stage128_m3i2_live_pr_head_commit_source":
+            _STAGE128_M3I2_LIVE_PR_HEAD_SEMANTICS,
+        "stage128_m3i2_live_pr_ready_for_review_authorized": False,
+        # ... which demotes the recovery initiation PR to HISTORY.
+        "stage128_m3i2_recovery_pr_number": predecessor_number,
+        "stage128_m3i2_recovery_pr_merged": True,
+        "stage128_m3i2_recovery_pr_merge_commit": merge_commit,
+        "stage128_m3i2_recovery_pr_semantics": (
+            "merged_predecessor_superseded_by_pr" f"{live_number}"),
+        "stage128_m3i2_merge_authorized": False,
         "stage128_m3i2_inquiry_human_submission_result_code":
             decision.get("result_code"),
         "stage128_m3i2_inquiry_authorization_sha256":
