@@ -11,15 +11,15 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3i2-final-official-inquiry-response-ingestion`
-- **Last stage commit:** `7f91f64706db694240301ae746b6a911259420dd`
-- **Generated from commit:** `7f91f64706db694240301ae746b6a911259420dd` (branch `stage128-m3-lag-wdi-exploratory-contract-lock`, informational)
-- **Baseline:** `origin/main` @ `93de6bae9344ce893b0261f818abce8a991cf842`
+- **Last stage commit:** `1fdb671579d0792d827d58305d3e6bbaf26a09bd`
+- **Generated from commit:** `1fdb671579d0792d827d58305d3e6bbaf26a09bd` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
+- **Baseline:** `origin/main` @ `175e7949e009eeecdd66aedab31ec4b48e9d3c7d`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **149 assertions, 0 failed**, all_pass=True
+- ✅ **155 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -184,7 +184,7 @@ _A COMPLETED predecessor action, superseded by the human submission recorded bel
 - **Stopping rule:** waiting period 10 business days — status `ACTIVE` through `2026-08-20` — earliest possible follow-up `2026-08-21` — follow-ups attempted 0 — follow-up authorized now = False — response adjudication authorized = False
 - **LIVE PR topology:** the LIVE Draft PR is **PR #78** (`m3_lag_wdi_exploratory_contract_lock_pr`) → base `main` @ `93de6bae9344ce893b0261f818abce8a991cf842` — draft = True, merged = False, ready-for-review authorized = False, merge authorized = False. The head shown for it is a GENERATION ANCHOR (`repository_head_at_generation_not_github_pr_head`), never pinned and **not** the instantaneous GitHub PR head
 - **HISTORICAL PR roles (pinned, never re-derived):** PR #76 = `final_official_documentary_recovery_initiation_pr` (action `stage128-m3i2-final-official-documentary-recovery-initiation`) — merged = True by merge commit `89d8e6ff2d12ec82903cd28aa7ab839eb946b658` — semantics `merged_predecessor_superseded_by_pr77`. PR #77 = `final_official_inquiry_human_submission_recording_pr` (action `stage128-m3i2-final-official-inquiry-human-submission`) — merged = True by merge commit `93de6bae9344ce893b0261f818abce8a991cf842` — semantics `merged_predecessor_superseded_by_pr78`. PR #78 = `m3_lag_wdi_exploratory_contract_lock_pr`, the current LIVE Draft. Roles are historical facts, not positions (True)
-- ⛔ **M3-LAG-WDI-EXPLORATORY:** authoritative contract status `AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL` — the earlier local, uncommitted partial draft was detected (True) and quarantined outside the repository (True); it is not authoritative (False), its authorization is not reusable (False), retrieval started = False
+- ⛔ **M3-LAG-WDI-EXPLORATORY:** authoritative contract status `AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL` — the earlier local, uncommitted partial draft was detected (True) and quarantined outside the repository (True); it is not authoritative (False), its authorization is not reusable (False), retrieval started = True
 - ⛔ **Nothing scientific moved:** M3I-2 evidence status `UNRESOLVED_OFFICIAL_SOURCE_EVIDENCE` — admitted False — Data Gate executed False — modeling started False — Final Test locked True — M4 authorized False — merge authorized False
 - Package: `project/stage128/m3i2_final_official_documentary_recovery/`; interpretation: `project/stage128/m3i2_final_official_documentary_recovery/README_STAGE128_M3I2_FINAL_OFFICIAL_DOCUMENTARY_RECOVERY.md`
 
@@ -206,9 +206,9 @@ _Two tracks now run in PARALLEL. **Track A** is the World Bank official inquiry,
 - **Exactly two lagged WDI features** (2): `FP.CPI.TOTL.ZG` (identity) and `PA.NUS.FCRF` (`100 * ln(E_(t-1) / E_(t-2))`), country `IRN`, observation year `t - 1` — M2 comparator 12 features, M3-LAG-WDI 14 features on the retained-M2 539-row development sample
 - ⛔ **No point-in-time claim:** point-in-time availability claimed = False — the future retrieval uses the CURRENT/LATEST revised WDI (True), and the one-year lag does not turn revised WDI into point-in-time data
 - ⛔ **Separate family:** exploratory comparison family `M3_LAG_WDI_EXPLORATORY_SUPPLEMENTARY` — in the confirmatory Holm family = False
-- ⛔ **Nothing executed:** retrieval started False — Data Gate `NOT_EXECUTED` (executed False) — modeling started False (authorized False) — Final Test rows read 0
-- **Track B next action — RETRIEVAL ONLY:** `stage128-m3-lag-wdi-exploratory-data-retrieval` — scope `retrieval_only`, authorized = False, executes the Data Gate = False. A pointer is never an authorization
-- ⛔ **Separated future actions (each needs its OWN new explicit human authorization):** (B) `stage128-m3-lag-wdi-exploratory-data-retrieval` — authorized False, executes Gate False; (C) `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — authorized False, executes Gate False; (D) `stage128-m3-lag-wdi-exploratory-data-gate` — authorized False; (E) `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — authorized False
+- ⛔ **Nothing executed:** retrieval started True — Data Gate `NOT_EXECUTED` (executed False) — modeling started False (authorized False) — Final Test rows read 0
+- **Track B next action — RETRIEVAL ONLY:** `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — scope `post_retrieval_audit_only`, authorized = False, executes the Data Gate = False. A pointer is never an authorization
+- ⛔ **Separated future actions (each needs its OWN new explicit human authorization):** (B) `stage128-m3-lag-wdi-exploratory-data-retrieval` — authorized True, executes Gate False; (C) `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — authorized False, executes Gate False; (D) `stage128-m3-lag-wdi-exploratory-data-gate` — authorized False; (E) `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — authorized False
 - ⛔ **Authorization boundaries:** a retrieval authorization implies a Gate authorization = False — a combined retrieval-and-Gate action is permitted = False — a Gate PASS is data admission only = True and authorizes modeling = False
 - **Prior restriction:** `SUPERSEDED_BY_NEW_EXPLICIT_HUMAN_AUTHORIZATION` — the old "only after `UNRESOLVED_AFTER_FINAL_OFFICIAL_INQUIRY`" rule is retained as HISTORY, not deleted
 - ⛔ **Track A untouched:** the inquiry was NOT terminated by this action (False) — follow-up authorized now False, response adjudication authorized False
@@ -263,5 +263,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `00d1d0424271bafb6ebf0f1338024c3358f0dc2324d7110f867f089a84b6992e`_
-_generated_at_utc: 2026-08-08T11:54:03Z (informational)_
+_state_fingerprint: `47a940f09d72d89c03dd5494b2b80e21372de0487b8f92458b70adc6c3cd75da`_
+_generated_at_utc: 2026-08-08T20:12:49Z (informational)_
