@@ -1,0 +1,32 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-incremental-evaluation",
+  "authorization_covers_calendar_mapping_change": false,
+  "authorization_covers_confirmatory_holm": false,
+  "authorization_covers_feature_search": false,
+  "authorization_covers_final_test": false,
+  "authorization_covers_final_test_unlock": false,
+  "authorization_covers_m4": false,
+  "authorization_covers_merge": false,
+  "authorization_covers_new_retrieval": false,
+  "authorization_covers_new_scientific_design_choice": false,
+  "authorization_covers_paper_winner_selection": false,
+  "authorization_covers_ready_for_review": false,
+  "authorization_covers_retuning": false,
+  "authorization_covers_step_c_rerun": false,
+  "authorization_covers_step_d_rerun": false,
+  "authorization_is_development_only": true,
+  "authorization_is_single_use": true,
+  "authorization_sha256": "540a6dbd9363face320d0b39017304ce06a11fd528746431dce942e338167941",
+  "authorization_text": "HUMAN SCIENTIFIC DECISION — AUTHORIZE STEP E ONLY\n\nI explicitly authorize ONE new single-use action only:\n\nstage128-m3-lag-wdi-exploratory-incremental-evaluation",
+  "authorization_utf8_bytes": 163,
+  "authorized_scope": "exploratory_incremental_evaluation_only",
+  "prior_authorizations_not_reused": [
+    "stage128-m3-lag-wdi-exploratory-contract-lock",
+    "stage128-m3-lag-wdi-exploratory-data-retrieval",
+    "stage128-m3-lag-wdi-exploratory-post-retrieval-audit",
+    "stage128-m3-lag-wdi-exploratory-data-gate",
+    "stage128-m3-lag-wdi-exploratory-calendar-mapping-lock"
+  ],
+  "prior_authorizations_reused": false,
+  "standing_authorization": false
+}

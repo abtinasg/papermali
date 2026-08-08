@@ -1,0 +1,53 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-incremental-evaluation",
+  "artifact_count": 17,
+  "artifacts": {
+    "README_STAGE128_M3_LAG_WDI_EXPLORATORY_INCREMENTAL_EVALUATION.md": "fcbec285524e253f3c6b66383d60526222f23ff6f71812b3bf0c73dbf0a9d89e",
+    "stage128_m3_lag_wdi_evaluation_block_model_metrics.csv": "6293faf7870f084f1ab591dff249f181ce92fb0a3acb90097ad15f481640e425",
+    "stage128_m3_lag_wdi_evaluation_calibration_report.json": "87075e6b70f1d66268a1ead51e162421dc679375fe2c72a9d474ece91de8fe7b",
+    "stage128_m3_lag_wdi_evaluation_common_sample_audit.json": "c77f77cc38221d9e34e509ddea60d773eb8f0de7c6c06027b2f92ebf6c30f5da",
+    "stage128_m3_lag_wdi_evaluation_decision.json": "9d82c1e0217808699cb2d7521e8855bb44bb06f74da5d4b0280f55057069a705",
+    "stage128_m3_lag_wdi_evaluation_execution_audit.json": "1aff3fa7dcf042b4cf378a9ba6c0dcb55b2c50e42c76ffe2772074395ac07fa0",
+    "stage128_m3_lag_wdi_evaluation_execution_contract.json": "832a072c7425b4a73cb4e35a5f531eff46d7b35bbe3ee10533c9d9cf54f701bf",
+    "stage128_m3_lag_wdi_evaluation_feature_configuration_manifest.json": "250c9b2e93a98327e691aeb18240db5550cc90365eb5eb32483d85c4c7eeac86",
+    "stage128_m3_lag_wdi_evaluation_feature_values.csv": "4d621f5124ff8209d1d067df66309011e9b34403494c37abacd8c3af423e3cd9",
+    "stage128_m3_lag_wdi_evaluation_final_test_firewall_audit.json": "08b7e743fc751fcbb6a9b41b0907d1bbb4b8b7dad5bd241fefbce5fb824fee44",
+    "stage128_m3_lag_wdi_evaluation_governance_boundary.json": "0ee13b5991a5b5a5bbc420886ff12f8b06dd12365310e5ca03a6097985c7da9a",
+    "stage128_m3_lag_wdi_evaluation_human_authorization_record.json": "8bee4dae8ac53cc6cbadf89b61462b67d70732fd494d6404a1c1e70214cd7454",
+    "stage128_m3_lag_wdi_evaluation_multiplicity_family_status.json": "e8e43f3ae28d04943c217fd2abfc3cc3f3fb4ec6374b3886d4b0ef4138382a89",
+    "stage128_m3_lag_wdi_evaluation_paired_bootstrap_delta_summary.json": "ba74bbdc49d8939e74818fdaebf621a6f800bad60cec96c0caf0e95af308a490",
+    "stage128_m3_lag_wdi_evaluation_paired_oof_predictions.csv": "ba6fc5e8d93b10a9d3e1208a3ce08841848156126520efdd806c3f77a44cbb57",
+    "stage128_m3_lag_wdi_evaluation_predictive_fit_count_audit.json": "54b27d0982c0519e935ebaab0acf11628730ba187aa3d92358fb051123f9bb94",
+    "stage128_m3_lag_wdi_evaluation_qc_report.json": "e0cc7d0c009c7b813c8014dde73c1505f37f962036c800eaa7691086fac00b33"
+  },
+  "authorized_scope": "exploratory_incremental_evaluation_only",
+  "execution_count_semantics": {
+    "canonical_authorized_scientific_executions": 1,
+    "canonical_primary_predictive_fits_in_that_execution": 44,
+    "deterministic_verification_recomputation_is_not_a_new_execution": true,
+    "note": "44 is the CANONICAL SCIENTIFIC fit count of the single authorized execution of this action. `--check` and the test suite deterministically RECOMPUTE the same models to verify the committed artifacts; those recomputations are verification, not new scientific executions, they consume no new human authorization and they never change the canonical counts. This action makes NO new scientific design decision at all: every rule it applies was frozen before it ran.",
+    "scientific_decisions": 0,
+    "verification_recomputation_changes_canonical_counts": false
+  },
+  "execution_environment": {
+    "new_human_authorization": false,
+    "new_scientific_decision": true,
+    "platform": "macOS-26.6.1-arm64-arm-64bit-Mach-O",
+    "python_version": "3.14.0",
+    "role": "original_authorized_scientific_execution",
+    "runtime_versions": {
+      "jdatetime": "6.0.1",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "python": "3.14.0",
+      "scikit-learn": "1.9.0",
+      "xgboost": "3.3.0"
+    },
+    "scientific_execution": true
+  },
+  "package_id": "stage128_m3_lag_wdi_exploratory_incremental_evaluation",
+  "runner": "project/run_stage128_m3_lag_wdi_exploratory_incremental_evaluation.py",
+  "runner_sha256": "83efe26ded72dded651e6268c38f2e6d2c45c51fcc1f888d105711f2da580844",
+  "source_module": "project/src/stage128_m3_lag_wdi_exploratory_incremental_evaluation.py",
+  "source_module_sha256": "0fd12d45a0b2dd0535546f4680ef33ff59c1a19d1fefaa031cc6bff9101c525f"
+}

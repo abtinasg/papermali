@@ -492,7 +492,11 @@ def test_pr_77_is_merged_history_and_the_new_pr_is_the_live_draft():
 def test_the_handoff_publishes_the_new_pr_as_live_and_pr_77_as_history(
         handoff):
     topo = _read_json(_TOPOLOGY_REL)
-    assert handoff["stage128_m3i2_live_pr_number"] == topo["live_pr_number"]
+    # The contract-lock topology is contract-lock-TIME history: it names the
+    # PR that was live then. The live PR *now* is a strict successor of it,
+    # because that PR has since merged. Anchoring on ">" rather than "==" is
+    # the point: the handoff must never simply echo a superseded artifact.
+    assert handoff["stage128_m3i2_live_pr_number"] > topo["live_pr_number"]
     assert handoff["stage128_m3i2_live_pr_is_draft"] is True
     assert handoff["stage128_m3i2_live_pr_merged"] is False
     # PR #77 is history under its OWN role — the human inquiry submission
@@ -528,10 +532,22 @@ def test_the_handoff_publishes_the_locked_contract(handoff):
 
 
 def test_the_handoff_records_zero_execution(handoff):
-    assert handoff["stage128_m3_lag_wdi_data_retrieval_started"] is False
-    assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
-    assert handoff["stage128_m3_lag_wdi_data_gate_result"] == "NOT_EXECUTED"
-    assert handoff["stage128_m3_lag_wdi_modeling_started"] is False
+    # Retrieval (step B) and the Data Gate (step D) are SEPARATE, later,
+    # separately authorized actions, so whether they have run is owned by
+    # their own test modules, not by the lock's. Asserting here that the Gate
+    # never ran would encode the pre-Gate MOMENT rather than the rule, and it
+    # would fail the instant a legitimate step D executed. What the LOCK must
+    # never have caused — modeling, an authorized pointer, a Final Test read —
+    # is asserted here and stays asserted for the whole life of the branch.
+    # A RULE, not a snapshot: step E is the separately authorized action that
+    # legitimately makes modeling started, so pinning it False here would
+    # encode the pre-step-E MOMENT and fail the instant a legitimate step E
+    # ran. What holds at EVERY step is that modeling was not started BY THIS
+    # action, and that no STANDING modeling permission ever exists.
+    if handoff["stage128_m3_lag_wdi_modeling_started"] is True:
+        assert handoff["stage128_m3_lag_wdi_modeling_executed"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_modeling_authorization_consumed"] is True
     assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_final_test_rows_read"] == 0
@@ -868,7 +884,16 @@ _RECOVERY_PR = 76
 _RECOVERY_MERGE_COMMIT = "89d8e6ff2d12ec82903cd28aa7ab839eb946b658"
 _HUMAN_SUBMISSION_PR = 77
 _HUMAN_SUBMISSION_MERGE_COMMIT = "93de6bae9344ce893b0261f818abce8a991cf842"
-_LIVE_PR = 78
+#: HISTORICAL: PR #78 carried the contract lock and was the live Draft *at
+#: contract-lock time*. The contract-lock ARTIFACT still records it that way,
+#: and that record is a permanent historical fact about that action.
+_CONTRACT_LOCK_PR = 78
+#: PR #78 has since been MERGED into main by this commit.
+_CONTRACT_LOCK_MERGE_COMMIT = "175e7949e009eeecdd66aedab31ec4b48e9d3c7d"
+#: CURRENT: the live Draft *now* is the retrieval PR. A merged PR is never the
+#: live Draft, so the handoff must publish this number, not _CONTRACT_LOCK_PR.
+_LIVE_PR = 79
+_LIVE_PR_ROLE = "m3_lag_wdi_exploratory_data_retrieval_pr"
 
 
 def test_the_three_historical_pr_roles_are_recorded_separately():
@@ -887,7 +912,10 @@ def test_the_three_historical_pr_roles_are_recorded_separately():
         _HUMAN_SUBMISSION_MERGE_COMMIT)
     assert topo["human_submission_pr_action_id"] == (
         "stage128-m3i2-final-official-inquiry-human-submission")
-    assert topo["live_pr_number"] == _LIVE_PR
+    # The contract-lock ARTIFACT records contract-lock-TIME topology, where
+    # PR #78 was the live Draft. That stays true of the artifact forever; what
+    # is live NOW is asserted against the handoff, not against this file.
+    assert topo["live_pr_number"] == _CONTRACT_LOCK_PR
     assert topo["live_pr_is_draft"] is True
     assert topo["live_pr_merged"] is False
     # the two merged PRs are two different merges, not one relabelled twice
@@ -897,7 +925,7 @@ def test_the_three_historical_pr_roles_are_recorded_separately():
     assert topo["pr_roles_are_historical_facts_not_positional"] is True
     assert [(e["pr_number"], e["merged"]) for e in topo["pr_role_sequence"]] \
         == [(_RECOVERY_PR, True), (_HUMAN_SUBMISSION_PR, True),
-            (_LIVE_PR, False)]
+            (_CONTRACT_LOCK_PR, False)]
 
 
 def test_the_handoff_keeps_pr76_as_the_documentary_recovery(handoff):
@@ -923,23 +951,48 @@ def test_the_handoff_keeps_pr77_as_the_human_submission_recording(handoff):
         "final_official_inquiry_human_submission_recording_pr")
 
 
-def test_the_handoff_keeps_pr78_as_the_live_draft(handoff):
+def test_the_handoff_keeps_pr78_as_merged_history_not_the_live_draft(handoff):
+    """Replaces `test_the_handoff_keeps_pr78_as_the_live_draft`.
+
+    PR #78 has been MERGED into main by `175e7949…`. The old test asserted it
+    was still the live Draft, so it enforced a claim that is now false. What
+    must hold instead is the pair: #78 is merged history WITH its merge commit
+    pinned, and the live Draft is the strictly later retrieval PR #79.
+    """
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_number"] == (
+        _CONTRACT_LOCK_PR)
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_merged"] is True
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_merge_commit"] == (
+        _CONTRACT_LOCK_MERGE_COMMIT)
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_role"] == (
+        "m3_lag_wdi_exploratory_contract_lock_pr")
+    assert handoff["stage128_m3_lag_wdi_contract_lock_pr_semantics"] == (
+        f"merged_predecessor_superseded_by_pr{_LIVE_PR}")
+    # ... and it is emphatically NOT the live Draft any more.
+    assert handoff["stage128_m3i2_live_pr_number"] != _CONTRACT_LOCK_PR
+
+
+def test_the_handoff_publishes_pr79_as_the_current_live_draft(handoff):
     assert handoff["stage128_m3i2_live_pr_number"] == _LIVE_PR
     assert handoff["stage128_m3i2_live_pr_is_draft"] is True
     assert handoff["stage128_m3i2_live_pr_merged"] is False
-    assert handoff["stage128_m3i2_live_pr_role"] == (
-        "m3_lag_wdi_exploratory_contract_lock_pr")
+    assert handoff["stage128_m3i2_live_pr_role"] == _LIVE_PR_ROLE
+    assert handoff["stage128_m3i2_live_pr_base_commit"] == (
+        _CONTRACT_LOCK_MERGE_COMMIT)
     assert handoff["stage128_m3i2_live_pr_ready_for_review_authorized"] is (
         False)
     assert handoff["stage128_m3i2_merge_authorized"] is False
 
 
-def test_the_three_pr_roles_cannot_be_collapsed_or_shifted(handoff):
+def test_the_four_pr_roles_cannot_be_collapsed_or_shifted(handoff):
     numbers = (handoff["stage128_m3i2_recovery_pr_number"],
                handoff["stage128_m3i2_human_submission_pr_number"],
+               handoff["stage128_m3_lag_wdi_contract_lock_pr_number"],
                handoff["stage128_m3i2_live_pr_number"])
-    assert numbers == (_RECOVERY_PR, _HUMAN_SUBMISSION_PR, _LIVE_PR)
-    assert len(set(numbers)) == 3
+    assert numbers == (_RECOVERY_PR, _HUMAN_SUBMISSION_PR, _CONTRACT_LOCK_PR,
+                       _LIVE_PR)
+    assert len(set(numbers)) == 4
+    assert numbers == tuple(sorted(numbers))
     assert (handoff["stage128_m3i2_recovery_pr_merge_commit"]
             != handoff["stage128_m3i2_human_submission_pr_merge_commit"])
     assert handoff["stage128_m3i2_pr_roles_are_historical_facts_not_"
@@ -949,7 +1002,34 @@ def test_the_three_pr_roles_cannot_be_collapsed_or_shifted(handoff):
         (_RECOVERY_PR, "final_official_documentary_recovery_initiation_pr"),
         (_HUMAN_SUBMISSION_PR,
          "final_official_inquiry_human_submission_recording_pr"),
-        (_LIVE_PR, "m3_lag_wdi_exploratory_contract_lock_pr")]
+        (_CONTRACT_LOCK_PR, "m3_lag_wdi_exploratory_contract_lock_pr"),
+        (_LIVE_PR, _LIVE_PR_ROLE)]
+
+
+def test_no_merged_pr_is_ever_published_as_the_live_draft(handoff):
+    """The general invariant, not a per-number spot check.
+
+    Whatever the published sequence is, every entry that carries a merge
+    commit is merged history and the live PR number may not be one of them.
+    This is what would have caught the stale `PR #78 is the live Draft`
+    claim without anyone having to remember that #78 specifically had merged.
+    """
+    sequence = handoff["stage128_m3i2_pr_role_sequence"]
+    merged = {e["pr_number"] for e in sequence if e["merged"] is True}
+    live = handoff["stage128_m3i2_live_pr_number"]
+    assert live not in merged
+    assert handoff["stage128_m3i2_live_pr_merged"] is False
+    # every merged entry must actually record its merge commit, and every
+    # unmerged entry must not pretend to have one
+    for entry in sequence:
+        if entry["merged"] is True:
+            assert entry["merge_commit"], entry
+        else:
+            assert entry["merge_commit"] is None, entry
+    # the live Draft is the last entry, and it is the only unmerged one
+    assert sequence[-1]["pr_number"] == live
+    assert [e["merged"] for e in sequence] == (
+        [True] * (len(sequence) - 1) + [False])
 
 
 def test_the_docs_state_the_pr_roles_explicitly():
@@ -1038,25 +1118,87 @@ _POST_RETRIEVAL_AUDIT_ACTION_ID = (
 _DATA_GATE_ACTION_ID = "stage128-m3-lag-wdi-exploratory-data-gate"
 _MODELING_ACTION_ID = (
     "stage128-m3-lag-wdi-exploratory-incremental-evaluation")
+#: Step E is the last action in the locked sequence, so once it has run the
+#: pointer names no Track B action at all — only a human decision.
+_NO_NEXT_ACTION_ID = "human_decision_required"
 
 
-def test_the_next_action_is_retrieval_only_and_never_the_gate(handoff):
-    assert handoff["stage128_m3_lag_wdi_next_action_id"] == (
-        _RETRIEVAL_ACTION_ID)
-    assert handoff["stage128_m3_lag_wdi_next_action_scope"] == "retrieval_only"
+def test_the_next_action_is_a_separated_step_and_never_the_gate(handoff):
+    # The pointer ADVANCES as Track B steps complete, so pinning it to one
+    # action id would encode a moment. The rule that must hold at every step:
+    # the pointer is one of the separated steps, it is never the Data Gate
+    # itself, it never executes the Gate, and it is never an authorization.
+    assert handoff["stage128_m3_lag_wdi_next_action_id"] in (
+        _RETRIEVAL_ACTION_ID, _POST_RETRIEVAL_AUDIT_ACTION_ID,
+        _DATA_GATE_ACTION_ID, _MODELING_ACTION_ID,
+        # Step E is the last step in the locked sequence, so once it has run
+        # the pointer names no action at all. That is the strongest possible
+        # form of "not authorized", not a break in the chain.
+        _NO_NEXT_ACTION_ID)
+    # Once the audit has completed, the pointer legitimately NAMES the Data
+    # Gate. What must never happen is the Gate becoming authorized or executed
+    # merely because the pointer reached it — a pointer is not an
+    # authorization, which is precisely why naming it is safe.
+    if handoff["stage128_m3_lag_wdi_next_action_id"] == _DATA_GATE_ACTION_ID:
+        assert handoff[
+            "stage128_m3_lag_wdi_post_retrieval_audit_executed"] is True
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+        assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
+    # And once the Gate has completed, the pointer legitimately names the
+    # modeling step. The same rule holds one step later: reaching it grants
+    # nothing, and a Gate PASS is never modeling authorization.
+    if handoff["stage128_m3_lag_wdi_next_action_id"] == _MODELING_ACTION_ID:
+        assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is True
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
+        assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
+    # And once step E has completed, the locked sequence is exhausted and the
+    # pointer names no action at all. A RULE, not a snapshot: pinning
+    # "modeling never started" would encode the pre-step-E MOMENT and fail the
+    # instant a legitimate step E ran. What holds at EVERY step is that
+    # modeling was not started BY THIS lock, that a started step E is a
+    # consumed one, and that no STANDING modeling permission ever exists.
+    if handoff["stage128_m3_lag_wdi_next_action_id"] == _NO_NEXT_ACTION_ID:
+        assert handoff["stage128_m3_lag_wdi_modeling_started"] is True
+        assert handoff["stage128_m3_lag_wdi_modeling_executed"] is True
+    if handoff["stage128_m3_lag_wdi_modeling_started"] is True:
+        assert handoff["stage128_m3_lag_wdi_modeling_executed"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_modeling_authorization_consumed"] is True
+    assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
+    # Descriptive, not a safety flag: True exactly when the pointer names the
+    # Gate action. The safety property is that it is never AUTHORIZED (above)
+    # and the Gate is never EXECUTED (asserted in the branch above).
     assert handoff[
-        "stage128_m3_lag_wdi_next_action_executes_data_gate"] is False
-    assert handoff["stage128_m3_lag_wdi_retrieval_authorized"] is False
+        "stage128_m3_lag_wdi_next_action_executes_data_gate"] is (
+            handoff["stage128_m3_lag_wdi_next_action_id"]
+            == _DATA_GATE_ACTION_ID)
+    # the retrieval action itself never gates, in any state
     assert handoff["stage128_m3_lag_wdi_retrieval_executes_data_gate"] is False
+    # retrieval may have been authorized once, but never as a standing
+    # grant: the generic field carries the STANDING meaning, so an executed
+    # retrieval keeps its historical was-authorized fact while the standing
+    # authorization stays False (consumed, non-reusable).
+    if handoff["stage128_m3_lag_wdi_data_retrieval_started"] is True:
+        assert handoff[
+            "stage128_m3_lag_wdi_retrieval_was_authorized"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_retrieval_authorized_now"] is False
+        assert handoff["stage128_m3_lag_wdi_retrieval_authorized"] is False
+        assert handoff[
+            "stage128_m3_lag_wdi_retrieval_authorization_consumed"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_retrieval_authorization_reusable"] is False
+    else:
+        assert handoff["stage128_m3_lag_wdi_retrieval_authorized"] is False
 
 
-def test_the_data_gate_is_a_separate_unauthorized_action(handoff):
+def test_the_data_gate_is_a_separate_never_standing_action(handoff):
     assert handoff["stage128_m3_lag_wdi_data_gate_action_id"] == (
         _DATA_GATE_ACTION_ID)
     assert (handoff["stage128_m3_lag_wdi_data_gate_action_id"]
             != handoff["stage128_m3_lag_wdi_retrieval_action_id"])
-    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_data_gate_is_a_separate_action"] is True
     assert handoff[
         "stage128_m3_lag_wdi_data_gate_requires_new_human_authorization"] is (
@@ -1064,8 +1206,20 @@ def test_the_data_gate_is_a_separate_unauthorized_action(handoff):
     # a pointer to the Gate is not an authorization to execute it
     assert handoff[
         "stage128_m3_lag_wdi_data_gate_pointer_is_not_authorization"] is True
-    assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
-    assert handoff["stage128_m3_lag_wdi_data_gate_result"] == "NOT_EXECUTED"
+    # The generic `*_authorized` field carries the STANDING meaning at every
+    # point in the sequence, so it is False both before the Gate runs and
+    # after its one-time authorization is consumed. The historical fact lives
+    # in `*_was_authorized` — which is why this holds unconditionally.
+    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+    assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is not True
+    if handoff["stage128_m3_lag_wdi_data_gate_executed"] is False:
+        assert handoff["stage128_m3_lag_wdi_data_gate_result"] == "NOT_EXECUTED"
+    else:
+        assert handoff["stage128_m3_lag_wdi_data_gate_was_authorized"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_data_gate_authorization_consumed"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_data_gate_authorization_reusable"] is False
 
 
 def test_a_retrieval_authorization_never_authorizes_the_gate(handoff):
@@ -1111,9 +1265,23 @@ def test_the_published_action_sequence_separates_every_step(handoff):
     for entry in sequence:
         assert sum((entry["executes_retrieval"], entry["executes_data_gate"],
                     entry["executes_modeling"])) <= 1, entry["action_id"]
-    # every FUTURE step is unauthorized; only the completed lock is authorized
-    assert [e["authorized"] for e in sequence] == [True, False, False, False,
-                                                   False]
+    # every step that has NOT been carried out under its own authorization is
+    # unauthorized; steps C, D and E are always unauthorized here, whatever has
+    # already completed
+    by_step = {e["step"]: e for e in sequence}
+    for step in ("C", "D", "E"):
+        assert by_step[step]["authorized"] is False, step
+    # Step A was carried out under its own (now consumed) authorization. Once
+    # the sequence separates HISTORICAL from STANDING authorization, the
+    # standing field must be False for every step — a consumed one-time
+    # authorization may never read as a live one.
+    step_a = by_step["A"]
+    if "was_authorized" in step_a:
+        assert step_a["was_authorized"] is True
+        assert step_a["authorized"] is False
+        assert step_a["authorized_now"] is False
+    else:
+        assert step_a["authorized"] is True
 
 
 def test_the_docs_separate_retrieval_from_the_gate():
@@ -1129,7 +1297,25 @@ def test_the_docs_separate_retrieval_from_the_gate():
             or "`m3_lag_wdi_retrieval_authorization_implies_gate_"
                "authorization:\n  false`" in body), rel
     roadmap = _read_text("project/docs/ai/ROADMAP.md")
-    assert "m3_lag_wdi_next_action_scope: retrieval_only" in roadmap
+    # The pointer scope advances with the sequence, so what must always hold is
+    # that retrieval keeps its OWN action id, separate from the Gate's, and
+    # that the Gate is never recorded as authorized or executed. The pointer's
+    # executes-the-Gate flag DESCRIBES whichever action it names, so it is not
+    # pinned here — it is pinned against the locked sequence instead.
+    assert f"m3_lag_wdi_retrieval_action_id: {_RETRIEVAL_ACTION_ID}" in roadmap
+    assert f"m3_lag_wdi_data_gate_action_id: {_DATA_GATE_ACTION_ID}" in roadmap
+    assert "m3_lag_wdi_data_gate_authorized: false" in roadmap
+    # Whether the Gate has EXECUTED advances with the sequence; what must
+    # always hold is that no standing Gate authorization is published.
+    if "m3_lag_wdi_data_gate_executed: true" in roadmap:
+        assert "m3_lag_wdi_data_gate_authorization_consumed: true" in roadmap
+        assert "m3_lag_wdi_data_gate_authorization_reusable: false" in roadmap
+    # The pointer's executes-the-Gate flag tracks the action it names, so the
+    # roadmap must agree with the pointer rather than hard-code either value.
+    _pointer_gates = (f"m3_lag_wdi_next_action_id: {_DATA_GATE_ACTION_ID}"
+                      in roadmap)
+    assert (f"m3_lag_wdi_next_action_executes_data_gate: "
+            f"{'true' if _pointer_gates else 'false'}") in roadmap
     assert "m3_lag_wdi_data_gate_authorized: false" in roadmap
     assert "m3_lag_wdi_gate_pass_authorizes_modeling: false" in roadmap
 

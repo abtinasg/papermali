@@ -1,0 +1,74 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-data-retrieval",
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "exactly_two_locked_indicators_requested",
+      "detail": "only FP.CPI.TOTL.ZG and PA.NUS.FCRF may be requested",
+      "pass": true
+    },
+    {
+      "check": "locked_country_only",
+      "detail": "IRN only",
+      "pass": true
+    },
+    {
+      "check": "no_alternative_indicator_retrieved",
+      "detail": "no substitution, proxy or post-hoc alternative series",
+      "pass": true
+    },
+    {
+      "check": "every_request_targeted_the_official_wdi_api",
+      "detail": "official World Bank WDI API over HTTPS only",
+      "pass": true
+    },
+    {
+      "check": "raw_bytes_retained_for_every_attempt",
+      "detail": "one retained artifact per attempt, successes and failures alike",
+      "pass": true
+    },
+    {
+      "check": "payload_never_parsed",
+      "detail": "acquisition stops at the byte boundary",
+      "pass": true
+    },
+    {
+      "check": "no_coverage_calculated",
+      "detail": "coverage belongs to the Data Gate, which is not authorized",
+      "pass": true
+    },
+    {
+      "check": "data_gate_not_executed",
+      "detail": "step D requires its own new explicit human authorization",
+      "pass": true
+    },
+    {
+      "check": "no_admission_decision",
+      "detail": "acquisition is not admission",
+      "pass": true
+    },
+    {
+      "check": "no_company_row_join",
+      "detail": "joining belongs to a later authorized action",
+      "pass": true
+    },
+    {
+      "check": "no_modeling",
+      "detail": "step E is not authorized",
+      "pass": true
+    },
+    {
+      "check": "final_test_untouched",
+      "detail": "the Final Test stays hard locked",
+      "pass": true
+    },
+    {
+      "check": "no_raw_payload_committed_to_git",
+      "detail": "raw WDI payloads are retained OUTSIDE the repository",
+      "pass": true
+    }
+  ],
+  "checks_failed": 0,
+  "checks_total": 13,
+  "scope": "stage128_m3_lag_wdi_exploratory_data_retrieval"
+}

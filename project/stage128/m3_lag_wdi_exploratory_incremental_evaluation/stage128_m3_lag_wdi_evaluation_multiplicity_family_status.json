@@ -1,0 +1,26 @@
+{
+  "confirmatory_holm_executed_by_this_action": false,
+  "confirmatory_holm_family": [
+    "M2_minus_M1",
+    "M3_CBI_minus_M2",
+    "M4_minus_M3_CBI"
+  ],
+  "confirmatory_holm_family_changed_by_this_action": false,
+  "confirmatory_holm_family_size": 3,
+  "confirmatory_holm_modified_by_this_action": false,
+  "confirmatory_superiority_claim_made": false,
+  "e1_is_confirmatory": false,
+  "exploratory_comparison": "M3_LAG_WDI_minus_retained_M2",
+  "exploratory_comparison_inserted_into_confirmatory_family": false,
+  "exploratory_family_holm_adjusted": false,
+  "exploratory_family_holm_adjustment_reason": "a single-member exploratory family has no multiplicity to adjust, and adjusting it would not make it confirmatory",
+  "exploratory_family_id": "M3_LAG_WDI_EXPLORATORY_SUPPLEMENTARY",
+  "exploratory_family_members": [
+    "E1"
+  ],
+  "exploratory_family_size": 1,
+  "exploratory_hypothesis_id": "E1",
+  "main_confirmatory_conclusion_changed_by_this_action": false,
+  "paper_winner_selected_by_this_action": false,
+  "results_label": "supplementary_exploratory_robustness_only"
+}

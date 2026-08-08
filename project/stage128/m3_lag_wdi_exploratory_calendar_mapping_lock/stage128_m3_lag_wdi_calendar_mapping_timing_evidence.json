@@ -1,0 +1,210 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-calendar-mapping-lock",
+  "calendar_library_required": false,
+  "columns_read": [
+    "fiscal_year_t",
+    "target_year",
+    "pair_cutoff_date"
+  ],
+  "criterion": "G07 no_future_or_target_year_information: the binding t-1 macro observation year must be COMPLETE at the prediction cutoff",
+  "criterion_is_necessary_not_sufficient": true,
+  "criterion_note": "This is a NECESSARY condition only. It does not establish that the value had been PUBLISHED by the cutoff — the repository deliberately does not claim point-in-time WDI availability, and that limitation is unchanged by this lock.",
+  "criterion_source": "project/stage125/part3b1_cutoff_available_at_contract_stage125.json",
+  "denominator_rows": 539,
+  "denominator_source": "project/stage128/stage128_m2_d2_development_features.csv",
+  "denominator_source_sha256": "068519065fc4c36594a892b14c9242471a088e7b33484fbd5453b12391af2583",
+  "evaluated_offsets": [
+    621,
+    622
+  ],
+  "feature_values_read": 0,
+  "final_test_rows_read": 0,
+  "outcome_values_read": 0,
+  "per_offset": {
+    "621": {
+      "gregorian_year_semantics": "the Gregorian year in which the Jalali year BEGINS",
+      "margin_days_max": 568,
+      "margin_days_median": 566,
+      "margin_days_min": 234,
+      "observation_year_first": 2012,
+      "observation_year_last": 2018,
+      "offset": 621,
+      "predictor_year_first": 2013,
+      "predictor_year_last": 2019,
+      "rows_evaluated": 539,
+      "rule_formula": "predictor_year_t = jalali_fiscal_year_t + 621",
+      "satisfies_necessary_timing_condition": true,
+      "timing_violation_fiscal_years": {},
+      "timing_violation_rows": 0,
+      "timing_violations": [],
+      "worst_violation_days_after_cutoff": null
+    },
+    "622": {
+      "gregorian_year_semantics": "the Gregorian year in which the Jalali year ENDS",
+      "margin_days_max": 202,
+      "margin_days_median": 201,
+      "margin_days_min": -131,
+      "observation_year_first": 2013,
+      "observation_year_last": 2019,
+      "offset": 622,
+      "predictor_year_first": 2014,
+      "predictor_year_last": 2020,
+      "rows_evaluated": 539,
+      "rule_formula": "predictor_year_t = jalali_fiscal_year_t + 622",
+      "satisfies_necessary_timing_condition": false,
+      "timing_violation_fiscal_years": {
+        "1392": 2,
+        "1393": 2,
+        "1394": 3,
+        "1395": 3,
+        "1396": 3,
+        "1397": 4,
+        "1398": 5
+      },
+      "timing_violation_rows": 22,
+      "timing_violations": [
+        {
+          "fiscal_year_t": "1393",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2014-10-22",
+          "required_observation_year": 2014
+        },
+        {
+          "fiscal_year_t": "1394",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2015-10-22",
+          "required_observation_year": 2015
+        },
+        {
+          "fiscal_year_t": "1395",
+          "observation_year_completes_days_after_cutoff": 71,
+          "pair_cutoff_date": "2016-10-21",
+          "required_observation_year": 2016
+        },
+        {
+          "fiscal_year_t": "1396",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2017-10-22",
+          "required_observation_year": 2017
+        },
+        {
+          "fiscal_year_t": "1397",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2018-10-22",
+          "required_observation_year": 2018
+        },
+        {
+          "fiscal_year_t": "1398",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2019-10-22",
+          "required_observation_year": 2019
+        },
+        {
+          "fiscal_year_t": "1392",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2013-10-22",
+          "required_observation_year": 2013
+        },
+        {
+          "fiscal_year_t": "1394",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2015-10-22",
+          "required_observation_year": 2015
+        },
+        {
+          "fiscal_year_t": "1395",
+          "observation_year_completes_days_after_cutoff": 71,
+          "pair_cutoff_date": "2016-10-21",
+          "required_observation_year": 2016
+        },
+        {
+          "fiscal_year_t": "1396",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2017-10-22",
+          "required_observation_year": 2017
+        },
+        {
+          "fiscal_year_t": "1397",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2018-10-22",
+          "required_observation_year": 2018
+        },
+        {
+          "fiscal_year_t": "1398",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2019-10-22",
+          "required_observation_year": 2019
+        },
+        {
+          "fiscal_year_t": "1397",
+          "observation_year_completes_days_after_cutoff": 131,
+          "pair_cutoff_date": "2018-08-22",
+          "required_observation_year": 2018
+        },
+        {
+          "fiscal_year_t": "1398",
+          "observation_year_completes_days_after_cutoff": 131,
+          "pair_cutoff_date": "2019-08-22",
+          "required_observation_year": 2019
+        },
+        {
+          "fiscal_year_t": "1398",
+          "observation_year_completes_days_after_cutoff": 10,
+          "pair_cutoff_date": "2019-12-21",
+          "required_observation_year": 2019
+        },
+        {
+          "fiscal_year_t": "1392",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2013-10-22",
+          "required_observation_year": 2013
+        },
+        {
+          "fiscal_year_t": "1393",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2014-10-22",
+          "required_observation_year": 2014
+        },
+        {
+          "fiscal_year_t": "1394",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2015-10-22",
+          "required_observation_year": 2015
+        },
+        {
+          "fiscal_year_t": "1395",
+          "observation_year_completes_days_after_cutoff": 71,
+          "pair_cutoff_date": "2016-10-21",
+          "required_observation_year": 2016
+        },
+        {
+          "fiscal_year_t": "1396",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2017-10-22",
+          "required_observation_year": 2017
+        },
+        {
+          "fiscal_year_t": "1397",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2018-10-22",
+          "required_observation_year": 2018
+        },
+        {
+          "fiscal_year_t": "1398",
+          "observation_year_completes_days_after_cutoff": 70,
+          "pair_cutoff_date": "2019-10-22",
+          "required_observation_year": 2019
+        }
+      ],
+      "worst_violation_days_after_cutoff": 131
+    }
+  },
+  "recomputable_from_committed_bytes": true,
+  "selection_basis": "temporal_semantics_and_leakage_prevention_only",
+  "selection_used_coverage_comparison": false,
+  "selection_used_feature_values": false,
+  "selection_used_model_performance": false,
+  "timing_feasible_offsets": [
+    621
+  ]
+}

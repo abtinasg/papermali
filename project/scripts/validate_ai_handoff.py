@@ -46,6 +46,11 @@ FORBIDDEN_PHRASES = (
     "git not initialized",
     "n/a (git",
     "git init",
+    # Bug fix regression guard: once the Track A waiting-period termination
+    # package exists, this unqualified claim must never render again — it
+    # was accurate only up through the calendar-mapping-lock action.
+    "track a untouched: the inquiry was not terminated by this action "
+    "(false)",
 )
 
 

@@ -1,0 +1,103 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-incremental-evaluation",
+  "calendar_mapping_locked_offset": 621,
+  "calendar_mapping_rule": "jalali_fiscal_year_t_plus_621",
+  "calendar_mapping_rule_formula": "predictor_year_t = jalali_fiscal_year_t + 621",
+  "feature_search_executed": false,
+  "feature_selection_executed": false,
+  "frozen_configurations": {
+    "random_forest": {
+      "configuration_id": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
+      "hyperparameters": {
+        "bootstrap": true,
+        "class_weight": "balanced_subsample",
+        "max_depth": 3,
+        "max_features": "sqrt",
+        "min_samples_leaf": 10,
+        "n_estimators": 500
+      }
+    },
+    "regularized_logistic_regression": {
+      "configuration_id": "logistic__C_0.1",
+      "hyperparameters": {
+        "C": 0.1,
+        "class_weight": "balanced",
+        "max_iter": 5000,
+        "penalty": "l2",
+        "solver": "liblinear"
+      }
+    },
+    "xgboost": {
+      "configuration_id": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1",
+      "hyperparameters": {
+        "colsample_bytree": 0.8,
+        "early_stopping": false,
+        "eval_metric": "aucpr",
+        "gamma": 0,
+        "learning_rate": 0.03,
+        "max_depth": 2,
+        "min_child_weight": 1,
+        "n_estimators": 300,
+        "n_jobs": 1,
+        "objective": "binary:logistic",
+        "reg_lambda": 1,
+        "subsample": 0.8,
+        "tree_method": "hist"
+      }
+    }
+  },
+  "m2_feature_count": 12,
+  "m2_feature_order": [
+    "log_total_assets",
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio",
+    "equity_return_window",
+    "realized_volatility",
+    "amihud_illiquidity"
+  ],
+  "m3_lag_wdi_feature_count": 14,
+  "m3_lag_wdi_feature_order": [
+    "log_total_assets",
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio",
+    "equity_return_window",
+    "realized_volatility",
+    "amihud_illiquidity",
+    "intl_cpi_inflation_lag1_wdi",
+    "intl_fx_change_official_lag1_wdi"
+  ],
+  "retuning_executed": false,
+  "wdi_features": [
+    {
+      "country": "IRN",
+      "feature_id": "intl_cpi_inflation_lag1_wdi",
+      "indicator_code": "FP.CPI.TOTL.ZG",
+      "observation_year": "t-1",
+      "same_year_t_observation_used": false,
+      "transformation": "identity"
+    },
+    {
+      "country": "IRN",
+      "feature_id": "intl_fx_change_official_lag1_wdi",
+      "indicator_code": "PA.NUS.FCRF",
+      "observation_years": [
+        "t-1",
+        "t-2"
+      ],
+      "same_year_t_observation_used": false,
+      "transformation": "FX_LAG1_t = 100 * ln(E_(t-1) / E_(t-2))"
+    }
+  ]
+}

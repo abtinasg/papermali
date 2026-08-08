@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 149,
+  "assertion_count": 178,
   "assertions": [
     {
       "detail": "",
@@ -668,8 +668,103 @@
       "status": "PASS"
     },
     {
-      "detail": "a contract lock retrieves nothing, executes no Gate, fits no model and reads no Final Test row",
-      "name": "m3_lag_wdi_lock_executes_nothing",
+      "detail": "the contract lock executes no Gate — only the separately authorized Gate action may — and no step fits a model or reads a Final Test row",
+      "name": "m3_lag_wdi_lock_executes_no_gate_no_model_no_final_test",
+      "status": "PASS"
+    },
+    {
+      "detail": "the Handoff may publish the Data Gate as executed only when the data-gate-only action package justifies it",
+      "name": "m3_lag_wdi_gate_executed_only_with_its_own_action",
+      "status": "PASS"
+    },
+    {
+      "detail": "the Handoff may publish retrieval as started only when the retrieval-only action package justifies it",
+      "name": "m3_lag_wdi_retrieval_started_only_with_its_own_action",
+      "status": "PASS"
+    },
+    {
+      "detail": "an executed retrieval must be published as executed, and as retrieval_only",
+      "name": "m3_lag_wdi_retrieval_is_published_when_it_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "acquisition is not admission: only the separately authorized Data Gate may admit the block, and no step fits a model or reads a Final Test row",
+      "name": "m3_lag_wdi_retrieval_executed_nothing_downstream",
+      "status": "PASS"
+    },
+    {
+      "detail": "values are read only by an authorized post-retrieval audit, and no step ever retrieves an alternative indicator",
+      "name": "m3_lag_wdi_values_are_read_only_by_an_authorized_audit",
+      "status": "PASS"
+    },
+    {
+      "detail": "the Track B pointer advances one separated step at a time — to the audit after retrieval, to the Data Gate after the audit, to modeling after the Gate, and to NO named action after step E — and a pointer is never an authorization",
+      "name": "m3_lag_wdi_pointer_advances_but_never_authorizes",
+      "status": "PASS"
+    },
+    {
+      "detail": "a completed post-retrieval audit is consumed, non-reusable and never an authorization for the Data Gate — a later Gate execution must rest on the Gate's OWN authorization and package, not on this one",
+      "name": "m3_lag_wdi_completed_audit_is_consumed_and_not_a_gate_authorization",
+      "status": "PASS"
+    },
+    {
+      "detail": "recorded material findings may never be published as a bare PASS",
+      "name": "m3_lag_wdi_audit_findings_are_not_laundered_away",
+      "status": "PASS"
+    },
+    {
+      "detail": "a completed Data Gate is consumed, non-reusable and never an authorization to fit a model",
+      "name": "m3_lag_wdi_completed_gate_is_consumed_and_not_modeling_authorization",
+      "status": "PASS"
+    },
+    {
+      "detail": "a coverage PASS never becomes an information-content claim, and the step C findings survive it",
+      "name": "m3_lag_wdi_gate_pass_is_not_an_information_content_claim",
+      "status": "PASS"
+    },
+    {
+      "detail": "the Handoff may publish the calendar mapping as locked only when the calendar-mapping-lock action package justifies it",
+      "name": "m3_lag_wdi_calendar_mapping_locked_only_with_its_own_action",
+      "status": "PASS"
+    },
+    {
+      "detail": "the locked Jalali-to-Gregorian mapping is the one with zero timing violations, and the rejected one really does violate the timing rule",
+      "name": "m3_lag_wdi_locked_calendar_mapping_is_the_timing_feasible_one",
+      "status": "PASS"
+    },
+    {
+      "detail": "the calendar mapping was selected on temporal semantics alone, and changing it requires a new explicit human scientific decision",
+      "name": "m3_lag_wdi_calendar_mapping_was_not_chosen_on_model_performance",
+      "status": "PASS"
+    },
+    {
+      "detail": "locking a timing convention is not permission to build a feature table, fit a model or start step E",
+      "name": "m3_lag_wdi_calendar_mapping_lock_authorizes_nothing_downstream",
+      "status": "PASS"
+    },
+    {
+      "detail": "locking the calendar mapping establishes no point-in-time WDI availability, and the surviving limitations stay published",
+      "name": "m3_lag_wdi_calendar_mapping_lock_keeps_the_vintage_limitation",
+      "status": "PASS"
+    },
+    {
+      "detail": "CURRENT_STATE.md may not claim the calendar mapping is still unlocked, or that it still must be human-locked, while the state publishes calendar_mapping_locked = true (offending lines: 0)",
+      "name": "current_state_cannot_publish_a_locked_mapping_as_still_unlocked",
+      "status": "PASS"
+    },
+    {
+      "detail": "once the mapping is locked, CURRENT_STATE.md must name the locked rule and the action that locked it",
+      "name": "current_state_renders_the_calendar_mapping_lock_once_locked",
+      "status": "PASS"
+    },
+    {
+      "detail": "no M3-LAG-WDI modeling feature-value table may be materialized while the Jalali-to-Gregorian mapping is unlocked, because feature values are not invariant to it (found: ['project/stage128/m3_lag_wdi_exploratory_incremental_evaluation/stage128_m3_lag_wdi_evaluation_feature_values.csv'])",
+      "name": "m3_lag_wdi_no_feature_value_table_without_a_locked_calendar_mapping",
+      "status": "PASS"
+    },
+    {
+      "detail": "the Gate ran on the locked inherited thresholds, weakened no criterion and excluded no row to reach its verdict",
+      "name": "m3_lag_wdi_gate_thresholds_and_admission_were_not_engineered",
       "status": "PASS"
     },
     {
@@ -688,6 +783,46 @@
       "status": "PASS"
     },
     {
+      "detail": "the Handoff may publish modeling as started only when step E's own exploratory-evaluation-only package justifies it",
+      "name": "m3_lag_wdi_modeling_started_only_with_its_own_action",
+      "status": "PASS"
+    },
+    {
+      "detail": "an executed step E must be published as executed",
+      "name": "m3_lag_wdi_modeling_is_published_when_it_exists",
+      "status": "PASS"
+    },
+    {
+      "detail": "a completed step E is consumed and non-reusable; its grant is history and may never read as a standing permission",
+      "name": "m3_lag_wdi_modeling_authorization_is_consumed_never_standing",
+      "status": "PASS"
+    },
+    {
+      "detail": "E1 belongs to the supplementary exploratory family and is never inserted into, or allowed to modify, the confirmatory Holm family",
+      "name": "m3_lag_wdi_result_stays_in_the_exploratory_family",
+      "status": "PASS"
+    },
+    {
+      "detail": "a predictive result — favourable or not — never becomes a confirmatory superiority claim and never selects the paper winner",
+      "name": "m3_lag_wdi_result_makes_no_confirmatory_claim",
+      "status": "PASS"
+    },
+    {
+      "detail": "both blocks are refit on ONE identical 539-row development sample, 12 features versus 14, in exactly 44 primary predictive fits",
+      "name": "m3_lag_wdi_evaluation_used_one_identical_sample_and_12_vs_14",
+      "status": "PASS"
+    },
+    {
+      "detail": "fitting a model resolves none of the block's data limitations, and never turns revised WDI into point-in-time data",
+      "name": "m3_lag_wdi_evaluation_keeps_the_vintage_limitation",
+      "status": "PASS"
+    },
+    {
+      "detail": "step E reads no Final Test row and authorizes no next action",
+      "name": "m3_lag_wdi_evaluation_reads_no_final_test_row",
+      "status": "PASS"
+    },
+    {
       "detail": "activating Track B in parallel never terminates, resolves or authorizes anything on the still-active World Bank inquiry",
       "name": "m3_lag_wdi_lock_does_not_terminate_the_world_bank_inquiry",
       "status": "PASS"
@@ -698,13 +833,23 @@
       "status": "PASS"
     },
     {
-      "detail": "the immediate Track B pointer is retrieval ONLY, it does not execute the Data Gate, and it is not authorized",
-      "name": "m3_lag_wdi_next_action_is_retrieval_only",
+      "detail": "the immediate Track B pointer is a single separated step whose executes-the-Gate flag matches the locked sequence for the action it names, and it is never authorized and never executed",
+      "name": "m3_lag_wdi_next_action_is_a_separated_unauthorized_step",
       "status": "PASS"
     },
     {
-      "detail": "the M3-LAG-WDI Data Gate is a SEPARATE action with its own identity, it is unauthorized, and it requires a new explicit human authorization",
-      "name": "m3_lag_wdi_data_gate_is_a_separate_unauthorized_action",
+      "detail": "before retrieval has run, the immediate Track B pointer is the retrieval action with scope retrieval_only",
+      "name": "m3_lag_wdi_pointer_is_retrieval_only_until_retrieval_runs",
+      "status": "PASS"
+    },
+    {
+      "detail": "the M3-LAG-WDI Data Gate is a SEPARATE action with its own identity that always requires a new explicit human authorization, and no STANDING Gate authorization ever exists — before or after it runs",
+      "name": "m3_lag_wdi_data_gate_is_a_separate_never_standing_authorized_action",
+      "status": "PASS"
+    },
+    {
+      "detail": "a consumed one-time authorization is history: it may never be published as a standing permission, and the historical fact must be recorded in *_was_authorized (standing leaks: []; missing history: [])",
+      "name": "m3_lag_wdi_no_consumed_authorization_is_published_as_standing",
       "status": "PASS"
     },
     {
@@ -749,7 +894,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "9d530fcbf7cfc767a6bc755277a4f3188802bf2b",
+  "code_commit": "9c87674c692600195a94c2ba862ace9d604fdc46",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -757,7 +902,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "9d530fcbf7cfc767a6bc755277a4f3188802bf2b",
+  "generated_at": "9c87674c692600195a94c2ba862ace9d604fdc46",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -775,7 +920,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "2320a635a8b77db837d2b01b1b72882b517a1c7057f906befa92d98ef262a4f4",
+  "source_file_sha256": "d2f90a5e49d7ed9cdcff172a37b51305e24e5fe962b6be991285d3cedb70d403",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {
@@ -788,7 +933,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "e2bc66f40ceeec1018c16a46aa8e5e85b96e7c7732c50dc229868ca1d853932a",
+  "test_file_sha256": "afa55d9aec6f0c59b176c7115e8f30031d8d257968fd62fc5b75eef0f83b854d",
   "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v2_lean"

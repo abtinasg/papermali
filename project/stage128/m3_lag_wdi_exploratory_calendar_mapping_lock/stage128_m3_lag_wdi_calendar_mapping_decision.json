@@ -1,0 +1,88 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-calendar-mapping-lock",
+  "amended_contract_sha256": "61d3158bc79633b1e5e4c8dfdb9ec6a5f95ee5789fa2a6109158d0f39d20b8b5",
+  "amends_but_does_not_edit": true,
+  "amends_contract": "project/stage128/m3_lag_wdi_exploratory_contract_lock/stage128_m3_lag_wdi_exploratory_contract.json",
+  "authorized_scope": "calendar_mapping_lock_only",
+  "authorizes_next_action": false,
+  "calendar_mapping_lock_action_id": "stage128-m3-lag-wdi-exploratory-calendar-mapping-lock",
+  "calendar_mapping_lock_required_before_modeling": false,
+  "calendar_mapping_locked": true,
+  "calendar_mapping_locked_offset": 621,
+  "calendar_mapping_locked_offset_semantics": "the Gregorian year in which the Jalali year BEGINS",
+  "calendar_mapping_rule": "jalali_fiscal_year_t_plus_621",
+  "calendar_mapping_rule_formula": "predictor_year_t = jalali_fiscal_year_t + 621",
+  "changing_the_locked_mapping_requires_new_explicit_human_decision": true,
+  "decision_id": "m3_lag_wdi_predictor_year_calendar_mapping",
+  "fiscal_year_semantics": {
+    "agreement_rows": 539,
+    "agreement_total_rows": 539,
+    "decides_the_lock": false,
+    "established_by": "inverting the Stage125 Part 3C four-Jalali-month regulatory lag over the 539 committed pair_cutoff_date values",
+    "fiscal_year_t_labels": "the Jalali year in which the accounting period ENDS",
+    "mismatches": 0,
+    "not_recomputed_reason": "recomputation would require a second Jalali calendar implementation inside this action; the project pins a canonical one (jdatetime==6.0.1, Stage125 Part 3B1A) and a divergent second converter is a worse risk than an unrecomputed input finding. This finding is NOT what decides the lock — the recomputed timing evidence is.",
+    "provenance": "project/stage125/part3c_four_month_regulatory_lag_revision_decision_stage125.json",
+    "recomputed_by_this_action": false,
+    "recovered_fiscal_year_ends_are_canonical_iranian": true
+  },
+  "historical_unlocked_state_erased": false,
+  "locked_offset_margin_days_median": 566,
+  "locked_offset_margin_days_min": 234,
+  "locked_offset_observation_year_first": 2012,
+  "locked_offset_observation_year_last": 2018,
+  "locked_offset_predictor_year_first": 2013,
+  "locked_offset_predictor_year_last": 2019,
+  "locked_offset_timing_violation_rows": 0,
+  "next_action_authorized": false,
+  "next_action_id": "stage128-m3-lag-wdi-exploratory-incremental-evaluation",
+  "next_action_scope": "modeling_requires_new_human_authorization",
+  "observation_year_rules": {
+    "binding_observation_year": "t-1",
+    "changed_by_this_action": false,
+    "intl_cpi_inflation_lag1_wdi": {
+      "indicator_code": "FP.CPI.TOTL.ZG",
+      "required_observation_years": [
+        "t-1"
+      ],
+      "same_year_t_observation_permitted": false,
+      "transformation": "identity"
+    },
+    "intl_fx_change_official_lag1_wdi": {
+      "indicator_code": "PA.NUS.FCRF",
+      "required_observation_years": [
+        "t-1",
+        "t-2"
+      ],
+      "same_year_t_observation_permitted": false,
+      "transformation": "FX_LAG1_t = 100 * ln(E_(t-1) / E_(t-2))"
+    }
+  },
+  "point_in_time_availability_established_by_this_lock": false,
+  "rejected_offset": 622,
+  "rejected_offset_semantics": "the Gregorian year in which the Jalali year ENDS",
+  "rejected_offset_timing_violation_fiscal_years": {
+    "1392": 2,
+    "1393": 2,
+    "1394": 3,
+    "1395": 3,
+    "1396": 3,
+    "1397": 4,
+    "1398": 5
+  },
+  "rejected_offset_timing_violation_rows": 22,
+  "rejected_offset_worst_violation_days": 131,
+  "rejection_basis": "offset 622 requires a macro observation year that is still incomplete at the prediction cutoff for 22 of 539 development rows, across fiscal years ['1392', '1393', '1394', '1395', '1396', '1397', '1398']; worst case 131 days after the cutoff",
+  "selection_basis": "temporal_semantics_and_leakage_prevention_only",
+  "selection_reversible_by_a_better_predictive_result": false,
+  "selection_used_coverage_comparison": false,
+  "selection_used_feature_values": false,
+  "selection_used_model_performance": false,
+  "superseding_pattern_precedent": "project/stage125/part3c_four_month_regulatory_lag_revision_decision_stage125.json",
+  "unresolved_limitations": [
+    "point-in-time WDI availability remains UNPROVEN: the retained values are current/latest revised WDI and may contain later revisions, and locking the calendar mapping does not turn revised WDI into point-in-time data",
+    "the one-year lag remains a conservative temporal-separation design only; it does not prove historical publication availability",
+    "the FX feature remains defined but identically ZERO for predictor years 2021-2024 (outside the development sample under the locked mapping, but real for any future extension of the block)",
+    "PA.NUS.FCRF still carries no value for observation years 2024-2025, so the jointly constructible predictor-year ceiling remains 2024"
+  ]
+}

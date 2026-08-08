@@ -146,47 +146,104 @@ retrieval, for the Data Gate or for modeling.
 * **Separate family:** the exploratory comparison never enters the confirmatory
   Holm family `M2_minus_M1`, `M3_CBI_minus_M2`, `M4_minus_M3_CBI`.
 
-**Open item for the human supervisor on Track B.** Nothing may be retrieved
-yet. The immediate pointer is **retrieval ONLY**:
-`m3_lag_wdi_next_action_id: stage128-m3-lag-wdi-exploratory-data-retrieval`,
-`m3_lag_wdi_next_action_scope: retrieval_only`,
-`m3_lag_wdi_next_action_authorized: false`,
-`m3_lag_wdi_next_action_executes_data_gate: false`.
+**TRACK B step B is DONE: the locked source data has been RETRIEVED (item 25i).**
+Under its own new one-action authorization (125 UTF-8 bytes, SHA-256
+`b409e0a5…a604`, now **consumed**), the two locked WDI series were acquired
+from the official World Bank WDI API: `FP.CPI.TOTL.ZG` and `PA.NUS.FCRF`, both
+`IRN` — 2 requests, 2 successes, 2 raw artifacts, 32,287 bytes. Raw payloads
+live **outside** the repository; only byte counts and SHA-256 digests are
+committed.
 
-**Retrieval, the Data Gate and modeling are three SEPARATE actions.** An
-authorization boundary only exists where an action boundary exists, so they are
-never bundled and never share an identity:
+**Acquiring bytes is not admitting data.** The payloads were never decoded or
+parsed, no observation was read, no coverage was computed, no Gate ran, nothing
+was admitted, nothing was joined to a company row, no model was fit and no
+Final Test row was read. The authoritative contract is unchanged.
 
-| Step | Action id | Authorized |
+**Open item for the human supervisor on Track B.** The Data Gate (step D) has
+now been EXECUTED once under its own new single-use human authorization, which
+is **consumed** and not reusable. The next eligible action is
+`m3_lag_wdi_next_action_id: stage128-m3-lag-wdi-exploratory-incremental-evaluation`
+with `m3_lag_wdi_modeling_authorized: false`. **Eligibility is not
+authorization, and a Data Gate PASS is not modeling authorization.**
+
+**What the Gate decided.** Result `PASS_M3_LAG_WDI_DATA_GATE` on the exact
+retained-M2 539-row development common sample: CPI 539/539, FX 539/539, block
+common sample 539/539, and 18 / 10 positive evaluable outcomes in the two
+locked validation windows — against the inherited thresholds `>= 0.80`,
+`>= 0.70` and `>= 5`, re-read at run time and **unchanged**. Nothing was
+excluded, no imputation was used and no alternative indicator was tried. The
+block is formally **ADMITTED**, and that admission is **DATA ADMISSION ONLY**.
+
+**What the Gate did NOT decide, and what a future authorizer must weigh.** A
+coverage PASS is not a statement that either feature is informative. Three
+limitations survive it, and one is new:
+
+* the FX log-ratio is **defined but identically zero for predictor years
+  2021-2024** (step C's finding, unchanged). Those years fall outside the
+  development sample — which ends at Gregorian predictor year 2020 at the
+  latest — so **0** development rows are zero-change and the degeneracy does
+  not change the formal verdict under the pre-existing rules. No new rejection
+  criterion was invented to make it do so, and the limitation is still real;
+* `PA.NUS.FCRF` has no value for 2024-2025, so the jointly constructible
+  ceiling stays at predictor year 2024. This does not bind the development
+  sample but caps any future extension of the block;
+* the WDI `lastupdated` value is a **revision marker**, not point-in-time
+  availability proof, and the one-year lag does not create one;
+* ~~the locked contract does not fix the Jalali-to-Gregorian mapping for
+  `predictor_year_t`~~ — **RESOLVED.** Recorded by step D, then locked by a
+  separate human scientific decision
+  (`stage128-m3-lag-wdi-exploratory-calendar-mapping-lock`, authorization now
+  consumed): **`predictor_year_t = jalali_fiscal_year_t + 621`**, the
+  Gregorian year in which the Jalali year begins. Selected on timing alone —
+  `+622` would require a macro observation year still incomplete at the
+  prediction cutoff for **22 of 539** rows across every fiscal-year cohort
+  (worst case 131 days late), while `+621` does so for **0 of 539**
+  (minimum margin 234 days). Development predictor years are **2013–2019**.
+  The lock is fail-closed: the runner recomputes the evidence from committed
+  bytes and refuses any offset with a timing violation, so `+622` is
+  structurally unlockable. **It resolved the blocker; it authorized nothing.**
+
+**Open item for the human supervisor on Track B — Step E.** Both
+prerequisites are now met (Gate PASS, calendar mapping locked), and meeting
+prerequisites is **not** authorization. Step E
+(`stage128-m3-lag-wdi-exploratory-incremental-evaluation`) requires its own
+new explicit human authorization; neither the Gate PASS nor the calendar lock
+propagates to it. The FX 2021–2024 degeneracy, the `PA.NUS.FCRF` 2024–2025
+missingness and the unproven point-in-time availability all still stand.
+
+The remaining step stays a separate decision:
+
+* **E — modeling** (`…-incremental-evaluation`): needs **another** new
+  explicit human authorization. The Gate authorization did not propagate to
+  it (`gate_authorization_propagates_to_step_e: false`).
+
+Neither the Gate nor its PASS unlocks the Final Test
+(`final_test_locked: true`, `final_test_rows_read: 0`).
+
+| Step | Action | Authorized |
 | --- | --- | --- |
-| A | `stage128-m3-lag-wdi-exploratory-contract-lock` (DONE, item 25h) | consumed |
-| B | `stage128-m3-lag-wdi-exploratory-data-retrieval` — retrieval only | **false** |
-| C | `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — audit/state recording, **no Gate** | **false** |
-| D | `stage128-m3-lag-wdi-exploratory-data-gate` — the Data Gate | **false** |
+| B | `stage128-m3-lag-wdi-exploratory-data-retrieval` — retrieval | **COMPLETE** (authorization consumed) |
+| C | `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — audit | **COMPLETE** (authorization consumed) |
+| D | `stage128-m3-lag-wdi-exploratory-data-gate` — the Data Gate | **COMPLETE** (authorization consumed) |
+| D-bis | `stage128-m3-lag-wdi-exploratory-calendar-mapping-lock` — the calendar mapping | **COMPLETE** (authorization consumed) |
 | E | `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — modeling | **false** |
 
-* An authorization to **retrieve** is **not** an authorization to execute the
-  Data Gate: `m3_lag_wdi_retrieval_authorization_implies_gate_authorization:
-  false`.
-* A **combined** retrieval-and-Gate action is forbidden:
-  `m3_lag_wdi_combined_retrieval_and_gate_action_permitted: false`.
-* A **pointer** to the Data Gate is not an authorization to execute it. Step D
-  needs its own NEW explicit human authorization.
-* A Gate **PASS** is **DATA ADMISSION ONLY**
-  (`m3_lag_wdi_gate_pass_is_data_admission_only: true`) and authorizes no model
-  fit (`m3_lag_wdi_gate_pass_authorizes_modeling: false`). Step E needs
-  ANOTHER separate explicit human authorization.
-* None of A–E unlocks the Final Test.
+A retrieval authorization did **not** authorize the Data Gate
+(`m3_lag_wdi_retrieval_authorization_implies_gate_authorization: false`,
+`m3_lag_wdi_combined_retrieval_and_gate_action_permitted: false`), and the
+Data Gate PASS is **data admission only** and does **not** authorize modeling
+(`m3_lag_wdi_gate_pass_authorizes_modeling: false`).
 
-**PR history, pinned (not re-derived from adjacency).** PR **#76** =
-`stage128-m3i2-final-official-documentary-recovery-initiation`, MERGED by
+**PR roles are pinned historical facts, not positional labels.** PR **#76** =
+the final official documentary recovery INITIATION
+(`stage128-m3i2-final-official-documentary-recovery-initiation`), MERGED by
 `89d8e6ff2d12ec82903cd28aa7ab839eb946b658`. PR **#77** = the later, separate
-HUMAN World Bank inquiry submission RECORDING
+human World Bank inquiry submission RECORDING
 (`stage128-m3i2-final-official-inquiry-human-submission`), MERGED by
-`93de6bae9344ce893b0261f818abce8a991cf842`. PR **#78** = the current **LIVE
-Draft**, the M3-LAG-WDI exploratory contract lock. "The recovery PR" always
-means PR #76 — it never slides forward to mean whichever PR merged most
-recently, and the three roles may not be collapsed or shifted.
+`93de6bae9344ce893b0261f818abce8a991cf842`. PR **#78** = the M3-LAG-WDI
+exploratory contract lock, MERGED by
+`175e7949e009eeecdd66aedab31ec4b48e9d3c7d`. "The recovery PR" means PR #76
+specifically — never "whichever PR merged most recently".
 
 **HISTORICAL — superseded by the new explicit human authorization.** Until item
 25h this file recorded: *"M3-LAG-WDI-EXPLORATORY is NOT locked … the

@@ -2067,3 +2067,85 @@ def test_m3i2_recognizer_fails_closed(tmp_path, field, bad):
         json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     with pytest.raises(v.ValidationFail):
         v.stage128_m3i2_contract_lock_completed(tmp_path)
+
+
+# --------------------------------------------------------------------------- #
+# The calendar-mapping decision may not be published two different ways
+#
+# The machine-readable Handoff and the human-readable CURRENT_STATE are
+# generated from the same record, but the prose was hand-written and did not
+# branch on the marker — so a state could publish
+# `calendar_mapping_locked = true` while the rendered line still said the
+# mapping was unlocked and still had to be human-locked before modeling. These
+# tests make that combination impossible to publish again.
+# --------------------------------------------------------------------------- #
+
+def _current_state_text(root: Path) -> str:
+    return (root / v.CURRENT_STATE_MD_REL).read_text(encoding="utf-8")
+
+
+def _assertions(built: dict) -> dict[str, str]:
+    return {a["name"]: a["status"] for a in built["assertions"]}
+
+
+_CALMAP_NO_STALE_CLAIM = (
+    "current_state_cannot_publish_a_locked_mapping_as_still_unlocked")
+_CALMAP_RENDERS_LOCK = (
+    "current_state_renders_the_calendar_mapping_lock_once_locked")
+
+
+def test_live_current_state_does_not_claim_an_unlocked_calendar_mapping():
+    handoff = json.loads(
+        (_root() / v.HANDOFF_STATE_REL).read_text(encoding="utf-8"))
+    assert handoff["stage128_m3_lag_wdi_calendar_mapping_locked"] is True
+    for line in _current_state_text(_root()).splitlines():
+        if v.STAGE128_M3_LAG_CALMAP_HISTORICAL_HEADER in line:
+            # The Step D limitation list is quoted verbatim: at Step D time
+            # the mapping really WAS unlocked, and that record is not
+            # rewritten to pretend otherwise.
+            continue
+        for claim in v.STAGE128_M3_LAG_CALMAP_PRE_LOCK_CLAIMS:
+            assert claim not in line, line
+
+
+def test_live_current_state_publishes_the_locked_rule_and_its_action():
+    text = _current_state_text(_root())
+    assert v.STAGE128_M3_LAG_CALMAP_LOCKED_RULE in text
+    assert v.STAGE128_M3_LAG_CALMAP_ACTION_ID in text
+    assert "predictor_year_t = jalali_fiscal_year_t + 621" in text
+
+
+@pytest.mark.parametrize("claim", [
+    "Calendar mapping still unlocked",
+    "the mapping must be human-locked before any modeling table exists",
+])
+def test_pre_lock_prose_in_current_state_fails_validation(tmp_path, claim):
+    """Re-introducing the pre-lock wording while the state publishes the lock
+    must FAIL validation, not merely read oddly."""
+    root = _mirror(tmp_path)
+    target = root / v.CURRENT_STATE_MD_REL
+    target.write_text(
+        target.read_text(encoding="utf-8") + f"\n- **{claim}**\n",
+        encoding="utf-8")
+    with pytest.raises(v.ValidationFail):
+        v.run(project_dir=root / "project", build=True)
+
+
+def test_dropping_the_lock_from_current_state_fails_validation(tmp_path):
+    """The reverse drift: the state publishes the lock, but the prose stops
+    naming the locked rule at all."""
+    root = _mirror(tmp_path)
+    target = root / v.CURRENT_STATE_MD_REL
+    target.write_text(
+        target.read_text(encoding="utf-8").replace(
+            v.STAGE128_M3_LAG_CALMAP_LOCKED_RULE, "REMOVED"),
+        encoding="utf-8")
+    with pytest.raises(v.ValidationFail):
+        v.run(project_dir=root / "project", build=True)
+
+
+def test_clean_tree_passes_both_calendar_consistency_assertions(tmp_path):
+    root = _mirror(tmp_path)
+    status = _assertions(v.run(project_dir=root / "project", build=True))
+    assert status[_CALMAP_NO_STALE_CLAIM] == "PASS"
+    assert status[_CALMAP_RENDERS_LOCK] == "PASS"

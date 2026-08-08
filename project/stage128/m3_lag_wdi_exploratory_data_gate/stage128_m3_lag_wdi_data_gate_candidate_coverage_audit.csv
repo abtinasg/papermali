@@ -1,0 +1,3 @@
+candidate_id,feature_id,indicator_code,coverage_denominator_rows,valid_value_rows,valid_coverage,coverage_threshold,coverage_meets_threshold,coverage_status
+cand_m3_lag_wdi_cpi_inflation_lag1,intl_cpi_inflation_lag1_wdi,FP.CPI.TOTL.ZG,539,539,1.0,0.8,True,RESOLVED
+cand_m3_lag_wdi_fx_change_official_lag1,intl_fx_change_official_lag1_wdi,PA.NUS.FCRF,539,539,1.0,0.8,True,RESOLVED

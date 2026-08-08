@@ -1,0 +1,42 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-post-retrieval-audit",
+  "audited_evidence_modified": false,
+  "audited_evidence_zenodo_version_doi": "10.5281/zenodo.21844636",
+  "authorization_sha256": "b820c5e781aeb81c575292c07f0dc14c18e12fada4a31064cd3e9df1871e6427",
+  "authorization_utf8_bytes": 147,
+  "authorized_scope": "post_retrieval_audit_only",
+  "credentials_committed_to_git": false,
+  "package_files": {
+    "README_STAGE128_M3_LAG_WDI_EXPLORATORY_POST_RETRIEVAL_AUDIT.md": {
+      "bytes": 2715,
+      "sha256": "ecab6f6b492ad5f9f2472537227aaee8e29e59c20f28944797187e1925910903"
+    },
+    "stage128_m3_lag_wdi_post_retrieval_audit_decision.json": {
+      "bytes": 1534,
+      "sha256": "9403fa652c3b6cb04ff3ffa0bc7aa308247779400e8cea52f3e3e50639f39f75"
+    },
+    "stage128_m3_lag_wdi_post_retrieval_audit_execution_audit.json": {
+      "bytes": 1134,
+      "sha256": "b3912901f5128610d52af41248f4d02e6754f30362fb514cd6a9cc2fcbed04c8"
+    },
+    "stage128_m3_lag_wdi_post_retrieval_audit_governance_boundary.json": {
+      "bytes": 2158,
+      "sha256": "279b7e7904232e562443899f90f5c38128f1df73091ebe227ebec974ab895ecf"
+    },
+    "stage128_m3_lag_wdi_post_retrieval_audit_human_authorization_record.json": {
+      "bytes": 836,
+      "sha256": "569352c0ba53211aaeb4d7395e179af5a789dba7c97cbc5ebff33c575e0aec98"
+    },
+    "stage128_m3_lag_wdi_post_retrieval_audit_qc_report.json": {
+      "bytes": 1299,
+      "sha256": "c87c9624c201c1a90e61c9888bffac6b6a36018c53cfd0c47df3934e56e8c807"
+    },
+    "stage128_m3_lag_wdi_post_retrieval_audit_report.json": {
+      "bytes": 4470,
+      "sha256": "44d0028e5d58de452a882150d34adce3019ee44fc4a855cfb1ad42b0ab2266b5"
+    }
+  },
+  "package_id": "stage128_m3_lag_wdi_exploratory_post_retrieval_audit",
+  "pii_committed_to_git": false,
+  "raw_wdi_payloads_committed_to_git": 0
+}
