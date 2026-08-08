@@ -1,0 +1,26 @@
+{
+  "action_id": "stage129-m4-governance-data-gate-contract-lock",
+  "action_type": "contract_lock_only",
+  "counters": {
+    "codal_requests": 0,
+    "network_requests": 0,
+    "documents_retrieved": 0,
+    "m4_candidate_observations_read": 0,
+    "company_rows_loaded": 0,
+    "final_test_rows_loaded": 0,
+    "coverage_calculations": 0,
+    "model_fits": 0,
+    "predictions": 0,
+    "predictive_metrics": 0,
+    "holm_calculations": 0,
+    "bootstrap_executions": 0
+  },
+  "retrieval_started": false,
+  "data_gate_executed": false,
+  "modeling_started": false,
+  "final_test_rows_read": 0,
+  "final_test_predictor_values_read": 0,
+  "final_test_target_values_read": 0,
+  "external_data_source_accessed": false,
+  "scientific_computation_ran": false
+}

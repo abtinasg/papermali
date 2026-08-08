@@ -1,0 +1,348 @@
+{
+  "action_id": "stage129-m4-governance-data-gate-contract-lock",
+  "action_type": "contract_lock_only_no_retrieval_no_value_inspection_no_gate_no_feature_no_modeling_no_final_test",
+  "contract_id": "stage129_m4_governance_data_gate_contract",
+  "contract_version": "stage129_m4_governance_data_gate_contract_v1",
+  "lock_type": "prospective_contract_lock_before_any_retrieval",
+  "locked_before_any_value_level_work": true,
+  "scientific_role": "M4_governance_block_data_admission_gate_design",
+  "is_confirmatory_m4_admission": false,
+  "is_the_gate_itself": false,
+  "authorizes_retrieval": false,
+  "authorizes_gate_execution": false,
+  "authorizes_modeling": false,
+
+  "inherits_m4_semantic_contract_from": "project/stage125/part3b1_m4_feature_definition_contract_stage125.json",
+  "inherits_cutoff_available_at_contract_from": "project/stage125/part3b1_cutoff_available_at_contract_stage125.json",
+  "candidate_set": {
+    "candidate_count": 4,
+    "candidate_count_is_exact": true,
+    "no_feature_shopping": true,
+    "failed_candidate_may_be_replaced_to_preserve_count": false,
+    "candidates": [
+      "audit_opinion_type",
+      "going_concern_flag",
+      "audit_lag_days",
+      "board_size"
+    ],
+    "candidate_order_is_frozen": true,
+    "candidate_ids_frozen_from_stage125": {
+      "audit_opinion_type": "cand_m4_audit_opinion_type",
+      "going_concern_flag": "cand_m4_going_concern_flag",
+      "audit_lag_days": "cand_m4_audit_lag_days",
+      "board_size": "cand_m4_board_size"
+    },
+    "excluded_candidates_forbidden_from_m4": [
+      "non_executive_ratio",
+      "institutional_ownership",
+      "any_ownership_or_management_feature",
+      "auditor_identity_features",
+      "audit_fee_features",
+      "textual_nlp_or_llm_derived_predictors",
+      "outcome_inspected_keywords",
+      "any_governance_feature_discovered_later"
+    ]
+  },
+
+  "semantic_definitions": {
+    "audit_opinion_type": {
+      "inherited_stage125_definition": "Structured audit-opinion label taken only from an official CODAL audit report for predictor year t. The label must be an explicit structured field/value on the report (not inferred from free text). If the field is absent, unreadable, conflicting, or ambiguous => null.",
+      "representation": "structured_categorical",
+      "allowed_categories_must_be_prospectively_enumerated": true,
+      "allowed_categories_source": "authoritative_audit_report_framework_not_empirical_inspection",
+      "categories_derived_from_empirical_data_forbidden": true,
+      "unclear_or_unsupported_classification": "missing_unresolved_never_guessed",
+      "document": "official_CODAL_audit_report_year_t",
+      "source_id": "src_m4_codal_audit"
+    },
+    "going_concern_flag": {
+      "inherited_stage125_definition": "true only when the official CODAL audit report for year t contains an explicit structured going-concern / material-uncertainty indication set to true/present. false only when an explicit structured official field states negative/false for going-concern. Absent clause, missing field, unstructured-only text, conflict, or ambiguity => null/UNRESOLVED (never default false).",
+      "representation": "binary_or_null",
+      "basis": "explicit_reproducibly_defined_going_concern_signal_in_authoritative_audit_disclosure_only",
+      "forbidden_inference_sources": [
+        "accumulated_losses",
+        "article_141_status",
+        "negative_equity",
+        "financial_ratios",
+        "distress_outcome",
+        "future_events"
+      ],
+      "llm_or_text_based_semantic_guessing_forbidden": true,
+      "if_canonical_disclosure_cannot_support_deterministic_auditable_definition_prospectively": "candidate_becomes_UNRESOLVED_not_hand_interpreted",
+      "document": "official_CODAL_audit_report_year_t",
+      "source_id": "src_m4_codal_audit"
+    },
+    "audit_lag_days": {
+      "inherited_stage125_definition": "audit_lag_days = calendar_days(fiscal_year_end, audit_report_date) using the official CODAL audit report date field and the predictor fiscal_year_end. Both dates must be semantic valid ISO calendar dates. If fiscal_year_end missing (LC08), or audit_report_date missing/ambiguous, or either date unparseable, or audit_report_date < fiscal_year_end (negative lag) => null/UNRESOLVED. Never impute dates or emit a negative lag.",
+      "representation": "integer_calendar_days",
+      "frozen_date_fields": {
+        "field_1": "predictor_fiscal_year_end (official CODAL financial-statement fiscal_year_end field)",
+        "field_2": "audit_report_date (official CODAL audit report date field)"
+      },
+      "calendar_conversion_convention": "Both fields must be normalized to Gregorian ISO calendar dates before differencing. The project's canonical calendar-handling precedent (locked in the M3-LAG-WDI calendar mapping, project/stage128/m3_lag_wdi_exploratory_calendar_mapping_lock/, rule jalali_fiscal_year_t_plus_621) establishes that any Jalali source date MUST be converted through a human-locked, evidence-based offset before use; no new offset is invented by this contract, and audit_lag_days must use whichever conversion is already authoritative for the CODAL audit-report date field at the time of the Gate, or remain UNRESOLVED if none is authoritative.",
+      "difference_direction": "audit_report_date minus fiscal_year_end (non-negative only)",
+      "report_date_is_not_automatically_availability_date": true,
+      "report_date_before_cutoff_but_first_public_after_cutoff_is_not_available": "A report dated before the pair cutoff whose verified public availability (available_at) is after the cutoff is NOT point-in-time available; only available_at, never the document's internal date, governs usability.",
+      "document": "official_CODAL_audit_report_year_t",
+      "source_id": "src_m4_codal_audit"
+    },
+    "board_size": {
+      "inherited_stage125_definition": "Integer count of board members from an official CODAL governance disclosure for year t, using an explicit auditable membership list/field. Ambiguous membership, missing list, or conflicting counts => null. Director networks remain out of scope.",
+      "representation": "integer_count",
+      "basis": "authoritative_board_composition_disclosure_applicable_at_the_prediction_cutoff",
+      "backfilling_from_later_disclosures_forbidden": true,
+      "future_board_composition_forbidden": true,
+      "document": "official_CODAL_governance_disclosure_year_t",
+      "source_id": "src_m4_codal_governance"
+    }
+  },
+
+  "authoritative_source_policy": {
+    "primary_authority": "official_issuer_or_regulatory_disclosure",
+    "codal_treated_as_intended_authoritative_disclosure_surface": true,
+    "source_family": "official_CODAL_structured_disclosures_only",
+    "forbidden_silent_sources": [
+      "commercial_databases",
+      "financial_websites",
+      "search_engine_snippets",
+      "manually_reconstructed_later_information",
+      "current_company_websites_as_historical_evidence",
+      "secondary_aggregators"
+    ],
+    "secondary_source_agreement_does_not_establish_point_in_time_truth": true,
+    "provenance_schema_required_per_admitted_value": [
+      "company",
+      "fiscal_year",
+      "feature",
+      "source_document_or_disclosure_identity",
+      "source_type",
+      "document_report_date",
+      "public_availability_or_publication_timestamp_where_available",
+      "extraction_rule",
+      "raw_value",
+      "normalized_value",
+      "point_in_time_verdict",
+      "reason_for_any_missing_or_unresolved_status"
+    ],
+    "values_collected_by_this_action": 0,
+    "no_values_are_collected_in_this_action_contract_only": true
+  },
+
+  "point_in_time_rule": {
+    "inherited_from": "project/stage125/part3b1_cutoff_available_at_contract_stage125.json",
+    "inherited_verbatim": true,
+    "block_rule_for_m4": "document_available_at_le_pair_cutoff",
+    "cutoff_definition": "The prediction cutoff for a t -> t+1 pair is the earliest verified available_at timestamp of the predictor (year t) financial statement. No feature value whose available_at is after the cutoff may be used at prediction time.",
+    "cutoff_basis": "verified_available_at_timestamp",
+    "cutoff_not_based_on": [
+      "fiscal_year_end_alone",
+      "published_at_alone",
+      "retrieved_at_alone",
+      "any_inferred_or_guessed_date"
+    ],
+    "missing_availability_means_unavailable": true,
+    "no_future_or_target_year_information": true,
+    "missing_or_after_cutoff": "unavailable_null_never_inferred",
+    "availability_timestamp_must_represent": "actual_public_availability",
+    "availability_timestamp_must_not_be_derived_from": [
+      "fiscal_year_label",
+      "document_internal_date",
+      "auditor_signature_date",
+      "meeting_date",
+      "later_archive_date",
+      "current_website_presence"
+    ],
+    "if_historical_availability_cannot_be_demonstrated": "pit_status_UNRESOLVED_never_PASS_never_FAIL_by_assumption",
+    "unknown_is_not_zero": true
+  },
+
+  "thresholds": {
+    "candidate_development_coverage_min": 0.80,
+    "minimum_training_fold_coverage_min": 0.75,
+    "m4_block_common_sample_coverage_min": 0.70,
+    "minimum_positive_evaluable_per_locked_validation_fold": 5,
+    "coverage_scope": "development_only",
+    "final_test_access_for_admission": false,
+    "thresholds_changed_by_this_action": false,
+    "canonical_sources": {
+      "candidate_development_coverage_min": {
+        "value": 0.80,
+        "found_in": "project/stage125/part4_statistical_analysis_plan_stage125.json (field candidate_valid_coverage_min, m1_coverage_gates config block)",
+        "reused_by": [
+          "project/stage128/m3_macro_data_gate/stage128_m3_macro_data_gate_decision.json",
+          "project/stage128/m3_intl_macro_contract_lock/stage128_m3_intl_macro_data_gate_contract.json",
+          "project/stage128/m3_lag_wdi_exploratory_data_gate/stage128_m3_lag_wdi_data_gate_decision.json"
+        ],
+        "status": "already_canonical_pre_existing_reused_verbatim"
+      },
+      "minimum_training_fold_coverage_min": {
+        "value": 0.75,
+        "found_in": "project/stage125/part4_statistical_analysis_plan_stage125.json (field m1_minimum_fold_training_min, m1_coverage_gates config block)",
+        "status": "already_canonical_pre_existing_reused_verbatim"
+      },
+      "m4_block_common_sample_coverage_min": {
+        "value": 0.70,
+        "found_in": "project/stage125/part4_statistical_analysis_plan_stage125.json (field block_common_sample_coverage_min, m1_coverage_gates config block); also project/stage125/part3a_approved_gate_thresholds_stage125.csv gate G10 (pilot-only variant, same 0.70 value, denominator differs)",
+        "reused_by": [
+          "project/stage128/m3_macro_data_gate/stage128_m3_macro_data_gate_decision.json",
+          "project/stage128/m3_lag_wdi_exploratory_data_gate/stage128_m3_lag_wdi_data_gate_decision.json"
+        ],
+        "status": "already_canonical_pre_existing_reused_verbatim"
+      },
+      "minimum_positive_evaluable_per_locked_validation_fold": {
+        "value": 5,
+        "found_in": "project/stage128/m3_macro_data_gate/stage128_m3_macro_data_gate_decision.json (field min_positive_evaluable_each_temporal_validation_window)",
+        "reused_by": [
+          "project/stage128/m3_lag_wdi_exploratory_data_gate/stage128_m3_lag_wdi_data_gate_decision.json"
+        ],
+        "note": "Distinct from the earlier PILOT-ONLY gates G11/G12 in part3a_approved_gate_thresholds_stage125.csv, which used >=3 per target-year stratum over the 80-pair pilot sample and are explicitly marked 'not a final modeling sample threshold'. The >=5 figure is the development-sample threshold already reused twice for M3-family gates; this contract reuses it a third time, unchanged, for M4.",
+        "status": "already_canonical_pre_existing_reused_verbatim"
+      }
+    },
+    "conflicts_found_with_pre_existing_frozen_contracts": false,
+    "conflicts_found_detail": "None of the four threshold values specified for this M4 Gate contract conflict with any pre-existing frozen contract. All four numeric values (0.80, 0.75, 0.70, 5) were found already canonically fixed in project/stage125/part4_statistical_analysis_plan_stage125.json and/or already reused unchanged by the M3 macro data Gate and the M3-LAG-WDI exploratory Data Gate. This contract reuses them for M4, it does not set them for the first time and does not override any conflicting number."
+  },
+
+  "individual_gate_dimensions_for_the_future_gate": {
+    "dimensions": [
+      {"id": "A", "name": "semantic_definition"},
+      {"id": "B", "name": "authoritative_source_accessibility"},
+      {"id": "C", "name": "provenance"},
+      {"id": "D", "name": "point_in_time_availability"},
+      {"id": "E", "name": "development_coverage"},
+      {"id": "F", "name": "minimum_training_fold_coverage"},
+      {"id": "G", "name": "join_quality_uniqueness"},
+      {"id": "H", "name": "leakage"},
+      {"id": "I", "name": "missingness_mechanism_or_unresolved"},
+      {"id": "J", "name": "deterministic_reproducibility"}
+    ],
+    "separate_dimension_not_in_the_list_above": "block_or_common_sample_eligibility",
+    "all_mandatory_dimensions_must_pass_for_admission": true,
+    "coverage_pass_is_not_provenance_pass": true,
+    "provenance_pass_is_not_pit_pass": true,
+    "coverage_pass_neq_provenance_pass_neq_pit_pass": true,
+    "this_contract_assesses_none_of_these_dimensions": true,
+    "assessment_of_these_dimensions_belongs_to_the_future_gate_only": true
+  },
+
+  "join_identity_rule": {
+    "join_keys_and_uniqueness_policy_frozen_now": true,
+    "fuzzy_matching_at_gate_time_forbidden": true,
+    "required_identifier": "the_repository_canonical_company_identifier_or_an_already_audited_deterministic_mapping",
+    "accidental_many_to_many_forbidden": true,
+    "duplicate_company_year_feature_after_resolution_forbidden": true,
+    "cross_year_carry_forward_forbidden_unless_explicitly_preregistered": true,
+    "future_filing_filling_earlier_missingness_forbidden": true,
+    "outcome_informed_manual_matching_forbidden": true,
+    "ambiguous_identity_verdict": "unresolved"
+  },
+
+  "missingness_policy": {
+    "no_imputation_default": true,
+    "override_requires": "an_already_frozen_canonical_SAP_explicitly_saying_otherwise",
+    "checked_stage125_sap_for_override": "project/stage125/part4_statistical_analysis_plan_stage125.json",
+    "sap_override_found": false,
+    "sap_override_detail": "No clause in the Stage125 Part 4 Statistical Analysis Plan authorizes imputation, forward-fill, backward-fill, interpolation, extrapolation, or any inferred/proxy substitute for M4 governance candidates. The default no-imputation rule therefore stands unmodified.",
+    "forbidden_operations": [
+      "impute",
+      "forward_fill",
+      "backward_fill",
+      "interpolate",
+      "extrapolate",
+      "infer_opinion",
+      "infer_going_concern",
+      "infer_board_size",
+      "replace_missing",
+      "proxy_candidate"
+    ],
+    "missing_stays_missing": true
+  },
+
+  "three_state_gate_semantics": {
+    "states": [
+      "PASS_M4_DATA_GATE",
+      "FAIL_M4_DATA_GATE",
+      "UNRESOLVED_M4_DATA_GATE"
+    ],
+    "states_are_distinct_and_not_collapsible": true,
+    "pass_definition": "all pre-specified conditions are observed to pass",
+    "fail_definition": "one or more pre-specified conditions are demonstrably violated by observed evidence",
+    "unresolved_definition": "insufficient evidence to determine PASS or FAIL for one or more pre-specified conditions",
+    "forbidden_coercions": [
+      "UNKNOWN_to_FAIL",
+      "UNKNOWN_to_zero",
+      "missing_evidence_to_negative_evidence"
+    ]
+  },
+
+  "m3_comparator_boundary": {
+    "confirmatory_chain_redefined_by_this_action": false,
+    "m3_cbi_status_preserved": "UNRESOLVED_M3_DATA_GATE",
+    "m3_cbi_status_source": "project/docs/ai/handoff_state.json (m3_macro_data_gate_status), project/stage128/m3_macro_data_gate/",
+    "m3_lag_wdi_disposition_preserved": "SUPPLEMENTARY_EXPLORATORY_ONLY",
+    "m3_lag_wdi_disposition_source": "project/docs/ai/handoff_state.json (m3_lag_wdi_final_research_disposition, stage128_m3_lag_wdi_final_research_disposition)",
+    "m3_lag_wdi_promoted_to_confirmatory_model": false,
+    "confirmatory_holm_family": ["M2_minus_M1", "M3_CBI_minus_M2", "M4_minus_M3_CBI"],
+    "confirmatory_holm_family_source": "project/docs/ai/DECISIONS.md and project/docs/ai/OPEN_TASKS.md",
+    "confirmatory_holm_family_changed_by_this_action": false,
+    "confirmatory_holm_family_executed": false,
+    "m4_minus_m3_cbi_comparison_identity_preserved_exactly": true,
+    "m3_cbi_unresolved_creates_future_dependency_for_m4_incremental_evaluation": true,
+    "dependency_detail": "The confirmatory comparison M4_minus_M3_CBI cannot be executed while M3-CBI remains UNRESOLVED_M3_DATA_GATE, because M3-CBI is its comparator block. This dependency is recorded here explicitly and is NOT resolved by this action: M3-CBI's resolution (or a separate human decision about how to proceed without it) is a prerequisite for any future M4 incremental evaluation, not something this M4 data-gate contract can or does address."
+  },
+
+  "final_test_firewall": {
+    "final_test_locked": true,
+    "final_test_rows_read": 0,
+    "this_contract_touches_final_test": false,
+    "future_gate_touches_final_test": false,
+    "no_final_test_predictor_or_target_value_inspected": true,
+    "no_final_test_distribution_or_coverage_inspected": true
+  },
+
+  "contract_lock_state": {
+    "m4_contract_status": "PROSPECTIVELY_LOCKED_PRE_RETRIEVAL",
+    "candidate_count": 4,
+    "candidate_set": ["audit_opinion_type", "going_concern_flag", "audit_lag_days", "board_size"],
+    "m4_data_retrieval_started": false,
+    "m4_candidate_observations_read": 0,
+    "m4_data_gate_executed": false,
+    "m4_block_admitted": false,
+    "m4_modeling_started": false,
+    "m4_incremental_evaluation_authorized": false,
+    "contract_lock_authorization": {
+      "was_authorized": true,
+      "authorized_now": false,
+      "authorization_consumed": true,
+      "authorization_reusable": false
+    },
+    "next_action_pointer": "stage129-m4-governance-data-gate",
+    "next_action_authorized": false,
+    "pointer_is_not_authorization": true
+  },
+
+  "preserved_unchanged_state": {
+    "m2_retained_status": "RETAIN_M2_AS_INTERMEDIATE_CONFIRMATORY_BLOCK",
+    "m3_cbi_status": "UNRESOLVED_M3_DATA_GATE",
+    "m3_lag_wdi_disposition": "SUPPLEMENTARY_EXPLORATORY_ONLY",
+    "m3_lag_wdi_e1_conclusion": "E1_NULL_NO_DETECTABLE_INCREMENTAL_CONTRIBUTION",
+    "m3_lag_wdi_pr_auc_deltas": {
+      "logistic": [0.000862, [-0.028237, 0.032186]],
+      "random_forest": [-0.002720, [-0.029157, 0.011924]],
+      "xgboost": [0.002749, [-0.007437, 0.014554]]
+    },
+    "m3_lag_wdi_brier_deltas": {
+      "logistic": [-0.004600, [-0.006147, -0.003066]],
+      "random_forest": [-0.001375, [-0.002229, -0.000566]]
+    },
+    "wdi_pit_status": "UNVERIFIED_WITH_CURRENTLY_AVAILABLE_EVIDENCE",
+    "track_a_status": "VOLUNTARILY_TERMINATED_BY_EXPLICIT_HUMAN_DECISION",
+    "confirmatory_holm_family_unchanged": true,
+    "holm_final_adjustment_not_executed": true,
+    "paper_winner_selected": false,
+    "final_model_selected": false,
+    "full_development_refit_performed": false,
+    "final_test_locked": true,
+    "final_test_rows_read": 0
+  }
+}

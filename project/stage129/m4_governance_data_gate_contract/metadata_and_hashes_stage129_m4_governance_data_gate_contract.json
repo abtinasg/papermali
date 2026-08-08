@@ -1,0 +1,24 @@
+{
+  "action_id": "stage129-m4-governance-data-gate-contract-lock",
+  "credentials_committed_to_git": false,
+  "m4_value_files_committed": 0,
+  "package_files": {
+    "README_STAGE129_M4_GOVERNANCE_DATA_GATE_CONTRACT.md": {
+      "bytes": 7445,
+      "sha256": "61620d7c371669200902dac59936aa902ff3cdd4024a26b530d8e847ea7fd701"
+    },
+    "stage129_m4_data_gate_contract.json": {
+      "bytes": 19315,
+      "sha256": "0097c1ad9d24f2f1ae3a38e6cb1c2a2ca6a4dc6cec282701721e09532fa75815"
+    },
+    "stage129_m4_data_gate_execution_audit.json": {
+      "bytes": 755,
+      "sha256": "1c167006c8662f718d97615e9896d854eb6cd5afd31171baf7f4e2ecaed66223"
+    },
+    "stage129_m4_data_gate_governance_boundary.json": {
+      "bytes": 1199,
+      "sha256": "58b8b87c8d9710488bd80270242400a32ad806e524844280d348ec15a7f49dda"
+    }
+  },
+  "pii_committed_to_git": false
+}
