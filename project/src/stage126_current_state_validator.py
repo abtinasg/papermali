@@ -1766,6 +1766,20 @@ STAGE128_M3_LAG_CALMAP_LOCKED_OFFSET = 621
 STAGE128_M3_LAG_CALMAP_LOCKED_RULE = "jalali_fiscal_year_t_plus_621"
 STAGE128_M3_LAG_CALMAP_REJECTED_OFFSET = 622
 
+#: Prose that asserts, in the present tense, that the mapping is still open.
+#: Once the lock is published these may not appear in CURRENT_STATE.md.
+STAGE128_M3_LAG_CALMAP_PRE_LOCK_CLAIMS = (
+    "Calendar mapping still unlocked",
+    "calendar mapping still unlocked",
+    "mapping is still unlocked",
+    "must be human-locked",
+    "must be human locked",
+)
+
+#: The one header under which the Step D limitation list — which contains the
+#: pre-lock wording as a quoted historical fact — may still be published.
+STAGE128_M3_LAG_CALMAP_HISTORICAL_HEADER = "Limitations RECORDED AT STEP D"
+
 
 def stage128_m3_lag_wdi_calendar_mapping_locked(repo_root: Path) -> bool:
     """True once the Jalali-to-Gregorian mapping has been locked properly.
@@ -4056,6 +4070,32 @@ def build_assertions(
             is False),
         "locking the calendar mapping establishes no point-in-time WDI "
         "availability, and the surviving limitations stay published")
+    # The machine-readable state and the human-readable CURRENT_STATE must
+    # not be able to disagree about this decision. Publishing
+    # calendar_mapping_locked = true while the generated prose still says the
+    # mapping is unlocked or still needs a human decision is exactly the drift
+    # this catches. The Step D limitation list is exempt because it is quoted
+    # verbatim from the Step D artifact under an explicitly historical header:
+    # at Step D time the mapping really WAS unlocked, and that record is not
+    # rewritten.
+    _calmap_pre_lock_claims = [
+        line for line in current_state_text.splitlines()
+        if any(claim in line for claim in
+               STAGE128_M3_LAG_CALMAP_PRE_LOCK_CLAIMS)
+        and STAGE128_M3_LAG_CALMAP_HISTORICAL_HEADER not in line]
+    add("current_state_cannot_publish_a_locked_mapping_as_still_unlocked",
+        (handoff.get("stage128_m3_lag_wdi_calendar_mapping_locked") is not True)
+        or not _calmap_pre_lock_claims,
+        "CURRENT_STATE.md may not claim the calendar mapping is still "
+        "unlocked, or that it still must be human-locked, while the state "
+        "publishes calendar_mapping_locked = true "
+        f"(offending lines: {len(_calmap_pre_lock_claims)})")
+    add("current_state_renders_the_calendar_mapping_lock_once_locked",
+        (not m3_lag_calmap_locked)
+        or (STAGE128_M3_LAG_CALMAP_LOCKED_RULE in current_state_text
+            and STAGE128_M3_LAG_CALMAP_ACTION_ID in current_state_text),
+        "once the mapping is locked, CURRENT_STATE.md must name the locked "
+        "rule and the action that locked it")
     # No feature-value table may exist while the mapping is unlocked. Checked
     # against the tree, not against a self-report.
     _m3_lag_feature_tables = sorted(

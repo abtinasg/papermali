@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 168,
+  "assertion_count": 170,
   "assertions": [
     {
       "detail": "",
@@ -748,6 +748,16 @@
       "status": "PASS"
     },
     {
+      "detail": "CURRENT_STATE.md may not claim the calendar mapping is still unlocked, or that it still must be human-locked, while the state publishes calendar_mapping_locked = true (offending lines: 0)",
+      "name": "current_state_cannot_publish_a_locked_mapping_as_still_unlocked",
+      "status": "PASS"
+    },
+    {
+      "detail": "once the mapping is locked, CURRENT_STATE.md must name the locked rule and the action that locked it",
+      "name": "current_state_renders_the_calendar_mapping_lock_once_locked",
+      "status": "PASS"
+    },
+    {
       "detail": "no M3-LAG-WDI modeling feature-value table may be materialized while the Jalali-to-Gregorian mapping is unlocked, because feature values are not invariant to it (found: [])",
       "name": "m3_lag_wdi_no_feature_value_table_without_a_locked_calendar_mapping",
       "status": "PASS"
@@ -844,7 +854,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "0d8af9dcffd271eb54b9076a346a151c5d76b97b",
+  "code_commit": "2f0b23848a98fff41a6841c5ffe8764079bdfc53",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -852,7 +862,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "0d8af9dcffd271eb54b9076a346a151c5d76b97b",
+  "generated_at": "2f0b23848a98fff41a6841c5ffe8764079bdfc53",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -870,7 +880,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "76225c57b36a42287f27c9630ed6ea83525929002eec4f8bec19832a0bbd6df2",
+  "source_file_sha256": "65b74448d764ca9b26aa445d81889a986f753d7bc9372779b7727d62ed50f418",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {
@@ -883,7 +893,7 @@
   "stage125_part5_live_gate_active": false,
   "stage125_part5_mode": "historical_immutable",
   "stage125_tree_aggregate_sha256": "61b20558a031648bf86df937f3356de1e69d02587fb37f1d22ceb25462596a26",
-  "test_file_sha256": "e2bc66f40ceeec1018c16a46aa8e5e85b96e7c7732c50dc229868ca1d853932a",
+  "test_file_sha256": "afa55d9aec6f0c59b176c7115e8f30031d8d257968fd62fc5b75eef0f83b854d",
   "validation_architecture": "stage126_q1q2_lean_governance_v1",
   "validator_id": "stage126_current_state_validator",
   "validator_version": "stage126_current_state_validator_v2_lean"

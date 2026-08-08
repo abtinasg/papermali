@@ -5085,19 +5085,101 @@ def render_current_state(record: dict) -> str:
                 "degeneracy does not change the formal verdict under the "
                 "PRE-EXISTING rules, and no new rejection criterion was "
                 "invented to make it do so",
-                f"- ⚠️ **Limitations that SURVIVE the verdict ({len(_g_lims)}):** "
+            ]
+            # The limitation list is the Step D artifact's own wording, read
+            # verbatim and never rewritten. One of its four entries — the
+            # unlocked calendar mapping — was TRUE WHEN STEP D RAN and was
+            # later resolved by a separate human decision. Publishing the
+            # historical list under a present-tense header is what made the
+            # generated CURRENT_STATE contradict
+            # `calendar_mapping_locked = True`, so the header states when the
+            # list was recorded and the calendar bullet below reports the
+            # CURRENT status of that entry.
+            _calmap_locked = bool(
+                record.get("stage128_m3_lag_wdi_calendar_mapping_locked"))
+            _lims_header = (
+                "Limitations RECORDED AT STEP D, verbatim"
+                if _calmap_locked
+                else "Limitations that SURVIVE the verdict")
+            _gate_lines += [
+                f"- ⚠️ **{_lims_header} ({len(_g_lims)}):** "
                 + " | ".join(_g_lims),
-                "- ⛔ **Calendar mapping still unlocked:** the locked contract "
-                "does not fix the Jalali→Gregorian mapping for "
-                "`predictor_year_t` (locked = "
-                f"{record.get('stage128_m3_lag_wdi_calendar_mapping_locked')}"
-                "). The verdict is invariant across BOTH admissible "
-                "conventions (invariant = "
-                f"{record.get('stage128_m3_lag_wdi_gate_status_invariant_across_calendar_conventions')}"
-                "), so it is well-defined despite the gap — but feature "
-                "VALUES are not invariant, so no feature-value table was "
-                "materialized and the mapping must be human-locked before "
-                "any modeling table exists",
+            ]
+            if _calmap_locked:
+                _gate_lines += [
+                    "- ✅ **Calendar mapping LOCKED (resolved AFTER step D, "
+                    "by a separate human scientific decision — action "
+                    f"`{record.get('stage128_m3_lag_wdi_calendar_mapping_lock_action_id')}`):** "
+                    "the fourth step-D limitation above is HISTORICAL and no "
+                    "longer open. Locked rule "
+                    f"`{record.get('stage128_m3_lag_wdi_calendar_mapping_rule')}` "
+                    "— "
+                    f"`{record.get('stage128_m3_lag_wdi_calendar_mapping_rule_formula')}` "
+                    "(locked = "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_locked')}"
+                    "). Offset +"
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_locked_offset')}"
+                    " carries "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_locked_offset_violations')}"
+                    f"/{_g_n} timing violations (minimum margin "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_locked_offset_margin_days_min')}"
+                    " days); the REJECTED offset +"
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_rejected_offset')}"
+                    " carries "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_rejected_offset_violations')}"
+                    f"/{_g_n} (worst "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_rejected_offset_worst_days')}"
+                    " days past the cutoff), so the two conventions are NOT "
+                    "equally admissible. Selected on timing alone (selection "
+                    "used model performance = "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_selection_used_model_performance')}"
+                    "). A further calendar-mapping decision is required "
+                    "before modeling = "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_lock_required_before_modeling')}"
+                    "; its one-time authorization is consumed = "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_lock_authorization_consumed')}"
+                    ", reusable = "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_lock_authorization_reusable')}"
+                    ", authorized NOW (standing) = "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_lock_authorized_now')}"
+                    " — changing it needs a NEW human decision = "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_changing_requires_new_human_decision')}",
+                    "- ⛔ **The lock authorized NOTHING downstream:** "
+                    "authorizes modeling = "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_lock_authorizes_modeling')}"
+                    ", authorizes a feature-value table = "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_lock_authorizes_feature_table')}"
+                    ". It amends the frozen contract without editing its "
+                    "history (amends but does not edit = "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_amends_but_does_not_edit')}"
+                    "), and it resolved NO data limitation: "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_unresolved_limitation_count')}"
+                    " limitations survive it (point-in-time WDI availability "
+                    "UNPROVEN, the FX 2021–2024 degeneracy and the "
+                    "`PA.NUS.FCRF` 2024–2025 missingness all stand). Step E "
+                    "still requires its own NEW explicit human authorization",
+                    "- Package: `project/stage128/"
+                    "m3_lag_wdi_exploratory_calendar_mapping_lock/`; "
+                    "interpretation: `project/stage128/"
+                    "m3_lag_wdi_exploratory_calendar_mapping_lock/"
+                    "README_STAGE128_M3_LAG_WDI_EXPLORATORY_CALENDAR_MAPPING"
+                    "_LOCK.md`",
+                ]
+            else:
+                _gate_lines += [
+                    "- ⛔ **Calendar mapping still unlocked:** the locked "
+                    "contract does not fix the Jalali→Gregorian mapping for "
+                    "`predictor_year_t` (locked = "
+                    f"{record.get('stage128_m3_lag_wdi_calendar_mapping_locked')}"
+                    "). The verdict is invariant across BOTH admissible "
+                    "conventions (invariant = "
+                    f"{record.get('stage128_m3_lag_wdi_gate_status_invariant_across_calendar_conventions')}"
+                    "), so it is well-defined despite the gap — but feature "
+                    "VALUES are not invariant, so no feature-value table was "
+                    "materialized and the mapping must be human-locked "
+                    "before any modeling table exists",
+                ]
+            _gate_lines += [
                 "- Package: `project/stage128/"
                 "m3_lag_wdi_exploratory_data_gate/`; interpretation: "
                 "`project/stage128/m3_lag_wdi_exploratory_data_gate/"
