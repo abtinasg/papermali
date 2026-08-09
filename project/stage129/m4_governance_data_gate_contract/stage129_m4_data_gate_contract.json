@@ -52,6 +52,33 @@
       "allowed_categories_source": "authoritative_audit_report_framework_not_empirical_inspection",
       "categories_derived_from_empirical_data_forbidden": true,
       "unclear_or_unsupported_classification": "missing_unresolved_never_guessed",
+      "candidate_identity_frozen": true,
+      "taxonomy_status": "CONTRACT_ISSUE_UNRESOLVED",
+      "taxonomy_frozen": false,
+      "modeled_categorical_values_admitted": false,
+      "gate_may_execute_for_this_candidate": false,
+      "identity_lock_does_not_imply_taxonomy_lock": "The candidate identity 'audit_opinion_type' is frozen as one of the four M4 candidates. Its exact allowed category taxonomy is NOT frozen. These are two different locks and this contract asserts only the first.",
+      "candidate_taxonomy_documented_not_verified": {
+        "candidate_categories": [
+          "اظهارنظر مقبول (Unqualified)",
+          "اظهارنظر مشروط (Qualified)",
+          "اظهارنظر مردود (Adverse)",
+          "عدم اظهارنظر (Disclaimer of opinion)"
+        ],
+        "candidate_alignment_claimed": "reported to align with ISA 700/705 opinion-type structure",
+        "sources": [
+          "secondary Persian accounting-blog sources describing a plausible 4-category Iranian audit-opinion structure"
+        ],
+        "source_authority": "secondary_not_authoritative",
+        "verification_status": "unverified_provisional_not_confirmed_against_CODAL_field_schema",
+        "authoritative_sources_checked_and_not_found": [
+          "no official IACPA (Iranian Association of Certified Public Accountants) standard text located confirming this exact category list",
+          "no official Audit Organization (سازمان حسابرسی) standard text located confirming this exact category list",
+          "no CODAL structured field schema located confirming the field's exact allowed value set"
+        ],
+        "must_not_be_treated_as_frozen": true
+      },
+      "resolution_required_before_gate": "authoritative CODAL field schema or IACPA/Audit Organization standard text confirming exact category identifiers",
       "document": "official_CODAL_audit_report_year_t",
       "source_id": "src_m4_codal_audit"
     },
@@ -79,7 +106,15 @@
         "field_1": "predictor_fiscal_year_end (official CODAL financial-statement fiscal_year_end field)",
         "field_2": "audit_report_date (official CODAL audit report date field)"
       },
-      "calendar_conversion_convention": "Both fields must be normalized to Gregorian ISO calendar dates before differencing. The project's canonical calendar-handling precedent (locked in the M3-LAG-WDI calendar mapping, project/stage128/m3_lag_wdi_exploratory_calendar_mapping_lock/, rule jalali_fiscal_year_t_plus_621) establishes that any Jalali source date MUST be converted through a human-locked, evidence-based offset before use; no new offset is invented by this contract, and audit_lag_days must use whichever conversion is already authoritative for the CODAL audit-report date field at the time of the Gate, or remain UNRESOLVED if none is authoritative.",
+      "calendar_conversion_convention": "Both fields must be normalized to Gregorian ISO calendar dates before differencing. CONTRACT ISSUE / UNRESOLVED: (a) the M3-LAG-WDI jalali_fiscal_year_t_plus_621 rule (locked in project/stage128/m3_lag_wdi_exploratory_calendar_mapping_lock/) is a YEAR-MAPPING convention -- it maps a Jalali fiscal year t to an annual macro-indicator lookup year (t + 621) -- and is NOT a calendar-date-to-date conversion rule; it is not applicable to a day-level date difference and must NOT be reused or invoked as backing for converting the CODAL audit-report-date or fiscal_year_end fields. (b) No authoritative CODAL date-field format documentation and no independent, authoritative Jalali-to-Gregorian (or other) conversion rule for the CODAL audit-report-date field currently exists in this repository or was found in available research (checked: no repo artifact defines a CODAL date-field format or conversion rule; web search found nothing authoritative on CODAL's date-field format). (c) audit_lag_days computation is therefore UNRESOLVED pending an authoritative date-field-format/conversion source -- no conversion may be invented or assumed by this contract or by any downstream code. (d) resolution_required_before_gate: authoritative CODAL date-field format documentation or an independently verifiable, authoritative Jalali-to-Gregorian (or other) calendar-date conversion rule specific to the CODAL audit-report-date and fiscal_year_end fields.",
+      "candidate_identity_frozen": true,
+      "calendar_conversion_status": "CONTRACT_ISSUE_UNRESOLVED",
+      "calendar_conversion_frozen": false,
+      "value_may_be_calculated": false,
+      "jalali_fiscal_year_t_plus_621_permitted_as_daily_date_conversion": false,
+      "gate_may_execute_for_this_candidate": false,
+      "identity_lock_does_not_imply_conversion_lock": "The candidate identity 'audit_lag_days' is frozen as one of the four M4 candidates. Its exact deterministic date-conversion convention is NOT frozen, and no audit_lag_days value may be computed while this remains unresolved. These are two different locks and this contract asserts only the first.",
+      "resolution_required_before_gate": "authoritative CODAL date-field format documentation or an independently verifiable, authoritative Jalali-to-Gregorian (or other) calendar-date conversion rule specific to the CODAL audit-report-date and fiscal_year_end fields",
       "difference_direction": "audit_report_date minus fiscal_year_end (non-negative only)",
       "report_date_is_not_automatically_availability_date": true,
       "report_date_before_cutoff_but_first_public_after_cutoff_is_not_available": "A report dated before the pair cutoff whose verified public availability (available_at) is after the cutoff is NOT point-in-time available; only available_at, never the document's internal date, governs usability.",
@@ -228,12 +263,36 @@
   "join_identity_rule": {
     "join_keys_and_uniqueness_policy_frozen_now": true,
     "fuzzy_matching_at_gate_time_forbidden": true,
-    "required_identifier": "the_repository_canonical_company_identifier_or_an_already_audited_deterministic_mapping",
+    "required_identifier": {
+      "company_key": "ticker",
+      "fiscal_year_key": "fiscal_year_t",
+      "row_disambiguation_keys_for_full_pair_identity": [
+        "predictor_row_key_t",
+        "target_row_key_t_plus_1",
+        "target_year"
+      ],
+      "source": "project/stage128/m2_incremental_evaluation/stage127_m2_common_sample_join_audit.json (fields canonical_row_identity, join_keys) and project/stage128/m3_macro_data_gate/stage128_m3_macro_data_gate_decision.json (field required_join_keys), the already-audited M2/M3-family join keys, reused unchanged for M4",
+      "uniqueness_cardinality_before_join": "one row per (ticker, fiscal_year_t) in each joined side, as audited in stage127_m2_common_sample_join_audit.json (parent_rows=666, d2_rows=666, matched_rows=666, unmatched_parent_rows=0, unmatched_d2_rows=0)",
+      "uniqueness_cardinality_after_join": "join_is_one_to_one=true, duplicate_join_keys=0, many_to_many_joins=0, as audited in stage127_m2_common_sample_join_audit.json; the same one-to-one, zero-duplicate result is reused unmodified by the M3 macro Data Gate (required_join_keys) for the M2 development common sample that M4 must join against",
+      "duplicate_resolution_policy": "none_permitted; any duplicate (ticker, fiscal_year_t) pair after join is a contract violation, not something resolved by a tie-break rule; ambiguous identity is recorded as unresolved per ambiguous_identity_verdict below, never silently deduplicated",
+      "scope_of_what_this_audited_evidence_establishes": "PARENT-SIDE ONLY. The stage127 audit establishes the canonical row identity of the modeling surface (the retained M2 development common sample) and proves a one-to-one, zero-duplicate join for a child side sourced from TSETMC market data (source_id src_m2_tsetmc_market, matched on the Persian ticker/نماد). It does NOT audit, and must not be read as auditing, the resolution of a CODAL-sourced disclosure to that same ticker.",
+      "fallback_mapping_permitted": false
+    },
+    "codal_to_parent_company_identity_resolution": {
+      "status": "CONTRACT_ISSUE_UNRESOLVED",
+      "issue": "No audited, deterministic mapping exists from a CODAL issuer/company identity (as CODAL itself identifies a filer -- e.g. symbol/نماد, issuer id, national id, or ISIN on the disclosure) to the frozen parent-side company key `ticker`.",
+      "why_prior_joins_do_not_settle_it": "The already-audited join evidence (stage127_m2_common_sample_join_audit.json, reused by the M3 macro Data Gate) covers a TSETMC-sourced child side, and the M3 macro child side is country-year macro data, not company-level filings. Neither audited a CODAL-sourced company-level child side. Semantic compatibility of the identifier across those two source systems is asserted nowhere in this repository and is NOT established by prior use of the same parent-side keys.",
+      "only_codal_identity_work_in_repository": "project/stage124/batch02_parts/ (part02/part03) -- a 10-ticker screening pilot in which all 10 tickers are network_blocked, fetched_source_count=0, evidence_source_count=0, ready_count=0 and every ticker is requires_manual_review. It establishes no mapping and is not a canonical identity artifact.",
+      "consequence": "The M4 Data Gate's join-quality/uniqueness dimension (G) cannot be evaluated for CODAL-sourced values until this mapping exists and is audited. No fuzzy matching, no name matching, no outcome-informed matching and no fallback mapping may be substituted for it.",
+      "resolution_required_before_gate": "a separately authorized, audited deterministic CODAL-identity-to-ticker mapping artifact, with its own uniqueness and ambiguity audit",
+      "gate_may_execute_join_dimension_for_codal_sourced_values": false
+    },
     "accidental_many_to_many_forbidden": true,
     "duplicate_company_year_feature_after_resolution_forbidden": true,
     "cross_year_carry_forward_forbidden_unless_explicitly_preregistered": true,
     "future_filing_filling_earlier_missingness_forbidden": true,
     "outcome_informed_manual_matching_forbidden": true,
+    "fuzzy_or_outcome_informed_or_future_carry_back_matching_forbidden": true,
     "ambiguous_identity_verdict": "unresolved"
   },
 
@@ -302,8 +361,62 @@
 
   "contract_lock_state": {
     "m4_contract_status": "PROSPECTIVELY_LOCKED_PRE_RETRIEVAL",
+
+    "_section_A_candidate_identity_lock": "Which candidates M4 may ever contain. FROZEN and complete.",
+    "m4_candidate_identity_set_locked": true,
     "candidate_count": 4,
     "candidate_set": ["audit_opinion_type", "going_concern_flag", "audit_lag_days", "board_size"],
+
+    "_section_B_gate_policy_lock": "The Gate's decision policy: thresholds, dimensions, point-in-time rule, join identity, missingness, three-state semantics. RECORDED and complete.",
+    "m4_gate_policy_contract_recorded": true,
+
+    "_section_C_unresolved_prerequisite_definitions": "Mandatory preregistered SEMANTIC definitions that are NOT frozen. Candidate identity being frozen (section A) does not make these definitions frozen. No authoritative source currently supports them, and none may be invented, guessed, or discovered empirically.",
+    "unresolved_prerequisite_definitions": [
+      {
+        "candidate": "audit_opinion_type",
+        "candidate_identity_frozen": true,
+        "definition_issue": "exact_allowed_audit_opinion_taxonomy",
+        "status": "CONTRACT_ISSUE_UNRESOLVED",
+        "modeled_categorical_values_admitted": false,
+        "empirical_taxonomy_discovery_allowed": false,
+        "gate_may_execute_for_this_candidate": false,
+        "unblocking_requires": "a separately authorized, authoritative resolution (official CODAL structured-field schema, or IACPA / Audit Organization standard text) enumerating the exact category identifiers"
+      },
+      {
+        "candidate": "audit_lag_days",
+        "candidate_identity_frozen": true,
+        "definition_issue": "exact_deterministic_calendar_date_conversion_convention",
+        "status": "CONTRACT_ISSUE_UNRESOLVED",
+        "value_may_be_calculated": false,
+        "jalali_fiscal_year_t_plus_621_permitted_as_daily_date_conversion": false,
+        "gate_may_execute_for_this_candidate": false,
+        "unblocking_requires": "a separately authorized, authoritative CODAL date-field format / calendar-date conversion source specific to audit_report_date and fiscal_year_end"
+      }
+    ],
+
+    "unresolved_cross_cutting_prerequisites": [
+      {
+        "issue": "codal_to_parent_company_identity_resolution",
+        "status": "CONTRACT_ISSUE_UNRESOLVED",
+        "scope": "all_four_candidates",
+        "detail": "Every M4 candidate value is CODAL-sourced, and no audited deterministic mapping from a CODAL issuer identity to the frozen parent-side `ticker` key exists. See join_identity_rule.codal_to_parent_company_identity_resolution.",
+        "gate_join_dimension_executable": false
+      }
+    ],
+
+    "_section_D_overall_contract_disposition": "Whether the contract as a whole is complete or blocked.",
+    "m4_contract_complete": false,
+    "m4_contract_fully_executable": false,
+    "m4_contract_completion_status": "LOCKED_WITH_UNRESOLVED_PREREQUISITE_DEFINITIONS",
+    "m4_contract_blocked_reason": "Three unresolved prerequisites. (i) audit_opinion_type has no authoritative allowed-category taxonomy. (ii) audit_lag_days has no authoritative deterministic calendar-date conversion convention. (iii) CROSS-CUTTING: no audited deterministic mapping resolves a CODAL issuer identity to the frozen parent-side `ticker` key, so the Gate's join-quality dimension cannot be evaluated for ANY of the four candidates. The candidate identity set and the Gate policy are locked; the contract is NOT unconditionally complete and the Gate is NOT executable for any candidate.",
+    "m4_data_gate_executable": false,
+    "m4_data_gate_authorized": false,
+    "m4_candidates_with_gate_ready_semantic_definitions": ["going_concern_flag", "board_size"],
+    "gate_ready_semantic_definition_is_not_gate_executability": "going_concern_flag and board_size have gate-ready SEMANTIC definitions, but the Gate is still not executable for them: the cross-cutting CODAL-identity issue blocks the join-quality dimension for all four candidates.",
+    "m4_candidates_the_gate_may_execute_for": [],
+    "m4_candidates_blocked_by_unresolved_definitions": ["audit_opinion_type", "audit_lag_days"],
+    "m4_coverage_calculated": false,
+
     "m4_data_retrieval_started": false,
     "m4_candidate_observations_read": 0,
     "m4_data_gate_executed": false,

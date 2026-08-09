@@ -4,12 +4,12 @@
   "m4_value_files_committed": 0,
   "package_files": {
     "README_STAGE129_M4_GOVERNANCE_DATA_GATE_CONTRACT.md": {
-      "bytes": 7445,
-      "sha256": "61620d7c371669200902dac59936aa902ff3cdd4024a26b530d8e847ea7fd701"
+      "bytes": 12469,
+      "sha256": "72190718fa9300d3f60a4784e1f467b585d6cfc88d6a959d6dc49d6a06047fd0"
     },
     "stage129_m4_data_gate_contract.json": {
-      "bytes": 19315,
-      "sha256": "0097c1ad9d24f2f1ae3a38e6cb1c2a2ca6a4dc6cec282701721e09532fa75815"
+      "bytes": 30664,
+      "sha256": "3aed4917bccd71ca34e6a4425b9a80f31ce49b37cf03c8f19c36c884b51f44ca"
     },
     "stage129_m4_data_gate_execution_audit.json": {
       "bytes": 755,
