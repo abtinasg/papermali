@@ -4397,3 +4397,444 @@ def test_the_current_next_pointer_is_human_decision_required_and_unauthorized():
     assert state["next_research_action_id"] == "human-decision-required"
     assert state["next_research_action_authorized"] is False
     assert state["next_research_action_pointer_is_not_authorization"] is True
+
+
+# --------------------------------------------------------------------------- #
+# Stage129 — M4 governance Data-Gate contract lock (design only, additive)
+# --------------------------------------------------------------------------- #
+
+_STAGE129_M4_REQUIRED_RELS = (
+    gen._STAGE129_M4_CONTRACT_REL,
+    gen._STAGE129_M4_BOUNDARY_REL,
+    gen._STAGE129_M4_AUDIT_REL,
+)
+
+
+def _stage129_m4_root(tmp_path, mutate_rel=None, mutate=None):
+    """A fresh temp root carrying real copies of all three Stage129 files.
+
+    ``mutate_rel`` names which of the three companion files to mutate;
+    ``mutate`` is applied to that file's loaded JSON dict before writing it
+    back. When both are None, the root is an untouched, faithful copy of the
+    real committed package (used as the positive-control baseline).
+    """
+    root = tmp_path
+    for rel in _STAGE129_M4_REQUIRED_RELS:
+        src = os.path.join(REAL_ROOT, rel)
+        payload = json.load(open(src, encoding="utf-8"))
+        if rel == mutate_rel and mutate is not None:
+            payload = mutate(payload)
+        dst = root / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_text(json.dumps(payload, ensure_ascii=False),
+                        encoding="utf-8")
+    return str(root)
+
+
+def test_stage129_m4_contract_lock_markers_are_recognized_on_a_faithful_copy(
+        tmp_path):
+    root = _stage129_m4_root(tmp_path)
+    markers = gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+        root)
+    assert markers["stage129_m4_contract_lock_executed"] is True
+    assert markers["stage129_m4_candidate_set"] == [
+        "audit_opinion_type", "going_concern_flag", "audit_lag_days",
+        "board_size",
+    ]
+    assert markers["stage129_m4_audit_opinion_type_taxonomy_status"] == (
+        "CONTRACT_ISSUE_UNRESOLVED")
+    assert markers["stage129_m4_audit_lag_days_calendar_conversion_status"] \
+        == "CONTRACT_ISSUE_UNRESOLVED"
+    assert markers["m4_data_retrieval_started"] is False
+    assert markers["m4_candidate_observations_read"] == 0
+    assert markers["m4_data_gate_executed"] is False
+    assert markers["m4_block_admitted"] is False
+    assert markers["m4_modeling_started"] is False
+    assert markers["m4_incremental_evaluation_authorized"] is False
+    assert markers["stage129_m4_next_action_id"] == (
+        "stage129-m4-governance-data-gate")
+    assert markers["stage129_m4_next_action_authorized"] is False
+    assert markers[
+        "stage129_m4_next_action_pointer_is_not_authorization"] is True
+
+
+def test_stage129_m4_markers_are_empty_before_the_package_exists(tmp_path):
+    """Missing contract == pre-lock state, not an error (fail-closed only on
+    a present-but-corrupt package, never on plain absence)."""
+    assert gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+        str(tmp_path)) == {}
+
+
+def test_stage129_m4_markers_fail_closed_on_a_corrupt_contract(tmp_path):
+    rel = gen._STAGE129_M4_CONTRACT_REL
+    dst = tmp_path / rel
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    dst.write_text("{not valid json", encoding="utf-8")
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            str(tmp_path))
+
+
+def test_stage129_m4_markers_fail_closed_when_companion_files_are_missing(
+        tmp_path):
+    """The contract alone is not sufficient: the governance boundary and the
+    execution audit are required companions, and their absence must fail
+    closed rather than silently produce a valid-looking Stage129 state."""
+    src = os.path.join(REAL_ROOT, gen._STAGE129_M4_CONTRACT_REL)
+    payload = json.load(open(src, encoding="utf-8"))
+    dst = tmp_path / gen._STAGE129_M4_CONTRACT_REL
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    dst.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            str(tmp_path))
+
+
+@pytest.mark.parametrize("mutation", [
+    {"authorizes_retrieval": True},
+    {"authorizes_gate_execution": True},
+    {"authorizes_modeling": True},
+    {"is_the_gate_itself": True},
+    {"locked_before_any_value_level_work": False},
+])
+def test_stage129_m4_contract_authorization_flags_fail_closed(
+        tmp_path, mutation):
+    def _mutate(payload):
+        payload = dict(payload)
+        payload.update(mutation)
+        return payload
+    root = _stage129_m4_root(
+        tmp_path, mutate_rel=gen._STAGE129_M4_CONTRACT_REL, mutate=_mutate)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            root)
+
+
+def test_stage129_m4_candidate_set_mutation_fails_closed(tmp_path):
+    def _mutate(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["candidate_set"]["candidates"] = [
+            "audit_opinion_type", "going_concern_flag", "audit_lag_days",
+            "board_size", "auditor_tenure",
+        ]
+        return payload
+    root = _stage129_m4_root(
+        tmp_path, mutate_rel=gen._STAGE129_M4_CONTRACT_REL, mutate=_mutate)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            root)
+
+
+def test_stage129_m4_taxonomy_cannot_be_smuggled_in_as_frozen(tmp_path):
+    """If a future edit tried to quietly re-freeze the audit-opinion-type
+    taxonomy (dropping the CONTRACT_ISSUE_UNRESOLVED status) instead of
+    resolving it with an authoritative source, recognition must fail
+    closed rather than publish it as gate-ready."""
+    def _mutate(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["semantic_definitions"]["audit_opinion_type"][
+            "taxonomy_status"] = "FROZEN"
+        return payload
+    root = _stage129_m4_root(
+        tmp_path, mutate_rel=gen._STAGE129_M4_CONTRACT_REL, mutate=_mutate)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            root)
+
+
+def test_stage129_m4_lag_days_cannot_apply_the_plus_621_year_mapping_rule(
+        tmp_path):
+    """The M3-LAG-WDI +621 rule is a YEAR-MAPPING convention, not a
+    date-conversion rule. If a future edit tried to reuse it as a date
+    offset for audit_lag_days (dropping the UNRESOLVED status), recognition
+    must fail closed."""
+    def _mutate(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["semantic_definitions"]["audit_lag_days"][
+            "calendar_conversion_status"] = "RESOLVED"
+        return payload
+    root = _stage129_m4_root(
+        tmp_path, mutate_rel=gen._STAGE129_M4_CONTRACT_REL, mutate=_mutate)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            root)
+    # And on the real, committed contract, the +621 rule is explicitly
+    # documented as NOT applicable -- no code path may apply that offset to
+    # audit_lag_days.
+    real_contract = json.load(open(
+        os.path.join(REAL_ROOT, gen._STAGE129_M4_CONTRACT_REL),
+        encoding="utf-8"))
+    convention = real_contract["semantic_definitions"]["audit_lag_days"][
+        "calendar_conversion_convention"]
+    assert "jalali_fiscal_year_t_plus_621" in convention
+    assert "NOT applicable" in convention or "NOT be reused" in convention
+
+
+def test_stage129_m4_join_keys_frozen_or_unresolved(tmp_path):
+    def _mutate(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["join_identity_rule"]["required_identifier"] = (
+            "some_vague_open_ended_description")
+        return payload
+    root = _stage129_m4_root(
+        tmp_path, mutate_rel=gen._STAGE129_M4_CONTRACT_REL, mutate=_mutate)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            root)
+
+
+def test_stage129_m4_threshold_provenance_mutation_fails_closed(tmp_path):
+    """A blanket 'all four thresholds from Stage125 Part4' claim for the
+    fourth threshold (which actually originates in the Stage128 M3 macro
+    Data Gate decision) must not be recognized as valid."""
+    def _mutate(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["thresholds"]["canonical_sources"][
+            "minimum_positive_evaluable_per_locked_validation_fold"][
+            "found_in"] = (
+                "project/stage125/part4_statistical_analysis_plan_"
+                "stage125.json")
+        return payload
+    root = _stage129_m4_root(
+        tmp_path, mutate_rel=gen._STAGE129_M4_CONTRACT_REL, mutate=_mutate)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            root)
+
+
+@pytest.mark.parametrize("field,bad", [
+    ("m4_data_retrieval_started", True),
+    ("m4_candidate_observations_read", 3),
+    ("m4_data_gate_executed", True),
+    ("m4_block_admitted", True),
+    ("m4_modeling_started", True),
+    ("m4_incremental_evaluation_authorized", True),
+    ("next_action_authorized", True),
+])
+def test_stage129_m4_no_retrieval_gate_or_modeling_may_be_claimed(
+        tmp_path, field, bad):
+    def _mutate(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["contract_lock_state"][field] = bad
+        return payload
+    root = _stage129_m4_root(
+        tmp_path, mutate_rel=gen._STAGE129_M4_CONTRACT_REL, mutate=_mutate)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            root)
+
+
+def test_stage129_m4_m3_boundary_and_holm_family_mutations_fail_closed(
+        tmp_path):
+    for field, bad in (
+        ("m3_cbi_status_preserved", "PASS_M3_DATA_GATE"),
+        ("m3_lag_wdi_disposition_preserved", "CONFIRMATORY"),
+        ("confirmatory_holm_family_executed", True),
+    ):
+        def _mutate(payload, field=field, bad=bad):
+            payload = json.loads(json.dumps(payload))
+            payload["m3_comparator_boundary"][field] = bad
+            return payload
+        root = _stage129_m4_root(
+            tmp_path / field, mutate_rel=gen._STAGE129_M4_CONTRACT_REL,
+            mutate=_mutate)
+        with pytest.raises(gen.HandoffError):
+            gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+                root)
+
+
+def test_stage129_m4_final_test_firewall_mutation_fails_closed(tmp_path):
+    def _mutate(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["final_test_firewall"]["final_test_rows_read"] = 1
+        return payload
+    root = _stage129_m4_root(
+        tmp_path, mutate_rel=gen._STAGE129_M4_CONTRACT_REL, mutate=_mutate)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            root)
+
+
+def test_stage129_m4_boundary_and_audit_mutations_fail_closed(tmp_path):
+    def _mutate_boundary(payload):
+        payload = dict(payload)
+        payload["m4_authorized"] = True
+        return payload
+    root = _stage129_m4_root(
+        tmp_path / "boundary", mutate_rel=gen._STAGE129_M4_BOUNDARY_REL,
+        mutate=_mutate_boundary)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            root)
+
+    def _mutate_audit(payload):
+        payload = dict(payload)
+        payload["counters"] = dict(payload["counters"])
+        payload["counters"]["m4_candidate_observations_read"] = 12
+        return payload
+    root2 = _stage129_m4_root(
+        tmp_path / "audit", mutate_rel=gen._STAGE129_M4_AUDIT_REL,
+        mutate=_mutate_audit)
+    with pytest.raises(gen.HandoffError):
+        gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            root2)
+
+
+def test_stage129_m4_is_recognized_by_the_full_handoff_build():
+    """End-to-end: the real, committed repository state carries the locked
+    Stage129 contract all the way into the generated handoff record."""
+    record = gen.compute_record(REAL_ROOT)
+    assert record["stage129_m4_contract_lock_executed"] is True
+    assert record["m4_data_retrieval_started"] is False
+    assert record["m4_data_gate_executed"] is False
+    assert record["m4_block_admitted"] is False
+    assert record["m4_modeling_started"] is False
+    assert record["m4_incremental_evaluation_authorized"] is False
+    assert record["stage129_m4_next_action_id"] == (
+        "stage129-m4-governance-data-gate")
+    assert record["stage129_m4_next_action_authorized"] is False
+    assert record["next_research_action_id"] == "human-decision-required"
+    assert record["stage128_m3_lag_wdi_next_action_id"] == (
+        "human_decision_required")
+
+
+def test_current_state_renders_the_stage129_m4_contract_lock_section():
+    text = _current_state_text()
+    assert "Stage129" in text
+    assert "M4 governance Data-Gate contract lock" in text
+    assert "PROSPECTIVELY_LOCKED_PRE_RETRIEVAL" in text
+    assert "CONTRACT_ISSUE_UNRESOLVED" in text
+    assert "stage129-m4-governance-data-gate" in text
+    # It must not claim to have advanced either pre-existing live pointer.
+    assert "A THIRD, separate pointer" in text
+
+
+def test_stage129_m4_completion_cannot_be_overstated(tmp_path):
+    """Section D must never publish the contract as complete/executable while
+    section C holds unresolved prerequisite definitions. Each of these single
+    flips is the whole overstatement, so each must fail closed on its own."""
+    for field, value in (
+        ("m4_contract_complete", True),
+        ("m4_contract_fully_executable", True),
+        ("m4_data_gate_executable", True),
+        ("m4_data_gate_authorized", True),
+        ("m4_coverage_calculated", True),
+        ("m4_contract_completion_status", "COMPLETE"),
+        ("m4_candidate_identity_set_locked", False),
+        ("m4_gate_policy_contract_recorded", False),
+    ):
+        def _mutate(payload, _field=field, _value=value):
+            payload = json.loads(json.dumps(payload))
+            payload["contract_lock_state"][_field] = _value
+            return payload
+        root = _stage129_m4_root(
+            tmp_path / field.replace("/", "_"),
+            mutate_rel=gen._STAGE129_M4_CONTRACT_REL, mutate=_mutate)
+        with pytest.raises(gen.HandoffError):
+            gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+                root)
+
+
+def test_stage129_m4_blocked_candidate_cannot_be_quietly_unblocked(tmp_path):
+    """Dropping a candidate from the blocked list, or declaring its Gate
+    executable, must fail closed while its definition stays unresolved."""
+    def _drop_blocked(payload):
+        payload = json.loads(json.dumps(payload))
+        state = payload["contract_lock_state"]
+        state["m4_candidates_blocked_by_unresolved_definitions"] = [
+            "audit_lag_days"]
+        state["m4_candidates_with_gate_ready_semantic_definitions"] = [
+            "audit_opinion_type", "going_concern_flag", "board_size"]
+        return payload
+
+    def _gate_executable_for_blocked(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["contract_lock_state"][
+            "unresolved_prerequisite_definitions"][0][
+                "gate_may_execute_for_this_candidate"] = True
+        return payload
+
+    def _semantic_gate_executable(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["semantic_definitions"]["audit_opinion_type"][
+            "gate_may_execute_for_this_candidate"] = True
+        return payload
+
+    def _admit_categorical_values(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["semantic_definitions"]["audit_opinion_type"][
+            "modeled_categorical_values_admitted"] = True
+        return payload
+
+    def _permit_621_as_date_rule(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["semantic_definitions"]["audit_lag_days"][
+            "jalali_fiscal_year_t_plus_621_permitted_as_daily_date_conversion"
+        ] = True
+        return payload
+
+    def _permit_lag_calculation(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["semantic_definitions"]["audit_lag_days"][
+            "value_may_be_calculated"] = True
+        return payload
+
+    for index, mutate in enumerate((
+            _drop_blocked, _gate_executable_for_blocked,
+            _semantic_gate_executable, _admit_categorical_values,
+            _permit_621_as_date_rule, _permit_lag_calculation)):
+        root = _stage129_m4_root(
+            tmp_path / f"case{index}",
+            mutate_rel=gen._STAGE129_M4_CONTRACT_REL, mutate=mutate)
+        with pytest.raises(gen.HandoffError):
+            gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+                root)
+
+
+def test_stage129_m4_codal_identity_cannot_be_declared_resolved(tmp_path):
+    """Prior use of the same parent-side keys against a TSETMC child is not
+    evidence of CODAL identity compatibility. Declaring it resolved, or
+    re-opening a fallback mapping, must fail closed."""
+    def _resolve_identity(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["join_identity_rule"][
+            "codal_to_parent_company_identity_resolution"][
+                "status"] = "RESOLVED"
+        return payload
+
+    def _allow_join_dimension(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["join_identity_rule"][
+            "codal_to_parent_company_identity_resolution"][
+                "gate_may_execute_join_dimension_for_codal_sourced_values"
+            ] = True
+        return payload
+
+    def _permit_fallback(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["join_identity_rule"]["required_identifier"][
+            "fallback_mapping_permitted"] = True
+        return payload
+
+    def _drop_cross_cutting(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["contract_lock_state"][
+            "unresolved_cross_cutting_prerequisites"] = []
+        return payload
+
+    def _claim_gate_executable_candidates(payload):
+        payload = json.loads(json.dumps(payload))
+        payload["contract_lock_state"][
+            "m4_candidates_the_gate_may_execute_for"] = [
+                "going_concern_flag", "board_size"]
+        return payload
+
+    for index, mutate in enumerate((
+            _resolve_identity, _allow_join_dimension, _permit_fallback,
+            _drop_cross_cutting, _claim_gate_executable_candidates)):
+        root = _stage129_m4_root(
+            tmp_path / f"identity{index}",
+            mutate_rel=gen._STAGE129_M4_CONTRACT_REL, mutate=mutate)
+        with pytest.raises(gen.HandoffError):
+            gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
+                root)

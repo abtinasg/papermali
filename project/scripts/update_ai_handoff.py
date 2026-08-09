@@ -2964,6 +2964,13 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # unmoved, and converges both the Track A and Track B pointers on
         # `human_decision_required`.
         **derive_stage128_m3i2_track_a_waiting_termination_markers(root),
+        # Must come last of all: Stage129 is an ADDITIVE, design-only,
+        # pre-retrieval contract lock for a distinct future block (M4). It
+        # never advances the Track A pointer (`next_research_action_id`) or
+        # the Track B pointer (`stage128_m3_lag_wdi_next_action_id`) set
+        # above -- it publishes its own, separate M4 pointer instead.
+        **derive_stage129_m4_governance_data_gate_contract_lock_markers(
+            root),
         }))
 
 
@@ -5540,6 +5547,117 @@ def render_current_state(record: dict) -> str:
             "m3i2_track_a_waiting_termination_and_m3_disposition/"
             "README_STAGE128_M3I2_TRACK_A_WAITING_TERMINATION_AND_M3_"
             "DISPOSITION.md`",
+            "",
+        ]
+    if record.get("stage129_m4_contract_lock_executed"):
+        holm = record.get("stage129_m4_confirmatory_holm_family") or []
+        lines += [
+            "### Stage129 — M4 governance Data-Gate contract lock "
+            "(DESIGN ONLY, additive, not on either live pointer chain)\n",
+            "_A prospective, pre-retrieval contract lock only. Zero M4 "
+            "retrieval, zero Data Gate execution, zero modeling, zero Final "
+            "Test access._\n",
+            "- ✅ **(A) Candidate identity lock:** "
+            f"`{record.get('stage129_m4_contract_status')}` — candidate "
+            f"identity set locked = "
+            f"{record.get('stage129_m4_candidate_identity_set_locked')}, "
+            f"count `{record.get('stage129_m4_candidate_count')}` "
+            "(exact, no substitution): "
+            f"`{record.get('stage129_m4_candidate_set')}`.",
+            "- ✅ **(B) Gate policy contract recorded:** "
+            f"{record.get('stage129_m4_gate_policy_contract_recorded')} "
+            "(thresholds, Gate dimensions, point-in-time rule, join "
+            "identity, missingness policy, three-state semantics).",
+            "- ⛔ **(D) The contract as a whole is NOT complete:** "
+            f"contract complete = "
+            f"{record.get('stage129_m4_contract_complete')}, fully "
+            "executable = "
+            f"{record.get('stage129_m4_contract_fully_executable')}, status "
+            f"`{record.get('stage129_m4_contract_completion_status')}`. "
+            "M4 Data Gate executable = "
+            f"{record.get('stage129_m4_data_gate_executable')}, Data Gate "
+            f"authorized = "
+            f"{record.get('stage129_m4_data_gate_authorized')}, coverage "
+            f"calculated = {record.get('stage129_m4_coverage_calculated')}. "
+            "Candidates blocked by an unresolved semantic definition: "
+            f"`{record.get('stage129_m4_candidates_blocked_by_unresolved_definitions')}`"
+            "; candidates with gate-ready semantic definitions: "
+            f"`{record.get('stage129_m4_candidates_with_gate_ready_semantic_definitions')}`"
+            "; candidates the Gate may actually execute for: "
+            f"`{record.get('stage129_m4_candidates_the_gate_may_execute_for')}` "
+            "(none — see the cross-cutting identity issue below).",
+            "- ⚠️ **(C) CROSS-CUTTING CONTRACT ISSUE — CODAL company "
+            "identity:** "
+            f"`{record.get('stage129_m4_codal_identity_resolution_status')}`. "
+            "No audited deterministic mapping resolves a CODAL issuer "
+            "identity to the frozen parent-side `ticker` key. The audited "
+            "stage127 join evidence is PARENT-SIDE only (its child side was "
+            "TSETMC market data, not CODAL filings), so it does not "
+            "establish cross-source identity compatibility. The Gate's "
+            "join-quality dimension is therefore not executable for "
+            "CODAL-sourced values "
+            f"({record.get('stage129_m4_join_dimension_executable_for_codal_values')})"
+            " — which is every M4 candidate.",
+            "- ⛔ **Nothing executed:** M4 data retrieval started "
+            f"{record.get('m4_data_retrieval_started')} — candidate "
+            f"observations read {record.get('m4_candidate_observations_read')}"
+            f" — Data Gate executed {record.get('m4_data_gate_executed')} — "
+            f"block admitted {record.get('m4_block_admitted')} — modeling "
+            f"started {record.get('m4_modeling_started')} — incremental "
+            "evaluation authorized "
+            f"{record.get('m4_incremental_evaluation_authorized')}.",
+            "- **Contract-lock authorization (consumed, not standing):** "
+            f"was_authorized={record.get('stage129_m4_contract_lock_was_authorized')}, "
+            f"authorized_now={record.get('stage129_m4_contract_lock_authorized_now')}, "
+            f"authorization_consumed={record.get('stage129_m4_contract_lock_authorization_consumed')}, "
+            f"authorization_reusable={record.get('stage129_m4_contract_lock_authorization_reusable')}.",
+            "- **A THIRD, separate pointer** (neither Track A's "
+            f"`{record.get('next_research_action_id')}` nor Track B's "
+            f"`{record.get('stage128_m3_lag_wdi_next_action_id')}` is moved "
+            "by this action): "
+            f"`{record.get('stage129_m4_next_action_id')}` — authorized = "
+            f"{record.get('stage129_m4_next_action_authorized')}. A pointer "
+            "is never an authorization.",
+            "- ⚠️ **(C) Two candidate-specific CONTRACT ISSUES / UNRESOLVED "
+            "prerequisite definitions.** Candidate IDENTITY for both is frozen; their "
+            "DEFINITIONS are not, no modeled values are admitted, no "
+            "empirical discovery is allowed, and the future Gate cannot "
+            "execute for either candidate until a separately authorized, "
+            "authoritative resolution exists: `audit_opinion_type` category "
+            "taxonomy = "
+            f"`{record.get('stage129_m4_audit_opinion_type_taxonomy_status')}`"
+            " (only secondary Persian accounting-blog sources found, no "
+            "authoritative CODAL field schema or IACPA/Audit Organization "
+            "standard text); `audit_lag_days` calendar-conversion "
+            "convention = "
+            f"`{record.get('stage129_m4_audit_lag_days_calendar_conversion_status')}`"
+            " (the M3-LAG-WDI `jalali_fiscal_year_t_plus_621` YEAR-MAPPING "
+            "rule is explicitly NOT applicable to this day-level date "
+            "difference, and no authoritative CODAL date-field conversion "
+            "rule was found).",
+            "- ⚠️ **Join identity: parent-side keys frozen, CODAL side "
+            "UNRESOLVED.** Frozen to the already-audited M2/M3-family "
+            "keys:** company key = "
+            f"`{record.get('stage129_m4_join_identity_company_key')}`, "
+            "fiscal-year key = "
+            f"`{record.get('stage129_m4_join_identity_fiscal_year_key')}`, "
+            "ambiguous-identity verdict = "
+            f"`{record.get('stage129_m4_join_identity_ambiguous_verdict')}`"
+            " — source: "
+            f"`{record.get('stage129_m4_join_identity_source')}`.",
+            "- ⛔ **Unchanged (regression check):** M3-CBI status "
+            f"`{record.get('stage129_m4_m3_cbi_status_preserved')}`, "
+            "M3-LAG-WDI disposition "
+            f"`{record.get('stage129_m4_m3_lag_wdi_disposition_preserved')}`,"
+            f" confirmatory Holm family `{holm}` executed = "
+            f"{record.get('stage129_m4_confirmatory_holm_family_executed')}.",
+            "- ⛔ **Final Test firewall untouched:** locked "
+            f"{record.get('stage129_m4_final_test_locked')}, rows read "
+            f"{record.get('stage129_m4_final_test_rows_read')}.",
+            "- Package: `project/stage129/m4_governance_data_gate_contract/`;"
+            " interpretation: `project/stage129/"
+            "m4_governance_data_gate_contract/"
+            "README_STAGE129_M4_GOVERNANCE_DATA_GATE_CONTRACT.md`",
             "",
         ]
     lines += [
@@ -11091,6 +11209,499 @@ def derive_stage128_m3i2_track_a_waiting_termination_markers(
         "final_test_locked": True,
         "merge_authorized": False,
         "paper_winner_selected": False,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# Stage129 -- M4 governance Data-Gate contract lock (design only)
+# --------------------------------------------------------------------------- #
+
+_STAGE129_M4_PKG = "project/stage129/m4_governance_data_gate_contract"
+_STAGE129_M4_ACTION_ID = "stage129-m4-governance-data-gate-contract-lock"
+_STAGE129_M4_CONTRACT_REL = (
+    f"{_STAGE129_M4_PKG}/stage129_m4_data_gate_contract.json")
+_STAGE129_M4_BOUNDARY_REL = (
+    f"{_STAGE129_M4_PKG}/stage129_m4_data_gate_governance_boundary.json")
+_STAGE129_M4_AUDIT_REL = (
+    f"{_STAGE129_M4_PKG}/stage129_m4_data_gate_execution_audit.json")
+
+_STAGE129_M4_CONTRACT_STATUS = "PROSPECTIVELY_LOCKED_PRE_RETRIEVAL"
+_STAGE129_M4_CANDIDATE_SET = (
+    "audit_opinion_type", "going_concern_flag", "audit_lag_days",
+    "board_size",
+)
+#: This is a THIRD, independent pointer. It is distinct from both the Track A
+#: pointer (`next_research_action_id`) and the Track B pointer
+#: (`stage128_m3_lag_wdi_next_action_id`), neither of which this additive,
+#: design-only action may advance -- the contract itself says so
+#: (`m3_comparator_boundary.confirmatory_chain_redefined_by_this_action` is
+#: false and ROADMAP.md records both live pointers as unchanged by this item).
+_STAGE129_M4_NEXT_ACTION_ID = "stage129-m4-governance-data-gate"
+#: The two candidates whose mandatory preregistered semantic definitions are
+#: unresolved CONTRACT ISSUES. Their candidate IDENTITY is frozen (they stay
+#: M4 candidates and are never substituted); what is not frozen is the
+#: taxonomy / date-conversion definition each needs before the Gate can run.
+_STAGE129_M4_BLOCKED_CANDIDATES = ("audit_opinion_type", "audit_lag_days")
+
+
+def derive_stage129_m4_governance_data_gate_contract_lock_markers(
+        root: str) -> dict:
+    """Recognize the prospective, pre-retrieval M4 governance Data-Gate lock.
+
+    Narrow and fail-closed, mirroring the M3I-2 / M3-LAG-WDI contract-lock
+    recognition pattern. The lock is a CONTRACT event only: it retrieves no
+    M4 observation, executes no Data Gate, fits no model and never touches
+    the Final Test. Two of the four candidate semantic definitions
+    (`audit_opinion_type`'s category taxonomy and `audit_lag_days`'s
+    calendar-conversion convention) are explicit, unresolved CONTRACT ISSUES
+    -- this function surfaces that status rather than letting it silently
+    read as a frozen, gate-ready definition. Returns {} before the contract
+    package exists, so pre-lock Handoffs are unaffected. Raises on a
+    present-but-corrupt or internally inconsistent package (fail-closed).
+    """
+    path = os.path.join(root, _STAGE129_M4_CONTRACT_REL)
+    if not os.path.isfile(path):
+        return {}
+    try:
+        contract = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HandoffError(
+            f"unreadable Stage129 M4 contract-lock artifact: {exc}"
+        ) from exc
+
+    if contract.get("action_id") != _STAGE129_M4_ACTION_ID:
+        raise HandoffError("Stage129 M4 contract-lock action_id mismatch")
+    for field, expected in (
+        ("locked_before_any_value_level_work", True),
+        ("authorizes_retrieval", False),
+        ("authorizes_gate_execution", False),
+        ("authorizes_modeling", False),
+        ("is_the_gate_itself", False),
+        ("is_confirmatory_m4_admission", False),
+    ):
+        if contract.get(field) is not expected:
+            raise HandoffError(
+                f"Stage129 M4 contract-lock {field} must be {expected}")
+
+    candidates = contract.get("candidate_set") or {}
+    if tuple(candidates.get("candidates") or ()) != _STAGE129_M4_CANDIDATE_SET:
+        raise HandoffError(
+            "Stage129 M4 candidate set must be exactly "
+            f"{_STAGE129_M4_CANDIDATE_SET} in order, no substitution")
+    for field, expected in (
+        ("candidate_count", 4),
+        ("candidate_count_is_exact", True),
+        ("no_feature_shopping", True),
+        ("candidate_order_is_frozen", True),
+        ("failed_candidate_may_be_replaced_to_preserve_count", False),
+    ):
+        if candidates.get(field) != expected:
+            raise HandoffError(
+                f"Stage129 M4 candidate_set.{field} must be {expected!r}")
+
+    semantic = contract.get("semantic_definitions") or {}
+    opinion = semantic.get("audit_opinion_type") or {}
+    if opinion.get("categories_derived_from_empirical_data_forbidden") is not (
+            True):
+        raise HandoffError(
+            "Stage129 M4 audit_opinion_type must forbid deriving categories "
+            "from empirical data")
+    if opinion.get("taxonomy_status") != "CONTRACT_ISSUE_UNRESOLVED":
+        raise HandoffError(
+            "Stage129 M4 audit_opinion_type taxonomy must be published as "
+            "CONTRACT_ISSUE_UNRESOLVED, not a frozen enum")
+    # An unresolved taxonomy may never simultaneously read as frozen, admit
+    # modeled categorical values, or leave the Gate executable for this
+    # candidate. Flipping any of these to a "resolved" reading without an
+    # authoritative taxonomy is exactly the silent overstatement this
+    # recognizer exists to prevent.
+    for field, expected in (
+        ("candidate_identity_frozen", True),
+        ("taxonomy_frozen", False),
+        ("modeled_categorical_values_admitted", False),
+        ("gate_may_execute_for_this_candidate", False),
+    ):
+        if opinion.get(field) is not expected:
+            raise HandoffError(
+                f"Stage129 M4 audit_opinion_type.{field} must be {expected} "
+                "while the taxonomy is CONTRACT_ISSUE_UNRESOLVED")
+    candidate_taxonomy = opinion.get(
+        "candidate_taxonomy_documented_not_verified") or {}
+    if candidate_taxonomy.get("must_not_be_treated_as_frozen") is not True:
+        raise HandoffError(
+            "Stage129 M4 audit_opinion_type candidate taxonomy must be "
+            "marked must_not_be_treated_as_frozen")
+    if candidate_taxonomy.get("source_authority") != "secondary_not_authoritative":
+        raise HandoffError(
+            "Stage129 M4 audit_opinion_type candidate taxonomy source "
+            "authority must be recorded as secondary_not_authoritative")
+
+    audit_lag = semantic.get("audit_lag_days") or {}
+    if audit_lag.get("calendar_conversion_status") != (
+            "CONTRACT_ISSUE_UNRESOLVED"):
+        raise HandoffError(
+            "Stage129 M4 audit_lag_days calendar conversion must be "
+            "published as CONTRACT_ISSUE_UNRESOLVED")
+    for field, expected in (
+        ("candidate_identity_frozen", True),
+        ("calendar_conversion_frozen", False),
+        ("value_may_be_calculated", False),
+        ("jalali_fiscal_year_t_plus_621_permitted_as_daily_date_conversion",
+         False),
+        ("gate_may_execute_for_this_candidate", False),
+    ):
+        if audit_lag.get(field) is not expected:
+            raise HandoffError(
+                f"Stage129 M4 audit_lag_days.{field} must be {expected} while "
+                "the calendar conversion is CONTRACT_ISSUE_UNRESOLVED")
+    conversion_text = str(audit_lag.get("calendar_conversion_convention", ""))
+    if "jalali_fiscal_year_t_plus_621" not in conversion_text:
+        raise HandoffError(
+            "Stage129 M4 audit_lag_days calendar_conversion_convention must "
+            "explicitly address the M3-LAG-WDI +621 rule")
+    if "NOT applicable" not in conversion_text and "NOT be reused" not in (
+            conversion_text) and "not applicable" not in conversion_text:
+        raise HandoffError(
+            "Stage129 M4 audit_lag_days calendar_conversion_convention must "
+            "explicitly state the +621 year-mapping rule is not applicable "
+            "to this day-level date difference")
+
+    join_rule = contract.get("join_identity_rule") or {}
+    required_identifier = join_rule.get("required_identifier")
+    if not isinstance(required_identifier, dict):
+        raise HandoffError(
+            "Stage129 M4 join_identity_rule.required_identifier must be a "
+            "concrete frozen field mapping, not an open-ended description")
+    if required_identifier.get("company_key") != "ticker" or (
+            required_identifier.get("fiscal_year_key") != "fiscal_year_t"):
+        raise HandoffError(
+            "Stage129 M4 join_identity_rule must freeze the already-audited "
+            "ticker / fiscal_year_t join keys")
+    # The audited join evidence is PARENT-SIDE only: it proves a one-to-one
+    # join against a TSETMC-sourced child, not against CODAL-sourced company
+    # filings. Prior use of the same parent keys is not evidence of
+    # cross-source identity compatibility, so the CODAL-identity resolution
+    # is its own unresolved, cross-cutting contract issue and may never be
+    # published as settled.
+    codal_identity = join_rule.get(
+        "codal_to_parent_company_identity_resolution") or {}
+    if codal_identity.get("status") != "CONTRACT_ISSUE_UNRESOLVED":
+        raise HandoffError(
+            "Stage129 M4 codal_to_parent_company_identity_resolution must be "
+            "CONTRACT_ISSUE_UNRESOLVED: no audited CODAL-identity-to-ticker "
+            "mapping exists in this repository")
+    if codal_identity.get(
+            "gate_may_execute_join_dimension_for_codal_sourced_values") is not (
+            False):
+        raise HandoffError(
+            "Stage129 M4 Gate join dimension must not be executable for "
+            "CODAL-sourced values while the identity mapping is unresolved")
+    if required_identifier.get("fallback_mapping_permitted") is not False:
+        raise HandoffError(
+            "Stage129 M4 join identity must not permit a fallback mapping")
+    if join_rule.get("ambiguous_identity_verdict") != "unresolved":
+        raise HandoffError(
+            "Stage129 M4 join_identity_rule.ambiguous_identity_verdict must "
+            "remain 'unresolved'")
+    for field in ("fuzzy_matching_at_gate_time_forbidden",
+                  "accidental_many_to_many_forbidden",
+                  "outcome_informed_manual_matching_forbidden",
+                  "cross_year_carry_forward_forbidden_unless_explicitly_"
+                  "preregistered"):
+        if join_rule.get(field) is not True:
+            raise HandoffError(f"Stage129 M4 join_identity_rule.{field} "
+                                "must be True")
+
+    thresholds = contract.get("thresholds") or {}
+    canonical_sources = thresholds.get("canonical_sources") or {}
+    fourth = canonical_sources.get(
+        "minimum_positive_evaluable_per_locked_validation_fold") or {}
+    if "stage128_m3_macro_data_gate_decision.json" not in str(
+            fourth.get("found_in", "")):
+        raise HandoffError(
+            "Stage129 M4 minimum_positive_evaluable_per_locked_validation_"
+            "fold threshold must cite its true source (Stage128 M3 macro "
+            "Data Gate decision), not a blanket Stage125 Part4 claim")
+    if thresholds.get("thresholds_changed_by_this_action") is not False:
+        raise HandoffError(
+            "Stage129 M4 thresholds must not be changed by this action")
+
+    lock_state = contract.get("contract_lock_state") or {}
+    if lock_state.get("m4_contract_status") != _STAGE129_M4_CONTRACT_STATUS:
+        raise HandoffError(
+            "Stage129 M4 contract_lock_state.m4_contract_status must be "
+            f"{_STAGE129_M4_CONTRACT_STATUS}")
+    for field, expected in (
+        ("candidate_count", 4),
+        ("m4_data_retrieval_started", False),
+        ("m4_candidate_observations_read", 0),
+        ("m4_data_gate_executed", False),
+        ("m4_block_admitted", False),
+        ("m4_modeling_started", False),
+        ("m4_incremental_evaluation_authorized", False),
+        ("next_action_pointer", _STAGE129_M4_NEXT_ACTION_ID),
+        ("next_action_authorized", False),
+        ("pointer_is_not_authorization", True),
+        # Section A/B are complete; section D must never publish the whole
+        # contract as complete or the Gate as executable while section C
+        # holds unresolved prerequisite definitions.
+        ("m4_candidate_identity_set_locked", True),
+        ("m4_gate_policy_contract_recorded", True),
+        ("m4_contract_complete", False),
+        ("m4_contract_fully_executable", False),
+        ("m4_contract_completion_status",
+         "LOCKED_WITH_UNRESOLVED_PREREQUISITE_DEFINITIONS"),
+        ("m4_data_gate_executable", False),
+        ("m4_data_gate_authorized", False),
+        ("m4_coverage_calculated", False),
+    ):
+        if lock_state.get(field) != expected:
+            raise HandoffError(
+                f"Stage129 M4 contract_lock_state.{field} must be "
+                f"{expected!r}")
+    if tuple(lock_state.get("candidate_set") or ()) != (
+            _STAGE129_M4_CANDIDATE_SET):
+        raise HandoffError(
+            "Stage129 M4 contract_lock_state.candidate_set mismatch")
+
+    # The blocked-candidate list, the per-candidate semantic statuses and the
+    # section C entries must agree. A package that drops a candidate from one
+    # surface while leaving it unresolved on another is inconsistent and must
+    # fail closed rather than publish a partially-resolved reading.
+    blocked = tuple(lock_state.get(
+        "m4_candidates_blocked_by_unresolved_definitions") or ())
+    if blocked != _STAGE129_M4_BLOCKED_CANDIDATES:
+        raise HandoffError(
+            "Stage129 M4 contract_lock_state."
+            "m4_candidates_blocked_by_unresolved_definitions must be "
+            f"{list(_STAGE129_M4_BLOCKED_CANDIDATES)} while both semantic "
+            "definitions remain CONTRACT_ISSUE_UNRESOLVED")
+    ready = tuple(lock_state.get(
+        "m4_candidates_with_gate_ready_semantic_definitions") or ())
+    if sorted(ready) + sorted(blocked) and set(ready) & set(blocked):
+        raise HandoffError(
+            "Stage129 M4 gate-ready and blocked candidate lists overlap")
+    if sorted(list(ready) + list(blocked)) != sorted(
+            _STAGE129_M4_CANDIDATE_SET):
+        raise HandoffError(
+            "Stage129 M4 gate-ready + blocked candidates must together be "
+            "exactly the four locked candidates")
+    cross_cutting = lock_state.get(
+        "unresolved_cross_cutting_prerequisites") or []
+    if not any(entry.get("issue") == (
+            "codal_to_parent_company_identity_resolution")
+            and entry.get("status") == "CONTRACT_ISSUE_UNRESOLVED"
+            for entry in cross_cutting):
+        raise HandoffError(
+            "Stage129 M4 contract_lock_state must record the unresolved, "
+            "cross-cutting codal_to_parent_company_identity_resolution issue")
+    if lock_state.get("m4_candidates_the_gate_may_execute_for") != []:
+        raise HandoffError(
+            "Stage129 M4 Gate may not be executable for any candidate while "
+            "the cross-cutting CODAL identity issue is unresolved")
+    unresolved_entries = lock_state.get(
+        "unresolved_prerequisite_definitions") or []
+    if tuple(e.get("candidate") for e in unresolved_entries) != (
+            _STAGE129_M4_BLOCKED_CANDIDATES):
+        raise HandoffError(
+            "Stage129 M4 unresolved_prerequisite_definitions must list "
+            f"exactly {list(_STAGE129_M4_BLOCKED_CANDIDATES)}")
+    for entry in unresolved_entries:
+        if entry.get("status") != "CONTRACT_ISSUE_UNRESOLVED":
+            raise HandoffError(
+                f"Stage129 M4 unresolved prerequisite for "
+                f"{entry.get('candidate')!r} must carry status "
+                "CONTRACT_ISSUE_UNRESOLVED")
+        if entry.get("candidate_identity_frozen") is not True:
+            raise HandoffError(
+                f"Stage129 M4 unresolved prerequisite for "
+                f"{entry.get('candidate')!r} must still record the candidate "
+                "identity as frozen")
+        if entry.get("gate_may_execute_for_this_candidate") is not False:
+            raise HandoffError(
+                f"Stage129 M4 Gate must not be executable for "
+                f"{entry.get('candidate')!r} while its definition is "
+                "unresolved")
+    auth = lock_state.get("contract_lock_authorization") or {}
+    for field, expected in (
+        ("was_authorized", True),
+        ("authorized_now", False),
+        ("authorization_consumed", True),
+        ("authorization_reusable", False),
+    ):
+        if auth.get(field) is not expected:
+            raise HandoffError(
+                f"Stage129 M4 contract_lock_authorization.{field} must be "
+                f"{expected}")
+
+    firewall = contract.get("final_test_firewall") or {}
+    if firewall.get("final_test_locked") is not True or firewall.get(
+            "final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage129 M4 final_test_firewall must show locked=True and "
+            "rows_read=0")
+
+    comparator = contract.get("m3_comparator_boundary") or {}
+    if comparator.get("m3_cbi_status_preserved") != "UNRESOLVED_M3_DATA_GATE":
+        raise HandoffError(
+            "Stage129 M4 contract must preserve M3-CBI as "
+            "UNRESOLVED_M3_DATA_GATE")
+    if comparator.get("m3_lag_wdi_disposition_preserved") != (
+            "SUPPLEMENTARY_EXPLORATORY_ONLY"):
+        raise HandoffError(
+            "Stage129 M4 contract must preserve the M3-LAG-WDI disposition "
+            "as SUPPLEMENTARY_EXPLORATORY_ONLY")
+    holm_family = tuple(comparator.get("confirmatory_holm_family") or ())
+    if holm_family != ("M2_minus_M1", "M3_CBI_minus_M2", "M4_minus_M3_CBI"):
+        raise HandoffError(
+            "Stage129 M4 contract must preserve the confirmatory Holm "
+            "family unchanged")
+    if comparator.get("confirmatory_holm_family_executed") is not False or (
+            comparator.get("confirmatory_holm_family_changed_by_this_action")
+            is not False):
+        raise HandoffError(
+            "Stage129 M4 contract must record the confirmatory Holm family "
+            "as unexecuted and unchanged")
+
+    # The governance boundary and execution audit are required companions,
+    # not optional -- a contract-lock claim unsupported by either is a
+    # corrupt/incomplete package and must fail closed, never silently pass.
+    boundary = _require_json_artifact(root, _STAGE129_M4_BOUNDARY_REL)
+    for field, expected in (
+        ("m4_authorized", False), ("m4_started", False),
+        ("m4_data_collected", False), ("m4_data_gate_executed", False),
+        ("m4_block_admitted", False),
+        ("m4_incremental_evaluation_authorized", False),
+        ("final_test_locked", True), ("final_test_access_authorized", False),
+        ("merge_authorized", False), ("pr_is_draft", True),
+        ("candidate_count", 4),
+        ("candidate_count_can_change_without_new_human_authorization", False),
+        ("institutional_ownership_admitted_as_m4_candidate", False),
+        ("non_executive_ratio_admitted_as_m4_candidate", False),
+        ("m3_lag_wdi_described_as_confirmatory", False),
+        ("gate_pass_described_as_modeling_authorization", False),
+        ("m2_retained_status_modified_by_this_action", False),
+        ("m3_cbi_status_modified_by_this_action", False),
+        ("m3_lag_wdi_disposition_modified_by_this_action", False),
+        ("confirmatory_holm_family_modified_by_this_action", False),
+        ("paper_winner_selected", False), ("final_model_selected", False),
+        ("pointer_is_not_authorization", True),
+    ):
+        if boundary.get(field) is not expected:
+            raise HandoffError(
+                f"Stage129 M4 governance boundary {field} must be "
+                f"{expected}")
+    if boundary.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage129 M4 governance boundary final_test_rows_read must be 0")
+    if boundary.get("next_action_pointer") != _STAGE129_M4_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage129 M4 governance boundary next_action_pointer mismatch")
+
+    audit = _require_json_artifact(root, _STAGE129_M4_AUDIT_REL)
+    for field, expected in (
+        ("retrieval_started", False), ("data_gate_executed", False),
+        ("modeling_started", False),
+        ("external_data_source_accessed", False),
+        ("scientific_computation_ran", False),
+    ):
+        if audit.get(field) is not expected:
+            raise HandoffError(f"Stage129 M4 execution audit {field} must "
+                                f"be {expected}")
+    for field in ("final_test_rows_read", "final_test_predictor_values_read",
+                  "final_test_target_values_read"):
+        if audit.get(field) != 0:
+            raise HandoffError(
+                f"Stage129 M4 execution audit {field} must be 0")
+    counters = audit.get("counters") or {}
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage129 M4 execution audit counters.{field} must be 0 "
+                "(no M4 retrieval, coverage or modeling occurred)")
+
+    return {
+        # Namespaced (stage129_m4_*) detail, following the same convention
+        # used for the other Stage128 contract-lock actions.
+        "stage129_m4_contract_lock_executed": True,
+        "stage129_m4_contract_status": _STAGE129_M4_CONTRACT_STATUS,
+        "stage129_m4_candidate_count": 4,
+        "stage129_m4_candidate_set": list(_STAGE129_M4_CANDIDATE_SET),
+        "stage129_m4_contract_lock_was_authorized": True,
+        "stage129_m4_contract_lock_authorized_now": False,
+        "stage129_m4_contract_lock_authorization_consumed": True,
+        "stage129_m4_contract_lock_authorization_reusable": False,
+        # This is a THIRD pointer, deliberately NOT named
+        # `next_research_action_id` or `stage128_m3_lag_wdi_next_action_id`:
+        # this additive, design-only action does not own or advance either
+        # of those two live pointer chains, both of which stay
+        # `human-decision-required` / `human_decision_required` untouched.
+        "stage129_m4_next_action_id": _STAGE129_M4_NEXT_ACTION_ID,
+        "stage129_m4_next_action_authorized": False,
+        "stage129_m4_next_action_pointer_is_not_authorization": True,
+        "stage129_m4_audit_opinion_type_taxonomy_status":
+            "CONTRACT_ISSUE_UNRESOLVED",
+        "stage129_m4_audit_lag_days_calendar_conversion_status":
+            "CONTRACT_ISSUE_UNRESOLVED",
+        "stage129_m4_contract_issues_unresolved": [
+            "audit_opinion_type_taxonomy",
+            "audit_lag_days_calendar_conversion",
+            "codal_to_parent_company_identity_resolution",
+        ],
+        "stage129_m4_codal_identity_resolution_status":
+            "CONTRACT_ISSUE_UNRESOLVED",
+        "stage129_m4_join_dimension_executable_for_codal_values": False,
+        "stage129_m4_candidates_the_gate_may_execute_for": [],
+        # Section A/B locked, section C unresolved, section D therefore
+        # blocked. Publishing the status string alone would let a consumer
+        # read "PROSPECTIVELY_LOCKED_PRE_RETRIEVAL" as "contract finished",
+        # so completion and executability are published explicitly.
+        "stage129_m4_candidate_identity_set_locked": True,
+        "stage129_m4_gate_policy_contract_recorded": True,
+        "stage129_m4_contract_complete": False,
+        "stage129_m4_contract_fully_executable": False,
+        "stage129_m4_contract_completion_status":
+            "LOCKED_WITH_UNRESOLVED_PREREQUISITE_DEFINITIONS",
+        "stage129_m4_data_gate_executable": False,
+        "stage129_m4_data_gate_authorized": False,
+        "stage129_m4_coverage_calculated": False,
+        "stage129_m4_candidates_blocked_by_unresolved_definitions":
+            list(_STAGE129_M4_BLOCKED_CANDIDATES),
+        "stage129_m4_candidates_with_gate_ready_semantic_definitions":
+            list(ready),
+        "m4_contract_fully_executable": False,
+        "m4_data_gate_executable": False,
+        "m4_data_gate_authorized": False,
+        "m4_coverage_calculated": False,
+        "stage129_m4_join_identity_company_key": "ticker",
+        "stage129_m4_join_identity_fiscal_year_key": "fiscal_year_t",
+        "stage129_m4_join_identity_ambiguous_verdict": "unresolved",
+        "stage129_m4_join_identity_source": required_identifier.get(
+            "source"),
+        "stage129_m4_threshold_canonical_sources": canonical_sources,
+        "stage129_m4_m3_cbi_status_preserved": "UNRESOLVED_M3_DATA_GATE",
+        "stage129_m4_m3_lag_wdi_disposition_preserved":
+            "SUPPLEMENTARY_EXPLORATORY_ONLY",
+        "stage129_m4_confirmatory_holm_family": list(holm_family),
+        "stage129_m4_confirmatory_holm_family_executed": False,
+        "stage129_m4_final_test_locked": True,
+        "stage129_m4_final_test_rows_read": 0,
+        # Flat/bare fields, matching the vocabulary already used by other
+        # M4-adjacent state elsewhere in the Handoff (`m4_authorized`,
+        # `m4_started`) and by the contract's own `contract_lock_state`
+        # field names, so a consumer checking either surface sees the same
+        # facts.
+        "m4_authorized": False,
+        "m4_started": False,
+        "m4_data_retrieval_started": False,
+        "m4_candidate_observations_read": 0,
+        "m4_data_gate_executed": False,
+        "m4_block_admitted": False,
+        "m4_modeling_started": False,
+        "m4_incremental_evaluation_authorized": False,
+        "m4_pointer_is_not_authorization": True,
+        "final_test_locked": True,
+        "final_test_rows_read": 0,
     }
 
 

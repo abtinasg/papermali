@@ -21,6 +21,7 @@
   "final_test_evaluation_performed": false,
   "final_test_locked": true,
   "final_test_predictor_values_inspected": false,
+  "final_test_rows_read": 0,
   "final_test_target_values_inspected": false,
   "final_test_unlocked": false,
   "financial_data_researcher_verified_frozen": true,
@@ -39,8 +40,8 @@
   "full_suite_new_failures": 0,
   "full_suite_preexisting_failures": 8,
   "gate_b_started": true,
-  "generated_at_utc": "2026-08-08T22:18:36Z",
-  "generated_from_commit": "62370dab2975c0a3a817227a2d767aa1630dc9b1",
+  "generated_at_utc": "2026-08-09T13:08:00Z",
+  "generated_from_commit": "3c1faf386ffe50af2d3c3b10659744494f2243a5",
   "historical_six_month_decision_retained": true,
   "holm_family_complete": false,
   "holm_final_adjustment_deferred": true,
@@ -50,7 +51,7 @@
   "last_completed_micro_part_qc_path": "project/stage126/stage126_m1_robustness_part6_qc_report.json",
   "last_completed_micro_part_qc_scope": "stage126_m1_robustness_part6_smote_training_fold_only",
   "last_completed_research_action_id": "stage128-m3i2-track-a-waiting-termination-and-m3-disposition",
-  "last_stage_commit": "62370dab2975c0a3a817227a2d767aa1630dc9b1",
+  "last_stage_commit": "3c1faf386ffe50af2d3c3b10659744494f2243a5",
   "legacy_validation_boundary_adapted": true,
   "m1_primary_claim_ordering_preserved": true,
   "m1_primary_development_tuning_completed": true,
@@ -146,7 +147,18 @@
   "m3i3_financing_lock": "UNRESOLVED_METADATA_LOCK",
   "m3i_is_supplementary_not_confirmatory_m3": true,
   "m4_authorized": false,
+  "m4_block_admitted": false,
+  "m4_candidate_observations_read": 0,
+  "m4_contract_fully_executable": false,
+  "m4_coverage_calculated": false,
   "m4_data_collected": false,
+  "m4_data_gate_authorized": false,
+  "m4_data_gate_executable": false,
+  "m4_data_gate_executed": false,
+  "m4_data_retrieval_started": false,
+  "m4_incremental_evaluation_authorized": false,
+  "m4_modeling_started": false,
+  "m4_pointer_is_not_authorization": true,
   "m4_started": false,
   "merge_authorized": false,
   "modeling_authorized": true,
@@ -155,8 +167,8 @@
   "next_research_action_id": "human-decision-required",
   "next_research_action_pointer_is_not_authorization": true,
   "next_research_action_scope": "no_further_action_is_authorized",
-  "observed_branch": "stage128-m3-lag-wdi-exploratory-data-retrieval",
-  "observed_repository_head_commit": "62370dab2975c0a3a817227a2d767aa1630dc9b1",
+  "observed_branch": "stage129-m4-governance-data-gate-contract-lock",
+  "observed_repository_head_commit": "3c1faf386ffe50af2d3c3b10659744494f2243a5",
   "operational_surfaces_git_versioned": true,
   "paper_winner_selected": false,
   "part3b_completed": false,
@@ -646,7 +658,7 @@
   "stage128_m3i2_live_main_commit": "175e7949e009eeecdd66aedab31ec4b48e9d3c7d",
   "stage128_m3i2_live_pr_base_branch": "main",
   "stage128_m3i2_live_pr_base_commit": "175e7949e009eeecdd66aedab31ec4b48e9d3c7d",
-  "stage128_m3i2_live_pr_head_commit": "62370dab2975c0a3a817227a2d767aa1630dc9b1",
+  "stage128_m3i2_live_pr_head_commit": "3c1faf386ffe50af2d3c3b10659744494f2243a5",
   "stage128_m3i2_live_pr_head_commit_source": "repository_head_at_generation_not_github_pr_head",
   "stage128_m3i2_live_pr_is_draft": true,
   "stage128_m3i2_live_pr_merged": false,
@@ -720,7 +732,98 @@
   "stage128_track_a_waiting_termination_recorded": true,
   "stage128_track_a_world_bank_response_characterization": "AS_OF_2026_08_08_NO_RESPONSE_RESOLVING_THE_POINT_IN_TIME_AVAILABILITY_QUESTION_HAD_BEEN_OBTAINED",
   "stage128_track_a_world_bank_will_not_respond_claim_made": false,
-  "state_fingerprint": "2c061595845e843f63cb564120ca84f1314c5518899b996444f7ffe968cf094f",
+  "stage129_m4_audit_lag_days_calendar_conversion_status": "CONTRACT_ISSUE_UNRESOLVED",
+  "stage129_m4_audit_opinion_type_taxonomy_status": "CONTRACT_ISSUE_UNRESOLVED",
+  "stage129_m4_candidate_count": 4,
+  "stage129_m4_candidate_identity_set_locked": true,
+  "stage129_m4_candidate_set": [
+    "audit_opinion_type",
+    "going_concern_flag",
+    "audit_lag_days",
+    "board_size"
+  ],
+  "stage129_m4_candidates_blocked_by_unresolved_definitions": [
+    "audit_opinion_type",
+    "audit_lag_days"
+  ],
+  "stage129_m4_candidates_the_gate_may_execute_for": [],
+  "stage129_m4_candidates_with_gate_ready_semantic_definitions": [
+    "going_concern_flag",
+    "board_size"
+  ],
+  "stage129_m4_codal_identity_resolution_status": "CONTRACT_ISSUE_UNRESOLVED",
+  "stage129_m4_confirmatory_holm_family": [
+    "M2_minus_M1",
+    "M3_CBI_minus_M2",
+    "M4_minus_M3_CBI"
+  ],
+  "stage129_m4_confirmatory_holm_family_executed": false,
+  "stage129_m4_contract_complete": false,
+  "stage129_m4_contract_completion_status": "LOCKED_WITH_UNRESOLVED_PREREQUISITE_DEFINITIONS",
+  "stage129_m4_contract_fully_executable": false,
+  "stage129_m4_contract_issues_unresolved": [
+    "audit_opinion_type_taxonomy",
+    "audit_lag_days_calendar_conversion",
+    "codal_to_parent_company_identity_resolution"
+  ],
+  "stage129_m4_contract_lock_authorization_consumed": true,
+  "stage129_m4_contract_lock_authorization_reusable": false,
+  "stage129_m4_contract_lock_authorized_now": false,
+  "stage129_m4_contract_lock_executed": true,
+  "stage129_m4_contract_lock_was_authorized": true,
+  "stage129_m4_contract_status": "PROSPECTIVELY_LOCKED_PRE_RETRIEVAL",
+  "stage129_m4_coverage_calculated": false,
+  "stage129_m4_data_gate_authorized": false,
+  "stage129_m4_data_gate_executable": false,
+  "stage129_m4_final_test_locked": true,
+  "stage129_m4_final_test_rows_read": 0,
+  "stage129_m4_gate_policy_contract_recorded": true,
+  "stage129_m4_join_dimension_executable_for_codal_values": false,
+  "stage129_m4_join_identity_ambiguous_verdict": "unresolved",
+  "stage129_m4_join_identity_company_key": "ticker",
+  "stage129_m4_join_identity_fiscal_year_key": "fiscal_year_t",
+  "stage129_m4_join_identity_source": "project/stage128/m2_incremental_evaluation/stage127_m2_common_sample_join_audit.json (fields canonical_row_identity, join_keys) and project/stage128/m3_macro_data_gate/stage128_m3_macro_data_gate_decision.json (field required_join_keys), the already-audited M2/M3-family join keys, reused unchanged for M4",
+  "stage129_m4_m3_cbi_status_preserved": "UNRESOLVED_M3_DATA_GATE",
+  "stage129_m4_m3_lag_wdi_disposition_preserved": "SUPPLEMENTARY_EXPLORATORY_ONLY",
+  "stage129_m4_next_action_authorized": false,
+  "stage129_m4_next_action_id": "stage129-m4-governance-data-gate",
+  "stage129_m4_next_action_pointer_is_not_authorization": true,
+  "stage129_m4_threshold_canonical_sources": {
+    "candidate_development_coverage_min": {
+      "found_in": "project/stage125/part4_statistical_analysis_plan_stage125.json (field candidate_valid_coverage_min, m1_coverage_gates config block)",
+      "reused_by": [
+        "project/stage128/m3_macro_data_gate/stage128_m3_macro_data_gate_decision.json",
+        "project/stage128/m3_intl_macro_contract_lock/stage128_m3_intl_macro_data_gate_contract.json",
+        "project/stage128/m3_lag_wdi_exploratory_data_gate/stage128_m3_lag_wdi_data_gate_decision.json"
+      ],
+      "status": "already_canonical_pre_existing_reused_verbatim",
+      "value": 0.8
+    },
+    "m4_block_common_sample_coverage_min": {
+      "found_in": "project/stage125/part4_statistical_analysis_plan_stage125.json (field block_common_sample_coverage_min, m1_coverage_gates config block); also project/stage125/part3a_approved_gate_thresholds_stage125.csv gate G10 (pilot-only variant, same 0.70 value, denominator differs)",
+      "reused_by": [
+        "project/stage128/m3_macro_data_gate/stage128_m3_macro_data_gate_decision.json",
+        "project/stage128/m3_lag_wdi_exploratory_data_gate/stage128_m3_lag_wdi_data_gate_decision.json"
+      ],
+      "status": "already_canonical_pre_existing_reused_verbatim",
+      "value": 0.7
+    },
+    "minimum_positive_evaluable_per_locked_validation_fold": {
+      "found_in": "project/stage128/m3_macro_data_gate/stage128_m3_macro_data_gate_decision.json (field min_positive_evaluable_each_temporal_validation_window)",
+      "note": "Distinct from the earlier PILOT-ONLY gates G11/G12 in part3a_approved_gate_thresholds_stage125.csv, which used >=3 per target-year stratum over the 80-pair pilot sample and are explicitly marked 'not a final modeling sample threshold'. The >=5 figure is the development-sample threshold already reused twice for M3-family gates; this contract reuses it a third time, unchanged, for M4.",
+      "reused_by": [
+        "project/stage128/m3_lag_wdi_exploratory_data_gate/stage128_m3_lag_wdi_data_gate_decision.json"
+      ],
+      "status": "already_canonical_pre_existing_reused_verbatim",
+      "value": 5
+    },
+    "minimum_training_fold_coverage_min": {
+      "found_in": "project/stage125/part4_statistical_analysis_plan_stage125.json (field m1_minimum_fold_training_min, m1_coverage_gates config block)",
+      "status": "already_canonical_pre_existing_reused_verbatim",
+      "value": 0.75
+    }
+  },
+  "state_fingerprint": "e87674022bf19736ba543b3ef1fb1e8fb5ba6e37e863f017e88458811dd438b5",
   "tickers": [
     "اردستان",
     "اروند",

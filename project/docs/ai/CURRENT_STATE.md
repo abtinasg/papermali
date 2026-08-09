@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `62370dab2975c0a3a817227a2d767aa1630dc9b1`
-- **Generated from commit:** `62370dab2975c0a3a817227a2d767aa1630dc9b1` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
+- **Last stage commit:** `3c1faf386ffe50af2d3c3b10659744494f2243a5`
+- **Generated from commit:** `3c1faf386ffe50af2d3c3b10659744494f2243a5` (branch `stage129-m4-governance-data-gate-contract-lock`, informational)
 - **Baseline:** `origin/main` @ `175e7949e009eeecdd66aedab31ec4b48e9d3c7d`
 
 ## Current-state validation
@@ -241,6 +241,23 @@ _An explicit human governance decision, not a one-action execution authorization
 - **Both pointer chains converge on the same human decision:** `human-decision-required` — scope `no_further_action_is_authorized`, authorized = False. Track B: `human_decision_required` — scope `no_further_action_is_authorized`, authorized = False. A pointer is never an authorization.
 - Package: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/`; interpretation: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/README_STAGE128_M3I2_TRACK_A_WAITING_TERMINATION_AND_M3_DISPOSITION.md`
 
+### Stage129 — M4 governance Data-Gate contract lock (DESIGN ONLY, additive, not on either live pointer chain)
+
+_A prospective, pre-retrieval contract lock only. Zero M4 retrieval, zero Data Gate execution, zero modeling, zero Final Test access._
+
+- ✅ **(A) Candidate identity lock:** `PROSPECTIVELY_LOCKED_PRE_RETRIEVAL` — candidate identity set locked = True, count `4` (exact, no substitution): `['audit_opinion_type', 'going_concern_flag', 'audit_lag_days', 'board_size']`.
+- ✅ **(B) Gate policy contract recorded:** True (thresholds, Gate dimensions, point-in-time rule, join identity, missingness policy, three-state semantics).
+- ⛔ **(D) The contract as a whole is NOT complete:** contract complete = False, fully executable = False, status `LOCKED_WITH_UNRESOLVED_PREREQUISITE_DEFINITIONS`. M4 Data Gate executable = False, Data Gate authorized = False, coverage calculated = False. Candidates blocked by an unresolved semantic definition: `['audit_opinion_type', 'audit_lag_days']`; candidates with gate-ready semantic definitions: `['going_concern_flag', 'board_size']`; candidates the Gate may actually execute for: `[]` (none — see the cross-cutting identity issue below).
+- ⚠️ **(C) CROSS-CUTTING CONTRACT ISSUE — CODAL company identity:** `CONTRACT_ISSUE_UNRESOLVED`. No audited deterministic mapping resolves a CODAL issuer identity to the frozen parent-side `ticker` key. The audited stage127 join evidence is PARENT-SIDE only (its child side was TSETMC market data, not CODAL filings), so it does not establish cross-source identity compatibility. The Gate's join-quality dimension is therefore not executable for CODAL-sourced values (False) — which is every M4 candidate.
+- ⛔ **Nothing executed:** M4 data retrieval started False — candidate observations read 0 — Data Gate executed False — block admitted False — modeling started False — incremental evaluation authorized False.
+- **Contract-lock authorization (consumed, not standing):** was_authorized=True, authorized_now=False, authorization_consumed=True, authorization_reusable=False.
+- **A THIRD, separate pointer** (neither Track A's `human-decision-required` nor Track B's `human_decision_required` is moved by this action): `stage129-m4-governance-data-gate` — authorized = False. A pointer is never an authorization.
+- ⚠️ **(C) Two candidate-specific CONTRACT ISSUES / UNRESOLVED prerequisite definitions.** Candidate IDENTITY for both is frozen; their DEFINITIONS are not, no modeled values are admitted, no empirical discovery is allowed, and the future Gate cannot execute for either candidate until a separately authorized, authoritative resolution exists: `audit_opinion_type` category taxonomy = `CONTRACT_ISSUE_UNRESOLVED` (only secondary Persian accounting-blog sources found, no authoritative CODAL field schema or IACPA/Audit Organization standard text); `audit_lag_days` calendar-conversion convention = `CONTRACT_ISSUE_UNRESOLVED` (the M3-LAG-WDI `jalali_fiscal_year_t_plus_621` YEAR-MAPPING rule is explicitly NOT applicable to this day-level date difference, and no authoritative CODAL date-field conversion rule was found).
+- ⚠️ **Join identity: parent-side keys frozen, CODAL side UNRESOLVED.** Frozen to the already-audited M2/M3-family keys:** company key = `ticker`, fiscal-year key = `fiscal_year_t`, ambiguous-identity verdict = `unresolved` — source: `project/stage128/m2_incremental_evaluation/stage127_m2_common_sample_join_audit.json (fields canonical_row_identity, join_keys) and project/stage128/m3_macro_data_gate/stage128_m3_macro_data_gate_decision.json (field required_join_keys), the already-audited M2/M3-family join keys, reused unchanged for M4`.
+- ⛔ **Unchanged (regression check):** M3-CBI status `UNRESOLVED_M3_DATA_GATE`, M3-LAG-WDI disposition `SUPPLEMENTARY_EXPLORATORY_ONLY`, confirmatory Holm family `['M2_minus_M1', 'M3_CBI_minus_M2', 'M4_minus_M3_CBI']` executed = False.
+- ⛔ **Final Test firewall untouched:** locked True, rows read 0.
+- Package: `project/stage129/m4_governance_data_gate_contract/`; interpretation: `project/stage129/m4_governance_data_gate_contract/README_STAGE129_M4_GOVERNANCE_DATA_GATE_CONTRACT.md`
+
 ### Last completed scientific micro-part QC
 
 _Scientific QC of the newest completed robustness micro-part — a DIFFERENT role from current-state validation above._
@@ -290,5 +307,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `2c061595845e843f63cb564120ca84f1314c5518899b996444f7ffe968cf094f`_
-_generated_at_utc: 2026-08-08T22:18:36Z (informational)_
+_state_fingerprint: `e87674022bf19736ba543b3ef1fb1e8fb5ba6e37e863f017e88458811dd438b5`_
+_generated_at_utc: 2026-08-09T13:08:00Z (informational)_
