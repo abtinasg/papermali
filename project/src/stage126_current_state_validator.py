@@ -3673,18 +3673,25 @@ def build_assertions(
                                 STAGE128_M3_LAG_DATA_GATE_ACTION_ID,
                                 STAGE128_M3_LAG_MODELING_ACTION_ID)
             # Once the audit has run, the pointer legitimately NAMES the Data
-            # Gate. Forbidding that would encode the pre-audit moment; the rule
-            # that actually protects the boundary is that the pointer never
-            # EXECUTES the Gate and is never itself an authorization.
-            and handoff.get(
-                "stage128_m3_lag_wdi_next_action_executes_data_gate") is False
+            # Gate, and `next_action_executes_data_gate` is a DESCRIPTIVE
+            # property of the named action — so it becomes True exactly when
+            # the pointer reaches step D. Asserting it is forever False would
+            # both encode the pre-audit moment and contradict the locked
+            # sequence. What actually protects the boundary is that the
+            # pointer is never AUTHORIZED and the Gate is never EXECUTED.
+            and (handoff.get(
+                "stage128_m3_lag_wdi_next_action_executes_data_gate")
+                is (_m3_lag_pointer == STAGE128_M3_LAG_DATA_GATE_ACTION_ID))
             and handoff.get("stage128_m3_lag_wdi_next_action_authorized")
             is False
             and (_m3_lag_pointer != STAGE128_M3_LAG_DATA_GATE_ACTION_ID
-                 or handoff.get("stage128_m3_lag_wdi_data_gate_authorized")
-                 is False)),
-        "the immediate Track B pointer is a single separated step, it never "
-        "executes the Data Gate, and it is not authorized")
+                 or (handoff.get("stage128_m3_lag_wdi_data_gate_authorized")
+                     is False
+                     and handoff.get("stage128_m3_lag_wdi_data_gate_executed")
+                     is False))),
+        "the immediate Track B pointer is a single separated step whose "
+        "executes-the-Gate flag matches the locked sequence for the action it "
+        "names, and it is never authorized and never executed")
     add("m3_lag_wdi_pointer_is_retrieval_only_until_retrieval_runs",
         (not m3_lag_locked)
         or handoff.get("stage128_m3_lag_wdi_data_retrieval_started") is True

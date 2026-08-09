@@ -12,7 +12,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3i2-final-official-inquiry-response-ingestion`
 - **Last stage commit:** `36e8d5d49f3459e8564ffe240967cf6bbb5ba2d0`
-- **Generated from commit:** `36e8d5d49f3459e8564ffe240967cf6bbb5ba2d0` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
+- **Generated from commit:** `2771f95586ea546acf19a72308d3aa71e81c8ac2` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
 - **Baseline:** `origin/main` @ `175e7949e009eeecdd66aedab31ec4b48e9d3c7d`
 
 ## Current-state validation
@@ -207,7 +207,7 @@ _Two tracks now run in PARALLEL. **Track A** is the World Bank official inquiry,
 - ⛔ **No point-in-time claim:** point-in-time availability claimed = False — the future retrieval uses the CURRENT/LATEST revised WDI (True), and the one-year lag does not turn revised WDI into point-in-time data
 - ⛔ **Separate family:** exploratory comparison family `M3_LAG_WDI_EXPLORATORY_SUPPLEMENTARY` — in the confirmatory Holm family = False
 - ⛔ **Nothing executed:** retrieval started True — Data Gate `NOT_EXECUTED` (executed False) — modeling started False (authorized False) — Final Test rows read 0
-- **Track B next action (pointer only, NOT an authorization):** `stage128-m3-lag-wdi-exploratory-data-gate` — scope `data_gate_only`, authorized = False, executes the Data Gate = False. A pointer is never an authorization
+- **Track B next action (pointer only, NOT an authorization):** `stage128-m3-lag-wdi-exploratory-data-gate` — scope `data_gate_only`, authorized = False, WOULD execute the Data Gate if it were ever authorized = True (a property of the named action, NOT a statement that the Gate ran — see Data Gate executed below). A pointer is never an authorization
 - ⛔ **Separated future actions (each needs its OWN new explicit human authorization):** (B) `stage128-m3-lag-wdi-exploratory-data-retrieval` — was authorized (historical) True, authorized NOW (standing) False — one-time authorization consumed = True, reusable = False, further retrieval requires NEW human authorization = True, executes Gate False; (C) `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — authorized True, executes Gate False; (D) `stage128-m3-lag-wdi-exploratory-data-gate` — authorized False; (E) `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — authorized False
 - ⛔ **Authorization boundaries:** a retrieval authorization implies a Gate authorization = False — a combined retrieval-and-Gate action is permitted = False — a Gate PASS is data admission only = True and authorizes modeling = False
 - **Prior restriction:** `SUPERSEDED_BY_NEW_EXPLICIT_HUMAN_AUTHORIZATION` — the old "only after `UNRESOLVED_AFTER_FINAL_OFFICIAL_INQUIRY`" rule is retained as HISTORY, not deleted
@@ -268,5 +268,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `16a1ab0e09fc60596279b605f864861e3e5ea868df1b9b6cbbf76be99e4dff62`_
-_generated_at_utc: 2026-08-08T22:43:34Z (informational)_
+_state_fingerprint: `9c8678de0b54e85f511b7acd01713bd79ea15593dc6ca1360025b417f3d24471`_
+_generated_at_utc: 2026-08-09T07:36:29Z (informational)_

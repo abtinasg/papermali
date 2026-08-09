@@ -25,7 +25,9 @@ m3_lag_wdi_last_completed_action_id: stage128-m3-lag-wdi-exploratory-post-retrie
 m3_lag_wdi_next_action_id: stage128-m3-lag-wdi-exploratory-data-gate
 m3_lag_wdi_next_action_scope: data_gate_only
 m3_lag_wdi_next_action_authorized: false
-m3_lag_wdi_next_action_executes_data_gate: false
+m3_lag_wdi_next_action_executes_data_gate: true
+m3_lag_wdi_next_action_executes_data_gate_semantics: describes_the_named_next_action_not_a_permission
+m3_lag_wdi_data_gate_executed: false
 m3_lag_wdi_retrieval_action_id: stage128-m3-lag-wdi-exploratory-data-retrieval
 m3_lag_wdi_retrieval_status: RETRIEVAL_COMPLETED_RAW_SOURCE_RETAINED
 m3_lag_wdi_retrieval_authorization_consumed: true

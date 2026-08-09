@@ -363,8 +363,11 @@ def test_the_handoff_pointer_advanced_to_an_unauthorized_next_step(handoff):
     expected = _GATE_ACTION if audited else _AUDIT_ACTION
     assert handoff["stage128_m3_lag_wdi_next_action_id"] == expected
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
+    # `executes_data_gate` describes the NAMED action, so it is True exactly
+    # when the pointer has reached the Gate action itself. Pinning it to False
+    # would contradict the locked sequence, in which step D executes the Gate.
     assert handoff["stage128_m3_lag_wdi_next_action_executes_data_gate"] is (
-        False)
+        expected == _GATE_ACTION)
     # whatever the pointer names, the Gate itself stays closed
     assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False

@@ -733,7 +733,7 @@
       "status": "PASS"
     },
     {
-      "detail": "the immediate Track B pointer is a single separated step, it never executes the Data Gate, and it is not authorized",
+      "detail": "the immediate Track B pointer is a single separated step whose executes-the-Gate flag matches the locked sequence for the action it names, and it is never authorized and never executed",
       "name": "m3_lag_wdi_next_action_is_a_separated_unauthorized_step",
       "status": "PASS"
     },
@@ -789,7 +789,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "1fdb671579d0792d827d58305d3e6bbaf26a09bd",
+  "code_commit": "36e8d5d49f3459e8564ffe240967cf6bbb5ba2d0",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -797,7 +797,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "1fdb671579d0792d827d58305d3e6bbaf26a09bd",
+  "generated_at": "36e8d5d49f3459e8564ffe240967cf6bbb5ba2d0",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -815,7 +815,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "59210b300fbf269b94ff2063a2b9030490a7770aee05ebbecea0694d44e40b91",
+  "source_file_sha256": "c155f5c6de2ee4d27cc597a7079c4c8c58ea2b6ea9447fb38f8913ac85b8b991",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {

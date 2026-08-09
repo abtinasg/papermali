@@ -4990,9 +4990,11 @@ def render_current_state(record: dict) -> str:
             f"`{record.get('stage128_m3_lag_wdi_next_action_scope')}`, "
             "authorized = "
             f"{record.get('stage128_m3_lag_wdi_next_action_authorized')}, "
-            "executes the Data Gate = "
+            "WOULD execute the Data Gate if it were ever authorized = "
             f"{record.get('stage128_m3_lag_wdi_next_action_executes_data_gate')}"
-            ". A pointer is never an authorization",
+            " (a property of the named action, NOT a statement that the Gate "
+            "ran — see Data Gate executed below). A pointer is never an "
+            "authorization",
             # Retrieval, the Gate and modeling are three separate actions, so
             # an authorization for one can never be read as authorizing the
             # next. Rendering them as one line would erase that boundary.
@@ -7446,6 +7448,33 @@ _STAGE128_M3_LAG_ACTION_SEQUENCE = (
     ("D", _STAGE128_M3_LAG_DATA_GATE_ACTION_ID, False, True, False),
     ("E", _STAGE128_M3_LAG_MODELING_ACTION_ID, False, False, True),
 )
+def _stage128_m3_lag_action_executes_data_gate(action_id: str) -> bool:
+    """Does the NAMED Track B action execute the Data Gate?
+
+    ``*_executes_data_gate`` is a DESCRIPTIVE property of a specific action,
+    not a promise that no Gate will ever run. The canonical values live in
+    ``_STAGE128_M3_LAG_ACTION_SEQUENCE``: only step D, the Data Gate action
+    itself, carries True.
+
+    ``next_action_executes_data_gate`` is therefore the same property applied
+    to whichever action the pointer currently names — it has always mirrored
+    the per-action field for that action (at contract-lock time it mirrored
+    ``retrieval_action_executes_data_gate``, after retrieval it mirrored
+    ``post_retrieval_audit_executes_data_gate``). Deriving it here means it can
+    never again be hard-coded to a value that was only true at one moment.
+
+    The safety property is carried by ``next_action_authorized`` and by
+    ``data_gate_authorized``/``data_gate_executed``, NOT by pretending the Gate
+    action does not gate.
+    """
+    for _step, candidate, _retr, executes_gate, _model in (
+            _STAGE128_M3_LAG_ACTION_SEQUENCE):
+        if candidate == action_id:
+            return bool(executes_gate)
+    raise HandoffError(
+        f"{action_id!r} is not a Track B action in the locked sequence")
+
+
 #: The two features, in the exact locked order, with their exact identities.
 _STAGE128_M3_LAG_FEATURES = (
     ("intl_cpi_inflation_lag1_wdi", "FP.CPI.TOTL.ZG"),
@@ -8180,7 +8209,10 @@ def derive_stage128_m3_lag_wdi_exploratory_markers(root: str) -> dict:
         "stage128_m3_lag_wdi_next_action_authorized": False,
         "stage128_m3_lag_wdi_next_action_scope":
             _STAGE128_M3_LAG_NEXT_ACTION_SCOPE,
-        "stage128_m3_lag_wdi_next_action_executes_data_gate": False,
+        # Derived from the action the pointer names (here: retrieval → False).
+        "stage128_m3_lag_wdi_next_action_executes_data_gate":
+            _stage128_m3_lag_action_executes_data_gate(
+                _STAGE128_M3_LAG_NEXT_ACTION_ID),
         "stage128_m3_lag_wdi_retrieval_action_id":
             _STAGE128_M3_LAG_RETRIEVAL_ACTION_ID,
         "stage128_m3_lag_wdi_retrieval_authorized": False,
@@ -8638,7 +8670,10 @@ def derive_stage128_m3_lag_wdi_data_retrieval_markers(root: str) -> dict:
             _STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID,
         "stage128_m3_lag_wdi_next_action_authorized": False,
         "stage128_m3_lag_wdi_next_action_scope": "post_retrieval_audit_only",
-        "stage128_m3_lag_wdi_next_action_executes_data_gate": False,
+        # Derived from the action the pointer names (here: the audit → False).
+        "stage128_m3_lag_wdi_next_action_executes_data_gate":
+            _stage128_m3_lag_action_executes_data_gate(
+                _STAGE128_M3_LAG_POST_RETRIEVAL_AUDIT_ACTION_ID),
         "stage128_m3_lag_wdi_post_retrieval_audit_executed": False,
         "stage128_m3_lag_wdi_data_gate_executed": False,
         "stage128_m3_lag_wdi_data_gate_authorized": False,
@@ -8787,6 +8822,16 @@ def derive_stage128_m3_lag_wdi_post_retrieval_audit_markers(
             _STAGE128_M3_LAG_DATA_GATE_ACTION_ID):
         raise HandoffError(
             "the Track B pointer after step C is the Data Gate")
+    # The pointer's descriptive fields must agree with the locked sequence for
+    # the action they point AT. Publishing "the next action is the Data Gate"
+    # beside "the next action does not execute the Data Gate" is a
+    # contradiction, and it is exactly what happens when the field is carried
+    # forward as a hard-coded False instead of being derived.
+    if _stage128_m3_lag_action_executes_data_gate(
+            _STAGE128_M3_LAG_DATA_GATE_ACTION_ID) is not True:
+        raise HandoffError(
+            "the locked sequence must mark the Data Gate action as the step "
+            "that executes the Gate")
     if decision.get("scientific_effect") != "NONE":
         raise HandoffError("an audit has no scientific effect")
     if decision.get("authorizes_next_action") is not False:
@@ -8850,7 +8895,14 @@ def derive_stage128_m3_lag_wdi_post_retrieval_audit_markers(
             _STAGE128_M3_LAG_DATA_GATE_ACTION_ID,
         "stage128_m3_lag_wdi_next_action_authorized": False,
         "stage128_m3_lag_wdi_next_action_scope": "data_gate_only",
-        "stage128_m3_lag_wdi_next_action_executes_data_gate": False,
+        # DERIVED, never hard-coded. The pointer now names the Data Gate
+        # action, and that action does by definition execute the Gate — so
+        # this is True. It is NOT a statement that the Gate has run or may
+        # run: `next_action_authorized`, `data_gate_authorized` and
+        # `data_gate_executed` are all False, and they are what hold the line.
+        "stage128_m3_lag_wdi_next_action_executes_data_gate":
+            _stage128_m3_lag_action_executes_data_gate(
+                _STAGE128_M3_LAG_DATA_GATE_ACTION_ID),
         "stage128_m3_lag_wdi_action_sequence": [
             {
                 "step": step,

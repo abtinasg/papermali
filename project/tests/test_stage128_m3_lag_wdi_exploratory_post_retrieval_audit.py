@@ -365,6 +365,43 @@ def test_current_state_shows_the_findings_next_to_the_pass():
     assert "Reading is not admitting" in text
 
 
+def test_next_action_executes_data_gate_describes_the_named_action(handoff):
+    """`*_executes_data_gate` is DESCRIPTIVE, not a permission flag.
+
+    Its established meaning is "does this named action execute the Data
+    Gate?" — the canonical values live in the locked action sequence, where
+    only step D carries True. Applied to the pointer, it has always mirrored
+    the per-action value for the action pointed at: False while the pointer
+    named retrieval, False while it named the audit, and True now that it
+    names the Gate itself.
+
+    Publishing "the next action is the Data Gate" beside "the next action does
+    not execute the Data Gate" is a contradiction. The safety property lives
+    in `next_action_authorized` / `data_gate_authorized` / `data_gate_executed`
+    — never in pretending the Gate action does not gate.
+    """
+    pointer = handoff["stage128_m3_lag_wdi_next_action_id"]
+    sequence = handoff["stage128_m3_lag_wdi_action_sequence"]
+    canonical = {e["action_id"]: e["executes_data_gate"] for e in sequence}
+    assert pointer in canonical
+    assert handoff["stage128_m3_lag_wdi_next_action_executes_data_gate"] is (
+        canonical[pointer]), (
+            "the pointer's executes-the-Gate flag must equal the locked "
+            "sequence value for the action it names")
+    # and the flag being True must never leak into permission or execution
+    assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
+    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+    assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
+
+
+def test_exactly_one_locked_step_executes_the_data_gate(handoff):
+    sequence = handoff["stage128_m3_lag_wdi_action_sequence"]
+    gating = [e for e in sequence if e["executes_data_gate"]]
+    assert len(gating) == 1
+    assert gating[0]["step"] == "D"
+    assert gating[0]["action_id"] == _GATE_ACTION
+
+
 def test_the_action_sequence_marks_c_complete_but_nothing_standing(handoff):
     sequence = handoff["stage128_m3_lag_wdi_action_sequence"]
     by_step = {e["step"]: e for e in sequence}

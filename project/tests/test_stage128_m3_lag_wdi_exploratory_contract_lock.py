@@ -1129,8 +1129,14 @@ def test_the_next_action_is_a_separated_step_and_never_the_gate(handoff):
         assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
         assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
+    # Descriptive, not a safety flag: True exactly when the pointer names the
+    # Gate action. The safety property is that it is never AUTHORIZED (above)
+    # and the Gate is never EXECUTED (asserted in the branch above).
     assert handoff[
-        "stage128_m3_lag_wdi_next_action_executes_data_gate"] is False
+        "stage128_m3_lag_wdi_next_action_executes_data_gate"] is (
+            handoff["stage128_m3_lag_wdi_next_action_id"]
+            == _DATA_GATE_ACTION_ID)
+    # the retrieval action itself never gates, in any state
     assert handoff["stage128_m3_lag_wdi_retrieval_executes_data_gate"] is False
     # retrieval may have been authorized once, but never as a standing
     # grant: the generic field carries the STANDING meaning, so an executed
@@ -1244,11 +1250,19 @@ def test_the_docs_separate_retrieval_from_the_gate():
     roadmap = _read_text("project/docs/ai/ROADMAP.md")
     # The pointer scope advances with the sequence, so what must always hold is
     # that retrieval keeps its OWN action id, separate from the Gate's, and
-    # that the current pointer never claims to execute the Gate.
+    # that the Gate is never recorded as authorized or executed. The pointer's
+    # executes-the-Gate flag DESCRIBES whichever action it names, so it is not
+    # pinned here — it is pinned against the locked sequence instead.
     assert f"m3_lag_wdi_retrieval_action_id: {_RETRIEVAL_ACTION_ID}" in roadmap
     assert f"m3_lag_wdi_data_gate_action_id: {_DATA_GATE_ACTION_ID}" in roadmap
     assert "m3_lag_wdi_data_gate_authorized: false" in roadmap
-    assert "m3_lag_wdi_next_action_executes_data_gate: false" in roadmap
+    assert "m3_lag_wdi_data_gate_executed: false" in roadmap
+    # The pointer's executes-the-Gate flag tracks the action it names, so the
+    # roadmap must agree with the pointer rather than hard-code either value.
+    _pointer_gates = (f"m3_lag_wdi_next_action_id: {_DATA_GATE_ACTION_ID}"
+                      in roadmap)
+    assert (f"m3_lag_wdi_next_action_executes_data_gate: "
+            f"{'true' if _pointer_gates else 'false'}") in roadmap
     assert "m3_lag_wdi_data_gate_authorized: false" in roadmap
     assert "m3_lag_wdi_gate_pass_authorizes_modeling: false" in roadmap
 
