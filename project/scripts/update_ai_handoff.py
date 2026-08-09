@@ -2808,6 +2808,14 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # nothing — it executes no Gate, computes no coverage against any
         # threshold and returns no admission decision.
         **derive_stage128_m3_lag_wdi_post_retrieval_audit_markers(root),
+        # Step D. Must come after the step C markers: the executed Data Gate
+        # is the newest Track B action and moves the pointer from the Gate to
+        # the (still unauthorized) modeling step E. It is the ONLY action that
+        # may compute coverage against the locked thresholds and return an
+        # admission verdict — and a PASS admits DATA ONLY: it authorizes no
+        # model fit, makes no claim that the FX feature is informative, and
+        # never propagates authorization to step E.
+        **derive_stage128_m3_lag_wdi_data_gate_markers(root),
         # Must come last: PR #78 (the contract lock) has been MERGED, so the
         # contract-lock topology above is history. This re-anchors the LIVE
         # topology onto the retrieval Draft PR #79 while carrying every pinned
@@ -4921,6 +4929,109 @@ def render_current_state(record: dict) -> str:
                 "predictor years (the official rate is repeated unchanged), "
                 "so completeness there does not imply information",
             ]
+        # Step D authorization, split the same way step B's is: a spent
+        # one-time Gate authorization must never render as a live permission
+        # to run the Gate again. Before step D both fall back to the generic
+        # (standing) field, which is False until a new authorization exists.
+        _gate_generic = record.get("stage128_m3_lag_wdi_data_gate_authorized")
+        _gate_was = record.get(
+            "stage128_m3_lag_wdi_data_gate_was_authorized", _gate_generic)
+        _gate_now = record.get(
+            "stage128_m3_lag_wdi_data_gate_authorized_now", _gate_generic)
+        _gate_consumed = record.get(
+            "stage128_m3_lag_wdi_data_gate_authorization_consumed", False)
+        _gate_reusable = record.get(
+            "stage128_m3_lag_wdi_data_gate_authorization_reusable", False)
+        # Step D. The single most dangerous thing this section could do is
+        # render a coverage PASS in a way that reads as scientific
+        # endorsement or as permission to model, so the verdict is never
+        # published without the limitations that survive it.
+        _gate_lines = []
+        if record.get("stage128_m3_lag_wdi_data_gate_executed"):
+            _g_result = record.get("stage128_m3_lag_wdi_data_gate_result")
+            _g_admitted = record.get("stage128_m3_lag_wdi_block_admitted")
+            _g_n = record.get("stage128_m3_lag_wdi_gate_denominator_rows")
+            _g_cpi = record.get("stage128_m3_lag_wdi_gate_cpi_valid_rows")
+            _g_fx = record.get("stage128_m3_lag_wdi_gate_fx_valid_rows")
+            _g_block = record.get(
+                "stage128_m3_lag_wdi_gate_block_common_sample_rows")
+            _g_cand_min = record.get(
+                "stage128_m3_lag_wdi_gate_candidate_coverage_min")
+            _g_block_min = record.get(
+                "stage128_m3_lag_wdi_gate_block_coverage_min")
+            _g_pos_min = record.get(
+                "stage128_m3_lag_wdi_gate_min_positive_each_validation_window")
+            _g_f1 = record.get(
+                "stage128_m3_lag_wdi_gate_fold1_positive_evaluable")
+            _g_f2 = record.get(
+                "stage128_m3_lag_wdi_gate_fold2_positive_evaluable")
+            _g_zero = record.get(
+                "stage128_m3_lag_wdi_gate_fx_zero_change_development_rows")
+            _g_lims = record.get(
+                "stage128_m3_lag_wdi_gate_material_limitations") or []
+            _gate_lines = [
+                "- ✅ **Step D Data Gate EXECUTED** — formal verdict "
+                f"`{_g_result}`; block formally admitted = {_g_admitted}, and "
+                "that admission is DATA ADMISSION ONLY (authorizes modeling = "
+                f"{record.get('stage128_m3_lag_wdi_gate_pass_authorizes_modeling')}"
+                ", unlocks the Final Test = "
+                f"{record.get('stage128_m3_lag_wdi_gate_pass_unlocks_final_test')}"
+                "). Its one-time authorization is consumed = "
+                f"{record.get('stage128_m3_lag_wdi_data_gate_authorization_consumed')}"
+                ", reusable = "
+                f"{record.get('stage128_m3_lag_wdi_data_gate_authorization_reusable')}"
+                ", authorized NOW (standing) = "
+                f"{record.get('stage128_m3_lag_wdi_data_gate_authorized_now')}",
+                "- **Coverage against the LOCKED, INHERITED thresholds** "
+                "(thresholds changed by this action = "
+                f"{record.get('stage128_m3_lag_wdi_gate_thresholds_changed_by_this_action')}"
+                f", criteria weakened = "
+                f"{record.get('stage128_m3_lag_wdi_gate_criteria_weakened')}): "
+                f"CPI {_g_cpi}/{_g_n}, FX {_g_fx}/{_g_n} (each vs "
+                f">= {_g_cand_min}); block common sample {_g_block}/{_g_n} "
+                f"(vs >= {_g_block_min}); positive evaluable per locked "
+                f"validation window {_g_f1} and {_g_f2} (vs >= {_g_pos_min}); "
+                "rows excluded = "
+                f"{record.get('stage128_m3_lag_wdi_gate_rows_excluded')}",
+                "- ⚠️ **A coverage PASS is NOT an information-content claim** "
+                "(published as one = "
+                f"{record.get('stage128_m3_lag_wdi_gate_pass_is_information_content_claim')}"
+                "). The step C finding stands unchanged (step C result "
+                f"`{record.get('stage128_m3_lag_wdi_post_retrieval_audit_result')}`"
+                ", findings preserved = "
+                f"{record.get('stage128_m3_lag_wdi_step_c_material_findings_preserved')}"
+                "): the FX log-ratio is identically ZERO for predictor years "
+                "2021–2024. Those years fall OUTSIDE the development sample, "
+                f"which carries {_g_zero} zero-change rows — so the "
+                "degeneracy does not change the formal verdict under the "
+                "PRE-EXISTING rules, and no new rejection criterion was "
+                "invented to make it do so",
+                f"- ⚠️ **Limitations that SURVIVE the verdict ({len(_g_lims)}):** "
+                + " | ".join(_g_lims),
+                "- ⛔ **Calendar mapping still unlocked:** the locked contract "
+                "does not fix the Jalali→Gregorian mapping for "
+                "`predictor_year_t` (locked = "
+                f"{record.get('stage128_m3_lag_wdi_calendar_mapping_locked')}"
+                "). The verdict is invariant across BOTH admissible "
+                "conventions (invariant = "
+                f"{record.get('stage128_m3_lag_wdi_gate_status_invariant_across_calendar_conventions')}"
+                "), so it is well-defined despite the gap — but feature "
+                "VALUES are not invariant, so no feature-value table was "
+                "materialized and the mapping must be human-locked before "
+                "any modeling table exists",
+                "- Package: `project/stage128/"
+                "m3_lag_wdi_exploratory_data_gate/`; interpretation: "
+                "`project/stage128/m3_lag_wdi_exploratory_data_gate/"
+                "README_STAGE128_M3_LAG_WDI_EXPLORATORY_DATA_GATE.md`",
+            ]
+        # "Nothing executed" was true only while Track B was a bare contract
+        # lock. Derived so the summary can never contradict the line below it.
+        _track_b_ran = bool(
+            record.get("stage128_m3_lag_wdi_data_retrieval_started")
+            or record.get("stage128_m3_lag_wdi_data_gate_executed"))
+        _track_b_exec_icon = "✅" if _track_b_ran else "⛔"
+        _track_b_exec_label = (
+            "Track B execution state" if _track_b_ran else "Nothing executed")
         lines += [
             "### Stage128 — TRACK B: M3-LAG-WDI-EXPLORATORY contract lock "
             "(PRE-RETRIEVAL)\n",
@@ -4967,7 +5078,11 @@ def render_current_state(record: dict) -> str:
             f"`{record.get('stage128_m3_lag_wdi_comparison_family_id')}` — in "
             "the confirmatory Holm family = "
             f"{record.get('stage128_m3_lag_wdi_in_confirmatory_holm_family')}",
-            "- ⛔ **Nothing executed:** retrieval started "
+            # The heading must describe what is actually true NOW. Once the
+            # Gate has run, "Nothing executed" would be a false summary
+            # sitting directly above a line that says it executed.
+            f"- {_track_b_exec_icon} **{_track_b_exec_label}:** retrieval "
+            "started "
             f"{record.get('stage128_m3_lag_wdi_data_retrieval_started')} — "
             "Data Gate "
             f"`{record.get('stage128_m3_lag_wdi_data_gate_result')}` "
@@ -5020,8 +5135,9 @@ def render_current_state(record: dict) -> str:
             f"{record.get('stage128_m3_lag_wdi_post_retrieval_audit_executes_data_gate')}"
             "; (D) "
             f"`{record.get('stage128_m3_lag_wdi_data_gate_action_id')}` — "
-            "authorized "
-            f"{record.get('stage128_m3_lag_wdi_data_gate_authorized')}; (E) "
+            f"was authorized (historical) {_gate_was}, authorized NOW "
+            f"(standing) {_gate_now} — one-time authorization consumed = "
+            f"{_gate_consumed}, reusable = {_gate_reusable}; (E) "
             f"`{record.get('stage128_m3_lag_wdi_modeling_action_id')}` — "
             "authorized "
             f"{record.get('stage128_m3_lag_wdi_modeling_authorized')}",
@@ -5048,6 +5164,7 @@ def render_current_state(record: dict) -> str:
             f"{record.get('stage128_m3i2_response_adjudication_authorized')}",
             *_custody_lines,
             *_audit_lines,
+            *_gate_lines,
             "- Package: `project/stage128/"
             "m3_lag_wdi_exploratory_contract_lock/`; interpretation: "
             "`project/stage128/m3_lag_wdi_exploratory_contract_lock/"
@@ -8914,6 +9031,347 @@ def derive_stage128_m3_lag_wdi_post_retrieval_audit_markers(
                 "authorized_now": False,
                 "authorized": False,
                 "status": "COMPLETE" if step in ("A", "B", "C")
+                          else "NOT_AUTHORIZED",
+            }
+            for (step, action_id, executes_retrieval, executes_gate,
+                 executes_modeling) in _STAGE128_M3_LAG_ACTION_SEQUENCE
+        ],
+    }
+
+
+#: Stage128 Track B step D — the executed Data Gate package.
+_STAGE128_M3_LAG_GATE_PKG = (
+    "project/stage128/m3_lag_wdi_exploratory_data_gate")
+_STAGE128_M3_LAG_GATE_REPORT_REL = (
+    f"{_STAGE128_M3_LAG_GATE_PKG}/stage128_m3_lag_wdi_data_gate_report.json")
+_STAGE128_M3_LAG_GATE_EXEC_REL = (
+    f"{_STAGE128_M3_LAG_GATE_PKG}/"
+    "stage128_m3_lag_wdi_data_gate_execution_audit.json")
+_STAGE128_M3_LAG_GATE_BOUNDARY_REL = (
+    f"{_STAGE128_M3_LAG_GATE_PKG}/"
+    "stage128_m3_lag_wdi_data_gate_governance_boundary.json")
+_STAGE128_M3_LAG_GATE_DECISION_REL = (
+    f"{_STAGE128_M3_LAG_GATE_PKG}/stage128_m3_lag_wdi_data_gate_decision.json")
+
+#: The Gate's own outcome vocabulary. Anything else is an invented verdict.
+_STAGE128_M3_LAG_GATE_VOCABULARY = (
+    "PASS_M3_LAG_WDI_DATA_GATE",
+    "FAIL_M3_LAG_WDI_DATA_GATE",
+    "UNRESOLVED_M3_LAG_WDI_DATA_GATE",
+)
+
+#: Counters a data Gate must STILL leave at zero. The Gate computes coverage
+#: — that is its job — but it retrieves nothing, fits nothing, materializes no
+#: feature-value table and reads no Final Test row.
+_STAGE128_M3_LAG_GATE_ZERO_COUNTERS = (
+    "world_bank_api_requests", "new_payloads_retrieved",
+    "alternative_indicators_searched", "alternative_indicators_retrieved",
+    "feature_value_tables_materialized", "model_fits", "predictions",
+    "predictive_metrics", "bootstrap_executions", "holm_calculations",
+    "shap_executions", "tuning_runs", "cross_validation_runs",
+    "model_selections", "final_test_rows_read",
+    "final_test_predictor_values_read", "final_test_target_values_read",
+)
+
+#: The locked, inherited thresholds. Republished here so a silently lowered
+#: threshold in the Gate package cannot reach the Handoff unnoticed.
+#: The locked Gate denominator: the retained-M2 development common sample.
+_STAGE128_M3_LAG_PARENT_ROWS = 539
+_STAGE128_M3_LAG_GATE_CANDIDATE_COVERAGE_MIN = 0.80
+_STAGE128_M3_LAG_GATE_BLOCK_COVERAGE_MIN = 0.70
+_STAGE128_M3_LAG_GATE_MIN_POSITIVE_EACH_WINDOW = 5
+
+
+def derive_stage128_m3_lag_wdi_data_gate_markers(root: str) -> dict:
+    """Publish Track B step D — the EXECUTED M3-LAG-WDI Data Gate.
+
+    Step D is the only action permitted to bring the audited series to the
+    development sample and return an admission verdict. Fail-closed on the
+    confusions that would matter most here, all of which are ways a coverage
+    PASS could be laundered into something it is not:
+
+    * a verdict outside the Gate's own vocabulary;
+    * a threshold that does not match the locked, inherited contract — the
+      single most valuable thing to catch, since lowering one is exactly how
+      a FAIL becomes a PASS;
+    * a verdict that does not follow from the published numbers (recomputed
+      here from numerator, denominator and threshold, never trusted);
+    * a PASS published as modeling authorization, as an information-content
+      claim about the FX feature, as a Final Test unlock, or as anything that
+      propagates to step E;
+    * the step C material findings quietly dropped once the Gate passed.
+
+    Returns {} before the Gate package exists.
+    """
+    report_path = os.path.join(root, _STAGE128_M3_LAG_GATE_REPORT_REL)
+    if not os.path.isfile(report_path):
+        return {}
+    report = _require_json_artifact(root, _STAGE128_M3_LAG_GATE_REPORT_REL)
+    audit = _require_json_artifact(root, _STAGE128_M3_LAG_GATE_EXEC_REL)
+    boundary = _require_json_artifact(
+        root, _STAGE128_M3_LAG_GATE_BOUNDARY_REL)
+    decision = _require_json_artifact(
+        root, _STAGE128_M3_LAG_GATE_DECISION_REL)
+
+    if report.get("action_id") != _STAGE128_M3_LAG_DATA_GATE_ACTION_ID:
+        raise HandoffError("the step D action id is wrong")
+    if report.get("authorized_scope") != "data_gate_only":
+        raise HandoffError("step D scope must be data_gate_only")
+    if audit.get("data_gate_executed") is not True:
+        raise HandoffError("the step D audit must record that it executed")
+    if audit.get("data_gate_executions") != 1:
+        raise HandoffError("the Gate is executed exactly once")
+    for counter in _STAGE128_M3_LAG_GATE_ZERO_COUNTERS:
+        if audit.get(counter) != 0:
+            raise HandoffError(f"data-gate-only: counter {counter} must be 0")
+    for field in ("retained_bytes_modified", "deposited_evidence_modified"):
+        if audit.get(field) is not False:
+            raise HandoffError(
+                f"the Gate may not mutate the evidence it reads ({field})")
+
+    # ---- the thresholds are the locked, inherited ones -------------------- #
+    thresholds = report["locked_thresholds"]
+    gate = report["gate_computation"]
+    if thresholds.get("thresholds_changed_by_this_action") is not False:
+        raise HandoffError("step D may not change the locked thresholds")
+    if thresholds.get("coverage_scope") != "development_only":
+        raise HandoffError("the M3-LAG-WDI Gate is development-only")
+    expected_thresholds = (
+        ("candidate_valid_coverage_min",
+         _STAGE128_M3_LAG_GATE_CANDIDATE_COVERAGE_MIN),
+        ("block_common_sample_coverage_min",
+         _STAGE128_M3_LAG_GATE_BLOCK_COVERAGE_MIN),
+        ("minimum_positive_evaluable_each_locked_validation_window",
+         _STAGE128_M3_LAG_GATE_MIN_POSITIVE_EACH_WINDOW),
+    )
+    for key, expected in expected_thresholds:
+        if float(thresholds.get(key)) != float(expected):
+            raise HandoffError(
+                f"step D threshold {key} is {thresholds.get(key)}, not the "
+                f"locked inherited {expected}; thresholds must not be "
+                "lowered, raised or replaced")
+
+    # ---- the verdict must FOLLOW from the published numbers --------------- #
+    rows = gate.get("rows")
+    if rows != _STAGE128_M3_LAG_PARENT_ROWS:
+        raise HandoffError(
+            f"the Gate denominator is the {_STAGE128_M3_LAG_PARENT_ROWS}-row "
+            f"retained-M2 development sample, not {rows}")
+    if report.get("parent_surface", {}).get(
+            "final_test_rows_in_parent_surface") != 0:
+        raise HandoffError("no final-test row may enter the Gate denominator")
+    verdict = decision.get("gate_result")
+    if verdict not in _STAGE128_M3_LAG_GATE_VOCABULARY:
+        raise HandoffError(f"unrecognized step D verdict {verdict!r}")
+
+    cand_min = float(thresholds["candidate_valid_coverage_min"])
+    block_min = float(thresholds["block_common_sample_coverage_min"])
+    pos_min = int(thresholds[
+        "minimum_positive_evaluable_each_locked_validation_window"])
+    recomputed = {
+        "cpi_candidate_coverage_meets_threshold":
+            gate["cpi_constructible_rows"] / rows >= cand_min,
+        "fx_candidate_coverage_meets_threshold":
+            gate["fx_constructible_rows"] / rows >= cand_min,
+        "block_common_sample_coverage_meets_threshold":
+            gate["both_constructible_rows"] / rows >= block_min,
+        "every_validation_window_meets_positive_floor": all(
+            window["positive_evaluable_in_m3_lag_wdi_common_sample"] >= pos_min
+            for window in gate["validation_windows"].values()),
+    }
+    if recomputed != gate.get("threshold_checks"):
+        raise HandoffError(
+            "the published threshold checks do not follow from the published "
+            "coverage numerators, denominator and locked thresholds")
+    invariant = gate.get("status_invariant_across_calendar_conventions")
+    expected_verdict = (
+        "UNRESOLVED_M3_LAG_WDI_DATA_GATE" if invariant is not True
+        else "PASS_M3_LAG_WDI_DATA_GATE" if all(recomputed.values())
+        else "FAIL_M3_LAG_WDI_DATA_GATE")
+    if verdict != expected_verdict:
+        raise HandoffError(
+            f"the published verdict {verdict} does not follow from the "
+            f"published checks (recomputed {expected_verdict})")
+
+    admitted = verdict == "PASS_M3_LAG_WDI_DATA_GATE"
+    if decision.get("block_formally_admitted") is not admitted:
+        raise HandoffError(
+            "block_formally_admitted must equal (verdict == PASS)")
+    if boundary.get("m3_lag_wdi_block_admitted") is not admitted:
+        raise HandoffError(
+            "the governance boundary disagrees with the Gate verdict about "
+            "whether the block was admitted")
+
+    # ---- a PASS admits DATA and nothing else ------------------------------ #
+    for field in ("gate_pass_is_modeling_authorization",
+                  "gate_pass_is_information_content_claim",
+                  "gate_pass_is_final_test_unlock",
+                  "gate_authorization_propagates_to_step_e",
+                  "m3_lag_wdi_data_gate_authorized_now",
+                  "m3_lag_wdi_data_gate_authorization_reusable",
+                  "m3_lag_wdi_next_action_authorized",
+                  "m3_lag_wdi_modeling_authorized",
+                  "m3_lag_wdi_modeling_started",
+                  "m3_lag_wdi_contract_modified_by_this_action",
+                  "m3_lag_wdi_thresholds_modified_by_this_action",
+                  "step_c_rerun_by_this_action",
+                  "step_c_result_modified_by_this_action",
+                  "m3_lag_wdi_calendar_mapping_locked",
+                  "retrieval_authorized_now",
+                  "new_world_bank_request_made_by_this_action",
+                  "world_bank_inquiry_terminated_by_this_action",
+                  "final_test_access_authorized", "m4_authorized",
+                  "merge_authorized", "ready_for_review_authorized",
+                  "pii_committed_to_git", "credentials_committed_to_git"):
+        if boundary.get(field) is not False:
+            raise HandoffError(
+                f"step D governance boundary {field} must be False")
+    for field in ("m3_lag_wdi_data_gate_action_authorized",
+                  "m3_lag_wdi_data_gate_executed",
+                  "m3_lag_wdi_data_gate_authorization_consumed",
+                  "m3_lag_wdi_block_admission_is_data_admission_only",
+                  "m3_lag_wdi_modeling_requires_new_explicit_human_"
+                  "authorization",
+                  "step_c_material_findings_preserved",
+                  "retrieval_was_authorized",
+                  "retrieval_authorization_consumed",
+                  "post_retrieval_audit_was_authorized",
+                  "post_retrieval_audit_authorization_consumed",
+                  "further_retrieval_requires_new_human_authorization",
+                  "final_test_locked"):
+        if boundary.get(field) is not True:
+            raise HandoffError(
+                f"step D governance boundary {field} must be True")
+    if boundary.get("m3_lag_wdi_next_action_id") != (
+            _STAGE128_M3_LAG_MODELING_ACTION_ID):
+        raise HandoffError("the Track B pointer after step D is step E")
+    if decision.get("authorizes_next_action") is not False:
+        raise HandoffError("step D authorizes nothing")
+    if decision.get("gate_pass_authorizes_modeling") is not False:
+        raise HandoffError("a Gate PASS is not modeling authorization")
+
+    # ---- step C's findings are not allowed to evaporate ------------------- #
+    step_c_decision = _require_json_artifact(
+        root, _STAGE128_M3_LAG_AUDIT_DECISION_REL)
+    if decision.get("step_c_result_preserved") != (
+            step_c_decision.get("audit_result")):
+        raise HandoffError("step D misreports the accepted step C result")
+    if decision.get("step_c_material_limitations_preserved") != (
+            step_c_decision.get("material_limitations")):
+        raise HandoffError(
+            "the step C material findings must be preserved verbatim")
+    distinctions = decision.get("scientific_distinctions") or {}
+    required_distinctions = {
+        "A_syntactic_availability_and_coverage",
+        "B_pre_defined_thresholds_satisfied",
+        "C_information_content_limitation_from_step_c",
+        "D_effect_on_the_formal_gate_decision",
+        "E_remaining_scientific_limitation",
+    }
+    if set(distinctions) != required_distinctions:
+        raise HandoffError(
+            "step D must distinguish coverage, thresholds, information "
+            "content, formal effect and residual limitation")
+    if distinctions["D_effect_on_the_formal_gate_decision"].get(
+            "new_rejection_criterion_created") is not False:
+        raise HandoffError(
+            "step D may not invent a rejection criterion the locked contract "
+            "does not contain")
+    if distinctions["E_remaining_scientific_limitation"].get(
+            "limitation_survives_the_pass") is not True:
+        raise HandoffError(
+            "the FX information-content limitation survives a formal PASS")
+    limitations = decision.get("material_limitations") or []
+    if not limitations:
+        raise HandoffError(
+            "step D inherited material limitations and may not publish none")
+    for field in ("thresholds_changed_to_obtain_result", "criteria_weakened",
+                  "criteria_strengthened_after_seeing_result",
+                  "imputation_used", "alternative_indicator_tried"):
+        if decision.get(field) is not False:
+            raise HandoffError(f"step D decision {field} must be False")
+
+    windows = gate["validation_windows"]
+    return {
+        "stage128_m3_lag_wdi_data_gate_executed": True,
+        "stage128_m3_lag_wdi_data_gate_authorized": True,
+        "stage128_m3_lag_wdi_data_gate_was_authorized": True,
+        "stage128_m3_lag_wdi_data_gate_authorized_now": False,
+        "stage128_m3_lag_wdi_data_gate_authorization_consumed": True,
+        "stage128_m3_lag_wdi_data_gate_authorization_reusable": False,
+        "stage128_m3_lag_wdi_data_gate_result": verdict,
+        "stage128_m3_lag_wdi_data_gate_result_vocabulary": list(
+            _STAGE128_M3_LAG_GATE_VOCABULARY),
+        "stage128_m3_lag_wdi_block_admitted": admitted,
+        "stage128_m3_lag_wdi_block_admission_is_data_admission_only": True,
+        "stage128_m3_lag_wdi_gate_denominator_rows": rows,
+        "stage128_m3_lag_wdi_gate_cpi_valid_rows":
+            gate["cpi_constructible_rows"],
+        "stage128_m3_lag_wdi_gate_fx_valid_rows":
+            gate["fx_constructible_rows"],
+        "stage128_m3_lag_wdi_gate_block_common_sample_rows":
+            gate["both_constructible_rows"],
+        "stage128_m3_lag_wdi_gate_cpi_candidate_coverage":
+            gate["cpi_candidate_coverage"],
+        "stage128_m3_lag_wdi_gate_fx_candidate_coverage":
+            gate["fx_candidate_coverage"],
+        "stage128_m3_lag_wdi_gate_block_common_sample_coverage":
+            gate["block_common_sample_coverage"],
+        "stage128_m3_lag_wdi_gate_candidate_coverage_min": cand_min,
+        "stage128_m3_lag_wdi_gate_block_coverage_min": block_min,
+        "stage128_m3_lag_wdi_gate_min_positive_each_validation_window":
+            pos_min,
+        "stage128_m3_lag_wdi_gate_fold1_positive_evaluable":
+            windows["fold1_validation"][
+                "positive_evaluable_in_m3_lag_wdi_common_sample"],
+        "stage128_m3_lag_wdi_gate_fold2_positive_evaluable":
+            windows["fold2_validation"][
+                "positive_evaluable_in_m3_lag_wdi_common_sample"],
+        "stage128_m3_lag_wdi_gate_rows_excluded": decision["rows_excluded"],
+        "stage128_m3_lag_wdi_gate_fx_zero_change_development_rows":
+            gate["fx_zero_change_rows"],
+        "stage128_m3_lag_wdi_gate_status_invariant_across_calendar_"
+        "conventions": invariant,
+        "stage128_m3_lag_wdi_calendar_mapping_locked": False,
+        "stage128_m3_lag_wdi_calendar_mapping_lock_required_before_modeling":
+            True,
+        "stage128_m3_lag_wdi_gate_material_limitations": limitations,
+        "stage128_m3_lag_wdi_gate_material_limitation_count": len(limitations),
+        "stage128_m3_lag_wdi_gate_thresholds_changed_by_this_action": False,
+        "stage128_m3_lag_wdi_gate_criteria_weakened": False,
+        "stage128_m3_lag_wdi_step_c_material_findings_preserved": True,
+        # The step C result and its findings stay exactly as accepted.
+        "stage128_m3_lag_wdi_post_retrieval_audit_result":
+            step_c_decision["audit_result"],
+        # A PASS admits DATA. It authorizes nothing, and the pointer that now
+        # names step E is still only a pointer.
+        "stage128_m3_lag_wdi_gate_pass_authorizes_modeling": False,
+        "stage128_m3_lag_wdi_gate_pass_is_information_content_claim": False,
+        "stage128_m3_lag_wdi_gate_pass_unlocks_final_test": False,
+        "stage128_m3_lag_wdi_next_action_id":
+            _STAGE128_M3_LAG_MODELING_ACTION_ID,
+        "stage128_m3_lag_wdi_next_action_authorized": False,
+        "stage128_m3_lag_wdi_next_action_scope":
+            "modeling_requires_new_human_authorization",
+        "stage128_m3_lag_wdi_next_action_executes_data_gate":
+            _stage128_m3_lag_action_executes_data_gate(
+                _STAGE128_M3_LAG_MODELING_ACTION_ID),
+        "stage128_m3_lag_wdi_modeling_authorized": False,
+        "stage128_m3_lag_wdi_modeling_started": False,
+        "stage128_m3_lag_wdi_modeling_requires_new_human_authorization": True,
+        "stage128_m3_lag_wdi_final_test_rows_read": 0,
+        "stage128_m3_lag_wdi_world_bank_api_requests": 0,
+        "stage128_m3_lag_wdi_action_sequence": [
+            {
+                "step": step,
+                "action_id": action_id,
+                "executes_retrieval": executes_retrieval,
+                "executes_data_gate": executes_gate,
+                "executes_modeling": executes_modeling,
+                "was_authorized": step in ("A", "B", "C", "D"),
+                "authorized_now": False,
+                "authorized": False,
+                "status": "COMPLETE" if step in ("A", "B", "C", "D")
                           else "NOT_AUTHORIZED",
             }
             for (step, action_id, executes_retrieval, executes_gate,

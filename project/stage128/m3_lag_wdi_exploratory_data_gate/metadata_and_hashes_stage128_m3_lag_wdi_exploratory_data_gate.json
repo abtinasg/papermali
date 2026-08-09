@@ -1,0 +1,58 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-data-gate",
+  "audited_evidence_modified": false,
+  "audited_evidence_zenodo_version_doi": "10.5281/zenodo.21844636",
+  "authorization_sha256": "2397a5ad92387bf59ba68674be8864a164f5717739afb07af1fdc2d99a0a4fea",
+  "authorization_utf8_bytes": 148,
+  "authorized_scope": "data_gate_only",
+  "credentials_committed_to_git": false,
+  "package_files": {
+    "README_STAGE128_M3_LAG_WDI_EXPLORATORY_DATA_GATE.md": {
+      "bytes": 4521,
+      "sha256": "eb1354d686f2bdd27466a4eee09331024d3bec179ed65eb24884e45d9359b5c2"
+    },
+    "stage128_m3_lag_wdi_data_gate_candidate_coverage_audit.csv": {
+      "bytes": 383,
+      "sha256": "3171750ff5d9b294114967b5d0cdbafbacd64d69f9ac9f9df40b40f03f00febb"
+    },
+    "stage128_m3_lag_wdi_data_gate_common_sample_audit.json": {
+      "bytes": 1418,
+      "sha256": "90f3ae42c6f03fb1111c072926a79ed3a29f1a856361003442ef7572ba1a0c61"
+    },
+    "stage128_m3_lag_wdi_data_gate_decision.json": {
+      "bytes": 5570,
+      "sha256": "254a06095a890dc1a950da2b12f98abf9b5abb3b014508edfa92eced3ba53a90"
+    },
+    "stage128_m3_lag_wdi_data_gate_event_count_audit.csv": {
+      "bytes": 252,
+      "sha256": "a747f1cf73aea1c174ec6081bae02d3de051ef562faac8c97c2b3002f6b7763e"
+    },
+    "stage128_m3_lag_wdi_data_gate_execution_audit.json": {
+      "bytes": 1045,
+      "sha256": "80b00bec47ecf68a897340c26fae397a67db91b43b79d1b99215bb62ecb19fb6"
+    },
+    "stage128_m3_lag_wdi_data_gate_governance_boundary.json": {
+      "bytes": 2493,
+      "sha256": "10c7b3fa3334bbe415fdda9f339cb36fdda090abe5fe71b5ab934b8f470ebc66"
+    },
+    "stage128_m3_lag_wdi_data_gate_human_authorization_record.json": {
+      "bytes": 994,
+      "sha256": "9e3f532cd20a431eed253dd37d6d006854d1199893fc4db4872376a259d45a1d"
+    },
+    "stage128_m3_lag_wdi_data_gate_qc_report.json": {
+      "bytes": 1458,
+      "sha256": "c3277d46c133262663832eb7e32d13d8c2029b5f21890b4b67fd4888dab4c33a"
+    },
+    "stage128_m3_lag_wdi_data_gate_report.json": {
+      "bytes": 5322,
+      "sha256": "fdd2c959be7747d1b41ab21e5d6b54e22736204ac249132dc3a5dd88d93ad72c"
+    },
+    "stage128_m3_lag_wdi_data_gate_row_status_audit.csv": {
+      "bytes": 66972,
+      "sha256": "4df9bf0c98cde58f8fbf231b7a342d9078cef9890db96d278e5b88a5aa082a9e"
+    }
+  },
+  "package_id": "stage128_m3_lag_wdi_exploratory_data_gate",
+  "pii_committed_to_git": false,
+  "raw_wdi_payloads_committed_to_git": 0
+}

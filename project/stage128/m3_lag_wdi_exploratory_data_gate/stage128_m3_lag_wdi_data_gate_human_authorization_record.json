@@ -1,0 +1,20 @@
+{
+  "action_id": "stage128-m3-lag-wdi-exploratory-data-gate",
+  "authorization_covers_final_test": false,
+  "authorization_covers_merge": false,
+  "authorization_covers_model_fitting": false,
+  "authorization_covers_modeling": false,
+  "authorization_covers_new_retrieval": false,
+  "authorization_covers_ready_for_review": false,
+  "authorization_covers_step_e": false,
+  "authorization_is_single_use": true,
+  "authorization_sha256": "2397a5ad92387bf59ba68674be8864a164f5717739afb07af1fdc2d99a0a4fea",
+  "authorization_text": "HUMAN AUTHORIZATION — STAGE128 M3-LAG-WDI STEP D / DATA GATE ONLY\n\nI explicitly authorize execution of:\n\nstage128-m3-lag-wdi-exploratory-data-gate",
+  "authorization_utf8_bytes": 148,
+  "authorized_scope": "data_gate_only",
+  "gate_pass_is_not_modeling_authorization": true,
+  "prior_contract_lock_authorization_reused": false,
+  "prior_retrieval_authorization_reused": false,
+  "prior_step_c_authorization_reused": false,
+  "standing_authorization": false
+}

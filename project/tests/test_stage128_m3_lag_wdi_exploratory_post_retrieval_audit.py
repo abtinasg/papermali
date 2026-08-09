@@ -54,6 +54,7 @@ _ALL_RELS = (_REPORT_REL, _EXEC_REL, _BOUNDARY_REL, _DECISION_REL, _AUTH_REL,
 
 _ACTION_ID = "stage128-m3-lag-wdi-exploratory-post-retrieval-audit"
 _GATE_ACTION = "stage128-m3-lag-wdi-exploratory-data-gate"
+_MODELING_ACTION = "stage128-m3-lag-wdi-exploratory-incremental-evaluation"
 _CPI = "FP.CPI.TOTL.ZG"
 _FX = "PA.NUS.FCRF"
 
@@ -333,12 +334,21 @@ def test_the_handoff_publishes_the_audit_and_advances_the_pointer(handoff):
         "PASS_WITH_MATERIAL_FINDINGS")
     assert handoff["stage128_m3_lag_wdi_payload_json_decoded"] is True
     assert handoff["stage128_m3_lag_wdi_wdi_observations_read"] > 0
-    # pointer advanced to the Gate, which is still not authorized
-    assert handoff["stage128_m3_lag_wdi_next_action_id"] == _GATE_ACTION
+    # The pointer advanced to the Gate. Pinning it there forever would encode
+    # the pre-Gate MOMENT: step D has its own separate authorization, and once
+    # it runs the pointer legitimately advances again. What the AUDIT must
+    # never have caused is that the Gate ran on the audit's authorization.
+    gated = handoff["stage128_m3_lag_wdi_data_gate_executed"]
+    assert handoff["stage128_m3_lag_wdi_next_action_id"] == (
+        _MODELING_ACTION if gated else _GATE_ACTION)
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
-    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
-    assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
-    assert handoff["stage128_m3_lag_wdi_block_admitted"] is False
+    if not gated:
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+        assert handoff["stage128_m3_lag_wdi_block_admitted"] is False
+    else:
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
+        assert handoff[
+            "stage128_m3_lag_wdi_data_gate_authorization_consumed"] is True
     assert handoff["stage128_m3_lag_wdi_final_test_rows_read"] == 0
     assert handoff["final_test_locked"] is True
 
@@ -388,10 +398,15 @@ def test_next_action_executes_data_gate_describes_the_named_action(handoff):
         canonical[pointer]), (
             "the pointer's executes-the-Gate flag must equal the locked "
             "sequence value for the action it names")
-    # and the flag being True must never leak into permission or execution
+    # and the flag must never leak into a STANDING permission, whether or not
+    # the Gate has since run under its own separate authorization
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
-    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
-    assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
+    if handoff["stage128_m3_lag_wdi_data_gate_executed"] is False:
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+    else:
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
+        assert handoff[
+            "stage128_m3_lag_wdi_data_gate_authorization_reusable"] is False
 
 
 def test_exactly_one_locked_step_executes_the_data_gate(handoff):
@@ -410,9 +425,12 @@ def test_the_action_sequence_marks_c_complete_but_nothing_standing(handoff):
     for entry in sequence:
         assert entry["authorized"] is False, entry["step"]
         assert entry["authorized_now"] is False, entry["step"]
-    for step in ("D", "E"):
-        assert by_step[step]["was_authorized"] is False, step
-        assert by_step[step]["status"] == "NOT_AUTHORIZED", step
+    # Step E stays closed. Step D is NOT pinned: it has its own separate
+    # authorization and may since have completed, so asserting it is forever
+    # unauthorized would encode a moment rather than the rule.
+    assert by_step["E"]["was_authorized"] is False
+    assert by_step["E"]["status"] == "NOT_AUTHORIZED"
+    assert by_step["D"]["status"] in ("COMPLETE", "NOT_AUTHORIZED")
 
 
 # --------------------------------------------------------------------------- #

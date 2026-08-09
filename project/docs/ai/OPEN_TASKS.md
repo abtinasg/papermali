@@ -159,50 +159,65 @@ parsed, no observation was read, no coverage was computed, no Gate ran, nothing
 was admitted, nothing was joined to a company row, no model was fit and no
 Final Test row was read. The authoritative contract is unchanged.
 
-**Open item for the human supervisor on Track B.** The next eligible action is
-`m3_lag_wdi_next_action_id: stage128-m3-lag-wdi-exploratory-data-gate`
-with `m3_lag_wdi_data_gate_authorized: false`. Eligibility is not
-authorization, and the completed step C audit is **not** a Gate authorization.
+**Open item for the human supervisor on Track B.** The Data Gate (step D) has
+now been EXECUTED once under its own new single-use human authorization, which
+is **consumed** and not reusable. The next eligible action is
+`m3_lag_wdi_next_action_id: stage128-m3-lag-wdi-exploratory-incremental-evaluation`
+with `m3_lag_wdi_modeling_authorized: false`. **Eligibility is not
+authorization, and a Data Gate PASS is not modeling authorization.**
 
-**What step C found, for whoever weighs authorizing the Gate.** The retained
-evidence is authentic (identity re-verified against the immutable Zenodo record
-`10.5281/zenodo.21844636` before decoding) and schema-conformant. But two
-limitations are now on the record: `PA.NUS.FCRF` has no value for 2024-2025, so
-the block is capped at predictor year 2024; and the official rate is repeated
-unchanged across the most recent usable years, so the contract-locked
-`100 * ln(E_(t-1)/E_(t-2))` transform is **defined but identically zero** for
-predictor years 2021-2024. A coverage-only reading would score those years as
-present and would not reveal that they carry no information.
+**What the Gate decided.** Result `PASS_M3_LAG_WDI_DATA_GATE` on the exact
+retained-M2 539-row development common sample: CPI 539/539, FX 539/539, block
+common sample 539/539, and 18 / 10 positive evaluable outcomes in the two
+locked validation windows — against the inherited thresholds `>= 0.80`,
+`>= 0.70` and `>= 5`, re-read at run time and **unchanged**. Nothing was
+excluded, no imputation was used and no alternative indicator was tried. The
+block is formally **ADMITTED**, and that admission is **DATA ADMISSION ONLY**.
 
-The remaining steps stay separate decisions:
+**What the Gate did NOT decide, and what a future authorizer must weigh.** A
+coverage PASS is not a statement that either feature is informative. Three
+limitations survive it, and one is new:
 
-* **C — post-retrieval audit** (`…-post-retrieval-audit`): reads what is inside
-  the retained bytes. **COMPLETE** — executed once under its own single-use
-  authorization, now consumed. Result `PASS_WITH_MATERIAL_FINDINGS`: the
-  evidence is authentic and schema-conformant, but the FX series ends in 2023
-  (capping the block at predictor year 2024) and the FX log-ratio is
-  identically **zero** for predictor years 2021-2024. It executed no Gate.
-* **D — Data Gate** (`…-data-gate`): needs a **NEW explicit human
-  authorization**. A retrieval authorization never authorized it, and it was
-  not executed.
-* **E — modeling** (`…-incremental-evaluation`): only if the Gate returns PASS,
-  and only under **another** explicit authorization. A Gate PASS would be
-  **data admission only**.
+* the FX log-ratio is **defined but identically zero for predictor years
+  2021-2024** (step C's finding, unchanged). Those years fall outside the
+  development sample — which ends at Gregorian predictor year 2020 at the
+  latest — so **0** development rows are zero-change and the degeneracy does
+  not change the formal verdict under the pre-existing rules. No new rejection
+  criterion was invented to make it do so, and the limitation is still real;
+* `PA.NUS.FCRF` has no value for 2024-2025, so the jointly constructible
+  ceiling stays at predictor year 2024. This does not bind the development
+  sample but caps any future extension of the block;
+* the WDI `lastupdated` value is a **revision marker**, not point-in-time
+  availability proof, and the one-year lag does not create one;
+* **NEW (recorded by step D):** the locked contract does not fix the
+  Jalali-to-Gregorian mapping for `predictor_year_t`. The Gate refused to
+  invent it and computed every row's status under **both** admissible
+  conventions, which agreed — so the verdict is well-defined. But feature
+  **values** differ between them, so **no feature-value table was
+  materialized** and the mapping must be **human-locked before any modeling
+  feature table is built**.
 
-None of them unlocks the Final Test.
+The remaining step stays a separate decision:
+
+* **E — modeling** (`…-incremental-evaluation`): needs **another** new
+  explicit human authorization. The Gate authorization did not propagate to
+  it (`gate_authorization_propagates_to_step_e: false`).
+
+Neither the Gate nor its PASS unlocks the Final Test
+(`final_test_locked: true`, `final_test_rows_read: 0`).
 
 | Step | Action | Authorized |
 | --- | --- | --- |
 | B | `stage128-m3-lag-wdi-exploratory-data-retrieval` — retrieval | **COMPLETE** (authorization consumed) |
 | C | `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — audit | **COMPLETE** (authorization consumed) |
-| D | `stage128-m3-lag-wdi-exploratory-data-gate` — the Data Gate | **false** |
+| D | `stage128-m3-lag-wdi-exploratory-data-gate` — the Data Gate | **COMPLETE** (authorization consumed) |
 | E | `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — modeling | **false** |
 
 A retrieval authorization did **not** authorize the Data Gate
 (`m3_lag_wdi_retrieval_authorization_implies_gate_authorization: false`,
-`m3_lag_wdi_combined_retrieval_and_gate_action_permitted: false`), and a
-Data Gate PASS would be **data admission only** and would **not** authorize
-modeling (`m3_lag_wdi_gate_pass_authorizes_modeling: false`).
+`m3_lag_wdi_combined_retrieval_and_gate_action_permitted: false`), and the
+Data Gate PASS is **data admission only** and does **not** authorize modeling
+(`m3_lag_wdi_gate_pass_authorizes_modeling: false`).
 
 **PR roles are pinned historical facts, not positional labels.** PR **#76** =
 the final official documentary recovery INITIATION

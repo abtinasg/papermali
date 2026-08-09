@@ -532,12 +532,13 @@ def test_the_handoff_publishes_the_locked_contract(handoff):
 
 
 def test_the_handoff_records_zero_execution(handoff):
-    # Retrieval (step B) is a SEPARATE, later, separately authorized action, so
-    # whether it has run is owned by its own test module, not by the lock's.
-    # What the LOCK must never have caused is asserted here and stays asserted
-    # for the whole life of the branch.
-    assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
-    assert handoff["stage128_m3_lag_wdi_data_gate_result"] == "NOT_EXECUTED"
+    # Retrieval (step B) and the Data Gate (step D) are SEPARATE, later,
+    # separately authorized actions, so whether they have run is owned by
+    # their own test modules, not by the lock's. Asserting here that the Gate
+    # never ran would encode the pre-Gate MOMENT rather than the rule, and it
+    # would fail the instant a legitimate step D executed. What the LOCK must
+    # never have caused — modeling, an authorized pointer, a Final Test read —
+    # is asserted here and stays asserted for the whole life of the branch.
     assert handoff["stage128_m3_lag_wdi_modeling_started"] is False
     assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
@@ -1118,7 +1119,7 @@ def test_the_next_action_is_a_separated_step_and_never_the_gate(handoff):
     # itself, it never executes the Gate, and it is never an authorization.
     assert handoff["stage128_m3_lag_wdi_next_action_id"] in (
         _RETRIEVAL_ACTION_ID, _POST_RETRIEVAL_AUDIT_ACTION_ID,
-        _DATA_GATE_ACTION_ID)
+        _DATA_GATE_ACTION_ID, _MODELING_ACTION_ID)
     # Once the audit has completed, the pointer legitimately NAMES the Data
     # Gate. What must never happen is the Gate becoming authorized or executed
     # merely because the pointer reached it — a pointer is not an
@@ -1128,6 +1129,14 @@ def test_the_next_action_is_a_separated_step_and_never_the_gate(handoff):
             "stage128_m3_lag_wdi_post_retrieval_audit_executed"] is True
         assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
         assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
+    # And once the Gate has completed, the pointer legitimately names the
+    # modeling step. The same rule holds one step later: reaching it grants
+    # nothing, and a Gate PASS is never modeling authorization.
+    if handoff["stage128_m3_lag_wdi_next_action_id"] == _MODELING_ACTION_ID:
+        assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is True
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
+        assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
+        assert handoff["stage128_m3_lag_wdi_modeling_started"] is False
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
     # Descriptive, not a safety flag: True exactly when the pointer names the
     # Gate action. The safety property is that it is never AUTHORIZED (above)
@@ -1156,12 +1165,11 @@ def test_the_next_action_is_a_separated_step_and_never_the_gate(handoff):
         assert handoff["stage128_m3_lag_wdi_retrieval_authorized"] is False
 
 
-def test_the_data_gate_is_a_separate_unauthorized_action(handoff):
+def test_the_data_gate_is_a_separate_never_standing_action(handoff):
     assert handoff["stage128_m3_lag_wdi_data_gate_action_id"] == (
         _DATA_GATE_ACTION_ID)
     assert (handoff["stage128_m3_lag_wdi_data_gate_action_id"]
             != handoff["stage128_m3_lag_wdi_retrieval_action_id"])
-    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
     assert handoff["stage128_m3_lag_wdi_data_gate_is_a_separate_action"] is True
     assert handoff[
         "stage128_m3_lag_wdi_data_gate_requires_new_human_authorization"] is (
@@ -1169,8 +1177,19 @@ def test_the_data_gate_is_a_separate_unauthorized_action(handoff):
     # a pointer to the Gate is not an authorization to execute it
     assert handoff[
         "stage128_m3_lag_wdi_data_gate_pointer_is_not_authorization"] is True
-    assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
-    assert handoff["stage128_m3_lag_wdi_data_gate_result"] == "NOT_EXECUTED"
+    # The Gate's SEPARATENESS is permanent; its unauthorized-ness was only the
+    # pre-Gate moment. Once step D has run under its own new authorization,
+    # that authorization is consumed — so the rule that must hold at every
+    # step is that no STANDING Gate authorization ever exists.
+    if handoff["stage128_m3_lag_wdi_data_gate_executed"] is False:
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+        assert handoff["stage128_m3_lag_wdi_data_gate_result"] == "NOT_EXECUTED"
+    else:
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
+        assert handoff[
+            "stage128_m3_lag_wdi_data_gate_authorization_consumed"] is True
+        assert handoff[
+            "stage128_m3_lag_wdi_data_gate_authorization_reusable"] is False
 
 
 def test_a_retrieval_authorization_never_authorizes_the_gate(handoff):
@@ -1256,7 +1275,11 @@ def test_the_docs_separate_retrieval_from_the_gate():
     assert f"m3_lag_wdi_retrieval_action_id: {_RETRIEVAL_ACTION_ID}" in roadmap
     assert f"m3_lag_wdi_data_gate_action_id: {_DATA_GATE_ACTION_ID}" in roadmap
     assert "m3_lag_wdi_data_gate_authorized: false" in roadmap
-    assert "m3_lag_wdi_data_gate_executed: false" in roadmap
+    # Whether the Gate has EXECUTED advances with the sequence; what must
+    # always hold is that no standing Gate authorization is published.
+    if "m3_lag_wdi_data_gate_executed: true" in roadmap:
+        assert "m3_lag_wdi_data_gate_authorization_consumed: true" in roadmap
+        assert "m3_lag_wdi_data_gate_authorization_reusable: false" in roadmap
     # The pointer's executes-the-Gate flag tracks the action it names, so the
     # roadmap must agree with the pointer rather than hard-code either value.
     _pointer_gates = (f"m3_lag_wdi_next_action_id: {_DATA_GATE_ACTION_ID}"

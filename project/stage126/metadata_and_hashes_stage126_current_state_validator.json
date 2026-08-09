@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 157,
+  "assertion_count": 161,
   "assertions": [
     {
       "detail": "",
@@ -668,8 +668,13 @@
       "status": "PASS"
     },
     {
-      "detail": "the contract lock executes no Gate, fits no model and reads no Final Test row",
+      "detail": "the contract lock executes no Gate — only the separately authorized Gate action may — and no step fits a model or reads a Final Test row",
       "name": "m3_lag_wdi_lock_executes_no_gate_no_model_no_final_test",
+      "status": "PASS"
+    },
+    {
+      "detail": "the Handoff may publish the Data Gate as executed only when the data-gate-only action package justifies it",
+      "name": "m3_lag_wdi_gate_executed_only_with_its_own_action",
       "status": "PASS"
     },
     {
@@ -683,7 +688,7 @@
       "status": "PASS"
     },
     {
-      "detail": "acquisition is not admission: neither retrieval nor the audit executes a Gate or a model, admits anything or reads a Final Test row",
+      "detail": "acquisition is not admission: only the separately authorized Data Gate may admit the block, and no step fits a model or reads a Final Test row",
       "name": "m3_lag_wdi_retrieval_executed_nothing_downstream",
       "status": "PASS"
     },
@@ -693,18 +698,33 @@
       "status": "PASS"
     },
     {
-      "detail": "the Track B pointer advances one separated step at a time — to the audit after retrieval, to the Data Gate after the audit — and a pointer is never an authorization",
+      "detail": "the Track B pointer advances one separated step at a time — to the audit after retrieval, to the Data Gate after the audit, to modeling after the Gate — and a pointer is never an authorization",
       "name": "m3_lag_wdi_pointer_advances_but_never_authorizes",
       "status": "PASS"
     },
     {
-      "detail": "a completed post-retrieval audit is consumed, non-reusable and never an authorization for the Data Gate",
+      "detail": "a completed post-retrieval audit is consumed, non-reusable and never an authorization for the Data Gate — a later Gate execution must rest on the Gate's OWN authorization and package, not on this one",
       "name": "m3_lag_wdi_completed_audit_is_consumed_and_not_a_gate_authorization",
       "status": "PASS"
     },
     {
       "detail": "recorded material findings may never be published as a bare PASS",
       "name": "m3_lag_wdi_audit_findings_are_not_laundered_away",
+      "status": "PASS"
+    },
+    {
+      "detail": "a completed Data Gate is consumed, non-reusable and never an authorization to fit a model",
+      "name": "m3_lag_wdi_completed_gate_is_consumed_and_not_modeling_authorization",
+      "status": "PASS"
+    },
+    {
+      "detail": "a coverage PASS never becomes an information-content claim, and the step C findings survive it",
+      "name": "m3_lag_wdi_gate_pass_is_not_an_information_content_claim",
+      "status": "PASS"
+    },
+    {
+      "detail": "the Gate ran on the locked inherited thresholds, weakened no criterion and excluded no row to reach its verdict",
+      "name": "m3_lag_wdi_gate_thresholds_and_admission_were_not_engineered",
       "status": "PASS"
     },
     {
@@ -743,8 +763,8 @@
       "status": "PASS"
     },
     {
-      "detail": "the M3-LAG-WDI Data Gate is a SEPARATE action with its own identity, it is unauthorized, and it requires a new explicit human authorization",
-      "name": "m3_lag_wdi_data_gate_is_a_separate_unauthorized_action",
+      "detail": "the M3-LAG-WDI Data Gate is a SEPARATE action with its own identity that always requires a new explicit human authorization: unauthorized before it runs, and consumed and never standing after",
+      "name": "m3_lag_wdi_data_gate_is_a_separate_action_never_standing_authorized",
       "status": "PASS"
     },
     {
@@ -789,7 +809,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "36e8d5d49f3459e8564ffe240967cf6bbb5ba2d0",
+  "code_commit": "737be8068e67e1f88ccb3368f4b036f9318e4557",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -797,7 +817,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "36e8d5d49f3459e8564ffe240967cf6bbb5ba2d0",
+  "generated_at": "737be8068e67e1f88ccb3368f4b036f9318e4557",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -815,7 +835,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "c155f5c6de2ee4d27cc597a7079c4c8c58ea2b6ea9447fb38f8913ac85b8b991",
+  "source_file_sha256": "b0dc7e4768586ec193d883404e50298db525b4ac2fbd646db5ce73222ebee61b",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {

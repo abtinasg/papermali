@@ -340,12 +340,20 @@ def test_the_handoff_publishes_retrieval_and_nothing_more(handoff):
         _CPI, _FX]
     assert handoff["stage128_m3_lag_wdi_retrieval_country_code"] == "IRN"
     assert handoff["stage128_m3_lag_wdi_raw_payloads_committed_to_git"] == 0
-    # and nothing downstream moved
-    assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
-    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+    # and RETRIEVAL moved nothing downstream. The Data Gate is step D's own
+    # separately authorized action: admission may exist only once that action
+    # has run, and only as its verdict. Asserting "never admitted" here would
+    # encode the pre-Gate moment instead of the rule.
+    if handoff["stage128_m3_lag_wdi_data_gate_executed"] is False:
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+        assert handoff["stage128_m3_lag_wdi_block_admitted"] is False
+    else:
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
+        assert handoff["stage128_m3_lag_wdi_block_admitted"] is (
+            handoff["stage128_m3_lag_wdi_data_gate_result"]
+            == "PASS_M3_LAG_WDI_DATA_GATE")
     assert handoff["stage128_m3_lag_wdi_modeling_started"] is False
     assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
-    assert handoff["stage128_m3_lag_wdi_block_admitted"] is False
     assert handoff["stage128_m3_lag_wdi_final_test_rows_read"] == 0
     assert handoff["final_test_locked"] is True
 
@@ -360,7 +368,9 @@ def test_the_handoff_pointer_advanced_to_an_unauthorized_next_step(handoff):
     is never itself an authorization.
     """
     audited = handoff["stage128_m3_lag_wdi_post_retrieval_audit_executed"]
-    expected = _GATE_ACTION if audited else _AUDIT_ACTION
+    gated = handoff["stage128_m3_lag_wdi_data_gate_executed"]
+    expected = (_MODEL_ACTION if gated
+                else _GATE_ACTION if audited else _AUDIT_ACTION)
     assert handoff["stage128_m3_lag_wdi_next_action_id"] == expected
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
     # `executes_data_gate` describes the NAMED action, so it is True exactly
@@ -368,9 +378,13 @@ def test_the_handoff_pointer_advanced_to_an_unauthorized_next_step(handoff):
     # would contradict the locked sequence, in which step D executes the Gate.
     assert handoff["stage128_m3_lag_wdi_next_action_executes_data_gate"] is (
         expected == _GATE_ACTION)
-    # whatever the pointer names, the Gate itself stays closed
-    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
-    assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is False
+    # whatever the pointer names, no STANDING authorization exists behind it
+    if not gated:
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+    else:
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
+        assert handoff[
+            "stage128_m3_lag_wdi_data_gate_authorization_reusable"] is False
 
 
 def test_the_handoff_marks_the_authorization_spent(handoff):
@@ -436,14 +450,15 @@ def test_the_action_sequence_still_separates_every_step(handoff):
     assert by_step["C"]["action_id"] == _AUDIT_ACTION
     assert by_step["D"]["action_id"] == _GATE_ACTION
     assert by_step["E"]["action_id"] == _MODEL_ACTION
-    # Steps D and E are always unauthorized here. Step C is NOT pinned: it may
-    # since have been separately authorized and completed, and asserting it is
-    # forever unauthorized would encode a moment rather than the rule.
-    for step in ("D", "E"):
-        assert by_step[step]["authorized"] is False, step
-        assert by_step[step]["was_authorized"] is False, step
-        assert by_step[step]["status"] == "NOT_AUTHORIZED", step
-    assert by_step["C"]["status"] in ("COMPLETE", "NOT_AUTHORIZED")
+    # Step E is always unauthorized here. Steps C and D are NOT pinned: each
+    # may since have been separately authorized and completed, and asserting
+    # either is forever unauthorized would encode a moment rather than the
+    # rule. What holds at every step is that nothing is authorized NOW.
+    assert by_step["E"]["authorized"] is False
+    assert by_step["E"]["was_authorized"] is False
+    assert by_step["E"]["status"] == "NOT_AUTHORIZED"
+    for step in ("C", "D"):
+        assert by_step[step]["status"] in ("COMPLETE", "NOT_AUTHORIZED"), step
     # completed steps stay history: nothing in the sequence is standing
     for entry in sequence:
         assert entry["authorized"] is False, entry["step"]

@@ -4166,10 +4166,9 @@ def test_handoff_publishes_the_comparison_as_verification_only():
     # assertion is that the verification record did not move it.
     assert state["stage128_m3_lag_wdi_authoritative_contract_status"] == (
         "AUTHORITATIVE_CONTRACT_LOCKED_PRE_RETRIEVAL")
-    # Retrieval has its own separately authorized action and may legitimately
-    # have advanced, so it is not asserted here. What a VERIFICATION record can
-    # never move — the Gate and modeling — still is.
-    assert state["stage128_m3_lag_wdi_data_gate_executed"] is False
+    # Retrieval and the Data Gate each have their own separately authorized
+    # actions and may legitimately have advanced, so neither is asserted here.
+    # What a VERIFICATION record can never move — modeling — still is.
     assert state["stage128_m3_lag_wdi_modeling_started"] is False
     assert state["stage128_m3_lag_wdi_modeling_authorized"] is False
 
