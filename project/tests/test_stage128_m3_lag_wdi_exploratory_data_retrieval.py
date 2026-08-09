@@ -344,8 +344,8 @@ def test_the_handoff_publishes_retrieval_and_nothing_more(handoff):
     # separately authorized action: admission may exist only once that action
     # has run, and only as its verdict. Asserting "never admitted" here would
     # encode the pre-Gate moment instead of the rule.
+    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
     if handoff["stage128_m3_lag_wdi_data_gate_executed"] is False:
-        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
         assert handoff["stage128_m3_lag_wdi_block_admitted"] is False
     else:
         assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
@@ -379,9 +379,8 @@ def test_the_handoff_pointer_advanced_to_an_unauthorized_next_step(handoff):
     assert handoff["stage128_m3_lag_wdi_next_action_executes_data_gate"] is (
         expected == _GATE_ACTION)
     # whatever the pointer names, no STANDING authorization exists behind it
-    if not gated:
-        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
-    else:
+    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+    if gated:
         assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
         assert handoff[
             "stage128_m3_lag_wdi_data_gate_authorization_reusable"] is False

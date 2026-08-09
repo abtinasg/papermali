@@ -12,14 +12,14 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `stage128-m3i2-final-official-inquiry-response-ingestion`
 - **Last stage commit:** `7c297d3c9eb7d07886670b6225ded138a499a808`
-- **Generated from commit:** `7c297d3c9eb7d07886670b6225ded138a499a808` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
+- **Generated from commit:** `8aac3f6078453e81c63c6ad034b0afb7654abba9` (branch `stage128-m3-lag-wdi-exploratory-data-retrieval`, informational)
 - **Baseline:** `origin/main` @ `175e7949e009eeecdd66aedab31ec4b48e9d3c7d`
 
 ## Current-state validation
 
 _The independent Stage126 current-state validator is the SOLE current-state validation surface._
 
-- ✅ **161 assertions, 0 failed**, all_pass=True
+- ✅ **162 assertions, 0 failed**, all_pass=True
 - Scope: `stage126_current_state_validator`
 - Report: `project/stage126/stage126_current_state_validation_report.json`
 - Metadata: `project/stage126/metadata_and_hashes_stage126_current_state_validator.json`
@@ -208,7 +208,7 @@ _Two tracks now run in PARALLEL. **Track A** is the World Bank official inquiry,
 - ⛔ **Separate family:** exploratory comparison family `M3_LAG_WDI_EXPLORATORY_SUPPLEMENTARY` — in the confirmatory Holm family = False
 - ✅ **Track B execution state:** retrieval started True — Data Gate `PASS_M3_LAG_WDI_DATA_GATE` (executed True) — modeling started False (authorized False) — Final Test rows read 0
 - **Track B next action (pointer only, NOT an authorization):** `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — scope `modeling_requires_new_human_authorization`, authorized = False, WOULD execute the Data Gate if it were ever authorized = False (a property of the named action, NOT a statement that the Gate ran — see Data Gate executed below). A pointer is never an authorization
-- ⛔ **Separated future actions (each needs its OWN new explicit human authorization):** (B) `stage128-m3-lag-wdi-exploratory-data-retrieval` — was authorized (historical) True, authorized NOW (standing) False — one-time authorization consumed = True, reusable = False, further retrieval requires NEW human authorization = True, executes Gate False; (C) `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — authorized True, executes Gate False; (D) `stage128-m3-lag-wdi-exploratory-data-gate` — was authorized (historical) True, authorized NOW (standing) False — one-time authorization consumed = True, reusable = False; (E) `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — authorized False
+- ⛔ **Separated future actions (each needs its OWN new explicit human authorization):** (B) `stage128-m3-lag-wdi-exploratory-data-retrieval` — was authorized (historical) True, authorized NOW (standing) False — one-time authorization consumed = True, reusable = False, further retrieval requires NEW human authorization = True, executes Gate False; (C) `stage128-m3-lag-wdi-exploratory-post-retrieval-audit` — was authorized (historical) True, authorized NOW (standing) False — one-time authorization consumed = True, reusable = False, executes Gate False; (D) `stage128-m3-lag-wdi-exploratory-data-gate` — was authorized (historical) True, authorized NOW (standing) False — one-time authorization consumed = True, reusable = False; (E) `stage128-m3-lag-wdi-exploratory-incremental-evaluation` — authorized False
 - ⛔ **Authorization boundaries:** a retrieval authorization implies a Gate authorization = False — a combined retrieval-and-Gate action is permitted = False — a Gate PASS is data admission only = True and authorizes modeling = False
 - **Prior restriction:** `SUPERSEDED_BY_NEW_EXPLICIT_HUMAN_AUTHORIZATION` — the old "only after `UNRESOLVED_AFTER_FINAL_OFFICIAL_INQUIRY`" rule is retained as HISTORY, not deleted
 - ⛔ **Track A untouched:** the inquiry was NOT terminated by this action (False) — follow-up authorized now False, response adjudication authorized False
@@ -274,5 +274,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `3ddddbf871d6580585fa152fa5a1369ef5a3aef756b418c6abe9cf8a51de2f1b`_
-_generated_at_utc: 2026-08-09T08:51:55Z (informational)_
+_state_fingerprint: `48086174cb0c40044f3e80b17170938f836be08c1386cfc6c02eda2adba39ed9`_
+_generated_at_utc: 2026-08-09T09:22:28Z (informational)_

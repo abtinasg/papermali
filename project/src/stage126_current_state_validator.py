@@ -4000,12 +4000,12 @@ def build_assertions(
             == STAGE128_M3_LAG_NEXT_ACTION_SCOPE),
         "before retrieval has run, the immediate Track B pointer is the "
         "retrieval action with scope retrieval_only")
-    # The Gate's separateness is permanent; its UNauthorized-ness was only the
-    # pre-Gate moment. Once step D has legitimately run under its own new
-    # authorization, that authorization is consumed — so what must hold at
-    # every step is that no STANDING Gate authorization ever exists, not that
-    # the Gate was never authorized at all.
-    add("m3_lag_wdi_data_gate_is_a_separate_action_never_standing_authorized",
+    # The Gate is permanently a separate action, and the generic
+    # ``*_authorized`` field carries the STANDING meaning at every point in
+    # the sequence — so it is False before step D runs AND after its one-time
+    # authorization is consumed. The historical fact lives in
+    # ``*_was_authorized``, which is why this can be asserted unconditionally.
+    add("m3_lag_wdi_data_gate_is_a_separate_never_standing_authorized_action",
         (not m3_lag_locked)
         or (handoff.get("stage128_m3_lag_wdi_data_gate_action_id")
             == STAGE128_M3_LAG_DATA_GATE_ACTION_ID
@@ -4014,20 +4014,40 @@ def build_assertions(
             and handoff.get(
                 "stage128_m3_lag_wdi_data_gate_requires_new_human_"
                 "authorization") is True
-            and ((handoff.get("stage128_m3_lag_wdi_data_gate_authorized")
-                  is False)
-                 if not m3_lag_gated else
-                 (handoff.get("stage128_m3_lag_wdi_data_gate_authorized_now")
-                  is False
-                  and handoff.get(
-                      "stage128_m3_lag_wdi_data_gate_authorization_consumed")
-                  is True
-                  and handoff.get(
-                      "stage128_m3_lag_wdi_data_gate_authorization_reusable")
-                  is False))),
+            and handoff.get("stage128_m3_lag_wdi_data_gate_authorized")
+            is False
+            and handoff.get("stage128_m3_lag_wdi_data_gate_authorized_now")
+            is not True),
         "the M3-LAG-WDI Data Gate is a SEPARATE action with its own identity "
-        "that always requires a new explicit human authorization: "
-        "unauthorized before it runs, and consumed and never standing after")
+        "that always requires a new explicit human authorization, and no "
+        "STANDING Gate authorization ever exists — before or after it runs")
+    # The general invariant, applied to every one-time Track B authorization:
+    # a CONSUMED grant is history and may never appear in a standing field.
+    # Asserted here, independently of the generator, so the two would have to
+    # drift in the same direction to hide it.
+    _one_time_prefixes = (
+        "stage128_m3_lag_wdi_retrieval",
+        "stage128_m3_lag_wdi_post_retrieval_audit",
+        "stage128_m3_lag_wdi_data_gate",
+    )
+    _standing_leaks = sorted(
+        f"{prefix}_{suffix}"
+        for prefix in _one_time_prefixes
+        if handoff.get(f"{prefix}_authorization_consumed") is True
+        for suffix in ("authorized", "authorized_now",
+                       "authorization_reusable")
+        if handoff.get(f"{prefix}_{suffix}") is True)
+    _missing_history = sorted(
+        f"{prefix}_was_authorized"
+        for prefix in _one_time_prefixes
+        if handoff.get(f"{prefix}_authorization_consumed") is True
+        and handoff.get(f"{prefix}_was_authorized") is not True)
+    add("m3_lag_wdi_no_consumed_authorization_is_published_as_standing",
+        not _standing_leaks and not _missing_history,
+        "a consumed one-time authorization is history: it may never be "
+        "published as a standing permission, and the historical fact must be "
+        f"recorded in *_was_authorized (standing leaks: {_standing_leaks}; "
+        f"missing history: {_missing_history})")
     add("m3_lag_wdi_retrieval_authorization_never_authorizes_the_gate",
         (not m3_lag_locked)
         or (handoff.get(

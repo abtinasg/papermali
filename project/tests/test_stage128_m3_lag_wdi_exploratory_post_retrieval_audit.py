@@ -342,8 +342,8 @@ def test_the_handoff_publishes_the_audit_and_advances_the_pointer(handoff):
     assert handoff["stage128_m3_lag_wdi_next_action_id"] == (
         _MODELING_ACTION if gated else _GATE_ACTION)
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
+    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
     if not gated:
-        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
         assert handoff["stage128_m3_lag_wdi_block_admitted"] is False
     else:
         assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
@@ -351,6 +351,31 @@ def test_the_handoff_publishes_the_audit_and_advances_the_pointer(handoff):
             "stage128_m3_lag_wdi_data_gate_authorization_consumed"] is True
     assert handoff["stage128_m3_lag_wdi_final_test_rows_read"] == 0
     assert handoff["final_test_locked"] is True
+
+
+def test_the_consumed_audit_authorization_is_not_published_as_standing(
+        handoff):
+    """A spent one-time authorization is history, never a live permission.
+
+    The generic ``*_authorized`` field carries the STANDING meaning — the
+    semantics step B's retrieval markers established explicitly — so once the
+    audit authorization is consumed it must read False there, with the
+    historical fact preserved in ``*_was_authorized``.
+    """
+    assert handoff[
+        "stage128_m3_lag_wdi_post_retrieval_audit_authorization_consumed"] is (
+            True)
+    assert handoff["stage128_m3_lag_wdi_post_retrieval_audit_authorized"] is (
+        False)
+    assert handoff[
+        "stage128_m3_lag_wdi_post_retrieval_audit_authorized_now"] is False
+    assert handoff[
+        "stage128_m3_lag_wdi_post_retrieval_audit_authorization_reusable"] is (
+            False)
+    # and the history is not lost in the process
+    assert handoff[
+        "stage128_m3_lag_wdi_post_retrieval_audit_was_authorized"] is True
+    assert handoff["stage128_m3_lag_wdi_post_retrieval_audit_executed"] is True
 
 
 def test_the_handoff_keeps_the_findings_visible(handoff):
@@ -401,9 +426,8 @@ def test_next_action_executes_data_gate_describes_the_named_action(handoff):
     # and the flag must never leak into a STANDING permission, whether or not
     # the Gate has since run under its own separate authorization
     assert handoff["stage128_m3_lag_wdi_next_action_authorized"] is False
-    if handoff["stage128_m3_lag_wdi_data_gate_executed"] is False:
-        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
-    else:
+    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+    if handoff["stage128_m3_lag_wdi_data_gate_executed"] is True:
         assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
         assert handoff[
             "stage128_m3_lag_wdi_data_gate_authorization_reusable"] is False

@@ -2719,6 +2719,59 @@ _NEXT_RESEARCH_ACTION_ID_AFTER_ROBUSTNESS_CLOSURE = (
 )
 
 
+#: Every ``<prefix>`` whose authorization the repository publishes as the
+#: HISTORICAL/STANDING pair. The naming contract, established by the step B
+#: retrieval markers and stated in their comment, is:
+#:
+#:   ``<prefix>_was_authorized``          historical fact — it happened
+#:   ``<prefix>_authorized_now``          standing permission — right now
+#:   ``<prefix>_authorized``              THE SAME standing meaning (generic)
+#:   ``<prefix>_authorization_consumed``  the one-time grant is spent
+#:
+#: so a CONSUMED authorization must never publish the generic (or ``_now``)
+#: field as True. Publishing history in a standing field is precisely how a
+#: spent one-time authorization comes to read as live permission.
+_ONE_TIME_AUTHORIZATION_PREFIXES = (
+    "stage128_m3_lag_wdi_retrieval",
+    "stage128_m3_lag_wdi_post_retrieval_audit",
+    "stage128_m3_lag_wdi_data_gate",
+)
+
+
+def _assert_no_consumed_authorization_is_standing(state: dict) -> dict:
+    """Fail closed if a consumed authorization is published as a standing one.
+
+    This is a structural invariant, not a per-step opinion: it holds for every
+    one-time Track B authorization at every point in the sequence, so a future
+    step cannot reintroduce the drift by copying whichever neighbouring step
+    happened to be wrong. It never inspects a scientific result — only the
+    authorization bookkeeping around it.
+    """
+    for prefix in _ONE_TIME_AUTHORIZATION_PREFIXES:
+        consumed = state.get(f"{prefix}_authorization_consumed")
+        if consumed is not True:
+            continue
+        for suffix in ("authorized", "authorized_now"):
+            if state.get(f"{prefix}_{suffix}") is True:
+                raise HandoffError(
+                    f"{prefix}_authorization_consumed is True, so "
+                    f"{prefix}_{suffix} must be False: a consumed one-time "
+                    "authorization is history and may never be published as "
+                    f"a standing permission (the historical fact belongs in "
+                    f"{prefix}_was_authorized)")
+        if state.get(f"{prefix}_authorization_reusable") is True:
+            raise HandoffError(
+                f"{prefix}_authorization_consumed is True, so "
+                f"{prefix}_authorization_reusable must be False")
+        # History must actually be recorded somewhere, or "consumed" would be
+        # describing an authorization the state never admits existed.
+        if state.get(f"{prefix}_was_authorized") is not True:
+            raise HandoffError(
+                f"{prefix}_authorization_consumed is True, so "
+                f"{prefix}_was_authorized must be True")
+    return state
+
+
 def derive_m1_robustness_closure_markers(root: str) -> dict:
     """Recognize the (synthesis-only) M1 robustness closure, if completed.
 
@@ -2756,7 +2809,7 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
             raise HandoffError(
                 f"robustness closure lock field {key}={lock.get(key)!r} != {want!r}"
             )
-    return {
+    return _assert_no_consumed_authorization_is_standing({
         "m1_robustness_closure_completed": True,
         "m1_robustness_closure_paper_winner_selected": False,
         "m1_robustness_closure_retained_design_selected": False,
@@ -2821,7 +2874,7 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # topology onto the retrieval Draft PR #79 while carrying every pinned
         # historical PR role forward unchanged. Metadata only.
         **derive_stage128_m3_lag_wdi_retrieval_live_pr_topology_markers(root),
-    }
+    })
 
 
 _RETAINED_DESIGN_FREEZE_REL = (
@@ -4929,6 +4982,25 @@ def render_current_state(record: dict) -> str:
                 "predictor years (the official rate is repeated unchanged), "
                 "so completeness there does not imply information",
             ]
+        # Step C authorization, split the same way step B's and step D's are.
+        # Rendering only the generic field here used to hide the historical
+        # fact behind a bare "authorized False", which reads as though the
+        # audit never happened — the mirror image of the drift where a spent
+        # authorization read as a live one. Both facts are shown instead.
+        _audit_generic = record.get(
+            "stage128_m3_lag_wdi_post_retrieval_audit_authorized")
+        _audit_was = record.get(
+            "stage128_m3_lag_wdi_post_retrieval_audit_was_authorized",
+            _audit_generic)
+        _audit_now = record.get(
+            "stage128_m3_lag_wdi_post_retrieval_audit_authorized_now",
+            _audit_generic)
+        _audit_consumed = record.get(
+            "stage128_m3_lag_wdi_post_retrieval_audit_authorization_consumed",
+            False)
+        _audit_reusable = record.get(
+            "stage128_m3_lag_wdi_post_retrieval_audit_authorization_reusable",
+            False)
         # Step D authorization, split the same way step B's is: a spent
         # one-time Gate authorization must never render as a live permission
         # to run the Gate again. Before step D both fall back to the generic
@@ -5129,8 +5201,9 @@ def render_current_state(record: dict) -> str:
             f"{record.get('stage128_m3_lag_wdi_retrieval_executes_data_gate')}"
             "; (C) "
             f"`{record.get('stage128_m3_lag_wdi_post_retrieval_audit_action_id')}`"
-            " — authorized "
-            f"{record.get('stage128_m3_lag_wdi_post_retrieval_audit_authorized')}"
+            f" — was authorized (historical) {_audit_was}, authorized NOW "
+            f"(standing) {_audit_now} — one-time authorization consumed = "
+            f"{_audit_consumed}, reusable = {_audit_reusable}"
             ", executes Gate "
             f"{record.get('stage128_m3_lag_wdi_post_retrieval_audit_executes_data_gate')}"
             "; (D) "
@@ -8974,7 +9047,17 @@ def derive_stage128_m3_lag_wdi_post_retrieval_audit_markers(
     cpi_avail, fx_avail = report["feature_availability"]
     return {
         "stage128_m3_lag_wdi_post_retrieval_audit_executed": True,
-        "stage128_m3_lag_wdi_post_retrieval_audit_authorized": True,
+        # Same HISTORICAL vs STANDING split step B established: the generic
+        # ``*_authorized`` field carries the STANDING meaning, so a consumed
+        # one-time audit authorization publishes False here and keeps the
+        # historical fact in ``*_was_authorized``. This field previously
+        # published True after consumption, which contradicted step B's
+        # documented semantics, the action sequence (where every completed
+        # step carries authorized=False) and ROADMAP.md's own
+        # ``m3_lag_wdi_post_retrieval_audit_authorized: false``. Correcting it
+        # changes NO audit result: step C was not rerun and its
+        # PASS_WITH_MATERIAL_FINDINGS and findings are untouched.
+        "stage128_m3_lag_wdi_post_retrieval_audit_authorized": False,
         "stage128_m3_lag_wdi_post_retrieval_audit_was_authorized": True,
         "stage128_m3_lag_wdi_post_retrieval_audit_authorized_now": False,
         "stage128_m3_lag_wdi_post_retrieval_audit_authorization_consumed":
@@ -9294,7 +9377,15 @@ def derive_stage128_m3_lag_wdi_data_gate_markers(root: str) -> dict:
     windows = gate["validation_windows"]
     return {
         "stage128_m3_lag_wdi_data_gate_executed": True,
-        "stage128_m3_lag_wdi_data_gate_authorized": True,
+        # HISTORICAL vs STANDING authorization, published as two separate
+        # facts so neither can be misread as the other — the same semantics
+        # step B established for retrieval. The Gate WAS explicitly authorized
+        # (once), and that authorization was CONSUMED by this execution, so no
+        # standing permission to run the Gate again exists NOW. The generic
+        # ``data_gate_authorized`` field carries the STANDING meaning and is
+        # therefore False after consumption; the historical fact lives only in
+        # ``data_gate_was_authorized``.
+        "stage128_m3_lag_wdi_data_gate_authorized": False,
         "stage128_m3_lag_wdi_data_gate_was_authorized": True,
         "stage128_m3_lag_wdi_data_gate_authorized_now": False,
         "stage128_m3_lag_wdi_data_gate_authorization_consumed": True,

@@ -4149,6 +4149,91 @@ def test_suite_comparison_moves_nothing_scientific():
     assert rec["scientific_effect"] == "NONE_AUTHORITATIVE"
 
 
+# --------------------------------------------------------------------------- #
+# A CONSUMED one-time authorization may never read as a STANDING one
+# --------------------------------------------------------------------------- #
+#
+# The naming contract, established by the step B retrieval markers and stated
+# in their own comment, is that ``<prefix>_was_authorized`` holds the
+# HISTORICAL fact while ``<prefix>_authorized`` and ``<prefix>_authorized_now``
+# hold the STANDING permission. Publishing history in a standing field is how a
+# spent one-time authorization comes to read as live permission to act again —
+# which is exactly the drift these tests exist to prevent recurring.
+
+def test_no_consumed_track_b_authorization_is_published_as_standing():
+    state = _handoff_state()
+    for prefix in gen._ONE_TIME_AUTHORIZATION_PREFIXES:
+        if state.get(f"{prefix}_authorization_consumed") is not True:
+            continue
+        assert state[f"{prefix}_authorized"] is False, prefix
+        assert state[f"{prefix}_authorized_now"] is False, prefix
+        assert state[f"{prefix}_authorization_reusable"] is False, prefix
+        # the history must survive the correction, not be erased by it
+        assert state[f"{prefix}_was_authorized"] is True, prefix
+
+
+def test_every_completed_track_b_step_records_history_not_permission():
+    """Each executed step keeps its history AND publishes no live permission."""
+    state = _handoff_state()
+    executed = {
+        "stage128_m3_lag_wdi_retrieval":
+            state.get("stage128_m3_lag_wdi_data_retrieval_started"),
+        "stage128_m3_lag_wdi_post_retrieval_audit":
+            state.get("stage128_m3_lag_wdi_post_retrieval_audit_executed"),
+        "stage128_m3_lag_wdi_data_gate":
+            state.get("stage128_m3_lag_wdi_data_gate_executed"),
+    }
+    for prefix, ran in executed.items():
+        if ran is not True:
+            continue
+        assert state[f"{prefix}_authorization_consumed"] is True, prefix
+        assert state[f"{prefix}_was_authorized"] is True, prefix
+        assert state[f"{prefix}_authorized"] is False, prefix
+    # and the action sequence agrees: history in was_authorized, never in
+    # authorized / authorized_now
+    for entry in state["stage128_m3_lag_wdi_action_sequence"]:
+        assert entry["authorized"] is False, entry["step"]
+        assert entry["authorized_now"] is False, entry["step"]
+
+
+@pytest.mark.parametrize("leaking_field", [
+    "authorized", "authorized_now", "authorization_reusable"])
+@pytest.mark.parametrize("prefix", gen._ONE_TIME_AUTHORIZATION_PREFIXES)
+def test_the_generator_refuses_a_consumed_authorization_that_stands(
+        prefix, leaking_field):
+    with pytest.raises(gen.HandoffError):
+        gen._assert_no_consumed_authorization_is_standing({
+            f"{prefix}_authorization_consumed": True,
+            f"{prefix}_was_authorized": True,
+            f"{prefix}_{leaking_field}": True,
+        })
+
+
+@pytest.mark.parametrize("prefix", gen._ONE_TIME_AUTHORIZATION_PREFIXES)
+def test_the_generator_refuses_a_consumed_authorization_without_history(
+        prefix):
+    """"Consumed" without a recorded grant would describe an authorization the
+    state never admits existed."""
+    with pytest.raises(gen.HandoffError):
+        gen._assert_no_consumed_authorization_is_standing({
+            f"{prefix}_authorization_consumed": True,
+            f"{prefix}_was_authorized": False,
+            f"{prefix}_authorized": False,
+        })
+
+
+@pytest.mark.parametrize("prefix", gen._ONE_TIME_AUTHORIZATION_PREFIXES)
+def test_the_generator_accepts_the_correct_consumed_shape(prefix):
+    state = {
+        f"{prefix}_authorization_consumed": True,
+        f"{prefix}_was_authorized": True,
+        f"{prefix}_authorized": False,
+        f"{prefix}_authorized_now": False,
+        f"{prefix}_authorization_reusable": False,
+    }
+    assert gen._assert_no_consumed_authorization_is_standing(state) is state
+
+
 def test_handoff_publishes_the_comparison_as_verification_only():
     state = _handoff_state()
     assert state["full_suite_baseline_comparison_completed"] is True

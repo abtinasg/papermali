@@ -1,6 +1,6 @@
 {
   "all_pass": true,
-  "assertion_count": 161,
+  "assertion_count": 162,
   "assertions": [
     {
       "detail": "",
@@ -763,8 +763,13 @@
       "status": "PASS"
     },
     {
-      "detail": "the M3-LAG-WDI Data Gate is a SEPARATE action with its own identity that always requires a new explicit human authorization: unauthorized before it runs, and consumed and never standing after",
-      "name": "m3_lag_wdi_data_gate_is_a_separate_action_never_standing_authorized",
+      "detail": "the M3-LAG-WDI Data Gate is a SEPARATE action with its own identity that always requires a new explicit human authorization, and no STANDING Gate authorization ever exists — before or after it runs",
+      "name": "m3_lag_wdi_data_gate_is_a_separate_never_standing_authorized_action",
+      "status": "PASS"
+    },
+    {
+      "detail": "a consumed one-time authorization is history: it may never be published as a standing permission, and the historical fact must be recorded in *_was_authorized (standing leaks: []; missing history: [])",
+      "name": "m3_lag_wdi_no_consumed_authorization_is_published_as_standing",
       "status": "PASS"
     },
     {
@@ -809,7 +814,7 @@
     }
   ],
   "closed_part_count": 6,
-  "code_commit": "737be8068e67e1f88ccb3368f4b036f9318e4557",
+  "code_commit": "7c297d3c9eb7d07886670b6225ded138a499a808",
   "current_stage": "Stage126",
   "current_state_validation_path": "project/stage126/stage126_current_state_validation_report.json",
   "current_state_validation_scope": "stage126_current_state_validator",
@@ -817,7 +822,7 @@
   "decision_version": "stage126_validation_architecture_boundary_v1",
   "description": "Stage126 independent current-state validator. Stage125 Part 5 is historical and immutable and is neither imported nor executed here; current state is validated only from Stage126-native contracts and immutable hashes.",
   "failed_count": 0,
-  "generated_at": "737be8068e67e1f88ccb3368f4b036f9318e4557",
+  "generated_at": "7c297d3c9eb7d07886670b6225ded138a499a808",
   "human_decision_text_sha256": "8231bbf8704d3128cce6a7f2cc40a33af8e7fe7730b2c4575997330cafb21ac1",
   "last_completed_micro_part": "stage126-m1-robustness-part6-smote-training-fold-only",
   "legacy_validation_boundary_adapted": true,
@@ -835,7 +840,7 @@
   "prior_part_scientific_artifact_regeneration_forbidden": true,
   "scientific_artifacts_hard_locked": true,
   "single_live_current_state_authority": true,
-  "source_file_sha256": "b0dc7e4768586ec193d883404e50298db525b4ac2fbd646db5ce73222ebee61b",
+  "source_file_sha256": "618f862322e7de37fb64b2eaa23719b75d10e38dbe44620a66dd29748c3b3a68",
   "stage": "stage126_current_state_validator",
   "stage125_part5_executed": false,
   "stage125_part5_frozen_files_sha256": {

@@ -1134,6 +1134,7 @@ def test_the_next_action_is_a_separated_step_and_never_the_gate(handoff):
     # nothing, and a Gate PASS is never modeling authorization.
     if handoff["stage128_m3_lag_wdi_next_action_id"] == _MODELING_ACTION_ID:
         assert handoff["stage128_m3_lag_wdi_data_gate_executed"] is True
+        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
         assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
         assert handoff["stage128_m3_lag_wdi_modeling_authorized"] is False
         assert handoff["stage128_m3_lag_wdi_modeling_started"] is False
@@ -1177,15 +1178,16 @@ def test_the_data_gate_is_a_separate_never_standing_action(handoff):
     # a pointer to the Gate is not an authorization to execute it
     assert handoff[
         "stage128_m3_lag_wdi_data_gate_pointer_is_not_authorization"] is True
-    # The Gate's SEPARATENESS is permanent; its unauthorized-ness was only the
-    # pre-Gate moment. Once step D has run under its own new authorization,
-    # that authorization is consumed — so the rule that must hold at every
-    # step is that no STANDING Gate authorization ever exists.
+    # The generic `*_authorized` field carries the STANDING meaning at every
+    # point in the sequence, so it is False both before the Gate runs and
+    # after its one-time authorization is consumed. The historical fact lives
+    # in `*_was_authorized` — which is why this holds unconditionally.
+    assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
+    assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is not True
     if handoff["stage128_m3_lag_wdi_data_gate_executed"] is False:
-        assert handoff["stage128_m3_lag_wdi_data_gate_authorized"] is False
         assert handoff["stage128_m3_lag_wdi_data_gate_result"] == "NOT_EXECUTED"
     else:
-        assert handoff["stage128_m3_lag_wdi_data_gate_authorized_now"] is False
+        assert handoff["stage128_m3_lag_wdi_data_gate_was_authorized"] is True
         assert handoff[
             "stage128_m3_lag_wdi_data_gate_authorization_consumed"] is True
         assert handoff[
