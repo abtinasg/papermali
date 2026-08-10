@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `b296a9c23d74e5a899c2cda7095fc3846c1c6d5c`
-- **Generated from commit:** `b296a9c23d74e5a899c2cda7095fc3846c1c6d5c` (branch `stage129-m4-authoritative-prerequisite-resolution`, informational)
+- **Last stage commit:** `199ea7cb3e2658eb07d759221848202d50d0d83f`
+- **Generated from commit:** `199ea7cb3e2658eb07d759221848202d50d0d83f` (branch `stage129-m4-authoritative-prerequisite-resolution`, informational)
 - **Baseline:** `origin/main` @ `9d6567ef3ad86e06daf552a04e7db7a28adeee89`
 
 ## Current-state validation
@@ -307,5 +307,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `6c6217164cf4efc65981fbe7a2edcbd253aee6af6646e2c63f4d1998d745c393`_
-_generated_at_utc: 2026-08-10T14:26:44Z (informational)_
+_state_fingerprint: `81f327f7570be58ba6c2432fa5484186215a46cfe36e2a81c02a852546877be3`_
+_generated_at_utc: 2026-08-10T15:37:13Z (informational)_
