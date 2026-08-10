@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `3c1faf386ffe50af2d3c3b10659744494f2243a5`
-- **Generated from commit:** `3c1faf386ffe50af2d3c3b10659744494f2243a5` (branch `stage129-m4-governance-data-gate-contract-lock`, informational)
-- **Baseline:** `origin/main` @ `175e7949e009eeecdd66aedab31ec4b48e9d3c7d`
+- **Last stage commit:** `9384c98c7072bc99f6fd1f135a1e934014f459b6`
+- **Generated from commit:** `9384c98c7072bc99f6fd1f135a1e934014f459b6` (branch `stage129-readme-generator-integration-factual-correction`, informational)
+- **Baseline:** `origin/main` @ `1d05c74e3cf2086c9f10ed5cfeff0ea48206ad3d`
 
 ## Current-state validation
 
@@ -307,5 +307,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `e87674022bf19736ba543b3ef1fb1e8fb5ba6e37e863f017e88458811dd438b5`_
-_generated_at_utc: 2026-08-09T13:08:00Z (informational)_
+_state_fingerprint: `1f59c0201d741a192c4649918287d5d8fd2e5342bc3d87fb5dcaec7a6c7d5354`_
+_generated_at_utc: 2026-08-10T07:03:05Z (informational)_
