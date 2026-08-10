@@ -1,0 +1,130 @@
+{
+  "action_id": "stage129-m4-authoritative-prerequisite-resolution",
+  "action_type": "documentary_prerequisite_research_only",
+  "contract_version": "stage129_m4_prerequisite_resolution_v1",
+  "researches_prerequisites_of": "project/stage129/m4_governance_data_gate_contract/stage129_m4_data_gate_contract.json",
+  "base_commit": "9d6567ef3ad86e06daf552a04e7db7a28adeee89",
+
+  "authorizes_retrieval": false,
+  "authorizes_gate_execution": false,
+  "authorizes_modeling": false,
+  "is_the_gate_itself": false,
+
+  "candidate_set_unchanged": true,
+  "candidate_set": [
+    "audit_opinion_type",
+    "going_concern_flag",
+    "audit_lag_days",
+    "board_size"
+  ],
+  "candidate_identity_added_removed_or_renamed_by_this_action": false,
+  "thresholds_changed_by_this_action": false,
+  "confirmatory_holm_family_changed_by_this_action": false,
+
+  "overall_outcome": "DOCUMENTARY_RESEARCH_BLOCKED",
+  "overall_outcome_reason": "All three prerequisite questions terminate in authoritative sources that are not reachable from this execution environment (codal.ir, audit.org.ir, tsetmc.com, seo.ir). Substantive research was performed and is recorded, but no prerequisite could be closed on adequate authoritative evidence.",
+
+  "prerequisites": {
+    "codal_to_parent_company_identity_resolution": {
+      "verdict": "BLOCKED_BY_ACCESS_OR_SOURCE_LIMITATION",
+      "question": "Is there an authoritative, deterministic, auditable mapping from a CODAL issuer/disclosure identity to the frozen parent-side company key `ticker` (with `fiscal_year_t`)?",
+      "authoritative_routes_attempted": [
+        "CODAL official site / public metadata (codal.ir, www.codal.ir, search.codal.ir)",
+        "Tehran Securities Exchange technology company market data (tsetmc.com)",
+        "Securities and Exchange Organization (seo.ir)"
+      ],
+      "outcome_of_each_route": "network unreachable from this environment; see evidence manifest",
+      "identifier_candidates_considered_but_not_verified": [
+        "CODAL symbol / نماد",
+        "issuer or entity identifier exposed by CODAL",
+        "national identifier (شناسه ملی)",
+        "ISIN"
+      ],
+      "identifier_field_names_confirmed": [],
+      "normalization_rules_specified": false,
+      "unicode_normalization_specified": false,
+      "persian_arabic_character_normalization_specified": false,
+      "zwnj_and_whitespace_policy_specified": false,
+      "ticker_change_policy_specified": false,
+      "collision_policy_specified": false,
+      "one_to_one_requirement_verifiable": false,
+      "mapping_frozen": false,
+      "mapping_audited": false,
+      "fuzzy_or_name_or_outcome_informed_matching_used": false,
+      "fallback_mapping_substituted": false,
+      "absence_of_evidence_is_not_evidence_of_absence": true,
+      "resolution_still_required_before_gate": "an authoritative, deterministic CODAL-identity-to-ticker mapping artifact with its own uniqueness and ambiguity audit"
+    },
+
+    "audit_opinion_type_taxonomy": {
+      "verdict": "BLOCKED_BY_ACCESS_OR_SOURCE_LIMITATION",
+      "question": "What is the exact authoritative allowed-category taxonomy for the structured `audit_opinion_type` field, per a CODAL field schema or Iranian Audit Organization / IACPA standard text?",
+      "authoritative_routes_attempted": [
+        "CODAL structured-field schema (codal.ir) - unreachable",
+        "Iranian Audit Organization codified standards (audit.org.ir/WFrmCodificatedStandardView.aspx) - unreachable",
+        "IACPA (iacpa.ir) - REACHABLE, but publishes no taxonomy itself; it links out to audit.org.ir, which is unreachable"
+      ],
+      "supporting_evidence_obtained": {
+        "source": "ISA 705 (Revised), Modifications to the Opinion in the Independent Auditor's Report",
+        "publisher": "IAASB / IFAC",
+        "retrieved_from": "https://www.ifac.org/_flysystem/azure-private/publications/files/ISA-705-Revised_0.pdf",
+        "sha256": "3517bbe5134a86739131b2424dba13e9c5b9781cd9276d71676ac6376ead9bfc",
+        "bytes": 173296,
+        "establishes": "ISA 705 (Revised) paragraph 2 establishes exactly three types of modified opinion: a qualified opinion, an adverse opinion, and a disclaimer of opinion; effective for audits of financial statements for periods ending on or after December 15, 2016. Together with an unmodified opinion under ISA 700 (Revised) this yields a four-category opinion structure.",
+        "does_not_establish": [
+          "that the Iranian Audit Organization adopted this taxonomy verbatim (audit.org.ir unreachable)",
+          "that CODAL exposes a STRUCTURED audit-opinion field at all",
+          "the exact machine-readable category identifiers/values CODAL would use",
+          "the Persian term-to-category mapping as encoded by CODAL"
+        ]
+      },
+      "why_supporting_evidence_is_insufficient": "The frozen Stage125 definition requires the label to be an explicit structured field/value on the official CODAL report, never inferred from free text. An international standard describing opinion types cannot establish either the existence or the allowed value set of a CODAL structured field.",
+      "candidate_categories_remain_unverified_provisional": true,
+      "taxonomy_frozen": false,
+      "categories_derived_from_empirical_data": false,
+      "resolution_still_required_before_gate": "an authoritative CODAL field schema, or Iranian Audit Organization / IACPA standard text, confirming the exact category identifiers"
+    },
+
+    "audit_lag_days_calendar_conversion": {
+      "verdict": "BLOCKED_BY_ACCESS_OR_SOURCE_LIMITATION",
+      "question": "Is there an authoritative deterministic convention for computing audit_lag_days = audit_report_date - fiscal_year_end, including each field's documented calendar and format, and an authoritative Jalali/Gregorian conversion rule if conversion is required?",
+      "authoritative_routes_attempted": [
+        "CODAL date-field format documentation (codal.ir) - unreachable"
+      ],
+      "codal_date_field_calendar_documented": false,
+      "codal_date_field_format_documented": false,
+      "both_dates_confirmed_same_calendar": false,
+      "difference_direction_inherited_from_frozen_contract": "audit_report_date minus fiscal_year_end (non-negative only)",
+      "inclusive_or_exclusive_day_count_documented": false,
+      "substantive_secondary_finding": {
+        "finding": "The official Solar Hijri (Jalali) calendar is OBSERVATIONAL, not rule-based: leap years are determined by the actual astronomical timing of the vernal equinox at the Iranian reference meridian, not by a closed-form arithmetic rule. Consequently no arithmetic library rule can be assumed to be the authoritative civil calendar without checking it against officially published dates.",
+        "repository_pinned_library": "jdatetime==6.0.1",
+        "library_algorithm_observed": "date.isleap() returns (year % 33) in (1, 5, 9, 13, 17, 22, 26, 30) - a fixed 33-year arithmetic cycle",
+        "library_cited_authority": "the isleap() docstring cites only http://en.wikipedia.org/wiki/Leap_year",
+        "library_authority_is_adequate": false,
+        "library_internal_roundtrip_check": "7304 consecutive Jalali dates (1385-01-01..1404-12-28) round-tripped Jalali->Gregorian->Jalali with 0 mismatches",
+        "roundtrip_check_interpretation": "establishes internal invertibility of the library's own approximation ONLY; it does not establish agreement with the official observational calendar and is not offered as authoritative validation"
+      },
+      "deterministic_implementation_may_be_frozen_now": false,
+      "jalali_fiscal_year_t_plus_621_permitted_as_daily_date_conversion": false,
+      "resolution_still_required_before_gate": "authoritative CODAL date-field format documentation, plus an authoritative deterministic calendar-conversion rule validated against officially published Iranian calendar dates"
+    }
+  },
+
+  "post_action_contract_state": {
+    "m4_contract_complete": false,
+    "m4_contract_fully_executable": false,
+    "m4_data_gate_executable": false,
+    "m4_data_gate_authorized": false,
+    "m4_candidates_the_gate_may_execute_for": [],
+    "contract_issues_unresolved": [
+      "audit_opinion_type_taxonomy",
+      "audit_lag_days_calendar_conversion",
+      "codal_to_parent_company_identity_resolution"
+    ],
+    "issues_resolved_by_this_action": [],
+    "next_action_pointer": "stage129-m4-governance-data-gate",
+    "next_action_authorized": false,
+    "pointer_is_not_authorization": true
+  }
+}

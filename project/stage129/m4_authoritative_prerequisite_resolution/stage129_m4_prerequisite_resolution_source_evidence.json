@@ -1,0 +1,142 @@
+{
+  "action_id": "stage129-m4-authoritative-prerequisite-resolution",
+  "evidence_capture_window_utc": {
+    "start": "2026-08-10T14:10:00Z",
+    "end": "2026-08-10T14:25:00Z"
+  },
+  "environment_note": "Every host below resolves to an address in 198.18.0.0/15 (RFC 2544 benchmarking range), i.e. DNS is intercepted by the execution sandbox. Reachability therefore reflects a sandbox proxy allowlist, NOT public internet availability of these sites. Unreachability recorded here is an ACCESS LIMITATION of this environment and is not evidence that the documentation does not exist.",
+
+  "sources": [
+    {
+      "id": "src_probe_codal",
+      "authority": "CODAL - Comprehensive Database of All Listed Companies (Iran)",
+      "url": "https://www.codal.ir/",
+      "retrieved_at_utc": "2026-08-10T14:19:51Z",
+      "resolved_ip": "198.18.0.35",
+      "http_status": null,
+      "curl_exit_condition": "connection timed out (curl exit 28) after 8s; also timed out at 20s in an earlier probe",
+      "media_type": null,
+      "bytes": 0,
+      "sha256": null,
+      "language": null,
+      "establishes": "nothing - not reached",
+      "does_not_establish": "does not establish that CODAL lacks issuer-identifier or date-field documentation; the endpoint was simply unreachable from here",
+      "relevant_to": ["codal_to_parent_company_identity_resolution", "audit_opinion_type_taxonomy", "audit_lag_days_calendar_conversion"]
+    },
+    {
+      "id": "src_probe_tsetmc",
+      "authority": "Tehran Securities Exchange Technology Management Co (TSETMC)",
+      "url": "https://www.tsetmc.com/",
+      "retrieved_at_utc": "2026-08-10T14:19:59Z",
+      "resolved_ip": "198.18.0.37",
+      "http_status": null,
+      "curl_exit_condition": "connection timed out (curl exit 28)",
+      "bytes": 0,
+      "sha256": null,
+      "establishes": "nothing - not reached",
+      "does_not_establish": "does not establish absence of official issuer identifier records",
+      "relevant_to": ["codal_to_parent_company_identity_resolution"]
+    },
+    {
+      "id": "src_probe_audit_org_ir",
+      "authority": "Audit Organization of Iran (سازمان حسابرسی) - codified standards portal",
+      "url": "https://audit.org.ir/",
+      "additional_paths_probed": ["http://audit.org.ir/WFrmCodificatedStandardView.aspx", "http://www.audit.org.ir/"],
+      "retrieved_at_utc": "2026-08-10T14:20:07Z",
+      "resolved_ip": "198.18.0.31",
+      "http_status": null,
+      "curl_exit_condition": "connection timed out (curl exit 28) on every variant probed (http and https, apex and www, and the standards-view path)",
+      "bytes": 0,
+      "sha256": null,
+      "establishes": "nothing - not reached",
+      "does_not_establish": "does not establish that Iranian codified auditing standards are unpublished; this is the decisive authoritative route for the opinion taxonomy and it could not be reached",
+      "relevant_to": ["audit_opinion_type_taxonomy"]
+    },
+    {
+      "id": "src_iacpa_home",
+      "authority": "Iranian Association / Society of Certified Public Accountants (IACPA, جامعه حسابداران رسمی ایران)",
+      "url": "https://www.iacpa.ir/",
+      "retrieved_at_utc": "2026-08-10T14:20:15Z",
+      "resolved_ip": "198.18.0.39",
+      "http_status": 200,
+      "media_type": "text/html",
+      "language": "fa",
+      "establishes": "IACPA is an IFAC member body. Its site does NOT itself publish the audit-opinion taxonomy; it links out to the Audit Organization codified-standards portal at audit.org.ir for 'استانداردهای حسابرسی' (auditing standards).",
+      "does_not_establish": "does not provide any allowed-category list for a structured audit-opinion field, and does not describe any CODAL field schema",
+      "relevant_to": ["audit_opinion_type_taxonomy"]
+    },
+    {
+      "id": "src_isa705_revised",
+      "authority": "International Auditing and Assurance Standards Board (IAASB), published via IFAC",
+      "url": "https://www.ifac.org/_flysystem/azure-private/publications/files/ISA-705-Revised_0.pdf",
+      "retrieved_at_utc": "2026-08-10T14:14:09Z",
+      "http_status": 200,
+      "media_type": "application/pdf",
+      "bytes": 173296,
+      "sha256": "3517bbe5134a86739131b2424dba13e9c5b9781cd9276d71676ac6376ead9bfc",
+      "pages": 25,
+      "language": "en",
+      "relevant_section": "Scope of this ISA, para 1; Types of Modified Opinions, para 2; Effective Date, para 3",
+      "verbatim_key_text": "This ISA establishes three types of modified opinions, namely, a qualified opinion, an adverse opinion, and a disclaimer of opinion.",
+      "effective_date_text": "This ISA is effective for audits of financial statements for periods ending on or after December 15, 2016.",
+      "evidence_class": "authoritative_for_international_standard_supporting_only_for_this_contract_issue",
+      "establishes": "The international standard's exact modified-opinion taxonomy: qualified, adverse, disclaimer. With ISA 700 (Revised)'s unmodified opinion this is a four-category structure.",
+      "does_not_establish": [
+        "Iranian adoption of this taxonomy verbatim",
+        "existence of a CODAL structured audit-opinion field",
+        "the exact machine-readable category identifiers CODAL would use",
+        "the Persian term to category mapping as encoded by CODAL"
+      ],
+      "relevant_to": ["audit_opinion_type_taxonomy"]
+    },
+    {
+      "id": "src_solar_hijri_calendar_nature",
+      "authority": "secondary reference material (encyclopedic); consulted only to characterise the calendar's definitional nature",
+      "evidence_class": "secondary_supporting_not_authoritative",
+      "retrieved_at_utc": "2026-08-10T14:16:00Z",
+      "establishes": "The Solar Hijri calendar is described as observational: the year begins at the midnight nearest the vernal equinox as determined astronomically at the Iranian reference meridian, and leap-year placement follows the actual equinox timing rather than a closed-form arithmetic rule.",
+      "does_not_establish": "an official, citable Iranian legal or standards text stating the civil calendar rule; that text was not retrieved",
+      "relevant_to": ["audit_lag_days_calendar_conversion"]
+    },
+    {
+      "id": "src_jdatetime_pinned_library",
+      "authority": "repository-pinned dependency, inspected locally (not an external authority)",
+      "repository_path_declaring_pin": "project/requirements.txt",
+      "pin": "jdatetime==6.0.1",
+      "inspected_at_utc": "2026-08-10T14:22:00Z",
+      "evidence_class": "implementation_artifact_not_authoritative_source",
+      "observed_implementation": "jdatetime.date.isleap() returns (year % 33) in (1, 5, 9, 13, 17, 22, 26, 30)",
+      "observed_cited_authority_in_source": "docstring cites only http://en.wikipedia.org/wiki/Leap_year",
+      "internal_roundtrip_check": "7304 consecutive Jalali dates (1385-01-01..1404-12-28) round-tripped Jalali->Gregorian->Jalali with 0 mismatches",
+      "establishes": "the library applies a fixed 33-year arithmetic approximation and is internally invertible over the checked range",
+      "does_not_establish": "that this approximation equals the official observational civil calendar, nor that the library is an authoritative calendar source",
+      "relevant_to": ["audit_lag_days_calendar_conversion"]
+    },
+    {
+      "id": "src_control_reachability",
+      "authority": "control probes establishing that general outbound network egress works",
+      "urls": ["https://github.com/", "https://www.ifac.org/", "https://www.iaasb.org/"],
+      "retrieved_at_utc": "2026-08-10T14:20:18Z",
+      "http_status": 200,
+      "establishes": "the unreachability of codal.ir / audit.org.ir / tsetmc.com / seo.ir is host-specific, not a total loss of network egress",
+      "does_not_establish": "why those specific hosts are unreachable",
+      "relevant_to": ["codal_to_parent_company_identity_resolution", "audit_opinion_type_taxonomy", "audit_lag_days_calendar_conversion"]
+    }
+  ],
+
+  "evidence_class_definitions": {
+    "authoritative": "primary text issued by the standard-setting or regulatory body that governs the field in question",
+    "authoritative_for_international_standard_supporting_only_for_this_contract_issue": "primary standards text, but from a body that does not by itself define the CODAL field encoding this contract requires",
+    "secondary_supporting_not_authoritative": "reference material used only to characterise a concept; never used to freeze a contract value",
+    "implementation_artifact_not_authoritative_source": "observed behaviour of software; never a substitute for a documented rule",
+    "access_failure": "endpoint not reached; establishes nothing about the content that endpoint may hold"
+  },
+
+  "explicit_non_claims": [
+    "No claim is made that CODAL lacks issuer-identifier documentation.",
+    "No claim is made that Iranian codified auditing standards do not exist or are unpublished.",
+    "No claim is made that CODAL lacks date-field format documentation.",
+    "No URL, identifier, standard, taxonomy, field name, date or source content in this manifest was invented; every unreachable endpoint is recorded as unreached rather than summarised.",
+    "Failure to locate documentation from this environment is not treated as proof that the documentation does not exist: absence of evidence is not evidence of absence."
+  ]
+}

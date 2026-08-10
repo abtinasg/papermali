@@ -1,0 +1,28 @@
+{
+  "action_id": "stage129-m4-authoritative-prerequisite-resolution",
+  "credentials_committed_to_git": false,
+  "m4_value_files_committed": 0,
+  "package_files": {
+    "README_STAGE129_M4_AUTHORITATIVE_PREREQUISITE_RESOLUTION.md": {
+      "bytes": 10516,
+      "sha256": "4a1bdcfdf9577df77afebf8dbf5e55d583c7aebc0cbd5f335292c2c08ad39b75"
+    },
+    "stage129_m4_prerequisite_resolution_decision.json": {
+      "bytes": 8520,
+      "sha256": "aaa9d44a4db2b2f5cdf1998b0d86b2763b77d97f0d9a301a875e3b3bfb6402aa"
+    },
+    "stage129_m4_prerequisite_resolution_execution_audit.json": {
+      "bytes": 2023,
+      "sha256": "1be2d24670a04d24988a40e7a56d2d9f5b0d541559a1b4001a77d200f87ea4ae"
+    },
+    "stage129_m4_prerequisite_resolution_governance_boundary.json": {
+      "bytes": 1827,
+      "sha256": "530d6a72f2be9585be886b022ff7a84ce559a69fc0f0044a59abca9f98d4fb01"
+    },
+    "stage129_m4_prerequisite_resolution_source_evidence.json": {
+      "bytes": 9405,
+      "sha256": "953ea5101377650be851c39906cae2f0c41764b3159586d0ba3ddfc275c30171"
+    }
+  },
+  "pii_committed_to_git": false
+}
