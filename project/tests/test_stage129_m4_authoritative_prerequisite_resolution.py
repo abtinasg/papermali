@@ -226,9 +226,90 @@ def test_zero_m4_observations_and_zero_scientific_execution(audit):
 
 def test_network_access_is_documented_as_documentary_only(audit):
     assert audit["network_access_scope"] == "documentary_only"
-    assert audit["documents_retained"]
-    for doc in audit["documents_retained"]:
+    docs = audit["documents_downloaded_and_hashed_not_repository_retained"]
+    assert docs
+    for doc in docs:
         assert doc["contains_company_level_data"] is False
+
+
+# --------------------------------------------------------------------------- #
+# Documentary custody honesty
+# --------------------------------------------------------------------------- #
+
+def test_repository_custody_count_matches_actual_committed_objects(audit):
+    """Nothing may be described as repository-retained unless custody exists.
+
+    This package commits no documentary object, so the custody count must be 0
+    and every downloaded document must be flagged as NOT in repository custody.
+    """
+    assert audit["counters"]["documentary_documents_in_repository_custody"] == 0
+    assert audit["counters"]["documentary_documents_downloaded_and_hashed_not_in_repository_custody"] >= 1
+    assert audit["repository_custody_note"]
+    for doc in audit["documents_downloaded_and_hashed_not_repository_retained"]:
+        assert doc["in_repository_custody"] is False
+        assert doc["hash_is_of_a_committed_file"] is False
+        assert doc["custody_status"].startswith("downloaded_and_locally_hashed")
+        assert doc["not_committed_reason"]
+        assert doc["independent_reproduction_requires"]
+
+
+def test_no_audit_key_claims_repository_retention(audit):
+    """The legacy 'documents_retained' / 'documentary_documents_retained' keys
+    must not reappear: they read as repository-preserved evidence."""
+    assert "documents_retained" not in audit
+    assert "documentary_documents_retained" not in audit
+
+
+def test_observed_hashes_are_never_presented_as_committed_custody(evidence):
+    summary = evidence["repository_custody_summary"]
+    assert summary["documentary_objects_committed_to_this_repository"] == 0
+    assert summary["every_recorded_hash_is_historical_execution_metadata"] is True
+    assert summary["no_recorded_hash_can_be_verified_against_a_committed_file"] is True
+    assert summary["independent_byte_level_reproduction_requires"]
+
+
+def test_hash_bearing_sources_declare_no_repository_custody(evidence):
+    for src in evidence["sources"]:
+        if src.get("observed_sha256"):
+            assert src["in_repository_custody"] is False
+            assert src["hash_is_of_a_committed_file"] is False
+            assert src["hash_and_byte_count_are_historical_execution_metadata"] is True
+            assert src["not_committed_reason"]
+
+
+def test_package_manifest_only_covers_this_packages_own_artifacts():
+    """The hash manifest must never appear to give custody of a third-party
+    document: every entry it lists must exist inside the package directory."""
+    with open(os.path.join(REPO_ROOT, _META_REL), encoding="utf-8") as fh:
+        meta = json.load(fh)
+    for name in meta["package_files"]:
+        assert os.path.isfile(os.path.join(_PKG, name)), name
+        assert not name.lower().endswith(".pdf"), name
+
+
+def test_uncaptured_metadata_is_null_with_a_capture_note(evidence):
+    """Metadata not captured during the original session must be recorded as
+    null WITH an explanation - never estimated, reconstructed or fabricated."""
+    for src in evidence["sources"]:
+        for field in ("bytes", "sha256", "media_type", "http_status"):
+            if field in src and src[field] is None:
+                note = src.get(f"{field}_capture_note")
+                curl = src.get("curl_exit_condition")
+                assert note or curl, f"{src['id']}.{field} is null with no explanation"
+
+
+def test_every_source_declares_an_access_class(evidence):
+    allowed = set(evidence["access_class_definitions"])
+    for src in evidence["sources"]:
+        assert src["access_class"] in allowed, src["id"]
+
+
+def test_no_source_claims_retention_in_this_repository(evidence):
+    reached_and_retained = [
+        s for s in evidence["sources"]
+        if s.get("access_class") == "reached_content_received_and_retained_in_repository"
+    ]
+    assert reached_and_retained == []
 
 
 def test_no_empirical_or_outcome_informed_discovery(audit):
@@ -316,12 +397,20 @@ def test_unreached_sources_claim_nothing(evidence):
             assert src["establishes"] == "nothing - not reached", src.get("id")
 
 
-def test_retained_document_hash_is_recorded(evidence):
-    retained = [s for s in evidence["sources"] if s.get("sha256")]
-    assert retained, "at least one retained documentary artifact must carry a SHA-256"
-    for src in retained:
-        assert len(src["sha256"]) == 64
-        assert src["bytes"] > 0
+def test_observed_document_hash_is_recorded_and_well_formed(evidence):
+    """A document whose bytes were obtained must carry a well-formed observed
+    hash and byte count, explicitly marked as historical execution metadata
+    rather than committed repository custody."""
+    hashed = [s for s in evidence["sources"] if s.get("observed_sha256")]
+    assert hashed, "at least one downloaded documentary artifact must carry an observed SHA-256"
+    for src in hashed:
+        assert len(src["observed_sha256"]) == 64
+        assert src["observed_bytes"] > 0
+        assert src["hash_and_byte_count_are_historical_execution_metadata"] is True
+        assert src["in_repository_custody"] is False
+        assert "sha256" not in src, (
+            f"{src['id']}: bare 'sha256' reads as committed custody; use 'observed_sha256'"
+        )
 
 
 def test_absence_of_evidence_is_not_claimed_as_absence(evidence):
@@ -338,3 +427,52 @@ def test_non_authoritative_sources_are_labelled_as_such(evidence):
             assert cls == "implementation_artifact_not_authoritative_source"
         if src.get("id") == "src_solar_hijri_calendar_nature":
             assert cls == "secondary_supporting_not_authoritative"
+
+
+def test_calendar_claim_is_qualified_not_presented_as_authoritative(evidence, decision):
+    """The calendar characterisation rests on secondary evidence, so it must
+    carry its own limits and must not read as a resolved authoritative rule."""
+    src = next(s for s in evidence["sources"] if s["id"] == "src_solar_hijri_calendar_nature")
+    assert src["is_official_iranian_primary_source"] is False
+    assert src["supported_proposition_exactly"]
+    assert src["inference_limits"]
+
+    finding = decision["prerequisites"]["audit_lag_days_calendar_conversion"]["substantive_secondary_finding"]
+    assert finding["evidence_class_for_this_finding"] == "secondary_supporting_not_authoritative"
+    assert finding["is_official_iranian_primary_source"] is False
+    assert finding["inference_limits"]
+    assert finding["library_authority_is_adequate"] is False
+
+
+def test_calendar_core_conclusion_is_preserved(decision):
+    """Qualifying the wording must not weaken the operative conclusion."""
+    cal = decision["prerequisites"]["audit_lag_days_calendar_conversion"]
+    finding = cal["substantive_secondary_finding"]
+    assert "internal invertibility" in finding["roundtrip_check_interpretation"].lower()
+    assert cal["deterministic_implementation_may_be_frozen_now"] is False
+    assert cal["verdict"] == "BLOCKED_BY_ACCESS_OR_SOURCE_LIMITATION"
+
+
+def test_access_failure_is_never_recorded_as_documentary_absence(evidence, decision):
+    unreachable = [
+        s for s in evidence["sources"]
+        if s.get("access_class") == "connection_failed_zero_content"
+    ]
+    assert unreachable
+    for src in unreachable:
+        assert src["establishes"] == "nothing - not reached"
+        assert src.get("authoritative_but_inaccessible") is True
+        text = json.dumps(src["does_not_establish"]).lower()
+        assert "does not establish" in text
+    identity = decision["prerequisites"]["codal_to_parent_company_identity_resolution"]
+    assert identity["absence_of_evidence_is_not_evidence_of_absence"] is True
+
+
+def test_no_new_network_access_during_the_custody_correction(decision):
+    assert decision["documentary_custody"]["no_source_was_contacted_again_during_the_custody_correction"] is True
+
+
+def test_all_three_verdicts_remain_blocked(decision):
+    for name in PREREQUISITES:
+        assert decision["prerequisites"][name]["verdict"] == "BLOCKED_BY_ACCESS_OR_SOURCE_LIMITATION"
+    assert decision["overall_outcome"] == "DOCUMENTARY_RESEARCH_BLOCKED"

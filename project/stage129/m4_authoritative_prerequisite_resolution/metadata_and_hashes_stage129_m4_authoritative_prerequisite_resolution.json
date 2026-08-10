@@ -4,25 +4,27 @@
   "m4_value_files_committed": 0,
   "package_files": {
     "README_STAGE129_M4_AUTHORITATIVE_PREREQUISITE_RESOLUTION.md": {
-      "bytes": 10516,
-      "sha256": "4a1bdcfdf9577df77afebf8dbf5e55d583c7aebc0cbd5f335292c2c08ad39b75"
+      "bytes": 12998,
+      "sha256": "0bd79e37a493b7ab351c098292a1990c51ee14a8a6fd6cfdece413efcd01a649"
     },
     "stage129_m4_prerequisite_resolution_decision.json": {
-      "bytes": 8520,
-      "sha256": "aaa9d44a4db2b2f5cdf1998b0d86b2763b77d97f0d9a301a875e3b3bfb6402aa"
+      "bytes": 10050,
+      "sha256": "3ffb3ddf7f064ca72e7809fb3742235251fc8dc516a193090fcc394e8e974e8f"
     },
     "stage129_m4_prerequisite_resolution_execution_audit.json": {
-      "bytes": 2023,
-      "sha256": "1be2d24670a04d24988a40e7a56d2d9f5b0d541559a1b4001a77d200f87ea4ae"
+      "bytes": 3661,
+      "sha256": "86d7c1e6c876db2aa3412d8b52c973a3df141ea6a47a5e20bab213ac0a75f186"
     },
     "stage129_m4_prerequisite_resolution_governance_boundary.json": {
       "bytes": 1827,
       "sha256": "530d6a72f2be9585be886b022ff7a84ce559a69fc0f0044a59abca9f98d4fb01"
     },
     "stage129_m4_prerequisite_resolution_source_evidence.json": {
-      "bytes": 9405,
-      "sha256": "953ea5101377650be851c39906cae2f0c41764b3159586d0ba3ddfc275c30171"
+      "bytes": 15898,
+      "sha256": "4c341e7ece969136044b96436c06206521a72fe51b632d06c029cbe33a5d8da3"
     }
   },
-  "pii_committed_to_git": false
+  "pii_committed_to_git": false,
+  "third_party_copyrighted_documents_committed": 0,
+  "manifest_scope_note": "This manifest covers ONLY this package's own artifacts. It provides no repository custody for any external document; no documentary object is committed by this action."
 }

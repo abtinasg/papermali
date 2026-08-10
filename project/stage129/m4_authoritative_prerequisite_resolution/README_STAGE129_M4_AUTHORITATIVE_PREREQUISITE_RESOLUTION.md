@@ -76,8 +76,11 @@ value is CODAL-sourced.
 **Question.** What is the exact authoritative allowed-category taxonomy for the
 structured `audit_opinion_type` field?
 
-**What was obtained.** ISA 705 (Revised) was retrieved as primary text
-(SHA-256 `3517bbe5…`, 173,296 bytes, 25 pages). Paragraph 2 states verbatim:
+**What was obtained.** ISA 705 (Revised) was read as primary text during the
+original authorized documentary session. Its bytes were hashed at that time
+(observed SHA-256 `3517bbe5…`, observed 173,296 bytes, 25 pages) but are **not
+in repository custody** — see [Documentary custody](#documentary-custody)
+below. Paragraph 2 states verbatim:
 
 > "This ISA establishes three types of modified opinions, namely, a qualified
 > opinion, an adverse opinion, and a disclaimer of opinion."
@@ -120,11 +123,20 @@ exclusive day-count convention is likewise undocumented.
 **Two substantive secondary findings were obtained, and both cut against
 freezing a rule now:**
 
-1. **The official Solar Hijri calendar is observational, not rule-based.**
-   Leap-year placement follows the actual astronomical timing of the vernal
-   equinox at the Iranian reference meridian, not a closed-form arithmetic
-   rule. So no arithmetic library can be *assumed* to reproduce the official
-   civil calendar without being checked against officially published dates.
+1. **Available supporting evidence describes the official Iranian civil
+   calendar as astronomically determined** — the year beginning at the midnight
+   nearest the vernal equinox observed at the Iranian reference meridian —
+   **rather than governed by a closed-form arithmetic rule** such as the
+   repository library's fixed 33-year cycle. So no arithmetic library can be
+   *assumed* to reproduce the official civil calendar without being checked
+   against officially published dates.
+
+   > **Qualification.** This rests on **secondary** reference material, not on
+   > an Iranian legal or standards text — that text was not retrieved. It is
+   > enough to show the library approximation cannot simply be assumed correct,
+   > and therefore to keep this prerequisite blocked. It is **not** offered as
+   > independently resolved authoritative evidence, and it establishes no
+   > specific divergence in any specific year.
 
 2. **The repository's pinned library is an approximation with no standards
    authority.** `jdatetime==6.0.1` implements:
@@ -145,6 +157,42 @@ freezing a rule now:**
 
 The Stage128 `jalali_fiscal_year_t_plus_621` rule remains forbidden here: it is
 a year-level macro-data mapping, not a day-level date conversion.
+
+## Documentary custody
+
+**This package places zero documentary objects into repository custody.**
+
+One document — ISA 705 (Revised) — was downloaded and locally hashed inside the
+original authorized documentary session. Its bytes are **deliberately not
+committed**, because the document's own notice states verbatim:
+
+> "Copyright © January 2015 by the IFAC®. All rights reserved. Written
+> permission from IFAC® is required to reproduce, store or transmit, or to make
+> other similar uses of, this document, except as permitted by law. Contact
+> permissions@ifac.org." (ISBN 978-1-60815-205-6)
+
+This repository is **public**, so committing the PDF would reproduce, store and
+transmit it publicly. No such written permission exists. The document was
+therefore **not** re-downloaded, **not** reconstructed, and **not** substituted
+with a different copy.
+
+Consequently:
+
+- `documentary_documents_in_repository_custody = 0`
+- every byte count and SHA-256 in this package is **historical execution
+  metadata** observed at retrieval time — **none of them hashes a file
+  committed by this action**;
+- the package hash manifest covers only this package's own JSON/README
+  artifacts, and never claimed otherwise;
+- **independent byte-level reproduction of ISA 705 requires a separately
+  authorized future retrieval.** The recorded hash cannot be verified against
+  anything inside this repository.
+
+Where byte count, media type or hash was not captured during the original
+session (for example the IACPA page, read through a summarising fetch layer),
+the field is recorded as `null` with an explicit capture note. Nothing was
+estimated, reconstructed or fabricated, and no source was contacted again
+during this correction.
 
 ## What this action did NOT do
 
