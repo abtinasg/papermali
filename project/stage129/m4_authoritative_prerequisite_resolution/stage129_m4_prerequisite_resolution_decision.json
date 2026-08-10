@@ -104,9 +104,14 @@
         "library_authority_is_adequate": false,
         "library_internal_roundtrip_check": "7304 consecutive Jalali dates (1385-01-01..1404-12-28) round-tripped Jalali->Gregorian->Jalali with 0 mismatches",
         "roundtrip_check_interpretation": "establishes internal invertibility of the library's own approximation ONLY; it does not establish agreement with the official observational calendar and is not offered as authoritative validation",
-        "evidence_class_for_this_finding": "secondary_supporting_not_authoritative",
+        "evidence_class_for_this_finding": "unverified_session_level_supporting_observation_not_a_citable_source",
         "is_official_iranian_primary_source": false,
-        "inference_limits": "Sufficient to show the library approximation cannot be assumed correct, and therefore to keep this prerequisite BLOCKED. NOT sufficient to positively define the official calendar rule, and not presented as independently resolved authoritative evidence. Establishes no specific divergence in any specific year."
+        "inference_limits": "An UNVERIFIED SESSION-LEVEL SUPPORTING OBSERVATION with no identifiable underlying document. Sufficient only to show the library's 33-year approximation cannot be ASSUMED to equal the official civil calendar, and therefore to keep this prerequisite BLOCKED. NOT sufficient to define the official calendar rule, never authoritative, and never citable as evidence for the calendar's definition.",
+        "underlying_source_is_independently_identifiable": false,
+        "source_url": null,
+        "source_url_capture_status": "not_captured_during_original_session",
+        "source_identity_note": "The observation came from a web-search summarisation layer spanning several general-reference results; no individual page was fetched, so no document can be attributed as its source and it is NOT a reproducible documentary citation. The candidate result URLs are preserved in the evidence manifest for retracing only.",
+        "is_reproducible_documentary_source": false
       },
       "deterministic_implementation_may_be_frozen_now": false,
       "jalali_fiscal_year_t_plus_621_permitted_as_daily_date_conversion": false,

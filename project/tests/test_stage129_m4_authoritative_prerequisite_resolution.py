@@ -304,6 +304,89 @@ def test_every_source_declares_an_access_class(evidence):
         assert src["access_class"] in allowed, src["id"]
 
 
+def test_every_non_local_source_has_a_url_or_an_explicit_not_captured_marker(evidence):
+    """Unconditional: a non-local documentary source must either carry an exact
+    URL, or explicitly declare that its URL was never captured. Silence fails."""
+    local_only = {"src_jdatetime_pinned_library"}
+    for src in evidence["sources"]:
+        if src["id"] in local_only:
+            continue
+        has_url = bool(src.get("url")) or bool(src.get("source_url"))
+        has_per_endpoint = bool(src.get("per_endpoint_results"))
+        declared_missing = (
+            src.get("source_url_capture_status") == "not_captured_during_original_session"
+            and "source_url" in src
+            and src["source_url"] is None
+            and bool(src.get("source_url_capture_note"))
+        )
+        assert has_url or has_per_endpoint or declared_missing, (
+            f"{src['id']}: no exact URL and no explicit not-captured marker"
+        )
+
+
+def test_unidentifiable_source_is_not_called_reproducible(evidence):
+    """A source with no identifiable document may never be presented as a
+    reproducible/citable documentary source."""
+    for src in evidence["sources"]:
+        if src.get("is_independently_identifiable") is False:
+            assert src.get("is_reproducible_documentary_source") is False, src["id"]
+            assert src.get("reproducibility_note"), src["id"]
+            assert src.get("evidence_class") != "authoritative", src["id"]
+
+
+def test_uncaptured_url_is_never_guessed_or_substituted(evidence):
+    """Candidate search results must be explicitly non-attributive."""
+    for src in evidence["sources"]:
+        if src.get("source_url_capture_status") == "not_captured_during_original_session":
+            assert src["source_url"] is None, src["id"]
+            cands = src.get("candidate_result_urls_returned_by_the_search_layer")
+            if cands:
+                note = src.get("candidate_result_urls_note", "").lower()
+                assert "none is asserted to be the source" in note, src["id"]
+                assert "not as citations" in note or "retracing" in note, src["id"]
+
+
+def test_multi_endpoint_sources_report_per_endpoint_results(evidence):
+    """Several endpoints may not hide behind one shared status/timestamp."""
+    for src in evidence["sources"]:
+        urls = src.get("urls")
+        if urls and len(urls) > 1:
+            assert src.get("per_endpoint_results"), (
+                f"{src['id']}: multiple endpoints without per-endpoint results"
+            )
+        if src.get("per_endpoint_results"):
+            assert "http_status" not in src, (
+                f"{src['id']}: a single shared http_status alongside per-endpoint results"
+            )
+            assert "retrieved_at_utc" not in src, (
+                f"{src['id']}: a single shared timestamp alongside per-endpoint results"
+            )
+            assert src.get("capture_structure")
+
+
+def test_every_probed_endpoint_declares_byte_media_and_hash_treatment(evidence):
+    """Unconditional: each consulted endpoint must carry bytes/media_type/sha256
+    (or a null plus a specific not_captured note) - never silent omission."""
+    for src in evidence["sources"]:
+        for ep in src.get("per_endpoint_results", []):
+            for field in ("media_type", "bytes", "sha256"):
+                assert field in ep, f"{src['id']} {ep['url']}: missing {field}"
+                if ep[field] is None:
+                    note = ep.get(f"{field}_capture_note", "")
+                    assert note.startswith("not_captured"), (
+                        f"{src['id']} {ep['url']}: {field} null without a not_captured note"
+                    )
+            assert ep["in_repository_custody"] is False
+
+
+def test_control_probes_do_not_claim_to_explain_blocked_endpoints(evidence):
+    control = [s for s in evidence["sources"] if s.get("access_class") == "control_endpoint"]
+    assert control
+    for src in control:
+        text = json.dumps(src["does_not_establish"]).lower()
+        assert "cause" in text, src["id"]
+
+
 def test_no_source_claims_retention_in_this_repository(evidence):
     reached_and_retained = [
         s for s in evidence["sources"]
@@ -430,17 +513,24 @@ def test_non_authoritative_sources_are_labelled_as_such(evidence):
 
 
 def test_calendar_claim_is_qualified_not_presented_as_authoritative(evidence, decision):
-    """The calendar characterisation rests on secondary evidence, so it must
-    carry its own limits and must not read as a resolved authoritative rule."""
+    """The calendar characterisation is an unverified session-level observation,
+    so it must carry its own limits and must never read as authoritative."""
     src = next(s for s in evidence["sources"] if s["id"] == "src_solar_hijri_calendar_nature")
     assert src["is_official_iranian_primary_source"] is False
+    assert src["is_independently_identifiable"] is False
+    assert src["is_reproducible_documentary_source"] is False
+    assert src["evidence_class"] == "secondary_supporting_not_authoritative"
+    assert src["access_class"] == "unverified_session_level_supporting_observation"
     assert src["supported_proposition_exactly"]
-    assert src["inference_limits"]
+    assert "unverified" in src["inference_limits"].lower()
 
     finding = decision["prerequisites"]["audit_lag_days_calendar_conversion"]["substantive_secondary_finding"]
-    assert finding["evidence_class_for_this_finding"] == "secondary_supporting_not_authoritative"
-    assert finding["is_official_iranian_primary_source"] is False
-    assert finding["inference_limits"]
+    assert finding["underlying_source_is_independently_identifiable"] is False
+    assert finding["is_reproducible_documentary_source"] is False
+    assert finding["source_url"] is None
+    assert finding["source_url_capture_status"] == "not_captured_during_original_session"
+    assert finding["source_identity_note"]
+    assert "unverified" in finding["inference_limits"].lower()
     assert finding["library_authority_is_adequate"] is False
 
 

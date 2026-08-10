@@ -40,11 +40,20 @@ allowlist**, not public availability of these sites.
 | `audit.org.ir` | `198.18.0.31` | connection timed out (all variants, incl. the standards path) |
 | `www.seo.ir` | — | connection timed out |
 | `www.iacpa.ir` | `198.18.0.39` | **HTTP 200 — reachable** |
-| `www.ifac.org` | `198.18.0.40` | **HTTP 200 — reachable** |
+| `www.ifac.org` | `198.18.0.40` | **HTTP 200 — reachable** (control) |
 | `github.com` | `198.18.0.41` | **HTTP 200 — reachable** (control) |
+| `www.iaasb.org` | not captured | **HTTP 200 — reachable** (control; probed in an earlier batch that recorded no timestamp or IP) |
 
 Because control hosts return 200, the failures are **host-specific, not a loss
 of network egress**.
+
+> **What the controls do and do not show.** They establish only that *some*
+> permitted outbound access succeeded at the times recorded. They do **not**
+> prove the cause of any blocked endpoint — not filtering, censorship, outage
+> nor geo-restriction — and say nothing about reachability from elsewhere.
+> Each control endpoint is recorded separately with its own captured values;
+> no single status or timestamp is applied across all three, and every
+> uncaptured field is `null` with an explicit note.
 
 > **This is an access limitation of this environment. It is explicitly NOT a
 > finding that CODAL, the Audit Organization or TSETMC lack the documentation
@@ -131,12 +140,20 @@ freezing a rule now:**
    *assumed* to reproduce the official civil calendar without being checked
    against officially published dates.
 
-   > **Qualification.** This rests on **secondary** reference material, not on
-   > an Iranian legal or standards text — that text was not retrieved. It is
-   > enough to show the library approximation cannot simply be assumed correct,
-   > and therefore to keep this prerequisite blocked. It is **not** offered as
-   > independently resolved authoritative evidence, and it establishes no
-   > specific divergence in any specific year.
+   > **Qualification — this is the weakest evidence in the package.** It is an
+   > **unverified session-level supporting observation**, not a citable
+   > document. It came from a web-search summarisation layer spanning several
+   > general-reference results; **no individual page was ever fetched**, so no
+   > source URL, publisher or title can be attributed, and it is **not a
+   > reproducible documentary source**. The candidate search results are
+   > preserved in the evidence manifest **for retracing only** — none was
+   > fetched and none is asserted to be the source.
+   >
+   > It is enough to show the library approximation cannot simply be assumed
+   > correct, and therefore to keep this prerequisite blocked. It is **not**
+   > authoritative, **not** citable as evidence for the calendar's definition,
+   > and it establishes no specific divergence in any specific year. It also
+   > does not establish that no authoritative text exists.
 
 2. **The repository's pinned library is an approximation with no standards
    authority.** `jdatetime==6.0.1` implements:
