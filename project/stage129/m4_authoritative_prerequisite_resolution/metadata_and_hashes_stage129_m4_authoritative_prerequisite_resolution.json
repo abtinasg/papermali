@@ -1,0 +1,30 @@
+{
+  "action_id": "stage129-m4-authoritative-prerequisite-resolution",
+  "credentials_committed_to_git": false,
+  "m4_value_files_committed": 0,
+  "package_files": {
+    "README_STAGE129_M4_AUTHORITATIVE_PREREQUISITE_RESOLUTION.md": {
+      "bytes": 14174,
+      "sha256": "c0edba51e42fdd1f0d80cbe080cb5800ca1847f4f1883a45e1392c68684abbcc"
+    },
+    "stage129_m4_prerequisite_resolution_decision.json": {
+      "bytes": 10740,
+      "sha256": "24427478acc65ac962c384aa158c2958196f5f4c158d48830626c1c1c81a89ec"
+    },
+    "stage129_m4_prerequisite_resolution_execution_audit.json": {
+      "bytes": 3661,
+      "sha256": "86d7c1e6c876db2aa3412d8b52c973a3df141ea6a47a5e20bab213ac0a75f186"
+    },
+    "stage129_m4_prerequisite_resolution_governance_boundary.json": {
+      "bytes": 1827,
+      "sha256": "530d6a72f2be9585be886b022ff7a84ce559a69fc0f0044a59abca9f98d4fb01"
+    },
+    "stage129_m4_prerequisite_resolution_source_evidence.json": {
+      "bytes": 22069,
+      "sha256": "22e763087f692d0f1f870db56779384caa7c85856cd57d57d012c9f0c3193247"
+    }
+  },
+  "pii_committed_to_git": false,
+  "third_party_copyrighted_documents_committed": 0,
+  "manifest_scope_note": "This manifest covers ONLY this package's own artifacts. It provides no repository custody for any external document; no documentary object is committed by this action."
+}

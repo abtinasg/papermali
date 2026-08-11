@@ -1,0 +1,295 @@
+{
+  "action_id": "stage129-m4-authoritative-prerequisite-resolution",
+  "evidence_capture_window_utc": {
+    "start": "2026-08-10T14:10:00Z",
+    "end": "2026-08-10T14:25:00Z"
+  },
+  "environment_note": "Every host below resolves to an address in 198.18.0.0/15 (RFC 2544 benchmarking range), i.e. DNS is intercepted by the execution sandbox. Reachability therefore reflects a sandbox proxy allowlist, NOT public internet availability of these sites. Unreachability recorded here is an ACCESS LIMITATION of this environment and is not evidence that the documentation does not exist.",
+  "sources": [
+    {
+      "id": "src_probe_codal",
+      "authority": "CODAL - Comprehensive Database of All Listed Companies (Iran)",
+      "url": "https://www.codal.ir/",
+      "retrieved_at_utc": "2026-08-10T14:19:51Z",
+      "resolved_ip": "198.18.0.35",
+      "http_status": null,
+      "curl_exit_condition": "connection timed out (curl exit 28) after 8s; also timed out at 20s in an earlier probe",
+      "media_type": null,
+      "bytes": 0,
+      "sha256": null,
+      "language": null,
+      "establishes": "nothing - not reached",
+      "does_not_establish": "does not establish that CODAL lacks issuer-identifier or date-field documentation; the endpoint was simply unreachable from here",
+      "relevant_to": [
+        "codal_to_parent_company_identity_resolution",
+        "audit_opinion_type_taxonomy",
+        "audit_lag_days_calendar_conversion"
+      ],
+      "access_class": "connection_failed_zero_content",
+      "in_repository_custody": false,
+      "authoritative_but_inaccessible": true
+    },
+    {
+      "id": "src_probe_tsetmc",
+      "authority": "Tehran Securities Exchange Technology Management Co (TSETMC)",
+      "url": "https://www.tsetmc.com/",
+      "retrieved_at_utc": "2026-08-10T14:19:59Z",
+      "resolved_ip": "198.18.0.37",
+      "http_status": null,
+      "curl_exit_condition": "connection timed out (curl exit 28)",
+      "bytes": 0,
+      "sha256": null,
+      "establishes": "nothing - not reached",
+      "does_not_establish": "does not establish absence of official issuer identifier records",
+      "relevant_to": [
+        "codal_to_parent_company_identity_resolution"
+      ],
+      "access_class": "connection_failed_zero_content",
+      "in_repository_custody": false,
+      "authoritative_but_inaccessible": true
+    },
+    {
+      "id": "src_probe_audit_org_ir",
+      "authority": "Audit Organization of Iran (سازمان حسابرسی) - codified standards portal",
+      "url": "https://audit.org.ir/",
+      "additional_paths_probed": [
+        "http://audit.org.ir/WFrmCodificatedStandardView.aspx",
+        "http://www.audit.org.ir/"
+      ],
+      "retrieved_at_utc": "2026-08-10T14:20:07Z",
+      "resolved_ip": "198.18.0.31",
+      "http_status": null,
+      "curl_exit_condition": "connection timed out (curl exit 28) on every variant probed (http and https, apex and www, and the standards-view path)",
+      "bytes": 0,
+      "sha256": null,
+      "establishes": "nothing - not reached",
+      "does_not_establish": "does not establish that Iranian codified auditing standards are unpublished; this is the decisive authoritative route for the opinion taxonomy and it could not be reached",
+      "relevant_to": [
+        "audit_opinion_type_taxonomy"
+      ],
+      "access_class": "connection_failed_zero_content",
+      "in_repository_custody": false,
+      "authoritative_but_inaccessible": true
+    },
+    {
+      "id": "src_iacpa_home",
+      "authority": "Iranian Association / Society of Certified Public Accountants (IACPA, جامعه حسابداران رسمی ایران)",
+      "url": "https://www.iacpa.ir/",
+      "retrieved_at_utc": "2026-08-10T14:20:15Z",
+      "resolved_ip": "198.18.0.39",
+      "http_status": 200,
+      "access_class": "reached_content_received_but_not_retained",
+      "media_type": "text/html",
+      "media_type_capture_note": "reported by the fetch layer; not independently re-verified against a stored response",
+      "bytes": null,
+      "bytes_capture_note": "not_captured: the page was read through a summarising fetch tool that did not expose a raw byte count, and no new request was made to obtain one",
+      "sha256": null,
+      "sha256_capture_note": "not_captured: no raw response body was stored during the original authorized session, so no hash exists; this is recorded as missing rather than estimated",
+      "in_repository_custody": false,
+      "language": "fa",
+      "relevant_section": "site navigation / standards links section (استانداردهای حسابرسی)",
+      "establishes": "IACPA is an IFAC member body. Its site does NOT itself publish the audit-opinion taxonomy; it links out to the Audit Organization codified-standards portal at audit.org.ir for 'استانداردهای حسابرسی' (auditing standards).",
+      "does_not_establish": "does not provide any allowed-category list for a structured audit-opinion field, and does not describe any CODAL field schema",
+      "relevant_to": [
+        "audit_opinion_type_taxonomy"
+      ]
+    },
+    {
+      "id": "src_isa705_revised",
+      "authority": "International Auditing and Assurance Standards Board (IAASB), published via IFAC",
+      "url": "https://www.ifac.org/_flysystem/azure-private/publications/files/ISA-705-Revised_0.pdf",
+      "retrieved_at_utc": "2026-08-10T14:14:09Z",
+      "http_status": 200,
+      "access_class": "reached_content_received_but_not_retained",
+      "media_type": "application/pdf",
+      "observed_bytes": 173296,
+      "observed_sha256": "3517bbe5134a86739131b2424dba13e9c5b9781cd9276d71676ac6376ead9bfc",
+      "hash_and_byte_count_are_historical_execution_metadata": true,
+      "hash_is_of_a_committed_file": false,
+      "in_repository_custody": false,
+      "custody_status": "downloaded_and_locally_hashed_during_the_original_authorized_documentary_session_but_not_preserved_in_repository_custody",
+      "licensing_and_copyright_status": "Copyright (c) January 2015 by IFAC. All rights reserved. The document states verbatim: 'Written permission from IFAC is required to reproduce, store or transmit, or to make other similar uses of, this document, except as permitted by law. Contact permissions@ifac.org.' ISBN 978-1-60815-205-6.",
+      "not_committed_reason": "This repository is PUBLIC. Committing the PDF would reproduce, store and transmit the document publicly, which the copyright notice above requires written IFAC permission to do. No such permission exists, so the bytes are deliberately NOT committed and no repository custody is claimed.",
+      "independent_reproduction_requires": "a separately authorized future retrieval from the source URL; the observed hash cannot be verified against anything inside this repository",
+      "pages": 25,
+      "language": "en",
+      "relevant_section": "Scope of this ISA, para 1; Types of Modified Opinions, para 2; Effective Date, para 3",
+      "verbatim_key_text": "This ISA establishes three types of modified opinions, namely, a qualified opinion, an adverse opinion, and a disclaimer of opinion.",
+      "effective_date_text": "This ISA is effective for audits of financial statements for periods ending on or after December 15, 2016.",
+      "evidence_class": "authoritative_for_international_standard_supporting_only_for_this_contract_issue",
+      "establishes": "The international standard's exact modified-opinion taxonomy: qualified, adverse, disclaimer. With ISA 700 (Revised)'s unmodified opinion this is a four-category structure.",
+      "does_not_establish": [
+        "Iranian adoption of this taxonomy verbatim",
+        "existence of a CODAL structured audit-opinion field",
+        "the exact machine-readable category identifiers CODAL would use",
+        "the Persian term to category mapping as encoded by CODAL"
+      ],
+      "relevant_to": [
+        "audit_opinion_type_taxonomy"
+      ]
+    },
+    {
+      "id": "src_solar_hijri_calendar_nature",
+      "authority": "NOT A SINGLE IDENTIFIABLE DOCUMENT. This observation came from a web-search summarisation layer that synthesised prose across several general-reference results; no individual page was ever fetched, so no one page can be attributed as 'the' source.",
+      "evidence_class": "secondary_supporting_not_authoritative",
+      "access_class": "unverified_session_level_supporting_observation",
+      "source_url": null,
+      "source_url_capture_status": "not_captured_during_original_session",
+      "source_url_capture_note": "No individual page was fetched. The proposition was read off a search-engine summary spanning multiple results, so attributing it to any single URL would be a guess. Per this correction's constraints no endpoint was contacted again to resolve the attribution, and no substitute source was introduced.",
+      "publisher": null,
+      "publisher_capture_note": "not_captured: no single document was fetched, so no publisher can be attributed",
+      "page_title": null,
+      "page_title_capture_note": "not_captured: no single document was fetched",
+      "search_query_recorded_from_session": "Solar Hijri Jalali calendar official Iranian law leap year determination vernal equinox Tehran meridian 52.5 degrees",
+      "candidate_result_urls_returned_by_the_search_layer": [
+        "https://calendars.fandom.com/wiki/Iranian_calendar",
+        "https://en.wikipedia.org/wiki/Iranian_calendars",
+        "https://welcometoiran.com/persian-calendar-solar-hijri/",
+        "http://world.clndr.org/calendars/iranian-calendar/",
+        "https://grokipedia.com/page/Solar_Hijri_calendar",
+        "https://grokipedia.com/page/Date_and_time_notation_in_Iran",
+        "https://grokipedia.com/page/Iranian_calendars",
+        "https://www.timeanddate.com/date/iran-leap-year.html",
+        "https://packages.oit.ncsu.edu/cran/web/packages/jalcal/readme/README.html"
+      ],
+      "candidate_result_urls_note": "These are the results the search layer reported, preserved from the original session record. NONE of them was fetched, retrieved, hashed or verified, and none is asserted to be the source of the proposition. They are listed only so a future authorized session can retrace the search - not as citations.",
+      "retrieved_at_utc": "2026-08-10T14:16:00Z",
+      "retrieved_at_utc_note": "approximate session time of the search call; no per-URL retrieval timestamp exists because no URL was retrieved",
+      "http_status": null,
+      "http_status_capture_note": "not_captured: no individual page request was made, so no HTTP status exists",
+      "media_type": null,
+      "media_type_capture_note": "not_captured: no individual page request was made",
+      "bytes": null,
+      "bytes_capture_note": "not_captured: no response body was ever received or stored",
+      "sha256": null,
+      "sha256_capture_note": "not_captured: no response body was ever received or stored, so no hash exists",
+      "in_repository_custody": false,
+      "is_official_iranian_primary_source": false,
+      "is_independently_identifiable": false,
+      "is_reproducible_documentary_source": false,
+      "reproducibility_note": "This is NOT a reproducible documentary source. It is an unverified session-level supporting observation. Independent verification requires a separately authorized future session to consult and cite an actual document.",
+      "relevant_section": "the proposition below only; no section/page reference exists because no document was opened",
+      "supported_proposition_exactly": "Available supporting evidence describes the official Iranian civil calendar as astronomically determined - the year beginning at the midnight nearest the vernal equinox observed at the Iranian reference meridian - rather than being governed by a closed-form arithmetic rule such as the repository library's fixed 33-year cycle.",
+      "inference_limits": "This is an UNVERIFIED SESSION-LEVEL SUPPORTING OBSERVATION with no identifiable underlying document, not secondary literature that could be cited. It is sufficient only to show that the repository library's 33-year arithmetic approximation cannot simply be ASSUMED to equal the official civil calendar, and therefore to keep the prerequisite BLOCKED. It is NOT sufficient to define the official calendar rule, is not authoritative, and must never be cited as evidence for the calendar's definition.",
+      "establishes": "only the qualified proposition recorded in supported_proposition_exactly, and only as an unverified session-level observation",
+      "does_not_establish": "an official, citable Iranian legal or standards text stating the civil calendar rule; no such text was retrieved. It does not establish any specific divergence between the library approximation and the official calendar in any specific year, and it does not establish that no such authoritative text exists.",
+      "relevant_to": [
+        "audit_lag_days_calendar_conversion"
+      ]
+    },
+    {
+      "id": "src_jdatetime_pinned_library",
+      "authority": "repository-pinned dependency, inspected locally (not an external authority)",
+      "repository_path_declaring_pin": "project/requirements.txt",
+      "pin": "jdatetime==6.0.1",
+      "inspected_at_utc": "2026-08-10T14:22:00Z",
+      "evidence_class": "implementation_artifact_not_authoritative_source",
+      "observed_implementation": "jdatetime.date.isleap() returns (year % 33) in (1, 5, 9, 13, 17, 22, 26, 30)",
+      "observed_cited_authority_in_source": "docstring cites only http://en.wikipedia.org/wiki/Leap_year",
+      "internal_roundtrip_check": "7304 consecutive Jalali dates (1385-01-01..1404-12-28) round-tripped Jalali->Gregorian->Jalali with 0 mismatches",
+      "establishes": "the library applies a fixed 33-year arithmetic approximation and is internally invertible over the checked range",
+      "does_not_establish": "that this approximation equals the official observational civil calendar, nor that the library is an authoritative calendar source",
+      "relevant_to": [
+        "audit_lag_days_calendar_conversion"
+      ],
+      "access_class": "local_implementation_artifact_no_network_access"
+    },
+    {
+      "id": "src_control_reachability",
+      "authority": "control probes run by this session (not an external documentary authority)",
+      "access_class": "control_endpoint",
+      "capture_structure": "per_endpoint_results; no single status or timestamp is applied across endpoints",
+      "per_endpoint_results": [
+        {
+          "url": "https://github.com/",
+          "retrieved_at_utc": "2026-08-10T14:20:18Z",
+          "retrieved_at_utc_source": "captured per-endpoint in the session probe log (probes.tsv)",
+          "resolved_ip": "198.18.0.41",
+          "http_status": 200,
+          "time_total_seconds": 1.490569,
+          "media_type": null,
+          "media_type_capture_note": "not_captured: the probe used curl with the body discarded and did not record content type",
+          "bytes": null,
+          "bytes_capture_note": "not_captured: response body was discarded by the probe (curl -o /dev/null)",
+          "sha256": null,
+          "sha256_capture_note": "not_captured: no body was stored, so no hash exists",
+          "in_repository_custody": false
+        },
+        {
+          "url": "https://www.ifac.org/",
+          "retrieved_at_utc": "2026-08-10T14:20:17Z",
+          "retrieved_at_utc_source": "captured per-endpoint in the session probe log (probes.tsv)",
+          "resolved_ip": "198.18.0.40",
+          "http_status": 200,
+          "time_total_seconds": 0.88198,
+          "media_type": null,
+          "media_type_capture_note": "not_captured: probe discarded the body",
+          "bytes": null,
+          "bytes_capture_note": "not_captured: response body was discarded by the probe",
+          "sha256": null,
+          "sha256_capture_note": "not_captured: no body was stored",
+          "in_repository_custody": false
+        },
+        {
+          "url": "https://www.iaasb.org/",
+          "retrieved_at_utc": null,
+          "retrieved_at_utc_capture_note": "not_captured: this endpoint was probed in an earlier batch that recorded only status and elapsed time, with no per-line timestamp; it does NOT appear in the timestamped probe log, and no new request was made to obtain a timestamp",
+          "resolved_ip": null,
+          "resolved_ip_capture_note": "not_captured: that earlier batch did not resolve or record an IP for this host",
+          "http_status": 200,
+          "time_total_seconds": 1.003506,
+          "media_type": null,
+          "media_type_capture_note": "not_captured: probe discarded the body",
+          "bytes": null,
+          "bytes_capture_note": "not_captured: response body was discarded by the probe",
+          "sha256": null,
+          "sha256_capture_note": "not_captured: no body was stored",
+          "in_repository_custody": false
+        }
+      ],
+      "establishes": "that at least some permitted outbound HTTP access from this environment succeeded at the times recorded; therefore the failures against codal.ir / audit.org.ir / tsetmc.com / seo.ir were host-specific rather than a total loss of network egress",
+      "does_not_establish": "the CAUSE of any specific blocked Iranian endpoint. These probes do not prove filtering, censorship, outage, geo-restriction or any other mechanism, and they say nothing about whether those hosts are reachable from elsewhere.",
+      "relevant_to": [
+        "codal_to_parent_company_identity_resolution",
+        "audit_opinion_type_taxonomy",
+        "audit_lag_days_calendar_conversion"
+      ]
+    }
+  ],
+  "evidence_class_definitions": {
+    "authoritative": "primary text issued by the standard-setting or regulatory body that governs the field in question",
+    "authoritative_for_international_standard_supporting_only_for_this_contract_issue": "primary standards text, but from a body that does not by itself define the CODAL field encoding this contract requires",
+    "secondary_supporting_not_authoritative": "reference material used only to characterise a concept; never used to freeze a contract value",
+    "implementation_artifact_not_authoritative_source": "observed behaviour of software; never a substitute for a documented rule",
+    "access_failure": "endpoint not reached; establishes nothing about the content that endpoint may hold"
+  },
+  "explicit_non_claims": [
+    "No claim is made that CODAL lacks issuer-identifier documentation.",
+    "No claim is made that Iranian codified auditing standards do not exist or are unpublished.",
+    "No claim is made that CODAL lacks date-field format documentation.",
+    "No URL, identifier, standard, taxonomy, field name, date or source content in this manifest was invented; every unreachable endpoint is recorded as unreached rather than summarised.",
+    "Failure to locate documentation from this environment is not treated as proof that the documentation does not exist: absence of evidence is not evidence of absence.",
+    "No documentary object is claimed to be in repository custody. Every byte count and SHA-256 recorded here was observed during the original authorized documentary session and is historical execution metadata; none of them hashes a file committed by this action.",
+    "Where byte count, media type or hash was not captured during the original session it is recorded as null with a capture note, never estimated, reconstructed or fabricated.",
+    "The characterisation of the official Iranian calendar rests on SECONDARY supporting evidence only and is not presented as independently resolved authoritative evidence.",
+    "The calendar observation has no identifiable underlying document and is recorded as an unverified session-level supporting observation, not as a reproducible or citable documentary source. The candidate search results listed are preserved for retracing only; none was fetched and none is asserted to be the source.",
+    "Control probes establish only that some permitted outbound access worked. They do not prove the cause of any blocked endpoint, and no single status or timestamp is applied across the three control endpoints."
+  ],
+  "access_class_definitions": {
+    "reached_content_received_but_not_retained": "the endpoint responded and its content was read, but no raw response body is preserved in repository custody",
+    "reached_content_received_and_retained_in_repository": "the endpoint responded and its exact bytes are committed to this repository (NOT used by this action - no such source exists here)",
+    "connection_failed_zero_content": "the connection did not complete; zero bytes were received; the source establishes nothing",
+    "control_endpoint": "probed only to demonstrate that general network egress works",
+    "supporting_source": "secondary material used to characterise a concept; never used to freeze a contract value",
+    "local_implementation_artifact_no_network_access": "inspected locally from the installed dependency; no network request involved",
+    "authoritative_but_inaccessible": "a source that would be authoritative for the question but could not be reached from this environment",
+    "unverified_session_level_supporting_observation": "an observation formed during the session from a search-summarisation layer with no individual document fetched; not independently identifiable, not reproducible as a documentary citation, and never usable to freeze a contract value"
+  },
+  "repository_custody_summary": {
+    "documentary_objects_committed_to_this_repository": 0,
+    "every_recorded_hash_is_historical_execution_metadata": true,
+    "no_recorded_hash_can_be_verified_against_a_committed_file": true,
+    "reason_no_documentary_object_is_committed": "The only document whose bytes were obtained (ISA 705 (Revised)) is IFAC-copyrighted and its own notice requires written IFAC permission to reproduce, store or transmit it. This repository is public and no such permission exists.",
+    "independent_byte_level_reproduction_requires": "a separately authorized future retrieval"
+  }
+}
