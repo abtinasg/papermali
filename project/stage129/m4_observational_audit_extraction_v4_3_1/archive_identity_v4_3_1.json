@@ -1,0 +1,33 @@
+{
+  "archive_filename_logical": "اکسل های صورت مالی کل زیپ ۱۳۹۲-۱۴۰۲.zip",
+  "archive_location": "LOCAL_SOURCE_ARCHIVE_NOT_REPOSITORY_RETAINED",
+  "auditor_block_detection": {
+    "DETECTED": 792,
+    "NOT_DETECTED": 836
+  },
+  "byte_for_byte_reproducibility_without_the_archive": false,
+  "byte_size": 34909380,
+  "excluded_entries": "__MACOSX/ and AppleDouble ._* resource forks are skipped, as in V4.3; they carry no financial content.",
+  "extension_counts": {
+    ".xlsx": 1628
+  },
+  "hash_scope": "observed_external_local_source_not_repository_retained",
+  "mtime_utc": "2026-08-12T12:45:51.333217+00:00",
+  "nested_zip_count": 128,
+  "note": "Source archive was never modified, renamed, moved or extracted in place; all reads were in-memory and read-only.",
+  "outer_zip_integrity": "OK_unzip_-t_no_errors",
+  "payload_file_count": 1628,
+  "payload_fingerprints_committed_in": "archive_file_inventory.csv",
+  "payload_type_counts": {
+    "HTML_MISLABELED_XLSX": 836,
+    "OLE2_LEGACY_EXCEL": 792
+  },
+  "payload_verdict_counts": {
+    "PAYLOAD_NON_SUBSTANTIVE": 29,
+    "PAYLOAD_SUBSTANTIVE": 1599
+  },
+  "raw_archive_retained_in_repository": false,
+  "raw_payloads_retained_in_repository": 0,
+  "reproducibility_note": "The source archive is NOT in repository custody. Re-running the scripts in this package reproduces every committed artefact ONLY when the same archive, matching the recorded SHA-256, is supplied locally. Without it, this package is verifiable but not re-derivable, and no byte-for-byte claim about the raw source is made.",
+  "sha256": "f33ee950ffdd7042f6fe60f411e2d81b8cbe38b51ec84d30c2e224de1a1c6bb2"
+}

@@ -1,0 +1,75 @@
+{
+  "counts": {
+    "canonical_rows": 1331,
+    "field_level_missing": 2214,
+    "nested_zip": 128,
+    "opinion_distribution": {
+      "UNVERIFIED": 887,
+      "مشروط": 224,
+      "مقبول": 220
+    },
+    "payload_types": {
+      "HTML_MISLABELED_XLSX": 836,
+      "OLE2_LEGACY_EXCEL": 792
+    },
+    "payloads": 1628,
+    "rows_with_fiscal_year_end": 889,
+    "rows_with_verified_opinion": 444,
+    "rows_with_verified_report_date": 446
+  },
+  "decision": "V4_3_1_CORRECTION_PASS_OBSERVATIONAL_EXTRACTION_READY_FOR_SUPERVISORY_AUDIT",
+  "execution_order": [
+    "1. s1_scan_extract.py  — scan 1628 payloads, detect auditor block, extract fields",
+    "2. s2_match_outputs.py — correction gate, canonical matching, all CSV outputs",
+    "3. s3_qa.py            — 46 semantic QA checks",
+    "4. tests/test_extraction_semantics.py — independent negative-control tests",
+    "5. s5_docs.py          — identity files + README generated from the artefacts",
+    "6. s6_package.py       — manifest, SHA256SUMS, verify, zip"
+  ],
+  "generated_utc": "2026-08-12T18:59:00.617137+00:00",
+  "independent_tests_passed": true,
+  "inputs": {
+    "access_note": "Both inputs were opened read-only and in memory during the local extraction run. Neither is copied into the repository; the archive is external to repository custody.",
+    "archive_hash_scope": "observed_external_local_source_not_repository_retained",
+    "archive_path": "LOCAL_SOURCE_ARCHIVE_NOT_REPOSITORY_RETAINED",
+    "archive_sha256": "f33ee950ffdd7042f6fe60f411e2d81b8cbe38b51ec84d30c2e224de1a1c6bb2",
+    "canonical_hash_scope": "committed_repository_artifact",
+    "canonical_path": "project/stage124/gate_b_final/modeling_all_rows_stage124_gate_b.csv",
+    "canonical_sha256": "f6b6bc41cbe757d19d4397ffc5898629d0fca8ab0480351f75040a71d7ce7376"
+  },
+  "mission": "Local financial-statement archive audit & auditor-field extraction (correction run)",
+  "prohibitions_observed": {
+    "audit_lag_days_computed": false,
+    "canonical_overwritten": false,
+    "final_test_accessed": false,
+    "git_commit_push_branch_pr_merge": false,
+    "github_modified": false,
+    "going_concern_derived_from_text": false,
+    "m4_data_gate_executed_or_opened": false,
+    "missing_data_imputed": false,
+    "modeling_executed": false,
+    "source_archive_copied_into_package": false,
+    "source_archive_modified": false,
+    "taxonomy_invented_or_inferred_from_frequency": false
+  },
+  "qa_checks_failed": [],
+  "qa_checks_total": 46,
+  "qa_passed": true,
+  "rule_changes_vs_v4_3": [
+    "Correction selection now requires a proven-substantive payload; an invalid or non-substantive correction never displaces a healthy original.",
+    "Opinion, heading and report date must all lie inside ONE detected auditor-report block on ONE sheet, whose start/end rows are recorded.",
+    "The opinion PARAGRAPH decides the category; the heading only corroborates. \"مبانی X\" basis labels are never treated as the opinion.",
+    "مقبول requires the complete fair-presentation formula, no exception clause, and no modified-opinion heading in the same report; contradictions yield UNVERIFIED.",
+    "Report date must sit inside the block, anchored to تاریخ تهیه گزارش, with context and signature evidence recorded.",
+    "Jalali check renamed to all_dates_pass_syntactic_jalali_bounds; no calendar-validity claim, no audit_lag_days.",
+    "Structured field نظر حسابرس is recorded separately from free-text inference."
+  ],
+  "scientific_status": "OBSERVATIONAL_TEXT_EXTRACTION_NOT_YET_ADMITTED_AS_LOCKED_M4_INPUT",
+  "supersedes": {
+    "version": "V4.3",
+    "zip_name": "papermali_m4_local_archive_audit_extraction_20260812T131104Z.zip",
+    "zip_sha256": "a675cd984e30126070526f8f212ed676628013de651366c1a04b67a861dbb7af",
+    "zip_sha256_reverified_this_session": true
+  },
+  "version": "V4.3.1"
+}
