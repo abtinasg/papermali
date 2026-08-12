@@ -1,0 +1,47 @@
+PILOT EVIDENCE — papermali V4.3.1
+CASE              : correction_valid
+ROW_KEY           : بکاب|1397
+==============================================================================
+SOURCE            : بكاب.zip!بكاب_۱۳۹۷_۰۶_۳۱_separate_ن-۱۰_صورت‌های مالی سال مالی منتهی به ۱۳۹۷_۰۶_۳۱ (حسابرسی شده)(اصلاحیه).xlsx
+SOURCE_SHA256     : e686beecc5ab31d9550cbd60762e9ca72950e24b00ed04775d26bc8f62922a7d
+PAYLOAD_TYPE      : HTML_MISLABELED_XLSX   BYTES: 116728   CELLS: 495
+PAYLOAD_VERDICT   : PAYLOAD_SUBSTANTIVE 
+AUDITOR_BLOCK     : NOT_DETECTED (no auditor report in this payload)
+OPINION           : UNVERIFIED   kind=-
+OPINION_REJECT    : NO_AUDITOR_BLOCK_DETECTED
+OPINION_HEADING   :   ''
+OPINION_PARAGRAPH : 
+REPORT_DATE       : NOT_FOUND @ -
+REPORT_DATE_NOTE  : NO_AUDITOR_BLOCK_DETECTED
+FISCAL_YEAR_END   : 1397/06/31 @ HTML_TABLE_1!R1C2
+
+--- FULL OPINION PARAGRAPH (verbatim, untruncated) ---
+(none)
+
+--- AUDITOR REPORT BLOCK, VERBATIM ---
+(no auditor block; first 25 content cells of the payload follow)
+HTML_TABLE_1!R1C1 | شرح
+HTML_TABLE_1!R1C2 | پایان عملکرد واقعی منتهی به 1397/06/31
+HTML_TABLE_1!R1C3 | پایان سال مالی قبل 1396/06/31
+HTML_TABLE_1!R1C4 | درصد تغییرات
+HTML_TABLE_1!R1C5 | شرح
+HTML_TABLE_1!R1C6 | پایان عملکرد واقعی منتهی به 1397/06/31
+HTML_TABLE_1!R1C7 | پایان سال مالی قبل 1396/06/31
+HTML_TABLE_1!R1C8 | درصد تغییرات
+HTML_TABLE_1!R2C1 | دارایی ها
+HTML_TABLE_1!R2C5 | بدهی ها و حقوق صاحبان سهام
+HTML_TABLE_1!R3C1 | دارایی های جاری
+HTML_TABLE_1!R3C5 | بدهی های جاری
+HTML_TABLE_1!R4C1 | موجودی نقد
+HTML_TABLE_1!R4C2 | 939
+HTML_TABLE_1!R4C3 | 640
+HTML_TABLE_1!R4C4 | 47
+HTML_TABLE_1!R4C5 | پرداختنی های تجاری
+HTML_TABLE_1!R4C6 | 16,527
+HTML_TABLE_1!R4C7 | 9,935
+HTML_TABLE_1!R4C8 | 66
+HTML_TABLE_1!R5C1 | سرمایه گذاری های کوتاه مدت
+HTML_TABLE_1!R5C2 | 0
+HTML_TABLE_1!R5C3 | 0
+HTML_TABLE_1!R5C4 | --
+HTML_TABLE_1!R5C5 | پرداختنی های غیرتجاری

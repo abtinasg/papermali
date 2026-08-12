@@ -1,0 +1,35 @@
+PILOT EVIDENCE — papermali V4.3.1
+CASE              : named_case_original
+ROW_KEY           : سآبیک|1392
+==============================================================================
+SOURCE            : سآبيك.zip!سآبيك_۱۳۹۲_۱۲_۲۹_separate_ن-۱۰_صورتهای مالی سال مالی منتهی به ۱۳۹۲_۱۲_۲۹ (حسابرسی شده).xlsx
+SOURCE_SHA256     : d2985360e6577b8d0e77f8c4a7669852c93422164019897fa395d3e16caada9c
+PAYLOAD_TYPE      : OLE2_LEGACY_EXCEL   BYTES: 60416   CELLS: 622
+PAYLOAD_VERDICT   : PAYLOAD_SUBSTANTIVE 
+AUDITOR_BLOCK     : sheet=Sheet1 rows 9..26  (title @ Sheet1!R9C19)
+OPINION           : UNVERIFIED   kind=-
+OPINION_REJECT    : NO_DECISIVE_OPINION_PARAGRAPH_IN_BLOCK;REFERRAL_TO_ATTACHMENT
+OPINION_HEADING   : Sheet1!R20C14  'اظهار نظر مشروط'
+OPINION_PARAGRAPH : 
+REPORT_DATE       : 1393/04/07 @ Sheet1!R23C23
+REPORT_DATE_NOTE  : ACCEPTED_NO_SIGNATURE_MARKER_NEARBY
+FISCAL_YEAR_END   : 1392/12/29 @ Sheet1!R6C4
+
+--- FULL OPINION PARAGRAPH (verbatim, untruncated) ---
+(none)
+
+--- AUDITOR REPORT BLOCK, VERBATIM ---
+Sheet1!R9C19 | گزارش حسابرس مستقل
+Sheet1!R11C17 | سیمان آبیک
+Sheet1!R12C19 | به مجمع عمومی صاحبان سهام
+Sheet1!R13C14 | گزارش نسبت به صورت های مالی
+Sheet1!R14C14 | بند مقدمه
+Sheet1!R15C2 | 1. گزارش حسابرس و بازرس قانونی به پیوست ایفاد می گردد.
+Sheet1!R16C14 | بند مسئولیت هیئت مدیره در قبال صورتهای مالی
+Sheet1!R17C2 | 2. گزارش حسابرس و بازرس قانونی به پیوست ایفاد می گردد.
+Sheet1!R18C14 | بند مسئولیت حسابرس
+Sheet1!R19C2 | 3. گزارش حسابرس و بازرس قانونی به پیوست ایفاد می گردد.
+Sheet1!R20C14 | اظهار نظر مشروط
+Sheet1!R21C2 | 6. گزارش حسابرس و بازرس قانونی به پیوست ایفاد می گردد.
+Sheet1!R23C23 | 07تیر1393
+Sheet1!R23C24 | تاریخ تهیه گزارش

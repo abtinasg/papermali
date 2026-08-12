@@ -1,0 +1,217 @@
+{
+  "action_id": "stage129-m4-observational-audit-extraction-v4-3-1-custody",
+  "committed_repository_input_fingerprints": {
+    "canonical_population": {
+      "hash_scope": "committed_repository_artifact",
+      "path": "project/stage124/gate_b_final/modeling_all_rows_stage124_gate_b.csv",
+      "sha256": "f6b6bc41cbe757d19d4397ffc5898629d0fca8ab0480351f75040a71d7ce7376"
+    }
+  },
+  "credentials_committed_to_git": false,
+  "external_source_fingerprints": {
+    "source_archive": {
+      "bytes": 34909380,
+      "hash_scope": "observed_external_local_source_not_repository_retained",
+      "location": "LOCAL_SOURCE_ARCHIVE_NOT_REPOSITORY_RETAINED",
+      "sha256": "f33ee950ffdd7042f6fe60f411e2d81b8cbe38b51ec84d30c2e224de1a1c6bb2"
+    }
+  },
+  "m4_value_files_committed": 0,
+  "package_file_count": 47,
+  "package_files": {
+    "README_STAGE129_M4_OBSERVATIONAL_AUDIT_EXTRACTION_V4_3_1.md": {
+      "bytes": 11675,
+      "sha256": "d3092a708686043d7264162cd726c8c9a37f6238292dc51737ac058ca3e0782a"
+    },
+    "archive_file_inventory.csv": {
+      "bytes": 1200619,
+      "sha256": "1caaef02cbdaedbfe3fa6d4e5a6fb156da4426f96d390f232465f3dc5b638855"
+    },
+    "archive_identity_v4_3_1.json": {
+      "bytes": 1661,
+      "sha256": "e5952d33e4f1168f34618aa463b44f4e9dbc71dd64d0cdd78f30cdcf52a83773"
+    },
+    "audit_field_evidence_v4_3_1.csv": {
+      "bytes": 809031,
+      "sha256": "a85bad80a2cb255edf433a0530d80a4513705b47b48e920580297cc4c2f4509e"
+    },
+    "audit_fields_extracted_v4_3_1.csv": {
+      "bytes": 630404,
+      "sha256": "7fd40499c8a5cae7f54c80d5263be3598659a7a787403d7c121ab5478c51a655"
+    },
+    "audit_fields_missing_worklist_v4_3_1.csv": {
+      "bytes": 574958,
+      "sha256": "e4440f470f03b5eaf9276a4a753de1e6d274e32ca5f6895dc845152f2ad4c435"
+    },
+    "auditor_block_detection_audit_v4_3_1.csv": {
+      "bytes": 257927,
+      "sha256": "0bc3f109adda5235cbe02b12d84499feb8d383aef28e2a9becabe3f471384951"
+    },
+    "canonical_1331_coverage.csv": {
+      "bytes": 312323,
+      "sha256": "e67c913306d024b860de5607c5ac4af5e9c527b05c4389b40b023c73ae98a43a"
+    },
+    "canonical_source_identity_v4_3_1.json": {
+      "bytes": 883,
+      "sha256": "9c9894ae69d969fe5904a9467b1c024035b88eaee0d6e7989db8a76b5bfc1130"
+    },
+    "correction_selection_audit_v4_3_1.csv": {
+      "bytes": 66561,
+      "sha256": "8a65df10888361f2ddd99e5f3d556bcc051dd16c351d5bfe64d952e67228b8af"
+    },
+    "corrupt_and_error_files.csv": {
+      "bytes": 9300,
+      "sha256": "7f37bdc9b7648476a979daf61be395a6254e61ad76c4b934ded7f7b3fac7e2d1"
+    },
+    "date_without_verified_opinion_review_v4_3_1.csv": {
+      "bytes": 12149,
+      "sha256": "0da021a892e0c408766f8a66ca47b8cca6b5244b257663a882d3fb750b136ef7"
+    },
+    "pilot_evidence/01_html_no_auditor_report_اپال__1396.txt": {
+      "bytes": 2156,
+      "sha256": "812459a561e26e8052554dc722d898c0f24a91f7d27f76bb9134dc673a7cfdb5"
+    },
+    "pilot_evidence/02_html_no_auditor_report_اپال__1397.txt": {
+      "bytes": 2162,
+      "sha256": "db69d74819856e4db298db7ab992c50b30a9449a3c2f95580b1c1d0de6472c22"
+    },
+    "pilot_evidence/03_html_no_auditor_report_اپال__1398.txt": {
+      "bytes": 2163,
+      "sha256": "abb941fe0c96a155071a16684f2def2908b7c8aabfc56c0b7d208308d43e3d30"
+    },
+    "pilot_evidence/04_qualified_بالبر__1393.txt": {
+      "bytes": 22482,
+      "sha256": "cc1f31d137689a6ce3429247f321ba889738c857085811317817e0e853048ba8"
+    },
+    "pilot_evidence/05_qualified_بالبر__1394.txt": {
+      "bytes": 20953,
+      "sha256": "f5ba2b924f4370d72e5d92b682c036ba37a70de50a30d23520341750a5739a19"
+    },
+    "pilot_evidence/06_qualified_بالبر__1395.txt": {
+      "bytes": 20816,
+      "sha256": "5493853a54106661c60f21c5a62f7d21bc21ac4160235c696839373eb67626e8"
+    },
+    "pilot_evidence/07_qualified_بالبر__1396.txt": {
+      "bytes": 18782,
+      "sha256": "3108882edaada5dde0e208a4992e25b76242d0479cf1d270330f1dcdba7e1c3d"
+    },
+    "pilot_evidence/08_correction_valid_بالبر__1399.txt": {
+      "bytes": 2167,
+      "sha256": "6b9bc7972741665768c9f7025c8126aa947ed2cd2286f1ccc20987737f61cc52"
+    },
+    "pilot_evidence/09_unqualified_بترانس__1393.txt": {
+      "bytes": 19966,
+      "sha256": "e944614e81cca2c1e58447717125033d5026eda4d7ef6df0730abfa84841e113"
+    },
+    "pilot_evidence/10_unqualified_برکت__1394.txt": {
+      "bytes": 9194,
+      "sha256": "2fda2563e33022aaa0116f3118302944a1b773e29b38a2f8759fe8a70cc1c8bf"
+    },
+    "pilot_evidence/11_unqualified_برکت__1395.txt": {
+      "bytes": 9758,
+      "sha256": "b67b6f4d6cc0ac53f384ced848a35ba49ac7836f145b44241464d14c94fb6441"
+    },
+    "pilot_evidence/12_unqualified_برکت__1396.txt": {
+      "bytes": 12621,
+      "sha256": "351c7bfa0ab4621af8868eb2f4bdbfe10e061c4f478f89465d80b76cdc90fe87"
+    },
+    "pilot_evidence/13_disclaimer_in_archive_outside_canonical_بکاب__1392.txt": {
+      "bytes": 19173,
+      "sha256": "20ea94813baeefa677dd508ee38e096531aedd8af0bd532e38640ec51cb3b65d"
+    },
+    "pilot_evidence/14_correction_valid_بکاب__1397.txt": {
+      "bytes": 2158,
+      "sha256": "27f81776f5017e7b2fc77aeb2608982862d47e5a3abdc630d0f130e98afd394f"
+    },
+    "pilot_evidence/15_named_case_original_خوساز__1396.txt": {
+      "bytes": 13708,
+      "sha256": "1420755e899eb8140c510d2616df362a7a054562095357ef61220593d605ad0d"
+    },
+    "pilot_evidence/16_named_case_original_سآبیک__1392.txt": {
+      "bytes": 2062,
+      "sha256": "6cdac7cc4d052123a16fc03cf93c012e1261dc483127abd5cebd75880d164739"
+    },
+    "pilot_evidence/17_named_case_original_سخوز__1392.txt": {
+      "bytes": 13828,
+      "sha256": "22775094fd587010619707835d87d07604a9d6a563332ae4efe599eb2f3c3f60"
+    },
+    "pilot_evidence/18_named_case_correction_سخوز__1392.txt": {
+      "bytes": 2064,
+      "sha256": "96cce6de802f516c4750c3fd3cc3aed6e34447ff703a91b575a974f24904dd73"
+    },
+    "pilot_evidence/19_named_case_original_سقاین__1393.txt": {
+      "bytes": 11209,
+      "sha256": "2cb1550034a4dbcbb6fdd1920265c842d3a8240f6f22fcdfe9dce691fc82741a"
+    },
+    "pilot_evidence/20_named_case_correction_سقاین__1393.txt": {
+      "bytes": 11647,
+      "sha256": "aa2984c7a12f0b4caded510ec87696c3e6b1ef430ed912a67417217df2273916"
+    },
+    "pilot_evidence/21_named_case_original_فنورد__1400.txt": {
+      "bytes": 2161,
+      "sha256": "238d9fabe21dcaefd5b5690a9b0fcbbb1d0e96d741bd70ad7907689ef98bed56"
+    },
+    "pilot_evidence/22_named_case_correction_فنورد__1400.txt": {
+      "bytes": 1488,
+      "sha256": "4020ce2597cf0498a6ffcac2121565c99bde5d9863364dc30a556b2970e2b935"
+    },
+    "pilot_evidence/INDEX.csv": {
+      "bytes": 7656,
+      "sha256": "039bf21f855d198807f139c127ee50a6030d8b962d91c613a10cf3612d71958d"
+    },
+    "qa_report_v4_3_1.json": {
+      "bytes": 3741,
+      "sha256": "0ff50b9770e03f45d6903a41590654740c75e90a6af4279a813793bfb647672f"
+    },
+    "scope_and_correction_exceptions.csv": {
+      "bytes": 76836,
+      "sha256": "bdb27e7a9366d636a3b19212ec7fd9223ceddfa2a40c90c71a2a0785ed05ecf4"
+    },
+    "scripts/lib_extract.py": {
+      "bytes": 19977,
+      "sha256": "1610864eaf84603f6e3401547a991c231bb13f4a4705d1634d101304adafa819"
+    },
+    "scripts/s1_scan_extract.py": {
+      "bytes": 8010,
+      "sha256": "db5387bb6e2130e31ef5ed5d4177b7e3ef4a2cc2f6685a9e6931dbea4add7333"
+    },
+    "scripts/s2_match_outputs.py": {
+      "bytes": 22244,
+      "sha256": "7cd69330b08d499003f5e5182cf27fdff95978f745cc1369669431c2363a5f28"
+    },
+    "scripts/s3_qa.py": {
+      "bytes": 12492,
+      "sha256": "3c3cb378eaab15b97f62cc1ca11436920407fbcac51701625a6abaec138f062e"
+    },
+    "scripts/s4_pilot_evidence.py": {
+      "bytes": 8129,
+      "sha256": "f13bbbe22458a1202c53e4df0fde539d8259d7a867ab242aeebbf89e50f95521"
+    },
+    "scripts/s5_docs.py": {
+      "bytes": 21604,
+      "sha256": "f1aaf98ecd46fd51c6e67e47c722235d18ac1a66990b4bf5fb5438525ab58619"
+    },
+    "scripts/s6_package.py": {
+      "bytes": 8151,
+      "sha256": "fcee7782e47e93de78f18e81c0495874f6e37386f6e768fc4245784e173d5705"
+    },
+    "session_manifest_v4_3_1.json": {
+      "bytes": 3893,
+      "sha256": "e14ab7898e42aabb261cece3cc92e22626717b3b3208e8019f6bfa773bbbcf48"
+    },
+    "stage129_m4_observational_extraction_governance_boundary.json": {
+      "bytes": 1824,
+      "sha256": "3b75e467037099f389348d04c01151b84d8806cf70e0dac161932073b8be4edd"
+    },
+    "tests/test_extraction_semantics.py": {
+      "bytes": 11564,
+      "sha256": "37c8f2ef38b1896114d5cb7c9906b7d776574d12314f05b90eeba0ff134d5a7c"
+    }
+  },
+  "package_status": "OBSERVATIONAL_TEXT_EXTRACTION_NOT_YET_ADMITTED_AS_LOCKED_M4_INPUT",
+  "pii_committed_to_git": false,
+  "qa_checks_total": 46,
+  "qa_passed": true,
+  "raw_archive_committed": false,
+  "raw_payload_files_committed": 0
+}

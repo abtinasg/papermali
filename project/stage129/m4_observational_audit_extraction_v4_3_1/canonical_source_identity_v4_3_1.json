@@ -1,0 +1,32 @@
+{
+  "fiscal_years": [
+    1392,
+    1393,
+    1394,
+    1395,
+    1396,
+    1397,
+    1398,
+    1399,
+    1400,
+    1401,
+    1402
+  ],
+  "hash_scope": "committed_repository_artifact",
+  "key_unique": true,
+  "modified_by_this_mission": false,
+  "note": "Opened read-only. This mission neither rewrote nor re-derived the canonical population.",
+  "primary_key": "ticker|fiscal_year",
+  "read_only_in_this_action": true,
+  "repo_commit": "2c990820e61dc9611ff6586424c6302b5132346a",
+  "repo_commit_date": "2026-08-10T18:08:48+02:00",
+  "repo_dirty_paths": [
+    "?? .claude/"
+  ],
+  "rows": 1331,
+  "selected_canonical_repository_path": "project/stage124/gate_b_final/modeling_all_rows_stage124_gate_b.csv",
+  "selected_sha256": "f6b6bc41cbe757d19d4397ffc5898629d0fca8ab0480351f75040a71d7ce7376",
+  "sha256_matches_v4_3_record": true,
+  "tickers": 130,
+  "unchanged_since_v4_3": true
+}

@@ -1,0 +1,47 @@
+PILOT EVIDENCE — papermali V4.3.1
+CASE              : correction_valid
+ROW_KEY           : بالبر|1399
+==============================================================================
+SOURCE            : بالبر.zip!بالبر_۱۳۹۹_۰۶_۳۱_separate_ن-۱۰_صورت‌های مالی سال مالی منتهی به ۱۳۹۹_۰۶_۳۱ (حسابرسی شده)(اصلاحیه).xlsx
+SOURCE_SHA256     : 0d891ebda4bfca1b51ab8541fb04ed12bad842286b5b21c2cda7a5f5646e2edf
+PAYLOAD_TYPE      : HTML_MISLABELED_XLSX   BYTES: 306602   CELLS: 1416
+PAYLOAD_VERDICT   : PAYLOAD_SUBSTANTIVE 
+AUDITOR_BLOCK     : NOT_DETECTED (no auditor report in this payload)
+OPINION           : UNVERIFIED   kind=-
+OPINION_REJECT    : NO_AUDITOR_BLOCK_DETECTED
+OPINION_HEADING   :   ''
+OPINION_PARAGRAPH : 
+REPORT_DATE       : NOT_FOUND @ -
+REPORT_DATE_NOTE  : NO_AUDITOR_BLOCK_DETECTED
+FISCAL_YEAR_END   : 1399/06/31 @ HTML_TABLE_1!R1C2
+
+--- FULL OPINION PARAGRAPH (verbatim, untruncated) ---
+(none)
+
+--- AUDITOR REPORT BLOCK, VERBATIM ---
+(no auditor block; first 25 content cells of the payload follow)
+HTML_TABLE_1!R1C1 | شرح
+HTML_TABLE_1!R1C2 | دوره منتهی به 1399/06/31 جهت ارائه به حسابرس
+HTML_TABLE_1!R1C3 | تجدید ارائه شده دوره منتهی به 1398/06/31
+HTML_TABLE_1!R1C4 | درصد تغییر
+HTML_TABLE_1!R2C1 | حسابرسی شده
+HTML_TABLE_1!R3C1 | عملیات در حال تداوم:
+HTML_TABLE_1!R4C1 | درآمدهای عملیاتی
+HTML_TABLE_1!R4C2 | 2,789,153
+HTML_TABLE_1!R4C3 | 2,224,185
+HTML_TABLE_1!R4C4 | 25
+HTML_TABLE_1!R5C1 | بهاى تمام شده درآمدهای عملیاتی
+HTML_TABLE_1!R5C2 | (2,568,834)
+HTML_TABLE_1!R5C3 | (1,988,479)
+HTML_TABLE_1!R5C4 | (29)
+HTML_TABLE_1!R6C1 | سود (زیان) ناخالص
+HTML_TABLE_1!R6C2 | 220,319
+HTML_TABLE_1!R6C3 | 235,706
+HTML_TABLE_1!R6C4 | (7)
+HTML_TABLE_1!R7C1 | هزینه هاى فروش، ادارى و عمومى
+HTML_TABLE_1!R7C2 | (93,903)
+HTML_TABLE_1!R7C3 | (70,040)
+HTML_TABLE_1!R7C4 | (34)
+HTML_TABLE_1!R8C1 | هزینه کاهش ارزش دریافتنی ها (هزینه استثنایی)
+HTML_TABLE_1!R8C2 | 0
+HTML_TABLE_1!R8C3 | 0

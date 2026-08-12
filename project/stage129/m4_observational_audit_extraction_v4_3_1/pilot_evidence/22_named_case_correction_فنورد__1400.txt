@@ -1,0 +1,23 @@
+PILOT EVIDENCE — papermali V4.3.1
+CASE              : named_case_correction
+ROW_KEY           : فنورد|1400
+==============================================================================
+SOURCE            : فنورد.zip!فنورد_۱۴۰۰_۱۲_۲۹_separate_ن-۱۰_صورت‌های مالی سال مالی منتهی به ۱۴۰۰_۱۲_۲۹ (حسابرسی شده)(اصلاحیه).xlsx
+SOURCE_SHA256     : 64c184b37ee4767f97ee207cd261c0c9d0dc17e2486ca4ef4c860c40e679b478
+PAYLOAD_TYPE      : HTML_MISLABELED_XLSX   BYTES: 2908   CELLS: 1
+PAYLOAD_VERDICT   : PAYLOAD_NON_SUBSTANTIVE SUSPICIOUS_SMALL_PAYLOAD:2908_bytes
+AUDITOR_BLOCK     : NOT_DETECTED (no auditor report in this payload)
+OPINION           : UNVERIFIED   kind=-
+OPINION_REJECT    : NO_AUDITOR_BLOCK_DETECTED
+OPINION_HEADING   :   ''
+OPINION_PARAGRAPH : 
+REPORT_DATE       : NOT_FOUND @ -
+REPORT_DATE_NOTE  : NO_AUDITOR_BLOCK_DETECTED
+FISCAL_YEAR_END   : NOT_FOUND @ -
+
+--- FULL OPINION PARAGRAPH (verbatim, untruncated) ---
+(none)
+
+--- AUDITOR REPORT BLOCK, VERBATIM ---
+(no auditor block; first 25 content cells of the payload follow)
+HTML_BODY!R1C1 | صورت سود و زیان صورت سود و زیان جامع صورت وضعیت مالی صورت تغییرات در حقوق مالکانه صورت جریان های نقدی خلاصه اطلاعات گزارش تفسیری - صفحه 1 خلاصه اطلاعات گزارش تفسیری - صفحه 2 خلاصه اطلاعات گزارش تفسیری
