@@ -4690,9 +4690,15 @@ def test_stage129_m4_is_recognized_by_the_full_handoff_build():
     assert record["m4_block_admitted"] is False
     assert record["m4_modeling_started"] is False
     assert record["m4_incremental_evaluation_authorized"] is False
-    assert record["stage129_m4_next_action_id"] == (
+    # History is immutable: the lock published its own pointer at lock time.
+    assert record["stage129_m4_contract_lock_pointer_at_lock_time"] == (
         "stage129-m4-governance-data-gate")
+    # The LIVE M4 pointer, however, was superseded by the human decision to
+    # discontinue M4 -- a discontinued block may not keep pointing at its own
+    # Gate. See test_stage129_m4_human_discontinuation_data_inadequacy.py.
+    assert record["stage129_m4_next_action_id"] == "human_decision_required"
     assert record["stage129_m4_next_action_authorized"] is False
+    # Neither live research pointer chain is moved by either Stage129 action.
     assert record["next_research_action_id"] == "human-decision-required"
     assert record["stage128_m3_lag_wdi_next_action_id"] == (
         "human_decision_required")
