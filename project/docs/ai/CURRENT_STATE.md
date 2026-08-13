@@ -12,8 +12,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
 - **Last stage commit:** `9861e91983486ec450a2372fd01741e073cbfdaf`
-- **Generated from commit:** `9861e91983486ec450a2372fd01741e073cbfdaf` (branch `stage129-m3-cbi-human-discontinuation-and-reporting`, informational)
-- **Baseline:** `origin/main` @ `e2d3597ed77dd2ff32cfa7c02c84e51579e7fffa`
+- **Generated from commit:** `22289f5b86c7abe9ecf3496981c5199eea720364` (branch `stage129-final-development-model-eligibility-audit`, informational)
+- **Baseline:** `origin/main` @ `22289f5b86c7abe9ecf3496981c5199eea720364`
 
 ## Current-state validation
 
@@ -309,6 +309,22 @@ _A human scientific decision plus its reporting consequence. Governance only: ze
 - ➡️ **Next action:** `human_decision_required` — scope `m3_cbi_discontinued_no_further_m3_cbi_action_is_authorized`, authorized = False, executes M3-CBI = False. A pointer is never an authorization.
 - Package: `project/stage129/m3_cbi_human_discontinuation_and_reporting/`; interpretation: `project/stage129/m3_cbi_human_discontinuation_and_reporting/README_STAGE129_M3_CBI_HUMAN_DISCONTINUATION_AND_REPORTING.md`
 
+### Stage129 — final development model eligibility audit (READ-ONLY)
+
+_Reads committed artifacts and answers one question: do the frozen rules determine the final block and algorithm uniquely? It selects nothing. Zero fits, zero predictions, zero new metric/CI/p-value, zero row-level scientific data reads, zero Final Test access._
+
+- ⚖️ **Block verdict:** `FINAL_BLOCK_REQUIRES_HUMAN_DECISION` — determined candidate `None`.
+- ⚖️ **Algorithm verdict:** `FINAL_ALGORITHM_REQUIRES_HUMAN_DECISION` — determined candidate `None`.
+- ⚖️ **Holm reporting verdict:** `HOLM_FINAL_REPORTING_REQUIRES_SEPARATE_HUMAN_OR_METHODS_DECISION`.
+- 📊 **Candidate matrix:** 6 candidates over blocks `['M1', 'M2']` × algorithms `['regularized_logistic_regression', 'random_forest', 'xgboost']`; eligible = 6. Eligibility is not selection = True.
+- 🔀 **Robustness ordering:** stable across all robustness = False; parts reversing the primary ordering = [1], parts preserving it = [2, 3, 4, 5, 6]. Used to exclude a candidate = False.
+- ⛔ **M2 retained ≠ M2 selected:** retention treated as final selection = False, M2 predictive superiority claim supported = False.
+- ⛔ **Holm ledger reconciled, not executed:** family `['M2_minus_M1', 'M3_CBI_minus_M2', 'M4_minus_M3_CBI']`, complete = False, adjustment executed = False, new p-values = 0.
+- ⛔ **Nothing is selected or opened:** paper winner = False, final model = False, full-development refit = False, Stage130 started = False.
+- ⛔ **Final Test firewall untouched:** locked True, rows read 0.
+- ➡️ **Next action:** `human_decision_required` — authorized = False. An audit verdict is never an authorization.
+- Package: `project/stage129/final_development_model_eligibility_audit/`; interpretation: `project/stage129/final_development_model_eligibility_audit/README_STAGE129_FINAL_DEVELOPMENT_MODEL_ELIGIBILITY_AUDIT.md`
+
 ### Last completed scientific micro-part QC
 
 _Scientific QC of the newest completed robustness micro-part — a DIFFERENT role from current-state validation above._
@@ -358,5 +374,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `f046fcb88e69c7a2d03e06c7a3b8744984098611a2e9c44683209479c9b76779`_
-_generated_at_utc: 2026-08-13T13:41:56Z (informational)_
+_state_fingerprint: `b49dc2d02934cb96b7800bd5c238b9b1d9bd976be77990fd8a149878e9e3f8d7`_
+_generated_at_utc: 2026-08-13T20:04:06Z (informational)_
