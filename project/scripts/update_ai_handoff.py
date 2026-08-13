@@ -2998,6 +2998,13 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # selects nothing, executes nothing, and moves no pointer; it only
         # publishes its verdicts and the eligible-candidate matrix.
         **derive_stage129_final_model_eligibility_audit_markers(root),
+        # Must come last of all: the human governance decision the audit above
+        # called for. It supersedes the audit's `human_decision_required`
+        # pointer and nothing else -- the audit's findings stay history. It
+        # names the block and the algorithm family, and NOTHING is fitted:
+        # the configuration was pre-locked, no refit runs, no trained artifact
+        # is produced and the Final Test stays locked.
+        **derive_stage129_final_model_human_selection_markers(root),
         }))
 
 
@@ -4436,11 +4443,16 @@ def render_current_state(record: dict) -> str:
             "point-estimate signs disagree across model families). Retention "
             "implies no predictive improvement and no statistical "
             "significance.",
-            "- ⛔ **No winner, no final model:** paper_winner_selected="
-            f"{record.get('paper_winner_selected')}, final_model_selected="
-            f"{record.get('final_model_selected')}, "
-            "full_development_refit_performed="
-            f"{record.get('full_development_refit_performed')}",
+            "- ⛔ **This decision selected no winner and no final model:** "
+            "paper_winner_selected_by_this_decision="
+            f"{record.get('stage128_m2_retained_block_decision_selected_paper_winner')}"
+            ", final_model_selected_by_this_decision="
+            f"{record.get('stage128_m2_retained_block_decision_selected_final_model')}"
+            ", full_development_refit_performed_by_this_decision="
+            f"{record.get('stage128_m2_retained_block_decision_performed_refit')}"
+            " — action-scoped and permanently false. Any later winner "
+            "selection belongs to its own separately authorized decision, "
+            "never to this one.",
             "- ⛔ **Holm family:** complete="
             f"{record.get('holm_family_complete')}, final adjustment "
             f"deferred={record.get('holm_final_adjustment_deferred')} — "
@@ -6005,6 +6017,89 @@ def render_current_state(record: dict) -> str:
             "final_development_model_eligibility_audit/`; interpretation: "
             "`project/stage129/final_development_model_eligibility_audit/"
             "README_STAGE129_FINAL_DEVELOPMENT_MODEL_ELIGIBILITY_AUDIT.md`",
+            "",
+        ]
+    if record.get("stage129_final_selection_recorded"):
+        lines += [
+            "### Stage129 — FINAL MODEL SELECTED by human governance decision\n",
+            "_A governance act, not an inference and not an execution. The "
+            "block and the algorithm family are named; the configuration was "
+            "already locked; nothing is fitted, no trained artifact exists and "
+            "the Final Test stays locked._\n",
+            "- ✅ **Final development block:** "
+            f"`{record.get('final_development_block')}` — selected = "
+            f"{record.get('final_development_block_selected')}.",
+            "- ✅ **Final algorithm:** "
+            f"`{record.get('final_algorithm')}` — selected = "
+            f"{record.get('final_algorithm_selected')}, configuration "
+            f"`{record.get('final_configuration')}`.",
+            "- ⚖️ **Basis:** "
+            f"`{record.get('selection_basis')}` — human governance decision = "
+            f"{record.get('selection_is_human_governance_decision')}, paper "
+            f"winner selected = {record.get('paper_winner_selected')}.",
+            "- ❗ **NOT an inferential result:** inferential superiority "
+            f"claimed = {record.get('inferential_superiority_claimed')}, tested "
+            "superiority = "
+            f"{record.get('stage129_final_selection_is_tested_superiority')}, "
+            "Holm result = "
+            f"{record.get('stage129_final_selection_is_holm_result')}, "
+            "statistical proof = "
+            f"{record.get('stage129_final_selection_is_statistical_proof')}, "
+            "used a Holm result = "
+            f"{record.get('stage129_final_selection_used_holm_result')}.",
+            "- 🔒 **Configuration was pre-locked, not chosen here:** pre-locked "
+            "before this decision = "
+            f"{record.get('final_configuration_was_prelocked_before_this_decision')}"
+            ", selected by this decision = "
+            f"{record.get('final_configuration_selected_by_this_decision')}.",
+            "- ⛔ **Selected is not fitted:** full-development refit performed = "
+            f"{record.get('full_development_refit_performed')}, trained "
+            "final-model artifact created = "
+            f"{record.get('trained_final_model_artifact_created')}, Stage130 "
+            f"started = {record.get('stage130_started')}.",
+            "- 📄 **M2 keeps its role:** "
+            f"`{record.get('stage129_final_selection_m2_role_preserved')}` — "
+            "declared statistically failed = "
+            f"{record.get('stage129_final_selection_m2_declared_statistically_failed')}"
+            ", M2 predictive superiority claim supported = "
+            f"{record.get('m2_predictive_superiority_claim_supported')}. Not "
+            "being selected is not a statistical failure.",
+            "- 📄 **Not-selected algorithms keep their standing:** "
+            f"{record.get('stage129_final_selection_non_selected_algorithms')} — "
+            f"status `{record.get('stage129_final_selection_non_selected_status')}`"
+            ", declared rejected = "
+            f"{record.get('stage129_final_selection_non_selected_declared_rejected')}"
+            ", declared statistically inferior = "
+            f"{record.get('stage129_final_selection_non_selected_declared_inferior')}.",
+            "- ⛔ **Holm family preserved, never executed:** status "
+            f"`{record.get('stage129_final_holm_reporting_status')}`, family "
+            f"`{record.get('stage129_final_holm_family')}`, complete = "
+            f"{record.get('stage129_final_holm_family_complete')}, adjustment "
+            f"executed = {record.get('stage129_final_holm_adjustment_executed')}"
+            ", any hypothesis resolved = "
+            f"{record.get('stage129_final_holm_any_hypothesis_resolved')}, new "
+            f"p-values = {record.get('stage129_final_holm_new_p_values')}.",
+            "- 🔁 **Supersedes the pending decision, not the audit findings:** "
+            f"`{record.get('stage129_final_selection_supersedes_block_verdict')}`"
+            " and "
+            f"`{record.get('stage129_final_selection_supersedes_algorithm_verdict')}`"
+            " in "
+            f"`{record.get('stage129_final_selection_supersedes_artifact')}`; "
+            "audit package preserved = "
+            f"{record.get('stage129_final_selection_audit_package_preserved')}.",
+            "- ⛔ **Final Test firewall untouched:** locked "
+            f"{record.get('final_test_locked')}, rows read "
+            f"{record.get('final_test_rows_read')}, access authorized "
+            f"{record.get('final_test_access_authorized')}.",
+            "- ➡️ **Next action:** "
+            f"`{record.get('stage129_final_selection_next_action_id')}` — "
+            "authorized = "
+            f"{record.get('stage129_final_selection_next_action_authorized')}. A "
+            "pointer is never an authorization.",
+            "- Package: `project/stage129/"
+            "final_model_human_selection_governance/`; interpretation: "
+            "`project/stage129/final_model_human_selection_governance/"
+            "README_STAGE129_FINAL_MODEL_HUMAN_SELECTION_GOVERNANCE.md`",
             "",
         ]
     lines += [
@@ -13419,6 +13514,382 @@ def derive_stage129_final_model_eligibility_audit_markers(root: str) -> dict:
     }
 
 
+_STAGE129_SELECT_PKG = "project/stage129/final_model_human_selection_governance"
+_STAGE129_SELECT_ACTION_ID = "stage129-final-model-human-selection-governance"
+_STAGE129_SELECT_DECISION_REL = (
+    f"{_STAGE129_SELECT_PKG}/stage129_final_model_human_selection_decision.json")
+_STAGE129_SELECT_HOLM_REL = (
+    f"{_STAGE129_SELECT_PKG}/stage129_final_holm_family_status.json")
+_STAGE129_SELECT_BOUNDARY_REL = (
+    f"{_STAGE129_SELECT_PKG}/"
+    "stage129_final_model_selection_governance_boundary.json")
+_STAGE129_SELECT_BLOCK = "M1"
+_STAGE129_SELECT_ALGORITHM = "regularized_logistic_regression"
+_STAGE129_SELECT_CONFIGURATION = "logistic__C_0.1"
+#: The ONLY admissible basis. A selection recorded on any other basis would be
+#: claiming something the study never did.
+_STAGE129_SELECT_BASIS = "HUMAN_DECISION_BASED_ON_PRELOCKED_DEVELOPMENT_EVIDENCE"
+_STAGE129_SELECT_HOLM_STATUS = "HOLM_NOT_EXECUTED_FAMILY_PRESERVED_NO_INFERENCE"
+_STAGE129_SELECT_NOT_SELECTED_STATUS = "NOT_SELECTED_BY_HUMAN_DECISION_ONLY"
+_STAGE129_SELECT_M2_ROLE = "intermediate_confirmatory_block"
+#: The two algorithms the decision did NOT select. Neither may be recorded as
+#: rejected, removed or statistically beaten.
+_STAGE129_SELECT_NON_SELECTED = ("random_forest", "xgboost")
+_STAGE129_SELECT_NEXT_ACTION_ID = (
+    "human_authorization_required_for_full_development_refit_and_final_test")
+#: Words that would turn a governance choice into an inferential claim.
+_STAGE129_SELECT_FORBIDDEN_CLAIM_FIELDS = (
+    "inferential_superiority_claimed", "is_tested_superiority",
+    "is_holm_result", "is_statistical_proof",
+)
+
+
+def derive_stage129_final_model_human_selection_markers(root: str) -> dict:
+    """Recognize the human decision naming the final block and algorithm.
+
+    Narrow and fail-closed. This is a GOVERNANCE act and nothing else: it fits
+    no model, refits nothing on full development, writes no trained artifact,
+    computes no metric, CI or p-value, executes no Holm step, reads no
+    row-level scientific data and never touches the Final Test.
+
+    Two safety properties define this function. First, a selection may never be
+    dressed up as an inference -- the basis must be the human-decision basis and
+    every inferential-claim flag must be False. Second, the two algorithms that
+    were not selected, and the M2 block that was not selected, may never be
+    recorded as rejected, removed, statistically inferior or statistically
+    failed; "not selected" is the only permitted characterization.
+
+    Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE129_SELECT_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    decision = _require_json_artifact(root, _STAGE129_SELECT_DECISION_REL)
+    holm = _require_json_artifact(root, _STAGE129_SELECT_HOLM_REL)
+    boundary = _require_json_artifact(root, _STAGE129_SELECT_BOUNDARY_REL)
+
+    if decision.get("decision_id") != _STAGE129_SELECT_ACTION_ID:
+        raise HandoffError("Stage129 final selection decision_id mismatch")
+    for artifact, label in ((holm, "holm"), (boundary, "boundary")):
+        if artifact.get("action_id") != _STAGE129_SELECT_ACTION_ID:
+            raise HandoffError(f"Stage129 final selection {label} action_id mismatch")
+    if decision.get("decision_type") != "human_governance_selection_decision":
+        raise HandoffError(
+            "Stage129 final selection must be a human_governance_selection_decision")
+    if decision.get("authorized_by_human") is not True:
+        raise HandoffError("Stage129 final selection must be human-authorized")
+
+    # (1)(2) The block, the algorithm and the pre-locked configuration.
+    for artifact, label in ((decision, "decision"), (boundary, "boundary")):
+        if artifact.get("final_development_block") != _STAGE129_SELECT_BLOCK:
+            raise HandoffError(
+                f"Stage129 final selection {label} block must be "
+                f"{_STAGE129_SELECT_BLOCK}")
+        if artifact.get("final_algorithm") != _STAGE129_SELECT_ALGORITHM:
+            raise HandoffError(
+                f"Stage129 final selection {label} algorithm must be "
+                f"{_STAGE129_SELECT_ALGORITHM}")
+        if artifact.get("final_configuration") != _STAGE129_SELECT_CONFIGURATION:
+            raise HandoffError(
+                f"Stage129 final selection {label} configuration must be "
+                f"{_STAGE129_SELECT_CONFIGURATION}")
+        for field in ("final_development_block_selected",
+                      "final_algorithm_selected", "paper_winner_selected",
+                      "selection_is_human_governance_decision"):
+            if artifact.get(field) is not True:
+                raise HandoffError(
+                    f"Stage129 final selection {label} {field} must be True")
+    # The configuration was locked BEFORE this decision, and this decision did
+    # not choose it. Both halves matter.
+    for artifact, label in ((decision, "decision"), (boundary, "boundary")):
+        if artifact.get("final_configuration_was_prelocked_before_this_decision") \
+                is not True:
+            raise HandoffError(
+                f"Stage129 final selection {label} must record the configuration "
+                "as pre-locked before this decision")
+        if artifact.get("final_configuration_selected_by_this_decision") is not False:
+            raise HandoffError(
+                f"Stage129 final selection {label} may not claim it chose the "
+                "configuration; the configuration was already locked")
+    # and the named configuration must really be the frozen one on disk
+    freeze_rel = "project/stage126/stage126_m1_retained_design_freeze.json"
+    if os.path.isfile(os.path.join(root, freeze_rel)):
+        freeze = _require_json_artifact(root, freeze_rel)
+        families = freeze.get("retained_model_families") or {}
+        entry = families.get(_STAGE129_SELECT_CONFIGURATION) or {}
+        if entry.get("family") != _STAGE129_SELECT_ALGORITHM:
+            raise HandoffError(
+                "Stage129 final selection configuration "
+                f"{_STAGE129_SELECT_CONFIGURATION} is not the frozen "
+                f"{_STAGE129_SELECT_ALGORITHM} configuration in {freeze_rel}")
+
+    # (3)(4) The basis is a human decision, never an inference.
+    for artifact, label in ((decision, "decision"), (boundary, "boundary")):
+        if artifact.get("selection_basis") != _STAGE129_SELECT_BASIS:
+            raise HandoffError(
+                f"Stage129 final selection {label} basis must be "
+                f"{_STAGE129_SELECT_BASIS}, got "
+                f"{artifact.get('selection_basis')!r}")
+    for field in _STAGE129_SELECT_FORBIDDEN_CLAIM_FIELDS:
+        if decision.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 final selection {field} must be False; a governance "
+                "choice is not an inferential, tested, Holm-derived or "
+                "statistically proven superiority")
+    if boundary.get("inferential_superiority_claimed") is not False:
+        raise HandoffError(
+            "Stage129 final selection boundary may not claim inferential "
+            "superiority")
+    if boundary.get("selection_used_holm_result") is not False or \
+            holm.get("final_selection_used_holm_result") is not False:
+        raise HandoffError(
+            "Stage129 final selection may not rest on a Holm result; the "
+            "confirmatory family was never executed")
+
+    # (5) M2 keeps its role, and not selecting it is not a failure.
+    for artifact, label in ((decision, "decision"), (boundary, "boundary")):
+        if artifact.get("m2_role_preserved") != _STAGE129_SELECT_M2_ROLE:
+            raise HandoffError(
+                f"Stage129 final selection {label} must preserve the M2 role "
+                f"{_STAGE129_SELECT_M2_ROLE}")
+        if artifact.get("m2_predictive_superiority_claim_supported") is not False:
+            raise HandoffError(
+                f"Stage129 final selection {label} must preserve that M2 "
+                "superiority is unsupported")
+    if decision.get("m2_reported_as_statistically_failed") is not False:
+        raise HandoffError(
+            "Stage129 final selection may not report M2 as statistically failed")
+    if decision.get("m2_not_selected_is_not_a_statistical_failure") is not True:
+        raise HandoffError(
+            "Stage129 final selection must record that not selecting M2 is not "
+            "a statistical failure")
+    if boundary.get("m2_declared_statistically_failed") is not False:
+        raise HandoffError(
+            "Stage129 final selection boundary may not declare M2 failed")
+
+    # (6) RF and XGBoost are not selected -- and nothing stronger than that.
+    entries = decision.get("non_selected_algorithms") or []
+    named = tuple(e.get("algorithm") for e in entries)
+    if named != _STAGE129_SELECT_NON_SELECTED:
+        raise HandoffError(
+            "Stage129 final selection must record exactly "
+            f"{_STAGE129_SELECT_NON_SELECTED} as not selected, got {named}")
+    for entry in entries:
+        if entry.get("status") != _STAGE129_SELECT_NOT_SELECTED_STATUS:
+            raise HandoffError(
+                f"Stage129 final selection {entry.get('algorithm')} status must "
+                f"be {_STAGE129_SELECT_NOT_SELECTED_STATUS}")
+        for field in ("declared_rejected", "declared_removed",
+                      "declared_statistically_inferior"):
+            if entry.get(field) is not False:
+                raise HandoffError(
+                    f"Stage129 final selection {entry.get('algorithm')} {field} "
+                    "must be False; it was not selected, not defeated")
+    for field in ("non_selected_algorithms_declared_rejected",
+                  "non_selected_algorithms_declared_statistically_inferior"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 final selection boundary {field} must be False")
+
+    # The Holm family is preserved exactly, executed never.
+    if tuple(holm.get("family_members_live") or ()) != \
+            _STAGE128_M3_LAG_CONFIRMATORY_FAMILY:
+        raise HandoffError(
+            "Stage129 final selection must preserve the confirmatory Holm family "
+            f"exactly as {_STAGE128_M3_LAG_CONFIRMATORY_FAMILY}")
+    if holm.get("family_member_count") != 3:
+        raise HandoffError("Stage129 final selection Holm family must keep 3 members")
+    if holm.get("holm_reporting_status") != _STAGE129_SELECT_HOLM_STATUS or \
+            boundary.get("holm_reporting_status") != _STAGE129_SELECT_HOLM_STATUS:
+        raise HandoffError(
+            f"Stage129 final selection Holm status must be "
+            f"{_STAGE129_SELECT_HOLM_STATUS}")
+    expected_member_status = {
+        "M2_minus_M1": "EVALUATED_NO_SUPERIORITY_ESTABLISHED",
+        "M3_CBI_minus_M2": "NOT_EXECUTED_M3_CBI_DISCONTINUED",
+        "M4_minus_M3_CBI": "NOT_EXECUTED_M4_DISCONTINUED",
+    }
+    members = holm.get("members") or {}
+    for name, want in expected_member_status.items():
+        entry = members.get(name) or {}
+        if not entry:
+            raise HandoffError(f"Stage129 final selection Holm ledger lacks {name}")
+        if entry.get("status") != want:
+            raise HandoffError(
+                f"Stage129 final selection Holm member {name} status must be "
+                f"{want}, got {entry.get('status')!r}")
+        if entry.get("p_value") is not None:
+            raise HandoffError(
+                f"Stage129 final selection Holm member {name} p_value must be null")
+        for field in ("null_hypothesis_accepted", "null_hypothesis_rejected"):
+            if entry.get(field) is not False:
+                raise HandoffError(
+                    f"Stage129 final selection Holm member {name} {field} must "
+                    "be False")
+    for field in ("holm_adjustment_executed_by_this_action",
+                  "family_shrunk_by_this_action", "family_redefined_by_this_action",
+                  "family_removed_or_renamed_by_this_action",
+                  "any_hypothesis_accepted", "any_hypothesis_rejected",
+                  "holm_family_complete", "confirmatory_family_1_executed"):
+        if holm.get(field) is not False:
+            raise HandoffError(f"Stage129 final selection Holm {field} must be False")
+    if holm.get("new_p_values_created_by_this_action") != 0:
+        raise HandoffError("Stage129 final selection may not create a p-value")
+    for field in ("holm_adjustment_executed", "holm_family_complete",
+                  "holm_family_members_removed_or_renamed",
+                  "holm_family_shrunk_post_hoc",
+                  "any_hypothesis_accepted_or_rejected"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 final selection boundary {field} must be False")
+
+    # THE distinction: selected, but nothing fitted and nothing unlocked.
+    for artifact, label in ((decision, "decision"), (boundary, "boundary")):
+        for field in ("full_development_refit_performed",
+                      "trained_final_model_artifact_created", "stage130_started",
+                      "final_test_access_authorized"):
+            if artifact.get(field) is not False:
+                raise HandoffError(
+                    f"Stage129 final selection {label} {field} must be False; "
+                    "naming the final model is not fitting or evaluating it")
+        if artifact.get("final_test_locked") is not True:
+            raise HandoffError(
+                f"Stage129 final selection {label} must keep the Final Test locked")
+        if artifact.get("final_test_rows_read") != 0:
+            raise HandoffError(
+                f"Stage129 final selection {label} final_test_rows_read must be 0")
+    for field in ("new_metric_computed", "new_p_value_created",
+                  "historical_scientific_artifacts_modified_by_this_action",
+                  "prior_packages_modified_by_this_action",
+                  "existing_pull_requests_modified_by_this_action",
+                  "m1_results_modified_by_this_action",
+                  "m2_status_modified_by_this_action",
+                  "m3_cbi_disposition_modified_by_this_action",
+                  "m4_disposition_modified_by_this_action",
+                  "m3_lag_wdi_promoted_to_confirmatory_model",
+                  "m3_lag_wdi_disposition_modified_by_this_action",
+                  "stage130_or_next_stage_executed", "next_research_action_authorized",
+                  "next_action_authorized", "next_action_executes_refit",
+                  "next_action_executes_final_test", "merge_authorized",
+                  "ready_for_review_authorized"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 final selection boundary {field} must be False")
+    if boundary.get("m3_lag_wdi_disposition") != _STAGE129_M3_LAG_WDI_DISPOSITION:
+        raise HandoffError(
+            "Stage129 final selection must preserve the M3-LAG-WDI disposition")
+    if boundary.get("next_action_id") != _STAGE129_SELECT_NEXT_ACTION_ID:
+        raise HandoffError(
+            f"Stage129 final selection pointer must be "
+            f"{_STAGE129_SELECT_NEXT_ACTION_ID}")
+    if boundary.get("pointer_is_not_authorization") is not True:
+        raise HandoffError(
+            "Stage129 final selection must declare its pointer is not an authorization")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError("Stage129 final selection boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage129 final selection counters.{field} must be 0 (naming the "
+                "final model fits nothing, writes no artifact and reads no data)")
+
+    # The supersede targets the pending decision, not the audit's findings.
+    marker = decision.get("superseded_marker") or {}
+    audit_rel = _STAGE129_AUDIT_VERDICT_REL
+    if marker.get("artifact") != audit_rel:
+        raise HandoffError(
+            "Stage129 final selection supersede must name the audit verdict artifact")
+    if marker.get("historical_artifact_preserved_byte_for_byte") is not True:
+        raise HandoffError(
+            "Stage129 final selection must preserve the audit package byte-for-byte")
+    previous = marker.get("previous_values") or {}
+    if previous.get("block_verdict") != "FINAL_BLOCK_REQUIRES_HUMAN_DECISION" or \
+            previous.get("algorithm_verdict") != \
+            "FINAL_ALGORITHM_REQUIRES_HUMAN_DECISION":
+        raise HandoffError(
+            "Stage129 final selection supersede must be anchored on the audit's "
+            "real 'requires human decision' verdicts")
+    if os.path.isfile(os.path.join(root, audit_rel)):
+        audit = _require_json_artifact(root, audit_rel)
+        if audit.get("block_verdict") != previous.get("block_verdict") or \
+                audit.get("algorithm_verdict") != previous.get("algorithm_verdict"):
+            raise HandoffError(
+                "Stage129 final selection supersede is not anchored on the audit "
+                "as committed; the audit package must stay byte-for-byte intact")
+
+    return {
+        "stage129_final_selection_recorded": True,
+        "stage129_final_selection_action_id": _STAGE129_SELECT_ACTION_ID,
+        "stage129_final_selection_authorized_by_human": True,
+
+        # The selection itself. Bare and namespaced.
+        "paper_winner_selected": True,
+        "final_development_block_selected": True,
+        "final_development_block": _STAGE129_SELECT_BLOCK,
+        "final_algorithm_selected": True,
+        "final_algorithm": _STAGE129_SELECT_ALGORITHM,
+        "final_configuration": _STAGE129_SELECT_CONFIGURATION,
+        "selection_is_human_governance_decision": True,
+        "selection_basis": _STAGE129_SELECT_BASIS,
+        "stage129_final_selection_block": _STAGE129_SELECT_BLOCK,
+        "stage129_final_selection_algorithm": _STAGE129_SELECT_ALGORITHM,
+        "stage129_final_selection_configuration": _STAGE129_SELECT_CONFIGURATION,
+        "stage129_final_selection_basis": _STAGE129_SELECT_BASIS,
+
+        # Never an inference.
+        "inferential_superiority_claimed": False,
+        "stage129_final_selection_is_tested_superiority": False,
+        "stage129_final_selection_is_holm_result": False,
+        "stage129_final_selection_is_statistical_proof": False,
+        "stage129_final_selection_used_holm_result": False,
+
+        # Configuration was pre-locked, not chosen here.
+        "final_configuration_was_prelocked_before_this_decision": True,
+        "final_configuration_selected_by_this_decision": False,
+
+        # Nothing fitted, nothing produced, nothing unlocked.
+        "full_development_refit_performed": False,
+        "trained_final_model_artifact_created": False,
+        "stage130_started": False,
+        "final_test_access_authorized": False,
+        "final_test_locked": True,
+        "final_test_rows_read": 0,
+
+        # M2 and the non-selected algorithms keep their standing.
+        "stage129_final_selection_m2_role_preserved": _STAGE129_SELECT_M2_ROLE,
+        "stage129_final_selection_m2_declared_statistically_failed": False,
+        "m2_predictive_superiority_claim_supported": False,
+        "stage129_final_selection_non_selected_algorithms":
+            list(_STAGE129_SELECT_NON_SELECTED),
+        "stage129_final_selection_non_selected_status":
+            _STAGE129_SELECT_NOT_SELECTED_STATUS,
+        "stage129_final_selection_non_selected_declared_rejected": False,
+        "stage129_final_selection_non_selected_declared_inferior": False,
+
+        # The Holm ledger, preserved and unexecuted.
+        "stage129_final_holm_reporting_status": _STAGE129_SELECT_HOLM_STATUS,
+        "stage129_final_holm_family": list(_STAGE128_M3_LAG_CONFIRMATORY_FAMILY),
+        "stage129_final_holm_family_complete": False,
+        "stage129_final_holm_adjustment_executed": False,
+        "stage129_final_holm_new_p_values": 0,
+        "stage129_final_holm_any_hypothesis_resolved": False,
+        "stage129_final_holm_m2_minus_m1_status":
+            "EVALUATED_NO_SUPERIORITY_ESTABLISHED",
+        "stage129_final_holm_m3_cbi_minus_m2_status":
+            "NOT_EXECUTED_M3_CBI_DISCONTINUED",
+        "stage129_final_holm_m4_minus_m3_cbi_status":
+            "NOT_EXECUTED_M4_DISCONTINUED",
+
+        # The supersede, and the pointer.
+        "stage129_final_selection_supersedes_artifact": audit_rel,
+        "stage129_final_selection_supersedes_block_verdict":
+            "FINAL_BLOCK_REQUIRES_HUMAN_DECISION",
+        "stage129_final_selection_supersedes_algorithm_verdict":
+            "FINAL_ALGORITHM_REQUIRES_HUMAN_DECISION",
+        "stage129_final_selection_audit_package_preserved": True,
+        "stage129_final_selection_next_action_id": _STAGE129_SELECT_NEXT_ACTION_ID,
+        "stage129_final_selection_next_action_authorized": False,
+    }
+
+
 #: The evidence-capture PR, merged into main and now the predecessor context.
 _STAGE128_M3I2_EVIDENCE_CAPTURE_PR_NUMBER = 75
 
@@ -13895,6 +14366,14 @@ def derive_stage128_m2_retained_block_human_decision_markers(
         "stage128_m2_retained_block_human_decision_authorization_consumed":
             True,
         "stage128_m2_retention_basis": d.get("m2_retention_basis"),
+        # ACTION-SCOPED, and permanently False: THIS decision selected no
+        # winner and no final model. Deliberately distinct from the live global
+        # `paper_winner_selected`, which a later, separately authorized
+        # governance decision may legitimately set. Reading the global as a
+        # proxy for this fact would misattribute that later decision here.
+        "stage128_m2_retained_block_decision_selected_paper_winner": False,
+        "stage128_m2_retained_block_decision_selected_final_model": False,
+        "stage128_m2_retained_block_decision_performed_refit": False,
         # RETENTION and SUPERIORITY are different things. M2 is retained as the
         # intermediate confirmatory block; the observed development evidence
         # stays approximately null and no superiority claim is supported.
