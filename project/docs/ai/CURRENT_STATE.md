@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `9861e91983486ec450a2372fd01741e073cbfdaf`
-- **Generated from commit:** `22289f5b86c7abe9ecf3496981c5199eea720364` (branch `stage129-final-development-model-eligibility-audit`, informational)
+- **Last stage commit:** `2df54ed5c3bfb23644cc05b84ccd704fac21eb3f`
+- **Generated from commit:** `2df54ed5c3bfb23644cc05b84ccd704fac21eb3f` (branch `stage129-final-development-model-eligibility-audit`, informational)
 - **Baseline:** `origin/main` @ `22289f5b86c7abe9ecf3496981c5199eea720364`
 
 ## Current-state validation
@@ -374,5 +374,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `b49dc2d02934cb96b7800bd5c238b9b1d9bd976be77990fd8a149878e9e3f8d7`_
-_generated_at_utc: 2026-08-13T20:04:06Z (informational)_
+_state_fingerprint: `dd4b2ea5b7250ed312b4b4c9ba36949f8f0ff2ec9c29dfeadfb13bcbd23f2051`_
+_generated_at_utc: 2026-08-13T20:33:22Z (informational)_
