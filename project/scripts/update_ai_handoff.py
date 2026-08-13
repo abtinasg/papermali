@@ -2977,6 +2977,14 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # pointing at its own Gate. It still advances neither live research
         # pointer chain.
         **derive_stage129_m4_human_discontinuation_markers(root),
+        # Must come after the discontinuation: the human manuscript-reporting
+        # decision SUPERSEDES exactly one marker the discontinuation left
+        # open -- how a never-admitted block's comparison is presented. It
+        # resolves a REPORTING question only. It changes no scientific state:
+        # the disposition, the comparison status, the null p-value, the null
+        # formal Gate verdict, the four candidates and both live research
+        # pointers all survive it untouched.
+        **derive_stage129_m4_manuscript_reporting_decision_markers(root),
         }))
 
 
@@ -5738,6 +5746,70 @@ def render_current_state(record: dict) -> str:
             "m4_human_discontinuation_data_inadequacy/`; interpretation: "
             "`project/stage129/m4_human_discontinuation_data_inadequacy/"
             "README_STAGE129_M4_HUMAN_DISCONTINUATION_DATA_INADEQUACY.md`",
+            "",
+        ]
+    if record.get("stage129_m4_manuscript_reporting_decision_recorded"):
+        lines += [
+            "### Stage129 — M4 manuscript reporting decision (governance only)\n",
+            "_A human REPORTING decision only. It settles how a prespecified "
+            "but never-admitted block is presented, and changes no scientific "
+            "state: zero extraction rerun, zero retrieval, zero coverage "
+            "computation, zero feature materialization, zero modeling, zero "
+            "Holm, zero bootstrap, zero Final Test access._\n",
+            "- ✅ **Reporting decision (resolved):** "
+            f"`{record.get('stage129_m4_manuscript_reporting_decision_for_unexecuted_comparison')}`"
+            " — authorized by human = "
+            f"{record.get('stage129_m4_manuscript_reporting_decision_authorized_by_human')}"
+            ", resolved = "
+            f"{record.get('stage129_m4_manuscript_reporting_decision_is_resolved')}.",
+            "- 🔁 **Supersedes one marker, in the open:** previous value "
+            f"`{record.get('stage129_m4_manuscript_reporting_decision_previous_value')}`"
+            " in "
+            f"`{record.get('stage129_m4_manuscript_reporting_decision_supersedes_artifact')}`"
+            " (key "
+            f"`{record.get('stage129_m4_manuscript_reporting_decision_supersedes_key')}`)"
+            ". The discontinuation package is preserved byte-for-byte = "
+            f"{record.get('stage129_m4_prior_discontinuation_artifact_preserved')}"
+            " — history is superseded, never rewritten.",
+            "- ⛔ **M4 is reported as prespecified but NOT executed:** "
+            "prespecified = "
+            f"{record.get('stage129_m4_reported_as_prespecified')}, not "
+            f"executed = {record.get('stage129_m4_reported_as_not_executed')}, "
+            "reason class "
+            f"`{record.get('stage129_m4_reporting_reason_class')}`.",
+            "- ⛔ **No inference is drawn:** "
+            f"`{record.get('stage129_m4_comparison_id')}` stays "
+            f"`{record.get('stage129_m4_comparison_status')}`, p-value "
+            f"`{record.get('stage129_m4_comparison_p_value')}`, null hypothesis "
+            "accepted or rejected = "
+            f"`{record.get('stage129_m4_reporting_null_hypothesis_accepted_or_rejected')}`"
+            ", claims an executed result = "
+            f"{record.get('stage129_m4_reporting_claims_an_executed_result')}, "
+            "claims M4 performance = "
+            f"{record.get('stage129_m4_reporting_claims_m4_performance')}.",
+            "- ✅ **SAP history intact:** the comparison is removed from SAP "
+            "history = "
+            f"{record.get('stage129_m4_comparison_removed_from_sap_history')}, "
+            "renamed or substituted = "
+            f"{record.get('stage129_m4_comparison_renamed_or_substituted')} — it "
+            "is reported as prespecified-but-not-executed, not erased.",
+            "- ❗ **Still NOT a Gate failure:** formal Gate executed = "
+            f"{record.get('m4_data_gate_executed')}, formal verdict "
+            f"`{record.get('m4_formal_gate_verdict')}`, "
+            "is-formal-gate-failure = "
+            f"{record.get('stage129_m4_reporting_is_formal_gate_failure')}.",
+            "- 📝 **Approved reporting text (EN):** "
+            f"{record.get('stage129_m4_approved_manuscript_text_en')}",
+            "- 📝 **Approved reporting text (FA):** "
+            f"{record.get('stage129_m4_approved_manuscript_text_fa')}",
+            "- ⛔ **Text is a reporting decision, not a writing authorization:** "
+            "manuscript writing or rewriting authorized = "
+            f"{record.get('stage129_m4_manuscript_writing_authorized')}.",
+            "- ⛔ **Final Test firewall untouched:** rows read "
+            f"{record.get('stage129_m4_reporting_final_test_rows_read')}.",
+            "- Package: `project/stage129/m4_manuscript_reporting_decision/`;"
+            " interpretation: `project/stage129/m4_manuscript_reporting_decision/"
+            "README_STAGE129_M4_MANUSCRIPT_REPORTING_DECISION.md`",
             "",
         ]
     lines += [
@@ -11987,6 +12059,313 @@ def derive_stage129_m4_human_discontinuation_markers(root: str) -> dict:
         "stage129_m4_observational_extraction_reportable_in_limitations": True,
         "stage129_m4_final_test_locked": True,
         "stage129_m4_final_test_rows_read": 0,
+    }
+
+
+_STAGE129_M4_REPORT_PKG = "project/stage129/m4_manuscript_reporting_decision"
+_STAGE129_M4_REPORT_ACTION_ID = "stage129-m4-manuscript-reporting-decision"
+_STAGE129_M4_REPORT_DECISION_REL = (
+    f"{_STAGE129_M4_REPORT_PKG}/stage129_m4_manuscript_reporting_decision.json")
+_STAGE129_M4_REPORT_BOUNDARY_REL = (
+    f"{_STAGE129_M4_REPORT_PKG}/"
+    "stage129_m4_manuscript_reporting_governance_boundary.json")
+#: The one canonical, machine-readable value the reporting question resolves to.
+_STAGE129_M4_REPORT_DECISION_VALUE = (
+    "REPORT_AS_PRESPECIFIED_NOT_EXECUTED_DATA_INADEQUACY_NO_INFERENCE")
+#: What the discontinuation package left open, and what this supersedes.
+_STAGE129_M4_REPORT_SUPERSEDED_VALUE = "UNRESOLVED_REPORTING_DECISION"
+_STAGE129_M4_REPORT_COMPARISON_ID = "M4_minus_M3_CBI"
+_STAGE129_M4_REPORT_COMPARISON_STATUS = "NOT_EXECUTED_M4_DISCONTINUED"
+#: Phrases that would turn a presentation decision into a claim about a result
+#: that was never produced. The approved text may not contain any of them.
+_STAGE129_M4_REPORT_FORBIDDEN_TEXT = (
+    "p =", "p-value of", "p<", "p >", "p <", "significant", "significantly",
+    "outperform", "improved", "improvement", "gain of", "we reject",
+    "we accept", "rejected the null", "accepted the null",
+)
+
+
+def derive_stage129_m4_manuscript_reporting_decision_markers(root: str) -> dict:
+    """Recognize the human decision on how to REPORT the unexecuted M4 block.
+
+    Narrow and fail-closed. This is a presentation decision and nothing else:
+    it retrieves no observation, re-runs no extraction, computes no coverage,
+    materializes no feature, fits no model, runs no Holm step and never touches
+    the Final Test.
+
+    It resolves exactly one marker that the M4 discontinuation left open --
+    ``manuscript_reporting_decision_for_the_unexecuted_m4_comparison``, which
+    stood at ``UNRESOLVED_REPORTING_DECISION``. The discontinuation package
+    itself stays byte-for-byte intact: this function reads it only to prove the
+    supersede is anchored on the real prior value, so history is superseded in
+    the open rather than rewritten.
+
+    Fails closed if the decision tries to revert to unresolved, publish a
+    p-value, resolve a null hypothesis, forge a Gate verdict, disturb the
+    comparison status or the four frozen candidates, or claim a result that was
+    never produced. Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE129_M4_REPORT_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    decision = _require_json_artifact(root, _STAGE129_M4_REPORT_DECISION_REL)
+    boundary = _require_json_artifact(root, _STAGE129_M4_REPORT_BOUNDARY_REL)
+
+    if decision.get("decision_id") != _STAGE129_M4_REPORT_ACTION_ID:
+        raise HandoffError("Stage129 M4 reporting decision decision_id mismatch")
+    if boundary.get("action_id") != _STAGE129_M4_REPORT_ACTION_ID:
+        raise HandoffError("Stage129 M4 reporting decision boundary action_id mismatch")
+    if decision.get("decision_type") != "human_reporting_decision":
+        raise HandoffError(
+            "Stage129 M4 reporting decision must be a human_reporting_decision")
+    if decision.get("authorized_by_human") is not True:
+        raise HandoffError("Stage129 M4 reporting decision must be human-authorized")
+
+    # (1) The decision must be RESOLVED, and resolved to the canonical value.
+    # Reverting to the unresolved placeholder is a build failure, not a state.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        value = source.get(
+            "manuscript_reporting_decision_for_the_unexecuted_m4_comparison")
+        if value == _STAGE129_M4_REPORT_SUPERSEDED_VALUE:
+            raise HandoffError(
+                f"Stage129 M4 reporting {label} may not revert the manuscript "
+                "reporting decision to "
+                f"{_STAGE129_M4_REPORT_SUPERSEDED_VALUE}")
+        if value != _STAGE129_M4_REPORT_DECISION_VALUE:
+            raise HandoffError(
+                f"Stage129 M4 reporting {label} decision value must be "
+                f"{_STAGE129_M4_REPORT_DECISION_VALUE}, got {value!r}")
+    if decision.get("decision_status") != _STAGE129_M4_REPORT_DECISION_VALUE:
+        raise HandoffError(
+            "Stage129 M4 reporting decision_status must be "
+            f"{_STAGE129_M4_REPORT_DECISION_VALUE}")
+    if boundary.get("manuscript_reporting_decision_is_resolved") is not True:
+        raise HandoffError(
+            "Stage129 M4 reporting boundary must declare the decision resolved")
+
+    # (2) The supersede must be anchored on the REAL prior value, read from the
+    # untouched discontinuation artifact -- not on an asserted one.
+    marker = decision.get("superseded_marker") or {}
+    if marker.get("artifact") != _STAGE129_M4_DISC_BOUNDARY_REL:
+        raise HandoffError(
+            "Stage129 M4 reporting decision must supersede "
+            f"{_STAGE129_M4_DISC_BOUNDARY_REL}")
+    if marker.get("key") != (
+            "manuscript_reporting_decision_for_the_unexecuted_m4_comparison"):
+        raise HandoffError(
+            "Stage129 M4 reporting decision must supersede the reporting marker")
+    if marker.get("previous_value") != _STAGE129_M4_REPORT_SUPERSEDED_VALUE:
+        raise HandoffError(
+            "Stage129 M4 reporting decision must record the real prior value "
+            f"{_STAGE129_M4_REPORT_SUPERSEDED_VALUE}")
+    if marker.get("resolved_value") != _STAGE129_M4_REPORT_DECISION_VALUE:
+        raise HandoffError(
+            "Stage129 M4 reporting supersede resolved_value must match the "
+            "canonical decision value")
+    prior = _require_json_artifact(root, _STAGE129_M4_DISC_BOUNDARY_REL)
+    prior_value = prior.get(
+        "manuscript_reporting_decision_for_the_unexecuted_m4_comparison")
+    if prior_value != _STAGE129_M4_REPORT_SUPERSEDED_VALUE:
+        raise HandoffError(
+            "Stage129 M4 reporting supersede is not anchored on the historical "
+            f"discontinuation value: found {prior_value!r}. The discontinuation "
+            "package must stay byte-for-byte intact.")
+    for field in ("prior_discontinuation_artifact_preserved_byte_for_byte",
+                  "prior_contract_lock_history_preserved",
+                  "prior_prerequisite_resolution_history_preserved"):
+        if boundary.get(field) is not True:
+            raise HandoffError(
+                f"Stage129 M4 reporting boundary {field} must be True")
+
+    # (3) The scientific state is untouched. A reporting decision may not move
+    # the comparison, invent a p-value or resolve a hypothesis.
+    if boundary.get("m4_comparison_id") != _STAGE129_M4_REPORT_COMPARISON_ID:
+        raise HandoffError("Stage129 M4 reporting comparison_id mismatch")
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        status = source.get("comparison_status") if label == "decision" \
+            else source.get("m4_comparison_status")
+        if status != _STAGE129_M4_REPORT_COMPARISON_STATUS:
+            raise HandoffError(
+                f"Stage129 M4 reporting {label} must keep the comparison at "
+                f"{_STAGE129_M4_REPORT_COMPARISON_STATUS}")
+    if decision.get("comparison_p_value") is not None or \
+            boundary.get("m4_comparison_p_value") is not None:
+        raise HandoffError(
+            "Stage129 M4 reporting decision must not publish a p-value for an "
+            "unexecuted comparison")
+    if decision.get("null_hypothesis_accepted_or_rejected") is not None or \
+            boundary.get("m4_comparison_null_hypothesis_accepted_or_rejected") \
+            is not None:
+        raise HandoffError(
+            "Stage129 M4 reporting decision must not accept or reject a null "
+            "hypothesis for an unexecuted comparison")
+    for field in ("m4_comparison_removed_from_sap_history",
+                  "m4_comparison_renamed_or_substituted",
+                  "m4_comparison_status_modified_by_this_action",
+                  "m4_block_disposition_modified_by_this_action"):
+        if boundary.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 M4 reporting boundary {field} must be False")
+    if boundary.get("m4_block_disposition") != _STAGE129_M4_DISC_STATUS:
+        raise HandoffError(
+            "Stage129 M4 reporting boundary must preserve the M4 disposition "
+            f"{_STAGE129_M4_DISC_STATUS}")
+
+    # (4) The Gate was never executed and no Gate verdict may be forged.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        executed = source.get("formal_m4_data_gate_executed") if \
+            label == "decision" else source.get("m4_data_gate_executed")
+        if executed is not False:
+            raise HandoffError(
+                f"Stage129 M4 reporting {label} may not report an executed "
+                "formal Gate")
+        verdict = source.get("formal_m4_gate_verdict") if label == "decision" \
+            else source.get("m4_formal_gate_verdict")
+        if verdict is not None:
+            raise HandoffError(
+                f"Stage129 M4 reporting {label} formal Gate verdict must be null")
+    if _STAGE129_M4_REPORT_DECISION_VALUE in _STAGE129_M4_GATE_VERDICT_VOCAB:
+        raise HandoffError(
+            "Stage129 M4 reporting decision value must not be Gate vocabulary")
+    for field in ("m4_block_disposition", "m4_comparison_status",
+                  "manuscript_reporting_decision_for_the_unexecuted_m4_comparison"):
+        if boundary.get(field) in _STAGE129_M4_GATE_VERDICT_VOCAB:
+            raise HandoffError(
+                f"Stage129 M4 reporting {field} must not be a Gate verdict")
+
+    # (5) The approved text is a reporting position, never a result claim.
+    for field in ("approved_manuscript_text_en", "approved_manuscript_text_fa"):
+        text = decision.get(field)
+        if not isinstance(text, str) or not text.strip():
+            raise HandoffError(
+                f"Stage129 M4 reporting decision must carry {field}")
+        lowered = text.lower()
+        for phrase in _STAGE129_M4_REPORT_FORBIDDEN_TEXT:
+            if phrase in lowered:
+                raise HandoffError(
+                    f"Stage129 M4 reporting {field} claims an executed result "
+                    f"via {phrase!r}; the comparison was never executed")
+    for field in ("reporting_claims_an_executed_result",
+                  "reporting_claims_m4_performance"):
+        if decision.get(field) is not False or boundary.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 M4 reporting {field} must be False")
+    if decision.get("m4_was_prespecified") is not True:
+        raise HandoffError(
+            "Stage129 M4 reporting decision must record that M4 was prespecified")
+    if decision.get("m4_was_stopped_before_admission_and_modeling") is not True:
+        raise HandoffError(
+            "Stage129 M4 reporting decision must record that M4 was stopped "
+            "before admission and modeling")
+    if boundary.get("manuscript_writing_or_rewriting_authorized") is not False:
+        raise HandoffError(
+            "Stage129 M4 reporting decision is not a manuscript writing "
+            "authorization")
+
+    # (6) The four frozen candidates survive with identity, order and count.
+    if tuple(decision.get("m4_candidate_set") or ()) != _STAGE129_M4_CANDIDATE_SET:
+        raise HandoffError(
+            "Stage129 M4 reporting decision must preserve the four frozen "
+            f"candidates exactly as {_STAGE129_M4_CANDIDATE_SET}")
+    if decision.get("m4_candidate_count") != 4:
+        raise HandoffError(
+            "Stage129 M4 reporting decision must preserve candidate_count 4")
+    for field in ("m4_candidate_count_changed_by_this_decision",
+                  "m4_candidates_removed_or_renamed_by_this_decision",
+                  "m4_candidates_substituted_by_this_decision"):
+        if decision.get(field) is not False:
+            raise HandoffError(f"Stage129 M4 reporting decision {field} must be False")
+
+    # (7) Nothing is authorized or executed by a reporting decision.
+    for field in ("m4_retrieval_continues", "m4_manual_completion_continues",
+                  "m4_feature_materialization_authorized", "m4_modeling_will_run",
+                  "m4_incremental_evaluation_will_run", "m4_reopening_authorized",
+                  "m4_block_admitted", "m4_data_gate_authorized",
+                  "m4_coverage_calculated",
+                  "confirmatory_holm_family_modified_by_this_action",
+                  "family_shrunk_post_hoc_after_observing_a_result",
+                  "m1_status_modified_by_this_action",
+                  "m2_status_modified_by_this_action",
+                  "m3_cbi_status_modified_by_this_action",
+                  "m3_cbi_declared_successful_by_this_action",
+                  "m3_lag_wdi_disposition_modified_by_this_action",
+                  "m3_lag_wdi_promoted_to_confirmatory_model",
+                  "observational_package_modified_by_this_action",
+                  "observational_extraction_admitted_as_model_input",
+                  "prior_packages_modified_by_this_action",
+                  "paper_winner_selected", "final_model_selected",
+                  "full_development_refit_executed",
+                  "stage130_or_next_stage_executed",
+                  "final_test_access_authorized", "next_action_authorized",
+                  "next_action_executes_m4"):
+        if boundary.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 M4 reporting boundary {field} must be False")
+    if boundary.get("m4_reopening_requires_new_human_authorization") is not True:
+        raise HandoffError(
+            "Stage129 M4 reporting must keep reopening behind a new human "
+            "authorization")
+    if boundary.get("final_test_rows_read") != 0 or \
+            decision.get("final_test_rows_read") != 0:
+        raise HandoffError("Stage129 M4 reporting final_test_rows_read must be 0")
+    if boundary.get("final_test_locked") is not True:
+        raise HandoffError("Stage129 M4 reporting must keep the Final Test locked")
+    if boundary.get("next_action_id") != _STAGE129_M4_DISC_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage129 M4 reporting must keep the M4 pointer at "
+            f"{_STAGE129_M4_DISC_NEXT_ACTION_ID}")
+    if boundary.get("next_action_scope") != _STAGE129_M4_DISC_NEXT_ACTION_SCOPE:
+        raise HandoffError(
+            "Stage129 M4 reporting must keep the M4 pointer scope unchanged")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError("Stage129 M4 reporting boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage129 M4 reporting counters.{field} must be 0 "
+                "(no extraction rerun, retrieval, coverage, modeling, Holm, "
+                "bootstrap, SHAP or Final Test access occurred)")
+
+    return {
+        "stage129_m4_manuscript_reporting_decision_recorded": True,
+        "stage129_m4_manuscript_reporting_decision_action_id":
+            _STAGE129_M4_REPORT_ACTION_ID,
+        "stage129_m4_manuscript_reporting_decision_authorized_by_human": True,
+        "stage129_m4_manuscript_reporting_decision_is_resolved": True,
+
+        # THE resolved marker. Supersedes the discontinuation's unresolved
+        # placeholder on the live surface; the artifact itself keeps its history.
+        "stage129_m4_manuscript_reporting_decision_for_unexecuted_comparison":
+            _STAGE129_M4_REPORT_DECISION_VALUE,
+        "stage129_m4_manuscript_reporting_decision_previous_value":
+            _STAGE129_M4_REPORT_SUPERSEDED_VALUE,
+        "stage129_m4_manuscript_reporting_decision_supersedes_artifact":
+            _STAGE129_M4_DISC_BOUNDARY_REL,
+        "stage129_m4_manuscript_reporting_decision_supersedes_key":
+            "manuscript_reporting_decision_for_the_unexecuted_m4_comparison",
+        "stage129_m4_prior_discontinuation_artifact_preserved": True,
+
+        # The reporting position itself, stated as what was NOT done.
+        "stage129_m4_reported_as_prespecified": True,
+        "stage129_m4_reported_as_not_executed": True,
+        "stage129_m4_reporting_reason_class":
+            decision.get("reporting_reason_class"),
+        "stage129_m4_reporting_claims_an_executed_result": False,
+        "stage129_m4_reporting_claims_m4_performance": False,
+        "stage129_m4_reporting_null_hypothesis_accepted_or_rejected": None,
+        "stage129_m4_comparison_removed_from_sap_history": False,
+        "stage129_m4_comparison_renamed_or_substituted": False,
+        "stage129_m4_approved_manuscript_text_en":
+            decision.get("approved_manuscript_text_en"),
+        "stage129_m4_approved_manuscript_text_fa":
+            decision.get("approved_manuscript_text_fa"),
+        "stage129_m4_manuscript_writing_authorized": False,
+
+        # Restated from this action's own boundary, so a consumer reading only
+        # the reporting decision still sees the firewall.
+        "stage129_m4_reporting_is_formal_gate_failure": False,
+        "stage129_m4_reporting_final_test_rows_read": 0,
     }
 
 

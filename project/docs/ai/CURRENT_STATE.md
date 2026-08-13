@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `191c784c84169717cd2cc243cd6294be28e07e44`
-- **Generated from commit:** `191c784c84169717cd2cc243cd6294be28e07e44` (branch `stage129-m4-human-discontinuation-data-inadequacy`, informational)
-- **Baseline:** `origin/main` @ `5e37d1644a7ff3475c7740816803a478a6a5785d`
+- **Last stage commit:** `3d2c6105309424384318bd2f081697dfc176dfe2`
+- **Generated from commit:** `3d2c6105309424384318bd2f081697dfc176dfe2` (branch `stage129-m4-manuscript-reporting-decision`, informational)
+- **Baseline:** `origin/main` @ `019ea71db840d771e7dff99bf22a332c9dd5150f`
 
 ## Current-state validation
 
@@ -267,11 +267,27 @@ _A human governance decision only. The formal M4 Data Gate was NEVER executed: z
 - ⛔ **Nothing downstream is authorized:** retrieval continues = False, manual completion continues = False, feature materialization = False, modeling will run = False, incremental evaluation will run = False.
 - 🔒 **Reopening:** authorized = False, requires new explicit human authorization = True.
 - ✅ **Candidate identity preserved, not rewritten:** count `4`, set `['audit_opinion_type', 'going_concern_flag', 'audit_lag_days', 'board_size']`, removed or renamed = False.
-- ⛔ **Holm family unchanged and the M4 comparison unexecuted:** `M4_minus_M3_CBI` status `NOT_EXECUTED_M4_DISCONTINUED`, p-value `None`, family modified = False, shrunk post hoc = False. Manuscript reporting decision for the unexecuted comparison: `UNRESOLVED_REPORTING_DECISION`.
+- ⛔ **Holm family unchanged and the M4 comparison unexecuted:** `M4_minus_M3_CBI` status `NOT_EXECUTED_M4_DISCONTINUED`, p-value `None`, family modified = False, shrunk post hoc = False. Manuscript reporting decision for the unexecuted comparison: `REPORT_AS_PRESPECIFIED_NOT_EXECUTED_DATA_INADEQUACY_NO_INFERENCE`.
 - 📄 **Observational extraction:** status `OBSERVATIONAL_TEXT_EXTRACTION_NOT_YET_ADMITTED_AS_LOCKED_M4_INPUT` — retained in custody, not a model input, reportable in limitations = True.
 - ⛔ **Final Test firewall untouched:** locked True, rows read 0.
 - ➡️ **Next action:** `human_decision_required` — scope `m4_discontinued_no_further_m4_action_is_authorized`, authorized = False, executes M4 = False. A pointer is never an authorization.
 - Package: `project/stage129/m4_human_discontinuation_data_inadequacy/`; interpretation: `project/stage129/m4_human_discontinuation_data_inadequacy/README_STAGE129_M4_HUMAN_DISCONTINUATION_DATA_INADEQUACY.md`
+
+### Stage129 — M4 manuscript reporting decision (governance only)
+
+_A human REPORTING decision only. It settles how a prespecified but never-admitted block is presented, and changes no scientific state: zero extraction rerun, zero retrieval, zero coverage computation, zero feature materialization, zero modeling, zero Holm, zero bootstrap, zero Final Test access._
+
+- ✅ **Reporting decision (resolved):** `REPORT_AS_PRESPECIFIED_NOT_EXECUTED_DATA_INADEQUACY_NO_INFERENCE` — authorized by human = True, resolved = True.
+- 🔁 **Supersedes one marker, in the open:** previous value `UNRESOLVED_REPORTING_DECISION` in `project/stage129/m4_human_discontinuation_data_inadequacy/stage129_m4_human_discontinuation_governance_boundary.json` (key `manuscript_reporting_decision_for_the_unexecuted_m4_comparison`). The discontinuation package is preserved byte-for-byte = True — history is superseded, never rewritten.
+- ⛔ **M4 is reported as prespecified but NOT executed:** prespecified = True, not executed = True, reason class `data_accessibility_coverage_and_definition_mismatch`.
+- ⛔ **No inference is drawn:** `M4_minus_M3_CBI` stays `NOT_EXECUTED_M4_DISCONTINUED`, p-value `None`, null hypothesis accepted or rejected = `None`, claims an executed result = False, claims M4 performance = False.
+- ✅ **SAP history intact:** the comparison is removed from SAP history = False, renamed or substituted = False — it is reported as prespecified-but-not-executed, not erased.
+- ❗ **Still NOT a Gate failure:** formal Gate executed = False, formal verdict `None`, is-formal-gate-failure = False.
+- 📝 **Approved reporting text (EN):** M4 was prespecified but was not admitted to modeling because the available data did not provide adequate coverage and did not satisfy the frozen feature definitions. Consequently, the M4−M3-CBI comparison was not executed, no p-value was computed, and no inferential conclusion is drawn for M4.
+- 📝 **Approved reporting text (FA):** بلوک M4 از پیش تعریف شده بود، اما به‌دلیل ناکافی‌بودن پوشش داده‌ها و برآورده‌نشدن تعاریف تثبیت‌شده ویژگی‌ها، وارد مرحله مدل‌سازی نشد. در نتیجه، مقایسه M4−M3-CBI اجرا نشد، هیچ مقدار p محاسبه نشد و هیچ نتیجه استنباطی درباره M4 ارائه نمی‌شود.
+- ⛔ **Text is a reporting decision, not a writing authorization:** manuscript writing or rewriting authorized = False.
+- ⛔ **Final Test firewall untouched:** rows read 0.
+- Package: `project/stage129/m4_manuscript_reporting_decision/`; interpretation: `project/stage129/m4_manuscript_reporting_decision/README_STAGE129_M4_MANUSCRIPT_REPORTING_DECISION.md`
 
 ### Last completed scientific micro-part QC
 
@@ -322,5 +338,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `8c29b183084b064f4339d29c69fb1d55baecd8385cd734673c43181c2409e263`_
-_generated_at_utc: 2026-08-13T07:17:24Z (informational)_
+_state_fingerprint: `7c558bc401ebf07b8a8824996456720e880fef88661c34b5bb24440292547df0`_
+_generated_at_utc: 2026-08-13T08:13:10Z (informational)_

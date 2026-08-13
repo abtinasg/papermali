@@ -1,0 +1,27 @@
+{
+  "action_id": "stage129-m4-manuscript-reporting-decision",
+  "action_type": "manuscript_reporting_decision_recording_only",
+  "credentials_committed_to_git": false,
+  "decision_status": "REPORT_AS_PRESPECIFIED_NOT_EXECUTED_DATA_INADEQUACY_NO_INFERENCE",
+  "final_test_artifacts_committed": 0,
+  "formal_m4_data_gate_executed": false,
+  "m4_value_files_committed": 0,
+  "model_artifacts_committed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "package_file_count": 3,
+  "package_files": {
+    "README_STAGE129_M4_MANUSCRIPT_REPORTING_DECISION.md": {
+      "bytes": 5477,
+      "sha256": "345b402af84b45729af98ea36e6f3ecd10f649571a080372b4ec553bf1b1cd7c"
+    },
+    "stage129_m4_manuscript_reporting_decision.json": {
+      "bytes": 5100,
+      "sha256": "53509fa4d389450f7994dd0483721cf698ff842900b23a8733681243cba31d8e"
+    },
+    "stage129_m4_manuscript_reporting_governance_boundary.json": {
+      "bytes": 4242,
+      "sha256": "c5133d085cb6364cb84e58e0b759e683ab468da4ce74a4c749121b8e41bff053"
+    }
+  },
+  "pii_committed_to_git": false
+}
