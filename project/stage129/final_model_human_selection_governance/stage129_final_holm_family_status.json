@@ -1,0 +1,59 @@
+{
+  "action_id": "stage129-final-model-human-selection-governance",
+  "alpha": 0.05,
+  "any_hypothesis_accepted": false,
+  "any_hypothesis_rejected": false,
+  "correction": "Holm",
+  "family_member_count": 3,
+  "family_members_live": [
+    "M2_minus_M1",
+    "M3_CBI_minus_M2",
+    "M4_minus_M3_CBI"
+  ],
+  "family_members_frozen_sap": [
+    "M2_minus_M1",
+    "M3_minus_M2",
+    "M4_minus_M3"
+  ],
+  "family_redefined_by_this_action": false,
+  "family_removed_or_renamed_by_this_action": false,
+  "family_shrunk_by_this_action": false,
+  "final_selection_used_holm_result": false,
+  "frozen_sap_contract_path": "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
+  "frozen_sap_family_key": "confirmatory_family_2_adjacent_block_gains_if_admitted",
+  "holm_adjustment_executed_by_this_action": false,
+  "holm_family_complete": false,
+  "holm_reporting_status": "HOLM_NOT_EXECUTED_FAMILY_PRESERVED_NO_INFERENCE",
+  "members": {
+    "M2_minus_M1": {
+      "null_hypothesis_accepted": false,
+      "null_hypothesis_rejected": false,
+      "p_value": null,
+      "source": "project/stage128/m2_incremental_evaluation/stage127_m2_multiplicity_family_status.json",
+      "status": "EVALUATED_NO_SUPERIORITY_ESTABLISHED"
+    },
+    "M3_CBI_minus_M2": {
+      "null_hypothesis_accepted": false,
+      "null_hypothesis_rejected": false,
+      "p_value": null,
+      "source": "project/stage129/m3_cbi_human_discontinuation_and_reporting/stage129_m3_cbi_confirmatory_comparison_record.json",
+      "status": "NOT_EXECUTED_M3_CBI_DISCONTINUED"
+    },
+    "M4_minus_M3_CBI": {
+      "null_hypothesis_accepted": false,
+      "null_hypothesis_rejected": false,
+      "p_value": null,
+      "source": "project/stage129/m4_human_discontinuation_data_inadequacy/stage129_m4_human_discontinuation_governance_boundary.json",
+      "status": "NOT_EXECUTED_M4_DISCONTINUED"
+    }
+  },
+  "new_p_values_created_by_this_action": 0,
+  "note": "The family is preserved exactly as prespecified, with all three members and all three p-values null. No Holm adjustment was executed, the family was neither shrunk nor redefined, and no null hypothesis was accepted or rejected. The final-model selection recorded alongside this ledger is a human governance decision and did NOT use any Holm result.",
+  "confirmatory_family_1_executed": false,
+  "confirmatory_family_1_members": [
+    "Logistic_vs_RF",
+    "Logistic_vs_XGBoost",
+    "RF_vs_XGBoost"
+  ],
+  "confirmatory_family_1_note": "The prespecified model-comparison family was never executed, so no adjusted inferential ranking of the three algorithms exists and none is claimed by the selection."
+}
