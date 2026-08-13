@@ -2992,6 +2992,12 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # UNRESOLVED_M3_DATA_GATE and is republished as terminal. It advances
         # no pointer, promotes nothing, and touches no M1/M2/M4 state.
         **derive_stage129_m3_cbi_human_discontinuation_markers(root),
+        # Must come last of all: the final-development eligibility audit READS
+        # every decision above and asks one question -- do the frozen rules
+        # determine the final block and algorithm uniquely? It is read-only. It
+        # selects nothing, executes nothing, and moves no pointer; it only
+        # publishes its verdicts and the eligible-candidate matrix.
+        **derive_stage129_final_model_eligibility_audit_markers(root),
         }))
 
 
@@ -5934,6 +5940,71 @@ def render_current_state(record: dict) -> str:
             "m3_cbi_human_discontinuation_and_reporting/`; interpretation: "
             "`project/stage129/m3_cbi_human_discontinuation_and_reporting/"
             "README_STAGE129_M3_CBI_HUMAN_DISCONTINUATION_AND_REPORTING.md`",
+            "",
+        ]
+    if record.get("stage129_final_model_eligibility_audit_recorded"):
+        lines += [
+            "### Stage129 — final development model eligibility audit "
+            "(READ-ONLY)\n",
+            "_Reads committed artifacts and answers one question: do the frozen "
+            "rules determine the final block and algorithm uniquely? It selects "
+            "nothing. Zero fits, zero predictions, zero new metric/CI/p-value, "
+            "zero row-level scientific data reads, zero Final Test access._\n",
+            "- ⚖️ **Block verdict:** "
+            f"`{record.get('stage129_final_block_verdict')}` — determined "
+            "candidate "
+            f"`{record.get('stage129_final_block_determined_candidate')}`.",
+            "- ⚖️ **Algorithm verdict:** "
+            f"`{record.get('stage129_final_algorithm_verdict')}` — determined "
+            "candidate "
+            f"`{record.get('stage129_final_algorithm_determined_candidate')}`.",
+            "- ⚖️ **Holm reporting verdict:** "
+            f"`{record.get('stage129_holm_reporting_verdict')}`.",
+            "- 📊 **Candidate matrix:** "
+            f"{record.get('stage129_audit_candidate_count')} candidates over "
+            f"blocks `{record.get('stage129_audit_blocks_audited')}` × "
+            f"algorithms `{record.get('stage129_audit_algorithms_audited')}`; "
+            "eligible = "
+            f"{record.get('stage129_audit_eligible_candidate_count')}. "
+            "Eligibility is not selection = "
+            f"{record.get('stage129_audit_eligibility_is_not_selection')}.",
+            "- 🔀 **Robustness ordering:** stable across all robustness = "
+            f"{record.get('stage129_audit_ordering_stable_across_robustness')}"
+            "; parts reversing the primary ordering = "
+            f"{record.get('stage129_audit_parts_reversing_primary_ordering')}, "
+            "parts preserving it = "
+            f"{record.get('stage129_audit_parts_preserving_primary_ordering')}. "
+            "Used to exclude a candidate = "
+            f"{record.get('stage129_audit_robustness_used_to_exclude_a_candidate')}.",
+            "- ⛔ **M2 retained ≠ M2 selected:** retention treated as final "
+            "selection = "
+            f"{not record.get('stage129_audit_m2_retained_is_not_final_selection')}"
+            ", M2 predictive superiority claim supported = "
+            f"{record.get('stage129_audit_m2_superiority_claim_supported')}.",
+            "- ⛔ **Holm ledger reconciled, not executed:** family "
+            f"`{record.get('stage129_audit_holm_family')}`, complete = "
+            f"{record.get('stage129_audit_holm_family_complete')}, adjustment "
+            f"executed = {record.get('stage129_audit_holm_adjustment_executed')}"
+            ", new p-values = "
+            f"{record.get('stage129_audit_holm_new_p_values')}.",
+            "- ⛔ **Nothing is selected or opened:** paper winner = "
+            f"{record.get('stage129_audit_paper_winner_selected')}, final model "
+            f"= {record.get('stage129_audit_final_model_selected')}, "
+            "full-development refit = "
+            f"{record.get('stage129_audit_full_development_refit_executed')}, "
+            f"Stage130 started = "
+            f"{record.get('stage129_audit_stage130_started')}.",
+            "- ⛔ **Final Test firewall untouched:** locked "
+            f"{record.get('stage129_audit_final_test_locked')}, rows read "
+            f"{record.get('stage129_audit_final_test_rows_read')}.",
+            "- ➡️ **Next action:** "
+            f"`{record.get('stage129_audit_next_action_id')}` — authorized = "
+            f"{record.get('stage129_audit_next_action_authorized')}. An audit "
+            "verdict is never an authorization.",
+            "- Package: `project/stage129/"
+            "final_development_model_eligibility_audit/`; interpretation: "
+            "`project/stage129/final_development_model_eligibility_audit/"
+            "README_STAGE129_FINAL_DEVELOPMENT_MODEL_ELIGIBILITY_AUDIT.md`",
             "",
         ]
     lines += [
@@ -12921,6 +12992,430 @@ def derive_stage129_m3_cbi_human_discontinuation_markers(root: str) -> dict:
         "stage129_m3_cbi_next_action_executes_m3_cbi": False,
         "stage129_m3_cbi_final_test_locked": True,
         "stage129_m3_cbi_final_test_rows_read": 0,
+    }
+
+
+_STAGE129_AUDIT_PKG = "project/stage129/final_development_model_eligibility_audit"
+_STAGE129_AUDIT_ACTION_ID = "stage129-final-development-model-eligibility-audit"
+_STAGE129_AUDIT_VERDICT_REL = (
+    f"{_STAGE129_AUDIT_PKG}/stage129_final_model_eligibility_audit_verdict.json")
+_STAGE129_AUDIT_MATRIX_REL = (
+    f"{_STAGE129_AUDIT_PKG}/stage129_final_model_eligibility_matrix.json")
+_STAGE129_AUDIT_ORDERING_REL = (
+    f"{_STAGE129_AUDIT_PKG}/stage129_robustness_ordering_record.json")
+_STAGE129_AUDIT_BOUNDARY_REL = (
+    f"{_STAGE129_AUDIT_PKG}/"
+    "stage129_final_model_eligibility_audit_governance_boundary.json")
+#: The four allowed block verdicts, and the four allowed algorithm verdicts.
+#: A verdict outside these vocabularies is a build failure, never a new label.
+_STAGE129_AUDIT_BLOCK_VERDICTS = (
+    "UNIQUE_FINAL_BLOCK_DETERMINED_BY_FROZEN_RULE",
+    "FINAL_BLOCK_REQUIRES_HUMAN_DECISION",
+    "NO_BLOCK_CURRENTLY_ELIGIBLE_UNDER_FROZEN_RULES",
+    "CONTRACT_CONFLICT_PREVENTS_BLOCK_DETERMINATION",
+)
+_STAGE129_AUDIT_ALGORITHM_VERDICTS = (
+    "UNIQUE_FINAL_ALGORITHM_DETERMINED_BY_FROZEN_RULE",
+    "FINAL_ALGORITHM_REQUIRES_HUMAN_DECISION",
+    "NO_ALGORITHM_CURRENTLY_ELIGIBLE_UNDER_FROZEN_RULES",
+    "CONTRACT_CONFLICT_PREVENTS_ALGORITHM_DETERMINATION",
+)
+#: Only these two verdicts may name a determined candidate. Everything else must
+#: leave it null.
+_STAGE129_AUDIT_UNIQUE_VERDICTS = (
+    "UNIQUE_FINAL_BLOCK_DETERMINED_BY_FROZEN_RULE",
+    "UNIQUE_FINAL_ALGORITHM_DETERMINED_BY_FROZEN_RULE",
+)
+_STAGE129_AUDIT_BLOCKS = ("M1", "M2")
+_STAGE129_AUDIT_ALGORITHMS = (
+    "regularized_logistic_regression", "random_forest", "xgboost")
+_STAGE129_AUDIT_HOLM_REPORTING_VERDICTS = (
+    "HOLM_FINAL_REPORTING_REQUIRES_SEPARATE_HUMAN_OR_METHODS_DECISION",
+    "HOLM_FINAL_REPORTING_DETERMINED_BY_FROZEN_RULE",
+)
+#: Pointer vocabulary, keyed to the verdict pair. Even two unique verdicts may
+#: only ever point at a human AUTHORIZATION step -- never at a refit or the
+#: Final Test.
+_STAGE129_AUDIT_POINTER_BOTH_UNIQUE = (
+    "human_authorization_required_for_final_model_selection")
+_STAGE129_AUDIT_POINTER_CONFLICT = "human_methods_decision_required"
+_STAGE129_AUDIT_POINTER_DEFAULT = "human_decision_required"
+#: A pointer that would execute science. None of these may ever appear.
+_STAGE129_AUDIT_FORBIDDEN_POINTER_SUBSTRINGS = (
+    "refit", "final-test", "final_test", "stage130", "retune", "tuning",
+    "bootstrap", "shap",
+)
+
+
+def derive_stage129_final_model_eligibility_audit_markers(root: str) -> dict:
+    """Recognize the READ-ONLY final-development eligibility audit.
+
+    Narrow and fail-closed. The audit reads committed artifacts and answers one
+    question: do the frozen rules determine the final block and the final
+    algorithm uniquely? It fits nothing, predicts nothing, computes no metric,
+    CI or p-value, reads no row-level scientific data, and never touches the
+    Final Test.
+
+    The safety property that matters here is that an AUDIT may not become a
+    SELECTION. So this function refuses a unique verdict that does not carry a
+    deterministic rule citation with a real file path and key, refuses any
+    determined candidate under a non-unique verdict, refuses a selected winner
+    or final model in every case, and refuses a next pointer that would execute
+    science even when both verdicts are unique.
+
+    Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE129_AUDIT_VERDICT_REL)
+    if not os.path.isfile(path):
+        return {}
+    verdict = _require_json_artifact(root, _STAGE129_AUDIT_VERDICT_REL)
+    matrix = _require_json_artifact(root, _STAGE129_AUDIT_MATRIX_REL)
+    ordering = _require_json_artifact(root, _STAGE129_AUDIT_ORDERING_REL)
+    boundary = _require_json_artifact(root, _STAGE129_AUDIT_BOUNDARY_REL)
+
+    for artifact, label in ((verdict, "verdict"), (matrix, "matrix"),
+                            (ordering, "ordering"), (boundary, "boundary")):
+        if artifact.get("action_id") != _STAGE129_AUDIT_ACTION_ID:
+            raise HandoffError(f"Stage129 audit {label} action_id mismatch")
+
+    # (1) The audit is read-only over committed artifacts.
+    for field in ("audit_is_read_only", "sources_read_are_committed_artifacts_only"):
+        if verdict.get(field) is not True:
+            raise HandoffError(f"Stage129 audit {field} must be True")
+    for field in ("audit_performed_row_level_analysis", "audit_recomputed_any_metric"):
+        if verdict.get(field) is not False:
+            raise HandoffError(f"Stage129 audit {field} must be False")
+    if boundary.get("audit_read_only") is not True:
+        raise HandoffError("Stage129 audit boundary must declare the audit read-only")
+    for field in ("new_metric_computed_from_row_level_data", "new_p_value_created",
+                  "new_tie_breaker_rule_created", "calibration_executed"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 audit boundary {field} must be False")
+
+    # (3) Verdicts come from the locked vocabularies. No new labels.
+    block_verdict = verdict.get("block_verdict")
+    algo_verdict = verdict.get("algorithm_verdict")
+    if block_verdict not in _STAGE129_AUDIT_BLOCK_VERDICTS:
+        raise HandoffError(
+            f"Stage129 audit block_verdict {block_verdict!r} outside the locked "
+            f"vocabulary {_STAGE129_AUDIT_BLOCK_VERDICTS}")
+    if algo_verdict not in _STAGE129_AUDIT_ALGORITHM_VERDICTS:
+        raise HandoffError(
+            f"Stage129 audit algorithm_verdict {algo_verdict!r} outside the "
+            f"locked vocabulary {_STAGE129_AUDIT_ALGORITHM_VERDICTS}")
+    holm_verdict = verdict.get("holm_reporting_verdict")
+    if holm_verdict not in _STAGE129_AUDIT_HOLM_REPORTING_VERDICTS:
+        raise HandoffError(
+            f"Stage129 audit holm_reporting_verdict {holm_verdict!r} outside the "
+            "locked vocabulary")
+
+    # (4) A unique verdict needs a deterministic rule with a REAL path and key.
+    # Absent that, the verdict may not be unique -- and a non-unique verdict may
+    # not smuggle a determined candidate.
+    for name, value, basis_key in (
+        ("block", block_verdict, "block_verdict_basis"),
+        ("algorithm", algo_verdict, "algorithm_verdict_basis"),
+    ):
+        basis = verdict.get(basis_key) or {}
+        if not basis:
+            raise HandoffError(f"Stage129 audit {name} verdict must carry a basis")
+        unique = value in _STAGE129_AUDIT_UNIQUE_VERDICTS
+        candidate = basis.get("audit_determined_candidate")
+        if not unique:
+            if basis.get("deterministic_rule_found") is not False:
+                raise HandoffError(
+                    f"Stage129 audit {name} verdict is not unique, so "
+                    "deterministic_rule_found must be False")
+            if candidate is not None:
+                raise HandoffError(
+                    f"Stage129 audit {name} verdict is not unique, so it may not "
+                    f"name a determined candidate (got {candidate!r})")
+            continue
+        if basis.get("deterministic_rule_found") is not True:
+            raise HandoffError(
+                f"Stage129 audit unique {name} verdict requires "
+                "deterministic_rule_found = True")
+        if not candidate:
+            raise HandoffError(
+                f"Stage129 audit unique {name} verdict must name the determined "
+                "candidate")
+        rule = basis.get("determining_rule") or {}
+        rule_path, rule_key = rule.get("path"), rule.get("key")
+        if not rule_path or not rule_key or not rule.get("binding_phrase"):
+            raise HandoffError(
+                f"Stage129 audit unique {name} verdict requires a determining "
+                "rule with path, key and binding_phrase")
+        if not os.path.isfile(os.path.join(root, rule_path)):
+            raise HandoffError(
+                f"Stage129 audit unique {name} verdict cites a rule file that "
+                f"does not exist: {rule_path}")
+        if rule.get("deterministic_proof") in (None, "", []):
+            raise HandoffError(
+                f"Stage129 audit unique {name} verdict requires a "
+                "deterministic_proof showing the rule selects exactly one")
+
+    # A determined candidate, if any, is never a final selection.
+    if verdict.get("audit_determined_candidate") is not None and \
+            block_verdict not in _STAGE129_AUDIT_UNIQUE_VERDICTS and \
+            algo_verdict not in _STAGE129_AUDIT_UNIQUE_VERDICTS:
+        raise HandoffError(
+            "Stage129 audit may not publish a determined candidate when neither "
+            "verdict is unique")
+    if boundary.get("audit_determined_candidate_is_not_a_final_selection") is not True:
+        raise HandoffError(
+            "Stage129 audit must declare that a determined candidate is not a "
+            "final selection")
+
+    # (2) The candidate matrix covers exactly the frozen blocks x algorithms.
+    candidates = matrix.get("candidates") or []
+    seen = {(c.get("block"), c.get("algorithm")) for c in candidates}
+    expected = {(b, a) for b in _STAGE129_AUDIT_BLOCKS
+                for a in _STAGE129_AUDIT_ALGORITHMS}
+    if seen != expected:
+        raise HandoffError(
+            "Stage129 audit candidate matrix must cover exactly "
+            f"{sorted(expected)}, got {sorted(seen)}")
+    if len(candidates) != len(expected):
+        raise HandoffError(
+            "Stage129 audit candidate matrix must not duplicate a candidate")
+    if matrix.get("candidate_count") != len(expected):
+        raise HandoffError("Stage129 audit candidate_count mismatch")
+    if tuple(matrix.get("algorithms_audited") or ()) != _STAGE129_AUDIT_ALGORITHMS:
+        raise HandoffError(
+            "Stage129 audit must audit exactly the three frozen algorithms")
+    required_fields = (
+        "configuration_id", "configuration_source_artifact",
+        "development_evaluation_exists", "configuration_frozen",
+        "robustness_evidence_available", "predictor_block_admitted",
+        "eligible_for_final_selection", "selection_rule_source")
+    for cand in candidates:
+        for field in required_fields:
+            if field not in cand:
+                raise HandoffError(
+                    f"Stage129 audit candidate {cand.get('block')}/"
+                    f"{cand.get('algorithm')} is missing {field}")
+        # No candidate may carry a selection rule while the verdicts are not
+        # unique -- that would be a winner smuggled in through the matrix.
+        if cand.get("selection_rule_source") and \
+                algo_verdict not in _STAGE129_AUDIT_UNIQUE_VERDICTS:
+            raise HandoffError(
+                "Stage129 audit candidate may not cite a selection rule while "
+                "the algorithm verdict is not unique")
+    if matrix.get("eligibility_is_not_selection") is not True:
+        raise HandoffError(
+            "Stage129 audit matrix must declare that eligibility is not selection")
+    for field in ("no_candidate_declared_winner_on_point_estimate",
+                  "point_estimates_are_quoted_from_committed_artifacts_only",
+                  "metrics_are_quoted_never_recomputed"):
+        if matrix.get(field) is not True:
+            raise HandoffError(f"Stage129 audit matrix {field} must be True")
+
+    # (5)(6) M2 retention is not a selection, and its non-superiority stands.
+    distinctions = verdict.get("terminology_distinctions_preserved") or {}
+    for field in ("m2_retained_is_not_m2_final_block_selected",
+                  "m2_evaluated_is_not_m2_superiority_established",
+                  "best_point_estimate_is_not_paper_winner",
+                  "retained_design_is_not_final_model",
+                  "selected_configuration_per_algorithm_is_not_selected_final_algorithm",
+                  "eligible_candidate_is_not_authorized_refit",
+                  "development_winner_is_not_final_test_result"):
+        if distinctions.get(field) is not True:
+            raise HandoffError(
+                f"Stage129 audit must preserve the distinction {field}")
+    if boundary.get("m2_retention_treated_as_final_selection") is not False:
+        raise HandoffError(
+            "Stage129 audit may not treat M2 retention as a final selection")
+    if boundary.get("selected_configuration_treated_as_final_algorithm") is not False:
+        raise HandoffError(
+            "Stage129 audit may not treat a selected configuration as the final "
+            "algorithm")
+    if boundary.get("m2_predictive_superiority_claim_supported") is not False:
+        raise HandoffError(
+            "Stage129 audit must preserve that M2 superiority is unsupported")
+
+    # (7) Robustness is reported, never used to cherry-pick.
+    for field in ("cherry_picking_performed", "used_to_exclude_a_candidate",
+                  "candidate_excluded_on_robustness_grounds",
+                  "promoted_any_robustness_to_primary",
+                  "new_tie_breaker_rule_created"):
+        if ordering.get(field) is not False:
+            raise HandoffError(f"Stage129 audit ordering {field} must be False")
+    if ordering.get("all_locked_robustness_parts_included") is not True:
+        raise HandoffError(
+            "Stage129 audit must include every locked robustness part")
+    if ordering.get("new_robustness_executed") != 0:
+        raise HandoffError("Stage129 audit may not execute new robustness")
+    if ordering.get("values_are_quoted_not_recomputed") is not True:
+        raise HandoffError("Stage129 audit ordering values must be quoted")
+    for field in ("robustness_used_for_outcome_driven_exclusion",
+                  "robustness_promoted_to_primary"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 audit boundary {field} must be False")
+
+    # (11) The Holm ledger is reconciled, never executed or shrunk.
+    ledger = verdict.get("holm_family_ledger") or {}
+    if tuple(ledger.get("family_members_live") or ()) != \
+            _STAGE128_M3_LAG_CONFIRMATORY_FAMILY:
+        raise HandoffError(
+            "Stage129 audit must preserve the live confirmatory Holm family "
+            f"exactly as {_STAGE128_M3_LAG_CONFIRMATORY_FAMILY}")
+    if ledger.get("family_member_count") != 3:
+        raise HandoffError("Stage129 audit Holm family must keep three members")
+    for field in ("family_members_removed_or_renamed_by_this_audit",
+                  "family_shrunk_post_hoc_by_this_audit",
+                  "holm_adjustment_executed_by_this_audit",
+                  "holm_family_complete"):
+        if ledger.get(field) is not False:
+            raise HandoffError(f"Stage129 audit Holm ledger {field} must be False")
+    if ledger.get("new_p_values_created_by_this_audit") != 0:
+        raise HandoffError("Stage129 audit may not create a p-value")
+    for member in _STAGE128_M3_LAG_CONFIRMATORY_FAMILY:
+        entry = ledger.get(member) or {}
+        if not entry:
+            raise HandoffError(
+                f"Stage129 audit Holm ledger is missing member {member}")
+        if entry.get("p_value") is not None:
+            raise HandoffError(
+                f"Stage129 audit Holm ledger {member} p_value must stay null")
+        if not entry.get("status"):
+            raise HandoffError(
+                f"Stage129 audit Holm ledger {member} must carry a status")
+    # The boundary must agree with the ledger: an audit neither closes the
+    # family nor runs the adjustment, and may not shrink or rename its members.
+    for field in ("holm_family_complete", "holm_adjustment_executed",
+                  "holm_family_members_removed_or_renamed",
+                  "holm_family_shrunk_post_hoc"):
+        if boundary.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 audit boundary {field} must be False; an audit "
+                "reconciles the Holm ledger, it never executes or closes it")
+
+    # (9)(10) M3, M4 and M3-LAG-WDI keep their dispositions.
+    for field in ("m3_cbi_modeling_executed_or_authorized",
+                  "m4_modeling_executed_or_authorized",
+                  "m3_cbi_disposition_modified_by_this_action",
+                  "m4_disposition_modified_by_this_action",
+                  "m3_lag_wdi_promoted_to_confirmatory_model",
+                  "m3_lag_wdi_disposition_modified_by_this_action",
+                  "m1_status_modified_by_this_action",
+                  "m2_status_modified_by_this_action",
+                  "m2_retained_status_modified_by_this_action",
+                  "historical_scientific_artifacts_modified_by_this_action",
+                  "prior_packages_modified_by_this_action",
+                  "existing_pull_requests_modified_by_this_action"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 audit boundary {field} must be False")
+    if boundary.get("m3_lag_wdi_disposition") != _STAGE129_M3_LAG_WDI_DISPOSITION:
+        raise HandoffError(
+            "Stage129 audit must preserve the M3-LAG-WDI disposition "
+            f"{_STAGE129_M3_LAG_WDI_DISPOSITION}")
+
+    # (12)(13)(14) Nothing is selected, executed or unlocked.
+    for field in ("paper_winner_selected", "final_model_selected",
+                  "full_development_refit_executed", "stage130_started",
+                  "stage130_or_next_stage_executed", "final_test_access_authorized",
+                  "next_research_action_authorized", "next_action_authorized",
+                  "next_action_executes_refit", "next_action_executes_final_test",
+                  "merge_authorized", "ready_for_review_authorized",
+                  "manuscript_writing_or_rewriting_authorized"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 audit boundary {field} must be False")
+    if boundary.get("final_test_locked") is not True:
+        raise HandoffError("Stage129 audit must keep the Final Test locked")
+    if boundary.get("final_test_rows_read") != 0:
+        raise HandoffError("Stage129 audit final_test_rows_read must be 0")
+    if verdict.get("next_action_authorized") is not False:
+        raise HandoffError("Stage129 audit next_action_authorized must be False")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError("Stage129 audit boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage129 audit counters.{field} must be 0 (the audit fits no "
+                "model, computes no metric and reads no row-level data)")
+
+    # The pointer must match the verdict pair, and may never execute science.
+    both_unique = (block_verdict in _STAGE129_AUDIT_UNIQUE_VERDICTS
+                   and algo_verdict in _STAGE129_AUDIT_UNIQUE_VERDICTS)
+    any_conflict = ("CONTRACT_CONFLICT" in block_verdict
+                    or "CONTRACT_CONFLICT" in algo_verdict)
+    if any_conflict:
+        expected_pointer = _STAGE129_AUDIT_POINTER_CONFLICT
+    elif both_unique:
+        expected_pointer = _STAGE129_AUDIT_POINTER_BOTH_UNIQUE
+    else:
+        expected_pointer = _STAGE129_AUDIT_POINTER_DEFAULT
+    pointer = verdict.get("next_action_id")
+    if pointer != expected_pointer:
+        raise HandoffError(
+            f"Stage129 audit next_action_id must be {expected_pointer!r} for "
+            f"block={block_verdict} / algorithm={algo_verdict}, got {pointer!r}")
+    if boundary.get("next_action_id") != expected_pointer:
+        raise HandoffError("Stage129 audit boundary pointer must match the verdict")
+    lowered = str(pointer).lower()
+    for bad in _STAGE129_AUDIT_FORBIDDEN_POINTER_SUBSTRINGS:
+        if bad in lowered:
+            raise HandoffError(
+                f"Stage129 audit pointer {pointer!r} names an execution step "
+                f"({bad}); an audit may never open one")
+    if boundary.get("pointer_is_not_authorization") is not True:
+        raise HandoffError(
+            "Stage129 audit must declare that its pointer is not an authorization")
+
+    return {
+        "stage129_final_model_eligibility_audit_recorded": True,
+        "stage129_final_model_eligibility_audit_action_id": _STAGE129_AUDIT_ACTION_ID,
+        "stage129_final_model_eligibility_audit_is_read_only": True,
+
+        # The three verdicts.
+        "stage129_final_block_verdict": block_verdict,
+        "stage129_final_algorithm_verdict": algo_verdict,
+        "stage129_holm_reporting_verdict": holm_verdict,
+        "stage129_final_block_determined_candidate":
+            (verdict.get("block_verdict_basis") or {}).get(
+                "audit_determined_candidate"),
+        "stage129_final_algorithm_determined_candidate":
+            (verdict.get("algorithm_verdict_basis") or {}).get(
+                "audit_determined_candidate"),
+        "stage129_audit_determined_candidate_is_not_a_final_selection": True,
+
+        # The candidate matrix.
+        "stage129_audit_candidate_count": len(candidates),
+        "stage129_audit_blocks_audited": list(_STAGE129_AUDIT_BLOCKS),
+        "stage129_audit_algorithms_audited": list(_STAGE129_AUDIT_ALGORITHMS),
+        "stage129_audit_eligible_candidate_count": sum(
+            1 for c in candidates if c.get("eligible_for_final_selection")),
+        "stage129_audit_eligibility_is_not_selection": True,
+
+        # Robustness, reported not weaponized.
+        "stage129_audit_ordering_stable_across_robustness":
+            ordering.get("ordering_is_stable_across_all_robustness"),
+        "stage129_audit_parts_reversing_primary_ordering":
+            ordering.get("parts_reversing_primary_ordering"),
+        "stage129_audit_parts_preserving_primary_ordering":
+            ordering.get("parts_preserving_primary_ordering"),
+        "stage129_audit_robustness_used_to_exclude_a_candidate": False,
+
+        # M2: retained, not selected; evaluated, not superior.
+        "stage129_audit_m2_retained_is_not_final_selection": True,
+        "stage129_audit_m2_superiority_claim_supported": False,
+
+        # The Holm ledger, reconciled only.
+        "stage129_audit_holm_family": list(_STAGE128_M3_LAG_CONFIRMATORY_FAMILY),
+        "stage129_audit_holm_family_complete": False,
+        "stage129_audit_holm_adjustment_executed": False,
+        "stage129_audit_holm_new_p_values": 0,
+
+        # The firewall, restated from this action's own boundary.
+        "stage129_audit_paper_winner_selected": False,
+        "stage129_audit_final_model_selected": False,
+        "stage129_audit_full_development_refit_executed": False,
+        "stage129_audit_stage130_started": False,
+        "stage129_audit_final_test_locked": True,
+        "stage129_audit_final_test_rows_read": 0,
+        "stage129_audit_next_action_id": expected_pointer,
+        "stage129_audit_next_action_authorized": False,
     }
 
 
