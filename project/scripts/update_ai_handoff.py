@@ -2985,6 +2985,13 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # formal Gate verdict, the four candidates and both live research
         # pointers all survive it untouched.
         **derive_stage129_m4_manuscript_reporting_decision_markers(root),
+        # Must come after the M3 macro Data Gate and the Track A termination:
+        # the human decision to discontinue M3-CBI answers the pending human
+        # review that the EXECUTED Gate handed over. It supersedes that open
+        # review only -- never the Gate's own status, which stays
+        # UNRESOLVED_M3_DATA_GATE and is republished as terminal. It advances
+        # no pointer, promotes nothing, and touches no M1/M2/M4 state.
+        **derive_stage129_m3_cbi_human_discontinuation_markers(root),
         }))
 
 
@@ -5810,6 +5817,123 @@ def render_current_state(record: dict) -> str:
             "- Package: `project/stage129/m4_manuscript_reporting_decision/`;"
             " interpretation: `project/stage129/m4_manuscript_reporting_decision/"
             "README_STAGE129_M4_MANUSCRIPT_REPORTING_DECISION.md`",
+            "",
+        ]
+    if record.get("stage129_m3_cbi_discontinuation_recorded"):
+        lines += [
+            "### Stage129 — M3-CBI DISCONTINUED by human decision, and its "
+            "reporting decision\n",
+            "_A human scientific decision plus its reporting consequence. "
+            "Governance only: zero retrieval, zero official-source contact, "
+            "zero Gate re-execution, zero new coverage or threshold, zero "
+            "feature materialization, zero modeling, zero Holm, zero Final "
+            "Test access._\n",
+            "- ⛔ **Block disposition:** "
+            f"`{record.get('m3_cbi_disposition')}` — authorized by human = "
+            f"{record.get('stage129_m3_cbi_discontinuation_authorized_by_human')}"
+            ", reason class "
+            f"`{record.get('stage129_m3_cbi_reason_class')}`.",
+            "- ❗ **The Gate WAS executed, and its status is NOT reassigned:** "
+            "executed = "
+            f"{record.get('stage129_m3_macro_data_gate_executed')}, terminal "
+            f"status `{record.get('m3_macro_data_gate_terminal_status')}`, "
+            "formal failure = "
+            f"{record.get('stage129_m3_macro_data_gate_formal_failure')}, "
+            "recorded as not executed = "
+            f"{record.get('stage129_m3_macro_data_gate_recorded_as_not_executed')}"
+            ", status reassigned = "
+            f"{record.get('stage129_m3_macro_data_gate_status_reassigned')}. "
+            "Unlike M4 this Gate ran, so it is neither a FAIL nor an unrun "
+            "Gate — it terminated unresolved.",
+            "- 🔎 **Nothing is fabricated as resolved:** "
+            f"{record.get('stage129_m3_macro_data_gate_unresolved_reason_count')}"
+            " unresolved/blocker reasons stand, resolved by this decision = "
+            f"{record.get('stage129_m3_macro_data_gate_unresolved_reasons_resolved')}"
+            "; new coverage or threshold computed = "
+            f"{record.get('stage129_m3_cbi_new_coverage_or_threshold_computed')}"
+            "; point-in-time availability established = "
+            f"{record.get('stage129_m3_cbi_point_in_time_availability_established')}"
+            f" (`{record.get('stage129_m3_cbi_point_in_time_evidence_status')}`).",
+            "- ⛔ **The reason is evidence, not a result:** poor model result = "
+            f"{record.get('stage129_m3_cbi_reason_is_poor_model_result')}, "
+            "outcome inspection = "
+            f"{record.get('stage129_m3_cbi_reason_is_outcome_inspection')}.",
+            "- ⛔ **Nothing downstream is authorized:** block admitted = "
+            f"{record.get('m3_cbi_block_admitted')}, retrieval continues = "
+            f"{record.get('m3_cbi_retrieval_continues')}, feature "
+            f"materialization = "
+            f"{record.get('m3_cbi_feature_materialization_authorized')}, "
+            f"modeling will run = {record.get('m3_cbi_modeling_will_run')}, "
+            "incremental evaluation will run = "
+            f"{record.get('m3_cbi_incremental_evaluation_will_run')}.",
+            "- 🔒 **Reopening:** authorized = "
+            f"{record.get('m3_cbi_reopening_authorized')}, requires new "
+            "explicit human authorization = "
+            f"{record.get('m3_cbi_reopening_requires_new_human_authorization')}.",
+            "- ⛔ **The prespecified comparison is kept, not erased:** "
+            f"`{record.get('stage129_m3_cbi_comparison_id')}` (frozen SAP "
+            f"identifier `{record.get('stage129_m3_cbi_frozen_sap_identifier')}`)"
+            f" status `{record.get('stage129_m3_cbi_comparison_status')}`, "
+            f"p-value `{record.get('stage129_m3_cbi_comparison_p_value')}`, null "
+            "hypothesis accepted = "
+            f"{record.get('stage129_m3_cbi_comparison_null_hypothesis_accepted')}"
+            ", rejected = "
+            f"{record.get('stage129_m3_cbi_comparison_null_hypothesis_rejected')}"
+            ", inferential conclusion "
+            f"`{record.get('stage129_m3_cbi_comparison_inferential_conclusion')}`"
+            ", performance claim "
+            f"`{record.get('stage129_m3_cbi_comparison_performance_claim')}`. "
+            "Removed from SAP history = "
+            f"{record.get('stage129_m3_cbi_comparison_removed_from_sap_history')}"
+            ", renamed or substituted = "
+            f"{record.get('stage129_m3_cbi_comparison_renamed_or_substituted')}"
+            ". Holm family "
+            f"`{record.get('stage129_m3_cbi_confirmatory_holm_family')}` "
+            "modified = "
+            f"{record.get('stage129_m3_cbi_confirmatory_holm_family_modified')}"
+            ", final adjustment declared complete = "
+            f"{record.get('stage129_m3_cbi_holm_final_adjustment_declared_complete')}.",
+            "- 📄 **M3-LAG-WDI is NOT promoted into the vacated role:** "
+            "disposition "
+            f"`{record.get('stage129_m3_cbi_m3_lag_wdi_disposition_preserved')}`"
+            ", promoted to confirmatory = "
+            f"{record.get('stage129_m3_cbi_m3_lag_wdi_promoted_to_confirmatory')}"
+            ", substitute or proxy for M3-CBI = "
+            f"{record.get('stage129_m3_cbi_m3_lag_wdi_is_substitute_or_proxy')}"
+            ", used to fill the M3-CBI comparison = "
+            f"{record.get('stage129_m3_cbi_m3_lag_wdi_used_to_fill_the_comparison')}"
+            ", exploratory value in the confirmatory family = "
+            f"{record.get('stage129_m3_cbi_exploratory_value_in_confirmatory_family')}"
+            ". Existing PRs modified = "
+            f"{record.get('stage129_m3_cbi_existing_pull_requests_modified')}.",
+            "- 🔁 **Supersedes the pending review, never the verdict:** key "
+            f"`{record.get('stage129_m3_cbi_supersedes_key')}` "
+            f"(was `{record.get('stage129_m3_cbi_supersedes_previous_value')}`) "
+            f"in `{record.get('stage129_m3_cbi_supersedes_artifact')}`, scope "
+            f"`{record.get('stage129_m3_cbi_supersede_scope')}`. Gate artifact "
+            "preserved byte-for-byte = "
+            f"{record.get('stage129_m3_cbi_gate_artifact_preserved')}.",
+            "- 📝 **Approved reporting text (EN):** "
+            f"{record.get('stage129_m3_cbi_approved_manuscript_text_en')}",
+            "- 📝 **Approved reporting text (FA):** "
+            f"{record.get('stage129_m3_cbi_approved_manuscript_text_fa')}",
+            "- ⛔ **Text is a reporting decision, not a writing "
+            "authorization:** manuscript writing or rewriting authorized = "
+            f"{record.get('stage129_m3_cbi_manuscript_writing_authorized')}.",
+            "- ⛔ **Final Test firewall untouched:** locked "
+            f"{record.get('stage129_m3_cbi_final_test_locked')}, rows read "
+            f"{record.get('stage129_m3_cbi_final_test_rows_read')}.",
+            "- ➡️ **Next action:** "
+            f"`{record.get('stage129_m3_cbi_next_action_id')}` — scope "
+            f"`{record.get('stage129_m3_cbi_next_action_scope')}`, authorized = "
+            f"{record.get('stage129_m3_cbi_next_action_authorized')}, executes "
+            f"M3-CBI = "
+            f"{record.get('stage129_m3_cbi_next_action_executes_m3_cbi')}. A "
+            "pointer is never an authorization.",
+            "- Package: `project/stage129/"
+            "m3_cbi_human_discontinuation_and_reporting/`; interpretation: "
+            "`project/stage129/m3_cbi_human_discontinuation_and_reporting/"
+            "README_STAGE129_M3_CBI_HUMAN_DISCONTINUATION_AND_REPORTING.md`",
             "",
         ]
     lines += [
@@ -12366,6 +12490,437 @@ def derive_stage129_m4_manuscript_reporting_decision_markers(root: str) -> dict:
         # the reporting decision still sees the firewall.
         "stage129_m4_reporting_is_formal_gate_failure": False,
         "stage129_m4_reporting_final_test_rows_read": 0,
+    }
+
+
+_STAGE129_M3_CBI_PKG = "project/stage129/m3_cbi_human_discontinuation_and_reporting"
+_STAGE129_M3_CBI_ACTION_ID = "stage129-m3-cbi-human-discontinuation-and-reporting"
+_STAGE129_M3_CBI_DECISION_REL = (
+    f"{_STAGE129_M3_CBI_PKG}/stage129_m3_cbi_human_discontinuation_decision.json")
+_STAGE129_M3_CBI_COMPARISON_REL = (
+    f"{_STAGE129_M3_CBI_PKG}/stage129_m3_cbi_confirmatory_comparison_record.json")
+_STAGE129_M3_CBI_BOUNDARY_REL = (
+    f"{_STAGE129_M3_CBI_PKG}/stage129_m3_cbi_governance_boundary.json")
+_STAGE129_M3_CBI_DISPOSITION = (
+    "M3_CBI_DISCONTINUED_BY_HUMAN_DECISION_UNRESOLVED_DATA_GATE_AND_UNPROVEN_POINT_IN_TIME")
+#: The Gate WAS executed and terminated here. This value is republished, never
+#: reassigned: the two other members of the locked vocabulary are outcomes the
+#: Gate did not produce, and "not executed" would erase a completed action.
+_STAGE129_M3_CBI_GATE_TERMINAL_STATUS = "UNRESOLVED_M3_DATA_GATE"
+_STAGE129_M3_CBI_GATE_FORBIDDEN_STATUS = (
+    "PASS_FOR_M3_INCREMENTAL_EVALUATION", "FAIL_M3_DATA_GATE")
+#: Live canonical id, already published by the merged Stage129 M4 packages.
+#: This action reuses it and may not mint an alias.
+_STAGE129_M3_CBI_COMPARISON_ID = "M3_CBI_minus_M2"
+_STAGE129_M3_CBI_COMPARISON_STATUS = "NOT_EXECUTED_M3_CBI_DISCONTINUED"
+#: The frozen Stage125 contract's own member name for the same comparison.
+_STAGE129_M3_CBI_FROZEN_SAP_ID = "M3_minus_M2"
+_STAGE129_M3_CBI_NEXT_ACTION_ID = "human_decision_required"
+_STAGE129_M3_CBI_NEXT_ACTION_SCOPE = (
+    "m3_cbi_discontinued_no_further_m3_cbi_action_is_authorized")
+_STAGE129_M3_LAG_WDI_DISPOSITION = "SUPPLEMENTARY_EXPLORATORY_ONLY"
+#: Phrases that would turn "we did not run it" into a claim about a result.
+_STAGE129_M3_CBI_FORBIDDEN_TEXT = (
+    "p =", "p-value of", "p<", "p >", "p <", "significant", "significantly",
+    "outperform", "improved", "improvement", "we reject", "we accept",
+    "rejected the null", "accepted the null",
+)
+
+
+def derive_stage129_m3_cbi_human_discontinuation_markers(root: str) -> dict:
+    """Recognize the human decision to discontinue M3-CBI, and how it is reported.
+
+    Narrow and fail-closed. This is a decision event only: it retrieves nothing,
+    contacts no official source, re-executes no Gate, computes no coverage or
+    threshold, materializes no feature, fits no model and never touches the
+    Final Test.
+
+    The methodological care that defines this function: unlike M4, the M3 macro
+    Data Gate WAS executed, and it terminated at ``UNRESOLVED_M3_DATA_GATE``.
+    So the function refuses BOTH falsifications -- it will not let the decision
+    republish the Gate as PASS/FAIL, and it will not let it claim the Gate was
+    never executed. It also refuses to let any of the recorded unresolved
+    reasons be declared resolved, and refuses to let the supplementary
+    M3-LAG-WDI block be promoted into the confirmatory role M3-CBI vacated.
+
+    Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE129_M3_CBI_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    decision = _require_json_artifact(root, _STAGE129_M3_CBI_DECISION_REL)
+    comparison = _require_json_artifact(root, _STAGE129_M3_CBI_COMPARISON_REL)
+    boundary = _require_json_artifact(root, _STAGE129_M3_CBI_BOUNDARY_REL)
+
+    for artifact, label in ((decision, "decision"), (comparison, "comparison"),
+                            (boundary, "boundary")):
+        key = "decision_id" if label == "decision" else "action_id"
+        if artifact.get(key) != _STAGE129_M3_CBI_ACTION_ID:
+            raise HandoffError(
+                f"Stage129 M3-CBI {label} action id mismatch")
+    if decision.get("decision_type") != "human_scientific_decision":
+        raise HandoffError(
+            "Stage129 M3-CBI decision must be a human_scientific_decision")
+    if decision.get("authorized_by_human") is not True:
+        raise HandoffError("Stage129 M3-CBI decision must be human-authorized")
+
+    # (1) The disposition is explicit, machine-readable and unambiguous.
+    for artifact, label in ((decision, "decision"), (boundary, "boundary")):
+        if artifact.get("m3_cbi_disposition") != _STAGE129_M3_CBI_DISPOSITION:
+            raise HandoffError(
+                f"Stage129 M3-CBI {label} disposition must be "
+                f"{_STAGE129_M3_CBI_DISPOSITION}")
+
+    # (2)(3) The EXECUTED Gate keeps its terminal status. Neither falsification
+    # is allowed: not PASS/FAIL, and not "never executed".
+    for artifact, label in ((decision, "decision"), (boundary, "boundary")):
+        if artifact.get("m3_macro_data_gate_executed") is not True:
+            raise HandoffError(
+                f"Stage129 M3-CBI {label} must record that the M3 Data Gate WAS "
+                "executed; recording it as unexecuted would erase a completed "
+                "research action")
+        terminal = artifact.get("m3_macro_data_gate_terminal_status")
+        if terminal in _STAGE129_M3_CBI_GATE_FORBIDDEN_STATUS:
+            raise HandoffError(
+                f"Stage129 M3-CBI {label} may not reassign the executed Gate to "
+                f"{terminal!r}; the Gate returned "
+                f"{_STAGE129_M3_CBI_GATE_TERMINAL_STATUS}")
+        if terminal != _STAGE129_M3_CBI_GATE_TERMINAL_STATUS:
+            raise HandoffError(
+                f"Stage129 M3-CBI {label} Gate terminal status must be "
+                f"{_STAGE129_M3_CBI_GATE_TERMINAL_STATUS}, got {terminal!r}")
+        if artifact.get("m3_macro_data_gate_formal_failure") is not False:
+            raise HandoffError(
+                f"Stage129 M3-CBI {label} must not record a formal Gate failure")
+        if artifact.get("m3_macro_data_gate_status_reassigned_by_this_decision") \
+                is not False and label == "decision":
+            raise HandoffError(
+                "Stage129 M3-CBI decision must not reassign the Gate status")
+    if boundary.get("m3_macro_data_gate_status_reassigned_by_this_action") is not False:
+        raise HandoffError(
+            "Stage129 M3-CBI boundary must not reassign the Gate status")
+    if decision.get("m3_macro_data_gate_recorded_as_not_executed") is not False:
+        raise HandoffError(
+            "Stage129 M3-CBI decision may not record the Gate as unexecuted")
+    for field in ("m3_macro_data_gate_reexecuted_by_this_action",
+                  "m3_macro_data_gate_artifacts_modified_by_this_action"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 M3-CBI boundary {field} must be False")
+
+    # The live Gate markers must agree with the decision, read from the
+    # untouched Gate artifact itself -- the supersede is anchored on reality.
+    gate = derive_stage128_m3_macro_data_gate_markers(root)
+    if gate:
+        if gate.get("m3_macro_data_gate_executed") is not True:
+            raise HandoffError(
+                "Stage129 M3-CBI decision requires an executed M3 Data Gate")
+        if gate.get("m3_macro_data_gate_status") != \
+                _STAGE129_M3_CBI_GATE_TERMINAL_STATUS:
+            raise HandoffError(
+                "Stage129 M3-CBI decision is anchored on a Gate status that no "
+                f"longer reads {_STAGE129_M3_CBI_GATE_TERMINAL_STATUS}: found "
+                f"{gate.get('m3_macro_data_gate_status')!r}. The Gate package "
+                "must stay byte-for-byte intact.")
+        live_count = gate.get("m3_macro_data_gate_unresolved_reason_count")
+        for artifact, label in ((decision, "decision"), (boundary, "boundary")):
+            if artifact.get("m3_macro_data_gate_unresolved_reason_count") != live_count:
+                raise HandoffError(
+                    f"Stage129 M3-CBI {label} unresolved reason count must match "
+                    f"the executed Gate's own count ({live_count})")
+
+    # (4) No unresolved reason may be fabricated as resolved.
+    if decision.get("m3_macro_data_gate_unresolved_reasons_resolved_by_this_decision") != 0:
+        raise HandoffError(
+            "Stage129 M3-CBI decision may not resolve any of the Gate's "
+            "unresolved reasons")
+    if boundary.get("m3_macro_data_gate_unresolved_reasons_resolved_by_this_action") != 0:
+        raise HandoffError(
+            "Stage129 M3-CBI boundary may not resolve any unresolved reason")
+    for field in ("new_coverage_or_threshold_computed",
+                  "point_in_time_availability_established"):
+        if decision.get(field) is not False:
+            raise HandoffError(f"Stage129 M3-CBI decision {field} must be False")
+    if boundary.get("point_in_time_availability_established") is not False:
+        raise HandoffError(
+            "Stage129 M3-CBI boundary may not claim point-in-time availability")
+
+    # (5) The block is not admitted and nothing downstream is authorized.
+    for field in ("m3_cbi_block_admitted", "m3_cbi_modeling_will_run",
+                  "m3_cbi_incremental_evaluation_will_run",
+                  "m3_cbi_retrieval_continues", "m3_cbi_reopening_authorized",
+                  "m3_cbi_feature_materialization_authorized"):
+        for artifact, label in ((decision, "decision"), (boundary, "boundary")):
+            if artifact.get(field) is not False:
+                raise HandoffError(
+                    f"Stage129 M3-CBI {label} {field} must be False")
+    for artifact, label in ((decision, "decision"), (boundary, "boundary")):
+        if artifact.get("m3_cbi_reopening_requires_new_human_authorization") is not True:
+            raise HandoffError(
+                f"Stage129 M3-CBI {label} must keep reopening behind a new "
+                "human authorization")
+    # The reason is evidence, never a result the study looked at.
+    for field in ("reason_is_poor_model_result", "reason_is_outcome_inspection",
+                  "outcome_or_final_test_observation_used_for_this_decision"):
+        if decision.get(field) is not False:
+            raise HandoffError(f"Stage129 M3-CBI decision {field} must be False")
+    if decision.get("decision_made_before_any_m3_cbi_modeling") is not True:
+        raise HandoffError(
+            "Stage129 M3-CBI decision must be made before any M3-CBI modeling")
+
+    # (6)(7) The prespecified comparison survives, unexecuted and unresolved.
+    if comparison.get("comparison_id") != _STAGE129_M3_CBI_COMPARISON_ID:
+        raise HandoffError(
+            f"Stage129 M3-CBI comparison id must be "
+            f"{_STAGE129_M3_CBI_COMPARISON_ID}")
+    if comparison.get("alias_created_by_this_action") is not False:
+        raise HandoffError(
+            "Stage129 M3-CBI may not mint a new comparison alias")
+    if comparison.get("frozen_sap_identifier_for_this_comparison") != \
+            _STAGE129_M3_CBI_FROZEN_SAP_ID:
+        raise HandoffError(
+            "Stage129 M3-CBI must preserve the frozen SAP identifier "
+            f"{_STAGE129_M3_CBI_FROZEN_SAP_ID}")
+    if comparison.get("comparison_status") != _STAGE129_M3_CBI_COMPARISON_STATUS:
+        raise HandoffError(
+            f"Stage129 M3-CBI comparison status must be "
+            f"{_STAGE129_M3_CBI_COMPARISON_STATUS}")
+    if comparison.get("comparison_p_value") is not None:
+        raise HandoffError(
+            "Stage129 M3-CBI must not publish a p-value for an unexecuted "
+            "comparison")
+    for field in ("comparison_null_hypothesis_accepted",
+                  "comparison_null_hypothesis_rejected",
+                  "comparison_removed_from_sap_history",
+                  "comparison_removed_from_holm_family",
+                  "comparison_renamed_by_this_action",
+                  "comparison_substituted_by_this_action",
+                  "confirmatory_holm_family_modified_by_this_action",
+                  "confirmatory_holm_family_shrunk_by_this_action",
+                  "holm_executed_by_this_action",
+                  "holm_final_adjustment_declared_complete",
+                  "exploratory_value_admitted_into_confirmatory_family",
+                  "frozen_sap_family_members_modified_by_this_action"):
+        if comparison.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 M3-CBI comparison {field} must be False")
+    for field in ("comparison_inferential_conclusion",
+                  "comparison_performance_claim"):
+        if comparison.get(field) != "none":
+            raise HandoffError(
+                f"Stage129 M3-CBI comparison {field} must be 'none'")
+    # The live family and the frozen family both keep all three members.
+    if tuple(comparison.get("confirmatory_holm_family_live") or ()) != \
+            _STAGE128_M3_LAG_CONFIRMATORY_FAMILY:
+        raise HandoffError(
+            "Stage129 M3-CBI must preserve the live confirmatory Holm family "
+            f"exactly as {_STAGE128_M3_LAG_CONFIRMATORY_FAMILY}")
+    if comparison.get("confirmatory_holm_family_member_count") != 3:
+        raise HandoffError(
+            "Stage129 M3-CBI must keep three confirmatory family members")
+    frozen = _require_json_artifact(
+        root, "project/stage125/part4_metrics_uncertainty_contract_stage125.json")
+    frozen_members = (frozen.get("multiplicity") or {}).get(
+        comparison.get("frozen_sap_family_key") or "")
+    if list(comparison.get("frozen_sap_family_members") or []) != list(
+            frozen_members or []):
+        raise HandoffError(
+            "Stage129 M3-CBI frozen SAP family members must match the frozen "
+            f"contract exactly, got {comparison.get('frozen_sap_family_members')!r} "
+            f"vs {frozen_members!r}")
+    if _STAGE129_M3_CBI_FROZEN_SAP_ID not in list(frozen_members or []):
+        raise HandoffError(
+            "Stage129 M3-CBI frozen SAP identifier is absent from the frozen "
+            "contract family")
+    if boundary.get("holm_final_adjustment_declared_complete") is not False:
+        raise HandoffError(
+            "Stage129 M3-CBI may not declare the Holm final adjustment complete")
+
+    # (8)(9) The supplementary block is not promoted into the vacated role.
+    if boundary.get("m3_lag_wdi_disposition") != _STAGE129_M3_LAG_WDI_DISPOSITION:
+        raise HandoffError(
+            "Stage129 M3-CBI must preserve the M3-LAG-WDI disposition "
+            f"{_STAGE129_M3_LAG_WDI_DISPOSITION}")
+    for field in ("m3_lag_wdi_promoted_to_confirmatory_model",
+                  "m3_lag_wdi_is_confirmatory_m3",
+                  "m3_lag_wdi_is_substitute_for_m3_cbi",
+                  "m3_lag_wdi_is_proxy_for_m3_cbi",
+                  "m3_lag_wdi_is_representative_of_m3_cbi",
+                  "m3_lag_wdi_results_used_to_fill_the_m3_cbi_comparison",
+                  "m3_lag_wdi_p_value_entered_confirmatory_holm_family",
+                  "m3_lag_wdi_disposition_modified_by_this_action",
+                  "m3_lag_wdi_artifacts_modified_by_this_action",
+                  "m3_lag_wdi_step_e_artifacts_modified_by_this_action",
+                  "m3_lag_wdi_pull_request_modified_by_this_action",
+                  "existing_pull_requests_modified_by_this_action"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 M3-CBI boundary {field} must be False")
+
+    # (10) M1, M2 and M4 are untouched, and no endgame step is opened.
+    for field in ("m1_status_modified_by_this_action",
+                  "m2_status_modified_by_this_action",
+                  "m2_retained_status_modified_by_this_action",
+                  "m4_discontinuation_status_modified_by_this_action",
+                  "m4_reporting_decision_modified_by_this_action",
+                  "m3i2_artifacts_modified_by_this_action",
+                  "prior_packages_modified_by_this_action",
+                  "paper_winner_selected", "final_model_selected",
+                  "full_development_refit_executed",
+                  "stage130_or_next_stage_executed",
+                  "next_research_action_authorized",
+                  "next_action_authorized", "next_action_executes_m3_cbi",
+                  "final_test_access_authorized",
+                  "manuscript_writing_or_rewriting_authorized",
+                  "new_official_source_contact_made",
+                  "reporting_claims_an_executed_result",
+                  "reporting_claims_m3_cbi_performance"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 M3-CBI boundary {field} must be False")
+
+    # (11) The Final Test firewall.
+    for artifact, label in ((decision, "decision"), (boundary, "boundary")):
+        if artifact.get("final_test_rows_read") != 0:
+            raise HandoffError(
+                f"Stage129 M3-CBI {label} final_test_rows_read must be 0")
+        if artifact.get("final_test_locked") is not True:
+            raise HandoffError(
+                f"Stage129 M3-CBI {label} must keep the Final Test locked")
+    if boundary.get("next_action_id") != _STAGE129_M3_CBI_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage129 M3-CBI pointer must stay "
+            f"{_STAGE129_M3_CBI_NEXT_ACTION_ID}")
+    if boundary.get("next_action_scope") != _STAGE129_M3_CBI_NEXT_ACTION_SCOPE:
+        raise HandoffError("Stage129 M3-CBI pointer scope mismatch")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError("Stage129 M3-CBI boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage129 M3-CBI counters.{field} must be 0 (no retrieval, "
+                "official-source contact, Gate execution, coverage, feature "
+                "materialization, modeling, Holm, bootstrap, SHAP or Final "
+                "Test access occurred)")
+
+    # (13) The approved text exists and states only what did NOT happen.
+    for field in ("approved_manuscript_text_en", "approved_manuscript_text_fa"):
+        text = decision.get(field)
+        if not isinstance(text, str) or not text.strip():
+            raise HandoffError(f"Stage129 M3-CBI decision must carry {field}")
+        lowered = text.lower()
+        for phrase in _STAGE129_M3_CBI_FORBIDDEN_TEXT:
+            if phrase in lowered:
+                raise HandoffError(
+                    f"Stage129 M3-CBI {field} claims an executed result via "
+                    f"{phrase!r}; the comparison was never executed")
+    for phrase in _STAGE129_M3_CBI_GATE_FORBIDDEN_STATUS:
+        if phrase in (decision.get("approved_manuscript_text_en") or ""):
+            raise HandoffError(
+                "Stage129 M3-CBI approved text must not publish a Gate verdict "
+                "the Gate never returned")
+
+    # The supersede is scoped to the pending review, never to the verdict.
+    marker = decision.get("superseded_marker") or {}
+    if marker.get("artifact") != _STAGE128_M3_MACRO_DATA_GATE_REL:
+        raise HandoffError(
+            "Stage129 M3-CBI supersede must name the executed Gate artifact")
+    if marker.get("key") != "m3_macro_data_gate_human_review_required":
+        raise HandoffError(
+            "Stage129 M3-CBI supersede must target the pending human review")
+    if marker.get("previous_value") is not True:
+        raise HandoffError(
+            "Stage129 M3-CBI supersede previous_value must be True (review pending)")
+    if marker.get("resolved_value") != _STAGE129_M3_CBI_DISPOSITION:
+        raise HandoffError(
+            "Stage129 M3-CBI supersede resolved_value must be the disposition")
+    if marker.get("historical_artifact_preserved_byte_for_byte") is not True:
+        raise HandoffError(
+            "Stage129 M3-CBI must preserve the Gate package byte-for-byte")
+
+    return {
+        "stage129_m3_cbi_discontinuation_recorded": True,
+        "stage129_m3_cbi_discontinuation_action_id": _STAGE129_M3_CBI_ACTION_ID,
+        "stage129_m3_cbi_discontinuation_authorized_by_human": True,
+
+        # The disposition. Bare and namespaced, so either surface reads the same.
+        "m3_cbi_disposition": _STAGE129_M3_CBI_DISPOSITION,
+        "stage129_m3_cbi_disposition": _STAGE129_M3_CBI_DISPOSITION,
+        "stage129_m3_cbi_reason_class": decision.get("reason_class"),
+        "stage129_m3_cbi_reason_is_poor_model_result": False,
+        "stage129_m3_cbi_reason_is_outcome_inspection": False,
+
+        # The Gate: executed, terminal, and NOT converted to a verdict.
+        "m3_macro_data_gate_terminal_status": _STAGE129_M3_CBI_GATE_TERMINAL_STATUS,
+        "stage129_m3_macro_data_gate_executed": True,
+        "stage129_m3_macro_data_gate_terminal_status":
+            _STAGE129_M3_CBI_GATE_TERMINAL_STATUS,
+        "stage129_m3_macro_data_gate_formal_failure": False,
+        "stage129_m3_macro_data_gate_recorded_as_not_executed": False,
+        "stage129_m3_macro_data_gate_status_reassigned": False,
+        "stage129_m3_macro_data_gate_unresolved_reason_count":
+            decision.get("m3_macro_data_gate_unresolved_reason_count"),
+        "stage129_m3_macro_data_gate_unresolved_reasons_resolved": 0,
+        "stage129_m3_cbi_point_in_time_availability_established": False,
+        "stage129_m3_cbi_point_in_time_evidence_status":
+            decision.get("point_in_time_evidence_status"),
+        "stage129_m3_cbi_new_coverage_or_threshold_computed": False,
+
+        # Nothing downstream of the block is open.
+        "m3_cbi_block_admitted": False,
+        "m3_cbi_modeling_will_run": False,
+        "m3_cbi_incremental_evaluation_will_run": False,
+        "m3_cbi_retrieval_continues": False,
+        "m3_cbi_feature_materialization_authorized": False,
+        "m3_cbi_reopening_authorized": False,
+        "m3_cbi_reopening_requires_new_human_authorization": True,
+
+        # The prespecified comparison, kept and unexecuted.
+        "stage129_m3_cbi_comparison_id": _STAGE129_M3_CBI_COMPARISON_ID,
+        "stage129_m3_cbi_comparison_status": _STAGE129_M3_CBI_COMPARISON_STATUS,
+        "stage129_m3_cbi_comparison_p_value": None,
+        "stage129_m3_cbi_comparison_null_hypothesis_accepted": False,
+        "stage129_m3_cbi_comparison_null_hypothesis_rejected": False,
+        "stage129_m3_cbi_comparison_inferential_conclusion": "none",
+        "stage129_m3_cbi_comparison_performance_claim": "none",
+        "stage129_m3_cbi_comparison_removed_from_sap_history": False,
+        "stage129_m3_cbi_comparison_renamed_or_substituted": False,
+        "stage129_m3_cbi_frozen_sap_identifier": _STAGE129_M3_CBI_FROZEN_SAP_ID,
+        "stage129_m3_cbi_confirmatory_holm_family":
+            list(_STAGE128_M3_LAG_CONFIRMATORY_FAMILY),
+        "stage129_m3_cbi_confirmatory_holm_family_modified": False,
+        "stage129_m3_cbi_holm_final_adjustment_declared_complete": False,
+
+        # The supplementary block is not promoted into the vacated role.
+        "stage129_m3_cbi_m3_lag_wdi_disposition_preserved":
+            _STAGE129_M3_LAG_WDI_DISPOSITION,
+        "stage129_m3_cbi_m3_lag_wdi_promoted_to_confirmatory": False,
+        "stage129_m3_cbi_m3_lag_wdi_is_substitute_or_proxy": False,
+        "stage129_m3_cbi_m3_lag_wdi_used_to_fill_the_comparison": False,
+        "stage129_m3_cbi_exploratory_value_in_confirmatory_family": False,
+        "stage129_m3_cbi_existing_pull_requests_modified": False,
+
+        # The supersede: the pending review, never the verdict.
+        "stage129_m3_cbi_supersedes_artifact": _STAGE128_M3_MACRO_DATA_GATE_REL,
+        "stage129_m3_cbi_supersedes_key": "m3_macro_data_gate_human_review_required",
+        "stage129_m3_cbi_supersedes_previous_value": True,
+        "stage129_m3_cbi_supersede_scope":
+            "the_pending_human_review_only_not_the_gate_status",
+        "stage129_m3_cbi_gate_artifact_preserved": True,
+
+        # The approved reporting text.
+        "stage129_m3_cbi_approved_manuscript_text_en":
+            decision.get("approved_manuscript_text_en"),
+        "stage129_m3_cbi_approved_manuscript_text_fa":
+            decision.get("approved_manuscript_text_fa"),
+        "stage129_m3_cbi_manuscript_writing_authorized": False,
+        "stage129_m3_cbi_reporting_claims_an_executed_result": False,
+
+        # The pointer, and the firewall.
+        "stage129_m3_cbi_next_action_id": _STAGE129_M3_CBI_NEXT_ACTION_ID,
+        "stage129_m3_cbi_next_action_scope": _STAGE129_M3_CBI_NEXT_ACTION_SCOPE,
+        "stage129_m3_cbi_next_action_authorized": False,
+        "stage129_m3_cbi_next_action_executes_m3_cbi": False,
+        "stage129_m3_cbi_final_test_locked": True,
+        "stage129_m3_cbi_final_test_rows_read": 0,
     }
 
 

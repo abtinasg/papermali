@@ -1,0 +1,31 @@
+{
+  "action_id": "stage129-m3-cbi-human-discontinuation-and-reporting",
+  "action_type": "human_decision_and_reporting_recording_only",
+  "credentials_committed_to_git": false,
+  "decision_status": "M3_CBI_DISCONTINUED_BY_HUMAN_DECISION_UNRESOLVED_DATA_GATE_AND_UNPROVEN_POINT_IN_TIME",
+  "final_test_artifacts_committed": 0,
+  "m3_cbi_value_files_committed": 0,
+  "m3_macro_data_gate_reexecuted": false,
+  "model_artifacts_committed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "package_file_count": 4,
+  "package_files": {
+    "README_STAGE129_M3_CBI_HUMAN_DISCONTINUATION_AND_REPORTING.md": {
+      "bytes": 7847,
+      "sha256": "0671d71c9b69de8b4a530e42380ebc35633b3c213c2c6fce8250f6f6d4779df8"
+    },
+    "stage129_m3_cbi_confirmatory_comparison_record.json": {
+      "bytes": 2087,
+      "sha256": "7980ac4d9af68a8088e10b530b8740b186c00c4992be7803471a8b3cd03e58d0"
+    },
+    "stage129_m3_cbi_governance_boundary.json": {
+      "bytes": 4028,
+      "sha256": "2c601edd73b420a9171fbaa472fd01d46d5e91e5b1c75f7d9f197600ea8ff6ce"
+    },
+    "stage129_m3_cbi_human_discontinuation_decision.json": {
+      "bytes": 7294,
+      "sha256": "3c18babd3f33a2dc73dc0ad1fe2cb4076d4b4f28b7d82e9b569fc3a3504cdd0b"
+    }
+  },
+  "pii_committed_to_git": false
+}
