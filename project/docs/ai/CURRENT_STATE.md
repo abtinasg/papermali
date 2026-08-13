@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `3d2c6105309424384318bd2f081697dfc176dfe2`
-- **Generated from commit:** `e2d3597ed77dd2ff32cfa7c02c84e51579e7fffa` (branch `stage129-m3-cbi-human-discontinuation-and-reporting`, informational)
+- **Last stage commit:** `9861e91983486ec450a2372fd01741e073cbfdaf`
+- **Generated from commit:** `9861e91983486ec450a2372fd01741e073cbfdaf` (branch `stage129-m3-cbi-human-discontinuation-and-reporting`, informational)
 - **Baseline:** `origin/main` @ `e2d3597ed77dd2ff32cfa7c02c84e51579e7fffa`
 
 ## Current-state validation
@@ -358,5 +358,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `8807df4d7789f51e4afc85137fbd9698bf23985e9d9d9d96c3e557b4d9148bb5`_
-_generated_at_utc: 2026-08-13T13:21:54Z (informational)_
+_state_fingerprint: `f046fcb88e69c7a2d03e06c7a3b8744984098611a2e9c44683209479c9b76779`_
+_generated_at_utc: 2026-08-13T13:41:56Z (informational)_
