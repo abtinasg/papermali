@@ -1,0 +1,42 @@
+{
+  "action_id": "stage129-m3-cbi-human-discontinuation-and-reporting",
+  "alias_created_by_this_action": false,
+  "comparison_id": "M3_CBI_minus_M2",
+  "comparison_id_is_the_live_canonical_identifier": true,
+  "comparison_id_origin": "Already the live canonical identifier before this action: published by the merged Stage129 M4 packages (PR #84, PR #85) as member 2 of stage129_m4_confirmatory_holm_family. This action reuses it and creates no new alias.",
+  "comparison_inferential_conclusion": "none",
+  "comparison_null_hypothesis_accepted": false,
+  "comparison_null_hypothesis_rejected": false,
+  "comparison_p_value": null,
+  "comparison_performance_claim": "none",
+  "comparison_reason": "block never admitted because its executed Data Gate remained unresolved and point-in-time evidence was unproven",
+  "comparison_removed_from_holm_family": false,
+  "comparison_removed_from_sap_history": false,
+  "comparison_renamed_by_this_action": false,
+  "comparison_status": "NOT_EXECUTED_M3_CBI_DISCONTINUED",
+  "comparison_substituted_by_this_action": false,
+  "confirmatory_holm_family_live": [
+    "M2_minus_M1",
+    "M3_CBI_minus_M2",
+    "M4_minus_M3_CBI"
+  ],
+  "confirmatory_holm_family_member_count": 3,
+  "confirmatory_holm_family_modified_by_this_action": false,
+  "confirmatory_holm_family_shrunk_by_this_action": false,
+  "exploratory_value_admitted_into_confirmatory_family": false,
+  "family_membership_is_prospectively_conditional_on_block_admission": true,
+  "frozen_sap_contract_path": "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
+  "frozen_sap_family_key": "confirmatory_family_2_adjacent_block_gains_if_admitted",
+  "frozen_sap_family_members": [
+    "M2_minus_M1",
+    "M3_minus_M2",
+    "M4_minus_M3"
+  ],
+  "frozen_sap_family_members_modified_by_this_action": false,
+  "frozen_sap_identifier_for_this_comparison": "M3_minus_M2",
+  "holm_correction": "Holm",
+  "holm_final_adjustment_declared_complete": false,
+  "holm_executed_by_this_action": false,
+  "sap_history_preserved": true,
+  "unexecuted_comparisons_keep_null_p_values": true
+}
