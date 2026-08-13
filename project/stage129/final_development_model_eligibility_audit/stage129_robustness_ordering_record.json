@@ -1,0 +1,106 @@
+{
+  "action_id": "stage129-final-development-model-eligibility-audit",
+  "all_locked_robustness_parts_included": true,
+  "cherry_picking_performed": false,
+  "candidate_excluded_on_robustness_grounds": false,
+  "new_robustness_executed": 0,
+  "new_tie_breaker_rule_created": false,
+  "ordering_is_stable_across_all_robustness": false,
+  "ordering_instability_reported": true,
+  "primary": {
+    "observed_ordering": [
+      "regularized_logistic_regression",
+      "random_forest",
+      "xgboost"
+    ],
+    "pooled_oof_pr_auc": {
+      "random_forest": 0.40244183002,
+      "regularized_logistic_regression": 0.445756964048,
+      "xgboost": 0.356545008162
+    },
+    "role": "locked_primary_development_result",
+    "source": "project/stage126/stage126_m1_primary_development_lock.json"
+  },
+  "promoted_any_robustness_to_primary": false,
+  "robustness_parts": [
+    {
+      "observed_ordering": ["xgboost", "random_forest", "regularized_logistic_regression"],
+      "ordering_differs_from_primary": true,
+      "part": 1,
+      "pooled_pr_auc": {
+        "random_forest": 0.332133983124,
+        "regularized_logistic_regression": 0.318117505162,
+        "xgboost": 0.339262787141
+      },
+      "scientific_role": "target_proximity_six_feature_set_sensitivity",
+      "source": "project/stage126/stage126_m1_robustness_part1_primary_comparison.json"
+    },
+    {
+      "observed_ordering": ["regularized_logistic_regression", "random_forest", "xgboost"],
+      "ordering_differs_from_primary": false,
+      "part": 2,
+      "pooled_pr_auc": {
+        "random_forest": 0.401263142511,
+        "regularized_logistic_regression": 0.447170385532,
+        "xgboost": 0.34195953388
+      },
+      "scientific_role": "sample_robustness_sensitivity_only",
+      "source": "project/stage126/stage126_m1_robustness_part2_primary_comparison.json"
+    },
+    {
+      "observed_ordering": ["regularized_logistic_regression", "random_forest", "xgboost"],
+      "ordering_differs_from_primary": false,
+      "part": 3,
+      "pooled_pr_auc": {
+        "random_forest": 0.39070232845,
+        "regularized_logistic_regression": 0.442885909854,
+        "xgboost": 0.35656070755
+      },
+      "scientific_role": "expanded_company_scope_sample_robustness",
+      "source": "project/stage126/stage126_m1_robustness_part3_primary_comparison.json"
+    },
+    {
+      "observed_ordering": ["regularized_logistic_regression", "random_forest", "xgboost"],
+      "ordering_differs_from_primary": false,
+      "part": 4,
+      "pooled_pr_auc": {
+        "random_forest": 0.396418788419,
+        "regularized_logistic_regression": 0.444983882478,
+        "xgboost": 0.355210803326
+      },
+      "scientific_role": "combined_sample_robustness",
+      "source": "project/stage126/stage126_m1_robustness_part4_primary_comparison.json"
+    },
+    {
+      "observed_ordering": ["regularized_logistic_regression", "random_forest", "xgboost"],
+      "ordering_differs_from_primary": false,
+      "part": 5,
+      "per_fold_top_two_inverted_in_fold1": true,
+      "per_fold_note": "Pooled ordering is preserved, but within fold1_validation random_forest (0.601020440117) exceeds regularized_logistic_regression (0.566356251832). The pooled ordering therefore conceals a per-fold inversion of the top two families.",
+      "pooled_pr_auc": {
+        "random_forest": 0.500501101034,
+        "regularized_logistic_regression": 0.508760611404,
+        "xgboost": 0.441491570406
+      },
+      "scientific_role": "secondary_target_robustness",
+      "source": "project/stage126/stage126_m1_robustness_part5_primary_comparison.json"
+    },
+    {
+      "observed_ordering": ["regularized_logistic_regression", "random_forest", "xgboost"],
+      "ordering_differs_from_primary": false,
+      "part": 6,
+      "pooled_pr_auc": {
+        "random_forest": 0.370840785189,
+        "regularized_logistic_regression": 0.443220732198,
+        "xgboost": 0.301969007417
+      },
+      "scientific_role": "imbalance_strategy_robustness",
+      "source": "project/stage126/stage126_m1_robustness_part6_primary_comparison.json"
+    }
+  ],
+  "parts_preserving_primary_ordering": [2, 3, 4, 5, 6],
+  "parts_reversing_primary_ordering": [1],
+  "summary": "Five of six locked robustness parts preserve the primary pooled ordering; Part 1 fully reverses it, placing xgboost first and regularized_logistic_regression last. Part 5 preserves the pooled ordering but inverts the top two families within fold 1. The instability is reported, not used to exclude any candidate.",
+  "used_to_exclude_a_candidate": false,
+  "values_are_quoted_not_recomputed": true
+}

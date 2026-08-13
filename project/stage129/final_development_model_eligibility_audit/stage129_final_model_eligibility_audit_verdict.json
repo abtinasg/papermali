@@ -1,0 +1,123 @@
+{
+  "action_id": "stage129-final-development-model-eligibility-audit",
+  "algorithm_verdict": "FINAL_ALGORITHM_REQUIRES_HUMAN_DECISION",
+  "algorithm_verdict_basis": {
+    "audit_determined_candidate": null,
+    "conflicting_criteria_present": true,
+    "conflicting_criteria_detail": "On the M2 paired common sample the primary metric PR-AUC excludes zero for no family, while Brier excludes zero for all three but in conflicting directions (random_forest worse, logistic and xgboost better). A criterion that disagrees with the primary metric cannot break a tie no frozen rule authorizes breaking.",
+    "deterministic_rule_found": false,
+    "eligible_configuration_count": 3,
+    "explicit_prohibition_citations": [
+      {
+        "binding_phrase": "This evidence does NOT justify changing the primary result, selecting a winning model family, retuning any configuration, opening the final test, or automatically freezing a retained design.",
+        "key": "scientific_interpretation.E_overall_synthesis.finding",
+        "path": "project/stage126/stage126_m1_robustness_closure_synthesis_record.json"
+      },
+      {
+        "binding_phrase": "winner_selection is listed among prohibited_actions",
+        "key": "prohibited_actions[0]",
+        "path": "project/stage126/stage126_m1_robustness_closure_synthesis_record.json"
+      },
+      {
+        "binding_phrase": "paper_winner_selection and final_model_selection are listed among authorization_scope.not_authorized",
+        "key": "authorization_scope.not_authorized",
+        "path": "project/stage126/stage126_m1_retained_design_freeze.json"
+      }
+    ],
+    "frozen_rule_absent_detail": "No committed frozen artifact contains a rule that maps development results to a single final algorithm. The metrics/uncertainty contract fixes primary_metric = PR-AUC for REPORTING and fixes a tie_break only for the thresholded secondary threshold choice (thresholded_secondary.tie_break = higher_threshold), not for model choice. Its only winner-related clause is a prohibition (do_not_select_winner_on_calibrated_final_test = true). No model-level tie-breaker exists anywhere.",
+    "multiple_eligible_configurations": true,
+    "ordering_unstable_across_robustness": true,
+    "prespecified_model_tie_breaker_exists": false,
+    "retained_families_count": 3,
+    "retained_families_detail": "The retained design freeze retains ALL THREE model families with their frozen configurations and sets final_model_selected = false. A selected configuration per algorithm is not a selected final algorithm.",
+    "confirmatory_family_1_executed": false,
+    "confirmatory_family_1_detail": "The frozen contract defines confirmatory_family_1 = [Logistic_vs_RF, Logistic_vs_XGBoost, RF_vs_XGBoost] under Holm at alpha 0.05. That family was never executed, so no adjusted inferential ranking of the three algorithms exists."
+  },
+  "audit_determined_candidate": null,
+  "audit_is_read_only": true,
+  "audit_performed_row_level_analysis": false,
+  "audit_recomputed_any_metric": false,
+  "audit_type": "read_only_eligibility_and_determinability_audit_over_committed_frozen_artifacts",
+  "block_verdict": "FINAL_BLOCK_REQUIRES_HUMAN_DECISION",
+  "block_verdict_basis": {
+    "audit_determined_candidate": null,
+    "contract_states_what_happens_when_superiority_is_absent": false,
+    "deterministic_rule_found": false,
+    "eligible_blocks": ["M1", "M2"],
+    "frozen_rule_absent_detail": "No committed frozen artifact contains a rule that selects a final predictor block. The nested confirmatory chain [M1, M2, M3, M4] defines an ARCHITECTURE and a comparison order; it does not designate a final block. Nothing states that the absence of M2 superiority forces M1, and nothing states that M2 retention forces M2. Choosing either would be inference, not rule-following.",
+    "m2_retention_explicitly_excludes_selection": true,
+    "m2_retention_citations": [
+      {
+        "binding_phrase": "m2_retention_does_not_imply includes final_model_selection and paper_winner_selection",
+        "key": "m2_retention_does_not_imply",
+        "path": "project/stage128/m2_retained_block_human_decision/stage128_m2_retained_block_human_decision.json"
+      },
+      {
+        "binding_phrase": "preregistered_nested_confirmatory_architecture_preservation_not_observed_predictive_superiority",
+        "key": "m2_retention_basis",
+        "path": "project/stage128/m2_retained_block_human_decision/stage128_m2_retained_block_human_decision.json"
+      },
+      {
+        "binding_phrase": "decision_is_a_retained_block_decision_not_a_superiority_decision = true",
+        "key": "decision_is_a_retained_block_decision_not_a_superiority_decision",
+        "path": "project/stage128/m2_retained_block_human_decision/stage128_m2_retained_block_human_decision.json"
+      }
+    ],
+    "unresolved_interpretation": "The frozen contracts are silent on final-block selection. This is an ABSENCE of a rule, not a conflict between rules, so the verdict is a human decision rather than a contract conflict."
+  },
+  "decision_date_utc": "2026-08-13",
+  "holm_family_ledger": {
+    "M2_minus_M1": {
+      "p_value": null,
+      "p_value_note": "No Holm-adjusted or raw p-value is committed for this comparison. The committed evidence is paired cluster-bootstrap percentile-95 confidence intervals, quoted verbatim in the reconciliation artifact. This audit computes none.",
+      "source": "project/stage128/m2_incremental_evaluation/stage127_m2_multiplicity_family_status.json",
+      "status": "EVALUATED_NO_SUPERIORITY_ESTABLISHED"
+    },
+    "M3_CBI_minus_M2": {
+      "p_value": null,
+      "source": "project/stage129/m3_cbi_human_discontinuation_and_reporting/stage129_m3_cbi_confirmatory_comparison_record.json",
+      "status": "NOT_EXECUTED_M3_CBI_DISCONTINUED"
+    },
+    "M4_minus_M3_CBI": {
+      "p_value": null,
+      "source": "project/stage129/m4_human_discontinuation_data_inadequacy/stage129_m4_human_discontinuation_governance_boundary.json",
+      "status": "NOT_EXECUTED_M4_DISCONTINUED"
+    },
+    "family_members_live": ["M2_minus_M1", "M3_CBI_minus_M2", "M4_minus_M3_CBI"],
+    "family_members_frozen_sap": ["M2_minus_M1", "M3_minus_M2", "M4_minus_M3"],
+    "family_member_count": 3,
+    "family_members_removed_or_renamed_by_this_audit": false,
+    "family_shrunk_post_hoc_by_this_audit": false,
+    "holm_adjustment_executed_by_this_audit": false,
+    "holm_family_complete": false,
+    "new_p_values_created_by_this_audit": 0
+  },
+  "holm_reporting_verdict": "HOLM_FINAL_REPORTING_REQUIRES_SEPARATE_HUMAN_OR_METHODS_DECISION",
+  "holm_reporting_verdict_basis": {
+    "contract_specifies_closure_with_unexecuted_members": false,
+    "detail": "The frozen multiplicity contract fixes the family membership, the correction (Holm) and alpha (0.05), and forbids additional post hoc families. It is silent on how to close or report a family two of whose three prespecified members were never executed. The Stage129 M4 reporting decision settled how the M4 comparison is PRESENTED, not how the family is CLOSED.",
+    "path": "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
+    "key": "multiplicity"
+  },
+  "next_action_authorized": false,
+  "next_action_id": "human_decision_required",
+  "next_action_scope": "final_block_and_final_algorithm_both_require_a_separate_human_decision",
+  "questions_answered": {
+    "q1_eligible_blocks_after_m3_m4_decisions": "M1 and M2 only. M3-CBI and M4 were both discontinued before admission and before any modeling.",
+    "q2_does_m2_retained_mean_m2_selected": "No. The merged retention decision states explicitly that retention does not imply final_model_selection or paper_winner_selection, and that its basis is architecture preservation, not observed predictive superiority.",
+    "q3_does_absent_m2_superiority_force_m1": "No frozen rule says so. The contracts are silent on what block is selected when superiority is absent, so this cannot be resolved by rule-following.",
+    "q4_do_frozen_rules_determine_a_unique_algorithm": "No. There is no model-selection rule and no model-level tie-breaker; the retained design freeze retains all three families; and confirmatory_family_1, the only prespecified inferential ranking mechanism, was never executed.",
+    "q5_effect_of_robustness_and_ordering_instability": "Part 1 fully reverses the primary ordering and Part 5 inverts the top two families within fold 1, so the ordering is not stable enough for a rule that does not exist to be applied deterministically even if one did.",
+    "q6_can_selection_proceed_without_new_human_judgment": "No. Both the block and the algorithm require a separate human decision."
+  },
+  "sources_read_are_committed_artifacts_only": true,
+  "terminology_distinctions_preserved": {
+    "best_point_estimate_is_not_paper_winner": true,
+    "development_winner_is_not_final_test_result": true,
+    "eligible_candidate_is_not_authorized_refit": true,
+    "m2_evaluated_is_not_m2_superiority_established": true,
+    "m2_retained_is_not_m2_final_block_selected": true,
+    "retained_design_is_not_final_model": true,
+    "selected_configuration_per_algorithm_is_not_selected_final_algorithm": true
+  }
+}

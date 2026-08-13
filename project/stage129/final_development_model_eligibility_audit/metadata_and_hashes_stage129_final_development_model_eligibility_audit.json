@@ -1,0 +1,37 @@
+{
+  "action_id": "stage129-final-development-model-eligibility-audit",
+  "action_type": "read_only_eligibility_and_determinability_audit",
+  "algorithm_verdict": "FINAL_ALGORITHM_REQUIRES_HUMAN_DECISION",
+  "block_verdict": "FINAL_BLOCK_REQUIRES_HUMAN_DECISION",
+  "credentials_committed_to_git": false,
+  "final_model_selected": false,
+  "final_test_artifacts_committed": 0,
+  "model_artifacts_committed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "new_metric_files_committed": 0,
+  "package_file_count": 5,
+  "package_files": {
+    "README_STAGE129_FINAL_DEVELOPMENT_MODEL_ELIGIBILITY_AUDIT.md": {
+      "bytes": 8459,
+      "sha256": "498d8e0ceaa4af53abcf5f83640e56239d8c4bcea125b3529f5e92cd66fc9cb4"
+    },
+    "stage129_final_model_eligibility_audit_governance_boundary.json": {
+      "bytes": 2987,
+      "sha256": "074cac7e66fb336da6016f481eb8f46bd21d66ae3f85fbfaf0b4ccf1b93d2a9d"
+    },
+    "stage129_final_model_eligibility_audit_verdict.json": {
+      "bytes": 9194,
+      "sha256": "8a1fb75b2a57842f60410445d1d5bcbc2a79caf5873d049e00b339fe65564910"
+    },
+    "stage129_final_model_eligibility_matrix.json": {
+      "bytes": 8876,
+      "sha256": "85b195079cc09e4a738b6b380523b82f8cfc57b5e95f887dc1a98114ec971e56"
+    },
+    "stage129_robustness_ordering_record.json": {
+      "bytes": 4605,
+      "sha256": "2cfd4bce5c1f16ebf3c3d030fc1a472af17fddfa88b6d9c7873a76b1446140fd"
+    }
+  },
+  "paper_winner_selected": false,
+  "pii_committed_to_git": false
+}
