@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `2df54ed5c3bfb23644cc05b84ccd704fac21eb3f`
-- **Generated from commit:** `01213894684479916c909ebe861fcc292850ef7f` (branch `stage129-final-model-human-selection-governance`, informational)
+- **Last stage commit:** `8abacdf3869fe584059d21cb6980233c65e913bf`
+- **Generated from commit:** `8abacdf3869fe584059d21cb6980233c65e913bf` (branch `stage129-final-model-human-selection-governance`, informational)
 - **Baseline:** `origin/main` @ `01213894684479916c909ebe861fcc292850ef7f`
 
 ## Current-state validation
@@ -392,5 +392,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `22a12e4bbff3360a292b18fb447c7a8da11045b2d9461996b506791b2218d5a2`_
-_generated_at_utc: 2026-08-13T21:26:00Z (informational)_
+_state_fingerprint: `02ea1d7b92cf68fff7945cb2fbd76040f4da9f2d06f1b1eab3dc802efb2938dc`_
+_generated_at_utc: 2026-08-13T21:38:07Z (informational)_
