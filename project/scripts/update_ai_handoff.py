@@ -2971,6 +2971,12 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # above -- it publishes its own, separate M4 pointer instead.
         **derive_stage129_m4_governance_data_gate_contract_lock_markers(
             root),
+        # Must come after the contract lock: the human decision to discontinue
+        # M4 SUPERSEDES the contract lock's own M4 pointer, which still named
+        # `stage129-m4-governance-data-gate`. A discontinued block may not keep
+        # pointing at its own Gate. It still advances neither live research
+        # pointer chain.
+        **derive_stage129_m4_human_discontinuation_markers(root),
         }))
 
 
@@ -5614,10 +5620,15 @@ def render_current_state(record: dict) -> str:
             "- **A THIRD, separate pointer** (neither Track A's "
             f"`{record.get('next_research_action_id')}` nor Track B's "
             f"`{record.get('stage128_m3_lag_wdi_next_action_id')}` is moved "
-            "by this action): "
-            f"`{record.get('stage129_m4_next_action_id')}` — authorized = "
+            "by this action): at lock time this action published "
+            f"`{record.get('stage129_m4_contract_lock_pointer_at_lock_time')}`"
+            " — authorized = "
             f"{record.get('stage129_m4_next_action_authorized')}. A pointer "
-            "is never an authorization.",
+            "is never an authorization."
+            + (" **Superseded:** the live M4 pointer is now "
+               f"`{record.get('stage129_m4_next_action_id')}` after the human "
+               "decision to discontinue M4."
+               if record.get("stage129_m4_discontinuation_recorded") else ""),
             "- ⚠️ **(C) Two candidate-specific CONTRACT ISSUES / UNRESOLVED "
             "prerequisite definitions.** Candidate IDENTITY for both is frozen; their "
             "DEFINITIONS are not, no modeled values are admitted, no "
@@ -5658,6 +5669,75 @@ def render_current_state(record: dict) -> str:
             " interpretation: `project/stage129/"
             "m4_governance_data_gate_contract/"
             "README_STAGE129_M4_GOVERNANCE_DATA_GATE_CONTRACT.md`",
+            "",
+        ]
+    if record.get("stage129_m4_discontinuation_recorded"):
+        lines += [
+            "### Stage129 — M4 DISCONTINUED by human decision (data inadequacy)\n",
+            "_A human governance decision only. The formal M4 Data Gate was "
+            "NEVER executed: zero formal coverage computation, zero feature "
+            "materialization, zero modeling, zero Final Test access._\n",
+            "- ⛔ **Block disposition:** "
+            f"`{record.get('m4_block_disposition')}` — authorized by human = "
+            f"{record.get('stage129_m4_discontinuation_authorized_by_human')}, "
+            f"reason class `{record.get('stage129_m4_discontinuation_reason_class')}`.",
+            "- ❗ **This is NOT a formal Gate failure:** formal Gate executed = "
+            f"{record.get('m4_data_gate_executed')}, formal verdict "
+            f"`{record.get('m4_formal_gate_verdict')}`, is-formal-gate-failure = "
+            f"{record.get('stage129_m4_discontinuation_is_formal_gate_failure')}. "
+            "The observational figures "
+            f"({record.get('stage129_m4_observational_verified_opinion_rows')} "
+            "verified opinions and "
+            f"{record.get('stage129_m4_observational_report_date_rows')} report "
+            "dates over the whole 1331-row canonical population, "
+            f"{record.get('stage129_m4_observational_field_level_missing')} "
+            "field-level missing) are OBSERVATIONAL coverage, not a Gate "
+            "verdict: "
+            f"{record.get('stage129_m4_observational_coverage_is_not_formal_gate_coverage')}.",
+            "- ⛔ **Nothing downstream is authorized:** retrieval continues = "
+            f"{record.get('m4_retrieval_continues')}, manual completion "
+            f"continues = {record.get('m4_manual_completion_continues')}, "
+            f"feature materialization = "
+            f"{record.get('m4_feature_materialization_authorized')}, modeling "
+            f"will run = {record.get('m4_modeling_will_run')}, incremental "
+            f"evaluation will run = "
+            f"{record.get('m4_incremental_evaluation_will_run')}.",
+            "- 🔒 **Reopening:** authorized = "
+            f"{record.get('m4_reopening_authorized')}, requires new explicit "
+            "human authorization = "
+            f"{record.get('m4_reopening_requires_new_human_authorization')}.",
+            "- ✅ **Candidate identity preserved, not rewritten:** count "
+            f"`{record.get('stage129_m4_candidate_count_after_discontinuation')}`, "
+            f"set `{record.get('stage129_m4_candidate_set_after_discontinuation')}`, "
+            "removed or renamed = "
+            f"{record.get('stage129_m4_candidates_removed_or_renamed')}.",
+            "- ⛔ **Holm family unchanged and the M4 comparison unexecuted:** "
+            f"`{record.get('stage129_m4_comparison_id')}` status "
+            f"`{record.get('stage129_m4_comparison_status')}`, p-value "
+            f"`{record.get('stage129_m4_comparison_p_value')}`, family modified "
+            f"= {record.get('stage129_m4_confirmatory_holm_family_modified')}, "
+            "shrunk post hoc = "
+            f"{record.get('stage129_m4_family_shrunk_post_hoc')}. Manuscript "
+            "reporting decision for the unexecuted comparison: "
+            f"`{record.get('stage129_m4_manuscript_reporting_decision_for_unexecuted_comparison')}`.",
+            "- 📄 **Observational extraction:** status "
+            f"`{record.get('stage129_m4_observational_package_status_preserved')}`"
+            " — retained in custody, not a model input, reportable in "
+            "limitations = "
+            f"{record.get('stage129_m4_observational_extraction_reportable_in_limitations')}.",
+            "- ⛔ **Final Test firewall untouched:** locked "
+            f"{record.get('stage129_m4_final_test_locked')}, rows read "
+            f"{record.get('stage129_m4_final_test_rows_read')}.",
+            "- ➡️ **Next action:** "
+            f"`{record.get('stage129_m4_next_action_id')}` — scope "
+            f"`{record.get('stage129_m4_next_action_scope')}`, authorized = "
+            f"{record.get('stage129_m4_next_action_authorized')}, executes M4 = "
+            f"{record.get('stage129_m4_next_action_executes_m4')}. A pointer is "
+            "never an authorization.",
+            "- Package: `project/stage129/"
+            "m4_human_discontinuation_data_inadequacy/`; interpretation: "
+            "`project/stage129/m4_human_discontinuation_data_inadequacy/"
+            "README_STAGE129_M4_HUMAN_DISCONTINUATION_DATA_INADEQUACY.md`",
             "",
         ]
     lines += [
@@ -11637,6 +11717,11 @@ def derive_stage129_m4_governance_data_gate_contract_lock_markers(
         # of those two live pointer chains, both of which stay
         # `human-decision-required` / `human_decision_required` untouched.
         "stage129_m4_next_action_id": _STAGE129_M4_NEXT_ACTION_ID,
+        # Immutable history: the pointer this lock published AT LOCK TIME.
+        # A later action may supersede the live pointer above; it may not
+        # rewrite what the lock itself published.
+        "stage129_m4_contract_lock_pointer_at_lock_time":
+            _STAGE129_M4_NEXT_ACTION_ID,
         "stage129_m4_next_action_authorized": False,
         "stage129_m4_next_action_pointer_is_not_authorization": True,
         "stage129_m4_audit_opinion_type_taxonomy_status":
@@ -11702,6 +11787,206 @@ def derive_stage129_m4_governance_data_gate_contract_lock_markers(
         "m4_pointer_is_not_authorization": True,
         "final_test_locked": True,
         "final_test_rows_read": 0,
+    }
+
+
+_STAGE129_M4_DISC_PKG = "project/stage129/m4_human_discontinuation_data_inadequacy"
+_STAGE129_M4_DISC_ACTION_ID = "stage129-m4-human-discontinuation-data-inadequacy"
+_STAGE129_M4_DISC_DECISION_REL = (
+    f"{_STAGE129_M4_DISC_PKG}/stage129_m4_human_discontinuation_decision.json")
+_STAGE129_M4_DISC_BOUNDARY_REL = (
+    f"{_STAGE129_M4_DISC_PKG}/"
+    "stage129_m4_human_discontinuation_governance_boundary.json")
+_STAGE129_M4_DISC_STATUS = "M4_DISCONTINUED_BY_HUMAN_DECISION_DATA_INADEQUACY"
+#: Deliberately NOT the M4 Data Gate. The block is stopped, so the M4 pointer
+#: may not keep naming an M4 execution step.
+_STAGE129_M4_DISC_NEXT_ACTION_ID = "human_decision_required"
+_STAGE129_M4_DISC_NEXT_ACTION_SCOPE = (
+    "m4_discontinued_no_further_m4_action_is_authorized")
+#: Formal Gate verdict vocabulary. None of these may be published by a decision
+#: that never executed the Gate.
+_STAGE129_M4_GATE_VERDICT_VOCAB = (
+    "PASS_M4_DATA_GATE", "FAIL_M4_DATA_GATE", "UNRESOLVED_M4_DATA_GATE")
+
+
+def derive_stage129_m4_human_discontinuation_markers(root: str) -> dict:
+    """Recognize the human decision to discontinue the M4 block.
+
+    Narrow and fail-closed, mirroring the contract-lock recognition pattern.
+    This is a DECISION event only: it retrieves no M4 observation, computes no
+    formal Gate coverage, materializes no feature, fits no model and never
+    touches the Final Test.
+
+    The decision is emphatically NOT a formal Gate verdict -- the Gate was never
+    executed -- so this function refuses to publish any Gate-verdict vocabulary
+    and fails closed if the artifacts try to. Returns {} before the package
+    exists, so pre-decision Handoffs are unaffected.
+    """
+    path = os.path.join(root, _STAGE129_M4_DISC_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    decision = _require_json_artifact(root, _STAGE129_M4_DISC_DECISION_REL)
+    boundary = _require_json_artifact(root, _STAGE129_M4_DISC_BOUNDARY_REL)
+
+    if decision.get("decision_id") != _STAGE129_M4_DISC_ACTION_ID:
+        raise HandoffError("Stage129 M4 discontinuation decision_id mismatch")
+    if boundary.get("action_id") != _STAGE129_M4_DISC_ACTION_ID:
+        raise HandoffError("Stage129 M4 discontinuation boundary action_id mismatch")
+    if decision.get("decision_type") != "human_scientific_decision":
+        raise HandoffError(
+            "Stage129 M4 discontinuation must be a human_scientific_decision")
+    if decision.get("decision_status") != _STAGE129_M4_DISC_STATUS:
+        raise HandoffError(
+            f"Stage129 M4 discontinuation status must be {_STAGE129_M4_DISC_STATUS}")
+    if boundary.get("m4_block_disposition") != _STAGE129_M4_DISC_STATUS:
+        raise HandoffError(
+            "Stage129 M4 discontinuation boundary disposition must match the decision")
+    if decision.get("authorized_by_human") is not True:
+        raise HandoffError("Stage129 M4 discontinuation must be human-authorized")
+
+    # The decision must not masquerade as a Gate verdict.
+    if decision.get("formal_m4_data_gate_executed") is not False:
+        raise HandoffError(
+            "Stage129 M4 discontinuation may not report an executed formal Gate")
+    if decision.get("formal_m4_gate_verdict") is not None:
+        raise HandoffError(
+            "Stage129 M4 discontinuation formal_m4_gate_verdict must be null")
+    if decision.get("observational_coverage_is_not_formal_gate_coverage") is not True:
+        raise HandoffError(
+            "Stage129 M4 discontinuation must distinguish observational coverage "
+            "from formal Gate coverage")
+    if _STAGE129_M4_DISC_STATUS in _STAGE129_M4_GATE_VERDICT_VOCAB:
+        raise HandoffError(
+            "Stage129 M4 discontinuation status must not be Gate-verdict vocabulary")
+    for field in ("m4_block_disposition", "m4_comparison_status"):
+        if boundary.get(field) in _STAGE129_M4_GATE_VERDICT_VOCAB:
+            raise HandoffError(
+                f"Stage129 M4 discontinuation {field} must not be a Gate verdict")
+
+    # Nothing downstream of the decision may be authorized by it.
+    for field in ("m4_retrieval_to_continue", "m4_manual_completion_to_continue",
+                  "m4_feature_materialization_authorized", "m4_modeling_authorized",
+                  "m4_incremental_evaluation_authorized", "reopening_authorized_now",
+                  "outcome_or_final_test_observation_used_for_this_decision",
+                  "reason_is_poor_model_result", "reason_is_outcome_inspection"):
+        if decision.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 M4 discontinuation decision {field} must be False")
+    if decision.get("reopening_requires_new_explicit_human_authorization") is not True:
+        raise HandoffError(
+            "Stage129 M4 discontinuation must require new human authorization to reopen")
+
+    # The four frozen candidates survive the decision unchanged.
+    if tuple(decision.get("m4_candidate_set") or ()) != _STAGE129_M4_CANDIDATE_SET:
+        raise HandoffError(
+            "Stage129 M4 discontinuation must preserve the four frozen candidates "
+            f"exactly as {_STAGE129_M4_CANDIDATE_SET}")
+    if decision.get("m4_candidate_count") != 4:
+        raise HandoffError("Stage129 M4 discontinuation must preserve candidate_count 4")
+    for field in ("m4_candidate_count_changed_by_this_decision",
+                  "m4_candidates_removed_or_renamed_by_this_decision",
+                  "m4_candidates_substituted_by_this_decision"):
+        if decision.get(field) is not False:
+            raise HandoffError(f"Stage129 M4 discontinuation {field} must be False")
+
+    # Prior blocks, the Holm family and the firewall are untouched.
+    for field in ("m1_status_modified_by_this_action",
+                  "m2_status_modified_by_this_action",
+                  "m3_cbi_status_modified_by_this_action",
+                  "m3_cbi_declared_successful_by_this_action",
+                  "m3_lag_wdi_disposition_modified_by_this_action",
+                  "m3_lag_wdi_promoted_to_confirmatory_model",
+                  "confirmatory_holm_family_modified_by_this_action",
+                  "family_shrunk_post_hoc_after_observing_a_result",
+                  "paper_winner_selected", "final_model_selected",
+                  "full_development_refit_executed",
+                  "stage130_or_next_stage_executed",
+                  "observational_package_modified_by_this_action",
+                  "observational_extraction_admitted_as_model_input",
+                  "prior_packages_modified_by_this_action"):
+        if boundary.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 M4 discontinuation boundary {field} must be False")
+    if boundary.get("m4_comparison_p_value") is not None:
+        raise HandoffError(
+            "Stage129 M4 discontinuation must not publish a p-value for an "
+            "unexecuted comparison")
+    if boundary.get("m4_comparison_null_hypothesis_accepted_or_rejected") is not None:
+        raise HandoffError(
+            "Stage129 M4 discontinuation must not accept or reject a null "
+            "hypothesis for an unexecuted comparison")
+    if boundary.get("final_test_rows_read") != 0 or \
+            decision.get("final_test_rows_read") != 0:
+        raise HandoffError("Stage129 M4 discontinuation final_test_rows_read must be 0")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError("Stage129 M4 discontinuation boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage129 M4 discontinuation counters.{field} must be 0 "
+                "(no retrieval, coverage, modeling or Final Test access occurred)")
+
+    return {
+        "stage129_m4_discontinuation_recorded": True,
+        "stage129_m4_discontinuation_action_id": _STAGE129_M4_DISC_ACTION_ID,
+        "stage129_m4_discontinuation_authorized_by_human": True,
+        "stage129_m4_discontinuation_reason_class":
+            decision.get("reason_class"),
+        "stage129_m4_discontinuation_is_formal_gate_failure": False,
+        "stage129_m4_observational_verified_opinion_rows":
+            (decision.get("decision_basis") or {}).get(
+                "observational_verified_auditor_opinion_rows"),
+        "stage129_m4_observational_report_date_rows":
+            (decision.get("decision_basis") or {}).get(
+                "observational_auditor_report_date_rows"),
+        "stage129_m4_observational_field_level_missing":
+            (decision.get("decision_basis") or {}).get(
+                "observational_field_level_missing"),
+        "stage129_m4_observational_coverage_is_not_formal_gate_coverage": True,
+
+        # Block disposition. Bare and namespaced, so a consumer checking either
+        # surface sees the same fact.
+        "m4_block_disposition": _STAGE129_M4_DISC_STATUS,
+        "stage129_m4_block_disposition": _STAGE129_M4_DISC_STATUS,
+        "m4_formal_gate_verdict": None,
+        "stage129_m4_formal_gate_verdict": None,
+        "m4_retrieval_continues": False,
+        "m4_manual_completion_continues": False,
+        "m4_feature_materialization_authorized": False,
+        "m4_modeling_will_run": False,
+        "m4_incremental_evaluation_will_run": False,
+        "m4_reopening_authorized": False,
+        "m4_reopening_requires_new_human_authorization": True,
+
+        # Candidate identity history survives the discontinuation.
+        "stage129_m4_candidate_count_after_discontinuation": 4,
+        "stage129_m4_candidate_set_after_discontinuation":
+            list(_STAGE129_M4_CANDIDATE_SET),
+        "stage129_m4_candidates_removed_or_renamed": False,
+
+        # Holm: recorded, never rewritten.
+        "stage129_m4_comparison_id": boundary.get("m4_comparison_id"),
+        "stage129_m4_comparison_status": boundary.get("m4_comparison_status"),
+        "stage129_m4_comparison_p_value": None,
+        "stage129_m4_confirmatory_holm_family_modified": False,
+        "stage129_m4_family_shrunk_post_hoc": False,
+        "stage129_m4_manuscript_reporting_decision_for_unexecuted_comparison":
+            boundary.get(
+                "manuscript_reporting_decision_for_the_unexecuted_m4_comparison"),
+
+        # The M4 pointer must stop naming an M4 execution step.
+        "stage129_m4_next_action_id": _STAGE129_M4_DISC_NEXT_ACTION_ID,
+        "stage129_m4_next_action_scope": _STAGE129_M4_DISC_NEXT_ACTION_SCOPE,
+        "stage129_m4_next_action_authorized": False,
+        "stage129_m4_next_action_executes_m4": False,
+        "stage129_m4_next_action_pointer_is_not_authorization": True,
+
+        "stage129_m4_observational_package_status_preserved":
+            boundary.get("observational_package_status_preserved"),
+        "stage129_m4_observational_extraction_reportable_in_limitations": True,
+        "stage129_m4_final_test_locked": True,
+        "stage129_m4_final_test_rows_read": 0,
     }
 
 
