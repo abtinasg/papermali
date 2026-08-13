@@ -12,8 +12,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
 - **Last stage commit:** `3d2c6105309424384318bd2f081697dfc176dfe2`
-- **Generated from commit:** `3d2c6105309424384318bd2f081697dfc176dfe2` (branch `stage129-m4-manuscript-reporting-decision`, informational)
-- **Baseline:** `origin/main` @ `019ea71db840d771e7dff99bf22a332c9dd5150f`
+- **Generated from commit:** `e2d3597ed77dd2ff32cfa7c02c84e51579e7fffa` (branch `stage129-m3-cbi-human-discontinuation-and-reporting`, informational)
+- **Baseline:** `origin/main` @ `e2d3597ed77dd2ff32cfa7c02c84e51579e7fffa`
 
 ## Current-state validation
 
@@ -289,6 +289,26 @@ _A human REPORTING decision only. It settles how a prespecified but never-admitt
 - ⛔ **Final Test firewall untouched:** rows read 0.
 - Package: `project/stage129/m4_manuscript_reporting_decision/`; interpretation: `project/stage129/m4_manuscript_reporting_decision/README_STAGE129_M4_MANUSCRIPT_REPORTING_DECISION.md`
 
+### Stage129 — M3-CBI DISCONTINUED by human decision, and its reporting decision
+
+_A human scientific decision plus its reporting consequence. Governance only: zero retrieval, zero official-source contact, zero Gate re-execution, zero new coverage or threshold, zero feature materialization, zero modeling, zero Holm, zero Final Test access._
+
+- ⛔ **Block disposition:** `M3_CBI_DISCONTINUED_BY_HUMAN_DECISION_UNRESOLVED_DATA_GATE_AND_UNPROVEN_POINT_IN_TIME` — authorized by human = True, reason class `unresolved_executed_data_gate_and_unproven_point_in_time_availability`.
+- ❗ **The Gate WAS executed, and its status is NOT reassigned:** executed = True, terminal status `UNRESOLVED_M3_DATA_GATE`, formal failure = False, recorded as not executed = False, status reassigned = False. Unlike M4 this Gate ran, so it is neither a FAIL nor an unrun Gate — it terminated unresolved.
+- 🔎 **Nothing is fabricated as resolved:** 8 unresolved/blocker reasons stand, resolved by this decision = 0; new coverage or threshold computed = False; point-in-time availability established = False (`NOT_ESTABLISHED_NO_INDEPENDENTLY_VERIFIABLE_OFFICIAL_EVIDENCE`).
+- ⛔ **The reason is evidence, not a result:** poor model result = False, outcome inspection = False.
+- ⛔ **Nothing downstream is authorized:** block admitted = False, retrieval continues = False, feature materialization = False, modeling will run = False, incremental evaluation will run = False.
+- 🔒 **Reopening:** authorized = False, requires new explicit human authorization = True.
+- ⛔ **The prespecified comparison is kept, not erased:** `M3_CBI_minus_M2` (frozen SAP identifier `M3_minus_M2`) status `NOT_EXECUTED_M3_CBI_DISCONTINUED`, p-value `None`, null hypothesis accepted = False, rejected = False, inferential conclusion `none`, performance claim `none`. Removed from SAP history = False, renamed or substituted = False. Holm family `['M2_minus_M1', 'M3_CBI_minus_M2', 'M4_minus_M3_CBI']` modified = False, final adjustment declared complete = False.
+- 📄 **M3-LAG-WDI is NOT promoted into the vacated role:** disposition `SUPPLEMENTARY_EXPLORATORY_ONLY`, promoted to confirmatory = False, substitute or proxy for M3-CBI = False, used to fill the M3-CBI comparison = False, exploratory value in the confirmatory family = False. Existing PRs modified = False.
+- 🔁 **Supersedes the pending review, never the verdict:** key `m3_macro_data_gate_human_review_required` (was `True`) in `project/stage128/m3_macro_data_gate/stage128_m3_macro_data_gate_decision.json`, scope `the_pending_human_review_only_not_the_gate_status`. Gate artifact preserved byte-for-byte = True.
+- 📝 **Approved reporting text (EN):** M3-CBI was prespecified, but its executed Data Gate remained unresolved because point-in-time availability could not be established. The block was therefore not admitted to modeling. Consequently, the M3-CBI−M2 comparison was not executed, no p-value was computed, and no inferential conclusion is drawn for M3-CBI. The M3-LAG-WDI analysis is reported separately as supplementary exploratory evidence and is neither a substitute nor a proxy for confirmatory M3-CBI.
+- 📝 **Approved reporting text (FA):** بلوک M3-CBI از پیش تعریف شده بود، اما Data Gate اجراشده آن به‌دلیل اثبات‌نشدن دسترسی point-in-time حل‌نشده باقی ماند؛ بنابراین این بلوک وارد مدل‌سازی نشد. در نتیجه، مقایسه M3-CBI−M2 اجرا نشد، هیچ مقدار p محاسبه نشد و هیچ نتیجه استنباطی درباره M3-CBI ارائه نمی‌شود. تحلیل M3-LAG-WDI به‌صورت جداگانه و صرفاً به‌عنوان شواهد اکتشافی تکمیلی گزارش می‌شود و جایگزین یا نماینده M3-CBI تأییدی نیست.
+- ⛔ **Text is a reporting decision, not a writing authorization:** manuscript writing or rewriting authorized = False.
+- ⛔ **Final Test firewall untouched:** locked True, rows read 0.
+- ➡️ **Next action:** `human_decision_required` — scope `m3_cbi_discontinued_no_further_m3_cbi_action_is_authorized`, authorized = False, executes M3-CBI = False. A pointer is never an authorization.
+- Package: `project/stage129/m3_cbi_human_discontinuation_and_reporting/`; interpretation: `project/stage129/m3_cbi_human_discontinuation_and_reporting/README_STAGE129_M3_CBI_HUMAN_DISCONTINUATION_AND_REPORTING.md`
+
 ### Last completed scientific micro-part QC
 
 _Scientific QC of the newest completed robustness micro-part — a DIFFERENT role from current-state validation above._
@@ -338,5 +358,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `7c558bc401ebf07b8a8824996456720e880fef88661c34b5bb24440292547df0`_
-_generated_at_utc: 2026-08-13T08:13:10Z (informational)_
+_state_fingerprint: `8807df4d7789f51e4afc85137fbd9698bf23985e9d9d9d96c3e557b4d9148bb5`_
+_generated_at_utc: 2026-08-13T13:21:54Z (informational)_
