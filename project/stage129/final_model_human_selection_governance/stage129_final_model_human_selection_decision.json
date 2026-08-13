@@ -1,0 +1,71 @@
+{
+  "authorized_by_human": true,
+  "authorized_scope": "Governance recording ONLY of the human decision naming the final development block and the final algorithm family, together with the already-locked development configuration for that family. This authorization does NOT cover refitting any model on full development, producing a trained final-model artifact, tuning, calibration, threshold search, bootstrap, SHAP, prediction, computing any new metric/CI/p-value, executing or closing Holm, reading any row-level scientific data, accessing or unlocking the Final Test, starting Stage130, or marking this PR ready or merging it.",
+  "decision_date_utc": "2026-08-13",
+  "decision_id": "stage129-final-model-human-selection-governance",
+  "decision_type": "human_governance_selection_decision",
+  "final_algorithm": "regularized_logistic_regression",
+  "final_algorithm_selected": true,
+  "final_configuration": "logistic__C_0.1",
+  "final_configuration_source_artifact": "project/stage126/stage126_m1_retained_design_freeze.json#retained_model_families",
+  "final_configuration_was_prelocked_before_this_decision": true,
+  "final_configuration_selected_by_this_decision": false,
+  "final_development_block": "M1",
+  "final_development_block_selected": true,
+  "final_test_access_authorized": false,
+  "final_test_locked": true,
+  "final_test_rows_read": 0,
+  "full_development_refit_performed": false,
+  "human_decision_translation": "The final development block is M1. The selected algorithm is regularized logistic regression with the locked configuration logistic__C_0.1. The basis of the selection is a human decision on pre-locked development evidence. This is not an inferential superiority claim, not a tested superiority, not a Holm result and not a statistical proof.",
+  "inferential_superiority_claimed": false,
+  "is_holm_result": false,
+  "is_statistical_proof": false,
+  "is_tested_superiority": false,
+  "m2_role_preserved": "intermediate_confirmatory_block",
+  "m2_not_selected_is_not_a_statistical_failure": true,
+  "m2_predictive_superiority_claim_supported": false,
+  "m2_reported_as_statistically_failed": false,
+  "non_selected_algorithms": [
+    {
+      "algorithm": "random_forest",
+      "configuration": "rf__depth_3__maxfeat_'sqrt'__leaf_10",
+      "declared_rejected": false,
+      "declared_removed": false,
+      "declared_statistically_inferior": false,
+      "status": "NOT_SELECTED_BY_HUMAN_DECISION_ONLY"
+    },
+    {
+      "algorithm": "xgboost",
+      "configuration": "xgboost__lr_0.03__depth_2__mcw_1__lambda_1",
+      "declared_rejected": false,
+      "declared_removed": false,
+      "declared_statistically_inferior": false,
+      "status": "NOT_SELECTED_BY_HUMAN_DECISION_ONLY"
+    }
+  ],
+  "paper_winner_selected": true,
+  "predecessor_action_id": "stage129-final-development-model-eligibility-audit",
+  "selection_basis": "HUMAN_DECISION_BASED_ON_PRELOCKED_DEVELOPMENT_EVIDENCE",
+  "selection_is_human_governance_decision": true,
+  "stage130_started": false,
+  "superseded_marker": {
+    "artifact": "project/stage129/final_development_model_eligibility_audit/stage129_final_model_eligibility_audit_verdict.json",
+    "historical_artifact_preserved_byte_for_byte": true,
+    "keys": [
+      "block_verdict",
+      "algorithm_verdict",
+      "next_action_id"
+    ],
+    "previous_values": {
+      "algorithm_verdict": "FINAL_ALGORITHM_REQUIRES_HUMAN_DECISION",
+      "block_verdict": "FINAL_BLOCK_REQUIRES_HUMAN_DECISION",
+      "next_action_id": "human_decision_required"
+    },
+    "previous_value_meaning": "The read-only audit found no frozen rule determining the block or the algorithm, and therefore required a separate human decision. That finding was correct and remains the historical record.",
+    "resolved_value_meaning": "The required human decision has now been made. It does not create the frozen rule the audit looked for; it exercises human governance judgement on pre-locked development evidence, which is why the basis is recorded as HUMAN_DECISION_BASED_ON_PRELOCKED_DEVELOPMENT_EVIDENCE and not as a rule-derived determination.",
+    "supersede_scope": "the_pending_human_decision_only_not_the_audit_findings",
+    "superseding_decision_id": "stage129-final-model-human-selection-governance"
+  },
+  "trained_final_model_artifact_created": false,
+  "why_this_is_not_an_inferential_claim": "No hypothesis test selected this model. The confirmatory model-comparison family (confirmatory_family_1) was never executed, the adjacent-block family was never adjusted, and no p-value exists for any of its members. The development evidence this decision rests on was locked before the decision and is quoted, not recomputed. Presenting the selection as a tested or statistically proven superiority would assert an inference the study never performed."
+}

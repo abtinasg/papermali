@@ -454,13 +454,25 @@ def test_final_test_stays_locked_with_zero_rows_read(decision, boundary, state):
 
 
 def test_no_final_model_winner_refit_or_stage130(boundary, state):
+    """THIS action selected no winner and opened no endgame step.
+
+    The action-scoped facts in its own boundary are the authoritative statement
+    and stay False forever. The live global `paper_winner_selected` is NOT a
+    proxy for them: a later, separate governance decision
+    (`stage129-final-model-human-selection-governance`) legitimately set it, and
+    asserting it False here would misreport that later decision as belonging to
+    this one.
+    """
     for field in ("paper_winner_selected", "final_model_selected",
                   "full_development_refit_executed",
                   "stage130_or_next_stage_executed", "merge_authorized",
                   "ready_for_review_authorized"):
         assert boundary[field] is False, field
-    assert state["paper_winner_selected"] is False
+    # nothing this action could open has been opened, then or since
     assert state["full_development_refit_performed"] is False
+    assert state["trained_final_model_artifact_created"] is False
+    assert state["stage130_started"] is False
+    assert state["final_test_rows_read"] == 0
 
 
 # ---------------------------------------------- 13. the approved text exists

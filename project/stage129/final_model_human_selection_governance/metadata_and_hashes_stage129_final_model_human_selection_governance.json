@@ -1,0 +1,37 @@
+{
+  "action_id": "stage129-final-model-human-selection-governance",
+  "action_type": "human_governance_selection_recording_only",
+  "credentials_committed_to_git": false,
+  "final_algorithm": "regularized_logistic_regression",
+  "final_configuration": "logistic__C_0.1",
+  "final_development_block": "M1",
+  "final_test_artifacts_committed": 0,
+  "full_development_refit_performed": false,
+  "inferential_superiority_claimed": false,
+  "new_data_files_created_by_this_action": 0,
+  "new_metric_files_committed": 0,
+  "package_file_count": 4,
+  "package_files": {
+    "README_STAGE129_FINAL_MODEL_HUMAN_SELECTION_GOVERNANCE.md": {
+      "bytes": 8192,
+      "sha256": "ae6dbf5562ca53c0e4003c1d2f698ee7b90c8119d00093888ac5180c20f372c9"
+    },
+    "stage129_final_holm_family_status.json": {
+      "bytes": 2642,
+      "sha256": "966a5c272f8cb4295d0be7a91003059a07ffd9104c8f20c5f57120fa43fa9ed1"
+    },
+    "stage129_final_model_human_selection_decision.json": {
+      "bytes": 4812,
+      "sha256": "b5a6f08466fb325559d28cc69d1c8f227403483e0613be6b7de403d08fa2c064"
+    },
+    "stage129_final_model_selection_governance_boundary.json": {
+      "bytes": 3307,
+      "sha256": "162d9d83c200fa9c804b44ee2b4633b04e0981f5ea1877b10d548a41e0ceb7d5"
+    }
+  },
+  "paper_winner_selected": true,
+  "pii_committed_to_git": false,
+  "selection_basis": "HUMAN_DECISION_BASED_ON_PRELOCKED_DEVELOPMENT_EVIDENCE",
+  "trained_final_model_artifact_created": false,
+  "trained_model_artifacts_committed": 0
+}
