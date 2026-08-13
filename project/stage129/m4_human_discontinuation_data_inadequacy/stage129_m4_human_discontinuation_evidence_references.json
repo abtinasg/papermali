@@ -1,0 +1,70 @@
+{
+  "action_id": "stage129-m4-human-discontinuation-data-inadequacy",
+  "new_data_created_by_this_action": false,
+  "note": "Every reference below is an artifact ALREADY COMMITTED to this repository at or before this action. This action creates no new data, computes no coverage and materializes no feature.",
+  "references": [
+    {
+      "bytes": 11675,
+      "hash_scope": "committed_repository_artifact",
+      "path": "project/stage129/m4_observational_audit_extraction_v4_3_1/README_STAGE129_M4_OBSERVATIONAL_AUDIT_EXTRACTION_V4_3_1.md",
+      "role": "interpretation of the observational extraction",
+      "sha256": "d3092a708686043d7264162cd726c8c9a37f6238292dc51737ac058ca3e0782a"
+    },
+    {
+      "bytes": 630404,
+      "hash_scope": "committed_repository_artifact",
+      "path": "project/stage129/m4_observational_audit_extraction_v4_3_1/audit_fields_extracted_v4_3_1.csv",
+      "role": "the 1331-row observational extraction table",
+      "sha256": "7fd40499c8a5cae7f54c80d5263be3598659a7a787403d7c121ab5478c51a655"
+    },
+    {
+      "bytes": 312323,
+      "hash_scope": "committed_repository_artifact",
+      "path": "project/stage129/m4_observational_audit_extraction_v4_3_1/canonical_1331_coverage.csv",
+      "role": "per-row coverage of the canonical population",
+      "sha256": "e67c913306d024b860de5607c5ac4af5e9c527b05c4389b40b023c73ae98a43a"
+    },
+    {
+      "bytes": 574958,
+      "hash_scope": "committed_repository_artifact",
+      "path": "project/stage129/m4_observational_audit_extraction_v4_3_1/audit_fields_missing_worklist_v4_3_1.csv",
+      "role": "field-level missingness",
+      "sha256": "e4440f470f03b5eaf9276a4a753de1e6d274e32ca5f6895dc845152f2ad4c435"
+    },
+    {
+      "bytes": 3741,
+      "hash_scope": "committed_repository_artifact",
+      "path": "project/stage129/m4_observational_audit_extraction_v4_3_1/qa_report_v4_3_1.json",
+      "role": "QA result of the observational run",
+      "sha256": "0ff50b9770e03f45d6903a41590654740c75e90a6af4279a813793bfb647672f"
+    },
+    {
+      "bytes": 1824,
+      "hash_scope": "committed_repository_artifact",
+      "path": "project/stage129/m4_observational_audit_extraction_v4_3_1/stage129_m4_observational_extraction_governance_boundary.json",
+      "role": "observational package governance boundary",
+      "sha256": "3b75e467037099f389348d04c01151b84d8806cf70e0dac161932073b8be4edd"
+    },
+    {
+      "bytes": 30664,
+      "hash_scope": "committed_repository_artifact",
+      "path": "project/stage129/m4_governance_data_gate_contract/stage129_m4_data_gate_contract.json",
+      "role": "the prospective M4 Gate contract, unchanged",
+      "sha256": "3aed4917bccd71ca34e6a4425b9a80f31ce49b37cf03c8f19c36c884b51f44ca"
+    },
+    {
+      "bytes": 10740,
+      "hash_scope": "committed_repository_artifact",
+      "path": "project/stage129/m4_authoritative_prerequisite_resolution/stage129_m4_prerequisite_resolution_decision.json",
+      "role": "the 0-of-3 prerequisite resolution outcome, unchanged",
+      "sha256": "24427478acc65ac962c384aa158c2958196f5f4c158d48830626c1c1c81a89ec"
+    },
+    {
+      "bytes": 1973,
+      "hash_scope": "committed_repository_artifact",
+      "path": "project/stage125/part4_metrics_uncertainty_contract_stage125.json",
+      "role": "multiplicity / Holm family definition, unchanged",
+      "sha256": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760"
+    }
+  ]
+}

@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `f9a6926c7b03f6604a2eea92a31ddcdb49e95325`
-- **Generated from commit:** `f9a6926c7b03f6604a2eea92a31ddcdb49e95325` (branch `stage129-m4-authoritative-prerequisite-resolution`, informational)
-- **Baseline:** `origin/main` @ `9d6567ef3ad86e06daf552a04e7db7a28adeee89`
+- **Last stage commit:** `191c784c84169717cd2cc243cd6294be28e07e44`
+- **Generated from commit:** `191c784c84169717cd2cc243cd6294be28e07e44` (branch `stage129-m4-human-discontinuation-data-inadequacy`, informational)
+- **Baseline:** `origin/main` @ `5e37d1644a7ff3475c7740816803a478a6a5785d`
 
 ## Current-state validation
 
@@ -251,12 +251,27 @@ _A prospective, pre-retrieval contract lock only. Zero M4 retrieval, zero Data G
 - ⚠️ **(C) CROSS-CUTTING CONTRACT ISSUE — CODAL company identity:** `CONTRACT_ISSUE_UNRESOLVED`. No audited deterministic mapping resolves a CODAL issuer identity to the frozen parent-side `ticker` key. The audited stage127 join evidence is PARENT-SIDE only (its child side was TSETMC market data, not CODAL filings), so it does not establish cross-source identity compatibility. The Gate's join-quality dimension is therefore not executable for CODAL-sourced values (False) — which is every M4 candidate.
 - ⛔ **Nothing executed:** M4 data retrieval started False — candidate observations read 0 — Data Gate executed False — block admitted False — modeling started False — incremental evaluation authorized False.
 - **Contract-lock authorization (consumed, not standing):** was_authorized=True, authorized_now=False, authorization_consumed=True, authorization_reusable=False.
-- **A THIRD, separate pointer** (neither Track A's `human-decision-required` nor Track B's `human_decision_required` is moved by this action): `stage129-m4-governance-data-gate` — authorized = False. A pointer is never an authorization.
+- **A THIRD, separate pointer** (neither Track A's `human-decision-required` nor Track B's `human_decision_required` is moved by this action): at lock time this action published `stage129-m4-governance-data-gate` — authorized = False. A pointer is never an authorization. **Superseded:** the live M4 pointer is now `human_decision_required` after the human decision to discontinue M4.
 - ⚠️ **(C) Two candidate-specific CONTRACT ISSUES / UNRESOLVED prerequisite definitions.** Candidate IDENTITY for both is frozen; their DEFINITIONS are not, no modeled values are admitted, no empirical discovery is allowed, and the future Gate cannot execute for either candidate until a separately authorized, authoritative resolution exists: `audit_opinion_type` category taxonomy = `CONTRACT_ISSUE_UNRESOLVED` (only secondary Persian accounting-blog sources found, no authoritative CODAL field schema or IACPA/Audit Organization standard text); `audit_lag_days` calendar-conversion convention = `CONTRACT_ISSUE_UNRESOLVED` (the M3-LAG-WDI `jalali_fiscal_year_t_plus_621` YEAR-MAPPING rule is explicitly NOT applicable to this day-level date difference, and no authoritative CODAL date-field conversion rule was found).
 - ⚠️ **Join identity: parent-side keys frozen, CODAL side UNRESOLVED.** Frozen to the already-audited M2/M3-family keys:** company key = `ticker`, fiscal-year key = `fiscal_year_t`, ambiguous-identity verdict = `unresolved` — source: `project/stage128/m2_incremental_evaluation/stage127_m2_common_sample_join_audit.json (fields canonical_row_identity, join_keys) and project/stage128/m3_macro_data_gate/stage128_m3_macro_data_gate_decision.json (field required_join_keys), the already-audited M2/M3-family join keys, reused unchanged for M4`.
 - ⛔ **Unchanged (regression check):** M3-CBI status `UNRESOLVED_M3_DATA_GATE`, M3-LAG-WDI disposition `SUPPLEMENTARY_EXPLORATORY_ONLY`, confirmatory Holm family `['M2_minus_M1', 'M3_CBI_minus_M2', 'M4_minus_M3_CBI']` executed = False.
 - ⛔ **Final Test firewall untouched:** locked True, rows read 0.
 - Package: `project/stage129/m4_governance_data_gate_contract/`; interpretation: `project/stage129/m4_governance_data_gate_contract/README_STAGE129_M4_GOVERNANCE_DATA_GATE_CONTRACT.md`
+
+### Stage129 — M4 DISCONTINUED by human decision (data inadequacy)
+
+_A human governance decision only. The formal M4 Data Gate was NEVER executed: zero formal coverage computation, zero feature materialization, zero modeling, zero Final Test access._
+
+- ⛔ **Block disposition:** `M4_DISCONTINUED_BY_HUMAN_DECISION_DATA_INADEQUACY` — authorized by human = True, reason class `data_accessibility_coverage_and_definition_mismatch`.
+- ❗ **This is NOT a formal Gate failure:** formal Gate executed = False, formal verdict `None`, is-formal-gate-failure = False. The observational figures (444 verified opinions and 446 report dates over the whole 1331-row canonical population, 2214 field-level missing) are OBSERVATIONAL coverage, not a Gate verdict: True.
+- ⛔ **Nothing downstream is authorized:** retrieval continues = False, manual completion continues = False, feature materialization = False, modeling will run = False, incremental evaluation will run = False.
+- 🔒 **Reopening:** authorized = False, requires new explicit human authorization = True.
+- ✅ **Candidate identity preserved, not rewritten:** count `4`, set `['audit_opinion_type', 'going_concern_flag', 'audit_lag_days', 'board_size']`, removed or renamed = False.
+- ⛔ **Holm family unchanged and the M4 comparison unexecuted:** `M4_minus_M3_CBI` status `NOT_EXECUTED_M4_DISCONTINUED`, p-value `None`, family modified = False, shrunk post hoc = False. Manuscript reporting decision for the unexecuted comparison: `UNRESOLVED_REPORTING_DECISION`.
+- 📄 **Observational extraction:** status `OBSERVATIONAL_TEXT_EXTRACTION_NOT_YET_ADMITTED_AS_LOCKED_M4_INPUT` — retained in custody, not a model input, reportable in limitations = True.
+- ⛔ **Final Test firewall untouched:** locked True, rows read 0.
+- ➡️ **Next action:** `human_decision_required` — scope `m4_discontinued_no_further_m4_action_is_authorized`, authorized = False, executes M4 = False. A pointer is never an authorization.
+- Package: `project/stage129/m4_human_discontinuation_data_inadequacy/`; interpretation: `project/stage129/m4_human_discontinuation_data_inadequacy/README_STAGE129_M4_HUMAN_DISCONTINUATION_DATA_INADEQUACY.md`
 
 ### Last completed scientific micro-part QC
 
@@ -307,5 +322,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `7dff8b85555f5a66c566926e19aa237dd4cc218678520a82c5338534d25028f9`_
-_generated_at_utc: 2026-08-10T16:08:35Z (informational)_
+_state_fingerprint: `8c29b183084b064f4339d29c69fb1d55baecd8385cd734673c43181c2409e263`_
+_generated_at_utc: 2026-08-13T07:17:24Z (informational)_

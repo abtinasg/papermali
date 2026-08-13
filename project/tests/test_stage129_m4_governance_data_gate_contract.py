@@ -453,20 +453,26 @@ def test_handoff_state_shows_zero_m4_execution():
 
 def test_handoff_state_pointer_is_distinct_from_authorization_and_from_the_two_live_pointers():
     state = _handoff_state()
-    assert state["stage129_m4_next_action_id"] == (
+    # What THIS lock published at lock time is history and never changes.
+    assert state["stage129_m4_contract_lock_pointer_at_lock_time"] == (
         "stage129-m4-governance-data-gate")
+    # The live M4 pointer was later superseded by the human decision to
+    # discontinue M4; a discontinued block may not keep naming its own Gate.
+    assert state["stage129_m4_next_action_id"] == "human_decision_required"
     assert state["stage129_m4_next_action_authorized"] is False
     assert state["stage129_m4_next_action_pointer_is_not_authorization"] is (
         True)
-    # Both pre-existing live pointer chains are preserved, not collapsed
-    # into the new M4 pointer.
+    # Both pre-existing live pointer chains are preserved, and neither was
+    # advanced by any Stage129 action.
     assert state["next_research_action_id"] == "human-decision-required"
     assert state["stage128_m3_lag_wdi_next_action_id"] == (
         "human_decision_required")
-    assert state["stage129_m4_next_action_id"] not in (
-        state["next_research_action_id"],
-        state["stage128_m3_lag_wdi_next_action_id"],
-    )
+    # The three chains may CONVERGE on the same terminal "a human must decide"
+    # value -- Track A and Track B already did. What is forbidden is the M4
+    # pointer naming an executable M4 step, or being read as an authorization.
+    assert state["stage129_m4_next_action_id"] != (
+        "stage129-m4-governance-data-gate")
+    assert state["stage129_m4_next_action_executes_m4"] is False
 
 
 def test_handoff_state_surfaces_the_three_unresolved_contract_issues():
