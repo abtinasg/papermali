@@ -171,9 +171,13 @@ def test_retained_block_wording_and_semantics_are_unchanged():
         "`m2_block_retained=True`",
         "`m2_retained_block_decision_required=False`",
         "**M2 predictive superiority claim supported:** False",
-        "**No winner, no final model:** paper_winner_selected=False",
-        "final_model_selected=False",
-        "full_development_refit_performed=False",
+        # Action-scoped: THIS decision selected no winner. Deliberately not the
+        # live global flag, which a later separately authorized governance
+        # decision may set without changing what this decision did.
+        "**This decision selected no winner and no final model:**",
+        "paper_winner_selected_by_this_decision=False",
+        "final_model_selected_by_this_decision=False",
+        "full_development_refit_performed_by_this_decision=False",
     ):
         assert fragment in text, fragment
     assert "**M3:** authorized=False, started=False" in text

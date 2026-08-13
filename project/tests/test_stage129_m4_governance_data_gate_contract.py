@@ -550,8 +550,14 @@ def test_protected_handoff_keys_have_the_expected_pre_existing_values():
         "final_test_locked": True,
         "final_test_access_authorized": False,
         "final_test_evaluation_performed": False,
-        "paper_winner_selected": False,
+        # NB: `paper_winner_selected` is deliberately NOT pinned here. It was
+        # False when this contract-lock task ran and this task never moved it,
+        # but it is a LIVE STANDING flag that a later, separately authorized
+        # governance decision (stage129-final-model-human-selection-governance)
+        # legitimately sets. What this task must never move is the scientific
+        # state below, plus the fact that no trained final model exists.
         "final_model_selected": False,
+        "trained_final_model_artifact_created": False,
         "full_development_refit_performed": False,
         "holm_family_complete": False,
         "holm_final_adjustment_deferred": True,

@@ -482,16 +482,26 @@ def test_the_holm_reporting_gap_is_recorded_not_filled(verdict):
 # ------------------------------- 12/13/14. nothing selected, opened or unlocked
 def test_no_winner_or_final_model_is_selected(boundary, state,
                                               roadmap_front_matter):
+    """THE AUDIT selected nothing. Its own action-scoped markers say so and stay
+    False forever.
+
+    The live global `paper_winner_selected` is deliberately NOT asserted here.
+    The audit's verdicts required a separate human decision, that decision was
+    subsequently made (`stage129-final-model-human-selection-governance`), and
+    it set the global flag. Pinning the global flag False in the audit's own
+    test file would make the audit's finding un-actionable by construction.
+    """
     assert boundary["paper_winner_selected"] is False
     assert boundary["final_model_selected"] is False
     assert state["stage129_audit_paper_winner_selected"] is False
     assert state["stage129_audit_final_model_selected"] is False
-    assert state["paper_winner_selected"] is False
-    assert state["final_model_selected"] is False
-    assert roadmap_front_matter["paper_winner_selected"] == "false"
-    assert roadmap_front_matter["final_model_selected"] == "false"
     assert boundary["audit_determined_candidate_is_not_a_final_selection"] is True
     assert state["stage129_audit_determined_candidate_is_not_a_final_selection"] is True
+    # no trained model exists and no endgame step opened, then or since
+    assert state["final_model_selected"] is False
+    assert state["trained_final_model_artifact_created"] is False
+    assert state["full_development_refit_performed"] is False
+    assert roadmap_front_matter["final_model_selected"] == "false"
 
 
 def test_no_refit_stage130_or_final_test_is_executed_or_authorized(
