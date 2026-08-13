@@ -1,0 +1,31 @@
+{
+  "action_id": "stage129-m4-human-discontinuation-data-inadequacy",
+  "action_type": "human_decision_recording_only",
+  "credentials_committed_to_git": false,
+  "decision_status": "M4_DISCONTINUED_BY_HUMAN_DECISION_DATA_INADEQUACY",
+  "final_test_artifacts_committed": 0,
+  "formal_m4_data_gate_executed": false,
+  "m4_value_files_committed": 0,
+  "model_artifacts_committed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "package_file_count": 4,
+  "package_files": {
+    "README_STAGE129_M4_HUMAN_DISCONTINUATION_DATA_INADEQUACY.md": {
+      "bytes": 7160,
+      "sha256": "38be91e58dd930fbf6c7efbece7f532080326cf3e9fd27c33cfd36f77ed6c6f5"
+    },
+    "stage129_m4_human_discontinuation_decision.json": {
+      "bytes": 3898,
+      "sha256": "cee5a11d64468d723e9a0977664b84d0f4fe7f66b45f8ce37b1cc45bdc3410b7"
+    },
+    "stage129_m4_human_discontinuation_evidence_references.json": {
+      "bytes": 3416,
+      "sha256": "689d7ec0fa3c90db0a948390497a2635566ced566aa032f2df39baa01cb1e3d7"
+    },
+    "stage129_m4_human_discontinuation_governance_boundary.json": {
+      "bytes": 3288,
+      "sha256": "258590f27d0c362112df7ded6d1481caf78c71fc536c176237a8533cd757d80b"
+    }
+  },
+  "pii_committed_to_git": false
+}
