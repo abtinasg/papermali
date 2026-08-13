@@ -266,14 +266,26 @@ def test_holm_family_unchanged_and_m4_comparison_unexecuted(boundary, state):
 def test_the_unresolved_reporting_decision_is_recorded_not_invented(
         boundary, state):
     """The frozen contract makes family-2 membership conditional on admission,
-    but says nothing about presenting a never-admitted block's comparison. That
-    gap must be recorded as unresolved, never filled in."""
+    but says nothing about presenting a never-admitted block's comparison. At
+    the time of THIS decision that gap was unresolved, and this artifact must
+    still say so -- it is the historical record of what was true then.
+
+    The gap was resolved later, by the separate
+    ``stage129-m4-manuscript-reporting-decision``, which supersedes this single
+    marker on the live Handoff surface while leaving this package byte-for-byte
+    intact. So the artifact keeps `UNRESOLVED_REPORTING_DECISION` and the live
+    state carries the resolved value; the resolved value is pinned by that
+    decision's own test file.
+    """
     assert boundary["family_membership_is_prospectively_conditional_on_block_admission"] is True
     assert boundary[
         "manuscript_reporting_decision_for_the_unexecuted_m4_comparison"
     ] == "UNRESOLVED_REPORTING_DECISION"
     assert state[
         "stage129_m4_manuscript_reporting_decision_for_unexecuted_comparison"
+    ] == "REPORT_AS_PRESPECIFIED_NOT_EXECUTED_DATA_INADEQUACY_NO_INFERENCE"
+    assert state[
+        "stage129_m4_manuscript_reporting_decision_previous_value"
     ] == "UNRESOLVED_REPORTING_DECISION"
     # and the conditional wording must really exist in the frozen contract
     metrics = _load("project/stage125/part4_metrics_uncertainty_contract_stage125.json")
