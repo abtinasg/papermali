@@ -12,8 +12,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
 - **Last stage commit:** `2df54ed5c3bfb23644cc05b84ccd704fac21eb3f`
-- **Generated from commit:** `2df54ed5c3bfb23644cc05b84ccd704fac21eb3f` (branch `stage129-final-development-model-eligibility-audit`, informational)
-- **Baseline:** `origin/main` @ `22289f5b86c7abe9ecf3496981c5199eea720364`
+- **Generated from commit:** `01213894684479916c909ebe861fcc292850ef7f` (branch `stage129-final-model-human-selection-governance`, informational)
+- **Baseline:** `origin/main` @ `01213894684479916c909ebe861fcc292850ef7f`
 
 ## Current-state validation
 
@@ -105,7 +105,7 @@ _The human governance decision that the paired evaluation deliberately left open
 - ✅ **M2 block retained:** True — as the INTERMEDIATE block of the preregistered nested chain M1→M2→M3→M4 and the comparator for a future paired `M3 − M2` evaluation, conditional on a separately authorized M3 data Gate that passes
 - **Retention basis:** `preregistered_nested_confirmatory_architecture_preservation_not_observed_predictive_superiority`
 - ⛔ **M2 predictive superiority claim supported:** False — the observed development evidence stays approximately null (all three 95% paired-bootstrap PR-AUC intervals include zero and the point-estimate signs disagree across model families). Retention implies no predictive improvement and no statistical significance.
-- ⛔ **No winner, no final model:** paper_winner_selected=False, final_model_selected=False, full_development_refit_performed=False
+- ⛔ **This decision selected no winner and no final model:** paper_winner_selected_by_this_decision=False, final_model_selected_by_this_decision=False, full_development_refit_performed_by_this_decision=False — action-scoped and permanently false. Any later winner selection belongs to its own separately authorized decision, never to this one.
 - ⛔ **Holm family:** complete=False, final adjustment deferred=True — the incomplete confirmatory family stays incomplete
 - 🔒 **Final test locked:** final_test_unlocked=False, final_test_access_authorized=False, predictor values inspected=False, target values inspected=False
 - ⛔ **M3:** authorized=False, started=False — **M4:** authorized=False, started=False
@@ -237,7 +237,7 @@ _An explicit human governance decision, not a one-action execution authorization
 - ⚠️ **Point-in-time WDI availability:** `UNVERIFIED_WITH_CURRENTLY_AVAILABLE_EVIDENCE` — treated as `EVIDENCE_LIMITATION_NOT_A_BLOCKING_TASK`, never as a task that blocks the research programme.
 - ✅ **M3-LAG-WDI final research disposition:** `SUPPLEMENTARY_EXPLORATORY_ONLY` — promoted to the confirmatory model = False. A future unsolicited World Bank response auto-reopens M3 = False (using it for anything requires a new explicit human decision = True).
 - ✅ **Step E result PRESERVED EXACTLY, re-verified against the committed artifact by this recording:** `E1_NULL_NO_DETECTABLE_INCREMENTAL_CONTRIBUTION` — paired PR-AUC deltas (M3-LAG-WDI minus retained M2) logistic +0.000862 [-0.028237, +0.032186], random forest -0.002720 [-0.029157, +0.011924], XGBoost +0.002749 [-0.007437, +0.014554] (all three 95% intervals include zero); secondary Brier deltas logistic -0.004600 [-0.006147, -0.003066] and random forest -0.001375 [-0.002229, -0.000566] (calibration only, non-confirmatory).
-- ⛔ **Unchanged:** M4 authorized False — Final Test locked True, rows read 0 — confirmatory Holm family unchanged and unexecuted — paper winner selected False.
+- ⛔ **Unchanged:** M4 authorized False — Final Test locked True, rows read 0 — confirmatory Holm family unchanged and unexecuted — paper winner selected True.
 - **Both pointer chains converge on the same human decision:** `human-decision-required` — scope `no_further_action_is_authorized`, authorized = False. Track B: `human_decision_required` — scope `no_further_action_is_authorized`, authorized = False. A pointer is never an authorization.
 - Package: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/`; interpretation: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/README_STAGE128_M3I2_TRACK_A_WAITING_TERMINATION_AND_M3_DISPOSITION.md`
 
@@ -325,6 +325,24 @@ _Reads committed artifacts and answers one question: do the frozen rules determi
 - ➡️ **Next action:** `human_decision_required` — authorized = False. An audit verdict is never an authorization.
 - Package: `project/stage129/final_development_model_eligibility_audit/`; interpretation: `project/stage129/final_development_model_eligibility_audit/README_STAGE129_FINAL_DEVELOPMENT_MODEL_ELIGIBILITY_AUDIT.md`
 
+### Stage129 — FINAL MODEL SELECTED by human governance decision
+
+_A governance act, not an inference and not an execution. The block and the algorithm family are named; the configuration was already locked; nothing is fitted, no trained artifact exists and the Final Test stays locked._
+
+- ✅ **Final development block:** `M1` — selected = True.
+- ✅ **Final algorithm:** `regularized_logistic_regression` — selected = True, configuration `logistic__C_0.1`.
+- ⚖️ **Basis:** `HUMAN_DECISION_BASED_ON_PRELOCKED_DEVELOPMENT_EVIDENCE` — human governance decision = True, paper winner selected = True.
+- ❗ **NOT an inferential result:** inferential superiority claimed = False, tested superiority = False, Holm result = False, statistical proof = False, used a Holm result = False.
+- 🔒 **Configuration was pre-locked, not chosen here:** pre-locked before this decision = True, selected by this decision = False.
+- ⛔ **Selected is not fitted:** full-development refit performed = False, trained final-model artifact created = False, Stage130 started = False.
+- 📄 **M2 keeps its role:** `intermediate_confirmatory_block` — declared statistically failed = False, M2 predictive superiority claim supported = False. Not being selected is not a statistical failure.
+- 📄 **Not-selected algorithms keep their standing:** ['random_forest', 'xgboost'] — status `NOT_SELECTED_BY_HUMAN_DECISION_ONLY`, declared rejected = False, declared statistically inferior = False.
+- ⛔ **Holm family preserved, never executed:** status `HOLM_NOT_EXECUTED_FAMILY_PRESERVED_NO_INFERENCE`, family `['M2_minus_M1', 'M3_CBI_minus_M2', 'M4_minus_M3_CBI']`, complete = False, adjustment executed = False, any hypothesis resolved = False, new p-values = 0.
+- 🔁 **Supersedes the pending decision, not the audit findings:** `FINAL_BLOCK_REQUIRES_HUMAN_DECISION` and `FINAL_ALGORITHM_REQUIRES_HUMAN_DECISION` in `project/stage129/final_development_model_eligibility_audit/stage129_final_model_eligibility_audit_verdict.json`; audit package preserved = True.
+- ⛔ **Final Test firewall untouched:** locked True, rows read 0, access authorized False.
+- ➡️ **Next action:** `human_authorization_required_for_full_development_refit_and_final_test` — authorized = False. A pointer is never an authorization.
+- Package: `project/stage129/final_model_human_selection_governance/`; interpretation: `project/stage129/final_model_human_selection_governance/README_STAGE129_FINAL_MODEL_HUMAN_SELECTION_GOVERNANCE.md`
+
 ### Last completed scientific micro-part QC
 
 _Scientific QC of the newest completed robustness micro-part — a DIFFERENT role from current-state validation above._
@@ -374,5 +392,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `dd4b2ea5b7250ed312b4b4c9ba36949f8f0ff2ec9c29dfeadfb13bcbd23f2051`_
-_generated_at_utc: 2026-08-13T20:33:22Z (informational)_
+_state_fingerprint: `22a12e4bbff3360a292b18fb447c7a8da11045b2d9461996b506791b2218d5a2`_
+_generated_at_utc: 2026-08-13T21:26:00Z (informational)_
