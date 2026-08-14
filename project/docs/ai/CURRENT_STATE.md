@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `8abacdf3869fe584059d21cb6980233c65e913bf`
-- **Generated from commit:** `0e55bca07ff065a026e23a36ee0c21017c3858a9` (branch `stage129-full-development-refit-contract-lock`, informational)
+- **Last stage commit:** `bda1d90030737cd149aadb504796808e76ae371e`
+- **Generated from commit:** `bda1d90030737cd149aadb504796808e76ae371e` (branch `stage129-full-development-refit-contract-lock`, informational)
 - **Baseline:** `origin/main` @ `0e55bca07ff065a026e23a36ee0c21017c3858a9`
 
 ## Current-state validation
@@ -410,5 +410,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `7cd23634a84b1f9a3f839b4c4f1a7890a2b9090b34c9f62c658d7c2402f8f249`_
-_generated_at_utc: 2026-08-14T10:19:21Z (informational)_
+_state_fingerprint: `9dec5dfd4c7cbe38c18aa27ee1e15e853d835fdfd64c13a5cbd422d6cc6898b1`_
+_generated_at_utc: 2026-08-14T10:56:03Z (informational)_
