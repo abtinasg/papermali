@@ -3011,6 +3011,12 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # nothing, executes nothing, and authorizes nothing -- the refit itself
         # still needs a separate human authorization.
         **derive_stage129_full_development_refit_contract_markers(root),
+        # Must come last of all: the one-time contracted refit EXECUTION. It is
+        # the only action in the programme that fits a model outside the locked
+        # development tuning, and it does so exactly once, on the 1393-1399
+        # window, under FC01-FC12. It reads no Final Test row and authorizes no
+        # Final Test access.
+        **derive_stage129_full_development_refit_execution_markers(root),
         }))
 
 
@@ -6174,6 +6180,64 @@ def render_current_state(record: dict) -> str:
             "full_development_refit_contract_lock/`; interpretation: "
             "`project/stage129/full_development_refit_contract_lock/"
             "README_STAGE129_FULL_DEVELOPMENT_REFIT_CONTRACT_LOCK.md`",
+            "",
+        ]
+    if record.get("stage129_refit_execution_recorded"):
+        lines += [
+            "### Stage129 — Full-Development Refit EXECUTED (development "
+            "only)\n",
+            "_The one-time contracted refit. Exactly one model fitted, on the "
+            "development window only, under all twelve fail-closed controls. "
+            "No Final Test row, predictor, target, prediction or metric was "
+            "read or produced._\n",
+            "- ✅ **Refit executed:** "
+            f"{record.get('stage129_refit_executed')} — model fits = "
+            f"{record.get('stage129_refit_model_fits_executed')}, trained "
+            "artifact created = "
+            f"{record.get('trained_final_model_artifact_created')}.",
+            "- 🎯 **Model:** "
+            f"`{record.get('final_development_block')}` / "
+            f"`{record.get('final_algorithm')}` / "
+            f"`{record.get('final_configuration')}` — retuned = "
+            f"{record.get('stage129_refit_retuning_authorized')}, re-selected = "
+            f"{record.get('stage129_refit_model_reselected')}.",
+            "- 📆 **Fit set:** target years "
+            f"`{record.get('stage129_refit_fit_set_target_years')}` — "
+            f"{record.get('stage129_refit_fit_set_rows')} rows "
+            f"({record.get('stage129_refit_fit_set_positive')} positive / "
+            f"{record.get('stage129_refit_fit_set_negative')} negative), design "
+            f"matrix {record.get('stage129_refit_design_columns')} columns.",
+            "- 🔁 **Preprocessing re-estimated on this fit set only:** "
+            f"{record.get('stage129_refit_preprocessing_estimated_on_fit_set_only')}"
+            " — nothing carried over from a development fold. Pipeline reused, "
+            "not reimplemented = "
+            f"{record.get('stage129_refit_pipeline_reused_not_reimplemented')}.",
+            "- 🛡️ **Fail-closed controls:** "
+            f"{record.get('stage129_refit_controls_evaluated')} evaluated, all "
+            f"passed = {record.get('stage129_refit_controls_all_passed')}.",
+            "- ⛔ **No new science:** new scientific result produced = "
+            f"{record.get('stage129_refit_new_scientific_result_produced')}, "
+            f"predictions generated = "
+            f"{record.get('stage129_refit_predictions_generated')}, inferential "
+            "superiority claimed = "
+            f"{record.get('inferential_superiority_claimed')}. The locked "
+            "primary development results are unchanged.",
+            "- ⛔ **Final Test firewall held:** locked "
+            f"{record.get('stage129_refit_execution_final_test_locked')}, rows "
+            f"read {record.get('stage129_refit_execution_final_test_rows_read')}"
+            ", access authorized "
+            f"{record.get('final_test_access_authorized')}, Stage130 started "
+            f"{record.get('stage130_started')}.",
+            "- ➡️ **Next action:** "
+            f"`{record.get('stage129_refit_execution_next_action_id')}` — "
+            "authorized = "
+            f"{record.get('stage129_refit_execution_next_action_authorized')}. "
+            "Applying this model to the Final Test needs a separate human "
+            "authorization.",
+            "- Package: `project/stage129/"
+            "full_development_refit_execution/`; interpretation: "
+            "`project/stage129/full_development_refit_execution/"
+            "README_STAGE129_FULL_DEVELOPMENT_REFIT_EXECUTION.md`",
             "",
         ]
     lines += [
@@ -14318,10 +14382,14 @@ def derive_stage129_full_development_refit_contract_markers(root: str) -> dict:
         "stage129_refit_expected_output_count": len(artifacts),
         "stage129_refit_expected_outputs_exist_now": False,
 
-        # What it does NOT do.
-        "stage129_refit_executed": False,
-        "full_development_refit_performed": False,
-        "trained_final_model_artifact_created": False,
+        # What LOCKING does not do. NB: `stage129_refit_executed`,
+        # `full_development_refit_performed` and
+        # `trained_final_model_artifact_created` are LIVE facts owned by the
+        # execution action, not by this lock. Publishing them False here would
+        # make the lock silently contradict a later, separately authorized
+        # execution of this very contract. The lock's own action-scoped
+        # statement lives in its governance boundary instead.
+        "stage129_refit_contract_locked_but_not_executed_at_lock_time": True,
         "stage129_refit_execution_authorized": False,
         "stage129_refit_execution_requires_new_human_authorization": True,
         "stage129_refit_retuning_authorized": False,
@@ -14340,6 +14408,280 @@ def derive_stage129_full_development_refit_contract_markers(root: str) -> dict:
 
         "stage129_refit_next_action_id": _STAGE129_REFIT_NEXT_ACTION_ID,
         "stage129_refit_next_action_authorized": False,
+    }
+
+
+_STAGE129_REFIT_EXEC_PKG = "project/stage129/full_development_refit_execution"
+_STAGE129_REFIT_EXEC_ACTION_ID = "stage129-full-development-refit-execution"
+_STAGE129_REFIT_EXEC_MODEL_REL = (
+    f"{_STAGE129_REFIT_EXEC_PKG}/stage129_full_development_refit_model.json")
+_STAGE129_REFIT_EXEC_PRE_REL = (
+    f"{_STAGE129_REFIT_EXEC_PKG}/"
+    "stage129_full_development_refit_preprocessing_parameters.json")
+_STAGE129_REFIT_EXEC_PROV_REL = (
+    f"{_STAGE129_REFIT_EXEC_PKG}/"
+    "stage129_full_development_refit_provenance_record.json")
+_STAGE129_REFIT_EXEC_QC_REL = (
+    f"{_STAGE129_REFIT_EXEC_PKG}/stage129_full_development_refit_qc_report.json")
+_STAGE129_REFIT_EXEC_BOUNDARY_REL = (
+    f"{_STAGE129_REFIT_EXEC_PKG}/"
+    "stage129_full_development_refit_execution_governance_boundary.json")
+#: The refit fits exactly one model. Any other count is a contract violation.
+_STAGE129_REFIT_EXEC_EXPECTED_FITS = 1
+_STAGE129_REFIT_EXEC_EXPECTED_ROWS = 666
+_STAGE129_REFIT_EXEC_EXPECTED_POSITIVE = 68
+_STAGE129_REFIT_EXEC_EXPECTED_NEGATIVE = 598
+_STAGE129_REFIT_EXEC_DESIGN_COLUMNS = 18
+_STAGE129_REFIT_EXEC_NEXT_ACTION_ID = (
+    "human_authorization_required_for_final_test_access")
+#: Every counter that must be zero even though a fit DID happen.
+_STAGE129_REFIT_EXEC_ZERO_COUNTERS = (
+    "final_test_rows_read", "final_test_rows_loaded",
+    "final_test_predictor_values_read", "final_test_target_values_read",
+    "final_test_predictions", "final_test_metrics_computed",
+    "tuning_runs", "feature_searches", "threshold_searches",
+    "bootstrap_executions", "recalibration_executions", "shap_executions",
+    "holm_executions", "p_values_computed", "confidence_intervals_computed",
+    "new_scientific_metrics_computed",
+)
+
+
+def derive_stage129_full_development_refit_execution_markers(root: str) -> dict:
+    """Recognize the one-time contracted full-development refit EXECUTION.
+
+    Narrow and fail-closed. This is the single action in the programme that
+    fits a model outside the locked development tuning, so the checks are the
+    inverse of the usual ones: instead of proving nothing ran, they prove that
+    EXACTLY the contracted thing ran and nothing more.
+
+    Fails closed if the artifacts report anything other than one fit, a fit set
+    outside 1393-1399, a row/event count that disagrees with the locked
+    development counts, a design matrix that is not 9 continuous + 9
+    indicators, a failed or missing fail-closed control, any non-zero Final
+    Test counter, any new scientific result, or any authorization of Final Test
+    access or Stage130. Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE129_REFIT_EXEC_MODEL_REL)
+    if not os.path.isfile(path):
+        return {}
+    model = _require_json_artifact(root, _STAGE129_REFIT_EXEC_MODEL_REL)
+    pre = _require_json_artifact(root, _STAGE129_REFIT_EXEC_PRE_REL)
+    prov = _require_json_artifact(root, _STAGE129_REFIT_EXEC_PROV_REL)
+    qc = _require_json_artifact(root, _STAGE129_REFIT_EXEC_QC_REL)
+    boundary = _require_json_artifact(root, _STAGE129_REFIT_EXEC_BOUNDARY_REL)
+
+    for artifact, label in ((model, "model"), (pre, "preprocessing"),
+                            (prov, "provenance"), (qc, "qc"),
+                            (boundary, "boundary")):
+        if artifact.get("action_id") != _STAGE129_REFIT_EXEC_ACTION_ID:
+            raise HandoffError(f"Stage129 refit execution {label} action_id mismatch")
+
+    # (1) Exactly one fit, of exactly the selected model.
+    for artifact, label in ((qc, "qc"), (prov, "provenance")):
+        if artifact.get("model_fits_executed") != _STAGE129_REFIT_EXEC_EXPECTED_FITS:
+            raise HandoffError(
+                f"Stage129 refit execution {label} reports "
+                f"{artifact.get('model_fits_executed')!r} fits; exactly "
+                f"{_STAGE129_REFIT_EXEC_EXPECTED_FITS} is permitted")
+    if boundary.get("counters", {}).get("model_fits") != \
+            _STAGE129_REFIT_EXEC_EXPECTED_FITS:
+        raise HandoffError(
+            "Stage129 refit execution boundary model_fits must be "
+            f"{_STAGE129_REFIT_EXEC_EXPECTED_FITS}")
+    if model.get("block") != _STAGE129_SELECT_BLOCK or \
+            model.get("algorithm") != _STAGE129_SELECT_ALGORITHM or \
+            model.get("configuration_id") != _STAGE129_SELECT_CONFIGURATION:
+        raise HandoffError(
+            "Stage129 refit execution did not fit the selected model")
+    if model.get("hyperparameters", {}).get("C") != 0.1 or \
+            model.get("hyperparameters", {}).get("class_weight") != "balanced":
+        raise HandoffError(
+            "Stage129 refit execution hyperparameters are not the locked ones")
+    if boundary.get("final_model_reselected_by_this_action") is not False or \
+            boundary.get("retuning_authorized") is not False:
+        raise HandoffError(
+            "Stage129 refit execution may not re-select or retune the model")
+
+    # (2) The fit set is the development window, with the locked counts.
+    fit_set = model.get("fit_set") or {}
+    years = list(fit_set.get("target_years") or ())
+    if tuple(years) != _STAGE129_REFIT_FIT_YEARS:
+        raise HandoffError(
+            f"Stage129 refit execution fit set years {years} != "
+            f"{list(_STAGE129_REFIT_FIT_YEARS)}")
+    leaked = set(years) & set(_STAGE129_REFIT_FINAL_TEST_YEARS)
+    if leaked:
+        raise HandoffError(
+            f"Stage129 refit execution fit set contains Final Test years "
+            f"{sorted(leaked)}")
+    if fit_set.get("rows") != _STAGE129_REFIT_EXEC_EXPECTED_ROWS or \
+            fit_set.get("positive") != _STAGE129_REFIT_EXEC_EXPECTED_POSITIVE or \
+            fit_set.get("negative") != _STAGE129_REFIT_EXEC_EXPECTED_NEGATIVE:
+        raise HandoffError(
+            "Stage129 refit execution fit-set counts do not match the locked "
+            f"development counts {_STAGE129_REFIT_EXEC_EXPECTED_ROWS}/"
+            f"{_STAGE129_REFIT_EXEC_EXPECTED_POSITIVE}/"
+            f"{_STAGE129_REFIT_EXEC_EXPECTED_NEGATIVE}")
+    if model.get("n_design_columns") != _STAGE129_REFIT_EXEC_DESIGN_COLUMNS or \
+            len(model.get("coefficients") or ()) != \
+            _STAGE129_REFIT_EXEC_DESIGN_COLUMNS:
+        raise HandoffError(
+            "Stage129 refit execution design matrix must be 9 continuous + 9 "
+            "missingness indicators")
+    if tuple((model.get("design_matrix_columns") or [])[:9]) != \
+            _STAGE129_REFIT_FEATURES:
+        raise HandoffError(
+            "Stage129 refit execution continuous columns must be the locked "
+            "M1_PRIMARY_FEATURE_ORDER")
+
+    # (3) Preprocessing was re-estimated on THIS fit set, not carried over.
+    if pre.get("estimated_on") != "the_single_full_development_fit_set_1393_1399":
+        raise HandoffError(
+            "Stage129 refit execution preprocessing must be estimated on the "
+            "single full-development fit set")
+    if pre.get("standardization_applied") is not True or \
+            pre.get("missingness_indicators_standardized") is not False:
+        raise HandoffError(
+            "Stage129 refit execution standardization terms are wrong")
+    for field in ("clip_lower_1st_percentile", "clip_upper_99th_percentile",
+                  "median_of_clipped_observed", "standardization_mean",
+                  "standardization_std"):
+        if len(pre.get(field) or ()) != 9:
+            raise HandoffError(
+                f"Stage129 refit execution preprocessing {field} must have 9 entries")
+
+    # (4) Every fail-closed control ran and passed.
+    controls = qc.get("controls") or []
+    ids = tuple(c.get("id") for c in controls)
+    if ids != _STAGE129_REFIT_FAIL_CLOSED_IDS:
+        raise HandoffError(
+            "Stage129 refit execution must report every control "
+            f"{_STAGE129_REFIT_FAIL_CLOSED_IDS}, got {ids}")
+    for control in controls:
+        if control.get("result") != "PASS":
+            raise HandoffError(
+                f"Stage129 refit execution control {control.get('id')} did not "
+                f"pass: {control.get('result')!r}")
+    if qc.get("all_pass") is not True or \
+            boundary.get("fail_closed_controls_all_passed") is not True:
+        raise HandoffError("Stage129 refit execution must report all controls passed")
+    if boundary.get("fail_closed_controls_evaluated") != len(
+            _STAGE129_REFIT_FAIL_CLOSED_IDS):
+        raise HandoffError(
+            "Stage129 refit execution evaluated control count mismatch")
+
+    # (5) The Final Test was never touched, and stays unauthorized.
+    for name, counters in (("qc", qc.get("final_test_counters") or {}),
+                           ("boundary", boundary.get("counters") or {})):
+        for field in _STAGE129_REFIT_EXEC_ZERO_COUNTERS:
+            if field in counters and counters[field] != 0:
+                raise HandoffError(
+                    f"Stage129 refit execution {name} counter {field} must be 0, "
+                    f"got {counters[field]!r}")
+    if prov.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage129 refit execution provenance final_test_rows_read must be 0")
+    if tuple(prov.get("final_test_target_years_excluded") or ()) != \
+            _STAGE129_REFIT_FINAL_TEST_YEARS:
+        raise HandoffError(
+            "Stage129 refit execution must record the excluded Final Test years")
+    for field in ("final_test_locked",):
+        if boundary.get(field) is not True:
+            raise HandoffError(f"Stage129 refit execution boundary {field} must be True")
+    for field in ("final_test_access_authorized", "final_test_unlock_authorized",
+                  "stage130_authorized", "stage130_started",
+                  "next_action_authorized", "next_action_executes_final_test",
+                  "next_research_action_authorized", "merge_authorized",
+                  "ready_for_review_authorized"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 refit execution boundary {field} must be False")
+    if boundary.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage129 refit execution boundary final_test_rows_read must be 0")
+
+    # (6) No new science, and nothing historical rewritten.
+    for field in ("new_scientific_result_produced",
+                  "inferential_superiority_claimed",
+                  "locked_primary_development_results_modified_by_this_action",
+                  "m1_results_modified_by_this_action",
+                  "m2_status_modified_by_this_action",
+                  "m3_cbi_disposition_modified_by_this_action",
+                  "m4_disposition_modified_by_this_action",
+                  "m3_lag_wdi_promoted_to_confirmatory_model",
+                  "historical_scientific_artifacts_modified_by_this_action",
+                  "prior_packages_modified_by_this_action",
+                  "existing_pull_requests_modified_by_this_action",
+                  "pipeline_reimplemented_by_this_action",
+                  "holm_family_complete"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 refit execution boundary {field} must be False")
+    for field in ("new_metric_computed", "new_p_value_computed",
+                  "bootstrap_executed", "recalibration_executed", "shap_executed"):
+        if qc.get(field) is not False:
+            raise HandoffError(f"Stage129 refit execution qc {field} must be False")
+    if qc.get("predictions_generated") != 0 or model.get("predictions_generated") != 0:
+        raise HandoffError(
+            "Stage129 refit execution may not generate predictions")
+    # the locked primary results really are unchanged, checked against disk
+    before = qc.get("locked_results_sha256_before") or {}
+    after = qc.get("locked_results_sha256_after") or {}
+    if not before or before != after:
+        raise HandoffError(
+            "Stage129 refit execution locked-result hashes changed during the run")
+    for rel, want in before.items():
+        p = os.path.join(root, rel)
+        if not os.path.isfile(p):
+            raise HandoffError(f"Stage129 refit execution locked result missing: {rel}")
+        with open(p, "rb") as fh:
+            if hashlib.sha256(fh.read()).hexdigest() != want:
+                raise HandoffError(
+                    f"Stage129 refit execution locked result {rel} has since "
+                    "changed; the refit's FC10 guarantee no longer holds")
+    if boundary.get("next_action_id") != _STAGE129_REFIT_EXEC_NEXT_ACTION_ID:
+        raise HandoffError(
+            f"Stage129 refit execution pointer must be "
+            f"{_STAGE129_REFIT_EXEC_NEXT_ACTION_ID}")
+
+    return {
+        "stage129_refit_execution_recorded": True,
+        "stage129_refit_execution_action_id": _STAGE129_REFIT_EXEC_ACTION_ID,
+        "stage129_refit_execution_authorized_by_human": True,
+
+        # The refit happened, exactly once.
+        "full_development_refit_performed": True,
+        "trained_final_model_artifact_created": True,
+        "stage129_refit_executed": True,
+        "stage129_refit_model_fits_executed": _STAGE129_REFIT_EXEC_EXPECTED_FITS,
+        "stage129_refit_fit_set_rows": _STAGE129_REFIT_EXEC_EXPECTED_ROWS,
+        "stage129_refit_fit_set_positive": _STAGE129_REFIT_EXEC_EXPECTED_POSITIVE,
+        "stage129_refit_fit_set_negative": _STAGE129_REFIT_EXEC_EXPECTED_NEGATIVE,
+        "stage129_refit_fit_set_target_years": list(_STAGE129_REFIT_FIT_YEARS),
+        "stage129_refit_design_columns": _STAGE129_REFIT_EXEC_DESIGN_COLUMNS,
+        "stage129_refit_preprocessing_estimated_on_fit_set_only": True,
+        "stage129_refit_pipeline_reused_not_reimplemented": True,
+
+        # Controls.
+        "stage129_refit_controls_evaluated": len(_STAGE129_REFIT_FAIL_CLOSED_IDS),
+        "stage129_refit_controls_all_passed": True,
+
+        # Nothing else happened.
+        "stage129_refit_new_scientific_result_produced": False,
+        "stage129_refit_predictions_generated": 0,
+        "stage129_refit_retuning_authorized": False,
+        "stage129_refit_model_reselected": False,
+        "stage130_started": False,
+        "stage129_refit_stage130_authorized": False,
+        "inferential_superiority_claimed": False,
+
+        # The firewall still holds.
+        "final_test_locked": True,
+        "final_test_rows_read": 0,
+        "final_test_access_authorized": False,
+        "stage129_refit_execution_final_test_rows_read": 0,
+        "stage129_refit_execution_final_test_locked": True,
+        "stage129_refit_execution_next_action_id":
+            _STAGE129_REFIT_EXEC_NEXT_ACTION_ID,
+        "stage129_refit_execution_next_action_authorized": False,
     }
 
 
