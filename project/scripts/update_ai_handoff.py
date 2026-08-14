@@ -3005,6 +3005,12 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # the configuration was pre-locked, no refit runs, no trained artifact
         # is produced and the Final Test stays locked.
         **derive_stage129_final_model_human_selection_markers(root),
+        # Must come last of all: the Full-Development Refit contract lock is a
+        # DESIGN artifact for the model selected above. It extracts its terms
+        # from already-frozen contracts and locks them prospectively. It fits
+        # nothing, executes nothing, and authorizes nothing -- the refit itself
+        # still needs a separate human authorization.
+        **derive_stage129_full_development_refit_contract_markers(root),
         }))
 
 
@@ -6100,6 +6106,74 @@ def render_current_state(record: dict) -> str:
             "final_model_human_selection_governance/`; interpretation: "
             "`project/stage129/final_model_human_selection_governance/"
             "README_STAGE129_FINAL_MODEL_HUMAN_SELECTION_GOVERNANCE.md`",
+            "",
+        ]
+    if record.get("stage129_refit_contract_recorded"):
+        lines += [
+            "### Stage129 — Full-Development Refit contract LOCKED (not "
+            "executed)\n",
+            "_A design artifact for the selected model. Every term is "
+            "extracted from an already-frozen contract. Zero fits, zero "
+            "predictions, zero tuning, zero new metrics, zero row-level "
+            "scientific data reads, zero Final Test access._\n",
+            "- 📋 **Contract:** "
+            f"`{record.get('stage129_refit_contract_id')}` version "
+            f"`{record.get('stage129_refit_contract_version')}` — status "
+            f"`{record.get('stage129_refit_contract_status')}`.",
+            "- 🎯 **Target model:** block "
+            f"`{record.get('stage129_refit_block')}`, algorithm "
+            f"`{record.get('stage129_refit_algorithm')}`, configuration "
+            f"`{record.get('stage129_refit_configuration')}` — retuning "
+            f"authorized = {record.get('stage129_refit_retuning_authorized')}, "
+            "model re-selected = "
+            f"{record.get('stage129_refit_model_reselected')}.",
+            "- 📆 **Fit window:** target years "
+            f"`{record.get('stage129_refit_fit_target_years')}` — the Final "
+            f"Test years `{record.get('stage129_refit_final_test_years')}` are "
+            "excluded by construction.",
+            "- 🧮 **Features:** "
+            f"{record.get('stage129_refit_feature_count')} in locked order "
+            f"`{record.get('stage129_refit_feature_order')}`.",
+            "- 🎚️ **Threshold:** "
+            f"`{record.get('stage129_refit_threshold_rule')}`, tie-break "
+            f"`{record.get('stage129_refit_threshold_tie_break')}` — a "
+            "development-OOF quantity, never optimized on the Final Test.",
+            "- 🔁 **Determinism:** logistic fit is deterministic = "
+            f"{record.get('stage129_refit_logistic_is_deterministic')} (no fit "
+            "seed and no seed averaging apply); runtime pinned to Python "
+            f"{record.get('stage129_refit_runtime_python')} and the locked "
+            "development package set.",
+            "- 🛡️ **Fail-closed controls:** "
+            f"{record.get('stage129_refit_fail_closed_control_count')} checks, "
+            "each aborting the refit on failure.",
+            "- 📦 **Expected outputs:** "
+            f"{record.get('stage129_refit_expected_output_count')} artifacts, "
+            "exist now = "
+            f"{record.get('stage129_refit_expected_outputs_exist_now')} — the "
+            "refit has not run.",
+            "- 🔗 **Extraction anchored:** "
+            f"{record.get('stage129_refit_source_artifact_count')} source "
+            "artifacts pinned by SHA-256; terms extracted not invented = "
+            f"{record.get('stage129_refit_terms_are_extracted_not_invented')}.",
+            "- ⛔ **Locking authorizes nothing:** refit executed = "
+            f"{record.get('stage129_refit_executed')}, refit execution "
+            f"authorized = {record.get('stage129_refit_execution_authorized')}"
+            ", requires new human authorization = "
+            f"{record.get('stage129_refit_execution_requires_new_human_authorization')}"
+            ", Stage130 authorized = "
+            f"{record.get('stage129_refit_stage130_authorized')}.",
+            "- ⛔ **Final Test firewall untouched:** locked "
+            f"{record.get('stage129_refit_final_test_locked')}, rows read "
+            f"{record.get('stage129_refit_final_test_rows_read')}, refit may "
+            f"read it = {record.get('stage129_refit_may_read_final_test')}.",
+            "- ➡️ **Next action:** "
+            f"`{record.get('stage129_refit_next_action_id')}` — authorized = "
+            f"{record.get('stage129_refit_next_action_authorized')}. A locked "
+            "contract is not an execution permission.",
+            "- Package: `project/stage129/"
+            "full_development_refit_contract_lock/`; interpretation: "
+            "`project/stage129/full_development_refit_contract_lock/"
+            "README_STAGE129_FULL_DEVELOPMENT_REFIT_CONTRACT_LOCK.md`",
             "",
         ]
     lines += [
@@ -13887,6 +13961,385 @@ def derive_stage129_final_model_human_selection_markers(root: str) -> dict:
         "stage129_final_selection_audit_package_preserved": True,
         "stage129_final_selection_next_action_id": _STAGE129_SELECT_NEXT_ACTION_ID,
         "stage129_final_selection_next_action_authorized": False,
+    }
+
+
+_STAGE129_REFIT_PKG = "project/stage129/full_development_refit_contract_lock"
+_STAGE129_REFIT_ACTION_ID = "stage129-full-development-refit-contract-lock"
+_STAGE129_REFIT_CONTRACT_REL = (
+    f"{_STAGE129_REFIT_PKG}/stage129_full_development_refit_contract.json")
+_STAGE129_REFIT_PROVENANCE_REL = (
+    f"{_STAGE129_REFIT_PKG}/stage129_full_development_refit_source_provenance.json")
+_STAGE129_REFIT_BOUNDARY_REL = (
+    f"{_STAGE129_REFIT_PKG}/stage129_full_development_refit_governance_boundary.json")
+_STAGE129_REFIT_STATUS = "PROSPECTIVELY_LOCKED_NOT_EXECUTED"
+#: The refit fit window, and the years that may NEVER enter it.
+_STAGE129_REFIT_FIT_YEARS = (1393, 1394, 1395, 1396, 1397, 1398, 1399)
+_STAGE129_REFIT_FINAL_TEST_YEARS = (1400, 1401, 1402)
+_STAGE129_REFIT_FEATURES = (
+    "log_total_assets", "leverage_ratio", "current_ratio", "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted", "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio",
+)
+_STAGE129_REFIT_HYPERPARAMETERS = {
+    "C": 0.1, "max_iter": 5000, "penalty": "l2", "solver": "liblinear"}
+_STAGE129_REFIT_THRESHOLD_RULE = "development_OOF_F2_maximizing_threshold"
+_STAGE129_REFIT_THRESHOLD_TIE_BREAK = "higher_threshold"
+_STAGE129_REFIT_RUNTIME = {
+    "jdatetime": "6.0.1", "numpy": "2.4.6", "pandas": "3.0.3",
+    "python": "3.13.5", "scikit-learn": "1.9.0", "xgboost": "3.3.0"}
+_STAGE129_REFIT_FAIL_CLOSED_IDS = tuple(f"FC{i:02d}" for i in range(1, 13))
+_STAGE129_REFIT_NEXT_ACTION_ID = (
+    "human_authorization_required_for_full_development_refit_execution")
+
+
+def derive_stage129_full_development_refit_contract_markers(root: str) -> dict:
+    """Recognize the prospectively locked Full-Development Refit contract.
+
+    Narrow and fail-closed. A CONTRACT LOCK is a design artifact: it fits no
+    model, predicts nothing, computes no metric, reads no row-level scientific
+    data and never touches the Final Test.
+
+    The safety properties here are unusual, because the artifact being checked
+    is itself a description of a future execution. So this function enforces
+    that (a) the contract's terms agree with the frozen artifacts they were
+    extracted from -- the fit window, the feature order, the hyperparameters,
+    the threshold rule and the runtime are all re-derived from disk, not
+    trusted; (b) the Final Test years can never appear in the fit window; and
+    (c) locking the contract authorizes nothing, so the refit stays behind a
+    new human authorization and every counter stays zero.
+
+    Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE129_REFIT_CONTRACT_REL)
+    if not os.path.isfile(path):
+        return {}
+    contract = _require_json_artifact(root, _STAGE129_REFIT_CONTRACT_REL)
+    provenance = _require_json_artifact(root, _STAGE129_REFIT_PROVENANCE_REL)
+    boundary = _require_json_artifact(root, _STAGE129_REFIT_BOUNDARY_REL)
+
+    for artifact, label in ((contract, "contract"), (provenance, "provenance"),
+                            (boundary, "boundary")):
+        if artifact.get("action_id") != _STAGE129_REFIT_ACTION_ID:
+            raise HandoffError(f"Stage129 refit contract {label} action_id mismatch")
+    for artifact, label in ((contract, "contract"), (boundary, "boundary")):
+        if artifact.get("contract_status") != _STAGE129_REFIT_STATUS:
+            raise HandoffError(
+                f"Stage129 refit {label} status must be {_STAGE129_REFIT_STATUS}")
+
+    # (1) The contract is an extraction, not an invention.
+    if contract.get("every_term_is_extracted_from_a_prelocked_artifact") is not True:
+        raise HandoffError(
+            "Stage129 refit contract must declare every term extracted from a "
+            "pre-locked artifact")
+    if contract.get("no_term_invented_by_this_action") is not True or \
+            boundary.get("new_contract_term_invented_by_this_action") is not False:
+        raise HandoffError(
+            "Stage129 refit contract may not invent a term")
+    sources = provenance.get("source_artifacts_sha256") or {}
+    if not sources:
+        raise HandoffError("Stage129 refit contract must pin its source artifacts")
+    for rel, info in sources.items():
+        src = os.path.join(root, rel)
+        if not os.path.isfile(src):
+            raise HandoffError(
+                f"Stage129 refit contract cites a missing source artifact: {rel}")
+        with open(src, "rb") as fh:
+            blob = fh.read()
+        if hashlib.sha256(blob).hexdigest() != info.get("sha256"):
+            raise HandoffError(
+                f"Stage129 refit contract source {rel} has drifted from its "
+                "pinned SHA-256; the extraction is no longer anchored")
+    if provenance.get("sources_modified_by_this_action") is not False or \
+            boundary.get("source_contracts_modified_by_this_action") is not False:
+        raise HandoffError(
+            "Stage129 refit contract may not modify its source contracts")
+
+    # (2) The selected model is the one that was actually selected, unchanged.
+    model = contract.get("selected_model") or {}
+    if model.get("block") != _STAGE129_SELECT_BLOCK or \
+            model.get("algorithm") != _STAGE129_SELECT_ALGORITHM or \
+            model.get("configuration_id") != _STAGE129_SELECT_CONFIGURATION:
+        raise HandoffError(
+            "Stage129 refit contract must target the selected model "
+            f"{_STAGE129_SELECT_BLOCK}/{_STAGE129_SELECT_ALGORITHM}/"
+            f"{_STAGE129_SELECT_CONFIGURATION}")
+    if model.get("hyperparameters") != _STAGE129_REFIT_HYPERPARAMETERS:
+        raise HandoffError(
+            "Stage129 refit contract hyperparameters must equal the frozen "
+            f"{_STAGE129_REFIT_HYPERPARAMETERS}")
+    for field in ("retuning_authorized", "hyperparameter_search_authorized",
+                  "grid_expansion_after_results_authorized"):
+        if model.get(field) is not False:
+            raise HandoffError(f"Stage129 refit contract {field} must be False")
+    if boundary.get("final_model_reselected_by_this_action") is not False or \
+            boundary.get("retuning_authorized") is not False:
+        raise HandoffError(
+            "Stage129 refit contract may not re-select or retune the model")
+    # and the hyperparameters must still match the retained design freeze
+    freeze_rel = "project/stage126/stage126_m1_retained_design_freeze.json"
+    if os.path.isfile(os.path.join(root, freeze_rel)):
+        freeze = _require_json_artifact(root, freeze_rel)
+        frozen = (freeze.get("retained_model_families") or {}).get(
+            _STAGE129_SELECT_CONFIGURATION) or {}
+        if frozen.get("hyperparameters") != _STAGE129_REFIT_HYPERPARAMETERS:
+            raise HandoffError(
+                "Stage129 refit contract hyperparameters no longer match the "
+                "retained design freeze")
+
+    # (3) The fit window, and the Final Test years that may never enter it.
+    data = contract.get("authorized_development_data") or {}
+    if tuple(data.get("fit_target_years") or ()) != _STAGE129_REFIT_FIT_YEARS:
+        raise HandoffError(
+            "Stage129 refit contract fit window must be exactly "
+            f"{_STAGE129_REFIT_FIT_YEARS}")
+    leaked = set(data.get("fit_target_years") or ()) & set(
+        _STAGE129_REFIT_FINAL_TEST_YEARS)
+    if leaked:
+        raise HandoffError(
+            f"Stage129 refit contract fit window contains Final Test years "
+            f"{sorted(leaked)}; the firewall would be broken before execution")
+    for field in ("random_split_authorized", "shuffle_authorized"):
+        if data.get(field) is not False:
+            raise HandoffError(f"Stage129 refit contract {field} must be False")
+    if data.get("sample") != "main_rule_a_primary" or \
+            data.get("target") != "FD_target_main_t_plus_1":
+        raise HandoffError(
+            "Stage129 refit contract must use the locked primary sample and target")
+    # the pinned input hashes must match the frozen SAP's own pins
+    sap_rel = "project/stage125/part4_statistical_analysis_plan_stage125.json"
+    if os.path.isfile(os.path.join(root, sap_rel)):
+        sap = _require_json_artifact(root, sap_rel)
+        pins = sap.get("pinned_part3c_input_sha256") or {}
+        for key, want in (("analysis_ready_path", "analysis_ready_sha256"),
+                          ("audited_pairs_path", "audited_pairs_sha256")):
+            rel = data.get(key)
+            if pins.get(rel) != data.get(want):
+                raise HandoffError(
+                    f"Stage129 refit contract input pin for {rel} does not match "
+                    "the frozen SAP pinned_part3c_input_sha256")
+
+    # (4) Features: identity, order and count, checked against the lock.
+    features = contract.get("features") or {}
+    if tuple(features.get("features_exact_order") or ()) != _STAGE129_REFIT_FEATURES:
+        raise HandoffError(
+            "Stage129 refit contract feature order must equal the locked "
+            "M1_PRIMARY_FEATURE_ORDER exactly")
+    if features.get("feature_count") != 9:
+        raise HandoffError("Stage129 refit contract feature_count must be 9")
+    lock_rel = "project/stage126/stage126_m1_primary_development_lock.json"
+    if os.path.isfile(os.path.join(root, lock_rel)):
+        lock = _require_json_artifact(root, lock_rel)
+        if tuple(lock.get("feature_order") or ()) != _STAGE129_REFIT_FEATURES:
+            raise HandoffError(
+                "Stage129 refit contract feature order no longer matches the "
+                "primary development lock")
+    if not features.get("feature_selection_forbidden"):
+        raise HandoffError(
+            "Stage129 refit contract must forbid feature selection")
+
+    # (5) Preprocessing and missing handling keep their frozen order.
+    pre = contract.get("preprocessing") or {}
+    order = tuple(pre.get("continuous_pipeline_order") or ())
+    pre_rel = "project/stage125/part4_preprocessing_contract_stage125.json"
+    if os.path.isfile(os.path.join(root, pre_rel)):
+        frozen_pre = _require_json_artifact(root, pre_rel)
+        if order != tuple(frozen_pre.get("continuous_pipeline_order") or ()):
+            raise HandoffError(
+                "Stage129 refit contract preprocessing pipeline order must equal "
+                "the frozen contract's order exactly")
+        if tuple(frozen_pre.get("final_development_refit", {}).get("fit_years") or ()) \
+                != _STAGE129_REFIT_FIT_YEARS:
+            raise HandoffError(
+                "Stage129 refit contract fit window is not anchored on the frozen "
+                "final_development_refit.fit_years")
+    if pre.get("never_fit_on_final_test") is not True:
+        raise HandoffError(
+            "Stage129 refit contract must forbid fitting on the Final Test")
+    miss = contract.get("missing_handling") or {}
+    for field in ("missingness_mask_captured_before_imputation",
+                  "do_not_infer_missingness_indicator_from_imputed_matrix"):
+        if miss.get(field) is not True:
+            raise HandoffError(f"Stage129 refit contract missing_handling {field} must be True")
+    if (miss.get("target_state_contract") or {}).get(
+            "missing_never_counted_as_negative") is not True:
+        raise HandoffError(
+            "Stage129 refit contract must keep missing targets out of the negatives")
+
+    # (6) Threshold stays a development-OOF quantity.
+    thr = contract.get("threshold") or {}
+    if thr.get("rule") != _STAGE129_REFIT_THRESHOLD_RULE or \
+            thr.get("tie_break") != _STAGE129_REFIT_THRESHOLD_TIE_BREAK:
+        raise HandoffError(
+            "Stage129 refit contract threshold rule must be "
+            f"{_STAGE129_REFIT_THRESHOLD_RULE} with tie-break "
+            f"{_STAGE129_REFIT_THRESHOLD_TIE_BREAK}")
+    for field in ("never_optimize_on_final_test",
+                  "threshold_is_derived_from_development_oof_only"):
+        if thr.get(field) is not True:
+            raise HandoffError(f"Stage129 refit contract threshold {field} must be True")
+    if thr.get("threshold_search_on_refit_output_authorized") is not False:
+        raise HandoffError(
+            "Stage129 refit contract may not authorize a threshold search")
+
+    # (7) Environment and seeds.
+    env = contract.get("environment") or {}
+    if env.get("runtime_versions") != _STAGE129_REFIT_RUNTIME:
+        raise HandoffError(
+            "Stage129 refit contract runtime_versions must equal the locked "
+            f"development runtime {_STAGE129_REFIT_RUNTIME}")
+    if env.get("environment_mismatch_action") != "FAIL_CLOSED_DO_NOT_REFIT":
+        raise HandoffError(
+            "Stage129 refit contract must fail closed on environment mismatch")
+    seeds = contract.get("seeds_and_determinism") or {}
+    if seeds.get("logistic_regression_deterministic") is not True:
+        raise HandoffError(
+            "Stage129 refit contract must record the logistic fit as deterministic")
+    if seeds.get("new_seed_introduction_authorized") is not False or \
+            boundary.get("new_seed_introduced_by_this_action") is not False:
+        raise HandoffError("Stage129 refit contract may not introduce a new seed")
+
+    # (8) Expected outputs exist only as expectations.
+    outputs = contract.get("expected_outputs") or {}
+    artifacts = outputs.get("artifacts") or []
+    if not artifacts:
+        raise HandoffError("Stage129 refit contract must enumerate expected outputs")
+    for entry in artifacts:
+        if entry.get("exists_now") is not False:
+            raise HandoffError(
+                f"Stage129 refit contract expected output {entry.get('name')!r} "
+                "may not already exist; the refit has not run")
+    if not outputs.get("forbidden_outputs"):
+        raise HandoffError("Stage129 refit contract must enumerate forbidden outputs")
+    if outputs.get("locked_primary_results_are_not_replaced_by_the_refit") is not True:
+        raise HandoffError(
+            "Stage129 refit contract must preserve the locked primary results")
+
+    # (9) The fail-closed controls are complete.
+    controls = contract.get("fail_closed_controls") or []
+    ids = tuple(c.get("id") for c in controls)
+    if ids != _STAGE129_REFIT_FAIL_CLOSED_IDS:
+        raise HandoffError(
+            "Stage129 refit contract must carry fail-closed controls "
+            f"{_STAGE129_REFIT_FAIL_CLOSED_IDS}, got {ids}")
+    for control in controls:
+        if control.get("on_failure") != "ABORT_REFIT":
+            raise HandoffError(
+                f"Stage129 refit control {control.get('id')} must abort on failure")
+        if not control.get("check"):
+            raise HandoffError(
+                f"Stage129 refit control {control.get('id')} must state its check")
+
+    # (10) The Final Test firewall, and the fact that locking authorizes nothing.
+    ft = contract.get("final_test_boundary") or {}
+    if tuple(ft.get("final_test_target_years") or ()) != \
+            _STAGE129_REFIT_FINAL_TEST_YEARS:
+        raise HandoffError(
+            "Stage129 refit contract Final Test years must be "
+            f"{_STAGE129_REFIT_FINAL_TEST_YEARS}")
+    for field in ("refit_may_read_final_test", "refit_may_predict_on_final_test",
+                  "refit_may_evaluate_on_final_test", "final_test_access_authorized"):
+        if ft.get(field) is not False:
+            raise HandoffError(f"Stage129 refit contract final_test_boundary {field} must be False")
+    if ft.get("final_test_locked") is not True or ft.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage129 refit contract must keep the Final Test locked at 0 rows")
+    ex = contract.get("execution_authorization") or {}
+    for field in ("refit_execution_authorized_by_this_contract",
+                  "stage130_authorized", "final_test_unlock_authorized"):
+        if ex.get(field) is not False:
+            raise HandoffError(f"Stage129 refit contract {field} must be False")
+    for field in ("refit_execution_requires_new_explicit_human_authorization",
+                  "contract_lock_is_not_an_execution_permission"):
+        if ex.get(field) is not True:
+            raise HandoffError(f"Stage129 refit contract {field} must be True")
+    for field in ("full_development_refit_executed", "full_development_refit_performed",
+                  "trained_final_model_artifact_created", "refit_execution_authorized",
+                  "final_test_access_authorized", "final_test_unlock_authorized",
+                  "stage130_authorized", "stage130_started",
+                  "stage130_or_next_stage_executed", "next_action_authorized",
+                  "next_action_executes_refit", "next_action_executes_final_test",
+                  "next_research_action_authorized", "merge_authorized",
+                  "ready_for_review_authorized", "new_metric_computed",
+                  "new_p_value_created", "inferential_superiority_claimed",
+                  "locked_primary_development_results_modified_by_this_action",
+                  "m1_results_modified_by_this_action",
+                  "historical_scientific_artifacts_modified_by_this_action",
+                  "existing_pull_requests_modified_by_this_action",
+                  "prior_packages_modified_by_this_action",
+                  "m3_lag_wdi_promoted_to_confirmatory_model"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 refit boundary {field} must be False")
+    if boundary.get("refit_execution_requires_new_explicit_human_authorization") \
+            is not True:
+        raise HandoffError(
+            "Stage129 refit contract must keep execution behind a new human "
+            "authorization")
+    if boundary.get("final_test_locked") is not True or \
+            boundary.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage129 refit boundary must keep the Final Test locked at 0 rows")
+    if boundary.get("next_action_id") != _STAGE129_REFIT_NEXT_ACTION_ID:
+        raise HandoffError(
+            f"Stage129 refit pointer must be {_STAGE129_REFIT_NEXT_ACTION_ID}")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError("Stage129 refit boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage129 refit counters.{field} must be 0 (locking a contract "
+                "fits nothing and executes nothing)")
+
+    return {
+        "stage129_refit_contract_recorded": True,
+        "stage129_refit_contract_action_id": _STAGE129_REFIT_ACTION_ID,
+        "stage129_refit_contract_status": _STAGE129_REFIT_STATUS,
+        "stage129_refit_contract_id": contract.get("contract_id"),
+        "stage129_refit_contract_version": contract.get("contract_version"),
+        "stage129_refit_terms_are_extracted_not_invented": True,
+        "stage129_refit_source_artifact_count": len(sources),
+
+        # What the contract fixes.
+        "stage129_refit_block": _STAGE129_SELECT_BLOCK,
+        "stage129_refit_algorithm": _STAGE129_SELECT_ALGORITHM,
+        "stage129_refit_configuration": _STAGE129_SELECT_CONFIGURATION,
+        "stage129_refit_fit_target_years": list(_STAGE129_REFIT_FIT_YEARS),
+        "stage129_refit_feature_count": 9,
+        "stage129_refit_feature_order": list(_STAGE129_REFIT_FEATURES),
+        "stage129_refit_threshold_rule": _STAGE129_REFIT_THRESHOLD_RULE,
+        "stage129_refit_threshold_tie_break": _STAGE129_REFIT_THRESHOLD_TIE_BREAK,
+        "stage129_refit_logistic_is_deterministic": True,
+        "stage129_refit_runtime_python": _STAGE129_REFIT_RUNTIME["python"],
+        "stage129_refit_runtime_versions": dict(_STAGE129_REFIT_RUNTIME),
+        "stage129_refit_fail_closed_control_count": len(controls),
+        "stage129_refit_expected_output_count": len(artifacts),
+        "stage129_refit_expected_outputs_exist_now": False,
+
+        # What it does NOT do.
+        "stage129_refit_executed": False,
+        "full_development_refit_performed": False,
+        "trained_final_model_artifact_created": False,
+        "stage129_refit_execution_authorized": False,
+        "stage129_refit_execution_requires_new_human_authorization": True,
+        "stage129_refit_retuning_authorized": False,
+        "stage129_refit_model_reselected": False,
+        "stage130_started": False,
+        "stage129_refit_stage130_authorized": False,
+
+        # The firewall.
+        "stage129_refit_final_test_years": list(_STAGE129_REFIT_FINAL_TEST_YEARS),
+        "stage129_refit_final_test_locked": True,
+        "stage129_refit_final_test_rows_read": 0,
+        "stage129_refit_may_read_final_test": False,
+        "final_test_locked": True,
+        "final_test_rows_read": 0,
+        "final_test_access_authorized": False,
+
+        "stage129_refit_next_action_id": _STAGE129_REFIT_NEXT_ACTION_ID,
+        "stage129_refit_next_action_authorized": False,
     }
 
 
