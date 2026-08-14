@@ -1,0 +1,57 @@
+{
+  "action_id": "stage129-full-development-refit-contract-lock",
+  "every_contract_term_traces_to_one_of_these_artifacts": true,
+  "extraction_is_read_only": true,
+  "source_artifact_count": 12,
+  "source_artifacts_sha256": {
+    "project/stage125/part4_hyperparameter_budget_stage125.json": {
+      "bytes": 1872,
+      "sha256": "22d6989681a7cd59ffbf57077910615ce00adb9f171d303d5d61100a54490b40"
+    },
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json": {
+      "bytes": 1973,
+      "sha256": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760"
+    },
+    "project/stage125/part4_model_specifications_stage125.json": {
+      "bytes": 1409,
+      "sha256": "ef933be3eb2f75e6f493ac1401100c629bdb83850c81950d8f235c5ccf4cdb21"
+    },
+    "project/stage125/part4_preprocessing_contract_stage125.json": {
+      "bytes": 2051,
+      "sha256": "3722bd6165574c78aef1138a810ff4863b5c214f80df197889eaa40163f0e415"
+    },
+    "project/stage125/part4_statistical_analysis_plan_stage125.json": {
+      "bytes": 27695,
+      "sha256": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e"
+    },
+    "project/stage125/part4_temporal_split_contract_stage125.json": {
+      "bytes": 1138,
+      "sha256": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9"
+    },
+    "project/stage125/part5_stage126_m1_entry_contract_stage125.json": {
+      "bytes": 3488,
+      "sha256": "74a2159785daeda44fa82ebd76f42870fa25aba3667846bccba6b3099ea65da5"
+    },
+    "project/stage126/metadata_and_hashes_stage126_m1_primary_development_tuning.json": {
+      "bytes": 2365,
+      "sha256": "c19235fca319001fd77c7fc26769eff188bb8ecb158a284251773c0d564783f5"
+    },
+    "project/stage126/stage126_m1_development_metrics.csv": {
+      "bytes": 1415,
+      "sha256": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a"
+    },
+    "project/stage126/stage126_m1_primary_development_lock.json": {
+      "bytes": 1731,
+      "sha256": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4"
+    },
+    "project/stage126/stage126_m1_retained_design_freeze.json": {
+      "bytes": 15303,
+      "sha256": "53beb8603de48bdeed33858093f40dc0e89bf6f86cb97534a86dff32b74a2876"
+    },
+    "project/stage129/final_model_human_selection_governance/stage129_final_model_human_selection_decision.json": {
+      "bytes": 4812,
+      "sha256": "b5a6f08466fb325559d28cc69d1c8f227403483e0613be6b7de403d08fa2c064"
+    }
+  },
+  "sources_modified_by_this_action": false
+}

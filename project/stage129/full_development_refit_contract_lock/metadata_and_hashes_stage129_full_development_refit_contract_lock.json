@@ -1,0 +1,33 @@
+{
+  "action_id": "stage129-full-development-refit-contract-lock",
+  "action_type": "contract_audit_and_lock_only",
+  "contract_status": "PROSPECTIVELY_LOCKED_NOT_EXECUTED",
+  "credentials_committed_to_git": false,
+  "final_test_artifacts_committed": 0,
+  "full_development_refit_executed": false,
+  "model_artifacts_committed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "new_metric_files_committed": 0,
+  "package_file_count": 4,
+  "package_files": {
+    "README_STAGE129_FULL_DEVELOPMENT_REFIT_CONTRACT_LOCK.md": {
+      "bytes": 8804,
+      "sha256": "d19ed87c09609f182cd1b28e88b9f834b656c311ec8d854dade98bbe82bf7c0b"
+    },
+    "stage129_full_development_refit_contract.json": {
+      "bytes": 15978,
+      "sha256": "300fb32f8acdcc5e2b3c6c6584ba3bdde2faa977ad7c0be2e8eaa7866660ff0b"
+    },
+    "stage129_full_development_refit_governance_boundary.json": {
+      "bytes": 3909,
+      "sha256": "39c12e09466a3eb64013f0abb114469874653263f014e4586f001c419d708120"
+    },
+    "stage129_full_development_refit_source_provenance.json": {
+      "bytes": 2506,
+      "sha256": "bbb40527ef79ccd821b91bf75c844f109980b3ac6b90b5c3b3fc05b93f7d0475"
+    }
+  },
+  "pii_committed_to_git": false,
+  "refit_execution_authorized": false,
+  "trained_model_artifacts_committed": 0
+}
