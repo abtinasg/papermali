@@ -676,7 +676,12 @@ def test_roadmap_and_handoff_agree_on_the_decided_state():
     assert state["m2_winner_selected"] is False
     assert state["paper_winner_selected"] is False
     assert state["final_model_selected"] is False
-    assert state["full_development_refit_performed"] is False
+    # ACTION-SCOPED: this decision authorized no refit, and its own artifact
+    # records that permanently. The live global is set by the separately
+    # authorized Stage129 contracted refit and is not a proxy for it.
+    assert _load("project/stage128/m2_retained_block_human_decision/"
+                 "stage128_m2_retained_block_human_decision.json"
+                 )["full_development_refit_performed"] is False
     assert state["final_test_unlocked"] is False
     assert state["final_test_access_authorized"] is False
     assert state["m3_authorized"] is False

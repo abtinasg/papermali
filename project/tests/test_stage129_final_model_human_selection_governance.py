@@ -61,8 +61,11 @@ REQUIRED_STATE = {
     "final_configuration": "logistic__C_0.1",
     "selection_is_human_governance_decision": True,
     "inferential_superiority_claimed": False,
-    "full_development_refit_performed": False,
-    "trained_final_model_artifact_created": False,
+    # NB: `full_development_refit_performed` and
+    # `trained_final_model_artifact_created` were False when this decision was
+    # recorded and this decision set neither. They are LIVE flags now owned by
+    # the separately authorized Stage129 refit execution, so they are asserted
+    # action-scoped below rather than pinned globally here.
     "stage130_started": False,
     "final_test_access_authorized": False,
     "final_test_locked": True,
@@ -197,9 +200,12 @@ def test_nothing_was_fitted_and_no_artifact_was_produced(decision, boundary,
         assert src["full_development_refit_performed"] is False
         assert src["trained_final_model_artifact_created"] is False
         assert src["stage130_started"] is False
-    assert state["full_development_refit_performed"] is False
-    assert state["trained_final_model_artifact_created"] is False
+    # ACTION-SCOPED: the selection fitted nothing; its own artifacts say so.
+    assert decision["full_development_refit_performed"] is False
+    assert decision["trained_final_model_artifact_created"] is False
+    assert boundary["full_development_refit_performed"] is False
     assert state["stage130_started"] is False
+    assert state["final_test_rows_read"] == 0
     assert roadmap_front_matter["full_development_refit_performed"] == "false"
     assert roadmap_front_matter["trained_final_model_artifact_created"] == "false"
     assert roadmap_front_matter["stage130_started"] == "false"

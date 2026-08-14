@@ -469,8 +469,8 @@ def test_no_final_model_winner_refit_or_stage130(boundary, state):
                   "ready_for_review_authorized"):
         assert boundary[field] is False, field
     # nothing this action could open has been opened, then or since
-    assert state["full_development_refit_performed"] is False
-    assert state["trained_final_model_artifact_created"] is False
+    # ACTION-SCOPED: this decision fitted nothing; its own boundary says so.
+    assert boundary["full_development_refit_executed"] is False
     assert state["stage130_started"] is False
     assert state["final_test_rows_read"] == 0
 
