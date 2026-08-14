@@ -18,7 +18,7 @@ produced.**
 | configuration | `logistic__C_0.1` |
 | hyperparameters | `C=0.1`, `penalty=l2`, `solver=liblinear`, `max_iter=5000`, `class_weight=balanced` |
 | fit set | development target years **1393–1399** |
-| rows | **666** (68 positive / 598 negative), 119 tickers |
+| rows | **666** (68 positive / 598 negative), 110 tickers |
 | design matrix | 18 columns — 9 continuous + 9 unstandardized missingness indicators |
 | convergence | `n_iter = 6` |
 
