@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `8abacdf3869fe584059d21cb6980233c65e913bf`
-- **Generated from commit:** `8abacdf3869fe584059d21cb6980233c65e913bf` (branch `stage129-final-model-human-selection-governance`, informational)
-- **Baseline:** `origin/main` @ `01213894684479916c909ebe861fcc292850ef7f`
+- **Last stage commit:** `bda1d90030737cd149aadb504796808e76ae371e`
+- **Generated from commit:** `bda1d90030737cd149aadb504796808e76ae371e` (branch `stage129-full-development-refit-contract-lock`, informational)
+- **Baseline:** `origin/main` @ `0e55bca07ff065a026e23a36ee0c21017c3858a9`
 
 ## Current-state validation
 
@@ -343,6 +343,24 @@ _A governance act, not an inference and not an execution. The block and the algo
 - ➡️ **Next action:** `human_authorization_required_for_full_development_refit_and_final_test` — authorized = False. A pointer is never an authorization.
 - Package: `project/stage129/final_model_human_selection_governance/`; interpretation: `project/stage129/final_model_human_selection_governance/README_STAGE129_FINAL_MODEL_HUMAN_SELECTION_GOVERNANCE.md`
 
+### Stage129 — Full-Development Refit contract LOCKED (not executed)
+
+_A design artifact for the selected model. Every term is extracted from an already-frozen contract. Zero fits, zero predictions, zero tuning, zero new metrics, zero row-level scientific data reads, zero Final Test access._
+
+- 📋 **Contract:** `stage129_full_development_refit_contract` version `stage129_full_development_refit_contract_v1` — status `PROSPECTIVELY_LOCKED_NOT_EXECUTED`.
+- 🎯 **Target model:** block `M1`, algorithm `regularized_logistic_regression`, configuration `logistic__C_0.1` — retuning authorized = False, model re-selected = False.
+- 📆 **Fit window:** target years `[1393, 1394, 1395, 1396, 1397, 1398, 1399]` — the Final Test years `[1400, 1401, 1402]` are excluded by construction.
+- 🧮 **Features:** 9 in locked order `['log_total_assets', 'leverage_ratio', 'current_ratio', 'roa_period_adjusted', 'ocf_to_assets_period_adjusted', 'asset_turnover_period_adjusted', 'operating_margin_period_adjusted', 'financial_expense_to_assets_period_adjusted', 'accumulated_loss_to_capital_ratio']`.
+- 🎚️ **Threshold:** `development_OOF_F2_maximizing_threshold`, tie-break `higher_threshold` — a development-OOF quantity, never optimized on the Final Test.
+- 🔁 **Determinism:** logistic fit is deterministic = True (no fit seed and no seed averaging apply); runtime pinned to Python 3.13.5 and the locked development package set.
+- 🛡️ **Fail-closed controls:** 12 checks, each aborting the refit on failure.
+- 📦 **Expected outputs:** 4 artifacts, exist now = False — the refit has not run.
+- 🔗 **Extraction anchored:** 12 source artifacts pinned by SHA-256; terms extracted not invented = True.
+- ⛔ **Locking authorizes nothing:** refit executed = False, refit execution authorized = False, requires new human authorization = True, Stage130 authorized = False.
+- ⛔ **Final Test firewall untouched:** locked True, rows read 0, refit may read it = False.
+- ➡️ **Next action:** `human_authorization_required_for_full_development_refit_execution` — authorized = False. A locked contract is not an execution permission.
+- Package: `project/stage129/full_development_refit_contract_lock/`; interpretation: `project/stage129/full_development_refit_contract_lock/README_STAGE129_FULL_DEVELOPMENT_REFIT_CONTRACT_LOCK.md`
+
 ### Last completed scientific micro-part QC
 
 _Scientific QC of the newest completed robustness micro-part — a DIFFERENT role from current-state validation above._
@@ -392,5 +410,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `02ea1d7b92cf68fff7945cb2fbd76040f4da9f2d06f1b1eab3dc802efb2938dc`_
-_generated_at_utc: 2026-08-13T21:38:07Z (informational)_
+_state_fingerprint: `9dec5dfd4c7cbe38c18aa27ee1e15e853d835fdfd64c13a5cbd422d6cc6898b1`_
+_generated_at_utc: 2026-08-14T10:56:03Z (informational)_

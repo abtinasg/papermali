@@ -1,0 +1,330 @@
+{
+  "action_id": "stage129-full-development-refit-contract-lock",
+  "contract_id": "stage129_full_development_refit_contract",
+  "contract_status": "PROSPECTIVELY_LOCKED_NOT_EXECUTED",
+  "contract_version": "stage129_full_development_refit_contract_v1",
+  "every_term_is_extracted_from_a_prelocked_artifact": true,
+  "no_term_invented_by_this_action": true,
+
+  "selected_model": {
+    "block": "M1",
+    "algorithm": "regularized_logistic_regression",
+    "configuration_id": "logistic__C_0.1",
+    "hyperparameters": {
+      "C": 0.1,
+      "max_iter": 5000,
+      "penalty": "l2",
+      "solver": "liblinear"
+    },
+    "hyperparameters_source": "project/stage126/stage126_m1_retained_design_freeze.json#retained_model_families",
+    "selection_action_id": "stage129-final-model-human-selection-governance",
+    "selection_basis": "HUMAN_DECISION_BASED_ON_PRELOCKED_DEVELOPMENT_EVIDENCE",
+    "retuning_authorized": false,
+    "hyperparameter_search_authorized": false,
+    "grid_expansion_after_results_authorized": false,
+    "grid_expansion_source": "project/stage125/part4_hyperparameter_budget_stage125.json#grid_expansion_after_results_authorized"
+  },
+
+  "authorized_development_data": {
+    "sample": "main_rule_a_primary",
+    "sample_source": "project/stage125/part4_statistical_analysis_plan_stage125.json#primary_sample",
+    "target": "FD_target_main_t_plus_1",
+    "target_source": "project/stage125/part4_statistical_analysis_plan_stage125.json#primary_target",
+    "analysis_ready_path": "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv",
+    "analysis_ready_sha256": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+    "audited_pairs_path": "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv",
+    "audited_pairs_sha256": "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
+    "input_pin_source": "project/stage125/part4_statistical_analysis_plan_stage125.json#pinned_part3c_input_sha256",
+    "fit_target_years": [1393, 1394, 1395, 1396, 1397, 1398, 1399],
+    "fit_years_source": "project/stage125/part4_preprocessing_contract_stage125.json#final_development_refit.fit_years",
+    "development_target_years_source": "project/stage125/part4_temporal_split_contract_stage125.json#development_target_years",
+    "split_variable": "target_year",
+    "random_split_authorized": false,
+    "shuffle_authorized": false,
+    "sample_spec": {
+      "companies": 119,
+      "negative": 932,
+      "positive": 80,
+      "rows": 1012
+    },
+    "sample_spec_source": "project/stage125/part4_statistical_analysis_plan_stage125.json#sample_specs.main_rule_a_primary",
+    "prediction_alignment": "predictor_year_t_to_target_year_t_plus_1",
+    "availability_lag_jalali_months": 4
+  },
+
+  "features": {
+    "feature_set": "M1_PRIMARY_FEATURE_ORDER",
+    "feature_count": 9,
+    "features_exact_order": [
+      "log_total_assets",
+      "leverage_ratio",
+      "current_ratio",
+      "roa_period_adjusted",
+      "ocf_to_assets_period_adjusted",
+      "asset_turnover_period_adjusted",
+      "operating_margin_period_adjusted",
+      "financial_expense_to_assets_period_adjusted",
+      "accumulated_loss_to_capital_ratio"
+    ],
+    "feature_order_source": "project/stage126/stage126_m1_primary_development_lock.json#feature_order",
+    "feature_order_is_binding": true,
+    "excluded_feature": "revenue_growth_period_adjusted",
+    "excluded_feature_reason": "rejected_m1_primary_coverage_gate_failed",
+    "excluded_feature_source": "project/stage125/part4_statistical_analysis_plan_stage125.json#revenue_growth_period_adjusted_status",
+    "feature_selection_forbidden": [
+      "univariate_screening",
+      "recursive_feature_elimination",
+      "shap_selection",
+      "p_value_feature_selection"
+    ],
+    "feature_selection_forbidden_source": "project/stage125/part4_preprocessing_contract_stage125.json#forbidden_selection",
+    "financial_expense_sign_convention": "preserve_frozen_part3c_source_sign; expenses_are_nonpositive_in_researcher_verified_data; do_not_abs_or_reverse_sign",
+    "financial_expense_sign_convention_source": "project/stage125/part4_statistical_analysis_plan_stage125.json#financial_expense_to_assets_sign_convention"
+  },
+
+  "preprocessing": {
+    "canonical_source": "project/stage125/part4_preprocessing_contract_stage125.json",
+    "continuous_pipeline_order": [
+      "1_deterministic_source_to_feature_transformation",
+      "2_capture_original_pre_imputation_missingness_mask",
+      "3_estimate_1st_99th_percentile_clipping_bounds_on_observed_training_fold_values_only",
+      "4_apply_training_derived_clipping_bounds",
+      "5_estimate_training_fold_median_on_observed_clipped_training_values",
+      "6_impute_missing_values_with_training_fold_median",
+      "7_append_missingness_indicators_from_original_pre_imputation_mask",
+      "8_logistic_regression_only_standardize_imputed_continuous_features_using_training_fold_mean_std"
+    ],
+    "clip_percentiles": [1, 99],
+    "clipping_fit_on_observed_training_values_only": true,
+    "do_not_compute_clipping_quantiles_after_median_imputation": true,
+    "median_fit_after_training_clipping": true,
+    "standardization_applies_to_logistic_regression": true,
+    "standardization_scope": "imputed_continuous_predictors_only_using_fit_set_mean_std",
+    "missing_indicators_standardized": false,
+    "refit_fit_scope": "the_single_full_development_fit_set_1393_1399",
+    "refit_fit_scope_note": "In development the pipeline was fit on each temporal TRAINING FOLD separately (fit_scope = each_temporal_training_fold_separately). For the full-development refit the fit set is the whole 1393-1399 development window, so every training-derived statistic - clipping bounds, medians, means and standard deviations - is estimated on that single fit set. No statistic may be carried over from a fold.",
+    "forbidden_fit_on": [
+      "validation_data",
+      "final_test_data",
+      "combined_train_plus_validation_before_configuration_selection"
+    ],
+    "never_fit_on_final_test": true
+  },
+
+  "missing_handling": {
+    "canonical_source": "project/stage125/part4_preprocessing_contract_stage125.json",
+    "missingness_mask_captured_before_imputation": true,
+    "missingness_indicator_source": "original_pre_imputation_mask",
+    "do_not_infer_missingness_indicator_from_imputed_matrix": true,
+    "imputation": "median_impute_on_fit_set_statistics",
+    "missingness_indicators": "appended_unstandardized_binary_0_1",
+    "final_test_masks_from_own_original_missing_positions": true,
+    "final_test_masks_source": "project/stage125/part4_preprocessing_contract_stage125.json#validation_and_final_test_masks_from_own_original_missing_positions",
+    "target_state_contract": {
+      "positive": "exact_numeric_or_string_1",
+      "negative": "exact_numeric_or_string_0",
+      "missing": "blank_null_unparseable_or_any_other_value",
+      "missing_never_counted_as_negative": true,
+      "evaluable_rows": "positive_plus_negative",
+      "target_specific_analyses_use_evaluable_rows_only": true
+    },
+    "target_state_contract_source": "project/stage125/part4_statistical_analysis_plan_stage125.json#target_state_contract"
+  },
+
+  "imbalance_handling": {
+    "canonical_source": "project/stage125/part4_model_specifications_stage125.json#imbalance_handling_primary",
+    "regularized_logistic_regression": {"class_weight": "balanced"},
+    "smote_or_smotenc_authorized": false,
+    "smote_status": "robustness_only_not_retained",
+    "smote_status_source": "project/stage126/stage126_m1_retained_design_freeze.json#imbalance_strategy.smotenc_status"
+  },
+
+  "threshold": {
+    "canonical_source": "project/stage125/part4_metrics_uncertainty_contract_stage125.json#thresholded_secondary",
+    "rule": "development_OOF_F2_maximizing_threshold",
+    "tie_break": "higher_threshold",
+    "never_optimize_on_final_test": true,
+    "threshold_is_derived_from_development_oof_only": true,
+    "threshold_search_on_refit_output_authorized": false,
+    "note": "The operating threshold is a DEVELOPMENT-OOF quantity. It is not re-derived from the refit model's own in-sample predictions and is never optimized on the Final Test.",
+    "topk": {
+      "definition": "K_y = ceil(0.10 * N_y)",
+      "fraction": 0.1,
+      "optimize_K_after_results": false,
+      "ranking_order": [
+        "predicted_probability_descending",
+        "ticker_ascending_deterministic_tiebreaker"
+      ]
+    }
+  },
+
+  "seeds_and_determinism": {
+    "canonical_source": "project/stage125/part4_hyperparameter_budget_stage125.json",
+    "logistic_regression_deterministic": true,
+    "logistic_regression_requires_seed_for_fit": false,
+    "logistic_regression_seed_note": "The frozen budget records logistic_regression_deterministic = true, and the 5-seed probability averaging rule (final_rf_xgb_probability = mean_predicted_probability_across_5_fixed_seeds) is scoped to random forest and xgboost. The selected logistic configuration therefore needs no fit seed, and no seed averaging applies to it.",
+    "locked_final_seeds_for_reference": [20260719, 20260720, 20260721, 20260722, 20260723],
+    "locked_final_seeds_source": "project/stage126/stage126_m1_primary_development_lock.json#final_oof_seeds",
+    "bootstrap_seed_for_reference": 20260724,
+    "bootstrap_seed_source": "project/stage125/part4_metrics_uncertainty_contract_stage125.json#uncertainty.bootstrap_seed",
+    "bootstrap_execution_authorized_by_this_contract": false,
+    "new_seed_introduction_authorized": false
+  },
+
+  "environment": {
+    "canonical_source": "project/stage126/metadata_and_hashes_stage126_m1_primary_development_tuning.json#runtime_versions",
+    "runtime_versions": {
+      "jdatetime": "6.0.1",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "python": "3.13.5",
+      "scikit-learn": "1.9.0",
+      "xgboost": "3.3.0"
+    },
+    "environment_must_match_the_locked_development_environment": true,
+    "environment_mismatch_action": "FAIL_CLOSED_DO_NOT_REFIT",
+    "xgboost_present_but_unused_for_this_model": true
+  },
+
+  "expected_outputs": {
+    "note": "These are the artifacts a future, separately authorized refit execution is expected to produce. NONE of them exists yet and none is produced by this contract lock.",
+    "artifacts": [
+      {
+        "name": "full_development_refit_model_artifact",
+        "description": "the single logistic__C_0.1 model fitted once on development target years 1393-1399",
+        "exists_now": false
+      },
+      {
+        "name": "full_development_refit_preprocessing_parameters",
+        "description": "clipping bounds, medians and standardization mean/std estimated on the full development fit set",
+        "exists_now": false
+      },
+      {
+        "name": "full_development_refit_provenance_record",
+        "description": "input SHA-256s, runtime versions, row and event counts, and the fit-set definition actually used",
+        "exists_now": false
+      },
+      {
+        "name": "full_development_refit_qc_report",
+        "description": "fail-closed control results for every check listed in fail_closed_controls",
+        "exists_now": false
+      }
+    ],
+    "forbidden_outputs": [
+      "any_final_test_prediction",
+      "any_final_test_metric",
+      "any_new_hyperparameter_search_result",
+      "any_recalibrated_primary_probability",
+      "any_new_development_metric_that_replaces_the_locked_primary_results"
+    ],
+    "locked_primary_results_are_not_replaced_by_the_refit": true,
+    "locked_primary_results_source": "project/stage126/stage126_m1_primary_development_lock.json#pooled_oof_pr_auc"
+  },
+
+  "calibration": {
+    "canonical_source": "project/stage125/part4_metrics_uncertainty_contract_stage125.json#calibration",
+    "primary_probabilities": "raw_locked_pipeline_probabilities",
+    "isotonic_authorized": false,
+    "optional_secondary_recalibration": "sigmoid_Platt",
+    "platt_fit_on": "pooled_development_OOF_predictions_only",
+    "skip_recalibration_if_oof_positives_lt": 20,
+    "pooled_development_oof_positives_for_selected_model": 35,
+    "pooled_development_oof_positives_source": "project/stage126/stage126_m1_development_metrics.csv (regularized_logistic_regression, scope=pooled_development_oof, n_positive)",
+    "skip_rule_triggered": false,
+    "recalibration_execution_authorized_by_this_contract": false,
+    "do_not_select_winner_on_calibrated_final_test": true
+  },
+
+  "fail_closed_controls": [
+    {
+      "id": "FC01",
+      "check": "input file SHA-256 equals the pinned analysis_ready and audited_pairs hashes",
+      "on_failure": "ABORT_REFIT"
+    },
+    {
+      "id": "FC02",
+      "check": "runtime versions equal the locked development runtime_versions exactly",
+      "on_failure": "ABORT_REFIT"
+    },
+    {
+      "id": "FC03",
+      "check": "fit set contains only target years 1393-1399 and zero rows with target_year in 1400-1402",
+      "on_failure": "ABORT_REFIT"
+    },
+    {
+      "id": "FC04",
+      "check": "feature matrix columns equal M1_PRIMARY_FEATURE_ORDER exactly, in order, with count 9",
+      "on_failure": "ABORT_REFIT"
+    },
+    {
+      "id": "FC05",
+      "check": "hyperparameters equal C=0.1, penalty=l2, solver=liblinear, max_iter=5000, class_weight=balanced",
+      "on_failure": "ABORT_REFIT"
+    },
+    {
+      "id": "FC06",
+      "check": "missingness mask captured before imputation and indicators are unstandardized binary 0/1",
+      "on_failure": "ABORT_REFIT"
+    },
+    {
+      "id": "FC07",
+      "check": "clipping bounds estimated before median imputation, on observed fit-set values only",
+      "on_failure": "ABORT_REFIT"
+    },
+    {
+      "id": "FC08",
+      "check": "no hyperparameter search, no grid expansion and no early stopping is executed",
+      "on_failure": "ABORT_REFIT"
+    },
+    {
+      "id": "FC09",
+      "check": "final_test_rows_loaded == 0 and final_test_predictor_values_read == 0 and final_test_target_values_read == 0",
+      "on_failure": "ABORT_REFIT"
+    },
+    {
+      "id": "FC10",
+      "check": "the locked primary development results are byte-identical before and after the refit",
+      "on_failure": "ABORT_REFIT"
+    },
+    {
+      "id": "FC11",
+      "check": "the operating threshold is read from the development-OOF F2 rule and not re-derived from refit in-sample predictions",
+      "on_failure": "ABORT_REFIT"
+    },
+    {
+      "id": "FC12",
+      "check": "exactly one model is fitted; no alternative algorithm, configuration or feature set is fitted alongside it",
+      "on_failure": "ABORT_REFIT"
+    }
+  ],
+
+  "final_test_boundary": {
+    "final_test_target_years": [1400, 1401, 1402],
+    "final_test_target_years_source": "project/stage125/part4_temporal_split_contract_stage125.json#final_test_target_years",
+    "expected_final_test_counts_metadata_only": {
+      "pairs": 346,
+      "positive": 12,
+      "negative": 334
+    },
+    "expected_final_test_counts_source": "project/stage125/part4_temporal_split_contract_stage125.json#primary_sample_final_test_expected",
+    "expected_counts_are_frozen_metadata_not_row_level_access": true,
+    "final_test_locked": true,
+    "final_test_access_authorized": false,
+    "final_test_rows_read": 0,
+    "refit_may_read_final_test": false,
+    "refit_may_predict_on_final_test": false,
+    "refit_may_evaluate_on_final_test": false,
+    "apply_once_to_locked_final_test_is_a_future_separately_authorized_step": true,
+    "apply_once_source": "project/stage125/part4_preprocessing_contract_stage125.json#final_development_refit.apply_once_to_locked_final_test",
+    "manifest_forbids_predictor_values": true,
+    "manifest_forbids_row_level_targets": true
+  },
+
+  "execution_authorization": {
+    "refit_execution_authorized_by_this_contract": false,
+    "refit_execution_requires_new_explicit_human_authorization": true,
+    "contract_lock_is_not_an_execution_permission": true,
+    "stage130_authorized": false,
+    "final_test_unlock_authorized": false
+  }
+}
