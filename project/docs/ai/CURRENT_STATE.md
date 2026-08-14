@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `bda1d90030737cd149aadb504796808e76ae371e`
-- **Generated from commit:** `c4eda0d6b97d6319f20bb84710434ce0605abc85` (branch `stage129-full-development-refit-execution`, informational)
+- **Last stage commit:** `85be48693b79c64bdb64a7b447f1429bc883eae1`
+- **Generated from commit:** `85be48693b79c64bdb64a7b447f1429bc883eae1` (branch `stage129-full-development-refit-execution`, informational)
 - **Baseline:** `origin/main` @ `c4eda0d6b97d6319f20bb84710434ce0605abc85`
 
 ## Current-state validation
@@ -424,5 +424,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `c8266c2b54946085042ef94db5b1a4a295fb5edeb357262638e20b8d16b13a76`_
-_generated_at_utc: 2026-08-14T11:48:16Z (informational)_
+_state_fingerprint: `f2e7ecdbe02b35898b210615e437314d61fafb4078ce0244ebe6757ab74a2ad8`_
+_generated_at_utc: 2026-08-14T15:09:00Z (informational)_
