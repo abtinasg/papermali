@@ -1,0 +1,100 @@
+{
+  "action_id": "stage129-full-development-refit-execution",
+  "all_pass": true,
+  "artifact": "full_development_refit_qc_report",
+  "bootstrap_executed": false,
+  "controls": [
+    {
+      "detail": "3 pinned inputs match their SHA-256",
+      "id": "FC01",
+      "result": "PASS"
+    },
+    {
+      "detail": "runtime versions equal the locked development runtime",
+      "id": "FC02",
+      "result": "PASS"
+    },
+    {
+      "detail": "fit set target years [1393, 1394, 1395, 1396, 1397, 1398, 1399]; zero Final Test years",
+      "id": "FC03",
+      "result": "PASS"
+    },
+    {
+      "detail": "feature matrix equals M1_PRIMARY_FEATURE_ORDER, count 9",
+      "id": "FC04",
+      "result": "PASS"
+    },
+    {
+      "detail": "hyperparameters {'C': 0.1, 'max_iter': 5000, 'penalty': 'l2', 'solver': 'liblinear', 'class_weight': 'balanced'}",
+      "id": "FC05",
+      "result": "PASS"
+    },
+    {
+      "detail": "missingness indicators are unstandardized binary 0/1",
+      "id": "FC06",
+      "result": "PASS"
+    },
+    {
+      "detail": "clip bounds and medians recomputed and matched: clipping preceded imputation",
+      "id": "FC07",
+      "result": "PASS"
+    },
+    {
+      "detail": "no search, no grid expansion, no early stopping",
+      "id": "FC08",
+      "result": "PASS"
+    },
+    {
+      "detail": "final_test_rows_loaded == 0 and no final-test value read",
+      "id": "FC09",
+      "result": "PASS"
+    },
+    {
+      "detail": "locked primary results byte-identical before and after",
+      "id": "FC10",
+      "result": "PASS"
+    },
+    {
+      "detail": "threshold read from the development-OOF rule, not re-derived",
+      "id": "FC11",
+      "result": "PASS"
+    },
+    {
+      "detail": "exactly one model fitted",
+      "id": "FC12",
+      "result": "PASS"
+    }
+  ],
+  "final_test_counters": {
+    "final_test_metrics_computed": 0,
+    "final_test_predictions": 0,
+    "final_test_predictor_values_read": 0,
+    "final_test_rows_loaded": 0,
+    "final_test_rows_read": 0,
+    "final_test_target_values_read": 0
+  },
+  "locked_results_sha256_after": {
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4",
+    "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e"
+  },
+  "locked_results_sha256_before": {
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4",
+    "project/stage126/stage126_m1_selected_configurations.json": "34488e07bd16d467b177c37dcaf571d9c68c25ecbc1c94fee5091f554d2eb97e"
+  },
+  "model_fits_executed": 1,
+  "new_metric_computed": false,
+  "new_p_value_computed": false,
+  "predictions_generated": 0,
+  "recalibration_executed": false,
+  "shap_executed": false,
+  "threshold": {
+    "derived_by_this_refit": false,
+    "rule": "development_OOF_F2_maximizing_threshold",
+    "source": "development_OOF_only_not_recomputed_here",
+    "tie_break": "higher_threshold"
+  }
+}

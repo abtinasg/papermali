@@ -1,0 +1,47 @@
+{
+  "action_id": "stage129-full-development-refit-execution",
+  "artifact": "full_development_refit_provenance_record",
+  "contract_path": "project/stage129/full_development_refit_contract_lock/stage129_full_development_refit_contract.json",
+  "contract_sha256": "300fb32f8acdcc5e2b3c6c6584ba3bdde2faa977ad7c0be2e8eaa7866660ff0b",
+  "final_test_rows_read": 0,
+  "final_test_target_years_excluded": [
+    1400,
+    1401,
+    1402
+  ],
+  "fit_set_definition": {
+    "negative": 598,
+    "positive": 68,
+    "rows": 666,
+    "sample": "main_rule_a_primary",
+    "target": "FD_target_main_t_plus_1",
+    "target_years": [
+      1393,
+      1394,
+      1395,
+      1396,
+      1397,
+      1398,
+      1399
+    ],
+    "unique_tickers": 110
+  },
+  "fit_set_is_the_union_of_development_fold_roles_deduplicated": true,
+  "input_sha256": {
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv": "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
+    "project/stage125/part4_temporal_split_manifest_stage125.csv": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc"
+  },
+  "model_fits_executed": 1,
+  "pipeline_reused_not_reimplemented": true,
+  "pipeline_source_module": "project/src/stage126_m1_primary_development_tuning.py",
+  "pipeline_source_sha256": "ae63bee24c3b868919b008cb15a0d4f4bfb8300ee6e3002a61e1e105d9391d82",
+  "runtime_versions": {
+    "jdatetime": "6.0.1",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "python": "3.13.5",
+    "scikit-learn": "1.9.0",
+    "xgboost": "3.3.0"
+  }
+}
