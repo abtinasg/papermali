@@ -1,0 +1,57 @@
+{
+  "action_id": "stage129-threshold-derivation-abort-and-parse-rule-lock",
+  "extraction_is_read_only": true,
+  "sources_modified_by_this_action": false,
+  "no_final_test_artifact_is_a_source": true,
+  "no_probability_or_target_value_was_read_by_this_action": true,
+  "source_artifact_count": 5,
+  "every_contract_term_traces_to_one_of_these_artifacts": false,
+  "traceability_note": "The parse rule is not extracted from anything. No frozen artifact anticipated a numpy repr in this column, which is precisely the defect. All eight parse terms are human decisions and are listed as such in the contract.",
+  "source_artifacts_sha256": {
+    "project/stage126/stage126_m1_development_oof_predictions.csv": {
+      "bytes": 214784,
+      "sha256": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+      "supplies": "the artifact the parse rule applies to. Its SHA-256 and byte count were verified. No probability or target value was read by THIS action; the token shapes were characterised during the aborted attempt and are reported in the abort record."
+    },
+    "project/stage129/threshold_derivation_algorithm_contract_lock/stage129_threshold_derivation_algorithm_contract.json": {
+      "bytes": 16549,
+      "sha256": "0683d0b4da005121dcad80c11b934d164b99bdc9e4cb3ba95843ca0b4b5a160c",
+      "supplies": "the merged algorithm contract that stays in force unchanged: candidate set, >= operator, beta 2 closed form, argmax tie-break, no rounding, round-trip precision, pick_threshold prohibition"
+    },
+    "project/stage129/final_test_execution_contract_lock/stage129_final_test_execution_contract.json": {
+      "bytes": 29892,
+      "sha256": "036d85f8b095e0cd7e55afb899283c71f957234ce4740085a20c2d81a617074e",
+      "supplies": "PRE01 and PRE02, which this action leaves unresolved"
+    },
+    "project/stage126/stage126_m1_primary_development_lock.json": {
+      "bytes": 1731,
+      "sha256": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4",
+      "supplies": "the selected configuration and the 421-row pooled-OOF expectation"
+    },
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json": {
+      "bytes": 1973,
+      "sha256": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
+      "supplies": "the threshold rule and tie-break that remain in force"
+    }
+  },
+  "human_supplied_terms_not_traceable_to_any_frozen_artifact": [
+    {"term": "wrapper_token_grammar", "why_not_traceable": "no frozen artifact describes the stored token format; the frozen record assumed a bare decimal"},
+    {"term": "anchored_regex_extraction_requirement", "why_not_traceable": "no frozen artifact specifies an extraction method"},
+    {"term": "code_evaluation_prohibition", "why_not_traceable": "no frozen artifact contemplates the token resembling executable code"},
+    {"term": "decimal_grammar_and_finiteness_requirement", "why_not_traceable": "no frozen artifact defines an accepted numeric literal grammar"},
+    {"term": "rejection_set", "why_not_traceable": "no frozen artifact enumerates rejectable tokens or a rejection behaviour"},
+    {"term": "binary64_conversion_semantics", "why_not_traceable": "no frozen artifact states the target numeric type or its conversion semantics"},
+    {"term": "serialization_interpretation_not_cleaning_classification", "why_not_traceable": "no frozen artifact classifies this operation"},
+    {"term": "original_file_immutability_requirement", "why_not_traceable": "byte-identity of locked results is required by FC10 and TD13, but no artifact addresses a defective serialization inside a byte-identical file"}
+  ],
+  "aborted_attempt_evidence": {
+    "note": "The counters in the abort record are reconstructed from these two evidence sources only. Nothing was re-executed to produce them.",
+    "evidence_sources": [
+      "the Python traceback of the aborted dry run, including the failing statement and the raised ValueError",
+      "the source of the executor that was run, which determines what had executed before the failing line"
+    ],
+    "executor_retained_in_repository": false,
+    "counts_estimated_or_guessed": false,
+    "unprovable_counts_marked_unknown_not_zero": true
+  }
+}

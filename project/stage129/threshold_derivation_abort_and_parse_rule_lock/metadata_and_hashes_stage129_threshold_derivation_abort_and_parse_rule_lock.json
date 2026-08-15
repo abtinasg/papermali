@@ -1,0 +1,49 @@
+{
+  "action_id": "stage129-threshold-derivation-abort-and-parse-rule-lock",
+  "action_type": "aborted_execution_record_and_prospective_parse_rule_lock",
+  "contract_status": "PROSPECTIVELY_LOCKED_NOT_EXECUTED",
+  "credentials_committed_to_git": false,
+  "derivation_attempts_completed": 0,
+  "derivation_attempts_started": 1,
+  "f2_candidates_evaluated": 0,
+  "fail_closed_control_count": 12,
+  "final_test_access_authorized": false,
+  "final_test_artifacts_committed": 0,
+  "final_test_rows_read": 0,
+  "frozen_oof_file_modified": false,
+  "frozen_oof_file_sha256": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+  "human_supplied_term_count": 8,
+  "model_fits_executed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "package_file_count": 5,
+  "package_files": {
+    "README_STAGE129_THRESHOLD_DERIVATION_ABORT_AND_PARSE_RULE_LOCK.md": {
+      "bytes": 9692,
+      "sha256": "97b245c555c1560d7440ad46d31114aa9453162f8641a5e92ced31e2c2f59765"
+    },
+    "stage129_predicted_probability_parse_rule_contract.json": {
+      "bytes": 11102,
+      "sha256": "5c67727f002fed5c2fa8d631a0a4ccdb724fdeef968fe59f7a8dbc02213bf162"
+    },
+    "stage129_threshold_derivation_abort_and_parse_rule_governance_boundary.json": {
+      "bytes": 5720,
+      "sha256": "b577153220ffa428271b5f0922c189f47282d64a4c0915dc49636b7e24b875ed"
+    },
+    "stage129_threshold_derivation_abort_and_parse_rule_source_provenance.json": {
+      "bytes": 4213,
+      "sha256": "f6b927a0234a7581ab8bbd4076d4c2f27d2cbeab9ceedcaa0a614a490056cafb"
+    },
+    "stage129_threshold_derivation_abort_record.json": {
+      "bytes": 6316,
+      "sha256": "17de5e2047f07e110fd74669374f14dd1212ec78fdb6952a65c26ee6a1cdc122"
+    }
+  },
+  "parse_executed_against_data": false,
+  "pii_committed_to_git": false,
+  "pre01_resolved": false,
+  "pre02_resolved": false,
+  "probability_values_reread_by_this_action": 0,
+  "source_artifact_count": 5,
+  "threshold_values_materialized": 0,
+  "thresholds_selected": 0
+}

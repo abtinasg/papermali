@@ -1,0 +1,112 @@
+{
+  "action_id": "stage129-threshold-derivation-abort-and-parse-rule-lock",
+  "artifact": "threshold_derivation_abort_record",
+  "record_type": "HONEST_RECORD_OF_AN_ABORTED_EXECUTION",
+
+  "attempt": {
+    "derivation_attempts_started": 1,
+    "derivation_attempts_completed": 0,
+    "terminal_status": "ABORT_THRESHOLD_DERIVATION",
+    "authorizing_contract": "stage129_threshold_derivation_algorithm_contract",
+    "authorizing_contract_lock_pr": 92,
+    "started_from_commit": "fbcc48b6c24a1199a945914696a3eae359180808",
+    "executor_was_committed": false,
+    "executor_was_committed_note": "The executor was written, run once as a dry run, and deleted when the attempt aborted. It is not part of the repository and is not proposed here.",
+    "abort_stage": "candidate_set_construction",
+    "abort_stage_detail": "The run passed TD01, TD15, TD09, TD02, TD03, TD16 and TD12, then failed while building the candidate set from the distinct stored probabilities.",
+    "abort_mechanism": "uncaught_valueerror_classified_as_abort_by_the_operator",
+    "abort_mechanism_note": "The executor raised ValueError from float() rather than reaching a fail-closed branch, because no control anticipated a non-numeric token in this column. The operator classified the terminated run as ABORT_THRESHOLD_DERIVATION. Recording the mechanism honestly matters: this was a crash that behaved like a fail-closed abort, not a control firing as designed.",
+    "raised_exception": "ValueError: could not convert string to float: 'np.float64(0.513922437119)'"
+  },
+
+  "defect_found": {
+    "artifact": "project/stage126/stage126_m1_development_oof_predictions.csv",
+    "artifact_sha256": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "artifact_unchanged_by_this_action": true,
+    "column": "predicted_probability",
+    "defect": "SERIALIZATION_ONLY_NUMPY_REPR_LEAKED_INTO_CSV",
+    "stored_form": "np.float64(<decimal>)",
+    "expected_form": "a bare decimal",
+    "scope": "every row of the column, all three model families",
+    "rows_affected_total": 1263,
+    "rows_affected_selected_model": 421,
+    "other_columns_affected": [],
+    "other_columns_checked": ["observed_target", "target_year", "probability_seed_aggregation"],
+    "numeric_content_damaged": false,
+    "numeric_content_damaged_evidence": "Every inspected token matched an anchored wrapper pattern with a well-formed finite decimal inside, and every parsed inner value satisfied float(str(v)) == v.",
+    "defect_is_serialization_not_data_loss": true,
+    "no_digits_were_lost": true
+  },
+
+  "counters": {
+    "counters_note": "Reported from the traceback and the executed source, not estimated. Where the evidence cannot prove an exact number it is recorded as UNKNOWN_NOT_ZERO rather than guessed, and never as 0.",
+
+    "f2_candidates_evaluated": 0,
+    "f2_values_computed": 0,
+    "thresholds_selected": 0,
+    "thresholds_materialized": 0,
+    "confusion_matrices_computed": 0,
+    "model_fits_executed": 0,
+    "refits_executed": 0,
+    "predict_proba_calls": 0,
+    "models_loaded": 0,
+    "recalibration_executions": 0,
+    "bootstrap_executions": 0,
+    "shap_executions": 0,
+    "p_values_computed": 0,
+    "final_test_rows_read": 0,
+    "final_test_rows_loaded": 0,
+    "final_test_predictor_values_read": 0,
+    "final_test_target_values_read": 0,
+    "final_test_predictions": 0,
+    "final_test_metrics_computed": 0,
+
+    "aborted_derivation_run": {
+      "csv_rows_read_into_memory": 1263,
+      "csv_rows_read_into_memory_basis": "csv.DictReader materialised every row before the model filter was applied",
+      "filtered_rows_for_selected_model": 421,
+      "observed_target_values_classified": 421,
+      "observed_target_values_classified_basis": "the TD12 block completed; it precedes the failing statement",
+      "evaluable_rows_determined": "UNKNOWN_NOT_ZERO",
+      "evaluable_rows_determined_basis": "the count was computed in memory but the process terminated before emitting it; it is provably at least 1 because the executor aborts on an empty evaluable set and did not take that branch",
+      "probability_tokens_held_as_strings": 421,
+      "probability_token_float_conversion_attempts": 1,
+      "probability_token_float_conversion_attempts_basis": "sorted(key=float) raised on its first key invocation",
+      "probability_inner_values_successfully_parsed": 0,
+      "candidate_set_constructed": false
+    },
+
+    "subsequent_diagnostic_reads": {
+      "diagnostic_note": "These reads happened AFTER the abort, to characterise the defect for this record. They are reported because a counter must never be falsely zero. No F2 and no threshold resulted from them.",
+      "shape_census_rows_inspected": 1263,
+      "selected_model_rows_inspected": 421,
+      "anchored_regex_matches_on_selected_model": 421,
+      "probability_inner_values_parsed_to_float": 421,
+      "distinct_inner_values_observed": 421,
+      "min_max_observed": true,
+      "observed_minimum": 0.013909949749,
+      "observed_maximum": 0.997504747717,
+      "f2_candidates_evaluated": 0,
+      "thresholds_selected": 0
+    }
+  },
+
+  "assertions": {
+    "one_attempt_was_started_and_aborted": true,
+    "no_candidate_was_evaluated_for_f2": true,
+    "no_threshold_was_selected": true,
+    "no_threshold_was_materialized": true,
+    "pre02_remains_unresolved": true,
+    "pre01_remains_unresolved": true,
+    "final_test_rows_read": 0,
+    "no_final_test_access_occurred": true,
+    "no_model_was_loaded_fitted_or_refitted": true,
+    "no_scientific_result_was_produced": true,
+    "frozen_oof_file_is_byte_identical": true,
+    "no_cleaned_copy_of_the_oof_file_was_created": true,
+    "no_historical_artifact_was_rewritten": true,
+    "no_cascade_of_pinned_hashes_was_triggered": true
+  },
+
+  "why_the_run_was_not_forced_through": "Stripping the wrapper would have required a parse step no merged contract defines. TD07 forbids transforming values before selection, and the candidate set is contracted as the values present in the column. Inventing a parse rule mid-run would have made the resulting threshold an artefact of an unpinned implementation choice — the exact failure this contract chain exists to prevent. The rule is therefore locked prospectively, in this package, before any value is parsed for scientific use."
+}
