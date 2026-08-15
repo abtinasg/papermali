@@ -1,0 +1,363 @@
+{
+  "action_id": "stage129-threshold-derivation-algorithm-contract-lock",
+  "contract_id": "stage129_threshold_derivation_algorithm_contract",
+  "contract_status": "PROSPECTIVELY_LOCKED_NOT_EXECUTED",
+  "contract_version": "stage129_threshold_derivation_algorithm_contract_v1",
+
+  "provenance_of_terms": {
+    "note": "Unlike its two predecessors this contract is NOT a pure extraction, and says so. The frozen record named the RULE and the TIE-BREAK but never defined the candidate set, the comparison operator or the F2 formula. Those three gaps were audited and reported, and a human supervisor has now supplied them. Recording that honestly is the point: the supplied terms are a decision, not a rule that was always there.",
+    "every_term_is_extracted_from_a_prelocked_artifact": false,
+    "some_terms_are_supplied_by_human_decision": true,
+    "basis_for_supplied_terms": "HUMAN_DECISION_RESOLVING_A_RECORDED_CONTRACT_GAP",
+    "gap_audit_action_id": "stage129-final-test-execution-contract-lock",
+    "gap_recorded_as": "PRE02",
+    "extracted_terms": [
+      "threshold_rule_name",
+      "tie_break_direction",
+      "never_optimize_on_final_test",
+      "input_surface_identity_and_scope",
+      "selected_model_block_algorithm_and_configuration",
+      "target_state_semantics",
+      "development_and_final_test_target_years",
+      "runtime_versions"
+    ],
+    "human_supplied_terms": [
+      "candidate_threshold_set_definition",
+      "positive_prediction_comparison_operator",
+      "f2_beta_and_closed_form_formula",
+      "zero_denominator_convention",
+      "no_rounding_before_selection",
+      "output_precision_requirement"
+    ],
+    "supplied_terms_do_not_retroactively_create_a_frozen_rule": true
+  },
+
+  "authorized_input": {
+    "path": "project/stage126/stage126_m1_development_oof_predictions.csv",
+    "sha256": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "bytes": 214784,
+    "surface": "pooled_development_oof",
+    "surface_source": "project/stage126/stage126_m1_retained_design_freeze.json#metric_definitions.scopes",
+    "row_filter": {
+      "model_family": "regularized_logistic_regression",
+      "configuration_id": "logistic__C_0.1"
+    },
+    "expected_rows_after_filter": 421,
+    "expected_rows_source": "project/stage126/stage126_m1_primary_development_lock.json#pooled_oof_rows_per_family",
+    "probability_column": "predicted_probability",
+    "target_column": "observed_target",
+    "cluster_column": "ticker",
+    "target_year_column": "target_year",
+    "columns_source": "the committed header row of the pinned input; no value was read by this contract lock",
+    "no_other_input_is_authorized": true,
+    "final_test_rows_in_input": 0,
+    "final_test_rows_in_input_note": "The pooled development OOF surface is by construction development-only. TD03 re-proves it at derivation time rather than assuming it."
+  },
+
+  "algorithm": {
+    "id": "development_OOF_F2_maximizing_threshold",
+    "rule_source": "project/stage125/part4_metrics_uncertainty_contract_stage125.json#thresholded_secondary.rule",
+    "tie_break": "higher_threshold",
+    "tie_break_source": "project/stage125/part4_metrics_uncertainty_contract_stage125.json#thresholded_secondary.tie_break",
+
+    "candidate_set": {
+      "definition": "exactly the distinct values present in the predicted_probability column of the filtered input",
+      "is_exactly_the_unique_stored_probabilities": true,
+      "synthetic_endpoints_added": false,
+      "linear_grid_used": false,
+      "grid_points_parameter_used": false,
+      "midpoints_between_consecutive_values_used": false,
+      "candidate_set_size": "REPORT",
+      "forbidden_candidate_constructions": [
+        "numpy_linspace_or_any_fixed_resolution_grid",
+        "appending_synthetic_0_0_or_1_0_endpoints",
+        "midpoints_between_consecutive_sorted_probabilities",
+        "any_union_of_a_grid_with_the_observed_values",
+        "any_subsample_or_quantile_thinning_of_the_observed_values"
+      ]
+    },
+
+    "decision_rule": {
+      "positive_prediction": "predicted_probability >= threshold",
+      "comparison_operator": ">=",
+      "strict_greater_than_authorized": false
+    },
+
+    "objective": {
+      "name": "F2",
+      "beta": 2,
+      "closed_form": "5*TP / (5*TP + 4*FN + FP)",
+      "closed_form_is_binding": true,
+      "zero_denominator_convention": "F2 = 0 when 5*TP + 4*FN + FP == 0",
+      "counts_are_integer_confusion_matrix_entries": true,
+      "counts_computed_on_evaluable_rows_only": true,
+      "library_fbeta_substitution_authorized": false,
+      "library_substitution_note": "The closed form is binding rather than advisory. A library call that agrees numerically is acceptable only as a CHECK; the recorded value must come from the stated expression."
+    },
+
+    "selection": {
+      "objective_direction": "maximize",
+      "primary_criterion": "highest F2 over the candidate set",
+      "tie_break_criterion": "among all candidates attaining the maximum F2, select the LARGEST numeric threshold",
+      "tie_break_direction_is_higher_not_lower": true,
+      "exactly_one_threshold_is_selected": true
+    },
+
+    "numeric_discipline": {
+      "rounding_before_selection_authorized": false,
+      "truncation_before_selection_authorized": false,
+      "probabilities_compared_at_full_stored_precision": true,
+      "f2_compared_at_full_computed_precision": true,
+      "output_precision_requirement": "round_trip_exact",
+      "output_precision_test": "float(str(value)) == value must hold for the recorded threshold",
+      "rounding_for_display_only_and_never_for_the_recorded_value": true
+    },
+
+    "forbidden_implementation": {
+      "project/src/metrics.py::pick_threshold": {
+        "authorized": false,
+        "reasons": [
+          "it is referenced by zero merged contracts and is not imported by the locked development pipeline",
+          "its candidate set is a 200-point linear grid unioned with the observed probabilities and synthetic 0.0/1.0 endpoints, none of which any contract fixes",
+          "its grid_points value is a default function argument rather than a contract term",
+          "its ascending scan keeps the FIRST maximizing candidate, which is the LOWEST, and therefore contradicts the locked higher_threshold tie-break"
+        ]
+      },
+      "any_other_unpinned_helper_authorized": false
+    }
+  },
+
+  "selected_model": {
+    "block": "M1",
+    "algorithm": "regularized_logistic_regression",
+    "configuration_id": "logistic__C_0.1",
+    "selection_action_id": "stage129-final-model-human-selection-governance",
+    "selection_basis": "HUMAN_DECISION_BASED_ON_PRELOCKED_DEVELOPMENT_EVIDENCE",
+    "model_is_not_refitted_by_the_derivation": true,
+    "no_model_is_loaded_by_the_derivation": true,
+    "derivation_reads_stored_predictions_only": true
+  },
+
+  "target_semantics": {
+    "positive": "exact_numeric_or_string_1",
+    "negative": "exact_numeric_or_string_0",
+    "missing": "blank_null_unparseable_or_any_other_value",
+    "missing_never_counted_as_negative": true,
+    "evaluable_rows": "positive_plus_negative",
+    "target_specific_analyses_use_evaluable_rows_only": true,
+    "source": "project/stage125/part4_statistical_analysis_plan_stage125.json#target_state_contract"
+  },
+
+  "environment": {
+    "runtime_versions": {
+      "jdatetime": "6.0.1",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "python": "3.13.5",
+      "scikit-learn": "1.9.0",
+      "xgboost": "3.3.0"
+    },
+    "environment_must_match_the_locked_development_environment": true,
+    "environment_mismatch_action": "FAIL_CLOSED_DO_NOT_DERIVE"
+  },
+
+  "expected_outputs": {
+    "note": "These are the artifacts a future, separately authorized derivation would produce. NONE exists yet and none is produced by this contract lock.",
+    "artifacts": [
+      {
+        "name": "threshold_value_artifact",
+        "description": "the single selected threshold at round-trip-exact precision, with its F2, confusion counts and candidate-set size",
+        "exists_now": false
+      },
+      {
+        "name": "threshold_derivation_provenance_record",
+        "description": "input SHA-256, row filter and counts, runtime versions, and the algorithm terms actually applied",
+        "exists_now": false
+      },
+      {
+        "name": "threshold_derivation_qc_report",
+        "description": "results for every fail-closed control listed below, plus the counters block",
+        "exists_now": false
+      },
+      {
+        "name": "threshold_derivation_hash_manifest",
+        "description": "SHA-256 and byte count for every file in the derivation package",
+        "exists_now": false
+      }
+    ],
+    "forbidden_outputs": [
+      "any_final_test_prediction_metric_or_row_read",
+      "any_model_fit_refit_or_predict_proba_call",
+      "any_recalibrated_probability",
+      "any_new_development_metric_that_replaces_the_locked_primary_results",
+      "any_alternative_threshold_promoted_as_a_sensitivity_result",
+      "any_p_value_or_confidence_interval",
+      "any_full_sweep_table_published_as_a_scientific_result"
+    ],
+    "locked_primary_results_are_not_replaced_by_the_derivation": true,
+    "locked_development_results_pinned": {
+      "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+      "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+      "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4"
+    }
+  },
+
+  "required_counters": {
+    "note": "A future derivation MUST report every counter below. 'REPORT' means the execution reports the observed number.",
+    "model_fits_executed": 0,
+    "refits_executed": 0,
+    "predict_proba_calls": 0,
+    "tuning_runs": 0,
+    "recalibration_executions": 0,
+    "final_test_rows_read": 0,
+    "final_test_rows_loaded": 0,
+    "final_test_predictions": 0,
+    "final_test_metrics_computed": 0,
+    "p_values_computed": 0,
+    "bootstrap_executions": 0,
+    "shap_executions": 0,
+    "thresholds_selected": 1,
+    "development_oof_rows_read": "REPORT",
+    "evaluable_rows_used": "REPORT",
+    "candidate_thresholds_evaluated": "REPORT"
+  },
+
+  "fail_closed_controls": [
+    {
+      "id": "TD01",
+      "check": "the input file SHA-256 equals the pinned 48a00c88...3326749 and its byte count equals 214784",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD02",
+      "check": "rows are filtered to model_family=regularized_logistic_regression and configuration_id=logistic__C_0.1, and the filtered row count equals the pinned 421",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD03",
+      "check": "every filtered row has target_year in 1393-1399 and zero rows have target_year in 1400-1402",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD04",
+      "check": "the candidate set equals the distinct predicted_probability values of the filtered rows exactly, with no grid, no synthetic endpoints, no midpoints and no thinning",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD05",
+      "check": "the positive prediction uses predicted_probability >= threshold; strict greater-than is never used",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD06",
+      "check": "F2 is computed as 5*TP / (5*TP + 4*FN + FP) on integer confusion counts, and equals 0 when the denominator is 0",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD07",
+      "check": "no probability and no F2 value is rounded or truncated at any point before selection",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD08",
+      "check": "among all candidates attaining the maximum F2 the LARGEST numeric threshold is selected, and this is verified against the full argmax set rather than assumed from scan order",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD09",
+      "check": "project/src/metrics.py::pick_threshold is neither imported nor called, and no other unpinned threshold helper is used",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD10",
+      "check": "exactly one threshold is selected and recorded; no alternative threshold is promoted as a sensitivity or robustness result",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD11",
+      "check": "model_fits_executed == 0, refits_executed == 0 and predict_proba_calls == 0; the derivation reads stored predictions and loads no model",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD12",
+      "check": "target states follow the frozen target_state_contract, missing is never counted as negative, and only evaluable rows enter the confusion counts",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD13",
+      "check": "the locked development results are byte-identical before and after the derivation",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD14",
+      "check": "the recorded threshold satisfies float(str(value)) == value, so the stored value round-trips exactly",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD15",
+      "check": "runtime versions equal the locked development runtime exactly",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD16",
+      "check": "final_test_rows_read == 0 and no Final Test row, predictor, target or prediction is loaded, read or produced",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD17",
+      "check": "the derivation writes no file outside its own package and edits no historical or frozen artifact",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "TD18",
+      "check": "no recalibration, bootstrap, SHAP, p-value, confidence interval or model re-selection is executed",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    }
+  ],
+
+  "relationship_to_the_final_test_contract": {
+    "final_test_contract_id": "stage129_final_test_execution_contract",
+    "final_test_contract_path": "project/stage129/final_test_execution_contract_lock/stage129_final_test_execution_contract.json",
+    "final_test_contract_sha256": "036d85f8b095e0cd7e55afb899283c71f957234ce4740085a20c2d81a617074e",
+    "this_lock_resolves_pre02": false,
+    "this_lock_resolves_pre02_note": "PRE02 requires the threshold VALUE to exist in a committed artifact. This action defines the algorithm that would produce it and computes nothing, so PRE02 remains UNRESOLVED. Defining how a number would be produced is not producing it.",
+    "pre02_status_after_this_lock": "UNRESOLVED",
+    "pre01_status_after_this_lock": "UNRESOLVED",
+    "final_test_contract_fully_executable": false,
+    "final_test_contract_modified_by_this_action": false
+  },
+
+  "final_test_boundary": {
+    "final_test_target_years": [1400, 1401, 1402],
+    "final_test_locked": true,
+    "final_test_access_authorized": false,
+    "final_test_unlock_authorized": false,
+    "final_test_rows_read": 0,
+    "final_test_rows_read_by_this_contract_lock": 0,
+    "probability_values_read_by_this_contract_lock": 0,
+    "this_contract_lock_is_read_only_over_committed_metadata": true,
+    "input_row_values_read_by_this_contract_lock": 0,
+    "input_header_read_by_this_contract_lock": true,
+    "input_header_note": "Only the committed header row and the file's SHA-256 and byte count were read. No predicted_probability or observed_target value was read."
+  },
+
+  "execution_authorization": {
+    "threshold_derivation_authorized_by_this_contract": false,
+    "threshold_derivation_requires_new_explicit_human_authorization": true,
+    "threshold_value_materialized": false,
+    "threshold_value": null,
+    "contract_lock_is_not_an_execution_permission": true,
+    "model_fit_authorized": false,
+    "refit_authorized": false,
+    "recalibration_authorized": false,
+    "final_test_execution_authorized": false,
+    "final_test_access_authorized": false,
+    "stage130_authorized": false,
+    "stage130_started": false,
+    "ready_for_review_authorized": false,
+    "merge_authorized": false,
+    "next_action_id": "human_authorization_required_for_threshold_derivation_execution",
+    "next_action_authorized": false,
+    "pointer_is_not_authorization": true
+  }
+}

@@ -3024,6 +3024,12 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # only the four merged refit artifacts, fits nothing, reads no Final
         # Test row, and leaves the F2 threshold value unmaterialized.
         **derive_stage129_final_test_execution_contract_markers(root),
+        # Must come last of all: the threshold derivation ALGORITHM lock. It is
+        # the first contract in the programme that is not a pure extraction --
+        # six of its terms are human decisions filling the PRE02 gap -- so the
+        # marker function polices the provenance split rather than assuming it.
+        # It derives no value, reads no probability, and leaves PRE02 unresolved.
+        **derive_stage129_threshold_derivation_algorithm_markers(root),
         }))
 
 
@@ -14923,6 +14929,378 @@ def derive_stage129_final_test_execution_contract_markers(root: str) -> dict:
 
         "stage129_final_test_next_action_id": _STAGE129_FT_NEXT_ACTION_ID,
         "stage129_final_test_next_action_authorized": False,
+    }
+
+_STAGE129_TD_PKG = "project/stage129/threshold_derivation_algorithm_contract_lock"
+_STAGE129_TD_ACTION_ID = "stage129-threshold-derivation-algorithm-contract-lock"
+_STAGE129_TD_CONTRACT_REL = (
+    f"{_STAGE129_TD_PKG}/stage129_threshold_derivation_algorithm_contract.json")
+_STAGE129_TD_PROVENANCE_REL = (
+    f"{_STAGE129_TD_PKG}/stage129_threshold_derivation_algorithm_source_provenance.json")
+_STAGE129_TD_BOUNDARY_REL = (
+    f"{_STAGE129_TD_PKG}/stage129_threshold_derivation_algorithm_governance_boundary.json")
+_STAGE129_TD_STATUS = "PROSPECTIVELY_LOCKED_NOT_EXECUTED"
+_STAGE129_TD_FAIL_CLOSED_IDS = tuple(f"TD{i:02d}" for i in range(1, 19))
+_STAGE129_TD_NEXT_ACTION_ID = (
+    "human_authorization_required_for_threshold_derivation_execution")
+#: The six terms the frozen record never defined, supplied by human decision.
+_STAGE129_TD_SUPPLIED_TERMS = frozenset({
+    "candidate_threshold_set_definition",
+    "positive_prediction_comparison_operator",
+    "f2_beta_and_closed_form_formula",
+    "zero_denominator_convention",
+    "no_rounding_before_selection",
+    "output_precision_requirement",
+})
+_STAGE129_TD_OOF_REL = "project/stage126/stage126_m1_development_oof_predictions.csv"
+
+
+def derive_stage129_threshold_derivation_algorithm_markers(root: str) -> dict:
+    """Recognize the prospectively locked threshold derivation algorithm.
+
+    Unlike the two locks before it, this contract is NOT a pure extraction, and
+    the checks below exist mostly to keep it honest about that. The frozen
+    record named the F2 rule and the higher_threshold tie-break and then stopped;
+    it never defined the candidate set, the comparison operator or the formula.
+    A human supervisor supplied those six terms after the gap was audited.
+
+    The failure mode this guards against is LAUNDERING -- a 2026 decision
+    acquiring the authority of a 2025 frozen rule. So the contract must declare
+    `every_term_is_extracted_from_a_prelocked_artifact = false`, name all six
+    supplied terms, and keep them disjoint from the extracted ones.
+
+    The second failure mode is a lock that quietly unblocks the Final Test.
+    Defining how a number would be computed is not computing it, so PRE02 must
+    stay unresolved and the value must stay null.
+
+    Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE129_TD_CONTRACT_REL)
+    if not os.path.isfile(path):
+        return {}
+    contract = _require_json_artifact(root, _STAGE129_TD_CONTRACT_REL)
+    provenance = _require_json_artifact(root, _STAGE129_TD_PROVENANCE_REL)
+    boundary = _require_json_artifact(root, _STAGE129_TD_BOUNDARY_REL)
+
+    for artifact, label in ((contract, "contract"), (provenance, "provenance"),
+                            (boundary, "boundary")):
+        if artifact.get("action_id") != _STAGE129_TD_ACTION_ID:
+            raise HandoffError(
+                f"Stage129 threshold algorithm {label} action_id mismatch")
+    for artifact, label in ((contract, "contract"), (boundary, "boundary")):
+        if artifact.get("contract_status") != _STAGE129_TD_STATUS:
+            raise HandoffError(
+                f"Stage129 threshold algorithm {label} status must be "
+                f"{_STAGE129_TD_STATUS}")
+
+    # (1) The provenance split must be declared, complete and disjoint.
+    terms = contract.get("provenance_of_terms") or {}
+    if terms.get("every_term_is_extracted_from_a_prelocked_artifact") is not False:
+        raise HandoffError(
+            "Stage129 threshold algorithm contract must NOT claim to be a pure "
+            "extraction; six of its terms are human decisions")
+    if terms.get("some_terms_are_supplied_by_human_decision") is not True or \
+            boundary.get("some_terms_are_supplied_by_human_decision") is not True:
+        raise HandoffError(
+            "Stage129 threshold algorithm must declare its human-supplied terms")
+    if terms.get("supplied_terms_do_not_retroactively_create_a_frozen_rule") \
+            is not True:
+        raise HandoffError(
+            "Stage129 threshold algorithm must record that a supplied term does "
+            "not become a frozen rule")
+    supplied = frozenset(terms.get("human_supplied_terms") or ())
+    if supplied != _STAGE129_TD_SUPPLIED_TERMS:
+        raise HandoffError(
+            "Stage129 threshold algorithm human_supplied_terms must be exactly "
+            f"{sorted(_STAGE129_TD_SUPPLIED_TERMS)}, got {sorted(supplied)}")
+    extracted = frozenset(terms.get("extracted_terms") or ())
+    if supplied & extracted:
+        raise HandoffError(
+            "Stage129 threshold algorithm: a term cannot be both extracted and "
+            f"human-supplied ({sorted(supplied & extracted)})")
+    listed = provenance.get(
+        "human_supplied_terms_not_traceable_to_any_frozen_artifact") or []
+    if frozenset(e.get("term") for e in listed) != _STAGE129_TD_SUPPLIED_TERMS:
+        raise HandoffError(
+            "Stage129 threshold algorithm provenance must list every supplied term")
+    for entry in listed:
+        if not entry.get("why_not_traceable"):
+            raise HandoffError(
+                f"Stage129 threshold algorithm supplied term {entry.get('term')!r} "
+                "must record why it is untraceable")
+    if provenance.get("every_contract_term_traces_to_one_of_these_artifacts") \
+            is not False:
+        raise HandoffError(
+            "Stage129 threshold algorithm provenance must not claim full "
+            "traceability")
+
+    # (2) Sources are pinned and unmodified.
+    sources = provenance.get("source_artifacts_sha256") or {}
+    if not sources:
+        raise HandoffError("Stage129 threshold algorithm must pin its sources")
+    for rel, info in sources.items():
+        src = os.path.join(root, rel)
+        if not os.path.isfile(src):
+            raise HandoffError(
+                f"Stage129 threshold algorithm cites a missing source: {rel}")
+        with open(src, "rb") as fh:
+            blob = fh.read()
+        if hashlib.sha256(blob).hexdigest() != info.get("sha256"):
+            raise HandoffError(
+                f"Stage129 threshold algorithm source {rel} has drifted from its "
+                "pinned SHA-256")
+    if provenance.get("sources_modified_by_this_action") is not False or \
+            boundary.get("source_contracts_modified_by_this_action") is not False:
+        raise HandoffError(
+            "Stage129 threshold algorithm may not modify its sources")
+
+    # (3) The extracted rule and tie-break still match the frozen contract.
+    alg = contract.get("algorithm") or {}
+    if alg.get("id") != _STAGE129_REFIT_THRESHOLD_RULE or \
+            alg.get("tie_break") != _STAGE129_REFIT_THRESHOLD_TIE_BREAK:
+        raise HandoffError(
+            "Stage129 threshold algorithm must implement "
+            f"{_STAGE129_REFIT_THRESHOLD_RULE} with tie-break "
+            f"{_STAGE129_REFIT_THRESHOLD_TIE_BREAK}")
+
+    # (4) The supplied algorithm terms are exactly what was authorized.
+    cs = alg.get("candidate_set") or {}
+    if cs.get("is_exactly_the_unique_stored_probabilities") is not True:
+        raise HandoffError(
+            "Stage129 threshold algorithm candidate set must be exactly the unique "
+            "stored probabilities")
+    for field in ("synthetic_endpoints_added", "linear_grid_used",
+                  "grid_points_parameter_used",
+                  "midpoints_between_consecutive_values_used"):
+        if cs.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 threshold algorithm candidate_set {field} must be False")
+    dr = alg.get("decision_rule") or {}
+    if dr.get("comparison_operator") != ">=" or \
+            dr.get("strict_greater_than_authorized") is not False:
+        raise HandoffError(
+            "Stage129 threshold algorithm must predict positive on "
+            "predicted_probability >= threshold")
+    obj = alg.get("objective") or {}
+    if obj.get("beta") != 2:
+        raise HandoffError("Stage129 threshold algorithm beta must be 2")
+    if obj.get("closed_form") != "5*TP / (5*TP + 4*FN + FP)":
+        raise HandoffError(
+            "Stage129 threshold algorithm closed form must be "
+            "5*TP / (5*TP + 4*FN + FP), the F-beta identity at beta=2")
+    if obj.get("closed_form_is_binding") is not True or \
+            obj.get("library_fbeta_substitution_authorized") is not False:
+        raise HandoffError(
+            "Stage129 threshold algorithm closed form must be binding")
+    sel = alg.get("selection") or {}
+    if sel.get("tie_break_direction_is_higher_not_lower") is not True or \
+            sel.get("exactly_one_threshold_is_selected") is not True:
+        raise HandoffError(
+            "Stage129 threshold algorithm must select exactly one threshold and "
+            "break ties upward")
+    nd = alg.get("numeric_discipline") or {}
+    for field in ("rounding_before_selection_authorized",
+                  "truncation_before_selection_authorized"):
+        if nd.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 threshold algorithm {field} must be False")
+    if nd.get("output_precision_requirement") != "round_trip_exact":
+        raise HandoffError(
+            "Stage129 threshold algorithm output precision must be round_trip_exact")
+
+    # (5) The rejected helper stays rejected.
+    forbidden = alg.get("forbidden_implementation") or {}
+    entry = forbidden.get("project/src/metrics.py::pick_threshold") or {}
+    if entry.get("authorized") is not False or not entry.get("reasons"):
+        raise HandoffError(
+            "Stage129 threshold algorithm must forbid metrics.py::pick_threshold "
+            "and state why")
+    if boundary.get("metrics_py_pick_threshold_authorized") is not False:
+        raise HandoffError(
+            "Stage129 threshold boundary may not authorize pick_threshold")
+
+    # (6) The authorized input is the pinned development-OOF surface.
+    inp = contract.get("authorized_input") or {}
+    if inp.get("path") != _STAGE129_TD_OOF_REL:
+        raise HandoffError(
+            "Stage129 threshold algorithm input must be the pooled development-OOF "
+            "predictions")
+    oof = os.path.join(root, _STAGE129_TD_OOF_REL)
+    if os.path.isfile(oof):
+        with open(oof, "rb") as fh:
+            blob = fh.read()
+        if hashlib.sha256(blob).hexdigest() != inp.get("sha256"):
+            raise HandoffError(
+                "Stage129 threshold algorithm input has drifted from its pinned "
+                "SHA-256")
+    if inp.get("no_other_input_is_authorized") is not True or \
+            inp.get("final_test_rows_in_input") != 0:
+        raise HandoffError(
+            "Stage129 threshold algorithm must authorize only the development-OOF "
+            "input and record zero Final Test rows in it")
+
+    # (7) Controls, and the fact that nothing was computed.
+    controls = contract.get("fail_closed_controls") or []
+    ids = tuple(c.get("id") for c in controls)
+    if ids != _STAGE129_TD_FAIL_CLOSED_IDS:
+        raise HandoffError(
+            "Stage129 threshold algorithm must carry controls "
+            f"{_STAGE129_TD_FAIL_CLOSED_IDS}, got {ids}")
+    for control in controls:
+        if control.get("on_failure") != "ABORT_THRESHOLD_DERIVATION":
+            raise HandoffError(
+                f"Stage129 threshold control {control.get('id')} must abort")
+        if not control.get("check"):
+            raise HandoffError(
+                f"Stage129 threshold control {control.get('id')} must state its check")
+    outputs = contract.get("expected_outputs") or {}
+    artifacts = outputs.get("artifacts") or []
+    if not artifacts:
+        raise HandoffError(
+            "Stage129 threshold algorithm must enumerate expected outputs")
+    for art in artifacts:
+        if art.get("exists_now") is not False:
+            raise HandoffError(
+                f"Stage129 threshold expected output {art.get('name')!r} may not "
+                "already exist; nothing was derived")
+
+    ex = contract.get("execution_authorization") or {}
+    if ex.get("threshold_value") is not None or \
+            ex.get("threshold_value_materialized") is not False:
+        raise HandoffError(
+            "Stage129 threshold algorithm may not materialize a threshold value; "
+            "this action locks an algorithm and computes nothing")
+    if boundary.get("threshold_value_materialized_by_this_action") is not False or \
+            boundary.get("threshold_derivation_executed_by_this_action") is not False:
+        raise HandoffError(
+            "Stage129 threshold boundary must record that nothing was derived")
+
+    # (8) The Final Test stays blocked: PRE02 is NOT resolved by defining an
+    #     algorithm, and the Final Test contract must be untouched.
+    rel_ft = contract.get("relationship_to_the_final_test_contract") or {}
+    if rel_ft.get("this_lock_resolves_pre02") is not False or \
+            rel_ft.get("pre02_status_after_this_lock") != "UNRESOLVED":
+        raise HandoffError(
+            "Stage129 threshold algorithm may not resolve PRE02; PRE02 requires "
+            "the VALUE in a committed artifact, and defining how a number would "
+            "be produced is not producing it")
+    if rel_ft.get("final_test_contract_fully_executable") is not False or \
+            boundary.get("final_test_contract_fully_executable") is not False:
+        raise HandoffError(
+            "Stage129 threshold algorithm must keep the Final Test contract not "
+            "fully executable")
+    if rel_ft.get("final_test_contract_modified_by_this_action") is not False or \
+            boundary.get("final_test_contract_modified_by_this_action") is not False:
+        raise HandoffError(
+            "Stage129 threshold algorithm may not modify the Final Test contract")
+    ft_rel = rel_ft.get("final_test_contract_path") or ""
+    ft_path = os.path.join(root, ft_rel)
+    if ft_rel and os.path.isfile(ft_path):
+        with open(ft_path, "rb") as fh:
+            if hashlib.sha256(fh.read()).hexdigest() != \
+                    rel_ft.get("final_test_contract_sha256"):
+                raise HandoffError(
+                    "Stage129 threshold algorithm: the Final Test contract has "
+                    "drifted from the hash this lock pinned")
+
+    # (9) The firewall, and the fact that locking authorizes nothing.
+    ftb = contract.get("final_test_boundary") or {}
+    if ftb.get("final_test_locked") is not True or \
+            ftb.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage129 threshold algorithm must keep the Final Test locked at 0 rows")
+    for field in ("final_test_rows_read_by_this_contract_lock",
+                  "probability_values_read_by_this_contract_lock",
+                  "input_row_values_read_by_this_contract_lock"):
+        if ftb.get(field) != 0:
+            raise HandoffError(
+                f"Stage129 threshold algorithm {field} must be 0; this lock read no "
+                "row values")
+    for field in ("threshold_derivation_authorized_by_this_contract",
+                  "model_fit_authorized", "refit_authorized",
+                  "recalibration_authorized", "final_test_execution_authorized",
+                  "final_test_access_authorized", "stage130_authorized",
+                  "stage130_started", "ready_for_review_authorized",
+                  "merge_authorized", "next_action_authorized"):
+        if ex.get(field) is not False:
+            raise HandoffError(f"Stage129 threshold algorithm {field} must be False")
+    if ex.get("next_action_id") != _STAGE129_TD_NEXT_ACTION_ID:
+        raise HandoffError(
+            f"Stage129 threshold pointer must be {_STAGE129_TD_NEXT_ACTION_ID}")
+    for field in ("threshold_derivation_authorized", "model_fit_authorized",
+                  "refit_authorized", "recalibration_authorized",
+                  "final_test_access_authorized", "final_test_execution_authorized",
+                  "stage130_authorized", "stage130_started",
+                  "stage130_or_next_stage_executed", "next_action_authorized",
+                  "next_action_executes_final_test",
+                  "next_action_executes_threshold_derivation",
+                  "next_research_action_authorized", "merge_authorized",
+                  "ready_for_review_authorized", "new_metric_computed",
+                  "new_p_value_created", "new_scientific_result_produced",
+                  "inferential_superiority_claimed",
+                  "locked_primary_development_results_modified_by_this_action",
+                  "m1_results_modified_by_this_action",
+                  "historical_scientific_artifacts_modified_by_this_action",
+                  "existing_pull_requests_modified_by_this_action",
+                  "prior_packages_modified_by_this_action",
+                  "pre02_resolved_by_this_action"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 threshold boundary {field} must be False")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError("Stage129 threshold boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage129 threshold counters.{field} must be 0 (locking an "
+                "algorithm computes nothing and reads no probability value)")
+
+    return {
+        "stage129_threshold_algorithm_contract_recorded": True,
+        "stage129_threshold_algorithm_action_id": _STAGE129_TD_ACTION_ID,
+        "stage129_threshold_algorithm_status": _STAGE129_TD_STATUS,
+        "stage129_threshold_algorithm_contract_id": contract.get("contract_id"),
+        "stage129_threshold_algorithm_contract_version":
+            contract.get("contract_version"),
+        "stage129_threshold_algorithm_source_artifact_count": len(sources),
+
+        # The honest provenance split.
+        "stage129_threshold_algorithm_is_pure_extraction": False,
+        "stage129_threshold_algorithm_human_supplied_term_count": len(supplied),
+        "stage129_threshold_algorithm_human_supplied_terms": sorted(supplied),
+        "stage129_threshold_algorithm_extracted_term_count": len(extracted),
+        "stage129_threshold_algorithm_supplied_basis":
+            terms.get("basis_for_supplied_terms"),
+
+        # What the algorithm fixes.
+        "stage129_threshold_algorithm_rule": _STAGE129_REFIT_THRESHOLD_RULE,
+        "stage129_threshold_algorithm_tie_break": _STAGE129_REFIT_THRESHOLD_TIE_BREAK,
+        "stage129_threshold_algorithm_candidate_set":
+            "exactly_the_unique_stored_probabilities",
+        "stage129_threshold_algorithm_comparison_operator": ">=",
+        "stage129_threshold_algorithm_beta": 2,
+        "stage129_threshold_algorithm_closed_form": obj.get("closed_form"),
+        "stage129_threshold_algorithm_output_precision": "round_trip_exact",
+        "stage129_threshold_algorithm_fail_closed_control_count": len(controls),
+        "stage129_threshold_algorithm_pick_threshold_authorized": False,
+
+        # Nothing was computed, and PRE02 is still blocked.
+        "stage129_threshold_algorithm_locked_but_not_executed_at_lock_time": True,
+        "stage129_threshold_value_materialized": False,
+        "stage129_threshold_derivation_authorized": False,
+        "stage129_threshold_derivation_requires_new_human_authorization": True,
+        "stage129_threshold_probability_values_read": 0,
+        "stage129_final_test_pre02_resolved": False,
+        "stage129_final_test_contract_fully_executable": False,
+        "stage130_started": False,
+
+        # The firewall.
+        "final_test_locked": True,
+        "final_test_rows_read": 0,
+        "final_test_access_authorized": False,
+
+        "stage129_threshold_algorithm_next_action_id": _STAGE129_TD_NEXT_ACTION_ID,
+        "stage129_threshold_algorithm_next_action_authorized": False,
     }
 
 
