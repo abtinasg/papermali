@@ -2,10 +2,17 @@
   "action_id": "stage129-threshold-derivation-execution",
   "action_type": "one_time_contracted_threshold_derivation_development_only",
   "algorithm_contract_lock_pr": 92,
+  "all_contractual_controls_passed": false,
+  "computations_completed_but_not_admitted": 1,
+  "computed_threshold": 0.426878838687,
+  "contractual_controls_not_executed": 1,
+  "contractual_controls_not_executed_ids": [
+    "PP08"
+  ],
   "credentials_committed_to_git": false,
   "executor_path": "project/src/stage129_threshold_derivation.py",
-  "executor_sha256": "2c58a185aa40c12d0df206aff04fbf46a317d34ea3548b44558bb5548b93f232",
-  "fail_closed_controls_all_passed": true,
+  "executor_sha256": "3f343fad82bd29d85c46296a2bad99024571610dbdd462af13cde12de0d1dade",
+  "fail_closed_controls_all_passed": false,
   "final_test_access_authorized": false,
   "final_test_artifacts_committed": 0,
   "final_test_execution_authorized": false,
@@ -17,31 +24,33 @@
   "package_file_count": 4,
   "package_files": {
     "README_STAGE129_THRESHOLD_DERIVATION_EXECUTION.md": {
-      "bytes": 8374,
-      "sha256": "b86c55cbf245df8c0a8deca099851c28c5d150c21de77a56de1fc6af2310fb7b"
+      "bytes": 10092,
+      "sha256": "5844d2f85820c9e361ccf6cb3c158e83a6a572c2b42644e82aa78ea009b198c4"
     },
     "stage129_threshold_derivation_provenance_record.json": {
-      "bytes": 2413,
-      "sha256": "23b530169c9d6df2f6d89b050ffc4b27740f49db922a5ec45ebee09206abe25c"
+      "bytes": 3105,
+      "sha256": "dc96e8542d0c2219844e3c6921c8a7029ba1cce44fe2992b9b711f9d7a3220fe"
     },
     "stage129_threshold_derivation_qc_report.json": {
-      "bytes": 8486,
-      "sha256": "f33ac106fa6c2304ddf97b54d9bc29c12822556cb49591d0928b679b65cb061c"
+      "bytes": 10536,
+      "sha256": "fbf5484a3ff195be9683c63efd833ad041cb89cb65c5a30fa0619758daad486f"
     },
     "stage129_threshold_value.json": {
-      "bytes": 1053,
-      "sha256": "9dd455b89c472a0ad0d84af1d91217aa8a336e7a1555eb0b5ae8b54308c79864"
+      "bytes": 1767,
+      "sha256": "273cee5fd0764e8fddfa22365491cf2732a2faeccdaf0a1f8a749a5a5efe7f22"
     }
   },
   "parse_rule_contract_lock_pr": 93,
   "pii_committed_to_git": false,
   "pre01_resolved": false,
-  "pre02_resolved": true,
+  "pre02_resolved": false,
   "prior_aborted_attempts": 1,
-  "selected_threshold": 0.426878838687,
-  "successful_attempts": 1,
+  "result_admission_status": "COMPUTED_BUT_NOT_ADMITTED_QC_INCOMPLETE",
+  "result_admitted": false,
+  "successful_admitted_derivations": 0,
   "threshold_round_trip_exact": true,
-  "thresholds_materialized": 1,
+  "thresholds_admitted": 0,
+  "thresholds_computed": 1,
   "total_derivation_attempts_started": 2,
   "trained_model_artifacts_committed": 0
 }

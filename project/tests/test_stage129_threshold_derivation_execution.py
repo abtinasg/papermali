@@ -92,7 +92,7 @@ def test_the_threshold_and_its_f2_are_recorded(value):
     assert value["threshold"] == THRESHOLD
     assert value["f2_at_threshold"] == F2
     assert value["confusion_at_threshold"] == {"tp": TP, "fp": FP, "fn": FN}
-    assert value["thresholds_selected"] == 1
+    assert value["thresholds_selected"] == 0
 
 
 def test_f2_recomputes_from_the_recorded_counts(value):
@@ -164,6 +164,19 @@ def test_the_algorithm_terms_are_the_contracted_ones(prov):
     assert prov["rounding_applied_before_selection"] is False
 
 
+def test_the_conversion_was_conforming_but_pp08_clause_b_did_not_run(prov):
+    """float() was permitted; the missing piece is the contracted re-check."""
+    assert prov["numeric_conversion_implementation"] == \
+        "python_builtin_float_on_the_regex_capture_group"
+    assert prov["numpy_float64_constructor_invoked"] is False
+    assert prov["numpy_imported_by_executor"] is False
+    assert prov["pp08_clause_b_agreement_check_executed"] is False
+    assert prov["result_admitted"] is False
+    note = prov["conversion_conformity_note"]
+    assert "equivalent_to_python_float_on_the_captured_group" in note
+    assert "may use either" in note
+
+
 def test_exactly_one_run_with_no_dry_run_or_determinism_rerun(prov):
     assert prov["computational_dry_run_executed"] is False
     assert prov["determinism_rerun_executed"] is False
@@ -178,17 +191,57 @@ def test_the_executor_refuses_to_run_without_write():
     assert "Refusing to run without --write" in src
 
 
-def test_the_thirty_contractual_controls_passed(qc):
+def test_the_thirty_contractual_controls_are_counted_honestly(qc):
     """TD01-TD18 and PP01-PP12 are the 30 contractual controls -- no more."""
-    assert qc["all_pass"] is True
-    assert qc["all_contractual_controls_passed"] is True
+    assert qc["all_contractual_controls_passed"] is False
     assert qc["contractual_control_count"] == 30
     assert qc["control_count"] == len(qc["controls"]) == 30
     ids = {c["id"] for c in qc["controls"]}
     assert ids == ({f"TD{i:02d}" for i in range(1, 19)}
                    | {f"PP{i:02d}" for i in range(1, 13)})
+    assert qc["contractual_controls_passed"] == 29
+    assert qc["contractual_controls_failed"] == 0
+    assert qc["contractual_controls_not_executed"] == 1
+    assert (qc["contractual_controls_passed"] + qc["contractual_controls_failed"]
+            + qc["contractual_controls_not_executed"]) == 30
+
+
+def test_pp08_is_not_executed_with_both_clauses_stated(qc):
+    """The control was recorded PASS but its clause (b) never ran."""
+    assert qc["contractual_controls_not_executed_ids"] == ["PP08"]
+    pp08 = next(c for c in qc["controls"] if c["id"] == "PP08")
+    assert pp08["result"] == "NOT_EXECUTED"
+    assert pp08["clause_a_conversion_to_binary64"] == "PERFORMED"
+    assert pp08["clause_b_numpy_float_agreement_over_all_tokens"] == "NOT_PERFORMED"
+    assert pp08["originally_recorded_as"] == "PASS"
+    assert "no later edit" in pp08["correction_note"].lower()
     for c in qc["controls"]:
-        assert c["result"] == "PASS", c["id"]
+        if c["id"] != "PP08":
+            assert c["result"] == "PASS", c["id"]
+
+
+def test_the_result_is_computed_but_not_admitted(qc, value, manifest):
+    assert qc["result_admitted"] is False
+    assert qc["result_admission_status"] == "COMPUTED_BUT_NOT_ADMITTED_QC_INCOMPLETE"
+    assert qc["qc_complete"] is False
+    assert qc["qc_incomplete_reason"] == "PP08_CLAUSE_B_NOT_EXECUTED"
+    assert value["admitted"] is False
+    assert value["admission_status"] == "COMPUTED_BUT_NOT_ADMITTED_QC_INCOMPLETE"
+    for field in ("is_canonical_threshold", "is_authorized_threshold",
+                  "is_operational_threshold", "usable_for_final_test"):
+        assert value[field] is False, field
+    assert value["retained_for"] == "audit_history_only"
+    assert manifest["result_admitted"] is False
+    assert manifest["thresholds_admitted"] == 0
+
+
+def test_the_number_is_preserved_not_hidden(value):
+    """Audit history must keep the computed number visible."""
+    assert value["threshold"] == THRESHOLD
+    assert value["f2_at_threshold"] == F2
+    assert value["confusion_at_threshold"] == {"tp": TP, "fp": FP, "fn": FN}
+    assert value["threshold_computed"] is True
+    assert value["threshold_admitted"] is False
 
 
 def test_the_supplementary_check_is_not_counted_as_contractual(qc):
@@ -216,24 +269,31 @@ def test_the_prior_abort_record_is_byte_identical(qc):
         "evaluable_rows_determined"] == "UNKNOWN_NOT_ZERO"
 
 
-def test_cumulative_counters_keep_both_attempts(qc, manifest):
+def test_cumulative_counters_keep_both_attempts_and_admit_neither(qc, manifest):
     cum = qc["cumulative_counters"]
     assert cum["total_derivation_attempts_started"] == 2
     assert cum["prior_aborted_attempts"] == 1
-    assert cum["successful_attempts"] == 1
-    assert cum["total_thresholds_materialized"] == 1
+    assert cum["computations_completed_but_not_admitted"] == 1
+    assert cum["admitted_derivations"] == 0
+    assert cum["successful_attempts"] == 0
+    assert cum["total_thresholds_computed"] == 1
+    assert cum["total_thresholds_admitted"] == 0
     assert cum["prior_attempt_terminal_status"] == "ABORT_THRESHOLD_DERIVATION"
     assert manifest["total_derivation_attempts_started"] == 2
     assert manifest["prior_aborted_attempts"] == 1
-    assert manifest["successful_attempts"] == 1
-    assert manifest["thresholds_materialized"] == 1
+    assert manifest["successful_admitted_derivations"] == 0
+    assert manifest["computations_completed_but_not_admitted"] == 1
+    assert manifest["thresholds_computed"] == 1
+    assert manifest["thresholds_admitted"] == 0
 
 
 def test_action_counters_are_separate_from_cumulative(qc):
     a = qc["action_counters"]
     assert a["derivation_attempts_started_by_this_action"] == 1
-    assert a["derivation_attempts_succeeded_by_this_action"] == 1
-    assert a["thresholds_selected_by_this_action"] == 1
+    assert a["derivation_attempts_succeeded_by_this_action"] == 0
+    assert a["computations_completed_but_not_admitted_by_this_action"] == 1
+    assert a["thresholds_computed_by_this_action"] == 1
+    assert a["thresholds_admitted_by_this_action"] == 0
     assert a["probability_tokens_parsed_by_this_action"] == SELECTED
     for k in ("model_fits_executed", "refits_executed", "predict_proba_calls",
               "tuning_runs", "recalibration_executions", "bootstrap_executions",
@@ -244,12 +304,13 @@ def test_action_counters_are_separate_from_cumulative(qc):
 
 
 # ------------------------------------ PRE02 resolved, Final Test still shut
-def test_pre02_is_resolved_and_pre01_is_not(manifest):
-    assert manifest["pre02_resolved"] is True
+def test_pre02_is_not_resolved_by_a_qc_incomplete_computation(manifest):
+    """A committed numeric file is not a resolved prerequisite."""
+    assert manifest["pre02_resolved"] is False
     assert manifest["pre01_resolved"] is False
 
 
-def test_resolving_pre02_does_not_open_the_final_test(value, prov, qc, manifest):
+def test_the_final_test_stays_shut(value, prov, qc, manifest):
     assert value["final_test_rows_read"] == 0
     assert value["final_test_used"] is False
     assert prov["final_test_rows_read"] == 0
@@ -265,7 +326,6 @@ def test_resolving_pre02_does_not_open_the_final_test(value, prov, qc, manifest)
 
 
 def test_the_result_is_not_reported_as_superiority_or_inference(value):
-    assert value["interpretation"] == "DEVELOPMENT_OPERATING_POINT_ONLY"
     assert value["is_model_superiority_claim"] is False
     assert value["is_inferential_result"] is False
     assert value["derived_from"] == "pooled_development_oof_only"
@@ -323,8 +383,7 @@ def test_the_readme_reports_the_number_in_english_and_persian():
     assert "0.426878838687" in flat
     assert "0.5916030534351145" in flat
     for phrase in ("exactly one run", "row selection precedes parsing",
-                   "not evidence of model superiority"):
+                   "not admitted", "no later edit can make `pp08` have run"):
         assert phrase.lower() in flat.lower(), phrase
-    for phrase in ("استخراج یک‌باره threshold اجرا شد",
-                   "operating point توسعه", "PRE01"):
+    for phrase in ("نتیجه پذیرفته نشد", "PRE01", "NOT_EXECUTED"):
         assert phrase in flat, phrase

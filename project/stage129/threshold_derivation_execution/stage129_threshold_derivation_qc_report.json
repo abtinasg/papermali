@@ -1,8 +1,9 @@
 {
   "action_counters": {
     "bootstrap_executions": 0,
+    "computations_completed_but_not_admitted_by_this_action": 1,
     "derivation_attempts_started_by_this_action": 1,
-    "derivation_attempts_succeeded_by_this_action": 1,
+    "derivation_attempts_succeeded_by_this_action": 0,
     "final_test_metrics_computed": 0,
     "final_test_predictions": 0,
     "final_test_rows_loaded": 0,
@@ -16,20 +17,29 @@
     "refits_executed": 0,
     "sensitivity_analyses": 0,
     "shap_executions": 0,
-    "thresholds_selected_by_this_action": 1,
+    "thresholds_admitted_by_this_action": 0,
+    "thresholds_computed_by_this_action": 1,
     "tuning_runs": 0
   },
   "action_id": "stage129-threshold-derivation-execution",
-  "all_contractual_controls_passed": true,
-  "all_pass": true,
+  "admission_note": "The computation ran to completion and its outputs are retained for audit history, but an unexecuted contractual control means the result is NOT admitted. The 14-literal agreement spot-check performed during review does not substitute for the contracted check over all 421 real tokens.",
+  "all_contractual_controls_passed": false,
+  "all_pass": false,
   "argmax_member_count": 1,
   "argmax_member_thresholds": [
     0.426878838687
   ],
   "artifact": "threshold_derivation_qc_report",
+  "attempt_terminal_status": "COMPUTATION_COMPLETED_RESULT_NOT_ADMITTED_PP08_NOT_EXECUTED",
   "contractual_control_count": 30,
+  "contractual_controls_failed": 0,
+  "contractual_controls_not_executed": 1,
+  "contractual_controls_not_executed_ids": [
+    "PP08"
+  ],
+  "contractual_controls_passed": 29,
   "control_count": 30,
-  "control_count_note": "30 contractual controls (TD01-TD18, PP01-PP12) plus 1 supplementary check (SUP01). An earlier version of this report counted 31 controls by including the supplementary check; that was a reporting error, corrected without repeating the derivation.",
+  "control_count_note": "30 contractual controls (TD01-TD18, PP01-PP12) plus 1 supplementary check (SUP01, non-contractual). Of the 30 contractual controls: 29 PASS, 0 FAIL, 1 NOT_EXECUTED (PP08). An earlier version of this report counted 31 controls by including the supplementary check among the contractual ones, and recorded PP08 as PASS; both were reporting errors, corrected without repeating the derivation.",
   "controls": [
     {
       "detail": "input matches pinned SHA-256 and 214784 bytes",
@@ -102,9 +112,13 @@
       "result": "PASS"
     },
     {
-      "detail": "captured groups converted to IEEE-754 binary64",
+      "clause_a_conversion_to_binary64": "PERFORMED",
+      "clause_b_numpy_float_agreement_over_all_tokens": "NOT_PERFORMED",
+      "correction_note": "This entry was originally recorded PASS. That was inaccurate: only clause (a) had been performed. The entry is corrected here to state what the past run actually did. NOTHING was re-executed, and no later edit can make PP08 have run.",
+      "detail": "Clause (a) PERFORMED: captured groups were converted to IEEE-754 binary64 via the built-in float() on the regex capture group. Clause (b) NOT PERFORMED: the contracted re-check that numpy.float64(group) == float(group) for every parsed token was never run -- numpy was not imported by the executor and no comparison was made over the 421 tokens.",
       "id": "PP08",
-      "result": "PASS"
+      "originally_recorded_as": "PASS",
+      "result": "NOT_EXECUTED"
     },
     {
       "detail": "no row was skipped, defaulted or imputed; a rejected token would have aborted",
@@ -183,13 +197,18 @@
     }
   ],
   "cumulative_counters": {
+    "admitted_derivations": 0,
+    "computations_completed_but_not_admitted": 1,
     "cumulative_note": "The PR #93 abort record is preserved verbatim and is not rewritten. These totals span both attempts.",
     "prior_aborted_attempts": 1,
     "prior_attempt_record": "project/stage129/threshold_derivation_abort_and_parse_rule_lock/stage129_threshold_derivation_abort_record.json",
     "prior_attempt_record_sha256": "17de5e2047f07e110fd74669374f14dd1212ec78fdb6952a65c26ee6a1cdc122",
     "prior_attempt_terminal_status": "ABORT_THRESHOLD_DERIVATION",
-    "successful_attempts": 1,
+    "successful_attempts": 0,
+    "successful_attempts_note": "Previously recorded as 1. Corrected: a computation whose QC is incomplete is not a successful admitted derivation.",
     "total_derivation_attempts_started": 2,
+    "total_thresholds_admitted": 0,
+    "total_thresholds_computed": 1,
     "total_thresholds_materialized": 1
   },
   "evaluable_rows": 421,
@@ -210,6 +229,10 @@
   },
   "non_evaluable_rows_excluded": 0,
   "probability_tokens_parsed": 421,
+  "qc_complete": false,
+  "qc_incomplete_reason": "PP08_CLAUSE_B_NOT_EXECUTED",
+  "result_admission_status": "COMPUTED_BUT_NOT_ADMITTED_QC_INCOMPLETE",
+  "result_admitted": false,
   "selected_rows": 421,
   "selected_threshold": 0.426878838687,
   "supplementary_check_count": 1,
