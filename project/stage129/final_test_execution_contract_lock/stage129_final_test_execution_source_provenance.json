@@ -1,0 +1,98 @@
+{
+  "action_id": "stage129-final-test-execution-contract-lock",
+  "every_contract_term_traces_to_one_of_these_artifacts": true,
+  "extraction_is_read_only": true,
+  "no_final_test_artifact_is_a_source": true,
+  "no_source_contains_final_test_row_level_data": true,
+  "source_artifact_count": 17,
+  "source_artifacts_sha256": {
+    "project/stage125/part4_hyperparameter_budget_stage125.json": {
+      "bytes": 1872,
+      "sha256": "22d6989681a7cd59ffbf57077910615ce00adb9f171d303d5d61100a54490b40",
+      "supplies": "seed and determinism terms; bootstrap seed reference"
+    },
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json": {
+      "bytes": 1973,
+      "sha256": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
+      "supplies": "primary and secondary metrics, top-K definitions, threshold rule and tie-break, bootstrap parameters, calibration terms, multiplicity family and alpha"
+    },
+    "project/stage125/part4_model_specifications_stage125.json": {
+      "bytes": 1409,
+      "sha256": "ef933be3eb2f75e6f493ac1401100c629bdb83850c81950d8f235c5ccf4cdb21",
+      "supplies": "imbalance handling for the primary specification"
+    },
+    "project/stage125/part4_preprocessing_contract_stage125.json": {
+      "bytes": 2051,
+      "sha256": "3722bd6165574c78aef1138a810ff4863b5c214f80df197889eaa40163f0e415",
+      "supplies": "the eight-step continuous pipeline, forbidden_fit_on, final-test mask rule, forbidden selection methods, and the apply_once_to_locked_final_test clause"
+    },
+    "project/stage125/part4_statistical_analysis_plan_stage125.json": {
+      "bytes": 27695,
+      "sha256": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
+      "supplies": "primary sample, primary target, target_state_contract, excluded feature status and sign convention"
+    },
+    "project/stage125/part4_temporal_split_contract_stage125.json": {
+      "bytes": 1138,
+      "sha256": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
+      "supplies": "final_test_target_years, expected final-test counts as frozen metadata, manifest allowed columns and manifest prohibitions, split variable"
+    },
+    "project/stage126/metadata_and_hashes_stage126_m1_primary_development_tuning.json": {
+      "bytes": 2365,
+      "sha256": "c19235fca319001fd77c7fc26769eff188bb8ecb158a284251773c0d564783f5",
+      "supplies": "the locked development runtime versions"
+    },
+    "project/stage126/stage126_m1_development_metrics.csv": {
+      "bytes": 1415,
+      "sha256": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+      "supplies": "pooled development-OOF positive count for the selected model (35), used only to show the recalibration skip rule does not trigger"
+    },
+    "project/stage126/stage126_m1_development_oof_predictions.csv": {
+      "bytes": 214784,
+      "sha256": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+      "supplies": "the pinned identity of the development-OOF surface from which an F2 threshold would be derived IF that were ever authorized. This action did not read its rows and did not derive any threshold."
+    },
+    "project/stage126/stage126_m1_primary_development_lock.json": {
+      "bytes": 1731,
+      "sha256": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4",
+      "supplies": "M1_PRIMARY_FEATURE_ORDER, sample and target, locked final-test status flags"
+    },
+    "project/stage126/stage126_m1_retained_design_freeze.json": {
+      "bytes": 15303,
+      "sha256": "53beb8603de48bdeed33858093f40dc0e89bf6f86cb97534a86dff32b74a2876",
+      "supplies": "retained model families and the frozen hyperparameter block for the selected configuration"
+    },
+    "project/stage129/final_model_human_selection_governance/stage129_final_model_human_selection_decision.json": {
+      "bytes": 4812,
+      "sha256": "b5a6f08466fb325559d28cc69d1c8f227403483e0613be6b7de403d08fa2c064",
+      "supplies": "the human selection of block M1, algorithm regularized_logistic_regression and configuration logistic__C_0.1, and its basis"
+    },
+    "project/stage129/full_development_refit_contract_lock/stage129_full_development_refit_contract.json": {
+      "bytes": 15978,
+      "sha256": "300fb32f8acdcc5e2b3c6c6584ba3bdde2faa977ad7c0be2e8eaa7866660ff0b",
+      "supplies": "the predecessor contract, including the final_test_boundary clauses this contract continues"
+    },
+    "project/stage129/full_development_refit_execution/stage129_full_development_refit_model.json": {
+      "bytes": 2115,
+      "sha256": "48faab1ef186206508385713fb3b885a88a55bb072fb586d56e63d2777c97690",
+      "supplies": "the accepted fitted model: intercept, 18 coefficients, design matrix columns and hyperparameters"
+    },
+    "project/stage129/full_development_refit_execution/stage129_full_development_refit_preprocessing_parameters.json": {
+      "bytes": 2422,
+      "sha256": "862c65ec37082be1e3e95c29d2bf8873df9105e90cc43ce1ecac4fd8901ba9f6",
+      "supplies": "the fit-set clipping bounds, medians and standardization mean/std that must be applied unchanged"
+    },
+    "project/stage129/full_development_refit_execution/stage129_full_development_refit_provenance_record.json": {
+      "bytes": 1693,
+      "sha256": "4b1aa9a6c85208713f250b5ac3fe71f56c4a8398c3834855926e29a43ad8f07d",
+      "supplies": "pinned input hashes, runtime versions and the fit-set definition"
+    },
+    "project/stage129/full_development_refit_execution/stage129_full_development_refit_qc_report.json": {
+      "bytes": 3587,
+      "sha256": "e874ee5bdf2510f6c630f170482ca7a13f50ab73c7838550e9412c372c5ee63c",
+      "supplies": "the refit fail-closed results and its zeroed final-test counters"
+    }
+  },
+  "sources_modified_by_this_action": false,
+  "threshold_value_found_in_any_source": false,
+  "threshold_value_search_note": "All 17 sources were searched for a materialized development-OOF F2-maximizing threshold value. Only the RULE and the TIE-BREAK exist, in part4_metrics_uncertainty_contract_stage125.json#thresholded_secondary. No numeric value is committed anywhere in the repository."
+}
