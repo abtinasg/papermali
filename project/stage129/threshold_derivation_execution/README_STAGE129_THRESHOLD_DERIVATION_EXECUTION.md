@@ -2,7 +2,7 @@
 
 **Action id:** `stage129-threshold-derivation-execution`
 **Contracts executed:** `stage129_threshold_derivation_algorithm_contract` (PR #92) and `stage129_predicted_probability_parse_rule_contract` (PR #93)
-**Result:** all 31 controls PASS · exactly **1** threshold selected · `final_test_rows_read = 0`
+**Result:** all **30** contractual controls PASS (+1 supplementary check) · exactly **1** threshold selected · `final_test_rows_read = 0`
 
 This is the second attempt. The first, recorded in PR #93, aborted on the
 serialization defect. That record is preserved verbatim and is **not** rewritten.
@@ -31,6 +31,18 @@ from the recorded confusion counts and equal to the recorded F2.
 **This is a development operating point, nothing more.** It is not evidence of
 model superiority, not a test statistic, and carries no inference. It exists so
 a future, separately authorized evaluation has a threshold to apply.
+
+## Controls: 30 contractual, plus one supplementary check
+
+`TD01`–`TD18` and `PP01`–`PP12` are the **30** contractual controls and all
+PASS. The executor additionally recorded one observation about parse scope. It
+is **not** a contracted control, so it is carried separately as `SUP01` with a
+non-`TD`/`PP` identifier and `classification: SUPPLEMENTARY_QC_CHECK`.
+
+An earlier version of this package reported "31 controls" by counting the
+supplementary check among the contractual ones. That was a reporting error and
+is corrected here **without repeating the derivation** — the threshold, its F2
+and the confusion counts are untouched.
 
 ## Exactly one run
 
@@ -156,7 +168,7 @@ F2 از شمارش‌های ثبت‌شده بررسی شد، نه با تکرا
 
 - `stage129_threshold_value.json` — the threshold, its F2 and confusion counts.
 - `stage129_threshold_derivation_provenance_record.json` — contract hashes, input hash, counts, parse regex, runtime.
-- `stage129_threshold_derivation_qc_report.json` — the 31 controls, the tie-break proof, action and cumulative counters.
+- `stage129_threshold_derivation_qc_report.json` — the 30 contractual controls, the SUP01 supplementary check, the tie-break proof, action and cumulative counters.
 - `metadata_and_hashes_stage129_threshold_derivation_execution.json`.
 
 Executor: `project/src/stage129_threshold_derivation.py`.

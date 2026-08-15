@@ -20,13 +20,16 @@
     "tuning_runs": 0
   },
   "action_id": "stage129-threshold-derivation-execution",
+  "all_contractual_controls_passed": true,
   "all_pass": true,
   "argmax_member_count": 1,
   "argmax_member_thresholds": [
     0.426878838687
   ],
   "artifact": "threshold_derivation_qc_report",
-  "control_count": 31,
+  "contractual_control_count": 30,
+  "control_count": 30,
+  "control_count_note": "30 contractual controls (TD01-TD18, PP01-PP12) plus 1 supplementary check (SUP01). An earlier version of this report counted 31 controls by including the supplementary check; that was a reporting error, corrected without repeating the derivation.",
   "controls": [
     {
       "detail": "input matches pinned SHA-256 and 214784 bytes",
@@ -111,11 +114,6 @@
     {
       "detail": "parsed 421 of 421 read tokens; none silently dropped",
       "id": "PP11",
-      "result": "PASS"
-    },
-    {
-      "detail": "probabilities parsed for the selected evaluable rows only; the other 842 rows' tokens were never converted to numbers",
-      "id": "TD05_parse_scope",
       "result": "PASS"
     },
     {
@@ -214,6 +212,17 @@
   "probability_tokens_parsed": 421,
   "selected_rows": 421,
   "selected_threshold": 0.426878838687,
+  "supplementary_check_count": 1,
+  "supplementary_checks": [
+    {
+      "classification": "SUPPLEMENTARY_QC_CHECK",
+      "contractual": false,
+      "detail": "probabilities parsed for the selected evaluable rows only; the other 842 rows' tokens were never converted to numbers",
+      "id": "SUP01",
+      "note": "Not a contracted control. TD01-TD18 and PP01-PP12 are the 30 contractual controls; this is an extra observation the executor recorded about parse scope. It is retained for transparency and carries a non-TD/PP identifier so it can never be miscounted as contractual.",
+      "result": "PASS"
+    }
+  ],
   "tie_break_applied": false,
   "tie_break_proof": "the maximum F2 was computed first; every candidate attaining it was collected into an explicit argmax set; max() was taken over that set; a post-check re-asserted that no member exceeds the selection",
   "tie_break_rule": "higher_threshold",

@@ -178,16 +178,31 @@ def test_the_executor_refuses_to_run_without_write():
     assert "Refusing to run without --write" in src
 
 
-def test_all_controls_passed(qc):
+def test_the_thirty_contractual_controls_passed(qc):
+    """TD01-TD18 and PP01-PP12 are the 30 contractual controls -- no more."""
     assert qc["all_pass"] is True
-    assert qc["control_count"] == len(qc["controls"]) == 31
+    assert qc["all_contractual_controls_passed"] is True
+    assert qc["contractual_control_count"] == 30
+    assert qc["control_count"] == len(qc["controls"]) == 30
     ids = {c["id"] for c in qc["controls"]}
-    for i in range(1, 19):
-        assert f"TD{i:02d}" in ids, f"TD{i:02d}"
-    for i in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12):
-        assert f"PP{i:02d}" in ids, f"PP{i:02d}"
+    assert ids == ({f"TD{i:02d}" for i in range(1, 19)}
+                   | {f"PP{i:02d}" for i in range(1, 13)})
     for c in qc["controls"]:
         assert c["result"] == "PASS", c["id"]
+
+
+def test_the_supplementary_check_is_not_counted_as_contractual(qc):
+    """A non-contracted observation must never inflate the control count."""
+    supp = qc["supplementary_checks"]
+    assert qc["supplementary_check_count"] == len(supp) == 1
+    entry = supp[0]
+    assert entry["classification"] == "SUPPLEMENTARY_QC_CHECK"
+    assert entry["contractual"] is False
+    assert not entry["id"].startswith(("TD", "PP")), entry["id"]
+    assert entry["id"] == "SUP01"
+    # and it is absent from the contractual list
+    assert entry["id"] not in {c["id"] for c in qc["controls"]}
+    assert "31" in qc["control_count_note"], "the earlier miscount must be disclosed"
 
 
 # --------------------------------------------- the earlier abort survives
