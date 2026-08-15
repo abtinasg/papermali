@@ -1,0 +1,41 @@
+{
+  "action_id": "stage129-threshold-derivation-algorithm-contract-lock",
+  "action_type": "algorithm_contract_audit_and_lock_only_no_derivation",
+  "contract_status": "PROSPECTIVELY_LOCKED_NOT_EXECUTED",
+  "credentials_committed_to_git": false,
+  "development_oof_probability_values_read": 0,
+  "fail_closed_control_count": 18,
+  "final_test_access_authorized": false,
+  "final_test_artifacts_committed": 0,
+  "final_test_rows_read": 0,
+  "human_supplied_term_count": 6,
+  "model_artifacts_committed": 0,
+  "model_fits_executed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "new_metric_files_committed": 0,
+  "package_file_count": 4,
+  "package_files": {
+    "README_STAGE129_THRESHOLD_DERIVATION_ALGORITHM_CONTRACT_LOCK.md": {
+      "bytes": 8399,
+      "sha256": "8326b0482afbaf90f55cc9024ff611a92edbf98c298ef8433d8993e9854d5b6f"
+    },
+    "stage129_threshold_derivation_algorithm_contract.json": {
+      "bytes": 16549,
+      "sha256": "0683d0b4da005121dcad80c11b934d164b99bdc9e4cb3ba95843ca0b4b5a160c"
+    },
+    "stage129_threshold_derivation_algorithm_governance_boundary.json": {
+      "bytes": 5582,
+      "sha256": "bd79cb4878730df327b91f7ac082265cca91de7fbf95459707f3d8b38273db15"
+    },
+    "stage129_threshold_derivation_algorithm_source_provenance.json": {
+      "bytes": 5657,
+      "sha256": "fb3d4d4e9811a928200e3901cb6bf6306143ef886ba95fb1eba03ef335a77680"
+    }
+  },
+  "pii_committed_to_git": false,
+  "pre02_resolved_by_this_action": false,
+  "source_artifact_count": 9,
+  "threshold_derivation_authorized": false,
+  "threshold_values_materialized": 0,
+  "trained_model_artifacts_committed": 0
+}

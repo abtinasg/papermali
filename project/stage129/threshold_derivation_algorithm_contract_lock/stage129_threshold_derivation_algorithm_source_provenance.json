@@ -1,0 +1,102 @@
+{
+  "action_id": "stage129-threshold-derivation-algorithm-contract-lock",
+  "extraction_is_read_only": true,
+  "sources_modified_by_this_action": false,
+  "no_final_test_artifact_is_a_source": true,
+  "no_source_row_values_were_read": true,
+  "source_artifact_count": 9,
+
+  "every_contract_term_traces_to_one_of_these_artifacts": false,
+  "traceability_note": "Eight terms are extracted from the artifacts below and each carries its source key. SIX terms are NOT traceable to any frozen artifact because no frozen artifact defines them; they were supplied by a human supervisor after the gap was audited and reported. They are listed separately so no future reader mistakes a decision for a rule.",
+
+  "source_artifacts_sha256": {
+    "project/stage125/part4_metrics_uncertainty_contract_stage125.json": {
+      "bytes": 1973,
+      "sha256": "117ddf3ecf688032a3baba4843a477e58890a33b2ad80c26574c33c949ae7760",
+      "supplies": "the threshold rule name, the higher_threshold tie-break and never_optimize_on_final_test"
+    },
+    "project/stage125/part4_statistical_analysis_plan_stage125.json": {
+      "bytes": 27695,
+      "sha256": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
+      "supplies": "target_state_contract semantics, including missing_never_counted_as_negative"
+    },
+    "project/stage125/part4_temporal_split_contract_stage125.json": {
+      "bytes": 1138,
+      "sha256": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
+      "supplies": "development and final-test target years, used by TD03 to prove the input is development-only"
+    },
+    "project/stage126/metadata_and_hashes_stage126_m1_primary_development_tuning.json": {
+      "bytes": 2365,
+      "sha256": "c19235fca319001fd77c7fc26769eff188bb8ecb158a284251773c0d564783f5",
+      "supplies": "the locked development runtime versions"
+    },
+    "project/stage126/stage126_m1_development_oof_predictions.csv": {
+      "bytes": 214784,
+      "sha256": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+      "supplies": "the pinned identity of the only authorized input. Its SHA-256, byte count and header row were read. NO predicted_probability or observed_target value was read by this action."
+    },
+    "project/stage126/stage126_m1_primary_development_lock.json": {
+      "bytes": 1731,
+      "sha256": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4",
+      "supplies": "pooled_oof_rows_per_family = 421, the expected filtered row count, and the selected configuration per family"
+    },
+    "project/stage126/stage126_m1_retained_design_freeze.json": {
+      "bytes": 15303,
+      "sha256": "53beb8603de48bdeed33858093f40dc0e89bf6f86cb97534a86dff32b74a2876",
+      "supplies": "the pooled_development_oof scope name and the non-authoritative restatement of the same threshold rule and tie-break"
+    },
+    "project/stage129/final_model_human_selection_governance/stage129_final_model_human_selection_decision.json": {
+      "bytes": 4812,
+      "sha256": "b5a6f08466fb325559d28cc69d1c8f227403483e0613be6b7de403d08fa2c064",
+      "supplies": "the selected block M1, algorithm regularized_logistic_regression and configuration logistic__C_0.1"
+    },
+    "project/stage129/final_test_execution_contract_lock/stage129_final_test_execution_contract.json": {
+      "bytes": 29892,
+      "sha256": "036d85f8b095e0cd7e55afb899283c71f957234ce4740085a20c2d81a617074e",
+      "supplies": "the PRE02 gap this algorithm contract was written in response to, and the boundary clauses it must not weaken"
+    }
+  },
+
+  "human_supplied_terms_not_traceable_to_any_frozen_artifact": [
+    {
+      "term": "candidate_threshold_set_definition",
+      "value": "exactly the distinct predicted_probability values of the filtered input",
+      "why_not_traceable": "No frozen artifact enumerates or constrains the candidate set, even though the locked higher_threshold tie-break presupposes one exists."
+    },
+    {
+      "term": "positive_prediction_comparison_operator",
+      "value": ">=",
+      "why_not_traceable": "No frozen artifact states whether a probability equal to the threshold predicts positive. With candidates drawn from the observed values this choice changes the confusion counts."
+    },
+    {
+      "term": "f2_beta_and_closed_form_formula",
+      "value": "beta = 2; F2 = 5*TP / (5*TP + 4*FN + FP)",
+      "why_not_traceable": "The frozen record names 'F2' but never states beta or a formula."
+    },
+    {
+      "term": "zero_denominator_convention",
+      "value": "F2 = 0 when 5*TP + 4*FN + FP == 0",
+      "why_not_traceable": "No frozen artifact defines the degenerate case."
+    },
+    {
+      "term": "no_rounding_before_selection",
+      "value": "rounding and truncation are both forbidden before selection",
+      "why_not_traceable": "No frozen artifact addresses numeric discipline during threshold selection."
+    },
+    {
+      "term": "output_precision_requirement",
+      "value": "round_trip_exact: float(str(value)) == value",
+      "why_not_traceable": "No frozen artifact specifies the recorded precision of the threshold."
+    }
+  ],
+
+  "rejected_implementation": {
+    "path": "project/src/metrics.py",
+    "symbol": "pick_threshold",
+    "authorized": false,
+    "referenced_by_merged_contract_count": 0,
+    "imported_by_locked_development_pipeline": false,
+    "contradicts_locked_tie_break": true,
+    "note": "Its ascending scan keeps the first, and therefore lowest, maximizing candidate, while the locked tie-break requires the highest. It also builds a 200-point linear grid unioned with synthetic 0.0/1.0 endpoints, none of which any contract fixes."
+  }
+}
