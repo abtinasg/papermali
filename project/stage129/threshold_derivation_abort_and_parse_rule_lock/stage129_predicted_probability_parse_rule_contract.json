@@ -1,0 +1,252 @@
+{
+  "action_id": "stage129-threshold-derivation-abort-and-parse-rule-lock",
+  "contract_id": "stage129_predicted_probability_parse_rule_contract",
+  "contract_status": "PROSPECTIVELY_LOCKED_NOT_EXECUTED",
+  "contract_version": "stage129_predicted_probability_parse_rule_contract_v1",
+
+  "purpose": "Define, before any value is parsed for scientific use, how a predicted_probability token stored as a numpy repr is interpreted as a number. This is a SERIALIZATION INTERPRETATION rule. It is not data cleaning.",
+
+  "provenance_of_terms": {
+    "every_term_is_extracted_from_a_prelocked_artifact": false,
+    "some_terms_are_supplied_by_human_decision": true,
+    "basis_for_supplied_terms": "HUMAN_DECISION_RESOLVING_A_RECORDED_SERIALIZATION_DEFECT",
+    "defect_recorded_in": "stage129_threshold_derivation_abort_record",
+    "supplied_terms_do_not_retroactively_create_a_frozen_rule": true,
+    "human_supplied_terms": [
+      "wrapper_token_grammar",
+      "anchored_regex_extraction_requirement",
+      "code_evaluation_prohibition",
+      "decimal_grammar_and_finiteness_requirement",
+      "rejection_set",
+      "binary64_conversion_semantics",
+      "serialization_interpretation_not_cleaning_classification",
+      "original_file_immutability_requirement"
+    ]
+  },
+
+  "applies_to": {
+    "artifact": "project/stage126/stage126_m1_development_oof_predictions.csv",
+    "artifact_sha256": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "column": "predicted_probability",
+    "scope": "reading only; the artifact is never modified",
+    "no_other_column_is_parsed_by_this_rule": true,
+    "no_other_artifact_is_in_scope": true
+  },
+
+  "token_grammar": {
+    "required_form": "np.float64(<decimal>)",
+    "token_must_be_ascii": true,
+    "token_must_be_ascii_note": "Checked explicitly. Python's \\d matches Unicode decimal digits, so a non-ASCII digit could otherwise satisfy a naive pattern and parse to an unintended value. The pattern below uses [0-9] rather than \\d for the same reason.",
+    "leading_or_trailing_whitespace_permitted": false,
+    "internal_whitespace_permitted": false,
+    "nested_or_repeated_wrapper_permitted": false,
+    "prefix_permitted": false,
+    "suffix_permitted": false
+  },
+
+  "extraction": {
+    "method": "fullmatch_anchored_regular_expression",
+    "regex": "^np\\.float64\\((?P<decimal>[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?)\\)$",
+    "regex_is_anchored": true,
+    "regex_uses_ascii_digit_class_not_backslash_d": true,
+    "capture_group": "decimal",
+    "eval_authorized": false,
+    "exec_authorized": false,
+    "ast_literal_eval_authorized": false,
+    "general_code_parser_authorized": false,
+    "code_evaluation_prohibition_note": "The token is text that happens to resemble a Python expression. Evaluating it would execute repository data as code. Extraction is by anchored regex only.",
+    "numpy_import_required_for_extraction": false,
+    "partial_match_authorized": false,
+    "search_instead_of_fullmatch_authorized": false
+  },
+
+  "decimal_grammar": {
+    "sign": "optional_single_leading_plus_or_minus",
+    "integer_part": "optional_when_a_fractional_part_is_present",
+    "fractional_part": "optional",
+    "exponent": "optional_e_or_E_with_optional_sign_and_at_least_one_digit",
+    "must_be_finite": true,
+    "digits_must_be_ascii_0_to_9": true,
+    "hexadecimal_authorized": false,
+    "underscore_digit_separator_authorized": false,
+    "thousands_separator_authorized": false
+  },
+
+  "rejection_set": {
+    "note": "Every case below aborts. There is no fallback, no default value and no skip-the-row behaviour.",
+    "on_any_rejection": "ABORT_THRESHOLD_DERIVATION",
+    "rejected": [
+      "NaN",
+      "nan",
+      "Inf",
+      "inf",
+      "-Inf",
+      "Infinity",
+      "any_non_finite_literal",
+      "leading_or_trailing_whitespace",
+      "internal_whitespace",
+      "nested_wrapper_such_as_np_float64_np_float64_value",
+      "repeated_wrapper",
+      "any_prefix_before_np_float64",
+      "any_suffix_after_the_closing_parenthesis",
+      "a_bare_decimal_with_no_wrapper",
+      "an_empty_token",
+      "a_non_ascii_digit",
+      "a_hexadecimal_or_underscore_separated_literal",
+      "any_token_not_matching_the_anchored_regex"
+    ],
+    "row_skipping_on_rejection_authorized": false,
+    "default_or_sentinel_substitution_authorized": false,
+    "imputation_on_rejection_authorized": false
+  },
+
+  "conversion": {
+    "target_type": "IEEE_754_binary64",
+    "semantics": "the numpy.float64 constructor semantics of the locked runtime applied to the captured decimal group",
+    "locked_runtime_numpy_version": "2.4.6",
+    "locked_runtime_python_version": "3.13.5",
+    "equivalent_to_python_float_on_the_captured_group": true,
+    "equivalent_note": "numpy.float64(s) and float(s) agree on a finite ASCII decimal literal in the locked runtime. The contract names numpy.float64 because that is the constructor whose repr produced the token; a conforming implementation may use either, and a control re-checks agreement.",
+    "rounding_applied_during_conversion": "IEEE_754_round_to_nearest_even_only_as_inherent_to_binary64",
+    "additional_rounding_authorized": false,
+    "truncation_authorized": false,
+    "rounding_after_parse_and_before_selection_authorized": false,
+    "precision_loss_beyond_binary64_authorized": false
+  },
+
+  "classification": {
+    "this_is": "serialization_interpretation",
+    "this_is_not": [
+      "data_cleaning",
+      "rounding",
+      "imputation",
+      "correction",
+      "normalisation",
+      "outlier_handling",
+      "any_modification_of_the_underlying_data"
+    ],
+    "underlying_numeric_content_is_unchanged_by_parsing": true,
+    "parsing_is_a_read_operation_only": true
+  },
+
+  "immutability": {
+    "original_file_must_remain_byte_identical": true,
+    "original_file_sha256": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "cleaned_copy_authorized": false,
+    "rewritten_or_normalised_replacement_authorized": false,
+    "in_place_edit_authorized": false,
+    "cascade_of_dependent_pinned_hashes_authorized": false,
+    "cascade_note": "This file's SHA-256 is pinned in many committed artifacts. Rewriting it would invalidate every one of them. The parse rule exists precisely so the file never has to change."
+  },
+
+  "unchanged_terms_of_the_merged_algorithm_contract": {
+    "note": "PR #92 stays in force in every other respect. This contract inserts a parse step between reading a token and treating it as a number, and changes nothing else.",
+    "algorithm_contract_id": "stage129_threshold_derivation_algorithm_contract",
+    "algorithm_contract_path": "project/stage129/threshold_derivation_algorithm_contract_lock/stage129_threshold_derivation_algorithm_contract.json",
+    "algorithm_contract_sha256": "0683d0b4da005121dcad80c11b934d164b99bdc9e4cb3ba95843ca0b4b5a160c",
+    "algorithm_contract_modified_by_this_action": false,
+    "candidate_set": "the distinct NUMERIC VALUES obtained by applying this parse rule to the stored tokens",
+    "comparison_operator": ">=",
+    "objective_beta": 2,
+    "objective_closed_form": "5*TP / (5*TP + 4*FN + FP)",
+    "zero_denominator_convention": "F2 = 0",
+    "tie_break": "largest threshold across the full argmax set",
+    "no_rounding_before_selection": true,
+    "output_precision_requirement": "round_trip_exact",
+    "pick_threshold_authorized": false
+  },
+
+  "fail_closed_controls": [
+    {
+      "id": "PP01",
+      "check": "the input file SHA-256 still equals 48a00c88...3326749 and the file was not modified",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "PP02",
+      "check": "every predicted_probability token is ASCII",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "PP03",
+      "check": "every token fullmatches the anchored regex; a search-style or partial match is never accepted",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "PP04",
+      "check": "no token carries leading, trailing or internal whitespace, a prefix, a suffix, or a nested or repeated wrapper",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "PP05",
+      "check": "the captured decimal is finite; NaN, Inf and every non-finite literal are rejected",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "PP06",
+      "check": "eval, exec, ast.literal_eval and every general code parser are absent from the parse path",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "PP07",
+      "check": "the digit class used is [0-9] and no Unicode decimal digit can satisfy the pattern",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "PP08",
+      "check": "conversion yields IEEE-754 binary64 and numpy.float64(group) equals float(group) for every parsed token in the locked runtime",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "PP09",
+      "check": "no rounding or truncation is applied after parsing and before selection",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "PP10",
+      "check": "no row is skipped, defaulted, imputed or substituted on a rejected token; the run aborts instead",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "PP11",
+      "check": "the parsed token count equals the read token count exactly, so no token is silently dropped",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    },
+    {
+      "id": "PP12",
+      "check": "the original CSV is byte-identical after the run and no cleaned, normalised or rewritten copy exists anywhere in the repository",
+      "on_failure": "ABORT_THRESHOLD_DERIVATION"
+    }
+  ],
+
+  "relationship_to_pre02": {
+    "this_lock_resolves_pre02": false,
+    "pre02_status_after_this_lock": "UNRESOLVED",
+    "pre01_status_after_this_lock": "UNRESOLVED",
+    "final_test_contract_fully_executable": false,
+    "note": "PRE02 requires the threshold VALUE in a committed artifact. This action defines how a stored token becomes a number and derives nothing, so PRE02 stands unresolved."
+  },
+
+  "execution_authorization": {
+    "parse_executed_by_this_action": false,
+    "probability_values_reread_by_this_action": 0,
+    "threshold_derivation_authorized_by_this_contract": false,
+    "threshold_derivation_requires_new_explicit_human_authorization": true,
+    "threshold_value_materialized": false,
+    "threshold_value": null,
+    "contract_lock_is_not_an_execution_permission": true,
+    "model_fit_authorized": false,
+    "refit_authorized": false,
+    "recalibration_authorized": false,
+    "final_test_execution_authorized": false,
+    "final_test_access_authorized": false,
+    "final_test_rows_read": 0,
+    "stage130_authorized": false,
+    "stage130_started": false,
+    "ready_for_review_authorized": false,
+    "merge_authorized": false,
+    "next_action_id": "human_authorization_required_for_threshold_derivation_re_execution",
+    "next_action_authorized": false,
+    "pointer_is_not_authorization": true
+  }
+}

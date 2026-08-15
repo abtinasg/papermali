@@ -3030,6 +3030,11 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # marker function polices the provenance split rather than assuming it.
         # It derives no value, reads no probability, and leaves PRE02 unresolved.
         **derive_stage129_threshold_derivation_algorithm_markers(root),
+        # Must come last of all: the aborted-derivation record and the parse
+        # rule lock. The record must not flatter itself with a silent zero, and
+        # the parse rule must actually reject what it claims to reject -- the
+        # generator compiles the pattern and tries it. Neither resolves PRE02.
+        **derive_stage129_threshold_abort_and_parse_rule_markers(root),
         }))
 
 
@@ -15301,6 +15306,328 @@ def derive_stage129_threshold_derivation_algorithm_markers(root: str) -> dict:
 
         "stage129_threshold_algorithm_next_action_id": _STAGE129_TD_NEXT_ACTION_ID,
         "stage129_threshold_algorithm_next_action_authorized": False,
+    }
+
+_STAGE129_PP_PKG = "project/stage129/threshold_derivation_abort_and_parse_rule_lock"
+_STAGE129_PP_ACTION_ID = "stage129-threshold-derivation-abort-and-parse-rule-lock"
+_STAGE129_PP_ABORT_REL = (
+    f"{_STAGE129_PP_PKG}/stage129_threshold_derivation_abort_record.json")
+_STAGE129_PP_PARSE_REL = (
+    f"{_STAGE129_PP_PKG}/stage129_predicted_probability_parse_rule_contract.json")
+_STAGE129_PP_BOUNDARY_REL = (
+    f"{_STAGE129_PP_PKG}/stage129_threshold_derivation_abort_and_parse_rule"
+    "_governance_boundary.json")
+_STAGE129_PP_STATUS = "PROSPECTIVELY_LOCKED_NOT_EXECUTED"
+_STAGE129_PP_FAIL_CLOSED_IDS = tuple(f"PP{i:02d}" for i in range(1, 13))
+_STAGE129_PP_NEXT_ACTION_ID = (
+    "human_authorization_required_for_threshold_derivation_re_execution")
+_STAGE129_PP_OOF_REL = "project/stage126/stage126_m1_development_oof_predictions.csv"
+_STAGE129_PP_OOF_SHA = (
+    "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749")
+
+
+def derive_stage129_threshold_abort_and_parse_rule_markers(root: str) -> dict:
+    """Recognize the aborted-derivation record and the parse rule lock.
+
+    Two artifacts with two different ways of going wrong.
+
+    The abort record can go wrong by FLATTERING ARITHMETIC -- reporting a
+    counter as 0 because the true number is unprovable or unflattering. So the
+    generator refuses a record that claims zero attempts, and refuses one whose
+    unprovable count has been quietly zeroed instead of carrying
+    UNKNOWN_NOT_ZERO. The counters that must genuinely be zero are checked
+    separately and strictly.
+
+    The parse rule can go wrong by being PERMISSIVE. A pattern that looks strict
+    but admits NaN, a nested wrapper or a Unicode digit would let an unintended
+    value through. So the generator compiles the contracted regex and runs it
+    against an accept/reject corpus, and refuses a pattern built on \\d.
+
+    Neither may resolve PRE02, and the frozen OOF file must not move.
+
+    Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE129_PP_PARSE_REL)
+    if not os.path.isfile(path):
+        return {}
+    abort = _require_json_artifact(root, _STAGE129_PP_ABORT_REL)
+    parse = _require_json_artifact(root, _STAGE129_PP_PARSE_REL)
+    boundary = _require_json_artifact(root, _STAGE129_PP_BOUNDARY_REL)
+
+    for artifact, label in ((abort, "abort record"), (parse, "parse contract"),
+                            (boundary, "boundary")):
+        if artifact.get("action_id") != _STAGE129_PP_ACTION_ID:
+            raise HandoffError(f"Stage129 parse rule {label} action_id mismatch")
+    for artifact, label in ((parse, "parse contract"), (boundary, "boundary")):
+        if artifact.get("contract_status") != _STAGE129_PP_STATUS:
+            raise HandoffError(
+                f"Stage129 parse rule {label} status must be {_STAGE129_PP_STATUS}")
+
+    # (1) The abort record admits an attempt happened.
+    attempt = abort.get("attempt") or {}
+    if attempt.get("derivation_attempts_started") != 1:
+        raise HandoffError(
+            "Stage129 abort record must record exactly one started attempt; a "
+            "run that happened may not be reported as never having happened")
+    if attempt.get("derivation_attempts_completed") != 0 or \
+            attempt.get("terminal_status") != "ABORT_THRESHOLD_DERIVATION":
+        raise HandoffError(
+            "Stage129 abort record must record the attempt as aborted, not completed")
+    if not attempt.get("abort_mechanism") or not attempt.get("raised_exception"):
+        raise HandoffError(
+            "Stage129 abort record must state how the run actually terminated")
+
+    counters = abort.get("counters") or {}
+    for field in ("f2_candidates_evaluated", "f2_values_computed",
+                  "thresholds_selected", "thresholds_materialized",
+                  "model_fits_executed", "refits_executed", "predict_proba_calls",
+                  "final_test_rows_read", "final_test_rows_loaded",
+                  "final_test_predictions", "final_test_metrics_computed"):
+        if counters.get(field) != 0:
+            raise HandoffError(
+                f"Stage129 abort record counters.{field} must be 0; the run "
+                "aborted before any candidate was evaluated")
+
+    run = counters.get("aborted_derivation_run") or {}
+    evaluable = run.get("evaluable_rows_determined")
+    if evaluable == 0:
+        raise HandoffError(
+            "Stage129 abort record may not report evaluable_rows_determined as 0; "
+            "the count was computed in memory and is unprovable, so it must be "
+            "UNKNOWN_NOT_ZERO")
+    if evaluable != "UNKNOWN_NOT_ZERO":
+        raise HandoffError(
+            "Stage129 abort record evaluable_rows_determined must be "
+            f"UNKNOWN_NOT_ZERO, got {evaluable!r}")
+    if run.get("probability_inner_values_successfully_parsed") != 0:
+        raise HandoffError(
+            "Stage129 abort record: the aborted run parsed no inner value")
+    diagnostic = counters.get("subsequent_diagnostic_reads") or {}
+    if not diagnostic or diagnostic.get("probability_inner_values_parsed_to_float") \
+            in (None, 0):
+        raise HandoffError(
+            "Stage129 abort record must disclose the post-abort diagnostic reads; "
+            "they parsed inner values and may not be reported as zero")
+    if boundary.get("diagnostic_reads_after_abort_disclosed") is not True or \
+            boundary.get("unprovable_counters_recorded_as_unknown_not_zero") is not True:
+        raise HandoffError(
+            "Stage129 parse rule boundary must disclose the diagnostic reads and "
+            "the unprovable counters")
+
+    assertions = abort.get("assertions") or {}
+    for field in ("one_attempt_was_started_and_aborted",
+                  "no_candidate_was_evaluated_for_f2", "no_threshold_was_selected",
+                  "no_threshold_was_materialized", "pre02_remains_unresolved",
+                  "no_final_test_access_occurred",
+                  "frozen_oof_file_is_byte_identical"):
+        if assertions.get(field) is not True:
+            raise HandoffError(f"Stage129 abort record assertion {field} must be True")
+    if assertions.get("final_test_rows_read") != 0:
+        raise HandoffError("Stage129 abort record must keep final_test_rows_read at 0")
+
+    # (2) The parse rule must actually bite.
+    extraction = parse.get("extraction") or {}
+    for field in ("eval_authorized", "exec_authorized",
+                  "ast_literal_eval_authorized", "general_code_parser_authorized",
+                  "partial_match_authorized",
+                  "search_instead_of_fullmatch_authorized"):
+        if extraction.get(field) is not False:
+            raise HandoffError(f"Stage129 parse rule {field} must be False")
+    if extraction.get("regex_is_anchored") is not True:
+        raise HandoffError("Stage129 parse rule regex must be anchored")
+    pattern = extraction.get("regex") or ""
+    if "\\d" in pattern or "[0-9]" not in pattern:
+        raise HandoffError(
+            "Stage129 parse rule must use the ASCII digit class [0-9]; \\d matches "
+            "Unicode decimal digits and would admit an unintended value")
+    try:
+        compiled = re.compile(pattern)
+    except re.error as exc:
+        raise HandoffError(f"Stage129 parse rule regex does not compile: {exc}")
+    for token in ("np.float64(0.5)", "np.float64(-0.25)", "np.float64(1e-3)"):
+        if not compiled.fullmatch(token):
+            raise HandoffError(
+                f"Stage129 parse rule regex must accept {token!r}")
+    for token in ("np.float64(nan)", "np.float64(inf)", " np.float64(0.5)",
+                  "np.float64(0.5) ", "np.float64(np.float64(0.5))", "0.5",
+                  "np.float64()", "np.float64(۰.۵)"):
+        if compiled.fullmatch(token):
+            raise HandoffError(
+                f"Stage129 parse rule regex must reject {token!r}")
+
+    rejection = parse.get("rejection_set") or {}
+    if rejection.get("on_any_rejection") != "ABORT_THRESHOLD_DERIVATION":
+        raise HandoffError("Stage129 parse rule must abort on a rejected token")
+    for field in ("row_skipping_on_rejection_authorized",
+                  "default_or_sentinel_substitution_authorized",
+                  "imputation_on_rejection_authorized"):
+        if rejection.get(field) is not False:
+            raise HandoffError(f"Stage129 parse rule {field} must be False")
+
+    conversion = parse.get("conversion") or {}
+    if conversion.get("target_type") != "IEEE_754_binary64":
+        raise HandoffError("Stage129 parse rule must convert to IEEE-754 binary64")
+    for field in ("additional_rounding_authorized", "truncation_authorized",
+                  "rounding_after_parse_and_before_selection_authorized"):
+        if conversion.get(field) is not False:
+            raise HandoffError(f"Stage129 parse rule {field} must be False")
+
+    classification = parse.get("classification") or {}
+    if classification.get("this_is") != "serialization_interpretation":
+        raise HandoffError(
+            "Stage129 parse rule must be classified as serialization "
+            "interpretation, not cleaning")
+    for forbidden in ("data_cleaning", "rounding", "imputation"):
+        if forbidden not in (classification.get("this_is_not") or []):
+            raise HandoffError(
+                f"Stage129 parse rule must disclaim {forbidden}")
+
+    controls = parse.get("fail_closed_controls") or []
+    ids = tuple(c.get("id") for c in controls)
+    if ids != _STAGE129_PP_FAIL_CLOSED_IDS:
+        raise HandoffError(
+            f"Stage129 parse rule must carry controls {_STAGE129_PP_FAIL_CLOSED_IDS}, "
+            f"got {ids}")
+    for control in controls:
+        if control.get("on_failure") != "ABORT_THRESHOLD_DERIVATION":
+            raise HandoffError(
+                f"Stage129 parse control {control.get('id')} must abort")
+
+    # (3) The frozen file must not have moved, and no cleaned copy may exist.
+    immutability = parse.get("immutability") or {}
+    if immutability.get("original_file_must_remain_byte_identical") is not True:
+        raise HandoffError(
+            "Stage129 parse rule must require the frozen OOF file to stay "
+            "byte-identical")
+    for field in ("cleaned_copy_authorized",
+                  "rewritten_or_normalised_replacement_authorized",
+                  "in_place_edit_authorized",
+                  "cascade_of_dependent_pinned_hashes_authorized"):
+        if immutability.get(field) is not False:
+            raise HandoffError(f"Stage129 parse rule {field} must be False")
+    oof = os.path.join(root, _STAGE129_PP_OOF_REL)
+    if os.path.isfile(oof):
+        with open(oof, "rb") as fh:
+            if hashlib.sha256(fh.read()).hexdigest() != _STAGE129_PP_OOF_SHA:
+                raise HandoffError(
+                    "Stage129 parse rule: the frozen OOF file has changed. Its "
+                    "SHA-256 is pinned across many committed artifacts and the "
+                    "parse rule exists so it never has to move")
+    if boundary.get("frozen_oof_file_modified_by_this_action") is not False or \
+            boundary.get("cleaned_copy_created_by_this_action") is not False or \
+            boundary.get("dependent_pinned_hash_cascade_triggered") is not False:
+        raise HandoffError(
+            "Stage129 parse rule boundary must record the frozen file untouched "
+            "and no cascade triggered")
+
+    # (4) The merged algorithm contract is untouched, and PRE02 stays open.
+    unchanged = parse.get("unchanged_terms_of_the_merged_algorithm_contract") or {}
+    alg_rel = unchanged.get("algorithm_contract_path") or ""
+    alg_path = os.path.join(root, alg_rel)
+    if alg_rel and os.path.isfile(alg_path):
+        with open(alg_path, "rb") as fh:
+            if hashlib.sha256(fh.read()).hexdigest() != \
+                    unchanged.get("algorithm_contract_sha256"):
+                raise HandoffError(
+                    "Stage129 parse rule: the merged algorithm contract has drifted "
+                    "from the hash this lock pinned")
+    if unchanged.get("algorithm_contract_modified_by_this_action") is not False or \
+            boundary.get("algorithm_contract_modified_by_this_action") is not False:
+        raise HandoffError(
+            "Stage129 parse rule may not modify the merged algorithm contract")
+
+    rel_pre = parse.get("relationship_to_pre02") or {}
+    if rel_pre.get("this_lock_resolves_pre02") is not False or \
+            rel_pre.get("pre02_status_after_this_lock") != "UNRESOLVED":
+        raise HandoffError(
+            "Stage129 parse rule may not resolve PRE02; defining how a token "
+            "becomes a number is not producing a threshold")
+    if rel_pre.get("final_test_contract_fully_executable") is not False or \
+            boundary.get("final_test_contract_fully_executable") is not False:
+        raise HandoffError(
+            "Stage129 parse rule must keep the Final Test contract not fully "
+            "executable")
+
+    # (5) Nothing was executed, and locking authorizes nothing.
+    ex = parse.get("execution_authorization") or {}
+    if ex.get("parse_executed_by_this_action") is not False or \
+            ex.get("probability_values_reread_by_this_action") != 0:
+        raise HandoffError(
+            "Stage129 parse rule action executed no parse and re-read no value")
+    if ex.get("threshold_value") is not None or \
+            ex.get("threshold_value_materialized") is not False:
+        raise HandoffError(
+            "Stage129 parse rule may not materialize a threshold value")
+    for field in ("threshold_derivation_authorized_by_this_contract",
+                  "model_fit_authorized", "refit_authorized",
+                  "recalibration_authorized", "final_test_execution_authorized",
+                  "final_test_access_authorized", "stage130_authorized",
+                  "stage130_started", "ready_for_review_authorized",
+                  "merge_authorized", "next_action_authorized"):
+        if ex.get(field) is not False:
+            raise HandoffError(f"Stage129 parse rule {field} must be False")
+    if ex.get("next_action_id") != _STAGE129_PP_NEXT_ACTION_ID:
+        raise HandoffError(
+            f"Stage129 parse rule pointer must be {_STAGE129_PP_NEXT_ACTION_ID}")
+    for field in ("pre02_resolved_by_this_action", "parse_rule_executed_by_this_action",
+                  "eval_or_exec_used_by_this_action",
+                  "threshold_value_materialized_by_this_action",
+                  "threshold_derivation_authorized", "final_test_access_authorized",
+                  "final_test_execution_authorized", "stage130_authorized",
+                  "stage130_started", "merge_authorized",
+                  "ready_for_review_authorized", "new_scientific_result_produced",
+                  "final_test_contract_modified_by_this_action",
+                  "prior_packages_modified_by_this_action",
+                  "historical_artifacts_rewritten_by_this_action"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 parse rule boundary {field} must be False")
+    action_counters = boundary.get("counters") or {}
+    if not action_counters:
+        raise HandoffError("Stage129 parse rule boundary must carry counters")
+    for field, value in action_counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage129 parse rule counters.{field} must be 0 for THIS action")
+
+    return {
+        "stage129_parse_rule_contract_recorded": True,
+        "stage129_parse_rule_action_id": _STAGE129_PP_ACTION_ID,
+        "stage129_parse_rule_status": _STAGE129_PP_STATUS,
+        "stage129_parse_rule_fail_closed_control_count": len(controls),
+        "stage129_parse_rule_regex_is_anchored": True,
+        "stage129_parse_rule_uses_ascii_digit_class": True,
+        "stage129_parse_rule_code_evaluation_authorized": False,
+        "stage129_parse_rule_target_type": "IEEE_754_binary64",
+        "stage129_parse_rule_is_serialization_interpretation_not_cleaning": True,
+        "stage129_parse_rule_executed_against_data": False,
+
+        # The aborted attempt, recorded rather than hidden.
+        "stage129_threshold_derivation_attempts_started": 1,
+        "stage129_threshold_derivation_attempts_completed": 0,
+        "stage129_threshold_derivation_terminal_status": "ABORT_THRESHOLD_DERIVATION",
+        "stage129_threshold_f2_candidates_evaluated": 0,
+        "stage129_threshold_evaluable_rows_determined": "UNKNOWN_NOT_ZERO",
+        "stage129_threshold_diagnostic_inner_values_parsed":
+            diagnostic.get("probability_inner_values_parsed_to_float"),
+
+        # The defect, and the file that did not move.
+        "stage129_oof_serialization_defect_recorded": True,
+        "stage129_oof_serialization_defect_is_data_loss": False,
+        "stage129_oof_file_modified": False,
+        "stage129_oof_file_sha256": _STAGE129_PP_OOF_SHA,
+
+        # Still blocked.
+        "stage129_threshold_value_materialized": False,
+        "stage129_threshold_derivation_authorized": False,
+        "stage129_final_test_pre02_resolved": False,
+        "stage129_final_test_contract_fully_executable": False,
+        "stage130_started": False,
+        "final_test_locked": True,
+        "final_test_rows_read": 0,
+        "final_test_access_authorized": False,
+
+        "stage129_parse_rule_next_action_id": _STAGE129_PP_NEXT_ACTION_ID,
+        "stage129_parse_rule_next_action_authorized": False,
     }
 
 
