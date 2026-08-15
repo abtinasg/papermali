@@ -1,0 +1,29 @@
+{
+  "action_id": "stage129-threshold-derivation-execution",
+  "algorithm": "regularized_logistic_regression",
+  "argmax_member_count": 1,
+  "artifact": "threshold_value",
+  "block": "M1",
+  "candidate_count": 421,
+  "configuration_id": "logistic__C_0.1",
+  "confusion_at_threshold": {
+    "fn": 4,
+    "fp": 91,
+    "tp": 31
+  },
+  "derived_from": "pooled_development_oof_only",
+  "evaluable_rows": 421,
+  "f2_at_threshold": 0.5916030534351145,
+  "final_test_rows_read": 0,
+  "final_test_used": false,
+  "interpretation": "DEVELOPMENT_OPERATING_POINT_ONLY",
+  "interpretation_note": "This is a development-side operating point fixed so a future evaluation has a threshold. It is not evidence of model superiority, not a test statistic, and carries no inference.",
+  "is_inferential_result": false,
+  "is_model_superiority_claim": false,
+  "rule": "development_OOF_F2_maximizing_threshold",
+  "threshold": 0.426878838687,
+  "threshold_round_trip_exact": true,
+  "thresholds_selected": 1,
+  "tie_break": "higher_threshold",
+  "tie_break_applied": false
+}
