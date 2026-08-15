@@ -14432,7 +14432,7 @@ _STAGE129_FT_DEV_YEARS = (1393, 1394, 1395, 1396, 1397, 1398, 1399)
 _STAGE129_FT_PRIMARY_METRIC = "PR-AUC"
 _STAGE129_FT_SECONDARY_METRICS = (
     "ROC-AUC", "Brier_score", "Recall@10%", "Lift@10%")
-_STAGE129_FT_FAIL_CLOSED_IDS = tuple(f"FT{i:02d}" for i in range(1, 21))
+_STAGE129_FT_FAIL_CLOSED_IDS = tuple(f"FT{i:02d}" for i in range(1, 22))
 _STAGE129_FT_NEXT_ACTION_ID = (
     "human_authorization_required_for_final_test_execution")
 #: The four merged refit artifacts this contract will accept, and nothing else.
@@ -14640,6 +14640,49 @@ def derive_stage129_final_test_execution_contract_markers(root: str) -> dict:
         raise HandoffError(
             "Stage129 Final Test boundary must record that no threshold value was "
             "materialized")
+    for field in ("threshold_derivation_authorized",
+                  "threshold_extracted_from_oof_predictions_by_this_action"):
+        if boundary.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 Final Test boundary {field} must be False; deriving the "
+                "threshold is a separate development-only action needing its own "
+                "human authorization")
+    if thr.get("topk_independence_is_not_an_execution_permission") is not True or \
+            thr.get("no_threshold_free_partial_execution_alternative") is not True:
+        raise HandoffError(
+            "Stage129 Final Test contract must record that top-K independence from "
+            "the threshold is arithmetic, not a permission to open the Final Test "
+            "for a partial metric set")
+
+    # (5b) Executability is published, not inferred, and blocks partial runs.
+    exe = contract.get("executability_status") or {}
+    if not exe:
+        raise HandoffError(
+            "Stage129 Final Test contract must publish an executability_status block")
+    for field in ("final_test_contract_fully_executable",
+                  "final_test_execution_authorized", "final_test_access_authorized",
+                  "partial_execution_authorized", "threshold_free_execution_authorized",
+                  "metric_subset_execution_authorized"):
+        if exe.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 Final Test executability_status {field} must be False "
+                "while any prerequisite is unresolved")
+    if exe.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage129 Final Test executability_status final_test_rows_read must be 0")
+    for field in ("final_test_opens_once_after_all_prerequisites_are_resolved",
+                  "final_test_may_not_be_opened_in_stages"):
+        if exe.get(field) is not True:
+            raise HandoffError(
+                f"Stage129 Final Test executability_status {field} must be True")
+    for field in ("final_test_contract_fully_executable",
+                  "final_test_partial_execution_authorized",
+                  "final_test_threshold_free_execution_authorized"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 Final Test boundary {field} must be False")
+    if boundary.get("final_test_may_not_be_opened_in_stages") is not True:
+        raise HandoffError(
+            "Stage129 Final Test boundary must forbid opening the Final Test in stages")
 
     # (6) Metrics, uncertainty and inference are fixed before any access.
     metrics = contract.get("metrics") or {}
@@ -14733,6 +14776,15 @@ def derive_stage129_final_test_execution_contract_markers(root: str) -> dict:
     if boundary.get("unresolved_prerequisites_recorded") != len(unsatisfied):
         raise HandoffError(
             "Stage129 Final Test boundary must count its unresolved prerequisites")
+    if list(exe.get("final_test_contract_fully_executable_blocked_by") or []) != \
+            unsatisfied:
+        raise HandoffError(
+            "Stage129 Final Test executability_status must name exactly the "
+            f"unresolved prerequisites {unsatisfied} as its blockers")
+    if exe.get("unresolved_prerequisite_count") != len(unsatisfied):
+        raise HandoffError(
+            "Stage129 Final Test executability_status must count the unresolved "
+            "prerequisites")
 
     # (10) The firewall, and the fact that locking authorizes nothing.
     ft = contract.get("final_test_boundary") or {}
@@ -14841,6 +14893,11 @@ def derive_stage129_final_test_execution_contract_markers(root: str) -> dict:
 
         # The threshold gap, published so the next actor cannot miss it.
         "stage129_final_test_threshold_value_materialized": False,
+        "stage129_final_test_threshold_derivation_authorized": False,
+        "stage129_final_test_contract_fully_executable": False,
+        "stage129_final_test_partial_execution_authorized": False,
+        "stage129_final_test_threshold_free_execution_authorized": False,
+        "stage129_final_test_opens_once_after_all_prerequisites": True,
         "stage129_final_test_threshold_value_status": thr.get("threshold_value_status"),
         "stage129_final_test_unresolved_prerequisites": list(unsatisfied),
         "stage129_final_test_unresolved_prerequisite_count": len(unsatisfied),

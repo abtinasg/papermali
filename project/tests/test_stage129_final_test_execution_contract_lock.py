@@ -72,7 +72,7 @@ FEATURES = [
 ]
 RUNTIME = {"jdatetime": "6.0.1", "numpy": "2.4.6", "pandas": "3.0.3",
            "python": "3.13.5", "scikit-learn": "1.9.0", "xgboost": "3.3.0"}
-FT_IDS = [f"FT{i:02d}" for i in range(1, 21)]
+FT_IDS = [f"FT{i:02d}" for i in range(1, 22)]
 NEXT_ACTION = "human_authorization_required_for_final_test_execution"
 
 ACCEPTED = {
@@ -311,13 +311,68 @@ def test_threshold_derivation_needs_zero_final_test_rows(contract):
         assert col in header, col
 
 
-def test_topk_metrics_do_not_depend_on_the_missing_threshold(contract):
-    """Recall@10% and Lift@10% are top-K, so PRE02 must not block them."""
+def test_topk_independence_is_arithmetic_not_a_permission(contract):
+    """Recall@10% and Lift@10% are top-K and need no threshold.
+
+    That must never be read as licence to open the Final Test early for the
+    metrics that happen to be computable. PRE02 has exactly one resolution.
+    """
     topk = contract["metrics"]["topk"]
     assert topk["definition"] == "K_y = ceil(0.10 * N_y)"
     assert topk["optimize_K_after_results"] is False
     assert topk == {**topk, **{k: v for k, v in _load(_METRICS_REL)["topk"].items()
                                if k in topk}}
+    thr = contract["threshold"]
+    assert thr["topk_metrics_are_mathematically_independent_of_this_value"] is True
+    assert thr["topk_independence_is_not_an_execution_permission"] is True
+    assert thr["no_threshold_free_partial_execution_alternative"] is True
+
+
+def test_pre02_has_no_threshold_free_escape_hatch(contract):
+    pre02 = next(p for p in contract["execution_prerequisites"]["prerequisites"]
+                 if p["id"] == "PRE02")
+    assert pre02["satisfied_now"] is False
+    assert pre02["no_partial_execution_alternative"] is True
+    assert "threshold-free" in pre02["note"].lower()
+    assert "committed artifact" in pre02["requirement"]
+
+
+def test_contract_publishes_that_it_is_not_fully_executable(contract, boundary):
+    exe = contract["executability_status"]
+    for field in ("final_test_contract_fully_executable",
+                  "final_test_execution_authorized", "final_test_access_authorized",
+                  "partial_execution_authorized",
+                  "threshold_free_execution_authorized",
+                  "metric_subset_execution_authorized"):
+        assert exe[field] is False, field
+    assert exe["final_test_rows_read"] == 0
+    assert exe["final_test_contract_fully_executable_blocked_by"] == ["PRE01", "PRE02"]
+    assert exe["unresolved_prerequisite_count"] == 2
+    assert exe["final_test_opens_once_after_all_prerequisites_are_resolved"] is True
+    assert exe["final_test_may_not_be_opened_in_stages"] is True
+    # and the boundary agrees
+    assert boundary["final_test_contract_fully_executable"] is False
+    assert boundary["final_test_partial_execution_authorized"] is False
+    assert boundary["final_test_threshold_free_execution_authorized"] is False
+    assert boundary["final_test_may_not_be_opened_in_stages"] is True
+
+
+def test_ft21_blocks_partial_and_staged_execution(contract):
+    ft21 = next(c for c in contract["fail_closed_controls"] if c["id"] == "FT21")
+    check = ft21["check"].lower()
+    assert "prerequisite" in check
+    assert "threshold-free" in check
+    assert "stages" in check
+    assert ft21["on_failure"] == "ABORT_FINAL_TEST"
+
+
+def test_threshold_derivation_is_a_separate_unauthorized_action(contract, boundary):
+    thr = contract["threshold"]
+    assert thr["threshold_derivation_requires_its_own_human_authorization"] is True
+    assert thr["threshold_derivation_is_a_separate_development_only_action"] is True
+    assert boundary["threshold_derivation_authorized"] is False
+    assert boundary["threshold_extracted_from_oof_predictions_by_this_action"] is False
+    assert contract["execution_authorization"]["threshold_derivation_authorized"] is False
 
 
 # ----------------------------------------------------------------- the metrics
@@ -410,7 +465,7 @@ def test_required_counters_forbid_any_fit_or_search(contract):
 
 
 # ------------------------------------------------------ fail-closed controls
-def test_all_twenty_controls_exist_and_abort(contract):
+def test_all_twenty_one_controls_exist_and_abort(contract):
     controls = contract["fail_closed_controls"]
     assert [c["id"] for c in controls] == FT_IDS
     for c in controls:
@@ -483,7 +538,12 @@ def test_apply_once_is_acknowledged_not_taken(contract):
 
 def test_locking_authorizes_nothing(contract, boundary):
     a = contract["execution_authorization"]
-    for k in ("final_test_execution_authorized_by_this_contract",
+    assert a["final_test_contract_fully_executable"] is False
+    assert a["final_test_rows_read"] == 0
+    for k in ("final_test_execution_authorized", "final_test_access_authorized",
+              "partial_execution_authorized", "threshold_free_execution_authorized",
+              "threshold_derivation_authorized",
+              "final_test_execution_authorized_by_this_contract",
               "recalibration_authorized", "refit_authorized", "second_fit_authorized",
               "tuning_authorized", "new_scientific_result_authorized",
               "stage130_authorized", "stage130_started",

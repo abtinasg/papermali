@@ -76,18 +76,22 @@ an unsatisfied prerequisite `PRE02`, the derivation inputs are pinned for
 whoever is later authorized to do it, and `FT10` blocks every thresholded output
 until a committed value exists.
 
-Two consequences worth stating plainly:
+One tempting inference is explicitly **blocked**. `Recall@10%` and `Lift@10%`
+are **top-K** metrics, defined by `K_y = ceil(0.10 * N_y)`, so they do not need
+the F2 threshold. That is a statement about arithmetic, **not a permission**. It
+does not license opening the Final Test early to collect whichever metrics
+happen to be computable today.
 
-- `Recall@10%` and `Lift@10%` are **top-K** metrics, defined by
-  `K_y = ceil(0.10 * N_y)`. They do **not** depend on the F2 threshold and are
-  therefore *not* blocked by `PRE02`.
-- A future execution can legitimately be scoped to threshold-free metrics only.
-  `PRE02` offers exactly that alternative rather than forcing the threshold to
-  be invented.
+`PRE02` therefore has exactly one resolution: the value is computed and
+committed under its own human authorization. A threshold-free run is **not** an
+alternative route, and `FT21` aborts any partial, threshold-free or
+metric-subset execution. **The Final Test is opened once, after every
+prerequisite is resolved — never in stages.**
 
-Deriving the threshold requires **zero** Final Test rows — it is a
-development-OOF computation. It is unauthorized here because it is a new result,
-not because it would touch the Final Test.
+Deriving the threshold requires **zero** Final Test rows: it is a
+development-only OOF computation. It is unauthorized here because it is a new
+scientific result, not because it would touch the Final Test. It needs its own
+separate human authorization.
 
 ## Metrics, uncertainty and inference are locked before any access
 
@@ -114,7 +118,7 @@ authorized here. The frozen `skip_recalibration_if_oof_positives_lt: 20` rule
 does not trigger, because the selected model has **35** pooled development-OOF
 positives.
 
-## Twenty fail-closed controls — every one `ABORT_FINAL_TEST`
+## Twenty-one fail-closed controls — every one `ABORT_FINAL_TEST`
 
 `FT01` accepted artifact hashes · `FT02` model identity · `FT03` runtime match ·
 `FT04` input hashes · `FT05` **only target years ۱۴۰۰–۱۴۰۲, zero development
@@ -127,7 +131,8 @@ pass** · `FT12` no recalibration · `FT13` no re-selection, no winner ·
 `FT16` missing never counted as negative · `FT17` closed metric set, `K` not
 optimized after results · `FT18` no Holm, no p-value · `FT19` bootstrap
 parameters unchanged or zero executions · `FT20` writes nothing outside its own
-package.
+package · `FT21` **every prerequisite resolved first, and no partial,
+threshold-free or staged opening**.
 
 Note the direction of `FT05`. In the refit contract, `FC03` required **zero
 Final Test years**. Here the window is the mirror image — only ۱۴۰۰–۱۴۰۲, and
@@ -139,9 +144,19 @@ report an in-sample result.
 | id | requirement | satisfied |
 | --- | --- | --- |
 | `PRE01` | a new explicit human authorization for Final Test access exists | **no** |
-| `PRE02` | the F2 threshold value exists in a committed artifact, or the execution is scoped to threshold-free metrics only | **no** |
+| `PRE02` | the F2 threshold value exists in a committed artifact, produced by a separately authorized development-only computation | **no** |
 | `PRE03` | the four accepted refit artifacts are merged on main and hash to their pinned values | yes |
 | `PRE04` | the runtime matches the locked development runtime exactly | yes |
+
+Because two are unresolved, the contract publishes its executability directly
+rather than making a reader infer it:
+
+```
+final_test_contract_fully_executable = false   (blocked by PRE01, PRE02)
+final_test_execution_authorized      = false
+final_test_access_authorized         = false
+final_test_rows_read                 = 0
+```
 
 ## What was NOT done
 
@@ -175,10 +190,21 @@ Final Test برآورد نمی‌شود؛ فقط ماسک missing از موقع�
 Final Test خوانده می‌شود که برآورد آماره نیست.
 
 **شکاف threshold:** قاعده و tie-break قفل‌اند، اما مقدار عددی آن **هرگز محاسبه
-نشده** و در هیچ artifactی وجود ندارد. این قرارداد آن را محاسبه نمی‌کند، چون
-تولید نتیجه جدید مجاز نیست؛ در عوض به‌عنوان پیش‌نیاز `PRE02` ثبت شده و `FT10`
-هر خروجی threshold-محور را تا وجود مقدار committed مسدود می‌کند. معیارهای
-`Recall@10%` و `Lift@10%` بر پایه top-K هستند و به این مقدار وابسته نیستند.
+نشده** و در هیچ artifactی وجود ندارد. این قرارداد آن را محاسبه نمی‌کند و از
+OOF predictions هم استخراج نمی‌کند؛ استخراج آن یک محاسبه علمی Development-only
+جداگانه و نیازمند مجوز انسانی مستقل است. این شکاف به‌عنوان پیش‌نیاز حل‌نشده
+`PRE02` ثبت شده است.
+
+معیارهای `Recall@10%` و `Lift@10%` بر پایه top-K هستند و از نظر ریاضی به این
+مقدار وابسته نیستند، اما **این یک مجوز نیست**: هیچ اجرای جزئی یا threshold-free
+روی Final Test مجاز نیست و کنترل `FT21` چنین اجرایی را متوقف می‌کند. Final Test
+فقط **یک‌بار** و **پس از حل همه پیش‌نیازها** باز می‌شود و هرگز مرحله‌به‌مرحله
+باز نمی‌شود.
+
+تا زمانی که `PRE02` حل نشده است:
+`final_test_contract_fully_executable = false`،
+`final_test_execution_authorized = false`،
+`final_test_access_authorized = false` و `final_test_rows_read = 0`.
 
 معیارها، threshold، خروجی‌ها، شمارنده‌ها و بیست کنترل `ABORT_FINAL_TEST` همگی
 **پیش از هر دسترسی** قفل شدند. هیچ fit دوم، recalibration، refit، tuning، Holm،

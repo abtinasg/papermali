@@ -199,8 +199,14 @@
     },
     "threshold_materialization_is_a_prerequisite_of_execution": true,
     "threshold_materialization_authorized_by_this_contract": false,
+    "threshold_derivation_requires_its_own_human_authorization": true,
+    "threshold_derivation_is_a_separate_development_only_action": true,
     "thresholded_outputs_blocked_until_value_exists": true,
-    "note": "The operating threshold is a DEVELOPMENT-OOF quantity. It is neither re-derived from the model's Final Test predictions nor optimized against any Final Test outcome. Until the value exists in a committed artifact, every thresholded output listed under expected_outputs is blocked by FT10."
+    "topk_metrics_are_mathematically_independent_of_this_value": true,
+    "topk_independence_is_not_an_execution_permission": true,
+    "no_threshold_free_partial_execution_alternative": true,
+    "topk_independence_note": "Recall@10% and Lift@10% are top-K quantities under K_y = ceil(0.10 * N_y) and do not need the threshold. That is a statement about arithmetic, NOT a permission. It does not license opening the Final Test early to collect the metrics that happen to be computable. The Final Test is opened once, after every prerequisite is resolved.",
+    "note": "The operating threshold is a DEVELOPMENT-OOF quantity. It is neither re-derived from the model's Final Test predictions nor optimized against any Final Test outcome. Until the value exists in a committed artifact, PRE02 is unresolved, the contract is not fully executable, and no Final Test access of any scope is permitted."
   },
 
   "metrics": {
@@ -309,7 +315,11 @@
       }
     ],
     "thresholded_outputs_blocked_until_threshold_value_exists": true,
+    "all_outputs_blocked_until_every_prerequisite_is_resolved": true,
+    "partial_output_set_is_not_a_permitted_execution_mode": true,
     "forbidden_outputs": [
+      "any_partial_or_threshold_free_final_test_execution",
+      "any_staged_or_incremental_opening_of_the_final_test",
       "any_refit_or_second_fit_of_any_model",
       "any_recalibrated_primary_probability",
       "any_new_hyperparameter_search_result",
@@ -450,6 +460,11 @@
       "id": "FT20",
       "check": "the evaluation writes no file outside its own package and edits no historical or frozen artifact",
       "on_failure": "ABORT_FINAL_TEST"
+    },
+    {
+      "id": "FT21",
+      "check": "every execution prerequisite is resolved before the first Final Test row is read, and the run is not a partial, threshold-free or metric-subset execution; the Final Test is opened once and never in stages",
+      "on_failure": "ABORT_FINAL_TEST"
     }
   ],
 
@@ -463,8 +478,10 @@
       },
       {
         "id": "PRE02",
-        "requirement": "the development-OOF F2-maximizing threshold value exists in a committed artifact, or the execution is explicitly scoped to threshold-free metrics only",
-        "satisfied_now": false
+        "requirement": "the development-OOF F2-maximizing threshold value exists in a committed artifact, produced by a separately authorized development-only computation",
+        "satisfied_now": false,
+        "no_partial_execution_alternative": true,
+        "note": "This prerequisite has exactly one resolution: the value is computed and committed under its own human authorization. Scoping an execution to threshold-free metrics is NOT an alternative route and does not satisfy PRE02."
       },
       {
         "id": "PRE03",
@@ -477,6 +494,22 @@
         "satisfied_now": true
       }
     ]
+  },
+
+  "executability_status": {
+    "note": "Published explicitly so no reader has to infer executability from the prerequisite list. While any prerequisite is unresolved, every flag below stays in the state shown.",
+    "final_test_contract_fully_executable": false,
+    "final_test_contract_fully_executable_blocked_by": ["PRE01", "PRE02"],
+    "final_test_execution_authorized": false,
+    "final_test_access_authorized": false,
+    "final_test_rows_read": 0,
+    "unresolved_prerequisite_count": 2,
+    "partial_execution_authorized": false,
+    "threshold_free_execution_authorized": false,
+    "metric_subset_execution_authorized": false,
+    "final_test_opens_once_after_all_prerequisites_are_resolved": true,
+    "final_test_may_not_be_opened_in_stages": true,
+    "recomputing_executability_is_the_next_actors_job": "These flags describe the state at lock time. Resolving PRE01 and PRE02 does not flip them automatically; a separately authorized action must record the resolution."
   },
 
   "environment": {
@@ -512,9 +545,16 @@
   },
 
   "execution_authorization": {
+    "final_test_contract_fully_executable": false,
+    "final_test_execution_authorized": false,
+    "final_test_access_authorized": false,
+    "final_test_rows_read": 0,
     "final_test_execution_authorized_by_this_contract": false,
     "final_test_execution_requires_new_explicit_human_authorization": true,
     "contract_lock_is_not_an_execution_permission": true,
+    "partial_execution_authorized": false,
+    "threshold_free_execution_authorized": false,
+    "threshold_derivation_authorized": false,
     "recalibration_authorized": false,
     "refit_authorized": false,
     "second_fit_authorized": false,
