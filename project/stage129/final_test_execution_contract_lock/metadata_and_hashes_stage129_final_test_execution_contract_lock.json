@@ -1,0 +1,41 @@
+{
+  "action_id": "stage129-final-test-execution-contract-lock",
+  "action_type": "contract_audit_and_lock_only_read_only_no_final_test_access",
+  "contract_status": "PROSPECTIVELY_LOCKED_NOT_EXECUTED",
+  "credentials_committed_to_git": false,
+  "fail_closed_control_count": 21,
+  "final_test_access_authorized": false,
+  "final_test_artifacts_committed": 0,
+  "final_test_contract_fully_executable": false,
+  "final_test_execution_authorized": false,
+  "final_test_rows_read": 0,
+  "model_artifacts_committed": 0,
+  "model_fits_executed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "new_metric_files_committed": 0,
+  "package_file_count": 4,
+  "package_files": {
+    "README_STAGE129_FINAL_TEST_EXECUTION_CONTRACT_LOCK.md": {
+      "bytes": 12719,
+      "sha256": "9f11098633986ce5a1b1b0bf35f984c28fb7d1f4acb2316f20888416c25e2a2c"
+    },
+    "stage129_final_test_execution_contract.json": {
+      "bytes": 29892,
+      "sha256": "036d85f8b095e0cd7e55afb899283c71f957234ce4740085a20c2d81a617074e"
+    },
+    "stage129_final_test_execution_governance_boundary.json": {
+      "bytes": 5857,
+      "sha256": "c733273a5d95e39d4ee8875f721bdb15883833e6cf3c9dbaba5d9f5dbfd8d695"
+    },
+    "stage129_final_test_execution_source_provenance.json": {
+      "bytes": 6134,
+      "sha256": "75d796782e88b4defbdc500bccdcf9c8d131747db49dea773a78efcbf37ba471"
+    }
+  },
+  "pii_committed_to_git": false,
+  "source_artifact_count": 17,
+  "threshold_derivation_authorized": false,
+  "threshold_values_materialized": 0,
+  "trained_model_artifacts_committed": 0,
+  "unresolved_prerequisite_count": 2
+}

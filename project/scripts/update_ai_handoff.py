@@ -3017,6 +3017,13 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # window, under FC01-FC12. It reads no Final Test row and authorizes no
         # Final Test access.
         **derive_stage129_full_development_refit_execution_markers(root),
+        # Must come last of all: the Final Test execution contract lock. It is
+        # the mirror image of the refit lock -- there Final Test years could
+        # leak into a fit window, here development years could leak into an
+        # evaluation window and silently make the result in-sample. It accepts
+        # only the four merged refit artifacts, fits nothing, reads no Final
+        # Test row, and leaves the F2 threshold value unmaterialized.
+        **derive_stage129_final_test_execution_contract_markers(root),
         }))
 
 
@@ -14408,6 +14415,514 @@ def derive_stage129_full_development_refit_contract_markers(root: str) -> dict:
 
         "stage129_refit_next_action_id": _STAGE129_REFIT_NEXT_ACTION_ID,
         "stage129_refit_next_action_authorized": False,
+    }
+
+_STAGE129_FT_PKG = "project/stage129/final_test_execution_contract_lock"
+_STAGE129_FT_ACTION_ID = "stage129-final-test-execution-contract-lock"
+_STAGE129_FT_CONTRACT_REL = (
+    f"{_STAGE129_FT_PKG}/stage129_final_test_execution_contract.json")
+_STAGE129_FT_PROVENANCE_REL = (
+    f"{_STAGE129_FT_PKG}/stage129_final_test_execution_source_provenance.json")
+_STAGE129_FT_BOUNDARY_REL = (
+    f"{_STAGE129_FT_PKG}/stage129_final_test_execution_governance_boundary.json")
+_STAGE129_FT_STATUS = "PROSPECTIVELY_LOCKED_NOT_EXECUTED"
+#: The evaluation window, and the development years that may NEVER enter it.
+_STAGE129_FT_EVAL_YEARS = (1400, 1401, 1402)
+_STAGE129_FT_DEV_YEARS = (1393, 1394, 1395, 1396, 1397, 1398, 1399)
+_STAGE129_FT_PRIMARY_METRIC = "PR-AUC"
+_STAGE129_FT_SECONDARY_METRICS = (
+    "ROC-AUC", "Brier_score", "Recall@10%", "Lift@10%")
+_STAGE129_FT_FAIL_CLOSED_IDS = tuple(f"FT{i:02d}" for i in range(1, 22))
+_STAGE129_FT_NEXT_ACTION_ID = (
+    "human_authorization_required_for_final_test_execution")
+#: The four merged refit artifacts this contract will accept, and nothing else.
+_STAGE129_FT_ACCEPTED_SHA256 = {
+    "stage129_full_development_refit_model.json":
+        "48faab1ef186206508385713fb3b885a88a55bb072fb586d56e63d2777c97690",
+    "stage129_full_development_refit_preprocessing_parameters.json":
+        "862c65ec37082be1e3e95c29d2bf8873df9105e90cc43ce1ecac4fd8901ba9f6",
+    "stage129_full_development_refit_provenance_record.json":
+        "4b1aa9a6c85208713f250b5ac3fe71f56c4a8398c3834855926e29a43ad8f07d",
+    "stage129_full_development_refit_qc_report.json":
+        "e874ee5bdf2510f6c630f170482ca7a13f50ab73c7838550e9412c372c5ee63c",
+}
+
+
+def derive_stage129_final_test_execution_contract_markers(root: str) -> dict:
+    """Recognize the prospectively locked Final Test execution contract.
+
+    This lock is the mirror image of its Full-Development Refit predecessor,
+    and the mirroring is the point. There, the danger was Final Test years
+    leaking INTO a fit window; here it is development years leaking into an
+    EVALUATION window, which would silently report an in-sample result. So the
+    window check runs in both directions.
+
+    Three further properties are enforced, because a contract describing a read
+    of the sealed partition can fail in ways a fit contract cannot:
+
+      * the contract may accept ONLY the four merged refit artifacts, pinned by
+        SHA-256 and re-hashed here, and only the selected M1 model -- widening
+        the accepted set is how a different model could reach the Final Test;
+      * it must fix `model_fits_executed = 0`, because this action APPLIES a
+        model that already exists rather than producing one;
+      * it may not materialize the development-OOF F2 threshold value. The rule
+        is frozen but the value was never computed, and inventing it here would
+        manufacture a scientific quantity under cover of a governance action.
+
+    Locking authorizes nothing: every counter stays zero and execution stays
+    behind a new human authorization.
+
+    Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE129_FT_CONTRACT_REL)
+    if not os.path.isfile(path):
+        return {}
+    contract = _require_json_artifact(root, _STAGE129_FT_CONTRACT_REL)
+    provenance = _require_json_artifact(root, _STAGE129_FT_PROVENANCE_REL)
+    boundary = _require_json_artifact(root, _STAGE129_FT_BOUNDARY_REL)
+
+    for artifact, label in ((contract, "contract"), (provenance, "provenance"),
+                            (boundary, "boundary")):
+        if artifact.get("action_id") != _STAGE129_FT_ACTION_ID:
+            raise HandoffError(
+                f"Stage129 Final Test contract {label} action_id mismatch")
+    for artifact, label in ((contract, "contract"), (boundary, "boundary")):
+        if artifact.get("contract_status") != _STAGE129_FT_STATUS:
+            raise HandoffError(
+                f"Stage129 Final Test {label} status must be {_STAGE129_FT_STATUS}")
+
+    # (1) The contract is an extraction, not an invention.
+    if contract.get("every_term_is_extracted_from_a_prelocked_artifact") is not True:
+        raise HandoffError(
+            "Stage129 Final Test contract must declare every term extracted from "
+            "a pre-locked artifact")
+    if contract.get("no_term_invented_by_this_action") is not True or \
+            boundary.get("new_contract_term_invented_by_this_action") is not False:
+        raise HandoffError("Stage129 Final Test contract may not invent a term")
+    sources = provenance.get("source_artifacts_sha256") or {}
+    if not sources:
+        raise HandoffError(
+            "Stage129 Final Test contract must pin its source artifacts")
+    for rel, info in sources.items():
+        src = os.path.join(root, rel)
+        if not os.path.isfile(src):
+            raise HandoffError(
+                f"Stage129 Final Test contract cites a missing source: {rel}")
+        with open(src, "rb") as fh:
+            blob = fh.read()
+        if hashlib.sha256(blob).hexdigest() != info.get("sha256"):
+            raise HandoffError(
+                f"Stage129 Final Test contract source {rel} has drifted from its "
+                "pinned SHA-256; the extraction is no longer anchored")
+    if provenance.get("sources_modified_by_this_action") is not False or \
+            boundary.get("source_contracts_modified_by_this_action") is not False:
+        raise HandoffError(
+            "Stage129 Final Test contract may not modify its source contracts")
+
+    # (2) Only the selected model, and only the four pinned refit artifacts.
+    model = contract.get("accepted_model") or {}
+    if model.get("block") != _STAGE129_SELECT_BLOCK or \
+            model.get("algorithm") != _STAGE129_SELECT_ALGORITHM or \
+            model.get("configuration_id") != _STAGE129_SELECT_CONFIGURATION:
+        raise HandoffError(
+            "Stage129 Final Test contract must accept the selected model "
+            f"{_STAGE129_SELECT_BLOCK}/{_STAGE129_SELECT_ALGORITHM}/"
+            f"{_STAGE129_SELECT_CONFIGURATION}")
+    for field in ("model_is_taken_as_given_not_refit",
+                  "no_other_model_block_algorithm_or_configuration_is_accepted"):
+        if model.get(field) is not True:
+            raise HandoffError(f"Stage129 Final Test contract {field} must be True")
+    accepted = (contract.get("accepted_artifacts") or {}).get("artifacts") or {}
+    if set(accepted) != set(_STAGE129_FT_ACCEPTED_SHA256):
+        raise HandoffError(
+            "Stage129 Final Test contract must accept exactly the four merged "
+            f"refit artifacts, got {sorted(accepted)}")
+    for name, info in accepted.items():
+        if info.get("sha256") != _STAGE129_FT_ACCEPTED_SHA256[name]:
+            raise HandoffError(
+                f"Stage129 Final Test contract accepted artifact {name} is pinned "
+                "to an unexpected SHA-256")
+        rel = info.get("path") or ""
+        src = os.path.join(root, rel)
+        if not os.path.isfile(src):
+            raise HandoffError(
+                f"Stage129 Final Test contract accepts a missing artifact: {rel}")
+        with open(src, "rb") as fh:
+            if hashlib.sha256(fh.read()).hexdigest() != info["sha256"]:
+                raise HandoffError(
+                    f"Stage129 Final Test contract accepted artifact {rel} has "
+                    "drifted from its pinned SHA-256")
+
+    # (3) The evaluation window -- checked in BOTH directions.
+    data = contract.get("final_test_data") or {}
+    if tuple(data.get("final_test_target_years") or ()) != _STAGE129_FT_EVAL_YEARS:
+        raise HandoffError(
+            "Stage129 Final Test contract evaluation window must be exactly "
+            f"{_STAGE129_FT_EVAL_YEARS}")
+    leaked = set(data.get("final_test_target_years") or ()) & set(
+        _STAGE129_FT_DEV_YEARS)
+    if leaked:
+        raise HandoffError(
+            f"Stage129 Final Test contract evaluation window contains development "
+            f"years {sorted(leaked)}; the result would be in-sample")
+    if tuple(data.get("development_target_years_excluded_from_evaluation") or ()) \
+            != _STAGE129_FT_DEV_YEARS:
+        raise HandoffError(
+            "Stage129 Final Test contract must exclude every development year "
+            "from the evaluation window")
+    for field in ("random_split_authorized", "shuffle_authorized"):
+        if data.get(field) is not False:
+            raise HandoffError(f"Stage129 Final Test contract {field} must be False")
+    if data.get("expected_counts_are_frozen_metadata_not_row_level_access") \
+            is not True:
+        raise HandoffError(
+            "Stage129 Final Test contract must treat the expected counts as frozen "
+            "metadata, not row-level access")
+
+    # (4) The model is APPLIED, never fitted, and nothing is re-estimated.
+    pre = contract.get("preprocessing_application") or {}
+    for field in ("parameters_are_taken_from_the_refit_not_re_estimated",
+                  "nothing_is_fit_on_final_test", "never_fit_on_final_test",
+                  "final_test_masks_from_own_original_missing_positions"):
+        if pre.get(field) is not True:
+            raise HandoffError(
+                f"Stage129 Final Test contract preprocessing {field} must be True")
+    for field in ("clipping_bounds_recomputed_on_final_test",
+                  "medians_recomputed_on_final_test",
+                  "standardization_recomputed_on_final_test",
+                  "missing_indicators_standardized"):
+        if pre.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 Final Test contract preprocessing {field} must be False")
+    if (pre.get("target_state_contract") or {}).get(
+            "missing_never_counted_as_negative") is not True:
+        raise HandoffError(
+            "Stage129 Final Test contract must keep missing targets out of the "
+            "negatives")
+    counters_required = contract.get("required_counters") or {}
+    for field in ("model_fits_executed", "refits_executed", "tuning_runs",
+                  "hyperparameter_searches", "feature_searches",
+                  "threshold_searches", "recalibration_executions",
+                  "isotonic_executions", "shap_executions", "holm_executions",
+                  "p_values_computed", "winner_selections"):
+        if counters_required.get(field) != 0:
+            raise HandoffError(
+                f"Stage129 Final Test contract required_counters.{field} must be 0; "
+                "this action applies an existing model and creates no inference")
+
+    # (5) The threshold rule is frozen and its value stays unmaterialized.
+    thr = contract.get("threshold") or {}
+    if thr.get("rule") != _STAGE129_REFIT_THRESHOLD_RULE or \
+            thr.get("tie_break") != _STAGE129_REFIT_THRESHOLD_TIE_BREAK:
+        raise HandoffError(
+            "Stage129 Final Test contract threshold rule must be "
+            f"{_STAGE129_REFIT_THRESHOLD_RULE} with tie-break "
+            f"{_STAGE129_REFIT_THRESHOLD_TIE_BREAK}")
+    for field in ("never_optimize_on_final_test",
+                  "threshold_is_derived_from_development_oof_only",
+                  "thresholded_outputs_blocked_until_value_exists"):
+        if thr.get(field) is not True:
+            raise HandoffError(
+                f"Stage129 Final Test contract threshold {field} must be True")
+    for field in ("threshold_search_on_final_test_authorized",
+                  "threshold_value_materialized",
+                  "threshold_materialization_authorized_by_this_contract"):
+        if thr.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 Final Test contract threshold {field} must be False")
+    if thr.get("threshold_value") is not None:
+        raise HandoffError(
+            "Stage129 Final Test contract may not materialize the development-OOF "
+            "F2 threshold value; the rule is frozen but the value was never "
+            "computed, and inventing it here would manufacture a scientific "
+            "quantity under cover of a governance action")
+    if boundary.get("threshold_value_materialized_by_this_action") is not False:
+        raise HandoffError(
+            "Stage129 Final Test boundary must record that no threshold value was "
+            "materialized")
+    for field in ("threshold_derivation_authorized",
+                  "threshold_extracted_from_oof_predictions_by_this_action"):
+        if boundary.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 Final Test boundary {field} must be False; deriving the "
+                "threshold is a separate development-only action needing its own "
+                "human authorization")
+    if thr.get("topk_independence_is_not_an_execution_permission") is not True or \
+            thr.get("no_threshold_free_partial_execution_alternative") is not True:
+        raise HandoffError(
+            "Stage129 Final Test contract must record that top-K independence from "
+            "the threshold is arithmetic, not a permission to open the Final Test "
+            "for a partial metric set")
+
+    # (5b) Executability is published, not inferred, and blocks partial runs.
+    exe = contract.get("executability_status") or {}
+    if not exe:
+        raise HandoffError(
+            "Stage129 Final Test contract must publish an executability_status block")
+    for field in ("final_test_contract_fully_executable",
+                  "final_test_execution_authorized", "final_test_access_authorized",
+                  "partial_execution_authorized", "threshold_free_execution_authorized",
+                  "metric_subset_execution_authorized"):
+        if exe.get(field) is not False:
+            raise HandoffError(
+                f"Stage129 Final Test executability_status {field} must be False "
+                "while any prerequisite is unresolved")
+    if exe.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage129 Final Test executability_status final_test_rows_read must be 0")
+    for field in ("final_test_opens_once_after_all_prerequisites_are_resolved",
+                  "final_test_may_not_be_opened_in_stages"):
+        if exe.get(field) is not True:
+            raise HandoffError(
+                f"Stage129 Final Test executability_status {field} must be True")
+    for field in ("final_test_contract_fully_executable",
+                  "final_test_partial_execution_authorized",
+                  "final_test_threshold_free_execution_authorized"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 Final Test boundary {field} must be False")
+    if boundary.get("final_test_may_not_be_opened_in_stages") is not True:
+        raise HandoffError(
+            "Stage129 Final Test boundary must forbid opening the Final Test in stages")
+
+    # (6) Metrics, uncertainty and inference are fixed before any access.
+    metrics = contract.get("metrics") or {}
+    if metrics.get("primary_metric") != _STAGE129_FT_PRIMARY_METRIC:
+        raise HandoffError(
+            "Stage129 Final Test contract primary metric must be "
+            f"{_STAGE129_FT_PRIMARY_METRIC}")
+    if tuple(metrics.get("secondary_metrics") or ()) != _STAGE129_FT_SECONDARY_METRICS:
+        raise HandoffError(
+            "Stage129 Final Test contract secondary metrics must equal the frozen "
+            f"{_STAGE129_FT_SECONDARY_METRICS}")
+    for field in ("metric_set_is_closed",
+                  "primary_metric_may_not_be_changed_after_seeing_final_test_results"):
+        if metrics.get(field) is not True:
+            raise HandoffError(f"Stage129 Final Test contract metrics {field} must be True")
+    for field in ("additional_metrics_authorized", "metric_substitution_authorized"):
+        if metrics.get(field) is not False:
+            raise HandoffError(f"Stage129 Final Test contract metrics {field} must be False")
+    unc = contract.get("uncertainty") or {}
+    for field in ("bootstrap_execution_authorized_by_this_contract",
+                  "new_seed_introduction_authorized"):
+        if unc.get(field) is not False:
+            raise HandoffError(f"Stage129 Final Test contract uncertainty {field} must be False")
+    cal = contract.get("calibration") or {}
+    for field in ("isotonic_authorized", "platt_fit_on_final_test_authorized",
+                  "recalibration_execution_authorized_by_this_contract"):
+        if cal.get(field) is not False:
+            raise HandoffError(f"Stage129 Final Test contract calibration {field} must be False")
+    if cal.get("do_not_select_winner_on_calibrated_final_test") is not True:
+        raise HandoffError(
+            "Stage129 Final Test contract must carry the frozen prohibition on "
+            "selecting a winner from calibrated Final Test output")
+    inf = contract.get("multiplicity_and_inference") or {}
+    for field in ("holm_execution_authorized_by_this_contract",
+                  "inferential_superiority_claim_authorized"):
+        if inf.get(field) is not False:
+            raise HandoffError(f"Stage129 Final Test contract inference {field} must be False")
+    for field in ("family_may_not_be_shrunk_or_redefined_post_hoc",
+                  "final_test_results_may_not_be_used_to_select_a_winner",
+                  "final_test_results_may_not_reopen_model_selection"):
+        if inf.get(field) is not True:
+            raise HandoffError(f"Stage129 Final Test contract inference {field} must be True")
+    if inf.get("holm_family_complete") is not False:
+        raise HandoffError(
+            "Stage129 Final Test contract may not close the Holm family")
+
+    # (7) Expected outputs exist only as expectations.
+    outputs = contract.get("expected_outputs") or {}
+    artifacts = outputs.get("artifacts") or []
+    if not artifacts:
+        raise HandoffError(
+            "Stage129 Final Test contract must enumerate expected outputs")
+    for entry in artifacts:
+        if entry.get("exists_now") is not False:
+            raise HandoffError(
+                f"Stage129 Final Test expected output {entry.get('name')!r} may not "
+                "already exist; the evaluation has not run")
+    if not outputs.get("forbidden_outputs"):
+        raise HandoffError(
+            "Stage129 Final Test contract must enumerate forbidden outputs")
+    if outputs.get("locked_primary_results_are_not_replaced_by_the_final_test") \
+            is not True:
+        raise HandoffError(
+            "Stage129 Final Test contract must preserve the locked primary results")
+
+    # (8) The fail-closed controls are complete.
+    controls = contract.get("fail_closed_controls") or []
+    ids = tuple(c.get("id") for c in controls)
+    if ids != _STAGE129_FT_FAIL_CLOSED_IDS:
+        raise HandoffError(
+            "Stage129 Final Test contract must carry fail-closed controls "
+            f"{_STAGE129_FT_FAIL_CLOSED_IDS}, got {ids}")
+    for control in controls:
+        if control.get("on_failure") != "ABORT_FINAL_TEST":
+            raise HandoffError(
+                f"Stage129 Final Test control {control.get('id')} must abort on failure")
+        if not control.get("check"):
+            raise HandoffError(
+                f"Stage129 Final Test control {control.get('id')} must state its check")
+
+    # (9) Prerequisites are recorded honestly, including the unsatisfied ones.
+    prereqs = (contract.get("execution_prerequisites") or {}).get("prerequisites") or []
+    if not prereqs:
+        raise HandoffError(
+            "Stage129 Final Test contract must enumerate its execution prerequisites")
+    unsatisfied = sorted(p.get("id") for p in prereqs if p.get("satisfied_now") is not True)
+    if list(boundary.get("unresolved_prerequisites") or []) != unsatisfied:
+        raise HandoffError(
+            "Stage129 Final Test boundary unresolved_prerequisites must equal the "
+            f"contract's unsatisfied prerequisites {unsatisfied}")
+    if boundary.get("unresolved_prerequisites_recorded") != len(unsatisfied):
+        raise HandoffError(
+            "Stage129 Final Test boundary must count its unresolved prerequisites")
+    if list(exe.get("final_test_contract_fully_executable_blocked_by") or []) != \
+            unsatisfied:
+        raise HandoffError(
+            "Stage129 Final Test executability_status must name exactly the "
+            f"unresolved prerequisites {unsatisfied} as its blockers")
+    if exe.get("unresolved_prerequisite_count") != len(unsatisfied):
+        raise HandoffError(
+            "Stage129 Final Test executability_status must count the unresolved "
+            "prerequisites")
+
+    # (10) The firewall, and the fact that locking authorizes nothing.
+    ft = contract.get("final_test_boundary") or {}
+    if tuple(ft.get("final_test_target_years") or ()) != _STAGE129_FT_EVAL_YEARS:
+        raise HandoffError(
+            "Stage129 Final Test contract Final Test years must be "
+            f"{_STAGE129_FT_EVAL_YEARS}")
+    if ft.get("final_test_locked") is not True or ft.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage129 Final Test contract must keep the Final Test locked at 0 rows")
+    for field in ("final_test_rows_read_by_this_contract_lock",
+                  "final_test_predictor_values_read_by_this_contract_lock",
+                  "final_test_target_values_read_by_this_contract_lock",
+                  "final_test_predictions_by_this_contract_lock",
+                  "final_test_metrics_computed_by_this_contract_lock"):
+        if ft.get(field) != 0:
+            raise HandoffError(
+                f"Stage129 Final Test contract {field} must be 0; locking a "
+                "contract reads nothing")
+    if ft.get("this_contract_lock_is_read_only_over_committed_artifacts") is not True:
+        raise HandoffError(
+            "Stage129 Final Test contract must declare itself read-only")
+    ex = contract.get("execution_authorization") or {}
+    for field in ("final_test_execution_authorized_by_this_contract",
+                  "recalibration_authorized", "refit_authorized",
+                  "second_fit_authorized", "tuning_authorized",
+                  "new_scientific_result_authorized", "stage130_authorized",
+                  "stage130_started", "ready_for_review_authorized",
+                  "merge_authorized", "next_action_authorized"):
+        if ex.get(field) is not False:
+            raise HandoffError(f"Stage129 Final Test contract {field} must be False")
+    for field in ("final_test_execution_requires_new_explicit_human_authorization",
+                  "contract_lock_is_not_an_execution_permission",
+                  "pointer_is_not_authorization"):
+        if ex.get(field) is not True:
+            raise HandoffError(f"Stage129 Final Test contract {field} must be True")
+    if ex.get("next_action_id") != _STAGE129_FT_NEXT_ACTION_ID:
+        raise HandoffError(
+            f"Stage129 Final Test pointer must be {_STAGE129_FT_NEXT_ACTION_ID}")
+
+    for field in ("final_test_access_authorized", "final_test_execution_authorized",
+                  "final_test_evaluation_performed", "final_test_unlock_authorized",
+                  "recalibration_authorized", "refit_authorized",
+                  "second_fit_authorized", "retuning_authorized",
+                  "final_model_reselected_by_this_action",
+                  "new_scientific_result_produced", "new_metric_computed",
+                  "new_p_value_created", "inferential_superiority_claimed",
+                  "stage130_authorized", "stage130_started",
+                  "stage130_or_next_stage_executed", "next_action_authorized",
+                  "next_action_executes_final_test", "next_research_action_authorized",
+                  "merge_authorized", "ready_for_review_authorized",
+                  "locked_primary_development_results_modified_by_this_action",
+                  "m1_results_modified_by_this_action",
+                  "historical_scientific_artifacts_modified_by_this_action",
+                  "existing_pull_requests_modified_by_this_action",
+                  "prior_packages_modified_by_this_action",
+                  "m3_lag_wdi_promoted_to_confirmatory_model",
+                  "full_development_refit_executed_by_this_action"):
+        if boundary.get(field) is not False:
+            raise HandoffError(f"Stage129 Final Test boundary {field} must be False")
+    if boundary.get("final_test_execution_requires_new_explicit_human_authorization") \
+            is not True:
+        raise HandoffError(
+            "Stage129 Final Test contract must keep execution behind a new human "
+            "authorization")
+    if boundary.get("final_test_locked") is not True or \
+            boundary.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage129 Final Test boundary must keep the Final Test locked at 0 rows")
+    if boundary.get("next_action_id") != _STAGE129_FT_NEXT_ACTION_ID:
+        raise HandoffError(
+            f"Stage129 Final Test pointer must be {_STAGE129_FT_NEXT_ACTION_ID}")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError("Stage129 Final Test boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage129 Final Test counters.{field} must be 0 (locking a "
+                "contract reads nothing and executes nothing)")
+
+    return {
+        "stage129_final_test_contract_recorded": True,
+        "stage129_final_test_contract_action_id": _STAGE129_FT_ACTION_ID,
+        "stage129_final_test_contract_status": _STAGE129_FT_STATUS,
+        "stage129_final_test_contract_id": contract.get("contract_id"),
+        "stage129_final_test_contract_version": contract.get("contract_version"),
+        "stage129_final_test_terms_are_extracted_not_invented": True,
+        "stage129_final_test_source_artifact_count": len(sources),
+
+        # What the contract fixes.
+        "stage129_final_test_block": _STAGE129_SELECT_BLOCK,
+        "stage129_final_test_algorithm": _STAGE129_SELECT_ALGORITHM,
+        "stage129_final_test_configuration": _STAGE129_SELECT_CONFIGURATION,
+        "stage129_final_test_accepted_artifact_count": len(accepted),
+        "stage129_final_test_evaluation_target_years": list(_STAGE129_FT_EVAL_YEARS),
+        "stage129_final_test_development_years_excluded": list(_STAGE129_FT_DEV_YEARS),
+        "stage129_final_test_primary_metric": _STAGE129_FT_PRIMARY_METRIC,
+        "stage129_final_test_secondary_metrics": list(_STAGE129_FT_SECONDARY_METRICS),
+        "stage129_final_test_metric_set_is_closed": True,
+        "stage129_final_test_threshold_rule": _STAGE129_REFIT_THRESHOLD_RULE,
+        "stage129_final_test_threshold_tie_break": _STAGE129_REFIT_THRESHOLD_TIE_BREAK,
+        "stage129_final_test_fail_closed_control_count": len(controls),
+        "stage129_final_test_expected_output_count": len(artifacts),
+        "stage129_final_test_expected_outputs_exist_now": False,
+
+        # The threshold gap, published so the next actor cannot miss it.
+        "stage129_final_test_threshold_value_materialized": False,
+        "stage129_final_test_threshold_derivation_authorized": False,
+        "stage129_final_test_contract_fully_executable": False,
+        "stage129_final_test_partial_execution_authorized": False,
+        "stage129_final_test_threshold_free_execution_authorized": False,
+        "stage129_final_test_opens_once_after_all_prerequisites": True,
+        "stage129_final_test_threshold_value_status": thr.get("threshold_value_status"),
+        "stage129_final_test_unresolved_prerequisites": list(unsatisfied),
+        "stage129_final_test_unresolved_prerequisite_count": len(unsatisfied),
+
+        # What LOCKING does not do. As with the refit lock, the live execution
+        # facts are owned by a future execution action, not by this lock; only
+        # the lock's own action-scoped statements are published here.
+        "stage129_final_test_contract_locked_but_not_executed_at_lock_time": True,
+        "stage129_final_test_execution_authorized": False,
+        "stage129_final_test_execution_requires_new_human_authorization": True,
+        "stage129_final_test_recalibration_authorized": False,
+        "stage129_final_test_refit_authorized": False,
+        "stage129_final_test_model_reselected": False,
+        "stage130_started": False,
+        "stage129_final_test_stage130_authorized": False,
+
+        # The firewall.
+        "stage129_final_test_locked": True,
+        "stage129_final_test_rows_read": 0,
+        "final_test_locked": True,
+        "final_test_rows_read": 0,
+        "final_test_access_authorized": False,
+
+        "stage129_final_test_next_action_id": _STAGE129_FT_NEXT_ACTION_ID,
+        "stage129_final_test_next_action_authorized": False,
     }
 
 
