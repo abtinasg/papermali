@@ -1,0 +1,44 @@
+{
+  "action_id": "stage129-full-development-refit-execution",
+  "action_type": "one_time_contracted_refit_execution",
+  "contract_lock_pr": 89,
+  "credentials_committed_to_git": false,
+  "executor_path": "project/src/stage129_full_development_refit.py",
+  "executor_sha256": "3f2d22ab53eae3f81303f656fe6c07107c62fa3df9553ac697a7f81a3d520cf5",
+  "fail_closed_controls_all_passed": true,
+  "final_test_artifacts_committed": 0,
+  "final_test_rows_read": 0,
+  "full_development_refit_executed": true,
+  "model_fits_executed": 1,
+  "new_data_files_created_by_this_action": 0,
+  "package_file_count": 6,
+  "package_files": {
+    "README_STAGE129_FULL_DEVELOPMENT_REFIT_EXECUTION.md": {
+      "bytes": 7764,
+      "sha256": "09b7134ca4264f66019f7d56770fd1bc1e92e6d23fd2af70b90e4e97d9f71fc7"
+    },
+    "stage129_full_development_refit_execution_governance_boundary.json": {
+      "bytes": 3642,
+      "sha256": "4d652f6afc254b04f87adb51e94596c1dc4bfd4b928404d5883504ec4fb46a0f"
+    },
+    "stage129_full_development_refit_model.json": {
+      "bytes": 2115,
+      "sha256": "48faab1ef186206508385713fb3b885a88a55bb072fb586d56e63d2777c97690"
+    },
+    "stage129_full_development_refit_preprocessing_parameters.json": {
+      "bytes": 2422,
+      "sha256": "862c65ec37082be1e3e95c29d2bf8873df9105e90cc43ce1ecac4fd8901ba9f6"
+    },
+    "stage129_full_development_refit_provenance_record.json": {
+      "bytes": 1693,
+      "sha256": "4b1aa9a6c85208713f250b5ac3fe71f56c4a8398c3834855926e29a43ad8f07d"
+    },
+    "stage129_full_development_refit_qc_report.json": {
+      "bytes": 3587,
+      "sha256": "e874ee5bdf2510f6c630f170482ca7a13f50ab73c7838550e9412c372c5ee63c"
+    }
+  },
+  "pickle_or_binary_model_committed": false,
+  "pii_committed_to_git": false,
+  "trained_final_model_artifact_created": true
+}

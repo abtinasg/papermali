@@ -550,15 +550,16 @@ def test_protected_handoff_keys_have_the_expected_pre_existing_values():
         "final_test_locked": True,
         "final_test_access_authorized": False,
         "final_test_evaluation_performed": False,
-        # NB: `paper_winner_selected` is deliberately NOT pinned here. It was
-        # False when this contract-lock task ran and this task never moved it,
-        # but it is a LIVE STANDING flag that a later, separately authorized
-        # governance decision (stage129-final-model-human-selection-governance)
-        # legitimately sets. What this task must never move is the scientific
-        # state below, plus the fact that no trained final model exists.
+        # NB: `paper_winner_selected`, `trained_final_model_artifact_created`
+        # and `full_development_refit_performed` are deliberately NOT pinned
+        # here. All three were False when this contract-lock task ran and this
+        # task moved none of them, but they are LIVE STANDING flags that later,
+        # separately authorized actions legitimately set — the final-model
+        # governance decision and the contracted full-development refit
+        # execution. What this task must never move is the M2/M3/M4 scientific
+        # state, the Holm ledger and the Final Test lock, all pinned here.
         "final_model_selected": False,
-        "trained_final_model_artifact_created": False,
-        "full_development_refit_performed": False,
+        "final_test_rows_read": 0,
         "holm_family_complete": False,
         "holm_final_adjustment_deferred": True,
         "stage128_m3_lag_wdi_promoted_to_confirmatory_model": False,

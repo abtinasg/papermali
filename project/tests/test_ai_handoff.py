@@ -49,6 +49,17 @@ def _state(root: str) -> dict:
     return json.load(open(os.path.join(root, "project/docs/ai/handoff_state.json"), encoding="utf-8"))
 
 
+def _read_json(rel: str, root: str = None) -> dict:
+    """Read a committed artifact, for ACTION-SCOPED assertions.
+
+    Several invariants used to be expressed against live global flags as a
+    proxy for "this action did not do X". Once a later, separately authorized
+    action legitimately sets such a flag, the proxy misattributes that action.
+    The artifact's own permanently-false field is the authoritative statement.
+    """
+    return json.load(open(os.path.join(root or REAL_ROOT, rel), encoding="utf-8"))
+
+
 # --------------------------------------------------------------------------- #
 # Real-repo, read-only checks
 # --------------------------------------------------------------------------- #
@@ -2562,7 +2573,13 @@ def test_handoff_state_carries_part3_markers():
     assert state["m1_robustness_part4_authorized"] is False
     assert state["m1_robustness_execution_authorized"] is False
     assert state["m1_robustness_completed"] is True
-    assert state["full_development_refit_performed"] is False
+    # ACTION-SCOPED: the robustness part itself performed no refit, and its own
+    # completion lock records that permanently. The live global flag is NOT a
+    # proxy for it -- the separately authorized Stage129 contracted refit sets
+    # the global, without changing what this part did.
+    assert _read_json(
+        "project/stage126/stage126_m1_robustness_part3_completion_lock.json"
+    )["full_development_refit_performed"] is False
     for field in ("final_test_unlocked", "final_test_access_authorized",
                   "final_test_predictor_values_inspected",
                   "final_test_target_values_inspected",
@@ -2581,7 +2598,10 @@ def test_handoff_state_carries_part4_markers():
     assert state["contract_version"] == (
         "stage126_m1_robustness_part6_smote_training_fold_only_v1"
     )
-    assert state["full_development_refit_performed"] is False
+    # ACTION-SCOPED, as above: this part's own completion lock, not the global.
+    assert _read_json(
+        "project/stage126/stage126_m1_robustness_part4_completion_lock.json"
+    )["full_development_refit_performed"] is False
     for field in ("final_test_unlocked", "final_test_access_authorized",
                   "final_test_predictor_values_inspected",
                   "final_test_target_values_inspected",
@@ -2629,7 +2649,10 @@ def test_part2_half_present_fails_closed(tmp_path):
 def test_part1_preserves_primary_and_final_test_state():
     state = _state(REAL_ROOT)
     assert state["m1_primary_development_tuning_completed"] is True
-    assert state["full_development_refit_performed"] is False
+    # ACTION-SCOPED, as above: Part 1's own completion lock, not the global.
+    assert _read_json(
+        "project/stage126/stage126_m1_robustness_part1_completion_lock.json"
+    )["full_development_refit_performed"] is False
     assert state["final_test_unlocked"] is False
     assert state["final_test_access_authorized"] is False
     assert state["final_test_predictor_values_inspected"] is False

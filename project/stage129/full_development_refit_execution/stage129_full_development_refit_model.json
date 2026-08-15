@@ -1,0 +1,82 @@
+{
+  "action_id": "stage129-full-development-refit-execution",
+  "algorithm": "regularized_logistic_regression",
+  "artifact": "full_development_refit_model_artifact",
+  "block": "M1",
+  "classes": [
+    0,
+    1
+  ],
+  "coefficients": [
+    -0.19520805906,
+    0.663684563254,
+    0.137463730074,
+    -0.381668897564,
+    -0.490395638824,
+    0.080845687786,
+    0.183025212532,
+    -0.1161911309,
+    0.809558129623,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.212061732053,
+    0.0,
+    -0.099474732555,
+    -0.01969263415,
+    0.0
+  ],
+  "configuration_id": "logistic__C_0.1",
+  "design_matrix_columns": [
+    "log_total_assets",
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio",
+    "log_total_assets__missing",
+    "leverage_ratio__missing",
+    "current_ratio__missing",
+    "roa_period_adjusted__missing",
+    "ocf_to_assets_period_adjusted__missing",
+    "asset_turnover_period_adjusted__missing",
+    "operating_margin_period_adjusted__missing",
+    "financial_expense_to_assets_period_adjusted__missing",
+    "accumulated_loss_to_capital_ratio__missing"
+  ],
+  "final_test_used": false,
+  "fit_set": {
+    "negative": 598,
+    "positive": 68,
+    "rows": 666,
+    "target_years": [
+      1393,
+      1394,
+      1395,
+      1396,
+      1397,
+      1398,
+      1399
+    ]
+  },
+  "hyperparameters": {
+    "C": 0.1,
+    "class_weight": "balanced",
+    "max_iter": 5000,
+    "penalty": "l2",
+    "solver": "liblinear"
+  },
+  "intercept": -0.763911411758,
+  "n_design_columns": 18,
+  "n_iter": [
+    6
+  ],
+  "predictions_generated": 0,
+  "random_state": 20260719,
+  "random_state_note": "liblinear + L2 is deterministic; the frozen budget records logistic_regression_deterministic = true. This value is the first locked final seed, reused so the call shape matches the locked development module. No new seed was introduced.",
+  "serialization": "explicit_coefficients_not_a_pickle"
+}

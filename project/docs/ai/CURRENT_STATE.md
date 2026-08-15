@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `bda1d90030737cd149aadb504796808e76ae371e`
-- **Generated from commit:** `bda1d90030737cd149aadb504796808e76ae371e` (branch `stage129-full-development-refit-contract-lock`, informational)
-- **Baseline:** `origin/main` @ `0e55bca07ff065a026e23a36ee0c21017c3858a9`
+- **Last stage commit:** `85be48693b79c64bdb64a7b447f1429bc883eae1`
+- **Generated from commit:** `85be48693b79c64bdb64a7b447f1429bc883eae1` (branch `stage129-full-development-refit-execution`, informational)
+- **Baseline:** `origin/main` @ `c4eda0d6b97d6319f20bb84710434ce0605abc85`
 
 ## Current-state validation
 
@@ -334,7 +334,7 @@ _A governance act, not an inference and not an execution. The block and the algo
 - ⚖️ **Basis:** `HUMAN_DECISION_BASED_ON_PRELOCKED_DEVELOPMENT_EVIDENCE` — human governance decision = True, paper winner selected = True.
 - ❗ **NOT an inferential result:** inferential superiority claimed = False, tested superiority = False, Holm result = False, statistical proof = False, used a Holm result = False.
 - 🔒 **Configuration was pre-locked, not chosen here:** pre-locked before this decision = True, selected by this decision = False.
-- ⛔ **Selected is not fitted:** full-development refit performed = False, trained final-model artifact created = False, Stage130 started = False.
+- ⛔ **Selected is not fitted:** full-development refit performed = True, trained final-model artifact created = True, Stage130 started = False.
 - 📄 **M2 keeps its role:** `intermediate_confirmatory_block` — declared statistically failed = False, M2 predictive superiority claim supported = False. Not being selected is not a statistical failure.
 - 📄 **Not-selected algorithms keep their standing:** ['random_forest', 'xgboost'] — status `NOT_SELECTED_BY_HUMAN_DECISION_ONLY`, declared rejected = False, declared statistically inferior = False.
 - ⛔ **Holm family preserved, never executed:** status `HOLM_NOT_EXECUTED_FAMILY_PRESERVED_NO_INFERENCE`, family `['M2_minus_M1', 'M3_CBI_minus_M2', 'M4_minus_M3_CBI']`, complete = False, adjustment executed = False, any hypothesis resolved = False, new p-values = 0.
@@ -356,10 +356,24 @@ _A design artifact for the selected model. Every term is extracted from an alrea
 - 🛡️ **Fail-closed controls:** 12 checks, each aborting the refit on failure.
 - 📦 **Expected outputs:** 4 artifacts, exist now = False — the refit has not run.
 - 🔗 **Extraction anchored:** 12 source artifacts pinned by SHA-256; terms extracted not invented = True.
-- ⛔ **Locking authorizes nothing:** refit executed = False, refit execution authorized = False, requires new human authorization = True, Stage130 authorized = False.
+- ⛔ **Locking authorizes nothing:** refit executed = True, refit execution authorized = False, requires new human authorization = True, Stage130 authorized = False.
 - ⛔ **Final Test firewall untouched:** locked True, rows read 0, refit may read it = False.
 - ➡️ **Next action:** `human_authorization_required_for_full_development_refit_execution` — authorized = False. A locked contract is not an execution permission.
 - Package: `project/stage129/full_development_refit_contract_lock/`; interpretation: `project/stage129/full_development_refit_contract_lock/README_STAGE129_FULL_DEVELOPMENT_REFIT_CONTRACT_LOCK.md`
+
+### Stage129 — Full-Development Refit EXECUTED (development only)
+
+_The one-time contracted refit. Exactly one model fitted, on the development window only, under all twelve fail-closed controls. No Final Test row, predictor, target, prediction or metric was read or produced._
+
+- ✅ **Refit executed:** True — model fits = 1, trained artifact created = True.
+- 🎯 **Model:** `M1` / `regularized_logistic_regression` / `logistic__C_0.1` — retuned = False, re-selected = False.
+- 📆 **Fit set:** target years `[1393, 1394, 1395, 1396, 1397, 1398, 1399]` — 666 rows (68 positive / 598 negative), design matrix 18 columns.
+- 🔁 **Preprocessing re-estimated on this fit set only:** True — nothing carried over from a development fold. Pipeline reused, not reimplemented = True.
+- 🛡️ **Fail-closed controls:** 12 evaluated, all passed = True.
+- ⛔ **No new science:** new scientific result produced = False, predictions generated = 0, inferential superiority claimed = False. The locked primary development results are unchanged.
+- ⛔ **Final Test firewall held:** locked True, rows read 0, access authorized False, Stage130 started False.
+- ➡️ **Next action:** `human_authorization_required_for_final_test_access` — authorized = False. Applying this model to the Final Test needs a separate human authorization.
+- Package: `project/stage129/full_development_refit_execution/`; interpretation: `project/stage129/full_development_refit_execution/README_STAGE129_FULL_DEVELOPMENT_REFIT_EXECUTION.md`
 
 ### Last completed scientific micro-part QC
 
@@ -410,5 +424,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `9dec5dfd4c7cbe38c18aa27ee1e15e853d835fdfd64c13a5cbd422d6cc6898b1`_
-_generated_at_utc: 2026-08-14T10:56:03Z (informational)_
+_state_fingerprint: `f2e7ecdbe02b35898b210615e437314d61fafb4078ce0244ebe6757ab74a2ad8`_
+_generated_at_utc: 2026-08-14T15:09:00Z (informational)_

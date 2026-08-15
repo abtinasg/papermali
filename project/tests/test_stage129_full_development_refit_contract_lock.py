@@ -383,12 +383,19 @@ def test_locking_the_contract_authorizes_nothing(contract, boundary, state,
                   "ready_for_review_authorized"):
         assert boundary[field] is False, field
     assert boundary["refit_execution_requires_new_explicit_human_authorization"] is True
-    assert state["stage129_refit_executed"] is False
+    # ACTION-SCOPED: locking executed nothing. `stage129_refit_executed` is a
+    # LIVE fact owned by the execution action, so it is not asserted here.
+    assert state["stage129_refit_contract_locked_but_not_executed_at_lock_time"] is True
     assert state["stage129_refit_execution_authorized"] is False
     assert state["stage129_refit_execution_requires_new_human_authorization"] is True
-    assert state["full_development_refit_performed"] is False
-    assert state["trained_final_model_artifact_created"] is False
+    # ACTION-SCOPED: LOCKING the contract executed nothing. Its own boundary
+    # records that permanently; the live global is set by the later,
+    # separately authorized execution of this very contract.
+    assert boundary["full_development_refit_executed"] is False
+    assert boundary["full_development_refit_performed"] is False
+    assert boundary["trained_final_model_artifact_created"] is False
     assert state["stage130_started"] is False
+    assert state["final_test_rows_read"] == 0
     assert roadmap_front_matter["refit_executed"] == "false"
     assert roadmap_front_matter["refit_execution_authorized"] == "false"
     assert roadmap_front_matter["refit_next_action_authorized"] == "false"
@@ -699,7 +706,7 @@ def test_the_generator_is_semantically_idempotent():
     second = gen.derive_stage129_full_development_refit_contract_markers(REPO_ROOT)
     assert first == second
     assert copy.deepcopy(first) == second
-    assert first["stage129_refit_executed"] is False
+    assert first["stage129_refit_contract_locked_but_not_executed_at_lock_time"] is True
 
 
 def test_current_state_renders_the_contract_as_locked_not_executed():

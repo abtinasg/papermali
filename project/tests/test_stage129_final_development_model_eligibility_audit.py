@@ -499,8 +499,8 @@ def test_no_winner_or_final_model_is_selected(boundary, state,
     assert state["stage129_audit_determined_candidate_is_not_a_final_selection"] is True
     # no trained model exists and no endgame step opened, then or since
     assert state["final_model_selected"] is False
-    assert state["trained_final_model_artifact_created"] is False
-    assert state["full_development_refit_performed"] is False
+    # ACTION-SCOPED: the audit fitted nothing. Its own boundary says so.
+    assert boundary["full_development_refit_executed"] is False
     assert roadmap_front_matter["final_model_selected"] == "false"
 
 
@@ -512,9 +512,10 @@ def test_no_refit_stage130_or_final_test_is_executed_or_authorized(
                   "next_action_executes_refit", "next_action_executes_final_test",
                   "merge_authorized", "ready_for_review_authorized"):
         assert boundary[field] is False, field
-    assert state["full_development_refit_performed"] is False
+    # ACTION-SCOPED above; the still-true global facts below.
     assert state["next_research_action_authorized"] is False
-    assert roadmap_front_matter["full_development_refit_performed"] == "false"
+    assert state["stage130_started"] is False
+    assert state["final_test_rows_read"] == 0
     assert roadmap_front_matter["stage130_started"] == "false"
     assert roadmap_front_matter["next_research_action_authorized"] == "false"
 

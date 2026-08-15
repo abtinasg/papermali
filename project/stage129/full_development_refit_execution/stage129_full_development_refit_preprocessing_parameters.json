@@ -1,0 +1,88 @@
+{
+  "action_id": "stage129-full-development-refit-execution",
+  "artifact": "full_development_refit_preprocessing_parameters",
+  "clip_lower_1st_percentile": [
+    11.577497044219,
+    0.064756437407,
+    0.352632842246,
+    -0.184325728965,
+    -0.145867572408,
+    0.003327264719,
+    -0.411130481051,
+    -0.150872001722,
+    0.0
+  ],
+  "clip_percentiles": [
+    1,
+    99
+  ],
+  "clip_upper_99th_percentile": [
+    19.113930908209,
+    1.016377607796,
+    12.971732621714,
+    0.539568754841,
+    0.462358449025,
+    4.979925760219,
+    1.230259178309,
+    0.0,
+    1.521742502564
+  ],
+  "estimated_on": "the_single_full_development_fit_set_1393_1399",
+  "estimated_on_note": "Every statistic below was re-estimated on this one fit set. Nothing was carried over from a development fold.",
+  "feature_order": [
+    "log_total_assets",
+    "leverage_ratio",
+    "current_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "asset_turnover_period_adjusted",
+    "operating_margin_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "accumulated_loss_to_capital_ratio"
+  ],
+  "median_of_clipped_observed": [
+    14.449759882725,
+    0.573434139185,
+    1.223700633437,
+    0.087468369054,
+    0.103223141238,
+    0.725831641551,
+    0.150898961133,
+    -0.025700784588,
+    0.0
+  ],
+  "missingness_indicators_standardized": false,
+  "pipeline_order": [
+    "1_deterministic_source_to_feature_transformation",
+    "2_capture_original_pre_imputation_missingness_mask",
+    "3_estimate_1st_99th_percentile_clipping_bounds_on_observed_training_fold_values_only",
+    "4_apply_training_derived_clipping_bounds",
+    "5_estimate_training_fold_median_on_observed_clipped_training_values",
+    "6_impute_missing_values_with_training_fold_median",
+    "7_append_missingness_indicators_from_original_pre_imputation_mask",
+    "8_logistic_regression_only_standardize_imputed_continuous_features_using_training_fold_mean_std"
+  ],
+  "standardization_applied": true,
+  "standardization_mean": [
+    14.685821889287,
+    0.56171432781,
+    1.642508817492,
+    0.116233183675,
+    0.118394378864,
+    0.961419044168,
+    0.19433242999,
+    -0.033520098154,
+    0.113619830106
+  ],
+  "standardization_std": [
+    1.589524334688,
+    0.207012453663,
+    1.765704403898,
+    0.133878571898,
+    0.112828916301,
+    0.833341617848,
+    0.22655925658,
+    0.033445931809,
+    0.282946926781
+  ]
+}
