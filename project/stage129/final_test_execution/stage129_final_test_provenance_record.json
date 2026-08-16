@@ -1,0 +1,57 @@
+{
+  "accepted_artifacts_sha256": {
+    "project/stage129/full_development_refit_execution/stage129_full_development_refit_model.json": "48faab1ef186206508385713fb3b885a88a55bb072fb586d56e63d2777c97690",
+    "project/stage129/full_development_refit_execution/stage129_full_development_refit_preprocessing_parameters.json": "862c65ec37082be1e3e95c29d2bf8873df9105e90cc43ce1ecac4fd8901ba9f6",
+    "project/stage129/full_development_refit_execution/stage129_full_development_refit_provenance_record.json": "4b1aa9a6c85208713f250b5ac3fe71f56c4a8398c3834855926e29a43ad8f07d",
+    "project/stage129/full_development_refit_execution/stage129_full_development_refit_qc_report.json": "e874ee5bdf2510f6c630f170482ca7a13f50ab73c7838550e9412c372c5ee63c"
+  },
+  "action_id": "stage129-final-test-execution",
+  "artifact": "final_test_provenance_record",
+  "base_commit": "bc1baa11eb94999af8a60cd2f266628b8c78db68",
+  "cohort_pairs": 346,
+  "contract_path": "project/stage129/final_test_execution_contract_lock/stage129_final_test_execution_contract.json",
+  "contract_sha256": "036d85f8b095e0cd7e55afb899283c71f957234ce4740085a20c2d81a617074e",
+  "evaluable_rows": 346,
+  "executor_path": "project/src/stage129_final_test_execution.py",
+  "executor_sha256": "d85234ee4c7e2b14dc21084348a059fceb083cf8bcc0ecbf30ee64eef79c56a4",
+  "final_test_passes_executed": 1,
+  "final_test_rows_read": 346,
+  "final_test_target_years": [
+    1400,
+    1401,
+    1402
+  ],
+  "input_sha256": {
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv": "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
+    "project/stage125/part4_temporal_split_manifest_stage125.csv": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc"
+  },
+  "locked_development_results_sha256_after": {
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4"
+  },
+  "locked_development_results_sha256_before": {
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4"
+  },
+  "model_fits_executed": 0,
+  "pipeline_reused_not_reimplemented": true,
+  "pipeline_source_module": "project/src/stage126_m1_primary_development_tuning.py",
+  "pipeline_source_sha256": "ae63bee24c3b868919b008cb15a0d4f4bfb8300ee6e3002a61e1e105d9391d82",
+  "pre01_path": "project/stage129/final_test_execution/stage129_pre01_human_authorization_record.json",
+  "pre01_sha256": "70ed6dddcd2a7cdd6468844ebe1fda27f163006a5fd54735e5b5278fc69d3ca4",
+  "runtime_versions": {
+    "jdatetime": "6.0.1",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "python": "3.13.5",
+    "scikit-learn": "1.9.0",
+    "xgboost": "3.3.0"
+  },
+  "threshold_artifact_path": "project/stage129/threshold_derivation_attempt3/stage129_threshold_value_attempt3.json",
+  "threshold_artifact_sha256": "9b8a7d799616eb12d6e70a6dcf623ff1a636b4ec4b1bde37c21116252876b534",
+  "threshold_value": 0.426878838687,
+  "unique_tickers": 119
+}

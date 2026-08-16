@@ -1335,6 +1335,26 @@ def sha256_file(path: str) -> str | None:
 
 
 # --------------------------------------------------------------------------- #
+# Historical Final Test firewall state
+# --------------------------------------------------------------------------- #
+
+#: The Final Test firewall stood, untouched, for every action in the programme
+#: up to and including the threshold derivation. Those sections describe the
+#: state AT THEIR OWN TIME, so they are pinned here rather than read from the
+#: live record: once the one authorized Final Test pass spends the firewall,
+#: the live keys legitimately flip, and a historical section that read them
+#: would silently rewrite itself to claim the firewall was already open while
+#: those actions ran. It was not. The live state is owned solely by
+#: `derive_stage129_final_test_execution_markers`.
+_FIREWALL_STOOD_LOCKED = True
+_FIREWALL_STOOD_UNLOCKED = False
+_FIREWALL_STOOD_ACCESS_AUTHORIZED = False
+_FIREWALL_STOOD_EVALUATION_PERFORMED = False
+_FIREWALL_STOOD_VALUES_INSPECTED = False
+_FIREWALL_STOOD_ROWS_READ = 0
+
+
+# --------------------------------------------------------------------------- #
 # ROADMAP front matter
 # --------------------------------------------------------------------------- #
 
@@ -3046,6 +3066,14 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # a PP08 clause (b) that sampled rather than covered every token, and
         # refuses any state where attempts 1 and 2 have been tidied away.
         **derive_stage129_threshold_attempt3_markers(root),
+        # Must come last of ALL: the one-time Final Test EXECUTION. Every
+        # action above published the firewall markers that held while the
+        # firewall stood (`final_test_locked = True`, `final_test_rows_read =
+        # 0`, `final_test_access_authorized = False`). This is the single
+        # action authorized to spend that firewall, so it must be the last
+        # word on those keys -- and it re-hashes its own outputs and the
+        # frozen executor, so a result edited after the fact fails the build.
+        **derive_stage129_final_test_execution_markers(root),
         }))
 
 
@@ -4269,11 +4297,11 @@ def render_current_state(record: dict) -> str:
             "only; any live M2 execution marker was set by a later, "
             "separately authorized action)",
             "- 🔒 **Final test locked:** final_test_unlocked="
-            f"{record.get('final_test_unlocked')}, "
+            f"{_FIREWALL_STOOD_UNLOCKED}, "
             f"final_test_access_authorized="
-            f"{record.get('final_test_access_authorized')}, "
+            f"{_FIREWALL_STOOD_ACCESS_AUTHORIZED}, "
             f"final_test_evaluation_performed="
-            f"{record.get('final_test_evaluation_performed')}",
+            f"{_FIREWALL_STOOD_EVALUATION_PERFORMED}",
             "- Contract: `project/docs/ai/STAGE128_M2_D2_DESIGN_FREEZE.md`; "
             "machine-readable package: `project/stage128/`",
             "",
@@ -4433,11 +4461,11 @@ def render_current_state(record: dict) -> str:
             f"`{record.get('stage128_m2_d2_gate_rerun_status')}` is preserved "
             "unchanged",
             "- \U0001f512 **Final test locked:** final_test_unlocked="
-            f"{record.get('final_test_unlocked')}, "
+            f"{_FIREWALL_STOOD_UNLOCKED}, "
             f"final_test_access_authorized="
-            f"{record.get('final_test_access_authorized')}, "
+            f"{_FIREWALL_STOOD_ACCESS_AUTHORIZED}, "
             f"final_test_evaluation_performed="
-            f"{record.get('final_test_evaluation_performed')} — "
+            f"{_FIREWALL_STOOD_EVALUATION_PERFORMED} — "
             f"**M3 started:** {record.get('m3_started')} — "
             f"**M4 started:** {record.get('m4_started')}",
             (
@@ -4499,13 +4527,13 @@ def render_current_state(record: dict) -> str:
             f"deferred={record.get('holm_final_adjustment_deferred')} — "
             "the incomplete confirmatory family stays incomplete",
             "- 🔒 **Final test locked:** final_test_unlocked="
-            f"{record.get('final_test_unlocked')}, "
+            f"{_FIREWALL_STOOD_UNLOCKED}, "
             "final_test_access_authorized="
-            f"{record.get('final_test_access_authorized')}, "
+            f"{_FIREWALL_STOOD_ACCESS_AUTHORIZED}, "
             "predictor values inspected="
-            f"{record.get('final_test_predictor_values_inspected')}, "
+            f"{_FIREWALL_STOOD_VALUES_INSPECTED}, "
             "target values inspected="
-            f"{record.get('final_test_target_values_inspected')}",
+            f"{_FIREWALL_STOOD_VALUES_INSPECTED}",
             "- ⛔ **M3:** authorized="
             f"{record.get('m3_authorized')}, started={record.get('m3_started')}"
             " — **M4:** authorized="
@@ -4580,7 +4608,7 @@ def render_current_state(record: dict) -> str:
             "- \u26d4 **M4:** authorized="
             f"{record.get('m4_authorized')}, started="
             f"{record.get('m4_started')} — **final test locked:** "
-            f"{record.get('final_test_locked')}",
+            f"{_FIREWALL_STOOD_LOCKED}",
         ]
         if m3_passed:
             lines.append(
@@ -4760,7 +4788,7 @@ def render_current_state(record: dict) -> str:
             f"{record.get('m3i2_data_gate_executed')}) — **M3I-2 admitted:** "
             f"{record.get('m3i2_block_admitted')} — **modeling started:** "
             f"{record.get('m3i2_modeling_started')} — **Final Test locked:** "
-            f"{record.get('final_test_locked')} — **M4 authorized:** "
+            f"{_FIREWALL_STOOD_LOCKED} — **M4 authorized:** "
             f"{record.get('m4_authorized')} — **merge authorized:** "
             f"{record.get('stage128_m3i2_merge_authorized')}",
             "- Package: `project/stage128/"
@@ -4809,7 +4837,7 @@ def render_current_state(record: dict) -> str:
             f"{record.get('m3i2_block_admitted')} — Data Gate executed "
             f"{record.get('m3i2_data_gate_executed')} — modeling started "
             f"{record.get('m3i2_modeling_started')} — Final Test locked "
-            f"{record.get('final_test_locked')} — M4 authorized "
+            f"{_FIREWALL_STOOD_LOCKED} — M4 authorized "
             f"{record.get('m4_authorized')} — merge authorized "
             f"{record.get('stage128_m3i2_merge_authorized')}",
             "- ⛔ A passing integrity audit does **not** resolve the "
@@ -5033,7 +5061,7 @@ def render_current_state(record: dict) -> str:
             f"{record.get('m3i2_block_admitted')} — Data Gate executed "
             f"{record.get('m3i2_data_gate_executed')} — modeling started "
             f"{record.get('m3i2_modeling_started')} — Final Test locked "
-            f"{record.get('final_test_locked')} — M4 authorized "
+            f"{_FIREWALL_STOOD_LOCKED} — M4 authorized "
             f"{record.get('m4_authorized')} — merge authorized "
             f"{record.get('stage128_m3i2_merge_authorized')}",
             "- Package: `project/stage128/"
@@ -5608,7 +5636,7 @@ def render_current_state(record: dict) -> str:
             "only, non-confirmatory).",
             "- ⛔ **Unchanged:** M4 authorized "
             f"{record.get('m4_authorized')} — Final Test locked "
-            f"{record.get('final_test_locked')}, rows read "
+            f"{_FIREWALL_STOOD_LOCKED}, rows read "
             f"{record.get('stage128_m3_lag_wdi_final_test_rows_read', 0)} — "
             "confirmatory Holm family unchanged and unexecuted — paper "
             f"winner selected {record.get('paper_winner_selected')}.",
@@ -6129,9 +6157,9 @@ def render_current_state(record: dict) -> str:
             "audit package preserved = "
             f"{record.get('stage129_final_selection_audit_package_preserved')}.",
             "- ⛔ **Final Test firewall untouched:** locked "
-            f"{record.get('final_test_locked')}, rows read "
-            f"{record.get('final_test_rows_read')}, access authorized "
-            f"{record.get('final_test_access_authorized')}.",
+            f"{_FIREWALL_STOOD_LOCKED}, rows read "
+            f"{_FIREWALL_STOOD_ROWS_READ}, access authorized "
+            f"{_FIREWALL_STOOD_ACCESS_AUTHORIZED}.",
             "- ➡️ **Next action:** "
             f"`{record.get('stage129_final_selection_next_action_id')}` — "
             "authorized = "
@@ -6255,7 +6283,7 @@ def render_current_state(record: dict) -> str:
             f"{record.get('stage129_refit_execution_final_test_locked')}, rows "
             f"read {record.get('stage129_refit_execution_final_test_rows_read')}"
             ", access authorized "
-            f"{record.get('final_test_access_authorized')}, Stage130 started "
+            f"{_FIREWALL_STOOD_ACCESS_AUTHORIZED}, Stage130 started "
             f"{record.get('stage130_started')}.",
             "- ➡️ **Next action:** "
             f"`{record.get('stage129_refit_execution_next_action_id')}` — "
@@ -6267,6 +6295,92 @@ def render_current_state(record: dict) -> str:
             "full_development_refit_execution/`; interpretation: "
             "`project/stage129/full_development_refit_execution/"
             "README_STAGE129_FULL_DEVELOPMENT_REFIT_EXECUTION.md`",
+            "",
+        ]
+    if record.get("stage129_final_test_execution_recorded"):
+        lines += [
+            "### Stage129 — Final Test EXECUTED (the firewall is spent)\n",
+            "_The one-time contracted Final Test pass. The held-out years "
+            "۱۴۰۰–۱۴۰۲ have now been opened, exactly once, under all "
+            "twenty-one fail-closed controls. The result below is reported as "
+            "computed — it was accepted before it was seen, and no method, "
+            "threshold or metric was changed after seeing it._\n",
+            "- ✅ **Executed:** passes = "
+            f"{record.get('stage129_final_test_passes_executed')}, executor "
+            f"`{record.get('stage129_final_test_executor_sha256')}` (frozen "
+            "before the pass).",
+            "- 🎯 **Model APPLIED, never fitted:** "
+            f"`{record.get('final_development_block')}` / "
+            f"`{record.get('final_algorithm')}` / "
+            f"`{record.get('final_configuration')}` — model fits = "
+            f"{record.get('stage129_final_test_model_fits_executed')}, refits = "
+            f"{record.get('stage129_final_test_refits_executed')}, winner "
+            "selections = "
+            f"{record.get('stage129_final_test_winner_selections')}.",
+            "- 📆 **Evaluation set:** target years "
+            f"`{record.get('stage129_final_test_target_years')}` — "
+            f"{record.get('stage129_final_test_cohort_pairs')} cohort pairs, "
+            f"{record.get('stage129_final_test_evaluable_rows')} evaluable "
+            f"({record.get('stage129_final_test_positive')} positive / "
+            f"{record.get('stage129_final_test_negative')} negative) across "
+            f"{record.get('stage129_final_test_unique_tickers')} tickers; "
+            f"{record.get('stage129_final_test_predictions')} predictions.",
+            "- 📊 **Primary metric — "
+            f"{record.get('stage129_final_test_primary_metric')}: "
+            f"{record.get('stage129_final_test_pr_auc')}**.",
+            "- 📊 **Secondary:** ROC-AUC "
+            f"{record.get('stage129_final_test_roc_auc')}, Brier "
+            f"{record.get('stage129_final_test_brier')}, Recall@10% "
+            f"{record.get('stage129_final_test_recall_at_10pct')}, Lift@10% "
+            f"{record.get('stage129_final_test_lift_at_10pct')}. Metric set "
+            f"closed = {record.get('stage129_final_test_metric_set_is_closed')}"
+            f", metrics computed = "
+            f"{record.get('stage129_final_test_metrics_computed')}.",
+            "- 🎚️ **Threshold applied, not derived here:** "
+            f"`{record.get('stage129_final_test_threshold')}` (development-OOF "
+            "F2 rule) — TP "
+            f"{record.get('stage129_final_test_confusion_tp')} / FP "
+            f"{record.get('stage129_final_test_confusion_fp')} / TN "
+            f"{record.get('stage129_final_test_confusion_tn')} / FN "
+            f"{record.get('stage129_final_test_confusion_fn')}. Threshold "
+            f"searches = {record.get('stage129_final_test_threshold_searches')}.",
+            "- 📈 **Uncertainty:** paired company-cluster bootstrap on "
+            f"`ticker`, {record.get('stage129_final_test_bootstrap_replicates')}"
+            " replicates, "
+            f"{record.get('stage129_final_test_bootstrap_valid_replicates')} "
+            "valid, percentile-95, seed "
+            f"`{record.get('stage129_final_test_bootstrap_seed')}`.",
+            "- 🛡️ **Fail-closed controls:** "
+            f"{record.get('stage129_final_test_controls_evaluated')} evaluated "
+            "(FT01–FT21), all passed = "
+            f"{record.get('stage129_final_test_controls_all_passed')}.",
+            "- ⛔ **No recalibration, no inference:** recalibration executions = "
+            f"{record.get('stage129_final_test_recalibration_executions')}, "
+            "probabilities raw = "
+            f"{record.get('stage129_final_test_probabilities_are_raw')}, "
+            "inferential superiority claimed = "
+            f"{record.get('inferential_superiority_claimed')}. The locked "
+            "primary development results are byte-identical.",
+            "- 🔓 **Firewall status:** "
+            f"`{record.get('final_test_firewall_status')}` — rows read "
+            f"{record.get('final_test_rows_read')}, evaluation performed "
+            f"{record.get('final_test_evaluation_performed')}. The one-action "
+            "PRE01 authorization was CONSUMED by this pass, so access "
+            "authorized is back to "
+            f"{record.get('final_test_access_authorized')} and the Final Test "
+            f"is shut again (locked = {record.get('final_test_locked')}). "
+            "Second pass authorized = "
+            f"{record.get('final_test_second_pass_authorized')}: it may never "
+            "be opened again, and no result here may reopen model selection.",
+            "- ➡️ **Next action:** "
+            f"`{record.get('stage129_final_test_next_action_id')}` — "
+            "authorized = "
+            f"{record.get('stage129_final_test_next_action_authorized')}. "
+            "Stage130 started = "
+            f"{record.get('stage130_started')}, Stage130 authorized = "
+            f"{record.get('stage129_final_test_stage130_authorized')}.",
+            "- Package: `project/stage129/final_test_execution/`; executor: "
+            "`project/src/stage129_final_test_execution.py`",
             "",
         ]
     lines += [
@@ -16404,6 +16518,373 @@ def derive_stage129_full_development_refit_execution_markers(root: str) -> dict:
         "stage129_refit_execution_next_action_id":
             _STAGE129_REFIT_EXEC_NEXT_ACTION_ID,
         "stage129_refit_execution_next_action_authorized": False,
+    }
+
+
+_STAGE129_FT_EXEC_PKG = "project/stage129/final_test_execution"
+_STAGE129_FT_EXEC_ACTION_ID = "stage129-final-test-execution"
+_STAGE129_FT_EXEC_MANIFEST_REL = (
+    f"{_STAGE129_FT_EXEC_PKG}/metadata_and_hashes_stage129_final_test_execution.json")
+_STAGE129_FT_EXEC_METRICS_REL = (
+    f"{_STAGE129_FT_EXEC_PKG}/stage129_final_test_metrics.json")
+_STAGE129_FT_EXEC_PREDICTIONS_REL = (
+    f"{_STAGE129_FT_EXEC_PKG}/stage129_final_test_predictions.json")
+_STAGE129_FT_EXEC_PROV_REL = (
+    f"{_STAGE129_FT_EXEC_PKG}/stage129_final_test_provenance_record.json")
+_STAGE129_FT_EXEC_QC_REL = (
+    f"{_STAGE129_FT_EXEC_PKG}/stage129_final_test_qc_report.json")
+_STAGE129_FT_EXEC_PRE01_REL = (
+    f"{_STAGE129_FT_EXEC_PKG}/stage129_pre01_human_authorization_record.json")
+#: The executor frozen BEFORE the pass. Its hash is recorded in the provenance
+#: and re-verified here against the file on disk.
+_STAGE129_FT_EXEC_EXECUTOR_REL = "project/src/stage129_final_test_execution.py"
+_STAGE129_FT_EXEC_EXECUTOR_SHA256 = (
+    "d85234ee4c7e2b14dc21084348a059fceb083cf8bcc0ecbf30ee64eef79c56a4")
+_STAGE129_FT_EXEC_CONTROL_IDS = tuple(f"FT{i:02d}" for i in range(1, 22))
+_STAGE129_FT_EXEC_TARGET_YEARS = (1400, 1401, 1402)
+_STAGE129_FT_EXEC_THRESHOLD = 0.426878838687
+_STAGE129_FT_EXEC_CLOSED_METRICS = (
+    "Brier_score", "Lift@10%", "PR-AUC", "ROC-AUC", "Recall@10%")
+_STAGE129_FT_EXEC_PRIMARY_METRIC = "PR-AUC"
+_STAGE129_FT_EXEC_BOOTSTRAP_REPLICATES = 2000
+_STAGE129_FT_EXEC_BOOTSTRAP_MIN_VALID = 1000
+_STAGE129_FT_EXEC_BOOTSTRAP_SEED = 20260724
+#: Counters the contract fixes at zero even though the Final Test WAS opened.
+_STAGE129_FT_EXEC_ZERO_COUNTERS = (
+    "model_fits_executed", "refits_executed", "tuning_runs",
+    "hyperparameter_searches", "feature_searches", "threshold_searches",
+    "recalibration_executions", "isotonic_executions", "shap_executions",
+    "holm_executions", "p_values_computed", "winner_selections",
+)
+_STAGE129_FT_EXEC_NEXT_ACTION_ID = (
+    "human_authorization_required_for_ready_for_review_and_merge")
+
+
+def derive_stage129_final_test_execution_markers(root: str) -> dict:
+    """Recognize the one-time contracted Final Test EXECUTION.
+
+    Must be registered LAST. This is the only action in the programme that
+    opens the Final Test, so it is the only one permitted to move
+    ``final_test_locked`` off True and ``final_test_rows_read`` off 0 — and it
+    supersedes those markers from every earlier action, which published them
+    while the firewall still stood.
+
+    Narrow and fail-closed, in the same spirit as the refit-execution
+    recognizer: instead of proving nothing ran, it proves that EXACTLY the
+    contracted thing ran and nothing more. It re-hashes every package file
+    against the package's own manifest and re-hashes the frozen executor, so a
+    post-hoc edit to any output or to the executor fails the build. It fails
+    closed on anything other than one pass, 21/21 passing controls, the closed
+    five-metric set, the pinned threshold, the 1400-1402 window, the contracted
+    bootstrap parameters, or any non-zero prohibited counter. Returns {} before
+    the package exists.
+    """
+    path = os.path.join(root, _STAGE129_FT_EXEC_METRICS_REL)
+    if not os.path.isfile(path):
+        return {}
+    manifest = _require_json_artifact(root, _STAGE129_FT_EXEC_MANIFEST_REL)
+    metrics = _require_json_artifact(root, _STAGE129_FT_EXEC_METRICS_REL)
+    preds = _require_json_artifact(root, _STAGE129_FT_EXEC_PREDICTIONS_REL)
+    prov = _require_json_artifact(root, _STAGE129_FT_EXEC_PROV_REL)
+    qc = _require_json_artifact(root, _STAGE129_FT_EXEC_QC_REL)
+    pre01 = _require_json_artifact(root, _STAGE129_FT_EXEC_PRE01_REL)
+
+    for artifact, label in ((metrics, "metrics"), (preds, "predictions"),
+                            (prov, "provenance"), (qc, "qc"),
+                            (manifest, "manifest"), (pre01, "pre01")):
+        if artifact.get("action_id") != _STAGE129_FT_EXEC_ACTION_ID:
+            raise HandoffError(
+                f"Stage129 Final Test execution {label} action_id mismatch")
+
+    # (1) The written package is byte-intact, against its own manifest.
+    listed = manifest.get("package_files") or {}
+    if not listed:
+        raise HandoffError(
+            "Stage129 Final Test execution manifest lists no package files")
+    for name, want in listed.items():
+        p = os.path.join(root, _STAGE129_FT_EXEC_PKG, name)
+        if not os.path.isfile(p):
+            raise HandoffError(
+                f"Stage129 Final Test execution package file missing: {name}")
+        with open(p, "rb") as fh:
+            raw = fh.read()
+        if hashlib.sha256(raw).hexdigest() != want.get("sha256") or \
+                len(raw) != want.get("bytes"):
+            raise HandoffError(
+                f"Stage129 Final Test execution output {name} has drifted from "
+                "the manifest; the recorded result is no longer the written one")
+
+    # (2) The executor that produced it is the frozen one.
+    exec_path = os.path.join(root, _STAGE129_FT_EXEC_EXECUTOR_REL)
+    if not os.path.isfile(exec_path):
+        raise HandoffError("Stage129 Final Test executor is missing")
+    with open(exec_path, "rb") as fh:
+        exec_sha = hashlib.sha256(fh.read()).hexdigest()
+    if exec_sha != _STAGE129_FT_EXEC_EXECUTOR_SHA256:
+        raise HandoffError(
+            "Stage129 Final Test executor has changed since the frozen "
+            f"pre-execution state {_STAGE129_FT_EXEC_EXECUTOR_SHA256}")
+    if prov.get("executor_sha256") != _STAGE129_FT_EXEC_EXECUTOR_SHA256:
+        raise HandoffError(
+            "Stage129 Final Test provenance does not record the frozen executor")
+
+    # (3) Authorization really was recorded before the first row was read.
+    if pre01.get("status") != "RESOLVED" or \
+            pre01.get("all_prerequisites_resolved") is not True:
+        raise HandoffError("Stage129 Final Test execution requires PRE01 RESOLVED")
+    if pre01.get("recorded_before_any_final_test_row_was_read") is not True or \
+            pre01.get("final_test_rows_read_at_time_of_recording") != 0:
+        raise HandoffError(
+            "Stage129 Final Test PRE01 must be recorded before any row was read")
+    for key in ("pre02_status", "pre03_status", "pre04_status"):
+        if pre01.get(key) != "RESOLVED":
+            raise HandoffError(f"Stage129 Final Test {key} must be RESOLVED")
+    if pre01.get("contract_sha256") != prov.get("contract_sha256"):
+        raise HandoffError(
+            "Stage129 Final Test PRE01 and provenance pin different contracts")
+
+    # (4) Exactly one pass, over exactly the Final Test window.
+    counters = qc.get("counters") or {}
+    if counters.get("final_test_passes_executed") != 1 or \
+            prov.get("final_test_passes_executed") != 1:
+        raise HandoffError(
+            "Stage129 Final Test permits exactly one pass; "
+            f"{counters.get('final_test_passes_executed')!r} recorded")
+    if counters.get("final_test_load_invocations") != 1:
+        raise HandoffError(
+            "Stage129 Final Test must record exactly one load invocation")
+    if tuple(prov.get("final_test_target_years") or ()) != \
+            _STAGE129_FT_EXEC_TARGET_YEARS or \
+            tuple(metrics.get("target_years") or ()) != \
+            _STAGE129_FT_EXEC_TARGET_YEARS:
+        raise HandoffError(
+            "Stage129 Final Test target years must be "
+            f"{list(_STAGE129_FT_EXEC_TARGET_YEARS)}")
+    rows_read = prov.get("final_test_rows_read")
+    if not isinstance(rows_read, int) or rows_read <= 0:
+        raise HandoffError(
+            "Stage129 Final Test execution must record a positive rows_read")
+    if counters.get("final_test_rows_read") != rows_read or \
+            counters.get("final_test_rows_seen_in_manifest") != rows_read:
+        raise HandoffError("Stage129 Final Test row counters disagree")
+    evaluable = prov.get("evaluable_rows")
+    if metrics.get("evaluable_rows") != evaluable or \
+            counters.get("final_test_evaluable_rows") != evaluable:
+        raise HandoffError("Stage129 Final Test evaluable-row counters disagree")
+    rows = preds.get("predictions") or []
+    if len(rows) != counters.get("final_test_predictions") or \
+            len(rows) != evaluable:
+        raise HandoffError(
+            "Stage129 Final Test prediction count disagrees with the counters")
+    stray = sorted({r.get("target_year") for r in rows}
+                   - set(_STAGE129_FT_EXEC_TARGET_YEARS))
+    if stray:
+        raise HandoffError(
+            f"Stage129 Final Test predictions carry non-Final-Test years {stray}")
+
+    # (5) The model was APPLIED, and the threshold was READ, never derived.
+    if prov.get("model_fits_executed") != 0:
+        raise HandoffError(
+            "Stage129 Final Test execution may not fit anything")
+    if prov.get("threshold_value") != _STAGE129_FT_EXEC_THRESHOLD:
+        raise HandoffError(
+            "Stage129 Final Test did not apply the admitted threshold "
+            f"{_STAGE129_FT_EXEC_THRESHOLD}")
+    thresholded = metrics.get("thresholded_secondary") or {}
+    if thresholded.get("threshold") != _STAGE129_FT_EXEC_THRESHOLD or \
+            thresholded.get("derived_from") != "pooled_development_oof_only":
+        raise HandoffError(
+            "Stage129 Final Test threshold must be the development-OOF value")
+    if prov.get("pipeline_reused_not_reimplemented") is not True:
+        raise HandoffError(
+            "Stage129 Final Test must reuse the locked pipeline, not reimplement it")
+
+    # (6) The metric set is CLOSED, and the primary was not swapped.
+    got_metrics = metrics.get("metrics") or {}
+    if tuple(sorted(got_metrics)) != _STAGE129_FT_EXEC_CLOSED_METRICS:
+        raise HandoffError(
+            f"Stage129 Final Test metric set {sorted(got_metrics)} is not the "
+            f"closed set {list(_STAGE129_FT_EXEC_CLOSED_METRICS)}")
+    if metrics.get("metric_set_is_closed") is not True or \
+            metrics.get("additional_metrics_computed") != 0:
+        raise HandoffError("Stage129 Final Test metric set must be closed")
+    if metrics.get("primary_metric") != _STAGE129_FT_EXEC_PRIMARY_METRIC:
+        raise HandoffError(
+            "Stage129 Final Test primary metric may not be changed after results")
+    if metrics.get("primary_metric_value") != \
+            got_metrics.get(_STAGE129_FT_EXEC_PRIMARY_METRIC):
+        raise HandoffError("Stage129 Final Test primary metric value disagrees")
+    if counters.get("final_test_metrics_computed") != \
+            len(_STAGE129_FT_EXEC_CLOSED_METRICS):
+        raise HandoffError(
+            "Stage129 Final Test must compute exactly the five contracted metrics")
+    if metrics.get("topk", {}).get("K_optimized_after_results") is not False:
+        raise HandoffError("Stage129 Final Test K may not be optimized on results")
+
+    # (7) The contracted bootstrap, with its parameters unchanged.
+    unc = metrics.get("uncertainty") or {}
+    if unc.get("method") != "paired_company_cluster_bootstrap" or \
+            unc.get("cluster") != "ticker" or \
+            unc.get("confidence_interval") != "percentile_95" or \
+            unc.get("replicates") != _STAGE129_FT_EXEC_BOOTSTRAP_REPLICATES or \
+            unc.get("seed") != _STAGE129_FT_EXEC_BOOTSTRAP_SEED:
+        raise HandoffError(
+            "Stage129 Final Test bootstrap parameters drifted from the contract")
+    valid = unc.get("valid_replicates")
+    if not isinstance(valid, int) or valid < _STAGE129_FT_EXEC_BOOTSTRAP_MIN_VALID:
+        raise HandoffError(
+            f"Stage129 Final Test bootstrap needs at least "
+            f"{_STAGE129_FT_EXEC_BOOTSTRAP_MIN_VALID} valid replicates, got {valid!r}")
+    if counters.get("bootstrap_executions") != 1:
+        raise HandoffError("Stage129 Final Test permits exactly one bootstrap")
+
+    # (8) Every control ran, in order, and passed.
+    controls = qc.get("controls") or []
+    ids = tuple(c.get("id") for c in controls)
+    if ids != _STAGE129_FT_EXEC_CONTROL_IDS:
+        raise HandoffError(
+            "Stage129 Final Test must report every control "
+            f"{list(_STAGE129_FT_EXEC_CONTROL_IDS)}, got {list(ids)}")
+    for control in controls:
+        if control.get("result") != "PASS":
+            raise HandoffError(
+                f"Stage129 Final Test control {control.get('id')} did not pass: "
+                f"{control.get('result')!r}")
+
+    # (9) Nothing prohibited happened, despite the Final Test being open.
+    for field in _STAGE129_FT_EXEC_ZERO_COUNTERS:
+        if counters.get(field) != 0:
+            raise HandoffError(
+                f"Stage129 Final Test counter {field} must be 0, got "
+                f"{counters.get(field)!r}")
+    if metrics.get("inferential_superiority_claim") is not False or \
+            metrics.get("holm_executions") != 0 or \
+            metrics.get("p_values_computed") != 0:
+        raise HandoffError(
+            "Stage129 Final Test produces no inference and closes no Holm family")
+
+    # (10) The locked development results survived the pass unchanged.
+    before = prov.get("locked_development_results_sha256_before") or {}
+    after = prov.get("locked_development_results_sha256_after") or {}
+    if not before or before != after:
+        raise HandoffError(
+            "Stage129 Final Test locked-result hashes changed during the run")
+    for rel, want in before.items():
+        p = os.path.join(root, rel)
+        if not os.path.isfile(p):
+            raise HandoffError(f"Stage129 Final Test locked result missing: {rel}")
+        with open(p, "rb") as fh:
+            if hashlib.sha256(fh.read()).hexdigest() != want:
+                raise HandoffError(
+                    f"Stage129 Final Test locked result {rel} has since changed; "
+                    "the run's FT14 guarantee no longer holds")
+
+    # (11) Opening the Final Test authorizes nothing further.
+    for artifact, label in ((qc, "qc"), (pre01, "pre01")):
+        for field in ("stage130_authorized", "stage130_started",
+                      "merge_authorized", "ready_for_review_authorized"):
+            if field in artifact and artifact.get(field) is not False:
+                raise HandoffError(
+                    f"Stage129 Final Test {label} {field} must be False")
+
+    return {
+        "stage129_final_test_execution_recorded": True,
+        "stage129_final_test_execution_action_id": _STAGE129_FT_EXEC_ACTION_ID,
+        "stage129_final_test_execution_authorized_by_human": True,
+        "stage129_final_test_executor_sha256": exec_sha,
+
+        # The pass happened, exactly once.
+        "stage129_final_test_executed": True,
+        "stage129_final_test_passes_executed": 1,
+        "stage129_final_test_target_years": list(_STAGE129_FT_EXEC_TARGET_YEARS),
+        "stage129_final_test_cohort_pairs": prov.get("cohort_pairs"),
+        "stage129_final_test_evaluable_rows": evaluable,
+        "stage129_final_test_predictions": len(rows),
+        "stage129_final_test_unique_tickers": prov.get("unique_tickers"),
+        "stage129_final_test_positive": metrics.get("positive"),
+        "stage129_final_test_negative": metrics.get("negative"),
+
+        # The result, as computed. Reported unchanged, favourable or not.
+        "stage129_final_test_primary_metric": _STAGE129_FT_EXEC_PRIMARY_METRIC,
+        "stage129_final_test_pr_auc": got_metrics.get("PR-AUC"),
+        "stage129_final_test_roc_auc": got_metrics.get("ROC-AUC"),
+        "stage129_final_test_brier": got_metrics.get("Brier_score"),
+        "stage129_final_test_recall_at_10pct": got_metrics.get("Recall@10%"),
+        "stage129_final_test_lift_at_10pct": got_metrics.get("Lift@10%"),
+        "stage129_final_test_metric_set_is_closed": True,
+        "stage129_final_test_metrics_computed":
+            len(_STAGE129_FT_EXEC_CLOSED_METRICS),
+        "stage129_final_test_threshold": _STAGE129_FT_EXEC_THRESHOLD,
+        "stage129_final_test_confusion_tp": thresholded.get("tp"),
+        "stage129_final_test_confusion_fp": thresholded.get("fp"),
+        "stage129_final_test_confusion_tn": thresholded.get("tn"),
+        "stage129_final_test_confusion_fn": thresholded.get("fn"),
+        "stage129_final_test_bootstrap_replicates":
+            _STAGE129_FT_EXEC_BOOTSTRAP_REPLICATES,
+        "stage129_final_test_bootstrap_valid_replicates": valid,
+        "stage129_final_test_bootstrap_seed": _STAGE129_FT_EXEC_BOOTSTRAP_SEED,
+
+        # Controls.
+        "stage129_final_test_controls_evaluated":
+            len(_STAGE129_FT_EXEC_CONTROL_IDS),
+        "stage129_final_test_controls_all_passed": True,
+
+        # Nothing else happened.
+        "stage129_final_test_model_fits_executed": 0,
+        "stage129_final_test_refits_executed": 0,
+        "stage129_final_test_recalibration_executions": 0,
+        "stage129_final_test_probabilities_are_raw": True,
+        "stage129_final_test_threshold_searches": 0,
+        "stage129_final_test_winner_selections": 0,
+        "inferential_superiority_claimed": False,
+
+        # The firewall is SPENT: opened exactly once under a one-action
+        # authorization that the pass CONSUMED, and shut again permanently.
+        #
+        # Two different kinds of key live here and they must not be conflated.
+        # PERMISSION keys describe what is available NOW, and nothing is: the
+        # Final Test is shut, there is no standing unlock, and the PRE01
+        # authorization is spent, so `locked` stays True and `unlocked` /
+        # `access_authorized` stay False. Reporting `access_authorized = True`
+        # after the fact would advertise a standing permission to open the
+        # Final Test again, which is exactly what must never be implied.
+        # EVENT keys describe what HAPPENED, and an evaluation did happen, so
+        # those flip. `final_test_firewall_status` carries the distinction
+        # explicitly so the pair is not read as a contradiction.
+        "final_test_locked": True,
+        "final_test_unlocked": False,
+        "final_test_access_authorized": False,
+        "final_test_firewall_status": "SPENT_BY_AUTHORIZED_SINGLE_PASS",
+        "final_test_second_pass_authorized": False,
+        "final_test_rows_read": rows_read,
+        "final_test_executed": True,
+        "final_test_evaluation_performed": True,
+        "final_test_predictor_values_inspected": True,
+        "final_test_target_values_inspected": True,
+        "stage129_final_test_locked": True,
+        "stage129_final_test_rows_read": rows_read,
+        "stage129_final_test_contract_status": "EXECUTED_SINGLE_PASS_COMPLETE",
+        "stage129_final_test_expected_outputs_exist_now": True,
+        "stage129_final_test_threshold_value_materialized": True,
+        "stage129_final_test_pre01_resolved": True,
+        "stage129_final_test_pre02_resolved": True,
+        "stage129_final_test_unresolved_prerequisites": [],
+        "stage129_final_test_unresolved_prerequisite_count": 0,
+        "stage129_final_test_contract_fully_executable": True,
+        "stage129_threshold_usable_for_final_test": True,
+
+        # And it authorizes nothing further. The one-action authorization was
+        # CONSUMED by this pass: `..._execution_authorized` stays False by the
+        # standing-authorization convention, and a second pass is forbidden
+        # outright rather than merely unauthorized.
+        "stage129_final_test_execution_authorized": False,
+        "stage129_final_test_second_pass_authorized": False,
+        "stage130_started": False,
+        "stage129_final_test_stage130_authorized": False,
+        "stage129_final_test_merge_authorized": False,
+        "stage129_final_test_ready_for_review_authorized": False,
+        "stage129_final_test_next_action_id": _STAGE129_FT_EXEC_NEXT_ACTION_ID,
+        "stage129_final_test_next_action_authorized": False,
     }
 
 

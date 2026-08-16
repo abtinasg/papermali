@@ -1,0 +1,161 @@
+{
+  "action_id": "stage129-final-test-execution",
+  "all_pass": true,
+  "artifact": "final_test_qc_report",
+  "bootstrap_executed": true,
+  "controls": [
+    {
+      "detail": "4 accepted refit artifacts hash to their pinned SHA-256",
+      "id": "FT01",
+      "result": "PASS"
+    },
+    {
+      "detail": "model is M1 / regularized_logistic_regression / logistic__C_0.1",
+      "id": "FT02",
+      "result": "PASS"
+    },
+    {
+      "detail": "python 3.13.5, numpy 2.4.6 and every other locked package version match the development runtime",
+      "id": "FT03",
+      "result": "PASS"
+    },
+    {
+      "detail": "both contracted inputs and all 3 inputs pinned by the accepted refit provenance hash to their SHA-256",
+      "id": "FT04",
+      "result": "PASS"
+    },
+    {
+      "detail": "cohort of 346 pairs, target years [1400, 1401, 1402]; zero development rows",
+      "id": "FT05",
+      "result": "PASS"
+    },
+    {
+      "detail": "design matrix 18 columns equal the accepted model's design_matrix_columns exactly and in order",
+      "id": "FT06",
+      "result": "PASS"
+    },
+    {
+      "detail": "clipping bounds, medians and standardization mean/std taken verbatim from the PR #90 preprocessing artifact; nothing re-estimated on Final Test rows",
+      "id": "FT07",
+      "result": "PASS"
+    },
+    {
+      "detail": "missingness indicators equal each row's own pre-imputation NaN positions, unstandardized binary 0/1, never inferred from the imputed matrix",
+      "id": "FT08",
+      "result": "PASS"
+    },
+    {
+      "detail": "model_fits_executed == 0; reconstructed from the pinned intercept and 18 coefficients, no estimator was trained",
+      "id": "FT09",
+      "result": "PASS"
+    },
+    {
+      "detail": "threshold 0.426878838687 read from the committed admitted development-OOF artifact and re-confirmed by PRE01; not derived here",
+      "id": "FT10",
+      "result": "PASS"
+    },
+    {
+      "detail": "exactly one pass over the Final Test",
+      "id": "FT11",
+      "result": "PASS"
+    },
+    {
+      "detail": "recalibration_executions == 0 and isotonic_executions == 0; reported probabilities are the raw pipeline probabilities",
+      "id": "FT12",
+      "result": "PASS"
+    },
+    {
+      "detail": "no model, block, algorithm or configuration re-selected; no winner selected on any Final Test quantity",
+      "id": "FT13",
+      "result": "PASS"
+    },
+    {
+      "detail": "the 3 locked development results are byte-identical before and after",
+      "id": "FT14",
+      "result": "PASS"
+    },
+    {
+      "detail": "no hyperparameter search, grid expansion, early stopping, feature search or threshold search executed",
+      "id": "FT15",
+      "result": "PASS"
+    },
+    {
+      "detail": "346 evaluable of 346 loaded; 0 non-evaluable excluded and never counted as negative",
+      "id": "FT16",
+      "result": "PASS"
+    },
+    {
+      "detail": "closed metric set computed: PR-AUC, ROC-AUC, Brier, Recall@10%, Lift@10% with K_y = ceil(0.10*N_y), 36 rows selected",
+      "id": "FT17",
+      "result": "PASS"
+    },
+    {
+      "detail": "no Holm execution, no p-value, no inferential superiority claim",
+      "id": "FT18",
+      "result": "PASS"
+    },
+    {
+      "detail": "paired company-cluster bootstrap on ticker: 1998 valid of 2000, percentile-95, seed 20260724, parameters unchanged",
+      "id": "FT19",
+      "result": "PASS"
+    },
+    {
+      "detail": "writes confined to project/stage129/final_test_execution/ through a validated temporary directory; no historical or frozen artifact edited",
+      "id": "FT20",
+      "result": "PASS"
+    },
+    {
+      "detail": "every prerequisite was resolved before the first row was read; one complete run, not a partial, threshold-free or metric-subset execution",
+      "id": "FT21",
+      "result": "PASS"
+    }
+  ],
+  "controls_executed": 21,
+  "counters": {
+    "bootstrap_executions": 1,
+    "bootstrap_valid_replicates": 1998,
+    "feature_searches": 0,
+    "final_test_evaluable_rows": 346,
+    "final_test_load_invocations": 1,
+    "final_test_metrics_computed": 5,
+    "final_test_passes_executed": 1,
+    "final_test_predictions": 346,
+    "final_test_predictor_values_read": 3114,
+    "final_test_rows_read": 346,
+    "final_test_rows_seen_in_manifest": 346,
+    "final_test_target_values_read": 346,
+    "holm_executions": 0,
+    "hyperparameter_searches": 0,
+    "isotonic_executions": 0,
+    "model_fits_executed": 0,
+    "p_values_computed": 0,
+    "recalibration_executions": 0,
+    "refits_executed": 0,
+    "shap_executions": 0,
+    "threshold_searches": 0,
+    "tuning_runs": 0,
+    "winner_selections": 0
+  },
+  "final_test_counters": {
+    "final_test_evaluable_rows": 346,
+    "final_test_metrics_computed": 5,
+    "final_test_passes_executed": 1,
+    "final_test_predictions": 346,
+    "final_test_predictor_values_read": 3114,
+    "final_test_rows_read": 346,
+    "final_test_target_values_read": 346
+  },
+  "locked_results_sha256_after": {
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4"
+  },
+  "locked_results_sha256_before": {
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4"
+  },
+  "metric_subset_execution": false,
+  "partial_execution": false,
+  "threshold_free_execution": false
+}

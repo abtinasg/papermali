@@ -1,0 +1,2791 @@
+{
+  "action_id": "stage129-final-test-execution",
+  "algorithm": "regularized_logistic_regression",
+  "artifact": "final_test_prediction_artifact",
+  "block": "M1",
+  "configuration_id": "logistic__C_0.1",
+  "contract_path": "project/stage129/final_test_execution_contract_lock/stage129_final_test_execution_contract.json",
+  "contract_sha256": "036d85f8b095e0cd7e55afb899283c71f957234ce4740085a20c2d81a617074e",
+  "evaluable_rows": 346,
+  "final_test_target_years": [
+    1400,
+    1401,
+    1402
+  ],
+  "forward_passes_executed": 1,
+  "model_fits_executed": 0,
+  "predictions": [
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.223918257616,
+      "predictor_row_key_t": "اردستان|1401",
+      "target_row_key_t_plus_1": "اردستان|1402",
+      "target_year": 1402,
+      "ticker": "اردستان"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.050425842754,
+      "predictor_row_key_t": "اپال|1400",
+      "target_row_key_t_plus_1": "اپال|1401",
+      "target_year": 1401,
+      "ticker": "اپال"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.1535654269,
+      "predictor_row_key_t": "اپال|1401",
+      "target_row_key_t_plus_1": "اپال|1402",
+      "target_year": 1402,
+      "ticker": "اپال"
+    },
+    {
+      "observed_target": 1,
+      "predicted_probability": 0.600322133479,
+      "predictor_row_key_t": "بالبر|1399",
+      "target_row_key_t_plus_1": "بالبر|1400",
+      "target_year": 1400,
+      "ticker": "بالبر"
+    },
+    {
+      "observed_target": 1,
+      "predicted_probability": 0.634129722288,
+      "predictor_row_key_t": "بالبر|1400",
+      "target_row_key_t_plus_1": "بالبر|1401",
+      "target_year": 1401,
+      "ticker": "بالبر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.625079374421,
+      "predictor_row_key_t": "بالبر|1401",
+      "target_row_key_t_plus_1": "بالبر|1402",
+      "target_year": 1402,
+      "ticker": "بالبر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.14446694437,
+      "predictor_row_key_t": "بترانس|1399",
+      "target_row_key_t_plus_1": "بترانس|1400",
+      "target_year": 1400,
+      "ticker": "بترانس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.231635807465,
+      "predictor_row_key_t": "بترانس|1400",
+      "target_row_key_t_plus_1": "بترانس|1401",
+      "target_year": 1401,
+      "ticker": "بترانس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.295558515847,
+      "predictor_row_key_t": "بترانس|1401",
+      "target_row_key_t_plus_1": "بترانس|1402",
+      "target_year": 1402,
+      "ticker": "بترانس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.073579036218,
+      "predictor_row_key_t": "بموتو|1399",
+      "target_row_key_t_plus_1": "بموتو|1400",
+      "target_year": 1400,
+      "ticker": "بموتو"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.2370759374,
+      "predictor_row_key_t": "بموتو|1400",
+      "target_row_key_t_plus_1": "بموتو|1401",
+      "target_year": 1401,
+      "ticker": "بموتو"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.114370238838,
+      "predictor_row_key_t": "بموتو|1401",
+      "target_row_key_t_plus_1": "بموتو|1402",
+      "target_year": 1402,
+      "ticker": "بموتو"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.120786493571,
+      "predictor_row_key_t": "بوعلی|1399",
+      "target_row_key_t_plus_1": "بوعلی|1400",
+      "target_year": 1400,
+      "ticker": "بوعلی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.169759864767,
+      "predictor_row_key_t": "بوعلی|1400",
+      "target_row_key_t_plus_1": "بوعلی|1401",
+      "target_year": 1401,
+      "ticker": "بوعلی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.079535033432,
+      "predictor_row_key_t": "بوعلی|1401",
+      "target_row_key_t_plus_1": "بوعلی|1402",
+      "target_year": 1402,
+      "ticker": "بوعلی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.397483057322,
+      "predictor_row_key_t": "بکاب|1399",
+      "target_row_key_t_plus_1": "بکاب|1400",
+      "target_year": 1400,
+      "ticker": "بکاب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.263853418657,
+      "predictor_row_key_t": "بکاب|1400",
+      "target_row_key_t_plus_1": "بکاب|1401",
+      "target_year": 1401,
+      "ticker": "بکاب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.264398894716,
+      "predictor_row_key_t": "بکاب|1401",
+      "target_row_key_t_plus_1": "بکاب|1402",
+      "target_year": 1402,
+      "ticker": "بکاب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.21802448722,
+      "predictor_row_key_t": "بکام|1399",
+      "target_row_key_t_plus_1": "بکام|1400",
+      "target_year": 1400,
+      "ticker": "بکام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.175466840768,
+      "predictor_row_key_t": "بکام|1400",
+      "target_row_key_t_plus_1": "بکام|1401",
+      "target_year": 1401,
+      "ticker": "بکام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.191586280499,
+      "predictor_row_key_t": "بکام|1401",
+      "target_row_key_t_plus_1": "بکام|1402",
+      "target_year": 1402,
+      "ticker": "بکام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.100392782059,
+      "predictor_row_key_t": "تپمپی|1399",
+      "target_row_key_t_plus_1": "تپمپی|1400",
+      "target_year": 1400,
+      "ticker": "تپمپی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.079468133913,
+      "predictor_row_key_t": "تپمپی|1400",
+      "target_row_key_t_plus_1": "تپمپی|1401",
+      "target_year": 1401,
+      "ticker": "تپمپی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.062710564434,
+      "predictor_row_key_t": "تپمپی|1401",
+      "target_row_key_t_plus_1": "تپمپی|1402",
+      "target_year": 1402,
+      "ticker": "تپمپی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.322121687512,
+      "predictor_row_key_t": "تکمبا|1399",
+      "target_row_key_t_plus_1": "تکمبا|1400",
+      "target_year": 1400,
+      "ticker": "تکمبا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.510722139191,
+      "predictor_row_key_t": "تکمبا|1400",
+      "target_row_key_t_plus_1": "تکمبا|1401",
+      "target_year": 1401,
+      "ticker": "تکمبا"
+    },
+    {
+      "observed_target": 1,
+      "predicted_probability": 0.168963862182,
+      "predictor_row_key_t": "تکمبا|1401",
+      "target_row_key_t_plus_1": "تکمبا|1402",
+      "target_year": 1402,
+      "ticker": "تکمبا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.42695322696,
+      "predictor_row_key_t": "ثشرق|1399",
+      "target_row_key_t_plus_1": "ثشرق|1400",
+      "target_year": 1400,
+      "ticker": "ثشرق"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.507376806349,
+      "predictor_row_key_t": "ثشرق|1400",
+      "target_row_key_t_plus_1": "ثشرق|1401",
+      "target_year": 1401,
+      "ticker": "ثشرق"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.361419055659,
+      "predictor_row_key_t": "ثشرق|1401",
+      "target_row_key_t_plus_1": "ثشرق|1402",
+      "target_year": 1402,
+      "ticker": "ثشرق"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.243030134465,
+      "predictor_row_key_t": "ثنوسا|1399",
+      "target_row_key_t_plus_1": "ثنوسا|1400",
+      "target_year": 1400,
+      "ticker": "ثنوسا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.329088760272,
+      "predictor_row_key_t": "ثنوسا|1400",
+      "target_row_key_t_plus_1": "ثنوسا|1401",
+      "target_year": 1401,
+      "ticker": "ثنوسا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.380883361017,
+      "predictor_row_key_t": "ثنوسا|1401",
+      "target_row_key_t_plus_1": "ثنوسا|1402",
+      "target_year": 1402,
+      "ticker": "ثنوسا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.012735314238,
+      "predictor_row_key_t": "جم|1399",
+      "target_row_key_t_plus_1": "جم|1400",
+      "target_year": 1400,
+      "ticker": "جم"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.021901718443,
+      "predictor_row_key_t": "جم|1400",
+      "target_row_key_t_plus_1": "جم|1401",
+      "target_year": 1401,
+      "ticker": "جم"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.047285580842,
+      "predictor_row_key_t": "جم|1401",
+      "target_row_key_t_plus_1": "جم|1402",
+      "target_year": 1402,
+      "ticker": "جم"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.012011448588,
+      "predictor_row_key_t": "جم پیلن|1399",
+      "target_row_key_t_plus_1": "جم پیلن|1400",
+      "target_year": 1400,
+      "ticker": "جم پیلن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.006521517962,
+      "predictor_row_key_t": "جم پیلن|1400",
+      "target_row_key_t_plus_1": "جم پیلن|1401",
+      "target_year": 1401,
+      "ticker": "جم پیلن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.007563646392,
+      "predictor_row_key_t": "جم پیلن|1401",
+      "target_row_key_t_plus_1": "جم پیلن|1402",
+      "target_year": 1402,
+      "ticker": "جم پیلن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.359282004018,
+      "predictor_row_key_t": "حپترو|1399",
+      "target_row_key_t_plus_1": "حپترو|1400",
+      "target_year": 1400,
+      "ticker": "حپترو"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.438335500834,
+      "predictor_row_key_t": "حپترو|1400",
+      "target_row_key_t_plus_1": "حپترو|1401",
+      "target_year": 1401,
+      "ticker": "حپترو"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.188316394192,
+      "predictor_row_key_t": "حپترو|1401",
+      "target_row_key_t_plus_1": "حپترو|1402",
+      "target_year": 1402,
+      "ticker": "حپترو"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.472330426209,
+      "predictor_row_key_t": "حکشتی|1399",
+      "target_row_key_t_plus_1": "حکشتی|1400",
+      "target_year": 1400,
+      "ticker": "حکشتی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.40207402106,
+      "predictor_row_key_t": "حکشتی|1400",
+      "target_row_key_t_plus_1": "حکشتی|1401",
+      "target_year": 1401,
+      "ticker": "حکشتی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.111664086978,
+      "predictor_row_key_t": "حکشتی|1401",
+      "target_row_key_t_plus_1": "حکشتی|1402",
+      "target_year": 1402,
+      "ticker": "حکشتی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.659695095924,
+      "predictor_row_key_t": "خاذین|1399",
+      "target_row_key_t_plus_1": "خاذین|1400",
+      "target_year": 1400,
+      "ticker": "خاذین"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.492396268876,
+      "predictor_row_key_t": "خاذین|1400",
+      "target_row_key_t_plus_1": "خاذین|1401",
+      "target_year": 1401,
+      "ticker": "خاذین"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.534404377829,
+      "predictor_row_key_t": "خاذین|1401",
+      "target_row_key_t_plus_1": "خاذین|1402",
+      "target_year": 1402,
+      "ticker": "خاذین"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.106984336471,
+      "predictor_row_key_t": "خبهمن|1399",
+      "target_row_key_t_plus_1": "خبهمن|1400",
+      "target_year": 1400,
+      "ticker": "خبهمن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.082700841483,
+      "predictor_row_key_t": "خبهمن|1400",
+      "target_row_key_t_plus_1": "خبهمن|1401",
+      "target_year": 1401,
+      "ticker": "خبهمن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.093142720553,
+      "predictor_row_key_t": "خبهمن|1401",
+      "target_row_key_t_plus_1": "خبهمن|1402",
+      "target_year": 1402,
+      "ticker": "خبهمن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.154985898305,
+      "predictor_row_key_t": "ختوقا|1399",
+      "target_row_key_t_plus_1": "ختوقا|1400",
+      "target_year": 1400,
+      "ticker": "ختوقا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.261320700277,
+      "predictor_row_key_t": "ختوقا|1400",
+      "target_row_key_t_plus_1": "ختوقا|1401",
+      "target_year": 1401,
+      "ticker": "ختوقا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.124731479807,
+      "predictor_row_key_t": "ختوقا|1401",
+      "target_row_key_t_plus_1": "ختوقا|1402",
+      "target_year": 1402,
+      "ticker": "ختوقا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.507243076705,
+      "predictor_row_key_t": "خرینگ|1399",
+      "target_row_key_t_plus_1": "خرینگ|1400",
+      "target_year": 1400,
+      "ticker": "خرینگ"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.366004855086,
+      "predictor_row_key_t": "خرینگ|1400",
+      "target_row_key_t_plus_1": "خرینگ|1401",
+      "target_year": 1401,
+      "ticker": "خرینگ"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.370158319427,
+      "predictor_row_key_t": "خرینگ|1401",
+      "target_row_key_t_plus_1": "خرینگ|1402",
+      "target_year": 1402,
+      "ticker": "خرینگ"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.435114436099,
+      "predictor_row_key_t": "خمحور|1399",
+      "target_row_key_t_plus_1": "خمحور|1400",
+      "target_year": 1400,
+      "ticker": "خمحور"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.269744104672,
+      "predictor_row_key_t": "خمحور|1400",
+      "target_row_key_t_plus_1": "خمحور|1401",
+      "target_year": 1401,
+      "ticker": "خمحور"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.440774906595,
+      "predictor_row_key_t": "خمحور|1401",
+      "target_row_key_t_plus_1": "خمحور|1402",
+      "target_year": 1402,
+      "ticker": "خمحور"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.619193382083,
+      "predictor_row_key_t": "خمهر|1399",
+      "target_row_key_t_plus_1": "خمهر|1400",
+      "target_year": 1400,
+      "ticker": "خمهر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.534382541725,
+      "predictor_row_key_t": "خمهر|1400",
+      "target_row_key_t_plus_1": "خمهر|1401",
+      "target_year": 1401,
+      "ticker": "خمهر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.467568202738,
+      "predictor_row_key_t": "خمهر|1401",
+      "target_row_key_t_plus_1": "خمهر|1402",
+      "target_year": 1402,
+      "ticker": "خمهر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.116995710295,
+      "predictor_row_key_t": "خنصیر|1399",
+      "target_row_key_t_plus_1": "خنصیر|1400",
+      "target_year": 1400,
+      "ticker": "خنصیر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.271752861648,
+      "predictor_row_key_t": "خنصیر|1400",
+      "target_row_key_t_plus_1": "خنصیر|1401",
+      "target_year": 1401,
+      "ticker": "خنصیر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.120595946878,
+      "predictor_row_key_t": "خنصیر|1401",
+      "target_row_key_t_plus_1": "خنصیر|1402",
+      "target_year": 1402,
+      "ticker": "خنصیر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.276196293543,
+      "predictor_row_key_t": "خوساز|1399",
+      "target_row_key_t_plus_1": "خوساز|1400",
+      "target_year": 1400,
+      "ticker": "خوساز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.374988732432,
+      "predictor_row_key_t": "خوساز|1400",
+      "target_row_key_t_plus_1": "خوساز|1401",
+      "target_year": 1401,
+      "ticker": "خوساز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.30563919222,
+      "predictor_row_key_t": "خوساز|1401",
+      "target_row_key_t_plus_1": "خوساز|1402",
+      "target_year": 1402,
+      "ticker": "خوساز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.459347159205,
+      "predictor_row_key_t": "خچرخش|1399",
+      "target_row_key_t_plus_1": "خچرخش|1400",
+      "target_year": 1400,
+      "ticker": "خچرخش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.498810537059,
+      "predictor_row_key_t": "خچرخش|1400",
+      "target_row_key_t_plus_1": "خچرخش|1401",
+      "target_year": 1401,
+      "ticker": "خچرخش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.36342072199,
+      "predictor_row_key_t": "خچرخش|1401",
+      "target_row_key_t_plus_1": "خچرخش|1402",
+      "target_year": 1402,
+      "ticker": "خچرخش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.864810917309,
+      "predictor_row_key_t": "خکمک|1399",
+      "target_row_key_t_plus_1": "خکمک|1400",
+      "target_year": 1400,
+      "ticker": "خکمک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.871011050051,
+      "predictor_row_key_t": "خکمک|1400",
+      "target_row_key_t_plus_1": "خکمک|1401",
+      "target_year": 1401,
+      "ticker": "خکمک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.326977354558,
+      "predictor_row_key_t": "خکمک|1401",
+      "target_row_key_t_plus_1": "خکمک|1402",
+      "target_year": 1402,
+      "ticker": "خکمک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.398825748693,
+      "predictor_row_key_t": "ددام|1399",
+      "target_row_key_t_plus_1": "ددام|1400",
+      "target_year": 1400,
+      "ticker": "ددام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.132175994636,
+      "predictor_row_key_t": "ددام|1400",
+      "target_row_key_t_plus_1": "ددام|1401",
+      "target_year": 1401,
+      "ticker": "ددام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.328070375253,
+      "predictor_row_key_t": "ددام|1401",
+      "target_row_key_t_plus_1": "ددام|1402",
+      "target_year": 1402,
+      "ticker": "ددام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.417689050927,
+      "predictor_row_key_t": "درازک|1399",
+      "target_row_key_t_plus_1": "درازک|1400",
+      "target_year": 1400,
+      "ticker": "درازک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.29685442426,
+      "predictor_row_key_t": "درازک|1400",
+      "target_row_key_t_plus_1": "درازک|1401",
+      "target_year": 1401,
+      "ticker": "درازک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.259345344879,
+      "predictor_row_key_t": "درازک|1401",
+      "target_row_key_t_plus_1": "درازک|1402",
+      "target_year": 1402,
+      "ticker": "درازک"
+    },
+    {
+      "observed_target": 1,
+      "predicted_probability": 0.744511658576,
+      "predictor_row_key_t": "دروز|1399",
+      "target_row_key_t_plus_1": "دروز|1400",
+      "target_year": 1400,
+      "ticker": "دروز"
+    },
+    {
+      "observed_target": 1,
+      "predicted_probability": 0.579339876404,
+      "predictor_row_key_t": "دروز|1400",
+      "target_row_key_t_plus_1": "دروز|1401",
+      "target_year": 1401,
+      "ticker": "دروز"
+    },
+    {
+      "observed_target": 1,
+      "predicted_probability": 0.676937651831,
+      "predictor_row_key_t": "دروز|1401",
+      "target_row_key_t_plus_1": "دروز|1402",
+      "target_year": 1402,
+      "ticker": "دروز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.063800309949,
+      "predictor_row_key_t": "دسبحا|1399",
+      "target_row_key_t_plus_1": "دسبحا|1400",
+      "target_year": 1400,
+      "ticker": "دسبحا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.08822567724,
+      "predictor_row_key_t": "دسبحا|1400",
+      "target_row_key_t_plus_1": "دسبحا|1401",
+      "target_year": 1401,
+      "ticker": "دسبحا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.055214005261,
+      "predictor_row_key_t": "دسبحا|1401",
+      "target_row_key_t_plus_1": "دسبحا|1402",
+      "target_year": 1402,
+      "ticker": "دسبحا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.201931575076,
+      "predictor_row_key_t": "دسینا|1399",
+      "target_row_key_t_plus_1": "دسینا|1400",
+      "target_year": 1400,
+      "ticker": "دسینا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.06936380848,
+      "predictor_row_key_t": "دسینا|1400",
+      "target_row_key_t_plus_1": "دسینا|1401",
+      "target_year": 1401,
+      "ticker": "دسینا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.049680247162,
+      "predictor_row_key_t": "دسینا|1401",
+      "target_row_key_t_plus_1": "دسینا|1402",
+      "target_year": 1402,
+      "ticker": "دسینا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.099582359309,
+      "predictor_row_key_t": "دشیمی|1399",
+      "target_row_key_t_plus_1": "دشیمی|1400",
+      "target_year": 1400,
+      "ticker": "دشیمی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.31784749131,
+      "predictor_row_key_t": "دشیمی|1400",
+      "target_row_key_t_plus_1": "دشیمی|1401",
+      "target_year": 1401,
+      "ticker": "دشیمی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.233405058612,
+      "predictor_row_key_t": "دشیمی|1401",
+      "target_row_key_t_plus_1": "دشیمی|1402",
+      "target_year": 1402,
+      "ticker": "دشیمی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.49805441428,
+      "predictor_row_key_t": "دیران|1399",
+      "target_row_key_t_plus_1": "دیران|1400",
+      "target_year": 1400,
+      "ticker": "دیران"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.463002556757,
+      "predictor_row_key_t": "دیران|1400",
+      "target_row_key_t_plus_1": "دیران|1401",
+      "target_year": 1401,
+      "ticker": "دیران"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.418434668882,
+      "predictor_row_key_t": "دیران|1401",
+      "target_row_key_t_plus_1": "دیران|1402",
+      "target_year": 1402,
+      "ticker": "دیران"
+    },
+    {
+      "observed_target": 1,
+      "predicted_probability": 0.299434543281,
+      "predictor_row_key_t": "ذوب|1400",
+      "target_row_key_t_plus_1": "ذوب|1401",
+      "target_year": 1401,
+      "ticker": "ذوب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.850244085009,
+      "predictor_row_key_t": "ذوب|1401",
+      "target_row_key_t_plus_1": "ذوب|1402",
+      "target_year": 1402,
+      "ticker": "ذوب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.025815281526,
+      "predictor_row_key_t": "رانفور|1399",
+      "target_row_key_t_plus_1": "رانفور|1400",
+      "target_year": 1400,
+      "ticker": "رانفور"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.03707455649,
+      "predictor_row_key_t": "رانفور|1400",
+      "target_row_key_t_plus_1": "رانفور|1401",
+      "target_year": 1401,
+      "ticker": "رانفور"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.036191602493,
+      "predictor_row_key_t": "رانفور|1401",
+      "target_row_key_t_plus_1": "رانفور|1402",
+      "target_year": 1402,
+      "ticker": "رانفور"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.445564871786,
+      "predictor_row_key_t": "رمپنا|1399",
+      "target_row_key_t_plus_1": "رمپنا|1400",
+      "target_year": 1400,
+      "ticker": "رمپنا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.433857367643,
+      "predictor_row_key_t": "رمپنا|1400",
+      "target_row_key_t_plus_1": "رمپنا|1401",
+      "target_year": 1401,
+      "ticker": "رمپنا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.428175062769,
+      "predictor_row_key_t": "رمپنا|1401",
+      "target_row_key_t_plus_1": "رمپنا|1402",
+      "target_year": 1402,
+      "ticker": "رمپنا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.313325527696,
+      "predictor_row_key_t": "زمگسا|1399",
+      "target_row_key_t_plus_1": "زمگسا|1400",
+      "target_year": 1400,
+      "ticker": "زمگسا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.143385915538,
+      "predictor_row_key_t": "زمگسا|1400",
+      "target_row_key_t_plus_1": "زمگسا|1401",
+      "target_year": 1401,
+      "ticker": "زمگسا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.120822968575,
+      "predictor_row_key_t": "زمگسا|1401",
+      "target_row_key_t_plus_1": "زمگسا|1402",
+      "target_year": 1402,
+      "ticker": "زمگسا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.186313206963,
+      "predictor_row_key_t": "زپارس|1399",
+      "target_row_key_t_plus_1": "زپارس|1400",
+      "target_year": 1400,
+      "ticker": "زپارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.205448697879,
+      "predictor_row_key_t": "زپارس|1400",
+      "target_row_key_t_plus_1": "زپارس|1401",
+      "target_year": 1401,
+      "ticker": "زپارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.114065054289,
+      "predictor_row_key_t": "زپارس|1401",
+      "target_row_key_t_plus_1": "زپارس|1402",
+      "target_year": 1402,
+      "ticker": "زپارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.020526051028,
+      "predictor_row_key_t": "سآبیک|1401",
+      "target_row_key_t_plus_1": "سآبیک|1402",
+      "target_year": 1402,
+      "ticker": "سآبیک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.017188681074,
+      "predictor_row_key_t": "ساراب|1399",
+      "target_row_key_t_plus_1": "ساراب|1400",
+      "target_year": 1400,
+      "ticker": "ساراب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.039874815374,
+      "predictor_row_key_t": "ساراب|1400",
+      "target_row_key_t_plus_1": "ساراب|1401",
+      "target_year": 1401,
+      "ticker": "ساراب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.023897705107,
+      "predictor_row_key_t": "ساراب|1401",
+      "target_row_key_t_plus_1": "ساراب|1402",
+      "target_year": 1402,
+      "ticker": "ساراب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.013512945024,
+      "predictor_row_key_t": "ساربیل|1399",
+      "target_row_key_t_plus_1": "ساربیل|1400",
+      "target_year": 1400,
+      "ticker": "ساربیل"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.016188932371,
+      "predictor_row_key_t": "ساربیل|1400",
+      "target_row_key_t_plus_1": "ساربیل|1401",
+      "target_year": 1401,
+      "ticker": "ساربیل"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.017506461654,
+      "predictor_row_key_t": "ساربیل|1401",
+      "target_row_key_t_plus_1": "ساربیل|1402",
+      "target_year": 1402,
+      "ticker": "ساربیل"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.011390560418,
+      "predictor_row_key_t": "ساروم|1399",
+      "target_row_key_t_plus_1": "ساروم|1400",
+      "target_year": 1400,
+      "ticker": "ساروم"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.008964151979,
+      "predictor_row_key_t": "ساروم|1400",
+      "target_row_key_t_plus_1": "ساروم|1401",
+      "target_year": 1401,
+      "ticker": "ساروم"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.010200347707,
+      "predictor_row_key_t": "ساروم|1401",
+      "target_row_key_t_plus_1": "ساروم|1402",
+      "target_year": 1402,
+      "ticker": "ساروم"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.052754265709,
+      "predictor_row_key_t": "سبجنو|1399",
+      "target_row_key_t_plus_1": "سبجنو|1400",
+      "target_year": 1400,
+      "ticker": "سبجنو"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.016384573877,
+      "predictor_row_key_t": "سبجنو|1400",
+      "target_row_key_t_plus_1": "سبجنو|1401",
+      "target_year": 1401,
+      "ticker": "سبجنو"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.093685461196,
+      "predictor_row_key_t": "سبجنو|1401",
+      "target_row_key_t_plus_1": "سبجنو|1402",
+      "target_year": 1402,
+      "ticker": "سبجنو"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.014968179118,
+      "predictor_row_key_t": "سبهان|1399",
+      "target_row_key_t_plus_1": "سبهان|1400",
+      "target_year": 1400,
+      "ticker": "سبهان"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.026163987809,
+      "predictor_row_key_t": "سبهان|1400",
+      "target_row_key_t_plus_1": "سبهان|1401",
+      "target_year": 1401,
+      "ticker": "سبهان"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.064893953592,
+      "predictor_row_key_t": "سبهان|1401",
+      "target_row_key_t_plus_1": "سبهان|1402",
+      "target_year": 1402,
+      "ticker": "سبهان"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.148328323085,
+      "predictor_row_key_t": "ستران|1399",
+      "target_row_key_t_plus_1": "ستران|1400",
+      "target_year": 1400,
+      "ticker": "ستران"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.080028018085,
+      "predictor_row_key_t": "ستران|1400",
+      "target_row_key_t_plus_1": "ستران|1401",
+      "target_year": 1401,
+      "ticker": "ستران"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.03121574075,
+      "predictor_row_key_t": "ستران|1401",
+      "target_row_key_t_plus_1": "ستران|1402",
+      "target_year": 1402,
+      "ticker": "ستران"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.020269821252,
+      "predictor_row_key_t": "سخاش|1399",
+      "target_row_key_t_plus_1": "سخاش|1400",
+      "target_year": 1400,
+      "ticker": "سخاش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.01865285453,
+      "predictor_row_key_t": "سخاش|1400",
+      "target_row_key_t_plus_1": "سخاش|1401",
+      "target_year": 1401,
+      "ticker": "سخاش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.020160510522,
+      "predictor_row_key_t": "سخاش|1401",
+      "target_row_key_t_plus_1": "سخاش|1402",
+      "target_year": 1402,
+      "ticker": "سخاش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.042671131715,
+      "predictor_row_key_t": "سخزر|1399",
+      "target_row_key_t_plus_1": "سخزر|1400",
+      "target_year": 1400,
+      "ticker": "سخزر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.033802597373,
+      "predictor_row_key_t": "سخزر|1400",
+      "target_row_key_t_plus_1": "سخزر|1401",
+      "target_year": 1401,
+      "ticker": "سخزر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.025714459289,
+      "predictor_row_key_t": "سخزر|1401",
+      "target_row_key_t_plus_1": "سخزر|1402",
+      "target_year": 1402,
+      "ticker": "سخزر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.017328301019,
+      "predictor_row_key_t": "سخوز|1399",
+      "target_row_key_t_plus_1": "سخوز|1400",
+      "target_year": 1400,
+      "ticker": "سخوز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.01064762362,
+      "predictor_row_key_t": "سخوز|1400",
+      "target_row_key_t_plus_1": "سخوز|1401",
+      "target_year": 1401,
+      "ticker": "سخوز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.014381269364,
+      "predictor_row_key_t": "سخوز|1401",
+      "target_row_key_t_plus_1": "سخوز|1402",
+      "target_year": 1402,
+      "ticker": "سخوز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.094293901463,
+      "predictor_row_key_t": "سدشت|1399",
+      "target_row_key_t_plus_1": "سدشت|1400",
+      "target_year": 1400,
+      "ticker": "سدشت"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.202637815551,
+      "predictor_row_key_t": "سدشت|1400",
+      "target_row_key_t_plus_1": "سدشت|1401",
+      "target_year": 1401,
+      "ticker": "سدشت"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.056106616983,
+      "predictor_row_key_t": "سدشت|1401",
+      "target_row_key_t_plus_1": "سدشت|1402",
+      "target_year": 1402,
+      "ticker": "سدشت"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.714562966174,
+      "predictor_row_key_t": "سدور|1399",
+      "target_row_key_t_plus_1": "سدور|1400",
+      "target_year": 1400,
+      "ticker": "سدور"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.490598230564,
+      "predictor_row_key_t": "سدور|1400",
+      "target_row_key_t_plus_1": "سدور|1401",
+      "target_year": 1401,
+      "ticker": "سدور"
+    },
+    {
+      "observed_target": 1,
+      "predicted_probability": 0.396884537178,
+      "predictor_row_key_t": "سدور|1401",
+      "target_row_key_t_plus_1": "سدور|1402",
+      "target_year": 1402,
+      "ticker": "سدور"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.039017054034,
+      "predictor_row_key_t": "سرود|1399",
+      "target_row_key_t_plus_1": "سرود|1400",
+      "target_year": 1400,
+      "ticker": "سرود"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.056946708217,
+      "predictor_row_key_t": "سرود|1400",
+      "target_row_key_t_plus_1": "سرود|1401",
+      "target_year": 1401,
+      "ticker": "سرود"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.080218553419,
+      "predictor_row_key_t": "سرود|1401",
+      "target_row_key_t_plus_1": "سرود|1402",
+      "target_year": 1402,
+      "ticker": "سرود"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.377476634634,
+      "predictor_row_key_t": "سشرق|1399",
+      "target_row_key_t_plus_1": "سشرق|1400",
+      "target_year": 1400,
+      "ticker": "سشرق"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.065100383442,
+      "predictor_row_key_t": "سشرق|1400",
+      "target_row_key_t_plus_1": "سشرق|1401",
+      "target_year": 1401,
+      "ticker": "سشرق"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.073886916266,
+      "predictor_row_key_t": "سشرق|1401",
+      "target_row_key_t_plus_1": "سشرق|1402",
+      "target_year": 1402,
+      "ticker": "سشرق"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.096652738737,
+      "predictor_row_key_t": "سصفها|1399",
+      "target_row_key_t_plus_1": "سصفها|1400",
+      "target_year": 1400,
+      "ticker": "سصفها"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.070732383505,
+      "predictor_row_key_t": "سصفها|1400",
+      "target_row_key_t_plus_1": "سصفها|1401",
+      "target_year": 1401,
+      "ticker": "سصفها"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.094625645545,
+      "predictor_row_key_t": "سصفها|1401",
+      "target_row_key_t_plus_1": "سصفها|1402",
+      "target_year": 1402,
+      "ticker": "سصفها"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.059572741897,
+      "predictor_row_key_t": "سغرب|1399",
+      "target_row_key_t_plus_1": "سغرب|1400",
+      "target_year": 1400,
+      "ticker": "سغرب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.048211796414,
+      "predictor_row_key_t": "سغرب|1400",
+      "target_row_key_t_plus_1": "سغرب|1401",
+      "target_year": 1401,
+      "ticker": "سغرب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.029803051119,
+      "predictor_row_key_t": "سغرب|1401",
+      "target_row_key_t_plus_1": "سغرب|1402",
+      "target_year": 1402,
+      "ticker": "سغرب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.019596537629,
+      "predictor_row_key_t": "سقاین|1399",
+      "target_row_key_t_plus_1": "سقاین|1400",
+      "target_year": 1400,
+      "ticker": "سقاین"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.031243388779,
+      "predictor_row_key_t": "سقاین|1400",
+      "target_row_key_t_plus_1": "سقاین|1401",
+      "target_year": 1401,
+      "ticker": "سقاین"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.114689494013,
+      "predictor_row_key_t": "سقاین|1401",
+      "target_row_key_t_plus_1": "سقاین|1402",
+      "target_year": 1402,
+      "ticker": "سقاین"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.030818122847,
+      "predictor_row_key_t": "سمازن|1399",
+      "target_row_key_t_plus_1": "سمازن|1400",
+      "target_year": 1400,
+      "ticker": "سمازن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.011191108026,
+      "predictor_row_key_t": "سمازن|1400",
+      "target_row_key_t_plus_1": "سمازن|1401",
+      "target_year": 1401,
+      "ticker": "سمازن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.007378457691,
+      "predictor_row_key_t": "سمازن|1401",
+      "target_row_key_t_plus_1": "سمازن|1402",
+      "target_year": 1402,
+      "ticker": "سمازن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.035497902491,
+      "predictor_row_key_t": "سنیر|1399",
+      "target_row_key_t_plus_1": "سنیر|1400",
+      "target_year": 1400,
+      "ticker": "سنیر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.078265638477,
+      "predictor_row_key_t": "سنیر|1400",
+      "target_row_key_t_plus_1": "سنیر|1401",
+      "target_year": 1401,
+      "ticker": "سنیر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.071472400175,
+      "predictor_row_key_t": "سنیر|1401",
+      "target_row_key_t_plus_1": "سنیر|1402",
+      "target_year": 1402,
+      "ticker": "سنیر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.034764437615,
+      "predictor_row_key_t": "سهگمت|1399",
+      "target_row_key_t_plus_1": "سهگمت|1400",
+      "target_year": 1400,
+      "ticker": "سهگمت"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.037033885242,
+      "predictor_row_key_t": "سهگمت|1400",
+      "target_row_key_t_plus_1": "سهگمت|1401",
+      "target_year": 1401,
+      "ticker": "سهگمت"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.014812742653,
+      "predictor_row_key_t": "سهگمت|1401",
+      "target_row_key_t_plus_1": "سهگمت|1402",
+      "target_year": 1402,
+      "ticker": "سهگمت"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.169106564425,
+      "predictor_row_key_t": "سپاها|1399",
+      "target_row_key_t_plus_1": "سپاها|1400",
+      "target_year": 1400,
+      "ticker": "سپاها"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.071182614271,
+      "predictor_row_key_t": "سپاها|1400",
+      "target_row_key_t_plus_1": "سپاها|1401",
+      "target_year": 1401,
+      "ticker": "سپاها"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.029187835696,
+      "predictor_row_key_t": "سپاها|1401",
+      "target_row_key_t_plus_1": "سپاها|1402",
+      "target_year": 1402,
+      "ticker": "سپاها"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.048195990572,
+      "predictor_row_key_t": "سپید|1400",
+      "target_row_key_t_plus_1": "سپید|1401",
+      "target_year": 1401,
+      "ticker": "سپید"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.217004647555,
+      "predictor_row_key_t": "سپید|1401",
+      "target_row_key_t_plus_1": "سپید|1402",
+      "target_year": 1402,
+      "ticker": "سپید"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.242183654171,
+      "predictor_row_key_t": "سکرد|1399",
+      "target_row_key_t_plus_1": "سکرد|1400",
+      "target_year": 1400,
+      "ticker": "سکرد"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.126441085854,
+      "predictor_row_key_t": "سکرد|1400",
+      "target_row_key_t_plus_1": "سکرد|1401",
+      "target_year": 1401,
+      "ticker": "سکرد"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.245502811341,
+      "predictor_row_key_t": "سکرد|1401",
+      "target_row_key_t_plus_1": "سکرد|1402",
+      "target_year": 1402,
+      "ticker": "سکرد"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.828773633426,
+      "predictor_row_key_t": "سیلام|1399",
+      "target_row_key_t_plus_1": "سیلام|1400",
+      "target_year": 1400,
+      "ticker": "سیلام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.541463015849,
+      "predictor_row_key_t": "سیلام|1400",
+      "target_row_key_t_plus_1": "سیلام|1401",
+      "target_year": 1401,
+      "ticker": "سیلام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.136465750066,
+      "predictor_row_key_t": "سیلام|1401",
+      "target_row_key_t_plus_1": "سیلام|1402",
+      "target_year": 1402,
+      "ticker": "سیلام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.017678377411,
+      "predictor_row_key_t": "شاراک|1399",
+      "target_row_key_t_plus_1": "شاراک|1400",
+      "target_year": 1400,
+      "ticker": "شاراک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.0125710992,
+      "predictor_row_key_t": "شاراک|1400",
+      "target_row_key_t_plus_1": "شاراک|1401",
+      "target_year": 1401,
+      "ticker": "شاراک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.088899622652,
+      "predictor_row_key_t": "شاراک|1401",
+      "target_row_key_t_plus_1": "شاراک|1402",
+      "target_year": 1402,
+      "ticker": "شاراک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.022702244449,
+      "predictor_row_key_t": "شبریز|1399",
+      "target_row_key_t_plus_1": "شبریز|1400",
+      "target_year": 1400,
+      "ticker": "شبریز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.027840474367,
+      "predictor_row_key_t": "شبریز|1400",
+      "target_row_key_t_plus_1": "شبریز|1401",
+      "target_year": 1401,
+      "ticker": "شبریز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.017648698431,
+      "predictor_row_key_t": "شبریز|1401",
+      "target_row_key_t_plus_1": "شبریز|1402",
+      "target_year": 1402,
+      "ticker": "شبریز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.032459514157,
+      "predictor_row_key_t": "شبندر|1399",
+      "target_row_key_t_plus_1": "شبندر|1400",
+      "target_year": 1400,
+      "ticker": "شبندر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.024435644351,
+      "predictor_row_key_t": "شبندر|1400",
+      "target_row_key_t_plus_1": "شبندر|1401",
+      "target_year": 1401,
+      "ticker": "شبندر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.024668789945,
+      "predictor_row_key_t": "شبندر|1401",
+      "target_row_key_t_plus_1": "شبندر|1402",
+      "target_year": 1402,
+      "ticker": "شبندر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.037334175281,
+      "predictor_row_key_t": "شدوص|1399",
+      "target_row_key_t_plus_1": "شدوص|1400",
+      "target_year": 1400,
+      "ticker": "شدوص"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.108346807579,
+      "predictor_row_key_t": "شدوص|1400",
+      "target_row_key_t_plus_1": "شدوص|1401",
+      "target_year": 1401,
+      "ticker": "شدوص"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.037577553977,
+      "predictor_row_key_t": "شدوص|1401",
+      "target_row_key_t_plus_1": "شدوص|1402",
+      "target_year": 1402,
+      "ticker": "شدوص"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.008971912085,
+      "predictor_row_key_t": "شغدیر|1400",
+      "target_row_key_t_plus_1": "شغدیر|1401",
+      "target_year": 1401,
+      "ticker": "شغدیر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.015861033795,
+      "predictor_row_key_t": "شغدیر|1401",
+      "target_row_key_t_plus_1": "شغدیر|1402",
+      "target_year": 1402,
+      "ticker": "شغدیر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.076552269061,
+      "predictor_row_key_t": "شفارس|1399",
+      "target_row_key_t_plus_1": "شفارس|1400",
+      "target_year": 1400,
+      "ticker": "شفارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.088586580177,
+      "predictor_row_key_t": "شفارس|1400",
+      "target_row_key_t_plus_1": "شفارس|1401",
+      "target_year": 1401,
+      "ticker": "شفارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.092015254169,
+      "predictor_row_key_t": "شفارس|1401",
+      "target_row_key_t_plus_1": "شفارس|1402",
+      "target_year": 1402,
+      "ticker": "شفارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.453503311318,
+      "predictor_row_key_t": "شلعاب|1399",
+      "target_row_key_t_plus_1": "شلعاب|1400",
+      "target_year": 1400,
+      "ticker": "شلعاب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.547038299139,
+      "predictor_row_key_t": "شلعاب|1400",
+      "target_row_key_t_plus_1": "شلعاب|1401",
+      "target_year": 1401,
+      "ticker": "شلعاب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.501842359192,
+      "predictor_row_key_t": "شلعاب|1401",
+      "target_row_key_t_plus_1": "شلعاب|1402",
+      "target_year": 1402,
+      "ticker": "شلعاب"
+    },
+    {
+      "observed_target": 1,
+      "predicted_probability": 0.42553318363,
+      "predictor_row_key_t": "شپارس|1399",
+      "target_row_key_t_plus_1": "شپارس|1400",
+      "target_year": 1400,
+      "ticker": "شپارس"
+    },
+    {
+      "observed_target": 1,
+      "predicted_probability": 0.536343089206,
+      "predictor_row_key_t": "شپارس|1400",
+      "target_row_key_t_plus_1": "شپارس|1401",
+      "target_year": 1401,
+      "ticker": "شپارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.702376964681,
+      "predictor_row_key_t": "شپارس|1401",
+      "target_row_key_t_plus_1": "شپارس|1402",
+      "target_year": 1402,
+      "ticker": "شپارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.01549560816,
+      "predictor_row_key_t": "شپنا|1399",
+      "target_row_key_t_plus_1": "شپنا|1400",
+      "target_year": 1400,
+      "ticker": "شپنا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.041411954025,
+      "predictor_row_key_t": "شپنا|1400",
+      "target_row_key_t_plus_1": "شپنا|1401",
+      "target_year": 1401,
+      "ticker": "شپنا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.028179707165,
+      "predictor_row_key_t": "شپنا|1401",
+      "target_row_key_t_plus_1": "شپنا|1402",
+      "target_year": 1402,
+      "ticker": "شپنا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.079151235658,
+      "predictor_row_key_t": "شکربن|1399",
+      "target_row_key_t_plus_1": "شکربن|1400",
+      "target_year": 1400,
+      "ticker": "شکربن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.096798361935,
+      "predictor_row_key_t": "شکربن|1400",
+      "target_row_key_t_plus_1": "شکربن|1401",
+      "target_year": 1401,
+      "ticker": "شکربن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.073410632522,
+      "predictor_row_key_t": "شکربن|1401",
+      "target_row_key_t_plus_1": "شکربن|1402",
+      "target_year": 1402,
+      "ticker": "شکربن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.0335087146,
+      "predictor_row_key_t": "شکلر|1399",
+      "target_row_key_t_plus_1": "شکلر|1400",
+      "target_year": 1400,
+      "ticker": "شکلر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.009673814258,
+      "predictor_row_key_t": "شکلر|1401",
+      "target_row_key_t_plus_1": "شکلر|1402",
+      "target_year": 1402,
+      "ticker": "شکلر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.01617289495,
+      "predictor_row_key_t": "شیران|1399",
+      "target_row_key_t_plus_1": "شیران|1400",
+      "target_year": 1400,
+      "ticker": "شیران"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.012319942415,
+      "predictor_row_key_t": "شیران|1400",
+      "target_row_key_t_plus_1": "شیران|1401",
+      "target_year": 1401,
+      "ticker": "شیران"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.030965319136,
+      "predictor_row_key_t": "شیران|1401",
+      "target_row_key_t_plus_1": "شیران|1402",
+      "target_year": 1402,
+      "ticker": "شیران"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.492412411981,
+      "predictor_row_key_t": "غبهنوش|1399",
+      "target_row_key_t_plus_1": "غبهنوش|1400",
+      "target_year": 1400,
+      "ticker": "غبهنوش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.263251471551,
+      "predictor_row_key_t": "غبهنوش|1400",
+      "target_row_key_t_plus_1": "غبهنوش|1401",
+      "target_year": 1401,
+      "ticker": "غبهنوش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.536767338936,
+      "predictor_row_key_t": "غبهنوش|1401",
+      "target_row_key_t_plus_1": "غبهنوش|1402",
+      "target_year": 1402,
+      "ticker": "غبهنوش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.184431403593,
+      "predictor_row_key_t": "غدام|1399",
+      "target_row_key_t_plus_1": "غدام|1400",
+      "target_year": 1400,
+      "ticker": "غدام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.29564729409,
+      "predictor_row_key_t": "غدام|1400",
+      "target_row_key_t_plus_1": "غدام|1401",
+      "target_year": 1401,
+      "ticker": "غدام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.297449644999,
+      "predictor_row_key_t": "غدام|1401",
+      "target_row_key_t_plus_1": "غدام|1402",
+      "target_year": 1402,
+      "ticker": "غدام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.10257635154,
+      "predictor_row_key_t": "غسالم|1399",
+      "target_row_key_t_plus_1": "غسالم|1400",
+      "target_year": 1400,
+      "ticker": "غسالم"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.11425545583,
+      "predictor_row_key_t": "غسالم|1400",
+      "target_row_key_t_plus_1": "غسالم|1401",
+      "target_year": 1401,
+      "ticker": "غسالم"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.07908587213,
+      "predictor_row_key_t": "غسالم|1401",
+      "target_row_key_t_plus_1": "غسالم|1402",
+      "target_year": 1402,
+      "ticker": "غسالم"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.235593602965,
+      "predictor_row_key_t": "غشان|1399",
+      "target_row_key_t_plus_1": "غشان|1400",
+      "target_year": 1400,
+      "ticker": "غشان"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.318099481402,
+      "predictor_row_key_t": "غشان|1400",
+      "target_row_key_t_plus_1": "غشان|1401",
+      "target_year": 1401,
+      "ticker": "غشان"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.216155086281,
+      "predictor_row_key_t": "غشان|1401",
+      "target_row_key_t_plus_1": "غشان|1402",
+      "target_year": 1402,
+      "ticker": "غشان"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.150704302782,
+      "predictor_row_key_t": "غشهد|1399",
+      "target_row_key_t_plus_1": "غشهد|1400",
+      "target_year": 1400,
+      "ticker": "غشهد"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.064904819524,
+      "predictor_row_key_t": "غشهد|1400",
+      "target_row_key_t_plus_1": "غشهد|1401",
+      "target_year": 1401,
+      "ticker": "غشهد"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.145623115476,
+      "predictor_row_key_t": "غشهد|1401",
+      "target_row_key_t_plus_1": "غشهد|1402",
+      "target_year": 1402,
+      "ticker": "غشهد"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.086926862492,
+      "predictor_row_key_t": "غنوش|1399",
+      "target_row_key_t_plus_1": "غنوش|1400",
+      "target_year": 1400,
+      "ticker": "غنوش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.118031474505,
+      "predictor_row_key_t": "غنوش|1400",
+      "target_row_key_t_plus_1": "غنوش|1401",
+      "target_year": 1401,
+      "ticker": "غنوش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.106654238203,
+      "predictor_row_key_t": "غنوش|1401",
+      "target_row_key_t_plus_1": "غنوش|1402",
+      "target_year": 1402,
+      "ticker": "غنوش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.082018587811,
+      "predictor_row_key_t": "غگل|1399",
+      "target_row_key_t_plus_1": "غگل|1400",
+      "target_year": 1400,
+      "ticker": "غگل"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.053137818322,
+      "predictor_row_key_t": "غگل|1400",
+      "target_row_key_t_plus_1": "غگل|1401",
+      "target_year": 1401,
+      "ticker": "غگل"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.104004847406,
+      "predictor_row_key_t": "غگل|1401",
+      "target_row_key_t_plus_1": "غگل|1402",
+      "target_year": 1402,
+      "ticker": "غگل"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.601656751912,
+      "predictor_row_key_t": "فاذر|1399",
+      "target_row_key_t_plus_1": "فاذر|1400",
+      "target_year": 1400,
+      "ticker": "فاذر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.249050351022,
+      "predictor_row_key_t": "فاذر|1400",
+      "target_row_key_t_plus_1": "فاذر|1401",
+      "target_year": 1401,
+      "ticker": "فاذر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.272788935991,
+      "predictor_row_key_t": "فاذر|1401",
+      "target_row_key_t_plus_1": "فاذر|1402",
+      "target_year": 1402,
+      "ticker": "فاذر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.080269637239,
+      "predictor_row_key_t": "فایرا|1399",
+      "target_row_key_t_plus_1": "فایرا|1400",
+      "target_year": 1400,
+      "ticker": "فایرا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.108171828642,
+      "predictor_row_key_t": "فایرا|1400",
+      "target_row_key_t_plus_1": "فایرا|1401",
+      "target_year": 1401,
+      "ticker": "فایرا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.06848925611,
+      "predictor_row_key_t": "فایرا|1401",
+      "target_row_key_t_plus_1": "فایرا|1402",
+      "target_year": 1402,
+      "ticker": "فایرا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.214230022631,
+      "predictor_row_key_t": "فباهنر|1399",
+      "target_row_key_t_plus_1": "فباهنر|1400",
+      "target_year": 1400,
+      "ticker": "فباهنر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.290492649456,
+      "predictor_row_key_t": "فباهنر|1400",
+      "target_row_key_t_plus_1": "فباهنر|1401",
+      "target_year": 1401,
+      "ticker": "فباهنر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.071642485694,
+      "predictor_row_key_t": "فباهنر|1401",
+      "target_row_key_t_plus_1": "فباهنر|1402",
+      "target_year": 1402,
+      "ticker": "فباهنر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.103719294361,
+      "predictor_row_key_t": "فجام|1399",
+      "target_row_key_t_plus_1": "فجام|1400",
+      "target_year": 1400,
+      "ticker": "فجام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.096982863618,
+      "predictor_row_key_t": "فجام|1400",
+      "target_row_key_t_plus_1": "فجام|1401",
+      "target_year": 1401,
+      "ticker": "فجام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.075932912583,
+      "predictor_row_key_t": "فجام|1401",
+      "target_row_key_t_plus_1": "فجام|1402",
+      "target_year": 1402,
+      "ticker": "فجام"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.010220932891,
+      "predictor_row_key_t": "فجر|1399",
+      "target_row_key_t_plus_1": "فجر|1400",
+      "target_year": 1400,
+      "ticker": "فجر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.269923314358,
+      "predictor_row_key_t": "فجر|1400",
+      "target_row_key_t_plus_1": "فجر|1401",
+      "target_year": 1401,
+      "ticker": "فجر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.042114272354,
+      "predictor_row_key_t": "فجر|1401",
+      "target_row_key_t_plus_1": "فجر|1402",
+      "target_year": 1402,
+      "ticker": "فجر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.027057618764,
+      "predictor_row_key_t": "فخوز|1399",
+      "target_row_key_t_plus_1": "فخوز|1400",
+      "target_year": 1400,
+      "ticker": "فخوز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.048064539507,
+      "predictor_row_key_t": "فخوز|1400",
+      "target_row_key_t_plus_1": "فخوز|1401",
+      "target_year": 1401,
+      "ticker": "فخوز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.12618257358,
+      "predictor_row_key_t": "فخوز|1401",
+      "target_row_key_t_plus_1": "فخوز|1402",
+      "target_year": 1402,
+      "ticker": "فخوز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.229345589099,
+      "predictor_row_key_t": "فرآور|1399",
+      "target_row_key_t_plus_1": "فرآور|1400",
+      "target_year": 1400,
+      "ticker": "فرآور"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.056778891085,
+      "predictor_row_key_t": "فرآور|1400",
+      "target_row_key_t_plus_1": "فرآور|1401",
+      "target_year": 1401,
+      "ticker": "فرآور"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.244210881775,
+      "predictor_row_key_t": "فرآور|1401",
+      "target_row_key_t_plus_1": "فرآور|1402",
+      "target_year": 1402,
+      "ticker": "فرآور"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.23333599025,
+      "predictor_row_key_t": "فسرب|1399",
+      "target_row_key_t_plus_1": "فسرب|1400",
+      "target_year": 1400,
+      "ticker": "فسرب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.093757569006,
+      "predictor_row_key_t": "فسرب|1400",
+      "target_row_key_t_plus_1": "فسرب|1401",
+      "target_year": 1401,
+      "ticker": "فسرب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.11910859368,
+      "predictor_row_key_t": "فسرب|1401",
+      "target_row_key_t_plus_1": "فسرب|1402",
+      "target_year": 1402,
+      "ticker": "فسرب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.043383602527,
+      "predictor_row_key_t": "فسپا|1399",
+      "target_row_key_t_plus_1": "فسپا|1400",
+      "target_year": 1400,
+      "ticker": "فسپا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.03641899555,
+      "predictor_row_key_t": "فسپا|1400",
+      "target_row_key_t_plus_1": "فسپا|1401",
+      "target_year": 1401,
+      "ticker": "فسپا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.048474945814,
+      "predictor_row_key_t": "فسپا|1401",
+      "target_row_key_t_plus_1": "فسپا|1402",
+      "target_year": 1402,
+      "ticker": "فسپا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.080203892667,
+      "predictor_row_key_t": "فمراد|1399",
+      "target_row_key_t_plus_1": "فمراد|1400",
+      "target_year": 1400,
+      "ticker": "فمراد"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.160690365515,
+      "predictor_row_key_t": "فمراد|1400",
+      "target_row_key_t_plus_1": "فمراد|1401",
+      "target_year": 1401,
+      "ticker": "فمراد"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.243559978555,
+      "predictor_row_key_t": "فمراد|1401",
+      "target_row_key_t_plus_1": "فمراد|1402",
+      "target_year": 1402,
+      "ticker": "فمراد"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.013779594922,
+      "predictor_row_key_t": "فملی|1399",
+      "target_row_key_t_plus_1": "فملی|1400",
+      "target_year": 1400,
+      "ticker": "فملی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.018891103181,
+      "predictor_row_key_t": "فملی|1400",
+      "target_row_key_t_plus_1": "فملی|1401",
+      "target_year": 1401,
+      "ticker": "فملی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.014684368874,
+      "predictor_row_key_t": "فملی|1401",
+      "target_row_key_t_plus_1": "فملی|1402",
+      "target_year": 1402,
+      "ticker": "فملی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.024533235038,
+      "predictor_row_key_t": "فنورد|1399",
+      "target_row_key_t_plus_1": "فنورد|1400",
+      "target_year": 1400,
+      "ticker": "فنورد"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.032660118914,
+      "predictor_row_key_t": "فنورد|1400",
+      "target_row_key_t_plus_1": "فنورد|1401",
+      "target_year": 1401,
+      "ticker": "فنورد"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.09361516561,
+      "predictor_row_key_t": "فنورد|1401",
+      "target_row_key_t_plus_1": "فنورد|1402",
+      "target_year": 1402,
+      "ticker": "فنورد"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.042557712778,
+      "predictor_row_key_t": "فولاژ|1399",
+      "target_row_key_t_plus_1": "فولاژ|1400",
+      "target_year": 1400,
+      "ticker": "فولاژ"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.044024286296,
+      "predictor_row_key_t": "فولاژ|1400",
+      "target_row_key_t_plus_1": "فولاژ|1401",
+      "target_year": 1401,
+      "ticker": "فولاژ"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.052541714598,
+      "predictor_row_key_t": "فولاژ|1401",
+      "target_row_key_t_plus_1": "فولاژ|1402",
+      "target_year": 1402,
+      "ticker": "فولاژ"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.063111894252,
+      "predictor_row_key_t": "فپنتا|1399",
+      "target_row_key_t_plus_1": "فپنتا|1400",
+      "target_year": 1400,
+      "ticker": "فپنتا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.009356908983,
+      "predictor_row_key_t": "فپنتا|1400",
+      "target_row_key_t_plus_1": "فپنتا|1401",
+      "target_year": 1401,
+      "ticker": "فپنتا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.017722571661,
+      "predictor_row_key_t": "فپنتا|1401",
+      "target_row_key_t_plus_1": "فپنتا|1402",
+      "target_year": 1402,
+      "ticker": "فپنتا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.106672517806,
+      "predictor_row_key_t": "لابسا|1399",
+      "target_row_key_t_plus_1": "لابسا|1400",
+      "target_year": 1400,
+      "ticker": "لابسا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.248787429389,
+      "predictor_row_key_t": "لابسا|1400",
+      "target_row_key_t_plus_1": "لابسا|1401",
+      "target_year": 1401,
+      "ticker": "لابسا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.279680799808,
+      "predictor_row_key_t": "لابسا|1401",
+      "target_row_key_t_plus_1": "لابسا|1402",
+      "target_year": 1402,
+      "ticker": "لابسا"
+    },
+    {
+      "observed_target": 1,
+      "predicted_probability": 0.578376585275,
+      "predictor_row_key_t": "لبوتان|1399",
+      "target_row_key_t_plus_1": "لبوتان|1400",
+      "target_year": 1400,
+      "ticker": "لبوتان"
+    },
+    {
+      "observed_target": 1,
+      "predicted_probability": 0.710582928122,
+      "predictor_row_key_t": "لبوتان|1400",
+      "target_row_key_t_plus_1": "لبوتان|1401",
+      "target_year": 1401,
+      "ticker": "لبوتان"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.591576302582,
+      "predictor_row_key_t": "لبوتان|1401",
+      "target_row_key_t_plus_1": "لبوتان|1402",
+      "target_year": 1402,
+      "ticker": "لبوتان"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.208335736934,
+      "predictor_row_key_t": "لخزر|1399",
+      "target_row_key_t_plus_1": "لخزر|1400",
+      "target_year": 1400,
+      "ticker": "لخزر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.210813681578,
+      "predictor_row_key_t": "لخزر|1400",
+      "target_row_key_t_plus_1": "لخزر|1401",
+      "target_year": 1401,
+      "ticker": "لخزر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.147590303947,
+      "predictor_row_key_t": "لخزر|1401",
+      "target_row_key_t_plus_1": "لخزر|1402",
+      "target_year": 1402,
+      "ticker": "لخزر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.458014858442,
+      "predictor_row_key_t": "لسرما|1399",
+      "target_row_key_t_plus_1": "لسرما|1400",
+      "target_year": 1400,
+      "ticker": "لسرما"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.318353267837,
+      "predictor_row_key_t": "لسرما|1400",
+      "target_row_key_t_plus_1": "لسرما|1401",
+      "target_year": 1401,
+      "ticker": "لسرما"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.371235962827,
+      "predictor_row_key_t": "لسرما|1401",
+      "target_row_key_t_plus_1": "لسرما|1402",
+      "target_year": 1402,
+      "ticker": "لسرما"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.04116642301,
+      "predictor_row_key_t": "نوری|1399",
+      "target_row_key_t_plus_1": "نوری|1400",
+      "target_year": 1400,
+      "ticker": "نوری"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.098717744944,
+      "predictor_row_key_t": "نوری|1400",
+      "target_row_key_t_plus_1": "نوری|1401",
+      "target_year": 1401,
+      "ticker": "نوری"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.078825310703,
+      "predictor_row_key_t": "نوری|1401",
+      "target_row_key_t_plus_1": "نوری|1402",
+      "target_year": 1402,
+      "ticker": "نوری"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.111755431198,
+      "predictor_row_key_t": "های وب|1399",
+      "target_row_key_t_plus_1": "های وب|1400",
+      "target_year": 1400,
+      "ticker": "های وب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.081401860492,
+      "predictor_row_key_t": "های وب|1400",
+      "target_row_key_t_plus_1": "های وب|1401",
+      "target_year": 1401,
+      "ticker": "های وب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.044167872489,
+      "predictor_row_key_t": "های وب|1401",
+      "target_row_key_t_plus_1": "های وب|1402",
+      "target_year": 1402,
+      "ticker": "های وب"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.161583367686,
+      "predictor_row_key_t": "همراه|1399",
+      "target_row_key_t_plus_1": "همراه|1400",
+      "target_year": 1400,
+      "ticker": "همراه"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.181292760825,
+      "predictor_row_key_t": "همراه|1400",
+      "target_row_key_t_plus_1": "همراه|1401",
+      "target_year": 1401,
+      "ticker": "همراه"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.241300329963,
+      "predictor_row_key_t": "همراه|1401",
+      "target_row_key_t_plus_1": "همراه|1402",
+      "target_year": 1402,
+      "ticker": "همراه"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.009353331904,
+      "predictor_row_key_t": "پارس|1399",
+      "target_row_key_t_plus_1": "پارس|1400",
+      "target_year": 1400,
+      "ticker": "پارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.044246802702,
+      "predictor_row_key_t": "پارس|1400",
+      "target_row_key_t_plus_1": "پارس|1401",
+      "target_year": 1401,
+      "ticker": "پارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.053669175353,
+      "predictor_row_key_t": "پارس|1401",
+      "target_row_key_t_plus_1": "پارس|1402",
+      "target_year": 1402,
+      "ticker": "پارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.063336020197,
+      "predictor_row_key_t": "پدرخش|1399",
+      "target_row_key_t_plus_1": "پدرخش|1400",
+      "target_year": 1400,
+      "ticker": "پدرخش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.383759992401,
+      "predictor_row_key_t": "پدرخش|1400",
+      "target_row_key_t_plus_1": "پدرخش|1401",
+      "target_year": 1401,
+      "ticker": "پدرخش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.075226162294,
+      "predictor_row_key_t": "پدرخش|1401",
+      "target_row_key_t_plus_1": "پدرخش|1402",
+      "target_year": 1402,
+      "ticker": "پدرخش"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.034976843016,
+      "predictor_row_key_t": "پرداخت|1399",
+      "target_row_key_t_plus_1": "پرداخت|1400",
+      "target_year": 1400,
+      "ticker": "پرداخت"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.036311204823,
+      "predictor_row_key_t": "پرداخت|1400",
+      "target_row_key_t_plus_1": "پرداخت|1401",
+      "target_year": 1401,
+      "ticker": "پرداخت"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.018385976335,
+      "predictor_row_key_t": "پسهند|1399",
+      "target_row_key_t_plus_1": "پسهند|1400",
+      "target_year": 1400,
+      "ticker": "پسهند"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.040307225735,
+      "predictor_row_key_t": "پسهند|1400",
+      "target_row_key_t_plus_1": "پسهند|1401",
+      "target_year": 1401,
+      "ticker": "پسهند"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.09455386012,
+      "predictor_row_key_t": "پسهند|1401",
+      "target_row_key_t_plus_1": "پسهند|1402",
+      "target_year": 1402,
+      "ticker": "پسهند"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.673068820139,
+      "predictor_row_key_t": "پلاسک|1399",
+      "target_row_key_t_plus_1": "پلاسک|1400",
+      "target_year": 1400,
+      "ticker": "پلاسک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.626023954955,
+      "predictor_row_key_t": "پلاسک|1400",
+      "target_row_key_t_plus_1": "پلاسک|1401",
+      "target_year": 1401,
+      "ticker": "پلاسک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.647707934367,
+      "predictor_row_key_t": "پلاسک|1401",
+      "target_row_key_t_plus_1": "پلاسک|1402",
+      "target_year": 1402,
+      "ticker": "پلاسک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.203397881287,
+      "predictor_row_key_t": "چافست|1399",
+      "target_row_key_t_plus_1": "چافست|1400",
+      "target_year": 1400,
+      "ticker": "چافست"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.276679074412,
+      "predictor_row_key_t": "چافست|1400",
+      "target_row_key_t_plus_1": "چافست|1401",
+      "target_year": 1401,
+      "ticker": "چافست"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.150601878586,
+      "predictor_row_key_t": "چافست|1401",
+      "target_row_key_t_plus_1": "چافست|1402",
+      "target_year": 1402,
+      "ticker": "چافست"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.13716545318,
+      "predictor_row_key_t": "چکارن|1399",
+      "target_row_key_t_plus_1": "چکارن|1400",
+      "target_year": 1400,
+      "ticker": "چکارن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.152205318959,
+      "predictor_row_key_t": "چکارن|1400",
+      "target_row_key_t_plus_1": "چکارن|1401",
+      "target_year": 1401,
+      "ticker": "چکارن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.157892764455,
+      "predictor_row_key_t": "چکارن|1401",
+      "target_row_key_t_plus_1": "چکارن|1402",
+      "target_year": 1402,
+      "ticker": "چکارن"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.116683057468,
+      "predictor_row_key_t": "کاوه|1399",
+      "target_row_key_t_plus_1": "کاوه|1400",
+      "target_year": 1400,
+      "ticker": "کاوه"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.118100707244,
+      "predictor_row_key_t": "کاوه|1400",
+      "target_row_key_t_plus_1": "کاوه|1401",
+      "target_year": 1401,
+      "ticker": "کاوه"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.126089499092,
+      "predictor_row_key_t": "کاوه|1401",
+      "target_row_key_t_plus_1": "کاوه|1402",
+      "target_year": 1402,
+      "ticker": "کاوه"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.181691705271,
+      "predictor_row_key_t": "کبافق|1399",
+      "target_row_key_t_plus_1": "کبافق|1400",
+      "target_year": 1400,
+      "ticker": "کبافق"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.190141409102,
+      "predictor_row_key_t": "کبافق|1400",
+      "target_row_key_t_plus_1": "کبافق|1401",
+      "target_year": 1401,
+      "ticker": "کبافق"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.032432540614,
+      "predictor_row_key_t": "کبافق|1401",
+      "target_row_key_t_plus_1": "کبافق|1402",
+      "target_year": 1402,
+      "ticker": "کبافق"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.020470338827,
+      "predictor_row_key_t": "کرازی|1399",
+      "target_row_key_t_plus_1": "کرازی|1400",
+      "target_year": 1400,
+      "ticker": "کرازی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.068110226704,
+      "predictor_row_key_t": "کرازی|1400",
+      "target_row_key_t_plus_1": "کرازی|1401",
+      "target_year": 1401,
+      "ticker": "کرازی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.100073367208,
+      "predictor_row_key_t": "کرازی|1401",
+      "target_row_key_t_plus_1": "کرازی|1402",
+      "target_year": 1402,
+      "ticker": "کرازی"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.306581483627,
+      "predictor_row_key_t": "کفرا|1399",
+      "target_row_key_t_plus_1": "کفرا|1400",
+      "target_year": 1400,
+      "ticker": "کفرا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.152639841052,
+      "predictor_row_key_t": "کفرا|1400",
+      "target_row_key_t_plus_1": "کفرا|1401",
+      "target_year": 1401,
+      "ticker": "کفرا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.219036258231,
+      "predictor_row_key_t": "کفرا|1401",
+      "target_row_key_t_plus_1": "کفرا|1402",
+      "target_year": 1402,
+      "ticker": "کفرا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.270466196117,
+      "predictor_row_key_t": "کفپارس|1399",
+      "target_row_key_t_plus_1": "کفپارس|1400",
+      "target_year": 1400,
+      "ticker": "کفپارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.071015116666,
+      "predictor_row_key_t": "کفپارس|1400",
+      "target_row_key_t_plus_1": "کفپارس|1401",
+      "target_year": 1401,
+      "ticker": "کفپارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.157990748401,
+      "predictor_row_key_t": "کفپارس|1401",
+      "target_row_key_t_plus_1": "کفپارس|1402",
+      "target_year": 1402,
+      "ticker": "کفپارس"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.339408510007,
+      "predictor_row_key_t": "کهمدا|1399",
+      "target_row_key_t_plus_1": "کهمدا|1400",
+      "target_year": 1400,
+      "ticker": "کهمدا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.246195507855,
+      "predictor_row_key_t": "کهمدا|1400",
+      "target_row_key_t_plus_1": "کهمدا|1401",
+      "target_year": 1401,
+      "ticker": "کهمدا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.270523229247,
+      "predictor_row_key_t": "کهمدا|1401",
+      "target_row_key_t_plus_1": "کهمدا|1402",
+      "target_year": 1402,
+      "ticker": "کهمدا"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.084643942789,
+      "predictor_row_key_t": "کویر|1399",
+      "target_row_key_t_plus_1": "کویر|1400",
+      "target_year": 1400,
+      "ticker": "کویر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.109945419177,
+      "predictor_row_key_t": "کویر|1400",
+      "target_row_key_t_plus_1": "کویر|1401",
+      "target_year": 1401,
+      "ticker": "کویر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.077992846428,
+      "predictor_row_key_t": "کویر|1401",
+      "target_row_key_t_plus_1": "کویر|1402",
+      "target_year": 1402,
+      "ticker": "کویر"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.299018474385,
+      "predictor_row_key_t": "کگاز|1399",
+      "target_row_key_t_plus_1": "کگاز|1400",
+      "target_year": 1400,
+      "ticker": "کگاز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.440865338122,
+      "predictor_row_key_t": "کگاز|1400",
+      "target_row_key_t_plus_1": "کگاز|1401",
+      "target_year": 1401,
+      "ticker": "کگاز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.470349339458,
+      "predictor_row_key_t": "کگاز|1401",
+      "target_row_key_t_plus_1": "کگاز|1402",
+      "target_year": 1402,
+      "ticker": "کگاز"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.024665254373,
+      "predictor_row_key_t": "کگل|1399",
+      "target_row_key_t_plus_1": "کگل|1400",
+      "target_year": 1400,
+      "ticker": "کگل"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.0708462732,
+      "predictor_row_key_t": "کگل|1400",
+      "target_row_key_t_plus_1": "کگل|1401",
+      "target_year": 1401,
+      "ticker": "کگل"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.116685937934,
+      "predictor_row_key_t": "کگل|1401",
+      "target_row_key_t_plus_1": "کگل|1402",
+      "target_year": 1402,
+      "ticker": "کگل"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.197069614903,
+      "predictor_row_key_t": "کیمیاتک|1400",
+      "target_row_key_t_plus_1": "کیمیاتک|1401",
+      "target_year": 1401,
+      "ticker": "کیمیاتک"
+    },
+    {
+      "observed_target": 0,
+      "predicted_probability": 0.23233165378,
+      "predictor_row_key_t": "کیمیاتک|1401",
+      "target_row_key_t_plus_1": "کیمیاتک|1402",
+      "target_year": 1402,
+      "ticker": "کیمیاتک"
+    }
+  ],
+  "predictions_are_raw_pipeline_probabilities": true,
+  "recalibration_applied": false,
+  "rows_loaded": 346,
+  "rows_non_evaluable_excluded": 0
+}
