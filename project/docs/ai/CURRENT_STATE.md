@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `dfd5b5dfbc1b0a74f025c18d21ead71e73b825b4`
-- **Generated from commit:** `dfd5b5dfbc1b0a74f025c18d21ead71e73b825b4` (branch `stage129-final-test-execution`, informational)
+- **Last stage commit:** `470f8622818a2df3d486f99abfb639404b05af58`
+- **Generated from commit:** `470f8622818a2df3d486f99abfb639404b05af58` (branch `stage129-final-test-execution`, informational)
 - **Baseline:** `origin/main` @ `bc1baa11eb94999af8a60cd2f266628b8c78db68`
 
 ## Current-state validation
@@ -441,5 +441,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `326ac2aeff1c742f52a512a069839bf0dacbde16be9625bb6eb94f52106f83ea`_
-_generated_at_utc: 2026-08-16T14:17:02Z (informational)_
+_state_fingerprint: `2e92ccae35e742101f0b2d48de3223181a2cceec2073bbb97215a8d2fc98a8c1`_
+_generated_at_utc: 2026-08-16T14:34:26Z (informational)_
