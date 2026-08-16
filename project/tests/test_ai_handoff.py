@@ -1338,9 +1338,15 @@ def test_real_repo_handoff_part3b_workflow_markers():
     assert state["m1_robustness_completed"] is True
     assert state["final_test_unlocked"] is False
     assert state["final_test_access_authorized"] is False
-    assert state["final_test_predictor_values_inspected"] is False
-    assert state["final_test_target_values_inspected"] is False
-    assert state["final_test_evaluation_performed"] is False
+    # MOVED from live globals to the pre-pass historical snapshot. These three
+    # are EVENT keys that the separately authorized Stage129 Final Test pass
+    # set True, and it happened after everything this test describes. The live
+    # PERMISSION keys above are still asserted, because a spent firewall must
+    # never read as re-openable.
+    assert state["final_test_prior_to_authorized_pass_predictor_values_inspected"] is False
+    assert state["final_test_prior_to_authorized_pass_target_values_inspected"] is False
+    assert state["final_test_prior_to_authorized_pass_evaluation_performed"] is False
+    assert state["final_test_second_pass_authorized"] is False
     assert state["m2_data_collected"] is False
     assert state["m3_data_collected"] is False
     assert state["m4_data_collected"] is False
@@ -2403,7 +2409,10 @@ def test_robustness_decision_lock_preserves_primary_and_final_test_state():
     assert state["m1_primary_development_tuning_completed"] is True
     assert state["final_test_unlocked"] is False
     assert state["final_test_access_authorized"] is False
-    assert state["final_test_evaluation_performed"] is False
+    # MOVED from a live global to the pre-pass historical snapshot: an EVENT
+    # key that the later, separately authorized Final Test pass set True.
+    assert state["final_test_prior_to_authorized_pass_evaluation_performed"] is False
+    assert state["final_test_second_pass_authorized"] is False
 
 
 def test_robustness_decision_markers_derive_from_record():
@@ -2580,11 +2589,21 @@ def test_handoff_state_carries_part3_markers():
     assert _read_json(
         "project/stage126/stage126_m1_robustness_part3_completion_lock.json"
     )["full_development_refit_performed"] is False
+    # ACTION-SCOPED, as with the refit flag above: this part's own completion
+    # lock is the historical snapshot of the firewall it ran under. The live
+    # globals are NOT a proxy -- the separately authorized Stage129 Final Test
+    # pass set the three EVENT keys True without changing what this part did.
+    part_lock = _read_json(
+        "project/stage126/stage126_m1_robustness_part3_completion_lock.json"
+    )
     for field in ("final_test_unlocked", "final_test_access_authorized",
                   "final_test_predictor_values_inspected",
                   "final_test_target_values_inspected",
                   "final_test_evaluation_performed"):
-        assert state[field] is False, field
+        assert part_lock[field] is False, field
+    assert state["final_test_unlocked"] is False
+    assert state["final_test_access_authorized"] is False
+    assert state["final_test_second_pass_authorized"] is False
 
 
 def test_handoff_state_carries_part4_markers():
@@ -2602,11 +2621,21 @@ def test_handoff_state_carries_part4_markers():
     assert _read_json(
         "project/stage126/stage126_m1_robustness_part4_completion_lock.json"
     )["full_development_refit_performed"] is False
+    # ACTION-SCOPED, as with the refit flag above: this part's own completion
+    # lock is the historical snapshot of the firewall it ran under. The live
+    # globals are NOT a proxy -- the separately authorized Stage129 Final Test
+    # pass set the three EVENT keys True without changing what this part did.
+    part_lock = _read_json(
+        "project/stage126/stage126_m1_robustness_part4_completion_lock.json"
+    )
     for field in ("final_test_unlocked", "final_test_access_authorized",
                   "final_test_predictor_values_inspected",
                   "final_test_target_values_inspected",
                   "final_test_evaluation_performed"):
-        assert state[field] is False, field
+        assert part_lock[field] is False, field
+    assert state["final_test_unlocked"] is False
+    assert state["final_test_access_authorized"] is False
+    assert state["final_test_second_pass_authorized"] is False
 
 
 def test_handoff_state_carries_part2_sample_robustness_markers():
@@ -2655,9 +2684,15 @@ def test_part1_preserves_primary_and_final_test_state():
     )["full_development_refit_performed"] is False
     assert state["final_test_unlocked"] is False
     assert state["final_test_access_authorized"] is False
-    assert state["final_test_predictor_values_inspected"] is False
-    assert state["final_test_target_values_inspected"] is False
-    assert state["final_test_evaluation_performed"] is False
+    # ACTION-SCOPED, as above: Part 1's own completion lock records the
+    # firewall it ran under. That lock predates the predictor/target inspection
+    # fields, so the pre-pass snapshot carries those two.
+    assert _read_json(
+        "project/stage126/stage126_m1_robustness_part1_completion_lock.json"
+    )["final_test_evaluation_performed"] is False
+    assert state["final_test_prior_to_authorized_pass_predictor_values_inspected"] is False
+    assert state["final_test_prior_to_authorized_pass_target_values_inspected"] is False
+    assert state["final_test_second_pass_authorized"] is False
     assert state["m2_data_collected"] is False
     assert state["m3_data_collected"] is False
     assert state["m4_data_collected"] is False
@@ -2998,7 +3033,13 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     assert state["m1_robustness_part6_authorized"] is False
     assert state["final_test_unlocked"] is False
     assert state["final_test_access_authorized"] is False
-    assert state["final_test_evaluation_performed"] is False
+    # ACTION-SCOPED: Part 5's own completion lock is the historical snapshot of
+    # the firewall it ran under; the live EVENT key was set True by the later,
+    # separately authorized Final Test pass.
+    assert _read_json(
+        "project/stage126/stage126_m1_robustness_part5_completion_lock.json"
+    )["final_test_evaluation_performed"] is False
+    assert state["final_test_second_pass_authorized"] is False
     # The workstream pointer stays put; the research-action pointer legitimately
     # advanced because Part 6 closed the six-category robustness set.
     # The live workstream label advanced with the live state: the Stage128

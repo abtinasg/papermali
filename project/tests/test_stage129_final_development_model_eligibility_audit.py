@@ -515,7 +515,16 @@ def test_no_refit_stage130_or_final_test_is_executed_or_authorized(
     # ACTION-SCOPED above; the still-true global facts below.
     assert state["next_research_action_authorized"] is False
     assert state["stage130_started"] is False
-    assert state["final_test_rows_read"] == 0
+    # MOVED from a live global proxy to an action-scoped historical fact. The
+    # live `final_test_rows_read` is 346 since the separately authorized
+    # Stage129 Final Test pass, which happened AFTER this audit. What this
+    # audit guarantees is that IT read nothing, which its own scoped marker
+    # records permanently; the snapshot pins the firewall state it ran under.
+    assert state["stage129_audit_final_test_rows_read"] == 0
+    assert state["final_test_prior_to_authorized_pass_rows_read"] == 0
+    # And the live surface must still refuse a second pass.
+    assert state["final_test_access_authorized"] is False
+    assert state["final_test_second_pass_authorized"] is False
     assert roadmap_front_matter["stage130_started"] == "false"
     assert roadmap_front_matter["next_research_action_authorized"] == "false"
 
@@ -527,7 +536,9 @@ def test_final_test_stays_locked_with_zero_rows_read(boundary, state):
     assert boundary["counters"]["final_test_target_values_read"] == 0
     assert boundary["counters"]["final_test_predictor_values_read"] == 0
     assert state["final_test_locked"] is True
-    assert state["final_test_rows_read"] == 0
+    # MOVED from a live global proxy to the action-scoped historical fact, as
+    # above: the audit's own zero, plus the pre-pass firewall snapshot.
+    assert state["final_test_prior_to_authorized_pass_rows_read"] == 0
     assert state["stage129_audit_final_test_locked"] is True
     assert state["stage129_audit_final_test_rows_read"] == 0
 

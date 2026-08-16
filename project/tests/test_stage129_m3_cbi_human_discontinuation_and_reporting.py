@@ -448,7 +448,12 @@ def test_final_test_stays_locked_with_zero_rows_read(decision, boundary, state):
     assert boundary["counters"]["final_test_target_values_read"] == 0
     assert boundary["counters"]["final_test_predictor_values_read"] == 0
     assert state["final_test_locked"] is True
-    assert state["final_test_rows_read"] == 0
+    # MOVED from a live global proxy to action-scoped historical facts. The
+    # live `final_test_rows_read` is 346 since the separately authorized
+    # Stage129 Final Test pass, which happened AFTER this action. This
+    # action's own zero is asserted above / below; the snapshot pins the
+    # firewall state it ran under.
+    assert state["final_test_prior_to_authorized_pass_rows_read"] == 0
     assert state["stage129_m3_cbi_final_test_locked"] is True
     assert state["stage129_m3_cbi_final_test_rows_read"] == 0
 
@@ -472,7 +477,13 @@ def test_no_final_model_winner_refit_or_stage130(boundary, state):
     # ACTION-SCOPED: this decision fitted nothing; its own boundary says so.
     assert boundary["full_development_refit_executed"] is False
     assert state["stage130_started"] is False
-    assert state["final_test_rows_read"] == 0
+    # MOVED from a live global proxy to action-scoped historical facts. The
+    # live `final_test_rows_read` is 346 since the separately authorized
+    # Stage129 Final Test pass, which happened AFTER this action. This
+    # action's own zero is asserted above / below; the snapshot pins the
+    # firewall state it ran under.
+    assert state["final_test_prior_to_authorized_pass_rows_read"] == 0
+    assert state["stage129_m3_cbi_final_test_rows_read"] == 0
 
 
 # ---------------------------------------------- 13. the approved text exists

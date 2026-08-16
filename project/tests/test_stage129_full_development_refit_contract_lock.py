@@ -327,7 +327,12 @@ def test_the_refit_may_not_touch_the_final_test(contract, boundary, state):
     assert boundary["final_test_access_authorized"] is False
     assert boundary["final_test_unlock_authorized"] is False
     assert state["final_test_locked"] is True
-    assert state["final_test_rows_read"] == 0
+    # MOVED from a live global proxy to action-scoped historical facts. The
+    # live `final_test_rows_read` is 346 since the separately authorized
+    # Stage129 Final Test pass, which happened AFTER this lock. The lock's own
+    # contract and boundary (asserted above) carry its zero.
+    assert state["stage129_refit_final_test_rows_read"] == 0
+    assert state["final_test_prior_to_authorized_pass_rows_read"] == 0
     assert state["stage129_refit_may_read_final_test"] is False
     # the expected counts are frozen metadata, quoted not read
     assert ft["expected_counts_are_frozen_metadata_not_row_level_access"] is True
@@ -395,7 +400,11 @@ def test_locking_the_contract_authorizes_nothing(contract, boundary, state,
     assert boundary["full_development_refit_performed"] is False
     assert boundary["trained_final_model_artifact_created"] is False
     assert state["stage130_started"] is False
-    assert state["final_test_rows_read"] == 0
+    # MOVED from a live global proxy to the action-scoped historical fact, as
+    # above: locking read nothing, and the later authorized pass is not this
+    # action's doing.
+    assert state["stage129_refit_final_test_rows_read"] == 0
+    assert state["final_test_prior_to_authorized_pass_rows_read"] == 0
     assert roadmap_front_matter["refit_executed"] == "false"
     assert roadmap_front_matter["refit_execution_authorized"] == "false"
     assert roadmap_front_matter["refit_next_action_authorized"] == "false"

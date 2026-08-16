@@ -591,9 +591,21 @@ def test_final_test_remains_locked():
     state = json.loads(
         (_root() / v.HANDOFF_STATE_REL).read_text(encoding="utf-8")
     )
+    # ACTION-SCOPED: the Stage126 validation report is the frozen snapshot of
+    # the firewall this validator ran under, and stays False forever.
     for field in v.FINAL_TEST_LOCK_FIELDS:
         assert report[field] is False, field
-        assert state[field] is False, field
+    # MOVED from live globals: the two PERMISSION fields must still be False
+    # now, but the three EVENT fields were legitimately set True by the
+    # separately authorized Stage129 Final Test pass, so they are asserted
+    # against the pre-pass historical snapshot instead of the live surface.
+    assert state["final_test_unlocked"] is False
+    assert state["final_test_access_authorized"] is False
+    assert state["final_test_second_pass_authorized"] is False
+    for field in ("final_test_predictor_values_inspected",
+                  "final_test_target_values_inspected",
+                  "final_test_evaluation_performed"):
+        assert state[f"final_test_prior_to_authorized_pass_{field[11:]}"] is False, field
     assert report["full_development_refit_performed"] is False
 
 
@@ -1757,9 +1769,14 @@ def test_live_m2_state_distinguishes_authorization_execution_and_retention():
     for field in (
         "m3_authorized", "m3_started", "m4_authorized", "m4_started",
         "final_test_unlocked", "final_test_access_authorized",
-        "final_test_evaluation_performed",
     ):
         assert state[field] is False, field
+    # MOVED from a live global: `final_test_evaluation_performed` is an EVENT
+    # key that the separately authorized Stage129 Final Test pass set True,
+    # long after the M2 work this test describes. The historical snapshot
+    # carries the state M2 ran under; a second pass stays refused.
+    assert state["final_test_prior_to_authorized_pass_evaluation_performed"] is False
+    assert state["final_test_second_pass_authorized"] is False
 
 
 def test_current_state_does_not_report_modeling_as_never_started():
@@ -1796,9 +1813,12 @@ def test_live_m2_data_state_is_true_and_historical_marker_is_labelled():
     for field in (
         "m3_authorized", "m3_started", "m4_authorized", "m4_started",
         "final_test_unlocked", "final_test_access_authorized",
-        "final_test_evaluation_performed",
     ):
         assert state[field] is False, field
+    # MOVED from a live global, as above: an EVENT key set True by the later,
+    # separately authorized Final Test pass.
+    assert state["final_test_prior_to_authorized_pass_evaluation_performed"] is False
+    assert state["final_test_second_pass_authorized"] is False
 
 
 def test_current_state_never_renders_bare_m2_data_collected_as_live():

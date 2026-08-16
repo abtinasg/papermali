@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `05332e5add56df6a4714a121f10ef401a7fbcc4b`
-- **Generated from commit:** `ba5a93e21bd1660dea7feedd0c0a7f396848511f` (branch `stage129-threshold-derivation-attempt3`, informational)
-- **Baseline:** `origin/main` @ `99c9288d0abc268f926e21ac766cc55db507054c`
+- **Last stage commit:** `4cdc3d4286ada549d3a157449ef344207c98685f`
+- **Generated from commit:** `46bd12960c4d950a66f6e5f50b1378c700c2d3f1` (branch `stage129-final-test-execution`, informational)
+- **Baseline:** `origin/main` @ `bc1baa11eb94999af8a60cd2f266628b8c78db68`
 
 ## Current-state validation
 
@@ -375,6 +375,24 @@ _The one-time contracted refit. Exactly one model fitted, on the development win
 - ➡️ **Next action:** `human_authorization_required_for_final_test_access` — authorized = False. Applying this model to the Final Test needs a separate human authorization.
 - Package: `project/stage129/full_development_refit_execution/`; interpretation: `project/stage129/full_development_refit_execution/README_STAGE129_FULL_DEVELOPMENT_REFIT_EXECUTION.md`
 
+### Stage129 — Final Test EXECUTED (the firewall is spent)
+
+_The one-time contracted Final Test pass. The held-out years ۱۴۰۰–۱۴۰۲ have now been opened, exactly once, under all twenty-one fail-closed controls. The result below is reported as computed — it was accepted before it was seen, and no method, threshold or metric was changed after seeing it._
+
+- ✅ **Executed:** passes = 1, executor `d85234ee4c7e2b14dc21084348a059fceb083cf8bcc0ecbf30ee64eef79c56a4` (frozen before the pass).
+- 🎯 **Model APPLIED, never fitted:** `M1` / `regularized_logistic_regression` / `logistic__C_0.1` — model fits = 0, refits = 0, winner selections = 0.
+- 📆 **Evaluation set:** target years `[1400, 1401, 1402]` — 346 cohort pairs, 346 evaluable (12 positive / 334 negative) across 119 tickers; 346 predictions.
+- 📊 **Primary metric — PR-AUC: 0.243879669979**.
+- 📊 **Secondary:** ROC-AUC 0.907684630739, Brier 0.071625345916, Recall@10% 0.666666666667, Lift@10% 6.407407407407. Metric set closed = True, metrics computed = 5.
+- 🎚️ **Threshold applied, not derived here:** `0.426878838687` (development-OOF F2 rule) — TP 8 / FP 43 / TN 291 / FN 4. Threshold searches = 0.
+- 📈 **Uncertainty:** paired company-cluster bootstrap on `ticker`, 2000 replicates, 1998 valid, percentile-95, seed `20260724`.
+- 🛡️ **Fail-closed controls:** 21 evaluated (FT01–FT21), all passed = True.
+- ⛔ **No recalibration, no inference:** recalibration executions = 0, probabilities raw = True, inferential superiority claimed = False. The locked primary development results are byte-identical.
+- 🔓 **Firewall status:** `SPENT_BY_AUTHORIZED_SINGLE_PASS` — rows read 346, evaluation performed True. The one-action PRE01 authorization was CONSUMED by this pass, so access authorized is back to False and the Final Test is shut again (locked = True). Second pass authorized = False: it may never be opened again, and no result here may reopen model selection.
+- 🧾 **Current state vs historical fact:** the contract is single-use and its authorization is spent, so NOW `stage129_final_test_contract_fully_executable` = False and `stage129_threshold_usable_for_final_test` = False (`SINGLE_USE_CONTRACT_ALREADY_EXECUTED_AUTHORIZATION_CONSUMED`) — not because a prerequisite is missing. That every precondition WAS resolved before access is preserved separately: preconditions resolved before access = True, contract was fully executable at the authorized pass = True, threshold was usable in the authorized pass = True, authorization consumed = True.
+- ➡️ **Next action:** `human_authorization_required_for_ready_for_review_and_merge` — authorized = False. Stage130 started = False, Stage130 authorized = False.
+- Package: `project/stage129/final_test_execution/`; executor: `project/src/stage129_final_test_execution.py`
+
 ### Last completed scientific micro-part QC
 
 _Scientific QC of the newest completed robustness micro-part — a DIFFERENT role from current-state validation above._
@@ -400,7 +418,7 @@ _Scientific QC of the newest completed robustness micro-part — a DIFFERENT rol
 - m1_robustness_completed: **True**
 - final_test_unlocked: **False**
 - final_test_access_authorized: **False**
-- final_test_evaluation_performed: **False**
+- final_test_evaluation_performed: **True**
 - m3_data_collected: **False**
 - m4_data_collected: **False**
 - financial_data_researcher_verified_frozen: **True**
@@ -424,5 +442,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `c57dc632879be9a568258abec5217053186e1f73686824d52ca0dbd7e8850e8b`_
-_generated_at_utc: 2026-08-16T07:31:32Z (informational)_
+_state_fingerprint: `113eaf583266d83c98cd9e57acdf500c7329da20090bf97fee86d24ed62bfb46`_
+_generated_at_utc: 2026-08-16T18:39:11Z (informational)_

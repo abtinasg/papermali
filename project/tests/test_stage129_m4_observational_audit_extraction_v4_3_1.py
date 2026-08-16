@@ -486,7 +486,10 @@ def test_final_test_stays_locked_with_zero_rows_read(boundary):
     assert boundary["final_test_rows_read"] == 0
     handoff = json.load(open(os.path.join(
         REPO_ROOT, "project/docs/ai/handoff_state.json"), encoding="utf-8"))
-    assert handoff["final_test_rows_read"] == 0
+    # MOVED from a live global proxy to action-scoped historical facts. The
+    # live `final_test_rows_read` is 346 since the separately authorized
+    # Stage129 Final Test pass, which happened AFTER this extraction.
+    assert handoff["final_test_prior_to_authorized_pass_rows_read"] == 0
     assert handoff["stage129_m4_final_test_rows_read"] == 0
 
 

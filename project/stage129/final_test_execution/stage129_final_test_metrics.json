@@ -1,0 +1,98 @@
+{
+  "action_id": "stage129-final-test-execution",
+  "additional_metrics_computed": 0,
+  "artifact": "final_test_metrics_artifact",
+  "evaluable_rows": 346,
+  "holm_executions": 0,
+  "inferential_superiority_claim": false,
+  "metric_set_is_closed": true,
+  "metrics": {
+    "Brier_score": 0.071625345916,
+    "Lift@10%": 6.407407407407,
+    "PR-AUC": 0.243879669979,
+    "ROC-AUC": 0.907684630739,
+    "Recall@10%": 0.666666666667
+  },
+  "negative": 334,
+  "p_values_computed": 0,
+  "positive": 12,
+  "primary_metric": "PR-AUC",
+  "primary_metric_value": 0.243879669979,
+  "secondary_metrics": [
+    "Brier_score",
+    "Lift@10%",
+    "ROC-AUC",
+    "Recall@10%"
+  ],
+  "target_years": [
+    1400,
+    1401,
+    1402
+  ],
+  "thresholded_secondary": {
+    "derived_from": "pooled_development_oof_only",
+    "fn": 4,
+    "fp": 43,
+    "rule": "development_OOF_F2_maximizing_threshold",
+    "threshold": 0.426878838687,
+    "threshold_source": "project/stage129/threshold_derivation_attempt3/stage129_threshold_value_attempt3.json",
+    "tie_break": "higher_threshold",
+    "tn": 291,
+    "tp": 8
+  },
+  "topk": {
+    "K_optimized_after_results": false,
+    "captured_positives": 8,
+    "definition": "K_y = ceil(0.10 * N_y)",
+    "fraction": 0.1,
+    "per_target_year": {
+      "1400": {
+        "K_y": 12,
+        "N_y": 112,
+        "captured_positives": 3
+      },
+      "1401": {
+        "K_y": 12,
+        "N_y": 116,
+        "captured_positives": 4
+      },
+      "1402": {
+        "K_y": 12,
+        "N_y": 118,
+        "captured_positives": 1
+      }
+    },
+    "pooled_precision_among_selected": 0.2222222222222222,
+    "pooled_test_prevalence": 0.03468208092485549,
+    "ranking_order": [
+      "predicted_probability_descending",
+      "ticker_ascending_deterministic_tiebreaker"
+    ],
+    "selected_rows": 36,
+    "total_positives": 12
+  },
+  "uncertainty": {
+    "cluster": "ticker",
+    "confidence_interval": "percentile_95",
+    "intervals": {
+      "Brier_score": {
+        "lower": 0.053164118058,
+        "upper": 0.092580775647
+      },
+      "PR-AUC": {
+        "lower": 0.053272572767,
+        "upper": 0.541675572242
+      },
+      "ROC-AUC": {
+        "lower": 0.787834897749,
+        "upper": 0.97144045144
+      }
+    },
+    "method": "paired_company_cluster_bootstrap",
+    "replicates": 2000,
+    "seed": 20260724,
+    "valid_replicate_requires_both_classes": true,
+    "valid_replicates": 1998
+  },
+  "unique_tickers": 119
+}

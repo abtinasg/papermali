@@ -1,0 +1,57 @@
+{
+  "action_id": "stage129-final-test-execution",
+  "all_prerequisites_resolved": true,
+  "artifact": "pre01_human_authorization_record",
+  "authorization_date_utc": "2026-08-16",
+  "authorization_excludes": [
+    "any second or partial Final Test pass",
+    "any computational dry run",
+    "any metric-subset or threshold-free run",
+    "any retry after seeing results",
+    "any staged opening of the Final Test",
+    "any fit, refit, tuning or model selection",
+    "any feature search, threshold search or new threshold derivation",
+    "any preprocessing change or recalibration",
+    "any metric, uncertainty or calibration analysis outside the merged contract",
+    "Stage130",
+    "rewriting manuscript claims",
+    "selecting favourable results",
+    "new exploratory analysis"
+  ],
+  "authorized_scope": "Exactly one complete Final Test execution under the merged stage129_final_test_execution_contract: apply the accepted M1 / regularized_logistic_regression / logistic__C_0.1 model with the PR #90 fitted coefficients and preprocessing parameters and the admitted threshold 0.426878838687 to Final Test target years 1400-1402.",
+  "base_commit": "bc1baa11eb94999af8a60cd2f266628b8c78db68",
+  "contract_path": "project/stage129/final_test_execution_contract_lock/stage129_final_test_execution_contract.json",
+  "contract_sha256": "036d85f8b095e0cd7e55afb899283c71f957234ce4740085a20c2d81a617074e",
+  "final_test_rows_read_at_time_of_recording": 0,
+  "merge_authorized": false,
+  "pre02_admitted_threshold": 0.426878838687,
+  "pre02_resolved_by": "stage129-threshold-derivation-attempt3",
+  "pre02_status": "RESOLVED",
+  "pre03_status": "RESOLVED",
+  "pre04_status": "RESOLVED",
+  "prerequisite": "PRE01",
+  "ready_for_review_authorized": false,
+  "recorded_before_any_final_test_row_was_read": true,
+  "requirement": "a new explicit human authorization for Final Test access exists and is recorded",
+  "resolved_by": "explicit_human_authorization",
+  "stage130_authorized": false,
+  "stage130_started": false,
+  "status": "RESOLVED",
+  "supersedes": {
+    "artifact": "stage129_final_test_execution_contract",
+    "keys": [
+      "execution_prerequisites.prerequisites[PRE01].satisfied_now",
+      "executability_status.final_test_contract_fully_executable",
+      "executability_status.final_test_contract_fully_executable_blocked_by"
+    ],
+    "note": "The merged contract artifact is NOT edited. It records the state at lock time. This record supersedes those three keys and nothing else.",
+    "previous_values": {
+      "PRE01.satisfied_now": false,
+      "blocked_by": [
+        "PRE01",
+        "PRE02"
+      ],
+      "final_test_contract_fully_executable": false
+    }
+  }
+}
