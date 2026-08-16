@@ -45,6 +45,41 @@ REAL_FORBIDDEN = {
 }
 REAL_PACKAGE_DIR = (REPO_ROOT / ft.PKG_REL).resolve()
 
+#: The pre-execution freeze. At this commit the executor and this suite were
+#: complete and the real Final Test had never been opened. Assertions about
+#: "before the authorized run" are scoped to THIS commit rather than to the
+#: live directory, which now legitimately holds the executed package.
+PRE_EXECUTION_COMMIT = "dfd5b5dfbc1b0a74f025c18d21ead71e73b825b4"
+
+#: SHA-256 of THIS suite as committed and executed at the pre-execution freeze.
+#: The working copy has since been edited to re-scope post-execution semantics,
+#: so this is a historical provenance pin, NOT the current file's hash.
+SUITE_SHA256_AT_PRE_EXECUTION_COMMIT = (
+    "e17e5377875baf78a9c2f541c6fcea90a381b9dcf81483c8bdfe76d0a075ff46")
+
+#: The package the one authorized pass actually wrote, pinned by SHA-256.
+EXECUTED_PACKAGE_SHA256 = {
+    "metadata_and_hashes_stage129_final_test_execution.json":
+        "0ac59f9bef0fc984b78b3398a8ffe022906a07953db236331c892b8d6b73c4c9",
+    "stage129_final_test_metrics.json":
+        "0b1ea6c086430d6ecc65432c8001cc3b028422e7c1293a9ea2fb6c44d7ef4392",
+    "stage129_final_test_predictions.json":
+        "654c8c50b25d90b6811901708876b542a9ede87598ad58ca1a35a5a5e3dba37b",
+    "stage129_final_test_provenance_record.json":
+        "5b5d4d66ed4ca0770667547752c0436380c8960f0d5296f62bda83b3fa80c551",
+    "stage129_final_test_qc_report.json":
+        "016eaa19149a9247574e13931e9aae4a10fede26316a63f1321a6643c96ad9f5",
+}
+
+
+def _package_names_at(commit: str) -> set[str]:
+    """File names in the package directory AS OF a commit (never the worktree)."""
+    proc = subprocess.run(
+        ["git", "ls-tree", "--name-only", f"{commit}:{ft.PKG_REL}"],
+        capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=300)
+    assert proc.returncode == 0, proc.stderr
+    return {line.strip() for line in proc.stdout.splitlines() if line.strip()}
+
 #: Every attempt to open a real Final Test input, recorded for the final proof.
 FINAL_TEST_OPEN_ATTEMPTS: list[str] = []
 
@@ -1409,7 +1444,12 @@ def test_the_written_package_is_stable_across_repeat_builds(tmp_path, monkeypatc
 
 def test_importing_the_module_executes_nothing():
     assert ft._OPENED_ROOTS == set()
-    assert not REAL_PACKAGE_DIR.joinpath(ft.PREDICTIONS_NAME).exists()
+    # SCOPED to the pre-execution freeze. Importing this module still executes
+    # nothing -- `_OPENED_ROOTS` above is the direct proof. The predictions
+    # file now exists because the separately authorized single pass wrote it,
+    # so its ABSENCE is no longer a valid proxy for "import ran nothing"; what
+    # stays checkable forever is that it did not exist at the frozen commit.
+    assert ft.PREDICTIONS_NAME not in _package_names_at(PRE_EXECUTION_COMMIT)
 
 
 def test_main_refuses_without_the_explicit_flag(capsys):
@@ -1482,10 +1522,47 @@ def test_the_real_final_test_counters_are_all_zero():
 
 
 def test_the_real_package_directory_holds_only_the_pre01_record():
+    """SCOPED to the pre-execution freeze `dfd5b5d`.
+
+    Before the authorized run the package directory held only the PRE01
+    record. That is a fact about a COMMIT, so it stays checkable forever --
+    unlike the live directory, which now legitimately holds the package the
+    one authorized pass wrote. The live directory is verified straight after,
+    by hash, so re-scoping this guard removes no coverage.
+    """
+    assert _package_names_at(PRE_EXECUTION_COMMIT) == {Path(ft.PRE01_REL).name}, (
+        "the real Final Test package must not exist before the authorized run")
+
+
+def test_the_real_package_directory_now_holds_the_executed_package():
+    """CURRENT state: the package exists and every file matches its pinned hash."""
     assert REAL_PACKAGE_DIR.exists()
     names = {p.name for p in REAL_PACKAGE_DIR.iterdir()}
-    assert names == {Path(ft.PRE01_REL).name}, (
-        "the real Final Test package must not exist before the authorized run")
+    assert Path(ft.PRE01_REL).name in names
+    assert set(EXECUTED_PACKAGE_SHA256) <= names, sorted(
+        set(EXECUTED_PACKAGE_SHA256) - names)
+    for name, want in sorted(EXECUTED_PACKAGE_SHA256.items()):
+        got = hashlib.sha256((REAL_PACKAGE_DIR / name).read_bytes()).hexdigest()
+        assert got == want, name
+
+
+def test_the_executed_suite_hash_is_recorded_as_historical_not_current():
+    """The frozen suite hash belongs to `dfd5b5d`, never to the working copy.
+
+    This file was edited AFTER the pass to re-scope post-execution semantics.
+    Pinning the historical hash here keeps provenance honest: it names the
+    version that was committed and executed, and it must NOT match this file.
+    """
+    committed = subprocess.run(
+        ["git", "show", f"{PRE_EXECUTION_COMMIT}:project/tests/"
+         "test_stage129_final_test_execution.py"],
+        capture_output=True, cwd=str(REPO_ROOT), timeout=300)
+    assert committed.returncode == 0, committed.stderr
+    assert hashlib.sha256(committed.stdout).hexdigest() == \
+        SUITE_SHA256_AT_PRE_EXECUTION_COMMIT
+    current = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    assert current != SUITE_SHA256_AT_PRE_EXECUTION_COMMIT, (
+        "the historical pin must not be presented as this file's hash")
 
 
 def test_the_real_pinned_inputs_are_present_but_unread():

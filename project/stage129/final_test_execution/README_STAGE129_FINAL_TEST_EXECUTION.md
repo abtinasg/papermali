@@ -47,9 +47,17 @@ Zero development rows entered the evaluation.
 The metric set is **closed**: `additional_metrics_computed = 0`. The primary
 metric was not changed after seeing results.
 
-The frozen executor computes intervals for the three metrics above only. The
-two top-K metrics carry no interval because `K_y = ceil(0.10 * N_y)` is not
-stable under a ticker resample that changes `N_y`.
+**Interval coverage is a reporting limitation, not a contractual exclusion.**
+The merged contract fixes the bootstrap method, cluster, replicate count,
+minimum valid count, percentile and seed, but it does **not** state which of
+the five metrics receive an interval. The executor frozen before access
+produced intervals for `PR-AUC`, `ROC-AUC` and `Brier_score`; `Recall@10%` and
+`Lift@10%` are reported as point estimates only. No interval is computed for
+them now, because that would be a new scientific quantity produced after
+seeing the results. Nothing here should be read as the contract having
+forbidden intervals for the two top-K metrics — it is silent on the question,
+and the frozen executor's behaviour is what the single authorized pass
+recorded.
 
 **Read the primary interval honestly.** The contract's own low-positive caveat
 applies and is not softened here: with **12** positives the `PR-AUC` interval is

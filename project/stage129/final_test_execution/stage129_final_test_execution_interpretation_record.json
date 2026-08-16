@@ -51,6 +51,26 @@
     "entry_point_flag": "--execute-final-test",
     "write_flag_note": "--execute-final-test is the entry-point gate; without --write the executor self-labels the run a dry run and emits no package. PRE01 excludes 'any computational dry run' and the mission requires the written artifacts to be re-read, so --write is required for the authorized pass to be the real one."
   },
+  "reporting_limitations": [
+    {
+      "id": "LIM01",
+      "subject": "confidence_interval_coverage_across_the_five_contracted_metrics",
+      "contract_specifies_which_metrics_receive_an_interval": false,
+      "metrics_with_intervals": ["PR-AUC", "ROC-AUC", "Brier_score"],
+      "metrics_with_point_estimate_only": ["Recall@10%", "Lift@10%"],
+      "produced_by": "the executor frozen before access, at SHA-256 d85234ee4c7e2b14dc21084348a059fceb083cf8bcc0ecbf30ee64eef79c56a4",
+      "new_interval_computed_after_the_pass": false,
+      "statement": "The merged contract fixes the bootstrap method, cluster, replicate count, minimum valid count, percentile and seed, but does not state which of the five metrics receive an interval. The executor frozen before access produced intervals for three of them. This is recorded as a REPORTING LIMITATION of the single authorized pass. It is NOT a claim that the contract prohibited intervals for Recall@10% or Lift@10% -- the contract is silent on that question. No interval is computed for them now, because doing so after seeing the results would be a new scientific quantity."
+    }
+  ],
+  "suite_provenance": {
+    "path": "project/tests/test_stage129_final_test_execution.py",
+    "sha256_at_pre_execution_commit": "e17e5377875baf78a9c2f541c6fcea90a381b9dcf81483c8bdfe76d0a075ff46",
+    "pre_execution_commit": "dfd5b5dfbc1b0a74f025c18d21ead71e73b825b4",
+    "sha256_is_the_current_working_copy": false,
+    "note": "e17e5377... is the SHA-256 of the suite AS COMMITTED AND EXECUTED at the pre-execution freeze dfd5b5d. The file has since been edited to re-scope its post-execution semantics: two guards that asserted the real package did not exist are now scoped to that commit, and the live package is verified by hash instead. The historical hash must never be presented as the current file's hash; `test_the_executed_suite_hash_is_recorded_as_historical_not_current` enforces both halves of that statement.",
+    "executor_sha256_unchanged_by_the_repair": true
+  },
   "final_test_rows_read": 346,
   "model_fits_executed": 0,
   "refits_executed": 0,

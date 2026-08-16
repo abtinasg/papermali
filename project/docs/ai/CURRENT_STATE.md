@@ -12,7 +12,7 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
 - **Last stage commit:** `470f8622818a2df3d486f99abfb639404b05af58`
-- **Generated from commit:** `470f8622818a2df3d486f99abfb639404b05af58` (branch `stage129-final-test-execution`, informational)
+- **Generated from commit:** `38e0003123e09825facdb7d47aa2a88635c1d649` (branch `stage129-final-test-execution`, informational)
 - **Baseline:** `origin/main` @ `bc1baa11eb94999af8a60cd2f266628b8c78db68`
 
 ## Current-state validation
@@ -389,6 +389,7 @@ _The one-time contracted Final Test pass. The held-out years ۱۴۰۰–۱۴۰۲
 - 🛡️ **Fail-closed controls:** 21 evaluated (FT01–FT21), all passed = True.
 - ⛔ **No recalibration, no inference:** recalibration executions = 0, probabilities raw = True, inferential superiority claimed = False. The locked primary development results are byte-identical.
 - 🔓 **Firewall status:** `SPENT_BY_AUTHORIZED_SINGLE_PASS` — rows read 346, evaluation performed True. The one-action PRE01 authorization was CONSUMED by this pass, so access authorized is back to False and the Final Test is shut again (locked = True). Second pass authorized = False: it may never be opened again, and no result here may reopen model selection.
+- 🧾 **Current state vs historical fact:** the contract is single-use and its authorization is spent, so NOW `stage129_final_test_contract_fully_executable` = False and `stage129_threshold_usable_for_final_test` = False (`SINGLE_USE_CONTRACT_ALREADY_EXECUTED_AUTHORIZATION_CONSUMED`) — not because a prerequisite is missing. That every precondition WAS resolved before access is preserved separately: preconditions resolved before access = True, contract was fully executable at the authorized pass = True, threshold was usable in the authorized pass = True, authorization consumed = True.
 - ➡️ **Next action:** `human_authorization_required_for_ready_for_review_and_merge` — authorized = False. Stage130 started = False, Stage130 authorized = False.
 - Package: `project/stage129/final_test_execution/`; executor: `project/src/stage129_final_test_execution.py`
 
@@ -441,5 +442,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `2e92ccae35e742101f0b2d48de3223181a2cceec2073bbb97215a8d2fc98a8c1`_
-_generated_at_utc: 2026-08-16T14:34:26Z (informational)_
+_state_fingerprint: `f7857b0d70b0631efb40beedad343bcb11a8f7c23362029fbdb62b3d97268839`_
+_generated_at_utc: 2026-08-16T15:17:28Z (informational)_

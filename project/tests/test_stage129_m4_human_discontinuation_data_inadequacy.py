@@ -299,7 +299,12 @@ def test_final_test_stays_locked_with_zero_rows_read(decision, boundary, state):
     assert decision["final_test_access_authorized"] is False
     assert decision["final_test_rows_read"] == 0
     assert boundary["final_test_rows_read"] == 0
-    assert state["final_test_rows_read"] == 0
+    # MOVED from a live global proxy to action-scoped historical facts. The
+    # live `final_test_rows_read` is 346 since the separately authorized
+    # Stage129 Final Test pass, which happened AFTER this action. This
+    # action's own zero is asserted above / below; the snapshot pins the
+    # firewall state it ran under.
+    assert state["final_test_prior_to_authorized_pass_rows_read"] == 0
     assert state["stage129_m4_final_test_rows_read"] == 0
     assert state["stage129_m4_final_test_locked"] is True
 

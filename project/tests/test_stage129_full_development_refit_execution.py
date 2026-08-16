@@ -281,7 +281,10 @@ def test_no_final_test_row_predictor_target_prediction_or_metric(
         assert boundary["counters"][key] == 0, key
     assert prov["final_test_rows_read"] == 0
     assert prov["final_test_target_years_excluded"] == FINAL_TEST_YEARS
-    assert state["final_test_rows_read"] == 0
+    # MOVED from a live global proxy to the action-scoped historical fact. The
+    # live `final_test_rows_read` is 346 since the separately authorized
+    # Stage129 Final Test pass, which happened AFTER this refit execution.
+    assert state["final_test_prior_to_authorized_pass_rows_read"] == 0
     assert state["stage129_refit_execution_final_test_rows_read"] == 0
     assert roadmap_front_matter["refit_execution_final_test_rows_read"] == "0"
 

@@ -69,7 +69,13 @@ REQUIRED_STATE = {
     "stage130_started": False,
     "final_test_access_authorized": False,
     "final_test_locked": True,
-    "final_test_rows_read": 0,
+    "final_test_second_pass_authorized": False,
+    # MOVED from a live global to the pre-pass historical snapshot:
+    # `final_test_rows_read` is an EVENT key that the separately authorized
+    # Stage129 Final Test pass set to 346, long after this selection. The
+    # firewall this selection ran under is pinned here permanently, and the
+    # live PERMISSION keys above are still pinned exactly.
+    "final_test_prior_to_authorized_pass_rows_read": 0,
 }
 
 
@@ -205,7 +211,12 @@ def test_nothing_was_fitted_and_no_artifact_was_produced(decision, boundary,
     assert decision["trained_final_model_artifact_created"] is False
     assert boundary["full_development_refit_performed"] is False
     assert state["stage130_started"] is False
-    assert state["final_test_rows_read"] == 0
+    # MOVED from a live global proxy to an action-scoped historical fact. The
+    # live `final_test_rows_read` is 346 since the separately authorized
+    # Stage129 Final Test pass, which happened AFTER this selection. The
+    # selection's own decision and boundary artifacts (asserted above) carry
+    # its zero; the snapshot pins the firewall state it ran under.
+    assert state["final_test_prior_to_authorized_pass_rows_read"] == 0
     assert roadmap_front_matter["full_development_refit_performed"] == "false"
     assert roadmap_front_matter["trained_final_model_artifact_created"] == "false"
     assert roadmap_front_matter["stage130_started"] == "false"
@@ -236,8 +247,11 @@ def test_final_test_stays_locked_with_zero_rows_read(decision, boundary, state):
     assert boundary["counters"]["final_test_target_values_read"] == 0
     assert boundary["counters"]["final_test_predictor_values_read"] == 0
     assert state["final_test_locked"] is True
-    assert state["final_test_rows_read"] == 0
+    # MOVED from a live global proxy to the pre-pass historical snapshot, as
+    # above; `decision` and `boundary` above carry this action's own zero.
+    assert state["final_test_prior_to_authorized_pass_rows_read"] == 0
     assert state["final_test_access_authorized"] is False
+    assert state["final_test_second_pass_authorized"] is False
 
 
 # --------------------------------------------- M2 keeps its role, not blamed

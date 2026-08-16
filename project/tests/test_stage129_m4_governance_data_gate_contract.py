@@ -448,7 +448,13 @@ def test_handoff_state_shows_zero_m4_execution():
     assert state["stage129_m4_final_test_locked"] is True
     assert state["stage129_m4_final_test_rows_read"] == 0
     assert state["final_test_locked"] is True
-    assert state["final_test_rows_read"] == 0
+    # MOVED from a live global proxy to action-scoped historical facts. The
+    # live `final_test_rows_read` is 346 since the separately authorized
+    # Stage129 Final Test pass, which happened AFTER this action. This
+    # action's own zero is asserted above / below; the snapshot pins the
+    # firewall state it ran under.
+    assert state["final_test_prior_to_authorized_pass_rows_read"] == 0
+
 
 
 def test_handoff_state_pointer_is_distinct_from_authorization_and_from_the_two_live_pointers():
@@ -549,7 +555,15 @@ def test_protected_handoff_keys_have_the_expected_pre_existing_values():
         "m4_started": False,
         "final_test_locked": True,
         "final_test_access_authorized": False,
-        "final_test_evaluation_performed": False,
+        "final_test_second_pass_authorized": False,
+        # MOVED from live globals to the pre-pass historical snapshot. The
+        # separately authorized Stage129 Final Test pass legitimately set the
+        # EVENT keys (`evaluation_performed`, `rows_read`) after this
+        # contract-lock task ran. What this task must never have moved is the
+        # firewall it found, which the snapshot pins permanently; the live
+        # PERMISSION keys above are still pinned as well.
+        "final_test_prior_to_authorized_pass_evaluation_performed": False,
+        "final_test_prior_to_authorized_pass_rows_read": 0,
         # NB: `paper_winner_selected`, `trained_final_model_artifact_created`
         # and `full_development_refit_performed` are deliberately NOT pinned
         # here. All three were False when this contract-lock task ran and this
@@ -559,7 +573,6 @@ def test_protected_handoff_keys_have_the_expected_pre_existing_values():
         # execution. What this task must never move is the M2/M3/M4 scientific
         # state, the Holm ledger and the Final Test lock, all pinned here.
         "final_model_selected": False,
-        "final_test_rows_read": 0,
         "holm_family_complete": False,
         "holm_final_adjustment_deferred": True,
         "stage128_m3_lag_wdi_promoted_to_confirmatory_model": False,

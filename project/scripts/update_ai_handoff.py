@@ -6372,6 +6372,23 @@ def render_current_state(record: dict) -> str:
             "Second pass authorized = "
             f"{record.get('final_test_second_pass_authorized')}: it may never "
             "be opened again, and no result here may reopen model selection.",
+            "- 🧾 **Current state vs historical fact:** the contract is "
+            "single-use and its authorization is spent, so NOW "
+            "`stage129_final_test_contract_fully_executable` = "
+            f"{record.get('stage129_final_test_contract_fully_executable')} "
+            "and `stage129_threshold_usable_for_final_test` = "
+            f"{record.get('stage129_threshold_usable_for_final_test')} "
+            f"(`{record.get('stage129_final_test_contract_not_executable_reason')}`)"
+            " — not because a prerequisite is missing. That every "
+            "precondition WAS resolved before access is preserved separately: "
+            "preconditions resolved before access = "
+            f"{record.get('stage129_final_test_preconditions_resolved_before_access')}"
+            ", contract was fully executable at the authorized pass = "
+            f"{record.get('stage129_final_test_contract_was_fully_executable_at_authorized_pass')}"
+            ", threshold was usable in the authorized pass = "
+            f"{record.get('stage129_threshold_was_usable_in_authorized_pass')}"
+            ", authorization consumed = "
+            f"{record.get('stage129_final_test_authorization_consumed')}.",
             "- ➡️ **Next action:** "
             f"`{record.get('stage129_final_test_next_action_id')}` — "
             "authorized = "
@@ -16870,8 +16887,46 @@ def derive_stage129_final_test_execution_markers(root: str) -> dict:
         "stage129_final_test_pre02_resolved": True,
         "stage129_final_test_unresolved_prerequisites": [],
         "stage129_final_test_unresolved_prerequisite_count": 0,
-        "stage129_final_test_contract_fully_executable": True,
-        "stage129_threshold_usable_for_final_test": True,
+
+        # Executability and threshold usability are CURRENT-STATE keys, so
+        # after the pass they read False: the contract is single-use and its
+        # one authorization is spent, so it is not executable NOW -- not
+        # because a prerequisite is missing (none is), but because there is
+        # nothing left to execute. Publishing True here would say the contract
+        # could be run again.
+        "stage129_final_test_contract_fully_executable": False,
+        "stage129_final_test_contract_not_executable_reason":
+            "SINGLE_USE_CONTRACT_ALREADY_EXECUTED_AUTHORIZATION_CONSUMED",
+        "stage129_threshold_usable_for_final_test": False,
+
+        # The historical fact those two keys used to carry is preserved here,
+        # action-scoped, so spending the firewall does not erase the record
+        # that every precondition really was resolved BEFORE access.
+        "stage129_final_test_contract_was_fully_executable_at_authorized_pass":
+            True,
+        "stage129_threshold_was_usable_in_authorized_pass": True,
+        "stage129_final_test_preconditions_resolved_before_access": True,
+        "stage129_final_test_authorization_consumed": True,
+
+        # The firewall state as it stood for EVERY action before this one,
+        # published as a historical snapshot. Until the pass, the live globals
+        # and this snapshot were the same values, so earlier actions could use
+        # the live global as a proxy for "the Final Test was untouched when I
+        # ran". Spending the firewall breaks that proxy. Actions with their own
+        # frozen artifact (a completion lock, a governance boundary) should
+        # assert against that artifact; this snapshot serves the rest, so a
+        # historical guarantee is never re-expressed as a claim about now.
+        "final_test_prior_to_authorized_pass_unlocked": _FIREWALL_STOOD_UNLOCKED,
+        "final_test_prior_to_authorized_pass_access_authorized":
+            _FIREWALL_STOOD_ACCESS_AUTHORIZED,
+        "final_test_prior_to_authorized_pass_predictor_values_inspected":
+            _FIREWALL_STOOD_VALUES_INSPECTED,
+        "final_test_prior_to_authorized_pass_target_values_inspected":
+            _FIREWALL_STOOD_VALUES_INSPECTED,
+        "final_test_prior_to_authorized_pass_evaluation_performed":
+            _FIREWALL_STOOD_EVALUATION_PERFORMED,
+        "final_test_prior_to_authorized_pass_rows_read": _FIREWALL_STOOD_ROWS_READ,
+        "final_test_prior_to_authorized_pass_locked": _FIREWALL_STOOD_LOCKED,
 
         # And it authorizes nothing further. The one-action authorization was
         # CONSUMED by this pass: `..._execution_authorized` stays False by the
