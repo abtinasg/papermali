@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `bd5bc96f362450af112bf70962cc6a895c757b1d`
-- **Generated from commit:** `bd5bc96f362450af112bf70962cc6a895c757b1d` (branch `stage129-threshold-derivation-execution-v2`, informational)
-- **Baseline:** `origin/main` @ `74906ac5b6c390a243eebcfc10f292549f322b46`
+- **Last stage commit:** `05332e5add56df6a4714a121f10ef401a7fbcc4b`
+- **Generated from commit:** `ba5a93e21bd1660dea7feedd0c0a7f396848511f` (branch `stage129-threshold-derivation-attempt3`, informational)
+- **Baseline:** `origin/main` @ `99c9288d0abc268f926e21ac766cc55db507054c`
 
 ## Current-state validation
 
@@ -424,5 +424,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `bfd843b037db0f79e44874c48a79954890c3874fd9962f0ec64631e919f14144`_
-_generated_at_utc: 2026-08-15T14:09:14Z (informational)_
+_state_fingerprint: `c57dc632879be9a568258abec5217053186e1f73686824d52ca0dbd7e8850e8b`_
+_generated_at_utc: 2026-08-16T07:31:32Z (informational)_
