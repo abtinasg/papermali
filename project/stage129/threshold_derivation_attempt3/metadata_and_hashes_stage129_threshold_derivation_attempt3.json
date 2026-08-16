@@ -1,0 +1,60 @@
+{
+  "aborted_attempts": 1,
+  "action_id": "stage129-threshold-derivation-attempt3",
+  "action_type": "one_time_contracted_threshold_derivation_development_only",
+  "admitted_threshold": 0.426878838687,
+  "algorithm_contract_lock_pr": 92,
+  "all_contractual_controls_passed": true,
+  "attempt": 3,
+  "base_commit": "99c9288d0abc268f926e21ac766cc55db507054c",
+  "computations_completed_but_not_admitted": 1,
+  "contractual_control_count": 30,
+  "contractual_controls_not_executed": 0,
+  "credentials_committed_to_git": false,
+  "executor_path": "project/src/stage129_threshold_derivation_attempt3.py",
+  "executor_sha256": "5d11d42ee25e5480c34846b72e70772d3ce27e68e7defd2c9b23ae8190a6730a",
+  "final_test_access_authorized": false,
+  "final_test_artifacts_committed": 0,
+  "final_test_execution_authorized": false,
+  "final_test_rows_read": 0,
+  "frozen_oof_file_modified": false,
+  "frozen_oof_file_sha256": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+  "historical_artifacts_modified": false,
+  "model_fits_executed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "package_file_count": 4,
+  "package_files": {
+    "README_STAGE129_THRESHOLD_DERIVATION_ATTEMPT3.md": {
+      "bytes": 7534,
+      "sha256": "8471e0ad03e64e2b95f4650e0e9458ed016d035644024d559fe27a6f9e0f91d7"
+    },
+    "stage129_threshold_derivation_attempt3_provenance_record.json": {
+      "bytes": 3488,
+      "sha256": "eca550ebd399f4bfb3ba504e600117dc1b3d953551b2ac598b02816d9673673a"
+    },
+    "stage129_threshold_derivation_attempt3_qc_report.json": {
+      "bytes": 9886,
+      "sha256": "e3d9c0d74b8cb1c08949773dc7585c410a2ec47c460c85c1045d695eac57dd26"
+    },
+    "stage129_threshold_value_attempt3.json": {
+      "bytes": 1267,
+      "sha256": "9b8a7d799616eb12d6e70a6dcf623ff1a636b4ec4b1bde37c21116252876b534"
+    }
+  },
+  "parse_rule_contract_lock_pr": 93,
+  "pii_committed_to_git": false,
+  "pp08_agreement_comparisons": 421,
+  "pp08_agreement_mismatches": 0,
+  "pp08_clause_b_executed": true,
+  "pre01_resolved": false,
+  "pre02_resolved": true,
+  "result_admission_status": "ADMITTED",
+  "result_admitted": true,
+  "successful_admitted_derivations": 1,
+  "supplementary_check_count": 1,
+  "threshold_round_trip_exact": true,
+  "thresholds_admitted": 1,
+  "thresholds_computed": 1,
+  "total_derivation_attempts_started": 3,
+  "trained_model_artifacts_committed": 0
+}

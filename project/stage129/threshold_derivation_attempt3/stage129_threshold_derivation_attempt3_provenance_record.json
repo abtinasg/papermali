@@ -1,0 +1,83 @@
+{
+  "action_id": "stage129-threshold-derivation-attempt3",
+  "algorithm_contract_path": "project/stage129/threshold_derivation_algorithm_contract_lock/stage129_threshold_derivation_algorithm_contract.json",
+  "algorithm_contract_sha256": "0683d0b4da005121dcad80c11b934d164b99bdc9e4cb3ba95843ca0b4b5a160c",
+  "artifact": "threshold_derivation_provenance_record",
+  "attempt": 3,
+  "attempt2_executor_path": "project/src/stage129_threshold_derivation.py",
+  "attempt2_executor_rewritten": false,
+  "attempt2_value_read_by_this_run": false,
+  "base_commit": "99c9288d0abc268f926e21ac766cc55db507054c",
+  "beta": 2,
+  "candidate_count": 421,
+  "candidate_set_definition": "exactly_the_distinct_parsed_values",
+  "closed_form": "5*TP / (5*TP + 4*FN + FP)",
+  "comparison_operator": ">=",
+  "computational_dry_run_executed": false,
+  "determinism_rerun_executed": false,
+  "eval_exec_or_literal_eval_used": false,
+  "evaluable_rows": 421,
+  "executor_path": "project/src/stage129_threshold_derivation_attempt3.py",
+  "final_test_rows_read": 0,
+  "final_test_target_years_excluded": [
+    1400,
+    1401,
+    1402
+  ],
+  "historical_artifacts_sha256_after": {
+    "project/src/stage129_threshold_derivation.py": "3f343fad82bd29d85c46296a2bad99024571610dbdd462af13cde12de0d1dade",
+    "project/stage129/threshold_derivation_abort_and_parse_rule_lock/stage129_threshold_derivation_abort_record.json": "17de5e2047f07e110fd74669374f14dd1212ec78fdb6952a65c26ee6a1cdc122",
+    "project/stage129/threshold_derivation_execution/stage129_threshold_derivation_qc_report.json": "fbf5484a3ff195be9683c63efd833ad041cb89cb65c5a30fa0619758daad486f",
+    "project/stage129/threshold_derivation_execution/stage129_threshold_value.json": "273cee5fd0764e8fddfa22365491cf2732a2faeccdaf0a1f8a749a5a5efe7f22"
+  },
+  "input_bytes": 214784,
+  "input_path": "project/stage126/stage126_m1_development_oof_predictions.csv",
+  "input_sha256": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+  "input_unchanged_after_run": true,
+  "model_fits_executed": 0,
+  "negatives": 386,
+  "non_evaluable_rows_excluded": 0,
+  "numeric_conversion_implementations_used": [
+    "float",
+    "numpy.float64"
+  ],
+  "numpy_version_observed": "2.4.6",
+  "objective": "F2",
+  "other_family_tokens_parsed": 0,
+  "parse_regex": "^np\\.float64\\((?P<decimal>[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?)\\)$",
+  "parse_rule_contract_path": "project/stage129/threshold_derivation_abort_and_parse_rule_lock/stage129_predicted_probability_parse_rule_contract.json",
+  "parse_rule_contract_sha256": "5c67727f002fed5c2fa8d631a0a4ccdb724fdeef968fe59f7a8dbc02213bf162",
+  "pick_threshold_used": false,
+  "positives": 35,
+  "pp08_agreement_comparisons": 421,
+  "pp08_agreement_mismatches": 0,
+  "pp08_clause_b_agreement_check_executed": true,
+  "probability_tokens_parsed": 421,
+  "probability_tokens_parsed_scope": "selected_evaluable_rows_only",
+  "rounding_applied_before_selection": false,
+  "row_filter": {
+    "configuration_id": "logistic__C_0.1",
+    "model_family": "regularized_logistic_regression"
+  },
+  "runtime_python_observed": "3.13.5",
+  "runtime_versions": {
+    "jdatetime": "6.0.1",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "python": "3.13.5",
+    "scikit-learn": "1.9.0",
+    "xgboost": "3.3.0"
+  },
+  "selected_rows": 421,
+  "target_years": [
+    1393,
+    1394,
+    1395,
+    1396,
+    1397,
+    1398,
+    1399
+  ],
+  "total_rows_read": 1263,
+  "zero_denominator_convention": "F2 = 0"
+}

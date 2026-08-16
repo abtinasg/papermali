@@ -3042,6 +3042,10 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # exists, and re-asserts that resolving PRE02 leaves PRE01 -- and the
         # Final Test -- shut.
         **derive_stage129_threshold_derivation_execution_markers(root),
+        # Must come last of all: attempt 3, the admitted derivation. It refuses
+        # a PP08 clause (b) that sampled rather than covered every token, and
+        # refuses any state where attempts 1 and 2 have been tidied away.
+        **derive_stage129_threshold_attempt3_markers(root),
         }))
 
 
@@ -15906,6 +15910,226 @@ def derive_stage129_threshold_derivation_execution_markers(root: str) -> dict:
         "stage129_threshold_execution_next_action_id":
             "human_authorization_required_for_final_test_access",
         "stage129_threshold_execution_next_action_authorized": False,
+    }
+
+_STAGE129_A3_PKG = "project/stage129/threshold_derivation_attempt3"
+_STAGE129_A3_ACTION_ID = "stage129-threshold-derivation-attempt3"
+_STAGE129_A3_VALUE_REL = f"{_STAGE129_A3_PKG}/stage129_threshold_value_attempt3.json"
+_STAGE129_A3_PROV_REL = (
+    f"{_STAGE129_A3_PKG}/stage129_threshold_derivation_attempt3_provenance_record.json")
+_STAGE129_A3_QC_REL = (
+    f"{_STAGE129_A3_PKG}/stage129_threshold_derivation_attempt3_qc_report.json")
+_STAGE129_A3_OLD_EXECUTOR = "project/src/stage129_threshold_derivation.py"
+
+
+def derive_stage129_threshold_attempt3_markers(root: str) -> dict:
+    """Recognize the admitted attempt-3 threshold derivation.
+
+    Attempt 2 was refused admission because a contractual control was recorded
+    PASS without running. So the checks here are aimed squarely at that:
+
+      * PP08 clause (b) must be shown to have EXECUTED, with one comparison per
+        parsed token and zero mismatches -- a count short of the token count is
+        a sample, not the contracted check;
+      * attempts 1 and 2 must survive byte-identical, and the attempt-2 executor
+        must not have been rewritten. A success is exactly when a programme is
+        tempted to tidy away the failures before it;
+      * admission must not rest on agreeing with attempt 2;
+      * PRE02 resolving must not drag PRE01 or any Final Test lock with it.
+
+    Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE129_A3_VALUE_REL)
+    if not os.path.isfile(path):
+        return {}
+    value = _require_json_artifact(root, _STAGE129_A3_VALUE_REL)
+    prov = _require_json_artifact(root, _STAGE129_A3_PROV_REL)
+    qc = _require_json_artifact(root, _STAGE129_A3_QC_REL)
+
+    for artifact, label in ((value, "value"), (prov, "provenance"), (qc, "qc")):
+        if artifact.get("action_id") != _STAGE129_A3_ACTION_ID:
+            raise HandoffError(f"Stage129 attempt-3 {label} action_id mismatch")
+
+    # (1) The number must satisfy its own closed form and tie-break.
+    threshold = value.get("threshold")
+    if not isinstance(threshold, float) or float(str(threshold)) != threshold:
+        raise HandoffError("Stage129 attempt-3 threshold must round-trip exactly")
+    counts = value.get("confusion_at_threshold") or {}
+    tp, fp, fn = counts.get("tp"), counts.get("fp"), counts.get("fn")
+    if not all(isinstance(v, int) for v in (tp, fp, fn)):
+        raise HandoffError("Stage129 attempt-3 confusion counts must be integers")
+    denominator = 5 * tp + 4 * fn + fp
+    expected = 0.0 if denominator == 0 else 5 * tp / denominator
+    if value.get("f2_at_threshold") != expected:
+        raise HandoffError(
+            "Stage129 attempt-3 F2 does not satisfy 5*TP / (5*TP + 4*FN + FP) on "
+            "its own recorded counts")
+    members = qc.get("argmax_member_thresholds") or []
+    if not members or threshold != max(members):
+        raise HandoffError(
+            "Stage129 attempt-3 threshold must be the largest member of the argmax set")
+
+    # (2) PP08 clause (b) must have EXECUTED over every token.
+    tokens = qc.get("probability_tokens_parsed")
+    if qc.get("pp08_clause_b_executed") is not True or \
+            prov.get("pp08_clause_b_agreement_check_executed") is not True:
+        raise HandoffError(
+            "Stage129 attempt-3 must record PP08 clause (b) as executed")
+    if qc.get("pp08_agreement_comparisons") != tokens:
+        raise HandoffError(
+            "Stage129 attempt-3 PP08 clause (b) must compare EVERY parsed token; "
+            f"{qc.get('pp08_agreement_comparisons')} comparisons for {tokens} tokens "
+            "is a sample, not the contracted check")
+    if qc.get("pp08_agreement_mismatches") != 0:
+        raise HandoffError(
+            "Stage129 attempt-3 PP08 clause (b) reported a mismatch; no threshold "
+            "may be admitted")
+    if set(prov.get("numeric_conversion_implementations_used") or []) != \
+            {"float", "numpy.float64"}:
+        raise HandoffError(
+            "Stage129 attempt-3 must record both constructors as used")
+
+    # (3) All 30 contractual controls, with SUP01 outside the count.
+    if qc.get("all_contractual_controls_passed") is not True or \
+            qc.get("contractual_control_count") != 30 or \
+            qc.get("contractual_controls_passed") != 30 or \
+            qc.get("contractual_controls_not_executed") != 0:
+        raise HandoffError(
+            "Stage129 attempt-3 must record all 30 contractual controls passing")
+    ids = {c.get("id") for c in qc.get("controls") or []}
+    expected_ids = ({f"TD{i:02d}" for i in range(1, 19)}
+                    | {f"PP{i:02d}" for i in range(1, 13)})
+    if ids != expected_ids:
+        raise HandoffError(
+            f"Stage129 attempt-3 contractual control set is wrong: "
+            f"missing {sorted(expected_ids - ids)}")
+    for entry in qc.get("supplementary_checks") or []:
+        if entry.get("id") in ids or entry.get("contractual") is not False:
+            raise HandoffError(
+                "a supplementary check may not enter the contractual count")
+
+    # (4) One run only, and the method as contracted.
+    if prov.get("computational_dry_run_executed") is not False or \
+            prov.get("determinism_rerun_executed") is not False or \
+            prov.get("model_fits_executed") != 0:
+        raise HandoffError("Stage129 attempt-3 permits exactly one execution")
+    if prov.get("other_family_tokens_parsed") != 0:
+        raise HandoffError(
+            "Stage129 attempt-3 may parse only the selected model's tokens")
+    if prov.get("comparison_operator") != ">=" or prov.get("beta") != 2 or \
+            prov.get("closed_form") != "5*TP / (5*TP + 4*FN + FP)" or \
+            prov.get("rounding_applied_before_selection") is not False or \
+            prov.get("pick_threshold_used") is not False:
+        raise HandoffError("Stage129 attempt-3 algorithm terms drifted")
+
+    # (5) Admission must not lean on attempt 2, and history must survive.
+    if value.get("independent_of_attempt2") is not True or \
+            value.get("attempt2_result_used_as_input_or_shortcut") is not False or \
+            prov.get("attempt2_value_read_by_this_run") is not False:
+        raise HandoffError(
+            "Stage129 attempt-3 admission may not rest on attempt 2's result")
+    if prov.get("attempt2_executor_rewritten") is not False:
+        raise HandoffError(
+            "Stage129 attempt-3 may not rewrite the attempt-2 executor; it is "
+            "evidence of a run whose PP08(b) never executed")
+    cumulative = qc.get("cumulative_counters") or {}
+    if cumulative.get("total_derivation_attempts_started") != 3 or \
+            cumulative.get("aborted_attempts") != 1 or \
+            cumulative.get("computations_completed_but_not_admitted") != 1 or \
+            cumulative.get("admitted_derivations") != 1 or \
+            cumulative.get("total_thresholds_admitted") != 1:
+        raise HandoffError(
+            "Stage129 attempt-3 cumulative counters must record 3 attempts, 1 "
+            "aborted, 1 computed-but-not-admitted and 1 admitted")
+    for key_rel, key_sha in (("attempt1_record", "attempt1_record_sha256"),
+                             ("attempt2_record", "attempt2_record_sha256")):
+        rel = cumulative.get(key_rel) or ""
+        p = os.path.join(root, rel)
+        if not rel or not os.path.isfile(p):
+            raise HandoffError(f"Stage129 attempt-3 cites a missing {key_rel}")
+        with open(p, "rb") as fh:
+            if hashlib.sha256(fh.read()).hexdigest() != cumulative.get(key_sha):
+                raise HandoffError(
+                    f"Stage129 attempt-3: {rel} has changed. A success does not "
+                    "license tidying away the attempts before it")
+    for rel, want in (qc.get("historical_artifacts_sha256_after") or {}).items():
+        p = os.path.join(root, rel)
+        if os.path.isfile(p):
+            with open(p, "rb") as fh:
+                if hashlib.sha256(fh.read()).hexdigest() != want:
+                    raise HandoffError(
+                        f"Stage129 attempt-3: historical artifact {rel} has drifted")
+    before = qc.get("locked_results_sha256_before") or {}
+    if not before or before != (qc.get("locked_results_sha256_after") or {}):
+        raise HandoffError(
+            "Stage129 attempt-3 must leave the locked development results identical")
+
+    # (6) PRE02 resolves. PRE01 does not, so the Final Test stays shut.
+    if value.get("admitted") is not True or \
+            value.get("admission_status") != "ADMITTED":
+        raise HandoffError("Stage129 attempt-3 value must be recorded as admitted")
+    if value.get("usable_for_final_test") is not False:
+        raise HandoffError(
+            "Stage129 attempt-3 threshold may not be marked usable for the Final "
+            "Test while PRE01 is unresolved")
+    if value.get("is_model_superiority_claim") is not False or \
+            value.get("is_inferential_result") is not False:
+        raise HandoffError(
+            "Stage129 attempt-3 threshold carries no superiority or inference")
+    for artifact, label in ((value, "value"), (prov, "provenance"), (qc, "qc")):
+        if artifact.get("final_test_rows_read") != 0:
+            raise HandoffError(
+                f"Stage129 attempt-3 {label} must keep final_test_rows_read at 0")
+
+    return {
+        "stage129_threshold_attempt3_executed": True,
+        "stage129_threshold_attempt3_action_id": _STAGE129_A3_ACTION_ID,
+        "stage129_threshold_attempt3_all_contractual_controls_passed": True,
+        "stage129_threshold_attempt3_contractual_controls_passed": 30,
+        "stage129_threshold_attempt3_contractual_controls_not_executed": 0,
+        "stage129_threshold_pp08_clause_b_executed": True,
+        "stage129_threshold_pp08_agreement_comparisons":
+            qc.get("pp08_agreement_comparisons"),
+        "stage129_threshold_pp08_agreement_mismatches": 0,
+
+        # The admitted result.
+        "stage129_threshold_value": threshold,
+        "stage129_threshold_f2": value.get("f2_at_threshold"),
+        "stage129_threshold_confusion_tp": tp,
+        "stage129_threshold_confusion_fp": fp,
+        "stage129_threshold_confusion_fn": fn,
+        "stage129_threshold_candidate_count": value.get("candidate_count"),
+        "stage129_threshold_value_written_to_file": True,
+        "stage129_threshold_value_admitted": True,
+        "stage129_threshold_value_materialized": True,
+        "stage129_threshold_result_admission_status": "ADMITTED",
+        "stage129_threshold_interpretation": "DEVELOPMENT_OPERATING_POINT_ONLY",
+        "stage129_threshold_usable_for_final_test": False,
+        "stage129_threshold_is_inferential_result": False,
+
+        # All three attempts, kept visible.
+        "stage129_threshold_derivation_attempts_started": 3,
+        "stage129_threshold_derivation_attempts_succeeded": 1,
+        "stage129_threshold_derivation_aborted_attempts": 1,
+        "stage129_threshold_computations_completed_but_not_admitted": 1,
+        "stage129_threshold_admitted_derivations": 1,
+        "stage129_threshold_derivation_terminal_status": "SUCCESS_RESULT_ADMITTED",
+        "stage129_threshold_prior_attempt_records_preserved": True,
+        "stage129_threshold_attempt2_executor_rewritten": False,
+
+        # PRE02 resolves; nothing else moves.
+        "stage129_final_test_pre01_resolved": False,
+        "stage129_final_test_pre02_resolved": True,
+        "stage129_final_test_unresolved_prerequisites": ["PRE01"],
+        "stage129_final_test_contract_fully_executable": False,
+        "final_test_locked": True,
+        "final_test_rows_read": 0,
+        "final_test_access_authorized": False,
+        "stage130_started": False,
+
+        "stage129_threshold_attempt3_next_action_id":
+            "human_authorization_required_for_final_test_access",
+        "stage129_threshold_attempt3_next_action_authorized": False,
     }
 
 

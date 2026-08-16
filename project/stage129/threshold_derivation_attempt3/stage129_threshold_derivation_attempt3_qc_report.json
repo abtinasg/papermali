@@ -1,0 +1,260 @@
+{
+  "action_counters": {
+    "bootstrap_executions": 0,
+    "derivation_attempts_started_by_this_action": 1,
+    "derivation_attempts_succeeded_by_this_action": 1,
+    "final_test_metrics_computed": 0,
+    "final_test_predictions": 0,
+    "final_test_rows_loaded": 0,
+    "final_test_rows_read": 0,
+    "model_fits_executed": 0,
+    "model_reselections": 0,
+    "p_values_computed": 0,
+    "pp08_agreement_comparisons_by_this_action": 421,
+    "predict_proba_calls": 0,
+    "probability_tokens_parsed_by_this_action": 421,
+    "recalibration_executions": 0,
+    "refits_executed": 0,
+    "sensitivity_analyses": 0,
+    "shap_executions": 0,
+    "thresholds_admitted_by_this_action": 1,
+    "thresholds_computed_by_this_action": 1,
+    "tuning_runs": 0
+  },
+  "action_id": "stage129-threshold-derivation-attempt3",
+  "all_contractual_controls_passed": true,
+  "argmax_member_count": 1,
+  "argmax_member_thresholds": [
+    0.426878838687
+  ],
+  "artifact": "threshold_derivation_qc_report",
+  "attempt": 3,
+  "attempt_terminal_status": "SUCCESS_RESULT_ADMITTED",
+  "contractual_control_count": 30,
+  "contractual_controls_failed": 0,
+  "contractual_controls_not_executed": 0,
+  "contractual_controls_not_executed_ids": [],
+  "contractual_controls_passed": 30,
+  "control_count": 30,
+  "control_count_note": "30 contractual controls (TD01-TD18, PP01-PP12), all PASS, plus 1 supplementary check (SUP01) excluded from the contractual count.",
+  "controls": [
+    {
+      "detail": "input matches pinned SHA-256 and 214784 bytes",
+      "id": "TD01",
+      "result": "PASS"
+    },
+    {
+      "detail": "input SHA-256 verified before any value was read",
+      "id": "PP01",
+      "result": "PASS"
+    },
+    {
+      "detail": "python 3.13.5 and numpy 2.4.6 equal the locked development runtime",
+      "id": "TD15",
+      "result": "PASS"
+    },
+    {
+      "detail": "locked pattern uses [0-9]; no Unicode decimal digit can satisfy it",
+      "id": "PP07",
+      "result": "PASS"
+    },
+    {
+      "detail": "pick_threshold neither imported nor called",
+      "id": "TD09",
+      "result": "PASS"
+    },
+    {
+      "detail": "extraction is anchored-regex only; no eval, exec or ast.literal_eval appears in the parse path",
+      "id": "PP06",
+      "result": "PASS"
+    },
+    {
+      "detail": "421 rows for regularized_logistic_regression/logistic__C_0.1 out of 1263 read",
+      "id": "TD02",
+      "result": "PASS"
+    },
+    {
+      "detail": "target years [1396, 1397, 1398, 1399]; zero Final Test rows",
+      "id": "TD03",
+      "result": "PASS"
+    },
+    {
+      "detail": "final_test_rows_read == 0; no Final Test row, predictor, target or prediction loaded or produced",
+      "id": "TD16",
+      "result": "PASS"
+    },
+    {
+      "detail": "421 evaluable of 421 selected; 0 non-evaluable excluded and never counted as negative",
+      "id": "TD12",
+      "result": "PASS"
+    },
+    {
+      "detail": "all 421 parsed tokens are ASCII",
+      "id": "PP02",
+      "result": "PASS"
+    },
+    {
+      "detail": "all 421 tokens fullmatched the anchored locked pattern",
+      "id": "PP03",
+      "result": "PASS"
+    },
+    {
+      "detail": "the anchored fullmatch admits no whitespace, prefix, suffix or nested wrapper",
+      "id": "PP04",
+      "result": "PASS"
+    },
+    {
+      "detail": "all 421 converted values are finite; NaN and Inf cannot match the pattern and were re-checked",
+      "id": "PP05",
+      "result": "PASS"
+    },
+    {
+      "agreement_comparisons": 421,
+      "agreement_mismatches": 0,
+      "clause_a_conversion_to_binary64": "PERFORMED",
+      "clause_b_numpy_float_agreement_over_all_tokens": "PERFORMED",
+      "detail": "clause (a) PERFORMED: converted to IEEE-754 binary64. clause (b) PERFORMED: numpy.float64(group) == float(group) evaluated for every token -- 421 comparisons, 0 mismatches, in numpy 2.4.6 / python 3.13.5",
+      "id": "PP08",
+      "result": "PASS"
+    },
+    {
+      "detail": "no row was skipped, defaulted or imputed",
+      "id": "PP10",
+      "result": "PASS"
+    },
+    {
+      "detail": "parsed 421 of 421 read tokens; none silently dropped",
+      "id": "PP11",
+      "result": "PASS"
+    },
+    {
+      "detail": "421 candidates, exactly the distinct parsed values; no grid, endpoints, midpoints or thinning",
+      "id": "TD04",
+      "result": "PASS"
+    },
+    {
+      "detail": "no rounding or truncation applied before selection",
+      "id": "TD07",
+      "result": "PASS"
+    },
+    {
+      "detail": "no rounding applied after parsing and before selection",
+      "id": "PP09",
+      "result": "PASS"
+    },
+    {
+      "detail": "positive prediction is predicted_probability >= threshold",
+      "id": "TD05",
+      "result": "PASS"
+    },
+    {
+      "detail": "F2 = 5*TP / (5*TP + 4*FN + FP) on integer counts, 0 on a zero denominator; no library fbeta call",
+      "id": "TD06",
+      "result": "PASS"
+    },
+    {
+      "detail": "1 maximizer(s) at F2=0.5916030534351145; largest threshold 0.426878838687 taken from the explicit argmax set, then re-asserted against it",
+      "id": "TD08",
+      "result": "PASS"
+    },
+    {
+      "detail": "float(str(0.426878838687)) == 0.426878838687",
+      "id": "TD14",
+      "result": "PASS"
+    },
+    {
+      "detail": "the 3 locked development results are byte-identical",
+      "id": "TD13",
+      "result": "PASS"
+    },
+    {
+      "detail": "the frozen OOF file is byte-identical; no cleaned or normalised copy was created",
+      "id": "PP12",
+      "result": "PASS"
+    },
+    {
+      "detail": "exactly one threshold selected; no alternative promoted",
+      "id": "TD10",
+      "result": "PASS"
+    },
+    {
+      "detail": "model_fits_executed == 0, predict_proba_calls == 0",
+      "id": "TD11",
+      "result": "PASS"
+    },
+    {
+      "detail": "writes confined to project/stage129/threshold_derivation_attempt3/",
+      "id": "TD17",
+      "result": "PASS"
+    },
+    {
+      "detail": "no recalibration, bootstrap, SHAP, p-value, confidence interval or model re-selection executed",
+      "id": "TD18",
+      "result": "PASS"
+    }
+  ],
+  "cumulative_counters": {
+    "aborted_attempts": 1,
+    "admitted_derivations": 1,
+    "attempt1_record": "project/stage129/threshold_derivation_abort_and_parse_rule_lock/stage129_threshold_derivation_abort_record.json",
+    "attempt1_record_sha256": "17de5e2047f07e110fd74669374f14dd1212ec78fdb6952a65c26ee6a1cdc122",
+    "attempt1_terminal_status": "ABORT_THRESHOLD_DERIVATION",
+    "attempt2_record": "project/stage129/threshold_derivation_execution/stage129_threshold_derivation_qc_report.json",
+    "attempt2_record_sha256": "fbf5484a3ff195be9683c63efd833ad041cb89cb65c5a30fa0619758daad486f",
+    "attempt2_terminal_status": "COMPUTATION_COMPLETED_RESULT_NOT_ADMITTED_PP08_NOT_EXECUTED",
+    "computations_completed_but_not_admitted": 1,
+    "cumulative_note": "Attempts 1 and 2 are preserved byte-identical and are not rewritten.",
+    "total_derivation_attempts_started": 3,
+    "total_thresholds_admitted": 1,
+    "total_thresholds_computed": 2
+  },
+  "evaluable_rows": 421,
+  "f2_at_selected_threshold": 0.5916030534351145,
+  "final_test_rows_read": 0,
+  "fn": 4,
+  "fp": 91,
+  "historical_artifacts_sha256_after": {
+    "project/src/stage129_threshold_derivation.py": "3f343fad82bd29d85c46296a2bad99024571610dbdd462af13cde12de0d1dade",
+    "project/stage129/threshold_derivation_abort_and_parse_rule_lock/stage129_threshold_derivation_abort_record.json": "17de5e2047f07e110fd74669374f14dd1212ec78fdb6952a65c26ee6a1cdc122",
+    "project/stage129/threshold_derivation_execution/stage129_threshold_derivation_qc_report.json": "fbf5484a3ff195be9683c63efd833ad041cb89cb65c5a30fa0619758daad486f",
+    "project/stage129/threshold_derivation_execution/stage129_threshold_value.json": "273cee5fd0764e8fddfa22365491cf2732a2faeccdaf0a1f8a749a5a5efe7f22"
+  },
+  "input_sha256": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+  "locked_results_sha256_after": {
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4"
+  },
+  "locked_results_sha256_before": {
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4"
+  },
+  "non_evaluable_rows_excluded": 0,
+  "pp08_agreement_comparisons": 421,
+  "pp08_agreement_mismatches": 0,
+  "pp08_clause_b_executed": true,
+  "probability_tokens_parsed": 421,
+  "qc_complete": true,
+  "result_admission_status": "ADMITTED",
+  "result_admitted": true,
+  "selected_rows": 421,
+  "selected_threshold": 0.426878838687,
+  "supplementary_check_count": 1,
+  "supplementary_checks": [
+    {
+      "classification": "SUPPLEMENTARY_QC_CHECK",
+      "contractual": false,
+      "detail": "probabilities parsed for the selected evaluable rows only; the other 842 rows' tokens were never converted to numbers",
+      "id": "SUP01",
+      "note": "Not a contracted control and excluded from the count of 30.",
+      "result": "PASS"
+    }
+  ],
+  "tie_break_applied": false,
+  "tie_break_proof": "maximum F2 computed first; every candidate attaining it collected into an explicit argmax set; max() taken over that set; post-check re-asserted no member exceeds it",
+  "tie_break_rule": "higher_threshold",
+  "total_rows_read": 1263,
+  "tp": 31,
+  "unique_candidate_count": 421
+}
