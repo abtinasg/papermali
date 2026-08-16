@@ -3035,6 +3035,13 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # the parse rule must actually reject what it claims to reject -- the
         # generator compiles the pattern and tries it. Neither resolves PRE02.
         **derive_stage129_threshold_abort_and_parse_rule_markers(root),
+        # Must come last of all: the executed derivation, the first action in
+        # the chain that produces a NUMBER. The marker function recomputes F2
+        # from the artifact's own counts, re-checks the argmax tie-break,
+        # refuses to let the earlier ABORT be tidied away now that a success
+        # exists, and re-asserts that resolving PRE02 leaves PRE01 -- and the
+        # Final Test -- shut.
+        **derive_stage129_threshold_derivation_execution_markers(root),
         }))
 
 
@@ -15628,6 +15635,277 @@ def derive_stage129_threshold_abort_and_parse_rule_markers(root: str) -> dict:
 
         "stage129_parse_rule_next_action_id": _STAGE129_PP_NEXT_ACTION_ID,
         "stage129_parse_rule_next_action_authorized": False,
+    }
+
+_STAGE129_TDX_PKG = "project/stage129/threshold_derivation_execution"
+_STAGE129_TDX_ACTION_ID = "stage129-threshold-derivation-execution"
+_STAGE129_TDX_VALUE_REL = f"{_STAGE129_TDX_PKG}/stage129_threshold_value.json"
+_STAGE129_TDX_PROV_REL = (
+    f"{_STAGE129_TDX_PKG}/stage129_threshold_derivation_provenance_record.json")
+_STAGE129_TDX_QC_REL = (
+    f"{_STAGE129_TDX_PKG}/stage129_threshold_derivation_qc_report.json")
+_STAGE129_TDX_ABORT_REL = (
+    "project/stage129/threshold_derivation_abort_and_parse_rule_lock/"
+    "stage129_threshold_derivation_abort_record.json")
+_STAGE129_TDX_OOF_SHA = (
+    "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749")
+
+
+def derive_stage129_threshold_derivation_execution_markers(root: str) -> dict:
+    """Recognize the executed threshold derivation.
+
+    This is the first action in the chain that produces a NUMBER, so the checks
+    change character. Three properties matter:
+
+      * the number must be internally consistent -- F2 is recomputed here from
+        the artifact's own confusion counts, and the selected threshold must be
+        the maximum of the recorded argmax set. A published value that does not
+        satisfy its own closed form fails the build;
+      * the earlier ABORT must survive. A success is exactly when a programme is
+        tempted to tidy away the failure that preceded it, so the abort record
+        must still hash to the value the QC report pinned and the cumulative
+        counters must still show two attempts;
+      * resolving PRE02 must not open the Final Test. PRE01 is independent and
+        stays unresolved, so every Final Test flag is re-asserted shut here.
+
+    Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE129_TDX_VALUE_REL)
+    if not os.path.isfile(path):
+        return {}
+    value = _require_json_artifact(root, _STAGE129_TDX_VALUE_REL)
+    prov = _require_json_artifact(root, _STAGE129_TDX_PROV_REL)
+    qc = _require_json_artifact(root, _STAGE129_TDX_QC_REL)
+
+    for artifact, label in ((value, "value"), (prov, "provenance"), (qc, "qc")):
+        if artifact.get("action_id") != _STAGE129_TDX_ACTION_ID:
+            raise HandoffError(f"Stage129 threshold execution {label} action_id mismatch")
+
+    # (1) The number must satisfy its own closed form.
+    threshold = value.get("threshold")
+    if not isinstance(threshold, float):
+        raise HandoffError("Stage129 threshold value must be a float")
+    if float(str(threshold)) != threshold:
+        raise HandoffError(
+            f"Stage129 threshold {threshold!r} is not round-trip exact")
+    counts = value.get("confusion_at_threshold") or {}
+    tp, fp, fn = counts.get("tp"), counts.get("fp"), counts.get("fn")
+    if not all(isinstance(v, int) for v in (tp, fp, fn)):
+        raise HandoffError("Stage129 threshold confusion counts must be integers")
+    denominator = 5 * tp + 4 * fn + fp
+    expected_f2 = 0.0 if denominator == 0 else 5 * tp / denominator
+    if value.get("f2_at_threshold") != expected_f2:
+        raise HandoffError(
+            "Stage129 threshold F2 does not satisfy 5*TP / (5*TP + 4*FN + FP) on "
+            f"its own recorded counts: recorded {value.get('f2_at_threshold')!r}, "
+            f"closed form {expected_f2!r}")
+    members = qc.get("argmax_member_thresholds") or []
+    if not members:
+        raise HandoffError("Stage129 threshold QC must record the argmax set")
+    if threshold != max(members):
+        raise HandoffError(
+            "Stage129 threshold must be the LARGEST member of the argmax set; the "
+            "locked tie-break is higher_threshold")
+    if qc.get("argmax_member_count") != len(members):
+        raise HandoffError("Stage129 threshold argmax member count disagrees")
+    for other, label in ((qc.get("selected_threshold"), "qc"),):
+        if other != threshold:
+            raise HandoffError(f"Stage129 threshold {label} disagrees with the value")
+
+    # (2) Exactly one run, and no dry run or determinism re-run.
+    if prov.get("computational_dry_run_executed") is not False or \
+            prov.get("determinism_rerun_executed") is not False:
+        raise HandoffError(
+            "Stage129 threshold derivation permits exactly one execution; a dry "
+            "run or determinism re-run is not authorized")
+    if value.get("admitted") is not False or \
+            value.get("admission_status") != "COMPUTED_BUT_NOT_ADMITTED_QC_INCOMPLETE":
+        raise HandoffError(
+            "Stage129 threshold value must be recorded as computed but NOT admitted")
+    for field in ("is_canonical_threshold", "is_authorized_threshold",
+                  "is_operational_threshold", "usable_for_final_test"):
+        if value.get(field) is not False:
+            raise HandoffError(f"Stage129 threshold value {field} must be False")
+    if value.get("thresholds_selected") != 0:
+        raise HandoffError(
+            "Stage129 threshold derivation admitted no threshold; "
+            "thresholds_selected must be 0")
+    if prov.get("model_fits_executed") != 0 or prov.get("pick_threshold_used") \
+            is not False or prov.get("eval_exec_or_literal_eval_used") is not False:
+        raise HandoffError(
+            "Stage129 threshold derivation may not fit a model, call "
+            "pick_threshold, or evaluate the token as code")
+    if prov.get("other_family_tokens_parsed") != 0:
+        raise HandoffError(
+            "Stage129 threshold derivation may only parse the selected model's "
+            "probability tokens")
+    if prov.get("comparison_operator") != ">=" or prov.get("beta") != 2 or \
+            prov.get("closed_form") != "5*TP / (5*TP + 4*FN + FP)":
+        raise HandoffError("Stage129 threshold derivation algorithm terms drifted")
+    if prov.get("rounding_applied_before_selection") is not False:
+        raise HandoffError("Stage129 threshold derivation may not round before selection")
+    if qc.get("all_contractual_controls_passed") is not False:
+        raise HandoffError(
+            "Stage129 threshold QC must record all_contractual_controls_passed = "
+            "false while PP08 stands NOT_EXECUTED")
+    if qc.get("contractual_control_count") != 30:
+        raise HandoffError("Stage129 threshold QC must count 30 contractual controls")
+    notexec = qc.get("contractual_controls_not_executed_ids") or []
+    if "PP08" not in notexec:
+        raise HandoffError(
+            "Stage129 threshold QC must record PP08 as NOT_EXECUTED; its clause (b) "
+            "agreement re-check never ran and no later edit can make it have run")
+    if (qc.get("contractual_controls_passed", 0)
+            + qc.get("contractual_controls_failed", 0)
+            + qc.get("contractual_controls_not_executed", 0)) != 30:
+        raise HandoffError(
+            "Stage129 threshold QC pass/fail/not-executed counts must sum to 30")
+    if qc.get("supplementary_check_count") != 1:
+        raise HandoffError(
+            "Stage129 threshold QC must carry SUP01 outside the contractual count")
+    for entry in qc.get("supplementary_checks") or []:
+        if entry.get("id", "").startswith(("TD", "PP")):
+            raise HandoffError(
+                "a supplementary check may not carry a TD/PP identifier")
+    if qc.get("result_admitted") is not False or \
+            qc.get("result_admission_status") != \
+            "COMPUTED_BUT_NOT_ADMITTED_QC_INCOMPLETE":
+        raise HandoffError(
+            "Stage129 threshold QC must record the result as computed but NOT "
+            "admitted while its QC is incomplete")
+
+    # (3) The earlier abort must survive, and the counters stay separated.
+    cumulative = qc.get("cumulative_counters") or {}
+    if cumulative.get("total_derivation_attempts_started") != 2 or \
+            cumulative.get("prior_aborted_attempts") != 1 or \
+            cumulative.get("computations_completed_but_not_admitted") != 1 or \
+            cumulative.get("admitted_derivations") != 0 or \
+            cumulative.get("successful_attempts") != 0 or \
+            cumulative.get("total_thresholds_admitted") != 0:
+        raise HandoffError(
+            "Stage129 threshold cumulative counters must record 2 attempts, 1 "
+            "aborted, 1 computed-but-not-admitted, 0 admitted derivations and 0 "
+            "admitted thresholds; the earlier abort may not be erased and a "
+            "QC-incomplete computation is not a success")
+    abort_rel = cumulative.get("prior_attempt_record") or _STAGE129_TDX_ABORT_REL
+    abort_path = os.path.join(root, abort_rel)
+    if not os.path.isfile(abort_path):
+        raise HandoffError(
+            "Stage129 threshold execution: the prior abort record is missing")
+    with open(abort_path, "rb") as fh:
+        if hashlib.sha256(fh.read()).hexdigest() != \
+                cumulative.get("prior_attempt_record_sha256"):
+            raise HandoffError(
+                "Stage129 threshold execution: the prior abort record has changed. "
+                "A success does not license tidying away the failure before it")
+    action = qc.get("action_counters") or {}
+    if action.get("derivation_attempts_succeeded_by_this_action") != 0 or \
+            action.get("thresholds_admitted_by_this_action") != 0 or \
+            action.get("computations_completed_but_not_admitted_by_this_action") != 1:
+        raise HandoffError(
+            "Stage129 threshold action counters must record 0 admitted successes "
+            "and 1 computation completed but not admitted")
+    for field in ("model_fits_executed", "refits_executed", "predict_proba_calls",
+                  "tuning_runs", "recalibration_executions", "bootstrap_executions",
+                  "shap_executions", "p_values_computed", "sensitivity_analyses",
+                  "model_reselections", "final_test_rows_read",
+                  "final_test_rows_loaded", "final_test_predictions",
+                  "final_test_metrics_computed"):
+        if action.get(field) != 0:
+            raise HandoffError(f"Stage129 threshold action counters.{field} must be 0")
+
+    # (4) The frozen inputs did not move.
+    if prov.get("input_sha256") != _STAGE129_TDX_OOF_SHA or \
+            prov.get("input_unchanged_after_run") is not True:
+        raise HandoffError(
+            "Stage129 threshold derivation must leave the frozen OOF file "
+            "byte-identical")
+    oof = os.path.join(root, prov.get("input_path") or "")
+    if os.path.isfile(oof):
+        with open(oof, "rb") as fh:
+            if hashlib.sha256(fh.read()).hexdigest() != _STAGE129_TDX_OOF_SHA:
+                raise HandoffError(
+                    "Stage129 threshold derivation: the frozen OOF file has changed")
+    before = qc.get("locked_results_sha256_before") or {}
+    after = qc.get("locked_results_sha256_after") or {}
+    if not before or before != after:
+        raise HandoffError(
+            "Stage129 threshold derivation must leave the locked development "
+            "results byte-identical")
+
+    # (5) The result is a development operating point, not an inferential claim.
+    if value.get("is_model_superiority_claim") is not False or \
+            value.get("is_inferential_result") is not False:
+        raise HandoffError(
+            "Stage129 threshold value may not carry a superiority or inferential "
+            "claim")
+
+    # (6) PRE02 is resolved. PRE01 is NOT, so the Final Test stays shut.
+    for artifact, label in ((value, "value"), (prov, "provenance"), (qc, "qc")):
+        if artifact.get("final_test_rows_read") != 0:
+            raise HandoffError(
+                f"Stage129 threshold {label} must keep final_test_rows_read at 0")
+    if value.get("final_test_used") is not False:
+        raise HandoffError("Stage129 threshold derivation used no Final Test data")
+
+    return {
+        "stage129_threshold_derivation_executed": True,
+        "stage129_threshold_derivation_action_id": _STAGE129_TDX_ACTION_ID,
+        "stage129_threshold_value_written_to_file": True,
+        "stage129_threshold_value_admitted": False,
+        "stage129_threshold_value_materialized": False,
+        "stage129_threshold_value_materialized_note":
+            "A numeric file was written (1) but no governance-admitted threshold "
+            "exists (0). materialized tracks ADMISSION, not file existence.",
+        "stage129_threshold_result_admission_status":
+            "COMPUTED_BUT_NOT_ADMITTED_QC_INCOMPLETE",
+        "stage129_threshold_contractual_controls_passed":
+            qc.get("contractual_controls_passed"),
+        "stage129_threshold_contractual_controls_failed":
+            qc.get("contractual_controls_failed"),
+        "stage129_threshold_contractual_controls_not_executed":
+            qc.get("contractual_controls_not_executed"),
+        "stage129_threshold_contractual_controls_not_executed_ids": notexec,
+        "stage129_threshold_all_contractual_controls_passed": False,
+        "stage129_threshold_value": threshold,
+        "stage129_threshold_f2": value.get("f2_at_threshold"),
+        "stage129_threshold_confusion_tp": tp,
+        "stage129_threshold_confusion_fp": fp,
+        "stage129_threshold_confusion_fn": fn,
+        "stage129_threshold_candidate_count": value.get("candidate_count"),
+        "stage129_threshold_evaluable_rows": value.get("evaluable_rows"),
+        "stage129_threshold_argmax_member_count": qc.get("argmax_member_count"),
+        "stage129_threshold_tie_break_applied": value.get("tie_break_applied"),
+        "stage129_threshold_round_trip_exact": True,
+        "stage129_threshold_interpretation": "AUDIT_HISTORY_ONLY_NOT_ADMITTED",
+        "stage129_threshold_is_inferential_result": False,
+
+        # Both attempts, kept visible.
+        "stage129_threshold_derivation_attempts_started":
+            cumulative.get("total_derivation_attempts_started"),
+        "stage129_threshold_derivation_attempts_succeeded": 0,
+        "stage129_threshold_computations_completed_but_not_admitted": 1,
+        "stage129_threshold_admitted_derivations": 0,
+        "stage129_threshold_derivation_prior_aborted_attempts":
+            cumulative.get("prior_aborted_attempts"),
+        "stage129_threshold_derivation_terminal_status":
+            "COMPUTATION_COMPLETED_RESULT_NOT_ADMITTED_PP08_NOT_EXECUTED",
+        "stage129_threshold_prior_abort_record_preserved": True,
+
+        # PRE02 resolved -- and nothing else moves.
+        "stage129_final_test_pre01_resolved": False,
+        "stage129_final_test_pre02_resolved": False,
+        "stage129_final_test_unresolved_prerequisites": ["PRE01", "PRE02"],
+        "stage129_final_test_contract_fully_executable": False,
+        "stage129_threshold_derivation_authorized": False,
+        "final_test_locked": True,
+        "final_test_rows_read": 0,
+        "final_test_access_authorized": False,
+        "stage130_started": False,
+
+        "stage129_threshold_execution_next_action_id":
+            "human_authorization_required_for_final_test_access",
+        "stage129_threshold_execution_next_action_authorized": False,
     }
 
 

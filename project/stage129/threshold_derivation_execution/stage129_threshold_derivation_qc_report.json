@@ -1,0 +1,255 @@
+{
+  "action_counters": {
+    "bootstrap_executions": 0,
+    "computations_completed_but_not_admitted_by_this_action": 1,
+    "derivation_attempts_started_by_this_action": 1,
+    "derivation_attempts_succeeded_by_this_action": 0,
+    "final_test_metrics_computed": 0,
+    "final_test_predictions": 0,
+    "final_test_rows_loaded": 0,
+    "final_test_rows_read": 0,
+    "model_fits_executed": 0,
+    "model_reselections": 0,
+    "p_values_computed": 0,
+    "predict_proba_calls": 0,
+    "probability_tokens_parsed_by_this_action": 421,
+    "recalibration_executions": 0,
+    "refits_executed": 0,
+    "sensitivity_analyses": 0,
+    "shap_executions": 0,
+    "thresholds_admitted_by_this_action": 0,
+    "thresholds_computed_by_this_action": 1,
+    "tuning_runs": 0
+  },
+  "action_id": "stage129-threshold-derivation-execution",
+  "admission_note": "The computation ran to completion and its outputs are retained for audit history, but an unexecuted contractual control means the result is NOT admitted. The 14-literal agreement spot-check performed during review does not substitute for the contracted check over all 421 real tokens.",
+  "all_contractual_controls_passed": false,
+  "all_pass": false,
+  "argmax_member_count": 1,
+  "argmax_member_thresholds": [
+    0.426878838687
+  ],
+  "artifact": "threshold_derivation_qc_report",
+  "attempt_terminal_status": "COMPUTATION_COMPLETED_RESULT_NOT_ADMITTED_PP08_NOT_EXECUTED",
+  "contractual_control_count": 30,
+  "contractual_controls_failed": 0,
+  "contractual_controls_not_executed": 1,
+  "contractual_controls_not_executed_ids": [
+    "PP08"
+  ],
+  "contractual_controls_passed": 29,
+  "control_count": 30,
+  "control_count_note": "30 contractual controls (TD01-TD18, PP01-PP12) plus 1 supplementary check (SUP01, non-contractual). Of the 30 contractual controls: 29 PASS, 0 FAIL, 1 NOT_EXECUTED (PP08). An earlier version of this report counted 31 controls by including the supplementary check among the contractual ones, and recorded PP08 as PASS; both were reporting errors, corrected without repeating the derivation.",
+  "controls": [
+    {
+      "detail": "input matches pinned SHA-256 and 214784 bytes",
+      "id": "TD01",
+      "result": "PASS"
+    },
+    {
+      "detail": "input SHA-256 verified before any value was read",
+      "id": "PP01",
+      "result": "PASS"
+    },
+    {
+      "detail": "python 3.13.5 equals the locked development runtime",
+      "id": "TD15",
+      "result": "PASS"
+    },
+    {
+      "detail": "locked pattern uses [0-9]; no Unicode decimal digit can satisfy it",
+      "id": "PP07",
+      "result": "PASS"
+    },
+    {
+      "detail": "pick_threshold neither imported nor called",
+      "id": "TD09",
+      "result": "PASS"
+    },
+    {
+      "detail": "extraction is anchored-regex only; no eval, exec or ast.literal_eval appears in the parse path",
+      "id": "PP06",
+      "result": "PASS"
+    },
+    {
+      "detail": "421 rows for regularized_logistic_regression/logistic__C_0.1 out of 1263 read",
+      "id": "TD02",
+      "result": "PASS"
+    },
+    {
+      "detail": "target years [1396, 1397, 1398, 1399]; zero Final Test rows",
+      "id": "TD03",
+      "result": "PASS"
+    },
+    {
+      "detail": "final_test_rows_read == 0; no Final Test row, predictor, target or prediction loaded or produced",
+      "id": "TD16",
+      "result": "PASS"
+    },
+    {
+      "detail": "421 evaluable of 421 selected; 0 non-evaluable excluded and never counted as negative",
+      "id": "TD12",
+      "result": "PASS"
+    },
+    {
+      "detail": "all 421 parsed tokens are ASCII",
+      "id": "PP02",
+      "result": "PASS"
+    },
+    {
+      "detail": "all 421 tokens fullmatched the anchored locked pattern",
+      "id": "PP03",
+      "result": "PASS"
+    },
+    {
+      "detail": "the anchored fullmatch admits no whitespace, prefix, suffix or nested wrapper",
+      "id": "PP04",
+      "result": "PASS"
+    },
+    {
+      "detail": "the pattern admits only finite decimals; NaN and Inf cannot match",
+      "id": "PP05",
+      "result": "PASS"
+    },
+    {
+      "clause_a_conversion_to_binary64": "PERFORMED",
+      "clause_b_numpy_float_agreement_over_all_tokens": "NOT_PERFORMED",
+      "correction_note": "This entry was originally recorded PASS. That was inaccurate: only clause (a) had been performed. The entry is corrected here to state what the past run actually did. NOTHING was re-executed, and no later edit can make PP08 have run.",
+      "detail": "Clause (a) PERFORMED: captured groups were converted to IEEE-754 binary64 via the built-in float() on the regex capture group. Clause (b) NOT PERFORMED: the contracted re-check that numpy.float64(group) == float(group) for every parsed token was never run -- numpy was not imported by the executor and no comparison was made over the 421 tokens.",
+      "id": "PP08",
+      "originally_recorded_as": "PASS",
+      "result": "NOT_EXECUTED"
+    },
+    {
+      "detail": "no row was skipped, defaulted or imputed; a rejected token would have aborted",
+      "id": "PP10",
+      "result": "PASS"
+    },
+    {
+      "detail": "parsed 421 of 421 read tokens; none silently dropped",
+      "id": "PP11",
+      "result": "PASS"
+    },
+    {
+      "detail": "421 candidates, exactly the distinct parsed values; no grid, endpoints, midpoints or thinning",
+      "id": "TD04",
+      "result": "PASS"
+    },
+    {
+      "detail": "no rounding or truncation applied at any point before selection",
+      "id": "TD07",
+      "result": "PASS"
+    },
+    {
+      "detail": "no rounding applied after parsing and before selection",
+      "id": "PP09",
+      "result": "PASS"
+    },
+    {
+      "detail": "positive prediction is predicted_probability >= threshold; strict greater-than never used",
+      "id": "TD05",
+      "result": "PASS"
+    },
+    {
+      "detail": "F2 = 5*TP / (5*TP + 4*FN + FP) on integer counts, 0 on a zero denominator; no library fbeta call",
+      "id": "TD06",
+      "result": "PASS"
+    },
+    {
+      "detail": "1 maximizer(s) at F2=0.5916030534351145; the largest threshold 0.426878838687 taken from the explicit argmax set, then re-asserted against it",
+      "id": "TD08",
+      "result": "PASS"
+    },
+    {
+      "detail": "float(str(0.426878838687)) == 0.426878838687",
+      "id": "TD14",
+      "result": "PASS"
+    },
+    {
+      "detail": "the 3 locked development results are byte-identical before and after",
+      "id": "TD13",
+      "result": "PASS"
+    },
+    {
+      "detail": "the frozen OOF file is byte-identical; no cleaned or normalised copy was created",
+      "id": "PP12",
+      "result": "PASS"
+    },
+    {
+      "detail": "exactly one threshold selected; no alternative promoted",
+      "id": "TD10",
+      "result": "PASS"
+    },
+    {
+      "detail": "model_fits_executed == 0, predict_proba_calls == 0; stored predictions were read and no model was loaded",
+      "id": "TD11",
+      "result": "PASS"
+    },
+    {
+      "detail": "writes confined to project/stage129/threshold_derivation_execution/",
+      "id": "TD17",
+      "result": "PASS"
+    },
+    {
+      "detail": "no recalibration, bootstrap, SHAP, p-value, confidence interval or model re-selection executed",
+      "id": "TD18",
+      "result": "PASS"
+    }
+  ],
+  "cumulative_counters": {
+    "admitted_derivations": 0,
+    "computations_completed_but_not_admitted": 1,
+    "cumulative_note": "The PR #93 abort record is preserved verbatim and is not rewritten. These totals span both attempts.",
+    "prior_aborted_attempts": 1,
+    "prior_attempt_record": "project/stage129/threshold_derivation_abort_and_parse_rule_lock/stage129_threshold_derivation_abort_record.json",
+    "prior_attempt_record_sha256": "17de5e2047f07e110fd74669374f14dd1212ec78fdb6952a65c26ee6a1cdc122",
+    "prior_attempt_terminal_status": "ABORT_THRESHOLD_DERIVATION",
+    "successful_attempts": 0,
+    "successful_attempts_note": "Previously recorded as 1. Corrected: a computation whose QC is incomplete is not a successful admitted derivation.",
+    "total_derivation_attempts_started": 2,
+    "total_thresholds_admitted": 0,
+    "total_thresholds_computed": 1,
+    "total_thresholds_materialized": 1
+  },
+  "evaluable_rows": 421,
+  "f2_at_selected_threshold": 0.5916030534351145,
+  "final_test_rows_read": 0,
+  "fn": 4,
+  "fp": 91,
+  "input_sha256": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+  "locked_results_sha256_after": {
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4"
+  },
+  "locked_results_sha256_before": {
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_development_oof_predictions.csv": "48a00c882309c412aeba8f3b7200b65003e435080410c7b7c7ab62c9c3326749",
+    "project/stage126/stage126_m1_primary_development_lock.json": "c500563049e30a27ac59fd3d673ef801b8d8e12f0bb684dd2e0aec13eb5618e4"
+  },
+  "non_evaluable_rows_excluded": 0,
+  "probability_tokens_parsed": 421,
+  "qc_complete": false,
+  "qc_incomplete_reason": "PP08_CLAUSE_B_NOT_EXECUTED",
+  "result_admission_status": "COMPUTED_BUT_NOT_ADMITTED_QC_INCOMPLETE",
+  "result_admitted": false,
+  "selected_rows": 421,
+  "selected_threshold": 0.426878838687,
+  "supplementary_check_count": 1,
+  "supplementary_checks": [
+    {
+      "classification": "SUPPLEMENTARY_QC_CHECK",
+      "contractual": false,
+      "detail": "probabilities parsed for the selected evaluable rows only; the other 842 rows' tokens were never converted to numbers",
+      "id": "SUP01",
+      "note": "Not a contracted control. TD01-TD18 and PP01-PP12 are the 30 contractual controls; this is an extra observation the executor recorded about parse scope. It is retained for transparency and carries a non-TD/PP identifier so it can never be miscounted as contractual.",
+      "result": "PASS"
+    }
+  ],
+  "tie_break_applied": false,
+  "tie_break_proof": "the maximum F2 was computed first; every candidate attaining it was collected into an explicit argmax set; max() was taken over that set; a post-check re-asserted that no member exceeds the selection",
+  "tie_break_rule": "higher_threshold",
+  "total_rows_read": 1263,
+  "tp": 31,
+  "unique_candidate_count": 421
+}

@@ -411,9 +411,36 @@ def test_the_counters_were_reconstructed_not_guessed():
     assert len(ev["evidence_sources"]) == 2
 
 
-def test_the_executor_is_not_in_the_repository():
-    assert not os.path.exists(
-        os.path.join(REPO_ROOT, "project/src/stage129_threshold_derivation.py"))
+def test_the_aborted_attempts_executor_was_not_retained():
+    """The ABORTED run's executor was written, run once and deleted.
+
+    This originally asserted that nothing exists at that path, which encoded a
+    transient condition as a permanent invariant. A later authorized derivation
+    legitimately puts a NEW executor there, so the durable claim is the scoped
+    one the provenance record actually makes: the aborted attempt's executor was
+    not retained, and its counters were reconstructed from the traceback and the
+    executed source rather than by re-running anything.
+
+    If an executor exists at that path now, it belongs to a successful
+    derivation and must be pinned by that run's own manifest.
+    """
+    prov = _load(_PROV)
+    ev = prov["aborted_attempt_evidence"]
+    assert ev["executor_retained_in_repository"] is False
+    assert ev["counts_estimated_or_guessed"] is False
+
+    executor_rel = "project/src/stage129_threshold_derivation.py"
+    executor_abs = os.path.join(REPO_ROOT, executor_rel)
+    if not os.path.exists(executor_abs):
+        return
+    manifest_rel = ("project/stage129/threshold_derivation_execution/"
+                    "metadata_and_hashes_stage129_threshold_derivation_execution.json")
+    assert os.path.exists(os.path.join(REPO_ROOT, manifest_rel)), (
+        "an executor exists at the aborted attempt's path but no successful "
+        "derivation package claims it")
+    manifest = _load(manifest_rel)
+    assert manifest["executor_path"] == executor_rel
+    assert manifest["executor_sha256"] == _sha256(executor_rel)
 
 
 # ------------------------------------------------------------ package hygiene
