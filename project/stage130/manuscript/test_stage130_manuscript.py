@@ -37,7 +37,8 @@ REQUIRED_SECTIONS = [
     "## 14. Conclusion",
     "## 15. Reproducibility and Data/Code Availability",
     "## 16. References",
-    "## 17. Table and Figure Callouts",
+    # End matter, deliberately unnumbered: captions are not a results section.
+    "## Table and Figure Captions/Callouts",
 ]
 
 MATRIX_COLUMNS = [
@@ -80,6 +81,52 @@ def test_manuscript_has_every_required_section(draft):
 
 def test_manuscript_has_a_title_line(draft):
     assert draft.lstrip().startswith("# "), "manuscript must open with a title"
+
+
+def test_callouts_are_end_matter_not_a_numbered_results_section(draft):
+    assert "## 17." not in draft
+    assert "## Table and Figure Captions/Callouts" in draft
+    assert "_End matter." in draft
+
+
+def test_abstract_is_between_250_and_350_words(draft):
+    module = _load_validator()
+    body = re.sub(r"\[@[^\]]+\]", "", module.section(draft, "## Structured Abstract"))
+    words = len(body.replace("**", "").split())
+    assert 250 <= words <= 350, words
+
+
+def test_keywords_are_five_to_eight(draft):
+    module = _load_validator()
+    kws = [k for k in module.section(draft, "## Keywords").split(";") if k.strip()]
+    assert 5 <= len(kws) <= 8, len(kws)
+
+
+def test_no_sha256_or_ft_control_in_the_journal_facing_narrative(draft):
+    narrative = draft[: draft.index("## 16. References")]
+    assert not re.search(r"\b[0-9a-f]{64}\b", narrative)
+    assert not re.search(r"\bFT\d{2}\b", narrative)
+
+
+def test_every_section_cross_reference_resolves(draft):
+    numbered = {m.group(1) for m in re.finditer(r"^## (\d+)\. ", draft, re.M)}
+    subs = {m.group(1) for m in re.finditer(r"^### (\d+\.\d+) ", draft, re.M)}
+    unresolved = []
+    for m in re.finditer(r"Section (\d+(?:\.\d+)?)", draft):
+        ref = m.group(1)
+        ok = ref in numbered if "." not in ref else ref in subs
+        if not ok:
+            unresolved.append(ref)
+    assert not unresolved, sorted(set(unresolved))
+
+
+def test_no_absolute_deployment_or_screening_recommendation(draft):
+    module = _load_validator()
+    low = draft.lower()
+    for phrase in module.BANNED_OUTRIGHT:
+        assert phrase not in low, phrase
+    for phrase in module.REQUIRED_RESTRAINT:
+        assert phrase in low, phrase
 
 
 def test_acceptance_checks_pass():

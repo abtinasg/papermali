@@ -1519,7 +1519,12 @@ def test_stage128_freeze_forbids_stale_stage126_current_labels():
 
 def test_live_handoff_labels_match_the_live_research_state():
     state = _live_handoff()
-    if state.get("stage128_m2_d2_design_freeze_completed"):
+    if state.get("stage130_phase2_recorded"):
+        assert state["current_stage"] == "Stage130"
+        assert state["active_workstream"] == (
+            "stage130_phase2_manuscript_assembly_human_review"
+        )
+    elif state.get("stage128_m2_d2_design_freeze_completed"):
         assert state["current_stage"] == "Stage128"
         assert state["active_workstream"] == (
             "stage128_m3i2_final_official_documentary_recovery"
@@ -1556,9 +1561,9 @@ def test_live_handoff_labels_match_the_live_research_state():
 
 def test_expected_labels_are_state_dependent_not_hardcoded():
     root = _root()
-    assert v.expected_current_stage(root) == "Stage128"
+    assert v.expected_current_stage(root) == "Stage130"
     assert v.expected_active_workstream(root) == (
-        "stage128_m3i2_final_official_documentary_recovery"
+        "stage130_phase2_manuscript_assembly_human_review"
     )
     # The Stage126 constants survive as the pre-freeze expectation.
     assert v.ACTIVE_WORKSTREAM == "stage126_m1_financial_baseline"
@@ -1849,11 +1854,12 @@ def test_m3_gate_executed_is_recognized():
 
 
 def test_expected_active_workstream_advances_to_the_m3_gate():
-    # The M3 Gate label is the expectation until the supplementary M3I-2
-    # contract lock succeeds it; on this branch the lock is complete.
+    # Each label is the expectation only until its successor exists. The
+    # Stage128 constants stay pinned as history; the LIVE expectation has since
+    # advanced to the Stage130 Phase 2 manuscript awaiting human review.
     assert v.STAGE128_M3_ACTIVE_WORKSTREAM == "stage128_m3_macro_data_gate"
     assert v.expected_active_workstream(_root()) == (
-        "stage128_m3i2_final_official_documentary_recovery")
+        "stage130_phase2_manuscript_assembly_human_review")
     assert v.STAGE128_M3I2_ACTIVE_WORKSTREAM == (
         "stage128_m3i2_prospective_contract_lock")
     assert v.STAGE128_M3I2_EVIDENCE_ACTIVE_WORKSTREAM == (

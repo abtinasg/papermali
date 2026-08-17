@@ -3094,6 +3094,12 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # `stage130_scientific_execution_started` False, because Phase 1
         # computed nothing.
         **derive_stage130_phase1_markers(root),
+        # Must come after Phase 1: Stage130 Phase 2. Phase 1 published
+        # `human_authorization_required_for_manuscript_assembly` as its next
+        # action, which was true while no manuscript existed. A committed
+        # manuscript makes that statement stale, so Phase 2 owns the live
+        # next-action key while Phase 1 keeps its own historical pointer.
+        **derive_stage130_phase2_markers(root),
         }))
 
 
@@ -3978,6 +3984,13 @@ def build_handoff_state(root: str):
     # the newest completed robustness micro-part, not the live stage.
     if derive_stage128_m2_d2_design_freeze_markers(root):
         stage = _STAGE128_CURRENT_STAGE
+    # ...and it cannot keep saying Stage128 once a Stage130 manuscript is
+    # committed. `current_stage` describes the CURRENT live state, so a
+    # committed Phase 2 manuscript makes Stage130 the truthful label. The
+    # Stage128 workstream history is untouched and still rendered in its own
+    # sections; only the live label moves.
+    if derive_stage130_phase2_markers(root):
+        stage = _STAGE130_P2_CURRENT_STAGE
     record = {
         "schema_version": GENERATOR_VERSION,
         "repository": derive_repository(root),
@@ -3997,7 +4010,11 @@ def build_handoff_state(root: str):
         # contract lock is live, its predecessor is the CBI M3 macro data
         # Gate, not the older M2 D2 boundary-month workstream.
         "active_workstream_predecessor_context": (
-            _STAGE128_M3I2_EVIDENCE_WORKSTREAM_ID.replace("-", "_")
+            # Once the Stage130 Phase 2 manuscript is live, the Stage128
+            # documentary-recovery workstream it succeeded is the predecessor.
+            _STAGE128_M3I2_RECOVERY_WORKSTREAM_ID.replace("-", "_")
+            if derive_stage130_phase2_markers(root)
+            else _STAGE128_M3I2_EVIDENCE_WORKSTREAM_ID.replace("-", "_")
             if derive_stage128_m3i2_final_documentary_recovery_markers(
                 root).get("stage128_m3i2_final_documentary_recovery_initiated")
             else _STAGE128_M3I2_ACTIVE_WORKSTREAM_ID.replace("-", "_")
@@ -5739,8 +5756,12 @@ def render_current_state(record: dict) -> str:
             f"authorized_now={record.get('stage129_m4_contract_lock_authorized_now')}, "
             f"authorization_consumed={record.get('stage129_m4_contract_lock_authorization_consumed')}, "
             f"authorization_reusable={record.get('stage129_m4_contract_lock_authorization_reusable')}.",
+            # Track A's pointer is quoted at its HISTORICAL value. Interpolating
+            # the live `next_research_action_id` here would put a later
+            # pointer into a sentence about what this action did not move, which
+            # reads as though the M4 contract lock had seen it.
             "- **A THIRD, separate pointer** (neither Track A's "
-            f"`{record.get('next_research_action_id')}` nor Track B's "
+            f"`{_TRACK_A_POINTER_AT_STAGE129_M4_LOCK_TIME}` nor Track B's "
             f"`{record.get('stage128_m3_lag_wdi_next_action_id')}` is moved "
             "by this action): at lock time this action published "
             f"`{record.get('stage129_m4_contract_lock_pointer_at_lock_time')}`"
@@ -6455,12 +6476,71 @@ def render_current_state(record: dict) -> str:
             f"`{record.get('stage130_phase1_legacy_outputs_status')}` — the "
             "Stage123-era outputs are preserved byte-identical and may not be "
             "cited.",
-            "- ➡️ **Next action:** "
+            "- ➡️ **Next action AT PHASE 1 TIME (historical):** "
             f"`{record.get('stage130_phase1_next_action_id')}` — authorized = "
             f"{record.get('stage130_phase1_next_action_authorized')}. Stage130 "
-            f"authorized = {record.get('stage130_authorized')}.",
+            f"authorized = {record.get('stage130_authorized')}. "
+            + ("**Superseded:** the manuscript now exists; the live next "
+               "action is in the Phase 2 section below."
+               if record.get("stage130_phase2_recorded")
+               else "This is the live pointer while no manuscript exists."),
             "- Package: `project/stage130/manuscript_evidence_package/`; "
             "generator: `project/src/stage130_manuscript_evidence_package.py`",
+            "",
+        ]
+    if record.get("stage130_phase2_recorded"):
+        lines += [
+            "### Stage130 Phase 2 — manuscript assembly (CURRENT; writing "
+            "only, awaiting human review)\n",
+            "_The manuscript draft exists. This is a WRITING action: it "
+            "assembled prose and audit files from already-committed evidence "
+            "and computed nothing. It is a draft awaiting human review, not a "
+            "submission._\n",
+            "- ✅ **Phase 2 started:** "
+            f"{record.get('stage130_phase2_started')} — completed = "
+            f"{record.get('stage130_phase2_completed')}, presentation only = "
+            f"{record.get('stage130_phase2_presentation_only')}, traceability "
+            f"rows = {record.get('stage130_phase2_traceability_row_count')}, "
+            f"references = {record.get('stage130_phase2_reference_count')} "
+            "(all verified = "
+            f"{record.get('stage130_phase2_references_all_verified')}).",
+            "- 🔬 **Phase 2 scientific execution started:** "
+            f"{record.get('stage130_phase2_scientific_execution_started')} — "
+            "and the programme-wide **Stage130 scientific execution started:** "
+            f"{record.get('stage130_scientific_execution_started')}. These are "
+            "SEPARATE keys and neither may absorb the other: writing a "
+            "manuscript is not a scientific stage.",
+            "- ⛔ **Final Test untouched by Phase 2:** rows read = "
+            f"{record.get('stage130_phase2_final_test_rows_read')}, prediction "
+            "artifact opened = "
+            f"{record.get('stage130_phase2_prediction_artifact_opened')}, new "
+            "scientific analysis performed = "
+            f"{record.get('stage130_phase2_new_scientific_analysis_performed')}"
+            ", models fitted = "
+            f"{record.get('stage130_phase2_models_fitted_or_refitted')}, "
+            "thresholds derived = "
+            f"{record.get('stage130_phase2_thresholds_derived')}, new metrics "
+            f"= {record.get('stage130_phase2_new_metrics_computed')}, new CIs "
+            f"= {record.get('stage130_phase2_new_confidence_intervals_computed')}"
+            f", SHAP = {record.get('stage130_phase2_shap_executions')}.",
+            "- 📝 **Human review REQUIRED:** "
+            f"{record.get('stage130_phase2_human_review_required')} — review "
+            f"completed = {record.get('stage130_phase2_human_review_completed')}"
+            ", submission ready = "
+            f"{record.get('stage130_phase2_submission_ready')}. Author list, "
+            "affiliations, funding, conflicts, ethics and the data-access "
+            "mechanism are human-only and are carried as explicit "
+            "placeholders, never invented.",
+            "- ⛔ **Not authorized:** ready-for-review = "
+            f"{record.get('stage130_phase2_ready_for_review_authorized')}, "
+            f"merge = {record.get('stage130_phase2_merge_authorized')}, "
+            f"Stage130 authorized = {record.get('stage130_authorized')}.",
+            "- ➡️ **Live next action:** "
+            f"`{record.get('stage130_phase2_next_action_id')}` — authorized = "
+            f"{record.get('stage130_phase2_next_action_authorized')}. A "
+            "pointer is never an authorization.",
+            "- Manuscript: `project/stage130/manuscript/`; validator: "
+            "`project/stage130/manuscript/validate_manuscript.py`",
             "",
         ]
     lines += [
@@ -7155,7 +7235,14 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
     m3i2_recovery = bool(
         derive_stage128_m3i2_final_documentary_recovery_markers(root).get(
             "stage128_m3i2_final_documentary_recovery_initiated"))
-    if m3i2_recovery:
+    # ...and once the Stage130 Phase 2 manuscript is committed, the live
+    # workstream has legitimately advanced out of the Stage128 chain entirely.
+    # This check exists to refuse a STALE label; it must therefore recognize
+    # the successor rather than pin the Stage128 label forever. Every Stage128
+    # label below becomes predecessor context at that point.
+    if derive_stage130_phase2_markers(root):
+        allowed = _STAGE130_P2_WORKSTREAM_ID
+    elif m3i2_recovery:
         allowed = _STAGE128_M3I2_RECOVERY_WORKSTREAM_ID
     elif m3i2_evidence:
         allowed = _STAGE128_M3I2_EVIDENCE_WORKSTREAM_ID
@@ -12018,6 +12105,11 @@ def derive_stage128_m3i2_track_a_waiting_termination_markers(
 # --------------------------------------------------------------------------- #
 # Stage129 -- M4 governance Data-Gate contract lock (design only)
 # --------------------------------------------------------------------------- #
+
+#: Track A's research pointer as it stood when the Stage129 M4 contract lock ran.
+#: Pinned history: this sentence describes what that action did NOT move, so it
+#: must quote the value that existed then, never the current live pointer.
+_TRACK_A_POINTER_AT_STAGE129_M4_LOCK_TIME = "human-decision-required"
 
 _STAGE129_M4_PKG = "project/stage129/m4_governance_data_gate_contract"
 _STAGE129_M4_ACTION_ID = "stage129-m4-governance-data-gate-contract-lock"
@@ -17106,6 +17198,140 @@ def derive_stage130_phase1_markers(root: str) -> dict:
         "stage130_authorized": False,
         "stage130_phase1_ready_for_review_authorized": False,
         "stage130_phase1_merge_authorized": False,
+    }
+
+
+#: Stage130 Phase 2 -- the manuscript itself.
+_STAGE130_P2_DIR = "project/stage130/manuscript"
+_STAGE130_P2_ACTION_ID = "stage130-phase2-manuscript-assembly"
+_STAGE130_P2_WORKSTREAM_ID = "stage130-phase2-manuscript-assembly-human-review"
+_STAGE130_P2_CURRENT_STAGE = "Stage130"
+_STAGE130_P2_NEXT_ACTION_ID = "human-manuscript-review"
+#: The manuscript deliverables. All must exist before Phase 2 may be recorded.
+_STAGE130_P2_REQUIRED = (
+    "manuscript_draft_en.md",
+    "claim_traceability_matrix.csv",
+    "references.bib",
+    "reference_audit.csv",
+    "README.md",
+)
+#: Phase 2 is prose and audit files only. Any of these extensions in the
+#: manuscript directory would mean a figure, dataset or result artifact was
+#: produced, which a presentation-only phase may not do.
+_STAGE130_P2_FORBIDDEN_SUFFIXES = (
+    ".svg", ".png", ".pdf", ".jpg", ".jpeg", ".json", ".parquet", ".npy", ".pkl")
+
+
+def derive_stage130_phase2_markers(root: str) -> dict:
+    """Recognize Stage130 Phase 2 -- the assembled manuscript.
+
+    Phase 1 correctly published
+    `human_authorization_required_for_manuscript_assembly` as the next action:
+    at the time, no manuscript existed. Once one is committed, continuing to
+    render that pointer -- and continuing to render Stage128 as the current
+    stage -- states something the repository contradicts. This function owns
+    the LIVE keys for that transition. Phase 1's own historical pointer is
+    left untouched, because it remains a true statement about Phase 1.
+
+    Phase 2 is a WRITING action, so the same distinction Phase 1 protects is
+    reasserted here: `stage130_phase2_started` says prose exists;
+    `stage130_phase2_scientific_execution_started` stays False, and it may
+    never be collapsed into `stage130_scientific_execution_started`, which
+    remains the programme-wide scientific marker.
+
+    Fails closed if a deliverable is missing, if the traceability matrix is
+    empty, or if the manuscript directory carries a figure/data artifact.
+    Returns {} before the manuscript exists.
+    """
+    ms = os.path.join(root, _STAGE130_P2_DIR)
+    if not os.path.isdir(ms):
+        return {}
+    draft = os.path.join(ms, "manuscript_draft_en.md")
+    if not os.path.isfile(draft):
+        return {}
+
+    missing = [n for n in _STAGE130_P2_REQUIRED
+               if not os.path.isfile(os.path.join(ms, n))]
+    if missing:
+        raise HandoffError(
+            f"Stage130 Phase 2 manuscript deliverables missing: {missing}")
+
+    # Presentation only: prose and audit files, never a produced artifact.
+    for entry in sorted(os.listdir(ms)):
+        if entry == "__pycache__":
+            continue
+        if entry.lower().endswith(_STAGE130_P2_FORBIDDEN_SUFFIXES):
+            raise HandoffError(
+                "Stage130 Phase 2 must not produce a figure or data artifact; "
+                f"found {entry}")
+
+    matrix = os.path.join(ms, "claim_traceability_matrix.csv")
+    with open(matrix, "r", encoding="utf-8") as fh:
+        rows = [r for r in csv.DictReader(fh)]
+    if not rows:
+        raise HandoffError("Stage130 Phase 2 traceability matrix is empty")
+    for row in rows:
+        if not (row.get("source_sha256") or "").strip():
+            raise HandoffError(
+                "Stage130 Phase 2 traceability row without a source digest: "
+                f"{row.get('claim_id')}")
+
+    with open(os.path.join(ms, "reference_audit.csv"), "r", encoding="utf-8") as fh:
+        refs = [r for r in csv.DictReader(fh)]
+    if not refs:
+        raise HandoffError("Stage130 Phase 2 reference audit is empty")
+    unverified = [r.get("citation_key") for r in refs
+                  if not (r.get("verification_status") or "").startswith("VERIFIED")]
+    if unverified:
+        raise HandoffError(
+            f"Stage130 Phase 2 carries unverified references: {unverified}")
+
+    return {
+        "stage130_phase2_recorded": True,
+        "stage130_phase2_action_id": _STAGE130_P2_ACTION_ID,
+
+        # The writing phase exists and is finished as a draft...
+        "stage130_phase2_started": True,
+        "stage130_phase2_completed": True,
+        "stage130_phase2_presentation_only": True,
+
+        # ...and it computed nothing. Deliberately a SEPARATE key from the
+        # programme-wide `stage130_scientific_execution_started`, so neither can
+        # absorb the other.
+        "stage130_phase2_scientific_execution_started": False,
+        "stage130_phase2_final_test_rows_read": 0,
+        "stage130_phase2_prediction_artifact_opened": False,
+        "stage130_phase2_new_scientific_analysis_performed": False,
+        "stage130_phase2_models_fitted_or_refitted": 0,
+        "stage130_phase2_thresholds_derived": 0,
+        "stage130_phase2_new_metrics_computed": 0,
+        "stage130_phase2_new_confidence_intervals_computed": 0,
+        "stage130_phase2_shap_executions": 0,
+        "stage130_phase2_traceability_row_count": len(rows),
+        "stage130_phase2_reference_count": len(refs),
+        "stage130_phase2_references_all_verified": True,
+
+        # A draft is not a submission, and a human has not read it yet.
+        "stage130_phase2_human_review_required": True,
+        "stage130_phase2_human_review_completed": False,
+        "stage130_phase2_submission_ready": False,
+        "stage130_phase2_ready_for_review_authorized": False,
+        "stage130_phase2_merge_authorized": False,
+        "stage130_phase2_next_action_id": _STAGE130_P2_NEXT_ACTION_ID,
+        "stage130_phase2_next_action_authorized": False,
+        "stage130_authorized": False,
+
+        # Phase 2 is registered last, so it owns the LIVE pointer. Every
+        # earlier action published `human-decision-required`, which was true
+        # while the next step was genuinely undetermined. It no longer is: a
+        # draft exists and a human has to read it. Those earlier statements
+        # stay true of the actions that made them and are not rewritten.
+        "last_completed_research_action_id": _STAGE130_P2_ACTION_ID,
+        "next_research_action_id": _STAGE130_P2_NEXT_ACTION_ID,
+        "next_research_action_scope":
+            "manuscript_human_review_no_further_action_is_authorized",
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
     }
 
 

@@ -52,6 +52,9 @@ DEV_METRICS_REL = "project/stage126/stage126_m1_development_metrics.csv"
 ROBUST_SYNTH_REL = ("project/stage126/"
                     "stage126_m1_robustness_closure_synthesis_record.json")
 SPLIT_CONTRACT_REL = "project/stage125/part4_temporal_split_contract_stage125.json"
+#: The committed outcome-definition table. Definitional, not inferential: it
+#: states the frozen target rules, and no value in it is a result.
+TARGET_DEF_REL = "project/stage122/target_definition_stage122.csv"
 
 #: Never opened by this module. The row-level prediction artifact is excluded
 #: by the Stage130 Phase 1 authorization; the raw inputs are Final Test data.
@@ -166,7 +169,7 @@ def build_coefficient_table(model: dict[str, Any],
 def build_tables(ft: dict[str, Any], prov: dict[str, Any],
                  model: dict[str, Any], split: dict[str, Any],
                  dev_csv: str, robust: dict[str, Any],
-                 coef_csv: bytes) -> dict[str, bytes]:
+                 coef_csv: bytes, target_def_csv: str) -> dict[str, bytes]:
     thr = ft["thresholded_secondary"]
     topk = ft["topk"]
     unc = ft["uncertainty"]
@@ -266,15 +269,26 @@ def build_tables(ft: dict[str, Any], prov: dict[str, Any],
                      "source_artifact"], rows4)
 
     si = robust["scientific_interpretation"]
+    # `ordering_preserved_in_parts` must span EVERY registered robustness part,
+    # not the sample-definition subset. The authoritative per-part flag is
+    # `part_summaries[*].primary_ordering_preserved`; reading
+    # `B_sample_definition_sensitivity` reported only Parts 2-4 and silently
+    # dropped Parts 5 and 6, contradicting claim freeze C6 and the locked source.
+    preserved_parts = sorted(
+        p["part_index"] for p in robust["part_summaries"]
+        if p["primary_ordering_preserved"])
+    reversed_parts = sorted(
+        p["part_index"] for p in robust["part_summaries"]
+        if not p["primary_ordering_preserved"])
     t5 = _csv_bytes(
         ["item", "status_or_finding", "source_artifact"],
         [
             ["primary_development_ordering",
              " > ".join(robust["primary_ordering"]), ROBUST_SYNTH_REL],
             ["ordering_preserved_in_parts",
-             json.dumps(si["B_sample_definition_sensitivity"]
-                        ["primary_ordering_preserved_in_parts"]),
-             ROBUST_SYNTH_REL],
+             json.dumps(preserved_parts), ROBUST_SYNTH_REL],
+            ["ordering_reversed_in_parts",
+             json.dumps(reversed_parts), ROBUST_SYNTH_REL],
             ["part1_is_the_exception",
              str(si["A_model_family_ordering"]["part1_is_the_exception"]).lower(),
              ROBUST_SYNTH_REL],
@@ -285,6 +299,9 @@ def build_tables(ft: dict[str, Any], prov: dict[str, Any],
              str(robust["paper_winner_selected"]).lower(), ROBUST_SYNTH_REL],
         ])
 
+    t7 = build_development_performance_table(dev_csv)
+    t8 = build_target_definition_table(target_def_csv)
+
     return {
         f"{TABLES_SUBDIR}/table_1_cohort_and_temporal_design.csv": t1,
         f"{TABLES_SUBDIR}/table_2_final_test_aggregate_performance.csv": t2,
@@ -292,7 +309,83 @@ def build_tables(ft: dict[str, Any], prov: dict[str, Any],
         f"{TABLES_SUBDIR}/table_4_top10_percent_screening.csv": t4,
         f"{TABLES_SUBDIR}/table_5_robustness_and_block_dispositions.csv": t5,
         f"{TABLES_SUBDIR}/table_6_model_coefficients_and_odds_ratios.csv": coef_csv,
+        f"{TABLES_SUBDIR}/table_7_development_performance.csv": t7,
+        f"{TABLES_SUBDIR}/table_8_outcome_definition.csv": t8,
     }
+
+
+#: The three development scopes, in the order the locked metrics file uses them.
+DEV_SCOPES = ("fold1_validation", "fold2_validation", "pooled_development_oof")
+#: The three locked model families, in the frozen primary-ordering order.
+DEV_FAMILIES = ("regularized_logistic_regression", "random_forest", "xgboost")
+
+
+def build_development_performance_table(dev_csv: str) -> bytes:
+    """Locked development metrics, copied verbatim.
+
+    Nothing is recomputed, averaged, re-rounded or compared. Every cell is the
+    exact string committed in ``stage126_m1_development_metrics.csv``. The table
+    exists so that the reported development ordering is auditable for all three
+    model families rather than asserted.
+    """
+    rows = list(csv.DictReader(io.StringIO(dev_csv)))
+    index = {(r["model_family"], r["scope"]): r for r in rows}
+    missing = [(f, s) for s in DEV_SCOPES for f in DEV_FAMILIES
+               if (f, s) not in index]
+    if missing:
+        raise Stage130Error(
+            "cannot identify the locked development rows unambiguously; "
+            f"missing (model_family, scope): {missing}")
+    duplicates = [k for k in index
+                  if sum(1 for r in rows
+                         if (r["model_family"], r["scope"]) == k) > 1]
+    if duplicates:
+        raise Stage130Error(
+            "locked development metrics contain duplicate (model_family, scope) "
+            f"rows, so no unambiguous selection exists: {sorted(duplicates)}")
+
+    out: list[list[str]] = []
+    for scope in DEV_SCOPES:
+        for family in DEV_FAMILIES:
+            r = index[(family, scope)]
+            out.append([
+                scope, family, r["configuration_id"], r["n_rows"],
+                r["n_positive"], r["pr_auc"], r["roc_auc"], r["brier_score"],
+                "true" if scope == "pooled_development_oof" else "false",
+                DEV_METRICS_REL,
+            ])
+    return _csv_bytes(
+        ["scope", "model_family", "configuration_id", "n_rows", "n_positive",
+         "pr_auc", "roc_auc", "brier_score", "is_ordering_basis",
+         "source_artifact"], out)
+
+
+#: The frozen outcome criteria, in the order the Stage122 definition table uses.
+TARGET_DEF_ROWS = (
+    "fd_article141_direct",
+    "fd_accumulated_loss",
+    "fd_negative_equity",
+    "fd_ocf_high_leverage",
+    "FD_target_main",
+)
+
+
+def build_target_definition_table(target_def_csv: str) -> bytes:
+    """The frozen outcome definition, copied verbatim from Stage122.
+
+    Definitional, not inferential. No threshold here is estimated, tuned or
+    derived: each is a committed rule, and the manuscript needs them to state
+    what it predicts. No value is recalculated or inferred.
+    """
+    rows = list(csv.DictReader(io.StringIO(target_def_csv)))
+    index = {r["criterion"]: r for r in rows}
+    missing = [c for c in TARGET_DEF_ROWS if c not in index]
+    if missing:
+        raise Stage130Error(
+            f"committed target definition is missing criteria: {missing}")
+    out = [[c, index[c]["label"], index[c]["rule"], TARGET_DEF_REL]
+           for c in TARGET_DEF_ROWS]
+    return _csv_bytes(["criterion", "label", "rule", "source_artifact"], out)
 
 
 # ------------------------------------------------------------------ figures
@@ -384,11 +477,22 @@ def build_figures(model: dict[str, Any], split: dict[str, Any]) -> dict[str, byt
 
 # -------------------------------------------------------------- narrative
 def build_claim_freeze(ft: dict[str, Any], prov: dict[str, Any],
-                       model: dict[str, Any]) -> bytes:
+                       model: dict[str, Any], robust: dict[str, Any],
+                       dev_csv: str, target_def_csv: str) -> bytes:
     m, thr, topk = ft["metrics"], ft["thresholded_secondary"], ft["topk"]
     iv = ft["uncertainty"]["intervals"]
     fit = model["fit_set"]
     prevalence = _num(topk["pooled_test_prevalence"])
+    preserved = sorted(p["part_index"] for p in robust["part_summaries"]
+                       if p["primary_ordering_preserved"])
+    reversed_ = sorted(p["part_index"] for p in robust["part_summaries"]
+                       if not p["primary_ordering_preserved"])
+    preserved_txt = ", ".join(str(p) for p in preserved[:-1]) + f" and {preserved[-1]}"
+    reversed_txt = ", ".join(str(p) for p in reversed_)
+    dev = {(r["model_family"], r["scope"]): r
+           for r in csv.DictReader(io.StringIO(dev_csv))}
+    pooled = {f: dev[(f, "pooled_development_oof")]["pr_auc"] for f in DEV_FAMILIES}
+    tdef = {r["criterion"]: r for r in csv.DictReader(io.StringIO(target_def_csv))}
     text = f"""# Stage130 Phase 1 — manuscript claim freeze
 
 Every claim below is pinned to a committed artifact and an exact committed
@@ -489,10 +593,15 @@ comparator is permitted anywhere in the manuscript.
 * **Permissible wording:** six pre-registered robustness categories provide
   **sensitivity evidence only**; validation was strictly forward-chaining with
   no shuffling and no random split.
+* **Committed value:** the primary ordering is preserved in Parts
+  {preserved_txt}; Part {reversed_txt} is the sole reversal. Derived from
+  `part_summaries[*].primary_ordering_preserved` in the locked source, which is
+  the only per-part flag covering every registered category.
 * **Prohibited overclaim:** presenting robustness as model selection, as proof
   of generalization, or as a superiority argument.
 * **Mandatory accompanying limitation:** the primary ordering was preserved in
-  Parts 2-6 and not in Part 1; no winner was selected on this evidence.
+  Parts {preserved_txt} and not in Part {reversed_txt}; no winner was selected
+  on this evidence.
 
 ## C7 — Explainability
 
@@ -534,6 +643,48 @@ comparator is permitted anywhere in the manuscript.
   access; the Final Test was opened exactly once; artifacts are SHA-256 pinned.
 * **Prohibited overclaim:** describing this as external or independent
   validation.
+
+## C10 — Outcome definition (DEFINITIONAL, not inferential)
+
+This section states what is predicted. Every rule below is copied verbatim from
+the committed target-definition table; **no value here is estimated, tuned,
+derived or inferred**, and none of it is a result.
+
+* **Source:** `{TARGET_DEF_REL}`
+* **Committed rules:**
+  * `fd_accumulated_loss` — {tdef["fd_accumulated_loss"]["rule"]}
+  * `fd_negative_equity` — {tdef["fd_negative_equity"]["rule"]}
+  * `fd_ocf_high_leverage` — {tdef["fd_ocf_high_leverage"]["rule"]}
+  * `fd_article141_direct` — {tdef["fd_article141_direct"]["rule"]}
+  * `FD_target_main` — {tdef["FD_target_main"]["rule"]}
+* **Permissible wording:** the primary outcome is a composite **operational**
+  indicator aggregated by a modified three-valued OR, in which unknown evidence
+  is recorded as unknown and never as healthy.
+* **Prohibited overclaim:** describing `FD_target_main` as an Article-141
+  target, as legal insolvency, or as a bankruptcy filing; restating any
+  threshold in a different form; treating the unobserved direct Article-141
+  criterion as though it had been evaluated.
+* **Mandatory accompanying limitation:** direct Article-141 evidence is
+  unobserved for every row in this panel, so the composite rests on the
+  remaining quantitative criteria alone.
+
+## C11 — Development performance and the observed ordering
+
+* **Source:** `{DEV_METRICS_REL}`
+* **Committed values (pooled development out-of-fold PR-AUC):**
+  `regularized_logistic_regression` = `{pooled["regularized_logistic_regression"]}`,
+  `random_forest` = `{pooled["random_forest"]}`,
+  `xgboost` = `{pooled["xgboost"]}`
+* **Permissible wording:** report these as **observed development out-of-fold
+  values** that make the stated ordering auditable. Per-fold values for all
+  three families are displayed in the development-performance table.
+* **Prohibited overclaim:** any paired difference, ratio, delta, average,
+  re-rounding, significance statement or superiority inference computed from
+  these values; presenting them as Final Test performance; presenting the
+  ordering as a model-selection result.
+* **Mandatory accompanying limitation:** these are development values under the
+  locked folds, not held-out performance, and no uncertainty interval,
+  multiplicity adjustment or comparative test accompanies them.
 
 ---
 
@@ -618,7 +769,7 @@ Presentation only. **No new scientific analysis was performed.**
 |---|---|
 | `manuscript_claim_freeze.md` | frozen claims: source, exact value, permissible wording, prohibited overclaim, mandatory limitation |
 | `table_model_coefficients_and_odds_ratios.csv` | canonical coefficient/OR table ({model["n_design_columns"]} terms + intercept) |
-| `{TABLES_SUBDIR}/` | six deterministic result tables |
+| `{TABLES_SUBDIR}/` | eight deterministic tables: six result tables, one locked development-performance table and one definitional outcome table |
 | `{FIGURES_SUBDIR}/` | three schematic figures (no performance curves) |
 | `legacy_outputs_supersession.md` | `{LEGACY_DIR_REL}` marked {LEGACY_STATUS} |
 | `manifest.json` | SHA-256 + byte count per file, and the authoritative source of every displayed value |
@@ -670,6 +821,8 @@ def build_package(repo_root: Path | str = REPO_ROOT) -> dict[str, bytes]:
     split = _load(root, SPLIT_CONTRACT_REL)
     robust = _load(root, ROBUST_SYNTH_REL)
     dev_csv = _guarded_open(root, DEV_METRICS_REL).decode("utf-8")
+    # utf-8-sig: the committed Stage122 definition table carries a BOM.
+    target_def_csv = _guarded_open(root, TARGET_DEF_REL).decode("utf-8-sig")
 
     counters = qc["counters"]
     for field in ("model_fits_executed", "refits_executed",
@@ -682,9 +835,11 @@ def build_package(repo_root: Path | str = REPO_ROOT) -> dict[str, bytes]:
     files: dict[str, bytes] = {
         "table_model_coefficients_and_odds_ratios.csv": coef_csv,
     }
-    files.update(build_tables(ft, prov, model, split, dev_csv, robust, coef_csv))
+    files.update(build_tables(ft, prov, model, split, dev_csv, robust, coef_csv,
+                              target_def_csv))
     files.update(build_figures(model, split))
-    files["manuscript_claim_freeze.md"] = build_claim_freeze(ft, prov, model)
+    files["manuscript_claim_freeze.md"] = build_claim_freeze(
+        ft, prov, model, robust, dev_csv, target_def_csv)
     files["legacy_outputs_supersession.md"] = build_legacy_supersession()
     files["README.md"] = build_readme(ft, model)
 
@@ -716,12 +871,13 @@ def build_package(repo_root: Path | str = REPO_ROOT) -> dict[str, bytes]:
             "development_metrics": DEV_METRICS_REL,
             "robustness_closure": ROBUST_SYNTH_REL,
             "temporal_split_contract": SPLIT_CONTRACT_REL,
+            "outcome_definition": TARGET_DEF_REL,
         },
         "source_sha256": {
             rel: _sha256(_guarded_open(root, rel)) for rel in sorted((
                 FT_METRICS_REL, FT_PROV_REL, FT_QC_REL, FT_MANIFEST_REL,
                 MODEL_REL, PREP_REL, THRESHOLD_REL, DEV_METRICS_REL,
-                ROBUST_SYNTH_REL, SPLIT_CONTRACT_REL))
+                ROBUST_SYNTH_REL, SPLIT_CONTRACT_REL, TARGET_DEF_REL))
         },
         # The pinned SHA-256 of the Final Test package manifest itself. This
         # must be a digest, not an identifier: it is the value the field name

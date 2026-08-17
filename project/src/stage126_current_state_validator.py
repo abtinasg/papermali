@@ -406,6 +406,13 @@ STAGE128_ACTIVE_WORKSTREAM = "stage128_m2_d2_boundary_month_equity_return"
 #: the live stage label remains the Stage126 M1 baseline.
 STAGE126_CURRENT_STAGE = "Stage126"
 STAGE128_CURRENT_STAGE = "Stage128"
+
+#: Stage130 Phase 2 -- the assembled manuscript. Once it is committed the live
+#: stage and workstream have advanced out of the Stage128 chain, and the
+#: Stage128 labels below become history rather than current state.
+STAGE130_P2_MANUSCRIPT_REL = "project/stage130/manuscript/manuscript_draft_en.md"
+STAGE130_P2_CURRENT_STAGE = "Stage130"
+STAGE130_P2_ACTIVE_WORKSTREAM = "stage130_phase2_manuscript_assembly_human_review"
 NEXT_RESEARCH_ACTION_ID = "stage126-m1-financial-baseline"
 # Once all six registered M1 robustness categories are complete (Part 6
 # closes the set), the next legitimate ROADMAP research action advances to
@@ -508,6 +515,16 @@ NEXT_RESEARCH_ACTION_ID_AFTER_STAGE128_M2_D2_DESIGN_FREEZE = (
 STAGE128_M2_D2_DESIGN_FREEZE_REL = (
     "project/stage128/stage128_m2_d2_design_freeze.json"
 )
+
+
+def stage130_phase2_manuscript_committed(repo_root: Path) -> bool:
+    """True once the Stage130 Phase 2 manuscript draft exists on disk.
+
+    A committed manuscript is the observable fact that makes the Stage128 live
+    labels stale. This is a presence check on a committed file, not a
+    scientific state: it admits nothing and computes nothing.
+    """
+    return (repo_root / STAGE130_P2_MANUSCRIPT_REL).is_file()
 
 
 def stage128_m2_d2_design_freeze_completed(repo_root: Path) -> bool:
@@ -2159,10 +2176,15 @@ def m3_gate_state_is_self_consistent(
         # The live workstream is the M3 Gate until the supplementary M3I-2
         # contract lock succeeds it; both are M3-family DATA/CONTRACT labels
         # and neither implies modeling.
+        # ...and once the Stage130 Phase 2 manuscript is recorded, the live
+        # workstream has advanced out of the M3 family altogether. This check
+        # is about the Gate not being contradicted, not about pinning a
+        # workstream label forever, so the successor is admitted too.
         and handoff.get("active_workstream") in (
             STAGE128_M3_ACTIVE_WORKSTREAM, STAGE128_M3I2_ACTIVE_WORKSTREAM,
             STAGE128_M3I2_EVIDENCE_ACTIVE_WORKSTREAM,
-            STAGE128_M3I2_RECOVERY_ACTIVE_WORKSTREAM)
+            STAGE128_M3I2_RECOVERY_ACTIVE_WORKSTREAM,
+            STAGE130_P2_ACTIVE_WORKSTREAM)
         and handoff.get("m3_modeling_started") is False
         and handoff.get("m3_incremental_evaluation_authorized") is False
         and handoff.get("m3_block_admitted_for_incremental_evaluation") is False
@@ -2181,6 +2203,8 @@ def expected_active_workstream(repo_root: Path) -> str:
     Stage128 M2 D2 one, not the Stage126 M1 financial baseline. The Stage126
     value remains correct history, but it is no longer the CURRENT value.
     """
+    if stage130_phase2_manuscript_committed(repo_root):
+        return STAGE130_P2_ACTIVE_WORKSTREAM
     if stage128_m3i2_final_documentary_recovery_initiated(repo_root):
         return STAGE128_M3I2_RECOVERY_ACTIVE_WORKSTREAM
     if stage128_m3i2_evidence_capture_completed(repo_root):
@@ -2196,6 +2220,8 @@ def expected_active_workstream(repo_root: Path) -> str:
 
 def expected_current_stage(repo_root: Path) -> str:
     """The single source of truth for the CURRENT live stage label."""
+    if stage130_phase2_manuscript_committed(repo_root):
+        return STAGE130_P2_CURRENT_STAGE
     if stage128_m2_d2_design_freeze_completed(repo_root):
         return STAGE128_CURRENT_STAGE
     return STAGE126_CURRENT_STAGE
@@ -2215,6 +2241,14 @@ def current_state_labels_are_not_stale(
     """
     if not freeze_completed:
         return True
+    # Once the Stage130 Phase 2 manuscript is recorded the live labels have
+    # legitimately advanced out of the Stage128 chain entirely. This guard
+    # exists to refuse a STALE label, so it must recognize the successor rather
+    # than pin Stage128 forever; the Stage128 values survive as history.
+    if handoff.get("stage130_phase2_recorded") is True:
+        return (handoff.get("current_stage") == STAGE130_P2_CURRENT_STAGE
+                and handoff.get("active_workstream")
+                == STAGE130_P2_ACTIVE_WORKSTREAM)
     if handoff.get("current_stage") != STAGE128_CURRENT_STAGE:
         return False
     # Once the supplementary M3I-2 contract has been locked, the live

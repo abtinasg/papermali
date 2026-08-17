@@ -54,6 +54,7 @@ TERM_PROSE = {
 NEGATION_MARKERS = (
     "no ", "not ", "never", "cannot", "does not", "do not", "is not", "are not",
     "without", "neither", "nor ", "avoid", "absent", "deny", "denies",
+    "rather than", "instead of",
 )
 
 
@@ -91,7 +92,40 @@ PROHIBITED_PHRASES = [
     "first study",
     "the full test suite passes",
     "all tests pass",
+    "verified point-in-time availability",
+    "observed filing date",
 ]
+
+#: Overclaiming that must not survive anywhere, in any form. Unlike
+#: PROHIBITED_PHRASES these are not rescued by a negation: the wording itself is
+#: what was removed, so a "we do not claim it is a screening aid" sentence is
+#: still a sentence that puts the phrase in a reader's head.
+BANNED_OUTRIGHT = [
+    "genuinely point-in-time",
+    "screening aid",
+    "usable ranking",
+    "the relevant kind of evidence",
+    "we recommend",
+    "should be deployed",
+    "suitable for deployment",
+    "fit for deployment",
+    "ready for use",
+    "can be used to decide",
+]
+
+#: The restrained framing the corrected manuscript must actually contain.
+REQUIRED_RESTRAINT = [
+    "observed risk ordering",
+    "independent prospective validation",
+    "neither deployment readiness nor decision utility",
+    "prespecified four-month availability assumption",
+]
+
+#: Journal-facing prose must not carry repository audit mechanics.
+FT_CONTROL_RE = re.compile(r"\bFT\d{2}\b")
+SHA256_RE = re.compile(r"\b[0-9a-f]{64}\b")
+
+ABSTRACT_MIN, ABSTRACT_MAX = 250, 350
 
 # Sections whose numeric content is bibliographic rather than scientific.
 NUMERIC_SCAN_STOP = "## 16. References"
@@ -102,6 +136,9 @@ STRUCTURAL_NUMBERS = {
     "95",   # nominal interval level
     "10",   # top-10 per cent screening label
     "23",   # ICML'06 conference ordinal in a prose citation, if present
+    # Data-availability paragraph only. Neither is a scientific quantity:
+    "128",  # part of the deposited record's own title, "papermali Stage128 ..."
+    "2026", # the calendar year the raw-evidence bundle was deposited
 }
 
 failures: list[str] = []
@@ -300,12 +337,137 @@ def main() -> int:
         check(f"traceability source exists and matches its digest: {row['claim_id']}",
               path.exists() and sha256(path) == row["source_sha256"])
 
-    # --- 19 / 20: historical failures and suite claims --------------------
+    # --- 19 / 20: no test-suite discussion in the scientific narrative ----
     for m in re.finditer(r"full repository test suite passes", low):
         check("any mention of the full test suite passing is an explicit disclaimer",
               is_negated(low, m.start()), low[max(0, m.start() - 70): m.start() + 40])
-    check("accepted historical failures are disclosed",
-          "accepted historical failures" in low)
+    limitations = section(draft, "## 13. Limitations").lower()
+    for token in ("test suite", "test-suite", "pytest", "historical failures"):
+        check(f"repository test mechanics absent from Limitations: {token!r}",
+              token not in limitations)
+
+    # --- abstract length ---------------------------------------------------
+    abstract = re.sub(r"\[@[^\]]+\]", "", section(draft, "## Structured Abstract"))
+    words = len(abstract.replace("**", "").split())
+    check(f"abstract is {ABSTRACT_MIN}-{ABSTRACT_MAX} words",
+          ABSTRACT_MIN <= words <= ABSTRACT_MAX, f"{words} words")
+    keywords = [k for k in section(draft, "## Keywords").split(";") if k.strip()]
+    check("5-8 keywords", 5 <= len(keywords) <= 8, str(len(keywords)))
+
+    # --- overclaiming removed, restrained framing present ------------------
+    for phrase in BANNED_OUTRIGHT:
+        check(f"overclaiming phrase fully removed: {phrase!r}", phrase not in low)
+    for phrase in REQUIRED_RESTRAINT:
+        check(f"restrained framing present: {phrase!r}", phrase in low)
+    check("the availability rule is described as an assumption or proxy",
+          "prespecified proxy" in low or "availability assumption" in low)
+
+    # --- Article 141 is attributed, never asserted as settled legal text ---
+    for m in re.finditer(r"article 141", low):
+        window = low[m.start(): m.start() + 400]
+        check("every Article 141 mention is attributed to a cited study or "
+              "explicitly declined, never stated as settled statute",
+              "salehi2016" in window or "operationalis" in window
+              or "do not restate" in window or "labelling route" in window
+              or "labelled" in window,
+              window[:120])
+    check("the manuscript declines to restate the statute without a primary source",
+          "we do not restate the statutory text" in low)
+
+    # --- journal-facing narrative carries no repository audit mechanics ----
+    narrative = draft[: draft.index(NUMERIC_SCAN_STOP)]
+    check("no exact SHA-256 digest in the journal-facing narrative",
+          not SHA256_RE.search(narrative),
+          str(SHA256_RE.findall(narrative)[:3]))
+    check("no FT-control enumeration in the journal-facing narrative",
+          not FT_CONTROL_RE.search(narrative),
+          str(FT_CONTROL_RE.findall(narrative)[:5]))
+
+    # --- every cross-reference resolves ------------------------------------
+    numbered = {m.group(1) for m in re.finditer(r"^## (\d+)\. ", draft, re.M)}
+    subsections = {m.group(1) for m in re.finditer(r"^### (\d+\.\d+) ", draft, re.M)}
+    for m in re.finditer(r"Section (\d+(?:\.\d+)?)", draft):
+        ref = m.group(1)
+        ok = ref in numbered if "." not in ref else ref in subsections
+        check(f"cross-reference resolves: Section {ref}", ok)
+    tables = {p.name for p in TABLES.iterdir() if p.suffix == ".csv"}
+    table_nums = {re.match(r"table_(\d+)_", n).group(1) for n in tables}
+    for m in re.finditer(r"Table (\d+)", draft):
+        check(f"cross-reference resolves: Table {m.group(1)}",
+              m.group(1) in table_nums)
+    figures = {p.name for p in (PKG / "manuscript_figures").iterdir()}
+    fig_nums = {re.match(r"figure_(\d+)_", n).group(1) for n in figures}
+    for m in re.finditer(r"Figure (\d+)", draft):
+        check(f"cross-reference resolves: Figure {m.group(1)}",
+              m.group(1) in fig_nums)
+    check("every frozen table is cited at least once",
+          all(f"Table {n}" in draft for n in sorted(table_nums)),
+          str(sorted(n for n in table_nums if f"Table {n}" not in draft)))
+    check("every frozen figure is cited at least once",
+          all(f"Figure {n}" in draft for n in sorted(fig_nums)))
+
+    # --- end matter is not numbered as a results section -------------------
+    check("table/figure callouts are unnumbered end matter",
+          "## Table and Figure Captions/Callouts" in draft
+          and "## 17." not in draft)
+
+    # --- robustness ordering agrees across all three surfaces --------------
+    robust = json.loads((ROOT.parent / "project/stage126/"
+                         "stage126_m1_robustness_closure_synthesis_record.json"
+                         ).read_text(encoding="utf-8"))
+    src_ok = sorted(p["part_index"] for p in robust["part_summaries"]
+                    if p["primary_ordering_preserved"])
+    src_rev = sorted(p["part_index"] for p in robust["part_summaries"]
+                     if not p["primary_ordering_preserved"])
+    t5 = {r["item"]: r["status_or_finding"] for r in csv.DictReader(
+        (TABLES / "table_5_robustness_and_block_dispositions.csv").open(
+            encoding="utf-8"))}
+    check("table 5 ordering matches the locked source",
+          json.loads(t5["ordering_preserved_in_parts"]) == src_ok, str(src_ok))
+    check("table 5 records the reversal explicitly",
+          json.loads(t5["ordering_reversed_in_parts"]) == src_rev, str(src_rev))
+    freeze = " ".join((PKG / "manuscript_claim_freeze.md").read_text(
+        encoding="utf-8").split())
+    check("claim freeze states the same preserved parts",
+          "preserved in Parts 2, 3, 4, 5 and 6" in freeze)
+    check("claim freeze names Part 1 as the sole reversal",
+          "Part 1 is the sole reversal" in freeze)
+    body8 = section(draft, "## 8. Development and Robustness Evidence")
+    check("manuscript states the same preserved parts",
+          "preserved in categories 2, 3, 4, 5 and 6" in body8)
+    check("manuscript names the single reversal",
+          "sole reversal" in body8)
+
+    # --- development values are the locked strings, not recomputed ---------
+    dev = {(r["model_family"], r["scope"]): r for r in csv.DictReader(
+        (ROOT.parent / "project/stage126/stage126_m1_development_metrics.csv"
+         ).open(encoding="utf-8"))}
+    for family in ("regularized_logistic_regression", "random_forest", "xgboost"):
+        value = dev[(family, "pooled_development_oof")]["pr_auc"]
+        check(f"pooled development PR-AUC quoted verbatim for {family}",
+              value in body8, value)
+
+    # --- reporting guideline is adapted, not claimed as compliance ---------
+    if "TRIPOD" in draft:
+        check("TRIPOD is invoked via the verified 2024 update",
+              "collins2024" in draft and "TRIPOD+AI" in draft)
+        check("TRIPOD use is described as an adapted checklist",
+              "adapted" in low and "checklist" in low)
+        check("no formal TRIPOD compliance is claimed",
+              "no claim of formal tripod+ai compliance is made" in low)
+
+    # --- human-only metadata is carried as placeholders --------------------
+    for item in ("Authors and author order", "Affiliations and corresponding",
+                 "Funding", "Conflicts of interest",
+                 "Ethics and data-governance", "Data-access mechanism"):
+        check(f"human-only placeholder present: {item}", item in draft)
+    check("placeholders are marked, not invented",
+          draft.count("*[TO BE COMPLETED") >= 6)
+
+    # --- Jalali labels are kept and explained, never converted -------------
+    check("Jalali year labels are retained", "1393" in draft and "1400" in draft)
+    check("the calendar choice is explained rather than converted",
+          "Jalali (Solar Hijri)" in draft and "fiscal year-end" in low)
 
     print(f"checks run: {checks_run}")
     if failures:
