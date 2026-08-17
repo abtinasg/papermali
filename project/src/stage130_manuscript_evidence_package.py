@@ -723,8 +723,11 @@ def build_package(repo_root: Path | str = REPO_ROOT) -> dict[str, bytes]:
                 MODEL_REL, PREP_REL, THRESHOLD_REL, DEV_METRICS_REL,
                 ROBUST_SYNTH_REL, SPLIT_CONTRACT_REL))
         },
+        # The pinned SHA-256 of the Final Test package manifest itself. This
+        # must be a digest, not an identifier: it is the value the field name
+        # promises, and it must agree with `source_sha256` for the same file.
         "final_test_package_manifest_sha256_at_source":
-            ft_manifest.get("action_id"),
+            _sha256(_guarded_open(root, FT_MANIFEST_REL)),
         "legacy_outputs_status": {LEGACY_DIR_REL: LEGACY_STATUS},
         "package_files": {
             name: {"sha256": _sha256(data), "bytes": len(data)}

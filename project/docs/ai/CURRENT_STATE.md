@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `9d9580ecdd5271206462314972be41e48a59b0f4`
-- **Generated from commit:** `9d9580ecdd5271206462314972be41e48a59b0f4` (branch `stage130-manuscript-evidence-package`, informational)
+- **Last stage commit:** `2a818d893c1f8121893e1191aa0f62b558575c23`
+- **Generated from commit:** `2a818d893c1f8121893e1191aa0f62b558575c23` (branch `stage130-manuscript-evidence-package`, informational)
 - **Baseline:** `origin/main` @ `02af8c56235f70f4ec45f0dad15e4ad3aebf7a21`
 
 ## Current-state validation
@@ -334,7 +334,8 @@ _A governance act, not an inference and not an execution. The block and the algo
 - ⚖️ **Basis:** `HUMAN_DECISION_BASED_ON_PRELOCKED_DEVELOPMENT_EVIDENCE` — human governance decision = True, paper winner selected = True.
 - ❗ **NOT an inferential result:** inferential superiority claimed = False, tested superiority = False, Holm result = False, statistical proof = False, used a Holm result = False.
 - 🔒 **Configuration was pre-locked, not chosen here:** pre-locked before this decision = True, selected by this decision = False.
-- ⛔ **Selected is not fitted:** full-development refit performed = True, trained final-model artifact created = True, Stage130 started = True.
+- ⛔ **Selected is not fitted:** full-development refit performed = True, trained final-model artifact created = True, Stage130 started = False.
+- 🕒 **Temporal scope:** Historical action: Stage130 had not started and no Stage130 scientific execution was authorized. Live state now: Stage130 Phase 1 presentation has started; Stage130 scientific execution remains false.
 - 📄 **M2 keeps its role:** `intermediate_confirmatory_block` — declared statistically failed = False, M2 predictive superiority claim supported = False. Not being selected is not a statistical failure.
 - 📄 **Not-selected algorithms keep their standing:** ['random_forest', 'xgboost'] — status `NOT_SELECTED_BY_HUMAN_DECISION_ONLY`, declared rejected = False, declared statistically inferior = False.
 - ⛔ **Holm family preserved, never executed:** status `HOLM_NOT_EXECUTED_FAMILY_PRESERVED_NO_INFERENCE`, family `['M2_minus_M1', 'M3_CBI_minus_M2', 'M4_minus_M3_CBI']`, complete = False, adjustment executed = False, any hypothesis resolved = False, new p-values = 0.
@@ -371,7 +372,8 @@ _The one-time contracted refit. Exactly one model fitted, on the development win
 - 🔁 **Preprocessing re-estimated on this fit set only:** True — nothing carried over from a development fold. Pipeline reused, not reimplemented = True.
 - 🛡️ **Fail-closed controls:** 12 evaluated, all passed = True.
 - ⛔ **No new science:** new scientific result produced = False, predictions generated = 0, inferential superiority claimed = False. The locked primary development results are unchanged.
-- ⛔ **Final Test firewall held:** locked True, rows read 0, access authorized False, Stage130 started True.
+- ⛔ **Final Test firewall held:** locked True, rows read 0, access authorized False, Stage130 started False.
+- 🕒 **Temporal scope:** Historical action: Stage130 had not started and no Stage130 scientific execution was authorized. Live state now: Stage130 Phase 1 presentation has started; Stage130 scientific execution remains false.
 - ➡️ **Next action:** `human_authorization_required_for_final_test_access` — authorized = False. Applying this model to the Final Test needs a separate human authorization.
 - Package: `project/stage129/full_development_refit_execution/`; interpretation: `project/stage129/full_development_refit_execution/README_STAGE129_FULL_DEVELOPMENT_REFIT_EXECUTION.md`
 
@@ -390,7 +392,8 @@ _The one-time contracted Final Test pass. The held-out years ۱۴۰۰–۱۴۰۲
 - ⛔ **No recalibration, no inference:** recalibration executions = 0, probabilities raw = True, inferential superiority claimed = False. The locked primary development results are byte-identical.
 - 🔓 **Firewall status:** `SPENT_BY_AUTHORIZED_SINGLE_PASS` — rows read 346, evaluation performed True. The one-action PRE01 authorization was CONSUMED by this pass, so access authorized is back to False and the Final Test is shut again (locked = True). Second pass authorized = False: it may never be opened again, and no result here may reopen model selection.
 - 🧾 **Current state vs historical fact:** the contract is single-use and its authorization is spent, so NOW `stage129_final_test_contract_fully_executable` = False and `stage129_threshold_usable_for_final_test` = False (`SINGLE_USE_CONTRACT_ALREADY_EXECUTED_AUTHORIZATION_CONSUMED`) — not because a prerequisite is missing. That every precondition WAS resolved before access is preserved separately: preconditions resolved before access = True, contract was fully executable at the authorized pass = True, threshold was usable in the authorized pass = True, authorization consumed = True.
-- ➡️ **Next action:** `human_authorization_required_for_ready_for_review_and_merge` — authorized = False. Stage130 started = True, Stage130 authorized = False.
+- ➡️ **Next action:** `human_authorization_required_for_ready_for_review_and_merge` — authorized = False. Stage130 started = False, Stage130 authorized = False.
+- 🕒 **Temporal scope:** Historical action: Stage130 had not started and no Stage130 scientific execution was authorized. Live state now: Stage130 Phase 1 presentation has started; Stage130 scientific execution remains false.
 - Package: `project/stage129/final_test_execution/`; executor: `project/src/stage129_final_test_execution.py`
 
 ### Stage130 Phase 1 — manuscript evidence package (presentation only)
@@ -453,5 +456,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `a5f4bc17b4f8bb5ac9e978a15e0c705eddc9cdc509493affa5ab66be1d5de21c`_
-_generated_at_utc: 2026-08-17T11:16:14Z (informational)_
+_state_fingerprint: `c1eff23135ab2d762e90c71e6bb9f97992eae73101f00bb858aa7531c0182822`_
+_generated_at_utc: 2026-08-17T11:30:42Z (informational)_

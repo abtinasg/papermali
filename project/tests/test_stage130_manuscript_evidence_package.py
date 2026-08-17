@@ -525,3 +525,74 @@ def test_no_narrative_claims_all_nine_or_only_two_missingness_terms():
         assert "all nine missingness" not in text, path.name
         assert "only two missingness" not in text, path.name
         assert "two missingness indicators are non-zero" not in text, path.name
+
+# --------------------------------------------------------------------------- #
+# 9. Manifest field types, and the historical/live Stage130 temporal boundary
+# --------------------------------------------------------------------------- #
+
+#: The Final Test package manifest's own pinned digest.
+FT_PACKAGE_MANIFEST_SHA256 = (
+    "0ac59f9bef0fc984b78b3398a8ffe022906a07953db236331c892b8d6b73c4c9")
+
+
+def test_final_test_package_manifest_field_is_a_real_sha256():
+    """The field name promises a digest; an action ID would contradict it."""
+    import re
+    man = json.loads((PKG_DIR / "manifest.json").read_text(encoding="utf-8"))
+    value = man["final_test_package_manifest_sha256_at_source"]
+    assert isinstance(value, str)
+    assert re.fullmatch(r"[0-9a-f]{64}", value), value
+    assert value == FT_PACKAGE_MANIFEST_SHA256
+    assert value == man["source_sha256"][pkg.FT_MANIFEST_REL]
+
+
+def test_no_manifest_sha256_field_holds_a_non_digest():
+    import re
+    man = json.loads((PKG_DIR / "manifest.json").read_text(encoding="utf-8"))
+    for key, value in man.items():
+        if key.endswith("_sha256") and isinstance(value, str):
+            assert re.fullmatch(r"[0-9a-f]{64}", value), (key, value)
+
+
+def _current_state() -> str:
+    return (REPO_ROOT / "project/docs/ai/CURRENT_STATE.md").read_text(
+        encoding="utf-8")
+
+
+def test_historical_stage129_sections_never_show_stage130_as_started():
+    """The live `stage130_started = True` must not be read back into history.
+
+    Every Stage129 section describes an action that ran BEFORE Stage130 Phase 1
+    existed. Rendering today's live value there would assert something false
+    about those actions.
+    """
+    text = _current_state()
+    start = text.index("## Stage129")  if "## Stage129" in text else 0
+    end = text.index("### Stage130 Phase 1")
+    historical = text[start:end]
+    assert "Stage130 started = True" not in historical
+    assert "Stage130 started True" not in historical
+
+
+def test_every_historical_stage130_line_carries_the_temporal_scope_note():
+    text = _current_state()
+    end = text.index("### Stage130 Phase 1")
+    historical = text[:end]
+    note = ("Historical action: Stage130 had not started and no Stage130 "
+            "scientific execution was authorized. Live state now: Stage130 "
+            "Phase 1 presentation has started; Stage130 scientific execution "
+            "remains false.")
+    mentions = [ln for ln in historical.splitlines()
+                if "Stage130 started" in ln]
+    assert mentions, "expected historical Stage130 lines"
+    for line in mentions:
+        assert "= False" in line or "False" in line, line
+    assert historical.count(note) >= 3, historical.count(note)
+
+
+def test_the_live_stage130_section_still_reports_the_started_phase():
+    """History is scoped, but the LIVE section must not hide the true state."""
+    text = _current_state()
+    live = text[text.index("### Stage130 Phase 1"):]
+    assert "Phase 1 started:** True" in live
+    assert "Stage130 scientific execution started:** False" in live

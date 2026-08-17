@@ -1353,6 +1353,19 @@ _FIREWALL_STOOD_EVALUATION_PERFORMED = False
 _FIREWALL_STOOD_VALUES_INSPECTED = False
 _FIREWALL_STOOD_ROWS_READ = 0
 
+#: Stage130 had NOT started while any Stage129 action ran, and no Stage130
+#: scientific execution was authorized. Stage130 Phase 1 (a presentation-only
+#: package) began later, which legitimately flipped the live `stage130_started`
+#: marker. Historical sections therefore pin the value that was true of THEIR
+#: moment and carry the note below, so a reader never mistakes today's live
+#: state for the state those earlier actions ran under.
+_STAGE130_STOOD_STARTED = False
+_STAGE130_HISTORICAL_NOTE = (
+    "Historical action: Stage130 had not started and no Stage130 scientific "
+    "execution was authorized. Live state now: Stage130 Phase 1 presentation "
+    "has started; Stage130 scientific execution remains false."
+)
+
 
 # --------------------------------------------------------------------------- #
 # ROADMAP front matter
@@ -6132,7 +6145,8 @@ def render_current_state(record: dict) -> str:
             f"{record.get('full_development_refit_performed')}, trained "
             "final-model artifact created = "
             f"{record.get('trained_final_model_artifact_created')}, Stage130 "
-            f"started = {record.get('stage130_started')}.",
+            f"started = {_STAGE130_STOOD_STARTED}.",
+            f"- 🕒 **Temporal scope:** {_STAGE130_HISTORICAL_NOTE}",
             "- 📄 **M2 keeps its role:** "
             f"`{record.get('stage129_final_selection_m2_role_preserved')}` — "
             "declared statistically failed = "
@@ -6291,7 +6305,8 @@ def render_current_state(record: dict) -> str:
             f"read {record.get('stage129_refit_execution_final_test_rows_read')}"
             ", access authorized "
             f"{_FIREWALL_STOOD_ACCESS_AUTHORIZED}, Stage130 started "
-            f"{record.get('stage130_started')}.",
+            f"{_STAGE130_STOOD_STARTED}.",
+            f"- 🕒 **Temporal scope:** {_STAGE130_HISTORICAL_NOTE}",
             "- ➡️ **Next action:** "
             f"`{record.get('stage129_refit_execution_next_action_id')}` — "
             "authorized = "
@@ -6401,8 +6416,9 @@ def render_current_state(record: dict) -> str:
             "authorized = "
             f"{record.get('stage129_final_test_next_action_authorized')}. "
             "Stage130 started = "
-            f"{record.get('stage130_started')}, Stage130 authorized = "
+            f"{_STAGE130_STOOD_STARTED}, Stage130 authorized = "
             f"{record.get('stage129_final_test_stage130_authorized')}.",
+            f"- 🕒 **Temporal scope:** {_STAGE130_HISTORICAL_NOTE}",
             "- Package: `project/stage129/final_test_execution/`; executor: "
             "`project/src/stage129_final_test_execution.py`",
             "",
