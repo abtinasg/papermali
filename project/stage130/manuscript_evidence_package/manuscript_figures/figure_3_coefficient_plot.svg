@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 492" width="700" height="492" font-family="Helvetica,Arial,sans-serif">
+<text x="20" y="30" font-size="16" font-weight="bold">Locked logistic coefficients (model term order)</text>
+<text x="20" y="50" font-size="11">Regularized conditional associations on the log-odds scale. No confidence interval exists.</text>
+<text x="16" y="87" font-size="11">log_total_assets</text>
+<rect x="319.7177" y="76" width="60.2823" height="14" fill="#4f81bd"/>
+<text x="16" y="109" font-size="11">leverage_ratio</text>
+<rect x="380.0000" y="98" width="204.9527" height="14" fill="#c0504d"/>
+<text x="16" y="131" font-size="11">current_ratio</text>
+<rect x="380.0000" y="120" width="42.4502" height="14" fill="#c0504d"/>
+<text x="16" y="153" font-size="11">roa_period_adjusted</text>
+<rect x="262.1367" y="142" width="117.8633" height="14" fill="#4f81bd"/>
+<text x="16" y="175" font-size="11">ocf_to_assets_period_adjusted</text>
+<rect x="228.5607" y="164" width="151.4393" height="14" fill="#4f81bd"/>
+<text x="16" y="197" font-size="11">asset_turnover_period_adjusted</text>
+<rect x="380.0000" y="186" width="24.9660" height="14" fill="#c0504d"/>
+<text x="16" y="219" font-size="11">operating_margin_period_adjusted</text>
+<rect x="380.0000" y="208" width="56.5201" height="14" fill="#c0504d"/>
+<text x="16" y="241" font-size="11">financial_expense_to_assets_period_adjusted</text>
+<rect x="344.1190" y="230" width="35.8810" height="14" fill="#4f81bd"/>
+<text x="16" y="263" font-size="11">accumulated_loss_to_capital_ratio</text>
+<rect x="380.0000" y="252" width="250.0000" height="14" fill="#c0504d"/>
+<text x="16" y="285" font-size="11">log_total_assets__missing</text>
+<rect x="380.0000" y="274" width="0.0000" height="14" fill="#c0504d"/>
+<text x="16" y="307" font-size="11">leverage_ratio__missing</text>
+<rect x="380.0000" y="296" width="0.0000" height="14" fill="#c0504d"/>
+<text x="16" y="329" font-size="11">current_ratio__missing</text>
+<rect x="380.0000" y="318" width="0.0000" height="14" fill="#c0504d"/>
+<text x="16" y="351" font-size="11">roa_period_adjusted__missing</text>
+<rect x="380.0000" y="340" width="0.0000" height="14" fill="#c0504d"/>
+<text x="16" y="373" font-size="11">ocf_to_assets_period_adjusted__missing</text>
+<rect x="380.0000" y="362" width="65.4869" height="14" fill="#c0504d"/>
+<text x="16" y="395" font-size="11">asset_turnover_period_adjusted__missing</text>
+<rect x="380.0000" y="384" width="0.0000" height="14" fill="#c0504d"/>
+<text x="16" y="417" font-size="11">operating_margin_period_adjusted__missing</text>
+<rect x="349.2812" y="406" width="30.7188" height="14" fill="#4f81bd"/>
+<text x="16" y="439" font-size="11">financial_expense_to_assets_period_adjusted__missing</text>
+<rect x="373.9187" y="428" width="6.0813" height="14" fill="#4f81bd"/>
+<text x="16" y="461" font-size="11">accumulated_loss_to_capital_ratio__missing</text>
+<rect x="380.0000" y="450" width="0.0000" height="14" fill="#c0504d"/>
+<line x1="380" y1="70" x2="380" y2="472" stroke="#333" stroke-width="1"/>
+</svg>

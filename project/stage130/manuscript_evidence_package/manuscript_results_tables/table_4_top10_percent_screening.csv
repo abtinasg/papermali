@@ -1,0 +1,13 @@
+item,N_y_or_value,K_y,captured_positives,source_artifact
+definition,K_y = ceil(0.10 * N_y),,,project/stage129/final_test_execution/stage129_final_test_metrics.json
+fraction,0.1,,,project/stage129/final_test_execution/stage129_final_test_metrics.json
+target_year_1400,112,12,3,project/stage129/final_test_execution/stage129_final_test_metrics.json
+target_year_1401,116,12,4,project/stage129/final_test_execution/stage129_final_test_metrics.json
+target_year_1402,118,12,1,project/stage129/final_test_execution/stage129_final_test_metrics.json
+pooled_selected_rows,36,,,project/stage129/final_test_execution/stage129_final_test_metrics.json
+pooled_captured_positives,8,,,project/stage129/final_test_execution/stage129_final_test_metrics.json
+pooled_total_positives,12,,,project/stage129/final_test_execution/stage129_final_test_metrics.json
+pooled_precision_among_selected,0.2222222222222222,,,project/stage129/final_test_execution/stage129_final_test_metrics.json
+K_optimized_after_results,false,,,project/stage129/final_test_execution/stage129_final_test_metrics.json
+Recall@10%_point_estimate_no_interval,0.666666666667,,,project/stage129/final_test_execution/stage129_final_test_metrics.json
+Lift@10%_point_estimate_no_interval,6.407407407407,,,project/stage129/final_test_execution/stage129_final_test_metrics.json

@@ -1,0 +1,108 @@
+{
+  "action_id": "stage130-manuscript-evidence-package",
+  "artifact": "stage130_manuscript_evidence_package_manifest",
+  "authoritative_value_sources": {
+    "admitted_threshold": "project/stage129/threshold_derivation_attempt3/stage129_threshold_value_attempt3.json",
+    "development_metrics": "project/stage126/stage126_m1_development_metrics.csv",
+    "final_test_aggregate_metrics": "project/stage129/final_test_execution/stage129_final_test_metrics.json",
+    "final_test_manifest": "project/stage129/final_test_execution/metadata_and_hashes_stage129_final_test_execution.json",
+    "final_test_provenance": "project/stage129/final_test_execution/stage129_final_test_provenance_record.json",
+    "final_test_qc": "project/stage129/final_test_execution/stage129_final_test_qc_report.json",
+    "locked_model": "project/stage129/full_development_refit_execution/stage129_full_development_refit_model.json",
+    "locked_preprocessing": "project/stage129/full_development_refit_execution/stage129_full_development_refit_preprocessing_parameters.json",
+    "robustness_closure": "project/stage126/stage126_m1_robustness_closure_synthesis_record.json",
+    "temporal_split_contract": "project/stage125/part4_temporal_split_contract_stage125.json"
+  },
+  "base_commit": "02af8c56235f70f4ec45f0dad15e4ad3aebf7a21",
+  "final_test_package_manifest_sha256_at_source": "stage129-final-test-execution",
+  "final_test_prediction_artifact_opened": false,
+  "final_test_rows_read_by_this_action": 0,
+  "legacy_outputs_status": {
+    "project/outputs/09_report": "LEGACY_STAGE123_NONCANONICAL_DO_NOT_CITE"
+  },
+  "merge_authorized": false,
+  "models_fitted_or_refitted": 0,
+  "new_bootstrap_replicates": 0,
+  "new_confidence_intervals_computed": 0,
+  "new_metrics_computed": 0,
+  "new_scientific_analysis_performed": false,
+  "only_deterministic_transformation_applied": "exp(beta) on locked coefficients",
+  "p_values_computed": 0,
+  "package_files": {
+    "README.md": {
+      "bytes": 2452,
+      "sha256": "229ad97f8265af156317b918242b3b67ae7e5283a517274a96540f2a7edacb3f"
+    },
+    "legacy_outputs_supersession.md": {
+      "bytes": 1942,
+      "sha256": "8fb39d04c4d8790518f4ebe35288e6ced477303b376daa0e74cea77a52981d4d"
+    },
+    "manuscript_claim_freeze.md": {
+      "bytes": 7954,
+      "sha256": "58a4a4225ee47e974df9beb910310e1aa78137e01791c76652ba3283925c9d92"
+    },
+    "manuscript_figures/figure_1_study_timeline_and_leakage_safe_design.svg": {
+      "bytes": 1940,
+      "sha256": "7afa9f4cdd17cd354ed4c272b8f954d61f2637b7c325b062b48d1495ac5724bb"
+    },
+    "manuscript_figures/figure_2_model_development_workflow.svg": {
+      "bytes": 1791,
+      "sha256": "7e70e625d9dc15f9b60fed4b9d157ea21e5d4b49e398931867d7c9e1ae434188"
+    },
+    "manuscript_figures/figure_3_coefficient_plot.svg": {
+      "bytes": 3073,
+      "sha256": "82794cdce242c15cbf0b244cc98e83017187460ce126b95be50f6f4d8e4ada49"
+    },
+    "manuscript_results_tables/table_1_cohort_and_temporal_design.csv": {
+      "bytes": 1837,
+      "sha256": "07717076b90b32af2e586ab687d45e4d86b24c008cc6fdba33a4b6dfcb7924e2"
+    },
+    "manuscript_results_tables/table_2_final_test_aggregate_performance.csv": {
+      "bytes": 722,
+      "sha256": "674bc56e001bf86619a2bfea8c476554b7df64a927a6491ec347d69ee5ee3020"
+    },
+    "manuscript_results_tables/table_3_operating_point_confusion_matrix.csv": {
+      "bytes": 896,
+      "sha256": "80acdc7f1fb28a36de12e8bf0e8a3f5d98f45160e8ddb04fa953fcc32fa10767"
+    },
+    "manuscript_results_tables/table_4_top10_percent_screening.csv": {
+      "bytes": 1317,
+      "sha256": "15856e82e51acadc15c7f1d8223e014258f06855c610a5388c889f6df08a4ca2"
+    },
+    "manuscript_results_tables/table_5_robustness_and_block_dispositions.csv": {
+      "bytes": 736,
+      "sha256": "a9fe60a843add0e505e2031b3709e5d8a48bfb939af281265e977a2086d8f46b"
+    },
+    "manuscript_results_tables/table_6_model_coefficients_and_odds_ratios.csv": {
+      "bytes": 3431,
+      "sha256": "bc0c6495c6d0261f0b4ab7bc6498b8337f7b9df0b5a7b84753de8e8026832577"
+    },
+    "table_model_coefficients_and_odds_ratios.csv": {
+      "bytes": 3431,
+      "sha256": "bc0c6495c6d0261f0b4ab7bc6498b8337f7b9df0b5a7b84753de8e8026832577"
+    }
+  },
+  "phase": "stage130_phase1_manuscript_evidence_package_and_claim_freeze",
+  "prohibited_sources_never_opened": [
+    "project/stage129/final_test_execution/stage129_final_test_predictions.json",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv",
+    "project/stage125/part4_temporal_split_manifest_stage125.csv"
+  ],
+  "ready_for_review_authorized": false,
+  "shap_executions": 0,
+  "source_sha256": {
+    "project/stage125/part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
+    "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
+    "project/stage126/stage126_m1_robustness_closure_synthesis_record.json": "fdf8c585e6f4c38a066feec6f90094a2b6d50867ffac290195f40b9ce616846a",
+    "project/stage129/final_test_execution/metadata_and_hashes_stage129_final_test_execution.json": "0ac59f9bef0fc984b78b3398a8ffe022906a07953db236331c892b8d6b73c4c9",
+    "project/stage129/final_test_execution/stage129_final_test_metrics.json": "0b1ea6c086430d6ecc65432c8001cc3b028422e7c1293a9ea2fb6c44d7ef4392",
+    "project/stage129/final_test_execution/stage129_final_test_provenance_record.json": "5b5d4d66ed4ca0770667547752c0436380c8960f0d5296f62bda83b3fa80c551",
+    "project/stage129/final_test_execution/stage129_final_test_qc_report.json": "016eaa19149a9247574e13931e9aae4a10fede26316a63f1321a6643c96ad9f5",
+    "project/stage129/full_development_refit_execution/stage129_full_development_refit_model.json": "48faab1ef186206508385713fb3b885a88a55bb072fb586d56e63d2777c97690",
+    "project/stage129/full_development_refit_execution/stage129_full_development_refit_preprocessing_parameters.json": "862c65ec37082be1e3e95c29d2bf8873df9105e90cc43ce1ecac4fd8901ba9f6",
+    "project/stage129/threshold_derivation_attempt3/stage129_threshold_value_attempt3.json": "9b8a7d799616eb12d6e70a6dcf623ff1a636b4ec4b1bde37c21116252876b534"
+  },
+  "stage130_scientific_execution_started": false,
+  "thresholds_derived": 0
+}

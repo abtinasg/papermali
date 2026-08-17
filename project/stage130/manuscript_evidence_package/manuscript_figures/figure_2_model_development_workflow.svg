@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 402" width="660" height="402" font-family="Helvetica,Arial,sans-serif">
+<text x="20" y="30" font-size="16" font-weight="bold">Model development and evaluation workflow</text>
+<rect x="40" y="60" width="560" height="32" fill="#d7e3f4" stroke="#333"/>
+<text x="52" y="81" font-size="13">Leakage-safe dataset (Stage125)</text>
+<line x1="320" y1="92" x2="320" y2="106" stroke="#333" stroke-width="2"/>
+<rect x="40" y="106" width="560" height="32" fill="#d7e3f4" stroke="#333"/>
+<text x="52" y="127" font-size="13">Temporal folds — development only</text>
+<line x1="320" y1="138" x2="320" y2="152" stroke="#333" stroke-width="2"/>
+<rect x="40" y="152" width="560" height="32" fill="#d7e3f4" stroke="#333"/>
+<text x="52" y="173" font-size="13">Model tuning (Stage126, development OOF)</text>
+<line x1="320" y1="184" x2="320" y2="198" stroke="#333" stroke-width="2"/>
+<rect x="40" y="198" width="560" height="32" fill="#d7e3f4" stroke="#333"/>
+<text x="52" y="219" font-size="13">Robustness — 6 pre-registered categories</text>
+<line x1="320" y1="230" x2="320" y2="244" stroke="#333" stroke-width="2"/>
+<rect x="40" y="244" width="560" height="32" fill="#d7e3f4" stroke="#333"/>
+<text x="52" y="265" font-size="13">Full-development refit (PR #90)</text>
+<line x1="320" y1="276" x2="320" y2="290" stroke="#333" stroke-width="2"/>
+<rect x="40" y="290" width="560" height="32" fill="#d7e3f4" stroke="#333"/>
+<text x="52" y="311" font-size="13">Threshold from development OOF (PR #95)</text>
+<line x1="320" y1="322" x2="320" y2="336" stroke="#333" stroke-width="2"/>
+<rect x="40" y="336" width="560" height="32" fill="#f6dcc8" stroke="#333"/>
+<text x="52" y="357" font-size="13">Final Test — one pre-registered pass (PR #96)</text>
+</svg>

@@ -1,0 +1,17 @@
+item,value,source_artifact
+development_target_years,1393-1399,project/stage125/part4_temporal_split_contract_stage125.json
+final_test_target_years,1400-1402,project/stage125/part4_temporal_split_contract_stage125.json
+temporal_validation_fold_1,"{""train_target_years"": [1393, 1394, 1395], ""validation_target_years"": [1396, 1397]}",project/stage125/part4_temporal_split_contract_stage125.json
+temporal_validation_fold_2,"{""train_target_years"": [1393, 1394, 1395, 1396, 1397], ""validation_target_years"": [1398, 1399]}",project/stage125/part4_temporal_split_contract_stage125.json
+split_variable,target_year,project/stage125/part4_temporal_split_contract_stage125.json
+random_split_authorized,false,project/stage125/part4_temporal_split_contract_stage125.json
+shuffle_authorized,false,project/stage125/part4_temporal_split_contract_stage125.json
+development_fit_set_rows,666,project/stage129/full_development_refit_execution/stage129_full_development_refit_model.json
+development_fit_set_positive,68,project/stage129/full_development_refit_execution/stage129_full_development_refit_model.json
+development_fit_set_negative,598,project/stage129/full_development_refit_execution/stage129_full_development_refit_model.json
+final_test_cohort_pairs,346,project/stage129/final_test_execution/stage129_final_test_provenance_record.json
+final_test_evaluable_rows,346,project/stage129/final_test_execution/stage129_final_test_metrics.json
+final_test_positive,12,project/stage129/final_test_execution/stage129_final_test_metrics.json
+final_test_negative,334,project/stage129/final_test_execution/stage129_final_test_metrics.json
+final_test_unique_tickers,119,project/stage129/final_test_execution/stage129_final_test_metrics.json
+final_test_prevalence,0.03468208092485549,project/stage129/final_test_execution/stage129_final_test_metrics.json
