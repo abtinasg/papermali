@@ -387,3 +387,141 @@ def test_no_figure_is_a_performance_curve():
                    "decision_curve", "net_benefit"):
         assert not any(banned in n.lower() for n in names), banned
     assert len(names) == 3
+
+# --------------------------------------------------------------------------- #
+# 7. Stage130 has STARTED as a programme phase; its SCIENCE has not
+# --------------------------------------------------------------------------- #
+
+def _state() -> dict:
+    return json.loads(
+        (REPO_ROOT / "project/docs/ai/handoff_state.json").read_text(
+            encoding="utf-8"))
+
+
+def _roadmap_front_matter() -> dict:
+    import re
+    text = (REPO_ROOT / "project/docs/ai/ROADMAP.md").read_text(encoding="utf-8")
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", text, re.DOTALL)
+    assert m
+    fm = {}
+    for line in m.group(1).splitlines():
+        if ":" in line and not line.strip().startswith("#"):
+            k, _, v = line.partition(":")
+            fm[k.strip()] = v.strip()
+    return fm
+
+
+def test_live_state_says_the_stage130_programme_phase_has_started():
+    state = _state()
+    assert state["stage130_started"] is True
+    assert state["stage130_phase1_started"] is True
+    assert state["stage130_phase1_completed"] is True
+    assert state["stage130_phase1_presentation_only"] is True
+
+
+def test_live_state_says_stage130_scientific_execution_has_not_started():
+    """The whole point of the distinction: a package is not a scientific stage."""
+    state = _state()
+    assert state["stage130_scientific_execution_started"] is False
+    assert state["stage130_phase1_new_scientific_analysis_performed"] is False
+    assert state["stage130_authorized"] is False
+    for field in ("stage130_phase1_final_test_rows_read",
+                  "stage130_phase1_shap_executions",
+                  "stage130_phase1_new_metrics_computed",
+                  "stage130_phase1_new_confidence_intervals_computed",
+                  "stage130_phase1_thresholds_derived",
+                  "stage130_phase1_models_fitted_or_refitted"):
+        assert state[field] == 0, field
+    assert state["stage130_phase1_prediction_artifact_opened"] is False
+
+
+def test_the_two_stage130_markers_are_not_collapsed_into_one():
+    state = _state()
+    assert state["stage130_started"] != \
+        state["stage130_scientific_execution_started"]
+
+
+def test_roadmap_front_matter_agrees_with_the_live_handoff():
+    """A key added to the ROADMAP but absent from the generated state is a lie."""
+    fm, state = _roadmap_front_matter(), _state()
+    pairs = {
+        "stage130_started": True,
+        "stage130_phase1_started": True,
+        "stage130_phase1_completed": True,
+        "stage130_scientific_execution_started": False,
+    }
+    for key, want in pairs.items():
+        assert key in fm, f"ROADMAP front matter missing {key}"
+        assert fm[key] == str(want).lower(), key
+        assert state[key] is want, key
+
+
+def test_current_state_renders_the_stage130_phase1_distinction():
+    text = (REPO_ROOT / "project/docs/ai/CURRENT_STATE.md").read_text(
+        encoding="utf-8")
+    assert "Stage130 Phase 1" in text
+    assert "Stage130 scientific execution started:** False" in text
+
+
+def test_historical_stage129_stage130_markers_are_unchanged():
+    """Earlier actions said stage130 had not started. That stays true of them."""
+    state = _state()
+    assert state["stage129_audit_stage130_started"] is False
+    assert state["stage129_final_test_stage130_authorized"] is False
+    assert state["stage129_refit_stage130_authorized"] is False
+
+
+# --------------------------------------------------------------------------- #
+# 8. Corrected wording and the missingness facts
+# --------------------------------------------------------------------------- #
+
+def _flat(name: str) -> str:
+    """Markdown wraps; compare on whitespace-normalized text."""
+    import re
+    return re.sub(r"\s+", " ", (PKG_DIR / name).read_text(encoding="utf-8"))
+
+
+def test_roc_auc_limitation_uses_the_corrected_wording():
+    flat = _flat("manuscript_claim_freeze.md")
+    assert ("under severe class imbalance, ROC-AUC is less informative about "
+            "positive-class retrieval and must be interpreted alongside the "
+            "pre-specified primary PR-AUC") in flat
+    assert "optimistic under a low" not in flat
+
+
+def test_roc_auc_overclaim_wording_stays_prohibited():
+    text = (PKG_DIR / "manuscript_claim_freeze.md").read_text(encoding="utf-8")
+    assert "may not be" in text or "Prohibited overclaim" in text
+    assert "superiority" in text
+    assert "leading the abstract with ROC-AUC" in text
+
+
+def test_missingness_indicator_counts_are_exactly_six_zero_and_three_nonzero():
+    rows = [r for r in _rows("table_model_coefficients_and_odds_ratios.csv")
+            if r["term_type"] == "binary_missingness_indicator"]
+    assert len(rows) == 9
+    zero = [r["term"] for r in rows if float(r["coefficient_beta"]) == 0.0]
+    nonzero = [r["term"] for r in rows if float(r["coefficient_beta"]) != 0.0]
+    assert len(zero) == 6, zero
+    assert sorted(nonzero) == sorted([
+        "ocf_to_assets_period_adjusted__missing",
+        "operating_margin_period_adjusted__missing",
+        "financial_expense_to_assets_period_adjusted__missing",
+    ]), nonzero
+
+
+def test_narrative_states_the_missingness_pattern_descriptively():
+    for name in ("manuscript_claim_freeze.md", "README.md"):
+        flat = _flat(name)
+        assert ("Six of the nine missingness-indicator coefficients are exactly "
+                "zero in the locked model; three are non-zero") in flat, name
+        assert ("does not establish statistical significance or a general claim "
+                "that missingness is informative") in flat, name
+
+
+def test_no_narrative_claims_all_nine_or_only_two_missingness_terms():
+    for path in sorted(PKG_DIR.rglob("*.md")):
+        text = path.read_text(encoding="utf-8").lower()
+        assert "all nine missingness" not in text, path.name
+        assert "only two missingness" not in text, path.name
+        assert "two missingness indicators are non-zero" not in text, path.name

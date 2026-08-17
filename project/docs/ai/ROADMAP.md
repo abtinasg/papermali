@@ -56,7 +56,10 @@ final_model_eligibility_audit_next_action_authorized: false
 paper_winner_selected: true
 final_model_selected: false
 full_development_refit_performed: false
-stage130_started: false
+stage130_started: true
+stage130_phase1_started: true
+stage130_phase1_completed: true
+stage130_scientific_execution_started: false
 final_selection_action_id: stage129-final-model-human-selection-governance
 final_development_block_selected: true
 final_development_block: M1

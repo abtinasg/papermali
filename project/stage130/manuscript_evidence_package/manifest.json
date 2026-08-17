@@ -30,16 +30,16 @@
   "p_values_computed": 0,
   "package_files": {
     "README.md": {
-      "bytes": 2452,
-      "sha256": "229ad97f8265af156317b918242b3b67ae7e5283a517274a96540f2a7edacb3f"
+      "bytes": 2899,
+      "sha256": "712bd3d4ba4faf3d974c08d384a5134196e96bc087e5318763ec9cfb86ee47a0"
     },
     "legacy_outputs_supersession.md": {
       "bytes": 1942,
       "sha256": "8fb39d04c4d8790518f4ebe35288e6ced477303b376daa0e74cea77a52981d4d"
     },
     "manuscript_claim_freeze.md": {
-      "bytes": 7954,
-      "sha256": "58a4a4225ee47e974df9beb910310e1aa78137e01791c76652ba3283925c9d92"
+      "bytes": 8278,
+      "sha256": "99399069a29f26837a2b48a1044fb3ed37224260a90d1664d290e42f0ba7c372"
     },
     "manuscript_figures/figure_1_study_timeline_and_leakage_safe_design.svg": {
       "bytes": 1940,

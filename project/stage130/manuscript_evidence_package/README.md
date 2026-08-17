@@ -35,6 +35,14 @@ error, p-value or significance marker is present, because none exists in the
 locked artifact. All effects are **regularized conditional associations**, never
 causal.
 
+**Missingness indicators — descriptive fact only.** Six of the nine
+missingness-indicator coefficients are exactly zero in the locked model; three
+are non-zero (`ocf_to_assets_period_adjusted__missing`,
+`operating_margin_period_adjusted__missing`,
+`financial_expense_to_assets_period_adjusted__missing`). This pattern is
+reported descriptively and does not establish statistical significance or a
+general claim that missingness is informative.
+
 ## Figures
 
 Only schematics and a coefficient plot. ROC, precision-recall, calibration,

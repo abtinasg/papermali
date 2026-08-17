@@ -350,7 +350,14 @@ def test_no_stage130_and_no_holm_change(boundary, state):
     assert boundary["holm_family_complete"] is False
     assert boundary["holm_reporting_status"] == (
         "HOLM_NOT_EXECUTED_FAMILY_PRESERVED_NO_INFERENCE")
-    assert state["stage130_started"] is False
+    # MOVED from a live global proxy to an action-scoped historical fact.
+    # `stage130_started` is now True in the live Handoff, because the
+    # Stage130 Phase 1 manuscript evidence package exists. That happened
+    # AFTER this action, and Phase 1 is PRESENTATION only. What this
+    # action guarantees -- that no Stage130 SCIENTIFIC execution has
+    # begun -- is asserted here instead, and its own artifacts above
+    # still pin `stage130_started = False` for its own moment.
+    assert state["stage130_scientific_execution_started"] is False
     assert state["holm_family_complete"] is False
     assert state["stage129_final_holm_reporting_status"] == (
         "HOLM_NOT_EXECUTED_FAMILY_PRESERVED_NO_INFERENCE")

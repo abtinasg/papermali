@@ -45,8 +45,9 @@ comparator is permitted anywhere in the manuscript.
   "outstanding" or any synonym applied to ROC-AUC; any use of ROC-AUC as
   evidence of superiority; leading the abstract with ROC-AUC in place of the
   primary metric.
-* **Mandatory accompanying limitation:** ROC-AUC is optimistic under a low
-  event rate; PR-AUC is the pre-registered primary metric.
+* **Mandatory accompanying limitation:** under severe class imbalance,
+  ROC-AUC is less informative about positive-class retrieval and must be
+  interpreted alongside the pre-specified primary PR-AUC.
 
 ## C3 — Brier score
 
@@ -113,7 +114,11 @@ comparator is permitted anywhere in the manuscript.
   significance marks; confidence intervals or p-values on any coefficient;
   reordering terms by magnitude.
 * **Mandatory accompanying limitation:** coefficients are penalized (L2,
-  C = 0.1) and conditional on the remaining terms.
+  C = 0.1) and conditional on the remaining terms. Six of the nine
+  missingness-indicator coefficients are exactly zero in the locked model;
+  three are non-zero. This pattern is reported descriptively and does not
+  establish statistical significance or a general claim that missingness is
+  informative.
 
 ## C8 — Sample size and precision
 

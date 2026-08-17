@@ -399,7 +399,14 @@ def test_locking_the_contract_authorizes_nothing(contract, boundary, state,
     assert boundary["full_development_refit_executed"] is False
     assert boundary["full_development_refit_performed"] is False
     assert boundary["trained_final_model_artifact_created"] is False
-    assert state["stage130_started"] is False
+    # MOVED from a live global proxy to an action-scoped historical fact.
+    # `stage130_started` is now True in the live Handoff, because the
+    # Stage130 Phase 1 manuscript evidence package exists. That happened
+    # AFTER this action, and Phase 1 is PRESENTATION only. What this
+    # action guarantees -- that no Stage130 SCIENTIFIC execution has
+    # begun -- is asserted here instead, and its own artifacts above
+    # still pin `stage130_started = False` for its own moment.
+    assert state["stage130_scientific_execution_started"] is False
     # MOVED from a live global proxy to the action-scoped historical fact, as
     # above: locking read nothing, and the later authorized pass is not this
     # action's doing.

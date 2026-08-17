@@ -514,7 +514,14 @@ def test_no_refit_stage130_or_final_test_is_executed_or_authorized(
         assert boundary[field] is False, field
     # ACTION-SCOPED above; the still-true global facts below.
     assert state["next_research_action_authorized"] is False
-    assert state["stage130_started"] is False
+    # MOVED from a live global proxy to an action-scoped historical fact.
+    # `stage130_started` is now True in the live Handoff, because the
+    # Stage130 Phase 1 manuscript evidence package exists. That happened
+    # AFTER this action, and Phase 1 is PRESENTATION only. What this
+    # action guarantees -- that no Stage130 SCIENTIFIC execution has
+    # begun -- is asserted here instead, and its own artifacts above
+    # still pin `stage130_started = False` for its own moment.
+    assert state["stage130_scientific_execution_started"] is False
     # MOVED from a live global proxy to an action-scoped historical fact. The
     # live `final_test_rows_read` is 346 since the separately authorized
     # Stage129 Final Test pass, which happened AFTER this audit. What this
@@ -525,7 +532,11 @@ def test_no_refit_stage130_or_final_test_is_executed_or_authorized(
     # And the live surface must still refuse a second pass.
     assert state["final_test_access_authorized"] is False
     assert state["final_test_second_pass_authorized"] is False
-    assert roadmap_front_matter["stage130_started"] == "false"
+    # MOVED, as above: the live ROADMAP front matter now records the
+    # started Stage130 PRESENTATION phase, so the scientific pointer is
+    # what this action guarantees.
+    assert roadmap_front_matter[
+        "stage130_scientific_execution_started"] == "false"
     assert roadmap_front_matter["next_research_action_authorized"] == "false"
 
 
