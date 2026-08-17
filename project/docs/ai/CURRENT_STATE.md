@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `2a818d893c1f8121893e1191aa0f62b558575c23`
-- **Generated from commit:** `2a818d893c1f8121893e1191aa0f62b558575c23` (branch `stage130-manuscript-evidence-package`, informational)
-- **Baseline:** `origin/main` @ `02af8c56235f70f4ec45f0dad15e4ad3aebf7a21`
+- **Last stage commit:** `3440e37264d41c74f7808dc861c068018140850b`
+- **Generated from commit:** `388d0ff83cec7100156cfea1b1d4288942c29ecf` (branch `stage130-phase1-handoff-pointer-repair`, informational)
+- **Baseline:** `origin/main` @ `388d0ff83cec7100156cfea1b1d4288942c29ecf`
 
 ## Current-state validation
 
@@ -456,5 +456,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `c1eff23135ab2d762e90c71e6bb9f97992eae73101f00bb858aa7531c0182822`_
-_generated_at_utc: 2026-08-17T11:30:42Z (informational)_
+_state_fingerprint: `437e89746c97015cef5580c24aec4ac333b408ac3a7c39d27a559c29c8b575ae`_
+_generated_at_utc: 2026-08-17T12:38:37Z (informational)_
