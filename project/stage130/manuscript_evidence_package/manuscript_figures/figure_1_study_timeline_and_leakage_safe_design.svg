@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 245" width="720" height="245" font-family="Helvetica,Arial,sans-serif">
+<text x="20" y="30" font-size="16" font-weight="bold">Study timeline and leakage-safe temporal design</text>
+<rect x="60" y="70" width="54" height="40" fill="#d7e3f4" stroke="#333"/>
+<text x="68" y="95" font-size="13">1393</text>
+<rect x="120" y="70" width="54" height="40" fill="#d7e3f4" stroke="#333"/>
+<text x="128" y="95" font-size="13">1394</text>
+<rect x="180" y="70" width="54" height="40" fill="#d7e3f4" stroke="#333"/>
+<text x="188" y="95" font-size="13">1395</text>
+<rect x="240" y="70" width="54" height="40" fill="#d7e3f4" stroke="#333"/>
+<text x="248" y="95" font-size="13">1396</text>
+<rect x="300" y="70" width="54" height="40" fill="#d7e3f4" stroke="#333"/>
+<text x="308" y="95" font-size="13">1397</text>
+<rect x="360" y="70" width="54" height="40" fill="#d7e3f4" stroke="#333"/>
+<text x="368" y="95" font-size="13">1398</text>
+<rect x="420" y="70" width="54" height="40" fill="#d7e3f4" stroke="#333"/>
+<text x="428" y="95" font-size="13">1399</text>
+<rect x="480" y="70" width="54" height="40" fill="#f6dcc8" stroke="#333"/>
+<text x="488" y="95" font-size="13">1400</text>
+<rect x="540" y="70" width="54" height="40" fill="#f6dcc8" stroke="#333"/>
+<text x="548" y="95" font-size="13">1401</text>
+<rect x="600" y="70" width="54" height="40" fill="#f6dcc8" stroke="#333"/>
+<text x="608" y="95" font-size="13">1402</text>
+<text x="60" y="135" font-size="12">Development 1393–1399</text>
+<text x="480" y="135" font-size="12">Final Test 1400–1402 (opened once)</text>
+<text x="20" y="175" font-size="12">Fold 1 — train [1393, 1394, 1395] → validate [1396, 1397]</text>
+<text x="20" y="197" font-size="12">Fold 2 — train [1393, 1394, 1395, 1396, 1397] → validate [1398, 1399]</text>
+<text x="20" y="225" font-size="12">Forward-chaining only: no shuffling, no random split.</text>
+</svg>

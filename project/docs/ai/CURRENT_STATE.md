@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage128_m3i2_final_official_documentary_recovery`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-decision-required`
-- **Last stage commit:** `4cdc3d4286ada549d3a157449ef344207c98685f`
-- **Generated from commit:** `46bd12960c4d950a66f6e5f50b1378c700c2d3f1` (branch `stage129-final-test-execution`, informational)
-- **Baseline:** `origin/main` @ `bc1baa11eb94999af8a60cd2f266628b8c78db68`
+- **Last stage commit:** `2a818d893c1f8121893e1191aa0f62b558575c23`
+- **Generated from commit:** `2a818d893c1f8121893e1191aa0f62b558575c23` (branch `stage130-manuscript-evidence-package`, informational)
+- **Baseline:** `origin/main` @ `02af8c56235f70f4ec45f0dad15e4ad3aebf7a21`
 
 ## Current-state validation
 
@@ -335,6 +335,7 @@ _A governance act, not an inference and not an execution. The block and the algo
 - ❗ **NOT an inferential result:** inferential superiority claimed = False, tested superiority = False, Holm result = False, statistical proof = False, used a Holm result = False.
 - 🔒 **Configuration was pre-locked, not chosen here:** pre-locked before this decision = True, selected by this decision = False.
 - ⛔ **Selected is not fitted:** full-development refit performed = True, trained final-model artifact created = True, Stage130 started = False.
+- 🕒 **Temporal scope:** Historical action: Stage130 had not started and no Stage130 scientific execution was authorized. Live state now: Stage130 Phase 1 presentation has started; Stage130 scientific execution remains false.
 - 📄 **M2 keeps its role:** `intermediate_confirmatory_block` — declared statistically failed = False, M2 predictive superiority claim supported = False. Not being selected is not a statistical failure.
 - 📄 **Not-selected algorithms keep their standing:** ['random_forest', 'xgboost'] — status `NOT_SELECTED_BY_HUMAN_DECISION_ONLY`, declared rejected = False, declared statistically inferior = False.
 - ⛔ **Holm family preserved, never executed:** status `HOLM_NOT_EXECUTED_FAMILY_PRESERVED_NO_INFERENCE`, family `['M2_minus_M1', 'M3_CBI_minus_M2', 'M4_minus_M3_CBI']`, complete = False, adjustment executed = False, any hypothesis resolved = False, new p-values = 0.
@@ -372,6 +373,7 @@ _The one-time contracted refit. Exactly one model fitted, on the development win
 - 🛡️ **Fail-closed controls:** 12 evaluated, all passed = True.
 - ⛔ **No new science:** new scientific result produced = False, predictions generated = 0, inferential superiority claimed = False. The locked primary development results are unchanged.
 - ⛔ **Final Test firewall held:** locked True, rows read 0, access authorized False, Stage130 started False.
+- 🕒 **Temporal scope:** Historical action: Stage130 had not started and no Stage130 scientific execution was authorized. Live state now: Stage130 Phase 1 presentation has started; Stage130 scientific execution remains false.
 - ➡️ **Next action:** `human_authorization_required_for_final_test_access` — authorized = False. Applying this model to the Final Test needs a separate human authorization.
 - Package: `project/stage129/full_development_refit_execution/`; interpretation: `project/stage129/full_development_refit_execution/README_STAGE129_FULL_DEVELOPMENT_REFIT_EXECUTION.md`
 
@@ -391,7 +393,19 @@ _The one-time contracted Final Test pass. The held-out years ۱۴۰۰–۱۴۰۲
 - 🔓 **Firewall status:** `SPENT_BY_AUTHORIZED_SINGLE_PASS` — rows read 346, evaluation performed True. The one-action PRE01 authorization was CONSUMED by this pass, so access authorized is back to False and the Final Test is shut again (locked = True). Second pass authorized = False: it may never be opened again, and no result here may reopen model selection.
 - 🧾 **Current state vs historical fact:** the contract is single-use and its authorization is spent, so NOW `stage129_final_test_contract_fully_executable` = False and `stage129_threshold_usable_for_final_test` = False (`SINGLE_USE_CONTRACT_ALREADY_EXECUTED_AUTHORIZATION_CONSUMED`) — not because a prerequisite is missing. That every precondition WAS resolved before access is preserved separately: preconditions resolved before access = True, contract was fully executable at the authorized pass = True, threshold was usable in the authorized pass = True, authorization consumed = True.
 - ➡️ **Next action:** `human_authorization_required_for_ready_for_review_and_merge` — authorized = False. Stage130 started = False, Stage130 authorized = False.
+- 🕒 **Temporal scope:** Historical action: Stage130 had not started and no Stage130 scientific execution was authorized. Live state now: Stage130 Phase 1 presentation has started; Stage130 scientific execution remains false.
 - Package: `project/stage129/final_test_execution/`; executor: `project/src/stage129_final_test_execution.py`
+
+### Stage130 Phase 1 — manuscript evidence package (presentation only)
+
+_The programme phase has started; Stage130 SCIENTIFIC execution has not. Phase 1 re-displays already-committed aggregate evidence and freezes manuscript claims. It computed nothing._
+
+- ✅ **Phase 1 started:** True — completed = True, presentation only = True, package files = 13.
+- 🔬 **Stage130 scientific execution started:** False — new scientific analysis performed = False. These two are deliberately distinct: a presentation package is not a scientific stage.
+- ⛔ **Final Test untouched by Phase 1:** rows read = 0, prediction artifact opened = False, SHAP = 0, new metrics = 0, new CIs = 0, thresholds derived = 0, models fitted = 0.
+- 🗂️ **Legacy report tree:** `LEGACY_STAGE123_NONCANONICAL_DO_NOT_CITE` — the Stage123-era outputs are preserved byte-identical and may not be cited.
+- ➡️ **Next action:** `human_authorization_required_for_manuscript_assembly` — authorized = False. Stage130 authorized = False.
+- Package: `project/stage130/manuscript_evidence_package/`; generator: `project/src/stage130_manuscript_evidence_package.py`
 
 ### Last completed scientific micro-part QC
 
@@ -442,5 +456,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `113eaf583266d83c98cd9e57acdf500c7329da20090bf97fee86d24ed62bfb46`_
-_generated_at_utc: 2026-08-16T18:39:11Z (informational)_
+_state_fingerprint: `c1eff23135ab2d762e90c71e6bb9f97992eae73101f00bb858aa7531c0182822`_
+_generated_at_utc: 2026-08-17T11:30:42Z (informational)_

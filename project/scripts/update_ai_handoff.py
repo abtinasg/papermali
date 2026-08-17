@@ -1353,6 +1353,19 @@ _FIREWALL_STOOD_EVALUATION_PERFORMED = False
 _FIREWALL_STOOD_VALUES_INSPECTED = False
 _FIREWALL_STOOD_ROWS_READ = 0
 
+#: Stage130 had NOT started while any Stage129 action ran, and no Stage130
+#: scientific execution was authorized. Stage130 Phase 1 (a presentation-only
+#: package) began later, which legitimately flipped the live `stage130_started`
+#: marker. Historical sections therefore pin the value that was true of THEIR
+#: moment and carry the note below, so a reader never mistakes today's live
+#: state for the state those earlier actions ran under.
+_STAGE130_STOOD_STARTED = False
+_STAGE130_HISTORICAL_NOTE = (
+    "Historical action: Stage130 had not started and no Stage130 scientific "
+    "execution was authorized. Live state now: Stage130 Phase 1 presentation "
+    "has started; Stage130 scientific execution remains false."
+)
+
 
 # --------------------------------------------------------------------------- #
 # ROADMAP front matter
@@ -3074,6 +3087,13 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # word on those keys -- and it re-hashes its own outputs and the
         # frozen executor, so a result edited after the fact fails the build.
         **derive_stage129_final_test_execution_markers(root),
+        # Must come last of ALL: Stage130 Phase 1. Every action above published
+        # `stage130_started = False`, which was true when each ran. The
+        # manuscript evidence package now exists, so the PROGRAMME phase has
+        # started and this action owns that live key -- while keeping
+        # `stage130_scientific_execution_started` False, because Phase 1
+        # computed nothing.
+        **derive_stage130_phase1_markers(root),
         }))
 
 
@@ -6125,7 +6145,8 @@ def render_current_state(record: dict) -> str:
             f"{record.get('full_development_refit_performed')}, trained "
             "final-model artifact created = "
             f"{record.get('trained_final_model_artifact_created')}, Stage130 "
-            f"started = {record.get('stage130_started')}.",
+            f"started = {_STAGE130_STOOD_STARTED}.",
+            f"- 🕒 **Temporal scope:** {_STAGE130_HISTORICAL_NOTE}",
             "- 📄 **M2 keeps its role:** "
             f"`{record.get('stage129_final_selection_m2_role_preserved')}` — "
             "declared statistically failed = "
@@ -6284,7 +6305,8 @@ def render_current_state(record: dict) -> str:
             f"read {record.get('stage129_refit_execution_final_test_rows_read')}"
             ", access authorized "
             f"{_FIREWALL_STOOD_ACCESS_AUTHORIZED}, Stage130 started "
-            f"{record.get('stage130_started')}.",
+            f"{_STAGE130_STOOD_STARTED}.",
+            f"- 🕒 **Temporal scope:** {_STAGE130_HISTORICAL_NOTE}",
             "- ➡️ **Next action:** "
             f"`{record.get('stage129_refit_execution_next_action_id')}` — "
             "authorized = "
@@ -6394,10 +6416,51 @@ def render_current_state(record: dict) -> str:
             "authorized = "
             f"{record.get('stage129_final_test_next_action_authorized')}. "
             "Stage130 started = "
-            f"{record.get('stage130_started')}, Stage130 authorized = "
+            f"{_STAGE130_STOOD_STARTED}, Stage130 authorized = "
             f"{record.get('stage129_final_test_stage130_authorized')}.",
+            f"- 🕒 **Temporal scope:** {_STAGE130_HISTORICAL_NOTE}",
             "- Package: `project/stage129/final_test_execution/`; executor: "
             "`project/src/stage129_final_test_execution.py`",
+            "",
+        ]
+    if record.get("stage130_phase1_recorded"):
+        lines += [
+            "### Stage130 Phase 1 — manuscript evidence package (presentation "
+            "only)\n",
+            "_The programme phase has started; Stage130 SCIENTIFIC execution "
+            "has not. Phase 1 re-displays already-committed aggregate evidence "
+            "and freezes manuscript claims. It computed nothing._\n",
+            "- ✅ **Phase 1 started:** "
+            f"{record.get('stage130_phase1_started')} — completed = "
+            f"{record.get('stage130_phase1_completed')}, presentation only = "
+            f"{record.get('stage130_phase1_presentation_only')}, package files "
+            f"= {record.get('stage130_phase1_package_file_count')}.",
+            "- 🔬 **Stage130 scientific execution started:** "
+            f"{record.get('stage130_scientific_execution_started')} — new "
+            "scientific analysis performed = "
+            f"{record.get('stage130_phase1_new_scientific_analysis_performed')}"
+            ". These two are deliberately distinct: a presentation package is "
+            "not a scientific stage.",
+            "- ⛔ **Final Test untouched by Phase 1:** rows read = "
+            f"{record.get('stage130_phase1_final_test_rows_read')}, prediction "
+            "artifact opened = "
+            f"{record.get('stage130_phase1_prediction_artifact_opened')}, SHAP "
+            f"= {record.get('stage130_phase1_shap_executions')}, new metrics = "
+            f"{record.get('stage130_phase1_new_metrics_computed')}, new CIs = "
+            f"{record.get('stage130_phase1_new_confidence_intervals_computed')}"
+            ", thresholds derived = "
+            f"{record.get('stage130_phase1_thresholds_derived')}, models "
+            f"fitted = {record.get('stage130_phase1_models_fitted_or_refitted')}.",
+            "- 🗂️ **Legacy report tree:** "
+            f"`{record.get('stage130_phase1_legacy_outputs_status')}` — the "
+            "Stage123-era outputs are preserved byte-identical and may not be "
+            "cited.",
+            "- ➡️ **Next action:** "
+            f"`{record.get('stage130_phase1_next_action_id')}` — authorized = "
+            f"{record.get('stage130_phase1_next_action_authorized')}. Stage130 "
+            f"authorized = {record.get('stage130_authorized')}.",
+            "- Package: `project/stage130/manuscript_evidence_package/`; "
+            "generator: `project/src/stage130_manuscript_evidence_package.py`",
             "",
         ]
     lines += [
@@ -16940,6 +17003,109 @@ def derive_stage129_final_test_execution_markers(root: str) -> dict:
         "stage129_final_test_ready_for_review_authorized": False,
         "stage129_final_test_next_action_id": _STAGE129_FT_EXEC_NEXT_ACTION_ID,
         "stage129_final_test_next_action_authorized": False,
+    }
+
+
+_STAGE130_P1_PKG = "project/stage130/manuscript_evidence_package"
+_STAGE130_P1_ACTION_ID = "stage130-manuscript-evidence-package"
+_STAGE130_P1_MANIFEST_REL = f"{_STAGE130_P1_PKG}/manifest.json"
+_STAGE130_P1_NEXT_ACTION_ID = (
+    "human_authorization_required_for_manuscript_assembly")
+
+
+def derive_stage130_phase1_markers(root: str) -> dict:
+    """Recognize Stage130 Phase 1 -- the manuscript evidence package.
+
+    Must be registered LAST. Stage130 has objectively STARTED as a programme
+    phase: its canonical evidence package exists on disk. The live
+    `stage130_started` marker must therefore say so, and every earlier action
+    published False only because that was true when it ran -- those statements
+    are action-scoped history and are asserted against each action's own
+    artifact, never against this live key.
+
+    The distinction this function exists to protect is between:
+
+      * `stage130_started` / `stage130_phase1_started` -- the PROGRAMME phase
+        began, because a presentation-only package was produced; and
+      * `stage130_scientific_execution_started` -- FALSE, because Phase 1
+        computed no metric, interval, replicate, p-value, threshold or model.
+
+    Fails closed if the package ever claims to have performed new analysis,
+    read a Final Test row, or opened the row-level prediction artifact.
+    Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE130_P1_MANIFEST_REL)
+    if not os.path.isfile(path):
+        return {}
+    man = _require_json_artifact(root, _STAGE130_P1_MANIFEST_REL)
+    if man.get("action_id") != _STAGE130_P1_ACTION_ID:
+        raise HandoffError("Stage130 Phase 1 manifest action_id mismatch")
+
+    # Presentation only. Any of these turning non-zero means Phase 1 stopped
+    # being a presentation action and the marker set below would be a lie.
+    if man.get("new_scientific_analysis_performed") is not False:
+        raise HandoffError(
+            "Stage130 Phase 1 must not report new scientific analysis")
+    if man.get("final_test_prediction_artifact_opened") is not False:
+        raise HandoffError(
+            "Stage130 Phase 1 must not open the prediction artifact")
+    for field in ("final_test_rows_read_by_this_action", "shap_executions",
+                  "new_metrics_computed", "new_confidence_intervals_computed",
+                  "new_bootstrap_replicates", "p_values_computed",
+                  "thresholds_derived", "models_fitted_or_refitted"):
+        if man.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 Phase 1 counter {field} must be 0, got "
+                f"{man.get(field)!r}")
+    if man.get("stage130_scientific_execution_started") is not False:
+        raise HandoffError(
+            "Stage130 Phase 1 may not start Stage130 scientific execution")
+
+    # The package is byte-intact against its own manifest.
+    listed = man.get("package_files") or {}
+    if not listed:
+        raise HandoffError("Stage130 Phase 1 manifest lists no package files")
+    for name, want in listed.items():
+        fp = os.path.join(root, _STAGE130_P1_PKG, name)
+        if not os.path.isfile(fp):
+            raise HandoffError(f"Stage130 Phase 1 file missing: {name}")
+        with open(fp, "rb") as fh:
+            raw = fh.read()
+        if hashlib.sha256(raw).hexdigest() != want.get("sha256") or \
+                len(raw) != want.get("bytes"):
+            raise HandoffError(
+                f"Stage130 Phase 1 file drifted from its manifest: {name}")
+
+    return {
+        "stage130_phase1_recorded": True,
+        "stage130_phase1_action_id": _STAGE130_P1_ACTION_ID,
+
+        # The programme phase HAS started -- the package exists.
+        "stage130_started": True,
+        "stage130_phase1_started": True,
+        "stage130_phase1_completed": True,
+        "stage130_phase1_presentation_only": True,
+
+        # ...and the SCIENTIFIC stage has not. These two must never be
+        # collapsed into one another.
+        "stage130_scientific_execution_started": False,
+        "stage130_phase1_new_scientific_analysis_performed": False,
+        "stage130_phase1_final_test_rows_read": 0,
+        "stage130_phase1_prediction_artifact_opened": False,
+        "stage130_phase1_shap_executions": 0,
+        "stage130_phase1_new_metrics_computed": 0,
+        "stage130_phase1_new_confidence_intervals_computed": 0,
+        "stage130_phase1_thresholds_derived": 0,
+        "stage130_phase1_models_fitted_or_refitted": 0,
+
+        "stage130_phase1_legacy_outputs_status":
+            "LEGACY_STAGE123_NONCANONICAL_DO_NOT_CITE",
+        "stage130_phase1_package_file_count": len(listed),
+        "stage130_phase1_next_action_id": _STAGE130_P1_NEXT_ACTION_ID,
+        "stage130_phase1_next_action_authorized": False,
+        "stage130_authorized": False,
+        "stage130_phase1_ready_for_review_authorized": False,
+        "stage130_phase1_merge_authorized": False,
     }
 
 

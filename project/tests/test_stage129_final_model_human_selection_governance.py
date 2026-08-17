@@ -66,7 +66,10 @@ REQUIRED_STATE = {
     # recorded and this decision set neither. They are LIVE flags now owned by
     # the separately authorized Stage129 refit execution, so they are asserted
     # action-scoped below rather than pinned globally here.
-    "stage130_started": False,
+    # MOVED: the live `stage130_started` now reports the started
+    # Stage130 PRESENTATION phase; this selection guarantees only that
+    # no Stage130 scientific execution has begun.
+    "stage130_scientific_execution_started": False,
     "final_test_access_authorized": False,
     "final_test_locked": True,
     "final_test_second_pass_authorized": False,
@@ -210,7 +213,14 @@ def test_nothing_was_fitted_and_no_artifact_was_produced(decision, boundary,
     assert decision["full_development_refit_performed"] is False
     assert decision["trained_final_model_artifact_created"] is False
     assert boundary["full_development_refit_performed"] is False
-    assert state["stage130_started"] is False
+    # MOVED from a live global proxy to an action-scoped historical fact.
+    # `stage130_started` is now True in the live Handoff, because the
+    # Stage130 Phase 1 manuscript evidence package exists. That happened
+    # AFTER this action, and Phase 1 is PRESENTATION only. What this
+    # action guarantees -- that no Stage130 SCIENTIFIC execution has
+    # begun -- is asserted here instead, and its own artifacts above
+    # still pin `stage130_started = False` for its own moment.
+    assert state["stage130_scientific_execution_started"] is False
     # MOVED from a live global proxy to an action-scoped historical fact. The
     # live `final_test_rows_read` is 346 since the separately authorized
     # Stage129 Final Test pass, which happened AFTER this selection. The
@@ -219,7 +229,11 @@ def test_nothing_was_fitted_and_no_artifact_was_produced(decision, boundary,
     assert state["final_test_prior_to_authorized_pass_rows_read"] == 0
     assert roadmap_front_matter["full_development_refit_performed"] == "false"
     assert roadmap_front_matter["trained_final_model_artifact_created"] == "false"
-    assert roadmap_front_matter["stage130_started"] == "false"
+    # MOVED, as above: the live ROADMAP front matter now records the
+    # started Stage130 PRESENTATION phase, so the scientific pointer is
+    # what this action guarantees.
+    assert roadmap_front_matter[
+        "stage130_scientific_execution_started"] == "false"
     assert boundary["counters"]["trained_model_artifacts_written"] == 0
     assert boundary["counters"]["model_fits"] == 0
 

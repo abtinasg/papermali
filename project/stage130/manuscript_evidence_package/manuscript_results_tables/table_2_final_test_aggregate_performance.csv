@@ -1,0 +1,6 @@
+metric,role,value,ci_lower_95,ci_upper_95,interval_available,source_artifact
+PR-AUC,primary,0.243879669979,0.053272572767,0.541675572242,true,project/stage129/final_test_execution/stage129_final_test_metrics.json
+ROC-AUC,secondary,0.907684630739,0.787834897749,0.97144045144,true,project/stage129/final_test_execution/stage129_final_test_metrics.json
+Brier_score,secondary,0.071625345916,0.053164118058,0.092580775647,true,project/stage129/final_test_execution/stage129_final_test_metrics.json
+Recall@10%,secondary,0.666666666667,,,false,project/stage129/final_test_execution/stage129_final_test_metrics.json
+Lift@10%,secondary,6.407407407407,,,false,project/stage129/final_test_execution/stage129_final_test_metrics.json

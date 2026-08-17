@@ -476,7 +476,14 @@ def test_no_final_model_winner_refit_or_stage130(boundary, state):
     # nothing this action could open has been opened, then or since
     # ACTION-SCOPED: this decision fitted nothing; its own boundary says so.
     assert boundary["full_development_refit_executed"] is False
-    assert state["stage130_started"] is False
+    # MOVED from a live global proxy to an action-scoped historical fact.
+    # `stage130_started` is now True in the live Handoff, because the
+    # Stage130 Phase 1 manuscript evidence package exists. That happened
+    # AFTER this action, and Phase 1 is PRESENTATION only. What this
+    # action guarantees -- that no Stage130 SCIENTIFIC execution has
+    # begun -- is asserted here instead, and its own artifacts above
+    # still pin `stage130_started = False` for its own moment.
+    assert state["stage130_scientific_execution_started"] is False
     # MOVED from a live global proxy to action-scoped historical facts. The
     # live `final_test_rows_read` is 346 since the separately authorized
     # Stage129 Final Test pass, which happened AFTER this action. This
