@@ -1277,7 +1277,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     state = _state(REAL_ROOT)
     # `current_stage` is a CURRENT-state field and advanced with the freeze;
     # the Stage126 label survives in the separate micro-part QC role.
-    assert state["current_stage"] == "Stage128"
+    assert state["current_stage"] == "Stage130"
     assert state["selected_qc_scope"].startswith("stage126")
     # The newest completed robustness micro-part supplies the selected QC.
     # Part 6 closes the six-category robustness set, so the research-action
@@ -1305,7 +1305,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # waiting period early (2026-08-08) and frozen M3-LAG-WDI's final
     # disposition as supplementary/exploratory only; both pointer chains now
     # converge on the same human-decision-required state.
-    assert state["next_research_action_id"] == "human-decision-required"
+    assert state["next_research_action_id"] == "human-manuscript-review"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -1316,12 +1316,14 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # M3 Gate. `stage128_m2_d2_boundary_month_equity_return` is now
     # predecessor context and `stage126_m1_financial_baseline` remains correct
     # HISTORY for the completed M1 baseline workstream — neither is current.
-    # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
-    # as the live workstream; the Gate is now predecessor context.
+    # The Stage130 Phase 2 manuscript has since succeeded the whole Stage128
+    # chain as the live workstream; the documentary-recovery workstream is now
+    # predecessor context. The Stage128 labels remain correct HISTORY for the
+    # actions that published them and are asserted against their own artifacts.
     assert state["active_workstream"] == (
-        "stage128_m3i2_final_official_documentary_recovery")
+        "stage130_phase2_manuscript_assembly_human_review")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m3i2_official_source_evidence_capture"
+        "stage128_m3i2_final_official_documentary_recovery"
     )
     # Stage126 M1 is human-authorized and started; development-fold modeling
     # occurred, while the final test remains fully locked.
@@ -1373,18 +1375,20 @@ def test_real_repo_roadmap_stage126_status_consistency():
         os.path.join(REAL_ROOT, "project/docs/ai/ROADMAP.md"), encoding="utf-8",
     ).read()
     fm = gen.read_roadmap(REAL_ROOT)
-    # The M3 macro data Gate has executed, so the live workstream is the Gate.
+    # The Stage130 Phase 2 manuscript is live, so the workstream has advanced
+    # out of the Stage128 chain and the recovery workstream is predecessor.
     assert fm["active_research_workstream_id"] == (
-        "stage128-m3i2-final-official-documentary-recovery")
+        "stage130-phase2-manuscript-assembly-human-review")
     assert fm["predecessor_research_workstream_id"] == (
-        "stage128-m3i2-official-source-evidence-capture"
+        "stage128-m3i2-final-official-documentary-recovery"
     )
     # The workstream label is derived from the frozen action and never
-    # substitutes for a research-action id.
+    # substitutes for a research-action id. The last completed action has since
+    # advanced to the Stage130 Phase 2 manuscript assembly.
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m3i2-track-a-waiting-termination-and-m3-disposition"
+        "stage130-phase2-manuscript-assembly"
     )
-    assert fm["next_research_action_id"] == "human-decision-required"
+    assert fm["next_research_action_id"] == "human-manuscript-review"
     # The Stage128 M2 D2 design freeze completed, and the canonical D2 Gate
     # re-run has since been EXECUTED under its own explicit one-action
     # authorization and PASSED data admission, so both pointers legitimately
@@ -1491,7 +1495,7 @@ def test_real_repo_open_tasks_stage126_markers_match_handoff():
         in open_tasks
     )
     assert state["active_workstream"] == (
-        "stage128_m3i2_final_official_documentary_recovery")
+        "stage130_phase2_manuscript_assembly_human_review")
     assert "Stage126 M1 human-authorized = true" in open_tasks
     assert "Stage126 started = true" in open_tasks
     assert "development modeling authorized = true" in open_tasks
@@ -2369,7 +2373,7 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # Track A waiting period and froze M3-LAG-WDI's final disposition
     # (2026-08-08); both pointer chains now converge on
     # `human-decision-required`.
-    assert state["next_research_action_id"] == "human-decision-required"
+    assert state["next_research_action_id"] == "human-manuscript-review"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2390,9 +2394,9 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage128_m3i2_final_official_documentary_recovery")
+        "stage130_phase2_manuscript_assembly_human_review")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m3i2_official_source_evidence_capture"
+        "stage128_m3i2_final_official_documentary_recovery"
     )
     # The micro-part pointer tracks the newest completed robustness micro-part.
     assert state["last_completed_micro_part"] == \
@@ -2404,7 +2408,7 @@ def test_robustness_decision_lock_preserves_primary_and_final_test_state():
     state = _state(REAL_ROOT)
     # `current_stage` is a CURRENT-state field and advanced with the freeze;
     # the Stage126 label survives in the separate micro-part QC role.
-    assert state["current_stage"] == "Stage128"
+    assert state["current_stage"] == "Stage130"
     assert state["selected_qc_scope"].startswith("stage126")
     assert state["m1_primary_development_tuning_completed"] is True
     assert state["final_test_unlocked"] is False
@@ -2730,7 +2734,7 @@ def test_part1_does_not_advance_research_pointers():
     # Track A waiting period and froze M3-LAG-WDI's final disposition
     # (2026-08-08); both pointer chains now converge on
     # `human-decision-required`.
-    assert state["next_research_action_id"] == "human-decision-required"
+    assert state["next_research_action_id"] == "human-manuscript-review"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2751,13 +2755,13 @@ def test_part1_does_not_advance_research_pointers():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage128_m3i2_final_official_documentary_recovery")
+        "stage130_phase2_manuscript_assembly_human_review")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m3i2_official_source_evidence_capture"
+        "stage128_m3i2_final_official_documentary_recovery"
     )
     # `current_stage` is a CURRENT-state field and advanced with the freeze;
     # the Stage126 label survives in the separate micro-part QC role.
-    assert state["current_stage"] == "Stage128"
+    assert state["current_stage"] == "Stage130"
     assert state["selected_qc_scope"].startswith("stage126")
 
 
@@ -2971,7 +2975,7 @@ def test_handoff_carries_live_vs_historical_test_boundary_markers():
     # Track A waiting period and froze M3-LAG-WDI's final disposition
     # (2026-08-08); both pointer chains now converge on
     # `human-decision-required`.
-    assert state["next_research_action_id"] == "human-decision-required"
+    assert state["next_research_action_id"] == "human-manuscript-review"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -3050,9 +3054,9 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage128_m3i2_final_official_documentary_recovery")
+        "stage130_phase2_manuscript_assembly_human_review")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m3i2_official_source_evidence_capture"
+        "stage128_m3i2_final_official_documentary_recovery"
     )
     # The human retained-block decision
     # (stage128-m2-retained-block-human-decision) has since been RECORDED
@@ -3069,7 +3073,7 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # Track A waiting period and froze M3-LAG-WDI's final disposition
     # (2026-08-08); both pointer chains now converge on
     # `human-decision-required`.
-    assert state["next_research_action_id"] == "human-decision-required"
+    assert state["next_research_action_id"] == "human-manuscript-review"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -3135,7 +3139,7 @@ def test_current_state_labels_micro_part_not_research_action():
     )
     assert (
         "- **Next research action:** "
-        "`human-decision-required`" in text
+        "`human-manuscript-review`" in text
     )
 
 
@@ -3242,12 +3246,12 @@ def test_active_workstream_identifies_the_m3_macro_gate():
     # The live label is the supplementary M3I-2 contract lock, which succeeded
     # the CBI M3 Gate; neither older label may be the CURRENT one.
     assert state["active_workstream"] == (
-        "stage128_m3i2_final_official_documentary_recovery")
+        "stage130_phase2_manuscript_assembly_human_review")
     assert state["active_workstream"] not in (
         "stage128_m2_d2_boundary_month_equity_return",
         "stage128_m3_macro_data_gate")
     assert state["active_workstream_predecessor_context"] == (
-        "stage128_m3i2_official_source_evidence_capture")
+        "stage128_m3i2_final_official_documentary_recovery")
 
 
 def test_m3_data_workstream_started_but_modeling_did_not():
@@ -3269,13 +3273,15 @@ def test_pointers_are_unchanged_because_the_gate_is_unresolved():
     CBI Gate's own successor was never created.
     """
     state = _handoff_state()
-    # The pointer has since advanced once more: the human supervisor
-    # voluntarily terminated the Track A waiting period and froze M3-LAG-WDI's
-    # final disposition (2026-08-08), which is its own separately recorded
-    # decision — not the CBI Gate's successor either.
+    # The pointer has since advanced twice more, each time through a different,
+    # separately recorded action: the Track A waiting-period termination and
+    # M3-LAG-WDI disposition (2026-08-08), and then the Stage130 Phase 2
+    # manuscript assembly. Neither is the CBI Gate's successor.
     assert state["last_completed_research_action_id"] == (
-        "stage128-m3i2-track-a-waiting-termination-and-m3-disposition")
-    assert state["next_research_action_id"] == "human-decision-required"
+        "stage130-phase2-manuscript-assembly")
+    assert state["last_completed_research_action_id"] != (
+        "stage128-m3-incremental-evaluation")
+    assert state["next_research_action_id"] == "human-manuscript-review"
     assert state["next_research_action_id"] != (
         "stage128-m3-incremental-evaluation")
     assert state["m3_macro_data_gate_human_review_required"] is True
@@ -3297,8 +3303,9 @@ def test_current_state_says_the_m3_gate_was_executed():
     assert "M3 macro DATA Gate" in text
     assert "**Executed:** True" in text
     assert "UNRESOLVED_M3_DATA_GATE" in text
+    # The M3 Gate section is history; the LIVE workstream is now Phase 2.
     assert ("**Active workstream:** "
-            "`stage128_m3i2_final_official_documentary_recovery`") in text
+            "`stage130_phase2_manuscript_assembly_human_review`") in text
 
 
 def test_current_state_cannot_both_assert_and_deny_gate_execution():
@@ -3313,9 +3320,9 @@ def test_roadmap_no_longer_labels_the_m3_gate_unauthorized_or_unstarted():
     text = _roadmap_text()
     front = text.split("---")[1]
     assert ("active_research_workstream_id: "
-            "stage128-m3i2-final-official-documentary-recovery") in front
+            "stage130-phase2-manuscript-assembly-human-review") in front
     assert ("predecessor_research_workstream_id: "
-            "stage128-m3i2-official-source-evidence-capture") in front
+            "stage128-m3i2-final-official-documentary-recovery") in front
     # the stale live-workstream label must not be the ACTIVE one
     assert ("active_research_workstream_id: "
             "stage128-m2-d2-boundary-month-equity-return") not in front
@@ -3686,7 +3693,7 @@ def test_current_state_renders_the_m3i2_contract_lock_section():
     pointers = [ln for ln in text.splitlines()
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1
-    assert "human-decision-required" in pointers[0]
+    assert "human-manuscript-review" in pointers[0]
 
 
 # --------------------------------------------------------------------------- #
@@ -4080,14 +4087,19 @@ def test_superseded_m3i2_claims_never_return_to_the_roadmap(claim):
 
 
 def test_roadmap_front_matter_pins_the_live_recovery_workstream():
+    """The live workstream is the Stage130 Phase 2 manuscript awaiting review.
+
+    The Stage128 documentary-recovery labels are retained as predecessor
+    context and as roadmap history, never deleted.
+    """
     fm = gen.read_roadmap(REAL_ROOT)
     assert fm["active_research_workstream_id"] == (
-        "stage128-m3i2-final-official-documentary-recovery")
+        "stage130-phase2-manuscript-assembly-human-review")
     assert fm["predecessor_research_workstream_id"] == (
-        "stage128-m3i2-official-source-evidence-capture")
+        "stage128-m3i2-final-official-documentary-recovery")
     assert fm["last_completed_research_action_id"] == (
-        "stage128-m3i2-track-a-waiting-termination-and-m3-disposition")
-    assert fm["next_research_action_id"] == "human-decision-required"
+        "stage130-phase2-manuscript-assembly")
+    assert fm["next_research_action_id"] == "human-manuscript-review"
     # the front-matter reader hands back the raw scalar; unauthorized either way
     assert fm["next_research_action_authorized"] in (False, "false")
 
@@ -4449,20 +4461,23 @@ def test_item_25e_is_historical_superseded_and_unauthorized():
         assert claim not in item, claim
 
 
-def test_the_current_next_pointer_is_human_decision_required_and_unauthorized():
-    """Both pointer chains converge on human-decision-required (2026-08-08).
+def test_the_current_next_pointer_is_human_manuscript_review_and_unauthorized():
+    """The live pointer is the Stage130 Phase 2 manuscript review.
 
-    The Track A waiting period was voluntarily terminated early and
-    M3-LAG-WDI's final disposition was frozen as supplementary/exploratory
-    only, superseding the earlier `...-response-ingestion` pointer (which
-    remains valid roadmap history) and confirming the already-exhausted
-    Track B sequence.
+    Both Stage128 pointer chains converged on `human-decision-required`
+    (2026-08-08), which was correct while the next step was genuinely
+    undetermined: the Track A waiting period had been voluntarily terminated
+    early and M3-LAG-WDI's disposition frozen as supplementary/exploratory
+    only. A committed Stage130 Phase 2 manuscript determines the next step —
+    a human must review the draft — so Phase 2 owns the live pointer. The
+    Track A statement remains true of the Track A action and is asserted
+    against its own artifact, not against this live key.
     """
     fm = gen.read_roadmap(REAL_ROOT)
-    assert fm["next_research_action_id"] == "human-decision-required"
+    assert fm["next_research_action_id"] == "human-manuscript-review"
     assert fm["next_research_action_authorized"] in (False, "false")
     state = _handoff_state()
-    assert state["next_research_action_id"] == "human-decision-required"
+    assert state["next_research_action_id"] == "human-manuscript-review"
     assert state["next_research_action_authorized"] is False
     assert state["next_research_action_pointer_is_not_authorization"] is True
 
@@ -4767,7 +4782,9 @@ def test_stage129_m4_is_recognized_by_the_full_handoff_build():
     assert record["stage129_m4_next_action_id"] == "human_decision_required"
     assert record["stage129_m4_next_action_authorized"] is False
     # Neither live research pointer chain is moved by either Stage129 action.
-    assert record["next_research_action_id"] == "human-decision-required"
+    # The live pointer itself has since advanced to the Stage130 Phase 2
+    # manuscript review; that is owned by Phase 2, not by any Stage129 action.
+    assert record["next_research_action_id"] == "human-manuscript-review"
     assert record["stage128_m3_lag_wdi_next_action_id"] == (
         "human_decision_required")
 
@@ -4912,3 +4929,135 @@ def test_stage129_m4_codal_identity_cannot_be_declared_resolved(tmp_path):
         with pytest.raises(gen.HandoffError):
             gen.derive_stage129_m4_governance_data_gate_contract_lock_markers(
                 root)
+
+
+# --------------------------------------------------------------------------- #
+# Stage130 Phase 2 — the manuscript exists, so the live state must say so
+# --------------------------------------------------------------------------- #
+
+_P2_DIR = os.path.join(REAL_ROOT, "project/stage130/manuscript")
+_P2_EXISTS = os.path.isfile(os.path.join(_P2_DIR, "manuscript_draft_en.md"))
+_needs_p2 = pytest.mark.skipif(
+    not _P2_EXISTS, reason="no Stage130 Phase 2 manuscript is committed yet")
+
+
+@_needs_p2
+def test_current_state_does_not_still_call_the_live_stage_stage128():
+    """A committed manuscript makes `current_stage: Stage128` false.
+
+    This is the exact drift the correction exists to prevent: Phase 2 prose on
+    disk while the snapshot still renders the Stage128 label.
+    """
+    state = _handoff_state()
+    assert state["current_stage"] == "Stage130", (
+        "a Stage130 Phase 2 manuscript is committed but current_stage still "
+        f"says {state['current_stage']!r}")
+    text = _current_state_text()
+    assert "**Stage / Batch:** Stage128" not in text
+
+
+@_needs_p2
+def test_live_workstream_is_the_phase2_manuscript_review():
+    state = _handoff_state()
+    assert state["active_workstream"] == (
+        "stage130_phase2_manuscript_assembly_human_review")
+    # the Stage128 chain is retained as predecessor context, never deleted
+    assert state["active_workstream_predecessor_context"] == (
+        "stage128_m3i2_final_official_documentary_recovery")
+
+
+@_needs_p2
+def test_manuscript_assembly_is_no_longer_advertised_as_the_next_action():
+    """Phase 1's pointer was `..._required_for_manuscript_assembly`.
+
+    That was true while no manuscript existed. With one committed it is a
+    stale statement about the future, and the live pointer must have moved on.
+    """
+    state = _handoff_state()
+    assert state["next_research_action_id"] == "human-manuscript-review"
+    assert state["next_research_action_authorized"] is False
+    # Phase 1 keeps its OWN historical pointer -- history is not rewritten.
+    assert state["stage130_phase1_next_action_id"] == (
+        "human_authorization_required_for_manuscript_assembly")
+    text = _current_state_text()
+    assert "Next action AT PHASE 1 TIME (historical)" in text
+    assert "**Superseded:**" in text
+
+
+@_needs_p2
+def test_phase2_markers_record_a_writing_action_that_computed_nothing():
+    state = _handoff_state()
+    assert state["stage130_phase2_started"] is True
+    assert state["stage130_phase2_completed"] is True
+    assert state["stage130_phase2_presentation_only"] is True
+    assert state["stage130_phase2_scientific_execution_started"] is False
+    assert state["stage130_phase2_prediction_artifact_opened"] is False
+    assert state["stage130_phase2_new_scientific_analysis_performed"] is False
+    for field in ("stage130_phase2_final_test_rows_read",
+                  "stage130_phase2_models_fitted_or_refitted",
+                  "stage130_phase2_thresholds_derived",
+                  "stage130_phase2_new_metrics_computed",
+                  "stage130_phase2_new_confidence_intervals_computed",
+                  "stage130_phase2_shap_executions"):
+        assert state[field] == 0, field
+
+
+@_needs_p2
+def test_phase2_markers_cannot_collapse_into_the_programme_wide_marker():
+    """Two different questions, two different keys.
+
+    `stage130_scientific_execution_started` is programme-wide;
+    `stage130_phase2_scientific_execution_started` is about the writing action.
+    Collapsing them would let a future scientific stage hide behind a
+    presentation-only phase, or vice versa.
+    """
+    state = _handoff_state()
+    assert "stage130_scientific_execution_started" in state
+    assert "stage130_phase2_scientific_execution_started" in state
+    assert state["stage130_phase2_started"] != (
+        state["stage130_phase2_scientific_execution_started"])
+    # and the Phase 1 distinction still holds independently
+    assert state["stage130_started"] != (
+        state["stage130_scientific_execution_started"])
+
+
+@_needs_p2
+def test_a_draft_is_not_a_submission_and_nothing_downstream_is_authorized():
+    state = _handoff_state()
+    assert state["stage130_phase2_human_review_required"] is True
+    assert state["stage130_phase2_human_review_completed"] is False
+    assert state["stage130_phase2_submission_ready"] is False
+    assert state["stage130_phase2_ready_for_review_authorized"] is False
+    assert state["stage130_phase2_merge_authorized"] is False
+    assert state["stage130_authorized"] is False
+    assert state["stage130_phase2_next_action_authorized"] is False
+
+
+@_needs_p2
+def test_current_state_renders_a_phase2_section():
+    text = _current_state_text()
+    assert "Stage130 Phase 2" in text
+    assert "Phase 2 scientific execution started:** False" in text
+    assert "Human review REQUIRED:** True" in text
+
+
+@_needs_p2
+def test_phase2_did_not_disturb_the_spent_final_test_firewall():
+    state = _handoff_state()
+    assert state["final_test_firewall_status"] == (
+        "SPENT_BY_AUTHORIZED_SINGLE_PASS")
+    assert state["final_test_rows_read"] == 346
+    assert state["final_test_access_authorized"] is False
+    assert state["final_test_second_pass_authorized"] is False
+
+
+@_needs_p2
+def test_historical_phase1_and_stage129_facts_are_unchanged_by_phase2():
+    """Phase 2 moves live keys only. Action-scoped history stays put."""
+    state = _handoff_state()
+    assert state["stage130_phase1_started"] is True
+    assert state["stage130_phase1_completed"] is True
+    assert state["stage130_phase1_presentation_only"] is True
+    assert state["stage130_scientific_execution_started"] is False
+    assert state["stage129_audit_stage130_started"] is False
+    assert state["stage129_final_test_stage130_authorized"] is False

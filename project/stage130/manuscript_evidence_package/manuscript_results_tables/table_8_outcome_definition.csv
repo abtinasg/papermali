@@ -1,0 +1,6 @@
+criterion,label,rule,source_artifact
+fd_article141_direct,direct Article-141 evidence,1 if direct Article-141 inclusion verified from a controlled source; 0 if non-inclusion verified; else missing. Stage121 has NO such source -> missing for ALL rows.,project/stage122/target_definition_stage122.csv
+fd_accumulated_loss,accumulated loss >= 50% capital,1 if accumulated_loss/registered_capital >= 0.5; 0 if < 0.5; missing if registered_capital <=0/missing OR accumulated_loss missing.,project/stage122/target_definition_stage122.csv
+fd_negative_equity,negative equity,1 if equity<0; 0 if equity>=0; missing if equity missing.,project/stage122/target_definition_stage122.csv
+fd_ocf_high_leverage,negative OCF & high leverage,1 if OCF<0 AND liabilities/assets>0.70; definite 0 if OCF>=0 OR leverage<=0.70; missing otherwise (three-valued).,project/stage122/target_definition_stage122.csv
+FD_target_main,composite operational financial distress target,modified three-valued OR with non-blocking unavailable direct Article-141 evidence. 1 if any criterion definitely 1; 0 if all evaluable quantitative criteria definitely 0; missing otherwise. NOT an Article-141 target.,project/stage122/target_definition_stage122.csv

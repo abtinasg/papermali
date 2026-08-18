@@ -1,0 +1,10 @@
+scope,model_family,configuration_id,n_rows,n_positive,pr_auc,roc_auc,brier_score,is_ordering_basis,source_artifact
+fold1_validation,regularized_logistic_regression,logistic__C_0.1,205,25,0.484040818257,0.880222222222,0.167737099569,false,project/stage126/stage126_m1_development_metrics.csv
+fold1_validation,random_forest,rf__depth_3__maxfeat_'sqrt'__leaf_10,205,25,0.486027245902,0.838888888889,0.144081827119,false,project/stage126/stage126_m1_development_metrics.csv
+fold1_validation,xgboost,xgboost__lr_0.03__depth_2__mcw_1__lambda_1,205,25,0.457454011864,0.829333333333,0.108530738978,false,project/stage126/stage126_m1_development_metrics.csv
+fold2_validation,regularized_logistic_regression,logistic__C_0.1,216,10,0.44052213868,0.881553398058,0.137572562053,false,project/stage126/stage126_m1_development_metrics.csv
+fold2_validation,random_forest,rf__depth_3__maxfeat_'sqrt'__leaf_10,216,10,0.339967293076,0.886893203883,0.113952642147,false,project/stage126/stage126_m1_development_metrics.csv
+fold2_validation,xgboost,xgboost__lr_0.03__depth_2__mcw_1__lambda_1,216,10,0.340958587436,0.867475728155,0.096706837349,false,project/stage126/stage126_m1_development_metrics.csv
+pooled_development_oof,regularized_logistic_regression,logistic__C_0.1,421,35,0.445756964048,0.882457438934,0.15226075728,true,project/stage126/stage126_m1_development_metrics.csv
+pooled_development_oof,random_forest,rf__depth_3__maxfeat_'sqrt'__leaf_10,421,35,0.40244183002,0.861954108068,0.128623622953,true,project/stage126/stage126_m1_development_metrics.csv
+pooled_development_oof,xgboost,xgboost__lr_0.03__depth_2__mcw_1__lambda_1,421,35,0.356545008162,0.841524796447,0.10246431914,true,project/stage126/stage126_m1_development_metrics.csv

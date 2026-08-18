@@ -596,3 +596,205 @@ def test_the_live_stage130_section_still_reports_the_started_phase():
     live = text[text.index("### Stage130 Phase 1"):]
     assert "Phase 1 started:** True" in live
     assert "Stage130 scientific execution started:** False" in live
+
+
+# --------------------------------------------------------------------------- #
+# 12. Robustness ordering: table 5, the claim freeze and the locked source
+#     must agree on Parts 2-6, with Part 1 as the sole reversal
+# --------------------------------------------------------------------------- #
+
+def _robust_source() -> dict:
+    return json.loads((REPO_ROOT / pkg.ROBUST_SYNTH_REL).read_text(
+        encoding="utf-8"))
+
+
+def _table5_rows() -> dict:
+    text = (PKG_DIR / "manuscript_results_tables"
+            / "table_5_robustness_and_block_dispositions.csv").read_text(
+        encoding="utf-8")
+    return {r["item"]: r["status_or_finding"]
+            for r in csv.DictReader(io.StringIO(text))}
+
+
+def test_locked_source_preserves_the_primary_ordering_in_parts_two_to_six():
+    """The authority for this claim is the per-part flag, nothing narrower."""
+    parts = _robust_source()["part_summaries"]
+    preserved = sorted(p["part_index"] for p in parts
+                       if p["primary_ordering_preserved"])
+    assert preserved == [2, 3, 4, 5, 6]
+
+
+def test_part_one_is_the_sole_reversal_in_the_locked_source():
+    parts = _robust_source()["part_summaries"]
+    reversed_ = sorted(p["part_index"] for p in parts
+                       if not p["primary_ordering_preserved"])
+    assert reversed_ == [1]
+    assert _robust_source()["scientific_interpretation"][
+        "A_model_family_ordering"]["part1_is_the_exception"] is True
+
+
+def test_table5_reports_every_preserving_part_not_the_sample_subset():
+    """Regression: reading `B_sample_definition_sensitivity` yielded [2, 3, 4].
+
+    That subset silently dropped Parts 5 and 6 and contradicted both the claim
+    freeze and the locked source, understating the robustness evidence.
+    """
+    rows = _table5_rows()
+    assert json.loads(rows["ordering_preserved_in_parts"]) == [2, 3, 4, 5, 6]
+    assert json.loads(rows["ordering_reversed_in_parts"]) == [1]
+    assert rows["part1_is_the_exception"] == "true"
+
+
+def test_table5_ordering_matches_the_locked_source_exactly():
+    parts = _robust_source()["part_summaries"]
+    want_ok = sorted(p["part_index"] for p in parts
+                     if p["primary_ordering_preserved"])
+    want_rev = sorted(p["part_index"] for p in parts
+                      if not p["primary_ordering_preserved"])
+    rows = _table5_rows()
+    assert json.loads(rows["ordering_preserved_in_parts"]) == want_ok
+    assert json.loads(rows["ordering_reversed_in_parts"]) == want_rev
+    # every registered part is accounted for exactly once
+    assert sorted(want_ok + want_rev) == sorted(
+        p["part_index"] for p in parts)
+
+
+def test_claim_freeze_c6_agrees_with_table5_and_the_source():
+    raw = (PKG_DIR / "manuscript_claim_freeze.md").read_text(encoding="utf-8")
+    # normalize wrapping: the claim must hold regardless of where lines break
+    text = " ".join(raw.split())
+    assert "preserved in Parts 2, 3, 4, 5 and 6" in text
+    assert "Part 1 is the sole reversal" in text
+    assert "not in Part 1" in text
+    # the superseded, narrower claim must not survive anywhere
+    assert "Parts 2-4" not in text
+    assert "[2, 3, 4]" not in text
+    assert "preserved in Parts 2, 3, 4;" not in text
+
+
+# --------------------------------------------------------------------------- #
+# 13. Development-performance table: locked values, copied verbatim
+# --------------------------------------------------------------------------- #
+
+def _table7_rows() -> list[dict]:
+    text = (PKG_DIR / "manuscript_results_tables"
+            / "table_7_development_performance.csv").read_text(encoding="utf-8")
+    return list(csv.DictReader(io.StringIO(text)))
+
+
+def _dev_metrics() -> dict:
+    text = (REPO_ROOT / pkg.DEV_METRICS_REL).read_text(encoding="utf-8")
+    return {(r["model_family"], r["scope"]): r
+            for r in csv.DictReader(io.StringIO(text))}
+
+
+def test_development_table_covers_all_three_families_in_every_scope():
+    rows = _table7_rows()
+    assert len(rows) == len(pkg.DEV_SCOPES) * len(pkg.DEV_FAMILIES)
+    for scope in pkg.DEV_SCOPES:
+        got = {r["model_family"] for r in rows if r["scope"] == scope}
+        assert got == set(pkg.DEV_FAMILIES), scope
+
+
+def test_every_development_value_is_the_committed_string_unchanged():
+    """Verbatim copies only: no recomputation, averaging or re-rounding."""
+    src = _dev_metrics()
+    for row in _table7_rows():
+        want = src[(row["model_family"], row["scope"])]
+        for col in ("configuration_id", "n_rows", "n_positive", "pr_auc",
+                    "roc_auc", "brier_score"):
+            assert row[col] == want[col], (row["scope"], row["model_family"], col)
+
+
+def test_development_table_makes_the_reported_ordering_auditable():
+    """The stated ordering must be checkable from the table's own numbers."""
+    pooled = {r["model_family"]: float(r["pr_auc"]) for r in _table7_rows()
+              if r["scope"] == "pooled_development_oof"}
+    ordering = _robust_source()["primary_ordering"]
+    values = [pooled[f] for f in ordering]
+    assert values == sorted(values, reverse=True)
+    assert set(pooled) == set(pkg.DEV_FAMILIES)
+
+
+def test_only_the_pooled_scope_is_flagged_as_the_ordering_basis():
+    for row in _table7_rows():
+        want = "true" if row["scope"] == "pooled_development_oof" else "false"
+        assert row["is_ordering_basis"] == want, row["scope"]
+
+
+def test_development_table_carries_no_comparison_or_uncertainty_column():
+    """No delta, interval, p-value or significance column may exist."""
+    header = _table7_rows()[0].keys()
+    banned = ("delta", "diff", "p_value", "pvalue", "ci_", "lower", "upper",
+              "significant", "significance", "rank", "winner", "better")
+    for col in header:
+        assert not any(b in col.lower() for b in banned), col
+
+
+def test_claim_freeze_c11_quotes_the_locked_pooled_values():
+    text = (PKG_DIR / "manuscript_claim_freeze.md").read_text(encoding="utf-8")
+    assert "## C11 — Development performance and the observed ordering" in text
+    src = _dev_metrics()
+    for family in pkg.DEV_FAMILIES:
+        assert src[(family, "pooled_development_oof")]["pr_auc"] in text, family
+
+
+# --------------------------------------------------------------------------- #
+# 14. Outcome-definition table and claim freeze C10: definitional, not a result
+# --------------------------------------------------------------------------- #
+
+def _table8_rows() -> dict:
+    text = (PKG_DIR / "manuscript_results_tables"
+            / "table_8_outcome_definition.csv").read_text(encoding="utf-8")
+    return {r["criterion"]: r for r in csv.DictReader(io.StringIO(text))}
+
+
+def _target_def_source() -> dict:
+    text = (REPO_ROOT / pkg.TARGET_DEF_REL).read_text(encoding="utf-8-sig")
+    return {r["criterion"]: r for r in csv.DictReader(io.StringIO(text))}
+
+
+def test_outcome_definition_table_copies_stage122_verbatim():
+    src, got = _target_def_source(), _table8_rows()
+    assert set(got) == set(pkg.TARGET_DEF_ROWS)
+    for criterion, row in got.items():
+        assert row["label"] == src[criterion]["label"], criterion
+        assert row["rule"] == src[criterion]["rule"], criterion
+
+
+def test_outcome_definition_records_the_unobserved_article141_criterion():
+    row = _table8_rows()["fd_article141_direct"]
+    assert "missing for ALL rows" in row["rule"]
+
+
+def test_outcome_definition_is_not_an_article141_target():
+    row = _table8_rows()["FD_target_main"]
+    assert "NOT an Article-141 target" in row["rule"]
+    assert "modified three-valued OR" in row["rule"]
+
+
+def test_claim_freeze_c10_is_marked_definitional_and_quotes_the_rules():
+    text = (PKG_DIR / "manuscript_claim_freeze.md").read_text(encoding="utf-8")
+    assert "## C10 — Outcome definition (DEFINITIONAL, not inferential)" in text
+    assert "no value here is estimated, tuned,\nderived or inferred" in text
+    src = _target_def_source()
+    for criterion in ("fd_accumulated_loss", "fd_negative_equity",
+                      "fd_ocf_high_leverage"):
+        assert src[criterion]["rule"] in text, criterion
+
+
+def test_manifest_pins_the_outcome_definition_source():
+    man = json.loads((PKG_DIR / "manifest.json").read_text(encoding="utf-8"))
+    assert man["authoritative_value_sources"]["outcome_definition"] == (
+        pkg.TARGET_DEF_REL)
+    digest = man["source_sha256"][pkg.TARGET_DEF_REL]
+    raw = (REPO_ROOT / pkg.TARGET_DEF_REL).read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == digest
+
+
+def test_the_package_now_carries_eight_tables():
+    names = sorted(p.name for p in
+                   (PKG_DIR / "manuscript_results_tables").glob("*.csv"))
+    assert len(names) == 8, names
+    assert names[-2:] == ["table_7_development_performance.csv",
+                          "table_8_outcome_definition.csv"]

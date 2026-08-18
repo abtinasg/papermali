@@ -10,6 +10,7 @@
     "final_test_qc": "project/stage129/final_test_execution/stage129_final_test_qc_report.json",
     "locked_model": "project/stage129/full_development_refit_execution/stage129_full_development_refit_model.json",
     "locked_preprocessing": "project/stage129/full_development_refit_execution/stage129_full_development_refit_preprocessing_parameters.json",
+    "outcome_definition": "project/stage122/target_definition_stage122.csv",
     "robustness_closure": "project/stage126/stage126_m1_robustness_closure_synthesis_record.json",
     "temporal_split_contract": "project/stage125/part4_temporal_split_contract_stage125.json"
   },
@@ -30,16 +31,16 @@
   "p_values_computed": 0,
   "package_files": {
     "README.md": {
-      "bytes": 2899,
-      "sha256": "712bd3d4ba4faf3d974c08d384a5134196e96bc087e5318763ec9cfb86ee47a0"
+      "bytes": 2990,
+      "sha256": "1ac8020ac9a68b9cf8b351969f7147c16a20af8ad361401418f5711275f35b2a"
     },
     "legacy_outputs_supersession.md": {
       "bytes": 1942,
       "sha256": "8fb39d04c4d8790518f4ebe35288e6ced477303b376daa0e74cea77a52981d4d"
     },
     "manuscript_claim_freeze.md": {
-      "bytes": 8278,
-      "sha256": "99399069a29f26837a2b48a1044fb3ed37224260a90d1664d290e42f0ba7c372"
+      "bytes": 11434,
+      "sha256": "7789874cda328b5a6c653915555c1e7bc8eb7bce034702349b687063b5b5de64"
     },
     "manuscript_figures/figure_1_study_timeline_and_leakage_safe_design.svg": {
       "bytes": 1940,
@@ -70,12 +71,20 @@
       "sha256": "15856e82e51acadc15c7f1d8223e014258f06855c610a5388c889f6df08a4ca2"
     },
     "manuscript_results_tables/table_5_robustness_and_block_dispositions.csv": {
-      "bytes": 736,
-      "sha256": "a9fe60a843add0e505e2031b3709e5d8a48bfb939af281265e977a2086d8f46b"
+      "bytes": 843,
+      "sha256": "9b2a48dfca187a4bcab51007f300dfdd68dd75ba67175cb1bd1c1b7fdd839074"
     },
     "manuscript_results_tables/table_6_model_coefficients_and_odds_ratios.csv": {
       "bytes": 3431,
       "sha256": "bc0c6495c6d0261f0b4ab7bc6498b8337f7b9df0b5a7b84753de8e8026832577"
+    },
+    "manuscript_results_tables/table_7_development_performance.csv": {
+      "bytes": 1728,
+      "sha256": "47f4e3967d3d97509499bbff0a1ef14c9b60e2c5c0dca17cde5513dec0fe2a94"
+    },
+    "manuscript_results_tables/table_8_outcome_definition.csv": {
+      "bytes": 1213,
+      "sha256": "b2cd6082e2feebfc5f528df218c05e770b92c3f39192bcb9b833137d614b0a08"
     },
     "table_model_coefficients_and_odds_ratios.csv": {
       "bytes": 3431,
@@ -92,6 +101,7 @@
   "ready_for_review_authorized": false,
   "shap_executions": 0,
   "source_sha256": {
+    "project/stage122/target_definition_stage122.csv": "573bc1e47bef8b9e48b11acd1bf87b7fc89ea22b926b2add94da67b9f95abb98",
     "project/stage125/part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
     "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
     "project/stage126/stage126_m1_robustness_closure_synthesis_record.json": "fdf8c585e6f4c38a066feec6f90094a2b6d50867ffac290195f40b9ce616846a",

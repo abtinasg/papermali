@@ -98,10 +98,15 @@ comparator is permitted anywhere in the manuscript.
 * **Permissible wording:** six pre-registered robustness categories provide
   **sensitivity evidence only**; validation was strictly forward-chaining with
   no shuffling and no random split.
+* **Committed value:** the primary ordering is preserved in Parts
+  2, 3, 4, 5 and 6; Part 1 is the sole reversal. Derived from
+  `part_summaries[*].primary_ordering_preserved` in the locked source, which is
+  the only per-part flag covering every registered category.
 * **Prohibited overclaim:** presenting robustness as model selection, as proof
   of generalization, or as a superiority argument.
 * **Mandatory accompanying limitation:** the primary ordering was preserved in
-  Parts 2-6 and not in Part 1; no winner was selected on this evidence.
+  Parts 2, 3, 4, 5 and 6 and not in Part 1; no winner was selected
+  on this evidence.
 
 ## C7 — Explainability
 
@@ -143,6 +148,48 @@ comparator is permitted anywhere in the manuscript.
   access; the Final Test was opened exactly once; artifacts are SHA-256 pinned.
 * **Prohibited overclaim:** describing this as external or independent
   validation.
+
+## C10 — Outcome definition (DEFINITIONAL, not inferential)
+
+This section states what is predicted. Every rule below is copied verbatim from
+the committed target-definition table; **no value here is estimated, tuned,
+derived or inferred**, and none of it is a result.
+
+* **Source:** `project/stage122/target_definition_stage122.csv`
+* **Committed rules:**
+  * `fd_accumulated_loss` — 1 if accumulated_loss/registered_capital >= 0.5; 0 if < 0.5; missing if registered_capital <=0/missing OR accumulated_loss missing.
+  * `fd_negative_equity` — 1 if equity<0; 0 if equity>=0; missing if equity missing.
+  * `fd_ocf_high_leverage` — 1 if OCF<0 AND liabilities/assets>0.70; definite 0 if OCF>=0 OR leverage<=0.70; missing otherwise (three-valued).
+  * `fd_article141_direct` — 1 if direct Article-141 inclusion verified from a controlled source; 0 if non-inclusion verified; else missing. Stage121 has NO such source -> missing for ALL rows.
+  * `FD_target_main` — modified three-valued OR with non-blocking unavailable direct Article-141 evidence. 1 if any criterion definitely 1; 0 if all evaluable quantitative criteria definitely 0; missing otherwise. NOT an Article-141 target.
+* **Permissible wording:** the primary outcome is a composite **operational**
+  indicator aggregated by a modified three-valued OR, in which unknown evidence
+  is recorded as unknown and never as healthy.
+* **Prohibited overclaim:** describing `FD_target_main` as an Article-141
+  target, as legal insolvency, or as a bankruptcy filing; restating any
+  threshold in a different form; treating the unobserved direct Article-141
+  criterion as though it had been evaluated.
+* **Mandatory accompanying limitation:** direct Article-141 evidence is
+  unobserved for every row in this panel, so the composite rests on the
+  remaining quantitative criteria alone.
+
+## C11 — Development performance and the observed ordering
+
+* **Source:** `project/stage126/stage126_m1_development_metrics.csv`
+* **Committed values (pooled development out-of-fold PR-AUC):**
+  `regularized_logistic_regression` = `0.445756964048`,
+  `random_forest` = `0.40244183002`,
+  `xgboost` = `0.356545008162`
+* **Permissible wording:** report these as **observed development out-of-fold
+  values** that make the stated ordering auditable. Per-fold values for all
+  three families are displayed in the development-performance table.
+* **Prohibited overclaim:** any paired difference, ratio, delta, average,
+  re-rounding, significance statement or superiority inference computed from
+  these values; presenting them as Final Test performance; presenting the
+  ordering as a model-selection result.
+* **Mandatory accompanying limitation:** these are development values under the
+  locked folds, not held-out performance, and no uncertainty interval,
+  multiplicity adjustment or comparative test accompanies them.
 
 ---
 

@@ -1,6 +1,7 @@
 item,status_or_finding,source_artifact
 primary_development_ordering,regularized_logistic_regression > random_forest > xgboost,project/stage126/stage126_m1_robustness_closure_synthesis_record.json
-ordering_preserved_in_parts,"[2, 3, 4]",project/stage126/stage126_m1_robustness_closure_synthesis_record.json
+ordering_preserved_in_parts,"[2, 3, 4, 5, 6]",project/stage126/stage126_m1_robustness_closure_synthesis_record.json
+ordering_reversed_in_parts,[1],project/stage126/stage126_m1_robustness_closure_synthesis_record.json
 part1_is_the_exception,true,project/stage126/stage126_m1_robustness_closure_synthesis_record.json
 robustness_evidence_class,synthesis_only,project/stage126/stage126_m1_robustness_closure_synthesis_record.json
 retained_design_selected,false,project/stage126/stage126_m1_robustness_closure_synthesis_record.json
