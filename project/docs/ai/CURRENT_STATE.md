@@ -11,9 +11,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage130_phase2_manuscript_assembly_human_review`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-manuscript-review`
-- **Last stage commit:** `8be458aec0d9e238b2e4b0fd2ed2e089f83344e6`
-- **Generated from commit:** `8be458aec0d9e238b2e4b0fd2ed2e089f83344e6` (branch `stage130-phase2-manuscript-assembly`, informational)
-- **Baseline:** `origin/main` @ `14e6624bdc0bf9741bfae0a2379a8d7355ff5b35`
+- **Last stage commit:** `756c2eb11944b26dacc1005e208d6f05de4fdf6a`
+- **Generated from commit:** `756c2eb11944b26dacc1005e208d6f05de4fdf6a` (branch `stage130-human-review-data-contribution`, informational)
+- **Baseline:** `origin/main` @ `76b4e9d286bc513a290c0534da9b5fcd23fcf497`
 
 ## Current-state validation
 
@@ -400,7 +400,7 @@ _The one-time contracted Final Test pass. The held-out years ۱۴۰۰–۱۴۰۲
 
 _The programme phase has started; Stage130 SCIENTIFIC execution has not. Phase 1 re-displays already-committed aggregate evidence and freezes manuscript claims. It computed nothing._
 
-- ✅ **Phase 1 started:** True — completed = True, presentation only = True, package files = 15.
+- ✅ **Phase 1 started:** True — completed = True, presentation only = True, package files = 16.
 - 🔬 **Stage130 scientific execution started:** False — new scientific analysis performed = False. These two are deliberately distinct: a presentation package is not a scientific stage.
 - ⛔ **Final Test untouched by Phase 1:** rows read = 0, prediction artifact opened = False, SHAP = 0, new metrics = 0, new CIs = 0, thresholds derived = 0, models fitted = 0.
 - 🗂️ **Legacy report tree:** `LEGACY_STAGE123_NONCANONICAL_DO_NOT_CITE` — the Stage123-era outputs are preserved byte-identical and may not be cited.
@@ -411,7 +411,7 @@ _The programme phase has started; Stage130 SCIENTIFIC execution has not. Phase 1
 
 _The manuscript draft exists. This is a WRITING action: it assembled prose and audit files from already-committed evidence and computed nothing. It is a draft awaiting human review, not a submission._
 
-- ✅ **Phase 2 started:** True — completed = True, presentation only = True, traceability rows = 130, references = 33 (all verified = True).
+- ✅ **Phase 2 started:** True — completed = True, presentation only = True, traceability rows = 163, references = 33 (all verified = True).
 - 🔬 **Phase 2 scientific execution started:** False — and the programme-wide **Stage130 scientific execution started:** False. These are SEPARATE keys and neither may absorb the other: writing a manuscript is not a scientific stage.
 - ⛔ **Final Test untouched by Phase 2:** rows read = 0, prediction artifact opened = False, new scientific analysis performed = False, models fitted = 0, thresholds derived = 0, new metrics = 0, new CIs = 0, SHAP = 0.
 - 📝 **Human review REQUIRED:** True — review completed = False, submission ready = False. Author list, affiliations, funding, conflicts, ethics and the data-access mechanism are human-only and are carried as explicit placeholders, never invented.
@@ -468,5 +468,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `856f9e17fc974f69db3e30db7bb97dd74574bd00270ef8c42def77269ec996d2`_
-_generated_at_utc: 2026-08-17T22:53:02Z (informational)_
+_state_fingerprint: `0282be34c4e588b839c89ecf65ca3b636da6c0e6ccf84973bc2d6eaf9bb5f247`_
+_generated_at_utc: 2026-08-18T15:06:27Z (informational)_
