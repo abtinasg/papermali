@@ -191,6 +191,61 @@ derived or inferred**, and none of it is a result.
   locked folds, not held-out performance, and no uncertainty interval,
   multiplicity adjustment or comparative test accompanies them.
 
+## C12 — Data construction and QC (DESCRIPTIVE/PROVENANCE, not a result)
+
+This section states how the analysis table was built and what the committed
+checks found. **It is descriptive provenance evidence, not a new scientific
+result**: no value here is estimated, tuned, derived or inferred, and none of
+it is a performance quantity.
+
+* **Sources:** `project/raw_handoff/financial_distress_programmer_handoff_stage121(1)/qc_report_stage121.json`, `project/stage122/stage122_qc_report.json`,
+  `project/stage125/README_STAGE125_PART1_DATA_CONTRACT.md`, `project/stage125/part4_statistical_analysis_plan_stage125.json`
+* **Displayed by:** `manuscript_results_tables/table_9_data_construction_and_qc.csv`
+* **Committed values (upstream source panel):**
+  1331 firm-year rows,
+  130 companies, Jalali fiscal years
+  1392-1402;
+  1331 unique row keys,
+  0 duplicate keys,
+  0 missing keys; accounting identity checked
+  on 1312 evaluable rows with 1311
+  exact matches,
+  1 match
+  within the recorded tolerance of 1 million IRR and
+  0 failures; the
+  7 recorded ratio families recalculated with 0 mismatches.
+* **Committed values (Stage122 target QC):** 98 positive,
+  1205 negative and 28 unknown target states;
+  `no_missing_target_converted_to_zero =
+  true`;
+  `rows_preserved =
+  true`
+  (1331 rows in, 1331 rows out); source-file
+  provenance present for 1303 rows and absent for 28.
+* **Committed values (prespecified analysis plan):**
+  `active_availability_lag_months = 4`,
+  `active_availability_method = fixed_regulatory_lag`,
+  `row_level_publish_datetime_collection_required =
+  false`.
+* **Permissible wording:** report these as committed checks and their exact
+  results, each with its scope named. Structural keys were complete and
+  nonduplicated; the accounting identity reconciled; the recorded ratio
+  recalculations produced no mismatch; unknown target evidence was preserved
+  as unknown.
+* **Prohibited overclaim:** any unqualified statement that this is a
+  "high-quality dataset"; any claim of complete row-level provenance, of all
+  observations being fully traceable, or of verified point-in-time filing
+  dates; describing the panel as an open dataset or an open benchmark;
+  presenting any figure in this section as a scientific result; collapsing the
+  upstream panel, the eligible pairs, the development fit set and the Final
+  Test cohort into one cohort.
+* **Mandatory accompanying limitation:** provenance is file-level and covers
+  1303 of 1331 rows, leaving
+  28 without a recorded source file; row-level publication
+  timestamps were never collected, so the four-month availability rule is a
+  prespecified proxy rather than an observed filing date; and the company
+  panel is restricted-access, not openly redistributable.
+
 ---
 
 ## Standing prohibitions for the manuscript

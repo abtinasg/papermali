@@ -22,6 +22,7 @@ import io
 import json
 import math
 import os
+import re
 from pathlib import Path
 from typing import Any
 
@@ -55,6 +56,17 @@ SPLIT_CONTRACT_REL = "project/stage125/part4_temporal_split_contract_stage125.js
 #: The committed outcome-definition table. Definitional, not inferential: it
 #: states the frozen target rules, and no value in it is a result.
 TARGET_DEF_REL = "project/stage122/target_definition_stage122.csv"
+#: Upstream data-construction QC. Aggregate records only: the underlying
+#: financial panel itself is never opened by this module.
+STAGE121_QC_REL = ("project/raw_handoff/"
+                   "financial_distress_programmer_handoff_stage121(1)/"
+                   "qc_report_stage121.json")
+STAGE122_QC_REL = "project/stage122/stage122_qc_report.json"
+#: The Part 1 provenance contract. Its committed provenance line is read and
+#: reconciled against the Stage122 counts; a disagreement aborts the build.
+PROVENANCE_CONTRACT_REL = ("project/stage125/"
+                           "README_STAGE125_PART1_DATA_CONTRACT.md")
+SAP_REL = "project/stage125/part4_statistical_analysis_plan_stage125.json"
 
 #: Never opened by this module. The row-level prediction artifact is excluded
 #: by the Stage130 Phase 1 authorization; the raw inputs are Final Test data.
@@ -169,7 +181,10 @@ def build_coefficient_table(model: dict[str, Any],
 def build_tables(ft: dict[str, Any], prov: dict[str, Any],
                  model: dict[str, Any], split: dict[str, Any],
                  dev_csv: str, robust: dict[str, Any],
-                 coef_csv: bytes, target_def_csv: str) -> dict[str, bytes]:
+                 coef_csv: bytes, target_def_csv: str,
+                 qc121: dict[str, Any], qc122: dict[str, Any],
+                 provenance_readme: str,
+                 sap: dict[str, Any]) -> dict[str, bytes]:
     thr = ft["thresholded_secondary"]
     topk = ft["topk"]
     unc = ft["uncertainty"]
@@ -301,6 +316,8 @@ def build_tables(ft: dict[str, Any], prov: dict[str, Any],
 
     t7 = build_development_performance_table(dev_csv)
     t8 = build_target_definition_table(target_def_csv)
+    t9 = build_data_construction_table(qc121, qc122, provenance_readme, sap,
+                                       model, ft)
 
     return {
         f"{TABLES_SUBDIR}/table_1_cohort_and_temporal_design.csv": t1,
@@ -311,6 +328,7 @@ def build_tables(ft: dict[str, Any], prov: dict[str, Any],
         f"{TABLES_SUBDIR}/table_6_model_coefficients_and_odds_ratios.csv": coef_csv,
         f"{TABLES_SUBDIR}/table_7_development_performance.csv": t7,
         f"{TABLES_SUBDIR}/table_8_outcome_definition.csv": t8,
+        f"{TABLES_SUBDIR}/table_9_data_construction_and_qc.csv": t9,
     }
 
 
@@ -386,6 +404,277 @@ def build_target_definition_table(target_def_csv: str) -> bytes:
     out = [[c, index[c]["label"], index[c]["rule"], TARGET_DEF_REL]
            for c in TARGET_DEF_ROWS]
     return _csv_bytes(["criterion", "label", "rule", "source_artifact"], out)
+
+
+# ------------------------------------- data construction and QC (Table 9)
+#: The seven ratio families the committed Stage121 QC report recalculated, in
+#: the order that report lists them. Copied, never recomputed.
+RATIO_FAMILIES = (
+    "leverage_ratio",
+    "current_ratio",
+    "equity_ratio",
+    "roa_period_adjusted",
+    "ocf_to_assets_period_adjusted",
+    "financial_expense_to_assets_period_adjusted",
+    "asset_turnover_period_adjusted",
+)
+
+#: Scope labels. The upstream panel, the eligible one-year-ahead pairs, the
+#: development fit set and the Final Test cohort are four different
+#: populations; collapsing them would misstate every count in this table.
+SCOPE_UPSTREAM = "upstream_source_panel"
+SCOPE_TARGET_QC = "stage122_target_qc"
+SCOPE_PAIRS = "model_eligible_pairs"
+SCOPE_FIT = "development_fit_set"
+SCOPE_FINAL = "final_test_cohort"
+SCOPE_PLAN = "prespecified_analysis_plan"
+
+#: The committed provenance line in the Part 1 data contract. It is parsed so
+#: that the pinned digest actually guards a value this package displays.
+PROVENANCE_LINE_RE = re.compile(
+    r"^- source_file present/missing: (\d+)/(\d+)$", re.M)
+
+#: Every row of Table 9 carries a limitation. This one is the scope guard that
+#: the whole table exists to make unmissable.
+_SCOPE_LIMIT = ("Upstream source panel only; not the eligible pairs, the "
+                "development fit set or the Final Test cohort.")
+
+
+def _provenance_contract_counts(readme: str) -> tuple[int, int]:
+    """Read the committed present/missing source-file counts, fail-closed."""
+    match = PROVENANCE_LINE_RE.search(readme)
+    if match is None:
+        raise Stage130Error(
+            "the Part 1 data contract no longer carries the committed "
+            "'source_file present/missing' provenance line")
+    return int(match.group(1)), int(match.group(2))
+
+
+def build_data_construction_table(qc121: dict[str, Any], qc122: dict[str, Any],
+                                  provenance_readme: str, sap: dict[str, Any],
+                                  model: dict[str, Any],
+                                  ft: dict[str, Any]) -> bytes:
+    """Descriptive data-construction and QC evidence, copied verbatim.
+
+    Every ``committed_result`` cell is a value that already exists in a
+    committed aggregate QC or provenance record. Nothing is recomputed from the
+    financial panel, which this module never opens, and nothing here is a
+    scientific result: the table is provenance evidence.
+
+    The build is fail-closed. Where two committed records state the same fact
+    -- panel size, source-file provenance coverage -- they are reconciled, and
+    a disagreement aborts rather than silently picking one.
+    """
+    structural = qc121["structural_checks"]
+    identity = qc121["accounting_identity"]
+    ratios = qc121["ratio_recalculation_checks"]
+    targets = qc122["target_counts"]
+    eligibility = qc122["eligibility_counts"]
+    exclusions = qc122["exclusion_reason_counts_row"]
+    assertions = qc122["assertions"]
+
+    panel_rows = qc121["source_dimensions"]["rows"]
+    for label, value in (
+            ("stage121 unique_key_count", structural["unique_key_count"]),
+            ("stage122 rows_before", qc122["rows_before"]),
+            ("stage122 rows_after", qc122["rows_after"])):
+        if value != panel_rows:
+            raise Stage130Error(
+                f"committed records disagree on the panel size: "
+                f"source_dimensions.rows={panel_rows} but {label}={value}")
+
+    present, missing = _provenance_contract_counts(provenance_readme)
+    if present != eligibility["eligible_source_quality"]:
+        raise Stage130Error(
+            "the Part 1 data contract and the Stage122 QC report disagree on "
+            f"source-file provenance coverage: {present} vs "
+            f"{eligibility['eligible_source_quality']}")
+    if missing != exclusions["source_not_traceable"]:
+        raise Stage130Error(
+            "the Part 1 data contract and the Stage122 QC report disagree on "
+            f"rows without source-file provenance: {missing} vs "
+            f"{exclusions['source_not_traceable']}")
+    if present + missing != panel_rows:
+        raise Stage130Error(
+            "provenance coverage does not account for every panel row")
+
+    if identity["failures"]:
+        raise Stage130Error(
+            "the committed accounting-identity check reports failures; the "
+            "frozen manuscript wording states there were none")
+    for family in RATIO_FAMILIES:
+        if family not in ratios:
+            raise Stage130Error(
+                f"the committed ratio-recalculation checks lost {family}")
+        if ratios[family]["mismatches"] != 0:
+            raise Stage130Error(
+                f"the committed ratio recalculation for {family} reports "
+                "mismatches; the frozen manuscript wording states there were "
+                "none")
+    if set(ratios) != set(RATIO_FAMILIES):
+        raise Stage130Error(
+            "the committed ratio-recalculation families changed: "
+            f"{sorted(set(ratios) ^ set(RATIO_FAMILIES))}")
+
+    if assertions["no_missing_target_converted_to_zero"] is not True:
+        raise Stage130Error(
+            "the committed Stage122 QC no longer asserts that unknown target "
+            "evidence was never converted to a negative observation")
+    if assertions["rows_preserved"] is not True:
+        raise Stage130Error(
+            "the committed Stage122 QC no longer asserts that every row was "
+            "preserved")
+    if sap["row_level_publish_datetime_collection_required"] is not False:
+        raise Stage130Error(
+            "the analysis plan no longer records that row-level publication "
+            "timestamps were not collected")
+
+    years = sorted(structural["year_counts"])
+    rows: list[list[str]] = []
+
+    def add(item: str, scope: str, result: str, meaning: str,
+            limitation: str, source: str) -> None:
+        rows.append([item, scope, result, meaning, limitation, source])
+
+    add("source_panel_rows", SCOPE_UPSTREAM, str(panel_rows),
+        "Researcher-verified firm-year rows frozen before any modelling.",
+        _SCOPE_LIMIT, f"{STAGE121_QC_REL} :: source_dimensions.rows")
+    add("source_panel_companies", SCOPE_UPSTREAM,
+        str(qc122["n_companies_before"]),
+        "Distinct companies represented in the upstream panel.",
+        _SCOPE_LIMIT, f"{STAGE122_QC_REL} :: n_companies_before")
+    add("source_panel_fiscal_years_jalali", SCOPE_UPSTREAM,
+        f"{years[0]}-{years[-1]}",
+        "Jalali fiscal years covered by the upstream panel.",
+        "Jalali labels; no Gregorian span is stated for the sample.",
+        f"{STAGE121_QC_REL} :: structural_checks.year_counts")
+    add("unique_row_keys", SCOPE_UPSTREAM, str(structural["unique_key_count"]),
+        "Every firm-year row carries a distinct primary key.",
+        _SCOPE_LIMIT,
+        f"{STAGE121_QC_REL} :: structural_checks.unique_key_count")
+    add("duplicate_row_keys", SCOPE_UPSTREAM,
+        str(structural["duplicate_key_count"]),
+        "No firm-year is represented twice.",
+        _SCOPE_LIMIT,
+        f"{STAGE121_QC_REL} :: structural_checks.duplicate_key_count")
+    add("missing_row_keys", SCOPE_UPSTREAM,
+        str(structural["missing_key_count"]),
+        "No row lacks its primary key.",
+        _SCOPE_LIMIT,
+        f"{STAGE121_QC_REL} :: structural_checks.missing_key_count")
+    add("accounting_identity_rows_checked", SCOPE_UPSTREAM,
+        str(identity["rows_checked"]),
+        "Rows on which the balance-sheet identity could be evaluated.",
+        "Fewer than the panel total; the remaining rows were not evaluable.",
+        f"{STAGE121_QC_REL} :: accounting_identity.rows_checked")
+    add("accounting_identity_exact_matches", SCOPE_UPSTREAM,
+        str(identity["exact_matches"]),
+        "Rows reconciling exactly.",
+        "Reconciliation is arithmetic agreement, not source re-audit.",
+        f"{STAGE121_QC_REL} :: accounting_identity.exact_matches")
+    add("accounting_identity_within_recorded_tolerance", SCOPE_UPSTREAM,
+        str(identity["rounding_tolerance_matches_abs_diff_le_1_million_irr"]),
+        "Rows reconciling within the recorded tolerance of 1 million IRR.",
+        "Tolerance is a recorded rounding allowance, not an exact match.",
+        f"{STAGE121_QC_REL} :: accounting_identity."
+        "rounding_tolerance_matches_abs_diff_le_1_million_irr")
+    add("accounting_identity_failures", SCOPE_UPSTREAM,
+        str(len(identity["failures"])),
+        "No evaluable row failed the identity check.",
+        "Absence of failures is not a statement about unevaluable rows.",
+        f"{STAGE121_QC_REL} :: accounting_identity.failures (empty list)")
+    for family in RATIO_FAMILIES:
+        check = ratios[family]
+        add(f"ratio_recalculation_{family}", SCOPE_UPSTREAM,
+            f"checked={check['checked']}; mismatches={check['mismatches']}",
+            "The stored ratio reproduces from its stored components.",
+            "Coverage differs per family; unevaluable rows are not checked.",
+            f"{STAGE121_QC_REL} :: ratio_recalculation_checks.{family}")
+    add("target_state_positive", SCOPE_TARGET_QC, str(targets["1"]),
+        "Firm-years meeting the composite operational distress definition.",
+        "Operational composite, not a legal insolvency event.",
+        f"{STAGE122_QC_REL} :: target_counts.1")
+    add("target_state_negative", SCOPE_TARGET_QC, str(targets["0"]),
+        "Firm-years for which every evaluable criterion was definitely "
+        "negative.",
+        "Operational composite, not a legal insolvency event.",
+        f"{STAGE122_QC_REL} :: target_counts.0")
+    add("target_state_unknown", SCOPE_TARGET_QC, str(targets["missing"]),
+        "Firm-years whose evidence did not permit a determination.",
+        "Unknown rows are excluded from target-specific analyses, not "
+        "reclassified.",
+        f"{STAGE122_QC_REL} :: target_counts.missing")
+    add("unknown_target_never_converted_to_negative", SCOPE_TARGET_QC,
+        str(assertions["no_missing_target_converted_to_zero"]).lower(),
+        "Missing outcome evidence was never recorded as a healthy firm-year.",
+        "Preserving unknowns reduces the analysable sample.",
+        f"{STAGE122_QC_REL} :: assertions."
+        "no_missing_target_converted_to_zero")
+    add("rows_preserved_through_target_qc", SCOPE_TARGET_QC,
+        f"{qc122['rows_before']} -> {qc122['rows_after']}",
+        "No row was silently dropped while the outcome was constructed.",
+        "Preservation is not eligibility; exclusions are recorded separately.",
+        f"{STAGE122_QC_REL} :: rows_before, rows_after, assertions."
+        "rows_preserved")
+    add("eligibility_counts", SCOPE_TARGET_QC,
+        json.dumps(eligibility, sort_keys=True),
+        "Each eligibility dimension is counted explicitly.",
+        "Eligibility is recorded per dimension; the counts are not additive.",
+        f"{STAGE122_QC_REL} :: eligibility_counts")
+    add("exclusion_reason_counts_row", SCOPE_TARGET_QC,
+        json.dumps(exclusions, sort_keys=True),
+        "Every exclusion carries an explicit recorded reason.",
+        "A row may satisfy more than one exclusion reason.",
+        f"{STAGE122_QC_REL} :: exclusion_reason_counts_row")
+    add("source_file_provenance_present", SCOPE_TARGET_QC, str(present),
+        "Rows for which a source file is recorded.",
+        "File-level provenance only, and it does not cover every row.",
+        f"{STAGE122_QC_REL} :: eligibility_counts.eligible_source_quality; "
+        f"reconciled with {PROVENANCE_CONTRACT_REL}")
+    add("source_file_provenance_absent", SCOPE_TARGET_QC, str(missing),
+        "Rows without a recorded source file.",
+        "These rows are a documented provenance gap and are not concealed.",
+        f"{STAGE122_QC_REL} :: exclusion_reason_counts_row."
+        "source_not_traceable; "
+        f"reconciled with {PROVENANCE_CONTRACT_REL}")
+    add("row_level_publication_timestamps", SCOPE_PLAN,
+        "row_level_publish_datetime_collection_required="
+        f"{str(sap['row_level_publish_datetime_collection_required']).lower()}",
+        "Row-level publication timestamps were never collected for this "
+        "panel.",
+        "No filing date was verified for any individual company-year.",
+        f"{SAP_REL} :: row_level_publish_datetime_collection_required")
+    add("availability_rule", SCOPE_PLAN,
+        f"lag_months={sap['active_availability_lag_months']}; "
+        f"method={sap['active_availability_method']}",
+        "Predictor admission uses a prespecified fixed regulatory lag.",
+        "A prespecified proxy for availability, not an observed filing date.",
+        f"{SAP_REL} :: active_availability_lag_months, "
+        "active_availability_method")
+    add("one_year_ahead_pairs_total", SCOPE_PAIRS, str(qc122["pairs_total"]),
+        "Company-year pairs constructible for one-year-ahead prediction.",
+        "Pairs, not panel rows; the two counts are not interchangeable.",
+        f"{STAGE122_QC_REL} :: pairs_total")
+    add("one_year_ahead_pairs_final_eligible", SCOPE_PAIRS,
+        str(qc122["pairs_final_eligible"]),
+        "Pairs surviving every recorded eligibility rule.",
+        "Eligibility here precedes the temporal split and the availability "
+        "filter.",
+        f"{STAGE122_QC_REL} :: pairs_final_eligible")
+    add("development_fit_set_rows", SCOPE_FIT, str(model["fit_set"]["rows"]),
+        "Rows the locked model was fitted on.",
+        "A development population; it is neither the panel nor the Final "
+        "Test cohort.",
+        f"{MODEL_REL} :: fit_set.rows")
+    add("final_test_evaluable_rows", SCOPE_FINAL,
+        str(ft["evaluable_rows"]),
+        "Rows in the single-pass held-out evaluation.",
+        "Opened exactly once; only 12 of these rows are positive.",
+        f"{FT_METRICS_REL} :: evaluable_rows")
+
+    return _csv_bytes(
+        ["item", "scope", "committed_result", "scientific_meaning",
+         "mandatory_limitation", "canonical_source"], rows)
 
 
 # ------------------------------------------------------------------ figures
@@ -478,7 +767,10 @@ def build_figures(model: dict[str, Any], split: dict[str, Any]) -> dict[str, byt
 # -------------------------------------------------------------- narrative
 def build_claim_freeze(ft: dict[str, Any], prov: dict[str, Any],
                        model: dict[str, Any], robust: dict[str, Any],
-                       dev_csv: str, target_def_csv: str) -> bytes:
+                       dev_csv: str, target_def_csv: str,
+                       qc121: dict[str, Any], qc122: dict[str, Any],
+                       provenance_readme: str,
+                       sap: dict[str, Any]) -> bytes:
     m, thr, topk = ft["metrics"], ft["thresholded_secondary"], ft["topk"]
     iv = ft["uncertainty"]["intervals"]
     fit = model["fit_set"]
@@ -493,6 +785,10 @@ def build_claim_freeze(ft: dict[str, Any], prov: dict[str, Any],
            for r in csv.DictReader(io.StringIO(dev_csv))}
     pooled = {f: dev[(f, "pooled_development_oof")]["pr_auc"] for f in DEV_FAMILIES}
     tdef = {r["criterion"]: r for r in csv.DictReader(io.StringIO(target_def_csv))}
+    structural = qc121["structural_checks"]
+    identity = qc121["accounting_identity"]
+    targets = qc122["target_counts"]
+    prov_present, prov_absent = _provenance_contract_counts(provenance_readme)
     text = f"""# Stage130 Phase 1 — manuscript claim freeze
 
 Every claim below is pinned to a committed artifact and an exact committed
@@ -686,6 +982,61 @@ derived or inferred**, and none of it is a result.
   locked folds, not held-out performance, and no uncertainty interval,
   multiplicity adjustment or comparative test accompanies them.
 
+## C12 — Data construction and QC (DESCRIPTIVE/PROVENANCE, not a result)
+
+This section states how the analysis table was built and what the committed
+checks found. **It is descriptive provenance evidence, not a new scientific
+result**: no value here is estimated, tuned, derived or inferred, and none of
+it is a performance quantity.
+
+* **Sources:** `{STAGE121_QC_REL}`, `{STAGE122_QC_REL}`,
+  `{PROVENANCE_CONTRACT_REL}`, `{SAP_REL}`
+* **Displayed by:** `{TABLES_SUBDIR}/table_9_data_construction_and_qc.csv`
+* **Committed values (upstream source panel):**
+  {qc121["source_dimensions"]["rows"]} firm-year rows,
+  {qc122["n_companies_before"]} companies, Jalali fiscal years
+  {sorted(structural["year_counts"])[0]}-{sorted(structural["year_counts"])[-1]};
+  {structural["unique_key_count"]} unique row keys,
+  {structural["duplicate_key_count"]} duplicate keys,
+  {structural["missing_key_count"]} missing keys; accounting identity checked
+  on {identity["rows_checked"]} evaluable rows with {identity["exact_matches"]}
+  exact matches,
+  {identity["rounding_tolerance_matches_abs_diff_le_1_million_irr"]} match
+  within the recorded tolerance of 1 million IRR and
+  {len(identity["failures"])} failures; the
+  {len(RATIO_FAMILIES)} recorded ratio families recalculated with 0 mismatches.
+* **Committed values (Stage122 target QC):** {targets["1"]} positive,
+  {targets["0"]} negative and {targets["missing"]} unknown target states;
+  `no_missing_target_converted_to_zero =
+  {str(qc122["assertions"]["no_missing_target_converted_to_zero"]).lower()}`;
+  `rows_preserved =
+  {str(qc122["assertions"]["rows_preserved"]).lower()}`
+  ({qc122["rows_before"]} rows in, {qc122["rows_after"]} rows out); source-file
+  provenance present for {prov_present} rows and absent for {prov_absent}.
+* **Committed values (prespecified analysis plan):**
+  `active_availability_lag_months = {sap["active_availability_lag_months"]}`,
+  `active_availability_method = {sap["active_availability_method"]}`,
+  `row_level_publish_datetime_collection_required =
+  {str(sap["row_level_publish_datetime_collection_required"]).lower()}`.
+* **Permissible wording:** report these as committed checks and their exact
+  results, each with its scope named. Structural keys were complete and
+  nonduplicated; the accounting identity reconciled; the recorded ratio
+  recalculations produced no mismatch; unknown target evidence was preserved
+  as unknown.
+* **Prohibited overclaim:** any unqualified statement that this is a
+  "high-quality dataset"; any claim of complete row-level provenance, of all
+  observations being fully traceable, or of verified point-in-time filing
+  dates; describing the panel as an open dataset or an open benchmark;
+  presenting any figure in this section as a scientific result; collapsing the
+  upstream panel, the eligible pairs, the development fit set and the Final
+  Test cohort into one cohort.
+* **Mandatory accompanying limitation:** provenance is file-level and covers
+  {prov_present} of {qc121["source_dimensions"]["rows"]} rows, leaving
+  {prov_absent} without a recorded source file; row-level publication
+  timestamps were never collected, so the four-month availability rule is a
+  prespecified proxy rather than an observed filing date; and the company
+  panel is restricted-access, not openly redistributable.
+
 ---
 
 ## Standing prohibitions for the manuscript
@@ -769,7 +1120,7 @@ Presentation only. **No new scientific analysis was performed.**
 |---|---|
 | `manuscript_claim_freeze.md` | frozen claims: source, exact value, permissible wording, prohibited overclaim, mandatory limitation |
 | `table_model_coefficients_and_odds_ratios.csv` | canonical coefficient/OR table ({model["n_design_columns"]} terms + intercept) |
-| `{TABLES_SUBDIR}/` | eight deterministic tables: six result tables, one locked development-performance table and one definitional outcome table |
+| `{TABLES_SUBDIR}/` | nine deterministic tables: six result tables, one locked development-performance table, one definitional outcome table and one descriptive data-construction/QC table |
 | `{FIGURES_SUBDIR}/` | three schematic figures (no performance curves) |
 | `legacy_outputs_supersession.md` | `{LEGACY_DIR_REL}` marked {LEGACY_STATUS} |
 | `manifest.json` | SHA-256 + byte count per file, and the authoritative source of every displayed value |
@@ -823,6 +1174,11 @@ def build_package(repo_root: Path | str = REPO_ROOT) -> dict[str, bytes]:
     dev_csv = _guarded_open(root, DEV_METRICS_REL).decode("utf-8")
     # utf-8-sig: the committed Stage122 definition table carries a BOM.
     target_def_csv = _guarded_open(root, TARGET_DEF_REL).decode("utf-8-sig")
+    qc121 = _load(root, STAGE121_QC_REL)
+    qc122 = _load(root, STAGE122_QC_REL)
+    provenance_readme = _guarded_open(
+        root, PROVENANCE_CONTRACT_REL).decode("utf-8")
+    sap = _load(root, SAP_REL)
 
     counters = qc["counters"]
     for field in ("model_fits_executed", "refits_executed",
@@ -836,10 +1192,12 @@ def build_package(repo_root: Path | str = REPO_ROOT) -> dict[str, bytes]:
         "table_model_coefficients_and_odds_ratios.csv": coef_csv,
     }
     files.update(build_tables(ft, prov, model, split, dev_csv, robust, coef_csv,
-                              target_def_csv))
+                              target_def_csv, qc121, qc122, provenance_readme,
+                              sap))
     files.update(build_figures(model, split))
     files["manuscript_claim_freeze.md"] = build_claim_freeze(
-        ft, prov, model, robust, dev_csv, target_def_csv)
+        ft, prov, model, robust, dev_csv, target_def_csv, qc121, qc122,
+        provenance_readme, sap)
     files["legacy_outputs_supersession.md"] = build_legacy_supersession()
     files["README.md"] = build_readme(ft, model)
 
@@ -872,12 +1230,18 @@ def build_package(repo_root: Path | str = REPO_ROOT) -> dict[str, bytes]:
             "robustness_closure": ROBUST_SYNTH_REL,
             "temporal_split_contract": SPLIT_CONTRACT_REL,
             "outcome_definition": TARGET_DEF_REL,
+            "upstream_panel_qc": STAGE121_QC_REL,
+            "target_construction_qc": STAGE122_QC_REL,
+            "upstream_provenance_contract": PROVENANCE_CONTRACT_REL,
+            "statistical_analysis_plan": SAP_REL,
         },
         "source_sha256": {
             rel: _sha256(_guarded_open(root, rel)) for rel in sorted((
                 FT_METRICS_REL, FT_PROV_REL, FT_QC_REL, FT_MANIFEST_REL,
                 MODEL_REL, PREP_REL, THRESHOLD_REL, DEV_METRICS_REL,
-                ROBUST_SYNTH_REL, SPLIT_CONTRACT_REL, TARGET_DEF_REL))
+                ROBUST_SYNTH_REL, SPLIT_CONTRACT_REL, TARGET_DEF_REL,
+                STAGE121_QC_REL, STAGE122_QC_REL, PROVENANCE_CONTRACT_REL,
+                SAP_REL))
         },
         # The pinned SHA-256 of the Final Test package manifest itself. This
         # must be a digest, not an identifier: it is the value the field name
