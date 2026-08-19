@@ -397,3 +397,110 @@ def test_manuscript_directory_contains_no_figure_or_data_artifact():
     unexpected = [p.name for p in MS_DIR.iterdir()
                   if p.suffix.lower() in {".svg", ".png", ".pdf", ".jpg", ".jpeg", ".json", ".parquet"}]
     assert not unexpected, unexpected
+
+
+# ---------------------------------------------------------------------------
+# Human-review language corrections.
+#
+# Each string below was a real overclaim in an earlier draft. They are pinned as
+# literal text because each one failed in a different way: the first offered an
+# inspection right the restricted panel cannot honour, the second promoted
+# provenance evidence to a scientific result, the third asserted a point-in-time
+# property that row-level publication timestamps were never collected to
+# support, and the fourth implied a verified statutory filing date. A
+# reintroduction must fail loudly rather than pass as a wording preference.
+# ---------------------------------------------------------------------------
+
+RETIRED_OVERCLAIMS = (
+    "inspect the table the estimates rest on",
+    "known to respect the prediction cutoff",
+    "later, regulated date",
+)
+
+#: Values reported in the Abstract. Correction 5 rewrote a sentence inside it,
+#: so the Abstract is pinned separately from the whole-draft frozen-string test.
+ABSTRACT_FROZEN_VALUES = (
+    "0.03468208092485549",                  # Final Test prevalence
+    "0.243879669979",                       # PR-AUC (primary)
+    "0.053272572767", "0.541675572242",     # PR-AUC 95% cluster-bootstrap CI
+    "0.907684630739",                       # ROC-AUC (secondary)
+    "0.071625345916",                       # Brier score, raw probabilities
+)
+
+DATA_CONSTRUCTION_HEADING = (
+    "**Data construction and auditability as a contribution.**")
+CONTRIBUTION_OPENING = "The contribution is therefore evidential and infrastructural"
+
+
+def _paragraph_containing(draft: str, needle: str) -> str:
+    for para in draft.split("\n\n"):
+        if needle in para:
+            return para
+    raise AssertionError(f"paragraph not found for {needle!r}")
+
+
+@pytest.mark.parametrize("phrase", RETIRED_OVERCLAIMS)
+def test_retired_overclaim_never_returns(draft, phrase):
+    assert phrase not in draft, phrase
+
+
+def test_data_construction_passage_is_evidence_not_a_result(draft):
+    """C12 classifies this material as provenance evidence; prose must agree."""
+    passage = _paragraph_containing(draft, DATA_CONSTRUCTION_HEADING)
+    assert "part of the result" not in passage, passage
+    assert "part of the evidentiary contribution" in passage, passage
+
+
+def test_claim_freeze_c12_still_says_not_a_result():
+    """The prose correction above is only true while C12 says the same thing."""
+    freeze = (PKG / "manuscript_claim_freeze.md").read_text(encoding="utf-8")
+    heading = [ln for ln in freeze.splitlines() if ln.startswith("## C12")]
+    assert len(heading) == 1, heading
+    assert "DESCRIPTIVE/PROVENANCE" in heading[0], heading[0]
+    assert "not a result" in heading[0], heading[0]
+
+
+def test_restricted_panel_is_distinguished_from_the_inspectable_record(draft):
+    """The reader is offered the aggregate record, never the restricted panel."""
+    passage = _paragraph_containing(draft, CONTRIBUTION_OPENING)
+    # The panel itself is off limits...
+    assert "restricted" in passage, passage
+    assert "neither openly inspected nor redistributed" in passage, passage
+    # ...and what is actually inspectable is the aggregate construction record.
+    assert ("inspect the construction, quality-control, provenance and "
+            "eligibility record") in passage, passage
+
+
+def test_the_prediction_cutoff_claim_is_bounded_by_the_proxy(draft):
+    """Auditable internal consistency and observed availability are separate."""
+    passage = _paragraph_containing(draft, DATA_CONSTRUCTION_HEADING)
+    assert "auditable internal consistency" in passage, passage
+    assert "explicit prediction-cutoff rule" in passage, passage
+    assert ("without establishing observed point-in-time availability"
+            in passage), passage
+
+
+def test_the_four_month_rule_is_still_labelled_a_proxy(draft):
+    low = draft.lower()
+    assert "four-month proxy" in low or "prespecified four-month availability proxy" in low
+    # The Abstract's own statement of the rule must stay a proxy, not a date.
+    module = _load_validator()
+    abstract = module.section(draft, "## Structured Abstract").lower()
+    assert "proxy" in abstract, abstract
+    assert "not an observed filing date" in abstract, abstract
+
+
+def test_abstract_qualifies_ratio_checks_by_evaluable_coverage(draft):
+    """Coverage differs per family, so a bare zero-mismatch claim overreaches."""
+    module = _load_validator()
+    abstract = module.section(draft, "## Structured Abstract")
+    assert "within their evaluable coverage" in abstract, abstract
+    assert "recalculated with no mismatches" not in abstract, abstract
+
+
+def test_abstract_keeps_its_frozen_final_test_values(draft):
+    """Correction 5 edited the Abstract; no reported value may move with it."""
+    module = _load_validator()
+    abstract = module.section(draft, "## Structured Abstract")
+    for value in ABSTRACT_FROZEN_VALUES:
+        assert value in abstract, value
