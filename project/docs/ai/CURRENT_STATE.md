@@ -10,9 +10,9 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Stage / Batch:** Stage130 / None
 - **Active workstream:** `stage130_phase2_manuscript_assembly_human_review`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `human-manuscript-review`
-- **Last stage commit:** `8ddbe2596353aaa8097f523b37beae59e6828589`
-- **Generated from commit:** `8ddbe2596353aaa8097f523b37beae59e6828589` (branch `stage130-human-review-data-contribution`, informational)
+- **Next research action:** `human-manuscript-submission-metadata`
+- **Last stage commit:** `d30ce378132f6b529257e15bc0699a37e771fc7f`
+- **Generated from commit:** `d30ce378132f6b529257e15bc0699a37e771fc7f` (branch `stage130-human-review-data-contribution`, informational)
 - **Baseline:** `origin/main` @ `76b4e9d286bc513a290c0534da9b5fcd23fcf497`
 
 ## Current-state validation
@@ -139,7 +139,7 @@ _A metadata-only, PROSPECTIVE source/definition/statistical contract lock for th
 - **M3-CBI preserved unchanged:** Gate status `UNRESOLVED_M3_DATA_GATE`, block admitted False
 - **Scientific provenance baseline:** PR #73 head `e6db63fb7d105f0d3a39db101c9e364161c367e9` — protected hashes are verified against that commit permanently; a merge or retarget never moves it
 - **PR topology at contract-lock time (HISTORICAL, not live):** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and never merged under this action — merged = False, no merge authorization. Semantics: `historical_contract_lock_topology_superseded_by_pr75`. PR #74 is the **historical contract-lock PR**, never the current draft; the live Draft PR is identified in the live-action section below.
-- **Next research action (pointer only):** `human-manuscript-review` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
+- **Next research action (pointer only):** `human-manuscript-submission-metadata` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
 - Package: `project/stage128/m3_intl_macro_contract_lock/`; interpretation: `project/stage128/m3_intl_macro_contract_lock/README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`
 
 ### Stage128 — M3I-2 official-source evidence capture
@@ -238,7 +238,7 @@ _An explicit human governance decision, not a one-action execution authorization
 - ✅ **M3-LAG-WDI final research disposition:** `SUPPLEMENTARY_EXPLORATORY_ONLY` — promoted to the confirmatory model = False. A future unsolicited World Bank response auto-reopens M3 = False (using it for anything requires a new explicit human decision = True).
 - ✅ **Step E result PRESERVED EXACTLY, re-verified against the committed artifact by this recording:** `E1_NULL_NO_DETECTABLE_INCREMENTAL_CONTRIBUTION` — paired PR-AUC deltas (M3-LAG-WDI minus retained M2) logistic +0.000862 [-0.028237, +0.032186], random forest -0.002720 [-0.029157, +0.011924], XGBoost +0.002749 [-0.007437, +0.014554] (all three 95% intervals include zero); secondary Brier deltas logistic -0.004600 [-0.006147, -0.003066] and random forest -0.001375 [-0.002229, -0.000566] (calibration only, non-confirmatory).
 - ⛔ **Unchanged:** M4 authorized False — Final Test locked True, rows read 0 — confirmatory Holm family unchanged and unexecuted — paper winner selected True.
-- **Both pointer chains converge on the same human decision:** `human-manuscript-review` — scope `manuscript_human_review_no_further_action_is_authorized`, authorized = False. Track B: `human_decision_required` — scope `no_further_action_is_authorized`, authorized = False. A pointer is never an authorization.
+- **Both pointer chains converge on the same human decision:** `human-manuscript-submission-metadata` — scope `manuscript_human_submission_metadata_no_further_action_is_authorized`, authorized = False. Track B: `human_decision_required` — scope `no_further_action_is_authorized`, authorized = False. A pointer is never an authorization.
 - Package: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/`; interpretation: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/README_STAGE128_M3I2_TRACK_A_WAITING_TERMINATION_AND_M3_DISPOSITION.md`
 
 ### Stage129 — M4 governance Data-Gate contract lock (DESIGN ONLY, additive, not on either live pointer chain)
@@ -407,17 +407,30 @@ _The programme phase has started; Stage130 SCIENTIFIC execution has not. Phase 1
 - ➡️ **Next action AT PHASE 1 TIME (historical):** `human_authorization_required_for_manuscript_assembly` — authorized = False. Stage130 authorized = False. **Superseded:** the manuscript now exists; the live next action is in the Phase 2 section below.
 - Package: `project/stage130/manuscript_evidence_package/`; generator: `project/src/stage130_manuscript_evidence_package.py`
 
-### Stage130 Phase 2 — manuscript assembly (CURRENT; writing only, awaiting human review)
+### Stage130 Phase 2 — manuscript assembly (CURRENT; writing only, human review COMPLETED)
 
-_The manuscript draft exists. This is a WRITING action: it assembled prose and audit files from already-committed evidence and computed nothing. It is a draft awaiting human review, not a submission._
+_The manuscript draft exists. This is a WRITING action: it assembled prose and audit files from already-committed evidence and computed nothing. The human scientific and editorial review of that draft is COMPLETE and its content is approved; a reviewed draft is still not a submission._
 
 - ✅ **Phase 2 started:** True — completed = True, presentation only = True, traceability rows = 163, references = 33 (all verified = True).
 - 🔬 **Phase 2 scientific execution started:** False — and the programme-wide **Stage130 scientific execution started:** False. These are SEPARATE keys and neither may absorb the other: writing a manuscript is not a scientific stage.
 - ⛔ **Final Test untouched by Phase 2:** rows read = 0, prediction artifact opened = False, new scientific analysis performed = False, models fitted = 0, thresholds derived = 0, new metrics = 0, new CIs = 0, SHAP = 0.
-- 📝 **Human review REQUIRED:** True — review completed = False, submission ready = False. Author list, affiliations, funding, conflicts, ethics and the data-access mechanism are human-only and are carried as explicit placeholders, never invented.
+- 📝 **Human review COMPLETED:** True — review still required = False (it HAD been required: was required = True), submission ready = False. Author list, affiliations, funding, conflicts, ethics and the data-access mechanism are human-only and are carried as explicit placeholders, never invented — approving the manuscript TEXT is not submission authorization.
 - ⛔ **Not authorized:** ready-for-review = False, merge = False, Stage130 authorized = False.
-- ➡️ **Live next action:** `human-manuscript-review` — authorized = False. A pointer is never an authorization.
+- ➡️ **Live next action:** `human-manuscript-submission-metadata` — authorized = False. A pointer is never an authorization.
 - Manuscript: `project/stage130/manuscript/`; validator: `project/stage130/manuscript/validate_manuscript.py`
+
+### Stage130 — human manuscript review COMPLETED (recording only; not a submission)
+
+_The human supervisor read the committed draft at one exact commit and approved its CONTENT. Recording that is not submission readiness, not Ready-for-Review and not merge authorization._
+
+- ✅ **Review completed:** True — recorded by `stage130-manuscript-human-review-completion` on 2026-08-20, human-authorized = True.
+- 🔒 **Reviewed head:** `c4136a412696c7bb626f0c389bcccb829f381629` — approved file `project/stage130/manuscript/manuscript_draft_en.md`, SHA-256 `8b5d861c36e01dc81133c1071cd96f7e340482ac2148b53c055369bbd5ffcb19`, blob `93f7e8e796ec098de38725271305ab06263efd1f`. Manuscript modified by this action = False; both digests are re-derived from the file, so editing the approved text fails the build instead of inheriting the approval.
+- 🕰️ **History preserved:** the Phase 2 assembly record still publishes `human_review_required = True` (was required = True); this supersedes `stage130_phase2_human_review_required` in the open, and the historical pointer `human-manuscript-review` is not rewritten (Phase 2 record preserved = True).
+- ⛔ **Still NOT authorized:** submission ready = False, ready-for-review = False, merge = False, Stage130 authorized = False, submission workflow started = False.
+- 👤 **Human-supplied submission metadata still outstanding:** True — 6 items (`authors_and_author_order`, `affiliations_and_corresponding_author`, `funding`, `conflicts_of_interest`, `ethics_and_data_governance_statement`, `data_access_mechanism_for_the_restricted_company_panel`). None was invented by this action.
+- ⛔ **Nothing scientific occurred:** Final Test rows read = 0, prediction artifact opened = False, Stage130 scientific execution started = False.
+- ➡️ **Live next action:** `human-manuscript-submission-metadata` — authorized = False. The review it used to name is done; a pointer is never an authorization.
+- Package: `project/stage130/manuscript_human_review_completion/`
 
 ### Last completed scientific micro-part QC
 
@@ -468,5 +481,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `b4f9c21a41e1c63642ae237db9021710e7cc898d79df45e07315c709f4fc8bda`_
-_generated_at_utc: 2026-08-19T11:12:22Z (informational)_
+_state_fingerprint: `bd575a83790cea2698c7b2d4b89bab55cd38d0ff00257e94609853bfd15bb266`_
+_generated_at_utc: 2026-08-20T09:32:35Z (informational)_
