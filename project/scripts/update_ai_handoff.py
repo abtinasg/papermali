@@ -7322,7 +7322,13 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
     # This check exists to refuse a STALE label; it must therefore recognize
     # the successor rather than pin the Stage128 label forever. Every Stage128
     # label below becomes predecessor context at that point.
-    if derive_stage130_phase2_markers(root):
+    # ...and once the human review that Phase 2 workstream names is COMPLETE,
+    # the "…-human-review" label is itself stale. The successor names what is
+    # actually pending -- the human-supplied submission metadata -- and is a
+    # description of the live state, not an authorization for it.
+    if derive_stage130_manuscript_human_review_completion_markers(root):
+        allowed = _STAGE130_SUBMISSION_METADATA_WORKSTREAM_ID
+    elif derive_stage130_phase2_markers(root):
         allowed = _STAGE130_P2_WORKSTREAM_ID
     elif m3i2_recovery:
         allowed = _STAGE128_M3I2_RECOVERY_WORKSTREAM_ID
@@ -17287,6 +17293,14 @@ def derive_stage130_phase1_markers(root: str) -> dict:
 _STAGE130_P2_DIR = "project/stage130/manuscript"
 _STAGE130_P2_ACTION_ID = "stage130-phase2-manuscript-assembly"
 _STAGE130_P2_WORKSTREAM_ID = "stage130-phase2-manuscript-assembly-human-review"
+#: The SAME Stage130 Phase 2 workstream, relabelled once the human review it
+#: names is complete. `active_workstream` is a description of what is live NOW,
+#: so continuing to advertise "…-human-review" after the review finished states
+#: something the repository contradicts. The label is a STATE DESCRIPTION and
+#: never a permission: the metadata action stays unauthorized. The workstream
+#: keeps the `stage130-phase2-` prefix, so its predecessor context is unchanged.
+_STAGE130_SUBMISSION_METADATA_WORKSTREAM_ID = (
+    "stage130-phase2-manuscript-submission-metadata")
 _STAGE130_P2_CURRENT_STAGE = "Stage130"
 _STAGE130_P2_NEXT_ACTION_ID = "human-manuscript-review"
 #: The manuscript deliverables. All must exist before Phase 2 may be recorded.

@@ -1318,10 +1318,14 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # HISTORY for the completed M1 baseline workstream — neither is current.
     # The Stage130 Phase 2 manuscript has since succeeded the whole Stage128
     # chain as the live workstream; the documentary-recovery workstream is now
-    # predecessor context. The Stage128 labels remain correct HISTORY for the
-    # actions that published them and are asserted against their own artifacts.
+    # predecessor context. That workstream was relabelled once the human review
+    # it named completed (2026-08-20), so the live label now describes the
+    # pending submission metadata; it is the SAME Stage130 Phase 2 workstream,
+    # which is why the predecessor context is unchanged. The Stage128 labels
+    # remain correct HISTORY for the actions that published them and are
+    # asserted against their own artifacts.
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_assembly_human_review")
+        "stage130_phase2_manuscript_submission_metadata")
     assert state["active_workstream_predecessor_context"] == (
         "stage128_m3i2_final_official_documentary_recovery"
     )
@@ -1376,9 +1380,11 @@ def test_real_repo_roadmap_stage126_status_consistency():
     ).read()
     fm = gen.read_roadmap(REAL_ROOT)
     # The Stage130 Phase 2 manuscript is live, so the workstream has advanced
-    # out of the Stage128 chain and the recovery workstream is predecessor.
+    # out of the Stage128 chain and the recovery workstream is predecessor. The
+    # live label names the pending submission metadata because the human review
+    # the earlier label named is complete.
     assert fm["active_research_workstream_id"] == (
-        "stage130-phase2-manuscript-assembly-human-review")
+        "stage130-phase2-manuscript-submission-metadata")
     assert fm["predecessor_research_workstream_id"] == (
         "stage128-m3i2-final-official-documentary-recovery"
     )
@@ -1496,7 +1502,7 @@ def test_real_repo_open_tasks_stage126_markers_match_handoff():
         in open_tasks
     )
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_assembly_human_review")
+        "stage130_phase2_manuscript_submission_metadata")
     assert "Stage126 M1 human-authorized = true" in open_tasks
     assert "Stage126 started = true" in open_tasks
     assert "development modeling authorized = true" in open_tasks
@@ -2395,7 +2401,7 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_assembly_human_review")
+        "stage130_phase2_manuscript_submission_metadata")
     assert state["active_workstream_predecessor_context"] == (
         "stage128_m3i2_final_official_documentary_recovery"
     )
@@ -2756,7 +2762,7 @@ def test_part1_does_not_advance_research_pointers():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_assembly_human_review")
+        "stage130_phase2_manuscript_submission_metadata")
     assert state["active_workstream_predecessor_context"] == (
         "stage128_m3i2_final_official_documentary_recovery"
     )
@@ -3055,7 +3061,7 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_assembly_human_review")
+        "stage130_phase2_manuscript_submission_metadata")
     assert state["active_workstream_predecessor_context"] == (
         "stage128_m3i2_final_official_documentary_recovery"
     )
@@ -3247,7 +3253,7 @@ def test_active_workstream_identifies_the_m3_macro_gate():
     # The live label is the supplementary M3I-2 contract lock, which succeeded
     # the CBI M3 Gate; neither older label may be the CURRENT one.
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_assembly_human_review")
+        "stage130_phase2_manuscript_submission_metadata")
     assert state["active_workstream"] not in (
         "stage128_m2_d2_boundary_month_equity_return",
         "stage128_m3_macro_data_gate")
@@ -3305,9 +3311,10 @@ def test_current_state_says_the_m3_gate_was_executed():
     assert "M3 macro DATA Gate" in text
     assert "**Executed:** True" in text
     assert "UNRESOLVED_M3_DATA_GATE" in text
-    # The M3 Gate section is history; the LIVE workstream is now Phase 2.
+    # The M3 Gate section is history; the LIVE workstream is Stage130 Phase 2,
+    # labelled for the submission metadata now that the human review is done.
     assert ("**Active workstream:** "
-            "`stage130_phase2_manuscript_assembly_human_review`") in text
+            "`stage130_phase2_manuscript_submission_metadata`") in text
 
 
 def test_current_state_cannot_both_assert_and_deny_gate_execution():
@@ -3322,7 +3329,7 @@ def test_roadmap_no_longer_labels_the_m3_gate_unauthorized_or_unstarted():
     text = _roadmap_text()
     front = text.split("---")[1]
     assert ("active_research_workstream_id: "
-            "stage130-phase2-manuscript-assembly-human-review") in front
+            "stage130-phase2-manuscript-submission-metadata") in front
     assert ("predecessor_research_workstream_id: "
             "stage128-m3i2-final-official-documentary-recovery") in front
     # the stale live-workstream label must not be the ACTIVE one
@@ -4089,14 +4096,16 @@ def test_superseded_m3i2_claims_never_return_to_the_roadmap(claim):
 
 
 def test_roadmap_front_matter_pins_the_live_recovery_workstream():
-    """The live workstream is the Stage130 Phase 2 manuscript awaiting review.
+    """The live workstream is Stage130 Phase 2, pending submission metadata.
 
-    The Stage128 documentary-recovery labels are retained as predecessor
-    context and as roadmap history, never deleted.
+    The human review that the earlier `…-human-review` label named completed on
+    2026-08-20, so the live label names what is actually pending. The Stage128
+    documentary-recovery labels are retained as predecessor context and as
+    roadmap history, never deleted.
     """
     fm = gen.read_roadmap(REAL_ROOT)
     assert fm["active_research_workstream_id"] == (
-        "stage130-phase2-manuscript-assembly-human-review")
+        "stage130-phase2-manuscript-submission-metadata")
     assert fm["predecessor_research_workstream_id"] == (
         "stage128-m3i2-final-official-documentary-recovery")
     assert fm["last_completed_research_action_id"] == (
@@ -4961,10 +4970,17 @@ def test_current_state_does_not_still_call_the_live_stage_stage128():
 
 
 @_needs_p2
-def test_live_workstream_is_the_phase2_manuscript_review():
+def test_live_workstream_is_the_phase2_submission_metadata():
+    """Phase 2 is still the live workstream; only its LABEL advanced.
+
+    While a human had not read the draft the label named the review. That
+    review is complete, so the label names the pending human-supplied
+    submission metadata instead — a description of the live state, never a
+    permission for it.
+    """
     state = _handoff_state()
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_assembly_human_review")
+        "stage130_phase2_manuscript_submission_metadata")
     # the Stage128 chain is retained as predecessor context, never deleted
     assert state["active_workstream_predecessor_context"] == (
         "stage128_m3i2_final_official_documentary_recovery")

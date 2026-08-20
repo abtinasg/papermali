@@ -577,3 +577,135 @@ def test_the_human_decision_is_recorded_verbatim(decision):
     assert decision["human_decision_translation"].strip()
     assert decision["decision_date_utc"] == "2026-08-20"
     assert decision["pr_number"] == 100
+
+
+# ------------------------- 12. the live workstream label is not stale either
+#: The workstream label that was true only while a human had not read the
+#: draft. It survives as a generator/validator CONSTANT (history), but it may
+#: no longer be the live value.
+STALE_WORKSTREAM_ID = "stage130-phase2-manuscript-assembly-human-review"
+STALE_WORKSTREAM_KEY = "stage130_phase2_manuscript_assembly_human_review"
+WORKSTREAM_ID = "stage130-phase2-manuscript-submission-metadata"
+WORKSTREAM_KEY = "stage130_phase2_manuscript_submission_metadata"
+
+
+def test_the_live_workstream_is_no_longer_the_human_review_workstream(
+        state, roadmap_front_matter):
+    """A completed review makes the `…-human-review` label a stale claim."""
+    assert roadmap_front_matter["active_research_workstream_id"] != \
+        STALE_WORKSTREAM_ID
+    assert state["active_workstream"] != STALE_WORKSTREAM_KEY
+    assert roadmap_front_matter["active_research_workstream_id"] == WORKSTREAM_ID
+    assert state["active_workstream"] == WORKSTREAM_KEY
+    # the completed review is what makes it stale
+    assert state["stage130_phase2_human_review_completed"] is True
+    assert state["stage130_phase2_human_review_required"] is False
+
+
+def test_the_workstream_label_aligns_with_the_submission_metadata_pointer(
+        state, roadmap_front_matter):
+    """The label and the pointer name the same pending thing."""
+    assert state["next_research_action_id"] == NEXT_POINTER
+    assert WORKSTREAM_ID.endswith("manuscript-submission-metadata")
+    assert NEXT_POINTER.endswith("manuscript-submission-metadata")
+    assert roadmap_front_matter["next_research_action_scope"] == NEXT_POINTER_SCOPE
+    assert "submission_metadata" in NEXT_POINTER_SCOPE
+
+
+def test_the_workstream_label_is_not_an_authorization(state,
+                                                      roadmap_front_matter):
+    """Renaming a state description may not grant the action it describes."""
+    assert state["next_research_action_authorized"] is False
+    assert state["next_research_action_pointer_is_not_authorization"] is True
+    assert state["stage130_phase2_next_action_authorized"] is False
+    assert state["stage130_phase2_submission_ready"] is False
+    assert state["stage130_phase2_ready_for_review_authorized"] is False
+    assert state["stage130_phase2_merge_authorized"] is False
+    assert state["stage130_authorized"] is False
+    assert state["stage130_manuscript_submission_workflow_started"] is False
+    assert state["stage130_manuscript_human_supplied_metadata_outstanding"] is True
+    for key in ("next_research_action_authorized",
+                "stage130_phase2_submission_ready",
+                "stage130_phase2_ready_for_review_authorized",
+                "stage130_phase2_merge_authorized"):
+        assert roadmap_front_matter[key] == "false", key
+
+
+def test_roadmap_and_generated_handoff_representations_agree(
+        state, roadmap_front_matter):
+    """ROADMAP is the input, the Handoff is derived; they must not diverge."""
+    import update_ai_handoff as gen
+    assert state["active_workstream"] == \
+        roadmap_front_matter["active_research_workstream_id"].replace("-", "_")
+    assert gen._STAGE130_SUBMISSION_METADATA_WORKSTREAM_ID == WORKSTREAM_ID
+    # ...and the independent Stage126 current-state validator agrees, derived
+    # from the committed artifacts rather than from the Handoff it validates
+    sys.path.insert(0, os.path.join(REPO_ROOT, "project", "src"))
+    import stage126_current_state_validator as csv_mod
+    from pathlib import Path
+    assert csv_mod.stage130_human_review_completed(Path(REPO_ROOT)) is True
+    assert csv_mod.expected_active_workstream(Path(REPO_ROOT)) == WORKSTREAM_KEY
+    assert csv_mod.STAGE130_SUBMISSION_METADATA_ACTIVE_WORKSTREAM == WORKSTREAM_KEY
+    assert csv_mod.current_state_labels_are_not_stale(
+        state, freeze_completed=True) is True
+    # the rendered snapshot says the same thing
+    text = _text("project/docs/ai/CURRENT_STATE.md")
+    assert f"- **Active workstream:** `{WORKSTREAM_KEY}`" in text
+    assert STALE_WORKSTREAM_KEY not in text
+    # and the historical constants survive, unmoved
+    assert gen._STAGE130_P2_WORKSTREAM_ID == STALE_WORKSTREAM_ID
+    assert csv_mod.STAGE130_P2_ACTIVE_WORKSTREAM == STALE_WORKSTREAM_KEY
+
+
+def test_the_generator_fails_closed_on_a_stale_live_workstream(sandbox,
+                                                               monkeypatch):
+    """The staleness guard must REFUSE the old label once review is complete.
+
+    This is the fail-closed half: it is not enough that the label was updated
+    by hand — a ROADMAP that still advertises the human-review workstream must
+    break the build.
+    """
+    import update_ai_handoff as gen
+    monkeypatch.setattr(
+        gen, "read_roadmap",
+        lambda root: {"active_research_workstream_id": STALE_WORKSTREAM_ID})
+    monkeypatch.setattr(
+        gen, "derive_stage130_manuscript_human_review_completion_markers",
+        lambda root: {"stage130_manuscript_human_review_completion_recorded": True})
+    with pytest.raises(gen.HandoffError) as exc:
+        gen.derive_stage128_m2_d2_design_freeze_markers(REPO_ROOT)
+    assert STALE_WORKSTREAM_ID in str(exc.value)
+    assert WORKSTREAM_ID in str(exc.value)
+
+
+def test_the_independent_validator_fails_closed_on_a_stale_live_workstream(
+        state):
+    """Same refusal, from the independent current-state validator."""
+    sys.path.insert(0, os.path.join(REPO_ROOT, "project", "src"))
+    import stage126_current_state_validator as csv_mod
+    stale = dict(state)
+    stale["active_workstream"] = STALE_WORKSTREAM_KEY
+    assert csv_mod.current_state_labels_are_not_stale(
+        stale, freeze_completed=True) is False
+    # ...and it still accepts the truthful label
+    assert csv_mod.current_state_labels_are_not_stale(
+        dict(state), freeze_completed=True) is True
+
+
+def test_the_validator_recognizer_fails_closed_on_a_permission_claim(tmp_path):
+    """The label may never be reached by a decision that claims a permission."""
+    sys.path.insert(0, os.path.join(REPO_ROOT, "project", "src"))
+    import stage126_current_state_validator as csv_mod
+    from pathlib import Path
+    rel = csv_mod.STAGE130_REVIEW_COMPLETION_DECISION_REL
+    for field in ("submission_ready", "ready_for_review_authorized",
+                  "merge_authorized", "approval_is_submission_authorization"):
+        dst = tmp_path / field
+        (dst / os.path.dirname(rel)).mkdir(parents=True, exist_ok=True)
+        blob = _load(rel)
+        blob[field] = True
+        with open(dst / rel, "w", encoding="utf-8") as fh:
+            json.dump(blob, fh, ensure_ascii=False, indent=2, sort_keys=True)
+        with pytest.raises(csv_mod.ValidationFail) as exc:
+            csv_mod.stage130_human_review_completed(dst)
+        assert field in str(exc.value)
