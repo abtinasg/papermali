@@ -8,11 +8,11 @@ _Generated from the repository (git + QC). Do not edit by hand._
 ## Snapshot
 
 - **Stage / Batch:** Stage130 / None
-- **Active workstream:** `stage130_phase2_manuscript_assembly_human_review`
+- **Active workstream:** `stage130_phase2_manuscript_submission_metadata`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-manuscript-submission-metadata`
-- **Last stage commit:** `d30ce378132f6b529257e15bc0699a37e771fc7f`
-- **Generated from commit:** `d30ce378132f6b529257e15bc0699a37e771fc7f` (branch `stage130-human-review-data-contribution`, informational)
+- **Last stage commit:** `37dc173404a680bc4407a239807d750d53d776f2`
+- **Generated from commit:** `37dc173404a680bc4407a239807d750d53d776f2` (branch `stage130-human-review-data-contribution`, informational)
 - **Baseline:** `origin/main` @ `76b4e9d286bc513a290c0534da9b5fcd23fcf497`
 
 ## Current-state validation
@@ -481,5 +481,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `bd575a83790cea2698c7b2d4b89bab55cd38d0ff00257e94609853bfd15bb266`_
-_generated_at_utc: 2026-08-20T09:32:35Z (informational)_
+_state_fingerprint: `21414fd8d52127d68477b19ed73b4113e145ea0e1a8285c1ee55beb5b8203be5`_
+_generated_at_utc: 2026-08-20T10:30:31Z (informational)_
