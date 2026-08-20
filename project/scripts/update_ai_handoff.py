@@ -3100,6 +3100,14 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # manuscript makes that statement stale, so Phase 2 owns the live
         # next-action key while Phase 1 keeps its own historical pointer.
         **derive_stage130_phase2_markers(root),
+        # Must come after Phase 2: the human read the draft. Phase 2 published
+        # `human_review_required = True` and pointed at `human-manuscript-
+        # review`, both true while no human had read it. The review is now
+        # complete, so this owns those live keys and the live pointer -- while
+        # Phase 2 keeps publishing its own historical values, which this
+        # deriver reads back and requires, so history is superseded in the
+        # open rather than rewritten.
+        **derive_stage130_manuscript_human_review_completion_markers(root),
         }))
 
 
@@ -6491,11 +6499,12 @@ def render_current_state(record: dict) -> str:
     if record.get("stage130_phase2_recorded"):
         lines += [
             "### Stage130 Phase 2 — manuscript assembly (CURRENT; writing "
-            "only, awaiting human review)\n",
+            "only, human review COMPLETED)\n",
             "_The manuscript draft exists. This is a WRITING action: it "
             "assembled prose and audit files from already-committed evidence "
-            "and computed nothing. It is a draft awaiting human review, not a "
-            "submission._\n",
+            "and computed nothing. The human scientific and editorial review "
+            "of that draft is COMPLETE and its content is approved; a "
+            "reviewed draft is still not a submission._\n",
             "- ✅ **Phase 2 started:** "
             f"{record.get('stage130_phase2_started')} — completed = "
             f"{record.get('stage130_phase2_completed')}, presentation only = "
@@ -6523,14 +6532,18 @@ def render_current_state(record: dict) -> str:
             f"= {record.get('stage130_phase2_new_metrics_computed')}, new CIs "
             f"= {record.get('stage130_phase2_new_confidence_intervals_computed')}"
             f", SHAP = {record.get('stage130_phase2_shap_executions')}.",
-            "- 📝 **Human review REQUIRED:** "
-            f"{record.get('stage130_phase2_human_review_required')} — review "
-            f"completed = {record.get('stage130_phase2_human_review_completed')}"
-            ", submission ready = "
+            "- 📝 **Human review COMPLETED:** "
+            f"{record.get('stage130_phase2_human_review_completed')} — review "
+            "still required = "
+            f"{record.get('stage130_phase2_human_review_required')} (it HAD "
+            "been required: was required = "
+            f"{record.get('stage130_phase2_human_review_was_required')}), "
+            "submission ready = "
             f"{record.get('stage130_phase2_submission_ready')}. Author list, "
             "affiliations, funding, conflicts, ethics and the data-access "
             "mechanism are human-only and are carried as explicit "
-            "placeholders, never invented.",
+            "placeholders, never invented — approving the manuscript TEXT is "
+            "not submission authorization.",
             "- ⛔ **Not authorized:** ready-for-review = "
             f"{record.get('stage130_phase2_ready_for_review_authorized')}, "
             f"merge = {record.get('stage130_phase2_merge_authorized')}, "
@@ -6541,6 +6554,75 @@ def render_current_state(record: dict) -> str:
             "pointer is never an authorization.",
             "- Manuscript: `project/stage130/manuscript/`; validator: "
             "`project/stage130/manuscript/validate_manuscript.py`",
+            "",
+        ]
+    if record.get("stage130_manuscript_human_review_completion_recorded"):
+        lines += [
+            "### Stage130 — human manuscript review COMPLETED (recording "
+            "only; not a submission)\n",
+            "_The human supervisor read the committed draft at one exact "
+            "commit and approved its CONTENT. Recording that is not "
+            "submission readiness, not Ready-for-Review and not merge "
+            "authorization._\n",
+            "- ✅ **Review completed:** "
+            f"{record.get('stage130_phase2_human_review_completed')} — "
+            "recorded by "
+            f"`{record.get('stage130_manuscript_human_review_completion_action_id')}`"
+            " on "
+            f"{record.get('stage130_manuscript_human_review_decision_date_utc')}"
+            ", human-authorized = "
+            f"{record.get('stage130_manuscript_human_review_authorized_by_human')}.",
+            "- 🔒 **Reviewed head:** "
+            f"`{record.get('stage130_manuscript_reviewed_head_commit')}` — "
+            "approved file "
+            f"`{record.get('stage130_manuscript_reviewed_path')}`, SHA-256 "
+            f"`{record.get('stage130_manuscript_reviewed_sha256')}`, blob "
+            f"`{record.get('stage130_manuscript_reviewed_blob_id')}`. "
+            "Manuscript modified by this action = "
+            f"{record.get('stage130_manuscript_modified_by_this_action')}; "
+            "both digests are re-derived from the file, so editing the "
+            "approved text fails the build instead of inheriting the "
+            "approval.",
+            "- 🕰️ **History preserved:** the Phase 2 assembly record still "
+            "publishes `human_review_required = True` (was required = "
+            f"{record.get('stage130_phase2_human_review_was_required')}); this "
+            "supersedes "
+            f"`{record.get('stage130_manuscript_supersedes_key')}` in the "
+            "open, and the historical pointer "
+            f"`{record.get('stage130_manuscript_supersedes_pointer')}` is not "
+            "rewritten (Phase 2 record preserved = "
+            f"{record.get('stage130_phase2_assembly_record_preserved')}).",
+            "- ⛔ **Still NOT authorized:** submission ready = "
+            f"{record.get('stage130_phase2_submission_ready')}, "
+            "ready-for-review = "
+            f"{record.get('stage130_phase2_ready_for_review_authorized')}, "
+            f"merge = {record.get('stage130_phase2_merge_authorized')}, "
+            f"Stage130 authorized = {record.get('stage130_authorized')}, "
+            "submission workflow started = "
+            f"{record.get('stage130_manuscript_submission_workflow_started')}.",
+            "- 👤 **Human-supplied submission metadata still outstanding:** "
+            f"{record.get('stage130_manuscript_human_supplied_metadata_outstanding')}"
+            " — "
+            f"{record.get('stage130_manuscript_human_supplied_metadata_outstanding_count')}"
+            " items ("
+            + ", ".join(
+                f"`{item}`" for item in
+                (record.get(
+                    "stage130_manuscript_human_supplied_metadata_outstanding_items")
+                 or []))
+            + "). None was invented by this action.",
+            "- ⛔ **Nothing scientific occurred:** Final Test rows read = "
+            f"{record.get('stage130_phase2_final_test_rows_read')}, prediction "
+            "artifact opened = "
+            f"{record.get('stage130_phase2_prediction_artifact_opened')}, "
+            "Stage130 scientific execution started = "
+            f"{record.get('stage130_scientific_execution_started')}.",
+            "- ➡️ **Live next action:** "
+            f"`{record.get('next_research_action_id')}` — authorized = "
+            f"{record.get('next_research_action_authorized')}. The review it "
+            "used to name is done; a pointer is never an authorization.",
+            "- Package: "
+            "`project/stage130/manuscript_human_review_completion/`",
             "",
         ]
     lines += [
@@ -17330,6 +17412,402 @@ def derive_stage130_phase2_markers(root: str) -> dict:
         "next_research_action_id": _STAGE130_P2_NEXT_ACTION_ID,
         "next_research_action_scope":
             "manuscript_human_review_no_further_action_is_authorized",
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
+    }
+
+#: Stage130 -- the human manuscript review, COMPLETED.
+_STAGE130_REVIEW_PKG = "project/stage130/manuscript_human_review_completion"
+_STAGE130_REVIEW_ACTION_ID = "stage130-manuscript-human-review-completion"
+_STAGE130_REVIEW_DECISION_REL = (
+    f"{_STAGE130_REVIEW_PKG}/"
+    "stage130_manuscript_human_review_completion_decision.json")
+_STAGE130_REVIEW_BOUNDARY_REL = (
+    f"{_STAGE130_REVIEW_PKG}/"
+    "stage130_manuscript_human_review_governance_boundary.json")
+#: The exact commit the human read. An approval attaches to one commit.
+_STAGE130_REVIEW_REVIEWED_HEAD = "c4136a412696c7bb626f0c389bcccb829f381629"
+#: The Draft pull request the reviewed head belongs to.
+_STAGE130_REVIEW_PR_NUMBER = 100
+#: The manuscript that was approved, pinned by BOTH digests.
+_STAGE130_REVIEW_MANUSCRIPT_REL = (
+    f"{_STAGE130_P2_DIR}/manuscript_draft_en.md")
+#: The pointer the completed review replaces, and the one it advances to. The
+#: successor names the human-supplied submission metadata the draft still
+#: lacks; it is a POINTER and never a permission.
+_STAGE130_REVIEW_NEXT_ACTION_ID = "human-manuscript-submission-metadata"
+_STAGE130_REVIEW_NEXT_ACTION_SCOPE = (
+    "manuscript_human_submission_metadata_no_further_action_is_authorized")
+#: `human-manuscript-review` is what the human actually completed, so it -- not
+#: the Phase 2 assembly -- is the newest completed research action.
+_STAGE130_REVIEW_LAST_COMPLETED_ACTION_ID = _STAGE130_P2_NEXT_ACTION_ID
+#: The six human-only submission items. Reviewing the TEXT supplies none of
+#: them, so none may be recorded as supplied by this action.
+_STAGE130_REVIEW_OUTSTANDING_METADATA = (
+    "authors_and_author_order",
+    "affiliations_and_corresponding_author",
+    "funding",
+    "conflicts_of_interest",
+    "ethics_and_data_governance_statement",
+    "data_access_mechanism_for_the_restricted_company_panel",
+)
+#: Everything a content approval is explicitly NOT.
+_STAGE130_REVIEW_FORBIDDEN_TRUE = (
+    "submission_ready",
+    "ready_for_review_authorized",
+    "merge_authorized",
+    "stage130_authorized",
+    "stage130_or_next_stage_executed",
+    "manuscript_modified_by_this_action",
+    "manuscript_rewriting_authorized",
+    "manuscript_text_approval_is_submission_authorization",
+    "new_scientific_analysis_performed",
+    "scientific_execution_started",
+    "stage130_phase2_scientific_execution_started",
+    "submission_workflow_started",
+    "final_test_access_authorized",
+    "final_test_second_pass_authorized",
+    "author_names_supplied_by_this_action",
+    "affiliations_supplied_by_this_action",
+    "funding_supplied_by_this_action",
+    "conflicts_of_interest_supplied_by_this_action",
+    "ethics_statement_supplied_by_this_action",
+    "data_access_mechanism_finalized_by_this_action",
+    "prior_packages_modified_by_this_action",
+    "stage122_to_stage129_artifacts_modified_by_this_action",
+    "next_action_authorized",
+    "pr_merged",
+    "branch_deleted_by_this_action",
+    "auto_merge_enabled_by_this_action",
+)
+
+
+def _git_blob_id(payload: bytes) -> str:
+    """Git object id of ``payload`` as a blob, computed without invoking git.
+
+    Deterministic and sandbox-safe: it is exactly what ``git hash-object``
+    would print, so a recorded blob ID can be checked against a working file
+    in a temporary tree that is not a repository at all.
+    """
+    header = f"blob {len(payload)}\0".encode("ascii")
+    return hashlib.sha1(header + payload).hexdigest()
+
+
+def derive_stage130_manuscript_human_review_completion_markers(
+        root: str) -> dict:
+    """Recognize that the human manuscript review is COMPLETE.
+
+    Narrow and fail-closed. This is a review-completion RECORDING and nothing
+    else: it changes no manuscript byte, computes nothing, opens no Final Test
+    row, reads no prediction-artifact content and authorizes nothing.
+
+    It resolves exactly the three live markers the Phase 2 assembly left
+    standing while no human had read the draft --
+    ``stage130_phase2_human_review_required``,
+    ``stage130_phase2_human_review_completed`` and the live next-action
+    pointer. Phase 2's own record is NOT rewritten: this function reads the
+    historical values back out of ``derive_stage130_phase2_markers`` and
+    refuses to build if they have been quietly changed, so the supersede is
+    anchored on real history.
+
+    The approval is bound to bytes, not to a filename: the decision pins the
+    reviewed commit, the manuscript SHA-256 and the manuscript Git blob ID,
+    and both digests are RE-DERIVED here from the file on disk. Editing the
+    approved manuscript therefore breaks the build instead of silently
+    inheriting a human approval it never received.
+
+    Fails closed if the decision claims submission readiness, Ready-for-Review
+    or merge authorization, invents human-only submission metadata, reports a
+    non-zero action counter, or reverts the review to incomplete. Returns {}
+    before the package exists.
+    """
+    path = os.path.join(root, _STAGE130_REVIEW_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    decision = _require_json_artifact(root, _STAGE130_REVIEW_DECISION_REL)
+    boundary = _require_json_artifact(root, _STAGE130_REVIEW_BOUNDARY_REL)
+
+    if decision.get("decision_id") != _STAGE130_REVIEW_ACTION_ID:
+        raise HandoffError(
+            "Stage130 manuscript human-review completion decision_id mismatch")
+    if boundary.get("action_id") != _STAGE130_REVIEW_ACTION_ID:
+        raise HandoffError(
+            "Stage130 manuscript human-review completion boundary action_id "
+            "mismatch")
+    if decision.get("decision_type") != "human_manuscript_review_completion":
+        raise HandoffError(
+            "Stage130 manuscript review completion must be a "
+            "human_manuscript_review_completion")
+    if decision.get("authorized_by_human") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review completion must be human-authorized")
+
+    # (1) The review is COMPLETE and no longer outstanding, on both surfaces.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("human_review_completed") is not True:
+            raise HandoffError(
+                f"Stage130 manuscript review {label} must record the human "
+                "review as completed")
+    if decision.get("human_review_required_after_this_decision") is not False:
+        raise HandoffError(
+            "Stage130 manuscript review decision must clear the outstanding "
+            "review requirement")
+    if boundary.get("human_review_required") is not False:
+        raise HandoffError(
+            "Stage130 manuscript review boundary human_review_required must "
+            "be False once the review is complete")
+    if decision.get("manuscript_content_approved") is not True or \
+            boundary.get("manuscript_content_approved_by_human") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review must record the content approval")
+
+    # (2) The HISTORY is preserved, not rewritten. Phase 2 must still publish
+    # what was true when it ran; the supersede is anchored on those values.
+    prior = derive_stage130_phase2_markers(root)
+    if not prior:
+        raise HandoffError(
+            "Stage130 manuscript review completion cannot be recorded without "
+            "the Phase 2 manuscript it reviews")
+    if prior.get("stage130_phase2_human_review_required") is not True:
+        raise HandoffError(
+            "the Stage130 Phase 2 assembly record must keep publishing "
+            "human_review_required = True: that is what was true when Phase 2 "
+            "ran, and the review completion supersedes it in the open rather "
+            "than rewriting history")
+    if prior.get("stage130_phase2_human_review_completed") is not False:
+        raise HandoffError(
+            "the Stage130 Phase 2 assembly record must keep publishing "
+            "human_review_completed = False (historical value)")
+    if prior.get("stage130_phase2_next_action_id") != _STAGE130_P2_NEXT_ACTION_ID:
+        raise HandoffError(
+            "the Stage130 Phase 2 assembly record must keep pointing at "
+            f"{_STAGE130_P2_NEXT_ACTION_ID} (historical pointer)")
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        was = source.get("human_review_was_required_before_this_decision") \
+            if label == "decision" else source.get("human_review_was_required")
+        if was is not True:
+            raise HandoffError(
+                f"Stage130 manuscript review {label} must preserve the "
+                "historical fact that the review had been REQUIRED")
+    for field in ("prior_phase2_assembly_record_preserved",
+                  "prior_phase1_evidence_package_preserved"):
+        if boundary.get(field) is not True:
+            raise HandoffError(
+                f"Stage130 manuscript review boundary {field} must be True")
+
+    marker = decision.get("superseded_marker") or {}
+    if marker.get("key") != "stage130_phase2_human_review_required":
+        raise HandoffError(
+            "Stage130 manuscript review must supersede "
+            "stage130_phase2_human_review_required")
+    if marker.get("previous_value") is not True or \
+            marker.get("resolved_value") is not False:
+        raise HandoffError(
+            "Stage130 manuscript review supersede must record the real prior "
+            "value True resolving to False")
+    if marker.get("companion_key") != "stage130_phase2_human_review_completed" \
+            or marker.get("companion_previous_value") is not False \
+            or marker.get("companion_resolved_value") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review supersede must record the companion "
+            "review-completed marker moving False -> True")
+    if marker.get("pointer_previous_value") != _STAGE130_P2_NEXT_ACTION_ID or \
+            marker.get("pointer_resolved_value") != \
+            _STAGE130_REVIEW_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 manuscript review supersede must record the pointer "
+            f"moving {_STAGE130_P2_NEXT_ACTION_ID} -> "
+            f"{_STAGE130_REVIEW_NEXT_ACTION_ID}")
+    if marker.get("historical_phase2_assembly_record_preserved") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review supersede must declare the historical "
+            "Phase 2 assembly record preserved")
+
+    # (3) The approval is bound to BYTES at ONE commit, re-derived here. An
+    # approval that follows a moving file is not an approval.
+    head = decision.get("reviewed_head_commit")
+    if not (isinstance(head, str) and len(head) == 40
+            and all(c in "0123456789abcdef" for c in head)):
+        raise HandoffError(
+            "Stage130 manuscript review must pin a full 40-hex reviewed head")
+    if head != _STAGE130_REVIEW_REVIEWED_HEAD:
+        raise HandoffError(
+            "Stage130 manuscript review reviewed head must be "
+            f"{_STAGE130_REVIEW_REVIEWED_HEAD}, got {head!r}")
+    if boundary.get("reviewed_head_commit") != head:
+        raise HandoffError(
+            "Stage130 manuscript review boundary reviewed head disagrees with "
+            "the decision")
+    if decision.get("reviewed_manuscript_path") != \
+            _STAGE130_REVIEW_MANUSCRIPT_REL:
+        raise HandoffError(
+            "Stage130 manuscript review must name "
+            f"{_STAGE130_REVIEW_MANUSCRIPT_REL} as the reviewed manuscript")
+    manuscript_path = os.path.join(root, _STAGE130_REVIEW_MANUSCRIPT_REL)
+    if not os.path.isfile(manuscript_path):
+        raise HandoffError(
+            "Stage130 manuscript review: the approved manuscript is missing")
+    with open(manuscript_path, "rb") as fh:
+        payload = fh.read()
+    actual_sha = hashlib.sha256(payload).hexdigest()
+    actual_blob = _git_blob_id(payload)
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("reviewed_manuscript_sha256") != actual_sha:
+            raise HandoffError(
+                "the approved manuscript has changed since the human read it: "
+                f"{label} pins sha256 "
+                f"{source.get('reviewed_manuscript_sha256')!r} but the file is "
+                f"{actual_sha}. A content approval attaches to the bytes that "
+                "were reviewed, so this requires a NEW human review, not a "
+                "rebuild.")
+        if source.get("reviewed_manuscript_blob_id") != actual_blob:
+            raise HandoffError(
+                "the approved manuscript has changed since the human read it: "
+                f"{label} pins blob {source.get('reviewed_manuscript_blob_id')!r}"
+                f" but the file hashes to {actual_blob}")
+
+    # (4) Approving the TEXT authorizes nothing downstream.
+    for field in _STAGE130_REVIEW_FORBIDDEN_TRUE:
+        for source, label in ((decision, "decision"), (boundary, "boundary")):
+            if field not in source:
+                continue
+            if source.get(field) is not False:
+                raise HandoffError(
+                    f"Stage130 manuscript review {label} {field} must be "
+                    "False: approving the manuscript text is not submission, "
+                    "Ready-for-Review or merge authorization")
+    for field in ("approval_is_submission_authorization",
+                  "approval_is_ready_for_review_authorization",
+                  "approval_is_merge_authorization",
+                  "author_names_supplied_by_this_decision",
+                  "affiliations_supplied_by_this_decision",
+                  "funding_supplied_by_this_decision",
+                  "conflicts_of_interest_supplied_by_this_decision",
+                  "ethics_statement_supplied_by_this_decision",
+                  "data_access_mechanism_finalized_by_this_decision",
+                  "manuscript_modified_by_this_decision"):
+        if decision.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 manuscript review decision {field} must be False")
+    if decision.get("approval_is_manuscript_content_approval_only") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review must declare itself a content "
+            "approval only")
+    if boundary.get("human_supplied_submission_metadata_outstanding") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review must keep the human-supplied "
+            "submission metadata outstanding")
+    outstanding = tuple(
+        decision.get("outstanding_human_supplied_submission_metadata") or ())
+    if outstanding != _STAGE130_REVIEW_OUTSTANDING_METADATA:
+        raise HandoffError(
+            "Stage130 manuscript review must list the six outstanding "
+            f"human-supplied submission items exactly as "
+            f"{_STAGE130_REVIEW_OUTSTANDING_METADATA}, got {outstanding}")
+    if decision.get("outstanding_human_supplied_submission_metadata_count") != \
+            len(_STAGE130_REVIEW_OUTSTANDING_METADATA):
+        raise HandoffError(
+            "Stage130 manuscript review outstanding-metadata count must be "
+            f"{len(_STAGE130_REVIEW_OUTSTANDING_METADATA)}")
+
+    # (5) The PR stays a Draft, and the firewall is untouched.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("pr_is_draft") is not True:
+            raise HandoffError(
+                f"Stage130 manuscript review {label} must keep the PR a Draft")
+        if source.get("pr_number") != _STAGE130_REVIEW_PR_NUMBER:
+            raise HandoffError(
+                f"Stage130 manuscript review {label} PR number must be "
+                f"{_STAGE130_REVIEW_PR_NUMBER}")
+    if boundary.get("final_test_locked") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review must keep the Final Test locked")
+    if boundary.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage130 manuscript review final_test_rows_read must be 0")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError(
+            "Stage130 manuscript review boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage130 manuscript review counters.{field} must be 0 "
+                "(reading a manuscript reads no Final Test row, opens no "
+                "prediction artifact and computes nothing)")
+
+    # (6) The live pointer moves off the completed review -- as a POINTER.
+    if boundary.get("next_action_id") != _STAGE130_REVIEW_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 manuscript review must advance the pointer to "
+            f"{_STAGE130_REVIEW_NEXT_ACTION_ID}")
+    if boundary.get("next_action_id") == _STAGE130_P2_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 manuscript review may not keep pointing at the review "
+            "it just completed")
+    if boundary.get("next_action_scope") != _STAGE130_REVIEW_NEXT_ACTION_SCOPE:
+        raise HandoffError(
+            "Stage130 manuscript review next_action_scope must be "
+            f"{_STAGE130_REVIEW_NEXT_ACTION_SCOPE}")
+    if boundary.get("pointer_is_not_authorization") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review must declare the pointer is not an "
+            "authorization")
+
+    return {
+        "stage130_manuscript_human_review_completion_recorded": True,
+        "stage130_manuscript_human_review_completion_action_id":
+            _STAGE130_REVIEW_ACTION_ID,
+        "stage130_manuscript_human_review_authorized_by_human": True,
+        "stage130_manuscript_human_review_decision_date_utc":
+            decision.get("decision_date_utc"),
+
+        # THE resolved markers. Phase 2's own record keeps its history.
+        "stage130_phase2_human_review_required": False,
+        "stage130_phase2_human_review_completed": True,
+        "stage130_phase2_human_review_was_required": True,
+        "stage130_phase2_human_review_completed_previous_value": False,
+
+        # What exactly was approved, and at which commit.
+        "stage130_manuscript_reviewed_head_commit": head,
+        "stage130_manuscript_reviewed_path": _STAGE130_REVIEW_MANUSCRIPT_REL,
+        "stage130_manuscript_reviewed_sha256": actual_sha,
+        "stage130_manuscript_reviewed_blob_id": actual_blob,
+        "stage130_manuscript_content_approved": True,
+        "stage130_manuscript_modified_by_this_action": False,
+        "stage130_manuscript_supersedes_key":
+            "stage130_phase2_human_review_required",
+        "stage130_manuscript_supersedes_pointer": _STAGE130_P2_NEXT_ACTION_ID,
+        "stage130_phase2_assembly_record_preserved": True,
+
+        # ...and what it is NOT. Restated here so a consumer reading only the
+        # review completion still sees every boundary.
+        "stage130_phase2_submission_ready": False,
+        "stage130_phase2_ready_for_review_authorized": False,
+        "stage130_phase2_merge_authorized": False,
+        "stage130_authorized": False,
+        "stage130_manuscript_review_is_submission_authorization": False,
+        "stage130_manuscript_submission_workflow_started": False,
+        "stage130_manuscript_human_supplied_metadata_outstanding": True,
+        "stage130_manuscript_human_supplied_metadata_outstanding_count":
+            len(_STAGE130_REVIEW_OUTSTANDING_METADATA),
+        "stage130_manuscript_human_supplied_metadata_outstanding_items":
+            list(_STAGE130_REVIEW_OUTSTANDING_METADATA),
+        "stage130_phase2_scientific_execution_started": False,
+        "stage130_scientific_execution_started": False,
+        "stage130_phase2_final_test_rows_read": 0,
+        "stage130_phase2_prediction_artifact_opened": False,
+
+        # The live pointer. The review it used to name is done, so continuing
+        # to publish it would state something the repository contradicts. The
+        # successor names the human-only submission metadata that is still
+        # missing, and it is a POINTER: nothing here is authorized.
+        "last_completed_research_action_id":
+            _STAGE130_REVIEW_LAST_COMPLETED_ACTION_ID,
+        "stage130_phase2_next_action_id": _STAGE130_REVIEW_NEXT_ACTION_ID,
+        "stage130_phase2_next_action_authorized": False,
+        "next_research_action_id": _STAGE130_REVIEW_NEXT_ACTION_ID,
+        "next_research_action_scope": _STAGE130_REVIEW_NEXT_ACTION_SCOPE,
         "next_research_action_authorized": False,
         "next_research_action_pointer_is_not_authorization": True,
     }

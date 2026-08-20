@@ -1,0 +1,31 @@
+{
+  "action_id": "stage130-manuscript-human-review-completion",
+  "action_type": "human_manuscript_review_completion_recording_only",
+  "credentials_committed_to_git": false,
+  "final_test_artifacts_committed": 0,
+  "human_review_completed": true,
+  "manuscript_files_modified_by_this_action": 0,
+  "model_artifacts_committed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "package_file_count": 3,
+  "package_files": {
+    "README_STAGE130_MANUSCRIPT_HUMAN_REVIEW_COMPLETION.md": {
+      "bytes": 3932,
+      "sha256": "629aaf85adf787b7e202c855a8ef4b8143440959a56640b0ccf10d2998ff73aa"
+    },
+    "stage130_manuscript_human_review_completion_decision.json": {
+      "bytes": 4272,
+      "sha256": "8c02a0c02b97e5683ce8546be1b34c34d4128ea38abd4c67d30b1948abee6737"
+    },
+    "stage130_manuscript_human_review_governance_boundary.json": {
+      "bytes": 2707,
+      "sha256": "b7fe5138ba77ec07188a59df242385bfd8c5c8aa802c2a00f3799ef681c6f8fb"
+    }
+  },
+  "pii_committed_to_git": false,
+  "reviewed_head_commit": "c4136a412696c7bb626f0c389bcccb829f381629",
+  "reviewed_manuscript_blob_id": "93f7e8e796ec098de38725271305ab06263efd1f",
+  "reviewed_manuscript_sha256": "8b5d861c36e01dc81133c1071cd96f7e340482ac2148b53c055369bbd5ffcb19",
+  "submission_ready": false,
+  "value_files_committed": 0
+}

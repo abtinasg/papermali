@@ -3,10 +3,10 @@ roadmap_version: 2
 active_research_workstream_id: stage130-phase2-manuscript-assembly-human-review
 predecessor_research_workstream_id: stage128-m3i2-final-official-documentary-recovery
 qc_scope: stage126-m1-financial-baseline
-last_completed_research_action_id: stage130-phase2-manuscript-assembly
-next_research_action_id: human-manuscript-review
+last_completed_research_action_id: human-manuscript-review
+next_research_action_id: human-manuscript-submission-metadata
 next_research_action_authorized: false
-next_research_action_scope: manuscript_human_review_no_further_action_is_authorized
+next_research_action_scope: manuscript_human_submission_metadata_no_further_action_is_authorized
 conditional_follow_up_action_id: stage128-m3i2-final-official-inquiry-one-follow-up
 conditional_follow_up_earliest_date: 2026-08-21
 conditional_follow_up_authorized: false
@@ -64,7 +64,13 @@ stage130_phase2_started: true
 stage130_phase2_completed: true
 stage130_phase2_presentation_only: true
 stage130_phase2_scientific_execution_started: false
-stage130_phase2_human_review_required: true
+stage130_phase2_human_review_required: false
+stage130_phase2_human_review_was_required: true
+stage130_phase2_human_review_completed: true
+stage130_manuscript_human_review_completion_action_id: stage130-manuscript-human-review-completion
+stage130_manuscript_reviewed_head_commit: c4136a412696c7bb626f0c389bcccb829f381629
+stage130_manuscript_content_approved: true
+stage130_manuscript_modified_by_review_completion: false
 stage130_phase2_submission_ready: false
 stage130_phase2_ready_for_review_authorized: false
 stage130_phase2_merge_authorized: false
@@ -359,7 +365,9 @@ From 2026-07-26 onward, Stage126+ follows [`STAGE126_Q1Q2_LEAN_GOVERNANCE.md`](S
 
 25p. `stage130-phase2-manuscript-assembly` — **COMPLETE; STAGE130 PHASE 2; WRITING AND REFERENCE VERIFICATION ONLY, ZERO SCIENTIFIC EXECUTION.** The first complete English manuscript draft, assembled from the Phase 1 claim freeze and canonical tables plus the Stage125–Stage129 aggregate artifacts those pin. Every quantitative claim is recorded in a claim-traceability matrix carrying the canonical source path, the field or row, the exact committed value and the source SHA-256; every bibliography entry was verified against an authoritative registration record or the publisher's own page, with no guessed field. **Nothing scientific occurred:** `stage130_phase2_final_test_rows_read: 0`, the prediction artifact was never opened, and model fits, refits, predictions, thresholds, metrics, confidence intervals, bootstrap replicates, p-values, Holm executions, SHAP executions, recalibrations, isotonic fits, subgroup analyses, per-year performance calculations, decision-curve quantities and variable rankings are **0** of each. No figure was created; the three schematic figures are used by reference. `stage130_phase2_scientific_execution_started` is a SEPARATE key from the programme-wide `stage130_scientific_execution_started`, and neither may absorb the other. The draft makes no causal, superiority, significance, stability or deployment claim, never describes the Final Test as external or independent validation, and carries the reversal in robustness Part 1 explicitly alongside the preservation in Parts 2–6. **A draft is not a submission:** `stage130_phase2_human_review_required: true`, `stage130_phase2_submission_ready: false`, and author list, affiliations, funding, conflicts, ethics and the data-access mechanism are human-only placeholders that were never invented. Ready-for-review and merge remain **unauthorized**. See `project/stage130/manuscript/`.
 
-25q. `human-manuscript-review` — **POINTER ONLY; NOT AN ACTION AND NOT AUTHORIZED.** The literal state item 25p leaves behind: a complete manuscript draft exists and a human has not yet read it. The next step is a human scientific and editorial review of the draft, together with the human-only metadata the draft cannot supply. This item exists in the ordered list so the front-matter `next_research_action_id` truthfully names what is actually about to happen instead of continuing to point at `human_authorization_required_for_manuscript_assembly`, which was true only while no manuscript existed and is retained as Phase 1 history. It authorizes nothing, executes nothing, opens no Final Test row and is not itself a scientific action.
+25q. `human-manuscript-review` — **COMPLETE (2026-08-20); HUMAN SCIENTIFIC AND EDITORIAL REVIEW, PERFORMED BY THE HUMAN SUPERVISOR; RECORDING ONLY, ZERO SCIENTIFIC EXECUTION AND ZERO MANUSCRIPT CHANGE.** **Until 2026-08-20 this was a POINTER ONLY item and it was NOT authorized:** the literal state item 25p left behind was a complete manuscript draft that no human had yet read, so `stage130_phase2_human_review_required` stood at `true` and `stage130_phase2_human_review_completed` at `false`. That requirement was real and is retained as history — the Phase 2 assembly record at item 25p is **not rewritten** and still publishes both historical values, and `stage130_phase2_human_review_was_required: true` preserves the fact explicitly. The human supervisor has now read the complete draft at the exact reviewed Head `c4136a412696c7bb626f0c389bcccb829f381629` and approved it **on content**; the completion is recorded by `stage130-manuscript-human-review-completion` in `project/stage130/manuscript_human_review_completion/`, which pins the reviewed commit, the manuscript SHA-256 `8b5d861c36e01dc81133c1071cd96f7e340482ac2148b53c055369bbd5ffcb19` and the Git blob ID `93f7e8e796ec098de38725271305ab06263efd1f`, and re-derives both from the file so that editing the approved text fails the build instead of inheriting the approval. **The approved manuscript is byte-identical**: `stage130_manuscript_modified_by_review_completion: false`. **Approving the text is not a submission authorization.** `stage130_phase2_submission_ready: false`; author names, affiliations, funding, conflicts of interest, ethics wording and the final data-access mechanism remain human-supplied submission metadata and were **not** invented here; and `stage130_phase2_ready_for_review_authorized`, `stage130_phase2_merge_authorized` and `stage130_authorized` all remain `false`. Nothing scientific occurred: zero Final Test rows read, the prediction artifact was never opened, and zero fits, predictions, thresholds, metrics, confidence intervals, bootstrap replicates, p-values, Holm steps and SHAP executions.
+
+25r. `human-manuscript-submission-metadata` — **POINTER ONLY; NOT AN ACTION AND NOT AUTHORIZED.** The literal state item 25q leaves behind: the manuscript text has been read and approved by a human, and the six human-supplied submission items the draft deliberately carries as placeholders — authors and author order, affiliations and corresponding author, funding, conflicts of interest, the ethics and data-governance statement, and the data-access mechanism for the restricted company panel — are still missing. This item exists in the ordered list so the front-matter `next_research_action_id` truthfully names what is actually about to happen instead of continuing to point at `human-manuscript-review`, which was true only while no human had read the draft and is retained as history at item 25q. It authorizes nothing, executes nothing, supplies no author or institutional information, starts no submission workflow, opens no Final Test row and is not itself a scientific action: `next_research_action_authorized: false`.
 
 26. `stage128-m3-incremental-evaluation` — **conditional on Gate pass.** Evaluate M3 vs M2 on the paired M3 common sample. Keep the macro set parsimonious; no searched macro universe.
 27. `stage129-m4-governance-data-gate` — Gate each structured audit/governance predictor individually for definition, point-in-time availability, coverage and join quality. **No text modeling.**
