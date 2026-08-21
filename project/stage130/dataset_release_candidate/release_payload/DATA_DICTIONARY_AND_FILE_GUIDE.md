@@ -56,24 +56,52 @@ model on these files.
 
 ## The 115 columns
 
-`part3c_column_role_map_stage125.csv` is authoritative: it names all 115
-released columns and gives each exactly one role.
+### Start here: `RELEASE_COLUMN_DICTIONARY.csv`
 
-**`data_dictionary_stage125.csv` does not cover all of them, and the release
-says so rather than implying otherwise.** It is a Part 1 variable dictionary
-written over the *upstream source panel* and its candidate variable blocks, so:
+**One row for each of the 115 released columns. No gaps, no duplicates.** This
+is the file to open when you want to know what a column is.
 
-* it holds 38 entries;
-* **25** of the 115 released columns appear in it;
-* **90** released columns do not;
-* 13 of its entries are candidate variables that were never materialized (M2
-  market fields, M3 macro fields, M4 governance fields) or upstream keys that
-  were renamed when the company-year pair surface was built.
+| Field | What it gives you |
+|---|---|
+| `column_name` | The column, exactly as it appears in the CSV header |
+| `definition` | What the column is, in a sentence |
+| `data_type` | `numeric`, `integer`, `string`, `categorical`, `boolean_0_1`, `boolean_true_false`, `three_valued_1_0_missing`, `date_jalali_iso`, `date_gregorian_iso` |
+| `unit` | `million_IRR`, `ratio`, `binary_0_1`, `jalali_year`, a date format, or `not_applicable` |
+| `column_role` | The role from the authoritative role map |
+| `model_eligibility` | Whether it may ever be a feature — read this before selecting |
+| `source_block` | Which panel or construction stage the column comes from |
+| `source_provider_or_author_derived` | Provider line item, author-compiled ratio, author-derived rule output, or an assigned key |
+| `temporal_reference` | Which period the value describes: predictor year *t*, outcome year *t+1*, a period end, or a constant |
+| `missing_value_semantics` | What a missing or empty value means for **this** column |
+| `derivation_or_formula` | The committed formula, or the copy rule |
+| `authoritative_source_path` | The repository file the facts were transcribed from |
+| `authoritative_source_field_or_section` | The row, key or code section inside that file |
+| `definition_status` | `committed_dictionary`, `committed_contract`, `committed_target_definition`, or `frozen_generator_code` |
+| `limitations` | What this specific column cannot support |
 
-So: use the **role map** to decide what a column is and whether it may be a
-feature; use the **dictionary** for the richer prose description of the source
-variables it does cover. The gap is recorded in `release_manifest.json` under
-`column_documentation_coverage`.
+Nothing in it was invented. Every row is anchored to a committed artifact and
+the build refuses to ship a row it cannot anchor — an undefined column is
+reported by name rather than filled with a plausible sentence.
+
+### How it relates to the two historical artifacts
+
+Three files describe columns, and they are not interchangeable:
+
+| File | What it is | Coverage of the 115 |
+|---|---|---|
+| `RELEASE_COLUMN_DICTIONARY.csv` | **This release's** dictionary, built for publication | **115 / 115** |
+| `documentation/part3c_column_role_map_stage125.csv` | The **authoritative column set and role contract**, committed at Stage125 | 115 / 115 — names and roles only, no definitions |
+| `documentation/data_dictionary_stage125.csv` | The historical **Part 1 dictionary over the upstream panel** | 25 / 115 |
+
+The role map stays authoritative for *which* columns exist and *what role* each
+has; the release dictionary is gated at build time to match it exactly, so the
+two can never drift apart. The Stage125 dictionary ships unedited as history: it
+holds 38 entries, 25 of which correspond to released columns, and 13 of which
+describe candidate variables that were never materialized (M2 market fields, M3
+macro fields, M4 governance fields) or upstream keys renamed when the
+company-year pair surface was built. That shortfall is a fact about a committed
+historical artifact, and it is published in `release_manifest.json` under
+`upstream_dictionary_coverage` rather than quietly corrected.
 
 Every column carries exactly one role:
 
@@ -91,8 +119,9 @@ Every column carries exactly one role:
 
 **The 14 `forbidden_from_model_matrix` columns are the important ones.** They
 include the target-derived fields. Using one as a feature produces a model that
-predicts the outcome from the outcome. Check the role map before selecting
-features; do not select by name pattern.
+predicts the outcome from the outcome. Filter on `model_eligibility` in
+`RELEASE_COLUMN_DICTIONARY.csv`, or on `role` in the role map; do not select by
+name pattern.
 
 ### Key column groups
 
@@ -158,6 +187,13 @@ Missing is missing. Unknown outcomes are preserved as unknown and never
 converted to a negative. No imputation and no scaling has been applied to the
 released values — the contract records `no_imputation_or_scaling` among its
 explicit non-claims.
+
+What a blank means differs by column, and that is why every row of
+`RELEASE_COLUMN_DICTIONARY.csv` carries its own `missing_value_semantics`. In
+the reason-string columns an empty value means *there was no reason to record*,
+not *the reason is unknown*; in the outcome and criterion columns a blank is a
+genuine three-valued unknown; in the provenance columns it is a recorded gap.
+Do not treat the three the same way.
 
 ## Verifying what you received
 

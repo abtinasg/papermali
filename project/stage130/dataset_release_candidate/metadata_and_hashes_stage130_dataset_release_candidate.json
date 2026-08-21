@@ -1,15 +1,15 @@
 {
   "action_id": "stage130-dataset-release-candidate",
   "action_type": "dataset_release_candidate_preparation_and_documentation_only",
-  "archive_build_path_relative_to_repo_root": "project/stage130/dataset_release_candidate/build/tse_financial_distress_dataset_1392_1402_release_candidate.zip",
+  "archive_build_path_relative_to_repo_root": "project/stage130/dataset_release_candidate/build/rc2/tse_financial_distress_dataset_1392_1402_release_candidate_rc2.zip",
   "archive_format": "zip_stored_fixed_timestamps",
-  "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate.zip",
-  "archive_sha256": "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
-  "archive_size_bytes": 11657151,
+  "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate_rc2.zip",
+  "archive_sha256": "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+  "archive_size_bytes": 11808267,
   "archive_tracked_in_git": false,
   "author_contact_details_committed": true,
   "author_contact_details_note": "The two author email addresses are release metadata the human supplied for this dataset deposit. They are the authors' own contact details, not third-party personal data.",
-  "bundle_payload_file_count": 26,
+  "bundle_payload_file_count": 27,
   "bundle_root": "tse_financial_distress_dataset_1392_1402",
   "credentials_committed_to_git": false,
   "final_test_artifacts_committed": 0,
@@ -18,64 +18,87 @@
   "manuscript_files_modified_by_this_action": 0,
   "model_artifacts_committed": 0,
   "new_data_files_created_by_this_action": 0,
-  "package_file_count": 13,
+  "package_file_count": 14,
   "package_files": {
     "README_STAGE130_DATASET_RELEASE_CANDIDATE.md": {
-      "bytes": 4839,
-      "sha256": "a42c3ce19f125f03f6c6dbeb402d0a782750911ef5e199cd246abd80302df82c"
+      "bytes": 10005,
+      "sha256": "34e3fb53ede8784a8a36905ae28a56777e65805b6d3a8971ff8c246348efa589"
     },
     "SHA256SUMS.txt": {
-      "bytes": 2676,
-      "sha256": "d09adb27e47760538333c954296a09ceba4b3464787cb79b6c64c965522b8fd6"
+      "bytes": 2772,
+      "sha256": "6954f2d991fa7d99990f37d7bc8086563f7bfad97232b2ff45f84ff20f4280f8"
     },
     "release_manifest.json": {
-      "bytes": 13904,
-      "sha256": "696b5288643c948efce21ab421d7047e486eb2e168ee59790cea04fc08836837"
+      "bytes": 17674,
+      "sha256": "d170b5d36070d5cf0e6188ffac7be2ada02e75cb4b72f14c1fd0e4f0cf855404"
     },
     "release_payload/CITATION.cff": {
       "bytes": 1672,
-      "sha256": "1bc117e0812e0bc08dea04fbd564f865475ef31cb4fb9bfca56953556878b7b9"
+      "sha256": "1db919033d7bc35a9866ec6ced99a78cfc03b69a5f410faaa0f0e1a472e97d48"
     },
     "release_payload/DATA_DICTIONARY_AND_FILE_GUIDE.md": {
-      "bytes": 7562,
-      "sha256": "4e0680a54ad2fc68f12921e00d891c75deb445cba96cfe59cc77cde6f4c3b58e"
+      "bytes": 10217,
+      "sha256": "5c3a58482c163ca573002bcc5909e266d31d451dfb27aa3e4108dbb97308e89f"
     },
     "release_payload/LICENSE_DATASET.txt": {
-      "bytes": 1976,
-      "sha256": "0d9a815d88a775a387af81c44484fbcf5bebb95d9e8e71fd160acb5ec1411c2b"
+      "bytes": 2594,
+      "sha256": "7cb28bcd364c68544fa8e82345eefc09c32758fb2d2467444dd18da4cfa5d3da"
     },
     "release_payload/LIMITATIONS.md": {
-      "bytes": 5896,
-      "sha256": "08139295d0ebef04ac222d8773f8674bb0bb310a16bf54d091a7e7419f4c41d5"
+      "bytes": 7639,
+      "sha256": "932b818a87baabd5d176acfdde10fac4b611bfe747768a094ffbc29583db8132"
     },
     "release_payload/README.md": {
-      "bytes": 7092,
-      "sha256": "05908590d25d1abe1c8a1dc72e7765429804aeee815cd4eae291a5009c41c55c"
+      "bytes": 9565,
+      "sha256": "3b818d5ef1b2e9a478fd025b5c86d9650b84e675189a301960f7c3a17e657c45"
+    },
+    "release_payload/RELEASE_COLUMN_DICTIONARY.csv": {
+      "bytes": 134488,
+      "sha256": "8851b93d2425d162e418f84aecf463838a5ece719e8f4f6f1f8d25ea897a0135"
     },
     "release_payload/SOURCE_AND_LICENSE_NOTES.md": {
-      "bytes": 7604,
-      "sha256": "965c4acd5d4fdbc3b9ad7980996b5c540d50b71612cba8a339245ff2928a9ebb"
+      "bytes": 10590,
+      "sha256": "38287553190d1e4235b421916c7fd529a129d9e0bd4880bd0ad1b7f3d2150a5e"
     },
     "release_payload/zenodo_metadata_candidate.json": {
-      "bytes": 5531,
-      "sha256": "7743ce8588ec782b1eb6a9e6a2796402aee3d847e647ac23eafe65554caf2cb6"
+      "bytes": 7602,
+      "sha256": "8e949475072a2143b5f599dd0e43f20da21382f1abd52eda85dad1287f94a065"
     },
     "source_rights_matrix.csv": {
-      "bytes": 2611,
-      "sha256": "969b35805ea067f98b863a5e4f275b4ec38ffeee383c19e062f266392dbd4d94"
+      "bytes": 3830,
+      "sha256": "13bd727f47d8621fb56a05febcfaa2879f6d4ebf80edc73e9cc100b4882596bd"
     },
     "stage130_dataset_release_candidate_decision.json": {
-      "bytes": 7734,
-      "sha256": "977877d7345535abddfe3c7f1d6d5e4aa55b846d26b433489571b2e239f6012e"
+      "bytes": 15211,
+      "sha256": "e34a5f20815d242f1b50a41ddfc474b2ed287ac861df4115114377647c63283a"
     },
     "stage130_dataset_release_candidate_governance_boundary.json": {
-      "bytes": 3131,
-      "sha256": "90c4a197fde1b99f8388b0d3564cc0eacb7ea714244914a3829cb633ee775b80"
+      "bytes": 4807,
+      "sha256": "ee2120556093d533608e0e7e9fbe891d694faa3270b581919a53a33b5b1493e7"
     }
   },
+  "provider_terms_independently_verified": false,
   "public_release_authorized": false,
-  "publication_readiness": "NOT_READY_FOR_PUBLICATION",
+  "publication_readiness": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
   "release_candidate_prepared": true,
+  "release_column_dictionary_columns_documented": 115,
+  "release_column_dictionary_columns_released": 115,
+  "release_version": "1.0.0-rc.2",
+  "source_rights_status": "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED",
+  "supersedes": {
+    "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate.zip",
+    "archive_sha256": "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
+    "archive_size_bytes": 11657151,
+    "public_release_authorized": false,
+    "publication_readiness_at_the_time": "NOT_READY_FOR_PUBLICATION",
+    "superseded_on_utc": "2026-08-21",
+    "superseded_reason": "The human author supplied a source-rights determination, and the release-specific column dictionary was completed from 25 of the 115 released columns to all 115.",
+    "version": "1.0.0-rc.1",
+    "zenodo_deposition_created": false,
+    "zenodo_doi_reserved": false,
+    "zenodo_published": false,
+    "zenodo_upload_performed": false
+  },
   "third_party_pii_committed_to_git": false,
   "value_files_committed": 0,
   "zenodo_deposition_created": false,

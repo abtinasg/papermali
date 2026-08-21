@@ -39,8 +39,23 @@ to grant rights the authors do not hold. A reuser who needs the original
 provider documents must obtain them from the provider under the provider's own
 terms.
 
-See SOURCE_AND_LICENSE_NOTES.md for the provider-by-provider audit, including
-terms that could not be verified at the time this candidate was prepared.
+
+THE BASIS FOR OFFERING THIS GRANT
+---------------------------------
+
+The authors offer this grant on the basis of a determination the human author
+supplied: that the source data used in the study were publicly and freely
+accessible, and that redistributing the researcher-compiled panel and the
+author-derived variables requires no separate provider permission.
+
+That is a determination BY THE AUTHOR. It is not a provider licence, not an
+independent verification of any provider's published terms, and not a legal
+opinion. No CODAL or TSETMC terms page was retrieved or read in preparing this
+release.
+
+See SOURCE_AND_LICENSE_NOTES.md for the full statement, the operational
+translation, and the historical record of which provider terms pages could not
+be retrieved.
 
 
 NO WARRANTY

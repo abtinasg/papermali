@@ -53,18 +53,29 @@ Zero failures **among evaluable rows** is not a statement about the rows that
 could not be evaluated. Reconciliation is arithmetic agreement between stored
 components, not a re-audit against the original filing.
 
-## 3a. Column documentation is uneven
+## 3a. Column documentation — complete, but assembled from three sources
 
-`part3c_column_role_map_stage125.csv` covers all 115 released columns and is
-authoritative for what each column is. The prose data dictionary does not:
-`data_dictionary_stage125.csv` holds 38 entries, of which **25** correspond to
-released columns, leaving **90** released columns with a role but no dictionary
-description. Thirteen dictionary entries describe candidate variables that were
-never materialized, or upstream keys renamed when the pair surface was built.
+`RELEASE_COLUMN_DICTIONARY.csv` documents **all 115 released columns**, one row
+each, and is the file to read when you want to know what a column is. It was
+built for this release by transcribing facts out of the committed project
+record; the `definition_status` column on every row says which kind of source
+the facts came from, and `authoritative_source_path` names the exact file.
 
-Both artifacts are shipped as committed. Neither was edited for this release,
-and the shortfall is published in `release_manifest.json` under
-`column_documentation_coverage` rather than papered over.
+Two things follow, and neither is hidden:
+
+* **It is a documentation join, not a new measurement.** No value was
+  recomputed, no row was read, and nothing was inferred to fill a gap. Where a
+  formula appears, it is the formula the committed dictionary or the frozen
+  generator records — not a formula re-derived from the data.
+* **The two historical artifacts still ship, unedited.**
+  `part3c_column_role_map_stage125.csv` remains the authoritative column set and
+  role contract, and the release dictionary is gated to match it exactly.
+  `data_dictionary_stage125.csv` is the Part 1 dictionary over the *upstream*
+  panel: it holds 38 entries, of which **25** correspond to released columns and
+  13 describe candidate variables that were never materialized or upstream keys
+  renamed when the pair surface was built. That is a fact about a committed
+  historical artifact, not a gap in this release's documentation, and it is
+  published in `release_manifest.json` under `upstream_dictionary_coverage`.
 
 ## 4. The outcome is an operational composite, not a legal event
 
@@ -123,8 +134,26 @@ values. Cross-year comparison of nominal levels is the reuser's responsibility.
 * It establishes **no deployment readiness and no decision utility**. The
   authors make no recommendation for investment, credit or supervisory use.
 
-## 10. Redistribution status
+## 10. The source-rights basis is a human author determination
 
-The upstream redistribution question is **unresolved**, and this candidate is
-marked `NOT_READY_FOR_PUBLICATION` for that reason. See
-`SOURCE_AND_LICENSE_NOTES.md`.
+This candidate's rights position rests on a determination the **human author**
+supplied: that the source data used in the study were publicly and freely
+accessible, and that no separate provider permission is required to
+redistribute the researcher-compiled panel and the author-derived variables.
+
+That is a determination by the author. It is **not**:
+
+* a provider licence;
+* an independent verification of CODAL's, TSETMC's or anyone's published terms;
+* a legal opinion.
+
+**No CODAL or TSETMC terms page was ever retrieved or read** in the course of
+preparing this release. That historical fact is recorded in full in
+`SOURCE_AND_LICENSE_NOTES.md` and has not been reclassified. A reuser who needs
+certainty about the underlying provider materials should consult the provider
+directly; a reuser who needs the original filings must obtain them from the
+provider, because this release does not carry them.
+
+The candidate's status is `READY_FOR_EXACT_DIGEST_HUMAN_REVIEW` — a human is
+being asked to read its exact digest and decide. Nothing is published, no
+deposition exists and no DOI has been reserved.

@@ -1,42 +1,95 @@
-# Source use and redistribution audit
+# Source use and redistribution notes
 
 This file records, provider by provider, what was used, what is included here,
-and what is known about the terms. It is a factual audit. Where a term could
-not be verified, this file says so rather than guessing, and no legal
-conclusion is drawn that the evidence does not support.
+what an environment check could and could not establish, and what the **human
+author has determined**. It keeps those three things apart on purpose. Where a
+term could not be verified, this file still says so; a human determination is
+recorded as a human determination and never re-described as verification.
 
-**Audit date: 2026-08-21.**
+**Environment terms check: 2026-08-21. Human author determination: 2026-08-21.**
 
 ---
 
-## Overall disposition: NOT_READY_FOR_PUBLICATION
+## Disposition: READY_FOR_EXACT_DIGEST_HUMAN_REVIEW
 
-The blocker is CODAL. The panel's financial-statement values are compiled from
-CODAL filings, and the authors were **unable to verify CODAL's published terms
-of use from the audit environment** (see below). Until a primary CODAL terms
-page is retrieved and read, the redistribution question for the compiled
-factual fields is **genuinely unresolved**, not resolved-in-favour.
+Release candidate **1.0.0-rc.2**. It supersedes 1.0.0-rc.1, which was marked
+`NOT_READY_FOR_PUBLICATION`.
 
-Two further facts weigh on the same question and are recorded here rather than
-smoothed over:
+What changed is **not** that anyone verified CODAL's terms. Nobody did, and
+§"What was and was not established" below still says so in full. What changed is
+that the **human author supplied a source-rights determination** for the data
+used in this study, and that determination — not an agent inference, and not a
+provider licence anyone read — is what now governs the candidate's status.
 
-1. The study manuscript, as approved, states that the company-level source data
-   are *"researcher-verified and frozen; redistribution is governed by the terms
-   under which they were obtained"*, and describes the underlying company panel
-   as **not openly redistributable**.
-2. The authors' stated intent is to publish this analysis-ready dataset openly.
+The status this candidate carries is `READY_FOR_EXACT_DIGEST_HUMAN_REVIEW`: a
+human is being asked to read the exact archive digest and decide. It is **not**
+`PUBLISHED`, it is **not** `PUBLIC_RELEASE_AUTHORIZED`, and it authorizes no
+Zenodo action of any kind.
 
-Those two positions are in tension. Publishing this bundle would require
-resolving that tension deliberately — by verifying CODAL's terms, and by
-updating the manuscript's data-availability statement in a separate authorized
-action. Neither has happened. Nothing was quietly removed from the payload and
-no frozen value was altered to make the conflict go away.
+---
+
+## The human author's source-rights determination
+
+**Status: `HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED`**
+
+Supplied by the human author, verbatim:
+
+> برای تمام داده‌هایی که در این پژوهش استفاده کرده‌ام نیازی به اخذ مجوز جداگانه
+> نیست. این داده‌ها به‌صورت رایگان و عمومی در اینترنت در دسترس‌اند.
+
+Operationally, and as it applies to this release:
+
+1. All source data used in the study were **publicly and freely accessible**.
+2. **No purchased, confidential, personal or human-participant data** were used.
+3. The human author determines that **public redistribution of the
+   researcher-compiled analysis-ready panel and the author-derived variables
+   does not require separate provider permission**.
+4. **No original provider PDF, filing document, workbook, raw API response or
+   raw provider response is redistributed** — none is in this bundle.
+5. **CC BY 4.0 applies only to the authors' own** compilation, structure,
+   annotations, derived variables and release metadata, to the extent the
+   authors hold rights in them. See `LICENSE_DATASET.txt`.
+6. This determination was **supplied by the human author and was not
+   independently inferred by the agent** that assembled this release.
+
+### What this determination is not
+
+It is **not** a provider licence, **not** an independent verification of any
+provider's published terms, and **not** a legal opinion. No CODAL or TSETMC
+terms page was retrieved or read at any point in preparing either release
+candidate, and none has been read since. This file does not assert that CODAL's
+terms are open, that they were verified, or that they permit redistribution. It
+asserts only what the human author determined, and attributes it to them.
+
+A reuser who needs certainty about the underlying provider materials should
+consult the provider directly. A reuser who needs the original filings must
+obtain them from the provider under the provider's own terms — this release does
+not carry them.
+
+---
+
+## What was and was not established by the environment check
+
+This section is **historical and unchanged**. It records what the 2026-08-21
+audit could and could not retrieve, and it is retained exactly because the
+determination above did not make any of it go away.
+
+| Provider | Terms pages requested | Outcome | Terms independently retrieved | Terms independently verified |
+|---|---|---|---|---|
+| CODAL | `https://www.codal.ir/`, `https://www.codal.ir/Rules.aspx` | Connection timeout; no HTTP response | **no** | **no** |
+| TSETMC | `https://www.tsetmc.com/`, `https://old.tsetmc.com/`, `https://tsetmc.ir/` | Connection timeout; no HTTP response | **no** | **no** |
+| World Bank | `https://datacatalog.worldbank.org/public-licenses` | HTTP 200; retrieved and read | **yes** | **yes** |
+
+CODAL and TSETMC were unreachable from the audit environment. That is a network
+condition, not a refusal and not evidence about anyone's terms. This release does
+not infer permission from a timeout, and it does not infer prohibition from one
+either. What it records is: the pages were not retrieved, so they were not read.
 
 ---
 
 ## Provider matrix
 
-### 1. CODAL — Comprehensive Database of All Listed Companies
+### 1. CODAL — the Iranian listed-company disclosure system
 
 | Field | Value |
 |---|---|
@@ -45,10 +98,10 @@ no frozen value was altered to make the conflict go away.
 | Type of information used | Annual company financial-statement line items (assets, liabilities, equity, capital, accumulated loss, revenue, profit, operating cash flow, financial expense) and audit-status labels, for listed non-financial companies, fiscal years 1392–1402 |
 | Original provider file included in this candidate? | **No.** No PDF, no XLS/XLSX filing, no HTML report, no API payload |
 | Only researcher-compiled factual fields included? | **Yes.** Numeric line items keyed to company and fiscal year, plus researcher-derived ratios, flags and eligibility annotations |
-| Publicly stated license or terms | **NOT VERIFIED** |
-| Date and URL of terms checked | 2026-08-21 — `https://www.codal.ir/` and `https://www.codal.ir/Rules.aspx` were both requested and **did not respond** from the audit environment (connection timeout, no HTTP status). No CODAL terms page was retrieved, so none was read |
-| Residual uncertainty | **HIGH.** The terms are unread, not permissive-by-default. Separately, the extent to which factual financial-statement line items attract protectable rights under Iranian law is not something this audit is competent to decide |
-| Release disposition | **BLOCKS PUBLICATION.** Prepared and documented; not publishable until a primary CODAL terms page is retrieved and assessed |
+| Publicly stated licence or terms | **`NOT_VERIFIED`** — no terms page was retrieved, so none was read |
+| Terms independently retrieved / verified | **no / no** |
+| Human author determination | Publicly and freely accessible; **no separate permission required** for redistributing the researcher-compiled panel and author-derived variables |
+| Release disposition | **SUPERSEDED_BY_HUMAN_AUTHOR_DETERMINATION** (previously `BLOCKS_PUBLICATION` in 1.0.0-rc.1) |
 
 Two provenance columns in the payload reference CODAL:
 
@@ -68,10 +121,10 @@ Two provenance columns in the payload reference CODAL:
 | Type of information used **in this release** | **None** |
 | Original provider file included in this candidate? | **No** |
 | Only researcher-compiled factual fields included? | **Not applicable — no TSETMC-derived field is in this release** |
-| Publicly stated license or terms | **NOT VERIFIED** |
-| Date and URL of terms checked | 2026-08-21 — `https://www.tsetmc.com/`, `https://old.tsetmc.com/` and `https://tsetmc.ir/` were requested and **did not respond** from the audit environment (connection timeout) |
-| Residual uncertainty | **Not material to this release.** The terms are unverified, but no TSETMC value is distributed here |
-| Release disposition | **Does not block.** No TSETMC content to redistribute |
+| Publicly stated licence or terms | **`NOT_VERIFIED`** — no terms page was retrieved, so none was read |
+| Terms independently retrieved / verified | **no / no** |
+| Human author determination | Covered by the same determination, but **not material**: nothing from TSETMC is distributed |
+| Release disposition | **DOES_NOT_BLOCK.** No TSETMC content to redistribute |
 
 Verified two ways: the committed source registry records
 `src_m2_tsetmc_market` as `pending_part3` / not collected, and none of the 115
@@ -86,10 +139,10 @@ released columns is a market-data field.
 | Type of information used **in this release** | **None** |
 | Original provider file included in this candidate? | **No** |
 | Only researcher-compiled factual fields included? | **Not applicable — no World Bank field is in this release** |
-| Publicly stated license or terms | **Creative Commons Attribution 4.0 International (CC BY 4.0)**, the World Bank's stated default for datasets it produces and distributes as open data — permitting copying, modification and distribution in any format for any purpose including commercial use, subject to attribution and indication of changes |
-| Date and URL of terms checked | 2026-08-21 — `https://datacatalog.worldbank.org/public-licenses`, retrieved successfully (HTTP 200) and read |
-| Residual uncertainty | **LOW.** The licence is published and was read directly. It is nonetheless not exercised here, since no World Bank value is distributed |
-| Release disposition | **Does not block.** No World Bank content to redistribute |
+| Publicly stated licence or terms | **Creative Commons Attribution 4.0 International (CC BY 4.0)**, the World Bank's stated default for datasets it produces and distributes as open data — permitting copying, modification and distribution in any format for any purpose including commercial use, subject to attribution and indication of changes |
+| Terms independently retrieved / verified | **yes / yes** — `https://datacatalog.worldbank.org/public-licenses`, HTTP 200, 2026-08-21, read directly |
+| Human author determination | Covered by the same determination, but **not material**: nothing from the World Bank is distributed |
+| Release disposition | **DOES_NOT_BLOCK.** No World Bank content to redistribute |
 
 The raw World Bank retrieval evidence for the supplementary analysis was
 deposited separately and openly; it is not part of this bundle and does not
@@ -97,16 +150,24 @@ contain the company panel.
 
 ---
 
-## Why "not verified" is not the same as "not permitted"
+## The standing conflict with the manuscript
 
-CODAL and TSETMC were unreachable from the audit environment — a network
-condition, not a refusal and not evidence about their terms. This audit records
-what it could and could not establish. It does not infer permission from
-silence, and it does not infer prohibition from a timeout. It marks the
-question open, which is what it is.
+The approved study manuscript, as reviewed and byte-pinned, states that the
+company-level source data are *"researcher-verified and frozen; redistribution
+is governed by the terms under which they were obtained"*, and describes the
+underlying company panel as **not openly redistributable**.
 
-Resolving it requires retrieving a primary CODAL terms page from an environment
-that can reach it, and recording the finding here with the same fields.
+That wording is **unchanged**, and this release did not touch the manuscript.
+The conflict between it and the authors' intent to publish this panel openly is
+recorded here rather than smoothed over. Reconciling it requires a separate,
+separately authorized manuscript edit — and that edit may only happen once a
+real DOI exists, because until then the manuscript's present description is the
+truthful one.
+
+Nothing was removed from the payload and no frozen value was altered at any
+point: `columns_removed_to_avoid_the_blocker = 0` and
+`frozen_values_altered_to_avoid_the_blocker = 0` in the decision record, for
+both 1.0.0-rc.1 and 1.0.0-rc.2.
 
 ---
 

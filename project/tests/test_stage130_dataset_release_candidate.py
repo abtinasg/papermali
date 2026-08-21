@@ -1,4 +1,4 @@
-"""Stage130 — the deterministic Zenodo dataset Release Candidate.
+"""Stage130 — the deterministic Zenodo dataset Release Candidate (1.0.0-rc.2).
 
 Custody only. These tests pin:
 
@@ -11,21 +11,37 @@ Custody only. These tests pin:
     robustness surfaces and four audit surfaces that are not model-ready;
   * that the counts published are the committed contract's, never recomputed
     from row content;
+  * that ALL 115 released columns are documented, exactly once, each row
+    anchored to a committed repository source that exists — and that a
+    hand-edited or incomplete dictionary cannot ship;
+  * that the rights position is recorded as the HUMAN AUTHOR'S DETERMINATION
+    and never as a verification of a provider's published terms, which nobody
+    ever retrieved: no artifact in the package may claim otherwise;
+  * that rc.1 is preserved as superseded history — its digest, its byte size
+    and its NOT_READY_FOR_PUBLICATION status intact — and that rc.2 builds
+    under a NEW filename so rc.1 is neither overwritten nor deleted;
+  * that the six human submission items are recorded as SUPPLIED but NOT
+    APPLIED to the byte-pinned manuscript, and that neither half can be
+    dropped;
   * that the release carries no DOI and no placeholder that could be read as
-    one, and that every Zenodo counter is false;
+    one, that every Zenodo counter is false, and that readiness may only ever
+    be `NOT_READY_FOR_PUBLICATION` or `READY_FOR_EXACT_DIGEST_HUMAN_REVIEW`;
   * that the source-rights audit covers all three providers and that a blocked
     disposition cannot be quietly upgraded to ready;
   * that the approved manuscript is byte-identical, and that the generator is
     FAIL-CLOSED — drifting a frozen surface, editing the manuscript, claiming a
-    DOI, or reporting a non-zero action counter must each break the build;
+    DOI, claiming a verified provider licence, erasing the superseded blocker,
+    or reporting a non-zero action counter must each break the build;
   * that the Final Test prediction artifact is never opened, hashed or packaged.
 """
 import copy
+import csv
 import hashlib
 import importlib
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import zipfile
@@ -37,6 +53,7 @@ sys.path.insert(0, os.path.join(REPO_ROOT, "project", "scripts"))
 sys.path.insert(0, os.path.join(REPO_ROOT, "project", "src"))
 
 import stage130_dataset_release_candidate as rc  # noqa: E402
+import stage130_release_column_dictionary as dictionary  # noqa: E402
 import update_ai_handoff as gen  # noqa: E402
 
 ACTION_ID = "stage130-dataset-release-candidate"
@@ -47,6 +64,8 @@ BOUNDARY_REL = (f"{PKG_REL}/"
 MANIFEST_REL = f"{PKG_REL}/release_manifest.json"
 SUMS_REL = f"{PKG_REL}/SHA256SUMS.txt"
 MATRIX_REL = f"{PKG_REL}/source_rights_matrix.csv"
+DICTIONARY_REL = f"{PKG_REL}/release_payload/RELEASE_COLUMN_DICTIONARY.csv"
+ROLE_MAP_REL = "project/stage125/part3c_column_role_map_stage125.csv"
 METADATA_REL = (f"{PKG_REL}/"
                 "metadata_and_hashes_stage130_dataset_release_candidate.json")
 
@@ -61,6 +80,31 @@ NEXT_POINTER_SCOPE = (
     "authorized")
 SUPERSEDED_POINTER = "human-manuscript-submission-metadata"
 PROVIDERS = ("CODAL", "TSETMC", "World Bank")
+RELEASE_VERSION = "1.0.0-rc.2"
+SUPERSEDED_VERSION = "1.0.0-rc.1"
+SUPERSEDED_SHA256 = (
+    "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45")
+SUPERSEDED_BYTES = 11657151
+READINESS = "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW"
+RIGHTS_STATUS = "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED"
+#: Restated independently of the builder so a silent edit to its tuple cannot
+#: also edit the expectation.
+FORBIDDEN_RIGHTS_CLAIMS = (
+    "codal open licence verified",
+    "codal open license verified",
+    "codal terms independently verified",
+    "codal terms verified",
+    "provider terms independently verified",
+)
+#: The six human submission items, supplied but not applied.
+SUBMISSION_ITEMS = (
+    "authors_and_author_order",
+    "affiliations_and_corresponding_author",
+    "funding",
+    "conflicts_of_interest",
+    "ethics_and_data_governance_statement",
+    "data_access_mechanism_for_the_restricted_company_panel",
+)
 
 #: The frozen Stage125 Part 3C surfaces, restated here independently of the
 #: builder so a silent edit to its table cannot also edit the expectation.
@@ -425,23 +469,74 @@ def test_every_released_surface_has_the_contract_columns():
     assert len(columns) == PRIMARY_COLUMNS
 
 
-def test_dictionary_coverage_is_measured_and_published_not_hidden(manifest):
-    """The dictionary covers only part of the release, and the release says so."""
-    coverage = manifest["column_documentation_coverage"]
+def test_every_released_column_is_documented(manifest):
+    """115 of 115. An undocumented column fails the release, not the reuser."""
+    coverage = manifest["release_column_dictionary_coverage"]
+    assert coverage["released_columns"] == PRIMARY_COLUMNS
+    assert coverage["released_columns_documented"] == PRIMARY_COLUMNS
+    assert coverage["released_columns_undocumented"] == 0
+    assert coverage["duplicate_rows"] == 0
+    assert coverage["column_set_matches_authoritative_role_map"] is True
+    assert coverage["every_row_names_an_authoritative_repository_source"] is True
+    assert coverage["definitions_invented_by_this_action"] == 0
+    assert sum(coverage["rows_by_column_role"].values()) == PRIMARY_COLUMNS
+    assert sum(coverage["rows_by_definition_status"].values()) == PRIMARY_COLUMNS
+
+
+def test_the_release_dictionary_is_in_the_bundle_and_regenerable(payload):
+    shipped = payload[rc.RELEASE_DICTIONARY_NAME]
+    assert shipped == dictionary.build_csv(REPO_ROOT)
+    rows = list(csv.DictReader(io.StringIO(shipped.decode("utf-8"),
+                                           newline="")))
+    assert len(rows) == PRIMARY_COLUMNS
+    assert len({r["column_name"] for r in rows}) == PRIMARY_COLUMNS
+
+
+def test_a_hand_edited_release_dictionary_cannot_ship(tmp_path, monkeypatch):
+    """The committed CSV must equal a fresh generation, byte for byte."""
+    root = tmp_path / "repo"
+    shutil.copytree(os.path.join(REPO_ROOT, "project"), root / "project",
+                    ignore=shutil.ignore_patterns("build", "__pycache__"))
+    target = root / DICTIONARY_REL
+    tampered = target.read_bytes().replace(
+        b"Total assets of the company at fiscal year t.",
+        b"Total assets, roughly.                       ")
+    assert tampered != target.read_bytes()
+    target.write_bytes(tampered)
+    with pytest.raises(rc.Stage130ReleaseError,
+                       match="does not match a fresh generation"):
+        rc.gate_release_column_dictionary(root, ["x"])
+
+
+def test_an_undocumented_column_aborts_the_build(monkeypatch):
+    facts = dict(dictionary.COLUMN_FACTS)
+    facts.pop("leverage_ratio")
+    monkeypatch.setattr(dictionary, "COLUMN_FACTS", facts)
+    with pytest.raises(rc.Stage130ReleaseError) as excinfo:
+        rc.gate_release_column_dictionary(REPO_ROOT, ["leverage_ratio"])
+    assert "leverage_ratio" in str(excinfo.value)
+
+
+def test_the_upstream_dictionary_shortfall_is_still_published(manifest):
+    """The Part 1 dictionary covers 25 of 115, and that stays visible."""
+    coverage = manifest["upstream_dictionary_coverage"]
     assert coverage["released_columns"] == PRIMARY_COLUMNS
     documented = coverage["released_columns_documented_in_data_dictionary"]
     missing = coverage["released_columns_not_in_data_dictionary"]
     assert documented + missing == PRIMARY_COLUMNS
     assert missing > 0, (
-        "if the dictionary ever covers everything, drop the disclosure "
-        "instead of leaving a stale caveat")
-    assert "role_map" in manifest["column_documentation_authority"] or \
-        "column_role_map" in manifest["column_documentation_authority"]
+        "if the upstream dictionary ever covers everything, drop the "
+        "disclosure instead of leaving a stale caveat")
+    authority = manifest["column_documentation_authority"]
+    assert rc.RELEASE_DICTIONARY_NAME in authority
+    assert "column_role_map" in authority
 
 
-def test_the_limitations_document_states_the_documentation_gap(payload):
+def test_the_limitations_document_states_the_documentation_position(payload):
     text = payload["LIMITATIONS.md"].decode("utf-8")
-    assert "column_documentation_coverage" in text
+    assert "upstream_dictionary_coverage" in text
+    assert rc.RELEASE_DICTIONARY_NAME in text
+    assert "all 115 released columns" in text
 
 
 # --------------------------------------------------------------------------- #
@@ -529,12 +624,94 @@ def test_an_unverified_provider_is_recorded_as_unverified_not_permissive():
         assert rows[name]["publicly_stated_license_or_terms"] == "NOT_VERIFIED"
 
 
-def test_a_blocking_provider_forces_not_ready_for_publication(decision,
-                                                              boundary):
+def test_the_live_readiness_is_a_digest_review_not_a_publication(decision,
+                                                                boundary,
+                                                                manifest):
     audit = decision["source_rights_audit"]
-    assert audit["publication_readiness"] == "NOT_READY_FOR_PUBLICATION"
-    assert audit["blocking_provider"] == "CODAL"
-    assert boundary["publication_readiness"] == "NOT_READY_FOR_PUBLICATION"
+    assert audit["publication_readiness"] == READINESS
+    assert boundary["publication_readiness"] == READINESS
+    assert manifest["publication_readiness"] == READINESS
+    assert audit["blocking_provider"] is None
+    for value in (READINESS, boundary["publication_readiness"]):
+        assert value not in ("PUBLISHED", "PUBLIC_RELEASE_AUTHORIZED")
+
+
+def test_the_rights_basis_is_the_human_author_determination(decision):
+    audit = decision["source_rights_audit"]
+    assert audit["rights_basis"] == "human_author_determination"
+    assert audit["rights_status"] == RIGHTS_STATUS
+    determination = decision["human_supplied_source_rights_determination"]
+    assert determination["status"] == RIGHTS_STATUS
+    assert determination["supplied_by"] == "human"
+    assert determination["independently_inferred_by_the_agent"] is False
+    assert determination["statement_verbatim_fa"].strip()
+    assert len(determination["operational_translation"]) == 6
+    for field in ("sources_publicly_and_freely_accessible",):
+        assert determination[field] is True
+    for field in ("purchased_data_used", "confidential_data_used",
+                  "personal_data_used", "human_participant_data_used",
+                  "separate_provider_permission_required_for_redistribution",
+                  "original_provider_files_redistributed"):
+        assert determination[field] is False
+
+
+def test_the_determination_is_not_dressed_up_as_a_verification(decision):
+    determination = decision["human_supplied_source_rights_determination"]
+    for field in ("is_a_provider_licence",
+                  "is_an_independent_verification_of_provider_terms",
+                  "is_a_legal_opinion",
+                  "provider_terms_independently_retrieved",
+                  "provider_terms_independently_verified",
+                  "codal_terms_page_retrieved", "codal_terms_page_read",
+                  "tsetmc_terms_page_retrieved", "tsetmc_terms_page_read",
+                  "retroactive_independent_verification_claimed"):
+        assert determination[field] is False, field
+    audit = decision["source_rights_audit"]
+    for field in ("provider_terms_independently_retrieved",
+                  "provider_terms_independently_verified",
+                  "codal_open_licence_verified_claimed",
+                  "codal_terms_independently_verified_claimed",
+                  "legal_conclusion_asserted_beyond_the_evidence"):
+        assert audit[field] is False, field
+
+
+def test_no_artifact_claims_a_provider_licence_was_verified():
+    """Grep the whole committed package, prose included."""
+    for dirpath, dirnames, filenames in os.walk(
+            os.path.join(REPO_ROOT, PKG_REL)):
+        dirnames[:] = [d for d in dirnames if d != "build"]
+        for name in filenames:
+            path = os.path.join(dirpath, name)
+            try:
+                with open(path, encoding="utf-8") as fh:
+                    lowered = fh.read().lower()
+            except (UnicodeDecodeError, OSError):
+                continue
+            for claim in FORBIDDEN_RIGHTS_CLAIMS:
+                assert claim not in lowered, (name, claim)
+
+
+def test_the_superseded_blocker_is_preserved_not_erased(decision):
+    audit = decision["source_rights_audit"]
+    assert audit["superseded_blocking_provider"] == "CODAL"
+    assert audit["superseded_publication_readiness"] == \
+        "NOT_READY_FOR_PUBLICATION"
+    assert audit["historical_non_retrieval_preserved"] is True
+    rows = _matrix_rows()
+    assert rows["CODAL"]["release_disposition"] == \
+        "SUPERSEDED_BY_HUMAN_AUTHOR_DETERMINATION"
+    assert rows["CODAL"]["superseded_release_disposition"] == \
+        "BLOCKS_PUBLICATION"
+
+
+def test_the_historical_non_retrieval_is_still_documented(payload):
+    text = payload["SOURCE_AND_LICENSE_NOTES.md"].decode("utf-8")
+    assert "NOT_VERIFIED" in text
+    assert "codal.ir/Rules.aspx" in text
+    lowered = text.lower()
+    assert "no terms page was retrieved" in lowered
+    assert "was retrieved or read at any point" in lowered
+    assert "determination" in text.lower()
 
 
 def test_the_blocker_was_reported_not_engineered_away(decision):
@@ -546,12 +723,55 @@ def test_the_blocker_was_reported_not_engineered_away(decision):
 
 def test_upgrading_a_blocked_candidate_to_ready_breaks_the_build(tmp_path,
                                                                 monkeypatch):
-    """A blocked matrix and a 'ready' verdict may not coexist."""
+    """A blocked matrix and a 'ready' verdict may not coexist.
+
+    The live matrix no longer blocks, so this reinstates a blocking row and
+    checks the rule still holds — the invariant outlives the state.
+    """
+    root = _clone_repo_shim(tmp_path)
+    rows = _matrix_rows()
+    rows["CODAL"]["release_disposition"] = "BLOCKS_PUBLICATION"
+    _write_matrix(root, rows)
+    with pytest.raises(gen.HandoffError, match="blocked candidate|blocking"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_claiming_publication_readiness_breaks_the_build(tmp_path):
+    """`PUBLISHED` is not a status an undeposited candidate may carry."""
     root = _clone_repo_shim(tmp_path)
     decision = _read(DECISION_REL)
-    decision["source_rights_audit"]["publication_readiness"] = "READY"
+    decision["source_rights_audit"]["publication_readiness"] = "PUBLISHED"
     _write_json(root, DECISION_REL, decision)
-    with pytest.raises(gen.HandoffError, match="blocked candidate|blocking"):
+    with pytest.raises(gen.HandoffError, match="is not one of"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_claiming_the_provider_terms_were_verified_breaks_the_build(tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    rows = _matrix_rows()
+    rows["CODAL"]["provider_terms_independently_verified"] = "yes"
+    _write_matrix(root, rows)
+    with pytest.raises(gen.HandoffError, match="must be 'no'"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_erasing_the_superseded_blocker_breaks_the_build(tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    rows = _matrix_rows()
+    rows["CODAL"]["superseded_release_disposition"] = "DOES_NOT_BLOCK"
+    _write_matrix(root, rows)
+    with pytest.raises(gen.HandoffError, match="previously read"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_relabelling_the_determination_as_a_verification_breaks_the_build(
+        tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    decision = _read(DECISION_REL)
+    decision["human_supplied_source_rights_determination"][
+        "is_an_independent_verification_of_provider_terms"] = True
+    _write_json(root, DECISION_REL, decision)
+    with pytest.raises(gen.HandoffError, match="must be False"):
         gen.derive_stage130_dataset_release_candidate_markers(str(root))
 
 
@@ -858,10 +1078,65 @@ def test_the_next_action_demands_the_exact_archive_digest(boundary):
     assert boundary["next_action_requires_exact_archive_sha256_review"] is True
 
 
-def test_the_manuscript_submission_metadata_is_still_outstanding(state,
-                                                                 decision,
-                                                                 boundary):
-    """Zenodo creator metadata fills no manuscript placeholder."""
+def test_the_manuscript_submission_metadata_is_supplied(state, decision,
+                                                       boundary):
+    """The six items WERE supplied. Saying otherwise is no longer true."""
+    supplied = decision["human_supplied_manuscript_submission_metadata"]
+    assert supplied["human_submission_metadata_supplied"] is True
+    assert supplied["supplied_by"] == "human"
+    assert supplied["independently_inferred_by_the_agent"] is False
+    assert tuple(supplied["items_supplied"]) == SUBMISSION_ITEMS
+    assert supplied["items_supplied_count"] == 6
+    for key, value in supplied["items_supplied"].items():
+        assert value, key
+    assert decision["manuscript_human_submission_metadata_supplied"] is True
+    assert boundary["manuscript_human_submission_metadata_supplied"] is True
+    assert state["stage130_manuscript_human_submission_metadata_supplied"] \
+        is True
+    assert state[
+        "stage130_manuscript_human_submission_metadata_supplied_items"] == \
+        list(SUBMISSION_ITEMS)
+
+
+def test_the_supplied_metadata_names_the_two_authors_in_order(decision):
+    supplied = decision["human_supplied_manuscript_submission_metadata"]
+    items = supplied["items_supplied"]
+    assert items["authors_and_author_order"] == [
+        "Abtin Asghari", "MohammadMehdi Mehraein"]
+    creators = items["affiliations_and_corresponding_author"]["creators"]
+    assert [c["order"] for c in creators] == [1, 2]
+    assert [c["name"] for c in creators] == [
+        "Abtin Asghari", "MohammadMehdi Mehraein"]
+    for creator in creators:
+        assert creator["affiliation"].strip()
+    assert items["affiliations_and_corresponding_author"][
+        "corresponding_author"] == "Abtin Asghari"
+    assert "no external funding" in items["funding"].lower()
+    assert "none declared" in items["conflicts_of_interest"].lower()
+    assert items["ethics_and_data_governance_statement"].strip()
+    access = items["data_access_mechanism_for_the_restricted_company_panel"]
+    assert "zenodo" in access.lower()
+    assert "pending" in access.lower()
+
+
+def test_the_supplied_metadata_is_not_yet_in_the_manuscript(state, decision,
+                                                            boundary):
+    """Supplying a fact is not inserting it, and this action inserted none."""
+    supplied = decision["human_supplied_manuscript_submission_metadata"]
+    assert supplied["human_submission_metadata_applied_to_manuscript"] is False
+    assert supplied["manuscript_modified_by_this_action"] is False
+    assert supplied[
+        "manuscript_requires_post_doi_metadata_update_and_human_review"] is True
+    assert decision[
+        "manuscript_human_submission_metadata_applied_to_manuscript"] is False
+    assert boundary[
+        "manuscript_human_submission_metadata_applied_to_manuscript"] is False
+    assert state[
+        "stage130_manuscript_human_submission_metadata_applied_to_manuscript"] \
+        is False
+    assert state["stage130_manuscript_requires_post_doi_metadata_update"] is True
+    assert state["stage130_manuscript_requires_post_doi_human_review"] is True
+    # ...and they are therefore still outstanding AS INSERTIONS.
     assert state["stage130_manuscript_human_supplied_metadata_outstanding"] \
         is True
     assert state[
@@ -873,6 +1148,99 @@ def test_the_manuscript_submission_metadata_is_still_outstanding(state,
     assert marker["manuscript_submission_metadata_outstanding_count"] == 6
     assert marker["pointer_previous_value"] == SUPERSEDED_POINTER
     assert marker["pointer_resolved_value"] == NEXT_POINTER
+
+
+def test_claiming_the_metadata_reached_the_manuscript_breaks_the_build(
+        tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    decision = _read(DECISION_REL)
+    decision["human_supplied_manuscript_submission_metadata"][
+        "human_submission_metadata_applied_to_manuscript"] = True
+    _write_json(root, DECISION_REL, decision)
+    with pytest.raises(gen.HandoffError, match="must be False"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_denying_that_the_metadata_was_supplied_breaks_the_build(tmp_path):
+    """The stale 'never supplied' claim may not come back."""
+    root = _clone_repo_shim(tmp_path)
+    decision = _read(DECISION_REL)
+    decision["human_supplied_manuscript_submission_metadata"][
+        "human_submission_metadata_supplied"] = False
+    _write_json(root, DECISION_REL, decision)
+    with pytest.raises(gen.HandoffError, match="SUPPLIED"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+# --------------------------------------------------------------------------- #
+# rc.2, and the rc.1 it supersedes without deleting
+# --------------------------------------------------------------------------- #
+
+def test_the_release_is_rc2(decision, manifest, metadata, state):
+    assert decision["release_version"] == RELEASE_VERSION
+    assert manifest["release_version"] == RELEASE_VERSION
+    assert metadata["release_version"] == RELEASE_VERSION
+    assert state["stage130_dataset_release_candidate_version"] == \
+        RELEASE_VERSION
+    assert rc.RELEASE_VERSION == RELEASE_VERSION
+
+
+def test_rc1_is_recorded_as_superseded_history(decision, manifest, metadata,
+                                               state):
+    for source in (decision["supersedes_release"], manifest["supersedes"],
+                   metadata["supersedes"]):
+        assert source["version"] == SUPERSEDED_VERSION
+        assert source["archive_sha256"] == SUPERSEDED_SHA256
+        assert source["archive_size_bytes"] == SUPERSEDED_BYTES
+        assert source["publication_readiness_at_the_time"] == \
+            "NOT_READY_FOR_PUBLICATION"
+        for field in ("zenodo_deposition_created", "zenodo_upload_performed",
+                      "zenodo_doi_reserved", "zenodo_published",
+                      "public_release_authorized"):
+            assert source[field] is False, field
+    assert decision["supersedes_release"]["preserved_not_deleted"] is True
+    assert state[
+        "stage130_dataset_release_candidate_supersedes_archive_sha256"] == \
+        SUPERSEDED_SHA256
+    assert state[
+        "stage130_dataset_release_candidate_supersedes_preserved_not_deleted"] \
+        is True
+
+
+def test_rc2_builds_under_a_new_filename_so_rc1_is_not_overwritten(manifest,
+                                                                   metadata):
+    assert manifest["archive_name"] != manifest["supersedes"]["archive_name"]
+    assert manifest["archive_name"].endswith("_rc2.zip")
+    assert rc.ARCHIVE_NAME == manifest["archive_name"]
+    assert "build/rc2" in metadata[
+        "archive_build_path_relative_to_repo_root"]
+    assert rc.SUPERSEDED_RELEASE["archive_name"] != rc.ARCHIVE_NAME
+
+
+def test_no_commit_was_amended_squashed_rebased_or_force_pushed(decision,
+                                                                boundary):
+    assert decision[
+        "existing_commits_amended_squashed_rebased_or_force_pushed"] == 0
+    assert boundary[
+        "existing_commits_amended_squashed_rebased_or_force_pushed"] == 0
+
+
+def test_erasing_the_superseded_digest_breaks_the_build(tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    decision = _read(DECISION_REL)
+    decision["supersedes_release"]["archive_sha256"] = "0" * 64
+    _write_json(root, DECISION_REL, decision)
+    with pytest.raises(gen.HandoffError, match="superseded archive digest"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_reusing_rc1s_filename_breaks_the_build(tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    manifest = _read(MANIFEST_REL)
+    manifest["archive_name"] = manifest["supersedes"]["archive_name"]
+    _write_json(root, MANIFEST_REL, manifest)
+    with pytest.raises(gen.HandoffError, match="NEW archive filename"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
 
 
 def test_the_roadmap_lists_both_action_ids_in_order():
@@ -915,12 +1283,22 @@ def _clone_repo_shim(tmp_path):
     with open(os.path.join(REPO_ROOT, ".gitignore"), "rb") as fh:
         (root / ".gitignore").write_bytes(fh.read())
     for rel in (DECISION_REL, BOUNDARY_REL, MANIFEST_REL, MATRIX_REL,
-                MANUSCRIPT_REL,
+                MANUSCRIPT_REL, DICTIONARY_REL, ROLE_MAP_REL,
                 "project/stage130/manuscript_human_review_completion/"
                 "stage130_manuscript_human_review_completion_decision.json",
                 "project/stage130/manuscript_human_review_completion/"
                 "stage130_manuscript_human_review_governance_boundary.json"):
         source = os.path.join(REPO_ROOT, rel)
+        target = root / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with open(source, "rb") as fh:
+            target.write_bytes(fh.read())
+    # Every authoritative source the release dictionary anchors a row to. The
+    # deriver checks each one resolves, so the shim must carry them.
+    for rel in sorted(dictionary.AUTHORITATIVE_SOURCES):
+        source = os.path.join(REPO_ROOT, rel)
+        if not os.path.isfile(source):
+            continue
         target = root / rel
         target.parent.mkdir(parents=True, exist_ok=True)
         with open(source, "rb") as fh:
@@ -938,6 +1316,29 @@ def _clone_repo_shim(tmp_path):
         with open(source, "rb") as fh:
             target.write_bytes(fh.read())
     return root
+
+
+def _matrix_fields():
+    with open(os.path.join(REPO_ROOT, MATRIX_REL), encoding="utf-8",
+              newline="") as fh:
+        return list(csv.DictReader(fh).fieldnames)
+
+
+def _matrix_rows():
+    with open(os.path.join(REPO_ROOT, MATRIX_REL), encoding="utf-8",
+              newline="") as fh:
+        return {row["provider"]: dict(row) for row in csv.DictReader(fh)}
+
+
+def _write_matrix(root, rows):
+    target = root / MATRIX_REL
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with open(target, "w", encoding="utf-8", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=_matrix_fields(),
+                                lineterminator="\n")
+        writer.writeheader()
+        for name in PROVIDERS:
+            writer.writerow(rows[name])
 
 
 def _write_json(root, rel, obj):

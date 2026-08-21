@@ -70,7 +70,7 @@
   },
   "source_rights_audit": {
     "audit_date_utc": "2026-08-21",
-    "blocking_provider": "CODAL",
+    "determination_date_utc": "2026-08-21",
     "matrix_path": "project/stage130/dataset_release_candidate/source_rights_matrix.csv",
     "primary_provider_pages_only": true,
     "providers_covered": [
@@ -78,8 +78,19 @@
       "TSETMC",
       "World Bank"
     ],
-    "publication_readiness": "NOT_READY_FOR_PUBLICATION",
-    "blocker_summary": "CODAL's published terms of use could not be retrieved from the audit environment on 2026-08-21 (connection timeout, no HTTP response, on both https://www.codal.ir/ and https://www.codal.ir/Rules.aspx), so the redistribution terms governing the compiled CODAL-derived factual fields remain genuinely unresolved. Separately, the approved manuscript states that the company-level source data are not openly redistributable. Neither point was resolved by this action.",
+    "publication_readiness": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+    "rights_basis": "human_author_determination",
+    "rights_status": "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED",
+    "blocking_provider": null,
+    "superseded_blocking_provider": "CODAL",
+    "superseded_publication_readiness": "NOT_READY_FOR_PUBLICATION",
+    "supersede_basis": "human_author_source_rights_determination_not_independent_verification",
+    "supersede_summary": "In 1.0.0-rc.1 the CODAL row was recorded as BLOCKS_PUBLICATION because the provider's published terms could not be retrieved from the audit environment on 2026-08-21 (connection timeout, no HTTP response, on both https://www.codal.ir/ and https://www.codal.ir/Rules.aspx). That historical fact is unchanged and is preserved in full. What supersedes the blocker is the human author's source-rights determination, which is a determination BY THE AUTHOR -- not a provider licence, not a verification of anyone's published terms, and not a legal opinion. No CODAL or TSETMC terms page has been retrieved or read at any point.",
+    "provider_terms_independently_retrieved": false,
+    "provider_terms_independently_verified": false,
+    "codal_open_licence_verified_claimed": false,
+    "codal_terms_independently_verified_claimed": false,
+    "historical_non_retrieval_preserved": true,
     "columns_removed_to_avoid_the_blocker": 0,
     "frozen_values_altered_to_avoid_the_blocker": 0,
     "legal_conclusion_asserted_beyond_the_evidence": false
@@ -95,7 +106,7 @@
     "why_the_manuscript_is_unchanged": "No public DOI exists, so the manuscript must continue to describe the dataset according to its present availability. Updating it before a DOI exists would make the manuscript state something untrue, and the approved manuscript is byte-pinned to a completed human review that a change would invalidate."
   },
   "release_candidate_conflicts_with_current_manuscript_claim": true,
-  "release_candidate_conflict_resolution": "The conflict is left standing and visible rather than resolved in either direction. The manuscript keeps its present, truthful restricted-access description because nothing is published; the release candidate records the authors' publication intent without acting on it. Reconciling the two requires (a) resolving the CODAL terms question and (b) a separate authorized manuscript action once a DOI actually exists.",
+  "release_candidate_conflict_resolution": "The conflict is left standing and visible rather than resolved in either direction. The manuscript keeps its present, truthful restricted-access description because nothing is published and no DOI exists; the release candidate records the authors' publication intent and the human author's source-rights determination without acting on either. Reconciling the two requires a separate authorized manuscript action once a DOI actually exists. The author's rights determination does not by itself change the manuscript, and this action did not change one byte of it.",
   "superseded_marker": {
     "deriver": "derive_stage130_dataset_release_candidate_markers",
     "generator": "project/scripts/update_ai_handoff.py",
@@ -119,5 +130,102 @@
   "zenodo_doi_reserved": false,
   "zenodo_published": false,
   "next_action_authorized": false,
-  "human_decision_translation": "Prepare a deterministic, audit-ready Zenodo dataset Release Candidate for the study. This authorizes preparation and documentation only. It does not authorize creating a Zenodo deposition, uploading anything, reserving or publishing a DOI, changing the manuscript's data-availability claim, marking PR #100 Ready, or merging it. A separate exact-digest authorization will be required before any Zenodo write or publication."
+  "human_decision_translation": "Prepare a deterministic, audit-ready Zenodo dataset Release Candidate for the study. This authorizes preparation and documentation only. It does not authorize creating a Zenodo deposition, uploading anything, reserving or publishing a DOI, changing the manuscript's data-availability claim, marking PR #100 Ready, or merging it. A separate exact-digest authorization will be required before any Zenodo write or publication.",
+  "release_version": "1.0.0-rc.2",
+  "supersedes_release": {
+    "version": "1.0.0-rc.1",
+    "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate.zip",
+    "archive_sha256": "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
+    "archive_size_bytes": 11657151,
+    "publication_readiness_at_the_time": "NOT_READY_FOR_PUBLICATION",
+    "superseded_on_utc": "2026-08-21",
+    "superseded_reason": "Human author source-rights determination plus complete 115-column dictionary preparation.",
+    "preserved_not_deleted": true,
+    "preserved_how": "rc.1 keeps its own archive filename and its own gitignored build directory; rc.2 writes to a new filename under build/rc2/. No commit was amended, squashed, rebased or force-pushed, so rc.1's record stands in the branch history exactly as it was written.",
+    "zenodo_deposition_created": false,
+    "zenodo_upload_performed": false,
+    "zenodo_doi_reserved": false,
+    "zenodo_published": false,
+    "public_release_authorized": false
+  },
+  "human_supplied_source_rights_determination": {
+    "status": "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED",
+    "determination_date_utc": "2026-08-21",
+    "supplied_by": "human",
+    "independently_inferred_by_the_agent": false,
+    "statement_verbatim_fa": "برای تمام داده‌هایی که در این پژوهش استفاده کرده‌ام نیازی به اخذ مجوز جداگانه نیست. این داده‌ها به‌صورت رایگان و عمومی در اینترنت در دسترس‌اند.",
+    "operational_translation": [
+      "All source data used in the study were publicly and freely accessible.",
+      "No purchased, confidential, personal or human-participant data were used.",
+      "The human author determines that public redistribution of the researcher-compiled analysis-ready panel and author-derived variables does not require separate provider permission.",
+      "No original provider PDF, filing document, workbook, raw API response or raw provider response will be redistributed.",
+      "CC BY 4.0 applies only to the authors' original compilation, structure, annotations, derived variables and release metadata, to the extent the authors hold rights in them.",
+      "This determination is human-supplied and was not independently inferred by the agent."
+    ],
+    "sources_publicly_and_freely_accessible": true,
+    "purchased_data_used": false,
+    "confidential_data_used": false,
+    "personal_data_used": false,
+    "human_participant_data_used": false,
+    "separate_provider_permission_required_for_redistribution": false,
+    "original_provider_files_redistributed": false,
+    "licence_scope": "the authors' original compilation, structure, annotations, derived variables and release metadata only, to the extent the authors hold rights in them",
+    "is_a_provider_licence": false,
+    "is_an_independent_verification_of_provider_terms": false,
+    "is_a_legal_opinion": false,
+    "provider_terms_independently_retrieved": false,
+    "provider_terms_independently_verified": false,
+    "codal_terms_page_retrieved": false,
+    "codal_terms_page_read": false,
+    "tsetmc_terms_page_retrieved": false,
+    "tsetmc_terms_page_read": false,
+    "world_bank_licence_retrieved_and_read": true,
+    "historical_retrieval_record_preserved": true,
+    "historical_retrieval_record_path": "project/stage130/dataset_release_candidate/release_payload/SOURCE_AND_LICENSE_NOTES.md",
+    "retroactive_independent_verification_claimed": false
+  },
+  "human_supplied_manuscript_submission_metadata": {
+    "human_submission_metadata_supplied": true,
+    "human_submission_metadata_applied_to_manuscript": false,
+    "manuscript_modified_by_this_action": false,
+    "manuscript_requires_post_doi_metadata_update_and_human_review": true,
+    "supplied_by": "human",
+    "independently_inferred_by_the_agent": false,
+    "supplied_on_utc": "2026-08-21",
+    "items_supplied": {
+      "authors_and_author_order": [
+        "Abtin Asghari",
+        "MohammadMehdi Mehraein"
+      ],
+      "affiliations_and_corresponding_author": {
+        "creators": [
+          {
+            "order": 1,
+            "name": "Abtin Asghari",
+            "affiliation": "Department of Computer Engineering, Islamic Azad University, West Tehran Branch, Tehran, Iran"
+          },
+          {
+            "order": 2,
+            "name": "MohammadMehdi Mehraein",
+            "affiliation": "Department of Financial Management, Islamic Azad University, Central Tehran Branch, Tehran, Iran"
+          }
+        ],
+        "corresponding_author": "Abtin Asghari"
+      },
+      "funding": "No external funding.",
+      "conflicts_of_interest": "None declared.",
+      "ethics_and_data_governance_statement": "The study uses only publicly and freely accessible company-level financial disclosure data. No human participants, no personal data and no confidential or purchased data were involved, so no ethics-committee approval was required. This is the ethics statement the human author approved.",
+      "data_access_mechanism_for_the_restricted_company_panel": "A future open Zenodo dataset, pending an authorized deposit and DOI. Neither exists yet."
+    },
+    "items_supplied_count": 6,
+    "items_still_outstanding_count": 0,
+    "why_the_manuscript_is_still_unchanged": "Supplying the facts is not the same as inserting them. The approved manuscript is byte-pinned to a completed human review, and its data-access wording additionally depends on a DOI that does not exist. Editing it now would both invalidate the byte-pinned approval and make it describe an access mechanism that is not in place. The insertion is a separate action requiring its own authorization, and it must be followed by a fresh human review of the changed bytes.",
+    "supersedes_the_claim_that_these_items_were_never_supplied": true,
+    "previous_claim": "As of 1.0.0-rc.1 these six items were recorded as outstanding and unsupplied. That is no longer true: they are supplied. What remains outstanding is their APPLICATION to the manuscript, which is a different thing and is recorded as such."
+  },
+  "manuscript_human_submission_metadata_supplied": true,
+  "manuscript_human_submission_metadata_applied_to_manuscript": false,
+  "manuscript_requires_post_doi_metadata_update_and_human_review": true,
+  "source_rights_status": "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED",
+  "existing_commits_amended_squashed_rebased_or_force_pushed": 0
 }

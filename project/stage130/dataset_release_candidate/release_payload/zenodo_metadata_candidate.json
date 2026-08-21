@@ -4,13 +4,35 @@
     "doi": null,
     "doi_reserved": false,
     "public_release_authorized": false,
-    "publication_readiness": "NOT_READY_FOR_PUBLICATION",
-    "publication_readiness_reason": "CODAL redistribution terms could not be verified from the audit environment on 2026-08-21, and the approved study manuscript states the company panel is not openly redistributable. See SOURCE_AND_LICENSE_NOTES.md.",
+    "publication_readiness": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+    "publication_readiness_reason": "The human author supplied a source-rights determination and the release-specific column dictionary now documents all 115 released columns, so what remains before any Zenodo action is a human reading this archive's exact SHA-256. That review has not happened. See SOURCE_AND_LICENSE_NOTES.md.",
     "release_candidate_prepared": true,
     "separate_exact_digest_human_authorization_required_before_any_zenodo_action": true,
+    "supersedes_version": "1.0.0-rc.1",
+    "supersedes_archive_sha256": "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
+    "supersedes_publication_readiness": "NOT_READY_FOR_PUBLICATION",
     "zenodo_deposition_created": false,
     "zenodo_published": false,
     "zenodo_upload_performed": false
+  },
+  "source_rights": {
+    "status": "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED",
+    "basis": "human_author_determination",
+    "supplied_by": "human",
+    "independently_inferred_by_the_agent": false,
+    "determination_date_utc": "2026-08-21",
+    "sources_publicly_and_freely_accessible": true,
+    "purchased_data_used": false,
+    "confidential_data_used": false,
+    "personal_data_used": false,
+    "human_participant_data_used": false,
+    "separate_provider_permission_required_for_redistribution": false,
+    "original_provider_files_redistributed": false,
+    "provider_terms_independently_retrieved": false,
+    "provider_terms_independently_verified": false,
+    "legal_opinion_asserted": false,
+    "licence_scope": "the authors' original compilation, structure, annotations, derived variables and release metadata only, to the extent the authors hold rights in them",
+    "note": "This is a determination by the human author, not a provider licence and not a verification of any provider's published terms. No CODAL or TSETMC terms page was retrieved or read. See SOURCE_AND_LICENSE_NOTES.md."
   },
   "metadata": {
     "access_right": "open",
@@ -27,7 +49,7 @@
       }
     ],
     "creators_note": "Order is author-supplied and must not be reordered. No ORCID identifier is recorded for either creator: none was supplied, and none is invented.",
-    "description": "<p>An analysis-ready company-year panel of Iranian listed non-financial companies for one-year-ahead corporate financial distress prediction, covering Jalali fiscal years 1392–1402, together with the contracts, dictionaries, quality-control records and audit surfaces needed to reproduce and check its construction.</p><p><strong>Primary modeling surface:</strong> <code>data/analysis_ready_main_rule_a_stage125.csv</code> — 1,012 company-year pairs, 119 companies, 115 columns, 80 positive and 932 negative outcomes. The other three analysis-ready files are prespecified robustness surfaces, not alternative headline datasets.</p><p><strong>Audit surfaces:</strong> the four <code>audit/audited_pairs_*.csv</code> files retain company-year pairs that the leakage-safe timing rule excludes. They are audit surfaces and are <strong>not all model-ready</strong>; fitting a model on them reintroduces look-ahead.</p><p><strong>Availability is an assumption.</strong> Predictor admission uses a prespecified fixed four-Jalali-month regulatory lag. Row-level publication timestamps were never collected and no individual filing date was verified, so the availability date is a proxy, not an observed publication timestamp.</p><p><strong>Provenance is file-level and incomplete:</strong> a source file is recorded for 1,303 of 1,331 upstream rows and absent for 28. Quality-control coverage differs across accounting checks (1,273 to 1,312 evaluable rows depending on the check).</p><p>All values were compiled by the authors from publicly accessible sources including CODAL, TSETMC and the World Bank. No purchased, confidential, personal or human-participant data were used. Original source PDFs and raw provider responses are <strong>not</strong> redistributed. The CC BY 4.0 licence covers only the authors' own compilation, annotations and release metadata to the extent the authors hold rights in them; it does not relicense third-party source materials. See <code>SOURCE_AND_LICENSE_NOTES.md</code> and <code>LIMITATIONS.md</code>.</p>",
+    "description": "<p>An analysis-ready company-year panel of Iranian listed non-financial companies for one-year-ahead corporate financial distress prediction, covering Jalali fiscal years 1392–1402, together with the contracts, dictionaries, quality-control records and audit surfaces needed to reproduce and check its construction.</p><p><strong>Primary modeling surface:</strong> <code>data/analysis_ready_main_rule_a_stage125.csv</code> — 1,012 company-year pairs, 119 companies, 115 columns, 80 positive and 932 negative outcomes. The other three analysis-ready files are prespecified robustness surfaces, not alternative headline datasets.</p><p><strong>Audit surfaces:</strong> the four <code>audit/audited_pairs_*.csv</code> files retain company-year pairs that the leakage-safe timing rule excludes. They are audit surfaces and are <strong>not all model-ready</strong>; fitting a model on them reintroduces look-ahead.</p><p><strong>Availability is an assumption.</strong> Predictor admission uses a prespecified fixed four-Jalali-month regulatory lag. Row-level publication timestamps were never collected and no individual filing date was verified, so the availability date is a proxy, not an observed publication timestamp.</p><p><strong>Provenance is file-level and incomplete:</strong> a source file is recorded for 1,303 of 1,331 upstream rows and absent for 28. Quality-control coverage differs across accounting checks (1,273 to 1,312 evaluable rows depending on the check).</p><p><strong>Every one of the 115 released columns is documented</strong> in <code>RELEASE_COLUMN_DICTIONARY.csv</code>, one row each, with definition, type, unit, role, model eligibility, provenance, temporal reference, missing-value semantics, formula, limitations and the exact committed source each fact came from.</p><p>All values were compiled by the authors from publicly accessible sources including CODAL, TSETMC and the World Bank. No purchased, confidential, personal or human-participant data were used. Original source PDFs and raw provider responses are <strong>not</strong> redistributed. The CC BY 4.0 licence covers only the authors' own compilation, annotations and release metadata to the extent the authors hold rights in them; it does not relicense third-party source materials. The authors' rights position rests on a determination by the human author that the source data were publicly and freely accessible and need no separate provider permission — a determination by the author, not a provider licence and not a verification of any provider's published terms. See <code>SOURCE_AND_LICENSE_NOTES.md</code> and <code>LIMITATIONS.md</code>.</p>",
     "keywords": [
       "financial distress",
       "bankruptcy prediction",
@@ -43,10 +65,10 @@
     "license": "cc-by-4.0",
     "license_name": "Creative Commons Attribution 4.0 International",
     "license_scope": "Applies to the authors' original compilation, annotations and release metadata only, to the extent the authors hold rights in them. It does not relicense third-party source materials.",
-    "notes": "Release candidate. Not deposited, not published, no DOI.",
+    "notes": "Release candidate 1.0.0-rc.2, superseding 1.0.0-rc.1. Not deposited, not published, no DOI.",
     "title": "Tehran Stock Exchange Corporate Financial Distress Prediction Dataset (1392–1402): Analysis-Ready Company-Year Panel and Reproducibility Materials",
     "upload_type": "dataset",
-    "version": "1.0.0-rc.1"
+    "version": "1.0.0-rc.2"
   },
   "correspondence": {
     "corresponding_author": "Abtin Asghari",

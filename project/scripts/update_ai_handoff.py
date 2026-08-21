@@ -281,6 +281,14 @@ ALLOWLIST_FILES = (
     # archive it writes is gitignored rather than tracked.
     "project/src/stage130_dataset_release_candidate.py",
     "project/tests/test_stage130_dataset_release_candidate.py",
+    # The complete 115-column release dictionary: its fail-closed generator,
+    # its tests, and the CSV it emits. The generator transcribes committed
+    # facts and refuses to invent one; the CSV is regenerated and byte-compared
+    # at build time, so a hand-edited dictionary cannot ship.
+    "project/src/stage130_release_column_dictionary.py",
+    "project/tests/test_stage130_release_column_dictionary.py",
+    "project/stage130/dataset_release_candidate/release_payload/"
+    "RELEASE_COLUMN_DICTIONARY.csv",
     "project/stage130/dataset_release_candidate/"
     "README_STAGE130_DATASET_RELEASE_CANDIDATE.md",
     "project/stage130/dataset_release_candidate/"
@@ -6638,9 +6646,11 @@ def render_current_state(record: dict) -> str:
             f"Stage130 authorized = {record.get('stage130_authorized')}, "
             "submission workflow started = "
             f"{record.get('stage130_manuscript_submission_workflow_started')}.",
-            "- 👤 **Human-supplied submission metadata still outstanding:** "
-            f"{record.get('stage130_manuscript_human_supplied_metadata_outstanding')}"
-            " — "
+            "- 👤 **Human submission metadata — supplied = "
+            f"{record.get('stage130_manuscript_human_submission_metadata_supplied', False)}"
+            ", applied to the manuscript = "
+            f"{record.get('stage130_manuscript_human_submission_metadata_applied_to_manuscript', False)}"
+            ":** "
             f"{record.get('stage130_manuscript_human_supplied_metadata_outstanding_count')}"
             " items ("
             + ", ".join(
@@ -6648,7 +6658,10 @@ def render_current_state(record: dict) -> str:
                 (record.get(
                     "stage130_manuscript_human_supplied_metadata_outstanding_items")
                  or []))
-            + "). None was invented by this action.",
+            + "). None was invented by any action. Where they are supplied, "
+            "they are recorded in the decision artifact only — the byte-pinned "
+            "manuscript still carries placeholders, and inserting them needs a "
+            "separate authorization plus a fresh human review.",
             "- ⛔ **Nothing scientific occurred:** Final Test rows read = "
             f"{record.get('stage130_phase2_final_test_rows_read')}, prediction "
             "artifact opened = "
@@ -6672,11 +6685,36 @@ def render_current_state(record: dict) -> str:
             "published, and the manuscript was not touched._\n",
             "- 📦 **Candidate prepared:** "
             f"{record.get('stage130_dataset_release_candidate_prepared')} — "
+            "version "
+            f"`{record.get('stage130_dataset_release_candidate_version')}`, "
             f"{record.get('stage130_dataset_release_candidate_file_count')} "
             "payload files; the archive itself is **not** tracked in Git "
             "(tracked in git = "
             f"{record.get('stage130_dataset_release_candidate_archive_tracked_in_git')}"
             ").",
+            "- 🗂️ **Supersedes** "
+            f"`{record.get('stage130_dataset_release_candidate_supersedes_version')}`"
+            " (archive SHA-256 "
+            f"`{record.get('stage130_dataset_release_candidate_supersedes_archive_sha256')}`"
+            ", "
+            f"{record.get('stage130_dataset_release_candidate_supersedes_archive_size_bytes')}"
+            " bytes, readiness "
+            f"`{record.get('stage130_dataset_release_candidate_supersedes_readiness')}`"
+            "), preserved not deleted = "
+            f"{record.get('stage130_dataset_release_candidate_supersedes_preserved_not_deleted')}"
+            ". Nothing was ever deposited under it.",
+            "- 📖 **Column documentation complete:** "
+            f"{record.get('stage130_dataset_release_candidate_columns_documented')}"
+            "/"
+            f"{record.get('stage130_dataset_release_candidate_columns_released')}"
+            " released columns documented, "
+            f"{record.get('stage130_dataset_release_candidate_columns_undocumented')}"
+            " undocumented, "
+            f"{record.get('stage130_dataset_release_candidate_definitions_invented')}"
+            " definitions invented. Dictionary: "
+            f"`{record.get('stage130_dataset_release_candidate_dictionary')}`."
+            " Every row names the committed repository source its facts came "
+            "from.",
             "- 🎯 **Primary modeling surface:** "
             f"`{record.get('stage130_dataset_release_candidate_primary_file')}`"
             f" — {record.get('stage130_dataset_release_candidate_primary_pairs')}"
@@ -6698,8 +6736,10 @@ def render_current_state(record: dict) -> str:
             "is).",
             "- ⛔ **Publication readiness:** "
             f"`{record.get('stage130_dataset_release_candidate_publication_readiness')}`"
-            " — blocking provider = "
+            " — live blocking provider = "
             f"`{record.get('stage130_dataset_release_candidate_blocking_provider')}`"
+            ", superseded blocking provider = "
+            f"`{record.get('stage130_dataset_release_candidate_superseded_blocking_provider')}`"
             ". Providers audited: "
             + ", ".join(
                 f"`{name}`" for name in
@@ -6711,6 +6751,21 @@ def render_current_state(record: dict) -> str:
             ") and no raw provider response ("
             f"{record.get('stage130_dataset_release_candidate_raw_responses_included')}"
             ") is redistributed.",
+            "- ⚖️ **Source rights — HUMAN AUTHOR DETERMINATION, not an "
+            "independent verification:** status "
+            f"`{record.get('stage130_dataset_release_candidate_rights_status')}`"
+            ", basis "
+            f"`{record.get('stage130_dataset_release_candidate_rights_basis')}`"
+            ", supplied by human = "
+            f"{record.get('stage130_dataset_release_candidate_rights_supplied_by_human')}"
+            ", inferred by the agent = "
+            f"{record.get('stage130_dataset_release_candidate_rights_inferred_by_the_agent')}"
+            ". **Provider terms independently retrieved = "
+            f"{record.get('stage130_dataset_release_candidate_provider_terms_retrieved')}"
+            ", independently verified = "
+            f"{record.get('stage130_dataset_release_candidate_provider_terms_verified')}"
+            "** — no CODAL or TSETMC terms page was ever retrieved or read, "
+            "and the historical record of that says so.",
             "- ⛔ **Nothing reached Zenodo:** deposition created = "
             f"{record.get('zenodo_deposition_created')}, upload performed = "
             f"{record.get('zenodo_upload_performed')}, DOI reserved = "
@@ -6723,7 +6778,15 @@ def render_current_state(record: dict) -> str:
             "availability claim changed = "
             f"{record.get('stage130_manuscript_availability_claim_changed')}. "
             "It keeps describing the dataset by its PRESENT availability, "
-            "because no public DOI exists.",
+            "because no public DOI exists. The six human submission items are "
+            "supplied = "
+            f"{record.get('stage130_manuscript_human_submission_metadata_supplied')}"
+            " but applied to the manuscript = "
+            f"{record.get('stage130_manuscript_human_submission_metadata_applied_to_manuscript')}"
+            "; a post-DOI metadata update plus a fresh human review is still "
+            "required (= "
+            f"{record.get('stage130_manuscript_requires_post_doi_human_review')}"
+            ").",
             "- ➡️ **Live next action:** "
             f"`{record.get('next_research_action_id')}` — authorized = "
             f"{record.get('next_research_action_authorized')}. A human must "
@@ -17972,6 +18035,55 @@ _STAGE130_RC_NEXT_ACTION_SCOPE = (
     "authorized")
 #: The three providers the source-rights audit must cover.
 _STAGE130_RC_PROVIDERS = ("CODAL", "TSETMC", "World Bank")
+#: The live candidate, and the predecessor it supersedes without deleting.
+_STAGE130_RC_RELEASE_VERSION = "1.0.0-rc.2"
+_STAGE130_RC_SUPERSEDED_VERSION = "1.0.0-rc.1"
+_STAGE130_RC_SUPERSEDED_SHA256 = (
+    "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45")
+_STAGE130_RC_SUPERSEDED_BYTES = 11657151
+#: The only two statuses an undeposited candidate may carry. `PUBLISHED` and
+#: `PUBLIC_RELEASE_AUTHORIZED` are deliberately absent: nothing in this
+#: repository can support either.
+_STAGE130_RC_ALLOWED_READINESS = (
+    "NOT_READY_FOR_PUBLICATION",
+    "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+)
+#: The human author's source-rights determination, as a status token. A
+#: determination BY THE AUTHOR -- never a provider licence, never a
+#: verification of anyone's published terms.
+_STAGE130_RC_RIGHTS_STATUS = (
+    "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED")
+#: The matrix disposition that records the rc.1 blocker as superseded by that
+#: determination -- as a determination, not as retroactive verification.
+_STAGE130_RC_SUPERSEDED_DISPOSITION = (
+    "SUPERSEDED_BY_HUMAN_AUTHOR_DETERMINATION")
+#: Claims no artifact in this package may make. The terms pages were never
+#: retrieved, so a sentence asserting they were read is false however
+#: convenient. Matched case-insensitively across the whole package.
+_STAGE130_RC_FORBIDDEN_RIGHTS_CLAIMS = (
+    "codal open licence verified",
+    "codal open license verified",
+    "codal terms independently verified",
+    "codal terms verified",
+    "provider terms independently verified",
+)
+#: The complete release dictionary and the authoritative column set it must
+#: match exactly.
+_STAGE130_RC_DICTIONARY_REL = (
+    f"{_STAGE130_RC_PKG}/release_payload/RELEASE_COLUMN_DICTIONARY.csv")
+_STAGE130_RC_ROLE_MAP_REL = (
+    "project/stage125/part3c_column_role_map_stage125.csv")
+#: Every field a release dictionary row must carry, non-empty.
+_STAGE130_RC_DICTIONARY_FIELDS = (
+    "column_name", "definition", "data_type", "unit", "column_role",
+    "model_eligibility", "source_block", "source_provider_or_author_derived",
+    "temporal_reference", "missing_value_semantics", "derivation_or_formula",
+    "authoritative_source_path", "authoritative_source_field_or_section",
+    "definition_status", "limitations",
+)
+#: The six human submission items. They are now SUPPLIED; what remains is their
+#: application to the byte-pinned manuscript, which is a different thing.
+_STAGE130_RC_SUPPLIED_METADATA = _STAGE130_REVIEW_OUTSTANDING_METADATA
 #: The eight frozen Stage125 Part 3C surfaces, pinned by digest. These files
 #: are gitignored (see .gitignore), so a fresh clone legitimately lacks them:
 #: absence is tolerated, drift never is.
@@ -18032,6 +18144,113 @@ _STAGE130_RC_FORBIDDEN_TRUE = (
     "branch_deleted_by_this_action",
     "auto_merge_enabled_by_this_action",
 )
+
+
+def _stage130_rc_assert_no_unsupported_rights_claim(root: str) -> None:
+    """No committed package file may claim a provider's terms were verified.
+
+    The human author's determination is recorded as a determination everywhere
+    it appears. Restating it as an independent verification of CODAL's -- or
+    anyone's -- published terms would be false, because no such page was ever
+    retrieved. Swept over prose as well as flags, since a paragraph can assert
+    what a boolean denies.
+    """
+    pkg = os.path.join(root, _STAGE130_RC_PKG)
+    for dirpath, dirnames, filenames in os.walk(pkg):
+        dirnames[:] = [d for d in dirnames if d != "build"]
+        for name in sorted(filenames):
+            path = os.path.join(dirpath, name)
+            rel = os.path.relpath(path, root)
+            try:
+                with open(path, encoding="utf-8") as fh:
+                    text = fh.read()
+            except (UnicodeDecodeError, OSError):
+                continue
+            lowered = text.lower()
+            for claim in _STAGE130_RC_FORBIDDEN_RIGHTS_CLAIMS:
+                if claim in lowered:
+                    raise HandoffError(
+                        f"{rel} asserts {claim!r}. No provider terms page was "
+                        "retrieved, so that claim is unsupported; record the "
+                        "human author determination instead")
+
+
+def _stage130_rc_assert_complete_column_dictionary(root: str) -> dict:
+    """All 115 released columns documented exactly once, or fail closed.
+
+    Checks the committed dictionary against the authoritative column-role map:
+    same column set, no duplicate, no blank field, and an
+    ``authoritative_source_path`` that resolves to a file that actually exists.
+    The role map is the authority for WHICH columns exist; this makes the
+    release dictionary prove it covers every one of them.
+    """
+    dictionary_path = os.path.join(root, _STAGE130_RC_DICTIONARY_REL)
+    role_map_path = os.path.join(root, _STAGE130_RC_ROLE_MAP_REL)
+    if not os.path.isfile(dictionary_path):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate is missing the complete "
+            f"release column dictionary: {_STAGE130_RC_DICTIONARY_REL}")
+    if not os.path.isfile(role_map_path):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate cannot verify column coverage "
+            f"without {_STAGE130_RC_ROLE_MAP_REL}")
+
+    with open(role_map_path, encoding="utf-8-sig", newline="") as fh:
+        released = [row["column_name"] for row in csv.DictReader(fh)]
+    expected = _STAGE130_RC_PRIMARY_COUNTS["columns"]
+    if len(released) != expected:
+        raise HandoffError(
+            f"{_STAGE130_RC_ROLE_MAP_REL} lists {len(released)} columns, "
+            f"expected {expected}")
+
+    with open(dictionary_path, encoding="utf-8-sig", newline="") as fh:
+        reader = csv.DictReader(fh)
+        header = tuple(reader.fieldnames or ())
+        documented = list(reader)
+    if header != _STAGE130_RC_DICTIONARY_FIELDS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate release column dictionary "
+            f"header is {list(header)}, expected "
+            f"{list(_STAGE130_RC_DICTIONARY_FIELDS)}")
+    if len(documented) != expected:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate release column dictionary has "
+            f"{len(documented)} rows, expected {expected} -- one per released "
+            "column")
+
+    names = [row["column_name"] for row in documented]
+    duplicates = sorted({n for n in names if names.count(n) > 1})
+    if duplicates:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate release column dictionary "
+            f"repeats columns: {duplicates}")
+    missing = sorted(set(released) - set(names))
+    extra = sorted(set(names) - set(released))
+    if missing or extra:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate release column dictionary "
+            f"disagrees with {_STAGE130_RC_ROLE_MAP_REL}: "
+            f"undocumented={missing} not_released={extra}")
+
+    statuses = {}
+    for row in documented:
+        for field in _STAGE130_RC_DICTIONARY_FIELDS:
+            if not (row.get(field) or "").strip():
+                raise HandoffError(
+                    "Stage130 dataset Release Candidate release column "
+                    f"dictionary row {row['column_name']!r} leaves {field} "
+                    "empty; an incompletely defined column must be reported, "
+                    "never shipped blank")
+        anchor = row["authoritative_source_path"]
+        if not os.path.isfile(os.path.join(root, anchor)):
+            raise HandoffError(
+                "Stage130 dataset Release Candidate release column dictionary "
+                f"row {row['column_name']!r} cites {anchor!r}, which does not "
+                "exist in the repository")
+        statuses[row["definition_status"]] = \
+            statuses.get(row["definition_status"], 0) + 1
+    return {"documented": len(documented), "released": len(released),
+            "statuses": dict(sorted(statuses.items()))}
 
 
 def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
@@ -18213,6 +18432,84 @@ def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
             "Stage130 dataset Release Candidate decision must record the "
             "counts as contract-supplied, not recomputed")
 
+    # (6a) All 115 released columns documented, exactly once, each anchored to
+    # a committed repository source that exists.
+    dictionary = _stage130_rc_assert_complete_column_dictionary(root)
+    dictionary_coverage = manifest.get("release_column_dictionary_coverage") \
+        or {}
+    if dictionary_coverage.get("released_columns_documented") != \
+            dictionary["documented"]:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest reports "
+            f"{dictionary_coverage.get('released_columns_documented')!r} "
+            f"documented columns, but the dictionary has "
+            f"{dictionary['documented']}")
+    if dictionary_coverage.get("released_columns_undocumented") != 0:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must document every released "
+            "column; an undocumented column fails the release rather than "
+            "shipping undefined")
+    for field in ("column_set_matches_authoritative_role_map",
+                  "every_row_names_an_authoritative_repository_source"):
+        if dictionary_coverage.get(field) is not True:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest {field} must be "
+                "True")
+    if dictionary_coverage.get("definitions_invented_by_this_action") != 0:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must invent zero definitions")
+
+    # (6b) The predecessor candidate is superseded, not erased. rc.1's digest
+    # and byte size are recorded, and nothing was ever deposited under it.
+    supersedes = decision.get("supersedes_release") or {}
+    manifest_supersedes = manifest.get("supersedes") or {}
+    if decision.get("release_version") != _STAGE130_RC_RELEASE_VERSION:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate decision release_version must "
+            f"be {_STAGE130_RC_RELEASE_VERSION}")
+    if manifest.get("release_version") != _STAGE130_RC_RELEASE_VERSION:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest release_version must "
+            f"be {_STAGE130_RC_RELEASE_VERSION}")
+    for source, label in ((supersedes, "decision"),
+                          (manifest_supersedes, "manifest")):
+        if source.get("version") != _STAGE130_RC_SUPERSEDED_VERSION:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must record "
+                f"{_STAGE130_RC_SUPERSEDED_VERSION} as superseded")
+        if source.get("archive_sha256") != _STAGE130_RC_SUPERSEDED_SHA256:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must preserve "
+                f"the superseded archive digest "
+                f"{_STAGE130_RC_SUPERSEDED_SHA256}")
+        if source.get("archive_size_bytes") != _STAGE130_RC_SUPERSEDED_BYTES:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must preserve "
+                f"the superseded archive size "
+                f"{_STAGE130_RC_SUPERSEDED_BYTES}")
+        if source.get("publication_readiness_at_the_time") != \
+                "NOT_READY_FOR_PUBLICATION":
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must preserve "
+                "that the superseded candidate was NOT_READY_FOR_PUBLICATION")
+        for field in ("zenodo_deposition_created", "zenodo_upload_performed",
+                      "zenodo_doi_reserved", "zenodo_published",
+                      "public_release_authorized"):
+            if source.get(field) is not False:
+                raise HandoffError(
+                    f"Stage130 dataset Release Candidate {label} supersede "
+                    f"record {field} must be False: nothing was ever "
+                    "deposited under the superseded candidate")
+    if supersedes.get("preserved_not_deleted") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record the superseded "
+            "candidate as preserved, not deleted")
+    if manifest.get("archive_name") == \
+            manifest_supersedes.get("archive_name"):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must build under a NEW "
+            "archive filename so the superseded candidate is not overwritten")
+
     # (7) The source-rights audit: all three providers, and a blocked
     # disposition that is not quietly upgraded.
     audit = decision.get("source_rights_audit") or {}
@@ -18239,14 +18536,85 @@ def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
                 "Stage130 dataset Release Candidate may not redistribute an "
                 f"original {row.get('provider')} provider file")
         for field in ("terms_checked_date_utc", "terms_checked_url",
-                      "residual_uncertainty", "release_disposition"):
+                      "residual_uncertainty", "release_disposition",
+                      "provider_terms_independently_retrieved",
+                      "provider_terms_independently_verified",
+                      "human_author_determination",
+                      "human_author_determination_status",
+                      "determination_date_utc", "determination_supplied_by"):
             if not (row.get(field) or "").strip():
                 raise HandoffError(
                     "Stage130 dataset Release Candidate source-rights matrix "
                     f"row {row.get('provider')!r} is missing {field}")
+        if row.get("determination_supplied_by") != "human":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate source-rights matrix row "
+                f"{row.get('provider')!r} must attribute the determination to "
+                "the human author")
+        if row.get("determination_independently_inferred_by_the_agent") != "no":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate source-rights matrix row "
+                f"{row.get('provider')!r} must record the determination as "
+                "human-supplied, not agent-inferred")
+        if row.get("human_author_determination_status") != \
+                _STAGE130_RC_RIGHTS_STATUS:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate source-rights matrix row "
+                f"{row.get('provider')!r} must carry the determination status "
+                f"{_STAGE130_RC_RIGHTS_STATUS}")
+
+    # A provider whose terms were never retrieved may not be recorded as
+    # having a verified licence, and its stated terms stay NOT_VERIFIED. The
+    # human determination supersedes the blocker; it does not retroactively
+    # read a page nobody opened.
+    by_provider = {row.get("provider"): row for row in rows}
+    for name in ("CODAL", "TSETMC"):
+        row = by_provider[name]
+        if row.get("publicly_stated_license_or_terms") != "NOT_VERIFIED":
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate must keep {name}'s "
+                "publicly stated terms recorded as NOT_VERIFIED: no terms "
+                "page was retrieved, so none was read")
+        for field in ("provider_terms_independently_retrieved",
+                      "provider_terms_independently_verified"):
+            if row.get(field) != "no":
+                raise HandoffError(
+                    f"Stage130 dataset Release Candidate {name} {field} must "
+                    "be 'no': claiming otherwise would assert a verification "
+                    "that never happened")
+    codal = by_provider["CODAL"]
+    if codal.get("release_disposition") == \
+            _STAGE130_RC_SUPERSEDED_DISPOSITION:
+        if codal.get("superseded_release_disposition") != "BLOCKS_PUBLICATION":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate must preserve that the "
+                "CODAL row previously read BLOCKS_PUBLICATION; a supersede "
+                "that erases what it supersedes is a rewrite")
+        if audit.get("superseded_blocking_provider") != "CODAL":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate must name CODAL as the "
+                "superseded blocking provider")
+        if audit.get("superseded_publication_readiness") != \
+                "NOT_READY_FOR_PUBLICATION":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate must preserve the "
+                "superseded NOT_READY_FOR_PUBLICATION readiness")
+        if audit.get("historical_non_retrieval_preserved") is not True:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate must preserve the "
+                "historical fact that the provider terms pages were never "
+                "retrieved")
+
     blocked = tuple(row.get("provider") for row in rows
                     if row.get("release_disposition") == "BLOCKS_PUBLICATION")
     readiness = audit.get("publication_readiness")
+    if readiness not in _STAGE130_RC_ALLOWED_READINESS:
+        raise HandoffError(
+            f"Stage130 dataset Release Candidate publication_readiness "
+            f"{readiness!r} is not one of "
+            f"{list(_STAGE130_RC_ALLOWED_READINESS)}: an undeposited candidate "
+            "may be not-ready or awaiting a human digest review, and it may "
+            "never be published or public-release-authorized")
     if blocked and readiness != "NOT_READY_FOR_PUBLICATION":
         raise HandoffError(
             f"Stage130 dataset Release Candidate has blocking provider(s) "
@@ -18256,21 +18624,80 @@ def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
         raise HandoffError(
             "Stage130 dataset Release Candidate boundary and decision "
             "disagree on publication_readiness")
+    if manifest.get("publication_readiness") not in (None, readiness):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest and decision "
+            "disagree on publication_readiness")
     if readiness == "NOT_READY_FOR_PUBLICATION" and \
             audit.get("blocking_provider") not in blocked:
         raise HandoffError(
             "Stage130 dataset Release Candidate must name the blocking "
             "provider that the matrix actually blocks on")
+    if readiness == "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW":
+        if audit.get("blocking_provider") is not None:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate names a blocking provider "
+                "while reporting READY_FOR_EXACT_DIGEST_HUMAN_REVIEW")
+        if audit.get("rights_basis") != "human_author_determination":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate readiness rests on the "
+                "human author determination and must record rights_basis = "
+                "human_author_determination")
+        if audit.get("rights_status") != _STAGE130_RC_RIGHTS_STATUS:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate rights_status must be "
+                f"{_STAGE130_RC_RIGHTS_STATUS}")
     for field in ("columns_removed_to_avoid_the_blocker",
                   "frozen_values_altered_to_avoid_the_blocker"):
         if audit.get(field) != 0:
             raise HandoffError(
                 f"Stage130 dataset Release Candidate {field} must be 0: a "
                 "rights blocker is reported, never engineered away")
-    if audit.get("legal_conclusion_asserted_beyond_the_evidence") is not False:
+    for field in ("legal_conclusion_asserted_beyond_the_evidence",
+                  "provider_terms_independently_retrieved",
+                  "provider_terms_independently_verified",
+                  "codal_open_licence_verified_claimed",
+                  "codal_terms_independently_verified_claimed"):
+        if audit.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate source_rights_audit "
+                f"{field} must be False: no provider terms page was ever "
+                "retrieved, so no verification may be claimed")
+
+    # (7a) The human author's determination: recorded as a determination.
+    determination = decision.get(
+        "human_supplied_source_rights_determination") or {}
+    if determination.get("status") != _STAGE130_RC_RIGHTS_STATUS:
         raise HandoffError(
-            "Stage130 dataset Release Candidate must not assert a legal "
-            "conclusion beyond its evidence")
+            "Stage130 dataset Release Candidate must record the human author "
+            f"source-rights determination with status "
+            f"{_STAGE130_RC_RIGHTS_STATUS}")
+    if determination.get("supplied_by") != "human":
+        raise HandoffError(
+            "Stage130 dataset Release Candidate source-rights determination "
+            "must be recorded as human-supplied")
+    for field in ("independently_inferred_by_the_agent",
+                  "is_a_provider_licence",
+                  "is_an_independent_verification_of_provider_terms",
+                  "is_a_legal_opinion",
+                  "provider_terms_independently_retrieved",
+                  "provider_terms_independently_verified",
+                  "codal_terms_page_retrieved", "codal_terms_page_read",
+                  "retroactive_independent_verification_claimed"):
+        if determination.get(field) is not False:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate source-rights "
+                f"determination {field} must be False: it is a determination "
+                "by the author, not a licence and not a verification")
+    if determination.get("historical_retrieval_record_preserved") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must preserve the historical "
+            "record of which provider terms pages were never retrieved")
+
+    # (7b) No artifact in the package may claim a verification that never
+    # happened. Swept over the whole committed package, not just the fields
+    # above, so a sentence in prose cannot say what a flag denies.
+    _stage130_rc_assert_no_unsupported_rights_claim(root)
 
     # (8) The approved manuscript is untouched, proven by re-derived digests.
     manuscript_boundary = decision.get("manuscript_boundary") or {}
@@ -18427,9 +18854,10 @@ def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
     if marker.get("manuscript_submission_metadata_still_outstanding") \
             is not True:
         raise HandoffError(
-            "Stage130 dataset Release Candidate must keep the six human-only "
-            "manuscript submission items outstanding: supplying Zenodo "
-            "creator metadata fills no manuscript placeholder")
+            "Stage130 dataset Release Candidate must keep the six human "
+            "manuscript submission items outstanding AS MANUSCRIPT "
+            "INSERTIONS: the facts are supplied, but none is in the "
+            "byte-pinned manuscript")
     if marker.get("manuscript_submission_metadata_outstanding_count") != \
             len(_STAGE130_REVIEW_OUTSTANDING_METADATA):
         raise HandoffError(
@@ -18440,7 +18868,63 @@ def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
             is not True:
         raise HandoffError(
             "Stage130 dataset Release Candidate boundary must keep the "
-            "manuscript submission metadata outstanding")
+            "manuscript submission metadata outstanding as an insertion")
+
+    # (12a) SUPPLIED, and not yet applied. Those are different facts and the
+    # record must carry both: continuing to say the items were never supplied
+    # would now be false, and saying they are in the manuscript would be false
+    # too. The manuscript is byte-identical, proven above.
+    supplied = decision.get(
+        "human_supplied_manuscript_submission_metadata") or {}
+    if supplied.get("human_submission_metadata_supplied") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record the six human "
+            "manuscript submission items as SUPPLIED: they were, and claiming "
+            "otherwise is no longer true")
+    for field in ("human_submission_metadata_applied_to_manuscript",
+                  "manuscript_modified_by_this_action",
+                  "independently_inferred_by_the_agent"):
+        if supplied.get(field) is not False:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate "
+                f"human_supplied_manuscript_submission_metadata.{field} must "
+                "be False: supplying a fact is not inserting it, and this "
+                "action changed no manuscript byte")
+    if supplied.get(
+            "manuscript_requires_post_doi_metadata_update_and_human_review") \
+            is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record that the "
+            "manuscript still requires a post-DOI metadata update and a fresh "
+            "human review")
+    if supplied.get("supplied_by") != "human":
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manuscript submission "
+            "metadata must be recorded as human-supplied")
+    items = supplied.get("items_supplied") or {}
+    if tuple(items) != _STAGE130_RC_SUPPLIED_METADATA:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record exactly the six "
+            f"human submission items {_STAGE130_RC_SUPPLIED_METADATA}, got "
+            f"{tuple(items)}")
+    for key, value in items.items():
+        if not value:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate submission item {key!r} "
+                "is recorded as supplied but carries no value")
+    for source, label in ((boundary, "boundary"), (decision, "decision")):
+        if source.get(
+                "manuscript_human_submission_metadata_supplied") is not True:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must record "
+                "manuscript_human_submission_metadata_supplied = True")
+        if source.get(
+                "manuscript_human_submission_metadata_applied_to_manuscript") \
+                is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must record "
+                "manuscript_human_submission_metadata_applied_to_manuscript "
+                "= False")
 
     # (13) The predecessor records keep their own history.
     for field in ("prior_phase1_evidence_package_preserved",
@@ -18486,10 +18970,47 @@ def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
         "stage130_dataset_release_candidate_frozen_surfaces_verified": verified,
         "stage130_dataset_release_candidate_archive_tracked_in_git": False,
 
-        # The rights audit, and the blocker it found.
+        # The candidate, and the predecessor it supersedes without deleting.
+        "stage130_dataset_release_candidate_version":
+            _STAGE130_RC_RELEASE_VERSION,
+        "stage130_dataset_release_candidate_supersedes_version":
+            _STAGE130_RC_SUPERSEDED_VERSION,
+        "stage130_dataset_release_candidate_supersedes_archive_sha256":
+            _STAGE130_RC_SUPERSEDED_SHA256,
+        "stage130_dataset_release_candidate_supersedes_archive_size_bytes":
+            _STAGE130_RC_SUPERSEDED_BYTES,
+        "stage130_dataset_release_candidate_supersedes_readiness":
+            "NOT_READY_FOR_PUBLICATION",
+        "stage130_dataset_release_candidate_supersedes_preserved_not_deleted":
+            True,
+
+        # Column documentation: complete, and anchored.
+        "stage130_dataset_release_candidate_columns_released":
+            dictionary["released"],
+        "stage130_dataset_release_candidate_columns_documented":
+            dictionary["documented"],
+        "stage130_dataset_release_candidate_columns_undocumented": 0,
+        "stage130_dataset_release_candidate_dictionary":
+            _STAGE130_RC_DICTIONARY_REL,
+        "stage130_dataset_release_candidate_dictionary_rows_by_status":
+            dictionary["statuses"],
+        "stage130_dataset_release_candidate_definitions_invented": 0,
+
+        # The rights position, stated as what it is.
         "stage130_dataset_release_candidate_publication_readiness": readiness,
+        "stage130_dataset_release_candidate_rights_status":
+            _STAGE130_RC_RIGHTS_STATUS,
+        "stage130_dataset_release_candidate_rights_basis":
+            "human_author_determination",
+        "stage130_dataset_release_candidate_rights_supplied_by_human": True,
+        "stage130_dataset_release_candidate_rights_inferred_by_the_agent":
+            False,
+        "stage130_dataset_release_candidate_provider_terms_retrieved": False,
+        "stage130_dataset_release_candidate_provider_terms_verified": False,
         "stage130_dataset_release_candidate_blocking_provider":
             audit.get("blocking_provider"),
+        "stage130_dataset_release_candidate_superseded_blocking_provider":
+            audit.get("superseded_blocking_provider"),
         "stage130_dataset_release_candidate_providers_audited":
             list(_STAGE130_RC_PROVIDERS),
         "stage130_dataset_release_candidate_source_pdfs_included": 0,
@@ -18515,11 +19036,24 @@ def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
         "stage130_scientific_execution_started": False,
         "stage130_phase2_final_test_rows_read": 0,
         "stage130_phase2_prediction_artifact_opened": False,
+        # The six submission items are SUPPLIED but NOT APPLIED. Both facts
+        # are published, because publishing only the first would imply the
+        # manuscript carries them and publishing only the second would repeat
+        # a claim that is no longer true.
         "stage130_manuscript_human_supplied_metadata_outstanding": True,
         "stage130_manuscript_human_supplied_metadata_outstanding_count":
             len(_STAGE130_REVIEW_OUTSTANDING_METADATA),
         "stage130_manuscript_human_supplied_metadata_outstanding_items":
             list(_STAGE130_REVIEW_OUTSTANDING_METADATA),
+        "stage130_manuscript_human_submission_metadata_supplied": True,
+        "stage130_manuscript_human_submission_metadata_supplied_count":
+            len(_STAGE130_RC_SUPPLIED_METADATA),
+        "stage130_manuscript_human_submission_metadata_supplied_items":
+            list(_STAGE130_RC_SUPPLIED_METADATA),
+        "stage130_manuscript_human_submission_metadata_applied_to_manuscript":
+            False,
+        "stage130_manuscript_requires_post_doi_metadata_update": True,
+        "stage130_manuscript_requires_post_doi_human_review": True,
 
         # The live pointer. A prepared candidate needs a human to read its
         # exact digest before anything reaches Zenodo, so that is what the
