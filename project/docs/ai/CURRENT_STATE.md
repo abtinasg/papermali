@@ -8,11 +8,11 @@ _Generated from the repository (git + QC). Do not edit by hand._
 ## Snapshot
 
 - **Stage / Batch:** Stage130 / None
-- **Active workstream:** `stage130_phase2_manuscript_submission_metadata`
+- **Active workstream:** `stage130_dataset_release_candidate_review`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `human-manuscript-submission-metadata`
-- **Last stage commit:** `37dc173404a680bc4407a239807d750d53d776f2`
-- **Generated from commit:** `37dc173404a680bc4407a239807d750d53d776f2` (branch `stage130-human-review-data-contribution`, informational)
+- **Next research action:** `human-dataset-release-candidate-digest-review`
+- **Last stage commit:** `b228793797399044d47313c30b7ccaeb26193151`
+- **Generated from commit:** `b228793797399044d47313c30b7ccaeb26193151` (branch `stage130-human-review-data-contribution`, informational)
 - **Baseline:** `origin/main` @ `76b4e9d286bc513a290c0534da9b5fcd23fcf497`
 
 ## Current-state validation
@@ -139,7 +139,7 @@ _A metadata-only, PROSPECTIVE source/definition/statistical contract lock for th
 - **M3-CBI preserved unchanged:** Gate status `UNRESOLVED_M3_DATA_GATE`, block admitted False
 - **Scientific provenance baseline:** PR #73 head `e6db63fb7d105f0d3a39db101c9e364161c367e9` — protected hashes are verified against that commit permanently; a merge or retarget never moves it
 - **PR topology at contract-lock time (HISTORICAL, not live):** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and never merged under this action — merged = False, no merge authorization. Semantics: `historical_contract_lock_topology_superseded_by_pr75`. PR #74 is the **historical contract-lock PR**, never the current draft; the live Draft PR is identified in the live-action section below.
-- **Next research action (pointer only):** `human-manuscript-submission-metadata` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
+- **Next research action (pointer only):** `human-dataset-release-candidate-digest-review` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
 - Package: `project/stage128/m3_intl_macro_contract_lock/`; interpretation: `project/stage128/m3_intl_macro_contract_lock/README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`
 
 ### Stage128 — M3I-2 official-source evidence capture
@@ -238,7 +238,7 @@ _An explicit human governance decision, not a one-action execution authorization
 - ✅ **M3-LAG-WDI final research disposition:** `SUPPLEMENTARY_EXPLORATORY_ONLY` — promoted to the confirmatory model = False. A future unsolicited World Bank response auto-reopens M3 = False (using it for anything requires a new explicit human decision = True).
 - ✅ **Step E result PRESERVED EXACTLY, re-verified against the committed artifact by this recording:** `E1_NULL_NO_DETECTABLE_INCREMENTAL_CONTRIBUTION` — paired PR-AUC deltas (M3-LAG-WDI minus retained M2) logistic +0.000862 [-0.028237, +0.032186], random forest -0.002720 [-0.029157, +0.011924], XGBoost +0.002749 [-0.007437, +0.014554] (all three 95% intervals include zero); secondary Brier deltas logistic -0.004600 [-0.006147, -0.003066] and random forest -0.001375 [-0.002229, -0.000566] (calibration only, non-confirmatory).
 - ⛔ **Unchanged:** M4 authorized False — Final Test locked True, rows read 0 — confirmatory Holm family unchanged and unexecuted — paper winner selected True.
-- **Both pointer chains converge on the same human decision:** `human-manuscript-submission-metadata` — scope `manuscript_human_submission_metadata_no_further_action_is_authorized`, authorized = False. Track B: `human_decision_required` — scope `no_further_action_is_authorized`, authorized = False. A pointer is never an authorization.
+- **Both pointer chains converge on the same human decision:** `human-dataset-release-candidate-digest-review` — scope `dataset_release_candidate_human_digest_review_no_zenodo_action_is_authorized`, authorized = False. Track B: `human_decision_required` — scope `no_further_action_is_authorized`, authorized = False. A pointer is never an authorization.
 - Package: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/`; interpretation: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/README_STAGE128_M3I2_TRACK_A_WAITING_TERMINATION_AND_M3_DISPOSITION.md`
 
 ### Stage129 — M4 governance Data-Gate contract lock (DESIGN ONLY, additive, not on either live pointer chain)
@@ -416,7 +416,7 @@ _The manuscript draft exists. This is a WRITING action: it assembled prose and a
 - ⛔ **Final Test untouched by Phase 2:** rows read = 0, prediction artifact opened = False, new scientific analysis performed = False, models fitted = 0, thresholds derived = 0, new metrics = 0, new CIs = 0, SHAP = 0.
 - 📝 **Human review COMPLETED:** True — review still required = False (it HAD been required: was required = True), submission ready = False. Author list, affiliations, funding, conflicts, ethics and the data-access mechanism are human-only and are carried as explicit placeholders, never invented — approving the manuscript TEXT is not submission authorization.
 - ⛔ **Not authorized:** ready-for-review = False, merge = False, Stage130 authorized = False.
-- ➡️ **Live next action:** `human-manuscript-submission-metadata` — authorized = False. A pointer is never an authorization.
+- ➡️ **Live next action:** `human-dataset-release-candidate-digest-review` — authorized = False. A pointer is never an authorization.
 - Manuscript: `project/stage130/manuscript/`; validator: `project/stage130/manuscript/validate_manuscript.py`
 
 ### Stage130 — human manuscript review COMPLETED (recording only; not a submission)
@@ -429,8 +429,21 @@ _The human supervisor read the committed draft at one exact commit and approved 
 - ⛔ **Still NOT authorized:** submission ready = False, ready-for-review = False, merge = False, Stage130 authorized = False, submission workflow started = False.
 - 👤 **Human-supplied submission metadata still outstanding:** True — 6 items (`authors_and_author_order`, `affiliations_and_corresponding_author`, `funding`, `conflicts_of_interest`, `ethics_and_data_governance_statement`, `data_access_mechanism_for_the_restricted_company_panel`). None was invented by this action.
 - ⛔ **Nothing scientific occurred:** Final Test rows read = 0, prediction artifact opened = False, Stage130 scientific execution started = False.
-- ➡️ **Live next action:** `human-manuscript-submission-metadata` — authorized = False. The review it used to name is done; a pointer is never an authorization.
+- ➡️ **Live next action:** `human-dataset-release-candidate-digest-review` — authorized = False. The review it used to name is done; a pointer is never an authorization.
 - Package: `project/stage130/manuscript_human_review_completion/`
+
+### Stage130 — Zenodo dataset Release Candidate (PREPARED, NOT PUBLISHED)
+
+_Custody and documentation only. Frozen bytes were copied, hashed and archived. Nothing was deposited, uploaded, minted or published, and the manuscript was not touched._
+
+- 📦 **Candidate prepared:** True — 24 payload files; the archive itself is **not** tracked in Git (tracked in git = False).
+- 🎯 **Primary modeling surface:** `data/analysis_ready_main_rule_a_stage125.csv` — 1012 pairs, 119 companies, 115 columns, 80 positive, 932 negative. These are CONTRACT values (recomputed from rows = False).
+- 🔒 **Frozen surfaces verified:** 8 of 8 hashed and matching (the eight live under a gitignored directory, so absence in a fresh clone is tolerated; drift never is).
+- ⛔ **Publication readiness:** `NOT_READY_FOR_PUBLICATION` — blocking provider = `CODAL`. Providers audited: `CODAL`, `TSETMC`, `World Bank`. No source PDF (0) and no raw provider response (0) is redistributed.
+- ⛔ **Nothing reached Zenodo:** deposition created = False, upload performed = False, DOI reserved = False, published = False, DOI = None, public release authorized = False.
+- 📄 **Manuscript untouched:** modified = False, availability claim changed = False. It keeps describing the dataset by its PRESENT availability, because no public DOI exists.
+- ➡️ **Live next action:** `human-dataset-release-candidate-digest-review` — authorized = False. A human must review the exact archive SHA-256, and a SEPARATE exact-digest authorization is required before any Zenodo action. A pointer is never an authorization.
+- Package: `project/stage130/dataset_release_candidate/`; builder: `project/src/stage130_dataset_release_candidate.py`
 
 ### Last completed scientific micro-part QC
 
@@ -481,5 +494,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `21414fd8d52127d68477b19ed73b4113e145ea0e1a8285c1ee55beb5b8203be5`_
-_generated_at_utc: 2026-08-20T10:30:31Z (informational)_
+_state_fingerprint: `03e7d92330ee3c8e112f3ecc64c6a53fb5a77b87bc912d309ee38b48e564df42`_
+_generated_at_utc: 2026-08-21T14:20:56Z (informational)_
