@@ -273,7 +273,7 @@ def test_no_m4_execution_is_performed_or_authorized(decision, boundary, state):
     assert boundary["pointer_is_not_authorization"] is True
     assert state["stage129_m4_next_action_id"] == "human_decision_required"
     assert state["stage129_m4_next_action_authorized"] is False
-    assert state["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert state["next_research_action_authorized"] is False
     assert state["stage128_m3_lag_wdi_next_action_id"] == "human_decision_required"
 
@@ -562,7 +562,7 @@ def test_roadmap_records_the_reporting_decision_without_a_new_scientific_stage(
     # the M4 pointer and BOTH live research pointers are unmoved
     assert fm["m4_next_action_id"] == "human_decision_required"
     assert fm["m4_next_action_authorized"] == "false"
-    assert fm["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert fm["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert fm["next_research_action_authorized"] == "false"
     assert fm["m3_lag_wdi_next_action_id"] == "human_decision_required"
     assert fm["m4_block_disposition"] == DISC_STATUS

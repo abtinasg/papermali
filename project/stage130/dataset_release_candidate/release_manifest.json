@@ -1,0 +1,271 @@
+{
+  "action_id": "stage130-dataset-release-candidate",
+  "archive_format": "zip_stored_fixed_timestamps",
+  "bundle_root": "tse_financial_distress_dataset_1392_1402",
+  "column_documentation_authority": "documentation/part3c_column_role_map_stage125.csv covers all 115 released columns and is authoritative. data_dictionary_stage125.csv is an upstream-panel variable dictionary and covers only a subset; see LIMITATIONS.md.",
+  "column_documentation_coverage": {
+    "dictionary_entries": 38,
+    "dictionary_entries_not_released": 13,
+    "released_columns": 115,
+    "released_columns_documented_in_data_dictionary": 25,
+    "released_columns_not_in_data_dictionary": 90
+  },
+  "counts_recomputed_from_rows": false,
+  "counts_source": "documentation/part3c_leakage_safe_dataset_contract_stage125.json :: expected_sample_counts.main_rule_a_primary",
+  "credentials_included": 0,
+  "doi": null,
+  "doi_reserved": false,
+  "file_count": 24,
+  "files": [
+    {
+      "bundle_path": "CITATION.cff",
+      "bytes": 1672,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Machine-readable citation metadata.",
+      "role": "release_documentation",
+      "sha256": "1bc117e0812e0bc08dea04fbd564f865475ef31cb4fb9bfca56953556878b7b9",
+      "source_path": "project/stage130/dataset_release_candidate/release_payload/CITATION.cff"
+    },
+    {
+      "bundle_path": "DATA_DICTIONARY_AND_FILE_GUIDE.md",
+      "bytes": 7562,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "File-by-file guide mapping each payload file to its role and to the committed dictionary that documents its columns.",
+      "role": "release_documentation",
+      "sha256": "4e0680a54ad2fc68f12921e00d891c75deb445cba96cfe59cc77cde6f4c3b58e",
+      "source_path": "project/stage130/dataset_release_candidate/release_payload/DATA_DICTIONARY_AND_FILE_GUIDE.md"
+    },
+    {
+      "bundle_path": "LICENSE_DATASET.txt",
+      "bytes": 1976,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "The CC BY 4.0 grant, scoped to what the authors actually hold rights in.",
+      "role": "release_documentation",
+      "sha256": "0d9a815d88a775a387af81c44484fbcf5bebb95d9e8e71fd160acb5ec1411c2b",
+      "source_path": "project/stage130/dataset_release_candidate/release_payload/LICENSE_DATASET.txt"
+    },
+    {
+      "bundle_path": "LIMITATIONS.md",
+      "bytes": 5896,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "The limitations a reuser must know before drawing a conclusion from these files.",
+      "role": "release_documentation",
+      "sha256": "08139295d0ebef04ac222d8773f8674bb0bb310a16bf54d091a7e7419f4c41d5",
+      "source_path": "project/stage130/dataset_release_candidate/release_payload/LIMITATIONS.md"
+    },
+    {
+      "bundle_path": "README.md",
+      "bytes": 7092,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Entry point: what the release is, which file is primary, and what it must not be read as.",
+      "role": "release_documentation",
+      "sha256": "05908590d25d1abe1c8a1dc72e7765429804aeee815cd4eae291a5009c41c55c",
+      "source_path": "project/stage130/dataset_release_candidate/release_payload/README.md"
+    },
+    {
+      "bundle_path": "SOURCE_AND_LICENSE_NOTES.md",
+      "bytes": 7604,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Provider-by-provider source-use and redistribution audit, including the unresolved terms that block publication.",
+      "role": "release_documentation",
+      "sha256": "965c4acd5d4fdbc3b9ad7980996b5c540d50b71612cba8a339245ff2928a9ebb",
+      "source_path": "project/stage130/dataset_release_candidate/release_payload/SOURCE_AND_LICENSE_NOTES.md"
+    },
+    {
+      "bundle_path": "audit/audited_pairs_expanded_rule_a_stage125.csv",
+      "bytes": 1416623,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Audit surface for expanded_rule_a. NOT model-ready.",
+      "role": "audit_surface_not_model_ready",
+      "sha256": "23ff63d82bbc1a5a06536783eddfa5113ad988cb0db8c1c9adb004489da22bc9",
+      "source_path": "project/stage125/part3c_outputs/audited_pairs_expanded_rule_a_stage125.csv"
+    },
+    {
+      "bundle_path": "audit/audited_pairs_expanded_rule_b_stage125.csv",
+      "bytes": 1380573,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Audit surface for expanded_rule_b. NOT model-ready.",
+      "role": "audit_surface_not_model_ready",
+      "sha256": "56c80ccb0a8bcbb1c030e87c892190579628c298026c6140045cbaf08ff7135f",
+      "source_path": "project/stage125/part3c_outputs/audited_pairs_expanded_rule_b_stage125.csv"
+    },
+    {
+      "bundle_path": "audit/audited_pairs_main_rule_a_stage125.csv",
+      "bytes": 1331052,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Audit surface for main_rule_a. It retains rows the leakage-safe timing rule excludes, so it is NOT model-ready; it exists so the exclusions themselves stay inspectable.",
+      "role": "audit_surface_not_model_ready",
+      "sha256": "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
+      "source_path": "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv"
+    },
+    {
+      "bundle_path": "audit/audited_pairs_main_rule_b_stage125.csv",
+      "bytes": 1314827,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Audit surface for main_rule_b. NOT model-ready.",
+      "role": "audit_surface_not_model_ready",
+      "sha256": "d2d9893e40b0c3bdf876a7447fc5147985fc25c9c5add07264677f6ed817b72c",
+      "source_path": "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv"
+    },
+    {
+      "bundle_path": "data/analysis_ready_expanded_rule_a_stage125.csv",
+      "bytes": 1415281,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Prespecified company-scope robustness surface. Not the primary surface.",
+      "role": "prespecified_robustness_surface",
+      "sha256": "fbe9b29c6323b59e830ca9d2dd8c1543b9ef48b21709b01cc56a3989cd2d64d9",
+      "source_path": "project/stage125/part3c_outputs/analysis_ready_expanded_rule_a_stage125.csv"
+    },
+    {
+      "bundle_path": "data/analysis_ready_expanded_rule_b_stage125.csv",
+      "bytes": 1379236,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Prespecified combined company-scope + listing-rule robustness surface. Not the primary surface.",
+      "role": "prespecified_robustness_surface",
+      "sha256": "2e61a282165ccdaef37bac61a460c83878f2ae633b10535945cc33897d3b4c22",
+      "source_path": "project/stage125/part3c_outputs/analysis_ready_expanded_rule_b_stage125.csv"
+    },
+    {
+      "bundle_path": "data/analysis_ready_main_rule_a_stage125.csv",
+      "bytes": 1329731,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "THE primary analysis-ready modeling surface: the prespecified main_rule_a leakage-safe company-year panel every headline result rests on.",
+      "role": "primary_modeling_surface",
+      "sha256": "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+      "source_path": "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv"
+    },
+    {
+      "bundle_path": "data/analysis_ready_main_rule_b_stage125.csv",
+      "bytes": 1313495,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Prespecified listing-rule robustness surface. Not the primary surface; supplied so the locked robustness design can be reproduced.",
+      "role": "prespecified_robustness_surface",
+      "sha256": "5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480",
+      "source_path": "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv"
+    },
+    {
+      "bundle_path": "documentation/data_dictionary_stage125.csv",
+      "bytes": 6323,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Variable-level dictionary: block, role, type, unit, temporal reference, source id and provenance status for every field.",
+      "role": "committed_documentation",
+      "sha256": "ed3d0593fe8456842841be0286285ecfe076f5349b54f0bd6bdf664cc77a759d",
+      "source_path": "project/stage125/data_dictionary_stage125.csv"
+    },
+    {
+      "bundle_path": "documentation/part3c_column_role_map_stage125.csv",
+      "bytes": 11889,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Column-role contract: which of the 115 columns are identifiers, predictor candidates, targets, audit fields, or forbidden from the model matrix. Required to avoid using a target-derived column as a feature.",
+      "role": "committed_documentation",
+      "sha256": "c06d5ceb7dc0b63bccbadc9e95a59bc04d30e8a2b3c97e76111bd989c89b5fc2",
+      "source_path": "project/stage125/part3c_column_role_map_stage125.csv"
+    },
+    {
+      "bundle_path": "documentation/part3c_leakage_safe_dataset_contract_stage125.json",
+      "bytes": 18931,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "The leakage-safe dataset contract: availability semantics, the four locked sample designs, expected counts and the explicit non-claims. This is the authority for every count in this release.",
+      "role": "committed_documentation",
+      "sha256": "f294454602c3fac83e191319bfe3354c3f601326396092f228db17eb08649839",
+      "source_path": "project/stage125/part3c_leakage_safe_dataset_contract_stage125.json"
+    },
+    {
+      "bundle_path": "documentation/part3c_sample_summary_stage125.csv",
+      "bytes": 2434,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Per-design pair/company/positive/negative counts for all four locked sample designs, with the frozen output digests.",
+      "role": "committed_documentation",
+      "sha256": "c203ed3f31a796b769d96e586d45b9b14ab1f73a74bffdfbfcf2d975f2e512bc",
+      "source_path": "project/stage125/part3c_sample_summary_stage125.csv"
+    },
+    {
+      "bundle_path": "documentation/part3c_target_year_distribution_stage125.csv",
+      "bytes": 4960,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Target-year distribution by design and surface: shows how sparse the positive class is in the later Jalali years.",
+      "role": "committed_documentation",
+      "sha256": "d9f4a9e30bd2a94284bc01bb4dd44cf3e1c0b325c748110bcfe1acd9183677eb",
+      "source_path": "project/stage125/part3c_target_year_distribution_stage125.csv"
+    },
+    {
+      "bundle_path": "documentation/part4_temporal_split_manifest_stage125.csv",
+      "bytes": 650222,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Prespecified temporal split assignment, so the development/holdout boundary is reproducible without re-deriving it.",
+      "role": "committed_documentation",
+      "sha256": "5e27dc48cc502e36951d4080ef80be684eacff61a46b55a07d39d3318863aedc",
+      "source_path": "project/stage125/part4_temporal_split_manifest_stage125.csv"
+    },
+    {
+      "bundle_path": "documentation/source_registry_stage125.csv",
+      "bytes": 1985,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Source registry: which provider each block came from, its status, and the recorded provenance gaps.",
+      "role": "committed_documentation",
+      "sha256": "980f375acea69795d06bc19b003563f731bc25f7041bcb07b3fb8f9ec922e13c",
+      "source_path": "project/stage125/source_registry_stage125.csv"
+    },
+    {
+      "bundle_path": "documentation/stage125_part3c_leakage_safe_dataset_qc_report.json",
+      "bytes": 18165,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Quality-control report for the finalization step that produced the eight frozen files.",
+      "role": "committed_documentation",
+      "sha256": "a9e9d81756aff3b79170f39d561b4bda3875b23b67da12d03f2a314252e5ccad",
+      "source_path": "project/stage125/stage125_part3c_leakage_safe_dataset_qc_report.json"
+    },
+    {
+      "bundle_path": "documentation/target_definition_stage122.csv",
+      "bytes": 1351,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "The operational distress target definition, criterion by criterion, including its three-valued missing semantics.",
+      "role": "committed_documentation",
+      "sha256": "573bc1e47bef8b9e48b11acd1bf87b7fc89ea22b926b2add94da67b9f95abb98",
+      "source_path": "project/stage122/target_definition_stage122.csv"
+    },
+    {
+      "bundle_path": "zenodo_metadata_candidate.json",
+      "bytes": 5531,
+      "copied_byte_for_byte": true,
+      "inclusion_reason": "Proposed Zenodo deposition metadata. A CANDIDATE: no deposition exists, no DOI is reserved and publication is not authorized.",
+      "role": "release_documentation",
+      "sha256": "7743ce8588ec782b1eb6a9e6a2796402aee3d847e647ac23eafe65554caf2cb6",
+      "source_path": "project/stage130/dataset_release_candidate/release_payload/zenodo_metadata_candidate.json"
+    }
+  ],
+  "final_test_predictions_opened": false,
+  "generated_by": "project/src/stage130_dataset_release_candidate.py",
+  "manifest_excludes": [
+    "release_manifest.json",
+    "SHA256SUMS.txt"
+  ],
+  "manifest_excludes_reason": "the manifest describes the payload; SHA256SUMS.txt then covers the payload AND the manifest. Neither hashes itself.",
+  "manifest_version": 1,
+  "metrics_computed": 0,
+  "models_fitted": 0,
+  "prediction_artifacts_included": 0,
+  "primary_file": "data/analysis_ready_main_rule_a_stage125.csv",
+  "primary_file_column_count": 115,
+  "primary_file_contract_counts": {
+    "companies": 119,
+    "negative": 932,
+    "pairs": 1012,
+    "positive": 80
+  },
+  "public_release_authorized": false,
+  "raw_provider_responses_included": 0,
+  "release_candidate_prepared": true,
+  "role_counts": {
+    "audit_surface_not_model_ready": 4,
+    "committed_documentation": 9,
+    "prespecified_robustness_surface": 3,
+    "primary_modeling_surface": 1,
+    "release_documentation": 7
+  },
+  "source_pdfs_included": 0,
+  "thresholds_derived": 0,
+  "zenodo_deposition_created": false,
+  "zenodo_published": false,
+  "zenodo_upload_performed": false
+}

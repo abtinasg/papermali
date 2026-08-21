@@ -470,7 +470,7 @@ def test_handoff_state_pointer_is_distinct_from_authorization_and_from_the_two_l
         True)
     # Both pre-existing live pointer chains are preserved, and neither was
     # advanced by any Stage129 action.
-    assert state["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert state["stage128_m3_lag_wdi_next_action_id"] == (
         "human_decision_required")
     # The three chains may CONVERGE on the same terminal "a human must decide"

@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this dataset, please cite it as below."
+type: dataset
+title: "Tehran Stock Exchange Corporate Financial Distress Prediction Dataset (1392–1402): Analysis-Ready Company-Year Panel and Reproducibility Materials"
+abstract: >-
+  An analysis-ready company-year panel of Iranian listed non-financial
+  companies for one-year-ahead corporate financial distress prediction,
+  covering Jalali fiscal years 1392–1402, together with the contracts,
+  dictionaries, quality-control records and audit surfaces needed to reproduce
+  and check its construction. The primary modeling surface contains 1,012
+  company-year pairs across 119 companies and 115 columns, with 80 positive and
+  932 negative outcomes. Predictor admission uses a prespecified fixed
+  four-Jalali-month regulatory availability lag, which is an assumption about
+  availability rather than an observed publication timestamp.
+authors:
+  - family-names: "Asghari"
+    given-names: "Abtin"
+    affiliation: "Department of Computer Engineering, Islamic Azad University, West Tehran Branch, Tehran, Iran"
+    email: "abtinsag@gmail.com"
+  - family-names: "Mehraein"
+    given-names: "MohammadMehdi"
+    affiliation: "Department of Financial Management, Islamic Azad University, Central Tehran Branch, Tehran, Iran"
+    email: "mohammadmehdimehraein@gmail.com"
+contact:
+  - family-names: "Asghari"
+    given-names: "Abtin"
+    email: "abtinsag@gmail.com"
+license: CC-BY-4.0
+version: "1.0.0-rc.1"
+keywords:
+  - financial distress
+  - bankruptcy prediction
+  - Tehran Stock Exchange
+  - Iran
+  - emerging markets
+  - company-year panel
+  - corporate finance
+  - accounting ratios

@@ -1,0 +1,86 @@
+{
+  "action_id": "stage130-dataset-release-candidate",
+  "action_type": "dataset_release_candidate_preparation_and_documentation_only",
+  "archive_build_path_relative_to_repo_root": "project/stage130/dataset_release_candidate/build/tse_financial_distress_dataset_1392_1402_release_candidate.zip",
+  "archive_format": "zip_stored_fixed_timestamps",
+  "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate.zip",
+  "archive_sha256": "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
+  "archive_size_bytes": 11657151,
+  "archive_tracked_in_git": false,
+  "author_contact_details_committed": true,
+  "author_contact_details_note": "The two author email addresses are release metadata the human supplied for this dataset deposit. They are the authors' own contact details, not third-party personal data.",
+  "bundle_payload_file_count": 26,
+  "bundle_root": "tse_financial_distress_dataset_1392_1402",
+  "credentials_committed_to_git": false,
+  "final_test_artifacts_committed": 0,
+  "final_test_predictions_opened": false,
+  "frozen_dataset_files_modified_by_this_action": 0,
+  "manuscript_files_modified_by_this_action": 0,
+  "model_artifacts_committed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "package_file_count": 13,
+  "package_files": {
+    "README_STAGE130_DATASET_RELEASE_CANDIDATE.md": {
+      "bytes": 4839,
+      "sha256": "a42c3ce19f125f03f6c6dbeb402d0a782750911ef5e199cd246abd80302df82c"
+    },
+    "SHA256SUMS.txt": {
+      "bytes": 2676,
+      "sha256": "d09adb27e47760538333c954296a09ceba4b3464787cb79b6c64c965522b8fd6"
+    },
+    "release_manifest.json": {
+      "bytes": 13904,
+      "sha256": "696b5288643c948efce21ab421d7047e486eb2e168ee59790cea04fc08836837"
+    },
+    "release_payload/CITATION.cff": {
+      "bytes": 1672,
+      "sha256": "1bc117e0812e0bc08dea04fbd564f865475ef31cb4fb9bfca56953556878b7b9"
+    },
+    "release_payload/DATA_DICTIONARY_AND_FILE_GUIDE.md": {
+      "bytes": 7562,
+      "sha256": "4e0680a54ad2fc68f12921e00d891c75deb445cba96cfe59cc77cde6f4c3b58e"
+    },
+    "release_payload/LICENSE_DATASET.txt": {
+      "bytes": 1976,
+      "sha256": "0d9a815d88a775a387af81c44484fbcf5bebb95d9e8e71fd160acb5ec1411c2b"
+    },
+    "release_payload/LIMITATIONS.md": {
+      "bytes": 5896,
+      "sha256": "08139295d0ebef04ac222d8773f8674bb0bb310a16bf54d091a7e7419f4c41d5"
+    },
+    "release_payload/README.md": {
+      "bytes": 7092,
+      "sha256": "05908590d25d1abe1c8a1dc72e7765429804aeee815cd4eae291a5009c41c55c"
+    },
+    "release_payload/SOURCE_AND_LICENSE_NOTES.md": {
+      "bytes": 7604,
+      "sha256": "965c4acd5d4fdbc3b9ad7980996b5c540d50b71612cba8a339245ff2928a9ebb"
+    },
+    "release_payload/zenodo_metadata_candidate.json": {
+      "bytes": 5531,
+      "sha256": "7743ce8588ec782b1eb6a9e6a2796402aee3d847e647ac23eafe65554caf2cb6"
+    },
+    "source_rights_matrix.csv": {
+      "bytes": 2611,
+      "sha256": "969b35805ea067f98b863a5e4f275b4ec38ffeee383c19e062f266392dbd4d94"
+    },
+    "stage130_dataset_release_candidate_decision.json": {
+      "bytes": 7734,
+      "sha256": "977877d7345535abddfe3c7f1d6d5e4aa55b846d26b433489571b2e239f6012e"
+    },
+    "stage130_dataset_release_candidate_governance_boundary.json": {
+      "bytes": 3131,
+      "sha256": "90c4a197fde1b99f8388b0d3564cc0eacb7ea714244914a3829cb633ee775b80"
+    }
+  },
+  "public_release_authorized": false,
+  "publication_readiness": "NOT_READY_FOR_PUBLICATION",
+  "release_candidate_prepared": true,
+  "third_party_pii_committed_to_git": false,
+  "value_files_committed": 0,
+  "zenodo_deposition_created": false,
+  "zenodo_doi": null,
+  "zenodo_doi_reserved": false,
+  "zenodo_published": false,
+  "zenodo_upload_performed": false
+}

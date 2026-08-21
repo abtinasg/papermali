@@ -1,0 +1,123 @@
+{
+  "authorized_by_human": true,
+  "authorized_scope": "Preparation and documentation of a deterministic, audit-ready Zenodo dataset Release Candidate ONLY. This decision does NOT authorize creating a Zenodo deposition, uploading any file to Zenodo, reserving or publishing a DOI, changing the manuscript's current data-availability claim, marking pull request #100 Ready for Review, or merging it. A separate exact-digest human authorization is required before any Zenodo write or publication.",
+  "decision_date_utc": "2026-08-21",
+  "decision_id": "stage130-dataset-release-candidate",
+  "decision_type": "dataset_release_candidate_preparation",
+  "human_supplied_data_governance_facts": {
+    "confidential_data_used": false,
+    "human_participant_data_used": false,
+    "personal_data_used": false,
+    "purchased_data_used": false,
+    "sources_are_publicly_accessible": true,
+    "sources_named_by_human": [
+      "CODAL",
+      "TSETMC",
+      "World Bank"
+    ],
+    "statement": "All underlying data were obtained from publicly accessible sources such as CODAL, TSETMC and the World Bank. No purchased, confidential, personal or human-participant data were used.",
+    "supplied_by": "human",
+    "independently_inferred_by_the_agent": false
+  },
+  "human_supplied_release_intent": {
+    "authors_intend_public_zenodo_publication_of_the_analysis_ready_dataset": true,
+    "independently_inferred_by_the_agent": false,
+    "supplied_by": "human",
+    "this_intent_is_not_an_authorization_to_publish": true
+  },
+  "human_supplied_release_metadata": {
+    "access_right_after_future_publication": "open",
+    "corresponding_author": "Abtin Asghari",
+    "corresponding_author_email": "abtinsag@gmail.com",
+    "creators_in_human_supplied_order": [
+      {
+        "affiliation": "Department of Computer Engineering, Islamic Azad University, West Tehran Branch, Tehran, Iran",
+        "name": "Abtin Asghari",
+        "order": 1
+      },
+      {
+        "affiliation": "Department of Financial Management, Islamic Azad University, Central Tehran Branch, Tehran, Iran",
+        "name": "MohammadMehdi Mehraein",
+        "order": 2
+      }
+    ],
+    "independently_inferred_by_the_agent": false,
+    "license_approved_by_human": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "license_scope_approved_by_human": "the authors' original dataset compilation and metadata only",
+    "orcid_identifiers_supplied": false,
+    "orcid_identifiers_invented_by_this_action": false,
+    "resource_type": "Dataset",
+    "second_author_email": "mohammadmehdimehraein@gmail.com",
+    "supplied_by": "human",
+    "title": "Tehran Stock Exchange Corporate Financial Distress Prediction Dataset (1392–1402): Analysis-Ready Company-Year Panel and Reproducibility Materials"
+  },
+  "frozen_dataset_gate": {
+    "eight_frozen_files_present": true,
+    "eight_frozen_files_sha256_match": true,
+    "files_regenerated_by_this_action": 0,
+    "files_reconstructed_by_this_action": 0,
+    "stage121_to_stage124_substitutions": 0,
+    "primary_surface": "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv",
+    "primary_surface_contract_counts": {
+      "columns": 115,
+      "companies": 119,
+      "negative": 932,
+      "pairs": 1012,
+      "positive": 80
+    },
+    "counts_source": "project/stage125/part3c_leakage_safe_dataset_contract_stage125.json :: expected_sample_counts.main_rule_a_primary",
+    "counts_recomputed_from_row_content": false
+  },
+  "source_rights_audit": {
+    "audit_date_utc": "2026-08-21",
+    "blocking_provider": "CODAL",
+    "matrix_path": "project/stage130/dataset_release_candidate/source_rights_matrix.csv",
+    "primary_provider_pages_only": true,
+    "providers_covered": [
+      "CODAL",
+      "TSETMC",
+      "World Bank"
+    ],
+    "publication_readiness": "NOT_READY_FOR_PUBLICATION",
+    "blocker_summary": "CODAL's published terms of use could not be retrieved from the audit environment on 2026-08-21 (connection timeout, no HTTP response, on both https://www.codal.ir/ and https://www.codal.ir/Rules.aspx), so the redistribution terms governing the compiled CODAL-derived factual fields remain genuinely unresolved. Separately, the approved manuscript states that the company-level source data are not openly redistributable. Neither point was resolved by this action.",
+    "columns_removed_to_avoid_the_blocker": 0,
+    "frozen_values_altered_to_avoid_the_blocker": 0,
+    "legal_conclusion_asserted_beyond_the_evidence": false
+  },
+  "manuscript_boundary": {
+    "approved_manuscript_blob_id": "93f7e8e796ec098de38725271305ab06263efd1f",
+    "approved_manuscript_path": "project/stage130/manuscript/manuscript_draft_en.md",
+    "approved_manuscript_sha256": "8b5d861c36e01dc81133c1071cd96f7e340482ac2148b53c055369bbd5ffcb19",
+    "data_availability_statement_inserted": false,
+    "manuscript_availability_claim_changed_by_this_action": false,
+    "manuscript_files_modified_by_this_action": 0,
+    "restricted_access_language_replaced": false,
+    "why_the_manuscript_is_unchanged": "No public DOI exists, so the manuscript must continue to describe the dataset according to its present availability. Updating it before a DOI exists would make the manuscript state something untrue, and the approved manuscript is byte-pinned to a completed human review that a change would invalidate."
+  },
+  "release_candidate_conflicts_with_current_manuscript_claim": true,
+  "release_candidate_conflict_resolution": "The conflict is left standing and visible rather than resolved in either direction. The manuscript keeps its present, truthful restricted-access description because nothing is published; the release candidate records the authors' publication intent without acting on it. Reconciling the two requires (a) resolving the CODAL terms question and (b) a separate authorized manuscript action once a DOI actually exists.",
+  "superseded_marker": {
+    "deriver": "derive_stage130_dataset_release_candidate_markers",
+    "generator": "project/scripts/update_ai_handoff.py",
+    "key": "next_research_action_id",
+    "pointer_previous_value": "human-manuscript-submission-metadata",
+    "pointer_resolved_value": "human-dataset-release-candidate-digest-review",
+    "manuscript_submission_metadata_still_outstanding": true,
+    "manuscript_submission_metadata_outstanding_count": 6,
+    "supersede_scope": "the_live_next_action_pointer_only",
+    "superseding_decision_id": "stage130-dataset-release-candidate",
+    "why_the_previous_pointer_is_not_marked_complete": "The six human-supplied manuscript submission items are still outstanding. This action supplied dataset-release metadata for a Zenodo candidate, which is not the same surface and does not fill any manuscript placeholder. The pointer advances because a prepared candidate now needs a human digest review first; the manuscript metadata remains outstanding and is republished as such."
+  },
+  "pr_is_draft": true,
+  "pr_number": 100,
+  "ready_for_review_authorized": false,
+  "merge_authorized": false,
+  "submission_ready": false,
+  "public_release_authorized": false,
+  "zenodo_deposition_created": false,
+  "zenodo_upload_performed": false,
+  "zenodo_doi_reserved": false,
+  "zenodo_published": false,
+  "next_action_authorized": false,
+  "human_decision_translation": "Prepare a deterministic, audit-ready Zenodo dataset Release Candidate for the study. This authorizes preparation and documentation only. It does not authorize creating a Zenodo deposition, uploading anything, reserving or publishing a DOI, changing the manuscript's data-availability claim, marking PR #100 Ready, or merging it. A separate exact-digest authorization will be required before any Zenodo write or publication."
+}

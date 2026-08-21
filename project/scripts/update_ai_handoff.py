@@ -273,6 +273,36 @@ ALLOWLIST_FILES = (
     "project/tests/test_stage124_gate_b_execution.py",
     "project/stage124/stage124_batch02_gate_b_qc_report.json",
     "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
+    # Stage130 deterministic Zenodo dataset Release Candidate: builder, tests,
+    # and the governance/documentation package. Narrowest exact-file allowance
+    # -- project/stage130/ is deliberately NOT allowlisted as a directory, so
+    # the manuscript tree is not swept in. The builder copies frozen bytes,
+    # fits nothing, computes nothing, opens no Final Test artifact, and the
+    # archive it writes is gitignored rather than tracked.
+    "project/src/stage130_dataset_release_candidate.py",
+    "project/tests/test_stage130_dataset_release_candidate.py",
+    "project/stage130/dataset_release_candidate/"
+    "README_STAGE130_DATASET_RELEASE_CANDIDATE.md",
+    "project/stage130/dataset_release_candidate/"
+    "stage130_dataset_release_candidate_decision.json",
+    "project/stage130/dataset_release_candidate/"
+    "stage130_dataset_release_candidate_governance_boundary.json",
+    "project/stage130/dataset_release_candidate/"
+    "metadata_and_hashes_stage130_dataset_release_candidate.json",
+    "project/stage130/dataset_release_candidate/release_manifest.json",
+    "project/stage130/dataset_release_candidate/SHA256SUMS.txt",
+    "project/stage130/dataset_release_candidate/source_rights_matrix.csv",
+    "project/stage130/dataset_release_candidate/release_payload/README.md",
+    "project/stage130/dataset_release_candidate/release_payload/"
+    "DATA_DICTIONARY_AND_FILE_GUIDE.md",
+    "project/stage130/dataset_release_candidate/release_payload/"
+    "LICENSE_DATASET.txt",
+    "project/stage130/dataset_release_candidate/release_payload/"
+    "SOURCE_AND_LICENSE_NOTES.md",
+    "project/stage130/dataset_release_candidate/release_payload/LIMITATIONS.md",
+    "project/stage130/dataset_release_candidate/release_payload/CITATION.cff",
+    "project/stage130/dataset_release_candidate/release_payload/"
+    "zenodo_metadata_candidate.json",
     "AGENTS.md",
     "CLAUDE.md",
     ".gitignore",
@@ -3108,6 +3138,14 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # deriver reads back and requires, so history is superseded in the
         # open rather than rewritten.
         **derive_stage130_manuscript_human_review_completion_markers(root),
+        # Must come after the review completion: the dataset Release Candidate.
+        # The review published `human-manuscript-submission-metadata` as the
+        # live pointer, which was the only outstanding thing when it ran. A
+        # prepared, unpublished Zenodo candidate now needs a human to approve
+        # its exact archive digest first, so this owns the live pointer -- while
+        # republishing the six manuscript submission items as STILL outstanding,
+        # because Zenodo creator metadata fills no manuscript placeholder.
+        **derive_stage130_dataset_release_candidate_markers(root),
         }))
 
 
@@ -6625,6 +6663,77 @@ def render_current_state(record: dict) -> str:
             "`project/stage130/manuscript_human_review_completion/`",
             "",
         ]
+    if record.get("stage130_dataset_release_candidate_recorded"):
+        lines += [
+            "### Stage130 — Zenodo dataset Release Candidate (PREPARED, NOT "
+            "PUBLISHED)\n",
+            "_Custody and documentation only. Frozen bytes were copied, "
+            "hashed and archived. Nothing was deposited, uploaded, minted or "
+            "published, and the manuscript was not touched._\n",
+            "- 📦 **Candidate prepared:** "
+            f"{record.get('stage130_dataset_release_candidate_prepared')} — "
+            f"{record.get('stage130_dataset_release_candidate_file_count')} "
+            "payload files; the archive itself is **not** tracked in Git "
+            "(tracked in git = "
+            f"{record.get('stage130_dataset_release_candidate_archive_tracked_in_git')}"
+            ").",
+            "- 🎯 **Primary modeling surface:** "
+            f"`{record.get('stage130_dataset_release_candidate_primary_file')}`"
+            f" — {record.get('stage130_dataset_release_candidate_primary_pairs')}"
+            " pairs, "
+            f"{record.get('stage130_dataset_release_candidate_primary_companies')}"
+            " companies, "
+            f"{record.get('stage130_dataset_release_candidate_primary_columns')}"
+            " columns, "
+            f"{record.get('stage130_dataset_release_candidate_primary_positive')}"
+            " positive, "
+            f"{record.get('stage130_dataset_release_candidate_primary_negative')}"
+            " negative. These are CONTRACT values (recomputed from rows = "
+            f"{record.get('stage130_dataset_release_candidate_counts_recomputed')}"
+            ").",
+            "- 🔒 **Frozen surfaces verified:** "
+            f"{record.get('stage130_dataset_release_candidate_frozen_surfaces_verified')}"
+            " of 8 hashed and matching (the eight live under a gitignored "
+            "directory, so absence in a fresh clone is tolerated; drift never "
+            "is).",
+            "- ⛔ **Publication readiness:** "
+            f"`{record.get('stage130_dataset_release_candidate_publication_readiness')}`"
+            " — blocking provider = "
+            f"`{record.get('stage130_dataset_release_candidate_blocking_provider')}`"
+            ". Providers audited: "
+            + ", ".join(
+                f"`{name}`" for name in
+                (record.get(
+                    "stage130_dataset_release_candidate_providers_audited")
+                 or []))
+            + ". No source PDF ("
+            f"{record.get('stage130_dataset_release_candidate_source_pdfs_included')}"
+            ") and no raw provider response ("
+            f"{record.get('stage130_dataset_release_candidate_raw_responses_included')}"
+            ") is redistributed.",
+            "- ⛔ **Nothing reached Zenodo:** deposition created = "
+            f"{record.get('zenodo_deposition_created')}, upload performed = "
+            f"{record.get('zenodo_upload_performed')}, DOI reserved = "
+            f"{record.get('zenodo_doi_reserved')}, published = "
+            f"{record.get('zenodo_published')}, DOI = "
+            f"{record.get('zenodo_doi')}, public release authorized = "
+            f"{record.get('public_release_authorized')}.",
+            "- 📄 **Manuscript untouched:** modified = "
+            f"{record.get('stage130_manuscript_modified_by_this_action')}, "
+            "availability claim changed = "
+            f"{record.get('stage130_manuscript_availability_claim_changed')}. "
+            "It keeps describing the dataset by its PRESENT availability, "
+            "because no public DOI exists.",
+            "- ➡️ **Live next action:** "
+            f"`{record.get('next_research_action_id')}` — authorized = "
+            f"{record.get('next_research_action_authorized')}. A human must "
+            "review the exact archive SHA-256, and a SEPARATE exact-digest "
+            "authorization is required before any Zenodo action. A pointer is "
+            "never an authorization.",
+            "- Package: `project/stage130/dataset_release_candidate/`; "
+            "builder: `project/src/stage130_dataset_release_candidate.py`",
+            "",
+        ]
     lines += [
         "### Last completed scientific micro-part QC\n",
         "_Scientific QC of the newest completed robustness micro-part — a "
@@ -7326,7 +7435,13 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
     # the "…-human-review" label is itself stale. The successor names what is
     # actually pending -- the human-supplied submission metadata -- and is a
     # description of the live state, not an authorization for it.
-    if derive_stage130_manuscript_human_review_completion_markers(root):
+    # ...and once a dataset Release Candidate is prepared and waiting on a
+    # human digest review, the submission-metadata label is itself stale as the
+    # LIVE description. The metadata is still outstanding and is republished as
+    # such; what is actually pending now is the digest review.
+    if derive_stage130_dataset_release_candidate_markers(root):
+        allowed = _STAGE130_RELEASE_CANDIDATE_WORKSTREAM_ID
+    elif derive_stage130_manuscript_human_review_completion_markers(root):
         allowed = _STAGE130_SUBMISSION_METADATA_WORKSTREAM_ID
     elif derive_stage130_phase2_markers(root):
         allowed = _STAGE130_P2_WORKSTREAM_ID
@@ -17301,6 +17416,13 @@ _STAGE130_P2_WORKSTREAM_ID = "stage130-phase2-manuscript-assembly-human-review"
 #: keeps the `stage130-phase2-` prefix, so its predecessor context is unchanged.
 _STAGE130_SUBMISSION_METADATA_WORKSTREAM_ID = (
     "stage130-phase2-manuscript-submission-metadata")
+#: ...and relabelled once more when a Zenodo dataset Release Candidate exists
+#: awaiting a human digest review. Like every label before it this describes
+#: what is live NOW and is never a permission: the digest review is a POINTER,
+#: and no Zenodo action is authorized. The manuscript submission metadata stays
+#: outstanding underneath -- the relabel does not complete it.
+_STAGE130_RELEASE_CANDIDATE_WORKSTREAM_ID = (
+    "stage130-dataset-release-candidate-review")
 _STAGE130_P2_CURRENT_STAGE = "Stage130"
 _STAGE130_P2_NEXT_ACTION_ID = "human-manuscript-review"
 #: The manuscript deliverables. All must exist before Phase 2 may be recorded.
@@ -17822,6 +17944,593 @@ def derive_stage130_manuscript_human_review_completion_markers(
         "stage130_phase2_next_action_authorized": False,
         "next_research_action_id": _STAGE130_REVIEW_NEXT_ACTION_ID,
         "next_research_action_scope": _STAGE130_REVIEW_NEXT_ACTION_SCOPE,
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
+    }
+
+
+
+#: Stage130 -- the deterministic Zenodo dataset Release Candidate.
+_STAGE130_RC_PKG = "project/stage130/dataset_release_candidate"
+_STAGE130_RC_ACTION_ID = "stage130-dataset-release-candidate"
+_STAGE130_RC_DECISION_REL = (
+    f"{_STAGE130_RC_PKG}/stage130_dataset_release_candidate_decision.json")
+_STAGE130_RC_BOUNDARY_REL = (
+    f"{_STAGE130_RC_PKG}/"
+    "stage130_dataset_release_candidate_governance_boundary.json")
+_STAGE130_RC_MANIFEST_REL = f"{_STAGE130_RC_PKG}/release_manifest.json"
+_STAGE130_RC_MATRIX_REL = f"{_STAGE130_RC_PKG}/source_rights_matrix.csv"
+#: The Draft pull request the candidate was prepared on.
+_STAGE130_RC_PR_NUMBER = 100
+#: The pointer this action replaces, and the one it advances to. The successor
+#: demands a human read the exact archive digest; it is a POINTER, never a
+#: permission.
+_STAGE130_RC_PREVIOUS_POINTER = _STAGE130_REVIEW_NEXT_ACTION_ID
+_STAGE130_RC_NEXT_ACTION_ID = "human-dataset-release-candidate-digest-review"
+_STAGE130_RC_NEXT_ACTION_SCOPE = (
+    "dataset_release_candidate_human_digest_review_no_zenodo_action_is_"
+    "authorized")
+#: The three providers the source-rights audit must cover.
+_STAGE130_RC_PROVIDERS = ("CODAL", "TSETMC", "World Bank")
+#: The eight frozen Stage125 Part 3C surfaces, pinned by digest. These files
+#: are gitignored (see .gitignore), so a fresh clone legitimately lacks them:
+#: absence is tolerated, drift never is.
+_STAGE130_RC_FROZEN_SHA256 = {
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv":
+        "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv":
+        "5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480",
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_a_stage125.csv":
+        "fbe9b29c6323b59e830ca9d2dd8c1543b9ef48b21709b01cc56a3989cd2d64d9",
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_b_stage125.csv":
+        "2e61a282165ccdaef37bac61a460c83878f2ae633b10535945cc33897d3b4c22",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv":
+        "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv":
+        "d2d9893e40b0c3bdf876a7447fc5147985fc25c9c5add07264677f6ed817b72c",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_a_stage125.csv":
+        "23ff63d82bbc1a5a06536783eddfa5113ad988cb0db8c1c9adb004489da22bc9",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_b_stage125.csv":
+        "56c80ccb0a8bcbb1c030e87c892190579628c298026c6140045cbaf08ff7135f",
+}
+#: Contract-supplied primary-surface counts. Read, never recomputed.
+_STAGE130_RC_PRIMARY_COUNTS = {
+    "columns": 115,
+    "companies": 119,
+    "negative": 932,
+    "pairs": 1012,
+    "positive": 80,
+}
+#: Everything preparing a candidate is explicitly NOT. Any of these recorded
+#: True means the record is claiming an authorization it does not have.
+_STAGE130_RC_FORBIDDEN_TRUE = (
+    "zenodo_deposition_created",
+    "zenodo_upload_performed",
+    "zenodo_doi_reserved",
+    "zenodo_published",
+    "public_release_authorized",
+    "submission_ready",
+    "ready_for_review_authorized",
+    "merge_authorized",
+    "stage130_authorized",
+    "stage130_or_next_stage_executed",
+    "manuscript_modified_by_this_action",
+    "manuscript_availability_claim_changed_by_this_action",
+    "new_scientific_analysis_performed",
+    "scientific_execution_started",
+    "stage130_phase2_scientific_execution_started",
+    "submission_workflow_started",
+    "final_test_access_authorized",
+    "final_test_second_pass_authorized",
+    "final_test_predictions_file_opened",
+    "prior_packages_modified_by_this_action",
+    "stage122_to_stage129_artifacts_modified_by_this_action",
+    "data_access_mechanism_finalized_by_this_action",
+    "release_candidate_archive_tracked_in_git",
+    "next_action_authorized",
+    "pr_merged",
+    "branch_deleted_by_this_action",
+    "auto_merge_enabled_by_this_action",
+)
+
+
+def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
+    """Recognize a PREPARED, unpublished Zenodo dataset Release Candidate.
+
+    Preparation and documentation only. Nothing here creates a deposition,
+    uploads a byte, reserves a DOI, publishes anything, edits the manuscript,
+    marks the pull request Ready or merges it -- and this deriver refuses to
+    build if any artifact claims otherwise.
+
+    Fail-closed on the things that actually matter:
+
+    * the eight frozen Stage125 surfaces must still hash to their pinned
+      values. They are gitignored, so a fresh clone legitimately lacks them and
+      absence is tolerated; DRIFT never is;
+    * the committed manifest must agree with the pinned digests, carry a null
+      DOI, and report every Zenodo counter false;
+    * the source-rights matrix must cover all three providers and must not
+      silently upgrade a blocked disposition;
+    * a candidate whose audit reports ``NOT_READY_FOR_PUBLICATION`` may not
+      simultaneously claim publication readiness anywhere;
+    * the approved manuscript must be byte-identical to the reviewed bytes,
+      re-derived here, so preparing a release cannot quietly ride on a human
+      approval of different text.
+
+    The live pointer advances to a human digest review. The MANUSCRIPT
+    submission metadata is NOT thereby completed: those six items are
+    republished as outstanding, because supplying dataset-release metadata for
+    a Zenodo candidate fills no manuscript placeholder.
+
+    Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE130_RC_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    decision = _require_json_artifact(root, _STAGE130_RC_DECISION_REL)
+    boundary = _require_json_artifact(root, _STAGE130_RC_BOUNDARY_REL)
+    manifest = _require_json_artifact(root, _STAGE130_RC_MANIFEST_REL)
+
+    if decision.get("decision_id") != _STAGE130_RC_ACTION_ID:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate decision_id mismatch")
+    if boundary.get("action_id") != _STAGE130_RC_ACTION_ID:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary action_id mismatch")
+    if manifest.get("action_id") != _STAGE130_RC_ACTION_ID:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest action_id mismatch")
+    if decision.get("decision_type") != "dataset_release_candidate_preparation":
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must be a "
+            "dataset_release_candidate_preparation")
+    if decision.get("authorized_by_human") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must be human-authorized")
+
+    # (1) The candidate is PREPARED and nothing more. Every Zenodo-facing key
+    # is false on all three surfaces that publish one.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        for field in _STAGE130_RC_FORBIDDEN_TRUE:
+            if field not in source:
+                continue
+            if source.get(field) is not False:
+                raise HandoffError(
+                    f"Stage130 dataset Release Candidate {label} {field} must "
+                    "be False: preparing a candidate is not a deposition, an "
+                    "upload, a DOI, a publication, a Ready-for-Review or a "
+                    "merge")
+    for field in ("zenodo_deposition_created", "zenodo_upload_performed",
+                  "zenodo_published", "public_release_authorized"):
+        if manifest.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest {field} must be "
+                "False")
+    if boundary.get("release_candidate_prepared") is not True or \
+            manifest.get("release_candidate_prepared") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record "
+            "release_candidate_prepared = True once every local gate passed")
+
+    # (2) No DOI, and no placeholder that could be read as one.
+    if "doi" in manifest and manifest.get("doi") is not None:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest doi must be omitted "
+            f"or null, got {manifest.get('doi')!r}: no DOI exists and a "
+            "placeholder could be mistaken for a real identifier")
+    if manifest.get("doi_reserved") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest doi_reserved must be "
+            "False")
+
+    # (3) The eight frozen surfaces. Drift is fatal; gitignored absence is not.
+    verified = 0
+    for rel, expected in sorted(_STAGE130_RC_FROZEN_SHA256.items()):
+        target = os.path.join(root, rel)
+        if not os.path.isfile(target):
+            if _is_git_ignored(root, rel):
+                continue  # a fresh clone legitimately lacks the bulky output
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate frozen surface {rel} is "
+                "absent and is NOT gitignored")
+        actual = sha256_file(target)
+        if actual != expected:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate frozen surface {rel} has "
+                f"DRIFTED: expected {expected}, found {actual}. The release "
+                "describes bytes that no longer exist.")
+        verified += 1
+
+    # (4) The manifest must pin the same digests it claims to describe.
+    files = manifest.get("files") or []
+    if not files:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest lists no files")
+    by_source = {entry.get("source_path"): entry for entry in files}
+    for rel, expected in _STAGE130_RC_FROZEN_SHA256.items():
+        entry = by_source.get(rel)
+        if entry is None:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest omits the frozen "
+                f"surface {rel}")
+        if entry.get("sha256") != expected:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest pins "
+                f"{entry.get('sha256')!r} for {rel}, expected {expected}")
+        if entry.get("copied_byte_for_byte") is not True:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest must record "
+                f"{rel} as copied byte-for-byte")
+    for entry in files:
+        for field in ("bundle_path", "bytes", "sha256", "role", "source_path",
+                      "inclusion_reason"):
+            if not entry.get(field) and entry.get(field) != 0:
+                raise HandoffError(
+                    "Stage130 dataset Release Candidate manifest entry "
+                    f"{entry.get('bundle_path')!r} is missing {field}")
+    if manifest.get("file_count") != len(files):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest file_count disagrees "
+            "with the listed files")
+
+    # (5) Roles: exactly one primary surface, three robustness surfaces, four
+    # audit surfaces. A release that cannot say which file is THE file has not
+    # done its job.
+    roles = manifest.get("role_counts") or {}
+    for role, expected in (("primary_modeling_surface", 1),
+                           ("prespecified_robustness_surface", 3),
+                           ("audit_surface_not_model_ready", 4)):
+        if roles.get(role) != expected:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate must declare exactly "
+                f"{expected} {role} file(s), got {roles.get(role)!r}")
+    if manifest.get("primary_file") != \
+            "data/analysis_ready_main_rule_a_stage125.csv":
+        raise HandoffError(
+            "Stage130 dataset Release Candidate primary file must be the "
+            "frozen main_rule_a analysis-ready surface")
+
+    # (6) Counts come from the contract, and are not recomputed.
+    counts = manifest.get("primary_file_contract_counts") or {}
+    for key in ("companies", "negative", "pairs", "positive"):
+        if counts.get(key) != _STAGE130_RC_PRIMARY_COUNTS[key]:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate primary-surface {key} is "
+                f"{counts.get(key)!r}, expected "
+                f"{_STAGE130_RC_PRIMARY_COUNTS[key]}")
+    if manifest.get("primary_file_column_count") != \
+            _STAGE130_RC_PRIMARY_COUNTS["columns"]:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate primary-surface column count "
+            f"must be {_STAGE130_RC_PRIMARY_COUNTS['columns']}")
+    if manifest.get("counts_recomputed_from_rows") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must not recompute the "
+            "contract counts from row content")
+    if decision.get("frozen_dataset_gate", {}).get(
+            "counts_recomputed_from_row_content") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate decision must record the "
+            "counts as contract-supplied, not recomputed")
+
+    # (7) The source-rights audit: all three providers, and a blocked
+    # disposition that is not quietly upgraded.
+    audit = decision.get("source_rights_audit") or {}
+    providers = tuple(audit.get("providers_covered") or ())
+    if providers != _STAGE130_RC_PROVIDERS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate source-rights audit must "
+            f"cover exactly {_STAGE130_RC_PROVIDERS}, got {providers}")
+    matrix_path = os.path.join(root, _STAGE130_RC_MATRIX_REL)
+    if not os.path.isfile(matrix_path):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate source-rights matrix is "
+            f"missing: {_STAGE130_RC_MATRIX_REL}")
+    with open(matrix_path, encoding="utf-8-sig", newline="") as fh:
+        rows = list(csv.DictReader(fh))
+    matrix_providers = tuple(row.get("provider") for row in rows)
+    if matrix_providers != _STAGE130_RC_PROVIDERS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate source-rights matrix must "
+            f"list exactly {_STAGE130_RC_PROVIDERS}, got {matrix_providers}")
+    for row in rows:
+        if row.get("original_provider_file_included_in_candidate") != "no":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate may not redistribute an "
+                f"original {row.get('provider')} provider file")
+        for field in ("terms_checked_date_utc", "terms_checked_url",
+                      "residual_uncertainty", "release_disposition"):
+            if not (row.get(field) or "").strip():
+                raise HandoffError(
+                    "Stage130 dataset Release Candidate source-rights matrix "
+                    f"row {row.get('provider')!r} is missing {field}")
+    blocked = tuple(row.get("provider") for row in rows
+                    if row.get("release_disposition") == "BLOCKS_PUBLICATION")
+    readiness = audit.get("publication_readiness")
+    if blocked and readiness != "NOT_READY_FOR_PUBLICATION":
+        raise HandoffError(
+            f"Stage130 dataset Release Candidate has blocking provider(s) "
+            f"{blocked} but reports publication_readiness {readiness!r}: a "
+            "blocked candidate may not be marked ready")
+    if boundary.get("publication_readiness") != readiness:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary and decision "
+            "disagree on publication_readiness")
+    if readiness == "NOT_READY_FOR_PUBLICATION" and \
+            audit.get("blocking_provider") not in blocked:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must name the blocking "
+            "provider that the matrix actually blocks on")
+    for field in ("columns_removed_to_avoid_the_blocker",
+                  "frozen_values_altered_to_avoid_the_blocker"):
+        if audit.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {field} must be 0: a "
+                "rights blocker is reported, never engineered away")
+    if audit.get("legal_conclusion_asserted_beyond_the_evidence") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must not assert a legal "
+            "conclusion beyond its evidence")
+
+    # (8) The approved manuscript is untouched, proven by re-derived digests.
+    manuscript_boundary = decision.get("manuscript_boundary") or {}
+    manuscript_path = os.path.join(root, _STAGE130_REVIEW_MANUSCRIPT_REL)
+    if not os.path.isfile(manuscript_path):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate: the approved manuscript is "
+            "missing")
+    with open(manuscript_path, "rb") as fh:
+        payload = fh.read()
+    actual_sha = hashlib.sha256(payload).hexdigest()
+    actual_blob = _git_blob_id(payload)
+    if manuscript_boundary.get("approved_manuscript_sha256") != actual_sha:
+        raise HandoffError(
+            "the approved manuscript has changed: the Release Candidate pins "
+            f"{manuscript_boundary.get('approved_manuscript_sha256')!r} but "
+            f"the file is {actual_sha}. Preparing a dataset release may not "
+            "edit the manuscript, and may not inherit a human approval of "
+            "different bytes.")
+    if manuscript_boundary.get("approved_manuscript_blob_id") != actual_blob:
+        raise HandoffError(
+            "the approved manuscript has changed: the Release Candidate pins "
+            f"blob {manuscript_boundary.get('approved_manuscript_blob_id')!r} "
+            f"but the file hashes to {actual_blob}")
+    for field in ("data_availability_statement_inserted",
+                  "manuscript_availability_claim_changed_by_this_action",
+                  "restricted_access_language_replaced"):
+        if manuscript_boundary.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manuscript_boundary "
+                f"{field} must be False: no public DOI exists, so the "
+                "manuscript keeps its present availability description")
+    if manuscript_boundary.get("manuscript_files_modified_by_this_action") != 0:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must modify zero manuscript "
+            "files")
+    # The conflict is declared, not hidden. A candidate that intends open
+    # publication while the manuscript says restricted-access must say so.
+    if decision.get(
+            "release_candidate_conflicts_with_current_manuscript_claim") \
+            is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must declare the standing "
+            "conflict between the authors' publication intent and the "
+            "manuscript's current restricted-access description")
+
+    # (9) Human-supplied facts are recorded AS human-supplied, and no ORCID is
+    # invented.
+    for block in ("human_supplied_data_governance_facts",
+                  "human_supplied_release_intent",
+                  "human_supplied_release_metadata"):
+        record = decision.get(block) or {}
+        if record.get("supplied_by") != "human":
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {block} must be recorded "
+                "as human-supplied")
+        if record.get("independently_inferred_by_the_agent") is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {block} must not be "
+                "recorded as independently inferred")
+    metadata = decision.get("human_supplied_release_metadata") or {}
+    if metadata.get("orcid_identifiers_invented_by_this_action") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must not invent ORCID "
+            "identifiers")
+    creators = metadata.get("creators_in_human_supplied_order") or []
+    if [c.get("name") for c in creators] != ["Abtin Asghari",
+                                             "MohammadMehdi Mehraein"]:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate creator order must be the "
+            "human-supplied order")
+    intent = decision.get("human_supplied_release_intent") or {}
+    if intent.get("this_intent_is_not_an_authorization_to_publish") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record that publication "
+            "INTENT is not publication AUTHORIZATION")
+
+    # (10) The firewall, and the excluded payload classes.
+    if boundary.get("final_test_locked") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must keep the Final Test "
+            "locked")
+    if boundary.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate final_test_rows_read must be 0")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate counters.{field} must be "
+                "0: copying frozen bytes fits no model, computes no metric, "
+                "reads no Final Test row and calls no Zenodo endpoint")
+    for field in ("source_pdfs_included_in_candidate",
+                  "raw_provider_responses_included_in_candidate",
+                  "credentials_included_in_candidate",
+                  "prediction_artifacts_included_in_candidate"):
+        if boundary.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {field} must be 0")
+    for field in ("source_pdfs_included", "raw_provider_responses_included",
+                  "credentials_included", "prediction_artifacts_included",
+                  "models_fitted", "metrics_computed", "thresholds_derived"):
+        if manifest.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest {field} must "
+                "be 0")
+    if manifest.get("final_test_predictions_opened") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest must record the "
+            "Final Test predictions as unopened")
+
+    # (11) The PR stays a Draft, and the pointer moves as a POINTER.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("pr_is_draft") is not True:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must keep the PR "
+                "a Draft")
+        if source.get("pr_number") != _STAGE130_RC_PR_NUMBER:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} PR number must "
+                f"be {_STAGE130_RC_PR_NUMBER}")
+    if boundary.get("next_action_id") != _STAGE130_RC_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must advance the pointer to "
+            f"{_STAGE130_RC_NEXT_ACTION_ID}")
+    if boundary.get("next_action_scope") != _STAGE130_RC_NEXT_ACTION_SCOPE:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate next_action_scope must be "
+            f"{_STAGE130_RC_NEXT_ACTION_SCOPE}")
+    if boundary.get("pointer_is_not_authorization") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must declare the pointer is "
+            "not an authorization")
+    if boundary.get("next_action_requires_exact_archive_sha256_review") \
+            is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must require human review of "
+            "the exact archive SHA-256 before any Zenodo action")
+
+    # (12) The pointer it supersedes was NOT completed, and says so. The six
+    # manuscript items are still missing; a dataset candidate fills none.
+    marker = decision.get("superseded_marker") or {}
+    if marker.get("pointer_previous_value") != _STAGE130_RC_PREVIOUS_POINTER:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate supersede must record the "
+            f"pointer moving off {_STAGE130_RC_PREVIOUS_POINTER}")
+    if marker.get("pointer_resolved_value") != _STAGE130_RC_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate supersede must record the "
+            f"pointer resolving to {_STAGE130_RC_NEXT_ACTION_ID}")
+    if marker.get("manuscript_submission_metadata_still_outstanding") \
+            is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must keep the six human-only "
+            "manuscript submission items outstanding: supplying Zenodo "
+            "creator metadata fills no manuscript placeholder")
+    if marker.get("manuscript_submission_metadata_outstanding_count") != \
+            len(_STAGE130_REVIEW_OUTSTANDING_METADATA):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate outstanding manuscript "
+            f"metadata count must be "
+            f"{len(_STAGE130_REVIEW_OUTSTANDING_METADATA)}")
+    if boundary.get("stage130_manuscript_human_supplied_metadata_outstanding") \
+            is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary must keep the "
+            "manuscript submission metadata outstanding")
+
+    # (13) The predecessor records keep their own history.
+    for field in ("prior_phase1_evidence_package_preserved",
+                  "prior_phase2_assembly_record_preserved",
+                  "prior_human_review_completion_record_preserved"):
+        if boundary.get(field) is not True:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate boundary {field} must be "
+                "True")
+    prior = derive_stage130_manuscript_human_review_completion_markers(root)
+    if not prior:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate cannot be recorded without "
+            "the completed manuscript human review it follows")
+    if prior.get("stage130_manuscript_content_approved") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate requires the completed "
+            "manuscript content approval to still stand")
+
+    return {
+        "stage130_dataset_release_candidate_recorded": True,
+        "stage130_dataset_release_candidate_action_id": _STAGE130_RC_ACTION_ID,
+        "stage130_dataset_release_candidate_authorized_by_human": True,
+        "stage130_dataset_release_candidate_decision_date_utc":
+            decision.get("decision_date_utc"),
+        "stage130_dataset_release_candidate_prepared": True,
+        "stage130_dataset_release_candidate_package": _STAGE130_RC_PKG,
+        "stage130_dataset_release_candidate_file_count":
+            manifest.get("file_count"),
+        "stage130_dataset_release_candidate_primary_file":
+            manifest.get("primary_file"),
+        "stage130_dataset_release_candidate_primary_pairs":
+            _STAGE130_RC_PRIMARY_COUNTS["pairs"],
+        "stage130_dataset_release_candidate_primary_companies":
+            _STAGE130_RC_PRIMARY_COUNTS["companies"],
+        "stage130_dataset_release_candidate_primary_columns":
+            _STAGE130_RC_PRIMARY_COUNTS["columns"],
+        "stage130_dataset_release_candidate_primary_positive":
+            _STAGE130_RC_PRIMARY_COUNTS["positive"],
+        "stage130_dataset_release_candidate_primary_negative":
+            _STAGE130_RC_PRIMARY_COUNTS["negative"],
+        "stage130_dataset_release_candidate_counts_recomputed": False,
+        "stage130_dataset_release_candidate_frozen_surfaces_verified": verified,
+        "stage130_dataset_release_candidate_archive_tracked_in_git": False,
+
+        # The rights audit, and the blocker it found.
+        "stage130_dataset_release_candidate_publication_readiness": readiness,
+        "stage130_dataset_release_candidate_blocking_provider":
+            audit.get("blocking_provider"),
+        "stage130_dataset_release_candidate_providers_audited":
+            list(_STAGE130_RC_PROVIDERS),
+        "stage130_dataset_release_candidate_source_pdfs_included": 0,
+        "stage130_dataset_release_candidate_raw_responses_included": 0,
+
+        # ...and what preparing it is NOT. Restated so a consumer reading only
+        # this action still sees every boundary.
+        "zenodo_deposition_created": False,
+        "zenodo_upload_performed": False,
+        "zenodo_doi_reserved": False,
+        "zenodo_published": False,
+        "zenodo_doi": None,
+        "public_release_authorized": False,
+        "stage130_dataset_release_candidate_is_publication_authorization":
+            False,
+        "stage130_manuscript_availability_claim_changed": False,
+        "stage130_manuscript_modified_by_this_action": False,
+        "stage130_phase2_submission_ready": False,
+        "stage130_phase2_ready_for_review_authorized": False,
+        "stage130_phase2_merge_authorized": False,
+        "stage130_authorized": False,
+        "stage130_phase2_scientific_execution_started": False,
+        "stage130_scientific_execution_started": False,
+        "stage130_phase2_final_test_rows_read": 0,
+        "stage130_phase2_prediction_artifact_opened": False,
+        "stage130_manuscript_human_supplied_metadata_outstanding": True,
+        "stage130_manuscript_human_supplied_metadata_outstanding_count":
+            len(_STAGE130_REVIEW_OUTSTANDING_METADATA),
+        "stage130_manuscript_human_supplied_metadata_outstanding_items":
+            list(_STAGE130_REVIEW_OUTSTANDING_METADATA),
+
+        # The live pointer. A prepared candidate needs a human to read its
+        # exact digest before anything reaches Zenodo, so that is what the
+        # pointer names -- and it is a POINTER: nothing here is authorized.
+        # `active_workstream` is deliberately NOT set here: it is derived from
+        # ROADMAP.md, a human input file the generator never overwrites.
+        "last_completed_research_action_id": _STAGE130_RC_ACTION_ID,
+        "stage130_phase2_next_action_id": _STAGE130_RC_NEXT_ACTION_ID,
+        "stage130_phase2_next_action_authorized": False,
+        "next_research_action_id": _STAGE130_RC_NEXT_ACTION_ID,
+        "next_research_action_scope": _STAGE130_RC_NEXT_ACTION_SCOPE,
         "next_research_action_authorized": False,
         "next_research_action_pointer_is_not_authorization": True,
     }

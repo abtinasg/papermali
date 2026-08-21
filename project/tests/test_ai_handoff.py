@@ -1305,7 +1305,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # waiting period early (2026-08-08) and frozen M3-LAG-WDI's final
     # disposition as supplementary/exploratory only; both pointer chains now
     # converge on the same human-decision-required state.
-    assert state["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -1325,7 +1325,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # remain correct HISTORY for the actions that published them and are
     # asserted against their own artifacts.
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_submission_metadata")
+        "stage130_dataset_release_candidate_review")
     assert state["active_workstream_predecessor_context"] == (
         "stage128_m3i2_final_official_documentary_recovery"
     )
@@ -1384,18 +1384,19 @@ def test_real_repo_roadmap_stage126_status_consistency():
     # live label names the pending submission metadata because the human review
     # the earlier label named is complete.
     assert fm["active_research_workstream_id"] == (
-        "stage130-phase2-manuscript-submission-metadata")
+        "stage130-dataset-release-candidate-review")
     assert fm["predecessor_research_workstream_id"] == (
         "stage128-m3i2-final-official-documentary-recovery"
     )
     # The workstream label is derived from the frozen action and never
     # substitutes for a research-action id. The last completed action has since
-    # advanced past the Stage130 Phase 2 manuscript assembly to the human
-    # manuscript review, which the human supervisor completed on 2026-08-20.
+    # advanced past the Stage130 Phase 2 manuscript assembly, past the human
+    # manuscript review completed on 2026-08-20, to the deterministic Zenodo
+    # dataset Release Candidate prepared on 2026-08-21.
     assert fm["last_completed_research_action_id"] == (
-        "human-manuscript-review"
+        "stage130-dataset-release-candidate"
     )
-    assert fm["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert fm["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     # The Stage128 M2 D2 design freeze completed, and the canonical D2 Gate
     # re-run has since been EXECUTED under its own explicit one-action
     # authorization and PASSED data admission, so both pointers legitimately
@@ -1502,7 +1503,7 @@ def test_real_repo_open_tasks_stage126_markers_match_handoff():
         in open_tasks
     )
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_submission_metadata")
+        "stage130_dataset_release_candidate_review")
     assert "Stage126 M1 human-authorized = true" in open_tasks
     assert "Stage126 started = true" in open_tasks
     assert "development modeling authorized = true" in open_tasks
@@ -2380,7 +2381,7 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # Track A waiting period and froze M3-LAG-WDI's final disposition
     # (2026-08-08); both pointer chains now converge on
     # `human-decision-required`.
-    assert state["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2401,7 +2402,7 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_submission_metadata")
+        "stage130_dataset_release_candidate_review")
     assert state["active_workstream_predecessor_context"] == (
         "stage128_m3i2_final_official_documentary_recovery"
     )
@@ -2741,7 +2742,7 @@ def test_part1_does_not_advance_research_pointers():
     # Track A waiting period and froze M3-LAG-WDI's final disposition
     # (2026-08-08); both pointer chains now converge on
     # `human-decision-required`.
-    assert state["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2762,7 +2763,7 @@ def test_part1_does_not_advance_research_pointers():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_submission_metadata")
+        "stage130_dataset_release_candidate_review")
     assert state["active_workstream_predecessor_context"] == (
         "stage128_m3i2_final_official_documentary_recovery"
     )
@@ -2982,7 +2983,7 @@ def test_handoff_carries_live_vs_historical_test_boundary_markers():
     # Track A waiting period and froze M3-LAG-WDI's final disposition
     # (2026-08-08); both pointer chains now converge on
     # `human-decision-required`.
-    assert state["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -3061,7 +3062,7 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # The supplementary M3I-2 contract lock has since succeeded the M3 Gate
     # as the live workstream; the Gate is now predecessor context.
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_submission_metadata")
+        "stage130_dataset_release_candidate_review")
     assert state["active_workstream_predecessor_context"] == (
         "stage128_m3i2_final_official_documentary_recovery"
     )
@@ -3080,7 +3081,7 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # Track A waiting period and froze M3-LAG-WDI's final disposition
     # (2026-08-08); both pointer chains now converge on
     # `human-decision-required`.
-    assert state["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -3146,7 +3147,7 @@ def test_current_state_labels_micro_part_not_research_action():
     )
     assert (
         "- **Next research action:** "
-        "`human-manuscript-submission-metadata`" in text
+        "`human-dataset-release-candidate-digest-review`" in text
     )
 
 
@@ -3253,7 +3254,7 @@ def test_active_workstream_identifies_the_m3_macro_gate():
     # The live label is the supplementary M3I-2 contract lock, which succeeded
     # the CBI M3 Gate; neither older label may be the CURRENT one.
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_submission_metadata")
+        "stage130_dataset_release_candidate_review")
     assert state["active_workstream"] not in (
         "stage128_m2_d2_boundary_month_equity_return",
         "stage128_m3_macro_data_gate")
@@ -3280,16 +3281,17 @@ def test_pointers_are_unchanged_because_the_gate_is_unresolved():
     CBI Gate's own successor was never created.
     """
     state = _handoff_state()
-    # The pointer has since advanced three times more, each time through a
+    # The pointer has since advanced four times more, each time through a
     # different, separately recorded action: the Track A waiting-period
     # termination and M3-LAG-WDI disposition (2026-08-08), the Stage130 Phase 2
-    # manuscript assembly, and the completed human manuscript review
-    # (2026-08-20). None is the CBI Gate's successor.
+    # manuscript assembly, the completed human manuscript review (2026-08-20)
+    # and the dataset Release Candidate (2026-08-21). None is the CBI Gate's
+    # successor.
     assert state["last_completed_research_action_id"] == (
-        "human-manuscript-review")
+        "stage130-dataset-release-candidate")
     assert state["last_completed_research_action_id"] != (
         "stage128-m3-incremental-evaluation")
-    assert state["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert state["next_research_action_id"] != (
         "stage128-m3-incremental-evaluation")
     assert state["m3_macro_data_gate_human_review_required"] is True
@@ -3314,7 +3316,7 @@ def test_current_state_says_the_m3_gate_was_executed():
     # The M3 Gate section is history; the LIVE workstream is Stage130 Phase 2,
     # labelled for the submission metadata now that the human review is done.
     assert ("**Active workstream:** "
-            "`stage130_phase2_manuscript_submission_metadata`") in text
+            "`stage130_dataset_release_candidate_review`") in text
 
 
 def test_current_state_cannot_both_assert_and_deny_gate_execution():
@@ -3329,7 +3331,7 @@ def test_roadmap_no_longer_labels_the_m3_gate_unauthorized_or_unstarted():
     text = _roadmap_text()
     front = text.split("---")[1]
     assert ("active_research_workstream_id: "
-            "stage130-phase2-manuscript-submission-metadata") in front
+            "stage130-dataset-release-candidate-review") in front
     assert ("predecessor_research_workstream_id: "
             "stage128-m3i2-final-official-documentary-recovery") in front
     # the stale live-workstream label must not be the ACTIVE one
@@ -3702,7 +3704,7 @@ def test_current_state_renders_the_m3i2_contract_lock_section():
     pointers = [ln for ln in text.splitlines()
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1
-    assert "human-manuscript-submission-metadata" in pointers[0]
+    assert "human-dataset-release-candidate-digest-review" in pointers[0]
 
 
 # --------------------------------------------------------------------------- #
@@ -4105,12 +4107,12 @@ def test_roadmap_front_matter_pins_the_live_recovery_workstream():
     """
     fm = gen.read_roadmap(REAL_ROOT)
     assert fm["active_research_workstream_id"] == (
-        "stage130-phase2-manuscript-submission-metadata")
+        "stage130-dataset-release-candidate-review")
     assert fm["predecessor_research_workstream_id"] == (
         "stage128-m3i2-final-official-documentary-recovery")
     assert fm["last_completed_research_action_id"] == (
-        "human-manuscript-review")
-    assert fm["next_research_action_id"] == "human-manuscript-submission-metadata"
+        "stage130-dataset-release-candidate")
+    assert fm["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     # the front-matter reader hands back the raw scalar; unauthorized either way
     assert fm["next_research_action_authorized"] in (False, "false")
 
@@ -4472,8 +4474,8 @@ def test_item_25e_is_historical_superseded_and_unauthorized():
         assert claim not in item, claim
 
 
-def test_the_current_next_pointer_is_the_submission_metadata_and_unauthorized():
-    """The live pointer is the human-supplied submission metadata.
+def test_the_current_next_pointer_is_the_release_candidate_digest_review():
+    """The live pointer is the human review of the Release Candidate digest.
 
     Both Stage128 pointer chains converged on `human-decision-required`
     (2026-08-08), which was correct while the next step was genuinely
@@ -4481,16 +4483,21 @@ def test_the_current_next_pointer_is_the_submission_metadata_and_unauthorized():
     early and M3-LAG-WDI's disposition frozen as supplementary/exploratory
     only. A committed Stage130 Phase 2 manuscript then determined the next
     step — a human had to review the draft — and that review was completed on
-    2026-08-20, so the pointer has advanced once more to the six human-only
-    submission items the draft still carries as placeholders. The Track A
-    statement remains true of the Track A action and is asserted against its
-    own artifact, not against this live key.
+    2026-08-20, moving the pointer to the six human-only submission items the
+    draft still carries as placeholders. A deterministic Zenodo dataset
+    Release Candidate was then prepared (2026-08-21), and it needs a human to
+    approve its exact archive digest before anything may reach Zenodo, so the
+    pointer names that. The six manuscript items remain outstanding underneath
+    and are published as such; the pointer moved because something new became
+    pending, not because they were supplied. The Track A statement remains
+    true of the Track A action and is asserted against its own artifact, not
+    against this live key.
     """
     fm = gen.read_roadmap(REAL_ROOT)
-    assert fm["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert fm["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert fm["next_research_action_authorized"] in (False, "false")
     state = _handoff_state()
-    assert state["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert state["next_research_action_authorized"] is False
     assert state["next_research_action_pointer_is_not_authorization"] is True
 
@@ -4797,7 +4804,7 @@ def test_stage129_m4_is_recognized_by_the_full_handoff_build():
     # Neither live research pointer chain is moved by either Stage129 action.
     # The live pointer itself has since advanced to the Stage130 Phase 2
     # manuscript review; that is owned by Phase 2, not by any Stage129 action.
-    assert record["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert record["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert record["stage128_m3_lag_wdi_next_action_id"] == (
         "human_decision_required")
 
@@ -4970,17 +4977,19 @@ def test_current_state_does_not_still_call_the_live_stage_stage128():
 
 
 @_needs_p2
-def test_live_workstream_is_the_phase2_submission_metadata():
-    """Phase 2 is still the live workstream; only its LABEL advanced.
+def test_live_workstream_is_the_dataset_release_candidate_review():
+    """The live workstream LABEL tracks what is actually pending.
 
     While a human had not read the draft the label named the review. That
-    review is complete, so the label names the pending human-supplied
-    submission metadata instead — a description of the live state, never a
-    permission for it.
+    review completed, so the label named the pending human-supplied submission
+    metadata. A prepared Zenodo dataset Release Candidate now awaits a human
+    digest review, so the label names that — a description of the live state,
+    never a permission for it, and never a claim that the submission metadata
+    was supplied.
     """
     state = _handoff_state()
     assert state["active_workstream"] == (
-        "stage130_phase2_manuscript_submission_metadata")
+        "stage130_dataset_release_candidate_review")
     # the Stage128 chain is retained as predecessor context, never deleted
     assert state["active_workstream_predecessor_context"] == (
         "stage128_m3i2_final_official_documentary_recovery")
@@ -4994,7 +5003,7 @@ def test_manuscript_assembly_is_no_longer_advertised_as_the_next_action():
     stale statement about the future, and the live pointer must have moved on.
     """
     state = _handoff_state()
-    assert state["next_research_action_id"] == "human-manuscript-submission-metadata"
+    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
     assert state["next_research_action_authorized"] is False
     # Phase 1 keeps its OWN historical pointer -- history is not rewritten.
     assert state["stage130_phase1_next_action_id"] == (

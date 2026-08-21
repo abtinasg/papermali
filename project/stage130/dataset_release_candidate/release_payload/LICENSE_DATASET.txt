@@ -1,0 +1,57 @@
+LICENCE FOR THIS DATASET RELEASE
+================================
+
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+Full text: https://creativecommons.org/licenses/by/4.0/legalcode
+Summary:   https://creativecommons.org/licenses/by/4.0/
+
+Copyright (c) 2026 Abtin Asghari and MohammadMehdi Mehraein.
+
+
+WHAT IS LICENSED
+----------------
+
+The authors licence, under CC BY 4.0 and to the extent that they hold rights in
+them, their own original contributions in this release:
+
+  * the selection, structure and arrangement of the company-year panel;
+  * the derived variables, ratios, flags, eligibility annotations and outcome
+    labels the authors constructed;
+  * the quality-control records, contracts, dictionaries and manifests the
+    authors produced;
+  * the release documentation and metadata in this bundle.
+
+
+WHAT IS NOT LICENSED
+--------------------
+
+This grant does NOT extend to, and makes no representation about:
+
+  * the underlying source materials published by CODAL, TSETMC, or any other
+    third party;
+  * any rights any third party may hold in the financial statements, filings or
+    market data from which the authors' factual fields were compiled;
+  * any original source PDF, filing document, workbook, or raw provider API
+    response -- none of which is included in this release.
+
+Nothing here relicenses third-party source material, and nothing here purports
+to grant rights the authors do not hold. A reuser who needs the original
+provider documents must obtain them from the provider under the provider's own
+terms.
+
+See SOURCE_AND_LICENSE_NOTES.md for the provider-by-provider audit, including
+terms that could not be verified at the time this candidate was prepared.
+
+
+NO WARRANTY
+-----------
+
+The dataset is provided "as is", without warranty of any kind. See
+LIMITATIONS.md for what these files can and cannot support.
+
+
+ATTRIBUTION
+-----------
+
+Please cite the dataset as set out in CITATION.cff. Indicate whether you made
+changes.

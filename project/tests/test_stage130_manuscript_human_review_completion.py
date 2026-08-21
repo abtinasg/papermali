@@ -47,9 +47,22 @@ REVIEWED_HEAD = "c4136a412696c7bb626f0c389bcccb829f381629"
 MANUSCRIPT_SHA256 = "8b5d861c36e01dc81133c1071cd96f7e340482ac2148b53c055369bbd5ffcb19"
 MANUSCRIPT_BLOB_ID = "93f7e8e796ec098de38725271305ab06263efd1f"
 SUPERSEDED_POINTER = "human-manuscript-review"
+#: What THIS action published as its successor. Historical: it is what the
+#: review's own decision, boundary and README say, and they are not rewritten.
 NEXT_POINTER = "human-manuscript-submission-metadata"
 NEXT_POINTER_SCOPE = (
     "manuscript_human_submission_metadata_no_further_action_is_authorized")
+#: What is live NOW. A later action -- the Zenodo dataset Release Candidate --
+#: moved the live pointer on again, so assertions about CURRENT state use
+#: these, while assertions about this action's own artifacts keep the values
+#: above. The manuscript submission metadata is still outstanding underneath;
+#: the pointer moved because a prepared candidate now needs a digest review
+#: first, not because the metadata was supplied.
+LIVE_POINTER = "human-dataset-release-candidate-digest-review"
+LIVE_POINTER_SCOPE = (
+    "dataset_release_candidate_human_digest_review_no_zenodo_action_is_"
+    "authorized")
+LIVE_LAST_COMPLETED_ACTION = "stage130-dataset-release-candidate"
 OUTSTANDING_METADATA = [
     "authors_and_author_order",
     "affiliations_and_corresponding_author",
@@ -294,28 +307,34 @@ def test_the_human_only_submission_metadata_was_not_invented(decision, boundary,
 # ------------------------------------ 8. the live pointer moved off the review
 def test_the_live_pointer_moved_off_the_completed_review(
         boundary, state, roadmap_front_matter):
-    assert state["next_research_action_id"] == NEXT_POINTER
-    assert state["next_research_action_id"] != SUPERSEDED_POINTER
-    assert roadmap_front_matter["next_research_action_id"] == NEXT_POINTER
-    assert roadmap_front_matter["next_research_action_id"] != SUPERSEDED_POINTER
-    assert state["stage130_phase2_next_action_id"] == NEXT_POINTER
+    """It moved off the review, and has since moved on again.
+
+    This action's OWN boundary keeps naming its own successor; the LIVE
+    pointer has advanced past it to the dataset Release Candidate digest
+    review. Both statements are true, and neither overwrites the other.
+    """
     assert boundary["next_action_id"] == NEXT_POINTER
-    assert state["last_completed_research_action_id"] == SUPERSEDED_POINTER
+    for value in (state["next_research_action_id"],
+                  roadmap_front_matter["next_research_action_id"],
+                  state["stage130_phase2_next_action_id"]):
+        assert value != SUPERSEDED_POINTER
+        assert value == LIVE_POINTER
+    assert state["last_completed_research_action_id"] == LIVE_LAST_COMPLETED_ACTION
     assert roadmap_front_matter[
-        "last_completed_research_action_id"] == SUPERSEDED_POINTER
+        "last_completed_research_action_id"] == LIVE_LAST_COMPLETED_ACTION
 
 
 def test_the_pointer_is_not_an_authorization(boundary, state,
                                              roadmap_front_matter):
     assert state["next_research_action_authorized"] is False
     assert state["next_research_action_pointer_is_not_authorization"] is True
-    assert state["next_research_action_scope"] == NEXT_POINTER_SCOPE
+    assert state["next_research_action_scope"] == LIVE_POINTER_SCOPE
     assert state["stage130_phase2_next_action_authorized"] is False
     assert boundary["next_action_authorized"] is False
     assert boundary["next_action_scope"] == NEXT_POINTER_SCOPE
     assert boundary["pointer_is_not_authorization"] is True
     assert roadmap_front_matter["next_research_action_authorized"] == "false"
-    assert roadmap_front_matter["next_research_action_scope"] == NEXT_POINTER_SCOPE
+    assert roadmap_front_matter["next_research_action_scope"] == LIVE_POINTER_SCOPE
 
 
 def test_the_roadmap_orders_the_new_pointer_after_the_completed_review():
@@ -587,6 +606,9 @@ STALE_WORKSTREAM_ID = "stage130-phase2-manuscript-assembly-human-review"
 STALE_WORKSTREAM_KEY = "stage130_phase2_manuscript_assembly_human_review"
 WORKSTREAM_ID = "stage130-phase2-manuscript-submission-metadata"
 WORKSTREAM_KEY = "stage130_phase2_manuscript_submission_metadata"
+#: ...and the label the live state carries now, one relabel further on.
+LIVE_WORKSTREAM_ID = "stage130-dataset-release-candidate-review"
+LIVE_WORKSTREAM_KEY = "stage130_dataset_release_candidate_review"
 
 
 def test_the_live_workstream_is_no_longer_the_human_review_workstream(
@@ -595,21 +617,36 @@ def test_the_live_workstream_is_no_longer_the_human_review_workstream(
     assert roadmap_front_matter["active_research_workstream_id"] != \
         STALE_WORKSTREAM_ID
     assert state["active_workstream"] != STALE_WORKSTREAM_KEY
-    assert roadmap_front_matter["active_research_workstream_id"] == WORKSTREAM_ID
-    assert state["active_workstream"] == WORKSTREAM_KEY
+    # The live label has since advanced again, to the dataset Release
+    # Candidate review. What this test pins is that it is no longer the
+    # human-review label -- which remains true.
+    assert roadmap_front_matter["active_research_workstream_id"] == \
+        LIVE_WORKSTREAM_ID
+    assert state["active_workstream"] == LIVE_WORKSTREAM_KEY
     # the completed review is what makes it stale
     assert state["stage130_phase2_human_review_completed"] is True
     assert state["stage130_phase2_human_review_required"] is False
 
 
-def test_the_workstream_label_aligns_with_the_submission_metadata_pointer(
+def test_the_workstream_label_aligns_with_the_live_pointer(
         state, roadmap_front_matter):
-    """The label and the pointer name the same pending thing."""
-    assert state["next_research_action_id"] == NEXT_POINTER
+    """The label and the pointer name the same pending thing.
+
+    That held when this action ran (`…-submission-metadata` label,
+    `human-manuscript-submission-metadata` pointer) and it must still hold now
+    that both have advanced together to the dataset Release Candidate review.
+    A label that drifts away from the pointer is exactly the staleness these
+    tests exist to catch.
+    """
     assert WORKSTREAM_ID.endswith("manuscript-submission-metadata")
     assert NEXT_POINTER.endswith("manuscript-submission-metadata")
-    assert roadmap_front_matter["next_research_action_scope"] == NEXT_POINTER_SCOPE
     assert "submission_metadata" in NEXT_POINTER_SCOPE
+    assert state["next_research_action_id"] == LIVE_POINTER
+    assert LIVE_WORKSTREAM_ID.endswith("dataset-release-candidate-review")
+    assert LIVE_POINTER.endswith("dataset-release-candidate-digest-review")
+    assert roadmap_front_matter["next_research_action_scope"] == \
+        LIVE_POINTER_SCOPE
+    assert "dataset_release_candidate" in LIVE_POINTER_SCOPE
 
 
 def test_the_workstream_label_is_not_an_authorization(state,
@@ -644,13 +681,19 @@ def test_roadmap_and_generated_handoff_representations_agree(
     import stage126_current_state_validator as csv_mod
     from pathlib import Path
     assert csv_mod.stage130_human_review_completed(Path(REPO_ROOT)) is True
-    assert csv_mod.expected_active_workstream(Path(REPO_ROOT)) == WORKSTREAM_KEY
     assert csv_mod.STAGE130_SUBMISSION_METADATA_ACTIVE_WORKSTREAM == WORKSTREAM_KEY
+    # The live label has advanced once more, to the dataset Release Candidate
+    # review; the validator and the generator must agree on THAT, not on a
+    # value either of them remembers.
+    assert csv_mod.expected_active_workstream(Path(REPO_ROOT)) == \
+        LIVE_WORKSTREAM_KEY
+    assert csv_mod.STAGE130_RELEASE_CANDIDATE_ACTIVE_WORKSTREAM == \
+        LIVE_WORKSTREAM_KEY
     assert csv_mod.current_state_labels_are_not_stale(
         state, freeze_completed=True) is True
     # the rendered snapshot says the same thing
     text = _text("project/docs/ai/CURRENT_STATE.md")
-    assert f"- **Active workstream:** `{WORKSTREAM_KEY}`" in text
+    assert f"- **Active workstream:** `{LIVE_WORKSTREAM_KEY}`" in text
     assert STALE_WORKSTREAM_KEY not in text
     # and the historical constants survive, unmoved
     assert gen._STAGE130_P2_WORKSTREAM_ID == STALE_WORKSTREAM_ID
@@ -672,6 +715,12 @@ def test_the_generator_fails_closed_on_a_stale_live_workstream(sandbox,
     monkeypatch.setattr(
         gen, "derive_stage130_manuscript_human_review_completion_markers",
         lambda root: {"stage130_manuscript_human_review_completion_recorded": True})
+    # The dataset Release Candidate is a LATER action with its own successor
+    # label. Suppress it here so the guard under test is the review-completion
+    # one; its own successor label is exercised by the Release Candidate tests.
+    monkeypatch.setattr(
+        gen, "derive_stage130_dataset_release_candidate_markers",
+        lambda root: {})
     with pytest.raises(gen.HandoffError) as exc:
         gen.derive_stage128_m2_d2_design_freeze_markers(REPO_ROOT)
     assert STALE_WORKSTREAM_ID in str(exc.value)
