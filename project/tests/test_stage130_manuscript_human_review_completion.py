@@ -549,7 +549,11 @@ def test_current_state_says_the_review_is_completed_not_required():
     assert "awaiting human review" not in text
     assert REVIEWED_HEAD in text
     assert MANUSCRIPT_SHA256 in text
-    assert NEXT_POINTER in text
+    # The rendered snapshot names the LIVE pointer, which has advanced past
+    # this action's own successor to the dataset Release Candidate digest
+    # review. What this test pins is that the snapshot no longer advertises a
+    # review that is finished.
+    assert LIVE_POINTER in text
     # it must not claim anything the human did not authorize
     for forbidden in ("submission ready = True",
                       "ready-for-review = True",
