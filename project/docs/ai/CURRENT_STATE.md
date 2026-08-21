@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage130_dataset_release_candidate_review`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-dataset-release-candidate-digest-review`
-- **Last stage commit:** `1773cbd3f3f4bc21c7ba534e432eb643d4d7f62e`
-- **Generated from commit:** `1773cbd3f3f4bc21c7ba534e432eb643d4d7f62e` (branch `stage130-human-review-data-contribution`, informational)
+- **Last stage commit:** `a006345c65e0baf0651393884d0aa1b4724923c4`
+- **Generated from commit:** `a006345c65e0baf0651393884d0aa1b4724923c4` (branch `stage130-human-review-data-contribution`, informational)
 - **Baseline:** `origin/main` @ `76b4e9d286bc513a290c0534da9b5fcd23fcf497`
 
 ## Current-state validation
@@ -427,7 +427,7 @@ _The human supervisor read the committed draft at one exact commit and approved 
 - 🔒 **Reviewed head:** `c4136a412696c7bb626f0c389bcccb829f381629` — approved file `project/stage130/manuscript/manuscript_draft_en.md`, SHA-256 `8b5d861c36e01dc81133c1071cd96f7e340482ac2148b53c055369bbd5ffcb19`, blob `93f7e8e796ec098de38725271305ab06263efd1f`. Manuscript modified by this action = False; both digests are re-derived from the file, so editing the approved text fails the build instead of inheriting the approval.
 - 🕰️ **History preserved:** the Phase 2 assembly record still publishes `human_review_required = True` (was required = True); this supersedes `stage130_phase2_human_review_required` in the open, and the historical pointer `human-manuscript-review` is not rewritten (Phase 2 record preserved = True).
 - ⛔ **Still NOT authorized:** submission ready = False, ready-for-review = False, merge = False, Stage130 authorized = False, submission workflow started = False.
-- 👤 **Human-supplied submission metadata still outstanding:** True — 6 items (`authors_and_author_order`, `affiliations_and_corresponding_author`, `funding`, `conflicts_of_interest`, `ethics_and_data_governance_statement`, `data_access_mechanism_for_the_restricted_company_panel`). None was invented by this action.
+- 👤 **Human submission metadata — supplied = True, applied to the manuscript = False:** 6 items (`authors_and_author_order`, `affiliations_and_corresponding_author`, `funding`, `conflicts_of_interest`, `ethics_and_data_governance_statement`, `data_access_mechanism_for_the_restricted_company_panel`). None was invented by any action. Where they are supplied, they are recorded in the decision artifact only — the byte-pinned manuscript still carries placeholders, and inserting them needs a separate authorization plus a fresh human review.
 - ⛔ **Nothing scientific occurred:** Final Test rows read = 0, prediction artifact opened = False, Stage130 scientific execution started = False.
 - ➡️ **Live next action:** `human-dataset-release-candidate-digest-review` — authorized = False. The review it used to name is done; a pointer is never an authorization.
 - Package: `project/stage130/manuscript_human_review_completion/`
@@ -436,12 +436,15 @@ _The human supervisor read the committed draft at one exact commit and approved 
 
 _Custody and documentation only. Frozen bytes were copied, hashed and archived. Nothing was deposited, uploaded, minted or published, and the manuscript was not touched._
 
-- 📦 **Candidate prepared:** True — 24 payload files; the archive itself is **not** tracked in Git (tracked in git = False).
+- 📦 **Candidate prepared:** True — version `1.0.0-rc.2`, 25 payload files; the archive itself is **not** tracked in Git (tracked in git = False).
+- 🗂️ **Supersedes** `1.0.0-rc.1` (archive SHA-256 `6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45`, 11657151 bytes, readiness `NOT_READY_FOR_PUBLICATION`), preserved not deleted = True. Nothing was ever deposited under it.
+- 📖 **Column documentation complete:** 115/115 released columns documented, 0 undocumented, 0 definitions invented. Dictionary: `project/stage130/dataset_release_candidate/release_payload/RELEASE_COLUMN_DICTIONARY.csv`. Every row names the committed repository source its facts came from.
 - 🎯 **Primary modeling surface:** `data/analysis_ready_main_rule_a_stage125.csv` — 1012 pairs, 119 companies, 115 columns, 80 positive, 932 negative. These are CONTRACT values (recomputed from rows = False).
 - 🔒 **Frozen surfaces verified:** 8 of 8 hashed and matching (the eight live under a gitignored directory, so absence in a fresh clone is tolerated; drift never is).
-- ⛔ **Publication readiness:** `NOT_READY_FOR_PUBLICATION` — blocking provider = `CODAL`. Providers audited: `CODAL`, `TSETMC`, `World Bank`. No source PDF (0) and no raw provider response (0) is redistributed.
+- ⛔ **Publication readiness:** `READY_FOR_EXACT_DIGEST_HUMAN_REVIEW` — live blocking provider = `None`, superseded blocking provider = `CODAL`. Providers audited: `CODAL`, `TSETMC`, `World Bank`. No source PDF (0) and no raw provider response (0) is redistributed.
+- ⚖️ **Source rights — HUMAN AUTHOR DETERMINATION, not an independent verification:** status `HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED`, basis `human_author_determination`, supplied by human = True, inferred by the agent = False. **Provider terms independently retrieved = False, independently verified = False** — no CODAL or TSETMC terms page was ever retrieved or read, and the historical record of that says so.
 - ⛔ **Nothing reached Zenodo:** deposition created = False, upload performed = False, DOI reserved = False, published = False, DOI = None, public release authorized = False.
-- 📄 **Manuscript untouched:** modified = False, availability claim changed = False. It keeps describing the dataset by its PRESENT availability, because no public DOI exists.
+- 📄 **Manuscript untouched:** modified = False, availability claim changed = False. It keeps describing the dataset by its PRESENT availability, because no public DOI exists. The six human submission items are supplied = True but applied to the manuscript = False; a post-DOI metadata update plus a fresh human review is still required (= True).
 - ➡️ **Live next action:** `human-dataset-release-candidate-digest-review` — authorized = False. A human must review the exact archive SHA-256, and a SEPARATE exact-digest authorization is required before any Zenodo action. A pointer is never an authorization.
 - Package: `project/stage130/dataset_release_candidate/`; builder: `project/src/stage130_dataset_release_candidate.py`
 
@@ -494,5 +497,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `4148c85f9ab5b34adf14e066e572f832bb2bc6445947cacd713e2421e0d0d1f6`_
-_generated_at_utc: 2026-08-21T14:41:50Z (informational)_
+_state_fingerprint: `ea88128f6690291feca83b15e99494ba1f4c432dc0ff64f9fa25e1291806cedf`_
+_generated_at_utc: 2026-08-21T18:37:08Z (informational)_
