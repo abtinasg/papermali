@@ -134,7 +134,25 @@ values. Cross-year comparison of nominal levels is the reuser's responsibility.
 * It establishes **no deployment readiness and no decision utility**. The
   authors make no recommendation for investment, credit or supervisory use.
 
-## 10. The source-rights basis is a human author determination
+## 10. What this release draws on, and what it does not
+
+The released panel contains researcher-compiled company financial-statement
+fields from publicly accessible **CODAL** disclosures, together with
+author-derived variables and annotations.
+
+**No TSETMC-derived and no World Bank-derived field is included in this
+release.** TSETMC market data was evaluated as a candidate predictor block and
+World Bank indicators were retrieved for a supplementary exploratory analysis;
+both belong to the wider study and neither contributes a released column. Two
+committed records establish this independently: the source registry marks
+`src_m2_tsetmc_market` as not collected, and none of the 115 columns in
+`RELEASE_COLUMN_DICTIONARY.csv` is a market-data or macroeconomic field.
+
+Earlier candidate 1.0.0-rc.2 carried a description implying all three providers
+fed the released values. That was wrong about this release and is corrected in
+1.0.0-rc.3; see `SOURCE_AND_LICENSE_NOTES.md`.
+
+## 11. The source-rights basis is a human author determination
 
 This candidate's rights position rests on a determination the **human author**
 supplied: that the source data used in the study were publicly and freely

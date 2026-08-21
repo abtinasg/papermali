@@ -201,6 +201,24 @@ Do not treat the three the same way.
 sha256sum -c SHA256SUMS.txt
 ```
 
-`release_manifest.json` additionally records, for every payload file, its byte
-size, SHA-256, role, source path within the study repository, and the reason it
-is included.
+`release_manifest.json` additionally records, for each of the **25 payload
+files**, its byte size, SHA-256, role, source path within the study repository,
+and the reason it is included.
+
+**Two counts, and they are not the same count.** `release_manifest.json`
+describes **25 payload files**. The archive contains **27 members**: those 25
+plus `release_manifest.json` and `SHA256SUMS.txt`. The last two are integrity
+records *about* the payload, so they are not themselves manifest payload files —
+the manifest deliberately excludes both, and `SHA256SUMS.txt` covers the payload
+and the manifest but never hashes itself. That is why the checksum file carries
+**26 lines**, not 27.
+
+## What the released columns are compiled from
+
+Every released value is either a researcher-compiled company
+financial-statement field transcribed from a publicly accessible CODAL
+disclosure, or a variable or annotation the authors derived from those fields.
+**No TSETMC-derived and no World Bank-derived field is included in this
+release**; those sources relate only to the wider study. Each row of
+`RELEASE_COLUMN_DICTIONARY.csv` states, per column, whether the value came from
+a provider line item or was author-derived.

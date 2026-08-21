@@ -1,7 +1,8 @@
 {
   "action_id": "stage130-dataset-release-candidate",
   "archive_format": "zip_stored_fixed_timestamps",
-  "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate_rc2.zip",
+  "archive_member_count": 27,
+  "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate_rc3.zip",
   "bundle_root": "tse_financial_distress_dataset_1392_1402",
   "column_documentation_authority": "RELEASE_COLUMN_DICTIONARY.csv documents all 115 released columns, one row each, and every row names the committed repository source its facts came from. documentation/part3c_column_role_map_stage125.csv remains the authoritative column SET and role contract, and the release dictionary is gated to match it exactly. documentation/data_dictionary_stage125.csv is the historical upstream-panel variable dictionary and covers only a subset; it ships unedited, and the difference is published above.",
   "counts_recomputed_from_rows": false,
@@ -10,6 +11,7 @@
   "doi": null,
   "doi_reserved": false,
   "file_count": 25,
+  "file_count_terminology": "25 files are described by release_manifest.json as payload files. The deterministic archive contains 27 members: those 25 payload files plus release_manifest.json and SHA256SUMS.txt, which are integrity records about the payload and are not themselves manifest payload files.",
   "files": [
     {
       "bundle_path": "CITATION.cff",
@@ -17,43 +19,43 @@
       "copied_byte_for_byte": true,
       "inclusion_reason": "Machine-readable citation metadata.",
       "role": "release_documentation",
-      "sha256": "1db919033d7bc35a9866ec6ced99a78cfc03b69a5f410faaa0f0e1a472e97d48",
+      "sha256": "1980444da5d74d147cd79c7225bdd738fcc52eb1370b0537f52dea2874979d6a",
       "source_path": "project/stage130/dataset_release_candidate/release_payload/CITATION.cff"
     },
     {
       "bundle_path": "DATA_DICTIONARY_AND_FILE_GUIDE.md",
-      "bytes": 10217,
+      "bytes": 11252,
       "copied_byte_for_byte": true,
       "inclusion_reason": "File-by-file guide mapping each payload file to its role, and how the release dictionary, the authoritative role map and the historical upstream dictionary relate to one another.",
       "role": "release_documentation",
-      "sha256": "5c3a58482c163ca573002bcc5909e266d31d451dfb27aa3e4108dbb97308e89f",
+      "sha256": "c33952548eb2b323705aaeff1e29b11981c18231146106c09aa4cde8e8552813",
       "source_path": "project/stage130/dataset_release_candidate/release_payload/DATA_DICTIONARY_AND_FILE_GUIDE.md"
     },
     {
       "bundle_path": "LICENSE_DATASET.txt",
-      "bytes": 2594,
+      "bytes": 2954,
       "copied_byte_for_byte": true,
       "inclusion_reason": "The CC BY 4.0 grant, scoped to what the authors actually hold rights in.",
       "role": "release_documentation",
-      "sha256": "7cb28bcd364c68544fa8e82345eefc09c32758fb2d2467444dd18da4cfa5d3da",
+      "sha256": "9d7a5eae6bd7600c12e809796633eed752c0e27d25ae03e44522f3a256696526",
       "source_path": "project/stage130/dataset_release_candidate/release_payload/LICENSE_DATASET.txt"
     },
     {
       "bundle_path": "LIMITATIONS.md",
-      "bytes": 7639,
+      "bytes": 8619,
       "copied_byte_for_byte": true,
       "inclusion_reason": "The limitations a reuser must know before drawing a conclusion from these files.",
       "role": "release_documentation",
-      "sha256": "932b818a87baabd5d176acfdde10fac4b611bfe747768a094ffbc29583db8132",
+      "sha256": "2a55860c490d7dfb8ab6dec3ab424158ca8d1164f3574d663a8e9435db73d876",
       "source_path": "project/stage130/dataset_release_candidate/release_payload/LIMITATIONS.md"
     },
     {
       "bundle_path": "README.md",
-      "bytes": 9565,
+      "bytes": 12715,
       "copied_byte_for_byte": true,
       "inclusion_reason": "Entry point: what the release is, which file is primary, and what it must not be read as.",
       "role": "release_documentation",
-      "sha256": "3b818d5ef1b2e9a478fd025b5c86d9650b84e675189a301960f7c3a17e657c45",
+      "sha256": "acef98cb29b0bf0fd1f832566538f459624d4341837ce8db91efe3ac2ebe1620",
       "source_path": "project/stage130/dataset_release_candidate/release_payload/README.md"
     },
     {
@@ -67,11 +69,11 @@
     },
     {
       "bundle_path": "SOURCE_AND_LICENSE_NOTES.md",
-      "bytes": 10590,
+      "bytes": 12799,
       "copied_byte_for_byte": true,
       "inclusion_reason": "Provider-by-provider source-use notes, the human author's source-rights determination recorded as a determination, and the historical record of which provider terms pages were never retrieved.",
       "role": "release_documentation",
-      "sha256": "38287553190d1e4235b421916c7fd529a129d9e0bd4880bd0ad1b7f3d2150a5e",
+      "sha256": "9d2824f1752421ecbdca06923c849afb926ddffd3c6caca8870af1a65800eac0",
       "source_path": "project/stage130/dataset_release_candidate/release_payload/SOURCE_AND_LICENSE_NOTES.md"
     },
     {
@@ -229,11 +231,11 @@
     },
     {
       "bundle_path": "zenodo_metadata_candidate.json",
-      "bytes": 7602,
+      "bytes": 11838,
       "copied_byte_for_byte": true,
       "inclusion_reason": "Proposed Zenodo deposition metadata. A CANDIDATE: no deposition exists, no DOI is reserved and publication is not authorized.",
       "role": "release_documentation",
-      "sha256": "8e949475072a2143b5f599dd0e43f20da21382f1abd52eda85dad1287f94a065",
+      "sha256": "4ab3d4f12425d6eea7fbf3074f02117c369eb1f65d5375ad775719cc60050126",
       "source_path": "project/stage130/dataset_release_candidate/release_payload/zenodo_metadata_candidate.json"
     }
   ],
@@ -244,10 +246,15 @@
     "release_manifest.json",
     "SHA256SUMS.txt"
   ],
-  "manifest_excludes_reason": "the manifest describes the payload; SHA256SUMS.txt then covers the payload AND the manifest. Neither hashes itself.",
-  "manifest_version": 2,
+  "manifest_excludes_reason": "the manifest describes the payload; SHA256SUMS.txt then covers the payload AND the manifest. Neither hashes itself. This is why file_count is 25 while the archive holds 27 members.",
+  "manifest_payload_file_count": 25,
+  "manifest_version": 3,
   "metrics_computed": 0,
   "models_fitted": 0,
+  "non_released_source_providers": [
+    "TSETMC",
+    "World Bank"
+  ],
   "prediction_artifacts_included": 0,
   "primary_file": "data/analysis_ready_main_rule_a_stage125.csv",
   "primary_file_column_count": 115,
@@ -300,7 +307,11 @@
       "frozen_generator_code": 44
     }
   },
-  "release_version": "1.0.0-rc.2",
+  "release_version": "1.0.0-rc.3",
+  "released_source_providers": [
+    "CODAL"
+  ],
+  "released_source_scope": "The released company-year panel contains researcher-compiled company financial-statement fields from publicly accessible CODAL disclosures, together with author-derived variables and annotations. No TSETMC- or World Bank-derived field is included in this release; those sources relate only to the wider study.",
   "role_counts": {
     "audit_surface_not_model_ready": 4,
     "committed_documentation": 9,
@@ -308,24 +319,68 @@
     "primary_modeling_surface": 1,
     "release_documentation": 8
   },
+  "sha256sums_line_count": 26,
   "source_pdfs_included": 0,
   "source_rights_basis": "human_author_determination",
   "source_rights_status": "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED",
   "supersedes": {
-    "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate.zip",
-    "archive_sha256": "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
-    "archive_size_bytes": 11657151,
+    "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate_rc2.zip",
+    "archive_sha256": "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+    "archive_size_bytes": 11808267,
+    "build_directory": "build/rc2",
+    "preserved_how": "rc.2 keeps its own archive filename and its own gitignored build directory (build/rc2/). rc.3 writes to a new filename under build/rc3/, so rc.2's archive and unpacked tree are never overwritten, renamed, rebuilt or deleted, and its recorded digest does not move. No commit was amended, squashed, rebased or force-pushed.",
+    "preserved_not_deleted": true,
     "public_release_authorized": false,
-    "publication_readiness_at_the_time": "NOT_READY_FOR_PUBLICATION",
+    "publication_readiness_at_the_time": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+    "superseded_by_version": "1.0.0-rc.3",
     "superseded_on_utc": "2026-08-21",
-    "superseded_reason": "The human author supplied a source-rights determination, and the release-specific column dictionary was completed from 25 of the 115 released columns to all 115.",
-    "version": "1.0.0-rc.1",
+    "superseded_reason": "rc.2's Zenodo description named all three study providers together as the sources of the released values. Only CODAL-derived, researcher-compiled company financial-statement fields and author-derived variables are released; no TSETMC- and no World Bank-derived field is. rc.3 corrects that sentence and makes the payload-file versus archive-member counts explicit.",
+    "version": "1.0.0-rc.2",
     "zenodo_deposition_created": false,
     "zenodo_doi_reserved": false,
     "zenodo_published": false,
     "zenodo_upload_performed": false
   },
+  "supersedes_history": [
+    {
+      "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate.zip",
+      "archive_sha256": "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
+      "archive_size_bytes": 11657151,
+      "build_directory": "build",
+      "preserved_how": "rc.1 keeps its own archive filename and its own gitignored build directory (build/). Later candidates write to new filenames under their own subdirectories, so rc.1's archive and unpacked tree are never overwritten, renamed, rebuilt or deleted. No commit was amended, squashed, rebased or force-pushed, so rc.1's record stands in the branch history exactly as it was written.",
+      "preserved_not_deleted": true,
+      "public_release_authorized": false,
+      "publication_readiness_at_the_time": "NOT_READY_FOR_PUBLICATION",
+      "superseded_by_version": "1.0.0-rc.2",
+      "superseded_on_utc": "2026-08-21",
+      "superseded_reason": "The human author supplied a source-rights determination, and the release-specific column dictionary was completed from 25 of the 115 released columns to all 115.",
+      "version": "1.0.0-rc.1",
+      "zenodo_deposition_created": false,
+      "zenodo_doi_reserved": false,
+      "zenodo_published": false,
+      "zenodo_upload_performed": false
+    },
+    {
+      "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate_rc2.zip",
+      "archive_sha256": "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+      "archive_size_bytes": 11808267,
+      "build_directory": "build/rc2",
+      "preserved_how": "rc.2 keeps its own archive filename and its own gitignored build directory (build/rc2/). rc.3 writes to a new filename under build/rc3/, so rc.2's archive and unpacked tree are never overwritten, renamed, rebuilt or deleted, and its recorded digest does not move. No commit was amended, squashed, rebased or force-pushed.",
+      "preserved_not_deleted": true,
+      "public_release_authorized": false,
+      "publication_readiness_at_the_time": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+      "superseded_by_version": "1.0.0-rc.3",
+      "superseded_on_utc": "2026-08-21",
+      "superseded_reason": "rc.2's Zenodo description named all three study providers together as the sources of the released values. Only CODAL-derived, researcher-compiled company financial-statement fields and author-derived variables are released; no TSETMC- and no World Bank-derived field is. rc.3 corrects that sentence and makes the payload-file versus archive-member counts explicit.",
+      "version": "1.0.0-rc.2",
+      "zenodo_deposition_created": false,
+      "zenodo_doi_reserved": false,
+      "zenodo_published": false,
+      "zenodo_upload_performed": false
+    }
+  ],
   "thresholds_derived": 0,
+  "tsetmc_derived_fields_included": false,
   "upstream_dictionary_coverage": {
     "dictionary_entries": 38,
     "dictionary_entries_not_released": 13,
@@ -333,6 +388,7 @@
     "released_columns_documented_in_data_dictionary": 25,
     "released_columns_not_in_data_dictionary": 90
   },
+  "world_bank_derived_fields_included": false,
   "zenodo_deposition_created": false,
   "zenodo_published": false,
   "zenodo_upload_performed": false

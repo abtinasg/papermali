@@ -27,7 +27,9 @@
     "thresholds_derived": 0,
     "zenodo_api_calls": 0,
     "scientific_recomputations": 0,
-    "released_row_values_read_for_analysis": 0
+    "released_row_values_read_for_analysis": 0,
+    "superseded_release_archives_modified": 0,
+    "rights_records_rewritten": 0
   },
   "credentials_included_in_candidate": 0,
   "data_access_mechanism_finalized_by_this_action": false,
@@ -74,11 +76,11 @@
   "zenodo_doi_reserved": false,
   "zenodo_published": false,
   "zenodo_upload_performed": false,
-  "release_version": "1.0.0-rc.2",
-  "supersedes_release_version": "1.0.0-rc.1",
-  "supersedes_release_archive_sha256": "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
-  "supersedes_release_archive_size_bytes": 11657151,
-  "supersedes_release_publication_readiness": "NOT_READY_FOR_PUBLICATION",
+  "release_version": "1.0.0-rc.3",
+  "supersedes_release_version": "1.0.0-rc.2",
+  "supersedes_release_archive_sha256": "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+  "supersedes_release_archive_size_bytes": 11808267,
+  "supersedes_release_publication_readiness": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
   "supersedes_release_preserved_not_deleted": true,
   "existing_commits_amended_squashed_rebased_or_force_pushed": 0,
   "source_rights_status": "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED",
@@ -99,5 +101,63 @@
   "release_column_dictionary_rows_recomputed_from_row_values": 0,
   "manuscript_human_submission_metadata_supplied": true,
   "manuscript_human_submission_metadata_applied_to_manuscript": false,
-  "manuscript_requires_post_doi_metadata_update_and_human_review": true
+  "manuscript_requires_post_doi_metadata_update_and_human_review": true,
+  "supersedes_release_history": [
+    {
+      "version": "1.0.0-rc.1",
+      "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate.zip",
+      "archive_sha256": "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
+      "archive_size_bytes": 11657151,
+      "publication_readiness_at_the_time": "NOT_READY_FOR_PUBLICATION",
+      "superseded_on_utc": "2026-08-21",
+      "superseded_by_version": "1.0.0-rc.2",
+      "superseded_reason": "Human author source-rights determination plus complete 115-column dictionary preparation.",
+      "build_directory": "build",
+      "preserved_not_deleted": true,
+      "zenodo_deposition_created": false,
+      "zenodo_upload_performed": false,
+      "zenodo_doi_reserved": false,
+      "zenodo_published": false,
+      "public_release_authorized": false,
+      "preserved_how": "rc.1 keeps its own archive filename and its own gitignored build directory (build/). Later candidates write to new filenames under their own subdirectories, so rc.1's archive and unpacked tree are never overwritten, renamed, rebuilt or deleted. No commit was amended, squashed, rebased or force-pushed, so rc.1's record stands in the branch history exactly as it was written."
+    },
+    {
+      "version": "1.0.0-rc.2",
+      "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate_rc2.zip",
+      "archive_sha256": "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+      "archive_size_bytes": 11808267,
+      "publication_readiness_at_the_time": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+      "superseded_on_utc": "2026-08-21",
+      "superseded_by_version": "1.0.0-rc.3",
+      "superseded_reason": "rc.2's Zenodo description named all three study providers together as the sources of the released values. Only CODAL-derived, researcher-compiled company financial-statement fields and author-derived variables are released; no TSETMC- and no World Bank-derived field is. rc.3 corrects that sentence and makes the payload-file versus archive-member counts explicit.",
+      "build_directory": "build/rc2",
+      "preserved_not_deleted": true,
+      "zenodo_deposition_created": false,
+      "zenodo_upload_performed": false,
+      "zenodo_doi_reserved": false,
+      "zenodo_published": false,
+      "public_release_authorized": false,
+      "preserved_how": "rc.2 keeps its own archive filename and its own gitignored build directory (build/rc2/). rc.3 writes to a new filename under build/rc3/, so rc.2's archive and unpacked tree are never overwritten, renamed, rebuilt or deleted, and its recorded digest does not move. No commit was amended, squashed, rebased or force-pushed."
+    }
+  ],
+  "superseded_archives_rebuilt_renamed_or_deleted_by_this_action": 0,
+  "superseded_recorded_digests_altered_by_this_action": 0,
+  "released_source_providers": [
+    "CODAL"
+  ],
+  "non_released_source_providers": [
+    "TSETMC",
+    "World Bank"
+  ],
+  "tsetmc_derived_fields_included_in_release": false,
+  "world_bank_derived_fields_included_in_release": false,
+  "released_source_scope_statement": "The released company-year panel contains researcher-compiled company financial-statement fields from publicly accessible CODAL disclosures, together with author-derived variables and annotations. No TSETMC- or World Bank-derived field is included in this release; those sources relate only to the wider study.",
+  "misleading_three_provider_release_scope_claim_present": false,
+  "manifest_payload_file_count": 25,
+  "archive_member_count": 27,
+  "sha256sums_line_count": 26,
+  "all_archive_members_described_as_manifest_payload_files": false,
+  "rights_matrix_rows_changed_by_this_action": 0,
+  "historical_rights_record_changed_by_this_action": false,
+  "human_supplied_statements_altered_by_this_action": 0
 }

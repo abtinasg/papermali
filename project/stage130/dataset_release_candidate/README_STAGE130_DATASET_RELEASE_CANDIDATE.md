@@ -1,7 +1,7 @@
 # Stage130 — Zenodo dataset Release Candidate
 
 **Action id:** `stage130-dataset-release-candidate`
-**Release version:** `1.0.0-rc.2` (supersedes `1.0.0-rc.1`)
+**Release version:** `1.0.0-rc.3` (supersedes `1.0.0-rc.2`, and through it `1.0.0-rc.1`)
 **Date:** 2026-08-21
 **Type:** preparation and documentation only
 
@@ -13,7 +13,45 @@ It built a deterministic, audit-ready Zenodo dataset Release Candidate from the
 eight frozen Stage125 Part 3C surfaces plus the committed documentation needed
 to read them, and recorded the governance boundary around it.
 
-`1.0.0-rc.2` adds two things to `1.0.0-rc.1`:
+`1.0.0-rc.3` corrects two descriptive defects in `1.0.0-rc.2`. Nothing
+scientific, no data value and no rights record changed.
+
+1. **The source-scope description was wrong.** rc.2's
+   `zenodo_metadata_candidate.json` named all three study providers together as
+   the sources of the released values. That implies material from every one of
+   them is in the release, which contradicts the committed
+   `source_rights_matrix.csv` — the matrix has recorded throughout that
+   CODAL-derived, researcher-compiled company financial fields are present, and
+   that **no TSETMC-derived and no World Bank-derived field is**. The
+   superseded wording is quoted verbatim in exactly one place,
+   `stage130_dataset_release_candidate_decision.json` under
+   `rc3_correction.previous_statement`, so the correction can be audited
+   without the false sentence circulating anywhere else. The corrected
+   statement is:
+
+   > The released company-year panel contains researcher-compiled company
+   > financial-statement fields from publicly accessible CODAL disclosures,
+   > together with author-derived variables and annotations. No TSETMC- or
+   > World Bank-derived field is included in this release; those sources relate
+   > only to the wider study.
+
+   The old sentence cannot come back: `FORBIDDEN_RELEASE_SCOPE_CLAIMS` and
+   `gate_release_scope_statements` in the builder, and
+   `_stage130_rc_assert_no_misleading_release_scope_claim` in the Handoff
+   deriver, both fail closed on it and on any newly worded sentence asserting
+   that TSETMC- or World Bank-derived material is released.
+
+2. **The file counts were ambiguous.** rc.2's package metadata published a
+   single `bundle_payload_file_count` of `27`, which read as "27 manifest
+   payload files" and was wrong. rc.3 publishes the two counts under two names:
+   **25** files are described by `release_manifest.json` as payload files, and
+   the deterministic archive contains **27 members** — those 25 plus
+   `release_manifest.json` and `SHA256SUMS.txt`, which are integrity records
+   about the payload and are not themselves manifest payload files.
+   `SHA256SUMS.txt` covers the payload and the manifest but never itself, so it
+   carries **26** lines.
+
+`1.0.0-rc.2` itself added two things to `1.0.0-rc.1`, and that remains true:
 
 1. the **human author's source-rights determination**, recorded as a
    determination by the author and never as a verification of any provider's
@@ -46,8 +84,8 @@ recorded **CODAL** as a blocking provider: its published terms of use could not
 be retrieved from the audit environment on 2026-08-21 — `https://www.codal.ir/`
 and `https://www.codal.ir/Rules.aspx` both timed out with no HTTP response.
 
-**That historical fact is unchanged and preserved in full.** No CODAL or TSETMC
-terms page has been retrieved or read, then or since. The matrix still records
+**That historical fact is unchanged and preserved in full, through rc.3.** No
+CODAL or TSETMC terms page has been retrieved or read, then or since. The matrix still records
 their stated terms as `NOT_VERIFIED`, and
 `provider_terms_independently_retrieved` and
 `provider_terms_independently_verified` are both `no`.
@@ -66,7 +104,11 @@ It is a determination **by the author** — not a provider licence, not an
 independent verification of anyone's terms, and not a legal opinion. The
 generator and the Handoff deriver both refuse to build if any artifact in this
 package asserts otherwise; the forbidden phrasings are enumerated in
-`FORBIDDEN_RIGHTS_CLAIMS`.
+`FORBIDDEN_RIGHTS_CLAIMS`. A second, separate sweep — `FORBIDDEN_RELEASE_SCOPE_CLAIMS`
+and the sentence classifier behind `gate_release_scope_statements` — refuses any
+claim that TSETMC- or World Bank-derived material is in the release. The two
+gates are independent: one protects the rights record, the other protects the
+composition record, and neither can be satisfied by the other passing.
 
 `READY_FOR_EXACT_DIGEST_HUMAN_REVIEW` means one thing: a human is being asked to
 read the exact archive SHA-256 and decide. It is **not** `PUBLISHED`, **not**
@@ -81,6 +123,42 @@ TSETMC and World Bank do not block: no field from either is in the release. The
 World Bank's CC BY 4.0 licence was verified directly
 (`https://datacatalog.worldbank.org/public-licenses`, HTTP 200, 2026-08-21) —
 that provider, and only that provider, was actually read.
+
+## What the release actually contains
+
+| | |
+|---|---|
+| Providers contributing a released field | **CODAL** only |
+| Providers relating to the wider study only | **TSETMC**, **World Bank** |
+| TSETMC-derived fields included | **no** |
+| World Bank-derived fields included | **no** |
+| Original provider files redistributed | **no** |
+
+The released company-year panel contains researcher-compiled company
+financial-statement fields from publicly accessible CODAL disclosures, together
+with author-derived variables and annotations. No TSETMC- or World Bank-derived
+field is included in this release; those sources relate only to the wider study.
+
+Two committed records establish the exclusions independently: the Stage125
+source registry marks `src_m2_tsetmc_market` as `pending_part3` / not collected,
+and none of the 115 columns in the role map is a market-data or macroeconomic
+field.
+
+## Two file counts, named apart
+
+| | |
+|---|---|
+| Files described by `release_manifest.json` as payload files | **25** |
+| Members in the deterministic archive | **27** |
+| Lines in `SHA256SUMS.txt` | **26** |
+
+The archive's 27 members are the 25 payload files plus `release_manifest.json`
+and `SHA256SUMS.txt`. Those two are integrity records *about* the payload: the
+manifest deliberately excludes itself and the checksum file, and the checksum
+file covers the payload and the manifest but never hashes itself. **Describing
+all 27 as manifest payload files would be wrong**, and no surface in this
+package does. `gate_file_count_terminology` derives all three numbers from the payload it
+actually built and stops the build if any published figure disagrees.
 
 ## The 115-column release dictionary
 
@@ -139,22 +217,27 @@ data-access wording additionally depends on a DOI that does not exist. The
 approved manuscript stays byte-identical, and the deriver re-derives both its
 blob id and its SHA-256 to prove it.
 
-## Preserving 1.0.0-rc.1
+## Preserving 1.0.0-rc.1 and 1.0.0-rc.2
 
-`1.0.0-rc.1` is superseded, not deleted:
+Both predecessors are superseded, not deleted. The chain is recorded on the
+decision, the manifest and the package metadata under `supersedes_history`:
 
-| | |
-|---|---|
-| Version | `1.0.0-rc.1` |
-| Archive | `tse_financial_distress_dataset_1392_1402_release_candidate.zip` |
-| SHA-256 | `6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45` |
-| Bytes | `11657151` |
-| Readiness at the time | `NOT_READY_FOR_PUBLICATION` |
-| Superseded because | human author source-rights determination plus complete 115-column dictionary preparation |
+| | `1.0.0-rc.1` | `1.0.0-rc.2` |
+|---|---|---|
+| Archive | `..._release_candidate.zip` | `..._release_candidate_rc2.zip` |
+| SHA-256 | `6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45` | `d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373` |
+| Bytes | `11657151` | `11808267` |
+| Readiness at the time | `NOT_READY_FOR_PUBLICATION` | `READY_FOR_EXACT_DIGEST_HUMAN_REVIEW` |
+| Build directory | `build/` | `build/rc2/` |
+| Superseded by | `1.0.0-rc.2` | `1.0.0-rc.3` |
+| Superseded because | human author source-rights determination plus complete 115-column dictionary preparation | misleading three-provider source-scope description, and ambiguous payload-file versus archive-member counts |
+| Deposited on Zenodo | **never** | **never** |
 
-`rc.2` builds under a **new filename** into a **new build subdirectory**
-(`build/rc2/`), so rc.1's archive and unpacked tree are untouched. No commit was
-amended, squashed, rebased or force-pushed.
+`rc.3` builds under a **new filename**
+(`tse_financial_distress_dataset_1392_1402_release_candidate_rc3.zip`) into a
+**new build subdirectory** (`build/rc3/`), so neither predecessor's archive nor
+unpacked tree is overwritten, renamed or deleted, and neither recorded digest
+moves. No commit was amended, squashed, rebased or force-pushed.
 
 ## Package contents
 
@@ -163,7 +246,7 @@ amended, squashed, rebased or force-pushed.
 | `stage130_dataset_release_candidate_decision.json` | The human decision, the human-supplied release metadata, and the source-rights audit summary |
 | `stage130_dataset_release_candidate_governance_boundary.json` | Every boundary and every zeroed counter |
 | `release_manifest.json` | Per-file bundle path, byte size, SHA-256, role, source path and inclusion reason |
-| `SHA256SUMS.txt` | `sha256sum`-compatible checksums for the bundle payload |
+| `SHA256SUMS.txt` | `sha256sum`-compatible checksums: 26 lines covering the 25 payload files plus `release_manifest.json` |
 | `source_rights_matrix.csv` | Provider-by-provider rights audit |
 | `metadata_and_hashes_stage130_dataset_release_candidate.json` | Hashes of this package's own files, and the archive digest |
 | `release_payload/` | The release-specific documents copied byte-for-byte into the bundle |
@@ -183,7 +266,7 @@ To regenerate the three committed package records — `release_manifest.json`,
 python project/src/stage130_dataset_release_candidate.py --write-records
 ```
 
-Output goes to `project/stage130/dataset_release_candidate/build/rc2/`, which is
+Output goes to `project/stage130/dataset_release_candidate/build/rc3/`, which is
 **gitignored** (the whole `build/` tree is). The archive is never tracked; the builder, its inputs, the
 manifest and the checksums are, so the bundle is reproducible from Git without
 the repository carrying a second copy of the frozen CSVs.

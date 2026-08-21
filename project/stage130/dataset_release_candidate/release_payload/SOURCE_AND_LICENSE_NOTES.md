@@ -12,10 +12,41 @@ recorded as a human determination and never re-described as verification.
 
 ## Disposition: READY_FOR_EXACT_DIGEST_HUMAN_REVIEW
 
-Release candidate **1.0.0-rc.2**. It supersedes 1.0.0-rc.1, which was marked
-`NOT_READY_FOR_PUBLICATION`.
+Release candidate **1.0.0-rc.3**. It supersedes 1.0.0-rc.2, which in turn
+superseded 1.0.0-rc.1 (marked `NOT_READY_FOR_PUBLICATION`). Both predecessors
+are preserved, not deleted.
 
-What changed is **not** that anyone verified CODAL's terms. Nobody did, and
+### What 1.0.0-rc.3 corrected, and what it did not touch
+
+1.0.0-rc.2's Zenodo description named all three study providers together as
+the sources of the released values. As a statement about **this release** that
+is false, and it contradicted the very matrix below. The superseded wording is
+preserved verbatim in the study repository's decision record, so the correction
+stays auditable without reproducing a false statement here. rc.3 replaces it
+with what the matrix has said throughout:
+
+> The released company-year panel contains researcher-compiled company
+> financial-statement fields from publicly accessible CODAL disclosures,
+> together with author-derived variables and annotations. **No TSETMC- or
+> World Bank-derived field is included in this release**; those sources relate
+> only to the wider study.
+
+That correction is about **composition**, not about rights. **No rights record
+changed.** No CODAL or TSETMC terms page has been retrieved or read — then, in
+rc.2, or since; their stated terms are still `NOT_VERIFIED`; the CODAL row still
+carries its rc.1 `BLOCKS_PUBLICATION` as `superseded_release_disposition`; and
+the basis of this release is still the human author's determination, never a
+verification. Both the builder and the Handoff generator now fail closed on any
+recurrence of the superseded three-provider sentence, and on any new sentence
+asserting that TSETMC- or World Bank-derived material is in the release.
+
+rc.3 also made the file counts unambiguous: `release_manifest.json` describes
+**25 payload files**, while the archive holds **27 members** — those 25 plus
+`release_manifest.json` and `SHA256SUMS.txt`.
+
+### The rights position itself
+
+What changed in rc.2 was **not** that anyone verified CODAL's terms. Nobody did, and
 §"What was and was not established" below still says so in full. What changed is
 that the **human author supplied a source-rights determination** for the data
 used in this study, and that determination — not an agent inference, and not a
@@ -39,6 +70,12 @@ Supplied by the human author, verbatim:
 
 Operationally, and as it applies to this release:
 
+0. **Scope.** The determination covers all source data used in the wider study.
+   What this release actually distributes is narrower: researcher-compiled
+   company financial-statement fields from publicly accessible CODAL
+   disclosures, plus author-derived variables and annotations. No TSETMC- and
+   no World Bank-derived field is in it. The two facts are separate and neither
+   implies the other.
 1. All source data used in the study were **publicly and freely accessible**.
 2. **No purchased, confidential, personal or human-participant data** were used.
 3. The human author determines that **public redistribution of the
@@ -57,7 +94,8 @@ Operationally, and as it applies to this release:
 It is **not** a provider licence, **not** an independent verification of any
 provider's published terms, and **not** a legal opinion. No CODAL or TSETMC
 terms page was retrieved or read at any point in preparing either release
-candidate, and none has been read since. This file does not assert that CODAL's
+candidate, and none has been read since — through 1.0.0-rc.3 inclusive. This
+file does not assert that CODAL's
 terms are open, that they were verified, or that they permit redistribution. It
 asserts only what the human author determined, and attributes it to them.
 
@@ -167,7 +205,7 @@ truthful one.
 Nothing was removed from the payload and no frozen value was altered at any
 point: `columns_removed_to_avoid_the_blocker = 0` and
 `frozen_values_altered_to_avoid_the_blocker = 0` in the decision record, for
-both 1.0.0-rc.1 and 1.0.0-rc.2.
+1.0.0-rc.1, 1.0.0-rc.2 and 1.0.0-rc.3.
 
 ---
 

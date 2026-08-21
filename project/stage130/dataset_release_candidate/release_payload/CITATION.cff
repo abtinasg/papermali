@@ -26,7 +26,7 @@ contact:
     given-names: "Abtin"
     email: "abtinsag@gmail.com"
 license: CC-BY-4.0
-version: "1.0.0-rc.2"
+version: "1.0.0-rc.3"
 keywords:
   - financial distress
   - bankruptcy prediction

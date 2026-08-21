@@ -1,4 +1,4 @@
-"""Stage130 — the deterministic Zenodo dataset Release Candidate (1.0.0-rc.2).
+"""Stage130 — the deterministic Zenodo dataset Release Candidate (1.0.0-rc.3).
 
 Custody only. These tests pin:
 
@@ -17,9 +17,17 @@ Custody only. These tests pin:
   * that the rights position is recorded as the HUMAN AUTHOR'S DETERMINATION
     and never as a verification of a provider's published terms, which nobody
     ever retrieved: no artifact in the package may claim otherwise;
-  * that rc.1 is preserved as superseded history — its digest, its byte size
-    and its NOT_READY_FOR_PUBLICATION status intact — and that rc.2 builds
-    under a NEW filename so rc.1 is neither overwritten nor deleted;
+  * that rc.1 AND rc.2 are preserved as immutable superseded history — every
+    digest, byte size and readiness intact on all three surfaces — and that
+    rc.3 builds under a NEW filename so neither predecessor is overwritten,
+    renamed, rebuilt or deleted;
+  * that no surface claims TSETMC-derived or World Bank-derived fields are in
+    the release, that the superseded three-provider sentence cannot recur, and
+    that the human author's wider-study statement is nevertheless preserved
+    verbatim rather than swept away;
+  * that the two file counts stay distinct — 25 files described by
+    `release_manifest.json` as payload files, 27 members in the archive — and
+    that nothing describes all 27 as manifest payload files;
   * that the six human submission items are recorded as SUPPLIED but NOT
     APPLIED to the byte-pinned manuscript, and that neither half can be
     dropped;
@@ -80,11 +88,58 @@ NEXT_POINTER_SCOPE = (
     "authorized")
 SUPERSEDED_POINTER = "human-manuscript-submission-metadata"
 PROVIDERS = ("CODAL", "TSETMC", "World Bank")
-RELEASE_VERSION = "1.0.0-rc.2"
-SUPERSEDED_VERSION = "1.0.0-rc.1"
+RELEASE_VERSION = "1.0.0-rc.3"
+#: The immediate predecessor.
+SUPERSEDED_VERSION = "1.0.0-rc.2"
 SUPERSEDED_SHA256 = (
-    "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45")
-SUPERSEDED_BYTES = 11657151
+    "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373")
+SUPERSEDED_BYTES = 11808267
+SUPERSEDED_READINESS = "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW"
+#: The full chain, oldest first, restated independently of both the builder and
+#: the deriver so a silent edit to either cannot also edit the expectation.
+SUPERSEDE_CHAIN = (
+    {
+        "version": "1.0.0-rc.1",
+        "archive_name":
+            "tse_financial_distress_dataset_1392_1402_release_candidate.zip",
+        "archive_sha256":
+            "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
+        "archive_size_bytes": 11657151,
+        "publication_readiness_at_the_time": "NOT_READY_FOR_PUBLICATION",
+        "superseded_by_version": "1.0.0-rc.2",
+    },
+    {
+        "version": "1.0.0-rc.2",
+        "archive_name": "tse_financial_distress_dataset_1392_1402_release_"
+                        "candidate_rc2.zip",
+        "archive_sha256":
+            "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+        "archive_size_bytes": 11808267,
+        "publication_readiness_at_the_time":
+            "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+        "superseded_by_version": "1.0.0-rc.3",
+    },
+)
+#: The two counts, restated independently.
+MANIFEST_PAYLOAD_FILE_COUNT = 25
+ARCHIVE_MEMBER_COUNT = 27
+SHA256SUMS_LINE_COUNT = 26
+NON_PAYLOAD_MEMBERS = ("release_manifest.json", "SHA256SUMS.txt")
+#: The corrected release-scope statement, restated independently.
+RELEASED_SOURCE_SCOPE = (
+    "The released company-year panel contains researcher-compiled company "
+    "financial-statement fields from publicly accessible CODAL disclosures, "
+    "together with author-derived variables and annotations. No TSETMC- or "
+    "World Bank-derived field is included in this release; those sources "
+    "relate only to the wider study.")
+RELEASED_PROVIDERS = ("CODAL",)
+NON_RELEASED_PROVIDERS = ("TSETMC", "World Bank")
+#: The human author's wider-study statement, pinned so a test proves it was
+#: preserved rather than reworded by the scope correction.
+HUMAN_GOVERNANCE_STATEMENT = (
+    "All underlying data were obtained from publicly accessible sources such "
+    "as CODAL, TSETMC and the World Bank. No purchased, confidential, "
+    "personal or human-participant data were used.")
 READINESS = "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW"
 RIGHTS_STATUS = "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED"
 #: Restated independently of the builder so a silent edit to its tuple cannot
@@ -1176,7 +1231,7 @@ def test_denying_that_the_metadata_was_supplied_breaks_the_build(tmp_path):
 # rc.2, and the rc.1 it supersedes without deleting
 # --------------------------------------------------------------------------- #
 
-def test_the_release_is_rc2(decision, manifest, metadata, state):
+def test_the_release_is_rc3(decision, manifest, metadata, state):
     assert decision["release_version"] == RELEASE_VERSION
     assert manifest["release_version"] == RELEASE_VERSION
     assert metadata["release_version"] == RELEASE_VERSION
@@ -1185,15 +1240,15 @@ def test_the_release_is_rc2(decision, manifest, metadata, state):
     assert rc.RELEASE_VERSION == RELEASE_VERSION
 
 
-def test_rc1_is_recorded_as_superseded_history(decision, manifest, metadata,
-                                               state):
+def test_rc2_is_recorded_as_the_immediate_superseded_predecessor(
+        decision, manifest, metadata, state):
     for source in (decision["supersedes_release"], manifest["supersedes"],
                    metadata["supersedes"]):
         assert source["version"] == SUPERSEDED_VERSION
         assert source["archive_sha256"] == SUPERSEDED_SHA256
         assert source["archive_size_bytes"] == SUPERSEDED_BYTES
         assert source["publication_readiness_at_the_time"] == \
-            "NOT_READY_FOR_PUBLICATION"
+            SUPERSEDED_READINESS
         for field in ("zenodo_deposition_created", "zenodo_upload_performed",
                       "zenodo_doi_reserved", "zenodo_published",
                       "public_release_authorized"):
@@ -1207,14 +1262,23 @@ def test_rc1_is_recorded_as_superseded_history(decision, manifest, metadata,
         is True
 
 
-def test_rc2_builds_under_a_new_filename_so_rc1_is_not_overwritten(manifest,
-                                                                   metadata):
+def test_rc3_builds_under_a_new_filename_so_no_predecessor_is_overwritten(
+        manifest, metadata):
     assert manifest["archive_name"] != manifest["supersedes"]["archive_name"]
-    assert manifest["archive_name"].endswith("_rc2.zip")
+    assert manifest["archive_name"].endswith("_rc3.zip")
     assert rc.ARCHIVE_NAME == manifest["archive_name"]
-    assert "build/rc2" in metadata[
+    assert "build/rc3" in metadata[
         "archive_build_path_relative_to_repo_root"]
     assert rc.SUPERSEDED_RELEASE["archive_name"] != rc.ARCHIVE_NAME
+    # Neither predecessor's filename or build directory is reused, so their
+    # archives and unpacked trees survive on disk untouched.
+    for record in SUPERSEDE_CHAIN:
+        assert manifest["archive_name"] != record["archive_name"]
+    assert len({record["archive_name"] for record in SUPERSEDE_CHAIN}) == \
+        len(SUPERSEDE_CHAIN)
+    assert {r["build_directory"] for r in rc.SUPERSEDED_RELEASES} == \
+        {"build", "build/rc2"}
+    assert rc.BUILD_SUBDIR not in {"build", "build/rc2"}
 
 
 def test_no_commit_was_amended_squashed_rebased_or_force_pushed(decision,
@@ -1506,3 +1570,621 @@ def test_every_committed_package_path_is_change_allowlisted():
     for rel in ("project/src/stage130_dataset_release_candidate.py",
                 "project/tests/test_stage130_dataset_release_candidate.py"):
         assert gen.path_allowlisted(rel), rel
+
+
+# --------------------------------------------------------------------------- #
+# rc.3 — the released source scope, and the sentences that would misstate it
+# --------------------------------------------------------------------------- #
+#
+# The committed rights matrix is the authority: CODAL-derived,
+# researcher-compiled company financial fields are released; no TSETMC-derived
+# and no World Bank-derived field is. rc.2 shipped a description implying all
+# three providers fed the released values. These tests pin the correction and
+# make its recurrence impossible.
+
+def test_the_rights_matrix_records_no_tsetmc_or_world_bank_field_released():
+    """The authority the correction rests on, read directly."""
+    with open(os.path.join(REPO_ROOT, MATRIX_REL), encoding="utf-8-sig",
+              newline="") as fh:
+        rows = {row["provider"]: row for row in csv.DictReader(fh)}
+    for provider in NON_RELEASED_PROVIDERS:
+        used = rows[provider]["type_of_information_used_in_this_release"]
+        assert used.strip().upper().startswith("NONE"), (
+            f"{provider} must contribute NOTHING to this release, got {used!r}")
+    assert rows["CODAL"]["type_of_information_used_in_this_release"].strip()
+    assert rows["CODAL"]["only_researcher_compiled_factual_fields_included"] \
+        == "yes"
+
+
+def test_every_surface_states_the_released_source_scope(decision, boundary,
+                                                        manifest, state):
+    assert decision["released_source_scope"]["statement"] == \
+        RELEASED_SOURCE_SCOPE
+    assert manifest["released_source_scope"] == RELEASED_SOURCE_SCOPE
+    assert boundary["released_source_scope_statement"] == \
+        RELEASED_SOURCE_SCOPE
+    assert state["stage130_dataset_release_candidate_released_source_scope"] \
+        == RELEASED_SOURCE_SCOPE
+    assert rc.RELEASED_SOURCE_SCOPE_STATEMENT == RELEASED_SOURCE_SCOPE
+    for source in (
+            tuple(decision["released_source_scope"][
+                "released_source_providers"]),
+            tuple(manifest["released_source_providers"]),
+            tuple(boundary["released_source_providers"]),
+            tuple(state[
+                "stage130_dataset_release_candidate_released_source_"
+                "providers"]),
+            rc.RELEASED_SOURCE_PROVIDERS):
+        assert source == RELEASED_PROVIDERS
+    for source in (
+            tuple(decision["released_source_scope"][
+                "non_released_source_providers"]),
+            tuple(manifest["non_released_source_providers"]),
+            tuple(boundary["non_released_source_providers"]),
+            tuple(state[
+                "stage130_dataset_release_candidate_non_released_source_"
+                "providers"]),
+            rc.NON_RELEASED_SOURCE_PROVIDERS):
+        assert source == NON_RELEASED_PROVIDERS
+
+
+def test_no_surface_claims_tsetmc_or_world_bank_fields_are_included(
+        decision, boundary, manifest, metadata, state):
+    assert decision["released_source_scope"][
+        "tsetmc_derived_fields_included"] is False
+    assert decision["released_source_scope"][
+        "world_bank_derived_fields_included"] is False
+    for source in (manifest, metadata):
+        assert source["tsetmc_derived_fields_included"] is False
+        assert source["world_bank_derived_fields_included"] is False
+    assert boundary["tsetmc_derived_fields_included_in_release"] is False
+    assert boundary["world_bank_derived_fields_included_in_release"] is False
+    assert state["stage130_dataset_release_candidate_tsetmc_fields_included"] \
+        is False
+    assert state[
+        "stage130_dataset_release_candidate_world_bank_fields_included"] \
+        is False
+
+
+def test_the_payload_never_asserts_tsetmc_or_world_bank_material_is_released(
+        payload):
+    """Every shipped byte, swept — prose as well as flags."""
+    for name, data in sorted(payload.items()):
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError:
+            continue
+        assert rc.find_release_scope_violations(text) == [], name
+
+
+def test_the_committed_package_never_asserts_it_either():
+    gen._stage130_rc_assert_no_misleading_release_scope_claim(REPO_ROOT)
+
+
+@pytest.mark.parametrize("claim", [
+    "All values were compiled by the authors from publicly accessible sources "
+    "including CODAL, TSETMC and the World Bank.",
+    "<p>Compiled from publicly accessible sources including CODAL, TSETMC and "
+    "the World Bank.</p>",
+    "Values were drawn from CODAL, TSETMC and the World Bank.",
+    "All underlying values come from publicly accessible sources such as "
+    "CODAL, TSETMC and the World Bank.",
+])
+def test_the_superseded_three_provider_sentence_is_rejected(claim):
+    """The exact rc.2 sentence, and re-typings of it, in either guard."""
+    assert rc.find_release_scope_violations(claim), claim
+    assert gen._stage130_rc_scope_violations(claim), claim
+
+
+@pytest.mark.parametrize("claim", [
+    "This release includes TSETMC market data for every company-year.",
+    "The released columns include World Bank macroeconomic indicators.",
+    "This bundle contains TSETMC daily prices alongside the statement fields.",
+    "The released panel is built from CODAL filings and TSETMC market data.",
+    "World Bank indicators are included in this release.",
+])
+def test_a_newly_worded_inclusion_claim_is_rejected_too(claim):
+    """Not just the known sentence: any assertion of the same falsehood."""
+    assert rc.find_release_scope_violations(claim), claim
+    assert gen._stage130_rc_scope_violations(claim), claim
+
+
+@pytest.mark.parametrize("sentence", [
+    RELEASED_SOURCE_SCOPE,
+    "No TSETMC-derived and no World Bank-derived field is in this release.",
+    "Type of information used in this release: NONE - no TSETMC-derived field "
+    "is in this release.",
+    "TSETMC market data was evaluated as a candidate predictor block in the "
+    "wider study.",
+    "The World Bank's CC BY 4.0 licence permits distribution in any format "
+    "for any purpose including commercial use.",
+])
+def test_truthful_and_historical_statements_are_not_rejected(sentence):
+    """The guard must not sweep away the sentences that are actually true."""
+    assert rc.find_release_scope_violations(sentence) == [], sentence
+    assert gen._stage130_rc_scope_violations(sentence) == [], sentence
+
+
+def test_the_human_statement_is_exempt_by_location_not_by_wording():
+    """The carve-out is a named field, not a hole in the pattern.
+
+    Read as a claim about THIS release the human's sentence would offend, and
+    in isolation the sweep says so. It is tolerated only where it actually
+    lives -- the decision artifact's
+    ``human_supplied_data_governance_facts.statement`` -- because there it is a
+    record of what a person said about the wider study. Put the same words
+    anywhere else and the guard fires.
+    """
+    assert rc.find_release_scope_violations(HUMAN_GOVERNANCE_STATEMENT)
+    assert gen._stage130_rc_scope_violations(HUMAN_GOVERNANCE_STATEMENT)
+    # ...yet the committed package, which contains it, passes.
+    gen._stage130_rc_assert_no_misleading_release_scope_claim(REPO_ROOT)
+
+
+def test_the_human_statement_pasted_elsewhere_breaks_the_build(tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    boundary = _read(BOUNDARY_REL)
+    boundary["released_source_scope_note"] = HUMAN_GOVERNANCE_STATEMENT
+    _write_json(root, BOUNDARY_REL, boundary)
+    with pytest.raises(gen.HandoffError,
+                       match="misstates the released source scope"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_a_misleading_claim_added_to_the_payload_breaks_the_build(payload):
+    poisoned = dict(payload)
+    poisoned["README.md"] = (
+        b"# Release\n\nThis release includes TSETMC market data.\n")
+    with pytest.raises(rc.Stage130ReleaseError,
+                       match="misstates the released source scope"):
+        rc.gate_release_scope_statements(poisoned)
+
+
+def test_a_misleading_claim_added_to_the_package_breaks_the_handoff(tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    decision = _read(DECISION_REL)
+    decision["release_candidate_conflict_resolution"] = (
+        "The released panel is compiled from CODAL, TSETMC and the World "
+        "Bank.")
+    _write_json(root, DECISION_REL, decision)
+    with pytest.raises(gen.HandoffError,
+                       match="misstates the released source scope"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_dropping_the_scope_statement_breaks_the_build(tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    decision = _read(DECISION_REL)
+    decision["released_source_scope"]["statement"] = \
+        "Compiled from publicly accessible sources."
+    _write_json(root, DECISION_REL, decision)
+    with pytest.raises(gen.HandoffError, match="released source scope"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_claiming_a_non_released_provider_contributes_breaks_the_build(
+        tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    decision = _read(DECISION_REL)
+    decision["released_source_scope"]["tsetmc_derived_fields_included"] = True
+    _write_json(root, DECISION_REL, decision)
+    with pytest.raises(gen.HandoffError,
+                       match="tsetmc_derived_fields_included"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_flipping_the_matrix_to_release_a_tsetmc_field_breaks_the_build(
+        tmp_path):
+    """The scope statement and the matrix move together, or not at all."""
+    root = _clone_repo_shim(tmp_path)
+    with open(os.path.join(REPO_ROOT, MATRIX_REL), encoding="utf-8-sig",
+              newline="") as fh:
+        rows = {row["provider"]: dict(row) for row in csv.DictReader(fh)}
+    rows["TSETMC"]["type_of_information_used_in_this_release"] = \
+        "Daily market prices keyed to company and fiscal year"
+    _write_matrix(root, rows)
+    with pytest.raises(gen.HandoffError, match="NONE"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+# --------------------------------------------------------------------------- #
+# rc.3 — the correction record, and what it may not have touched
+# --------------------------------------------------------------------------- #
+
+def test_the_correction_records_what_it_corrected(decision):
+    correction = decision["rc3_correction"]
+    assert correction["corrected_statement"] == RELEASED_SOURCE_SCOPE
+    assert correction["previous_statement"].strip()
+    # The superseded sentence is quoted in exactly ONE place, so the
+    # correction stays auditable without the false statement circulating.
+    assert "TSETMC" in correction["previous_statement"]
+    assert "World Bank" in correction["previous_statement"]
+
+
+def test_the_superseded_sentence_appears_in_exactly_one_committed_field():
+    quoted = _read(DECISION_REL)["rc3_correction"]["previous_statement"]
+    pkg = os.path.join(REPO_ROOT, PKG_REL)
+    hits = []
+    for dirpath, dirnames, filenames in os.walk(pkg):
+        dirnames[:] = [d for d in dirnames if d != "build"]
+        for name in sorted(filenames):
+            path = os.path.join(dirpath, name)
+            try:
+                with open(path, encoding="utf-8") as fh:
+                    text = fh.read()
+            except (UnicodeDecodeError, OSError):
+                continue
+            if quoted in text or json.dumps(quoted, ensure_ascii=False)[1:-1] \
+                    in text:
+                hits.append(os.path.relpath(path, REPO_ROOT))
+    assert hits == [DECISION_REL], hits
+
+
+def test_the_correction_changed_no_rights_record(decision, boundary, state):
+    correction = decision["rc3_correction"]
+    for field in ("historical_rights_record_changed",
+                  "provider_terms_retrieved_by_this_correction",
+                  "provider_terms_verified_by_this_correction",
+                  "codal_or_tsetmc_terms_claimed_retrieved_or_verified"):
+        assert correction[field] is False, field
+    for field in ("data_values_changed", "frozen_surface_bytes_changed",
+                  "manuscript_bytes_changed", "rights_matrix_rows_changed",
+                  "human_supplied_statements_altered",
+                  "superseded_candidates_altered",
+                  "superseded_archives_rebuilt_renamed_or_deleted"):
+        assert correction[field] == 0, field
+    assert boundary["historical_rights_record_changed_by_this_action"] is False
+    assert boundary["rights_matrix_rows_changed_by_this_action"] == 0
+    assert boundary["human_supplied_statements_altered_by_this_action"] == 0
+    assert state[
+        "stage130_dataset_release_candidate_rights_record_changed_by_"
+        "correction"] is False
+
+
+def test_the_preserved_rights_flags_are_untouched_by_rc3(decision, boundary,
+                                                         manifest, state):
+    """The four things the correction was forbidden to move."""
+    assert decision["source_rights_status"] == RIGHTS_STATUS
+    assert boundary["source_rights_status"] == RIGHTS_STATUS
+    assert state["stage130_dataset_release_candidate_rights_status"] == \
+        RIGHTS_STATUS
+    assert manifest["provider_terms_independently_retrieved"] is False
+    assert manifest["provider_terms_independently_verified"] is False
+    assert state[
+        "stage130_dataset_release_candidate_provider_terms_retrieved"] is False
+    assert state[
+        "stage130_dataset_release_candidate_provider_terms_verified"] is False
+    determination = decision["human_supplied_source_rights_determination"]
+    assert determination["supplied_by"] == "human"
+    assert determination["independently_inferred_by_the_agent"] is False
+    assert determination["is_a_legal_opinion"] is False
+    assert determination[
+        "is_an_independent_verification_of_provider_terms"] is False
+
+
+def test_the_human_wider_study_statement_is_preserved_verbatim(decision):
+    """A record of what a person said is not the agent's to reword."""
+    assert decision["human_supplied_data_governance_facts"]["statement"] == \
+        HUMAN_GOVERNANCE_STATEMENT
+    assert gen._STAGE130_RC_HUMAN_GOVERNANCE_STATEMENT == \
+        HUMAN_GOVERNANCE_STATEMENT
+    scope = decision["released_source_scope"]
+    assert scope[
+        "wider_study_statement_is_not_a_release_composition_claim"] is True
+
+
+def test_rewording_the_human_statement_breaks_the_build(tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    decision = _read(DECISION_REL)
+    decision["human_supplied_data_governance_facts"]["statement"] = (
+        "All underlying data were obtained from CODAL.")
+    _write_json(root, DECISION_REL, decision)
+    with pytest.raises(gen.HandoffError,
+                       match="altered the human author's data-governance"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_dropping_the_recorded_previous_statement_breaks_the_build(tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    decision = _read(DECISION_REL)
+    decision["rc3_correction"]["previous_statement"] = ""
+    _write_json(root, DECISION_REL, decision)
+    with pytest.raises(gen.HandoffError, match="not auditable"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+# --------------------------------------------------------------------------- #
+# rc.3 — 25 payload files, 27 archive members, never one number for both
+# --------------------------------------------------------------------------- #
+
+def test_the_two_counts_are_what_they_are(payload, manifest):
+    members = sorted(payload)
+    assert len(members) == ARCHIVE_MEMBER_COUNT
+    payload_files = [n for n in members if n not in NON_PAYLOAD_MEMBERS]
+    assert len(payload_files) == MANIFEST_PAYLOAD_FILE_COUNT
+    assert len(manifest["files"]) == MANIFEST_PAYLOAD_FILE_COUNT
+    assert manifest["file_count"] == MANIFEST_PAYLOAD_FILE_COUNT
+    sums = payload["SHA256SUMS.txt"].decode("utf-8").splitlines()
+    assert len([line for line in sums if line.strip()]) == \
+        SHA256SUMS_LINE_COUNT
+    assert rc.MANIFEST_PAYLOAD_FILE_COUNT == MANIFEST_PAYLOAD_FILE_COUNT
+    assert rc.ARCHIVE_MEMBER_COUNT == ARCHIVE_MEMBER_COUNT
+    assert rc.SHA256SUMS_LINE_COUNT == SHA256SUMS_LINE_COUNT
+
+
+def test_the_manifest_never_lists_the_integrity_records_as_payload(manifest):
+    listed = {entry["bundle_path"] for entry in manifest["files"]}
+    for name in NON_PAYLOAD_MEMBERS:
+        assert name not in listed, name
+    assert set(manifest["manifest_excludes"]) == set(NON_PAYLOAD_MEMBERS)
+
+
+def test_every_surface_publishes_both_counts_under_distinct_names(
+        decision, boundary, manifest, metadata, state):
+    expected = {
+        "manifest_payload_file_count": MANIFEST_PAYLOAD_FILE_COUNT,
+        "archive_member_count": ARCHIVE_MEMBER_COUNT,
+        "sha256sums_line_count": SHA256SUMS_LINE_COUNT,
+    }
+    for field, value in expected.items():
+        assert manifest[field] == value, field
+        assert metadata[field] == value, field
+        assert boundary[field] == value, field
+        assert decision["release_composition"][field] == value, field
+    assert state[
+        "stage130_dataset_release_candidate_manifest_payload_file_count"] == \
+        MANIFEST_PAYLOAD_FILE_COUNT
+    assert state["stage130_dataset_release_candidate_archive_member_count"] \
+        == ARCHIVE_MEMBER_COUNT
+    assert state["stage130_dataset_release_candidate_file_count"] == \
+        MANIFEST_PAYLOAD_FILE_COUNT
+    # The ambiguous rc.2 key is gone, not merely supplemented.
+    assert "bundle_payload_file_count" not in metadata
+
+
+def test_nothing_describes_all_27_members_as_manifest_payload_files(
+        decision, boundary, state):
+    assert decision["release_composition"][
+        "all_27_described_as_manifest_payload_files"] is False
+    assert boundary[
+        "all_archive_members_described_as_manifest_payload_files"] is False
+    assert state[
+        "stage130_dataset_release_candidate_all_members_are_payload_files"] \
+        is False
+    assert tuple(decision["release_composition"][
+        "archive_members_that_are_not_manifest_payload_files"]) == \
+        NON_PAYLOAD_MEMBERS
+    assert tuple(state[
+        "stage130_dataset_release_candidate_non_payload_archive_members"]) == \
+        NON_PAYLOAD_MEMBERS
+
+
+def test_conflating_the_two_counts_breaks_the_build(tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    manifest = _read(MANIFEST_REL)
+    manifest["manifest_payload_file_count"] = ARCHIVE_MEMBER_COUNT
+    _write_json(root, MANIFEST_REL, manifest)
+    with pytest.raises(gen.HandoffError,
+                       match="manifest_payload_file_count"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_calling_all_27_payload_files_breaks_the_build(tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    decision = _read(DECISION_REL)
+    decision["release_composition"][
+        "all_27_described_as_manifest_payload_files"] = True
+    _write_json(root, DECISION_REL, decision)
+    with pytest.raises(gen.HandoffError, match="NOT all"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_a_payload_file_count_that_disagrees_with_the_build_breaks_it(payload):
+    poisoned = dict(payload)
+    poisoned.pop("CITATION.cff")
+    with pytest.raises(rc.Stage130ReleaseError, match="members"):
+        rc.gate_file_count_terminology(poisoned)
+
+
+# --------------------------------------------------------------------------- #
+# rc.3 — rc.1 and rc.2 are immutable superseded history
+# --------------------------------------------------------------------------- #
+
+def test_the_full_supersede_chain_is_recorded_on_every_surface(
+        decision, boundary, manifest, metadata, state):
+    chains = (
+        decision["supersedes_release_history"],
+        boundary["supersedes_release_history"],
+        manifest["supersedes_history"],
+        metadata["supersedes_history"],
+        state["stage130_dataset_release_candidate_supersede_chain"],
+    )
+    for chain in chains:
+        assert len(chain) == len(SUPERSEDE_CHAIN)
+        for recorded, expected in zip(chain, SUPERSEDE_CHAIN):
+            for field, value in expected.items():
+                if field in recorded:
+                    assert recorded[field] == value, (expected["version"],
+                                                      field)
+    assert state["stage130_dataset_release_candidate_superseded_versions"] == \
+        [record["version"] for record in SUPERSEDE_CHAIN]
+    assert tuple(r["version"] for r in rc.SUPERSEDED_RELEASES) == \
+        tuple(r["version"] for r in SUPERSEDE_CHAIN)
+
+
+def test_nothing_was_ever_deposited_under_any_superseded_candidate(
+        decision, manifest):
+    for chain in (decision["supersedes_release_history"],
+                  manifest["supersedes_history"]):
+        for record in chain:
+            assert record["preserved_not_deleted"] is True
+            for field in ("zenodo_deposition_created",
+                          "zenodo_upload_performed", "zenodo_doi_reserved",
+                          "zenodo_published", "public_release_authorized"):
+                assert record[field] is False, (record["version"], field)
+
+
+def test_the_superseded_archives_were_not_rebuilt_renamed_or_deleted(
+        boundary, state):
+    assert boundary[
+        "superseded_archives_rebuilt_renamed_or_deleted_by_this_action"] == 0
+    assert boundary[
+        "superseded_recorded_digests_altered_by_this_action"] == 0
+    assert state[
+        "stage130_dataset_release_candidate_superseded_archives_preserved"] \
+        is True
+    assert state[
+        "stage130_dataset_release_candidate_superseded_digests_altered"] == 0
+
+
+@pytest.mark.parametrize("index,field,poison", [
+    (0, "archive_sha256", "0" * 64),
+    (0, "archive_size_bytes", 1),
+    (0, "publication_readiness_at_the_time",
+     "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW"),
+    (1, "archive_sha256", "f" * 64),
+    (1, "archive_size_bytes", 2),
+    (1, "publication_readiness_at_the_time", "NOT_READY_FOR_PUBLICATION"),
+])
+def test_altering_any_superseded_record_breaks_the_build(tmp_path, index,
+                                                         field, poison):
+    """rc.1's and rc.2's history is history; a version bump may not edit it."""
+    root = _clone_repo_shim(tmp_path)
+    decision = _read(DECISION_REL)
+    decision["supersedes_release_history"][index][field] = poison
+    _write_json(root, DECISION_REL, decision)
+    with pytest.raises(gen.HandoffError, match="supersede history"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_dropping_rc1_from_the_chain_breaks_the_build(tmp_path):
+    """Superseding rc.2 does not make rc.1 stop having existed."""
+    root = _clone_repo_shim(tmp_path)
+    decision = _read(DECISION_REL)
+    decision["supersedes_release_history"] = \
+        decision["supersedes_release_history"][1:]
+    _write_json(root, DECISION_REL, decision)
+    with pytest.raises(gen.HandoffError, match="all 2 superseded candidates"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_claiming_a_deposit_under_a_superseded_candidate_breaks_the_build(
+        tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    manifest = _read(MANIFEST_REL)
+    manifest["supersedes_history"][0]["zenodo_published"] = True
+    _write_json(root, MANIFEST_REL, manifest)
+    with pytest.raises(gen.HandoffError, match="nothing was ever deposited"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_reusing_rc2s_filename_breaks_the_build(tmp_path):
+    root = _clone_repo_shim(tmp_path)
+    manifest = _read(MANIFEST_REL)
+    manifest["archive_name"] = SUPERSEDE_CHAIN[1]["archive_name"]
+    _write_json(root, MANIFEST_REL, manifest)
+    with pytest.raises(gen.HandoffError, match="archive filename"):
+        gen.derive_stage130_dataset_release_candidate_markers(str(root))
+
+
+def test_a_superseded_archive_on_disk_still_hashes_to_its_recorded_digest():
+    """Absence is tolerated; DRIFT never is.
+
+    The archives are gitignored build outputs, so a fresh clone legitimately
+    has none of them and this test asserts nothing there — the same tolerance
+    the Handoff deriver applies to the frozen Stage125 surfaces. What it will
+    not tolerate is a superseded archive that is present and no longer hashes
+    to the digest the record pins: that would mean rc.3 rebuilt, overwrote or
+    corrupted a predecessor whose bytes a reviewer may still be asked about.
+    """
+    expected = {record["archive_name"]: record["archive_sha256"]
+                for record in SUPERSEDE_CHAIN}
+    build = os.path.join(REPO_ROOT, PKG_REL, "build")
+    checked = []
+    for dirpath, _dirnames, filenames in os.walk(build):
+        for name in sorted(filenames):
+            if name not in expected:
+                continue
+            with open(os.path.join(dirpath, name), "rb") as fh:
+                actual = hashlib.sha256(fh.read()).hexdigest()
+            assert actual == expected[name], (
+                f"superseded archive {name} has DRIFTED: expected "
+                f"{expected[name]}, found {actual}")
+            checked.append(name)
+    # rc.3 must never build over a predecessor's name, present or not.
+    assert rc.ARCHIVE_NAME not in expected
+    assert set(checked) <= set(expected)
+
+
+def test_the_roadmap_front_matter_carries_the_rc3_digest_and_the_chain(
+        roadmap_front_matter, metadata):
+    front = roadmap_front_matter
+    assert front["dataset_release_candidate_version"] == RELEASE_VERSION
+    assert front["dataset_release_candidate_archive_sha256"] == \
+        metadata["archive_sha256"]
+    assert int(front["dataset_release_candidate_archive_size_bytes"]) == \
+        metadata["archive_size_bytes"]
+    assert front["dataset_release_candidate_supersedes_version"] == \
+        SUPERSEDED_VERSION
+    assert front["dataset_release_candidate_supersedes_archive_sha256"] == \
+        SUPERSEDED_SHA256
+    assert front["dataset_release_candidate_rc1_archive_sha256"] == \
+        SUPERSEDE_CHAIN[0]["archive_sha256"]
+    assert int(
+        front["dataset_release_candidate_manifest_payload_file_count"]) == \
+        MANIFEST_PAYLOAD_FILE_COUNT
+    assert int(front["dataset_release_candidate_archive_member_count"]) == \
+        ARCHIVE_MEMBER_COUNT
+    assert str(
+        front["dataset_release_candidate_tsetmc_fields_included"]).lower() \
+        == "false"
+    assert str(front[
+        "dataset_release_candidate_world_bank_fields_included"]).lower() \
+        == "false"
+
+
+# --------------------------------------------------------------------------- #
+# rc.3 — determinism, and the 115-column dictionary it must not lose
+# --------------------------------------------------------------------------- #
+
+def test_two_builds_in_separate_directories_are_byte_identical(tmp_path):
+    """Member sets, per-file hashes, archive bytes, digest, size and trees."""
+    first = rc.write_release_candidate(REPO_ROOT, tmp_path / "a")
+    second = rc.write_release_candidate(REPO_ROOT, tmp_path / "b")
+    assert sorted(first["payload"]) == sorted(second["payload"])
+    for name in first["payload"]:
+        assert hashlib.sha256(first["payload"][name]).hexdigest() == \
+            hashlib.sha256(second["payload"][name]).hexdigest(), name
+    assert first["archive_bytes"] == second["archive_bytes"]
+    assert first["archive_sha256"] == second["archive_sha256"]
+    assert first["archive_size"] == second["archive_size"]
+    for tree in (first["tree_path"], second["tree_path"]):
+        assert os.path.isdir(tree)
+    walked = []
+    for tree in (first["tree_path"], second["tree_path"]):
+        entries = {}
+        for dirpath, _dirnames, filenames in os.walk(tree):
+            for name in filenames:
+                path = os.path.join(dirpath, name)
+                with open(path, "rb") as fh:
+                    entries[os.path.relpath(path, tree)] = \
+                        hashlib.sha256(fh.read()).hexdigest()
+        walked.append(entries)
+    assert walked[0] == walked[1]
+    assert len(walked[0]) == ARCHIVE_MEMBER_COUNT
+
+
+def test_the_complete_115_column_dictionary_survives_rc3(payload, manifest,
+                                                         state):
+    rows = list(csv.DictReader(io.StringIO(
+        payload["RELEASE_COLUMN_DICTIONARY.csv"].decode("utf-8"),
+        newline="")))
+    assert len(rows) == PRIMARY_COLUMNS
+    coverage = manifest["release_column_dictionary_coverage"]
+    assert coverage["released_columns_documented"] == PRIMARY_COLUMNS
+    assert coverage["released_columns_undocumented"] == 0
+    assert coverage["definitions_invented_by_this_action"] == 0
+    assert state["stage130_dataset_release_candidate_columns_documented"] == \
+        PRIMARY_COLUMNS
+    assert state["stage130_dataset_release_candidate_columns_undocumented"] \
+        == 0

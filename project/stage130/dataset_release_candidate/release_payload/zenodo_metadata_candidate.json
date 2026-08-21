@@ -5,15 +5,44 @@
     "doi_reserved": false,
     "public_release_authorized": false,
     "publication_readiness": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
-    "publication_readiness_reason": "The human author supplied a source-rights determination and the release-specific column dictionary now documents all 115 released columns, so what remains before any Zenodo action is a human reading this archive's exact SHA-256. That review has not happened. See SOURCE_AND_LICENSE_NOTES.md.",
+    "publication_readiness_reason": "The human author supplied a source-rights determination and the release-specific column dictionary documents all 115 released columns. 1.0.0-rc.3 additionally corrects the source-scope description that 1.0.0-rc.2 carried and states the payload-file and archive-member counts separately. What remains before any Zenodo action is a human reading this archive's exact SHA-256. That review has not happened. See SOURCE_AND_LICENSE_NOTES.md.",
     "release_candidate_prepared": true,
     "separate_exact_digest_human_authorization_required_before_any_zenodo_action": true,
-    "supersedes_version": "1.0.0-rc.1",
-    "supersedes_archive_sha256": "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
-    "supersedes_publication_readiness": "NOT_READY_FOR_PUBLICATION",
+    "supersedes_version": "1.0.0-rc.2",
+    "supersedes_archive_sha256": "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+    "supersedes_publication_readiness": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
     "zenodo_deposition_created": false,
     "zenodo_published": false,
-    "zenodo_upload_performed": false
+    "zenodo_upload_performed": false,
+    "supersedes_history": [
+      {
+        "version": "1.0.0-rc.1",
+        "archive_sha256": "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
+        "archive_size_bytes": 11657151,
+        "publication_readiness_at_the_time": "NOT_READY_FOR_PUBLICATION",
+        "superseded_by_version": "1.0.0-rc.2",
+        "preserved_not_deleted": true,
+        "zenodo_deposition_created": false,
+        "zenodo_upload_performed": false,
+        "zenodo_doi_reserved": false,
+        "zenodo_published": false,
+        "public_release_authorized": false
+      },
+      {
+        "version": "1.0.0-rc.2",
+        "archive_sha256": "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+        "archive_size_bytes": 11808267,
+        "publication_readiness_at_the_time": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+        "superseded_by_version": "1.0.0-rc.3",
+        "preserved_not_deleted": true,
+        "zenodo_deposition_created": false,
+        "zenodo_upload_performed": false,
+        "zenodo_doi_reserved": false,
+        "zenodo_published": false,
+        "public_release_authorized": false
+      }
+    ],
+    "correction_in_this_candidate": "1.0.0-rc.2's description named all three study providers together as the sources of the released values. That implied material from every one of them is in the release, which contradicts the committed rights matrix. The sentence is replaced in 1.0.0-rc.3 and the builder now refuses to ship it again. The superseded wording is quoted verbatim, once, in stage130_dataset_release_candidate_decision.json under rc3_correction.previous_statement, so the correction stays auditable without reproducing a false statement in the bundle a reuser receives. No rights record was changed: no CODAL or TSETMC terms page has been retrieved or read, and the rights basis remains the human author's determination."
   },
   "source_rights": {
     "status": "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED",
@@ -49,7 +78,7 @@
       }
     ],
     "creators_note": "Order is author-supplied and must not be reordered. No ORCID identifier is recorded for either creator: none was supplied, and none is invented.",
-    "description": "<p>An analysis-ready company-year panel of Iranian listed non-financial companies for one-year-ahead corporate financial distress prediction, covering Jalali fiscal years 1392–1402, together with the contracts, dictionaries, quality-control records and audit surfaces needed to reproduce and check its construction.</p><p><strong>Primary modeling surface:</strong> <code>data/analysis_ready_main_rule_a_stage125.csv</code> — 1,012 company-year pairs, 119 companies, 115 columns, 80 positive and 932 negative outcomes. The other three analysis-ready files are prespecified robustness surfaces, not alternative headline datasets.</p><p><strong>Audit surfaces:</strong> the four <code>audit/audited_pairs_*.csv</code> files retain company-year pairs that the leakage-safe timing rule excludes. They are audit surfaces and are <strong>not all model-ready</strong>; fitting a model on them reintroduces look-ahead.</p><p><strong>Availability is an assumption.</strong> Predictor admission uses a prespecified fixed four-Jalali-month regulatory lag. Row-level publication timestamps were never collected and no individual filing date was verified, so the availability date is a proxy, not an observed publication timestamp.</p><p><strong>Provenance is file-level and incomplete:</strong> a source file is recorded for 1,303 of 1,331 upstream rows and absent for 28. Quality-control coverage differs across accounting checks (1,273 to 1,312 evaluable rows depending on the check).</p><p><strong>Every one of the 115 released columns is documented</strong> in <code>RELEASE_COLUMN_DICTIONARY.csv</code>, one row each, with definition, type, unit, role, model eligibility, provenance, temporal reference, missing-value semantics, formula, limitations and the exact committed source each fact came from.</p><p>All values were compiled by the authors from publicly accessible sources including CODAL, TSETMC and the World Bank. No purchased, confidential, personal or human-participant data were used. Original source PDFs and raw provider responses are <strong>not</strong> redistributed. The CC BY 4.0 licence covers only the authors' own compilation, annotations and release metadata to the extent the authors hold rights in them; it does not relicense third-party source materials. The authors' rights position rests on a determination by the human author that the source data were publicly and freely accessible and need no separate provider permission — a determination by the author, not a provider licence and not a verification of any provider's published terms. See <code>SOURCE_AND_LICENSE_NOTES.md</code> and <code>LIMITATIONS.md</code>.</p>",
+    "description": "<p>An analysis-ready company-year panel of Iranian listed non-financial companies for one-year-ahead corporate financial distress prediction, covering Jalali fiscal years 1392–1402, together with the contracts, dictionaries, quality-control records and audit surfaces needed to reproduce and check its construction.</p><p><strong>Primary modeling surface:</strong> <code>data/analysis_ready_main_rule_a_stage125.csv</code> — 1,012 company-year pairs, 119 companies, 115 columns, 80 positive and 932 negative outcomes. The other three analysis-ready files are prespecified robustness surfaces, not alternative headline datasets.</p><p><strong>Audit surfaces:</strong> the four <code>audit/audited_pairs_*.csv</code> files retain company-year pairs that the leakage-safe timing rule excludes. They are audit surfaces and are <strong>not all model-ready</strong>; fitting a model on them reintroduces look-ahead.</p><p><strong>Availability is an assumption.</strong> Predictor admission uses a prespecified fixed four-Jalali-month regulatory lag. Row-level publication timestamps were never collected and no individual filing date was verified, so the availability date is a proxy, not an observed publication timestamp.</p><p><strong>Provenance is file-level and incomplete:</strong> a source file is recorded for 1,303 of 1,331 upstream rows and absent for 28. Quality-control coverage differs across accounting checks (1,273 to 1,312 evaluable rows depending on the check).</p><p><strong>What the archive holds:</strong> <code>release_manifest.json</code> describes <strong>25 payload files</strong>. The archive itself contains <strong>27 members</strong> — those 25 payload files plus <code>release_manifest.json</code> and <code>SHA256SUMS.txt</code>, which are integrity records about the payload and are not themselves manifest payload files.</p><p><strong>Every one of the 115 released columns is documented</strong> in <code>RELEASE_COLUMN_DICTIONARY.csv</code>, one row each, with definition, type, unit, role, model eligibility, provenance, temporal reference, missing-value semantics, formula, limitations and the exact committed source each fact came from.</p><p>The released company-year panel contains researcher-compiled company financial-statement fields transcribed from publicly accessible CODAL disclosures, together with author-derived variables and annotations. <strong>No TSETMC-derived and no World Bank-derived field is included in this release</strong>; those sources relate only to the wider study. No purchased, confidential, personal or human-participant data were used. Original source PDFs and raw provider responses are <strong>not</strong> redistributed. The CC BY 4.0 licence covers only the authors' own compilation, annotations and release metadata to the extent the authors hold rights in them; it does not relicense third-party source materials. The authors' rights position rests on a determination by the human author that the source data were publicly and freely accessible and need no separate provider permission — a determination by the author, not a provider licence and not a verification of any provider's published terms. See <code>SOURCE_AND_LICENSE_NOTES.md</code> and <code>LIMITATIONS.md</code>.</p>",
     "keywords": [
       "financial distress",
       "bankruptcy prediction",
@@ -65,10 +94,10 @@
     "license": "cc-by-4.0",
     "license_name": "Creative Commons Attribution 4.0 International",
     "license_scope": "Applies to the authors' original compilation, annotations and release metadata only, to the extent the authors hold rights in them. It does not relicense third-party source materials.",
-    "notes": "Release candidate 1.0.0-rc.2, superseding 1.0.0-rc.1. Not deposited, not published, no DOI.",
+    "notes": "Release candidate 1.0.0-rc.3, superseding 1.0.0-rc.2 and, through it, 1.0.0-rc.1. Both predecessors are preserved, not deleted. Not deposited, not published, no DOI.",
     "title": "Tehran Stock Exchange Corporate Financial Distress Prediction Dataset (1392–1402): Analysis-Ready Company-Year Panel and Reproducibility Materials",
     "upload_type": "dataset",
-    "version": "1.0.0-rc.2"
+    "version": "1.0.0-rc.3"
   },
   "correspondence": {
     "corresponding_author": "Abtin Asghari",
@@ -94,5 +123,26 @@
     "cache and temporary files",
     "macOS metadata",
     "model artifacts, predictions and any held-out evaluation output"
-  ]
+  ],
+  "released_source_scope": {
+    "statement": "The released company-year panel contains researcher-compiled company financial-statement fields from publicly accessible CODAL disclosures, together with author-derived variables and annotations. No TSETMC- or World Bank-derived field is included in this release; those sources relate only to the wider study.",
+    "released_source_providers": [
+      "CODAL"
+    ],
+    "non_released_source_providers": [
+      "TSETMC",
+      "World Bank"
+    ],
+    "tsetmc_derived_fields_included": false,
+    "world_bank_derived_fields_included": false,
+    "original_provider_files_redistributed": false,
+    "authority": "project/stage130/dataset_release_candidate/source_rights_matrix.csv, which records CODAL as contributing compiled numeric statement line items and author-derived variables, and both TSETMC and World Bank as 'NONE - no ...-derived field is in this release'.",
+    "superseded_claim_recorded_at": "project/stage130/dataset_release_candidate/stage130_dataset_release_candidate_decision.json :: rc3_correction.previous_statement"
+  },
+  "release_composition": {
+    "manifest_payload_file_count": 25,
+    "archive_member_count": 27,
+    "sha256sums_line_count": 26,
+    "terminology": "25 files are described by release_manifest.json as payload files. The deterministic archive contains 27 members: those 25 payload files plus release_manifest.json and SHA256SUMS.txt, which are integrity records about the payload and are not themselves manifest payload files."
+  }
 }

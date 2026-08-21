@@ -1,8 +1,28 @@
 """Stage130 — deterministic Zenodo dataset Release Candidate builder.
 
-Builds candidate **1.0.0-rc.2**, which supersedes 1.0.0-rc.1 without
-overwriting or deleting it: a new archive filename, a new build directory, and
-the predecessor's digest recorded as history.
+Builds candidate **1.0.0-rc.3**, which supersedes 1.0.0-rc.2 — and, through it,
+1.0.0-rc.1 — without overwriting or deleting either: a new archive filename, a
+new build directory, and every predecessor's digest recorded as history.
+
+What rc.3 corrects
+------------------
+rc.2's Zenodo description said the released values were "compiled by the
+authors from publicly accessible sources including CODAL, TSETMC and the World
+Bank". Read as a statement about THIS release that is false, and it contradicts
+the committed rights matrix: the released panel carries researcher-compiled
+company financial-statement fields from CODAL disclosures plus author-derived
+variables and annotations, and **no TSETMC-derived and no World Bank-derived
+field is in it**. Those two providers relate to the wider study only. The
+sentence is replaced, :data:`FORBIDDEN_RELEASE_SCOPE_CLAIMS` and
+:func:`gate_release_scope_statements` refuse its recurrence anywhere in the
+payload, and the file-count terminology is made unambiguous: 25 payload files
+are described by ``release_manifest.json``; the archive contains 27 members,
+those 25 plus the manifest and ``SHA256SUMS.txt``.
+
+The historical rights record is untouched. No CODAL or TSETMC terms page has
+been retrieved or read, ``provider_terms_independently_retrieved`` and
+``provider_terms_independently_verified`` stay False, and the rights basis stays
+the human author's determination — never a verification.
 
 CUSTODY ONLY. This module packages already-frozen bytes. It performs no
 scientific work of any kind:
@@ -69,34 +89,86 @@ BUNDLE_ROOT = "tse_financial_distress_dataset_1392_1402"
 #: This candidate. The version is part of the release's identity, so it appears
 #: in the archive filename, the manifest, the Zenodo metadata and CITATION.cff,
 #: and the build gates that they agree.
-RELEASE_VERSION = "1.0.0-rc.2"
-ARCHIVE_NAME = f"{BUNDLE_ROOT}_release_candidate_rc2.zip"
-#: Build output, per version. Gitignored: no archive is ever tracked. rc.2
-#: writes to its own subdirectory so rc.1's build output is neither overwritten
-#: nor deleted -- a superseded candidate whose bytes vanish cannot be checked.
-BUILD_SUBDIR = "build/rc2"
+RELEASE_VERSION = "1.0.0-rc.3"
+ARCHIVE_NAME = f"{BUNDLE_ROOT}_release_candidate_rc3.zip"
+#: Build output, per version. Gitignored: no archive is ever tracked. Each
+#: candidate writes to its own subdirectory so no predecessor's build output is
+#: overwritten or deleted -- a superseded candidate whose bytes vanish cannot
+#: be checked.
+BUILD_SUBDIR = "build/rc3"
 
-#: The superseded predecessor, recorded rather than replaced. A reviewer who
-#: was shown rc.1's digest can still tell which candidate that was, and that
-#: nothing was ever deposited under it.
-SUPERSEDED_RELEASE: dict[str, Any] = {
-    "version": "1.0.0-rc.1",
-    "archive_name": f"{BUNDLE_ROOT}_release_candidate.zip",
-    "archive_sha256":
-        "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
-    "archive_size_bytes": 11657151,
-    "publication_readiness_at_the_time": "NOT_READY_FOR_PUBLICATION",
-    "superseded_on_utc": "2026-08-21",
-    "superseded_reason":
-        "The human author supplied a source-rights determination, and the "
-        "release-specific column dictionary was completed from 25 of the 115 "
-        "released columns to all 115.",
-    "zenodo_deposition_created": False,
-    "zenodo_upload_performed": False,
-    "zenodo_doi_reserved": False,
-    "zenodo_published": False,
-    "public_release_authorized": False,
-}
+#: Every superseded predecessor, oldest first, recorded rather than replaced.
+#: A reviewer who was shown rc.1's or rc.2's digest can still tell which
+#: candidate that was, and that nothing was ever deposited under either.
+#: This is a CHAIN, not a single slot: rc.3 supersedes rc.2, and rc.2's own
+#: supersede of rc.1 does not stop being history because a third candidate
+#: exists.
+SUPERSEDED_RELEASES: tuple[dict[str, Any], ...] = (
+    {
+        "version": "1.0.0-rc.1",
+        "archive_name": f"{BUNDLE_ROOT}_release_candidate.zip",
+        "archive_sha256":
+            "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
+        "archive_size_bytes": 11657151,
+        "publication_readiness_at_the_time": "NOT_READY_FOR_PUBLICATION",
+        "superseded_on_utc": "2026-08-21",
+        "superseded_by_version": "1.0.0-rc.2",
+        "superseded_reason":
+            "The human author supplied a source-rights determination, and the "
+            "release-specific column dictionary was completed from 25 of the "
+            "115 released columns to all 115.",
+        "build_directory": "build",
+        "preserved_not_deleted": True,
+        "preserved_how":
+            "rc.1 keeps its own archive filename and its own gitignored build "
+            "directory (build/). Later candidates write to new filenames "
+            "under their own subdirectories, so rc.1's archive and unpacked "
+            "tree are never overwritten, renamed, rebuilt or deleted. No "
+            "commit was amended, squashed, rebased or force-pushed, so rc.1's "
+            "record stands in the branch history exactly as it was written.",
+        "zenodo_deposition_created": False,
+        "zenodo_upload_performed": False,
+        "zenodo_doi_reserved": False,
+        "zenodo_published": False,
+        "public_release_authorized": False,
+    },
+    {
+        "version": "1.0.0-rc.2",
+        "archive_name": f"{BUNDLE_ROOT}_release_candidate_rc2.zip",
+        "archive_sha256":
+            "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+        "archive_size_bytes": 11808267,
+        "publication_readiness_at_the_time":
+            "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+        "superseded_on_utc": "2026-08-21",
+        "superseded_by_version": "1.0.0-rc.3",
+        "superseded_reason":
+            "rc.2's Zenodo description named all three study providers "
+            "together as the sources of the released values. Only "
+            "CODAL-derived, researcher-compiled company financial-statement "
+            "fields and author-derived variables are released; no TSETMC- and "
+            "no World Bank-derived field is. rc.3 corrects that sentence and "
+            "makes the payload-file versus archive-member counts explicit.",
+        "build_directory": "build/rc2",
+        "preserved_not_deleted": True,
+        "preserved_how":
+            "rc.2 keeps its own archive filename and its own gitignored build "
+            "directory (build/rc2/). rc.3 writes to a new filename under "
+            "build/rc3/, so rc.2's archive and unpacked tree are never "
+            "overwritten, renamed, rebuilt or deleted, and its recorded "
+            "digest does not move. No commit was amended, squashed, rebased "
+            "or force-pushed.",
+        "zenodo_deposition_created": False,
+        "zenodo_upload_performed": False,
+        "zenodo_doi_reserved": False,
+        "zenodo_published": False,
+        "public_release_authorized": False,
+    },
+)
+
+#: The immediate predecessor. Kept as its own name because the supersede
+#: relation rc.3 -> rc.2 is a single edge; the chain above is the full history.
+SUPERSEDED_RELEASE: dict[str, Any] = SUPERSEDED_RELEASES[-1]
 
 #: The live status of THIS candidate. A human is being asked to read the exact
 #: archive digest and decide. It is not publication, and not an authorization.
@@ -123,6 +195,95 @@ FORBIDDEN_RIGHTS_CLAIMS = (
     "CODAL TERMS INDEPENDENTLY VERIFIED",
     "CODAL TERMS VERIFIED",
     "PROVIDER TERMS INDEPENDENTLY VERIFIED",
+)
+
+# --------------------------------------------------------------------------- #
+# What this release actually contains -- and the sentences that would misstate
+# it
+# --------------------------------------------------------------------------- #
+
+#: The providers whose material is genuinely in the released panel. CODAL alone:
+#: the released fields are researcher-compiled company financial-statement line
+#: items transcribed from publicly accessible CODAL disclosures, plus variables
+#: and annotations the authors derived from them.
+RELEASED_SOURCE_PROVIDERS = ("CODAL",)
+#: Providers that belong to the WIDER STUDY and contribute no released field.
+#: The committed rights matrix records both as "NONE - no ...-derived field is
+#: in this release". Any sentence implying otherwise is a false statement about
+#: what a reuser is being handed, and the build refuses to ship it.
+NON_RELEASED_SOURCE_PROVIDERS = ("TSETMC", "World Bank")
+
+#: The corrected release-scope statement, stated once and reused, so the
+#: payload, the manifest, the package records and the Handoff all say the same
+#: thing in the same words.
+RELEASED_SOURCE_SCOPE_STATEMENT = (
+    "The released company-year panel contains researcher-compiled company "
+    "financial-statement fields from publicly accessible CODAL disclosures, "
+    "together with author-derived variables and annotations. No TSETMC- or "
+    "World Bank-derived field is included in this release; those sources "
+    "relate only to the wider study."
+)
+
+#: Exact sentences rc.2 shipped, or wrote close variants of, that imply the
+#: released values draw on all three providers. Matched on text normalized to
+#: lowercase with HTML tags stripped, punctuation dropped and whitespace
+#: collapsed, so re-typing the claim with different markup, commas or line
+#: breaks does not slip past. These are AFFIRMATIVE inclusion phrasings; the
+#: truthful negative sentence ("no TSETMC- or World Bank-derived field is
+#: included") contains none of them.
+FORBIDDEN_RELEASE_SCOPE_CLAIMS = (
+    "sources including codal tsetmc and the world bank",
+    "sources including codal tsetmc and world bank",
+    "sources such as codal tsetmc and the world bank",
+    "sources such as codal tsetmc and world bank",
+    "compiled from codal tsetmc and the world bank",
+    "compiled from publicly accessible sources including codal tsetmc",
+    "from codal tsetmc and the world bank",
+    "codal tsetmc and the world bank are the sources of the released",
+    "includes tsetmc derived fields",
+    "includes world bank derived fields",
+    "tsetmc derived fields are included in this release",
+    "world bank derived fields are included in this release",
+    "released columns include market data",
+    "the release includes market data",
+    "the release includes world development indicators",
+)
+
+#: Sentence-level classification for the same sweep. A sentence naming a
+#: provider that contributes nothing, while asserting inclusion in something
+#: release-shaped and carrying no negation, is a misleading composition claim
+#: however it is worded.
+_NON_RELEASED_PROVIDER_TOKENS = ("tsetmc", "world bank", "worldbank",
+                                 "world development indicators")
+#: Verbs and connectives that assert something IS in the release.
+_INCLUSION_CUES = (
+    "is included", "are included", "included in", "includes", "include ",
+    "is in this release", "are in this release", "is present", "are present",
+    "contains", "contain ", "comprises", "consists of", "compiled from",
+    "drawn from", "sourced from", "obtained from", "including", "made up of",
+    "built from", "assembled from", "taken from",
+)
+#: Phrases that make the sentence about THIS release's contents. Deliberately
+#: demonstrative rather than generic: bare "dataset", "values" or "data" also
+#: appear in sentences about the wider study and about a provider's own
+#: published licence, and neither is a claim about what this bundle carries.
+#: The human author's governance statement is one of the former, and it is
+#: preserved verbatim. The exact superseded sentence is caught by
+#: :data:`FORBIDDEN_RELEASE_SCOPE_CLAIMS` regardless.
+_RELEASE_SCOPE_CUES = (
+    "this release", "the release", "this bundle", "the bundle",
+    "this candidate", "this archive", "this dataset", "this panel",
+    "the released", "released column", "released field", "released value",
+    "released panel", "the payload", "this payload", "in the release",
+)
+#: Anything that makes the sentence a denial, a scope limit or an exclusion.
+#: Presence of any of these means the sentence is not asserting inclusion.
+_NEGATION_CUES = (
+    "no ", "not ", "none", "never", "n/a", "excluded", "exclude", "without",
+    "wider study", "not material", "nothing from", "neither", "nor ",
+    "does not", "do not", "is not", "are not", "cannot", "must not",
+    "may not", "refus", "forbidden", "prohibit", "relate only",
+    "not applicable", "pending_part3", "not collected", "zero ",
 )
 
 #: Fixed ZIP member metadata. The 1980 epoch is the earliest a ZIP can encode.
@@ -328,6 +489,36 @@ RELEASE_DICTIONARY_NAME = "RELEASE_COLUMN_DICTIONARY.csv"
 #: the payload plus the manifest.
 MANIFEST_NAME = "release_manifest.json"
 SHA256SUMS_NAME = "SHA256SUMS.txt"
+
+# --------------------------------------------------------------------------- #
+# Two different counts, named so they can never be read as one
+# --------------------------------------------------------------------------- #
+
+#: How many files ``release_manifest.json`` describes: the copied frozen
+#: surfaces, the copied committed documentation and the release documents.
+#: 25. The manifest deliberately excludes itself and SHA256SUMS.txt, so this is
+#: NOT the number of things in the archive.
+MANIFEST_PAYLOAD_FILE_COUNT = (len(FROZEN_DATASETS) + len(DOC_SOURCES)
+                               + len(TEMPLATE_FILES))
+#: How many members the deterministic archive holds: the 25 payload files PLUS
+#: ``release_manifest.json`` and ``SHA256SUMS.txt``. 27. Those last two are
+#: integrity records ABOUT the payload; describing all 27 as manifest payload
+#: files would double-count the records as the thing they describe.
+ARCHIVE_MEMBER_COUNT = MANIFEST_PAYLOAD_FILE_COUNT + 2
+#: How many lines ``SHA256SUMS.txt`` carries: the payload plus the manifest,
+#: but not itself. 26.
+SHA256SUMS_LINE_COUNT = MANIFEST_PAYLOAD_FILE_COUNT + 1
+
+#: The single sentence every surface uses for the distinction, so no document
+#: has to invent its own phrasing and drift.
+FILE_COUNT_TERMINOLOGY = (
+    f"{MANIFEST_PAYLOAD_FILE_COUNT} files are described by {MANIFEST_NAME} as "
+    f"payload files. The deterministic archive contains "
+    f"{ARCHIVE_MEMBER_COUNT} members: those {MANIFEST_PAYLOAD_FILE_COUNT} "
+    f"payload files plus {MANIFEST_NAME} and {SHA256SUMS_NAME}, which are "
+    f"integrity records about the payload and are not themselves manifest "
+    f"payload files."
+)
 
 #: The primary surface, named once so documentation and manifest agree.
 PRIMARY_BUNDLE_REL = "data/analysis_ready_main_rule_a_stage125.csv"
@@ -651,6 +842,200 @@ def gate_no_unsupported_rights_claim(payload: dict[str, bytes]) -> None:
                     "record the human author determination instead")
 
 
+_TAG_RE = re.compile(r"<[^>]+>")
+_NON_TEXT_RE = re.compile(r"[^a-z0-9 ]+")
+_WS_RE = re.compile(r"\s+")
+#: A line that opens a new block: heading, bullet, numbered item, blockquote,
+#: table row, or a fence. A newline BEFORE one of these is a real boundary; a
+#: newline inside a wrapped paragraph is not, and splitting on it would tear
+#: "No TSETMC-derived and no / World Bank-derived field is included" in half
+#: and read the second half as an assertion.
+_BLOCK_START_RE = re.compile(r"^\s*(?:[#|*+-]|\d+[.)]|```)")
+#: Leading blockquote markers, stripped before the rejoin so a quotation that
+#: wraps across several ``>`` lines is classified as the one sentence it is.
+_QUOTE_MARKER_RE = re.compile(r"^\s*>+\s?")
+#: Sentence boundaries after wrapped lines have been rejoined. Markdown table
+#: pipes still split, because a table cell is a claim on its own and must not
+#: borrow the negation standing in a neighbouring cell.
+_SENTENCE_SPLIT_RE = re.compile(r"[.;!?|]+|\n")
+
+
+def split_claim_sentences(text: str) -> list[str]:
+    """Split into claim-sized units without tearing wrapped prose apart.
+
+    Lines are rejoined into their paragraph first, so a sentence that a text
+    editor wrapped across two lines is classified as the one sentence it is.
+    Only a blank line, or a line that starts a new block, ends the join.
+    """
+    joined: list[str] = []
+    for raw_line in text.splitlines():
+        # A blockquote marker is punctuation around prose, not a new claim.
+        # Stripping it first keeps a quotation that wraps across lines whole.
+        line = _QUOTE_MARKER_RE.sub("", raw_line)
+        if not line.strip():
+            joined.append("\n")
+            continue
+        if joined and joined[-1] != "\n" and not _BLOCK_START_RE.match(line):
+            joined[-1] = f"{joined[-1]} {line.strip()}"
+        else:
+            joined.append(line.strip())
+    return [part for chunk in joined
+            for part in _SENTENCE_SPLIT_RE.split(chunk)]
+
+
+def normalize_claim_text(text: str) -> str:
+    """Lowercase, strip markup and punctuation, collapse whitespace.
+
+    Matching normalized text is what makes the sweep resistant to the ways a
+    claim gets re-typed: HTML tags around it, a serial comma, a hyphen, a line
+    break inside a JSON string.
+    """
+    lowered = _TAG_RE.sub(" ", text.lower())
+    return _WS_RE.sub(" ", _NON_TEXT_RE.sub(" ", lowered)).strip()
+
+
+def _sentence_asserts_non_released_provider(sentence: str) -> str | None:
+    """Return the offending provider token, or None if the sentence is fine.
+
+    A sentence is misleading when it (a) names a provider that contributes no
+    released field, (b) asserts inclusion, (c) is about this release's
+    contents, and (d) carries no negation, scope limit or exclusion. All four
+    must hold; the truthful sentences in this bundle each fail at least one.
+    """
+    lowered = sentence.lower()
+    if any(cue in lowered for cue in _NEGATION_CUES):
+        return None
+    provider = next((token for token in _NON_RELEASED_PROVIDER_TOKENS
+                     if token in lowered), None)
+    if provider is None:
+        return None
+    if not any(cue in lowered for cue in _INCLUSION_CUES):
+        return None
+    if not any(cue in lowered for cue in _RELEASE_SCOPE_CUES):
+        return None
+    return provider
+
+
+def _json_string_leaves(value: Any) -> list[str]:
+    """Every string in a parsed JSON document, in document order."""
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        return [leaf for key, item in value.items()
+                for leaf in _json_string_leaves(key) + _json_string_leaves(item)]
+    if isinstance(value, list):
+        return [leaf for item in value for leaf in _json_string_leaves(item)]
+    return []
+
+
+def _claim_documents(text: str) -> list[str]:
+    """Split a file into the units the sentence classifier should read.
+
+    JSON is not prose: its keys and values sit on separate lines and joining
+    them produces pseudo-sentences that borrow negations across unrelated
+    fields. So a JSON document is swept one string value at a time, each on
+    its own; anything else is swept as prose.
+    """
+    try:
+        parsed = json.loads(text)
+    except (ValueError, TypeError):
+        return [text]
+    return _json_string_leaves(parsed)
+
+
+def find_release_scope_violations(text: str) -> list[str]:
+    """Every misleading composition claim in one document, as messages."""
+    violations: list[str] = []
+    normalized = normalize_claim_text(text)
+    for claim in FORBIDDEN_RELEASE_SCOPE_CLAIMS:
+        if claim in normalized:
+            violations.append(
+                f"repeats the superseded three-provider claim {claim!r}")
+    for document in _claim_documents(text):
+        plain = _TAG_RE.sub(" ", document)
+        for raw in split_claim_sentences(plain):
+            sentence = _WS_RE.sub(" ", raw).strip()
+            if not sentence:
+                continue
+            provider = _sentence_asserts_non_released_provider(sentence)
+            if provider is not None:
+                violations.append(
+                    f"asserts that {provider!r} material is in this release: "
+                    f"{sentence[:160]!r}")
+    return violations
+
+
+def gate_release_scope_statements(payload: dict[str, bytes]) -> None:
+    """No bundle member may misstate which providers the release draws on.
+
+    The committed rights matrix is the authority: CODAL-derived,
+    researcher-compiled company financial fields are present; no TSETMC-derived
+    and no World Bank-derived field is. A description that implies all three
+    providers fed the released values tells a reuser something untrue about the
+    bytes they are holding, so the build refuses to produce it.
+    """
+    for name, data in sorted(payload.items()):
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError:
+            continue
+        violations = find_release_scope_violations(text)
+        if violations:
+            raise Stage130ReleaseError(
+                f"bundle member {name!r} misstates the released source scope: "
+                + "; ".join(violations)
+                + ". The correct statement is: "
+                + RELEASED_SOURCE_SCOPE_STATEMENT)
+
+
+def gate_file_count_terminology(payload: dict[str, bytes]) -> None:
+    """The two counts must be what they are, and must be labelled apart.
+
+    Derived from the payload actually built rather than asserted, so a future
+    file added to ``TEMPLATE_FILES`` moves both numbers together or stops the
+    build.
+    """
+    members = sorted(payload)
+    records = {MANIFEST_NAME, SHA256SUMS_NAME}
+    payload_files = [name for name in members if name not in records]
+    if len(members) != ARCHIVE_MEMBER_COUNT:
+        raise Stage130ReleaseError(
+            f"the archive would carry {len(members)} members, but "
+            f"ARCHIVE_MEMBER_COUNT is {ARCHIVE_MEMBER_COUNT}")
+    if len(payload_files) != MANIFEST_PAYLOAD_FILE_COUNT:
+        raise Stage130ReleaseError(
+            f"{len(payload_files)} payload files were assembled, but "
+            f"MANIFEST_PAYLOAD_FILE_COUNT is {MANIFEST_PAYLOAD_FILE_COUNT}")
+    for name in sorted(records):
+        if name not in payload:
+            raise Stage130ReleaseError(
+                f"the archive must carry the integrity record {name}")
+    manifest = json.loads(payload[MANIFEST_NAME].decode("utf-8"))
+    if manifest.get("file_count") != MANIFEST_PAYLOAD_FILE_COUNT:
+        raise Stage130ReleaseError(
+            f"{MANIFEST_NAME} file_count is {manifest.get('file_count')!r}, "
+            f"expected {MANIFEST_PAYLOAD_FILE_COUNT}")
+    if manifest.get("archive_member_count") != ARCHIVE_MEMBER_COUNT:
+        raise Stage130ReleaseError(
+            f"{MANIFEST_NAME} archive_member_count is "
+            f"{manifest.get('archive_member_count')!r}, expected "
+            f"{ARCHIVE_MEMBER_COUNT}")
+    if manifest.get("manifest_payload_file_count") != \
+            MANIFEST_PAYLOAD_FILE_COUNT:
+        raise Stage130ReleaseError(
+            f"{MANIFEST_NAME} manifest_payload_file_count is "
+            f"{manifest.get('manifest_payload_file_count')!r}, expected "
+            f"{MANIFEST_PAYLOAD_FILE_COUNT}")
+    sums_lines = [line for line in
+                  payload[SHA256SUMS_NAME].decode("utf-8").splitlines()
+                  if line.strip()]
+    if len(sums_lines) != SHA256SUMS_LINE_COUNT:
+        raise Stage130ReleaseError(
+            f"{SHA256SUMS_NAME} carries {len(sums_lines)} lines, expected "
+            f"{SHA256SUMS_LINE_COUNT} (the payload plus the manifest, never "
+            "itself)")
+
+
 # --------------------------------------------------------------------------- #
 # Payload assembly
 # --------------------------------------------------------------------------- #
@@ -733,6 +1118,8 @@ def build_payload(root: Path | str = REPO_ROOT) -> dict[str, bytes]:
     assert_no_absolute_paths(SHA256SUMS_NAME, sums)
 
     gate_no_unsupported_rights_claim(payload)
+    gate_release_scope_statements(payload)
+    gate_file_count_terminology(payload)
 
     return payload
 
@@ -784,9 +1171,10 @@ def build_manifest(entries: list[dict[str, Any]],
 
     return _json_bytes({
         "action_id": ACTION_ID,
-        "manifest_version": 2,
+        "manifest_version": 3,
         "release_version": RELEASE_VERSION,
         "supersedes": SUPERSEDED_RELEASE,
+        "supersedes_history": list(SUPERSEDED_RELEASES),
         "bundle_root": BUNDLE_ROOT,
         "archive_name": ARCHIVE_NAME,
         "archive_format": "zip_stored_fixed_timestamps",
@@ -794,6 +1182,22 @@ def build_manifest(entries: list[dict[str, Any]],
         "file_count": len(ordered),
         "files": ordered,
         "role_counts": roles,
+
+        # Two counts, never one. `file_count` and `manifest_payload_file_count`
+        # are the same number by construction; the second name exists so a
+        # reader who sees 25 and 27 together cannot mistake which is which.
+        "manifest_payload_file_count": MANIFEST_PAYLOAD_FILE_COUNT,
+        "archive_member_count": ARCHIVE_MEMBER_COUNT,
+        "sha256sums_line_count": SHA256SUMS_LINE_COUNT,
+        "file_count_terminology": FILE_COUNT_TERMINOLOGY,
+
+        # What the released values actually are, and are not.
+        "released_source_providers": list(RELEASED_SOURCE_PROVIDERS),
+        "non_released_source_providers":
+            list(NON_RELEASED_SOURCE_PROVIDERS),
+        "released_source_scope": RELEASED_SOURCE_SCOPE_STATEMENT,
+        "tsetmc_derived_fields_included": False,
+        "world_bank_derived_fields_included": False,
         "primary_file": PRIMARY_BUNDLE_REL,
         "primary_file_contract_counts": dict(PRIMARY_MANIFEST_COUNTS),
         "primary_file_column_count": PRIMARY_COLUMN_COUNT,
@@ -818,7 +1222,9 @@ def build_manifest(entries: list[dict[str, Any]],
             [MANIFEST_NAME, SHA256SUMS_NAME],
         "manifest_excludes_reason":
             "the manifest describes the payload; SHA256SUMS.txt then covers "
-            "the payload AND the manifest. Neither hashes itself.",
+            "the payload AND the manifest. Neither hashes itself. This is why "
+            f"file_count is {MANIFEST_PAYLOAD_FILE_COUNT} while the archive "
+            f"holds {ARCHIVE_MEMBER_COUNT} members.",
 
         # Every Zenodo-facing fact, restated where a reader will see it.
         "doi": None,
@@ -939,6 +1345,7 @@ def build_package_metadata(root: Path, result: dict[str, Any]) -> bytes:
             "dataset_release_candidate_preparation_and_documentation_only",
         "release_version": RELEASE_VERSION,
         "supersedes": SUPERSEDED_RELEASE,
+        "supersedes_history": list(SUPERSEDED_RELEASES),
         "archive_name": ARCHIVE_NAME,
         "archive_build_path_relative_to_repo_root":
             f"{PKG_REL}/{BUILD_SUBDIR}/{ARCHIVE_NAME}",
@@ -951,7 +1358,19 @@ def build_package_metadata(root: Path, result: dict[str, Any]) -> bytes:
             "The two author email addresses are release metadata the human "
             "supplied for this dataset deposit. They are the authors' own "
             "contact details, not third-party personal data.",
-        "bundle_payload_file_count": len(result["payload"]),
+        # Two counts, each under a name that says which it is. rc.2 published
+        # a single `bundle_payload_file_count` of 27, which read as "27
+        # manifest payload files" and was wrong: the manifest describes 25,
+        # and the archive additionally carries the manifest and SHA256SUMS.txt.
+        "manifest_payload_file_count": MANIFEST_PAYLOAD_FILE_COUNT,
+        "archive_member_count": len(result["payload"]),
+        "sha256sums_line_count": SHA256SUMS_LINE_COUNT,
+        "file_count_terminology": FILE_COUNT_TERMINOLOGY,
+        "released_source_providers": list(RELEASED_SOURCE_PROVIDERS),
+        "non_released_source_providers": list(NON_RELEASED_SOURCE_PROVIDERS),
+        "released_source_scope": RELEASED_SOURCE_SCOPE_STATEMENT,
+        "tsetmc_derived_fields_included": False,
+        "world_bank_derived_fields_included": False,
         "bundle_root": BUNDLE_ROOT,
         "credentials_committed_to_git": False,
         "final_test_artifacts_committed": 0,
@@ -1012,19 +1431,23 @@ def main(argv: list[str] | None = None) -> int:
     result = write_release_candidate(REPO_ROOT)
     payload = result["payload"]
     print(f"Stage130 dataset Release Candidate {RELEASE_VERSION}: "
-          f"{len(payload)} payload files")
+          f"{MANIFEST_PAYLOAD_FILE_COUNT} manifest payload files, "
+          f"{len(payload)} archive members")
     for name in sorted(payload):
         print(f"  {_sha256(payload[name])}  {len(payload[name]):>9}  {name}")
     rel = os.path.relpath(result["archive_path"], REPO_ROOT)
+    print(f"\n{FILE_COUNT_TERMINOLOGY}")
     print(f"\nrelease version: {RELEASE_VERSION}")
-    print(f"supersedes     : {SUPERSEDED_RELEASE['version']} "
-          f"({SUPERSEDED_RELEASE['archive_sha256']})")
+    for record in SUPERSEDED_RELEASES:
+        print(f"supersedes     : {record['version']} "
+              f"({record['archive_sha256']}) -- preserved, not deleted")
     print(f"archive        : {rel}")
     print(f"archive bytes  : {result['archive_size']}")
     print(f"archive sha256 : {result['archive_sha256']}")
     print(f"\npublication_readiness     = {PUBLICATION_READINESS}")
     print(f"source_rights_status      = {RIGHTS_STATUS}")
     print("provider_terms_verified   = false (none was ever retrieved)")
+    print(f"released source scope     : {RELEASED_SOURCE_SCOPE_STATEMENT}")
     print("zenodo_deposition_created = false")
     print("zenodo_upload_performed   = false")
     print("zenodo_published          = false")

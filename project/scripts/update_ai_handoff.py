@@ -6686,11 +6686,50 @@ def render_current_state(record: dict) -> str:
             "- 📦 **Candidate prepared:** "
             f"{record.get('stage130_dataset_release_candidate_prepared')} — "
             "version "
-            f"`{record.get('stage130_dataset_release_candidate_version')}`, "
-            f"{record.get('stage130_dataset_release_candidate_file_count')} "
-            "payload files; the archive itself is **not** tracked in Git "
-            "(tracked in git = "
+            f"`{record.get('stage130_dataset_release_candidate_version')}`. "
+            "**Two counts, and they are different:** "
+            f"{record.get('stage130_dataset_release_candidate_manifest_payload_file_count')}"
+            " files are described by `release_manifest.json` as payload files, "
+            "while the deterministic archive contains "
+            f"{record.get('stage130_dataset_release_candidate_archive_member_count')}"
+            " members — those payload files plus "
+            + ", ".join(
+                f"`{name}`" for name in
+                (record.get(
+                    "stage130_dataset_release_candidate_non_payload_archive_"
+                    "members") or []))
+            + ", which are integrity records about the payload and are not "
+            "themselves manifest payload files (all members are payload files "
+            "= "
+            f"{record.get('stage130_dataset_release_candidate_all_members_are_payload_files')}"
+            "). `SHA256SUMS.txt` accordingly carries "
+            f"{record.get('stage130_dataset_release_candidate_sha256sums_line_count')}"
+            " lines. The archive itself is **not** tracked in Git (tracked in "
+            "git = "
             f"{record.get('stage130_dataset_release_candidate_archive_tracked_in_git')}"
+            ").",
+            "- 🧾 **What the release actually draws on:** "
+            + ", ".join(
+                f"`{name}`" for name in
+                (record.get(
+                    "stage130_dataset_release_candidate_released_source_"
+                    "providers") or []))
+            + " only. No field derived from "
+            + " or ".join(
+                f"`{name}`" for name in
+                (record.get(
+                    "stage130_dataset_release_candidate_non_released_source_"
+                    "providers") or []))
+            + " is in this release (TSETMC included = "
+            f"{record.get('stage130_dataset_release_candidate_tsetmc_fields_included')}"
+            ", World Bank included = "
+            f"{record.get('stage130_dataset_release_candidate_world_bank_fields_included')}"
+            "); those sources relate only to the wider study. rc.2's "
+            "three-provider description was corrected here (corrected = "
+            f"{record.get('stage130_dataset_release_candidate_scope_claim_corrected')}"
+            ") **without changing any rights record** (rights record changed "
+            "by the correction = "
+            f"{record.get('stage130_dataset_release_candidate_rights_record_changed_by_correction')}"
             ").",
             "- 🗂️ **Supersedes** "
             f"`{record.get('stage130_dataset_release_candidate_supersedes_version')}`"
@@ -6702,7 +6741,22 @@ def render_current_state(record: dict) -> str:
             f"`{record.get('stage130_dataset_release_candidate_supersedes_readiness')}`"
             "), preserved not deleted = "
             f"{record.get('stage130_dataset_release_candidate_supersedes_preserved_not_deleted')}"
-            ". Nothing was ever deposited under it.",
+            ". Nothing was ever deposited under it. Full superseded chain, "
+            "each archive preserved and each digest intact: "
+            + "; ".join(
+                f"`{item.get('version')}` = "
+                f"`{item.get('archive_sha256')}` "
+                f"({item.get('archive_size_bytes')} bytes, "
+                f"`{item.get('publication_readiness_at_the_time')}`)"
+                for item in
+                (record.get(
+                    "stage130_dataset_release_candidate_supersede_chain")
+                 or []))
+            + " (archives preserved = "
+            f"{record.get('stage130_dataset_release_candidate_superseded_archives_preserved')}"
+            ", digests altered = "
+            f"{record.get('stage130_dataset_release_candidate_superseded_digests_altered')}"
+            ").",
             "- 📖 **Column documentation complete:** "
             f"{record.get('stage130_dataset_release_candidate_columns_documented')}"
             "/"
@@ -18035,12 +18089,38 @@ _STAGE130_RC_NEXT_ACTION_SCOPE = (
     "authorized")
 #: The three providers the source-rights audit must cover.
 _STAGE130_RC_PROVIDERS = ("CODAL", "TSETMC", "World Bank")
-#: The live candidate, and the predecessor it supersedes without deleting.
-_STAGE130_RC_RELEASE_VERSION = "1.0.0-rc.2"
-_STAGE130_RC_SUPERSEDED_VERSION = "1.0.0-rc.1"
+#: The live candidate, and the predecessors it supersedes without deleting.
+_STAGE130_RC_RELEASE_VERSION = "1.0.0-rc.3"
+#: The immediate predecessor.
+_STAGE130_RC_SUPERSEDED_VERSION = "1.0.0-rc.2"
 _STAGE130_RC_SUPERSEDED_SHA256 = (
-    "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45")
-_STAGE130_RC_SUPERSEDED_BYTES = 11657151
+    "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373")
+_STAGE130_RC_SUPERSEDED_BYTES = 11808267
+_STAGE130_RC_SUPERSEDED_READINESS = "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW"
+#: The FULL supersede chain, oldest first. rc.2 superseding rc.1 does not stop
+#: being history because rc.3 exists, so every predecessor keeps its digest,
+#: its byte size and the readiness it actually carried. Pinned here
+#: independently of the artifacts, so a rewritten package cannot also rewrite
+#: the expectation.
+_STAGE130_RC_SUPERSEDE_CHAIN = (
+    {
+        "version": "1.0.0-rc.1",
+        "archive_sha256":
+            "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
+        "archive_size_bytes": 11657151,
+        "publication_readiness_at_the_time": "NOT_READY_FOR_PUBLICATION",
+        "superseded_by_version": "1.0.0-rc.2",
+    },
+    {
+        "version": "1.0.0-rc.2",
+        "archive_sha256":
+            "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+        "archive_size_bytes": 11808267,
+        "publication_readiness_at_the_time":
+            "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+        "superseded_by_version": "1.0.0-rc.3",
+    },
+)
 #: The only two statuses an undeposited candidate may carry. `PUBLISHED` and
 #: `PUBLIC_RELEASE_AUTHORIZED` are deliberately absent: nothing in this
 #: repository can support either.
@@ -18067,6 +18147,77 @@ _STAGE130_RC_FORBIDDEN_RIGHTS_CLAIMS = (
     "codal terms verified",
     "provider terms independently verified",
 )
+
+#: What the release actually draws on. CODAL contributes researcher-compiled
+#: company financial-statement fields; TSETMC and the World Bank contribute
+#: nothing to it and relate to the wider study only. The committed rights
+#: matrix is the authority and records both exclusions as
+#: "NONE - no ...-derived field is in this release".
+_STAGE130_RC_RELEASED_PROVIDERS = ("CODAL",)
+_STAGE130_RC_NON_RELEASED_PROVIDERS = ("TSETMC", "World Bank")
+_STAGE130_RC_RELEASED_SOURCE_SCOPE = (
+    "The released company-year panel contains researcher-compiled company "
+    "financial-statement fields from publicly accessible CODAL disclosures, "
+    "together with author-derived variables and annotations. No TSETMC- or "
+    "World Bank-derived field is included in this release; those sources "
+    "relate only to the wider study."
+)
+#: The superseded three-provider sentence and its close variants, matched on
+#: text normalized to lowercase with markup, punctuation and extra whitespace
+#: removed. These are AFFIRMATIVE inclusion phrasings; the truthful negative
+#: sentence contains none of them.
+_STAGE130_RC_FORBIDDEN_SCOPE_CLAIMS = (
+    "sources including codal tsetmc and the world bank",
+    "sources including codal tsetmc and world bank",
+    "sources such as codal tsetmc and the world bank",
+    "sources such as codal tsetmc and world bank",
+    "compiled from codal tsetmc and the world bank",
+    "compiled from publicly accessible sources including codal tsetmc",
+    "from codal tsetmc and the world bank",
+    "includes tsetmc derived fields",
+    "includes world bank derived fields",
+    "tsetmc derived fields are included in this release",
+    "world bank derived fields are included in this release",
+    "released columns include market data",
+    "the release includes market data",
+    "the release includes world development indicators",
+)
+#: Sentence-level classification for the same sweep, mirroring the builder's.
+_STAGE130_RC_NON_RELEASED_TOKENS = (
+    "tsetmc", "world bank", "worldbank", "world development indicators")
+_STAGE130_RC_INCLUSION_CUES = (
+    "is included", "are included", "included in", "includes", "include ",
+    "is in this release", "are in this release", "is present", "are present",
+    "contains", "contain ", "comprises", "consists of", "compiled from",
+    "drawn from", "sourced from", "obtained from", "including", "made up of",
+    "built from", "assembled from", "taken from",
+)
+#: Demonstrative rather than generic. Bare "dataset", "values" or "data" also
+#: appear in sentences about the wider study and about a provider's own
+#: published licence, and neither is a claim about what this bundle carries.
+#: The human author's governance statement is one of the former; it is
+#: preserved verbatim and must not be swept away. The exact superseded
+#: sentence is caught by _STAGE130_RC_FORBIDDEN_SCOPE_CLAIMS regardless.
+_STAGE130_RC_SCOPE_CUES = (
+    "this release", "the release", "this bundle", "the bundle",
+    "this candidate", "this archive", "this dataset", "this panel",
+    "the released", "released column", "released field", "released value",
+    "released panel", "the payload", "this payload", "in the release",
+)
+_STAGE130_RC_NEGATION_CUES = (
+    "no ", "not ", "none", "never", "n/a", "excluded", "exclude", "without",
+    "wider study", "not material", "nothing from", "neither", "nor ",
+    "does not", "do not", "is not", "are not", "cannot", "must not",
+    "may not", "refus", "forbidden", "prohibit", "relate only",
+    "not applicable", "pending_part3", "not collected", "zero ",
+)
+#: The two counts, which are not one count.
+_STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT = 25
+_STAGE130_RC_ARCHIVE_MEMBER_COUNT = 27
+_STAGE130_RC_SHA256SUMS_LINE_COUNT = 26
+#: The archive members that are integrity records ABOUT the payload, and are
+#: therefore not manifest payload files.
+_STAGE130_RC_NON_PAYLOAD_MEMBERS = ("release_manifest.json", "SHA256SUMS.txt")
 #: The complete release dictionary and the authoritative column set it must
 #: match exactly.
 _STAGE130_RC_DICTIONARY_REL = (
@@ -18173,6 +18324,430 @@ def _stage130_rc_assert_no_unsupported_rights_claim(root: str) -> None:
                         f"{rel} asserts {claim!r}. No provider terms page was "
                         "retrieved, so that claim is unsupported; record the "
                         "human author determination instead")
+
+
+_STAGE130_RC_TAG_RE = re.compile(r"<[^>]+>")
+_STAGE130_RC_NON_TEXT_RE = re.compile(r"[^a-z0-9 ]+")
+_STAGE130_RC_WS_RE = re.compile(r"\s+")
+#: A line that opens a new block. A newline BEFORE one of these is a real
+#: boundary; a newline inside a wrapped paragraph is not, and splitting on it
+#: would tear "No TSETMC-derived and no / World Bank-derived field is included"
+#: in half and read the second half as an assertion.
+_STAGE130_RC_BLOCK_START_RE = re.compile(r"^\s*(?:[#|*+-]|\d+[.)]|```)")
+#: Leading blockquote markers, stripped before the rejoin so a quotation that
+#: wraps across several ``>`` lines is classified as the one sentence it is.
+_STAGE130_RC_QUOTE_MARKER_RE = re.compile(r"^\s*>+\s?")
+#: Sentence boundaries after wrapped lines have been rejoined. Markdown table
+#: pipes still split: a table cell is a claim on its own and must not borrow a
+#: neighbour's negation.
+_STAGE130_RC_SENTENCE_RE = re.compile(r"[.;!?|]+|\n")
+
+
+def _stage130_rc_split_sentences(text: str) -> list:
+    """Split into claim-sized units without tearing wrapped prose apart."""
+    joined = []
+    for raw_line in text.splitlines():
+        line = _STAGE130_RC_QUOTE_MARKER_RE.sub("", raw_line)
+        if not line.strip():
+            joined.append("\n")
+            continue
+        if joined and joined[-1] != "\n" and \
+                not _STAGE130_RC_BLOCK_START_RE.match(line):
+            joined[-1] = f"{joined[-1]} {line.strip()}"
+        else:
+            joined.append(line.strip())
+    return [part for chunk in joined
+            for part in _STAGE130_RC_SENTENCE_RE.split(chunk)]
+
+
+def _stage130_rc_normalize_claim(text: str) -> str:
+    """Lowercase, strip markup and punctuation, collapse whitespace."""
+    lowered = _STAGE130_RC_TAG_RE.sub(" ", text.lower())
+    return _STAGE130_RC_WS_RE.sub(
+        " ", _STAGE130_RC_NON_TEXT_RE.sub(" ", lowered)).strip()
+
+
+def _stage130_rc_json_leaves(value) -> list:
+    """Every string in a parsed JSON document, in document order."""
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        return [leaf for key, item in value.items()
+                for leaf in _stage130_rc_json_leaves(key)
+                + _stage130_rc_json_leaves(item)]
+    if isinstance(value, list):
+        return [leaf for item in value
+                for leaf in _stage130_rc_json_leaves(item)]
+    return []
+
+
+def _stage130_rc_claim_documents(text: str) -> list:
+    """Split a file into the units the sentence classifier should read.
+
+    JSON is not prose: its keys and values sit on separate lines and joining
+    them produces pseudo-sentences that borrow negations across unrelated
+    fields. So a JSON document is swept one string value at a time, each on
+    its own; anything else is swept as prose.
+    """
+    try:
+        parsed = json.loads(text)
+    except (ValueError, TypeError):
+        return [text]
+    return _stage130_rc_json_leaves(parsed)
+
+
+def _stage130_rc_scope_violations(text: str) -> list:
+    """Every misleading release-composition claim in one document.
+
+    A sentence offends when it (a) names a provider that contributes no
+    released field, (b) asserts inclusion, (c) is about this release's
+    contents, and (d) carries no negation, scope limit or exclusion. All four
+    must hold. The human author's own governance statement -- about the WIDER
+    STUDY's underlying data -- fails (c) and is preserved verbatim.
+    """
+    violations = []
+    normalized = _stage130_rc_normalize_claim(text)
+    for claim in _STAGE130_RC_FORBIDDEN_SCOPE_CLAIMS:
+        if claim in normalized:
+            violations.append(
+                f"repeats the superseded three-provider claim {claim!r}")
+    for document in _stage130_rc_claim_documents(text):
+        plain = _STAGE130_RC_TAG_RE.sub(" ", document)
+        for raw in _stage130_rc_split_sentences(plain):
+            sentence = _STAGE130_RC_WS_RE.sub(" ", raw).strip()
+            if not sentence:
+                continue
+            lowered = sentence.lower()
+            if any(cue in lowered for cue in _STAGE130_RC_NEGATION_CUES):
+                continue
+            provider = next(
+                (token for token in _STAGE130_RC_NON_RELEASED_TOKENS
+                 if token in lowered), None)
+            if provider is None:
+                continue
+            if not any(cue in lowered
+                       for cue in _STAGE130_RC_INCLUSION_CUES):
+                continue
+            if not any(cue in lowered for cue in _STAGE130_RC_SCOPE_CUES):
+                continue
+            violations.append(
+                f"asserts that {provider!r} material is in this release: "
+                f"{sentence[:160]!r}")
+    return violations
+
+
+#: The human author's own statement about the WIDER STUDY's data sources,
+#: pinned verbatim. It names all three providers because the study used all
+#: three; it is not, and never was, a claim about which providers contributed
+#: a field to this release. It is a record of what a person said, so it is
+#: preserved exactly and is exempt from the composition sweep -- and pinning
+#: it here turns "human_supplied_statements_altered = 0" from an assertion
+#: into something the generator actually checks.
+_STAGE130_RC_HUMAN_GOVERNANCE_STATEMENT = (
+    "All underlying data were obtained from publicly accessible sources such "
+    "as CODAL, TSETMC and the World Bank. No purchased, confidential, "
+    "personal or human-participant data were used."
+)
+
+
+def _stage130_rc_permitted_quotations(root: str) -> list:
+    """The only verbatim texts exempt from the composition sweep.
+
+    Exactly two, both in the decision artifact, both required to be present:
+
+    1. ``rc3_correction.previous_statement`` -- the superseded sentence,
+       recorded because a correction that hides what it corrected cannot be
+       audited;
+    2. ``human_supplied_data_governance_facts.statement`` -- the human author's
+       words about the wider study's data sources, which are a record of what
+       a person said and are not the agent's to edit.
+
+    Read from the artifact rather than pinned as patterns, so the carve-out
+    covers exactly the text the record holds and cannot be widened into a
+    general exemption by editing this file.
+    """
+    path = os.path.join(root, _STAGE130_RC_DECISION_REL)
+    if not os.path.isfile(path):
+        return []
+    with open(path, encoding="utf-8") as fh:
+        decision = json.load(fh)
+    quoted = ((decision.get("rc3_correction") or {})
+              .get("previous_statement") or "")
+    if not quoted.strip():
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record the superseded "
+            "release-scope statement verbatim in "
+            "rc3_correction.previous_statement: a correction that hides what "
+            "it corrected cannot be audited")
+    human = ((decision.get("human_supplied_data_governance_facts") or {})
+             .get("statement") or "")
+    if human != _STAGE130_RC_HUMAN_GOVERNANCE_STATEMENT:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate has altered the human "
+            "author's data-governance statement. It is a record of what a "
+            "person said about the WIDER STUDY's sources, not a claim about "
+            "this release's composition, and it is preserved verbatim:\n"
+            f"{_STAGE130_RC_HUMAN_GOVERNANCE_STATEMENT}")
+    # Match the JSON-encoded forms, which is what appears in the file bytes.
+    return [json.dumps(text, ensure_ascii=False)[1:-1]
+            for text in (quoted, human)]
+
+
+def _stage130_rc_assert_no_misleading_release_scope_claim(root: str) -> None:
+    """No committed package file may misstate which providers are released.
+
+    The committed rights matrix is the authority: CODAL-derived,
+    researcher-compiled company financial fields are present; no TSETMC-derived
+    and no World Bank-derived field is. A description implying all three
+    providers fed the released values tells a reuser something untrue about the
+    bytes they are being handed, and 1.0.0-rc.2 shipped exactly such a
+    sentence. This sweep refuses its recurrence -- in prose as well as flags,
+    since a paragraph can assert what a boolean denies.
+
+    Independent of :func:`_stage130_rc_assert_no_unsupported_rights_claim`:
+    that one protects the RIGHTS record, this one protects the COMPOSITION
+    record, and neither is satisfied by the other passing.
+
+    **Two narrow carve-outs, both in the decision artifact.** The superseded
+    sentence is quoted verbatim in ``rc3_correction.previous_statement``,
+    because a correction that hides what it corrected is not auditable; and the
+    human author's wider-study data statement is preserved verbatim in
+    ``human_supplied_data_governance_facts.statement``, because it is a record
+    of what a person said rather than a claim this action may reword. Both are
+    masked before the sweep runs and both are separately required to be present
+    and unchanged. No other file, and no other key, may carry either text:
+    describing the defect is enough everywhere else.
+    """
+    quoted = _stage130_rc_permitted_quotations(root)
+    pkg = os.path.join(root, _STAGE130_RC_PKG)
+    for dirpath, dirnames, filenames in os.walk(pkg):
+        dirnames[:] = [d for d in dirnames if d != "build"]
+        for name in sorted(filenames):
+            path = os.path.join(dirpath, name)
+            rel = os.path.relpath(path, root)
+            try:
+                with open(path, encoding="utf-8") as fh:
+                    text = fh.read()
+            except (UnicodeDecodeError, OSError):
+                continue
+            if rel == _STAGE130_RC_DECISION_REL:
+                for permitted in quoted:
+                    text = text.replace(permitted, " ")
+            violations = _stage130_rc_scope_violations(text)
+            if violations:
+                raise HandoffError(
+                    f"{rel} misstates the released source scope: "
+                    + "; ".join(violations)
+                    + ". The correct statement is: "
+                    + _STAGE130_RC_RELEASED_SOURCE_SCOPE)
+
+
+def _stage130_rc_assert_released_source_scope(root: str, decision: dict,
+                                             boundary: dict,
+                                             manifest: dict) -> None:
+    """Every surface must state the released source scope, and state it right.
+
+    The committed ``source_rights_matrix.csv`` is the authority. It records
+    CODAL as contributing compiled statement line items and author-derived
+    variables, and both TSETMC and World Bank as contributing NONE. The
+    decision, the boundary and the manifest must each carry that fact
+    explicitly, so a reader of any one of them gets the true composition
+    without having to reconcile three surfaces.
+    """
+    matrix_path = os.path.join(root, _STAGE130_RC_MATRIX_REL)
+    with open(matrix_path, encoding="utf-8-sig", newline="") as fh:
+        rows = {row.get("provider"): row for row in csv.DictReader(fh)}
+    for provider in _STAGE130_RC_NON_RELEASED_PROVIDERS:
+        row = rows.get(provider) or {}
+        used = (row.get("type_of_information_used_in_this_release") or "")
+        if not used.strip().upper().startswith("NONE"):
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate rights matrix row "
+                f"{provider!r} must record its contribution to THIS release "
+                f"as NONE, got {used!r}. If that ever changes, the release "
+                "scope statement changes with it -- it is not edited alone.")
+    codal = rows.get("CODAL") or {}
+    if not (codal.get("type_of_information_used_in_this_release") or "").strip():
+        raise HandoffError(
+            "Stage130 dataset Release Candidate rights matrix must record "
+            "what CODAL contributes to this release")
+
+    scope = decision.get("released_source_scope") or {}
+    if scope.get("statement") != _STAGE130_RC_RELEASED_SOURCE_SCOPE:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate decision must carry the "
+            "released source scope statement verbatim:\n"
+            f"{_STAGE130_RC_RELEASED_SOURCE_SCOPE}")
+    if tuple(scope.get("released_source_providers") or ()) != \
+            _STAGE130_RC_RELEASED_PROVIDERS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate decision released_source_"
+            f"providers must be {list(_STAGE130_RC_RELEASED_PROVIDERS)}")
+    if tuple(scope.get("non_released_source_providers") or ()) != \
+            _STAGE130_RC_NON_RELEASED_PROVIDERS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate decision non_released_source_"
+            f"providers must be {list(_STAGE130_RC_NON_RELEASED_PROVIDERS)}")
+    for field in ("tsetmc_derived_fields_included",
+                  "world_bank_derived_fields_included",
+                  "original_provider_files_redistributed"):
+        if scope.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate decision "
+                f"released_source_scope.{field} must be False: the rights "
+                "matrix records no such field in this release")
+    if scope.get("wider_study_statement_is_not_a_release_composition_claim") \
+            is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record that the human "
+            "author's wider-study data statement is not a claim about which "
+            "providers contributed a released field")
+    if scope.get("rights_record_changed_by_this_correction") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate scope correction must record "
+            "that it changed no rights record")
+
+    if manifest.get("released_source_scope") != \
+            _STAGE130_RC_RELEASED_SOURCE_SCOPE:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest must publish the "
+            "released source scope statement")
+    for field in ("tsetmc_derived_fields_included",
+                  "world_bank_derived_fields_included"):
+        if manifest.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest {field} must be "
+                "False")
+    if boundary.get("released_source_scope_statement") != \
+            _STAGE130_RC_RELEASED_SOURCE_SCOPE:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary must publish the "
+            "released source scope statement")
+    for field in ("tsetmc_derived_fields_included_in_release",
+                  "world_bank_derived_fields_included_in_release",
+                  "misleading_three_provider_release_scope_claim_present",
+                  "historical_rights_record_changed_by_this_action"):
+        if boundary.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate boundary {field} must be "
+                "False")
+    for field in ("rights_matrix_rows_changed_by_this_action",
+                  "human_supplied_statements_altered_by_this_action"):
+        if boundary.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate boundary {field} must be "
+                "0: correcting a description does not rewrite a human's words "
+                "or the rights record")
+
+    correction = decision.get("rc3_correction") or {}
+    if correction.get("corrected_statement") != \
+            _STAGE130_RC_RELEASED_SOURCE_SCOPE:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record the corrected "
+            "statement it now publishes")
+    if not (correction.get("previous_statement") or "").strip():
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record the superseded "
+            "statement it replaced; a correction that hides what it corrected "
+            "is not auditable")
+    for field in ("historical_rights_record_changed",
+                  "provider_terms_retrieved_by_this_correction",
+                  "provider_terms_verified_by_this_correction",
+                  "codal_or_tsetmc_terms_claimed_retrieved_or_verified"):
+        if correction.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate rc3_correction.{field} "
+                "must be False")
+    for field in ("data_values_changed", "frozen_surface_bytes_changed",
+                  "manuscript_bytes_changed", "rights_matrix_rows_changed",
+                  "human_supplied_statements_altered",
+                  "superseded_candidates_altered",
+                  "superseded_archives_rebuilt_renamed_or_deleted"):
+        if correction.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate rc3_correction.{field} "
+                "must be 0: this correction rewrote a description, nothing "
+                "else")
+
+
+def _stage130_rc_assert_file_count_terminology(decision: dict, boundary: dict,
+                                               manifest: dict) -> None:
+    """25 manifest payload files, 27 archive members, never one number.
+
+    rc.2 published a single ``bundle_payload_file_count`` of 27, which read as
+    "27 manifest payload files" and was wrong: the manifest describes 25, and
+    the archive additionally carries the manifest and SHA256SUMS.txt. Both
+    numbers are now published under names that say which is which, and the
+    manifest's own ``file_count`` must agree with the payload count.
+    """
+    files = manifest.get("files") or []
+    if len(files) != _STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT:
+        raise HandoffError(
+            f"Stage130 dataset Release Candidate manifest lists {len(files)} "
+            f"payload files, expected "
+            f"{_STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT}")
+    listed = {entry.get("bundle_path") for entry in files}
+    for name in _STAGE130_RC_NON_PAYLOAD_MEMBERS:
+        if name in listed:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest lists {name!r} "
+                "as a payload file. It is an integrity record ABOUT the "
+                "payload and is not one of the "
+                f"{_STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT} payload files")
+    expected = {
+        "manifest_payload_file_count":
+            _STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT,
+        "archive_member_count": _STAGE130_RC_ARCHIVE_MEMBER_COUNT,
+        "sha256sums_line_count": _STAGE130_RC_SHA256SUMS_LINE_COUNT,
+    }
+    for field, value in expected.items():
+        if manifest.get(field) != value:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest {field} is "
+                f"{manifest.get(field)!r}, expected {value}")
+    if manifest.get("file_count") != \
+            _STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest file_count must "
+            f"equal the payload count "
+            f"{_STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT}")
+    if _STAGE130_RC_ARCHIVE_MEMBER_COUNT != (
+            _STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT
+            + len(_STAGE130_RC_NON_PAYLOAD_MEMBERS)):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate archive member count must be "
+            "the payload count plus the two integrity records")
+
+    composition = decision.get("release_composition") or {}
+    for field, value in expected.items():
+        if composition.get(field) != value:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate decision "
+                f"release_composition.{field} is {composition.get(field)!r}, "
+                f"expected {value}")
+    if composition.get("all_27_described_as_manifest_payload_files") \
+            is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record that the "
+            f"{_STAGE130_RC_ARCHIVE_MEMBER_COUNT} archive members are NOT all "
+            "manifest payload files")
+    if tuple(composition.get(
+            "archive_members_that_are_not_manifest_payload_files") or ()) != \
+            _STAGE130_RC_NON_PAYLOAD_MEMBERS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must name the two archive "
+            "members that are not manifest payload files: "
+            f"{list(_STAGE130_RC_NON_PAYLOAD_MEMBERS)}")
+    for field, value in expected.items():
+        if boundary.get(field) != value:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate boundary {field} is "
+                f"{boundary.get(field)!r}, expected {value}")
+    if boundary.get("all_archive_members_described_as_manifest_payload_files") \
+            is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary must record that not "
+            "every archive member is a manifest payload file")
 
 
 def _stage130_rc_assert_complete_column_dictionary(root: str) -> dict:
@@ -18488,10 +19063,11 @@ def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
                 f"the superseded archive size "
                 f"{_STAGE130_RC_SUPERSEDED_BYTES}")
         if source.get("publication_readiness_at_the_time") != \
-                "NOT_READY_FOR_PUBLICATION":
+                _STAGE130_RC_SUPERSEDED_READINESS:
             raise HandoffError(
                 f"Stage130 dataset Release Candidate {label} must preserve "
-                "that the superseded candidate was NOT_READY_FOR_PUBLICATION")
+                "that the superseded candidate was "
+                f"{_STAGE130_RC_SUPERSEDED_READINESS}")
         for field in ("zenodo_deposition_created", "zenodo_upload_performed",
                       "zenodo_doi_reserved", "zenodo_published",
                       "public_release_authorized"):
@@ -18509,6 +19085,83 @@ def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
         raise HandoffError(
             "Stage130 dataset Release Candidate must build under a NEW "
             "archive filename so the superseded candidate is not overwritten")
+
+    # (6c) The FULL supersede chain. rc.2 superseding rc.1 is still history
+    # once rc.3 exists, so every predecessor keeps its own digest, byte size
+    # and the readiness it actually carried, on all three surfaces. Losing or
+    # altering one is a rewrite of history, not a version bump.
+    chain_sources = (
+        (decision.get("supersedes_release_history"), "decision"),
+        (manifest.get("supersedes_history"), "manifest"),
+    )
+    for chain, label in chain_sources:
+        if not isinstance(chain, list) or len(chain) != \
+                len(_STAGE130_RC_SUPERSEDE_CHAIN):
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must record all "
+                f"{len(_STAGE130_RC_SUPERSEDE_CHAIN)} superseded candidates, "
+                f"oldest first; got {chain!r}")
+        for recorded, expected in zip(chain, _STAGE130_RC_SUPERSEDE_CHAIN):
+            for field, value in expected.items():
+                if recorded.get(field) != value:
+                    raise HandoffError(
+                        f"Stage130 dataset Release Candidate {label} "
+                        f"supersede history for {expected['version']} records "
+                        f"{field} = {recorded.get(field)!r}, expected "
+                        f"{value!r}. A superseded candidate's record is "
+                        "history and may not be altered.")
+            if recorded.get("preserved_not_deleted") is not True:
+                raise HandoffError(
+                    f"Stage130 dataset Release Candidate {label} must record "
+                    f"{expected['version']} as preserved, not deleted")
+            for field in ("zenodo_deposition_created",
+                          "zenodo_upload_performed", "zenodo_doi_reserved",
+                          "zenodo_published", "public_release_authorized"):
+                if recorded.get(field) is not False:
+                    raise HandoffError(
+                        f"Stage130 dataset Release Candidate {label} "
+                        f"supersede history for {expected['version']} must "
+                        f"keep {field} False: nothing was ever deposited "
+                        "under any candidate")
+        names = [record.get("archive_name") for record in chain]
+        if manifest.get("archive_name") in names:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate reuses a superseded "
+                f"archive filename ({manifest.get('archive_name')!r}); each "
+                "candidate must build under its own name so no predecessor is "
+                "overwritten")
+        if len(set(names)) != len(names):
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} supersede "
+                "history repeats an archive filename")
+    boundary_chain = boundary.get("supersedes_release_history")
+    if not isinstance(boundary_chain, list) or len(boundary_chain) != \
+            len(_STAGE130_RC_SUPERSEDE_CHAIN):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary must record the "
+            "full supersede history")
+    for recorded, expected in zip(boundary_chain, _STAGE130_RC_SUPERSEDE_CHAIN):
+        if recorded.get("archive_sha256") != expected["archive_sha256"]:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate boundary supersede "
+                f"history for {expected['version']} lost its digest")
+    for field in ("superseded_archives_rebuilt_renamed_or_deleted_by_this_"
+                  "action",
+                  "superseded_recorded_digests_altered_by_this_action"):
+        if boundary.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate boundary {field} must be "
+                "0: a superseded candidate is preserved, never rebuilt, "
+                "renamed, deleted or re-digested")
+
+    # (6d) What the release actually draws on. The rights matrix is the
+    # authority; every surface must agree with it, and no surface may repeat
+    # rc.2's three-provider sentence.
+    _stage130_rc_assert_released_source_scope(root, decision, boundary,
+                                              manifest)
+
+    # (6e) 25 payload files, 27 archive members, and never one number for both.
+    _stage130_rc_assert_file_count_terminology(decision, boundary, manifest)
 
     # (7) The source-rights audit: all three providers, and a blocked
     # disposition that is not quietly upgraded.
@@ -18698,6 +19351,7 @@ def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
     # happened. Swept over the whole committed package, not just the fields
     # above, so a sentence in prose cannot say what a flag denies.
     _stage130_rc_assert_no_unsupported_rights_claim(root)
+    _stage130_rc_assert_no_misleading_release_scope_claim(root)
 
     # (8) The approved manuscript is untouched, proven by re-derived digests.
     manuscript_boundary = decision.get("manuscript_boundary") or {}
@@ -18952,8 +19606,21 @@ def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
             decision.get("decision_date_utc"),
         "stage130_dataset_release_candidate_prepared": True,
         "stage130_dataset_release_candidate_package": _STAGE130_RC_PKG,
+        # Two counts, two names. `..._file_count` keeps its meaning -- the
+        # number of files the manifest describes as payload files -- and the
+        # archive member count is published beside it rather than folded in.
         "stage130_dataset_release_candidate_file_count":
             manifest.get("file_count"),
+        "stage130_dataset_release_candidate_manifest_payload_file_count":
+            _STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT,
+        "stage130_dataset_release_candidate_archive_member_count":
+            _STAGE130_RC_ARCHIVE_MEMBER_COUNT,
+        "stage130_dataset_release_candidate_sha256sums_line_count":
+            _STAGE130_RC_SHA256SUMS_LINE_COUNT,
+        "stage130_dataset_release_candidate_non_payload_archive_members":
+            list(_STAGE130_RC_NON_PAYLOAD_MEMBERS),
+        "stage130_dataset_release_candidate_all_members_are_payload_files":
+            False,
         "stage130_dataset_release_candidate_primary_file":
             manifest.get("primary_file"),
         "stage130_dataset_release_candidate_primary_pairs":
@@ -18983,6 +19650,29 @@ def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
             "NOT_READY_FOR_PUBLICATION",
         "stage130_dataset_release_candidate_supersedes_preserved_not_deleted":
             True,
+        # The FULL chain, so a consumer reading only the Handoff still sees
+        # that rc.1 and rc.2 both existed, what each hashed to, and that
+        # nothing was ever deposited under either.
+        "stage130_dataset_release_candidate_supersede_chain":
+            [dict(record) for record in _STAGE130_RC_SUPERSEDE_CHAIN],
+        "stage130_dataset_release_candidate_superseded_versions":
+            [record["version"] for record in _STAGE130_RC_SUPERSEDE_CHAIN],
+        "stage130_dataset_release_candidate_superseded_archives_preserved":
+            True,
+        "stage130_dataset_release_candidate_superseded_digests_altered": 0,
+
+        # What the release actually draws on, and what it does not.
+        "stage130_dataset_release_candidate_released_source_providers":
+            list(_STAGE130_RC_RELEASED_PROVIDERS),
+        "stage130_dataset_release_candidate_non_released_source_providers":
+            list(_STAGE130_RC_NON_RELEASED_PROVIDERS),
+        "stage130_dataset_release_candidate_released_source_scope":
+            _STAGE130_RC_RELEASED_SOURCE_SCOPE,
+        "stage130_dataset_release_candidate_tsetmc_fields_included": False,
+        "stage130_dataset_release_candidate_world_bank_fields_included": False,
+        "stage130_dataset_release_candidate_scope_claim_corrected": True,
+        "stage130_dataset_release_candidate_rights_record_changed_by_"
+        "correction": False,
 
         # Column documentation: complete, and anchored.
         "stage130_dataset_release_candidate_columns_released":
