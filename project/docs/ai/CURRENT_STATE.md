@@ -11,8 +11,8 @@ _Generated from the repository (git + QC). Do not edit by hand._
 - **Active workstream:** `stage130_dataset_release_candidate_review`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
 - **Next research action:** `human-dataset-release-candidate-digest-review`
-- **Last stage commit:** `a006345c65e0baf0651393884d0aa1b4724923c4`
-- **Generated from commit:** `a006345c65e0baf0651393884d0aa1b4724923c4` (branch `stage130-human-review-data-contribution`, informational)
+- **Last stage commit:** `b15176867712746ffae12c72bbd9ff3210da4365`
+- **Generated from commit:** `b15176867712746ffae12c72bbd9ff3210da4365` (branch `stage130-human-review-data-contribution`, informational)
 - **Baseline:** `origin/main` @ `76b4e9d286bc513a290c0534da9b5fcd23fcf497`
 
 ## Current-state validation
@@ -436,8 +436,9 @@ _The human supervisor read the committed draft at one exact commit and approved 
 
 _Custody and documentation only. Frozen bytes were copied, hashed and archived. Nothing was deposited, uploaded, minted or published, and the manuscript was not touched._
 
-- 📦 **Candidate prepared:** True — version `1.0.0-rc.2`, 25 payload files; the archive itself is **not** tracked in Git (tracked in git = False).
-- 🗂️ **Supersedes** `1.0.0-rc.1` (archive SHA-256 `6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45`, 11657151 bytes, readiness `NOT_READY_FOR_PUBLICATION`), preserved not deleted = True. Nothing was ever deposited under it.
+- 📦 **Candidate prepared:** True — version `1.0.0-rc.3`. **Two counts, and they are different:** 25 files are described by `release_manifest.json` as payload files, while the deterministic archive contains 27 members — those payload files plus `release_manifest.json`, `SHA256SUMS.txt`, which are integrity records about the payload and are not themselves manifest payload files (all members are payload files = False). `SHA256SUMS.txt` accordingly carries 26 lines. The archive itself is **not** tracked in Git (tracked in git = False).
+- 🧾 **What the release actually draws on:** `CODAL` only. No field derived from `TSETMC` or `World Bank` is in this release (TSETMC included = False, World Bank included = False); those sources relate only to the wider study. rc.2's three-provider description was corrected here (corrected = True) **without changing any rights record** (rights record changed by the correction = False).
+- 🗂️ **Supersedes** `1.0.0-rc.2` (archive SHA-256 `d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373`, 11808267 bytes, readiness `NOT_READY_FOR_PUBLICATION`), preserved not deleted = True. Nothing was ever deposited under it. Full superseded chain, each archive preserved and each digest intact: `1.0.0-rc.1` = `6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45` (11657151 bytes, `NOT_READY_FOR_PUBLICATION`); `1.0.0-rc.2` = `d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373` (11808267 bytes, `READY_FOR_EXACT_DIGEST_HUMAN_REVIEW`) (archives preserved = True, digests altered = 0).
 - 📖 **Column documentation complete:** 115/115 released columns documented, 0 undocumented, 0 definitions invented. Dictionary: `project/stage130/dataset_release_candidate/release_payload/RELEASE_COLUMN_DICTIONARY.csv`. Every row names the committed repository source its facts came from.
 - 🎯 **Primary modeling surface:** `data/analysis_ready_main_rule_a_stage125.csv` — 1012 pairs, 119 companies, 115 columns, 80 positive, 932 negative. These are CONTRACT values (recomputed from rows = False).
 - 🔒 **Frozen surfaces verified:** 8 of 8 hashed and matching (the eight live under a gitignored directory, so absence in a fresh clone is tolerated; drift never is).
@@ -497,5 +498,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `ea88128f6690291feca83b15e99494ba1f4c432dc0ff64f9fa25e1291806cedf`_
-_generated_at_utc: 2026-08-21T18:37:08Z (informational)_
+_state_fingerprint: `4c898b1eec133cd8537f2c7bc8ec9a8f99ac093fa9ce35820896ed7d8fe71c9c`_
+_generated_at_utc: 2026-08-21T20:25:58Z (informational)_
