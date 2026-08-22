@@ -93,6 +93,17 @@ NEXT_POINTER = "human-zenodo-draft-review-and-publication-decision"
 NEXT_POINTER_SCOPE = (
     "zenodo_draft_human_review_and_separate_publication_decision_no_publish_"
     "action_is_authorized")
+#: What is live NOW. This action's own successor named TWO separable human
+#: things -- review the draft, then decide about publication. A later action
+#: completed the review half (and recorded the human's own metadata-only Notes
+#: correction), so the live pointer names only the decision that is left.
+#: Assertions about this action's OWN artifacts keep the values above;
+#: assertions about CURRENT repository state use these.
+LIVE_POINTER = "human-zenodo-publication-decision"
+LIVE_POINTER_SCOPE = (
+    "zenodo_publication_decision_only_no_publication_action_is_"
+    "authorized")
+LIVE_LAST_COMPLETED_ACTION = "stage130-zenodo-draft-human-review-completion"
 
 MANUSCRIPT_REL = "project/stage130/manuscript/manuscript_draft_en.md"
 MANUSCRIPT_SHA256 = (
@@ -657,15 +668,31 @@ def test_the_release_candidate_package_is_byte_identical():
 
 def test_the_live_pointer_advances_to_the_human_draft_review(
         markers, boundary, roadmap_front_matter, state):
+    """This action's OWN pointer, and the one that is live now.
+
+    Both statements are true and neither overwrites the other. This action's
+    artifacts keep naming the draft review it created the need for; the
+    repository's CURRENT pointer has moved past it, because that review has
+    since been completed. What these assertions pin is that this action's own
+    record never drifts and that the live state never stalls on a finished
+    review.
+    """
     for value in (markers["next_research_action_id"],
                   boundary["next_action_id"],
-                  roadmap_front_matter["next_research_action_id"],
-                  state["next_research_action_id"],
                   markers["stage130_phase2_next_action_id"]):
         assert value == NEXT_POINTER
         assert value != SUPERSEDED_POINTER
+    for value in (roadmap_front_matter["next_research_action_id"],
+                  state["next_research_action_id"],
+                  state["stage130_phase2_next_action_id"]):
+        assert value == LIVE_POINTER
+        assert value != SUPERSEDED_POINTER
+        assert value != NEXT_POINTER
     assert markers["last_completed_research_action_id"] == ACTION_ID
-    assert roadmap_front_matter["last_completed_research_action_id"] == ACTION_ID
+    assert state["last_completed_research_action_id"] == \
+        LIVE_LAST_COMPLETED_ACTION
+    assert roadmap_front_matter["last_completed_research_action_id"] == \
+        LIVE_LAST_COMPLETED_ACTION
 
 
 def test_the_pointer_is_not_an_authorization(markers, boundary,
@@ -677,8 +704,11 @@ def test_the_pointer_is_not_an_authorization(markers, boundary,
     assert boundary["pointer_is_not_authorization"] is True
     assert boundary["next_action_scope"] == NEXT_POINTER_SCOPE
     assert roadmap_front_matter["next_research_action_authorized"] == "false"
+    # The ROADMAP publishes the LIVE scope, which has advanced past this
+    # action's own; both are unauthorized, and that is the point.
     assert roadmap_front_matter["next_research_action_scope"] == \
-        NEXT_POINTER_SCOPE
+        LIVE_POINTER_SCOPE
+    assert "no_publication_action_is_authorized" in LIVE_POINTER_SCOPE
 
 
 def test_the_successor_is_a_human_step(boundary):

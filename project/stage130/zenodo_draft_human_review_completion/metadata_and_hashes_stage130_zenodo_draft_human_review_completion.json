@@ -1,0 +1,62 @@
+{
+  "action_id": "stage130-zenodo-draft-human-review-completion",
+  "action_type": "human_zenodo_draft_review_completion_and_metadata_notes_correction_recording_only",
+  "archive_modified_by_this_action": false,
+  "archive_re_uploaded_by_this_action": false,
+  "concept_doi_displayed": true,
+  "credentials_committed_to_git": false,
+  "deposited_file_md5": "cbd3df6c75053ee6d0641f19d5301d7a",
+  "deposited_file_name": "tse_financial_distress_dataset_1392_1402_release_candidate_rc3.zip",
+  "deposited_file_sha256": "4adb32bd675fd9181d8ced783b6734382e9749c6c574e35567d1bec65fd72f70",
+  "deposited_file_size_bytes": 11824690,
+  "deposition_id": 22059238,
+  "deposition_state_file_committed_to_git": false,
+  "doi_publicly_activated": false,
+  "doi_published": false,
+  "doi_registered_or_resolving": false,
+  "final_test_artifacts_committed": 0,
+  "human_metadata_edit_performed": true,
+  "human_visual_review_completed": true,
+  "independently_retrieved_by_programmer": false,
+  "manuscript_files_modified_by_this_action": 0,
+  "model_artifacts_committed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "package_file_count": 3,
+  "package_files": {
+    "README.md": {
+      "bytes": 10511,
+      "sha256": "9450a861d3e1ea511f05c0522baef4ee8579a8a73ea91485867e37f5abcfbff7"
+    },
+    "stage130_zenodo_draft_human_review_completion_decision.json": {
+      "bytes": 14441,
+      "sha256": "c7aa450a470e45bf9a664e15f40c38771e38ec16ee583c3ffdc13e6d002ee6d6"
+    },
+    "stage130_zenodo_draft_human_review_completion_governance_boundary.json": {
+      "bytes": 6374,
+      "sha256": "d66a6f8ce6e877f2ae44fa817d490388769c4e2fc03b17696260274e6f496ce7"
+    }
+  },
+  "pii_committed_to_git": false,
+  "prior_package_files_modified_by_this_action": 0,
+  "public_release": false,
+  "public_release_authorized": false,
+  "publication_authorized": false,
+  "record_is_private_draft": true,
+  "record_publicly_available": false,
+  "record_state": "unsubmitted",
+  "record_submitted": false,
+  "release_candidate_version": "1.0.0-rc.3",
+  "reserved_concept_doi": "10.5281/zenodo.22059237",
+  "reserved_version_doi": "10.5281/zenodo.22059238",
+  "stage130_zenodo_draft_human_review_completed": true,
+  "stage130_zenodo_draft_notes_correction_completed": true,
+  "stage130_zenodo_historical_notes_sha256": "9096ed3fc195915fb6428a107adacffde23c59aaac6845966b20cbffcfc62ff2",
+  "stage130_zenodo_live_notes_are_publication_stable": true,
+  "stage130_zenodo_live_notes_sha256": "7ff1c7de2baab5e2ecc95e20d8996db38bb8ec67e35dc4200335ec37d6f5ea46",
+  "value_files_committed": 0,
+  "version_doi_reserved": true,
+  "zenodo_api_calls_made_by_this_action": 0,
+  "zenodo_deposition_created": true,
+  "zenodo_published": false,
+  "zenodo_upload_performed": true
+}

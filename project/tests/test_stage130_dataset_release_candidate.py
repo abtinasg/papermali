@@ -89,14 +89,15 @@ NEXT_POINTER = "human-dataset-release-candidate-digest-review"
 NEXT_POINTER_SCOPE = (
     "dataset_release_candidate_human_digest_review_no_zenodo_action_is_"
     "authorized")
-#: What is live NOW. A later action -- the human-executed Zenodo DRAFT
-#: deposition -- moved the live pointer on again, so assertions about the
-#: ROADMAP's CURRENT front matter use these while assertions about this
-#: action's own artifacts keep the values above.
-LIVE_POINTER = "human-zenodo-draft-review-and-publication-decision"
+#: What is live NOW. Two later actions -- the human-executed Zenodo DRAFT
+#: deposition, and then the human's completed review of that draft together
+#: with their own metadata-only Notes correction -- moved the live pointer on
+#: again, so assertions about the ROADMAP's CURRENT front matter use these
+#: while assertions about this action's own artifacts keep the values above.
+LIVE_POINTER = "human-zenodo-publication-decision"
 LIVE_POINTER_SCOPE = (
-    "zenodo_draft_human_review_and_separate_publication_decision_no_publish_"
-    "action_is_authorized")
+    "zenodo_publication_decision_only_no_publication_action_is_"
+    "authorized")
 SUPERSEDED_POINTER = "human-manuscript-submission-metadata"
 PROVIDERS = ("CODAL", "TSETMC", "World Bank")
 RELEASE_VERSION = "1.0.0-rc.3"

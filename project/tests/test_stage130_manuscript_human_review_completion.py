@@ -52,18 +52,19 @@ SUPERSEDED_POINTER = "human-manuscript-review"
 NEXT_POINTER = "human-manuscript-submission-metadata"
 NEXT_POINTER_SCOPE = (
     "manuscript_human_submission_metadata_no_further_action_is_authorized")
-#: What is live NOW. Two later actions moved the live pointer on again -- the
-#: Zenodo dataset Release Candidate, and then the human-executed Zenodo DRAFT
-#: deposition -- so assertions about CURRENT state use these, while assertions
-#: about this action's own artifacts keep the values above. The manuscript
-#: submission metadata is still outstanding underneath; the pointer moved
-#: because a private Draft now needs a human review and a separate publication
-#: decision, not because the metadata was supplied.
-LIVE_POINTER = "human-zenodo-draft-review-and-publication-decision"
+#: What is live NOW. Three later actions moved the live pointer on again -- the
+#: Zenodo dataset Release Candidate, the human-executed Zenodo DRAFT
+#: deposition, and then the human's completed review of that draft plus their
+#: own metadata-only Notes correction -- so assertions about CURRENT state use
+#: these, while assertions about this action's own artifacts keep the values
+#: above. The manuscript submission metadata is still outstanding underneath;
+#: the pointer moved because a reviewed private Draft now needs a separate
+#: human publication decision, not because the metadata was supplied.
+LIVE_POINTER = "human-zenodo-publication-decision"
 LIVE_POINTER_SCOPE = (
-    "zenodo_draft_human_review_and_separate_publication_decision_no_publish_"
-    "action_is_authorized")
-LIVE_LAST_COMPLETED_ACTION = "stage130-zenodo-draft-deposition"
+    "zenodo_publication_decision_only_no_publication_action_is_"
+    "authorized")
+LIVE_LAST_COMPLETED_ACTION = "stage130-zenodo-draft-human-review-completion"
 OUTSTANDING_METADATA = [
     "authors_and_author_order",
     "affiliations_and_corresponding_author",
@@ -651,11 +652,11 @@ def test_the_workstream_label_aligns_with_the_live_pointer(
     assert "submission_metadata" in NEXT_POINTER_SCOPE
     assert state["next_research_action_id"] == LIVE_POINTER
     assert LIVE_WORKSTREAM_ID.endswith("dataset-release-candidate-review")
-    assert LIVE_POINTER.endswith("draft-review-and-publication-decision")
+    assert LIVE_POINTER.endswith("zenodo-publication-decision")
     assert roadmap_front_matter["next_research_action_scope"] == \
         LIVE_POINTER_SCOPE
-    assert "zenodo_draft_human_review" in LIVE_POINTER_SCOPE
-    assert "no_publish_action_is_authorized" in LIVE_POINTER_SCOPE
+    assert "zenodo_publication_decision_only" in LIVE_POINTER_SCOPE
+    assert "no_publication_action_is_authorized" in LIVE_POINTER_SCOPE
 
 
 def test_the_workstream_label_is_not_an_authorization(state,
