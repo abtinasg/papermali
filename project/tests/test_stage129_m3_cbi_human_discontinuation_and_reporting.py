@@ -261,7 +261,7 @@ def test_m3_cbi_is_not_admitted_and_nothing_downstream_is_authorized(
     assert state["stage129_m3_cbi_next_action_authorized"] is False
     assert state["stage129_m3_cbi_next_action_executes_m3_cbi"] is False
     assert state["next_research_action_authorized"] is False
-    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert state["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     assert roadmap_front_matter["next_research_action_authorized"] == "false"
 
 
@@ -760,7 +760,7 @@ def test_roadmap_records_the_decision_without_opening_a_new_stage(
     assert fm["m3_cbi_next_action_authorized"] == "false"
     assert fm["m3_cbi_manuscript_writing_authorized"] == "false"
     # no live pointer chain moves, and none names an execution step
-    assert fm["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert fm["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     assert fm["next_research_action_authorized"] == "false"
     assert fm["m3_lag_wdi_next_action_id"] == "human_decision_required"
     assert fm["m4_next_action_id"] == "human_decision_required"

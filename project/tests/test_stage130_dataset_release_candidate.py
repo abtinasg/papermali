@@ -82,10 +82,21 @@ MANUSCRIPT_SHA256 = "8b5d861c36e01dc81133c1071cd96f7e340482ac2148b53c055369bbd5f
 MANUSCRIPT_BLOB_ID = "93f7e8e796ec098de38725271305ab06263efd1f"
 
 PRIMARY_BUNDLE_REL = "data/analysis_ready_main_rule_a_stage125.csv"
+#: What THIS action published as its successor. Historical: it is what the
+#: candidate's own decision, boundary and README say, and they are not
+#: rewritten.
 NEXT_POINTER = "human-dataset-release-candidate-digest-review"
 NEXT_POINTER_SCOPE = (
     "dataset_release_candidate_human_digest_review_no_zenodo_action_is_"
     "authorized")
+#: What is live NOW. A later action -- the human-executed Zenodo DRAFT
+#: deposition -- moved the live pointer on again, so assertions about the
+#: ROADMAP's CURRENT front matter use these while assertions about this
+#: action's own artifacts keep the values above.
+LIVE_POINTER = "human-zenodo-draft-review-and-publication-decision"
+LIVE_POINTER_SCOPE = (
+    "zenodo_draft_human_review_and_separate_publication_decision_no_publish_"
+    "action_is_authorized")
 SUPERSEDED_POINTER = "human-manuscript-submission-metadata"
 PROVIDERS = ("CODAL", "TSETMC", "World Bank")
 RELEASE_VERSION = "1.0.0-rc.3"
@@ -1112,10 +1123,18 @@ def test_the_predecessor_records_are_preserved(boundary):
 
 def test_the_live_pointer_advances_to_the_digest_review(state, boundary,
                                                         roadmap_front_matter):
+    """This action's own pointer, and the one that has since overtaken it.
+
+    The candidate's decision, boundary and deriver keep naming the digest
+    review, because that is what they published. The LIVE pointer has moved on
+    to the human review of the Zenodo Draft the digest review led to. Both
+    statements are true and neither overwrites the other.
+    """
     assert state["next_research_action_id"] == NEXT_POINTER
     assert boundary["next_action_id"] == NEXT_POINTER
-    assert roadmap_front_matter["next_research_action_id"] == NEXT_POINTER
     assert state["stage130_phase2_next_action_id"] == NEXT_POINTER
+    assert roadmap_front_matter["next_research_action_id"] == LIVE_POINTER
+    assert roadmap_front_matter["next_research_action_id"] != NEXT_POINTER
 
 
 def test_the_pointer_is_not_an_authorization(state, boundary,
@@ -1126,7 +1145,7 @@ def test_the_pointer_is_not_an_authorization(state, boundary,
     assert boundary["pointer_is_not_authorization"] is True
     assert roadmap_front_matter["next_research_action_authorized"] == "false"
     assert roadmap_front_matter["next_research_action_scope"] == \
-        NEXT_POINTER_SCOPE
+        LIVE_POINTER_SCOPE
 
 
 def test_the_next_action_demands_the_exact_archive_digest(boundary):

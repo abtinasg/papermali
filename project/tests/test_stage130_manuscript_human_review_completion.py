@@ -52,17 +52,18 @@ SUPERSEDED_POINTER = "human-manuscript-review"
 NEXT_POINTER = "human-manuscript-submission-metadata"
 NEXT_POINTER_SCOPE = (
     "manuscript_human_submission_metadata_no_further_action_is_authorized")
-#: What is live NOW. A later action -- the Zenodo dataset Release Candidate --
-#: moved the live pointer on again, so assertions about CURRENT state use
-#: these, while assertions about this action's own artifacts keep the values
-#: above. The manuscript submission metadata is still outstanding underneath;
-#: the pointer moved because a prepared candidate now needs a digest review
-#: first, not because the metadata was supplied.
-LIVE_POINTER = "human-dataset-release-candidate-digest-review"
+#: What is live NOW. Two later actions moved the live pointer on again -- the
+#: Zenodo dataset Release Candidate, and then the human-executed Zenodo DRAFT
+#: deposition -- so assertions about CURRENT state use these, while assertions
+#: about this action's own artifacts keep the values above. The manuscript
+#: submission metadata is still outstanding underneath; the pointer moved
+#: because a private Draft now needs a human review and a separate publication
+#: decision, not because the metadata was supplied.
+LIVE_POINTER = "human-zenodo-draft-review-and-publication-decision"
 LIVE_POINTER_SCOPE = (
-    "dataset_release_candidate_human_digest_review_no_zenodo_action_is_"
-    "authorized")
-LIVE_LAST_COMPLETED_ACTION = "stage130-dataset-release-candidate"
+    "zenodo_draft_human_review_and_separate_publication_decision_no_publish_"
+    "action_is_authorized")
+LIVE_LAST_COMPLETED_ACTION = "stage130-zenodo-draft-deposition"
 OUTSTANDING_METADATA = [
     "authors_and_author_order",
     "affiliations_and_corresponding_author",
@@ -550,9 +551,10 @@ def test_current_state_says_the_review_is_completed_not_required():
     assert REVIEWED_HEAD in text
     assert MANUSCRIPT_SHA256 in text
     # The rendered snapshot names the LIVE pointer, which has advanced past
-    # this action's own successor to the dataset Release Candidate digest
-    # review. What this test pins is that the snapshot no longer advertises a
-    # review that is finished.
+    # this action's own successor -- through the dataset Release Candidate
+    # digest review -- to the human review of the private Zenodo Draft. What
+    # this test pins is that the snapshot no longer advertises a review that
+    # is finished.
     assert LIVE_POINTER in text
     # it must not claim anything the human did not authorize
     for forbidden in ("submission ready = True",
@@ -638,8 +640,10 @@ def test_the_workstream_label_aligns_with_the_live_pointer(
 
     That held when this action ran (`…-submission-metadata` label,
     `human-manuscript-submission-metadata` pointer) and it must still hold now
-    that both have advanced together to the dataset Release Candidate review.
-    A label that drifts away from the pointer is exactly the staleness these
+    that both have advanced to the dataset Release Candidate review. The label
+    still names that review; the pointer now scopes it to the private Zenodo
+    Draft that holds the candidate, plus the separate publication decision. A
+    label that drifts away from the pointer is exactly the staleness these
     tests exist to catch.
     """
     assert WORKSTREAM_ID.endswith("manuscript-submission-metadata")
@@ -647,10 +651,11 @@ def test_the_workstream_label_aligns_with_the_live_pointer(
     assert "submission_metadata" in NEXT_POINTER_SCOPE
     assert state["next_research_action_id"] == LIVE_POINTER
     assert LIVE_WORKSTREAM_ID.endswith("dataset-release-candidate-review")
-    assert LIVE_POINTER.endswith("dataset-release-candidate-digest-review")
+    assert LIVE_POINTER.endswith("draft-review-and-publication-decision")
     assert roadmap_front_matter["next_research_action_scope"] == \
         LIVE_POINTER_SCOPE
-    assert "dataset_release_candidate" in LIVE_POINTER_SCOPE
+    assert "zenodo_draft_human_review" in LIVE_POINTER_SCOPE
+    assert "no_publish_action_is_authorized" in LIVE_POINTER_SCOPE
 
 
 def test_the_workstream_label_is_not_an_authorization(state,

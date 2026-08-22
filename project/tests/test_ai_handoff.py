@@ -1305,7 +1305,7 @@ def test_real_repo_handoff_part3b_workflow_markers():
     # waiting period early (2026-08-08) and frozen M3-LAG-WDI's final
     # disposition as supplementary/exploratory only; both pointer chains now
     # converge on the same human-decision-required state.
-    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert state["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -1391,12 +1391,13 @@ def test_real_repo_roadmap_stage126_status_consistency():
     # The workstream label is derived from the frozen action and never
     # substitutes for a research-action id. The last completed action has since
     # advanced past the Stage130 Phase 2 manuscript assembly, past the human
-    # manuscript review completed on 2026-08-20, to the deterministic Zenodo
-    # dataset Release Candidate prepared on 2026-08-21.
+    # manuscript review completed on 2026-08-20, past the deterministic Zenodo
+    # dataset Release Candidate prepared on 2026-08-21, to the human-executed
+    # Zenodo DRAFT deposition recorded on 2026-08-22.
     assert fm["last_completed_research_action_id"] == (
-        "stage130-dataset-release-candidate"
+        "stage130-zenodo-draft-deposition"
     )
-    assert fm["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert fm["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     # The Stage128 M2 D2 design freeze completed, and the canonical D2 Gate
     # re-run has since been EXECUTED under its own explicit one-action
     # authorization and PASSED data admission, so both pointers legitimately
@@ -2381,7 +2382,7 @@ def test_robustness_decision_lock_does_not_advance_research_pointers():
     # Track A waiting period and froze M3-LAG-WDI's final disposition
     # (2026-08-08); both pointer chains now converge on
     # `human-decision-required`.
-    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert state["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2742,7 +2743,7 @@ def test_part1_does_not_advance_research_pointers():
     # Track A waiting period and froze M3-LAG-WDI's final disposition
     # (2026-08-08); both pointer chains now converge on
     # `human-decision-required`.
-    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert state["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -2983,7 +2984,7 @@ def test_handoff_carries_live_vs_historical_test_boundary_markers():
     # Track A waiting period and froze M3-LAG-WDI's final disposition
     # (2026-08-08); both pointer chains now converge on
     # `human-decision-required`.
-    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert state["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -3081,7 +3082,7 @@ def test_part5_compatibility_status_is_generic_not_part1_specific():
     # Track A waiting period and froze M3-LAG-WDI's final disposition
     # (2026-08-08); both pointer chains now converge on
     # `human-decision-required`.
-    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert state["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     assert state["next_research_action_pointer_is_not_authorization"] is True
     assert state["m2_block_retained"] is True
     assert state["m2_predictive_superiority_claim_supported"] is False
@@ -3147,7 +3148,7 @@ def test_current_state_labels_micro_part_not_research_action():
     )
     assert (
         "- **Next research action:** "
-        "`human-dataset-release-candidate-digest-review`" in text
+        "`human-zenodo-draft-review-and-publication-decision`" in text
     )
 
 
@@ -3285,13 +3286,13 @@ def test_pointers_are_unchanged_because_the_gate_is_unresolved():
     # different, separately recorded action: the Track A waiting-period
     # termination and M3-LAG-WDI disposition (2026-08-08), the Stage130 Phase 2
     # manuscript assembly, the completed human manuscript review (2026-08-20)
-    # and the dataset Release Candidate (2026-08-21). None is the CBI Gate's
-    # successor.
+    # the dataset Release Candidate (2026-08-21) and the human-executed Zenodo
+    # DRAFT deposition (2026-08-22). None is the CBI Gate's successor.
     assert state["last_completed_research_action_id"] == (
-        "stage130-dataset-release-candidate")
+        "stage130-zenodo-draft-deposition")
     assert state["last_completed_research_action_id"] != (
         "stage128-m3-incremental-evaluation")
-    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert state["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     assert state["next_research_action_id"] != (
         "stage128-m3-incremental-evaluation")
     assert state["m3_macro_data_gate_human_review_required"] is True
@@ -3704,7 +3705,7 @@ def test_current_state_renders_the_m3i2_contract_lock_section():
     pointers = [ln for ln in text.splitlines()
                 if ln.startswith("- **Next research action (pointer only):**")]
     assert len(pointers) == 1
-    assert "human-dataset-release-candidate-digest-review" in pointers[0]
+    assert "human-zenodo-draft-review-and-publication-decision" in pointers[0]
 
 
 # --------------------------------------------------------------------------- #
@@ -4111,8 +4112,8 @@ def test_roadmap_front_matter_pins_the_live_recovery_workstream():
     assert fm["predecessor_research_workstream_id"] == (
         "stage128-m3i2-final-official-documentary-recovery")
     assert fm["last_completed_research_action_id"] == (
-        "stage130-dataset-release-candidate")
-    assert fm["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+        "stage130-zenodo-draft-deposition")
+    assert fm["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     # the front-matter reader hands back the raw scalar; unauthorized either way
     assert fm["next_research_action_authorized"] in (False, "false")
 
@@ -4494,10 +4495,10 @@ def test_the_current_next_pointer_is_the_release_candidate_digest_review():
     against this live key.
     """
     fm = gen.read_roadmap(REAL_ROOT)
-    assert fm["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert fm["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     assert fm["next_research_action_authorized"] in (False, "false")
     state = _handoff_state()
-    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert state["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     assert state["next_research_action_authorized"] is False
     assert state["next_research_action_pointer_is_not_authorization"] is True
 
@@ -4804,7 +4805,7 @@ def test_stage129_m4_is_recognized_by_the_full_handoff_build():
     # Neither live research pointer chain is moved by either Stage129 action.
     # The live pointer itself has since advanced to the Stage130 Phase 2
     # manuscript review; that is owned by Phase 2, not by any Stage129 action.
-    assert record["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert record["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     assert record["stage128_m3_lag_wdi_next_action_id"] == (
         "human_decision_required")
 
@@ -5003,7 +5004,7 @@ def test_manuscript_assembly_is_no_longer_advertised_as_the_next_action():
     stale statement about the future, and the live pointer must have moved on.
     """
     state = _handoff_state()
-    assert state["next_research_action_id"] == "human-dataset-release-candidate-digest-review"
+    assert state["next_research_action_id"] == "human-zenodo-draft-review-and-publication-decision"
     assert state["next_research_action_authorized"] is False
     # Phase 1 keeps its OWN historical pointer -- history is not rewritten.
     assert state["stage130_phase1_next_action_id"] == (
