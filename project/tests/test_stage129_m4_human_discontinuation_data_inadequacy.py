@@ -422,7 +422,7 @@ def test_the_next_pointer_does_not_point_at_m4_execution(boundary, state,
 def test_the_live_research_pointers_are_not_advanced_by_this_action(state):
     """This decision owns the M4 pointer only. It must not move either live
     research pointer chain."""
-    assert state["next_research_action_id"] == "human-manuscript-review"
+    assert state["next_research_action_id"] == "human-zenodo-publication-decision"
     assert state["next_research_action_authorized"] is False
     assert state["stage128_m3_lag_wdi_next_action_id"] == "human_decision_required"
 

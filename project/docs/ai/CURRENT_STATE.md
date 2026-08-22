@@ -8,12 +8,12 @@ _Generated from the repository (git + QC). Do not edit by hand._
 ## Snapshot
 
 - **Stage / Batch:** Stage130 / None
-- **Active workstream:** `stage130_phase2_manuscript_assembly_human_review`
+- **Active workstream:** `stage130_dataset_release_candidate_review`
 - **Last completed micro-part:** `stage126-m1-robustness-part6-smote-training-fold-only`
-- **Next research action:** `human-manuscript-review`
-- **Last stage commit:** `8be458aec0d9e238b2e4b0fd2ed2e089f83344e6`
-- **Generated from commit:** `8be458aec0d9e238b2e4b0fd2ed2e089f83344e6` (branch `stage130-phase2-manuscript-assembly`, informational)
-- **Baseline:** `origin/main` @ `14e6624bdc0bf9741bfae0a2379a8d7355ff5b35`
+- **Next research action:** `human-zenodo-publication-decision`
+- **Last stage commit:** `87ce854835f0f33d7ac531087b02ce611cf00ab0`
+- **Generated from commit:** `87ce854835f0f33d7ac531087b02ce611cf00ab0` (branch `stage130-human-review-data-contribution`, informational)
+- **Baseline:** `origin/main` @ `76b4e9d286bc513a290c0534da9b5fcd23fcf497`
 
 ## Current-state validation
 
@@ -139,7 +139,7 @@ _A metadata-only, PROSPECTIVE source/definition/statistical contract lock for th
 - **M3-CBI preserved unchanged:** Gate status `UNRESOLVED_M3_DATA_GATE`, block admitted False
 - **Scientific provenance baseline:** PR #73 head `e6db63fb7d105f0d3a39db101c9e364161c367e9` — protected hashes are verified against that commit permanently; a merge or retarget never moves it
 - **PR topology at contract-lock time (HISTORICAL, not live):** PR #73 **was merged** by merge commit `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`; PR #74 was subsequently retargeted to `main` (base `b94f73fab99b5c3bc5c55ea7c14736f2bddb516a`) and never merged under this action — merged = False, no merge authorization. Semantics: `historical_contract_lock_topology_superseded_by_pr75`. PR #74 is the **historical contract-lock PR**, never the current draft; the live Draft PR is identified in the live-action section below.
-- **Next research action (pointer only):** `human-manuscript-review` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
+- **Next research action (pointer only):** `human-zenodo-publication-decision` — it is **not authorized** and a pointer is **not** an authorization (`next_research_action_authorized` = False).
 - Package: `project/stage128/m3_intl_macro_contract_lock/`; interpretation: `project/stage128/m3_intl_macro_contract_lock/README_STAGE128_M3_INTL_MACRO_CONTRACT_LOCK.md`
 
 ### Stage128 — M3I-2 official-source evidence capture
@@ -238,7 +238,7 @@ _An explicit human governance decision, not a one-action execution authorization
 - ✅ **M3-LAG-WDI final research disposition:** `SUPPLEMENTARY_EXPLORATORY_ONLY` — promoted to the confirmatory model = False. A future unsolicited World Bank response auto-reopens M3 = False (using it for anything requires a new explicit human decision = True).
 - ✅ **Step E result PRESERVED EXACTLY, re-verified against the committed artifact by this recording:** `E1_NULL_NO_DETECTABLE_INCREMENTAL_CONTRIBUTION` — paired PR-AUC deltas (M3-LAG-WDI minus retained M2) logistic +0.000862 [-0.028237, +0.032186], random forest -0.002720 [-0.029157, +0.011924], XGBoost +0.002749 [-0.007437, +0.014554] (all three 95% intervals include zero); secondary Brier deltas logistic -0.004600 [-0.006147, -0.003066] and random forest -0.001375 [-0.002229, -0.000566] (calibration only, non-confirmatory).
 - ⛔ **Unchanged:** M4 authorized False — Final Test locked True, rows read 0 — confirmatory Holm family unchanged and unexecuted — paper winner selected True.
-- **Both pointer chains converge on the same human decision:** `human-manuscript-review` — scope `manuscript_human_review_no_further_action_is_authorized`, authorized = False. Track B: `human_decision_required` — scope `no_further_action_is_authorized`, authorized = False. A pointer is never an authorization.
+- **Both pointer chains converge on the same human decision:** `human-zenodo-publication-decision` — scope `zenodo_publication_decision_only_no_publication_action_is_authorized`, authorized = False. Track B: `human_decision_required` — scope `no_further_action_is_authorized`, authorized = False. A pointer is never an authorization.
 - Package: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/`; interpretation: `project/stage128/m3i2_track_a_waiting_termination_and_m3_disposition/README_STAGE128_M3I2_TRACK_A_WAITING_TERMINATION_AND_M3_DISPOSITION.md`
 
 ### Stage129 — M4 governance Data-Gate contract lock (DESIGN ONLY, additive, not on either live pointer chain)
@@ -400,24 +400,88 @@ _The one-time contracted Final Test pass. The held-out years ۱۴۰۰–۱۴۰۲
 
 _The programme phase has started; Stage130 SCIENTIFIC execution has not. Phase 1 re-displays already-committed aggregate evidence and freezes manuscript claims. It computed nothing._
 
-- ✅ **Phase 1 started:** True — completed = True, presentation only = True, package files = 15.
+- ✅ **Phase 1 started:** True — completed = True, presentation only = True, package files = 16.
 - 🔬 **Stage130 scientific execution started:** False — new scientific analysis performed = False. These two are deliberately distinct: a presentation package is not a scientific stage.
 - ⛔ **Final Test untouched by Phase 1:** rows read = 0, prediction artifact opened = False, SHAP = 0, new metrics = 0, new CIs = 0, thresholds derived = 0, models fitted = 0.
 - 🗂️ **Legacy report tree:** `LEGACY_STAGE123_NONCANONICAL_DO_NOT_CITE` — the Stage123-era outputs are preserved byte-identical and may not be cited.
 - ➡️ **Next action AT PHASE 1 TIME (historical):** `human_authorization_required_for_manuscript_assembly` — authorized = False. Stage130 authorized = False. **Superseded:** the manuscript now exists; the live next action is in the Phase 2 section below.
 - Package: `project/stage130/manuscript_evidence_package/`; generator: `project/src/stage130_manuscript_evidence_package.py`
 
-### Stage130 Phase 2 — manuscript assembly (CURRENT; writing only, awaiting human review)
+### Stage130 Phase 2 — manuscript assembly (CURRENT; writing only, human review COMPLETED)
 
-_The manuscript draft exists. This is a WRITING action: it assembled prose and audit files from already-committed evidence and computed nothing. It is a draft awaiting human review, not a submission._
+_The manuscript draft exists. This is a WRITING action: it assembled prose and audit files from already-committed evidence and computed nothing. The human scientific and editorial review of that draft is COMPLETE and its content is approved; a reviewed draft is still not a submission._
 
-- ✅ **Phase 2 started:** True — completed = True, presentation only = True, traceability rows = 130, references = 33 (all verified = True).
+- ✅ **Phase 2 started:** True — completed = True, presentation only = True, traceability rows = 163, references = 33 (all verified = True).
 - 🔬 **Phase 2 scientific execution started:** False — and the programme-wide **Stage130 scientific execution started:** False. These are SEPARATE keys and neither may absorb the other: writing a manuscript is not a scientific stage.
 - ⛔ **Final Test untouched by Phase 2:** rows read = 0, prediction artifact opened = False, new scientific analysis performed = False, models fitted = 0, thresholds derived = 0, new metrics = 0, new CIs = 0, SHAP = 0.
-- 📝 **Human review REQUIRED:** True — review completed = False, submission ready = False. Author list, affiliations, funding, conflicts, ethics and the data-access mechanism are human-only and are carried as explicit placeholders, never invented.
+- 📝 **Human review COMPLETED:** True — review still required = False (it HAD been required: was required = True), submission ready = False. Author list, affiliations, funding, conflicts, ethics and the data-access mechanism are human-only and are carried as explicit placeholders, never invented — approving the manuscript TEXT is not submission authorization.
 - ⛔ **Not authorized:** ready-for-review = False, merge = False, Stage130 authorized = False.
-- ➡️ **Live next action:** `human-manuscript-review` — authorized = False. A pointer is never an authorization.
+- ➡️ **Live next action:** `human-zenodo-publication-decision` — authorized = False. A pointer is never an authorization.
 - Manuscript: `project/stage130/manuscript/`; validator: `project/stage130/manuscript/validate_manuscript.py`
+
+### Stage130 — human manuscript review COMPLETED (recording only; not a submission)
+
+_The human supervisor read the committed draft at one exact commit and approved its CONTENT. Recording that is not submission readiness, not Ready-for-Review and not merge authorization._
+
+- ✅ **Review completed:** True — recorded by `stage130-manuscript-human-review-completion` on 2026-08-20, human-authorized = True.
+- 🔒 **Reviewed head:** `c4136a412696c7bb626f0c389bcccb829f381629` — approved file `project/stage130/manuscript/manuscript_draft_en.md`, SHA-256 `8b5d861c36e01dc81133c1071cd96f7e340482ac2148b53c055369bbd5ffcb19`, blob `93f7e8e796ec098de38725271305ab06263efd1f`. Manuscript modified by this action = False; both digests are re-derived from the file, so editing the approved text fails the build instead of inheriting the approval.
+- 🕰️ **History preserved:** the Phase 2 assembly record still publishes `human_review_required = True` (was required = True); this supersedes `stage130_phase2_human_review_required` in the open, and the historical pointer `human-manuscript-review` is not rewritten (Phase 2 record preserved = True).
+- ⛔ **Still NOT authorized:** submission ready = False, ready-for-review = False, merge = False, Stage130 authorized = False, submission workflow started = False.
+- 👤 **Human submission metadata — supplied = True, applied to the manuscript = False:** 6 items (`authors_and_author_order`, `affiliations_and_corresponding_author`, `funding`, `conflicts_of_interest`, `ethics_and_data_governance_statement`, `data_access_mechanism_for_the_restricted_company_panel`). None was invented by any action. Where they are supplied, they are recorded in the decision artifact only — the byte-pinned manuscript still carries placeholders, and inserting them needs a separate authorization plus a fresh human review.
+- ⛔ **Nothing scientific occurred:** Final Test rows read = 0, prediction artifact opened = False, Stage130 scientific execution started = False.
+- ➡️ **Live next action:** `human-zenodo-publication-decision` — authorized = False. The review it used to name is done; a pointer is never an authorization.
+- Package: `project/stage130/manuscript_human_review_completion/`
+
+### Stage130 — Zenodo dataset Release Candidate (PREPARED, NOT PUBLISHED)
+
+_Custody and documentation only. Frozen bytes were copied, hashed and archived. Nothing was deposited, uploaded, minted or published, and the manuscript was not touched._
+
+- 📦 **Candidate prepared:** True — version `1.0.0-rc.3`. **Two counts, and they are different:** 25 files are described by `release_manifest.json` as payload files, while the deterministic archive contains 27 members — those payload files plus `release_manifest.json`, `SHA256SUMS.txt`, which are integrity records about the payload and are not themselves manifest payload files (all members are payload files = False). `SHA256SUMS.txt` accordingly carries 26 lines. The archive itself is **not** tracked in Git (tracked in git = False).
+- 🧾 **What the release actually draws on:** `CODAL` only. No field derived from `TSETMC` or `World Bank` is in this release (TSETMC included = False, World Bank included = False); those sources relate only to the wider study. rc.2's three-provider description was corrected here (corrected = True) **without changing any rights record** (rights record changed by the correction = False).
+- 🗂️ **Supersedes** `1.0.0-rc.2` (archive SHA-256 `d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373`, 11808267 bytes, readiness `NOT_READY_FOR_PUBLICATION`), preserved not deleted = True. Nothing was ever deposited under it. Full superseded chain, each archive preserved and each digest intact: `1.0.0-rc.1` = `6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45` (11657151 bytes, `NOT_READY_FOR_PUBLICATION`); `1.0.0-rc.2` = `d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373` (11808267 bytes, `READY_FOR_EXACT_DIGEST_HUMAN_REVIEW`) (archives preserved = True, digests altered = 0).
+- 📖 **Column documentation complete:** 115/115 released columns documented, 0 undocumented, 0 definitions invented. Dictionary: `project/stage130/dataset_release_candidate/release_payload/RELEASE_COLUMN_DICTIONARY.csv`. Every row names the committed repository source its facts came from.
+- 🎯 **Primary modeling surface:** `data/analysis_ready_main_rule_a_stage125.csv` — 1012 pairs, 119 companies, 115 columns, 80 positive, 932 negative. These are CONTRACT values (recomputed from rows = False).
+- 🔒 **Frozen surfaces verified:** 8 of 8 hashed and matching (the eight live under a gitignored directory, so absence in a fresh clone is tolerated; drift never is).
+- ⛔ **Publication readiness:** `READY_FOR_EXACT_DIGEST_HUMAN_REVIEW` — live blocking provider = `None`, superseded blocking provider = `CODAL`. Providers audited: `CODAL`, `TSETMC`, `World Bank`. No source PDF (0) and no raw provider response (0) is redistributed.
+- ⚖️ **Source rights — HUMAN AUTHOR DETERMINATION, not an independent verification:** status `HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED`, basis `human_author_determination`, supplied by human = True, inferred by the agent = False. **Provider terms independently retrieved = False, independently verified = False** — no CODAL or TSETMC terms page was ever retrieved or read, and the historical record of that says so.
+- 🕰️ **Nothing had reached Zenodo when this candidate was prepared:** deposition created, upload performed, DOI reserved, published and public release authorized were all False and the DOI was null. That is the record of this action and it is not rewritten. **SUPERSEDED** by `stage130-zenodo-draft-deposition` — the live Zenodo state is published in its own section below.
+- 📄 **Manuscript untouched:** modified = False, availability claim changed = False. It keeps describing the dataset by its PRESENT availability, because no public DOI exists. The six human submission items are supplied = True but applied to the manuscript = False; a post-DOI metadata update plus a fresh human review is still required (= True).
+- ➡️ **Live next action:** `human-zenodo-publication-decision` — authorized = False. The digest review this action named has been overtaken by an actual draft deposition; see the section below. A pointer is never an authorization.
+- Package: `project/stage130/dataset_release_candidate/`; builder: `project/src/stage130_dataset_release_candidate.py`
+
+### Stage130 — Zenodo DRAFT deposition (CREATED and UPLOADED; NOT published, NOT submitted)
+
+_A human supervisor created a private Zenodo draft, uploaded the rc.3 archive into it and reserved a DOI. That is the FIRST half of Zenodo's lifecycle. Nothing was published, nothing was submitted, the DOI does not resolve and the manuscript was not touched._
+
+- 📥 **Draft created:** deposition created = True, upload performed = True, recorded by `stage130-zenodo-draft-deposition` on 2026-08-22 (deposition id `22059238`, result `ZENODO_DRAFT_CREATED_FILE_UPLOADED_DOI_RESERVED_RECORD_UNSUBMITTED`).
+- ⛔ **NOT published and NOT submitted:** published = False, record submitted = False, state = `unsubmitted`, private draft = True, public release = False, public release authorized = False, publication authorized = False.
+- 🔖 **DOI reserved, not registered:** DOI reserved = True, DOI = `10.5281/zenodo.22059238`, DOI published = False, registered or resolving = False. It is a placeholder identifier and must never be described as active, published, resolving or publicly available.
+- ⚠️ **`access_right = open` is DRAFT metadata, not availability:** is public availability = False. It states the access condition the record WOULD carry if it were ever published; while the record is `unsubmitted` it is visible only to its owner.
+- 🔒 **The deposited bytes are the documented candidate's:** `tse_financial_distress_dataset_1392_1402_release_candidate_rc3.zip`, 11824690 bytes, SHA-256 `4adb32bd675fd9181d8ced783b6734382e9749c6c574e35567d1bec65fd72f70`, MD5 `cbd3df6c75053ee6d0641f19d5301d7a`, version `1.0.0-rc.3` — matches the Release Candidate = True. A differently-built archive cannot inherit this record.
+- 👤 **Human-supplied, not agent-retrieved:** supplied by = `human`, authenticated Zenodo response observed = True, independently retrieved by the programmer = False. This action made no Zenodo API call (= False), no publish call (= False), did not re-run the deposition script (= False) and read or requested no token (= False). The state file stays out of Git (committed = False, credentials committed = False). Recording an event is not authorizing it (= True).
+- 📄 **Manuscript untouched:** modified = False, availability claim changed = False. A RESERVED DOI is not a public one, so the Data Availability Statement is deliberately unchanged; updating it needs a separate action after a human publication decision, plus a fresh human review (= True).
+- 🕰️ **History preserved:** the Release Candidate record still publishes every Zenodo key as False with a null DOI and its own pointer `human-zenodo-draft-review-and-publication-decision`; this supersedes `zenodo_deposition_created` in the open (record preserved = True).
+- ⛔ **Still NOT authorized:** submission ready = False, ready-for-review = False, merge = False, Stage130 authorized = False.
+- 🕰️ **The pointer this action set named review AND decision:** `human-zenodo-draft-review-and-publication-decision` — true while neither had happened. That is the record of this action and it is not rewritten. **SUPERSEDED** by `stage130-zenodo-draft-human-review-completion` — the live pointer is published in its own section below.
+- Package: `project/stage130/zenodo_draft_deposition/`
+
+### Stage130 — Zenodo Draft: human review COMPLETE, Notes corrected (STILL not published)
+
+_Two LATER human events on the same private draft: the human reviewed it in Zenodo Preview, and the human themself corrected its Notes field in the Zenodo UI and saved it as a Draft. Neither is a publication. The record is still unsubmitted, both DOIs are still reserved placeholders, and the archive did not move._
+
+- ✅ **Human visual review complete:** review completed = True, matrix complete = True over 10 items (archive_contents, citation, creators, description, file, keywords, license, reserved_doi_identifiers, title, version), reviewed in Zenodo Preview = True. Recorded by `stage130-zenodo-draft-human-review-completion` on 2026-08-22.
+- ✍️ **Human metadata-only Notes correction:** performed by = `human`, scope = `metadata_notes_field_only`, saved as = `draft`. The programmer edited nothing in Zenodo. Current live Notes SHA-256 = `7ff1c7de2baab5e2ecc95e20d8996db38bb8ec67e35dc4200335ec37d6f5ea46` (280 UTF-8 bytes), publication-stable = True because it states only the deposited archive's identity, which no lifecycle change can falsify.
+- 🕰️ **The historical Notes is still historically correct:** SHA-256 `9096ed3fc195915fb6428a107adacffde23c59aaac6845966b20cbffcfc62ff2` (263 UTF-8 bytes), remains historically correct = True, is the current live value = False. It is superseded ONLY as the live value; history is not rewritten to pretend the corrected text existed at deposit time.
+- ⛔ **Dropping the word “unpublished” published nothing:** record submitted = False, state = `unsubmitted`, private draft = True, published = False, DOI published = False, DOI publicly activated = False, public release = False. Lifecycle state lives in the record and in these markers, never in the prose of a Notes field.
+- 🔖 **Both DOIs are RESERVED placeholders:** deposition id `22059238`, version DOI `10.5281/zenodo.22059238` (reserved = True), concept DOI `10.5281/zenodo.22059237` (displayed = True), registered or resolving = False, activation authorized = False.
+- ⚠️ **`access_right = open` is DRAFT metadata, not availability:** is evidence of public availability = False. A completed review does not change that: while the record is `unsubmitted` it is visible only to its owner.
+- 🔒 **The archive is immutable for this action:** modified = False, re-uploaded = False. The pre-deposition `zenodo_metadata_candidate.json` frozen INSIDE the archive keeps its own notes (SHA-256 `171c3830982fd9c922ba6a92f79f3ea778baad34be053e4472135c3e0e275287`, modified = False): the later live correction is an EXTERNAL metadata event and is not retroactively injected into immutable bytes.
+- 👤 **Human-supplied, not agent-retrieved:** supplied by = `human`, human visual review = True, human metadata edit = True, independently retrieved by the programmer = False. Zenodo calls made by this action = 0; no publish call (= False), no browser automation (= False), no script re-run (= False), no token read or requested (= False). The state file was tested for existence only (= True) and stays out of Git (= False); credentials committed = False. The human authorization is preserved VERBATIM, pinned at SHA-256 `fa7f98d91a08cdcb4862c227584b843058468995d52480a5eaac1788645a2bac` (642 UTF-8 bytes). Recording an event is not authorizing it (= True).
+- 📄 **Manuscript untouched:** modified = False, availability claim changed = False. Reserved DOIs are not public ones, so the Data Availability Statement is deliberately unchanged; updating it needs a separate action after a publication decision, plus a fresh human review (= True).
+- 🕰️ **History preserved:** the draft-deposition record still publishes its own draft-state keys and its own pointer `human-zenodo-draft-review-and-publication-decision` (record preserved = True); every file of that package is byte-pinned in the generator, so editing it breaks the build.
+- ⛔ **Still NOT authorized:** publication = False, submission = False, DOI activation = False, public release = False, submission ready = False, PR Ready = False, PR merged = False, merge authorized = False, Stage130 authorized = False.
+- ➡️ **Live next action:** `human-zenodo-publication-decision` — scope `zenodo_publication_decision_only_no_publication_action_is_authorized`, authorized = False. The review half of the predecessor pointer is done, so the successor names only what is left: a human publication DECISION. It says what the next human decision concerns; it authorizes no publication action. A pointer is never an authorization (= True).
+- Package: `project/stage130/zenodo_draft_human_review_completion/`
 
 ### Last completed scientific micro-part QC
 
@@ -468,5 +532,5 @@ _Frozen Stage125 Part 4 contract values, republished verbatim for audit. They re
 
 اردستان، اروند، اپال، بالبر، بترانس، برکت، بموتو، بوعلی، بکاب، بکام، تاپیکو، تپمپی، تکمبا، ثشرق، ثنوسا، جم، جم پیلن، حپترو، حکشتی، خاذین، خبهمن، ختوقا، خرینگ، خمحور، خمهر، خنصیر، خوساز، خچرخش، خکمک، ددام، درازک، دروز، دسبحا، دسینا، دشیمی، دیران، ذوب، رانفور، رمپنا، زمگسا، زپارس، سآبیک، ساراب، ساربیل، ساروم، سبجنو، سبهان، ستران، سخاش، سخزر، سخوز، سدشت، سدور، سرود، سشرق، سصفها، سغرب، سفارس، سقاین، سمازن، سنیر، سهگمت، سپاها، سپید، سکرد، سیلام، شاراک، شبریز، شبندر، شدوص، شغدیر، شفارس، شلعاب، شپارس، شپنا، شکربن، شکلر، شیران، غبهنوش، غدام، غسالم، غشان، غشهد، غنوش، غگل، فاذر، فارس، فایرا، فباهنر، فجام، فجر، فخوز، فرآور، فسرب، فسپا، فمراد، فملی، فنورد، فولاژ، فپنتا، لابسا، لبوتان، لخزر، لسرما، نوری، های وب، همراه، ومعادن، وملی، وکغدیر، پارس، پارسان، پدرخش، پرداخت، پسهند، پلاسک، پی‌پاد، چافست، چکارن، کاوه، کبافق، کرازی، کروی، کفرا، کفپارس، کهمدا، کویر، کگاز، کگل، کیمیاتک
 
-_state_fingerprint: `856f9e17fc974f69db3e30db7bb97dd74574bd00270ef8c42def77269ec996d2`_
-_generated_at_utc: 2026-08-17T22:53:02Z (informational)_
+_state_fingerprint: `c902eb6164c9a56b36521317bf3679b8d566ad217a5c6d8e95b1b450971d2871`_
+_generated_at_utc: 2026-08-22T20:37:51Z (informational)_

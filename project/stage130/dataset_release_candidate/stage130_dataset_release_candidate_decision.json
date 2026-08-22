@@ -1,0 +1,329 @@
+{
+  "authorized_by_human": true,
+  "authorized_scope": "Preparation and documentation of a deterministic, audit-ready Zenodo dataset Release Candidate ONLY. This decision does NOT authorize creating a Zenodo deposition, uploading any file to Zenodo, reserving or publishing a DOI, changing the manuscript's current data-availability claim, marking pull request #100 Ready for Review, or merging it. A separate exact-digest human authorization is required before any Zenodo write or publication.",
+  "decision_date_utc": "2026-08-21",
+  "decision_id": "stage130-dataset-release-candidate",
+  "decision_type": "dataset_release_candidate_preparation",
+  "human_supplied_data_governance_facts": {
+    "confidential_data_used": false,
+    "human_participant_data_used": false,
+    "personal_data_used": false,
+    "purchased_data_used": false,
+    "sources_are_publicly_accessible": true,
+    "sources_named_by_human": [
+      "CODAL",
+      "TSETMC",
+      "World Bank"
+    ],
+    "statement": "All underlying data were obtained from publicly accessible sources such as CODAL, TSETMC and the World Bank. No purchased, confidential, personal or human-participant data were used.",
+    "supplied_by": "human",
+    "independently_inferred_by_the_agent": false
+  },
+  "human_supplied_release_intent": {
+    "authors_intend_public_zenodo_publication_of_the_analysis_ready_dataset": true,
+    "independently_inferred_by_the_agent": false,
+    "supplied_by": "human",
+    "this_intent_is_not_an_authorization_to_publish": true
+  },
+  "human_supplied_release_metadata": {
+    "access_right_after_future_publication": "open",
+    "corresponding_author": "Abtin Asghari",
+    "corresponding_author_email": "abtinsag@gmail.com",
+    "creators_in_human_supplied_order": [
+      {
+        "affiliation": "Department of Computer Engineering, Islamic Azad University, West Tehran Branch, Tehran, Iran",
+        "name": "Abtin Asghari",
+        "order": 1
+      },
+      {
+        "affiliation": "Department of Financial Management, Islamic Azad University, Central Tehran Branch, Tehran, Iran",
+        "name": "MohammadMehdi Mehraein",
+        "order": 2
+      }
+    ],
+    "independently_inferred_by_the_agent": false,
+    "license_approved_by_human": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "license_scope_approved_by_human": "the authors' original dataset compilation and metadata only",
+    "orcid_identifiers_supplied": false,
+    "orcid_identifiers_invented_by_this_action": false,
+    "resource_type": "Dataset",
+    "second_author_email": "mohammadmehdimehraein@gmail.com",
+    "supplied_by": "human",
+    "title": "Tehran Stock Exchange Corporate Financial Distress Prediction Dataset (1392–1402): Analysis-Ready Company-Year Panel and Reproducibility Materials"
+  },
+  "frozen_dataset_gate": {
+    "eight_frozen_files_present": true,
+    "eight_frozen_files_sha256_match": true,
+    "files_regenerated_by_this_action": 0,
+    "files_reconstructed_by_this_action": 0,
+    "stage121_to_stage124_substitutions": 0,
+    "primary_surface": "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv",
+    "primary_surface_contract_counts": {
+      "columns": 115,
+      "companies": 119,
+      "negative": 932,
+      "pairs": 1012,
+      "positive": 80
+    },
+    "counts_source": "project/stage125/part3c_leakage_safe_dataset_contract_stage125.json :: expected_sample_counts.main_rule_a_primary",
+    "counts_recomputed_from_row_content": false
+  },
+  "source_rights_audit": {
+    "audit_date_utc": "2026-08-21",
+    "determination_date_utc": "2026-08-21",
+    "matrix_path": "project/stage130/dataset_release_candidate/source_rights_matrix.csv",
+    "primary_provider_pages_only": true,
+    "providers_covered": [
+      "CODAL",
+      "TSETMC",
+      "World Bank"
+    ],
+    "publication_readiness": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+    "rights_basis": "human_author_determination",
+    "rights_status": "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED",
+    "blocking_provider": null,
+    "superseded_blocking_provider": "CODAL",
+    "superseded_publication_readiness": "NOT_READY_FOR_PUBLICATION",
+    "supersede_basis": "human_author_source_rights_determination_not_independent_verification",
+    "supersede_summary": "In 1.0.0-rc.1 the CODAL row was recorded as BLOCKS_PUBLICATION because the provider's published terms could not be retrieved from the audit environment on 2026-08-21 (connection timeout, no HTTP response, on both https://www.codal.ir/ and https://www.codal.ir/Rules.aspx). That historical fact is unchanged and is preserved in full. What supersedes the blocker is the human author's source-rights determination, which is a determination BY THE AUTHOR -- not a provider licence, not a verification of anyone's published terms, and not a legal opinion. No CODAL or TSETMC terms page has been retrieved or read at any point.",
+    "provider_terms_independently_retrieved": false,
+    "provider_terms_independently_verified": false,
+    "codal_open_licence_verified_claimed": false,
+    "codal_terms_independently_verified_claimed": false,
+    "historical_non_retrieval_preserved": true,
+    "columns_removed_to_avoid_the_blocker": 0,
+    "frozen_values_altered_to_avoid_the_blocker": 0,
+    "legal_conclusion_asserted_beyond_the_evidence": false
+  },
+  "manuscript_boundary": {
+    "approved_manuscript_blob_id": "93f7e8e796ec098de38725271305ab06263efd1f",
+    "approved_manuscript_path": "project/stage130/manuscript/manuscript_draft_en.md",
+    "approved_manuscript_sha256": "8b5d861c36e01dc81133c1071cd96f7e340482ac2148b53c055369bbd5ffcb19",
+    "data_availability_statement_inserted": false,
+    "manuscript_availability_claim_changed_by_this_action": false,
+    "manuscript_files_modified_by_this_action": 0,
+    "restricted_access_language_replaced": false,
+    "why_the_manuscript_is_unchanged": "No public DOI exists, so the manuscript must continue to describe the dataset according to its present availability. Updating it before a DOI exists would make the manuscript state something untrue, and the approved manuscript is byte-pinned to a completed human review that a change would invalidate."
+  },
+  "release_candidate_conflicts_with_current_manuscript_claim": true,
+  "release_candidate_conflict_resolution": "The conflict is left standing and visible rather than resolved in either direction. The manuscript keeps its present, truthful restricted-access description because nothing is published and no DOI exists; the release candidate records the authors' publication intent and the human author's source-rights determination without acting on either. Reconciling the two requires a separate authorized manuscript action once a DOI actually exists. The author's rights determination does not by itself change the manuscript, and this action did not change one byte of it.",
+  "superseded_marker": {
+    "deriver": "derive_stage130_dataset_release_candidate_markers",
+    "generator": "project/scripts/update_ai_handoff.py",
+    "key": "next_research_action_id",
+    "pointer_previous_value": "human-manuscript-submission-metadata",
+    "pointer_resolved_value": "human-dataset-release-candidate-digest-review",
+    "manuscript_submission_metadata_still_outstanding": true,
+    "manuscript_submission_metadata_outstanding_count": 6,
+    "supersede_scope": "the_live_next_action_pointer_only",
+    "superseding_decision_id": "stage130-dataset-release-candidate",
+    "why_the_previous_pointer_is_not_marked_complete": "The six human-supplied manuscript submission items are still outstanding. This action supplied dataset-release metadata for a Zenodo candidate, which is not the same surface and does not fill any manuscript placeholder. The pointer advances because a prepared candidate now needs a human digest review first; the manuscript metadata remains outstanding and is republished as such."
+  },
+  "pr_is_draft": true,
+  "pr_number": 100,
+  "ready_for_review_authorized": false,
+  "merge_authorized": false,
+  "submission_ready": false,
+  "public_release_authorized": false,
+  "zenodo_deposition_created": false,
+  "zenodo_upload_performed": false,
+  "zenodo_doi_reserved": false,
+  "zenodo_published": false,
+  "next_action_authorized": false,
+  "human_decision_translation": "Prepare a deterministic, audit-ready Zenodo dataset Release Candidate for the study. This authorizes preparation and documentation only. It does not authorize creating a Zenodo deposition, uploading anything, reserving or publishing a DOI, changing the manuscript's data-availability claim, marking PR #100 Ready, or merging it. A separate exact-digest authorization will be required before any Zenodo write or publication.",
+  "release_version": "1.0.0-rc.3",
+  "supersedes_release": {
+    "version": "1.0.0-rc.2",
+    "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate_rc2.zip",
+    "archive_sha256": "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+    "archive_size_bytes": 11808267,
+    "publication_readiness_at_the_time": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+    "superseded_on_utc": "2026-08-21",
+    "superseded_by_version": "1.0.0-rc.3",
+    "superseded_reason": "rc.2's Zenodo description named all three study providers together as the sources of the released values. Only CODAL-derived, researcher-compiled company financial-statement fields and author-derived variables are released; no TSETMC- and no World Bank-derived field is. rc.3 corrects that sentence and makes the payload-file versus archive-member counts explicit.",
+    "build_directory": "build/rc2",
+    "preserved_not_deleted": true,
+    "zenodo_deposition_created": false,
+    "zenodo_upload_performed": false,
+    "zenodo_doi_reserved": false,
+    "zenodo_published": false,
+    "public_release_authorized": false,
+    "preserved_how": "rc.2 keeps its own archive filename and its own gitignored build directory (build/rc2/). rc.3 writes to a new filename under build/rc3/, so rc.2's archive and unpacked tree are never overwritten, renamed, rebuilt or deleted, and its recorded digest does not move. No commit was amended, squashed, rebased or force-pushed."
+  },
+  "human_supplied_source_rights_determination": {
+    "status": "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED",
+    "determination_date_utc": "2026-08-21",
+    "supplied_by": "human",
+    "independently_inferred_by_the_agent": false,
+    "statement_verbatim_fa": "برای تمام داده‌هایی که در این پژوهش استفاده کرده‌ام نیازی به اخذ مجوز جداگانه نیست. این داده‌ها به‌صورت رایگان و عمومی در اینترنت در دسترس‌اند.",
+    "operational_translation": [
+      "All source data used in the study were publicly and freely accessible.",
+      "No purchased, confidential, personal or human-participant data were used.",
+      "The human author determines that public redistribution of the researcher-compiled analysis-ready panel and author-derived variables does not require separate provider permission.",
+      "No original provider PDF, filing document, workbook, raw API response or raw provider response will be redistributed.",
+      "CC BY 4.0 applies only to the authors' original compilation, structure, annotations, derived variables and release metadata, to the extent the authors hold rights in them.",
+      "This determination is human-supplied and was not independently inferred by the agent."
+    ],
+    "sources_publicly_and_freely_accessible": true,
+    "purchased_data_used": false,
+    "confidential_data_used": false,
+    "personal_data_used": false,
+    "human_participant_data_used": false,
+    "separate_provider_permission_required_for_redistribution": false,
+    "original_provider_files_redistributed": false,
+    "licence_scope": "the authors' original compilation, structure, annotations, derived variables and release metadata only, to the extent the authors hold rights in them",
+    "is_a_provider_licence": false,
+    "is_an_independent_verification_of_provider_terms": false,
+    "is_a_legal_opinion": false,
+    "provider_terms_independently_retrieved": false,
+    "provider_terms_independently_verified": false,
+    "codal_terms_page_retrieved": false,
+    "codal_terms_page_read": false,
+    "tsetmc_terms_page_retrieved": false,
+    "tsetmc_terms_page_read": false,
+    "world_bank_licence_retrieved_and_read": true,
+    "historical_retrieval_record_preserved": true,
+    "historical_retrieval_record_path": "project/stage130/dataset_release_candidate/release_payload/SOURCE_AND_LICENSE_NOTES.md",
+    "retroactive_independent_verification_claimed": false
+  },
+  "human_supplied_manuscript_submission_metadata": {
+    "human_submission_metadata_supplied": true,
+    "human_submission_metadata_applied_to_manuscript": false,
+    "manuscript_modified_by_this_action": false,
+    "manuscript_requires_post_doi_metadata_update_and_human_review": true,
+    "supplied_by": "human",
+    "independently_inferred_by_the_agent": false,
+    "supplied_on_utc": "2026-08-21",
+    "items_supplied": {
+      "authors_and_author_order": [
+        "Abtin Asghari",
+        "MohammadMehdi Mehraein"
+      ],
+      "affiliations_and_corresponding_author": {
+        "creators": [
+          {
+            "order": 1,
+            "name": "Abtin Asghari",
+            "affiliation": "Department of Computer Engineering, Islamic Azad University, West Tehran Branch, Tehran, Iran"
+          },
+          {
+            "order": 2,
+            "name": "MohammadMehdi Mehraein",
+            "affiliation": "Department of Financial Management, Islamic Azad University, Central Tehran Branch, Tehran, Iran"
+          }
+        ],
+        "corresponding_author": "Abtin Asghari"
+      },
+      "funding": "No external funding.",
+      "conflicts_of_interest": "None declared.",
+      "ethics_and_data_governance_statement": "The study uses only publicly and freely accessible company-level financial disclosure data. No human participants, no personal data and no confidential or purchased data were involved, so no ethics-committee approval was required. This is the ethics statement the human author approved.",
+      "data_access_mechanism_for_the_restricted_company_panel": "A future open Zenodo dataset, pending an authorized deposit and DOI. Neither exists yet."
+    },
+    "items_supplied_count": 6,
+    "items_still_outstanding_count": 0,
+    "why_the_manuscript_is_still_unchanged": "Supplying the facts is not the same as inserting them. The approved manuscript is byte-pinned to a completed human review, and its data-access wording additionally depends on a DOI that does not exist. Editing it now would both invalidate the byte-pinned approval and make it describe an access mechanism that is not in place. The insertion is a separate action requiring its own authorization, and it must be followed by a fresh human review of the changed bytes.",
+    "supersedes_the_claim_that_these_items_were_never_supplied": true,
+    "previous_claim": "As of 1.0.0-rc.1 these six items were recorded as outstanding and unsupplied. That is no longer true: they are supplied. What remains outstanding is their APPLICATION to the manuscript, which is a different thing and is recorded as such."
+  },
+  "manuscript_human_submission_metadata_supplied": true,
+  "manuscript_human_submission_metadata_applied_to_manuscript": false,
+  "manuscript_requires_post_doi_metadata_update_and_human_review": true,
+  "source_rights_status": "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED",
+  "existing_commits_amended_squashed_rebased_or_force_pushed": 0,
+  "supersedes_release_history": [
+    {
+      "version": "1.0.0-rc.1",
+      "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate.zip",
+      "archive_sha256": "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
+      "archive_size_bytes": 11657151,
+      "publication_readiness_at_the_time": "NOT_READY_FOR_PUBLICATION",
+      "superseded_on_utc": "2026-08-21",
+      "superseded_by_version": "1.0.0-rc.2",
+      "superseded_reason": "Human author source-rights determination plus complete 115-column dictionary preparation.",
+      "build_directory": "build",
+      "preserved_not_deleted": true,
+      "zenodo_deposition_created": false,
+      "zenodo_upload_performed": false,
+      "zenodo_doi_reserved": false,
+      "zenodo_published": false,
+      "public_release_authorized": false,
+      "preserved_how": "rc.1 keeps its own archive filename and its own gitignored build directory (build/). Later candidates write to new filenames under their own subdirectories, so rc.1's archive and unpacked tree are never overwritten, renamed, rebuilt or deleted. No commit was amended, squashed, rebased or force-pushed, so rc.1's record stands in the branch history exactly as it was written."
+    },
+    {
+      "version": "1.0.0-rc.2",
+      "archive_name": "tse_financial_distress_dataset_1392_1402_release_candidate_rc2.zip",
+      "archive_sha256": "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+      "archive_size_bytes": 11808267,
+      "publication_readiness_at_the_time": "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+      "superseded_on_utc": "2026-08-21",
+      "superseded_by_version": "1.0.0-rc.3",
+      "superseded_reason": "rc.2's Zenodo description named all three study providers together as the sources of the released values. Only CODAL-derived, researcher-compiled company financial-statement fields and author-derived variables are released; no TSETMC- and no World Bank-derived field is. rc.3 corrects that sentence and makes the payload-file versus archive-member counts explicit.",
+      "build_directory": "build/rc2",
+      "preserved_not_deleted": true,
+      "zenodo_deposition_created": false,
+      "zenodo_upload_performed": false,
+      "zenodo_doi_reserved": false,
+      "zenodo_published": false,
+      "public_release_authorized": false,
+      "preserved_how": "rc.2 keeps its own archive filename and its own gitignored build directory (build/rc2/). rc.3 writes to a new filename under build/rc3/, so rc.2's archive and unpacked tree are never overwritten, renamed, rebuilt or deleted, and its recorded digest does not move. No commit was amended, squashed, rebased or force-pushed."
+    }
+  ],
+  "released_source_scope": {
+    "statement": "The released company-year panel contains researcher-compiled company financial-statement fields from publicly accessible CODAL disclosures, together with author-derived variables and annotations. No TSETMC- or World Bank-derived field is included in this release; those sources relate only to the wider study.",
+    "released_source_providers": [
+      "CODAL"
+    ],
+    "non_released_source_providers": [
+      "TSETMC",
+      "World Bank"
+    ],
+    "tsetmc_derived_fields_included": false,
+    "world_bank_derived_fields_included": false,
+    "original_provider_files_redistributed": false,
+    "authority": "project/stage130/dataset_release_candidate/source_rights_matrix.csv",
+    "independent_confirmations": [
+      "project/stage125/source_registry_stage125.csv records src_m2_tsetmc_market as pending_part3 / not collected",
+      "none of the 115 columns in project/stage125/part3c_column_role_map_stage125.csv is a market-data or macroeconomic field"
+    ],
+    "wider_study_statement_is_not_a_release_composition_claim": true,
+    "wider_study_statement_scope_note": "human_supplied_data_governance_facts.statement above describes the sources of the WIDER STUDY's underlying data, as the human author supplied it. It is preserved verbatim and is not a claim about which providers contributed a field to this release; this block is.",
+    "determination_unchanged_by_this_correction": true,
+    "rights_record_changed_by_this_correction": false
+  },
+  "release_composition": {
+    "manifest_payload_file_count": 25,
+    "archive_member_count": 27,
+    "sha256sums_line_count": 26,
+    "archive_members_that_are_not_manifest_payload_files": [
+      "release_manifest.json",
+      "SHA256SUMS.txt"
+    ],
+    "terminology": "25 files are described by release_manifest.json as payload files. The deterministic archive contains 27 members: those 25 payload files plus release_manifest.json and SHA256SUMS.txt, which are integrity records about the payload and are not themselves manifest payload files.",
+    "all_27_described_as_manifest_payload_files": false
+  },
+  "rc3_correction": {
+    "correction_date_utc": "2026-08-21",
+    "corrected_artifact": "project/stage130/dataset_release_candidate/release_payload/zenodo_metadata_candidate.json",
+    "corrected_key": "metadata.description",
+    "previous_statement": "All values were compiled by the authors from publicly accessible sources including CODAL, TSETMC and the World Bank.",
+    "corrected_statement": "The released company-year panel contains researcher-compiled company financial-statement fields from publicly accessible CODAL disclosures, together with author-derived variables and annotations. No TSETMC- or World Bank-derived field is included in this release; those sources relate only to the wider study.",
+    "reason": "The previous statement named all three study providers together as the sources of the released values, implying material from every one of them is in the release. The committed rights matrix records that CODAL-derived, researcher-compiled company financial fields are present and that no TSETMC-derived and no World Bank-derived field is. The description contradicted the matrix and is corrected.",
+    "scope": "release_description_and_file_count_terminology_only",
+    "data_values_changed": 0,
+    "frozen_surface_bytes_changed": 0,
+    "manuscript_bytes_changed": 0,
+    "rights_matrix_rows_changed": 0,
+    "historical_rights_record_changed": false,
+    "provider_terms_retrieved_by_this_correction": false,
+    "provider_terms_verified_by_this_correction": false,
+    "codal_or_tsetmc_terms_claimed_retrieved_or_verified": false,
+    "human_supplied_statements_altered": 0,
+    "superseded_candidates_altered": 0,
+    "superseded_archives_rebuilt_renamed_or_deleted": 0,
+    "guards_added": [
+      "project/src/stage130_dataset_release_candidate.py :: gate_release_scope_statements",
+      "project/src/stage130_dataset_release_candidate.py :: gate_file_count_terminology",
+      "project/scripts/update_ai_handoff.py :: _stage130_rc_assert_no_misleading_release_scope_claim"
+    ]
+  }
+}

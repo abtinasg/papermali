@@ -792,9 +792,186 @@ def test_manifest_pins_the_outcome_definition_source():
     assert hashlib.sha256(raw).hexdigest() == digest
 
 
-def test_the_package_now_carries_eight_tables():
+def test_the_package_now_carries_nine_tables():
     names = sorted(p.name for p in
                    (PKG_DIR / "manuscript_results_tables").glob("*.csv"))
-    assert len(names) == 8, names
-    assert names[-2:] == ["table_7_development_performance.csv",
-                          "table_8_outcome_definition.csv"]
+    assert len(names) == 9, names
+    assert names[-3:] == ["table_7_development_performance.csv",
+                          "table_8_outcome_definition.csv",
+                          "table_9_data_construction_and_qc.csv"]
+
+
+# --------------------------------------------------------------------------- #
+# 15. Data-construction and QC table: descriptive provenance, not a result
+# --------------------------------------------------------------------------- #
+
+def _table9_rows() -> dict:
+    text = (PKG_DIR / "manuscript_results_tables"
+            / "table_9_data_construction_and_qc.csv").read_text(encoding="utf-8")
+    return {r["item"]: r for r in csv.DictReader(io.StringIO(text))}
+
+
+def _qc121() -> dict:
+    return json.loads((REPO_ROOT / pkg.STAGE121_QC_REL).read_text(encoding="utf-8"))
+
+
+def _qc122() -> dict:
+    return json.loads((REPO_ROOT / pkg.STAGE122_QC_REL).read_text(encoding="utf-8"))
+
+
+def test_table9_has_the_declared_schema():
+    text = (PKG_DIR / "manuscript_results_tables"
+            / "table_9_data_construction_and_qc.csv").read_text(encoding="utf-8")
+    header = next(csv.reader(io.StringIO(text)))
+    assert header == ["item", "scope", "committed_result", "scientific_meaning",
+                      "mandatory_limitation", "canonical_source"]
+
+
+def test_table9_copies_the_panel_dimensions_verbatim():
+    got, qc121, qc122 = _table9_rows(), _qc121(), _qc122()
+    assert got["source_panel_rows"]["committed_result"] == str(
+        qc121["source_dimensions"]["rows"])
+    assert got["source_panel_companies"]["committed_result"] == str(
+        qc122["n_companies_before"])
+    assert got["source_panel_fiscal_years_jalali"]["committed_result"] == "1392-1402"
+
+
+def test_table9_copies_the_key_integrity_checks_verbatim():
+    got, structural = _table9_rows(), _qc121()["structural_checks"]
+    assert got["unique_row_keys"]["committed_result"] == str(
+        structural["unique_key_count"])
+    assert got["duplicate_row_keys"]["committed_result"] == str(
+        structural["duplicate_key_count"])
+    assert got["missing_row_keys"]["committed_result"] == str(
+        structural["missing_key_count"])
+
+
+def test_table9_copies_the_accounting_identity_verbatim():
+    got, identity = _table9_rows(), _qc121()["accounting_identity"]
+    assert got["accounting_identity_rows_checked"]["committed_result"] == str(
+        identity["rows_checked"])
+    assert got["accounting_identity_exact_matches"]["committed_result"] == str(
+        identity["exact_matches"])
+    assert got["accounting_identity_within_recorded_tolerance"][
+        "committed_result"] == str(
+            identity["rounding_tolerance_matches_abs_diff_le_1_million_irr"])
+    assert got["accounting_identity_failures"]["committed_result"] == str(
+        len(identity["failures"]))
+
+
+def test_table9_covers_every_recorded_ratio_family_with_zero_mismatches():
+    got, families = _table9_rows(), _qc121()["ratio_recalculation_checks"]
+    assert len(families) == 7, sorted(families)
+    for family, rec in families.items():
+        row = got[f"ratio_recalculation_{family}"]
+        assert row["committed_result"] == (
+            f"checked={rec['checked']}; mismatches={rec['mismatches']}")
+        assert rec["mismatches"] == 0, family
+
+
+def test_table9_preserves_the_three_target_states():
+    got, qc122 = _table9_rows(), _qc122()
+    assert got["target_state_positive"]["committed_result"] == str(
+        qc122["target_counts"]["1"])
+    assert got["target_state_negative"]["committed_result"] == str(
+        qc122["target_counts"]["0"])
+    assert got["target_state_unknown"]["committed_result"] == str(
+        qc122["target_counts"]["missing"])
+    assert got["unknown_target_never_converted_to_negative"][
+        "committed_result"] == "true"
+    assert got["rows_preserved_through_target_qc"][
+        "committed_result"] == "1331 -> 1331"
+
+
+def test_table9_reports_the_provenance_gap_rather_than_hiding_it():
+    got, qc122 = _table9_rows(), _qc122()
+    assert got["source_file_provenance_present"]["committed_result"] == str(
+        qc122["eligibility_counts"]["eligible_source_quality"])
+    assert got["source_file_provenance_absent"]["committed_result"] == str(
+        qc122["exclusion_reason_counts_row"]["source_not_traceable"])
+    assert got["source_file_provenance_absent"]["committed_result"] == "28"
+    assert "provenance gap" in got["source_file_provenance_absent"][
+        "mandatory_limitation"].lower()
+    assert "does not cover every row" in got["source_file_provenance_present"][
+        "mandatory_limitation"].lower()
+
+
+def test_table9_records_that_publication_timestamps_were_unavailable():
+    got = _table9_rows()
+    row = got["row_level_publication_timestamps"]
+    assert row["committed_result"] == (
+        "row_level_publish_datetime_collection_required=false")
+    assert "no filing date was verified" in row["mandatory_limitation"].lower()
+    rule = got["availability_rule"]
+    assert rule["committed_result"] == "lag_months=4; method=fixed_regulatory_lag"
+    assert "proxy" in rule["mandatory_limitation"].lower()
+
+
+def test_table9_keeps_the_four_populations_apart():
+    got = _table9_rows()
+    scopes = {r["scope"] for r in got.values()}
+    assert {"upstream_source_panel", "model_eligible_pairs",
+            "development_fit_set", "final_test_cohort"} <= scopes
+    assert got["source_panel_rows"]["scope"] == "upstream_source_panel"
+    assert got["development_fit_set_rows"]["scope"] == "development_fit_set"
+    assert got["final_test_evaluable_rows"]["scope"] == "final_test_cohort"
+    assert got["one_year_ahead_pairs_final_eligible"]["scope"] == (
+        "model_eligible_pairs")
+    # Four different populations: no two of them may share a row count.
+    counts = {got[k]["committed_result"] for k in (
+        "source_panel_rows", "one_year_ahead_pairs_final_eligible",
+        "development_fit_set_rows", "final_test_evaluable_rows")}
+    assert len(counts) == 4, counts
+
+
+def test_every_table9_row_carries_a_limitation_and_a_source():
+    for item, row in _table9_rows().items():
+        assert row["scope"].strip(), item
+        assert row["scientific_meaning"].strip(), item
+        assert row["mandatory_limitation"].strip(), item
+        assert row["canonical_source"].strip(), item
+
+
+def test_claim_freeze_c12_is_descriptive_and_agrees_with_table9():
+    text = (PKG_DIR / "manuscript_claim_freeze.md").read_text(encoding="utf-8")
+    assert "## C12 — Data construction and QC" in text
+    c12 = text[text.index("## C12"):]
+    assert "DESCRIPTIVE/PROVENANCE" in c12
+    assert "not a result" in c12
+    got = _table9_rows()
+    for item in ("source_panel_rows", "source_panel_companies",
+                 "accounting_identity_rows_checked",
+                 "accounting_identity_exact_matches",
+                 "source_file_provenance_present",
+                 "source_file_provenance_absent"):
+        assert got[item]["committed_result"] in c12, item
+
+
+def test_c12_makes_no_open_data_or_completeness_claim():
+    text = (PKG_DIR / "manuscript_claim_freeze.md").read_text(encoding="utf-8")
+    c12 = text[text.index("## C12"):]
+    prohibited = c12[c12.index("**Prohibited overclaim:**"):]
+    for phrase in ("high-quality dataset", "complete row-level provenance",
+                   "open dataset", "open benchmark",
+                   "verified point-in-time"):
+        assert phrase in prohibited, phrase
+
+
+def test_manifest_pins_both_upstream_qc_sources():
+    man = json.loads((PKG_DIR / "manifest.json").read_text(encoding="utf-8"))
+    sources = man["authoritative_value_sources"]
+    assert sources["upstream_panel_qc"] == pkg.STAGE121_QC_REL
+    assert sources["target_construction_qc"] == pkg.STAGE122_QC_REL
+    for rel in (pkg.STAGE121_QC_REL, pkg.STAGE122_QC_REL):
+        raw = (REPO_ROOT / rel).read_bytes()
+        assert hashlib.sha256(raw).hexdigest() == man["source_sha256"][rel], rel
+
+
+def test_the_data_construction_table_computes_nothing():
+    """Table 9 is a transcription surface: every cell is a committed string."""
+    src = (REPO_ROOT / "project/src/stage130_manuscript_evidence_package.py"
+           ).read_text(encoding="utf-8")
+    body = src[src.index("def build_data_construction_table"):]
+    body = body[: body.index("\ndef ")]
+    for banned in ("sum(", "mean(", "/ len(", "np.", "statistics."):
+        assert banned not in body, banned

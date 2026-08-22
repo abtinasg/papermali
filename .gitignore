@@ -47,3 +47,9 @@ project/stage125/raw_cache_part3b/
 project/stage125/raw_cache_part3b1b/
 # Stage125 Part 3C bulky leakage-safe pair datasets (regenerable; hashed in metadata)
 project/stage125/part3c_outputs/
+
+# Stage130 dataset Release Candidate build output. The archive and its unpacked
+# tree are deliberately NOT tracked: the builder, its inputs, the manifest and
+# the checksums are committed instead, so the bundle is reproducible from Git
+# without the repository carrying a second copy of the frozen CSVs.
+project/stage130/dataset_release_candidate/build/

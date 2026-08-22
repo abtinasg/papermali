@@ -273,6 +273,71 @@ ALLOWLIST_FILES = (
     "project/tests/test_stage124_gate_b_execution.py",
     "project/stage124/stage124_batch02_gate_b_qc_report.json",
     "project/stage124/metadata_and_hashes_stage124_batch02_gate_b.json",
+    # Stage130 deterministic Zenodo dataset Release Candidate: builder, tests,
+    # and the governance/documentation package. Narrowest exact-file allowance
+    # -- project/stage130/ is deliberately NOT allowlisted as a directory, so
+    # the manuscript tree is not swept in. The builder copies frozen bytes,
+    # fits nothing, computes nothing, opens no Final Test artifact, and the
+    # archive it writes is gitignored rather than tracked.
+    "project/src/stage130_dataset_release_candidate.py",
+    "project/tests/test_stage130_dataset_release_candidate.py",
+    # The complete 115-column release dictionary: its fail-closed generator,
+    # its tests, and the CSV it emits. The generator transcribes committed
+    # facts and refuses to invent one; the CSV is regenerated and byte-compared
+    # at build time, so a hand-edited dictionary cannot ship.
+    "project/src/stage130_release_column_dictionary.py",
+    "project/tests/test_stage130_release_column_dictionary.py",
+    "project/stage130/dataset_release_candidate/release_payload/"
+    "RELEASE_COLUMN_DICTIONARY.csv",
+    "project/stage130/dataset_release_candidate/"
+    "README_STAGE130_DATASET_RELEASE_CANDIDATE.md",
+    "project/stage130/dataset_release_candidate/"
+    "stage130_dataset_release_candidate_decision.json",
+    "project/stage130/dataset_release_candidate/"
+    "stage130_dataset_release_candidate_governance_boundary.json",
+    "project/stage130/dataset_release_candidate/"
+    "metadata_and_hashes_stage130_dataset_release_candidate.json",
+    "project/stage130/dataset_release_candidate/release_manifest.json",
+    "project/stage130/dataset_release_candidate/SHA256SUMS.txt",
+    "project/stage130/dataset_release_candidate/source_rights_matrix.csv",
+    "project/stage130/dataset_release_candidate/release_payload/README.md",
+    "project/stage130/dataset_release_candidate/release_payload/"
+    "DATA_DICTIONARY_AND_FILE_GUIDE.md",
+    "project/stage130/dataset_release_candidate/release_payload/"
+    "LICENSE_DATASET.txt",
+    "project/stage130/dataset_release_candidate/release_payload/"
+    "SOURCE_AND_LICENSE_NOTES.md",
+    "project/stage130/dataset_release_candidate/release_payload/LIMITATIONS.md",
+    "project/stage130/dataset_release_candidate/release_payload/CITATION.cff",
+    "project/stage130/dataset_release_candidate/release_payload/"
+    "zenodo_metadata_candidate.json",
+    # Stage130 human-executed Zenodo DRAFT deposition: the governance package
+    # and its tests. Recording only -- this action makes no Zenodo call, holds
+    # no credential and writes no archive. The deposition script and its state
+    # file live OUTSIDE the repository and are deliberately not listed here.
+    "project/tests/test_stage130_zenodo_draft_deposition.py",
+    "project/stage130/zenodo_draft_deposition/"
+    "README_STAGE130_ZENODO_DRAFT_DEPOSITION.md",
+    "project/stage130/zenodo_draft_deposition/"
+    "stage130_zenodo_draft_deposition_decision.json",
+    "project/stage130/zenodo_draft_deposition/"
+    "stage130_zenodo_draft_deposition_governance_boundary.json",
+    "project/stage130/zenodo_draft_deposition/"
+    "metadata_and_hashes_stage130_zenodo_draft_deposition.json",
+    # Stage130 completed human review of that Zenodo DRAFT, plus the
+    # metadata-only Notes correction the HUMAN performed in the Zenodo UI:
+    # the append-only governance package and its tests. Recording only -- this
+    # action makes no Zenodo call, holds no credential, edits no Zenodo field
+    # and writes no archive. The predecessor package is byte-pinned, not
+    # relisted: it is history and is never rewritten.
+    "project/tests/test_stage130_zenodo_draft_human_review_completion.py",
+    "project/stage130/zenodo_draft_human_review_completion/README.md",
+    "project/stage130/zenodo_draft_human_review_completion/"
+    "stage130_zenodo_draft_human_review_completion_decision.json",
+    "project/stage130/zenodo_draft_human_review_completion/"
+    "stage130_zenodo_draft_human_review_completion_governance_boundary.json",
+    "project/stage130/zenodo_draft_human_review_completion/"
+    "metadata_and_hashes_stage130_zenodo_draft_human_review_completion.json",
     "AGENTS.md",
     "CLAUDE.md",
     ".gitignore",
@@ -3100,6 +3165,40 @@ def derive_m1_robustness_closure_markers(root: str) -> dict:
         # manuscript makes that statement stale, so Phase 2 owns the live
         # next-action key while Phase 1 keeps its own historical pointer.
         **derive_stage130_phase2_markers(root),
+        # Must come after Phase 2: the human read the draft. Phase 2 published
+        # `human_review_required = True` and pointed at `human-manuscript-
+        # review`, both true while no human had read it. The review is now
+        # complete, so this owns those live keys and the live pointer -- while
+        # Phase 2 keeps publishing its own historical values, which this
+        # deriver reads back and requires, so history is superseded in the
+        # open rather than rewritten.
+        **derive_stage130_manuscript_human_review_completion_markers(root),
+        # Must come after the review completion: the dataset Release Candidate.
+        # The review published `human-manuscript-submission-metadata` as the
+        # live pointer, which was the only outstanding thing when it ran. A
+        # prepared, unpublished Zenodo candidate now needs a human to approve
+        # its exact archive digest first, so this owns the live pointer -- while
+        # republishing the six manuscript submission items as STILL outstanding,
+        # because Zenodo creator metadata fills no manuscript placeholder.
+        **derive_stage130_dataset_release_candidate_markers(root),
+        # Must come after the Release Candidate: the human-executed Zenodo
+        # DRAFT deposition. The candidate published every Zenodo key as False
+        # with a null DOI and pointed at a digest review, all of which was true
+        # while nothing had been deposited. A draft now exists, so this owns
+        # those four live keys and the live pointer -- while `zenodo_published`
+        # and `public_release_authorized` stay False, because a draft is not a
+        # publication and nothing authorized one.
+        **derive_stage130_zenodo_draft_deposition_markers(root),
+        # Must come after the draft deposition: the LATER human events on that
+        # same draft. The deposition published a pointer naming TWO separable
+        # human things -- review the draft, then decide about publication --
+        # which was true while neither had happened. The review is now done and
+        # the human has themself corrected the record's Notes, so this owns the
+        # live pointer and names only the decision that is left. Every
+        # publication-facing key stays False: a reviewed draft with a corrected
+        # Notes field is still an unpublished draft, and nothing authorized a
+        # publication.
+        **derive_stage130_zenodo_draft_human_review_completion_markers(root),
         }))
 
 
@@ -6491,11 +6590,12 @@ def render_current_state(record: dict) -> str:
     if record.get("stage130_phase2_recorded"):
         lines += [
             "### Stage130 Phase 2 — manuscript assembly (CURRENT; writing "
-            "only, awaiting human review)\n",
+            "only, human review COMPLETED)\n",
             "_The manuscript draft exists. This is a WRITING action: it "
             "assembled prose and audit files from already-committed evidence "
-            "and computed nothing. It is a draft awaiting human review, not a "
-            "submission._\n",
+            "and computed nothing. The human scientific and editorial review "
+            "of that draft is COMPLETE and its content is approved; a "
+            "reviewed draft is still not a submission._\n",
             "- ✅ **Phase 2 started:** "
             f"{record.get('stage130_phase2_started')} — completed = "
             f"{record.get('stage130_phase2_completed')}, presentation only = "
@@ -6523,14 +6623,18 @@ def render_current_state(record: dict) -> str:
             f"= {record.get('stage130_phase2_new_metrics_computed')}, new CIs "
             f"= {record.get('stage130_phase2_new_confidence_intervals_computed')}"
             f", SHAP = {record.get('stage130_phase2_shap_executions')}.",
-            "- 📝 **Human review REQUIRED:** "
-            f"{record.get('stage130_phase2_human_review_required')} — review "
-            f"completed = {record.get('stage130_phase2_human_review_completed')}"
-            ", submission ready = "
+            "- 📝 **Human review COMPLETED:** "
+            f"{record.get('stage130_phase2_human_review_completed')} — review "
+            "still required = "
+            f"{record.get('stage130_phase2_human_review_required')} (it HAD "
+            "been required: was required = "
+            f"{record.get('stage130_phase2_human_review_was_required')}), "
+            "submission ready = "
             f"{record.get('stage130_phase2_submission_ready')}. Author list, "
             "affiliations, funding, conflicts, ethics and the data-access "
             "mechanism are human-only and are carried as explicit "
-            "placeholders, never invented.",
+            "placeholders, never invented — approving the manuscript TEXT is "
+            "not submission authorization.",
             "- ⛔ **Not authorized:** ready-for-review = "
             f"{record.get('stage130_phase2_ready_for_review_authorized')}, "
             f"merge = {record.get('stage130_phase2_merge_authorized')}, "
@@ -6541,6 +6645,543 @@ def render_current_state(record: dict) -> str:
             "pointer is never an authorization.",
             "- Manuscript: `project/stage130/manuscript/`; validator: "
             "`project/stage130/manuscript/validate_manuscript.py`",
+            "",
+        ]
+    if record.get("stage130_manuscript_human_review_completion_recorded"):
+        lines += [
+            "### Stage130 — human manuscript review COMPLETED (recording "
+            "only; not a submission)\n",
+            "_The human supervisor read the committed draft at one exact "
+            "commit and approved its CONTENT. Recording that is not "
+            "submission readiness, not Ready-for-Review and not merge "
+            "authorization._\n",
+            "- ✅ **Review completed:** "
+            f"{record.get('stage130_phase2_human_review_completed')} — "
+            "recorded by "
+            f"`{record.get('stage130_manuscript_human_review_completion_action_id')}`"
+            " on "
+            f"{record.get('stage130_manuscript_human_review_decision_date_utc')}"
+            ", human-authorized = "
+            f"{record.get('stage130_manuscript_human_review_authorized_by_human')}.",
+            "- 🔒 **Reviewed head:** "
+            f"`{record.get('stage130_manuscript_reviewed_head_commit')}` — "
+            "approved file "
+            f"`{record.get('stage130_manuscript_reviewed_path')}`, SHA-256 "
+            f"`{record.get('stage130_manuscript_reviewed_sha256')}`, blob "
+            f"`{record.get('stage130_manuscript_reviewed_blob_id')}`. "
+            "Manuscript modified by this action = "
+            f"{record.get('stage130_manuscript_modified_by_this_action')}; "
+            "both digests are re-derived from the file, so editing the "
+            "approved text fails the build instead of inheriting the "
+            "approval.",
+            "- 🕰️ **History preserved:** the Phase 2 assembly record still "
+            "publishes `human_review_required = True` (was required = "
+            f"{record.get('stage130_phase2_human_review_was_required')}); this "
+            "supersedes "
+            f"`{record.get('stage130_manuscript_supersedes_key')}` in the "
+            "open, and the historical pointer "
+            f"`{record.get('stage130_manuscript_supersedes_pointer')}` is not "
+            "rewritten (Phase 2 record preserved = "
+            f"{record.get('stage130_phase2_assembly_record_preserved')}).",
+            "- ⛔ **Still NOT authorized:** submission ready = "
+            f"{record.get('stage130_phase2_submission_ready')}, "
+            "ready-for-review = "
+            f"{record.get('stage130_phase2_ready_for_review_authorized')}, "
+            f"merge = {record.get('stage130_phase2_merge_authorized')}, "
+            f"Stage130 authorized = {record.get('stage130_authorized')}, "
+            "submission workflow started = "
+            f"{record.get('stage130_manuscript_submission_workflow_started')}.",
+            "- 👤 **Human submission metadata — supplied = "
+            f"{record.get('stage130_manuscript_human_submission_metadata_supplied', False)}"
+            ", applied to the manuscript = "
+            f"{record.get('stage130_manuscript_human_submission_metadata_applied_to_manuscript', False)}"
+            ":** "
+            f"{record.get('stage130_manuscript_human_supplied_metadata_outstanding_count')}"
+            " items ("
+            + ", ".join(
+                f"`{item}`" for item in
+                (record.get(
+                    "stage130_manuscript_human_supplied_metadata_outstanding_items")
+                 or []))
+            + "). None was invented by any action. Where they are supplied, "
+            "they are recorded in the decision artifact only — the byte-pinned "
+            "manuscript still carries placeholders, and inserting them needs a "
+            "separate authorization plus a fresh human review.",
+            "- ⛔ **Nothing scientific occurred:** Final Test rows read = "
+            f"{record.get('stage130_phase2_final_test_rows_read')}, prediction "
+            "artifact opened = "
+            f"{record.get('stage130_phase2_prediction_artifact_opened')}, "
+            "Stage130 scientific execution started = "
+            f"{record.get('stage130_scientific_execution_started')}.",
+            "- ➡️ **Live next action:** "
+            f"`{record.get('next_research_action_id')}` — authorized = "
+            f"{record.get('next_research_action_authorized')}. The review it "
+            "used to name is done; a pointer is never an authorization.",
+            "- Package: "
+            "`project/stage130/manuscript_human_review_completion/`",
+            "",
+        ]
+    if record.get("stage130_dataset_release_candidate_recorded"):
+        lines += [
+            "### Stage130 — Zenodo dataset Release Candidate (PREPARED, NOT "
+            "PUBLISHED)\n",
+            "_Custody and documentation only. Frozen bytes were copied, "
+            "hashed and archived. Nothing was deposited, uploaded, minted or "
+            "published, and the manuscript was not touched._\n",
+            "- 📦 **Candidate prepared:** "
+            f"{record.get('stage130_dataset_release_candidate_prepared')} — "
+            "version "
+            f"`{record.get('stage130_dataset_release_candidate_version')}`. "
+            "**Two counts, and they are different:** "
+            f"{record.get('stage130_dataset_release_candidate_manifest_payload_file_count')}"
+            " files are described by `release_manifest.json` as payload files, "
+            "while the deterministic archive contains "
+            f"{record.get('stage130_dataset_release_candidate_archive_member_count')}"
+            " members — those payload files plus "
+            + ", ".join(
+                f"`{name}`" for name in
+                (record.get(
+                    "stage130_dataset_release_candidate_non_payload_archive_"
+                    "members") or []))
+            + ", which are integrity records about the payload and are not "
+            "themselves manifest payload files (all members are payload files "
+            "= "
+            f"{record.get('stage130_dataset_release_candidate_all_members_are_payload_files')}"
+            "). `SHA256SUMS.txt` accordingly carries "
+            f"{record.get('stage130_dataset_release_candidate_sha256sums_line_count')}"
+            " lines. The archive itself is **not** tracked in Git (tracked in "
+            "git = "
+            f"{record.get('stage130_dataset_release_candidate_archive_tracked_in_git')}"
+            ").",
+            "- 🧾 **What the release actually draws on:** "
+            + ", ".join(
+                f"`{name}`" for name in
+                (record.get(
+                    "stage130_dataset_release_candidate_released_source_"
+                    "providers") or []))
+            + " only. No field derived from "
+            + " or ".join(
+                f"`{name}`" for name in
+                (record.get(
+                    "stage130_dataset_release_candidate_non_released_source_"
+                    "providers") or []))
+            + " is in this release (TSETMC included = "
+            f"{record.get('stage130_dataset_release_candidate_tsetmc_fields_included')}"
+            ", World Bank included = "
+            f"{record.get('stage130_dataset_release_candidate_world_bank_fields_included')}"
+            "); those sources relate only to the wider study. rc.2's "
+            "three-provider description was corrected here (corrected = "
+            f"{record.get('stage130_dataset_release_candidate_scope_claim_corrected')}"
+            ") **without changing any rights record** (rights record changed "
+            "by the correction = "
+            f"{record.get('stage130_dataset_release_candidate_rights_record_changed_by_correction')}"
+            ").",
+            "- 🗂️ **Supersedes** "
+            f"`{record.get('stage130_dataset_release_candidate_supersedes_version')}`"
+            " (archive SHA-256 "
+            f"`{record.get('stage130_dataset_release_candidate_supersedes_archive_sha256')}`"
+            ", "
+            f"{record.get('stage130_dataset_release_candidate_supersedes_archive_size_bytes')}"
+            " bytes, readiness "
+            f"`{record.get('stage130_dataset_release_candidate_supersedes_readiness')}`"
+            "), preserved not deleted = "
+            f"{record.get('stage130_dataset_release_candidate_supersedes_preserved_not_deleted')}"
+            ". Nothing was ever deposited under it. Full superseded chain, "
+            "each archive preserved and each digest intact: "
+            + "; ".join(
+                f"`{item.get('version')}` = "
+                f"`{item.get('archive_sha256')}` "
+                f"({item.get('archive_size_bytes')} bytes, "
+                f"`{item.get('publication_readiness_at_the_time')}`)"
+                for item in
+                (record.get(
+                    "stage130_dataset_release_candidate_supersede_chain")
+                 or []))
+            + " (archives preserved = "
+            f"{record.get('stage130_dataset_release_candidate_superseded_archives_preserved')}"
+            ", digests altered = "
+            f"{record.get('stage130_dataset_release_candidate_superseded_digests_altered')}"
+            ").",
+            "- 📖 **Column documentation complete:** "
+            f"{record.get('stage130_dataset_release_candidate_columns_documented')}"
+            "/"
+            f"{record.get('stage130_dataset_release_candidate_columns_released')}"
+            " released columns documented, "
+            f"{record.get('stage130_dataset_release_candidate_columns_undocumented')}"
+            " undocumented, "
+            f"{record.get('stage130_dataset_release_candidate_definitions_invented')}"
+            " definitions invented. Dictionary: "
+            f"`{record.get('stage130_dataset_release_candidate_dictionary')}`."
+            " Every row names the committed repository source its facts came "
+            "from.",
+            "- 🎯 **Primary modeling surface:** "
+            f"`{record.get('stage130_dataset_release_candidate_primary_file')}`"
+            f" — {record.get('stage130_dataset_release_candidate_primary_pairs')}"
+            " pairs, "
+            f"{record.get('stage130_dataset_release_candidate_primary_companies')}"
+            " companies, "
+            f"{record.get('stage130_dataset_release_candidate_primary_columns')}"
+            " columns, "
+            f"{record.get('stage130_dataset_release_candidate_primary_positive')}"
+            " positive, "
+            f"{record.get('stage130_dataset_release_candidate_primary_negative')}"
+            " negative. These are CONTRACT values (recomputed from rows = "
+            f"{record.get('stage130_dataset_release_candidate_counts_recomputed')}"
+            ").",
+            "- 🔒 **Frozen surfaces verified:** "
+            f"{record.get('stage130_dataset_release_candidate_frozen_surfaces_verified')}"
+            " of 8 hashed and matching (the eight live under a gitignored "
+            "directory, so absence in a fresh clone is tolerated; drift never "
+            "is).",
+            "- ⛔ **Publication readiness:** "
+            f"`{record.get('stage130_dataset_release_candidate_publication_readiness')}`"
+            " — live blocking provider = "
+            f"`{record.get('stage130_dataset_release_candidate_blocking_provider')}`"
+            ", superseded blocking provider = "
+            f"`{record.get('stage130_dataset_release_candidate_superseded_blocking_provider')}`"
+            ". Providers audited: "
+            + ", ".join(
+                f"`{name}`" for name in
+                (record.get(
+                    "stage130_dataset_release_candidate_providers_audited")
+                 or []))
+            + ". No source PDF ("
+            f"{record.get('stage130_dataset_release_candidate_source_pdfs_included')}"
+            ") and no raw provider response ("
+            f"{record.get('stage130_dataset_release_candidate_raw_responses_included')}"
+            ") is redistributed.",
+            "- ⚖️ **Source rights — HUMAN AUTHOR DETERMINATION, not an "
+            "independent verification:** status "
+            f"`{record.get('stage130_dataset_release_candidate_rights_status')}`"
+            ", basis "
+            f"`{record.get('stage130_dataset_release_candidate_rights_basis')}`"
+            ", supplied by human = "
+            f"{record.get('stage130_dataset_release_candidate_rights_supplied_by_human')}"
+            ", inferred by the agent = "
+            f"{record.get('stage130_dataset_release_candidate_rights_inferred_by_the_agent')}"
+            ". **Provider terms independently retrieved = "
+            f"{record.get('stage130_dataset_release_candidate_provider_terms_retrieved')}"
+            ", independently verified = "
+            f"{record.get('stage130_dataset_release_candidate_provider_terms_verified')}"
+            "** — no CODAL or TSETMC terms page was ever retrieved or read, "
+            "and the historical record of that says so.",
+            # The candidate's OWN Zenodo position. Once a draft deposition
+            # exists the live keys have moved, so restating them here would
+            # read as "nothing reached Zenodo: deposition created = True".
+            # The historical statement is kept, labelled as history, and the
+            # live state is published by the deposition section below.
+            ("- 🕰️ **Nothing had reached Zenodo when this candidate was "
+             "prepared:** deposition created, upload performed, DOI reserved, "
+             "published and public release authorized were all False and the "
+             "DOI was null. That is the record of this action and it is not "
+             "rewritten. **SUPERSEDED** by "
+             f"`{record.get('stage130_zenodo_draft_deposition_action_id')}` — "
+             "the live Zenodo state is published in its own section below."
+             if record.get("stage130_zenodo_draft_deposition_recorded") else
+             "- ⛔ **Nothing reached Zenodo:** deposition created = "
+             f"{record.get('zenodo_deposition_created')}, upload performed = "
+             f"{record.get('zenodo_upload_performed')}, DOI reserved = "
+             f"{record.get('zenodo_doi_reserved')}, published = "
+             f"{record.get('zenodo_published')}, DOI = "
+             f"{record.get('zenodo_doi')}, public release authorized = "
+             f"{record.get('public_release_authorized')}."),
+            "- 📄 **Manuscript untouched:** modified = "
+            f"{record.get('stage130_manuscript_modified_by_this_action')}, "
+            "availability claim changed = "
+            f"{record.get('stage130_manuscript_availability_claim_changed')}. "
+            "It keeps describing the dataset by its PRESENT availability, "
+            "because no public DOI exists. The six human submission items are "
+            "supplied = "
+            f"{record.get('stage130_manuscript_human_submission_metadata_supplied')}"
+            " but applied to the manuscript = "
+            f"{record.get('stage130_manuscript_human_submission_metadata_applied_to_manuscript')}"
+            "; a post-DOI metadata update plus a fresh human review is still "
+            "required (= "
+            f"{record.get('stage130_manuscript_requires_post_doi_human_review')}"
+            ").",
+            ("- ➡️ **Live next action:** "
+             f"`{record.get('next_research_action_id')}` — authorized = "
+             f"{record.get('next_research_action_authorized')}. The digest "
+             "review this action named has been overtaken by an actual draft "
+             "deposition; see the section below. A pointer is never an "
+             "authorization."
+             if record.get("stage130_zenodo_draft_deposition_recorded") else
+             "- ➡️ **Live next action:** "
+             f"`{record.get('next_research_action_id')}` — authorized = "
+             f"{record.get('next_research_action_authorized')}. A human must "
+             "review the exact archive SHA-256, and a SEPARATE exact-digest "
+             "authorization is required before any Zenodo action. A pointer "
+             "is never an authorization."),
+            "- Package: `project/stage130/dataset_release_candidate/`; "
+            "builder: `project/src/stage130_dataset_release_candidate.py`",
+            "",
+        ]
+    if record.get("stage130_zenodo_draft_deposition_recorded"):
+        lines += [
+            "### Stage130 — Zenodo DRAFT deposition (CREATED and UPLOADED; "
+            "NOT published, NOT submitted)\n",
+            "_A human supervisor created a private Zenodo draft, uploaded the "
+            "rc.3 archive into it and reserved a DOI. That is the FIRST half "
+            "of Zenodo's lifecycle. Nothing was published, nothing was "
+            "submitted, the DOI does not resolve and the manuscript was not "
+            "touched._\n",
+            "- 📥 **Draft created:** deposition created = "
+            f"{record.get('zenodo_deposition_created')}, upload performed = "
+            f"{record.get('zenodo_upload_performed')}, recorded by "
+            f"`{record.get('stage130_zenodo_draft_deposition_action_id')}` on "
+            f"{record.get('stage130_zenodo_draft_deposition_date_utc')} "
+            f"(deposition id `{record.get('stage130_zenodo_deposition_id')}`, "
+            f"result `{record.get('stage130_zenodo_draft_deposition_result')}`)"
+            ".",
+            "- ⛔ **NOT published and NOT submitted:** published = "
+            f"{record.get('zenodo_published')}, record submitted = "
+            f"{record.get('zenodo_record_submitted')}, state = "
+            f"`{record.get('zenodo_record_state')}`, private draft = "
+            f"{record.get('zenodo_record_is_private_draft')}, public release = "
+            f"{record.get('zenodo_public_release')}, public release "
+            f"authorized = {record.get('public_release_authorized')}, "
+            "publication authorized = "
+            f"{record.get('zenodo_publication_authorized')}.",
+            "- 🔖 **DOI reserved, not registered:** DOI reserved = "
+            f"{record.get('zenodo_doi_reserved')}, DOI = "
+            f"`{record.get('zenodo_doi')}`, DOI published = "
+            f"{record.get('zenodo_doi_published')}, registered or resolving = "
+            f"{record.get('zenodo_doi_registered_or_resolving')}. It is a "
+            "placeholder identifier and must never be described as active, "
+            "published, resolving or publicly available.",
+            "- ⚠️ **`access_right = "
+            f"{record.get('stage130_zenodo_access_right')}` is DRAFT "
+            "metadata, not availability:** is public availability = "
+            f"{record.get('stage130_zenodo_access_right_is_public_availability')}"
+            ". It states the access condition the record WOULD carry if it "
+            "were ever published; while the record is "
+            f"`{record.get('zenodo_record_state')}` it is visible only to its "
+            "owner.",
+            "- 🔒 **The deposited bytes are the documented candidate's:** "
+            f"`{record.get('stage130_zenodo_deposited_filename')}`, "
+            f"{record.get('stage130_zenodo_deposited_size_bytes')} bytes, "
+            f"SHA-256 `{record.get('stage130_zenodo_deposited_sha256')}`, "
+            f"MD5 `{record.get('stage130_zenodo_deposited_md5')}`, version "
+            f"`{record.get('stage130_zenodo_deposited_version')}` — matches "
+            "the Release Candidate = "
+            f"{record.get('stage130_zenodo_deposit_matches_release_candidate')}"
+            ". A differently-built archive cannot inherit this record.",
+            "- 👤 **Human-supplied, not agent-retrieved:** supplied by = "
+            f"`{record.get('stage130_zenodo_facts_supplied_by')}`, "
+            "authenticated Zenodo response observed = "
+            f"{record.get('stage130_zenodo_authenticated_response_observed')}, "
+            "independently retrieved by the programmer = "
+            f"{record.get('stage130_zenodo_independently_retrieved_by_programmer')}"
+            ". This action made no Zenodo API call (= "
+            f"{record.get('stage130_zenodo_api_called_by_this_action')}), no "
+            "publish call (= "
+            f"{record.get('stage130_zenodo_publish_endpoint_called')}), did "
+            "not re-run the deposition script (= "
+            f"{record.get('stage130_zenodo_script_re_executed_by_this_action')}"
+            ") and read or requested no token (= "
+            f"{record.get('stage130_zenodo_token_read_or_requested')}). The "
+            "state file stays out of Git (committed = "
+            f"{record.get('stage130_zenodo_state_file_committed_to_git')}, "
+            "credentials committed = "
+            f"{record.get('stage130_zenodo_credentials_committed_to_git')}). "
+            "Recording an event is not authorizing it (= "
+            f"{record.get('stage130_zenodo_recording_is_not_retroactive_authorization')}"
+            ").",
+            "- 📄 **Manuscript untouched:** modified = "
+            f"{record.get('stage130_manuscript_modified_by_this_action')}, "
+            "availability claim changed = "
+            f"{record.get('stage130_manuscript_availability_claim_changed')}. "
+            "A RESERVED DOI is not a public one, so the Data Availability "
+            "Statement is deliberately unchanged; updating it needs a separate "
+            "action after a human publication decision, plus a fresh human "
+            "review (= "
+            f"{record.get('stage130_manuscript_requires_post_doi_human_review')}"
+            ").",
+            "- 🕰️ **History preserved:** the Release Candidate record still "
+            "publishes every Zenodo key as False with a null DOI and its own "
+            "pointer "
+            f"`{record.get('stage130_zenodo_supersedes_pointer')}`; this "
+            f"supersedes `{record.get('stage130_zenodo_supersedes_key')}` in "
+            "the open (record preserved = "
+            f"{record.get('stage130_dataset_release_candidate_record_preserved')}"
+            ").",
+            "- ⛔ **Still NOT authorized:** submission ready = "
+            f"{record.get('stage130_phase2_submission_ready')}, "
+            "ready-for-review = "
+            f"{record.get('stage130_phase2_ready_for_review_authorized')}, "
+            f"merge = {record.get('stage130_phase2_merge_authorized')}, "
+            f"Stage130 authorized = {record.get('stage130_authorized')}.",
+            # The pointer this action set named TWO human things. Once the
+            # review half is done, restating it whole would read as "a human
+            # still has to review the draft" — stale as the LIVE description.
+            # The historical pointer is kept, labelled as history, and the live
+            # one is published by the review section below.
+            ("- 🕰️ **The pointer this action set named review AND decision:** "
+             f"`{record.get('stage130_zenodo_supersedes_pointer')}` — true "
+             "while neither had happened. That is the record of this action "
+             "and it is not rewritten. **SUPERSEDED** by "
+             f"`{record.get('stage130_zenodo_draft_human_review_completion_action_id')}`"
+             " — the live pointer is published in its own section below."
+             if record.get(
+                 "stage130_zenodo_draft_human_review_completion_recorded")
+             else
+             "- ➡️ **Live next action:** "
+             f"`{record.get('next_research_action_id')}` — authorized = "
+             f"{record.get('next_research_action_authorized')}. A human must "
+             "review the private Draft as it now stands and decide, separately "
+             "and explicitly, whether it is ever published. A pointer is never "
+             "an authorization."),
+            "- Package: `project/stage130/zenodo_draft_deposition/`",
+            "",
+        ]
+    if record.get("stage130_zenodo_draft_human_review_completion_recorded"):
+        lines += [
+            "### Stage130 — Zenodo Draft: human review COMPLETE, Notes "
+            "corrected (STILL not published)\n",
+            "_Two LATER human events on the same private draft: the human "
+            "reviewed it in Zenodo Preview, and the human themself corrected "
+            "its Notes field in the Zenodo UI and saved it as a Draft. Neither "
+            "is a publication. The record is still unsubmitted, both DOIs are "
+            "still reserved placeholders, and the archive did not move._\n",
+            "- ✅ **Human visual review complete:** review completed = "
+            f"{record.get('stage130_zenodo_human_visual_review_completed')}, "
+            "matrix complete = "
+            f"{record.get('stage130_zenodo_draft_review_matrix_complete')} over "
+            f"{record.get('stage130_zenodo_draft_reviewed_item_count')} items "
+            f"({', '.join(record.get('stage130_zenodo_draft_reviewed_items') or [])})"
+            ", reviewed in Zenodo Preview = "
+            f"{record.get('stage130_zenodo_draft_review_performed_in_zenodo_preview')}"
+            ". Recorded by "
+            f"`{record.get('stage130_zenodo_draft_human_review_completion_action_id')}`"
+            f" on {record.get('stage130_zenodo_draft_human_review_completion_date_utc')}"
+            ".",
+            "- ✍️ **Human metadata-only Notes correction:** performed by = "
+            f"`{record.get('stage130_zenodo_notes_edit_performed_by')}`, scope "
+            f"= `{record.get('stage130_zenodo_notes_edit_scope')}`, saved as = "
+            f"`{record.get('stage130_zenodo_notes_edit_saved_state')}`. The "
+            "programmer edited nothing in Zenodo. Current live Notes SHA-256 = "
+            f"`{record.get('stage130_zenodo_live_notes_sha256')}` "
+            f"({record.get('stage130_zenodo_live_notes_utf8_bytes')} UTF-8 "
+            "bytes), publication-stable = "
+            f"{record.get('stage130_zenodo_live_notes_are_publication_stable')}"
+            " because it states only the deposited archive's identity, which "
+            "no lifecycle change can falsify.",
+            "- 🕰️ **The historical Notes is still historically correct:** "
+            f"SHA-256 `{record.get('stage130_zenodo_historical_notes_sha256')}`"
+            f" ({record.get('stage130_zenodo_historical_notes_utf8_bytes')} "
+            "UTF-8 bytes), remains historically correct = "
+            f"{record.get('stage130_zenodo_historical_notes_remains_historically_correct')}"
+            ", is the current live value = "
+            f"{record.get('stage130_zenodo_historical_notes_is_the_current_live_value')}"
+            ". It is superseded ONLY as the live value; history is not "
+            "rewritten to pretend the corrected text existed at deposit time.",
+            "- ⛔ **Dropping the word “unpublished” published nothing:** "
+            "record submitted = "
+            f"{record.get('zenodo_record_submitted')}, state = "
+            f"`{record.get('zenodo_record_state')}`, private draft = "
+            f"{record.get('zenodo_record_is_private_draft')}, published = "
+            f"{record.get('zenodo_published')}, DOI published = "
+            f"{record.get('zenodo_doi_published')}, DOI publicly activated = "
+            f"{record.get('zenodo_doi_publicly_activated')}, public release = "
+            f"{record.get('zenodo_public_release')}. Lifecycle state lives in "
+            "the record and in these markers, never in the prose of a Notes "
+            "field.",
+            "- 🔖 **Both DOIs are RESERVED placeholders:** deposition id "
+            f"`{record.get('zenodo_deposition_id')}`, version DOI "
+            f"`{record.get('zenodo_version_doi')}` (reserved = "
+            f"{record.get('zenodo_version_doi_reserved')}), concept DOI "
+            f"`{record.get('zenodo_concept_doi')}` (displayed = "
+            f"{record.get('zenodo_concept_doi_displayed')}), registered or "
+            f"resolving = {record.get('zenodo_doi_registered_or_resolving')}, "
+            "activation authorized = "
+            f"{record.get('zenodo_doi_activation_authorized')}.",
+            "- ⚠️ **`access_right = "
+            f"{record.get('stage130_zenodo_access_right')}` is DRAFT metadata, "
+            "not availability:** is evidence of public availability = "
+            f"{record.get('stage130_zenodo_access_right_is_evidence_of_public_availability')}"
+            ". A completed review does not change that: while the record is "
+            f"`{record.get('zenodo_record_state')}` it is visible only to its "
+            "owner.",
+            "- 🔒 **The archive is immutable for this action:** modified = "
+            f"{record.get('stage130_zenodo_archive_modified_by_this_action')}, "
+            "re-uploaded = "
+            f"{record.get('stage130_zenodo_archive_re_uploaded_by_this_action')}"
+            ". The pre-deposition `zenodo_metadata_candidate.json` frozen "
+            "INSIDE the archive keeps its own notes (SHA-256 "
+            f"`{record.get('stage130_zenodo_embedded_candidate_notes_sha256')}`"
+            ", modified = "
+            f"{record.get('stage130_zenodo_embedded_candidate_metadata_modified')}"
+            "): the later live correction is an EXTERNAL metadata event and is "
+            "not retroactively injected into immutable bytes.",
+            "- 👤 **Human-supplied, not agent-retrieved:** supplied by = "
+            f"`{record.get('stage130_zenodo_review_facts_supplied_by')}`, human "
+            "visual review = "
+            f"{record.get('stage130_zenodo_human_visual_review_completed')}, "
+            "human metadata edit = "
+            f"{record.get('stage130_zenodo_human_metadata_edit_performed')}, "
+            "independently retrieved by the programmer = "
+            f"{record.get('stage130_zenodo_independently_retrieved_by_programmer')}"
+            ". Zenodo calls made by this action = "
+            f"{record.get('stage130_zenodo_api_calls_made_by_this_action')}; no "
+            "publish call (= "
+            f"{record.get('stage130_zenodo_publish_endpoint_called')}), no "
+            "browser automation (= "
+            f"{record.get('stage130_zenodo_opened_by_automation_in_this_action')}"
+            "), no script re-run (= "
+            f"{record.get('stage130_zenodo_script_re_executed_by_this_action')}"
+            "), no token read or requested (= "
+            f"{record.get('stage130_zenodo_token_read_or_requested')}). The "
+            "state file was tested for existence only (= "
+            f"{record.get('stage130_zenodo_state_file_existence_tested_only')}"
+            ") and stays out of Git (= "
+            f"{record.get('stage130_zenodo_state_file_committed_to_git')}); "
+            "credentials committed = "
+            f"{record.get('stage130_zenodo_credentials_committed_to_git')}. The "
+            "human authorization is preserved VERBATIM, pinned at SHA-256 "
+            f"`{record.get('stage130_zenodo_authorization_verbatim_sha256')}` "
+            f"({record.get('stage130_zenodo_authorization_verbatim_utf8_bytes')}"
+            " UTF-8 bytes). Recording an event is not authorizing it (= "
+            f"{record.get('stage130_zenodo_review_recording_is_not_retroactive_authorization')}"
+            ").",
+            "- 📄 **Manuscript untouched:** modified = "
+            f"{record.get('stage130_manuscript_modified_by_this_action')}, "
+            "availability claim changed = "
+            f"{record.get('stage130_manuscript_availability_claim_changed')}. "
+            "Reserved DOIs are not public ones, so the Data Availability "
+            "Statement is deliberately unchanged; updating it needs a separate "
+            "action after a publication decision, plus a fresh human review "
+            "(= "
+            f"{record.get('stage130_manuscript_requires_post_doi_human_review')}"
+            ").",
+            "- 🕰️ **History preserved:** the draft-deposition record still "
+            "publishes its own draft-state keys and its own pointer "
+            f"`{record.get('stage130_zenodo_supersedes_pointer')}` (record "
+            "preserved = "
+            f"{record.get('stage130_zenodo_draft_deposition_record_preserved')}"
+            "); every file of that package is byte-pinned in the generator, so "
+            "editing it breaks the build.",
+            "- ⛔ **Still NOT authorized:** publication = "
+            f"{record.get('zenodo_publication_authorized')}, submission = "
+            f"{record.get('zenodo_submission_authorized')}, DOI activation = "
+            f"{record.get('zenodo_doi_activation_authorized')}, public release "
+            f"= {record.get('public_release_authorized')}, submission ready = "
+            f"{record.get('stage130_phase2_submission_ready')}, PR Ready = "
+            f"{record.get('stage130_pr_ready')}, PR merged = "
+            f"{record.get('stage130_pr_merged')}, merge authorized = "
+            f"{record.get('stage130_phase2_merge_authorized')}, Stage130 "
+            f"authorized = {record.get('stage130_authorized')}.",
+            "- ➡️ **Live next action:** "
+            f"`{record.get('next_research_action_id')}` — scope "
+            f"`{record.get('next_research_action_scope')}`, authorized = "
+            f"{record.get('next_research_action_authorized')}. The review half "
+            "of the predecessor pointer is done, so the successor names only "
+            "what is left: a human publication DECISION. It says what the next "
+            "human decision concerns; it authorizes no publication action. A "
+            "pointer is never an authorization (= "
+            f"{record.get('next_research_action_pointer_is_not_authorization')}"
+            ").",
+            "- Package: "
+            "`project/stage130/zenodo_draft_human_review_completion/`",
             "",
         ]
     lines += [
@@ -7240,7 +7881,19 @@ def derive_stage128_m2_d2_design_freeze_markers(root: str) -> dict:
     # This check exists to refuse a STALE label; it must therefore recognize
     # the successor rather than pin the Stage128 label forever. Every Stage128
     # label below becomes predecessor context at that point.
-    if derive_stage130_phase2_markers(root):
+    # ...and once the human review that Phase 2 workstream names is COMPLETE,
+    # the "…-human-review" label is itself stale. The successor names what is
+    # actually pending -- the human-supplied submission metadata -- and is a
+    # description of the live state, not an authorization for it.
+    # ...and once a dataset Release Candidate is prepared and waiting on a
+    # human digest review, the submission-metadata label is itself stale as the
+    # LIVE description. The metadata is still outstanding and is republished as
+    # such; what is actually pending now is the digest review.
+    if derive_stage130_dataset_release_candidate_markers(root):
+        allowed = _STAGE130_RELEASE_CANDIDATE_WORKSTREAM_ID
+    elif derive_stage130_manuscript_human_review_completion_markers(root):
+        allowed = _STAGE130_SUBMISSION_METADATA_WORKSTREAM_ID
+    elif derive_stage130_phase2_markers(root):
         allowed = _STAGE130_P2_WORKSTREAM_ID
     elif m3i2_recovery:
         allowed = _STAGE128_M3I2_RECOVERY_WORKSTREAM_ID
@@ -17205,6 +17858,21 @@ def derive_stage130_phase1_markers(root: str) -> dict:
 _STAGE130_P2_DIR = "project/stage130/manuscript"
 _STAGE130_P2_ACTION_ID = "stage130-phase2-manuscript-assembly"
 _STAGE130_P2_WORKSTREAM_ID = "stage130-phase2-manuscript-assembly-human-review"
+#: The SAME Stage130 Phase 2 workstream, relabelled once the human review it
+#: names is complete. `active_workstream` is a description of what is live NOW,
+#: so continuing to advertise "…-human-review" after the review finished states
+#: something the repository contradicts. The label is a STATE DESCRIPTION and
+#: never a permission: the metadata action stays unauthorized. The workstream
+#: keeps the `stage130-phase2-` prefix, so its predecessor context is unchanged.
+_STAGE130_SUBMISSION_METADATA_WORKSTREAM_ID = (
+    "stage130-phase2-manuscript-submission-metadata")
+#: ...and relabelled once more when a Zenodo dataset Release Candidate exists
+#: awaiting a human digest review. Like every label before it this describes
+#: what is live NOW and is never a permission: the digest review is a POINTER,
+#: and no Zenodo action is authorized. The manuscript submission metadata stays
+#: outstanding underneath -- the relabel does not complete it.
+_STAGE130_RELEASE_CANDIDATE_WORKSTREAM_ID = (
+    "stage130-dataset-release-candidate-review")
 _STAGE130_P2_CURRENT_STAGE = "Stage130"
 _STAGE130_P2_NEXT_ACTION_ID = "human-manuscript-review"
 #: The manuscript deliverables. All must exist before Phase 2 may be recorded.
@@ -17333,6 +18001,3848 @@ def derive_stage130_phase2_markers(root: str) -> dict:
         "next_research_action_authorized": False,
         "next_research_action_pointer_is_not_authorization": True,
     }
+
+#: Stage130 -- the human manuscript review, COMPLETED.
+_STAGE130_REVIEW_PKG = "project/stage130/manuscript_human_review_completion"
+_STAGE130_REVIEW_ACTION_ID = "stage130-manuscript-human-review-completion"
+_STAGE130_REVIEW_DECISION_REL = (
+    f"{_STAGE130_REVIEW_PKG}/"
+    "stage130_manuscript_human_review_completion_decision.json")
+_STAGE130_REVIEW_BOUNDARY_REL = (
+    f"{_STAGE130_REVIEW_PKG}/"
+    "stage130_manuscript_human_review_governance_boundary.json")
+#: The exact commit the human read. An approval attaches to one commit.
+_STAGE130_REVIEW_REVIEWED_HEAD = "c4136a412696c7bb626f0c389bcccb829f381629"
+#: The Draft pull request the reviewed head belongs to.
+_STAGE130_REVIEW_PR_NUMBER = 100
+#: The manuscript that was approved, pinned by BOTH digests.
+_STAGE130_REVIEW_MANUSCRIPT_REL = (
+    f"{_STAGE130_P2_DIR}/manuscript_draft_en.md")
+#: The pointer the completed review replaces, and the one it advances to. The
+#: successor names the human-supplied submission metadata the draft still
+#: lacks; it is a POINTER and never a permission.
+_STAGE130_REVIEW_NEXT_ACTION_ID = "human-manuscript-submission-metadata"
+_STAGE130_REVIEW_NEXT_ACTION_SCOPE = (
+    "manuscript_human_submission_metadata_no_further_action_is_authorized")
+#: `human-manuscript-review` is what the human actually completed, so it -- not
+#: the Phase 2 assembly -- is the newest completed research action.
+_STAGE130_REVIEW_LAST_COMPLETED_ACTION_ID = _STAGE130_P2_NEXT_ACTION_ID
+#: The six human-only submission items. Reviewing the TEXT supplies none of
+#: them, so none may be recorded as supplied by this action.
+_STAGE130_REVIEW_OUTSTANDING_METADATA = (
+    "authors_and_author_order",
+    "affiliations_and_corresponding_author",
+    "funding",
+    "conflicts_of_interest",
+    "ethics_and_data_governance_statement",
+    "data_access_mechanism_for_the_restricted_company_panel",
+)
+#: Everything a content approval is explicitly NOT.
+_STAGE130_REVIEW_FORBIDDEN_TRUE = (
+    "submission_ready",
+    "ready_for_review_authorized",
+    "merge_authorized",
+    "stage130_authorized",
+    "stage130_or_next_stage_executed",
+    "manuscript_modified_by_this_action",
+    "manuscript_rewriting_authorized",
+    "manuscript_text_approval_is_submission_authorization",
+    "new_scientific_analysis_performed",
+    "scientific_execution_started",
+    "stage130_phase2_scientific_execution_started",
+    "submission_workflow_started",
+    "final_test_access_authorized",
+    "final_test_second_pass_authorized",
+    "author_names_supplied_by_this_action",
+    "affiliations_supplied_by_this_action",
+    "funding_supplied_by_this_action",
+    "conflicts_of_interest_supplied_by_this_action",
+    "ethics_statement_supplied_by_this_action",
+    "data_access_mechanism_finalized_by_this_action",
+    "prior_packages_modified_by_this_action",
+    "stage122_to_stage129_artifacts_modified_by_this_action",
+    "next_action_authorized",
+    "pr_merged",
+    "branch_deleted_by_this_action",
+    "auto_merge_enabled_by_this_action",
+)
+
+
+def _git_blob_id(payload: bytes) -> str:
+    """Git object id of ``payload`` as a blob, computed without invoking git.
+
+    Deterministic and sandbox-safe: it is exactly what ``git hash-object``
+    would print, so a recorded blob ID can be checked against a working file
+    in a temporary tree that is not a repository at all.
+    """
+    header = f"blob {len(payload)}\0".encode("ascii")
+    return hashlib.sha1(header + payload).hexdigest()
+
+
+def derive_stage130_manuscript_human_review_completion_markers(
+        root: str) -> dict:
+    """Recognize that the human manuscript review is COMPLETE.
+
+    Narrow and fail-closed. This is a review-completion RECORDING and nothing
+    else: it changes no manuscript byte, computes nothing, opens no Final Test
+    row, reads no prediction-artifact content and authorizes nothing.
+
+    It resolves exactly the three live markers the Phase 2 assembly left
+    standing while no human had read the draft --
+    ``stage130_phase2_human_review_required``,
+    ``stage130_phase2_human_review_completed`` and the live next-action
+    pointer. Phase 2's own record is NOT rewritten: this function reads the
+    historical values back out of ``derive_stage130_phase2_markers`` and
+    refuses to build if they have been quietly changed, so the supersede is
+    anchored on real history.
+
+    The approval is bound to bytes, not to a filename: the decision pins the
+    reviewed commit, the manuscript SHA-256 and the manuscript Git blob ID,
+    and both digests are RE-DERIVED here from the file on disk. Editing the
+    approved manuscript therefore breaks the build instead of silently
+    inheriting a human approval it never received.
+
+    Fails closed if the decision claims submission readiness, Ready-for-Review
+    or merge authorization, invents human-only submission metadata, reports a
+    non-zero action counter, or reverts the review to incomplete. Returns {}
+    before the package exists.
+    """
+    path = os.path.join(root, _STAGE130_REVIEW_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    decision = _require_json_artifact(root, _STAGE130_REVIEW_DECISION_REL)
+    boundary = _require_json_artifact(root, _STAGE130_REVIEW_BOUNDARY_REL)
+
+    if decision.get("decision_id") != _STAGE130_REVIEW_ACTION_ID:
+        raise HandoffError(
+            "Stage130 manuscript human-review completion decision_id mismatch")
+    if boundary.get("action_id") != _STAGE130_REVIEW_ACTION_ID:
+        raise HandoffError(
+            "Stage130 manuscript human-review completion boundary action_id "
+            "mismatch")
+    if decision.get("decision_type") != "human_manuscript_review_completion":
+        raise HandoffError(
+            "Stage130 manuscript review completion must be a "
+            "human_manuscript_review_completion")
+    if decision.get("authorized_by_human") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review completion must be human-authorized")
+
+    # (1) The review is COMPLETE and no longer outstanding, on both surfaces.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("human_review_completed") is not True:
+            raise HandoffError(
+                f"Stage130 manuscript review {label} must record the human "
+                "review as completed")
+    if decision.get("human_review_required_after_this_decision") is not False:
+        raise HandoffError(
+            "Stage130 manuscript review decision must clear the outstanding "
+            "review requirement")
+    if boundary.get("human_review_required") is not False:
+        raise HandoffError(
+            "Stage130 manuscript review boundary human_review_required must "
+            "be False once the review is complete")
+    if decision.get("manuscript_content_approved") is not True or \
+            boundary.get("manuscript_content_approved_by_human") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review must record the content approval")
+
+    # (2) The HISTORY is preserved, not rewritten. Phase 2 must still publish
+    # what was true when it ran; the supersede is anchored on those values.
+    prior = derive_stage130_phase2_markers(root)
+    if not prior:
+        raise HandoffError(
+            "Stage130 manuscript review completion cannot be recorded without "
+            "the Phase 2 manuscript it reviews")
+    if prior.get("stage130_phase2_human_review_required") is not True:
+        raise HandoffError(
+            "the Stage130 Phase 2 assembly record must keep publishing "
+            "human_review_required = True: that is what was true when Phase 2 "
+            "ran, and the review completion supersedes it in the open rather "
+            "than rewriting history")
+    if prior.get("stage130_phase2_human_review_completed") is not False:
+        raise HandoffError(
+            "the Stage130 Phase 2 assembly record must keep publishing "
+            "human_review_completed = False (historical value)")
+    if prior.get("stage130_phase2_next_action_id") != _STAGE130_P2_NEXT_ACTION_ID:
+        raise HandoffError(
+            "the Stage130 Phase 2 assembly record must keep pointing at "
+            f"{_STAGE130_P2_NEXT_ACTION_ID} (historical pointer)")
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        was = source.get("human_review_was_required_before_this_decision") \
+            if label == "decision" else source.get("human_review_was_required")
+        if was is not True:
+            raise HandoffError(
+                f"Stage130 manuscript review {label} must preserve the "
+                "historical fact that the review had been REQUIRED")
+    for field in ("prior_phase2_assembly_record_preserved",
+                  "prior_phase1_evidence_package_preserved"):
+        if boundary.get(field) is not True:
+            raise HandoffError(
+                f"Stage130 manuscript review boundary {field} must be True")
+
+    marker = decision.get("superseded_marker") or {}
+    if marker.get("key") != "stage130_phase2_human_review_required":
+        raise HandoffError(
+            "Stage130 manuscript review must supersede "
+            "stage130_phase2_human_review_required")
+    if marker.get("previous_value") is not True or \
+            marker.get("resolved_value") is not False:
+        raise HandoffError(
+            "Stage130 manuscript review supersede must record the real prior "
+            "value True resolving to False")
+    if marker.get("companion_key") != "stage130_phase2_human_review_completed" \
+            or marker.get("companion_previous_value") is not False \
+            or marker.get("companion_resolved_value") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review supersede must record the companion "
+            "review-completed marker moving False -> True")
+    if marker.get("pointer_previous_value") != _STAGE130_P2_NEXT_ACTION_ID or \
+            marker.get("pointer_resolved_value") != \
+            _STAGE130_REVIEW_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 manuscript review supersede must record the pointer "
+            f"moving {_STAGE130_P2_NEXT_ACTION_ID} -> "
+            f"{_STAGE130_REVIEW_NEXT_ACTION_ID}")
+    if marker.get("historical_phase2_assembly_record_preserved") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review supersede must declare the historical "
+            "Phase 2 assembly record preserved")
+
+    # (3) The approval is bound to BYTES at ONE commit, re-derived here. An
+    # approval that follows a moving file is not an approval.
+    head = decision.get("reviewed_head_commit")
+    if not (isinstance(head, str) and len(head) == 40
+            and all(c in "0123456789abcdef" for c in head)):
+        raise HandoffError(
+            "Stage130 manuscript review must pin a full 40-hex reviewed head")
+    if head != _STAGE130_REVIEW_REVIEWED_HEAD:
+        raise HandoffError(
+            "Stage130 manuscript review reviewed head must be "
+            f"{_STAGE130_REVIEW_REVIEWED_HEAD}, got {head!r}")
+    if boundary.get("reviewed_head_commit") != head:
+        raise HandoffError(
+            "Stage130 manuscript review boundary reviewed head disagrees with "
+            "the decision")
+    if decision.get("reviewed_manuscript_path") != \
+            _STAGE130_REVIEW_MANUSCRIPT_REL:
+        raise HandoffError(
+            "Stage130 manuscript review must name "
+            f"{_STAGE130_REVIEW_MANUSCRIPT_REL} as the reviewed manuscript")
+    manuscript_path = os.path.join(root, _STAGE130_REVIEW_MANUSCRIPT_REL)
+    if not os.path.isfile(manuscript_path):
+        raise HandoffError(
+            "Stage130 manuscript review: the approved manuscript is missing")
+    with open(manuscript_path, "rb") as fh:
+        payload = fh.read()
+    actual_sha = hashlib.sha256(payload).hexdigest()
+    actual_blob = _git_blob_id(payload)
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("reviewed_manuscript_sha256") != actual_sha:
+            raise HandoffError(
+                "the approved manuscript has changed since the human read it: "
+                f"{label} pins sha256 "
+                f"{source.get('reviewed_manuscript_sha256')!r} but the file is "
+                f"{actual_sha}. A content approval attaches to the bytes that "
+                "were reviewed, so this requires a NEW human review, not a "
+                "rebuild.")
+        if source.get("reviewed_manuscript_blob_id") != actual_blob:
+            raise HandoffError(
+                "the approved manuscript has changed since the human read it: "
+                f"{label} pins blob {source.get('reviewed_manuscript_blob_id')!r}"
+                f" but the file hashes to {actual_blob}")
+
+    # (4) Approving the TEXT authorizes nothing downstream.
+    for field in _STAGE130_REVIEW_FORBIDDEN_TRUE:
+        for source, label in ((decision, "decision"), (boundary, "boundary")):
+            if field not in source:
+                continue
+            if source.get(field) is not False:
+                raise HandoffError(
+                    f"Stage130 manuscript review {label} {field} must be "
+                    "False: approving the manuscript text is not submission, "
+                    "Ready-for-Review or merge authorization")
+    for field in ("approval_is_submission_authorization",
+                  "approval_is_ready_for_review_authorization",
+                  "approval_is_merge_authorization",
+                  "author_names_supplied_by_this_decision",
+                  "affiliations_supplied_by_this_decision",
+                  "funding_supplied_by_this_decision",
+                  "conflicts_of_interest_supplied_by_this_decision",
+                  "ethics_statement_supplied_by_this_decision",
+                  "data_access_mechanism_finalized_by_this_decision",
+                  "manuscript_modified_by_this_decision"):
+        if decision.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 manuscript review decision {field} must be False")
+    if decision.get("approval_is_manuscript_content_approval_only") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review must declare itself a content "
+            "approval only")
+    if boundary.get("human_supplied_submission_metadata_outstanding") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review must keep the human-supplied "
+            "submission metadata outstanding")
+    outstanding = tuple(
+        decision.get("outstanding_human_supplied_submission_metadata") or ())
+    if outstanding != _STAGE130_REVIEW_OUTSTANDING_METADATA:
+        raise HandoffError(
+            "Stage130 manuscript review must list the six outstanding "
+            f"human-supplied submission items exactly as "
+            f"{_STAGE130_REVIEW_OUTSTANDING_METADATA}, got {outstanding}")
+    if decision.get("outstanding_human_supplied_submission_metadata_count") != \
+            len(_STAGE130_REVIEW_OUTSTANDING_METADATA):
+        raise HandoffError(
+            "Stage130 manuscript review outstanding-metadata count must be "
+            f"{len(_STAGE130_REVIEW_OUTSTANDING_METADATA)}")
+
+    # (5) The PR stays a Draft, and the firewall is untouched.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("pr_is_draft") is not True:
+            raise HandoffError(
+                f"Stage130 manuscript review {label} must keep the PR a Draft")
+        if source.get("pr_number") != _STAGE130_REVIEW_PR_NUMBER:
+            raise HandoffError(
+                f"Stage130 manuscript review {label} PR number must be "
+                f"{_STAGE130_REVIEW_PR_NUMBER}")
+    if boundary.get("final_test_locked") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review must keep the Final Test locked")
+    if boundary.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage130 manuscript review final_test_rows_read must be 0")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError(
+            "Stage130 manuscript review boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage130 manuscript review counters.{field} must be 0 "
+                "(reading a manuscript reads no Final Test row, opens no "
+                "prediction artifact and computes nothing)")
+
+    # (6) The live pointer moves off the completed review -- as a POINTER.
+    if boundary.get("next_action_id") != _STAGE130_REVIEW_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 manuscript review must advance the pointer to "
+            f"{_STAGE130_REVIEW_NEXT_ACTION_ID}")
+    if boundary.get("next_action_id") == _STAGE130_P2_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 manuscript review may not keep pointing at the review "
+            "it just completed")
+    if boundary.get("next_action_scope") != _STAGE130_REVIEW_NEXT_ACTION_SCOPE:
+        raise HandoffError(
+            "Stage130 manuscript review next_action_scope must be "
+            f"{_STAGE130_REVIEW_NEXT_ACTION_SCOPE}")
+    if boundary.get("pointer_is_not_authorization") is not True:
+        raise HandoffError(
+            "Stage130 manuscript review must declare the pointer is not an "
+            "authorization")
+
+    return {
+        "stage130_manuscript_human_review_completion_recorded": True,
+        "stage130_manuscript_human_review_completion_action_id":
+            _STAGE130_REVIEW_ACTION_ID,
+        "stage130_manuscript_human_review_authorized_by_human": True,
+        "stage130_manuscript_human_review_decision_date_utc":
+            decision.get("decision_date_utc"),
+
+        # THE resolved markers. Phase 2's own record keeps its history.
+        "stage130_phase2_human_review_required": False,
+        "stage130_phase2_human_review_completed": True,
+        "stage130_phase2_human_review_was_required": True,
+        "stage130_phase2_human_review_completed_previous_value": False,
+
+        # What exactly was approved, and at which commit.
+        "stage130_manuscript_reviewed_head_commit": head,
+        "stage130_manuscript_reviewed_path": _STAGE130_REVIEW_MANUSCRIPT_REL,
+        "stage130_manuscript_reviewed_sha256": actual_sha,
+        "stage130_manuscript_reviewed_blob_id": actual_blob,
+        "stage130_manuscript_content_approved": True,
+        "stage130_manuscript_modified_by_this_action": False,
+        "stage130_manuscript_supersedes_key":
+            "stage130_phase2_human_review_required",
+        "stage130_manuscript_supersedes_pointer": _STAGE130_P2_NEXT_ACTION_ID,
+        "stage130_phase2_assembly_record_preserved": True,
+
+        # ...and what it is NOT. Restated here so a consumer reading only the
+        # review completion still sees every boundary.
+        "stage130_phase2_submission_ready": False,
+        "stage130_phase2_ready_for_review_authorized": False,
+        "stage130_phase2_merge_authorized": False,
+        "stage130_authorized": False,
+        "stage130_manuscript_review_is_submission_authorization": False,
+        "stage130_manuscript_submission_workflow_started": False,
+        "stage130_manuscript_human_supplied_metadata_outstanding": True,
+        "stage130_manuscript_human_supplied_metadata_outstanding_count":
+            len(_STAGE130_REVIEW_OUTSTANDING_METADATA),
+        "stage130_manuscript_human_supplied_metadata_outstanding_items":
+            list(_STAGE130_REVIEW_OUTSTANDING_METADATA),
+        "stage130_phase2_scientific_execution_started": False,
+        "stage130_scientific_execution_started": False,
+        "stage130_phase2_final_test_rows_read": 0,
+        "stage130_phase2_prediction_artifact_opened": False,
+
+        # The live pointer. The review it used to name is done, so continuing
+        # to publish it would state something the repository contradicts. The
+        # successor names the human-only submission metadata that is still
+        # missing, and it is a POINTER: nothing here is authorized.
+        "last_completed_research_action_id":
+            _STAGE130_REVIEW_LAST_COMPLETED_ACTION_ID,
+        "stage130_phase2_next_action_id": _STAGE130_REVIEW_NEXT_ACTION_ID,
+        "stage130_phase2_next_action_authorized": False,
+        "next_research_action_id": _STAGE130_REVIEW_NEXT_ACTION_ID,
+        "next_research_action_scope": _STAGE130_REVIEW_NEXT_ACTION_SCOPE,
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
+    }
+
+
+
+#: Stage130 -- the deterministic Zenodo dataset Release Candidate.
+_STAGE130_RC_PKG = "project/stage130/dataset_release_candidate"
+_STAGE130_RC_ACTION_ID = "stage130-dataset-release-candidate"
+_STAGE130_RC_DECISION_REL = (
+    f"{_STAGE130_RC_PKG}/stage130_dataset_release_candidate_decision.json")
+_STAGE130_RC_BOUNDARY_REL = (
+    f"{_STAGE130_RC_PKG}/"
+    "stage130_dataset_release_candidate_governance_boundary.json")
+_STAGE130_RC_MANIFEST_REL = f"{_STAGE130_RC_PKG}/release_manifest.json"
+_STAGE130_RC_MATRIX_REL = f"{_STAGE130_RC_PKG}/source_rights_matrix.csv"
+#: The Draft pull request the candidate was prepared on.
+_STAGE130_RC_PR_NUMBER = 100
+#: The pointer this action replaces, and the one it advances to. The successor
+#: demands a human read the exact archive digest; it is a POINTER, never a
+#: permission.
+_STAGE130_RC_PREVIOUS_POINTER = _STAGE130_REVIEW_NEXT_ACTION_ID
+_STAGE130_RC_NEXT_ACTION_ID = "human-dataset-release-candidate-digest-review"
+_STAGE130_RC_NEXT_ACTION_SCOPE = (
+    "dataset_release_candidate_human_digest_review_no_zenodo_action_is_"
+    "authorized")
+#: The three providers the source-rights audit must cover.
+_STAGE130_RC_PROVIDERS = ("CODAL", "TSETMC", "World Bank")
+#: The live candidate, and the predecessors it supersedes without deleting.
+_STAGE130_RC_RELEASE_VERSION = "1.0.0-rc.3"
+#: The immediate predecessor.
+_STAGE130_RC_SUPERSEDED_VERSION = "1.0.0-rc.2"
+_STAGE130_RC_SUPERSEDED_SHA256 = (
+    "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373")
+_STAGE130_RC_SUPERSEDED_BYTES = 11808267
+_STAGE130_RC_SUPERSEDED_READINESS = "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW"
+#: The FULL supersede chain, oldest first. rc.2 superseding rc.1 does not stop
+#: being history because rc.3 exists, so every predecessor keeps its digest,
+#: its byte size and the readiness it actually carried. Pinned here
+#: independently of the artifacts, so a rewritten package cannot also rewrite
+#: the expectation.
+_STAGE130_RC_SUPERSEDE_CHAIN = (
+    {
+        "version": "1.0.0-rc.1",
+        "archive_sha256":
+            "6649074290c5937066168e326b4e9c043f775c974edf2fb5b9c14ca452d25e45",
+        "archive_size_bytes": 11657151,
+        "publication_readiness_at_the_time": "NOT_READY_FOR_PUBLICATION",
+        "superseded_by_version": "1.0.0-rc.2",
+    },
+    {
+        "version": "1.0.0-rc.2",
+        "archive_sha256":
+            "d82b747a2e96f09cfa8b1a0118e6e7664cf83b469707409816a0b6dbd8127373",
+        "archive_size_bytes": 11808267,
+        "publication_readiness_at_the_time":
+            "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+        "superseded_by_version": "1.0.0-rc.3",
+    },
+)
+#: The only two statuses an undeposited candidate may carry. `PUBLISHED` and
+#: `PUBLIC_RELEASE_AUTHORIZED` are deliberately absent: nothing in this
+#: repository can support either.
+_STAGE130_RC_ALLOWED_READINESS = (
+    "NOT_READY_FOR_PUBLICATION",
+    "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW",
+)
+#: The human author's source-rights determination, as a status token. A
+#: determination BY THE AUTHOR -- never a provider licence, never a
+#: verification of anyone's published terms.
+_STAGE130_RC_RIGHTS_STATUS = (
+    "HUMAN_AUTHOR_DETERMINATION_NO_SEPARATE_PERMISSION_REQUIRED")
+#: The matrix disposition that records the rc.1 blocker as superseded by that
+#: determination -- as a determination, not as retroactive verification.
+_STAGE130_RC_SUPERSEDED_DISPOSITION = (
+    "SUPERSEDED_BY_HUMAN_AUTHOR_DETERMINATION")
+#: Claims no artifact in this package may make. The terms pages were never
+#: retrieved, so a sentence asserting they were read is false however
+#: convenient. Matched case-insensitively across the whole package.
+_STAGE130_RC_FORBIDDEN_RIGHTS_CLAIMS = (
+    "codal open licence verified",
+    "codal open license verified",
+    "codal terms independently verified",
+    "codal terms verified",
+    "provider terms independently verified",
+)
+
+#: What the release actually draws on. CODAL contributes researcher-compiled
+#: company financial-statement fields; TSETMC and the World Bank contribute
+#: nothing to it and relate to the wider study only. The committed rights
+#: matrix is the authority and records both exclusions as
+#: "NONE - no ...-derived field is in this release".
+_STAGE130_RC_RELEASED_PROVIDERS = ("CODAL",)
+_STAGE130_RC_NON_RELEASED_PROVIDERS = ("TSETMC", "World Bank")
+_STAGE130_RC_RELEASED_SOURCE_SCOPE = (
+    "The released company-year panel contains researcher-compiled company "
+    "financial-statement fields from publicly accessible CODAL disclosures, "
+    "together with author-derived variables and annotations. No TSETMC- or "
+    "World Bank-derived field is included in this release; those sources "
+    "relate only to the wider study."
+)
+#: The superseded three-provider sentence and its close variants, matched on
+#: text normalized to lowercase with markup, punctuation and extra whitespace
+#: removed. These are AFFIRMATIVE inclusion phrasings; the truthful negative
+#: sentence contains none of them.
+_STAGE130_RC_FORBIDDEN_SCOPE_CLAIMS = (
+    "sources including codal tsetmc and the world bank",
+    "sources including codal tsetmc and world bank",
+    "sources such as codal tsetmc and the world bank",
+    "sources such as codal tsetmc and world bank",
+    "compiled from codal tsetmc and the world bank",
+    "compiled from publicly accessible sources including codal tsetmc",
+    "from codal tsetmc and the world bank",
+    "includes tsetmc derived fields",
+    "includes world bank derived fields",
+    "tsetmc derived fields are included in this release",
+    "world bank derived fields are included in this release",
+    "released columns include market data",
+    "the release includes market data",
+    "the release includes world development indicators",
+)
+#: Sentence-level classification for the same sweep, mirroring the builder's.
+_STAGE130_RC_NON_RELEASED_TOKENS = (
+    "tsetmc", "world bank", "worldbank", "world development indicators")
+_STAGE130_RC_INCLUSION_CUES = (
+    "is included", "are included", "included in", "includes", "include ",
+    "is in this release", "are in this release", "is present", "are present",
+    "contains", "contain ", "comprises", "consists of", "compiled from",
+    "drawn from", "sourced from", "obtained from", "including", "made up of",
+    "built from", "assembled from", "taken from",
+)
+#: Demonstrative rather than generic. Bare "dataset", "values" or "data" also
+#: appear in sentences about the wider study and about a provider's own
+#: published licence, and neither is a claim about what this bundle carries.
+#: The human author's governance statement is one of the former; it is
+#: preserved verbatim and must not be swept away. The exact superseded
+#: sentence is caught by _STAGE130_RC_FORBIDDEN_SCOPE_CLAIMS regardless.
+_STAGE130_RC_SCOPE_CUES = (
+    "this release", "the release", "this bundle", "the bundle",
+    "this candidate", "this archive", "this dataset", "this panel",
+    "the released", "released column", "released field", "released value",
+    "released panel", "the payload", "this payload", "in the release",
+)
+_STAGE130_RC_NEGATION_CUES = (
+    "no ", "not ", "none", "never", "n/a", "excluded", "exclude", "without",
+    "wider study", "not material", "nothing from", "neither", "nor ",
+    "does not", "do not", "is not", "are not", "cannot", "must not",
+    "may not", "refus", "forbidden", "prohibit", "relate only",
+    "not applicable", "pending_part3", "not collected", "zero ",
+)
+#: The two counts, which are not one count.
+_STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT = 25
+_STAGE130_RC_ARCHIVE_MEMBER_COUNT = 27
+_STAGE130_RC_SHA256SUMS_LINE_COUNT = 26
+#: The archive members that are integrity records ABOUT the payload, and are
+#: therefore not manifest payload files.
+_STAGE130_RC_NON_PAYLOAD_MEMBERS = ("release_manifest.json", "SHA256SUMS.txt")
+#: The complete release dictionary and the authoritative column set it must
+#: match exactly.
+_STAGE130_RC_DICTIONARY_REL = (
+    f"{_STAGE130_RC_PKG}/release_payload/RELEASE_COLUMN_DICTIONARY.csv")
+_STAGE130_RC_ROLE_MAP_REL = (
+    "project/stage125/part3c_column_role_map_stage125.csv")
+#: Every field a release dictionary row must carry, non-empty.
+_STAGE130_RC_DICTIONARY_FIELDS = (
+    "column_name", "definition", "data_type", "unit", "column_role",
+    "model_eligibility", "source_block", "source_provider_or_author_derived",
+    "temporal_reference", "missing_value_semantics", "derivation_or_formula",
+    "authoritative_source_path", "authoritative_source_field_or_section",
+    "definition_status", "limitations",
+)
+#: The six human submission items. They are now SUPPLIED; what remains is their
+#: application to the byte-pinned manuscript, which is a different thing.
+_STAGE130_RC_SUPPLIED_METADATA = _STAGE130_REVIEW_OUTSTANDING_METADATA
+#: The eight frozen Stage125 Part 3C surfaces, pinned by digest. These files
+#: are gitignored (see .gitignore), so a fresh clone legitimately lacks them:
+#: absence is tolerated, drift never is.
+_STAGE130_RC_FROZEN_SHA256 = {
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_a_stage125.csv":
+        "4d04d7d28808573bb28c30848340b676bed3bb6820e67d8bfd4d9d7e1bb3755e",
+    "project/stage125/part3c_outputs/analysis_ready_main_rule_b_stage125.csv":
+        "5492cf244489cb88919243cf2f19d57663ba9e0b0d377791a3a1c26babc9b480",
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_a_stage125.csv":
+        "fbe9b29c6323b59e830ca9d2dd8c1543b9ef48b21709b01cc56a3989cd2d64d9",
+    "project/stage125/part3c_outputs/analysis_ready_expanded_rule_b_stage125.csv":
+        "2e61a282165ccdaef37bac61a460c83878f2ae633b10535945cc33897d3b4c22",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_a_stage125.csv":
+        "66ab136701b563a3ab9a5f4d168fce1b2a8790d73bc9b386963377db67f541f4",
+    "project/stage125/part3c_outputs/audited_pairs_main_rule_b_stage125.csv":
+        "d2d9893e40b0c3bdf876a7447fc5147985fc25c9c5add07264677f6ed817b72c",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_a_stage125.csv":
+        "23ff63d82bbc1a5a06536783eddfa5113ad988cb0db8c1c9adb004489da22bc9",
+    "project/stage125/part3c_outputs/audited_pairs_expanded_rule_b_stage125.csv":
+        "56c80ccb0a8bcbb1c030e87c892190579628c298026c6140045cbaf08ff7135f",
+}
+#: Contract-supplied primary-surface counts. Read, never recomputed.
+_STAGE130_RC_PRIMARY_COUNTS = {
+    "columns": 115,
+    "companies": 119,
+    "negative": 932,
+    "pairs": 1012,
+    "positive": 80,
+}
+#: Everything preparing a candidate is explicitly NOT. Any of these recorded
+#: True means the record is claiming an authorization it does not have.
+_STAGE130_RC_FORBIDDEN_TRUE = (
+    "zenodo_deposition_created",
+    "zenodo_upload_performed",
+    "zenodo_doi_reserved",
+    "zenodo_published",
+    "public_release_authorized",
+    "submission_ready",
+    "ready_for_review_authorized",
+    "merge_authorized",
+    "stage130_authorized",
+    "stage130_or_next_stage_executed",
+    "manuscript_modified_by_this_action",
+    "manuscript_availability_claim_changed_by_this_action",
+    "new_scientific_analysis_performed",
+    "scientific_execution_started",
+    "stage130_phase2_scientific_execution_started",
+    "submission_workflow_started",
+    "final_test_access_authorized",
+    "final_test_second_pass_authorized",
+    "final_test_predictions_file_opened",
+    "prior_packages_modified_by_this_action",
+    "stage122_to_stage129_artifacts_modified_by_this_action",
+    "data_access_mechanism_finalized_by_this_action",
+    "release_candidate_archive_tracked_in_git",
+    "next_action_authorized",
+    "pr_merged",
+    "branch_deleted_by_this_action",
+    "auto_merge_enabled_by_this_action",
+)
+
+
+def _stage130_rc_assert_no_unsupported_rights_claim(root: str) -> None:
+    """No committed package file may claim a provider's terms were verified.
+
+    The human author's determination is recorded as a determination everywhere
+    it appears. Restating it as an independent verification of CODAL's -- or
+    anyone's -- published terms would be false, because no such page was ever
+    retrieved. Swept over prose as well as flags, since a paragraph can assert
+    what a boolean denies.
+    """
+    pkg = os.path.join(root, _STAGE130_RC_PKG)
+    for dirpath, dirnames, filenames in os.walk(pkg):
+        dirnames[:] = [d for d in dirnames if d != "build"]
+        for name in sorted(filenames):
+            path = os.path.join(dirpath, name)
+            rel = os.path.relpath(path, root)
+            try:
+                with open(path, encoding="utf-8") as fh:
+                    text = fh.read()
+            except (UnicodeDecodeError, OSError):
+                continue
+            lowered = text.lower()
+            for claim in _STAGE130_RC_FORBIDDEN_RIGHTS_CLAIMS:
+                if claim in lowered:
+                    raise HandoffError(
+                        f"{rel} asserts {claim!r}. No provider terms page was "
+                        "retrieved, so that claim is unsupported; record the "
+                        "human author determination instead")
+
+
+_STAGE130_RC_TAG_RE = re.compile(r"<[^>]+>")
+_STAGE130_RC_NON_TEXT_RE = re.compile(r"[^a-z0-9 ]+")
+_STAGE130_RC_WS_RE = re.compile(r"\s+")
+#: A line that opens a new block. A newline BEFORE one of these is a real
+#: boundary; a newline inside a wrapped paragraph is not, and splitting on it
+#: would tear "No TSETMC-derived and no / World Bank-derived field is included"
+#: in half and read the second half as an assertion.
+_STAGE130_RC_BLOCK_START_RE = re.compile(r"^\s*(?:[#|*+-]|\d+[.)]|```)")
+#: Leading blockquote markers, stripped before the rejoin so a quotation that
+#: wraps across several ``>`` lines is classified as the one sentence it is.
+_STAGE130_RC_QUOTE_MARKER_RE = re.compile(r"^\s*>+\s?")
+#: Sentence boundaries after wrapped lines have been rejoined. Markdown table
+#: pipes still split: a table cell is a claim on its own and must not borrow a
+#: neighbour's negation.
+_STAGE130_RC_SENTENCE_RE = re.compile(r"[.;!?|]+|\n")
+
+
+def _stage130_rc_split_sentences(text: str) -> list:
+    """Split into claim-sized units without tearing wrapped prose apart."""
+    joined = []
+    for raw_line in text.splitlines():
+        line = _STAGE130_RC_QUOTE_MARKER_RE.sub("", raw_line)
+        if not line.strip():
+            joined.append("\n")
+            continue
+        if joined and joined[-1] != "\n" and \
+                not _STAGE130_RC_BLOCK_START_RE.match(line):
+            joined[-1] = f"{joined[-1]} {line.strip()}"
+        else:
+            joined.append(line.strip())
+    return [part for chunk in joined
+            for part in _STAGE130_RC_SENTENCE_RE.split(chunk)]
+
+
+def _stage130_rc_normalize_claim(text: str) -> str:
+    """Lowercase, strip markup and punctuation, collapse whitespace."""
+    lowered = _STAGE130_RC_TAG_RE.sub(" ", text.lower())
+    return _STAGE130_RC_WS_RE.sub(
+        " ", _STAGE130_RC_NON_TEXT_RE.sub(" ", lowered)).strip()
+
+
+def _stage130_rc_json_leaves(value) -> list:
+    """Every string in a parsed JSON document, in document order."""
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        return [leaf for key, item in value.items()
+                for leaf in _stage130_rc_json_leaves(key)
+                + _stage130_rc_json_leaves(item)]
+    if isinstance(value, list):
+        return [leaf for item in value
+                for leaf in _stage130_rc_json_leaves(item)]
+    return []
+
+
+def _stage130_rc_claim_documents(text: str) -> list:
+    """Split a file into the units the sentence classifier should read.
+
+    JSON is not prose: its keys and values sit on separate lines and joining
+    them produces pseudo-sentences that borrow negations across unrelated
+    fields. So a JSON document is swept one string value at a time, each on
+    its own; anything else is swept as prose.
+    """
+    try:
+        parsed = json.loads(text)
+    except (ValueError, TypeError):
+        return [text]
+    return _stage130_rc_json_leaves(parsed)
+
+
+def _stage130_rc_scope_violations(text: str) -> list:
+    """Every misleading release-composition claim in one document.
+
+    A sentence offends when it (a) names a provider that contributes no
+    released field, (b) asserts inclusion, (c) is about this release's
+    contents, and (d) carries no negation, scope limit or exclusion. All four
+    must hold. The human author's own governance statement -- about the WIDER
+    STUDY's underlying data -- fails (c) and is preserved verbatim.
+    """
+    violations = []
+    normalized = _stage130_rc_normalize_claim(text)
+    for claim in _STAGE130_RC_FORBIDDEN_SCOPE_CLAIMS:
+        if claim in normalized:
+            violations.append(
+                f"repeats the superseded three-provider claim {claim!r}")
+    for document in _stage130_rc_claim_documents(text):
+        plain = _STAGE130_RC_TAG_RE.sub(" ", document)
+        for raw in _stage130_rc_split_sentences(plain):
+            sentence = _STAGE130_RC_WS_RE.sub(" ", raw).strip()
+            if not sentence:
+                continue
+            lowered = sentence.lower()
+            if any(cue in lowered for cue in _STAGE130_RC_NEGATION_CUES):
+                continue
+            provider = next(
+                (token for token in _STAGE130_RC_NON_RELEASED_TOKENS
+                 if token in lowered), None)
+            if provider is None:
+                continue
+            if not any(cue in lowered
+                       for cue in _STAGE130_RC_INCLUSION_CUES):
+                continue
+            if not any(cue in lowered for cue in _STAGE130_RC_SCOPE_CUES):
+                continue
+            violations.append(
+                f"asserts that {provider!r} material is in this release: "
+                f"{sentence[:160]!r}")
+    return violations
+
+
+#: The human author's own statement about the WIDER STUDY's data sources,
+#: pinned verbatim. It names all three providers because the study used all
+#: three; it is not, and never was, a claim about which providers contributed
+#: a field to this release. It is a record of what a person said, so it is
+#: preserved exactly and is exempt from the composition sweep -- and pinning
+#: it here turns "human_supplied_statements_altered = 0" from an assertion
+#: into something the generator actually checks.
+_STAGE130_RC_HUMAN_GOVERNANCE_STATEMENT = (
+    "All underlying data were obtained from publicly accessible sources such "
+    "as CODAL, TSETMC and the World Bank. No purchased, confidential, "
+    "personal or human-participant data were used."
+)
+
+
+def _stage130_rc_permitted_quotations(root: str) -> list:
+    """The only verbatim texts exempt from the composition sweep.
+
+    Exactly two, both in the decision artifact, both required to be present:
+
+    1. ``rc3_correction.previous_statement`` -- the superseded sentence,
+       recorded because a correction that hides what it corrected cannot be
+       audited;
+    2. ``human_supplied_data_governance_facts.statement`` -- the human author's
+       words about the wider study's data sources, which are a record of what
+       a person said and are not the agent's to edit.
+
+    Read from the artifact rather than pinned as patterns, so the carve-out
+    covers exactly the text the record holds and cannot be widened into a
+    general exemption by editing this file.
+    """
+    path = os.path.join(root, _STAGE130_RC_DECISION_REL)
+    if not os.path.isfile(path):
+        return []
+    with open(path, encoding="utf-8") as fh:
+        decision = json.load(fh)
+    quoted = ((decision.get("rc3_correction") or {})
+              .get("previous_statement") or "")
+    if not quoted.strip():
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record the superseded "
+            "release-scope statement verbatim in "
+            "rc3_correction.previous_statement: a correction that hides what "
+            "it corrected cannot be audited")
+    human = ((decision.get("human_supplied_data_governance_facts") or {})
+             .get("statement") or "")
+    if human != _STAGE130_RC_HUMAN_GOVERNANCE_STATEMENT:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate has altered the human "
+            "author's data-governance statement. It is a record of what a "
+            "person said about the WIDER STUDY's sources, not a claim about "
+            "this release's composition, and it is preserved verbatim:\n"
+            f"{_STAGE130_RC_HUMAN_GOVERNANCE_STATEMENT}")
+    # Match the JSON-encoded forms, which is what appears in the file bytes.
+    return [json.dumps(text, ensure_ascii=False)[1:-1]
+            for text in (quoted, human)]
+
+
+def _stage130_rc_assert_no_misleading_release_scope_claim(root: str) -> None:
+    """No committed package file may misstate which providers are released.
+
+    The committed rights matrix is the authority: CODAL-derived,
+    researcher-compiled company financial fields are present; no TSETMC-derived
+    and no World Bank-derived field is. A description implying all three
+    providers fed the released values tells a reuser something untrue about the
+    bytes they are being handed, and 1.0.0-rc.2 shipped exactly such a
+    sentence. This sweep refuses its recurrence -- in prose as well as flags,
+    since a paragraph can assert what a boolean denies.
+
+    Independent of :func:`_stage130_rc_assert_no_unsupported_rights_claim`:
+    that one protects the RIGHTS record, this one protects the COMPOSITION
+    record, and neither is satisfied by the other passing.
+
+    **Two narrow carve-outs, both in the decision artifact.** The superseded
+    sentence is quoted verbatim in ``rc3_correction.previous_statement``,
+    because a correction that hides what it corrected is not auditable; and the
+    human author's wider-study data statement is preserved verbatim in
+    ``human_supplied_data_governance_facts.statement``, because it is a record
+    of what a person said rather than a claim this action may reword. Both are
+    masked before the sweep runs and both are separately required to be present
+    and unchanged. No other file, and no other key, may carry either text:
+    describing the defect is enough everywhere else.
+    """
+    quoted = _stage130_rc_permitted_quotations(root)
+    pkg = os.path.join(root, _STAGE130_RC_PKG)
+    for dirpath, dirnames, filenames in os.walk(pkg):
+        dirnames[:] = [d for d in dirnames if d != "build"]
+        for name in sorted(filenames):
+            path = os.path.join(dirpath, name)
+            rel = os.path.relpath(path, root)
+            try:
+                with open(path, encoding="utf-8") as fh:
+                    text = fh.read()
+            except (UnicodeDecodeError, OSError):
+                continue
+            if rel == _STAGE130_RC_DECISION_REL:
+                for permitted in quoted:
+                    text = text.replace(permitted, " ")
+            violations = _stage130_rc_scope_violations(text)
+            if violations:
+                raise HandoffError(
+                    f"{rel} misstates the released source scope: "
+                    + "; ".join(violations)
+                    + ". The correct statement is: "
+                    + _STAGE130_RC_RELEASED_SOURCE_SCOPE)
+
+
+def _stage130_rc_assert_released_source_scope(root: str, decision: dict,
+                                             boundary: dict,
+                                             manifest: dict) -> None:
+    """Every surface must state the released source scope, and state it right.
+
+    The committed ``source_rights_matrix.csv`` is the authority. It records
+    CODAL as contributing compiled statement line items and author-derived
+    variables, and both TSETMC and World Bank as contributing NONE. The
+    decision, the boundary and the manifest must each carry that fact
+    explicitly, so a reader of any one of them gets the true composition
+    without having to reconcile three surfaces.
+    """
+    matrix_path = os.path.join(root, _STAGE130_RC_MATRIX_REL)
+    with open(matrix_path, encoding="utf-8-sig", newline="") as fh:
+        rows = {row.get("provider"): row for row in csv.DictReader(fh)}
+    for provider in _STAGE130_RC_NON_RELEASED_PROVIDERS:
+        row = rows.get(provider) or {}
+        used = (row.get("type_of_information_used_in_this_release") or "")
+        if not used.strip().upper().startswith("NONE"):
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate rights matrix row "
+                f"{provider!r} must record its contribution to THIS release "
+                f"as NONE, got {used!r}. If that ever changes, the release "
+                "scope statement changes with it -- it is not edited alone.")
+    codal = rows.get("CODAL") or {}
+    if not (codal.get("type_of_information_used_in_this_release") or "").strip():
+        raise HandoffError(
+            "Stage130 dataset Release Candidate rights matrix must record "
+            "what CODAL contributes to this release")
+
+    scope = decision.get("released_source_scope") or {}
+    if scope.get("statement") != _STAGE130_RC_RELEASED_SOURCE_SCOPE:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate decision must carry the "
+            "released source scope statement verbatim:\n"
+            f"{_STAGE130_RC_RELEASED_SOURCE_SCOPE}")
+    if tuple(scope.get("released_source_providers") or ()) != \
+            _STAGE130_RC_RELEASED_PROVIDERS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate decision released_source_"
+            f"providers must be {list(_STAGE130_RC_RELEASED_PROVIDERS)}")
+    if tuple(scope.get("non_released_source_providers") or ()) != \
+            _STAGE130_RC_NON_RELEASED_PROVIDERS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate decision non_released_source_"
+            f"providers must be {list(_STAGE130_RC_NON_RELEASED_PROVIDERS)}")
+    for field in ("tsetmc_derived_fields_included",
+                  "world_bank_derived_fields_included",
+                  "original_provider_files_redistributed"):
+        if scope.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate decision "
+                f"released_source_scope.{field} must be False: the rights "
+                "matrix records no such field in this release")
+    if scope.get("wider_study_statement_is_not_a_release_composition_claim") \
+            is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record that the human "
+            "author's wider-study data statement is not a claim about which "
+            "providers contributed a released field")
+    if scope.get("rights_record_changed_by_this_correction") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate scope correction must record "
+            "that it changed no rights record")
+
+    if manifest.get("released_source_scope") != \
+            _STAGE130_RC_RELEASED_SOURCE_SCOPE:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest must publish the "
+            "released source scope statement")
+    for field in ("tsetmc_derived_fields_included",
+                  "world_bank_derived_fields_included"):
+        if manifest.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest {field} must be "
+                "False")
+    if boundary.get("released_source_scope_statement") != \
+            _STAGE130_RC_RELEASED_SOURCE_SCOPE:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary must publish the "
+            "released source scope statement")
+    for field in ("tsetmc_derived_fields_included_in_release",
+                  "world_bank_derived_fields_included_in_release",
+                  "misleading_three_provider_release_scope_claim_present",
+                  "historical_rights_record_changed_by_this_action"):
+        if boundary.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate boundary {field} must be "
+                "False")
+    for field in ("rights_matrix_rows_changed_by_this_action",
+                  "human_supplied_statements_altered_by_this_action"):
+        if boundary.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate boundary {field} must be "
+                "0: correcting a description does not rewrite a human's words "
+                "or the rights record")
+
+    correction = decision.get("rc3_correction") or {}
+    if correction.get("corrected_statement") != \
+            _STAGE130_RC_RELEASED_SOURCE_SCOPE:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record the corrected "
+            "statement it now publishes")
+    if not (correction.get("previous_statement") or "").strip():
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record the superseded "
+            "statement it replaced; a correction that hides what it corrected "
+            "is not auditable")
+    for field in ("historical_rights_record_changed",
+                  "provider_terms_retrieved_by_this_correction",
+                  "provider_terms_verified_by_this_correction",
+                  "codal_or_tsetmc_terms_claimed_retrieved_or_verified"):
+        if correction.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate rc3_correction.{field} "
+                "must be False")
+    for field in ("data_values_changed", "frozen_surface_bytes_changed",
+                  "manuscript_bytes_changed", "rights_matrix_rows_changed",
+                  "human_supplied_statements_altered",
+                  "superseded_candidates_altered",
+                  "superseded_archives_rebuilt_renamed_or_deleted"):
+        if correction.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate rc3_correction.{field} "
+                "must be 0: this correction rewrote a description, nothing "
+                "else")
+
+
+def _stage130_rc_assert_file_count_terminology(decision: dict, boundary: dict,
+                                               manifest: dict) -> None:
+    """25 manifest payload files, 27 archive members, never one number.
+
+    rc.2 published a single ``bundle_payload_file_count`` of 27, which read as
+    "27 manifest payload files" and was wrong: the manifest describes 25, and
+    the archive additionally carries the manifest and SHA256SUMS.txt. Both
+    numbers are now published under names that say which is which, and the
+    manifest's own ``file_count`` must agree with the payload count.
+    """
+    files = manifest.get("files") or []
+    if len(files) != _STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT:
+        raise HandoffError(
+            f"Stage130 dataset Release Candidate manifest lists {len(files)} "
+            f"payload files, expected "
+            f"{_STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT}")
+    listed = {entry.get("bundle_path") for entry in files}
+    for name in _STAGE130_RC_NON_PAYLOAD_MEMBERS:
+        if name in listed:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest lists {name!r} "
+                "as a payload file. It is an integrity record ABOUT the "
+                "payload and is not one of the "
+                f"{_STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT} payload files")
+    expected = {
+        "manifest_payload_file_count":
+            _STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT,
+        "archive_member_count": _STAGE130_RC_ARCHIVE_MEMBER_COUNT,
+        "sha256sums_line_count": _STAGE130_RC_SHA256SUMS_LINE_COUNT,
+    }
+    for field, value in expected.items():
+        if manifest.get(field) != value:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest {field} is "
+                f"{manifest.get(field)!r}, expected {value}")
+    if manifest.get("file_count") != \
+            _STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest file_count must "
+            f"equal the payload count "
+            f"{_STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT}")
+    if _STAGE130_RC_ARCHIVE_MEMBER_COUNT != (
+            _STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT
+            + len(_STAGE130_RC_NON_PAYLOAD_MEMBERS)):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate archive member count must be "
+            "the payload count plus the two integrity records")
+
+    composition = decision.get("release_composition") or {}
+    for field, value in expected.items():
+        if composition.get(field) != value:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate decision "
+                f"release_composition.{field} is {composition.get(field)!r}, "
+                f"expected {value}")
+    if composition.get("all_27_described_as_manifest_payload_files") \
+            is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record that the "
+            f"{_STAGE130_RC_ARCHIVE_MEMBER_COUNT} archive members are NOT all "
+            "manifest payload files")
+    if tuple(composition.get(
+            "archive_members_that_are_not_manifest_payload_files") or ()) != \
+            _STAGE130_RC_NON_PAYLOAD_MEMBERS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must name the two archive "
+            "members that are not manifest payload files: "
+            f"{list(_STAGE130_RC_NON_PAYLOAD_MEMBERS)}")
+    for field, value in expected.items():
+        if boundary.get(field) != value:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate boundary {field} is "
+                f"{boundary.get(field)!r}, expected {value}")
+    if boundary.get("all_archive_members_described_as_manifest_payload_files") \
+            is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary must record that not "
+            "every archive member is a manifest payload file")
+
+
+def _stage130_rc_assert_complete_column_dictionary(root: str) -> dict:
+    """All 115 released columns documented exactly once, or fail closed.
+
+    Checks the committed dictionary against the authoritative column-role map:
+    same column set, no duplicate, no blank field, and an
+    ``authoritative_source_path`` that resolves to a file that actually exists.
+    The role map is the authority for WHICH columns exist; this makes the
+    release dictionary prove it covers every one of them.
+    """
+    dictionary_path = os.path.join(root, _STAGE130_RC_DICTIONARY_REL)
+    role_map_path = os.path.join(root, _STAGE130_RC_ROLE_MAP_REL)
+    if not os.path.isfile(dictionary_path):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate is missing the complete "
+            f"release column dictionary: {_STAGE130_RC_DICTIONARY_REL}")
+    if not os.path.isfile(role_map_path):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate cannot verify column coverage "
+            f"without {_STAGE130_RC_ROLE_MAP_REL}")
+
+    with open(role_map_path, encoding="utf-8-sig", newline="") as fh:
+        released = [row["column_name"] for row in csv.DictReader(fh)]
+    expected = _STAGE130_RC_PRIMARY_COUNTS["columns"]
+    if len(released) != expected:
+        raise HandoffError(
+            f"{_STAGE130_RC_ROLE_MAP_REL} lists {len(released)} columns, "
+            f"expected {expected}")
+
+    with open(dictionary_path, encoding="utf-8-sig", newline="") as fh:
+        reader = csv.DictReader(fh)
+        header = tuple(reader.fieldnames or ())
+        documented = list(reader)
+    if header != _STAGE130_RC_DICTIONARY_FIELDS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate release column dictionary "
+            f"header is {list(header)}, expected "
+            f"{list(_STAGE130_RC_DICTIONARY_FIELDS)}")
+    if len(documented) != expected:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate release column dictionary has "
+            f"{len(documented)} rows, expected {expected} -- one per released "
+            "column")
+
+    names = [row["column_name"] for row in documented]
+    duplicates = sorted({n for n in names if names.count(n) > 1})
+    if duplicates:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate release column dictionary "
+            f"repeats columns: {duplicates}")
+    missing = sorted(set(released) - set(names))
+    extra = sorted(set(names) - set(released))
+    if missing or extra:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate release column dictionary "
+            f"disagrees with {_STAGE130_RC_ROLE_MAP_REL}: "
+            f"undocumented={missing} not_released={extra}")
+
+    statuses = {}
+    for row in documented:
+        for field in _STAGE130_RC_DICTIONARY_FIELDS:
+            if not (row.get(field) or "").strip():
+                raise HandoffError(
+                    "Stage130 dataset Release Candidate release column "
+                    f"dictionary row {row['column_name']!r} leaves {field} "
+                    "empty; an incompletely defined column must be reported, "
+                    "never shipped blank")
+        anchor = row["authoritative_source_path"]
+        if not os.path.isfile(os.path.join(root, anchor)):
+            raise HandoffError(
+                "Stage130 dataset Release Candidate release column dictionary "
+                f"row {row['column_name']!r} cites {anchor!r}, which does not "
+                "exist in the repository")
+        statuses[row["definition_status"]] = \
+            statuses.get(row["definition_status"], 0) + 1
+    return {"documented": len(documented), "released": len(released),
+            "statuses": dict(sorted(statuses.items()))}
+
+
+def derive_stage130_dataset_release_candidate_markers(root: str) -> dict:
+    """Recognize a PREPARED, unpublished Zenodo dataset Release Candidate.
+
+    Preparation and documentation only. Nothing here creates a deposition,
+    uploads a byte, reserves a DOI, publishes anything, edits the manuscript,
+    marks the pull request Ready or merges it -- and this deriver refuses to
+    build if any artifact claims otherwise.
+
+    Fail-closed on the things that actually matter:
+
+    * the eight frozen Stage125 surfaces must still hash to their pinned
+      values. They are gitignored, so a fresh clone legitimately lacks them and
+      absence is tolerated; DRIFT never is;
+    * the committed manifest must agree with the pinned digests, carry a null
+      DOI, and report every Zenodo counter false;
+    * the source-rights matrix must cover all three providers and must not
+      silently upgrade a blocked disposition;
+    * a candidate whose audit reports ``NOT_READY_FOR_PUBLICATION`` may not
+      simultaneously claim publication readiness anywhere;
+    * the approved manuscript must be byte-identical to the reviewed bytes,
+      re-derived here, so preparing a release cannot quietly ride on a human
+      approval of different text.
+
+    The live pointer advances to a human digest review. The MANUSCRIPT
+    submission metadata is NOT thereby completed: those six items are
+    republished as outstanding, because supplying dataset-release metadata for
+    a Zenodo candidate fills no manuscript placeholder.
+
+    Returns {} before the package exists.
+    """
+    path = os.path.join(root, _STAGE130_RC_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    decision = _require_json_artifact(root, _STAGE130_RC_DECISION_REL)
+    boundary = _require_json_artifact(root, _STAGE130_RC_BOUNDARY_REL)
+    manifest = _require_json_artifact(root, _STAGE130_RC_MANIFEST_REL)
+
+    if decision.get("decision_id") != _STAGE130_RC_ACTION_ID:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate decision_id mismatch")
+    if boundary.get("action_id") != _STAGE130_RC_ACTION_ID:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary action_id mismatch")
+    if manifest.get("action_id") != _STAGE130_RC_ACTION_ID:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest action_id mismatch")
+    if decision.get("decision_type") != "dataset_release_candidate_preparation":
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must be a "
+            "dataset_release_candidate_preparation")
+    if decision.get("authorized_by_human") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must be human-authorized")
+
+    # (1) The candidate is PREPARED and nothing more. Every Zenodo-facing key
+    # is false on all three surfaces that publish one.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        for field in _STAGE130_RC_FORBIDDEN_TRUE:
+            if field not in source:
+                continue
+            if source.get(field) is not False:
+                raise HandoffError(
+                    f"Stage130 dataset Release Candidate {label} {field} must "
+                    "be False: preparing a candidate is not a deposition, an "
+                    "upload, a DOI, a publication, a Ready-for-Review or a "
+                    "merge")
+    for field in ("zenodo_deposition_created", "zenodo_upload_performed",
+                  "zenodo_published", "public_release_authorized"):
+        if manifest.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest {field} must be "
+                "False")
+    if boundary.get("release_candidate_prepared") is not True or \
+            manifest.get("release_candidate_prepared") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record "
+            "release_candidate_prepared = True once every local gate passed")
+
+    # (2) No DOI, and no placeholder that could be read as one.
+    if "doi" in manifest and manifest.get("doi") is not None:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest doi must be omitted "
+            f"or null, got {manifest.get('doi')!r}: no DOI exists and a "
+            "placeholder could be mistaken for a real identifier")
+    if manifest.get("doi_reserved") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest doi_reserved must be "
+            "False")
+
+    # (3) The eight frozen surfaces. Drift is fatal; gitignored absence is not.
+    verified = 0
+    for rel, expected in sorted(_STAGE130_RC_FROZEN_SHA256.items()):
+        target = os.path.join(root, rel)
+        if not os.path.isfile(target):
+            if _is_git_ignored(root, rel):
+                continue  # a fresh clone legitimately lacks the bulky output
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate frozen surface {rel} is "
+                "absent and is NOT gitignored")
+        actual = sha256_file(target)
+        if actual != expected:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate frozen surface {rel} has "
+                f"DRIFTED: expected {expected}, found {actual}. The release "
+                "describes bytes that no longer exist.")
+        verified += 1
+
+    # (4) The manifest must pin the same digests it claims to describe.
+    files = manifest.get("files") or []
+    if not files:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest lists no files")
+    by_source = {entry.get("source_path"): entry for entry in files}
+    for rel, expected in _STAGE130_RC_FROZEN_SHA256.items():
+        entry = by_source.get(rel)
+        if entry is None:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest omits the frozen "
+                f"surface {rel}")
+        if entry.get("sha256") != expected:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest pins "
+                f"{entry.get('sha256')!r} for {rel}, expected {expected}")
+        if entry.get("copied_byte_for_byte") is not True:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest must record "
+                f"{rel} as copied byte-for-byte")
+    for entry in files:
+        for field in ("bundle_path", "bytes", "sha256", "role", "source_path",
+                      "inclusion_reason"):
+            if not entry.get(field) and entry.get(field) != 0:
+                raise HandoffError(
+                    "Stage130 dataset Release Candidate manifest entry "
+                    f"{entry.get('bundle_path')!r} is missing {field}")
+    if manifest.get("file_count") != len(files):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest file_count disagrees "
+            "with the listed files")
+
+    # (5) Roles: exactly one primary surface, three robustness surfaces, four
+    # audit surfaces. A release that cannot say which file is THE file has not
+    # done its job.
+    roles = manifest.get("role_counts") or {}
+    for role, expected in (("primary_modeling_surface", 1),
+                           ("prespecified_robustness_surface", 3),
+                           ("audit_surface_not_model_ready", 4)):
+        if roles.get(role) != expected:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate must declare exactly "
+                f"{expected} {role} file(s), got {roles.get(role)!r}")
+    if manifest.get("primary_file") != \
+            "data/analysis_ready_main_rule_a_stage125.csv":
+        raise HandoffError(
+            "Stage130 dataset Release Candidate primary file must be the "
+            "frozen main_rule_a analysis-ready surface")
+
+    # (6) Counts come from the contract, and are not recomputed.
+    counts = manifest.get("primary_file_contract_counts") or {}
+    for key in ("companies", "negative", "pairs", "positive"):
+        if counts.get(key) != _STAGE130_RC_PRIMARY_COUNTS[key]:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate primary-surface {key} is "
+                f"{counts.get(key)!r}, expected "
+                f"{_STAGE130_RC_PRIMARY_COUNTS[key]}")
+    if manifest.get("primary_file_column_count") != \
+            _STAGE130_RC_PRIMARY_COUNTS["columns"]:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate primary-surface column count "
+            f"must be {_STAGE130_RC_PRIMARY_COUNTS['columns']}")
+    if manifest.get("counts_recomputed_from_rows") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must not recompute the "
+            "contract counts from row content")
+    if decision.get("frozen_dataset_gate", {}).get(
+            "counts_recomputed_from_row_content") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate decision must record the "
+            "counts as contract-supplied, not recomputed")
+
+    # (6a) All 115 released columns documented, exactly once, each anchored to
+    # a committed repository source that exists.
+    dictionary = _stage130_rc_assert_complete_column_dictionary(root)
+    dictionary_coverage = manifest.get("release_column_dictionary_coverage") \
+        or {}
+    if dictionary_coverage.get("released_columns_documented") != \
+            dictionary["documented"]:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest reports "
+            f"{dictionary_coverage.get('released_columns_documented')!r} "
+            f"documented columns, but the dictionary has "
+            f"{dictionary['documented']}")
+    if dictionary_coverage.get("released_columns_undocumented") != 0:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must document every released "
+            "column; an undocumented column fails the release rather than "
+            "shipping undefined")
+    for field in ("column_set_matches_authoritative_role_map",
+                  "every_row_names_an_authoritative_repository_source"):
+        if dictionary_coverage.get(field) is not True:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest {field} must be "
+                "True")
+    if dictionary_coverage.get("definitions_invented_by_this_action") != 0:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must invent zero definitions")
+
+    # (6b) The predecessor candidate is superseded, not erased. rc.1's digest
+    # and byte size are recorded, and nothing was ever deposited under it.
+    supersedes = decision.get("supersedes_release") or {}
+    manifest_supersedes = manifest.get("supersedes") or {}
+    if decision.get("release_version") != _STAGE130_RC_RELEASE_VERSION:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate decision release_version must "
+            f"be {_STAGE130_RC_RELEASE_VERSION}")
+    if manifest.get("release_version") != _STAGE130_RC_RELEASE_VERSION:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest release_version must "
+            f"be {_STAGE130_RC_RELEASE_VERSION}")
+    for source, label in ((supersedes, "decision"),
+                          (manifest_supersedes, "manifest")):
+        if source.get("version") != _STAGE130_RC_SUPERSEDED_VERSION:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must record "
+                f"{_STAGE130_RC_SUPERSEDED_VERSION} as superseded")
+        if source.get("archive_sha256") != _STAGE130_RC_SUPERSEDED_SHA256:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must preserve "
+                f"the superseded archive digest "
+                f"{_STAGE130_RC_SUPERSEDED_SHA256}")
+        if source.get("archive_size_bytes") != _STAGE130_RC_SUPERSEDED_BYTES:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must preserve "
+                f"the superseded archive size "
+                f"{_STAGE130_RC_SUPERSEDED_BYTES}")
+        if source.get("publication_readiness_at_the_time") != \
+                _STAGE130_RC_SUPERSEDED_READINESS:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must preserve "
+                "that the superseded candidate was "
+                f"{_STAGE130_RC_SUPERSEDED_READINESS}")
+        for field in ("zenodo_deposition_created", "zenodo_upload_performed",
+                      "zenodo_doi_reserved", "zenodo_published",
+                      "public_release_authorized"):
+            if source.get(field) is not False:
+                raise HandoffError(
+                    f"Stage130 dataset Release Candidate {label} supersede "
+                    f"record {field} must be False: nothing was ever "
+                    "deposited under the superseded candidate")
+    if supersedes.get("preserved_not_deleted") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record the superseded "
+            "candidate as preserved, not deleted")
+    if manifest.get("archive_name") == \
+            manifest_supersedes.get("archive_name"):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must build under a NEW "
+            "archive filename so the superseded candidate is not overwritten")
+
+    # (6c) The FULL supersede chain. rc.2 superseding rc.1 is still history
+    # once rc.3 exists, so every predecessor keeps its own digest, byte size
+    # and the readiness it actually carried, on all three surfaces. Losing or
+    # altering one is a rewrite of history, not a version bump.
+    chain_sources = (
+        (decision.get("supersedes_release_history"), "decision"),
+        (manifest.get("supersedes_history"), "manifest"),
+    )
+    for chain, label in chain_sources:
+        if not isinstance(chain, list) or len(chain) != \
+                len(_STAGE130_RC_SUPERSEDE_CHAIN):
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must record all "
+                f"{len(_STAGE130_RC_SUPERSEDE_CHAIN)} superseded candidates, "
+                f"oldest first; got {chain!r}")
+        for recorded, expected in zip(chain, _STAGE130_RC_SUPERSEDE_CHAIN):
+            for field, value in expected.items():
+                if recorded.get(field) != value:
+                    raise HandoffError(
+                        f"Stage130 dataset Release Candidate {label} "
+                        f"supersede history for {expected['version']} records "
+                        f"{field} = {recorded.get(field)!r}, expected "
+                        f"{value!r}. A superseded candidate's record is "
+                        "history and may not be altered.")
+            if recorded.get("preserved_not_deleted") is not True:
+                raise HandoffError(
+                    f"Stage130 dataset Release Candidate {label} must record "
+                    f"{expected['version']} as preserved, not deleted")
+            for field in ("zenodo_deposition_created",
+                          "zenodo_upload_performed", "zenodo_doi_reserved",
+                          "zenodo_published", "public_release_authorized"):
+                if recorded.get(field) is not False:
+                    raise HandoffError(
+                        f"Stage130 dataset Release Candidate {label} "
+                        f"supersede history for {expected['version']} must "
+                        f"keep {field} False: nothing was ever deposited "
+                        "under any candidate")
+        names = [record.get("archive_name") for record in chain]
+        if manifest.get("archive_name") in names:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate reuses a superseded "
+                f"archive filename ({manifest.get('archive_name')!r}); each "
+                "candidate must build under its own name so no predecessor is "
+                "overwritten")
+        if len(set(names)) != len(names):
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} supersede "
+                "history repeats an archive filename")
+    boundary_chain = boundary.get("supersedes_release_history")
+    if not isinstance(boundary_chain, list) or len(boundary_chain) != \
+            len(_STAGE130_RC_SUPERSEDE_CHAIN):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary must record the "
+            "full supersede history")
+    for recorded, expected in zip(boundary_chain, _STAGE130_RC_SUPERSEDE_CHAIN):
+        if recorded.get("archive_sha256") != expected["archive_sha256"]:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate boundary supersede "
+                f"history for {expected['version']} lost its digest")
+    for field in ("superseded_archives_rebuilt_renamed_or_deleted_by_this_"
+                  "action",
+                  "superseded_recorded_digests_altered_by_this_action"):
+        if boundary.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate boundary {field} must be "
+                "0: a superseded candidate is preserved, never rebuilt, "
+                "renamed, deleted or re-digested")
+
+    # (6d) What the release actually draws on. The rights matrix is the
+    # authority; every surface must agree with it, and no surface may repeat
+    # rc.2's three-provider sentence.
+    _stage130_rc_assert_released_source_scope(root, decision, boundary,
+                                              manifest)
+
+    # (6e) 25 payload files, 27 archive members, and never one number for both.
+    _stage130_rc_assert_file_count_terminology(decision, boundary, manifest)
+
+    # (7) The source-rights audit: all three providers, and a blocked
+    # disposition that is not quietly upgraded.
+    audit = decision.get("source_rights_audit") or {}
+    providers = tuple(audit.get("providers_covered") or ())
+    if providers != _STAGE130_RC_PROVIDERS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate source-rights audit must "
+            f"cover exactly {_STAGE130_RC_PROVIDERS}, got {providers}")
+    matrix_path = os.path.join(root, _STAGE130_RC_MATRIX_REL)
+    if not os.path.isfile(matrix_path):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate source-rights matrix is "
+            f"missing: {_STAGE130_RC_MATRIX_REL}")
+    with open(matrix_path, encoding="utf-8-sig", newline="") as fh:
+        rows = list(csv.DictReader(fh))
+    matrix_providers = tuple(row.get("provider") for row in rows)
+    if matrix_providers != _STAGE130_RC_PROVIDERS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate source-rights matrix must "
+            f"list exactly {_STAGE130_RC_PROVIDERS}, got {matrix_providers}")
+    for row in rows:
+        if row.get("original_provider_file_included_in_candidate") != "no":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate may not redistribute an "
+                f"original {row.get('provider')} provider file")
+        for field in ("terms_checked_date_utc", "terms_checked_url",
+                      "residual_uncertainty", "release_disposition",
+                      "provider_terms_independently_retrieved",
+                      "provider_terms_independently_verified",
+                      "human_author_determination",
+                      "human_author_determination_status",
+                      "determination_date_utc", "determination_supplied_by"):
+            if not (row.get(field) or "").strip():
+                raise HandoffError(
+                    "Stage130 dataset Release Candidate source-rights matrix "
+                    f"row {row.get('provider')!r} is missing {field}")
+        if row.get("determination_supplied_by") != "human":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate source-rights matrix row "
+                f"{row.get('provider')!r} must attribute the determination to "
+                "the human author")
+        if row.get("determination_independently_inferred_by_the_agent") != "no":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate source-rights matrix row "
+                f"{row.get('provider')!r} must record the determination as "
+                "human-supplied, not agent-inferred")
+        if row.get("human_author_determination_status") != \
+                _STAGE130_RC_RIGHTS_STATUS:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate source-rights matrix row "
+                f"{row.get('provider')!r} must carry the determination status "
+                f"{_STAGE130_RC_RIGHTS_STATUS}")
+
+    # A provider whose terms were never retrieved may not be recorded as
+    # having a verified licence, and its stated terms stay NOT_VERIFIED. The
+    # human determination supersedes the blocker; it does not retroactively
+    # read a page nobody opened.
+    by_provider = {row.get("provider"): row for row in rows}
+    for name in ("CODAL", "TSETMC"):
+        row = by_provider[name]
+        if row.get("publicly_stated_license_or_terms") != "NOT_VERIFIED":
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate must keep {name}'s "
+                "publicly stated terms recorded as NOT_VERIFIED: no terms "
+                "page was retrieved, so none was read")
+        for field in ("provider_terms_independently_retrieved",
+                      "provider_terms_independently_verified"):
+            if row.get(field) != "no":
+                raise HandoffError(
+                    f"Stage130 dataset Release Candidate {name} {field} must "
+                    "be 'no': claiming otherwise would assert a verification "
+                    "that never happened")
+    codal = by_provider["CODAL"]
+    if codal.get("release_disposition") == \
+            _STAGE130_RC_SUPERSEDED_DISPOSITION:
+        if codal.get("superseded_release_disposition") != "BLOCKS_PUBLICATION":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate must preserve that the "
+                "CODAL row previously read BLOCKS_PUBLICATION; a supersede "
+                "that erases what it supersedes is a rewrite")
+        if audit.get("superseded_blocking_provider") != "CODAL":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate must name CODAL as the "
+                "superseded blocking provider")
+        if audit.get("superseded_publication_readiness") != \
+                "NOT_READY_FOR_PUBLICATION":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate must preserve the "
+                "superseded NOT_READY_FOR_PUBLICATION readiness")
+        if audit.get("historical_non_retrieval_preserved") is not True:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate must preserve the "
+                "historical fact that the provider terms pages were never "
+                "retrieved")
+
+    blocked = tuple(row.get("provider") for row in rows
+                    if row.get("release_disposition") == "BLOCKS_PUBLICATION")
+    readiness = audit.get("publication_readiness")
+    if readiness not in _STAGE130_RC_ALLOWED_READINESS:
+        raise HandoffError(
+            f"Stage130 dataset Release Candidate publication_readiness "
+            f"{readiness!r} is not one of "
+            f"{list(_STAGE130_RC_ALLOWED_READINESS)}: an undeposited candidate "
+            "may be not-ready or awaiting a human digest review, and it may "
+            "never be published or public-release-authorized")
+    if blocked and readiness != "NOT_READY_FOR_PUBLICATION":
+        raise HandoffError(
+            f"Stage130 dataset Release Candidate has blocking provider(s) "
+            f"{blocked} but reports publication_readiness {readiness!r}: a "
+            "blocked candidate may not be marked ready")
+    if boundary.get("publication_readiness") != readiness:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary and decision "
+            "disagree on publication_readiness")
+    if manifest.get("publication_readiness") not in (None, readiness):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest and decision "
+            "disagree on publication_readiness")
+    if readiness == "NOT_READY_FOR_PUBLICATION" and \
+            audit.get("blocking_provider") not in blocked:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must name the blocking "
+            "provider that the matrix actually blocks on")
+    if readiness == "READY_FOR_EXACT_DIGEST_HUMAN_REVIEW":
+        if audit.get("blocking_provider") is not None:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate names a blocking provider "
+                "while reporting READY_FOR_EXACT_DIGEST_HUMAN_REVIEW")
+        if audit.get("rights_basis") != "human_author_determination":
+            raise HandoffError(
+                "Stage130 dataset Release Candidate readiness rests on the "
+                "human author determination and must record rights_basis = "
+                "human_author_determination")
+        if audit.get("rights_status") != _STAGE130_RC_RIGHTS_STATUS:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate rights_status must be "
+                f"{_STAGE130_RC_RIGHTS_STATUS}")
+    for field in ("columns_removed_to_avoid_the_blocker",
+                  "frozen_values_altered_to_avoid_the_blocker"):
+        if audit.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {field} must be 0: a "
+                "rights blocker is reported, never engineered away")
+    for field in ("legal_conclusion_asserted_beyond_the_evidence",
+                  "provider_terms_independently_retrieved",
+                  "provider_terms_independently_verified",
+                  "codal_open_licence_verified_claimed",
+                  "codal_terms_independently_verified_claimed"):
+        if audit.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate source_rights_audit "
+                f"{field} must be False: no provider terms page was ever "
+                "retrieved, so no verification may be claimed")
+
+    # (7a) The human author's determination: recorded as a determination.
+    determination = decision.get(
+        "human_supplied_source_rights_determination") or {}
+    if determination.get("status") != _STAGE130_RC_RIGHTS_STATUS:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record the human author "
+            f"source-rights determination with status "
+            f"{_STAGE130_RC_RIGHTS_STATUS}")
+    if determination.get("supplied_by") != "human":
+        raise HandoffError(
+            "Stage130 dataset Release Candidate source-rights determination "
+            "must be recorded as human-supplied")
+    for field in ("independently_inferred_by_the_agent",
+                  "is_a_provider_licence",
+                  "is_an_independent_verification_of_provider_terms",
+                  "is_a_legal_opinion",
+                  "provider_terms_independently_retrieved",
+                  "provider_terms_independently_verified",
+                  "codal_terms_page_retrieved", "codal_terms_page_read",
+                  "retroactive_independent_verification_claimed"):
+        if determination.get(field) is not False:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate source-rights "
+                f"determination {field} must be False: it is a determination "
+                "by the author, not a licence and not a verification")
+    if determination.get("historical_retrieval_record_preserved") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must preserve the historical "
+            "record of which provider terms pages were never retrieved")
+
+    # (7b) No artifact in the package may claim a verification that never
+    # happened. Swept over the whole committed package, not just the fields
+    # above, so a sentence in prose cannot say what a flag denies.
+    _stage130_rc_assert_no_unsupported_rights_claim(root)
+    _stage130_rc_assert_no_misleading_release_scope_claim(root)
+
+    # (8) The approved manuscript is untouched, proven by re-derived digests.
+    manuscript_boundary = decision.get("manuscript_boundary") or {}
+    manuscript_path = os.path.join(root, _STAGE130_REVIEW_MANUSCRIPT_REL)
+    if not os.path.isfile(manuscript_path):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate: the approved manuscript is "
+            "missing")
+    with open(manuscript_path, "rb") as fh:
+        payload = fh.read()
+    actual_sha = hashlib.sha256(payload).hexdigest()
+    actual_blob = _git_blob_id(payload)
+    if manuscript_boundary.get("approved_manuscript_sha256") != actual_sha:
+        raise HandoffError(
+            "the approved manuscript has changed: the Release Candidate pins "
+            f"{manuscript_boundary.get('approved_manuscript_sha256')!r} but "
+            f"the file is {actual_sha}. Preparing a dataset release may not "
+            "edit the manuscript, and may not inherit a human approval of "
+            "different bytes.")
+    if manuscript_boundary.get("approved_manuscript_blob_id") != actual_blob:
+        raise HandoffError(
+            "the approved manuscript has changed: the Release Candidate pins "
+            f"blob {manuscript_boundary.get('approved_manuscript_blob_id')!r} "
+            f"but the file hashes to {actual_blob}")
+    for field in ("data_availability_statement_inserted",
+                  "manuscript_availability_claim_changed_by_this_action",
+                  "restricted_access_language_replaced"):
+        if manuscript_boundary.get(field) is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manuscript_boundary "
+                f"{field} must be False: no public DOI exists, so the "
+                "manuscript keeps its present availability description")
+    if manuscript_boundary.get("manuscript_files_modified_by_this_action") != 0:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must modify zero manuscript "
+            "files")
+    # The conflict is declared, not hidden. A candidate that intends open
+    # publication while the manuscript says restricted-access must say so.
+    if decision.get(
+            "release_candidate_conflicts_with_current_manuscript_claim") \
+            is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must declare the standing "
+            "conflict between the authors' publication intent and the "
+            "manuscript's current restricted-access description")
+
+    # (9) Human-supplied facts are recorded AS human-supplied, and no ORCID is
+    # invented.
+    for block in ("human_supplied_data_governance_facts",
+                  "human_supplied_release_intent",
+                  "human_supplied_release_metadata"):
+        record = decision.get(block) or {}
+        if record.get("supplied_by") != "human":
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {block} must be recorded "
+                "as human-supplied")
+        if record.get("independently_inferred_by_the_agent") is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {block} must not be "
+                "recorded as independently inferred")
+    metadata = decision.get("human_supplied_release_metadata") or {}
+    if metadata.get("orcid_identifiers_invented_by_this_action") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must not invent ORCID "
+            "identifiers")
+    creators = metadata.get("creators_in_human_supplied_order") or []
+    if [c.get("name") for c in creators] != ["Abtin Asghari",
+                                             "MohammadMehdi Mehraein"]:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate creator order must be the "
+            "human-supplied order")
+    intent = decision.get("human_supplied_release_intent") or {}
+    if intent.get("this_intent_is_not_an_authorization_to_publish") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record that publication "
+            "INTENT is not publication AUTHORIZATION")
+
+    # (10) The firewall, and the excluded payload classes.
+    if boundary.get("final_test_locked") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must keep the Final Test "
+            "locked")
+    if boundary.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate final_test_rows_read must be 0")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate counters.{field} must be "
+                "0: copying frozen bytes fits no model, computes no metric, "
+                "reads no Final Test row and calls no Zenodo endpoint")
+    for field in ("source_pdfs_included_in_candidate",
+                  "raw_provider_responses_included_in_candidate",
+                  "credentials_included_in_candidate",
+                  "prediction_artifacts_included_in_candidate"):
+        if boundary.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {field} must be 0")
+    for field in ("source_pdfs_included", "raw_provider_responses_included",
+                  "credentials_included", "prediction_artifacts_included",
+                  "models_fitted", "metrics_computed", "thresholds_derived"):
+        if manifest.get(field) != 0:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate manifest {field} must "
+                "be 0")
+    if manifest.get("final_test_predictions_opened") is not False:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manifest must record the "
+            "Final Test predictions as unopened")
+
+    # (11) The PR stays a Draft, and the pointer moves as a POINTER.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("pr_is_draft") is not True:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must keep the PR "
+                "a Draft")
+        if source.get("pr_number") != _STAGE130_RC_PR_NUMBER:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} PR number must "
+                f"be {_STAGE130_RC_PR_NUMBER}")
+    if boundary.get("next_action_id") != _STAGE130_RC_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must advance the pointer to "
+            f"{_STAGE130_RC_NEXT_ACTION_ID}")
+    if boundary.get("next_action_scope") != _STAGE130_RC_NEXT_ACTION_SCOPE:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate next_action_scope must be "
+            f"{_STAGE130_RC_NEXT_ACTION_SCOPE}")
+    if boundary.get("pointer_is_not_authorization") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must declare the pointer is "
+            "not an authorization")
+    if boundary.get("next_action_requires_exact_archive_sha256_review") \
+            is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must require human review of "
+            "the exact archive SHA-256 before any Zenodo action")
+
+    # (12) The pointer it supersedes was NOT completed, and says so. The six
+    # manuscript items are still missing; a dataset candidate fills none.
+    marker = decision.get("superseded_marker") or {}
+    if marker.get("pointer_previous_value") != _STAGE130_RC_PREVIOUS_POINTER:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate supersede must record the "
+            f"pointer moving off {_STAGE130_RC_PREVIOUS_POINTER}")
+    if marker.get("pointer_resolved_value") != _STAGE130_RC_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate supersede must record the "
+            f"pointer resolving to {_STAGE130_RC_NEXT_ACTION_ID}")
+    if marker.get("manuscript_submission_metadata_still_outstanding") \
+            is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must keep the six human "
+            "manuscript submission items outstanding AS MANUSCRIPT "
+            "INSERTIONS: the facts are supplied, but none is in the "
+            "byte-pinned manuscript")
+    if marker.get("manuscript_submission_metadata_outstanding_count") != \
+            len(_STAGE130_REVIEW_OUTSTANDING_METADATA):
+        raise HandoffError(
+            "Stage130 dataset Release Candidate outstanding manuscript "
+            f"metadata count must be "
+            f"{len(_STAGE130_REVIEW_OUTSTANDING_METADATA)}")
+    if boundary.get("stage130_manuscript_human_supplied_metadata_outstanding") \
+            is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate boundary must keep the "
+            "manuscript submission metadata outstanding as an insertion")
+
+    # (12a) SUPPLIED, and not yet applied. Those are different facts and the
+    # record must carry both: continuing to say the items were never supplied
+    # would now be false, and saying they are in the manuscript would be false
+    # too. The manuscript is byte-identical, proven above.
+    supplied = decision.get(
+        "human_supplied_manuscript_submission_metadata") or {}
+    if supplied.get("human_submission_metadata_supplied") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record the six human "
+            "manuscript submission items as SUPPLIED: they were, and claiming "
+            "otherwise is no longer true")
+    for field in ("human_submission_metadata_applied_to_manuscript",
+                  "manuscript_modified_by_this_action",
+                  "independently_inferred_by_the_agent"):
+        if supplied.get(field) is not False:
+            raise HandoffError(
+                "Stage130 dataset Release Candidate "
+                f"human_supplied_manuscript_submission_metadata.{field} must "
+                "be False: supplying a fact is not inserting it, and this "
+                "action changed no manuscript byte")
+    if supplied.get(
+            "manuscript_requires_post_doi_metadata_update_and_human_review") \
+            is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record that the "
+            "manuscript still requires a post-DOI metadata update and a fresh "
+            "human review")
+    if supplied.get("supplied_by") != "human":
+        raise HandoffError(
+            "Stage130 dataset Release Candidate manuscript submission "
+            "metadata must be recorded as human-supplied")
+    items = supplied.get("items_supplied") or {}
+    if tuple(items) != _STAGE130_RC_SUPPLIED_METADATA:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate must record exactly the six "
+            f"human submission items {_STAGE130_RC_SUPPLIED_METADATA}, got "
+            f"{tuple(items)}")
+    for key, value in items.items():
+        if not value:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate submission item {key!r} "
+                "is recorded as supplied but carries no value")
+    for source, label in ((boundary, "boundary"), (decision, "decision")):
+        if source.get(
+                "manuscript_human_submission_metadata_supplied") is not True:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must record "
+                "manuscript_human_submission_metadata_supplied = True")
+        if source.get(
+                "manuscript_human_submission_metadata_applied_to_manuscript") \
+                is not False:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate {label} must record "
+                "manuscript_human_submission_metadata_applied_to_manuscript "
+                "= False")
+
+    # (13) The predecessor records keep their own history.
+    for field in ("prior_phase1_evidence_package_preserved",
+                  "prior_phase2_assembly_record_preserved",
+                  "prior_human_review_completion_record_preserved"):
+        if boundary.get(field) is not True:
+            raise HandoffError(
+                f"Stage130 dataset Release Candidate boundary {field} must be "
+                "True")
+    prior = derive_stage130_manuscript_human_review_completion_markers(root)
+    if not prior:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate cannot be recorded without "
+            "the completed manuscript human review it follows")
+    if prior.get("stage130_manuscript_content_approved") is not True:
+        raise HandoffError(
+            "Stage130 dataset Release Candidate requires the completed "
+            "manuscript content approval to still stand")
+
+    return {
+        "stage130_dataset_release_candidate_recorded": True,
+        "stage130_dataset_release_candidate_action_id": _STAGE130_RC_ACTION_ID,
+        "stage130_dataset_release_candidate_authorized_by_human": True,
+        "stage130_dataset_release_candidate_decision_date_utc":
+            decision.get("decision_date_utc"),
+        "stage130_dataset_release_candidate_prepared": True,
+        "stage130_dataset_release_candidate_package": _STAGE130_RC_PKG,
+        # Two counts, two names. `..._file_count` keeps its meaning -- the
+        # number of files the manifest describes as payload files -- and the
+        # archive member count is published beside it rather than folded in.
+        "stage130_dataset_release_candidate_file_count":
+            manifest.get("file_count"),
+        "stage130_dataset_release_candidate_manifest_payload_file_count":
+            _STAGE130_RC_MANIFEST_PAYLOAD_FILE_COUNT,
+        "stage130_dataset_release_candidate_archive_member_count":
+            _STAGE130_RC_ARCHIVE_MEMBER_COUNT,
+        "stage130_dataset_release_candidate_sha256sums_line_count":
+            _STAGE130_RC_SHA256SUMS_LINE_COUNT,
+        "stage130_dataset_release_candidate_non_payload_archive_members":
+            list(_STAGE130_RC_NON_PAYLOAD_MEMBERS),
+        "stage130_dataset_release_candidate_all_members_are_payload_files":
+            False,
+        "stage130_dataset_release_candidate_primary_file":
+            manifest.get("primary_file"),
+        "stage130_dataset_release_candidate_primary_pairs":
+            _STAGE130_RC_PRIMARY_COUNTS["pairs"],
+        "stage130_dataset_release_candidate_primary_companies":
+            _STAGE130_RC_PRIMARY_COUNTS["companies"],
+        "stage130_dataset_release_candidate_primary_columns":
+            _STAGE130_RC_PRIMARY_COUNTS["columns"],
+        "stage130_dataset_release_candidate_primary_positive":
+            _STAGE130_RC_PRIMARY_COUNTS["positive"],
+        "stage130_dataset_release_candidate_primary_negative":
+            _STAGE130_RC_PRIMARY_COUNTS["negative"],
+        "stage130_dataset_release_candidate_counts_recomputed": False,
+        "stage130_dataset_release_candidate_frozen_surfaces_verified": verified,
+        "stage130_dataset_release_candidate_archive_tracked_in_git": False,
+
+        # The candidate, and the predecessor it supersedes without deleting.
+        "stage130_dataset_release_candidate_version":
+            _STAGE130_RC_RELEASE_VERSION,
+        "stage130_dataset_release_candidate_supersedes_version":
+            _STAGE130_RC_SUPERSEDED_VERSION,
+        "stage130_dataset_release_candidate_supersedes_archive_sha256":
+            _STAGE130_RC_SUPERSEDED_SHA256,
+        "stage130_dataset_release_candidate_supersedes_archive_size_bytes":
+            _STAGE130_RC_SUPERSEDED_BYTES,
+        "stage130_dataset_release_candidate_supersedes_readiness":
+            "NOT_READY_FOR_PUBLICATION",
+        "stage130_dataset_release_candidate_supersedes_preserved_not_deleted":
+            True,
+        # The FULL chain, so a consumer reading only the Handoff still sees
+        # that rc.1 and rc.2 both existed, what each hashed to, and that
+        # nothing was ever deposited under either.
+        "stage130_dataset_release_candidate_supersede_chain":
+            [dict(record) for record in _STAGE130_RC_SUPERSEDE_CHAIN],
+        "stage130_dataset_release_candidate_superseded_versions":
+            [record["version"] for record in _STAGE130_RC_SUPERSEDE_CHAIN],
+        "stage130_dataset_release_candidate_superseded_archives_preserved":
+            True,
+        "stage130_dataset_release_candidate_superseded_digests_altered": 0,
+
+        # What the release actually draws on, and what it does not.
+        "stage130_dataset_release_candidate_released_source_providers":
+            list(_STAGE130_RC_RELEASED_PROVIDERS),
+        "stage130_dataset_release_candidate_non_released_source_providers":
+            list(_STAGE130_RC_NON_RELEASED_PROVIDERS),
+        "stage130_dataset_release_candidate_released_source_scope":
+            _STAGE130_RC_RELEASED_SOURCE_SCOPE,
+        "stage130_dataset_release_candidate_tsetmc_fields_included": False,
+        "stage130_dataset_release_candidate_world_bank_fields_included": False,
+        "stage130_dataset_release_candidate_scope_claim_corrected": True,
+        "stage130_dataset_release_candidate_rights_record_changed_by_"
+        "correction": False,
+
+        # Column documentation: complete, and anchored.
+        "stage130_dataset_release_candidate_columns_released":
+            dictionary["released"],
+        "stage130_dataset_release_candidate_columns_documented":
+            dictionary["documented"],
+        "stage130_dataset_release_candidate_columns_undocumented": 0,
+        "stage130_dataset_release_candidate_dictionary":
+            _STAGE130_RC_DICTIONARY_REL,
+        "stage130_dataset_release_candidate_dictionary_rows_by_status":
+            dictionary["statuses"],
+        "stage130_dataset_release_candidate_definitions_invented": 0,
+
+        # The rights position, stated as what it is.
+        "stage130_dataset_release_candidate_publication_readiness": readiness,
+        "stage130_dataset_release_candidate_rights_status":
+            _STAGE130_RC_RIGHTS_STATUS,
+        "stage130_dataset_release_candidate_rights_basis":
+            "human_author_determination",
+        "stage130_dataset_release_candidate_rights_supplied_by_human": True,
+        "stage130_dataset_release_candidate_rights_inferred_by_the_agent":
+            False,
+        "stage130_dataset_release_candidate_provider_terms_retrieved": False,
+        "stage130_dataset_release_candidate_provider_terms_verified": False,
+        "stage130_dataset_release_candidate_blocking_provider":
+            audit.get("blocking_provider"),
+        "stage130_dataset_release_candidate_superseded_blocking_provider":
+            audit.get("superseded_blocking_provider"),
+        "stage130_dataset_release_candidate_providers_audited":
+            list(_STAGE130_RC_PROVIDERS),
+        "stage130_dataset_release_candidate_source_pdfs_included": 0,
+        "stage130_dataset_release_candidate_raw_responses_included": 0,
+
+        # ...and what preparing it is NOT. Restated so a consumer reading only
+        # this action still sees every boundary.
+        "zenodo_deposition_created": False,
+        "zenodo_upload_performed": False,
+        "zenodo_doi_reserved": False,
+        "zenodo_published": False,
+        "zenodo_doi": None,
+        "public_release_authorized": False,
+        "stage130_dataset_release_candidate_is_publication_authorization":
+            False,
+        "stage130_manuscript_availability_claim_changed": False,
+        "stage130_manuscript_modified_by_this_action": False,
+        "stage130_phase2_submission_ready": False,
+        "stage130_phase2_ready_for_review_authorized": False,
+        "stage130_phase2_merge_authorized": False,
+        "stage130_authorized": False,
+        "stage130_phase2_scientific_execution_started": False,
+        "stage130_scientific_execution_started": False,
+        "stage130_phase2_final_test_rows_read": 0,
+        "stage130_phase2_prediction_artifact_opened": False,
+        # The six submission items are SUPPLIED but NOT APPLIED. Both facts
+        # are published, because publishing only the first would imply the
+        # manuscript carries them and publishing only the second would repeat
+        # a claim that is no longer true.
+        "stage130_manuscript_human_supplied_metadata_outstanding": True,
+        "stage130_manuscript_human_supplied_metadata_outstanding_count":
+            len(_STAGE130_REVIEW_OUTSTANDING_METADATA),
+        "stage130_manuscript_human_supplied_metadata_outstanding_items":
+            list(_STAGE130_REVIEW_OUTSTANDING_METADATA),
+        "stage130_manuscript_human_submission_metadata_supplied": True,
+        "stage130_manuscript_human_submission_metadata_supplied_count":
+            len(_STAGE130_RC_SUPPLIED_METADATA),
+        "stage130_manuscript_human_submission_metadata_supplied_items":
+            list(_STAGE130_RC_SUPPLIED_METADATA),
+        "stage130_manuscript_human_submission_metadata_applied_to_manuscript":
+            False,
+        "stage130_manuscript_requires_post_doi_metadata_update": True,
+        "stage130_manuscript_requires_post_doi_human_review": True,
+
+        # The live pointer. A prepared candidate needs a human to read its
+        # exact digest before anything reaches Zenodo, so that is what the
+        # pointer names -- and it is a POINTER: nothing here is authorized.
+        # `active_workstream` is deliberately NOT set here: it is derived from
+        # ROADMAP.md, a human input file the generator never overwrites.
+        "last_completed_research_action_id": _STAGE130_RC_ACTION_ID,
+        "stage130_phase2_next_action_id": _STAGE130_RC_NEXT_ACTION_ID,
+        "stage130_phase2_next_action_authorized": False,
+        "next_research_action_id": _STAGE130_RC_NEXT_ACTION_ID,
+        "next_research_action_scope": _STAGE130_RC_NEXT_ACTION_SCOPE,
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
+    }
+
+
+
+#: Stage130 -- the HUMAN-EXECUTED Zenodo DRAFT deposition. A draft is not a
+#: publication, and this package exists to make that distinction unfalsifiable.
+_STAGE130_ZDD_PKG = "project/stage130/zenodo_draft_deposition"
+_STAGE130_ZDD_ACTION_ID = "stage130-zenodo-draft-deposition"
+_STAGE130_ZDD_DECISION_REL = (
+    f"{_STAGE130_ZDD_PKG}/stage130_zenodo_draft_deposition_decision.json")
+_STAGE130_ZDD_BOUNDARY_REL = (
+    f"{_STAGE130_ZDD_PKG}/"
+    "stage130_zenodo_draft_deposition_governance_boundary.json")
+_STAGE130_ZDD_METADATA_REL = (
+    f"{_STAGE130_ZDD_PKG}/"
+    "metadata_and_hashes_stage130_zenodo_draft_deposition.json")
+#: The Draft pull request this was recorded on. It stays a Draft.
+_STAGE130_ZDD_PR_NUMBER = 100
+#: The observed Zenodo state, pinned here independently of the artifacts so a
+#: rewritten package cannot also rewrite the expectation.
+_STAGE130_ZDD_DEPOSITION_ID = 22059238
+_STAGE130_ZDD_RESERVED_DOI = "10.5281/zenodo.22059238"
+_STAGE130_ZDD_RECORD_STATE = "unsubmitted"
+#: The file Zenodo stores in that draft -- which must be the SAME bytes the
+#: Release Candidate package documents, not a look-alike rebuild.
+_STAGE130_ZDD_FILENAME = (
+    "tse_financial_distress_dataset_1392_1402_release_candidate_rc3.zip")
+_STAGE130_ZDD_SHA256 = (
+    "4adb32bd675fd9181d8ced783b6734382e9749c6c574e35567d1bec65fd72f70")
+_STAGE130_ZDD_MD5 = "cbd3df6c75053ee6d0641f19d5301d7a"
+_STAGE130_ZDD_BYTES = 11824690
+_STAGE130_ZDD_RELEASE_VERSION = _STAGE130_RC_RELEASE_VERSION
+#: The local build path of that archive. It is gitignored, so a fresh clone
+#: legitimately lacks it: absence is tolerated, drift never is.
+_STAGE130_ZDD_ARCHIVE_REL = (
+    f"{_STAGE130_RC_PKG}/build/rc3/{_STAGE130_ZDD_FILENAME}")
+#: The deposition's verified metadata. `access_right` is the dangerous one and
+#: is handled explicitly below.
+_STAGE130_ZDD_DEPOSITION_METADATA = {
+    "access_right": "open",
+    "language": "eng",
+    "license": "cc-by-4.0",
+    "upload_type": "dataset",
+    "version": _STAGE130_RC_RELEASE_VERSION,
+}
+#: The three V6 artifacts the human ran, pinned by SHA-256. They live OUTSIDE
+#: the repository, so they cannot be re-hashed here; pinning them means a
+#: silently edited record of which script ran breaks the build.
+_STAGE130_ZDD_V6_SHA256 = {
+    "test_zenodo_rc3_draft.sh":
+        "84121f3d9c000a8d646975361a942f4402337248c2ae4c4c13c676988d943fd3",
+    "zenodo_draft_metadata_rc3.json":
+        "3cb1cc05f41c3b0d9ec9e16d3474290caeccfff8423d1a60cdc0324b7840c375",
+    "zenodo_rc3_draft.sh":
+        "b2f6e4feaae3ebd6a94d39c27f23aff015d9fec1568a60454b994696efafef35",
+}
+#: The pointer this action replaces, and the one it advances to. The successor
+#: names a HUMAN step -- read the private draft, then decide separately about
+#: publication -- and it is a POINTER, never a permission.
+_STAGE130_ZDD_PREVIOUS_POINTER = _STAGE130_RC_NEXT_ACTION_ID
+_STAGE130_ZDD_NEXT_ACTION_ID = (
+    "human-zenodo-draft-review-and-publication-decision")
+_STAGE130_ZDD_NEXT_ACTION_SCOPE = (
+    "zenodo_draft_human_review_and_separate_publication_decision_no_publish_"
+    "action_is_authorized")
+#: Everything a DRAFT deposition is explicitly NOT. Any of these recorded True
+#: means the record is claiming an authorization or a status it does not have.
+_STAGE130_ZDD_FORBIDDEN_TRUE = (
+    "zenodo_published",
+    "zenodo_record_submitted",
+    "zenodo_publish_endpoint_called",
+    "zenodo_token_read_or_requested_by_this_action",
+    "record_submitted",
+    "public_release",
+    "public_release_authorized",
+    "publication_authorized",
+    "doi_published",
+    "doi_active",
+    "doi_resolves_publicly",
+    "reserved_doi_is_registered_or_resolving",
+    "agent_called_the_zenodo_api",
+    "independently_retrieved_by_programmer",
+    "deposition_script_re_executed_by_this_action",
+    "deposition_state_file_committed_to_git",
+    "credentials_committed_to_git",
+    "submission_ready",
+    "ready_for_review_authorized",
+    "merge_authorized",
+    "stage130_authorized",
+    "stage130_or_next_stage_executed",
+    "manuscript_modified_by_this_action",
+    "manuscript_modified_by_this_decision",
+    "manuscript_rewriting_authorized",
+    "manuscript_availability_claim_changed_by_this_action",
+    "manuscript_availability_claim_changed_by_this_decision",
+    "manuscript_data_availability_statement_changed_by_this_decision",
+    "new_scientific_analysis_performed",
+    "scientific_execution_started",
+    "stage130_phase2_scientific_execution_started",
+    "submission_workflow_started",
+    "final_test_access_authorized",
+    "final_test_second_pass_authorized",
+    "prior_packages_modified_by_this_action",
+    "release_candidate_package_modified_by_this_action",
+    "release_candidate_archives_modified_by_this_action",
+    "stage122_to_stage129_artifacts_modified_by_this_action",
+    "next_action_authorized",
+    "preexisting_pointer_was_authorized",
+    "pr_merged",
+    "branch_deleted_by_this_action",
+    "auto_merge_enabled_by_this_action",
+)
+#: Secret-bearing shapes that must never enter a committed artifact. Prose
+#: ABOUT tokens is fine; a token is not. Matched case-insensitively.
+_STAGE130_ZDD_CREDENTIAL_PATTERNS = (
+    re.compile(r"authorization\s*:\s*bearer\s+\S", re.IGNORECASE),
+    re.compile(r"\bbearer\s+[A-Za-z0-9._\-]{16,}", re.IGNORECASE),
+    re.compile(r"access[_-]?token\s*[=:]\s*[\"']?[A-Za-z0-9._\-]{16,}",
+               re.IGNORECASE),
+    re.compile(r"zenodo[_-]?token\s*[=:]\s*[\"']?[A-Za-z0-9._\-]{8,}",
+               re.IGNORECASE),
+    re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
+)
+#: A Zenodo personal access token is a long opaque alphanumeric run. Digests
+#: are long too, but they are pure hexadecimal, so they are excluded by shape
+#: rather than by an allowlist that a real secret could hide behind.
+_STAGE130_ZDD_OPAQUE_RUN = re.compile(r"\b[A-Za-z0-9]{40,}\b")
+
+
+def _stage130_zdd_assert_no_credential_material(root: str) -> None:
+    """No committed file in this package may carry a token or a credential.
+
+    The deposition script authenticates with a personal access token. That
+    token is the one thing this recording must never inherit, so the package is
+    swept for credential-shaped material -- headers, bearer values, assignments
+    and long opaque non-hexadecimal runs -- rather than trusted to a boolean
+    that says none is present.
+    """
+    pkg = os.path.join(root, _STAGE130_ZDD_PKG)
+    if not os.path.isdir(pkg):
+        return
+    for dirpath, _dirnames, filenames in os.walk(pkg):
+        for name in sorted(filenames):
+            path = os.path.join(dirpath, name)
+            rel = os.path.relpath(path, root)
+            try:
+                with open(path, encoding="utf-8") as fh:
+                    text = fh.read()
+            except (UnicodeDecodeError, OSError):
+                raise HandoffError(
+                    f"Stage130 Zenodo draft deposition file {rel} is not "
+                    "readable UTF-8 text; this package carries records, not "
+                    "binaries")
+            for pattern in _STAGE130_ZDD_CREDENTIAL_PATTERNS:
+                if pattern.search(text):
+                    raise HandoffError(
+                        f"Stage130 Zenodo draft deposition file {rel} contains "
+                        "credential-shaped material; no token, credential or "
+                        "Authorization header may be committed")
+            for run in _STAGE130_ZDD_OPAQUE_RUN.findall(text):
+                if re.fullmatch(r"[0-9a-fA-F]+", run):
+                    continue
+                raise HandoffError(
+                    f"Stage130 Zenodo draft deposition file {rel} contains a "
+                    f"long opaque non-hexadecimal run ({run[:8]}...); that is "
+                    "the shape of an access token and may not be committed")
+
+
+def derive_stage130_zenodo_draft_deposition_markers(root: str) -> dict:
+    """Recognize the human-executed Zenodo DRAFT deposition.
+
+    Narrow and fail-closed. A human supervisor created a deposition, uploaded
+    the 1.0.0-rc.3 archive into it and reserved a DOI. That is the FIRST half
+    of Zenodo's lifecycle. The second half -- publish/submit, which registers
+    the DOI and makes the record public -- did not happen and is not
+    authorized, so this function resolves exactly four live markers
+    (``zenodo_deposition_created``, ``zenodo_upload_performed``,
+    ``zenodo_doi_reserved``, ``zenodo_doi``) plus the live pointer, and leaves
+    ``zenodo_published`` and ``public_release_authorized`` alone.
+
+    Three independent things are anchored rather than asserted:
+
+    * the deposited bytes. The recorded SHA-256, MD5 and byte size must equal
+      the ones the Release Candidate package publishes for rc.3, and if the
+      gitignored archive is present locally it is re-hashed and must match. A
+      differently-built archive cannot inherit this record.
+    * the history. The Release Candidate deriver is read back and must still
+      publish every Zenodo key as False with a null DOI and its own pointer;
+      a quietly rewritten predecessor breaks the build.
+    * the absence of credentials. The package is swept for token-shaped
+      material instead of being trusted to say there is none.
+
+    Fails closed if the record claims publication, submission, a resolving DOI,
+    public availability, Ready-for-Review, merge, a manuscript change or a
+    non-zero action counter -- and, specifically, if it lets
+    ``access_right = open`` stand as public availability. Returns {} before the
+    package exists.
+    """
+    path = os.path.join(root, _STAGE130_ZDD_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    decision = _require_json_artifact(root, _STAGE130_ZDD_DECISION_REL)
+    boundary = _require_json_artifact(root, _STAGE130_ZDD_BOUNDARY_REL)
+    metadata = _require_json_artifact(root, _STAGE130_ZDD_METADATA_REL)
+
+    if decision.get("decision_id") != _STAGE130_ZDD_ACTION_ID:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition decision_id mismatch")
+    for source, label in ((boundary, "boundary"), (metadata, "metadata")):
+        if source.get("action_id") != _STAGE130_ZDD_ACTION_ID:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition {label} action_id mismatch")
+    if decision.get("decision_type") != \
+            "human_executed_zenodo_draft_deposition_recording":
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must be a "
+            "human_executed_zenodo_draft_deposition_recording")
+    if decision.get("authorized_by_human") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must be human-authorized")
+
+    # (1) A DRAFT was created and NOTHING was published. Every publication-,
+    # submission-, authorization- and manuscript-facing key is False on every
+    # surface that publishes one.
+    for source, label in ((decision, "decision"), (boundary, "boundary"),
+                          (metadata, "metadata")):
+        for field in _STAGE130_ZDD_FORBIDDEN_TRUE:
+            if field not in source:
+                continue
+            if source.get(field) is not False:
+                raise HandoffError(
+                    f"Stage130 Zenodo draft deposition {label} {field} must be "
+                    "False: creating a draft, uploading a file and reserving a "
+                    "DOI is not a publication, a submission, a public release, "
+                    "a Ready-for-Review or a merge")
+    for field in ("zenodo_deposition_created", "zenodo_upload_performed"):
+        if boundary.get(field) is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition boundary {field} must be "
+                "True: the deposition and the upload are what actually "
+                "happened")
+    if decision.get("doi_reserved") is not True or \
+            boundary.get("doi_reserved") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must record the DOI as reserved")
+
+    # (2) The record is UNSUBMITTED, and says so in both vocabularies.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("record_state") != _STAGE130_ZDD_RECORD_STATE:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition {label} record_state must "
+                f"be {_STAGE130_ZDD_RECORD_STATE!r}, got "
+                f"{source.get('record_state')!r}")
+        if source.get("record_is_private_draft") is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition {label} must record the "
+                "deposition as a private draft")
+
+    # (3) `access_right = open` is DRAFT metadata and is not public
+    # availability. This is the misreading that would put a false claim into
+    # the manuscript, so it is refused explicitly rather than left to prose.
+    observed = decision.get("verified_metadata") or {}
+    for key, expected in _STAGE130_ZDD_DEPOSITION_METADATA.items():
+        if observed.get(key) != expected:
+            raise HandoffError(
+                "Stage130 Zenodo draft deposition verified_metadata "
+                f"{key} must be {expected!r}, got {observed.get(key)!r}")
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get(
+                "access_right_open_is_draft_metadata_not_public_availability"
+        ) is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition {label} must state that "
+                "access_right = open is draft metadata and NOT public "
+                "availability: an unsubmitted record is private whatever its "
+                "access_right says")
+    if not decision.get("why_open_access_right_is_not_public_availability"):
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must explain, in words, why "
+            "access_right = open is not public availability")
+    if not decision.get("why_this_is_not_a_publication"):
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must explain, in words, why a "
+            "draft is not a publication")
+
+    # (4) The identifiers. The DOI is RESERVED, matches the deposition id, and
+    # is never described as registered or resolving.
+    if decision.get("deposition_id") != _STAGE130_ZDD_DEPOSITION_ID or \
+            boundary.get("deposition_id") != _STAGE130_ZDD_DEPOSITION_ID:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition id must be "
+            f"{_STAGE130_ZDD_DEPOSITION_ID}")
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("reserved_doi") != _STAGE130_ZDD_RESERVED_DOI:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition {label} reserved_doi must "
+                f"be {_STAGE130_ZDD_RESERVED_DOI!r}")
+    if not _STAGE130_ZDD_RESERVED_DOI.endswith(
+            str(_STAGE130_ZDD_DEPOSITION_ID)):
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition reserved DOI must carry the "
+            "deposition id")
+
+    # (5) The deposited bytes ARE the recorded Release Candidate's. Anchored on
+    # the committed rc.3 metadata, and re-hashed locally when the gitignored
+    # archive is present.
+    rc_metadata = _require_json_artifact(
+        root,
+        f"{_STAGE130_RC_PKG}/"
+        "metadata_and_hashes_stage130_dataset_release_candidate.json")
+    if rc_metadata.get("archive_name") != _STAGE130_ZDD_FILENAME:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition: the Release Candidate archive "
+            f"name is {rc_metadata.get('archive_name')!r}, not the deposited "
+            f"{_STAGE130_ZDD_FILENAME!r}")
+    if rc_metadata.get("archive_sha256") != _STAGE130_ZDD_SHA256 or \
+            rc_metadata.get("archive_size_bytes") != _STAGE130_ZDD_BYTES:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition: the deposited digest/size no "
+            "longer equals the Release Candidate's. A deposit record may not "
+            "float free of the candidate it deposited.")
+    deposited = decision.get("deposited_file") or {}
+    for key, expected in (("filename", _STAGE130_ZDD_FILENAME),
+                          ("sha256", _STAGE130_ZDD_SHA256),
+                          ("md5", _STAGE130_ZDD_MD5),
+                          ("size_bytes", _STAGE130_ZDD_BYTES)):
+        if deposited.get(key) != expected:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition deposited_file {key} must "
+                f"be {expected!r}, got {deposited.get(key)!r}")
+    for key, expected in (("deposited_file_name", _STAGE130_ZDD_FILENAME),
+                          ("deposited_file_sha256", _STAGE130_ZDD_SHA256),
+                          ("deposited_file_md5", _STAGE130_ZDD_MD5),
+                          ("deposited_file_size_bytes", _STAGE130_ZDD_BYTES)):
+        if boundary.get(key) != expected:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition boundary {key} must be "
+                f"{expected!r}")
+    if decision.get("deposited_file_is_the_recorded_release_candidate") \
+            is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must record that the deposited "
+            "file is the documented Release Candidate")
+    archive_path = os.path.join(root, _STAGE130_ZDD_ARCHIVE_REL)
+    if os.path.isfile(archive_path):
+        with open(archive_path, "rb") as fh:
+            payload = fh.read()
+        if hashlib.sha256(payload).hexdigest() != _STAGE130_ZDD_SHA256 or \
+                hashlib.md5(payload).hexdigest() != _STAGE130_ZDD_MD5 or \
+                len(payload) != _STAGE130_ZDD_BYTES:
+            raise HandoffError(
+                "Stage130 Zenodo draft deposition: the local rc.3 archive no "
+                "longer matches the deposited digests. The file in Zenodo is "
+                "fixed; rebuilding a different one locally does not change it, "
+                "and the record may not silently follow.")
+
+    # (6) The three V6 artifacts the human ran, pinned by digest.
+    recorded_v6 = decision.get("v6_artifact_sha256") or {}
+    if recorded_v6 != _STAGE130_ZDD_V6_SHA256:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must pin the three V6 artifact "
+            f"SHA-256 values exactly as {_STAGE130_ZDD_V6_SHA256}, got "
+            f"{recorded_v6}")
+
+    # (7) Provenance: a human supplied these facts and the programmer did not
+    # go and fetch them. Both halves are published, because publishing only the
+    # first would imply an independent verification that never happened.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("authenticated_zenodo_response_observed") is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition {label} must record that an "
+                "authenticated Zenodo response was observed")
+    if decision.get("supplied_by") != "human" or \
+            decision.get("submitted_by") != "human":
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must record the human as the "
+            "source and the executor of this event")
+    if decision.get("recording_is_not_retroactive_authorization") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must declare that recording an "
+            "event is not a retroactive authorization for it")
+    if decision.get("preexisting_pointer_at_execution_time") != \
+            _STAGE130_ZDD_PREVIOUS_POINTER:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must record the pointer that was "
+            f"live at execution time ({_STAGE130_ZDD_PREVIOUS_POINTER})")
+    _stage130_zdd_assert_no_credential_material(root)
+
+    # (8) The HISTORY is preserved, not rewritten. The Release Candidate must
+    # still publish what was true when it ran.
+    prior = derive_stage130_dataset_release_candidate_markers(root)
+    if not prior:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition cannot be recorded without the "
+            "Release Candidate it deposited")
+    for field in ("zenodo_deposition_created", "zenodo_upload_performed",
+                  "zenodo_doi_reserved", "zenodo_published",
+                  "public_release_authorized"):
+        if prior.get(field) is not False:
+            raise HandoffError(
+                "the Stage130 Release Candidate record must keep publishing "
+                f"{field} = False: that is what was true when it ran, and this "
+                "deposition supersedes it in the open rather than rewriting "
+                "history")
+    if prior.get("zenodo_doi") is not None:
+        raise HandoffError(
+            "the Stage130 Release Candidate record must keep publishing a null "
+            "DOI (historical value)")
+    if prior.get("next_research_action_id") != _STAGE130_ZDD_PREVIOUS_POINTER:
+        raise HandoffError(
+            "the Stage130 Release Candidate record must keep pointing at "
+            f"{_STAGE130_ZDD_PREVIOUS_POINTER} (historical pointer)")
+    marker = decision.get("superseded_marker") or {}
+    if marker.get("key") != "zenodo_deposition_created":
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must supersede "
+            "zenodo_deposition_created")
+    if marker.get("previous_value") is not False or \
+            marker.get("resolved_value") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition supersede must record the real "
+            "prior value False resolving to True")
+    companions = marker.get("companion_keys") or {}
+    expected_companions = {
+        "zenodo_upload_performed": (False, True),
+        "zenodo_doi_reserved": (False, True),
+        "zenodo_doi": (None, _STAGE130_ZDD_RESERVED_DOI),
+    }
+    if set(companions) != set(expected_companions):
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition supersede must name exactly the "
+            f"companions {sorted(expected_companions)}, got "
+            f"{sorted(companions)}")
+    for key, (previous, resolved) in expected_companions.items():
+        entry = companions.get(key) or {}
+        if entry.get("previous_value") != previous or \
+                entry.get("resolved_value") != resolved:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition supersede companion {key} "
+                f"must record {previous!r} -> {resolved!r}")
+    not_superseded = list(marker.get("keys_deliberately_not_superseded") or [])
+    if sorted(not_superseded) != ["public_release_authorized",
+                                  "zenodo_published"]:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must declare zenodo_published "
+            "and public_release_authorized as deliberately NOT superseded: "
+            "they were false before the draft and they are false after it")
+    if marker.get("pointer_previous_value") != _STAGE130_ZDD_PREVIOUS_POINTER \
+            or marker.get("pointer_resolved_value") != \
+            _STAGE130_ZDD_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition supersede must record the "
+            f"pointer moving {_STAGE130_ZDD_PREVIOUS_POINTER} -> "
+            f"{_STAGE130_ZDD_NEXT_ACTION_ID}")
+    if marker.get("historical_release_candidate_record_preserved") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition supersede must declare the "
+            "historical Release Candidate record preserved")
+    for field in ("supersedes_key", "supersedes_pointer",
+                  "supersedes_artifact"):
+        if not boundary.get(field):
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition boundary {field} is "
+                "required")
+    if boundary.get("supersedes_previous_value") is not False:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition boundary must record the "
+            "superseded previous value False")
+
+    # (9) The MANUSCRIPT did not move. A reserved DOI is not a public one, so
+    # the availability wording stays exactly as the human approved it, and the
+    # digests are re-derived from the file rather than trusted.
+    manuscript_rel = boundary.get("reviewed_manuscript_path")
+    if manuscript_rel != _STAGE130_REVIEW_MANUSCRIPT_REL:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must name "
+            f"{_STAGE130_REVIEW_MANUSCRIPT_REL} as the untouched manuscript")
+    manuscript_path = os.path.join(root, manuscript_rel)
+    if not os.path.isfile(manuscript_path):
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition: the approved manuscript is "
+            "missing")
+    with open(manuscript_path, "rb") as fh:
+        manuscript_payload = fh.read()
+    manuscript_sha = hashlib.sha256(manuscript_payload).hexdigest()
+    manuscript_blob = _git_blob_id(manuscript_payload)
+    if boundary.get("reviewed_manuscript_sha256") != manuscript_sha or \
+            boundary.get("reviewed_manuscript_blob_id") != manuscript_blob:
+        raise HandoffError(
+            "the approved manuscript has changed: the Zenodo draft deposition "
+            f"pins sha256 {boundary.get('reviewed_manuscript_sha256')!r} / "
+            f"blob {boundary.get('reviewed_manuscript_blob_id')!r} but the "
+            f"file is {manuscript_sha} / {manuscript_blob}. Recording a "
+            "reserved DOI changes no manuscript byte; a changed manuscript "
+            "needs its own action and a fresh human review.")
+
+    # (10) The PR stays a Draft, the firewall is untouched, counters are zero.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("pr_is_draft") is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition {label} must keep the PR a "
+                "Draft")
+        if source.get("pr_number") != _STAGE130_ZDD_PR_NUMBER:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition {label} PR number must be "
+                f"{_STAGE130_ZDD_PR_NUMBER}")
+    if boundary.get("final_test_locked") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must keep the Final Test locked")
+    if boundary.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition final_test_rows_read must be 0")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition counters.{field} must be 0 "
+                "(recording an already-completed human upload makes no Zenodo "
+                "call, rebuilds no archive and computes nothing)")
+
+    # (11) The live pointer moves -- to a HUMAN step, as a POINTER.
+    if boundary.get("next_action_id") != _STAGE130_ZDD_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition must advance the pointer to "
+            f"{_STAGE130_ZDD_NEXT_ACTION_ID}")
+    if boundary.get("next_action_id") == _STAGE130_ZDD_PREVIOUS_POINTER:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition may not keep pointing at the "
+            "digest review a created draft has overtaken")
+    if boundary.get("next_action_scope") != _STAGE130_ZDD_NEXT_ACTION_SCOPE:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition next_action_scope must be "
+            f"{_STAGE130_ZDD_NEXT_ACTION_SCOPE}")
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("pointer_is_not_authorization") is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition {label} must declare the "
+                "pointer is not an authorization")
+    if boundary.get("next_action_is_a_human_step") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition successor must be a HUMAN step")
+
+    # (12) The package inventory is real: every listed file exists and hashes
+    # to what is published, and nothing in the directory is unlisted.
+    listed = metadata.get("package_files") or {}
+    if metadata.get("package_file_count") != len(listed):
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition metadata package_file_count "
+            "disagrees with the listed files")
+    pkg_dir = os.path.join(root, _STAGE130_ZDD_PKG)
+    on_disk = {
+        name for name in os.listdir(pkg_dir)
+        if os.path.isfile(os.path.join(pkg_dir, name))
+        and name != os.path.basename(_STAGE130_ZDD_METADATA_REL)
+    }
+    if on_disk != set(listed):
+        raise HandoffError(
+            "Stage130 Zenodo draft deposition package inventory disagrees with "
+            f"the directory: listed {sorted(listed)}, on disk {sorted(on_disk)}")
+    for name, expected in sorted(listed.items()):
+        file_path = os.path.join(pkg_dir, name)
+        with open(file_path, "rb") as fh:
+            payload = fh.read()
+        if hashlib.sha256(payload).hexdigest() != expected.get("sha256") or \
+                len(payload) != expected.get("bytes"):
+            raise HandoffError(
+                f"Stage130 Zenodo draft deposition package file {name} does "
+                "not match its published size/SHA-256")
+
+    return {
+        "stage130_zenodo_draft_deposition_recorded": True,
+        "stage130_zenodo_draft_deposition_action_id": _STAGE130_ZDD_ACTION_ID,
+        "stage130_zenodo_draft_deposition_date_utc":
+            decision.get("human_execution_date_utc"),
+        "stage130_zenodo_draft_deposition_result":
+            decision.get("human_execution_result"),
+
+        # THE resolved markers. The Release Candidate keeps its own history.
+        "zenodo_deposition_created": True,
+        "zenodo_upload_performed": True,
+        "zenodo_doi_reserved": True,
+        "zenodo_doi": _STAGE130_ZDD_RESERVED_DOI,
+
+        # ...and the two that did NOT move, restated so a consumer reading only
+        # this action cannot mistake a draft for a release.
+        "zenodo_published": False,
+        "zenodo_record_submitted": False,
+        "zenodo_record_state": _STAGE130_ZDD_RECORD_STATE,
+        "zenodo_record_is_private_draft": True,
+        "zenodo_doi_published": False,
+        "zenodo_doi_registered_or_resolving": False,
+        "zenodo_public_release": False,
+        "public_release_authorized": False,
+        "zenodo_publication_authorized": False,
+
+        # The deposit itself.
+        "stage130_zenodo_deposition_id": _STAGE130_ZDD_DEPOSITION_ID,
+        "stage130_zenodo_deposited_filename": _STAGE130_ZDD_FILENAME,
+        "stage130_zenodo_deposited_sha256": _STAGE130_ZDD_SHA256,
+        "stage130_zenodo_deposited_md5": _STAGE130_ZDD_MD5,
+        "stage130_zenodo_deposited_size_bytes": _STAGE130_ZDD_BYTES,
+        "stage130_zenodo_deposited_version": _STAGE130_ZDD_RELEASE_VERSION,
+        "stage130_zenodo_deposit_matches_release_candidate": True,
+        "stage130_zenodo_deposition_metadata":
+            dict(_STAGE130_ZDD_DEPOSITION_METADATA),
+        "stage130_zenodo_access_right": (
+            _STAGE130_ZDD_DEPOSITION_METADATA["access_right"]),
+        "stage130_zenodo_access_right_is_public_availability": False,
+        "stage130_zenodo_v6_artifact_sha256": dict(_STAGE130_ZDD_V6_SHA256),
+
+        # Provenance, both halves.
+        "stage130_zenodo_facts_supplied_by": "human",
+        "stage130_zenodo_authenticated_response_observed": True,
+        "stage130_zenodo_independently_retrieved_by_programmer": False,
+        "stage130_zenodo_api_called_by_this_action": False,
+        "stage130_zenodo_publish_endpoint_called": False,
+        "stage130_zenodo_script_re_executed_by_this_action": False,
+        "stage130_zenodo_token_read_or_requested": False,
+        "stage130_zenodo_state_file_committed_to_git": False,
+        "stage130_zenodo_credentials_committed_to_git": False,
+        "stage130_zenodo_recording_is_not_retroactive_authorization": True,
+        "stage130_zenodo_supersedes_key": "zenodo_deposition_created",
+        "stage130_zenodo_supersedes_pointer": _STAGE130_ZDD_PREVIOUS_POINTER,
+        "stage130_dataset_release_candidate_record_preserved": True,
+
+        # ...and what a draft is NOT.
+        "stage130_manuscript_modified_by_this_action": False,
+        "stage130_manuscript_availability_claim_changed": False,
+        "stage130_manuscript_requires_post_doi_metadata_update": True,
+        "stage130_manuscript_requires_post_doi_human_review": True,
+        "stage130_phase2_submission_ready": False,
+        "stage130_phase2_ready_for_review_authorized": False,
+        "stage130_phase2_merge_authorized": False,
+        "stage130_authorized": False,
+        "stage130_phase2_scientific_execution_started": False,
+        "stage130_scientific_execution_started": False,
+        "stage130_phase2_final_test_rows_read": 0,
+        "stage130_phase2_prediction_artifact_opened": False,
+
+        # The live pointer. The digest review it used to name has been overtaken
+        # by an actual draft, so the successor names the human step that is now
+        # outstanding -- read the draft, then decide about publication
+        # separately. It is a POINTER: nothing here is authorized.
+        "last_completed_research_action_id": _STAGE130_ZDD_ACTION_ID,
+        "stage130_phase2_next_action_id": _STAGE130_ZDD_NEXT_ACTION_ID,
+        "stage130_phase2_next_action_authorized": False,
+        "next_research_action_id": _STAGE130_ZDD_NEXT_ACTION_ID,
+        "next_research_action_scope": _STAGE130_ZDD_NEXT_ACTION_SCOPE,
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
+    }
+
+#: Stage130 -- the LATER human events on that same Zenodo Draft: a completed
+#: visual review, and a metadata-only Notes correction the HUMAN performed in
+#: the Zenodo UI. Neither is a publication, and this package exists so that
+#: distinction, and the distinction between the three separate Notes strings in
+#: this story, cannot quietly erode.
+_STAGE130_ZDHRC_PKG = "project/stage130/zenodo_draft_human_review_completion"
+_STAGE130_ZDHRC_ACTION_ID = "stage130-zenodo-draft-human-review-completion"
+_STAGE130_ZDHRC_DECISION_REL = (
+    f"{_STAGE130_ZDHRC_PKG}/"
+    "stage130_zenodo_draft_human_review_completion_decision.json")
+_STAGE130_ZDHRC_BOUNDARY_REL = (
+    f"{_STAGE130_ZDHRC_PKG}/"
+    "stage130_zenodo_draft_human_review_completion_governance_boundary.json")
+_STAGE130_ZDHRC_METADATA_REL = (
+    f"{_STAGE130_ZDHRC_PKG}/"
+    "metadata_and_hashes_stage130_zenodo_draft_human_review_completion.json")
+_STAGE130_ZDHRC_README_REL = f"{_STAGE130_ZDHRC_PKG}/README.md"
+#: The Draft pull request this is recorded on. It stays an open Draft.
+_STAGE130_ZDHRC_PR_NUMBER = _STAGE130_ZDD_PR_NUMBER
+#: The human authorization, preserved VERBATIM. It is never translated,
+#: paraphrased or normalized, and it is pinned by digest rather than trusted:
+#: a reflowed or "tidied" statement changes its bytes and breaks the build.
+_STAGE130_ZDHRC_AUTHORIZATION_TEXT = (
+    "Draft زنودو مربوط به deposition شماره 22059238 را کامل بازبینی کردم. فایل، عنوان، نویسندگان، توضیحات، کلیدواژه‌ها، نسخه، مجوز، Citation و DOIهای رزروشده را تأیید می‌کنم. اصلاح Notes به متن پایدار شامل SHA-256 و اندازه دقیق آرشیو را نیز تأیید می‌کنم و اجازه می‌دهم این بازبینی و اصلاح متادیتا در مخزن ثبت شود؛ اما انتشار Zenodo، فعال‌سازی عمومی DOI، Ready کردن PR و Merge هنوز مجاز نیست."
+)
+_STAGE130_ZDHRC_AUTHORIZATION_SHA256 = (
+    "fa7f98d91a08cdcb4862c227584b843058468995d52480a5eaac1788645a2bac")
+_STAGE130_ZDHRC_AUTHORIZATION_BYTES = 642
+#: The identifiers. The version DOI was already recorded by the deposition; the
+#: concept DOI is displayed on the same draft and is recorded here for the first
+#: time. Both are RESERVED placeholders that do not resolve.
+_STAGE130_ZDHRC_DEPOSITION_ID = _STAGE130_ZDD_DEPOSITION_ID
+_STAGE130_ZDHRC_VERSION_DOI = _STAGE130_ZDD_RESERVED_DOI
+_STAGE130_ZDHRC_CONCEPT_DOI = "10.5281/zenodo.22059237"
+_STAGE130_ZDHRC_RECORD_STATE = _STAGE130_ZDD_RECORD_STATE
+#: The draft metadata the human confirmed in Zenodo Preview. `access_right` is
+#: the dangerous one and is refused as availability, explicitly, below.
+_STAGE130_ZDHRC_VERSION = _STAGE130_RC_RELEASE_VERSION
+_STAGE130_ZDHRC_LICENSE = "cc-by-4.0"
+_STAGE130_ZDHRC_ACCESS_RIGHT = "open"
+#: Everything the human actually looked at. A review is recorded as complete
+#: only when the whole matrix is; a partial review is not a review.
+_STAGE130_ZDHRC_REVIEWED_ITEMS = (
+    "archive_contents",
+    "citation",
+    "creators",
+    "description",
+    "file",
+    "keywords",
+    "license",
+    "reserved_doi_identifiers",
+    "title",
+    "version",
+)
+#: The THREE distinct Notes strings in this story, pinned separately so no two
+#: of them can ever be conflated:
+#:  (1) the HISTORICAL live Notes, as deposited. Still historically correct for
+#:      the deposition event; superseded ONLY as the current live value.
+#:  (2) the CURRENT AUTHORITATIVE live Notes, after the human's UI correction.
+#:  (3) the notes field INSIDE the deposited ZIP -- a pre-deposition artifact,
+#:      frozen in immutable bytes, into which the later correction is NOT
+#:      retroactively injected.
+_STAGE130_ZDHRC_HISTORICAL_NOTES = (
+    "Release candidate 1.0.0-rc.3, superseding 1.0.0-rc.2 and, through it, "
+    "1.0.0-rc.1. Both predecessors are preserved, not deleted. This record is "
+    "an unpublished Zenodo draft. A DOI has been reserved but not published or "
+    "activated, and no public release has occurred."
+)
+_STAGE130_ZDHRC_HISTORICAL_NOTES_SHA256 = (
+    "9096ed3fc195915fb6428a107adacffde23c59aaac6845966b20cbffcfc62ff2")
+_STAGE130_ZDHRC_HISTORICAL_NOTES_BYTES = 263
+_STAGE130_ZDHRC_LIVE_NOTES = (
+    "Release candidate 1.0.0-rc.3, superseding 1.0.0-rc.2 and, through it, "
+    "1.0.0-rc.1. Both predecessors are preserved, not deleted. The deposited "
+    "archive is the exact RC3 artifact with SHA-256 "
+    "4adb32bd675fd9181d8ced783b6734382e9749c6c574e35567d1bec65fd72f70 and size "
+    "11,824,690 bytes."
+)
+_STAGE130_ZDHRC_LIVE_NOTES_SHA256 = (
+    "7ff1c7de2baab5e2ecc95e20d8996db38bb8ec67e35dc4200335ec37d6f5ea46")
+_STAGE130_ZDHRC_LIVE_NOTES_BYTES = 280
+_STAGE130_ZDHRC_EMBEDDED_NOTES = (
+    "Release candidate 1.0.0-rc.3, superseding 1.0.0-rc.2 and, through it, "
+    "1.0.0-rc.1. Both predecessors are preserved, not deleted. Not deposited, "
+    "not published, no DOI."
+)
+#: The committed copy of the pre-deposition candidate metadata. It lives in the
+#: Release Candidate payload and is read back so the ZIP-side notes cannot be
+#: quietly "corrected" to match the live one.
+_STAGE130_ZDHRC_EMBEDDED_METADATA_REL = (
+    f"{_STAGE130_RC_PKG}/release_payload/zenodo_metadata_candidate.json")
+#: The predecessor package, pinned FILE BY FILE. The deposition record is
+#: history: this action appends to it and may not edit one byte of it, so a
+#: silent change there breaks this build rather than passing unnoticed.
+_STAGE130_ZDHRC_PRIOR_PACKAGE_SHA256 = {
+    "README_STAGE130_ZENODO_DRAFT_DEPOSITION.md":
+        "fbfba50e6d4d1733cde04f4246a61417572fcf9b1a1d284748d09145d9fb09f5",
+    "metadata_and_hashes_stage130_zenodo_draft_deposition.json":
+        "7c6bd32ac7d0f51354b99d580fd6f9ce2073fee7c312875ab16e8545222e24ff",
+    "stage130_zenodo_draft_deposition_decision.json":
+        "debaf29e0155516991c416eb7ad0361c3f7b7682957b47838392b292194d92c9",
+    "stage130_zenodo_draft_deposition_governance_boundary.json":
+        "287035a559397906e7f0a9e525cf9e929924b7f4a573a046a67e9b88ea0c1cfb",
+}
+#: The pointer this action replaces, and the one it advances to. The predecessor
+#: named TWO separable human things -- review the draft, then decide about
+#: publication. The review half is now done, so the successor names only what is
+#: left: a publication DECISION. Naming a decision authorizes no publication.
+_STAGE130_ZDHRC_PREVIOUS_POINTER = _STAGE130_ZDD_NEXT_ACTION_ID
+_STAGE130_ZDHRC_NEXT_ACTION_ID = "human-zenodo-publication-decision"
+_STAGE130_ZDHRC_NEXT_ACTION_SCOPE = (
+    "zenodo_publication_decision_only_no_publication_action_is_authorized")
+#: Everything this action is explicitly NOT. Any of these recorded True means
+#: the record is claiming a status, a contact or an authorization it does not
+#: have. Checked on every surface that publishes the key.
+_STAGE130_ZDHRC_FORBIDDEN_TRUE = (
+    # the lifecycle
+    "record_submitted",
+    "zenodo_record_submitted",
+    "zenodo_published",
+    "doi_published",
+    "doi_publicly_activated",
+    "doi_active",
+    "doi_resolves_publicly",
+    "doi_registered_or_resolving",
+    "reserved_doi_is_registered_or_resolving",
+    "public_release",
+    "record_publicly_available",
+    # the authorizations that stay withheld
+    "publication_authorized",
+    "public_release_authorized",
+    "submission_authorized",
+    "doi_activation_authorized",
+    "ready_for_review_authorized",
+    "merge_authorized",
+    "auto_merge_authorized",
+    "next_action_authorized",
+    "stage130_authorized",
+    # contact with Zenodo BY THIS ACTION
+    "agent_called_the_zenodo_api",
+    "zenodo_publish_endpoint_called",
+    "zenodo_submit_endpoint_called",
+    "zenodo_metadata_written_by_this_action",
+    "zenodo_token_read_or_requested_by_this_action",
+    "zenodo_opened_by_automation_in_this_action",
+    "deposition_script_re_executed_by_this_action",
+    "independently_retrieved_by_programmer",
+    "deposition_state_file_opened_or_parsed_by_this_action",
+    "deposition_state_file_committed_to_git",
+    "credentials_committed_to_git",
+    "pii_committed_to_git",
+    # the archive
+    "archive_rebuilt_by_this_action",
+    "archive_replaced_by_this_action",
+    "archive_re_uploaded_by_this_action",
+    "archive_renamed_by_this_action",
+    "archive_modified_by_this_action",
+    "archive_manifest_regenerated_by_this_action",
+    "embedded_zip_candidate_metadata_modified_by_this_action",
+    # the manuscript, the prior packages and the firewall
+    "manuscript_modified_by_this_action",
+    "manuscript_availability_claim_changed_by_this_action",
+    "manuscript_data_availability_statement_changed_by_this_action",
+    "prior_packages_modified_by_this_action",
+    "stage122_to_stage129_artifacts_modified_by_this_action",
+    "release_candidate_package_modified_by_this_action",
+    "new_scientific_analysis_performed",
+    "scientific_execution_started",
+    "stage130_phase2_scientific_execution_started",
+    "stage130_or_next_stage_executed",
+    "submission_ready",
+    "submission_workflow_started",
+    "final_test_access_authorized",
+    "final_test_second_pass_authorized",
+    # the pull request
+    "pr_merged",
+    "pr_marked_ready_by_this_action",
+    "auto_merge_enabled_by_this_action",
+    "branch_deleted_by_this_action",
+    "new_pull_requests_created_by_this_action",
+    "new_pull_request_created_by_this_action",
+    # the misreading this package exists to block
+    "access_right_open_implies_public_availability",
+    "preexisting_pointer_was_authorized",
+)
+
+
+def _stage130_zdhrc_assert_no_credential_material(root: str) -> None:
+    """No committed file in this package may carry a token or a credential.
+
+    The human performed the Notes correction while signed in to Zenodo. Their
+    session and their personal access token are the two things this recording
+    must never inherit, so the package is swept for credential-shaped material
+    -- headers, bearer values, assignments and long opaque non-hexadecimal runs
+    -- rather than trusted to a boolean that says none is present. The shapes
+    are the ones the deposition package already refuses, reused deliberately so
+    the two packages cannot drift apart on what counts as a secret.
+    """
+    pkg = os.path.join(root, _STAGE130_ZDHRC_PKG)
+    if not os.path.isdir(pkg):
+        return
+    for dirpath, _dirnames, filenames in os.walk(pkg):
+        for name in sorted(filenames):
+            path = os.path.join(dirpath, name)
+            rel = os.path.relpath(path, root)
+            try:
+                with open(path, encoding="utf-8") as fh:
+                    text = fh.read()
+            except (UnicodeDecodeError, OSError):
+                raise HandoffError(
+                    f"Stage130 Zenodo draft human review file {rel} is not "
+                    "readable UTF-8 text; this package carries records, not "
+                    "binaries")
+            for pattern in _STAGE130_ZDD_CREDENTIAL_PATTERNS:
+                if pattern.search(text):
+                    raise HandoffError(
+                        f"Stage130 Zenodo draft human review file {rel} "
+                        "contains credential-shaped material; no token, "
+                        "credential or Authorization header may be committed")
+            for run in _STAGE130_ZDD_OPAQUE_RUN.findall(text):
+                if re.fullmatch(r"[0-9a-fA-F]+", run):
+                    continue
+                raise HandoffError(
+                    f"Stage130 Zenodo draft human review file {rel} contains a "
+                    f"long opaque non-hexadecimal run ({run[:8]}...); that is "
+                    "the shape of an access token and may not be committed")
+
+
+def _stage130_zdhrc_assert_prior_package_intact(root: str) -> None:
+    """The deposition package is HISTORY and is byte-pinned here.
+
+    This action appends; it never edits its predecessor. Every file of
+    ``project/stage130/zenodo_draft_deposition/`` is pinned by SHA-256 in this
+    module, independently of that package's own manifest, so a record quietly
+    rewritten to say the review or the correction had always been part of the
+    original deposit breaks the build instead of passing unnoticed.
+    """
+    pkg = os.path.join(root, _STAGE130_ZDD_PKG)
+    if not os.path.isdir(pkg):
+        raise HandoffError(
+            "Stage130 Zenodo draft human review cannot be recorded without the "
+            "draft-deposition package it appends to")
+    on_disk = {
+        name for name in os.listdir(pkg)
+        if os.path.isfile(os.path.join(pkg, name))
+    }
+    if on_disk != set(_STAGE130_ZDHRC_PRIOR_PACKAGE_SHA256):
+        raise HandoffError(
+            "the Stage130 Zenodo draft-deposition package has gained or lost "
+            f"files: expected {sorted(_STAGE130_ZDHRC_PRIOR_PACKAGE_SHA256)}, "
+            f"found {sorted(on_disk)}. That package is history and is "
+            "append-only from here.")
+    for name, expected in sorted(_STAGE130_ZDHRC_PRIOR_PACKAGE_SHA256.items()):
+        with open(os.path.join(pkg, name), "rb") as fh:
+            digest = hashlib.sha256(fh.read()).hexdigest()
+        if digest != expected:
+            raise HandoffError(
+                f"the Stage130 Zenodo draft-deposition file {name} has changed "
+                f"(sha256 {digest}, pinned {expected}). A later human review "
+                "and a later metadata correction are recorded in their OWN "
+                "package; the deposition record is never rewritten.")
+
+
+def derive_stage130_zenodo_draft_human_review_completion_markers(
+        root: str) -> dict:
+    """Recognize the completed human review of the Zenodo DRAFT, and the
+    human-performed metadata-only Notes correction on it.
+
+    Narrow and fail-closed. Two LATER human events happened on the draft this
+    repository already records: the human reviewed it in Zenodo Preview, and the
+    human themself edited its Notes field in the Zenodo UI and saved the result
+    as a Draft. Neither is a publication. Both are recorded here, in their own
+    append-only package, and the deposition package is left untouched.
+
+    Four things are kept apart on purpose, because blurring them is exactly how
+    a private draft becomes a false publication claim:
+
+    * the ORIGINAL automated draft-deposition event (history, byte-pinned);
+    * the LATER human visual review (complete);
+    * the LATER human metadata-only Notes correction (complete);
+    * the FUTURE publication decision (has not happened, is not authorized).
+
+    Three things are anchored rather than asserted:
+
+    * the human authorization, preserved verbatim and pinned by digest, so a
+      translated, paraphrased or reflowed statement breaks the build;
+    * the two Notes texts, each pinned by its own digest and re-hashed here, so
+      neither can drift and neither can be swapped for the other -- plus the
+      pre-deposition notes INSIDE the deposited ZIP, read back from the
+      committed payload so the correction cannot be retroactively injected into
+      immutable bytes;
+    * the predecessor package, pinned file by file.
+
+    Fails closed if the record claims publication, submission, DOI activation,
+    public availability, any Zenodo contact by this action, an independent
+    programmer retrieval, an archive change, a manuscript change, Ready-for-
+    Review, merge, or a non-zero action counter -- and, specifically, if it lets
+    ``access_right = open`` stand as current public availability. Returns {}
+    before the package exists.
+    """
+    path = os.path.join(root, _STAGE130_ZDHRC_DECISION_REL)
+    if not os.path.isfile(path):
+        return {}
+    decision = _require_json_artifact(root, _STAGE130_ZDHRC_DECISION_REL)
+    boundary = _require_json_artifact(root, _STAGE130_ZDHRC_BOUNDARY_REL)
+    metadata = _require_json_artifact(root, _STAGE130_ZDHRC_METADATA_REL)
+    surfaces = ((decision, "decision"), (boundary, "boundary"),
+                (metadata, "metadata"))
+
+    # A token is refused BEFORE anything else is derived. Sweeping first means
+    # a credential cannot hide behind some later failure, and cannot be masked
+    # by the inventory check noticing only that a file's hash has moved.
+    _stage130_zdhrc_assert_no_credential_material(root)
+
+    if decision.get("decision_id") != _STAGE130_ZDHRC_ACTION_ID:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review decision_id mismatch")
+    for source, label in ((boundary, "boundary"), (metadata, "metadata")):
+        if source.get("action_id") != _STAGE130_ZDHRC_ACTION_ID:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} action_id "
+                "mismatch")
+    if decision.get("decision_type") != (
+            "human_zenodo_draft_review_completion_and_metadata_notes_"
+            "correction_recording"):
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must be a "
+            "human_zenodo_draft_review_completion_and_metadata_notes_"
+            "correction_recording")
+    if decision.get("authorized_by_human") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must be human-authorized")
+    if not decision.get("authorized_scope"):
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must state its authorized "
+            "scope")
+
+    # (1) The human authorization, VERBATIM. It is pinned by digest and
+    # re-hashed here, so translating, paraphrasing, normalizing or reflowing it
+    # breaks the build rather than silently rewriting what a person said.
+    text = decision.get("human_decision_verbatim") or ""
+    if text != _STAGE130_ZDHRC_AUTHORIZATION_TEXT:
+        raise HandoffError(
+            "the recorded Stage130 Zenodo draft human review authorization "
+            "text does not match the pinned verbatim statement; it must be "
+            "preserved exactly, not translated, paraphrased or normalized")
+    recomputed = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    if recomputed != _STAGE130_ZDHRC_AUTHORIZATION_SHA256:
+        raise HandoffError(
+            "the pinned Stage130 Zenodo draft human review authorization hash "
+            "does not match the recomputed hash of the pinned text")
+    if decision.get("human_decision_verbatim_sha256") != recomputed:
+        raise HandoffError(
+            "the recorded Stage130 Zenodo draft human review authorization "
+            "hash field does not match its own text")
+    if len(text.encode("utf-8")) != _STAGE130_ZDHRC_AUTHORIZATION_BYTES or \
+            decision.get("human_decision_verbatim_utf8_bytes") != \
+            _STAGE130_ZDHRC_AUTHORIZATION_BYTES:
+        raise HandoffError(
+            "the Stage130 Zenodo draft human review authorization byte length "
+            f"must be {_STAGE130_ZDHRC_AUTHORIZATION_BYTES}")
+    if not decision.get("human_decision_translation"):
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must carry a translation "
+            "BESIDE the verbatim statement, never instead of it")
+
+    # (2) Provenance, both halves. A human reviewed and a human edited; the
+    # programmer did neither and fetched nothing. Publishing only the first half
+    # would imply an independent verification that never happened.
+    for source, label in ((decision, "decision"), (boundary, "boundary"),
+                          (metadata, "metadata")):
+        for field in ("human_visual_review_completed",
+                      "human_metadata_edit_performed"):
+            if field not in source:
+                continue
+            if source.get(field) is not True:
+                raise HandoffError(
+                    f"Stage130 Zenodo draft human review {label} {field} must "
+                    "be True: this is the record of what a human did")
+    if decision.get("supplied_by") != "human" or \
+            boundary.get("supplied_by") != "human" or \
+            decision.get("submitted_by") != "human":
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must record the human as the "
+            "source of these facts and the performer of these events")
+    for source, label in surfaces:
+        if "independently_retrieved_by_programmer" in source and \
+                source.get("independently_retrieved_by_programmer") is not \
+                False:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} must record "
+                "independently_retrieved_by_programmer = False: this action "
+                "made no Zenodo call and verified nothing against the live "
+                "record")
+        if "zenodo_api_calls_made_by_this_action" in source and \
+                source.get("zenodo_api_calls_made_by_this_action") != 0:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} "
+                "zenodo_api_calls_made_by_this_action must be 0")
+    for field in ("why_the_programmer_did_not_verify_this_independently",
+                  "why_a_completed_review_is_not_a_publication",
+                  "why_a_notes_correction_is_not_a_publication",
+                  "why_open_access_right_is_not_public_availability"):
+        if not decision.get(field):
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review must explain, in words, "
+                f"{field}")
+    if decision.get("recording_is_not_retroactive_authorization") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must declare that recording an "
+            "event is not a retroactive authorization for it")
+    if decision.get("preexisting_pointer_at_review_time") != \
+            _STAGE130_ZDHRC_PREVIOUS_POINTER:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must record the pointer that "
+            f"was live at review time ({_STAGE130_ZDHRC_PREVIOUS_POINTER})")
+    for field in ("deposition_state_file_existence_tested_only",):
+        for source, label in ((decision, "decision"), (boundary, "boundary")):
+            if source.get(field) is not True:
+                raise HandoffError(
+                    f"Stage130 Zenodo draft human review {label} {field} must "
+                    "be True: the deposition state file was tested for "
+                    "existence only and was never opened, parsed or committed")
+
+    # (3) NOTHING was published, submitted, activated, contacted or rebuilt.
+    for source, label in surfaces:
+        for field in _STAGE130_ZDHRC_FORBIDDEN_TRUE:
+            if field not in source:
+                continue
+            if source.get(field) is not False:
+                raise HandoffError(
+                    f"Stage130 Zenodo draft human review {label} {field} must "
+                    "be False: reviewing a draft and correcting its Notes is "
+                    "not a publication, a submission, a DOI activation, a "
+                    "public release, a Zenodo call, an archive change, a "
+                    "Ready-for-Review or a merge")
+    for field in ("zenodo_deposition_created", "zenodo_upload_performed",
+                  "zenodo_draft_exists"):
+        if boundary.get(field) is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review boundary {field} must be "
+                "True: the draft and its uploaded file are what the human "
+                "reviewed")
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("version_doi_reserved") is not True or \
+                source.get("concept_doi_displayed") is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} must record the "
+                "version DOI as reserved and the concept DOI as displayed")
+        if source.get("record_state") != _STAGE130_ZDHRC_RECORD_STATE:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} record_state must "
+                f"be {_STAGE130_ZDHRC_RECORD_STATE!r}, got "
+                f"{source.get('record_state')!r}")
+        if source.get("record_is_private_draft") is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} must record the "
+                "deposition as a private draft")
+
+    # (4) `access_right = open` is DRAFT metadata and is NOT evidence of
+    # current public availability. Refused explicitly on every surface, because
+    # this is the misreading that would put a false claim into the manuscript.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get(
+                "access_right_open_is_draft_metadata_not_public_availability"
+        ) is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} must state that "
+                "access_right = open is draft metadata and NOT evidence of "
+                "current public availability: an unsubmitted record is private "
+                "whatever its access_right says")
+        for key, expected in (("access_right", _STAGE130_ZDHRC_ACCESS_RIGHT),
+                              ("license", _STAGE130_ZDHRC_LICENSE),
+                              ("version", _STAGE130_ZDHRC_VERSION)):
+            if source.get(key) != expected:
+                raise HandoffError(
+                    f"Stage130 Zenodo draft human review {label} {key} must be "
+                    f"{expected!r}, got {source.get(key)!r}")
+
+    # (5) The identifiers -- including the concept DOI, recorded here for the
+    # first time. Both are RESERVED placeholders and neither may be described
+    # as registered, active or resolving.
+    for source, label in surfaces:
+        if source.get("deposition_id") != _STAGE130_ZDHRC_DEPOSITION_ID:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} deposition id "
+                f"must be {_STAGE130_ZDHRC_DEPOSITION_ID}")
+        if source.get("reserved_version_doi") != _STAGE130_ZDHRC_VERSION_DOI:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} "
+                f"reserved_version_doi must be {_STAGE130_ZDHRC_VERSION_DOI!r}")
+        if source.get("reserved_concept_doi") != _STAGE130_ZDHRC_CONCEPT_DOI:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} "
+                f"reserved_concept_doi must be {_STAGE130_ZDHRC_CONCEPT_DOI!r}")
+    if _STAGE130_ZDHRC_VERSION_DOI == _STAGE130_ZDHRC_CONCEPT_DOI:
+        raise HandoffError(
+            "the Stage130 Zenodo version DOI and concept DOI are different "
+            "identifiers and may not collapse into one")
+    if not _STAGE130_ZDHRC_VERSION_DOI.endswith(
+            str(_STAGE130_ZDHRC_DEPOSITION_ID)):
+        raise HandoffError(
+            "the Stage130 Zenodo version DOI must carry the deposition id")
+
+    # (6) The review MATRIX is complete. A partial review is not a review.
+    reviewed = decision.get("reviewed_items") or {}
+    if set(reviewed) != set(_STAGE130_ZDHRC_REVIEWED_ITEMS):
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must name exactly the reviewed "
+            f"items {sorted(_STAGE130_ZDHRC_REVIEWED_ITEMS)}, got "
+            f"{sorted(reviewed)}")
+    for item in _STAGE130_ZDHRC_REVIEWED_ITEMS:
+        if reviewed.get(item) is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review item {item!r} is not "
+                "recorded as reviewed; the matrix must be complete")
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("reviewed_item_count") != \
+                len(_STAGE130_ZDHRC_REVIEWED_ITEMS):
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} "
+                "reviewed_item_count disagrees with the matrix")
+        if source.get("reviewed_items_complete") is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} must record the "
+                "review matrix as complete")
+    if decision.get("human_review_performed_in_zenodo_preview") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must record that the review "
+            "happened in Zenodo Preview")
+
+    # (7) The NOTES correction. Both texts are pinned and re-hashed, the new one
+    # is the current live value, the old one stays historically correct and is
+    # superseded ONLY as the live value, and the pre-deposition notes inside the
+    # deposited ZIP are read back from the committed payload so the correction
+    # cannot be retroactively injected into immutable bytes.
+    notes = decision.get("notes_correction") or {}
+    if not notes:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must carry a notes_correction "
+            "record")
+    for key, expected_text, expected_sha, expected_bytes in (
+        ("historical_notes", _STAGE130_ZDHRC_HISTORICAL_NOTES,
+         _STAGE130_ZDHRC_HISTORICAL_NOTES_SHA256,
+         _STAGE130_ZDHRC_HISTORICAL_NOTES_BYTES),
+        ("authoritative_notes", _STAGE130_ZDHRC_LIVE_NOTES,
+         _STAGE130_ZDHRC_LIVE_NOTES_SHA256, _STAGE130_ZDHRC_LIVE_NOTES_BYTES),
+    ):
+        recorded_text = notes.get(f"{key}_text")
+        if recorded_text != expected_text:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {key}_text does not match "
+                "the pinned Notes value")
+        digest = hashlib.sha256(expected_text.encode("utf-8")).hexdigest()
+        if digest != expected_sha:
+            raise HandoffError(
+                f"the pinned Stage130 Zenodo {key} digest does not match the "
+                "recomputed hash of the pinned text")
+        if notes.get(f"{key}_sha256") != digest:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {key}_sha256 does not "
+                "match its own text")
+        if len(expected_text.encode("utf-8")) != expected_bytes or \
+                notes.get(f"{key}_utf8_bytes") != expected_bytes:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {key}_utf8_bytes must be "
+                f"{expected_bytes}")
+    if _STAGE130_ZDHRC_HISTORICAL_NOTES == _STAGE130_ZDHRC_LIVE_NOTES:
+        raise HandoffError(
+            "the historical and authoritative Stage130 Zenodo Notes values are "
+            "different texts and may not collapse into one")
+    if notes.get("authoritative_notes_is_the_current_live_value") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must record the corrected "
+            "Notes as the CURRENT live value")
+    if notes.get("historical_notes_is_the_current_live_value") is not False:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must NOT render the historical "
+            "Notes as the current live value")
+    if notes.get("historical_notes_remains_historically_correct") is not True \
+            or notes.get(
+                "historical_notes_superseded_only_as_the_current_live_value"
+            ) is not True:
+        raise HandoffError(
+            "the historical Stage130 Zenodo Notes value remains historically "
+            "correct for the deposition event and is superseded ONLY as the "
+            "current live value; it may not be erased or called wrong")
+    if notes.get(
+            "history_is_not_rewritten_to_pretend_the_new_notes_existed_at_"
+            "deposit_time") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must declare that history is "
+            "not rewritten to pretend the corrected Notes existed during the "
+            "original deposit operation")
+    if notes.get("edit_performed_by") != "human" or \
+            notes.get("edit_performed_by_programmer") is not False:
+        raise HandoffError(
+            "the Stage130 Zenodo Notes correction was performed by the HUMAN "
+            "through the Zenodo UI; the programmer edited nothing")
+    if notes.get("edit_scope") != "metadata_notes_field_only":
+        raise HandoffError(
+            "the Stage130 Zenodo Notes correction is metadata-only and must "
+            "say so")
+    if notes.get("files_changed_by_this_edit") != 0:
+        raise HandoffError(
+            "the Stage130 Zenodo Notes correction changed no file and must "
+            "record files_changed_by_this_edit = 0")
+    if notes.get("record_submitted_by_this_edit") is not False or \
+            notes.get("saved_state_after_this_edit") != "draft" or \
+            notes.get("record_state_after_this_edit") != \
+            _STAGE130_ZDHRC_RECORD_STATE:
+        raise HandoffError(
+            "the Stage130 Zenodo Notes correction was saved as a DRAFT and "
+            "submitted nothing; a saved draft is still a draft")
+    if notes.get("shorter_notes_is_not_a_lifecycle_change") is not True or \
+            not notes.get(
+                "why_removing_the_unpublished_sentence_published_nothing"):
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must refuse, explicitly, the "
+            "reading that dropping the word 'unpublished' from a Notes field "
+            "published the record")
+    for field in ("why_the_authoritative_text_is_publication_stable",
+                  "why_the_historical_text_was_not_publication_stable"):
+        if not notes.get(field):
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review notes_correction must "
+                f"explain, in words, {field}")
+    if notes.get("authoritative_notes_are_publication_stable") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must record the corrected "
+            "Notes as publication-stable")
+    if notes.get("authoritative_notes_pins_archive_sha256") != \
+            _STAGE130_ZDD_SHA256 or \
+            notes.get("authoritative_notes_pins_archive_size_bytes") != \
+            _STAGE130_ZDD_BYTES:
+        raise HandoffError(
+            "the corrected Stage130 Zenodo Notes pins the deposited archive's "
+            "digest and size, and those must equal the recorded ones")
+    if _STAGE130_ZDD_SHA256 not in _STAGE130_ZDHRC_LIVE_NOTES or \
+            "11,824,690" not in _STAGE130_ZDHRC_LIVE_NOTES:
+        raise HandoffError(
+            "the corrected Stage130 Zenodo Notes text must itself carry the "
+            "archive SHA-256 and the exact archive size")
+    for source, label in surfaces:
+        if "stage130_zenodo_live_notes_sha256" in source and \
+                source.get("stage130_zenodo_live_notes_sha256") != \
+                _STAGE130_ZDHRC_LIVE_NOTES_SHA256:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} "
+                "stage130_zenodo_live_notes_sha256 must be "
+                f"{_STAGE130_ZDHRC_LIVE_NOTES_SHA256}")
+
+    # ...and the THIRD notes string: the pre-deposition one frozen inside the
+    # deposited ZIP. It is read back from the committed payload, so a later
+    # "tidy-up" that injects the live correction into immutable bytes fails.
+    if notes.get("embedded_zip_candidate_metadata_notes_text") != \
+            _STAGE130_ZDHRC_EMBEDDED_NOTES:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must record the "
+            "pre-deposition notes embedded in the deposited archive verbatim")
+    if notes.get("embedded_zip_candidate_metadata_modified") is not False or \
+            notes.get(
+                "embedded_zip_candidate_metadata_notes_is_a_pre_deposition_"
+                "artifact") is not True:
+        raise HandoffError(
+            "the candidate metadata embedded in the deposited archive is a "
+            "pre-deposition artifact and was NOT modified by this action")
+    if notes.get(
+            "correction_is_an_external_metadata_event_not_an_archive_change"
+    ) is not True:
+        raise HandoffError(
+            "the Stage130 Zenodo Notes correction is an EXTERNAL metadata "
+            "event on the record, not a change to the deposited archive")
+    embedded_rel = notes.get("embedded_zip_candidate_metadata_path")
+    if embedded_rel != _STAGE130_ZDHRC_EMBEDDED_METADATA_REL:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must name "
+            f"{_STAGE130_ZDHRC_EMBEDDED_METADATA_REL} as the embedded "
+            "pre-deposition candidate metadata")
+    embedded = _require_json_artifact(root, embedded_rel)
+    embedded_notes = (embedded.get("metadata") or {}).get("notes")
+    if embedded_notes != _STAGE130_ZDHRC_EMBEDDED_NOTES:
+        raise HandoffError(
+            "the pre-deposition notes inside the released candidate metadata "
+            f"have changed (found {embedded_notes!r}). The deposited archive is "
+            "immutable for this action and the later live Notes correction is "
+            "NOT retroactively injected into it.")
+    if embedded_notes == _STAGE130_ZDHRC_LIVE_NOTES:
+        raise HandoffError(
+            "the embedded pre-deposition notes may not be rewritten to the "
+            "current live Notes value")
+
+    # (8) The deposited BYTES did not move. Anchored on the committed rc.3
+    # metadata, and re-hashed locally when the gitignored archive is present.
+    rc_metadata = _require_json_artifact(
+        root,
+        f"{_STAGE130_RC_PKG}/"
+        "metadata_and_hashes_stage130_dataset_release_candidate.json")
+    if rc_metadata.get("archive_name") != _STAGE130_ZDD_FILENAME or \
+            rc_metadata.get("archive_sha256") != _STAGE130_ZDD_SHA256 or \
+            rc_metadata.get("archive_size_bytes") != _STAGE130_ZDD_BYTES:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review: the Release Candidate archive "
+            "name/digest/size no longer equals the deposited one. Reviewing a "
+            "draft rebuilds nothing; the record may not float free of the "
+            "candidate it deposited.")
+    deposited = decision.get("deposited_file") or {}
+    for key, expected in (("filename", _STAGE130_ZDD_FILENAME),
+                          ("sha256", _STAGE130_ZDD_SHA256),
+                          ("md5", _STAGE130_ZDD_MD5),
+                          ("size_bytes", _STAGE130_ZDD_BYTES)):
+        if deposited.get(key) != expected:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review deposited_file {key} must "
+                f"be {expected!r}, got {deposited.get(key)!r}")
+    for source, label in ((boundary, "boundary"), (metadata, "metadata")):
+        for key, expected in (
+                ("deposited_file_name", _STAGE130_ZDD_FILENAME),
+                ("deposited_file_sha256", _STAGE130_ZDD_SHA256),
+                ("deposited_file_md5", _STAGE130_ZDD_MD5),
+                ("deposited_file_size_bytes", _STAGE130_ZDD_BYTES)):
+            if source.get(key) != expected:
+                raise HandoffError(
+                    f"Stage130 Zenodo draft human review {label} {key} must be "
+                    f"{expected!r}")
+    if decision.get("deposited_file_is_the_recorded_release_candidate") \
+            is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must record that the deposited "
+            "file is the documented Release Candidate")
+    archive_path = os.path.join(root, _STAGE130_ZDD_ARCHIVE_REL)
+    if os.path.isfile(archive_path):
+        with open(archive_path, "rb") as fh:
+            payload = fh.read()
+        if hashlib.sha256(payload).hexdigest() != _STAGE130_ZDD_SHA256 or \
+                hashlib.md5(payload).hexdigest() != _STAGE130_ZDD_MD5 or \
+                len(payload) != _STAGE130_ZDD_BYTES:
+            raise HandoffError(
+                "Stage130 Zenodo draft human review: the local rc.3 archive no "
+                "longer matches the deposited digests. The file in Zenodo is "
+                "fixed; a review does not rebuild it, and the record may not "
+                "silently follow a different build.")
+
+    # (9) The MANUSCRIPT did not move. A reviewed draft with reserved DOIs is
+    # still not a public one, so the availability wording stays exactly as the
+    # human approved it, and the digests are re-derived rather than trusted.
+    manuscript_rel = boundary.get("reviewed_manuscript_path")
+    if manuscript_rel != _STAGE130_REVIEW_MANUSCRIPT_REL:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must name "
+            f"{_STAGE130_REVIEW_MANUSCRIPT_REL} as the untouched manuscript")
+    manuscript_path = os.path.join(root, manuscript_rel)
+    if not os.path.isfile(manuscript_path):
+        raise HandoffError(
+            "Stage130 Zenodo draft human review: the approved manuscript is "
+            "missing")
+    with open(manuscript_path, "rb") as fh:
+        manuscript_payload = fh.read()
+    manuscript_sha = hashlib.sha256(manuscript_payload).hexdigest()
+    manuscript_blob = _git_blob_id(manuscript_payload)
+    if boundary.get("reviewed_manuscript_sha256") != manuscript_sha or \
+            boundary.get("reviewed_manuscript_blob_id") != manuscript_blob:
+        raise HandoffError(
+            "the approved manuscript has changed: the Zenodo draft human "
+            f"review pins sha256 {boundary.get('reviewed_manuscript_sha256')!r}"
+            f" / blob {boundary.get('reviewed_manuscript_blob_id')!r} but the "
+            f"file is {manuscript_sha} / {manuscript_blob}. Reviewing a Zenodo "
+            "draft and correcting its Notes changes no manuscript byte; a "
+            "changed manuscript needs its own action and a fresh human review.")
+
+    # (10) HISTORY. The deposition package is byte-pinned, and its published
+    # markers are read back: the draft-state keys it owns must still be what
+    # they were, including its OWN pointer, which this action supersedes in the
+    # open rather than rewriting.
+    _stage130_zdhrc_assert_prior_package_intact(root)
+    prior = derive_stage130_zenodo_draft_deposition_markers(root)
+    if not prior:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review cannot be recorded without the "
+            "draft deposition it reviews")
+    for field in ("zenodo_deposition_created", "zenodo_upload_performed",
+                  "zenodo_doi_reserved"):
+        if prior.get(field) is not True:
+            raise HandoffError(
+                f"the Stage130 Zenodo draft-deposition record must keep "
+                f"publishing {field} = True")
+    for field in ("zenodo_published", "zenodo_record_submitted",
+                  "zenodo_doi_published", "zenodo_public_release",
+                  "public_release_authorized"):
+        if prior.get(field) is not False:
+            raise HandoffError(
+                f"the Stage130 Zenodo draft-deposition record must keep "
+                f"publishing {field} = False: a completed review and a "
+                "corrected Notes field publish nothing")
+    if prior.get("zenodo_doi") != _STAGE130_ZDHRC_VERSION_DOI:
+        raise HandoffError(
+            "the Stage130 Zenodo draft-deposition record must keep publishing "
+            f"the reserved version DOI {_STAGE130_ZDHRC_VERSION_DOI}")
+    if prior.get("next_research_action_id") != \
+            _STAGE130_ZDHRC_PREVIOUS_POINTER:
+        raise HandoffError(
+            "the Stage130 Zenodo draft-deposition record must keep pointing at "
+            f"{_STAGE130_ZDHRC_PREVIOUS_POINTER} (historical pointer)")
+
+    marker = decision.get("superseded_marker") or {}
+    if marker.get("key") != "next_research_action_id":
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must supersede "
+            "next_research_action_id")
+    if marker.get("previous_value") != _STAGE130_ZDHRC_PREVIOUS_POINTER or \
+            marker.get("resolved_value") != _STAGE130_ZDHRC_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review supersede must record the real "
+            f"prior pointer {_STAGE130_ZDHRC_PREVIOUS_POINTER} resolving to "
+            f"{_STAGE130_ZDHRC_NEXT_ACTION_ID}")
+    if marker.get("pointer_previous_value") != \
+            _STAGE130_ZDHRC_PREVIOUS_POINTER or \
+            marker.get("pointer_resolved_value") != \
+            _STAGE130_ZDHRC_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review supersede must record the "
+            f"pointer moving {_STAGE130_ZDHRC_PREVIOUS_POINTER} -> "
+            f"{_STAGE130_ZDHRC_NEXT_ACTION_ID}")
+    introduced = marker.get("newly_introduced_keys") or {}
+    expected_introduced = (
+        "stage130_zenodo_draft_human_review_completed",
+        "stage130_zenodo_draft_notes_correction_completed",
+        "stage130_zenodo_live_notes_are_publication_stable",
+    )
+    if set(introduced) != set(expected_introduced):
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must declare exactly the newly "
+            f"introduced keys {sorted(expected_introduced)}, got "
+            f"{sorted(introduced)}")
+    for key in expected_introduced:
+        entry = introduced.get(key) or {}
+        if entry.get("published_before_this_action") is not False or \
+                entry.get("resolved_value") is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review introduced key {key} must "
+                "record that it was not published before this action and "
+                "resolves to True")
+        for source, label in ((decision, "decision"), (boundary, "boundary")):
+            if source.get(key) is not True:
+                raise HandoffError(
+                    f"Stage130 Zenodo draft human review {label} {key} must be "
+                    "True")
+        if key in prior:
+            raise HandoffError(
+                f"{key} is published by the draft-deposition record, so it is "
+                "not newly introduced here; declare it as a supersede instead")
+    not_superseded = sorted(marker.get("keys_deliberately_not_superseded") or [])
+    if not_superseded != ["public_release_authorized", "zenodo_doi_published",
+                          "zenodo_published", "zenodo_record_submitted"]:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must declare zenodo_published, "
+            "zenodo_record_submitted, zenodo_doi_published and "
+            "public_release_authorized as deliberately NOT superseded: they "
+            "were false before the review and they are false after it")
+    if marker.get("historical_zenodo_draft_deposition_record_preserved") \
+            is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review supersede must declare the "
+            "historical draft-deposition record preserved")
+    for field in ("supersedes_pointer", "supersedes_artifact",
+                  "supersedes_previous_value"):
+        if not boundary.get(field):
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review boundary {field} is "
+                "required")
+    if boundary.get("supersedes_pointer") != _STAGE130_ZDHRC_PREVIOUS_POINTER:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review boundary must record the "
+            f"superseded pointer {_STAGE130_ZDHRC_PREVIOUS_POINTER}")
+
+    # (11) The PR stays an open Draft, the firewall is untouched, and every
+    # counter is zero -- recording two completed human events makes no call,
+    # rebuilds nothing and computes nothing.
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("pr_is_draft") is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} must keep the PR "
+                "a Draft")
+        if source.get("pr_number") != _STAGE130_ZDHRC_PR_NUMBER:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} PR number must be "
+                f"{_STAGE130_ZDHRC_PR_NUMBER}")
+    if boundary.get("final_test_locked") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must keep the Final Test "
+            "locked")
+    if boundary.get("final_test_rows_read") != 0:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review final_test_rows_read must be 0")
+    counters = boundary.get("counters") or {}
+    if not counters:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review boundary must carry counters")
+    for field, value in counters.items():
+        if value != 0:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review counters.{field} must be "
+                "0 (recording an already-completed human review and an "
+                "already-performed human metadata edit makes no Zenodo call, "
+                "rebuilds no archive and computes nothing)")
+    for required in ("zenodo_api_calls_made_by_this_action",
+                     "zenodo_publish_endpoint_calls",
+                     "zenodo_submit_endpoint_calls",
+                     "zenodo_metadata_write_calls_made_by_this_action",
+                     "zenodo_tokens_read_or_requested",
+                     "zenodo_browser_automation_sessions",
+                     "deposition_script_executions",
+                     "deposition_state_file_reads",
+                     "archive_rebuilds",
+                     "archive_uploads_or_replacements",
+                     "manuscript_bytes_changed",
+                     "prior_package_bytes_changed"):
+        if required not in counters:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review counters must publish "
+                f"{required}")
+
+    # (12) The live pointer moves -- to a HUMAN decision, as a POINTER.
+    if boundary.get("next_action_id") != _STAGE130_ZDHRC_NEXT_ACTION_ID:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review must advance the pointer to "
+            f"{_STAGE130_ZDHRC_NEXT_ACTION_ID}")
+    if boundary.get("next_action_id") == _STAGE130_ZDHRC_PREVIOUS_POINTER:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review may not keep pointing at the "
+            "draft review it has completed")
+    if boundary.get("next_action_scope") != _STAGE130_ZDHRC_NEXT_ACTION_SCOPE:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review next_action_scope must be "
+            f"{_STAGE130_ZDHRC_NEXT_ACTION_SCOPE}")
+    for source, label in ((decision, "decision"), (boundary, "boundary")):
+        if source.get("pointer_is_not_authorization") is not True:
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review {label} must declare the "
+                "pointer is not an authorization")
+    if boundary.get("next_action_is_a_human_step") is not True:
+        raise HandoffError(
+            "Stage130 Zenodo draft human review successor must be a HUMAN step")
+
+    # (13) The package inventory is real: every listed file exists and
+    # hashes to what is published, and nothing in the directory is
+    # unlisted. (Credential material was already refused, first of all.)
+    listed = metadata.get("package_files") or {}
+    if metadata.get("package_file_count") != len(listed):
+        raise HandoffError(
+            "Stage130 Zenodo draft human review metadata package_file_count "
+            "disagrees with the listed files")
+    pkg_dir = os.path.join(root, _STAGE130_ZDHRC_PKG)
+    on_disk = {
+        name for name in os.listdir(pkg_dir)
+        if os.path.isfile(os.path.join(pkg_dir, name))
+        and name != os.path.basename(_STAGE130_ZDHRC_METADATA_REL)
+    }
+    if on_disk != set(listed):
+        raise HandoffError(
+            "Stage130 Zenodo draft human review package inventory disagrees "
+            f"with the directory: listed {sorted(listed)}, on disk "
+            f"{sorted(on_disk)}")
+    for name, expected in sorted(listed.items()):
+        with open(os.path.join(pkg_dir, name), "rb") as fh:
+            payload = fh.read()
+        if hashlib.sha256(payload).hexdigest() != expected.get("sha256") or \
+                len(payload) != expected.get("bytes"):
+            raise HandoffError(
+                f"Stage130 Zenodo draft human review package file {name} does "
+                "not match its published size/SHA-256")
+    return {
+        "stage130_zenodo_draft_human_review_completion_recorded": True,
+        "stage130_zenodo_draft_human_review_completion_action_id":
+            _STAGE130_ZDHRC_ACTION_ID,
+        "stage130_zenodo_draft_human_review_completion_date_utc":
+            decision.get("human_review_date_utc"),
+
+        # THE three resolved markers this action owns.
+        "stage130_zenodo_draft_human_review_completed": True,
+        "stage130_zenodo_draft_notes_correction_completed": True,
+        "stage130_zenodo_live_notes_are_publication_stable": True,
+
+        # The draft itself -- unchanged by a review and by a metadata edit.
+        "zenodo_deposition_created": True,
+        "zenodo_upload_performed": True,
+        "zenodo_version_doi_reserved": True,
+        "zenodo_doi_reserved": True,
+        "zenodo_draft_exists": True,
+        "zenodo_concept_doi_displayed": True,
+        "zenodo_deposition_id": _STAGE130_ZDHRC_DEPOSITION_ID,
+        "zenodo_doi": _STAGE130_ZDHRC_VERSION_DOI,
+        "zenodo_version_doi": _STAGE130_ZDHRC_VERSION_DOI,
+        "zenodo_concept_doi": _STAGE130_ZDHRC_CONCEPT_DOI,
+        "zenodo_version": _STAGE130_ZDHRC_VERSION,
+        "zenodo_license": _STAGE130_ZDHRC_LICENSE,
+
+        # ...and everything that did NOT happen, restated so a consumer reading
+        # only this action cannot mistake a reviewed draft for a release.
+        "zenodo_record_submitted": False,
+        "zenodo_record_state": _STAGE130_ZDHRC_RECORD_STATE,
+        "zenodo_record_is_private_draft": True,
+        "zenodo_published": False,
+        "zenodo_doi_published": False,
+        "zenodo_doi_publicly_activated": False,
+        "zenodo_doi_registered_or_resolving": False,
+        "zenodo_public_release": False,
+        "public_release_authorized": False,
+        "zenodo_publication_authorized": False,
+        "zenodo_submission_authorized": False,
+        "zenodo_doi_activation_authorized": False,
+
+        # `access_right = open` is DRAFT metadata. Published beside an explicit
+        # refusal of the availability reading, on purpose.
+        "stage130_zenodo_access_right": _STAGE130_ZDHRC_ACCESS_RIGHT,
+        "stage130_zenodo_access_right_is_public_availability": False,
+        "stage130_zenodo_access_right_is_evidence_of_public_availability":
+            False,
+
+        # The review.
+        "stage130_zenodo_draft_reviewed_item_count":
+            len(_STAGE130_ZDHRC_REVIEWED_ITEMS),
+        "stage130_zenodo_draft_reviewed_items":
+            list(_STAGE130_ZDHRC_REVIEWED_ITEMS),
+        "stage130_zenodo_draft_review_matrix_complete": True,
+        "stage130_zenodo_draft_review_performed_in_zenodo_preview": True,
+
+        # The Notes correction: which text is live, which is history, and the
+        # pre-deposition string frozen inside the archive.
+        "stage130_zenodo_live_notes_sha256": _STAGE130_ZDHRC_LIVE_NOTES_SHA256,
+        "stage130_zenodo_live_notes_utf8_bytes": _STAGE130_ZDHRC_LIVE_NOTES_BYTES,
+        "stage130_zenodo_historical_notes_sha256":
+            _STAGE130_ZDHRC_HISTORICAL_NOTES_SHA256,
+        "stage130_zenodo_historical_notes_utf8_bytes":
+            _STAGE130_ZDHRC_HISTORICAL_NOTES_BYTES,
+        "stage130_zenodo_historical_notes_remains_historically_correct": True,
+        "stage130_zenodo_historical_notes_is_the_current_live_value": False,
+        "stage130_zenodo_notes_edit_performed_by": "human",
+        "stage130_zenodo_notes_edit_scope": "metadata_notes_field_only",
+        "stage130_zenodo_notes_edit_saved_state": "draft",
+        "stage130_zenodo_embedded_candidate_notes_sha256":
+            hashlib.sha256(
+                _STAGE130_ZDHRC_EMBEDDED_NOTES.encode("utf-8")).hexdigest(),
+        "stage130_zenodo_embedded_candidate_metadata_modified": False,
+        "stage130_zenodo_archive_modified_by_this_action": False,
+        "stage130_zenodo_archive_re_uploaded_by_this_action": False,
+
+        # Provenance, both halves.
+        "stage130_zenodo_review_facts_supplied_by": "human",
+        "stage130_zenodo_human_visual_review_completed": True,
+        "stage130_zenodo_human_metadata_edit_performed": True,
+        "stage130_zenodo_independently_retrieved_by_programmer": False,
+        "stage130_zenodo_api_calls_made_by_this_action": 0,
+        "stage130_zenodo_api_called_by_this_action": False,
+        "stage130_zenodo_publish_endpoint_called": False,
+        "stage130_zenodo_script_re_executed_by_this_action": False,
+        "stage130_zenodo_token_read_or_requested": False,
+        "stage130_zenodo_opened_by_automation_in_this_action": False,
+        "stage130_zenodo_state_file_committed_to_git": False,
+        "stage130_zenodo_state_file_existence_tested_only": True,
+        "stage130_zenodo_credentials_committed_to_git": False,
+        "stage130_zenodo_authorization_verbatim_sha256":
+            _STAGE130_ZDHRC_AUTHORIZATION_SHA256,
+        "stage130_zenodo_authorization_verbatim_utf8_bytes":
+            _STAGE130_ZDHRC_AUTHORIZATION_BYTES,
+        "stage130_zenodo_review_recording_is_not_retroactive_authorization":
+            True,
+        "stage130_zenodo_draft_deposition_record_preserved": True,
+        "stage130_zenodo_supersedes_pointer": _STAGE130_ZDHRC_PREVIOUS_POINTER,
+
+        # ...and what a reviewed, re-noted draft is still NOT.
+        "stage130_manuscript_modified_by_this_action": False,
+        "stage130_manuscript_availability_claim_changed": False,
+        "stage130_manuscript_requires_post_doi_metadata_update": True,
+        "stage130_manuscript_requires_post_doi_human_review": True,
+        "stage130_phase2_submission_ready": False,
+        "stage130_phase2_ready_for_review_authorized": False,
+        "stage130_phase2_merge_authorized": False,
+        "stage130_pr_ready": False,
+        "stage130_pr_merged": False,
+        "stage130_authorized": False,
+        "stage130_phase2_scientific_execution_started": False,
+        "stage130_scientific_execution_started": False,
+        "stage130_phase2_final_test_rows_read": 0,
+        "stage130_phase2_prediction_artifact_opened": False,
+
+        # The live pointer. The predecessor named review AND decision; the
+        # review is done, so the successor names only the decision. It is a
+        # POINTER: nothing here is authorized.
+        "last_completed_research_action_id": _STAGE130_ZDHRC_ACTION_ID,
+        "stage130_phase2_next_action_id": _STAGE130_ZDHRC_NEXT_ACTION_ID,
+        "stage130_phase2_next_action_authorized": False,
+        "next_research_action_id": _STAGE130_ZDHRC_NEXT_ACTION_ID,
+        "next_research_action_scope": _STAGE130_ZDHRC_NEXT_ACTION_SCOPE,
+        "next_research_action_authorized": False,
+        "next_research_action_pointer_is_not_authorization": True,
+    }
+
 
 
 #: The evidence-capture PR, merged into main and now the predecessor context.

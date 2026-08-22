@@ -35,6 +35,30 @@ FORBIDDEN_SOURCES = [
 
 LEGACY_TREE = "project/outputs/09_report"
 
+#: The exact manuscript title. It names the data contribution and the
+#: leakage constraint, and it deliberately claims no verified filing dates.
+EXACT_TITLE = (
+    "# Auditable Data Construction and Incremental Information in "
+    "Financial-Distress Prediction: Leakage-Constrained Evidence from the "
+    "Tehran Stock Exchange")
+
+#: The committed upstream construction records. Aggregate QC and provenance
+#: only: no row of the financial panel is opened by this script.
+STAGE121_QC = ("project/raw_handoff/"
+               "financial_distress_programmer_handoff_stage121(1)/"
+               "qc_report_stage121.json")
+STAGE122_QC = "project/stage122/stage122_qc_report.json"
+TABLE9 = "table_9_data_construction_and_qc.csv"
+
+#: Upstream-panel counts. Each belongs to the source panel or to the target QC
+#: over it, and none of them describes a modelling or Final Test population, so
+#: none may appear in the Final Test results section.
+PANEL_ONLY_FIGURES = ("1,331", "1,312", "1,311", "1,303", "1,205")
+
+#: Exactly seven keywords, including the two that carry the data contribution.
+KEYWORD_COUNT = 7
+REQUIRED_KEYWORDS = ("data provenance", "reproducible research")
+
 # Prose names used in the manuscript for the locked machine term names. The
 # manuscript must name every continuous term and must keep the locked order
 # within each sign group.
@@ -94,6 +118,16 @@ PROHIBITED_PHRASES = [
     "all tests pass",
     "verified point-in-time availability",
     "observed filing date",
+    # Data-contribution overclaims. Quality is demonstrated by the committed
+    # checks and their exact results, never asserted as a blanket property,
+    # and neither provenance nor availability is complete for every row.
+    "high-quality dataset",
+    "high quality dataset",
+    "fully point-in-time verified",
+    "complete row-level provenance",
+    "all observations fully traceable",
+    "open dataset",
+    "open benchmark",
 ]
 
 #: Overclaiming that must not survive anywhere, in any form. Unlike
@@ -166,6 +200,18 @@ def section(text: str, heading: str) -> str:
     rest = text[start + len(heading):]
     nxt = rest.find("\n## ")
     return rest if nxt == -1 else rest[:nxt]
+
+
+#: A thousands separator is display formatting, not part of the number. The
+#: manuscript writes 1,331 where the committed record writes 1331; without
+#: this the scan would read "1" and "331" and report a phantom untraceable
+#: value. Applied to the manuscript body only -- inside a CSV source a comma
+#: between digits is a field separator, and stripping it would fuse two cells.
+THOUSANDS_SEP_RE = re.compile(r"(?<=\d),(?=\d{3}(?!\d))")
+
+
+def strip_thousands(text: str) -> str:
+    return THOUSANDS_SEP_RE.sub("", text)
 
 
 def allowed_numeric_tokens() -> set[str]:
@@ -317,6 +363,7 @@ def main() -> int:
     body = re.sub(r"^#+ .*$", "", body, flags=re.M)          # drop headings
     body = re.sub(r"`[^`]*`", "", body)                       # drop inline code / paths
     body = re.sub(r"\[@[^\]]+\]", "", body)                   # drop citations
+    body = strip_thousands(body)                              # 1,331 -> 1331
     untraceable = []
     for tok in re.findall(r"\d+(?:\.\d+)?", body):
         if tok in allowed:
@@ -351,8 +398,19 @@ def main() -> int:
     words = len(abstract.replace("**", "").split())
     check(f"abstract is {ABSTRACT_MIN}-{ABSTRACT_MAX} words",
           ABSTRACT_MIN <= words <= ABSTRACT_MAX, f"{words} words")
-    keywords = [k for k in section(draft, "## Keywords").split(";") if k.strip()]
-    check("5-8 keywords", 5 <= len(keywords) <= 8, str(len(keywords)))
+    keywords = [k.strip() for k in section(draft, "## Keywords").split(";")
+                if k.strip()]
+    check(f"exactly {KEYWORD_COUNT} keywords",
+          len(keywords) == KEYWORD_COUNT, str(len(keywords)))
+    for required in REQUIRED_KEYWORDS:
+        check(f"keyword list carries the data contribution: {required!r}",
+              required in keywords, str(keywords))
+
+    # --- the title is exact ------------------------------------------------
+    check("manuscript title is exact", draft.startswith(EXACT_TITLE + "\n"),
+          draft.splitlines()[0] if draft else "")
+    check("the title claims no verified filing dates",
+          "point-in-time" not in EXACT_TITLE.lower())
 
     # --- overclaiming removed, restrained framing present ------------------
     for phrase in BANNED_OUTRIGHT:
@@ -463,6 +521,103 @@ def main() -> int:
         check(f"human-only placeholder present: {item}", item in draft)
     check("placeholders are marked, not invented",
           draft.count("*[TO BE COMPLETED") >= 6)
+
+    # --- data construction and QC evidence agrees with its sources --------
+    qc121 = json.loads((ROOT.parent / STAGE121_QC).read_text(encoding="utf-8"))
+    qc122 = json.loads((ROOT.parent / STAGE122_QC).read_text(encoding="utf-8"))
+    t9 = {r["item"]: r for r in csv.DictReader(
+        (TABLES / TABLE9).open(encoding="utf-8"))}
+    structural = qc121["structural_checks"]
+    identity = qc121["accounting_identity"]
+
+    expected = {
+        "source_panel_rows": str(qc121["source_dimensions"]["rows"]),
+        "source_panel_companies": str(qc122["n_companies_before"]),
+        "unique_row_keys": str(structural["unique_key_count"]),
+        "duplicate_row_keys": str(structural["duplicate_key_count"]),
+        "missing_row_keys": str(structural["missing_key_count"]),
+        "accounting_identity_rows_checked": str(identity["rows_checked"]),
+        "accounting_identity_exact_matches": str(identity["exact_matches"]),
+        "accounting_identity_within_recorded_tolerance": str(
+            identity["rounding_tolerance_matches_abs_diff_le_1_million_irr"]),
+        "accounting_identity_failures": str(len(identity["failures"])),
+        "target_state_positive": str(qc122["target_counts"]["1"]),
+        "target_state_negative": str(qc122["target_counts"]["0"]),
+        "target_state_unknown": str(qc122["target_counts"]["missing"]),
+        "source_file_provenance_present": str(
+            qc122["eligibility_counts"]["eligible_source_quality"]),
+        "source_file_provenance_absent": str(
+            qc122["exclusion_reason_counts_row"]["source_not_traceable"]),
+        "one_year_ahead_pairs_total": str(qc122["pairs_total"]),
+        "one_year_ahead_pairs_final_eligible": str(qc122["pairs_final_eligible"]),
+    }
+    for item, want in expected.items():
+        check(f"table 9 copies its source verbatim: {item}",
+              item in t9 and t9[item]["committed_result"] == want,
+              f"{t9.get(item, {}).get('committed_result')!r} != {want!r}")
+    for item, row in t9.items():
+        check(f"table 9 row names a scope: {item}", bool(row["scope"].strip()))
+        check(f"table 9 row carries a mandatory limitation: {item}",
+              bool(row["mandatory_limitation"].strip()))
+        check(f"table 9 row names a canonical source: {item}",
+              bool(row["canonical_source"].strip()))
+    for family, checkrec in qc121["ratio_recalculation_checks"].items():
+        item = f"ratio_recalculation_{family}"
+        want = (f"checked={checkrec['checked']}; "
+                f"mismatches={checkrec['mismatches']}")
+        check(f"table 9 copies the ratio check verbatim: {family}",
+              item in t9 and t9[item]["committed_result"] == want,
+              f"{t9.get(item, {}).get('committed_result')!r} != {want!r}")
+        check(f"the committed ratio recalculation reports no mismatch: {family}",
+              checkrec["mismatches"] == 0, str(checkrec["mismatches"]))
+
+    # --- claim freeze C12 and table 9 agree -------------------------------
+    freeze_text = (PKG / "manuscript_claim_freeze.md").read_text(encoding="utf-8")
+    check("claim freeze carries a C12 data-construction section",
+          "## C12 — Data construction and QC" in freeze_text)
+    c12 = freeze_text[freeze_text.index("## C12"):]
+    c12 = c12[: c12.index("\n---")] if "\n---" in c12 else c12
+    check("C12 is classified as descriptive provenance, not a result",
+          "not a result" in c12 and "descriptive" in c12.lower())
+    check("C12 names table 9 as its display surface", TABLE9 in c12)
+    for item in ("source_panel_rows", "source_panel_companies",
+                 "accounting_identity_rows_checked",
+                 "accounting_identity_exact_matches",
+                 "source_file_provenance_present",
+                 "source_file_provenance_absent",
+                 "target_state_positive", "target_state_negative",
+                 "target_state_unknown"):
+        check(f"C12 states the same committed value as table 9: {item}",
+              t9[item]["committed_result"] in c12,
+              t9[item]["committed_result"])
+
+    # --- the upstream figures are scoped, never presented as a cohort -----
+    results = section(draft, "## 10. Locked Final Test Results")
+    for figure in PANEL_ONLY_FIGURES:
+        check(f"upstream-panel figure {figure} never appears in the Final Test "
+              "results section", figure not in results)
+    check("the panel figures are stated with their upstream scope",
+          "1,331 firm-year rows for 130 companies" in draft)
+    check("the four populations are kept distinct",
+          "Four populations are used in this study and must be kept distinct"
+          in draft)
+
+    # --- the exact QC results appear in the manuscript --------------------
+    data_section = section(draft, "## 4. Data and Sample")
+    for phrase in (
+            "1,312 rows for which it was evaluable",
+            "1,311 rows reconciled exactly",
+            "within the recorded tolerance of 1 million IRR",
+            "none failed",
+            "zero mismatches",
+            "1,303 of the 1,331 rows and is absent for 28"):
+        check(f"Data and Sample states the committed QC result: {phrase!r}",
+              phrase in data_section)
+    check("the 28 rows without source-file provenance are not concealed",
+          "absent for 28" in low and "provenance gap" in low)
+    check("the provenance gap is repeated in the Discussion boundary",
+          "1,303 of the 1,331 rows and absent for 28"
+          in section(draft, "## 12. Discussion"))
 
     # --- Jalali labels are kept and explained, never converted -------------
     check("Jalali year labels are retained", "1393" in draft and "1400" in draft)

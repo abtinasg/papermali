@@ -869,7 +869,7 @@ def test_roadmap_records_the_audit_without_opening_a_new_stage(
     assert fm["final_model_eligibility_audit_candidate_count"] == "6"
     assert fm["final_model_eligibility_audit_next_action_authorized"] == "false"
     # no live pointer chain moves
-    assert fm["next_research_action_id"] == "human-manuscript-review"
+    assert fm["next_research_action_id"] == "human-zenodo-publication-decision"
     assert fm["m3_cbi_next_action_id"] == "human_decision_required"
     assert fm["m4_next_action_id"] == "human_decision_required"
     assert fm["m3_lag_wdi_next_action_id"] == "human_decision_required"

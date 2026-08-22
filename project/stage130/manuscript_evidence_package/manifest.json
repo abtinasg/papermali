@@ -12,7 +12,11 @@
     "locked_preprocessing": "project/stage129/full_development_refit_execution/stage129_full_development_refit_preprocessing_parameters.json",
     "outcome_definition": "project/stage122/target_definition_stage122.csv",
     "robustness_closure": "project/stage126/stage126_m1_robustness_closure_synthesis_record.json",
-    "temporal_split_contract": "project/stage125/part4_temporal_split_contract_stage125.json"
+    "statistical_analysis_plan": "project/stage125/part4_statistical_analysis_plan_stage125.json",
+    "target_construction_qc": "project/stage122/stage122_qc_report.json",
+    "temporal_split_contract": "project/stage125/part4_temporal_split_contract_stage125.json",
+    "upstream_panel_qc": "project/raw_handoff/financial_distress_programmer_handoff_stage121(1)/qc_report_stage121.json",
+    "upstream_provenance_contract": "project/stage125/README_STAGE125_PART1_DATA_CONTRACT.md"
   },
   "base_commit": "02af8c56235f70f4ec45f0dad15e4ad3aebf7a21",
   "final_test_package_manifest_sha256_at_source": "0ac59f9bef0fc984b78b3398a8ffe022906a07953db236331c892b8d6b73c4c9",
@@ -31,16 +35,16 @@
   "p_values_computed": 0,
   "package_files": {
     "README.md": {
-      "bytes": 2990,
-      "sha256": "1ac8020ac9a68b9cf8b351969f7147c16a20af8ad361401418f5711275f35b2a"
+      "bytes": 3033,
+      "sha256": "96fabafc2725d81a8678ff0607d352d300d7b1f1acb8e584c1605c9ae7268751"
     },
     "legacy_outputs_supersession.md": {
       "bytes": 1942,
       "sha256": "8fb39d04c4d8790518f4ebe35288e6ced477303b376daa0e74cea77a52981d4d"
     },
     "manuscript_claim_freeze.md": {
-      "bytes": 11434,
-      "sha256": "7789874cda328b5a6c653915555c1e7bc8eb7bce034702349b687063b5b5de64"
+      "bytes": 14195,
+      "sha256": "2607811c34ee36891bce68484f3f86cd6254682324d1da9035604f6d9460131f"
     },
     "manuscript_figures/figure_1_study_timeline_and_leakage_safe_design.svg": {
       "bytes": 1940,
@@ -86,6 +90,10 @@
       "bytes": 1213,
       "sha256": "b2cd6082e2feebfc5f528df218c05e770b92c3f39192bcb9b833137d614b0a08"
     },
+    "manuscript_results_tables/table_9_data_construction_and_qc.csv": {
+      "bytes": 10239,
+      "sha256": "60c8a5ea03ccf49098e1ba1ef3a11b8d7aab1946b757ba90bc8aba0ff3ade70f"
+    },
     "table_model_coefficients_and_odds_ratios.csv": {
       "bytes": 3431,
       "sha256": "bc0c6495c6d0261f0b4ab7bc6498b8337f7b9df0b5a7b84753de8e8026832577"
@@ -101,7 +109,11 @@
   "ready_for_review_authorized": false,
   "shap_executions": 0,
   "source_sha256": {
+    "project/raw_handoff/financial_distress_programmer_handoff_stage121(1)/qc_report_stage121.json": "167e6922a03bba0f851e535d15bdae550da96f0fcaca1e40478a3f50305ba062",
+    "project/stage122/stage122_qc_report.json": "4e637d936c118e2a42a82432d5993428c368bf4c3fb44ce7d370f826cb0ee16a",
     "project/stage122/target_definition_stage122.csv": "573bc1e47bef8b9e48b11acd1bf87b7fc89ea22b926b2add94da67b9f95abb98",
+    "project/stage125/README_STAGE125_PART1_DATA_CONTRACT.md": "34fc241c4e9cc99983a5e05b8468f12bd1cde1c18b0318b158ac10285a481c2b",
+    "project/stage125/part4_statistical_analysis_plan_stage125.json": "8763bc094561ce63da2f9f621b8278a1c9836c8cbc2aeaace934e439d6e79d6e",
     "project/stage125/part4_temporal_split_contract_stage125.json": "3f6ff8c7adf77295e558045e5bcaa391b5d2c10e7be0a89aeb0c8ac2dd0463b9",
     "project/stage126/stage126_m1_development_metrics.csv": "1c5f33b4e3a156b111d29a2c4e13ecee9c5e7ad73f6b3d98cf3c6b4b506be17a",
     "project/stage126/stage126_m1_robustness_closure_synthesis_record.json": "fdf8c585e6f4c38a066feec6f90094a2b6d50867ffac290195f40b9ce616846a",

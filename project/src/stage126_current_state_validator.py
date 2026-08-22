@@ -413,6 +413,28 @@ STAGE128_CURRENT_STAGE = "Stage128"
 STAGE130_P2_MANUSCRIPT_REL = "project/stage130/manuscript/manuscript_draft_en.md"
 STAGE130_P2_CURRENT_STAGE = "Stage130"
 STAGE130_P2_ACTIVE_WORKSTREAM = "stage130_phase2_manuscript_assembly_human_review"
+#: Once the human review that label names is COMPLETE, the "…_human_review"
+#: workstream is itself stale. The successor names what is actually pending --
+#: the human-supplied submission metadata. It is a STATE DESCRIPTION only and
+#: never an authorization: the metadata action stays unauthorized.
+STAGE130_REVIEW_COMPLETION_DECISION_REL = (
+    "project/stage130/manuscript_human_review_completion/"
+    "stage130_manuscript_human_review_completion_decision.json")
+STAGE130_REVIEW_COMPLETION_ACTION_ID = (
+    "stage130-manuscript-human-review-completion")
+STAGE130_SUBMISSION_METADATA_ACTIVE_WORKSTREAM = (
+    "stage130_phase2_manuscript_submission_metadata")
+#: ...and once a deterministic Zenodo dataset Release Candidate is prepared and
+#: waiting on a human digest review, the submission-metadata label is itself
+#: stale as the CURRENT value. The metadata is still outstanding underneath —
+#: preparing a dataset candidate supplies none of it — and the label is a state
+#: description, never a permission.
+STAGE130_RELEASE_CANDIDATE_DECISION_REL = (
+    "project/stage130/dataset_release_candidate/"
+    "stage130_dataset_release_candidate_decision.json")
+STAGE130_RELEASE_CANDIDATE_ACTION_ID = "stage130-dataset-release-candidate"
+STAGE130_RELEASE_CANDIDATE_ACTIVE_WORKSTREAM = (
+    "stage130_dataset_release_candidate_review")
 NEXT_RESEARCH_ACTION_ID = "stage126-m1-financial-baseline"
 # Once all six registered M1 robustness categories are complete (Part 6
 # closes the set), the next legitimate ROADMAP research action advances to
@@ -525,6 +547,38 @@ def stage130_phase2_manuscript_committed(repo_root: Path) -> bool:
     scientific state: it admits nothing and computes nothing.
     """
     return (repo_root / STAGE130_P2_MANUSCRIPT_REL).is_file()
+
+
+def stage130_human_review_completed(repo_root: Path) -> bool:
+    """True once the human manuscript review is recorded as COMPLETE.
+
+    Fail-closed, and deliberately narrow: a completed review moves the live
+    workstream LABEL and nothing else. This recognizer refuses any decision
+    that tries to turn a content approval into submission readiness,
+    Ready-for-Review or merge authorization, so the label can never be reached
+    by an artifact that also claims a permission.
+    """
+    path = repo_root / STAGE130_REVIEW_COMPLETION_DECISION_REL
+    if not path.is_file():
+        return False
+    decision = json.loads(path.read_text(encoding="utf-8"))
+    if decision.get("decision_id") != STAGE130_REVIEW_COMPLETION_ACTION_ID:
+        raise ValidationFail(
+            "stage130 human-review completion decision_id mismatch")
+    for field, expected in (
+        ("human_review_completed", True),
+        ("human_review_required_after_this_decision", False),
+        ("manuscript_modified_by_this_decision", False),
+        ("submission_ready", False),
+        ("ready_for_review_authorized", False),
+        ("merge_authorized", False),
+        ("approval_is_submission_authorization", False),
+    ):
+        if decision.get(field) is not expected:
+            raise ValidationFail(
+                f"stage130 human-review completion {field}="
+                f"{decision.get(field)!r} != {expected!r}")
+    return True
 
 
 def stage128_m2_d2_design_freeze_completed(repo_root: Path) -> bool:
@@ -2184,7 +2238,9 @@ def m3_gate_state_is_self_consistent(
             STAGE128_M3_ACTIVE_WORKSTREAM, STAGE128_M3I2_ACTIVE_WORKSTREAM,
             STAGE128_M3I2_EVIDENCE_ACTIVE_WORKSTREAM,
             STAGE128_M3I2_RECOVERY_ACTIVE_WORKSTREAM,
-            STAGE130_P2_ACTIVE_WORKSTREAM)
+            STAGE130_P2_ACTIVE_WORKSTREAM,
+            STAGE130_SUBMISSION_METADATA_ACTIVE_WORKSTREAM,
+            STAGE130_RELEASE_CANDIDATE_ACTIVE_WORKSTREAM)
         and handoff.get("m3_modeling_started") is False
         and handoff.get("m3_incremental_evaluation_authorized") is False
         and handoff.get("m3_block_admitted_for_incremental_evaluation") is False
@@ -2192,6 +2248,32 @@ def m3_gate_state_is_self_consistent(
             "PASS_FOR_M3_INCREMENTAL_EVALUATION", "FAIL_M3_DATA_GATE",
             "UNRESOLVED_M3_DATA_GATE")
     )
+
+
+def stage130_dataset_release_candidate_prepared(repo_root: Path) -> bool:
+    """True iff a prepared, unpublished Zenodo dataset Release Candidate exists.
+
+    Derived from the committed decision record, independently of the Handoff it
+    validates. Fail-closed: a record that claims a deposition, an upload, a DOI
+    or a publication is not a prepared candidate — it is a contradiction, and
+    this refuses it rather than accepting the label.
+    """
+    path = repo_root / STAGE130_RELEASE_CANDIDATE_DECISION_REL
+    if not path.is_file():
+        return False
+    decision = json.loads(path.read_text(encoding="utf-8"))
+    if decision.get("decision_id") != STAGE130_RELEASE_CANDIDATE_ACTION_ID:
+        raise ValidationFail(
+            "stage130 dataset Release Candidate decision_id mismatch")
+    for field in ("zenodo_deposition_created", "zenodo_upload_performed",
+                  "zenodo_doi_reserved", "zenodo_published",
+                  "public_release_authorized"):
+        if decision.get(field) is not False:
+            raise ValidationFail(
+                f"stage130 dataset Release Candidate {field}="
+                f"{decision.get(field)!r} — a PREPARED candidate has reached "
+                "Zenodo in no way at all")
+    return True
 
 
 def expected_active_workstream(repo_root: Path) -> str:
@@ -2203,6 +2285,10 @@ def expected_active_workstream(repo_root: Path) -> str:
     Stage128 M2 D2 one, not the Stage126 M1 financial baseline. The Stage126
     value remains correct history, but it is no longer the CURRENT value.
     """
+    if stage130_dataset_release_candidate_prepared(repo_root):
+        return STAGE130_RELEASE_CANDIDATE_ACTIVE_WORKSTREAM
+    if stage130_human_review_completed(repo_root):
+        return STAGE130_SUBMISSION_METADATA_ACTIVE_WORKSTREAM
     if stage130_phase2_manuscript_committed(repo_root):
         return STAGE130_P2_ACTIVE_WORKSTREAM
     if stage128_m3i2_final_documentary_recovery_initiated(repo_root):
@@ -2245,6 +2331,20 @@ def current_state_labels_are_not_stale(
     # legitimately advanced out of the Stage128 chain entirely. This guard
     # exists to refuse a STALE label, so it must recognize the successor rather
     # than pin Stage128 forever; the Stage128 values survive as history.
+    if handoff.get("stage130_dataset_release_candidate_recorded") is True:
+        # A prepared candidate is now what is pending, so the submission-
+        # metadata label is stale as the CURRENT value — the metadata itself
+        # is still outstanding and is published as such elsewhere.
+        return (handoff.get("current_stage") == STAGE130_P2_CURRENT_STAGE
+                and handoff.get("active_workstream")
+                == STAGE130_RELEASE_CANDIDATE_ACTIVE_WORKSTREAM)
+    if handoff.get(
+            "stage130_manuscript_human_review_completion_recorded") is True:
+        # The review the Phase 2 workstream named is done, so that label is
+        # stale in exactly the way this guard exists to refuse.
+        return (handoff.get("current_stage") == STAGE130_P2_CURRENT_STAGE
+                and handoff.get("active_workstream")
+                == STAGE130_SUBMISSION_METADATA_ACTIVE_WORKSTREAM)
     if handoff.get("stage130_phase2_recorded") is True:
         return (handoff.get("current_stage") == STAGE130_P2_CURRENT_STAGE
                 and handoff.get("active_workstream")

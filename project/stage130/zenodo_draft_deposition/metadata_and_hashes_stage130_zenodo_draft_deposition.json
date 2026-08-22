@@ -1,0 +1,47 @@
+{
+  "action_id": "stage130-zenodo-draft-deposition",
+  "action_type": "human_executed_zenodo_draft_deposition_recording_only",
+  "credentials_committed_to_git": false,
+  "deposited_file_md5": "cbd3df6c75053ee6d0641f19d5301d7a",
+  "deposited_file_name": "tse_financial_distress_dataset_1392_1402_release_candidate_rc3.zip",
+  "deposited_file_sha256": "4adb32bd675fd9181d8ced783b6734382e9749c6c574e35567d1bec65fd72f70",
+  "deposited_file_size_bytes": 11824690,
+  "deposition_id": 22059238,
+  "deposition_state_file_committed_to_git": false,
+  "doi_published": false,
+  "doi_registered_or_resolving": false,
+  "doi_reserved": true,
+  "final_test_artifacts_committed": 0,
+  "manuscript_files_modified_by_this_action": 0,
+  "model_artifacts_committed": 0,
+  "new_data_files_created_by_this_action": 0,
+  "package_file_count": 3,
+  "package_files": {
+    "README_STAGE130_ZENODO_DRAFT_DEPOSITION.md": {
+      "bytes": 6464,
+      "sha256": "fbfba50e6d4d1733cde04f4246a61417572fcf9b1a1d284748d09145d9fb09f5"
+    },
+    "stage130_zenodo_draft_deposition_decision.json": {
+      "bytes": 6524,
+      "sha256": "debaf29e0155516991c416eb7ad0361c3f7b7682957b47838392b292194d92c9"
+    },
+    "stage130_zenodo_draft_deposition_governance_boundary.json": {
+      "bytes": 4063,
+      "sha256": "287035a559397906e7f0a9e525cf9e929924b7f4a573a046a67e9b88ea0c1cfb"
+    }
+  },
+  "pii_committed_to_git": false,
+  "public_release": false,
+  "public_release_authorized": false,
+  "publication_authorized": false,
+  "record_is_private_draft": true,
+  "record_publicly_available": false,
+  "record_state": "unsubmitted",
+  "record_submitted": false,
+  "release_candidate_version": "1.0.0-rc.3",
+  "reserved_doi": "10.5281/zenodo.22059238",
+  "value_files_committed": 0,
+  "zenodo_deposition_created": true,
+  "zenodo_published": false,
+  "zenodo_upload_performed": true
+}

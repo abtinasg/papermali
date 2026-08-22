@@ -19,7 +19,7 @@ Presentation only. **No new scientific analysis was performed.**
 |---|---|
 | `manuscript_claim_freeze.md` | frozen claims: source, exact value, permissible wording, prohibited overclaim, mandatory limitation |
 | `table_model_coefficients_and_odds_ratios.csv` | canonical coefficient/OR table (18 terms + intercept) |
-| `manuscript_results_tables/` | eight deterministic tables: six result tables, one locked development-performance table and one definitional outcome table |
+| `manuscript_results_tables/` | nine deterministic tables: six result tables, one locked development-performance table, one definitional outcome table and one descriptive data-construction/QC table |
 | `manuscript_figures/` | three schematic figures (no performance curves) |
 | `legacy_outputs_supersession.md` | `project/outputs/09_report` marked LEGACY_STAGE123_NONCANONICAL_DO_NOT_CITE |
 | `manifest.json` | SHA-256 + byte count per file, and the authoritative source of every displayed value |
